@@ -23,7 +23,7 @@
  *              @...X   +4
  *
  */
-char circle_data[] = {
+const char circle_data[] = {
     /*  0*/ 1,  1,
     /*  2*/ 2,  2,  1,
     /*  5*/ 3,  3,  2,  1,
@@ -46,7 +46,7 @@ char circle_data[] = {
  * These are the starting indexes into the circle_data[] array for a
  * circle of a given radius.
  */
-char circle_start[] = {
+const char circle_start[] = {
     /*  */ 0, /* circles of radius zero are not used */
     /* 1*/ 0,
     /* 2*/ 2,
@@ -496,7 +496,7 @@ int control;
     char *old_row;     /* row pointer for the old array */
     char *next_rmin;   /* min pointer for the new array */
     char *next_rmax;   /* max pointer for the new array */
-    char *ranges;      /* circle ranges -- used for xray & night vision */
+    const char *ranges;      /* circle ranges -- used for xray & night vision */
     int row = 0;       /* row counter (outer loop)  */
     int start, stop;   /* inner loop starting/stopping index */
     int dx, dy;        /* one step from a lit door or lit wall (see below) */
@@ -1602,8 +1602,9 @@ static close2d *close_dy[CLOSE_MAX_BC_DY];
 static far2d *far_dy[FAR_MAX_BC_DY];
 
 STATIC_DCL void FDECL(right_side,  (int, int, int, int, int,
-                                    int, int, char *));
-STATIC_DCL void FDECL(left_side, (int, int, int, int, int, int, int, char *));
+                                    int, int, const char *));
+STATIC_DCL void FDECL(left_side, (int, int, int, int, int, int, int, 
+                                    const char *));
 STATIC_DCL int FDECL(close_shadow, (int, int, int, int));
 STATIC_DCL int FDECL(far_shadow, (int, int, int, int));
 
@@ -1994,7 +1995,7 @@ int cb_row, cb_col; /* close block row and col */
 int fb_row, fb_col; /* far block row and col */
 int left_mark;      /* left mark of previous row */
 int right;          /* right mark of the previous row */
-char *limits;
+const char *limits;
 {
     register int i;
     register char *rowp = NULL;
@@ -2285,8 +2286,8 @@ genericptr_t arg;
 /*
  * Defines local to Algorithm C.
  */
-STATIC_DCL void FDECL(right_side, (int, int, int, char *));
-STATIC_DCL void FDECL(left_side, (int, int, int, char *));
+STATIC_DCL void FDECL(right_side, (int, int, int, const char *));
+STATIC_DCL void FDECL(left_side, (int, int, int, const char *));
 
 /* Initialize algorithm C (nothing). */
 STATIC_OVL void
@@ -2303,7 +2304,7 @@ right_side(row, left, right_mark, limits)
 int row;        /* current row */
 int left;       /* first (left side) visible spot on prev row */
 int right_mark; /* last (right side) visible spot on prev row */
-char *limits;   /* points at range limit for current row, or NULL */
+const char *limits;   /* points at range limit for current row, or NULL */
 {
     int right;                  /* right limit of "could see" */
     int right_edge;             /* right edge of an opening */
@@ -2493,7 +2494,7 @@ char *limits;   /* points at range limit for current row, or NULL */
 STATIC_OVL void
 left_side(row, left_mark, right, limits)
 int row, left_mark, right;
-char *limits;
+const char *limits;
 {
     int left, left_edge, nrow, deeper, result;
     register int i;
@@ -2641,7 +2642,7 @@ genericptr_t arg;
     int nrow;       /* the next row */
     int left;       /* the left-most visible column */
     int right;      /* the right-most visible column */
-    char *limits;   /* range limit for next row */
+    const char *limits;   /* range limit for next row */
 
     /* Set globals for q?_path(), left_side(), and right_side() to use. */
     start_col = scol;
@@ -2745,7 +2746,7 @@ genericptr_t arg;
     } else {
         register int x;
         int y, min_x, max_x, max_y, offset;
-        char *limits;
+        const char *limits;
         boolean override_vision;
 
         /* vision doesn't pass through water or clouds, detection should

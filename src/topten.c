@@ -23,9 +23,6 @@
  * way to truncate it).  The trailing junk is harmless and the code
  * which reads the scores will ignore it.
  */
-#ifdef UPDATE_RECORD_IN_PLACE
-static long final_fpos;
-#endif
 
 #define done_stopprint g.program_state.stopprint
 
@@ -232,7 +229,7 @@ struct toptenentry *tt;
 
 #ifdef UPDATE_RECORD_IN_PLACE
     /* note: input below must read the record's terminating newline */
-    final_fpos = tt->fpos = ftell(rfile);
+    g.final_fpos = tt->fpos = ftell(rfile);
 #endif
 #define TTFIELDS 13
     if (fscanf(rfile, fmt, &tt->ver_major, &tt->ver_minor, &tt->patchlevel,
@@ -676,7 +673,7 @@ time_t when;
     }
     if (flg) { /* rewrite record file */
 #ifdef UPDATE_RECORD_IN_PLACE
-        (void) fseek(rfile, (t0->fpos >= 0 ? t0->fpos : final_fpos),
+        (void) fseek(rfile, (t0->fpos >= 0 ? t0->fpos : g.final_fpos),
                      SEEK_SET);
 #else
         (void) fclose(rfile);
