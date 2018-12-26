@@ -2087,7 +2087,7 @@ register struct obj *obj;
     char buf[BUFSZ];
 
     if (!g.current_container) {
-        impossible("<in> no current_container?");
+        impossible("<in> no g.current_container?");
         return 0;
     } else if (obj == uball || obj == uchain) {
         You("must be kidding.");
@@ -2142,7 +2142,7 @@ register struct obj *obj;
         || (obj->otyp == STATUE && bigmonst(&mons[obj->corpsenm]))) {
         /*
          *  xname() uses a static result array.  Save obj's name
-         *  before current_container's name is computed.  Don't
+         *  before g.current_container's name is computed.  Don't
          *  use the result of strcpy() within You() --- the order
          *  of evaluation of the parameters is undefined.
          */
@@ -2192,16 +2192,16 @@ register struct obj *obj;
            handle bill issues, but if on floor, we need to put them on bill
            before deleting them (non-shop items will be flagged 'no_charge') */
         if (floor_container
-            && costly_spot(current_container->ox, current_container->oy)) {
+            && costly_spot(g.current_container->ox, g.current_container->oy)) {
             struct obj save_no_charge;
 
-            save_no_charge.no_charge = current_container->no_charge;
-            addtobill(current_container, FALSE, FALSE, FALSE);
+            save_no_charge.no_charge = g.current_container->no_charge;
+            addtobill(g.current_container, FALSE, FALSE, FALSE);
             /* addtobill() clears no charge; we need to set it back
                so that useupf() doesn't double bill */
-            current_container->no_charge = save_no_charge.no_charge;
+            g.current_container->no_charge = save_no_charge.no_charge;
         }
-        delete_contents(current_container);
+        delete_contents(g.current_container);
         if (!floor_container)
             useup(g.current_container);
         else if (obj_here(g.current_container, u.ux, u.uy))
@@ -2254,7 +2254,7 @@ register struct obj *obj;
     long count;
 
     if (!g.current_container) {
-        impossible("<out> no current_container?");
+        impossible("<out> no g.current_container?");
         return -1;
     } else if (is_gold) {
         obj->owt = weight(obj);
