@@ -1660,17 +1660,17 @@ int spell;
 
     /* Calculate intrinsic ability (splcaster) */
 
-    splcaster = urole.spelbase;
-    special = urole.spelheal;
-    statused = ACURR(urole.spelstat);
+    splcaster = g.urole.spelbase;
+    special = g.urole.spelheal;
+    statused = ACURR(g.urole.spelstat);
 
     if (uarm && is_metallic(uarm))
-        splcaster += (uarmc && uarmc->otyp == ROBE) ? urole.spelarmr / 2
-                                                    : urole.spelarmr;
+        splcaster += (uarmc && uarmc->otyp == ROBE) ? g.urole.spelarmr / 2
+                                                    : g.urole.spelarmr;
     else if (uarmc && uarmc->otyp == ROBE)
-        splcaster -= urole.spelarmr;
+        splcaster -= g.urole.spelarmr;
     if (uarms)
-        splcaster += urole.spelshld;
+        splcaster += g.urole.spelshld;
 
     if (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE)
         splcaster += uarmhbon;
@@ -1679,8 +1679,8 @@ int spell;
     if (uarmf && is_metallic(uarmf))
         splcaster += uarmfbon;
 
-    if (spellid(spell) == urole.spelspec)
-        splcaster += urole.spelsbon;
+    if (spellid(spell) == g.urole.spelspec)
+        splcaster += g.urole.spelsbon;
 
     /* `healing spell' bonus */
     if (spellid(spell) == SPE_HEALING || spellid(spell) == SPE_EXTRA_HEALING
@@ -1738,7 +1738,7 @@ int spell;
      * player's role-specific spell.
      */
     if (uarms && weight(uarms) > (int) objects[SMALL_SHIELD].oc_weight) {
-        if (spellid(spell) == urole.spelspec) {
+        if (spellid(spell) == g.urole.spelspec) {
             chance /= 2;
         } else {
             chance /= 4;

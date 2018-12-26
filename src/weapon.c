@@ -1488,7 +1488,7 @@ const struct def_skill *class_skill;
         P_SKILL(P_BARE_HANDED_COMBAT) = P_BASIC;
 
     /* Roles that start with a horse know how to ride it */
-    if (urole.petnum == PM_PONY)
+    if (g.urole.petnum == PM_PONY)
         P_SKILL(P_RIDING) = P_BASIC;
 
     /*
@@ -1507,7 +1507,7 @@ const struct def_skill *class_skill;
 
     /* each role has a special spell; allow at least basic for its type
        (despite the function name, this works for spell skills too) */
-    unrestrict_weapon_skill(spell_skilltype(urole.spelspec));
+    unrestrict_weapon_skill(spell_skilltype(g.urole.spelspec));
 }
 
 void

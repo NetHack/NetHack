@@ -26,8 +26,6 @@ STATIC_OVL NEARDATA const char *breathwep[] = {
     "strange breath #9"
 };
 
-STATIC_VAR int mesg_given; /* for m_throw()/thitu() 'miss' message */
-
 /* hero is hit by something other than a monster */
 int
 thitu(tlev, dam, objp, name)
@@ -61,7 +59,7 @@ const char *name; /* if null, then format `*objp' */
     is_acid = (obj && obj->otyp == ACID_VENOM);
 
     if (u.uac + tlev <= (dieroll = rnd(20))) {
-        ++mesg_given;
+        ++g.mesg_given;
         if (Blind || !flags.verbose) {
             pline("It misses.");
         } else if (u.uac + tlev <= dieroll - 2) {
@@ -145,11 +143,6 @@ int x, y;
         obfree(obj, (struct obj *) 0);
     return retvalu;
 }
-
-/* The monster that's being shot at when one monster shoots at another */
-STATIC_OVL struct monst *target = 0;
-/* The monster that's doing the shooting/throwing */
-STATIC_OVL struct monst *archer = 0;
 
 /* calculate multishot volley count for mtmp throwing otmp (if not ammo) or
    shooting otmp with mwep (if otmp is ammo and mwep appropriate launcher) */
@@ -243,7 +236,7 @@ monshoot(mtmp, otmp, mwep)
 struct monst *mtmp;
 struct obj *otmp, *mwep;
 {
-    struct monst *mtarg = target;
+    struct monst *mtarg = g.mtarget;
     int dm = distmin(mtmp->mx, mtmp->my,
                      mtarg ? mtarg->mx : mtmp->mux,
                      mtarg ? mtarg->my : mtmp->muy),
@@ -309,7 +302,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
     int damage, tmp;
     boolean vis, ismimic;
     int objgone = 1;
-    struct obj *mon_launcher = archer ? MON_WEP(archer) : NULL;
+    struct obj *mon_launcher = g.marcher ? MON_WEP(g.marcher) : NULL;
 
     g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
     ismimic = mtmp->m_ap_type && mtmp->m_ap_type != M_AP_MONSTER;
@@ -319,9 +312,9 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
     /* High level monsters will be more likely to hit */
     /* This check applies only if this monster is the target
      * the archer was aiming at. */
-    if (archer && target == mtmp) {
-        if (archer->m_lev > 5)
-            tmp += archer->m_lev - 5;
+    if (g.marcher && g.mtarget == mtmp) {
+        if (g.marcher->m_lev > 5)
+            tmp += g.marcher->m_lev - 5;
         if (mon_launcher && mon_launcher->oartifact)
             tmp += spec_abon(mon_launcher, mtmp);
     }
@@ -329,7 +322,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         if (!ismimic) {
             if (vis)
                 miss(distant_name(otmp, mshot_xname), mtmp);
-            else if (verbose && !target)
+            else if (verbose && !g.mtarget)
                 pline("It is missed.");
         }
         if (!range) { /* Last position; object drops */
@@ -359,7 +352,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                       otmp->known ? an(mons[otmp->corpsenm].mname) : "an");
             else
                 hit(distant_name(otmp, mshot_xname), mtmp, exclam(damage));
-        } else if (verbose && !target)
+        } else if (verbose && !g.mtarget)
             pline("%s%s is hit%s", (otmp->otyp == EGG) ? "Splat!  " : "",
                   Monnam(mtmp), exclam(damage));
 
@@ -382,17 +375,17 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
             && mon_hates_silver(mtmp)) {
             if (vis)
                 pline_The("silver sears %s flesh!", s_suffix(mon_nam(mtmp)));
-            else if (verbose && !target)
+            else if (verbose && !g.mtarget)
                 pline("Its flesh is seared!");
         }
         if (otmp->otyp == ACID_VENOM && cansee(mtmp->mx, mtmp->my)) {
             if (resists_acid(mtmp)) {
-                if (vis || (verbose && !target))
+                if (vis || (verbose && !g.mtarget))
                     pline("%s is unaffected.", Monnam(mtmp));
             } else {
                 if (vis)
                     pline_The("%s burns %s!", hliquid("acid"), mon_nam(mtmp));
-                else if (verbose && !target)
+                else if (verbose && !g.mtarget)
                     pline("It is burned!");
             }
         }
@@ -406,7 +399,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         if (!DEADMONSTER(mtmp)) { /* might already be dead (if petrified) */
             mtmp->mhp -= damage;
             if (DEADMONSTER(mtmp)) {
-                if (vis || (verbose && !target))
+                if (vis || (verbose && !g.mtarget))
                     pline("%s is %s!", Monnam(mtmp),
                           (nonliving(mtmp->data) || is_vampshifter(mtmp)
                            || !canspotmon(mtmp)) ? "destroyed" : "killed");
@@ -524,7 +517,7 @@ struct obj *obj;         /* missile (or stack providing it) */
         (void) drop_throw(singleobj, 0, g.bhitpos.x, g.bhitpos.y);
         return;
     }
-    mesg_given = 0; /* a 'missile misses' message has not yet been shown */
+    g.mesg_given = 0; /* a 'missile misses' message has not yet been shown */
 
     /* Note: drop_throw may destroy singleobj.  Since obj must be destroyed
      * early to avoid the dagger bug, anyone who modifies this code should
@@ -654,9 +647,9 @@ struct obj *obj;         /* missile (or stack providing it) */
             || MT_FLIGHTCHECK(FALSE)) {
             if (singleobj) { /* hits_bars might have destroyed it */
                 if (g.m_shot.n > 1
-                    && (!mesg_given || g.bhitpos.x != u.ux || g.bhitpos.y != u.uy)
+                    && (!g.mesg_given || g.bhitpos.x != u.ux || g.bhitpos.y != u.uy)
                     && (cansee(g.bhitpos.x, g.bhitpos.y)
-                        || (archer && canseemon(archer))))
+                        || (g.marcher && canseemon(g.marcher))))
                     pline("%s misses.", The(mshot_xname(singleobj)));
                 (void) drop_throw(singleobj, 0, g.bhitpos.x, g.bhitpos.y);
             }
@@ -668,7 +661,7 @@ struct obj *obj;         /* missile (or stack providing it) */
     tmp_at(g.bhitpos.x, g.bhitpos.y);
     delay_output();
     tmp_at(DISP_END, 0);
-    mesg_given = 0; /* reset */
+    g.mesg_given = 0; /* reset */
 
     if (blindinc) {
         u.ucreamed += blindinc;
@@ -717,10 +710,10 @@ struct monst *mtmp, *mtarg;
                    > PET_MISSILE_RANGE2)
                 return 0; /* Out of range */
             /* Set target monster */
-            target = mtarg;
-            archer = mtmp;
+            g.mtarget = mtarg;
+            g.marcher = mtmp;
             monshoot(mtmp, otmp, mwep); /* multishot shooting or throwing */
-            archer = target = (struct monst *) 0;
+            g.marcher = g.mtarget = (struct monst *) 0;
             nomul(0);
             return 1;
         }
@@ -758,10 +751,10 @@ struct attack *mattk;
         if (!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my))) {
             if (canseemon(mtmp))
                 pline("%s spits venom!", Monnam(mtmp));
-            target = mtarg;
+            g.mtarget = mtarg;
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby),
                     distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my), otmp);
-            target = (struct monst *)0;
+            g.mtarget = (struct monst *)0;
             nomul(0);
 
             /* If this is a pet, it'll get hungry. Minions and

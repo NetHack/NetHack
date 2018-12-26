@@ -69,8 +69,6 @@ static const char *rip_txt[] = {
 #define DEATH_LINE 8 /* *char[] line # for death description */
 #define YEAR_LINE 12 /* *char[] line # for year */
 
-static char **rip;
-
 STATIC_OVL void
 center(line, text)
 int line;
@@ -78,7 +76,7 @@ char *text;
 {
     register char *ip, *op;
     ip = text;
-    op = &rip[line][STONE_LINE_CENT - ((strlen(text) + 1) >> 1)];
+    op = &g.rip[line][STONE_LINE_CENT - ((strlen(text) + 1) >> 1)];
     while (*ip)
         *op++ = *ip++;
 }
@@ -96,7 +94,7 @@ time_t when;
     register int x;
     int line;
 
-    rip = dp = (char **) alloc(sizeof(rip_txt));
+    g.rip = dp = (char **) alloc(sizeof(rip_txt));
     for (x = 0; rip_txt[x]; ++x)
         dp[x] = dupstr(rip_txt[x]);
     dp[x] = (char *) 0;
@@ -158,10 +156,10 @@ time_t when;
         putstr(tmpwin, 0, "");
 
     for (x = 0; rip_txt[x]; x++) {
-        free((genericptr_t) rip[x]);
+        free((genericptr_t) g.rip[x]);
     }
-    free((genericptr_t) rip);
-    rip = 0;
+    free((genericptr_t) g.rip);
+    g.rip = 0;
 }
 
 #endif /* TEXT_TOMBSTONE */

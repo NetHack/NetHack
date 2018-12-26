@@ -376,8 +376,8 @@ register struct monst *mtmp;
     if (mtmp->mpeaceful)
         return; /* will drop to humanoid talk */
 
-    pline("Talk? -- %s", (mtmp->data == &mons[urole.malenum]
-                          || mtmp->data == &mons[urole.femalenum])
+    pline("Talk? -- %s", (mtmp->data == &mons[g.urole.malenum]
+                          || mtmp->data == &mons[g.urole.femalenum])
                              ? same_class_msg[rn2(3)]
                              : other_class_msg[rn2(3)]);
 }

@@ -11,9 +11,6 @@ STATIC_DCL void NDECL(vault_tele);
 STATIC_DCL boolean FDECL(rloc_pos_ok, (int, int, struct monst *));
 STATIC_DCL void FDECL(mvault_tele, (struct monst *));
 
-/* non-null when teleporting via having read this scroll */
-STATIC_VAR struct obj *telescroll = 0;
-
 /*
  * Is (x,y) a good position of mtmp?  If mtmp is NULL, then is (x,y) good
  * for an object?
@@ -345,14 +342,14 @@ boolean allow_drag;
        been updated for new location instead of right after u_on_newpos() */
     if (levl[u.ux][u.uy].typ != levl[u.ux0][u.uy0].typ)
         switch_terrain();
-    if (telescroll) {
+    if (g.telescroll) {
         /* when teleporting by scroll, we need to handle discovery
            now before getting feedback about any objects at our
            destination since we might land on another such scroll */
         if (distu(u.ux0, u.uy0) >= 16 || !couldsee(u.ux0, u.uy0))
-            learnscroll(telescroll);
+            learnscroll(g.telescroll);
         else
-            telescroll = 0; /* no discovery by scrolltele()'s caller */
+            g.telescroll = 0; /* no discovery by scrolltele()'s caller */
     }
     spoteffects(TRUE);
     invocation_message();
@@ -486,13 +483,13 @@ struct obj *scroll;
         result = TRUE;
     }
 
-    telescroll = scroll;
+    g.telescroll = scroll;
     (void) safe_teleds(FALSE);
-    /* teleds() will leave telescroll intact iff random destination
+    /* teleds() will leave g.telescroll intact iff random destination
        is far enough away for scroll discovery to be warranted */
-    if (telescroll)
+    if (g.telescroll)
         result = TRUE;
-    telescroll = 0; /* reset */
+    g.telescroll = 0; /* reset */
     return result;
 }
 

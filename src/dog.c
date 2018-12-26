@@ -61,8 +61,8 @@ register struct monst *mtmp;
 STATIC_OVL int
 pet_type()
 {
-    if (urole.petnum != NON_PM)
-        return  urole.petnum;
+    if (g.urole.petnum != NON_PM)
+        return  g.urole.petnum;
     else if (g.preferred_pet == 'c')
         return  PM_KITTEN;
     else if (g.preferred_pet == 'd')

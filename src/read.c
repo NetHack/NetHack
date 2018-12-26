@@ -6,11 +6,11 @@
 #include "hack.h"
 
 #define Your_Own_Role(mndx)  \
-    ((mndx) == urole.malenum \
-     || (urole.femalenum != NON_PM && (mndx) == urole.femalenum))
+    ((mndx) == g.urole.malenum \
+     || (g.urole.femalenum != NON_PM && (mndx) == g.urole.femalenum))
 #define Your_Own_Race(mndx)  \
-    ((mndx) == urace.malenum \
-     || (urace.femalenum != NON_PM && (mndx) == urace.femalenum))
+    ((mndx) == g.urace.malenum \
+     || (g.urace.femalenum != NON_PM && (mndx) == g.urace.femalenum))
 
 static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
                                           SPBOOK_CLASS, 0 };
@@ -2060,8 +2060,8 @@ do_class_genocide()
                     goodcnt++;
             }
         }
-        if (!goodcnt && class != mons[urole.malenum].mlet
-            && class != mons[urace.malenum].mlet) {
+        if (!goodcnt && class != mons[g.urole.malenum].mlet
+            && class != mons[g.urace.malenum].mlet) {
             if (gonecnt)
                 pline("All such monsters are already nonexistent.");
             else if (immunecnt || class == S_invisible)
@@ -2118,7 +2118,7 @@ do_class_genocide()
                     /* Self-genocide if it matches either your race
                        or role.  Assumption:  male and female forms
                        share same monster class. */
-                    if (i == urole.malenum || i == urace.malenum) {
+                    if (i == g.urole.malenum || i == g.urace.malenum) {
                         u.uhp = -1;
                         if (Upolyd) {
                             if (!feel_dead++)
@@ -2259,8 +2259,8 @@ int how;
         if (Upolyd)
             Strcpy(buf, g.youmonst.data->mname);
         else {
-            Strcpy(buf, (flags.female && urole.name.f) ? urole.name.f
-                                                       : urole.name.m);
+            Strcpy(buf, (flags.female && g.urole.name.f) ? g.urole.name.f
+                                                       : g.urole.name.m);
             buf[0] = lowc(buf[0]);
         }
     } else {
@@ -2276,14 +2276,14 @@ int how;
 
         if (killplayer) {
             /* might need to wipe out dual role */
-            if (urole.femalenum != NON_PM && mndx == urole.malenum)
-                g.mvitals[urole.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
-            if (urole.femalenum != NON_PM && mndx == urole.femalenum)
-                g.mvitals[urole.malenum].mvflags |= (G_GENOD | G_NOCORPSE);
-            if (urace.femalenum != NON_PM && mndx == urace.malenum)
-                g.mvitals[urace.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
-            if (urace.femalenum != NON_PM && mndx == urace.femalenum)
-                g.mvitals[urace.malenum].mvflags |= (G_GENOD | G_NOCORPSE);
+            if (g.urole.femalenum != NON_PM && mndx == g.urole.malenum)
+                g.mvitals[g.urole.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
+            if (g.urole.femalenum != NON_PM && mndx == g.urole.femalenum)
+                g.mvitals[g.urole.malenum].mvflags |= (G_GENOD | G_NOCORPSE);
+            if (g.urace.femalenum != NON_PM && mndx == g.urace.malenum)
+                g.mvitals[g.urace.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
+            if (g.urace.femalenum != NON_PM && mndx == g.urace.femalenum)
+                g.mvitals[g.urace.malenum].mvflags |= (G_GENOD | G_NOCORPSE);
 
             u.uhp = -1;
             if (how & PLAYER) {
@@ -2440,7 +2440,7 @@ struct _create_particular_data *d;
     char *tmpp;
 
     d->monclass = MAXMCLASSES;
-    d->which = urole.malenum; /* an arbitrary index into mons[] */
+    d->which = g.urole.malenum; /* an arbitrary index into mons[] */
     d->fem = -1; /* gender not specified */
     d->randmonst = FALSE;
     d->maketame = d->makepeaceful = d->makehostile = FALSE;
@@ -2492,7 +2492,7 @@ struct _create_particular_data *d;
         d->monclass = MAXMCLASSES; /* matters below */
         return TRUE;
     } else if (d->monclass > 0) {
-        d->which = urole.malenum; /* reset from NON_PM */
+        d->which = g.urole.malenum; /* reset from NON_PM */
         return TRUE;
     }
     return FALSE;

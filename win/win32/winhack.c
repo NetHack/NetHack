@@ -123,7 +123,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     windowprocs.win_wait_synch = mswin_wait_synch;
 
     win10_init();
-    sys_early_init();
+    early_init();
 
     /* init application structure */
     _nethack_app.hApp = hInstance;

@@ -42,7 +42,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine,
     char buf[NHSTR_BUFSIZE];
     boolean resuming;
 
-    sys_early_init();
+    early_init();
 
     /* ensure that we don't access violate on a panic() */
     windowprocs.win_raw_print = mswin_raw_print;

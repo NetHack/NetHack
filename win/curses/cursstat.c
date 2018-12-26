@@ -1237,7 +1237,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
 
     get_playerrank(rank);
     char race[BUFSZ];
-    Strcpy(race, urace.adj);
+    Strcpy(race, g.urace.adj);
     race[0] = highc(race[0]);
     wprintw(win, "%s the %s %s%s%s", g.plname,
             (u.ualign.type == A_CHAOTIC ? "Chaotic" :

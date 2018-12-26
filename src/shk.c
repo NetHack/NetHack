@@ -25,7 +25,6 @@ STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
 
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
-STATIC_VAR NEARDATA long int followmsg; /* last time of follow message */
 STATIC_VAR const char and_its_contents[] = " and its contents";
 STATIC_VAR const char the_contents_of[] = "the contents of ";
 
@@ -3690,7 +3689,7 @@ struct monst *shkp;
                 eshkp->following = 0;
                 return 0;
             }
-            if (g.moves > followmsg + 4) {
+            if (g.moves > g.followmsg + 4) {
                 if (!Deaf && !muteshk(shkp))
                     verbalize("%s, %s!  Didn't you forget to pay?",
                               Hello(shkp), g.plname);
@@ -3698,7 +3697,7 @@ struct monst *shkp;
                     pline("%s holds out %s upturned %s.",
                           Shknam(shkp), noit_mhis(shkp),
                           mbodypart(shkp, HAND));
-                followmsg = g.moves;
+                g.followmsg = g.moves;
                 if (!rn2(9)) {
                     pline("%s doesn't like customers who don't pay.",
                           Shknam(shkp));

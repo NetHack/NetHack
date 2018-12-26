@@ -250,14 +250,14 @@ change_sex()
     if (already_polyd) /* poly'd: also change saved sex */
         u.mfemale = !u.mfemale;
     max_rank_sz(); /* [this appears to be superfluous] */
-    if ((already_polyd ? u.mfemale : flags.female) && urole.name.f)
-        Strcpy(g.pl_character, urole.name.f);
+    if ((already_polyd ? u.mfemale : flags.female) && g.urole.name.f)
+        Strcpy(g.pl_character, g.urole.name.f);
     else
-        Strcpy(g.pl_character, urole.name.m);
+        Strcpy(g.pl_character, g.urole.name.m);
     u.umonster = ((already_polyd ? u.mfemale : flags.female)
-                  && urole.femalenum != NON_PM)
-                     ? urole.femalenum
-                     : urole.malenum;
+                  && g.urole.femalenum != NON_PM)
+                     ? g.urole.femalenum
+                     : g.urole.malenum;
     if (!already_polyd) {
         u.umonnum = u.umonster;
     } else if (u.umonnum == PM_SUCCUBUS || u.umonnum == PM_INCUBUS) {
@@ -369,11 +369,11 @@ newman()
     newuhs(FALSE);
     polyman("feel like a new %s!",
             /* use saved gender we're about to revert to, not current */
-            ((Upolyd ? u.mfemale : flags.female) && urace.individual.f)
-                ? urace.individual.f
-                : (urace.individual.m)
-                   ? urace.individual.m
-                   : urace.noun);
+            ((Upolyd ? u.mfemale : flags.female) && g.urace.individual.f)
+                ? g.urace.individual.f
+                : (g.urace.individual.m)
+                   ? g.urace.individual.m
+                   : g.urace.noun);
     if (Slimed) {
         Your("body transforms, but there is still slime on you.");
         make_slimed(10L, (const char *) 0);
@@ -460,8 +460,8 @@ int psflags;
                  * want if they specified a human.... */
             } else if (!polyok(&mons[mntmp])
                        && !(mntmp == PM_HUMAN || your_race(&mons[mntmp])
-                            || mntmp == urole.malenum
-                            || mntmp == urole.femalenum)) {
+                            || mntmp == g.urole.malenum
+                            || mntmp == g.urole.femalenum)) {
                 const char *pm_name;
 
                 /* mkclass_poly() can pick a !polyok()
@@ -1043,13 +1043,13 @@ rehumanize()
 
     if (emits_light(g.youmonst.data))
         del_light_source(LS_MONSTER, monst_to_any(&g.youmonst));
-    polyman("return to %s form!", urace.adj);
+    polyman("return to %s form!", g.urace.adj);
 
     if (u.uhp < 1) {
         /* can only happen if some bit of code reduces u.uhp
            instead of u.mh while poly'd */
         Your("old form was not healthy enough to survive.");
-        Sprintf(g.killer.name, "reverting to unhealthy %s form", urace.adj);
+        Sprintf(g.killer.name, "reverting to unhealthy %s form", g.urace.adj);
         g.killer.format = KILLED_BY;
         done(DIED);
     }
@@ -1839,12 +1839,12 @@ polysense()
 boolean
 ugenocided()
 {
-    return (boolean) ((g.mvitals[urole.malenum].mvflags & G_GENOD)
-                      || (urole.femalenum != NON_PM
-                          && (g.mvitals[urole.femalenum].mvflags & G_GENOD))
-                      || (g.mvitals[urace.malenum].mvflags & G_GENOD)
-                      || (urace.femalenum != NON_PM
-                          && (g.mvitals[urace.femalenum].mvflags & G_GENOD)));
+    return (boolean) ((g.mvitals[g.urole.malenum].mvflags & G_GENOD)
+                      || (g.urole.femalenum != NON_PM
+                          && (g.mvitals[g.urole.femalenum].mvflags & G_GENOD))
+                      || (g.mvitals[g.urace.malenum].mvflags & G_GENOD)
+                      || (g.urace.femalenum != NON_PM
+                          && (g.mvitals[g.urace.femalenum].mvflags & G_GENOD)));
 }
 
 /* how hero feels "inside" after self-genocide of role or race */

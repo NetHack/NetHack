@@ -44,7 +44,7 @@ char *argv[];
     privon();
 #endif
 
-    sys_early_init();
+    early_init();
 
     atexit(byebye);
     g.hname = argv[0];

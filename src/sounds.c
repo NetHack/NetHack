@@ -508,7 +508,7 @@ register struct monst *mtmp;
     if (mtmp->m_id == g.quest_status.leader_m_id && msound > MS_ANIMAL)
         msound = MS_LEADER;
     /* make sure it's your role's quest guardian; adjust if not */
-    else if (msound == MS_GUARDIAN && ptr != &mons[urole.guardnum])
+    else if (msound == MS_GUARDIAN && ptr != &mons[g.urole.guardnum])
         msound = mons[genus(monsndx(ptr), 1)].msound;
     /* some normally non-speaking types can/will speak if hero is similar */
     else if (msound == MS_ORC         /* note: MS_ORC is same as MS_GRUNT */
@@ -557,9 +557,9 @@ register struct monst *mtmp;
             (Upolyd && (u.umonnum == PM_WOLF || u.umonnum == PM_WINTER_WOLF
                         || u.umonnum == PM_WINTER_WOLF_CUB));
         const char *racenoun =
-            (flags.female && urace.individual.f)
-                ? urace.individual.f
-                : (urace.individual.m) ? urace.individual.m : urace.noun;
+            (flags.female && g.urace.individual.f)
+                ? g.urace.individual.f
+                : (g.urace.individual.m) ? g.urace.individual.m : g.urace.noun;
 
         if (mtmp->mtame) {
             if (kindred) {

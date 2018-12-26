@@ -1030,7 +1030,7 @@ int pm;
                     Hallucination
                        ? "You suddenly dread being peeled and mimic %s again!"
                        : "You now prefer mimicking %s again.",
-                    an(Upolyd ? g.youmonst.data->mname : urace.noun));
+                    an(Upolyd ? g.youmonst.data->mname : g.urace.noun));
             g.eatmbuf = dupstr(buf);
             g.nomovemsg = g.eatmbuf;
             g.afternmv = eatmdone;
@@ -3041,7 +3041,7 @@ boolean incr;
                               || Role_if(PM_VALKYRIE)))
                 pline("%s needs food, badly!",
                       (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE))
-                          ? urole.name.m
+                          ? g.urole.name.m
                           : "Elf");
             else
                 You((!incr)

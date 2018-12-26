@@ -3237,8 +3237,8 @@ monst_globals_init()
     return;
 }
 
-struct attack sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
-struct attack sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
+const struct attack c_sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
+const struct attack c_sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
 #endif
 
 /*monst.c*/

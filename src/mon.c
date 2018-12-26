@@ -3323,7 +3323,7 @@ struct monst *mon;
         } else if (!rn2(3)) { /* quest guardians */
             mndx = rn1(PM_APPRENTICE - PM_STUDENT + 1, PM_STUDENT);
             /* avoid own role's guardian */
-            if (mndx == urole.guardnum)
+            if (mndx == g.urole.guardnum)
                 mndx = NON_PM;
         } else { /* general humanoids */
             tryct = 5;

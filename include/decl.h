@@ -592,7 +592,21 @@ struct repo { /* repossession context */
     coord location;
 };
 
+/* from options.c */
+#define MAX_MENU_MAPPED_CMDS 32 /* some number */
 
+/* player selection constants */
+#define BP_ALIGN 0
+#define BP_GEND 1
+#define BP_RACE 2
+#define BP_ROLE 3
+#define NUM_BP 4
+
+#define NUM_ROLES (13)
+struct role_filter {
+    boolean roles[NUM_ROLES+1];
+    short mask;
+};
 
 /* instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
@@ -924,6 +938,11 @@ struct instance_globals {
     short *animal_list; /* list of PM values for animal monsters */
     int animal_list_count;
 
+    /* mthrowu.c */
+    int mesg_given; /* for m_throw()/thitu() 'miss' message */
+    struct monst *mtarget;  /* monster being shot by another monster */
+    struct monst *marcher; /* monster that is shooting */
+
     /* muse.c */
     boolean m_using; /* kludge to use mondided instead of killed */
     int trapx;
@@ -935,6 +954,12 @@ struct instance_globals {
                         * normal zap routines, and those routines don't
                         * remember who zapped the wand. */
     struct musable m;
+
+    /* nhlan.c */
+#ifdef MAX_LAN_USERNAME
+    char lusername[MAX_LAN_USERNAME];
+    int lusername_size;
+#endif
 
     /* o_init.c */
     short disco[NUM_OBJECTS];
@@ -949,6 +974,16 @@ struct instance_globals {
     /* options.c */
     struct symsetentry *symset_list; /* files.c will populate this with
                                         list of available sets */
+    /*
+        * Allow the user to map incoming characters to various menu commands.
+        * The accelerator list must be a valid C string.
+        */
+    char mapped_menu_cmds[MAX_MENU_MAPPED_CMDS + 1]; /* exported */
+    char mapped_menu_op[MAX_MENU_MAPPED_CMDS + 1];
+    short n_menu_mapped;
+    boolean opt_initial;
+    boolean opt_from_file;
+    boolean opt_need_redraw; /* for doset() */
 
     /* pickup.c */
     int oldcap; /* last encumberance */
@@ -1006,12 +1041,27 @@ struct instance_globals {
     /* read.c */
     boolean known;
 
+    /* region.c */
+    NhRegion **regions;
+    int n_regions;
+    int max_regions;
+
     /* restore.c */
     int n_ids_mapped;
     struct bucket *id_map;
     boolean restoring;
     struct fruit *oldfruit;
     long omoves;
+
+    /* rip.c */
+    char **rip;
+
+    /* role.c */
+    struct Role urole; /* player's role. May be munged in role_init() */
+    struct Race urace; /* player's race. May be munged in role_init() */
+    char role_pa[NUM_BP];
+    char role_post_attribs;
+    struct role_filter rfilter;
 
     /* rumors.c */
     long true_rumor_size; /* rumor size variables are signed so that value -1
@@ -1040,6 +1090,8 @@ struct instance_globals {
        shouldn't carry over from ordinary selling to credit selling */
     boolean auto_credit;
     struct repo repo;
+   long int followmsg; /* last time of follow message */
+
 
     /* sp_lev.c */
     char *lev_message;
@@ -1062,6 +1114,9 @@ struct instance_globals {
     int spl_sortmode;   /* index into spl_sortchoices[] */
     int *spl_orderindx; /* array of g.spl_book[] indices */
 
+    /* teleport.c */
+    struct obj *telescroll; /* non-null when teleporting via this scroll */
+
     /* timeout.c */
     /* ordered timer list */
     struct fe *timer_base; /* "active" */
@@ -1069,6 +1124,9 @@ struct instance_globals {
 
     /* topten.c */
     winid toptenwin;
+#ifdef UPDATE_RECORD_IN_PLACE
+    long final_fpos;
+#endif
 
 
     /* trap.c */

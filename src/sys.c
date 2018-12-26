@@ -20,10 +20,6 @@ struct sysopt sysopt;
 void
 sys_early_init()
 {
-    decl_globals_init();
-    objects_globals_init();
-    monst_globals_init();
-
     sysopt.support = (char *) 0;
     sysopt.recover = (char *) 0;
 #ifdef SYSCF
@@ -124,14 +120,14 @@ sysopt_release()
     return;
 }
 
-extern struct attack sa_yes[NATTK];
-extern struct attack sa_no[NATTK];
+extern const struct attack c_sa_yes[NATTK];
+extern const struct attack c_sa_no[NATTK];
 
 void
 sysopt_seduce_set(val)
 int val;
 {
-    struct attack *setval = val ? sa_yes : sa_no;
+    const struct attack *setval = val ? c_sa_yes : c_sa_no;
     int x;
 
     for (x = 0; x < NATTK; x++) {

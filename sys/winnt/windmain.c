@@ -97,7 +97,7 @@ char *argv[];
     if (!GUILaunched)
         windowprocs.win_nhgetch = windows_console_custom_nhgetch;
 
-    sys_early_init();
+    early_init();
 #ifdef _MSC_VER
 # ifdef DEBUG
     /* set these appropriately for VS debugging */
