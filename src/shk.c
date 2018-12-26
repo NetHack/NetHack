@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1545785119 2018/12/26 00:45:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.146 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1545786461 2018/12/26 01:07:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1974,7 +1974,7 @@ register struct obj *obj;
 
     if (*u.ushops && obj->oclass != COIN_CLASS
         && obj != uball && obj != uchain
-        && get_obj_location(obj, &x, &y, 0)
+        && get_obj_location(obj, &x, &y, CONTAINED_TOO)
         && *in_rooms(u.ux, u.uy, SHOPBASE) == *in_rooms(x, y, SHOPBASE)
         && (shkp = shop_keeper(inside_shop(x, y))) != 0 && inhishop(shkp)) {
         cost = obj->no_charge ? 0L : obj->quan * get_cost(obj, shkp);
