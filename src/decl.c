@@ -503,8 +503,10 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* m */
 
     /* nhlan.c */
+#ifdef MAX_LAN_USERNAME
     UNDEFINED_VALUES, /* lusername */
     MAX_LAN_USERNAME, /* lusername_size */
+#endif /* MAX_LAN_USERNAME */
 
     /* o_init.c */
     DUMMY, /* disco */
