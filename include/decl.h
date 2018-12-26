@@ -956,8 +956,10 @@ struct instance_globals {
     struct musable m;
 
     /* nhlan.c */
+#ifdef LAN_FEATURES
     char lusername[MAX_LAN_USERNAME];
     int lusername_size;
+#endif
 
     /* o_init.c */
     short disco[NUM_OBJECTS];
