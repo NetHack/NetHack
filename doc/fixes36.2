@@ -303,6 +303,8 @@ limit carrying heavy loads from water to land
 failing to carry a wished-for item behaved differenctly from dropping one
 life-saving while weak/starving/fainting boosted nutrition without restoring
 	lost point of strength, making temporary loss be permanent
+unlike #chat in a shop, walking on an item in a shop failed to include price
+	for hero-owned container holding shop-owned items
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -337,6 +339,8 @@ a config file line with OPTIONS=symset:default, roguesymset:RogueEpyx
 	during the processing of symset:default done after RogueEpyx had
 	already been processed
 avoid potential segfault when doing 'more information' lookup
+when built with STATUS_HILITES enabled (the default), gold on status line
+	was missing '$' prefix for symset:Blank
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -456,6 +460,8 @@ being trapped (bear trap, web, molten or solidified lava, chained to buried
 	pit ends when either of those starts so doesn't apply)
 early level traps are sometimes covered by the remains of fake players
 fake player characters resist Conflict
+when inside a shop, far-look now includes shop prices for items marked as
+	having been seen up close
 
 
 NetHack Community Patches (or Variation) Included

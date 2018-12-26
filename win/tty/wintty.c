@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1544919891 2018/12/16 00:24:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.189 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1545705819 2018/12/25 02:43:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -495,7 +495,7 @@ tty_player_selection()
             goto give_up;
     }
 
-makepicks:
+ makepicks:
     nextpick = RS_ROLE;
     do {
         if (nextpick == RS_ROLE) {
@@ -963,7 +963,7 @@ makepicks:
     tty_display_nhwindow(BASE_WINDOW, FALSE);
     return;
 
-give_up:
+ give_up:
     /* Quit */
     if (selected)
         free((genericptr_t) selected); /* [obsolete] */
@@ -1241,11 +1241,11 @@ tty_askname()
             }
 #if defined(UNIX) || defined(VMS)
             if (c != '-' && c != '@')
-                if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') &&
+                if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z')
                     /* reject leading digit but allow digits elsewhere
                        (avoids ambiguity when character name gets
                        appended to uid to construct save file name) */
-                    !(c >= '0' && c <= '9' && ct > 0))
+                    && !(c >= '0' && c <= '9' && ct > 0))
                     c = '_';
 #endif
             if (ct < (int) (sizeof g.plname) - 1) {
@@ -1476,16 +1476,18 @@ winid window;
 struct WinDesc *cw;
 boolean clear;
 {
-    if (cw->offx == 0)
+    if (cw->offx == 0) {
         if (cw->offy) {
             tty_curs(window, 1, 0);
             cl_eos();
-        } else if (clear)
+        } else if (clear) {
             clear_screen();
-        else
+        } else {
             docrt();
-    else
+        }
+    } else {
         docorner((int) cw->offx, cw->maxrow + 1);
+    }
 }
 
 STATIC_OVL void
@@ -2113,7 +2115,7 @@ struct WinDesc *cw;
                 tty_nhbell();
                 break;
             } else if (index(gacc, morc)) {
-            group_accel:
+ group_accel:
                 /* group accelerator; for the PICK_ONE case, we know that
                    it matches exactly one item in order to be in gacc[] */
                 invert_all(window, page_start, page_end, morc);
@@ -3393,15 +3395,16 @@ tty_nhgetch()
     if (WIN_MESSAGE != WIN_ERR && wins[WIN_MESSAGE])
         wins[WIN_MESSAGE]->flags &= ~WIN_STOP;
     if (iflags.debug_fuzzer) {
-	i = randomkey();
+        i = randomkey();
     } else {
 #ifdef UNIX
-    i = (++nesting == 1) ? tgetch()
-                         : (read(fileno(stdin), (genericptr_t) &nestbuf, 1)
-                            == 1) ? (int) nestbuf : EOF;
-    --nesting;
+        i = (++nesting == 1)
+              ? tgetch()
+              : (read(fileno(stdin), (genericptr_t) &nestbuf, 1) == 1)
+                  ? (int) nestbuf : EOF;
+        --nesting;
 #else
-    i = tgetch();
+        i = tgetch();
 #endif
     }
     if (!i)
@@ -3614,7 +3617,7 @@ static boolean truncation_expected = FALSE;
  * for all platforms eventually and the conditional
  * setting below can be removed.
  */
-static int do_field_opt = 
+static int do_field_opt =
 #if defined(DISABLE_TTY_FIELD_OPT)
     0;
 #else
@@ -3681,11 +3684,11 @@ boolean enable;
  *         BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
  *         BL_LEVELDESC, BL_EXP, BL_CONDITION
  *      -- fldindex could also be BL_FLUSH (-1), which is not really
- *         a field index, but is a special trigger to tell the 
+ *         a field index, but is a special trigger to tell the
  *         windowport that it should output all changes received
  *         to this point. It marks the end of a bot() cycle.
  *      -- fldindex could also be BL_RESET (-3), which is not really
- *         a field index, but is a special advisory to to tell the 
+ *         a field index, but is a special advisory to to tell the
  *         windowport that it should redisplay all its status fields,
  *         even if no changes have been presented to it.
  *      -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
@@ -3704,7 +3707,7 @@ boolean enable;
  *              BL_MASK_LEV             0x00000400L
  *              BL_MASK_FLY             0x00000800L
  *              BL_MASK_RIDE            0x00001000L
- *      -- The value passed for BL_GOLD includes an encoded leading
+ *      -- The value passed for BL_GOLD usually includes an encoded leading
  *         symbol for GOLD "\GXXXXNNNN:nnn". If the window port needs to use
  *         the textual gold amount without the leading "$:" the port will
  *         have to skip past ':' in the passed "ptr" for the BL_GOLD case.
@@ -3736,8 +3739,7 @@ unsigned long *colormasks;
     int i;
     long *condptr = (long *) ptr;
     char *text = (char *) ptr;
-    char *lastchar = (char *) 0;
-    char *fval = (char *) 0;
+    char *fval, *lastchar, *p;
     boolean reset_state = NO_RESET;
 
     if ((fldidx < BL_RESET) || (fldidx >= MAXBLSTATS))
@@ -3784,8 +3786,9 @@ unsigned long *colormasks;
 
     /* The core botl engine sends a single blank to the window port
        for carrying-capacity when its unused. Let's suppress that */
-    if (fldidx >= 0 && fldidx < MAXBLSTATS &&
-            tty_status[NOW][fldidx].lth == 1 && status_vals[fldidx][0] == ' ') {
+    if (fldidx >= 0 && fldidx < MAXBLSTATS
+        && tty_status[NOW][fldidx].lth == 1
+        && status_vals[fldidx][0] == ' ') {
         status_vals[fldidx][0] = '\0';
         tty_status[NOW][fldidx].lth = 0;
     }
@@ -3798,7 +3801,8 @@ unsigned long *colormasks;
             hpbar_percent = percent;
             hpbar_color = (color & 0x00FF);
         }
-        if (iflags.wc2_hitpointbar && (tty_procs.wincap2 & WC2_FLUSH_STATUS) != 0L) {
+        if (iflags.wc2_hitpointbar
+            && (tty_procs.wincap2 & WC2_FLUSH_STATUS) != 0L) {
             tty_status[NOW][BL_TITLE].color = hpbar_color;
             tty_status[NOW][BL_TITLE].dirty = TRUE;
         }
@@ -3821,7 +3825,9 @@ unsigned long *colormasks;
             tty_status[NOW][fldidx].lth += 2; /* '[' and ']' */
         break;
     case BL_GOLD:
-        tty_status[NOW][fldidx].lth -= (10 - 1); /* \GXXXXNNNN counts as 1 */
+        /* \GXXXXNNNN counts as 1 */
+        if ((p = index(status_vals[fldidx], '\\')) != 0 && p[1] == 'G')
+            tty_status[NOW][fldidx].lth -= (10 - 1);
         break;
     case BL_CAP:
         fval = status_vals[fldidx];
@@ -3856,7 +3862,7 @@ do_setlast()
 
            last_on_row[row] = fld;
            break;
-	}
+        }
 }
 
 STATIC_OVL int
@@ -3939,7 +3945,7 @@ int *topsz, *bottomsz;
             tty_status[NOW][idx].y = row;
             tty_status[NOW][idx].x = col;
 
-            /* On a change to the field length, everything 
+            /* On a change to the field length, everything
                further to the right must be updated as well */
             if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth)
                 update_right = TRUE;
@@ -4392,8 +4398,7 @@ render_status(VOID_ARGS)
                         if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_start_color(coloridx);
                     }
-                    tty_putstatusfield(&tty_status[NOW][idx],
-                                       text, x, y);                    
+                    tty_putstatusfield(&tty_status[NOW][idx], text, x, y);
                     if (iflags.hilite_delta) {
                         if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_end_color();
@@ -4442,4 +4447,3 @@ render_status(VOID_ARGS)
 #endif /* TTY_GRAPHICS */
 
 /*wintty.c*/
-

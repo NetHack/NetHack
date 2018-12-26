@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1536411259 2018/09/08 12:54:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1545705822 2018/12/25 02:43:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3084,24 +3084,29 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
         case BL_GOLD: {
             char buf[BUFSZ];
             char *p;
+
             ZeroMemory(buf, sizeof(buf));
-            mapglyph(objnum_to_glyph(GOLD_PIECE), &ochar, &ocolor, &ospecial,
-                     0, 0);
+            if (iflags.invis_goldsym)
+                ochar = GOLD_SYM;
+            else
+                mapglyph(objnum_to_glyph(GOLD_PIECE),
+                         &ochar, &ocolor, &ospecial, 0, 0);
             buf[0] = ochar;
             p = strchr(text, ':');
             if (p) {
                 strncpy(buf + 1, p, sizeof(buf) - 2);
             } else {
                 buf[1] = ':';
-                strncpy(buf + 2, text, sizeof(buf) - 2);
+                strncpy(buf + 2, text, sizeof(buf) - 3);
             }
-
-            Sprintf(status_field->string, status_field->format ? status_field->format : "%s", buf);
+            buf[sizeof buf - 1] = '\0';
+            Sprintf(status_field->string,
+                    status_field->format ? status_field->format : "%s", buf);
             nhassert(status_string->str == status_field->string);
         } break;
         default: {
-            Sprintf(status_field->string, status_field->format ? status_field->format : "%s",
-                    text);
+            Sprintf(status_field->string,
+                    status_field->format ? status_field->format : "%s", text);
             nhassert(status_string->str == status_field->string);
         } break;
         }
