@@ -62,14 +62,15 @@ curses_update_inv(void)
 
 /* Adds an inventory item. */
 void
-curses_add_inv(int y, int glyph, CHAR_P accelerator, attr_t attr,
-               const char *str)
+curses_add_inv(int y,
+               int glyph UNUSED,
+               CHAR_P accelerator, attr_t attr, const char *str)
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
     int color = NO_COLOR;
+    int x = 0;
 
     /* Figure out where to draw the line */
-    int x = 0;
     if (curses_window_has_border(INV_WIN)) {
         x++;
         y++;
@@ -78,6 +79,7 @@ curses_add_inv(int y, int glyph, CHAR_P accelerator, attr_t attr,
     wmove(win, y, x);
     if (accelerator) {
         attr_t bold = A_BOLD;
+
         wattron(win, bold);
         waddch(win, accelerator);
         wattroff(win, bold);
@@ -88,17 +90,20 @@ curses_add_inv(int y, int glyph, CHAR_P accelerator, attr_t attr,
         unsigned dummy = 0; /* Not used */
         int color = 0;
         int symbol = 0;
+        attr_t glyphclr;
+
         mapglyph(glyph, &symbol, &color, &dummy,
                      u.ux, u.uy);
-        attr_t glyphclr = curses_color_attr(color, 0);
+        glyphclr = curses_color_attr(color, 0);
         wattron(win, glyphclr);
         wprintw(win, "%c ", symbol);
         wattroff(win, glyphclr);
     }
 #endif
-    if (accelerator && /* Don't colorize categories */
-        iflags.use_menu_color) {
+    if (accelerator /* Don't colorize categories */
+        && iflags.use_menu_color) {
         char str_mutable[BUFSZ];
+
         Strcpy(str_mutable, str);
         attr = 0;
         get_menu_coloring(str_mutable, &color, (int *) &attr);
