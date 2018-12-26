@@ -40,7 +40,7 @@ get_strength_str()
 void
 check_gold_symbol()
 {
-    nhsym goldch = showsyms[COIN_CLASS + SYM_OFF_O];
+    nhsym goldch = g.showsyms[COIN_CLASS + SYM_OFF_O];
 
     iflags.invis_goldsym = (goldch <= (nhsym) ' ');
 }
