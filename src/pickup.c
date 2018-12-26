@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1545597427 2018/12/23 20:37:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.221 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1545785547 2018/12/26 00:52:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.222 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2201,6 +2201,19 @@ register struct obj *obj;
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);
         obfree(obj, (struct obj *) 0);
+        /* if carried, shop goods will be flagged 'unpaid' and obfree() will
+           handle bill issues, but if on floor, we need to put them on bill
+           before deleting them (non-shop items will be flagged 'no_charge') */
+        if (floor_container
+            && costly_spot(current_container->ox, current_container->oy)) {
+            struct obj save_no_charge;
+
+            save_no_charge.no_charge = current_container->no_charge;
+            addtobill(current_container, FALSE, FALSE, FALSE);
+            /* addtobill() clears no charge; we need to set it back
+               so that useupf() doesn't double bill */
+            current_container->no_charge = save_no_charge.no_charge;
+        }
         delete_contents(current_container);
         if (!floor_container)
             useup(current_container);

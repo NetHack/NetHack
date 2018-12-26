@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1545597422 2018/12/23 20:37:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.245 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1545785120 2018/12/26 00:45:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.246 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2892,6 +2892,7 @@ int *bcp, *ucp, *ccp, *xcp, *ocp;
     }
 }
 
+/* count everything inside a container, or just shop-owned items inside */
 long
 count_contents(container, nested, quantity, everything)
 struct obj *container;
@@ -2899,13 +2900,24 @@ boolean nested, /* include contents of any nested containers */
     quantity,   /* count all vs count separate stacks */
     everything; /* all objects vs only unpaid objects */
 {
-    struct obj *otmp;
+    struct obj *otmp, *topc;
+    boolean shoppy = FALSE;
     long count = 0L;
 
+    if (!everything) {
+        for (topc = container; topc->ocontainer; topc = topc->ocontainer)
+            continue;
+        if (topc->where == OBJ_FLOOR) {
+            xchar x, y;
+
+            (void) get_obj_location(topc, &x, &y, CONTAINED_TOO);
+            shoppy = costly_spot(x, y);
+        }
+    }
     for (otmp = container->cobj; otmp; otmp = otmp->nobj) {
         if (nested && Has_contents(otmp))
             count += count_contents(otmp, nested, quantity, everything);
-        if (everything || otmp->unpaid)
+        if (everything || otmp->unpaid || (shoppy && !otmp->no_charge))
             count += quantity ? otmp->quan : 1L;
     }
     return count;
