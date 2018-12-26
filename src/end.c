@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1545771927 2018/12/25 21:05:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.161 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1545786454 2018/12/26 01:07:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1576,7 +1576,7 @@ boolean identified, all_containers, reportempty;
                             if (Is_container(obj) || obj->otyp == STATUE)
                                 obj->cknown = obj->lknown = 1;
                         }
-                        Strcpy(&buf[2], doname(obj));
+                        Strcpy(&buf[2], doname_with_price(obj));
                         putstr(tmpwin, 0, buf);
                     }
                     unsortloot(&sortedcobj);
