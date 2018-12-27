@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1545785120 2018/12/26 00:45:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.246 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1545946249 2018/12/27 21:30:49 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.247 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -811,9 +811,11 @@ struct obj *obj;
     if (is_mines_prize(obj)) {
         u.uachieve.mines_luckstone = 1;
         obj->record_achieve_special = NON_PM;
+        obj->nomerge = 0;
     } else if (is_soko_prize(obj)) {
         u.uachieve.finish_sokoban = 1;
         obj->record_achieve_special = NON_PM;
+        obj->nomerge = 0;
     }
 }
 
@@ -3522,11 +3524,10 @@ register struct obj *otmp, *obj;
 {
     int objnamelth = 0, otmpnamelth = 0;
 
-    if (obj == otmp)
-        return FALSE; /* already the same object */
-    if (obj->otyp != otmp->otyp)
-        return FALSE; /* different types */
-    if (obj->nomerge) /* explicitly marked to prevent merge */
+    /* fail if already the same object, if different types, if either is
+       explicitly marked to prevent merge, or if not mergable in general */
+    if (obj == otmp || obj->otyp != otmp->otyp
+        || obj->nomerge || otmp->nomerge || !objects[obj->otyp].oc_merge)
         return FALSE;
 
     /* coins of the same kind will always merge */
