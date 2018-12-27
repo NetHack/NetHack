@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1545597425 2018/12/23 20:37:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1545948759 2018/12/27 22:12:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,6 +6,7 @@
 #include "hack.h"
 
 STATIC_DCL void FDECL(mkbox_cnts, (struct obj *));
+STATIC_DCL unsigned FDECL(nextoid, (struct obj *, struct obj *));
 STATIC_DCL void FDECL(maybe_adjust_light, (struct obj *, int));
 STATIC_DCL void FDECL(obj_timer_checks, (struct obj *,
                                          XCHAR_P, XCHAR_P, int));
@@ -436,9 +437,7 @@ long num;
     otmp = newobj();
     *otmp = *obj; /* copies whole structure */
     otmp->oextra = (struct oextra *) 0;
-    otmp->o_id = context.ident++;
-    if (!otmp->o_id)
-        otmp->o_id = context.ident++; /* ident overflowed */
+    otmp->o_id = nextoid(obj, otmp);
     otmp->timed = 0;                  /* not timed, yet */
     otmp->lamplit = 0;                /* ditto */
     otmp->owornmask = 0L;             /* new object isn't worn */
@@ -464,6 +463,26 @@ long num;
     if (obj_sheds_light(obj))
         obj_split_light_source(obj, otmp);
     return otmp;
+}
+
+/* when splitting a stack that has o_id-based shop prices (non-glass gems),
+   pick an o_id value for the new stack that will maintain the same price */
+STATIC_OVL unsigned
+nextoid(oldobj, newobj)
+struct obj *oldobj, *newobj;
+{
+    int olddif, newdif, trylimit = 256; /* limit of 4 suffices at present */
+    unsigned oid = context.ident - 1; /* loop increment will reverse -1 */
+
+    olddif = oid_price_adjustment(oldobj, oldobj->o_id);
+    do {
+        ++oid;
+        if (!oid) /* avoid using 0 (in case value wrapped) */
+            ++oid;
+        newdif = oid_price_adjustment(newobj, oid);
+    } while (newdif != olddif && --trylimit >= 0);
+    context.ident = oid + 1; /* ready for next new object */
+    return oid;
 }
 
 /* try to find the stack obj was split from, then merge them back together;
