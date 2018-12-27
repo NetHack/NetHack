@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1545948761 2018/12/27 22:12:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1545951668 2018/12/27 23:01:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1993,10 +1993,8 @@ unsigned oid;
 {
     int res = 0, otyp = obj->otyp;
 
-    /* currently only used for non-glass gems */
-    if (obj->oclass == GEM_CLASS && otyp != ROCK
-        && !(obj->dknown && objects[otyp].oc_name_known)
-        && objects[otyp].oc_material != GLASS) {
+    if (!(obj->dknown && objects[otyp].oc_name_known)
+        && (obj->oclass != GEM_CLASS || objects[otyp].oc_material != GLASS)) {
         res = ((oid % 4) == 0); /* id%4 ==0 -> +1, ==1..3 -> 0 */
     }
     return res;

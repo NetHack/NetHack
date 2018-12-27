@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1545948759 2018/12/27 22:12:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1545951660 2018/12/27 23:01:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -465,8 +465,8 @@ long num;
     return otmp;
 }
 
-/* when splitting a stack that has o_id-based shop prices (non-glass gems),
-   pick an o_id value for the new stack that will maintain the same price */
+/* when splitting a stack that has o_id-based shop prices, pick an
+   o_id value for the new stack that will maintain the same price */
 STATIC_OVL unsigned
 nextoid(oldobj, newobj)
 struct obj *oldobj, *newobj;
