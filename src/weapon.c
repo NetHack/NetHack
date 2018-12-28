@@ -1,4 +1,4 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1541145518 2018/11/02 07:58:38 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1545964580 2018/12/28 02:36:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -373,6 +373,7 @@ int x;
     return (struct obj *) 0;
 }
 
+/* TODO: have monsters use aklys' throw-and-return */
 static NEARDATA const int rwep[] = {
     DWARVISH_SPEAR, SILVER_SPEAR, ELVEN_SPEAR, SPEAR, ORCISH_SPEAR, JAVELIN,
     SHURIKEN, YA, SILVER_ARROW, ELVEN_ARROW, ARROW, ORCISH_ARROW,
@@ -508,6 +509,19 @@ register struct monst *mtmp;
 
     /* failure */
     return (struct obj *) 0;
+}
+
+/* is 'obj' a type of weapon that any monster knows how to throw? */
+boolean
+monmightthrowwep(obj)
+struct obj *obj;
+{
+    short idx;
+
+    for (idx = 0; idx < SIZE(rwep); ++idx)
+        if (obj->otyp == rwep[idx])
+            return TRUE;
+    return FALSE;
 }
 
 /* Weapons in order of preference */

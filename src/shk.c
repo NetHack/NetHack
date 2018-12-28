@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1545948761 2018/12/27 22:12:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1545953813 2018/12/27 23:36:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -958,6 +958,17 @@ register struct obj *obj, *merge;
             *bp = ESHK(shkp)->bill_p[ESHK(shkp)->billct];
 #endif
         }
+    } else {
+        /* not on bill; if the item is being merged away rather than
+           just deleted and has a higher price adjustment than the stack
+           being merged into, give the latter the former's obj->o_id so
+           that the merged stack takes on higher price; matters if hero
+           eventually buys them from a shop, but doesn't matter if hero
+           owns them and intends to sell (unless he subsequently buys
+           them back) or if no shopping activity ever involves them */
+        if (merge && (oid_price_adjustment(obj, obj->o_id)
+                      > oid_price_adjustment(merge, merge->o_id)))
+            merge->o_id = obj->o_id;
     }
     if (obj->owornmask) {
         impossible("obfree: deleting worn obj (%d: %ld)", obj->otyp,
@@ -1993,10 +2004,8 @@ unsigned oid;
 {
     int res = 0, otyp = obj->otyp;
 
-    /* currently only used for non-glass gems */
-    if (obj->oclass == GEM_CLASS && otyp != ROCK
-        && !(obj->dknown && objects[otyp].oc_name_known)
-        && objects[otyp].oc_material != GLASS) {
+    if (!(obj->dknown && objects[otyp].oc_name_known)
+        && (obj->oclass != GEM_CLASS || objects[otyp].oc_material != GLASS)) {
         res = ((oid % 4) == 0); /* id%4 ==0 -> +1, ==1..3 -> 0 */
     }
     return res;
