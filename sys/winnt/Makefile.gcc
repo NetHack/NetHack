@@ -1453,14 +1453,14 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 
 ifeq "$(ADD_CURSES)" "Y"
 # curses window port dependencies
-$(O)cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
-$(O)cursinit.c: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
-$(O)cursinvt.c: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
-$(O)cursmain.c: $(WCURSES)\cursmain.c $(WCURSES)\cursmain.h $(INCL)\wincurs.h
-$(O)cursmesg.c: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
-$(O)cursmisc.c: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
-$(O)cursstat.c: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
-$(O)curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
+$(O)cursdial.o: $(WCURSES)/cursdial.c $(WCURSES)/cursdial.h $(INCL)/wincurs.h
+$(O)cursinit.c: $(WCURSES)/cursinit.c $(WCURSES)/cursinit.h $(INCL)/wincurs.h $(INCL)/date.h
+$(O)cursinvt.c: $(WCURSES)/cursinvt.c $(WCURSES)/cursinvt.h $(INCL)/wincurs.h
+$(O)cursmain.c: $(WCURSES)/cursmain.c $(WCURSES)/cursmain.h $(INCL)/wincurs.h
+$(O)cursmesg.c: $(WCURSES)/cursmesg.c $(WCURSES)/cursmesg.h $(INCL)/wincurs.h
+$(O)cursmisc.c: $(WCURSES)/cursmisc.c $(WCURSES)/cursmisc.h $(INCL)/wincurs.h
+$(O)cursstat.c: $(WCURSES)/cursstat.c $(WCURSES)/cursstat.h $(INCL)/wincurs.h
+$(O)curswins.c: $(WCURSES)/curswins.c $(WCURSES)/curswins.h $(INCL)/wincurs.h
 endif
 
 ifeq "$(WANT_WIN_QT4)" "Y"
