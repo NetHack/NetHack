@@ -790,7 +790,7 @@ cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursstat.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursstat.c
 cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursinit.h ../include/patchlevel.h
+		../win/curses/cursinit.h ../include/patchlevel.h ../include/date.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursinit.c
 cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursmesg.h
