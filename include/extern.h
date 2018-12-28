@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1545948751 2018/12/27 22:12:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.677 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1545964581 2018/12/28 02:36:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.678 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2731,6 +2731,7 @@ E const char *FDECL(weapon_descr, (struct obj *));
 E int FDECL(hitval, (struct obj *, struct monst *));
 E int FDECL(dmgval, (struct obj *, struct monst *));
 E struct obj *FDECL(select_rwep, (struct monst *));
+E boolean FDECL(monmightthrowwep, (struct obj *));
 E struct obj *FDECL(select_hwep, (struct monst *));
 E void FDECL(possibly_unwield, (struct monst *, BOOLEAN_P));
 E void FDECL(mwepgone, (struct monst *));

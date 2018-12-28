@@ -1,4 +1,4 @@
-/* NetHack 3.6	mplayer.c	$NHDT-Date: 1458949461 2016/03/25 23:44:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	mplayer.c	$NHDT-Date: 1545964576 2018/12/28 02:36:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
 /*      Copyright (c) Izchak Miller, 1992.                        */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -270,7 +270,8 @@ register boolean special;
             if (special && rn2(2))
                 otmp = mk_artifact(otmp, A_NONE);
             /* usually increase stack size if stackable weapon */
-            if (objects[otmp->otyp].oc_merge && !otmp->oartifact)
+            if (objects[otmp->otyp].oc_merge && !otmp->oartifact
+                && monmightthrowwep(otmp))
                 otmp->quan += (long) rn2(is_spear(otmp) ? 4 : 8);
             /* mplayers knew better than to overenchant Magicbane */
             if (otmp->oartifact == ART_MAGICBANE)
