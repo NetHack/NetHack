@@ -71,7 +71,6 @@ STATIC_DCL void traverse_mapseenchn(boolean, winid,
                                             int, int, int *);
 STATIC_DCL const char *seen_string(xchar, const char *);
 STATIC_DCL const char *br_string2(branch *);
-STATIC_DCL const char *endgamelevelname(char *, int);
 STATIC_DCL const char *shop_string(int);
 STATIC_DCL char *tunesuffix(mapseen *, char *);
 
@@ -2666,7 +2665,7 @@ br_string2(branch *br)
 }
 
 /* get the name of an endgame level; topten.c does something similar */
-STATIC_OVL const char *
+const char *
 endgamelevelname(char *outbuf, int indx)
 {
     const char *planename = 0;

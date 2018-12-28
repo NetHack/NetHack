@@ -48,22 +48,25 @@ void *me;
 void *nextprocs;
 void *nextdata;
 {
+    struct trace_data *tdp = 0;
+
     switch (cmd) {
-    case WINCHAIN_ALLOC: {
-        struct trace_data *tdp = calloc(1, sizeof(struct trace_data));
+    case WINCHAIN_ALLOC:
+        tdp = (struct trace_data *) alloc(sizeof *tdp);
+        tdp->nprocs = 0;
+        tdp->ndata = 0;
         tdp->linknum = n;
-        return tdp;
-    }
-    case WINCHAIN_INIT: {
-        struct trace_data *tdp = me;
+        break;
+    case WINCHAIN_INIT:
+        tdp = me;
         tdp->nprocs = nextprocs;
         tdp->ndata = nextdata;
-        return tdp;
-    }
+        break;
     default:
-        raw_printf("trace_procs_chain: bad cmd\n");
-        exit(EXIT_FAILURE);
+        panic("trace_procs_chain: bad cmd\n");
+        /*NOTREACHED*/
     }
+    return tdp;
 }
 
 void
@@ -71,20 +74,22 @@ trace_procs_init(dir)
 int dir;
 {
     char fname[200];
+    long pid;
 
     /* processors shouldn't need this test, but just in case */
     if (dir != WININIT)
         return;
 
-    sprintf(fname, "%s/tlog.%d", HACKDIR, getpid());
+    pid = (long) getpid();
+    Sprintf(fname, "%s/tlog.%ld", HACKDIR, pid);
     wc_tracelogf = fopen(fname, "w");
-    if (wc_tracelogf == NULL) {
+    if (!wc_tracelogf) {
         fprintf(stderr, "Can't open trace log file %s: %s\n", fname,
                 strerror(errno));
-        exit(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     }
-    setvbuf(wc_tracelogf, (char *) NULL, _IONBF, 0);
-    fprintf(wc_tracelogf, "Trace log started for pid %d\n", getpid());
+    setvbuf(wc_tracelogf, (char *) 0, _IONBF, 0);
+    fprintf(wc_tracelogf, "Trace log started for pid %ld\n", pid);
 
     indent_level = 0;
 }
@@ -769,7 +774,7 @@ char *bufp;
     }
 
     if (bufp) {
-        fprintf(wc_tracelogf, "%p)\n", bufp);
+        fprintf(wc_tracelogf, "%s)\n", fmt_ptr((genericptr_t) bufp));
     } else {
         fprintf(wc_tracelogf, "NULL)\n");
     }
@@ -785,7 +790,7 @@ void *vp;
 {
     struct trace_data *tdp = vp;
     int rv;
-    int ecl_size;
+    int ecl_size = 0;
 
     /* this is ugly, but the size isn't exposed */
     const struct ext_func_tab *efp;
@@ -1095,7 +1100,8 @@ unsigned long *colormasks;
             ptr, chg, percent);
 
     PRE;
-    (*tdp->nprocs->win_status_update)(tdp->ndata, idx, ptr, chg, percent, color, colormasks);
+    (*tdp->nprocs->win_status_update)(tdp->ndata, idx, ptr, chg, percent,
+                                      color, colormasks);
     POST;
 }
 

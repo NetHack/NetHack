@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1524689449 2018/04/25 20:50:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1543447374 2018/11/28 23:22:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -146,6 +146,15 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 #LINK = gcc
 #LFLAGS = -Xlinker -soname=_APP_
 
+# Compile with PDCurses installed in a separate directory that doesn't
+# conflict with the system curses/ncurses library
+#CFLAGS = -O -I../include -I/usr/local/include/pdcurses
+# Same as above, but for XCurses
+#CFLAGS = -O -DXCURSES -I../include -I/usr/local/include/pdcurses
+# Compile against system curses library, such as ncurses
+#CFLAGS = -O -I../include
+
+
 # Only used for the Gnome interface.
 # When including the Gnome interface, you need to include gnome specific
 # directories.  The ones given below is the usual spot for linux systems.
@@ -163,7 +172,8 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
 # the C++ libraries linked in.
 CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include
-CXX=g++
+CXX ?= g++
+MOC ?= moc
 #LINK=g++
 #	For cross-compiling, eg. with gcc on Linux (see also CC further up):
 #CXX=arm-linux-g++
@@ -188,6 +198,14 @@ REGEXOBJ = posixregex.o
 WINTTYSRC = ../win/tty/getline.c ../win/tty/termcap.c ../win/tty/topl.c \
 	../win/tty/wintty.c
 WINTTYOBJ = getline.o termcap.o topl.o wintty.o
+#
+# Files for curses interface
+WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
+	../win/curses/cursmisc.c ../win/curses/cursdial.c \
+	../win/curses/cursstat.c ../win/curses/cursinit.c \
+	../win/curses/cursmesg.c ../win/curses/cursinvt.c
+WINCURSESOBJ = cursmain.o curswins.o cursmisc.o cursdial.o cursstat.o \
+	cursinit.o cursmesg.o cursinvt.o
 #
 # files for an X11 port
 # (tile.c is a generated source file)
@@ -242,12 +260,15 @@ WINBEOBJ =
 #WINBESRC = ../win/BeOS/winbe.cpp ../win/BeOS/NHWindow.cpp \
 #	../win/BeOS/NHMenuWindow.cpp ../win/BeOS/NHMapWindow.cpp tile.c
 #WINBEOBJ = winbe.o NHWindow.o NHMenuWindow.o NHMapWindow.o tile.o
-
 #
 #
 #WINSRC = $(WINTTYSRC)
 #WINOBJ = $(WINTTYOBJ)
-
+#
+# Curses - Karl Garrison, Tangles
+#WINSRC = $(WINCURSESSRC)
+#WINOBJ = $(WINCURSESOBJ)
+#
 # on some systems the termcap library is in -ltermcap or -lcurses
 # on 386 Xenix, the -ltermlib tputs() seems not to work; use -lcurses instead
 # Sysatt uses shared library in lieu of this option
@@ -271,11 +292,15 @@ WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 # WINX11LIB = -lXaw -lXmu -lXext -lXt -lXpm -lX11 -lm
 # WINX11LIB = -lXaw -lXmu -lXpm -lXext -lXt -lX11 -lSM -lICE -lm # BSD/OS 2.0
 #
+#
 # libraries for Qt 3
 WINQTLIB = -L$(QTDIR)/lib -lqt
 #
 # libraries for Qt 4
 WINQT4LIB = `pkg-config QtGui --libs`
+#
+# libraries for Qt 5 (use with WINQT4SRC and WINQT4OBJ)
+WINQT5LIB = `pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs`
 #
 # libraries for KDE (with Qt)
 WINKDELIB = -lkdecore -lkdeui -lXext
@@ -288,9 +313,20 @@ WINGEMLIB = -le_gem -lgem
 #
 # libraries for BeOS 
 WINBELIB = -lbe
-
+#
+# libraries for curses port
+# link with ncurses
+WINCURSESLIB = -lncurses
+# link with pdcurses for SDL, installed in a separate directory
+#WINCURSESLIB = -L/usr/local/lib/pdcurses -lpdcurses -lSDL
+# same as above, for XCurses
+#WINCURSESLIB = -L/usr/local/lib/pdcurses -lXCurses -lXawM -lXmu -lXext -lXt -lX11
+#
 #WINLIB = $(WINTTYLIB)
-
+#
+# For Curses
+#WINLIB = $(WINCURSESLIB)
+#
 # any other strange libraries your system needs (for Sysunix only -- the more
 # specialized targets should already be right)
 #
@@ -343,7 +379,13 @@ AWK	= nawk
 # will proceed without it
 GITINFO=1
 
-#VERBOSEMAKE = 1
+# if you change this to 1, feedback while building will omit -Dthis -Wthat
+# -Isomewhere so that each file being compiled is listed on one short line;
+# it requires support for '$<' in rules with more than one prerequisite
+# (rather than just in suffix default rule), such as is implemented by
+# gnu make and others which have picked up its extensions;
+# allowed values are 0, 1, and empty (which behaves like 0)
+QUIETCC=0
 
 # ----------------------------------------
 #
@@ -353,7 +395,7 @@ GITINFO=1
 # {unixconf.h, pcconf.h, tosconf.h}, and possibly system.h
 
 # Verbosity definitions, begin
-#   Set VERBOSEMAKE=1 to output more stuff.
+#   Set QUIETCC=1 above to output less feedback while building.
 #   CC and CXX obey verbosity, LD and LINK don't.
 #   AT is @ when not verbose, empty otherwise
 ACTUAL_CC := $(CC)
@@ -361,23 +403,25 @@ ACTUAL_CXX := $(CXX)
 ACTUAL_LD := $(LD)
 ACTUAL_LINK := $(LINK)
 
-CC_V0 = @echo "[CC] $<"; $(ACTUAL_CC)
+CC_V0 = $(ACTUAL_CC)
 CC_V = $(CC_V0)
-CC_V1 = $(ACTUAL_CC)
-CC = $(CC_V$(VERBOSEMAKE))
+CC_V1 = @echo "[CC] $<"; $(ACTUAL_CC)
+CC = $(CC_V$(QUIETCC))
 
-CXX_V0 = @echo "[CXX] $<"; $(ACTUAL_CXX)
+CXX_V0 = $(ACTUAL_CXX)
 CXX_V = $(CXX_V0)
-CXX_V1 = $(ACTUAL_CXX)
-CXX = $(CXX_V$(VERBOSEMAKE))
+CXX_V1 = @echo "[CXX] $<"; $(ACTUAL_CXX)
+CXX = $(CXX_V$(QUIETCC))
 
+# LD and LINK might be based on invoking CC and may not be able to substitute
+# for QUIETCC, so feedback from them is handled differently (via $AT)
 LD = $(ACTUAL_LD)
 LINK = $(ACTUAL_LINK)
 
-AT_V0 := @
+AT_V0 :=
 AT_V := $(AT_V0)
-AT_V1 :=
-AT = $(AT_V$(VERBOSEMAKE))
+AT_V1 := @
+AT = $(AT_V$(QUIETCC))
 # Verbosity, end
 
 MAKEDEFS = ../util/makedefs
@@ -415,10 +459,10 @@ SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 SYSCXXSRC = ../sys/share/cppregex.cpp
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = monstr.c vis_tab.c	#tile.c
+GENCSRC = vis_tab.c	#tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
-WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
+WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINQT4SRC) $(WINBESRC)
 
@@ -462,7 +506,7 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o \
 	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
 	minion.o mklev.o mkmap.o \
-	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o monstr.o \
+	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
@@ -558,25 +602,25 @@ qttableview.moc: ../include/qttableview.h
 
 # Qt 4 windowport meta-object-compiler output
 qt4kde0.moc : ../win/Qt4/qt4kde0.h
-	$(QTDIR)/bin/moc -o qt4kde0.moc ../win/Qt4/qt4kde0.h
+	$(QTDIR)/bin/$(MOC) -o qt4kde0.moc ../win/Qt4/qt4kde0.h
 qt4main.moc : ../win/Qt4/qt4main.h
-	$(QTDIR)/bin/moc -o qt4main.moc ../win/Qt4/qt4main.h
+	$(QTDIR)/bin/$(MOC) -o qt4main.moc ../win/Qt4/qt4main.h
 qt4map.moc : ../win/Qt4/qt4map.h
-	$(QTDIR)/bin/moc -o qt4map.moc ../win/Qt4/qt4map.h
+	$(QTDIR)/bin/$(MOC) -o qt4map.moc ../win/Qt4/qt4map.h
 qt4menu.moc : ../win/Qt4/qt4menu.h
-	$(QTDIR)/bin/moc -o qt4menu.moc ../win/Qt4/qt4menu.h
+	$(QTDIR)/bin/$(MOC) -o qt4menu.moc ../win/Qt4/qt4menu.h
 qt4msg.moc : ../win/Qt4/qt4msg.h
-	$(QTDIR)/bin/moc -o qt4msg.moc ../win/Qt4/qt4msg.h
+	$(QTDIR)/bin/$(MOC) -o qt4msg.moc ../win/Qt4/qt4msg.h
 qt4plsel.moc : ../win/Qt4/qt4plsel.h
-	$(QTDIR)/bin/moc -o qt4plsel.moc ../win/Qt4/qt4plsel.h
+	$(QTDIR)/bin/$(MOC) -o qt4plsel.moc ../win/Qt4/qt4plsel.h
 qt4set.moc : ../win/Qt4/qt4set.h
-	$(QTDIR)/bin/moc -o qt4set.moc ../win/Qt4/qt4set.h
+	$(QTDIR)/bin/$(MOC) -o qt4set.moc ../win/Qt4/qt4set.h
 qt4stat.moc : ../win/Qt4/qt4stat.h
-	$(QTDIR)/bin/moc -o qt4stat.moc ../win/Qt4/qt4stat.h
+	$(QTDIR)/bin/$(MOC) -o qt4stat.moc ../win/Qt4/qt4stat.h
 qt4xcmd.moc : ../win/Qt4/qt4xcmd.h
-	$(QTDIR)/bin/moc -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
+	$(QTDIR)/bin/$(MOC) -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
 qt4yndlg.moc : ../win/Qt4/qt4yndlg.h
-	$(QTDIR)/bin/moc -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
+	$(QTDIR)/bin/$(MOC) -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \
@@ -597,9 +641,7 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 	@( cd ../util ; $(MAKE) ../include/onames.h )
 ../include/pm.h: $(MAKEDEFS) ../include/onames.h
 	@( cd ../util ; $(MAKE) ../include/pm.h )
-monstr.c: $(MAKEDEFS) ../include/pm.h
-	@( cd ../util ; $(MAKE) ../src/monstr.c )
-../include/vis_tab.h: $(MAKEDEFS) monstr.c
+../include/vis_tab.h: $(MAKEDEFS) ../include/pm.h
 	@( cd ../util ; $(MAKE) ../include/vis_tab.h )
 # makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
 vis_tab.c: ../include/vis_tab.h
@@ -647,7 +689,7 @@ clean:
 spotless: clean
 	-rm -f a.out core $(GAME) Sys*
 	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
-	-rm -f monstr.c ../include/vis_tab.h vis_tab.c tile.c *.moc
+	-rm -f ../include/vis_tab.h vis_tab.c tile.c *.moc
 	-rm -f ../win/gnome/gn_rip.h
 
 
@@ -698,8 +740,7 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../sys/atari/tos.c
-pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h \
-		#../include/win32api.h
+pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
 	$(CC) $(CFLAGS) -c ../sys/share/pcmain.c
 pcsys.o: ../sys/share/pcsys.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/pcsys.c
@@ -733,13 +774,38 @@ topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/topl.c
 wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/wintty.c
+cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/patchlevel.h \
+		../include/wincurs.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmain.c
+curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/curswins.h
+	$(CC) $(CFLAGS) -c ../win/curses/curswins.c
+cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursmisc.h ../include/func_tab.h ../include/dlb.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmisc.c
+cursdial.o: ../win/curses/cursdial.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursdial.h ../include/func_tab.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursdial.c
+cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursstat.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursstat.c
+cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursinit.h ../include/patchlevel.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinit.c
+cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursmesg.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmesg.c
+cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursinvt.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinvt.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H) ../include/lint.h
 	$(CC) $(CFLAGS) -c ../win/X11/Window.c
 dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h
 	$(CC) $(CFLAGS) -c ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
-		../win/X11/nh72icon ../win/X11/nh56icon ../win/X11/nh32icon
+		../include/xwindow.h ../win/X11/nh72icon ../win/X11/nh56icon \
+		../win/X11/nh32icon
 	$(CC) $(CFLAGS) -c ../win/X11/winX.c
 winmap.o: ../win/X11/winmap.c ../include/xwindow.h $(HACK_H) ../include/dlb.h \
 		../include/winX.h ../include/tile2x11.h
@@ -751,7 +817,7 @@ winmesg.o: ../win/X11/winmesg.c ../include/xwindow.h $(HACK_H) ../include/winX.h
 winmisc.o: ../win/X11/winmisc.c $(HACK_H) ../include/func_tab.h \
 		../include/winX.h
 	$(CC) $(CFLAGS) -c ../win/X11/winmisc.c
-winstat.o: ../win/X11/winstat.c $(HACK_H) ../include/winX.h
+winstat.o: ../win/X11/winstat.c $(HACK_H) ../include/winX.h ../include/xwindow.h
 	$(CC) $(CFLAGS) -c ../win/X11/winstat.c
 wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h ../include/xwindow.h
 	$(CC) $(CFLAGS) -c ../win/X11/wintext.c
@@ -822,51 +888,82 @@ qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_clust.cpp
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qttableview.cpp
-qt4bind.o : ../win/Qt4/qt4bind.cpp $(HACK_H) ../win/Qt4/qt4bind.h
+qt4bind.o: ../win/Qt4/qt4bind.cpp $(HACK_H) ../win/Qt4/qt4bind.h \
+		../win/Qt4/qt4click.h ../win/Qt4/qt4delay.h \
+		../win/Qt4/qt4xcmd.h ../win/Qt4/qt4key.h ../win/Qt4/qt4map.h \
+		../win/Qt4/qt4menu.h ../win/Qt4/qt4msg.h ../win/Qt4/qt4plsel.h \
+		../win/Qt4/qt4svsel.h ../win/Qt4/qt4set.h ../win/Qt4/qt4stat.h \
+		../win/Qt4/qt4streq.h ../win/Qt4/qt4yndlg.h \
+		../win/Qt4/qt4str.h ../include/dlb.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4bind.cpp
-qt4click.o : ../win/Qt4/qt4click.cpp $(HACK_H) ../win/Qt4/qt4click.h
+qt4click.o: ../win/Qt4/qt4click.cpp $(HACK_H) ../win/Qt4/qt4click.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4click.cpp
-qt4clust.o : ../win/Qt4/qt4clust.cpp $(HACK_H) ../win/Qt4/qt4clust.h
+qt4clust.o: ../win/Qt4/qt4clust.cpp ../win/Qt4/qt4clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4clust.cpp
-qt4delay.o : ../win/Qt4/qt4delay.cpp $(HACK_H) ../win/Qt4/qt4delay.h
+qt4delay.o: ../win/Qt4/qt4delay.cpp $(HACK_H) ../win/Qt4/qt4delay.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4delay.cpp
-qt4glyph.o : ../win/Qt4/qt4glyph.cpp $(HACK_H) ../win/Qt4/qt4glyph.h
+qt4glyph.o: ../win/Qt4/qt4glyph.cpp $(HACK_H) ../include/tile2x11.h \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4glyph.cpp
-qt4icon.o : ../win/Qt4/qt4icon.cpp $(HACK_H) ../win/Qt4/qt4icon.h
+qt4icon.o: ../win/Qt4/qt4icon.cpp $(HACK_H) ../win/Qt4/qt4icon.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4icon.cpp
-qt4inv.o : ../win/Qt4/qt4inv.cpp $(HACK_H) ../win/Qt4/qt4inv.h
+qt4inv.o: ../win/Qt4/qt4inv.cpp $(HACK_H) ../win/Qt4/qt4inv.h \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4inv.cpp
-qt4key.o : ../win/Qt4/qt4key.cpp $(HACK_H) ../win/Qt4/qt4key.h
+qt4key.o: ../win/Qt4/qt4key.cpp $(HACK_H) ../win/Qt4/qt4key.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4key.cpp
-qt4line.o : ../win/Qt4/qt4line.cpp $(HACK_H) ../win/Qt4/qt4line.h
+qt4line.o: ../win/Qt4/qt4line.cpp $(HACK_H) ../win/Qt4/qt4line.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4line.cpp
-qt4main.o : ../win/Qt4/qt4main.cpp $(HACK_H) qt4main.moc ../win/Qt4/qt4main.h qt4kde0.moc
+qt4main.o: ../win/Qt4/qt4main.cpp $(HACK_H) ../include/patchlevel.h \
+		../win/Qt4/qt4main.h qt4main.moc ../win/Qt4/qt4bind.h \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4inv.h ../win/Qt4/qt4key.h \
+		../win/Qt4/qt4map.h ../win/Qt4/qt4msg.h ../win/Qt4/qt4set.h \
+		../win/Qt4/qt4stat.h ../win/Qt4/qt4str.h qt4kde0.moc
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4main.cpp
-qt4map.o : ../win/Qt4/qt4map.cpp $(HACK_H) qt4map.moc ../win/Qt4/qt4map.h
+qt4map.o: ../win/Qt4/qt4map.cpp $(HACK_H) ../win/Qt4/qt4map.h qt4map.moc \
+		../win/Qt4/qt4click.h ../win/Qt4/qt4glyph.h \
+		../include/qt_xpms.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4map.cpp
-qt4menu.o : ../win/Qt4/qt4menu.cpp $(HACK_H) qt4menu.moc ../win/Qt4/qt4menu.h
+qt4menu.o: ../win/Qt4/qt4menu.cpp $(HACK_H) ../win/Qt4/qt4menu.h qt4menu.moc \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h \
+		../win/Qt4/qt4streq.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4menu.cpp
-qt4msg.o : ../win/Qt4/qt4msg.cpp $(HACK_H) qt4msg.moc ../win/Qt4/qt4msg.h
+qt4msg.o: ../win/Qt4/qt4msg.cpp $(HACK_H) ../win/Qt4/qt4msg.h qt4msg.moc \
+		../win/Qt4/qt4map.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4msg.cpp
-qt4plsel.o : ../win/Qt4/qt4plsel.cpp $(HACK_H) qt4plsel.moc ../win/Qt4/qt4plsel.h
+qt4plsel.o: ../win/Qt4/qt4plsel.cpp $(HACK_H) ../win/Qt4/qt4plsel.h \
+		qt4plsel.moc ../win/Qt4/qt4bind.h ../win/Qt4/qt4glyph.h \
+		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4plsel.cpp
-qt4rip.o : ../win/Qt4/qt4rip.cpp $(HACK_H) ../win/Qt4/qt4rip.h
+qt4rip.o: ../win/Qt4/qt4rip.cpp $(HACK_H) ../win/Qt4/qt4rip.h \
+		../win/Qt4/qt4bind.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4rip.cpp
-qt4set.o : ../win/Qt4/qt4set.cpp $(HACK_H) qt4set.moc ../win/Qt4/qt4set.h
+qt4set.o: ../win/Qt4/qt4set.cpp $(HACK_H) ../win/Qt4/qt4set.h qt4set.moc \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4set.cpp
-qt4stat.o : ../win/Qt4/qt4stat.cpp $(HACK_H) qt4stat.moc ../win/Qt4/qt4stat.h
+qt4stat.o: ../win/Qt4/qt4stat.cpp $(HACK_H) ../win/Qt4/qt4stat.h qt4stat.moc \
+		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h ../include/qt_xpms.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4stat.cpp
-qt4str.o : ../win/Qt4/qt4str.cpp ../win/Qt4/qt4str.h
+qt4str.o: ../win/Qt4/qt4str.cpp ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4str.cpp
-qt4streq.o : ../win/Qt4/qt4streq.cpp $(HACK_H) ../win/Qt4/qt4streq.h
+qt4streq.o: ../win/Qt4/qt4streq.cpp $(HACK_H) ../win/Qt4/qt4streq.h \
+		../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4streq.cpp
-qt4svsel.o : ../win/Qt4/qt4svsel.cpp $(HACK_H) ../win/Qt4/qt4svsel.h
+qt4svsel.o: ../win/Qt4/qt4svsel.cpp $(HACK_H) ../win/Qt4/qt4svsel.h \
+		../win/Qt4/qt4bind.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4svsel.cpp
-qt4win.o : ../win/Qt4/qt4win.cpp $(HACK_H) ../win/Qt4/qt4win.h
+qt4win.o: ../win/Qt4/qt4win.cpp $(HACK_H) ../win/Qt4/qt4win.h \
+		../win/Qt4/qt4bind.h ../win/Qt4/qt4click.h \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4inv.h ../win/Qt4/qt4key.h \
+		../win/Qt4/qt4icon.h ../win/Qt4/qt4map.h ../win/Qt4/qt4menu.h \
+		../win/Qt4/qt4msg.h ../win/Qt4/qt4set.h ../win/Qt4/qt4clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4win.cpp
-qt4xcmd.o : ../win/Qt4/qt4xcmd.cpp $(HACK_H) qt4xcmd.moc ../win/Qt4/qt4xcmd.h
+qt4xcmd.o: ../win/Qt4/qt4xcmd.cpp $(HACK_H) ../include/func_tab.h \
+		../win/Qt4/qt4xcmd.h qt4xcmd.moc ../win/Qt4/qt4bind.h \
+		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4xcmd.cpp
-qt4yndlg.o : ../win/Qt4/qt4yndlg.cpp $(HACK_H) qt4yndlg.moc ../win/Qt4/qt4yndlg.h
+qt4yndlg.o: ../win/Qt4/qt4yndlg.cpp $(HACK_H) ../win/Qt4/qt4yndlg.h \
+		qt4yndlg.moc ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4yndlg.cpp
 wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../win/chain/wc_chainin.c
@@ -874,7 +971,6 @@ wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../win/chain/wc_chainout.c
 wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
 	$(CC) $(CFLAGS) -c ../win/chain/wc_trace.c
-monstr.o: monstr.c $(CONFIG_H)
 vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
 allmain.o: allmain.c $(HACK_H)
 alloc.o: alloc.c $(CONFIG_H)
@@ -884,7 +980,7 @@ attrib.o: attrib.c $(HACK_H)
 ball.o: ball.c $(HACK_H)
 bones.o: bones.c $(HACK_H) ../include/lev.h
 botl.o: botl.c $(HACK_H)
-cmd.o: cmd.c $(HACK_H) ../include/func_tab.h
+cmd.o: cmd.c $(HACK_H) ../include/lev.h ../include/func_tab.h
 dbridge.o: dbridge.c $(HACK_H)
 decl.o: decl.c $(HACK_H)
 detect.o: detect.c $(HACK_H) ../include/artifact.h

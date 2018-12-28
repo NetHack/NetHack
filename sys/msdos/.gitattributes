@@ -4,3 +4,6 @@ Makefile.* NHSUBST
 Install.* NHSUBST
 moveinit.pat NH_header=no
 vesa.h NH_header=no
+* NH_filestag=(file%s_for_MSDOS_version_-_untested_for_3.6.2)
+nhico.uu NH_filestag=(file%s_for_running_MSDOS_binary_under_Windows)
+nhpif.uu NH_filestag=>nhico.uu

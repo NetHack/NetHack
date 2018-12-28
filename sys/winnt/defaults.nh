@@ -23,6 +23,9 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 # for use by blind NetHack players
 #OPTIONS=symset:NHAccess,roguesymset:NHAccess
 
+# Optional curses port interface
+#OPTIONS=windowtype:curses
+#
 # Keyboard handling
 # Different keyboard handlers can be loaded.
 # Default is nhdefkey.dll but you can override that.
@@ -80,7 +83,7 @@ MENUCOLOR=" cursed .* (being worn)" = orange&underline
 #
 # number_pad option can have an optional value of 0 (off), 1 (on), 
 # or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
-OPTIONS=time,noshowexp,number_pad:2,lit_corridor
+OPTIONS=time,noshowexp,number_pad:2,lit_corridor,mouse_support:1
 
 # Make commands that ask for an inventory item pop up a menu
 OPTIONS=force_invmenu
@@ -105,16 +108,16 @@ OPTIONS=suppress_alert:3.3.1
 OPTIONS=map_mode:tiles,scroll_margin:10
 
 # Message window settings
-OPTIONS=font_message:Arial,font_size_message:9,align_message:top
+OPTIONS=font_message:Arial,font_size_message:14,align_message:top
 
 # Menu settings
-OPTIONS=font_menu:Arial,font_size_menu:9
+OPTIONS=font_menu:Arial,font_size_menu:14
 
 # Text settings
-OPTIONS=font_text:Courier New,font_size_text:9
+OPTIONS=font_text:Courier New,font_size_text:14
 
 # Status window settings
-OPTIONS=font_status:Courier New,font_size_status:9
+OPTIONS=font_status:Courier New,font_size_status:14
 
 # Other
 OPTIONS=hilite_pet,!toptenwin
@@ -133,7 +136,7 @@ OPTIONS=hilite_pet,!toptenwin
 
 # "Nethack mode" colors
 OPTIONS=windowcolors:status white/#000000 message white/#000000 text white/#000000 menu white/#000000 menutext white/#000000
-OPTIONS=vary_msgcount:1
+OPTIONS=vary_msgcount:4
 
 # *** LOCATIONS ***
 # IMPORTANT: If you change any of these locations, the directories they

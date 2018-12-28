@@ -20,7 +20,7 @@
       <Optimization>Disabled</Optimization>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TILES;_WINDOWS;DLB;MSWIN_GRAPHICS;WIN32CONNDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TILES;_WINDOWS;DLB;MSWIN_GRAPHICS;SAFEPROCS;NOTTYGRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -30,6 +30,9 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>comctl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Manifest>
+      <AdditionalManifestFiles>$(WinWin32Dir)NethackW.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(SrcDir)allmain.c" />
@@ -85,7 +88,6 @@
     <ClCompile Include="$(SrcDir)mondata.c" />
     <ClCompile Include="$(SrcDir)monmove.c" />
     <ClCompile Include="$(SrcDir)monst.c" />
-    <ClCompile Include="$(SrcDir)monstr.c" />
     <ClCompile Include="$(SrcDir)mplayer.c" />
     <ClCompile Include="$(SrcDir)mthrowu.c" />
     <ClCompile Include="$(SrcDir)muse.c" />
@@ -144,15 +146,15 @@
     <ClCompile Include="$(SrcDir)zap.c" />
     <ClCompile Include="$(SysShareDir)cppregex.cpp" />
     <ClCompile Include="$(SysShareDir)nhlan.c" />
-    <ClCompile Include="$(SysShareDir)pcmain.c" />
-    <ClCompile Include="$(SysShareDir)pcsys.c" />
-    <ClCompile Include="$(SysShareDir)pcunix.c" />
     <ClCompile Include="$(SysShareDir)random.c" />
     <ClCompile Include="$(SysWinntDir)ntsound.c" />
     <ClCompile Include="$(SysWinntDir)stubs.c">
       <PreprocessorDefinitions>TTYSTUB;</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="$(SysWinntDir)windmain.c" />
     <ClCompile Include="$(SysWinntDir)winnt.c" />
+    <ClCompile Include="$(SysWinntDir)win10.c" />
+    <ClCompile Include="$(WinShareDir)safeproc.c" />
     <ClCompile Include="$(WinWin32Dir)mhaskyn.c" />
     <ClCompile Include="$(WinWin32Dir)mhdlg.c" />
     <ClCompile Include="$(WinWin32Dir)mhfont.c" />
@@ -170,6 +172,22 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(WinWin32Dir)winhack.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(WinWin32Dir)mhaskyn.h" />
+    <ClInclude Include="$(WinWin32Dir)mhdlg.h" />
+    <ClInclude Include="$(WinWin32Dir)mhfont.h" />
+    <ClInclude Include="$(WinWin32Dir)mhinput.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmain.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmap.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmenu.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmsg.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmsgwnd.h" />
+    <ClInclude Include="$(WinWin32Dir)mhrip.h" />
+    <ClInclude Include="$(WinWin32Dir)mhsplash.h" />
+    <ClInclude Include="$(WinWin32Dir)mhstatus.h" />
+    <ClInclude Include="$(WinWin32Dir)mhtext.h" />
+    <ClInclude Include="$(WinWin32Dir)winMS.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="AfterBuild">

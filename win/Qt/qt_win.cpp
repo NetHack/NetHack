@@ -2906,7 +2906,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 	if (dialog->result()<0)
 	    qApp->enter_loop();
     }
-    //if ( (nhid != WIN_INVEN || !flags.perm_invent) ) // doesn't work yet
+    //if ( (nhid != WIN_INVEN || !iflags.perm_invent) ) // doesn't work yet
     {
 	dialog->hide();
     }
@@ -4840,7 +4840,7 @@ void NetHackQtBind::qt_update_inventory()
     if (main)
 	main->updateInventory();
     /* doesn't work yet
-    if (program_state.something_worth_saving && flags.perm_invent)
+    if (program_state.something_worth_saving && iflags.perm_invent)
         display_inventory(NULL, FALSE);
     */
 }

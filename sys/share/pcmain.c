@@ -1,9 +1,9 @@
-/* NetHack 3.6	pcmain.c	$NHDT-Date: 1524413707 2018/04/22 16:15:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.6	pcmain.c	$NHDT-Date: 1543465755 2018/11/29 04:29:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* main.c - MSDOS, OS/2, ST, Amiga, and Windows NetHack */
+/* main.c - MSDOS, OS/2, ST, Amiga NetHack */
 
 #include "hack.h"
 #include "dlb.h"
@@ -20,10 +20,6 @@
 #ifdef GNUDOS
 #include <sys/stat.h>
 #endif
-#endif
-
-#ifdef WIN32
-#include "win32api.h" /* for GetModuleFileName */
 #endif
 
 #ifdef __DJGPP__
@@ -47,25 +43,10 @@ void preserve_icon(void);
 STATIC_DCL void process_options(int argc, char **argv);
 STATIC_DCL void nhusage(void);
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(OS2)
 extern void nethack_exit(int);
 #else
 #define nethack_exit exit
-#endif
-
-#ifdef WIN32
-extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
-extern int redirect_stdout;       /* from sys/share/pcsys.c */
-extern int GUILaunched;
-HANDLE hStdOut;
-char *exename(void);
-char default_window_sys[] = "mswin";
-boolean fakeconsole(void);
-void freefakeconsole(void);
-#endif
-
-#if defined(MSWIN_GRAPHICS)
-extern void mswin_destroy_reg(void);
 #endif
 
 #ifdef EXEPATH
@@ -76,7 +57,7 @@ int main(int, char **);
 
 extern boolean pcmain(int, char **);
 
-#if defined(__BORLANDC__) && !defined(_WIN32)
+#if defined(__BORLANDC__)
 void startup(void);
 unsigned _stklen = STKSIZ;
 #endif
@@ -85,40 +66,33 @@ unsigned _stklen = STKSIZ;
  * to help MinGW decide which entry point to choose. If both main and
  * WinMain exist, the resulting executable won't work correctly.
  */
-#ifndef __MINGW32__
 int
-main(int argc, char *argv[])
+#ifndef __MINGW32__ 
+main(argc, argv)
+#else
+mingw_main(argc, argv)
+#endif
+int argc;
+char *argv[];
 {
     boolean resuming;
 
     sys_early_init();
-#ifdef WIN32
-    Strcpy(default_window_sys, "tty");
-#endif
-
     resuming = pcmain(argc, argv);
-#ifdef LAN_FEATURES
-    init_lan_features();
-#endif
     moveloop(resuming);
     nethack_exit(EXIT_SUCCESS);
     /*NOTREACHED*/
     return 0;
 }
-#endif
 
 boolean
 pcmain(int argc, char *argv[])
 {
     register int fd;
     register char *dir;
-#if defined(WIN32) || defined(MSDOS)
+#if defined(MSDOS)
     char *envp = NULL;
     char *sptr = NULL;
-#endif
-#if defined(WIN32)
-    char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
-    boolean save_getreturn_status = getreturn_enabled;
 #endif
 #ifdef NOCWD_ASSUMPTIONS
     char failbuf[BUFSZ];
@@ -148,7 +122,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 # endif
 #endif
 
-#if defined(__BORLANDC__) && !defined(_WIN32)
+#if defined(__BORLANDC__)
     startup();
 #endif
 
@@ -161,11 +135,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
         hname = "NetHack"; /* used for syntax messages */
 
-#ifndef WIN32
     choose_windows(DEFAULT_WINDOW_SYS);
-#else
-    choose_windows(default_window_sys);
-#endif
 
 #if !defined(AMIGA) && !defined(GNUDOS)
     /* Save current directory and make sure it gets restored when
@@ -225,7 +195,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++)
                 fqn_prefix[prefcnt] = fqn_prefix[0];
 
-#if defined(WIN32) || defined(MSDOS)
+#if defined(MSDOS)
             /* sysconf should be searched for in this location */
             envp = nh_getenv("COMMONPROGRAMFILES");
             if (envp) {
@@ -300,12 +270,6 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
     ami_wininit_data();
 #endif
-#ifdef WIN32
-    save_getreturn_status = getreturn_enabled;
-    raw_clear_screen();
-    getreturn_enabled = TRUE;
-    check_recordfile((char *) 0);
-#endif
     initoptions();
 
 #ifdef NOCWD_ASSUMPTIONS
@@ -327,10 +291,15 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         Strcpy(hackdir, HACKDIR);
 #endif
     if (argc > 1) {
-        if (argcheck(argc, argv, ARG_VERSION))
+        if (argcheck(argc, argv, ARG_VERSION) == 2)
             nethack_exit(EXIT_SUCCESS);
 
-        if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
+        if (argcheck(argc, argv, ARG_DEBUG) == 1) {
+            argc--;
+            argv++;
+	}
+
+        if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
              */
@@ -349,36 +318,11 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             Strcpy(hackdir, dir);
         }
         if (argc > 1) {
-#if defined(WIN32)
-            int sfd = 0;
-            boolean tmpconsole = FALSE;
-            hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-#endif
             /*
              * Now we know the directory containing 'record' and
              * may do a prscore().
              */
             if (!strncmp(argv[1], "-s", 2)) {
-#if defined(WIN32)
-
-#if 0
-                if (!hStdOut) {
-                    tmpconsole = fakeconsole();
-                }
-#endif
-                /*
-                 * Check to see if we're redirecting to a file.
-                 */
-                sfd = (int) _fileno(stdout);
-                redirect_stdout = (sfd >= 0) ? !isatty(sfd) : 0;
-
-                if (!redirect_stdout && !hStdOut) {
-                    raw_printf(
-                        "-s is not supported for the Graphical Interface\n");
-                    nethack_exit(EXIT_SUCCESS);
-                }
-#endif
-
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
                 chdirx(hackdir, 0);
 #endif
@@ -386,47 +330,16 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 initoptions();
 #endif
                 prscore(argc, argv);
-#ifdef WIN32
-                if (tmpconsole) {
-                    getreturn("to exit");
-                    freefakeconsole();
-                    tmpconsole = FALSE;
-                }
-#endif
                 nethack_exit(EXIT_SUCCESS);
             }
 
-#ifdef MSWIN_GRAPHICS
-            if (!strncmpi(argv[1], "-clearreg", 6)) { /* clear registry */
-                mswin_destroy_reg();
-                nethack_exit(EXIT_SUCCESS);
-            }
-#endif
             /* Don't initialize the window system just to print usage */
             if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
-#if 0
-                if (!hStdOut) {
-                    GUILaunched = 0;
-                    tmpconsole = fakeconsole();
-                }
-#endif
                 nhusage();
-
-#ifdef WIN32
-                if (tmpconsole) {
-                    getreturn("to exit");
-                    freefakeconsole();
-                    tmpconsole = FALSE;
-                }
-#endif
                 nethack_exit(EXIT_SUCCESS);
             }
         }
     }
-
-#ifdef WIN32
-    getreturn_enabled = save_getreturn_status;
-#endif
 /*
  * It seems you really want to play.
  */
@@ -440,11 +353,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             "\"%s\".%s",
             copyright_banner_line(1), copyright_banner_line(2),
             copyright_banner_line(3), copyright_banner_line(4), DLBFILE,
-#ifdef WIN32
-            "\nAre you perhaps trying to run NetHack within a zip utility?");
-#else
             "");
-#endif
         error("dlb_init failure.");
     }
 
@@ -458,47 +367,20 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     chdirx(hackdir, 1);
 #endif
 
-#if defined(MSDOS) || defined(WIN32)
+#if defined(MSDOS)
     /* In 3.6.0, several ports process options before they init
      * the window port. This allows settings that impact window
      * ports to be specified or read from the sys or user config files.
      */
     process_options(argc, argv);
 
-#ifdef WIN32
-    /*
-        if (!strncmpi(windowprocs.name, "mswin", 5))
-            NHWinMainInit();
-        else
-    */
-    if (!strncmpi(windowprocs.name, "tty", 3)) {
-        iflags.use_background_glyph = FALSE;
-        nttty_open(1);
-    } else {
-        iflags.use_background_glyph = TRUE;
-    }
-#endif
-#endif
+#endif /* MSDOS */
 
-#if defined(MSDOS) || defined(WIN32)
-    /* Player didn't specify any symbol set so use IBM defaults */
-    if (!symset[PRIMARY].name) {
-        load_symset("IBMGraphics_2", PRIMARY);
-    }
-    if (!symset[ROGUESET].name) {
-        load_symset("RogueEpyx", ROGUESET);
-    }
-#endif
-
-#if defined(MSDOS) || defined(WIN32)
+#if defined(MSDOS)
     init_nhwindows(&argc, argv);
 #else
     init_nhwindows(&argc, argv);
     process_options(argc, argv);
-#endif
-
-#ifdef WIN32
-    toggle_mouse_support(); /* must come after process_options */
 #endif
 
 #ifdef MFLOPPY
@@ -537,19 +419,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
  * overwritten without confirmation when a user starts up
  * another game with the same player name.
  */
-#if defined(WIN32)
-    /* Obtain the name of the logged on user and incorporate
-     * it into the name. */
-    Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
-    (void) fname_encode(
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.", '%',
-        fnamebuf, encodedfnamebuf, BUFSZ);
-    Sprintf(lock, "%s", encodedfnamebuf);
-    /* regularize(lock); */ /* we encode now, rather than substitute */
-#else
     Strcpy(lock, plname);
     regularize(lock);
-#endif
     getlock();
 #else        /* What follows is !PC_LOCKING */
 #ifdef AMIGA /* We'll put the bones & levels in the user specified directory \
@@ -575,11 +446,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (fd < 0) {
         raw_print("Cannot create lock file");
     } else {
-#ifdef WIN32
-        hackpid = GetCurrentProcessId();
-#else
         hackpid = 1;
-#endif
         write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
         nhclose(fd);
     }
@@ -594,10 +461,6 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     vision_init();
 
     display_gamewindows();
-#ifdef WIN32
-    getreturn_enabled = TRUE;
-#endif
-
 /*
  * First, try to find and restore a save file for specified character.
  * We'll return here if new game player_selection() renames the hero.
@@ -774,21 +637,6 @@ process_options(int argc, char *argv[])
             bigscreen = -1;
             break;
 #endif
-#ifdef WIN32
-        case 'w': /* windowtype */
-            if (strncmpi(&argv[0][2], "tty", 3)) {
-                nttty_open(1);
-            }
-            /*
-                        else {
-                            NHWinMainInit();
-                        }
-            */
-            config_error_init(FALSE, "command line", FALSE);
-            choose_windows(&argv[0][2]);
-            config_error_done();
-            break;
-#endif
         case '@':
             flags.randomall = 1;
             break;
@@ -879,14 +727,14 @@ chdirx(char *dir, boolean wr)
 #endif /* CHDIR */
 
 #ifdef PORT_HELP
-#if defined(MSDOS) || defined(WIN32)
+#if defined(MSDOS)
 void
 port_help()
 {
     /* display port specific help file */
     display_file(PORT_HELP, 1);
 }
-#endif /* MSDOS || WIN32 */
+#endif /* MSDOS */
 #endif /* PORT_HELP */
 
 /* validate wizard mode if player has requested access to it */
@@ -905,71 +753,6 @@ authorize_wizard_mode()
 #define PATH_SEPARATOR '\\'
 #endif
 
-#ifdef WIN32
-static char exenamebuf[PATHLEN];
-extern HANDLE hConIn;
-extern HANDLE hConOut;
-boolean has_fakeconsole;
-
-char *
-exename()
-{
-    int bsize = PATHLEN;
-    char *tmp = exenamebuf, *tmp2;
-
-#ifdef UNICODE
-    {
-        TCHAR wbuf[PATHLEN * 4];
-        GetModuleFileName((HANDLE) 0, wbuf, PATHLEN * 4);
-        WideCharToMultiByte(CP_ACP, 0, wbuf, -1, tmp, bsize, NULL, NULL);
-    }
-#else
-    *(tmp + GetModuleFileName((HANDLE) 0, tmp, bsize)) = '\0';
-#endif
-    tmp2 = strrchr(tmp, PATH_SEPARATOR);
-    if (tmp2)
-        *tmp2 = '\0';
-    tmp2++;
-    return tmp2;
-}
-
-boolean
-fakeconsole(void)
-{
-    if (!hStdOut) {
-        HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-        HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
-
-        if (!hStdOut && !hStdIn) {
-            /* Bool rval; */
-            AllocConsole();
-            AttachConsole(GetCurrentProcessId());
-            /* 	rval = SetStdHandle(STD_OUTPUT_HANDLE, hWrite); */
-            freopen("CON", "w", stdout);
-            freopen("CON", "r", stdin);
-        }
-        has_fakeconsole = TRUE;
-    }
-    
-    /* Obtain handles for the standard Console I/O devices */
-    hConIn = GetStdHandle(STD_INPUT_HANDLE);
-    hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
-#if 0
-    if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE) CtrlHandler, TRUE)) {
-        /* Unable to set control handler */
-        cmode = 0; /* just to have a statement to break on for debugger */
-    }
-#endif
-    return has_fakeconsole;
-}
-void freefakeconsole()
-{
-    if (has_fakeconsole) {
-        FreeConsole();
-    }
-}
-#endif
-
 #define EXEPATHBUFSZ 256
 char exepathbuf[EXEPATHBUFSZ];
 
@@ -983,19 +766,7 @@ exepath(char *str)
         return (char *) 0;
     bsize = EXEPATHBUFSZ;
     tmp = exepathbuf;
-#ifndef WIN32
     Strcpy(tmp, str);
-#else
-#ifdef UNICODE
-    {
-        TCHAR wbuf[BUFSZ];
-        GetModuleFileName((HANDLE) 0, wbuf, BUFSZ);
-        WideCharToMultiByte(CP_ACP, 0, wbuf, -1, tmp, bsize, NULL, NULL);
-    }
-#else
-    *(tmp + GetModuleFileName((HANDLE) 0, tmp, bsize)) = '\0';
-#endif
-#endif
     tmp2 = strrchr(tmp, PATH_SEPARATOR);
     if (tmp2)
         *tmp2 = '\0';

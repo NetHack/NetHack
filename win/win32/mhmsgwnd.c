@@ -416,6 +416,10 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             }
     } break;
 
+	case MSNH_MSG_RANDOM_INPUT:
+		nhassert(0); // unexpected
+		break;
+
     } /* switch( wParam ) */
 }
 
@@ -635,9 +639,9 @@ onPaint(HWND hWnd)
             draw_rt.top = y - data->yChar;
             draw_rt.bottom = y;
 
-            oldFont = SelectObject(
-                hdc, mswin_get_font(NHW_MESSAGE, data->window_text[i].attr,
-                                    hdc, FALSE));
+            cached_font * font = mswin_get_font(NHW_MESSAGE,
+                                        data->window_text[i].attr, hdc, FALSE);
+            oldFont = SelectObject(hdc, font->hFont);
 
             /* convert to UNICODE stripping newline */
             strcpy(tmptext, data->window_text[i].text);
@@ -746,8 +750,8 @@ mswin_message_window_size(HWND hWnd, LPSIZE sz)
     /* -- Calculate the font size -- */
     /* Get the handle to the client area's device context. */
     hdc = GetDC(hWnd);
-    saveFont =
-        SelectObject(hdc, mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, FALSE));
+    cached_font * font = mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, FALSE);
+    saveFont = SelectObject(hdc, font->hFont);
 
     /* Extract font dimensions from the text metrics. */
     GetTextMetrics(hdc, &tm);
@@ -813,10 +817,9 @@ can_append_text(HWND hWnd, int attr, const char *text)
     strcat(tmptext, MORE);
 
     hdc = GetDC(hWnd);
-    saveFont = SelectObject(
-        hdc,
-        mswin_get_font(NHW_MESSAGE, data->window_text[MSG_LINES - 1].attr,
-                       hdc, FALSE));
+    cached_font * font = mswin_get_font(NHW_MESSAGE,
+                            data->window_text[MSG_LINES - 1].attr, hdc, FALSE);
+    saveFont = SelectObject(hdc, font->hFont);
     GetClientRect(hWnd, &draw_rt);
     draw_rt.left += LINE_PADDING_LEFT(data);
     draw_rt.right -= LINE_PADDING_RIGHT(data);
@@ -860,17 +863,16 @@ more_prompt_check(HWND hWnd)
     remaining_height = client_rt.bottom - client_rt.top;
 
     hdc = GetDC(hWnd);
-    saveFont =
-        SelectObject(hdc, mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, FALSE));
+    cached_font * font = mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, FALSE);
+    saveFont = SelectObject(hdc, font->hFont);
     for (i = 0; i < data->lines_not_seen; i++) {
         /* we only need width for the DrawText */
         SetRect(&draw_rt,
             client_rt.left + LINE_PADDING_LEFT(data), client_rt.top,
             client_rt.right - LINE_PADDING_RIGHT(data), client_rt.top);
-        SelectObject(hdc,
-                     mswin_get_font(NHW_MESSAGE,
-                                    data->window_text[MSG_LINES - i - 1].attr,
-                                    hdc, FALSE));
+        font = mswin_get_font(NHW_MESSAGE,
+                        data->window_text[MSG_LINES - i - 1].attr, hdc, FALSE);
+        SelectObject(hdc, font->hFont);
 
         strcpy(tmptext, data->window_text[MSG_LINES - i - 1].text);
         strip_newline(tmptext);

@@ -7,22 +7,36 @@
  * header files & NetHack before including windows.h, so all NetHack
  * files should include "win32api.h" rather than <windows.h>.
  */
+#ifndef WIN32API
+#define WIN32API
+
 #if defined(_MSC_VER)
-#undef strcmpi
-#undef min
-#undef max
-#pragma warning(disable : 4142) /* Warning, Benign redefinition of type */
-#pragma pack(8)
+
+#if defined(HACK_H)
+#error win32api.h must be included before hack.h
 #endif
 
-#define WIN32_LEAN_AND_MEAN
+#if defined(strcmpi)
+#error win32api.h should be included first
+#endif
 
-#undef Protection /* We have a global name space collision.  No source file
-                     using win32api.h should be using the Protection macro
-                     from youprop.h.
-                     A better fix would be to ensure we include all window
-                     header files before we start clobbering the global name
-                     space with NetHack specific macros. */
+#if defined(min)
+#error win32api.h should be included first
+#endif
+
+#if defined(max)
+#error win32api.h should be included first
+#endif
+
+#if defined(Protection)
+#error win32api.h should be included first
+#endif
+
+#pragma warning(disable : 4142) /* Warning, Benign redefinition of type */
+#pragma pack(8)
+#endif // _MSC_VER
+
+#define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
 #include <commctrl.h>
@@ -30,5 +44,7 @@
 #if defined(_MSC_VER)
 #pragma pack()
 #endif
+
+#endif // WIN32API
 
 /*win32api.h*/

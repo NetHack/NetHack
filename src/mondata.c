@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1508479720 2017/10/20 06:08:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1543545188 2018/11/30 02:33:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -294,6 +294,14 @@ hates_silver(register struct permonst *ptr)
     return (boolean) (is_were(ptr) || ptr->mlet == S_VAMPIRE || is_demon(ptr)
                       || ptr == &mons[PM_SHADE]
                       || (ptr->mlet == S_IMP && ptr != &mons[PM_TENGU]));
+}
+
+/* True if specific monster is especially affected by light-emitting weapons */
+boolean
+mon_hates_light(mon)
+struct monst *mon;
+{
+    return (boolean) (hates_light(mon->data));
 }
 
 /* True iff the type of monster pass through iron bars */
@@ -698,8 +706,14 @@ name_to_mon(const char *in_str)
             /* Outdated names */
             { "invisible stalker", PM_STALKER },
             { "high-elf", PM_ELVENKING }, /* PM_HIGH_ELF is obsolete */
+            /* other misspellings or incorrect words */
+            { "wood-elf", PM_WOODLAND_ELF },
+            { "wood elf", PM_WOODLAND_ELF },
+            { "woodland nymph", PM_WOOD_NYMPH },
             { "halfling", PM_HOBBIT },    /* potential guess for polyself */
-            /* Hyphenated names */
+            { "genie", PM_DJINNI }, /* potential guess for ^G/#wizgenesis */
+            /* Hyphenated names -- it would be nice to handle these via
+               fuzzymatch() but it isn't able to ignore trailing stuff */
             { "ki rin", PM_KI_RIN },
             { "uruk hai", PM_URUK_HAI },
             { "orc captain", PM_ORC_CAPTAIN },
@@ -719,6 +733,7 @@ name_to_mon(const char *in_str)
             { "lurkers above", PM_LURKER_ABOVE },
             { "cavemen", PM_CAVEMAN },
             { "cavewomen", PM_CAVEWOMAN },
+            { "watchmen", PM_WATCHMAN },
             { "djinn", PM_DJINNI },
             { "mumakil", PM_MUMAK },
             { "erinyes", PM_ERINYS },
@@ -856,9 +871,12 @@ gender(register struct monst *mtmp)
 /* Like gender(), but lower animals and such are still "it".
    This is the one we want to use when printing messages. */
 int
-pronoun_gender(register struct monst *mtmp)
+pronoun_gender(register struct monst *mtmp,
+               boolean override_vis /* if True then 'no it' unless neuter */)
 {
-    if (is_neuter(mtmp->data) || !canspotmon(mtmp))
+    if (!override_vis && !canspotmon(mtmp))
+        return 2;
+    if (is_neuter(mtmp->data))
         return 2;
     return (humanoid(mtmp->data) || (mtmp->data->geno & G_UNIQ)
             || type_is_pname(mtmp->data)) ? (int) mtmp->female : 2;

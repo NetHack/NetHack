@@ -40,7 +40,7 @@ struct flag {
     boolean lit_corridor;    /* show a dark corr as lit if it is in sight */
     boolean nap;             /* `timed_delay' option for display effects */
     boolean null;            /* OK to send nulls to the terminal */
-    boolean perm_invent;     /* keep full inventories up until dismissed */
+    boolean p__obsolete;     /* [3.6.2: perm_invent moved to iflags] */
     boolean pickup;          /* whether you pickup or move and look */
     boolean pickup_thrown;   /* auto-pickup items you threw */
     boolean pushweapon; /* When wielding, push old weapon into second slot */
@@ -64,7 +64,7 @@ struct flag {
      * 'schar' to 'short int' instead of to 'char'.  (Needed by pre-ANSI
      * systems that use unsigned characters without a way to force them
      * to be signed.)  So, the type has been changed back to 'xchar' for
-     * 3.6.1.
+     * 3.6.x.
      *
      * TODO:  change to 'char' (and move out of this block of booleans,
      * and get rid of these comments...) once 3.6.0 savefile compatibility
@@ -221,20 +221,32 @@ enum getloc_filters {
     NUM_GFILTER
 };
 
+struct debug_flags {
+    boolean test;
+#ifdef TTY_GRAPHICS
+    boolean ttystatus;
+#endif
+#ifdef WIN32
+    boolean immediateflips;
+#endif
+};
+
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
      * set and cleared during the game to control the internal
      * behaviour of various NetHack functions and probably warrant
      * a structure of their own elsewhere some day.
      */
+    boolean debug_fuzzer;  /* fuzz testing */
     boolean defer_plname;  /* X11 hack: askname() might not set plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
-    int parse_config_file_src;  /* hack for parse_config_line() */
+    int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
     int in_lava_effects;   /* hack for Boots_off() */
     int last_msg;          /* indicator of last message player saw */
-    int purge_monsters;    /* # of dead monsters still on fmon list */
     int override_ID;       /* true to force full identification of objects */
+    int parse_config_file_src;  /* hack for parse_config_line() */
+    int purge_monsters;    /* # of dead monsters still on fmon list */
     int suppress_price;    /* controls doname() for unpaid objects */
     int terrainmode; /* for getpos()'s autodescribe when #terrain is active */
 #define TER_MAP    0x01
@@ -247,6 +259,7 @@ struct instance_flags {
     boolean getloc_usemenu;
     boolean getloc_moveskip;
     coord travelcc;        /* coordinates for travel_cache */
+    boolean trav_debug;    /* display travel path (#if DEBUG only) */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */
@@ -282,6 +295,7 @@ struct instance_flags {
     boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean news;             /* print news */
     boolean num_pad;          /* use numbers for movement commands */
+    boolean perm_invent;      /* keep full inventories up until dismissed */
     boolean renameallowed;    /* can change hero name during role selection */
     boolean renameinprogress; /* we are changing hero name */
     boolean status_updates;   /* allow updates to bottom status lines;
@@ -298,6 +312,7 @@ struct instance_flags {
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */
     uchar num_pad_mode;
+    boolean cursesgraphics;     /* Use portable curses extended characters */
 #if 0   /* XXXgraphics superseded by symbol sets */
     boolean  DECgraphics;       /* use DEC VT-xxx extended character set */
     boolean  IBMgraphics;       /* use IBM extended character set */
@@ -307,7 +322,7 @@ struct instance_flags {
 #endif
 #endif
     uchar bouldersym; /* symbol for boulder display */
-#ifdef TTY_GRAPHICS
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
     char prevmsg_window; /* type of old message window to use */
     boolean extmenu;     /* extended commands use menu interface */
 #endif
@@ -349,8 +364,10 @@ struct instance_flags {
 #ifdef TTY_TILES_ESCCODES
     boolean vt_tiledata;     /* output console codes for tile support in TTY */
 #endif
-    boolean wizweight;        /* display weight of everything in wizard mode */
-
+    boolean wizweight;       /* display weight of everything in wizard mode */
+    boolean cmdassist;       /* provide detailed assistance for some commands */
+    boolean clicklook;          /* allow right-clicking for look */
+    int statuslines;         /* default = 2, code support for alternative 3 */
     /*
      * Window capability support.
      */
@@ -395,15 +412,18 @@ struct instance_flags {
     boolean wc_popup_dialog;    /* put queries in pop up dialogs instead of
                                  * in the message window */
     boolean wc_eight_bit_input; /* allow eight bit input               */
-    boolean wc_mouse_support;   /* allow mouse support */
     boolean wc2_fullscreen;     /* run fullscreen */
     boolean wc2_softkeyboard;   /* use software keyboard */
     boolean wc2_wraptext;       /* wrap text */
     boolean wc2_selectsaved;    /* display a menu of user's saved games */
     boolean wc2_darkgray;    /* try to use dark-gray color for black glyphs */
     boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
-    boolean cmdassist;     /* provide detailed assistance for some commands */
-    boolean clicklook;          /* allow right-clicking for look */
+    int wc_mouse_support;       /* allow mouse support */
+    int wc2_term_cols;		/* terminal width, in characters */
+    int wc2_term_rows;		/* terminal height, in characters */
+    int wc2_windowborders;	/* display borders on NetHack windows */
+    int wc2_petattr;            /* text attributes for pet */
+    boolean wc2_guicolor;   /* allow colours in gui (outside map) */
     boolean obsolete;  /* obsolete options can point at this, it isn't used */
     struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0
@@ -423,6 +443,11 @@ struct instance_flags {
     short mines_prize_type;     /* luckstone */
     short soko_prize_type1;     /* bag of holding or    */
     short soko_prize_type2;     /* amulet of reflection */
+    struct debug_flags debug;
+    boolean windowtype_locked;  /* windowtype can't change from configfile */
+    boolean windowtype_deferred; /* pick a windowport and store it in
+                                    chosen_windowport[], but do not switch to
+                                    it in the midst of options processing */
 };
 
 /*

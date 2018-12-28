@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1515802375 2018/01/13 00:12:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1526728750 2018/05/19 11:19:10 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,19 +19,23 @@ static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 STATIC_DCL boolean learnscrolltyp(short);
-STATIC_DCL char * erode_obj_text(struct obj *, char *);
-STATIC_DCL void do_class_genocide(void);
+STATIC_DCL char *erode_obj_text(struct obj *, char *);
+STATIC_DCL char *apron_text(struct obj *, char *buf);
 STATIC_DCL void stripspe(struct obj *);
 STATIC_DCL void p_glow1(struct obj *);
 STATIC_DCL void p_glow2(struct obj *, const char *);
-STATIC_DCL void randomize(int *, int);
 STATIC_DCL void forget_single_object(int);
+#if 0 /* not used */
+STATIC_DCL void forget_objclass(int);
+#endif
+STATIC_DCL void randomize(int *, int);
 STATIC_DCL void forget(int);
 STATIC_DCL int maybe_tame(struct monst *, struct obj *);
-STATIC_DCL boolean is_valid_stinking_cloud_pos(int, int, boolean);
-STATIC_DCL void display_stinking_cloud_positions(int);
 STATIC_DCL boolean get_valid_stinking_cloud_pos(int, int);
+STATIC_DCL boolean is_valid_stinking_cloud_pos(int, int, boolean);
+STATIC_PTR void display_stinking_cloud_positions(int);
 STATIC_PTR void set_lit(int, int, genericptr);
+STATIC_DCL void do_class_genocide(void);
 
 STATIC_OVL boolean
 learnscrolltyp(short scrolltyp)
@@ -54,7 +58,7 @@ learnscroll(struct obj *sobj)
         (void) learnscrolltyp(sobj->otyp);
 }
 
-char *
+STATIC_OVL char *
 erode_obj_text(struct obj *otmp, char *buf)
 {
     int erosion = greatest_erosion(otmp);
@@ -152,7 +156,7 @@ tshirt_text(struct obj *tshirt, char *buf)
     return erode_obj_text(tshirt, buf);
 }
 
-char *
+STATIC_OVL char *
 apron_text(struct obj *apron, char *buf)
 {
     static const char *apron_msgs[] = {
@@ -316,6 +320,7 @@ doread()
         return 0;
     } else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
         const char *what = 0;
+
         if (scroll->oclass == SPBOOK_CLASS)
             what = "mystic runes";
         else if (!scroll->dknown)
@@ -929,7 +934,7 @@ int x,y;
               || distu(x, y) >= 32));
 }
 
-boolean
+STATIC_OVL boolean
 is_valid_stinking_cloud_pos(int x, int y, boolean showmsg)
 {
     if (!get_valid_stinking_cloud_pos(x,y)) {
@@ -940,7 +945,7 @@ is_valid_stinking_cloud_pos(int x, int y, boolean showmsg)
     return TRUE;
 }
 
-void
+STATIC_PTR void
 display_stinking_cloud_positions(int state)
 {
     if (state == 0) {
@@ -1593,7 +1598,8 @@ seffects(struct obj *sobj) /* scroll, or fake spellbook object for scroll-like s
                     pline("This is a scroll of fire!");
                 dam *= 5;
                 pline("Where do you want to center the explosion?");
-                getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+                getpos_sethilite(display_stinking_cloud_positions,
+                                 get_valid_stinking_cloud_pos);
                 (void) getpos(&cc, TRUE, "the desired position");
                 if (!is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
                     /* try to reach too far, get burned */
@@ -1665,7 +1671,8 @@ seffects(struct obj *sobj) /* scroll, or fake spellbook object for scroll-like s
               already_known ? "stinking " : "");
         cc.x = u.ux;
         cc.y = u.uy;
-        getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+        getpos_sethilite(display_stinking_cloud_positions,
+                         get_valid_stinking_cloud_pos);
         if (getpos(&cc, TRUE, "the desired position") < 0) {
             pline1(Never_mind);
             break;
@@ -1679,6 +1686,11 @@ seffects(struct obj *sobj) /* scroll, or fake spellbook object for scroll-like s
     default:
         impossible("What weird effect is this? (%u)", otyp);
     }
+    /* if sobj is gone, we've already called useup() above and the
+       update_inventory() that it performs might have come too soon
+       (before charging an item, for instance) */
+    if (!sobj)
+        update_inventory();
     return sobj ? 0 : 1;
 }
 
@@ -1771,7 +1783,7 @@ drop_boulder_on_monster(int x, int y, boolean confused, boolean byu)
             }
         }
         mtmp->mhp -= mdmg;
-        if (mtmp->mhp <= 0) {
+        if (DEADMONSTER(mtmp)) {
             if (byu) {
                 killed(mtmp);
             } else {
@@ -2320,8 +2332,8 @@ punish(struct obj *sobj)
     uball->spe = 1; /* special ball (see save) */
 
     /*
-     *  Place ball & chain if not swallowed.  If swallowed, the ball &
-     *  chain variables will be set at the next call to placebc().
+     *  Place ball & chain if not swallowed.  If swallowed, the ball & chain
+     *  variables will be set at the next call to placebc().
      */
     if (!u.uswallow) {
         placebc();
@@ -2371,6 +2383,152 @@ cant_revive(int *mtype, boolean revival, struct obj *from_obj)
     return FALSE;
 }
 
+struct _create_particular_data {
+    int which;
+    int fem;
+    char monclass;
+    boolean randmonst;
+    boolean maketame, makepeaceful, makehostile;
+    boolean sleeping, saddled, invisible;
+};
+
+boolean
+create_particular_parse(str, d)
+char *str;
+struct _create_particular_data *d;
+{
+    char *bufp = str;
+    char *tmpp;
+
+    d->monclass = MAXMCLASSES;
+    d->which = urole.malenum; /* an arbitrary index into mons[] */
+    d->fem = -1; /* gender not specified */
+    d->randmonst = FALSE;
+    d->maketame = d->makepeaceful = d->makehostile = FALSE;
+    d->sleeping = d->saddled = d->invisible = FALSE;
+
+    if ((tmpp = strstri(bufp, "saddled ")) != 0) {
+        d->saddled = TRUE;
+        (void) memset(tmpp, ' ', sizeof "saddled " - 1);
+    }
+    if ((tmpp = strstri(bufp, "sleeping ")) != 0) {
+        d->sleeping = TRUE;
+        (void) memset(tmpp, ' ', sizeof "sleeping " - 1);
+    }
+    if ((tmpp = strstri(bufp, "invisible ")) != 0) {
+        d->invisible = TRUE;
+        (void) memset(tmpp, ' ', sizeof "invisible " - 1);
+    }
+    /* check "female" before "male" to avoid false hit mid-word */
+    if ((tmpp = strstri(bufp, "female ")) != 0) {
+        d->fem = 1;
+        (void) memset(tmpp, ' ', sizeof "female " - 1);
+    }
+    if ((tmpp = strstri(bufp, "male ")) != 0) {
+        d->fem = 0;
+        (void) memset(tmpp, ' ', sizeof "male " - 1);
+    }
+    bufp = mungspaces(bufp); /* after potential memset(' ') */
+    /* allow the initial disposition to be specified */
+    if (!strncmpi(bufp, "tame ", 5)) {
+        bufp += 5;
+        d->maketame = TRUE;
+    } else if (!strncmpi(bufp, "peaceful ", 9)) {
+        bufp += 9;
+        d->makepeaceful = TRUE;
+    } else if (!strncmpi(bufp, "hostile ", 8)) {
+        bufp += 8;
+        d->makehostile = TRUE;
+    }
+    /* decide whether a valid monster was chosen */
+    if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "random"))) {
+        d->randmonst = TRUE;
+        return TRUE;
+    }
+    d->which = name_to_mon(bufp);
+    if (d->which >= LOW_PM)
+        return TRUE; /* got one */
+    d->monclass = name_to_monclass(bufp, &d->which);
+    if (d->which >= LOW_PM) {
+        d->monclass = MAXMCLASSES; /* matters below */
+        return TRUE;
+    } else if (d->monclass > 0) {
+        d->which = urole.malenum; /* reset from NON_PM */
+        return TRUE;
+    }
+    return FALSE;
+}
+
+boolean
+create_particular_creation(d)
+struct _create_particular_data *d;
+{
+    struct permonst *whichpm = NULL;
+    int i, firstchoice = NON_PM;
+    struct monst *mtmp;
+    boolean madeany = FALSE;
+
+    if (!d->randmonst) {
+        firstchoice = d->which;
+        if (cant_revive(&d->which, FALSE, (struct obj *) 0)) {
+            /* wizard mode can override handling of special monsters */
+            char buf[BUFSZ];
+
+            Sprintf(buf, "Creating %s instead; force %s?",
+                    mons[d->which].mname, mons[firstchoice].mname);
+            if (yn(buf) == 'y')
+                d->which = firstchoice;
+        }
+        whichpm = &mons[d->which];
+    }
+    for (i = 0; i <= multi; i++) {
+        if (d->monclass != MAXMCLASSES)
+            whichpm = mkclass(d->monclass, 0);
+        else if (d->randmonst)
+            whichpm = rndmonst();
+        mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);
+        if (!mtmp) {
+            /* quit trying if creation failed and is going to repeat */
+            if (d->monclass == MAXMCLASSES && !d->randmonst)
+                break;
+            /* otherwise try again */
+            continue;
+        }
+        /* 'is_FOO()' ought to be called 'always_FOO()' */
+        if (d->fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data))
+            mtmp->female = d->fem; /* ignored for is_neuter() */
+        if (d->maketame) {
+            (void) tamedog(mtmp, (struct obj *) 0);
+        } else if (d->makepeaceful || d->makehostile) {
+            mtmp->mtame = 0; /* sanity precaution */
+            mtmp->mpeaceful = d->makepeaceful ? 1 : 0;
+            set_malign(mtmp);
+        }
+        if (d->saddled && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
+            struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
+
+            put_saddle_on_mon(otmp, mtmp);
+        }
+        if (d->invisible) {
+            int mx = mtmp->mx, my = mtmp->my;
+            mon_set_minvis(mtmp);
+            if (does_block(mx, my, &levl[mx][my]))
+                block_point(mx, my);
+            else
+                unblock_point(mx, my);
+        }
+        if (d->sleeping)
+            mtmp->msleeping = 1;
+        madeany = TRUE;
+        /* in case we got a doppelganger instead of what was asked
+           for, make it start out looking like what was asked for */
+        if (mtmp->cham != NON_PM && firstchoice != NON_PM
+            && mtmp->cham != firstchoice)
+            (void) newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
+    }
+    return madeany;
+}
+
 /*
  * Make a new monster with the type controlled by the user.
  *
@@ -2386,135 +2544,29 @@ cant_revive(int *mtype, boolean revival, struct obj *from_obj)
 boolean
 create_particular()
 {
-    char buf[BUFSZ] = DUMMY, *bufp, monclass;
-    char *tmpp;
-    int which, tryct, i, firstchoice = NON_PM;
-    struct permonst *whichpm = NULL;
-    struct monst *mtmp;
-    boolean madeany = FALSE, randmonst = FALSE,
-        maketame, makepeaceful, makehostile, saddled, invisible,
-        sleeping;
-    int fem;
+    char buf[BUFSZ] = DUMMY, *bufp;
+    int  tryct = 5;
+    struct _create_particular_data d;
 
-    tryct = 5;
     do {
-        monclass = MAXMCLASSES;
-        which = urole.malenum; /* an arbitrary index into mons[] */
-        maketame = makepeaceful = makehostile = FALSE;
-        sleeping = saddled = invisible = FALSE;
-        fem = -1; /* gender not specified */
         getlin("Create what kind of monster? [type the name or symbol]", buf);
         bufp = mungspaces(buf);
         if (*bufp == '\033')
             return FALSE;
-        if ((tmpp = strstri(bufp, "saddled ")) != 0) {
-            saddled = TRUE;
-            (void) memset(tmpp, ' ', sizeof "saddled " - 1);
-        }
-        if ((tmpp = strstri(bufp, "sleeping ")) != 0) {
-            sleeping = TRUE;
-            (void) memset(tmpp, ' ', sizeof "sleeping " - 1);
-        }
-        if ((tmpp = strstri(bufp, "invisible ")) != 0) {
-            invisible = TRUE;
-            (void) memset(tmpp, ' ', sizeof "invisible " - 1);
-        }
-        /* check "female" before "male" to avoid false hit mid-word */
-        if ((tmpp = strstri(bufp, "female ")) != 0) {
-            fem = 1;
-            (void) memset(tmpp, ' ', sizeof "female " - 1);
-        }
-        if ((tmpp = strstri(bufp, "male ")) != 0) {
-            fem = 0;
-            (void) memset(tmpp, ' ', sizeof "male " - 1);
-        }
-        bufp = mungspaces(bufp); /* after potential memset(' ') */
-        /* allow the initial disposition to be specified */
-        if (!strncmpi(bufp, "tame ", 5)) {
-            bufp += 5;
-            maketame = TRUE;
-        } else if (!strncmpi(bufp, "peaceful ", 9)) {
-            bufp += 9;
-            makepeaceful = TRUE;
-        } else if (!strncmpi(bufp, "hostile ", 8)) {
-            bufp += 8;
-            makehostile = TRUE;
-        }
-        /* decide whether a valid monster was chosen */
-        if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "random"))) {
-            randmonst = TRUE;
+
+        if (create_particular_parse(bufp, &d))
             break;
-        }
-        which = name_to_mon(bufp);
-        if (which >= LOW_PM)
-            break; /* got one */
-        monclass = name_to_monclass(bufp, &which);
-        if (which >= LOW_PM) {
-            monclass = MAXMCLASSES; /* matters below */
-            break;
-        } else if (monclass > 0) {
-            which = urole.malenum; /* reset from NON_PM */
-            break;
-        }
+
         /* no good; try again... */
         pline("I've never heard of such monsters.");
     } while (--tryct > 0);
 
-    if (!tryct) {
+    if (!tryct)
         pline1(thats_enough_tries);
-    } else {
-        if (!randmonst) {
-            firstchoice = which;
-            if (cant_revive(&which, FALSE, (struct obj *) 0)) {
-                /* wizard mode can override handling of special monsters */
-                Sprintf(buf, "Creating %s instead; force %s?",
-                        mons[which].mname, mons[firstchoice].mname);
-                if (yn(buf) == 'y')
-                    which = firstchoice;
-            }
-            whichpm = &mons[which];
-        }
-        for (i = 0; i <= multi; i++) {
-            if (monclass != MAXMCLASSES)
-                whichpm = mkclass(monclass, 0);
-            else if (randmonst)
-                whichpm = rndmonst();
-            mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);
-            if (!mtmp) {
-                /* quit trying if creation failed and is going to repeat */
-                if (monclass == MAXMCLASSES && !randmonst)
-                    break;
-                /* otherwise try again */
-                continue;
-            }
-            /* 'is_FOO()' ought to be called 'always_FOO()' */
-            if (fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data))
-                mtmp->female = fem; /* ignored for is_neuter() */
-            if (maketame) {
-                (void) tamedog(mtmp, (struct obj *) 0);
-            } else if (makepeaceful || makehostile) {
-                mtmp->mtame = 0; /* sanity precaution */
-                mtmp->mpeaceful = makepeaceful ? 1 : 0;
-                set_malign(mtmp);
-            }
-            if (saddled && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
-                struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
+    else
+        return create_particular_creation(&d);
 
-                put_saddle_on_mon(otmp, mtmp);
-            }
-            if (invisible)
-                mon_set_minvis(mtmp);
-            if (sleeping)
-                mtmp->msleeping = 1;
-            madeany = TRUE;
-            /* in case we got a doppelganger instead of what was asked
-               for, make it start out looking like what was asked for */
-            if (mtmp->cham != NON_PM && firstchoice != NON_PM
-                && mtmp->cham != firstchoice)
-                (void) newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
-        }
-    }
-    return madeany;
+    return FALSE;
 }
 
 /*read.c*/

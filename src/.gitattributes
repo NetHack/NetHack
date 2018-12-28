@@ -1,0 +1,14 @@
+* NH_filestag=(file%s_for_all_versions)
+..files NH_filegenerated=Makefile,Makefile.bcc,Makefile.gcc,qt_kde0.moc,qt_win.moc,qttableview.moc,tile.c,monstr.c,vis_tab.c
+Makefile.bcc	NH_filesgentag=(file%s_for_win32_that_are_moved_into_src_at_compile_time)
+Makefile.gcc	NH_filesgentag=>Makefile.bcc
+Makefile	NH_filesgentag=>Makefile.bcc
+
+qt_kde0.moc	NH_filesgentag=(file%s_generated_by_'moc'_for_Qt_interface_at_compile_time)
+qt_win.moc	NH_filesgentag=>qt_kde0.moc
+qttableview.moc	NH_filesgentag=>qt_kde0.moc
+
+tile.c		NH_filesgentag=(file%s_optionally_generated_by_tilemap_at_compile_time)
+monstr.c	NH_filesgentag=(file%s_generated_by_makedefs_at_compile_time_by_some_ports)
+
+vis_tab.c	NH_filesgentag=(file%s_generated_by_makedefs_at_compile_time)

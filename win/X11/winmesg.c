@@ -50,6 +50,8 @@ static char mesg_translations[] = "#override\n\
  <Key>Right:    scroll(6)\n\
  <Key>Up:       scroll(8)\n\
  <Key>Down:     scroll(2)\n\
+ <Btn4Down>:    scroll(8)\n\
+ <Btn5Down>:    scroll(2)\n\
  <Key>:         input()";
 
 /* Move the message window's vertical scrollbar's slider to the bottom. */

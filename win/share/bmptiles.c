@@ -61,16 +61,16 @@ struct BitmapInfoHeader {
 #define BI_JPEG          4
 #define BI_PNG           5
 
-static uint16 FDECL(read_u16, (const unsigned char buf[2]));
-static uint32 FDECL(read_u32, (const unsigned char buf[4]));
-static int32 FDECL(read_s32, (const unsigned char buf[4]));
-static struct Pixel FDECL(build_pixel, (const struct BitmapInfoHeader *, uint32));
-static unsigned char FDECL(pixel_element, (uint32, uint32));
-static boolean FDECL(read_header, (FILE *, struct BitmapHeader *));
-static boolean FDECL(read_info_header, (FILE *, struct BitmapInfoHeader *));
-static boolean FDECL(check_info_header, (const struct BitmapInfoHeader *));
-static unsigned FDECL(get_palette_size, (const struct BitmapInfoHeader *));
-static boolean FDECL(read_palette, (FILE *, struct Pixel *, unsigned));
+static uint16 read_u16(const unsigned char buf[2]);
+static uint32 read_u32(const unsigned char buf[4]);
+static int32 read_s32(const unsigned char buf[4]);
+static struct Pixel build_pixel(const struct BitmapInfoHeader *, uint32);
+static unsigned char pixel_element(uint32, uint32);
+static boolean read_header(FILE *, struct BitmapHeader *);
+static boolean read_info_header(FILE *, struct BitmapInfoHeader *);
+static boolean check_info_header(const struct BitmapInfoHeader *);
+static unsigned get_palette_size(const struct BitmapInfoHeader *);
+static boolean read_palette(FILE *, struct Pixel *, unsigned);
 
 /* Read a .BMP file into the image structure */
 /* Return TRUE if successful, FALSE on any error */

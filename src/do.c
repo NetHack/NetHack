@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1472809073 2016/09/02 09:37:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1545597418 2018/12/23 20:36:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -64,7 +64,7 @@ boulder_hits_pool(struct obj *otmp, register int rx, register int ry, boolean pu
                 levl[rx][ry].drawbridgemask &= ~DB_UNDER; /* clear lava */
                 levl[rx][ry].drawbridgemask |= DB_FLOOR;
             } else
-                levl[rx][ry].typ = ROOM;
+                levl[rx][ry].typ = ROOM, levl[rx][ry].flags = 0;
 
             if (ttmp)
                 (void) delfloortrap(ttmp);
@@ -143,8 +143,7 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
     if (obj->otyp == BOULDER && boulder_hits_pool(obj, x, y, FALSE)) {
         return TRUE;
     } else if (obj->otyp == BOULDER && (t = t_at(x, y)) != 0
-             && (t->ttyp == PIT || t->ttyp == SPIKED_PIT
-                 || t->ttyp == TRAPDOOR || t->ttyp == HOLE)) {
+               && (is_pit(t->ttyp) || is_hole(t->ttyp))) {
         if (((mtmp = m_at(x, y)) && mtmp->mtrapped)
             || (u.utrap && u.ux == x && u.uy == y)) {
             if (*verb)
@@ -166,14 +165,16 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
                            "squished under a boulder", NO_KILLER_PREFIX);
                     return FALSE; /* player remains trapped */
                 } else
-                    u.utrap = 0;
+                    reset_utrap(TRUE);
             }
         }
         if (*verb) {
             if (Blind && (x == u.ux) && (y == u.uy)) {
                 You_hear("a CRASH! beneath you.");
             } else if (!Blind && cansee(x, y)) {
-                pline_The("boulder %s%s.", t->tseen ? "" : "triggers and ",
+                pline_The("boulder %s%s.",
+                    (t->ttyp == TRAPDOOR && !t->tseen)
+                        ? "triggers and " : "",
                           t->ttyp == TRAPDOOR
                               ? "plugs a trap door"
                               : t->ttyp == HOLE ? "plugs a hole"
@@ -267,22 +268,29 @@ STATIC_DCL void
 polymorph_sink()
 {
     uchar sym = S_sink;
+    boolean sinklooted;
 
     if (levl[u.ux][u.uy].typ != SINK)
         return;
 
+    sinklooted = levl[u.ux][u.uy].looted != 0;
     level.flags.nsinks--;
-    levl[u.ux][u.uy].doormask = 0;
+    levl[u.ux][u.uy].doormask = 0; /* levl[][].flags */
     switch (rn2(4)) {
     default:
     case 0:
         sym = S_fountain;
         levl[u.ux][u.uy].typ = FOUNTAIN;
+        levl[u.ux][u.uy].blessedftn = 0;
+        if (sinklooted)
+            SET_FOUNTAIN_LOOTED(u.ux, u.uy);
         level.flags.nfountains++;
         break;
     case 1:
         sym = S_throne;
         levl[u.ux][u.uy].typ = THRONE;
+        if (sinklooted)
+            levl[u.ux][u.uy].looted = T_LOOTED;
         break;
     case 2:
         sym = S_altar;
@@ -564,11 +572,12 @@ drop(register struct obj *obj)
     if (u.uswallow) {
         /* barrier between you and the floor */
         if (flags.verbose) {
-            char buf[BUFSZ];
+            char *onam_p, monbuf[BUFSZ];
 
             /* doname can call s_suffix, reusing its buffer */
-            Strcpy(buf, s_suffix(mon_nam(u.ustuck)));
-            You("drop %s into %s %s.", doname(obj), buf,
+            Strcpy(monbuf, s_suffix(mon_nam(u.ustuck)));
+            onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
+            You("drop %s into %s %s.", onam_p, monbuf,
                 mbodypart(u.ustuck, STOMACH));
         }
     } else {
@@ -591,7 +600,7 @@ drop(register struct obj *obj)
             if (obj->oclass == COIN_CLASS)
                 context.botl = 1;
             freeinv(obj);
-            hitfloor(obj);
+            hitfloor(obj, TRUE);
             if (levhack)
                 float_down(I_SPECIAL | TIMEOUT, W_ARTI | W_ART);
             return 1;
@@ -658,6 +667,8 @@ dropz(struct obj *obj, boolean with_impact)
                 could_grow = (obj->corpsenm == PM_WRAITH);
                 could_heal = (obj->corpsenm == PM_NURSE);
             }
+            if (is_unpaid(obj))
+                (void) stolen_value(obj, u.ux, u.uy, TRUE, FALSE);
             (void) mpickobj(u.ustuck, obj);
             if (is_animal(u.ustuck->data)) {
                 if (could_poly || could_slime) {
@@ -938,7 +949,7 @@ dodown()
         if (trap && uteetering_at_seen_pit(trap)) {
             dotrap(trap, TOOKPLUNGE);
             return 1;
-        } else if (!trap || (trap->ttyp != TRAPDOOR && trap->ttyp != HOLE)
+        } else if (!trap || !is_hole(trap->ttyp)
                    || !Can_fall_thru(&u.uz) || !trap->tseen) {
             if (flags.autodig && !context.nopick && uwep && is_pick(uwep)) {
                 return use_pick_axe2(uwep);
@@ -970,10 +981,31 @@ dodown()
         return 0;
     }
 
-    if (trap)
-        You("%s %s.", Flying ? "fly" : locomotion(youmonst.data, "jump"),
-            trap->ttyp == HOLE ? "down the hole" : "through the trap door");
+    if (trap) {
+        const char *down_or_thru = trap->ttyp == HOLE ? "down" : "through";
+        const char *actn = Flying ? "fly" : locomotion(youmonst.data, "jump");
 
+        if (youmonst.data->msize >= MZ_HUGE) {
+            char qbuf[QBUFSZ];
+
+            You("don't fit %s easily.", down_or_thru);
+            Sprintf(qbuf, "Try to squeeze %s?", down_or_thru);
+            if (yn(qbuf) == 'y') {
+                if (!rn2(3)) {
+                    actn = "manage to squeeze";
+                    losehp(Maybe_Half_Phys(rnd(4)),
+                           "contusion from a small passage", KILLED_BY);
+                } else {
+                    You("were unable to fit %s.", down_or_thru);
+                    return 0;
+                }
+            } else {
+                return 0;
+            }
+        }
+        You("%s %s the %s.", actn, down_or_thru,
+            trap->ttyp == HOLE ? "hole" : "trap door");
+    }
     if (trap && Is_stronghold(&u.uz)) {
         goto_hell(FALSE, TRUE);
     } else {
@@ -1021,7 +1053,9 @@ doup()
         return 1;
     }
     if (ledger_no(&u.uz) == 1) {
-        if (yn("Beware, there will be no return! Still climb?") != 'y')
+        if (iflags.debug_fuzzer)
+            return 0;
+        if (yn("Beware, there will be no return!  Still climb?") != 'y')
             return 0;
     }
     if (!next_to_u()) {
@@ -1192,13 +1226,24 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
     if (fd < 0)
         return;
 
+    /* discard context which applies to the level we're leaving;
+       for lock-picking, container may be carried, in which case we
+       keep context; if on the floor, it's about to be saved+freed and
+       maybe_reset_pick() needs to do its carried() check before that */
+    maybe_reset_pick();
+    reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
+    iflags.travelcc.x = iflags.travelcc.y = 0; /* travel destination cache */
+    context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+    /* digging context is level-aware and can actually be resumed if
+       hero returns to the previous level without any intervening dig */
+
     if (falling) /* assuming this is only trap door or hole */
         impact_drop((struct obj *) 0, u.ux, u.uy, newlevel->dlevel);
 
     check_special_room(TRUE); /* probably was a trap door */
     if (Punished)
         unplacebc();
-    u.utrap = 0; /* needed in level_tele */
+    reset_utrap(FALSE); /* needed in level_tele */
     fill_pit(u.ux, u.uy);
     u.ustuck = 0; /* idem */
     u.uinwater = 0;
@@ -1401,10 +1446,9 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
                with the situation, so only say something when debugging */
             if (wizard)
                 pline("(monster in hero's way)");
-            if (!rloc(mtmp, TRUE))
+            if (!rloc(mtmp, TRUE) || (mtmp = m_at(u.ux, u.uy)) != 0)
                 /* no room to move it; send it away, to return later */
-                migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_RANDOM,
-                                 (coord *) 0);
+                m_into_limbo(mtmp);
         }
     }
 
@@ -1532,14 +1576,6 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
     (void) pickup(1);
-
-    /* discard context which applied to previous level */
-    maybe_reset_pick(); /* for door or for box not accompanying hero */
-    reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
-    iflags.travelcc.x = iflags.travelcc.y = -1; /* travel destination cache */
-    context.polearm.hitmon = (struct monst *) 0; /* polearm target */
-    /* digging context is level-aware and can actually be resumed if
-       hero returns to the previous level without any intervening dig */
 }
 
 STATIC_OVL void
@@ -1831,7 +1867,8 @@ set_wounded_legs(register long side, register int timex)
 }
 
 void
-heal_legs()
+heal_legs(how)
+int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 {
     if (Wounded_legs) {
         if (ATEMP(A_DEX) < 0) {
@@ -1839,7 +1876,11 @@ heal_legs()
             context.botl = 1;
         }
 
-        if (!u.usteed) {
+        /* when mounted, wounded legs applies to the steed;
+           during petrification countdown, "your limbs turn to stone"
+           before the final stages and that calls us (how==2) to cure
+           wounded legs, but we want to suppress the feel better message */
+        if (!u.usteed && how != 2) {
             const char *legs = body_part(LEG);
 
             if ((EWounded_legs & BOTH_SIDES) == BOTH_SIDES)
@@ -1849,7 +1890,7 @@ heal_legs()
             Your("%s %s better.", legs, vtense(legs, "feel"));
         }
 
-        HWounded_legs = EWounded_legs = 0;
+        HWounded_legs = EWounded_legs = 0L;
 
         /* Wounded_legs reduces carrying capacity, so we want
            an encumbrance check when they're healed.  However,
@@ -1861,7 +1902,7 @@ heal_legs()
            it might be immediately contradicted [able to carry
            more when steed becomes healthy, then possible floor
            feedback, then able to carry less when back on foot]. */
-        if (!in_steed_dismounting)
+        if (how == 0)
             (void) encumber_msg();
     }
 }

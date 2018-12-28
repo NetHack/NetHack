@@ -1,4 +1,4 @@
-/* NetHack 3.6	objects.c	$NHDT-Date: 1447313395 2015/11/12 07:29:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	objects.c	$NHDT-Date: 1535422421 2018/08/28 02:13:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -368,7 +368,7 @@ HELM("helm of telepathy", "visored helmet",
  * There is code in obj.h, objnam.c, mon.c, read.c that assumes (2).
  *      (1) The dragon scale mails and the dragon scales are together.
  *      (2) That the order of the dragon scale mail and dragon scales
- *          is the the same as order of dragons defined in monst.c.
+ *          is the same as order of dragons defined in monst.c.
  */
 #define DRGN_ARMR(name,mgc,power,cost,ac,color)  \
     ARMOR(name, None, 1, mgc, 1, power, 0, 5, 40,  \
@@ -883,18 +883,35 @@ SCROLL("blank paper", "unlabeled",  0,  28,  60),
 #undef SCROLL
 
 /* spellbooks ... */
-/* expanding beyond 52 spells would require changes in spellcasting
-   or imposition of a limit on number of spells hero can know because
-   they are currently assigned successive letters, a-zA-Z, when learned */
+    /* Expanding beyond 52 spells would require changes in spellcasting
+     * or imposition of a limit on number of spells hero can know because
+     * they are currently assigned successive letters, a-zA-Z, when learned.
+     * [The existing spell sorting capability could conceivably be extended
+     * to enable moving spells from beyond Z to within it, bumping others
+     * out in the process, allowing more than 52 spells be known but keeping
+     * only 52 be castable at any given time.]
+     */
 #define SPELL(name,desc,sub,prob,delay,level,mgc,dir,color)  \
     OBJECT(OBJ(name, desc),                                             \
            BITS(0, 0, 0, 0, mgc, 0, 0, 0, 0, 0, dir, sub, PAPER),       \
            0, SPBOOK_CLASS, prob, delay, 50, level * 100,               \
            0, 0, 0, level, 20, color)
+/* Spellbook description normally refers to book covers (primarily color).
+   Parchment and vellum would never be used for such, but rather than
+   eliminate those, finagle their definitions to refer to the pages
+   rather than the cover.  They are made from animal skin (typically of
+   a goat or sheep) and books using them for pages generally need heavy
+   covers with straps or clamps to tightly close the book in order to
+   keep the pages flat.  (However, a wooden cover might itself be covered
+   by a sheet of parchment, making this become less of an exception.  Also,
+   changing the internal composition from paper to leather makes eating a
+   parchment or vellum spellbook break vegetarian conduct, as it should.) */
+#define PAPER LEATHER /* override enum for use in SPELL() expansion */
 SPELL("dig",             "parchment",
-      P_MATTER_SPELL,      20,  6, 5, 1, RAY, HI_PAPER),
+      P_MATTER_SPELL,      20,  6, 5, 1, RAY, HI_LEATHER),
 SPELL("magic missile",   "vellum",
-      P_ATTACK_SPELL,      45,  2, 2, 1, RAY, HI_PAPER),
+      P_ATTACK_SPELL,      45,  2, 2, 1, RAY, HI_LEATHER),
+#undef PAPER /* revert to normal material */
 SPELL("fireball",        "ragged",
       P_ATTACK_SPELL,      20,  4, 4, 1, RAY, HI_PAPER),
 SPELL("cone of cold",    "dog eared",

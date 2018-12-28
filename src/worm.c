@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1456528599 2016/02/26 23:16:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	worm.c	$NHDT-Date: 1543892216 2018/12/04 02:56:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -292,7 +292,8 @@ wormhitu(register struct monst *worm)
      */
     for (seg = wtails[wnum]; seg; seg = seg->nseg)
         if (distu(seg->wx, seg->wy) < 3)
-            (void) mattacku(worm);
+            if (mattacku(worm))
+                return; /* your passive ability killed the worm */
 }
 
 /*  cutworm()
@@ -304,7 +305,8 @@ wormhitu(register struct monst *worm)
  *  that both halves will survive.
  */
 void
-cutworm(struct monst *worm, xchar x, xchar y, struct obj *weap)
+cutworm(struct monst *worm, xchar x, xchar y, 
+        boolean cuttier /* hit is by wielded blade or axe or by thrown axe */)
 {
     register struct wseg *curr, *new_tail;
     register struct monst *new_worm;
@@ -317,12 +319,10 @@ cutworm(struct monst *worm, xchar x, xchar y, struct obj *weap)
     if (x == worm->mx && y == worm->my)
         return; /* hit on head */
 
-    /* cutting goes best with a bladed weapon */
-    cut_chance = rnd(20); /* Normally  1-16 does not cut */
-    /* Normally 17-20 does */
-
-    if (weap && is_blade(weap)) /* With a blade 1- 6 does not cut */
-        cut_chance += 10;       /*              7-20 does         */
+    /* cutting goes best with a cuttier weapon */
+    cut_chance = rnd(20); /* Normally     1-16 does not cut, 17-20 does, */
+    if (cuttier)
+        cut_chance += 10; /* with a blade 1- 6 does not cut,  7-20 does. */
 
     if (cut_chance < 17)
         return; /* not good enough */
@@ -370,6 +370,7 @@ cutworm(struct monst *worm, xchar x, xchar y, struct obj *weap)
 
     /* Sometimes the tail end dies. */
     if (!new_worm) {
+        place_worm_seg(worm, x, y); /* place the "head" segment back */
         if (context.mon_moving) {
             if (canspotmon(worm))
                 pline("Part of %s tail has been cut off.",
@@ -402,7 +403,7 @@ cutworm(struct monst *worm, xchar x, xchar y, struct obj *weap)
     wgrowtime[new_wnum] = 0L;    /* trying to call initworm().       */
 
     /* Place the new monster at all the segment locations. */
-    place_wsegs(new_worm);
+    place_wsegs(new_worm, worm);
 
     if (context.mon_moving)
         pline("%s is cut in half.", Monnam(worm));
@@ -538,16 +539,27 @@ rest_worm(int fd)
  *  place_wsegs()
  *
  *  Place the segments of the given worm.  Called from restore.c
+ *  If oldworm is not NULL, assumes the oldworm segments are on map
+ *  in the same location as worm segments
  */
 void
-place_wsegs(struct monst *worm)
+place_wsegs(struct monst *worm, struct monst *oldworm)
 {
     struct wseg *curr = wtails[worm->wormno];
 
     /*  if (!mtmp->wormno) return;  bullet proofing */
 
     while (curr != wheads[worm->wormno]) {
-        place_worm_seg(worm, curr->wx, curr->wy);
+        xchar x = curr->wx;
+        xchar y = curr->wy;
+
+        if (oldworm) {
+            if (m_at(x,y) == oldworm)
+                remove_monster(x, y);
+            else
+                impossible("placing worm seg <%i,%i> over another mon", x, y);
+        }
+        place_worm_seg(worm, x, y);
         curr = curr->nseg;
     }
 }
@@ -565,10 +577,12 @@ sanity_check_worm(struct monst *worm)
     curr = wtails[worm->wormno];
 
     while (curr != wheads[worm->wormno]) {
-        if (!isok(curr->wx, curr->wy))
-            panic("worm seg not isok");
-        if (level.monsters[curr->wx][curr->wy] != worm)
-            panic("worm not at seg location");
+        if (curr->wx) {
+            if (!isok(curr->wx, curr->wy))
+                panic("worm seg not isok");
+            if (level.monsters[curr->wx][curr->wy] != worm)
+                panic("worm not at seg location");
+        }
         curr = curr->nseg;
     }
 }
@@ -589,8 +603,11 @@ remove_worm(register struct monst *worm)
     /*  if (!mtmp->wormno) return;  bullet proofing */
 
     while (curr) {
-        remove_monster(curr->wx, curr->wy);
-        newsym(curr->wx, curr->wy);
+        if (curr->wx) {
+            remove_monster(curr->wx, curr->wy);
+            newsym(curr->wx, curr->wy);
+            curr->wx = 0;
+        }
         curr = curr->nseg;
     }
 }

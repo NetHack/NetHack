@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1519420054 2018/02/23 21:07:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1543185069 2018/11/25 22:31:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -48,17 +48,19 @@ getpos_sethilite(void (*gp_hilitef)(int), boolean (*gp_getvalidf)(int,int))
     getpos_getvalid = gp_getvalidf;
 }
 
-const char *const gloc_descr[NUM_GLOCS][4] = {
+static const char *const gloc_descr[NUM_GLOCS][4] = {
     { "any monsters", "monster", "next monster", "monsters" },
     { "any items", "item", "next object", "objects" },
     { "any doors", "door", "next door or doorway", "doors or doorways" },
     { "any unexplored areas", "unexplored area", "unexplored location",
       "unexplored locations" },
     { "anything interesting", "interesting thing", "anything interesting",
-      "anything interesting" }
+      "anything interesting" },
+    { "any valid locations", "valid location", "valid location",
+      "valid locations" }
 };
 
-const char *const gloc_filtertxt[NUM_GFILTER] = {
+static const char *const gloc_filtertxt[NUM_GFILTER] = {
     "",
     " in view",
     " in this area"
@@ -82,11 +84,11 @@ getpos_help_keyxhelp(winid tmpwin, const char *k1, const char *k2, int gloc)
 STATIC_OVL void
 getpos_help(boolean force, const char *goal)
 {
+    static const char *const fastmovemode[2] = { "8 units at a time",
+                                                 "skipping same glyphs" };
     char sbuf[BUFSZ];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
-    const char *const fastmovemode[2] = { "8 units at a time",
-                                          "skipping same glyphs" };
 
     Sprintf(sbuf,
             "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
@@ -167,7 +169,7 @@ getpos_help(boolean force, const char *goal)
         }
         /* disgusting hack; the alternate selection characters work for any
            getpos call, but only matter for dowhatis (and doquickwhatis) */
-	doing_what_is = (goal == what_is_an_unknown_object);
+        doing_what_is = (goal == what_is_an_unknown_object);
         if (doing_what_is) {
             Sprintf(kbuf, "'%s' or '%s' or '%s' or '%s'",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]),
@@ -264,7 +266,7 @@ gloc_filter_classify_glyph(int glyph)
 }
 
 STATIC_OVL int
-gloc_filter_floodfill_matcharea(int x,int y)
+gloc_filter_floodfill_matcharea(int x, int y)
 {
     int glyph = back_to_glyph(x, y);
 
@@ -295,7 +297,7 @@ gloc_filter_init()
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
         if (!gloc_filter_map) {
-            gloc_filter_map = selection_opvar(NULL);
+            gloc_filter_map = selection_opvar((char *) 0);
         }
         /* special case: if we're in a doorway, try to figure out which
            direction we're moving, and use that side of the doorway */
@@ -308,8 +310,6 @@ gloc_filter_init()
         } else {
             gloc_filter_floodfill(u.ux, u.uy);
         }
-
-
     }
 }
 
@@ -318,7 +318,7 @@ gloc_filter_done()
 {
     if (gloc_filter_map) {
         opvar_free_x(gloc_filter_map);
-        gloc_filter_map = NULL;
+        gloc_filter_map = (struct opvar *) 0;
     }
 }
 
@@ -366,6 +366,10 @@ gather_locs_interesting(int x, int y, int gloc)
                     || IS_UNEXPLORED_LOC(x - 1, y)
                     || IS_UNEXPLORED_LOC(x, y + 1)
                     || IS_UNEXPLORED_LOC(x, y - 1)));
+    case GLOC_VALID:
+        if (getpos_getvalid)
+            return (getpos_getvalid(x,y));
+        /*FALLTHRU*/
     case GLOC_INTERESTING:
         return gather_locs_interesting(x,y, GLOC_DOOR)
             || !(glyph_is_cmap(glyph)
@@ -383,8 +387,6 @@ gather_locs_interesting(int x, int y, int gloc)
                      || glyph_to_cmap(glyph) == S_darkroom
                      || glyph_to_cmap(glyph) == S_corr
                      || glyph_to_cmap(glyph) == S_litcorr));
-    case GLOC_VALID:
-        return (getpos_getvalid && getpos_getvalid(x,y));
     }
     /*NOTREACHED*/
     return FALSE;
@@ -447,7 +449,7 @@ dxdy_to_dist_descr(int dx, int dy, boolean fulldir)
         /* explicit direction; 'one step' is implicit */
         Sprintf(buf, "%s", directionname(dst));
     } else {
-        const char *dirnames[4][2] = {
+        static const char *dirnames[4][2] = {
             { "n", "north" },
             { "s", "south" },
             { "w", "west" },
@@ -521,7 +523,8 @@ auto_describe(int cx, int cy)
 
     cc.x = cx;
     cc.y = cy;
-    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
+    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch,
+                              (struct permonst **) 0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
         custompline(SUPPRESS_HISTORY,
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
@@ -566,10 +569,12 @@ getpos_menu(coord *ccp, int gloc)
         coord tmpcc;
         const char *firstmatch = "unknown";
         int sym = 0;
+
         any.a_int = i + 1;
         tmpcc.x = garr[i].x;
         tmpcc.y = garr[i].y;
-        if (do_screen_description(tmpcc, TRUE, sym, tmpbuf, &firstmatch)) {
+        if (do_screen_description(tmpcc, TRUE, sym, tmpbuf,
+                              &firstmatch, (struct permonst **)0)) {
             (void) coord_desc(garr[i].x, garr[i].y, tmpbuf,
                               iflags.getpos_coords);
             Sprintf(fullbuf, "%s%s%s", firstmatch,
@@ -776,11 +781,12 @@ getpos(coord *ccp, boolean force, const char *goal)
             msg_given = TRUE;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
-            const char *const view_filters[NUM_GFILTER] = {
+            static const char *const view_filters[NUM_GFILTER] = {
                 "Not limiting targets",
                 "Limiting targets to in sight",
                 "Limiting targets to in same area"
             };
+
             iflags.getloc_filter = (iflags.getloc_filter + 1) % NUM_GFILTER;
             for (i = 0; i < NUM_GLOCS; i++) {
                 if (garr[i]) {
@@ -817,6 +823,7 @@ getpos(coord *ccp, boolean force, const char *goal)
 
             if (iflags.getloc_usemenu) {
                 coord tmpcrd;
+
                 if (getpos_menu(&tmpcrd, gloc)) {
                     cx = tmpcrd.x;
                     cy = tmpcrd.y;
@@ -1470,7 +1477,7 @@ namefloorobj()
               (cc.x == u.ux && cc.y == u.uy) ? "under you" : "there");
         return;
     }
-    /* note well: 'obj' might be as instance of STRANGE_OBJECT if target
+    /* note well: 'obj' might be an instance of STRANGE_OBJECT if target
        is a mimic; passing that to xname (directly or via simpleonames)
        would yield "glorkum" so we need to handle it explicitly; it will
        always fail the Hallucination test and pass the !callable test,
@@ -1656,10 +1663,7 @@ x_monnam(register struct monst *mtmp,
     if (do_saddle && (mtmp->misc_worn_check & W_SADDLE) && !Blind
         && !Hallucination)
         Strcat(buf, "saddled ");
-    if (buf[0] != 0)
-        has_adjectives = TRUE;
-    else
-        has_adjectives = FALSE;
+    has_adjectives = (buf[0] != '\0');
 
     /* Put the actual monster name or type into the buffer now */
     /* Be sure to remember whether the buffer starts with a name */
@@ -1966,9 +1970,9 @@ static NEARDATA const char *const hliquids[] = {
     "instant coffee", "tea", "herbal infusion", "liquid rainbow",
     "creamy foam", "mulled wine", "bouillon", "nectar", "grog", "flubber",
     "ketchup", "slow light", "oil", "vinaigrette", "liquid crystal", "honey",
-    "caramel sauce", "ink", "aqueous humour", "milk substitute", "fruit juice",
-    "glowing lava", "gastric acid", "mineral water", "cough syrup", "quicksilver",
-    "sweet vitriol", "grey goo", "pink slime",
+    "caramel sauce", "ink", "aqueous humour", "milk substitute",
+    "fruit juice", "glowing lava", "gastric acid", "mineral water",
+    "cough syrup", "quicksilver", "sweet vitriol", "grey goo", "pink slime",
 };
 
 const char *
@@ -1976,7 +1980,7 @@ hliquid(liquidpref)
 const char *liquidpref;
 {
     return (Hallucination || !liquidpref) ? hliquids[rn2(SIZE(hliquids))]
-                                         : liquidpref;
+                                          : liquidpref;
 }
 
 /* Aliases for road-runner nemesis
@@ -2002,6 +2006,59 @@ coyotename(struct monst *mtmp, char *buf)
                            : coynames[mtmp->m_id % (SIZE(coynames) - 1)]);
     }
     return buf;
+}
+
+char *
+rndorcname(s)
+char *s;
+{
+    static const char *v[] = { "a", "ai", "og", "u" };
+    static const char *snd[] = { "gor", "gris", "un", "bane", "ruk",
+                                 "oth","ul", "z", "thos","akh","hai" };
+    int i, iend = rn1(2, 3), vstart = rn2(2);
+
+    if (s) {
+        *s = '\0';
+        for (i = 0; i < iend; ++i) {
+            vstart = 1 - vstart;                /* 0 -> 1, 1 -> 0 */
+            Sprintf(eos(s), "%s%s", (i > 0 && !rn2(30)) ? "-" : "",
+                    vstart ? v[rn2(SIZE(v))] : snd[rn2(SIZE(snd))]);
+        }
+    }
+    return s;
+}
+
+struct monst *
+christen_orc(mtmp, gang, other)
+struct monst *mtmp;
+const char *gang, *other;
+{
+    int sz = 0;
+    char buf[BUFSZ], buf2[BUFSZ], *orcname;
+
+    orcname = rndorcname(buf2);
+    sz = (int) strlen(orcname);
+    if (gang)
+        sz += (int) (strlen(gang) + sizeof " of " - sizeof "");
+    else if (other)
+        sz += (int) strlen(other);
+
+    if (sz < BUFSZ) {
+        char gbuf[BUFSZ];
+        boolean nameit = FALSE;
+
+        if (gang && orcname) {
+            Sprintf(buf, "%s of %s", upstart(orcname),
+                    upstart(strcpy(gbuf, gang)));
+            nameit = TRUE;
+        } else if (other && orcname) {
+            Sprintf(buf, "%s%s", upstart(orcname), other);
+            nameit = TRUE;
+        }
+        if (nameit)
+            mtmp = christen_monst(mtmp, buf);
+    }
+    return mtmp;
 }
 
 /* make sure "The Colour of Magic" remains the first entry in here */

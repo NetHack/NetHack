@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1489192905 2017/03/11 00:41:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1543972194 2018/12/05 01:09:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -77,6 +77,8 @@ static unsigned ustuck_id = 0, usteed_id = 0;
 int
 dosave()
 {
+    if (iflags.debug_fuzzer)
+        return 0;
     clear_nhwindow(WIN_MESSAGE);
     if (yn("Really save?") == 'n') {
         clear_nhwindow(WIN_MESSAGE);
@@ -179,7 +181,7 @@ dosave0()
     dotcnt = 0;
     dotrow = 2;
     curs(WIN_MAP, 1, 1);
-    if (strncmpi("X11", windowprocs.name, 3))
+    if (!WINDOWPORT("X11"))
         putstr(WIN_MAP, 0, "Saving:");
 #endif
 #ifdef MFLOPPY
@@ -243,7 +245,7 @@ dosave0()
             dotrow++;
             dotcnt = 0;
         }
-        if (strncmpi("X11", windowprocs.name, 3)) {
+        if (!WINDOWPORT("X11")) {
             putstr(WIN_MAP, 0, ".");
         }
         mark_synch();
@@ -528,6 +530,11 @@ skip_lots:
     saveobjchn(fd, level.buriedobjlist, mode);
     saveobjchn(fd, billobjs, mode);
     if (release_data(mode)) {
+        int x,y;
+
+        for (y = 0; y < ROWNO; y++)
+            for (x = 0; x < COLNO; x++)
+                level.monsters[x][y] = 0;
         fmon = 0;
         ftrap = 0;
         fobj = 0;
@@ -989,37 +996,22 @@ saveobjchn(register int fd, register struct obj *otmp, register int mode)
         if (Has_contents(otmp))
             saveobjchn(fd, otmp->cobj, mode);
         if (release_data(mode)) {
-            /*  if (otmp->oclass == FOOD_CLASS)
-             *      food_disappears(otmp);
-             */
             /*
-             * If these are on the floor, the discarding could
-             * be because of a game save, or we could just be changing levels.
+             * If these are on the floor, the discarding could be
+             * due to game save, or we could just be changing levels.
              * Always invalidate the pointer, but ensure that we have
              * the o_id in order to restore the pointer on reload.
              */
             if (otmp == context.victual.piece) {
-                /* Store the o_id of the victual if mismatched */
-                if (context.victual.o_id != otmp->o_id)
-                    context.victual.o_id = otmp->o_id;
-                /* invalidate the pointer; on reload it will get restored */
+                context.victual.o_id = otmp->o_id;
                 context.victual.piece = (struct obj *) 0;
             }
             if (otmp == context.tin.tin) {
-                /* Store the o_id of your tin */
-                if (context.tin.o_id != otmp->o_id)
-                    context.tin.o_id = otmp->o_id;
-                /* invalidate the pointer; on reload it will get restored */
+                context.tin.o_id = otmp->o_id;
                 context.tin.tin = (struct obj *) 0;
             }
-            /*  if (otmp->oclass == SPBOOK_CLASS)
-             *      book_disappears(otmp);
-             */
             if (otmp == context.spbook.book) {
-                /* Store the o_id of your spellbook */
-                if (context.spbook.o_id != otmp->o_id)
-                    context.spbook.o_id = otmp->o_id;
-                /* invalidate the pointer; on reload it will get restored */
+                context.spbook.o_id = otmp->o_id;
                 context.spbook.book = (struct obj *) 0;
             }
             otmp->where = OBJ_FREE; /* set to free so dealloc will work */

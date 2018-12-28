@@ -31,17 +31,13 @@ if exist ..\..\dat\data~1.bas goto long1b
 goto err_long
 :long1a
 echo Changing some long-named distribution file names:
-echo "Copying ..\..\dat\data.base -> ..\..\dat\data.bas"
-copy ..\..\dat\data.base ..\..\dat\data.bas
-if exist ..\..\dat\data.old del /Q ..\..\dat\data.old
-ren ..\..\dat\data.base data.old
+echo "Renaming ..\..\dat\data.base -> ..\..\dat\data.bas"
+ren ..\..\dat\data.base data.bas
 goto long1ok
 :long1b
 echo Changing some long-named distribution file names:
-echo "Copying ..\..\dat\data~1.bas -> ..\..\dat\data.bas"
-copy ..\..\dat\data~1.bas ..\..\dat\data.bas
-if exist ..\..\dat\data.old del /Q ..\..\dat\data.old
-ren ..\..\dat\data~1.bas data.old
+echo "Renaming ..\..\dat\data~1.bas -> ..\..\dat\data.bas"
+ren ..\..\dat\data~1.bas data.bas
 :long1ok
 
 if exist ..\..\include\patchlev.h goto long2ok
@@ -49,22 +45,12 @@ if exist ..\..\include\patchlevel.h goto long2a
 if exist ..\..\include\patchl~1.h goto long2b
 goto err_long
 :long2a
-echo "Copying ..\..\include\patchlevel.h -> ..\..\include\patchlev.h"
-copy ..\..\include\patchlevel.h ..\..\include\patchlev.h
-if exist ..\..\include\patchlev.old del /Q ..\..\include\patchlev.old
-ren ..\..\include\patchlevel.h patchlev.old
+echo "Renaming ..\..\include\patchlevel.h -> ..\..\include\patchlev.h"
+ren ..\..\include\patchlevel.h patchlev.h
 goto long2ok
 :long2b
-echo "Copying ..\..\include\patchl~1.h -> ..\..\include\patchlev.h"
-copy ..\..\include\patchl~1.h ..\..\include\patchlev.h
-if exist ..\..\include\patchlev.old del /Q ..\..\include\patchlev.old
-ren ..\..\include\patchl~1.h patchlev.old
-:long2c
-echo "Copying ..\..\sys\share\pmatch~1.c -> ..\..\sys\share\pmatchre.c"
-copy ..\..\sys\share\pmatch~1.c ..\..\sys\share\pmatchre.c
-:long2d
-echo "Copying ..\..\sys\share\posixr~1.c -> ..\..\sys\share\posixreg.c"
-copy ..\..\sys\share\posixr~1.c ..\..\sys\share\posixreg.c
+echo "Renaming ..\..\include\patchl~1.h -> ..\..\include\patchlev.h"
+ren ..\..\include\patchl~1.h patchlev.h
 :long2ok
 
 REM Missing guidebook is not fatal to the build process
@@ -73,21 +59,30 @@ if exist ..\..\doc\guidebook.txt goto long3a
 if exist ..\..\doc\guideb~1.txt goto long3b
 goto warn3long
 :long3a
-echo "Copying ..\..\doc\guidebook.txt -> ..\..\doc\guideboo.txt"
-copy ..\..\doc\guidebook.txt ..\..\doc\guideboo.txt
-if exist ..\..\doc\guideboo.old del /Q ..\..\doc\guideboo.old
-ren ..\..\doc\guidebook.txt guideboo.old
+echo "Copying ..\..\doc\guidebook.txt -> ..\..\doc\guidebk.txt"
+ren ..\..\doc\guidebook.txt guidebk.txt
 goto long3ok
 :long3b
-echo "Copying ..\..\doc\guideb~1.txt -> ..\..\doc\guideboo.txt"
-copy ..\..\doc\guideb~1.txt ..\..\doc\guideboo.txt
-if exist ..\..\doc\guideboo.old del /Q ..\..\doc\guideboo.old
-ren ..\..\doc\guideb~1.txt guideboo.old
+echo "Copying ..\..\doc\guideb~1.txt -> ..\..\doc\guidebk.txt"
+ren ..\..\doc\guideb~1.txt guidebk.txt
 goto long3ok
 :warn3long
-echo "Warning - There is no NetHack Guidebook (..\..\doc\guideboo.txt)"
+echo "Warning - There is no NetHack Guidebook (..\..\doc\guidebk.txt)"
 echo "          included in your distribution.  Build will proceed anyway."
 :long3ok
+
+if exist ..\..\sys\share\posixreg.c goto long4ok
+if exist ..\..\sys\share\posixregex.c goto long4a
+if exist ..\..\sys\share\posixr~1.c goto long4b
+goto err_long
+:long4a
+echo "Renaming ..\..\sys\share\posixregex.c -> ..\..\sys\share\posixreg.c"
+ren ..\..\sys\share\posixregex.c posixreg.c
+goto long4ok
+:long4b
+echo "Renaming ..\..\sys\share\posixr~1.c -> ..\..\sys\share\posixreg.c"
+ren ..\..\sys\share\posixr~1.h posixreg.c
+:long4ok
 
 if "%1"=="GCC"   goto ok_gcc
 if "%1"=="gcc"   goto ok_gcc

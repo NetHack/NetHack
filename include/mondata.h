@@ -175,6 +175,8 @@
 
 #define is_vampire(ptr) ((ptr)->mlet == S_VAMPIRE)
 
+#define hates_light(ptr) ((ptr) == &mons[PM_GREMLIN])
+
 /* used to vary a few messages */
 #define weirdnonliving(ptr) (is_golem(ptr) || (ptr)->mlet == S_VORTEX)
 #define nonliving(ptr) \

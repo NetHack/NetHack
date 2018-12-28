@@ -2,16 +2,21 @@
 /*      Copyright (c) 2015 by Michael Allison              */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#include "win32api.h"
 #include "hack.h"
 
 #ifdef GUISTUB
 #ifdef TTYSTUB
-#error You can't compile this with both GUISTUB and TTYSTUB defined.
+#error You cannot compile this with both GUISTUB and TTYSTUB defined.
 #endif
 
 int GUILaunched;
-struct window_procs mswin_procs = { "guistubs" };
+struct window_procs mswin_procs = { "-guistubs" };
 
+#ifdef QT_GRAPHICS
+struct window_procs Qt_procs = { "-guistubs" };
+int qt_tilewidth, qt_tileheight, qt_fontsize, qt_compact_mode;
+#endif
 void
 mswin_destroy_reg()
 {
@@ -24,16 +29,14 @@ mswin_destroy_reg()
  */
 #ifdef __MINGW32__
 extern char default_window_sys[];
+extern int mingw_main(int argc, char **argv);
 
 int
 main(int argc, char *argv[])
 {
     boolean resuming;
 
-    sys_early_init();
-    Strcpy(default_window_sys, "tty");
-    resuming = pcmain(argc, argv);
-    moveloop(resuming);
+    resuming = mingw_main(argc, argv);
     nethack_exit(EXIT_SUCCESS);
     /*NOTREACHED*/
     return 0;
@@ -46,13 +49,10 @@ main(int argc, char *argv[])
 
 #ifdef TTYSTUB
 
-#include "hack.h"
-#include "win32api.h"
-
 HANDLE hConIn;
 HANDLE hConOut;
 int GUILaunched;
-struct window_procs tty_procs = { "ttystubs" };
+struct window_procs tty_procs = { "-ttystubs" };
 
 void
 win_tty_init(int dir)
@@ -130,12 +130,6 @@ register char *op;
     return;
 }
 
-void
-load_keyboard_handler()
-{
-    return;
-}
-
 /* this is used as a printf() replacement when the window
  * system isn't initialized yet
  */
@@ -158,11 +152,13 @@ void nttty_error
     return;
 }
 
+#ifdef TTY_GRAPHICS
 void
 synch_cursor()
 {
     return;
 }
+#endif
 
 void
 more()
@@ -170,4 +166,15 @@ more()
     return;
 }
 
+void
+nethack_enter_nttty()
+{
+    return;
+}
+
+void
+set_altkeyhandler(const char *inName)
+{
+    return;
+}
 #endif /* TTYSTUBS */

@@ -4,3 +4,5 @@
 data.base NHSUBST
 symbols NHSUBST
 tribute NHSUBST
+* NH_filestag=(file%s_for_all_versions)
+..files NH_filegenprog

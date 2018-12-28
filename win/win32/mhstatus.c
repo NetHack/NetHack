@@ -1,15 +1,22 @@
-/* NetHack 3.6	mhstatus.c	$NHDT-Date: 1432512810 2015/05/25 00:13:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	mhstatus.c	$NHDT-Date: 1536411224 2018/09/08 12:53:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include <assert.h>
+#include "winos.h"
 #include "winMS.h"
 #include "mhstatus.h"
 #include "mhmsg.h"
 #include "mhfont.h"
 
-#define NHSW_LINES 2
+#ifndef STATUS_HILITES
+#error STATUS_HILITES not defined
+#endif
+
 #define MAXWINDOWTEXT BUFSZ
+
+#define STATUS_BLINK_INTERVAL 500 // milliseconds
+
 
 extern COLORREF nhcolor_to_RGB(int c); /* from mhmap */
 
@@ -59,24 +66,16 @@ void back_buffer_init(back_buffer_t * back_buffer, HWND hWnd, int width, int hei
     back_buffer_size(back_buffer, width, height);
 }
 
+
 typedef struct mswin_nethack_status_window {
     int index;
     char window_text[NHSW_LINES][MAXWINDOWTEXT + 1];
-    int n_fields;
-    const char **vals;
-    boolean *activefields;
-    int *percents;
-    int *colors;
+    mswin_status_lines * status_lines;
     back_buffer_t back_buffer;
+    boolean blink_state; /* true = invert blink text */
+    boolean has_blink_fields; /* true if one or more has blink attriubte */
 } NHStatusWindow, *PNHStatusWindow;
 
-static int fieldorder1[] = { BL_TITLE, BL_STR, BL_DX,    BL_CO,    BL_IN,
-                             BL_WI,    BL_CH,  BL_ALIGN, BL_SCORE, -1 };
-static int fieldorder2[] = { BL_LEVELDESC, BL_GOLD,      BL_HP,   BL_HPMAX,
-                             BL_ENE,       BL_ENEMAX,    BL_AC,   BL_XP,
-                             BL_EXP,       BL_HD,        BL_TIME, BL_HUNGER,
-                             BL_CAP,       BL_CONDITION, -1 };
-static int *fieldorders[] = { fieldorder1, fieldorder2, NULL };
 
 static TCHAR szStatusWindowClass[] = TEXT("MSNHStatusWndClass");
 LRESULT CALLBACK StatusWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -145,6 +144,9 @@ mswin_init_status_window()
         status_fg_brush = CreateSolidBrush(status_fg_color);
     }
 
+    /* set cursor blink timer */
+    SetTimer(ret, 0, STATUS_BLINK_INTERVAL, NULL);
+
     return ret;
 }
 
@@ -193,42 +195,35 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case MSNH_MSG_GETTEXT: {
             PMSNHMsgGetText msg_data = (PMSNHMsgGetText) lParam;
-#ifdef STATUS_HILITES
-            int **fop;
-            int *f;
-
             msg_data->buffer[0] = '\0';
-            if (data->n_fields > 0) {
-                for (fop = fieldorders; *fop; fop++) {
-                    for (f = *fop; *f != -1; f++) {
-                        if (data->activefields[*f])
-                            strncat(msg_data->buffer, data->vals[*f],
-                                    msg_data->max_size
-                                    - strlen(msg_data->buffer));
+            size_t space_remaining = msg_data->max_size;
+
+            for (int line = 0; line < NHSW_LINES; line++) {
+                mswin_status_line *status_line = data->status_lines[line].lines;
+                for (int i = 0; i < status_line->status_strings.count; i++) {
+                    mswin_status_string * status_string = status_line->status_strings.status_strings[i];
+                    if (status_string->space_in_front) {
+                        strncat(msg_data->buffer, " ", space_remaining);
+                        space_remaining = msg_data->max_size - strlen(msg_data->buffer);
                     }
-                    strncat(msg_data->buffer, "\r\n",
-                            msg_data->max_size - strlen(msg_data->buffer));
+                    strncat(msg_data->buffer, status_string->str, space_remaining);
+                    space_remaining = msg_data->max_size - strlen(msg_data->buffer);
                 }
+                strncat(msg_data->buffer, "\r\n", space_remaining);
+                space_remaining = msg_data->max_size - strlen(msg_data->buffer);
             }
-#else
-            strncpy(msg_data->buffer, data->window_text[0],
-                    msg_data->max_size);
-            strncat(msg_data->buffer, "\r\n",
-                    msg_data->max_size - strlen(msg_data->buffer));
-            strncat(msg_data->buffer, data->window_text[1],
-                    msg_data->max_size - strlen(msg_data->buffer));
-#endif
         } break;
 
         case MSNH_MSG_UPDATE_STATUS: {
             PMSNHMsgUpdateStatus msg_data = (PMSNHMsgUpdateStatus) lParam;
-            data->n_fields = msg_data->n_fields;
-            data->vals = msg_data->vals;
-            data->activefields = msg_data->activefields;
-            data->percents = msg_data->percents;
-            data->colors = msg_data->colors;
+            data->status_lines = msg_data->status_lines;
             InvalidateRect(hWnd, NULL, TRUE);
         } break;
+
+		case MSNH_MSG_RANDOM_INPUT:
+			nhassert(0); // unexpected
+			break;
+
         } /* end switch( wParam ) { */
     } break;
 
@@ -262,26 +257,25 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SetFocus(GetNHApp()->hMainWnd);
         break;
 
+    case WM_TIMER:
+        data->blink_state = !data->blink_state;
+        if (data->has_blink_fields)
+            InvalidateRect(hWnd, NULL, TRUE);
+        break;
+
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
 }
 
-#ifdef STATUS_HILITES
 static LRESULT
 onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    int hpbar_percent = 100;
-    int hpbar_color = NO_COLOR;
-    int *f;
-    int **fop;
     SIZE sz;
-    HGDIOBJ normalFont, boldFont;
-    TCHAR wbuf[BUFSZ];
+    WCHAR wbuf[BUFSZ];
     RECT rt;
     PAINTSTRUCT ps;
-    HDC hdc;
     PNHStatusWindow data;
     int width, height;
     RECT clear_rect;
@@ -297,21 +291,10 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     back_buffer_size(&data->back_buffer, width, height);
 
-    hdc = data->back_buffer.hdc;
-
-    normalFont = mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE);
-    boldFont = mswin_get_font(NHW_STATUS, ATR_BOLD, hdc, FALSE);
-
-    SelectObject(hdc, normalFont);
+    HDC hdc = data->back_buffer.hdc;
 
     SetBkColor(hdc, status_bg_color);
     SetTextColor(hdc, status_fg_color);
-
-    if (iflags.wc2_hitpointbar && BL_HP < data->n_fields
-        && data->activefields[BL_HP]) {
-        hpbar_percent = data->percents[BL_HP];
-        hpbar_color = data->colors[BL_HP] & 0x00ff;
-    }
 
     clear_rect.left = 0;
     clear_rect.top = 0;
@@ -320,99 +303,166 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     FillRect(hdc, &clear_rect, status_bg_brush);
 
-    for (fop = fieldorders; *fop; fop++) {
-        LONG left = rt.left;
-        LONG cy = 0;
-        int vlen;
-        for (f = *fop; *f != -1; f++) {
-            int clr, atr;
-            int fntatr = ATR_NONE;
-            HGDIOBJ fnt;
-            COLORREF nFg, nBg;
+    if (data->status_lines != NULL) {
+        
+        data->has_blink_fields = FALSE;
 
-            if (((*f) >= data->n_fields) || (!data->activefields[*f]))
-                continue;
-            clr = data->colors[*f] & 0x00ff;
-            atr = (data->colors[*f] & 0xff00) >> 8;
-            vlen = strlen(data->vals[*f]);
-            NH_A2W(data->vals[*f], wbuf, SIZE(wbuf));
+        for (int line = 0; line < NHSW_LINES; line++) {
+            LONG left = rt.left;
+            LONG cy = 0;
+            int vlen;
 
-            if (atr & HL_BOLD)
-                fntatr = ATR_BOLD;
-            else if (atr & HL_INVERSE)
-                fntatr = ATR_INVERSE;
-            else if (atr & HL_ULINE)
-                fntatr = ATR_ULINE;
-            else if (atr & HL_BLINK)
-                fntatr = ATR_BLINK;
-            else if (atr & HL_DIM)
-                fntatr = ATR_DIM;
-            fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
-            nFg = (clr == NO_COLOR ? status_fg_color
-                   : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)
-                      : status_fg_color));
-            nBg = status_bg_color;
+            mswin_status_line * status_line = &data->status_lines->lines[line];
 
-            sz.cy = -1;
-            if (*f == BL_TITLE && iflags.wc2_hitpointbar) {
-                HBRUSH back_brush = CreateSolidBrush(nhcolor_to_RGB(hpbar_color));
-                RECT barrect;
+            for (int i = 0; i < status_line->status_strings.count; i++) {
+                mswin_status_string * status_string = status_line->status_strings.status_strings[i];
+                int clr, atr;
+                int fntatr = ATR_NONE;
+                COLORREF nFg, nBg;
 
-                /* prepare for drawing */
-                SelectObject(hdc, fnt);
-                SetBkMode(hdc, OPAQUE);
-                SetBkColor(hdc, status_bg_color);
-                SetTextColor(hdc, nhcolor_to_RGB(hpbar_color));
+                if (status_string->str == NULL || status_string->str[0] == '\0')
+                    continue;
 
-                /* get bounding rectangle */
-                GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
+                clr = status_string->color;
+                atr = status_string->attribute;
 
-                /* first draw title normally */
-                DrawText(hdc, wbuf, vlen, &rt, DT_LEFT);
+                const char *str = status_string->str;
 
-                /* calc bar length */
-                barrect.left = rt.left;
-                barrect.top = rt.top;
-                barrect.bottom = sz.cy;
-                if (hpbar_percent > 0)
-                    barrect.right = (int)((hpbar_percent * sz.cx) / 100);
-                else
-                    barrect.right = sz.cx;
+                vlen = strlen(str);
 
-                /* then draw hpbar on top of title */
-                FillRect(hdc, &barrect, back_brush);
-                SetBkMode(hdc, TRANSPARENT);
-                SetTextColor(hdc, nBg);
-                DrawText(hdc, wbuf, vlen, &barrect, DT_LEFT);
+                if (atr & HL_BOLD)
+                    fntatr = ATR_BOLD;
+                else if (atr & HL_INVERSE)
+                    fntatr = ATR_INVERSE;
+                else if (atr & HL_ULINE)
+                    fntatr = ATR_ULINE;
+                else if (atr & HL_BLINK) {
+                    data->has_blink_fields = TRUE;
+                    if (data->blink_state) {
+                        fntatr = ATR_INVERSE;
+                        atr |= HL_INVERSE;
+                    }
+                }
+                else if (atr & HL_DIM)
+                    fntatr = ATR_DIM;
 
-                DeleteObject(back_brush);
-            } else {
-                if (atr & HL_INVERSE) {
-                    COLORREF tmp = nFg;
-                    nFg = nBg;
-                    nBg = tmp;
+                cached_font * fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
+
+                BOOL useUnicode = fnt->supportsUnicode;
+
+                winos_ascii_to_wide_str(str, wbuf, SIZE(wbuf));
+
+                nFg = (clr == NO_COLOR ? status_fg_color
+                    : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)
+                        : status_fg_color));
+
+                if (atr & HL_DIM) {
+                    /* make a dim representation - this can produce color shift */
+                    float redReduction = 0.5f;
+                    float greenReduction = 0.5f;
+                    float blueReduction = 0.25f;
+                    uchar red = (uchar)(GetRValue(nFg) * (1.0f - redReduction));
+                    uchar green = (uchar)(GetGValue(nFg) * (1.0f - greenReduction));
+                    uchar blue = (uchar)(GetBValue(nFg) * (1.0f - blueReduction));
+                    nFg = RGB(red, green, blue);
                 }
 
-                /* prepare for drawing */
-                SelectObject(hdc, fnt);
-                SetBkMode(hdc, OPAQUE);
-                SetBkColor(hdc, nBg);
-                SetTextColor(hdc, nFg);
+                nBg = status_bg_color;
 
-                /* get bounding rectangle */
-                GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
+                if (status_string->space_in_front)
+                    rt.left += fnt->width;
 
-                /* draw */
-                DrawText(hdc, wbuf, vlen, &rt, DT_LEFT);
+                sz.cy = -1;
+
+                if (status_string->draw_bar && iflags.wc2_hitpointbar) {
+                    /* NOTE: we current don't support bar attributes */
+
+                    /* when we are drawing bar we need to look at the hp status
+                     * field to get the correct percentage and color */
+                    COLORREF bar_color = nhcolor_to_RGB(status_string->bar_color);
+                    HBRUSH back_brush = CreateSolidBrush(bar_color);
+                    RECT barrect;
+
+                    /* prepare for drawing */
+                    SelectObject(hdc, fnt->hFont);
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, status_bg_color);
+                    SetTextColor(hdc, status_fg_color);
+
+                    if (useUnicode) {
+                        /* get bounding rectangle */
+                        GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
+
+                        /* first draw title normally */
+                        DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
+                    }
+                    else {
+                        /* get bounding rectangle */
+                        GetTextExtentPoint32A(hdc, str, vlen, &sz);
+
+                        /* first draw title normally */
+                        DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
+                    }
+                    int bar_percent = status_string->bar_percent;
+                    if (bar_percent > 0) {
+                        /* calc bar length */
+                        barrect.left = rt.left;
+                        barrect.top = rt.top;
+                        barrect.bottom = sz.cy;
+                        if (bar_percent > 0)
+                            barrect.right = (int)((bar_percent * sz.cx) / 100);
+                        /* else
+                            barrect.right = sz.cx; */
+
+                            /* then draw hpbar on top of title */
+                        FillRect(hdc, &barrect, back_brush);
+                        SetBkMode(hdc, TRANSPARENT);
+                        SetTextColor(hdc, nBg);
+
+                        if (useUnicode)
+                            DrawTextW(hdc, wbuf, vlen, &barrect, DT_LEFT);
+                        else
+                            DrawTextA(hdc, str, vlen, &barrect, DT_LEFT);
+                    }
+                    DeleteObject(back_brush);
+                }
+                else {
+                    if (atr & HL_INVERSE) {
+                        COLORREF tmp = nFg;
+                        nFg = nBg;
+                        nBg = tmp;
+                    }
+
+                    /* prepare for drawing */
+                    SelectObject(hdc, fnt->hFont);
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, nBg);
+                    SetTextColor(hdc, nFg);
+
+                    if (useUnicode) {
+                        /* get bounding rectangle */
+                        GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
+
+                        /* draw */
+                        DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
+                    }
+                    else {
+                        /* get bounding rectangle */
+                        GetTextExtentPoint32A(hdc, str, vlen, &sz);
+
+                        /* draw */
+                        DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
+                    }
+                }
+                assert(sz.cy >= 0);
+
+                rt.left += sz.cx;
+                cy = max(cy, sz.cy);
             }
-            assert(sz.cy >= 0);
 
-            rt.left += sz.cx;
-            cy = max(cy, sz.cy);
+            rt.left = left;
+            rt.top += cy;
         }
-
-        rt.left = left;
-        rt.top += cy;
     }
 
     BitBlt(front_buffer_hdc, 0, 0, width, height, hdc, 0, 0, SRCCOPY);
@@ -421,70 +471,24 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     return 0;
 }
-#else
-static LRESULT
-onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
-{
-    int i;
-    SIZE sz;
-    HGDIOBJ oldFont;
-    TCHAR wbuf[BUFSZ];
-    COLORREF OldBg, OldFg;
-    RECT rt;
-    PAINTSTRUCT ps;
-    HDC hdc;
-    PNHStatusWindow data;
-
-    data = (PNHStatusWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
-
-    hdc = BeginPaint(hWnd, &ps);
-    GetClientRect(hWnd, &rt);
-
-    oldFont =
-        SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));
-
-    OldBg = SetBkColor(hdc, status_bg_brush ? status_bg_color
-                                            : (COLORREF) GetSysColor(
-                                                  DEFAULT_COLOR_BG_STATUS));
-    OldFg = SetTextColor(hdc, status_fg_brush ? status_fg_color
-                                              : (COLORREF) GetSysColor(
-                                                    DEFAULT_COLOR_FG_STATUS));
-
-    for (i = 0; i < NHSW_LINES; i++) {
-        int wlen = strlen(data->window_text[i]);
-        NH_A2W(data->window_text[i], wbuf, SIZE(wbuf));
-        GetTextExtentPoint32(hdc, wbuf, wlen, &sz);
-        DrawText(hdc, wbuf, wlen, &rt, DT_LEFT | DT_END_ELLIPSIS);
-        rt.top += sz.cy;
-    }
-
-    SelectObject(hdc, oldFont);
-    SetTextColor(hdc, OldFg);
-    SetBkColor(hdc, OldBg);
-    EndPaint(hWnd, &ps);
-
-    return 0;
-}
-#endif /* !STATUS_HILITES */
 
 void
 mswin_status_window_size(HWND hWnd, LPSIZE sz)
 {
-    TEXTMETRIC tm;
-    HGDIOBJ saveFont;
-    HDC hdc;
-    PNHStatusWindow data;
     RECT rt;
-    SIZE text_sz;
 
     GetClientRect(hWnd, &rt);
 
-    data = (PNHStatusWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    PNHStatusWindow data = (PNHStatusWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     if (data) {
-        hdc = GetDC(hWnd);
-        saveFont = SelectObject(
-            hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));
+        HDC hdc = GetDC(hWnd);
+        cached_font * font = mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE);
+        HGDIOBJ saveFont = SelectObject(hdc, font->hFont);
+
+        SIZE text_sz;
         GetTextExtentPoint32(hdc, _T("W"), 1, &text_sz);
+
+        TEXTMETRIC tm;
         GetTextMetrics(hdc, &tm);
 
         rt.bottom = rt.top + text_sz.cy * NHSW_LINES;

@@ -4,3 +4,4 @@ Install.X11 NHSUBST
 nethack.rc NHSUBST
 *.bdf   NH_header=no
 *.xbm   NH_header=no
+* NH_filestag=(file%s_for_X_versions)

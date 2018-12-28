@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhdlg.c	$NHDT-Date: 1432512812 2015/05/25 00:13:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	mhdlg.c	$NHDT-Date: 1544695946 2018/12/13 10:12:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,6 +25,14 @@ INT_PTR CALLBACK GetlinDlgProc(HWND, UINT, WPARAM, LPARAM);
 int
 mswin_getlin_window(const char *question, char *result, size_t result_size)
 {
+    if (iflags.debug_fuzzer) {
+        random_response(result, (int) result_size);
+        if (result[0] != '\0')
+            return IDOK;
+        else
+            return IDCANCEL;
+    }
+
     INT_PTR ret;
     struct getlin_data data;
 
@@ -159,6 +167,15 @@ INT_PTR CALLBACK ExtCmdDlgProc(HWND, UINT, WPARAM, LPARAM);
 int
 mswin_ext_cmd_window(int *selection)
 {
+    if (iflags.debug_fuzzer) {
+        *selection = rnd_extcmd_idx();
+
+        if (*selection != -1)
+            return IDOK;
+        else
+            return IDCANCEL;
+    }
+
     INT_PTR ret;
     struct extcmd_data data;
 
@@ -391,10 +408,6 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case NM_KILLFOCUS:
                 {
-                    char buf[64];
-                    sprintf(buf, "KILLFOCUS %lx\n", (unsigned long) control);
-                    OutputDebugStringA(buf);
-
                     if (data->focus == data->control_race) {
                         data->focus = NULL;
                         ListView_RedrawItems(data->control_race, 0, data->race_count - 1);
@@ -406,9 +419,6 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case NM_SETFOCUS:
                 {
-                    char buf[64];
-                    sprintf(buf, "SETFOCUS %lx\n", (unsigned long) control);
-                    OutputDebugStringA(buf);
                     data->focus = control;
 
                     if (control == data->control_race) {
@@ -716,14 +726,8 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     if (lpdis->itemID < 0)
         return FALSE;
 
-    HWND control = GetDlgItem(hWnd, wParam);
+    HWND control = GetDlgItem(hWnd, (int) wParam);
     int i = lpdis->itemID;
-
-    {
-        char buf[64];
-        sprintf(buf, "DRAW %lx %d\n", (unsigned long)control, i);
-        OutputDebugStringA(buf);
-    }
 
     const char * string;
 
@@ -774,12 +778,6 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     client_rt.left + ListView_GetColumnWidth(lpdis->hwndItem, 0),
                     lpdis->rcItem.bottom);
             DrawFocusRect(lpdis->hDC, &rect);
-
-            {
-                char buf[64];
-                sprintf(buf, "FOCUS %lx %d\n", (unsigned long)control, i);
-                OutputDebugStringA(buf);
-            }
         }
     }
 

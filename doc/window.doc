@@ -177,7 +177,7 @@ int nhgetch()	-- Returns a single character input from the user.
 		   changed and also return ASCII 033 in this case.
 int nh_poskey(int *x, int *y, int *mod)
 		-- Returns a single character input from the user or a
-		   a positioning event (perhaps from a mouse).  If the
+		   positioning event (perhaps from a mouse).  If the
 		   return value is non-zero, a character was typed, else,
 		   a position in the MAP window is returned in x, y and mod.
 		   mod may be one of
@@ -334,7 +334,7 @@ add_menu(windid window, int glyph, const anything identifier,
 		   outside of the standard accelerator (see above) or a
 		   number.  If 0, the item is unaffected by any group
 		   accelerator.  If this accelerator conflicts with
-		   the menu command (or their user defined alises), it loses.
+		   the menu command (or their user defined aliases), it loses.
 		   The menu commands and aliases take care not to interfere
 		   with the default object class symbols.
 		-- If you want this choice to be preselected when the
@@ -412,6 +412,10 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, int color
 		   BL_LEVELDESC, BL_EXP, BL_CONDITION
 		-- fldindex could also be BL_FLUSH (-1), which is not really
 		   a field index, but is a special trigger to tell the 
+		   windowport that it should output all changes received
+                   to this point. It marks the end of a bot() cycle.
+		-- fldindex could also be BL_RESET (-2), which is not really
+		   a field index, but is a special advisory to to tell the 
 		   windowport that it should redisplay all its status fields,
 		   even if no changes have been presented to it.
 		-- ptr is usually a "char *", unless fldindex is BL_CONDITION.
@@ -457,7 +461,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, int color
 
                    For the user's chosen set of BL_MASK_ condition bits,
                    They are stored internally in the cond_hilites[] array,
-                   at the array offset aligned to the color those condtion
+                   at the array offset aligned to the color those condition
                    bits should display in.
 
                    For example, if the user has chosen to display strngl
@@ -598,7 +602,7 @@ getmsghistory(init)
 		   If init is TRUE, start over again from most recent message.
 
 putmsghistory(msg)
-		-- The is the counterpart to getmsghistory() for restores
+		-- This is the counterpart to getmsghistory() for restores
 		   used to reload the port's message recall buffer.
 		   The routine is called repeatedly from the core restore 
 		   routine, starting with the oldest message first, and
@@ -689,7 +693,7 @@ when processing options, either in the config file, or by the 'O' command.
 
 You may be wondering what values your window port will find in the 
 iflags.wc_* and iflags.wc2_* fields for options that the user has not 
-specified in his/her config file. Put another way, how does you port code
+specified in his/her config file. Put another way, how does your port code
 tell if an option has not been set? The next paragraph explains that.
 
 If the core does not set an option, it will still be initialized 
@@ -770,7 +774,24 @@ to support:
   |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
   |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
   |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
+  |  term_cols         | WC2_TERM_COLS      | wc2_term_cols      |int     |
+  |  term_rows         | WC2_TERM_ROWS      | wc2_term_rows      |int     |
+  |  windowborders     | WC2_WINDOWBORDERS  | wc2_windowborders  |int     |
   +--------------------+--------------------+--------------------+--------+
+
+  more wincap2 for STATUS_HILITES support and control
+  +--------------------------------- +---------------------------+
+  | To inform the game engine        |                           |
+  | that the window port is equipped | bit to set in wincap mask |
+  | to receive the following in its  |                           |
+  | x_status_update() routine        |                           |
+  |----------------------------------+---------------------------+
+  | BL_FLUSH to render buffered      | WC2_FLUSH_STATUS          |
+  |          field changes now       |                           |
+  |----------------------------------+---------------------------+
+  | BL_RESET to indicate that all    | WC2_RESET_STATUS          |
+  |          fields should be redone |                           |
+  +----------------------------------+---------------------------+
 
 align_message	-- where to place message window (top, bottom, left, right)
 align_status	-- where to place status display (top, bottom, left, right).
@@ -802,6 +823,8 @@ scroll_margin	-- port should scroll the display when the hero or cursor
 selectsaved     -- if port can display a menu of the user's saved games do so.
 softkeyboard    -- handhelds should display an on-screen keyboard if possible.
 splash_screen   -- port should/should not display an opening splashscreen.
+term_cols       -- Terminal should size itself to specified width, if possible.
+term_rows       -- Terminal should size itself to specified height, if possible.
 tiled_map	-- port should display a tiled map if it can.
 tile_width	-- port should display tiles with this width or round to closest
 		   if it can.
@@ -812,6 +835,8 @@ tile_file	-- open this alternative tile file. The file name is likely to be
 use_inverse	-- port should display inverse when NetHack asks for it.
 vary_msgcount	-- port should display this number of messages at a time in
 		   the message window.
+windowborders   -- port should display borders around main NetHack windows.
+                Can be set to (1) on, (2) off, or (3) auto.
 windowcolors
 		-- port should use these colors for window foreground/background
 		   colors.  Syntax:
@@ -1064,7 +1089,7 @@ When writing a new window-port, you need to follow the following guidelines:
    WINOBJ (if you want the NetHack binary to include them, that is).
 
 9) Look at your port's portmain.c (the file containing main()) and make
-   sure that all of the calls match the the requirements laid out in
+   sure that all of the calls match the requirements laid out in
    Section VII.
 
 Now, proceed with compilation and installation as usual.  Don't forget

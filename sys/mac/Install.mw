@@ -1,5 +1,7 @@
 Building a PPC NetHack 3.6 with the Metrowerks compilers
 
+Note: If you are building using any compiler for OS X, use the instructions 
+      in sys/unix. This file contains old instructions that predated OS X.
 
 You must be familiar with the Metrowerks compiler and know how to construct
 projects.  The NetHack source may come with the four pre-made projects that

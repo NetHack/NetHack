@@ -590,6 +590,7 @@ shkinit(const struct shclass *shp, struct mkroom *sroom)
     /* check that the shopkeeper placement is sane */
     if (sroom->irregular) {
         int rmno = (int) ((sroom - rooms) + ROOMOFFSET);
+
         if (isok(sx - 1, sy) && !levl[sx - 1][sy].edge
             && (int) levl[sx - 1][sy].roomno == rmno)
             sx--;
@@ -601,18 +602,18 @@ shkinit(const struct shclass *shp, struct mkroom *sroom)
             sy--;
         else if (isok(sx, sy + 1) && !levl[sx][sy + 1].edge
                  && (int) levl[sx][sy + 1].roomno == rmno)
-            sx++;
+            sy++;
         else
             goto shk_failed;
-    } else if (sx == sroom->lx - 1)
+    } else if (sx == sroom->lx - 1) {
         sx++;
-    else if (sx == sroom->hx + 1)
+    } else if (sx == sroom->hx + 1) {
         sx--;
-    else if (sy == sroom->ly - 1)
+    } else if (sy == sroom->ly - 1) {
         sy++;
-    else if (sy == sroom->hy + 1)
+    } else if (sy == sroom->hy + 1) {
         sy--;
-    else {
+    } else {
     shk_failed:
 #ifdef DEBUG
         /* Said to happen sometimes, but I have never seen it. */

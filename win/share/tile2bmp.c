@@ -12,11 +12,12 @@
 
 /* #pragma warning(4103:disable) */
 
-#include "hack.h"
-#include "tile.h"
 #ifndef __GNUC__
 #include "win32api.h"
 #endif
+
+#include "hack.h"
+#include "tile.h"
 
 #include <stdint.h>
 #if defined(UINT32_MAX) && defined(INT32_MAX) && defined(UINT16_MAX)

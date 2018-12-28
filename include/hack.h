@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1490908464 2017/03/30 21:14:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1525012595 2018/04/29 14:36:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -175,6 +175,7 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 enum bhit_call_types {
     ZAPPED_WAND = 0,
     THROWN_WEAPON,
+    THROWN_TETHERED_WEAPON,
     KICKED_WEAPON,
     FLASHED_LIGHT,
     INVIS_BEAM
@@ -188,6 +189,18 @@ enum hmon_atkmode_types {
     HMON_APPLIED,   /* polearm, treated as ranged */
     HMON_DRAGGED    /* attached iron ball, pulled into mon */
 };
+
+/* sortloot() return type; needed before extern.h */
+struct sortloot_item {
+    struct obj *obj;
+    char *str; /* result of loot_xname(obj) in some cases, otherwise null */
+    int indx; /* signed int, because sortloot()'s qsort comparison routine
+                 assumes (a->indx - b->indx) might yield a negative result */
+    xchar orderclass; /* order rather than object class; 0 => not yet init'd */
+    xchar subclass; /* subclass for some classes */
+    xchar disco; /* discovery status */
+};
+typedef struct sortloot_item Loot;
 
 #define MATCH_WARN_OF_MON(mon)                                               \
     (Warn_of_mon && ((context.warntype.obj                                   \
@@ -214,8 +227,7 @@ enum hmon_atkmode_types {
 #define SYM_OFF_X (SYM_OFF_W + WARNCOUNT)
 #define SYM_MAX (SYM_OFF_X + MAXOTHER)
 
-#ifdef USE_TRAMPOLI /* This doesn't belong here, but we have little choice \
-                       */
+#ifdef USE_TRAMPOLI /* this doesn't belong here, but we have little choice */
 #undef NDECL
 #define NDECL(f) f()
 #endif
@@ -241,13 +253,15 @@ enum hmon_atkmode_types {
 #define MM_IGNOREWATER 0x00008 /* ignore water when positioning */
 #define MM_ADJACENTOK \
     0x00010               /* it is acceptable to use adjacent coordinates */
-#define MM_ANGRY 0x00020  /* monster is created angry */
+#define MM_ANGRY  0x00020  /* monster is created angry */
 #define MM_NONAME 0x00040 /* monster is not christened */
-#define MM_EGD 0x00100    /* add egd structure */
-#define MM_EPRI 0x00200   /* add epri structure */
-#define MM_ESHK 0x00400   /* add eshk structure */
-#define MM_EMIN 0x00800   /* add emin structure */
-#define MM_EDOG 0x01000   /* add edog structure */
+#define MM_EGD    0x00100    /* add egd structure */
+#define MM_EPRI   0x00200   /* add epri structure */
+#define MM_ESHK   0x00400   /* add eshk structure */
+#define MM_EMIN   0x00800   /* add emin structure */
+#define MM_EDOG   0x01000   /* add edog structure */
+#define MM_ASLEEP 0x02000   /* monsters should be generated asleep */
+#define MM_NOGRP  0x04000   /* suppress creation of monster groups */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00
@@ -257,6 +271,11 @@ enum hmon_atkmode_types {
 /* flags for decide_to_shift() */
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
 #define SHIFT_MSG 0x02     /* always put out a message */
+
+/* flags for deliver_obj_to_mon */
+#define DF_NONE     0x00
+#define DF_RANDOM   0x01
+#define DF_ALL      0x04
 
 /* special mhpmax value when loading bones monster to flag as extinct or
  * genocided */
@@ -316,6 +335,7 @@ enum hmon_atkmode_types {
 #define RECURSIVETRAP 0x08 /* trap changed into another type this same turn */
 #define TOOKPLUNGE 0x10    /* used '>' to enter pit below you */
 #define VIASITTING 0x20    /* #sit while at trap location (affects message) */
+#define FAILEDUNTRAP 0x40  /* trap activated by failed untrap attempt */
 
 /* Flags to control test_move in hack.c */
 #define DO_MOVE 0   /* really doing the move */
@@ -368,6 +388,7 @@ enum explosion_types {
 #define SORTLOOT_PACK   0x01
 #define SORTLOOT_INVLET 0x02
 #define SORTLOOT_LOOT   0x04
+#define SORTLOOT_PETRIFY 0x20 /* override filter func for c-trice corpses */
 
 /* flags for xkilled() [note: meaning of first bit used to be reversed,
    1 to give message and 0 to suppress] */

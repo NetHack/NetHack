@@ -1,4 +1,4 @@
-/* NetHack 3.6	rumors.c	$NHDT-Date: 1446713640 2015/11/05 08:54:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.6	rumors.c	$NHDT-Date: 1545132266 2018/12/18 11:24:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -43,6 +43,7 @@
 
 STATIC_DCL void init_rumors(dlb *);
 STATIC_DCL void init_oracles(dlb *);
+STATIC_DCL void couldnt_open_file(const char *);
 
 /* rumor size variables are signed so that value -1 can be used as a flag */
 static long true_rumor_size = 0L, false_rumor_size;
@@ -153,7 +154,7 @@ getrumor(int truth, /* 1=true, -1=false, 0=either */
         else if (!in_mklev) /* avoid exercizing wisdom for graffiti */
             exercise(A_WIS, (adjtruth > 0));
     } else {
-        pline("Can't open rumors file!");
+        couldnt_open_file(RUMORFILE);
         true_rumor_size = -1; /* don't try to open it again */
     }
 /* this is safe either way, so do it always since we can't get the definition
@@ -180,13 +181,15 @@ getrumor(int truth, /* 1=true, -1=false, 0=either */
 void
 rumor_check()
 {
-    dlb *rumors;
+    dlb *rumors = 0;
     winid tmpwin;
     char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
 
     if (true_rumor_size < 0L) { /* we couldn't open RUMORFILE */
     no_rumors:
         pline("rumors not accessible.");
+        if (rumors)
+            (void) dlb_fclose(rumors);
         return;
     }
 
@@ -270,7 +273,7 @@ rumor_check()
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);
     } else {
-        impossible("Can't open rumors file!");
+        couldnt_open_file(RUMORFILE);
         true_rumor_size = -1; /* don't try to open it again */
     }
 }
@@ -310,8 +313,10 @@ get_rnd_text(const char *fname, char *buf)
             *endp = 0;
         Strcat(buf, xcrypt(line, xbuf));
         (void) dlb_fclose(fh);
-    } else
-        impossible("Can't open file %s!", fname);
+    } else {
+        couldnt_open_file(fname);
+    }
+
     return buf;
 }
 
@@ -410,11 +415,10 @@ restore_oracles(int fd)
 void
 outoracle(boolean special, boolean delphi)
 {
-    char line[COLNO];
-    char *endp;
+    winid tmpwin;
     dlb *oracles;
     int oracle_idx;
-    char xbuf[BUFSZ];
+    char *endp, line[COLNO], xbuf[BUFSZ];
 
     /* early return if we couldn't open ORACLEFILE on previous attempt,
        or if all the oracularities are already exhausted */
@@ -424,17 +428,16 @@ outoracle(boolean special, boolean delphi)
     oracles = dlb_fopen(ORACLEFILE, "r");
 
     if (oracles) {
-        winid tmpwin;
         if (oracle_flg == 0) { /* if this is the first outoracle() */
             init_oracles(oracles);
             oracle_flg = 1;
             if (oracle_cnt == 0)
-                return;
+                goto close_oracles;
         }
         /* oracle_loc[0] is the special oracle;
            oracle_loc[1..oracle_cnt-1] are normal ones */
         if (oracle_cnt <= 1 && !special)
-            return; /*(shouldn't happen)*/
+            goto close_oracles; /*(shouldn't happen)*/
         oracle_idx = special ? 0 : rnd((int) oracle_cnt - 1);
         (void) dlb_fseek(oracles, (long) oracle_loc[oracle_idx], SEEK_SET);
         if (!special) /* move offset of very last one into this slot */
@@ -457,9 +460,10 @@ outoracle(boolean special, boolean delphi)
         }
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);
+ close_oracles:
         (void) dlb_fclose(oracles);
     } else {
-        pline("Can't open oracles file!");
+        couldnt_open_file(ORACLEFILE);
         oracle_flg = -1; /* don't try to open it again */
     }
 }
@@ -534,6 +538,21 @@ doconsult(struct monst *oracl)
         newexplevel();
     }
     return 1;
+}
+
+STATIC_OVL void
+couldnt_open_file(const char *filename)
+{
+    int save_something = program_state.something_worth_saving;
+
+    /* most likely the file is missing, so suppress impossible()'s
+       "saving and restoring might fix this" (unless the fuzzer,
+       which escalates impossible to panic, is running) */
+    if (!iflags.debug_fuzzer)
+        program_state.something_worth_saving = 0;
+
+    impossible("Can't open '%s' file.", filename);
+    program_state.something_worth_saving = save_something;
 }
 
 /*rumors.c*/

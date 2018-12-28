@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1518193644 2018/02/09 16:27:24 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1539804859 2018/10/17 19:34:19 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,6 +6,7 @@
 /* various code that was replicated in *main.c */
 
 #include "hack.h"
+#include <ctype.h>
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -16,6 +17,7 @@ STATIC_DCL void do_positionbar(void);
 #endif
 STATIC_DCL void regen_hp(int);
 STATIC_DCL void interrupt_multi(const char *);
+STATIC_DCL void debug_fields(const char *);
 
 void
 moveloop(boolean resuming)
@@ -32,7 +34,6 @@ moveloop(boolean resuming)
     */
     decl_init();
     monst_init();
-    monstr_init(); /* monster strengths */
     objects_init();
 
     /* if a save file created in normal mode is now being restored in
@@ -387,7 +388,7 @@ moveloop(boolean resuming)
             continue;
         }
 
-        if (iflags.sanity_check)
+        if (iflags.sanity_check || iflags.debug_fuzzer)
             sanity_check();
 
 #ifdef CLIPPING
@@ -751,11 +752,25 @@ const char *msg;
  */
 
 static struct early_opt earlyopts[] = {
-    {ARG_DEBUG, "debug", 5, FALSE},
+    {ARG_DEBUG, "debug", 5, TRUE},
     {ARG_VERSION, "version", 4, TRUE},
+#ifdef WIN32
+    {ARG_WINDOWS, "windows", 4, TRUE},
+#endif
 };
 
-boolean
+#ifdef WIN32
+extern int windows_early_options(const char *);
+#endif
+
+/*
+ * Returns:
+ *    0 = no match
+ *    1 = found and skip past this argument
+ *    2 = found and trigger immediate exit
+ */
+
+int
 argcheck(argc, argv, e_arg)
 int argc;
 char *argv[];
@@ -773,7 +788,7 @@ enum earlyarg e_arg;
     if ((idx >= SIZE(earlyopts)) || (argc <= 1))
             return FALSE;
 
-    for (i = 1; i < argc; ++i) {
+    for (i = 0; i < argc; ++i) {
         if (argv[i][0] != '-')
             continue;
         if (argv[i][1] == '-') {
@@ -783,42 +798,111 @@ enum earlyarg e_arg;
             userea = &argv[i][1];
         }
         match = match_optname(userea, earlyopts[idx].name,
-                    earlyopts[idx].minlength, earlyopts[idx].valallowed);
+                              earlyopts[idx].minlength,
+                              earlyopts[idx].valallowed);
         if (match) break;
     }
 
     if (match) {
+        const char *extended_opt = index(userea, ':');
+
+        if (!extended_opt)
+            extended_opt = index(userea, '=');
         switch(e_arg) {
-            case ARG_DEBUG:
-                        break;
-            case ARG_VERSION: {
-                        boolean insert_into_pastebuf = FALSE;
-                        const char *extended_opt = index(userea,':');
-
-                        if (!extended_opt)
-                            extended_opt = index(userea, '=');
-
-                        if (extended_opt) {
-                            extended_opt++;
-                            if (match_optname(extended_opt, "paste",
-                                                   5, FALSE)) {
-                                insert_into_pastebuf = TRUE;
-                            } else {
-                                raw_printf(
-                     "-%sversion can only be extended with -%sversion:paste.\n",
-                                            dashdash, dashdash);
-                                return TRUE;
-            		    }
-        		}
-                        early_version_info(insert_into_pastebuf);
-                        return TRUE;
-                        break;
+        case ARG_DEBUG:
+            if (extended_opt) {
+                extended_opt++;
+                debug_fields(extended_opt);
             }
-            default:
-                        break;
+            return 1;
+        case ARG_VERSION: {
+            boolean insert_into_pastebuf = FALSE;
+
+            if (extended_opt) {
+                extended_opt++;
+                if (match_optname(extended_opt, "paste", 5, FALSE)) {
+                    insert_into_pastebuf = TRUE;
+                } else {
+                    raw_printf(
+                   "-%sversion can only be extended with -%sversion:paste.\n",
+                               dashdash, dashdash);
+                    return TRUE;
+                }
+            }
+            early_version_info(insert_into_pastebuf);
+            return 2;
+        }
+#ifdef WIN32
+        case ARG_WINDOWS: {
+            if (extended_opt) {
+                extended_opt++;
+                return windows_early_options(extended_opt);
+            }
+        }
+#endif
+        default:
+            break;
         }
     };
     return FALSE;
 }
 
+/*
+ * These are internal controls to aid developers with
+ * testing and debugging particular aspects of the code.
+ * They are not player options and the only place they
+ * are documented is right here. No gameplay is altered.
+ *
+ * test             - test whether this parser is working
+ * ttystatus        - TTY:
+ * immediateflips   - WIN32: turn off display performance
+ *                    optimization so that display output
+ *                    can be debugged without buffering.
+ */
+void
+debug_fields(opts)
+const char *opts;
+{
+    char *op;
+    boolean negated = FALSE;
+
+    while ((op = index(opts, ',')) != 0) {
+        *op++ = 0;
+        /* recurse */
+        debug_fields(op);
+    }
+    if (strlen(opts) > BUFSZ / 2)
+        return;
+
+
+    /* strip leading and trailing white space */
+    while (isspace((uchar) *opts))
+        opts++;
+    op = eos((char *) opts);
+    while (--op >= opts && isspace((uchar) *op))
+        *op = '\0';
+
+    if (!*opts) {
+        /* empty */
+        return;
+    }
+    while ((*opts == '!') || !strncmpi(opts, "no", 2)) {
+        if (*opts == '!')
+            opts++;
+        else
+            opts += 2;
+        negated = !negated;
+    }
+    if (match_optname(opts, "test", 4, FALSE))
+        iflags.debug.test = negated ? FALSE : TRUE;
+#ifdef TTY_GRAPHICS
+    if (match_optname(opts, "ttystatus", 9, FALSE))
+        iflags.debug.ttystatus = negated ? FALSE : TRUE;
+#endif
+#ifdef WIN32
+    if (match_optname(opts, "immediateflips", 14, FALSE))
+        iflags.debug.immediateflips = negated ? FALSE : TRUE;
+#endif
+    return;
+}
 /*allmain.c*/

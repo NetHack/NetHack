@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1524287214 2018/04/21 05:06:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1544930819 2018/12/16 03:26:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -221,7 +221,7 @@ enum sp_obj_var_flags {
 #define SPOVAR_SEL 0x09   /* selection. char[COLNO][ROWNO] in str */
 #define SPOVAR_ARRAY 0x40 /* used in splev_var & lc_vardefs, not in opvar */
 
-#define SP_COORD_IS_RANDOM 0x01000000
+#define SP_COORD_IS_RANDOM 0x01000000L
 /* Humidity flags for get_location() and friends, used with
  * SP_COORD_PACK_RANDOM() */
 #define DRY         0x01
@@ -487,11 +487,15 @@ struct lc_breakdef {
  */
 #ifdef SPEC_LEV
 /* compiling lev_comp rather than nethack */
+/* clang format off */
 #ifdef USE_OLDARGS
 #ifndef VA_TYPE
 typedef const char *vA;
 #define VA_TYPE
 #endif
+/* hack to avoid "warning: cast to 'vA' (aka 'const char *') from smaller
+   integer type 'int' [-Wint-to-pointer-cast]" */
+#define vA_(a) ((vA) (long) a)
 #undef VA_ARGS  /* redefine with the maximum number actually used */
 #undef VA_SHIFT /* ditto */
 #undef VA_PASS1
@@ -506,51 +510,48 @@ typedef const char *vA;
      arg11 = arg12, arg12 = arg13, arg13 = arg14, arg14 = 0)
 /* standard NULL may be either (void *)0 or plain 0, both of
    which would need to be explicitly cast to (char *) here */
-#define VA_PASS1(a1)                                                         \
-    (vA) a1, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
-        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
-#define VA_PASS2(a1, a2)                                              \
-    (vA) a1, (vA) a2, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
-        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
-#define VA_PASS3(a1, a2, a3)                                           \
-    (vA) a1, (vA) a2, (vA) a3, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
-        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
-#define VA_PASS4(a1, a2, a3, a4)                                        \
-    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
-        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
-#define VA_PASS5(a1, a2, a3, a4, a5)                                     \
-    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) 0, (vA) 0, (vA) 0, \
-        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
-#define VA_PASS7(a1, a2, a3, a4, a5, a6, a7)                               \
-    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) 0, \
-        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
-#define VA_PASS8(a1, a2, a3, a4, a5, a6, a7, a8)                            \
-    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) a8, \
-        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
-#define VA_PASS9(a1, a2, a3, a4, a5, a6, a7, a8, a9)                        \
-    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) a8, \
-        (vA) a9, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
-#define VA_PASS14(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13,   \
-                  a14)                                                      \
-    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) a8, \
-        (vA) a9, (vA) a10, (vA) a11, (vA) a12, (vA) a13, (vA) a14
+#define VA_PASS1(a1) \
+    vA_(a1), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0),    \
+        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
+#define VA_PASS2(a1,a2) \
+    vA_(a1), vA_(a2), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0),   \
+        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
+#define VA_PASS3(a1,a2,a3) \
+    vA_(a1), vA_(a2), vA_(a3), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0),  \
+        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
+#define VA_PASS4(a1,a2,a3,a4) \
+    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(0), vA_(0), vA_(0), vA_(0), \
+        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
+#define VA_PASS5(a1,a2,a3,a4,a5) \
+    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(0), vA_(0), vA_(0), \
+        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
+#define VA_PASS7(a1,a2,a3,a4,a5,a6,a7) \
+    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(a6), vA_(a7), vA_(0), \
+        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
+#define VA_PASS8(a1,a2,a3,a4,a5,a6,a7,a8) \
+    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(a6), vA_(a7), vA_(a8), \
+        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
+#define VA_PASS9(a1,a2,a3,a4,a5,a6,a7,a8,a9) \
+    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(a6), vA_(a7), vA_(a8), \
+        vA_(a9), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
+#define VA_PASS14(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14) \
+    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(a6), vA_(a7), vA_(a8), \
+        vA_(a9), vA_(a10), vA_(a11), vA_(a12), vA_(a13), vA_(a14)
 #else /*!USE_OLDARGS*/
 /* USE_STDARG and USE_VARARGS don't need to pass dummy arguments
    or cast real ones */
 #define VA_PASS1(a1) a1
-#define VA_PASS2(a1, a2) a1, a2
-#define VA_PASS3(a1, a2, a3) a1, a2, a3
-#define VA_PASS4(a1, a2, a3, a4) a1, a2, a3, a4
-#define VA_PASS5(a1, a2, a3, a4, a5) a1, a2, a3, a4, a5
-#define VA_PASS7(a1, a2, a3, a4, a5, a6, a7) a1, a2, a3, a4, a5, a6, a7
-#define VA_PASS8(a1, a2, a3, a4, a5, a6, a7, a8) \
-    a1, a2, a3, a4, a5, a6, a7, a8
-#define VA_PASS9(a1, a2, a3, a4, a5, a6, a7, a8, a9) \
-    a1, a2, a3, a4, a5, a6, a7, a8, a9
-#define VA_PASS14(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, \
-                  a14)                                                    \
+#define VA_PASS2(a1,a2) a1, a2
+#define VA_PASS3(a1,a2,a3) a1, a2, a3
+#define VA_PASS4(a1,a2,a3,a4) a1, a2, a3, a4
+#define VA_PASS5(a1,a2,a3,a4,a5) a1, a2, a3, a4, a5
+#define VA_PASS7(a1,a2,a3,a4,a5,a6,a7) a1, a2, a3, a4, a5, a6, a7
+#define VA_PASS8(a1,a2,a3,a4,a5,a6,a7,a8) a1, a2, a3, a4, a5, a6, a7, a8
+#define VA_PASS9(a1,a2,a3,a4,a5,a6,a7,a8,a9) a1, a2, a3, a4, a5, a6, a7, a8, a9
+#define VA_PASS14(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14) \
     a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14
 #endif /*?USE_OLDARGS*/
+/* clang format on */
 /* You were warned to avert your eyes.... */
 #endif /*SPEC_LEV*/
 

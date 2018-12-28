@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1518053380 2018/02/08 01:29:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.130 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1545597425 2018/12/23 20:37:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -206,6 +206,23 @@ mksobj_at(int otyp, int x, int y, boolean init, boolean artif)
 
     otmp = mksobj(otyp, init, artif);
     place_object(otmp, x, y);
+    return otmp;
+}
+
+struct obj *
+mksobj_migr_to_species(otyp, mflags2, init, artif)
+int otyp;
+unsigned mflags2;
+boolean init, artif;
+{
+    struct obj *otmp;
+
+    otmp = mksobj(otyp, init, artif);
+    if (otmp) {
+        add_to_migration(otmp);
+        otmp->owornmask = (long) MIGR_TO_SPECIES;
+        otmp->corpsenm = mflags2;
+    }
     return otmp;
 }
 
@@ -1330,8 +1347,6 @@ weight(register struct obj *obj)
        when we assume this is a brand new glob so use objects[].oc_weight */
     if (obj->globby && obj->owt > 0)
         wt = obj->owt;
-    if (SchroedingersBox(obj))
-        wt += mons[PM_HOUSECAT].cwt;
     if (Is_container(obj) || obj->otyp == STATUE) {
         struct obj *contents;
         register int cwt = 0;
@@ -1797,7 +1812,7 @@ void
 discard_minvent(struct monst *mtmp)
 {
     struct obj *otmp, *mwep = MON_WEP(mtmp);
-    boolean keeping_mon = (mtmp->mhp > 0);
+    boolean keeping_mon = (!DEADMONSTER(mtmp));
 
     while ((otmp = mtmp->minvent) != 0) {
         /* this has now become very similar to m_useupall()... */
@@ -2079,18 +2094,21 @@ hornoplenty(struct obj *horn,
            being included in its formatted name during next message */
         iflags.suppress_price++;
         if (!tipping) {
-            obj = hold_another_object(
-                obj, u.uswallow ? "Oops!  %s out of your reach!"
-                                : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                                   || levl[u.ux][u.uy].typ < IRONBARS
-                                   || levl[u.ux][u.uy].typ >= ICE)
-                                      ? "Oops!  %s away from you!"
-                                      : "Oops!  %s to the floor!",
-                The(aobjnam(obj, "slip")), (const char *) 0);
+            obj = hold_another_object(obj,
+                                      u.uswallow
+                                        ? "Oops!  %s out of your reach!"
+                                        : (Is_airlevel(&u.uz)
+                                           || Is_waterlevel(&u.uz)
+                                           || levl[u.ux][u.uy].typ < IRONBARS
+                                           || levl[u.ux][u.uy].typ >= ICE)
+                                          ? "Oops!  %s away from you!"
+                                          : "Oops!  %s to the floor!",
+                                      The(aobjnam(obj, "slip")), (char *) 0);
+            nhUse(obj);
         } else {
             /* assumes this is taking place at hero's location */
             if (!can_reach_floor(TRUE)) {
-                hitfloor(obj); /* does altar check, message, drop */
+                hitfloor(obj, TRUE); /* does altar check, message, drop */
             } else {
                 if (IS_ALTAR(levl[u.ux][u.uy].typ))
                     doaltarobj(obj); /* does its own drop message */
@@ -2160,7 +2178,7 @@ obj_sanity_check()
     /* monsters temporarily in transit;
        they should have arrived with hero by the time we get called */
     if (mydogs) {
-        pline("mydogs sanity [not empty]");
+        impossible("mydogs sanity [not empty]");
         mon_obj_sanity(mydogs, "mydogs minvent sanity");
     }
 
@@ -2290,10 +2308,10 @@ insane_object(struct obj *obj, const char *fmt, const char *mesg, struct monst *
         Strcat(strcpy(altfmt, fmt), " held by mon %s (%s)");
         if (mon)
             monnm = x_monnam(mon, ARTICLE_A, (char *) 0, EXACT_NAME, TRUE);
-        pline(altfmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj),
+        impossible(altfmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj),
               objnm, fmt_ptr((genericptr_t) mon), monnm);
     } else {
-        pline(fmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj), objnm);
+        impossible(fmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj), objnm);
     }
 }
 
@@ -2319,7 +2337,7 @@ check_contained(struct obj *container, const char *mesg)
         if (obj->where != OBJ_CONTAINED)
             insane_object(obj, "%s obj %s %s: %s", mesg, (struct monst *) 0);
         else if (obj->ocontainer != container)
-            pline("%s obj %s in container %s, not %s", mesg,
+            impossible("%s obj %s in container %s, not %s", mesg,
                   fmt_ptr((genericptr_t) obj),
                   fmt_ptr((genericptr_t) obj->ocontainer),
                   fmt_ptr((genericptr_t) container));

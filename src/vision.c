@@ -375,8 +375,8 @@ STATIC_DCL int new_angle(struct rm *, unsigned char *, int, int);
  *                 @    <-- hero                -->        @
  *
  *
- * We fake the above check by only checking if the horizontal &
- * vertical positions adjacent to the crosswall and T wall are
+ * We fake the above check by only checking if the horizontal
+ * & vertical positions adjacent to the crosswall and T wall are
  * unblocked.  Then, _in general_ we can see beyond.  Generally,
  * this is good enough.
  *
@@ -384,8 +384,8 @@ STATIC_DCL int new_angle(struct rm *, unsigned char *, int, int);
  *        information (we're doing a top down scan in vision_recalc).
  *        We would need to scan once to set all IN_SIGHT and COULD_SEE
  *        bits, then again to correctly set the seenv bits.
- *      + I'm trying to make this as cheap as possible.  The display &
- *        vision eat up too much CPU time.
+ *      + I'm trying to make this as cheap as possible.  The display
+ *        & vision eat up too much CPU time.
  *
  *
  * Note:  Even as I write this, I'm still not convinced.  There are too
@@ -867,11 +867,11 @@ unblock_point(int x, int y)
 }
 
 /*==========================================================================*\
- |                                                                          |
- |      Everything below this line uses (y,x) instead of (x,y) --- the      |
- |      algorithms are faster if they are less recursive and can scan       |
- |      on a row longer.                                                    |
- |                                                                          |
+ :                                                                          :
+ :      Everything below this line uses (y,x) instead of (x,y) --- the      :
+ :      algorithms are faster if they are less recursive and can scan       :
+ :      on a row longer.                                                    :
+ :                                                                          :
 \*==========================================================================*/
 
 /* ======================================================================= *\
@@ -1896,7 +1896,7 @@ right_side(int row,                 /* current row */
          * shadow limit imposed by the far block (right) then use the far
          * wall as our new far block when we recurse.
          *
-         * If the limits are the the same, and the far block really exists
+         * If the limits are the same, and the far block really exists
          * (fb_row >= 0) then do the same as above.
          *
          * Normally, the check would be for the far wall being closer OR EQUAL

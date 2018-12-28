@@ -742,6 +742,8 @@ tty_delay_output()
 #if defined(MICRO)
     register int i;
 #endif
+    if (iflags.debug_fuzzer)
+        return;
 #ifdef TIMED_DELAY
     if (flags.nap) {
         (void) fflush(stdout);
@@ -1254,6 +1256,13 @@ has_color(int color)
     /* XXX has_color() should be added to windowprocs */
     if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "Qt"))
         return 1;
+#endif
+#ifdef CURSES_GRAPHICS
+    /* XXX has_color() should be added to windowprocs */
+    /* iflags.wc_color is set to false and the option disabled if the
+     terminal cannot display color */
+    if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "curses"))
+        return iflags.wc_color;
 #endif
 #ifdef AMII_GRAPHICS
     /* hilites[] not used */

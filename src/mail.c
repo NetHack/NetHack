@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1519070343 2018/02/19 19:59:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1545597424 2018/12/23 20:37:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -185,7 +185,7 @@ md_start(coord *startp)
      */
     lax = 0; /* be picky */
     max_distance = -1;
-retry:
+ retry:
     for (row = 0; row < ROWNO; row++) {
         if (viz_rmin[row] < viz_rmax[row]) {
             /* There are valid positions on this row. */
@@ -333,19 +333,21 @@ md_rush(struct monst *md,
         else if (fx == u.ux && fy == u.uy)
             verbalize("Excuse me.");
 
+        if (mon)
+            remove_monster(fx, fy);
         place_monster(md, fx, fy); /* put md down */
         newsym(fx, fy);            /* see it */
         flush_screen(0);           /* make sure md shows up */
         delay_output();            /* wait a little bit */
 
         /* Remove md from the dungeon.  Restore original mon, if necessary. */
+        remove_monster(fx, fy);
         if (mon) {
             if ((mon->mx != fx) || (mon->my != fy))
                 place_worm_seg(mon, fx, fy);
             else
                 place_monster(mon, fx, fy);
-        } else
-            remove_monster(fx, fy);
+        }
         newsym(fx, fy);
     }
 
@@ -354,9 +356,11 @@ md_rush(struct monst *md,
      * very unlikely).  If one exists, then have the md leave in disgust.
      */
     if ((mon = m_at(fx, fy)) != 0) {
+        remove_monster(fx, fy);
         place_monster(md, fx, fy); /* display md with text below */
         newsym(fx, fy);
         verbalize("This place's too crowded.  I'm outta here.");
+        remove_monster(fx, fy);
 
         if ((mon->mx != fx) || (mon->my != fy)) /* put mon back */
             place_worm_seg(mon, fx, fy);
@@ -410,14 +414,17 @@ newmail(struct mail_info *info)
         display_nhwindow(WIN_MESSAGE, FALSE);
         obj = hold_another_object(obj, "Oops!", (const char *) 0,
                                   (const char *) 0);
+        nhUse(obj);
     }
 
-/* zip back to starting location */
-go_back:
-    (void) md_rush(md, start.x, start.y);
+ go_back:
+    /* zip back to starting location */
+    if (!md_rush(md, start.x, start.y))
+        md->mx = md->my = 0; /* for mongone, md is not on map */
     mongone(md);
-/* deliver some classes of messages even if no daemon ever shows up */
-give_up:
+
+ give_up:
+    /* deliver some classes of messages even if no daemon ever shows up */
     if (!message_seen && info->message_typ == MSG_OTHER)
         pline("Hark!  \"%s.\"", info->display_txt);
 }
@@ -458,7 +465,7 @@ readmail(struct obj *otmp UNUSED)
         "Please find enclosed a small token to represent your Owlbear",
         "**FR33 P0T10N 0F FULL H34L1NG**",
         "Please return to sender (Asmodeus)",
-      "Buy a potion of gain level for only $19.99! Guaranteed to be blessed!",
+     "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!",
         "Invitation: Visit the NetHack web site at http://www.nethack.org!"
     };
 
@@ -597,7 +604,7 @@ read_simplemail(char *mbox, boolean adminmsg)
     else
         unlink(mailbox);
     return;
-bail:
+ bail:
     /* bail out _professionally_ */
     if (!adminmsg)
         pline("It appears to be all gibberish.");
@@ -634,6 +641,8 @@ readmail(struct obj *otmp UNUSED)
     return;
 #endif /* SIMPLE_MAIL */
 #ifdef DEF_MAILREADER /* This implies that UNIX is defined */
+    if (iflags.debug_fuzzer)
+        return;
     display_nhwindow(WIN_MESSAGE, FALSE);
     if (!(mr = nh_getenv("MAILREADER")))
         mr = DEF_MAILREADER;
@@ -666,6 +675,8 @@ ckmailstatus()
 {
     struct mail_info *brdcst;
 
+    if (iflags.debug_fuzzer)
+        return;
     if (u.uswallow || !flags.biff)
         return;
 

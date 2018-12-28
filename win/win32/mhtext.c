@@ -27,7 +27,6 @@ HWND
 mswin_init_text_window()
 {
     HWND ret;
-    PNHTextWindow data;
     RECT rt;
 
     /* get window position */
@@ -51,13 +50,6 @@ mswin_init_text_window()
 
     /* Set window caption */
     SetWindowText(ret, "Text");
-
-    /* create and set window data */
-    data = (PNHTextWindow) malloc(sizeof(NHTextWindow));
-    if (!data)
-        panic("out of memory");
-    ZeroMemory(data, sizeof(NHTextWindow));
-    SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR) data);
 
     mswin_apply_window_style(ret);
 
@@ -84,38 +76,41 @@ mswin_display_text_window(HWND hWnd)
 INT_PTR CALLBACK
 NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    HWND control;
-    HDC hdc;
-    PNHTextWindow data;
-    TCHAR title[MAX_LOADSTRING];
+    PNHTextWindow data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-    data = (PNHTextWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     switch (message) {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
+        data = (PNHTextWindow)malloc(sizeof(NHTextWindow));
+        if (!data)
+            panic("out of memory");
+        ZeroMemory(data, sizeof(NHTextWindow));
+        SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
+
+        HWND control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+        HDC hdc = GetDC(control);
+        cached_font * font = mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE);
         /* set text control font */
-        control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+        
         if (!control) {
             panic("cannot get text view window");
         }
 
-        hdc = GetDC(control);
-        SendMessage(control, WM_SETFONT,
-                    (WPARAM) mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE),
-                    0);
+        SendMessage(control, WM_SETFONT, (WPARAM) font->hFont, 0);
         ReleaseDC(control, hdc);
 
         /* subclass edit control */
         editControlWndProc =
-            (WNDPROC) GetWindowLongPtr(control, GWLP_WNDPROC);
-        SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR) NHEditHookWndProc);
+            (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
+        SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)NHEditHookWndProc);
 
         SetFocus(control);
 
         /* Even though the dialog has no caption, you can still set the title
            which shows on Alt-Tab */
+        TCHAR title[MAX_LOADSTRING];
         LoadString(GetNHApp()->hApp, IDS_APP_TITLE, title, MAX_LOADSTRING);
         SetWindowText(hWnd, title);
-        return FALSE;
+    } break;
 
     case WM_MSNH_COMMAND:
         onMSNHCommand(hWnd, wParam, lParam);
@@ -180,7 +175,10 @@ NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) 0);
         }
         break;
+
     }
+
+
     return FALSE;
 }
 
@@ -215,6 +213,13 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         _tcscat(data->window_text, TEXT("\r\n"));
         break;
     }
+
+	case MSNH_MSG_RANDOM_INPUT: {
+        PostMessage(GetDlgItem(hWnd, IDC_TEXT_CONTROL), 
+            WM_MSNH_COMMAND, MSNH_MSG_RANDOM_INPUT, 0);
+	}
+	break;
+
     }
 }
 
@@ -268,6 +273,7 @@ LayoutText(HWND hWnd)
 LRESULT CALLBACK
 NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    HWND hWndParent = GetParent(hWnd);
     HDC hDC;
     RECT rc;
 
@@ -295,8 +301,7 @@ NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 && (si.nPos + (int) si.nPage) <= (si.nMax - si.nMin))
                 SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
             else
-                PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0),
-                            0);
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDOK, 0), 0);
             return 0;
         }
         case VK_NEXT:
@@ -336,6 +341,20 @@ NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SETFOCUS:
         HideCaret(hWnd);
         return 0;
+
+    case WM_MSNH_COMMAND:
+        if (wParam == MSNH_MSG_RANDOM_INPUT) {
+            char c = randomkey();
+            if (c == '\n')
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDOK, 0), 0);
+            else if (c == '\033')
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDCANCEL, 0), 0);
+            else
+                PostMessage(hWnd, WM_CHAR, c, 0);
+            return 0;
+        }
+        break;
+
     }
 
     if (editControlWndProc)

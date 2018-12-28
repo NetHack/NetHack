@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1505181522 2017/09/12 01:58:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1539804880 2018/10/17 19:34:40 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.85 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -7,8 +7,6 @@
  */
 
 #include "hack.h"
-
-extern const int monstr[];
 
 boolean m_using = FALSE;
 
@@ -153,7 +151,7 @@ precheck(struct monst *mon, struct obj *obj)
         }
         m_useup(mon, obj);
         mon->mhp -= dam;
-        if (mon->mhp <= 0) {
+        if (DEADMONSTER(mon)) {
             monkilled(mon, "", AD_RBRE);
             return 1;
         }
@@ -429,7 +427,7 @@ find_defensive(struct monst *mtmp)
                 || onscary(xx, yy, mtmp))
                 continue;
             /* use trap if it's the correct type */
-            if ((t->ttyp == TRAPDOOR || t->ttyp == HOLE)
+            if (is_hole(t->ttyp)
                 && !is_floater(mtmp->data)
                 && !mtmp->isshk && !mtmp->isgd && !mtmp->ispriest
                 && Can_fall_thru(&u.uz)) {
@@ -479,7 +477,7 @@ find_defensive(struct monst *mtmp)
 
     /* kludge to cut down on trap destruction (particularly portals) */
     t = t_at(x, y);
-    if (t && (t->ttyp == PIT || t->ttyp == SPIKED_PIT || t->ttyp == WEB
+    if (t && (is_pit(t->ttyp) || t->ttyp == WEB
               || t->ttyp == BEAR_TRAP))
         t = 0; /* ok for monster to dig here */
 
@@ -979,7 +977,7 @@ int
 rnd_defensive_item(struct monst *mtmp)
 {
     struct permonst *pm = mtmp->data;
-    int difficulty = monstr[(monsndx(pm))];
+    int difficulty = mons[(monsndx(pm))].difficulty;
     int trycnt = 0;
 
     if (is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
@@ -1258,7 +1256,7 @@ mbhitm(register struct monst *mtmp, register struct obj *otmp)
         break;
     }
     if (reveal_invis) {
-        if (mtmp->mhp > 0 && cansee(bhitpos.x, bhitpos.y)
+        if (!DEADMONSTER(mtmp) && cansee(bhitpos.x, bhitpos.y)
             && !canspotmon(mtmp))
             map_invisible(bhitpos.x, bhitpos.y);
     }
@@ -1389,7 +1387,7 @@ use_offensive(struct monst *mtmp)
              (otmp->otyp == WAN_MAGIC_MISSILE) ? 2 : 6, mtmp->mx, mtmp->my,
              sgn(mtmp->mux - mtmp->mx), sgn(mtmp->muy - mtmp->my));
         m_using = FALSE;
-        return (mtmp->mhp <= 0) ? 1 : 2;
+        return (DEADMONSTER(mtmp)) ? 1 : 2;
     case MUSE_FIRE_HORN:
     case MUSE_FROST_HORN:
         if (oseen) {
@@ -1403,7 +1401,7 @@ use_offensive(struct monst *mtmp)
              rn1(6, 6), mtmp->mx, mtmp->my, sgn(mtmp->mux - mtmp->mx),
              sgn(mtmp->muy - mtmp->my));
         m_using = FALSE;
-        return (mtmp->mhp <= 0) ? 1 : 2;
+        return (DEADMONSTER(mtmp)) ? 1 : 2;
     case MUSE_WAN_TELEPORTATION:
     case MUSE_WAN_STRIKING:
         zap_oseen = oseen;
@@ -1456,7 +1454,7 @@ use_offensive(struct monst *mtmp)
             drop_boulder_on_player(confused, !is_cursed, FALSE, TRUE);
         }
 
-        return (mtmp->mhp <= 0) ? 1 : 2;
+        return (DEADMONSTER(mtmp)) ? 1 : 2;
     }
 #if 0
     case MUSE_SCR_FIRE: {
@@ -1496,7 +1494,7 @@ use_offensive(struct monst *mtmp)
                     mtmp2->mhp -= num;
                     if (resists_cold(mtmp2))
                         mtmp2->mhp -= 3 * num;
-                    if (mtmp2->mhp < 1) {
+                    if (DEADMONSTER(mtmp2)) {
                         mondied(mtmp2);
                         break;
                     }
@@ -1538,7 +1536,7 @@ int
 rnd_offensive_item(struct monst *mtmp)
 {
     struct permonst *pm = mtmp->data;
-    int difficulty = monstr[(monsndx(pm))];
+    int difficulty = mons[(monsndx(pm))].difficulty;
 
     if (is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
         || pm->mlet == S_GHOST || pm->mlet == S_KOP)
@@ -1617,7 +1615,7 @@ find_misc(struct monst *mtmp)
         return FALSE;
 
     if (!stuck && !immobile && (mtmp->cham == NON_PM)
-        && monstr[(pmidx = monsndx(mdat))] < 6) {
+        && mons[(pmidx = monsndx(mdat))].difficulty < 6) {
         boolean ignore_boulders = (verysmall(mdat) || throws_rocks(mdat)
                                    || passes_walls(mdat)),
             diag_ok = !NODIAG(pmidx);
@@ -1703,13 +1701,13 @@ find_misc(struct monst *mtmp)
         }
         nomore(MUSE_WAN_POLYMORPH);
         if (obj->otyp == WAN_POLYMORPH && obj->spe > 0
-            && (mtmp->cham == NON_PM) && monstr[monsndx(mdat)] < 6) {
+            && (mtmp->cham == NON_PM) && mons[monsndx(mdat)].difficulty < 6) {
             m.misc = obj;
             m.has_misc = MUSE_WAN_POLYMORPH;
         }
         nomore(MUSE_POT_POLYMORPH);
         if (obj->otyp == POT_POLYMORPH && (mtmp->cham == NON_PM)
-            && monstr[monsndx(mdat)] < 6) {
+            && mons[monsndx(mdat)].difficulty < 6) {
             m.misc = obj;
             m.has_misc = MUSE_POT_POLYMORPH;
         }
@@ -1974,7 +1972,7 @@ int
 rnd_misc_item(struct monst *mtmp)
 {
     struct permonst *pm = mtmp->data;
-    int difficulty = monstr[(monsndx(pm))];
+    int difficulty = mons[(monsndx(pm))].difficulty;
 
     if (is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
         || pm->mlet == S_GHOST || pm->mlet == S_KOP)
@@ -2027,7 +2025,7 @@ searches_for_item(struct monst *mon, struct obj *obj)
         if (typ == WAN_DIGGING)
             return (boolean) !is_floater(mon->data);
         if (typ == WAN_POLYMORPH)
-            return (boolean) (monstr[monsndx(mon->data)] < 6);
+            return (boolean) (mons[monsndx(mon->data)].difficulty < 6);
         if (objects[typ].oc_dir == RAY || typ == WAN_STRIKING
             || typ == WAN_TELEPORTATION || typ == WAN_CREATE_MONSTER)
             return TRUE;
@@ -2225,7 +2223,7 @@ boolean stoning /* True: stop petrification, False: cure stun && confusion */)
         mon->mhp -= rnd(15);
         if (vis)
             pline("%s has a very bad case of stomach acid.", Monnam(mon));
-        if (mon->mhp <= 0) {
+        if (DEADMONSTER(mon)) {
             pline("%s dies!", Monnam(mon));
             if (by_you)
                 /* hero gets credit (experience) and blame (possible loss
@@ -2460,7 +2458,7 @@ muse_unslime(struct monst *mon,
            for fire breath, dmg is going to be 0 (fire breathers are
            immune to fire damage) but for wand of fire or fire horn,
            'mon' could have taken damage so might die */
-        if (mon->mhp <= 0) {
+        if (DEADMONSTER(mon)) {
             if (by_you) {
                 /* mon killed self but hero gets credit and blame (except
                    for pacifist conduct); xkilled()'s message would say
@@ -2478,7 +2476,7 @@ muse_unslime(struct monst *mon,
         }
     }
     if (vis) {
-        if (res && mon->mhp > 0)
+        if (res && !DEADMONSTER(mon))
             pline("%s slime is burned away!", s_suffix(Monnam(mon)));
         if (otyp != STRANGE_OBJECT)
             makeknown(otyp);

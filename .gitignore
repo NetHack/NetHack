@@ -50,5 +50,8 @@ Makefile.gcc-orig
 *.ilk
 # VS2013 extension to auto-whine about questionable code generates these
 *.lastcodeanalysissucceeded
+# VS 2017 caches data into the hidden directory .vs
+.vs
 # Win32-specific ignores end
+.DS_Store
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1545597414 2018/12/23 20:36:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,8 +19,7 @@ extern boolean notonhead; /* for long worms */
 #define get_artifact(o) \
     (((o) && (o)->oartifact) ? &artilist[(int) (o)->oartifact] : 0)
 
-STATIC_DCL boolean
-bane_applies(const struct artifact *, struct monst *);
+STATIC_DCL boolean bane_applies(const struct artifact *, struct monst *);
 STATIC_DCL int spec_applies(const struct artifact *, struct monst *);
 STATIC_DCL int arti_invoke(struct obj *);
 STATIC_DCL boolean Mb_hit(struct monst * magr, struct monst *mdef,
@@ -1171,6 +1170,8 @@ artifact_hit(struct monst *magr,
             pline_The("massive hammer hits%s %s%c",
                       !spec_dbon_applies ? "" : "!  Lightning strikes",
                       hittee, !spec_dbon_applies ? '.' : '!');
+        if (spec_dbon_applies)
+            wake_nearto(mdef->mx, mdef->my, 4 * 4);
         if (!rn2(5))
             (void) destroy_mitem(mdef, RING_CLASS, AD_ELEC);
         if (!rn2(5))
@@ -1431,6 +1432,7 @@ arti_invoke(struct obj *obj)
         }
         case ENERGY_BOOST: {
             int epboost = (u.uenmax + 1 - u.uen) / 2;
+
             if (epboost > 120)
                 epboost = 120; /* arbitrary */
             else if (epboost < 12)
@@ -1550,6 +1552,7 @@ arti_invoke(struct obj *obj)
             otmp->owt = weight(otmp);
             otmp = hold_another_object(otmp, "Suddenly %s out.",
                                        aobjnam(otmp, "fall"), (char *) 0);
+            nhUse(otmp);
             break;
         }
         }
@@ -1573,7 +1576,7 @@ arti_invoke(struct obj *obj)
         }
 
         if ((eprop & ~W_ARTI) || iprop) {
-        nothing_special:
+ nothing_special:
             /* you had the property from some other source too */
             if (carried(obj))
                 You_feel("a surge of power, but nothing seems to happen.");
@@ -1795,6 +1798,37 @@ glow_color(int arti_indx)
     return hcolor(colorstr);
 }
 
+/* glow verb; [0] holds the value used when blind */
+static const char *glow_verbs[] = {
+    "quiver", "flicker", "glimmer", "gleam"
+};
+
+/* relative strength that Sting is glowing (0..3), to select verb */
+STATIC_OVL int
+glow_strength(count)
+int count;
+{
+    /* glow strength should also be proportional to proximity and
+       probably difficulty, but we don't have that information and
+       gathering it is more trouble than this would be worth */
+    return (count > 12) ? 3 : (count > 4) ? 2 : (count > 0);
+}
+
+const char *
+glow_verb(count, ingsfx)
+int count; /* 0 means blind rather than no applicable creatures */
+boolean ingsfx;
+{
+    static char resbuf[20];
+
+    Strcpy(resbuf, glow_verbs[glow_strength(count)]);
+    /* ing_suffix() will double the last consonant for all the words
+       we're using and none of them should have that, so bypass it */
+    if (ingsfx)
+        Strcat(resbuf, "ing");
+    return resbuf;
+}
+
 /* use for warning "glow" for Sting, Orcrist, and Grimtooth */
 void
 Sting_effects(int orc_count) /* new count (warn_obj_cnt is old count); -1 is a flag value */
@@ -1803,22 +1837,28 @@ Sting_effects(int orc_count) /* new count (warn_obj_cnt is old count); -1 is a f
         && (uwep->oartifact == ART_STING
             || uwep->oartifact == ART_ORCRIST
             || uwep->oartifact == ART_GRIMTOOTH)) {
+        int oldstr = glow_strength(warn_obj_cnt),
+            newstr = glow_strength(orc_count);
+
         if (orc_count == -1 && warn_obj_cnt > 0) {
             /* -1 means that blindness has just been toggled; give a
                'continue' message that eventual 'stop' message will match */
             pline("%s is %s.", bare_artifactname(uwep),
-                  !Blind ? "glowing" : "quivering");
-        } else if (orc_count > 0 && warn_obj_cnt == 0) {
+                  glow_verb(Blind ? 0 : warn_obj_cnt, TRUE));
+        } else if (newstr > 0 && newstr != oldstr) {
             /* 'start' message */
             if (!Blind)
-                pline("%s %s %s!", bare_artifactname(uwep),
-                      otense(uwep, "glow"), glow_color(uwep->oartifact));
-            else
-                pline("%s quivers slightly.", bare_artifactname(uwep));
+                pline("%s %s %s%c", bare_artifactname(uwep),
+                      otense(uwep, glow_verb(orc_count, FALSE)),
+                      glow_color(uwep->oartifact),
+                      (newstr > oldstr) ? '!' : '.');
+            else if (oldstr == 0) /* quivers */
+                pline("%s %s slightly.", bare_artifactname(uwep),
+                      otense(uwep, glow_verb(0, FALSE)));
         } else if (orc_count == 0 && warn_obj_cnt > 0) {
             /* 'stop' message */
             pline("%s stops %s.", bare_artifactname(uwep),
-                  !Blind ? "glowing" : "quivering");
+                  glow_verb(Blind ? 0 : warn_obj_cnt, TRUE));
         }
     }
 }
@@ -1879,7 +1919,7 @@ retouch_object(struct obj **objp,   /* might be destroyed or unintentionally dro
     if (loseit && obj) {
         if (Levitation) {
             freeinv(obj);
-            hitfloor(obj);
+            hitfloor(obj, TRUE);
         } else {
             /* dropx gives a message iff item lands on an altar */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))

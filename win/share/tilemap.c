@@ -1,14 +1,16 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1524689272 2018/04/25 20:47:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1542501042 2018/11/18 00:30:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
 /*      Copyright (c) 2016 by Michael Allison                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
- *	This source file is compiled twice:
- *	once without TILETEXT defined to make tilemap.{o,obj},
- *	then again with it defined to produce tiletxt.{o,obj}.
+ *      This source file is compiled twice:
+ *      once without TILETEXT defined to make tilemap.{o,obj},
+ *      then again with it defined to produce tiletxt.{o,obj}.
  */
 
 #include "hack.h"
+
+#define Fprintf (void) fprintf
 
 const char *tilename(int, int);
 void init_tilemap(void);
@@ -40,7 +42,7 @@ struct conditionals {
     int sequence, predecessor;
     const char *name;
 } conditionals[] = {
-#ifndef CHARON /* not supported yet */
+#ifndef CHARON /* not supported */
     { MON_GLYPH, PM_HELL_HOUND, "Cerberus" },
 #endif
     /* commented out in monst.c at present */
@@ -68,7 +70,8 @@ struct conditionals {
  * don't know what a slime mold should look like when renamed anyway
  */
 #ifndef MAIL
-    { OBJ_GLYPH, SCR_STINKING_CLOUD + EXTRA_SCROLL_DESCR_COUNT, "stamped / mail" },
+    { OBJ_GLYPH, SCR_STINKING_CLOUD + EXTRA_SCROLL_DESCR_COUNT,
+      "stamped / mail" },
 #endif
     { 0, 0, 0 }
 };
@@ -393,18 +396,19 @@ init_tilemap()
 #endif
 }
 
-const char *prolog[] = { "", "", "void", "substitute_tiles(plev)",
-                         "d_level *plev;", "{", "\tint i;", "" };
+const char *prolog[] = { "", "void", "substitute_tiles(plev)",
+                         "d_level *plev;", "{", "    int i;", "" };
 
-const char *epilog[] = { "}" };
+const char *epilog[] = { "    return;", "}" };
 
 /* write out the substitutions in an easily-used form. */
 void
 process_substitutions(FILE *ofp)
 {
+    static const char Dent[] = "    "; /* 4 space indentation */
     int i, j, k, span, start;
 
-    fprintf(ofp, "\n\n");
+    Fprintf(ofp, "\n");
 
     j = 0; /* unnecessary */
     span = -1;
@@ -413,16 +417,16 @@ process_substitutions(FILE *ofp)
             || substitutes[i].last_glyph != substitutes[j].last_glyph) {
             j = i;
             span++;
-            fprintf(ofp, "short std_tiles%d[] = { ", span);
+            Fprintf(ofp, "short std_tiles%d[] = { ", span);
             for (k = substitutes[i].first_glyph;
                  k < substitutes[i].last_glyph; k++)
-                fprintf(ofp, "%d, ", tilemap[k]);
-            fprintf(ofp, "%d };\n", tilemap[substitutes[i].last_glyph]);
+                Fprintf(ofp, "%d, ", tilemap[k]);
+            Fprintf(ofp, "%d };\n", tilemap[substitutes[i].last_glyph]);
         }
     }
 
     for (i = 0; i < SIZE(prolog); i++) {
-        fprintf(ofp, "%s\n", prolog[i]);
+        Fprintf(ofp, "%s\n", prolog[i]);
     }
     j = -1;
     span = -1;
@@ -431,43 +435,41 @@ process_substitutions(FILE *ofp)
         if (i == 0 || substitutes[i].first_glyph != substitutes[j].first_glyph
             || substitutes[i].last_glyph != substitutes[j].last_glyph) {
             if (i != 0) { /* finish previous span */
-                fprintf(ofp, "\t} else {\n");
-                fprintf(ofp, "\t\tfor (i = %d; i <= %d; i++)\n",
-                        substitutes[j].first_glyph,
-                        substitutes[j].last_glyph);
-                fprintf(ofp, "\t\t\tglyph2tile[i] = std_tiles%d[i - %d];\n",
-                        span, substitutes[j].first_glyph);
-                fprintf(ofp, "\t}\n\n");
+                Fprintf(ofp, "%s} else {\n", Dent);
+                Fprintf(ofp, "%s%sfor (i = %d; i <= %d; i++)\n", Dent, Dent,
+                        substitutes[j].first_glyph, substitutes[j].last_glyph);
+                Fprintf(ofp, "%s%s%sglyph2tile[i] = std_tiles%d[i - %d];\n",
+                        Dent, Dent, Dent, span, substitutes[j].first_glyph);
+                Fprintf(ofp, "%s}\n\n", Dent);
             }
             j = i;
             span++;
         }
-        if (i != j)
-            fprintf(ofp, "\t} else ");
-        fprintf(ofp, "\tif (%s) {\n", substitutes[i].level_test);
-        fprintf(ofp, "\t\tfor (i = %d; i <= %d; i++)\n",
+        Fprintf(ofp, "%s%sif (%s) {\n", Dent, (i == j) ? "" : "} else ",
+                substitutes[i].level_test);
+        Fprintf(ofp, "%s%sfor (i = %d; i <= %d; i++)\n", Dent, Dent,
                 substitutes[i].first_glyph, substitutes[i].last_glyph);
-        fprintf(ofp, "\t\t\tglyph2tile[i] = %d + i - %d;\n", start,
-                substitutes[i].first_glyph);
+        Fprintf(ofp, "%s%s%sglyph2tile[i] = %d + i - %d;\n",
+                Dent, Dent, Dent, start, substitutes[i].first_glyph);
         start += substitutes[i].last_glyph - substitutes[i].first_glyph + 1;
     }
     /* finish last span */
-    fprintf(ofp, "\t} else {\n");
-    fprintf(ofp, "\t\tfor (i = %d; i <= %d; i++)\n",
+    Fprintf(ofp, "%s} else {\n", Dent);
+    Fprintf(ofp, "%s%sfor (i = %d; i <= %d; i++)\n", Dent, Dent,
             substitutes[j].first_glyph, substitutes[j].last_glyph);
-    fprintf(ofp, "\t\t\tglyph2tile[i] = std_tiles%d[i - %d];\n", span,
-            substitutes[j].first_glyph);
-    fprintf(ofp, "\t}\n\n");
+    Fprintf(ofp, "%s%s%sglyph2tile[i] = std_tiles%d[i - %d];\n",
+            Dent, Dent, Dent, span, substitutes[j].first_glyph);
+    Fprintf(ofp, "%s}\n", Dent);
 
     for (i = 0; i < SIZE(epilog); i++) {
-        fprintf(ofp, "%s\n", epilog[i]);
+        Fprintf(ofp, "%s\n", epilog[i]);
     }
 
     lastothtile = start - 1;
 #ifdef STATUES_LOOK_LIKE_MONSTERS
     start = laststatuetile + 1;
 #endif
-    fprintf(ofp, "\nint total_tiles_used = %d;\n", start);
+    Fprintf(ofp, "\nint total_tiles_used = %d;\n", start);
 }
 
 int
@@ -487,27 +489,29 @@ main()
         perror(filename);
         exit(EXIT_FAILURE);
     }
-    fprintf(ofp,
+    Fprintf(ofp,
             "/* This file is automatically generated.  Do not edit. */\n");
-    fprintf(ofp, "\n#include \"hack.h\"\n\n");
-    fprintf(ofp, "short glyph2tile[MAX_GLYPH] = {\n");
+    Fprintf(ofp, "\n#include \"hack.h\"\n");
+    Fprintf(ofp, "\nshort glyph2tile[MAX_GLYPH] = {\n");
 
     for (i = 0; i < MAX_GLYPH; i++) {
-        fprintf(ofp, "%2d,%c", tilemap[i], (i % 12) ? ' ' : '\n');
+        Fprintf(ofp, " %4d,", tilemap[i]);
+        if ((i % 12) == 11 || i == MAX_GLYPH - 1)
+            Fprintf(ofp, "\n");
     }
-    fprintf(ofp, "%s};\n", (i % 12) ? "\n" : "");
+    Fprintf(ofp, "};\n");
 
     process_substitutions(ofp);
 
-    fprintf(ofp, "\n#define MAXMONTILE %d\n", lastmontile);
-    fprintf(ofp, "#define MAXOBJTILE %d\n", lastobjtile);
-    fprintf(ofp, "#define MAXOTHTILE %d\n", lastothtile);
+    Fprintf(ofp, "\n#define MAXMONTILE %d\n", lastmontile);
+    Fprintf(ofp, "#define MAXOBJTILE %d\n", lastobjtile);
+    Fprintf(ofp, "#define MAXOTHTILE %d\n", lastothtile);
 #ifdef STATUES_LOOK_LIKE_MONSTERS
-    fprintf(ofp, "/* #define MAXSTATUETILE %d */\n", laststatuetile);
+    Fprintf(ofp, "/* #define MAXSTATUETILE %d */\n", laststatuetile);
 #endif
-    fprintf(ofp, "\n/*tile.c*/\n");
+    Fprintf(ofp, "\n/*tile.c*/\n");
 
-    fclose(ofp);
+    (void) fclose(ofp);
     exit(EXIT_SUCCESS);
     /*NOTREACHED*/
     return 0;
@@ -632,3 +636,4 @@ const char *encountered, *expected;
     return FALSE;
 }
 
+/*tilemap.c*/

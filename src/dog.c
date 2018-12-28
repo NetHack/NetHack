@@ -1,4 +1,4 @@
-/* NetHack 3.6	dog.c	$NHDT-Date: 1502753406 2017/08/14 23:30:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	dog.c	$NHDT-Date: 1543052701 2018/11/24 09:45:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,6 +6,11 @@
 #include "hack.h"
 
 STATIC_DCL int pet_type(void);
+
+/* cloned from mon.c; used here if mon_arrive() can't place mon */
+#define LEVEL_SPECIFIC_NOCORPSE(mdat) \
+    (Is_rogue_level(&u.uz)            \
+     || (level.flags.graveyard && is_undead(mdat) && rn2(3)))
 
 void
 newedog(struct monst *mtmp)
@@ -73,6 +78,7 @@ make_familiar(register struct obj *otmp, xchar x, xchar y, boolean quietly)
     do {
         if (otmp) { /* figurine; otherwise spell */
             int mndx = otmp->corpsenm;
+
             pm = &mons[mndx];
             /* activating a figurine provides one way to exceed the
                maximum number of the target critter created--unless
@@ -212,7 +218,7 @@ update_mlstmv()
 void
 losedogs()
 {
-    register struct monst *mtmp, *mtmp0 = 0, *mtmp2;
+    register struct monst *mtmp, *mtmp0, *mtmp2;
     int dismissKops = 0;
 
     /*
@@ -267,17 +273,26 @@ losedogs()
         mon_arrive(mtmp, TRUE);
     }
 
-    /* time for migrating monsters to arrive */
+    /* time for migrating monsters to arrive;
+       monsters who belong on this level but fail to arrive get put
+       back onto the list (at head), so traversing it is tricky */
     for (mtmp = migrating_mons; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp->nmon;
         if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel) {
-            if (mtmp == migrating_mons)
+            /* remove mtmp from migrating_mons list */
+            if (mtmp == migrating_mons) {
                 migrating_mons = mtmp->nmon;
-            else
-                mtmp0->nmon = mtmp->nmon;
+            } else {
+                for (mtmp0 = migrating_mons; mtmp0; mtmp0 = mtmp0->nmon)
+                    if (mtmp0->nmon == mtmp) {
+                        mtmp0->nmon = mtmp->nmon;
+                        break;
+                    }
+                if (!mtmp0)
+                    panic("losedogs: can't find migrating mon");
+            }
             mon_arrive(mtmp, FALSE);
-        } else
-            mtmp0 = mtmp;
+        }
     }
 }
 
@@ -288,6 +303,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
     struct trap *t;
     xchar xlocale, ylocale, xyloc, xyflags, wander;
     int num_segs;
+    boolean failed_to_place = FALSE;
 
     mtmp->nmon = fmon;
     fmon = mtmp;
@@ -313,7 +329,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
     xyflags = mtmp->mtrack[0].y;
     xlocale = mtmp->mtrack[1].x;
     ylocale = mtmp->mtrack[1].y;
-    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
+    memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
 
     if (mtmp == u.usteed)
         return; /* don't place steed on the map */
@@ -399,12 +415,20 @@ mon_arrive(struct monst *mtmp, boolean with_you)
         break;
     }
 
+    if ((mtmp->mspare1 & MIGR_LEFTOVERS) != 0L) {
+        /* Pick up the rest of the MIGR_TO_SPECIES objects */
+        if (migrating_objs)
+            deliver_obj_to_mon(mtmp, 0, DF_ALL);
+    }
+
     if (xlocale && wander) {
         /* monster moved a bit; pick a nearby location */
         /* mnearto() deals w/stone, et al */
         char *r = in_rooms(xlocale, ylocale, 0);
+
         if (r && *r) {
             coord c;
+
             /* somexy() handles irregular rooms */
             if (somexy(&rooms[*r - ROOMOFFSET], &c)) {
                 xlocale = c.x; ylocale = c.y;
@@ -412,6 +436,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
                 xlocale = ylocale = 0;
         } else { /* not in a room */
             int i, j;
+
             i = max(1, xlocale - wander);
             j = min(COLNO - 1, xlocale + wander);
             xlocale = rn1(j - i, i);
@@ -423,36 +448,13 @@ mon_arrive(struct monst *mtmp, boolean with_you)
 
     mtmp->mx = 0; /*(already is 0)*/
     mtmp->my = xyflags;
-    if (xlocale) {
-        if (!mnearto(mtmp, xlocale, ylocale, FALSE))
-            goto fail_mon_placement;
-    } else {
-        if (!rloc(mtmp, TRUE)) {
-            /*
-             * Failed to place migrating monster,
-             * probably because the level is full.
-             * Dump the monster's cargo and leave the monster dead.
-             */
-            struct obj *obj;
-fail_mon_placement:
-            while ((obj = mtmp->minvent) != 0) {
-                obj_extract_self(obj);
-                obj_no_longer_held(obj);
-                if (obj->owornmask & W_WEP)
-                    setmnotwielded(mtmp, obj);
-                obj->owornmask = 0L;
-                if (xlocale && ylocale)
-                    place_object(obj, xlocale, ylocale);
-                else if (rloco(obj)) {
-                    if (!get_obj_location(obj, &xlocale, &ylocale, 0))
-                        impossible("Can't find relocated object.");
-                }
-            }
-            (void) mkcorpstat(CORPSE, (struct monst *) 0, mtmp->data, xlocale,
-                              ylocale, CORPSTAT_NONE);
-            mongone(mtmp);
-        }
-    }
+    if (xlocale)
+        failed_to_place = !mnearto(mtmp, xlocale, ylocale, FALSE);
+    else
+        failed_to_place = !rloc(mtmp, TRUE);
+
+    if (failed_to_place)
+        m_into_limbo(mtmp); /* try again next time hero comes to this level */
 }
 
 /* heal monster for time spent elsewhere */
@@ -634,6 +636,7 @@ keepdogs(boolean pets_only)
                 cnt = count_wsegs(mtmp);
                 num_segs = min(cnt, MAX_NUM_WORMS - 1);
                 wormgone(mtmp);
+                place_monster(mtmp, mtmp->mx, mtmp->my);
             } else
                 num_segs = 0;
 
@@ -669,7 +672,7 @@ keepdogs(boolean pets_only)
 void
 migrate_to_level(register struct monst *mtmp, xchar tolev, xchar xyloc, coord *cc)
 {
-    register struct obj *obj;
+    struct obj *obj;
     d_level new_lev;
     xchar xyflags;
     int num_segs = 0; /* count of worm segments */
@@ -678,11 +681,12 @@ migrate_to_level(register struct monst *mtmp, xchar tolev, xchar xyloc, coord *c
         set_residency(mtmp, TRUE);
 
     if (mtmp->wormno) {
-        register int cnt;
+        int cnt = count_wsegs(mtmp);
+
         /* **** NOTE: worm is truncated to # segs = max wormno size **** */
-        cnt = count_wsegs(mtmp);
-        num_segs = min(cnt, MAX_NUM_WORMS - 1);
-        wormgone(mtmp);
+        num_segs = min(cnt, MAX_NUM_WORMS - 1); /* used below */
+        wormgone(mtmp); /* destroys tail and takes head off map */
+        place_monster(mtmp, mtmp->mx, mtmp->my); /* put head back for relmon */
     }
 
     /* set minvent's obj->no_charge to 0 */
@@ -715,7 +719,7 @@ migrate_to_level(register struct monst *mtmp, xchar tolev, xchar xyloc, coord *c
     mtmp->muy = new_lev.dlevel;
     mtmp->mx = mtmp->my = 0; /* this implies migration */
     if (mtmp == context.polearm.hitmon)
-        context.polearm.hitmon = NULL;
+        context.polearm.hitmon = (struct monst *) 0;
 }
 
 /* return quality of food; the lower the better */

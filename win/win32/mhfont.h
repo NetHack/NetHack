@@ -9,9 +9,20 @@
 
 #include "winMS.h"
 
-HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace);
-void mswin_init_splashfonts(HWND hWnd);
-void mswin_destroy_splashfonts(void);
+#define MIN_FONT_WIDTH 9
+#define MIN_FONT_HEIGHT 12
+
+typedef struct cached_font {
+    int code;
+    HFONT hFont;
+    BOOL supportsUnicode;
+    int width;
+    int height;
+} cached_font;
+
+BOOL mswin_font_supports_unicode(HFONT hFont);
+cached_font * mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace);
+HFONT mswin_create_splashfont(HWND hWnd);
 UINT mswin_charset(void);
 
 #endif /* MSWINFont_h */

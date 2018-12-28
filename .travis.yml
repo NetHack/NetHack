@@ -1,0 +1,52 @@
+language: c
+
+script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && QT_SELECT=5 make MOC=moc install"
+
+matrix:
+  include:
+    - env: HINTS=linux
+      compiler: gcc
+    - env: HINTS=linux
+      compiler: clang
+    - env: HINTS=linux-x11
+      compiler: gcc
+    - env: HINTS=linux-qt5
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - qtbase5-dev
+            - qtmultimedia5-dev
+            - qtbase5-dev-tools
+    - env: HINTS=linux-minimal
+      compiler: gcc
+      script: |
+              cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+              sed -i '/^#define CLIPPING/d'       include/config.h
+              sed -i '/^#define COMPRESS/d'       include/config.h
+              #sed -i '/^#define DOAGAIN/d'        include/config.h
+              sed -i '/^#define DUMPLOG/d'        include/config.h
+              #sed -i '/^#define GDBPATH/d'        include/config.h
+              #sed -i '/^#define GREPPATH/d'       include/config.h
+              sed -i '/^#define INSURANCE/d'      include/config.h
+              sed -i '/^#define LOGFILE/d'        include/config.h
+              sed -i '/^#define NEWS/d'           include/config.h
+              sed -i '/^#define PANICLOG/d'       include/config.h
+              #sed -i '/^#define STATUS_HILITES/d' include/config.h
+              sed -i '/^#define SYSCF/d'          include/config.h
+              sed -i '/^#define USER_SOUNDS/d'    include/config.h
+              sed -i '/^#define XLOGFILE/d'       include/config.h
+
+              sed -i '/^#define MAIL/d'           include/unixconf.h
+              sed -i '/^#define SHELL/d'          include/unixconf.h
+              sed -i '/^#define SUSPEND/d'        include/unixconf.h
+              sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
+              make install
+              cat dat/options
+
+sudo: false
+
+notifications:
+  email:
+    recipients:
+      - devteam@nethack.org

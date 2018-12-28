@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1496959480 2017/06/08 22:04:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1543492132 2018/11/29 11:48:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -111,7 +111,6 @@ setuwep(register struct obj *obj)
                        : !is_weptool(obj) && !is_wet_towel(obj);
     } else
         unweapon = TRUE; /* for "bare hands" message */
-    update_inventory();
 }
 
 STATIC_OVL boolean
@@ -184,6 +183,8 @@ ready_weapon(struct obj *wep)
             long dummy = wep->owornmask;
 
             wep->owornmask |= W_WEP;
+            if (wep->otyp == AKLYS && (wep->owornmask & W_WEP) != 0)
+                You("secure the tether.");
             prinv((char *) 0, wep, 0L);
             wep->owornmask = dummy;
         }
@@ -224,14 +225,16 @@ void
 setuqwep(register struct obj *obj)
 {
     setworn(obj, W_QUIVER);
-    update_inventory();
+    /* no extra handling needed; this used to include a call to
+       update_inventory() but that's already performed by setworn() */
+    return;
 }
 
 void
 setuswapwep(register struct obj *obj)
 {
     setworn(obj, W_SWAPWEP);
-    update_inventory();
+    return;
 }
 
 /*** Commands to change particular slot(s) ***/
@@ -566,8 +569,13 @@ wield_tool(struct obj *obj,
     } else {
         struct obj *oldwep = uwep;
 
-        You("now wield %s.", doname(obj));
-        setuwep(obj);
+        if (will_weld(obj)) {
+            /* hope none of ready_weapon()'s early returns apply here... */
+            (void) ready_weapon(obj);
+        } else {
+            You("now wield %s.", doname(obj));
+            setuwep(obj);
+        }
         if (flags.pushweapon && oldwep && uwep != oldwep)
             setuswapwep(oldwep);
     }

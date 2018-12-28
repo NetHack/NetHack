@@ -634,7 +634,7 @@ mdrop_obj(struct monst *mon, struct obj *obj, boolean verbosely)
 
     if (obj->owornmask) {
         /* perform worn item handling if the monster is still alive */
-        if (mon->mhp > 0) {
+        if (!DEADMONSTER(mon)) {
             mon->misc_worn_check &= ~obj->owornmask;
             update_mon = TRUE;
 

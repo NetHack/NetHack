@@ -20,9 +20,9 @@ extern void vms_abort(void);
 
 /*VARARGS1*/
 boolean panicking;
-void panic(char *, ...);
+void panic(const char *, ...);
 
-void panic(char *str, ...)
+void panic(const char *str, ...)
 {
     va_list the_args;
     va_start(the_args, str);

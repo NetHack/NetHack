@@ -21,6 +21,7 @@
 #define MSNH_MSG_CARET 110
 #define MSNH_MSG_GETTEXT 111
 #define MSNH_MSG_UPDATE_STATUS 112
+#define MSNH_MSG_RANDOM_INPUT 113
 
 typedef struct mswin_nhmsg_add_wnd {
     winid wid;
@@ -69,11 +70,7 @@ typedef struct mswin_nhmsg_get_text {
 } MSNHMsgGetText, *PMSNHMsgGetText;
 
 typedef struct mswin_nhmsg_update_status {
-    int n_fields;
-    const char **vals;
-    boolean *activefields;
-    int *percents;
-    int *colors;
+    struct mswin_status_lines * status_lines;
 } MSNHMsgUpdateStatus, *PMSNHMsgUpdateStatus;
 
 #endif

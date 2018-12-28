@@ -5,9 +5,9 @@
 #include "hack.h"
 #include "tileset.h"
 
-static void FDECL(get_tile_map, (const char *));
-static void FDECL(split_tiles, (const struct TileSetImage *));
-static void FDECL(free_image, (struct TileSetImage *));
+static void get_tile_map(const char *);
+static void split_tiles(const struct TileSetImage *);
+static void free_image(struct TileSetImage *);
 
 static struct TileImage *tiles;
 static unsigned num_tiles;

@@ -591,8 +591,7 @@ drag:
              || !is_pool(uball->ox, uball->oy)
              || levl[uball->ox][uball->oy].typ == POOL))
         || ((t = t_at(uchain->ox, uchain->oy))
-            && (t->ttyp == PIT || t->ttyp == SPIKED_PIT || t->ttyp == HOLE
-                || t->ttyp == TRAPDOOR))) {
+            && (is_pit(t->ttyp) || is_hole(t->ttyp)))) {
         if (Levitation) {
             You_feel("a tug from the iron ball.");
             if (t)
@@ -695,11 +694,12 @@ drop_ball(xchar x, xchar y)
     }
 
     if (x != u.ux || y != u.uy) {
+        static const char *pullmsg = "The ball pulls you out of the %s!";
         struct trap *t;
-        const char *pullmsg = "The ball pulls you out of the %s!";
+        long side;
 
-        if (u.utrap && u.utraptype != TT_INFLOOR
-            && u.utraptype != TT_BURIEDBALL) {
+        if (u.utrap
+            && u.utraptype != TT_INFLOOR && u.utraptype != TT_BURIEDBALL) {
             switch (u.utraptype) {
             case TT_PIT:
                 pline(pullmsg, "pit");
@@ -712,8 +712,8 @@ drop_ball(xchar x, xchar y)
             case TT_LAVA:
                 pline(pullmsg, hliquid("lava"));
                 break;
-            case TT_BEARTRAP: {
-                register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
+            case TT_BEARTRAP:
+                side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
                 pline(pullmsg, "bear trap");
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
@@ -726,8 +726,7 @@ drop_ball(xchar x, xchar y)
                 }
                 break;
             }
-            }
-            u.utrap = 0;
+            reset_utrap(TRUE);
             fill_pit(u.ux, u.uy);
         }
 
@@ -736,8 +735,8 @@ drop_ball(xchar x, xchar y)
         if (!Levitation && !MON_AT(x, y) && !u.utrap
             && (is_pool(x, y)
                 || ((t = t_at(x, y))
-                    && (t->ttyp == PIT || t->ttyp == SPIKED_PIT
-                        || t->ttyp == TRAPDOOR || t->ttyp == HOLE)))) {
+                    && (is_pit(t->ttyp)
+                        || is_hole(t->ttyp))))) {
             u.ux = x;
             u.uy = y;
         } else {

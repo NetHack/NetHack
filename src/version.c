@@ -55,7 +55,7 @@ getversionstring(char *buf)
 
         Sprintf(eos(buf), " (");
 #if defined(RUNTIME_PORT_ID)
-        tmp = get_port_id(tmpbuf);        
+        tmp = get_port_id(tmpbuf);
         if (tmp)
             Sprintf(eos(buf), "%s%s", c++ ? "," : "", tmp);
 #endif

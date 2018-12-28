@@ -1,0 +1,35 @@
+[ Releases notes for nethack 3.0 patchlevel 3. ]
+
+The main changes included in patch kit 3 are as follows:
+
+A few new objects were added to objects.c, so old save/bones files 
+should be thrown out.
+
+Prototypes were adapted to satisfy ANSI C.  Hopefully, we will not see
+anymore postings which helpfully fix prototypes for ANSI, while breaking
+them for the MSDOS compilers they were, originally, set up for.
+
+Use of $(MAKE), and a better use of $PAGER, in scripts.
+
+Improvements to OS/2 and TOS code, including their Makefiles.
+
+Graphics setting was centralized.
+
+Alignment was added to artifacts, and their suitability was improved.
+
+Discover mode games no longer use up bones files.
+
+Some excess 'register's that were giving Xenix trouble were removed.
+
+We settled an (amusing) argument over "rights" to available bits which
+was responsible (unintentionally) for ring-wielding bestowing
+long-lasting intrinsic attributes.  
+
+In addition, many bugs were fixed.  Among those were the problems
+with polymorphing creatures that swallowed you, finishing with
+containers, having chains eaten, external pagers, statue weights, wishing
+loopholes, parsing endgame options, and monsters growing up.
+
+In other words, this is a nuts and bolts patch, nothing dramatic but
+lots of cleanup.
+

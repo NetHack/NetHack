@@ -7,7 +7,6 @@
 	<Exec Command="$(ToolsDir)makedefs.exe -v" WorkingDirectory="$(UtilDir)"/>
 	<Exec Command="$(ToolsDir)makedefs.exe -o" WorkingDirectory="$(UtilDir)"/>
 	<Exec Command="$(ToolsDir)makedefs.exe -p" WorkingDirectory="$(UtilDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -m" WorkingDirectory="$(UtilDir)"/>
 	<Exec Command="$(ToolsDir)makedefs.exe -z" WorkingDirectory="$(UtilDir)"/>
 	<Exec Command="$(ToolsDir)makedefs.exe -d" WorkingDirectory="$(DatDir)"/>
 	<Exec Command="$(ToolsDir)makedefs.exe -r" WorkingDirectory="$(DatDir)"/>

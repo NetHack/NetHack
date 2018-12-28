@@ -62,7 +62,6 @@ struct toptenentry {
 
 STATIC_DCL void topten_print(const char *);
 STATIC_DCL void topten_print_bold(const char *);
-STATIC_DCL xchar observable_depth(d_level *);
 STATIC_DCL void outheader(void);
 STATIC_DCL void outentry(int, struct toptenentry *, xchar);
 STATIC_DCL void discardexcess(FILE *);
@@ -126,7 +125,9 @@ formatkiller(char *buf, unsigned siz, int how, boolean incl_helpless)
      */
     while (--siz > 0) {
         c = *kname++;
-        if (c == ',')
+        if (!c)
+            break;
+        else if (c == ',')
             c = ';';
         /* 'xlogfile' doesn't really need protection for '=', but
            fixrecord.awk for corrupted 3.6.0 'record' does (only
@@ -170,7 +171,7 @@ topten_print_bold(const char *x)
         putstr(toptenwin, ATR_BOLD, x);
 }
 
-STATIC_OVL xchar
+int
 observable_depth(d_level *lev)
 {
 #if 0

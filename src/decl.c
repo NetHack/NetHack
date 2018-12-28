@@ -17,6 +17,7 @@ int locknum = 0; /* max num of simultaneous users */
 #ifdef DEF_PAGER
 char *catmore = 0; /* default pager */
 #endif
+char chosen_windowtype[WINTYPELEN];
 
 NEARDATA int bases[MAXOCLASSES] = DUMMY;
 
@@ -57,6 +58,7 @@ NEARDATA char pl_fruit[PL_FSIZ] = DUMMY;
 NEARDATA struct fruit *ffruit = (struct fruit *) 0;
 
 NEARDATA char tune[6] = DUMMY;
+NEARDATA boolean ransacked = 0;
 
 const char *occtxt = DUMMY;
 const char quitchars[] = " \r\n\033";

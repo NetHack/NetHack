@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1502754159 2017/08/14 23:42:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.179 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1542765357 2018/11/21 01:55:57 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -109,14 +109,18 @@ is_edible(register struct obj *obj)
     return (boolean) (obj->oclass == FOOD_CLASS);
 }
 
+/* used for hero init, life saving (if choking), and prayer results of fix
+   starving, fix weak from hunger, or golden glow boon (if u.uhunger < 900) */
 void
 init_uhunger()
 {
     context.botl = (u.uhs != NOT_HUNGRY || ATEMP(A_STR) < 0);
     u.uhunger = 900;
     u.uhs = NOT_HUNGRY;
-    if (ATEMP(A_STR) < 0)
+    if (ATEMP(A_STR) < 0) {
         ATEMP(A_STR) = 0;
+        (void) encumber_msg();
+    }
 }
 
 /* tin types [SPINACH_TIN = -1, overrides corpsenm, nut==600] */
@@ -515,7 +519,7 @@ eat_brains(struct monst *magr,
             if (visflag && canseemon(magr))
                 pline("%s turns to stone!", Monnam(magr));
             monstone(magr);
-            if (magr->mhp > 0) {
+            if (!DEADMONSTER(magr)) {
                 /* life-saved; don't continue eating the brains */
                 return MM_MISS;
             } else {
@@ -602,7 +606,7 @@ eat_brains(struct monst *magr,
             return MM_MISS;
         } else if (is_rider(pd)) {
             mondied(magr);
-            if (magr->mhp <= 0)
+            if (DEADMONSTER(magr))
                 result = MM_AGR_DIED;
             /* Rider takes extra damage regardless of whether attacker dies */
             *dmg_p += xtra_dmg;
@@ -921,10 +925,11 @@ givit(int type, register struct permonst *ptr)
 
 /* called after completely consuming a corpse */
 STATIC_OVL void
-cpostfx(register int pm)
+cpostfx(int pm)
 {
-    register int tmp = 0;
+    int tmp = 0;
     int catch_lycanthropy = NON_PM;
+    boolean check_intrinsics = FALSE;
 
     /* in case `afternmv' didn't get called for previously mimicking
        gold, clean up now to avoid `eatmbuf' memory leak */
@@ -936,6 +941,7 @@ cpostfx(register int pm)
         /* MRKR: "eye of newt" may give small magical energy boost */
         if (rn2(3) || 3 * u.uen <= 2 * u.uenmax) {
             int old_uen = u.uen;
+
             u.uen += rnd(3);
             if (u.uen > u.uenmax) {
                 if (!rn2(3))
@@ -967,6 +973,7 @@ cpostfx(register int pm)
             u.uhp = u.uhpmax;
         make_blinded(0L, !u.ucreamed);
         context.botl = 1;
+        check_intrinsics = TRUE; /* might also convey poison resistance */
         break;
     case PM_STALKER:
         if (!Invis) {
@@ -1060,7 +1067,7 @@ cpostfx(register int pm)
     case PM_MASTER_MIND_FLAYER:
         if (ABASE(A_INT) < ATTRMAX(A_INT)) {
             if (!rn2(2)) {
-                pline("Yum! That was real brain food!");
+                pline("Yum!  That was real brain food!");
                 (void) adjattrib(A_INT, 1, FALSE);
                 break; /* don't give them telepathy, too */
             }
@@ -1068,7 +1075,13 @@ cpostfx(register int pm)
             pline("For some reason, that tasted bland.");
         }
     /*FALLTHRU*/
-    default: {
+    default:
+        check_intrinsics = TRUE;
+        break;
+    }
+
+    /* possibly convey an intrinsic */
+    if (check_intrinsics) {
         struct permonst *ptr = &mons[pm];
         boolean conveys_STR = is_giant(ptr);
         int i, count;
@@ -1115,9 +1128,7 @@ cpostfx(register int pm)
             gainstr((struct obj *) 0, 0, TRUE);
         else if (tmp > 0)
             givit(tmp, ptr);
-        break;
-    } /* default case */
-    } /* switch */
+    } /* check_intrinsics */
 
     if (catch_lycanthropy >= LOW_PM) {
         set_ulycn(catch_lycanthropy);
@@ -1367,7 +1378,16 @@ consume_tin(const char *mesg)
         u.uconduct.food++; /* don't need vegetarian checks for spinach */
         if (!tin->cursed)
             pline("This makes you feel like %s!",
-                  Hallucination ? "Swee'pea" : "Popeye");
+                  /* "Swee'pea" is a character from the Popeye cartoons */
+                  Hallucination ? "Swee'pea"
+                  /* "feel like Popeye" unless sustain ability suppresses
+                     any attribute change; this slightly oversimplifies
+                     things:  we want "Popeye" if no strength increase
+                     occurs due to already being at maximum, but we won't
+                     get it if at-maximum and fixed-abil both apply */
+                  : !Fixed_abil ? "Popeye"
+                  /* no gain, feel like another character from Popeye */
+                  : (flags.female ? "Olive Oyl" : "Bluto"));
         gainstr(tin, 0, FALSE);
 
         tin = costly_tin(COST_OPEN);
@@ -1750,7 +1770,7 @@ fprefx(struct obj *otmp)
         if (carnivorous(youmonst.data) && !humanoid(youmonst.data))
             pline("That tripe ration was surprisingly good!");
         else if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC)))
-            pline(Hallucination ? "Tastes great! Less filling!"
+            pline(Hallucination ? "Tastes great!  Less filling!"
                                 : "Mmm, tripe... not bad!");
         else {
             pline("Yak - dog food!");
@@ -1844,10 +1864,11 @@ bounded_increase(int old, int inc, int typ)
 {
     int absold, absinc, sgnold, sgninc;
 
-    /* don't include any amount coming from worn rings */
-    if (uright && uright->otyp == typ)
+    /* don't include any amount coming from worn rings (caller handles
+       'protection' differently) */
+    if (uright && uright->otyp == typ && typ != RIN_PROTECTION)
         old -= uright->spe;
-    if (uleft && uleft->otyp == typ)
+    if (uleft && uleft->otyp == typ && typ != RIN_PROTECTION)
         old -= uleft->spe;
     absold = abs(old); absinc = abs(inc);
     sgnold = sgn(old); sgninc = sgn(inc);
@@ -1867,6 +1888,11 @@ bounded_increase(int old, int inc, int typ)
     } else {
         inc = 0; /* no further increase allowed via this method */
     }
+    /* put amount from worn rings back */
+    if (uright && uright->otyp == typ && typ != RIN_PROTECTION)
+        old += uright->spe;
+    if (uleft && uleft->otyp == typ && typ != RIN_PROTECTION)
+        old += uleft->spe;
     return old + inc;
 }
 
@@ -1874,7 +1900,7 @@ STATIC_OVL void
 accessory_has_effect(struct obj *otmp)
 {
     pline("Magic spreads through your body as you digest the %s.",
-          otmp->oclass == RING_CLASS ? "ring" : "amulet");
+          (otmp->oclass == RING_CLASS) ? "ring" : "amulet");
 }
 
 STATIC_OVL void
@@ -2161,7 +2187,7 @@ fpostfx(struct obj *otmp)
             }
         }
         if (!otmp->cursed)
-            heal_legs();
+            heal_legs(0);
         break;
     case EGG:
         if (flesh_petrifies(&mons[otmp->corpsenm])) {
@@ -2271,7 +2297,7 @@ edibility_prompts(struct obj *otmp)
      */
     if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && !Sick_resistance) {
         /* Tainted meat */
-        Sprintf(buf, "%s like %s could be tainted! %s", foodsmell, it_or_they,
+        Sprintf(buf, "%s like %s could be tainted!  %s", foodsmell, it_or_they,
                 eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
@@ -2279,7 +2305,7 @@ edibility_prompts(struct obj *otmp)
             return 2;
     }
     if (stoneorslime) {
-        Sprintf(buf, "%s like %s could be something very dangerous! %s",
+        Sprintf(buf, "%s like %s could be something very dangerous!  %s",
                 foodsmell, it_or_they, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
@@ -2288,7 +2314,7 @@ edibility_prompts(struct obj *otmp)
     }
     if (otmp->orotten || (cadaver && rotted > 3L)) {
         /* Rotten */
-        Sprintf(buf, "%s like %s could be rotten! %s", foodsmell, it_or_they,
+        Sprintf(buf, "%s like %s could be rotten! %s",  foodsmell, it_or_they,
                 eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
@@ -2297,7 +2323,7 @@ edibility_prompts(struct obj *otmp)
     }
     if (cadaver && poisonous(&mons[mnum]) && !Poison_resistance) {
         /* poisonous */
-        Sprintf(buf, "%s like %s might be poisonous! %s", foodsmell,
+        Sprintf(buf, "%s like %s might be poisonous!  %s", foodsmell,
                 it_or_they, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
@@ -2306,20 +2332,20 @@ edibility_prompts(struct obj *otmp)
     }
     if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
         /* causes sleep, for long enough to be dangerous */
-        Sprintf(buf, "%s like %s might have been poisoned. %s", foodsmell,
+        Sprintf(buf, "%s like %s might have been poisoned.  %s", foodsmell,
                 it_or_they, eat_it_anyway);
         return (yn_function(buf, ynchars, 'n') == 'n') ? 1 : 2;
     }
     if (cadaver && !vegetarian(&mons[mnum]) && !u.uconduct.unvegetarian
         && Role_if(PM_MONK)) {
-        Sprintf(buf, "%s unhealthy. %s", foodsmell, eat_it_anyway);
+        Sprintf(buf, "%s unhealthy.  %s", foodsmell, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
             return 2;
     }
     if (cadaver && acidic(&mons[mnum]) && !Acid_resistance) {
-        Sprintf(buf, "%s rather acidic. %s", foodsmell, eat_it_anyway);
+        Sprintf(buf, "%s rather acidic.  %s", foodsmell, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -2327,7 +2353,7 @@ edibility_prompts(struct obj *otmp)
     }
     if (Upolyd && u.umonnum == PM_RUST_MONSTER && is_metallic(otmp)
         && otmp->oerodeproof) {
-        Sprintf(buf, "%s disgusting to you right now. %s", foodsmell,
+        Sprintf(buf, "%s disgusting to you right now.  %s", foodsmell,
                 eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
@@ -2342,7 +2368,7 @@ edibility_prompts(struct obj *otmp)
         && ((material == LEATHER || material == BONE
              || material == DRAGON_HIDE || material == WAX)
             || (cadaver && !vegan(&mons[mnum])))) {
-        Sprintf(buf, "%s foul and unfamiliar to you. %s", foodsmell,
+        Sprintf(buf, "%s foul and unfamiliar to you.  %s", foodsmell,
                 eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
@@ -2353,7 +2379,7 @@ edibility_prompts(struct obj *otmp)
         && ((material == LEATHER || material == BONE
              || material == DRAGON_HIDE)
             || (cadaver && !vegetarian(&mons[mnum])))) {
-        Sprintf(buf, "%s unfamiliar to you. %s", foodsmell, eat_it_anyway);
+        Sprintf(buf, "%s unfamiliar to you.  %s", foodsmell, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -2362,8 +2388,8 @@ edibility_prompts(struct obj *otmp)
 
     if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && Sick_resistance) {
         /* Tainted meat with Sick_resistance */
-        Sprintf(buf, "%s like %s could be tainted! %s", foodsmell, it_or_they,
-                eat_it_anyway);
+        Sprintf(buf, "%s like %s could be tainted!  %s",
+                foodsmell, it_or_they, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -3029,15 +3055,17 @@ floorfood(const char *verb,
         struct trap *ttmp = t_at(u.ux, u.uy);
 
         if (ttmp && ttmp->tseen && ttmp->ttyp == BEAR_TRAP) {
+            boolean u_in_beartrap = (u.utrap && u.utraptype == TT_BEARTRAP);
+
             /* If not already stuck in the trap, perhaps there should
                be a chance to becoming trapped?  Probably not, because
                then the trap would just get eaten on the _next_ turn... */
             Sprintf(qbuf, "There is a bear trap here (%s); eat it?",
-                    (u.utrap && u.utraptype == TT_BEARTRAP) ? "holding you"
-                                                            : "armed");
+                    u_in_beartrap ? "holding you" : "armed");
             if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
-                u.utrap = u.utraptype = 0;
                 deltrap(ttmp);
+                if (u_in_beartrap)
+                    reset_utrap(TRUE);
                 return mksobj(BEARTRAP, TRUE, FALSE);
             } else if (c == 'q') {
                 return (struct obj *) 0;
@@ -3116,7 +3144,8 @@ vomit() /* A good idea from David Neves */
            dealing with some esoteric body_part() */
         Your("jaw gapes convulsively.");
     } else {
-        make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
+        if (Sick && (u.usick_type & SICK_VOMITABLE) != 0)
+            make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
         /* if not enough in stomach to actually vomit then dry heave;
            vomiting_dialog() gives a vomit message when its countdown
            reaches 0, but only if u.uhs < FAINTING (and !cantvomit()) */

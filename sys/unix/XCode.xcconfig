@@ -1,0 +1,40 @@
+//  XCodeConfig.xcconfig
+//  NetHack
+//
+//  Created by Groot on 11/19/18.
+//  Copyright © 2018 Bart House. All rights reserved.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// PLEASE READ
+//
+// You must define the build configuration setting DEVELOPMENT_TEAM
+// in order for the project to build successfully.  This setting provides
+// the identifier XCode needs in order to sign your builds.
+//
+// Your DEVELOPMENT_TEAM can be found by opening Keychain Access
+// (found by Finder->Applications->Utilities).  Click on "Login" key chain.
+// Click on catagory "My Certificates".
+//
+// Look for your "Mac Developer" certificate.  Double click on
+// the certificate to open a dialog that shows certificate details.
+// Look for "Organizational Unit" among the details.  This ten digit value
+// is your development team identifier.
+//
+// Once found, you now need to create a file named "XCodeLocal.xcconfig"
+// in the same folder as "XCode.xcconfig".  This file should contain at
+// least one line that defines your DEVELOPMENT_TEAM. The line should have
+// the form:
+//   DEVELOPMENT_TEAM = XXXXXXXXXX
+//
+// If you know what you are doing, it can also have other build settings
+// you wish to override.
+//
+// This new file is ignored by git and should never be submitted to the
+// repository.  It is meant to be local to you machine only.
+//
+
+// Include locally provided config file that must define DEVELOPMENT_TEAM
+#include? "XCodeLocal.xcconfig"

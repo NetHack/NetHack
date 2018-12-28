@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1523306912 2018/04/09 20:48:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1544401270 2018/12/10 00:21:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -274,7 +274,7 @@ teleds(register int nux, register int nuy, boolean allow_drag)
             }
         }
     }
-    u.utrap = 0;
+    reset_utrap(FALSE);
     u.ustuck = 0;
     u.ux0 = u.ux;
     u.uy0 = u.uy;
@@ -325,6 +325,11 @@ teleds(register int nux, register int nuy, boolean allow_drag)
     vision_full_recalc = 1;
     nomul(0);
     vision_recalc(0); /* vision before effects */
+    /* if terrain type changes, levitation or flying might become blocked
+       or unblocked; might issue message, so do this after map+vision has
+       been updated for new location instead of right after u_on_newpos() */
+    if (levl[u.ux][u.uy].typ != levl[u.ux0][u.uy0].typ)
+        switch_terrain();
     if (telescroll) {
         /* when teleporting by scroll, we need to handle discovery
            now before getting feedback about any objects at our
@@ -473,7 +478,14 @@ scrolltele(struct obj *scroll)
 }
 
 int
-dotele()
+dotelecmd()
+{
+    return dotele((wizard) ? TRUE : FALSE);
+}
+
+int
+dotele(break_the_rules)
+boolean break_the_rules;
 {
     struct trap *trap;
     boolean trap_once = FALSE;
@@ -510,7 +522,7 @@ dotele()
                         castit = TRUE;
                         break;
                     }
-            if (!wizard) {
+            if (!break_the_rules) {
                 if (!castit) {
                     if (!Teleportation)
                         You("don't know that spell.");
@@ -522,7 +534,7 @@ dotele()
         }
 
         if (u.uhunger <= 100 || ACURR(A_STR) < 6) {
-            if (!wizard) {
+            if (!break_the_rules) {
                 You("lack the strength %s.",
                     castit ? "for a teleport spell" : "to teleport");
                 return 1;
@@ -531,7 +543,7 @@ dotele()
 
         energy = objects[SPE_TELEPORT_AWAY].oc_level * 7 / 2 - 2;
         if (u.uen <= energy) {
-            if (wizard)
+            if (break_the_rules)
                 energy = u.uen;
             else {
                 You("lack the energy %s.",
@@ -548,11 +560,13 @@ dotele()
             exercise(A_WIS, TRUE);
             if (spelleffects(sp_no, TRUE))
                 return 1;
-            else if (!wizard)
+            else if (!break_the_rules)
                 return 0;
         } else {
-            u.uen -= energy;
-            context.botl = 1;
+            if (!break_the_rules) {
+                u.uen -= energy;
+                context.botl = 1;
+            }
         }
     }
 
@@ -580,6 +594,8 @@ level_tele()
     char buf[BUFSZ];
     boolean force_dest = FALSE;
 
+    if (iflags.debug_fuzzer)
+        goto random_levtport;
     if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
         && !wizard) {
         You_feel("very disoriented for a moment.");
@@ -722,6 +738,8 @@ level_tele()
 
     killer.name[0] = 0; /* still alive, so far... */
 
+    if (iflags.debug_fuzzer && newlev < 0)
+        goto random_levtport;
     if (newlev < 0 && !force_dest) {
         if (*u.ushops0) {
             /* take unpaid inventory items off of shop bills */
@@ -737,8 +755,8 @@ level_tele()
             killer.format = NO_KILLER_PREFIX;
             Strcpy(killer.name, "went to heaven prematurely");
         } else if (newlev == -9) {
-            You_feel("deliriously happy. ");
-            pline("(In fact, you're on Cloud 9!) ");
+            You_feel("deliriously happy.");
+            pline("(In fact, you're on Cloud 9!)");
             display_nhwindow(WIN_MESSAGE, FALSE);
         } else
             You("are now high above the clouds...");
@@ -966,8 +984,8 @@ rloc_to(struct monst *mtmp, register int x, register int y)
     register int oldx = mtmp->mx, oldy = mtmp->my;
     boolean resident_shk = mtmp->isshk && inhishop(mtmp);
 
-    if (x == mtmp->mx && y == mtmp->my) /* that was easy */
-        return;
+    if (x == mtmp->mx && y == mtmp->my && m_at(x,y) == mtmp)
+        return; /* that was easy */
 
     if (oldx) { /* "pick up" monster */
         if (mtmp->wormno) {
@@ -1124,7 +1142,7 @@ mlevel_tele_trap(struct monst *mtmp, struct trap *trap, boolean force_it, int in
         d_level tolevel;
         int migrate_typ = MIGR_RANDOM;
 
-        if ((tt == HOLE || tt == TRAPDOOR)) {
+        if (is_hole(tt)) {
             if (Is_stronghold(&u.uz)) {
                 assign_level(&tolevel, &valley_level);
             } else if (Is_botlevel(&u.uz)) {

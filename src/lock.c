@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1521499715 2018/03/19 22:48:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1544442712 2018/12/10 11:51:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -939,7 +939,7 @@ doorlock(struct obj *otmp, int x, int y)
                 return FALSE;
             }
             block_point(x, y);
-            door->typ = SDOOR;
+            door->typ = SDOOR, door->doormask = D_NODOOR;
             if (vis)
                 pline_The("doorway vanishes!");
             newsym(x, y);

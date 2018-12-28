@@ -33,6 +33,7 @@ public slots:
 	void setGlyphSize(bool);
 
 private:
+	QSettings settings;
 	QSpinBox tilewidth;
 	QSpinBox tileheight;
 	QLabel widthlbl;
@@ -48,6 +49,7 @@ private:
 
 private slots:
 	void resizeTiles();
+	void changedFont();
 };
 
 extern NetHackQtSettings* qt_settings;

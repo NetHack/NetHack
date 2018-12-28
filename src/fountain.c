@@ -1,4 +1,4 @@
-/* NetHack 3.6	fountain.c	$NHDT-Date: 1455402364 2016/02/13 22:26:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	fountain.c	$NHDT-Date: 1544442711 2018/12/10 11:51:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -133,7 +133,7 @@ gush(int x, int y, genericptr_t poolcnt)
         pline("Water gushes forth from the overflowing fountain!");
 
     /* Put a pool at x, y */
-    levl[x][y].typ = POOL;
+    levl[x][y].typ = POOL, levl[x][y].flags = 0;
     /* No kelp! */
     del_engr_at(x, y);
     water_damage_chain(level.objects[x][y], TRUE);
@@ -199,8 +199,7 @@ dryup(xchar x, xchar y, boolean isyou)
                 return;
         }
         /* replace the fountain with ordinary floor */
-        levl[x][y].typ = ROOM;
-        levl[x][y].looted = 0;
+        levl[x][y].typ = ROOM, levl[x][y].flags = 0;
         levl[x][y].blessedftn = 0;
         if (cansee(x, y))
             pline_The("fountain dries up!");
@@ -390,8 +389,7 @@ dipfountain(register struct obj *obj)
             exercise(A_WIS, TRUE);
         }
         update_inventory();
-        levl[u.ux][u.uy].typ = ROOM;
-        levl[u.ux][u.uy].looted = 0;
+        levl[u.ux][u.uy].typ = ROOM, levl[u.ux][u.uy].flags = 0;
         newsym(u.ux, u.uy);
         level.flags.nfountains--;
         if (in_town(u.ux, u.uy))
@@ -503,8 +501,9 @@ breaksink(int x, int y)
     if (cansee(x, y) || (x == u.ux && y == u.uy))
         pline_The("pipes break!  Water spurts out!");
     level.flags.nsinks--;
-    levl[x][y].doormask = 0;
-    levl[x][y].typ = FOUNTAIN;
+    levl[x][y].typ = FOUNTAIN, levl[x][y].looted = 0;
+    levl[x][y].blessedftn = 0;
+    SET_FOUNTAIN_LOOTED(x, y);
     level.flags.nfountains++;
     newsym(x, y);
 }

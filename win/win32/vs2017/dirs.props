@@ -20,5 +20,9 @@
     <WinWin32Dir>$(RootDir)win\win32\</WinWin32Dir>
     <OutDir>$(ToolsDir)</OutDir>
 	<IntDir>$(ObjDir)</IntDir>
+	<WinCursDir>$(RootDir)win\curses\</WinCursDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PDCURSES)'=='' AND Exists('$(RootDir)..\PDCurses')">
+	<PDCURSES>$(RootDir)..\PDCurses\</PDCURSES>
   </PropertyGroup>
 </Project>

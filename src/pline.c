@@ -1,10 +1,9 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1520964541 2018/03/13 18:09:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1541719974 2018/11/08 23:32:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers \
-                                       */
+#define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers */
 #include "hack.h"
 
 static unsigned pline_flags = 0;
@@ -62,7 +61,6 @@ dumplogfreemessages()
 }
 #endif
 
-/*VARARGS1*/
 /* Note that these declarations rely on knowledge of the internals
  * of the variable argument handling stuff in "tradstdc.h"
  */
@@ -236,6 +234,7 @@ void You(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
+
     va_start(the_args, line);
     vpline(YouMessage(tmp, "You ", line), the_args);
     va_end(the_args);
@@ -246,6 +245,7 @@ void Your(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
+
     va_start(the_args, line);
     vpline(YouMessage(tmp, "Your ", line), the_args);
     va_end(the_args);
@@ -256,6 +256,7 @@ void You_feel(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
+
     va_start(the_args, line);
     if (Unaware)
         YouPrefix(tmp, "You dream that you feel ", line);
@@ -270,6 +271,7 @@ void You_cant(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
+
     va_start(the_args, line);
     vpline(YouMessage(tmp, "You can't ", line), the_args);
     va_end(the_args);
@@ -280,6 +282,7 @@ void pline_The(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
+
     va_start(the_args, line);
     vpline(YouMessage(tmp, "The ", line), the_args);
     va_end(the_args);
@@ -290,6 +293,7 @@ void There(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
+
     va_start(the_args, line);
     vpline(YouMessage(tmp, "There ", line), the_args);
     va_end(the_args);
@@ -394,6 +398,7 @@ void impossible(const char *s, ...)
     va_list the_args;
     char pbuf[2 * BUFSZ];
     va_start(the_args, s);
+
     if (program_state.in_impossible)
         panic("impossible called impossible");
 
@@ -401,14 +406,22 @@ void impossible(const char *s, ...)
     Vsprintf(pbuf, s, the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
-    pline("%s", pbuf);
-    pline("%s", "Program in disorder!  (Saving and reloading may fix this problem.)");
+    if (iflags.debug_fuzzer)
+        panic("%s", pbuf);
+    pline("%s", VA_PASS1(pbuf));
+    /* reuse pbuf[] */
+    Strcpy(pbuf, "Program in disorder!");
+    if (program_state.something_worth_saving)
+        Strcat(pbuf, "  (Saving and reloading may fix this problem.)");
+    pline("%s", VA_PASS1(pbuf));
+
     program_state.in_impossible = 0;
     va_end(the_args);
 }
 
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
 static boolean use_pline_handler = TRUE;
+
 static void
 execplinehandler(const char *line)
 {
@@ -445,6 +458,51 @@ execplinehandler(const char *line)
         pline("%s", VA_PASS1("Fork to message handler failed."));
     }
 }
-#endif /* defined(POSIX_TYPES) || defined(__GNUC__) */
+#endif /* MSGHANDLER && (POSIX_TYPES || __GNUC__) */
+
+/*
+ * varargs handling for files.c
+ */
+#if defined(USE_STDARG) || defined(USE_VARARGS)
+static void vconfig_error_add(const char *, va_list);
+
+/*VARARGS1*/
+void
+config_error_add(const char *str, ...)
+{
+    va_list the_args;
+    va_start(the_args, str);
+    vconfig_error_add(str, the_args);
+    va_end(the_args);
+}
+
+# ifdef USE_STDARG
+static void
+vconfig_error_add(const char *str, va_list the_args)
+# else
+static void
+vconfig_error_add(str, the_args)
+const char *str;
+va_list the_args;
+# endif
+
+#else /* !(USE_STDARG || USE_VARARG) => USE_OLDARGS */
+
+/*VARARGS1*/
+void
+config_error_add
+VA_DECL(const char *, str)
+#endif /* ?(USE_STDARG || USE_VARARG) */
+{       /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
+    char buf[2 * BUFSZ];
+
+    Vsprintf(buf, str, VA_ARGS);
+    buf[BUFSZ - 1] = '\0';
+    config_erradd(buf);
+
+#if !(defined(USE_STDARG) || defined(USE_VARARGS))
+    VA_END(); /* (see pline/vpline -- ends nested block for USE_OLDARGS) */
+#endif
+}
 
 /*pline.c*/

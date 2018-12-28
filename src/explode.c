@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1522454717 2018/03/31 00:05:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1545182146 2018/12/19 01:15:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -207,7 +207,7 @@ explode(int x, int y,
             if (!mtmp && i + x - 1 == u.ux && j + y - 1 == u.uy)
                 mtmp = u.usteed;
             if (mtmp) {
-                if (mtmp->mhp < 1)
+                if (DEADMONSTER(mtmp))
                     explmask[i][j] = 2;
                 else
                     switch (adtyp) {
@@ -443,7 +443,7 @@ explode(int x, int y,
                     mtmp->mhp -= mdam;
                     mtmp->mhp -= (idamres + idamnonres);
                 }
-                if (mtmp->mhp <= 0) {
+                if (DEADMONSTER(mtmp)) {
                     int xkflg = ((adtyp == AD_FIRE
                                   && completelyburns(mtmp->data))
                                  ? XKILL_NOCORPSE : 0);
@@ -614,6 +614,10 @@ scatter(int sx, int sy,     /* location of objects to scatter */
     struct scatter_chain *schain = (struct scatter_chain *) 0;
     long total = 0L;
 
+    if (individual_object && (obj->ox != sx || obj->oy != sy))
+        impossible("scattered object <%d,%d> not at scatter site <%d,%d>",
+                   obj->ox, obj->oy, sx, sy);
+
     while ((otmp = (individual_object ? obj : level.objects[sx][sy])) != 0) {
         if (otmp->quan > 1L) {
             qtmp = otmp->quan - 1L;
@@ -655,6 +659,7 @@ scatter(int sx, int sy,     /* location of objects to scatter */
                 (void) break_statue(otmp);
                 place_object(otmp, sx, sy); /* put fragments on floor */
             }
+            newsym(sx, sy); /* in case it's beyond radius of 'farthest' */
             used_up = TRUE;
 
             /* 1 in 10 chance of destruction of obj; glass, egg destruction */
@@ -756,7 +761,7 @@ scatter(int sx, int sy,     /* location of objects to scatter */
         free((genericptr_t) stmp);
         newsym(x, y);
     }
-
+    newsym(sx, sy);
     return total;
 }
 
@@ -773,11 +778,13 @@ scatter(int sx, int sy,     /* location of objects to scatter */
  * For now, just perform a "regular" explosion.
  */
 void
-splatter_burning_oil(int x, int y)
+splatter_burning_oil(int x, int y, boolean diluted_oil)
 {
+    int dmg = d(diluted_oil ? 3 : 4, 4);
+
 /* ZT_SPELL(ZT_FIRE) = ZT_SPELL(AD_FIRE-1) = 10+(2-1) = 11 */
 #define ZT_SPELL_O_FIRE 11 /* value kludge, see zap.c */
-    explode(x, y, ZT_SPELL_O_FIRE, d(4, 4), BURNING_OIL, EXPL_FIERY);
+    explode(x, y, ZT_SPELL_O_FIRE, dmg, BURNING_OIL, EXPL_FIERY);
 }
 
 /* lit potion of oil is exploding; extinguish it as a light source before
@@ -785,10 +792,12 @@ splatter_burning_oil(int x, int y)
 void
 explode_oil(struct obj *obj, int x, int y)
 {
+    boolean diluted_oil = obj->odiluted;
+
     if (!obj->lamplit)
         impossible("exploding unlit oil");
     end_burn(obj, TRUE);
-    splatter_burning_oil(x, y);
+    splatter_burning_oil(x, y, diluted_oil);
 }
 
 /*explode.c*/

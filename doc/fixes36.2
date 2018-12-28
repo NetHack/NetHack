@@ -1,0 +1,487 @@
+$NHDT-Branch: $:$NHDT-Revision: $ $NHDT-Date: $
+
+This fixes36.2 file is here to capture information about updates in the 3.6.x
+lineage following the release of 3.6.1 in April 2018. Please note, however,
+that another 3.6.x release is not anticipated after 3.6.2, and most developer
+focus will shift to the next major release.
+
+General Fixes and Modified Features
+-----------------------------------
+last line of config file wasn't being heeded if it had no newline
+list MSGTYPE values shows empty strings as reported in H7140
+Killing Vlad while he was in bat/fog cloud/wolf form gave poorly worded
+	feedback when he reverted to vampire form
+spaces in hilite_status option title text field not working
+numeric hilite_status values didn't allow negative numbers (needed for AC);
+	change them to accept leading '-', also accept unary '+' as a no-op
+permanent inventory window was updated too soon when a scroll of charging
+	was used to [re]charge an item, not reflecting the item's change(s)
+for starting inventory, don't give an orc hero lembas wafers or cram rations
+targetting with a polearm could give away location of hidden monster
+static prototype could be left orphaned depending on #defines in rip.c
+config file error handling routines were calling xx_wait_synch early
+	even before the window system was initialized; add a default routine
+status_finish() in botl.c would unconditionally invoke the window port's
+	win_status_finish() routine which was problematic if the windowport
+	wasn't initialized yet
+using 'O' to set up a hilite_status rule for string comparison, the menu for
+	color was titled "choose attribute for when <foo> is 'bar'" and the
+	one prompting for attribute used the default "pick an attribute"
+when finishing using 'O' to examine or set hilite_status rules, if the
+	'statushilites' option is 0 and there is at least one rule, give a
+	reminder about setting it to non-zero to activate highlighting
+if player creates any menu colors via 'O' while menucolors is off, issue a
+	reminder that it needs to be on in order for those to become effective
+end of game disclosure was exercising Wisdom when revealing inventory and
+	also repeatedly updating persistent inventory window if enabled
+internals for 'sortloot' option have been changed to not reorder the actual
+	list of objects, so changing it to 'n'one will get the original order
+	back and having a persistent inventory window open when performing
+	full-pack identify won't result in possibly skipping some items
+give vault guards a cursed tin whistle since there is a shrill whistling
+	sound if hero teleports out of vault while being confronted by guard
+polymorphing worn amulet triggers panic if it turns into amulet of change
+wishing for small mimic corpse or large mimic corpse failed with 'nothing
+	matching that exists'; wishing for large {dog,cat,kobold} corpse
+	yielded normal size one (size prefix was being stripped off for globs)
+wishing for "glob of grey ooze" failed even though grey ooze is recognized
+	as a variant spelling for gray ooze
+spells of healing and extra healing cast at monsters handled monster blindness
+	inconsistently compared to other healing
+when using the 'O' command to create a status highlight that specifies
+	multiple attributes (blink+inverse, &c), pick all of them in one menu
+	selection and create a single hilite_status rule instead of having
+	separate rules for each attribute to be merged when highlighting
+highlighting status conditions would fail to use attributes if a rule with
+	them was followed by another one without (color only or color&normal)
+when using 'O' to set hilite_status rules, hide the 'score' status field if
+	game has been built without SCORE_ON_BOTL; latent rules for 'score'
+	can still be set in config file and removed via 'O' but can't be added
+make stone-to-flesh behave the same on statues of petrified monsters as it
+	does on random 'dungeon art' ones (revive at a nearby spot instead of
+	becoming a corpse when there's already a monster at statue's location)
+special level loader didn't support populating several types of special rooms
+	(ant hole, cockatrice nest, leprechaun hall)
+eating rings while polymorphed didn't handle bonus/penalty for increase damage,
+	increase accuracy, or protection correctly
+shopkeeper's position in front of shop door didn't correctly handle bottom
+	edge of irregularly shaped shop due to typo or copy+paste error
+	(latent bug; no such shops are present in 3.6.x)
+attempting to update permanent inventory window during restore had problems
+	with unpaid items (needed shop bill before shop and its shopkeeper
+	were restored) and named fruit
+remembered corpse which isn't there anymore would be described by farlook as
+	the corpse of a random monster type
+when eating a tin of spinach, don't "feel like Popeye" if sustain-abilities
+	prevents any strength gain
+summary text [for message history] of quest message Pri 00081 (Priest quest
+	success message given when bringing quest artifact to leader)
+	misspelled "congratulations"
+verbal charm/seduce messages were given even when hero was deaf
+succubus/incubus seduction might result in loss of levitation which in turn
+	could drop the hero onto a trap that transports him/her elsewhere;
+	seduction was proceeding as if nothing unusual had happened
+#turn command which aggravated monsters did so without using a turn (not a pun)
+fix hole/trapdoor passage inconsistency when polymorphed into a giant
+making a wide-open special level with FLAGS:inaccessibles could trigger a
+	"floodfill stack overrun" panic (no 3.6.x levels were affected)
+wallifying a special level might go out of map bounds (not with 3.6.x levels)
+	and corrupt other level data
+if a random grave produced during level creation included some gold, that gold
+	was left on the ground instead of being buried with other treasure
+multiple instances of shop damage at same spot (before repairs, so a broken
+	door or dug wall plus trap creation) only charged hero for first one
+shop door repair which took place when hero was on another level only worked
+	correctly if a trap at the same spot was removed
+object scattering during shop wall repair was skipped if a trap at the same
+	spot was also being removed
+augmented death reason for "while helpless" was broken for record and logfile
+	(but still correct for xlogfile)
+prevent wish prompt input from remembering the previous wish
+parchment and vellum are made from animal skin so change material composition
+	and color for spellbooks with those descriptions from paper to leather;
+	eating those books now breaks vegetarian conduct
+fix monsters not wielding digging implements
+wizard mode ^I^I didn't make temporary identifications become persistent if
+	the build configuration makes plain 'char' unsigned
+wizard mode #wizidentify didn't disclose extra information for unID'd items if
+	key bindings took away ^I and didn't bind #wizidentify to another key
+make transformation message of a deliberate apply of a figurine seem a bit
+	less definite when blind and place unseen monster marker at the spot
+	you think it should be
+add window port status_update() value BL_RESET to use as a flag to redraw
+	all status fields, distinguished from BL_FLUSH which now only
+	specifies that the bot() call has completed so any buffered changes
+	should now be rendered
+for hilite_status of string status fields (title, dungeon-level, alignment),
+	the types value-goes-up and -down aren't meaningful; treat them as
+	value-changed if from config file and don't offer as choices with 'O'
+jumping into or over a Sokoban pit, or over a fire trap, triggers trap twice
+mimics created by #wizgenesis could block or not block vision incorrectly
+handle monsters inside the invocation area
+give monsters who have had a worn item stolen or who have been life-saved
+	(used up amulet) a chance to wear replacement gear on next move
+	instead of having to wait until they pick something up
+Unchanging hero in clay golem form will be killed when cancelled
+poly'd shapechanger and hiding mimic will revert to normal when cancelled,
+	like werecreature in beast form and non-Unchanging hero
+cancelled shapeshifter is no longer able to change shape
+cancelled shapeshifter hit by polymorph magic will become uncancelled
+polymorph zap which created a new long worm (or retains an old one via wizard
+	mode monpolycontrol) could hit that worm multiple times (tail segments)
+wishing for "orange" could yield orange or orange colored gem/potion/spellbook
+a sleeping or paralyzed mon would be frightened by its reflection when
+	applying a mirror
+prevent leash showing unseen monster as "attached to it"
+gremlins seemed impervious to Sunsword's light yet a flash from a camera
+	caused them to cry out in pain
+when objects migrated (fell down stairs) and invisible hero (w/o see invisible,
+	no-autopickup) descended, stairs got shown instead of object(s) on them
+drum of earthquake was causing deafness but oddly enough only when used up
+known bear trap was being forgotten about by a player polymorphed into a
+	flying monster if the player unsuccessfully tried to #untrap it and
+	moved onto the trap square as a result
+no leash-related message is given when a leashed pet yellow light explodes
+shop messages refer to shk by name even when shk is not visible but some
+	used pronoun "it" or "its" in same sentence; ditto for vault guards
+poly'd hero and monsters could eat through iron bars in areas where walls
+	were flagged as non-diggable
+Samurai seeing items at a distance could have them be described by their
+	ordinary names rather than by their Japanese names
+wizard mode ^T shouldn't have been diminishing player power but it was
+	and hilite_status:power settings really drew attention to that
+fix missing space in "would flyif you weren't levitating"
+a wand of polymorph lost its magical ability for the turn just because the
+	player using it to engrave happened to be blind, which didn't make
+	much sense
+floating eye is classified as a flyer but flying is blocked while levitating,
+	so don't set intrinsic flying if hero is polymorphed into one
+change default value for the 'autodescribe' option to 'on'
+Elbereth hypocrisy penalty doesn't apply if attacking a monster which isn't
+	frightened by Elbereth; normal scuffing of engravings still applies
+Elbereth hypocrisy penalty reduced when alignment is already low
+during character creation, don't unset alternate weapon when a shield gets
+	worn (was preventing knight from having lance set up as uswapwep)
+preformatted Guidebook.txt split line in middle of "' '" for #wait command
+prevent simiulated screenshot in Guidebook.txt from spanning page boundary
+overview information for former hero was not being set properly when bones
+	file was saved, so current hero coming across a dead hero's grave
+	didn't have #overview feedback augmented with "final resting place"
+in Guidebook.mn and Guidebook.txt, the 'I' command mis-described `IX' as
+	displaying inventory items whose bless/curse state is "known"
+	(Guidebook.tex correctly had "unknown")
+poison gas (stinking cloud) wasn't shown at drawbridge-up spot
+prayer result which enhanced strength (fix weakness from hunger) didn't give
+	a message if a change in encumbrance occurred; it came on next move
+add current location within the dungeon to the Background section of ^X and
+	final disclosure (it's not background but doesn't fit anywhere else)
+death from something other than loss of hit points could leave hero with
+	non-zero HP at end of game (during "really die?" prompt, disclosure)
+added several special cases for genocide and/or wishing prompt: (cookie,
+	pie, genie, watchmen)
+lightning strike from Mjollnir did not make any noise
+with menustyle:Full, picking 'A - autoselect all' when putting items into a
+	container actually took everything out of that container
+add missing 'A - autoselect all' choice for menustyle:Full when taking items
+	out while looting a container
+fix odd wording "The boulder triggers and fills a pit"
+^X status feedback: don't report "not wearing any armor" when wearing a shield
+attempting to #ride a long worm's tail could trigger impossible "worm_cross
+	checking for non-adjacent location?"
+avoid "The " in "The <known-artifact-but-not-The-artifact> falls down stairs."
+avoid potential buffer overflow if object with very long name knocks other
+	objects down stairs when dropped, thrown, or kicked there
+#wizintrinsic for 'flying' didn't update status line when flying ended
+#wizintrinsic for 'warn_of_mon' didn't set any type of monster (now grid bugs)
+clairvoyance would show trap instead of a monster on/in that trap, which was
+	intentional, but when clairvoyance finished the monster wasn't shown
+clairvoyance revealing underwater or under-lava objects left object displayed
+	instead of restoring the water or lava
+nurse corpse/tin chance to convey poison resistance when eaten was not honored
+make tame vampires be more aggressive when shifted to bat/fog/wolf form
+a stale gold symbol could be displayed on the status line following a switch
+	to a new symset, as observed and reported for Windows RogueEpyx symset
+successfully paying for shop damage with shop credit would be followed by
+	impossible "zero payment in money2mon"
+if a migrating monster was killed off because there was no room on the
+	destination level, it would leave a corpse even if it was a type
+	which should never leave one (demon, golem, blob, &c)
+monsters accompanying hero during level change (usually pets) who failed to
+	arrive and tried to re-migrate were being removed from the map after
+	already having been removed [impossible "no monster to remove" if
+	compiled with EXTRA_SANITY_CHECKS enabled] during migration handling
+monsters accompanying hero during level change (usually pets) who failed to
+	arrive and tried to re-migrate (for hero's next visit to the level)
+	ended up being killed because the migration attempt happened right
+	away (same visit by hero, so level still full) and they weren't
+	accompanying hero on the second attempt
+fix for above (all failed arrivals will re-migrate) makes the earlier fix (for
+	invalid corpse being left by monst killed upon migration failure) moot
+end of game while carrying Schroedinger's Box would reveal cat-or-corpse
+	for inventory disclosure or put that info into dumplog, but not both
+attempting to untrap an adjacent trap while on the edge of--not in--a pit
+	failed due to not being able to reach the floor
+magic trap's deafening roar effect wasn't waking nearby monsters
+scattering of objects might leave source location with wrong thing displayed
+for configurations with 'long int' larger than 'int', lev_comp wrote some
+	garbage into the *.lev files, but nethack seemed unaffected by that
+	(at least on little-endian hardare) and loaded the levels successfully
+stinking cloud placed near water could kill underwater creatures
+applying--rather than wielding--a cursed polearm or weapon-tool didn't report
+	that it had become welded to hero's hand(s)
+the message when riding a steed into a pit was composed but not shown
+dismount that killed steed because there was no room to put it on map blamed
+	hero; change that to only blame hero if dismount is voluntary
+to emphasize that it's not a light source, change description of wielded Sting
+	from "(glowing light blue)" to "(light blue aura)" when sighted and
+	from "(glowing)" to nothing (not warm enough to feel) when blind
+	[subsequently changed in different manner; see 'exposed via git' below]
+glowing Sting quivers if hero becomes blind and quivering Sting glows if
+	blindness ends; it worked for timed blindness but not for blindfold
+weapon (wielded pie, egg, potion, boomerang) might be destroyed when hitting a
+	long worm, then freed memory was accessed to decide whether to cut it
+level change after being interruped locking or unlocking a container might
+	access freed memory
+if a restore attempt failed and a new game was started instead, it would use
+	stale context from old game if restoration got far enough to load that
+if hero survives turning into slime (life-saving), survive as a green slime
+hero hit by something that causes inventory items to be destroyed with loss of
+	any of those causing other inventory items to be dropped or destroyed,
+	inventory traversal became unreliable (known sequence: potions hit by
+	fire then breathing vapor from boiled unholy water triggering 'were'
+	transformation to beast form; possible sequence: ring of levitation
+	blasted by lightning and dropping hero onto fire trap); [3.6.1 fixed a
+	similar problem with more obvious symptom, an "object lost" panic when
+	the unholy water was wielded; the fix for that wasn't general enough]
+add MM_ASLEEP makemon() flag and honor it when creating group for fill_zoo
+add MM_NOGRP makemon() flag as a means of suppressing groups of monsters in
+	a couple places that warrant it when a specific monster type isn't
+	specified on the call to makemon()
+at start of session (new game or restore), HILITE_STATUS for gold was ignored
+setting second or later named fruit to value beginning with two or more spaces
+	followed by non-space gave "singular of null?" warning
+when blocking/unblocking of levitation or flying was updated due to walking
+	onto different terrain, the relevant status condition wasn't updated
+	on the screen until some other status update happened
+if levitating hero in pass-wall creature form jumped or teleported from
+	terrain that allowed levitation to terrain that didn't or vice versa,
+	blocking of levitation wasn't updated properly
+make it easier to clear 'pickup_types' (menustyles Traditional and Combination
+	could do so by setting it to 'a'; now ' ' works too; Full and Partial
+	allowed unselecting every object class; now 'all classes' is a choice)
+distribution of monsters selected by mkclass() didn't match expected distrib
+	(cited example was ndemon() creating twice as many incubi as succubi)
+while inside a shop, dropping an unpaid item inside an engulfer would leave
+	that item 'unpaid' and it would remain so on shop floor after the
+	the engulfer was killed; treat dropping shop items inside an engulfer
+	as stealing them and giving them to that engulfer--hero must pay for
+	them and shop retains ownership of them
+while levitating inside a shop, throwing an unpaid item and having recoil move
+	hero out of shop (or to shopkeeper's spot in front of door) would
+	leave the item unpaid on shop floor and also on the shop's bill but
+	not visible via 'Iu' or 'Ix'; leaving the shop after that would anger
+	the shopkeeper and summon kops
+diluted potion of oil is less effective when filling lamps (adds less fuel)
+	or burning (lasts less long) or exploding (inflicts less damage)
+apply fix from grunthack to prevent panic "fakecorr overflow" when vault guard
+	couldn't figure out how to lead the hero from vault to civilization;
+	fixes longstanding bug C343-23
+vibrating square is not really a trap so monsters don't need to avoid it
+if hero kicks some embedded gold out of a wall while following vault gaurd
+	away from vault, don't report "the guard _calms_down_and_ picks up
+	the gold" unless he's on brink of going ballistic
+for '/?' information lookup, "item named The Artifact" failed to find info
+	about "Artifact" due to presence of "The"
+identifying or forgetting gem types now adjusts prices for gems already on
+	shopping bill
+when fire converts an ice location into a water location, dunk any monster on
+	that spot immediately instead of waiting until its next move
+training riding skill had an off-by-one bug when counting turns riding
+message sequencing when vampire shifts to fog cloud to pass under closed door:
+	when in sight, give form change message before moving to door spot
+limit carrying heavy loads from water to land
+failing to carry a wished-for item behaved differenctly from dropping one
+life-saving while weak/starving/fainting boosted nutrition without restoring
+	lost point of strength, making temporary loss be permanent
+unlike #chat in a shop, walking on an item in a shop failed to include price
+	for hero-owned container holding shop-owned items
+bag of holding explosion inside shop billed hero for unpaid contents if it
+	happened when applied while carried but not when looted while on floor
+looking into an applied container with ':' showed prices of unpaid items but
+	looking into a looted one with ':' did not show prices for shop items
+
+
+Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
+------------------------------------------------------------------
+fix access violation when --debug:xxxx has no other args after it
+setting the inverse attribute for gold had the space before "$:"
+	getting highlighted along with the gold field
+sortloot segfaulted when filtering a subset of items (seen with 'A' command)
+orctown: prevent "Bad fruit #0" and some minor tuning
+orctown: orcs beyond the mines were being given any left-over booty and named
+	as part of the same marauding gang operating within the mines
+make long extended commands list be more navigable
+simplify #wizidentify; don't rely on having bold menu entries
+ensure tmp_at() structures are initialized for all code paths when swallowed
+trapped-vs-levitation/flying change broke Sting releasing hero from web
+life-saving while poly'd and Unchanging wasn't restoring u.mh (HP as monster)
+change in searching stopped finding unseen monsters except hiders and eels
+buliding with EXTRA_SANITY_CHECKS enabled would issue "no monster to remove"
+	warning if steed was killed out from under the hero
+changing Sting's description to be "(weapon in hand) (light blue aura)" was
+	too close to feedback when objects become blessed; change it again,
+	to "(weapon in hand, flickering/glimmering/gleaming light blue)"
+fix bit-use collision between WC2_TERM_SIZE and WC2_RESET_STATUS in
+	include/winprocs.h following a recent merge
+fix foxen pluralization again after underflow remedy reintroduced the problem
+fix "placing monster over another?" warning for vault guards
+status highlighting classifies gold, time, and experience-points as data type
+	'long' but when selecting hilite rule to use treated them as 'int'
+a config file line with OPTIONS=symset:default, roguesymset:RogueEpyx
+	was disabling color on RogueEpyx even though the symset is 
+	meant to have color; that was due to an errant init_symbols() call
+	during the processing of symset:default done after RogueEpyx had
+	already been processed
+avoid potential segfault when doing 'more information' lookup
+when built with STATUS_HILITES enabled (the default), gold on status line
+	was missing '$' prefix for symset:Blank
+tty: turn off an optimization that is the suspected cause of Windows reported
+	partial status lines following level changes
+tty: ensure that current status fields are always copied to prior status
+	values so that comparisons are correct
+tty: fix an out of bounds error in tty_status_update() for BL_HUNGER case
+tty: fix leftover display artifact when the last field on the row got placed
+	to the left of where it was previously due to it, or one of the fields
+	to its left, getting shorter
+X11: its use of genl_status_update exposed a negative index use that could
+	lead to a segfault
+X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
+
+
+Platform- and/or Interface-Specific Fixes or Features
+-----------------------------------------------------
+move 'perm_invent' value from flags to iflags to keep it out of save files;
+	affects X11, win32, and curses (save file compatibility is preserved)
+always define shell and suspend commands so that key bindings copied from one
+	platform to another work even if second one disables those commands
+windows-gui: In nethackw, there could be conflicts between menu accelerators
+	and an extra choice accelerator to fix H7132.
+windows-gui: recognize new BL_RESET in status_update; no change in behavior yet
+windows-gui: align hpbar behavior at zero hit points with tty behavior
+windows-gui: add support for status_hilites for the player condition field
+	such as stone, slime, strngl, blind, deaf, stun, conf, etc.
+windows-tty: Specify both width and height when creating font for width testing
+windows-tty: To counter lag problems that were occuring with the Win32 console
+	port, implement a console back buffer to reduce the number of calls
+	made to WriteConsoleOutputXXX
+windows-tty: Additional changes to xputc_core() and early_raw_print() to
+	manage the cursor position correctly as that is needed to handle
+	raw printing correctly
+windows-tty: Added check for when we might be running off the bottom of the
+	screen when handling msmsg()
+windows-tty: Added runtime checks to keep cursor always within bounds
+windows-tty: Fix memory leaks as reported in H5779
+windows-tty: Use nhraykey by default if the player's keyboard layout is
+	non-english as reported in H4216
+windows-tty: We now support changing altkeyhandler in game
+windows-tty: augment codepage850-to-Unicode mappings that are not displayable
+	with codepage437-to-Unicode mappings that are, to help ensure that
+	rogue-level characters o status line match their appearance on map
+windows-tty: add support for mouse_support:0 (disabled), mouse_support:1
+	(fully-functional including disabling QuickEdit on Windows console
+	because QuickEdit intercepts the mouse clicks so NetHack never sees
+	them), or mouse_support:2 (NetHack support on but QuickEdit left as is)
+windows: Added ntassert() mechanism for Windows based port use
+windows: heed OPTIONS=symset:default in config file if it is present
+windows: add curses window port which can co-exist with tty in exe and be
+	selectable in user config file via OPTIONS=windowtype:curses
+tty: significant optimizations for performance and per field rendering
+tty: use WC2_FLUSH_STATUS to buffer changes until BL_FLUSH is received
+tty: support BL_RESET in status_update to force an update to all status fields
+tty: stop hitpointbar from jumping to 100% health at zero hit points
+tty: try harder to prevent a disconnected terminal (SIGHUP) from running amok
+	and using up all available CPU time
+MacOSX: add curses window port
+MacOSX: add Xcode project to sys/unixNetHack.xcodeproj
+MacOSX: add Xcode supporting files README.xcode and XCode.xcconfig
+	containing important build info
+unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
+	extension when using $(VERBOSEMAKE) to reduce build-time feedback;
+	replace with $(QUIETCC) which operates the same but defaults to
+	verbose so doesn't use '$<' for multi-prerequisite targets unless
+	specifically requested; use 'make QUIETCC=1 <target>' to get the
+	3.6.1 behavior back
+unix: add curses window port
+vms: data file processing and playground setup were missing post-3.4.3 files
+	engrave, epitaph, and bogusmon made from corresponding *.txt
+Qt: add Qt5 specific hints file for linux and Mac OS X (Ray Chason)
+Qt: enable compiling Qt5 on Windows (Ray Chason)
+Qt: entering extended commands, hide non-matching ones
+Qt: remember tile and font size
+X11: implement menucolors and allow menus to obey some attributes
+X11: make key translations work with menus on Linux
+X11: allow mouse wheel scrolling to work in menus by default
+X11: handle paged menu control keys
+X11: remember perm_invent window geometry
+X11: handle X errors via panic
+X11: don't reuse perm_invent window for picking an object
+X11: obey mouse_support and allow toggling it in game
+X11: obey menu movement keys
+X11: enable menu [cancel] button for PICK_NONE menus
+X11: text popups on OSX wouldn't accept keyboard input unless the 'autofocus'
+	resource was enabled; most noticeable when trying to dismiss 'things
+	that are here' while walking over object piles
+
+
+General New Features
+--------------------
+integrate aklys feature introduced in 3.6.1 into display
+status_hilite options which use comparisons may now use <= and >= in
+	addition to previous < and >; in 3.6.1 the latter operated as if
+	they were <= and >= but now behave as conventional less than and
+	greater than; old highlight rules using them should be updated
+sortloot option has been enhanced to improve object ordering; primarily,
+	items of undiscovered type come out before items of discovered type
+	within each class or sub-class of objects
+YAFM when stumbling on an undetected monster while hallucinating
+make it clear when a leprechaun dodges your attack
+wizard mode #wizidentify can now select individual items for permanent
+	identification and don't display the selection to permanently
+	identify everything if everything is already fully identified
+make mine town "orctown" variation a multiple level feature of the mines
+replace #monpolycontrol command with monpolycontrol boolean option
+replace #wizdebug_traveldisplay command with travel_debug boolean option
+rename #wizdebug_bury command to #wizbury
+life-saving now makes swallower or grabber release hero
+for ^X and enlightenment, display the information in a menu rather than a
+	plain text popup, so that player can go back within the text via
+	'<' (menu_previous_page) and '^' (menu_first_page) menu keys;
+	needed for interfaces (tty) without text popup scrollbar support;
+	end of game disclosure of attributes remains single-forward-pass
+for ^X, include current state of 'autopickup'
+being trapped (bear trap, web, molten or solidified lava, chained to buried
+	iron ball) blocks both levitation and flight (note: being stuck in a
+	pit ends when either of those starts so doesn't apply)
+early level traps are sometimes covered by the remains of fake players
+fake player characters resist Conflict
+when inside a shop, far-look now includes shop prices for items marked as
+	having been seen up close
+
+
+NetHack Community Patches (or Variation) Included
+-------------------------------------------------
+curses: the community patch for an optional curses window-port was
+	incorporated into the NetHack source code tree.  The curses
+	window-port evolved from work originally done by Karl Garrison,
+	and has been in use in several NetHack variants and on
+	nethack.alt.org and on www.hardfought.org/nethack/ for a while.
+	It is available and tested for 3.6.2 for Windows with PDCurses
+	layered underneath, and for Mac OSX and Unix (using ncurses as
+	the layer underneath).  It may also work for DOS with PDCurses
+	layered underneath, but that has not been tested.
+
+
+Code Cleanup and Reorganization
+-------------------------------
+generated source file monstr.c is no longer used
+

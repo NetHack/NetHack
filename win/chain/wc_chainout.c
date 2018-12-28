@@ -10,7 +10,7 @@
 struct chainout_data {
     struct window_procs *nprocs;
 #if 0
-	void *ndata;
+    void *ndata;
 
 #endif
     int linknum;
@@ -24,21 +24,23 @@ void *me;
 void *nextprocs;
 void *nextdata UNUSED;
 {
+    struct chainout_data *tdp = 0;
+
     switch (cmd) {
-    case WINCHAIN_ALLOC: {
-        struct chainout_data *tdp = calloc(1, sizeof(struct chainout_data));
+    case WINCHAIN_ALLOC:
+        tdp = (struct chainout_data *) alloc(sizeof *tdp);
+        tdp->nprocs = 0;
         tdp->linknum = n;
-        return tdp;
-    }
-    case WINCHAIN_INIT: {
-        struct chainout_data *tdp = me;
+        break;
+    case WINCHAIN_INIT:
+        tdp = me;
         tdp->nprocs = nextprocs;
-        return tdp;
-    }
+        break;
     default:
-        raw_printf("chainout_procs_chain: bad cmd\n");
-        exit(EXIT_FAILURE);
+        panic("chainout_procs_chain: bad cmd\n");
+        /*NOTREACHED*/
     }
+    return tdp;
 }
 
 /* XXX if we don't need this, take it out of the table */

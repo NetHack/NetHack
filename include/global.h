@@ -8,9 +8,11 @@
 
 #include <stdio.h>
 
-/* #define BETA  */ /* development or beta testing [MRS] */
+#define BETA   /* development or beta testing [MRS] */
 
-#define DEBUG 
+#ifndef DEBUG  /* allow tool chains to define without causing warnings */
+#define DEBUG
+#endif
 
 /*
  * Files expected to exist in the playground directory.
@@ -58,8 +60,13 @@
  * since otherwise comparisons with signed quantities are done incorrectly
  */
 typedef schar xchar;
+#if defined(__GNUC__) && defined(WIN32) && defined(__cplusplus)
+/* Resolve conflict with Qt 5 and MinGW-w32 */
+typedef uchar boolean; /* 0 or 1 */
+#else
 #ifndef SKIP_BOOLEAN
 typedef xchar boolean; /* 0 or 1 */
+#endif
 #endif
 
 #ifndef TRUE /* defined in some systems' native include files */
@@ -351,5 +358,11 @@ struct savefile_info {
 #ifdef UNIX
 #define PANICTRACE_GDB
 #endif
+
+/* Supply nethack_enter macro if not supplied by port */
+#ifndef nethack_enter
+#define nethack_enter(argc, argv) ((void) 0)
+#endif
+
 
 #endif /* GLOBAL_H */

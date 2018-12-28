@@ -2,39 +2,74 @@
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#include "win10.h"
 #include "winMS.h"
-#include "resource.h"
+#include "winos.h"
+
+#include "mhfont.h"
+#include "mhinput.h"
 #include "mhmap.h"
 #include "mhmsg.h"
-#include "mhinput.h"
-#include "mhfont.h"
+#include "resource.h"
 
 #include "color.h"
 #include "patchlevel.h"
 
 #define NHMAP_FONT_NAME TEXT("Terminal")
+#define NHMAP_TTFONT_NAME TEXT("Consolas")
 #define MAXWINDOWTEXT 255
+
+#define CURSOR_BLINK_INTERVAL 1000 // milliseconds
+#define CURSOR_HEIGHT 2 // pixels
 
 extern short glyph2tile[];
 
-#define TILEBMP_X(ntile) ((ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X)
-#define TILEBMP_Y(ntile) ((ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y)
+#define TILEBMP_X(ntile) \
+    ((ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X)
+#define TILEBMP_Y(ntile) \
+    ((ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y)
 
 /* map window data */
 typedef struct mswin_nethack_map_window {
-    int map[COLNO][ROWNO]; /* glyph map */
-    int bkmap[COLNO][ROWNO]; /* backround glyph map */
+    HWND hWnd;                  /* window */
 
-    int mapMode;              /* current map mode */
-    boolean bAsciiMode;       /* switch ASCII/tiled mode */
-    boolean bFitToScreenMode; /* switch Fit map to screen mode on/off */
-    int xPos, yPos;           /* scroll position */
-    int xPageSize, yPageSize; /* scroll page size */
-    int xCur, yCur;           /* position of the cursor */
-    int xScrTile, yScrTile;   /* size of display tile */
-    POINT map_orig;           /* map origin point */
+    int map[COLNO][ROWNO];      /* glyph map */
+    int bkmap[COLNO][ROWNO];    /* backround glyph map */
+    boolean mapDirty[COLNO][ROWNO]; /* dirty flag for map */
 
-    HFONT hMapFont;           /* font for ASCII mode */
+    int mapMode;                /* current map mode */
+    boolean bAsciiMode;         /* switch ASCII/tiled mode */
+    boolean bFitToScreenMode;   /* switch Fit map to screen mode on/off */
+    int xPos, yPos;             /* scroll position */
+    int xPageSize, yPageSize;   /* scroll page size */
+    int xMin, xMax, yMin, yMax; /* scroll range */
+    int xCur, yCur;             /* position of the cursor */
+    int xFrontTile, yFrontTile; /* size of tile in front buffer in pixels */
+    int xBackTile, yBackTile;   /* size of tile in back buffer in pixels */
+    POINT map_orig;             /* map origin point */
+
+    HFONT hMapFont;             /* font for ASCII mode */
+    boolean bUnicodeFont;       /* font supports unicode page 437 */
+
+    int tileWidth;              /* width of tile in pixels at 96 dpi */
+    int tileHeight;             /* height of tile in pixels at 96 dpi */
+    double backScale;           /* scaling from source to back buffer */
+    double frontScale;          /* scaling from back to front */
+    double monitorScale;        /* from 96dpi to monitor dpi*/
+    
+    boolean cursorOn;
+    int yNoBlinkCursor;         /* non-blinking cursor height inback buffer
+                                   in pixels */
+    int yBlinkCursor;           /* blinking cursor height inback buffer
+                                   in pixels */
+
+    int backWidth;              /* back buffer width */
+    int backHeight;             /* back buffer height */
+    HBITMAP hBackBuffer;        /* back buffe bitmap */
+    HDC backBufferDC;          /* back buffer drawing context */
+
+    HDC tileDC;                /* tile drawing context */
+
 } NHMapWindow, *PNHMapWindow;
 
 static TCHAR szNHMapWindowClass[] = TEXT("MSNethackMapWndClass");
@@ -46,15 +81,22 @@ static void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void onPaint(HWND hWnd);
 static void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void nhcoord2display(PNHMapWindow data, int x, int y, LPRECT lpOut);
+static void paint(PNHMapWindow data, int i, int j);
+static void dirtyAll(PNHMapWindow data);
+static void dirty(PNHMapWindow data, int i, int j);
+static void setGlyph(PNHMapWindow data, int i, int j, int fg, int bg);
+static void clearAll(PNHMapWindow data);
+
 #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
 static void nhglyph2charcolor(short glyph, uchar *ch, int *color);
 #endif
+extern boolean win32_cursorblink;       /* from sys\winnt\winnt.c */
 
 HWND
 mswin_init_map_window()
 {
     static int run_once = 0;
-    HWND ret;
+    HWND hWnd;
     RECT rt;
 
     if (!run_once) {
@@ -70,7 +112,7 @@ mswin_init_map_window()
     }
 
     /* create map window object */
-    ret = CreateWindow(
+    hWnd = CreateWindow(
         szNHMapWindowClass, /* registered class name */
         NULL,               /* window name */
         WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPSIBLINGS
@@ -83,127 +125,244 @@ mswin_init_map_window()
         NULL,                 /* menu handle or child identifier */
         GetNHApp()->hApp,     /* handle to application instance */
         NULL);                /* window-creation data */
-    if (!ret) {
+    if (!hWnd) {
         panic("Cannot create map window");
     }
 
     /* Set window caption */
-    SetWindowText(ret, "Map");
+    SetWindowText(hWnd, "Map");
 
-    mswin_apply_window_style(ret);
+    mswin_apply_window_style(hWnd);
 
-    return ret;
+    /* set cursor blink timer */
+    SetTimer(hWnd, 0, CURSOR_BLINK_INTERVAL, NULL);
+
+    return hWnd;
 }
 
 void
-mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
+mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 {
-    PNHMapWindow data;
-    RECT client_rt;
-    SCROLLINFO si;
-    SIZE wnd_size;
-    LOGFONT lgfnt;
-
     /* check arguments */
-    if (!IsWindow(hWnd) || !lpsz || lpsz->cx <= 0 || lpsz->cy <= 0)
+    if (!IsWindow(hWnd) || !map_size || map_size->cx <= 0
+        || map_size->cy <= 0)
         return;
 
+    PNHMapWindow data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
     /* calculate window size */
+    RECT client_rt;
     GetClientRect(hWnd, &client_rt);
+
+    SIZE wnd_size;
     wnd_size.cx = client_rt.right - client_rt.left;
     wnd_size.cy = client_rt.bottom - client_rt.top;
 
-    /* set new screen tile size */
-    data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
-    data->xScrTile =
-        max(1, (data->bFitToScreenMode ? wnd_size.cx : lpsz->cx) / COLNO);
-    data->yScrTile =
-        max(1, (data->bFitToScreenMode ? wnd_size.cy : lpsz->cy) / ROWNO);
+    // calculate back buffer scale
+    data->monitorScale = win10_monitor_scale(hWnd);
+
+    boolean bText = data->bAsciiMode ||
+                    (u.uz.dlevel != 0 && Is_rogue_level(&u.uz));
+
+    if (bText && !data->bFitToScreenMode)
+        data->backScale = data->monitorScale;
+    else
+        data->backScale = 1.0;
+
+    /* set back buffer tile size */
+    if (bText && data->bFitToScreenMode) {
+        data->xBackTile = wnd_size.cx / COLNO;
+        data->yBackTile = wnd_size.cy / ROWNO;
+        data->yBackTile = max(data->yBackTile, 12);
+    } else {
+        data->xBackTile = (int)(data->tileWidth * data->backScale);
+        data->yBackTile = (int)(data->tileHeight * data->backScale);
+    }
+
+    if (bText) {
+        LOGFONT lgfnt;
+
+        ZeroMemory(&lgfnt, sizeof(lgfnt));
+        if (data->bFitToScreenMode) {
+            lgfnt.lfHeight = -data->yBackTile;     // height of font
+            lgfnt.lfWidth = 0;                     // average character width
+        } else {
+            lgfnt.lfHeight = -data->yBackTile;     // height of font
+            lgfnt.lfWidth = -data->xBackTile;      // average character width
+        }
+        lgfnt.lfEscapement = 0;                    // angle of escapement
+        lgfnt.lfOrientation = 0;                   // base-line orientation angle
+        lgfnt.lfWeight = FW_NORMAL;                // font weight
+        lgfnt.lfItalic = FALSE;                    // italic attribute option
+        lgfnt.lfUnderline = FALSE;                 // underline attribute option
+        lgfnt.lfStrikeOut = FALSE;                 // strikeout attribute option
+        lgfnt.lfCharSet = mswin_charset();         // character set identifier
+        lgfnt.lfOutPrecision = OUT_DEFAULT_PRECIS; // output precision
+        lgfnt.lfClipPrecision = CLIP_DEFAULT_PRECIS; // clipping precision
+        if (data->bFitToScreenMode) {
+            lgfnt.lfQuality = ANTIALIASED_QUALITY; // output quality
+        } else {
+            lgfnt.lfQuality = NONANTIALIASED_QUALITY; // output quality
+        }
+        if (iflags.wc_font_map && *iflags.wc_font_map) {
+            lgfnt.lfPitchAndFamily = DEFAULT_PITCH; // pitch and family
+            NH_A2W(iflags.wc_font_map, lgfnt.lfFaceName, LF_FACESIZE);
+        } else {
+            if (!data->bFitToScreenMode) {
+                lgfnt.lfPitchAndFamily = FIXED_PITCH; // pitch and family
+                NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+            } else {
+                lgfnt.lfPitchAndFamily = DEFAULT_PITCH; // pitch and family
+                NH_A2W(NHMAP_TTFONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+            }
+        }
+
+        TEXTMETRIC textMetrics;
+        HFONT font = NULL;
+
+        while (1) {
+
+            if (font != NULL)
+                DeleteObject(font);
+
+            font = CreateFontIndirect(&lgfnt);
+
+            SelectObject(data->backBufferDC, font);
+
+            GetTextMetrics(data->backBufferDC, &textMetrics);
+
+            if (!data->bFitToScreenMode)
+                break;
+
+            if ((textMetrics.tmHeight > data->yBackTile ||
+                 textMetrics.tmAveCharWidth > data->xBackTile) &&
+                lgfnt.lfHeight < -MIN_FONT_HEIGHT) {
+                lgfnt.lfHeight++;
+                continue;
+            }
+
+            break;
+        }
+
+        if (data->hMapFont)
+            DeleteObject(data->hMapFont);
+
+        data->hMapFont = font;
+
+        data->bUnicodeFont = winos_font_support_cp437(data->hMapFont);
+
+        // set tile size to match font metrics
+
+        data->xBackTile = textMetrics.tmAveCharWidth;
+        data->yBackTile = textMetrics.tmHeight;
+
+    }
+
+    int backWidth = COLNO * data->xBackTile;
+    int backHeight = ROWNO * data->yBackTile;
+
+    /* create back buffer */
+
+    if (data->backWidth != backWidth || data->backHeight != backHeight) {
+
+        HDC frontBufferDC = GetDC(hWnd);
+        HBITMAP hBackBuffer = CreateCompatibleBitmap(frontBufferDC, backWidth, backHeight);
+        ReleaseDC(hWnd, frontBufferDC);
+        
+        if (data->hBackBuffer != NULL) {
+            SelectBitmap(data->backBufferDC, hBackBuffer);
+            DeleteObject(data->hBackBuffer);
+        }
+
+        data->backWidth = backWidth;
+        data->backHeight = backHeight;
+
+        SelectBitmap(data->backBufferDC, hBackBuffer);
+        data->hBackBuffer = hBackBuffer;
+    }
+
+    /* calculate front buffer tile size */
+
+    if (wnd_size.cx > 0 && wnd_size.cy > 0 && !bText && data->bFitToScreenMode) {
+        double windowAspectRatio =
+            (double) wnd_size.cx / (double) wnd_size.cy;
+
+        double backAspectRatio = 
+            (double) data->backWidth / (double) data->backHeight;
+
+        if (windowAspectRatio > backAspectRatio)
+            data->frontScale = (double) wnd_size.cy / (double) data->backHeight;
+        else
+            data->frontScale = (double) wnd_size.cx / (double) data->backWidth;
+
+    } else {
+
+        if (bText) {
+            data->frontScale = 1.0;
+        } else {
+            data->frontScale = data->monitorScale;
+        }
+
+    }
+
+    data->xFrontTile = (int) ((double) data->xBackTile * data->frontScale);
+    data->yFrontTile = (int) ((double) data->yBackTile * data->frontScale);
+
+    /* calcuate ASCII cursor height */
+    data->yBlinkCursor = (int) ((double) CURSOR_HEIGHT * data->backScale);
+    data->yNoBlinkCursor = data->yBackTile;
 
     /* set map origin point */
     data->map_orig.x =
-        max(0, client_rt.left + (wnd_size.cx - data->xScrTile * COLNO) / 2);
+        max(0, client_rt.left + (wnd_size.cx - data->xFrontTile * COLNO) / 2);
     data->map_orig.y =
-        max(0, client_rt.top + (wnd_size.cy - data->yScrTile * ROWNO) / 2);
+        max(0, client_rt.top + (wnd_size.cy - data->yFrontTile * ROWNO) / 2);
 
-    data->map_orig.x -= data->map_orig.x % data->xScrTile;
-    data->map_orig.y -= data->map_orig.y % data->yScrTile;
+    data->map_orig.x -= data->map_orig.x % data->xFrontTile;
+    data->map_orig.y -= data->map_orig.y % data->yFrontTile;
 
-    /* adjust horizontal scroll bar */
-    if (data->bFitToScreenMode)
-        data->xPageSize = COLNO + 1; /* disable scroll bar */
-    else
-        data->xPageSize = wnd_size.cx / data->xScrTile;
+    // Set horizontal scroll
 
-    if (data->xPageSize >= COLNO) {
-        data->xPos = 0;
-        GetNHApp()->bNoHScroll = TRUE;
-    } else {
-        GetNHApp()->bNoHScroll = FALSE;
-        data->xPos = max(
-            0, min(COLNO - data->xPageSize + 1, u.ux - data->xPageSize / 2));
-    }
+    data->xPageSize = min(COLNO, wnd_size.cx / data->xFrontTile);
+
+    GetNHApp()->bNoHScroll = (data->xPageSize == COLNO);
+
+    data->xMin = 0;
+    data->xMax = COLNO - data->xPageSize;
+    data->xPos = max(0, min(data->xMax, u.ux - (data->xPageSize / 2)));
+
+    SCROLLINFO si;
 
     si.cbSize = sizeof(si);
     si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
-    si.nMin = 0;
-    si.nMax = COLNO;
-    si.nPage = data->xPageSize;
+    si.nMin = data->xMin;
+    si.nMax = data->xMax;
+    si.nPage = 1;
     si.nPos = data->xPos;
     SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
 
-    /* adjust vertical scroll bar */
-    if (data->bFitToScreenMode)
-        data->yPageSize = ROWNO + 1; /* disable scroll bar */
-    else
-        data->yPageSize = wnd_size.cy / data->yScrTile;
+    data->yPageSize = min(ROWNO, wnd_size.cy / data->yFrontTile);
 
-    if (data->yPageSize >= ROWNO) {
-        data->yPos = 0;
-        GetNHApp()->bNoVScroll = TRUE;
-    } else {
-        GetNHApp()->bNoVScroll = FALSE;
-        data->yPos = max(
-            0, min(ROWNO - data->yPageSize + 1, u.uy - data->yPageSize / 2));
-    }
+    GetNHApp()->bNoVScroll = (data->yPageSize == ROWNO);
+
+    data->yMin = 0;
+    data->yMax = ROWNO - data->yPageSize;
+    data->yPos = max(0, min(data->yMax, u.uy - (data->yPageSize / 2)));
 
     si.cbSize = sizeof(si);
     si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
-    si.nMin = 0;
-    si.nMax = ROWNO;
-    si.nPage = data->yPageSize;
+    si.nMin = data->yMin;
+    si.nMax = data->yMax;
+    si.nPage = 1;
     si.nPos = data->yPos;
     SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 
-    /* create font */
-    if (data->hMapFont)
-        DeleteObject(data->hMapFont);
-    ZeroMemory(&lgfnt, sizeof(lgfnt));
-    lgfnt.lfHeight = -data->yScrTile;          // height of font
-    lgfnt.lfWidth = -data->xScrTile;           // average character width
-    lgfnt.lfEscapement = 0;                    // angle of escapement
-    lgfnt.lfOrientation = 0;                   // base-line orientation angle
-    lgfnt.lfWeight = FW_NORMAL;                // font weight
-    lgfnt.lfItalic = FALSE;                    // italic attribute option
-    lgfnt.lfUnderline = FALSE;                 // underline attribute option
-    lgfnt.lfStrikeOut = FALSE;                 // strikeout attribute option
-    lgfnt.lfCharSet = mswin_charset();         // character set identifier
-    lgfnt.lfOutPrecision = OUT_DEFAULT_PRECIS; // output precision
-    lgfnt.lfClipPrecision = CLIP_DEFAULT_PRECIS; // clipping precision
-    lgfnt.lfQuality = DEFAULT_QUALITY;           // output quality
-    if (iflags.wc_font_map && *iflags.wc_font_map) {
-        lgfnt.lfPitchAndFamily = DEFAULT_PITCH; // pitch and family
-        NH_A2W(iflags.wc_font_map, lgfnt.lfFaceName, LF_FACESIZE);
-    } else {
-        lgfnt.lfPitchAndFamily = FIXED_PITCH; // pitch and family
-        NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
-    }
-    data->hMapFont = CreateFontIndirect(&lgfnt);
-
     mswin_cliparound(data->xCur, data->yCur);
 
-    if (redraw)
+    if (redraw) {
+        dirtyAll(data);
         InvalidateRect(hWnd, NULL, TRUE);
+    }
 }
 
 /* set map mode */
@@ -225,94 +384,91 @@ mswin_map_mode(HWND hWnd, int mode)
     case MAP_MODE_ASCII4x6:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 4 * COLNO;
-        mapSize.cy = 6 * ROWNO;
+        data->tileWidth = 4;
+        data->tileHeight = 6;
         break;
 
     case MAP_MODE_ASCII6x8:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 6 * COLNO;
-        mapSize.cy = 8 * ROWNO;
+        data->tileWidth = 6;
+        data->tileHeight = 8;
         break;
 
     case MAP_MODE_ASCII8x8:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 8 * COLNO;
-        mapSize.cy = 8 * ROWNO;
+        data->tileWidth = 8;
+        data->tileHeight = 8;
         break;
 
     case MAP_MODE_ASCII16x8:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 16 * COLNO;
-        mapSize.cy = 8 * ROWNO;
+        data->tileWidth = 16;
+        data->tileHeight = 8;
         break;
 
     case MAP_MODE_ASCII7x12:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 7 * COLNO;
-        mapSize.cy = 12 * ROWNO;
+        data->tileWidth = 7;
+        data->tileHeight = 12;
         break;
 
     case MAP_MODE_ASCII8x12:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 8 * COLNO;
-        mapSize.cy = 12 * ROWNO;
+        data->tileWidth = 8;
+        data->tileHeight = 12;
         break;
 
     case MAP_MODE_ASCII16x12:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 16 * COLNO;
-        mapSize.cy = 12 * ROWNO;
+        data->tileWidth = 16;
+        data->tileHeight = 12;
         break;
 
     case MAP_MODE_ASCII12x16:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 12 * COLNO;
-        mapSize.cy = 16 * ROWNO;
+        data->tileWidth = 12;
+        data->tileHeight = 16;
         break;
 
     case MAP_MODE_ASCII10x18:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 10 * COLNO;
-        mapSize.cy = 18 * ROWNO;
+        data->tileWidth = 10;
+        data->tileHeight = 18;
         break;
 
-    case MAP_MODE_ASCII_FIT_TO_SCREEN: {
-        RECT client_rt;
-        GetClientRect(hWnd, &client_rt);
-        mapSize.cx = client_rt.right - client_rt.left;
-        mapSize.cy = client_rt.bottom - client_rt.top;
-
+    case MAP_MODE_ASCII_FIT_TO_SCREEN:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = TRUE;
-    } break;
+        data->tileWidth = 12;
+        data->tileHeight = 16;
+        break;
 
-    case MAP_MODE_TILES_FIT_TO_SCREEN: {
-        RECT client_rt;
-        GetClientRect(hWnd, &client_rt);
-        mapSize.cx = client_rt.right - client_rt.left;
-        mapSize.cy = client_rt.bottom - client_rt.top;
-
+    case MAP_MODE_TILES_FIT_TO_SCREEN:
         data->bAsciiMode = FALSE;
         data->bFitToScreenMode = TRUE;
-    } break;
+        data->tileWidth = GetNHApp()->mapTile_X;
+        data->tileHeight = GetNHApp()->mapTile_Y;
+        break;
 
     case MAP_MODE_TILES:
     default:
         data->bAsciiMode = FALSE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = GetNHApp()->mapTile_X * COLNO;
-        mapSize.cy = GetNHApp()->mapTile_Y * ROWNO;
+        data->tileWidth = GetNHApp()->mapTile_X;
+        data->tileHeight = GetNHApp()->mapTile_Y;
         break;
     }
+
+    mapSize.cx = data->tileWidth * COLNO;
+    mapSize.cy = data->tileHeight * ROWNO;
 
     mswin_map_stretch(hWnd, &mapSize, TRUE);
 
@@ -389,8 +545,8 @@ MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         } else {
             /* mapping factor is unchaged we just need to adjust scroll bars
              */
-            size.cx = data->xScrTile * COLNO;
-            size.cy = data->yScrTile * ROWNO;
+            size.cx = data->xFrontTile * COLNO;
+            size.cy = data->yFrontTile * ROWNO;
         }
         mswin_map_stretch(hWnd, &size, TRUE);
 
@@ -414,10 +570,10 @@ MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         NHEVENT_MS(CLICK_1,
                    max(0, min(COLNO, data->xPos
                                          + (LOWORD(lParam) - data->map_orig.x)
-                                               / data->xScrTile)),
+                                               / data->xFrontTile)),
                    max(0, min(ROWNO, data->yPos
                                          + (HIWORD(lParam) - data->map_orig.y)
-                                               / data->yScrTile)));
+                                               / data->yFrontTile)));
         return 0;
 
     case WM_LBUTTONDBLCLK:
@@ -425,18 +581,35 @@ MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         NHEVENT_MS(CLICK_2,
                    max(0, min(COLNO, data->xPos
                                          + (LOWORD(lParam) - data->map_orig.x)
-                                               / data->xScrTile)),
+                                               / data->xFrontTile)),
                    max(0, min(ROWNO, data->yPos
                                          + (HIWORD(lParam) - data->map_orig.y)
-                                               / data->yScrTile)));
+                                               / data->yFrontTile)));
         return 0;
 
     case WM_DESTROY:
         if (data->hMapFont)
             DeleteObject(data->hMapFont);
+        if (data->hBackBuffer)
+            DeleteBitmap(data->hBackBuffer);
+        if (data->backBufferDC)
+            DeleteDC(data->backBufferDC);
         free(data);
         SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) 0);
         break;
+
+    case WM_TIMER:
+        data->cursorOn = !data->cursorOn;
+        dirty(data, data->xCur, data->yCur);
+        break;
+
+    case WM_DPICHANGED: {
+        RECT rt;
+        GetWindowRect(hWnd, &rt);
+        ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+        ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt) + 1);
+        mswin_update_window_placement(NHW_MAP, &rt);
+    } break;
 
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -449,25 +622,13 @@ void
 onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     PNHMapWindow data;
-    RECT rt;
 
     data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     switch (wParam) {
     case MSNH_MSG_PRINT_GLYPH: {
         PMSNHMsgPrintGlyph msg_data = (PMSNHMsgPrintGlyph) lParam;
-        if ((data->map[msg_data->x][msg_data->y] != msg_data->glyph)
-            || (data->bkmap[msg_data->x][msg_data->y] != msg_data->bkglyph)) {
-            data->map[msg_data->x][msg_data->y] = msg_data->glyph;
-            data->bkmap[msg_data->x][msg_data->y] = msg_data->bkglyph;
-
-            /* invalidate the update area. Erase backround if there 
-               is nothing to paint or we are in text mode */
-            nhcoord2display(data, msg_data->x, msg_data->y, &rt);
-            InvalidateRect(hWnd, &rt, 
-                           (((msg_data->glyph == NO_GLYPH) && (msg_data->bkglyph == NO_GLYPH))
-                            || data->bAsciiMode 
-                            || Is_rogue_level(&u.uz)));
-        }
+        setGlyph(data, msg_data->x, msg_data->y, 
+            msg_data->glyph, msg_data->bkglyph);
     } break;
 
     case MSNH_MSG_CLIPAROUND: {
@@ -514,44 +675,22 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
     } break;
 
-    case MSNH_MSG_CLEAR_WINDOW: {
-        int i, j;
-        for (i = 0; i < COLNO; i++)
-            for (j = 0; j < ROWNO; j++) {
-                data->map[i][j] = NO_GLYPH;
-                data->bkmap[i][j] = NO_GLYPH;
-            }
-        InvalidateRect(hWnd, NULL, TRUE);
-    } break;
+    case MSNH_MSG_CLEAR_WINDOW:
+        clearAll(data);
+        break;
 
     case MSNH_MSG_CURSOR: {
         PMSNHMsgCursor msg_data = (PMSNHMsgCursor) lParam;
-        HDC hdc;
-        RECT rt;
 
-        /* move focus rectangle at the cursor postion */
-        hdc = GetDC(hWnd);
+        if (data->xCur != msg_data->x || data->yCur != msg_data->y) {
 
-        nhcoord2display(data, data->xCur, data->yCur, &rt);
-        if (data->bAsciiMode) {
-            PatBlt(hdc, rt.left, rt.top, rt.right - rt.left,
-                   rt.bottom - rt.top, DSTINVERT);
-        } else {
-            DrawFocusRect(hdc, &rt);
+            dirty(data, data->xCur, data->yCur);
+            dirty(data, msg_data->x, msg_data->y);
+
+            data->xCur = msg_data->x;
+            data->yCur = msg_data->y;
         }
-
-        data->xCur = msg_data->x;
-        data->yCur = msg_data->y;
-
-        nhcoord2display(data, data->xCur, data->yCur, &rt);
-        if (data->bAsciiMode) {
-            PatBlt(hdc, rt.left, rt.top, rt.right - rt.left,
-                   rt.bottom - rt.top, DSTINVERT);
-        } else {
-            DrawFocusRect(hdc, &rt);
-        }
-
-        ReleaseDC(hWnd, hdc);
+ 
     } break;
 
     case MSNH_MSG_GETTEXT: {
@@ -583,7 +722,11 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
     } break;
 
-    } /* end switch(wParam) */
+	case MSNH_MSG_RANDOM_INPUT:
+		nhassert(0); // unexpected
+		break;
+
+	} /* end switch(wParam) */
 }
 
 /* on WM_CREATE */
@@ -591,7 +734,6 @@ void
 onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     PNHMapWindow data;
-    int i, j;
 
     UNREFERENCED_PARAMETER(wParam);
     UNREFERENCED_PARAMETER(lParam);
@@ -602,232 +744,314 @@ onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
         panic("out of memory");
 
     ZeroMemory(data, sizeof(NHMapWindow));
-    for (i = 0; i < COLNO; i++)
-        for (j = 0; j < ROWNO; j++) {
-            data->map[i][j] = NO_GLYPH;
-            data->bkmap[i][j] = NO_GLYPH;
-        }
+
+    data->hWnd = hWnd;
 
     data->bAsciiMode = FALSE;
+    data->cursorOn = TRUE;
 
-    data->xScrTile = GetNHApp()->mapTile_X;
-    data->yScrTile = GetNHApp()->mapTile_Y;
+    data->xFrontTile = GetNHApp()->mapTile_X;
+    data->yFrontTile = GetNHApp()->mapTile_Y;
+    data->tileWidth = GetNHApp()->mapTile_X;
+    data->tileHeight = GetNHApp()->mapTile_Y;
+
+    HDC hDC = GetDC(hWnd);
+    data->backBufferDC = CreateCompatibleDC(hDC);
+    data->tileDC = CreateCompatibleDC(hDC);
+    ReleaseDC(hWnd, hDC);
 
     SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
+
+    clearAll(data);
+
 }
+
+static void
+paintTile(PNHMapWindow data, int i, int j, RECT * rect)
+{
+    short ntile;
+    int t_x, t_y;
+    int glyph, bkglyph;
+    int layer;
+#ifdef USE_PILEMARK
+    int color;
+    unsigned special;
+    int mgch;
+#endif
+    layer = 0;
+    glyph = data->map[i][j];
+    bkglyph = data->bkmap[i][j];
+
+    if (glyph == NO_GLYPH && bkglyph == NO_GLYPH) {
+        HBRUSH blackBrush = CreateSolidBrush(RGB(0, 0, 0));
+        FillRect(data->backBufferDC, rect, blackBrush);
+        DeleteObject(blackBrush);
+    }
+
+    if (bkglyph != NO_GLYPH) {
+        ntile = glyph2tile[bkglyph];
+        t_x = TILEBMP_X(ntile);
+        t_y = TILEBMP_Y(ntile);
+
+        StretchBlt(data->backBufferDC, rect->left, rect->top,
+                    data->xBackTile, data->yBackTile, data->tileDC,
+                    t_x, t_y, GetNHApp()->mapTile_X,
+                    GetNHApp()->mapTile_Y, SRCCOPY);
+        layer++;
+    }
+
+    if ((glyph != NO_GLYPH) && (glyph != bkglyph)) {
+        ntile = glyph2tile[glyph];
+        t_x = TILEBMP_X(ntile);
+        t_y = TILEBMP_Y(ntile);
+
+        if (layer > 0) {
+            (*GetNHApp()->lpfnTransparentBlt)(
+                data->backBufferDC, rect->left, rect->top,
+                data->xBackTile, data->yBackTile, data->tileDC, t_x,
+                t_y, GetNHApp()->mapTile_X,
+                GetNHApp()->mapTile_Y, TILE_BK_COLOR);
+        } else {
+            StretchBlt(data->backBufferDC, rect->left, rect->top,
+                        data->xBackTile, data->yBackTile, data->tileDC,
+                        t_x, t_y, GetNHApp()->mapTile_X,
+                        GetNHApp()->mapTile_Y, SRCCOPY);
+        }
+
+        layer++;
+    }
+
+#ifdef USE_PILEMARK
+    /* rely on NetHack core helper routine */
+    (void) mapglyph(data->map[i][j], &mgch, &color, &special,
+                    i, j);
+    if ((glyph != NO_GLYPH) && (special & MG_PET)
+#else
+    if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
+#endif
+        && iflags.wc_hilite_pet) {
+        /* apply pet mark transparently over
+            pet image */
+        HDC hdcPetMark;
+        HBITMAP bmPetMarkOld;
+
+        /* this is DC for petmark bitmap */
+        hdcPetMark = CreateCompatibleDC(data->backBufferDC);
+        bmPetMarkOld =
+            SelectObject(hdcPetMark, GetNHApp()->bmpPetMark);
+
+        (*GetNHApp()->lpfnTransparentBlt)(
+            data->backBufferDC, rect->left, rect->top,
+            data->xBackTile, data->yBackTile, hdcPetMark, 0, 0,
+            TILE_X, TILE_Y, TILE_BK_COLOR);
+        SelectObject(hdcPetMark, bmPetMarkOld);
+        DeleteDC(hdcPetMark);
+    }
+#ifdef USE_PILEMARK
+    if ((glyph != NO_GLYPH) && (special & MG_OBJPILE)
+        && iflags.hilite_pile) {
+        /* apply pilemark transparently over other image */
+        HDC hdcPileMark;
+        HBITMAP bmPileMarkOld;
+
+        /* this is DC for pilemark bitmap */
+        hdcPileMark = CreateCompatibleDC(data->backBufferDC);
+        bmPileMarkOld = SelectObject(hdcPileMark,
+                                        GetNHApp()->bmpPileMark);
+
+        (*GetNHApp()->lpfnTransparentBlt)(
+            data->backBufferDC, rect->left, rect->top,
+            data->xBackTile, data->yBackTile, hdcPileMark, 0, 0,
+            TILE_X, TILE_Y, TILE_BK_COLOR);
+        SelectObject(hdcPileMark, bmPileMarkOld);
+        DeleteDC(hdcPileMark);
+    }
+#endif
+
+    if (i == data->xCur && j == data->yCur && 
+        (data->cursorOn || !win32_cursorblink))
+        DrawFocusRect(data->backBufferDC, rect);
+}
+
+
+static void
+paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
+{
+    if (data->map[i][j] >= 0) {
+
+        char ch;
+        WCHAR wch;
+        int color;
+        unsigned special;
+        int mgch;
+        HBRUSH back_brush;
+        COLORREF OldFg;
+
+        SetBkMode(data->backBufferDC, TRANSPARENT);
+
+        HBRUSH blackBrush = CreateSolidBrush(RGB(0, 0, 0));
+        FillRect(data->backBufferDC, rect, blackBrush);
+        DeleteObject(blackBrush);
+
+    #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
+        nhglyph2charcolor(data->map[i][j], &ch, &color);
+        OldFg = SetTextColor(hDC, nhcolor_to_RGB(color));
+    #else
+        /* rely on NetHack core helper routine */
+        (void) mapglyph(data->map[i][j], &mgch, &color,
+                        &special, i, j);
+        ch = (char) mgch;
+        if (((special & MG_PET) && iflags.hilite_pet)
+            || ((special & (MG_DETECT | MG_BW_LAVA))
+                && iflags.use_inverse)) {
+            back_brush =
+                CreateSolidBrush(nhcolor_to_RGB(CLR_GRAY));
+            FillRect(data->backBufferDC, rect, back_brush);
+            DeleteObject(back_brush);
+            switch (color) {
+            case CLR_GRAY:
+            case CLR_WHITE:
+                OldFg = SetTextColor(
+                    data->backBufferDC, nhcolor_to_RGB(CLR_BLACK));
+                break;
+            default:
+                OldFg =
+                    SetTextColor(data->backBufferDC, nhcolor_to_RGB(color));
+            }
+        } else {
+            OldFg = SetTextColor(data->backBufferDC, nhcolor_to_RGB(color));
+        }
+    #endif
+        if (data->bUnicodeFont) {
+            wch = winos_ascii_to_wide(ch);
+            if (wch == 0x2591 || wch == 0x2592) {
+                int level = 80;
+                HBRUSH brush = CreateSolidBrush(RGB(level, level, level));
+                FillRect(data->backBufferDC, rect, brush);
+                DeleteObject(brush);
+                level = (wch == 0x2591 ? 100 : 200);
+                brush = CreateSolidBrush(RGB(level, level, level));
+                RECT smallRect = { rect->left + 1, rect->top + 1,
+                                    rect->right - 1, rect->bottom - 1 };
+                FillRect(data->backBufferDC, &smallRect, brush);
+                DeleteObject(brush);
+            } else {
+                DrawTextW(data->backBufferDC, &wch, 1, rect,
+                    DT_CENTER | DT_VCENTER | DT_NOPREFIX
+                    | DT_SINGLELINE);
+            }
+        } else {
+            DrawTextA(data->backBufferDC, &ch, 1, rect,
+                        DT_CENTER | DT_VCENTER | DT_NOPREFIX
+                            | DT_SINGLELINE);
+        }
+
+        SetTextColor(data->backBufferDC, OldFg);
+    }
+
+    if (i == data->xCur && j == data->yCur &&
+        (data->cursorOn || !win32_cursorblink)) {
+        int yCursor = (win32_cursorblink ? data->yBlinkCursor :
+                                           data->yNoBlinkCursor);
+        PatBlt(data->backBufferDC, 
+                rect->left, rect->bottom - yCursor,
+                rect->right - rect->left,
+                yCursor,
+                DSTINVERT);
+    }
+}
+
+static void setGlyph(PNHMapWindow data, int i, int j, int fg, int bg)
+{
+    if ((data->map[i][j] != fg) || (data->bkmap[i][j] != bg)) {
+        data->map[i][j] = fg;
+        data->bkmap[i][j] = bg;
+        data->mapDirty[i][j] = TRUE;
+
+        RECT rect;
+        nhcoord2display(data, i, j, &rect);
+        InvalidateRect(data->hWnd, &rect, FALSE);
+    }
+}
+
+static void clearAll(PNHMapWindow data)
+{
+    for (int x = 0; x < COLNO; x++)
+        for (int y = 0; y < ROWNO; y++) {
+            data->map[x][y] = NO_GLYPH;
+            data->bkmap[x][y] = NO_GLYPH;
+            data->mapDirty[x][y] = TRUE;
+        }
+    InvalidateRect(data->hWnd, NULL, FALSE);
+}
+
+static void dirtyAll(PNHMapWindow data)
+{
+    for (int i = 0; i < COLNO; i++)
+        for (int j = 0; j < ROWNO; j++)
+            data->mapDirty[i][j] = TRUE;
+
+    InvalidateRect(data->hWnd, NULL, FALSE);
+}
+
+static void dirty(PNHMapWindow data, int x, int y)
+{
+    data->mapDirty[x][y] = TRUE;
+
+    RECT rt;
+    nhcoord2display(data, data->xCur, data->yCur, &rt);
+
+    InvalidateRect(data->hWnd, &rt, FALSE);
+}
+
+static void
+paint(PNHMapWindow data, int i, int j)
+{
+    RECT rect;
+
+    rect.left = i * data->xBackTile;
+    rect.top = j * data->yBackTile;
+    rect.right = rect.left + data->xBackTile;
+    rect.bottom = rect.top + data->yBackTile;
+
+    if (data->bAsciiMode || Is_rogue_level(&u.uz)) {
+        paintGlyph(data, i, j, &rect);
+    } else {
+        paintTile(data, i, j, &rect);
+    }
+
+    data->mapDirty[i][j] = FALSE;
+}
+
 
 /* on WM_PAINT */
 void
 onPaint(HWND hWnd)
 {
-    PNHMapWindow data;
+    PNHMapWindow data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+    /* update back buffer */
+    HBITMAP savedBitmap = SelectObject(data->tileDC, GetNHApp()->bmpMapTiles);
+
+    for (int i = 0; i < COLNO; i++)
+        for (int j = 0; j < ROWNO; j++)
+            if (data->mapDirty[i][j])
+                paint(data, i, j);
+
+    SelectObject(data->tileDC, savedBitmap);
+
     PAINTSTRUCT ps;
-    HDC hDC;
-    HDC tileDC;
-    HGDIOBJ saveBmp;
-    RECT paint_rt;
-    int i, j;
+    HDC hFrontBufferDC = BeginPaint(hWnd, &ps);
 
-    /* get window data */
-    data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    /* stretch back buffer onto front buffer window */
+    int frontWidth = COLNO * data->xFrontTile;
+    int frontHeight = ROWNO * data->yFrontTile;
 
-    hDC = BeginPaint(hWnd, &ps);
+    StretchBlt(hFrontBufferDC,
+        data->map_orig.x - (data->xPos * data->xFrontTile),
+        data->map_orig.y - (data->yPos * data->yFrontTile), frontWidth, frontHeight,
+                data->backBufferDC, 0, 0, data->backWidth, data->backHeight, SRCCOPY);
 
-    /* calculate paint rectangle */
-    if (!IsRectEmpty(&ps.rcPaint)) {
-        /* calculate paint rectangle */
-        paint_rt.left =
-            max(data->xPos
-                    + (ps.rcPaint.left - data->map_orig.x) / data->xScrTile,
-                0);
-        paint_rt.top = max(
-            data->yPos + (ps.rcPaint.top - data->map_orig.y) / data->yScrTile,
-            0);
-        paint_rt.right = min(
-            data->xPos
-                + (ps.rcPaint.right - data->map_orig.x) / data->xScrTile + 1,
-            COLNO);
-        paint_rt.bottom = min(
-            data->yPos
-                + (ps.rcPaint.bottom - data->map_orig.y) / data->yScrTile + 1,
-            ROWNO);
-
-        if (data->bAsciiMode || Is_rogue_level(&u.uz)) {
-            /* You enter a VERY primitive world! */
-            HGDIOBJ oldFont;
-
-            oldFont = SelectObject(hDC, data->hMapFont);
-            SetBkMode(hDC, TRANSPARENT);
-
-            /* draw the map */
-            for (i = paint_rt.left; i < paint_rt.right; i++)
-                for (j = paint_rt.top; j < paint_rt.bottom; j++)
-                    if (data->map[i][j] >= 0) {
-                        char ch;
-                        TCHAR wch;
-                        RECT glyph_rect;
-                        int color;
-                        unsigned special;
-                        int mgch;
-                        HBRUSH back_brush;
-                        COLORREF OldFg;
-
-                        nhcoord2display(data, i, j, &glyph_rect);
-
-#if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
-                        nhglyph2charcolor(data->map[i][j], &ch, &color);
-                        OldFg = SetTextColor(hDC, nhcolor_to_RGB(color));
-#else
-                        /* rely on NetHack core helper routine */
-                        (void) mapglyph(data->map[i][j], &mgch, &color,
-                                        &special, i, j);
-                        ch = (char) mgch;
-                        if (((special & MG_PET) && iflags.hilite_pet)
-                            || ((special & (MG_DETECT | MG_BW_LAVA))
-                                && iflags.use_inverse)) {
-                            back_brush =
-                                CreateSolidBrush(nhcolor_to_RGB(CLR_GRAY));
-                            FillRect(hDC, &glyph_rect, back_brush);
-                            DeleteObject(back_brush);
-                            switch (color) {
-                            case CLR_GRAY:
-                            case CLR_WHITE:
-                                OldFg = SetTextColor(
-                                    hDC, nhcolor_to_RGB(CLR_BLACK));
-                                break;
-                            default:
-                                OldFg =
-                                    SetTextColor(hDC, nhcolor_to_RGB(color));
-                            }
-                        } else {
-                            OldFg = SetTextColor(hDC, nhcolor_to_RGB(color));
-                        }
-#endif
-
-                        DrawText(hDC, NH_A2W(&ch, &wch, 1), 1, &glyph_rect,
-                                 DT_CENTER | DT_VCENTER | DT_NOPREFIX);
-                        SetTextColor(hDC, OldFg);
-                    }
-            SelectObject(hDC, oldFont);
-        } else {
-            short ntile;
-            int t_x, t_y;
-            int glyph, bkglyph;
-            RECT glyph_rect;
-            int layer;
-#ifdef USE_PILEMARK
-            int color;
-            unsigned special;
-            int mgch;
-#endif
-            /* prepare tiles DC for mapping */
-            tileDC = CreateCompatibleDC(hDC);
-            saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
-
-            /* draw the map */
-            for (i = paint_rt.left; i < paint_rt.right; i++)
-                for (j = paint_rt.top; j < paint_rt.bottom; j++) {
-                    layer = 0;
-                    glyph = data->map[i][j];
-                    bkglyph = data->bkmap[i][j];
-
-                    if (bkglyph != NO_GLYPH) {
-                        ntile = glyph2tile[bkglyph];
-                        t_x = TILEBMP_X(ntile);
-                        t_y = TILEBMP_Y(ntile);
-                        nhcoord2display(data, i, j, &glyph_rect);
-
-                        StretchBlt(hDC, glyph_rect.left, glyph_rect.top,
-                                   data->xScrTile, data->yScrTile, tileDC,
-                                   t_x, t_y, GetNHApp()->mapTile_X,
-                                   GetNHApp()->mapTile_Y, SRCCOPY);
-                        layer ++;
-                    }
-
-                    if ((glyph != NO_GLYPH) && (glyph != bkglyph)) {
-                        ntile = glyph2tile[glyph];
-                        t_x = TILEBMP_X(ntile);
-                        t_y = TILEBMP_Y(ntile);
-                        nhcoord2display(data, i, j, &glyph_rect);
-
-                        if (layer > 0) {
-                            (*GetNHApp()->lpfnTransparentBlt)(
-                                hDC, glyph_rect.left, glyph_rect.top,
-                                data->xScrTile, data->yScrTile, tileDC,
-                                t_x, t_y, GetNHApp()->mapTile_X,
-                                GetNHApp()->mapTile_Y, TILE_BK_COLOR);
-                        } else {
-                            StretchBlt(hDC, glyph_rect.left, glyph_rect.top,
-                                       data->xScrTile, data->yScrTile, tileDC,
-                                       t_x, t_y, GetNHApp()->mapTile_X,
-                                       GetNHApp()->mapTile_Y, SRCCOPY);
-                        }
-
-                        layer ++;
-                     }
-
-#ifdef USE_PILEMARK
-                     /* rely on NetHack core helper routine */
-                     (void) mapglyph(data->map[i][j], &mgch, &color,
-                                        &special, i, j);
-                     if ((glyph != NO_GLYPH) && (special & MG_PET) 
-#else
-                     if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
-#endif
-                           && iflags.wc_hilite_pet) {
-                        /* apply pet mark transparently over
-                           pet image */
-                        HDC hdcPetMark;
-                        HBITMAP bmPetMarkOld;
-
-                        /* this is DC for petmark bitmap */
-                        hdcPetMark = CreateCompatibleDC(hDC);
-                        bmPetMarkOld = SelectObject(
-                            hdcPetMark, GetNHApp()->bmpPetMark);
-
-                        (*GetNHApp()->lpfnTransparentBlt)(
-                            hDC, glyph_rect.left, glyph_rect.top,
-                            data->xScrTile, data->yScrTile, hdcPetMark, 0,
-                            0, TILE_X, TILE_Y, TILE_BK_COLOR);
-                        SelectObject(hdcPetMark, bmPetMarkOld);
-                        DeleteDC(hdcPetMark);
-                    }
-#ifdef USE_PILEMARK
-                    if ((glyph != NO_GLYPH)
-                        && (special & MG_OBJPILE) && iflags.hilite_pile) {
-                        /* apply pilemark transparently over other image */
-                        HDC hdcPileMark;
-                        HBITMAP bmPileMarkOld;
-
-                        /* this is DC for pilemark bitmap */
-                        hdcPileMark = CreateCompatibleDC(hDC);
-                        bmPileMarkOld = SelectObject(
-                            hdcPileMark, GetNHApp()->bmpPileMark);
-
-                        (*GetNHApp()->lpfnTransparentBlt)(
-                            hDC, glyph_rect.left, glyph_rect.top,
-                            data->xScrTile, data->yScrTile, hdcPileMark, 0,
-                            0, TILE_X, TILE_Y, TILE_BK_COLOR);
-                        SelectObject(hdcPileMark, bmPileMarkOld);
-                        DeleteDC(hdcPileMark);                        
-		    }
-#endif
-                }
-
-            SelectObject(tileDC, saveBmp);
-            DeleteDC(tileDC);
-        }
-
-        /* draw focus rect */
-        nhcoord2display(data, data->xCur, data->yCur, &paint_rt);
-        if (data->bAsciiMode) {
-            PatBlt(hDC, paint_rt.left, paint_rt.top,
-                   paint_rt.right - paint_rt.left,
-                   paint_rt.bottom - paint_rt.top, DSTINVERT);
-        } else {
-            DrawFocusRect(hDC, &paint_rt);
-        }
-    }
     EndPaint(hWnd, &ps);
 }
 
@@ -875,14 +1099,14 @@ onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
         yNewPos = data->yPos;
     }
 
-    yNewPos = max(0, min(ROWNO - data->yPageSize + 1, yNewPos));
+    yNewPos = max(0, min(data->yMax, yNewPos));
     if (yNewPos == data->yPos)
         return;
 
     yDelta = yNewPos - data->yPos;
     data->yPos = yNewPos;
 
-    ScrollWindowEx(hWnd, 0, -data->yScrTile * yDelta, (CONST RECT *) NULL,
+    ScrollWindowEx(hWnd, 0, -data->yFrontTile * yDelta, (CONST RECT *) NULL,
                    (CONST RECT *) NULL, (HRGN) NULL, (LPRECT) NULL,
                    SW_INVALIDATE | SW_ERASE);
 
@@ -936,14 +1160,14 @@ onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
         xNewPos = data->xPos;
     }
 
-    xNewPos = max(0, min(COLNO - data->xPageSize + 1, xNewPos));
+    xNewPos = max(0, min(data->xMax, xNewPos));
     if (xNewPos == data->xPos)
         return;
 
     xDelta = xNewPos - data->xPos;
     data->xPos = xNewPos;
 
-    ScrollWindowEx(hWnd, -data->xScrTile * xDelta, 0, (CONST RECT *) NULL,
+    ScrollWindowEx(hWnd, -data->xFrontTile * xDelta, 0, (CONST RECT *) NULL,
                    (CONST RECT *) NULL, (HRGN) NULL, (LPRECT) NULL,
                    SW_INVALIDATE | SW_ERASE);
 
@@ -957,10 +1181,10 @@ onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 void
 nhcoord2display(PNHMapWindow data, int x, int y, LPRECT lpOut)
 {
-    lpOut->left = (x - data->xPos) * data->xScrTile + data->map_orig.x;
-    lpOut->top = (y - data->yPos) * data->yScrTile + data->map_orig.y;
-    lpOut->right = lpOut->left + data->xScrTile;
-    lpOut->bottom = lpOut->top + data->yScrTile;
+    lpOut->left = (x - data->xPos) * data->xFrontTile + data->map_orig.x;
+    lpOut->top = (y - data->yPos) * data->yFrontTile + data->map_orig.y;
+    lpOut->right = lpOut->left + data->xFrontTile;
+    lpOut->bottom = lpOut->top + data->yFrontTile;
 }
 
 #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
@@ -1030,4 +1254,3 @@ nhcolor_to_RGB(int c)
         return GetNHApp()->regMapColors[c];
     return RGB(0x00, 0x00, 0x00);
 }
-

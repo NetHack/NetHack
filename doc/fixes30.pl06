@@ -1,0 +1,38 @@
+This patch contains two major improvements:
+
+First, thanks to Ari Huttunen, different door states show up as different
+(configurable) characters on the screen.
+
+Second, doors can now be entered/exited diagonally both for player and
+monster.
+
+Third, a gaggle of people credited in the appropriate files developed an
+overlay manager for MS-DOS and MSC such that all the options of NetHack can
+be supported.  See Install.dos and ovlmgr.* for further details.
+
+In more minor news:
+
+You no longer have to pick up food to eat it, and you no longer necessarily
+resume eating your interrupted meal.
+
+You can no longer get properties from wielding a non-weapon.
+
+There is a new option, CLIPPING, which allows playing on small screens or
+windows.
+
+The multiple demon types portion of HARD has been split off into the new
+INFERNO option.
+
+The Macintosh port has been further refined.
+
+The / command now takes configurable characters into account when identifying
+items.
+
+Leprechauns and lichs and nymphs and nagas had their letters switched so that
+the more formidable monsters get capital letters.  Several new low-level
+monsters were added.
+
+Drawbridge interactions are much smarter, thanks to Kevin Darcy.
+
+And a large number of minor bug fixes and efficiency enhancements.
+

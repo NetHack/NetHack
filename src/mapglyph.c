@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1448175698 2015/11/22 07:01:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1526429201 2018/05/16 00:06:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,12 @@
 #include "color.h"
 #define HI_DOMESTIC CLR_WHITE /* monst.c */
 
-static int explcolors[] = {
+#if !defined(TTY_GRAPHICS)
+#define has_color(n) TRUE
+#endif
+
+#ifdef TEXTCOLOR
+static const int explcolors[] = {
     CLR_BLACK,   /* dark    */
     CLR_GREEN,   /* noxious */
     CLR_BROWN,   /* muddy   */
@@ -19,11 +24,6 @@ static int explcolors[] = {
     CLR_WHITE,   /* frosty  */
 };
 
-#if !defined(TTY_GRAPHICS)
-#define has_color(n) TRUE
-#endif
-
-#ifdef TEXTCOLOR
 #define zap_color(n) color = iflags.use_color ? zapcolors[n] : NO_COLOR
 #define cmap_color(n) color = iflags.use_color ? defsyms[n].color : NO_COLOR
 #define obj_color(n) color = iflags.use_color ? objects[n].oc_color : NO_COLOR
@@ -230,6 +230,8 @@ mapglyph(int glyph, int *ochar, int *ocolor, unsigned *ospecial, int x, int y)
     *ospecial = special;
 #ifdef TEXTCOLOR
     *ocolor = color;
+#else
+    nhUse(ocolor);
 #endif
     return idx;
 }
@@ -237,7 +239,7 @@ mapglyph(int glyph, int *ochar, int *ocolor, unsigned *ospecial, int x, int y)
 char *
 encglyph(int glyph)
 {
-    static char encbuf[20];
+    static char encbuf[20]; /* 10+1 would suffice */
 
     Sprintf(encbuf, "\\G%04X%04X", context.rndencode, glyph);
     return encbuf;
@@ -255,58 +257,59 @@ encglyph(int glyph)
  * putstr().
  */
 
-void
-genl_putmixed(winid window, int attr, const char *str)
+const char *
+decode_mixed(char *buf, const char *str)
 {
     static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
-    char buf[BUFSZ];
-    const char *cp = str;
     char *put = buf;
 
-    while (*cp) {
-        if (*cp == '\\') {
+    if (!put || !str)
+        return "";
+
+    while (*str) {
+        if (*str == '\\') {
             int rndchk, dcount, so, gv, ch = 0, oc = 0;
             unsigned os = 0;
-            const char *dp, *save_cp;
+            const char *dp, *save_str;
 
-            save_cp = cp++;
-            switch (*cp) {
+            save_str = str++;
+            switch (*str) {
             case 'G': /* glyph value \GXXXXNNNN*/
                 rndchk = dcount = 0;
-                for (++cp; *cp && ++dcount <= 4; ++cp)
-                    if ((dp = index(hex, *cp)) != 0)
+                for (++str; *str && ++dcount <= 4; ++str)
+                    if ((dp = index(hex, *str)) != 0)
                         rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
                     else
                         break;
                 if (rndchk == context.rndencode) {
                     gv = dcount = 0;
-                    for (; *cp && ++dcount <= 4; ++cp)
-                        if ((dp = index(hex, *cp)) != 0)
+                    for (; *str && ++dcount <= 4; ++str)
+                        if ((dp = index(hex, *str)) != 0)
                             gv = (gv * 16) + ((int) (dp - hex) / 2);
                         else
                             break;
                     so = mapglyph(gv, &ch, &oc, &os, 0, 0);
                     *put++ = showsyms[so];
-                    /* 'cp' is ready for the next loop iteration and '*cp'
+                    /* 'str' is ready for the next loop iteration and '*str'
                        should not be copied at the end of this iteration */
                     continue;
                 } else {
                     /* possible forgery - leave it the way it is */
-                    cp = save_cp;
+                    str = save_str;
                 }
                 break;
 #if 0
             case 'S': /* symbol offset */
                 so = rndchk = dcount = 0;
-                for (++cp; *cp && ++dcount <= 4; ++cp)
-                    if ((dp = index(hex, *cp)) != 0)
+                for (++str; *str && ++dcount <= 4; ++str)
+                    if ((dp = index(hex, *str)) != 0)
                         rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
                     else
                         break;
                 if (rndchk == context.rndencode) {
                     dcount = 0;
-                    for (; *cp && ++dcount <= 2; ++cp)
-                        if ((dp = index(hex, *cp)) != 0)
+                    for (; *str && ++dcount <= 2; ++str)
+                        if ((dp = index(hex, *str)) != 0)
                             so = (so * 16) + ((int) (dp - hex) / 2);
                         else
                             break;
@@ -318,11 +321,31 @@ genl_putmixed(winid window, int attr, const char *str)
                 break;
             }
         }
-        *put++ = *cp++;
+        *put++ = *str++;
     }
     *put = '\0';
+    return buf;
+}
+
+/*
+ * This differs from putstr() because the str parameter can
+ * contain a sequence of characters representing:
+ *        \GXXXXNNNN    a glyph value, encoded by encglyph().
+ *
+ * For window ports that haven't yet written their own
+ * XXX_putmixed() routine, this general one can be used.
+ * It replaces the encoded glyph sequence with a single
+ * showsyms[] char, then just passes that string onto
+ * putstr().
+ */
+
+void
+genl_putmixed(winid window, int attr, const char *str)
+{
+    char buf[BUFSZ];
+
     /* now send it to the normal putstr */
-    putstr(window, attr, buf);
+    putstr(window, attr, decode_mixed(buf, str));
 }
 
 /*mapglyph.c*/

@@ -3,7 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
- *  System related functions for MSDOS, OS/2, TOS, and Windows NT
+ *  System related functions for MSDOS, OS/2, TOS
  */
 
 #define NEED_VARARGS
@@ -28,7 +28,7 @@
 #define filesize filesize_nh
 #endif
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(OS2)
 void nethack_exit(int);
 #else
 #define nethack_exit exit
@@ -51,11 +51,7 @@ STATIC_DCL boolean comspec_exists(void);
 #endif
 #endif
 
-#ifdef WIN32
-extern int GUILaunched; /* from nttty.c */
-#endif
-
-#if defined(MICRO) || defined(WIN32)
+#if defined(MICRO)
 
 void
 flushout()
@@ -387,18 +383,9 @@ append_slash(char *name)
     return;
 }
 
-#ifdef WIN32
-boolean getreturn_enabled;
-int redirect_stdout;
-#endif
-
 void
 getreturn(const char *str)
 {
-#ifdef WIN32
-    if (!getreturn_enabled)
-        return;
-#endif
 #ifdef TOS
     msmsg("Hit <Return> %s.", str);
 #else
@@ -409,7 +396,6 @@ getreturn(const char *str)
     return;
 }
 
-#ifndef WIN32
 void msmsg(const char *fmt, ...)
 {
     va_list the_args;
@@ -423,7 +409,6 @@ void msmsg(const char *fmt, ...)
     va_end(the_args);
     return;
 }
-#endif
 
 /*
  * Follow the PATH, trying to fopen the file.
@@ -485,7 +470,7 @@ fopenp(const char *name, const char *mode)
     return (FILE *) 0;
 }
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(OS2)
 void
 nethack_exit(int code)
 {
@@ -508,9 +493,7 @@ msexit()
 
     flushout();
 #ifndef TOS
-#ifndef WIN32
     enable_ctrlP(); /* in case this wasn't done */
-#endif
 #endif
 #ifdef MFLOPPY
     if (ramdisk)
@@ -528,19 +511,7 @@ msexit()
         restore_colors();
 #endif
 #endif
-#ifdef WIN32
-    /* Only if we started from the GUI, not the command prompt,
-     * we need to get one last return, so the score board does
-     * not vanish instantly after being created.
-     * GUILaunched is defined and set in nttty.c.
-     */
-    synch_cursor();
-    if (GUILaunched)
-        getreturn("to end");
-    synch_cursor();
-#endif
-    getreturn_enabled = TRUE;
     wait_synch();
     return;
 }
-#endif /* MICRO || WIN32 || OS2 */
+#endif /* MICRO || OS2 */

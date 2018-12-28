@@ -16,6 +16,16 @@
   <PropertyGroup>
     <OutDir>$(BinDir)</OutDir>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="Exists('$(PDCURSES)')">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(PDCURSES);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+	  <PreprocessorDefinitions>CURSES_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+	<Link>
+      <AdditionalLibraryDirectories>$(ToolsDir)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>PDCurses.lib;%(AdditionalDependencies)</AdditionalDependencies>
+	  </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/Gs /Oi- %(AdditionalOptions)</AdditionalOptions>
@@ -24,7 +34,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;SAFEPROCS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -84,7 +94,6 @@
     <ClCompile Include="$(SrcDir)mondata.c" />
     <ClCompile Include="$(SrcDir)monmove.c" />
     <ClCompile Include="$(SrcDir)monst.c" />
-    <ClCompile Include="$(SrcDir)monstr.c" />
     <ClCompile Include="$(SrcDir)mplayer.c" />
     <ClCompile Include="$(SrcDir)mthrowu.c" />
     <ClCompile Include="$(SrcDir)muse.c" />
@@ -142,19 +151,26 @@
     <ClCompile Include="$(SrcDir)zap.c" />
     <ClCompile Include="$(SysShareDir)cppregex.cpp" />
     <ClCompile Include="$(SysShareDir)nhlan.c" />
-    <ClCompile Include="$(SysShareDir)pcmain.c" />
-    <ClCompile Include="$(SysShareDir)pcsys.c" />
-    <ClCompile Include="$(SysShareDir)pcunix.c" />
     <ClCompile Include="$(SysShareDir)random.c" />
     <ClCompile Include="$(SysWinntDir)ntsound.c" />
     <ClCompile Include="$(SysWinntDir)nttty.c" />
     <ClCompile Include="$(SysWinntDir)stubs.c">
       <PreprocessorDefinitions>GUISTUB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="$(SysWinntDir)windmain.c" />
     <ClCompile Include="$(SysWinntDir)winnt.c" />
+    <ClCompile Include="$(WinShareDir)safeproc.c" />
     <ClCompile Include="$(WinTtyDir)getline.c" />
     <ClCompile Include="$(WinTtyDir)topl.c" />
     <ClCompile Include="$(WinTtyDir)wintty.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursdial.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursinit.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursinvt.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursmain.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursmesg.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursmisc.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursstat.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)curswins.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(IncDir)align.h" />
@@ -213,6 +229,13 @@
     <ClInclude Include="$(IncDir)you.h" />
     <ClInclude Include="$(IncDir)youprop.h" />
     <ClInclude Include="$(WinWin32Dir)nhresource.h" />
+    <ClInclude Include="$(WinCursDir)cursdial.h" />
+    <ClInclude Include="$(WinCursDir)cursinit.h" />
+    <ClInclude Include="$(WinCursDir)cursinvt.h" />
+    <ClInclude Include="$(WinCursDir)cursmesg.h" />
+    <ClInclude Include="$(WinCursDir)cursmisc.h" />
+    <ClInclude Include="$(WinCursDir)cursstat.h" />
+    <ClInclude Include="$(WinCursDir)curswins.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(WinWin32Dir)NetHack.rc" />

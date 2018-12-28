@@ -45,14 +45,14 @@ struct DataBlock {
     unsigned char *data;
 };
 
-static boolean FDECL(read_data_block, (struct Bitstream *gif, struct DataBlock *block));
-static void FDECL(free_data_block, (struct DataBlock *block));
-static unsigned short FDECL(read_u16, (const unsigned char buf[2]));
-static void FDECL(init_decoder, (struct Bitstream *gif, unsigned bit_width));
-static void FDECL(reset_decoder, (struct Bitstream *gif));
-static int FDECL(decode, (struct Bitstream *gif, struct DataBlock *block));
-static int FDECL(get_code, (struct Bitstream *gif, struct DataBlock *block));
-static unsigned FDECL(interlace_incr, (unsigned y, unsigned height));
+static boolean read_data_block(struct Bitstream *gif, struct DataBlock *block);
+static void free_data_block(struct DataBlock *block);
+static unsigned short read_u16(const unsigned char buf[2]);
+static void init_decoder(struct Bitstream *gif, unsigned bit_width);
+static void reset_decoder(struct Bitstream *gif);
+static int decode(struct Bitstream *gif, struct DataBlock *block);
+static int get_code(struct Bitstream *gif, struct DataBlock *block);
+static unsigned interlace_incr(unsigned y, unsigned height);
 
 /*
  * GIF specifies a canvas, which may have a palette (the "global color table")
