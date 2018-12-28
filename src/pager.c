@@ -1917,7 +1917,7 @@ static struct {
     { port_help, "%s-specific help and commands." },
 #endif
     { dispfile_debughelp, "List of wizard-mode commands." },
-    { (void NDECL((*))) 0, (char *) 0 }
+    { (void (*)(void)) 0, (char *) 0 }
 };
 
 /* the '?' command */

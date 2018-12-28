@@ -408,12 +408,12 @@ void impossible(const char *s, ...)
     paniclog("impossible", pbuf);
     if (iflags.debug_fuzzer)
         panic("%s", pbuf);
-    pline("%s", VA_PASS1(pbuf));
+    pline("%s", pbuf);
     /* reuse pbuf[] */
     Strcpy(pbuf, "Program in disorder!");
     if (program_state.something_worth_saving)
         Strcat(pbuf, "  (Saving and reloading may fix this problem.)");
-    pline("%s", VA_PASS1(pbuf));
+    pline("%s", pbuf);
 
     program_state.in_impossible = 0;
     va_end(the_args);
@@ -463,7 +463,6 @@ execplinehandler(const char *line)
 /*
  * varargs handling for files.c
  */
-#if defined(USE_STDARG) || defined(USE_VARARGS)
 static void vconfig_error_add(const char *, va_list);
 
 /*VARARGS1*/
@@ -476,27 +475,12 @@ config_error_add(const char *str, ...)
     va_end(the_args);
 }
 
-# ifdef USE_STDARG
 static void
 vconfig_error_add(const char *str, va_list the_args)
-# else
-static void
-vconfig_error_add(str, the_args)
-const char *str;
-va_list the_args;
-# endif
-
-#else /* !(USE_STDARG || USE_VARARG) => USE_OLDARGS */
-
-/*VARARGS1*/
-void
-config_error_add
-VA_DECL(const char *, str)
-#endif /* ?(USE_STDARG || USE_VARARG) */
 {       /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
     char buf[2 * BUFSZ];
 
-    Vsprintf(buf, str, VA_ARGS);
+    Vsprintf(buf, str, the_args);
     buf[BUFSZ - 1] = '\0';
     config_erradd(buf);
 

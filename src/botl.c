@@ -458,7 +458,8 @@ STATIC_DCL int status_hilite_menu_choose_field(void);
 STATIC_DCL int status_hilite_menu_choose_behavior(int);
 STATIC_DCL int status_hilite_menu_choose_updownboth(int, const char *,
                                                     boolean, boolean);
-STATIC_DCL boolean status_hilite_menu_add(int);#define has_hilite(i) (blstats[0][(i)].thresholds)
+STATIC_DCL boolean status_hilite_menu_add(int);
+#define has_hilite(i) (blstats[0][(i)].thresholds)
 #endif
 
 #define INIT_BLSTAT(name, fmtstr, anytyp, wid, fld)                     \

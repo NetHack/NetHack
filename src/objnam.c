@@ -2692,7 +2692,7 @@ rnd_otyp_by_wpnskill(schar skill)
 }
 
 STATIC_OVL short
-rnd_otyp_by_namedesc(char *name, char oclass,
+rnd_otyp_by_namedesc(const char *name, char oclass,
 int xtra_prob /* to force 0% random generation items to also be considered */)
 {
     int i, n = 0;

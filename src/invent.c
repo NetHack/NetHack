@@ -18,7 +18,7 @@ STATIC_DCL char *loot_xname(struct obj *);
 STATIC_DCL int CFDECLSPEC sortloot_cmp(const genericptr,
                                        const genericptr);
 STATIC_DCL void reorder_invent(void);
-STATIC_DCL void noarmor(BOOLEAN_P);
+STATIC_DCL void noarmor(boolean);
 STATIC_DCL void invdisp_nothing(const char *, const char *);
 STATIC_DCL boolean worn_wield_only(struct obj *);
 STATIC_DCL boolean only_here(struct obj *);
@@ -31,7 +31,7 @@ STATIC_PTR char *safeq_xprname(struct obj *);
 STATIC_PTR char *safeq_shortxprname(struct obj *);
 STATIC_DCL char display_pickinv(const char *, const char *,
                                         const char *, boolean, long *);
-STATIC_DCL char display_used_invlets(CHAR_P);
+STATIC_DCL char display_used_invlets(char);
 STATIC_DCL boolean this_type_only(struct obj *);
 STATIC_DCL void dounpaid(void);
 STATIC_DCL struct obj *find_unpaid(struct obj *, struct obj **);
@@ -448,7 +448,7 @@ sortloot(olist, mode, by_nexthere, filterfunc)
 struct obj **olist; /* previous version might have changed *olist, we don't */
 unsigned mode; /* flags for sortloot_cmp() */
 boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
-boolean FDECL((*filterfunc), (OBJ_P));
+boolean (*filterfunc)(OBJ_P);
 {
     Loot *sliarray;
     struct obj *o;
@@ -1418,7 +1418,7 @@ getobj(register const char *let, register const char *word)
     /* force invent to be in invlet order before collecting candidate
        inventory letters */
     sortedinvent = sortloot(&invent, SORTLOOT_INVLET, FALSE,
-                            (boolean FDECL((*), (OBJ_P))) 0);
+                            (boolean (*)(OBJ_P)) 0);
 
     for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         if (&bp[foo] == &buf[sizeof buf - 1]
@@ -2064,7 +2064,7 @@ askchain(struct obj **objchn, /* *objchn might change */
     /* someday maybe we'll sort by 'olets' too (temporarily replace
        flags.packorder and pass SORTLOOT_PACK), but not yet... */
     sortedchn = sortloot(objchn, SORTLOOT_INVLET, FALSE,
-                         (boolean FDECL((*), (OBJ_P))) 0);
+                         (boolean (*)(OBJ_P)) 0);
 
     first = TRUE;
     /*
@@ -2549,7 +2549,7 @@ display_pickinv(register const char *lets,
     if (flags.sortpack)
         sortflags |= SORTLOOT_PACK;
     sortedinvent = sortloot(&invent, sortflags, FALSE,
-                            (boolean FDECL((*), (OBJ_P))) 0);
+                            (boolean (*)(OBJ_P)) 0);
 
     start_menu(win);
     any = zeroany;
