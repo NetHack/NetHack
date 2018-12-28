@@ -1456,7 +1456,7 @@ ifeq "$(ADD_CURSES)" "Y"
 $(O)cursdial.o: $(WCURSES)/cursdial.c $(WCURSES)/cursdial.h $(INCL)/wincurs.h
 $(O)cursinit.o: $(WCURSES)/cursinit.c $(WCURSES)/cursinit.h $(INCL)/wincurs.h $(INCL)/date.h
 $(O)cursinvt.o: $(WCURSES)/cursinvt.c $(WCURSES)/cursinvt.h $(INCL)/wincurs.h
-$(O)cursmain.o: $(WCURSES)/cursmain.c $(WCURSES)/cursmain.h $(INCL)/wincurs.h
+$(O)cursmain.o: $(WCURSES)/cursmain.c $(INCL)/wincurs.h
 $(O)cursmesg.o: $(WCURSES)/cursmesg.c $(WCURSES)/cursmesg.h $(INCL)/wincurs.h
 $(O)cursmisc.o: $(WCURSES)/cursmisc.c $(WCURSES)/cursmisc.h $(INCL)/wincurs.h
 $(O)cursstat.o: $(WCURSES)/cursstat.c $(WCURSES)/cursstat.h $(INCL)/wincurs.h
