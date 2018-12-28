@@ -8,6 +8,7 @@
 #include "wincurs.h"
 #include "cursinit.h"
 #include "patchlevel.h"
+#include "date.h"
 
 #include <ctype.h>
 
