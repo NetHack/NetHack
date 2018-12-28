@@ -3228,7 +3228,7 @@ struct obj *obj;
             (void) thitmonst(mtmp, uwep);
             return 1;
         }
-    /* FALL THROUGH */
+    /*FALLTHRU*/
     case 3: /* Surface */
         if (IS_AIR(levl[cc.x][cc.y].typ) || is_pool(cc.x, cc.y))
             pline_The("hook slices through the %s.", surface(cc.x, cc.y));
