@@ -1143,6 +1143,7 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
                 curpage = menu_operation(win, menu, INVERT, 0);
                 break;
             }
+            /*FALLTHRU*/
         default:
             if (isdigit(curletter)) {
                 count = curses_get_count(curletter - '0');
@@ -1255,6 +1256,8 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
                     if (how == PICK_ONE) {
                         menu_clear_selections(menu);
                         menu_select_deselect(win, menu_item_ptr, SELECT);
+                        if (count)
+                            menu_item_ptr->count = count;
                         num_selected = 1;
                         dismiss = TRUE;
                         break;
