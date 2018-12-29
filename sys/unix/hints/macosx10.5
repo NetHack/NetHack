@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  macosx10.5 $NHDT-Date: 1447844587 2015/11/18 11:03:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $
+# NetHack 3.6  macosx10.5 $NHDT-Date: 1546082882 2018/12/29 11:28:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -76,13 +76,19 @@ CFLAGS += -DNOTTYGRAPHICS
 endif	# !WANT_WIN_TTY
 
 ifdef WANT_WIN_X11
+WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
+VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
+CFLAGS += -DX11_GRAPHICS
+ifdef USE_XPM
+CFLAGS += -DUSE_XPM
+WINX11LIB += -lXpm
+VARDATND += rip.xpm
+endif
 WINSRC += $(WINX11SRC)
 WINOBJ += $(WINX11OBJ)
 WINLIB += $(WINX11LIB)
 LFLAGS=-L/usr/X11R6/lib
-VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
-POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
-CFLAGS += -DX11_GRAPHICS
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
