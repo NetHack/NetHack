@@ -1,4 +1,4 @@
-/* $NHDT-Date: 1524689304 2018/04/25 20:48:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $ */
+/* $NHDT-Date: 1546081295 2018/12/29 11:01:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $ */
 /*      Copyright (c) 2017 by Pasi Kallinen                       */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,10 +27,11 @@ static unsigned char
 pix_to_colormap(pix)
 pixel pix;
 {
-    unsigned i;
+    unsigned long i;
 
     for (i = 0; i < header.ncolors; i++) {
-        if (pix.r == ColorMap[CM_RED][i] && pix.g == ColorMap[CM_GREEN][i]
+        if (pix.r == ColorMap[CM_RED][i]
+            && pix.g == ColorMap[CM_GREEN][i]
             && pix.b == ColorMap[CM_BLUE][i])
             break;
     }
@@ -129,7 +130,8 @@ static int
 xpm_write(fp)
 FILE *fp;
 {
-    int i, j, n;
+    unsigned long i, j;
+    unsigned n;
 
     if (header.ncolors > 64) {
         Fprintf(stderr, "Sorry, only configured for up to 64 colors\n");
@@ -144,7 +146,7 @@ FILE *fp;
             header.ncolors, 1 /* char per color */);
     for (i = 0; i < header.ncolors; i++)
         Fprintf(fp, "\"%c  c #%02x%02x%02x\",\n",
-                i + '0', /* just one char per color */
+                (char) (i + '0'), /* just one char per color */
                 x11_colormap[i][0], x11_colormap[i][1], x11_colormap[i][2]);
 
     n = 0;
@@ -179,7 +181,9 @@ char **argv;
     header.per_row = TILES_PER_ROW;
 
     if (argc == 1) {
-        Fprintf(stderr, "usage: %s txt_file1 [txt_file2 ...] [-grayscale txt_fileN]\n", argv[0]);
+        Fprintf(stderr,
+                "usage: %s txt_file1 [txt_file2 ...] [-grayscale txt_fileN]\n",
+                argv[0]);
         exit(1);
     }
 
