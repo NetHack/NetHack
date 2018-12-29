@@ -1356,6 +1356,9 @@ const char *str;
 #ifndef NO_TERMS    /*(until this gets added to the window interface)*/
     tty_shutdown(); /* cleanup termcap/terminfo/whatever */
 #endif
+#ifdef WIN32
+    nttty_exit();
+#endif
     iflags.window_inited = 0;
 }
 
