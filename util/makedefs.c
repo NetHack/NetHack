@@ -1674,6 +1674,12 @@ static const char *build_opts[] = {
     "terminal capability library",
 #endif
 #endif
+#ifdef USE_XPM
+    "tile_file in XPM format",
+#endif
+#ifdef GRAPHIC_TOMBSTONE
+    "graphical RIP screen",
+#endif
 #ifdef TIMED_DELAY
     "timed wait for display effects",
 #endif

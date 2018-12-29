@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  macosx10.11 $NHDT-Date: 1515549543 2018/01/10 01:59:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $
+# NetHack 3.6  macosx10.11 $NHDT-Date: 1546082880 2018/12/29 11:28:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.50 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -106,15 +106,21 @@ WINLIB += -lncurses
 endif
 
 ifdef WANT_WIN_X11
-WINSRC += $(WINX11SRC)
-WINOBJ += $(WINX11OBJ)
-WINLIB += $(WINX11LIB)
-LFLAGS=-L/opt/X11/lib
+WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
 POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir);
 CFLAGS += -DX11_GRAPHICS -I/opt/X11/include
 # avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
 CFLAGS += -Wno-variadic-macros
+ifdef USE_XPM
+CFLAGS += -DUSE_XPM
+WINX11LIB += -lXpm
+VARDATND += rip.xpm
+endif
+WINSRC += $(WINX11SRC)
+WINOBJ += $(WINX11OBJ)
+WINLIB += $(WINX11LIB)
+LFLAGS=-L/opt/X11/lib
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT

@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1539392992 2018/10/13 01:09:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1546081304 2018/12/29 11:01:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1440,16 +1440,16 @@ static XtResource resources[] = {
       sizeof(XtRPixel), XtOffset(AppResources *, pilemark_color), XtRString,
       nhStr("Green") },
 #ifdef GRAPHIC_TOMBSTONE
-    { nhStr("tombstone"), "Tombstone", XtRString, sizeof(String),
-      XtOffset(AppResources *, tombstone), XtRString, "rip.xpm" },
-    { nhStr("tombtext_x"), "Tombtext_x", XtRInt, sizeof(int),
-      XtOffset(AppResources *, tombtext_x), XtRString, "155" },
-    { nhStr("tombtext_y"), "Tombtext_y", XtRInt, sizeof(int),
-      XtOffset(AppResources *, tombtext_y), XtRString, "78" },
-    { nhStr("tombtext_dx"), "Tombtext_dx", XtRInt, sizeof(int),
-      XtOffset(AppResources *, tombtext_dx), XtRString, "0" },
-    { nhStr("tombtext_dy"), "Tombtext_dy", XtRInt, sizeof(int),
-      XtOffset(AppResources *, tombtext_dy), XtRString, "13" },
+    { nhStr("tombstone"), nhStr("Tombstone"), XtRString, sizeof(String),
+      XtOffset(AppResources *, tombstone), XtRString, nhStr("rip.xpm") },
+    { nhStr("tombtext_x"), nhStr("Tombtext_x"), XtRInt, sizeof(int),
+      XtOffset(AppResources *, tombtext_x), XtRString, nhStr("155") },
+    { nhStr("tombtext_y"), nhStr("Tombtext_y"), XtRInt, sizeof(int),
+      XtOffset(AppResources *, tombtext_y), XtRString, nhStr("78") },
+    { nhStr("tombtext_dx"), nhStr("Tombtext_dx"), XtRInt, sizeof(int),
+      XtOffset(AppResources *, tombtext_dx), XtRString, nhStr("0") },
+    { nhStr("tombtext_dy"), nhStr("Tombtext_dy"), XtRInt, sizeof(int),
+      XtOffset(AppResources *, tombtext_dy), XtRString, nhStr("13") },
 #endif
 };
 

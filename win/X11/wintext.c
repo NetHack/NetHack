@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintext.c	$NHDT-Date: 1543622533 2018/12/01 00:02:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6	wintext.c	$NHDT-Date: 1546081305 2018/12/29 11:01:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -204,7 +204,7 @@ boolean blocking;
 #ifdef GRAPHIC_TOMBSTONE
     if (text_info->is_rip) {
         Widget rip = create_ripout_widget(XtParent(wp->w));
-        XtSetArg(args[num_args], XtNfromVert, rip);
+        XtSetArg(args[num_args], nhStr(XtNfromVert), rip);
         num_args++;
     }
 #endif
@@ -533,7 +533,7 @@ calculate_rip_text(int how, time_t when)
 static void
 rip_exposed(w, client_data, widget_data)
 Widget w;
-XtPointer client_data; /* unused */
+XtPointer client_data UNUSED;
 XtPointer widget_data; /* expose event from Window widget */
 {
     XExposeEvent *event = (XExposeEvent *) widget_data;
