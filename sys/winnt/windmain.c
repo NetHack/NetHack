@@ -47,6 +47,7 @@ void FDECL(windows_raw_print, (const char *));
 char FDECL(windows_yn_function, (const char *, const char *, CHAR_P));
 void FDECL(windows_getlin, (const char *, char *));
 extern int NDECL(windows_console_custom_nhgetch);
+void NDECL(safe_routines);
 
 char orgdir[PATHLEN];
 char *dir;
@@ -93,11 +94,7 @@ char *argv[];
      * Get a set of valid safe windowport function
      * pointers during early startup initialization.
      */
-    if (!WINDOWPORT("safe-startup"))
-        windowprocs = *get_safe_procs(1);
-    if (!GUILaunched)
-        windowprocs.win_nhgetch = windows_console_custom_nhgetch;
-
+    safe_routines();
     sys_early_init();
 #ifdef _MSC_VER
 # ifdef DEBUG
@@ -568,6 +565,19 @@ nhusage()
     else
         (void) printf("%s\n", buf1);
 #undef ADD_USAGE
+}
+
+void
+safe_routines(VOID_ARGS)
+{
+    /*
+     * Get a set of valid safe windowport function
+     * pointers during early startup initialization.
+     */
+    if (!WINDOWPORT("safe-startup"))
+        windowprocs = *get_safe_procs(1);
+    if (!GUILaunched)
+        windowprocs.win_nhgetch = windows_console_custom_nhgetch;
 }
 
 #ifdef PORT_HELP
