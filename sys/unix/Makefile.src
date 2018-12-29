@@ -287,7 +287,7 @@ WINBEOBJ =
 #
 # libraries for X11
 # If USE_XPM is defined in config.h, you will also need -lXpm here.
-WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
+#WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 # WINX11LIB = -lXaw -lXmu -lXt -lX11
 # WINX11LIB = -lXaw -lXmu -lXext -lXt -lXpm -lX11 -lm
 # WINX11LIB = -lXaw -lXmu -lXpm -lXext -lXt -lX11 -lSM -lICE -lm # BSD/OS 2.0

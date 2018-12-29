@@ -35,12 +35,17 @@ WINLIB = $(WINX11LIB)
 
 VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
 
-#WINTTYLIB=-lcurses
+WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 
 CHOWN=true
 CHGRP=true
 VARDIRPERM = 0755
 VARFILEPERM = 0600
 GAMEPERM = 0755
+
+# Use XPM format tile file
+CFLAGS+=-DUSE_XPM
+WINX11LIB+=-lXpm
+VARDATND+=rip.xpm
 
 # note: needs libxt-dev libxaw7-dev libx11-dev bdftopcf

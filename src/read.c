@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1526728750 2018/05/19 11:19:10 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1546053040 2018/12/29 03:10:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2488,8 +2488,13 @@ struct _create_particular_data *d;
     if (d->which >= LOW_PM)
         return TRUE; /* got one */
     d->monclass = name_to_monclass(bufp, &d->which);
+
     if (d->which >= LOW_PM) {
         d->monclass = MAXMCLASSES; /* matters below */
+        return TRUE;
+    } else if (d->monclass == S_invisible) { /* not an actual monster class */
+        d->which = PM_STALKER;
+        d->monclass = MAXMCLASSES;
         return TRUE;
     } else if (d->monclass > 0) {
         d->which = g.urole.malenum; /* reset from NON_PM */
