@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.218 $ $NHDT-Date: 1546144745 2018/12/30 04:39:05 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.219 $ $NHDT-Date: 1546212616 2018/12/30 23:30:16 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -319,6 +319,9 @@ when merging a stack where internal ID is used to adjust shop prices, always
 	from shop, not when selling; doesn't affect items already on bill)
 since knives became stackable in 3.6.0, fake player monsters could be given
 	multi-quantity stacks for weapons (scalpel, athame) they never throw
+using 'O' to attempt to set bouldersym to a monster letter or warning digit
+	while it still had its default value would override the display value
+	for it to be <NUL> ('\0') after 'badoption' feedback
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
