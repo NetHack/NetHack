@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1545774524 2018/12/25 21:48:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.145 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1546144745 2018/12/30 04:39:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -861,9 +861,9 @@ struct permonst **for_supplement;
 
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
-        for (i = 0; i < MAXMCLASSES; i++) {
+        for (i = 1; i < MAXMCLASSES; i++) {
             if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
-                && def_monsyms[i].explain) {
+                && def_monsyms[i].explain && *def_monsyms[i].explain) {
                 need_to_look = TRUE;
                 if (!found) {
                     Sprintf(out_str, "%s%s",
@@ -1235,7 +1235,7 @@ coord *click_cc;
         }
 
         found = do_screen_description(cc, (from_screen || clicklook), sym,
-                                  out_str, &firstmatch, &supplemental_pm);
+                                      out_str, &firstmatch, &supplemental_pm);
 
         /* Finally, print out our explanation. */
         if (found) {
