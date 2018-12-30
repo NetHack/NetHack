@@ -5196,7 +5196,7 @@ boolean setinitial, setfromfile;
         int res, which_set, setcount = 0, chosen = -2;
 
         which_set = rogueflag ? ROGUESET : PRIMARY;
-        symset_list = (struct symsetentry *) 0;
+        g.symset_list = (struct symsetentry *) 0;
         /* clear symset[].name as a flag to read_sym_file() to build list */
         symset_name = g.symset[which_set].name;
         g.symset[which_set].name = (char *) 0;
@@ -5257,7 +5257,7 @@ boolean setinitial, setfromfile;
 
             if (chosen > -1) {
                 /* chose an actual symset name from file */
-                for (sl = symset_list; sl; sl = sl->next)
+                for (sl = g.symset_list; sl; sl = sl->next)
                     if (sl->idx == chosen)
                         break;
                 if (sl) {
