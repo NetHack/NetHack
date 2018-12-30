@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1545702598 2018/12/25 01:49:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1546144856 2018/12/30 04:40:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3202,37 +3202,26 @@ int which_set;
 
             switch (symp->idx) {
             case 0:
-                tmpsp =
-                    (struct symsetentry *) alloc(sizeof (struct symsetentry));
-                tmpsp->next = (struct symsetentry *) 0;
-                if (!g.symset_list) {
-                    g.symset_list = tmpsp;
-                    g.symset_count = 0;
-                } else {
-                    g.symset_count++;
-                    tmpsp->next = g.symset_list;
-                    g.symset_list = tmpsp;
-                }
-                tmpsp->idx = g.symset_count;
+                tmpsp = (struct symsetentry *) alloc(sizeof *tmpsp);
+                tmpsp->next = g.symset_list;
+                g.symset_list = tmpsp;
+                tmpsp->idx = g.symset_count++;
                 tmpsp->name = dupstr(bufp);
                 tmpsp->desc = (char *) 0;
-                tmpsp->nocolor = 0;
+                tmpsp->handling = H_UNK;
                 /* initialize restriction bits */
+                tmpsp->nocolor = 0;
                 tmpsp->primary = 0;
                 tmpsp->rogue = 0;
                 break;
             case 2:
                 /* handler type identified */
                 tmpsp = g.symset_list; /* most recent symset */
-                tmpsp->handling = H_UNK;
-                i = 0;
-                while (known_handling[i]) {
+                for (i = 0; known_handling[i]; ++i)
                     if (!strcmpi(known_handling[i], bufp)) {
                         tmpsp->handling = i;
-                        break; /* while loop */
+                        break; /* for loop */
                     }
-                    i++;
-                }
                 break;
             case 3:                  /* description:something */
                 tmpsp = g.symset_list; /* most recent symset */
