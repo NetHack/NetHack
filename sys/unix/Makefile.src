@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1543447374 2018/11/28 23:22:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1546137503 2018/12/30 02:38:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.66 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -790,7 +790,7 @@ cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursstat.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursstat.c
 cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursinit.h ../include/patchlevel.h ../include/date.h
+		../win/curses/cursinit.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursinit.c
 cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursmesg.h

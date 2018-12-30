@@ -16,9 +16,7 @@ curses_update_inv(void)
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
     boolean border;
-    int x = 0;
-    int y = 0;
-    attr_t attr = A_UNDERLINE;
+    int x = 0, y = 0;
 
     /* Check if the inventory window is enabled in first place */
     if (!win) {

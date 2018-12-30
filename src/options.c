@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1544773907 2018/12/14 07:51:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.347 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1546144857 2018/12/30 04:40:57 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5201,8 +5201,7 @@ boolean setinitial, setfromfile;
     } else if (!strcmp("symset", optname)
                || !strcmp("roguesymset", optname)) {
         menu_item *symset_pick = (menu_item *) 0;
-        boolean primaryflag = (*optname == 's'),
-                rogueflag = (*optname == 'r'),
+        boolean rogueflag = (*optname == 'r'),
                 ready_to_switch = FALSE,
                 nothing_to_do = FALSE;
         char *symset_name, fmtstr[20];
@@ -5210,37 +5209,33 @@ boolean setinitial, setfromfile;
         int res, which_set, setcount = 0, chosen = -2;
 
         which_set = rogueflag ? ROGUESET : PRIMARY;
-
+        symset_list = (struct symsetentry *) 0;
         /* clear symset[].name as a flag to read_sym_file() to build list */
         symset_name = symset[which_set].name;
         symset[which_set].name = (char *) 0;
-        symset_list = (struct symsetentry *) 0;
 
         res = read_sym_file(which_set);
-        if (res && symset_list) {
-            char symsetchoice[BUFSZ];
-            int let = 'a', biggest = 0, thissize = 0;
 
-            sl = symset_list;
-            while (sl) {
+        /* put symset name back */
+        symset[which_set].name = symset_name;
+
+        if (res && symset_list) {
+            int thissize, biggest = 0;
+
+            for (sl = symset_list; sl; sl = sl->next) {
                 /* check restrictions */
-                if ((!rogueflag && sl->rogue)
-                    || (!primaryflag && sl->primary)) {
-                    sl = sl->next;
+                if (rogueflag ? sl->primary : sl->rogue)
                     continue;
-                }
+
                 setcount++;
                 /* find biggest name */
-                if (sl->name)
-                    thissize = strlen(sl->name);
+                thissize = sl->name ? (int) strlen(sl->name) : 0;
                 if (thissize > biggest)
                     biggest = thissize;
-                sl = sl->next;
             }
             if (!setcount) {
-                pline("There are no appropriate %ssymbol sets available.",
-                      (rogueflag) ? "rogue level "
-                                  : (primaryflag) ? "primary " : "");
+                pline("There are no appropriate %s symbol sets available.",
+                      rogueflag ? "rogue level" : "primary");
                 return TRUE;
             }
 
@@ -5249,29 +5244,20 @@ boolean setinitial, setfromfile;
             start_menu(tmpwin);
             any = zeroany;
             any.a_int = 1;
-            add_menu(tmpwin, NO_GLYPH, &any, let++, 0, ATR_NONE,
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "Default Symbols", MENU_UNSELECTED);
 
-            sl = symset_list;
-            while (sl) {
+            for (sl = symset_list; sl; sl = sl->next) {
                 /* check restrictions */
-                if ((!rogueflag && sl->rogue)
-                    || (!primaryflag && sl->primary)) {
-                    sl = sl->next;
+                if (rogueflag ? sl->primary : sl->rogue)
                     continue;
-                }
+
                 if (sl->name) {
                     any.a_int = sl->idx + 2;
-                    Sprintf(symsetchoice, fmtstr, sl->name,
-                            sl->desc ? sl->desc : "");
-                    add_menu(tmpwin, NO_GLYPH, &any, let, 0, ATR_NONE,
-                             symsetchoice, MENU_UNSELECTED);
-                    if (let == 'z')
-                        let = 'A';
-                    else
-                        let++;
+                    Sprintf(buf, fmtstr, sl->name, sl->desc ? sl->desc : "");
+                    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                             buf, MENU_UNSELECTED);
                 }
-                sl = sl->next;
             }
             Sprintf(buf, "Select %ssymbol set:",
                     rogueflag ? "rogue level " : "");
@@ -5284,30 +5270,20 @@ boolean setinitial, setfromfile;
 
             if (chosen > -1) {
                 /* chose an actual symset name from file */
-                sl = symset_list;
-                while (sl) {
-                    if (sl->idx == chosen) {
-                        if (symset_name) {
-                            free((genericptr_t) symset_name);
-                            symset_name = (char *) 0;
-                        }
-                        /* free the now stale attributes */
-                        clear_symsetentry(which_set, TRUE);
-
-                        /* transfer only the name of the symbol set */
-                        symset[which_set].name = dupstr(sl->name);
-                        ready_to_switch = TRUE;
+                for (sl = symset_list; sl; sl = sl->next)
+                    if (sl->idx == chosen)
                         break;
-                    }
-                    sl = sl->next;
+                if (sl) {
+                    /* free the now stale attributes */
+                    clear_symsetentry(which_set, TRUE);
+
+                    /* transfer only the name of the symbol set */
+                    symset[which_set].name = dupstr(sl->name);
+                    ready_to_switch = TRUE;
                 }
             } else if (chosen == -1) {
                 /* explicit selection of defaults */
                 /* free the now stale symset attributes */
-                if (symset_name) {
-                    free((genericptr_t) symset_name);
-                    symset_name = (char *) 0;
-                }
                 clear_symsetentry(which_set, TRUE);
             } else
                 nothing_to_do = TRUE;
@@ -5322,25 +5298,17 @@ boolean setinitial, setfromfile;
         }
 
         /* clean up */
-        while (symset_list) {
-            sl = symset_list;
-            if (sl->name)
-                free((genericptr_t) sl->name);
-            sl->name = (char *) 0;
-
-            if (sl->desc)
-                free((genericptr_t) sl->desc);
-            sl->desc = (char *) 0;
-
+        while ((sl = symset_list) != 0) {
             symset_list = sl->next;
+            if (sl->name)
+                free((genericptr_t) sl->name), sl->name = (char *) 0;
+            if (sl->desc)
+                free((genericptr_t) sl->desc), sl->desc = (char *) 0;
             free((genericptr_t) sl);
         }
 
         if (nothing_to_do)
             return TRUE;
-
-        if (!symset[which_set].name && symset_name)
-            symset[which_set].name = symset_name; /* not dupstr() here */
 
         /* Set default symbols and clear the handling value */
         if (rogueflag)
@@ -5349,6 +5317,7 @@ boolean setinitial, setfromfile;
             init_l_symbols();
 
         if (symset[which_set].name) {
+            /* non-default symbols */
             if (read_sym_file(which_set)) {
                 ready_to_switch = TRUE;
             } else {
@@ -5367,7 +5336,6 @@ boolean setinitial, setfromfile;
             assign_graphics(PRIMARY);
         preference_update("symset");
         need_redraw = TRUE;
-        return TRUE;
 
     } else {
         /* didn't match any of the special options */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1463561393 2016/05/18 08:49:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1546137492 2018/12/30 02:38:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1631,13 +1631,16 @@ int buflen, rolenum, racenum, gendnum, alignnum;
     Strcpy(tmpbuf, "Shall I pick ");
     if (racenum != ROLE_NONE || validrole(rolenum))
         Strcat(tmpbuf, "your ");
-    else {
+    else
         Strcat(tmpbuf, "a ");
-    }
     /* <your> */
 
     (void) root_plselection_prompt(eos(tmpbuf), buflen - strlen(tmpbuf),
                                    rolenum, racenum, gendnum, alignnum);
+    /* "Shall I pick a character's role, race, gender, and alignment for you?"
+       plus " [ynaq] (y)" is a little too long for a conventional 80 columns;
+       also, "pick a character's <anything>" sounds a bit stilted */
+    strsubst(tmpbuf, "pick a character", "pick character");
     Sprintf(buf, "%s", s_suffix(tmpbuf));
     /* don't bother splitting caveman/cavewoman or priest/priestess
        in order to apply possessive suffix to both halves, but do

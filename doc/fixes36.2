@@ -1,4 +1,4 @@
-$NHDT-Branch: $:$NHDT-Revision: $ $NHDT-Date: $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.218 $ $NHDT-Date: 1546144745 2018/12/30 04:39:05 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -357,6 +357,10 @@ when built with STATUS_HILITES enabled (the default), gold on status line
 	was missing '$' prefix for symset:Blank
 wizard mode ^G, creating a monster of class 'I' yielded impossible "mkclass
 	found no class 35 monsters"
+in some unknown circumstance, examining something on the map could match bogus
+	monster class #0 and trigger impossible "Alphabet soup: 'an("")'."
+	(fix avoids the warning but underlying cause is a mystery; noticed
+	with the fuzzer, which swaps symbol sets in and out at random)
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
