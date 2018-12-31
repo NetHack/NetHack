@@ -1,6 +1,6 @@
 # depend.awk -- awk script used to construct makefile dependencies
 # for nethack's source files (`make depend' support for Makefile.src).
-# $NHDT-Date: 1543447376 2018/11/28 23:22:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.7 $
+# $NHDT-Date: 1546220373 2018/12/31 01:39:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.8 $
 #
 # usage:
 #   cd src ; nawk -f depend.awk ../include/*.h list-of-.c/.cpp-files
@@ -121,11 +121,13 @@ function format_dep(target, source,		n, i, list)
   source = list[2]
   if (source ~ /\// && substr(source, 1, 11) != "../include/") {
     if (source ~ /\.cpp$/ )
-      print "\t$(CXX) $(CXXFLAGS) -c " source
+      print "\t$(CXX) $(CXXFLAGS) -c -o $@ " source
+    else if (source ~ /\/X11\//)	# "../win/X11/foo.c"
+      print "\t$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ " source
     else if (source ~ /\/gnome\//)	# "../win/gnome/foo.c"
-      print "\t$(CC) $(CFLAGS) $(GNOMEINC) -c " source
+      print "\t$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ " source
     else
-      print "\t$(CC) $(CFLAGS) -c " source
+      print "\t$(CC) $(CFLAGS) -c -o $@ " source
   }
 }
 
