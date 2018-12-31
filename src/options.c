@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1546144857 2018/12/30 04:40:57 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.349 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1546212618 2018/12/30 23:30:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.350 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2714,27 +2714,31 @@ boolean tinitial, tfrom_file;
         if (!(opts = string_for_opt(opts, FALSE)))
             return FALSE;
         escapes(opts, opts);
+        /* note: dummy monclass #0 has symbol value '\0'; we allow that--
+           attempting to set bouldersym to '^@'/'\0' will reset to default */
         if (def_char_to_monclass(opts[0]) != MAXMCLASSES)
-            clash = 1;
-        else if (opts[0] >= '1' && opts[0] <= '5')
+            clash = opts[0] ? 1 : 0;
+        else if (opts[0] >= '1' && opts[0] < WARNCOUNT + '0')
             clash = 2;
         if (clash) {
             /* symbol chosen matches a used monster or warning
-               symbol which is not good - reject it*/
+               symbol which is not good - reject it */
             config_error_add(
-                "Badoption - boulder symbol '%c' conflicts with a %s symbol.",
-                             opts[0], (clash == 1) ? "monster" : "warning");
+            "Badoption - boulder symbol '%s' would conflict with a %s symbol",
+                             visctrl(opts[0]),
+                             (clash == 1) ? "monster" : "warning");
         } else {
             /*
              * Override the default boulder symbol.
              */
             iflags.bouldersym = (uchar) opts[0];
-        }
-        /* for 'initial', update_bouldersym() is done in initoptions_finish(),
-           after all symset options have been processed */
-        if (!g.opt_initial) {
-            update_bouldersym();
-            g.opt_need_redraw = TRUE;
+            /* for 'initial', update_bouldersym() is done in
+               initoptions_finish(), after all symset options
+               have been processed */
+            if (!g.opt_initial) {
+                update_bouldersym();
+                g.opt_need_redraw = TRUE;
+            }
         }
         return retval;
 #else

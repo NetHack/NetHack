@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1546137503 2018/12/30 02:38:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.66 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1546220381 2018/12/31 01:39:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -154,6 +154,11 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 # Compile against system curses library, such as ncurses
 #CFLAGS = -O -I../include
 
+# files in ../win/X11 (relative to src) are passed $(CFLAGS) $(X11CFLAGS)
+# and by default will find <X11/foo.h> in /usr/include/X11/foo.h;
+# can be overridden via hints; post-10.7 OSX with XQuartz uses
+# X11CFLAGS=-I/opt/X11/include to find <X11/foo.h> in /opt/X11/include/X11/foo.h
+#X11CFLAGS=
 
 # Only used for the Gnome interface.
 # When including the Gnome interface, you need to include gnome specific
@@ -739,155 +744,155 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 	touch $(HACK_H)
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c ../sys/atari/tos.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/atari/tos.c
 pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
-	$(CC) $(CFLAGS) -c ../sys/share/pcmain.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcmain.c
 pcsys.o: ../sys/share/pcsys.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../sys/share/pcsys.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcsys.c
 pctty.o: ../sys/share/pctty.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../sys/share/pctty.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pctty.c
 pcunix.o: ../sys/share/pcunix.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../sys/share/pcunix.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcunix.c
 pmatchregex.o: ../sys/share/pmatchregex.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../sys/share/pmatchregex.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pmatchregex.c
 posixregex.o: ../sys/share/posixregex.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../sys/share/posixregex.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/posixregex.c
 random.o: ../sys/share/random.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../sys/share/random.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/random.c
 ioctl.o: ../sys/share/ioctl.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c ../sys/share/ioctl.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/ioctl.c
 unixtty.o: ../sys/share/unixtty.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../sys/share/unixtty.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/unixtty.c
 unixmain.o: ../sys/unix/unixmain.c $(HACK_H) ../include/dlb.h
-	$(CC) $(CFLAGS) -c ../sys/unix/unixmain.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/unix/unixmain.c
 unixunix.o: ../sys/unix/unixunix.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../sys/unix/unixunix.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/unix/unixunix.c
 unixres.o: ../sys/unix/unixres.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c ../sys/unix/unixres.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/unix/unixres.c
 bemain.o: ../sys/be/bemain.c $(HACK_H) ../include/dlb.h
-	$(CC) $(CFLAGS) -c ../sys/be/bemain.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/be/bemain.c
 getline.o: ../win/tty/getline.c $(HACK_H) ../include/func_tab.h
-	$(CC) $(CFLAGS) -c ../win/tty/getline.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/tty/getline.c
 termcap.o: ../win/tty/termcap.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c ../win/tty/termcap.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/tty/termcap.c
 topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c ../win/tty/topl.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/tty/topl.c
 wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
-	$(CC) $(CFLAGS) -c ../win/tty/wintty.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/tty/wintty.c
 cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/patchlevel.h \
 		../include/wincurs.h
-	$(CC) $(CFLAGS) -c ../win/curses/cursmain.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursmain.c
 curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/curswins.h
-	$(CC) $(CFLAGS) -c ../win/curses/curswins.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/curses/curswins.c
 cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursmisc.h ../include/func_tab.h ../include/dlb.h
-	$(CC) $(CFLAGS) -c ../win/curses/cursmisc.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursmisc.c
 cursdial.o: ../win/curses/cursdial.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursdial.h ../include/func_tab.h
-	$(CC) $(CFLAGS) -c ../win/curses/cursdial.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursdial.c
 cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursstat.h
-	$(CC) $(CFLAGS) -c ../win/curses/cursstat.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursstat.c
 cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursinit.h
-	$(CC) $(CFLAGS) -c ../win/curses/cursinit.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursinit.c
 cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursmesg.h
-	$(CC) $(CFLAGS) -c ../win/curses/cursmesg.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursmesg.c
 cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursinvt.h
-	$(CC) $(CFLAGS) -c ../win/curses/cursinvt.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursinvt.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H) ../include/lint.h
-	$(CC) $(CFLAGS) -c ../win/X11/Window.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/Window.c
 dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h
-	$(CC) $(CFLAGS) -c ../win/X11/dialogs.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
 		../include/xwindow.h ../win/X11/nh72icon ../win/X11/nh56icon \
 		../win/X11/nh32icon
-	$(CC) $(CFLAGS) -c ../win/X11/winX.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winX.c
 winmap.o: ../win/X11/winmap.c ../include/xwindow.h $(HACK_H) ../include/dlb.h \
 		../include/winX.h ../include/tile2x11.h
-	$(CC) $(CFLAGS) -c ../win/X11/winmap.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmap.c
 winmenu.o: ../win/X11/winmenu.c $(HACK_H) ../include/winX.h
-	$(CC) $(CFLAGS) -c ../win/X11/winmenu.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmenu.c
 winmesg.o: ../win/X11/winmesg.c ../include/xwindow.h $(HACK_H) ../include/winX.h
-	$(CC) $(CFLAGS) -c ../win/X11/winmesg.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmesg.c
 winmisc.o: ../win/X11/winmisc.c $(HACK_H) ../include/func_tab.h \
 		../include/winX.h
-	$(CC) $(CFLAGS) -c ../win/X11/winmisc.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmisc.c
 winstat.o: ../win/X11/winstat.c $(HACK_H) ../include/winX.h ../include/xwindow.h
-	$(CC) $(CFLAGS) -c ../win/X11/winstat.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winstat.c
 wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h ../include/xwindow.h
-	$(CC) $(CFLAGS) -c ../win/X11/wintext.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/wintext.c
 winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
-	$(CC) $(CFLAGS) -c ../win/X11/winval.c
+	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winval.c
 tile.o: tile.c $(HACK_H)
 gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
 		../win/gnome/gnmain.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnaskstr.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnaskstr.c
 gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnmain.h \
 		../win/gnome/gnmenu.h ../win/gnome/gnaskstr.h \
 		../win/gnome/gnyesno.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnbind.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnbind.c
 gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h ../include/tile2x11.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnglyph.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnglyph.c
 gnmain.o: ../win/gnome/gnmain.c ../win/gnome/gnmain.h ../win/gnome/gnsignal.h \
 		../win/gnome/gnbind.h ../win/gnome/gnopts.h $(HACK_H) \
 		../include/date.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmain.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmain.c
 gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h ../win/gnome/gnglyph.h \
 		../win/gnome/gnsignal.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmap.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmap.c
 gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h ../win/gnome/gnmain.h \
 		../win/gnome/gnbind.h ../include/func_tab.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmenu.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmenu.c
 gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h ../win/gnome/gnsignal.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnmesg.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmesg.c
 gnopts.o: ../win/gnome/gnopts.c ../win/gnome/gnopts.h ../win/gnome/gnglyph.h \
 		../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnopts.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnopts.c
 gnplayer.o: ../win/gnome/gnplayer.c ../win/gnome/gnplayer.h \
 		../win/gnome/gnmain.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnplayer.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnplayer.c
 gnsignal.o: ../win/gnome/gnsignal.c ../win/gnome/gnsignal.h \
 		../win/gnome/gnmain.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnsignal.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnsignal.c
 gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h \
 		../win/gnome/gnsignal.h ../win/gnome/gn_xpms.h \
 		../win/gnome/gnomeprv.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnstatus.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnstatus.c
 gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h ../win/gnome/gnmain.h \
 		../win/gnome/gn_rip.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gntext.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gntext.c
 gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnyesno.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnyesno.c
 gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h ../win/gnome/gnglyph.h \
 		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c ../win/gnome/gnworn.c
+	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnworn.c
 wingem.o: ../win/gem/wingem.c $(HACK_H) ../include/func_tab.h ../include/dlb.h \
 		../include/patchlevel.h ../include/wingem.h
-	$(CC) $(CFLAGS) -c ../win/gem/wingem.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/gem/wingem.c
 wingem1.o: ../win/gem/wingem1.c ../include/gem_rsc.h ../include/load_img.h \
 		../include/gr_rect.h ../include/wintype.h ../include/wingem.h
-	$(CC) $(CFLAGS) -c ../win/gem/wingem1.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/gem/wingem1.c
 load_img.o: ../win/gem/load_img.c ../include/load_img.h
-	$(CC) $(CFLAGS) -c ../win/gem/load_img.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/gem/load_img.c
 gr_rect.o: ../win/gem/gr_rect.c ../include/gr_rect.h
-	$(CC) $(CFLAGS) -c ../win/gem/gr_rect.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/gem/gr_rect.c
 tile.o: tile.c $(HACK_H)
 cppregex.o: ../sys/share/cppregex.cpp
-	$(CXX) $(CXXFLAGS) -c ../sys/share/cppregex.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../sys/share/cppregex.cpp
 qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
 		../include/dlb.h ../include/patchlevel.h ../include/tile2x11.h \
 		../include/qt_win.h ../include/qt_clust.h ../include/qt_kde0.h \
 		../include/qt_xpms.h qt_win.moc qt_kde0.moc qttableview.moc
-	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_win.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
 qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_clust.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_clust.cpp
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt/qttableview.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qttableview.cpp
 qt4bind.o: ../win/Qt4/qt4bind.cpp $(HACK_H) ../win/Qt4/qt4bind.h \
 		../win/Qt4/qt4click.h ../win/Qt4/qt4delay.h \
 		../win/Qt4/qt4xcmd.h ../win/Qt4/qt4key.h ../win/Qt4/qt4map.h \
@@ -895,82 +900,82 @@ qt4bind.o: ../win/Qt4/qt4bind.cpp $(HACK_H) ../win/Qt4/qt4bind.h \
 		../win/Qt4/qt4svsel.h ../win/Qt4/qt4set.h ../win/Qt4/qt4stat.h \
 		../win/Qt4/qt4streq.h ../win/Qt4/qt4yndlg.h \
 		../win/Qt4/qt4str.h ../include/dlb.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4bind.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4bind.cpp
 qt4click.o: ../win/Qt4/qt4click.cpp $(HACK_H) ../win/Qt4/qt4click.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4click.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4click.cpp
 qt4clust.o: ../win/Qt4/qt4clust.cpp ../win/Qt4/qt4clust.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4clust.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4clust.cpp
 qt4delay.o: ../win/Qt4/qt4delay.cpp $(HACK_H) ../win/Qt4/qt4delay.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4delay.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4delay.cpp
 qt4glyph.o: ../win/Qt4/qt4glyph.cpp $(HACK_H) ../include/tile2x11.h \
 		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4glyph.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4glyph.cpp
 qt4icon.o: ../win/Qt4/qt4icon.cpp $(HACK_H) ../win/Qt4/qt4icon.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4icon.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4icon.cpp
 qt4inv.o: ../win/Qt4/qt4inv.cpp $(HACK_H) ../win/Qt4/qt4inv.h \
 		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4inv.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4inv.cpp
 qt4key.o: ../win/Qt4/qt4key.cpp $(HACK_H) ../win/Qt4/qt4key.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4key.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4key.cpp
 qt4line.o: ../win/Qt4/qt4line.cpp $(HACK_H) ../win/Qt4/qt4line.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4line.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4line.cpp
 qt4main.o: ../win/Qt4/qt4main.cpp $(HACK_H) ../include/patchlevel.h \
 		../win/Qt4/qt4main.h qt4main.moc ../win/Qt4/qt4bind.h \
 		../win/Qt4/qt4glyph.h ../win/Qt4/qt4inv.h ../win/Qt4/qt4key.h \
 		../win/Qt4/qt4map.h ../win/Qt4/qt4msg.h ../win/Qt4/qt4set.h \
 		../win/Qt4/qt4stat.h ../win/Qt4/qt4str.h qt4kde0.moc
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4main.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4main.cpp
 qt4map.o: ../win/Qt4/qt4map.cpp $(HACK_H) ../win/Qt4/qt4map.h qt4map.moc \
 		../win/Qt4/qt4click.h ../win/Qt4/qt4glyph.h \
 		../include/qt_xpms.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4map.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4map.cpp
 qt4menu.o: ../win/Qt4/qt4menu.cpp $(HACK_H) ../win/Qt4/qt4menu.h qt4menu.moc \
 		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h \
 		../win/Qt4/qt4streq.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4menu.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4menu.cpp
 qt4msg.o: ../win/Qt4/qt4msg.cpp $(HACK_H) ../win/Qt4/qt4msg.h qt4msg.moc \
 		../win/Qt4/qt4map.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4msg.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4msg.cpp
 qt4plsel.o: ../win/Qt4/qt4plsel.cpp $(HACK_H) ../win/Qt4/qt4plsel.h \
 		qt4plsel.moc ../win/Qt4/qt4bind.h ../win/Qt4/qt4glyph.h \
 		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4plsel.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4plsel.cpp
 qt4rip.o: ../win/Qt4/qt4rip.cpp $(HACK_H) ../win/Qt4/qt4rip.h \
 		../win/Qt4/qt4bind.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4rip.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4rip.cpp
 qt4set.o: ../win/Qt4/qt4set.cpp $(HACK_H) ../win/Qt4/qt4set.h qt4set.moc \
 		../win/Qt4/qt4glyph.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4set.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4set.cpp
 qt4stat.o: ../win/Qt4/qt4stat.cpp $(HACK_H) ../win/Qt4/qt4stat.h qt4stat.moc \
 		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h ../include/qt_xpms.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4stat.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4stat.cpp
 qt4str.o: ../win/Qt4/qt4str.cpp ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4str.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4str.cpp
 qt4streq.o: ../win/Qt4/qt4streq.cpp $(HACK_H) ../win/Qt4/qt4streq.h \
 		../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4streq.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4streq.cpp
 qt4svsel.o: ../win/Qt4/qt4svsel.cpp $(HACK_H) ../win/Qt4/qt4svsel.h \
 		../win/Qt4/qt4bind.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4svsel.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4svsel.cpp
 qt4win.o: ../win/Qt4/qt4win.cpp $(HACK_H) ../win/Qt4/qt4win.h \
 		../win/Qt4/qt4bind.h ../win/Qt4/qt4click.h \
 		../win/Qt4/qt4glyph.h ../win/Qt4/qt4inv.h ../win/Qt4/qt4key.h \
 		../win/Qt4/qt4icon.h ../win/Qt4/qt4map.h ../win/Qt4/qt4menu.h \
 		../win/Qt4/qt4msg.h ../win/Qt4/qt4set.h ../win/Qt4/qt4clust.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4win.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4win.cpp
 qt4xcmd.o: ../win/Qt4/qt4xcmd.cpp $(HACK_H) ../include/func_tab.h \
 		../win/Qt4/qt4xcmd.h qt4xcmd.moc ../win/Qt4/qt4bind.h \
 		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4xcmd.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4xcmd.cpp
 qt4yndlg.o: ../win/Qt4/qt4yndlg.cpp $(HACK_H) ../win/Qt4/qt4yndlg.h \
 		qt4yndlg.moc ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4yndlg.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4yndlg.cpp
 wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../win/chain/wc_chainin.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
 wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../win/chain/wc_chainout.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_chainout.c
 wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
-	$(CC) $(CFLAGS) -c ../win/chain/wc_trace.c
+	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_trace.c
 vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
 allmain.o: allmain.c $(HACK_H)
 alloc.o: alloc.c $(CONFIG_H)
