@@ -4,7 +4,7 @@ NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.2 contains a collection of more than 15 bug fixes to NetHack 3.6.1.
+NetHack 3.6.2 contains a collection of more than 220 bug fixes to NetHack 3.6.1.
 The file doc/fixes36.2 in the source distribution has a full list of them. The
 text in there was written for the development team's own use and is provided 
 "as is", so please do not ask us to further explain the entries in that file. 
@@ -166,6 +166,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1533602460 2018/08/07 00:41:00 $ $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.46 $
+# $NHDT-Date: 1546383333 2019/01/01 22:55:33 $ $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.48 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
