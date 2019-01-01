@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -192,7 +192,7 @@
           you  have  seen on the current dungeon level; as you explore more
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -324,7 +324,7 @@
                Intelligence  affects  your  ability to cast spells and read
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -390,7 +390,7 @@
                ical attacks.  Many dungeons show only your experience level
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -522,7 +522,7 @@
                nasty and vicious.  Sometimes, however, they can be helpful.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -588,7 +588,7 @@
                symbol at the chosen location, conditionally check for "More
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -654,7 +654,7 @@
                if you remember a monster there).
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -852,7 +852,7 @@
                visited.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -984,7 +984,7 @@
                Some  characters  can wield two weapons at once; use the `X'
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1050,7 +1050,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1116,7 +1116,7 @@
           tures the game was compiled with.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1182,7 +1182,7 @@
                Call (name) a monster, or an object  in  inventory,  on  the
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1248,7 +1248,7 @@
                Show  what  type  of  thing  a  map  symbol  corresponds to.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1314,7 +1314,7 @@
                also `l' if number_pad is on.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1446,7 +1446,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1578,7 +1578,7 @@
                Go up a staircase.  Default key is `<'.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1644,7 +1644,7 @@
                mode only.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1842,7 +1842,7 @@
           the classic computer game "Sokoban."  The goal  is  to  push  the
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1908,7 +1908,7 @@
           told  that  the shopkeeper isn't interested (generally, your item
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -1974,7 +1974,7 @@
           name which is just a space will remove any prior name.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2040,7 +2040,7 @@
           with it even if adjacent at the time.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2106,7 +2106,7 @@
           to pick it up.  In NetHack, this is accomplished automatically by
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2172,7 +2172,7 @@
           your hand when wielded, so you cannot unwield them.   Any  cursed
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2238,7 +2238,7 @@
           like rust.  Such "erosion" damage can be repaired.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2304,7 +2304,7 @@
           time you use `f'.  There is also an option, autoquiver, which has
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2370,7 +2370,7 @@
           the  amount of damage done when you do hit; at basic level, there
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2436,7 +2436,7 @@
           protection  than  others.   Your armor class is a measure of this
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2502,7 +2502,7 @@
           open.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2568,7 +2568,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2634,7 +2634,7 @@
           the attempt backfires.  Reading a cursed spellbook  or  one  with
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2700,7 +2700,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2766,7 +2766,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2832,7 +2832,7 @@
           fungi  (`F') are also considered to be vegetable matter.  Certain
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2898,7 +2898,7 @@
           of item; or fight with your hands and feet.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -2964,7 +2964,7 @@
           On UNIX, Linux, and Mac OS X it is  ".nethackrc"  in  the  user's
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3030,7 +3030,7 @@
             Defaults to HACKDIR, must be writable.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3096,7 +3096,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3228,7 +3228,7 @@
             Persistent.  See pickup_types to refine the behavior.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3294,7 +3294,7 @@
             Have  user  confirm  attacks  on  pets,  shopkeepers, and other
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3360,7 +3360,7 @@
             veal things about them that you hadn't discovered.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3426,7 +3426,7 @@
             aren't  interrupted  with  the "More info?" prompt, but it also
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3492,7 +3492,7 @@
             Enable mail delivery during the game (default on).  Persistent.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3558,7 +3558,7 @@
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3606,9 +3606,33 @@
             Prompt for new form whenever any monster changes shape (default
             off).  Debug mode only.
 
+          mouse_support
+            Allow use of the mouse for input and  travel.   Valid  settings
+            are:
+
+             0 - disabled
+             1 - enabled  and  make  OS adjustments to support mouse use in
+                 the game.
+             2 - like 1 but does not make any OS adjustments
+
+            For backward compatibility, omitting a value  is  the  same  as
+            specifying 1 and negating mouse_support is the same as specify-
+            ing 0.
+
           msghistory
             The number of top line messages to keep (and be able to  recall
             with `^P') (default 20).  Cannot be set with the `O' command.
+
+
+          NetHack 3.6                                     December 15, 2018
+
+
+
+
+
+          NetHack Guidebook                                              56
+
+
 
           msg_window
             Allows  you  to change the way recalled messages are displayed.
@@ -3622,18 +3646,6 @@
 
             For  backward  compatibility,  no  value  needs to be specified
             (which defaults  to  "full"),  or  it  can  be  negated  (which
-
-
-          NetHack 3.6                                      October 16, 2018
-
-
-
-
-
-          NetHack Guidebook                                              56
-
-
-
             defaults to "single").
 
           name
@@ -3677,6 +3689,17 @@
             to search  twelve  times),  precede  it  with  the  letter  `n'
             ("n12s").
 
+
+          NetHack 3.6                                     December 15, 2018
+
+
+
+
+
+          NetHack Guidebook                                              57
+
+
+
           packorder
             Specify   the   order   to   list   object  types  in  (default
             "")[%?+!=/(*`0_").  The value of this option should be a string
@@ -3687,18 +3710,6 @@
             A space separated list of specific situations  where  alternate
             prompting   is  desired.   The  default  is  paranoid_confirma-
             tion:pray.
-
-
-
-          NetHack 3.6                                      October 16, 2018
-
-
-
-
-
-          NetHack Guidebook                                              57
-
-
 
             Confirm     - for any prompts which are set  to  require  "yes"
                           rather  than `y', also require "no" to reject in-
@@ -3743,6 +3754,18 @@
             "horse", and "none".  If the choice is not allowed for the role
             you are currently playing, it will be  silently  ignored.   For
             example,  "horse"  will  only be honored when playing a knight.
+
+
+          NetHack 3.6                                     December 15, 2018
+
+
+
+
+
+          NetHack Guidebook                                              58
+
+
+
             Cannot be set with the `O' command.
 
           pickup_burden
@@ -3754,18 +3777,6 @@
           pickup_thrown
             If  this option is on and autopickup is also on, try to pick up
             things that you threw, even if they aren't in  pickup_types  or
-
-
-          NetHack 3.6                                      October 16, 2018
-
-
-
-
-
-          NetHack Guidebook                                              58
-
-
-
             match an autopickup exception.  Default is on.  Persistent.
 
           pickup_types
@@ -3809,6 +3820,18 @@
             Make  the  space bar a synonym for the `.' (#wait) command (de-
             fault off).  Persistent.
 
+
+
+          NetHack 3.6                                     December 15, 2018
+
+
+
+
+
+          NetHack Guidebook                                              59
+
+
+
           role
             Pick your type of character (ex. "role:Samurai");  synonym  for
             "character".   See "name" for an alternate method of specifying
@@ -3820,18 +3843,6 @@
 
           roguesymset
             This option may be used to select one of the named symbol  sets
-
-
-          NetHack 3.6                                      October 16, 2018
-
-
-
-
-
-          NetHack Guidebook                                              59
-
-
-
             found  within  "symbols"  to alter the symbols displayed on the
             screen on the rogue level.
 
@@ -3875,6 +3886,18 @@
             Show your accumulated experience points on bottom line (default
             off).  Persistent.
 
+
+
+          NetHack 3.6                                     December 15, 2018
+
+
+
+
+
+          NetHack Guidebook                                              60
+
+
+
           showrace
             Display  yourself  as  the glyph for your race, rather than the
             glyph for your role (default off).  Note that this setting  af-
@@ -3884,19 +3907,6 @@
           showscore
             Show your approximate accumulated score on bottom line (default
             off).  Persistent.
-
-
-
-
-          NetHack 3.6                                      October 16, 2018
-
-
-
-
-
-          NetHack Guidebook                                              60
-
-
 
           silent
             Suppress terminal beeps (default on).  Persistent.
@@ -3943,18 +3953,8 @@
             screen.  Use "symset:default" to explicitly select the  default
             symbols.
 
-          time
-            Show  the  elapsed  game  time in turns on bottom line (default
-            off).  Persistent.
 
-          timed_delay
-            When pausing momentarily for display effect, such as  with  ex-
-            plosions  and  moving  objects, use a timer rather than sending
-            extra characters to the screen.  (Applies  to  "tty"  interface
-            only;  "X11"  interface  always  uses a timer based delay.  The
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -3964,7 +3964,16 @@
 
 
 
-            default is on if configured into the program.)  Persistent.
+          time
+            Show  the  elapsed  game  time in turns on bottom line (default
+            off).  Persistent.
+
+          timed_delay
+            When pausing momentarily for display effect, such as  with  ex-
+            plosions  and  moving  objects, use a timer rather than sending
+            extra characters to the screen.  (Applies  to  "tty"  interface
+            only; "X11" interface always uses a timer based delay.  The de-
+            fault is on if configured into the program.)  Persistent.
 
           tombstone
             Draw a tombstone graphic upon your death (default on).  Persis-
@@ -4011,16 +4020,7 @@
 
 
 
-                 n - no filtering [default]
-                 v - in view only
-                 a - in same area only
-
-            The  area-filter  tries  to be slightly predictive -- if you're
-            standing on a doorway, it will consider the area on the side of
-            the door you were last moving towards.
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4029,6 +4029,16 @@
           NetHack Guidebook                                              62
 
 
+
+
+
+                 n - no filtering [default]
+                 v - in view only
+                 a - in same area only
+
+            The  area-filter  tries  to be slightly predictive -- if you're
+            standing on a doorway, it will consider the area on the side of
+            the door you were last moving towards.
 
             Filtering  can also be changed when getting a location with the
             "getpos.filter" key.
@@ -4073,6 +4083,19 @@
           dynamic and can be specified during the game with  the  `O'  com-
           mand.
 
+
+
+
+          NetHack 3.6                                     December 15, 2018
+
+
+
+
+
+          NetHack Guidebook                                              63
+
+
+
           align_message
             Where  to align or place the message window (top, bottom, left,
             or right)
@@ -4084,17 +4107,6 @@
           ascii_map
             If  NetHack can, it should display an ascii character map if it
             can.
-
-
-          NetHack 3.6                                      October 16, 2018
-
-
-
-
-
-          NetHack Guidebook                                              63
-
-
 
           color
             If NetHack can, it should display color if it can for different
@@ -4138,6 +4150,18 @@
 
           font_size_status
             If  NetHack  can,  it  should use this size font for the status
+
+
+          NetHack 3.6                                     December 15, 2018
+
+
+
+
+
+          NetHack Guidebook                                              64
+
+
+
             window.
 
           font_size_text
@@ -4150,24 +4174,9 @@
           large_font
             If NetHack can, it should use a large font.
 
-
-
-          NetHack 3.6                                      October 16, 2018
-
-
-
-
-
-          NetHack Guidebook                                              64
-
-
-
           map_mode
             If NetHack can, it should display the map in the manner  speci-
             fied.
-
-          mouse_support
-            Allow use of the mouse for input and travel.
 
           player_selection
             If  NetHack  can, it should pop up dialog boxes, or use prompts
@@ -4208,17 +4217,8 @@
           tiled_map
             If NetHack can, it should display a tiled map if it can.
 
-          tile_file
-            Specify  the  name  of an alternative tile file to override the
-            default.
 
-          tile_height
-            Specify the preferred height of each tile  in  a  tile  capable
-            port.
-
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4227,6 +4227,14 @@
           NetHack Guidebook                                              65
 
 
+
+          tile_file
+            Specify  the  name  of an alternative tile file to override the
+            default.
+
+          tile_height
+            Specify the preferred height of each tile  in  a  tile  capable
+            port.
 
           tile_width
             Specify the preferred width of each tile in a tile capable port
@@ -4275,16 +4283,8 @@
             the .dll extension and without any path information.  Cannot be
             set with the `O' command.
 
-          altmeta
-            On Amiga, this option controls whether typing "Alt" plus anoth-
-            er key functions as a meta-shift for that key (default on).
 
-          altmeta
-            On other (non-Amiga) systems where this option is available, it
-            can be set to tell NetHack to convert a two character  sequence
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4294,6 +4294,13 @@
 
 
 
+          altmeta
+            On Amiga, this option controls whether typing "Alt" plus anoth-
+            er key functions as a meta-shift for that key (default on).
+
+          altmeta
+            On other (non-Amiga) systems where this option is available, it
+            can be set to tell NetHack to convert a two character  sequence
             beginning  with  ESC  into a meta-shifted version of the second
             character (default off).
 
@@ -4341,16 +4348,9 @@
             ments in the config file if needed.  Cannot be set with the `O'
             command.
 
-          video
-            Set the video mode used (PC NetHack only).  Values are "autode-
-            tect", "default", or "vga".   Setting  "vga"  (or  "autodetect"
-            with  vga  hardware  present)  will  cause  the game to display
-            tiles.  Cannot be set with the `O' command.
 
 
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4359,6 +4359,12 @@
           NetHack Guidebook                                              67
 
 
+
+          video
+            Set the video mode used (PC NetHack only).  Values are "autode-
+            tect", "default", or "vga".   Setting  "vga"  (or  "autodetect"
+            with  vga  hardware  present)  will  cause  the game to display
+            tiles.  Cannot be set with the `O' command.
 
           videocolors
             Set the color palette for PC systems  using  NO_TERMS  (default
@@ -4409,14 +4415,8 @@
             A "never pickup" rule takes precedence over an "always  pickup"
             rule if both match.
 
-            Exceptions  can  be set with the `O' command, but ones set that
-            way will not be preserved across saves and restores.
 
-          Here are some examples:
-
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4425,6 +4425,11 @@
           NetHack Guidebook                                              68
 
 
+
+            Exceptions  can  be set with the `O' command, but ones set that
+            way will not be preserved across saves and restores.
+
+          Here are some examples:
 
                  autopickup_exception="<*arrow"
                  autopickup_exception=">*corpse"
@@ -4475,14 +4480,9 @@
           doinv
             Show inventory.  With number_pad only.  Default is `0'.
 
-          fight
-            Prefix key to force fight a direction.  Default is `F'.
-
-          fight.numpad
-            Prefix key to force fight a direction.  With  number_pad  only.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4492,6 +4492,11 @@
 
 
 
+          fight
+            Prefix key to force fight a direction.  Default is `F'.
+
+          fight.numpad
+            Prefix key to force fight a direction.  With  number_pad  only.
             Default is `-'.
 
           getdir.help
@@ -4542,13 +4547,8 @@
             When asked for a location, the key to go to  next  closest  ob-
             ject.  Default is `o'.
 
-          getpos.obj.prev
-            When  asked  for  a location, the key to go to previous closest
-            object.  Default is `O'.
 
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4557,6 +4557,10 @@
           NetHack Guidebook                                              70
 
 
+
+          getpos.obj.prev
+            When  asked  for  a location, the key to go to previous closest
+            object.  Default is `O'.
 
           getpos.menu
             When asked for a location, and using one of the next or  previ-
@@ -4607,14 +4611,10 @@
             When  asked  for a location, the key to go to show valid target
             locations.  Default is `$'.
 
-          getpos.valid.next
-            When asked for a location, the key to go to next closest  valid
-            location.  Default is `z'.
 
 
 
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4623,6 +4623,10 @@
           NetHack Guidebook                                              71
 
 
+
+          getpos.valid.next
+            When asked for a location, the key to go to next closest  valid
+            location.  Default is `z'.
 
           getpos.valid.prev
             When  asked  for  a location, the key to go to previous closest
@@ -4674,13 +4678,9 @@
             Allowed types are:
 
             show  - show message normally;
-            hide  - never show the message;
-            stop  - wait for user with more-prompt;
-            norep - show the message once, but not again if no  other  mes-
-                    sage is shown in between.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4689,6 +4689,11 @@
           NetHack Guidebook                                              72
 
 
+
+            hide  - never show the message;
+            stop  - wait for user with more-prompt;
+            norep - show the message once, but not again if no  other  mes-
+                    sage is shown in between.
 
             Here's  an  example  of  message types using NetHack's internal
             pattern matching facility:
@@ -4737,16 +4742,11 @@
             Here's an example of menu colors using NetHack's internal  pat-
             tern matching facility:
 
-                 MENUCOLOR="* blessed *"=green
-                 MENUCOLOR="* cursed *"=red
-                 MENUCOLOR="* cursed *(being worn)"=red&underline
-
-            specifies  that  any menu line with " blessed " contained in it
-            will be shown in green color, lines  with  " cursed "  will  be
-            shown  in  red,  and  lines with " cursed " followed by "(being
 
 
-          NetHack 3.6                                      October 16, 2018
+
+
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4756,6 +4756,13 @@
 
 
 
+                 MENUCOLOR="* blessed *"=green
+                 MENUCOLOR="* cursed *"=red
+                 MENUCOLOR="* cursed *(being worn)"=red&underline
+
+            specifies  that  any menu line with " blessed " contained in it
+            will be shown in green color, lines  with  " cursed "  will  be
+            shown  in  red,  and  lines with " cursed " followed by "(being
             worn)" on the same line will be shown in red color  and  under-
             lined.   You can have multiple MENUCOLOR entries in your config
             file, and the last MENUCOLOR-line  in  your  config  file  that
@@ -4803,16 +4810,9 @@
 
                OPTION=hilite_status: field-name/behavior/color&attributes
 
-               For  example,  the  following  line in your config file will
-          cause the hitpoints field to display in the  color  red  if  your
-          hitpoints drop to or below a threshold of 30%:
-
-               OPTION=hilite_status: hitpoints/<30%/red/normal
 
 
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4821,6 +4821,12 @@
           NetHack Guidebook                                              74
 
 
+
+               For  example,  the  following  line in your config file will
+          cause the hitpoints field to display in the  color  red  if  your
+          hitpoints drop to or below a threshold of 30%:
+
+               OPTION=hilite_status: hitpoints/<=30%/red/normal
 
                For  another example, the following line in your config file
           will cause wisdom to be displayed red if it drops and green if it
@@ -4870,15 +4876,9 @@
                  matches  the  percentage.  It is specified as a number be-
                  tween 0 and 100, followed by `%' (percent sign).   If  the
                  percentage  is prefixed with `<=' or `>=', it also matches
-                 when value is below or above the percentage.   Use  prefix
-                 `<'  or  `>'  to match when strictly below or above.  (The
-                 numeric limit is relaxed  slightly  for  those:  >-1%  and
-                 <101%  are  allowed.)   Only  valid  for "power" and "hit-
-                 points" fields.
 
 
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4887,6 +4887,12 @@
           NetHack Guidebook                                              75
 
 
+
+                 when value is below or above the percentage.   Use  prefix
+                 `<'  or  `>'  to match when strictly below or above.  (The
+                 numeric limit is relaxed  slightly  for  those:  >-1%  and
+                 <101%  are  allowed.)   Only  valid  for "power" and "hit-
+                 points" fields.
 
                * absolute value sets the attribute  when  the  field  value
                  matches  that number.  The number must be 0 or higher, ex-
@@ -4935,16 +4941,10 @@
                The  options that are used to select a particular symbol set
           from the symbol file are:
 
-          symset
-            Set the name of the symbol set that you want to load.
-
-          roguesymset
-            Set the name of the symbol set that you want to load  for  dis-
-            play on the rogue level.
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -4953,6 +4953,13 @@
           NetHack Guidebook                                              76
 
 
+
+          symset
+            Set the name of the symbol set that you want to load.
+
+          roguesymset
+            Set the name of the symbol set that you want to load  for  dis-
+            play on the rogue level.
 
                You  can also override one or more symbols using the SYMBOLS
           config file option. Symbols are specified  as  name:value  pairs.
@@ -5000,17 +5007,10 @@
              >    S_dnladder             (ladder down)
              >    S_dnstair              (staircase down)
              d    S_dog                  (dog or other canine)
-             D    S_dragon               (dragon)
-             ;    S_eel                  (sea monster)
-             E    S_elemental            (elemental)
-             /    S_explode1             (explosion top left)
-             -    S_explode2             (explosion top center)
-             \    S_explode3             (explosion top right)
-             |    S_explode4             (explosion middle left)
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5020,6 +5020,13 @@
 
 
 
+             D    S_dragon               (dragon)
+             ;    S_eel                  (sea monster)
+             E    S_elemental            (elemental)
+             /    S_explode1             (explosion top left)
+             -    S_explode2             (explosion top center)
+             \    S_explode3             (explosion top right)
+             |    S_explode4             (explosion middle left)
                   S_explode5             (explosion middle center)
              |    S_explode6             (explosion middle right)
              \    S_explode7             (explosion bottom left)
@@ -5066,17 +5073,10 @@
              :    S_lizard               (lizard)
              \    S_lslant               (diagonal beam [zap animation])
              ^    S_magic_portal         (magic portal)
-             ^    S_magic_trap           (magic trap)
-             m    S_mimic                (mimic)
-             ]    S_mimic_def            (mimic)
-             M    S_mummy                (mummy)
-             N    S_naga                 (naga)
-             .    S_ndoor                (doorway without door)
-             n    S_nymph                (nymph)
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5086,6 +5086,13 @@
 
 
 
+             ^    S_magic_trap           (magic trap)
+             m    S_mimic                (mimic)
+             ]    S_mimic_def            (mimic)
+             M    S_mummy                (mummy)
+             N    S_naga                 (naga)
+             .    S_ndoor                (doorway without door)
+             n    S_nymph                (nymph)
              O    S_ogre                 (ogre)
              o    S_orc                  (orc)
              p    S_piercer              (piercer)
@@ -5132,17 +5139,10 @@
              \    S_throne               (opulent throne)
              -    S_tlcorn               (top left corner)
              |    S_tlwall               (wall)
-             (    S_tool                 (useful item (pick-axe key lamp...))
-             ^    S_trap_door            (trap door)
-             t    S_trapper              (trapper or lurker above)
-             -    S_trcorn               (top right corner)
-             #    S_tree                 (tree)
-             T    S_troll                (troll)
-             |    S_trwall               (wall)
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5152,6 +5152,13 @@
 
 
 
+             (    S_tool                 (useful item (pick-axe key lamp...))
+             ^    S_trap_door            (trap door)
+             t    S_trapper              (trapper or lurker above)
+             -    S_trcorn               (top right corner)
+             #    S_tree                 (tree)
+             T    S_troll                (troll)
+             |    S_trwall               (wall)
              -    S_tuwall               (wall)
              U    S_umber                (umber hulk)
              u    S_unicorn              (unicorn or horse)
@@ -5199,16 +5206,9 @@
           character by character. They will also find the search  capabili-
           ties  of their screen-readers to be quite valuable. Be certain to
           examine this Guidebook before playing so you have  an  idea  what
-          the  screen layout is like. You'll also need to be able to locate
-          the PC cursor. It is always  where  your  character  is  located.
-          Merely  searching for an @-sign will not always find your charac-
-          ter since there are other humanoids represented by the same sign.
-          Your  screen-reader  should  also have a function which gives you
-          the row and column of your  review  cursor  and  the  PC  cursor.
-          These  co-ordinates  are  often useful in giving players a better
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5218,6 +5218,13 @@
 
 
 
+          the  screen layout is like. You'll also need to be able to locate
+          the PC cursor. It is always  where  your  character  is  located.
+          Merely  searching for an @-sign will not always find your charac-
+          ter since there are other humanoids represented by the same sign.
+          Your  screen-reader  should  also have a function which gives you
+          the row and column of your  review  cursor  and  the  PC  cursor.
+          These  co-ordinates  are  often useful in giving players a better
           sense of the overall location of items on the screen.
 
                NetHack can also be compiled with support  for  sending  the
@@ -5265,16 +5272,9 @@
 
           mention_walls
             Give  feedback  messages  when  walking  towards a wall or when
-            travel command was interrupted.
-
-          whatis_coord:compass
-            When targeting with cursor, describe the cursor  position  with
-            coordinates relative to your character.
 
 
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5283,6 +5283,12 @@
           NetHack Guidebook                                              81
 
 
+
+            travel command was interrupted.
+
+          whatis_coord:compass
+            When targeting with cursor, describe the cursor  position  with
+            coordinates relative to your character.
 
           whatis_filter:area
             When  targeting  with cursor, filter possible locations so only
@@ -5332,15 +5338,9 @@
             SEDUCE = 0  or 1 to disable or enable, respectively, the SEDUCE
             option.  When disabled, incubi and succubi behave like  nymphs.
 
-            CHECK_PLNAME = Setting  this to 1 will make the EXPLORERS, WIZ-
-            ARDS, and SHELLERS check for the player name instead of the us-
-            er's login name.
-
-            CHECK_SAVE_UID = 0 or 1 to disable or enable, respectively, the
-            UID (used identification number) checking for  save  files  (to
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5350,6 +5350,12 @@
 
 
 
+            CHECK_PLNAME = Setting  this to 1 will make the EXPLORERS, WIZ-
+            ARDS, and SHELLERS check for the player name instead of the us-
+            er's login name.
+
+            CHECK_SAVE_UID = 0 or 1 to disable or enable, respectively, the
+            UID (used identification number) checking for  save  files  (to
             verify  that  the  user  who  is  restoring is the same one who
             saved).
 
@@ -5398,15 +5404,9 @@
           how the game ended.  If you quit the game, you escape with all of
           your  gold  intact.   If, however, you get killed in the Mazes of
           Menace, the guild will only hear about 90% of your gold when your
-          corpse  is  discovered  (adventurers  have  been known to collect
-          finder's fees).  So, consider whether you want to take  one  last
-          hit  at  that  monster  and  possibly live, or quit and stop with
-          whatever you have.  If you quit, you keep all your gold,  but  if
-          you swing and live, you might find more.
 
 
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5415,6 +5415,12 @@
           NetHack Guidebook                                              83
 
 
+
+          corpse  is  discovered  (adventurers  have  been known to collect
+          finder's fees).  So, consider whether you want to take  one  last
+          hit  at  that  monster  and  possibly live, or quit and stop with
+          whatever you have.  If you quit, you keep all your gold,  but  if
+          you swing and live, you might find more.
 
                If  you  just want to see what the current top players/games
           list is, you can type nethack -s all on most versions.
@@ -5464,15 +5470,9 @@
           and Kenneth C. R. C. Arnold.  Small portions  were  adapted  from
           Further Exploration of the Dungeons of Doom, by Ken Arromdee.
 
-               NetHack is the product of literally dozens of people's work.
-          Main events in the course of the game development  are  described
-          below:
-
-               Jay  Fenlason  wrote the original Hack, with help from Kenny
-          Woodland, Mike Thome and Jon Payne.
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5481,6 +5481,13 @@
           NetHack Guidebook                                              84
 
 
+
+               NetHack is the product of literally dozens of people's work.
+          Main events in the course of the game development  are  described
+          below:
+
+               Jay  Fenlason  wrote the original Hack, with help from Kenny
+          Woodland, Mike Thome and Jon Payne.
 
                Andries Brouwer did a major re-write, transforming Hack into
           a  very  different  game, and published (at least) three versions
@@ -5530,15 +5537,8 @@
           Richard Addison, Mike Passaretti,  and  Olaf  Seibert,  developed
           NetHack 3.1 for the Amiga.
 
-               Norm  Meluch and Kevin Smolkowski, with help from Carl Sche-
-          lin, Stephen Spackman, Steve VanDevender, and Paul Winner, ported
-          NetHack 3.1 to the PC.
 
-               Jon W{tte and Hao-yang Wang, with help from Ross Brown, Mike
-          Engber, David Hairston, Michael Hamel, Jonathan  Handler,  Johnny
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5548,6 +5548,12 @@
 
 
 
+               Norm  Meluch and Kevin Smolkowski, with help from Carl Sche-
+          lin, Stephen Spackman, Steve VanDevender, and Paul Winner, ported
+          NetHack 3.1 to the PC.
+
+               Jon W{tte and Hao-yang Wang, with help from Ross Brown, Mike
+          Engber, David Hairston, Michael Hamel, Jonathan  Handler,  Johnny
           Lee,  Tim  Lennan, Rob Menke, and Andy Swanson, developed NetHack
           3.1 for the Macintosh, porting it for MPW.  Building on their de-
           velopment, Barton House added a Think C port.
@@ -5596,15 +5602,9 @@
 
                The final update to 3.2 was the bug fix release 3.2.3, which
           was released simultaneously with 3.3.0 in December 1999  just  in
-          time for the Year 2000.
-
-               The 3.3 development team, consisting of Michael Allison, Ken
-          Arromdee, David Cohrs, Jessie Collet, Steve Creps,  Kevin  Darcy,
-          Timo  Hakulinen,  Kevin  Hugo,  Steve  Linhart,  Ken Lorber, Dean
-          Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet  Walz,  and
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5614,6 +5614,12 @@
 
 
 
+          time for the Year 2000.
+
+               The 3.3 development team, consisting of Michael Allison, Ken
+          Arromdee, David Cohrs, Jessie Collet, Steve Creps,  Kevin  Darcy,
+          Timo  Hakulinen,  Kevin  Hugo,  Steve  Linhart,  Ken Lorber, Dean
+          Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet  Walz,  and
           Paul  Winner, released 3.3.0 in December 1999 and 3.3.1 in August
           of 2000.
 
@@ -5663,14 +5669,8 @@
           the  Amiga  port of 3.4 after Janne Salmijarvi resurrected it for
           3.3.1.
 
-               Christian "Marvin" Bressler maintained 3.4 for the Atari af-
-          ter he resurrected it for 3.3.1.
 
-               The release of NetHack 3.4.3 in December 2003 marked the be-
-          ginning of a long release hiatus. 3.4.3 proved to be a remarkably
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5680,6 +5680,11 @@
 
 
 
+               Christian "Marvin" Bressler maintained 3.4 for the Atari af-
+          ter he resurrected it for 3.3.1.
+
+               The release of NetHack 3.4.3 in December 2003 marked the be-
+          ginning of a long release hiatus. 3.4.3 proved to be a remarkably
           stable version that provided continued enjoyment by the community
           for more than a decade. The devteam slowly and quietly  continued
           to work on the game behind the scenes during the tenure of 3.4.3.
@@ -5729,14 +5734,9 @@
           Mueller,  Pat  Rankin, Derek S. Ray, Alex Smith, Mike Stephenson,
           Janet Walz, and Paul Winner.
 
-               The development team, as well as Steve VanDevender and Kevin
-          Smolkowski, ensured that NetHack 3.6 continued to operate on var-
-          ious UNIX flavors and maintained the X11 interface.
 
 
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5745,6 +5745,10 @@
           NetHack Guidebook                                              88
 
 
+
+               The development team, as well as Steve VanDevender and Kevin
+          Smolkowski, ensured that NetHack 3.6 continued to operate on var-
+          ious UNIX flavors and maintained the X11 interface.
 
                Ken Lorber, Haoyang Wang, Pat Rankin, and Dean  Luick  main-
           tained the port of NetHack 3.6 for Mac OSX.
@@ -5772,37 +5776,33 @@
           NetHack  server  at  nethack.alt.org. Thanks to Keith Simpson and
           Andy Thomson for hardfought.org. Thanks to all those unnamed dun-
           geoneers  who  invest  their  time and effort into annual NetHack
-          tournaments such as Junethack and in days past, devnull.net (gone
-          for now, but not forgotten).
+          tournaments such as Junethack, The  November  NetHack  Tournament
+          and  in days past, devnull.net (gone for now, but not forgotten).
 
                                  - - - - - - - - - -
 
-               From  time  to  time,  some depraved individual out there in
-          netland sends a particularly intriguing modification to help  out
-          with  the  game.   The Gods of the Dungeon sometimes make note of
-          the names of the worst of these miscreants in this, the  list  of
+               From time to time, some depraved  individual  out  there  in
+          netland  sends a particularly intriguing modification to help out
+          with the game.  The Gods of the Dungeon sometimes  make  note  of
+          the  names  of the worst of these miscreants in this, the list of
           Dungeoneers:
-               Adam Aronow            J. Ali Harlow           Mikko Juola
-               Alex Kompel              Janet Walz            Nathan Eady
-               Alex Smith            Janne Salmijarvi         Norm Meluch
-              Andreas Dorn        Jean-Christophe Collet      Olaf Seibert
-               Andy Church             Jeff Bailey           Pasi Kallinen
-              Andy Swanson            Jochen Erwied            Pat Rankin
-              Ari Huttunen             John Kallen           Patric Mueller
-              Barton House             John Rupley            Paul Winner
-           Benson I. Margulies         John S. Bien         Pierre Martineau
-                Bill Dyer               Johnny Lee             Ralf Brown
-            Boudewijn Waijers           Jon W{tte              Ray Chason
-                Bruce Cox            Jonathan Handler       Richard Addison
-             Bruce Holloway          Joshua Delahunty        Richard Beigel
-             Bruce Mewborne           Keizo Yamamoto       Richard P. Hughey
-              Carl Schelin              Ken Arnold             Rob Menke
-               Chris Russo             Ken Arromdee           Robin Bandy
-               David Cohrs              Ken Lorber           Robin Johnson
+               Adam Aronow              Janet Walz            Nathan Eady
+               Alex Kompel           Janne Salmijarvi         Norm Meluch
+               Alex Smith         Jean-Christophe Collet      Olaf Seibert
+              Andreas Dorn             Jeff Bailey           Pasi Kallinen
+               Andy Church            Jochen Erwied            Pat Rankin
+              Andy Swanson             John Kallen           Patric Mueller
+              Ari Huttunen             John Rupley            Paul Winner
+              Barton House             John S. Bien         Pierre Martineau
+           Benson I. Margulies          Johnny Lee             Ralf Brown
+                Bill Dyer               Jon W{tte              Ray Chason
+            Boudewijn Waijers        Jonathan Handler       Richard Addison
+                Bruce Cox            Joshua Delahunty        Richard Beigel
+             Bruce Holloway           Karl Garrison        Richard P. Hughey
 
 
 
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
@@ -5812,31 +5812,36 @@
 
 
 
-             David Damerell           Ken Washikita        Roderick Schertler
-              David Gentzel            Kevin Darcy           Roland McGrath
-             David Hairston             Kevin Hugo          Ron Van Iwaarden
-               Dean Luick              Kevin Sitze           Ronnen Miller
-                Del Lamb             Kevin Smolkowski          Ross Brown
-              Derek S. Ray             Kevin Sweet          Sascha Wostmann
-              Deron Meranda            Lars Huttar            Scott Bigham
-              Dion Nicolaas            Leon Arnott          Scott R. Turner
-             Dylan O'Donnell          M. Drew Streib           Sean Hunt
-               Eric Backus             Malcolm Ryan         Stephen Spackman
-            Eric Hendrickson          Mark Gooderum        Stefan Thielscher
-              Eric R. Smith            Mark Modrall          Stephen White
-             Eric S. Raymond         Marvin Bressler          Steve Creps
-              Erik Andersen            Matthew Day           Steve Linhart
-            Frederick Roeber           Merlyn LeRoy        Steve VanDevender
-               Gil Neiger            Michael Allison          Teemu Suikki
-               Greg Laskin             Michael Feir            Tim Lennan
-               Greg Olson             Michael Hamel          Timo Hakulinen
-             Gregg Wonderly          Michael Sokolov            Tom Almy
-              Hao-yang Wang            Mike Engber              Tom West
-              Helge Hafting            Mike Gallop           Warren Cheung
-          Irina Rempt-Drijfhout      Mike Passaretti        Warwick Allison
-              Izchak Miller          Mike Stephenson         Yitzhak Sapir
+             Bruce Mewborne           Keizo Yamamoto           Rob Menke
+              Carl Schelin              Ken Arnold            Robin Bandy
+               Chris Russo             Ken Arromdee          Robin Johnson
+               David Cohrs              Ken Lorber         Roderick Schertler
+             David Damerell           Ken Washikita          Roland McGrath
+              David Gentzel            Kevin Darcy          Ron Van Iwaarden
+             David Hairston             Kevin Hugo           Ronnen Miller
+               Dean Luick              Kevin Sitze             Ross Brown
+                Del Lamb             Kevin Smolkowski       Sascha Wostmann
+              Derek S. Ray             Kevin Sweet            Scott Bigham
+              Deron Meranda            Lars Huttar          Scott R. Turner
+              Dion Nicolaas            Leon Arnott             Sean Hunt
+             Dylan O'Donnell          M. Drew Streib        Stephen Spackman
+               Eric Backus             Malcolm Ryan        Stefan Thielscher
+            Eric Hendrickson          Mark Gooderum          Stephen White
+              Eric R. Smith            Mark Modrall           Steve Creps
+             Eric S. Raymond         Marvin Bressler         Steve Linhart
+              Erik Andersen            Matthew Day         Steve VanDevender
+            Frederick Roeber           Merlyn LeRoy           Teemu Suikki
+               Gil Neiger            Michael Allison           Tim Lennan
+               Greg Laskin             Michael Feir          Timo Hakulinen
+               Greg Olson             Michael Hamel             Tom Almy
+             Gregg Wonderly          Michael Sokolov            Tom West
+              Hao-yang Wang            Mike Engber           Warren Cheung
+              Helge Hafting            Mike Gallop          Warwick Allison
+          Irina Rempt-Drijfhout      Mike Passaretti         Yitzhak Sapir
+              Izchak Miller          Mike Stephenson
+              J. Ali Harlow            Mikko Juola
 
-               Brand  and product names are trademarks or registered trade-
+               Brand and product names are trademarks or registered  trade-
           marks of their respective holders.
 
 
@@ -5863,12 +5868,7 @@
 
 
 
-
-
-
-
-
-          NetHack 3.6                                      October 16, 2018
+          NetHack 3.6                                     December 15, 2018
 
 
 
