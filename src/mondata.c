@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1543545188 2018/11/30 02:33:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1546465283 2019/01/02 21:41:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -781,11 +781,12 @@ const char *in_str;
     }
 
     for (len = 0, i = LOW_PM; i < NUMMONS; i++) {
-        register int m_i_len = strlen(mons[i].mname);
+        register int m_i_len = (int) strlen(mons[i].mname);
 
         if (m_i_len > len && !strncmpi(mons[i].mname, str, m_i_len)) {
             if (m_i_len == slen) {
-                return i; /* exact match */
+                mntmp = i;
+                break; /* exact match */
             } else if (slen > m_i_len
                        && (str[m_i_len] == ' '
                            || !strcmpi(&str[m_i_len], "s")
@@ -841,7 +842,7 @@ int *mndx_p;
         { 0, NON_PM }
     };
     const char *p, *x;
-    int i;
+    int i, len;
 
     if (mndx_p)
         *mndx_p = NON_PM; /* haven't [yet] matched a specific type */
@@ -863,6 +864,8 @@ int *mndx_p;
         return i;
     } else {
         /* multiple characters */
+        if (!strcmpi(in_str, "long")) /* not enough to match "long worm" */
+            return 0; /* avoid false whole-word match with "long worm tail" */
         in_str = makesingular(in_str);
         /* check for special cases */
         for (i = 0; falsematch[i]; i++)
@@ -878,9 +881,12 @@ int *mndx_p;
                 return mons[i].mlet;
             }
         /* check monster class descriptions */
+        len = (int) strlen(in_str);
         for (i = 1; i < MAXMCLASSES; i++) {
             x = def_monsyms[i].explain;
-            if ((p = strstri(x, in_str)) != 0 && (p == x || *(p - 1) == ' '))
+            if ((p = strstri(x, in_str)) != 0 && (p == x || *(p - 1) == ' ')
+                && ((int) strlen(p) >= len
+                    && (p[len] == '\0' || p[len] == ' ')))
                 return i;
         }
         /* check individual species names */
