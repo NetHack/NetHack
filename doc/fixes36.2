@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.219 $ $NHDT-Date: 1546212616 2018/12/30 23:30:16 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.221 $ $NHDT-Date: 1546467443 2019/01/02 22:17:23 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -360,10 +360,12 @@ when built with STATUS_HILITES enabled (the default), gold on status line
 	was missing '$' prefix for symset:Blank
 wizard mode ^G, creating a monster of class 'I' yielded impossible "mkclass
 	found no class 35 monsters"
-in some unknown circumstance, examining something on the map could match bogus
-	monster class #0 and trigger impossible "Alphabet soup: 'an("")'."
-	(fix avoids the warning but underlying cause is a mystery; noticed
-	with the fuzzer, which swaps symbol sets in and out at random)
+wizard mode ^G, creating a monster via class name using "lo" through "long wor"
+	or "long worm t" through "long worm tail" yielded impossible "mkclass
+	found no class 59 monsters" (class '~' creates a long worm as intended)
+if bouldersym bug (via 'O', above) put a <NUL> ('\0') on the map, examining
+	that spot matched placeholder monster class #0 and triggered impossible
+	"Alphabet soup: 'an("")'."
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -486,6 +488,11 @@ early level traps are sometimes covered by the remains of fake players
 fake player characters resist Conflict
 when inside a shop, far-look now includes shop prices for items marked as
 	having been seen up close
+when sortloot is enabled, gems are grouped in subsets (1) unseen gems and
+	glass, (2) seen but unidentified gems and glass, (3) identified gems,
+	(4) identified glass, (5) unseen stones (includes unseen rocks),
+	(6) seen but unidentified gray stones, (7) identified gray stones,
+	and (8) seen rocks (IDed/unIDed not applicable)
 
 
 NetHack Community Patches (or Variation) Included

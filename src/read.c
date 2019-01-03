@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1546053040 2018/12/29 03:10:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1546465285 2019/01/02 21:41:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2498,6 +2498,10 @@ struct _create_particular_data *d;
         d->which = PM_STALKER;
         d->monclass = MAXMCLASSES;
         return TRUE;
+    } else if (d->monclass == S_WORM_TAIL) { /* empty monster class */
+        d->which = PM_LONG_WORM;
+        d->monclass = MAXMCLASSES;
+        return TRUE;
     } else if (d->monclass > 0) {
         d->which = urole.malenum; /* reset from NON_PM */
         return TRUE;
@@ -2516,7 +2520,8 @@ struct _create_particular_data *d;
 
     if (!d->randmonst) {
         firstchoice = d->which;
-        if (cant_revive(&d->which, FALSE, (struct obj *) 0)) {
+        if (cant_revive(&d->which, FALSE, (struct obj *) 0)
+            && firstchoice != PM_LONG_WORM_TAIL) {
             /* wizard mode can override handling of special monsters */
             char buf[BUFSZ];
 

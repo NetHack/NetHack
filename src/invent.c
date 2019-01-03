@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1545946249 2018/12/27 21:30:49 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.247 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1546467443 2019/01/02 22:17:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -52,7 +52,7 @@ static int lastinvnr = 51; /* 0 ... 51 (never saved&restored) */
  */
 static char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
 
-/* sortloot() classification; called at most once for each object sorted  */
+/* sortloot() classification; called at most once [per sort] for each object */
 STATIC_OVL void
 loot_classify(sort_item, obj)
 Loot *sort_item;
@@ -71,6 +71,7 @@ struct obj *obj;
     const char *classorder;
     char *p;
     int k, otyp = obj->otyp, oclass = obj->oclass;
+    boolean seen, discovered = objects[otyp].oc_name_known ? TRUE : FALSE;
 
     /*
      * For the value types assigned by this classification, sortloot()
@@ -78,6 +79,7 @@ struct obj *obj;
      */
     if (!Blind)
         obj->dknown = 1; /* xname(obj) does this; we want it sooner */
+    seen = obj->dknown ? TRUE : FALSE,
     /* class order */
     classorder = flags.sortpack ? flags.inv_order : def_srt_order;
     p = index(classorder, oclass);
@@ -120,7 +122,7 @@ struct obj *obj;
                           : !is_pole(obj) ? 5 : 6);
         break;
     case TOOL_CLASS:
-        if (obj->dknown && objects[otyp].oc_name_known
+        if (seen && discovered
             && (otyp == BAG_OF_TRICKS || otyp == HORN_OF_PLENTY))
             k = 2; /* known pseudo-container */
         else if (Is_container(obj))
@@ -164,6 +166,35 @@ struct obj *obj;
             break;
         }
         break;
+    case GEM_CLASS:
+        /*
+         * Normally subclass takes priority over discovery status, but
+         * that would give away information for gems (assuming we'll
+         * group them as valuable gems, next glass, then gray stones,
+         * and finally rocks once they're all fully identified).
+         *
+         * Order:
+         *  1) unseen gems and glass ("gem")
+         *  2) seen but undiscovered gems and glass ("blue gem"),
+         *  3) discovered gems ("sapphire"),
+         *  4) discovered glass ("worthless pieced of blue glass"),
+         *  5) unseen gray stones and rocks ("stone"),
+         *  6) seen but undiscovered gray stones ("gray stone"),
+         *  7) discovered gray stones ("touchstone"),
+         *  8) seen rocks ("rock").
+         */
+        switch (objects[obj->otyp].oc_material) {
+        case GEMSTONE:
+            k = !seen ? 1 : !discovered ? 2 : 3;
+            break;
+        case GLASS:
+            k = !seen ? 1 : !discovered ? 2 : 4;
+            break;
+        default: /* MINERAL */
+            k = !seen ? 5 : (obj->otyp != ROCK) ? (!discovered ? 6 : 7) : 8;
+            break;
+        }
+        break;
     default:
         /* other classes don't have subclasses; we assign a nonzero
            value because sortloot() uses 0 to mean 'not yet classified' */
@@ -172,9 +203,9 @@ struct obj *obj;
     }
     sort_item->subclass = (xchar) k;
     /* discovery status */
-    k = !obj->dknown ? 1 /* unseen */
-        : (objects[otyp].oc_name_known || !OBJ_DESCR(objects[otyp])) ? 4
-          : (objects[otyp].oc_uname)? 3 /* named (partially discovered) */
+    k = !seen ? 1 /* unseen */
+        : (discovered || !OBJ_DESCR(objects[otyp])) ? 4
+          : (objects[otyp].oc_uname) ? 3 /* named (partially discovered) */
             : 2; /* undiscovered */
     sort_item->disco = (xchar) k;
 }
