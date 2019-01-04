@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1544401270 2018/12/10 00:21:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1546565815 2019/01/04 01:36:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -496,17 +496,114 @@ struct obj *scroll;
     return result;
 }
 
+/* ^T command; 'm ^T' == choose among several teleport modes */
 int
 dotelecmd()
 {
-    return dotele((wizard) ? TRUE : FALSE);
+    long save_HTele, save_ETele;
+    int res, added, hidden;
+    boolean ignore_restrictions = FALSE;
+/* also defined in spell.c */
+#define NOOP_SPELL  0
+#define HIDE_SPELL  1
+#define ADD_SPELL   2
+#define UNHIDESPELL 3
+#define REMOVESPELL 4
+
+    /* normal mode; ignore 'm' prefix if it was given */
+    if (!wizard)
+        return dotele(FALSE);
+
+    added = hidden = NOOP_SPELL;
+    save_HTele = HTeleportation, save_ETele = ETeleportation;
+    if (!iflags.menu_requested) {
+        ignore_restrictions = TRUE;
+    } else {
+        static const struct tporttypes {
+            char menulet;
+            const char *menudesc;
+        } tports[] = {
+            /*
+             * Potential combinations:
+             *  1) attempt ^T without intrinsic, not know spell;
+             *  2) via intrinsic, not know spell, obey restrictions;
+             *  3) via intrinsic, not know spell, ignore restrictions;
+             *  4) via intrinsic, know spell, obey restrictions;
+             *  5) via intrinsic, know spell, ignore restrictions;
+             *  6) via spell, not have intrinsic, obey restrictions;
+             *  7) via spell, not have intrinsic, ignore restrictions;
+             *  8) force, obey other restrictions;
+             *  9) force, ignore restrictions.
+             * We only support the 1st (t), 2nd (n), 6th (s), and 9th (w).
+             *
+             * This ignores the fact that there is an experience level
+             * (or poly-form) requirement which might make normal ^T fail.
+             */
+            { 'n', "normal ^T on demand; no spell, obey restrictions" },
+            { 's', "via spellcast; no intrinsic teleport" },
+            { 't', "try ^T without having it; no spell" },
+            { 'w', "debug mode; ignore restrictions" }, /* trad wizard mode */
+        };
+        menu_item *picks = (menu_item *) 0;
+        anything any;
+        winid win;
+        int i, tmode;
+
+        win = create_nhwindow(NHW_MENU);
+        start_menu(win);
+        any = zeroany;
+        for (i = 0; i < SIZE(tports); ++i) {
+            any.a_int = (int) tports[i].menulet;
+            add_menu(win, NO_GLYPH, &any, (char) any.a_int, 0, ATR_NONE,
+                     tports[i].menudesc, MENU_UNSELECTED);
+        }
+        end_menu(win, "Which way do you want to teleport?");
+        if (select_menu(win, PICK_ONE, &picks) > 0) {
+            tmode = picks[0].item.a_int;
+            free((genericptr_t) picks);
+        } else {
+            return 0;
+        }
+        destroy_nhwindow(win);
+        switch (tmode) {
+        case 'n':
+            HTeleportation |= I_SPECIAL; /* confer intrinsic teleportation */
+            hidden = tport_spell(HIDE_SPELL); /* hide teleport-away */
+            break;
+        case 's':
+            HTeleportation = ETeleportation = 0L; /* suppress intrinsic */
+            added = tport_spell(ADD_SPELL); /* add teleport-away */
+            break;
+        case 't':
+            HTeleportation = ETeleportation = 0L; /* suppress intrinsic */
+            hidden = tport_spell(HIDE_SPELL); /* hide teleport-away */
+            break;
+        case 'w':
+            ignore_restrictions = TRUE;
+            break;
+        }
+    }
+
+    /* if dotele() can be fatal, final disclosure might lie about
+       intrinsic teleportation; we should be able to live with that
+       since the menu finagling is only applicable in wizard mode */
+    res = dotele(ignore_restrictions);
+
+    HTeleportation = save_HTele;
+    ETeleportation = save_ETele;
+    if (added != NOOP_SPELL || hidden != NOOP_SPELL)
+        /* can't both be non-NOOP so addition will yield the non-NOOP one */
+        (void) tport_spell(added + hidden - NOOP_SPELL);
+
+    return res;
 }
 
 int
 dotele(break_the_rules)
-boolean break_the_rules;
+boolean break_the_rules; /* True: wizard mode ^T */
 {
     struct trap *trap;
+    const char *cantdoit;
     boolean trap_once = FALSE;
 
     trap = t_at(u.ux, u.uy);
@@ -517,9 +614,9 @@ boolean break_the_rules;
         trap_once = trap->once; /* trap may get deleted, save this */
         if (trap->once) {
             pline("This is a vault teleport, usable once only.");
-            if (yn("Jump in?") == 'n')
+            if (yn("Jump in?") == 'n') {
                 trap = 0;
-            else {
+            } else {
                 deltrap(trap);
                 newsym(u.ux, u.uy);
             }
@@ -534,58 +631,72 @@ boolean break_the_rules;
 
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(youmonst.data))) {
-            /* Try to use teleport away spell. */
-            if (objects[SPE_TELEPORT_AWAY].oc_name_known && !Confusion)
-                for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
-                    if (spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY) {
-                        castit = TRUE;
-                        break;
-                    }
-            if (!break_the_rules) {
-                if (!castit) {
-                    if (!Teleportation)
-                        You("don't know that spell.");
-                    else
-                        You("are not able to teleport at will.");
-                    return 0;
-                }
+            /* Try to use teleport away spell.
+               3.6.2: this used to require that you know the spellbook
+               (probably just intended as an optimization to skip the
+               lookup loop) but it is possible to know and cast a spell
+               after forgetting its book due to amnesia. */
+            for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
+                if (spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY)
+                    break;
+            /* casting isn't inhibited by being Stunned (...it ought to be) */
+            castit = (sp_no < MAXSPELL && !Confusion);
+            if (!castit && !break_the_rules) {
+                You("%s.",
+                    !Teleportation ? ((sp_no < MAXSPELL)
+                                        ? "can't cast that spell"
+                                        : "don't know that spell")
+                                   : "are not able to teleport at will");
+                return 0;
             }
         }
 
-        if (u.uhunger <= 100 || ACURR(A_STR) < 6) {
-            if (!break_the_rules) {
-                You("lack the strength %s.",
-                    castit ? "for a teleport spell" : "to teleport");
-                return 1;
-            }
+        cantdoit = 0;
+        /* 3.6.2: the magic numbers for hunger, strength, and energy
+           have been changed to match the ones used in spelleffects().
+           Also, failing these tests used to return 1 and use a move
+           even though casting failure due to these reasons doesn't.
+           [Note: this spellev() is different from the one in spell.c
+           but they both yield the same result.] */
+#define spellev(spell_otyp) ((int) objects[spell_otyp].oc_level)
+        energy = 5 * spellev(SPE_TELEPORT_AWAY);
+        if (break_the_rules) {
+            if (!castit)
+                energy = 0;
+            /* spell will cost more if carrying the Amulet, but the
+               amount is rnd(2 * energy) so we can't know by how much;
+               average is twice the normal cost, but could be triple;
+               the extra energy is spent even if that results in not
+               having enough to cast (which also uses the move) */
+            else if (u.uen < energy)
+                u.uen = energy;
+        } else if (u.uhunger <= 10) {
+            cantdoit = "are too weak from hunger";
+        } else if (ACURR(A_STR) < 4) {
+            cantdoit = "lack the strength";
+        } else if (energy > u.uen) {
+            cantdoit = "lack the energy";
         }
-
-        energy = objects[SPE_TELEPORT_AWAY].oc_level * 7 / 2 - 2;
-        if (u.uen <= energy) {
-            if (break_the_rules)
-                energy = u.uen;
-            else {
-                You("lack the energy %s.",
-                    castit ? "for a teleport spell" : "to teleport");
-                return 1;
-            }
+        if (cantdoit) {
+            You("%s %s.", cantdoit,
+                castit ? "for a teleport spell" : "to teleport");
+            return 0;
+        } else if (check_capacity(
+                       "Your concentration falters from carrying so much.")) {
+            return 1; /* this failure in spelleffects() also uses the move */
         }
-
-        if (check_capacity(
-                "Your concentration falters from carrying so much."))
-            return 1;
 
         if (castit) {
+            /* energy cost is deducted in spelleffects() */
             exercise(A_WIS, TRUE);
             if (spelleffects(sp_no, TRUE))
                 return 1;
             else if (!break_the_rules)
                 return 0;
         } else {
-            if (!break_the_rules) {
-                u.uen -= energy;
-                context.botl = 1;
-            }
+            /* bypassing spelleffects(); apply energy cost directly */
+            u.uen -= energy;
+            context.botl = 1;
         }
     }
 
@@ -596,7 +707,7 @@ boolean break_the_rules;
             tele();
         (void) next_to_u();
     } else {
-        You1(shudder_for_moment);
+        You("%s", shudder_for_moment);
         return 0;
     }
     if (!trap)

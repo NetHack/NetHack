@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1545964581 2018/12/28 02:36:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.678 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1546565812 2019/01/04 01:36:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.680 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2329,6 +2329,7 @@ E void NDECL(age_spells);
 E int NDECL(docast);
 E int FDECL(spell_skilltype, (int));
 E int FDECL(spelleffects, (int, BOOLEAN_P));
+E int FDECL(tport_spell, (int));
 E void NDECL(losespells);
 E int NDECL(dovspell);
 E void FDECL(initialspell, (struct obj *));
