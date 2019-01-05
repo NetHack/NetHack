@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1546212616 2018/12/30 23:30:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1546656404 2019/01/05 02:46:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -505,7 +505,7 @@ int nondefault;
 #endif
 # ifdef CURSES_GRAPHICS
         if (SYMHANDLING(H_CURS) && cursesgraphics_mode_callback)
-            (*cursesgraphics_mode_callback)();		
+            (*cursesgraphics_mode_callback)();
 # endif
     } else {
         init_l_symbols();
