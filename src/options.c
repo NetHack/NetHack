@@ -1862,7 +1862,7 @@ free_menu_coloring()
 {
     struct menucoloring *tmp, *tmp2;
 
-    for (tmp = menu_colorings; tmp; tmp = tmp2) {
+    for (tmp = g.menu_colorings; tmp; tmp = tmp2) {
         tmp2 = tmp->next;
         regex_free(tmp->match);
         free((genericptr_t) tmp->origstr);

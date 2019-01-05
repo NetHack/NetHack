@@ -1302,14 +1302,14 @@ int what;
             save_tport.tport_indx = MAXSPELL;
         } else if (what == UNHIDESPELL) {
             /*assert( save_tport.savespell.sp_id == SPE_TELEPORT_AWAY );*/
-            spl_book[save_tport.tport_indx] = save_tport.savespell;
+            g.spl_book[save_tport.tport_indx] = save_tport.savespell;
             save_tport.tport_indx = MAXSPELL; /* burn bridge... */
         } else if (what == ADD_SPELL) {
-            save_tport.savespell = spl_book[i];
+            save_tport.savespell = g.spl_book[i];
             save_tport.tport_indx = i;
-            spl_book[i].sp_id = SPE_TELEPORT_AWAY;
-            spl_book[i].sp_lev = objects[SPE_TELEPORT_AWAY].oc_level;
-            spl_book[i].sp_know = KEEN;
+            g.spl_book[i].sp_id = SPE_TELEPORT_AWAY;
+            g.spl_book[i].sp_lev = objects[SPE_TELEPORT_AWAY].oc_level;
+            g.spl_book[i].sp_know = KEEN;
             return REMOVESPELL; /* operation needed to reverse */
         }
     } else { /* spellid(i) == SPE_TELEPORT_AWAY */
@@ -1317,12 +1317,12 @@ int what;
             save_tport.tport_indx = MAXSPELL;
         } else if (what == REMOVESPELL) {
             /*assert( i == save_tport.tport_indx );*/
-            spl_book[i] = save_tport.savespell;
+            g.spl_book[i] = save_tport.savespell;
             save_tport.tport_indx = MAXSPELL;
         } else if (what == HIDE_SPELL) {
-            save_tport.savespell = spl_book[i];
+            save_tport.savespell = g.spl_book[i];
             save_tport.tport_indx = i;
-            spl_book[i].sp_id = NO_SPELL;
+            g.spl_book[i].sp_id = NO_SPELL;
             return UNHIDESPELL; /* operation needed to reverse */
         }
     }

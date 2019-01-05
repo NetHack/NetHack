@@ -548,7 +548,7 @@ dotelecmd()
 
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-        any = zeroany;
+        any = g.zeroany;
         for (i = 0; i < SIZE(tports); ++i) {
             any.a_int = (int) tports[i].menulet;
             add_menu(win, NO_GLYPH, &any, (char) any.a_int, 0, ATR_NONE,
