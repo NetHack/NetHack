@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1546565812 2019/01/04 01:36:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.680 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1546687295 2019/01/05 11:21:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.681 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2249,7 +2249,7 @@ E void FDECL(shk_chat, (struct monst *));
 E void FDECL(check_unpaid_usage, (struct obj *, BOOLEAN_P));
 E void FDECL(check_unpaid, (struct obj *));
 E void FDECL(costly_gold, (XCHAR_P, XCHAR_P, long));
-E long FDECL(get_cost_of_shop_item, (struct obj *));
+E long FDECL(get_cost_of_shop_item, (struct obj *, int *));
 E int FDECL(oid_price_adjustment, (struct obj *, unsigned));
 E boolean FDECL(block_door, (XCHAR_P, XCHAR_P));
 E boolean FDECL(block_entry, (XCHAR_P, XCHAR_P));

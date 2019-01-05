@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1545953813 2018/12/27 23:36:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1546687294 2019/01/05 11:21:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1970,19 +1970,27 @@ unsigned id;
 /* Returns the price of an arbitrary item in the shop,
    0 if the item doesn't belong to a shopkeeper or hero is not in the shop. */
 long
-get_cost_of_shop_item(obj)
+get_cost_of_shop_item(obj, nochrg)
 register struct obj *obj;
-{
+int *nochrg; /* alternate return value: 1: no charge, 0: shop owned,        */
+{            /* -1: not in a shop (so should't be formatted as "no charge") */
     struct monst *shkp;
+    struct obj *top;
     xchar x, y;
     long cost = 0L;
 
+    *nochrg = -1; /* assume 'not applicable' */
     if (*u.ushops && obj->oclass != COIN_CLASS
         && obj != uball && obj != uchain
         && get_obj_location(obj, &x, &y, CONTAINED_TOO)
-        && *in_rooms(u.ux, u.uy, SHOPBASE) == *in_rooms(x, y, SHOPBASE)
+        && *in_rooms(x, y, SHOPBASE) == *u.ushops
         && (shkp = shop_keeper(inside_shop(x, y))) != 0 && inhishop(shkp)) {
-        cost = obj->no_charge ? 0L : obj->quan * get_cost(obj, shkp);
+        for (top = obj; top->ocontainer; top = top->ocontainer)
+            continue;
+        *nochrg = (top->where == OBJ_FLOOR && obj->no_charge);
+
+        if (carried(top) ? (int) obj->unpaid : !*nochrg)
+            cost = obj->quan * get_cost(obj, shkp);
         if (Has_contents(obj))
             cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
     }
