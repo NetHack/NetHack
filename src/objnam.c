@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1545774525 2018/12/25 21:48:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.231 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1546687293 2019/01/05 11:21:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.232 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1203,21 +1203,23 @@ unsigned doname_flags;
     }
     /* treat 'restoring' like suppress_price because shopkeeper and
        bill might not be available yet while restore is in progress */
-    if (!iflags.suppress_price && !restoring && is_unpaid(obj)) {
+    if (iflags.suppress_price || restoring) {
+        ; /* don't attempt to obtain any stop pricing, even if 'with_price' */
+    } else if (is_unpaid(obj)) { /* in inventory or in container in invent */
         long quotedprice = unpaid_cost(obj, TRUE);
 
         Sprintf(eos(bp), " (%s, %ld %s)",
                 obj->unpaid ? "unpaid" : "contents",
                 quotedprice, currency(quotedprice));
-    } else if (with_price) {
-        long price = get_cost_of_shop_item(obj); /* updates obj->ox,oy */
+    } else if (with_price) { /* on floor or in container on floor */
+        int nochrg = 0;
+        long price = get_cost_of_shop_item(obj, &nochrg);
 
         if (price > 0L)
-            Sprintf(eos(bp), " (%ld %s)", price, currency(price));
-        else if (obj->no_charge /* only set for items on shop floor */
-                 && *u.ushops /* but make sure hero is inside same shop */
-                 && (*in_rooms(u.ux, u.uy, SHOPBASE)
-                     == *in_rooms(obj->ox, obj->oy, SHOPBASE)))
+            Sprintf(eos(bp), " (%s, %ld %s)",
+                    nochrg ? "contents" : "for sale",
+                    price, currency(price));
+        else if (nochrg > 0)
             Strcat(bp, " (no charge)");
     }
     if (!strncmp(prefix, "a ", 2)) {
