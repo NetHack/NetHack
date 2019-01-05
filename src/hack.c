@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1545530973 2018/12/23 02:09:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1546656413 2019/01/05 02:46:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.203 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -277,7 +277,7 @@ moverock()
                 /* note: reset to zero after save/restore cycle */
                 static NEARDATA long lastmovetime;
 #endif
-            dopush:
+ dopush:
                 if (!u.usteed) {
                     if (g.moves > lastmovetime + 2 || g.moves < lastmovetime)
                         pline("With %s effort you move %s.",
@@ -302,7 +302,7 @@ moverock()
                 newsym(sx, sy);
             }
         } else {
-        nopushmsg:
+ nopushmsg:
             if (u.usteed)
                 pline("%s tries to move %s, but cannot.",
                       upstart(y_monnam(u.usteed)), the(xname(otmp)));
@@ -310,7 +310,7 @@ moverock()
                 You("try to move %s, but in vain.", the(xname(otmp)));
             if (Blind)
                 feel_location(sx, sy);
-        cannot_push:
+ cannot_push:
             if (throws_rocks(g.youmonst.data)) {
                 boolean
                     canpickup = (!Sokoban
@@ -795,7 +795,7 @@ int mode;
                 return FALSE;
             }
         } else {
-        testdiag:
+ testdiag:
             if (dx && dy && !Passes_walls
                 && (!doorless_door(x, y) || block_door(x, y))) {
                 /* Diagonal moves into a door are not allowed. */
@@ -953,8 +953,8 @@ int mode;
             uy = u.uy;
         }
 
-    noguess:
-        (void) memset((genericptr_t) travel, 0, sizeof(travel));
+ noguess:
+        (void) memset((genericptr_t) travel, 0, sizeof travel);
         travelstepx[0][0] = tx;
         travelstepy[0][0] = ty;
 
@@ -1139,7 +1139,7 @@ int mode;
         return FALSE;
     }
 
-found:
+ found:
     u.dx = 0;
     u.dy = 0;
     nomul(0);
@@ -1292,7 +1292,7 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
                     Norep("You are %s %s.", predicament, culprit);
             }
         } else {
-wriggle_free:
+ wriggle_free:
             if (u.usteed)
                 pline("%s finally %s free.", upstart(steedname),
                       !anchored ? "lurches" : "wrenches the ball");
@@ -1491,7 +1491,7 @@ domove()
                 case 0:
                 case 1:
                 case 2:
-                pull_free:
+ pull_free:
                     You("pull free from %s.", mon_nam(u.ustuck));
                     u.ustuck = 0;
                     break;
@@ -2201,7 +2201,7 @@ boolean pick;
         }
         mnexto(mtmp); /* have to move the monster */
     }
-spotdone:
+ spotdone:
     if (!--inspoteffects) {
         spotterrain = STONE; /* 0 */
         spotloc.x = spotloc.y = 0;
@@ -2579,7 +2579,8 @@ dopickup(VOID_ARGS)
     int count, tmpcount, ret;
 
     /* awful kludge to work around parse()'s pre-decrement */
-    count = (g.multi || (g.save_cm && *g.save_cm == cmd_from_func(dopickup))) ? g.multi + 1 : 0;
+    count = (g.multi || (g.save_cm && *g.save_cm == cmd_from_func(dopickup)))
+              ? g.multi + 1 : 0;
     g.multi = 0; /* always reset */
 
     if ((ret = pickup_checks() >= 0))
@@ -2652,7 +2653,7 @@ lookaround()
                 }
                 goto bcorr;
             } else if (levl[x][y].typ == CORR) {
-            bcorr:
+ bcorr:
                 if (levl[u.ux][u.uy].typ != ROOM) {
                     if (g.context.run == 1 || g.context.run == 3
                         || g.context.run == 8) {
@@ -2710,7 +2711,7 @@ lookaround()
                     || ((y == u.uy - u.dy) && (x != u.ux + u.dx)))
                     continue;
             }
-        stop:
+ stop:
             nomul(0);
             return;
         } /* end for loops */

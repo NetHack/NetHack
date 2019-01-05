@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1546144745 2018/12/30 04:39:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.146 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1546656415 2019/01/05 02:46:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -117,7 +117,7 @@ char *outbuf;
         } else if (mon->m_ap_type == M_AP_OBJECT
                    /* remembered glyph, not glyph_at() which is 'mon' */
                    && glyph_is_object(glyph)) {
-        objfrommap:
+ objfrommap:
             otmp = (struct obj *) 0;
             fakeobj = object_from_map(glyph, x, y, &otmp);
             Strcat(outbuf, (otmp && otmp->otyp != STRANGE_OBJECT)
@@ -1421,7 +1421,7 @@ boolean without_asking;
                 } else {
                     textp = suptext2;
                     gang = "";
-		}
+                }
                 datawin = create_nhwindow(NHW_MENU);
                 for (i = 0; textp[i]; i++) {
                     char buf[BUFSZ];

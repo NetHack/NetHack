@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.221 $ $NHDT-Date: 1546467443 2019/01/02 22:17:23 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.223 $ $NHDT-Date: 1546655319 2019/01/05 02:28:39 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -322,6 +322,11 @@ since knives became stackable in 3.6.0, fake player monsters could be given
 using 'O' to attempt to set bouldersym to a monster letter or warning digit
 	while it still had its default value would override the display value
 	for it to be <NUL> ('\0') after 'badoption' feedback
+when ^T resorted to the teleport-away spell if hero didn't have intrinsic
+	telepotation, it used different hunger/strength/energy requirements
+	than casting with 'Z'; ^T also required that the corresponding book
+	be known even though knowing and casting a spell should be (and is
+	with 'Z') possible after forgetting the spellbook due to amnesia
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -366,6 +371,8 @@ wizard mode ^G, creating a monster via class name using "lo" through "long wor"
 if bouldersym bug (via 'O', above) put a <NUL> ('\0') on the map, examining
 	that spot matched placeholder monster class #0 and triggered impossible
 	"Alphabet soup: 'an("")'."
+wizard mode m^T, not selecting a teleport choice didn't teardown the menu
+	properly and could eventually lead to "No window slots!" panic
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -493,6 +500,8 @@ when sortloot is enabled, gems are grouped in subsets (1) unseen gems and
 	(4) identified glass, (5) unseen stones (includes unseen rocks),
 	(6) seen but unidentified gray stones, (7) identified gray stones,
 	and (8) seen rocks (IDed/unIDed not applicable)
+in wizard mode, ^T can be preceded by 'm' prefix in order to test teleporting
+	without having wizard mode override various restrictions
 
 
 NetHack Community Patches (or Variation) Included
