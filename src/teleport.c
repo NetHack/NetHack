@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1546565815 2019/01/04 01:36:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1546655319 2019/01/05 02:28:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.83 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -555,16 +555,25 @@ dotelecmd()
         for (i = 0; i < SIZE(tports); ++i) {
             any.a_int = (int) tports[i].menulet;
             add_menu(win, NO_GLYPH, &any, (char) any.a_int, 0, ATR_NONE,
-                     tports[i].menudesc, MENU_UNSELECTED);
+                     tports[i].menudesc,
+                     (tports[i].menulet == 'w') ? MENU_SELECTED
+                                                : MENU_UNSELECTED);
         }
         end_menu(win, "Which way do you want to teleport?");
-        if (select_menu(win, PICK_ONE, &picks) > 0) {
+        i = select_menu(win, PICK_ONE, &picks);
+        destroy_nhwindow(win);
+        if (i > 0) {
             tmode = picks[0].item.a_int;
+            /* if we got 2, use the one which wasn't preselected */
+            if (i > 1 && tmode == 'w')
+                tmode = picks[1].item.a_int;
             free((genericptr_t) picks);
-        } else {
+        } else if (i == 0) {
+            /* preselected one was explicitly chosen and got toggled off */
+            tmode = 'w';
+        } else { /* ESC */
             return 0;
         }
-        destroy_nhwindow(win);
         switch (tmode) {
         case 'n':
             HTeleportation |= I_SPECIAL; /* confer intrinsic teleportation */
