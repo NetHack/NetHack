@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.h	$NHDT-Date: 1525012585 2018/04/29 14:36:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	display.h	$NHDT-Date: 1546212620 2018/12/30 23:30:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -256,6 +256,8 @@
  *              in the lower three bits.  Count: NUMMONS << 3
  *
  * warning      A set of six representing the different warning levels.
+ *
+ * statue       One for each monster.  Count: NUMMONS
  *
  * The following are offsets used to convert to and from a glyph.
  */

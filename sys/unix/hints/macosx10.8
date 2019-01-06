@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  macosx10.8 $NHDT-Date: 1455397109 2016/02/13 20:58:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.0 $
+# NetHack 3.6  macosx10.8 $NHDT-Date: 1546220385 2018/12/31 01:39:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.36 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -101,15 +101,23 @@ CFLAGS += -DNOTTYGRAPHICS
 endif	# !WANT_WIN_TTY
 
 ifdef WANT_WIN_X11
+WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
+VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
+# separate from CFLAGS so that we don't pass it to every file
+X11CFLAGS = -I/opt/X11/include
+CFLAGS += -DX11_GRAPHICS
+# avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
+X11CFLAGS += -Wno-variadic-macros
+ifdef USE_XPM
+CFLAGS += -DUSE_XPM
+WINX11LIB += -lXpm
+VARDATND += rip.xpm
+endif
 WINSRC += $(WINX11SRC)
 WINOBJ += $(WINX11OBJ)
 WINLIB += $(WINX11LIB)
 LFLAGS=-L/opt/X11/lib
-VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
-POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
-CFLAGS += -DX11_GRAPHICS -I/opt/X11/include
-# avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
-CFLAGS += -Wno-variadic-macros
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT

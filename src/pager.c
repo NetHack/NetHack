@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1545774524 2018/12/25 21:48:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.145 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1546656415 2019/01/05 02:46:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -112,7 +112,7 @@ mhidden_description(struct monst *mon,
         } else if (mon->m_ap_type == M_AP_OBJECT
                    /* remembered glyph, not glyph_at() which is 'mon' */
                    && glyph_is_object(glyph)) {
-        objfrommap:
+ objfrommap:
             otmp = (struct obj *) 0;
             fakeobj = object_from_map(glyph, x, y, &otmp);
             Strcat(outbuf, (otmp && otmp->otyp != STRANGE_OBJECT)
@@ -844,9 +844,9 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
 
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
-        for (i = 0; i < MAXMCLASSES; i++) {
+        for (i = 1; i < MAXMCLASSES; i++) {
             if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
-                && def_monsyms[i].explain) {
+                && def_monsyms[i].explain && *def_monsyms[i].explain) {
                 need_to_look = TRUE;
                 if (!found) {
                     Sprintf(out_str, "%s%s",
@@ -1216,7 +1216,7 @@ do_look(int mode, coord *click_cc)
         }
 
         found = do_screen_description(cc, (from_screen || clicklook), sym,
-                                  out_str, &firstmatch, &supplemental_pm);
+                                      out_str, &firstmatch, &supplemental_pm);
 
         /* Finally, print out our explanation. */
         if (found) {
@@ -1401,7 +1401,7 @@ boolean without_asking;
                 } else {
                     textp = suptext2;
                     gang = "";
-		}
+                }
                 datawin = create_nhwindow(NHW_MENU);
                 for (i = 0; textp[i]; i++) {
                     char buf[BUFSZ];

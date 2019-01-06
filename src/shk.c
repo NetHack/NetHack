@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1545786461 2018/12/26 01:07:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1546687294 2019/01/05 11:21:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -921,6 +921,17 @@ obfree(register struct obj *obj, register struct obj *merge)
             *bp = ESHK(shkp)->bill_p[ESHK(shkp)->billct];
 #endif
         }
+    } else {
+        /* not on bill; if the item is being merged away rather than
+           just deleted and has a higher price adjustment than the stack
+           being merged into, give the latter the former's obj->o_id so
+           that the merged stack takes on higher price; matters if hero
+           eventually buys them from a shop, but doesn't matter if hero
+           owns them and intends to sell (unless he subsequently buys
+           them back) or if no shopping activity ever involves them */
+        if (merge && (oid_price_adjustment(obj, obj->o_id)
+                      > oid_price_adjustment(merge, merge->o_id)))
+            merge->o_id = obj->o_id;
     }
     if (obj->owornmask) {
         impossible("obfree: deleting worn obj (%d: %ld)", obj->otyp,
@@ -1904,22 +1915,44 @@ find_oid(unsigned id)
 /* Returns the price of an arbitrary item in the shop,
    0 if the item doesn't belong to a shopkeeper or hero is not in the shop. */
 long
-get_cost_of_shop_item(register struct obj *obj)
-{
+get_cost_of_shop_item(register struct obj *obj, 
+                      int *nochrg) /* alternate return value: 1: no charge, 0: shop owned,        */
+{                                  /* -1: not in a shop (so should't be formatted as "no charge") */
     struct monst *shkp;
+    struct obj *top;
     xchar x, y;
     long cost = 0L;
 
+    *nochrg = -1; /* assume 'not applicable' */
     if (*u.ushops && obj->oclass != COIN_CLASS
         && obj != uball && obj != uchain
         && get_obj_location(obj, &x, &y, CONTAINED_TOO)
-        && *in_rooms(u.ux, u.uy, SHOPBASE) == *in_rooms(x, y, SHOPBASE)
+        && *in_rooms(x, y, SHOPBASE) == *u.ushops
         && (shkp = shop_keeper(inside_shop(x, y))) != 0 && inhishop(shkp)) {
-        cost = obj->no_charge ? 0L : obj->quan * get_cost(obj, shkp);
+        for (top = obj; top->ocontainer; top = top->ocontainer)
+            continue;
+        *nochrg = (top->where == OBJ_FLOOR && obj->no_charge);
+
+        if (carried(top) ? (int) obj->unpaid : !*nochrg)
+            cost = obj->quan * get_cost(obj, shkp);
         if (Has_contents(obj))
             cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
     }
     return cost;
+}
+
+/* decide whether to apply a surcharge (or hypothetically, a discount) to obj
+   if it had ID number 'oid'; returns 1: increase, 0: normal, -1: decrease */
+int
+oid_price_adjustment(struct obj *obj, unsigned oid)
+{
+    int res = 0, otyp = obj->otyp;
+
+    if (!(obj->dknown && objects[otyp].oc_name_known)
+        && (obj->oclass != GEM_CLASS || objects[otyp].oc_material != GLASS)) {
+        res = ((oid % 4) == 0); /* id%4 ==0 -> +1, ==1..3 -> 0 */
+    }
+    return res;
 }
 
 /* calculate the value that the shk will charge for [one of] an object */
@@ -1980,7 +2013,7 @@ get_cost(register struct obj *obj,
                 break;
             }
             tmp = (long) objects[i].oc_cost;
-        } else if (!(obj->o_id % 4)) {
+        } else if (oid_price_adjustment(obj, obj->o_id) > 0) {
             /* unid'd, arbitrarily impose surcharge: tmp *= 4/3 */
             multiplier *= 4L;
             divisor *= 3L;

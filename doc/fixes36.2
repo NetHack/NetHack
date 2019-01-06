@@ -1,4 +1,4 @@
-$NHDT-Branch: $:$NHDT-Revision: $ $NHDT-Date: $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.224 $ $NHDT-Date: 1546687293 2019/01/05 11:21:33 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -309,6 +309,24 @@ bag of holding explosion inside shop billed hero for unpaid contents if it
 	happened when applied while carried but not when looted while on floor
 looking into an applied container with ':' showed prices of unpaid items but
 	looking into a looted one with ':' did not show prices for shop items
+prevent achievement luckstone from merging with other luckstones if kicked or
+	dropped by monster (not applicable for dropped by player; achievement
+	would have been recorded and luckstone reverted to normal if picked up)
+when splitting a stack where internal ID is used to make adjustment to
+	shop prices, pick an ID for new stack that yields same prices as old
+when merging a stack where internal ID is used to adjust shop prices, always
+	keep the ID which induces the higher price (only matters when buying
+	from shop, not when selling; doesn't affect items already on bill)
+since knives became stackable in 3.6.0, fake player monsters could be given
+	multi-quantity stacks for weapons (scalpel, athame) they never throw
+using 'O' to attempt to set bouldersym to a monster letter or warning digit
+	while it still had its default value would override the display value
+	for it to be <NUL> ('\0') after 'badoption' feedback
+when ^T resorted to the teleport-away spell if hero didn't have intrinsic
+	telepotation, it used different hunger/strength/energy requirements
+	than casting with 'Z'; ^T also required that the corresponding book
+	be known even though knowing and casting a spell should be (and is
+	with 'Z') possible after forgetting the spellbook due to amnesia
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -345,6 +363,21 @@ a config file line with OPTIONS=symset:default, roguesymset:RogueEpyx
 avoid potential segfault when doing 'more information' lookup
 when built with STATUS_HILITES enabled (the default), gold on status line
 	was missing '$' prefix for symset:Blank
+wizard mode ^G, creating a monster of class 'I' yielded impossible "mkclass
+	found no class 35 monsters"
+wizard mode ^G, creating a monster via class name using "lo" through "long wor"
+	or "long worm t" through "long worm tail" yielded impossible "mkclass
+	found no class 59 monsters" (class '~' creates a long worm as intended)
+if bouldersym bug (via 'O', above) put a <NUL> ('\0') on the map, examining
+	that spot matched placeholder monster class #0 and triggered impossible
+	"Alphabet soup: 'an("")'."
+wizard mode m^T, not selecting a teleport choice didn't teardown the menu
+	properly and could eventually lead to "No window slots!" panic
+when in a shop and using ':' to look inside a container in inventory, items
+	owned by hero showed price they'd be charged if hero was buying them
+when in a shop and using ':' to look inside a container on shop floor, items
+	that shopkeeper didn't care about weren't shown as "no charge" unless
+	the hero owned the container
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -431,6 +464,7 @@ X11: enable menu [cancel] button for PICK_NONE menus
 X11: text popups on OSX wouldn't accept keyboard input unless the 'autofocus'
 	resource was enabled; most noticeable when trying to dismiss 'things
 	that are here' while walking over object piles
+X11: default to using XPM format tile file and rip screen
 
 
 General New Features
@@ -466,6 +500,13 @@ early level traps are sometimes covered by the remains of fake players
 fake player characters resist Conflict
 when inside a shop, far-look now includes shop prices for items marked as
 	having been seen up close
+when sortloot is enabled, gems are grouped in subsets (1) unseen gems and
+	glass, (2) seen but unidentified gems and glass, (3) identified gems,
+	(4) identified glass, (5) unseen stones (includes unseen rocks),
+	(6) seen but unidentified gray stones, (7) identified gray stones,
+	and (8) seen rocks (IDed/unIDed not applicable)
+in wizard mode, ^T can be preceded by 'm' prefix in order to test teleporting
+	without having wizard mode override various restrictions
 
 
 NetHack Community Patches (or Variation) Included

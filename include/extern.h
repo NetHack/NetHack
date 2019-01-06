@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1545597403 2018/12/23 20:36:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.676 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1546687295 2019/01/05 11:21:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.681 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1635,6 +1635,7 @@ E int ntposkey(int *, int *, int *);
 E void set_output_mode(int);
 E void synch_cursor(void);
 E void nethack_enter_nttty(void);
+E void nttty_exit(void);
 #endif
 
 /* ### o_init.c ### */
@@ -2243,6 +2244,7 @@ E void check_unpaid_usage(struct obj *, boolean);
 E void check_unpaid(struct obj *);
 E void costly_gold(xchar, xchar, long);
 E long get_cost_of_shop_item(struct obj *);
+E int oid_price_adjustment(struct obj *, unsigned);
 E boolean block_door(xchar, xchar);
 E boolean block_entry(xchar, xchar);
 E char *shk_your(char *, struct obj *);
@@ -2322,6 +2324,7 @@ E void age_spells(void);
 E int docast(void);
 E int spell_skilltype(int);
 E int spelleffects(int, boolean);
+E int tport_spell(int);
 E void losespells(void);
 E int dovspell(void);
 E void initialspell(struct obj *);
@@ -2722,6 +2725,7 @@ E const char *weapon_descr(struct obj *);
 E int hitval(struct obj *, struct monst *);
 E int dmgval(struct obj *, struct monst *);
 E struct obj *select_rwep(struct monst *);
+E boolean monmightthrowwep(struct obj *);
 E struct obj *select_hwep(struct monst *);
 E void possibly_unwield(struct monst *, boolean);
 E void mwepgone(struct monst *);

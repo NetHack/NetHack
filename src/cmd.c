@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1545128652 2018/12/18 10:24:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.322 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1546565813 2019/01/04 01:36:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.324 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3628,18 +3628,18 @@ static const char stats_sep[] = "---------------------------  ----- -------";
 STATIC_OVL int
 size_obj(struct obj *otmp)
 {
-    int sz = (int) sizeof(struct obj);
+    int sz = (int) sizeof (struct obj);
 
     if (otmp->oextra) {
-        sz += (int) sizeof(struct oextra);
+        sz += (int) sizeof (struct oextra);
         if (ONAME(otmp))
             sz += (int) strlen(ONAME(otmp)) + 1;
         if (OMONST(otmp))
-            sz += (int) sizeof(struct monst);
+            sz += size_monst(OMONST(otmp), FALSE);
         if (OMID(otmp))
-            sz += (int) sizeof(unsigned);
+            sz += (int) sizeof (unsigned);
         if (OLONG(otmp))
-            sz += (int) sizeof(long);
+            sz += (int) sizeof (long);
         if (OMAILCMD(otmp))
             sz += (int) strlen(OMAILCMD(otmp)) + 1;
     }
@@ -4335,8 +4335,8 @@ accept_menu_prefix(int (*cmd_func)(void))
         || cmd_func == doloot
         /* travel: pop up a menu of interesting targets in view */
         || cmd_func == dotravel
-        /* wizard mode ^V */
-        || cmd_func == wiz_level_tele
+        /* wizard mode ^V and ^T */
+        || cmd_func == wiz_level_tele || cmd_func == dotelecmd
         /* 'm' prefix allowed for some extended commands */
         || cmd_func == doextcmd || cmd_func == doextlist)
         return TRUE;

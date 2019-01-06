@@ -16,9 +16,7 @@ curses_update_inv(void)
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
     boolean border;
-    int x = 0;
-    int y = 0;
-    attr_t attr = A_UNDERLINE;
+    int x = 0, y = 0;
 
     /* Check if the inventory window is enabled in first place */
     if (!win) {
@@ -43,15 +41,6 @@ curses_update_inv(void)
     /* Clear the window as it is at the moment. */
     werase(win);
 
-    wmove(win, y, x);
-    wattron(win, attr);
-    wprintw(win, "Inventory:");
-    wattroff(win, attr);
-
-    /* The actual inventory will override this if we do carry stuff */
-    wmove(win, y + 1, x);
-    wprintw(win, "Not carrying anything");
-
     display_inventory(NULL, FALSE);
 
     if (border)
@@ -73,7 +62,6 @@ curses_add_inv(int y,
     /* Figure out where to draw the line */
     if (curses_window_has_border(INV_WIN)) {
         x++;
-        y++;
     }
 
     wmove(win, y, x);

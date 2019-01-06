@@ -44,9 +44,10 @@ int windows_nhgetch(void);
 void windows_nhbell(void);
 int windows_nh_poskey(int *, int *, int *);
 void windows_raw_print(const char *);
-char windows_yn_function(const char *, const char *, CHAR_P);
+char windows_yn_function(const char *, const char *, char);
 void windows_getlin(const char *, char *);
 extern int windows_console_custom_nhgetch(void);
+void safe_routines(void);
 
 char orgdir[PATHLEN];
 char *dir;
@@ -93,11 +94,7 @@ char *argv[];
      * Get a set of valid safe windowport function
      * pointers during early startup initialization.
      */
-    if (!WINDOWPORT("safe-startup"))
-        windowprocs = *get_safe_procs(1);
-    if (!GUILaunched)
-        windowprocs.win_nhgetch = windows_console_custom_nhgetch;
-
+    safe_routines();
     sys_early_init();
 #ifdef _MSC_VER
 # ifdef DEBUG
@@ -568,6 +565,19 @@ nhusage()
     else
         (void) printf("%s\n", buf1);
 #undef ADD_USAGE
+}
+
+void
+safe_routines(VOID_ARGS)
+{
+    /*
+     * Get a set of valid safe windowport function
+     * pointers during early startup initialization.
+     */
+    if (!WINDOWPORT("safe-startup"))
+        windowprocs = *get_safe_procs(1);
+    if (!GUILaunched)
+        windowprocs.win_nhgetch = windows_console_custom_nhgetch;
 }
 
 #ifdef PORT_HELP

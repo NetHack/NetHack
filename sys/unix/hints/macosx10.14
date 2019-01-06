@@ -1,12 +1,12 @@
 #
-# NetHack 3.6  macosx10.11 $NHDT-Date: 1515549543 2018/01/10 01:59:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $
+# NetHack 3.6  macosx10.14 $NHDT-Date: 1546225353 2018/12/31 03:02:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
 #-PRE
 # Mac OS X (Darwin) hints file
-# This is for Mac OS X 10.10 or later, and has been tested on 10.11
-# (El Capitan). If this doesn't work for some other
+# This is for Mac OS X 10.14 or later.
+# If this doesn't work for some other
 # version of Mac OS X, make a new file for that OS, don't change this one.
 # And let us know about it.
 # Useful info: http://www.opensource.apple.com/darwinsource/index.html
@@ -106,15 +106,23 @@ WINLIB += -lncurses
 endif
 
 ifdef WANT_WIN_X11
+WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
+VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir);
+# separate from CFLAGS so that we don't pass it to every file
+X11CFLAGS = -I/opt/X11/include
+CFLAGS += -DX11_GRAPHICS
+# avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
+X11CFLAGS += -Wno-variadic-macros
+ifdef USE_XPM
+CFLAGS += -DUSE_XPM
+WINX11LIB += -lXpm
+VARDATND += rip.xpm
+endif
 WINSRC += $(WINX11SRC)
 WINOBJ += $(WINX11OBJ)
 WINLIB += $(WINX11LIB)
 LFLAGS=-L/opt/X11/lib
-VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
-POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir);
-CFLAGS += -DX11_GRAPHICS -I/opt/X11/include
-# avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
-CFLAGS += -Wno-variadic-macros
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
