@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1546467443 2019/01/02 22:17:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1546770988 2019/01/06 10:36:28 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2928,7 +2928,8 @@ boolean nested, /* include contents of any nested containers */
     long count = 0L;
 
     if (!everything) {
-        for (topc = container; topc->ocontainer; topc = topc->ocontainer)
+        for (topc = container; topc->where == OBJ_CONTAINED;
+             topc = topc->ocontainer)
             continue;
         if (topc->where == OBJ_FLOOR) {
             xchar x, y;
