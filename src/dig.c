@@ -581,7 +581,7 @@ int ttyp;
 
     if (ttyp != PIT && (!Can_dig_down(&u.uz) && !lev->candig)) {
         impossible("digactualhole: can't dig %s on this level.",
-                   defsyms[trap_to_defsym(ttyp)].explanation);
+                   trapname(ttyp, TRUE));
         ttyp = PIT;
     }
 

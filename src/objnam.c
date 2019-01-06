@@ -3363,10 +3363,8 @@ struct obj *no_wish;
                 goto typfnd;
             } else if (trapped == 1 || *zp != '\0') {
                 /* "trapped <foo>" or "<foo> trap" (actually "<foo>*") */
-                int idx = trap_to_defsym(beartrap ? BEAR_TRAP : LANDMINE);
-
                 /* use canonical trap spelling, skip object matching */
-                Strcpy(bp, defsyms[idx].explanation);
+                Strcpy(bp, trapname(beartrap ? BEAR_TRAP : LANDMINE, TRUE));
                 goto wiztrap;
             }
             /* [no prefix or suffix; we're going to end up matching
@@ -3568,7 +3566,7 @@ wiztrap:
             struct trap *t;
             const char *tname;
 
-            tname = defsyms[trap_to_defsym(trap)].explanation;
+            tname = trapname(trap, TRUE);
             if (strncmpi(tname, bp, strlen(tname)))
                 continue;
             /* found it; avoid stupid mistakes */
@@ -3576,7 +3574,7 @@ wiztrap:
                 trap = ROCKTRAP;
             if ((t = maketrap(x, y, trap)) != 0) {
                 trap = t->ttyp;
-                tname = defsyms[trap_to_defsym(trap)].explanation;
+                tname = trapname(trap, TRUE);
                 pline("%s%s.", An(tname),
                       (trap != MAGIC_PORTAL) ? "" : " to nowhere");
             } else

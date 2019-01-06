@@ -1453,10 +1453,8 @@ domove()
             if (context.run >= 2) {
                 if (iflags.mention_walls) {
                     if (trap && trap->tseen) {
-                        int tt = what_trap(trap->ttyp);
-
                         You("stop in front of %s.",
-                            an(defsyms[trap_to_defsym(tt)].explanation));
+                            an(trapname(trap->ttyp, FALSE)));
                     } else if (is_pool_or_lava(x,y) && levl[x][y].seenv) {
                         You("stop at the edge of the %s.",
                             hliquid(is_pool(x,y) ? "water" : "lava"));
@@ -2678,9 +2676,8 @@ lookaround()
                     goto bcorr; /* if you must */
                 if (x == u.ux + u.dx && y == u.uy + u.dy) {
                     if (iflags.mention_walls) {
-                        int tt = what_trap(trap->ttyp);
                         You("stop in front of %s.",
-                            an(defsyms[trap_to_defsym(tt)].explanation));
+                            an(trapname(trap->ttyp, FALSE)));
                     }
                     goto stop;
                 }

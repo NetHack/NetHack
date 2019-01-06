@@ -916,14 +916,14 @@ unsigned trflags;
          */
         pline("Air currents pull you down into %s %s!",
               a_your[trap->madeby_u],
-              defsyms[trap_to_defsym(ttype)].explanation);
+              trapname(ttype, TRUE)); /* do force "pit" while hallucinating */
         /* then proceed to normal trap effect */
     } else if (already_seen && !forcetrap) {
         if ((Levitation || (Flying && !plunged))
             && (is_pit(ttype) || ttype == HOLE || ttype == BEAR_TRAP)) {
             You("%s over %s %s.", Levitation ? "float" : "fly",
                 a_your[trap->madeby_u],
-                defsyms[trap_to_defsym(ttype)].explanation);
+                trapname(ttype, FALSE));
             return;
         }
         if (!Fumbling && ttype != MAGIC_PORTAL && ttype != VIBRATING_SQUARE
@@ -934,7 +934,7 @@ unsigned trflags;
                 You("escape %s %s.", (ttype == ARROW_TRAP && !trap->madeby_u)
                                      ? "an"
                                      : a_your[trap->madeby_u],
-                defsyms[trap_to_defsym(ttype)].explanation);
+                trapname(ttype, FALSE));
             return;
         }
     }
@@ -1283,7 +1283,7 @@ unsigned trflags;
         if (!Can_fall_thru(&u.uz)) {
             seetrap(trap); /* normally done in fall_through */
             impossible("dotrap: %ss cannot exist on this level.",
-                       defsyms[trap_to_defsym(ttype)].explanation);
+                       trapname(ttype, TRUE));
             break; /* don't activate it after all */
         }
         fall_through(TRUE);
@@ -2461,7 +2461,7 @@ register struct monst *mtmp;
         case TRAPDOOR:
             if (!Can_fall_thru(&u.uz)) {
                 impossible("mintrap: %ss cannot exist on this level.",
-                           defsyms[trap_to_defsym(tt)].explanation);
+                           trapname(tt, TRUE));
                 break; /* don't activate it after all */
             }
             if (is_flyer(mptr) || is_floater(mptr) || mptr == &mons[PM_WUMPUS]
@@ -4053,8 +4053,7 @@ boolean force_failure;
         if ((invent && (inv_weight() + weight_cap() > 600))
             || bigmonst(youmonst.data)) {
             /* don't allow untrap if they can't get thru to it */
-            You("are unable to reach the %s!",
-                defsyms[trap_to_defsym(ttype)].explanation);
+            You("are unable to reach the %s!", trapname(ttype, FALSE));
             return 0;
         }
     }
@@ -4063,8 +4062,7 @@ boolean force_failure;
         if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
             rider_cant_reach();
         else
-            You("are unable to reach the %s!",
-                defsyms[trap_to_defsym(ttype)].explanation);
+            You("are unable to reach the %s!", trapname(ttype, FALSE));
         return 0;
     }
 
@@ -4104,7 +4102,7 @@ boolean force_failure;
         } else {
             pline("%s %s is difficult to %s.",
                   ttmp->madeby_u ? "Your" : under_u ? "This" : "That",
-                  defsyms[trap_to_defsym(ttype)].explanation,
+                  trapname(ttype, FALSE),
                   (ttype == WEB) ? "remove" : "disarm");
         }
         return 1;
@@ -4383,7 +4381,7 @@ boolean force;
     ttmp = t_at(x, y);
     if (ttmp && !ttmp->tseen)
         ttmp = 0;
-    trapdescr = ttmp ? defsyms[trap_to_defsym(ttmp->ttyp)].explanation : 0;
+    trapdescr = ttmp ? trapname(ttmp->ttyp, FALSE) : 0;
     here = (x == u.ux && y == u.uy); /* !u.dx && !u.dy */
 
     if (here) /* are there are one or more containers here? */
@@ -4642,7 +4640,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
     }
 
     if (!trapdescr)
-        trapdescr = defsyms[trap_to_defsym(t->ttyp)].explanation;
+        trapdescr = trapname(t->ttyp, FALSE);
     if (!which)
         which = t->tseen ? the_your[t->madeby_u]
                          : index(vowels, *trapdescr) ? "an" : "a";
@@ -5435,6 +5433,57 @@ maybe_finish_sokoban()
             /* TODO: give some feedback about solving the sokoban puzzle
                (perhaps say "congratulations" in Japanese?) */
         }
+    }
+}
+
+/* Return the string name of the trap type passed in, unless the player is
+ * hallucinating, in which case return a random or hallucinatory trap name.
+ * If the second argument is true, return the correct trap name even when
+ * hallucinating (for things like wizard mode wishing for traps and impossible
+ * calls).
+ * Originally I had intended for messages like "You begin setting the bear trap"
+ * to override as well, but the context in those bits of code indicated that it
+ * was meant to take a random name if the hero was hallucinating.
+ */
+const char *
+trapname(ttyp, override)
+int ttyp;
+boolean override;
+{
+    const char * halu_trapnames[] = {
+        /* riffs on actual nethack traps */
+        "bottomless pit", "polymorphism trap", "devil teleporter",
+        "falling boulder trap", "anti-anti-magic field", "weeping gas trap",
+        "queasy board", "electrified web", "owlbear trap", "sand mine",
+        /* some traps found in nethack variants */
+        "death trap", "disintegration trap", "ice trap", "monochrome trap",
+        /* plausible real-life traps */
+        "axeblade trap", "pool of boiling oil", "pool of quicksand",
+        "field of caltrops", "buzzsaw trap", "spiked floor", "revolving wall",
+        "uneven floor", "finger trap", "jack-in-a-box", "yellow snow",
+        "booby trap", "rat trap", "poisoned nail", "snare", "whirlpool",
+        "trip wire",
+        /* sci-fi */
+        "negative space", "tensor field", "singularity", "imperial fleet",
+        "black hole", "thermal detonator", "event horizon",
+        "entoptic phenomenon",
+        /* miscellaneous suggestions */
+        "sweet-smelling gas vent", "phone booth", "exploding runes",
+        "never-ending elevator", "slime pit", "warp zone", "illusory floor",
+        "pile of poo", "honey trap", "tourist trap"
+    };
+    int total_names = TRAPNUM + SIZE(halu_trapnames);
+    int nameidx = rn2(total_names);
+    if (override || !Hallucination) {
+        return defsyms[trap_to_defsym(ttyp)].explanation;
+    }
+    if (nameidx < TRAPNUM) {
+        /* random but real trap name */
+        return defsyms[trap_to_defsym(nameidx)].explanation;
+    }
+    else {
+        nameidx -= TRAPNUM;
+        return halu_trapnames[nameidx];
     }
 }
 

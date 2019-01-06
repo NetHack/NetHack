@@ -285,7 +285,7 @@ boolean force;      /* Quietly force this animal */
         struct trap *t = t_at(mtmp->mx, mtmp->my);
 
         You_cant("mount %s while %s's trapped in %s.", mon_nam(mtmp),
-                 mhe(mtmp), an(defsyms[trap_to_defsym(t->ttyp)].explanation));
+                 mhe(mtmp), an(trapname(t->ttyp, FALSE)));
         return (FALSE);
     }
 
