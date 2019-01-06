@@ -3588,11 +3588,7 @@ tty_status_init()
 }
 
 void
-tty_status_enablefield(fieldidx, nm, fmt, enable)
-int fieldidx;
-const char *nm;
-const char *fmt;
-boolean enable;
+tty_status_enablefield(int fieldidx, const char *nm, const char *fmt, boolean enable)
 {
     genl_status_enablefield(fieldidx, nm, fmt, enable);
 #ifdef STATUS_HILITES
@@ -3793,8 +3789,7 @@ do_setlast()
 }
 
 STATIC_OVL int
-make_things_fit(force_update)
-boolean force_update;
+make_things_fit(boolean force_update)
 {
     int trycnt, fitting = 0, condsz = 0, requirement = 0;
     int rowsz[2], otheroptions = 0;
@@ -3847,9 +3842,7 @@ boolean force_update;
  * This is now done at an individual field case-by-case level.
  */
 boolean
-check_fields(forcefields, topsz, bottomsz)
-boolean forcefields;
-int *topsz, *bottomsz;
+check_fields(boolean forcefields, int *topsz, int *bottomsz)
 {
     int c, i, row, col, trackx, idx;
     boolean valid = TRUE, matchprev = FALSE, update_right, disregard = FALSE;
@@ -3943,10 +3936,7 @@ int *topsz, *bottomsz;
  * fld (it takes precedence).
  */
 STATIC_OVL void
-tty_putstatusfield(fld, val, x, y)
-struct tty_status_fields *fld;
-const char *val;
-int x, y;
+tty_putstatusfield(struct tty_status_fields *fld, const char *val, int x, int y)
 {
     int i, n, ncols, lth = 0;
     struct WinDesc *cw = 0;
@@ -4007,8 +3997,7 @@ condition_size()
 }
 
 STATIC_OVL void
-shrink_enc(lvl)
-int lvl;
+shrink_enc(int lvl)
 {
     /* shrink or restore the encumbrance word */
     if (lvl == 0 || lvl <= 2) {
@@ -4019,8 +4008,7 @@ int lvl;
 }
 
 STATIC_OVL void
-shrink_dlvl(lvl)
-int lvl;
+shrink_dlvl(int lvl)
 {
     /* try changing Dlvl: to Dl: */
     char buf[BUFSZ];
