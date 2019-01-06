@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1546687294 2019/01/05 11:21:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1546770990 2019/01/06 10:36:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.152 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1991,7 +1991,7 @@ int *nochrg; /* alternate return value: 1: no charge, 0: shop owned,        */
         && get_obj_location(obj, &x, &y, CONTAINED_TOO)
         && *in_rooms(x, y, SHOPBASE) == *u.ushops
         && (shkp = shop_keeper(inside_shop(x, y))) != 0 && inhishop(shkp)) {
-        for (top = obj; top->ocontainer; top = top->ocontainer)
+        for (top = obj; top->where == OBJ_CONTAINED; top = top->ocontainer)
             continue;
         *nochrg = (top->where == OBJ_FLOOR && obj->no_charge);
 
