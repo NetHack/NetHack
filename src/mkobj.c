@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1545951660 2018/12/27 23:01:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1546837153 2019/01/07 04:59:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1941,12 +1941,14 @@ struct obj *obj;
     case OBJ_CONTAINED:
         extract_nobj(obj, &obj->ocontainer->cobj);
         container_weight(obj->ocontainer);
+        obj->ocontainer = (struct obj *) 0; /* clear stale back-link */
         break;
     case OBJ_INVENT:
         freeinv(obj);
         break;
     case OBJ_MINVENT:
         extract_nobj(obj, &obj->ocarry->minvent);
+        obj->ocarry = (struct monst *) 0; /* clear stale back-link */
         break;
     case OBJ_MIGRATING:
         extract_nobj(obj, &migrating_objs);
@@ -1983,7 +1985,7 @@ struct obj *obj, **head_ptr;
     if (!curr)
         panic("extract_nobj: object lost");
     obj->where = OBJ_FREE;
-    obj->nobj = NULL;
+    obj->nobj = (struct obj *) 0;
 }
 
 /*
@@ -2010,6 +2012,7 @@ struct obj *obj, **head_ptr;
     }
     if (!curr)
         panic("extract_nexthere: object lost");
+    obj->nexthere = (struct obj *) 0;
 }
 
 /*
