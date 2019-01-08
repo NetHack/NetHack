@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.286 $ $NHDT-Date: 1540625949 2018/10/27 07:39:09 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.292 $ $NHDT-Date: 1546984605 2019/01/08 21:56:45 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -587,6 +587,8 @@ or (for \(lq#loot\(rq to remove a saddle),
 skip containers and go straight to adjacent monsters.
 The prefix will
 make \(lq#travel\(rq command show a menu of interesting targets in sight.
+In debug mode (aka \(lqwizard mode\(rq), the \(oqm\(cq prefix may also be
+used with the \(lq#teleport\(rq and \(lq#wizlevelport\(rq commands.
 .lp F[yuhjklbn]
 Prefix:  fight a monster (even if you only guess one is there).
 .lp M[yuhjklbn]
