@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1543185069 2018/11/25 22:31:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1546987367 2019/01/08 22:42:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -608,10 +608,10 @@ int gloc;
         }
     }
 
-    Sprintf(tmpbuf, "Pick a target %s%s%s",
-            gloc_descr[gloc][1],
+    Sprintf(tmpbuf, "Pick %s%s%s",
+            an(gloc_descr[gloc][1]),
             gloc_filtertxt[iflags.getloc_filter],
-            iflags.getloc_travelmode ? " for travel" : "");
+            iflags.getloc_travelmode ? " for travel destination" : "");
     end_menu(tmpwin, tmpbuf);
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
@@ -631,7 +631,7 @@ boolean force;
 const char *goal;
 {
     const char *cp;
-    struct {
+    static struct {
         int nhkf, ret;
     } const pick_chars_def[] = {
         { NHKF_GETPOS_PICK, LOOK_TRADITIONAL },
@@ -639,7 +639,7 @@ const char *goal;
         { NHKF_GETPOS_PICK_O, LOOK_ONCE },
         { NHKF_GETPOS_PICK_V, LOOK_VERBOSE }
     };
-    const int mMoOdDxX_def[] = {
+    static const int mMoOdDxX_def[] = {
         NHKF_GETPOS_MON_NEXT,
         NHKF_GETPOS_MON_PREV,
         NHKF_GETPOS_OBJ_NEXT,
@@ -810,8 +810,8 @@ const char *goal;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
             static const char *const view_filters[NUM_GFILTER] = {
                 "Not limiting targets",
-                "Limiting targets to in sight",
-                "Limiting targets to in same area"
+                "Limiting targets to those in sight",
+                "Limiting targets to those in same area"
             };
 
             iflags.getloc_filter = (iflags.getloc_filter + 1) % NUM_GFILTER;
@@ -827,8 +827,10 @@ const char *goal;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_MENU]) {
             iflags.getloc_usemenu = !iflags.getloc_usemenu;
-            pline("%s a menu to show possible targets.",
-                  iflags.getloc_usemenu ? "Using" : "Not using");
+            pline("%s a menu to show possible targets%s.",
+                  iflags.getloc_usemenu ? "Using" : "Not using",
+                  iflags.getloc_usemenu
+                      ? " for 'm|M', 'o|O', 'd|D', and 'x|X'" : "");
             msg_given = TRUE;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_SELF]) {
