@@ -1181,7 +1181,7 @@ int mmflags;
     }
     (void) propagate(mndx, countbirth, FALSE);
     mtmp = newmonst();
-    *mtmp = g.zeromonst; /* clear all entries in structure */
+    *mtmp = cg.zeromonst; /* clear all entries in structure */
 
     if (mmflags & MM_EGD)
         newegd(mtmp);

@@ -372,7 +372,7 @@ doextlist(VOID_ARGS)
 
     while (redisplay) {
         redisplay = FALSE;
-        any = g.zeroany;
+        any = cg.zeroany;
         start_menu(menuwin);
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "Extended Commands List", MENU_UNSELECTED);
@@ -416,7 +416,7 @@ doextlist(VOID_ARGS)
                      : "Show all alphabetically, including debugging commands",
                      MENU_UNSELECTED);
         }
-        any = g.zeroany;
+        any = cg.zeroany;
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "", MENU_UNSELECTED);
         menushown[0] = menushown[1] = 0;
@@ -557,7 +557,7 @@ extcmd_via_menu()
     biggest = 0;
     while (!ret) {
         i = n = 0;
-        any = g.zeroany;
+        any = cg.zeroany;
         /* populate choices */
         for (efp = extcmdlist; efp->ef_txt; efp++) {
             if ((efp->flags & CMD_NOT_AVAILABLE)
@@ -1326,7 +1326,7 @@ wiz_intrinsic(VOID_ARGS)
         const char *propname;
         menu_item *pick_list = (menu_item *) 0;
 
-        any = g.zeroany;
+        any = cg.zeroany;
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
         for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
@@ -1465,7 +1465,7 @@ doterrain(VOID_ARGS)
      */
     men = create_nhwindow(NHW_MENU);
     start_menu(men);
-    any = g.zeroany;
+    any = cg.zeroany;
     any.a_int = 1;
     add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
              "known map without monsters, objects, and traps",
@@ -1560,7 +1560,7 @@ const char *buf;
     if (g.en_via_menu) {
         anything any;
 
-        any = g.zeroany;
+        any = cg.zeroany;
         add_menu(g.en_win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     } else
         putstr(g.en_win, 0, buf);
@@ -2917,7 +2917,7 @@ minimal_enlightenment()
     fmtstr = iflags.menu_tab_sep ? tabbed_fmtstr : untabbed_fmtstr;
     deity_fmtstr = iflags.menu_tab_sep ? tabbed_deity_fmtstr
                                        : untabbed_deity_fmtstr;
-    any = g.zeroany;
+    any = cg.zeroany;
     buf[0] = buf2[0] = '\0';
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
@@ -5111,7 +5111,7 @@ const char *text;
     anything any;
 
     if ((ch = cmd_from_func(func)) != '\0') {
-        any = g.zeroany;
+        any = cg.zeroany;
         any.a_nfunc = func;
         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, text, MENU_UNSELECTED);
     }

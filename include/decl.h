@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1496531104 2017/06/03 23:05:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1547025154 2019/01/09 09:12:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -751,9 +751,6 @@ struct instance_globals {
     char *fqn_prefix[PREFIX_COUNT];
     /* Windowing stuff that's really tty oriented, but present for all ports */
     struct tc_gbl_data tc_gbl_data; /* AS,AE, LI,CO */     
-    struct obj zeroobj; /* used to zero out a struct obj */
-    struct monst zeromonst;  /* used to zero out a struct monst */
-    anything zeroany; /* used to zero out union any */
 #if defined(UNIX) || defined(VMS)
     int locknum; /* max num of simultaneous users */
 #endif
@@ -1173,6 +1170,14 @@ struct instance_globals {
 };
 
 E struct instance_globals g;
+
+struct const_globals {
+    const struct obj zeroobj;      /* used to zero out a struct obj */
+    const struct monst zeromonst;  /* used to zero out a struct monst */
+    const anything zeroany;        /* used to zero out union any */
+};
+
+E const struct const_globals cg;
 
 #undef E
 

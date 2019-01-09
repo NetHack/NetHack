@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1446975463 2015/11/08 09:37:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1547025164 2019/01/09 09:12:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -318,9 +318,6 @@ const struct instance_globals g_init = {
     DUMMY, /* context */
     DUMMY, /* fqn_prefix */
     DUMMY, /* tc_gbl_data */
-    DUMMY, /* zeroobj */
-    DUMMY, /* zeromonst */
-    DUMMY, /* zeronay */
 #if defined(UNIX) || defined(VMS)
     0, /* locknum */
 #endif
@@ -682,6 +679,12 @@ const struct instance_globals g_init = {
 };
 
 struct instance_globals g;
+
+const struct const_globals cg = {
+    DUMMY, /* zeroobj */
+    DUMMY, /* zeromonst */
+    DUMMY, /* zeroany */
+};
 
 #define ZERO(x) memset(&x, 0, sizeof(x))
 

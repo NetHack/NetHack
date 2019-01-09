@@ -1734,7 +1734,7 @@ set_vanq_order()
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
-    any = g.zeroany; /* zero out all bits */
+    any = cg.zeroany; /* zero out all bits */
     for (i = 0; i < SIZE(vanqorders); i++) {
         if (i == VANQ_ALPHA_MIX || i == VANQ_MCLS_HTOL) /* skip these */
             continue;

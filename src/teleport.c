@@ -126,7 +126,7 @@ unsigned entflags;
         /* default to player's original monster type */
         mdat = &mons[u.umonster];
     }
-    fakemon = g.zeromonst;
+    fakemon = cg.zeromonst;
     set_mon_data(&fakemon, mdat, -1); /* set up for goodpos */
 
     good_ptr = good;
@@ -548,7 +548,7 @@ dotelecmd()
 
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-        any = g.zeroany;
+        any = cg.zeroany;
         for (i = 0; i < SIZE(tports); ++i) {
             any.a_int = (int) tports[i].menulet;
             add_menu(win, NO_GLYPH, &any, (char) any.a_int, 0, ATR_NONE,

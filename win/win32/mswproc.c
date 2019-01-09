@@ -403,7 +403,7 @@ prompt_for_player_selection(void)
             /* Prompt for a role */
             win = create_nhwindow(NHW_MENU);
             start_menu(win);
-            any = g.zeroany; /* zero out all bits */
+            any = cg.zeroany; /* zero out all bits */
             for (i = 0; roles[i].name.m; i++) {
                 if (ok_role(i, flags.initrace, flags.initgend,
                             flags.initalign)) {
@@ -495,7 +495,7 @@ prompt_for_player_selection(void)
                 /* tty_putstr(BASE_WINDOW, 0, "Choosing Race"); */
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
-                any = g.zeroany; /* zero out all bits */
+                any = cg.zeroany; /* zero out all bits */
                 for (i = 0; races[i].noun; i++)
                     if (ok_race(flags.initrole, i, flags.initgend,
                                 flags.initalign)) {
@@ -569,7 +569,7 @@ prompt_for_player_selection(void)
                 /* tty_putstr(BASE_WINDOW, 0, "Choosing Gender"); */
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
-                any = g.zeroany; /* zero out all bits */
+                any = cg.zeroany; /* zero out all bits */
                 for (i = 0; i < ROLE_GENDERS; i++)
                     if (ok_gend(flags.initrole, flags.initrace, i,
                                 flags.initalign)) {
@@ -642,7 +642,7 @@ prompt_for_player_selection(void)
                 /* tty_putstr(BASE_WINDOW, 0, "Choosing Alignment"); */
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
-                any = g.zeroany; /* zero out all bits */
+                any = cg.zeroany; /* zero out all bits */
                 for (i = 0; i < ROLE_ALIGNS; i++)
                     if (ok_align(flags.initrole, flags.initrace,
                                  flags.initgend, i)) {

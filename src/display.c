@@ -422,7 +422,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
             /* Make a fake object to send to map_object(). */
             struct obj obj;
 
-            obj = g.zeroobj;
+            obj = cg.zeroobj;
             obj.ox = x;
             obj.oy = y;
             obj.otyp = mon->mappearance;

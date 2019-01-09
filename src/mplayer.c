@@ -335,7 +335,7 @@ boolean special;
     int pm, x, y;
     struct monst fakemon;
 
-    fakemon = g.zeromonst;
+    fakemon = cg.zeromonst;
     while (num) {
         int tryct = 0;
 

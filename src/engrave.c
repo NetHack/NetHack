@@ -539,10 +539,10 @@ doengrave()
      */
 
     otmp = getobj(styluses, "write with");
-    if (!otmp) /* otmp == g.zeroobj if fingers */
+    if (!otmp) /* otmp == cg.zeroobj if fingers */
         return 0;
 
-    if (otmp == &g.zeroobj) {
+    if (otmp == &cg.zeroobj) {
         Strcat(strcpy(fbuf, "your "), body_part(FINGERTIP));
         writer = fbuf;
     } else
@@ -571,7 +571,7 @@ doengrave()
         return 0;
     }
     if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
-        if (otmp == &g.zeroobj) { /* using only finger */
+        if (otmp == &cg.zeroobj) { /* using only finger */
             You("would only make a small smudge on the %s.",
                 surface(u.ux, u.uy));
             return 0;
@@ -1008,7 +1008,7 @@ doengrave()
     }
 
     /* Tell adventurer what is going on */
-    if (otmp != &g.zeroobj)
+    if (otmp != &cg.zeroobj)
         You("%s the %s with %s.", everb, eloc, doname(otmp));
     else
         You("%s the %s with your %s.", everb, eloc, body_part(FINGERTIP));

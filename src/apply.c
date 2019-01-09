@@ -2287,7 +2287,7 @@ struct obj *obj;
             return;
         consume_obj_charge(obj, TRUE);
 
-        if (otmp != &g.zeroobj) {
+        if (otmp != &cg.zeroobj) {
             You("cover %s with a thick layer of grease.", yname(otmp));
             otmp->greased = 1;
             if (obj->cursed && !nohands(g.youmonst.data)) {
@@ -3148,7 +3148,7 @@ struct obj *obj;
         char buf[BUFSZ];
         menu_item *selected;
 
-        any = g.zeroany; /* set all bits to zero */
+        any = cg.zeroany; /* set all bits to zero */
         any.a_int = 1; /* use index+1 (cant use 0) as identifier */
         start_menu(tmpwin);
         any.a_int++;

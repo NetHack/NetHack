@@ -1557,7 +1557,7 @@ spellsortmenu()
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
-    any = g.zeroany; /* zero out all bits */
+    any = cg.zeroany; /* zero out all bits */
 
     for (i = 0; i < SIZE(spl_sortchoices); i++) {
         if (i == SORTRETAINORDER) {
@@ -1640,7 +1640,7 @@ int *spell_no;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
-    any = g.zeroany; /* zero out all bits */
+    any = cg.zeroany; /* zero out all bits */
 
     /*
      * The correct spacing of the columns when not using

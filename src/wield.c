@@ -74,7 +74,7 @@ STATIC_DCL int FDECL(ready_weapon, (struct obj *));
  *     functions can be used to put the remainder back in the slot.
  * 4.  Putting an item that was thrown and returned back into the slot.
  * 5.  Emptying the slot, by passing a null object.  NEVER pass
- *     g.zeroobj!
+ *     cg.zeroobj!
  *
  * If the item is being moved from another slot, it is the caller's
  * responsibility to handle that.  It's also the caller's responsibility
@@ -285,7 +285,7 @@ dowield()
     }
 
     /* Handle no object, or object in other slot */
-    if (wep == &g.zeroobj)
+    if (wep == &cg.zeroobj)
         wep = (struct obj *) 0;
     else if (wep == uswapwep)
         return doswapweapon();
@@ -378,7 +378,7 @@ dowieldquiver()
     if (!newquiver) {
         /* Cancelled */
         return 0;
-    } else if (newquiver == &g.zeroobj) { /* no object */
+    } else if (newquiver == &cg.zeroobj) { /* no object */
         /* Explicitly nothing */
         if (uquiver) {
             You("now have no ammunition readied.");

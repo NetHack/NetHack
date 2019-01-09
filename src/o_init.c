@@ -511,7 +511,7 @@ doclassdisco()
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
     }
-    any = g.zeroany;
+    any = cg.zeroany;
     menulet = 'a';
 
     /* check whether we've discovered any unique objects */
@@ -667,7 +667,7 @@ rename_disco()
     anything any;
     menu_item *selected = 0;
 
-    any = g.zeroany;
+    any = cg.zeroany;
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
 
@@ -719,7 +719,7 @@ rename_disco()
         if (dis != STRANGE_OBJECT) {
             struct obj odummy;
 
-            odummy = g.zeroobj;
+            odummy = cg.zeroobj;
             odummy.otyp = dis;
             odummy.oclass = objects[dis].oc_class;
             odummy.quan = 1L;

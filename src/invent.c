@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1546770988 2019/01/06 10:36:28 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1547025166 2019/01/09 09:12:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -421,7 +421,7 @@ const genericptr vptr2;
             return val2 - val1; /* bigger is better */
     }
 
-tiebreak:
+ tiebreak:
     /* They're identical, as far as we're concerned.  We want
        to force a deterministic order, and do so by producing a
        stable sort: maintain the original order of equal items. */
@@ -933,7 +933,7 @@ struct obj *obj;
         && obj->oartifact != ART_MJOLLNIR
         && (throwing_weapon(obj) || is_ammo(obj)))
         setuqwep(obj);
-added:
+ added:
     addinv_core2(obj);
     carry_obj_effects(obj); /* carrying affects the obj */
     update_inventory();
@@ -1409,7 +1409,7 @@ const char *action;
  * getobj returns:
  *      struct obj *xxx:        object to do something with.
  *      (struct obj *) 0        error return: no object.
- *      &g.zeroobj                explicitly no object (as in w-).
+ *      &cg.zeroobj                explicitly no object (as in w-).
 !!!! test if gold can be used in unusual ways (eaten etc.)
 !!!! may be able to remove "usegold"
  */
@@ -1697,9 +1697,9 @@ register const char *let, *word;
                 You("mime %s something%s%s.", ing_suffix(bp), suf ? " " : "",
                     suf ? suf : "");
             }
-            return (allownone ? &g.zeroobj : (struct obj *) 0);
+            return (allownone ? (struct obj *) &cg.zeroobj : (struct obj *) 0);
         }
-redo_menu:
+ redo_menu:
         /* since gold is now kept in inventory, we need to do processing for
            select-from-invent before checking whether gold has been picked */
         if (ilet == '?' || ilet == '*') {
@@ -1730,7 +1730,7 @@ redo_menu:
             if (!ilet)
                 continue;
             if (ilet == HANDS_SYM)
-                return &g.zeroobj;
+                return (struct obj *) &cg.zeroobj; /* cast away 'const' */
             if (ilet == '\033') {
                 if (flags.verbose)
                     pline1(Never_mind);
@@ -2134,7 +2134,7 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
      * For example, if a person specifies =/ then first all rings
      * will be asked about followed by all wands.  -dgk
      */
-nextclass:
+ nextclass:
     ilet = 'a' - 1;
     if (*objchn && (*objchn)->oclass == COIN_CLASS)
         ilet--;                     /* extra iteration */
@@ -2244,7 +2244,7 @@ nextclass:
         pline("That was all.");
     else if (!dud && !cnt)
         pline("No applicable objects.");
-ret:
+ ret:
     unsortloot(&sortedchn);
     bypass_objlist(*objchn, FALSE);
     return cnt;
@@ -2620,7 +2620,7 @@ long *out_cnt;
                             (boolean FDECL((*), (OBJ_P))) 0);
 
     start_menu(win);
-    any = g.zeroany;
+    any = cg.zeroany;
     if (wizard && iflags.override_ID) {
         int unid_cnt;
         char prompt[QBUFSZ];
@@ -2660,7 +2660,7 @@ long *out_cnt;
         add_menu(win, NO_GLYPH, &any, HANDS_SYM, 0, ATR_NONE,
                  xtra_choice, MENU_UNSELECTED);
     }
-nextclass:
+ nextclass:
     classcount = 0;
     for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         if (lets && !index(lets, otmp->invlet))
@@ -2668,7 +2668,7 @@ nextclass:
         if (!flags.sortpack || otmp->oclass == *invlet) {
             if (wizid && !not_fully_identified(otmp))
                 continue;
-            any = g.zeroany; /* all bits zero */
+            any = cg.zeroany; /* all bits zero */
             ilet = otmp->invlet;
             if (flags.sortpack && !classcount) {
                 add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
@@ -2694,7 +2694,7 @@ nextclass:
         }
     }
     if (iflags.force_invmenu && lets && want_reply) {
-        any = g.zeroany;
+        any = cg.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                  "Special", MENU_UNSELECTED);
         any.a_char = '*';
@@ -2707,7 +2707,7 @@ nextclass:
        recognized via any.a_char still being zero; the n==0 case above
        gets skipped for perm_invent), put something into the menu */
     if (iflags.perm_invent && !lets && !any.a_char) {
-        any = g.zeroany;
+        any = cg.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, 0,
                  not_carrying_anything, MENU_UNSELECTED);
         want_reply = FALSE;
@@ -2779,7 +2779,7 @@ char avoidlet;
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
         while (!invdone) {
-            any = g.zeroany; /* set all bits to zero */
+            any = cg.zeroany; /* set all bits to zero */
             classcount = 0;
             for (otmp = g.invent; otmp; otmp = otmp->nobj) {
                 ilet = otmp->invlet;
@@ -2787,7 +2787,7 @@ char avoidlet;
                     continue;
                 if (!flags.sortpack || otmp->oclass == *invlet) {
                     if (flags.sortpack && !classcount) {
-                        any = g.zeroany; /* zero */
+                        any = cg.zeroany; /* zero */
                         add_menu(win, NO_GLYPH, &any, 0, 0,
                                  iflags.menu_headings,
                                  let_to_name(*invlet, FALSE, FALSE),
@@ -4086,7 +4086,7 @@ doorganize() /* inventory organizer by Del Lamb */
                compatible stacks get collected along the way,
                but splitting to same slot is not */
             || (splitting && let == obj->invlet)) {
-        noadjust:
+ noadjust:
             if (splitting)
                 (void) merged(&splitting, &obj);
             if (!ever_mind)
@@ -4215,7 +4215,7 @@ const char *hdr, *txt;
     anything any;
     menu_item *selected;
 
-    any = g.zeroany;
+    any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, hdr,

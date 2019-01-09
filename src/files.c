@@ -2883,7 +2883,7 @@ STATIC_DCL void
 wizkit_addinv(obj)
 struct obj *obj;
 {
-    if (!obj || obj == &g.zeroobj)
+    if (!obj || obj == &cg.zeroobj)
         return;
 
     /* subset of starting inventory pre-ID */
@@ -2913,7 +2913,7 @@ char *buf;
     struct obj *otmp = readobjnam(buf, (struct obj *) 0);
 
     if (otmp) {
-        if (otmp != &g.zeroobj)
+        if (otmp != &cg.zeroobj)
             wizkit_addinv(otmp);
     } else {
         /* .60 limits output line width to 79 chars */

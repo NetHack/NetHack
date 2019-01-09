@@ -1752,7 +1752,7 @@ boolean unreachable;
     lchoices->lev[lchoices->idx] = lvl_p->dlevel;
     lchoices->dgn[lchoices->idx] = lvl_p->dnum;
     lchoices->playerlev[lchoices->idx] = depth(lvl_p);
-    any = g.zeroany;
+    any = cg.zeroany;
     if (unreachable) {
         /* not selectable, but still consumes next menuletter;
            prepend padding in place of missing menu selector */
@@ -1872,7 +1872,7 @@ xchar *rdgn;
                         dptr->depth_start + dptr->entry_lev - 1);
         }
         if (bymenu) {
-            any = g.zeroany;
+            any = cg.zeroany;
             add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf,
                      MENU_UNSELECTED);
         } else

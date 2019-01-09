@@ -1437,7 +1437,7 @@ const char *prompt;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
-    any = g.zeroany;
+    any = cg.zeroany;
     for (i = 0; i < SIZE(colornames); i++) {
         if (!colornames[i].name)
             break;
@@ -1483,7 +1483,7 @@ const char *prompt;
         default_attr = iflags.menu_headings;
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
-    any = g.zeroany;
+    any = cg.zeroany;
     for (i = 0; i < SIZE(attrnames); i++) {
         if (!attrnames[i].name)
             break;
@@ -1582,7 +1582,7 @@ query_msgtype()
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
-    any = g.zeroany;
+    any = cg.zeroany;
     for (i = 0; i < SIZE(msgtype_names); i++)
         if (msgtype_names[i].descr) {
             any.a_int = msgtype_names[i].msgtyp + 1;
@@ -4225,7 +4225,7 @@ int indexoffset;    /* value to add to index in compopt[], or zero
     anything any;
     int i;
 
-    any = g.zeroany;
+    any = cg.zeroany;
     if (indexoffset == 0) {
         any.a_int = 0;
         value = get_compopt_value(option, buf2);
@@ -4262,7 +4262,7 @@ char *bufx;
 int nset;
 {
     char buf[BUFSZ], buf2[BUFSZ];
-    anything any = g.zeroany;
+    anything any = cg.zeroany;
 
     any.a_int = id;
     if (!bufx)
@@ -4362,7 +4362,7 @@ doset() /* changing options via menu by Per Liboriussen */
         made_fmtstr = TRUE;
     }
 
-    any = g.zeroany;
+    any = cg.zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
              "Booleans (selecting will toggle value):", MENU_UNSELECTED);
     any.a_int = 0;
@@ -4393,7 +4393,7 @@ doset() /* changing options via menu by Per Liboriussen */
 
     boolcount = i;
     indexoffset = boolcount;
-    any = g.zeroany;
+    any = cg.zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
              "Compounds (selecting will prompt for new value):",
@@ -4422,7 +4422,7 @@ doset() /* changing options via menu by Per Liboriussen */
                                (pass == DISP_IN_GAME) ? 0 : indexoffset);
             }
 
-    any = g.zeroany;
+    any = cg.zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
              "Other settings:", MENU_UNSELECTED);
@@ -4436,7 +4436,7 @@ doset() /* changing options via menu by Per Liboriussen */
     }
 
 #ifdef PREFIXES_IN_USE
-    any = g.zeroany;
+    any = cg.zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
              "Variable playground locations:", MENU_UNSELECTED);
@@ -4535,7 +4535,7 @@ int numtotal;
     opt_idx = 0;
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
-    any = g.zeroany;
+    any = cg.zeroany;
     for (i = 0; i < SIZE(action_titles); i++) {
         char tmpbuf[BUFSZ];
 
@@ -4581,7 +4581,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         for (i = 0; i < SIZE(menutype); i++) {
             style_name = menutype[i];
             /* note: separate `style_name' variable used
@@ -4601,7 +4601,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         for (i = 0; paranoia[i].flagmask != 0; ++i) {
             if (paranoia[i].flagmask == PARANOID_BONES && !wizard)
                 continue;
@@ -4633,7 +4633,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         for (i = 0; i < SIZE(burdentype); i++) {
             burden_name = burdentype[i];
             any.a_int = i + 1;
@@ -4664,7 +4664,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
             Sprintf(buf, "%-12s[%c%c]", disclosure_names[i],
                     flags.end_disclose[i], disclosure_options[i]);
@@ -4692,7 +4692,7 @@ boolean setinitial, setfromfile;
                         disclosure_names[i]);
                 tmpwin = create_nhwindow(NHW_MENU);
                 start_menu(tmpwin);
-                any = g.zeroany;
+                any = cg.zeroany;
                 /* 'y','n',and '+' work as alternate selectors; '-' doesn't */
                 any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
@@ -4741,7 +4741,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         for (i = 0; i < SIZE(runmodes); i++) {
             mode_name = runmodes[i];
             any.a_int = i + 1;
@@ -4761,7 +4761,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         any.a_char = GPCOORDS_COMPASS;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMPASS, 0, ATR_NONE,
                  "compass ('east' or '3s' or '2n,4w')",
@@ -4820,7 +4820,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         any.a_char = (GFILTER_NONE + 1);
         add_menu(tmpwin, NO_GLYPH, &any, 'n',
                  0, ATR_NONE, "no filtering",
@@ -4851,7 +4851,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         any.a_char = 's';
         add_menu(tmpwin, NO_GLYPH, &any, 's', 0, ATR_NONE, "single",
                  MENU_UNSELECTED);
@@ -4877,7 +4877,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         for (i = 0; i < SIZE(sortltype); i++) {
             sortl_name = sortltype[i];
             any.a_char = *sortl_name;
@@ -4904,7 +4904,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         any.a_int = ALIGN_TOP;
         add_menu(tmpwin, NO_GLYPH, &any, 't', 0, ATR_NONE, "top",
                  MENU_UNSELECTED);
@@ -4939,7 +4939,7 @@ boolean setinitial, setfromfile;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = g.zeroany;
+        any = cg.zeroany;
         for (i = 0; i < SIZE(npchoices); i++) {
             any.a_int = i + 1;
             add_menu(tmpwin, NO_GLYPH, &any, 'a' + i, 0, ATR_NONE,
@@ -5015,7 +5015,7 @@ boolean setinitial, setfromfile;
 
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
-            any = g.zeroany;
+            any = cg.zeroany;
             mt_idx = 0;
             while (tmp) {
                 mtype = msgtype2name(tmp->msgtype);
@@ -5083,7 +5083,7 @@ boolean setinitial, setfromfile;
 
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
-            any = g.zeroany;
+            any = cg.zeroany;
             mc_idx = 0;
             while (tmp) {
                 sattr = attr2attrname(tmp->attr);
@@ -5161,7 +5161,7 @@ boolean setinitial, setfromfile;
                 if (numapes[pass] == 0)
                     continue;
                 ape = iflags.autopickup_exceptions[pass];
-                any = g.zeroany;
+                any = cg.zeroany;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                          (pass == 0) ? "Never pickup" : "Always pickup",
                          MENU_UNSELECTED);
@@ -5234,7 +5234,7 @@ boolean setinitial, setfromfile;
             Sprintf(fmtstr, "%%-%ds %%s", biggest + 5);
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
-            any = g.zeroany;
+            any = cg.zeroany;
             any.a_int = 1;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "Default Symbols", MENU_UNSELECTED);
@@ -6269,7 +6269,7 @@ char *class_select;
         return 0;
     accelerator = 0;
     next_accelerator = 'a';
-    any = g.zeroany;
+    any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     while (*class_list) {
@@ -6311,7 +6311,7 @@ char *class_select;
     }
     if (category == 1 && next_accelerator <= 'z') {
         /* for objects, add "A - ' '  all classes", after a separator */
-        any = g.zeroany;
+        any = cg.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
         any.a_int = (int) ' ';
         Sprintf(buf, "%c  %s", (char) any.a_int, "all classes of objects");

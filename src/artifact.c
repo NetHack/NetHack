@@ -1437,7 +1437,7 @@ struct obj *obj;
             struct obj pseudo;
 
             pseudo =
-                g.zeroobj; /* neither cursed nor blessed, zero oextra too */
+                cg.zeroobj; /* neither cursed nor blessed, zero oextra too */
             pseudo.otyp = SCR_TAMING;
             (void) seffects(&pseudo);
             break;
@@ -1512,7 +1512,7 @@ struct obj *obj;
             winid tmpwin = create_nhwindow(NHW_MENU);
             anything any;
 
-            any = g.zeroany; /* set all bits to zero */
+            any = cg.zeroany; /* set all bits to zero */
             start_menu(tmpwin);
             /* use index+1 (cant use 0) as identifier */
             for (i = num_ok_dungeons = 0; i < g.n_dgns; i++) {

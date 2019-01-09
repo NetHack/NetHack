@@ -2223,7 +2223,7 @@ more_dips:
             if (!objects[old_otyp].oc_uname
                 && !objects[old_otyp].oc_name_known && old_dknown) {
                 struct obj fakeobj;
-                fakeobj = g.zeroobj;
+                fakeobj = cg.zeroobj;
                 fakeobj.dknown = 1;
                 fakeobj.otyp = old_otyp;
                 fakeobj.oclass = POTION_CLASS;

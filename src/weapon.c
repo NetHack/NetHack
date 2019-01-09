@@ -1,4 +1,4 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1545964580 2018/12/28 02:36:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1547025169 2019/01/09 09:12:49 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -400,7 +400,7 @@ register struct monst *mtmp;
 
     char mlet = mtmp->data->mlet;
 
-    g.propellor = &g.zeroobj;
+    g.propellor = (struct obj *) &cg.zeroobj;
     Oselect(EGG);      /* cockatrice egg */
     if (mlet == S_KOP) /* pies are first choice for Kops */
         Oselect(CREAM_PIE);
@@ -459,32 +459,32 @@ register struct monst *mtmp;
         }
 
         /* KMH -- This belongs here so darts will work */
-        g.propellor = &g.zeroobj;
+        g.propellor = (struct obj *) &cg.zeroobj;
 
-        prop = (objects[rwep[i]]).oc_skill;
+        prop = objects[rwep[i]].oc_skill;
         if (prop < 0) {
             switch (-prop) {
             case P_BOW:
-                g.propellor = (oselect(mtmp, YUMI));
+                g.propellor = oselect(mtmp, YUMI);
                 if (!g.propellor)
-                    g.propellor = (oselect(mtmp, ELVEN_BOW));
+                    g.propellor = oselect(mtmp, ELVEN_BOW);
                 if (!g.propellor)
-                    g.propellor = (oselect(mtmp, BOW));
+                    g.propellor = oselect(mtmp, BOW);
                 if (!g.propellor)
-                    g.propellor = (oselect(mtmp, ORCISH_BOW));
+                    g.propellor = oselect(mtmp, ORCISH_BOW);
                 break;
             case P_SLING:
-                g.propellor = (oselect(mtmp, SLING));
+                g.propellor = oselect(mtmp, SLING);
                 break;
             case P_CROSSBOW:
-                g.propellor = (oselect(mtmp, CROSSBOW));
+                g.propellor = oselect(mtmp, CROSSBOW);
             }
             if ((otmp = MON_WEP(mtmp)) && mwelded(otmp) && otmp != g.propellor
                 && mtmp->weapon_check == NO_WEAPON_WANTED)
                 g.propellor = 0;
         }
         /* propellor = obj, propellor to use
-         * propellor = &g.zeroobj, doesn't need a propellor
+         * propellor = &cg.zeroobj, doesn't need a propellor
          * propellor = 0, needed one and didn't have one
          */
         if (g.propellor != 0) {
@@ -677,8 +677,9 @@ register struct monst *mon;
                    mon_nam(mon));
         return 0;
     }
-    if (obj && obj != &g.zeroobj) {
+    if (obj && obj != &cg.zeroobj) {
         struct obj *mw_tmp = MON_WEP(mon);
+
         if (mw_tmp && mw_tmp->otyp == obj->otyp) {
             /* already wielding it */
             mon->weapon_check = NEED_WEAPON;
@@ -1059,7 +1060,7 @@ enhance_weapon_skill()
         /* start with a legend if any entries will be annotated
            with "*" or "#" below */
         if (eventually_advance > 0 || maxxed_cnt > 0) {
-            any = g.zeroany;
+            any = cg.zeroany;
             if (eventually_advance > 0) {
                 Sprintf(buf, "(Skill%s flagged by \"*\" may be enhanced %s.)",
                         plur(eventually_advance),
@@ -1088,7 +1089,7 @@ enhance_weapon_skill()
             for (i = skill_ranges[pass].first; i <= skill_ranges[pass].last;
                  i++) {
                 /* Print headings for skill types */
-                any = g.zeroany;
+                any = cg.zeroany;
                 if (i == skill_ranges[pass].first)
                     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                              skill_ranges[pass].name, MENU_UNSELECTED);
