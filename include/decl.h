@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1496531104 2017/06/03 23:05:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1547025154 2019/01/09 09:12:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -247,9 +247,10 @@ E NEARDATA struct obj *migrating_objs;
 E NEARDATA struct obj *billobjs;
 E NEARDATA struct obj *current_wand, *thrownobj, *kickedobj;
 
-E NEARDATA struct obj zeroobj; /* for init; &zeroobj used as special value */
+E NEARDATA const struct obj zeroobj; /* for init; also, &zeroobj is used
+                                      * as special value */
 
-E NEARDATA anything zeroany;   /* init'd and defined in decl.c */
+E NEARDATA const anything zeroany;   /* init'd and defined in decl.c */
 
 #include "you.h"
 E NEARDATA struct you u;
@@ -261,7 +262,7 @@ E NEARDATA struct u_realtime urealtime;
 #include "pm.h"
 #endif
 
-E NEARDATA struct monst zeromonst; /* for init of new or temp monsters */
+E NEARDATA const struct monst zeromonst; /* for init of new or temp monsters */
 E NEARDATA struct monst youmonst; /* monster details when hero is poly'd */
 E NEARDATA struct monst *mydogs, *migrating_mons;
 

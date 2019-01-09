@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1546687293 2019/01/05 11:21:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.232 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1547025168 2019/01/09 09:12:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -705,7 +705,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
 
     if (has_oname(obj) && dknown) {
         Strcat(buf, " named ");
-    nameit:
+ nameit:
         Strcat(buf, ONAME(obj));
     }
 
@@ -1083,7 +1083,7 @@ unsigned doname_flags;
             goto charges;
         break;
     case WAND_CLASS:
-    charges:
+ charges:
         if (known)
             Sprintf(eos(bp), " (%d:%d)", (int) obj->recharged, obj->spe);
         break;
@@ -1092,7 +1092,7 @@ unsigned doname_flags;
             Strcat(bp, " (lit)");
         break;
     case RING_CLASS:
-    ring:
+ ring:
         if (obj->owornmask & W_RINGR)
             Strcat(bp, " (on right ");
         if (obj->owornmask & W_RINGL)
@@ -2035,7 +2035,7 @@ register const char *verb;
             return strcpy(buf, verb);
     }
 
-sing:
+ sing:
     Strcpy(buf, verb);
     len = (int) strlen(buf);
     bspot = buf + len - 1;
@@ -2379,7 +2379,7 @@ const char *oldstr;
     /* Default: append an 's' */
     Strcasecpy(spot + 1, "s");
 
-bottom:
+ bottom:
     if (excess)
         Strcat(str, excess);
     return str;
@@ -2479,7 +2479,7 @@ const char *oldstr;
                    || (p - 4 == bp && !strcmpi(p - 4, "lens"))) {
             goto bottom;
         }
-    mins:
+ mins:
         *(p - 1) = '\0'; /* drop s */
 
     } else { /* input doesn't end in 's' */
@@ -2503,7 +2503,7 @@ const char *oldstr;
         /* here we cannot find the plural suffix */
     }
 
-bottom:
+ bottom:
     /* if we stripped off a suffix (" of bar" from "foo of bar"),
        put it back now [strcat() isn't actually 100% safe here...] */
     if (excess)
@@ -3376,7 +3376,7 @@ struct obj *no_wish;
         }
     }
 
-retry:
+ retry:
     /* "grey stone" check must be before general "stone" */
     for (i = 0; i < SIZE(o_ranges); i++)
         if (!strcmpi(bp, o_ranges[i].name)) {
@@ -3425,7 +3425,7 @@ retry:
     actualn = bp;
     if (!dn)
         dn = actualn; /* ex. "skull cap" */
-srch:
+ srch:
     /* check real names of gems first */
     if (!oclass && actualn) {
         for (i = bases[GEM_CLASS]; i <= LAST_GEM; i++) {
@@ -3561,7 +3561,7 @@ srch:
  * trap objects like beartraps.
  * Disallow such topology tweaks for WIZKIT startup wishes.
  */
-wiztrap:
+ wiztrap:
     if (wizard && !program_state.wizkit_wishing) {
         struct rm *lev;
         int trap, x = u.ux, y = u.uy;
@@ -3583,7 +3583,7 @@ wiztrap:
                       (trap != MAGIC_PORTAL) ? "" : " to nowhere");
             } else
                 pline("Creation of %s failed.", an(tname));
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
 
         /* furniture and terrain */
@@ -3596,20 +3596,20 @@ wiztrap:
                 lev->blessedftn = 1;
             pline("A %sfountain.", lev->blessedftn ? "magic " : "");
             newsym(x, y);
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
         if (!BSTRCMPI(bp, p - 6, "throne")) {
             lev->typ = THRONE;
             pline("A throne.");
             newsym(x, y);
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
         if (!BSTRCMPI(bp, p - 4, "sink")) {
             lev->typ = SINK;
             level.flags.nsinks++;
             pline("A sink.");
             newsym(x, y);
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
         /* ("water" matches "potion of water" rather than terrain) */
         if (!BSTRCMPI(bp, p - 4, "pool") || !BSTRCMPI(bp, p - 4, "moat")) {
@@ -3619,7 +3619,7 @@ wiztrap:
             /* Must manually make kelp! */
             water_damage_chain(level.objects[x][y], TRUE);
             newsym(x, y);
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
         if (!BSTRCMPI(bp, p - 4, "lava")) { /* also matches "molten lava" */
             lev->typ = LAVAPOOL;
@@ -3628,7 +3628,7 @@ wiztrap:
             if (!(Levitation || Flying))
                 (void) lava_effects();
             newsym(x, y);
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 5, "altar")) {
@@ -3648,7 +3648,7 @@ wiztrap:
             lev->altarmask = Align2amask(al);
             pline("%s altar.", An(align_str(al)));
             newsym(x, y);
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 5, "grave")
@@ -3657,7 +3657,7 @@ wiztrap:
             pline("%s.", IS_GRAVE(lev->typ) ? "A grave"
                                             : "Can't place a grave here");
             newsym(x, y);
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 4, "tree")) {
@@ -3665,14 +3665,14 @@ wiztrap:
             pline("A tree.");
             newsym(x, y);
             block_point(x, y);
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 4, "bars")) {
             lev->typ = IRONBARS;
             pline("Iron bars.");
             newsym(x, y);
-            return &zeroobj;
+            return (struct obj *) &zeroobj;
         }
     }
 
@@ -3688,10 +3688,10 @@ wiztrap:
 
     if (!oclass)
         return ((struct obj *) 0);
-any:
+ any:
     if (!oclass)
-        oclass = wrpsym[rn2((int) sizeof(wrpsym))];
-typfnd:
+        oclass = wrpsym[rn2((int) sizeof wrpsym)];
+ typfnd:
     if (typ)
         oclass = objects[typ].oc_class;
 
@@ -3981,7 +3981,7 @@ typfnd:
          || (otmp->oartifact && rn2(nartifact_exist()) > 1)) && !wizard) {
         artifact_exists(otmp, safe_oname(otmp), FALSE);
         obfree(otmp, (struct obj *) 0);
-        otmp = &zeroobj;
+        otmp = (struct obj *) &zeroobj;
         pline("For a moment, you feel %s in your %s, but it disappears!",
               something, makeplural(body_part(HAND)));
     }
