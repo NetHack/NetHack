@@ -1,4 +1,4 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1545964580 2018/12/28 02:36:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1547025169 2019/01/09 09:12:49 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -402,7 +402,7 @@ register struct monst *mtmp;
 
     char mlet = mtmp->data->mlet;
 
-    propellor = &zeroobj;
+    propellor = (struct obj *) &zeroobj;
     Oselect(EGG);      /* cockatrice egg */
     if (mlet == S_KOP) /* pies are first choice for Kops */
         Oselect(CREAM_PIE);
@@ -461,25 +461,25 @@ register struct monst *mtmp;
         }
 
         /* KMH -- This belongs here so darts will work */
-        propellor = &zeroobj;
+        propellor = (struct obj *) &zeroobj;
 
-        prop = (objects[rwep[i]]).oc_skill;
+        prop = objects[rwep[i]].oc_skill;
         if (prop < 0) {
             switch (-prop) {
             case P_BOW:
-                propellor = (oselect(mtmp, YUMI));
+                propellor = oselect(mtmp, YUMI);
                 if (!propellor)
-                    propellor = (oselect(mtmp, ELVEN_BOW));
+                    propellor = oselect(mtmp, ELVEN_BOW);
                 if (!propellor)
-                    propellor = (oselect(mtmp, BOW));
+                    propellor = oselect(mtmp, BOW);
                 if (!propellor)
-                    propellor = (oselect(mtmp, ORCISH_BOW));
+                    propellor = oselect(mtmp, ORCISH_BOW);
                 break;
             case P_SLING:
-                propellor = (oselect(mtmp, SLING));
+                propellor = oselect(mtmp, SLING);
                 break;
             case P_CROSSBOW:
-                propellor = (oselect(mtmp, CROSSBOW));
+                propellor = oselect(mtmp, CROSSBOW);
             }
             if ((otmp = MON_WEP(mtmp)) && mwelded(otmp) && otmp != propellor
                 && mtmp->weapon_check == NO_WEAPON_WANTED)
@@ -681,6 +681,7 @@ register struct monst *mon;
     }
     if (obj && obj != &zeroobj) {
         struct obj *mw_tmp = MON_WEP(mon);
+
         if (mw_tmp && mw_tmp->otyp == obj->otyp) {
             /* already wielding it */
             mon->weapon_check = NEED_WEAPON;
