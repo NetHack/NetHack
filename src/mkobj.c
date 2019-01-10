@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1546837153 2019/01/07 04:59:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.140 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1547086532 2019/01/10 02:15:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -71,7 +71,7 @@ newoextra()
 {
     struct oextra *oextra;
 
-    oextra = (struct oextra *) alloc(sizeof(struct oextra));
+    oextra = (struct oextra *) alloc(sizeof (struct oextra));
     oextra->oname = 0;
     oextra->omonst = 0;
     oextra->omid = 0;
@@ -391,7 +391,7 @@ struct obj *obj2, *obj1;
         if (!OMONST(obj2))
             newomonst(obj2);
         (void) memcpy((genericptr_t) OMONST(obj2),
-                      (genericptr_t) OMONST(obj1), sizeof(struct monst));
+                      (genericptr_t) OMONST(obj1), sizeof (struct monst));
         OMONST(obj2)->mextra = (struct mextra *) 0;
         OMONST(obj2)->nmon = (struct monst *) 0;
 #if 0
@@ -406,13 +406,13 @@ struct obj *obj2, *obj1;
         if (!OMID(obj2))
             newomid(obj2);
         (void) memcpy((genericptr_t) OMID(obj2), (genericptr_t) OMID(obj1),
-                      sizeof(unsigned));
+                      sizeof (unsigned));
     }
     if (has_olong(obj1)) {
         if (!OLONG(obj2))
             newolong(obj2);
         (void) memcpy((genericptr_t) OLONG(obj2), (genericptr_t) OLONG(obj1),
-                      sizeof(long));
+                      sizeof (long));
     }
     if (has_omailcmd(obj1)) {
         new_omailcmd(obj2, OMAILCMD(obj1));

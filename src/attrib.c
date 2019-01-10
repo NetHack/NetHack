@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1494034337 2017/05/06 01:32:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1547086687 2019/01/10 02:18:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.64 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -115,7 +115,7 @@ adjattrib(ndx, incr, msgflg)
 int ndx, incr;
 int msgflg; /* positive => no message, zero => message, and */
 {           /* negative => conditional (msg if change made) */
-    int old_acurr, old_abase;
+    int old_acurr, old_abase, old_amax, decr;
     boolean abonflg;
     const char *attrstr;
 
@@ -130,23 +130,38 @@ int msgflg; /* positive => no message, zero => message, and */
 
     old_acurr = ACURR(ndx);
     old_abase = ABASE(ndx);
+    old_amax = AMAX(ndx);
+    ABASE(ndx) += incr; /* when incr is negative, this reduces ABASE() */
     if (incr > 0) {
-        ABASE(ndx) += incr;
         if (ABASE(ndx) > AMAX(ndx)) {
-            incr = ABASE(ndx) - AMAX(ndx);
-            AMAX(ndx) += incr;
+            AMAX(ndx) = ABASE(ndx);
             if (AMAX(ndx) > ATTRMAX(ndx))
-                AMAX(ndx) = ATTRMAX(ndx);
-            ABASE(ndx) = AMAX(ndx);
+                ABASE(ndx) = AMAX(ndx) = ATTRMAX(ndx);
         }
         attrstr = plusattr[ndx];
         abonflg = (ABON(ndx) < 0);
-    } else {
-        ABASE(ndx) += incr;
+    } else { /* incr is negative */
         if (ABASE(ndx) < ATTRMIN(ndx)) {
-            incr = ABASE(ndx) - ATTRMIN(ndx);
+            /*
+             * If base value has dropped so low that it is trying to be
+             * taken below the minimum, reduce max value (peak reached)
+             * instead.  That means that restore ability and repeated
+             * applications of unicorn horn will not be able to recover
+             * all the lost value.  Starting will 3.6.2, we only take away
+             * some (average half, possibly zero) of the excess from max
+             * instead of all of it, but without intervening recovery, it
+             * can still eventually drop to the minimum allowed.  After
+             * that, it can't be recovered, only improved with new gains.
+             *
+             * This used to assign a new negative value to incr and then
+             * add it, but that could affect messages below, possibly
+             * making a large decrease be described as a small one.
+             *
+             * decr = rn2(-(ABASE - ATTRMIN) + 1);
+             */
+            decr = rn2(ATTRMIN(ndx) - ABASE(ndx) + 1);
             ABASE(ndx) = ATTRMIN(ndx);
-            AMAX(ndx) += incr;
+            AMAX(ndx) -= decr;
             if (AMAX(ndx) < ATTRMIN(ndx))
                 AMAX(ndx) = ATTRMIN(ndx);
         }
@@ -155,12 +170,15 @@ int msgflg; /* positive => no message, zero => message, and */
     }
     if (ACURR(ndx) == old_acurr) {
         if (msgflg == 0 && flags.verbose) {
-            if (ABASE(ndx) == old_abase)
+            if (ABASE(ndx) == old_abase && AMAX(ndx) == old_amax) {
                 pline("You're %s as %s as you can get.",
                       abonflg ? "currently" : "already", attrstr);
-            else /* current stayed the same but base value changed */
+            } else {
+                /* current stayed the same but base value changed, or
+                   base is at minimum and reduction caused max to drop */
                 Your("innate %s has %s.", attrname[ndx],
                      (incr > 0) ? "improved" : "declined");
+            }
         }
         return FALSE;
     }
@@ -582,7 +600,7 @@ exerchk()
                     (mod_val > 0) ? "must have been" : "haven't been",
                     exertext[i][(mod_val > 0) ? 0 : 1]);
             }
-        nextattrib:
+ nextattrib:
             /* this used to be ``AEXE(i) /= 2'' but that would produce
                platform-dependent rounding/truncation for negative vals */
             AEXE(i) = (abs(ax) / 2) * mod_val;

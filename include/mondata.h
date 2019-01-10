@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.h	$NHDT-Date: 1513297342 2017/12/15 00:22:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	mondata.h	$NHDT-Date: 1547086248 2019/01/10 02:10:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -127,9 +127,9 @@
 #define is_longworm(ptr)                                                   \
     (((ptr) == &mons[PM_BABY_LONG_WORM]) || ((ptr) == &mons[PM_LONG_WORM]) \
      || ((ptr) == &mons[PM_LONG_WORM_TAIL]))
-#define is_covetous(ptr) ((ptr->mflags3 & M3_COVETOUS))
-#define infravision(ptr) ((ptr->mflags3 & M3_INFRAVISION))
-#define infravisible(ptr) ((ptr->mflags3 & M3_INFRAVISIBLE))
+#define is_covetous(ptr) (((ptr)->mflags3 & M3_COVETOUS))
+#define infravision(ptr) (((ptr)->mflags3 & M3_INFRAVISION))
+#define infravisible(ptr) (((ptr)->mflags3 & M3_INFRAVISIBLE))
 #define is_displacer(ptr) (((ptr)->mflags3 & M3_DISPLACES) != 0L)
 #define is_mplayer(ptr) \
     (((ptr) >= &mons[PM_ARCHEOLOGIST]) && ((ptr) <= &mons[PM_WIZARD]))

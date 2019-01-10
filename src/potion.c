@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1545597429 2018/12/23 20:37:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1547086533 2019/01/10 02:15:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.158 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1399,7 +1399,7 @@ int how;
             /*FALLTHRU*/
         case POT_RESTORE_ABILITY:
         case POT_GAIN_ABILITY:
-        do_healing:
+ do_healing:
             angermon = FALSE;
             if (mon->mhp < mon->mhpmax) {
                 mon->mhp = mon->mhpmax;
@@ -1421,7 +1421,7 @@ int how;
                     pline("%s looks unharmed.", Monnam(mon));
                 break;
             }
-        do_illness:
+ do_illness:
             if ((mon->mhpmax > 3) && !resist(mon, POTION_CLASS, 0, NOTELL))
                 mon->mhpmax /= 2;
             if ((mon->mhp > 2) && !resist(mon, POTION_CLASS, 0, NOTELL))
@@ -2143,7 +2143,7 @@ dodip()
         useup(potion);
         return 1;
     }
-more_dips:
+ more_dips:
 
     /* Allow filling of MAGIC_LAMPs to prevent identification by player */
     if ((obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP)
@@ -2231,9 +2231,10 @@ more_dips:
             }
         }
         obj_extract_self(singlepotion);
-        singlepotion =
-            hold_another_object(singlepotion, "You juggle and drop %s!",
-                                doname(singlepotion), (const char *) 0);
+        singlepotion = hold_another_object(singlepotion,
+                                           "You juggle and drop %s!",
+                                           doname(singlepotion),
+                                           (const char *) 0);
         nhUse(singlepotion);
         update_inventory();
         return 1;
@@ -2242,7 +2243,7 @@ more_dips:
     pline("Interesting...");
     return 1;
 
-poof:
+ poof:
     if (!objects[potion->otyp].oc_name_known
         && !objects[potion->otyp].oc_uname)
         docall(potion);
