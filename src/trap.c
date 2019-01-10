@@ -2421,7 +2421,7 @@ register struct monst *mtmp;
                 You("smell smoke.");
             if (is_ice(mtmp->mx, mtmp->my))
                 melt_ice(mtmp->mx, mtmp->my, (char *) 0);
-            if (see_it)
+            if (see_it && t_at(mtmp->mx, mtmp->my))
                 seetrap(trap);
             break;
         case PIT:
