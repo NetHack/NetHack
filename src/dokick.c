@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1543185070 2018/11/25 22:31:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1547086527 2019/01/10 02:15:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -247,7 +247,7 @@ xchar x, y;
 
     else if (uarm && objects[uarm->otyp].oc_bulky && ACURR(A_DEX) < rnd(25))
         clumsy = TRUE;
-doit:
+ doit:
     You("kick %s.", mon_nam(mon));
     if (!rn2(clumsy ? 3 : 4) && (clumsy || !bigmonst(mon->data))
         && mon->mcansee && !mon->mtrapped && !thick_skinned(mon->data)
@@ -1203,7 +1203,7 @@ dokick()
             || IS_STWALL(maploc->typ)) {
             if (!IS_STWALL(maploc->typ) && maploc->ladder == LA_DOWN)
                 goto dumb;
-        ouch:
+ ouch:
             pline("Ouch!  That hurts!");
             exercise(A_DEX, FALSE);
             exercise(A_STR, FALSE);
@@ -1230,7 +1230,7 @@ dokick()
 
     if (maploc->doormask == D_ISOPEN || maploc->doormask == D_BROKEN
         || maploc->doormask == D_NODOOR) {
-    dumb:
+ dumb:
         exercise(A_DEX, FALSE);
         if (martial() || ACURR(A_DEX) >= 16 || rn2(3)) {
             You("kick at empty space.");
@@ -1412,10 +1412,11 @@ xchar dlev;          /* if !0 send to dlev near player */
         obj_extract_self(obj);
 
         if (costly) {
-            price += stolen_value(
-                obj, x, y, (costly_spot(u.ux, u.uy)
-                            && index(u.urooms, *in_rooms(x, y, SHOPBASE))),
-                TRUE);
+            price += stolen_value(obj, x, y,
+                                  (costly_spot(u.ux, u.uy)
+                                   && index(u.urooms,
+                                            *in_rooms(x, y, SHOPBASE))),
+                                  TRUE);
             /* set obj->no_charge to 0 */
             if (Has_contents(obj))
                 picked_container(obj); /* does the right thing */
@@ -1681,7 +1682,7 @@ unsigned long deliverflags;
     struct obj *otmp, *otmp2;
     int where, maxobj = 1;
     boolean at_crime_scene = In_mines(&u.uz);
- 
+
     if ((deliverflags & DF_RANDOM) && cnt > 1)
         maxobj = rnd(cnt);
     else if (deliverflags & DF_ALL)
