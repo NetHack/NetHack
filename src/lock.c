@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1544442712 2018/12/10 11:51:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1547086531 2019/01/10 02:15:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.83 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -195,12 +195,13 @@ boolean destroyit;
             if (!rn2(3) || otmp->oclass == POTION_CLASS) {
                 chest_shatter_msg(otmp);
                 if (costly)
-                    loss +=
-                        stolen_value(otmp, u.ux, u.uy, peaceful_shk, TRUE);
+                    loss += stolen_value(otmp, u.ux, u.uy, peaceful_shk, TRUE);
                 if (otmp->quan == 1L) {
                     obfree(otmp, (struct obj *) 0);
                     continue;
                 }
+                /* this works because we're sure to have at least 1 left;
+                   otherwise it would fail since otmp is not in inventory */
                 useup(otmp);
             }
             if (box->otyp == ICE_BOX && otmp->otyp == CORPSE) {
@@ -746,7 +747,7 @@ boolean quietly;
         return TRUE;
     }
     if (OBJ_AT(x, y)) {
-    objhere:
+ objhere:
         if (!quietly)
             pline("%s's in the way.", Something);
         return TRUE;
@@ -812,7 +813,7 @@ doclose()
         else if (portcullis || door->typ == DRAWBRIDGE_DOWN)
             There("is no obvious way to close the drawbridge.");
         else {
-        nodoor:
+ nodoor:
             You("%s no door there.", Blind ? "feel" : "see");
         }
         return res;
