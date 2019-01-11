@@ -917,6 +917,17 @@ init_random()
     set_random(seed);
 }
 
+/* Reshuffles the random number generator. */
+void
+reseed_random()
+{
+    /* only reseed if we are certain that the seed generation is unguessable
+     * by the players. */
+#ifdef DEV_RANDOM
+    init_random();
+#endif
+}
+
 time_t
 getnow()
 {
