@@ -408,5 +408,18 @@
 # define RUNTIME_PASTEBUF_SUPPORT
 #endif
 
+/*
+ * /dev/random is blocking on Linux, so there we default to /dev/urandom which
+ * should still be good enough.
+ * BSD systems usually have /dev/random that is supposed to be used.
+ */
+#ifdef LINUX
+# define DEV_RANDOM "/dev/urandom"
+#else
+# ifdef BSD
+#  define DEV_RANDOM "/dev/random"
+# endif
+#endif
+
 #endif /* UNIXCONF_H */
 #endif /* UNIX */

@@ -925,7 +925,8 @@ E char *FDECL(strstri, (const char *, const char *));
 #endif
 E boolean
 FDECL(fuzzymatch, (const char *, const char *, const char *, BOOLEAN_P));
-E void NDECL(setrandom);
+E void NDECL(init_random);
+E void NDECL(reseed_random);
 E time_t NDECL(getnow);
 E int NDECL(getyear);
 #if 0

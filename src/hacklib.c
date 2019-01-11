@@ -848,12 +848,23 @@ extern struct tm *FDECL(localtime, (time_t *));
 #endif
 STATIC_DCL struct tm *NDECL(getlt);
 
-void
-setrandom()
+/* Returns a number suitable as seed for the random number generator. */
+static unsigned long
+get_random_seed()
 {
-    unsigned long seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+    unsigned long seed = 0;
+#ifdef DEV_RANDOM
+    FILE *fptr = NULL;
 
-#if defined(UNIX) || defined(VMS)
+    fptr = fopen(DEV_RANDOM, "r");
+    if (fptr) {
+        fread(&seed, sizeof(long), 1, fptr);
+    }
+    fclose(fptr);
+#else
+    seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+
+# if defined(UNIX) || defined(VMS)
     {
         unsigned long pid = (unsigned long) getpid();
 
@@ -864,28 +875,46 @@ setrandom()
             seed *= pid;
         }
     }
+# endif
 #endif
+    return seed;
+}
 
+/* Sets the seed for the random number generator */
+static void
+set_random(unsigned long seed)
+{
     /* the types are different enough here that sweeping the different
      * routine names into one via #defines is even more confusing
      */
 #ifdef RANDOM /* srandom() from sys/share/random.c */
     srandom((unsigned int) seed);
 #else
-#if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) \
+# if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) \
     || defined(CYGWIN32) /* system srandom() */
-#if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
+#  if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
     (void)
-#endif
+#  endif
         srandom((int) seed);
-#else
-#ifdef UNIX /* system srand48() */
+# else
+# ifdef UNIX /* system srand48() */
     srand48((long) seed);
-#else       /* poor quality system routine */
+# else       /* poor quality system routine */
     srand((int) seed);
+# endif
 #endif
 #endif
-#endif
+}
+
+/*
+ * Initializes the random number generator.
+ * Only call once.
+ */
+void
+init_random()
+{
+    unsigned long seed = get_random_seed();
+    set_random(seed);
 }
 
 time_t
