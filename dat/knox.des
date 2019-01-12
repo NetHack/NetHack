@@ -1,4 +1,4 @@
-# NetHack 3.6	knox.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
+# NetHack 3.6	knox.des	$NHDT-Date: 1547262478 2019/01/12 03:07:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $
 #	Copyright (c) 1989 by Jean-Christophe Collet
 #	Copyright (c) 1992 by Izchak Miller
 # NetHack may be freely redistributed.  See license for details.
@@ -70,6 +70,32 @@ REGION:(03,10,07,13),lit,"zoo",filled,irregular
 #   arrival chamber; needs to be a real room to control migrating monsters,
 #   and `unfilled' is a kludge to force an ordinary room to remain a room
 REGION:(06,15,09,16),unlit,"ordinary",unfilled
+
+#   Run away!  Or at least look away!
+#
+#   Due to a quirk in how lit regions work, entering the arrival chamber
+#   with a lit candle reveals the left and left-top walls even though
+#   they're beyond the range of a candle's light, but the closer upper-right
+#   corner shows as blank (legitmately since that spot two steps away
+#   diagonally is beyond candle radius).  Explicity lighting the problematic
+#   spot hides that quirk.  Without a light source, it doesn't become mapped
+#   until you move next to it; with one, it becomes mapped when the spot
+#   adjacent to it becomes lit, matching the observable behavior of the rest
+#   of the entry chamber.
+REGION:(10,14,10,14),lit,"ordinary"
+#   Unfortunately, a single lit spot actually lights a 3x3 area around that
+#   spot, resulting in the wall corner showing even without a candle and
+#   making some unexpected lit spots on that other side of the wall.
+#   Making an explicitly unlit box around the lit spot hides _that_ quirk.
+REGION:(09,13,09,15),unlit,"ordinary"
+REGION:(09,13,11,13),unlit,"ordinary"
+REGION:(11,13,11,15),unlit,"ordinary"
+#   (We don't need to close the box across the bottom.)
+#REGION:(09,15,11,15),unlit,"ordinary"
+#   [Note: expanding unlit arrival region to (05,14,09,16) did not solve this
+#   issue in other direction, to make the walls unlit and obey candle radius.]
+#   We now take you back to your regularly scheduled level description....
+
 #   Barracks
 REGION:(62,03,71,04),lit,"barracks",filled,irregular
 # Doors
