@@ -7,7 +7,7 @@
 #ifndef INTEGER_H
 #define INTEGER_H
 
-#if defined(__STDC__) && __STDC__ >= 199101L
+#if defined(__STDC__) && __STDC_VERSION__ >= 199101L
 
 /* The compiler claims to conform to C99. Use stdint.h */
 #include <stdint.h>
