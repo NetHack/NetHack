@@ -1,7 +1,7 @@
-/* CC0 (Public domain) - see LICENSE file for details */
+/* CC0 (Public domain) - see http://creativecommons.org/publicdomain/zero/1.0/ for details */
 #if !defined(_isaac64_H)
 # define _isaac64_H (1)
-# include <stdint.h>
+# include <integer.h>
 
 
 
@@ -85,47 +85,5 @@ uint64_t isaac64_next_uint(isaac64_ctx *_ctx,uint64_t _n);
  * To generate cheaper float values that do not have these properties, use
  *   ldexpf((float)isaac64_next_uint64(_ctx),-64);
  */
-float isaac64_next_float(isaac64_ctx *_ctx);
-/**
- * isaac64_next_signed_float - Uniform random float in the range (-1,1).
- * @_ctx: The ISAAC64 instance to generate the value with.
- * Returns a high-quality float uniformly distributed between -1 and 1
- *  (exclusive).
- * All of the float's mantissa bits are random, e.g., the least significant bit
- *  may still be non-zero even if the magnitude is less than 0.5, and any
- *  representable float in the range (-1,1) has a chance to be returned, though
- *  values very close to zero become increasingly unlikely.
- * To generate cheaper float values that do not have these properties, use
- *   ldexpf((float)isaac64_next_uint64(_ctx),-63)-1;
- *  though this returns values in the range [-1,1).
- */
-float isaac64_next_signed_float(isaac64_ctx *_ctx);
-/**
- * isaac64_next_double - Uniform random double in the range [0,1).
- * @_ctx: The ISAAC64 instance to generate the value with.
- * Returns a high-quality double uniformly distributed between 0 (inclusive)
- *  and 1 (exclusive).
- * All of the double's mantissa bits are random, e.g., the least significant
- *  bit may still be non-zero even if the value is less than 0.5, and any
- *  representable double in the range [0,1) has a chance to be returned, though
- *  values very close to zero become increasingly unlikely.
- * To generate cheaper double values that do not have these properties, use
- *   ldexp((double)isaac64_next_uint64(_ctx),-64);
- */
-double isaac64_next_double(isaac64_ctx *_ctx);
-/**
- * isaac64_next_signed_double - Uniform random double in the range (-1,1).
- * @_ctx: The ISAAC64 instance to generate the value with.
- * Returns a high-quality double uniformly distributed between -1 and 1
- *  (exclusive).
- * All of the double's mantissa bits are random, e.g., the least significant
- *  bit may still be non-zero even if the value is less than 0.5, and any
- *  representable double in the range (-1,1) has a chance to be returned,
- *  though values very close to zero become increasingly unlikely.
- * To generate cheaper double values that do not have these properties, use
- *   ldexp((double)isaac64_next_uint64(_ctx),-63)-1;
- *  though this returns values in the range [-1,1).
- */
-double isaac64_next_signed_double(isaac64_ctx *_ctx);
 
 #endif

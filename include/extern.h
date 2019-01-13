@@ -2104,6 +2104,9 @@ E void FDECL(genl_outrip, (winid, int, time_t));
 
 /* ### rnd.c ### */
 
+#ifdef USE_ISAAC64
+E void FDECL(init_isaac64, (unsigned long));
+#endif
 E int FDECL(rn2, (int));
 E int FDECL(rnl, (int));
 E int FDECL(rnd, (int));

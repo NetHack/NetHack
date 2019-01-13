@@ -36,6 +36,9 @@ typedef int int32;
 typedef unsigned int uint32;
 #endif
 
+typedef unsigned long uint32_t;
+typedef unsigned long long uint64_t;
+
 #endif /* !C99 */
 
 #endif /* INTEGER_H */

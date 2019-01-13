@@ -884,25 +884,29 @@ get_random_seed()
 static void
 set_random(unsigned long seed)
 {
+#ifdef USE_ISAAC64
+    init_isaac64(seed);
+#else
     /* the types are different enough here that sweeping the different
      * routine names into one via #defines is even more confusing
      */
-#ifdef RANDOM /* srandom() from sys/share/random.c */
+# ifdef RANDOM /* srandom() from sys/share/random.c */
     srandom((unsigned int) seed);
-#else
-# if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) \
-    || defined(CYGWIN32) /* system srandom() */
-#  if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
-    (void)
-#  endif
-        srandom((int) seed);
 # else
-# ifdef UNIX /* system srand48() */
+#  if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) \
+    || defined(CYGWIN32) /* system srandom() */
+#   if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
+    (void)
+#   endif
+        srandom((int) seed);
+#  else
+#   ifdef UNIX /* system srand48() */
     srand48((long) seed);
-# else       /* poor quality system routine */
+#   else       /* poor quality system routine */
     srand((int) seed);
+#   endif
+#  endif
 # endif
-#endif
 #endif
 }
 

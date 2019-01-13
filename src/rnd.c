@@ -4,6 +4,30 @@
 
 #include "hack.h"
 
+#ifdef USE_ISAAC64
+#include "isaac64.h"
+
+static isaac64_ctx rng_state;
+
+void
+init_isaac64(unsigned long seed)
+{
+    unsigned char new_rng_state[sizeof(seed)];
+    int i;
+    for (i=0; i<sizeof(seed); i++) {
+        new_rng_state[i]= (unsigned char)(seed & 0xFF);
+        seed >>= 8;
+    }
+
+    isaac64_init(&rng_state, new_rng_state, sizeof(seed));
+}
+
+static int
+RND(int x)
+{
+    return (isaac64_next_uint64(&rng_state) % x);
+}
+#else
 /* "Rand()"s definition is determined by [OS]conf.h */
 #if defined(LINT) && defined(UNIX) /* rand() is long... */
 extern int NDECL(rand);
@@ -16,6 +40,7 @@ extern int NDECL(rand);
 #define RND(x) ((int) ((Rand() >> 3) % (x)))
 #endif
 #endif /* LINT */
+#endif
 
 /* 0 <= rn2(x) < x */
 int

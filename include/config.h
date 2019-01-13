@@ -556,6 +556,7 @@ typedef unsigned char uchar;
 
 #endif
 
+#define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 
 /* End of Section 4 */
 
