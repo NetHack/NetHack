@@ -1,4 +1,4 @@
-# NetHack 3.6	knox.des	$NHDT-Date: 1547262478 2019/01/12 03:07:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $
+# NetHack 3.6	knox.des	$NHDT-Date: 1547343821 2019/01/13 01:43:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.13 $
 #	Copyright (c) 1989 by Jean-Christophe Collet
 #	Copyright (c) 1992 by Izchak Miller
 # NetHack may be freely redistributed.  See license for details.
@@ -71,30 +71,28 @@ REGION:(03,10,07,13),lit,"zoo",filled,irregular
 #   and `unfilled' is a kludge to force an ordinary room to remain a room
 REGION:(06,15,09,16),unlit,"ordinary",unfilled
 
-#   Run away!  Or at least look away!
+#   3.6.2:  Entering level carrying a lit candle would show the whole entry
+#   chamber except for its top right corner even though some of the revealed
+#   spots are farther away than that is.  This is because the lit treasure zoo
+#   is forcing the walls around it to be lit too (see light_region(sp_lev.c)),
+#   and lit walls show up when light reaches the spot next to them.  The unlit
+#   corner is beyond candle range and isn't flagged as lit so it doesn't show
+#   up until light reaches it rather than when light gets next to it.
 #
-#   Due to a quirk in how lit regions work, entering the arrival chamber
-#   with a lit candle reveals the left and left-top walls even though
-#   they're beyond the range of a candle's light, but the closer upper-right
-#   corner shows as blank (legitmately since that spot two steps away
-#   diagonally is beyond candle radius).  Explicity lighting the problematic
-#   spot hides that quirk.  Without a light source, it doesn't become mapped
-#   until you move next to it; with one, it becomes mapped when the spot
-#   adjacent to it becomes lit, matching the observable behavior of the rest
-#   of the entry chamber.
-REGION:(10,14,10,14),lit,"ordinary"
-#   Unfortunately, a single lit spot actually lights a 3x3 area around that
-#   spot, resulting in the wall corner showing even without a candle and
-#   making some unexpected lit spots on that other side of the wall.
-#   Making an explicitly unlit box around the lit spot hides _that_ quirk.
-REGION:(09,13,09,15),unlit,"ordinary"
-REGION:(09,13,11,13),unlit,"ordinary"
-REGION:(11,13,11,15),unlit,"ordinary"
-#   (We don't need to close the box across the bottom.)
-#REGION:(09,15,11,15),unlit,"ordinary"
-#   [Note: expanding unlit arrival region to (05,14,09,16) did not solve this
-#   issue in other direction, to make the walls unlit and obey candle radius.]
-#   We now take you back to your regularly scheduled level description....
+#   Force left and top walls of the arrival chamber to be unlit in order to
+#   hide this lighting quirk.
+REGION:(05,14,05,17),unlit,"ordinary"
+REGION:(05,14,09,14),unlit,"ordinary"
+#   (Entering the treasure zoo while blind and then regaining sight might
+#   expose the new oddity of these walls not appearing when on the lit side
+#   but that's even less likely to occur than the rare instance of entering
+#   the level with a candle.  They'll almost always be mapped from the arrival
+#   side before entering the treasure zoo.
+#
+#   A prior workaround lit the top right corner wall and then jumped through
+#   hoops to suppress the extra light in the 3x3 lit area that produced.
+#   This is simpler and makes the short range candle light behave more like
+#   it is expected to work.)
 
 #   Barracks
 REGION:(62,03,71,04),lit,"barracks",filled,irregular
