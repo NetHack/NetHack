@@ -809,6 +809,7 @@ wiz_makemap(VOID_ARGS)
             ballrelease(FALSE);
             unplacebc();
         }
+        maybe_reset_pick();
         reset_utrap(FALSE); /* also done by safe_teleds() for new level */
         check_special_room(TRUE);
         dmonsfree();
