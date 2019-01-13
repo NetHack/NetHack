@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.227 $ $NHDT-Date: 1547262477 2019/01/12 03:07:57 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.228 $ $NHDT-Date: 1547343820 2019/01/13 01:43:40 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -331,9 +331,8 @@ setting SEDUCE=0 made all succubus and incubus attacks be described as
 	smiling engagingly or seductively rather than hitting or missing
 entering Ft.Ludios with a lit candle lit up the entire entry room except for
 	one corner spot; that corner is beyond candle radius but other spots
-	even further away were being shown; add a hack to knox.des to make
-	that corner show up too, although a proper fix should make the other
-	walls not be seen until approached
+	even further away were being shown; force the walls to unlit in order
+	to prevent those wall spots from showing so soon
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
