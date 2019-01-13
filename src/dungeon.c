@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1523308357 2018/04/09 21:12:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1547421449 2019/01/13 23:17:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1202,7 +1202,7 @@ int x, y;
         u.ux0 = u.ux, u.uy0 = u.uy;
 }
 
-/* place you on a random location */
+/* place you on a random location when arriving on a level */
 void
 u_on_rndspot(upflag)
 int upflag;
@@ -1230,6 +1230,9 @@ int upflag;
         place_lregion(dndest.lx, dndest.ly, dndest.hx, dndest.hy,
                       dndest.nlx, dndest.nly, dndest.nhx, dndest.nhy,
                       LR_DOWNTELE, (d_level *) 0);
+
+    /* might have just left solid rock and unblocked levitation */
+    switch_terrain();
 }
 
 /* place you on the special staircase */
