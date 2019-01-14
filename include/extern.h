@@ -2106,6 +2106,7 @@ E void FDECL(genl_outrip, (winid, int, time_t));
 
 #ifdef USE_ISAAC64
 E void FDECL(init_isaac64, (unsigned long));
+E long NDECL(nhrand);
 #endif
 E int FDECL(rn2, (int));
 E int FDECL(rnl, (int));

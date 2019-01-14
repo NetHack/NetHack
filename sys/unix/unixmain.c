@@ -765,4 +765,31 @@ error:
 }
 #endif
 
+#ifdef SYS_RANDOM_SEED
+unsigned long
+sys_random_seed()
+{
+    unsigned long seed;
+    unsigned long pid = (unsigned long) getpid();
+#ifdef DEV_RANDOM
+    FILE *fptr = NULL;
+
+    fptr = fopen(DEV_RANDOM, "r");
+    if (fptr) {
+        fread(&seed, sizeof(long), 1, fptr);
+    }
+    fclose(fptr);
+#else
+    seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+    /* Quick dirty band-aid to prevent PRNG prediction */
+    if (pid) {
+        if (!(pid & 3L))
+            pid -= 1L;
+        seed *= pid;
+    }
+#endif
+    return seed;
+}
+#endif /* SYS_RANDOM_SEED */
+
 /*unixmain.c*/

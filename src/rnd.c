@@ -27,6 +27,7 @@ RND(int x)
 {
     return (isaac64_next_uint64(&rng_state) % x);
 }
+
 #else
 /* "Rand()"s definition is determined by [OS]conf.h */
 #if defined(LINT) && defined(UNIX) /* rand() is long... */

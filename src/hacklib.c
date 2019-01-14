@@ -51,6 +51,8 @@
         boolean         fuzzymatch      (const char *, const char *,
                                          const char *, boolean)
         void            setrandom       (void)
+        void            init_random     (void)
+        void            reseed_random   (void)
         time_t          getnow          (void)
         int             getyear         (void)
         char *          yymmdd          (time_t)
@@ -848,34 +850,20 @@ extern struct tm *FDECL(localtime, (time_t *));
 #endif
 STATIC_DCL struct tm *NDECL(getlt);
 
+#ifdef SYS_RANDOM_SEED
+extern unsigned long NDECL(sys_random_seed);
+#endif
+
 /* Returns a number suitable as seed for the random number generator. */
 static unsigned long
 get_random_seed()
 {
     unsigned long seed = 0;
-#ifdef DEV_RANDOM
-    FILE *fptr = NULL;
-
-    fptr = fopen(DEV_RANDOM, "r");
-    if (fptr) {
-        fread(&seed, sizeof(long), 1, fptr);
-    }
-    fclose(fptr);
+#ifdef SYS_RANDOM_SEED
+    /* Platform-specific seed if one is provided */
+    seed = sys_random_seed();
 #else
     seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
-
-# if defined(UNIX) || defined(VMS)
-    {
-        unsigned long pid = (unsigned long) getpid();
-
-        /* Quick dirty band-aid to prevent PRNG prediction */
-        if (pid) {
-            if (!(pid & 3L))
-                pid -= 1L;
-            seed *= pid;
-        }
-    }
-# endif
 #endif
     return seed;
 }
@@ -927,7 +915,7 @@ reseed_random()
 {
     /* only reseed if we are certain that the seed generation is unguessable
      * by the players. */
-#ifdef DEV_RANDOM
+#if defined(SYS_RANDOM_SEED)
     init_random();
 #endif
 }

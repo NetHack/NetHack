@@ -465,4 +465,22 @@ wd_message()
         You("are in non-scoring explore/discovery mode.");
 }
 
+#ifdef SYS_RANDOM_SEED
+unsigned long
+sys_random_seed()
+{
+    unsigned long seed;
+    unsigned long pid = (unsigned long) getpid();
+
+    seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+    /* Quick dirty band-aid to prevent PRNG prediction */
+    if (pid) {
+        if (!(pid & 3L))
+            pid -= 1L;
+        seed *= pid;
+    }
+    return seed;
+}
+#endif
+
 /*vmsmain.c*/
