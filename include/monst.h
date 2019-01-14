@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.h	$NHDT-Date: 1461028522 2016/04/19 01:15:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	monst.h	$NHDT-Date: 1547428769 2019/01/14 01:19:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,13 +21,13 @@
  * weapon that this is impractical.  --KAA
  */
 enum wpn_chk_flags {
-    NO_WEAPON_WANTED = 0,
-    NEED_WEAPON,
-    NEED_RANGED_WEAPON,
-    NEED_HTH_WEAPON,
-    NEED_PICK_AXE,
-    NEED_AXE,
-    NEED_PICK_OR_AXE
+    NO_WEAPON_WANTED    = 0,
+    NEED_WEAPON         = 1,
+    NEED_RANGED_WEAPON  = 2,
+    NEED_HTH_WEAPON     = 3,
+    NEED_PICK_AXE       = 4,
+    NEED_AXE            = 5,
+    NEED_PICK_OR_AXE    = 6
 };
 
 /* The following flags are used for the second argument to display_minventory
@@ -42,11 +42,12 @@ enum wpn_chk_flags {
 #define MINV_NOLET    0x04
 #define MINV_ALL      0x08
 
+/* monster appearance types */
 enum m_ap_types {
-    M_AP_NOTHING = 0, /* mappearance unused--monster appears as itself */
-    M_AP_FURNITURE,   /* stairs, a door, an altar, etc. */
-    M_AP_OBJECT,      /* an object */
-    M_AP_MONSTER      /* a monster */
+    M_AP_NOTHING   = 0, /* mappearance unused--monster appears as itself */
+    M_AP_FURNITURE = 1, /* stairs, a door, an altar, etc. */
+    M_AP_OBJECT    = 2, /* an object */
+    M_AP_MONSTER   = 3  /* a monster; mostly used for cloned Wizard */
 };
 
 struct monst {

@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1546687295 2019/01/05 11:21:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.681 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1547486885 2019/01/14 17:28:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.682 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -385,6 +385,7 @@ E int NDECL(doup);
 #ifdef INSURANCE
 E void NDECL(save_currentstate);
 #endif
+E void FDECL(u_collide_m, (struct monst *));
 E void FDECL(goto_level, (d_level *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(schedule_goto, (d_level *, BOOLEAN_P, BOOLEAN_P, int,
                              const char *, const char *));

@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1546565813 2019/01/04 01:36:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.324 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1547486885 2019/01/14 17:28:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.327 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -781,36 +781,88 @@ wiz_identify(VOID_ARGS)
     return 0;
 }
 
+/* #wizmakemap - discard current dungeon level and replace with a new one */
 STATIC_PTR int
 wiz_makemap(VOID_ARGS)
 {
-    /* FIXME: doesn't handle riding */
     if (wizard) {
         struct monst *mtmp;
 
         rm_mapseen(ledger_no(&u.uz));
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (mtmp->isgd) { /* vault is going away; get rid of guard */
+                mtmp->isgd = 0;
+                mongone(mtmp);
+            }
+            if (DEADMONSTER(mtmp))
+                continue;
             if (mtmp->isshk)
                 setpaid(mtmp);
+            /* TODO?
+             *  Reduce 'born' tally for each monster about to be discarded
+             *  by savelev(), otherwise replacing heavily populated levels
+             *  tends to make their inhabitants become extinct.
+             */
+        }
         if (Punished) {
             ballrelease(FALSE);
             unplacebc();
         }
-        reset_utrap(FALSE); /* also done by safe_teleds() for new level */
-        check_special_room(TRUE);
-        dmonsfree();
+        /* reset lock picking unless it's for a carried container */
+        maybe_reset_pick();
+        /* reset interrupted digging if it was taking place on this level */
+        if (on_level(&context.digging.level, &u.uz))
+            (void) memset((genericptr_t) &context.digging, 0,
+                          sizeof (struct dig_info));
+        /* reset cached targets */
+        iflags.travelcc.x = iflags.travelcc.y = 0; /* travel destination */
+        context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+        /* escape from trap */
+        reset_utrap(FALSE);
+        check_special_room(TRUE); /* room exit */
+        u.ustuck = (struct monst *) 0;
+        u.uswallow = 0;
+        u.uinwater = 0;
+        u.uundetected = 0; /* not hidden, even if means are available */
+        dmonsfree(); /* purge dead monsters from 'fmon' */
+        /* keep steed and other adjacent pets after releasing them
+           from traps, stopping eating, &c as if hero were ascending */
+        keepdogs(TRUE); /* (pets-only; normally we'd be using 'FALSE' here) */
+
+        /* discard current level; "saving" is used to release dynamic data */
         savelev(-1, ledger_no(&u.uz), FREE_SAVE);
+        /* create a new level; various things like bestowing a guardian
+           angel on Astral or setting off alarm on Ft.Ludios are handled
+           by goto_level(do.c) so won't occur for replacement levels */
         mklev();
+
         vision_reset();
         g.vision_full_recalc = 1;
         cls();
-        (void) safe_teleds(TRUE);
+        /* was using safe_teleds() but that doesn't honor arrival region
+           on levels which have such; we don't force stairs, just area */
+        u_on_rndspot((u.uhave.amulet ? 1 : 0) /* 'going up' flag */
+                     | (In_W_tower(u.ux, u.uy, &u.uz) ? 2 : 0));
+        losedogs();
+        /* u_on_rndspot() might pick a spot that has a monster, or losedogs()
+           might pick the hero's spot (only if there isn't already a monster
+           there), so we might have to move hero or the co-located monster */
+        if ((mtmp = m_at(u.ux, u.uy)) != 0 && mtmp != u.usteed)
+            u_collide_m(mtmp);
+        initrack();
         if (Punished) {
             unplacebc();
             placebc();
         }
         docrt();
         flush_screen(1);
+        deliver_splev_message(); /* level entry */
+        check_special_room(FALSE); /* room entry */
+#ifdef INSURANCE
+        save_currentstate();
+#endif
+    } else {
+        pline(unavailcmd, "#wizmakemap");
     }
     return 0;
 }

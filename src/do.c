@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1547086513 2019/01/10 02:15:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1547486886 2019/01/14 17:28:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.184 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1150,6 +1150,39 @@ register xchar x, y;
 }
 */
 
+/* extracted from goto_level(); also used by wiz_makemap() */
+void
+u_collide_m(mtmp)
+struct monst *mtmp;
+{
+    coord cc;
+
+    if (!mtmp || mtmp->mx != u.ux || mtmp->my != u.uy)
+        return;
+
+    /* There's a monster at your target destination; it might be one
+       which accompanied you--see mon_arrive(dogmove.c)--or perhaps
+       it was already here.  Randomly move you to an adjacent spot
+       or else the monster to any nearby location.  Prior to 3.3.0
+       the latter was done unconditionally. */
+    if (!rn2(2) && enexto(&cc, u.ux, u.uy, g.youmonst.data)
+        && distu(cc.x, cc.y) <= 2)
+        u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
+    else
+        mnexto(mtmp);
+
+    if ((mtmp = m_at(u.ux, u.uy)) != 0) {
+        /* there was an unconditional impossible("mnearto failed")
+           here, but it's not impossible and we're prepared to cope
+           with the situation, so only say something when debugging */
+        if (wizard)
+            pline("(monster in hero's way)");
+        if (!rloc(mtmp, TRUE) || (mtmp = m_at(u.ux, u.uy)) != 0)
+            /* no room to move it; send it away, to return later */
+            m_into_limbo(mtmp);
+    }
+}
+
 void
 goto_level(newlevel, at_stairs, falling, portal)
 d_level *newlevel;
@@ -1438,33 +1471,12 @@ boolean at_stairs, falling, portal;
      */
     run_timers();
 
+    /* hero might be arriving at a spot containing a monster;
+       if so, move one or the other to another location */
+    if ((mtmp = m_at(u.ux, u.uy)) != 0 && mtmp != u.usteed)
+        u_collide_m(mtmp);
+
     initrack();
-
-    if ((mtmp = m_at(u.ux, u.uy)) != 0 && mtmp != u.usteed) {
-        /* There's a monster at your target destination; it might be one
-           which accompanied you--see mon_arrive(dogmove.c)--or perhaps
-           it was already here.  Randomly move you to an adjacent spot
-           or else the monster to any nearby location.  Prior to 3.3.0
-           the latter was done unconditionally. */
-        coord cc;
-
-        if (!rn2(2) && enexto(&cc, u.ux, u.uy, g.youmonst.data)
-            && distu(cc.x, cc.y) <= 2)
-            u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
-        else
-            mnexto(mtmp);
-
-        if ((mtmp = m_at(u.ux, u.uy)) != 0) {
-            /* there was an unconditional impossible("mnearto failed")
-               here, but it's not impossible and we're prepared to cope
-               with the situation, so only say something when debugging */
-            if (wizard)
-                pline("(monster in hero's way)");
-            if (!rloc(mtmp, TRUE) || (mtmp = m_at(u.ux, u.uy)) != 0)
-                /* no room to move it; send it away, to return later */
-                m_into_limbo(mtmp);
-        }
-    }
 
     /* initial movement of bubbles just before vision_recalc */
     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
