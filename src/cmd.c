@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1547421842 2019/01/13 23:24:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.326 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1547486885 2019/01/14 17:28:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.327 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -857,6 +857,11 @@ wiz_makemap(VOID_ARGS)
         u_on_rndspot((u.uhave.amulet ? 1 : 0) /* 'going up' flag */
                      | (In_W_tower(u.ux, u.uy, &u.uz) ? 2 : 0));
         losedogs();
+        /* u_on_rndspot() might pick a spot that has a monster, or losedogs()
+           might pick the hero's spot (only if there isn't already a monster
+           there), so we might have to move hero or the co-located monster */
+        if ((mtmp = m_at(u.ux, u.uy)) != 0 && mtmp != u.usteed)
+            u_collide_m(mtmp);
         initrack();
         if (Punished) {
             unplacebc();
