@@ -811,12 +811,12 @@ wiz_makemap(VOID_ARGS)
         /* reset lock picking unless it's for a carried container */
         maybe_reset_pick();
         /* reset interrupted digging if it was taking place on this level */
-        if (on_level(&context.digging.level, &u.uz))
-            (void) memset((genericptr_t) &context.digging, 0,
+        if (on_level(&g.context.digging.level, &u.uz))
+            (void) memset((genericptr_t) &g.context.digging, 0,
                           sizeof (struct dig_info));
         /* reset cached targets */
         iflags.travelcc.x = iflags.travelcc.y = 0; /* travel destination */
-        context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+        g.context.polearm.hitmon = (struct monst *) 0; /* polearm target */
         /* escape from trap */
         reset_utrap(FALSE);
         check_special_room(TRUE); /* room exit */
