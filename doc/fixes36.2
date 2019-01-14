@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.228 $ $NHDT-Date: 1547343820 2019/01/13 01:43:40 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.229 $ $NHDT-Date: 1547421445 2019/01/13 23:17:25 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -266,6 +266,8 @@ when blocking/unblocking of levitation or flying was updated due to walking
 if levitating hero in pass-wall creature form jumped or teleported from
 	terrain that allowed levitation to terrain that didn't or vice versa,
 	blocking of levitation wasn't updated properly
+digging down or level teleporting while stuck in solid rock which is blocking
+	levitation or flight didn't notice when that should become unblocked
 make it easier to clear 'pickup_types' (menustyles Traditional and Combination
 	could do so by setting it to 'a'; now ' ' works too; Full and Partial
 	allowed unselecting every object class; now 'all classes' is a choice)
