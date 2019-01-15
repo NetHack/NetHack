@@ -7,9 +7,6 @@
 
 /* #define SHELL */	/* nt use of pcsys routines caused a hang */
 
-/* #define RANDOM  */  /* have Berkeley random(3) */
-#define USE_ISAAC64
-
 #define TEXTCOLOR /* Color text */
 
 #define EXEPATH              /* Allow .exe location to be used as HACKDIR */
@@ -37,8 +34,9 @@
 
 /*#define CHANGE_COLOR*/ /* allow palette changes */
 #define SELECTSAVED /* Provide menu of saved games to choose from at start */
-
+ 
 #define SYS_RANDOM_SEED  /* Use random seed derived from CNG */
+
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.
@@ -182,11 +180,17 @@ extern void FDECL(interject, (int));
 #include <time.h>
 
 #define USE_STDARG
-#ifdef RANDOM
+
 /* Use the high quality random number routines. */
+#ifdef USE_ISAAC64
+#define Rand() rn2(RAND_MAX)
+#else
+#define RANDOM
+#ifdef RANDOM
 #define Rand() random()
 #else
 #define Rand() rand()
+#endif
 #endif
 
 #include <sys/stat.h>

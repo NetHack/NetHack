@@ -347,11 +347,16 @@
 #endif
 
 /* Use the high quality random number routines. */
+/* the high quality random number routines */
+#ifdef USE_ISAAC64
+#define Rand() rn2(RAND_MAX)
+#else
 #if defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) \
     || defined(RANDOM) || defined(__APPLE__)
 #define Rand() random()
 #else
 #define Rand() lrand48()
+#endif
 #endif
 
 #ifdef TIMED_DELAY

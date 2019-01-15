@@ -141,11 +141,16 @@
 #define index strchr
 #define rindex strrchr
 #define USE_STDARG
-#ifdef RANDOM
+
 /* Use the high quality random number routines. */
+#ifdef USE_ISAAC64
+#define Rand() rn2(RAND_MAX)
+#else
+#ifdef RANDOM
 #define Rand() random()
 #else
 #define Rand() rand()
+#endif
 #endif
 
 #define FCMASK 0660 /* file creation mask */
