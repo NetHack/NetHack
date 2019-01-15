@@ -1,4 +1,4 @@
-/* NetHack 3.6	you.h	$NHDT-Date: 1450231172 2015/12/16 01:59:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.6	you.h	$NHDT-Date: 1547514642 2019/01/15 01:10:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -262,12 +262,12 @@ struct Align {
 extern const struct Align aligns[]; /* table of available alignments */
 
 enum utraptypes {
-    TT_BEARTRAP = 0,
-    TT_PIT,
-    TT_WEB,
-    TT_LAVA,
-    TT_INFLOOR,
-    TT_BURIEDBALL
+    TT_BEARTRAP   = 0,
+    TT_PIT        = 1,
+    TT_WEB        = 2,
+    TT_LAVA       = 3,
+    TT_INFLOOR    = 4,
+    TT_BURIEDBALL = 5
 };
 
 /*** Information about the player ***/
