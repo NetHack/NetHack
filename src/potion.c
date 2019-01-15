@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1547086533 2019/01/10 02:15:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1547518427 2019/01/15 02:13:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1997,6 +1997,8 @@ dodip()
         pline("%s %s %s with %s%s...", qbuf, simpleonames(obj),
               otense(obj, "mix"), (potion->quan > 1L) ? "one of " : "",
               thesimpleoname(potion));
+        /* get rid of 'dippee' before potential perm_invent updates */
+        useup(potion); /* now gone */
         /* Mixing potions is dangerous...
            KMH, balance patch -- acid is particularly unstable */
         if (obj->cursed || obj->otyp == POT_ACID || !rn2(10)) {
@@ -2011,7 +2013,6 @@ dodip()
             if (!breathless(youmonst.data) || haseyes(youmonst.data))
                 potionbreathe(obj);
             useupall(obj);
-            useup(potion);
             losehp(amt + rnd(9), /* not physical damage */
                    "alchemic blast", KILLED_BY_AN);
             return 1;
@@ -2041,7 +2042,6 @@ dodip()
             }
             default:
                 useupall(obj);
-                useup(potion);
                 if (!Blind)
                     pline_The("mixture glows brightly and evaporates.");
                 return 1;
@@ -2056,7 +2056,6 @@ dodip()
                       hcolor(OBJ_DESCR(objects[obj->otyp])));
         }
 
-        useup(potion);
         /* this is required when 'obj' was split off from a bigger stack,
            so that 'obj' will now be assigned its own inventory slot;
            it has a side-effect of merging 'obj' into another compatible
