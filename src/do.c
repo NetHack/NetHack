@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1547486886 2019/01/14 17:28:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.184 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1547512513 2019/01/15 00:35:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1150,15 +1150,21 @@ register xchar x, y;
 }
 */
 
-/* extracted from goto_level(); also used by wiz_makemap() */
+/* when arriving on a level, if hero and a monster are trying to share same
+   spot, move one; extracted from goto_level(); also used by wiz_makemap() */
 void
 u_collide_m(mtmp)
 struct monst *mtmp;
 {
     coord cc;
 
-    if (!mtmp || mtmp->mx != u.ux || mtmp->my != u.uy)
+    if (!mtmp || mtmp == u.usteed || mtmp != m_at(u.ux, u.uy)) {
+        impossible("level arrival collision: %s?",
+                   !mtmp ? "no monster"
+                     : (mtmp == u.usteed) ? "steed is on map"
+                       : "monster not co-located");
         return;
+    }
 
     /* There's a monster at your target destination; it might be one
        which accompanied you--see mon_arrive(dogmove.c)--or perhaps
@@ -1172,7 +1178,7 @@ struct monst *mtmp;
         mnexto(mtmp);
 
     if ((mtmp = m_at(u.ux, u.uy)) != 0) {
-        /* there was an unconditional impossible("mnearto failed")
+        /* there was an unconditional impossible("mnexto failed")
            here, but it's not impossible and we're prepared to cope
            with the situation, so only say something when debugging */
         if (wizard)
@@ -1473,7 +1479,7 @@ boolean at_stairs, falling, portal;
 
     /* hero might be arriving at a spot containing a monster;
        if so, move one or the other to another location */
-    if ((mtmp = m_at(u.ux, u.uy)) != 0 && mtmp != u.usteed)
+    if ((mtmp = m_at(u.ux, u.uy)) != 0)
         u_collide_m(mtmp);
 
     initrack();

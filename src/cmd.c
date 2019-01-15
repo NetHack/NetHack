@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1547486885 2019/01/14 17:28:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.327 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1547512504 2019/01/15 00:35:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.328 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -787,6 +787,7 @@ wiz_makemap(VOID_ARGS)
 {
     if (wizard) {
         struct monst *mtmp;
+        boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
 
         rm_mapseen(ledger_no(&u.uz));
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -842,12 +843,12 @@ wiz_makemap(VOID_ARGS)
         /* was using safe_teleds() but that doesn't honor arrival region
            on levels which have such; we don't force stairs, just area */
         u_on_rndspot((u.uhave.amulet ? 1 : 0) /* 'going up' flag */
-                     | (In_W_tower(u.ux, u.uy, &u.uz) ? 2 : 0));
+                     | (was_in_W_tower ? 2 : 0));
         losedogs();
         /* u_on_rndspot() might pick a spot that has a monster, or losedogs()
            might pick the hero's spot (only if there isn't already a monster
            there), so we might have to move hero or the co-located monster */
-        if ((mtmp = m_at(u.ux, u.uy)) != 0 && mtmp != u.usteed)
+        if ((mtmp = m_at(u.ux, u.uy)) != 0)
             u_collide_m(mtmp);
         initrack();
         if (Punished) {
