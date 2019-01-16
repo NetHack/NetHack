@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1547512513 2019/01/15 00:35:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1547680082 2019/01/16 23:08:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -139,6 +139,8 @@ const char *verb;
     struct trap *t;
     struct monst *mtmp;
     struct obj *otmp;
+    boolean tseen;
+    int ttyp = NO_TRAP;
 
     if (obj->where != OBJ_FREE)
         panic("flooreffects: obj not free");
@@ -150,18 +152,43 @@ const char *verb;
         return TRUE;
     } else if (obj->otyp == BOULDER && (t = t_at(x, y)) != 0
                && (is_pit(t->ttyp) || is_hole(t->ttyp))) {
+        ttyp = t->ttyp;
+        tseen = t->tseen ? TRUE : FALSE;
         if (((mtmp = m_at(x, y)) && mtmp->mtrapped)
             || (u.utrap && u.ux == x && u.uy == y)) {
-            if (*verb)
-                pline_The("boulder %s into the pit%s.",
-                          vtense((const char *) 0, verb),
-                          (mtmp) ? "" : " with you");
+            if (*verb && (cansee(x, y) || distu(x, y) == 0))
+                pline("%s boulder %s into the pit%s.",
+                      Blind ? "A" : "The",
+                      vtense((const char *) 0, verb),
+                      mtmp ? "" : " with you");
             if (mtmp) {
                 if (!passes_walls(mtmp->data) && !throws_rocks(mtmp->data)) {
-                    int dieroll = rnd(20);
+                    /* dieroll was rnd(20); 1: maximum chance to hit
+                       since trapped target is a sitting duck */
+                    int damage, dieroll = 1;
 
-                    if (hmon(mtmp, obj, HMON_THROWN, dieroll)
-                        && !is_whirly(mtmp->data))
+                    /* 3.6.2: this was calling hmon() unconditionally
+                       so always credited/blamed the hero but the boulder
+                       might have been thrown by a giant or launched by
+                       a rolling boulder trap triggered by a monster or
+                       dropped by a scroll of earth read by a monster */
+                    if (context.mon_moving) {
+                        /* normally we'd use ohitmon() but it can call
+                           drop_throw() which calls flooreffects() */
+                        damage = dmgval(obj, mtmp);
+                        mtmp->mhp -= damage;
+                        if (DEADMONSTER(mtmp)) {
+                            if (canspotmon(mtmp))
+                                pline("%s is %s!", Monnam(mtmp),
+                                      (nonliving(mtmp->data)
+                                       || is_vampshifter(mtmp))
+                                      ? "destroyed" : "killed");
+                            mondied(mtmp);
+                        }
+                    } else {
+                        (void) hmon(mtmp, obj, HMON_THROWN, dieroll);
+                    }
+                    if (!DEADMONSTER(mtmp) && !is_whirly(mtmp->data))
                         return FALSE; /* still alive */
                 }
                 mtmp->mtrapped = 0;
@@ -179,17 +206,22 @@ const char *verb;
                 You_hear("a CRASH! beneath you.");
             } else if (!Blind && cansee(x, y)) {
                 pline_The("boulder %s%s.",
-                    (t->ttyp == TRAPDOOR && !t->tseen)
-                        ? "triggers and " : "",
-                          t->ttyp == TRAPDOOR
+                          (ttyp == TRAPDOOR && !tseen)
+                              ? "triggers and " : "",
+                          (ttyp == TRAPDOOR)
                               ? "plugs a trap door"
-                              : t->ttyp == HOLE ? "plugs a hole"
-                                                : "fills a pit");
+                              : (ttyp == HOLE) ? "plugs a hole"
+                                               : "fills a pit");
             } else {
                 You_hear("a boulder %s.", verb);
             }
         }
-        deltrap(t);
+        /*
+         * Note:  trap might have gone away via ((hmon -> killed -> xkilled)
+         *  || mondied) -> mondead -> m_detach -> fill_pit.
+         */
+        if ((t = t_at(x, y)) != 0)
+            deltrap(t);
         useupf(obj, 1L);
         bury_objs(x, y);
         newsym(x, y);
