@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.229 $ $NHDT-Date: 1547421445 2019/01/13 23:17:25 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.230 $ $NHDT-Date: 1547680081 2019/01/16 23:08:01 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -335,6 +335,8 @@ entering Ft.Ludios with a lit candle lit up the entire entry room except for
 	one corner spot; that corner is beyond candle radius but other spots
 	even further away were being shown; force the walls to unlit in order
 	to prevent those wall spots from showing so soon
+boulder dropped or launched by a monster onto a monster trapped in a pit and
+	killing it credited/blamed the hero and might trigger a deltrap panic
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
