@@ -182,15 +182,13 @@ extern void FDECL(interject, (int));
 #define USE_STDARG
 
 /* Use the high quality random number routines. */
-#ifdef USE_ISAAC64
-#define Rand() rn2(RAND_MAX)
-#else
-#define RANDOM
-#ifdef RANDOM
-#define Rand() random()
-#else
-#define Rand() rand()
-#endif
+#ifndef USE_ISAAC64
+# define RANDOM
+# ifdef RANDOM
+#  define Rand() random()
+# else
+#  define Rand() rand()
+# endif
 #endif
 
 #include <sys/stat.h>
