@@ -257,7 +257,6 @@ typedef __mode_t mode_t;
 #  define Rand() rand()
 # endif
 #endif
-#define SYS_RANDOM_SEED
 
 #ifndef __GNUC__
 #ifndef bcopy

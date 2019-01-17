@@ -681,7 +681,8 @@ char *name;
     return;
 }
 
-#ifdef SYS_RANDOM_SEED
+#include <bcrypt.h>     /* Windows Crypto Next Gen (CNG) */
+
 #ifndef STATUS_SUCCESS
 #define STATUS_SUCCESS 0
 #endif
@@ -691,8 +692,6 @@ char *name;
 #ifndef STATUS_UNSUCCESSFUL
 #define STATUS_UNSUCCESSFUL 0xC0000001
 #endif
-
-#include <bcrypt.h>     /* Windows Crypto Next Gen (CNG) */
 
 unsigned long
 sys_random_seed(VOID_ARGS)
@@ -727,7 +726,6 @@ sys_random_seed(VOID_ARGS)
     }
     return ourseed;
 }
-#endif /* SYS_RANDOM_SEED */
 
 #endif /* WIN32 */
 

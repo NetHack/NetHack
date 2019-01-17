@@ -765,7 +765,6 @@ error:
 }
 #endif
 
-#ifdef SYS_RANDOM_SEED
 unsigned long
 sys_random_seed()
 {
@@ -790,6 +789,5 @@ sys_random_seed()
 #endif
     return seed;
 }
-#endif /* SYS_RANDOM_SEED */
 
 /*unixmain.c*/

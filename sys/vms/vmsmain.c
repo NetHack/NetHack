@@ -465,7 +465,6 @@ wd_message()
         You("are in non-scoring explore/discovery mode.");
 }
 
-#ifdef SYS_RANDOM_SEED
 unsigned long
 sys_random_seed()
 {
@@ -481,6 +480,5 @@ sys_random_seed()
     }
     return seed;
 }
-#endif
 
 /*vmsmain.c*/

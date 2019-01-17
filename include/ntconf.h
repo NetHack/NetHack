@@ -35,8 +35,6 @@
 /*#define CHANGE_COLOR*/ /* allow palette changes */
 #define SELECTSAVED /* Provide menu of saved games to choose from at start */
  
-#define SYS_RANDOM_SEED  /* Use random seed derived from CNG */
-
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.

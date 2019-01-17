@@ -850,24 +850,6 @@ extern struct tm *FDECL(localtime, (time_t *));
 #endif
 STATIC_DCL struct tm *NDECL(getlt);
 
-#ifdef SYS_RANDOM_SEED
-extern unsigned long NDECL(sys_random_seed);
-#endif
-
-/* Returns a number suitable as seed for the random number generator. */
-static unsigned long
-get_random_seed()
-{
-    unsigned long seed = 0;
-#ifdef SYS_RANDOM_SEED
-    /* Platform-specific seed if one is provided */
-    seed = sys_random_seed();
-#else
-    seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
-#endif
-    return seed;
-}
-
 /* Sets the seed for the random number generator */
 static void
 set_random(unsigned long seed)
@@ -898,6 +880,11 @@ set_random(unsigned long seed)
 #endif
 }
 
+/* An appropriate version of this must always be provided in
+   port-specific code somewhere. It returns a number suitable
+   as seed for the random number generator */
+extern unsigned long NDECL(sys_random_seed);
+
 /*
  * Initializes the random number generator.
  * Only call once.
@@ -905,19 +892,15 @@ set_random(unsigned long seed)
 void
 init_random()
 {
-    unsigned long seed = get_random_seed();
-    set_random(seed);
+    set_random(sys_random_seed());
 }
 
 /* Reshuffles the random number generator. */
 void
 reseed_random()
 {
-    /* only reseed if we are certain that the seed generation is unguessable
-     * by the players. */
-#if defined(SYS_RANDOM_SEED)
+    /* reseed */
     init_random();
-#endif
 }
 
 time_t

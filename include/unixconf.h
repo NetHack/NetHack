@@ -423,7 +423,6 @@
 #  define DEV_RANDOM "/dev/random"
 # endif
 #endif
-#define SYS_RANDOM_SEED
 
 #endif /* UNIXCONF_H */
 #endif /* UNIX */
