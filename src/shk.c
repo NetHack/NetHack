@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1546770990 2019/01/06 10:36:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1547849604 2019/01/18 22:13:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1983,6 +1983,7 @@ int *nochrg; /* alternate return value: 1: no charge, 0: shop owned,        */
     struct monst *shkp;
     struct obj *top;
     xchar x, y;
+    boolean freespot;
     long cost = 0L;
 
     *nochrg = -1; /* assume 'not applicable' */
@@ -1993,11 +1994,15 @@ int *nochrg; /* alternate return value: 1: no charge, 0: shop owned,        */
         && (shkp = shop_keeper(inside_shop(x, y))) != 0 && inhishop(shkp)) {
         for (top = obj; top->where == OBJ_CONTAINED; top = top->ocontainer)
             continue;
-        *nochrg = (top->where == OBJ_FLOOR && obj->no_charge);
+        freespot = (top->where == OBJ_FLOOR
+                    && x == ESHK(shkp)->shk.x && y == ESHK(shkp)->shk.y);
+        /* no_charge is only set for floor items inside shop proper;
+           items on freespot are implicitly 'no charge' */
+        *nochrg = (top->where == OBJ_FLOOR && (obj->no_charge || freespot));
 
         if (carried(top) ? (int) obj->unpaid : !*nochrg)
             cost = obj->quan * get_cost(obj, shkp);
-        if (Has_contents(obj))
+        if (Has_contents(obj) && !freespot)
             cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
     }
     return cost;

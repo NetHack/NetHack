@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.230 $ $NHDT-Date: 1547680081 2019/01/16 23:08:01 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.232 $ $NHDT-Date: 1547849604 2019/01/18 22:13:24 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -337,6 +337,11 @@ entering Ft.Ludios with a lit candle lit up the entire entry room except for
 	to prevent those wall spots from showing so soon
 boulder dropped or launched by a monster onto a monster trapped in a pit and
 	killing it credited/blamed the hero and might trigger a deltrap panic
+the simulation of dual weapon combat when polymorphed into a form with more
+	than one weapon attack allowed off-hand artifact to be used; it also
+	used seconary weapon even when wearing a shield, or if it was silver
+	even when current shape couldn't handle silver, or if it was cursed;
+	cursed is allowed but weapon will be dropped, just like in two-weapon
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -390,6 +395,8 @@ when in a shop and using ':' to look inside a container on shop floor, items
 	the hero owned the container
 when engulfed while in a shop, dropping an item into the engulfer and then
 	using ':' to look at current location could cause a crash
+when items were on the floor just inside a shop's door where the shopkeeper
+	doesn't buy and sell stuff, those items showed a 'for sale' price
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
