@@ -2494,10 +2494,8 @@ list_vanquished(char defquery, boolean ask)
                 Snprintf(buftoo, sizeof(buftoo), "%*s%s", pfx, "", buf);
                 putstr(klwin, 0, buftoo);
             }
-            /*
-             * if (Hallucination)
-             *     putstr(klwin, 0, "and a partridge in a pear tree");
-             */
+            if (Hallucination && ntypes > 11)
+                putstr(klwin, 0, "and a partridge in a pear tree");
             if (ntypes > 1) {
                 if (!dumping)
                     putstr(klwin, 0, "");
