@@ -1953,10 +1953,8 @@ boolean ask;
                 Sprintf(buftoo, "%*s%s", pfx, "", buf);
                 putstr(klwin, 0, buftoo);
             }
-            /*
-             * if (Hallucination)
-             *     putstr(klwin, 0, "and a partridge in a pear tree");
-             */
+            if (Hallucination && ntypes > 10)
+                putstr(klwin, 0, "and a partridge in a pear tree");
             if (ntypes > 1) {
                 if (!dumping)
                     putstr(klwin, 0, "");
