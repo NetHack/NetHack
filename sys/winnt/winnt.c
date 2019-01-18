@@ -708,6 +708,7 @@ sys_random_seed(VOID_ARGS)
                                  (ULONG) sizeof ourseed, 0);
         if (status == STATUS_SUCCESS) {
             BCryptCloseAlgorithmProvider(hRa,0);
+            has_strong_rngseed = TRUE;
             Plan_B = FALSE;
         }
     }

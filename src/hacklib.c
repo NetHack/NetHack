@@ -899,8 +899,10 @@ init_random()
 void
 reseed_random()
 {
-    /* reseed */
-    init_random();
+   /* only reseed if we are certain that the seed generation is unguessable
+    * by the players. */
+    if (has_strong_rngseed)
+        init_random();
 }
 
 time_t
