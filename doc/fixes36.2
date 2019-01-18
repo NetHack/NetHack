@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.231 $ $NHDT-Date: 1547846557 2019/01/18 21:22:37 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.232 $ $NHDT-Date: 1547849604 2019/01/18 22:13:24 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -395,6 +395,8 @@ when in a shop and using ':' to look inside a container on shop floor, items
 	the hero owned the container
 when engulfed while in a shop, dropping an item into the engulfer and then
 	using ':' to look at current location could cause a crash
+when items were on the floor just inside a shop's door where the shopkeeper
+	doesn't buy and sell stuff, those items showed a 'for sale' price
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
