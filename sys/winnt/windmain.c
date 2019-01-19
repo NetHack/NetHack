@@ -33,8 +33,8 @@ E void NDECL(mswin_destroy_reg);
 #endif
 #ifdef TTY_GRAPHICS
 extern void NDECL(backsp);
-extern void NDECL(clear_screen);
 #endif
+extern void NDECL(clear_screen);
 #undef E
 
 #ifdef PC_LOCKING
