@@ -1236,6 +1236,8 @@ int fd, mode;
         while ((msg = getmsghistory(init)) != 0) {
             init = FALSE;
             msglen = strlen(msg);
+            if (msglen < 1)
+                continue;
             /* sanity: truncate if necessary (shouldn't happen);
                no need to modify msg[] since terminator isn't written */
             if (msglen > BUFSZ - 1)
