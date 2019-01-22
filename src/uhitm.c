@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1548125369 2019/01/22 02:49:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1548125661 2019/01/22 02:54:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1246,7 +1246,9 @@ int dieroll;
         else if (!flags.verbose)
             You("hit it.");
         else
-            You("%s %s%s", Role_if(PM_BARBARIAN) ? "smite" : "hit",
+            You("%s %s%s",
+                (obj && (is_shield(obj) || obj->otyp == HEAVY_IRON_BALL))
+                  ? "bash" : Role_if(PM_BARBARIAN) ? "smite" : "hit",
                 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
     }
 
