@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1547846557 2019/01/18 21:22:37 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1548125369 2019/01/22 02:49:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.201 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2316,7 +2316,8 @@ register struct monst *mon;
             originalweapon = (altwep && uswapwep) ? &uswapwep : &uwep;
             if (uswapwep /* set up 'altwep' flag for next iteration */
                 /* only consider seconary when wielding one-handed primary */
-                && uwep && !bimanual(uwep)
+                && uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))
+                && !bimanual(uwep)
                 /* only switch if not wearing shield and not at artifact;
                    shield limitation is iffy since still get extra swings
                    if polyform has them, but it matches twoweap behavior;
