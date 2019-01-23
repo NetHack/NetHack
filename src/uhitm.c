@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1548125661 2019/01/22 02:54:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1548209742 2019/01/23 02:15:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.203 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -392,6 +392,7 @@ register struct monst *mtmp;
        it uses bhitpos instead; it might map an invisible monster there */
     bhitpos.x = u.ux + u.dx;
     bhitpos.y = u.uy + u.dy;
+    notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
     if (attack_checks(mtmp, uwep))
         return TRUE;
 
@@ -686,6 +687,7 @@ int dieroll;
                             /* not grapnels; applied implies uwep */
                             || (thrown == HMON_APPLIED && is_pole(uwep)));
     int jousting = 0;
+    long silverhit = 0L;
     int wtype;
     struct obj *monwep;
     char unconventional[BUFSZ]; /* substituted for word "attack" in msg */
@@ -703,23 +705,15 @@ int dieroll;
         else
             tmp = rnd(2);
         valid_weapon_attack = (tmp > 1);
-        /* blessed gloves give bonuses when fighting 'bare-handed' */
-        if (uarmg && uarmg->blessed
-            && (is_undead(mdat) || is_demon(mdat) || is_vampshifter(mon)))
-            tmp += rnd(4);
-        /* So do silver rings.  Note: rings are worn under gloves, so you
-         * don't get both bonuses.
-         */
-        if (!uarmg) {
-            if (uleft && objects[uleft->otyp].oc_material == SILVER)
-                barehand_silver_rings++;
-            if (uright && objects[uright->otyp].oc_material == SILVER)
-                barehand_silver_rings++;
-            if (barehand_silver_rings && mon_hates_silver(mon)) {
-                tmp += rnd(20);
-                silvermsg = TRUE;
-            }
-        }
+        /* Blessed gloves give bonuses when fighting 'bare-handed'.  So do
+           silver rings.  Note:  rings are worn under gloves, so you don't
+           get both bonuses, and two silver rings don't give double bonus. */
+        tmp += special_dmgval(&youmonst, mon, (W_ARMG | W_RINGL | W_RINGR),
+                              &silverhit);
+        barehand_silver_rings += (((silverhit & W_RINGL) ? 1 : 0)
+                                  + ((silverhit & W_RINGR) ? 1 : 0));
+        if (barehand_silver_rings > 0)
+            silvermsg = TRUE;
     } else {
         if (!(artifact_light(obj) && obj->lamplit))
             Strcpy(saved_oname, cxname(obj));
@@ -1571,9 +1565,10 @@ struct attack *mattk;
 }
 
 int
-damageum(mdef, mattk)
+damageum(mdef, mattk, specialdmg)
 register struct monst *mdef;
 register struct attack *mattk;
+int specialdmg; /* blessed and/or silver bonus against various things */
 {
     register struct permonst *pd = mdef->data;
     int armpro, tmp = d((int) mattk->damn, (int) mattk->damd);
@@ -1609,19 +1604,24 @@ register struct attack *mattk;
     case AD_HEAL: /* likewise */
     case AD_PHYS:
  physical:
+        if (pd == &mons[PM_SHADE]) {
+            tmp = 0;
+            if (!specialdmg)
+                impossible("bad shade attack function flow?");
+        }
+        tmp += specialdmg;
+
         if (mattk->aatyp == AT_WEAP) {
-            if (uwep)
-                tmp = 0;
-        } else if (mattk->aatyp == AT_KICK) {
+            /* hmonas() uses known_hitum() to deal physical damage,
+               then also damageum() for non-AD_PHYS; don't inflict
+               extra physical damage for unusual damage types */
+            tmp = 0;
+        } else if (mattk->aatyp == AT_KICK
+                   || mattk->aatyp == AT_CLAW
+                   || mattk->aatyp == AT_TUCH
+                   || mattk->aatyp == AT_HUGS) {
             if (thick_skinned(pd))
-                tmp = 0;
-            if (pd == &mons[PM_SHADE]) {
-                if (!(uarmf && uarmf->blessed)) {
-                    impossible("bad shade attack function flow?");
-                    tmp = 0;
-                } else
-                    tmp = rnd(4); /* bless damage */
-            }
+                tmp = (mattk->aatyp == AT_KICK) ? 0 : (tmp + 1) / 2;
             /* add ring(s) of increase damage */
             if (u.udaminc > 0) {
                 /* applies even if damage was 0 */
@@ -2122,7 +2122,7 @@ register struct attack *mattk;
                 }
 
                 /* Use up amulet of life saving */
-                if (!!(otmp = mlifesaver(mdef)))
+                if ((otmp = mlifesaver(mdef)) != 0)
                     m_useup(mdef, otmp);
 
                 newuhs(FALSE);
@@ -2284,9 +2284,20 @@ register struct monst *mon;
 {
     struct attack *mattk, alt_attk;
     struct obj *weapon, **originalweapon;
-    boolean altwep = FALSE, weapon_used = FALSE;
+    boolean altwep = FALSE, weapon_used = FALSE, odd_claw = TRUE;
     int i, tmp, armorpenalty, sum[NATTK], nsum = 0, dhit = 0, attknum = 0;
-    int dieroll;
+    int dieroll, multi_claw = 0;
+
+    /* with just one touch/claw/weapon attack, both rings matter;
+       with more than one, alternate right and left when checking
+       whether silver ring causes successful hit */
+    for (i = 0; i < NATTK; i++) {
+        mattk = getmattk(&youmonst, mon, i, sum, &alt_attk);
+        if (mattk->aatyp == AT_WEAP
+            || mattk->aatyp == AT_CLAW || mattk->aatyp == AT_TUCH)
+            ++multi_claw;
+    }
+    multi_claw = (multi_claw > 1); /* switch from count to yes/no */
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
@@ -2294,7 +2305,9 @@ register struct monst *mon;
         weapon = 0;
         switch (mattk->aatyp) {
         case AT_WEAP:
+            /* if (!uwep) goto weaponless; */
  use_weapon:
+            odd_claw = !odd_claw; /* see case AT_CLAW,AT_TUCH below */
             /* if we've already hit with a two-handed weapon, we don't
                get to make another weapon attack (note:  monsters who
                use weapons do not have this restriction, but they also
@@ -2363,7 +2376,7 @@ register struct monst *mon;
             }
             /* Do not print "You hit" message; known_hitum already did it. */
             if (dhit && mattk->adtyp != AD_SPEL && mattk->adtyp != AD_PHYS)
-                sum[i] = damageum(mon, mattk);
+                sum[i] = damageum(mon, mattk, 0);
             break;
         case AT_CLAW:
             if (uwep && !cantwield(youmonst.data) && !weapon_used)
@@ -2378,73 +2391,189 @@ register struct monst *mon;
         case AT_STNG:
         case AT_BUTT:
         case AT_TENT:
+        /*weaponless:*/
             tmp = find_roll_to_hit(mon, mattk->aatyp, (struct obj *) 0,
                                    &attknum, &armorpenalty);
             dieroll = rnd(20);
             dhit = (tmp > dieroll || u.uswallow);
             if (dhit) {
-                int compat;
+                int compat, specialdmg;
+                long silverhit = 0L;
+                const char *verb = 0; /* verb or body part */
 
                 if (!u.uswallow
-                    && (compat = could_seduce(&youmonst, mon, mattk))) {
+                    && (compat = could_seduce(&youmonst, mon, mattk)) != 0) {
                     You("%s %s %s.",
-                        mon->mcansee && haseyes(mon->data) ? "smile at"
-                                                           : "talk to",
+                        (mon->mcansee && haseyes(mon->data)) ? "smile at"
+                                                             : "talk to",
                         mon_nam(mon),
-                        compat == 2 ? "engagingly" : "seductively");
+                        (compat == 2) ? "engagingly" : "seductively");
                     /* doesn't anger it; no wakeup() */
-                    sum[i] = damageum(mon, mattk);
+                    sum[i] = damageum(mon, mattk, 0);
                     break;
                 }
                 wakeup(mon, TRUE);
-                /* maybe this check should be in damageum()? */
-                if (mon->data == &mons[PM_SHADE]
-                    && !(mattk->aatyp == AT_KICK && uarmf
-                         && uarmf->blessed)) {
-                    Your("attack passes harmlessly through %s.",
-                         mon_nam(mon));
+
+                specialdmg = 0; /* blessed and/or silver bonus */
+                switch (mattk->aatyp) {
+                case AT_CLAW:
+                case AT_TUCH:
+                    /* verb=="claws" may be overridden below */
+                    verb = (mattk->aatyp == AT_TUCH) ? "touch" : "claws";
+                    /* decide if silver-hater will be hit by silver ring(s);
+                       for 'multi_claw' where attacks alternate right/left,
+                       assume 'even' claw or touch attacks use right hand
+                       or paw, 'odd' ones use left for ring interaction;
+                       even vs odd is based on actual attacks rather
+                       than on index into mon->dat->mattk[] so that {bite,
+                       claw,claw} instead of {claw,claw,bite} doesn't
+                       make poly'd hero mysteriously become left-handed */
+                    odd_claw = !odd_claw;
+                    specialdmg = special_dmgval(&youmonst, mon,
+                                                W_ARMG
+                                                | ((odd_claw || !multi_claw)
+                                                   ? W_RINGL : 0L)
+                                                | ((!odd_claw || !multi_claw)
+                                                   ? W_RINGR : 0L),
+                                                &silverhit);
+                    break;
+                case AT_TENT:
+                    /* assumes mind flayer's tentacles-on-head rather
+                       than sea monster's tentacle-as-arm */
+                    verb = "tentacles";
+                    break;
+                case AT_KICK:
+                    verb = "kick";
+                    specialdmg = special_dmgval(&youmonst, mon, W_ARMF,
+                                                &silverhit);
+                    break;
+                case AT_BUTT:
+                    verb = "head butt"; /* mbodypart(mon,HEAD)=="head" */
+                    /* hypothetical; if any form with a head-butt attack
+                       could wear a helmet, it would hit shades when
+                       wearing a blessed (or silver) one */
+                    specialdmg = special_dmgval(&youmonst, mon, W_ARMH,
+                                                &silverhit);
+                    break;
+                case AT_BITE:
+                    verb = "bite";
+                    break;
+                case AT_STNG:
+                    verb = "sting";
+                    break;
+                default:
+                    verb = "hit";
                     break;
                 }
-                if (mattk->aatyp == AT_KICK)
-                    You("kick %s.", mon_nam(mon));
-                else if (mattk->aatyp == AT_BITE)
-                    You("bite %s.", mon_nam(mon));
-                else if (mattk->aatyp == AT_STNG)
-                    You("sting %s.", mon_nam(mon));
-                else if (mattk->aatyp == AT_BUTT)
-                    You("butt %s.", mon_nam(mon));
-                else if (mattk->aatyp == AT_TUCH)
-                    You("touch %s.", mon_nam(mon));
-                else if (mattk->aatyp == AT_TENT)
-                    Your("tentacles suck %s.", mon_nam(mon));
-                else
-                    You("hit %s.", mon_nam(mon));
-                sum[i] = damageum(mon, mattk);
-            } else {
+                if (mon->data == &mons[PM_SHADE] && !specialdmg) {
+                    if (!strcmp(verb, "hit")
+                        || (mattk->aatyp == AT_CLAW && humanoid(mon->data)))
+                        verb = "attack";
+                    Your("%s %s harmlessly through %s.",
+                         verb, vtense(verb, "pass"), mon_nam(mon));
+                } else {
+                    if (mattk->aatyp == AT_TENT) {
+                        Your("tentacles suck %s.", mon_nam(mon));
+                    } else {
+                        if (mattk->aatyp == AT_CLAW)
+                            verb = "hit"; /* not "claws" */
+                        You("%s %s.", verb, mon_nam(mon));
+                        if (silverhit && flags.verbose)
+                            silver_sears(&youmonst, mon, silverhit);
+                    }
+                    sum[i] = damageum(mon, mattk, specialdmg);
+                }
+            } else { /* !dhit */
                 missum(mon, mattk, (tmp + armorpenalty > dieroll));
             }
             break;
 
-        case AT_HUGS:
+        case AT_HUGS: {
+            int specialdmg;
+            long silverhit = 0L;
+            boolean byhand = hug_throttles(&mons[u.umonnum]), /* rope golem */
+                    unconcerned = (byhand && !can_be_strangled(mon));
+
+            if (sticks(mon->data) || u.uswallow || notonhead
+                || (byhand && (uwep || !has_head(mon->data)))) {
+                /* can't hold a holder due to subsequent ambiguity over
+                   who is holding whom; can't hug engulfer from inside;
+                   can't hug a worm tail (would immobilize entire worm!);
+                   byhand: can't choke something that lacks a head;
+                   not allowed to make a choking hug if wielding a weapon
+                   (but might have grabbed w/o weapon, then wielded one,
+                   and may even be attacking a different monster now) */
+                if (byhand && uwep && u.ustuck
+                    && !(sticks(u.ustuck->data) || u.uswallow))
+                    uunstick();
+                continue; /* not 'break'; bypass passive counter-attack */
+            }
             /* automatic if prev two attacks succeed, or if
-             * already grabbed in a previous attack
-             */
+               already grabbed in a previous attack */
             dhit = 1;
             wakeup(mon, TRUE);
-            if (mon->data == &mons[PM_SHADE])
-                Your("hug passes harmlessly through %s.", mon_nam(mon));
-            else if (!sticks(mon->data) && !u.uswallow) {
-                if (mon == u.ustuck) {
-                    pline("%s is being %s.", Monnam(mon),
-                          u.umonnum == PM_ROPE_GOLEM ? "choked" : "crushed");
-                    sum[i] = damageum(mon, mattk);
-                } else if (i >= 2 && sum[i - 1] && sum[i - 2]) {
-                    You("grab %s!", mon_nam(mon));
-                    u.ustuck = mon;
-                    sum[i] = damageum(mon, mattk);
+            /* choking hug/throttling grab uses hands (gloves or rings);
+               normal hug uses outermost of cloak/suit/shirt */
+            specialdmg = special_dmgval(&youmonst, mon,
+                                        byhand ? (W_ARMG | W_RINGL | W_RINGR)
+                                               : (W_ARMC | W_ARM | W_ARMU),
+                                        &silverhit);
+            if (unconcerned) {
+                /* strangling something which can't be strangled */
+                if (mattk != &alt_attk) {
+                    alt_attk = *mattk;
+                    mattk = &alt_attk;
                 }
+                /* change damage to 1d1; not strangling but still
+                   doing [minimal] physical damage to victim's body */
+                mattk->damn = mattk->damd = 1;
+                /* don't give 'unconcerned' feedback if there is extra damage
+                   or if it is nearly destroyed or if creature doesn't have
+                   the mental ability to be concerned in the first place */
+                if (specialdmg || mindless(mon->data)
+                    || mon->mhp <= 1 + max(u.udaminc, 1))
+                    unconcerned = FALSE;
             }
-            break;
+            if (mon->data == &mons[PM_SHADE]) {
+                const char *verb = byhand ? "grasp" : "hug";
+
+                /* hugging a shade; successful if blessed outermost armor
+                   for normal hug, or blessed gloves or silver ring(s) for
+                   choking hug; deals damage but never grabs hold */
+                if (specialdmg) {
+                    You("%s %s%s", verb, mon_nam(mon), exclam(specialdmg));
+                    if (silverhit && flags.verbose)
+                        silver_sears(&youmonst, mon, silverhit);
+                    sum[i] = damageum(mon, mattk, specialdmg);
+                } else {
+                    Your("%s passes harmlessly through %s.",
+                         verb, mon_nam(mon));
+                }
+                break;
+            }
+            /* hug attack against ordinary foe */
+            if (mon == u.ustuck) {
+                pline("%s is being %s%s.", Monnam(mon),
+                      byhand ? "throttled" : "crushed",
+                      /* extra feedback for non-breather being choked */
+                      unconcerned ? " but doesn't seem concerned" : "");
+                if (silverhit && flags.verbose)
+                    silver_sears(&youmonst, mon, silverhit);
+                sum[i] = damageum(mon, mattk, specialdmg);
+            } else if (i >= 2 && sum[i - 1] && sum[i - 2]) {
+                /* in case we're hugging a new target while already
+                   holding something else; yields feedback
+                   "<u.ustuck> is no longer in your clutches" */
+                if (u.ustuck && u.ustuck != mon)
+                    uunstick();
+                You("grab %s!", mon_nam(mon));
+                u.ustuck = mon;
+                if (silverhit && flags.verbose)
+                    silver_sears(&youmonst, mon, silverhit);
+                sum[i] = damageum(mon, mattk, specialdmg);
+            }
+            break; /* AT_HUGS */
+        }
 
         case AT_EXPL: /* automatic hit if next to */
             dhit = -1;

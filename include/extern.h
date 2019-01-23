@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1547486885 2019/01/14 17:28:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.682 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1548209735 2019/01/23 02:15:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.684 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1906,6 +1906,7 @@ E int NDECL(dogaze);
 E int NDECL(dohide);
 E int NDECL(dopoly);
 E int NDECL(domindblast);
+E void NDECL(uunstick);
 E void FDECL(skinback, (BOOLEAN_P));
 E const char *FDECL(mbodypart, (struct monst *, int));
 E const char *FDECL(body_part, (int));
@@ -2515,7 +2516,7 @@ E int FDECL(find_roll_to_hit, (struct monst *, UCHAR_P, struct obj *,
                                int *, int *));
 E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *, struct obj *, int, int));
-E int FDECL(damageum, (struct monst *, struct attack *));
+E int FDECL(damageum, (struct monst *, struct attack *, int));
 E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
 E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,
                       UCHAR_P, BOOLEAN_P));
@@ -2732,6 +2733,8 @@ E int FDECL(vms_get_saved_games, (const char *, char ***));
 E const char *FDECL(weapon_descr, (struct obj *));
 E int FDECL(hitval, (struct obj *, struct monst *));
 E int FDECL(dmgval, (struct obj *, struct monst *));
+E int FDECL(special_dmgval, (struct monst *, struct monst *, long, long *));
+E void FDECL(silver_sears, (struct monst *, struct monst *, long));
 E struct obj *FDECL(select_rwep, (struct monst *));
 E boolean FDECL(monmightthrowwep, (struct obj *));
 E struct obj *FDECL(select_hwep, (struct monst *));
