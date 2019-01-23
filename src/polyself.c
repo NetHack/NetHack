@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1547086249 2019/01/10 02:10:49 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.125 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1548208238 2019/01/23 01:50:38 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.126 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,7 +25,6 @@ STATIC_DCL void FDECL(check_strangling, (BOOLEAN_P));
 STATIC_DCL void FDECL(polyman, (const char *, const char *));
 STATIC_DCL void NDECL(break_armor);
 STATIC_DCL void FDECL(drop_weapon, (int));
-STATIC_DCL void NDECL(uunstick);
 STATIC_DCL int FDECL(armor_to_dragon, (int));
 STATIC_DCL void NDECL(newman);
 STATIC_DCL void NDECL(polysense);
@@ -743,10 +742,14 @@ int mntmp;
     }
     newsym(u.ux, u.uy); /* Change symbol */
 
+    /* [note:  this 'sticky' handling is only sufficient for changing from
+       grabber to engulfer or vice versa because engulfing by poly'd hero
+       always ends immediately so won't be in effect during a polymorph] */
     if (!sticky && !u.uswallow && u.ustuck && sticks(g.youmonst.data))
         u.ustuck = 0;
     else if (sticky && !sticks(g.youmonst.data))
         uunstick();
+
     if (u.usteed) {
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
             pline("%s touch %s.", no_longer_petrify_resistant,
@@ -1537,9 +1540,13 @@ domindblast()
     return 1;
 }
 
-STATIC_OVL void
+void
 uunstick()
 {
+    if (!u.ustuck) {
+        impossible("uunstick: no ustuck?");
+        return;
+    }
     pline("%s is no longer in your clutches.", Monnam(u.ustuck));
     u.ustuck = 0;
 }

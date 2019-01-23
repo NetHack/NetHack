@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1545430257 2018/12/21 22:10:57 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.276 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1548208236 2019/01/23 01:50:36 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.277 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1941,9 +1941,14 @@ register struct monst *mtmp;
             if (mtmp->mhpmax <= 0)
                 mtmp->mhpmax = 10;
             mtmp->mhp = mtmp->mhpmax;
-            /* this can happen if previously a fog cloud */
-            if (u.uswallow && (mtmp == u.ustuck))
-                expels(mtmp, mtmp->data, FALSE);
+            /* mtmp==u.ustuck can happen if previously a fog cloud
+               or poly'd hero is hugging a vampire bat */
+            if (mtmp == u.ustuck) {
+                if (u.uswallow)
+                    expels(mtmp, mtmp->data, FALSE);
+                else
+                    uunstick();
+            }
             if (in_door) {
                 coord new_xy;
 
