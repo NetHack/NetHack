@@ -400,7 +400,7 @@ long *silverhit_p; /* output flag mask for silver bonus */
         }
 
     /* when no gloves we check for silver rings (blessed rings ignored) */
-    } else if ((left_ring || right_ring) && magr == &youmonst) {
+    } else if ((left_ring || right_ring) && magr == &g.youmonst) {
         if (left_ring && uleft) {
             if (objects[uleft->otyp].oc_material == SILVER
                 && mon_hates_silver(mdef)) {

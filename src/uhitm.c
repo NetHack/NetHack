@@ -387,7 +387,7 @@ register struct monst *mtmp;
        it uses g.bhitpos instead; it might map an invisible monster there */
     g.bhitpos.x = u.ux + u.dx;
     g.bhitpos.y = u.uy + u.dy;
-    notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+    g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
     if (attack_checks(mtmp, uwep))
         return TRUE;
 
@@ -703,7 +703,7 @@ int dieroll;
         /* Blessed gloves give bonuses when fighting 'bare-handed'.  So do
            silver rings.  Note:  rings are worn under gloves, so you don't
            get both bonuses, and two silver rings don't give double bonus. */
-        tmp += special_dmgval(&youmonst, mon, (W_ARMG | W_RINGL | W_RINGR),
+        tmp += special_dmgval(&g.youmonst, mon, (W_ARMG | W_RINGL | W_RINGR),
                               &silverhit);
         barehand_silver_rings += (((silverhit & W_RINGL) ? 1 : 0)
                                   + ((silverhit & W_RINGR) ? 1 : 0));
@@ -2287,7 +2287,7 @@ register struct monst *mon;
        with more than one, alternate right and left when checking
        whether silver ring causes successful hit */
     for (i = 0; i < NATTK; i++) {
-        mattk = getmattk(&youmonst, mon, i, sum, &alt_attk);
+        mattk = getmattk(&g.youmonst, mon, i, sum, &alt_attk);
         if (mattk->aatyp == AT_WEAP
             || mattk->aatyp == AT_CLAW || mattk->aatyp == AT_TUCH)
             ++multi_claw;
@@ -2424,7 +2424,7 @@ register struct monst *mon;
                        claw,claw} instead of {claw,claw,bite} doesn't
                        make poly'd hero mysteriously become left-handed */
                     odd_claw = !odd_claw;
-                    specialdmg = special_dmgval(&youmonst, mon,
+                    specialdmg = special_dmgval(&g.youmonst, mon,
                                                 W_ARMG
                                                 | ((odd_claw || !multi_claw)
                                                    ? W_RINGL : 0L)
@@ -2439,7 +2439,7 @@ register struct monst *mon;
                     break;
                 case AT_KICK:
                     verb = "kick";
-                    specialdmg = special_dmgval(&youmonst, mon, W_ARMF,
+                    specialdmg = special_dmgval(&g.youmonst, mon, W_ARMF,
                                                 &silverhit);
                     break;
                 case AT_BUTT:
@@ -2447,7 +2447,7 @@ register struct monst *mon;
                     /* hypothetical; if any form with a head-butt attack
                        could wear a helmet, it would hit shades when
                        wearing a blessed (or silver) one */
-                    specialdmg = special_dmgval(&youmonst, mon, W_ARMH,
+                    specialdmg = special_dmgval(&g.youmonst, mon, W_ARMH,
                                                 &silverhit);
                     break;
                 case AT_BITE:
@@ -2474,7 +2474,7 @@ register struct monst *mon;
                             verb = "hit"; /* not "claws" */
                         You("%s %s.", verb, mon_nam(mon));
                         if (silverhit && flags.verbose)
-                            silver_sears(&youmonst, mon, silverhit);
+                            silver_sears(&g.youmonst, mon, silverhit);
                     }
                     sum[i] = damageum(mon, mattk, specialdmg);
                 }
@@ -2489,7 +2489,7 @@ register struct monst *mon;
             boolean byhand = hug_throttles(&mons[u.umonnum]), /* rope golem */
                     unconcerned = (byhand && !can_be_strangled(mon));
 
-            if (sticks(mon->data) || u.uswallow || notonhead
+            if (sticks(mon->data) || u.uswallow || g.notonhead
                 || (byhand && (uwep || !has_head(mon->data)))) {
                 /* can't hold a holder due to subsequent ambiguity over
                    who is holding whom; can't hug engulfer from inside;
@@ -2509,7 +2509,7 @@ register struct monst *mon;
             wakeup(mon, TRUE);
             /* choking hug/throttling grab uses hands (gloves or rings);
                normal hug uses outermost of cloak/suit/shirt */
-            specialdmg = special_dmgval(&youmonst, mon,
+            specialdmg = special_dmgval(&g.youmonst, mon,
                                         byhand ? (W_ARMG | W_RINGL | W_RINGR)
                                                : (W_ARMC | W_ARM | W_ARMU),
                                         &silverhit);
@@ -2538,7 +2538,7 @@ register struct monst *mon;
                 if (specialdmg) {
                     You("%s %s%s", verb, mon_nam(mon), exclam(specialdmg));
                     if (silverhit && flags.verbose)
-                        silver_sears(&youmonst, mon, silverhit);
+                        silver_sears(&g.youmonst, mon, silverhit);
                     sum[i] = damageum(mon, mattk, specialdmg);
                 } else {
                     Your("%s passes harmlessly through %s.",
@@ -2553,7 +2553,7 @@ register struct monst *mon;
                       /* extra feedback for non-breather being choked */
                       unconcerned ? " but doesn't seem concerned" : "");
                 if (silverhit && flags.verbose)
-                    silver_sears(&youmonst, mon, silverhit);
+                    silver_sears(&g.youmonst, mon, silverhit);
                 sum[i] = damageum(mon, mattk, specialdmg);
             } else if (i >= 2 && sum[i - 1] && sum[i - 2]) {
                 /* in case we're hugging a new target while already
@@ -2564,7 +2564,7 @@ register struct monst *mon;
                 You("grab %s!", mon_nam(mon));
                 u.ustuck = mon;
                 if (silverhit && flags.verbose)
-                    silver_sears(&youmonst, mon, silverhit);
+                    silver_sears(&g.youmonst, mon, silverhit);
                 sum[i] = damageum(mon, mattk, specialdmg);
             }
             break; /* AT_HUGS */
