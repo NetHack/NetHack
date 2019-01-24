@@ -95,8 +95,8 @@ the file NewInstall.unx.
 			call Joan at +1 312 555-1234.
 			email support@example.com
 			visit http://www.example.com/game-support
-	RECOVER= instructions for running recover.  If RECOVER is not available,
-		do not use this line.  Some sample values:
+	RECOVER= instructions for running recover.  If RECOVER is not
+		available, do not use this line.  Some sample values:
 			To get your game recovered, contact support.
 			Run /usr/local/bin/nh-recover to recover your game.
 			
@@ -291,6 +291,13 @@ Notes:
 
     For recover, you just want the target binary to install on the target.
 
-# NetHack 3.6  Install.unx       $NHDT-Date: 1524689449 2018/04/25 20:50:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $
+16. If you get a compiler warning about 'get_colors()' being implicitly
+    declared, try uncommenting NEED_GET_COLORS_DECL in unixconf.h.
+    If you get a compiler complaint about tparmdecl() having conflicting
+    declarations, add '#define NOTPARMDECL' to unixconf.h or '-DNOTPARMDECL'
+    to CFLAGS in src/Makefile.  (The hints files for Mac OSX already do the
+    latter.)
+
+# NetHack 3.6  Install.unx       $NHDT-Date: 1548372344 2019/01/24 23:25:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $
 # Copyright (c) 2012 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
