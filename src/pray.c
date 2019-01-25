@@ -47,6 +47,12 @@ static const char *godvoices[] = {
     "booms out", "thunders", "rings out", "booms",
 };
 
+static const char *hgodvoices[] = {
+    "belches", "ring-a-lings out", "squeaks", "squeals", "screeches", "drones",
+    "buzzes", "pipes", "tinkles", "rumbulates", "moos", "brays", "barks",
+    "screams", "howls", "ululates", "quacks", "meows",
+};
+
 #define PIOUS 20
 #define DEVOUT 14
 #define FERVENT 9
@@ -1266,7 +1272,9 @@ const char *words;
         words = "";
 
     pline_The("voice of %s %s: %s%s%s", align_gname(g_align),
-              godvoices[rn2(SIZE(godvoices))], quot, words, quot);
+              Hallucination ? hgodvoices[rn2(SIZE(hgodvoices))]
+                            : godvoices[rn2(SIZE(godvoices))],
+              quot, words, quot);
 }
 
 static void
