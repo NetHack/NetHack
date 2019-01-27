@@ -405,6 +405,15 @@ when engulfed while in a shop, dropping an item into the engulfer and then
 	using ':' to look at current location could cause a crash
 when items were on the floor just inside a shop's door where the shopkeeper
 	doesn't buy and sell stuff, those items showed a 'for sale' price
+separate most of domove() into domove_core() and introduce a pair of global
+	variables that allow for assessment of domove_core() results in
+        domove() after one of the many return paths
+new domove()-related global variables mentioned above also replace a couple
+	of booleans in rhack() that were used for similar upcoming action
+	identification
+smudging of an engraving has been relocated and follows domove_core() and is
+	carried out only after a successful move attempt; your former
+	location and resulting location are both potentially impacted now
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
