@@ -180,13 +180,16 @@ extern void FDECL(interject, (int));
 #define USE_STDARG
 
 /* Use the high quality random number routines. */
-#ifndef USE_ISAAC64
-# define RANDOM
-# ifdef RANDOM
-#  define Rand() random()
-# else
-#  define Rand() rand()
-# endif
+#ifdef USE_ISAAC64
+#undef RANDOM
+#else
+#define RANDOM
+#define Rand() random()
+#endif
+
+/* Fall back to C's if nothing else, but this really isn't acceptable */
+#if !defined(USE_ISAAC64) && !defined(RANDOM)
+#define Rand() rand()
 #endif
 
 #include <sys/stat.h>
