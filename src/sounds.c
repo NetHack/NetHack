@@ -1069,6 +1069,10 @@ dochat()
 
     mtmp = m_at(tx, ty);
 
+    if (!mtmp && IS_WALL(levl[tx][ty].typ))
+        /* Walls have ears, not mouths. */
+        pline("The wall listens intently, but doesn't reply.");
+
     if ((!mtmp || mtmp->mundetected)
         && (otmp = vobj_at(tx, ty)) != 0 && otmp->otyp == STATUE) {
         /* Talking to a statue */

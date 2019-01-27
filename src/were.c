@@ -19,6 +19,7 @@ register struct monst *mon;
             new_were(mon); /* change into animal form */
             if (!Deaf && !canseemon(mon)) {
                 const char *howler;
+                const char *howl = "howling";
 
                 switch (monsndx(mon->data)) {
                 case PM_WEREWOLF:
@@ -27,12 +28,18 @@ register struct monst *mon;
                 case PM_WEREJACKAL:
                     howler = "jackal";
                     break;
+                case PM_WERERAT:
+                    if (Hallucination) {
+                        howler = "mouse";
+                        howl = "squeaking";
+                    }
+                    break;
                 default:
                     howler = (char *) 0;
                     break;
                 }
                 if (howler)
-                    You_hear("a %s howling at the moon.", howler);
+                    You_hear("a %s %s at the moon.", howler, howl);
             }
         }
     } else if (!rn2(30) || Protection_from_shape_changers) {

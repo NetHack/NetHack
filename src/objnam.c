@@ -4207,8 +4207,11 @@ struct obj *no_wish;
         artifact_exists(otmp, safe_oname(otmp), FALSE);
         obfree(otmp, (struct obj *) 0);
         otmp = (struct obj *) &cg.zeroobj;
-        pline("For a moment, you feel %s in your %s, but it disappears!",
-              something, makeplural(body_part(HAND)));
+        if (Hallucination)
+            pline("Yeah, you wish!");
+        else
+            pline("For a moment, you feel %s in your %s, but it disappears!",
+                something, makeplural(body_part(HAND)));
         return otmp;
     }
 
