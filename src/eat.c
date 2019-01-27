@@ -1727,6 +1727,36 @@ eatcorpse(struct obj *otmp)
                          && rn2(10)
                          && ((rotted < 1) ? TRUE : !rn2(rotted+1)));
         const char *pmxnam = food_xname(otmp, FALSE);
+        const char* taste;
+
+        if (Hallucination) {
+            /* if hallu, "This food is X"; if not, "This food tastes X" */
+            if (yummy)
+                /* tiger reference is to TV ads for "Frosted Flakes",
+                   breakfast cereal targeted at kids by "Tony the tiger" */
+                taste = (u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly";
+            else if (palatable)
+                taste = "copacetic";
+            else
+                taste = "grody";
+        }
+        else {
+            if (yummy)
+                taste = "delicious";
+            else if (palatable)
+                taste = "okay";
+            else
+                taste = "terrible";
+        }
+
+        /* special cases for funny messages or combinations go here */
+        if (maybe_polyd(is_dwarf(g.youmonst.data), Race_if(PM_DWARF))
+            && mons[mnum].mlet == S_RODENT) {
+            yummy = palatable = TRUE;
+        }
+        if (mnum == PM_LONG_WORM || mnum == PM_BABY_LONG_WORM) {
+            taste = "spicy";
+        }
 
         if (!strncmpi(pmxnam, "the ", 4))
             pmxnam += 4;
@@ -1734,13 +1764,7 @@ eatcorpse(struct obj *otmp)
               type_is_pname(&mons[mnum])
                  ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
               pmxnam,
-              Hallucination ? "is" : "tastes",
-                  /* tiger reference is to TV ads for "Frosted Flakes",
-                     breakfast cereal targeted at kids by "Tony the tiger" */
-              Hallucination
-                 ? (yummy ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly")
-                          : palatable ? "copacetic" : "grody")
-                 : (yummy ? "delicious" : palatable ? "okay" : "terrible"),
+              Hallucination ? "is" : "tastes", taste,
               (yummy || !palatable) ? '!' : '.');
     }
 

@@ -123,7 +123,7 @@ panictrace_handler(int sig_unused UNUSED)
         curses_uncurse_terminal();
     }
 #endif
-    
+
     f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
     nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
     NH_abort(); /* ... and we're already in the process of quitting? */
@@ -1324,8 +1324,11 @@ really_done(int how)
                 have been genocided:  genocide could occur after hero is
                 already infected or hero could eat a glob of one created
                 before genocide; don't try to arise as one if they're gone */
-             && !(g.mvitals[PM_GREEN_SLIME].mvflags & G_GENOD))
+             && !(g.mvitals[PM_GREEN_SLIME].mvflags & G_GENOD)) {
+        if (Hallucination)
+            pline("Next time, watch out for slime!");
         u.ugrave_arise = PM_GREEN_SLIME;
+    }
 
     if (how == QUIT) {
         g.killer.format = NO_KILLER_PREFIX;
