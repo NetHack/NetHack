@@ -117,6 +117,10 @@ struct context_info {
     int rndencode;          /* randomized escape sequence introducer */
     long next_attrib_check; /* next attribute check */
     long stethoscope_move;
+    long domove_attempting;
+    long domove_succeeded;
+#define DOMOVE_WALK         0x00000001
+#define DOMOVE_RUSH         0x00000002
     short stethoscope_movement;
     boolean travel;  /* find way automatically to u.tx,u.ty */
     boolean travel1; /* first travel step */
