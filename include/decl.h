@@ -691,6 +691,10 @@ struct instance_globals {
     int doorindex;
     char *save_cm;
     long done_money;
+    long domove_attempting;
+    long domove_succeeded;
+#define DOMOVE_WALK         0x00000001
+#define DOMOVE_RUSH         0x00000002
     const char *nomovemsg;
     char plname[PL_NSIZ]; /* player name */
     char pl_character[PL_CSIZ];

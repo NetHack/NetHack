@@ -579,7 +579,6 @@ newgame()
     g.context.botlx = 1;
     g.context.ident = 1;
     g.context.stethoscope_move = -1L;
-    g.context.domove_attempting = 0L;
     g.context.warnlevel = 1;
     g.context.next_attrib_check = 600L; /* arbitrary first setting */
     g.context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */

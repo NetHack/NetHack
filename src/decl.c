@@ -262,6 +262,8 @@ const struct instance_globals g_init = {
     0, /* doorindex */
     NULL, /* save_cm */
     0, /* done_money */
+    0L, /* domove_attempting */
+    0L, /* domove_succeeded */
     NULL, /* nomovemsg */
     DUMMY, /* plname */
     DUMMY, /* pl_character */

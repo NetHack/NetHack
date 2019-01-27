@@ -4562,7 +4562,7 @@ register char *cmd;
     case NHKF_RUSH:
         if (movecmd(cmd[1])) {
             g.context.run = 2;
-            g.context.domove_attempting |= DOMOVE_RUSH;
+            g.domove_attempting |= DOMOVE_RUSH;
         } else
             prefix_seen = TRUE;
         break;
@@ -4573,7 +4573,7 @@ register char *cmd;
     case NHKF_RUN:
         if (movecmd(lowc(cmd[1]))) {
             g.context.run = 3;
-            g.context.domove_attempting |= DOMOVE_RUSH;
+            g.domove_attempting |= DOMOVE_RUSH;
         } else
             prefix_seen = TRUE;
         break;
@@ -4589,7 +4589,7 @@ register char *cmd;
     case NHKF_FIGHT:
         if (movecmd(cmd[1])) {
             g.context.forcefight = 1;
-            g.context.domove_attempting |= DOMOVE_WALK;
+            g.domove_attempting |= DOMOVE_WALK;
         } else
             prefix_seen = TRUE;
         break;
@@ -4598,7 +4598,7 @@ register char *cmd;
             g.context.run = 0;
             g.context.nopick = 1;
             if (!u.dz)
-                g.context.domove_attempting |= DOMOVE_WALK;
+                g.domove_attempting |= DOMOVE_WALK;
             else
                 cmd[0] = cmd[1]; /* "m<" or "m>" */
         } else
@@ -4608,7 +4608,7 @@ register char *cmd;
         if (movecmd(lowc(cmd[1]))) {
             g.context.run = 1;
             g.context.nopick = 1;
-            g.context.domove_attempting |= DOMOVE_RUSH;
+            g.domove_attempting |= DOMOVE_RUSH;
         } else
             prefix_seen = TRUE;
         break;
@@ -4631,20 +4631,20 @@ register char *cmd;
             g.context.travel1 = 1;
             g.context.run = 8;
             g.context.nopick = 1;
-            g.context.domove_attempting |= DOMOVE_RUSH;
+            g.domove_attempting |= DOMOVE_RUSH;
             break;
         }
         /*FALLTHRU*/
     default:
         if (movecmd(*cmd)) { /* ordinary movement */
             g.context.run = 0; /* only matters here if it was 8 */
-            g.context.domove_attempting |= DOMOVE_WALK;
+            g.domove_attempting |= DOMOVE_WALK;
         } else if (movecmd(g.Cmd.num_pad ? unmeta(*cmd) : lowc(*cmd))) {
             g.context.run = 1;
-            g.context.domove_attempting |= DOMOVE_RUSH;
+            g.domove_attempting |= DOMOVE_RUSH;
         } else if (movecmd(unctrl(*cmd))) {
             g.context.run = 3;
-            g.context.domove_attempting |= DOMOVE_RUSH;
+            g.domove_attempting |= DOMOVE_RUSH;
         }
         break;
     }
@@ -4662,7 +4662,7 @@ register char *cmd;
         }
     }
 
-    if (((g.context.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
+    if (((g.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
                             && !g.context.travel && !dxdy_moveok()) {
         /* trying to move diagonally as a grid bug;
            this used to be treated by movecmd() as not being
@@ -4677,13 +4677,13 @@ register char *cmd;
         return;
     }
 
-    if ((g.context.domove_attempting & DOMOVE_WALK) != 0L) {
+    if ((g.domove_attempting & DOMOVE_WALK) != 0L) {
         if (g.multi)
             g.context.mv = TRUE;
         domove();
         g.context.forcefight = 0;
         return;
-    } else if ((g.context.domove_attempting & DOMOVE_RUSH) != 0L) {
+    } else if ((g.domove_attempting & DOMOVE_RUSH) != 0L) {
         if (firsttime) {
             if (!g.multi)
                 g.multi = max(COLNO, ROWNO);

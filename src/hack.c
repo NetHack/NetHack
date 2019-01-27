@@ -1332,12 +1332,12 @@ domove()
 {
         int ux1 = u.ux, uy1 = u.uy;
 
-        g.context.domove_succeeded = 0L;
+        g.domove_succeeded = 0L;
         domove_core();
-        /* g.context.domove_succeeded is available to make assessments now */
-        if ((g.context.domove_succeeded & (DOMOVE_RUSH | DOMOVE_WALK)) != 0)
+        /* g.domove_succeeded is available to make assessments now */
+        if ((g.domove_succeeded & (DOMOVE_RUSH | DOMOVE_WALK)) != 0)
             maybe_smudge_engr(ux1, uy1, u.ux, u.uy);
-        g.context.domove_attempting = 0L;
+        g.domove_attempting = 0L;
 }
 
 void
@@ -1872,8 +1872,8 @@ domove_core()
 
     if (u.ux0 != u.ux || u.uy0 != u.uy) {
         /* let caller know so that an evaluation may take place */
-        g.context.domove_succeeded |=
-                (g.context.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK));
+        g.domove_succeeded |=
+                (g.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK));
         u.umoved = TRUE;
         /* Clean old position -- vision_recalc() will print our new one. */
         newsym(u.ux0, u.uy0);
