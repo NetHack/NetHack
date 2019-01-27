@@ -272,6 +272,11 @@ E NEARDATA struct mvitals {
     uchar mvflags;
 } mvitals[NUMMONS];
 
+E NEARDATA long domove_attempting;
+E NEARDATA long domove_succeeded;
+#define DOMOVE_WALK         0x00000001
+#define DOMOVE_RUSH         0x00000002
+
 E NEARDATA struct c_color_names {
     const char *const c_black, *const c_amber, *const c_golden,
         *const c_light_blue, *const c_red, *const c_green, *const c_silver,
