@@ -1,4 +1,4 @@
-# NetHack 3.6	mines.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $
+# NetHack 3.6	mines.des	$NHDT-Date: 1548631704 2019/01/27 23:28:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $
 #	Copyright (c) 1989-95 by Jean-Christophe Collet
 #	Copyright (c) 1991-95 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
@@ -1023,8 +1023,10 @@ NON_DIGGABLE:(00,00,52,17)
 NON_DIGGABLE:(53,00,74,00)
 NON_DIGGABLE:(53,17,74,17)
 NON_DIGGABLE:(74,01,74,16)
-NON_DIGGABLE:(53,07,55,07)
+NON_DIGGABLE:(53,07,53,07)
+NON_DIGGABLE:(58,12,58,13)
 NON_DIGGABLE:(53,14,61,14)
+NON_DIGGABLE:(61,15,61,16)
 # The Gnome King's wine cellar.
 # the Trespassers sign is a long-running joke
 ENGRAVING:(12,03),engrave,"You are now entering the Gnome King's wine cellar."
