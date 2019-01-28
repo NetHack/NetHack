@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.235 $ $NHDT-Date: 1548209734 2019/01/23 02:15:34 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.239 $ $NHDT-Date: 1548695445 2019/01/28 17:10:45 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -335,6 +335,8 @@ entering Ft.Ludios with a lit candle lit up the entire entry room except for
 	one corner spot; that corner is beyond candle radius but other spots
 	even further away were being shown; force the walls to unlit in order
 	to prevent those wall spots from showing so soon
+a couple of short wall segments in the "Gnome King's Wine Cellar" variant of
+	Mines' End were diggable; one stone spot which should have been, wasn't
 boulder dropped or launched by a monster onto a monster trapped in a pit and
 	killing it credited/blamed the hero and might trigger a deltrap panic
 the simulation of dual weapon combat when polymorphed into a form with more
@@ -350,6 +352,9 @@ various non-weapon attacks while polymorphed didn't inflict blessed or silver
 hero poly'd into rope golem form could choke headless or non-breathing monsts
 hero poly'd into creature with hug attack could hug a long worm's tail which
 	rendered the whole worm immobile
+smudging of an engraving has been relocated to after a succesful move
+	and both your former location and your resulting location are
+	subject to the smudging
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -405,15 +410,8 @@ when engulfed while in a shop, dropping an item into the engulfer and then
 	using ':' to look at current location could cause a crash
 when items were on the floor just inside a shop's door where the shopkeeper
 	doesn't buy and sell stuff, those items showed a 'for sale' price
-separate most of domove() into domove_core() and introduce a pair of global
-	variables that allow for assessment of domove_core() results in
-        domove() after one of the many return paths
-new domove()-related global variables mentioned above also replace a couple
-	of booleans in rhack() that were used for similar upcoming action
-	identification
-smudging of an engraving has been relocated and follows domove_core() and is
-	carried out only after a successful move attempt; your former
-	location and resulting location are both potentially impacted now
+having an artifact wish be refused ("for a moment you feel <artifact> in
+	your hands, but it disappears") would immediately segfault
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
