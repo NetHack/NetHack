@@ -7,14 +7,26 @@
 
 #define ISAAC64_MASK ((uint64_t)0xFFFFFFFFFFFFFFFFULL)
 
+#if (defined(__STDC__) && __STDC_VERSION__ >= 199901L)
+#define HAS_INLINE
+#endif
+
 /* Extract ISAAC64_SZ_LOG bits (starting at bit 3). */
+#ifdef HAS_INLINE
 static inline uint32_t lower_bits(uint64_t x)
+#else
+static uint32_t lower_bits(uint64_t x)
+#endif
 {
 	return (x & ((ISAAC64_SZ-1) << 3)) >>3;
 }
 
 /* Extract next ISAAC64_SZ_LOG bits (starting at bit ISAAC64_SZ_LOG+2). */
+#ifdef HAS_INLINE
 static inline uint32_t upper_bits(uint64_t y)
+#else
+static uint32_t upper_bits(uint64_t y)
+#endif
 {
 	return (y >> (ISAAC64_SZ_LOG+3)) & (ISAAC64_SZ-1);
 }
