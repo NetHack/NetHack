@@ -129,9 +129,13 @@ OBJ     = o
 # (see pcconf.h). Set to nothing if not used.
 #
 
-RANDOM	= $(OBJ)\random.o
+RANDOM = $(OBJ)\isaac64.o
+#RANDOM	= $(OBJ)\random.o
 #RANDOM	=
-
+BCRYPT=
+! IF ("$(RANDOM)"=="$(OBJ)\isaac64.o")
+BCRYPT=bcrypt.lib
+! ENDIF
 WINPFLAG= -DTILES -DMSWIN_GRAPHICS -DWIN32CON
 
 # To store all the level files,
@@ -460,7 +464,8 @@ CURSESLIB=
 
 ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
 	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
-	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" $(CURSESDEF) \
+	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" \
+	-DHAS_STDINT_H -DHAS_INLINE $(CURSESDEF) \
 	-EHsc -fp:precise -Gd -GF -GS -Gy \
 	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
 cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
@@ -801,7 +806,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
         @echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
-		$(LIBS) $(PDCLIB) $(conlibs) -out:$@ @<<$(@B).lnk
+		$(LIBS) $(PDCLIB) $(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(TTYOBJ)
 		$(O)nttty.o
@@ -824,7 +829,7 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
-		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(guilibs) $(COMCTRL) -out:$@ @<<$(@B).lnk
+		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(GUIOBJ)
 		$(O)tile.o
@@ -1514,6 +1519,8 @@ $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\atari\tos.c
 $(O)pctty.o: ..\sys\share\pctty.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pctty.c
+$(O)isaac64.o: ..\src\isaac64.c $(HACK_H) $(INCL)\isaac64.h $(INCL)\integer.h
+	@$(CC) $(cflagsBuild) -Fo$@ ..\src\isaac64.c
 $(O)random.o: ..\sys\share\random.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\random.c
 $(O)ioctl.o: ..\sys\share\ioctl.c $(HACK_H) $(INCL)\tcap.h

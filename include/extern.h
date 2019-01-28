@@ -925,7 +925,8 @@ E char *FDECL(strstri, (const char *, const char *));
 #endif
 E boolean
 FDECL(fuzzymatch, (const char *, const char *, const char *, BOOLEAN_P));
-E void NDECL(setrandom);
+E void NDECL(init_random);
+E void NDECL(reseed_random);
 E time_t NDECL(getnow);
 E int NDECL(getyear);
 #if 0
@@ -2103,6 +2104,10 @@ E void FDECL(genl_outrip, (winid, int, time_t));
 
 /* ### rnd.c ### */
 
+#ifdef USE_ISAAC64
+E void FDECL(init_isaac64, (unsigned long));
+E long NDECL(nhrand);
+#endif
 E int FDECL(rn2, (int));
 E int FDECL(rn2_on_display_rng, (int));
 E int FDECL(rnl, (int));

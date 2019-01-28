@@ -680,6 +680,54 @@ char *name;
     }
     return;
 }
+
+#include <bcrypt.h>     /* Windows Crypto Next Gen (CNG) */
+
+#ifndef STATUS_SUCCESS
+#define STATUS_SUCCESS 0
+#endif
+#ifndef STATUS_NOT_FOUND
+#define STATUS_NOT_FOUND 0xC0000225
+#endif
+#ifndef STATUS_UNSUCCESSFUL
+#define STATUS_UNSUCCESSFUL 0xC0000001
+#endif
+
+unsigned long
+sys_random_seed(VOID_ARGS)
+{
+    unsigned long ourseed = 0UL;
+    BCRYPT_ALG_HANDLE hRa = (BCRYPT_ALG_HANDLE) 0;
+    NTSTATUS status = STATUS_UNSUCCESSFUL;
+    boolean Plan_B = TRUE;
+
+    status = BCryptOpenAlgorithmProvider(&hRa, BCRYPT_RNG_ALGORITHM,
+                                         (LPCWSTR) 0, 0);
+    if (hRa && status == STATUS_SUCCESS) {
+        status = BCryptGenRandom(hRa, (PUCHAR) &ourseed,
+                                 (ULONG) sizeof ourseed, 0);
+        if (status == STATUS_SUCCESS) {
+            BCryptCloseAlgorithmProvider(hRa,0);
+            has_strong_rngseed = TRUE;
+            Plan_B = FALSE;
+        }
+    }
+
+    if (Plan_B) {
+        time_t datetime = 0;
+        const char *emsg;
+
+        if (status == STATUS_NOT_FOUND)
+            emsg = "BCRYPT_RNG_ALGORITHM not avail, falling back";
+        else
+            emsg = "Other failure than algorithm not avail";
+        paniclog("sys_random_seed", emsg); /* leaves clue, doesn't exit */
+        (void) time(&datetime);
+        ourseed = (unsigned long) datetime;
+    }
+    return ourseed;
+}
+
 #endif /* WIN32 */
 
 /*winnt.c*/

@@ -125,12 +125,12 @@ boolean exclude_cookie;
             case 2: /*(might let a bogus input arg sneak thru)*/
             case 1:
                 beginning = (long) true_rumor_start;
-                tidbit = Rand() % true_rumor_size;
+                tidbit = rn2(true_rumor_size);
                 break;
             case 0: /* once here, 0 => false rather than "either"*/
             case -1:
                 beginning = (long) false_rumor_start;
-                tidbit = Rand() % false_rumor_size;
+                tidbit = rn2(false_rumor_size);
                 break;
             default:
                 impossible("strange truth value for rumor");

@@ -692,7 +692,7 @@ initoptions_init()
     reset_commands(TRUE); /* init */
 
     /* initialize the random number generator */
-    setrandom();
+    init_random();
 
     /* for detection of configfile options specified multiple times */
     iflags.opt_booldup = iflags.opt_compdup = (int *) 0;

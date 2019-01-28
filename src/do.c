@@ -1420,6 +1420,7 @@ boolean at_stairs, falling, portal;
             /* we'll reach here if running in wizard mode */
             error("Cannot continue this game.");
         }
+        reseed_random();
         minit(); /* ZEROCOMP */
         getlev(fd, hackpid, new_ledger, FALSE);
         (void) nhclose(fd);
