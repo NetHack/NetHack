@@ -34,6 +34,20 @@ register int x;
 #endif
 }
 
+/* 0 <= rn2(x) < x, but on a different sequence from the "main" rn2;
+   used in cases where the answer doesn't affect gameplay and we don't
+   want to give users easy control over the main RNG sequence. This is
+   an intentionally low-quality RNG to discourage its use for anything
+   gameplay-affecting; please use a better RNG in that case. */
+int
+rn2_on_display_rng(x)
+register int x;
+{
+    static unsigned seed = 1;
+    seed *= 2739110765;
+    return (int)((seed >> 16) % (unsigned)x);
+}
+
 /* 0 <= rnl(x) < x; sometimes subtracting Luck;
    good luck approaches 0, bad luck approaches (x-1) */
 int

@@ -2104,6 +2104,7 @@ E void FDECL(genl_outrip, (winid, int, time_t));
 /* ### rnd.c ### */
 
 E int FDECL(rn2, (int));
+E int FDECL(rn2_on_display_rng, (int));
 E int FDECL(rnl, (int));
 E int FDECL(rnd, (int));
 E int FDECL(d, (int, int));
@@ -2148,7 +2149,7 @@ E const char *NDECL(Goodbye);
 /* ### rumors.c ### */
 
 E char *FDECL(getrumor, (int, char *, BOOLEAN_P));
-E char *FDECL(get_rnd_text, (const char *, char *));
+E char *FDECL(get_rnd_text, (const char *, char *, int FDECL((*), (int))));
 E void FDECL(outrumor, (int, int));
 E void FDECL(outoracle, (BOOLEAN_P, BOOLEAN_P));
 E void FDECL(save_oracles, (int, int));

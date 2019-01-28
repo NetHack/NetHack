@@ -1538,8 +1538,12 @@ namefloorobj()
         unames[0] = ((Upolyd ? u.mfemale : flags.female) && urole.name.f)
                      ? urole.name.f
                      : urole.name.m;
-        /* random rank title for hero's role */
-        unames[1] = rank_of(rnd(30), Role_switch, flags.female);
+        /* random rank title for hero's role
+
+           note: the 30 is hardcoded in xlev_to_rank, so should be
+           hardcoded here too */
+        unames[1] = rank_of(rn2_on_display_rng(30) + 1,
+                            Role_switch, flags.female);
         /* random fake monster */
         unames[2] = bogusmon(tmpbuf, (char *) 0);
         /* increased chance for fake monster */
@@ -1550,7 +1554,7 @@ namefloorobj()
         unames[5] = "Wibbly Wobbly";
         pline("%s %s to call you \"%s.\"",
               The(buf), use_plural ? "decide" : "decides",
-              unames[rn2(SIZE(unames))]);
+              unames[rn2_on_display_rng(SIZE(unames))]);
     } else if (!objtyp_is_callable(obj->otyp)) {
         pline("%s %s can't be assigned a type name.",
               use_plural ? "Those" : "That", buf);
@@ -1930,7 +1934,7 @@ char *buf, *code;
 {
     char *mname = buf;
 
-    get_rnd_text(BOGUSMONFILE, buf);
+    get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng);
     /* strip prefix if present */
     if (!letter(*mname)) {
         if (code)
@@ -1957,7 +1961,7 @@ char *code;
         *code = '\0';
 
     do {
-        name = rn1(SPECIAL_PM + BOGUSMONSIZE - LOW_PM, LOW_PM);
+        name = rn2_on_display_rng(SPECIAL_PM + BOGUSMONSIZE - LOW_PM) + LOW_PM;
     } while (name < SPECIAL_PM
              && (type_is_pname(&mons[name]) || (mons[name].geno & G_NOGEN)));
 
@@ -2013,8 +2017,9 @@ const char *
 hcolor(colorpref)
 const char *colorpref;
 {
-    return (Hallucination || !colorpref) ? hcolors[rn2(SIZE(hcolors))]
-                                         : colorpref;
+    return (Hallucination || !colorpref)
+        ? hcolors[rn2_on_display_rng(SIZE(hcolors))]
+        : colorpref;
 }
 
 /* return a random real color unless hallucinating */
