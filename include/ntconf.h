@@ -128,7 +128,9 @@ extern void FDECL(interject, (int));
 /* suppress a warning in cppregex.cpp */
 #pragma warning(disable : 4101) /* unreferenced local variable */
 #endif
+#ifndef HAS_STDINT_H
 #define HAS_STDINT_H    /* force include of stdint.h in integer.h */
+#endif
 #endif /* _MSC_VER */
 
 /* The following is needed for prototypes of certain functions */
