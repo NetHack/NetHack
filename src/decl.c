@@ -21,6 +21,7 @@ const schar ydir[10] = { 0, -1, -1, -1, 0, 1, 1, 1, 0, 0 };
 const schar zdir[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1 };
 
 NEARDATA struct flag flags;
+NEARDATA boolean has_strong_rngseed = FALSE;
 #ifdef SYSFLAGS
 NEARDATA struct sysflag sysflags;
 #endif

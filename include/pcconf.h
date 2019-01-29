@@ -236,11 +236,13 @@
 #include <time.h>
 #endif
 
-#ifdef RANDOM
-/* Use the high quality random number routines. */
-#define Rand() random()
-#else
-#define Rand() rand()
+/* the high quality random number routines */
+#ifndef USE_ISAAC64
+# ifdef RANDOM
+#  define Rand() random()
+# else
+#  define Rand() rand()
+# endif
 #endif
 
 #ifndef TOS

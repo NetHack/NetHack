@@ -2090,13 +2090,18 @@ aligntyp alignment;
     if (!Hallucination)
         return align_gname(alignment);
 
+    /* Count the roles, so that we can pick one at random. */
+    int rolecount = 0;
+    while (roles[rolecount].filecode)
+        rolecount++;
+
     /* The priest may not have initialized god names. If this is the
-     * case, and we roll priest, we need to try again. */
+       case, and we roll priest, we need to try again. */
     do
-        which = randrole();
+        which = rn2_on_display_rng(rolecount);
     while (!roles[which].lgod);
 
-    switch (rn2(9)) {
+    switch (rn2_on_display_rng(9)) {
     case 0:
     case 1:
         gnam = roles[which].lgod;
@@ -2111,7 +2116,7 @@ aligntyp alignment;
         break;
     case 6:
     case 7:
-        gnam = hallu_gods[rn2(sizeof hallu_gods / sizeof *hallu_gods)];
+        gnam = hallu_gods[rn2_on_display_rng(SIZE(hallu_gods))];
         break;
     case 8:
         gnam = Moloch;

@@ -457,13 +457,14 @@ boolean use_detection_glyph;
     struct wseg *curr = wtails[worm->wormno];
 
     /*  if (!mtmp->wormno) return;  bullet proofing */
+    int what_tail = what_mon(PM_LONG_WORM_TAIL, newsym_rn2);
 
     while (curr != wheads[worm->wormno]) {
         num = use_detection_glyph
-            ? detected_monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL))
+            ? detected_monnum_to_glyph(what_tail)
             : (worm->mtame
-               ? petnum_to_glyph(what_mon(PM_LONG_WORM_TAIL))
-               : monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL)));
+               ? petnum_to_glyph(what_tail)
+               : monnum_to_glyph(what_tail));
         show_glyph(curr->wx, curr->wy, num);
         curr = curr->nseg;
     }

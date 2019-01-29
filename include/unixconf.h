@@ -347,11 +347,14 @@
 #endif
 
 /* Use the high quality random number routines. */
-#if defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) \
+/* the high quality random number routines */
+#ifndef USE_ISAAC64
+# if defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) \
     || defined(RANDOM) || defined(__APPLE__)
-#define Rand() random()
-#else
-#define Rand() lrand48()
+#  define Rand() random()
+# else
+#  define Rand() lrand48()
+# endif
 #endif
 
 #ifdef TIMED_DELAY
@@ -406,6 +409,19 @@
 
 #ifdef __APPLE__
 # define RUNTIME_PASTEBUF_SUPPORT
+#endif
+
+/*
+ * /dev/random is blocking on Linux, so there we default to /dev/urandom which
+ * should still be good enough.
+ * BSD systems usually have /dev/random that is supposed to be used.
+ */
+#ifdef LINUX
+# define DEV_RANDOM "/dev/urandom"
+#else
+# ifdef BSD
+#  define DEV_RANDOM "/dev/random"
+# endif
 #endif
 
 #endif /* UNIXCONF_H */

@@ -190,6 +190,7 @@ struct multishot {
     boolean s;
 };
 
+E NEARDATA boolean has_strong_rngseed;
 E const int shield_static[];
 
 #include "spell.h"

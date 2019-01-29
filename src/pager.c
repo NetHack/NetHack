@@ -381,7 +381,8 @@ char *buf, *monbuf;
     buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
     if (u.ux == x && u.uy == y && canspotself()
-        && !(iflags.save_uswallow && glyph == mon_to_glyph(u.ustuck))
+        && !(iflags.save_uswallow &&
+             glyph == mon_to_glyph(u.ustuck, rn2_on_display_rng))
         && (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
         /* fill in buf[] */
         (void) self_lookat(buf);
@@ -435,7 +436,7 @@ char *buf, *monbuf;
     } else if (glyph_is_object(glyph)) {
         look_at_object(buf, x, y, glyph); /* fill in buf[] */
     } else if (glyph_is_trap(glyph)) {
-        int tnum = what_trap(glyph_to_trap(glyph));
+        int tnum = what_trap(glyph_to_trap(glyph), rn2_on_display_rng);
 
         /* Trap detection displays a bear trap at locations having
          * a trapped door or trapped container or both.
@@ -1487,7 +1488,7 @@ doidtrap()
                 if (u.dz < 0 ? is_hole(tt) : tt == ROCKTRAP)
                     break;
             }
-            tt = what_trap(tt);
+            tt = what_trap(tt, rn2_on_display_rng);
             pline("That is %s%s%s.",
                   an(defsyms[trap_to_defsym(tt)].explanation),
                   !trap->madeby_u
