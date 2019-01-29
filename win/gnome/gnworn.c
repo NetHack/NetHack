@@ -75,7 +75,7 @@ image_of_worn_object(struct obj *o)
     GdkImlibImage *im;
 
     if (o)
-        glyph = obj_to_glyph(o);
+        glyph = obj_to_glyph(o, rn2_on_display_rng);
     else
         glyph = cmap_to_glyph(S_stone);
 
