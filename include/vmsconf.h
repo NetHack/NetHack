@@ -243,17 +243,19 @@ typedef __mode_t mode_t;
 #define rindex strrchr
 
 /* Use the high quality random number routines. */
-#if defined(RANDOM)
-#define Rand() random()
+#ifndef USE_ISAAC64
+# if defined(RANDOM)
+#  define Rand() random()
 /* VMS V7 adds these entry points to DECC$SHR; stick with the nethack-supplied
    code to avoid having to deal with version-specific conditionalized builds
    */
-#define random nh_random
-#define srandom nh_srandom
-#define initstate nh_initstate
-#define setstate nh_setstate
-#else
-#define Rand() rand()
+#  define random nh_random
+#  define srandom nh_srandom
+#  define initstate nh_initstate
+#  define setstate nh_setstate
+# else
+#  define Rand() rand()
+# endif
 #endif
 
 #ifndef __GNUC__

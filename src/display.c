@@ -222,7 +222,7 @@ register struct trap *trap;
 register int show;
 {
     register int x = trap->tx, y = trap->ty;
-    register int glyph = trap_to_glyph(trap);
+    register int glyph = trap_to_glyph(trap, newsym_rn2);
 
     if (level.flags.hero_memory)
         levl[x][y].glyph = glyph;
@@ -242,14 +242,14 @@ register struct obj *obj;
 register int show;
 {
     register int x = obj->ox, y = obj->oy;
-    register int glyph = obj_to_glyph(obj);
+    register int glyph = obj_to_glyph(obj, newsym_rn2);
 
     if (level.flags.hero_memory) {
         /* MRKR: While hallucinating, statues are seen as random monsters */
         /*       but remembered as random objects.                        */
 
         if (Hallucination && obj->otyp == STATUE) {
-            levl[x][y].glyph = random_obj_to_glyph();
+            levl[x][y].glyph = random_obj_to_glyph(newsym_rn2);
         } else {
             levl[x][y].glyph = glyph;
         }
@@ -394,7 +394,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
                        (int) mon->m_ap_type);
             /*FALLTHRU*/
         case M_AP_NOTHING:
-            show_glyph(x, y, mon_to_glyph(mon));
+            show_glyph(x, y, mon_to_glyph(mon, newsym_rn2));
             break;
 
         case M_AP_FURNITURE: {
@@ -434,7 +434,8 @@ xchar worm_tail;            /* mon is actually a worm tail */
 
         case M_AP_MONSTER:
             show_glyph(x, y,
-                       monnum_to_glyph(what_mon((int) mon->mappearance)));
+                       monnum_to_glyph(what_mon((int) mon->mappearance,
+                                                rn2_on_display_rng)));
             break;
         }
     }
@@ -456,17 +457,19 @@ xchar worm_tail;            /* mon is actually a worm tail */
             if (worm_tail)
                 num = petnum_to_glyph(PM_LONG_WORM_TAIL);
             else
-                num = pet_to_glyph(mon);
+                num = pet_to_glyph(mon, rn2_on_display_rng);
         } else if (sightflags == DETECTED) {
             if (worm_tail)
-                num = detected_monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
+                num = detected_monnum_to_glyph(
+                    what_mon(PM_LONG_WORM_TAIL, rn2_on_display_rng));
             else
-                num = detected_mon_to_glyph(mon);
+                num = detected_mon_to_glyph(mon, rn2_on_display_rng);
         } else {
             if (worm_tail)
-                num = monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
+                num = monnum_to_glyph(
+                    what_mon(PM_LONG_WORM_TAIL, rn2_on_display_rng));
             else
-                num = mon_to_glyph(mon);
+                num = mon_to_glyph(mon, rn2_on_display_rng);
         }
         show_glyph(x, y, num);
     }
@@ -489,10 +492,11 @@ register struct monst *mon;
     int glyph;
 
     if (mon_warning(mon)) {
-        int wl = Hallucination ? rn1(WARNCOUNT - 1, 1) : warning_of(mon);
+        int wl = Hallucination ?
+            rn2_on_display_rng(WARNCOUNT - 1) + 1 : warning_of(mon);
         glyph = warning_to_glyph(wl);
     } else if (MATCH_WARN_OF_MON(mon)) {
-        glyph = mon_to_glyph(mon);
+        glyph = mon_to_glyph(mon, rn2_on_display_rng);
     } else {
         impossible("display_warning did not match warning type?");
         return;
@@ -1751,7 +1755,8 @@ int loc;
         impossible("swallow_to_glyph: bad swallow location");
         loc = S_sw_br;
     }
-    return ((int) (what_mon(mnum) << 3) | (loc - S_sw_tl)) + GLYPH_SWALLOW_OFF;
+    return ((int) (what_mon(mnum, rn2_on_display_rng) << 3) |
+            (loc - S_sw_tl)) + GLYPH_SWALLOW_OFF;
 }
 
 /*

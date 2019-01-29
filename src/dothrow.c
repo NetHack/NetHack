@@ -1076,7 +1076,7 @@ struct obj *obj;
     if ((u.dx || u.dy) && (bhitpos.x != u.ux || bhitpos.y != u.uy)) {
         int x = bhitpos.x - u.dx, y = bhitpos.y - u.dy;
 
-        tmp_at(DISP_FLASH, obj_to_glyph(obj));
+        tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
         while (isok(x,y) && (x != u.ux || y != u.uy)) {
             tmp_at(x, y);
             delay_output();
@@ -1145,7 +1145,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         bhitpos.x = mon->mx;
         bhitpos.y = mon->my;
         if (tethered_weapon)
-            tmp_at(DISP_TETHER, obj_to_glyph(obj));
+            tmp_at(DISP_TETHER, obj_to_glyph(obj, rn2_on_display_rng));
     } else if (u.dz) {
         if (u.dz < 0
             /* Mjollnir must we wielded to be thrown--caller verifies this;
@@ -1374,7 +1374,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         }
 
         if (!IS_SOFT(levl[bhitpos.x][bhitpos.y].typ) && breaktest(obj)) {
-            tmp_at(DISP_FLASH, obj_to_glyph(obj));
+            tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
             tmp_at(bhitpos.x, bhitpos.y);
             delay_output();
             tmp_at(DISP_END, 0);
