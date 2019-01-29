@@ -17,6 +17,10 @@
 #include <stdint.h>
 #define SKIP_STDINT_WORKAROUND
 # endif
+# if defined(__GNUC__) && defined(__INT64_MAX__)
+#  include <stdint.h>
+#  define SKIP_STDINT_WORKAROUND
+# endif
 #endif
 
 #ifndef SKIP_STDINT_WORKAROUND /* !C99 */
