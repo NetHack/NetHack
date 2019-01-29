@@ -2691,8 +2691,8 @@ long *out_cnt;
                 any.a_obj = otmp;
             else
                 any.a_char = ilet;
-            add_menu(win, obj_to_glyph(otmp), &any, ilet, 0, ATR_NONE,
-                     doname(otmp), MENU_UNSELECTED);
+            add_menu(win, obj_to_glyph(otmp, rn2_on_display_rng), &any, ilet,
+                     0, ATR_NONE, doname(otmp), MENU_UNSELECTED);
         }
     }
     if (flags.sortpack) {
@@ -2805,7 +2805,8 @@ char avoidlet;
                         classcount++;
                     }
                     any.a_char = ilet;
-                    add_menu(win, obj_to_glyph(otmp), &any, ilet, 0, ATR_NONE,
+                    add_menu(win, obj_to_glyph(otmp, rn2_on_display_rng),
+                             &any, ilet, 0, ATR_NONE,
                              doname(otmp), MENU_UNSELECTED);
                 }
             }

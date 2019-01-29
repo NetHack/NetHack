@@ -78,10 +78,12 @@ struct monst *mtmp;
 boolean showtail;
 {
     if (def_monsyms[(int) mtmp->data->mlet].sym == ' ')
-        show_glyph(mtmp->mx, mtmp->my, detected_mon_to_glyph(mtmp));
-    else
         show_glyph(mtmp->mx, mtmp->my,
-                   mtmp->mtame ? pet_to_glyph(mtmp) : mon_to_glyph(mtmp));
+                   detected_mon_to_glyph(mtmp, newsym_rn2));
+    else
+        show_glyph(mtmp->mx, mtmp->my, mtmp->mtame
+                   ? pet_to_glyph(mtmp, newsym_rn2)
+                   : mon_to_glyph(mtmp, newsym_rn2));
 
     if (showtail && mtmp->data == &mons[PM_LONG_WORM])
         detect_wsegs(mtmp, 0);
@@ -867,10 +869,10 @@ int src_cursed;
             obj.ox = x;
             obj.oy = y;
         }
-        obj.otyp = !Hallucination ? GOLD_PIECE : random_object();
+        obj.otyp = !Hallucination ? GOLD_PIECE : random_object(rn2);
         obj.quan = (long) ((obj.otyp == GOLD_PIECE) ? rnd(10)
                            : objects[obj.otyp].oc_merge ? rnd(2) : 1);
-        obj.corpsenm = random_monster(); /* if otyp == CORPSE */
+        obj.corpsenm = random_monster(rn2); /* if otyp == CORPSE */
         map_object(&obj, 1);
     } else if (trap) {
         map_trap(trap, 1);
@@ -1591,14 +1593,20 @@ void
 find_trap(trap)
 struct trap *trap;
 {
-    int tt = what_trap(trap->ttyp);
+    int tt = what_trap(trap->ttyp, rn2);
     boolean cleared = FALSE;
 
     trap->tseen = 1;
     exercise(A_WIS, TRUE);
     feel_newsym(trap->tx, trap->ty);
 
-    if (levl[trap->tx][trap->ty].glyph != trap_to_glyph(trap)) {
+    /* The "Hallucination ||" is to preserve 3.6.1 behaviour, but this
+       behaviour might need a rework in the hallucination case
+       (e.g. to not prompt if any trap glyph appears on the
+       square). */
+    if (Hallucination ||
+        levl[trap->tx][trap->ty].glyph !=
+        trap_to_glyph(trap, rn2_on_display_rng)) {
         /* There's too much clutter to see your find otherwise */
         cls();
         map_trap(trap, 1);
@@ -1832,7 +1840,7 @@ int default_glyph, which_subset;
            an object, replacing any object or trap at its spot) */
         glyph = !swallowed ? glyph_at(x, y) : levl_glyph;
         if (keep_mons && x == u.ux && y == u.uy && swallowed)
-            glyph = mon_to_glyph(u.ustuck);
+            glyph = mon_to_glyph(u.ustuck, rn2_on_display_rng);
         else if (((glyph_is_monster(glyph)
                    || glyph_is_warning(glyph)) && !keep_mons)
                  || glyph_is_swallow(glyph))
@@ -1841,7 +1849,7 @@ int default_glyph, which_subset;
              || glyph_is_invisible(glyph))
             && keep_traps && !covers_traps(x, y)) {
             if ((t = t_at(x, y)) != 0 && t->tseen)
-                glyph = trap_to_glyph(t);
+                glyph = trap_to_glyph(t, rn2_on_display_rng);
         }
         if ((glyph_is_object(glyph) && !keep_objs)
             || (glyph_is_trap(glyph) && !keep_traps)

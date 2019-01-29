@@ -691,8 +691,9 @@ initoptions_init()
     /* set up the command parsing */
     reset_commands(TRUE); /* init */
 
-    /* initialize the random number generator */
-    setrandom();
+    /* initialize the random number generator(s) */
+    init_random(rn2);
+    init_random(rn2_on_display_rng);
 
     /* for detection of configfile options specified multiple times */
     iflags.opt_booldup = iflags.opt_compdup = (int *) 0;

@@ -914,7 +914,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
                 }
 
                 any.a_obj = curr;
-                add_menu(win, obj_to_glyph(curr), &any,
+                add_menu(win, obj_to_glyph(curr, rn2_on_display_rng), &any,
                          (qflags & USE_INVLET) ? curr->invlet
                            : (first && curr->oclass == COIN_CLASS) ? '$' : 0,
                          def_oc_syms[(int) objects[curr->otyp].oc_class].sym,
@@ -939,7 +939,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
         fake_hero_object = zeroobj;
         fake_hero_object.quan = 1L; /* not strictly necessary... */
         any.a_obj = &fake_hero_object;
-        add_menu(win, mon_to_glyph(&youmonst), &any,
+        add_menu(win, mon_to_glyph(&youmonst, rn2_on_display_rng), &any,
                  /* fake inventory letter, no group accelerator */
                  CONTAINED_SYM, 0, ATR_NONE, an(self_lookat(buf)),
                  MENU_UNSELECTED);
