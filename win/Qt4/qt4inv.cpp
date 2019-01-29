@@ -38,7 +38,7 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter& painter, obj* nhobj, int x, int
 {
     short int glyph;
     if (nhobj)
-	glyph=obj_to_glyph(nhobj);
+	glyph=obj_to_glyph(nhobj, rn2_on_display_rng);
     else if (canbe)
 	glyph=cmap_to_glyph(S_room);
     else
