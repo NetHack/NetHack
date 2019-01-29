@@ -1488,7 +1488,7 @@ int id;
 
         /* now change it into something laid by the hero */
         while (tryct--) {
-            mnum = can_be_hatched(random_monster());
+            mnum = can_be_hatched(random_monster(rn2));
             if (mnum != NON_PM && !dead_species(mnum, TRUE)) {
                 otmp->spe = 1;            /* laid by hero */
                 set_corpsenm(otmp, mnum); /* also sets hatch timer */

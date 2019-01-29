@@ -982,7 +982,8 @@ mklev()
     struct mkroom *croom;
     int ridx;
 
-    reseed_random();
+    reseed_random(rn2);
+    reseed_random(rn2_on_display_rng);
 
     init_mapseen(&u.uz);
     if (getbones())
@@ -1012,7 +1013,8 @@ mklev()
     for (ridx = 0; ridx < SIZE(rooms); ridx++)
         rooms[ridx].orig_rtype = rooms[ridx].rtype;
 
-    reseed_random();
+    reseed_random(rn2);
+    reseed_random(rn2_on_display_rng);
 }
 
 void

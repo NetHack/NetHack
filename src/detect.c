@@ -869,10 +869,10 @@ int src_cursed;
             obj.ox = x;
             obj.oy = y;
         }
-        obj.otyp = !Hallucination ? GOLD_PIECE : random_object();
+        obj.otyp = !Hallucination ? GOLD_PIECE : random_object(rn2_on_display_rng);
         obj.quan = (long) ((obj.otyp == GOLD_PIECE) ? rnd(10)
                            : objects[obj.otyp].oc_merge ? rnd(2) : 1);
-        obj.corpsenm = random_monster(); /* if otyp == CORPSE */
+        obj.corpsenm = random_monster(rn2); /* if otyp == CORPSE */
         map_object(&obj, 1);
     } else if (trap) {
         map_trap(trap, 1);

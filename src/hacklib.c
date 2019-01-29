@@ -51,8 +51,8 @@
         boolean         fuzzymatch      (const char *, const char *,
                                          const char *, boolean)
         void            setrandom       (void)
-        void            init_random     (void)
-        void            reseed_random   (void)
+        void            init_random     (fn)
+        void            reseed_random   (fn)
         time_t          getnow          (void)
         int             getyear         (void)
         char *          yymmdd          (time_t)
@@ -851,12 +851,20 @@ extern struct tm *FDECL(localtime, (time_t *));
 STATIC_DCL struct tm *NDECL(getlt);
 
 /* Sets the seed for the random number generator */
-static void
-set_random(unsigned long seed)
-{
 #ifdef USE_ISAAC64
-    init_isaac64(seed);
-#else
+static void
+set_random(seed, fn)
+unsigned long seed;
+int FDECL((*fn), (int));
+{
+    init_isaac64(seed, fn);
+}
+#else /* USE_ISAAC64 */
+static void
+set_random(seed, fn)
+unsigned long seed;
+int FDECL((*fn),(int));
+{
     /* the types are different enough here that sweeping the different
      * routine names into one via #defines is even more confusing
      */
@@ -877,8 +885,8 @@ set_random(unsigned long seed)
 #   endif
 #  endif
 # endif
-#endif
 }
+#endif /* USE_ISAAC64 */
 
 /* An appropriate version of this must always be provided in
    port-specific code somewhere. It returns a number suitable
@@ -890,19 +898,21 @@ extern unsigned long NDECL(sys_random_seed);
  * Only call once.
  */
 void
-init_random()
+init_random(fn)
+int FDECL((*fn),(int));
 {
-    set_random(sys_random_seed());
+    set_random(sys_random_seed(), fn);
 }
 
 /* Reshuffles the random number generator. */
 void
-reseed_random()
+reseed_random(fn)
+int FDECL((*fn),(int));
 {
    /* only reseed if we are certain that the seed generation is unguessable
     * by the players. */
     if (has_strong_rngseed)
-        init_random();
+        init_random(fn);
 }
 
 time_t
