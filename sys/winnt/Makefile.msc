@@ -129,13 +129,9 @@ OBJ     = o
 # (see pcconf.h). Set to nothing if not used.
 #
 
-RANDOM = $(OBJ)\isaac64.o
-#RANDOM	= $(OBJ)\random.o
+RANDOM	= $(OBJ)\random.o
 #RANDOM	=
-BCRYPT=
-! IF ("$(RANDOM)"=="$(OBJ)\isaac64.o")
 BCRYPT=bcrypt.lib
-! ENDIF
 WINPFLAG= -DTILES -DMSWIN_GRAPHICS -DWIN32CON
 
 # To store all the level files,
@@ -223,7 +219,7 @@ VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o
 VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
 VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
 VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
-VOBJ14 = $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
+VOBJ14 = $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o     $(O)isaac64.o
 VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
 VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
 VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  

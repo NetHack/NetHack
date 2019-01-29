@@ -38,6 +38,8 @@
 
 #include "hack.h"
 
+#if defined(USE_ISAAC64) && !defined(RANDOM)
+#else
 #ifdef LIBC_SCCS
 #ifndef lint
 static char sccsid[] = "@(#)random.c	5.5 (Berkeley) 7/6/88";
@@ -377,3 +379,7 @@ random()
     }
     return (i);
 }
+#endif /* else defined(USE_ISAAC64) && !defined(RANDOM) */
+
+
+
