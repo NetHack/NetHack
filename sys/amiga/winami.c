@@ -451,7 +451,7 @@ amii_player_selection()
     if (validrole(flags.initrole))
 	return;
     else {
-	flags.initrole=randrole();
+	flags.initrole = randrole(FALSE);
 	return;
     }
 #if 0 /* Don't query the user ... instead give random character -jhsa */
@@ -518,7 +518,7 @@ amii_player_selection()
 		}
 		else if( code == ' ' || code == '\n' || code == '\r' )
 		{
-		    flags.initrole = randrole();
+		    flags.initrole = randrole(FALSE);
 #if 0 /* OBSOLETE */
 		    strcpy( pl_character, roles[ rnd( 11 ) ] );
 #endif
@@ -543,7 +543,7 @@ amii_player_selection()
 		switch( gd->GadgetID )
 		{
 		case 1: /* Random Character */
-		    flags.initrole = randrole();
+		    flags.initrole = randrole(FALSE);
 #if 0 /* OBSOLETE */
 		    strcpy( pl_character, roles[ rnd( 11 ) ] );
 #endif
@@ -1380,7 +1380,7 @@ amii_player_selection()
                                        flags.initalign, PICK_RANDOM);
             if (flags.initrole < 0) {
                 amii_putstr(WIN_MESSAGE, 0, "Incompatible role!");
-                flags.initrole = randrole();
+                flags.initrole = randrole(FALSE);
             }
         } else {
             /* Prompt for a role */
@@ -1416,7 +1416,7 @@ amii_player_selection()
             any.a_int = pick_role(flags.initrace, flags.initgend,
                                   flags.initalign, PICK_RANDOM) + 1;
             if (any.a_int == 0) /* must be non-zero */
-                any.a_int = randrole() + 1;
+                any.a_int = randrole(FALSE) + 1;
             add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
                      MENU_UNSELECTED);
             any.a_int = i + 1; /* must be non-zero */

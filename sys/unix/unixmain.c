@@ -768,18 +768,18 @@ error:
 unsigned long
 sys_random_seed()
 {
-    unsigned long seed;
+    unsigned long seed = 0L;
     unsigned long pid = (unsigned long) getpid();
     boolean no_seed = TRUE;
 #ifdef DEV_RANDOM
-    FILE *fptr = NULL;
+    FILE *fptr;
 
     fptr = fopen(DEV_RANDOM, "r");
     if (fptr) {
-        fread(&seed, sizeof(long), 1, fptr);
+        fread(&seed, sizeof (long), 1, fptr);
         has_strong_rngseed = TRUE;  /* decl.c */
         no_seed = FALSE;
-        fclose(fptr);
+        (void) fclose(fptr);
     } else {
         /* leaves clue, doesn't exit */
         paniclog("sys_random_seed", "falling back to weak seed");

@@ -17,16 +17,16 @@ struct rnglist_t {
     isaac64_ctx rng_state;
 };
 
-enum {CORE = 0, DISP};
+enum { CORE = 0, DISP = 1 };
 
 static struct rnglist_t rnglist[] = {
-    {rn2, FALSE, {0}},                      /* CORE */
-    {rn2_on_display_rng, FALSE, {0}},       /* DISP */
+    { rn2, FALSE, { 0 } },                      /* CORE */
+    { rn2_on_display_rng, FALSE, { 0 } },       /* DISP */
 };
 
 int
 whichrng(fn)
-int (*fn)(int);
+int FDECL((*fn), (int));
 {
     int i;
 
@@ -39,19 +39,21 @@ int (*fn)(int);
 void
 init_isaac64(seed, fn)
 unsigned long seed;
-int FDECL((*fn),(int));
+int FDECL((*fn), (int));
 {
-    unsigned char new_rng_state[sizeof(seed)];
-    int i, rngindx = whichrng(fn);
+    unsigned char new_rng_state[sizeof seed];
+    unsigned i;
+    int rngindx = whichrng(fn);
 
     if (rngindx < 0)
         panic("Bad rng function passed to init_isaac64().");
 
-    for (i=0; i<sizeof(seed); i++) {
-        new_rng_state[i]= (unsigned char)(seed & 0xFF);
+    for (i = 0; i < sizeof seed; i++) {
+        new_rng_state[i] = (unsigned char) (seed & 0xFF);
         seed >>= 8;
     }
-    isaac64_init(&rnglist[rngindx].rng_state, new_rng_state, sizeof(seed));
+    isaac64_init(&rnglist[rngindx].rng_state, new_rng_state,
+                 (int) sizeof seed);
 }
 
 static int
