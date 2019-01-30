@@ -776,7 +776,7 @@ sys_random_seed()
 
     fptr = fopen(DEV_RANDOM, "r");
     if (fptr) {
-        fread(&seed, sizeof long, 1, fptr);
+        fread(&seed, sizeof (long), 1, fptr);
         has_strong_rngseed = TRUE;  /* decl.c */
         no_seed = FALSE;
         (void) fclose(fptr);
