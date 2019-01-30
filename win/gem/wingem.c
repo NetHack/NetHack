@@ -234,7 +234,7 @@ Gem_player_selection()
             if (flags.initrole < 0) {
                 mar_add_message("Incompatible role!");
                 mar_display_nhwindow(WIN_MESSAGE);
-                flags.initrole = randrole();
+                flags.initrole = randrole(FALSE);
             }
         } else {
             /* Prompt for a role */
@@ -256,7 +256,7 @@ Gem_player_selection()
             any.a_int = pick_role(flags.initrace, flags.initgend,
                                   flags.initalign, PICK_RANDOM) + 1;
             if (any.a_int == 0) /* must be non-zero */
-                any.a_int = randrole() + 1;
+                any.a_int = randrole(FALSE) + 1;
             add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
                      MENU_UNSELECTED);
             any.a_int = i + 1; /* must be non-zero */
