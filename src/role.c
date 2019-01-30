@@ -787,9 +787,16 @@ int rolenum;
 }
 
 int
-randrole()
+randrole(for_display)
+boolean for_display;
 {
-    return rn2(SIZE(roles) - 1);
+    int res = SIZE(roles) - 1;
+
+    if (for_display)
+        res = rn2_on_display_rng(res);
+    else
+        res = rn2(res);
+    return res;
 }
 
 STATIC_OVL int
@@ -805,7 +812,7 @@ randrole_filtered()
             && ok_gend(i, ROLE_NONE, ROLE_RANDOM, ROLE_NONE)
             && ok_align(i, ROLE_NONE, ROLE_NONE, ROLE_RANDOM))
             set[n++] = i;
-    return n ? set[rn2(n)] : randrole();
+    return n ? set[rn2(n)] : randrole(FALSE);
 }
 
 int
@@ -2088,7 +2095,7 @@ role_init()
     if (flags.pantheon == -1) {             /* new game */
         flags.pantheon = flags.initrole;    /* use own gods */
         while (!roles[flags.pantheon].lgod) /* unless they're missing */
-            flags.pantheon = randrole();
+            flags.pantheon = randrole(FALSE);
     }
     if (!urole.lgod) {
         urole.lgod = roles[flags.pantheon].lgod;
