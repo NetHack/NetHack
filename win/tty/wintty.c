@@ -512,7 +512,7 @@ tty_player_selection()
                     k = pick_role(RACE, GEND, ALGN, PICK_RANDOM);
                     if (k < 0) {
                         tty_putstr(BASE_WINDOW, 0, "Incompatible role!");
-                        k = randrole();
+                        k = randrole(FALSE);
                     }
                 } else {
                     /* Prompt for a role */
@@ -574,7 +574,7 @@ tty_player_selection()
                     } else if (choice == ROLE_RANDOM) {
                         k = pick_role(RACE, GEND, ALGN, PICK_RANDOM);
                         if (k < 0)
-                            k = randrole();
+                            k = randrole(FALSE);
                     } else {
                         k = choice - 1;
                     }

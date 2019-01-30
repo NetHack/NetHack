@@ -549,7 +549,7 @@ mac_askname()
         currrole = flags.initrole;
     /* Check for backward compatibility */
     else if ((currrole = str2role(pl_character)) < 0)
-        currrole = randrole();
+        currrole = randrole(FALSE);
 
     /* Initialize the race popup menu */
     if (!(askmenu[RSRC_ASK_RACE] = NewMenu(RSRC_ASK_RACE, "\p")))
