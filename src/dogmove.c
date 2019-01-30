@@ -971,8 +971,18 @@ dog_move(register struct monst *mtmp,
         if ((info[i] & ALLOW_M) && MON_AT(nx, ny)) {
             int mstatus;
             register struct monst *mtmp2 = m_at(nx, ny);
+            /* weight the audacity of the pet to attack a differently-leveled
+             * foe based on its fraction of max HP:
+             *       100%:  up to level + 2
+             * 80% and up:  up to level + 1
+             * 60% to 80%:  up to level
+             * 40% to 60%:  up to level - 1
+             * 25% to 40%:  up to level - 2
+             *  below 25%:  prevented from attacking at all by a different case
+             */
+            int balk = mtmp->m_lev + ((5 * mtmp->mhp) / mtmp->mhpmax) - 2;
 
-            if ((int) mtmp2->m_lev >= (int) mtmp->m_lev + 2
+            if ((int) mtmp2->m_lev >= balk
                 || (mtmp2->data == &mons[PM_FLOATING_EYE] && rn2(10)
                     && mtmp->mcansee && haseyes(mtmp->data) && mtmp2->mcansee
                     && (perceives(mtmp->data) || !mtmp2->minvis))
