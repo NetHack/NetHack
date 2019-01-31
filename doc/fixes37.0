@@ -115,6 +115,7 @@ auto-id scroll of remove curse when a known buc-state was changed
 demon lords hate Demonbane
 pets avoid eating shapeshifter corpses unless starving or nearly feral
 blessed scroll of teleportation gives a single controlled teleport
+allow opening a tin without interruption if slimed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
