@@ -852,6 +852,7 @@ STATIC_DCL struct tm *NDECL(getlt);
 
 /* Sets the seed for the random number generator */
 #ifdef USE_ISAAC64
+
 static void
 set_random(seed, fn)
 unsigned long seed;
@@ -859,11 +860,14 @@ int FDECL((*fn), (int));
 {
     init_isaac64(seed, fn);
 }
+
 #else /* USE_ISAAC64 */
+
+/*ARGSUSED*/
 static void
 set_random(seed, fn)
 unsigned long seed;
-int FDECL((*fn),(int));
+int FDECL((*fn), (int)) UNUSED;
 {
     /* the types are different enough here that sweeping the different
      * routine names into one via #defines is even more confusing
@@ -886,6 +890,7 @@ int FDECL((*fn),(int));
 #  endif
 # endif
 }
+
 #endif /* USE_ISAAC64 */
 
 /* An appropriate version of this must always be provided in
@@ -899,7 +904,7 @@ extern unsigned long NDECL(sys_random_seed);
  */
 void
 init_random(fn)
-int FDECL((*fn),(int));
+int FDECL((*fn), (int));
 {
     set_random(sys_random_seed(), fn);
 }
@@ -907,7 +912,7 @@ int FDECL((*fn),(int));
 /* Reshuffles the random number generator. */
 void
 reseed_random(fn)
-int FDECL((*fn),(int));
+int FDECL((*fn), (int));
 {
    /* only reseed if we are certain that the seed generation is unguessable
     * by the players. */
