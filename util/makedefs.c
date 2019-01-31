@@ -145,7 +145,9 @@ static char xclear[MAX_ROW][MAX_COL];
 #endif
 /*-end of vision defs-*/
 
-static char filename[600];
+#define MAXFNAMELEN 600
+
+static char filename[MAXFNAMELEN];
 
 #ifdef FILE_PREFIX
 /* if defined, a first argument not starting with - is
@@ -904,7 +906,7 @@ int *rumor_count;
 long *rumor_size;
 unsigned long old_rumor_offset;
 {
-    char infile[600];
+    char infile[MAXFNAMELEN];
     char *line;
     unsigned long rumor_offset;
 
@@ -1003,7 +1005,7 @@ do_rumors()
     char *line;
     static const char rumors_header[] =
         "%s%04d,%06ld,%06lx;%04d,%06ld,%06lx;0,0,%06lx\n";
-    char tempfile[600];
+    char tempfile[MAXFNAMELEN];
     int true_rumor_count, false_rumor_count;
     long true_rumor_size, false_rumor_size;
     unsigned long true_rumor_offset, false_rumor_offset, eof_offset;
@@ -1046,7 +1048,7 @@ do_rumors()
         goto rumors_failure;
 
     /* get ready to transfer the contents of temp file to output file */
-    line = malloc(256);
+    line = malloc(BUFSZ + MAXFNAMELEN);
     Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0) {
         perror(line);
@@ -1421,7 +1423,7 @@ char *githash, *gitbranch;
 {
     FILE *gifp;
     size_t len;
-    char infile[600];
+    char infile[MAXFNAMELEN];
     char *line, *strval, *opt, *c, *end;
     boolean havebranch = FALSE, havehash = FALSE;
 
@@ -1479,7 +1481,7 @@ void
 do_fix_sampleconfig()
 {
     FILE *scfp, *ofcfp;
-    char fixedline[600];
+    char fixedline[BUFSZ];
     char *line;
 
     if (!(scfp = fopen(SAMPLE_CONFIGFILE, RDTMODE))) {
@@ -1492,7 +1494,7 @@ do_fix_sampleconfig()
     /* read the sample config file */
     while ((line = fgetline(scfp)) != 0) {
         /* comment out the STATUS_HILITES related lines */
-        if (strlen(line) < (600 - 1)) {
+        if (strlen(line) < (BUFSZ - 1)) {
             if (strstr(line, "statushilites") || strstr(line, "hilite_status:")) {
 #ifdef FIX_SAMPLECONFIG
                 fixedline[0] = '#';
@@ -1502,7 +1504,7 @@ do_fix_sampleconfig()
 #endif
                 fputs(fixedline, ofcfp);
 	    } else {
-                fputs(line, ofcfp);	        
+                fputs(line, ofcfp);
 	    }
 	}
         free(line);
@@ -1983,7 +1985,7 @@ do_data()
     Fclose(ifp); /* all done with original input file */
 
     /* reprocess the scratch file; 1st format an error msg, just in case */
-    line = malloc(256);
+    line = malloc(BUFSZ + MAXFNAMELEN);
     Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0)
         goto dead_data;
@@ -1999,7 +2001,7 @@ do_data()
     Unlink(tempfile); /* remove it */
 
     /* update the first record of the output file; prepare error msg 1st */
-    line = malloc(256);
+    line = malloc(BUFSZ + MAXFNAMELEN);
     Sprintf(line, "rewind of \"%s\"", filename);
     ok = (rewind(ofp) == 0);
     if (ok) {
@@ -2156,7 +2158,7 @@ do_oracles()
     Fclose(ifp); /* all done with original input file */
 
     /* reprocess the scratch file; 1st format an error msg, just in case */
-    line = malloc(256);
+    line = malloc(BUFSZ + MAXFNAMELEN);
     Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0)
         goto dead_data;
@@ -2172,7 +2174,7 @@ do_oracles()
     Unlink(tempfile); /* remove it */
 
     /* update the first record of the output file; prepare error msg 1st */
-    line = malloc(256);
+    line = malloc(BUFSZ + MAXFNAMELEN);
     Sprintf(line, "rewind of \"%s\"", filename);
     ok = (rewind(ofp) == 0);
     if (ok) {
