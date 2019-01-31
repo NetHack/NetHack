@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.241 $ $NHDT-Date: 1548937318 2019/01/31 12:21:58 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.242 $ $NHDT-Date: 1548978603 2019/01/31 23:50:03 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -357,6 +357,8 @@ smudging of an engraving has been relocated to after a succesful move
 	subject to the smudging
 monster with multiple items in inventory could trigger 'dealloc_obj with nobj'
 	panic when turned into a statue if separate mon->minvent items merged
+lock picking context could end up with stale container pointer if container
+	being forced/unlocked/locked got destroyed or sent to another level
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
