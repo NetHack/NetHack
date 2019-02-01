@@ -1227,6 +1227,8 @@ int mmflags;
 
     if (In_sokoban(&u.uz) && !mindless(ptr)) /* know about traps here */
         mtmp->mtrapseen = (1L << (PIT - 1)) | (1L << (HOLE - 1));
+    if (Is_stronghold(&u.uz) && !mindless(ptr)) /* know about the trap doors */
+        mtmp->mtrapseen = (1L << (TRAPDOOR - 1));
     /* quest leader and nemesis both know about all trap types */
     if (ptr->msound == MS_LEADER || ptr->msound == MS_NEMESIS)
         mtmp->mtrapseen = ~0;
