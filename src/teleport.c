@@ -682,23 +682,34 @@ boolean break_the_rules; /* True: wizard mode ^T */
     boolean trap_once = FALSE;
 
     trap = t_at(u.ux, u.uy);
-    if (trap && (!trap->tseen || trap->ttyp != TELEP_TRAP))
+    if (trap && !trap->tseen)
         trap = 0;
 
     if (trap) {
-        trap_once = trap->once; /* trap may get deleted, save this */
-        if (trap->once) {
-            pline("This is a vault teleport, usable once only.");
-            if (yn("Jump in?") == 'n') {
-                trap = 0;
-            } else {
-                deltrap(trap);
-                newsym(u.ux, u.uy);
+        if (trap->ttyp == LEVEL_TELEP && trap->tseen) {
+            if (yn("There is a level teleporter here. Trigger it?") == 'y') {
+                level_tele_trap(trap, FORCETRAP);
+                /* deliberate jumping will always take time even if it doesn't
+                 * work */
+                return 1;
+            } else
+                trap = 0; /* continue with normal horizontal teleport */
+        } else if (trap->ttyp == TELEP_TRAP) {
+            trap_once = trap->once; /* trap may get deleted, save this */
+            if (trap->once) {
+                pline("This is a vault teleport, usable once only.");
+                if (yn("Jump in?") == 'n') {
+                    trap = 0;
+                } else {
+                    deltrap(trap);
+                    newsym(u.ux, u.uy);
+                }
             }
-        }
-        if (trap)
-            You("%s onto the teleportation trap.",
-                locomotion(g.youmonst.data, "jump"));
+            if (trap)
+                You("%s onto the teleportation trap.",
+                    locomotion(g.youmonst.data, "jump"));
+        } else
+            trap = 0;
     }
     if (!trap) {
         boolean castit = FALSE;
@@ -1112,19 +1123,21 @@ struct trap *trap;
 unsigned trflags;
 {
     char verbbuf[BUFSZ];
+    boolean intentional = FALSE;
 
-    if ((trflags & VIASITTING) != 0)
+    if ((trflags & (VIASITTING|FORCETRAP)) != 0) {
         Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
-    else
+        intentional = TRUE;
+    } else
         Sprintf(verbbuf, "%s onto",
                 Levitation ? (const char *) "float"
                            : locomotion(g.youmonst.data, "step"));
     You("%s a level teleport trap!", verbbuf);
 
-    if (Antimagic) {
+    if (Antimagic && !intentional) {
         shieldeff(u.ux, u.uy);
     }
-    if (Antimagic || In_endgame(&u.uz)) {
+    if ((Antimagic && !intentional) || In_endgame(&u.uz)) {
         You_feel("a wrenching sensation.");
         return;
     }
