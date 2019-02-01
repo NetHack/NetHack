@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1547849604 2019/01/18 22:13:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1548978606 2019/01/31 23:50:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.154 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -911,6 +911,8 @@ register struct obj *obj, *merge;
         book_disappears(obj);
     if (Has_contents(obj))
         delete_contents(obj);
+    if (Is_container(obj))
+        maybe_reset_pick(obj);
 
     shkp = 0;
     if (obj->unpaid) {

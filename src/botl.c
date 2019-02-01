@@ -3030,8 +3030,8 @@ choose_value:
                   op, aval.a_int, is_out_of_range);
             goto choose_value;
         } else if (dt == ANY_LONG
-                   && (aval.a_long < (lt_gt_eq == GT_VALUE) ? -1L
-                                     : (lt_gt_eq == LT_VALUE) ? 1L : 0L)) {
+                   && (aval.a_long < ((lt_gt_eq == GT_VALUE) ? -1L
+                                      : (lt_gt_eq == LT_VALUE) ? 1L : 0L))) {
             pline("%s'%s%ld'%s", threshold_value,
                   op, aval.a_long, is_out_of_range);
             goto choose_value;

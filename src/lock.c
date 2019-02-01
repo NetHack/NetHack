@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1547086531 2019/01/10 02:15:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1548978605 2019/01/31 23:50:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -244,10 +244,14 @@ forcelock(VOID_ARGS)
         return 1; /* still busy */
 
     You("succeed in forcing the lock.");
+    exercise(g.xlock.picktyp ? A_DEX : A_STR, TRUE);
+    /* breakchestlock() might destroy g.xlock.box; if so, g.xlock context will
+       be cleared (delobj -> obfree -> maybe_reset_pick); but it might not,
+       so explicitly clear that manually */
     breakchestlock(g.xlock.box, (boolean) (!g.xlock.picktyp && !rn2(3)));
+    reset_pick(); /* lock-picking context is no longer valid */
 
-    exercise((g.xlock.picktyp) ? A_DEX : A_STR, TRUE);
-    return ((g.xlock.usedtime = 0));
+    return 0;
 }
 
 void
@@ -255,15 +259,28 @@ reset_pick()
 {
     g.xlock.usedtime = g.xlock.chance = g.xlock.picktyp = 0;
     g.xlock.magic_key = FALSE;
-    g.xlock.door = 0;
-    g.xlock.box = 0;
+    g.xlock.door = (struct rm *) 0;
+    g.xlock.box = (struct obj *) 0;
 }
 
-/* level change; don't reset if hero is carrying xlock.box with him/her */
+/* level change or object deletion; context may no longer be valid */
 void
-maybe_reset_pick()
+maybe_reset_pick(container)
+struct obj *container; /* passed from obfree() */
 {
-    if (!g.xlock.box || !carried(g.xlock.box))
+    /*
+     * If a specific container, only clear context if it is for that
+     * particular container (which is being deleted).  Other stuff on
+     * the current dungeon level remains valid.
+     * However if 'container' is Null, clear context if not carrying
+     * g.xlock.box (which might be Null if context is for a door).
+     * Used for changing levels, where a floor container or a door is
+     * being left behind and won't be valid on the new level but a
+     * carried container will still be.  There might not be any context,
+     * in which case redundantly clearing it is harmless.
+     */
+    if (container ? (container == g.xlock.box)
+                  : (!g.xlock.box || !carried(g.xlock.box)))
         reset_pick();
 }
 
