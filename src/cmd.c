@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1547512504 2019/01/15 00:35:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.328 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1548978603 2019/01/31 23:50:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.330 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -823,7 +823,7 @@ wiz_makemap(VOID_ARGS)
             unplacebc();
         }
         /* reset lock picking unless it's for a carried container */
-        maybe_reset_pick();
+        maybe_reset_pick((struct obj *) 0);
         /* reset interrupted digging if it was taking place on this level */
         if (on_level(&context.digging.level, &u.uz))
             (void) memset((genericptr_t) &context.digging, 0,

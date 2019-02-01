@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1548208236 2019/01/23 01:50:36 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.277 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1548937318 2019/01/31 12:21:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.278 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2213,6 +2213,7 @@ struct monst *mdef;
             otmp = oname(otmp, MNAME(mdef));
         while ((obj = oldminvent) != 0) {
             oldminvent = obj->nobj;
+            obj->nobj = 0; /* avoid merged-> obfree-> dealloc_obj-> panic */
             (void) add_to_container(otmp, obj);
         }
         /* Archeologists should not break unique statues */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1547680082 2019/01/16 23:08:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.186 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1548978604 2019/01/31 23:50:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.189 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1322,7 +1322,7 @@ boolean at_stairs, falling, portal;
        for lock-picking, container may be carried, in which case we
        keep context; if on the floor, it's about to be saved+freed and
        maybe_reset_pick() needs to do its carried() check before that */
-    maybe_reset_pick();
+    maybe_reset_pick((struct obj *) 0);
     reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
     iflags.travelcc.x = iflags.travelcc.y = 0; /* travel destination cache */
     context.polearm.hitmon = (struct monst *) 0; /* polearm target */
