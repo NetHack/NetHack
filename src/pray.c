@@ -157,7 +157,7 @@ stuck_in_wall()
             y = u.uy + j;
             if (!isok(x, y)
                 || (IS_ROCK(levl[x][y].typ)
-                    && (levl[x][y].typ != SDOOR || levl[x][y].typ != SCORR))
+                    && (levl[x][y].typ != SDOOR && levl[x][y].typ != SCORR))
                 || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
                 ++count;
         }
