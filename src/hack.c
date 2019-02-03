@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1549157812 2019/02/03 01:36:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1549231692 2019/02/03 22:08:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2270,8 +2270,8 @@ register int typewanted;
     register struct rm *lev;
 
 #define goodtype(rno) \
-    (!typewanted                                                         \
-     || (typefound = (rooms[rno - ROOMOFFSET].rtype == typewanted)) != 0 \
+    (!typewanted                                                   \
+     || (typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted  \
      || (typewanted == SHOPBASE && typefound > SHOPBASE))
 
     switch (rno = levl[x][y].roomno) {
