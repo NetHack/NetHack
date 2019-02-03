@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.242 $ $NHDT-Date: 1548978603 2019/01/31 23:50:03 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.245 $ $NHDT-Date: 1549157810 2019/02/03 01:36:50 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -359,6 +359,12 @@ monster with multiple items in inventory could trigger 'dealloc_obj with nobj'
 	panic when turned into a statue if separate mon->minvent items merged
 lock picking context could end up with stale container pointer if container
 	being forced/unlocked/locked got destroyed or sent to another level
+teleporting out a vault after guard appears could result in the guard being
+	stranded in a one-square long temporary corridor adjacent to vault
+	wall and periodically saying "Move along!"
+if game ends while hero is in a vault wall breach or in guard's temporary
+	corridor, a message "you are encased in the rock" could be given when
+	guard repairs things (for possible bones); suppress it if hero is dead
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -372,6 +378,7 @@ orctown: orcs beyond the mines were being given any left-over booty and named
 	as part of the same marauding gang operating within the mines
 make long extended commands list be more navigable
 simplify #wizidentify; don't rely on having bold menu entries
+add object class group accelerators to #wizidentify
 ensure tmp_at() structures are initialized for all code paths when swallowed
 trapped-vs-levitation/flying change broke Sting releasing hero from web
 life-saving while poly'd and Unchanging wasn't restoring u.mh (HP as monster)
@@ -547,6 +554,7 @@ in wizard mode, ^T can be preceded by 'm' prefix in order to test teleporting
 	without having wizard mode override various restrictions
 include isaac64 for pseudo random number generation
 core prng and display prng use different contexts
+when healing magic other than unicorn horn cures blindness, cure deafness too
 
 
 NetHack Community Patches (or Variation) Included
