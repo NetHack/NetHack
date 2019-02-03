@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1545269451 2018/12/20 01:30:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1549157816 2019/02/03 01:36:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,7 +10,6 @@ STATIC_DCL void FDECL(blackout, (int, int));
 STATIC_DCL void FDECL(restfakecorr, (struct monst *));
 STATIC_DCL void FDECL(parkguard, (struct monst *));
 STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *, int, int));
-STATIC_DCL struct monst *NDECL(findgd);
 STATIC_DCL boolean FDECL(find_guard_dest, (struct monst *, xchar *, xchar *));
 STATIC_DCL void FDECL(move_gold, (struct obj *, int));
 STATIC_DCL void FDECL(wallify_vault, (struct monst *));
@@ -104,7 +103,9 @@ boolean forceshow;
     }
     if (sawcorridor)
         pline_The("corridor disappears.");
-    if (IS_ROCK(levl[u.ux][u.uy].typ))
+    /* only give encased message if hero is still alive (might get here
+       via paygd() when game is over; died: no message, quit: message) */
+    if (IS_ROCK(levl[u.ux][u.uy].typ) && (Upolyd ? u.mh : u.uhp) > 0)
         You("are encased in rock.");
     return TRUE;
 }
@@ -199,7 +200,6 @@ int x, y;
     return FALSE;
 }
 
-STATIC_OVL
 struct monst *
 findgd()
 {
@@ -231,6 +231,33 @@ char *array;
         if (rooms[*ptr - ROOMOFFSET].rtype == VAULT)
             return *ptr;
     return '\0';
+}
+
+/* hero has teleported out of vault while a guard is active */
+void
+uleftvault(grd)
+struct monst *grd;
+{
+    /* only called if caller has checked vault_occupied() and findgd() */
+    if (!grd || !grd->isgd || DEADMONSTER(grd)) {
+        impossible("escaping vault without guard?");
+        return;
+    }
+    /* if carrying gold and arriving anywhere other than next to the guard,
+       set the guard loose */
+    if ((money_cnt(invent) || hidden_gold())
+        && um_dist(grd->mx, grd->my, 1)) {
+        if (grd->mpeaceful) {
+            if (canspotmon(grd)) /* see or sense via telepathy */
+                pline("%s becomes irate.", Monnam(grd));
+            grd->mpeaceful = 0; /* bypass setmangry() */
+        }
+        /* if arriving outside guard's temporary corridor, give the
+           guard an extra move to deliver message(s) and to teleport
+           out of and remove that corridor */
+        if (!in_fcorridor(grd, u.ux, u.uy))
+            (void) gd_move(grd);
+    }
 }
 
 STATIC_OVL boolean
