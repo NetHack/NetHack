@@ -186,7 +186,7 @@ const char *str;
         if (cw->data[cw->cury] == NULL)
             panic("NULL pointer for status window");
         ob = &cw->data[cw->cury][j = cw->curx];
-        if (flags.botlx)
+        if (context.botlx)
             *ob = 0;
 
         /* Display when beam at top to avoid flicker... */
