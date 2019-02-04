@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1546987367 2019/01/08 22:42:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.140 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1549321230 2019/02/04 23:00:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.143 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -379,7 +379,7 @@ int x, y, gloc;
                     || IS_UNEXPLORED_LOC(x, y - 1)));
     case GLOC_VALID:
         if (getpos_getvalid)
-            return (getpos_getvalid(x,y));
+            return (*getpos_getvalid)(x,y);
         /*FALLTHRU*/
     case GLOC_INTERESTING:
         return gather_locs_interesting(x,y, GLOC_DOOR)
@@ -548,7 +548,7 @@ int cx, cy;
         custompline(SUPPRESS_HISTORY,
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
-                     && getpos_getvalid && !getpos_getvalid(cx, cy))
+                     && getpos_getvalid && !(*getpos_getvalid)(cx, cy))
                       ? " (illegal)" : "",
                     (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
                       ? " (no travel path)" : "");
