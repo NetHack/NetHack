@@ -63,10 +63,10 @@ const char *line;
 {
     int attr = ATR_NONE;
 
-    if ((pline_flags & URGENT_MESSAGE) != 0
+    if ((g.pline_flags & URGENT_MESSAGE) != 0
         && (windowprocs.wincap2 & WC2_URGENT_MESG) != 0)
         attr |= ATR_URGENT;
-    if ((pline_flags & SUPPRESS_HISTORY) != 0
+    if ((g.pline_flags & SUPPRESS_HISTORY) != 0
         && (windowprocs.wincap2 & WC2_SUPPRESS_HIST) != 0)
         attr |= ATR_NOHISTORY;
 
@@ -168,7 +168,7 @@ VA_DECL(const char *, line)
     no_repeat = (g.pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
     if ((g.pline_flags & OVERRIDE_MSGTYPE) == 0) {
         msgtyp = msgtype_type(line, no_repeat);
-        if ((pline_flags & URGENT_MESSAGE) == 0
+        if ((g.pline_flags & URGENT_MESSAGE) == 0
             && (msgtyp == MSGTYP_NOSHOW
                 || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg))))
             /* FIXME: we need a way to tell our caller that this message
