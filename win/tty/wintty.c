@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1549327503 2019/02/05 00:45:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.193 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1549333450 2019/02/05 02:24:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2151,6 +2151,7 @@ winid window;
 struct WinDesc *cw;
 {
     int i, n, attr;
+    boolean linestart;
     register char *cp;
 
     for (n = 0, i = 0; i < cw->maxrow; i++) {
@@ -2184,15 +2185,25 @@ struct WinDesc *cw;
                 ++ttyDisplay->curx;
             }
             term_start_attr(attr);
-            for (cp = &cw->data[i][1];
+            for (cp = &cw->data[i][1], linestart = TRUE;
 #ifndef WIN32CON
                  *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-                 cp++)
+                 cp++
 #else
                  *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
-                 cp++, ttyDisplay->curx++)
+                 cp++, ttyDisplay->curx++
 #endif
-                (void) putchar(*cp);
+                 ) {
+                /* message recall for msg_window:full/combination/reverse
+                   might have output from '/' in it (see redotoplin()) */
+                if (linestart && (*cp & 0x80) != 0) {
+                    g_putch(*cp);
+                    end_glyphout();
+                    linestart = FALSE;
+                } else {
+                    (void) putchar(*cp);
+                }
+            }
             term_end_attr(attr);
         }
     }
