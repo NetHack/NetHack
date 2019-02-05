@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1540934784 2018/10/30 21:26:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1549327499 2019/02/05 00:44:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,7 +16,6 @@
 
 STATIC_DCL void FDECL(redotoplin, (const char *));
 STATIC_DCL void FDECL(topl_putsym, (CHAR_P));
-STATIC_DCL void NDECL(remember_topl);
 STATIC_DCL void FDECL(removetopl, (int));
 STATIC_DCL void FDECL(msghistory_snapshot, (BOOLEAN_P));
 STATIC_DCL void FDECL(free_msghistory_snapshot, (BOOLEAN_P));
@@ -144,7 +143,23 @@ const char *str;
         more();
 }
 
-STATIC_OVL void
+/* for use by tty_putstr() */
+void
+show_topl(str)
+const char *str;
+{
+    struct WinDesc *cw = wins[WIN_MESSAGE];
+
+    if (!(cw->flags & WIN_STOP)) {
+        cw->curx = cw->cury = 0;
+        home();
+        cl_end();
+        addtopl(str);
+    }
+}
+
+/* used by update_topl(); also by tty_putstr() */
+void
 remember_topl()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
@@ -231,7 +246,8 @@ register const char *bp;
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
     n0 = strlen(bp);
-    if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP)) && cw->cury == 0
+    if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP))
+        && cw->cury == 0
         && n0 + (int) strlen(toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
         Strcat(toplines, "  ");
