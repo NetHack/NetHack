@@ -805,18 +805,25 @@ register struct monst *mtmp;
             pline_msg = "talks about spellcraft.";
         else if (ptr->mlet == S_CENTAUR)
             pline_msg = "discusses hunting.";
-        else if (is_gnome(ptr) && Hallucination && (gnomeplan = rn2(4)) % 2)
-            /* skipped for rn2(4) result of 0 or 2;
-               gag from an early episode of South Park called "Gnomes";
-               initially, Tweek (introduced in that episode) is the only
-               one aware of the tiny gnomes after spotting them sneaking
-               about; they are embarked upon a three-step business plan;
-               a diagram of the plan shows:
-                         Phase 1         Phase 2      Phase 3
-                   Collect underpants       ?          Profit
-               and they never verbalize step 2 so we don't either */
-            verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
-                                         : "Phase three, profit!";
+        else if (is_gnome(ptr)) {
+            if (Hallucination && (gnomeplan = rn2(4)) % 2) {
+                /* skipped for rn2(4) result of 0 or 2;
+                   gag from an early episode of South Park called "Gnomes";
+                   initially, Tweek (introduced in that episode) is the only
+                   one aware of the tiny gnomes after spotting them sneaking
+                   about; they are embarked upon a three-step business plan;
+                   a diagram of the plan shows:
+                               Phase 1         Phase 2      Phase 3
+                         Collect underpants       ?          Profit
+                   and they never verbalize step 2 so we don't either */
+                verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
+                                             : "Phase three, profit!";
+            }
+            else {
+                verbl_msg =
+                  "Many enter the dungeon, and few return to the sunlit lands.";
+            }
+        }
         else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:
