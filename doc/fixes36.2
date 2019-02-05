@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.248 $ $NHDT-Date: 1549333449 2019/02/05 02:24:09 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.249 $ $NHDT-Date: 1549334449 2019/02/05 02:40:49 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -365,6 +365,9 @@ teleporting out a vault after guard appears could result in the guard being
 if game ends while hero is in a vault wall breach or in guard's temporary
 	corridor, a message "you are encased in the rock" could be given when
 	guard repairs things (for possible bones); suppress it if hero is dead
+DUMPLOG: output from '/' (#whatis) and ';' went into ^P message recall history
+	but was missing from DUMPLOG's message history due to special handling
+	for the first character which might be graphical rather than text
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
