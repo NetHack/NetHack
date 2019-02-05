@@ -170,7 +170,7 @@ VA_DECL(const char *, line)
         msgtyp = msgtype_type(line, no_repeat);
         if ((g.pline_flags & URGENT_MESSAGE) == 0
             && (msgtyp == MSGTYP_NOSHOW
-                || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg))))
+                || (msgtyp == MSGTYP_NOREP && !strcmp(line, g.prevmsg))))
             /* FIXME: we need a way to tell our caller that this message
              * was suppressed so that caller doesn't set iflags.last_msg
              * for something that hasn't been shown, otherwise a subsequent
