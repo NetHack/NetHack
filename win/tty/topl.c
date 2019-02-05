@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1549327499 2019/02/05 00:44:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1549333449 2019/02/05 02:24:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -24,9 +24,9 @@ int
 tty_doprev_message()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
-
     winid prevmsg_win;
     int i;
+
     if ((iflags.prevmsg_window != 's')
         && !ttyDisplay->inread) {           /* not single */
         if (iflags.prevmsg_window == 'f') { /* full */
