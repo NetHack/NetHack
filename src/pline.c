@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1541719974 2018/11/08 23:32:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1549327495 2019/02/05 00:44:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,6 +6,7 @@
 #define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers */
 #include "hack.h"
 
+static void FDECL(putmesg, (const char *));
 static char *FDECL(You_buf, (int));
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
 static void FDECL(execplinehandler, (const char *));
@@ -54,6 +55,23 @@ dumplogfreemessages()
     g.saved_pline_index = 0;
 }
 #endif
+
+/* keeps windowprocs usage out of pline() */
+static void
+putmesg(line)
+const char *line;
+{
+    int attr = ATR_NONE;
+
+    if ((pline_flags & URGENT_MESSAGE) != 0
+        && (windowprocs.wincap2 & WC2_URGENT_MESG) != 0)
+        attr |= ATR_URGENT;
+    if ((pline_flags & SUPPRESS_HISTORY) != 0
+        && (windowprocs.wincap2 & WC2_SUPPRESS_HIST) != 0)
+        attr |= ATR_NOHISTORY;
+
+    putstr(WIN_MESSAGE, attr, line);
+}
 
 /* Note that these declarations rely on knowledge of the internals
  * of the variable argument handling stuff in "tradstdc.h"
@@ -150,8 +168,9 @@ VA_DECL(const char *, line)
     no_repeat = (g.pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
     if ((g.pline_flags & OVERRIDE_MSGTYPE) == 0) {
         msgtyp = msgtype_type(line, no_repeat);
-        if (msgtyp == MSGTYP_NOSHOW
-            || (msgtyp == MSGTYP_NOREP && !strcmp(line, g.prevmsg)))
+        if ((pline_flags & URGENT_MESSAGE) == 0
+            && (msgtyp == MSGTYP_NOSHOW
+                || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg))))
             /* FIXME: we need a way to tell our caller that this message
              * was suppressed so that caller doesn't set iflags.last_msg
              * for something that hasn't been shown, otherwise a subsequent
@@ -167,7 +186,7 @@ VA_DECL(const char *, line)
     if (u.ux)
         flush_screen(1); /* %% */
 
-    putstr(WIN_MESSAGE, 0, line);
+    putmesg(line);
 
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
     execplinehandler(line);
