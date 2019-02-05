@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.245 $ $NHDT-Date: 1549157810 2019/02/03 01:36:50 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.246 $ $NHDT-Date: 1549327954 2019/02/05 00:52:34 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -479,6 +479,8 @@ tty: support BL_RESET in status_update to force an update to all status fields
 tty: stop hitpointbar from jumping to 100% health at zero hit points
 tty: try harder to prevent a disconnected terminal (SIGHUP) from running amok
 	and using up all available CPU time
+tty: suppress intermediate 'Count: 123' prompt and getpos autodescribe
+	feedback from being included in ^P message recall
 MacOSX: add curses window port
 MacOSX: add Xcode project to sys/unixNetHack.xcodeproj
 MacOSX: add Xcode supporting files README.xcode and XCode.xcconfig

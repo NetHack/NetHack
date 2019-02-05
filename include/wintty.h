@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.h	$NHDT-Date: 1433806583 2015/06/08 23:36:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	wintty.h	$NHDT-Date: 1549327485 2019/02/05 00:44:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.32 $ */
 /* Copyright (c) David Cohrs, 1991,1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -164,6 +164,8 @@ E int FDECL(has_color, (int color));
 
 /* ### topl.c ### */
 
+E void FDECL(show_topl, (const char *));
+E void NDECL(remember_topl);
 E void FDECL(addtopl, (const char *));
 E void NDECL(more);
 E void FDECL(update_topl, (const char *));

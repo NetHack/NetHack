@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1547514631 2019/01/15 01:10:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1549327459 2019/02/05 00:44:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -402,6 +402,7 @@ enum explosion_types {
 #define PLINE_NOREPEAT   1
 #define OVERRIDE_MSGTYPE 2
 #define SUPPRESS_HISTORY 4
+#define URGENT_MESSAGE   8
 
 /* Macros for messages referring to hands, eyes, feet, etc... */
 enum bodypart_types {
