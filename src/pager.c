@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1546656415 2019/01/05 02:46:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1549334449 2019/02/05 02:40:49 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1242,6 +1242,21 @@ coord *click_cc;
         if (found) {
             /* use putmixed() because there may be an encoded glyph present */
             putmixed(WIN_MESSAGE, 0, out_str);
+#ifdef DUMPLOG
+            {
+                char dmpbuf[BUFSZ];
+
+                /* putmixed() bypasses pline() so doesn't write to DUMPLOG;
+                   tty puts it into ^P recall, so it ought to be there;
+                   DUMPLOG is plain text, so override graphics character;
+                   at present, force space, but we ought to use defsyms[]
+                   value for the glyph the graphics character came from */
+                (void) decode_mixed(dmpbuf, out_str);
+                if (dmpbuf[0] < ' ' || dmpbuf[0] >= 127) /* ASCII isprint() */
+                    dmpbuf[0] = ' ';
+                dumplogmsg(dmpbuf);
+            }
+#endif
 
             /* check the data file for information about this thing */
             if (found == 1 && ans != LOOK_QUICK && ans != LOOK_ONCE
