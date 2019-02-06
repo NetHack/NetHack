@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1543745354 2018/12/02 10:09:14 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1549406868 2019/02/05 22:47:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -572,7 +572,9 @@ STATIC_PTR int
 Shield_on(VOID_ARGS)
 {
     /* no shield currently requires special handling when put on, but we
-       keep this uncommented in case somebody adds a new one which does */
+       keep this uncommented in case somebody adds a new one which does
+       [reflection is handled by setting u.uprops[REFLECTION].extrinsic
+       in setworn() called by armor_or_accessory_on() before Shield_on()] */
     switch (uarms->otyp) {
     case SMALL_SHIELD:
     case ELVEN_SHIELD:
@@ -648,14 +650,15 @@ Shirt_off(VOID_ARGS)
     return 0;
 }
 
-/* This must be done in worn.c, because one of the possible intrinsics
- * conferred is fire resistance, and we have to immediately set
- * HFire_resistance in worn.c since worn.c will check it before returning.
- */
 STATIC_PTR
 int
 Armor_on(VOID_ARGS)
 {
+    /*
+     * No suits require special handling.  Special properties conferred by
+     * suits are set up as intrinsics (actually 'extrinsics') by setworn()
+     * which is called by armor_or_accessory_on() before Armor_on().
+     */
     return 0;
 }
 
@@ -669,7 +672,10 @@ Armor_off(VOID_ARGS)
 }
 
 /* The gone functions differ from the off functions in that if you die from
- * taking it off and have life saving, you still die.
+ * taking it off and have life saving, you still die.  [Obsolete reference
+ * to lack of fire resistance being fatal in hell (nethack 3.0) and life
+ * saving putting a removed item back on to prevent that from immediately
+ * repeating.]
  */
 int
 Armor_gone()
@@ -920,7 +926,7 @@ register struct obj *obj;
         goto adjust_attrib;
     case RIN_ADORNMENT:
         which = A_CHA;
-    adjust_attrib:
+ adjust_attrib:
         old_attrib = ACURR(which);
         ABON(which) += obj->spe;
         observable = (old_attrib != ACURR(which));
@@ -1034,7 +1040,7 @@ boolean gone;
         goto adjust_attrib;
     case RIN_ADORNMENT:
         which = A_CHA;
-    adjust_attrib:
+ adjust_attrib:
         old_attrib = ACURR(which);
         ABON(which) -= obj->spe;
         observable = (old_attrib != ACURR(which));
@@ -1082,7 +1088,7 @@ struct obj *obj;
 
 void
 Blindf_on(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     boolean already_blind = Blind, changed = FALSE;
 
@@ -1118,7 +1124,7 @@ register struct obj *otmp;
 
 void
 Blindf_off(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     boolean was_blind = Blind, changed = FALSE;
 
@@ -1902,8 +1908,21 @@ struct obj *obj;
     if (armor) {
         int delay;
 
+        /*
+         * FIXME: [#H8124]
+         *  This (setting 'obj->known=1') takes places as soon as hero
+         *  starts donning armor and sticks even if interrupted before
+         *  finishing.  (Most glaring instance is theft of this armor
+         *  by a nymph but any interruption applies.)
+         *
+         *  Perhaps setworn() (the reason to set obj->known=1) should
+         *  be deferred until the (*aftermv)() action?  But Boots_on()/
+         *  Helmet_on()/&c aren't passed this 'obj', they rely to uarmf/
+         *  uarmh/&c being assigned by setworn() before they're called.
+         */
         obj->known = 1; /* since AC is shown on the status line */
-        /* if the armor is wielded, release it for wearing */
+        /* if the armor is wielded, release it for wearing (won't be
+           welded even if cursed; that only happens for weapons/weptools) */
         if (obj->owornmask & W_WEAPON)
             remove_worn_item(obj, FALSE);
         setworn(obj, mask);
