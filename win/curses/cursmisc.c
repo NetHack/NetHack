@@ -632,7 +632,7 @@ curses_get_count(int first_digit)
             current_count = LARGEST_INT;
         }
 
-        pline("Count: %ld", current_count);
+        custompline(SUPPRESS_HISTORY, "Count: %ld", current_count);
         current_char = curses_read_char();
     }
 
@@ -647,12 +647,16 @@ curses_get_count(int first_digit)
 
 
 /* Convert the given NetHack text attributes into the format curses
-understands, and return that format mask. */
+   understands, and return that format mask. */
 
 int
 curses_convert_attr(int attr)
 {
     int curses_attr;
+
+    /* first, strip off control flags masked onto the display attributes
+       (caller should have already done this...) */
+    attr &= ~(ATR_URGENT | ATR_NOHISTORY);
 
     switch (attr) {
     case ATR_NONE:

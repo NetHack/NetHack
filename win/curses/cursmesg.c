@@ -50,10 +50,20 @@ curses_message_win_puts(const char *message, boolean recursed)
     int border_space = 0;
     static long suppress_turn = -1;
 
+#if 1
+    /*
+     * Handled by core's use of putstr(WIN_MESSAGE,ATR_NOHISTORY,message)
+     * for intermediate counts, but get_count() also uses putmsghistory()
+     * for the final count, to remember that without showing it.  But
+     * curses is using genl_putmsghistory() which just delivers the text
+     * via a normal pline().  This hides that at cost of not having in
+     * it ^P recall and being out of sync with DUMPLOG's message history.
+     */
     if (strncmp("Count:", message, 6) == 0) {
         curses_count_window(message);
         return;
     }
+#endif
 
     if (suppress_turn == moves) {
         return;
@@ -73,7 +83,9 @@ curses_message_win_puts(const char *message, boolean recursed)
     linespace = ((width + border_space) - 3) - mx;
 
     if (strcmp(message, "#") == 0) {    /* Extended command or Count: */
-        if ((strcmp(toplines, "#") != 0) && (my >= (height - 1 + border_space)) && (height != 1)) {     /* Bottom of message window */
+        if ((strcmp(toplines, "#") != 0)
+            /* Bottom of message window */
+            && (my >= (height - 1 + border_space)) && (height != 1)) {
             scroll_window(MESSAGE_WIN);
             mx = width;
             my--;
@@ -89,7 +101,8 @@ curses_message_win_puts(const char *message, boolean recursed)
     }
 
     if (linespace < message_length) {
-        if (my >= (height - 1 + border_space)) {        /* bottom of message win */
+        if (my >= (height - 1 + border_space)) {
+            /* bottom of message win */
             if ((turn_lines > height) || (height == 1)) {
                 /* Pause until key is hit - Esc suppresses any further
                    messages that turn */
@@ -124,8 +137,8 @@ curses_message_win_puts(const char *message, boolean recursed)
         if (height > 1) {
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
         }
-        curses_message_win_puts(tmpstr = curses_str_remainder(message, (width - 2), 1),
-                                TRUE);
+        tmpstr = curses_str_remainder(message, (width - 2), 1);
+        curses_message_win_puts(tmpstr, TRUE);
         free(tmpstr);
     } else {
         mvwprintw(win, my, mx, "%s", message);
@@ -217,7 +230,7 @@ curses_clear_unhighlight_message_window()
 
 
 /* Reset message window cursor to starting position, and display most
-recent messages. */
+   recent messages. */
 
 void
 curses_last_messages()
@@ -236,7 +249,7 @@ curses_last_messages()
 
     for (i = (num_messages - 1); i > 0; i--) {
         mesg = get_msg_line(TRUE, i);
-        if (mesg && mesg->str && strcmp(mesg->str, ""))
+        if (mesg && mesg->str && *mesg->str)
             curses_message_win_puts(mesg->str, TRUE);
     }
     curses_message_win_puts(toplines, TRUE);
@@ -293,8 +306,10 @@ curses_prev_mesg()
 }
 
 
-/* Shows Count: at the bottom of the message window,
-   popup_dialog is not currently implemented for this function */
+/* Display at the bottom of the message window without remembering the
+   line for ^P recall.  Used for putstr(WIN_MESSAGE,ATR_NOHISTORY,text)
+   which core currently uses for 'Count: 123' and dolook's autodescribe.
+   popup_dialog is not currently implemented for this function. */
 
 void
 curses_count_window(const char *count_text)
@@ -303,13 +318,12 @@ curses_count_window(const char *count_text)
     int messageh, messagew;
     static WINDOW *countwin = NULL;
 
-    if ((count_text == NULL) && (countwin != NULL)) {
-        delwin(countwin);
-        countwin = NULL;
+    if (!count_text) {
+        if (countwin)
+             delwin(countwin), countwin = NULL;
         counting = FALSE;
         return;
     }
-
     counting = TRUE;
 
     curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
@@ -322,18 +336,14 @@ curses_count_window(const char *count_text)
 
     winy += messageh - 1;
 
-    if (countwin == NULL) {
-#ifndef PDCURSES
-        countwin = newwin(1, 25, winy, winx);
-#endif /* !PDCURSES */
-    }
 #ifdef PDCURSES
-    else {
-        curses_destroy_win(countwin);
-    }
-
-    countwin = newwin(1, 25, winy, winx);
+    if (countwin)
+        curses_destroy_win(countwin), countwin = NULL;
 #endif /* PDCURSES */
+    /* this used to specify a width of 25; that was adequate for 'Count: 123'
+       but not for dolook's autodescribe when it refers to a named monster */
+    if (!countwin)
+        countwin = newwin(1, messagew, winy, winx);
     startx = 0;
     starty = 0;
 
