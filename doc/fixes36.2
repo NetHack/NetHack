@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.249 $ $NHDT-Date: 1549334449 2019/02/05 02:40:49 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.251 $ $NHDT-Date: 1549586901 2019/02/08 00:48:21 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -437,6 +437,11 @@ tty: fix leftover display artifact when the last field on the row got placed
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
 X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
+curses: catch up with tty to not put dolook/whatis autodescribe feedback into
+	^P message recall (multi-digit count feedback was already handled)
+curses: if the interface code ran out of memory, it would crash rather than
+	attempt a controlled panic (which is fairly likely crash anyway if
+	done when there's no memory available)
 
 
 Platform- and/or Interface-Specific Fixes or Features
