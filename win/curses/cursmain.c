@@ -20,8 +20,9 @@ struct window_procs curses_procs = {
 #if defined(STATUS_HILITES)
      | WC2_HILITE_STATUS
 #endif
-     |  WC2_HITPOINTBAR | WC2_FLUSH_STATUS
-     |  WC2_TERM_SIZE | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR),
+     | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
+     | WC2_TERM_SIZE | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR
+     | WC2_SUPPRESS_HIST),
     curses_init_nhwindows,
     curses_player_selection,
     curses_askname,
@@ -377,10 +378,19 @@ Attributes
 void
 curses_putstr(winid wid, int attr, const char *text)
 {
-    int curses_attr = curses_convert_attr(attr);
+    int mesgflags, curses_attr;
 
-    /* We need to convert NetHack attributes to curses attributes */
-    curses_puts(wid, curses_attr, text);
+    mesgflags = attr & (ATR_URGENT | ATR_NOHISTORY);
+    attr &= ~mesgflags;
+
+    if (wid == WIN_MESSAGE && (mesgflags & ATR_NOHISTORY) != 0) {
+        /* display message without saving it in recall history */
+        curses_count_window(text);
+    } else {
+        /* We need to convert NetHack attributes to curses attributes */
+        curses_attr = curses_convert_attr(attr);
+        curses_puts(wid, curses_attr, text);
+    }
 }
 
 /* Display the file named str.  Complain about missing files
@@ -442,7 +452,10 @@ curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
                 CHAR_P accelerator, CHAR_P group_accel, int attr,
                 const char *str, BOOLEAN_P presel)
 {
-    int curses_attr = curses_convert_attr(attr);
+    int curses_attr;
+
+    attr &= ~(ATR_URGENT | ATR_NOHISTORY);
+    curses_attr = curses_convert_attr(attr);
 
     if (inv_update) {
         curses_add_inv(inv_update, glyph, accelerator, curses_attr, str);
