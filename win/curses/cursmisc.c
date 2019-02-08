@@ -220,12 +220,12 @@ curses_copy_of(const char *s)
 {
     if (!s)
         s = "";
-    return strcpy((char *) alloc((unsigned) (strlen(s) + 1)), s);
+    return dupstr(s);
 }
 
 
 /* Determine the number of lines needed for a string for a dialog window
-of the given width */
+   of the given width */
 
 int
 curses_num_lines(const char *str, int width)
@@ -588,7 +588,7 @@ curses_view_file(const char *filename, boolean must_exist)
 
     wid = curses_get_wid(NHW_MENU);
     curses_create_nhmenu(wid);
-    identifier = malloc(sizeof (anything));
+    identifier = (anything *) alloc(sizeof (anything));
     identifier->a_void = NULL;
 
     while (dlb_fgets(buf, BUFSZ, fp) != NULL) {

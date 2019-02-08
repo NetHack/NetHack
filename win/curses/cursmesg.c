@@ -287,7 +287,7 @@ curses_prev_mesg()
 
     wid = curses_get_wid(NHW_MENU);
     curses_create_nhmenu(wid);
-    identifier = malloc(sizeof (anything));
+    identifier = (anything *) alloc((unsigned) sizeof (anything));
     identifier->a_void = NULL;
 
     for (count = 0; count < num_messages; count++) {
@@ -380,13 +380,13 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     maxy = height - 1 + border_space;
     maxx = width - 1 + border_space;
 
-    tmpbuf = (char *)malloc(strlen(prompt) + buffer + 2);
+    tmpbuf = (char *) alloc((unsigned) ((int) strlen(prompt) + buffer + 2));
     maxlines = buffer / width * 2;
     strcpy(tmpbuf, prompt);
     strcat(tmpbuf, " ");
     nlines = curses_num_lines(tmpbuf,width);
     maxlines += nlines * 2;
-    linestarts = (char **)malloc(sizeof(char*) * maxlines);
+    linestarts = (char **) alloc((unsigned) (sizeof (char *) * maxlines));
     p_answer = tmpbuf + strlen(tmpbuf);
     linestarts[0] = tmpbuf;
 
@@ -573,7 +573,8 @@ static void
 mesg_add_line(char *mline)
 {
     nhprev_mesg *tmp_mesg = NULL;
-    nhprev_mesg *current_mesg = malloc(sizeof (nhprev_mesg));
+    nhprev_mesg *current_mesg = (nhprev_mesg *) alloc((unsigned)
+                                                      (sizeof (nhprev_mesg)));
 
     current_mesg->str = curses_copy_of(mline);
     current_mesg->turn = moves;
