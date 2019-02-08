@@ -473,7 +473,7 @@ curses_get_window_orientation(winid wid)
 void
 curses_puts(winid wid, int attr, const char *text)
 {
-    anything *identifier;
+    anything Id;
     WINDOW *win = NULL;
 
     if (is_main_window(wid)) {
@@ -502,10 +502,8 @@ curses_puts(winid wid, int attr, const char *text)
                        wid);
             return;
         }
-        identifier = (anything *) alloc((unsigned) sizeof (anything));
-        identifier->a_void = NULL;
-        curses_add_nhmenu_item(wid, NO_GLYPH, identifier, 0, 0, attr, text,
-                               FALSE);
+        Id = zeroany;
+        curses_add_nhmenu_item(wid, NO_GLYPH, &Id, 0, 0, attr, text, FALSE);
     } else {
         waddstr(win, text);
         wnoutrefresh(win);

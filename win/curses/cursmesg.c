@@ -281,23 +281,20 @@ curses_prev_mesg()
     int count;
     winid wid;
     long turn = 0;
-    anything *identifier;
+    anything Id;
     nhprev_mesg *mesg;
     menu_item *selected = NULL;
 
     wid = curses_get_wid(NHW_MENU);
     curses_create_nhmenu(wid);
-    identifier = (anything *) alloc((unsigned) sizeof (anything));
-    identifier->a_void = NULL;
+    Id = zeroany;
 
     for (count = 0; count < num_messages; count++) {
         mesg = get_msg_line(TRUE, count);
         if ((turn != mesg->turn) && (count != 0)) {
-            curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-                            "---", FALSE);
+            curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, "---", FALSE);
         }
-        curses_add_menu(wid, NO_GLYPH, identifier, 0, 0, A_NORMAL,
-                        mesg->str, FALSE);
+        curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, mesg->str, FALSE);
         turn = mesg->turn;
     }
 
