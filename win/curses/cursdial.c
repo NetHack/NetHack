@@ -115,6 +115,7 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
                 height++;
             }
         }
+        free(tmpstr);
     }
 
     if (iflags.window_inited) {
@@ -231,9 +232,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
 
         wrefresh(askwin);
     } else {
-        linestr = curses_copy_of(askstr);
-        pline("%s", linestr);
-        free(linestr);
+        pline("%s", askstr);
         curs_set(1);
     }
 
@@ -305,9 +304,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         /* Kludge to make prompt visible after window is dismissed
            when inputting a number */
         if (digit(answer)) {
-            linestr = curses_copy_of(askstr);
-            pline("%s", linestr);
-            free(linestr);
+            pline("%s", askstr);
             curs_set(1);
         }
 
@@ -466,14 +463,16 @@ curses_create_nhmenu(winid wid)
         if (menu_item_ptr != NULL) {
             while (menu_item_ptr->next_item != NULL) {
                 tmp_menu_item = menu_item_ptr->next_item;
+                free((genericptr_t) menu_item_ptr->str);
                 free(menu_item_ptr);
                 menu_item_ptr = tmp_menu_item;
             }
+            free((genericptr_t) menu_item_ptr->str);
             free(menu_item_ptr);        /* Last entry */
             new_menu->entries = NULL;
         }
         if (new_menu->prompt != NULL) { /* Reusing existing menu */
-            free((char *) new_menu->prompt);
+            free((genericptr_t) new_menu->prompt);
         }
         return;
     }
@@ -692,9 +691,11 @@ curses_del_menu(winid wid)
     if (menu_item_ptr != NULL) {
         while (menu_item_ptr->next_item != NULL) {
             tmp_menu_item = menu_item_ptr->next_item;
+            free((genericptr_t) menu_item_ptr->str);
             free(menu_item_ptr);
             menu_item_ptr = tmp_menu_item;
         }
+        free((genericptr_t) menu_item_ptr->str);
         free(menu_item_ptr);    /* Last entry */
         current_menu->entries = NULL;
     }
@@ -711,6 +712,7 @@ curses_del_menu(winid wid)
         tmpmenu->prev_menu = current_menu->prev_menu;
     }
 
+    free((genericptr_t) current_menu->prompt);
     free(current_menu);
 
     curses_del_wid(wid);
@@ -940,8 +942,8 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
 {
     nhmenu_item *menu_item_ptr;
     int count, curletter, entry_cols, start_col, num_lines, footer_x;
+    char *tmpstr;
     boolean first_accel = TRUE;
-
     int color = NO_COLOR;
     int attr = A_NORMAL;
     boolean menu_color = FALSE;
@@ -964,12 +966,13 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
 
     werase(win);
 
-    if (strlen(menu->prompt) > 0) {
+    if (menu->prompt && *menu->prompt) {
         num_lines = curses_num_lines(menu->prompt, menu->width);
 
         for (count = 0; count < num_lines; count++) {
-            mvwprintw(win, count + 1, 1, "%s",
-                      curses_break_str(menu->prompt, menu->width, count + 1));
+            tmpstr = curses_break_str(menu->prompt, menu->width, count + 1);
+            mvwprintw(win, count + 1, 1, "%s", tmpstr);
+            free(tmpstr);
         }
     }
 
@@ -1029,9 +1032,9 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
             start_col += 2;
         }
 #endif
-        if (iflags.use_menu_color && (menu_color = get_menu_coloring
-                                      ((char *) menu_item_ptr->str, &color,
-                                       &attr))) {
+        if (iflags.use_menu_color
+            && (menu_color = get_menu_coloring(menu_item_ptr->str,
+                                               &color, &attr)) != 0) {
             if (color != NO_COLOR) {
                 curses_toggle_color_attr(win, color, NONE, ON);
             }
@@ -1045,11 +1048,12 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
         num_lines = curses_num_lines(menu_item_ptr->str, entry_cols);
 
         for (count = 0; count < num_lines; count++) {
-            if (strlen(menu_item_ptr->str) > 0) {
-                mvwprintw(win, menu_item_ptr->line_num + count + 1,
-                          start_col, "%s", curses_break_str(menu_item_ptr->str,
-                                                            entry_cols,
-                                                            count + 1));
+            if (menu_item_ptr->str && *menu_item_ptr->str) {
+                tmpstr = curses_break_str(menu_item_ptr->str,
+                                          entry_cols, count + 1);
+                mvwprintw(win, menu_item_ptr->line_num + count + 1, start_col,
+                          "%s", tmpstr);
+                free(tmpstr);
             }
         }
         if (menu_color && (color != NO_COLOR)) {

@@ -617,11 +617,11 @@ mesg_add_line(char *mline)
     current_mesg->prev_mesg = last_mesg;
     last_mesg = current_mesg;
 
-
     if (num_messages < max_messages) {
         num_messages++;
     } else {
         tmp_mesg = first_mesg->next_mesg;
+        free(first_mesg->str);
         free(first_mesg);
         first_mesg = tmp_mesg;
     }
