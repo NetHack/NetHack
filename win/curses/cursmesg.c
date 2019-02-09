@@ -281,7 +281,7 @@ curses_prev_mesg()
 
     wid = curses_get_wid(NHW_MENU);
     curses_create_nhmenu(wid);
-    Id = zeroany;
+    Id = cg.zeroany;
 
     for (count = 0; count < num_messages; count++) {
         mesg = get_msg_line(TRUE, count);

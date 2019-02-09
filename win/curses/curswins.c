@@ -502,7 +502,7 @@ curses_puts(winid wid, int attr, const char *text)
                        wid);
             return;
         }
-        Id = zeroany;
+        Id = cg.zeroany;
         curses_add_nhmenu_item(wid, NO_GLYPH, &Id, 0, 0, attr, text, FALSE);
     } else {
         waddstr(win, text);
