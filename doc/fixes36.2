@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.251 $ $NHDT-Date: 1549586901 2019/02/08 00:48:21 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.252 $ $NHDT-Date: 1549666475 2019/02/08 22:54:35 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -442,6 +442,9 @@ curses: catch up with tty to not put dolook/whatis autodescribe feedback into
 curses: if the interface code ran out of memory, it would crash rather than
 	attempt a controlled panic (which is fairly likely crash anyway if
 	done when there's no memory available)
+curses: when getting multi-character responses from player, support <delete>
+	as well as <backspace> to remove last character entered; also, return
+	<escape> to core if ESC is typed when there is no input entered
 
 
 Platform- and/or Interface-Specific Fixes or Features
