@@ -270,8 +270,8 @@ curses_break_str(const char *str, int width, int line_num)
     int last_space, count;
     char *retstr;
     int curline = 0;
-    int strsize = strlen(str) + 1;
-#if __STDC_VERSION__ >= 199901L
+    int strsize = (int) strlen(str) + 1;
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     char substr[strsize];
     char curstr[strsize];
     char tmpstr[strsize];
@@ -317,7 +317,7 @@ curses_break_str(const char *str, int width, int line_num)
         if (substr[count] == '\0') {
             break;
         }
-        for (count = (last_space + 1); (size_t) count < strlen(substr); count++) {
+        for (count = (last_space + 1); count < (int) strlen(substr); count++) {
             tmpstr[count - (last_space + 1)] = substr[count];
         }
         tmpstr[count - (last_space + 1)] = '\0';
