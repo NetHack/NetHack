@@ -266,6 +266,21 @@ curses_init_mesg_history()
     }
 }
 
+/* Delete message history at game end. */
+
+void
+curses_teardown_messages(void)
+{
+    nhprev_mesg *current_mesg;
+
+    while ((current_mesg = first_mesg) != 0) {
+        first_mesg = current_mesg->next_mesg;
+        free(current_mesg->str);
+        free(current_mesg);
+    }
+    last_mesg = (nhprev_mesg *) 0;
+    num_messages = 0;
+}
 
 /* Display previous message window messages in reverse chron order */
 

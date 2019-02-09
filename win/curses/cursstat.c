@@ -57,6 +57,20 @@ curses_status_init()
     genl_status_init();
 }
 
+void
+curses_teardown_status()
+{
+#ifdef STATUS_HILITES
+    int i;
+
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        free(status_vals_long[i]);
+        status_vals_long[i] = (char *) 0;
+    }
+#endif /* STATUS_HILITES */
+    return;
+}
+
 /*
  *  *_status_update()
  *      -- update the value of a status field.

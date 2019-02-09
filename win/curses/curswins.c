@@ -312,7 +312,11 @@ curses_del_nhwin(winid wid)
                    wid);
         return;
     }
-
+    if (wid == MESSAGE_WIN) {
+         curses_teardown_messages();
+    } else if (wid == STATUS_WIN) {
+         curses_teardown_status();
+    }
     nhwins[wid].curwin = NULL;
     nhwins[wid].nhwin = -1;
 }
@@ -562,11 +566,11 @@ curses_alert_main_borders(boolean onoff)
 static boolean
 is_main_window(winid wid)
 {
-    if ((wid == MESSAGE_WIN) || (wid == MAP_WIN) || (wid == STATUS_WIN) || wid == INV_WIN) {
+    if (wid == MESSAGE_WIN || wid == MAP_WIN
+        || wid == STATUS_WIN || wid == INV_WIN)
         return TRUE;
-    } else {
-        return FALSE;
-    }
+
+    return FALSE;
 }
 
 
