@@ -4714,7 +4714,7 @@ Creps\fP, \fBEric Hendrickson\fP, \fBIzchak Miller\fP, \fBJohn Rupley\fP,
 .pg
 NetHack 3.0 was ported to the Atari by \fBEric R. Smith\fP, to OS/2 by
 \fBTimo Hakulinen\fP, and to VMS by \fBDavid Gentzel\fP.  The three of them
-and \fBKevin Darcy\fP later joined the main development team to produce
+and \fBKevin Darcy\fP later joined the main NetHack Development Team to produce
 subsequent revisions of 3.0.
 .pg
 \fBOlaf Seibert\fP ported NetHack 2.3 and 3.0 to the Amiga.
@@ -4725,7 +4725,7 @@ continued to enhance the PC, Macintosh, and Amiga ports through the later
 revisions of 3.0.
 .pg
 Headed by \fBMike Stephenson\fP and coordinated by \fBIzchak Miller\fP and
-\fBJanet Walz\fP, the development team which now included \fBKen Arromdee\fP,
+\fBJanet Walz\fP, the NetHack Development Team which now included \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJean-Christophe Collet\fP, \fBKevin Darcy\fP,
 \fBMatt Day\fP, \fBTimo Hakulinen\fP, \fBSteve Linhart\fP, \fBDean Luick\fP,
 \fBPat Rankin\fP, \fBEric Raymond\fP, and \fBEric Smith\fP undertook a radical
@@ -4757,10 +4757,10 @@ ported NetHack 3.1 to the Atari.  \fBPat Rankin\fP, with help from
 \fBDean Luick\fP, with help from \fBDavid Cohrs\fP, developed NetHack
 3.1 for X11.
 \fBWarwick Allison\fP wrote a tiled version of NetHack for the Atari;
-he later contributed the tiles to the DevTeam and tile support was
+he later contributed the tiles to the NetHack Development Team and tile support was
 then added to other platforms.
 .pg
-The 3.2 development team, comprised of \fBMichael Allison\fP, \fBKen
+The 3.2 NetHack Development Team, comprised of \fBMichael Allison\fP, \fBKen
 Arromdee\fP, \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSteve Creps\fP,
 \fBKevin Darcy\fP, \fBTimo Hakulinen\fP, \fBSteve Linhart\fP, \fBDean
 Luick\fP, \fBPat Rankin\fP, \fBEric Smith\fP, \fBMike Stephenson\fP,
@@ -4769,9 +4769,9 @@ Luick\fP, \fBPat Rankin\fP, \fBEric Smith\fP, \fBMike Stephenson\fP,
 .pg
 Version 3.2 marked the tenth anniversary of the formation of the development
 team.  In a testament to their dedication to the game, all thirteen members
-of the original development team remained on the team at the start of work
+of the original NetHack Development Team remained on the team at the start of work
 on that release.  During the interval between the release of 3.1.3
-and 3.2, one of the founding members of the development team, \fBDr. Izchak
+and 3.2, one of the founding members of the NetHack Development Team, \fBDr. Izchak
 Miller\fP, was diagnosed with cancer and passed away.  That release of the
 game was dedicated to him by the development and porting teams.
 .pg
@@ -4792,12 +4792,12 @@ casting system with the Wizard Patch.
 \fBWarren Cheung\fP combined SLASH with the Wizard Patch to produce Slash'EM,
 and with the help of \fBKevin Hugo\fP, added more features.
 Kevin later joined the
-DevTeam and incorporated the best of these ideas in NetHack 3.3.
+NetHack Development Team and incorporated the best of these ideas in NetHack 3.3.
 .pg
 The final update to 3.2 was the bug fix release 3.2.3, which was released
 simultaneously with 3.3.0 in December 1999 just in time for the Year 2000.
 .pg
-The 3.3 development team, consisting of
+The 3.3 NetHack Development Team, consisting of
 \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSteve Creps\fP, \fBKevin Darcy\fP,
 \fBTimo Hakulinen\fP, \fBKevin Hugo\fP, \fBSteve Linhart\fP, \fBKen Lorber\fP,
@@ -4817,7 +4817,7 @@ available web-site listing all the bugs that had been discovered.  Despite
 that constantly growing bug list, 3.3 proved stable enough to last for
 more than a year and a half.
 .pg
-The 3.4 development team initially consisted of
+The 3.4 NetHack Development Team initially consisted of
 \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBKevin Hugo\fP, \fBKen Lorber\fP,
 \fBDean Luick\fP, \fBPat Rankin\fP, \fBMike Stephenson\fP,
@@ -4857,7 +4857,7 @@ resurrected it for 3.3.1.
 The release of NetHack 3.4.3 in December 2003 marked the beginning of a
 long release hiatus. 3.4.3 proved to be a remarkably stable version that
 provided continued enjoyment by the community for more than a decade. The
-devteam slowly and quietly continued to work on the game behind the scenes
+NetHack Development Team slowly and quietly continued to work on the game behind the scenes
 during the tenure of 3.4.3. It was during that same period that several new
 variants emerged within the NetHack community. Notably sporkhack by
 \fBDerek S. Ray\fP, unnethack by \fBPatric Mueller\fP, nitrohack and its
@@ -4870,21 +4870,21 @@ released publicly by other parties. Since that code was a work-in-progress
 and had not gone through the process of debugging it as a suitable release,
 it was decided that the version numbers present on that code snapshot would
 be retired and never used in an official NetHack release. An announcement
-was posted on the devteam's official nethack.org website to that effect,
+was posted on the NetHack Development Team's official nethack.org website to that effect,
 stating that there would never be a 3.4.4, 3.5, or 3.5.0 official release
 version.
 .pg
 In January 2015, preparation began for the release of NetHack 3.6.
 .pg
 At the beginning of development for what would eventually get released
-as 3.6.0, the development team consisted of \fBWarwick Allison\fP,
+as 3.6.0, the NetHack Development Team consisted of \fBWarwick Allison\fP,
 \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP,
 \fBKen Lorber\fP, \fBDean Luick\fP, \fBPat Rankin\fP,
 \fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
 In early 2015, ahead of the release of 3.6.0, new members
 \fBSean Hunt\fP, \fBPasi Kallinen\fP, and \fBDerek S. Ray\fP
-joined the NetHack development team.
+joined the NetHack Development Team.
 .pg
 Near the end of the development of 3.6.0, one of the significant inspirations for many of
 the humorous and fun features found in the game, author Terry Pratchett,
@@ -4896,14 +4896,14 @@ patches. Many bugs were fixed and some code was restructured.
 .pg
 In late April 2018, several hundred bug fixes for 3.6.0 and
 some new features were assembled and released as NetHack 3.6.1.
-The development team at the time of release of 3.6.1 consisted of
+The NetHack Development Team at the time of release of 3.6.1 consisted of
 \fBWarwick Allison\fP, \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBPasi Kallinen\fP,
 \fBKen Lorber\fP, \fBDean Luick\fP, \fBPatric Mueller\fP,
 \fBPat Rankin\fP, \fBDerek S. Ray\fP, \fBAlex Smith\fP,
 \fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
 .pg
-The development team, as well as \fBSteve VanDevender\fP and
+The NetHack Development Team, as well as \fBSteve VanDevender\fP and
 \fBKevin Smolkowski\fP, ensured that NetHack 3.6 continued to operate on
 various
 .UX
@@ -4944,9 +4944,9 @@ and in days past, devnull.net (gone for now, but not forgotten).
 .                          \" to the right, so pad them with a few spaces
 .pg
 From time to time, some depraved individual out there in netland sends a
-particularly intriguing modification to help out with the game.  The Gods of
-the Dungeon sometimes make note of the names of the worst of these miscreants
-in this, the list of Dungeoneers:
+particularly intriguing modification to help out with the game.  The NetHack
+Develpment Team sometimes makes note of the names of the worst of these
+miscreants in this, the list of Dungeoneers:
 .
 .TS S
 center;

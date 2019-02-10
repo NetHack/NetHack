@@ -30,8 +30,8 @@ level revisions and updates of 3.0.
 
 NetHack 3.0 was ported to the Atari by Eric R. Smith, to OS/2 by Timo
 Hakulinen, and to VMS by David Gentzel.  The three of them and Kevin Darcy
-later joined the main development team to produce subsequent revisions of
-3.0.
+later joined the main NetHack Development Team to produce subsequent
+revisions of 3.0.
 
 Olaf Seibert ported NetHack 2.3 and 3.0 to the Amiga.  Norm Meluch, Stephen
 Spackman and Pierre Martineau designed overlay code for PC NetHack 3.0.
@@ -40,7 +40,7 @@ Dungeoneers, they continued to enhance the PC, Macintosh, and Amiga ports
 through the later revisions of 3.0.
 
 Headed by Mike Stephenson and coordinated by Izchak Miller and Janet Walz,
-the development team which now included Ken Arromdee, David Cohrs,
+the NetHack Development Team which now included Ken Arromdee, David Cohrs,
 Jean-Christophe Collet, Kevin Darcy, Matt Day, Timo Hakulinen, Steve Linhart,
 Dean Luick, Pat Rankin, Eric Raymond, and Eric Smith undertook a radical
 revision of 3.0.  They re-structured the game's design, and re-wrote major
@@ -66,21 +66,21 @@ Windows NT.
 
 Dean Luick, with help from David Cohrs, developed NetHack 3.1 for X11.
 Warwick Allison wrote a tiled version of NetHack for the Atari;
-he later contributed the tiles to the DevTeam and tile support was
-then added to other platforms.
+he later contributed the tiles to the NetHack Development Team and tile
+support was then added to other platforms.
 
-The 3.2 development team, comprised of Michael Allison, Ken Arromdee, David
-Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, Steve
+The 3.2 NetHack Development Team, comprised of Michael Allison, Ken Arromdee, 
+David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, Steve
 Linhart, Dean Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet Walz,
 and Paul Winner, released version 3.2 in April of 1996.
 
 Version 3.2 marked the tenth anniversary of the formation of the development
 team.  In a testament to their dedication to the game, all thirteen members
-of the original development team remained on the team at the start of work
-on that release.  During the interval between the release of 3.1.3 and 3.2,
-one of the founding members of the development team, Dr. Izchak Miller,
-passed away.  That release of the game was dedicated to him by the
-development and porting teams.
+of the original NetHack Development Team remained on the team at the start of
+work on that release.  During the interval between the release of 3.1.3 and
+3.2, one of the founding members of the NetHack Development Team, 
+Dr. Izchak Miller, passed away.  That release of the game was dedicated to
+him by the development and porting teams.
 
 Version 3.2 proved to be more stable than previous versions.  Many bugs
 were fixed, abuses eliminated, and game features tuned for better game
@@ -99,12 +99,13 @@ the Qt interface.
 
 Warren Cheung combined SLASH with the Wizard Patch to produce Slash'em, and
 with the help of Kevin Hugo, added more features.  Kevin later joined the
-DevTeam and incorporated the best of these ideas in NetHack 3.3.
+NetHack Development Team and incorporated the best of these ideas in 
+NetHack 3.3.
 
 The final update to 3.2 was the bug fix release 3.2.3, which was released
 simultaneously with 3.3.0 in December 1999 just in time for the Year 2000.
 
-The 3.3 development team, consisting of Michael Allison, Ken Arromdee,
+The 3.3 NetHack Development Team, consisting of Michael Allison, Ken Arromdee,
 David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen,
 Kevin Hugo, Steve Linhart, Ken Lorber, Dean Luick, Pat Rankin, Eric Smith,
 Mike Stephenson, Janet Walz, and Paul Winner, released 3.3.0 in
@@ -121,10 +122,10 @@ publicly available web-site listing all the bugs that had been discovered.
 Despite that constantly growing bug list, 3.3 proved stable enough to last
 for more than a year and a half.
 
-The 3.4 development team initially consisted of Michael Allison, Ken Arromdee,
-David Cohrs, Jessie Collet, Kevin Hugo, Ken Lorber, Dean Luick, Pat Rankin,
-Mike Stephenson, Janet Walz, and Paul Winner, with Warwick Allison joining
-just before the release of NetHack 3.4.0 in March 2002.
+The 3.4 NetHack Development Team initially consisted of Michael Allison, 
+Ken Arromdee, David Cohrs, Jessie Collet, Kevin Hugo, Ken Lorber, Dean Luick,
+Pat Rankin, Mike Stephenson, Janet Walz, and Paul Winner, with Warwick Allison
+joining just before the release of NetHack 3.4.0 in March 2002.
 
 As with version 3.3, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
@@ -153,7 +154,7 @@ resurrected it for 3.3.1.
 The release of NetHack 3.4.3 in December 2003 marked the beginning of a
 long release hiatus.  3.4.3 proved to be a remarkably stable version that
 provided continued enjoyment by the community for more than a decade.  The
-devteam slowly and quietly continued to work on the game behind the scenes
+NetHack Development Team slowly and quietly continued to work on the game behind the scenes
 during the tenure of 3.4.3.  It was during that same period that several
 new variants emerged within the NetHack community.  Notably sporkhack by
 Derek S. Ray, unnethack by Patric Mueller, nitrohack and its successors
@@ -166,17 +167,18 @@ released publicly by other parties.  Since that code was a work-in-progress
 and had not gone through a period of debugging, it was decided that the
 version numbers present on that code snapshot would be retired and never
 used in an official NetHack release.  An announcement was posted on the
-devteam's official nethack.org website to that effect, stating that there
-would never be a 3.4.4, 3.5, or 3.5.0 official release version.
+NetHack Development Team's official nethack.org website to that effect, 
+stating that there would never be a 3.4.4, 3.5, or 3.5.0 official release
+version.
 
 In January 2015, preparation began for the release of NetHack 3.6.
 
 At the beginning of development for what would eventually get released
-as 3.6.0, the development team consisted of Warwick Allison,
+as 3.6.0, the NetHack Development Team consisted of Warwick Allison,
 Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet, Ken Lorber,
 Dean Luick, Pat Rankin, Mike Stephenson, Janet Walz, and Paul Winner.
 Leading up to the release of 3.6.0 in early 2015, new members Sean Hunt,
-Pasi Kallinen, and Derek S. Ray joined the NetHack development team.
+Pasi Kallinen, and Derek S. Ray joined the NetHack Development Team.
 
 Near the end of the development of 3.6.0, one of the significant inspirations
 for many of the humorous and fun features found in the game, author
@@ -188,14 +190,14 @@ Many bugs were fixed and some code was restructured.
 
 In late April 2018, several hundred bug fixes for 3.6.0 and some new
 features were assembled and released as NetHack 3.6.1.
-The development team at the time of release of 3.6.1 consisted of
+The NetHack Development Team at the time of release of 3.6.1 consisted of
 Warwick Allison, Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet,
 Pasi Kallinen, Ken Lorber, Dean Luick, Patric Mueller, Pat Rankin,
 Derek S. Ray, Alex Smith, Mike Stephenson, Janet Walz and Paul Winner.
 
-The development team, as well as Steve VanDevender and Kevin Smolkowski
-ensured that NetHack 3.6.1 continued to operate on various Unix flavors
-as well as maintaining the X11 interface.
+The NetHack Development Team, as well as Steve VanDevender and 
+Kevin Smolkowski ensured that NetHack 3.6.1 continued to operate on various
+Unix flavors as well as maintaining the X11 interface.
 
 Ken Lorber, Haoyang Wang, Pat Rankin, and Dean Luick maintained the port
 of NetHack 3.6.1 for Mac OSX.
