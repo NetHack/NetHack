@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1549757226 2019/02/10 00:07:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.105 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1549758452 2019/02/10 00:27:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1923,7 +1923,7 @@ struct obj *obj;
          * We used to set it here because of that, but then it would stick
          * if a nymph stole the armor before it was fully worn.  Delay it
          * until the aftermv action.  The player may still know this armor's
-         * +/- amount if donning gets interruptted, but the hero won't.
+         * +/- amount if donning gets interrupted, but the hero won't.
          *
         obj->known = 1;
          */
