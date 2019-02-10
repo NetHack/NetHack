@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1549333450 2019/02/05 02:24:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.194 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1549755185 2019/02/09 23:33:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.195 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1524,7 +1524,7 @@ boolean free_data;
         tty_menu_item *temp;
 
         while ((temp = cw->mlist) != 0) {
-            cw->mlist = cw->mlist->next;
+            cw->mlist = temp->next;
             if (temp->str)
                 free((genericptr_t) temp->str);
             free((genericptr_t) temp);
