@@ -1,10 +1,11 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1543545915 2018/11/30 02:45:15 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.32 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1549835645 2019/02/10 21:54:05 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.33 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
-#  The default configuration is for building with DEC C (aka Compaq C).
+#  The default configuration is for building with DEC C (aka Compaq C,
+#  then HP C).
 #  If you change CC or CFLAGS, make similar changes in [.util]Makefile.
 #
 #  Note:  modifying this Makefile will cause crtl.opt to be rebuilt,
@@ -88,9 +89,9 @@ WINOBJ = $(WINTTYOBJ)
 SYSTEM	= SysVMS.timestamp;
 GAME	= $(SRC)nethack.exe;
 
-# RANDOM is defined in vmsconf.h
-RANDSRC = random.c
-RANDOBJ = random.obj
+# RANDOM is defined in vmsconf.h, USE_ISAAC64 might be defined in config.h;
+RANDSRC = isaac64.c random.c
+RANDOBJ = isaac64.obj,random.obj
 
 # ----------------------------------------
 #
@@ -343,6 +344,7 @@ vmsfiles.obj :	$(VMS)vmsfiles.c $(CONFIG_H)
 vmsmail.obj :	$(VMS)vmsmail.c $(CONFIG_H) $(INC)mail.h \
 		$(INC)wintype.h $(INC)winprocs.h
 #	conditionally used code -- VMS always wants these
+isaac64.obj :	isaac64.c
 random.obj :	random.c $(HACK_H)
 random.c :	$(SYSSHR)random.c
 	copy $(SYSSHR)random.c random.c

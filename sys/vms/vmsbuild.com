@@ -1,6 +1,6 @@
 $ ! vms/vmsbuild.com -- compile and link NetHack 3.6.*			[pr]
 $	version_number = "3.6.2"
-$ ! $NHDT-Date: 1542847646 2018/11/22 00:47:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $
+$ ! $NHDT-Date: 1549835647 2019/02/10 21:54:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.21 $
 $ ! Copyright (c) 2018 by Robert Patrick Rankin
 $ ! NetHack may be freely redistributed.  See license for details.
 $ !
@@ -262,6 +262,7 @@ $ set default [-.src]
 $! compile most of the source files:
 $ c_list = "decl,version,[-.sys.vms]vmsmain,[-.sys.vms]vmsunix" -
 	+ ",[-.sys.vms]vmstty,[-.sys.vms]vmsmail" -
+	+ ",[]isaac64" -			!already in [.src]
 	+ ",[]random,[]tclib,[]pmatchregex"	!copied from [-.sys.share]
 $ gosub compile_list
 $ c_list = "[-.win.tty]getline,[-.win.tty]termcap" -
