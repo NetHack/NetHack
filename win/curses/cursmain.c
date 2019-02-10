@@ -75,7 +75,7 @@ struct window_procs curses_procs = {
     genl_getmsghistory,
     genl_putmsghistory,
     curses_status_init,
-    genl_status_finish,
+    curses_status_finish,
     genl_status_enablefield,
     curses_status_update,
     genl_can_suspend_yes,

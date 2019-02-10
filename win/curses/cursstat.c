@@ -58,15 +58,16 @@ curses_status_init()
 }
 
 void
-curses_teardown_status()
+curses_status_finish()
 {
 #ifdef STATUS_HILITES
     int i;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
-        free(status_vals_long[i]);
-        status_vals_long[i] = (char *) 0;
+         if (status_vals_long[i])
+              free(status_vals_long[i]), status_vals_long[i] = (char *) 0;
     }
+    genl_status_finish();
 #endif /* STATUS_HILITES */
     return;
 }

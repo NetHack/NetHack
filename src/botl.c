@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1545705812 2018/12/25 02:43:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1549755174 2019/02/09 23:32:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.134 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -926,14 +926,12 @@ status_finish()
             free((genericptr_t) blstats[1][i].val), blstats[1][i].val = 0;
 #ifdef STATUS_HILITES
         if (blstats[0][i].thresholds) {
-            struct hilite_s *temp = blstats[0][i].thresholds,
-                            *next = (struct hilite_s *)0;
-            while (temp) {
+            struct hilite_s *temp, *next = 0;
+
+            for (temp = blstats[0][i].thresholds; temp; temp = next) {
                 next = temp->next;
-                free(temp);
-                blstats[0][i].thresholds = (struct hilite_s *)0;
-                blstats[1][i].thresholds = blstats[0][i].thresholds;
-                temp = next;
+                free((genericptr_t) temp);
+                blstats[0][i].thresholds = blstats[1][i].thresholds = 0;
             }
         }
 #endif /* STATUS_HILITES */

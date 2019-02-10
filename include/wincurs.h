@@ -181,7 +181,7 @@ extern void curses_del_menu(winid wid);
 /* cursstat.c */
 
 extern void curses_status_init(void);
-extern void curses_teardown_status(void);
+extern void curses_status_finish(void);
 extern void curses_status_update(int, genericptr_t, int, int, int,
                                  unsigned long *);
 

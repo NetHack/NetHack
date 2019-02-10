@@ -313,9 +313,7 @@ curses_del_nhwin(winid wid)
         return;
     }
     if (wid == MESSAGE_WIN) {
-         curses_teardown_messages();
-    } else if (wid == STATUS_WIN) {
-         curses_teardown_status();
+        curses_teardown_messages();
     }
     nhwins[wid].curwin = NULL;
     nhwins[wid].nhwin = -1;

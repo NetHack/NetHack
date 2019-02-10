@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1549406868 2019/02/05 22:47:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1549758452 2019/02/10 00:27:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -197,6 +197,7 @@ Boots_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_boots, uarmf->otyp);
     }
+    uarmf->known = 1; /* boots' +/- evident because of status line AC */
     return 0;
 }
 
@@ -310,6 +311,7 @@ Cloak_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_cloak, uarmc->otyp);
     }
+    uarmc->known = 1; /* cloak's +/- evident because of status line AC */
     return 0;
 }
 
@@ -425,6 +427,7 @@ Helmet_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_helmet, uarmh->otyp);
     }
+    uarmh->known = 1; /* helmet's +/- evident because of status line AC */
     return 0;
 }
 
@@ -497,6 +500,7 @@ Gloves_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_gloves, uarmg->otyp);
     }
+    uarmg->known = 1; /* gloves' +/- evident because of status line AC */
     return 0;
 }
 
@@ -587,7 +591,7 @@ Shield_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_shield, uarms->otyp);
     }
-
+    uarms->known = 1; /* shield's +/- evident because of status line AC */
     return 0;
 }
 
@@ -627,7 +631,7 @@ Shirt_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_shirt, uarmu->otyp);
     }
-
+    uarmu->known = 1; /* shirt's +/- evident because of status line AC */
     return 0;
 }
 
@@ -659,6 +663,7 @@ Armor_on(VOID_ARGS)
      * suits are set up as intrinsics (actually 'extrinsics') by setworn()
      * which is called by armor_or_accessory_on() before Armor_on().
      */
+    uarm->known = 1; /* suit's +/- evident because of status line AC */
     return 0;
 }
 
@@ -1908,23 +1913,20 @@ struct obj *obj;
     if (armor) {
         int delay;
 
-        /*
-         * FIXME: [#H8124]
-         *  This (setting 'obj->known=1') takes places as soon as hero
-         *  starts donning armor and sticks even if interrupted before
-         *  finishing.  (Most glaring instance is theft of this armor
-         *  by a nymph but any interruption applies.)
-         *
-         *  Perhaps setworn() (the reason to set obj->known=1) should
-         *  be deferred until the (*aftermv)() action?  But Boots_on()/
-         *  Helmet_on()/&c aren't passed this 'obj', they rely to uarmf/
-         *  uarmh/&c being assigned by setworn() before they're called.
-         */
-        obj->known = 1; /* since AC is shown on the status line */
         /* if the armor is wielded, release it for wearing (won't be
            welded even if cursed; that only happens for weapons/weptools) */
         if (obj->owornmask & W_WEAPON)
             remove_worn_item(obj, FALSE);
+        /*
+         * Setting obj->known=1 is done because setworn() causes hero's AC
+         * to change so armor's +/- value is evident via the status line.
+         * We used to set it here because of that, but then it would stick
+         * if a nymph stole the armor before it was fully worn.  Delay it
+         * until the aftermv action.  The player may still know this armor's
+         * +/- amount if donning gets interrupted, but the hero won't.
+         *
+        obj->known = 1;
+         */
         setworn(obj, mask);
         delay = -objects[obj->otyp].oc_delay;
         if (delay) {
