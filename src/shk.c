@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1549849510 2019/02/11 01:45:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1549921170 2019/02/11 21:39:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -56,7 +56,7 @@ STATIC_DCL long FDECL(getprice, (struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(shk_names_obj, (struct monst *, struct obj *,
                                       const char *, long, const char *));
 STATIC_DCL struct obj *FDECL(bp_to_obj, (struct bill_x *));
-STATIC_DCL boolean FDECL(inherits, (struct monst *, int, int));
+STATIC_DCL boolean FDECL(inherits, (struct monst *, int, int, BOOLEAN_P));
 STATIC_DCL void FDECL(set_repo_loc, (struct monst *));
 STATIC_DCL boolean NDECL(angry_shk_exists);
 STATIC_DCL void FDECL(rile_shk, (struct monst *));
@@ -1686,8 +1686,9 @@ static struct repo { /* repossession context */
 
 /* routine called after dying (or quitting) */
 boolean
-paybill(croaked)
+paybill(croaked, silently)
 int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
+boolean silently; /* maybe avoid messages */
 {
     struct monst *mtmp, *mtmp2, *firstshk, *resident, *creditor, *hostile,
         *localshk;
@@ -1752,7 +1753,7 @@ int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
                                              : localshk;
     if (firstshk) {
         numsk++;
-        taken = inherits(firstshk, numsk, croaked);
+        taken = inherits(firstshk, numsk, croaked, silently);
     }
 
     /* now handle the rest */
@@ -1763,7 +1764,7 @@ int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
         local = on_level(&eshkp->shoplevel, &u.uz);
         if (mtmp != firstshk) {
             numsk++;
-            taken |= inherits(mtmp, numsk, croaked);
+            taken |= inherits(mtmp, numsk, croaked, silently);
         }
         /* for bones: we don't want a shopless shk around */
         if (!local)
@@ -1773,23 +1774,20 @@ int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
 }
 
 STATIC_OVL boolean
-inherits(shkp, numsk, croaked)
+inherits(shkp, numsk, croaked, silently)
 struct monst *shkp;
 int numsk;
 int croaked;
+boolean silently;
 {
     long loss = 0L;
     long umoney;
     struct eshk *eshkp = ESHK(shkp);
-    boolean take = FALSE, taken = FALSE, verbose;
+    boolean take = FALSE, taken = FALSE;
     unsigned save_minvis = shkp->minvis;
     int roomno = *u.ushops;
     char takes[BUFSZ];
 
-    verbose = !program_state.stopprint;
-#ifdef HANGUPHANDLING
-    verbose &= !program_state.done_hup;
-#endif
     /* not strictly consistent; affects messages and prevents next player
        (if bones are saved) from blundering into or being ambused by an
        invisible shopkeeper */
@@ -1797,7 +1795,7 @@ int croaked;
     /* The simplifying principle is that first-come
        already took everything you had. */
     if (numsk > 1) {
-        if (verbose && cansee(shkp->mx, shkp->my) && croaked) {
+        if (cansee(shkp->mx, shkp->my) && croaked && !silently) {
             takes[0] = '\0';
             if (has_head(shkp->data) && !rn2(2))
                 Sprintf(takes, ", shakes %s %s,", noit_mhis(shkp),
@@ -1817,7 +1815,7 @@ int croaked;
         && !eshkp->robbed && !eshkp->debit && NOTANGRY(shkp)
         && !eshkp->following && u.ugrave_arise < LOW_PM) {
         taken = (invent != 0);
-        if (taken && verbose)
+        if (taken && !silently)
             pline("%s gratefully inherits all your possessions.",
                   Shknam(shkp));
         set_repo_loc(shkp);
@@ -1851,7 +1849,7 @@ int croaked;
                 money2mon(shkp, umoney);
                 context.botl = 1;
             }
-            if (verbose)
+            if (!silently)
                 pline("%s %s all your possessions.", Shknam(shkp), takes);
             taken = TRUE;
             /* where to put player's invent (after disclosure) */
@@ -1859,7 +1857,7 @@ int croaked;
         } else {
             money2mon(shkp, loss);
             context.botl = 1;
-            if (verbose)
+            if (!silently)
                 pline("%s %s the %ld %s %sowed %s.", Shknam(shkp),
                       takes, loss, currency(loss),
                       strncmp(eshkp->customer, plname, PL_NSIZ) ? "" : "you ",
