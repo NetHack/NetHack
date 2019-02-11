@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.254 $ $NHDT-Date: 1549835645 2019/02/10 21:54:05 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.255 $ $NHDT-Date: 1549849509 2019/02/11 01:45:09 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -464,6 +464,8 @@ windows-gui: recognize new BL_RESET in status_update; no change in behavior yet
 windows-gui: align hpbar behavior at zero hit points with tty behavior
 windows-gui: add support for status_hilites for the player condition field
 	such as stone, slime, strngl, blind, deaf, stun, conf, etc.
+windows-gui: a shop or vault message could appear in a popup after the
+	close-window button was used when game was ending
 windows-tty: Specify both width and height when creating font for width testing
 windows-tty: To counter lag problems that were occuring with the Win32 console
 	port, implement a console back buffer to reduce the number of calls
