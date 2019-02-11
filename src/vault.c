@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1549157816 2019/02/03 01:36:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1549849513 2019/02/11 01:45:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1068,13 +1068,19 @@ paygd()
     struct obj *coins, *nextcoins;
     int gx, gy;
     char buf[BUFSZ];
+    boolean verbose;
 
     if (!umoney || !grd)
         return;
 
+    verbose = !program_state.stopprint;
+#ifdef HANGUPHANDLING
+    verbose &= !program_state.done_hup;
+#endif
     if (u.uinvault) {
-        Your("%ld %s goes into the Magic Memory Vault.", umoney,
-             currency(umoney));
+        if (verbose)
+            Your("%ld %s goes into the Magic Memory Vault.",
+                 umoney, currency(umoney));
         gx = u.ux;
         gy = u.uy;
     } else {
@@ -1083,7 +1089,8 @@ paygd()
             return;
         }
         mnexto(grd);
-        pline("%s remits your gold to the vault.", Monnam(grd));
+        if (verbose)
+            pline("%s remits your gold to the vault.", Monnam(grd));
         gx = rooms[EGD(grd)->vroom].lx + rn2(2);
         gy = rooms[EGD(grd)->vroom].ly + rn2(2);
         Sprintf(buf, "To Croesus: here's the gold recovered from %s the %s.",

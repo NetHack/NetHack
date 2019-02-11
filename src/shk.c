@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1548978606 2019/01/31 23:50:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1549849510 2019/02/11 01:45:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1781,16 +1781,23 @@ int croaked;
     long loss = 0L;
     long umoney;
     struct eshk *eshkp = ESHK(shkp);
-    boolean take = FALSE, taken = FALSE;
+    boolean take = FALSE, taken = FALSE, verbose;
     unsigned save_minvis = shkp->minvis;
     int roomno = *u.ushops;
     char takes[BUFSZ];
 
+    verbose = !program_state.stopprint;
+#ifdef HANGUPHANDLING
+    verbose &= !program_state.done_hup;
+#endif
+    /* not strictly consistent; affects messages and prevents next player
+       (if bones are saved) from blundering into or being ambused by an
+       invisible shopkeeper */
     shkp->minvis = 0;
     /* The simplifying principle is that first-come
        already took everything you had. */
     if (numsk > 1) {
-        if (cansee(shkp->mx, shkp->my) && croaked) {
+        if (verbose && cansee(shkp->mx, shkp->my) && croaked) {
             takes[0] = '\0';
             if (has_head(shkp->data) && !rn2(2))
                 Sprintf(takes, ", shakes %s %s,", noit_mhis(shkp),
@@ -1810,7 +1817,7 @@ int croaked;
         && !eshkp->robbed && !eshkp->debit && NOTANGRY(shkp)
         && !eshkp->following && u.ugrave_arise < LOW_PM) {
         taken = (invent != 0);
-        if (taken)
+        if (taken && verbose)
             pline("%s gratefully inherits all your possessions.",
                   Shknam(shkp));
         set_repo_loc(shkp);
@@ -1844,17 +1851,19 @@ int croaked;
                 money2mon(shkp, umoney);
                 context.botl = 1;
             }
-            pline("%s %s all your possessions.", Shknam(shkp), takes);
+            if (verbose)
+                pline("%s %s all your possessions.", Shknam(shkp), takes);
             taken = TRUE;
             /* where to put player's invent (after disclosure) */
             set_repo_loc(shkp);
         } else {
             money2mon(shkp, loss);
             context.botl = 1;
-            pline("%s %s the %ld %s %sowed %s.", Shknam(shkp),
-                  takes, loss, currency(loss),
-                  strncmp(eshkp->customer, plname, PL_NSIZ) ? "" : "you ",
-                  noit_mhim(shkp));
+            if (verbose)
+                pline("%s %s the %ld %s %sowed %s.", Shknam(shkp),
+                      takes, loss, currency(loss),
+                      strncmp(eshkp->customer, plname, PL_NSIZ) ? "" : "you ",
+                      noit_mhim(shkp));
             /* shopkeeper has now been paid in full */
             pacify_shk(shkp);
             eshkp->following = 0;
@@ -1866,7 +1875,7 @@ int croaked;
         if (!inhishop(shkp))
             home_shk(shkp, FALSE);
     }
-clear:
+ clear:
     shkp->minvis = save_minvis;
     setpaid(shkp);
     return taken;
@@ -1900,7 +1909,8 @@ struct monst *shkp;
     repo.shopkeeper = shkp;
 }
 
-/* called at game exit, after inventory disclosure but before making bones */
+/* called at game exit, after inventory disclosure but before making bones;
+   shouldn't issue any messages */
 void
 finish_paybill()
 {
