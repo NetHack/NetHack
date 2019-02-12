@@ -122,6 +122,28 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
                         - - - - - - - - - - -
 
+Installation instructions
+
+Following are the convenience scripts that can be used to install 
+NetHack on Linux.
+
+1. Install necessary packages
+
+	sudo apt-get update &&
+	sudo apt-get install -y \
+	build-essential \
+	gcc \
+	bison \
+	flex \
+	libncurses5-dev \
+	libncursesw5-dev \
+
+2. Run the convenience installation script
+
+	./install.sh
+
+                        - - - - - - - - - - -
+
 If you have problems building the game, or you find bugs in it, we recommend 
 filing a bug report from our "Contact Us" web page at:
     https://www.nethack.org/common/contact.html or
