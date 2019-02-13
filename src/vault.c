@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1549849513 2019/02/11 01:45:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1549921171 2019/02/11 21:39:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -49,7 +49,8 @@ boolean forceshow;
 {
     register int fcx, fcy, fcbeg;
     struct monst *mtmp;
-    boolean sawcorridor = FALSE;
+    boolean sawcorridor = FALSE,
+            silently = g.program_state.stopprint ? TRUE : FALSE;
     struct egd *egrd = EGD(grd);
     struct trap *trap;
     struct rm *lev;
@@ -101,11 +102,13 @@ boolean forceshow;
         g.vision_full_recalc = 1;
         egrd->fcbeg++;
     }
-    if (sawcorridor)
+    if (sawcorridor && !silently)
         pline_The("corridor disappears.");
     /* only give encased message if hero is still alive (might get here
-       via paygd() when game is over; died: no message, quit: message) */
-    if (IS_ROCK(levl[u.ux][u.uy].typ) && (Upolyd ? u.mh : u.uhp) > 0)
+       via paygd() -> mongone() -> grddead() when game is over;
+       died: no message, quit: message) */
+    if (IS_ROCK(levl[u.ux][u.uy].typ) && (Upolyd ? u.mh : u.uhp) > 0
+        && !silently)
         You("are encased in rock.");
     return TRUE;
 }
@@ -1061,35 +1064,30 @@ register struct monst *grd;
 
 /* Routine when dying or quitting with a vault guard around */
 void
-paygd()
+paygd(silently)
+boolean silently;
 {
     register struct monst *grd = findgd();
     long umoney = money_cnt(g.invent);
     struct obj *coins, *nextcoins;
     int gx, gy;
     char buf[BUFSZ];
-    boolean verbose;
 
     if (!umoney || !grd)
         return;
 
-    verbose = !program_state.stopprint;
-#ifdef HANGUPHANDLING
-    verbose &= !program_state.done_hup;
-#endif
     if (u.uinvault) {
-        if (verbose)
+        if (!silently)
             Your("%ld %s goes into the Magic Memory Vault.",
                  umoney, currency(umoney));
         gx = u.ux;
         gy = u.uy;
     } else {
-        if (grd->mpeaceful) { /* guard has no "right" to your gold */
-            mongone(grd);
-            return;
-        }
+        if (grd->mpeaceful) /* peaceful guard has no "right" to your gold */
+            goto remove_guard;
+
         mnexto(grd);
-        if (verbose)
+        if (!silently)
             pline("%s remits your gold to the vault.", Monnam(grd));
         gx = g.rooms[EGD(grd)->vroom].lx + rn2(2);
         gy = g.rooms[EGD(grd)->vroom].ly + rn2(2);
@@ -1105,7 +1103,9 @@ paygd()
             stackobj(coins);
         }
     }
+ remove_guard:
     mongone(grd);
+    return;
 }
 
 long

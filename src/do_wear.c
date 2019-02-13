@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1549758452 2019/02/10 00:27:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.106 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1550014802 2019/02/12 23:40:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.107 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1205,7 +1205,7 @@ struct obj *otmp;
 {
     boolean result = FALSE;
 
-    /* 'W' (or 'P' used for armor) sets afternmv */
+    /* 'W' (or 'P' used for armor) sets g.afternmv */
     if (doffing(otmp))
         result = TRUE;
     else if (otmp == uarm)
@@ -1235,7 +1235,7 @@ struct obj *otmp;
     long what = g.context.takeoff.what;
     boolean result = FALSE;
 
-    /* 'T' (or 'R' used for armor) sets afternmv, 'A' sets takeoff.what */
+    /* 'T' (or 'R' used for armor) sets g.afternmv, 'A' sets takeoff.what */
     if (otmp == uarm)
         result = (g.afternmv == Armor_off || what == WORN_ARMOR);
     else if (otmp == uarmu)
@@ -1250,7 +1250,7 @@ struct obj *otmp;
         result = (g.afternmv == Gloves_off || what == WORN_GLOVES);
     else if (otmp == uarms)
         result = (g.afternmv == Shield_off || what == WORN_SHIELD);
-    /* these 1-turn items don't need 'afternmv' checks */
+    /* these 1-turn items don't need 'g.afternmv' checks */
     else if (otmp == uamul)
         result = (what == WORN_AMUL);
     else if (otmp == uleft)
@@ -1924,26 +1924,31 @@ struct obj *obj;
         obj->known = 1;
          */
         setworn(obj, mask);
+        /* if there's no delay, we'll execute 'aftermv' immediately */
+        if (obj == uarm)
+            g.afternmv = Armor_on;
+        else if (obj == uarmh)
+            g.afternmv = Helmet_on;
+        else if (obj == uarmg)
+            g.afternmv = Gloves_on;
+        else if (obj == uarmf)
+            g.afternmv = Boots_on;
+        else if (obj == uarms)
+            g.afternmv = Shield_on;
+        else if (obj == uarmc)
+            g.afternmv = Cloak_on;
+        else if (obj == uarmu)
+            g.afternmv = Shirt_on;
+        else
+            panic("wearing armor not worn as armor? [%08lx]", obj->owornmask);
+
         delay = -objects[obj->otyp].oc_delay;
         if (delay) {
             nomul(delay);
             g.multi_reason = "dressing up";
-            if (is_boots(obj))
-                g.afternmv = Boots_on;
-            if (is_helmet(obj))
-                g.afternmv = Helmet_on;
-            if (is_gloves(obj))
-                g.afternmv = Gloves_on;
-            if (obj == uarm)
-                g.afternmv = Armor_on;
             g.nomovemsg = "You finish your dressing maneuver.";
         } else {
-            if (is_cloak(obj))
-                (void) Cloak_on();
-            if (is_shield(obj))
-                (void) Shield_on();
-            if (is_shirt(obj))
-                (void) Shirt_on();
+            unmul(""); /* call (*g.aftermv)(), clear it+g.nomovemsg+g.multi_reason */
             on_msg(obj);
         }
         g.context.takeoff.mask = g.context.takeoff.what = 0L;

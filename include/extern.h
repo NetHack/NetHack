@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1549157811 2019/02/03 01:36:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.692 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1549921169 2019/02/11 21:39:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.693 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2223,7 +2223,7 @@ E void FDECL(make_happy_shoppers, (BOOLEAN_P));
 E void FDECL(hot_pursuit, (struct monst *));
 E void FDECL(make_angry_shk, (struct monst *, XCHAR_P, XCHAR_P));
 E int NDECL(dopay);
-E boolean FDECL(paybill, (int));
+E boolean FDECL(paybill, (int, BOOLEAN_P));
 E void NDECL(finish_paybill);
 E struct obj *FDECL(find_oid, (unsigned));
 E long FDECL(contained_cost,
@@ -2593,7 +2593,7 @@ E char FDECL(vault_occupied, (char *));
 E void FDECL(uleftvault, (struct monst *));
 E void NDECL(invault);
 E int FDECL(gd_move, (struct monst *));
-E void NDECL(paygd);
+E void FDECL(paygd, (BOOLEAN_P));
 E long NDECL(hidden_gold);
 E boolean NDECL(gd_sound);
 E void FDECL(vault_gd_watching, (unsigned int));

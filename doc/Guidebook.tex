@@ -2885,7 +2885,8 @@ Prefix a boolean option with `no' or `!' to turn it off.
 For compound options, the option name and value are separated by a colon.
 Some options are persistent, and apply only to new games.
 You can specify multiple OPTIONS statements, and multiple options
-in a single OPTIONS statement.
+separated by commas in a single OPTIONS statement.
+(Comma separated options are processed from right to left.)
 
 %.pg
 Example:
@@ -3074,6 +3075,14 @@ to that shell), or the pair of commands
 %.ED
 
 \nd in {\it sh}, {\it ksh}, or {\it bash}.
+
+%.pg
+The NETHACKOPTIONS value is effectively the same as a single OPTIONS
+statement in a configuration file.
+The ``OPTIONS='' prefix is implied and comma separated options are
+processed from right to left.
+Other types of configuration statements such as BIND or MSGTYPE are
+not allowed.
 
 %.pg
 Instead of a comma-separated list of options,

@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1545786454 2018/12/26 01:07:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1549921169 2019/02/11 21:39:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1126,6 +1126,10 @@ int how;
     g.program_state.gameover = 1;
     /* in case of a subsequent panic(), there's no point trying to save */
     g.program_state.something_worth_saving = 0;
+#ifdef HANGUPHANDLING
+    if (g.program_state.done_hup)
+        done_stopprint++;
+#endif
     /* render vision subsystem inoperative */
     iflags.vision_inited = 0;
 
@@ -1150,8 +1154,8 @@ int how;
      * On those rare occasions you get hosed immediately, go out
      * smiling... :-)  -3.
      */
-    if (g.moves <= 1 && how < PANICKED) /* You die... --More-- */
-        pline("Do not pass go.  Do not collect 200 %s.", currency(200L));
+    if (g.moves <= 1 && how < PANICKED && !done_stopprint)
+        pline("Do not pass Go.  Do not collect 200 %s.", currency(200L));
 
     if (have_windows)
         wait_synch(); /* flush screen output */
@@ -1197,9 +1201,11 @@ int how;
     fixup_death(how); /* actually, fixup g.multi_reason */
 
     if (how != PANICKED) {
+        boolean silently = done_stopprint ? TRUE : FALSE;
+
         /* these affect score and/or bones, but avoid them during panic */
-        taken = paybill((how == ESCAPED) ? -1 : (how != QUIT));
-        paygd();
+        taken = paybill((how == ESCAPED) ? -1 : (how != QUIT), silently);
+        paygd(silently);
         clearpriests();
     } else
         taken = FALSE; /* lint; assert( !bones_ok ); */
@@ -1306,7 +1312,7 @@ int how;
         }
     }
 
-    if (u.ugrave_arise >= LOW_PM) {
+    if (u.ugrave_arise >= LOW_PM && !done_stopprint) {
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
