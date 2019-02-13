@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1549758452 2019/02/10 00:27:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.106 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1550014802 2019/02/12 23:40:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.107 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1928,26 +1928,31 @@ struct obj *obj;
         obj->known = 1;
          */
         setworn(obj, mask);
+        /* if there's no delay, we'll execute 'aftermv' immediately */
+        if (obj == uarm)
+            afternmv = Armor_on;
+        else if (obj == uarmh)
+            afternmv = Helmet_on;
+        else if (obj == uarmg)
+            afternmv = Gloves_on;
+        else if (obj == uarmf)
+            afternmv = Boots_on;
+        else if (obj == uarms)
+            afternmv = Shield_on;
+        else if (obj == uarmc)
+            afternmv = Cloak_on;
+        else if (obj == uarmu)
+            afternmv = Shirt_on;
+        else
+            panic("wearing armor not worn as armor? [%08lx]", obj->owornmask);
+
         delay = -objects[obj->otyp].oc_delay;
         if (delay) {
             nomul(delay);
             multi_reason = "dressing up";
-            if (is_boots(obj))
-                afternmv = Boots_on;
-            if (is_helmet(obj))
-                afternmv = Helmet_on;
-            if (is_gloves(obj))
-                afternmv = Gloves_on;
-            if (obj == uarm)
-                afternmv = Armor_on;
             nomovemsg = "You finish your dressing maneuver.";
         } else {
-            if (is_cloak(obj))
-                (void) Cloak_on();
-            if (is_shield(obj))
-                (void) Shield_on();
-            if (is_shirt(obj))
-                (void) Shirt_on();
+            unmul(""); /* call (*aftermv)(), clear it+nomovemsg+multi_reason */
             on_msg(obj);
         }
         context.takeoff.mask = context.takeoff.what = 0L;

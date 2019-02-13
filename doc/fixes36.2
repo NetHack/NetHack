@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.255 $ $NHDT-Date: 1549849509 2019/02/11 01:45:09 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.257 $ $NHDT-Date: 1550014802 2019/02/12 23:40:02 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -427,6 +427,9 @@ when engulfed while in a shop, dropping an item into the engulfer and then
 	using ':' to look at current location could cause a crash
 when items were on the floor just inside a shop's door where the shopkeeper
 	doesn't buy and sell stuff, those items showed a 'for sale' price
+after 'when donning armor, enchanment becomes known even if interrupted' fix,
+	wearing a leather jacket, fedora, or dented pot (no multi-turn delay
+	worn in a slot which usually has one) didn't make +/- become known
 having an artifact wish be refused ("for a moment you feel <artifact> in
 	your hands, but it disappears") would immediately segfault
 tty: turn off an optimization that is the suspected cause of Windows reported
@@ -458,6 +461,37 @@ move 'perm_invent' value from flags to iflags to keep it out of save files;
 always define shell and suspend commands so that key bindings copied from one
 	platform to another work even if second one disables those commands
 amiga: fix missing line continuation characters in Makefile
+MacOSX: add curses window port
+MacOSX: add Xcode project to sys/unixNetHack.xcodeproj
+MacOSX: add Xcode supporting files README.xcode and XCode.xcconfig
+	containing important build info
+Qt: add Qt5 specific hints file for linux and Mac OS X (Ray Chason)
+Qt: enable compiling Qt5 on Windows (Ray Chason)
+Qt: entering extended commands, hide non-matching ones
+Qt: remember tile and font size
+tty: significant optimizations for performance and per field rendering
+tty: use WC2_FLUSH_STATUS to buffer changes until BL_FLUSH is received
+tty: support BL_RESET in status_update to force an update to all status fields
+tty: stop hitpointbar from jumping to 100% health at zero hit points
+tty: try harder to prevent a disconnected terminal (SIGHUP) from running amok
+	and using up all available CPU time
+tty: suppress intermediate 'Count: 123' prompt and getpos autodescribe
+	feedback from being included in ^P message recall
+tty: ^P feedback with msg_window:full/combination/reverse containing output
+	from dolook/whatis could show strange characters for DECgraphics
+unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
+	extension when using $(VERBOSEMAKE) to reduce build-time feedback;
+	replace with $(QUIETCC) which operates the same but defaults to
+	verbose so doesn't use '$<' for multi-prerequisite targets unless
+	specifically requested; use 'make QUIETCC=1 <target>' to get the
+	3.6.1 behavior back
+unix: add curses window port
+vms: data file processing and playground setup were missing post-3.4.3 files
+	engrave, epitaph, and bogusmon made from corresponding *.txt
+windows: Added ntassert() mechanism for Windows based port use
+windows: heed OPTIONS=symset:default in config file if it is present
+windows: add curses window port which can co-exist with tty in exe and be
+	selectable in user config file via OPTIONS=windowtype:curses
 windows-gui: In nethackw, there could be conflicts between menu accelerators
 	and an extra choice accelerator to fix H7132.
 windows-gui: recognize new BL_RESET in status_update; no change in behavior yet
@@ -487,37 +521,6 @@ windows-tty: add support for mouse_support:0 (disabled), mouse_support:1
 	(fully-functional including disabling QuickEdit on Windows console
 	because QuickEdit intercepts the mouse clicks so NetHack never sees
 	them), or mouse_support:2 (NetHack support on but QuickEdit left as is)
-windows: Added ntassert() mechanism for Windows based port use
-windows: heed OPTIONS=symset:default in config file if it is present
-windows: add curses window port which can co-exist with tty in exe and be
-	selectable in user config file via OPTIONS=windowtype:curses
-tty: significant optimizations for performance and per field rendering
-tty: use WC2_FLUSH_STATUS to buffer changes until BL_FLUSH is received
-tty: support BL_RESET in status_update to force an update to all status fields
-tty: stop hitpointbar from jumping to 100% health at zero hit points
-tty: try harder to prevent a disconnected terminal (SIGHUP) from running amok
-	and using up all available CPU time
-tty: suppress intermediate 'Count: 123' prompt and getpos autodescribe
-	feedback from being included in ^P message recall
-tty: ^P feedback with msg_window:full/combination/reverse containing output
-	from dolook/whatis could show strange characters for DECgraphics
-MacOSX: add curses window port
-MacOSX: add Xcode project to sys/unixNetHack.xcodeproj
-MacOSX: add Xcode supporting files README.xcode and XCode.xcconfig
-	containing important build info
-unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
-	extension when using $(VERBOSEMAKE) to reduce build-time feedback;
-	replace with $(QUIETCC) which operates the same but defaults to
-	verbose so doesn't use '$<' for multi-prerequisite targets unless
-	specifically requested; use 'make QUIETCC=1 <target>' to get the
-	3.6.1 behavior back
-unix: add curses window port
-vms: data file processing and playground setup were missing post-3.4.3 files
-	engrave, epitaph, and bogusmon made from corresponding *.txt
-Qt: add Qt5 specific hints file for linux and Mac OS X (Ray Chason)
-Qt: enable compiling Qt5 on Windows (Ray Chason)
-Qt: entering extended commands, hide non-matching ones
-Qt: remember tile and font size
 X11: implement menucolors and allow menus to obey some attributes
 X11: make key translations work with menus on Linux
 X11: allow mouse wheel scrolling to work in menus by default
