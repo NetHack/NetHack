@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1547421449 2019/01/13 23:17:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1550103076 2019/02/14 00:11:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2199,7 +2199,7 @@ mapseen *mptr;
     bwrite(fd, (genericptr_t) &mptr->custom_lth, sizeof mptr->custom_lth);
     if (mptr->custom_lth)
         bwrite(fd, (genericptr_t) mptr->custom, mptr->custom_lth);
-    bwrite(fd, (genericptr_t) &mptr->msrooms, sizeof mptr->msrooms);
+    bwrite(fd, (genericptr_t) mptr->msrooms, sizeof mptr->msrooms);
     savecemetery(fd, WRITE_SAVE, &mptr->final_resting_place);
 }
 
@@ -2230,7 +2230,7 @@ int fd;
         load->custom[load->custom_lth] = '\0';
     } else
         load->custom = 0;
-    mread(fd, (genericptr_t) &load->msrooms, sizeof load->msrooms);
+    mread(fd, (genericptr_t) load->msrooms, sizeof load->msrooms);
     restcemetery(fd, &load->final_resting_place);
 
     return load;
