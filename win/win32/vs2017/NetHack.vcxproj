@@ -19,7 +19,7 @@
   <ItemDefinitionGroup Condition="Exists('$(PDCURSES)')">
     <ClCompile>
       <AdditionalIncludeDirectories>$(PDCURSES);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-	  <PreprocessorDefinitions>CURSES_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+	  <PreprocessorDefinitions>CURSES_GRAPHICS;CHTYPE_32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
 	<Link>
       <AdditionalLibraryDirectories>$(ToolsDir)</AdditionalLibraryDirectories>

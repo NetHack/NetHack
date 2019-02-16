@@ -1,5 +1,5 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1546174708 2018/12/30 12:58:28 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
-#       Copyright (c) NetHack PC Development Team 1993-2018
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1550344504 2019/02/16 19:15:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.152 $ */
+#       Copyright (c) NetHack PC Development Team 1993-2019
 #
 #==============================================================================
 # Build Tools Environment
@@ -452,7 +452,7 @@ CL_RECENT=-sdl
 #----------------------------------------------------------------
 
 !IF "$(ADD_CURSES)" == "Y"
-CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
 !ELSE
 CURSDEF=
 CURSESLIB=
