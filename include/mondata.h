@@ -10,14 +10,22 @@
 
 #define pm_resistance(ptr, typ) (((ptr)->mresists & (typ)) != 0)
 
-#define resists_fire(mon) (((mon)->mintrinsics & MR_FIRE) != 0)
-#define resists_cold(mon) (((mon)->mintrinsics & MR_COLD) != 0)
-#define resists_sleep(mon) (((mon)->mintrinsics & MR_SLEEP) != 0)
-#define resists_disint(mon) (((mon)->mintrinsics & MR_DISINT) != 0)
-#define resists_elec(mon) (((mon)->mintrinsics & MR_ELEC) != 0)
-#define resists_poison(mon) (((mon)->mintrinsics & MR_POISON) != 0)
-#define resists_acid(mon) (((mon)->mintrinsics & MR_ACID) != 0)
-#define resists_ston(mon) (((mon)->mintrinsics & MR_STONE) != 0)
+#define resists_fire(mon) \
+    ((((mon)->data->mresists | (mon)->mintrinsics) & MR_FIRE) != 0)
+#define resists_cold(mon) \
+    ((((mon)->data->mresists | (mon)->mintrinsics) & MR_COLD) != 0)
+#define resists_sleep(mon) \
+    ((((mon)->data->mresists | (mon)->mintrinsics) & MR_SLEEP) != 0)
+#define resists_disint(mon) \
+    ((((mon)->data->mresists | (mon)->mintrinsics) & MR_DISINT) != 0)
+#define resists_elec(mon) \
+    ((((mon)->data->mresists | (mon)->mintrinsics) & MR_ELEC) != 0)
+#define resists_poison(mon) \
+    ((((mon)->data->mresists | (mon)->mintrinsics) & MR_POISON) != 0)
+#define resists_acid(mon) \
+    ((((mon)->data->mresists | (mon)->mintrinsics) & MR_ACID) != 0)
+#define resists_ston(mon) \
+    ((((mon)->data->mresists | (mon)->mintrinsics) & MR_STONE) != 0)
 
 #define is_lminion(mon) \
     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)
