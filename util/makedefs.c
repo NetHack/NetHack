@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1539804926 2018/10/17 19:35:26 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1550444428 2019/02/17 23:00:28 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -187,6 +187,7 @@ static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
 static void NDECL(build_savebones_compat_string);
 static void NDECL(windowing_sanity);
+static void FDECL(opt_out_words, (char *, int *));
 
 static boolean FDECL(qt_comment, (char *));
 static boolean FDECL(qt_control, (char *));
@@ -1678,10 +1679,23 @@ struct win_info {
 };
 static struct win_info window_opts[] = {
 #ifdef TTY_GRAPHICS
-    { "tty", "traditional tty-based graphics" },
+    { "tty",
+      /* testing 'USE_TILES' here would bring confusion because it could
+         apply to another interface such as X11, so check MSDOS explicitly
+         instead; even checking TTY_TILES_ESCCODES would probably be
+         confusing to most users (and it will already be listed separately
+         in the compiled options section so users aware of it can find it) */
+#ifdef MSDOS
+      "traditional text with optional 'tiles' graphics"
+#else
+      /* assume that one or more of IBMgraphics, DECgraphics, or MACgraphics
+         can be enabled; we can't tell from here whether that is accurate */
+      "traditional text with optional line-drawing"
+#endif
+    },
 #endif
 #ifdef CURSES_GRAPHICS
-    { "curses", "terminal-based graphics using curses libraries" },
+    { "curses", "terminal-based graphics" },
 #endif
 #ifdef X11_GRAPHICS
     { "X11", "X11" },
@@ -1749,12 +1763,38 @@ windowing_sanity()
 #endif /*DEFAULT_WINDOW_SYS*/
 }
 
+static const char opt_indent[] = "    ";
+
+static void
+opt_out_words(str, length_p)
+char *str; /* input, but modified during processing */
+int *length_p; /* in/out */
+{
+    char *word;
+
+    while (*str) {
+        word = index(str, ' ');
+#if 0
+        /* treat " (" as unbreakable space */
+        if (word && *(word + 1) == '(')
+            word = index(word + 1,  ' ');
+#endif
+        if (word)
+            *word = '\0';
+        if (*length_p + (int) strlen(str) > COLNO - 5)
+            Fprintf(ofp, "\n%s", opt_indent),
+                *length_p = (int) strlen(opt_indent);
+        else
+            Fprintf(ofp, " "), (*length_p)++;
+        Fprintf(ofp, "%s", str), *length_p += (int) strlen(str);
+        str += strlen(str) + (word ? 1 : 0);
+    }
+}
+
 void
 do_options()
 {
-    static const char indent[] = "    ";
-    const char *str, *sep;
-    char *word, buf[BUFSZ];
+    char buf[BUFSZ];
     int i, length, winsyscnt;
 
     windowing_sanity();
@@ -1770,56 +1810,52 @@ do_options()
     }
 
     build_savebones_compat_string();
-    Fprintf(ofp,
+    Fprintf(ofp, "\n%sNetHack version %d.%d.%d%s\n",
+            opt_indent,
+            VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
 #ifdef BETA
-            "\n    NetHack version %d.%d.%d [beta]\n",
+            " [beta]"
 #else
-            "\n    NetHack version %d.%d.%d\n",
+            ""
 #endif
-            VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+            );
 
     Fprintf(ofp, "\nOptions compiled into this edition:\n");
     length = COLNO + 1; /* force 1st item onto new line */
     for (i = 0; i < SIZE(build_opts); i++) {
-        str = strcat(strcpy(buf, build_opts[i]),
-                     (i < SIZE(build_opts) - 1) ? "," : ".");
-        while (*str) {
-            word = index(str, ' ');
-            if (word)
-                *word = '\0';
-            if (length + strlen(str) > COLNO - 5)
-                Fprintf(ofp, "\n%s", indent), length = strlen(indent);
-            else
-                Fprintf(ofp, " "), length++;
-            Fprintf(ofp, "%s", str), length += strlen(str);
-            str += strlen(str) + (word ? 1 : 0);
-        }
+        opt_out_words(strcat(strcpy(buf, build_opts[i]),
+                             (i < SIZE(build_opts) - 1) ? "," : "."),
+                      &length);
     }
+    Fprintf(ofp, "\n"); /* terminate last line of words */
 
     winsyscnt = SIZE(window_opts) - 1;
-    Fprintf(ofp, "\n\nSupported windowing system%s:\n",
+    Fprintf(ofp, "\nSupported windowing system%s:\n",
             (winsyscnt > 1) ? "s" : "");
     length = COLNO + 1; /* force 1st item onto new line */
     for (i = 0; i < winsyscnt; i++) {
-        str = window_opts[i].name;
-        if (length + strlen(str) > COLNO - 5)
-            Fprintf(ofp, "\n%s", indent), length = strlen(indent);
-        else
-            Fprintf(ofp, " "), length++;
-        Fprintf(ofp, "%s", str), length += strlen(str);
-        sep = (winsyscnt == 1)
-                  ? "."
-                  : (winsyscnt == 2)
-                        ? ((i == 0) ? " and" : "")
-                        : (i < winsyscnt - 2)
-                              ? ","
-                              : ((i == winsyscnt - 2) ? ", and" : "");
-        Fprintf(ofp, "%s", sep), length += strlen(sep);
+        Sprintf(buf, "\"%s\"", window_opts[i].id);
+        if (strcmp(window_opts[i].name, window_opts[i].id))
+            Sprintf(eos(buf), " (%s)", window_opts[i].name);
+        /*
+         * 1 : foo.
+         * 2 : foo and bar  (note no period; comes from 'with default' below)
+         * 3+: for, bar, and quux
+         */
+        opt_out_words(strcat(buf, (winsyscnt == 1) ? "." /* no 'default' */
+                                  : (winsyscnt == 2 && i == 0) ? " and"
+                                    : (i == winsyscnt - 2) ? ", and"
+                                      : ","),
+                      &length);
     }
-    if (winsyscnt > 1)
-        Fprintf(ofp, "\n%swith a default of %s.", indent, DEFAULT_WINDOW_SYS);
-    Fprintf(ofp, "\n\n");
+    if (winsyscnt > 1) {
+        Sprintf(buf, "with a default of \"%s\".", DEFAULT_WINDOW_SYS);
+        opt_out_words(buf, &length);
+    }
+    Fprintf(ofp, "\n"); /* terminate last line of words */
 
+    /* end with a blank line */
+    Fprintf(ofp, "\n");
     Fclose(ofp);
     return;
 }
