@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1546465283 2019/01/02 21:41:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1550524563 2019/02/18 21:16:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,22 +10,14 @@
 
 /* set up an individual monster's base type (initial creation, shapechange) */
 void
-set_mon_data(mon, ptr, flag)
+set_mon_data(mon, ptr)
 struct monst *mon;
 struct permonst *ptr;
-int flag;
 {
     int new_speed, old_speed = mon->data ? mon->data->mmove : 0;
 
     mon->data = ptr;
     mon->mnum = (short) monsndx(ptr);
-    if (flag == -1)
-        return; /* "don't care" */
-
-    if (flag == 1)
-        mon->mintrinsics |= (ptr->mresists & 0x00FF);
-    else
-        mon->mintrinsics = (ptr->mresists & 0x00FF);
 
     if (mon->movement) { /* same adjustment as poly'd hero undergoes */
         new_speed = ptr->mmove;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1537234121 2018/09/18 01:28:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1550524569 2019/02/18 21:16:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -317,7 +317,8 @@ struct obj *obj; /* item to make known if effect can be seen */
     }
 }
 
-/* armor put on or taken off; might be magical variety */
+/* armor put on or taken off; might be magical variety
+   [TODO: rename to 'update_mon_extrinsics()' and change all callers...] */
 void
 update_mon_intrinsics(mon, obj, on, silently)
 struct monst *mon;
@@ -369,7 +370,7 @@ boolean on, silently;
             if (which <= 8) { /* 1 thru 8 correspond to MR_xxx mask values */
                 /* FIRE,COLD,SLEEP,DISINT,SHOCK,POISON,ACID,STONE */
                 mask = (uchar) (1 << (which - 1));
-                mon->mintrinsics |= (unsigned short) mask;
+                mon->mextrinsics |= (unsigned short) mask;
             }
             break;
         }
@@ -395,25 +396,22 @@ boolean on, silently;
         case ACID_RES:
         case STONE_RES:
             mask = (uchar) (1 << (which - 1));
-            /* If the monster doesn't have this resistance intrinsically,
-               check whether any other worn item confers it.  Note that
-               we don't currently check for anything conferred via simply
-               carrying an object. */
-            if (!(mon->data->mresists & mask)) {
-                for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
-                    if (otmp->owornmask
-                        && (int) objects[otmp->otyp].oc_oprop == which)
-                        break;
-                if (!otmp)
-                    mon->mintrinsics &= ~((unsigned short) mask);
-            }
+            /* update monster's extrinsics (for worn objects only;
+               'obj' itself might still be worn or already unworn) */
+            for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
+                if (otmp != obj
+                    && otmp->owornmask
+                    && (int) objects[otmp->otyp].oc_oprop == which)
+                    break;
+            if (!otmp)
+                mon->mextrinsics &= ~((unsigned short) mask);
             break;
         default:
             break;
         }
     }
 
-maybe_blocks:
+ maybe_blocks:
     /* obj->owornmask has been cleared by this point, so we can't use it.
        However, since monsters don't wield armor, we don't have to guard
        against that and can get away with a blanket worn-mask value. */
