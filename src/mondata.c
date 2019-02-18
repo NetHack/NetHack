@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1550524563 2019/02/18 21:16:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1550525093 2019/02/18 21:24:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,13 +19,21 @@ struct permonst *ptr;
     mon->data = ptr;
     mon->mnum = (short) monsndx(ptr);
 
-    if (mon->movement) { /* same adjustment as poly'd hero undergoes */
+    if (mon->movement) { /* used to adjust poly'd hero as well as monsters */
         new_speed = ptr->mmove;
         /* prorate unused movement if new form is slower so that
            it doesn't get extra moves leftover from previous form;
            if new form is faster, leave unused movement as is */
-        if (new_speed < old_speed)
-            mon->movement = new_speed * mon->movement / old_speed;
+        if (new_speed < old_speed) {
+            /*
+             * Some static analysis warns that this might divide by 0
+               mon->movement = new_speed * mon->movement / old_speed;
+             * so add a redundant test to suppress that.
+             */
+            mon->movement *= new_speed;
+            if (old_speed > 0) /* old > new and new >= 0, so always True */
+                mon->movement /= old_speed;
+        }
     }
     return;
 }
