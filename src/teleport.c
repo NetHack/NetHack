@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1549157815 2019/02/03 01:36:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1550524567 2019/02/18 21:16:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -130,7 +130,7 @@ unsigned entflags;
         mdat = &mons[u.umonster];
     }
     fakemon = zeromonst;
-    set_mon_data(&fakemon, mdat, -1); /* set up for goodpos */
+    set_mon_data(&fakemon, mdat); /* set up for goodpos */
 
     good_ptr = good;
     range = 1;

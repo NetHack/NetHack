@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1548208238 2019/01/23 01:50:38 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1550525094 2019/02/18 21:24:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.128 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,9 +41,8 @@ void
 set_uasmon()
 {
     struct permonst *mdat = &mons[u.umonnum];
-    int new_speed, old_speed = youmonst.data ? youmonst.data->mmove : 0;
 
-    set_mon_data(&youmonst, mdat, 0);
+    set_mon_data(&youmonst, mdat);
 
 #define PROPSET(PropIndx, ON)                          \
     do {                                               \
@@ -100,15 +99,6 @@ set_uasmon()
 
     float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
     polysense();
-
-    if (youmonst.movement) {
-        new_speed = mdat->mmove;
-        /* prorate unused movement if new form is slower so that
-           it doesn't get extra moves leftover from previous form;
-           if new form is faster, leave unused movement as is */
-        if (new_speed < old_speed)
-            youmonst.movement = new_speed * youmonst.movement / old_speed;
-    }
 
 #ifdef STATUS_HILITES
     status_initialize(REASSESS_ONLY);

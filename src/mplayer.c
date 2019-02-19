@@ -1,4 +1,4 @@
-/* NetHack 3.6	mplayer.c	$NHDT-Date: 1545964576 2018/12/28 02:36:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	mplayer.c	$NHDT-Date: 1550524564 2019/02/18 21:16:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.26 $ */
 /*      Copyright (c) Izchak Miller, 1992.                        */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -341,7 +341,7 @@ boolean special;
 
         /* roll for character class */
         pm = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
-        set_mon_data(&fakemon, &mons[pm], -1);
+        set_mon_data(&fakemon, &mons[pm]);
 
         /* roll for an available location */
         do {

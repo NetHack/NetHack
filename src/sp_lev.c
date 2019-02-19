@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1545946257 2018/12/27 21:30:57 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1550524566 2019/02/18 21:16:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.110 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1754,7 +1754,7 @@ struct mkroom *croom;
                     struct permonst *olddata = mtmp->data;
 
                     mgender_from_permonst(mtmp, mdat);
-                    set_mon_data(mtmp, mdat, 0);
+                    set_mon_data(mtmp, mdat);
                     if (emits_light(olddata) != emits_light(mtmp->data)) {
                         /* used to give light, now doesn't, or vice versa,
                            or light's range has changed */

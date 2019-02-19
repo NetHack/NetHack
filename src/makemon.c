@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1544998885 2018/12/16 22:21:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1550524560 2019/02/18 21:16:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1200,7 +1200,7 @@ int mmflags;
     mtmp->m_id = context.ident++;
     if (!mtmp->m_id)
         mtmp->m_id = context.ident++; /* ident overflowed */
-    set_mon_data(mtmp, ptr, 0);
+    set_mon_data(mtmp, ptr); /* mtmp->data = ptr; */
     if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
         quest_status.leader_m_id = mtmp->m_id;
     mtmp->mnum = mndx;
@@ -1863,7 +1863,7 @@ struct monst *mtmp, *victim;
                 pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
                       an(ptr->mname), mhe(mtmp),
                       nonliving(ptr) ? "expires" : "dies");
-            set_mon_data(mtmp, ptr, -1); /* keep mvitals[] accurate */
+            set_mon_data(mtmp, ptr); /* keep mvitals[] accurate */
             mondied(mtmp);
             return (struct permonst *) 0;
         } else if (canspotmon(mtmp)) {
@@ -1886,7 +1886,7 @@ struct monst *mtmp, *victim;
                                                         : "grows up into",
                   an(buf));
         }
-        set_mon_data(mtmp, ptr, 1);    /* preserve intrinsics */
+        set_mon_data(mtmp, ptr);
         newsym(mtmp->mx, mtmp->my);    /* color may change */
         lev_limit = (int) mtmp->m_lev; /* never undo increment */
 
