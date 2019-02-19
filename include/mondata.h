@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.h	$NHDT-Date: 1548209737 2019/01/23 02:15:37 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.6	mondata.h	$NHDT-Date: 1550524558 2019/02/18 21:15:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,14 +10,22 @@
 
 #define pm_resistance(ptr, typ) (((ptr)->mresists & (typ)) != 0)
 
-#define resists_fire(mon) (((mon)->mintrinsics & MR_FIRE) != 0)
-#define resists_cold(mon) (((mon)->mintrinsics & MR_COLD) != 0)
-#define resists_sleep(mon) (((mon)->mintrinsics & MR_SLEEP) != 0)
-#define resists_disint(mon) (((mon)->mintrinsics & MR_DISINT) != 0)
-#define resists_elec(mon) (((mon)->mintrinsics & MR_ELEC) != 0)
-#define resists_poison(mon) (((mon)->mintrinsics & MR_POISON) != 0)
-#define resists_acid(mon) (((mon)->mintrinsics & MR_ACID) != 0)
-#define resists_ston(mon) (((mon)->mintrinsics & MR_STONE) != 0)
+#define resists_fire(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_FIRE) != 0)
+#define resists_cold(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_COLD) != 0)
+#define resists_sleep(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_SLEEP) != 0)
+#define resists_disint(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_DISINT) != 0)
+#define resists_elec(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_ELEC) != 0)
+#define resists_poison(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_POISON) != 0)
+#define resists_acid(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_ACID) != 0)
+#define resists_ston(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_STONE) != 0)
 
 #define is_lminion(mon) \
     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)
