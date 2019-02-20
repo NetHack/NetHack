@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1549755185 2019/02/09 23:33:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1550629490 2019/02/20 02:24:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.196 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3209,7 +3209,12 @@ int in_ch;
 
     HUPSKIP();
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
-    if (SYMHANDLING(H_IBM) || iflags.eight_bit_tty) {
+    if (SYMHANDLING(H_IBM)
+        /* for DECgraphics, lower-case letters with high bit set mean
+           switch character set and render with high bit clear;
+           user might want 8-bits for other characters */
+        || (iflags.eight_bit_tty && (!SYMHANDLING(H_DEC)
+                                     || (in_ch & 0x7f) < 0x60))) {
         /* IBM-compatible displays don't need other stuff */
         (void) putchar(ch);
     } else if (ch & 0x80) {
