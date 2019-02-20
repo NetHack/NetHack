@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.258 $ $NHDT-Date: 1550532194 2019/02/18 23:23:14 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.259 $ $NHDT-Date: 1550629490 2019/02/20 02:24:50 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -481,6 +481,10 @@ tty: suppress intermediate 'Count: 123' prompt and getpos autodescribe
 	feedback from being included in ^P message recall
 tty: ^P feedback with msg_window:full/combination/reverse containing output
 	from dolook/whatis could show strange characters for DECgraphics
+tty: if eight_bit_tty option is set and current symbol set specifies
+	DECgraphics handling, render line-drawing characters (in nethack's
+	scheme, the 4th quarter of ASCII--mostly lower case letters--with
+	8th-bit forced on) instead of treating that subset as 8-bit characters
 unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
 	extension when using $(VERBOSEMAKE) to reduce build-time feedback;
 	replace with $(QUIETCC) which operates the same but defaults to
