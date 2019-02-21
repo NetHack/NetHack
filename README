@@ -125,7 +125,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 Installation instructions
 
 Following are the convenience scripts that can be used to install 
-NetHack on Linux.
+NetHack on Ubuntu Linux (tested on 18.04 LTS).
 
 1. Install necessary packages
 
