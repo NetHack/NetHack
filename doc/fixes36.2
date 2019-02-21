@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.259 $ $NHDT-Date: 1550629490 2019/02/20 02:24:50 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.260 $ $NHDT-Date: 1550784489 2019/02/21 21:28:09 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -373,6 +373,11 @@ when donning armor, defer flagging its +/- value--which can be deduced from
 	then (player might still deduce the +/- value but hero won't learn it)
 a monster with resistances supplied by worn armor would lose them if that
 	monster went through a shape change even if the armor stayed worn
+after using 'f' to fire/throw with autoquiver enabled and numpad off, then
+	using ^A to repeat, if ammo was just used up and there's nothing
+	suitable to autoquiver it would pick the item in the inventory slot
+	corresponding to the direction letter from preceding 'fire' (and if
+	there was such an item, then ask for direction since ^A data ran out)
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
