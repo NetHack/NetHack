@@ -751,14 +751,55 @@ register struct monst *mtmp;
     return (tmp == 2);
 }
 
-static NEARDATA const char practical[] = { WEAPON_CLASS, ARMOR_CLASS,
-                                           GEM_CLASS, FOOD_CLASS, 0 };
-static NEARDATA const char magical[] = { AMULET_CLASS, POTION_CLASS,
-                                         SCROLL_CLASS, WAND_CLASS,
-                                         RING_CLASS,   SPBOOK_CLASS, 0 };
-static NEARDATA const char indigestion[] = { BALL_CLASS, ROCK_CLASS, 0 };
-static NEARDATA const char boulder_class[] = { ROCK_CLASS, 0 };
-static NEARDATA const char gem_class[] = { GEM_CLASS, 0 };
+/* Return true if a "practical" monster should be interested in this obj. */
+boolean
+mitem_practical(obj)
+struct obj * obj;
+{
+    switch(obj->oclass) {
+    case WEAPON_CLASS:
+    case ARMOR_CLASS:
+    case GEM_CLASS:
+    case FOOD_CLASS:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+/* Return true if a monster that likes magical items should be interested in
+ * this obj. */
+boolean
+mitem_magical(obj)
+struct obj * obj;
+{
+    return objects[obj->otyp].oc_magic;
+}
+
+/* Return true if a monster (gelatinous cube) shouldn't try to eat this obj. */
+boolean
+mitem_indigestion(obj)
+struct obj * obj;
+{
+    return (obj->oclass == BALL_CLASS || obj->oclass == ROCK_CLASS);
+}
+
+/* Return true if a giant should be interested in this obj. (They like all
+ * rocks.)*/
+boolean
+mitem_rock(obj)
+struct obj * obj;
+{
+    return (obj->oclass == ROCK_CLASS);
+}
+
+/* Return true if a gem-liking monster should be interested in this obj. */
+boolean
+mitem_gem(obj)
+struct obj * obj;
+{
+    return (obj->oclass == GEM_CLASS);
+}
 
 boolean
 itsstuck(mtmp)
@@ -1110,18 +1151,18 @@ register int after;
                         continue;
 
                     if (((likegold && otmp->oclass == COIN_CLASS)
-                         || (likeobjs && index(practical, otmp->oclass)
+                         || (likeobjs && mitem_practical(otmp)
                              && (otmp->otyp != CORPSE
                                  || (ptr->mlet == S_NYMPH
                                      && !is_rider(&mons[otmp->corpsenm]))))
-                         || (likemagic && index(magical, otmp->oclass))
+                         || (likemagic && mitem_magical(otmp))
                          || (uses_items && searches_for_item(mtmp, otmp))
                          || (likerock && otmp->otyp == BOULDER)
                          || (likegems && otmp->oclass == GEM_CLASS
                              && objects[otmp->otyp].oc_material != MINERAL)
                          || (conceals && !cansee(otmp->ox, otmp->oy))
                          || (ptr == &mons[PM_GELATINOUS_CUBE]
-                             && !index(indigestion, otmp->oclass)
+                             && !mitem_indigestion(otmp)
                              && !(otmp->otyp == CORPSE
                                   && touch_petrifies(&mons[otmp->corpsenm]))))
                         && touch_artifact(otmp, mtmp)) {
@@ -1575,15 +1616,15 @@ register int after;
                 boolean picked = FALSE;
 
                 if (likeobjs)
-                    picked |= mpickstuff(mtmp, practical);
+                    picked |= mpickstuff(mtmp, mitem_practical);
                 if (likemagic)
-                    picked |= mpickstuff(mtmp, magical);
+                    picked |= mpickstuff(mtmp, mitem_magical);
                 if (likerock)
-                    picked |= mpickstuff(mtmp, boulder_class);
+                    picked |= mpickstuff(mtmp, mitem_rock);
                 if (likegems)
-                    picked |= mpickstuff(mtmp, gem_class);
+                    picked |= mpickstuff(mtmp, mitem_gem);
                 if (uses_items)
-                    picked |= mpickstuff(mtmp, (char *) 0);
+                    picked |= mpickstuff(mtmp, NULL);
                 if (picked)
                     mmoved = 3;
             }

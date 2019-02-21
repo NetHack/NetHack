@@ -1465,7 +1465,7 @@ E int FDECL(meatmetal, (struct monst *));
 E int FDECL(meatobj, (struct monst *));
 E int FDECL(meatcorpse, (struct monst *));
 E void FDECL(mpickgold, (struct monst *));
-E boolean FDECL(mpickstuff, (struct monst *, const char *));
+E boolean FDECL(mpickstuff, (struct monst *, boolean (*)(OBJ_P)));
 E int FDECL(curr_mon_load, (struct monst *));
 E int FDECL(max_mon_load, (struct monst *));
 E int FDECL(can_carry, (struct monst *, struct obj *));

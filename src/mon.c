@@ -1281,10 +1281,14 @@ register struct monst *mtmp;
     }
 }
 
+/* Monster tries to pick up an item. Return TRUE if something was picked up.
+ * mitem_wanted is a callback that takes an object and returns TRUE if the item
+ * should be picked up or FALSE if not.
+ */
 boolean
-mpickstuff(mtmp, str)
+mpickstuff(mtmp, mitem_wanted)
 register struct monst *mtmp;
-register const char *str;
+boolean FDECL ((*mitem_wanted), (OBJ_P));
 {
     register struct obj *otmp, *otmp2, *otmp3;
     int carryamt = 0;
@@ -1296,8 +1300,8 @@ register const char *str;
     for (otmp = g.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
         /* Nymphs take everything.  Most monsters don't pick up corpses. */
-        if (!str ? searches_for_item(mtmp, otmp)
-                 : !!(index(str, otmp->oclass))) {
+        if ((mitem_wanted != NULL && (*mitem_wanted)(otmp))
+            || (mitem_wanted == NULL && searches_for_item(mtmp, otmp))) {
             if (otmp->otyp == CORPSE && mtmp->data->mlet != S_NYMPH
                 /* let a handful of corpse types thru to can_carry() */
                 && !touch_petrifies(&mons[otmp->corpsenm])
