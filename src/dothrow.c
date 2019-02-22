@@ -383,7 +383,7 @@ dofire()
            fill quiver with it if it's not wielded */
         if (!obj) {
             /* direction of previous throw is not suitable answer here */
-            in_doagain = FALSE;
+            g.in_doagain = FALSE;
             obj = getobj(uslinging() ? bullets : toss_objs, "throw");
             /* Q command doesn't allow gold in quiver */
             if (obj && !obj->owornmask && obj->oclass != COIN_CLASS)

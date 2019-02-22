@@ -101,7 +101,7 @@ sort_rooms()
 #else
 #define CAST_nroom g.nroom /*as-is*/
 #endif
-    qsort((genericptr_t) rooms, CAST_nroom, sizeof (struct mkroom), do_comp);
+    qsort((genericptr_t) g.rooms, CAST_nroom, sizeof (struct mkroom), do_comp);
 #undef CAST_nroom
 }
 
