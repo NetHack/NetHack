@@ -123,5 +123,10 @@
 .sn \\n(bRu
 .br
 ..
+.\" .UR url
+.\" Just a pass-through here; converted to a link when generating HTML.
+.de UR
+\\$1\\$2
+..
 .
 .\"tmac.nh/"
