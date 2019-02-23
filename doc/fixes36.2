@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.261 $ $NHDT-Date: 1550800390 2019/02/22 01:53:10 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.262 $ $NHDT-Date: 1550868876 2019/02/22 20:54:36 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -373,11 +373,11 @@ when donning armor, defer flagging its +/- value--which can be deduced from
 	then (player might still deduce the +/- value but hero won't learn it)
 a monster with resistances supplied by worn armor would lose them if that
 	monster went through a shape change even if the armor stayed worn
-after using 'f' to fire/throw with autoquiver enabled and numpad off, then
-	using ^A to repeat, if ammo was just used up and there's nothing
-	suitable to autoquiver it would pick the item in the inventory slot
-	corresponding to the direction letter from preceding 'fire' (and if
-	there was such an item, then ask for direction since ^A data ran out)
+when using 'f' to fire/throw--and possibly some ^A's to repeat--then running
+	out of ammo (with either 'autoquiver' off or nothing suitable to put
+	in quiver), using ^A would put whichever inventory item was assigned
+	the same letter as the prior direction into quiver slot (unless item
+	was already worn or wielded) and then ask for a direction to fire it
 early rolling boulder trap lacking any boulder might still have the corpse
 	of a dead adventurer
 

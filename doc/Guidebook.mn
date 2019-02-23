@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.296 $ $NHDT-Date: 1549931433 2019/02/12 00:30:33 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.297 $ $NHDT-Date: 1550883608 2019/02/23 01:00:08 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -636,7 +636,7 @@ Panic button.  Quit the game.
 .lp d
 Drop something.
 .lp ""
-Ex. \(lqd7a\(rq means drop seven items of object \fIa\fP.
+For example \(lqd7a\(rq means drop seven items of object \fIa\fP.
 .lp D
 Drop several things.
 .lp ""
@@ -1068,7 +1068,7 @@ Cast a spell.
 Default key is \(oqZ\(cq.
 .lp "#chat    "
 Talk to someone.
-Default key is \(oqM-c\)cq.
+Default key is \(oqM-c\(cq.
 .lp "#close   "
 Close a door.
 Default key is \(oqc\(cq.
@@ -1603,7 +1603,7 @@ straight on, horizontally or vertically.  Doorways without doors are
 not restricted in this fashion.
 .pg
 Doors can be useful for shutting out monsters.  Most monsters cannot
-open doors, although a few don't need to (ex. ghosts can walk through
+open doors, although a few don't need to (for example, ghosts can walk through
 doors).
 .pg
 Secret doors are hidden.  You can find them with the \(oqs\(cq (search)
@@ -2170,7 +2170,7 @@ leather jacket	9
 no armor	10
 .TE
 .pg
-You can also wear other pieces of armor (ex. helmets, boots, shields, cloaks)
+You can also wear other pieces of armor (for example helmets, boots, shields, cloaks)
 to lower your armor class even further, but you can only wear one item
 of each category (one suit of armor, one cloak, one helmet, one
 shield, and so on) at a time.
@@ -2223,7 +2223,7 @@ The command to eat food is \(oqe\(cq.
 Scrolls (\(oq?\(cq)
 .pg
 Scrolls are labeled with various titles, probably chosen by ancient wizards
-for their amusement value (ex. \(lqREAD ME,\(rq or \(lqTHANX MAUD\(rq
+for their amusement value (for example \(lqREAD ME,\(rq or \(lqTHANX MAUD\(rq
 backwards).
 Scrolls disappear after you read them (except for blank ones, without
 magic spells on them).
@@ -2371,7 +2371,7 @@ have a limited number of uses, akin to wand charges.  For example, lamps burn
 out after a while.  Other tools are containers, which objects can
 be placed into or taken out of.
 .pg
-The command to use tools is \(oqa\(cq (apply).
+The command to use a tool is \(oqa\(cq (apply).
 .hn 3
 Containers
 .pg
@@ -2876,11 +2876,11 @@ Persistent.
 Set the character used to display boulders (default is the \(lqlarge rock\(rq
 class symbol, \(oq\`\(cq).
 .lp catname
-Name your starting cat (ex. \(lqcatname:Morris\(rq).
+Name your starting cat (for example \(lqcatname:Morris\(rq).
 Cannot be set with the \(oqO\(cq command.
 .lp character
 Synonym for \(lqrole\(rq to pick the type of your character
-(ex. \(lqcharacter:Monk\(rq).
+(for example \(lqcharacter:Monk\(rq).
 See
 .op role
 for more details.
@@ -2951,7 +2951,7 @@ Specified categories with omitted prefix implicitly use \(oq+\(cq prefix.
 Order of the disclosure categories does not matter, program display for
 end-of-game disclosure follows a set sequence.
 .lp ""
-(ex. \(lqdisclose:yi na +v -g o\(rq)
+(for example \(lqdisclose:yi na +v -g o\(rq)
 The example sets
 \fBinventory\fP to \fIprompt\fP and default to \fIyes\fP,
 \fBattributes\fP to \fIprompt\fP and default to \fIno\fP,
@@ -2965,7 +2965,7 @@ traps and each other as well as by you.
 And the dungeon overview shows all levels you had visited but does not
 reveal things about them that you hadn't discovered.
 .lp dogname
-Name your starting dog (ex. \(lqdogname:Fang\(rq).
+Name your starting dog (for example \(lqdogname:Fang\(rq).
 Cannot be set with the \(oqO\(cq command.
 .lp extmenu
 Changes the extended commands interface to pop-up a menu of available
@@ -2985,7 +2985,7 @@ Persistent.
 Commands asking for an inventory item show a menu instead of
 a text query with possible menu letters. Default is off.
 .lp "fruit   "
-Name a fruit after something you enjoy eating (ex. \(lqfruit:mango\(rq)
+Name a fruit after something you enjoy eating (for example \(lqfruit:mango\(rq)
 (default \(lqslime mold\(rq).
 Basically a nostalgic whimsy that NetHack uses from time to time.
 You should set this to something you find more appetizing than slime mold.
@@ -3036,7 +3036,7 @@ on the top of the pile.
 Show a hit point bar graph behind your name and title.
 Only available for TTY and Windows GUI, and only when statushilites is on.
 .lp horsename
-Name your starting horse (ex. \(lqhorsename:Trigger\(rq).
+Name your starting horse (for example \(lqhorsename:Trigger\(rq).
 Cannot be set with the \(oqO\(cq command.
 .lp ignintr
 Ignore interrupt signals, including breaks (default off).  Persistent.
@@ -3335,7 +3335,7 @@ Persistent.
 Make the space bar a synonym for the \(oq.\(cq (#wait) command (default off).
 Persistent.
 .lp "role    "
-Pick your type of character (ex. \(lqrole:Samurai\(rq);
+Pick your type of character (for example \(lqrole:Samurai\(rq);
 synonym for \(lqcharacter\(rq.
 See \(lqname\(rq for an alternate method of specifying your role.
 Normally only the first letter of the value is examined; \(oqr\(cq is an
@@ -3380,7 +3380,7 @@ Persistent.
 Evaluate monsters, objects, and map prior to each turn (default off).
 Debug mode only.
 .lp scores
-Control what parts of the score list you are shown at the end (ex.
+Control what parts of the score list you are shown at the end (for example
 \(lqscores:5 top scores/4 around my score/own scores\(rq).
 Only the first letter of each category (\(oqt\(cq, \(oqa\(cq, or \(oqo\(cq)
 is necessary.
@@ -3430,7 +3430,7 @@ Allow updates to the status lines at the bottom of the screen (default true).
 .lp suppress_alert
 This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that
-and prior versions (ex. \(lqsuppress_alert:3.3.1\(rq).
+and prior versions (for example \(lqsuppress_alert:3.3.1\(rq).
 .lp symset
 This option may be used to select one of the named symbol sets found within
 \(lqsymbols\(rq to alter the symbols displayed on the screen.
@@ -3678,7 +3678,7 @@ display quickly and to read the keyboard (allowing the use of arrow
 keys to move) on machines with an IBM PC compatible BIOS ROM (default off,
 OS/2, PC, and ST NetHack only).
 .lp flush
-(default off, AMIGA NetHack only).
+(default off, Amiga NetHack only).
 .lp "MACgraphics"
 (default on, Mac NetHack only).
 .lp page_wait
@@ -4399,7 +4399,7 @@ s	S_spider	(arachnid or centipede)
 \\	S_throne	(opulent throne)
 \-	S_tlcorn	(top left corner)
 |	S_tlwall	(wall)
-(	S_tool	(useful item (pick-axe\, key\, lamp...))
+(	S_tool	(useful item (pick-axe, key, lamp...))
 \(ha	S_trap_door	(trap door)
 t	S_trapper	(trapper or lurker above)
 \-	S_trcorn	(top right corner)
@@ -4877,7 +4877,9 @@ released publicly by other parties. Since that code was a work-in-progress
 and had not gone through the process of debugging it as a suitable release,
 it was decided that the version numbers present on that code snapshot would
 be retired and never used in an official NetHack release. An announcement
-was posted on the NetHack Development Team's official nethack.org website to that effect,
+was posted on the NetHack Development Team's official
+.UR nethack.org
+website to that effect,
 stating that there would never be a 3.4.4, 3.5, or 3.5.0 official release
 version.
 .pg
@@ -4933,7 +4935,8 @@ and Integrity (aka Itanium aka IA64) but not VAX.
 necessary updates to the community at large.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP
-at http://www.nethack.org/.
+at
+.UR http://www.nethack.org/ .
 .pg
 .hn 2
 SPECIAL THANKS
@@ -5006,6 +5009,6 @@ J. Ali Harlow	Mikko Juola
 .\"Microsoft and MS-DOS are registered trademarks of Microsoft Corporation.
 .\"Lattice is a trademark of Lattice, Inc.
 .\"Atari and 1040ST are trademarks of Atari, Inc.
-.\"AMIGA is a trademark of Commodore-Amiga, Inc.
+.\"Amiga is a trademark of Commodore-Amiga, Inc
 .sm "Brand and product names are trademarks or registered trademarks \
 of their respective holders."

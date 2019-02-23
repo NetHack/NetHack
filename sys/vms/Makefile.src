@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1550360058 2019/02/16 23:34:18 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.34 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1550876198 2019/02/22 22:56:38 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -384,12 +384,28 @@ random.c :	$(SYSSHR)random.c
 tclib.obj :	tclib.c $(CONFIG_H)
 tclib.c :	$(SYSSHR)tclib.c
 	copy $(SYSSHR)tclib.c tclib.c
-#	user interface code -- VMS uses tty (1st 4) only
+#	user interface code -- VMS uses tty or curses or both, not X11
 getline.obj :	$(TTY)getline.c $(HACK_H) $(INC)func_tab.h
 termcap.obj :	$(TTY)termcap.c $(HACK_H) $(INC)tcap.h
 topl.obj :	$(TTY)topl.c $(HACK_H) $(INC)tcap.h
 wintty.obj :	$(TTY)wintty.c $(HACK_H) $(INC)dlb.h \
 		$(INC)date.h $(INC)patchlevel.h $(INC)tcap.h
+cursmain.obj :	$(CURSES)cursmain.c $(HACK_H) $(INC)patchlevel.h \
+		$(INC)wincurs.h
+curswins.obj : 	$(CURSES)curswins.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)curswins.h
+cursmisc.obj : 	$(CURSES)cursmisc.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursmisc.h $(INC)func_tab.h $(INC)dlb.h
+cursdial.obj : 	$(CURSES)cursdial.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursdial.h ../include/func_tab.h
+cursstat.obj : 	$(CURSES)cursstat.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursstat.h
+cursinit.obj : 	$(CURSES)cursinit.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursinit.h
+cursmesg.obj : 	$(CURSES)cursmesg.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursmesg.h
+cursinvt.obj : 	$(CURSES)cursinvt.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursinvt.h
 Window.obj :	$(X11)Window.c $(INC)xwindowp.h $(INC)xwindow.h $(CONFIG_H)
 dialogs.obj :	$(X11)dialogs.c $(CONFIG_H)
 winX.obj :	$(X11)winX.c $(HACK_H) $(INC)winX.h $(INC)dlb.h \

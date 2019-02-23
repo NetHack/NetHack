@@ -1400,7 +1400,7 @@ coord *tm;
        in a pit and yet not be able to identify that the pit is there. */
     if (kind != NO_TRAP && lvl <= (unsigned) rnd(4)
         && kind != SQKY_BOARD && kind != RUST_TRAP
-        /* rolling bounder trap might not have a boulder if there was no
+        /* rolling boulder trap might not have a boulder if there was no
            viable path (such as when placed in the corner of a room), in
            which case tx,ty==launch.x,y; no boulder => no dead predecessor */
         && !(kind == ROLLING_BOULDER_TRAP

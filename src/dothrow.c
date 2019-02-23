@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1550784489 2019/02/21 21:28:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1550868876 2019/02/22 20:54:36 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.158 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -380,10 +380,12 @@ dofire()
                 You("have nothing appropriate for your quiver.");
         }
         /* if autoquiver is disabled or has failed, prompt for missile;
-           fill quiver with it if it's not wielded */
+           fill quiver with it if it's not wielded or worn */
         if (!obj) {
-            /* direction of previous throw is not suitable answer here */
-            g.in_doagain = FALSE;
+            /* in case we're using ^A to repeat prior 'f' command, don't
+               use direction of previous throw as getobj()'s choice here */
+            g.in_doagain = 0;
+            /* choose something from inventory, then usually quiver it */
             obj = getobj(uslinging() ? bullets : toss_objs, "throw");
             /* Q command doesn't allow gold in quiver */
             if (obj && !obj->owornmask && obj->oclass != COIN_CLASS)
