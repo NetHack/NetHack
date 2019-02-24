@@ -135,8 +135,9 @@ panictrace_handler(sig_unused)
 int sig_unused UNUSED;
 {
 #define SIG_MSG "\nSignal received.\n"
-    int f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
-
+    int f2;
+    
+    f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
     nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
     NH_abort(); /* ... and we're already in the process of quitting? */
 }
