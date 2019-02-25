@@ -33,6 +33,9 @@ register struct monst *mon;
                         howler = "mouse";
                         howl = "squeaking";
                     }
+                    else {
+                        howler = NULL;
+                    }
                     break;
                 default:
                     howler = (char *) 0;
