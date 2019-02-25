@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1540502147 2018/10/25 21:15:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1551138503 2019/02/25 23:48:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1373,6 +1373,9 @@ docrt()
 
     /* overlay with monsters */
     see_monsters();
+
+    /* perm_invent */
+    update_inventory();
 
     context.botlx = 1; /* force a redraw of the bottom line */
 }

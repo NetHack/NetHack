@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1546657409 2019/01/05 03:03:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.351 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1551138503 2019/02/25 23:48:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.355 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -440,7 +440,7 @@ static struct Comp_Opt {
     { "DECgraphics", "load DECGraphics display symbols", 70, SET_IN_FILE },
     { "IBMgraphics", "load IBMGraphics display symbols", 70, SET_IN_FILE },
 #ifdef CURSES_GRAPHICS
-    {"cursesgraphics", "load curses display symbols", 70, SET_IN_FILE},
+    { "cursesgraphics", "load curses display symbols", 70, SET_IN_FILE },
 #endif
 #ifdef MAC_GRAPHICS_ENV
     { "Macgraphics", "load MACGraphics display symbols", 70, SET_IN_FILE },
@@ -3987,8 +3987,11 @@ boolean tinitial, tfrom_file;
 #endif
                 context.botl = TRUE;
             } else if (boolopt[i].addr == &flags.invlet_constant) {
-                if (flags.invlet_constant)
+                if (flags.invlet_constant) {
                     reassign();
+                    if (iflags.perm_invent)
+                        need_redraw = TRUE;
+                }
             } else if (boolopt[i].addr == &flags.lit_corridor
                        || boolopt[i].addr == &flags.dark_room) {
                 /*
@@ -4006,16 +4009,16 @@ boolean tinitial, tfrom_file;
                        || boolopt[i].addr == &iflags.use_inverse
                        || boolopt[i].addr == &iflags.hilite_pile
                        || boolopt[i].addr == &iflags.hilite_pet
+                       || boolopt[i].addr == &iflags.perm_invent
+#ifdef CURSES_GRAPHICS
+                       || boolopt[i].addr == &iflags.cursesgraphics
+#endif
                        || boolopt[i].addr == &iflags.wc_ascii_map
                        || boolopt[i].addr == &iflags.wc_tiled_map) {
                 need_redraw = TRUE;
 #ifdef STATUS_HILITES
             } else if (boolopt[i].addr == &iflags.wc2_hitpointbar) {
                 status_initialize(REASSESS_ONLY);
-                need_redraw = TRUE;
-#endif
-#ifdef CURSES_GRAPHICS
-            } else if ((boolopt[i].addr) == &iflags.cursesgraphics) {
                 need_redraw = TRUE;
 #endif
 #ifdef TEXTCOLOR
