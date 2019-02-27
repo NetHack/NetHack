@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1550014802 2019/02/12 23:40:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.107 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1551138255 2019/02/25 23:44:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.108 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1227,7 +1227,8 @@ struct obj *otmp;
 }
 
 /* check whether the target object is currently being taken off,
-   so that stop_donning() and steal() can vary messages */
+   so that stop_donning() and steal() can vary messages and doname()
+   can vary "(being worn)" suffix */
 boolean
 doffing(otmp)
 struct obj *otmp;

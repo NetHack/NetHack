@@ -835,11 +835,15 @@ curses_init_options()
         iflags.wc2_windowborders = 3;   /* Set to auto if not specified */
     }
 
-    if (!iflags.wc2_petattr) {
-        iflags.wc2_petattr = A_REVERSE;
-    } else { /* Pet attribute specified, so hilite_pet should be true */
-
+    /* fix up pet highlighting */
+    if (iflags.wc2_petattr == -1) /* shouldn't happen */
+        iflags.wc2_petattr = A_NORMAL;
+    if (iflags.wc2_petattr != A_NORMAL) {
+        /* Pet attribute specified, so hilite_pet should be true */
         iflags.hilite_pet = TRUE;
+    } else if (iflags.hilite_pet) {
+        /* pet highlighting specified, so don't leave petattr at A_NORMAL */
+        iflags.wc2_petattr = A_REVERSE;
     }
 
 #ifdef NCURSES_MOUSE_VERSION
