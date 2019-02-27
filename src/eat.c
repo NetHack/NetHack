@@ -504,7 +504,10 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
     } else if (magr == &g.youmonst) {
         You("eat %s brain!", s_suffix(mon_nam(mdef)));
     } else if (mdef == &g.youmonst) {
-        Your("brain is eaten!");
+        if (Hallucination)
+            pline("Oh no! Brain drain!");
+        else
+            Your("brain is eaten!");
     } else { /* monster against monster */
         if (visflag && canspotmon(mdef))
             pline("%s brain is eaten!", s_suffix(Monnam(mdef)));
