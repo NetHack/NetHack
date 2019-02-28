@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.297 $ $NHDT-Date: 1550883608 2019/02/23 01:00:08 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.298 $ $NHDT-Date: 1551312285 2019/02/28 00:04:45 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "February 10, 2019
+.ds f2 "February 27, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -3010,6 +3010,10 @@ Gold is never blessed or cursed, but it is not described as \(lquncursed\(rq
 even when the
 .op implicit_uncursed
 option is \(lqoff\(rq.
+.lp guicolor
+Use color text and/or highlighting attributes when displaying some
+non-map data (such as menu selector letters).
+Curses interface only; default is on.
 .lp "help    "
 If more information is available for an object looked at
 with the \(oq/\(cq command, ask if you want to see it (default on).
@@ -3026,6 +3030,12 @@ Visually distinguish pets from similar animals (default off).
 The behavior of this option depends on the type of windowing you use.
 In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a heart symbol near pets.
+.lp ""
+With the curses interface, the
+.op petattr
+option controls how to highlight pets and setting it will turn the
+.op hilite_pet
+option on or off as warranted.
 .lp hilite_pile
 Visually distinguish piles of objects from individual objects (default off).
 The behavior of this option depends on the type of windowing you use.
@@ -3272,6 +3282,35 @@ such as \(lqparanoid_confirmation:attack pray Remove\(rq.
 .lp perm_invent
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
+.lp petattr
+Specifies one or more text highlighting attributes to use when showing
+pets on the map.
+Effectively a superset of the
+.op hilite_pet
+boolean option.
+Curses interface only; value is one or more of the following letters.
+.sd
+.si
+.CC N "Normal text (no highlighting)"
+.CC I "Inverse video (default)"
+.CC B "Bold text"
+.CC U "Underlined text"
+.CC K "blinKing text"
+.CC D "Dim text"
+.CC T "iTalic text"
+.CC L "Left line indicator"
+.CC R "Right line indicator"
+.ei
+.ed
+Some of those choices might not work, particularly the final three,
+depending upon terminal hardware or terminal emulation software.
+.lp ""
+Currently multiple highlight-style letters can be combined by simply
+stringing them together (for example, \(lqBK\(rq), but in the future
+they might require being separated by plus signs (such as \(lqB+K\(rq,
+which works already).
+When using the \(oqN\(cq choice, it should be specified on its own,
+not in combination with any of the other letters.
 .lp pettype
 Specify the type of your initial pet, if you are playing a character class
 that uses multiple types of pets; or choose to have no initial pet at all.
@@ -3435,6 +3474,13 @@ and prior versions (for example \(lqsuppress_alert:3.3.1\(rq).
 This option may be used to select one of the named symbol sets found within
 \(lqsymbols\(rq to alter the symbols displayed on the screen.
 Use \(lqsymset:default\(rq to explicitly select the default symbols.
+.lp "term_cols\ \ \fIand\fP"
+.lp term_rows
+Curses interface only.
+Number of columns and rows to use for the display.
+Curses will attempt to resize to the values specified but will settle
+for smaller sizes if they are too big.
+Default is the current window size.
 .lp "time    "
 Show the elapsed game time in turns on bottom line (default off).
 Persistent.
@@ -3479,7 +3525,6 @@ The possible settings are:
 .CC n "none (no coordinates shown) [default]."
 .ei
 .ed
-.lp ""
 The
 .op whatis_coord
 option is also used with the \(lq/m\(rq, \(lq/M\(rq, \(lq/o\(rq,
@@ -3488,7 +3533,6 @@ where the \(lqnone\(rq setting is overridden with \(lqmap\(rq.
 .lp whatis_filter
 When getting a location on the map, and using the keys to cycle through
 next and previous targets, allows filtering the possible targets.
-.lp ""
 .sd
 .si
 .CC n "no filtering [default]"
@@ -3496,7 +3540,6 @@ next and previous targets, allows filtering the possible targets.
 .CC a "in same area only"
 .ei
 .ed
-.lp ""
 The area-filter tries to be slightly predictive \(em if you're standing
 on a doorway,
 it will consider the area on the side of the door you were last moving towards.
@@ -3512,6 +3555,21 @@ When getting a location on the map, and using shifted movement keys or
 meta-digit keys to fast-move, instead of moving 8 units at a time,
 move by skipping the same glyphs.
 (default off)
+.lp windowborders
+Whether to draw boxes around the map, status area, message area, and
+persistent inventory window if enabled.
+Curses interface only.
+Acceptable values are
+.sd
+.si
+.CC 1 "on, always show borders"
+.CC 2 "off, never show borders"
+.CC 3 "auto, on if terminal or window is at least (24+2)x(80+2)\ \ (default)"
+.ei
+.ed
+.lp ""
+(The 26x82 size threshold for \(oq3\(cq refers to number of rows and
+columns of the display.)
 .lp windowtype
 When the program has been built to support multiple interfaces,
 select which one to use, such as \(lqtty\(rq or \(lqX11\(rq
