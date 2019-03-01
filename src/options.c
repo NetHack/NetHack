@@ -3648,7 +3648,7 @@ boolean tinitial, tfrom_file;
         }
         if (retval) {
             iflags.hilite_pet = (iflags.wc2_petattr != ATR_NONE);
-            if (!initial)
+            if (!g.opt_initial)
                 g.opt_need_redraw = TRUE;
         }
         return retval;
