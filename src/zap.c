@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1545614662 2018/12/24 01:24:22 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.304 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1551395521 2019/02/28 23:12:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.307 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -844,16 +844,16 @@ boolean by_hero;
 
         if (cansee(x, y)) {
             char buf[BUFSZ];
-            unsigned pfx = CXN_PFX_THE;
 
             Strcpy(buf, one_of ? "one of " : "");
-            if (carried(corpse) && !corpse->unpaid) {
-                Strcat(buf, "your ");
-                pfx = CXN_NO_PFX;
-            }
+            /* shk_your: "the " or "your " or "<mon>'s " or "<Shk>'s ".
+               If the result is "Shk's " then it will be ambiguous:
+               is Shk the mon carrying it, or does Shk's shop own it?
+               Let's not worry about that... */
+            (void) shk_your(eos(buf), corpse);
             if (one_of)
                 corpse->quan++; /* force plural */
-            Strcat(buf, corpse_xname(corpse, (const char *) 0, pfx));
+            Strcat(buf, corpse_xname(corpse, (const char *) 0, CXN_NO_PFX));
             if (one_of) /* could be simplified to ''corpse->quan = 1L;'' */
                 corpse->quan--;
             pline("%s glows iridescently.", upstart(buf));
@@ -2000,19 +2000,49 @@ struct obj *obj, *otmp;
             if (obj->otyp == EGG) {
                 revive_egg(obj);
             } else if (obj->otyp == CORPSE) {
+                struct monst *mtmp;
+                xchar ox, oy;
                 int corpsenm = corpse_revive_type(obj);
+                char *corpsname = cxname_singular(obj);
 
-                res = !!revive(obj, TRUE);
-                if (res && Role_if(PM_HEALER)) {
-                    if (Hallucination && !Deaf) {
-                        You_hear("the sound of a defibrillator.");
-                        learn_it = TRUE;
-                    } else if (!Blind) {
-                        You("observe %s %s change dramatically.",
-                            s_suffix(an(mons[corpsenm].mname)),
-                            nonliving(&mons[corpsenm]) ? "motility"
-                                                       : "health");
-                        learn_it = TRUE;
+                /* get corpse's location before revive() uses it up */
+                if (!get_obj_location(obj, &ox, &oy, 0))
+                    ox = obj->ox, oy = obj->oy; /* won't happen */
+
+                mtmp = revive(obj, TRUE);
+                if (!mtmp) {
+                    res = 0; /* no monster implies corpse was left intact */
+                } else {
+                    if (cansee(ox, oy)) {
+                        if (canspotmon(mtmp)) {
+                            pline("%s is resurrected!",
+                                  upstart(noname_monnam(mtmp, ARTICLE_THE)));
+                            learn_it = TRUE;
+                        } else {
+                            /* saw corpse but don't see monster: maybe
+                               mtmp is invisible, or has been placed at
+                               a different spot than <ox,oy> */
+                            if (!type_is_pname(&mons[corpsenm]))
+                                corpsname = The(corpsname);
+                            pline("%s disappears.", corpsname);
+                        }
+                    } else {
+                        /* couldn't see corpse's location */
+                        if (Role_if(PM_HEALER) && !Deaf
+                            && !nonliving(&mons[corpsenm])) {
+                            if (!type_is_pname(&mons[corpsenm]))
+                                corpsname = an(corpsname);
+                            if (!Hallucination)
+                                You_hear("%s reviving.", corpsname);
+                            else
+                                You_hear("a defibrillator.");
+                            learn_it = TRUE;
+                        }
+                        if (canspotmon(mtmp))
+                            /* didn't see corpse but do see monster: it
+                               has been placed somewhere other than <ox,oy>
+                               or blind hero spots it with ESP */
+                            pline("%s appears.", Monnam(mtmp));
                     }
                     if (learn_it)
                         exercise(A_WIS, TRUE);

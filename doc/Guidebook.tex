@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{February 10, 2019}
+\date{February 27, 2019}
 
 \maketitle
 
@@ -3305,6 +3305,11 @@ or {\tt U} (known to be uncursed, when `off', the default).
 Gold is never blessed or cursed, but it is not described as ``uncursed''
 even when the {\it implicit\verb+_+uncursed\/} option is `off'.
 %.lp
+\item[\ib{guicolor}]
+Use color text and/or highlighting attributes when displaying some
+non-map data (such as menu selector letters).
+Curses interface only; default is on.
+%.lp
 \item[\ib{help}]
 If more information is available for an object looked at
 with the `{\tt /}' command, ask if you want to see it (default on).
@@ -3322,6 +3327,10 @@ Visually distinguish pets from similar animals (default off).
 The behavior of this option depends on the type of windowing you use.
 In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a heart symbol near pets.
+%.lp ""
+With the curses interface, the {\it petattr\/}
+option controls how to highlight pets and setting it will turn the
+{\it hilite\verb+_+pet\/} option on or off as warranted.
 %.lp
 \item[\ib{hilite\verb+_+pile}]
 Visually distinguish piles of objects from individual objects (default off).
@@ -3577,6 +3586,38 @@ such as ``{\it par\-a\-noid\verb+_+con\-fir\-ma\-tion:attack~pray~Remove}''.
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
 %.lp
+\item[\ib{petattr}]
+Specifies one or more text highlighting attributes to use when showing
+pets on the map.
+Effectively a superset of the {\it hilite\verb+_+pet\/} boolean option.
+Curses interface only; value is one or more of the following letters.
+
+%.sd
+%.si
+{\tt N} --- Normal text (no highlighting)\\
+{\tt I} --- Inverse video (default)\\
+{\tt B} --- Bold text\\
+{\tt U} --- Underlined text\\
+{\tt K} --- blinKing text\\
+{\tt D} --- Dim text\\
+{\tt T} --- iTalic text\\
+{\tt L} --- Left line indicator\\
+{\tt R} --- Right line indicator\\
+%.ei
+%.ed
+
+Some of those choices might not work, particularly the final three,
+depending upon terminal hardware or terminal emulation software.
+
+%.lp ""
+Currently multiple highlight-style letters can be combined by simply
+stringing them together (for example, ``BK''), but in the future
+they might require being separated by plus signs (such as ``B\verb&+&K'',
+which works already).
+When using the `N' choice, it should be specified on its own,
+not in combination with any of the other letters.
+
+%.lp
 \item[\ib{pettype}]
 Specify the type of your initial pet, if you are playing a character class
 that uses multiple types of pets; or choose to have no initial pet at all.
@@ -3754,6 +3795,15 @@ This option may be used to select one of the named symbol sets found within
 {\tt symbols} to alter the symbols displayed on the screen.
 Use ``{\tt symset:default}'' to explicitly select the default symbols.
 %.lp
+\item[\ib{term\verb+_+cols}\ \ {\it and}]"
+%.lp
+\item[\ib{term\verb+_+rows}]
+Curses interface only.
+Number of columns and rows to use for the display.
+Curses will attempt to resize to the values specified but will settle
+for smaller sizes if they are too big.
+Default is the current window size.
+%.lp
 \item[\ib{time}]
 Show the elapsed game time in turns on bottom line (default off).  Persistent.
 %.lp
@@ -3844,6 +3894,25 @@ When getting a location on the map, and using shifted movement keys or
 meta-digit keys to fast-move, instead of moving 8 units at a time,
 move by skipping the same glyphs.
 (default off)
+%.lp
+\item[\ib{windowborders}]
+Whether to draw boxes around the map, status area, message area, and
+persistent inventory window if enabled.
+Curses interface only.
+Acceptable values are
+
+%.sd
+%.si
+{\tt 1} --- on, always show borders\\
+{\tt 2} --- off, never show borders\\
+{\tt 3} --- auto, on if terminal or window is at least
+(24\verb&+&2)x(80\verb&+&2)\ \ (default)\\
+%.ei
+%.ed
+
+%.lp ""
+(The 26x82 size threshold for `3' refers to number of rows and
+columns of the display.)
 %.lp
 \item[\ib{windowtype}]
 When the program has been built to support multiple interfaces,
