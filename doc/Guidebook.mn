@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.298 $ $NHDT-Date: 1551312285 2019/02/28 00:04:45 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ $NHDT-Date: 1551488947 2019/03/02 01:09:07 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -1713,7 +1713,7 @@ outside the shop.
 While the shopkeeper watches you like a hawk, he will generally ignore
 any other customers.
 .lp * 2
-If a shop is \(lqclosed for inventory\(rq, it will not open of its own accord.
+If a shop is \(lqclosed for inventory,\(rq it will not open of its own accord.
 .lp * 2
 Shops do not get restocked with new items, regardless of inventory depletion.
 .
@@ -3158,15 +3158,14 @@ Debug mode only.
 .lp mouse_support
 Allow use of the mouse for input and travel.
 Valid settings are:
-.PS -1
-.PL "\ 0"
-disabled
-.PL "\ 1"
-enabled and make OS adjustments to support mouse use in the game.
-.PL "\ 2"
-like 1 but does not make any OS adjustments
-.PE
-For backward compatibility, omitting a value is the same as specifying 1
+.sd
+.si
+.CC 0 "disabled"
+.CC 1 "enabled and make OS adjustments to support mouse use in the game"
+.CC 2 "like 1 but does not make any OS adjustments"
+.ei
+.ed
+Omitting a value is the same as specifying 1
 and negating
 .op mouse_support
 is the same as specifying 0.
@@ -3291,23 +3290,23 @@ boolean option.
 Curses interface only; value is one or more of the following letters.
 .sd
 .si
-.CC N "Normal text (no highlighting)"
-.CC I "Inverse video (default)"
-.CC B "Bold text"
-.CC U "Underlined text"
-.CC K "blinKing text"
-.CC D "Dim text"
-.CC T "iTalic text"
-.CC L "Left line indicator"
-.CC R "Right line indicator"
+.CC n "Normal text (no highlighting)"
+.CC i "Inverse video (default)"
+.CC b "Bold text"
+.CC u "Underlined text"
+.CC k "blinKing text"
+.CC d "Dim text"
+.CC t "iTalic text"
+.CC l "Left line indicator"
+.CC r "Right line indicator"
 .ei
 .ed
 Some of those choices might not work, particularly the final three,
 depending upon terminal hardware or terminal emulation software.
 .lp ""
 Currently multiple highlight-style letters can be combined by simply
-stringing them together (for example, \(lqBK\(rq), but in the future
-they might require being separated by plus signs (such as \(lqB+K\(rq,
+stringing them together (for example, \(lqbk\(rq), but in the future
+they might require being separated by plus signs (such as \(lqb+k\(rq,
 which works already).
 When using the \(oqN\(cq choice, it should be specified on its own,
 not in combination with any of the other letters.
@@ -4234,13 +4233,13 @@ it also matches when value is below or above the percentage.
 Use prefix \(oq<\(cq or \(oq>\(cq to match when strictly below or above.
 (The numeric limit is relaxed slightly for those: \f(CR>-1%\fP
 and \f(CR<101%\fP are allowed.)
-Only valid for \(lqpower\(rq and \(lqhitpoints\(rq fields.
+Only valid for \(lqhitpoints\(rq and \(lqpower\(rq fields.
 .lp "*"
 absolute value sets the attribute when the field value matches
 that number.
 The number must be 0 or higher, except for \(lqarmor-class\(cq which
-allows negative values.
-If the number is prefixed with \(oq<=\(cq or \(oq>=\(cq,
+allows negative values, and may optionally be preceded by \(oq=\(cq.
+If the number is preceded by \(oq<=\(cq or \(oq>=\(cq instead,
 it also matches when value is below or above.
 If the prefix is \(oq<\(cq or \(oq>\(cq, only match when strictly
 above or below.
