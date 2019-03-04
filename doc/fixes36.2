@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.268 $ $NHDT-Date: 1551493951 2019/03/02 02:32:31 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.269 $ $NHDT-Date: 1551739190 2019/03/04 22:39:50 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -445,13 +445,16 @@ when engulfed while in a shop, dropping an item into the engulfer and then
 	using ':' to look at current location could cause a crash
 when items were on the floor just inside a shop's door where the shopkeeper
 	doesn't buy and sell stuff, those items showed a 'for sale' price
+applying a container while inside a shop and initiating a put-in operation
+	would show non-empty containers in inventory--including the one being
+	applied--with "for sale" amounts for the prices of their contents
 after 'when donning armor, enchanment becomes known even if interrupted' fix,
 	wearing a leather jacket, fedora, or dented pot (no multi-turn delay
 	worn in a slot which usually has one) didn't make +/- become known
+when persistent inventory window is enabled, wearing armor didn't immediately
+	update it with armor's newly observed +/- value
 having an artifact wish be refused ("for a moment you feel <artifact> in
 	your hands, but it disappears") would immediately segfault
-when persistent inventory window is enabled, wearing armor doesn't immediately
-	update it with armor's newly observed +/- value
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
