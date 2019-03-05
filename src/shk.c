@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1549921170 2019/02/11 21:39:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1551738135 2019/03/04 22:22:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1328,7 +1328,7 @@ dopay()
         debugpline0("dopay: null shkp.");
         return 0;
     }
-proceed:
+ proceed:
     eshkp = ESHK(shkp);
     ltmp = eshkp->robbed;
 
@@ -1547,7 +1547,7 @@ proceed:
                 }
             }
         }
-    thanks:
+ thanks:
         if (!itemize)
             update_inventory(); /* Done in dopayobj() if itemize. */
     }
@@ -1867,7 +1867,7 @@ boolean silently;
             eshkp->following = 0;
             eshkp->robbed = 0L;
         }
-    skip:
+ skip:
         /* in case we create bones */
         rouse_shk(shkp, FALSE); /* wake up */
         if (!inhishop(shkp))
@@ -2013,7 +2013,7 @@ int *nochrg; /* alternate return value: 1: no charge, 0: shop owned,        */
         if (carried(top) ? (int) obj->unpaid : !*nochrg)
             cost = obj->quan * get_cost(obj, shkp);
         if (Has_contents(obj) && !freespot)
-            cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
+            cost += contained_cost(obj, shkp, 0L, FALSE, TRUE);
     }
     return cost;
 }
@@ -2154,7 +2154,19 @@ long price;
 boolean usell;
 boolean unpaid_only;
 {
-    register struct obj *otmp;
+    register struct obj *otmp, *top;
+    xchar x, y;
+    boolean on_floor, freespot;
+
+    for (top = obj; top->where == OBJ_CONTAINED; top = top->ocontainer)
+        continue;
+    /* pick_obj() removes item from floor, adds it to shop bill, then
+       puts it in inventory; behave as if it is still on the floor
+       during the add-to-bill portion of that situation */
+    on_floor = (top->where == OBJ_FLOOR || top->where == OBJ_FREE);
+    if (top->where == OBJ_FREE || !get_obj_location(top, &x, &y, 0))
+        x = u.ux, y = u.uy;
+    freespot = (on_floor && x == ESHK(shkp)->shk.x && y == ESHK(shkp)->shk.y);
 
     /* price of contained objects; "top" container handled by caller */
     for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
@@ -2168,8 +2180,13 @@ boolean unpaid_only;
                 && !(Is_candle(otmp)
                      && otmp->age < 20L * (long) objects[otmp->otyp].oc_cost))
                 price += set_cost(otmp, shkp);
-        } else if (!otmp->no_charge && (otmp->unpaid || !unpaid_only)) {
-            price += get_cost(otmp, shkp) * otmp->quan;
+        } else {
+            /* no_charge is only set for floor items (including
+               contents of floor containers) inside shop proper;
+               items on freespot are implicitly 'no charge' */
+            if (on_floor ? (!otmp->no_charge && !freespot)
+                         : (otmp->unpaid || !unpaid_only))
+                price += get_cost(otmp, shkp) * otmp->quan;
         }
 
         if (Has_contents(otmp))
@@ -3317,7 +3334,7 @@ int mode; /* 0: deliver count 1: paged */
     putstr(datawin, 0, "");
     putstr(datawin, 0, buf_p);
     display_nhwindow(datawin, FALSE);
-quit:
+ quit:
     destroy_nhwindow(datawin);
     return 0;
 }
@@ -4100,7 +4117,7 @@ boolean cant_mollify;
     if ((um_dist(x, y, 1) && !uinshp) || cant_mollify
         || (money_cnt(invent) + ESHK(shkp)->credit) < cost_of_damage
         || !rn2(50)) {
-    getcad:
+ getcad:
         if (muteshk(shkp)) {
             if (animal && shkp->mcanmove && !shkp->msleeping)
                 yelp(shkp);

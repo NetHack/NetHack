@@ -1,4 +1,4 @@
-/* NetHack 3.6	dogmove.c	$NHDT-Date: 1502753407 2017/08/14 23:30:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	dogmove.c	$NHDT-Date: 1551493951 2019/03/02 02:32:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1378,6 +1378,15 @@ struct monst *mtmp;
 
     if (Protection_from_shape_changers || !mtmp->meating)
         return;
+
+    /* with polymorph, the steed's equipment would be re-checked and its
+       saddle would come off, triggering DISMOUNT_FELL, but mimicking
+       doesn't impact monster's equipment; normally DISMOUNT_POLY is for
+       rider taking on an unsuitable shape, but its message works fine
+       for this and also avoids inflicting damage during forced dismount;
+       do this before changing so that dismount refers to original shape */
+    if (mtmp == u.usteed)
+        dismount_steed(DISMOUNT_POLY);
 
     do {
         idx = rn2(SIZE(qm));

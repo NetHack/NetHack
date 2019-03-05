@@ -1892,7 +1892,7 @@ While the shopkeeper watches you like a hawk, he will generally ignore
 any other customers.
 %.lp \(bu 2
 \item[$\bullet$]
-If a shop is ``closed for inventory'', it will not open of its own accord.
+If a shop is ``closed for inventory,'' it will not open of its own accord.
 %.lp \(bu 2
 \item[$\bullet$]
 Shops do not get restocked with new items, regardless of inventory depletion.
@@ -3471,16 +3471,13 @@ Valid settings are:
 
 %.sd
 %.si
-\newlength{\mwidth}
-\settowidth{\mwidth}{\tt -0}
-\newcommand{\numbox}[1]{\makebox[\mwidth][r]{{\tt #1}}}
-\numbox{0} --- disabled\\
-\numbox{1} --- enabled and make OS adjustment to support mouse use in the game\\
-\numbox{2} --- enabled like {\tt 1}, but does not make any OS adjustments\\
+{\tt 0} --- disabled\\
+{\tt 1} --- enabled and make OS adjustment to support mouse use in the game\\
+{\tt 2} --- enabled like {\tt 1}, but does not make any OS adjustments\\
 %.ei
 %.ed
 
-For backward compatibility, omitting a value is the same as specifying {\tt 1}
+Omitting a value is the same as specifying {\tt 1}
 and negating
 {\it mouse\verb+_+support\/}
 is the same as specifying {\tt 0}.
@@ -3526,6 +3523,37 @@ Start the character with no armor (default false).  Persistent.
 %.lp
 \item[\ib{null}]
 Send padding nulls to the terminal (default on).  Persistent.
+%.lp
+\item[\ib{number\verb+_+pad}]
+Use digit keys instead of letters to move (default 0 or off).\\
+Valid settings are:
+
+%.sd
+%.si
+\newlength{\mwidth}
+\settowidth{\mwidth}{\tt -0}
+\newcommand{\numbox}[1]{\makebox[\mwidth][r]{{\tt #1}}}
+\numbox{0} --- move by letters; `{\tt yuhjklbn}'\\
+\numbox{1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix\\
+\numbox{2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'\\
+\numbox{3} --- by numbers using phone key layout; {\tt 123} above, {\tt 789} below\\
+\numbox{4} --- combines {\tt 3} with {\tt 2}; phone layout plus MS-DOS compatibility\\
+\numbox{-1} --- by letters but use `{\tt z}' to go northwest, `{\tt y}' to zap wands
+%.ei
+%.ed
+
+For backward compatibility, omitting a value is the same as specifying {\tt 1}
+and negating
+{\it number\verb+_+pad\/}
+is the same as specifying {\tt 0}.
+(Settings {\tt 2} and {\tt 4} are for compatibility with MS-DOS or old PC Hack;
+in addition to the different behavior for `{\tt 5}', `{\tt Alt-5}' acts as `{\tt G}'
+and `{\tt Alt-0}' acts as `{\tt I}'.
+Setting {\tt -1} is to accommodate some QWERTZ keyboards which have the
+location of the `{\tt y}' and `{\tt z}' keys swapped.)
+When moving by numbers, to enter a count prefix for those commands
+which accept one (such as ``{\tt 12s}'' to search twelve times), precede it
+with the letter `{\tt n}' (``{\tt n12s}'').
 %.lp
 \item[\ib{packorder}]
 Specify the order to list object types in (default
@@ -3594,15 +3622,15 @@ Curses interface only; value is one or more of the following letters.
 
 %.sd
 %.si
-{\tt N} --- Normal text (no highlighting)\\
-{\tt I} --- Inverse video (default)\\
-{\tt B} --- Bold text\\
-{\tt U} --- Underlined text\\
-{\tt K} --- blinKing text\\
-{\tt D} --- Dim text\\
-{\tt T} --- iTalic text\\
-{\tt L} --- Left line indicator\\
-{\tt R} --- Right line indicator\\
+{\tt n} --- Normal text (no highlighting)\\
+{\tt i} --- Inverse video (default)\\
+{\tt b} --- Bold text\\
+{\tt u} --- Underlined text\\
+{\tt k} --- blinKing text\\
+{\tt d} --- Dim text\\
+{\tt t} --- iTalic text\\
+{\tt l} --- Left line indicator\\
+{\tt r} --- Right line indicator\\
 %.ei
 %.ed
 
@@ -3611,8 +3639,8 @@ depending upon terminal hardware or terminal emulation software.
 
 %.lp ""
 Currently multiple highlight-style letters can be combined by simply
-stringing them together (for example, ``BK''), but in the future
-they might require being separated by plus signs (such as ``B\verb&+&K'',
+stringing them together (for example, ``bk''), but in the future
+they might require being separated by plus signs (such as ``b\verb&+&k'',
 which works already).
 When using the `N' choice, it should be specified on its own,
 not in combination with any of the other letters.
@@ -4651,7 +4679,8 @@ depending upon your other option settings.
 Instead of a behavior, `condition' takes the following condition flags:
 {\it stone}, {\it slime}, {\it strngl}, {\it foodpois}, {\it termill},
 {\it blind}, {\it deaf}, {\it stun}, {\it conf}, {\it hallu},
-{\it lev}, {\it fly}, and {\it ride}.  You can use `major\_troubles' as an alias
+{\it lev}, {\it fly}, and {\it ride}.
+You can use `major\_troubles' as an alias
 for stone through termill, `minor\_troubles' for blind through hallu,
 `movement' for lev, fly, and ride, and `all' for every condition.
 
@@ -4686,14 +4715,14 @@ it also matches when value is below or above the percentage.
 Use prefix `{\tt <}' or `{\tt >}' to match when strictly below or above.
 (The numeric limit is relaxed slightly for those: {\tt >-1\%}
 and {\tt <101\%} are allowed.)
-Only valid for ``{\it power\/}'' and ``{\it hitpoints\/}'' fields.
+Only valid for ``{\it hitpoints\/}'' and ``{\it power\/}'' fields.
 %.lp "*"
 \item{\bb{}}
 absolute value sets the attribute when the field value
 matches that number.
 The number must be 0 or higher, except for ``{\it armor-class\/} which
-allows negative values.
-If the number is prefixed with `{\tt <=}' or `{\tt >=}',
+allows negative values, and may optionally be preceded by `{\tt =}'.
+If the number is preceded by `{\tt <=}' or `{\tt >=}' instead,
 it also matches when value is below or above.
 If the prefix is `{\tt <}' or `{\tt >}', only match when strictly
 above or below.
