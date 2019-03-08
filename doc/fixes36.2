@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.269 $ $NHDT-Date: 1551739190 2019/03/04 22:39:50 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.270 $ $NHDT-Date: 1551920371 2019/03/07 00:59:31 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -389,6 +389,9 @@ wand or spell of undead turning handled messages and wand-discovery in a
 	non-intuitive manner biased toward healers
 if steed ate a mimic corpse and began masquerading as something, hero could
 	keep riding it; force dismount
+kicking an object stack moves the topmost 1, but range calculation used the
+	weight of the whole stack to decide how far it would move, possibly
+	yielding "thump" result with no movement despite being a light item
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
