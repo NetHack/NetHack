@@ -1,4 +1,4 @@
-/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1545270756 2018/12/20 01:52:36 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1552007504 2019/03/08 01:11:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -278,12 +278,16 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 
 /*
- * According to ANSI, prototypes for old-style declarations must widen the
- * arguments to int.  However, the MSDOS compilers accept shorter arguments
- * (char, short, etc.) in prototypes and do typechecking with them.  Therefore
- * this mess to allow the better typechecking while also allowing some
- * prototypes for the ANSI compilers so people quit trying to fix the
- * prototypes to match the standard and thus lose the typechecking.
+ * According to ANSI C, prototypes for old-style function definitions like
+ *   int func(arg) short arg; { ... }
+ * must specify widened arguments (char and short to int, float to double),
+ *   int func(int);
+ * same as how narrow arguments get passed when there is no prototype info.
+ * However, various compilers accept shorter arguments (char, short, etc.)
+ * in prototypes and do typechecking with them.  Therefore this mess to
+ * allow the better typechecking while also allowing some prototypes for
+ * the ANSI compilers so people quit trying to fix the prototypes to match
+ * the standard and thus lose the typechecking.
  */
 #if defined(MSDOS) && !defined(__GO32__)
 #define UNWIDENED_PROTOTYPES
@@ -332,7 +336,9 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #ifdef WIDENED_PROTOTYPES
 #define CHAR_P int
 #define SCHAR_P int
+#ifndef UCHAR_P
 #define UCHAR_P int
+#endif
 #define XCHAR_P int
 #define SHORT_P int
 #define BOOLEAN_P int

@@ -1,4 +1,4 @@
-/* NetHack 3.6	vmsconf.h	$NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	vmsconf.h	$NHDT-Date: 1552007507 2019/03/08 01:11:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -160,6 +160,12 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 
 #define RANDOM /* use sys/share/random.c instead of vaxcrtl rand */
 
+/* config.h defines USE_ISAAC64; we'll use it on Alpha or IA64 but not VAX;
+   it overrides RANDOM */
+#if (defined(VAX) || defined(vax) || defined(__vax)) && defined(USE_ISAAC64)
+#undef ISAAC64
+#endif
+
 #define FCMASK 0660 /* file creation mask */
 
 /*
@@ -184,6 +190,21 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 #ifdef const
 #undef const
 #endif
+#endif
+
+/* ANSI C uses "value preserving rules", where 'unsigned char' and
+   'unsigned short' promote to 'int' if signed int is big enough to hold
+   all possible values, rather than traditional "sign preserving rules"
+   where 'unsigned char' and 'unsigned short' promote to 'unsigned int'.
+   However, the ANSI C rules aren't binding on non-ANSI compilers.
+   When DEC C (aka Compaq C, then HP C) is in non-standard 'common' mode
+   it supports prototypes that expect widened types, but it uses the old
+   sign preserving rules for how to widen narrow unsigned types.  (In its
+   default 'relaxed' mode, __STDC__ is 1 and uchar widens to 'int'.) */
+#if defined(__DECC) && (!defined(__STDC__) || !__STDC__)
+#define UCHAR_P unsigned int
+#else
+#define UCHAR_P int
 #endif
 
 #ifdef __DECC
@@ -237,6 +258,12 @@ typedef __mode_t mode_t;
 
 #define tgetch vms_getchar
 
+#if defined(__DECC_VER) && (__DECC_VER >= 50000000)
+ /* for cc/Standard=ANSI89, suppress notification that '$' in identifiers
+    is an extension; sys/vms/*.c needs it regardless of strict ANSI mode */
+ #pragma message disable DOLLARID
+#endif
+
 #include "system.h"
 
 #define index strchr
@@ -247,8 +274,7 @@ typedef __mode_t mode_t;
 # if defined(RANDOM)
 #  define Rand() random()
 /* VMS V7 adds these entry points to DECC$SHR; stick with the nethack-supplied
-   code to avoid having to deal with version-specific conditionalized builds
-   */
+   code to avoid having to deal with version-specific conditionalized builds */
 #  define random nh_random
 #  define srandom nh_srandom
 #  define initstate nh_initstate
@@ -270,7 +296,7 @@ typedef __mode_t mode_t;
 #define link(f1, f2) vms_link(f1, f2)   /* vmsfiles.c */
 #define open(f, k, m) vms_open(f, k, m) /* vmsfiles.c */
 #define fopen(f, m) vms_fopen(f, m)     /* vmsfiles.c */
-/* #define unlink(f0)	vms_unlink(f0)		/* vmsfiles.c */
+/* #define unlink(f0) vms_unlink(f0)       /* vmsfiles.c */
 #ifdef VERYOLD_VMS
 #define unlink(f0) delete (f0) /* vaxcrtl */
 #else
