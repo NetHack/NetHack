@@ -1,4 +1,4 @@
-/* NetHack 3.6	vmsconf.h	$NHDT-Date: 1552007507 2019/03/08 01:11:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	vmsconf.h	$NHDT-Date: 1552074506 2019/03/08 19:48:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -192,6 +192,8 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 #endif
 #endif
 
+/* tradstdc.h has't set this up yet, but config1.h might have */
+#ifndef UNWIDENED_PROTOTYPES
 /* ANSI C uses "value preserving rules", where 'unsigned char' and
    'unsigned short' promote to 'int' if signed int is big enough to hold
    all possible values, rather than traditional "sign preserving rules"
@@ -203,8 +205,7 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
    default 'relaxed' mode, __STDC__ is 1 and uchar widens to 'int'.) */
 #if defined(__DECC) && (!defined(__STDC__) || !__STDC__)
 #define UCHAR_P unsigned int
-#else
-#define UCHAR_P int
+#endif
 #endif
 
 #ifdef __DECC
