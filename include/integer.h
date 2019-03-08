@@ -1,4 +1,4 @@
-/* NetHack 3.6	integer.h	$NHDT-Date: 1524689514 2018/04/25 20:51:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.6	integer.h	$NHDT-Date: 1551901047 2019/03/06 19:37:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.7 $ */
 /*      Copyright (c) 2016 by Michael Allison          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,21 +32,33 @@
 #ifndef INTEGER_H
 #define INTEGER_H
 
-#if (defined(__STDC__) && __STDC_VERSION__ >= 199901L)
+/* DEC C (aka Compaq C for a while, HP C these days) for VMS is
+   classified as a freestanding implementation rather than a hosted one
+   and even though it claims to be C99, it does not provide <stdint.h>. */
+#if defined(__DECC) && defined(VMS) && !defined(HAS_STDINT_H)
+#define HAS_INTTYPES_H
+#else /*!__DECC*/
+
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
+    && !defined(HAS_STDINT_H)
 /* The compiler claims to conform to C99. Use stdint.h */
-#include <stdint.h>
-#define SKIP_STDINT_WORKAROUND
-#else
-# if defined(HAS_STDINT_H)
-/* Some compilers have stdint.h but don't conform to all of C99. */
-#include <stdint.h>
-#define SKIP_STDINT_WORKAROUND
-# endif
-# if defined(__GNUC__) && defined(__INT64_MAX__)
-#  include <stdint.h>
-#  define SKIP_STDINT_WORKAROUND
-# endif
+#define HAS_STDINT_H
 #endif
+#if defined(__GNUC__) && defined(__INT64_MAX__) && !defined(HAS_STDINT_H)
+#define HAS_STDINT_H
+#endif
+
+#endif /*?__DECC*/
+
+#ifdef HAS_STDINT_H
+#include <stdint.h>
+#define SKIP_STDINT_WORKAROUND
+#else /*!stdint*/
+#ifdef HAS_INTTYPES_H
+#include <inttypes.h>
+#define SKIP_STDINT_WORKAROUND
+#endif
+#endif /*?stdint*/
 
 #ifndef SKIP_STDINT_WORKAROUND /* !C99 */
 /*
@@ -59,8 +71,8 @@ typedef unsigned short uint16_t;
 #if defined(__WATCOMC__) && !defined(__386__)
 /* Open Watcom providing a 16 bit build for MS-DOS or OS/2 */
 /* int is 16 bits; use long for 32 bits */
-typedef long int32_t;
-typedef unsigned long uint32_t;
+typedef long int int32_t;
+typedef unsigned long int uint32_t;
 #else
 /* Otherwise, assume either a 32- or 64-bit compiler */
 /* long may be 64 bits; use int for 32 bits */
@@ -68,8 +80,13 @@ typedef int int32_t;
 typedef unsigned int uint32_t;
 #endif
 
-typedef long long int64_t;
-typedef unsigned long long uint64_t;
+/* The only place where nethack cares about 64-bit integers is in the
+   Isaac64 random number generator.  If your environment can't support
+   64-bit integers, you should comment out USE_ISAAC64 in config.h so
+   that the previous RNG gets used instead.  Then this file will be
+   inhibited and it won't matter what the int64_t and uint64_t lines are. */
+typedef long long int int64_t;
+typedef unsigned long long int uint64_t;
 
 #endif /* !C99 */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	config1.h	$NHDT-Date: 1432512781 2015/05/25 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	config1.h	$NHDT-Date: 1552007489 2019/03/08 01:11:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -146,7 +146,9 @@
 #undef UNIX
 #ifdef __DECC
 #ifndef __DECC_VER /* buggy early versions want widened prototypes */
-#define NOTSTDC    /* except when typedefs are involved		*/
+#define NOTSTDC    /* except when typedefs are involved            */
+        /* [25 or so years later...  That was probably uchar widening to */
+        /* 'unsigned int' rather than anything to do with typedefs.  pr] */
 #define USE_VARARGS
 #else
 #define NHSTDC
@@ -200,10 +202,10 @@
 /* Because:
  * #define FOO => FOO={} => defined( ) => (-1 != - - 1) => 1
  * #define FOO 1 or on command-line -DFOO
- *	=> defined(1) => (-1 != - 1 - 1) => 1
+ *      => defined(1) => (-1 != - 1 - 1) => 1
  * if FOO isn't defined, FOO=0. But some compilers default to 0 instead of 1
  * for -DFOO, oh well.
- *	=> defined(0) => (-1 != - 0 - 1) => 0
+ *      => defined(0) => (-1 != - 0 - 1) => 0
  *
  * But:
  * defined("") => (-1 != - "" - 1)
