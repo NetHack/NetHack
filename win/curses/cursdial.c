@@ -17,6 +17,36 @@
 #define strncasecmp strncmpi
 #endif
 
+/*
+ * Note:
+ *
+ *  Prototypes need to use the widened/unwidened type macros (CHAR_P, &c)
+ *  in order to match fields of the window_procs struct (see winprocs.h).
+ *  But for a standard-conforming compiler, we'll end up with the widened
+ *  types necessary to match the mixed prototype/old-style function
+ *  definition environment as used by nethack's core.  Prototype
+int func(CHAR_P);
+ *  becomes
+int func(int);
+ *  after expansion, which matches the definition
+int func(arg) char arg; { ... }
+ *  according to the rules of the C standard.  But the use of new-style
+ *  definitions
+int func(char arg) { ... }
+ *  by the curses interface turns that into a conflict.  No widening takes
+ *  place so it ought to be 'int func(char);' instead.  Unfortunately that
+ *  would be incompatible for functions assigned to window_procs.
+ *
+ *  So, the code here (also cursmain.c and cursinvt.c) is mis-using the
+ *  widening macros for variable types
+int func(CHAR_P arg) { ... }
+ *  (no doubt modelling it after the C++ code in win/Qt where the option
+ *  to switch the applicable definitions to old-style isn't available).
+ *  Other alternatives aren't significantly better so just live with it.
+ *  [Redoing the windowing interface to avoid narrow arguments would be
+ *  better since that would fix Qt's usage too.]
+ */
+
 /* Dialog windows for curses interface */
 
 
