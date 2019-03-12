@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.271 $ $NHDT-Date: 1552254771 2019/03/10 21:52:51 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.272 $ $NHDT-Date: 1552422652 2019/03/12 20:30:52 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -566,6 +566,8 @@ X11: text popups on OSX wouldn't accept keyboard input unless the 'autofocus'
 	resource was enabled; most noticeable when trying to dismiss 'things
 	that are here' while walking over object piles
 X11: default to using XPM format tile file and rip screen
+X11: when showing graphical tombstone, would crash if file rip.xpm is missing;
+	revert to text tombstone instead
 
 
 General New Features

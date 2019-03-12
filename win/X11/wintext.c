@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintext.c	$NHDT-Date: 1546081305 2018/12/29 11:01:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	wintext.c	$NHDT-Date: 1552422654 2019/03/12 20:30:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -181,8 +181,7 @@ boolean blocking;
      * _some_ lines.  Finally, use the number of lines in the text if
      * there are fewer than the max.
      */
-    nlines =
-        (XtScreen(wp->w)->height - text_info->extra_height) / font_height;
+    nlines = (XtScreen(wp->w)->height - text_info->extra_height) / font_height;
     nlines -= 4;
 
     if (nlines > text_info->text.num_lines)
@@ -204,13 +203,16 @@ boolean blocking;
 #ifdef GRAPHIC_TOMBSTONE
     if (text_info->is_rip) {
         Widget rip = create_ripout_widget(XtParent(wp->w));
-        XtSetArg(args[num_args], nhStr(XtNfromVert), rip);
-        num_args++;
+
+        if (rip) {
+            XtSetArg(args[num_args], nhStr(XtNfromVert), rip);
+            num_args++;
+        } else
+            text_info->is_rip = FALSE;
     }
 #endif
 
-    if (width
-        > (Dimension) XtScreen(wp->w)->width) { /* too wide for screen */
+    if (width > (Dimension) XtScreen(wp->w)->width) { /* too wide for screen */
         /* Back off some amount - we really need to back off the scrollbar */
         /* width plus some extra.					   */
         width = XtScreen(wp->w)->width - 20;
@@ -420,8 +422,7 @@ boolean concat;
     if (str) {
         (void) memcpy((tb->text + tb->text_last), str, length + 1);
         if (length) {
-            /* Remove all newlines. Otherwise we have a confused line count.
-             */
+            /* Remove all newlines. Otherwise we have a confused line count. */
             copy = (tb->text + tb->text_last);
             while ((copy = index(copy, '\n')) != (char *) 0)
                 *copy = ' ';
@@ -577,6 +578,7 @@ XtPointer widget_data; /* expose event from Window widget */
         int len = strlen(rip_line[i]);
         XFontStruct *font = WindowFontStruct(w);
         int width = XTextWidth(font, rip_line[i], len);
+
         XDrawString(dpy, XtWindow(w), gc, x - width / 2, y, rip_line[i], len);
         x += appResources.tombtext_dx;
         y += appResources.tombtext_dy;
@@ -603,14 +605,16 @@ create_ripout_widget(Widget parent)
 
         attributes.valuemask = XpmCloseness;
         attributes.closeness = 65535; /* Try anything */
-        errorcode =
-            XpmReadFileToImage(XtDisplay(parent), appResources.tombstone,
-                               &rip_image, 0, &attributes);
+        errorcode = XpmReadFileToImage(XtDisplay(parent),
+                                       appResources.tombstone,
+                                       &rip_image, 0, &attributes);
         if (errorcode != XpmSuccess) {
             char buf[BUFSZ];
+
             Sprintf(buf, "Failed to load %s: %s", appResources.tombstone,
                     XpmGetErrorString(errorcode));
             X11_raw_print(buf);
+            return (Widget) 0;
         }
         rip_width = rip_image->width;
         rip_height = rip_image->height;
