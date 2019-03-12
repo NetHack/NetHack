@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.272 $ $NHDT-Date: 1552422652 2019/03/12 20:30:52 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.273 $ $NHDT-Date: 1552425075 2019/03/12 21:11:15 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -517,6 +517,8 @@ unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
 	specifically requested; use 'make QUIETCC=1 <target>' to get the
 	3.6.1 behavior back
 unix: add curses window port
+unix: in nethack.sh, use 'test -f' instead of 'test -e' when checking for
+	fonts.dir while running under X11
 vms: data file processing and playground setup were missing post-3.4.3 files
 	engrave, epitaph, and bogusmon made from corresponding *.txt
 windows: Added ntassert() mechanism for Windows based port use
