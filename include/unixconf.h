@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixconf.h	$NHDT-Date: 1552007506 2019/03/08 01:11:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	unixconf.h	$NHDT-Date: 1552074505 2019/03/08 19:48:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -274,8 +274,6 @@
 /* Digital Unix/HP Tru64 -- see vmsconf.h for explanation */
 #if defined(__DECC) && (!defined(__STDC__) || !__STDC__)
 #define UCHAR_P unsigned int
-#else
-#define UCHAR_P int
 #endif
 
 /*

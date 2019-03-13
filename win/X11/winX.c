@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1546081304 2018/12/29 11:01:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1552422652 2019/03/12 20:30:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1355,9 +1355,19 @@ int how;
 time_t when;
 {
     struct xwindow *wp;
+    FILE *rip_fp;
 
     check_winid(window);
     wp = &window_list[window];
+
+    /* make sure the graphic_tombstone is available; it's not easy to
+       revert to ordinary text tombstone once we're past this point... */
+    rip_fp = fopen(appResources.tombstone, "r"); /* "rip.xpm" */
+    if (!rip_fp) {
+        genl_outrip(window, how, when);
+        return;
+    }
+    (void) fclose(rip_fp);
 
     if (wp->type == NHW_TEXT) {
         wp->text_information->is_rip = TRUE;

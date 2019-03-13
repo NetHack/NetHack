@@ -84,9 +84,9 @@ struct window_procs curses_procs = {
 /*
  * Global variables for curses interface
  */
- 
+
 int term_rows, term_cols;   /* size of underlying terminal */
-int orig_cursor;	    /* Preserve initial cursor state */
+int orig_cursor;            /* Preserve initial cursor state */
 WINDOW *base_term;          /* underlying terminal window */
 boolean counting;           /* Count window is active */
 WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows */
@@ -96,7 +96,7 @@ WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows */
    the inventory window. */
 static int inv_update = 0;
 
-/*  
+/*
 init_nhwindows(int* argcp, char** argv)
                 -- Initialize the windows used by NetHack.  This can also
                    create the standard windows listed at the top, but does
@@ -264,7 +264,7 @@ curses_resume_nhwindows()
     curses_refresh_nethack_windows();
 }
 
-/*  Create a window of type "type" which can be 
+/*  Create a window of type "type" which can be
         NHW_MESSAGE     (top line)
         NHW_STATUS      (bottom lines)
         NHW_MAP         (main dungeon)
@@ -307,6 +307,7 @@ void
 curses_display_nhwindow(winid wid, BOOLEAN_P block)
 {
     menu_item *selected = NULL;
+
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         curses_end_menu(wid, "");
         curses_select_menu(wid, PICK_NONE, &selected);
@@ -314,9 +315,9 @@ curses_display_nhwindow(winid wid, BOOLEAN_P block)
     }
 
     /* don't overwrite the splash screen first time through */
-    if (!iflags.window_inited && wid == MAP_WIN)
+    if (!iflags.window_inited && wid == MAP_WIN) {
         iflags.window_inited = TRUE;
-    else {
+    } else {
         /* actually display the window */
         wnoutrefresh(curses_get_nhwin(wid));
         /* flush pending writes from other windows too */
@@ -332,7 +333,7 @@ curses_display_nhwindow(winid wid, BOOLEAN_P block)
 }
 
 
-/* Destroy will dismiss the window if the window has not 
+/* Destroy will dismiss the window if the window has not
  * already been dismissed.
 */
 void
@@ -586,7 +587,7 @@ print_glyph(window, x, y, glyph, bkglyph)
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
                    bkglyph is to render the background behind the glyph.
-                   It's not used here. 
+                   It's not used here.
 */
 void
 curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
@@ -679,8 +680,8 @@ int nh_poskey(int *x, int *y, int *mod)
                    a position in the MAP window is returned in x, y and mod.
                    mod may be one of
 
-                        CLICK_1         -- mouse click type 1 
-                        CLICK_2         -- mouse click type 2 
+                        CLICK_1         -- mouse click type 1
+                        CLICK_2         -- mouse click type 2
 
                    The different click types can map to whatever the
                    hardware supports.  If no mouse is supported, this
@@ -841,14 +842,14 @@ preference_update(preference)
                    port of that change.  If your window-port is capable of
                    dynamically adjusting to the change then it should do so.
                    Your window-port will only be notified of a particular
-                   change if it indicated that it wants to be by setting the 
+                   change if it indicated that it wants to be by setting the
                    corresponding bit in the wincap mask.
 */
 void
 curses_preference_update(const char *pref)
 {
-    if ((strcmp(pref, "align_status") == 0) ||
-        (strcmp(pref, "align_message") == 0)) {
+    if (!strcmp(pref, "align_status")
+        || !strcmp(pref, "align_message")) {
         curses_create_main_windows();
         curses_last_messages();
         doredraw();

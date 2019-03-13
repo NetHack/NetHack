@@ -17,6 +17,36 @@
 #define strncasecmp strncmpi
 #endif
 
+/*
+ * Note:
+ *
+ *  Prototypes need to use the widened/unwidened type macros (CHAR_P, &c)
+ *  in order to match fields of the window_procs struct (see winprocs.h).
+ *  But for a standard-conforming compiler, we'll end up with the widened
+ *  types necessary to match the mixed prototype/old-style function
+ *  definition environment as used by nethack's core.  Prototype
+int func(CHAR_P);
+ *  becomes
+int func(int);
+ *  after expansion, which matches the definition
+int func(arg) char arg; { ... }
+ *  according to the rules of the C standard.  But the use of new-style
+ *  definitions
+int func(char arg) { ... }
+ *  by the curses interface turns that into a conflict.  No widening takes
+ *  place so it ought to be 'int func(char);' instead.  Unfortunately that
+ *  would be incompatible for functions assigned to window_procs.
+ *
+ *  So, the code here (also cursmain.c and cursinvt.c) is mis-using the
+ *  widening macros for variable types
+int func(CHAR_P arg) { ... }
+ *  (no doubt modelling it after the C++ code in win/Qt where the option
+ *  to switch the applicable definitions to old-style isn't available).
+ *  Other alternatives aren't significantly better so just live with it.
+ *  [Redoing the windowing interface to avoid narrow arguments would be
+ *  better since that would fix Qt's usage too.]
+ */
+
 /* Dialog windows for curses interface */
 
 
@@ -76,7 +106,8 @@ static int menu_max_height(void);
 static nhmenu *nhmenus = NULL;  /* NetHack menu array */
 
 
-/* Get a line of text from the player, such as asking for a character name or a wish */
+/* Get a line of text from the player, such as asking for a character name
+   or a wish */
 
 void
 curses_line_input_dialog(const char *prompt, char *answer, int buffer)
@@ -333,7 +364,7 @@ curses_ext_cmd()
     if (iflags.extmenu) {
         return extcmd_via_menu();
     }
-    
+
     startx = 0;
     starty = 0;
     if (iflags.wc_popup_dialog) { /* Prompt in popup window */
@@ -341,9 +372,9 @@ curses_ext_cmd()
         extwin2 = curses_create_window(25, 1, UP);
         wrefresh(extwin2);
         /* create window inside window to prevent overwriting of border */
-        getbegyx(extwin2,y0,x0);
-        getmaxyx(extwin2,h,w);
-        extwin = newwin(1, w-2, y0+1, x0+1);
+        getbegyx(extwin2, y0, x0);
+        getmaxyx(extwin2, h, w);
+        extwin = newwin(1, w - 2, y0 + 1, x0 + 1);
         if (w - 4 < maxlen) maxlen = w - 4;
     } else {
         curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
@@ -355,8 +386,9 @@ curses_ext_cmd()
         }
 
         winy += messageh - 1;
-        extwin = newwin(1, messagew-2, winy, winx);
-        if (messagew - 4 < maxlen) maxlen = messagew - 4;
+        extwin = newwin(1, messagew - 2, winy, winx);
+        if (messagew - 4 < maxlen)
+            maxlen = messagew - 4;
         pline("#");
     }
 
@@ -390,7 +422,7 @@ curses_ext_cmd()
             break;
         }
 
-        if ((letter == '\r') || (letter == '\n')) {
+        if (letter == '\r' || letter == '\n') {
             if (ret == -1) {
                 for (count = 0; extcmdlist[count].ef_txt; count++) {
                     if (!strcasecmp(cur_choice, extcmdlist[count].ef_txt)) {
@@ -402,7 +434,9 @@ curses_ext_cmd()
             break;
         }
 
-        if ((letter == '\b') || (letter == KEY_BACKSPACE)) {
+        if (letter == '\177') /* DEL/Rubout */
+             letter = '\b';
+        if (letter == '\b' || letter == KEY_BACKSPACE) {
             if (prompt_width == 0) {
                 ret = -1;
                 break;
@@ -749,10 +783,9 @@ menu_get_accel(boolean first)
 
     ret = next_letter;
 
-    if (((next_letter < 'z') && (next_letter >= 'a')) || ((next_letter < 'Z')
-                                                          && (next_letter >=
-                                                              'A')) ||
-        ((next_letter < '9') && (next_letter >= '0'))) {
+    if ((next_letter < 'z' && next_letter >= 'a')
+        || (next_letter < 'Z' && next_letter >= 'A')
+        || (next_letter < '9' && next_letter >= '0')) {
         next_letter++;
     } else if (next_letter == 'z') {
         next_letter = 'A';
@@ -789,8 +822,8 @@ menu_is_multipage(nhmenu *menu, int width, int height)
             menu_item_ptr->num_lines = num_lines;
             curline += num_lines;
             menu_item_ptr = menu_item_ptr->next_item;
-            if ((curline > height) || ((curline > height - 2) &&
-                                       (height == menu_max_height()))) {
+            if (curline > height
+                || (curline > height - 2 && height == menu_max_height())) {
                 break;
             }
         }
@@ -895,7 +928,7 @@ menu_win_size(nhmenu *menu)
         menu_item_ptr = menu_item_ptr->next_item;
     }
 
-    /* If the widest entry is smaller than maxwidth, reduce maxwidth accordingly */
+    /* If widest entry is smaller than maxwidth, reduce maxwidth accordingly */
     if (maxentrywidth < maxwidth) {
         maxwidth = maxentrywidth;
     }
@@ -922,7 +955,7 @@ menu_win_size(nhmenu *menu)
         if (lastline < maxheight) {
             maxheight = lastline;
         }
-    } else {                    /* If multipage, make sure we have enough width for page footer */
+    } else { /* If multipage, make sure we have enough width for page footer */
 
         if (width < 20) {
             width = 20;
@@ -1218,8 +1251,8 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
             menu_item_ptr = menu->entries;
 
             while (menu_item_ptr != NULL) {
-                if ((menu_item_ptr->identifier.a_void != NULL) &&
-                    (strstri(menu_item_ptr->str, search_key))) {
+                if (menu_item_ptr->identifier.a_void != NULL
+                    && strstri(menu_item_ptr->str, search_key)) {
                     if (how == PICK_ONE) {
                         menu_clear_selections(menu);
                         menu_select_deselect(win, menu_item_ptr, SELECT);
@@ -1247,12 +1280,11 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
         menu_item_ptr = menu->entries;
         while (menu_item_ptr != NULL) {
             if (menu_item_ptr->identifier.a_void != NULL) {
-                if (((curletter == menu_item_ptr->accelerator) &&
-                     ((curpage == menu_item_ptr->page_num) ||
-                      (!menu->reuse_accels))) || ((menu_item_ptr->group_accel)
-                                                  && (curletter ==
-                                                      menu_item_ptr->
-                                                      group_accel))) {
+                if ((curletter == menu_item_ptr->accelerator
+                     && (curpage == menu_item_ptr->page_num
+                         || !menu->reuse_accels))
+                    || (menu_item_ptr->group_accel
+                        && curletter == menu_item_ptr->group_accel)) {
                     if (curpage != menu_item_ptr->page_num) {
                         curpage = menu_item_ptr->page_num;
                         menu_display_page(menu, win, curpage);
@@ -1266,7 +1298,7 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
                         num_selected = 1;
                         dismiss = TRUE;
                         break;
-                    } else if ((how == PICK_ANY) && (curletter == count_letter)) {
+                    } else if (how == PICK_ANY && curletter == count_letter) {
                         menu_select_deselect(win, menu_item_ptr, SELECT);
                         menu_item_ptr->count = count;
                         count = 0;
@@ -1280,7 +1312,7 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
         }
     }
 
-    if ((how == PICK_ANY) && (num_selected != -1)) {
+    if (how == PICK_ANY && num_selected != -1) {
         num_selected = 0;
         menu_item_ptr = menu->entries;
 
