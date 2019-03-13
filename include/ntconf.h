@@ -98,6 +98,8 @@ extern void FDECL(interject, (int));
 #ifdef strcasecmp
 #undef strcasecmp
 #endif
+extern void FDECL(nethack_exit, (int));
+extern void NDECL(getlock);
 #endif
  
 #ifdef _MSC_VER
