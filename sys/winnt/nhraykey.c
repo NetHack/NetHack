@@ -461,6 +461,7 @@ int __declspec(dllexport) __stdcall CheckInput(hConIn, ir, count, numpad,
 HANDLE hConIn;
 INPUT_RECORD *ir;
 DWORD *count;
+int mode;
 int *mod;
 boolean numpad;
 coord *cc;
