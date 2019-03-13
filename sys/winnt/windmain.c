@@ -45,7 +45,7 @@ void NDECL(windows_nhbell);
 int FDECL(windows_nh_poskey, (int *, int *, int *));
 void FDECL(windows_raw_print, (const char *));
 char FDECL(windows_yn_function, (const char *, const char *, CHAR_P));
-void FDECL(windows_getlin, (const char *, char *));
+static void FDECL(windows_getlin, (const char *, char *));
 extern int NDECL(windows_console_custom_nhgetch);
 void NDECL(safe_routines);
 
