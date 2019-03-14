@@ -358,8 +358,7 @@ putstr(window, attr, str)
                 -- Print str on the window with the given attribute.  Only
                    printable ASCII characters (040-0126) must be supported.
                    Multiple putstr()s are output on separate lines.
-Attributes
-                   can be one of
+                   Attributes can be one of
                         ATR_NONE (or 0)
                         ATR_ULINE
                         ATR_BOLD
@@ -616,7 +615,10 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
         } else
 */
         if ((special & MG_OBJPILE) && iflags.hilite_pile) {
-            color = 16 + (color * 2) + 1;
+            if (iflags.wc_color)
+                color = 16 + (color * 2) + 1;
+            else
+                attr = A_REVERSE;
         }
     }
 
