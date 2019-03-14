@@ -10,10 +10,10 @@
 #include "func_tab.h"
 #include <ctype.h>
 
-#if defined(FILENAME_CMP)
+#if defined(FILENAME_CMP) && !defined(strcasecmp)
 #define strcasecmp FILENAME_CMP
 #endif
-#if defined(STRNCMPI)
+#if defined(STRNCMPI) && !defined(strncasecmp)
 #define strncasecmp strncmpi
 #endif
 

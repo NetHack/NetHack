@@ -98,7 +98,6 @@ extern void FDECL(interject, (int));
 #ifdef strcasecmp
 #undef strcasecmp
 #endif
-extern void FDECL(nethack_exit, (int));
 extern void NDECL(getlock);
 #endif
  
@@ -282,5 +281,5 @@ extern void FDECL(nhassert_failed, (const char * exp, const char * file,
 #endif
 
 #define nethack_enter(argc, argv) nethack_enter_winnt()
-
+extern void FDECL(nethack_exit, (int)) NORETURN;
 #endif /* NTCONF_H */

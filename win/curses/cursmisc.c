@@ -81,19 +81,22 @@ curses_read_char()
 /* Turn on or off the specified color and / or attribute */
 
 void
-curses_toggle_color_attr(WINDOW * win, int color, int attr, int onoff)
+curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
 {
 #ifdef TEXTCOLOR
     int curses_color;
 
-    /* Map color disabled */
-    if ((!iflags.wc_color) && (win == mapwin)) {
+    /* if color is disabled, just show attribute */
+    if ((win == mapwin) ? !iflags.wc_color : !iflags.wc2_guicolor) {
+#endif
+        if (attr != NONE) {
+            if (onoff == ON)
+                wattron(win, attr);
+            else
+                wattroff(win, attr);
+        }
         return;
-    }
-
-    /* GUI color disabled */
-    if ((!iflags.wc2_guicolor) && (win != mapwin)) {
-        return;
+#ifdef TEXTCOLOR
     }
 
     if (color == 0) {           /* make black fg visible */
@@ -149,6 +152,8 @@ curses_toggle_color_attr(WINDOW * win, int color, int attr, int onoff)
             wattroff(win, attr);
         }
     }
+#else
+    nhUse(color);
 #endif /* TEXTCOLOR */
 }
 
@@ -685,7 +690,7 @@ curses_convert_attr(int attr)
    success (might be 0), or -1 if not found. */
 
 int
-curses_read_attrs(char *attrs)
+curses_read_attrs(const char *attrs)
 {
     int retattr = 0;
 

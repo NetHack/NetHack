@@ -90,8 +90,8 @@ TARGET_CPU=x86
 #    of your PDCurses C files which must already be resident on 
 #    your machine.
 #
-ADD_CURSES=Y
-PDCURSES_TOP=../../pdcurses
+#ADD_CURSES=Y
+#PDCURSES_TOP=../../pdcurses
 
 #4b Qt
 #
