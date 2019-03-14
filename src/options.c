@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1551222973 2019/02/26 23:16:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.356 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1552521022 2019/03/13 23:50:22 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.357 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,7 +28,7 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 #endif
 
 #ifdef CURSES_GRAPHICS
-extern int curses_read_attrs(char *attrs);
+extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 #endif
 
@@ -4020,7 +4020,6 @@ boolean tinitial, tfrom_file;
             } else if (boolopt[i].addr == &flags.showrace
                        || boolopt[i].addr == &iflags.use_inverse
                        || boolopt[i].addr == &iflags.hilite_pile
-                       || boolopt[i].addr == &iflags.hilite_pet
                        || boolopt[i].addr == &iflags.perm_invent
 #ifdef CURSES_GRAPHICS
                        || boolopt[i].addr == &iflags.cursesgraphics
@@ -4028,6 +4027,16 @@ boolean tinitial, tfrom_file;
                        || boolopt[i].addr == &iflags.wc_ascii_map
                        || boolopt[i].addr == &iflags.wc_tiled_map) {
                 g.opt_need_redraw = TRUE;
+            } else if (boolopt[i].addr == &iflags.hilite_pet) {
+#ifdef CURSES_GRAPHICS
+                if (WINDOWPORT("curses")) {
+                    /* if we're enabling hilite_pet and petattr isn't set,
+                       set it to Inverse; if we're disabling, leave petattr
+                       alone so that re-enabling will get current value back */
+                    if (iflags.hilite_pet && !iflags.wc2_petattr)
+                        iflags.wc2_petattr = curses_read_attrs("I");
+                }
+#endif
 #ifdef STATUS_HILITES
             } else if (boolopt[i].addr == &iflags.wc2_hitpointbar) {
                 status_initialize(REASSESS_ONLY);
