@@ -850,6 +850,9 @@ preference_update(preference)
 void
 curses_preference_update(const char *pref)
 {
+    if (!strcmp(pref, "hilite_status") || !strcmp(pref, "align_status"))
+        status_initialize(REASSESS_ONLY);
+
     if (!strcmp(pref, "align_status")
         || !strcmp(pref, "align_message")) {
         curses_create_main_windows();

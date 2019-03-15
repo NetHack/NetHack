@@ -87,7 +87,10 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     int curses_color;
 
     /* if color is disabled, just show attribute */
-    if ((win == mapwin) ? !iflags.wc_color : !iflags.wc2_guicolor) {
+    if ((win == mapwin) ? !iflags.wc_color
+                        /* statuswin is for #if STATUS_HILITES
+                           but doesn't need to be conditional */
+                        : !(iflags.wc2_guicolor || win == statuswin)) {
 #endif
         if (attr != NONE) {
             if (onoff == ON)
