@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1518922474 2018/02/18 02:54:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1552639487 2019/03/15 08:44:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -170,13 +170,14 @@ char *bp;
     return bp;
 }
 
-/* remove leading and trailing whitespace, in place */
-char*
+/* skip leading whitespace; remove trailing whitespace, in place */
+char *
 trimspaces(txt)
-char* txt;
+char *txt;
 {
-    char* end;
+    char *end;
 
+    /* leading whitespace will remain in the buffer */
     while (*txt == ' ' || *txt == '\t')
         txt++;
     end = eos(txt);
