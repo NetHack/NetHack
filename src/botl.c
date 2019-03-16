@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1549755174 2019/02/09 23:32:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.134 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1552697495 2019/03/16 00:51:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -376,13 +376,16 @@ char *buf;
     int ret = 1;
 
     /* TODO:    Add in dungeon name */
-    if (Is_knox(&u.uz))
+    if (Is_knox(&u.uz)) {
         Sprintf(buf, "%s ", dungeons[u.uz.dnum].dname);
-    else if (In_quest(&u.uz))
+    } else if (In_quest(&u.uz)) {
         Sprintf(buf, "Home %d ", dunlev(&u.uz));
-    else if (In_endgame(&u.uz))
-        Sprintf(buf, Is_astralevel(&u.uz) ? "Astral Plane " : "End Game ");
-    else {
+    } else if (In_endgame(&u.uz)) {
+        /* [3.6.2: this used to be "Astral Plane" or generic "End Game"] */
+        (void) endgamelevelname(buf, depth(&u.uz));
+        (void) strsubst(buf, "Plane of ", ""); /* just keep <element> */
+        Strcat(buf, " ");
+    } else {
         /* ports with more room may expand this one */
         Sprintf(buf, "Dlvl:%-2d ", depth(&u.uz));
         ret = 0;
