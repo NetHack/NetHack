@@ -23,9 +23,13 @@ curses_update_inv(void)
         /* It's not. Re-initialize the main windows if the
            option was enabled. */
         if (iflags.perm_invent) {
-            curses_create_main_windows();
-            curses_last_messages();
-            doredraw();
+            /* [core_]status_initialize, curses_create_main_windows,
+               curses_last_messages, [core_]doredraw; doredraw will
+               call (*update_inventory) [curses_update_inventory] which
+               will call us but 'win' should be defined that time */
+            curs_reset_windows(TRUE, FALSE);
+            /* TODO: guard against window creation failure [if that's
+               possible] which would lead to uncontrolled recursion */
         }
         return;
     }
