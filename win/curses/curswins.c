@@ -490,9 +490,6 @@ curses_puts(winid wid, int attr, const char *text)
 #if 0
     if (wid == STATUS_WIN) {
         curses_update_stats();     /* We will do the write ourselves */
-        /* Inventory updating isn't performed on redraws, so
-           also update inventory here... */
-        curses_update_inventory();
         return;
     }
 #endif

@@ -210,13 +210,12 @@ curses_askname()
 void
 curses_get_nh_event()
 {
+    boolean do_reset = FALSE;
+
 #ifdef PDCURSES
     if (is_termresized()) {
         resize_term(0, 0);
-        getmaxyx(base_term, term_rows, term_cols);
-        curses_create_main_windows();
-        curses_last_messages();
-        doredraw();
+        do_reset = TRUE;
     }
 #endif
 #ifdef NCURSES_VERSION          /* Is there a better way to detect ncurses? */
@@ -224,14 +223,16 @@ curses_get_nh_event()
         if (!isendwin()) {
             endwin();
         }
-
         refresh();
-        getmaxyx(base_term, term_rows, term_cols);
-        curses_create_main_windows();
-        curses_last_messages();
-        doredraw();
+        do_reset = TRUE;
     }
 #endif
+
+    if (do_reset) {
+        getmaxyx(base_term, term_rows, term_cols);
+        /* status_initialize, create_main_windows, last_messages, doredraw */
+        curs_reset_windows(TRUE, TRUE);
+    }
 }
 
 /* Exits the window system.  This should dismiss all windows,
@@ -526,9 +527,7 @@ curses_update_inventory(void)
        changed the option. */
     if (!iflags.perm_invent) {
         if (curses_get_nhwin(INV_WIN)) {
-            curses_create_main_windows();
-            curses_last_messages();
-            doredraw();
+            curs_reset_windows(TRUE, FALSE);
         }
         return;
     }
@@ -850,14 +849,38 @@ preference_update(preference)
 void
 curses_preference_update(const char *pref)
 {
-    if (!strcmp(pref, "hilite_status") || !strcmp(pref, "align_status"))
-        status_initialize(REASSESS_ONLY);
+    boolean redo_main = FALSE, redo_status = FALSE;
 
     if (!strcmp(pref, "align_status")
-        || !strcmp(pref, "align_message")) {
+        || !strcmp(pref, "statuslines")
+        || !strcmp(pref, "windowborders"))
+        redo_main = redo_status = TRUE;
+    else if (!strcmp(pref, "hilite_status"))
+        redo_status = TRUE;
+    else if (!strcmp(pref, "align_message"))
+        redo_main = TRUE;
+
+    if (redo_main || redo_status)
+        curs_reset_windows(redo_main, redo_status);
+}
+
+void
+curs_reset_windows(boolean redo_main, boolean redo_status)
+{
+    boolean need_redraw = FALSE;
+
+    if (redo_status) {
+        status_initialize(REASSESS_ONLY);
+        need_redraw = TRUE;
+    }
+    if (redo_main) {
         curses_create_main_windows();
+        need_redraw = TRUE;
+    }
+    if (need_redraw) {
         curses_last_messages();
         doredraw();
     }
 }
 
+/*cursmain.c*/
