@@ -114,6 +114,7 @@ extern void curses_end_screen(void);
 extern void curses_outrip(winid wid, int how);
 extern void genl_outrip(winid tmpwin, int how, time_t when);
 extern void curses_preference_update(const char *pref);
+extern void curs_reset_windows(boolean, boolean);
 
 /* curswins.c */
 
