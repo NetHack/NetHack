@@ -3709,8 +3709,8 @@ boolean tinitial, tfrom_file;
             retval = FALSE;
         } else {
             iflags.wc2_statuslines = itmp;
-            if (!initial)
-                need_redraw = TRUE;
+            if (!g.opt_initial)
+                g.opt_need_redraw = TRUE;
         }
         return retval;
     }
