@@ -1,4 +1,4 @@
-/* NetHack 3.6	winprocs.h	$NHDT-Date: 1549327479 2019/02/05 00:44:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.6	winprocs.h	$NHDT-Date: 1553204011 2019/03/21 21:33:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -217,16 +217,17 @@ extern
 #define WC2_RESET_STATUS  0x0100L /* 09 call status_update(BL_RESET) to
                                    *    indicate 'draw everything'      */
 #define WC2_TERM_SIZE     0x0200L /* 10 support setting terminal size   */
-#define WC2_WINDOWBORDERS 0x0400L /* 11 display borders on nh windows   */
-#define WC2_PETATTR       0x0800L /* 12 attributes for hilite_pet       */
-#define WC2_GUICOLOR      0x1000L /* 13 display colours outside map win */
+#define WC2_STATUSLINES   0x0400L /* 16 switch between 2 or 3 lines of status */
+#define WC2_WINDOWBORDERS 0x0800L /* 11 display borders on nh windows   */
+#define WC2_PETATTR       0x1000L /* 12 attributes for hilite_pet       */
+#define WC2_GUICOLOR      0x2000L /* 13 display colours outside map win */
 /* pline() can overload the display attributes argument passed to putstr()
    with one or more flags and at most one of bold/blink/inverse/&c */
-#define WC2_URGENT_MESG   0x2000L /* 14 putstr(WIN_MESSAGE) supports urgency
+#define WC2_URGENT_MESG   0x4000L /* 14 putstr(WIN_MESSAGE) supports urgency
                                    *    via non-display attribute flag  */
-#define WC2_SUPPRESS_HIST 0x4000L /* 15 putstr(WIN_MESSAGE) supports history
+#define WC2_SUPPRESS_HIST 0x8000L /* 15 putstr(WIN_MESSAGE) supports history
                                    *    suppression via non-disp attr   */
-                                  /* 17 free bits */
+                                  /* 16 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2

@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{February 27, 2019}
+\date{March 19, 2019}
 
 \maketitle
 
@@ -3305,11 +3305,6 @@ or {\tt U} (known to be uncursed, when `off', the default).
 Gold is never blessed or cursed, but it is not described as ``uncursed''
 even when the {\it implicit\verb+_+uncursed\/} option is `off'.
 %.lp
-\item[\ib{guicolor}]
-Use color text and/or highlighting attributes when displaying some
-non-map data (such as menu selector letters).
-Curses interface only; default is on.
-%.lp
 \item[\ib{help}]
 If more information is available for an object looked at
 with the `{\tt /}' command, ask if you want to see it (default on).
@@ -3614,6 +3609,7 @@ such as ``{\it par\-a\-noid\verb+_+con\-fir\-ma\-tion:attack~pray~Remove}''.
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
 %.lp
+%.\" petattr is a wincap option but we'll document it here...
 \item[\ib{petattr}]
 Specifies one or more text highlighting attributes to use when showing
 pets on the map.
@@ -3642,7 +3638,7 @@ Currently multiple highlight-style letters can be combined by simply
 stringing them together (for example, ``bk''), but in the future
 they might require being separated by plus signs (such as ``b\verb&+&k'',
 which works already).
-When using the `N' choice, it should be specified on its own,
+When using the `n' choice, it should be specified on its own,
 not in combination with any of the other letters.
 
 %.lp
@@ -3754,8 +3750,8 @@ depend upon the window port used or on the type of terminal.  Persistent.
 Prevent you from (knowingly) attacking your pets (default on).  Persistent.
 %+.lp
 \item[\ib{sanity\verb+_+check}]
-+Evaluate monsters, objects, and map prior to each turn (default off).
-+Debug mode only.
+Evaluate monsters, objects, and map prior to each turn (default off).
+Debug mode only.
 %.lp
 \item[\ib{scores}]
 Control what parts of the score list you are shown at the end (for example,
@@ -3822,15 +3818,6 @@ and prior versions (for example, ``{\tt suppress\verb+_+alert:3.3.1}'')
 This option may be used to select one of the named symbol sets found within
 {\tt symbols} to alter the symbols displayed on the screen.
 Use ``{\tt symset:default}'' to explicitly select the default symbols.
-%.lp
-\item[\ib{term\verb+_+cols}\ \ {\it and}]"
-%.lp
-\item[\ib{term\verb+_+rows}]
-Curses interface only.
-Number of columns and rows to use for the display.
-Curses will attempt to resize to the values specified but will settle
-for smaller sizes if they are too big.
-Default is the current window size.
 %.lp
 \item[\ib{time}]
 Show the elapsed game time in turns on bottom line (default off).  Persistent.
@@ -3923,30 +3910,19 @@ meta-digit keys to fast-move, instead of moving 8 units at a time,
 move by skipping the same glyphs.
 (default off)
 %.lp
-\item[\ib{windowborders}]
-Whether to draw boxes around the map, status area, message area, and
-persistent inventory window if enabled.
-Curses interface only.
-Acceptable values are
-
-%.sd
-%.si
-{\tt 1} --- on, always show borders\\
-{\tt 2} --- off, never show borders\\
-{\tt 3} --- auto, on if terminal or window is at least
-(24\verb&+&2)x(80\verb&+&2)\ \ (default)\\
-%.ei
-%.ed
-
-%.lp ""
-(The 26x82 size threshold for `3' refers to number of rows and
-columns of the display.)
-%.lp
 \item[\ib{windowtype}]
 When the program has been built to support multiple interfaces,
 select whichone to use, such as ``{\tt tty}'' or ``{\tt X11}''
 (default depends on build-time settings; use ``{\tt \#version}'' to check).
 Cannot be set with the `{\tt O}' command.
+
+%.lp ""
+When used, it should be the first option set since its value might
+enable or disable the availability of various other options.
+For multiple lines in a configuration file, that would be the first
+non-comment line.
+For a comma-separated list in NETHACKOPTIONS or an OPTIONS line in a
+configuration file, that would be the {\it rightmost\/} option in the list.
 %.lp
 \item[\ib{wizweight}]
 Augment object descriptions with their objects' weight (default off).
@@ -4031,6 +4007,11 @@ If {\it NetHack\/} can, it should use this size font for text windows.
 \item[\ib{fullscreen}]
 If {\it NetHack\/} can, it should try and display on the entire screen rather than in a window.
 %.lp
+\item[\ib{guicolor}]
+Use color text and/or highlighting attributes when displaying some
+non-map data (such as menu selector letters).
+Curses interface only; default is on.
+%.lp
 \item[\ib{large\verb+_+font}]
 If {\it NetHack\/} can, it should use a large font.
 %.lp
@@ -4063,10 +4044,26 @@ If {\it NetHack\/} can, it should display a menu of existing saved games for the
 choose from at game startup, if it can. Not all ports support this option.
 %.lp
 \item[\ib{softkeyboard}]
-If {\it NetHack\/} can, it should display an onscreen keyboard.  Handhelds are most likely to support this option.
+If {\it NetHack\/} can, it should display an onscreen keyboard.
+Handhelds are most likely to support this option.
 %.lp
 \item[\ib{splash\verb+_+screen}]
-If {\it NetHack\/} can, it should display an opening splash screen when it starts up (default yes).
+If {\it NetHack\/} can, it should display an opening splash screen when
+it starts up (default yes).
+%.lp
+\item[\ib{statuslines}]
+Number of lines for traditional below-the-map status display.
+Acceptable values are 2 and 3 (default is 2).
+Curses interface only.
+%.lp
+\item[\ib{term\verb+_+cols}\ \ {\it and}]"
+%.lp
+\item[\ib{term\verb+_+rows}]
+Curses interface only.
+Number of columns and rows to use for the display.
+Curses will attempt to resize to the values specified but will settle
+for smaller sizes if they are too big.
+Default is the current window size.
 %.lp
 \item[\ib{tiled\verb+_+map}]
 If {\it NetHack\/} can, it should display a tiled map if it can.
@@ -4089,6 +4086,28 @@ If {\it NetHack\/} can, it should display inverse when the game specifies it.
 \item[\ib{vary\verb+_+msgcount}]
 If {\it NetHack\/} can, it should display this number of messages at a time
 in the message window.
+%.lp
+\item[\ib{windowborders}]
+Whether to draw boxes around the map, status area, message area, and
+persistent inventory window if enabled.
+Curses interface only.
+Acceptable values are
+
+%.sd
+%.si
+{\tt 0} --- off, never show borders\\
+{\tt 1} --- on, always show borders\\
+{\tt 2} --- auto, on display is at least
+(\verb&24+2&)x(\verb&80+2&)\ \ (default)\\
+%.ei
+%.ed
+
+%.lp "
+(The 26x82 size threshold for `2' refers to number of rows and
+columns of the display.
+A width of at least 110 columns (\verb&80+2+26+2&) is needed for
+{\it align_status\/}
+set to {tt left} or {\tt right}.)
 %.lp
 \item[\ib{windowcolors}]
 If {\it NetHack\/} can, it should display windows with the specified

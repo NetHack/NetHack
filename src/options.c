@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1552521022 2019/03/13 23:50:22 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.357 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1553204012 2019/03/21 21:33:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.358 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -394,10 +394,10 @@ static struct Comp_Opt {
 #endif
 #ifdef CURSES_GRAPHICS
     { "statuslines",
-      "0,1,2 = classic behavior, 3 = alternative behavior",
-      20, DISP_IN_GAME },
+      "2 or 3 lines for horizonal (bottom or top) status display",
+      20, SET_IN_GAME }, /*WC2*/
 #else
-    { "statuslines", "# of status lines", 20, SET_IN_FILE },
+    { "statuslines", "2 or 3 lines for status display", 20, SET_IN_FILE },
 #endif
     { "symset", "load a set of display symbols from the symbols file", 70,
       SET_IN_GAME },
@@ -433,7 +433,7 @@ static struct Comp_Opt {
     { "whatis_filter",
       "filter coordinate locations when targeting next or previous",
       1, SET_IN_GAME },
-    { "windowborders", "1 (on), 2 (off), 3 (auto)", 9, DISP_IN_GAME }, /*WC2*/
+    { "windowborders", "0 (off), 1 (on), 2 (auto)", 9, SET_IN_GAME }, /*WC2*/
     { "windowcolors", "the foreground/background colors of windows", /*WC*/
       80, DISP_IN_GAME },
     { "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
@@ -816,6 +816,12 @@ initoptions_init()
     switch_symbols(TRUE);
 #endif /* MAC_GRAPHICS_ENV */
     flags.menu_style = MENU_FULL;
+
+    iflags.wc_align_message = ALIGN_TOP;
+    iflags.wc_align_status = ALIGN_BOTTOM;
+    /* these are currently only used by curses */
+    iflags.wc2_statuslines = 2;
+    iflags.wc2_windowborders = 2; /* 'Auto' */
 
     /* since this is done before init_objects(), do partial init here */
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
@@ -1370,7 +1376,8 @@ static const struct {
     { "inverse", ATR_INVERSE },
     { NULL, ATR_NONE }, /* everything after this is an alias */
     { "normal", ATR_NONE },
-    { "uline", ATR_ULINE }
+    { "uline", ATR_ULINE },
+    { "reverse", ATR_INVERSE },
 };
 
 const char *
@@ -3676,18 +3683,44 @@ boolean tinitial, tfrom_file;
             int itmp;
 
             if (negated)
-                itmp = 2; /* Off */
+                itmp = 0; /* Off */
             else if (!op)
                 itmp = 1; /* On */
-            else    /* Value supplied; expect 1 (on), 2 (off), or 3 (auto) */
+            else    /* Value supplied; expect 0 (off), 1 (on), or 2 (auto) */
                 itmp = atoi(op);
 
-            if (itmp < 1 || itmp > 3) {
-                config_error_add("Invalid %s: %s.", fullname, opts);
+            if (itmp < 0 || itmp > 2) {
+                config_error_add("Invalid %s (should be 0, 1, or 2): %s",
+                                 fullname, opts);
                 retval = FALSE;
             } else {
                 iflags.wc2_windowborders = itmp;
             }
+        }
+        return retval;
+    }
+
+    /* WINCAP2
+     * statuslines:n */
+    fullname = "statuslines";
+    if (match_optname(opts, fullname, 11, TRUE)) {
+        int itmp = 0;
+
+        op = string_for_opt(opts, negated);
+        if (negated) {
+            bad_negation(fullname, TRUE);
+            itmp = 2;
+            retval = FALSE;
+        } else if (op) {
+            itmp = atoi(op);
+        }
+        if (itmp < 2 || itmp > 3) {
+            config_error_add("'%s' requires a value of 2 and 3", fullname);
+            retval = FALSE;
+        } else {
+            iflags.wc2_statuslines = itmp;
+            if (!initial)
+                need_redraw = TRUE;
         }
         return retval;
     }
@@ -5424,29 +5457,17 @@ char *buf;
     int i;
 
     buf[0] = '\0';
-    if (!strcmp(optname, "align_message"))
+    if (!strcmp(optname, "align_message")
+        || !strcmp(optname, "align_status")) {
+        int which = !strcmp(optname, "align_status") ? iflags.wc_align_status
+                                                     : iflags.wc_align_message;
         Sprintf(buf, "%s",
-                iflags.wc_align_message == ALIGN_TOP
-                    ? "top"
-                    : iflags.wc_align_message == ALIGN_LEFT
-                          ? "left"
-                          : iflags.wc_align_message == ALIGN_BOTTOM
-                                ? "bottom"
-                                : iflags.wc_align_message == ALIGN_RIGHT
-                                      ? "right"
-                                      : defopt);
-    else if (!strcmp(optname, "align_status"))
-        Sprintf(buf, "%s",
-                iflags.wc_align_status == ALIGN_TOP
-                    ? "top"
-                    : iflags.wc_align_status == ALIGN_LEFT
-                          ? "left"
-                          : iflags.wc_align_status == ALIGN_BOTTOM
-                                ? "bottom"
-                                : iflags.wc_align_status == ALIGN_RIGHT
-                                      ? "right"
-                                      : defopt);
-    else if (!strcmp(optname, "align"))
+                (which == ALIGN_TOP) ? "top"
+                : (which == ALIGN_LEFT) ? "left"
+                  : (which == ALIGN_BOTTOM) ? "bottom"
+                    : (which == ALIGN_RIGHT) ? "right"
+                      : defopt);
+    } else if (!strcmp(optname, "align"))
         Sprintf(buf, "%s", rolestring(flags.initalign, aligns, adj));
 #ifdef WIN32
     else if (!strcmp(optname, "altkeyhandler"))
@@ -5707,6 +5728,9 @@ char *buf;
             Sprintf(buf, "%ld (on: highlight status for %ld turns)",
                     iflags.hilite_delta, iflags.hilite_delta);
 #endif
+    } else if (!strcmp(optname,"statuslines")) {
+        Strcpy(buf, (WINDOWPORT("curses")
+                     && iflags.wc2_statuslines < 3) ? "2" : "3");
     } else if (!strcmp(optname, "suppress_alert")) {
         if (flags.suppress_alert == 0L)
             Strcpy(buf, none);
@@ -5764,14 +5788,12 @@ char *buf;
                 ttycolors[CLR_YELLOW], ttycolors[CLR_BRIGHT_BLUE],
                 ttycolors[CLR_BRIGHT_MAGENTA], ttycolors[CLR_BRIGHT_CYAN]);
 #endif /* VIDEOSHADES */
-#ifdef CURSES_GRAPHICS
     } else if (!strcmp(optname,"windowborders")) {
         Sprintf(buf, "%s",
-                (iflags.wc2_windowborders == 1) ? "1=on"
-                : (iflags.wc2_windowborders == 2) ? "2=off"
-                  : (iflags.wc2_windowborders == 3) ? "3=auto"
+                (iflags.wc2_windowborders == 0) ? "0=off"
+                : (iflags.wc2_windowborders == 1) ? "1=on"
+                  : (iflags.wc2_windowborders == 2) ? "2=auto"
                     : defopt);
-#endif
     } else if (!strcmp(optname, "windowtype")) {
         Sprintf(buf, "%s", windowprocs.name);
     } else if (!strcmp(optname, "windowcolors")) {
@@ -6479,6 +6501,7 @@ static struct wc_Opt wc2_options[] = {
     { "term_rows", WC2_TERM_SIZE },
     { "petattr", WC2_PETATTR },
     { "guicolor", WC2_GUICOLOR },
+    { "statuslines", WC2_STATUSLINES },
     { "windowborders", WC2_WINDOWBORDERS },
     { (char *) 0, 0L }
 };
