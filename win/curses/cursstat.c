@@ -3,7 +3,6 @@
 /* Copyright (c) Andy Thomson, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#include <ctype.h> /* toupper() */
 #include "curses.h"
 #include "hack.h"
 #include "wincurs.h"
@@ -28,9 +27,11 @@ static char *status_vals_long[MAXBLSTATS];
 #ifdef STATUS_HILITES
 static long curses_condition_bits;
 static int curses_status_colors[MAXBLSTATS];
-int hpbar_percent, hpbar_color;
+static int hpbar_percent, hpbar_color;
 
+#ifdef TEXTCOLOR
 static int FDECL(condcolor, (long, unsigned long *));
+#endif
 static int FDECL(condattr, (long, unsigned long *));
 #endif /* STATUS_HILITES */
 static void FDECL(draw_status, (unsigned long *));
@@ -45,8 +46,8 @@ curses_status_init()
     int i;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
-	curses_status_colors[i] = NO_COLOR; /* no color */
-	status_vals_long[i] = (char *) alloc(MAXCO);
+        curses_status_colors[i] = NO_COLOR; /* no color and no attributes */
+        status_vals_long[i] = (char *) alloc(MAXCO);
         *status_vals_long[i] = '\0';
     }
     curses_condition_bits = 0L;
@@ -189,18 +190,19 @@ curses_status_finish()
 #endif
 
 void
-curses_status_update(fldidx, ptr, chg, percent, color, colormasks)
-int fldidx, chg UNUSED, percent, color;
+curses_status_update(fldidx, ptr, chg, percent, color_and_attr, colormasks)
+int fldidx, chg UNUSED,
+    percent, color_and_attr;
 genericptr_t ptr;
 unsigned long *colormasks;
 {
     long *condptr = (long *) ptr;
     char *text = (char *) ptr;
     char *goldnum = NULL;
-    static boolean oncearound = FALSE; /* prevent premature partial display */
     boolean use_name = TRUE;
 
     if (fldidx != BL_FLUSH) {
+        *status_vals[fldidx] = '\0';
         if (!status_activefields[fldidx])
             return;
         if (fldidx == BL_GOLD)
@@ -208,7 +210,6 @@ unsigned long *colormasks;
         switch (fldidx) {
         case BL_CONDITION:
             curses_condition_bits = *condptr;
-            oncearound = TRUE;
             break;
         case BL_TITLE:
         case BL_HPMAX:
@@ -219,6 +220,15 @@ unsigned long *colormasks;
             use_name = FALSE;
             /* FALLTHROUGH */
         default:
+#ifndef TEXTCOLOR
+            color_and_attr = (color_and_attr & ~0x00FF) | NO_COLOR;
+#endif
+            /*
+             * status_vals[] are used for horizontal orientation
+             *  (wide lines of multiple short values).
+             * status_vals_long[] are used for vertical orientation
+             *  (narrow-ish lines of one long value each).
+             */
             Sprintf(status_vals[fldidx],
                     (fldidx == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30s" :
                     status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] : "%s",
@@ -226,51 +236,36 @@ unsigned long *colormasks;
             if (use_name) {
                 Sprintf(status_vals_long[fldidx], "%-16s: %s",
                         status_fieldnm[fldidx], goldnum ? goldnum : text);
-                *(status_vals_long[fldidx]) = toupper((*status_vals_long[fldidx]));
+                *(status_vals_long[fldidx]) = highc(*status_vals_long[fldidx]);
             } else
                 Strcpy(status_vals_long[fldidx], status_vals[fldidx]);
-#ifdef TEXTCOLOR
-            curses_status_colors[fldidx] = color;
-#else
-            curses_status_colors[fldidx] = NO_COLOR;
-#endif
+
+            curses_status_colors[fldidx] = color_and_attr;
             if (iflags.wc2_hitpointbar && fldidx == BL_HP) {
-			hpbar_percent = percent;
-#ifdef TEXTCOLOR
-                hpbar_color = color;
-#else
-                hpbar_color = NO_COLOR;
-#endif
+                hpbar_percent = percent;
+                hpbar_color = color_and_attr;
             }
             break;
         }
+    } else { /* BL_FLUSH */
+        draw_status(colormasks);
     }
-
-    if (!oncearound) return;
-    draw_status(colormasks);
 }
 
 void
 draw_status(colormasks)
 unsigned long *colormasks;
 {
-    boolean horiz = FALSE;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
     int orient = curses_get_window_orientation(STATUS_WIN);
+    boolean horiz = (orient != ALIGN_RIGHT && orient != ALIGN_LEFT);
     boolean border = curses_window_has_border(STATUS_WIN);
 
-    if ((orient != ALIGN_RIGHT) && (orient != ALIGN_LEFT))
-        horiz = TRUE;
-
-    /* Figure out if we have proper window dimensions for horizontal statusbar. */
+    /* Figure out if we have proper window dimensions for horizontal
+       statusbar. */
     if (horiz) {
-        int ax = 0;
-        int ay = 0;
-
-        /* correct y */
-        int cy = 3;
-        if (iflags.statuslines < 3)
-            cy = 2;
+        int ax = 0, ay = 0;
+        int cy = (iflags.wc2_statuslines < 3) ? 2 : 3;
 
         /* actual y (and x) */
         getmaxyx(win, ay, ax);
@@ -278,16 +273,14 @@ unsigned long *colormasks;
             ay -= 2;
 
         if (cy != ay) { /* something changed. Redo everything */
-            curses_create_main_windows();
-            curses_last_messages();
-            doredraw();
+            curs_reset_windows(TRUE, TRUE);
             win = curses_get_nhwin(STATUS_WIN);
         }
     }
 
     werase(win);
     if (horiz) {
-        if (iflags.statuslines < 3)
+        if (iflags.wc2_statuslines < 3)
             draw_classic(border, colormasks);
         else
             draw_horizontal(border, colormasks);
@@ -305,7 +298,7 @@ draw_classic(border, colormasks)
 boolean border;
 unsigned long *colormasks;
 {
-    enum statusfields fieldorder[2][15] = {
+    static const enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
           BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
           BL_FLUSH },
@@ -313,33 +306,32 @@ unsigned long *colormasks;
           BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
           BL_CAP, BL_CONDITION, BL_FLUSH }
     };
-#ifdef TEXTCOLOR
-    int coloridx = NO_COLOR;
-#endif
-    int i, attrmask = 0;
+    int i, coloridx = NO_COLOR, attrmask = 0;
     char *text;
     int attridx = 0;
 
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
-    if (border) wmove(win, 1, 1);
-    else wmove(win, 0, 0);
+    if (border)
+        wmove(win, 1, 1);
+    else
+        wmove(win, 0, 0);
     for (i = 0; fieldorder[0][i] != BL_FLUSH; ++i) {
         int fldidx1 = fieldorder[0][i];
+
         if (status_activefields[fldidx1]) {
             if (fldidx1 != BL_TITLE || !iflags.wc2_hitpointbar) {
-#ifdef TEXTCOLOR
-                coloridx = curses_status_colors[fldidx1] & 0x00FF;
-#endif
-                attridx = (curses_status_colors[fldidx1] & 0xFF00) >> 8;
                 text = status_vals[fldidx1];
-                if (iflags.hilite_delta) {
+                coloridx = curses_status_colors[fldidx1]; /* plus attributes */
+                if (iflags.hilite_delta && coloridx != NO_COLOR) {
                     if (*text == ' ') {
                         putstr(STATUS_WIN, 0, " ");
                         text++;
                     }
                     /* multiple attributes can be in effect concurrently */
+                    attridx = (coloridx >> 8) & 0x00FF;
                     Begin_Attr(attridx);
 #ifdef TEXTCOLOR
+                    coloridx &= 0x00FF;
                     if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                         curses_toggle_color_attr(win, coloridx, NONE, ON);
 #endif
@@ -350,7 +342,7 @@ unsigned long *colormasks;
                 if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
                     if (coloridx != NO_COLOR)
-                        curses_toggle_color_attr(win, coloridx,NONE,OFF);
+                        curses_toggle_color_attr(win, coloridx, NONE, OFF);
 #endif
                     End_Attr(attridx);
                 }
@@ -377,54 +369,56 @@ unsigned long *colormasks;
                         *bar2 = '\0';
                     }
                 }
-                if (iflags.hilite_delta && iflags.wc2_hitpointbar) {
-                    putstr(STATUS_WIN, 0, "[");
+
+                putstr(STATUS_WIN, 0, "[");
+                /* fixed attribute, not ((hpbar_color >> 8) & 0x00FF) */
+                wattron(win, A_REVERSE);
 #ifdef TEXTCOLOR
+                if (iflags.hilite_delta) {
                     coloridx = hpbar_color & 0x00FF;
-                    /* attridx = (hpbar_color & 0xFF00) >> 8; */
                     if (coloridx != NO_COLOR)
-                        curses_toggle_color_attr(win,coloridx,NONE,ON);
+                        curses_toggle_color_attr(win, coloridx, NONE, ON);
+                }
 #endif
-                    wattron(win,A_REVERSE);
-                    putstr(STATUS_WIN, 0, bar);
-                    wattroff(win,A_REVERSE);
+                putstr(STATUS_WIN, 0, bar);
 #ifdef TEXTCOLOR
-                    if (coloridx != NO_COLOR)
-                        curses_toggle_color_attr(win,coloridx,NONE,OFF);
+                if (iflags.hilite_delta && coloridx != NO_COLOR)
+                    curses_toggle_color_attr(win, coloridx, NONE, OFF);
 #endif
-                    if (twoparts) {
-                        *bar2 = savedch;
-                        putstr(STATUS_WIN, 0, bar2);
-                    }
-                    putstr(STATUS_WIN, 0, "]");
-                } else
-                    putstr(STATUS_WIN, 0, text);
+                wattroff(win, A_REVERSE);
+                if (twoparts) {
+                    *bar2 = savedch;
+                    putstr(STATUS_WIN, 0, bar2);
+                }
+                putstr(STATUS_WIN, 0, "]");
             }
         }
     }
     wclrtoeol(win);
-    if (border) wmove(win, 2, 1);
-    else wmove (win, 1, 0);
+    if (border)
+        wmove(win, 2, 1);
+    else
+        wmove (win, 1, 0);
     for (i = 0; fieldorder[1][i] != BL_FLUSH; ++i) {
         int fldidx2 = fieldorder[1][i];
 
         if (status_activefields[fldidx2]) {
             if (fldidx2 != BL_CONDITION) {
-#ifdef TEXTCOLOR
-                coloridx = curses_status_colors[fldidx2] & 0x00FF;
-#endif
-                attridx = (curses_status_colors[fldidx2] & 0xFF00) >> 8;
+                /* regular field, including title if no hitpointbar */
                 text = status_vals[fldidx2];
-                if (iflags.hilite_delta) {
+                coloridx = curses_status_colors[fldidx2]; /* plus attribute */
+                if (iflags.hilite_delta && coloridx != NO_COLOR) {
                     if (*text == ' ') {
                         putstr(STATUS_WIN, 0, " ");
                         text++;
                     }
+                    attridx = (coloridx >> 8) & 0x00FF;
                     /* multiple attributes can be in effect concurrently */
                     Begin_Attr(attridx);
 #ifdef TEXTCOLOR
+                    coloridx &= 0x00FF;
                     if (coloridx != NO_COLOR && coloridx != CLR_MAX)
-                        curses_toggle_color_attr(win,coloridx,NONE,ON);
+                        curses_toggle_color_attr(win, coloridx, NONE, ON);
 #endif
                 }
 
@@ -438,11 +432,11 @@ unsigned long *colormasks;
                 if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
                     if (coloridx != NO_COLOR)
-                        curses_toggle_color_attr(win,coloridx,NONE,OFF);
+                        curses_toggle_color_attr(win, coloridx, NONE, OFF);
 #endif
                     End_Attr(attridx);
                 }
-            } else {
+            } else if (curses_condition_bits) {
                 MaybeDisplayCond(BL_MASK_STONE, "Stone");
                 MaybeDisplayCond(BL_MASK_SLIME, "Slime");
                 MaybeDisplayCond(BL_MASK_STRNGL, "Strngl");
@@ -480,7 +474,7 @@ draw_vertical(border, colormasks)
 boolean border;
 unsigned long *colormasks;
 {
-    enum statusfields fieldorder[24] = {
+    static const enum statusfields fieldorder[24] = {
          BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
          BL_SCORE, BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
          BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
@@ -493,28 +487,29 @@ unsigned long *colormasks;
     char *text;
     int attridx = 0;
     int x = 0, y = 0;
-
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
-    if (border) x++,y++;
+
+    if (border)
+        x++, y++;
     for (i = 0; fieldorder[i] != BL_FLUSH; ++i) {
         int fldidx1 = fieldorder[i];
+
         if (status_activefields[fldidx1]) {
             if (fldidx1 != BL_TITLE || !iflags.wc2_hitpointbar) {
 
                 if (fldidx1 != BL_CONDITION) {
-#ifdef TEXTCOLOR
-                    coloridx = curses_status_colors[fldidx1] & 0x00FF;
-#endif
-                    attridx = (curses_status_colors[fldidx1] & 0xFF00) >> 8;
                     text = status_vals_long[fldidx1];
-                    if (iflags.hilite_delta) {
+                    coloridx = curses_status_colors[fldidx1]; /* plus attr */
+                    if (iflags.hilite_delta && coloridx != NO_COLOR) {
                         if (*text == ' ') {
                             putstr(STATUS_WIN, 0, " ");
                             text++;
                         }
                         /* multiple attributes can be in effect concurrently */
+                        attridx = (coloridx >> 8) & 0x00FF;
                         Begin_Attr(attridx);
 #ifdef TEXTCOLOR
+                        coloridx &= 0x00FF;
                         if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             curses_toggle_color_attr(win, coloridx, NONE, ON);
 #endif
@@ -523,20 +518,21 @@ unsigned long *colormasks;
                     if (fldidx1 != BL_HPMAX
                         && fldidx1 != BL_ENEMAX
                         && fldidx1 != BL_EXP)
-                        wmove(win, y++, x); /* everything on a new line except the above */
+                        wmove(win, y++, x); /* on next line unless the above */
 
                     putstr(STATUS_WIN, 0, text);
 
-                    if (fldidx1 == BL_TITLE) y++;
+                    if (fldidx1 == BL_TITLE)
+                        y++;
 
                     if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
                         if (coloridx != NO_COLOR)
-                            curses_toggle_color_attr(win, coloridx,NONE,OFF);
+                            curses_toggle_color_attr(win, coloridx, NONE, OFF);
 #endif
                         End_Attr(attridx);
                     }
-                } else { /* condition */
+                } else if (curses_condition_bits) { /* BL_CONDITION */
                     MaybeDisplayCond(BL_MASK_STONE, "Stone");
                     MaybeDisplayCond(BL_MASK_SLIME, "Slime");
                     MaybeDisplayCond(BL_MASK_STRNGL, "Strngl");
@@ -561,7 +557,7 @@ unsigned long *colormasks;
 
                 text = status_vals[fldidx1];
                 getmaxyx(win, height, width);
-                bar_len = min(strlen(text), (size_t)width - (border ? 4 : 2));
+                bar_len = min((int) strlen(text), width - (border ? 4 : 2));
                 text[bar_len] = '\0';
                 if (bar_len < MAXCO-1) {
                     Strcpy(bar, text);
@@ -578,28 +574,29 @@ unsigned long *colormasks;
                     }
                 }
                 wmove(win, y++, x);
-                if (iflags.hilite_delta && iflags.wc2_hitpointbar) {
-                    putstr(STATUS_WIN, 0, "[");
+                putstr(STATUS_WIN, 0, "[");
+                wattron(win, A_REVERSE); /* not (hpbar_color >> 8) & 0x00FF) */
 #ifdef TEXTCOLOR
-                    coloridx = hpbar_color & 0x00FF;
+                coloridx = hpbar_color & 0x00FF;
+                if (iflags.hilite_delta) {
                     /* attridx = (hpbar_color & 0xFF00) >> 8; */
                     if (coloridx != NO_COLOR)
-                        curses_toggle_color_attr(win,coloridx,NONE,ON);
+                        curses_toggle_color_attr(win, coloridx, NONE, ON);
 #endif
-                    wattron(win,A_REVERSE);
-                    putstr(STATUS_WIN, 0, bar);
-                    wattroff(win,A_REVERSE);
+                }
+                putstr(STATUS_WIN, 0, bar);
 #ifdef TEXTCOLOR
+                if (iflags.hilite_delta) {
                     if (coloridx != NO_COLOR)
-                        curses_toggle_color_attr(win,coloridx,NONE,OFF);
+                        curses_toggle_color_attr(win, coloridx, NONE, OFF);
+                }
 #endif
-                    if (twoparts) {
-                        *bar2 = savedch;
-                        putstr(STATUS_WIN, 0, bar2);
-                    }
-                    putstr(STATUS_WIN, 0, "]");
-                } else
-                    putstr(STATUS_WIN, 0, text);
+                wattroff(win,A_REVERSE);
+                if (twoparts) {
+                     *bar2 = savedch;
+                     putstr(STATUS_WIN, 0, bar2);
+                }
+                putstr(STATUS_WIN, 0, "]");
                 y++; /* blank line after title */
             }
         }
@@ -612,7 +609,8 @@ unsigned long *colormasks;
  * Return what color this condition should
  * be displayed in based on user settings.
  */
-int condcolor(bm, bmarray)
+static int
+condcolor(bm, bmarray)
 long bm;
 unsigned long *bmarray;
 {
@@ -620,39 +618,41 @@ unsigned long *bmarray;
 
     if (bm && bmarray)
         for (i = 0; i < CLR_MAX; ++i) {
-            if (bmarray[i] && (bm & bmarray[i]))
+            if ((bmarray[i] & bm) != 0)
                 return i;
         }
     return NO_COLOR;
 }
 #endif /* TEXTCOLOR */
 
-int condattr(bm, bmarray)
+static int
+condattr(bm, bmarray)
 long bm;
 unsigned long *bmarray;
 {
-    int attr = 0;
-    int i;
+    int i, attr = 0;
 
     if (bm && bmarray) {
         for (i = HL_ATTCLR_DIM; i < BL_ATTCLR_MAX; ++i) {
-            if (bmarray[i] && (bm & bmarray[i])) {
-                switch(i) {
-                    case HL_ATTCLR_DIM:
-                        attr |= HL_DIM;
-                        break;
-                    case HL_ATTCLR_BLINK:
-                        attr |= HL_BLINK;
-                        break;
-                    case HL_ATTCLR_ULINE:
-                        attr |= HL_ULINE;
-                        break;
-                    case HL_ATTCLR_INVERSE:
-                        attr |= HL_INVERSE;
-                        break;
-                    case HL_ATTCLR_BOLD:
-                        attr |= HL_BOLD;
-                        break;
+            if ((bmarray[i] & bm) != 0) {
+                switch (i) {
+                case HL_ATTCLR_DIM:
+                    attr |= HL_DIM;
+                    break;
+                case HL_ATTCLR_BLINK:
+                    attr |= HL_BLINK;
+                    break;
+                case HL_ATTCLR_ULINE:
+                    attr |= HL_ULINE;
+                    break;
+                case HL_ATTCLR_INVERSE:
+                    attr |= HL_INVERSE;
+                    break;
+                case HL_ATTCLR_BOLD:
+                    attr |= HL_BOLD;
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -661,7 +661,8 @@ unsigned long *bmarray;
 }
 #endif /* STATUS_HILITES */
 
-#if 0 /* old stuff to be re-incorporated */
+
+#if 0 /* old stuff; some may be re-incorporated, most should be discarded */
 /* Private declarations */
 
 /* Used to track previous value of things, to highlight changes. */
@@ -673,7 +674,7 @@ typedef struct nhs {
 
 static attr_t get_trouble_color(const char *);
 static void draw_trouble_str(const char *);
-static void print_statdiff(const char *append, nhstat *, int, int);
+static void print_statdiff(const char *append, nhstat *, long, int);
 static void get_playerrank(char *);
 static int hpen_color(boolean, int, int);
 static void draw_bar(boolean, int, int, const char *);
@@ -812,7 +813,7 @@ get_playerrank(char *rank)
    type is generally STAT_OTHER (generic "do nothing special"),
    but is used if the stat needs to be handled in a special way. */
 static void
-print_statdiff(const char *append, nhstat *stat, int new, int type)
+print_statdiff(const char *append, nhstat *stat, long new, int type)
 {
     char buf[BUFSZ];
     WINDOW *win = curses_get_nhwin(STATUS_WIN);

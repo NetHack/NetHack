@@ -380,6 +380,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     if (border) {
+        height -= 2, width -= 2;
         border_space = 1;
         if (mx < 1)
             mx = 1;
