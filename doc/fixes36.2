@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.276 $ $NHDT-Date: 1552697495 2019/03/16 00:51:35 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.277 $ $NHDT-Date: 1553204013 2019/03/21 21:33:33 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -474,8 +474,8 @@ X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
 curses: catch up with tty to not put dolook/whatis autodescribe feedback into
 	^P message recall (multi-digit count feedback was already handled)
 curses: if the interface code ran out of memory, it would crash rather than
-	attempt a controlled panic (which is fairly likely crash anyway if
-	done when there's no memory available)
+	attempt a controlled panic (though that's fairly likely to crash anyway
+	if done when there's no more memory available)
 curses: when getting multi-character responses from player, support <delete>
 	as well as <backspace> to remove last character entered; also, return
 	<escape> to core if ESC is typed when there is no input entered
@@ -483,7 +483,14 @@ curses: extend preceding <delete> support to typing of extended command names
 curses: support hilite_pet and hilite_pile even when color is disabled
 curses: support color hilite_status rules even if 'guicolor' is off
 curses: update status if 'O' is used to add/change/remove hilite_status rules
+curses: was doing a full status update for every changed field even when more
+	than one field was being changed at the same time
+curses: 'hitpointbar' now works even when status highlighting is disabled
+curses: add 'statuslines' option (value is 2 or 3)
+curses: change 'windowborders' option's value (0=Off, 1=On, or 2=Auto instead
+	of 1=On, 2=Off, 3=Auto; can now be changed via 'O' during play)
 vms: add compile of isaac64.c to Makefile.src and vmsbuild.com
+vms+curses: add compile support but it is known to fail to build
 
 
 Platform- and/or Interface-Specific Fixes or Features

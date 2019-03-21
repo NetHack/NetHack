@@ -119,16 +119,14 @@ curses_create_main_windows()
     boolean borders = FALSE;
 
     switch (iflags.wc2_windowborders) {
+    case 0:                     /* Off */
+        borders = FALSE;
+        break;
     case 1:                     /* On */
         borders = TRUE;
         break;
-    case 2:                     /* Off */
-        borders = FALSE;
-        break;
-    case 3:                     /* Auto */
-        if ((term_cols > 81) && (term_rows > 25)) {
-            borders = TRUE;
-        }
+    case 2:                     /* Auto */
+        borders = (term_cols > 81 && term_rows > 25);
         break;
     default:
         borders = FALSE;
@@ -208,7 +206,7 @@ curses_create_main_windows()
         int inv_width = 0;
         int map_height = (term_rows - border_space);
         int map_width = (term_cols - border_space);
-        int statusheight = (iflags.statuslines < 3) ? 2 : 3;
+        int statusheight = (iflags.wc2_statuslines < 3) ? 2 : 3;
         boolean status_vertical = (status_orientation == ALIGN_LEFT
                                    || status_orientation == ALIGN_RIGHT);
         boolean msg_vertical = (message_orientation == ALIGN_LEFT
@@ -221,7 +219,7 @@ curses_create_main_windows()
                                 &status_width, &status_height,
                                 status_orientation,
                                 &map_x, &map_y, &map_width, &map_height,
-                                border_space, statusheight, 26);
+                                border_space, 20, 26);
 
         if (iflags.perm_invent) {
             /* Take up all width unless msgbar is also vertical. */
@@ -246,7 +244,7 @@ curses_create_main_windows()
                                 &status_width, &status_height,
                                 status_orientation,
                                 &map_x, &map_y, &map_width, &map_height,
-                                border_space, statusheight, 26);
+                                border_space, statusheight, 0);
 
         if (!msg_vertical)
             set_window_position(&message_x, &message_y,
@@ -777,17 +775,12 @@ curses_character_dialog(const char **choices, const char *prompt)
 void
 curses_init_options()
 {
-    set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR
-                             | WC_HILITE_PET | WC_POPUP_DIALOG, SET_IN_GAME);
-
-    set_wc2_option_mod_status(WC2_GUICOLOR, SET_IN_GAME);
+    /* change these from DISP_IN_GAME to SET_IN_GAME */
+    set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS, SET_IN_GAME);
 
     /* Remove a few options that are irrelevant to this windowport */
     /*set_option_mod_status("DECgraphics", SET_IN_FILE); */
     set_option_mod_status("eight_bit_tty", SET_IN_FILE);
-
-    /* Add those that are */
-    set_option_mod_status("statuslines", SET_IN_GAME);
 
     /* Make sure that DECgraphics is not set to true via the config
        file, as this will cause display issues.  We can't disable it in
@@ -800,15 +793,12 @@ curses_init_options()
 #ifdef PDCURSES
     /* PDCurses for SDL, win32 and OS/2 has the ability to set the
        terminal size programatically.  If the user does not specify a
-       size in the config file, we will set it to a nice big 110x32 to
+       size in the config file, we will set it to a nice big 32x110 to
        take advantage of some of the nice features of this windowport. */
-    if (iflags.wc2_term_cols == 0) {
+    if (iflags.wc2_term_cols == 0)
         iflags.wc2_term_cols = 110;
-    }
-
-    if (iflags.wc2_term_rows == 0) {
+    if (iflags.wc2_term_rows == 0)
         iflags.wc2_term_rows = 32;
-    }
 
     resize_term(iflags.wc2_term_rows, iflags.wc2_term_cols);
     getmaxyx(base_term, term_rows, term_cols);
@@ -825,9 +815,6 @@ curses_init_options()
     }
 */
 #endif /* PDCURSES */
-    if (!iflags.wc2_windowborders) {
-        iflags.wc2_windowborders = 3;   /* Set to auto if not specified */
-    }
 
     /* fix up pet highlighting */
     if (iflags.wc2_petattr == -1) /* shouldn't happen */

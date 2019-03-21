@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ $NHDT-Date: 1551488947 2019/03/02 01:09:07 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.300 $ $NHDT-Date: 1553204011 2019/03/21 21:33:31 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "February 27, 2019
+.ds f2 "March 19, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -3010,10 +3010,6 @@ Gold is never blessed or cursed, but it is not described as \(lquncursed\(rq
 even when the
 .op implicit_uncursed
 option is \(lqoff\(rq.
-.lp guicolor
-Use color text and/or highlighting attributes when displaying some
-non-map data (such as menu selector letters).
-Curses interface only; default is on.
 .lp "help    "
 If more information is available for an object looked at
 with the \(oq/\(cq command, ask if you want to see it (default on).
@@ -3281,6 +3277,7 @@ such as \(lqparanoid_confirmation:attack pray Remove\(rq.
 .lp perm_invent
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
+.\" petattr is a wincap option but we'll document it here...
 .lp petattr
 Specifies one or more text highlighting attributes to use when showing
 pets on the map.
@@ -3308,7 +3305,7 @@ Currently multiple highlight-style letters can be combined by simply
 stringing them together (for example, \(lqbk\(rq), but in the future
 they might require being separated by plus signs (such as \(lqb+k\(rq,
 which works already).
-When using the \(oqN\(cq choice, it should be specified on its own,
+When using the \(oqn\(cq choice, it should be specified on its own,
 not in combination with any of the other letters.
 .lp pettype
 Specify the type of your initial pet, if you are playing a character class
@@ -3473,13 +3470,6 @@ and prior versions (for example \(lqsuppress_alert:3.3.1\(rq).
 This option may be used to select one of the named symbol sets found within
 \(lqsymbols\(rq to alter the symbols displayed on the screen.
 Use \(lqsymset:default\(rq to explicitly select the default symbols.
-.lp "term_cols\ \ \fIand\fP"
-.lp term_rows
-Curses interface only.
-Number of columns and rows to use for the display.
-Curses will attempt to resize to the values specified but will settle
-for smaller sizes if they are too big.
-Default is the current window size.
 .lp "time    "
 Show the elapsed game time in turns on bottom line (default off).
 Persistent.
@@ -3554,26 +3544,20 @@ When getting a location on the map, and using shifted movement keys or
 meta-digit keys to fast-move, instead of moving 8 units at a time,
 move by skipping the same glyphs.
 (default off)
-.lp windowborders
-Whether to draw boxes around the map, status area, message area, and
-persistent inventory window if enabled.
-Curses interface only.
-Acceptable values are
-.sd
-.si
-.CC 1 "on, always show borders"
-.CC 2 "off, never show borders"
-.CC 3 "auto, on if terminal or window is at least (24+2)x(80+2)\ \ (default)"
-.ei
-.ed
-.lp ""
-(The 26x82 size threshold for \(oq3\(cq refers to number of rows and
-columns of the display.)
 .lp windowtype
 When the program has been built to support multiple interfaces,
 select which one to use, such as \(lqtty\(rq or \(lqX11\(rq
 (default depends on build-time settings; use \(lq#version\(rq to check).
 Cannot be set with the \(oqO\(cq command.
+.lp ""
+When used, it should be the first option set since its value might
+enable or disable the availability of various other options.
+For multiple lines in a configuration file, that would be the first
+non-comment line.
+For a comma-separated list in NETHACKOPTIONS or an OPTIONS line in a
+configuration file,
+that would
+be the \fIrightmost\fP option in the list.
 .lp wizweight
 Augment object descriptions with their objects' weight (default off).
 Debug mode only.
@@ -3634,6 +3618,10 @@ If NetHack can, it should use this size font for text windows.
 .lp fullscreen
 If NetHack can, it should try and display on the entire screen rather than
 in a window.
+.lp guicolor
+Use color text and/or highlighting attributes when displaying some
+non-map data (such as menu selector letters).
+Curses interface only; default is on.
 .lp large_font
 If NetHack can, it should use a large font.
 .lp map_mode
@@ -3665,6 +3653,17 @@ Handhelds are most likely to support this option.
 .lp splash_screen
 If NetHack can, it should display an opening splash screen when it starts
 up (default yes).
+.lp statuslines
+Number of lines for traditional below-the-map status display.
+Acceptable values are 2 and 3 (default is 2).
+Curses interface only.
+.lp "term_cols\ \ \fIand\fP"
+.lp term_rows
+Curses interface only.
+Number of columns and rows to use for the display.
+Curses will attempt to resize to the values specified but will settle
+for smaller sizes if they are too big.
+Default is the current window size.
 .lp tiled_map
 If NetHack can, it should display a tiled map if it can.
 .lp tile_file
@@ -3680,6 +3679,24 @@ If NetHack can, it should display inverse when the game specifies it.
 .lp vary_msgcount
 If NetHack can, it should display this number of messages at a time in
 the message window.
+.lp windowborders
+Whether to draw boxes around the map, status area, message area, and
+persistent inventory window if enabled.
+Curses interface only.
+Acceptable values are
+.sd
+.si
+.CC 0 "off, never show borders"
+.CC 1 "on, always show borders"
+.CC 2 "auto, on if display is at least (24+2)x(80+2)\ \ (default)"
+.ei
+.ed
+.lp ""
+(The 26x82 size threshold for \(oq2\(cq refers to number of rows and
+columns of the display.
+A width of at least 110 columns (80+2+26+2) is needed for
+.op align_status
+set to \f(CRleft\fP or \f(CRright\fP.)
 .lp windowcolors
 If NetHack can, it should display windows with the specified
 foreground/background colors. Windows GUI only. The format is
