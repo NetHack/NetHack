@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1552697495 2019/03/16 00:51:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1553217909 2019/03/22 01:25:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -765,7 +765,7 @@ boolean *valsetlist;
         if (anytype != ANY_MASK32) {
 #ifdef STATUS_HILITES
             if ((chg || *curr->val)) {
-                get_hilite_color(idx, fld, (genericptr_t)&curr->a,
+                get_hilite_color(idx, fld, (genericptr_t) &curr->a,
                                  chg, pc, &color);
                 if (chg == 2) {
                     color = NO_COLOR;
@@ -2322,7 +2322,7 @@ int sidx;
         /*
          * We have the conditions_bitmask with bits set for
          * each ailment we want in a particular color and/or
-         * attribute, but we need to assign it to an arry of
+         * attribute, but we need to assign it to an array of
          * bitmasks indexed by the color chosen
          *        (0 to (CLR_MAX - 1))
          * and/or attributes chosen
@@ -2363,6 +2363,7 @@ int sidx;
 
         for (i = 0; i < sf; ++i) {
             int a = match_str2attr(subfields[i], FALSE);
+
             if (a == ATR_DIM)
                 cond_hilites[HL_ATTCLR_DIM] |= conditions_bitmask;
             else if (a == ATR_BLINK)
@@ -3275,15 +3276,15 @@ choose_color:
 
         if (atr & HL_DIM)
             cond_hilites[HL_ATTCLR_DIM] |= cond;
-        else if (atr & HL_BLINK)
+        if (atr & HL_BLINK)
             cond_hilites[HL_ATTCLR_BLINK] |= cond;
-        else if (atr & HL_ULINE)
+        if (atr & HL_ULINE)
             cond_hilites[HL_ATTCLR_ULINE] |= cond;
-        else if (atr & HL_INVERSE)
+        if (atr & HL_INVERSE)
             cond_hilites[HL_ATTCLR_INVERSE] |= cond;
-        else if (atr & HL_BOLD)
+        if (atr & HL_BOLD)
             cond_hilites[HL_ATTCLR_BOLD] |= cond;
-        else if (atr == HL_NONE) {
+        if (atr == HL_NONE) {
             cond_hilites[HL_ATTCLR_DIM] &= ~cond;
             cond_hilites[HL_ATTCLR_BLINK] &= ~cond;
             cond_hilites[HL_ATTCLR_ULINE] &= ~cond;
