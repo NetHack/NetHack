@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1539804859 2018/10/17 19:34:19 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1553363414 2019/03/23 17:50:14 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -183,7 +183,7 @@ boolean resuming;
                     if (u.ublesscnt)
                         u.ublesscnt--;
                     if (flags.time && !g.context.run)
-                        g.context.botl = 1;
+                        g.context.botl = TRUE;
 
                     /* One possible result of prayer is healing.  Whether or
                      * not you get healed depends on your current hit points.
@@ -228,7 +228,7 @@ boolean resuming;
                             (int) (ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1, 1);
                         if (u.uen > u.uenmax)
                             u.uen = u.uenmax;
-                        g.context.botl = 1;
+                        g.context.botl = TRUE;
                         if (u.uen == u.uenmax)
                             interrupt_multi("You feel full of energy.");
                     }
@@ -410,7 +410,7 @@ boolean resuming;
                 /* lookaround may clear multi */
                 g.context.move = 0;
                 if (flags.time)
-                    g.context.botl = 1;
+                    g.context.botl = TRUE;
                 continue;
             }
             if (g.context.mv) {
@@ -432,7 +432,7 @@ boolean resuming;
             deferred_goto(); /* after rhack() */
         /* !g.context.move here: multiple movement command stopped */
         else if (flags.time && (!g.context.move || !g.context.mv))
-            g.context.botl = 1;
+            g.context.botl = TRUE;
 
         if (g.vision_full_recalc)
             vision_recalc(0); /* vision! */
@@ -440,7 +440,8 @@ boolean resuming;
         if ((!g.context.run || flags.runmode == RUN_TPORT)
             && (g.multi && (!g.context.travel ? !(g.multi % 7) : !(g.moves % 7L)))) {
             if (flags.time && g.context.run)
-                g.context.botl = 1;
+                g.ontext.botl = TRUE;
+            /* [should this be flush_screen() instead?] */
             display_nhwindow(WIN_MAP, FALSE);
         }
     }
@@ -470,7 +471,7 @@ int wtcap;
                 heal = 1;
         }
         if (heal) {
-            g.context.botl = 1;
+            g.context.botl = TRUE;
             u.mh += heal;
             reached_full = (u.mh == u.mhmax);
         }
@@ -502,7 +503,7 @@ int wtcap;
                 heal = 1;
 
             if (heal) {
-                g.context.botl = 1;
+                g.context.botl = TRUE;
                 u.uhp += heal;
                 if (u.uhp > u.uhpmax)
                     u.uhp = u.uhpmax;
@@ -523,7 +524,7 @@ stop_occupation()
         if (!maybe_finished_meal(TRUE))
             You("stop %s.", g.occtxt);
         g.occupation = 0;
-        g.context.botl = 1; /* in case u.uhs changed */
+        g.context.botl = TRUE; /* in case u.uhs changed */
         nomul(0);
         pushch(0);
     } else if (g.multi >= 0) {
@@ -576,7 +577,7 @@ newgame()
     gameDiskPrompt();
 #endif
 
-    g.context.botlx = 1;
+    g.context.botlx = TRUE;
     g.context.ident = 1;
     g.context.stethoscope_move = -1L;
     g.context.warnlevel = 1;

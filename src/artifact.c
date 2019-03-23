@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1545597414 2018/12/23 20:36:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1553363416 2019/03/23 17:50:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1029,20 +1029,20 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                 if (g.youmonst.data != old_uasmon)
                     *dmgptr = 0; /* rehumanized, so no more damage */
                 if (u.uenmax > 0) {
-                    You("lose magical energy!");
                     u.uenmax--;
                     if (u.uen > 0)
                         u.uen--;
-                    g.context.botl = 1;
+                    g.context.botl = TRUE;
+                    You("lose magical energy!");
                 }
             } else {
                 if (mdef->data == &mons[PM_CLAY_GOLEM])
                     mdef->mhp = 1; /* cancelled clay golems will die */
                 if (youattack && attacktype(mdef->data, AT_MAGC)) {
-                    You("absorb magical energy!");
                     u.uenmax++;
                     u.uen++;
-                    g.context.botl = 1;
+                    g.context.botl = TRUE;
+                    You("absorb magical energy!");
                 }
             }
         }
@@ -1464,7 +1464,7 @@ struct obj *obj;
                 make_slimed(0L, (char *) 0);
             if (Blinded > creamed)
                 make_blinded(creamed, FALSE);
-            g.context.botl = 1;
+            g.context.botl = TRUE;
             break;
         }
         case ENERGY_BOOST: {
@@ -1475,9 +1475,9 @@ struct obj *obj;
             else if (epboost < 12)
                 epboost = u.uenmax - u.uen;
             if (epboost) {
-                You_feel("re-energized.");
                 u.uen += epboost;
-                g.context.botl = 1;
+                g.context.botl = TRUE;
+                You_feel("re-energized.");
             } else
                 goto nothing_special;
             break;
