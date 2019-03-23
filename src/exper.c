@@ -176,14 +176,14 @@ register int exper, rexp;
     if (newexp != oldexp) {
         u.uexp = newexp;
         if (flags.showexp)
-            context.botl = TRUE;
+            g.context.botl = TRUE;
     }
     /* newrexp will always differ from oldrexp unless they're LONG_MAX */
     if (newrexp != oldrexp) {
         u.urexp = newrexp;
 #ifdef SCORE_ON_BOTL
         if (flags.showscore)
-            context.botl = TRUE;
+            g.context.botl = TRUE;
 #endif
     }
     if (u.urexp >= (Role_if(PM_WIZARD) ? 1000 : 2000))
