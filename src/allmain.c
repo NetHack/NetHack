@@ -440,7 +440,7 @@ boolean resuming;
         if ((!g.context.run || flags.runmode == RUN_TPORT)
             && (g.multi && (!g.context.travel ? !(g.multi % 7) : !(g.moves % 7L)))) {
             if (flags.time && g.context.run)
-                g.ontext.botl = TRUE;
+                g.context.botl = TRUE;
             /* [should this be flush_screen() instead?] */
             display_nhwindow(WIN_MAP, FALSE);
         }

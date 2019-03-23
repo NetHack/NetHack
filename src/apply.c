@@ -2045,7 +2045,7 @@ struct obj *obj;
     }
 
     if (did_attr || did_prop)
-        context.botl = TRUE;
+        g.context.botl = TRUE;
     if (did_attr)
         pline("This makes you feel %s!",
               (did_prop + did_attr) == (trouble_count + unfixable_trbl)
