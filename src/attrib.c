@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1547086687 2019/01/10 02:18:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1553363417 2019/03/23 17:50:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.65 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -185,8 +185,8 @@ int msgflg; /* positive => no message, zero => message, and */
 
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
-    context.botl = 1;
-    if (moves > 1 && (ndx == A_STR || ndx == A_CON))
+    context.botl = TRUE;
+    if (program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         (void) encumber_msg();
     return TRUE;
 }
@@ -397,7 +397,7 @@ restore_attrib()
         if (ATEMP(i) != equilibrium && ATIME(i) != 0) {
             if (!(--(ATIME(i)))) { /* countdown for change */
                 ATEMP(i) += (ATEMP(i) > 0) ? -1 : 1;
-                context.botl = 1;
+                context.botl = TRUE;
                 if (ATEMP(i)) /* reset timer */
                     ATIME(i) = 100 / ACURR(A_CON);
             }
@@ -1141,8 +1141,10 @@ int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
 {
     aligntyp oldalign = u.ualign.type;
 
-    u.ublessed = 0;   /* lose divine protection */
-    context.botl = 1; /* status line needs updating */
+    u.ublessed = 0; /* lose divine protection */
+    /* You/Your/pline message with call flush_screen(), triggering bot(),
+       so the actual data change needs to come before the message */
+    context.botl = TRUE; /* status line needs updating */
     if (reason == 0) {
         /* conversion via altar */
         u.ualignbase[A_CURRENT] = (aligntyp) newalign;
@@ -1161,7 +1163,6 @@ int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
                                     ? "much of a muchness"
                                     : "back in sync with your body");
     }
-
     if (u.ualign.type != oldalign) {
         u.ualign.record = 0; /* slate is wiped clean */
         retouch_equipment(0);
