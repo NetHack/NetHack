@@ -299,8 +299,9 @@ unsigned long *colormasks;
     const enum statusfields (*fieldorder)[3][15];
     xchar spacing[MAXBLSTATS], valline[MAXBLSTATS];
     enum statusfields fld, prev_fld;
-    char *text, *colon, *p, cbuf[BUFSZ];
+    char *text, *p, cbuf[BUFSZ];
 #ifdef SCORE_ON_BOTL
+    char *colon;
     char sbuf[STATVAL_WIDTH];
 #endif
     int i, j, number_of_lines,
