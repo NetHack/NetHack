@@ -2280,7 +2280,7 @@ register struct monst *mon;
     struct attack *mattk, alt_attk;
     struct obj *weapon, **originalweapon;
     boolean altwep = FALSE, weapon_used = FALSE, odd_claw = TRUE;
-    int i, tmp, armorpenalty, sum[NATTK], nsum = 0, dhit = 0, attknum = 0;
+    int i, tmp, armorpenalty, sum[NATTK] = { 0 }, nsum = 0, dhit = 0, attknum = 0;
     int dieroll, multi_claw = 0;
 
     /* with just one touch/claw/weapon attack, both rings matter;
