@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1553217909 2019/03/22 01:25:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1553387148 2019/03/24 00:25:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -411,11 +411,6 @@ struct hilite_s {
     int coloridx;
     struct hilite_s *next;
 };
-
-struct condmap {
-    const char *id;
-    unsigned long bitmask;
-};
 #endif /* STATUS_HILITES */
 
 struct istat_s {
@@ -555,7 +550,7 @@ bot_via_windowport()
     Strcpy(nb = buf, plname);
     nb[0] = highc(nb[0]);
     nb[10] = '\0';
-    Sprintf(nb = eos(nb), " the ");
+    Strcpy(nb = eos(nb), " the ");
     if (Upolyd) {
         for (i = 0, nb = strcpy(eos(nb), mons[u.umonnum].mname); nb[i]; i++)
             if (i == 0 || nb[i - 1] == ' ')
@@ -834,7 +829,8 @@ boolean *valsetlist;
     if (context.botlx && (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
         status_update(BL_RESET, (genericptr_t) 0, 0, 0,
                       NO_COLOR, &cond_hilites[0]);
-    else if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
+    else if ((updated || context.botlx) &&
+             (windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, &cond_hilites[0]);
 
