@@ -241,6 +241,12 @@ curses_get_nh_event()
 void
 curses_exit_nhwindows(const char *str)
 {
+    curses_destroy_nhwindow(INV_WIN);
+    curses_destroy_nhwindow(MAP_WIN);
+    curses_destroy_nhwindow(STATUS_WIN);
+    curses_destroy_nhwindow(MESSAGE_WIN);
+    curs_destroy_all_wins();
+
     curses_cleanup();
     curs_set(orig_cursor);
     endwin();
@@ -340,6 +346,21 @@ curses_display_nhwindow(winid wid, BOOLEAN_P block)
 void
 curses_destroy_nhwindow(winid wid)
 {
+    switch (wid) {
+    case MESSAGE_WIN:
+        curses_teardown_messages(); /* discard ^P message history data */
+        break;
+    case STATUS_WIN:
+        curses_status_finish(); /* discard cached status data */
+        break;
+    case INV_WIN:
+        iflags.perm_invent = 0; /* avoid unexpected update_inventory() */
+        break;
+    case MAP_WIN:
+        break;
+    default:
+        break;
+    }
     curses_del_nhwin(wid);
 }
 

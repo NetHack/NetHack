@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.300 $ $NHDT-Date: 1553204011 2019/03/21 21:33:31 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.301 $ $NHDT-Date: 1553480404 2019/03/25 02:20:04 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 19, 2019
+.ds f2 "March 24, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -777,7 +777,7 @@ choices but will accept an accessory and attempt to put that on.)
 Repeat previous message.
 .lp ""
 Subsequent \(oq\(haP\(cqs repeat earlier messages.
-The behavior can be varied via the
+For some interfaces, the behavior can be varied via the
 .op msg_window
 option.
 .lp q
@@ -3171,7 +3171,8 @@ with \(oq\(haP\(cq) (default 20).
 Cannot be set with the \(oqO\(cq command.
 .lp msg_window
 Allows you to change the way recalled messages are displayed.
-(It is currently implemented for tty only.)
+Currently it is only supported for tty (all four choices) and for curses
+(\(oq\f(CRf\fP\(cq and \(oq\f(CRr\fP\(cq choices, default \(oq\f(CRr\fP\(cq).
 The possible values are:
 .sd
 .si

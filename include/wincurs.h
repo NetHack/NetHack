@@ -128,6 +128,7 @@ extern void curses_refresh_nhwin(winid wid);
 extern void curses_refresh_nethack_windows(void);
 extern void curses_del_nhwin(winid wid);
 extern void curses_del_wid(winid wid);
+extern void curs_destroy_all_wins(void);
 extern void curses_putch(winid wid, int x, int y, int ch,
                          int color, int attrs);
 extern void curses_get_window_size(winid wid, int *height, int *width);
@@ -184,7 +185,7 @@ extern void curses_add_nhmenu_item(winid wid, int glyph,
 extern void curses_finalize_nhmenu(winid wid, const char *prompt);
 extern int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected);
 extern boolean curses_menu_exists(winid wid);
-extern void curses_del_menu(winid wid);
+extern void curses_del_menu(winid, boolean);
 
 /* cursstat.c */
 

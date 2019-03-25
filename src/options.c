@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1553217909 2019/03/22 01:25:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.359 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1553480404 2019/03/25 02:20:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.360 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -726,8 +726,13 @@ initoptions_init()
     flags.pile_limit = PILE_LIMIT_DFLT;  /* 5 */
     flags.runmode = RUN_LEAP;
     iflags.msg_history = 20;
+    /* msg_window has conflicting defaults for multi-interface binary */
 #ifdef TTY_GRAPHICS
     iflags.prevmsg_window = 's';
+#else
+#ifdef CURSES_GRAPHICS
+    iflags.prevmsg_window = 'r';
+#endif
 #endif
     iflags.menu_headings = ATR_INVERSE;
     iflags.getpos_coords = GPCOORDS_NONE;
@@ -2402,19 +2407,18 @@ boolean tinitial, tfrom_file;
         case 's': /* single message history cycle (default if negated) */
             iflags.prevmsg_window = 's';
             break;
-        case 'c': /* combination: two singles, then full page reversed */
+        case 'c': /* combination: two singles, then full page */
             iflags.prevmsg_window = 'c';
             break;
-        case 'f': /* full page (default if no opts) */
+        case 'f': /* full page (default if specified without argument) */
             iflags.prevmsg_window = 'f';
             break;
         case 'r': /* full page (reversed) */
             iflags.prevmsg_window = 'r';
             break;
-        default: {
+        default:
             config_error_add("Unknown %s parameter '%s'", fullname, op);
-            return FALSE;
-        }
+            retval = FALSE;
         }
 #endif
         return retval;
@@ -4935,32 +4939,38 @@ boolean setinitial, setfromfile;
         }
         destroy_nhwindow(tmpwin);
     } else if (!strcmp("msg_window", optname)) {
-#ifdef TTY_GRAPHICS
-        /* by Christian W. Cooper */
-        menu_item *window_pick = (menu_item *) 0;
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+        if (WINDOWPORT("tty") || WINDOWPORT("curses")) {
+            /* by Christian W. Cooper */
+            menu_item *window_pick = (menu_item *) 0;
 
-        tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
-        any = cg.zeroany;
-        any.a_char = 's';
-        add_menu(tmpwin, NO_GLYPH, &any, 's', 0, ATR_NONE, "single",
-                 MENU_UNSELECTED);
-        any.a_char = 'c';
-        add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE, "combination",
-                 MENU_UNSELECTED);
-        any.a_char = 'f';
-        add_menu(tmpwin, NO_GLYPH, &any, 'f', 0, ATR_NONE, "full",
-                 MENU_UNSELECTED);
-        any.a_char = 'r';
-        add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "reversed",
-                 MENU_UNSELECTED);
-        end_menu(tmpwin, "Select message history display type:");
-        if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
-            iflags.prevmsg_window = window_pick->item.a_char;
-            free((genericptr_t) window_pick);
-        }
-        destroy_nhwindow(tmpwin);
-#endif
+            tmpwin = create_nhwindow(NHW_MENU);
+            start_menu(tmpwin);
+            any = cg.zeroany;
+            if (!WINDOWPORT("curses")) {
+                any.a_char = 's';
+                add_menu(tmpwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
+                         "single", MENU_UNSELECTED);
+                any.a_char = 'c';
+                add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE,
+                         "combination", MENU_UNSELECTED);
+            }
+            any.a_char = 'f';
+            add_menu(tmpwin, NO_GLYPH, &any, 'f', 0, ATR_NONE, "full",
+                     MENU_UNSELECTED);
+            any.a_char = 'r';
+            add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "reversed",
+                     MENU_UNSELECTED);
+            end_menu(tmpwin, "Select message history display type:");
+            if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
+                iflags.prevmsg_window = window_pick->item.a_char;
+                free((genericptr_t) window_pick);
+            }
+            destroy_nhwindow(tmpwin);
+        } else
+#endif /* msg_window for tty or curses */
+            pline("'%s' option is not supported for '%s'.",
+                  optname, windowprocs.name);
     } else if (!strcmp("sortloot", optname)) {
         const char *sortl_name;
         menu_item *sortl_pick = (menu_item *) 0;

@@ -498,16 +498,21 @@ curses_create_nhmenu(winid wid)
             while (menu_item_ptr->next_item != NULL) {
                 tmp_menu_item = menu_item_ptr->next_item;
                 free((genericptr_t) menu_item_ptr->str);
-                free(menu_item_ptr);
+                free((genericptr_t) menu_item_ptr);
                 menu_item_ptr = tmp_menu_item;
             }
             free((genericptr_t) menu_item_ptr->str);
-            free(menu_item_ptr);        /* Last entry */
+            free((genericptr_t) menu_item_ptr); /* Last entry */
             new_menu->entries = NULL;
         }
         if (new_menu->prompt != NULL) { /* Reusing existing menu */
             free((genericptr_t) new_menu->prompt);
+            new_menu->prompt = NULL;
         }
+        new_menu->num_pages = 0;
+        new_menu->height = 0;
+        new_menu->width = 0;
+        new_menu->reuse_accels = FALSE;
         return;
     }
 
@@ -708,7 +713,7 @@ curses_menu_exists(winid wid)
 /* Delete the menu associated with the given NetHack winid from memory */
 
 void
-curses_del_menu(winid wid)
+curses_del_menu(winid wid, boolean del_wid_too)
 {
     nhmenu_item *tmp_menu_item;
     nhmenu_item *menu_item_ptr;
@@ -735,21 +740,21 @@ curses_del_menu(winid wid)
     }
 
     /* Now unlink the menu from the list and free it as well */
-    if (current_menu->prev_menu != NULL) {
-        tmpmenu = current_menu->prev_menu;
+    if ((tmpmenu = current_menu->prev_menu) != NULL) {
         tmpmenu->next_menu = current_menu->next_menu;
     } else {
         nhmenus = current_menu->next_menu;      /* New head mode or NULL */
     }
-    if (current_menu->next_menu != NULL) {
-        tmpmenu = current_menu->next_menu;
+    if ((tmpmenu = current_menu->next_menu) != NULL) {
         tmpmenu->prev_menu = current_menu->prev_menu;
     }
 
-    free((genericptr_t) current_menu->prompt);
-    free(current_menu);
+    if (current_menu->prompt)
+        free((genericptr_t) current_menu->prompt);
+    free((genericptr_t) current_menu);
 
-    curses_del_wid(wid);
+    if (del_wid_too)
+        curses_del_wid(wid);
 }
 
 
