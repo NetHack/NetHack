@@ -284,20 +284,22 @@ curses_teardown_messages(void)
 void
 curses_prev_mesg()
 {
-    int count;
+    int count, fifo_count;
     winid wid;
     long turn = 0;
     anything Id;
     nhprev_mesg *mesg;
     menu_item *selected = NULL;
+    boolean do_lifo = (iflags.prevmsg_window != 'f');
 
     wid = curses_get_wid(NHW_MENU);
     curses_create_nhmenu(wid);
     Id = zeroany;
 
-    for (count = 0; count < num_messages; count++) {
-        mesg = get_msg_line(TRUE, count);
-        if ((turn != mesg->turn) && (count != 0)) {
+    for (count = 0, fifo_count = num_messages - 1; count < num_messages;
+         ++count, --fifo_count) {
+        mesg = get_msg_line(TRUE, do_lifo ? count : fifo_count);
+        if (turn != mesg->turn && count != 0) {
             curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, "---", FALSE);
         }
         curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, mesg->str, FALSE);

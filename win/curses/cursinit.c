@@ -827,6 +827,12 @@ curses_init_options()
         iflags.wc2_petattr = A_REVERSE;
     }
 
+    /* curses doesn't support 's' (single message at a time; successive
+       ^P's go back to earlier messages) and 'c' (combination; single
+       on first and second of consecutive ^P's, full on third) */
+    if (iflags.prevmsg_window != 'f')
+        iflags.prevmsg_window = 'r';
+
 #ifdef NCURSES_MOUSE_VERSION
     if (iflags.wc_mouse_support) {
         mousemask(BUTTON1_CLICKED, NULL);
