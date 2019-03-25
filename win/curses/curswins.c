@@ -147,7 +147,7 @@ curses_create_window(int width, int height, orient orientation)
 /* Erase and delete curses window, and refresh standard windows */
 
 void
-curses_destroy_win(WINDOW * win)
+curses_destroy_win(WINDOW *win)
 {
     werase(win);
     wrefresh(win);
@@ -303,17 +303,17 @@ void
 curses_del_nhwin(winid wid)
 {
     if (curses_is_menu(wid) || curses_is_text(wid)) {
-        curses_del_menu(wid);
+        curses_del_menu(wid, TRUE);
         return;
+    } else if (wid == INV_WIN) {
+        curses_del_menu(wid, TRUE);
+        /* don't return yet */
     }
 
     if (!is_main_window(wid)) {
         impossible("curses_del_nhwin: wid %d out of range. Not a main window.",
                    wid);
         return;
-    }
-    if (wid == MESSAGE_WIN) {
-        curses_teardown_messages();
     }
     nhwins[wid].curwin = NULL;
     nhwins[wid].nhwin = -1;
@@ -326,31 +326,35 @@ void
 curses_del_wid(winid wid)
 {
     nethack_wid *tmpwid;
-    nethack_wid *widptr = nhwids;
+    nethack_wid *widptr;
 
     if (curses_is_menu(wid) || curses_is_text(wid)) {
-        curses_del_menu(wid);
+        curses_del_menu(wid, FALSE);
     }
 
-    while (widptr != NULL) {
+    for (widptr = nhwids; widptr; widptr = widptr->next_wid) {
         if (widptr->nhwid == wid) {
-            if (widptr->prev_wid != NULL) {
-                tmpwid = widptr->prev_wid;
+            if ((tmpwid = widptr->prev_wid) != NULL) {
                 tmpwid->next_wid = widptr->next_wid;
             } else {
                 nhwids = widptr->next_wid;      /* New head mode, or NULL */
             }
-            if (widptr->next_wid != NULL) {
-                tmpwid = widptr->next_wid;
+            if ((tmpwid = widptr->next_wid) != NULL) {
                 tmpwid->prev_wid = widptr->prev_wid;
             }
             free(widptr);
             break;
         }
-        widptr = widptr->next_wid;
     }
 }
 
+/* called by destroy_nhwindows() prior to exit */
+void
+curs_destroy_all_wins()
+{
+    while (nhwids)
+        curses_del_wid(nhwids->nhwid);
+}
 
 /* Print a single character in the given window at the given coordinates */
 
@@ -439,15 +443,11 @@ curses_window_has_border(winid wid)
 boolean
 curses_window_exists(winid wid)
 {
-    nethack_wid *widptr = nhwids;
+    nethack_wid *widptr;
 
-    while (widptr != NULL) {
-        if (widptr->nhwid == wid) {
+    for (widptr = nhwids; widptr; widptr = widptr->next_wid)
+        if (widptr->nhwid == wid)
             return TRUE;
-        }
-
-        widptr = widptr->next_wid;
-    }
 
     return FALSE;
 }

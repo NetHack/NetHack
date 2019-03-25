@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{March 19, 2019}
+\date{March 24, 2019}
 
 \maketitle
 
@@ -883,7 +883,8 @@ choices but will accept an accessory and attempt to put that on.)
 Repeat previous message.\\
 %.lp ""
 Subsequent {\tt \^{}P}'s repeat earlier messages.
-The behavior can be varied via the {\it msg\verb+_+window\/} option.
+For some interfaces, the behavior can be varied via the
+{\it msg\verb+_+window\/} option.
 %.lp
 \item[\tb{q}]
 Quaff (drink) something (potion, water, etc).
@@ -3484,7 +3485,9 @@ Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{msg\verb+_+window}]
 Allows you to change the way recalled messages are displayed.
-(It is currently implemented for tty only.) The possible values are:
+Currently it is only supported for tty (all four choices) and for curses
+(`{\tt f}' and `{\tt r}' choices, default `{\tt r}').
+The possible values are:
 
 %.sd
 %.si

@@ -107,7 +107,7 @@ set_window_position(int *winx, int *winy, int *winw, int *winh,
     }
 }
 
-/* Create the "main" nonvolitile windows used by nethack */
+/* Create the "main" nonvolatile windows used by nethack */
 void
 curses_create_main_windows()
 {
@@ -826,6 +826,12 @@ curses_init_options()
         /* pet highlighting specified, so don't leave petattr at A_NORMAL */
         iflags.wc2_petattr = A_REVERSE;
     }
+
+    /* curses doesn't support 's' (single message at a time; successive
+       ^P's go back to earlier messages) and 'c' (combination; single
+       on first and second of consecutive ^P's, full on third) */
+    if (iflags.prevmsg_window != 'f')
+        iflags.prevmsg_window = 'r';
 
 #ifdef NCURSES_MOUSE_VERSION
     if (iflags.wc_mouse_support) {

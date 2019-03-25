@@ -148,9 +148,9 @@ curses_message_win_puts(const char *message, boolean recursed)
 
 
 int
-curses_block(boolean noscroll)
-/* noscroll - blocking because of msgtype = stop/alert */
-/* else blocking because window is full, so need to scroll after */
+curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
+                                * = stop/alert else blocking because
+                                * window is full, so need to scroll after */
 {
     int height, width, ret = 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
@@ -165,7 +165,7 @@ curses_block(boolean noscroll)
      * just any key, as we want to prevent YASD from
      * riding direction keys. */
     while ((ret = wgetch(win)) != 0 && !index(resp, (char) ret))
-         continue;
+        continue;
     if (height == 1) {
         curses_clear_unhighlight_message_window();
     } else {
@@ -233,13 +233,10 @@ curses_last_messages()
     nhprev_mesg *mesg;
     int i;
 
-    if (border) {
-        mx = 1;
-        my = 1;
-    } else {
-        mx = 0;
-        my = 0;
-    }
+    if (border)
+        mx = my = 1;
+    else
+        mx = my = 0;
 
     for (i = (num_messages - 1); i > 0; i--) {
         mesg = get_msg_line(TRUE, i);
@@ -287,28 +284,34 @@ curses_teardown_messages(void)
 void
 curses_prev_mesg()
 {
-    int count;
+    int count, fifo_count;
     winid wid;
     long turn = 0;
     anything Id;
     nhprev_mesg *mesg;
     menu_item *selected = NULL;
+    boolean do_lifo = (iflags.prevmsg_window != 'f');
 
     wid = curses_get_wid(NHW_MENU);
     curses_create_nhmenu(wid);
     Id = zeroany;
 
-    for (count = 0; count < num_messages; count++) {
-        mesg = get_msg_line(TRUE, count);
-        if ((turn != mesg->turn) && (count != 0)) {
+    for (count = 0, fifo_count = num_messages - 1; count < num_messages;
+         ++count, --fifo_count) {
+        mesg = get_msg_line(TRUE, do_lifo ? count : fifo_count);
+        if (turn != mesg->turn && count != 0) {
             curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, "---", FALSE);
         }
         curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, mesg->str, FALSE);
         turn = mesg->turn;
     }
+    if (!count)
+        curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL,
+                        "[No past messages available.]", FALSE);
 
     curses_end_menu(wid, "");
     curses_select_menu(wid, PICK_NONE, &selected);
+    curses_del_wid(wid);
 }
 
 
@@ -655,20 +658,19 @@ get_msg_line(boolean reverse, int mindex)
     if (reverse) {
         current_mesg = last_mesg;
         for (count = 0; count < mindex; count++) {
-            if (current_mesg == NULL) {
-                return NULL;
-            }
+            if (!current_mesg)
+                break;
             current_mesg = current_mesg->prev_mesg;
         }
-        return current_mesg;
     } else {
         current_mesg = first_mesg;
         for (count = 0; count < mindex; count++) {
-            if (current_mesg == NULL) {
-                return NULL;
-            }
+            if (!current_mesg)
+                break;
             current_mesg = current_mesg->next_mesg;
         }
-        return current_mesg;
     }
+    return current_mesg;
 }
+
+/*cursmesg.c*/

@@ -66,6 +66,7 @@ curses_status_init()
 
     /* let genl_status_init do most of the initialization */
     genl_status_init();
+    return;
 }
 
 void
@@ -78,8 +79,9 @@ curses_status_finish()
         if (status_vals_long[i])
             free(status_vals_long[i]), status_vals_long[i] = (char *) 0;
     }
-    genl_status_finish();
 #endif /* STATUS_HILITES */
+
+    genl_status_finish();
     return;
 }
 
