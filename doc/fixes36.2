@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.280 $ $NHDT-Date: 1553387147 2019/03/24 00:25:47 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.281 $ $NHDT-Date: 1553475022 2019/03/25 00:50:22 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -426,7 +426,7 @@ fix "placing monster over another?" warning for vault guards
 status highlighting classifies gold, time, and experience-points as data type
 	'long' but when selecting hilite rule to use treated them as 'int'
 a config file line with OPTIONS=symset:default, roguesymset:RogueEpyx
-	was disabling color on RogueEpyx even though the symset is 
+	was disabling color on RogueEpyx even though the symset is
 	meant to have color; that was due to an errant init_symbols() call
 	during the processing of symset:default done after RogueEpyx had
 	already been processed
@@ -494,6 +494,15 @@ curses: 'hitpointbar' now works even when status highlighting is disabled
 curses: add 'statuslines' option (value is 2 or 3)
 curses: change 'windowborders' option's value (0=Off, 1=On, or 2=Auto instead
 	of 1=On, 2=Off, 3=Auto; can now be changed via 'O' during play)
+curses: free allocated memory prior to exit; previous attempt at this only
+	handled game-over, not saving
+curses: the memory deallocation was releasing previous messages when curses
+	interface reinitialized its main windows after resize or 'O' was used
+	to set align_message, align_status, statuslines, or windowborders;
+	using ^P before next new message gave a warning about empty menu
+curses: popup window to show ^P output was removed from screen but never
+	deleted; further ^P's repeated that cycle; likewise for help which
+	displays an external text file
 vms: add compile of isaac64.c to Makefile.src and vmsbuild.com
 vms+curses: add compile support but it is known to fail to build
 

@@ -177,9 +177,9 @@ curses_bail(const char *mesg)
 winid
 curses_get_wid(int type)
 {
-    winid ret;
     static winid menu_wid = 20; /* Always even */
     static winid text_wid = 21; /* Always odd */
+    winid ret;
 
     switch (type) {
     case NHW_MESSAGE:
@@ -586,11 +586,9 @@ curses_view_file(const char *filename, boolean must_exist)
     menu_item *selected = NULL;
     dlb *fp = dlb_fopen(filename, "r");
 
-    if ((fp == NULL) && (must_exist)) {
-        pline("Cannot open %s for reading!", filename);
-    }
-
     if (fp == NULL) {
+        if (must_exist)
+            pline("Cannot open \"%s\" for reading!", filename);
         return;
     }
 
@@ -605,6 +603,7 @@ curses_view_file(const char *filename, boolean must_exist)
     dlb_fclose(fp);
     curses_end_menu(wid, "");
     curses_select_menu(wid, PICK_NONE, &selected);
+    curses_del_wid(wid);
 }
 
 
@@ -674,6 +673,9 @@ curses_convert_attr(int attr)
         break;
     case ATR_BOLD:
         curses_attr = A_BOLD;
+        break;
+    case ATR_DIM:
+        curses_attr = A_DIM;
         break;
     case ATR_BLINK:
         curses_attr = A_BLINK;

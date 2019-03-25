@@ -107,7 +107,7 @@ set_window_position(int *winx, int *winy, int *winw, int *winh,
     }
 }
 
-/* Create the "main" nonvolitile windows used by nethack */
+/* Create the "main" nonvolatile windows used by nethack */
 void
 curses_create_main_windows()
 {
