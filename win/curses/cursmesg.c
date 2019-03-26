@@ -284,7 +284,7 @@ curses_teardown_messages(void)
 void
 curses_prev_mesg()
 {
-    int count, fifo_count;
+    int count;
     winid wid;
     long turn = 0;
     anything Id;
@@ -296,9 +296,8 @@ curses_prev_mesg()
     curses_create_nhmenu(wid);
     Id = cg.zeroany;
 
-    for (count = 0, fifo_count = num_messages - 1; count < num_messages;
-         ++count, --fifo_count) {
-        mesg = get_msg_line(TRUE, do_lifo ? count : fifo_count);
+    for (count = 0; count < num_messages; ++count) {
+        mesg = get_msg_line(do_lifo, count);
         if (turn != mesg->turn && count != 0) {
             curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, "---", FALSE);
         }
@@ -323,13 +322,13 @@ curses_prev_mesg()
 void
 curses_count_window(const char *count_text)
 {
+    static WINDOW *countwin = NULL;
     int startx, starty, winx, winy;
     int messageh, messagew;
-    static WINDOW *countwin = NULL;
 
     if (!count_text) {
         if (countwin)
-             delwin(countwin), countwin = NULL;
+            delwin(countwin), countwin = NULL;
         counting = FALSE;
         return;
     }
