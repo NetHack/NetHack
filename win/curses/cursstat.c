@@ -370,6 +370,11 @@ unsigned long *colormasks;
         w = xtra = 0; /* w: width so far; xtra: number of extra spaces */
         prev_fld = BL_FLUSH;
         for (i = 0; (fld = (*fieldorder)[j][i]) != BL_FLUSH; ++i) {
+            /* when the core marks a field as disabled, it doesn't call
+               status_update() to tell us to throw away the old value, so
+               polymorph leaves stale XP and rehumanize leaves stale HD */
+            if (!status_activefields[fld])
+                *status_vals[fld] = '\0';
             text = status_vals[fld];
             if (i == 0 && *text == ' ')
                 ++text;

@@ -24,7 +24,7 @@ typedef struct nhpm {
 static void scroll_window(winid wid);
 static void unscroll_window(winid wid);
 static void directional_scroll(winid wid, int nlines);
-static void mesg_add_line(char *mline);
+static void mesg_add_line(const char *mline);
 static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
 
 static int turn_lines = 1;
@@ -95,7 +95,7 @@ curses_message_win_puts(const char *message, boolean recursed)
 
     if (!recursed) {
         strcpy(g.toplines, message);
-        mesg_add_line((char *) message);
+        mesg_add_line(message);
     }
 
     if (linespace < message_length) {
@@ -398,7 +398,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     Strcat(tmpbuf, " ");
     nlines = curses_num_lines(tmpbuf,width);
     maxlines += nlines * 2;
-    linestarts = (char **) alloc((unsigned) (sizeof (char *) * maxlines));
+    linestarts = (char **) alloc((unsigned) (maxlines * sizeof (char *)));
     p_answer = tmpbuf + strlen(tmpbuf);
     linestarts[0] = tmpbuf;
 
@@ -515,7 +515,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             (void) strncpy(answer, p_answer, buffer);
             answer[buffer - 1] = '\0';
             Strcpy(g.toplines, tmpbuf);
-            mesg_add_line((char *) tmpbuf);
+            mesg_add_line(tmpbuf);
             free(tmpbuf);
             curs_set(orig_cursor);
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
@@ -615,34 +615,54 @@ directional_scroll(winid wid, int nlines)
 /* Add given line to message history */
 
 static void
-mesg_add_line(char *mline)
+mesg_add_line(const char *mline)
 {
-    nhprev_mesg *tmp_mesg = NULL;
-    nhprev_mesg *current_mesg = (nhprev_mesg *) alloc((unsigned)
-                                                      (sizeof (nhprev_mesg)));
+    nhprev_mesg *current_mesg;
 
-    current_mesg->str = curses_copy_of(mline);
-    current_mesg->turn = g.moves;
-    current_mesg->next_mesg = NULL;
-
-    if (num_messages == 0) {
-        first_mesg = current_mesg;
+    /*
+     * Messages are kept in a doubly linked list, with head 'first_mesg',
+     * tail 'last_mesg', and a maximum capacity of 'max_messages'.
+     */
+    if (num_messages < max_messages) {
+        /* create a new list element */
+        current_mesg = (nhprev_mesg *) alloc((unsigned) sizeof (nhprev_mesg));
+        current_mesg->str = dupstr(mline);
+    } else {
+        /* instead of discarding list element being forced out, reuse it */
+        current_mesg = first_mesg;
+        /* whenever new 'mline' is shorter, extra allocation size of the
+           original element will be frittered away, until eventually we'll
+           discard this 'str' and dupstr() a replacement; we could easily
+           track the allocation size but don't really need to do so */
+        if (strlen(mline) <= strlen(current_mesg->str)) {
+            Strcpy(current_mesg->str, mline);
+        } else {
+            free((genericptr_t) current_mesg->str);
+            current_mesg->str = dupstr(mline);
+        }
     }
 
-    if (last_mesg != NULL) {
+    if (num_messages == 0) {
+        /* very first message; set up head */
+        first_mesg = current_mesg;
+    } else {
+        /* not first message; tail exists */
         last_mesg->next_mesg = current_mesg;
     }
     current_mesg->prev_mesg = last_mesg;
-    last_mesg = current_mesg;
+    last_mesg = current_mesg; /* new tail */
 
     if (num_messages < max_messages) {
-        num_messages++;
+        /* wasn't at capacity yet */
+        ++num_messages;
     } else {
-        tmp_mesg = first_mesg->next_mesg;
-        free(first_mesg->str);
-        free(first_mesg);
-        first_mesg = tmp_mesg;
+        /* at capacity; old head is being removed */
+        first_mesg = first_mesg->next_mesg; /* new head */
+        first_mesg->prev_mesg = NULL; /* head has no prev_mesg */
     }
+    /* since 'current_mesg' might be reusing 'first_mesg' and has now
+       become 'last_mesg', this update must be after head replacement */
+    last_mesg->next_mesg = NULL; /* tail has no next_mesg */
 }
 
 
