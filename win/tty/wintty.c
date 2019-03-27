@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1553653619 2019/03/27 02:26:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1553716531 2019/03/27 19:55:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.198 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3844,7 +3844,7 @@ unsigned long *colormasks;
         /* The core sends trailing blanks for some fields.
            Let's suppress the trailing blanks */
         if (tty_status[NOW][fldidx].lth > 0) {
-            p = eos(status_vals[fldidx]);
+            p = status_vals[fldidx];
             for (lastchar = eos(p); lastchar > p && *--lastchar == ' '; ) {
                 *lastchar = '\0';
                 tty_status[NOW][fldidx].lth--;
