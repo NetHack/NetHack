@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.283 $ $NHDT-Date: 1553644725 2019/03/26 23:58:45 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.284 $ $NHDT-Date: 1553652951 2019/03/27 02:15:51 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -467,6 +467,8 @@ having an artifact wish be refused ("for a moment you feel <artifact> in
 using 'O' to set status hilites for any status condition (Blind, &c) and
 	specifying more than one attribute (Bold, Inverse, &c) it would only
 	retain one of the chosen attributes
+when u.uhp==-1 became a flag to suppress status updating, if game ended when
+	hero died with exactly -1 HP, status would be blank during disclosure
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
