@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.282 $ $NHDT-Date: 1553480403 2019/03/25 02:20:03 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.285 $ $NHDT-Date: 1553653612 2019/03/27 02:26:52 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -396,6 +396,8 @@ status lines' dungeon location field in the elemental planes now shows Earth
 	or Air or Fire or Water instead of generic End Game
 avoid spurious status refresh when hero gains experience while 'showexp' and
 	'showscore' options are off
+using Cleaver to attack a worm tail segment but kill adjacent head first would
+	result in an impossible warning from cutworm
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -465,6 +467,8 @@ having an artifact wish be refused ("for a moment you feel <artifact> in
 using 'O' to set status hilites for any status condition (Blind, &c) and
 	specifying more than one attribute (Bold, Inverse, &c) it would only
 	retain one of the chosen attributes
+when u.uhp==-1 became a flag to suppress status updating, if game ended when
+	hero died with exactly -1 HP, status would be blank during disclosure
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -473,6 +477,7 @@ tty: fix an out of bounds error in tty_status_update() for BL_HUNGER case
 tty: fix leftover display artifact when the last field on the row got placed
 	to the left of where it was previously due to it, or one of the fields
 	to its left, getting shorter
+tty: support hitpointbar even when statushilites is set to 0
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
 X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)

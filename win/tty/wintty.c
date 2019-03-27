@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1550629490 2019/02/20 02:24:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.196 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1553653619 2019/03/27 02:26:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3838,9 +3838,6 @@ unsigned long *colormasks;
             /* Special additional processing for hitpointbar */
             hpbar_percent = percent;
             hpbar_color = (color & 0x00FF);
-        }
-        if (iflags.wc2_hitpointbar
-            && (tty_procs.wincap2 & WC2_FLUSH_STATUS) != 0L) {
             tty_status[NOW][BL_TITLE].color = hpbar_color;
             tty_status[NOW][BL_TITLE].dirty = TRUE;
         }
@@ -3850,17 +3847,18 @@ unsigned long *colormasks;
         /* The core sends trailing blanks for some fields.
            Let's suppress the trailing blanks */
         if (tty_status[NOW][fldidx].lth > 0) {
-            lastchar = eos(status_vals[fldidx]);
-            lastchar--;
-            while (lastchar >= status_vals[fldidx] && *lastchar == ' ') {
-                *lastchar-- = '\0';
+            p = eos(status_vals[fldidx]);
+            for (lastchar = eos(p); lastchar > p && *--lastchar == ' '; ) {
+                *lastchar = '\0';
                 tty_status[NOW][fldidx].lth--;
             }
         }
         break;
     case BL_TITLE:
+        /* when hitpointbar is enabled, rendering will enforce a length
+           of 30 on title, padding with spaces or truncating if necessary */
         if (iflags.wc2_hitpointbar)
-            tty_status[NOW][fldidx].lth += 2; /* '[' and ']' */
+            tty_status[NOW][fldidx].lth = 30 + 2; /* '[' and ']' */
         break;
     case BL_GOLD:
         /* \GXXXXNNNN counts as 1 */
@@ -4371,54 +4369,50 @@ render_status(VOID_ARGS)
                      * +-------------------------+
                      */
                     /* hitpointbar using hp percent calculation */
-                    int bar_pos, bar_len;
-                    char *bar2 = (char *)0;
-                    char bar[MAXCO], savedch = 0;
-                    boolean twoparts = FALSE;
+                    int bar_len, bar_pos = 0;
+                    char bar[MAXCO], *bar2 = (char *) 0, savedch = '\0';
+                    boolean twoparts = (hpbar_percent < 100);
 
-                    bar_len = strlen(text);
-                    if (bar_len < MAXCO-1) {
+                    /* force exactly 30 characters, padded with spaces
+                       if shorter or truncated if longer */
+                    if (strlen(text) != 30) {
+                        Sprintf(bar, "%-30.30s", text);
+                        Strcpy(status_vals[BL_TITLE], bar);
+                    } else
                         Strcpy(bar, text);
+                    bar_len = (int) strlen(bar); /* always 30 */
+                    /* when at full HP, the whole title will be highlighted;
+                       when injured or dead, there will be a second portion
+                       which is not highlighted */
+                    if (twoparts) {
+                        /* figure out where to separate the two parts */
                         bar_pos = (bar_len * hpbar_percent) / 100;
                         if (bar_pos < 1 && hpbar_percent > 0)
                             bar_pos = 1;
                         if (bar_pos >= bar_len && hpbar_percent < 100)
                             bar_pos = bar_len - 1;
-                        if (bar_pos > 0 && bar_pos < bar_len) {
-                            twoparts = TRUE;
-                            bar2 = &bar[bar_pos];
-                            savedch = *bar2;
-                            *bar2 = '\0';
-                        }
+                        bar2 = &bar[bar_pos];
+                        savedch = *bar2;
+                        *bar2 = '\0';
                     }
-                    if (iflags.hilite_delta) {
-                        char *s = bar;
-                        tty_putstatusfield(nullfield, "[", x++, y);
-                        if (hpbar_percent > 0) {
-                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                                term_start_color(hpbar_color);
-                            term_start_attr(ATR_INVERSE);
-                        }
-                        if (hpbar_percent == 0)
-                            s = text;
-                        tty_putstatusfield(nullfield, s, x, y);
-                        x += (int) strlen(s);
-                        if (hpbar_percent > 0) {
-                            term_end_attr(ATR_INVERSE);
-                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                                term_end_color();
-                        }
-                        if (twoparts && hpbar_percent > 0) {
-                            *bar2 = savedch;
-                            tty_putstatusfield(nullfield, bar2, x, y);
-                            x += (int) strlen(bar2);
-                            tty_curs(WIN_STATUS, x, y);
-                        }
-                        tty_putstatusfield(nullfield, "]", x++, y);
-                    } else {
-                        tty_putstatusfield(&tty_status[NOW][idx],
-                                           (char *) 0, x, y);
+                    tty_putstatusfield(nullfield, "[", x++, y);
+                    if (*bar) { /* always True, unless twoparts+dead (0 HP) */
+                        term_start_attr(ATR_INVERSE);
+                        if (iflags.hilite_delta && hpbar_color != NO_COLOR)
+                            term_start_color(hpbar_color);
+                        tty_putstatusfield(nullfield, bar, x, y);
+                        x += (int) strlen(bar);
+                        if (iflags.hilite_delta && hpbar_color != NO_COLOR)
+                            term_end_color();
+                        term_end_attr(ATR_INVERSE);
                     }
+                    if (twoparts) { /* no highlighting for second part */
+                        *bar2 = savedch;
+                        tty_putstatusfield(nullfield, bar2, x, y);
+                        x += (int) strlen(bar2);
+                        /*tty_curs(WIN_STATUS, x, y);*/
+                    }
+                    tty_putstatusfield(nullfield, "]", x++, y);
                 } else {
                     /*
                      * +-----------------------------+
