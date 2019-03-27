@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1548209742 2019/01/23 02:15:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.203 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1553644725 2019/03/26 23:58:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -476,7 +476,7 @@ int dieroll;
     if (!*mhit) {
         missum(mon, uattk, (rollneeded + armorpenalty > dieroll));
     } else {
-        int oldhp = mon->mhp, x = u.ux + u.dx, y = u.uy + u.dy;
+        int oldhp = mon->mhp;
         long oldweaphit = u.uconduct.weaphit;
 
         /* KMH, conduct */
@@ -485,7 +485,7 @@ int dieroll;
 
         /* we hit the monster; be careful: it might die or
            be knocked into a different location */
-        g.notonhead = (mon->mx != x || mon->my != y);
+        g.notonhead = (mon->mx != g.bhitpos.x || mon->my != g.bhitpos.y);
         malive = hmon(mon, weapon, HMON_MELEE, dieroll);
         if (malive) {
             /* monster still alive */
@@ -505,7 +505,7 @@ int dieroll;
                 u.uconduct.weaphit = oldweaphit;
             }
             if (mon->wormno && *mhit)
-                cutworm(mon, x, y, slice_or_chop);
+                cutworm(mon, g.bhitpos.x, g.bhitpos.y, slice_or_chop);
         }
     }
     return malive;
@@ -525,6 +525,7 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
        simulation attempt a bit */
     static boolean clockwise = FALSE;
     unsigned i;
+    coord save_bhitpos;
     int count, umort, x = u.ux, y = u.uy;
 
     /* find the direction toward primary target */
@@ -541,6 +542,7 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
        to primary target */
     i = (i + (clockwise ? 6 : 2)) % 8;
     umort = u.umortality; /* used to detect life-saving */
+    save_bhitpos = g.bhitpos;
 
     /*
      * Three attacks:  adjacent to primary, primary, adjacent on other
@@ -571,6 +573,7 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
                                &attknum, &armorpenalty);
         dieroll = rnd(20);
         mhit = (tmp > dieroll);
+        g.bhitpos.x = tx, g.bhitpos.y = ty; /* normally set up by attack() */
         (void) known_hitum(mtmp, uwep, &mhit, tmp, armorpenalty,
                            uattk, dieroll);
         (void) passive(mtmp, uwep, mhit, !DEADMONSTER(mtmp), AT_WEAP, !uwep);
@@ -582,6 +585,8 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
     }
     /* set up for next time */
     clockwise = !clockwise; /* alternate */
+    g.bhitpos = save_bhitpos; /* in case somebody relies on bhitpos
+                             * designating the primary target */
 
     /* return False if primary target died, True otherwise; note: if 'target'
        was nonNull upon entry then it's still nonNull even if *target died */
@@ -611,6 +616,7 @@ struct attack *uattk;
 
     if (tmp > dieroll)
         exercise(A_DEX, TRUE);
+    /* g.bhitpos is set up by caller */
     malive = known_hitum(mon, uwep, &mhit, tmp, armorpenalty, uattk, dieroll);
     if (wepbefore && !uwep)
         wep_was_destroyed = TRUE;
@@ -2280,13 +2286,14 @@ register struct monst *mon;
     struct attack *mattk, alt_attk;
     struct obj *weapon, **originalweapon;
     boolean altwep = FALSE, weapon_used = FALSE, odd_claw = TRUE;
-    int i, tmp, armorpenalty, sum[NATTK] = { 0 }, nsum = 0, dhit = 0, attknum = 0;
+    int i, tmp, armorpenalty, sum[NATTK], nsum = 0, dhit = 0, attknum = 0;
     int dieroll, multi_claw = 0;
 
     /* with just one touch/claw/weapon attack, both rings matter;
        with more than one, alternate right and left when checking
        whether silver ring causes successful hit */
     for (i = 0; i < NATTK; i++) {
+        sum[i] = 0;
         mattk = getmattk(&g.youmonst, mon, i, sum, &alt_attk);
         if (mattk->aatyp == AT_WEAP
             || mattk->aatyp == AT_CLAW || mattk->aatyp == AT_TUCH)
@@ -2295,7 +2302,7 @@ register struct monst *mon;
     multi_claw = (multi_claw > 1); /* switch from count to yes/no */
 
     for (i = 0; i < NATTK; i++) {
-        sum[i] = 0;
+        /* sum[i] = 0; -- now done above */
         mattk = getmattk(&g.youmonst, mon, i, sum, &alt_attk);
         weapon = 0;
         switch (mattk->aatyp) {
@@ -2352,6 +2359,7 @@ register struct monst *mon;
                                    &armorpenalty);
             dieroll = rnd(20);
             dhit = (tmp > dieroll || u.uswallow);
+            /* caller must set g.bhitpos */
             if (!known_hitum(mon, weapon, &dhit, tmp,
                              armorpenalty, mattk, dieroll)) {
                 /* enemy dead, before any special abilities used */
