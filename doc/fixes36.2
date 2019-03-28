@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.285 $ $NHDT-Date: 1553653612 2019/03/27 02:26:52 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.286 $ $NHDT-Date: 1553787633 2019/03/28 15:40:33 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -398,6 +398,9 @@ avoid spurious status refresh when hero gains experience while 'showexp' and
 	'showscore' options are off
 using Cleaver to attack a worm tail segment but kill adjacent head first would
 	result in an impossible warning from cutworm
+Valkyrie quest was supposed to have a 50:50 chance that northern drawbridge
+	would be raised, but both were always lowered; chances now are: both
+	lowered: 3/8, S down+N up: 3/8, N down+S up: 1/8, both raised: 1/8
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
