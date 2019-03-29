@@ -51,9 +51,9 @@ boolean FDECL((*gp_getvalidf), (int, int));
 }
 
 static const char *const gloc_descr[NUM_GLOCS][4] = {
-    { "any monsters", "monster", "next monster", "monsters" },
-    { "any items", "item", "next object", "objects" },
-    { "any doors", "door", "next door or doorway", "doors or doorways" },
+    { "any monsters", "monster", "next/previous monster", "monsters" },
+    { "any items", "item", "next/previous object", "objects" },
+    { "any doors", "door", "next/previous door or doorway", "doors or doorways" },
     { "any unexplored areas", "unexplored area", "unexplored location",
       "unexplored locations" },
     { "anything interesting", "interesting thing", "anything interesting",
@@ -77,7 +77,7 @@ int gloc;
 {
     char sbuf[BUFSZ];
 
-    Sprintf(sbuf, "Use '%s' or '%s' to %s%s%s.",
+    Sprintf(sbuf, "Use '%s'/'%s' to %s%s%s.",
             k1, k2,
             iflags.getloc_usemenu ? "get a menu of "
                                   : "move the cursor to ",
