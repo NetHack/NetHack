@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.287 $ $NHDT-Date: 1553858472 2019/03/29 11:21:12 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.288 $ $NHDT-Date: 1553885439 2019/03/29 18:50:39 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -401,6 +401,8 @@ using Cleaver to attack a worm tail segment but kill adjacent head first would
 Valkyrie quest was supposed to have a 50:50 chance that northern drawbridge
 	would be raised, but both were always lowered; chances now are: both
 	lowered: 3/8, S down+N up: 3/8, N down+S up: 1/8, both raised: 1/8
+shorten the getpos prompt for teleport destination so that it won't yield a
+	--More-- prompt for the help hint (--More-- still possible when riding)
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -481,6 +483,11 @@ tty: fix leftover display artifact when the last field on the row got placed
 	to the left of where it was previously due to it, or one of the fields
 	to its left, getting shorter
 tty: support hitpointbar even when statushilites is set to 0
+tty: when status condition names were abbreviated due to lack of room, they
+	were inconsistent about re-expanding when more room became available
+tty: when encumbrance state was abbreviated due to lack of room, there was no
+	separation from preceding status field and the value would not update
+	when the state changed (except for removal on change to unencumbered)
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
 X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
