@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.301 $ $NHDT-Date: 1553480404 2019/03/25 02:20:04 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.302 $ $NHDT-Date: 1553858473 2019/03/29 11:21:13 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -3657,7 +3657,7 @@ up (default yes).
 .lp statuslines
 Number of lines for traditional below-the-map status display.
 Acceptable values are 2 and 3 (default is 2).
-Curses interface only.
+Curses and tty interfaces only.
 .lp "term_cols\ \ \fIand\fP"
 .lp term_rows
 Curses interface only.
