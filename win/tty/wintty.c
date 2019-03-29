@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1553858474 2019/03/29 11:21:14 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1553895321 2019/03/29 21:35:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3315,7 +3315,6 @@ void
 tty_cliparound(x, y)
 int x, y;
 {
-    extern boolean restoring;
     int oldx = clipx, oldy = clipy;
 
     HUPSKIP();
@@ -3336,8 +3335,7 @@ int x, y;
         clipy = clipymax - (LI - 1 - iflags.wc2_statuslines);
     }
     if (clipx != oldx || clipy != oldy) {
-        if (on_level(&u.uz0, &u.uz) && !restoring)
-            (void) doredraw();
+        redraw_map(); /* ask the core to resend the map window's data */
     }
 }
 #endif /* CLIPPING */

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.288 $ $NHDT-Date: 1553885439 2019/03/29 18:50:39 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.289 $ $NHDT-Date: 1553895318 2019/03/29 21:35:18 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -488,6 +488,11 @@ tty: when status condition names were abbreviated due to lack of room, they
 tty: when encumbrance state was abbreviated due to lack of room, there was no
 	separation from preceding status field and the value would not update
 	when the state changed (except for removal on change to unencumbered)
+tty: when clipping was used to show a subset of the map on a small display,
+	panning into a new subset while using the cursor to pick a location
+	would ask the core to generate a new view of the map rather than use
+	whatever was currently shown, bringing back suppressed monsters/
+	objects/traps for #terrain and new hallucinatory monsters for farlook
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
 X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
