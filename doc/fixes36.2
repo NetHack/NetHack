@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.291 $ $NHDT-Date: 1554017610 2019/03/31 07:33:30 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.292 $ $NHDT-Date: 1554041056 2019/03/31 14:04:16 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -527,6 +527,8 @@ curses: popup window to show ^P output was removed from screen but never
 	deleted; further ^P's repeated that cycle; likewise for help which
 	displays an external text file
 curses: preserve ^P message history across save/restore
+curses: highlighting of status conditions was broken by the fix for timing out
+	of temporary highlights setting off unnecessary status updates
 vms: add compile of isaac64.c to Makefile.src and vmsbuild.com
 vms+curses: add compile support but it is known to fail to build
 
