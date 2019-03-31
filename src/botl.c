@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1553387148 2019/03/24 00:25:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1553993169 2019/03/31 00:46:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -524,9 +524,11 @@ unsigned long cond_hilites[BL_ATTCLR_MAX];
 void
 bot_via_windowport()
 {
+    static int idx = 0;
     char buf[BUFSZ];
+    const char *titl;
     register char *nb;
-    static int i, idx = 0, idx_p, cap;
+    int i, idx_p, cap;
     long money;
 
     if (!blinit)
@@ -549,15 +551,23 @@ bot_via_windowport()
      */
     Strcpy(nb = buf, plname);
     nb[0] = highc(nb[0]);
-    nb[10] = '\0';
+    titl = !Upolyd ? rank() : mons[u.umonnum].mname;
+    i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
+    /* if "Name the Rank/monster" is too long, we truncate the name
+       but always keep at least 10 characters of it; when hitpintbar is
+       enabled, anything beyond 30 (long monster name) will be truncated */
+    if (i > 30) {
+        i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
+        nb[max(i, 10)] = '\0';
+    }
     Strcpy(nb = eos(nb), " the ");
-    if (Upolyd) {
-        for (i = 0, nb = strcpy(eos(nb), mons[u.umonnum].mname); nb[i]; i++)
+    Strcpy(nb = eos(nb), titl);
+    if (Upolyd) { /* when poly'd, capitalize monster name */
+        for (i = 0; nb[i]; i++)
             if (i == 0 || nb[i - 1] == ' ')
                 nb[i] = highc(nb[i]);
-    } else
-        Strcpy(nb = eos(nb), rank());
-    Sprintf(blstats[idx][BL_TITLE].val, "%-29s", buf);
+    }
+    Sprintf(blstats[idx][BL_TITLE].val, "%-30s", buf);
     valset[BL_TITLE] = TRUE; /* indicate val already set */
 
     /* Strength */
