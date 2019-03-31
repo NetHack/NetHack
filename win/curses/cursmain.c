@@ -9,6 +9,8 @@
 #include "color.h"
 #include "wincurs.h"
 
+extern long curs_mesg_suppress_turn; /* from cursmesg.c */
+
 /* Public functions for curses NetHack interface */
 
 /* Interface definition, for windows.c */
@@ -686,6 +688,9 @@ int
 curses_nhgetch()
 {
     int ch;
+
+    /* if messages are being suppressed, reenable them */
+    curs_mesg_suppress_turn = -1;
 
     curses_prehousekeeping();
     ch = curses_read_char();

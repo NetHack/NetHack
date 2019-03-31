@@ -9,6 +9,10 @@
 #include "cursmesg.h"
 #include <ctype.h>
 
+/* player can type ESC at More>> prompt to avoid seeing more messages
+   for the current move; but hero might get more than one move per turn,
+   so the input routines need to be able to cancel this */
+long curs_mesg_suppress_turn = -1; /* also used in cursdial.c && cursmain.c */
 
 /* Message window routines for curses interface */
 
@@ -46,16 +50,13 @@ curses_message_win_puts(const char *message, boolean recursed)
     boolean border = curses_window_has_border(MESSAGE_WIN);
     int message_length = strlen(message);
     int border_space = 0;
-    static long suppress_turn = -1;
 
-#if 1
+#if 0
     /*
-     * Handled by core's use of putstr(WIN_MESSAGE,ATR_NOHISTORY,message)
-     * for intermediate counts, but get_count() also uses putmsghistory()
-     * for the final count, to remember that without showing it.  But
-     * curses is using genl_putmsghistory() which just delivers the text
-     * via a normal pline().  This hides that at cost of not having it
-     * in ^P recall and being out of sync with DUMPLOG's message history.
+     * This was useful when curses used genl_putmsghistory() but is not
+     * needed now that it has its own curses_putmsghistory() that's
+     * capable of putting something into the ^P recall history without
+     * displaying it at the same time.
      */
     if (strncmp("Count:", message, 6) == 0) {
         curses_count_window(message);
@@ -63,8 +64,8 @@ curses_message_win_puts(const char *message, boolean recursed)
     }
 #endif
 
-    if (suppress_turn == moves) {
-        return;
+    if (curs_mesg_suppress_turn == moves) {
+        return; /* user has typed ESC to avoid seeing remaining messages. */
     }
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
@@ -105,7 +106,7 @@ curses_message_win_puts(const char *message, boolean recursed)
                 /* Pause until key is hit - Esc suppresses any further
                    messages that turn */
                 if (curses_more() == '\033') {
-                    suppress_turn = moves;
+                    curs_mesg_suppress_turn = moves;
                     return;
                 }
             } else {
@@ -155,6 +156,9 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
     int height, width, ret = 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     const char *resp = " \r\n\033"; /* space, enter, esc */
+
+    /* if messages are being suppressed, reenable them */
+    curs_mesg_suppress_turn = -1;
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     curses_toggle_color_attr(win, MORECOLOR, NONE, ON);
