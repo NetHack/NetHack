@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.290 $ $NHDT-Date: 1553904170 2019/03/30 00:02:50 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.291 $ $NHDT-Date: 1554017610 2019/03/31 07:33:30 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -403,6 +403,9 @@ Valkyrie quest was supposed to have a 50:50 chance that northern drawbridge
 	lowered: 3/8, S down+N up: 3/8, N down+S up: 1/8, both raised: 1/8
 shorten the getpos prompt for teleport destination so that it won't yield a
 	--More-- prompt for the help hint (--More-- still possible when riding)
+once a status highlight for a temporary rule ('up', 'down', 'changed') timed
+	out, further spurious status updates (evaluating all fields) would
+	occur every 'statushilites' turns even if no fields had changed
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
