@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1554017610 2019/03/31 07:33:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1554045809 2019/03/31 15:23:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,6 +17,7 @@ STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 STATIC_DCL const char *NDECL(rank);
 #ifdef STATUS_HILITES
 STATIC_DCL void NDECL(bot_via_windowport);
+STATIC_DCL void NDECL(stat_update_time);
 #endif
 
 static char *
@@ -244,7 +245,21 @@ bot()
         putmixed(WIN_STATUS, 0, do_statusline2());
 #endif
     }
-    context.botl = context.botlx = 0;
+    context.botl = context.botlx = iflags.time_botl = FALSE;
+}
+
+void
+timebot()
+{
+    if (flags.time) {
+#ifdef STATUS_HILITES
+        stat_update_time();
+#else
+        /* old status display updates everything */
+        bot();
+#endif
+    }
+    iflags.time_botl = FALSE;
 }
 
 /* convert experience level (1..30) to rank index (0..8) */
@@ -528,22 +543,23 @@ static long bl_hilite_moves = 0L;
  * without STATUS_HILITES.
  */
 static unsigned long cond_hilites[BL_ATTCLR_MAX];
+static int now_or_before_idx = 0; /* 0..1 for array[2][] first index */
 
 void
 bot_via_windowport()
 {
-    static int idx = 0;
     char buf[BUFSZ];
     const char *titl;
     register char *nb;
-    int i, cap;
+    int i, idx, cap;
     long money;
 
     if (!blinit)
         panic("bot before init.");
 
     /* toggle from previous iteration */
-    idx = 1 - idx; /* 0 -> 1, 1 -> 0 */
+    idx = 1 - now_or_before_idx; /* 0 -> 1, 1 -> 0 */
+    now_or_before_idx = idx;
 
     /* clear the "value set" indicators */
     (void) memset((genericptr_t) valset, 0, MAXBLSTATS * sizeof (boolean));
@@ -710,6 +726,24 @@ bot_via_windowport()
     evaluate_and_notify_windowport(valset, idx);
 }
 
+/* update just the status lines' 'time' field */
+STATIC_OVL void
+stat_update_time()
+{
+    int idx = now_or_before_idx; /* no 0/1 toggle */
+    int fld = BL_TIME;
+
+    /* Time (moves) */
+    blstats[idx][fld].a.a_long = moves;
+    valset[fld] = FALSE;
+
+    eval_notify_windowport_field(fld, valset, idx);
+    if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
+        status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
+                      NO_COLOR, (unsigned long *) 0);
+    return;
+}
+
 STATIC_OVL boolean
 eval_notify_windowport_field(fld, valsetlist, idx)
 int fld, idx;
@@ -854,7 +888,7 @@ boolean *valsetlist;
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, (unsigned long *) 0);
 
-    context.botl = context.botlx = FALSE;
+    context.botl = context.botlx = iflags.time_botl = FALSE;
     update_all = FALSE;
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1553204011 2019/03/21 21:33:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1554045808 2019/03/31 15:23:28 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -364,9 +364,10 @@ struct instance_flags {
 #ifdef TTY_TILES_ESCCODES
     boolean vt_tiledata;     /* output console codes for tile support in TTY */
 #endif
+    boolean clicklook;       /* allow right-clicking for look */
+    boolean cmdassist;       /* provide detailed assistance for some comnds */
+    boolean time_botl;       /* context.botl for 'time' (moves) only */
     boolean wizweight;       /* display weight of everything in wizard mode */
-    boolean cmdassist;       /* provide detailed assistance for some commands */
-    boolean clicklook;          /* allow right-clicking for look */
     /*
      * Window capability support.
      */

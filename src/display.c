@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1553895319 2019/03/29 21:35:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1554045810 2019/03/31 15:23:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1625,6 +1625,8 @@ int cursor_on_u;
     flushing = 0;
     if (context.botl || context.botlx)
         bot();
+    else if (iflags.time_botl)
+        timebot();
 }
 
 /* ======================================================================== */
