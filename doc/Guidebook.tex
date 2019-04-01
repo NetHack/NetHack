@@ -3266,8 +3266,13 @@ Cannot be set with the `{\tt O}' command.
 \item[\ib{extmenu}]
 Changes the extended commands interface to pop-up a menu of available commands.
 It is keystroke compatible with the traditional interface except that it does
-not require that you hit Enter.  It is implemented only by the tty port
-(default off), when the game has been compiled to support tty graphics.
+not require that you hit Enter.
+It is implemented for the tty interface (default off).
+.lp ""
+For the X11 interface, which always uses a menu for choosing an extended
+command, it controls whether the menu shows all available commands (on)
+or just the subset of commands which have traditionally been considered
+extended ones (off).
 %.lp
 \item[\ib{female}]
 An obsolete synonym for ``{\tt gender:female}''.  Cannot be set with the

@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.302 $ $NHDT-Date: 1553858473 2019/03/29 11:21:13 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.303 $ $NHDT-Date: 1554134322 2019/04/01 15:58:42 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -2972,8 +2972,12 @@ Changes the extended commands interface to pop-up a menu of available
 commands.
 It is keystroke compatible with the traditional interface except that it
 does not require that you hit \fIEnter\fP.
-It is implemented only by the tty port
-(default off), when the game has been compiled to support tty graphics.
+It is implemented for the tty interface (default off).
+.lp ""
+For the X11 interface, which always uses a menu for choosing an extended
+command, it controls whether the menu shows all available commands (on)
+or just the subset of commands which have traditionally been considered
+extended ones (off).
 .lp female
 An obsolete synonym for \(lqgender:female\(rq.
 Cannot be set with the \(oqO\(cq command.
