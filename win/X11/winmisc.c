@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1554134316 2019/04/01 15:58:36 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1554135506 2019/04/01 16:18:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1856,11 +1856,12 @@ String *params;
 Cardinal *num_params;
 {
     char ch;
-    int i;
-    int pass;
+    int i, pass;
+    float shown, top;
+    Arg arg[2];
+    Widget hbar, vbar;
     XKeyEvent *xkey = (XKeyEvent *) event;
 
-    nhUse(w);
     nhUse(params);
     nhUse(num_params);
 
@@ -1887,6 +1888,25 @@ Cardinal *num_params;
 
         exit_x_event = TRUE; /* leave event loop */
         ec_active = FALSE;
+        return;
+    } else if (ch == MENU_FIRST_PAGE || ch == MENU_LAST_PAGE) {
+        hbar = vbar = (Widget) 0;
+        find_scrollbars(w, &hbar, &vbar);
+        if (vbar) {
+            top = (ch == MENU_FIRST_PAGE) ? 0.0 : 1.0;
+            XtCallCallbacks(vbar, XtNjumpProc, &top);
+        }
+        return;
+    } else if (ch == MENU_NEXT_PAGE || ch == MENU_PREVIOUS_PAGE) {
+        hbar = vbar = (Widget) 0;
+        find_scrollbars(w, &hbar, &vbar);
+        if (vbar) {
+            XtSetArg(arg[0], nhStr(XtNshown), &shown);
+            XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
+            XtGetValues(vbar, arg, TWO);
+            top += ((ch == MENU_NEXT_PAGE) ? shown : -shown);
+            XtCallCallbacks(vbar, XtNjumpProc, &top);
+        }
         return;
     }
 

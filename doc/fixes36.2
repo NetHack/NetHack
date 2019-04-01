@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.295 $ $NHDT-Date: 1554134321 2019/04/01 15:58:41 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.296 $ $NHDT-Date: 1554136021 2019/04/01 16:27:01 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -501,6 +501,7 @@ X11: its use of genl_status_update exposed a negative index use that could
 X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
 X11: make use of the 'extmenu' option:  On to choose among all commands, Off
 	to choose among the traditional extended command subset
+X11: support menu scrolling via (^ < > |) in the extended commands menu
 curses: catch up with tty to not put dolook/whatis autodescribe feedback into
 	^P message recall (multi-digit count feedback was already handled)
 curses: if the interface code ran out of memory, it would crash rather than
@@ -614,7 +615,7 @@ windows-tty: add support for mouse_support:0 (disabled), mouse_support:1
 X11: implement menucolors and allow menus to obey some attributes
 X11: make key translations work with menus on Linux
 X11: allow mouse wheel scrolling to work in menus by default
-X11: handle paged menu control keys
+X11: handle menu scrolling via first-/previous-/next-/last-page keys (^ < > |)
 X11: remember perm_invent window geometry
 X11: handle X errors via panic
 X11: don't reuse perm_invent window for picking an object
