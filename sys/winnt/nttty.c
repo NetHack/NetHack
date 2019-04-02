@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1524931557 2018/04/28 16:05:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1554215932 2019/04/02 14:38:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -800,6 +800,12 @@ has_color(int color)
 #endif
     else
         return 0;
+}
+
+int
+term_attr_fixup(int attrmask)
+{
+    return attrmask;
 }
 
 void

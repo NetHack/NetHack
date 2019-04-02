@@ -644,6 +644,7 @@ struct instance_globals {
     boolean valset[MAXBLSTATS];
     long bl_hilite_moves;
     unsigned long cond_hilites[BL_ATTCLR_MAX];
+    int now_or_before_idx;   /* 0..1 for array[2][] first index */
 
     /* cmd.c */
     struct cmd Cmd; /* flag.h */

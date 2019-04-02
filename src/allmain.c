@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1553363414 2019/03/23 17:50:14 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1554045808 2019/03/31 15:23:28 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -183,7 +183,7 @@ boolean resuming;
                     if (u.ublesscnt)
                         u.ublesscnt--;
                     if (flags.time && !g.context.run)
-                        g.context.botl = TRUE;
+                        iflags.time_botl = TRUE;
 
                     /* One possible result of prayer is healing.  Whether or
                      * not you get healed depends on your current hit points.
@@ -209,8 +209,10 @@ boolean resuming;
                                                    : g.moves % 10)) {
                             if (Upolyd && u.mh > 1) {
                                 u.mh--;
+                                g.context.botl = TRUE;
                             } else if (!Upolyd && u.uhp > 1) {
                                 u.uhp--;
+                                g.context.botl = TRUE;
                             } else {
                                 You("pass out from exertion!");
                                 exercise(A_CON, FALSE);
@@ -236,6 +238,7 @@ boolean resuming;
                     if (!u.uinvulnerable) {
                         if (Teleportation && !rn2(85)) {
                             xchar old_ux = u.ux, old_uy = u.uy;
+
                             tele();
                             if (u.ux != old_ux || u.uy != old_uy) {
                                 if (!next_to_u()) {
@@ -360,6 +363,9 @@ boolean resuming;
         }
         if (g.context.botl || g.context.botlx) {
             bot();
+            curs_on_u();
+        } else if (iflags.time_botl) {
+            timebot();
             curs_on_u();
         }
 

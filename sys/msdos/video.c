@@ -1,4 +1,4 @@
-/* NetHack 3.6	video.c	$NHDT-Date: 1457207042 2016/03/05 19:44:02 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.6	video.c	$NHDT-Date: 1554215931 2019/04/02 14:38:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $ */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 2001	    */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*								    */
@@ -283,6 +283,12 @@ void
 standoutend()
 {
     g_attribute = iflags.grmode ? attrib_gr_normal : attrib_text_normal;
+}
+
+int
+term_attr_fixup(int attrmask)
+{
+    return attrmask;
 }
 
 void

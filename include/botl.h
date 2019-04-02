@@ -104,6 +104,8 @@ enum hlattribs { HL_UNDEF   = 0x00,
                  HL_BLINK   = 0x10,
                  HL_DIM     = 0x20 };
 
+#define MAXVALWIDTH 80 /* actually less, but was using 80 to allocate title
+                       * and leveldesc then using QBUFSZ everywhere else   */
 #ifdef STATUS_HILITES
 struct hilite_s {
     enum statusfields fld;
@@ -111,7 +113,7 @@ struct hilite_s {
     unsigned anytype;
     anything value;
     int behavior;
-    char textmatch[QBUFSZ];
+    char textmatch[MAXVALWIDTH];
     enum relationships rel;
     int coloridx;
     struct hilite_s *next;
@@ -130,6 +132,8 @@ struct istat_s {
     enum statusfields idxmax;
     enum statusfields fld;
 #ifdef STATUS_HILITES
+    struct hilite_s *hilite_rule; /* the entry, if any, in 'thresholds'
+                                   * list that currently applies        */
     struct hilite_s *thresholds;
 #endif
 };

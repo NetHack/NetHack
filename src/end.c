@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1553652951 2019/03/27 02:15:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1554045810 2019/03/31 15:23:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1025,7 +1025,7 @@ int how;
 #endif
         ) {
         /* skip status update if panicking or disconnected */
-        g.context.botl = g.context.botlx = FALSE;
+        g.context.botl = g.context.botlx = iflags.time_botl = FALSE;
     } else {
         /* otherwise force full status update */
         g.context.botlx = TRUE;

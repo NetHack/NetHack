@@ -17,6 +17,8 @@
 #define strncasecmp strncmpi
 #endif
 
+extern long curs_mesg_suppress_turn; /* from cursmesg.c */
+
 /*
  * Note:
  *
@@ -79,6 +81,7 @@ typedef struct nhm {
     int height;                 /* Window height of menu */
     int width;                  /* Window width of menu */
     boolean reuse_accels;       /* Non-unique accelerators per page */
+    boolean bottom_heavy;       /* display multi-page menu starting at end */
     struct nhm *prev_menu;      /* Pointer to previous entry */
     struct nhm *next_menu;      /* Pointer to next entry */
 } nhmenu;
@@ -89,6 +92,8 @@ typedef enum menu_op_type {
     INVERT
 } menu_op;
 
+static nhmenu_item *curs_new_menu_item(winid, const char *);
+static void curs_pad_menu(nhmenu *, boolean);
 static nhmenu *get_menu(winid wid);
 static char menu_get_accel(boolean first);
 static void menu_determine_pages(nhmenu *menu);
@@ -119,6 +124,10 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
     int prompt_height = 1;
     int height = prompt_height;
     char input[BUFSZ];
+
+    /* if messages were being suppressed for the remainder of the turn,
+       re-activate them now that input is being requested */
+    curs_mesg_suppress_turn = -1;
 
     if (buffer >= (int) sizeof input)
          buffer = (int) sizeof input - 1;
@@ -200,6 +209,10 @@ curses_character_input_dialog(const char *prompt, const char *choices,
     int prompt_height = 1;
     boolean any_choice = FALSE;
     boolean accept_count = FALSE;
+
+    /* if messages were being suppressed for the remainder of the turn,
+       re-activate them now that input is being requested */
+    curs_mesg_suppress_turn = -1;
 
     if (g.invent || (g.moves > 1)) {
         curses_get_window_size(MAP_WIN, &map_height, &map_width);
@@ -369,6 +382,7 @@ curses_ext_cmd()
     starty = 0;
     if (iflags.wc_popup_dialog) { /* Prompt in popup window */
         int x0, y0, w, h; /* bounding coords of popup */
+
         extwin2 = curses_create_window(25, 1, UP);
         wrefresh(extwin2);
         /* create window inside window to prevent overwriting of border */
@@ -513,6 +527,7 @@ curses_create_nhmenu(winid wid)
         new_menu->height = 0;
         new_menu->width = 0;
         new_menu->reuse_accels = FALSE;
+        new_menu->bottom_heavy = FALSE;
         return;
     }
 
@@ -524,6 +539,7 @@ curses_create_nhmenu(winid wid)
     new_menu->height = 0;
     new_menu->width = 0;
     new_menu->reuse_accels = FALSE;
+    new_menu->bottom_heavy = FALSE;
     new_menu->next_menu = NULL;
 
     if (nhmenus == NULL) {      /* no menus in memory yet */
@@ -538,15 +554,38 @@ curses_create_nhmenu(winid wid)
     }
 }
 
+static nhmenu_item *
+curs_new_menu_item(winid wid, const char *str)
+{
+    char *new_str;
+    nhmenu_item *new_item;
 
+    new_str = curses_copy_of(str);
+    curses_rtrim(new_str);
+    new_item = (nhmenu_item *) alloc((unsigned) sizeof (nhmenu_item));
+    new_item->wid = wid;
+    new_item->glyph = NO_GLYPH;
+    new_item->identifier = cg.zeroany;
+    new_item->accelerator = '\0';;
+    new_item->group_accel = '\0';
+    new_item->attr = 0;
+    new_item->str = new_str;
+    new_item->presel = FALSE;
+    new_item->selected = FALSE;
+    new_item->page_num = 0;
+    new_item->line_num = 0;
+    new_item->num_lines = 0;
+    new_item->count = -1;
+    new_item->next_item = NULL;
+    return new_item;
+}
 /* Add a menu item to the given menu window */
 
 void
-curses_add_nhmenu_item(winid wid, int glyph, const ANY_P * identifier,
+curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
                        CHAR_P accelerator, CHAR_P group_accel, int attr,
                        const char *str, BOOLEAN_P presel)
 {
-    char *new_str;
     nhmenu_item *new_item, *current_items, *menu_item_ptr;
     nhmenu *current_menu = get_menu(wid);
 
@@ -560,23 +599,13 @@ curses_add_nhmenu_item(winid wid, int glyph, const ANY_P * identifier,
         return;
     }
 
-    new_str = curses_copy_of(str);
-    curses_rtrim((char *) new_str);
-    new_item = (nhmenu_item *) alloc((unsigned) sizeof (nhmenu_item));
-    new_item->wid = wid;
+    new_item = curs_new_menu_item(wid, str);
     new_item->glyph = glyph;
     new_item->identifier = *identifier;
     new_item->accelerator = accelerator;
     new_item->group_accel = group_accel;
     new_item->attr = attr;
-    new_item->str = new_str;
     new_item->presel = presel;
-    new_item->selected = FALSE;
-    new_item->page_num = 0;
-    new_item->line_num = 0;
-    new_item->num_lines = 0;
-    new_item->count = -1;
-    new_item->next_item = NULL;
 
     current_items = current_menu->entries;
     menu_item_ptr = current_items;
@@ -593,6 +622,67 @@ curses_add_nhmenu_item(winid wid, int glyph, const ANY_P * identifier,
     }
 }
 
+/* for menu->bottom_heavy -- insert enough blank lines at top of
+   first page to make the last page become a full one */
+static void
+curs_pad_menu(nhmenu *current_menu, boolean do_pad UNUSED)
+{
+    nhmenu_item *menu_item_ptr;
+    int numpages = current_menu->num_pages;
+
+    /* caller has already called menu_win_size() */
+    menu_determine_pages(current_menu); /* sets 'menu->num_pages' */
+    numpages = current_menu->num_pages;
+    /* pad beginning of menu so that partial last page becomes full;
+       might be slightly less than full if any entries take multiple
+       lines and the padding would force those to span page boundary
+       and that gets prevented; so we re-count the number of pages
+       with every insertion instead of trying to calculate the number
+       of them to add */
+    do {
+        menu_item_ptr = curs_new_menu_item(current_menu->wid, "");
+        menu_item_ptr->next_item = current_menu->entries;
+        current_menu->entries->prev_item = menu_item_ptr;
+        current_menu->entries = menu_item_ptr;
+        current_menu->num_entries += 1;
+
+        menu_determine_pages(current_menu);
+    } while (current_menu->num_pages == numpages);
+
+    /* we inserted blank lines at beginning until final entry spilled
+       over to another page; take the most recent blank one back out */
+    current_menu->num_entries -= 1;
+    current_menu->entries = menu_item_ptr->next_item;
+    current_menu->entries->prev_item = (nhmenu_item *) 0;
+    free((genericptr_t) menu_item_ptr->str);
+    free((genericptr_t) menu_item_ptr);
+
+    /* reset page count; shouldn't need to re-count */
+    current_menu->num_pages = numpages;
+    return;
+}
+
+/* mark ^P message recall menu, for msg_window:full (FIFO), where we'll
+   start viewing on the last page so be able to see most recent immediately */
+void
+curs_menu_set_bottom_heavy(winid wid)
+{
+    nhmenu *menu = get_menu(wid);
+
+    /*
+     * Called after end_menu + finalize_nhmenu,
+     * before select_menu + display_nhmenu.
+     */
+    menu_win_size(menu); /* (normally not done until display_nhmenu) */
+    if (menu_is_multipage(menu, menu->width, menu->height)) {
+        menu->bottom_heavy = TRUE;
+
+        /* insert enough blank lines at top of first page to make the
+           last page become a full one */
+        curs_pad_menu(menu, TRUE);
+    }
+    return;
+}
 
 /* No more entries are to be added to menu, so details of the menu can be
  finalized in memory */
@@ -689,8 +779,8 @@ curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
         }
 
         if (count != num_chosen) {
-            impossible("curses_display_nhmenu: Selected items less than "
-                  "expected number");
+            impossible(
+           "curses_display_nhmenu: Selected items less than expected number");
         }
     }
 
@@ -743,7 +833,7 @@ curses_del_menu(winid wid, boolean del_wid_too)
     if ((tmpmenu = current_menu->prev_menu) != NULL) {
         tmpmenu->next_menu = current_menu->next_menu;
     } else {
-        nhmenus = current_menu->next_menu;      /* New head mode or NULL */
+        nhmenus = current_menu->next_menu;      /* New head node or NULL */
     }
     if ((tmpmenu = current_menu->next_menu) != NULL) {
         tmpmenu->prev_menu = current_menu->prev_menu;
@@ -811,7 +901,7 @@ menu_is_multipage(nhmenu *menu, int width, int height)
     int curline = 0;
     nhmenu_item *menu_item_ptr = menu->entries;
 
-    if (strlen(menu->prompt) > 0) {
+    if (*menu->prompt) {
         curline += curses_num_lines(menu->prompt, width) + 1;
     }
 
@@ -854,7 +944,7 @@ menu_determine_pages(nhmenu *menu)
     int page_end = height;
 
 
-    if (strlen(menu->prompt) > 0) {
+    if (*menu->prompt) {
         curline += curses_num_lines(menu->prompt, width) + 1;
     }
 
@@ -922,8 +1012,7 @@ menu_win_size(nhmenu *menu)
             /* Add space for accelerator */
             curentrywidth = strlen(menu_item_ptr->str) + 4;
 #if 0 /* FIXME: menu glyphs */
-            if (menu_item_ptr->glyph != NO_GLYPH
-                        && iflags.use_menu_glyphs)
+            if (menu_item_ptr->glyph != NO_GLYPH && iflags.use_menu_glyphs)
                 curentrywidth += 2;
 #endif
         }
@@ -979,7 +1068,7 @@ static void
 menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
 {
     nhmenu_item *menu_item_ptr;
-    int count, curletter, entry_cols, start_col, num_lines, footer_x;
+    int count, curletter, entry_cols, start_col, num_lines;
     char *tmpstr;
     boolean first_accel = TRUE;
     int color = NO_COLOR;
@@ -1102,20 +1191,25 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
     }
 
     if (menu->num_pages > 1) {
-        footer_x = menu->width - strlen("<- (Page X of Y) ->");
-        if (menu->num_pages > 9) {      /* Unlikely */
-            footer_x -= 2;
+        int footer_x, footwidth, shoesize = menu->num_pages;
+
+        footwidth = (int) (sizeof "<- (Page X of Y) ->" - sizeof "");
+        while (shoesize >= 10) { /* possible for pickup from big piles... */
+             /* room for wider feet; extra digit for both X and Y */
+            footwidth += 2;
+            shoesize /= 10;
         }
-        mvwprintw(win, menu->height, footer_x + 3, "(Page %d of %d)",
-                  page_num, menu->num_pages);
+        footer_x = !menu->bottom_heavy ? (menu->width - footwidth) : 2;
         if (page_num != 1) {
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
             mvwaddstr(win, menu->height, footer_x, "<=");
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
         }
+        mvwprintw(win, menu->height, footer_x + 2, " (Page %d of %d) ",
+                  page_num, menu->num_pages);
         if (page_num != menu->num_pages) {
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
-            mvwaddstr(win, menu->height, menu->width - 2, "=>");
+            mvwaddstr(win, menu->height, footer_x + footwidth - 2, "=>");
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
         }
     }
@@ -1132,13 +1226,13 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
     int curletter;
     int count = -1;
     int count_letter = '\0';
-    int curpage = 1;
+    int curpage = !menu->bottom_heavy ? 1 : menu->num_pages;
     int num_selected = 0;
     boolean dismiss = FALSE;
     char search_key[BUFSZ];
     nhmenu_item *menu_item_ptr = menu->entries;
 
-    menu_display_page(menu, win, 1);
+    menu_display_page(menu, win, curpage);
 
     while (!dismiss) {
         curletter = getch();

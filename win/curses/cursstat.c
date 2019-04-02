@@ -25,6 +25,7 @@ extern boolean status_activefields[MAXBLSTATS];
 static char *status_vals_long[MAXBLSTATS];
 
 #ifdef STATUS_HILITES
+static unsigned long *curses_colormasks;
 static long curses_condition_bits;
 static int curses_status_colors[MAXBLSTATS];
 static int hpbar_percent, hpbar_color;
@@ -36,12 +37,11 @@ static int FDECL(condcolor, (long, unsigned long *));
 static int FDECL(condattr, (long, unsigned long *));
 static int FDECL(nhattr2curses, (int));
 #endif /* STATUS_HILITES */
-static void FDECL(draw_status, (unsigned long *));
-static void FDECL(draw_vertical, (BOOLEAN_P, unsigned long *));
-static void FDECL(draw_horizontal, (BOOLEAN_P, unsigned long *));
+static void NDECL(draw_status);
+static void FDECL(draw_vertical, (BOOLEAN_P));
+static void FDECL(draw_horizontal, (BOOLEAN_P));
 static void curs_HPbar(char *, int);
-static void curs_stat_conds(int, int *, int *, unsigned long *,
-                            char *, boolean *);
+static void curs_stat_conds(int, int *, int *, char *, boolean *);
 static void curs_vert_status_vals(int);
 
 /* width of a single line in vertical status orientation (one field per line;
@@ -162,6 +162,7 @@ unsigned long *colormasks;
             return;
         if (fldidx == BL_CONDITION) {
             curses_condition_bits = *condptr;
+            curses_colormasks = colormasks;
         } else {
 #ifndef TEXTCOLOR
             color_and_attr = (color_and_attr & ~0x00FF) | NO_COLOR;
@@ -204,19 +205,13 @@ unsigned long *colormasks;
             }
         }
     } else { /* BL_FLUSH */
-        if (!changed_fields && !g.context.botlx) {
-            ; /* TODO:  this isn't impossible but we want to track
-               * down the circumstances where it happens in order to
-               * minimize occurrences */
-        }
-        draw_status(colormasks);
+        draw_status();
         changed_fields = 0;
     }
 }
 
-void
-draw_status(colormasks)
-unsigned long *colormasks;
+static void
+draw_status()
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
     int orient = curses_get_window_orientation(STATUS_WIN);
@@ -242,9 +237,9 @@ unsigned long *colormasks;
 
     werase(win);
     if (horiz)
-        draw_horizontal(border, colormasks);
+        draw_horizontal(border);
     else
-        draw_vertical(border, colormasks);
+        draw_vertical(border);
 
     if (border)
         box(win, 0, 0);
@@ -252,10 +247,9 @@ unsigned long *colormasks;
 }
 
 /* horizontal layout on 2 or 3 lines */
-void
-draw_horizontal(border, colormasks)
+static void
+draw_horizontal(border)
 boolean border;
-unsigned long *colormasks;
 {
 #define blPAD BL_FLUSH
     /* almost all fields already come with a leading space;
@@ -343,7 +337,7 @@ unsigned long *colormasks;
     /* collect active conditions in cbuf[], space separated, suitable
        for direct output if no highlighting is requested ('asis') but
        primarily used to measure the length */
-    curs_stat_conds(0, &x, &y, colormasks, cbuf, &asis);
+    curs_stat_conds(0, &x, &y, cbuf, &asis);
     clen = (int) strlen(cbuf);
 
     cap_and_hunger = 0;
@@ -640,8 +634,7 @@ unsigned long *colormasks;
                     if (asis)
                         waddstr(win, cbuf);
                     else /* cond by cond if any cond specifies highlighting */
-                        curs_stat_conds(0, &x, &y, colormasks,
-                                        (char *) 0, (boolean *) 0);
+                        curs_stat_conds(0, &x, &y, (char *) 0, (boolean *) 0);
                 } /* curses_condition_bits */
             } /* hitpointbar vs regular field vs conditions */
         } /* i (fld) */
@@ -651,10 +644,9 @@ unsigned long *colormasks;
 }
 
 /* vertical layout, to left or right of map */
-void
-draw_vertical(border, colormasks)
+static void
+draw_vertical(border)
 boolean border;
-unsigned long *colormasks;
 {
     /* for blank lines, the digit prefix is the order in which they get
        removed if we need to shrink to fit within height limit (very rare) */
@@ -893,8 +885,7 @@ unsigned long *colormasks;
             if (cond_count) {
                 /* output active conditions, three per line;
                    cursor is already positioned where they should start */
-                curs_stat_conds(1, &x, &y, colormasks,
-                                (char *) 0, (boolean *) 0);
+                curs_stat_conds(1, &x, &y, (char *) 0, (boolean *) 0);
             }
         } /* hitpointbar vs regular field vs conditions */
     } /* fld loop */
@@ -971,7 +962,6 @@ extern const struct condmap valid_conditions[]; /* botl.c */
 static void
 curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                 int *x, int *y,  /* real for vertical, ignored otherwise */
-                unsigned long *colormasks, /* input */
                 char *condbuf, /* optional output; collect string of conds */
                 boolean *nohilite) /* optional output; indicates whether -*/
 {                                  /*+ condbuf[] could be used as-is      */
@@ -994,8 +984,8 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                 Strcpy(condnam, valid_conditions[i].id);
                 Strcat(strcat(condbuf, " "), upstart(condnam));
                 if (nohilite && *nohilite
-                    && (condcolor(bitmsk, colormasks) != NO_COLOR
-                        || condattr(bitmsk, colormasks) != 0))
+                    && (condcolor(bitmsk, curses_colormasks) != NO_COLOR
+                        || condattr(bitmsk, curses_colormasks) != 0))
                     *nohilite = FALSE;
             }
         }
@@ -1034,12 +1024,14 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                 if (!do_vert || (vert_cond % 3) != 1)
                     waddch(win, ' ');
                 if (iflags.hilite_delta) {
-                    if ((attrmask = condattr(bitmsk, colormasks)) != 0) {
+                    if ((attrmask = condattr(bitmsk, curses_colormasks))
+                        != 0) {
                         attrmask = nhattr2curses(attrmask);
                         wattron(win, attrmask);
                     }
 #ifdef TEXTCOLOR
-                    if ((color = condcolor(bitmsk, colormasks)) != NO_COLOR)
+                    if ((color = condcolor(bitmsk, curses_colormasks))
+                        != NO_COLOR)
                         curses_toggle_color_attr(win, color, NONE, ON);
 #endif
                 }

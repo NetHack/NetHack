@@ -220,6 +220,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* valset */
     0, /* bl_hilite_moves */
     UNDEFINED_VALUES, /* cond_hilites */
+    0, /* now_or_before_idx */
 
     /* cmd.c */
     UNDEFINED_VALUES, /* Cmd */

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.285 $ $NHDT-Date: 1553653612 2019/03/27 02:26:52 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.296 $ $NHDT-Date: 1554136021 2019/04/01 16:27:01 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -398,6 +398,14 @@ avoid spurious status refresh when hero gains experience while 'showexp' and
 	'showscore' options are off
 using Cleaver to attack a worm tail segment but kill adjacent head first would
 	result in an impossible warning from cutworm
+Valkyrie quest was supposed to have a 50:50 chance that northern drawbridge
+	would be raised, but both were always lowered; chances now are: both
+	lowered: 3/8, S down+N up: 3/8, N down+S up: 1/8, both raised: 1/8
+shorten the getpos prompt for teleport destination so that it won't yield a
+	--More-- prompt for the help hint (--More-- still possible when riding)
+once a status highlight for a temporary rule ('up', 'down', 'changed') timed
+	out, further spurious status updates (evaluating all fields) would
+	occur every 'statushilites' turns even if no fields had changed
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -478,9 +486,22 @@ tty: fix leftover display artifact when the last field on the row got placed
 	to the left of where it was previously due to it, or one of the fields
 	to its left, getting shorter
 tty: support hitpointbar even when statushilites is set to 0
+tty: when status condition names were abbreviated due to lack of room, they
+	were inconsistent about re-expanding when more room became available
+tty: when encumbrance state was abbreviated due to lack of room, there was no
+	separation from preceding status field and the value would not update
+	when the state changed (except for removal on change to unencumbered)
+tty: when clipping was used to show a subset of the map on a small display,
+	panning into a new subset while using the cursor to pick a location
+	would ask the core to generate a new view of the map rather than use
+	whatever was currently shown, bringing back suppressed monsters/
+	objects/traps for #terrain and new hallucinatory monsters for farlook
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
 X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
+X11: make use of the 'extmenu' option:  On to choose among all commands, Off
+	to choose among the traditional extended command subset
+X11: support menu scrolling via (^ < > |) in the extended commands menu
 curses: catch up with tty to not put dolook/whatis autodescribe feedback into
 	^P message recall (multi-digit count feedback was already handled)
 curses: if the interface code ran out of memory, it would crash rather than
@@ -508,6 +529,12 @@ curses: the memory deallocation was releasing previous messages when curses
 curses: popup window to show ^P output was removed from screen but never
 	deleted; further ^P's repeated that cycle; likewise for help which
 	displays an external text file
+curses: preserve ^P message history across save/restore
+curses: highlighting of status conditions was broken by the fix for timing out
+	of temporary highlights setting off unnecessary status updates
+curses: if player pressed ESC at More>> prompt to suppress remaining messages
+	for the current move and then hero got another move on the same turn,
+	messages and most prompts would stay suppressed during that extra move
 vms: add compile of isaac64.c to Makefile.src and vmsbuild.com
 vms+curses: add compile support but it is known to fail to build
 
@@ -588,7 +615,7 @@ windows-tty: add support for mouse_support:0 (disabled), mouse_support:1
 X11: implement menucolors and allow menus to obey some attributes
 X11: make key translations work with menus on Linux
 X11: allow mouse wheel scrolling to work in menus by default
-X11: handle paged menu control keys
+X11: handle menu scrolling via first-/previous-/next-/last-page keys (^ < > |)
 X11: remember perm_invent window geometry
 X11: handle X errors via panic
 X11: don't reuse perm_invent window for picking an object
@@ -646,10 +673,13 @@ in wizard mode, ^T can be preceded by 'm' prefix in order to test teleporting
 include isaac64 for pseudo random number generation
 core prng and display prng use different contexts
 when healing magic other than unicorn horn cures blindness, cure deafness too
+do less status updating when the 'time' option is on
 curses: status display substantially revamped for both horizontal (via
 	'align_status:bottom' or 'top') and vertical (via 'align_status:left'
 	or 'right'); 3-line horizontal layout (via 'statuslines:3') added
 curses: support msg_window:full; default is still msg_window:reversed
+tty: support statuslines:3 and dynamically switching between 2 and 3 with 'O'
+	(requires a display with at least 25 lines or that CLIPPING be enabled)
 
 
 NetHack Community Patches (or Variation) Included
