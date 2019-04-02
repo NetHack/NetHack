@@ -1,4 +1,4 @@
-/* NetHack 3.6	mttymain.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	mttymain.c	$NHDT-Date: 1554215928 2019/04/02 14:38:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Jon W{tte, 1993					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 
@@ -367,6 +367,13 @@ _mt_set_colors(long *colors)
     }
     err = set_tty_attrib(_mt_window, TTY_ATTRIB_FOREGROUND, colors[0]);
     err = set_tty_attrib(_mt_window, TTY_ATTRIB_BACKGROUND, colors[1]);
+}
+
+int
+term_attr_fixup(int attrmask)
+{
+    attrmask &= ~ATR_DIM;
+    return attrmask;
 }
 
 void

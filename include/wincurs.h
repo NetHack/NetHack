@@ -182,6 +182,7 @@ extern void curses_add_nhmenu_item(winid wid, int glyph,
                                    const ANY_P *identifier, CHAR_P accelerator,
                                    CHAR_P group_accel, int attr,
                                    const char *str, BOOLEAN_P presel);
+extern void curs_menu_set_bottom_heavy(winid);
 extern void curses_finalize_nhmenu(winid wid, const char *prompt);
 extern int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected);
 extern boolean curses_menu_exists(winid wid);

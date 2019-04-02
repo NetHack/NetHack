@@ -313,6 +313,8 @@ curses_prev_mesg()
                         "[No past messages available.]", FALSE);
 
     curses_end_menu(wid, "");
+    if (!do_lifo)
+        curs_menu_set_bottom_heavy(wid);
     curses_select_menu(wid, PICK_NONE, &selected);
     curses_del_wid(wid);
 }
