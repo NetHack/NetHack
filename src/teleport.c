@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1550524567 2019/02/18 21:16:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1553885439 2019/03/29 18:50:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -478,7 +478,7 @@ struct obj *scroll;
             Strcpy(whobuf, "you");
             if (u.usteed)
                 Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
-            pline("To what position do %s want to be teleported?", whobuf);
+            pline("Where do %s want to be teleported?", whobuf);
             cc.x = u.ux;
             cc.y = u.uy;
             if (getpos(&cc, TRUE, "the desired position") < 0)

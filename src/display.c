@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1551138503 2019/02/25 23:48:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1554045810 2019/03/31 15:23:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1213,8 +1213,7 @@ int mode;
     }
 }
 
-/* =========================================================================
- */
+/* ======================================================================== */
 
 /*
  * Loop through all of the monsters and update them.  Called when:
@@ -1380,10 +1379,39 @@ docrt()
     context.botlx = 1; /* force a redraw of the bottom line */
 }
 
-/* =========================================================================
- */
-/* Glyph Buffering (3rd screen) ============================================
- */
+/* for panning beyond a clipped region; resend the current map data to
+   the interface rather than use docrt()'s regeneration of that data */
+void
+redraw_map()
+{
+    int x, y, glyph;
+
+    /*
+     * Not sure whether this is actually necessary; save and restore did
+     * used to get much too involved with each dungeon level as it was
+     * read and written.
+     *
+     * !u.ux: display isn't ready yet; (restoring || !on_level()): was part
+     * of cliparound() but interface shouldn't access this much internals
+     */
+    if (!u.ux || restoring || !on_level(&u.uz0, &u.uz))
+        return;
+
+    /*
+     * This yields sensible clipping when #terrain+getpos is in
+     * progress and the screen displays something other than what
+     * the map would currently be showing.
+     */
+    for (y = 0; y < ROWNO; ++y)
+        for (x = 1; x < COLNO; ++x) {
+            glyph = glyph_at(x, y); /* not levl[x][y].glyph */
+            print_glyph(WIN_MAP, x, y, glyph, get_bk_glyph(x, y));
+        }
+    flush_screen(1);
+}
+
+/* ======================================================================== */
+/* Glyph Buffering (3rd screen) =========================================== */
 
 typedef struct {
     xchar new; /* perhaps move this bit into the rm structure. */
@@ -1536,7 +1564,7 @@ int start, stop, y;
 
     for (x = start; x <= stop; x++)
         if (gbuf[y][x].glyph != cmap_to_glyph(S_stone))
-            print_glyph(WIN_MAP, x, y, gbuf[y][x].glyph, get_bk_glyph(x,y));
+            print_glyph(WIN_MAP, x, y, gbuf[y][x].glyph, get_bk_glyph(x, y));
 }
 
 void
@@ -1597,10 +1625,11 @@ int cursor_on_u;
     flushing = 0;
     if (context.botl || context.botlx)
         bot();
+    else if (iflags.time_botl)
+        timebot();
 }
 
-/* =========================================================================
- */
+/* ======================================================================== */
 
 /*
  * back_to_glyph()
@@ -1804,16 +1833,19 @@ xchar x, y;
 
 /*
  * This will be used to get the glyph for the background so that
- * it can potentially be merged into graphical window ports
- * to improve the appearance of stuff on dark room
- * squares and the plane of air etc.
+ * it can potentially be merged into graphical window ports to
+ * improve the appearance of stuff on dark room squares and the
+ * plane of air etc.
  *
  * Until that is working correctly in the branch, however, for now
  * we just return NO_GLYPH as an indicator to ignore it.
+ *
+ * [This should be using background as recorded for #overview rather
+ * than current data from the map.]
  */
 
 STATIC_OVL int
-get_bk_glyph(x,y)
+get_bk_glyph(x, y)
 xchar x, y;
 {
     int idx, bkglyph = NO_GLYPH;

@@ -17,6 +17,8 @@
 #define strncasecmp strncmpi
 #endif
 
+extern long curs_mesg_suppress_turn; /* from cursmesg.c */
+
 /*
  * Note:
  *
@@ -120,6 +122,10 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
     int height = prompt_height;
     char input[BUFSZ];
 
+    /* if messages were being suppressed for the remainder of the turn,
+       re-activate them now that input is being requested */
+    curs_mesg_suppress_turn = -1;
+
     if (buffer >= (int) sizeof input)
          buffer = (int) sizeof input - 1;
     maxwidth = term_cols - 2;
@@ -200,6 +206,10 @@ curses_character_input_dialog(const char *prompt, const char *choices,
     int prompt_height = 1;
     boolean any_choice = FALSE;
     boolean accept_count = FALSE;
+
+    /* if messages were being suppressed for the remainder of the turn,
+       re-activate them now that input is being requested */
+    curs_mesg_suppress_turn = -1;
 
     if (invent || (moves > 1)) {
         curses_get_window_size(MAP_WIN, &map_height, &map_width);

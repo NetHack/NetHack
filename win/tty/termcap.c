@@ -1,4 +1,4 @@
-/* NetHack 3.6	termcap.c	$NHDT-Date: 1456907853 2016/03/02 08:37:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	termcap.c	$NHDT-Date: 1553858473 2019/03/29 11:21:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1206,12 +1206,37 @@ int n;
     return nulstr;
 }
 
+/* suppress nonfunctional highlights so render_status() might be able to
+   optimize more; keep this in sync with s_atr2str() */
+int
+term_attr_fixup(msk)
+int msk;
+{
+    /* underline is converted to bold if its start sequence isn't available */
+    if ((msk & (1 << ATR_ULINE)) && !nh_US) {
+        msk |= (1 << ATR_BOLD);
+        msk &= ~(1 << ATR_ULINE);
+    }
+    /* blink is converted to bold unconditionally [why?] */
+    if (msk & (1 << ATR_BLINK)) {
+        msk |= (1 << ATR_BOLD);
+        msk &= ~(1 << ATR_BLINK);
+    }
+    /* dim is ignored */
+    if (msk & (1 << ATR_DIM))
+        msk &= ~(1 << ATR_DIM);
+    return msk;
+}
+
 void
 term_start_attr(attr)
 int attr;
 {
     if (attr) {
-        xputs(s_atr2str(attr));
+        const char *astr = s_atr2str(attr);
+
+        if (*astr)
+            xputs(s_atr2str(attr));
     }
 }
 
@@ -1220,7 +1245,10 @@ term_end_attr(attr)
 int attr;
 {
     if (attr) {
-        xputs(e_atr2str(attr));
+        const char *astr = e_atr2str(attr);
+
+        if (*astr)
+            xputs(e_atr2str(attr));
     }
 }
 
@@ -1248,7 +1276,8 @@ void
 term_start_color(color)
 int color;
 {
-    xputs(hilites[color]);
+    if (color < CLR_MAX)
+        xputs(hilites[color]);
 }
 
 /* not to be confused with has_colors() in unixtty.c */

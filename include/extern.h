@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1552945074 2019/03/18 21:37:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.695 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1554045807 2019/03/31 15:23:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.697 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -159,6 +159,7 @@ E long NDECL(botl_score);
 E int FDECL(describe_level, (char *));
 E const char *FDECL(rank_of, (int, SHORT_P, BOOLEAN_P));
 E void NDECL(bot);
+E void NDECL(timebot);
 E void FDECL(status_initialize, (BOOLEAN_P));
 E void NDECL(status_finish);
 E void FDECL(status_notify_windowport, (BOOLEAN_P));
@@ -351,6 +352,7 @@ E void NDECL(see_traps);
 E void NDECL(curs_on_u);
 E int NDECL(doredraw);
 E void NDECL(docrt);
+E void NDECL(redraw_map);
 E void FDECL(show_glyph, (int, int, int));
 E void NDECL(clear_glyph_buffer);
 E void FDECL(row_refresh, (int, int, int));

@@ -9,6 +9,10 @@
 #include "cursmesg.h"
 #include <ctype.h>
 
+/* player can type ESC at More>> prompt to avoid seeing more messages
+   for the current move; but hero might get more than one move per turn,
+   so the input routines need to be able to cancel this */
+long curs_mesg_suppress_turn = -1; /* also used in cursdial.c && cursmain.c */
 
 /* Message window routines for curses interface */
 
@@ -46,16 +50,13 @@ curses_message_win_puts(const char *message, boolean recursed)
     boolean border = curses_window_has_border(MESSAGE_WIN);
     int message_length = strlen(message);
     int border_space = 0;
-    static long suppress_turn = -1;
 
-#if 1
+#if 0
     /*
-     * Handled by core's use of putstr(WIN_MESSAGE,ATR_NOHISTORY,message)
-     * for intermediate counts, but get_count() also uses putmsghistory()
-     * for the final count, to remember that without showing it.  But
-     * curses is using genl_putmsghistory() which just delivers the text
-     * via a normal pline().  This hides that at cost of not having it
-     * in ^P recall and being out of sync with DUMPLOG's message history.
+     * This was useful when curses used genl_putmsghistory() but is not
+     * needed now that it has its own curses_putmsghistory() that's
+     * capable of putting something into the ^P recall history without
+     * displaying it at the same time.
      */
     if (strncmp("Count:", message, 6) == 0) {
         curses_count_window(message);
@@ -63,8 +64,8 @@ curses_message_win_puts(const char *message, boolean recursed)
     }
 #endif
 
-    if (suppress_turn == moves) {
-        return;
+    if (curs_mesg_suppress_turn == moves) {
+        return; /* user has typed ESC to avoid seeing remaining messages. */
     }
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
@@ -105,7 +106,7 @@ curses_message_win_puts(const char *message, boolean recursed)
                 /* Pause until key is hit - Esc suppresses any further
                    messages that turn */
                 if (curses_more() == '\033') {
-                    suppress_turn = moves;
+                    curs_mesg_suppress_turn = moves;
                     return;
                 }
             } else {
@@ -155,6 +156,9 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
     int height, width, ret = 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     const char *resp = " \r\n\033"; /* space, enter, esc */
+
+    /* if messages are being suppressed, reenable them */
+    curs_mesg_suppress_turn = -1;
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     curses_toggle_color_attr(win, MORECOLOR, NONE, ON);
@@ -691,6 +695,101 @@ get_msg_line(boolean reverse, int mindex)
         }
     }
     return current_mesg;
+}
+
+/* save/restore code retrieves one ^P message at a time during save and
+   puts it into save file; if any new messages are added to the list while
+   that is taking place, the results are likely to be scrambled */
+char *
+curses_getmsghistory(init)
+boolean init;
+{
+    static int nxtidx;
+    nhprev_mesg *mesg;
+
+    if (init)
+        nxtidx = 0;
+    else
+        ++nxtidx;
+
+    if (nxtidx < num_messages) {
+        /* we could encode mesg->turn with the text of the message,
+           but then that text might need to be truncated, and more
+           significantly, restoring the save file with another
+           interface wouldn't know how find and decode or remove it;
+           likewise, restoring another interface's save file with
+           curses wouldn't find the expected turn info;
+           so, we live without that */
+        mesg = get_msg_line(FALSE, nxtidx);
+    } else
+        mesg = (nhprev_mesg *) 0;
+
+    return mesg ? mesg->str : (char *) 0;
+}
+
+/*
+ * This is called by the core savefile restore routines.
+ * Each time we are called, we stuff the string into our message
+ * history recall buffer. The core will send the oldest message
+ * first (actually it sends them in the order they exist in the
+ * save file, but that is supposed to be the oldest first).
+ * These messages get pushed behind any which have been issued
+ * during this session since they come from a previous session
+ * and logically precede anything (like "Restoring save file...")
+ * that's happened now.
+ *
+ * Called with a null pointer to finish up restoration.
+ *
+ * It's also called by the quest pager code when a block message
+ * has a one-line summary specified.  We put that line directly
+ * into message history for ^P recall without having displayed it.
+ */
+void
+curses_putmsghistory(msg, restoring_msghist)
+const char *msg;
+boolean restoring_msghist;
+{
+    static boolean initd = FALSE;
+    static int stash_count;
+    static nhprev_mesg *stash_head = 0;
+
+    if (restoring_msghist && !initd) {
+        /* hide any messages we've gathered since starting current session
+           so that the ^P data will start out empty as we add ones being
+           restored from save file; we'll put these back after that's done */
+        stash_count = num_messages, num_messages = 0;
+        stash_head = first_mesg, first_mesg = (nhprev_mesg *) 0;
+        last_mesg = (nhprev_mesg *) 0; /* no need to remember the tail */
+        initd = TRUE;
+    }
+
+    if (msg) {
+        mesg_add_line(msg);
+        /* treat all saved and restored messages as turn #1 */
+        last_mesg->turn = 1L;
+    } else if (stash_count) {
+        nhprev_mesg *mesg;
+        long mesg_turn;
+
+        /* put any messages generated during the beginning of the current
+           session back; they logically follow any from the previous
+           session's save file */
+        while (stash_count > 0) {
+            /* we could manipulate the linked list directly but treating
+               stashed messages as newly occurring ones is much simpler;
+               we ignore the backlinks because the list is destroyed as it
+               gets processed hence there can't be any other traversals */
+            mesg = stash_head;
+            stash_head = mesg->next_mesg;
+            --stash_count;
+            mesg_turn = mesg->turn;
+            mesg_add_line(mesg->str);
+            last_mesg->turn = mesg_turn;
+            free((genericptr_t) mesg->str);
+            free((genericptr_t) mesg);
+        }
+        initd = FALSE; /* reset */
+    }
 }
 
 /*cursmesg.c*/

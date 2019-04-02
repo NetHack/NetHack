@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1553480404 2019/03/25 02:20:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.360 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1554155747 2019/04/01 21:55:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.362 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -114,7 +114,7 @@ static struct Bool_Opt {
     { "confirm", &flags.confirm, TRUE, SET_IN_GAME },
     { "dark_room", &flags.dark_room, TRUE, SET_IN_GAME },
     { "eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_GAME }, /*WC*/
-#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS) || defined(X11_GRAPHICS)
     { "extmenu", &iflags.extmenu, FALSE, SET_IN_GAME },
 #else
     { "extmenu", (boolean *) 0, FALSE, SET_IN_FILE },
@@ -385,20 +385,23 @@ static struct Comp_Opt {
 #ifdef MSDOS
     { "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
-#ifdef STATUS_HILITES
     { "statushilites",
+#ifdef STATUS_HILITES
       "0=no status highlighting, N=show highlights for N turns",
-      20, SET_IN_GAME },
+      20, SET_IN_GAME
 #else
-    { "statushilites", "highlight control", 20, SET_IN_FILE },
+    "highlight control", 20, SET_IN_FILE
 #endif
-#ifdef CURSES_GRAPHICS
+    },
     { "statuslines",
+#ifdef CURSES_GRAPHICS
       "2 or 3 lines for horizonal (bottom or top) status display",
-      20, SET_IN_GAME }, /*WC2*/
+      20, SET_IN_GAME
 #else
-    { "statuslines", "2 or 3 lines for status display", 20, SET_IN_FILE },
+      "2 or 3 lines for status display",
+      20, SET_IN_FILE
 #endif
+    }, /*WC2*/
     { "symset", "load a set of display symbols from the symbols file", 70,
       SET_IN_GAME },
     { "roguesymset",
@@ -3703,6 +3706,7 @@ boolean tinitial, tfrom_file;
         }
         return retval;
     }
+#endif /* CURSES_GRAPHICS */
 
     /* WINCAP2
      * statuslines:n */
@@ -3728,7 +3732,6 @@ boolean tinitial, tfrom_file;
         }
         return retval;
     }
-#endif /* CURSES_GRAPHICS */
 
     /* menustyle:traditional or combination or full or partial */
     fullname = "menustyle";
@@ -5739,8 +5742,9 @@ char *buf;
                     iflags.hilite_delta, iflags.hilite_delta);
 #endif
     } else if (!strcmp(optname,"statuslines")) {
-        Strcpy(buf, (WINDOWPORT("curses")
-                     && iflags.wc2_statuslines < 3) ? "2" : "3");
+        if (wc2_supported(optname))
+            Strcpy(buf, (iflags.wc2_statuslines < 3) ? "2" : "3");
+        /* else default to "unknown" */
     } else if (!strcmp(optname, "suppress_alert")) {
         if (flags.suppress_alert == 0L)
             Strcpy(buf, none);
