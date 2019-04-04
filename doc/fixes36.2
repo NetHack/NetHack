@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.296 $ $NHDT-Date: 1554136021 2019/04/01 16:27:01 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.297 $ $NHDT-Date: 1554411130 2019/04/04 20:52:10 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -535,6 +535,7 @@ curses: highlighting of status conditions was broken by the fix for timing out
 curses: if player pressed ESC at More>> prompt to suppress remaining messages
 	for the current move and then hero got another move on the same turn,
 	messages and most prompts would stay suppressed during that extra move
+curses: don't let MSGTYPE=hide block prompts from being shown
 vms: add compile of isaac64.c to Makefile.src and vmsbuild.com
 vms+curses: add compile support but it is known to fail to build
 
