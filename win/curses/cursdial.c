@@ -276,7 +276,9 @@ curses_character_input_dialog(const char *prompt, const char *choices,
 
         wrefresh(askwin);
     } else {
-        pline("%s", askstr);
+        /* TODO: add SUPPRESS_HISTORY flag, then after getting a response,
+           append it and use put_msghistory() on combined prompt+answer */
+        custompline(OVERRIDE_MSGTYPE, "%s", askstr);
         curs_set(1);
     }
 
@@ -348,7 +350,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         /* Kludge to make prompt visible after window is dismissed
            when inputting a number */
         if (digit(answer)) {
-            pline("%s", askstr);
+            custompline(OVERRIDE_MSGTYPE, "%s", askstr);
             curs_set(1);
         }
 
@@ -403,7 +405,7 @@ curses_ext_cmd()
         extwin = newwin(1, messagew - 2, winy, winx);
         if (messagew - 4 < maxlen)
             maxlen = messagew - 4;
-        pline("#");
+        custompline(OVERRIDE_MSGTYPE, "#");
     }
 
     cur_choice[0] = '\0';
