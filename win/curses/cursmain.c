@@ -232,6 +232,7 @@ curses_get_nh_event()
 
     if (do_reset) {
         getmaxyx(base_term, term_rows, term_cols);
+        curses_got_input(); /* reset More>> */
         /* status_initialize, create_main_windows, last_messages, doredraw */
         curs_reset_windows(TRUE, TRUE);
     }
@@ -688,9 +689,6 @@ int
 curses_nhgetch()
 {
     int ch;
-
-    /* if messages are being suppressed, reenable them */
-    curs_mesg_suppress_turn = -1;
 
     curses_prehousekeeping();
     ch = curses_read_char();
