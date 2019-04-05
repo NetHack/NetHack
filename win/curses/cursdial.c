@@ -17,8 +17,6 @@
 #define strncasecmp strncmpi
 #endif
 
-extern long curs_mesg_suppress_turn; /* from cursmesg.c */
-
 /*
  * Note:
  *
@@ -127,7 +125,7 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
 
     /* if messages were being suppressed for the remainder of the turn,
        re-activate them now that input is being requested */
-    curs_mesg_suppress_turn = -1;
+    curses_got_input();
 
     if (buffer >= (int) sizeof input)
          buffer = (int) sizeof input - 1;
@@ -212,7 +210,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
 
     /* if messages were being suppressed for the remainder of the turn,
        re-activate them now that input is being requested */
-    curs_mesg_suppress_turn = -1;
+    curses_got_input();
 
     if (g.invent || (g.moves > 1)) {
         curses_get_window_size(MAP_WIN, &map_height, &map_width);
@@ -276,7 +274,9 @@ curses_character_input_dialog(const char *prompt, const char *choices,
 
         wrefresh(askwin);
     } else {
-        pline("%s", askstr);
+        /* TODO: add SUPPRESS_HISTORY flag, then after getting a response,
+           append it and use put_msghistory() on combined prompt+answer */
+        custompline(OVERRIDE_MSGTYPE, "%s", askstr);
         curs_set(1);
     }
 
@@ -348,7 +348,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         /* Kludge to make prompt visible after window is dismissed
            when inputting a number */
         if (digit(answer)) {
-            pline("%s", askstr);
+            custompline(OVERRIDE_MSGTYPE, "%s", askstr);
             curs_set(1);
         }
 
@@ -403,7 +403,7 @@ curses_ext_cmd()
         extwin = newwin(1, messagew - 2, winy, winx);
         if (messagew - 4 < maxlen)
             maxlen = messagew - 4;
-        pline("#");
+        custompline(OVERRIDE_MSGTYPE, "#");
     }
 
     cur_choice[0] = '\0';

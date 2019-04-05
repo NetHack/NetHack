@@ -9,10 +9,14 @@
 #include "cursmesg.h"
 #include <ctype.h>
 
+/*
+ * Note: references to "More>>" mean ">>", the curses rendition of "--More--".
+ */
+
 /* player can type ESC at More>> prompt to avoid seeing more messages
    for the current move; but hero might get more than one move per turn,
    so the input routines need to be able to cancel this */
-long curs_mesg_suppress_turn = -1; /* also used in cursdial.c && cursmain.c */
+long curs_mesg_suppress_turn = -1;
 
 /* Message window routines for curses interface */
 
@@ -31,30 +35,30 @@ static void directional_scroll(winid wid, int nlines);
 static void mesg_add_line(const char *mline);
 static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
 
-static int turn_lines = 1;
+static int turn_lines = 0;
 static int mx = 0;
 static int my = 0;              /* message window text location */
 static nhprev_mesg *first_mesg = NULL;
 static nhprev_mesg *last_mesg = NULL;
 static int max_messages;
 static int num_messages = 0;
+static int last_messages = 0;
 
 /* Write string to the message window.  Attributes set by calling function. */
 
 void
 curses_message_win_puts(const char *message, boolean recursed)
 {
-    int height, width, linespace;
+    int height, width, border_space, linespace;
     char *tmpstr;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
-    boolean border = curses_window_has_border(MESSAGE_WIN);
-    int message_length = strlen(message);
-    int border_space = 0;
+    boolean bold, border = curses_window_has_border(MESSAGE_WIN);
+    int message_length = (int) strlen(message);
 
 #if 0
     /*
      * This was useful when curses used genl_putmsghistory() but is not
-     * needed now that it has its own curses_putmsghistory() that's
+     * needed now that it has its own curses_putmsghistory() which is
      * capable of putting something into the ^P recall history without
      * displaying it at the same time.
      */
@@ -69,17 +73,11 @@ curses_message_win_puts(const char *message, boolean recursed)
     }
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
-    if (border) {
-        border_space = 1;
-        if (mx < 1) {
-            mx = 1;
-        }
-        if (my < 1) {
-            my = 1;
-        }
-    }
-
-    linespace = ((width + border_space) - 3) - mx;
+    border_space = (border ? 1 : 0);
+    if (mx < border_space)
+        mx = border_space;
+    if (my < border_space)
+        my = border_space;
 
     if (strcmp(message, "#") == 0) {    /* Extended command or Count: */
         if ((strcmp(g.toplines, "#") != 0)
@@ -90,7 +88,6 @@ curses_message_win_puts(const char *message, boolean recursed)
             my--;
             strcpy(g.toplines, message);
         }
-
         return;
     }
 
@@ -99,88 +96,142 @@ curses_message_win_puts(const char *message, boolean recursed)
         mesg_add_line(message);
     }
 
+    linespace = width - 3 - (mx - border_space);
+
     if (linespace < message_length) {
-        if (my >= (height - 1 + border_space)) {
+        if (my - border_space >= height - 1) {
             /* bottom of message win */
-            if ((turn_lines > height) || (height == 1)) {
+            if (++turn_lines >= height) { /* || height == 1) */
                 /* Pause until key is hit - Esc suppresses any further
                    messages that turn */
                 if (curses_more() == '\033') {
                     curs_mesg_suppress_turn = g.moves;
                     return;
                 }
+                /* turn_lines reset to 0 by more()->block()->got_input() */
             } else {
                 scroll_window(MESSAGE_WIN);
-                turn_lines++;
             }
         } else {
             if (mx != border_space) {
                 my++;
                 mx = border_space;
+                ++turn_lines;
             }
         }
     }
 
-    if (height > 1) {
+    bold = (height > 1 && !last_messages);
+    if (bold)
         curses_toggle_color_attr(win, NONE, A_BOLD, ON);
-    }
 
-    if ((mx == border_space) && ((message_length + 2) > width)) {
+    /* will this message fit as-is or do we need to split it? */
+    if (mx == border_space && message_length > width - 2) {
+        /* split needed */
         tmpstr = curses_break_str(message, (width - 2), 1);
-        mvwprintw(win, my, mx, "%s", tmpstr);
-        mx += strlen(tmpstr);
-        if (strlen(tmpstr) < (size_t) (width - 2)) {
-            mx++;
-        }
+        mvwprintw(win, my, mx, "%s", tmpstr), mx += (int) strlen(tmpstr);
+        /* one space to separate first part of message from rest [is this
+           actually useful?] */
+        if (mx < width - 2)
+            ++mx;
         free(tmpstr);
-        if (height > 1) {
+        if (bold)
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
-        }
         tmpstr = curses_str_remainder(message, (width - 2), 1);
         curses_message_win_puts(tmpstr, TRUE);
         free(tmpstr);
     } else {
-        mvwprintw(win, my, mx, "%s", message);
-        curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
-        mx += message_length + 1;
+        mvwprintw(win, my, mx, "%s", message), mx += message_length;
+        /* two spaces to separate this message from next one if they happen
+           to fit on the same line; (FIXME:  it would be better if this was
+           done at start of next message rather than end of this one since
+           it impacts placement of "More>>") */
+        if (mx < width - 2) {
+            if (++mx < width - 2)
+                ++mx;
+        }
+        if (bold)
+            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
     }
     wrefresh(win);
 }
 
+void
+curses_got_input(void)
+{
+    /* if messages are being suppressed, reenable them */
+    curs_mesg_suppress_turn = -1;
+
+    /* misleadingly named; represents number of lines delivered since
+       player was sure to have had a chance to read them; if player
+       has just given input then there aren't any such lines right;
+       that includes responding to More>> even though it stays same turn */
+    turn_lines = 0;
+}
 
 int
 curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
                                 * = stop/alert else blocking because
                                 * window is full, so need to scroll after */
 {
-    int height, width, ret = 0;
+    static const char resp[] = " \r\n\033"; /* space, enter, esc */
+    static int prev_x = -1, prev_y = -1, blink = 0;
+    int height, width, moreattr, oldcrsr, ret = 0,
+        brdroffset = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
-    const char *resp = " \r\n\033"; /* space, enter, esc */
-
-    /* if messages are being suppressed, reenable them */
-    curs_mesg_suppress_turn = -1;
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
-    curses_toggle_color_attr(win, MORECOLOR, NONE, ON);
-    mvwprintw(win, my, mx, ">>");
-    curses_toggle_color_attr(win, MORECOLOR, NONE, OFF);
+    if (mx - brdroffset > width - 3) { /* -3: room for ">>_" */
+        if (my - brdroffset < height - 1)
+            ++my, mx = brdroffset;
+        else
+            mx = width - 3 + brdroffset;
+    }
+    /* if ">>" (--More--) is being rendered at the same spot as before,
+       toggle attributes so that the first '>' starts blinking if it wasn't
+       or stops blinking if it was */
+    if (mx == prev_x && my == prev_y) {
+        blink = 1 - blink;
+    } else {
+        prev_x = mx, prev_y = my;
+        blink = 0;
+    }
+    moreattr = !iflags.wc2_guicolor ? A_REVERSE : NONE;
+    curses_toggle_color_attr(win, MORECOLOR, moreattr, ON);
+    if (blink) {
+        wattron(win, A_BLINK);
+        mvwprintw(win, my, mx, ">"), mx += 1;
+        wattroff(win, A_BLINK);
+        waddstr(win, ">"), mx += 1;
+    } else {
+        mvwprintw(win, my, mx, ">>"), mx += 2;
+    }
+    curses_toggle_color_attr(win, MORECOLOR, moreattr, OFF);
     wrefresh(win);
-    /* msgtype=stop should require space/enter rather than
-     * just any key, as we want to prevent YASD from
-     * riding direction keys. */
-    while ((ret = wgetch(win)) != 0 && !index(resp, (char) ret))
-        continue;
+
+    /* cancel mesg suppression; all messages will have had chance to be read */
+    curses_got_input();
+
+    oldcrsr = curs_set(1);
+    do {
+        ret = wgetch(win);
+        if (ret == ERR || ret == '\0')
+            ret = '\n';
+        /* msgtype=stop should require space/enter rather than any key,
+           as we want to prevent YASD from direction keys. */
+    } while (!index(resp, (char) ret));
+    if (oldcrsr >= 0)
+        (void) curs_set(oldcrsr);
+
     if (height == 1) {
         curses_clear_unhighlight_message_window();
     } else {
-        mvwprintw(win, my, mx, "      ");
+        mx -= 2, mvwprintw(win, my, mx, "  "); /* back up and blank out ">>" */
         if (!noscroll) {
             scroll_window(MESSAGE_WIN);
-            turn_lines = 1;
         }
         wrefresh(win);
     }
-
     return ret;
 }
 
@@ -196,34 +247,25 @@ curses_more()
 void
 curses_clear_unhighlight_message_window()
 {
-    int mh, mw, count;
-    boolean border = curses_window_has_border(MESSAGE_WIN);
+    int mh, mw, count,
+        brdroffset = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
 
-    turn_lines = 1;
+    turn_lines = 0;
     curses_get_window_size(MESSAGE_WIN, &mh, &mw);
-
-    mx = 0;
-    if (border) {
-        mx++;
-    }
 
     if (mh == 1) {
         curses_clear_nhwin(MESSAGE_WIN);
+        mx = my = brdroffset;
     } else {
-        mx += mw;               /* Force new line on new turn */
+        mx = mw + brdroffset; /* Force new line on new turn */
 
-        if (border) {
-            for (count = 0; count < mh; count++) {
-                mvwchgat(win, count + 1, 1, mw, COLOR_PAIR(8), A_NORMAL, NULL);
-            }
-        } else {
-            for (count = 0; count < mh; count++) {
-                mvwchgat(win, count, 0, mw, COLOR_PAIR(8), A_NORMAL, NULL);
-            }
-        }
+        for (count = 0; count < mh; count++)
+            mvwchgat(win, count + brdroffset, brdroffset,
+                     mw, COLOR_PAIR(8), A_NORMAL, NULL);
         wnoutrefresh(win);
     }
+    wmove(win, my, mx);
 }
 
 
@@ -235,19 +277,23 @@ curses_last_messages()
 {
     boolean border = curses_window_has_border(MESSAGE_WIN);
     nhprev_mesg *mesg;
-    int i;
+    int i, j, height, width;
+
+    curses_get_window_size(MESSAGE_WIN, &height, &width);
 
     if (border)
         mx = my = 1;
     else
         mx = my = 0;
 
-    for (i = (num_messages - 1); i > 0; i--) {
+    ++last_messages;
+    for (j = 0, i = num_messages - 1; i > 0 && j < height; --i, ++j) {
         mesg = get_msg_line(TRUE, i);
         if (mesg && mesg->str && *mesg->str)
             curses_message_win_puts(mesg->str, TRUE);
     }
     curses_message_win_puts(g.toplines, TRUE);
+    --last_messages;
 }
 
 
@@ -402,7 +448,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     maxlines = buffer / width * 2;
     Strcpy(tmpbuf, prompt);
     Strcat(tmpbuf, " ");
-    nlines = curses_num_lines(tmpbuf,width);
+    nlines = curses_num_lines(tmpbuf, width);
     maxlines += nlines * 2;
     linestarts = (char **) alloc((unsigned) (maxlines * sizeof (char *)));
     p_answer = tmpbuf + strlen(tmpbuf);
@@ -463,6 +509,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         wmove(win, my, mx);
         curs_set(1);
         wrefresh(win);
+        curses_got_input(); /* despite its name, before rathre than after... */
 #ifdef PDCURSES
         ch = wgetch(win);
 #else
@@ -785,6 +832,7 @@ boolean restoring_msghist;
             --stash_count;
             mesg_turn = mesg->turn;
             mesg_add_line(mesg->str);
+            /* added line became new tail */
             last_mesg->turn = mesg_turn;
             free((genericptr_t) mesg->str);
             free((genericptr_t) mesg);
