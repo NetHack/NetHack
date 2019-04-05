@@ -42,6 +42,9 @@ curses_read_char()
 {
     int ch, tmpch;
 
+    /* cancel message suppression; all messages have had a chance to be read */
+    curses_got_input();
+
     ch = getch();
     tmpch = ch;
     ch = curses_convert_keys(ch);
