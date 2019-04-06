@@ -1272,7 +1272,7 @@ stat_cap_indx()
     int cap;
 
 #ifdef STATUS_HILITES
-    cap = blstats[now_or_before_idx][BL_CAP].a.a_int;
+    cap = g.blstats[g.now_or_before_idx][BL_CAP].a.a_int;
 #else
     cap = near_capacity();
 #endif
@@ -1287,7 +1287,7 @@ stat_hunger_indx()
     int uhs;
 
 #ifdef STATUS_HILITES
-    uhs = blstats[now_or_before_idx][BL_HUNGER].a.a_int;
+    uhs = g.blstats[g.now_or_before_idx][BL_HUNGER].a.a_int;
 #else
     uhs = (int) u.uhs;
 #endif
