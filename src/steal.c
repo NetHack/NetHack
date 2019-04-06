@@ -1,4 +1,4 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1496614914 2017/06/04 22:21:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	steal.c	$NHDT-Date: 1554580626 2019/04/06 19:57:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -693,7 +693,17 @@ struct monst *mon;
            for the other roles are not */
         if (obj_resists(obj, 0, 0) || is_quest_artifact(obj)) {
             obj_extract_self(obj);
-            mdrop_obj(mon, obj, FALSE);
+            if (mon->mx) {
+                mdrop_obj(mon, obj, FALSE);
+            } else { /* migrating monster not on map */
+                if (obj->owornmask) {
+                    mon->misc_worn_check &= ~obj->owornmask;
+                    if (obj->owornmask & W_WEP)
+                        setmnotwielded(mon, obj);
+                    obj->owornmask = 0L;
+                }
+                rloco(obj);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dog.c	$NHDT-Date: 1543052701 2018/11/24 09:45:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	dog.c	$NHDT-Date: 1554580624 2019/04/06 19:57:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,11 +6,6 @@
 #include "hack.h"
 
 STATIC_DCL int NDECL(pet_type);
-
-/* cloned from mon.c; used here if mon_arrive() can't place mon */
-#define LEVEL_SPECIFIC_NOCORPSE(mdat) \
-    (Is_rogue_level(&u.uz)            \
-     || (level.flags.graveyard && is_undead(mdat) && rn2(3)))
 
 void
 newedog(mtmp)
@@ -697,7 +692,8 @@ coord *cc;   /* optional destination coordinates */
         /* **** NOTE: worm is truncated to # segs = max wormno size **** */
         num_segs = min(cnt, MAX_NUM_WORMS - 1); /* used below */
         wormgone(mtmp); /* destroys tail and takes head off map */
-        place_monster(mtmp, mtmp->mx, mtmp->my); /* put head back for relmon */
+        /* there used to be a place_monster() here for the relmon() below,
+           but it doesn't require the monster to be on the map anymore */
     }
 
     /* set minvent's obj->no_charge to 0 */

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.298 $ $NHDT-Date: 1554425733 2019/04/05 00:55:33 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ $NHDT-Date: 1554580624 2019/04/06 19:57:04 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -406,6 +406,9 @@ shorten the getpos prompt for teleport destination so that it won't yield a
 once a status highlight for a temporary rule ('up', 'down', 'changed') timed
 	out, further spurious status updates (evaluating all fields) would
 	occur every 'statushilites' turns even if no fields had changed
+if a migrating long worm couldn't be placed, or some other monster was given
+	an existing long worm's place and it couldn't be put somewhere else,
+	a "trying to place monster at <0,0>" warning would occur
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
