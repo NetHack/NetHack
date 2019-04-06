@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1554538091 2019/04/06 08:08:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1554554180 2019/04/06 12:36:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1300,6 +1300,37 @@ struct istat_s *bl, *maxbl;
         result = 1;
 
     return result;
+}
+
+/* callback so that interface can get capacity index rather than trying
+   to reconstruct that from the encumbrance string or asking the general
+   core what the value is */
+int
+stat_cap_indx()
+{
+    int cap;
+
+#ifdef STATUS_HILITES
+    cap = blstats[now_or_before_idx][BL_CAP].a.a_int;
+#else
+    cap = near_capacity();
+#endif
+    return cap;
+}
+
+/* callback so that interface can get hunger index rather than trying to
+   reconstruct that from the hunger string or dipping into core internals */
+int
+stat_hunger_indx()
+{
+    int uhs;
+
+#ifdef STATUS_HILITES
+    uhs = blstats[now_or_before_idx][BL_HUNGER].a.a_int;
+#else
+    uhs = (int) u.uhs;
+#endif
+    return uhs;
 }
 
 /* used by X11 for "tty status" even when STATUS_HILITES is disabled */
