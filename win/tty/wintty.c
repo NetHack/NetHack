@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1553895321 2019/03/29 21:35:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1554554181 2019/04/06 12:36:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.201 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3704,7 +3704,7 @@ static int finalx[3][2];    /* [rows][NOW or BEFORE] */
 static boolean windowdata_init = FALSE;
 static int cond_shrinklvl = 0;
 static int enclev = 0, enc_shrinklvl = 0;
-/* static int dl_shrinklvl = 0; */
+static int dlvl_shrinklvl = 0;
 static boolean truncation_expected = FALSE;
 #define FORCE_RESET TRUE
 #define NO_RESET FALSE
@@ -3833,10 +3833,10 @@ int fldidx, chg UNUSED, percent, color;
 genericptr_t ptr;
 unsigned long *colormasks;
 {
-    int i, attrmask;
+    int attrmask;
     long *condptr = (long *) ptr;
     char *text = (char *) ptr;
-    char goldbuf[40], *fval, *lastchar, *p;
+    char goldbuf[40], *lastchar, *p;
     const char *fmt;
     boolean reset_state = NO_RESET;
 
@@ -3911,6 +3911,8 @@ unsigned long *colormasks;
         }
         break;
     case BL_LEVELDESC:
+        dlvl_shrinklvl = 0; /* caller is passing full length string */
+        /*FALLTHRU*/
     case BL_HUNGER:
         /* The core sends trailing blanks for some fields.
            Let's suppress the trailing blanks */
@@ -3934,20 +3936,8 @@ unsigned long *colormasks;
             tty_status[NOW][fldidx].lth -= (10 - 1);
         break;
     case BL_CAP:
-        fval = status_vals[fldidx];
-        enclev = 0;
-        if (*fval) {
-            /* TODO: replace this with a callback to the core to
-               retrieve the cap index directly */
-            if (*fval == ' ')
-                fval++;
-            for (i = 0; i < SIZE(encvals[0]); ++i) {
-                if (!strcmp(encvals[0][i], fval)) {
-                    enclev = i;
-                    break;              /* for */
-                }
-            }
-        }
+        enc_shrinklvl = 0; /* caller is passing full length string */
+        enclev = stat_cap_indx();
         break;
     }
     /* 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
@@ -3962,15 +3952,21 @@ boolean force_update;
     int rowsz[3], num_rows, condrow, otheroptions = 0;
 
     num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
-    condrow = num_rows - 1;
+    condrow = num_rows - 1; /* always last row, 1 for 0..1 or 2 for 0..2 */
     cond_shrinklvl = 0;
+    if (enc_shrinklvl > 0 && num_rows == 2)
+        shrink_enc(0);
+    if (dlvl_shrinklvl > 0)
+        shrink_dlvl(0);
     condsz = condition_size();
     for (trycnt = 0; trycnt < 6 && !fitting; ++trycnt) {
         /* FIXME: this remeasures each line every time even though it
            is only attempting to shrink one of them and the other one
            (or two) remains the same */
-        if (!check_fields(force_update, rowsz))
-            return 0;
+        if (!check_fields(force_update, rowsz)) {
+            fitting = 0;
+            break;
+        }
 
         requirement = rowsz[condrow] - 1;
         if (requirement <= wins[WIN_STATUS]->cols - 1) {
@@ -3986,22 +3982,21 @@ boolean force_update;
         }
         if (cond_shrinklvl >= 2) {
             /* We've exhausted the condition identifiers shrinkage,
-             * so let's try something other things...
+             * so let's try shrinking other things...
              */
             if (otheroptions < 2) {
                 /* try shrinking the encumbrance word, but
                    only when it's on the same line as conditions */
                 if (num_rows == 2)
                     shrink_enc(otheroptions + 1);
-                otheroptions++;
             } else if (otheroptions == 2) {
                 shrink_dlvl(1);
-                otheroptions++;
             } else {
                 /* Last resort - turn on trunction */
                 truncation_expected = TRUE;
-                otheroptions++;
+                break;
             }
+            ++otheroptions;
         }
     }
     return fitting;
@@ -4035,24 +4030,37 @@ int sz[3];
                 continue;
             if (!tty_status[NOW][idx].valid)
                 valid = FALSE;
-
+            /* might be called more than once for shrink tests, so need
+               to reset these (redraw and x at any rate) each time */
+            tty_status[NOW][idx].redraw = FALSE;
             tty_status[NOW][idx].y = row;
             tty_status[NOW][idx].x = col;
 
-            /* On a change to the field length, everything
-               further to the right must be updated as well */
-            if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth
-                || (idx == BL_CONDITION
-                    && tty_status[NOW][idx].x != tty_status[BEFORE][idx].x))
+            /* On a change to the field location, everything further
+               to the right must be updated as well.  (Not necessarily
+               everything; it's possible for complementary changes to
+               multiple fields to put stuff further right back in sync.) */
+            if (tty_status[NOW][idx].x + tty_status[NOW][idx].lth
+                != tty_status[BEFORE][idx].x + tty_status[BEFORE][idx].lth)
                 update_right = TRUE;
+            else if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth
+                     || tty_status[NOW][idx].x != tty_status[BEFORE][idx].x)
+                tty_status[NOW][idx].redraw = TRUE;
+            else /* in case update_right is set, we're back in sync now */
+                update_right = FALSE;
 
             matchprev = FALSE; /* assume failure */
-            if (valid && !update_right && !forcefields) {
+            if (valid && !update_right && !forcefields
+                && !tty_status[NOW][idx].redraw) {
                 /*
                  * Check values against those already on the display.
                  *  - Is the additional processing time for this worth it?
                  */
                 if (do_field_opt
+                    /* These color/attr checks aren't right for
+                       'condition'; is it safe to assume that same text
+                       means same highlighting for that field?  If not,
+                       we'd end up redrawing conditions every time. */
                     && (tty_status[NOW][idx].color
                         == tty_status[BEFORE][idx].color)
                     && (tty_status[NOW][idx].attr
@@ -4183,6 +4191,7 @@ int lvl;
     char *levval = index(status_vals[BL_LEVELDESC], ':');
 
     if (levval) {
+        dlvl_shrinklvl = lvl;
         Strcpy(buf, (lvl == 0) ? "Dlvl" : "Dl");
         Strcat(buf, levval);
         Strcpy(status_vals[BL_LEVELDESC], buf);
@@ -4269,35 +4278,35 @@ unsigned long *bmarray;
 }
 
 #define Begin_Attr(m) \
-    do {                                                                \
-        if (m) {                                                        \
-            if ((m) & HL_BOLD)                                          \
-                term_start_attr(ATR_BOLD);                              \
-            if ((m) & HL_INVERSE)                                       \
-                term_start_attr(ATR_INVERSE);                           \
-            if ((m) & HL_ULINE)                                         \
-                term_start_attr(ATR_ULINE);                             \
-            if ((m) & HL_BLINK)                                         \
-                term_start_attr(ATR_BLINK);                             \
-            if ((m) & HL_DIM)                                           \
-                term_start_attr(ATR_DIM);                               \
-        }                                                               \
+    do {                                        \
+        if (m) {                                \
+            if ((m) & HL_BOLD)                  \
+                term_start_attr(ATR_BOLD);      \
+            if ((m) & HL_INVERSE)               \
+                term_start_attr(ATR_INVERSE);   \
+            if ((m) & HL_ULINE)                 \
+                term_start_attr(ATR_ULINE);     \
+            if ((m) & HL_BLINK)                 \
+                term_start_attr(ATR_BLINK);     \
+            if ((m) & HL_DIM)                   \
+                term_start_attr(ATR_DIM);       \
+        }                                       \
     } while (0)
 
 #define End_Attr(m) \
-    do {                                                                \
-        if (m) {                                                        \
-            if ((m) & HL_DIM)                                           \
-                term_end_attr(ATR_DIM);                                 \
-            if ((m) & HL_BLINK)                                         \
-                term_end_attr(ATR_BLINK);                               \
-            if ((m) & HL_ULINE)                                         \
-                term_end_attr(ATR_ULINE);                               \
-            if ((m) & HL_INVERSE)                                       \
-                term_end_attr(ATR_INVERSE);                             \
-            if ((m) & HL_BOLD)                                          \
-                term_end_attr(ATR_BOLD);                                \
-        }                                                               \
+    do {                                        \
+        if (m) {                                \
+            if ((m) & HL_DIM)                   \
+                term_end_attr(ATR_DIM);         \
+            if ((m) & HL_BLINK)                 \
+                term_end_attr(ATR_BLINK);       \
+            if ((m) & HL_ULINE)                 \
+                term_end_attr(ATR_ULINE);       \
+            if ((m) & HL_INVERSE)               \
+                term_end_attr(ATR_INVERSE);     \
+            if ((m) & HL_BOLD)                  \
+                term_end_attr(ATR_BOLD);        \
+        }                                       \
     } while (0)
 
 STATIC_OVL void
