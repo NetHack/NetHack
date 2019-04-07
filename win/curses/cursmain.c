@@ -354,7 +354,8 @@ curses_destroy_nhwindow(winid wid)
         curses_teardown_messages(); /* discard ^P message history data */
         break;
     case STATUS_WIN:
-        curses_status_finish(); /* discard cached status data */
+        if (VIA_WINDOWPORT())
+            curses_status_finish(); /* discard cached status data */
         break;
     case INV_WIN:
         iflags.perm_invent = 0; /* avoid unexpected update_inventory() */

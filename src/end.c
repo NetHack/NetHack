@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1554045810 2019/03/31 15:23:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1554591224 2019/04/06 22:53:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1372,9 +1372,8 @@ int how;
         }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;
-#ifndef STATUS_HILITES
-        destroy_nhwindow(WIN_STATUS),  WIN_STATUS = WIN_ERR;
-#endif
+        if (WIN_STATUS != WIN_ERR)
+            destroy_nhwindow(WIN_STATUS),  WIN_STATUS = WIN_ERR;
         destroy_nhwindow(WIN_MESSAGE),  WIN_MESSAGE = WIN_ERR;
 
         if (!done_stopprint || flags.tombstone)
