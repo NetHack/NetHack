@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1543972194 2018/12/05 01:09:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.115 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1554591225 2019/04/06 22:53:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1401,9 +1401,8 @@ freedynamicdata()
     /* free_pickinv_cache();  --  now done from really_done()... */
     free_symsets();
 #endif /* FREE_ALL_MEMORY */
-#ifdef STATUS_HILITES
-    status_finish();
-#endif
+    if (VIA_WINDOWPORT())
+        status_finish();
 #ifdef DUMPLOG
     dumplogfreemessages();
 #endif

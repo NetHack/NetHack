@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1554045808 2019/03/31 15:23:28 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1554591223 2019/04/06 22:53:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -542,11 +542,11 @@ void
 display_gamewindows()
 {
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
-#ifdef STATUS_HILITES
-    status_initialize(0);
-#else
-    WIN_STATUS = create_nhwindow(NHW_STATUS);
-#endif
+    if (VIA_WINDOWPORT()) {
+        status_initialize(0);
+    } else {
+        WIN_STATUS = create_nhwindow(NHW_STATUS);
+    }
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
     /* in case of early quit where WIN_INVEN could be destroyed before

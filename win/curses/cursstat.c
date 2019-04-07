@@ -24,25 +24,25 @@ extern boolean status_activefields[MAXBLSTATS];
 /* Long format fields for vertical window */
 static char *status_vals_long[MAXBLSTATS];
 
-#ifdef STATUS_HILITES
 static unsigned long *curses_colormasks;
 static long curses_condition_bits;
 static int curses_status_colors[MAXBLSTATS];
 static int hpbar_percent, hpbar_color;
 static int vert_status_dirty;
 
-#ifdef TEXTCOLOR
-static int FDECL(condcolor, (long, unsigned long *));
-#endif
-static int FDECL(condattr, (long, unsigned long *));
-static int FDECL(nhattr2curses, (int));
-#endif /* STATUS_HILITES */
 static void NDECL(draw_status);
 static void FDECL(draw_vertical, (BOOLEAN_P));
 static void FDECL(draw_horizontal, (BOOLEAN_P));
 static void curs_HPbar(char *, int);
 static void curs_stat_conds(int, int *, int *, char *, boolean *);
 static void curs_vert_status_vals(int);
+#ifdef STATUS_HILITES
+#ifdef TEXTCOLOR
+static int FDECL(condcolor, (long, unsigned long *));
+#endif
+static int FDECL(condattr, (long, unsigned long *));
+static int FDECL(nhattr2curses, (int));
+#endif /* STATUS_HILITES */
 
 /* width of a single line in vertical status orientation (one field per line;
    everything but title fits within 30 even with prefix and longest value) */
@@ -51,7 +51,6 @@ static void curs_vert_status_vals(int);
 void
 curses_status_init()
 {
-#ifdef STATUS_HILITES
     int i;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
@@ -62,7 +61,6 @@ curses_status_init()
     curses_condition_bits = 0L;
     hpbar_percent = 0, hpbar_color = NO_COLOR;
     vert_status_dirty = 1;
-#endif /* STATUS_HILITES */
 
     /* let genl_status_init do most of the initialization */
     genl_status_init();
@@ -72,14 +70,12 @@ curses_status_init()
 void
 curses_status_finish()
 {
-#ifdef STATUS_HILITES
     int i;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
         if (status_vals_long[i])
             free(status_vals_long[i]), status_vals_long[i] = (char *) 0;
     }
-#endif /* STATUS_HILITES */
 
     genl_status_finish();
     return;
@@ -138,7 +134,6 @@ curses_status_finish()
  *         See doc/window.doc for more details.
  */
 
-#ifdef STATUS_HILITES
 static int changed_fields = 0;
 
 void
@@ -304,7 +299,9 @@ boolean border;
         cap_and_hunger, exp_points, sho_score,
         height, width, w, xtra, clen, x, y, t, ex, ey,
         condstart = 0, conddummy = 0;
+#ifdef STATUS_HILITES
     int coloridx = NO_COLOR, attrmask = 0;
+#endif /* STATUS_HILITES */
     boolean asis = FALSE;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
@@ -562,6 +559,7 @@ boolean border;
 
             } else if (fld != BL_CONDITION) {
                 /* regular field, including title if no hitpointbar */
+#ifdef STATUS_HILITES
                 coloridx = curses_status_colors[fld]; /* includes attribute */
                 if (iflags.hilite_delta && coloridx != NO_COLOR) {
                     /* expect 1 leading space; don't highlight it */
@@ -580,9 +578,11 @@ boolean border;
                         curses_toggle_color_attr(win, coloridx, NONE, ON);
 #endif
                 }
+#endif /* STATUS_HILITES */
 
                 waddstr(win, text);
 
+#ifdef STATUS_HILITES
                 if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
                     if (coloridx != NO_COLOR)
@@ -591,6 +591,7 @@ boolean border;
                     if (attrmask)
                         wattroff(win, attrmask);
                 }
+#endif /* STATUS_HILITES */
 
             } else {
                 /* status conditions */
@@ -677,8 +678,11 @@ boolean border;
     };
     xchar spacing[MAXBLSTATS];
     int i, fld, cap_and_hunger, time_and_score, cond_count;
-    char *text, *p, savedch = '\0';
+    char *text;
+#ifdef STATUS_HILITES
+    char *p, savedch = '\0';
     int coloridx = NO_COLOR, attrmask = 0;
+#endif /* STATUS_HILITES */
     int height_needed, height, width, x = 0, y = 0;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
@@ -827,6 +831,7 @@ boolean border;
                 && (fld == BL_HUNGER
                     || (fld == BL_CAP && cap_and_hunger != 3)))
                 ++text;
+#ifdef STATUS_HILITES
             coloridx = curses_status_colors[fld]; /* includes attributes */
             if (iflags.hilite_delta && coloridx != NO_COLOR) {
                 /* most status_vals_long[] are "long-text : value" and
@@ -864,9 +869,11 @@ boolean border;
                     curses_toggle_color_attr(win, coloridx, NONE, ON);
 #endif
             } /* highlighting active */
+#endif /* STATUS_HILITES */
 
             waddstr(win, text);
 
+#ifdef STATUS_HILITES
             if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
                 if (coloridx != NO_COLOR)
@@ -879,6 +886,7 @@ boolean border;
                 *p = savedch;
                 waddstr(win, p);
             }
+#endif /* STATUS_HILITES */
 
         } else {
             /* status conditions */
@@ -897,9 +905,11 @@ static void
 curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
            int bar_len) /* width of space within the brackets */
 {
+#ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
     int coloridx;
 #endif
+#endif /* STATUS_HILITES */
     int k, bar_pos;
     char bar[STATVAL_WIDTH], *bar2 = (char *) 0, savedch = '\0';
     boolean twoparts = (hpbar_percent < 100);
@@ -927,6 +937,7 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
     if (*bar) { /* True unless dead (0 HP => bar_pos == 0) */
         /* fixed attribute, not nhattr2curses((hpbar_color >> 8) & 0x00FF) */
         wattron(win, A_REVERSE); /* do this even if hilite_delta is 0 */
+#ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
         if (iflags.hilite_delta) {
             coloridx = hpbar_color & 0x00FF;
@@ -934,16 +945,19 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
                 curses_toggle_color_attr(win, coloridx, NONE, ON);
         }
 #endif
+#endif /* STATUS_HILITES */
 
         /* portion of title corresponding to current hit points */
         waddstr(win, bar);
 
+#ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
         if (iflags.hilite_delta) {
             if (coloridx != NO_COLOR)
                 curses_toggle_color_attr(win, coloridx, NONE, OFF);
         }
 #endif
+#endif /* STATUS_HILITES */
         wattroff(win, A_REVERSE); /* do this even if hilite_delta is 0 */
     } /* *bar (current HP > 0) */
 
@@ -983,16 +997,20 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
             if (curses_condition_bits & bitmsk) {
                 Strcpy(condnam, valid_conditions[i].id);
                 Strcat(strcat(condbuf, " "), upstart(condnam));
+#ifdef STATUS_HILITES
                 if (nohilite && *nohilite
                     && (condcolor(bitmsk, curses_colormasks) != NO_COLOR
                         || condattr(bitmsk, curses_colormasks) != 0))
                     *nohilite = FALSE;
+#endif /* STATUS_HILITES */
             }
         }
     } else if (curses_condition_bits) {
         unsigned long cond_bits;
-        int height = 0, width, cx, cy, cy0, cndlen,
-            attrmask = 0, color = NO_COLOR;
+        int height = 0, width, cx, cy, cy0, cndlen;
+#ifdef STATUS_HILITES
+        int attrmask = 0, color = NO_COLOR;
+#endif /* STATUS_HILITES */
         boolean border, do_vert = (vert_cond != 0);
         WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
@@ -1023,6 +1041,7 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                 /* output unhighlighted leading space unless at #1 of 3 */
                 if (!do_vert || (vert_cond % 3) != 1)
                     waddch(win, ' ');
+#ifdef STATUS_HILITES
                 if (iflags.hilite_delta) {
                     if ((attrmask = condattr(bitmsk, curses_colormasks))
                         != 0) {
@@ -1035,10 +1054,12 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                         curses_toggle_color_attr(win, color, NONE, ON);
 #endif
                 }
+#endif /* STATUS_HILITES */
 
                 /* output the condition name */
                 waddstr(win, upstart(condnam));
 
+#ifdef STATUS_HILITES
                 if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
                     if (color != NO_COLOR)
@@ -1047,6 +1068,7 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                     if (attrmask)
                         wattroff(win, attrmask);
                 }
+#endif /* STATUS_HILITES */
                 /* if that was #3 of 3 advance to next line */
                 if (do_vert && (++vert_cond % 3) == 1)
                     wmove(win, (*y)++, *x);
@@ -1199,6 +1221,7 @@ curs_vert_status_vals(int win_width)
     vert_status_dirty = 0;
 }
 
+#ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
 /*
  * Return what color this condition should
@@ -1276,6 +1299,8 @@ int attrmask;
     return result;
 }
 #endif /* STATUS_HILITES */
+
+/* ======================================================================== */
 
 
 #if 0 /* old stuff; some may be re-incorporated, most should be discarded */
@@ -2216,4 +2241,6 @@ curses_decrement_highlights(boolean zero)
     if (unhighlight)
         curses_update_stats();
 }
-#endif
+#endif /*0*/
+
+/*cursstat.c*/

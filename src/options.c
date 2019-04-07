@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1554155747 2019/04/01 21:55:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.362 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1554591224 2019/04/06 22:53:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.363 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4034,9 +4034,8 @@ boolean tinitial, tfrom_file;
                 || boolopt[i].addr == &flags.showscore
 #endif
                 || boolopt[i].addr == &flags.showexp) {
-#ifdef STATUS_HILITES
-                status_initialize(REASSESS_ONLY);
-#endif
+                if (VIA_WINDOWPORT())
+                    status_initialize(REASSESS_ONLY);
                 g.context.botl = TRUE;
             } else if (boolopt[i].addr == &flags.invlet_constant) {
                 if (flags.invlet_constant) {
@@ -4077,11 +4076,12 @@ boolean tinitial, tfrom_file;
                         iflags.wc2_petattr = curses_read_attrs("I");
                 }
 #endif
-#ifdef STATUS_HILITES
             } else if (boolopt[i].addr == &iflags.wc2_hitpointbar) {
-                status_initialize(REASSESS_ONLY);
-                g.opt_need_redraw = TRUE;
-#endif
+                if (VIA_WINDOWPORT()) {
+                    /* [is reassessment really needed here?] */
+                    status_initialize(REASSESS_ONLY);
+                    g.opt_need_redraw = TRUE;
+                }
 #ifdef TEXTCOLOR
             } else if (boolopt[i].addr == &iflags.use_color) {
                 g.opt_need_redraw = TRUE;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1550524562 2019/02/18 21:16:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.279 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1554580625 2019/04/06 19:57:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.280 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2647,7 +2647,7 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
     xchar newx, newy;
     coord mm;
 
-    if (mtmp->mx == x && mtmp->my == y && m_at(x,y) == mtmp)
+    if (mtmp->mx == x && mtmp->my == y && m_at(x, y) == mtmp)
         return TRUE;
 
     if (move_other && (othermon = m_at(x, y)) != 0) {
@@ -2666,7 +2666,7 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
          */
         if (!enexto(&mm, newx, newy, mtmp->data))
             return FALSE;
-        if (!isok(mm.x,mm.y))
+        if (!isok(mm.x, mm.y))
             return FALSE;
         newx = mm.x;
         newy = mm.y;

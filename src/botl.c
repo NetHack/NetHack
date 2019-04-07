@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1554554180 2019/04/06 12:36:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.142 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1554591223 2019/04/06 22:53:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.143 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,10 +14,8 @@ const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
                                  "Strained", "Overtaxed", "Overloaded" };
 
 STATIC_DCL const char *NDECL(rank);
-#ifdef STATUS_HILITES
 STATIC_DCL void NDECL(bot_via_windowport);
 STATIC_DCL void NDECL(stat_update_time);
-#endif
 
 static char *
 get_strength_str()
@@ -235,14 +233,14 @@ bot()
 {
     /* dosave() flags completion by setting u.uhp to -1 */
     if ((u.uhp != -1) && g.youmonst.data && iflags.status_updates) {
-#ifdef STATUS_HILITES
-        bot_via_windowport();
-#else
-        curs(WIN_STATUS, 1, 0);
-        putstr(WIN_STATUS, 0, do_statusline1());
-        curs(WIN_STATUS, 1, 1);
-        putmixed(WIN_STATUS, 0, do_statusline2());
-#endif
+        if (VIA_WINDOWPORT()) {
+            bot_via_windowport();
+        } else {
+            curs(WIN_STATUS, 1, 0);
+            putstr(WIN_STATUS, 0, do_statusline1());
+            curs(WIN_STATUS, 1, 1);
+            putmixed(WIN_STATUS, 0, do_statusline2());
+        }
     }
     g.context.botl = g.context.botlx = iflags.time_botl = FALSE;
 }
@@ -250,13 +248,13 @@ bot()
 void
 timebot()
 {
-    if (flags.time) {
-#ifdef STATUS_HILITES
-        stat_update_time();
-#else
-        /* old status display updates everything */
-        bot();
-#endif
+    if (flags.time && iflags.status_updates) {
+        if (VIA_WINDOWPORT()) {
+            stat_update_time();
+        } else {
+            /* old status display updates everything */
+            bot();
+        }
     }
     iflags.time_botl = FALSE;
 }
@@ -696,11 +694,6 @@ bot_via_windowport()
     evaluate_and_notify_windowport(g.valset, idx);
 }
 
-#ifdef STATUS_HILITES
-        /* stat_update_time() isn't really a STATUS_HILITES routine
-         * but timebot() will only ever call it for that configuration.
-         */
-
 /* update just the status lines' 'time' field */
 STATIC_OVL void
 stat_update_time()
@@ -718,7 +711,6 @@ stat_update_time()
                       NO_COLOR, (unsigned long *) 0);
     return;
 }
-#endif
 
 STATIC_OVL boolean
 eval_notify_windowport_field(fld, valsetlist, idx)
@@ -2161,6 +2153,7 @@ boolean from_configfile;
 
     return TRUE;
 }
+#endif /* STATUS_HILITES */
 
 const struct condmap valid_conditions[] = {
     { "stone",    BL_MASK_STONE },
@@ -2177,6 +2170,8 @@ const struct condmap valid_conditions[] = {
     { "fly",      BL_MASK_FLY },
     { "ride",     BL_MASK_RIDE },
 };
+
+#ifdef STATUS_HILITES
 
 const struct condmap condition_aliases[] = {
     { "strangled",      BL_MASK_STRNGL },

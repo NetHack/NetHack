@@ -1,4 +1,4 @@
-/* NetHack 3.6  botl.h  $NHDT-Date: 1553387147 2019/03/24 00:25:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6  botl.h  $NHDT-Date: 1554591222 2019/04/06 22:53:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,12 +27,10 @@ Astral Plane \GXXXXNNNN:123456 HP:1234(1234) Pw:1234(1234) AC:-127
 #define MAXCO (COLNO + 40)
 #endif
 
-#ifdef STATUS_HILITES
 struct condmap {
     const char *id;
     unsigned long bitmask;
 };
-#endif
 
 enum statusfields {
     BL_CHARACTERISTICS = -3, /* alias for BL_STR..BL_CH */
@@ -71,6 +69,9 @@ enum relationships { NO_LTEQGT = -1,
 #define BL_MASK_RIDE            0x00001000L
 #define BL_MASK_BITS            13 /* number of mask bits that can be set */
 /* clang-format on */
+
+#define VIA_WINDOWPORT() \
+    ((windowprocs.wincap2 & (WC2_HILITE_STATUS | WC2_FLUSH_STATUS)) != 0)
 
 #define REASSESS_ONLY TRUE
 
