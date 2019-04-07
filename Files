@@ -236,10 +236,12 @@ NetHack.xcscheme   makedefs.xcscheme  recover.xcscheme
 
 sys/unix/hints:
 (files for configuring UNIX NetHack versions)
-linux           linux-chroot    linux-minimal   linux-qt4
-linux-qt5       linux-x11       macosx          macosx.sh
-macosx10.5      macosx10.7      macosx10.8      macosx10.10
-macosx10.10-qt  macosx10.14     unix
+linux               linux-chroot        linux-minimal
+linux-qt4           linux-qt5           linux-x11
+macosx              macosx.sh           macosx10.5
+macosx10.7          macosx10.8          macosx10.10
+macosx10.10-qt      macosx10.14         solaris
+solaris-playground  unix
 
 sys/vms:
 (files for VMS version)
