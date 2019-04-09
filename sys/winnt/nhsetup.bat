@@ -1,5 +1,5 @@
 @REM  NetHack 3.6	nhsetup.bat	$NHDT-Date: 1554784485 2019/04/09 04:34:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
-@REM  Copyright (c) NetHack PC Development Team 1993-2017
+@REM  Copyright (c) NetHack PC Development Team 1993-2019
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.nt for details
 @REM
@@ -79,6 +79,21 @@ if not exist %VCDir% goto :vscheck2015
 set MSVCVERSION=2017
 set MSVCPROJ=2017
 goto :fallback
+
+:vscheck2015
+rem cannot use the registry trick used for vc2017
+rem 14 = 2015
+SET VCVERS=14
+rem Finally, let's determine the root folder for this VC installation.
+set VCROOT=%%VS%VCVERS%0COMNTOOLS%%
+if "%VCROOT:~-1%"=="\" set VCROOT=%VCROOT:~0,-1%
+rem VCROOT=VSDir\Common7\Tools
+call :dirname VCROOT "%VCROOT%"
+rem VCROOT=VSDir\Common7
+call :dirname VCROOT "%VCROOT%"
+rem VCROOT=VSDir
+set VCDir=%VCROOT%\VC
+SET MSVCVERSION=2015
 
 :fallback
 echo Using VS%MSVCVERSION%.
