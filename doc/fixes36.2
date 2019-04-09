@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ $NHDT-Date: 1554580624 2019/04/06 19:57:04 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.300 $ $NHDT-Date: 1554841009 2019/04/09 20:16:49 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -574,6 +574,7 @@ tty: if eight_bit_tty option is set and current symbol set specifies
 	DECgraphics handling, render line-drawing characters (in nethack's
 	scheme, the 4th quarter of ASCII--mostly lower case letters--with
 	8th-bit forced on) instead of treating that subset as 8-bit characters
+tty: enable blink attribute for status highlights (TERMLIB + !NO_TERMS config)
 unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
 	extension when using $(VERBOSEMAKE) to reduce build-time feedback;
 	replace with $(QUIETCC) which operates the same but defaults to
