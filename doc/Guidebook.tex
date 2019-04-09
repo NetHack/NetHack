@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{March 24, 2019}
+\date{April 9, 2019}
 
 \maketitle
 
@@ -4582,12 +4582,15 @@ The pattern should be a regular expression.
 %.lp ""
 Allowed colors are {\it black}, {\it red}, {\it green}, {\it brown},
 {\it blue}, {\it magenta}, {\it cyan}, {\it gray}, {\it orange},
-{\it lightgreen}, {\it yellow}, {\it lightblue}, {\it lightmagenta},
-{\it lightcyan}, and {\it white}.
+{\it light-green}, {\it yellow}, {\it light-blue}, {\it light-magenta},
+{\it light-cyan}, and {\it white}.
+And {\itno-color}, the default foreground color, which isn't necessarily
+the same as any of the other colors.
 
 %.lp ""
 Allowed attributes are {\it none}, {\it bold}, {\it dim}, {\it underline},
 {\it blink}, and {\it inverse}.
+{\it Normal\/} is a synonym for {\it none}.
 Note that the platform used may interpret the attributes any way it
 wants.
 
@@ -4657,40 +4660,68 @@ The pattern should be a regular expression.
 \subsection*{Configuring Status Hilites}
 
 %.pg
-Your copy of {\it NetHack\/} may have been compiled with support for {\it Status Hilites}.
+Your copy of {\it NetHack\/} may have been compiled with support
+for {\it Status Hilites}.
 If so, you can customize your game display by setting thresholds to
 change the color or appearance of fields in the status display.
-%.pg
-The format for defining status colors is:
+
+The format for defining status colors is:\\
 \begin{verbatim}
-    OPTION=hilite_status: field-name/behavior/color&attributes
+OPTION=hilite_status:field-name/behavior/color&attributes
 \end{verbatim}
-%.pg
-For example, the following line in your config file will cause
+
+For example, the following line in your configuration file will cause
 the hitpoints field to display in the color red if your hitpoints
-drop to or below a threshold of 30%:
+drop to or below a threshold of 30%:\\
 \begin{verbatim}
-    OPTION=hilite_status: hitpoints/<=30%/red/normal
-\end{verbatim}
-%.pg
-For another example, the following line in your config file will cause
-wisdom to be displayed red if it drops and green if it rises.
+OPTION=hilite_status:hitpoints/<=30%/red/normal
+\end{verbatim}\\
+(That example is actually specifying {\tt red\&normal} for <=30\%
+and {\tt no-color\&normal} for >30\%.)\\
+
+For another example, the following line in your configuration file will cause
+wisdom to be displayed red if it drops and green if it rises:\\
 \begin{verbatim}
-    OPTION=hilite_status: wisdom/down/red/up/green
+OPTION=hilite_status:wisdom/down/red/up/green
 \end{verbatim}
+
+Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
+orange, light-green, yellow, light-blue, light-magenta, light-cyan, and white.
+And {\it no-color}, the default foreground color on the display, which
+is not necessarily the same as black or white or any of the other colors.
+
+Allowed attributes are none, bold, dim, underline, blink, and inverse.
+``Normal'' is a synonym for ``none''; they should not be used in
+combination with any of the other attributes.
+
+To specify both a color and an attribute, use `\&' to combine them.
+To specify multiple attributes, use `+' to combine those.
+For example: {\tt magenta\&inverse+dim}.
+
+Note that the display may substitute or ignore particular attributes
+depending upon its capabilities, and in general may interpret the
+attributes any way it wants.
+For example, on some display systems a request for bold might yield
+blink or vice versa.
+On others, issuing an attribute request while another is already
+set up will replace the earlier attribute rather than combine with it.
+Since nethack issues attribute requests sequentially (at least with
+the {\it tty} interface) rather than all at once, the only way a
+situation like that can be controlled is to specify just one attribute.
+
 You can adjust the display of the following status fields:
 %.sd
 \begin{center}
 \begin{tabular}{lll}
 %TABLE_START
-title & strength & dexterity\\
-constitution & intelligence & wisdom\\
-charisma & alignment & score\\
-carrying-capacity & gold & power\\
-power-max & experience-level & armor-class\\
-HD & time & hunger\\
-hitpoints & hitpoints-max & dungeon-level\\
-experience & condition\\
+title & dungeon-level & experience-level\\
+strength & gold & experience\\
+dexterity & hitpoints & HD\\
+constitution & hitpoints-max & time\\
+intelligence & power & hunger\\
+wisdom & power-max & carrying-capacity\\
+charisma & armor-class & condition\\
+alignment &  & score\\
 %TABLE_END  Do not delete this line.
 \end{tabular}
 \end{center}
@@ -4764,26 +4795,11 @@ is tested; the character's name is ignored.
 %.ei
 \elist
 
-%.lp ""
-Allowed colors are {\it black}, {\it red}, {\it green}, {\it brown},
-{\it blue}, {\it magenta}, {\it cyan}, {\it gray}, {\it orange},
-{\it lightgreen}, {\it yellow}, {\it lightblue}, {\it lightmagenta},
-{\it lightcyan}, and {\it white}.
-
-%.lp ""
-Allowed attributes are {\it bold}, {\it inverse}, {\it underline},
-{\it blink}, {\it dim}, and {\it normal}.
-Note that the platform used may interpret the attributes any way it
-wants.
-
-%.lp ""
 The in-game options menu can help you determine the correct syntax for a
 config file.
 
-%.lp ""
 The whole feature can be disable by setting option {\it statushilites} to 0.
 
-%.lp ""
 Example hilites:
 \begin{verbatim}
     OPTION=hilite_status: gold/up/yellow/down/brown

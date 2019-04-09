@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.303 $ $NHDT-Date: 1554134322 2019/04/01 15:58:42 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.304 $ $NHDT-Date: 1554849951 2019/04/09 22:45:51 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 24, 2019
+.ds f2 "April 9, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4112,9 +4112,12 @@ If no attribute is defined, no attribute is used.
 The pattern should be a regular expression.
 .lp ""
 Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
-orange, lightgreen, yellow, lightblue, lightmagenta, lightcyan, and white.
+orange, light-green, yellow, light-blue, light-magenta, light-cyan, and white.
+And \f(CRno-color\fP, the default foreground color, which isn't necessarily
+the same as any of the other colors.
 .lp ""
 Allowed attributes are none, bold, dim, underline, blink, and inverse.
+\(lqNormal\(rq is a synonym for \(lqnone\(rq.
 Note that the platform used may interpret the attributes any way it
 wants.
 .lp ""
@@ -4179,36 +4182,62 @@ If so, you can customize your game display by setting thresholds to
 change the color or appearance of fields in the status display.
 .pg
 The format for defining status colors is:
-.si
-.lp "OPTION=hilite_status: field-name/behavior/color&attributes"
-.ei
+.SD n
+\f(CROPTION=hilite_status:\fIfield-name\fP/\fIbehavior\fP/\fIcolor\fP&\fIattributes\fP\fP
+.ED
 .pg
-For example, the following line in your config file will cause
+For example, the following line in your configuration file will cause
 the hitpoints field to display in the color red if your hitpoints
 drop to or below a threshold of 30%:
-.si
-.lp "OPTION=hilite_status: hitpoints/<=30%/red/normal"
-.ei
+.SD n
+\f(CROPTION=hilite_status:hitpoints/<=30%/red/normal\fP
+.ED
+(That example is actually specifying \f(CRred&normal\fP for <=30%
+and \f(CRno-color&normal\fP for >30%.)
 .pg
-For another example, the following line in your config file will cause
-wisdom to be displayed red if it drops and green if it rises.
-.si
-.lp "OPTION=hilite_status: wisdom/down/red/up/green"
-.ei
+For another example, the following line in your configuration file will cause
+wisdom to be displayed red if it drops and green if it rises:
+.SD n
+\f(CROPTION=hilite_status:wisdom/down/red/up/green\fP
+.ED
 .pg
-You can adjust the display of the following status fields:
+Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
+orange, light-green, yellow, light-blue, light-magenta, light-cyan, and white.
+And \(lqno-color\(rq, the default foreground color on the display, which
+is not necessarily the same as black or white or any of the other colors.
+.pg
+Allowed attributes are none, bold, dim, underline, blink, and inverse.
+\(lqNormal\(rq is a synonym for \(lqnone\(rq; they should not be used in
+combination with any of the other attributes.
+.pg
+To specify both a color and an attribute, use \(oq&\(cq to combine them.
+To specify multiple attributes, use \(oq\+\(cq to combine those.
+For example: \(lqmagenta&inverse\+dim\(rq.
+.pg
+Note that the display may substitute or ignore particular attributes
+depending upon its capabilities, and in general may interpret the
+attributes any way it wants.
+For example, on some display systems a request for bold might yield
+blink or vice versa.
+On others, issuing an attribute request while another is already
+set up will replace the earlier attribute rather than combine with it.
+Since NetHack issues attribute requests sequentially (at least with
+the \f(CRtty\fP interface) rather than all at once, the only way a
+situation like that can be controlled is to specify just one attribute.
+.pg
+You can adjust the appearance of the following status fields:
 .TS S
 center;
 c c c.
 .\"TABLE_START
-title	strength	dexterity
-constitution	intelligence	wisdom
-charisma	alignment	score
-carrying-capacity	gold	power
-power-max	experience-level	armor-class
-HD	time	hunger
-hitpoints	hitpoints-max	dungeon-level
-experience	condition
+title	dungeon-level	experience-level
+strength	gold	experience
+dexterity	hitpoints	HD
+constitution	hitpoints-max	time
+intelligence	power	hunger
+wisdom	power-max	carrying-capacity
+charisma	armor-class	condition
+alignment		score
 .\"TABLE_END  Do not delete this line.
 .TE
 .lp ""
@@ -4274,20 +4303,14 @@ and \(lqtitle\(rq.
 For title, only the role's rank title
 is tested; the character's name is ignored.
 .ei
-.lp ""
-Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
-orange, lightgreen, yellow, lightblue, lightmagenta, lightcyan, and white.
-.lp ""
-Allowed attributes are bold, inverse, underline, blink, dim, and normal.
-Note that the platform used may interpret the attributes any way it
-wants.
-.lp ""
+.pg
 The in-game options menu can help you determine the correct syntax for a
 config file.
-.lp ""
-The whole feature  can  be  disabled  by  setting  option
-statushilites to 0.
-.lp ""
+.pg
+The whole feature can be disabled by setting option
+.op statushilites
+to 0.
+.pg
 Example hilites:
 .sd
 .si
