@@ -680,7 +680,7 @@ boolean border;
     int i, fld, cap_and_hunger, time_and_score, cond_count;
     char *text;
 #ifdef STATUS_HILITES
-    char *p, savedch = '\0';
+    char *p = 0, savedch = '\0';
     int coloridx = NO_COLOR, attrmask = 0;
 #endif /* STATUS_HILITES */
     int height_needed, height, width, x = 0, y = 0;

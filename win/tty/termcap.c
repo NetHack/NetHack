@@ -1,4 +1,4 @@
-/* NetHack 3.6	termcap.c	$NHDT-Date: 1553858473 2019/03/29 11:21:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.29 $ */
+/* NetHack 3.6	termcap.c	$NHDT-Date: 1554841008 2019/04/09 20:16:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,18 +36,10 @@ struct tc_lcl_data tc_lcl_data = { 0, 0, 0, 0, 0, 0, 0, FALSE };
 
 STATIC_VAR char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
 STATIC_VAR char *VS, *VE;
-STATIC_VAR char *ME;
-STATIC_VAR char *MR;
-#if 0
-STATIC_VAR char *MB, *MH;
-STATIC_VAR char *MD;     /* may already be in use below */
-#endif
+STATIC_VAR char *ME, *MR, *MB, *MH, *MD;
 
 #ifdef TERMLIB
 boolean dynamic_HIHE = FALSE;
-#ifdef TEXTCOLOR
-STATIC_VAR char *MD;
-#endif
 STATIC_VAR int SG;
 STATIC_OVL char PC = '\0';
 STATIC_VAR char tbuf[512];
@@ -177,7 +169,7 @@ int *wid, *hgt;
                         Sprintf(hilites[i], "\033[0;3%dm", i);
                     }
             }
-#endif
+#endif /* TEXTCOLOR */
         *wid = CO;
         *hgt = LI;
         CL = "\033[2J"; /* last thing set */
@@ -284,14 +276,12 @@ int *wid, *hgt;
     KS = Tgetstr("ks"); /* keypad start (special mode) */
     KE = Tgetstr("ke"); /* keypad end (ordinary mode [ie, digits]) */
     MR = Tgetstr("mr"); /* reverse */
-#if 0
     MB = Tgetstr("mb"); /* blink */
     MD = Tgetstr("md"); /* boldface */
     MH = Tgetstr("mh"); /* dim */
-#endif
     ME = Tgetstr("me"); /* turn off all attributes */
-    if (!ME || (SE == nullstr))
-        ME = SE; /* default to SE value */
+    if (!ME)
+        ME = SE ? SE : nullstr; /* default to SE value */
 
     /* Get rid of padding numbers for nh_HI and nh_HE.  Hope they
      * aren't really needed!!!  nh_HI and nh_HE are outputted to the
@@ -309,9 +299,6 @@ int *wid, *hgt;
     AS = Tgetstr("as");
     AE = Tgetstr("ae");
     nh_CD = Tgetstr("cd");
-#ifdef TEXTCOLOR
-    MD = Tgetstr("md");
-#endif
 #ifdef TEXTCOLOR
 #if defined(TOS) && defined(__GNUC__)
     if (!strcmp(term, "builtin") || !strcmp(term, "tw52")
@@ -849,8 +836,7 @@ cl_eos() /* free after Robert Viduya */
 #undef delay_output
 #undef TRUE
 #undef FALSE
-#define m_move curses_m_move /* Some curses.h decl m_move(), not used here \
-                                */
+#define m_move curses_m_move /* Some curses.h decl m_move(), not used here */
 
 #include <curses.h>
 
@@ -932,6 +918,7 @@ init_hilite()
     c = 6;
     while (c--) {
         char *work;
+
         scratch = tparm(setf, ti_map[c].ti_color);
         work = (char *) alloc(strlen(scratch) + md_len + 1);
         Strcpy(work, MD);
@@ -1171,19 +1158,30 @@ s_atr2str(n)
 int n;
 {
     switch (n) {
+    case ATR_BLINK:
     case ATR_ULINE:
-        if (nh_US)
-            return nh_US;
+        if (n == ATR_BLINK) {
+            if (MB && *MB)
+                return MB;
+        } else { /* Underline */
+            if (nh_US && *nh_US)
+                return nh_US;
+        }
         /*FALLTHRU*/
     case ATR_BOLD:
-    case ATR_BLINK:
-#if defined(TERMLIB) && defined(TEXTCOLOR)
-        if (MD)
+        if (MD && *MD)
             return MD;
-#endif
-        return nh_HI;
+        if (nh_HI && *nh_HI)
+            return nh_HI;
+        break;
     case ATR_INVERSE:
-        return MR;
+        if (MR && *MR)
+            return MR;
+        break;
+    case ATR_DIM:
+        if (MH && *MH)
+            return MH;
+        break;
     }
     return nulstr;
 }
@@ -1194,14 +1192,19 @@ int n;
 {
     switch (n) {
     case ATR_ULINE:
-        if (nh_UE)
+        if (nh_UE && *nh_UE)
             return nh_UE;
         /*FALLTHRU*/
     case ATR_BOLD:
     case ATR_BLINK:
-        return nh_HE;
+        if (nh_HE && *nh_HE)
+            return nh_HE;
+        /*FALLTHRU*/
+    case ATR_DIM:
     case ATR_INVERSE:
-        return ME;
+        if (ME && *ME)
+            return ME;
+        break;
     }
     return nulstr;
 }
@@ -1213,18 +1216,19 @@ term_attr_fixup(msk)
 int msk;
 {
     /* underline is converted to bold if its start sequence isn't available */
-    if ((msk & (1 << ATR_ULINE)) && !nh_US) {
+    if ((msk & (1 << ATR_ULINE)) && (!nh_US || !*nh_US)) {
         msk |= (1 << ATR_BOLD);
         msk &= ~(1 << ATR_ULINE);
     }
-    /* blink is converted to bold unconditionally [why?] */
-    if (msk & (1 << ATR_BLINK)) {
+    /* blink used to be converted to bold unconditionally; now depends on MB */
+    if (msk & (1 << ATR_BLINK) && (!MB || !*MB)) {
         msk |= (1 << ATR_BOLD);
         msk &= ~(1 << ATR_BLINK);
     }
-    /* dim is ignored */
-    if (msk & (1 << ATR_DIM))
+    /* dim is ignored if its start sequence isn't available */
+    if (msk & (1 << ATR_DIM) && (!MH || !*MH)) {
         msk &= ~(1 << ATR_DIM);
+    }
     return msk;
 }
 
@@ -1235,8 +1239,8 @@ int attr;
     if (attr) {
         const char *astr = s_atr2str(attr);
 
-        if (*astr)
-            xputs(s_atr2str(attr));
+        if (astr && *astr)
+            xputs(astr);
     }
 }
 
@@ -1247,8 +1251,8 @@ int attr;
     if (attr) {
         const char *astr = e_atr2str(attr);
 
-        if (*astr)
-            xputs(e_atr2str(attr));
+        if (astr && *astr)
+            xputs(astr);
     }
 }
 
@@ -1317,6 +1321,6 @@ int color;
 
 #endif /* TEXTCOLOR */
 
-#endif /* TTY_GRAPHICS */
+#endif /* TTY_GRAPHICS && !NO_TERMS */
 
 /*termcap.c*/
