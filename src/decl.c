@@ -218,7 +218,9 @@ const struct instance_globals g_init = {
     FALSE, /* blinit */
     FALSE, /* update_all */
     UNDEFINED_VALUES, /* valset */
+#ifdef STATUS_HILITES
     0, /* bl_hilite_moves */
+#endif
     UNDEFINED_VALUES, /* cond_hilites */
     0, /* now_or_before_idx */
 

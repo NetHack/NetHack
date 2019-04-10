@@ -642,7 +642,9 @@ struct instance_globals {
     boolean blinit;
     boolean update_all;
     boolean valset[MAXBLSTATS];
+#ifdef STATUS_HILITES
     long bl_hilite_moves;
+#endif
     unsigned long cond_hilites[BL_ATTCLR_MAX];
     int now_or_before_idx;   /* 0..1 for array[2][] first index */
 

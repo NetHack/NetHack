@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1554591223 2019/04/06 22:53:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1554895741 2019/04/10 11:29:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -325,7 +325,10 @@ boolean resuming;
             /* once-per-hero-took-time things go here */
             /******************************************/
 
-            status_eval_next_unhilite();
+#ifdef STATUS_HILITES
+            if (iflags.hilite_delta)
+                status_eval_next_unhilite();
+#endif
             if (g.context.bypasses)
                 clear_bypasses();
             if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)

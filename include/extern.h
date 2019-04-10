@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1554554180 2019/04/06 12:36:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.699 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1554857123 2019/04/10 00:45:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.700 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -160,13 +160,13 @@ E void NDECL(max_rank_sz);
 E long NDECL(botl_score);
 #endif
 E int FDECL(describe_level, (char *));
-E void NDECL(status_eval_next_unhilite);
 E void FDECL(status_initialize, (BOOLEAN_P));
 E void NDECL(status_finish);
 E int NDECL(stat_cap_indx);
 E int NDECL(stat_hunger_indx);
 E const char *FDECL(bl_idx_to_fldname, (int));
 #ifdef STATUS_HILITES
+E void NDECL(status_eval_next_unhilite);
 E void NDECL(reset_status_hilites);
 E boolean FDECL(parse_status_hl1, (char *op, BOOLEAN_P));
 E void FDECL(status_notify_windowport, (BOOLEAN_P));

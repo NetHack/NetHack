@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1554591223 2019/04/06 22:53:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.143 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1554857126 2019/04/10 00:45:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -505,6 +505,8 @@ STATIC_VAR struct istat_s initblstats[MAXBLSTATS] = {
 #undef INIT_BLSTAT
 #undef INIT_THRESH
 
+#ifdef STATUS_HILITES
+#endif
 /* we don't put this next declaration in #ifdef STATUS_HILITES.
  * In the absence of STATUS_HILITES, each array
  * element will be 0 however, and quite meaningless,
@@ -858,51 +860,6 @@ boolean *valsetlist;
 
     g.context.botl = g.context.botlx = iflags.time_botl = FALSE;
     g.update_all = FALSE;
-}
-
-/* called from moveloop(); sets context.botl if temp hilites have timed out */
-void
-status_eval_next_unhilite()
-{
-    int i;
-    struct istat_s *curr;
-    long next_unhilite, this_unhilite;
-
-    g.bl_hilite_moves = g.moves; /* simpllfied; used to try to encode fractional
-                              * amounts for multiple moves within same turn */
-    /* figure out whether an unhilight needs to be performed now */
-    next_unhilite = 0L;
-    for (i = 0; i < MAXBLSTATS; ++i) {
-        curr = &g.blstats[0][i]; /* g.blstats[0][*].time == g.blstats[1][*].time */
-
-        if (curr->chg) {
-            struct istat_s *prev = &g.blstats[1][i];
-
-#ifdef STATUS_HILITES
-            if (Is_Temp_Hilite(curr->hilite_rule))
-                curr->time = prev->time = (g.bl_hilite_moves
-                                           + iflags.hilite_delta);
-            else
-                curr->time = prev->time = 0L;
-#endif
-            curr->chg = prev->chg = FALSE;
-            g.context.botl = TRUE;
-        }
-        if (g.context.botl)
-            continue; /* just process other g.blstats[][].time and .chg */
-
-        this_unhilite = curr->time;
-        if (this_unhilite > 0L
-            && (next_unhilite == 0L || this_unhilite < next_unhilite)
-#ifdef STATUS_HILITES
-            && hilite_reset_needed(curr, this_unhilite + 1L)
-#endif
-            ) {
-            next_unhilite = this_unhilite;
-            if (next_unhilite < g.bl_hilite_moves)
-                g.context.botl = TRUE;
-        }
-    }
 }
 
 void
@@ -1393,6 +1350,47 @@ long augmented_time;
         return FALSE;
 
     return TRUE;
+}
+
+/* called from moveloop(); sets context.botl if temp hilites have timed out */
+void
+status_eval_next_unhilite()
+{
+    int i;
+    struct istat_s *curr;
+    long next_unhilite, this_unhilite;
+
+    g.bl_hilite_moves = g.moves; /* simpllfied; used to try to encode fractional
+                              * amounts for multiple moves within same turn */
+    /* figure out whether an unhilight needs to be performed now */
+    next_unhilite = 0L;
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        curr = &g.blstats[0][i]; /* g.blstats[0][*].time == g.blstats[1][*].time */
+
+        if (curr->chg) {
+            struct istat_s *prev = &g.blstats[1][i];
+
+            if (Is_Temp_Hilite(curr->hilite_rule))
+                curr->time = prev->time = (g.bl_hilite_moves
+                                           + iflags.hilite_delta);
+            else
+                curr->time = prev->time = 0L;
+
+            curr->chg = prev->chg = FALSE;
+            g.context.botl = TRUE;
+        }
+        if (g.context.botl)
+            continue; /* just process other g.blstats[][].time and .chg */
+
+        this_unhilite = curr->time;
+        if (this_unhilite > 0L
+            && (next_unhilite == 0L || this_unhilite < next_unhilite)
+            && hilite_reset_needed(curr, this_unhilite + 1L)) {
+            next_unhilite = this_unhilite;
+            if (next_unhilite < g.bl_hilite_moves)
+                g.context.botl = TRUE;
+        }
+    }
 }
 
 /* called by options handling when 'statushilites' boolean is toggled */
