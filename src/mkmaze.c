@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1543185071 2018/11/25 22:31:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1555022325 2019/04/11 22:38:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1878,6 +1878,7 @@ boolean ini;
 
             case CONS_MON: {
                 struct monst *mon = (struct monst *) cons->list;
+
                 (void) mnearto(mon, cons->x, cons->y, TRUE);
                 break;
             }

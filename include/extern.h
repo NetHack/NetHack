@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1554857123 2019/04/10 00:45:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.700 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1555022327 2019/04/11 22:38:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.701 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1411,7 +1411,7 @@ E void FDECL(mon_to_stone, (struct monst *));
 E void FDECL(m_into_limbo, (struct monst *));
 E void FDECL(mnexto, (struct monst *));
 E void FDECL(maybe_mnexto, (struct monst *));
-E boolean FDECL(mnearto, (struct monst *, XCHAR_P, XCHAR_P, BOOLEAN_P));
+E int FDECL(mnearto, (struct monst *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void FDECL(m_respond, (struct monst *));
 E void FDECL(setmangry, (struct monst *, BOOLEAN_P));
 E void FDECL(wakeup, (struct monst *, BOOLEAN_P));
