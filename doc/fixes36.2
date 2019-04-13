@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.301 $ $NHDT-Date: 1555022325 2019/04/11 22:38:45 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.302 $ $NHDT-Date: 1555196229 2019/04/13 22:57:09 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -467,6 +467,8 @@ when engulfed while in a shop, dropping an item into the engulfer and then
 	using ':' to look at current location could cause a crash
 when items were on the floor just inside a shop's door where the shopkeeper
 	doesn't buy and sell stuff, those items showed a 'for sale' price
+probing a monster inside a shop (including shopkeeper) showed 'for sale'
+	price for items in monster's minvent
 applying a container while inside a shop and initiating a put-in operation
 	would show non-empty containers in inventory--including the one being
 	applied--with "for sale" amounts for the prices of their contents

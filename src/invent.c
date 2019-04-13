@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1549075239 2019/02/02 02:40:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.252 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1555196229 2019/04/13 22:57:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.253 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4303,12 +4303,17 @@ char *title;
          * displaying 'weapon in claw', etc. properly.
          */
         youmonst.data = mon->data;
+        /* in case inside a shop, don't append "for sale" prices */
+        iflags.suppress_price++;
 
         n = query_objlist(title ? title : tmp, &(mon->minvent),
                           (INVORDER_SORT | (incl_hero ? INCLUDE_HERO : 0)),
                           &selected, pickings,
                           do_all ? allow_all : worn_wield_only);
-        set_uasmon();
+
+        iflags.suppress_price--;
+        /* was 'set_uasmon();' but that potentially has side-effects */
+        youmonst.data = &mons[u.umonnum]; /* most basic part of set_uasmon */
     } else {
         invdisp_nothing(title ? title : tmp, "(none)");
         n = 0;
