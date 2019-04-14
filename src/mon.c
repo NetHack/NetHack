@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1554580625 2019/04/06 19:57:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.280 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1555022326 2019/04/11 22:38:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.281 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2636,10 +2636,15 @@ struct monst *mtmp;
 /* mnearto()
  * Put monster near (or at) location if possible.
  * Returns:
- *  true if relocation was successful
- *  false otherwise
+ *  2 if another monster was moved out of this one's way;
+ *  1 if relocation was successful (without moving another one);
+ *  0 otherwise.
+ * Note: if already at the target spot, result is 1 rather than 0.
+ *
+ * Might be called recursively if 'move_other' is True; if so, that argument
+ * will be False on the nested call so there won't be any further recursion.
  */
-boolean
+int
 mnearto(mtmp, x, y, move_other)
 register struct monst *mtmp;
 xchar x, y;
@@ -2648,15 +2653,18 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
     struct monst *othermon = (struct monst *) 0;
     xchar newx, newy;
     coord mm;
+    int res = 1;
 
     if (mtmp->mx == x && mtmp->my == y && m_at(x, y) == mtmp)
-        return TRUE;
+        return res;
 
     if (move_other && (othermon = m_at(x, y)) != 0) {
         if (othermon->wormno)
             remove_worm(othermon);
         else
             remove_monster(x, y);
+
+        othermon->mx = othermon->my = 0; /* 'othermon' is not on the map */
     }
 
     newx = x;
@@ -2667,28 +2675,21 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
          * no end of trouble.
          */
         if (!enexto(&mm, newx, newy, mtmp->data))
-            return FALSE;
+            return 0;
         if (!isok(mm.x, mm.y))
-            return FALSE;
+            return 0;
         newx = mm.x;
         newy = mm.y;
     }
     rloc_to(mtmp, newx, newy);
 
     if (move_other && othermon) {
-        xchar oldx = othermon->mx, oldy = othermon->my;
-
-        othermon->mx = othermon->my = 0;
-        (void) mnearto(othermon, x, y, FALSE);
-        if (othermon->mx == 0 && othermon->my == 0) {
-            /* reloc failed */
-            othermon->mx = oldx;
-            othermon->my = oldy;
+        res = 2; /* moving another monster out of the way */
+        if (!mnearto(othermon, x, y, FALSE)) /* no 'move_other' this time */
             m_into_limbo(othermon);
-        }
     }
 
-    return TRUE;
+    return res;
 }
 
 /* monster responds to player action; not the same as a passive attack;

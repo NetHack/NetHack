@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1554857123 2019/04/10 00:45:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.700 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1555201698 2019/04/14 00:28:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.702 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1411,7 +1411,7 @@ E void FDECL(mon_to_stone, (struct monst *));
 E void FDECL(m_into_limbo, (struct monst *));
 E void FDECL(mnexto, (struct monst *));
 E void FDECL(maybe_mnexto, (struct monst *));
-E boolean FDECL(mnearto, (struct monst *, XCHAR_P, XCHAR_P, BOOLEAN_P));
+E int FDECL(mnearto, (struct monst *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void FDECL(m_respond, (struct monst *));
 E void FDECL(setmangry, (struct monst *, BOOLEAN_P));
 E void FDECL(wakeup, (struct monst *, BOOLEAN_P));
@@ -2247,7 +2247,8 @@ E void FDECL(sellobj, (struct obj *, XCHAR_P, XCHAR_P));
 E int FDECL(doinvbill, (int));
 E struct monst *FDECL(shkcatch, (struct obj *, XCHAR_P, XCHAR_P));
 E void FDECL(add_damage, (XCHAR_P, XCHAR_P, long));
-E int FDECL(repair_damage, (struct monst *, struct damage *, BOOLEAN_P));
+E int FDECL(repair_damage, (struct monst *, struct damage *, int *,
+                            BOOLEAN_P));
 E int FDECL(shk_move, (struct monst *));
 E void FDECL(after_shk_move, (struct monst *));
 E boolean FDECL(is_fshk, (struct monst *));
