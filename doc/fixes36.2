@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.300 $ $NHDT-Date: 1554841009 2019/04/09 20:16:49 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.303 $ $NHDT-Date: 1555201701 2019/04/14 00:28:21 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -409,6 +409,8 @@ once a status highlight for a temporary rule ('up', 'down', 'changed') timed
 if a migrating long worm couldn't be placed, or some other monster was given
 	an existing long worm's place and it couldn't be put somewhere else,
 	a "trying to place monster at <0,0>" warning would occur
+if hero throws a pick-axe into a shop and shopkeeper catches it, shk will say
+	"get out of my way, scum" even if there's no monster at pick-axe spot
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -465,6 +467,8 @@ when engulfed while in a shop, dropping an item into the engulfer and then
 	using ':' to look at current location could cause a crash
 when items were on the floor just inside a shop's door where the shopkeeper
 	doesn't buy and sell stuff, those items showed a 'for sale' price
+probing a monster inside a shop (including shopkeeper) showed 'for sale'
+	price for items in monster's minvent
 applying a container while inside a shop and initiating a put-in operation
 	would show non-empty containers in inventory--including the one being
 	applied--with "for sale" amounts for the prices of their contents
@@ -681,6 +685,7 @@ include isaac64 for pseudo random number generation
 core prng and display prng use different contexts
 when healing magic other than unicorn horn cures blindness, cure deafness too
 do less status updating when the 'time' option is on
+slightly more thorough feedback when shop damage is repaired in hero's presence
 curses: status display substantially revamped for both horizontal (via
 	'align_status:bottom' or 'top') and vertical (via 'align_status:left'
 	or 'right'); 3-line horizontal layout (via 'statuslines:3') added
