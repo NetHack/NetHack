@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1555058014 2019/04/12 08:33:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1555201699 2019/04/14 00:28:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3469,11 +3469,13 @@ struct monst *shkp;
 boolean croaked;
 {
     struct damage *tmp_dam, *tmp2_dam;
+    struct obj *shk_inv = shkp->minvent;
     boolean did_repair = FALSE, saw_door = FALSE, saw_floor = FALSE,
-            stop_picking = FALSE, doorway_trap = FALSE;
-    int saw_walls = 0, saw_untrap = 0;
+            stop_picking = FALSE, doorway_trap = FALSE, skip_msg = FALSE;
+    int saw_walls = 0, saw_untrap = 0, feedback;
     char trapmsg[BUFSZ];
 
+    feedback = !croaked; /* 1 => give feedback, 0 => don't or already did */
     tmp_dam = level.damagelist;
     tmp2_dam = 0;
     while (tmp_dam) {
@@ -3491,12 +3493,12 @@ boolean croaked;
             if (croaked) {
                 disposition = (shops[1]) ? 0 : 1;
             } else if (stop_picking) {
-                disposition = repair_damage(shkp, tmp_dam, FALSE);
+                disposition = repair_damage(shkp, tmp_dam, &feedback, FALSE);
             } else {
                 /* Defer the stop_occupation() until after repair msgs */
                 if (closed_door(x, y))
                     stop_picking = picking_at(x, y);
-                disposition = repair_damage(shkp, tmp_dam, FALSE);
+                disposition = repair_damage(shkp, tmp_dam, &feedback, FALSE);
                 if (!disposition)
                     stop_picking = FALSE;
             }
@@ -3539,7 +3541,16 @@ boolean croaked;
     if (!did_repair)
         return;
 
-    if (saw_untrap) {
+    trapmsg[0] = '\0'; /* not just lint suppression... */
+    shk_inv = (shkp->minvent != shk_inv) ? shkp->minvent : 0;
+    if (saw_untrap == 1 && shk_inv
+        && (shk_inv->otyp == BEARTRAP || shk_inv->otyp == LAND_MINE)
+        && canseemon(shkp)) {
+        pline("%s untraps %s.", Shknam(shkp), ansimpleoname(shk_inv));
+        /* we've already reported this trap (and know it's the only one) */
+        saw_untrap = 0;
+        skip_msg = !(saw_walls || saw_door || saw_floor);
+    } else if (saw_untrap) {
         Sprintf(trapmsg, "%s trap%s",
                 (saw_untrap > 3) ? "several" : (saw_untrap > 1) ? "some"
                                                                 : "a",
@@ -3547,10 +3558,11 @@ boolean croaked;
         Sprintf(eos(trapmsg), " %s", vtense(trapmsg, "are"));
         Sprintf(eos(trapmsg), " removed from the %s",
                 (doorway_trap && saw_untrap == 1) ? "doorway" : "floor");
-    } else
-        trapmsg[0] = '\0'; /* not just lint suppression... */
+    }
 
-    if (saw_walls) {
+    if (skip_msg) {
+        ; /* already gave an untrap message which covered the only repair */
+    } else if (saw_walls) {
         char wallbuf[BUFSZ];
 
         Sprintf(wallbuf, "section%s", plur(saw_walls));
@@ -3572,6 +3584,10 @@ boolean croaked;
                   saw_floor ? "the floor damage is gone" : "",
                   ((saw_door || saw_floor) && *trapmsg) ? " and " : "",
                   trapmsg);
+        /* FIXME:
+         *  these messages aren't right if the unseen repairs were only
+         *  for trap removal (except for hole and possibly trap door).
+         */
         else if (inside_shop(u.ux, u.uy) == ESHK(shkp)->shoproom)
             You_feel("more claustrophobic than before.");
         else if (!Deaf && !rn2(10))
@@ -3586,9 +3602,10 @@ boolean croaked;
  * 3: untrap
  */
 int
-repair_damage(shkp, tmp_dam, catchup)
+repair_damage(shkp, tmp_dam, once, catchup)
 struct monst *shkp;
 struct damage *tmp_dam;
+int *once;
 boolean catchup; /* restoring a level */
 {
     xchar x, y;
@@ -3607,13 +3624,30 @@ boolean catchup; /* restoring a level */
     if (!IS_ROOM(tmp_dam->typ)) {
         if ((x == u.ux && y == u.uy && !Passes_walls)
             || (x == shkp->mx && y == shkp->my)
-            || ((mtmp = m_at(x, y)) && !passes_walls(mtmp->data)))
+            || ((mtmp = m_at(x, y)) != 0 && !passes_walls(mtmp->data)))
             return 0;
     }
-    if ((ttmp = t_at(x, y)) != 0) {
-        if (x == u.ux && y == u.uy && !Passes_walls)
-            return 0;
-        if (ttmp->ttyp == LANDMINE || ttmp->ttyp == BEAR_TRAP) {
+    ttmp = t_at(x, y);
+    if (ttmp && x == u.ux && y == u.uy && !Passes_walls)
+        return 0;
+
+    if (once && *once) {
+        boolean shk_closeby = (distu(shkp->mx, shkp->my)
+                               <= (BOLT_LIM / 2) * (BOLT_LIM / 2));
+
+        /* this is suboptimal if we eventually give a "shk untraps"
+           message for the only repair, but perhaps the shop repair
+           incantation means that shk's untrap attempt will never fail */
+        if (canseemon(shkp))
+            pline("%s whispers %s.", Shknam(shkp),
+                  shk_closeby ? "an incantation" : "something");
+        else if (!Deaf && shk_closeby)
+            You_hear("someone muttering an incantation.");
+        *once = 0;
+    }
+    if (ttmp) {
+        if ((ttmp->ttyp == LANDMINE || ttmp->ttyp == BEAR_TRAP)
+            && dist2(x, y, shkp->mx, shkp->my) <= 2) {
             /* convert to an object */
             otmp = mksobj((ttmp->ttyp == LANDMINE) ? LAND_MINE : BEARTRAP,
                           TRUE, FALSE);
