@@ -1,4 +1,4 @@
-/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1552007504 2019/03/08 01:11:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1555361295 2019/04/15 20:48:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -317,6 +317,22 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #ifndef WIDENED_PROTOTYPES
 #define WIDENED_PROTOTYPES
 #endif
+#endif
+#endif
+
+/* this applies to both VMS and Digital Unix/HP Tru64 */
+#ifdef WIDENED_PROTOTYPES
+/* ANSI C uses "value preserving rules", where 'unsigned char' and
+   'unsigned short' promote to 'int' if signed int is big enough to hold
+   all possible values, rather than traditional "sign preserving rules"
+   where 'unsigned char' and 'unsigned short' promote to 'unsigned int'.
+   However, the ANSI C rules aren't binding on non-ANSI compilers.
+   When DEC C (aka Compaq C, then HP C) is in non-standard 'common' mode
+   it supports prototypes that expect widened types, but it uses the old
+   sign preserving rules for how to widen narrow unsigned types.  (In its
+   default 'relaxed' mode, __STDC__ is 1 and uchar widens to 'int'.) */
+#if defined(__DECC) && (!defined(__STDC__) || !__STDC__)
+#define UCHAR_P unsigned int
 #endif
 #endif
 
