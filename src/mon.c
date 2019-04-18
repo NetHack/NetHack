@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1555022326 2019/04/11 22:38:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.281 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1555552629 2019/04/18 01:57:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.282 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -654,12 +654,12 @@ struct monst *mon;
         mmove = ((rn2(2) ? 4 : 5) * mmove) / 3;
     }
 
-    /* Randomly round the monster's speed to a multiple of NORMAL_SPEED. This
-       makes it impossible for the player to predict when they'll get a free
-       turn (thus preventing exploits like "melee kiting"), while retaining
-       guarantees about shopkeepers not being outsped by a normal-speed player,
-       normal-speed players being unable to open up a gap when fleeing a
-       normal-speed monster, etc.*/
+    /* Randomly round the monster's speed to a multiple of NORMAL_SPEED.
+       This makes it impossible for the player to predict when they'll get
+       a free turn (thus preventing exploits like "melee kiting"), while
+       retaining guarantees about shopkeepers not being outsped by a
+       normal-speed player, normal-speed players being unable to open up
+       a gap when fleeing a normal-speed monster, etc. */
     mmove_adj = mmove % NORMAL_SPEED;
     mmove -= mmove_adj;
     if (rn2(NORMAL_SPEED) < mmove_adj)
@@ -680,8 +680,9 @@ mcalcdistress()
         if (DEADMONSTER(mtmp))
             continue;
 
-        /* must check non-moving monsters once/turn in case
-         * they managed to end up in liquid */
+        /* must check non-moving monsters once/turn in case they managed
+           to end up in water or lava; note: when not in liquid they regen,
+           shape-shift, timeout temporary maladies just like other monsters */
         if (mtmp->data->mmove == 0) {
             if (vision_full_recalc)
                 vision_recalc(0);
