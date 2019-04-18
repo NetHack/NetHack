@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1554895741 2019/04/10 11:29:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1555552624 2019/04/18 01:57:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -108,21 +108,24 @@ boolean resuming;
                 g.context.mon_moving = FALSE;
 
                 if (!monscanmove && g.youmonst.movement < NORMAL_SPEED) {
-                    /* both you and the monsters are out of steam this round
-                     */
-                    /* set up for a new turn */
+                    /* both hero and monsters are out of steam this round */
                     struct monst *mtmp;
+
+                    /* set up for a new turn */
                     mcalcdistress(); /* adjust monsters' trap, blind, etc */
 
-                    /* reallocate movement rations to monsters */
+                    /* reallocate movement rations to monsters; don't need
+                       to skip dead monsters here because they will have
+                       been purged at end of their previous round of moving */
                     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
                         mtmp->movement += mcalcmove(mtmp);
 
-                    if (!rn2(u.uevent.udemigod
-                                 ? 25
-                                 : (depth(&u.uz) > depth(&stronghold_level))
-                                       ? 50
-                                       : 70))
+                    /* occasionally add another monster; since this takes
+                       place after movement has been allotted, the new
+                       monster effectively loses its first turn */
+                    if (!rn2(u.uevent.udemigod ? 25
+                             : (depth(&u.uz) > depth(&stronghold_level)) ? 50
+                               : 70))
                         (void) makemon((struct permonst *) 0, 0, 0,
                                        NO_MM_FLAGS);
 
@@ -133,11 +136,11 @@ boolean resuming;
                     } else {
                         moveamt = g.youmonst.data->mmove;
 
-                        if (Very_fast) { /* speed boots or potion */
+                        if (Very_fast) { /* speed boots, potion, or spell */
                             /* gain a free action on 2/3 of turns */
                             if (rn2(3) != 0)
                                 moveamt += NORMAL_SPEED;
-                        } else if (Fast) {
+                        } else if (Fast) { /* intrinsic */
                             /* gain a free action on 1/3 of turns */
                             if (rn2(3) == 0)
                                 moveamt += NORMAL_SPEED;
@@ -318,8 +321,7 @@ boolean resuming;
                         }
                     }
                 }
-            } while (g.youmonst.movement
-                     < NORMAL_SPEED); /* hero can't move loop */
+            } while (g.youmonst.movement < NORMAL_SPEED); /* hero can't move */
 
             /******************************************/
             /* once-per-hero-took-time things go here */

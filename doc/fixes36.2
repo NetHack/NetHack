@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.303 $ $NHDT-Date: 1555201701 2019/04/14 00:28:21 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.304 $ $NHDT-Date: 1555552900 2019/04/18 02:01:40 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -359,7 +359,7 @@ monster with multiple items in inventory could trigger 'dealloc_obj with nobj'
 	panic when turned into a statue if separate mon->minvent items merged
 lock picking context could end up with stale container pointer if container
 	being forced/unlocked/locked got destroyed or sent to another level
-teleporting out a vault after guard appears could result in the guard being
+teleporting out of a vault after guard appears could result in the guard being
 	stranded in a one-square long temporary corridor adjacent to vault
 	wall and periodically saying "Move along!"
 if game ends while hero is in a vault wall breach or in guard's temporary
@@ -696,15 +696,14 @@ tty: support statuslines:3 and dynamically switching between 2 and 3 with 'O'
 
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
-curses: the community patch for an optional curses window-port was
-	incorporated into the NetHack source code tree.  The curses
-	window-port evolved from work originally done by Karl Garrison,
-	and has been in use in several NetHack variants and on
-	nethack.alt.org and on www.hardfought.org/nethack/ for a while.
-	It is available and tested for 3.6.2 for Windows with PDCurses
-	layered underneath, and for Mac OSX and Unix (using ncurses as
-	the layer underneath).  It may also work for DOS with PDCurses
-	layered underneath, but that has not been tested.
+curses: the community patch for an optional curses window-port has been
+	adopted.  The curses window-port evolved from work originally done
+	by Karl Garrison, and has been in use in several NetHack variants
+	and on nethack.alt.org and on www.hardfought.org/nethack/ for a
+	while.  It is available and tested for 3.6.2 for Windows console
+	with PDCurses layered underneath, and for Mac OSX and Unix (using
+	ncurses as the layer underneath).  It may also work for MS-DOS with
+	PDCurses, but that has not been tested.
 
 
 Code Cleanup and Reorganization
