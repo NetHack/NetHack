@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1554554181 2019/04/06 12:36:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1555702074 2019/04/19 19:27:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3698,7 +3698,7 @@ static const enum statusfields
     { BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_FLUSH, blPAD, blPAD,
       blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
 };
-static const enum statusfields (*fieldorder)[3][MAX_PER_ROW];
+static const enum statusfields (*fieldorder)[MAX_PER_ROW];
 
 static int finalx[3][2];    /* [rows][NOW or BEFORE] */
 static boolean windowdata_init = FALSE;
@@ -3738,7 +3738,7 @@ tty_status_init()
     int i, num_rows;
 
     num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
-    fieldorder = (num_rows != 3) ? &twolineorder : &threelineorder;
+    fieldorder = (num_rows != 3) ? twolineorder : threelineorder;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
         tty_status[NOW][i].idx = BL_FLUSH;
@@ -3876,9 +3876,9 @@ unsigned long *colormasks;
         /* should be checking for first enabled field here rather than
            just first field, but 'fieldorder' doesn't start any rows
            with fields which can be disabled so [any_row][0] suffices */
-        if (*fmt == ' ' && (fldidx == (*fieldorder)[0][0]
-                            || fldidx == (*fieldorder)[1][0]
-                            || fldidx == (*fieldorder)[2][0]))
+        if (*fmt == ' ' && (fldidx == fieldorder[0][0]
+                            || fldidx == fieldorder[1][0]
+                            || fldidx == fieldorder[2][0]))
             ++fmt; /* skip leading space for first field on line */
         Sprintf(status_vals[fldidx], fmt, text);
         tty_status[NOW][fldidx].idx = fldidx;
@@ -4025,7 +4025,7 @@ int sz[3];
         sz[row] = 0;
         col = 1;
         update_right = FALSE;
-        for (i = 0; (idx = (*fieldorder)[row][i]) != BL_FLUSH; ++i) {
+        for (i = 0; (idx = fieldorder[row][i]) != BL_FLUSH; ++i) {
             if (!status_activefields[idx])
                 continue;
             if (!tty_status[NOW][idx].valid)
@@ -4328,7 +4328,7 @@ render_status(VOID_ARGS)
         HUPSKIP();
         y = row;
         tty_curs(WIN_STATUS, 1, y);
-        for (i = 0; (idx = (*fieldorder)[row][i]) != BL_FLUSH; ++i) {
+        for (i = 0; (idx = fieldorder[row][i]) != BL_FLUSH; ++i) {
             if (!status_activefields[idx])
                 continue;
             x = tty_status[NOW][idx].x;

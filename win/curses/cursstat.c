@@ -287,7 +287,7 @@ boolean border;
           BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
           blPAD, blPAD, blPAD, blPAD }
     };
-    const enum statusfields (*fieldorder)[3][15];
+    const enum statusfields (*fieldorder)[15];
     xchar spacing[MAXBLSTATS], valline[MAXBLSTATS];
     enum statusfields fld, prev_fld;
     char *text, *p, cbuf[BUFSZ], ebuf[STATVAL_WIDTH];
@@ -327,7 +327,7 @@ boolean border;
      */
 
     number_of_lines = (iflags.wc2_statuslines < 3) ? 2 : 3;
-    fieldorder = (number_of_lines != 3) ? &twolineorder : &threelineorder;
+    fieldorder = (number_of_lines != 3) ? twolineorder : threelineorder;
 
     cbuf[0] = '\0';
     x = y = border ? 1 : 0; /* origin; ignored by curs_stat_conds(0) */
@@ -349,7 +349,7 @@ boolean border;
     /* simplify testing which fields reside on which lines; assume line #0 */
     (void) memset((genericptr_t) valline, 0, sizeof valline);
     for (j = 1; j < number_of_lines; ++j)
-        for (i = 0; (fld = (*fieldorder)[j][i]) != BL_FLUSH; ++i)
+        for (i = 0; (fld = fieldorder[j][i]) != BL_FLUSH; ++i)
             valline[fld] = j;
 
     /* iterate 0 and 1 and maybe 2 for status lines 1 and 2 and maybe 3 */
@@ -360,7 +360,7 @@ boolean border;
         (void) memset((genericptr_t) spacing, 0, sizeof spacing);
         w = xtra = 0; /* w: width so far; xtra: number of extra spaces */
         prev_fld = BL_FLUSH;
-        for (i = 0; (fld = (*fieldorder)[j][i]) != BL_FLUSH; ++i) {
+        for (i = 0; (fld = fieldorder[j][i]) != BL_FLUSH; ++i) {
             /* when the core marks a field as disabled, it doesn't call
                status_update() to tell us to throw away the old value, so
                polymorph leaves stale XP and rehumanize leaves stale HD */
@@ -484,7 +484,7 @@ boolean border;
         /* second pass for line #j -- render it */
         x = y = border ? 1 : 0;
         wmove(win, y + j, x);
-        for (i = 0; (fld = (*fieldorder)[j][i]) != BL_FLUSH; ++i) {
+        for (i = 0; (fld = fieldorder[j][i]) != BL_FLUSH; ++i) {
             if (!status_activefields[fld])
                 continue;
 
