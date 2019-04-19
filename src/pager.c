@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1549334449 2019/02/05 02:40:49 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1555627307 2019/04/18 22:41:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -123,8 +123,10 @@ char *outbuf;
             Strcat(outbuf, (otmp && otmp->otyp != STRANGE_OBJECT)
                               ? ansimpleoname(otmp)
                               : an(obj_descr[STRANGE_OBJECT].oc_name));
-            if (fakeobj)
+            if (fakeobj) {
+                otmp->where = OBJ_FREE; /* object_from_map set to OBJ_FLOOR */
                 dealloc_obj(otmp);
+            }
         } else {
             Strcat(outbuf, something);
         }
@@ -195,6 +197,10 @@ struct obj **obj_p;
             otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
         if (otmp->otyp == LEASH)
             otmp->leashmon = 0;
+        /* extra fields needed for shop price with doname() formatting */
+        otmp->where = OBJ_FLOOR;
+        otmp->ox = x, otmp->oy = y;
+        otmp->no_charge = (otmp->otyp == STRANGE_OBJECT && costly_spot(x, y));
     }
     /* if located at adjacent spot, mark it as having been seen up close
        (corpse type will be known even if dknown is 0, so we don't need a
@@ -226,8 +232,10 @@ int x, y, glyph;
                      ? distant_name(otmp, otmp->dknown ? doname_with_price
                                                        : doname_vague_quan)
                      : obj_descr[STRANGE_OBJECT].oc_name);
-        if (fakeobj)
+        if (fakeobj) {
+            otmp->where = OBJ_FREE; /* object_from_map set it to OBJ_FLOOR */
             dealloc_obj(otmp), otmp = 0;
+        }
     } else
         Strcpy(buf, something); /* sanity precaution */
 
