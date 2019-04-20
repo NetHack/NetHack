@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.305 $ $NHDT-Date: 1555627306 2019/04/18 22:41:46 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.306 $ $NHDT-Date: 1555720351 2019/04/20 00:32:31 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -411,6 +411,9 @@ if a migrating long worm couldn't be placed, or some other monster was given
 	a "trying to place monster at <0,0>" warning would occur
 if hero throws a pick-axe into a shop and shopkeeper catches it, shk will say
 	"get out of my way, scum" even if there's no monster at pick-axe spot
+a quantum mechanic hit that teleported the target could also kill it at the
+	destination; make sure that the small amount of physical damage isn't
+	fatal unless the teleport is negated by cancellation (magic or armor)
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
