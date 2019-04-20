@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1550524560 2019/02/18 21:16:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1555801218 2019/04/20 23:00:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1083,7 +1083,7 @@ coord *cc;
             }
         }
     } else {
-    gotgood:
+ gotgood:
         cc->x = nx;
         cc->y = ny;
         return TRUE;
@@ -2208,7 +2208,7 @@ register struct monst *mtmp;
         }
     } else {
         s_sym = syms[rn2((int) sizeof(syms))];
-    assign_sym:
+ assign_sym:
         if (s_sym == MAXOCLASSES || s_sym == MAXOCLASSES + 1) {
             ap_type = M_AP_FURNITURE;
             appear = (s_sym == MAXOCLASSES) ? S_upstair : S_dnstair;
@@ -2228,12 +2228,21 @@ register struct monst *mtmp;
     }
     mtmp->m_ap_type = ap_type;
     mtmp->mappearance = appear;
-    if (ap_type == M_AP_OBJECT && (appear == STATUE || appear == CORPSE
-                                   || appear == FIGURINE || appear == EGG)) {
+    /* when appearing as an object based on a monster type, pick a shape */
+    if (ap_type == M_AP_OBJECT
+        && (appear == STATUE || appear == FIGURINE
+            || appear == CORPSE || appear == EGG || appear == TIN)) {
+        int mndx = rndmonnum(),
+            nocorpse_ndx = (mvitals[mndx].mvflags & G_NOCORPSE) != 0;
+
+        if (appear == CORPSE && nocorpse_ndx)
+            mndx = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
+        else if ((appear == EGG && !can_be_hatched(mndx))
+                 || (appear == TIN && nocorpse_ndx))
+            mndx = NON_PM; /* revert to generic egg or empty tin */
+
         newmcorpsenm(mtmp);
-        MCORPSENM(mtmp) = rndmonnum();
-        if (appear == EGG && !can_be_hatched(MCORPSENM(mtmp)))
-            MCORPSENM(mtmp) = NON_PM; /* revert to generic egg */
+        MCORPSENM(mtmp) = mndx;
     }
 
     if (does_block(mx, my, &levl[mx][my]))
