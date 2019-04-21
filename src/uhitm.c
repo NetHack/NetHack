@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1553644725 2019/03/26 23:58:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1555720104 2019/04/20 00:28:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1737,7 +1737,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     case AD_TLPT:
         if (tmp <= 0)
             tmp = 1;
-        if (!negated && tmp < mdef->mhp) {
+        if (!negated) {
             char nambuf[BUFSZ];
             boolean u_saw_mon = (canseemon(mdef)
                                  || (u.uswallow && u.ustuck == mdef));
@@ -1747,6 +1747,11 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             if (u_teleport_mon(mdef, FALSE) && u_saw_mon
                 && !(canseemon(mdef) || (u.uswallow && u.ustuck == mdef)))
                 pline("%s suddenly disappears!", nambuf);
+            if (tmp >= mdef->mhp) { /* see hitmu(mhitu.c) */
+                if (mdef->mhp == 1)
+                    ++mdef->mhp;
+                tmp = mdef->mhp - 1;
+            }
         }
         break;
     case AD_BLND:

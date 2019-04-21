@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1547118629 2019/01/10 11:10:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1555720096 2019/04/20 00:28:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1090,6 +1090,7 @@ register struct attack *mattk;
         if (!cancelled && tmp < mdef->mhp && !tele_restrict(mdef)) {
             char mdef_Monnam[BUFSZ];
             boolean wasseen = canspotmon(mdef);
+
             /* save the name before monster teleports, otherwise
                we'll get "it" in the suddenly disappears message */
             if (g.vis && wasseen)
@@ -1098,6 +1099,11 @@ register struct attack *mattk;
             (void) rloc(mdef, TRUE);
             if (g.vis && wasseen && !canspotmon(mdef) && mdef != u.usteed)
                 pline("%s suddenly disappears!", mdef_Monnam);
+            if (tmp >= mdef->mhp) { /* see hitmu(mhitu.c) */
+                if (mdef->mhp == 1)
+                    ++mdef->mhp;
+                tmp = mdef->mhp - 1;
+            }
         }
         break;
     case AD_SLEE:
@@ -1345,7 +1351,8 @@ register struct attack *mattk;
             break; /* physical damage only */
         if (!rn2(4) && !slimeproof(pd)) {
             if (!munslime(mdef, FALSE) && !DEADMONSTER(mdef)) {
-                if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, g.vis && canseemon(mdef)))
+                if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE,
+                            (boolean) (g.vis && canseemon(mdef))))
                     pd = mdef->data;
                 mdef->mstrategy &= ~STRAT_WAITFORU;
                 res = MM_HIT;

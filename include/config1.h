@@ -1,4 +1,4 @@
-/* NetHack 3.6	config1.h	$NHDT-Date: 1552007489 2019/03/08 01:11:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	config1.h	$NHDT-Date: 1555702947 2019/04/19 19:42:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -154,13 +154,15 @@
 #define NHSTDC
 #define USE_STDARG
 #define POSIX_TYPES
-#define _DECC_V4_SOURCE /* avoid some incompatible V5.x changes */
+#ifndef _DECC_V4_SOURCE /* only def here if not already def'd on comd line */
+#define _DECC_V4_SOURCE /* avoid some incompatible V5.x (and later) changes */
 #endif
+#endif /*__DECC_VER*/
 #undef __HIDE_FORBIDDEN_NAMES /* need non-ANSI library support functions */
 #ifdef VAXC    /* DEC C in VAX C compatibility mode; 'signed' works   */
 #define signed /* but causes diagnostic about VAX C not supporting it */
 #endif
-#else
+#else /*!__DECC*/
 #ifdef VAXC /* must use CC/DEFINE=ANCIENT_VAXC for vaxc v2.2 or older */
 #define signed
 #ifdef ANCIENT_VAXC /* vaxc v2.2 and earlier [lots of warnings to come] */
