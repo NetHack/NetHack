@@ -136,7 +136,7 @@ struct obj *otmp;
     const char *zap_type_text = "spell";
     struct obj *obj;
     boolean disguised_mimic = (mtmp->data->mlet == S_MIMIC
-                               && mtmp->m_ap_type != M_AP_NOTHING);
+                               && M_AP_TYPE(mtmp) != M_AP_NOTHING);
 
     if (u.uswallow && mtmp == u.ustuck)
         reveal_invis = FALSE;
@@ -453,7 +453,7 @@ struct obj *otmp;
             m_respond(mtmp);
             if (mtmp->isshk && !*u.ushops)
                 hot_pursuit(mtmp);
-        } else if (mtmp->m_ap_type)
+        } else if (M_AP_TYPE(mtmp))
             seemimic(mtmp); /* might unblock if mimicing a boulder/door */
     }
     /* note: g.bhitpos won't be set if swallowed, but that's okay since
@@ -818,7 +818,7 @@ boolean by_hero;
         mtmp->mundetected = 0;
         newsym(mtmp->mx, mtmp->my);
     }
-    if (mtmp->m_ap_type)
+    if (M_AP_TYPE(mtmp))
         seemimic(mtmp);
 
     one_of = (corpse->quan > 1L);
@@ -2747,7 +2747,7 @@ boolean youattack, allow_cancel_kill, self_cancel;
     } else {
         mdef->mcan = 1;
         /* force shapeshifter into its base form */
-        if (mdef->m_ap_type != M_AP_NOTHING)
+        if (M_AP_TYPE(mdef) != M_AP_NOTHING)
             seemimic(mdef);
         /* [not 'else if'; chameleon might have been hiding as a mimic] */
         if (mdef->cham >= LOW_PM) {

@@ -215,13 +215,13 @@
 
 #define display_self() \
     show_glyph(u.ux, u.uy,                                                  \
-           maybe_display_usteed((g.youmonst.m_ap_type == M_AP_NOTHING)        \
+           maybe_display_usteed((U_AP_TYPE == M_AP_NOTHING)                 \
                                 ? hero_glyph                                \
-                                : (g.youmonst.m_ap_type == M_AP_FURNITURE)    \
+                                : (U_AP_TYPE == M_AP_FURNITURE)             \
                                   ? cmap_to_glyph(g.youmonst.mappearance)     \
-                                  : (g.youmonst.m_ap_type == M_AP_OBJECT)     \
+                                  : (U_AP_TYPE == M_AP_OBJECT)              \
                                     ? objnum_to_glyph(g.youmonst.mappearance) \
-                                    /* else M_AP_MONSTER */                 \
+                                    /* else U_AP_TYPE == M_AP_MONSTER */    \
                                     : monnum_to_glyph(g.youmonst.mappearance)))
 
 /*

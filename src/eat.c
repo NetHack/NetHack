@@ -155,7 +155,7 @@ eatmdone(VOID_ARGS)
         free((genericptr_t) g.eatmbuf), g.eatmbuf = 0;
     }
     /* update display */
-    if (g.youmonst.m_ap_type) {
+    if (U_AP_TYPE) {
         g.youmonst.m_ap_type = M_AP_NOTHING;
         newsym(u.ux, u.uy);
     }

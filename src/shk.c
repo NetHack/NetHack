@@ -516,8 +516,8 @@ deserted_shop(enterstring)
                 continue;
             if ((mtmp = m_at(x, y)) != 0) {
                 ++n;
-                if (sensemon(mtmp) || ((mtmp->m_ap_type == M_AP_NOTHING
-                                        || mtmp->m_ap_type == M_AP_MONSTER)
+                if (sensemon(mtmp) || ((M_AP_TYPE(mtmp) == M_AP_NOTHING
+                                        || M_AP_TYPE(mtmp) == M_AP_MONSTER)
                                        && canseemon(mtmp)))
                     ++m;
             }

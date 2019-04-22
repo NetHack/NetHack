@@ -377,7 +377,7 @@ int sightflags;             /* 1 if the monster is physically seen;
                                2 if detected using Detect_monsters */
 xchar worm_tail;            /* mon is actually a worm tail */
 {
-    boolean mon_mimic = (mon->m_ap_type != M_AP_NOTHING);
+    boolean mon_mimic = (M_AP_TYPE(mon) != M_AP_NOTHING);
     int sensed = (mon_mimic && (Protection_from_shape_changers
                                 || sensemon(mon)));
     /*
@@ -388,7 +388,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
      */
 
     if (mon_mimic && (sightflags == PHYSICALLY_SEEN)) {
-        switch (mon->m_ap_type) {
+        switch (M_AP_TYPE(mon)) {
         default:
             impossible("display_monster:  bad m_ap_type value [ = %d ]",
                        (int) mon->m_ap_type);
