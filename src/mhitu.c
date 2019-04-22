@@ -521,7 +521,7 @@ register struct monst *mtmp;
     }
 
     /* hero might be a mimic, concealed via #monster */
-    if (youmonst.data->mlet == S_MIMIC && U_AP_TYPE && !range2
+    if (g.youmonst.data->mlet == S_MIMIC && U_AP_TYPE && !range2
         && foundyou && !u.uswallow) {
         boolean sticky = sticks(g.youmonst.data);
 

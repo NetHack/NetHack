@@ -621,7 +621,7 @@ int mntmp;
     }
 
     /* if stuck mimicking gold, stop immediately */
-    if (multi < 0 && U_AP_TYPE == M_AP_OBJECT
+    if (g.multi < 0 && U_AP_TYPE == M_AP_OBJECT
         && g.youmonst.data->mlet != S_MIMIC)
         unmul("");
     /* if becoming a non-mimic, stop mimicking anything */
