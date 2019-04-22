@@ -89,7 +89,7 @@ char *outbuf;
             mons[u.umonnum].mname, plname);
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
-    if (u.uundetected || (Upolyd && youmonst.m_ap_type))
+    if (u.uundetected || (Upolyd && U_AP_TYPE))
         mhidden_description(&youmonst, FALSE, eos(outbuf));
     return outbuf;
 }
@@ -109,12 +109,12 @@ char *outbuf;
                                                     : glyph_at(x, y);
 
     *outbuf = '\0';
-    if (mon->m_ap_type == M_AP_FURNITURE
-        || mon->m_ap_type == M_AP_OBJECT) {
+    if (M_AP_TYPE(mon) == M_AP_FURNITURE
+        || M_AP_TYPE(mon) == M_AP_OBJECT) {
         Strcpy(outbuf, ", mimicking ");
-        if (mon->m_ap_type == M_AP_FURNITURE) {
+        if (M_AP_TYPE(mon) == M_AP_FURNITURE) {
             Strcat(outbuf, an(defsyms[mon->mappearance].explanation));
-        } else if (mon->m_ap_type == M_AP_OBJECT
+        } else if (M_AP_TYPE(mon) == M_AP_OBJECT
                    /* remembered glyph, not glyph_at() which is 'mon' */
                    && glyph_is_object(glyph)) {
  objfrommap:
@@ -130,7 +130,7 @@ char *outbuf;
         } else {
             Strcat(outbuf, something);
         }
-    } else if (mon->m_ap_type == M_AP_MONSTER) {
+    } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
         if (altmon)
             Sprintf(outbuf, ", masquerading as %s",
                     an(mons[mon->mappearance].mname));
@@ -160,7 +160,7 @@ object_from_map(glyph, x, y, obj_p)
 int glyph, x, y;
 struct obj **obj_p;
 {
-    boolean fakeobj = FALSE;
+    boolean fakeobj = FALSE, mimic_obj = FALSE;
     struct monst *mtmp;
     struct obj *otmp;
     int glyphotyp = glyph_to_obj(glyph);
@@ -174,9 +174,10 @@ struct obj **obj_p;
 
     /* there might be a mimic here posing as an object */
     mtmp = m_at(x, y);
-    if (mtmp && is_obj_mappear(mtmp, (unsigned) glyphotyp))
+    if (mtmp && is_obj_mappear(mtmp, (unsigned) glyphotyp)) {
         otmp = 0;
-    else
+        mimic_obj = TRUE;
+    } else
         mtmp = 0;
 
     if (!otmp || otmp->otyp != glyphotyp) {
@@ -214,7 +215,11 @@ struct obj **obj_p;
         /* terrain mode views what's already known, doesn't learn new stuff */
         && !iflags.terrainmode) /* so don't set dknown when in terrain mode */
         otmp->dknown = 1; /* if a pile, clearly see the top item only */
-
+    if (fakeobj && mtmp && mimic_obj &&
+        (otmp->dknown || (M_AP_FLAG(mtmp) & M_AP_F_DKNOWN))) {
+            mtmp->m_ap_type |= M_AP_F_DKNOWN;
+            otmp->dknown = 1;
+    }
     *obj_p = otmp;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
@@ -299,7 +304,7 @@ int x, y;
 
     /* we know the hero sees a monster at this location, but if it's shown
        due to persistant monster detection he might remember something else */
-    if (mtmp->mundetected || mtmp->m_ap_type)
+    if (mtmp->mundetected || M_AP_TYPE(mtmp))
         mhidden_description(mtmp, FALSE, eos(buf));
 
     if (monbuf) {

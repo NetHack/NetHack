@@ -655,7 +655,7 @@ int class;            /* an object class, 0 for all */
             if (do_dknown)
                 do_dknown_of(obj);
         }
-        if ((is_cursed && mtmp->m_ap_type == M_AP_OBJECT
+        if ((is_cursed && M_AP_TYPE(mtmp) == M_AP_OBJECT
              && (!class || class == objects[mtmp->mappearance].oc_class))
             || (findgold(mtmp->minvent) && (!class || class == COIN_CLASS))) {
             ct++;
@@ -730,7 +730,7 @@ int class;            /* an object class, 0 for all */
                 break;
             }
         /* Allow a mimic to override the detected objects it is carrying. */
-        if (is_cursed && mtmp->m_ap_type == M_AP_OBJECT
+        if (is_cursed && M_AP_TYPE(mtmp) == M_AP_OBJECT
             && (!class || class == objects[mtmp->mappearance].oc_class)) {
             struct obj temp;
 
@@ -1469,7 +1469,7 @@ genericptr_t num;
             (*(int *) num)++;
         }
     } else if ((mtmp = m_at(zx, zy)) != 0) {
-        if (mtmp->m_ap_type) {
+        if (M_AP_TYPE(mtmp)) {
             seemimic(mtmp);
             (*(int *) num)++;
         }
@@ -1633,7 +1633,7 @@ boolean via_warning;
     if (via_warning && !warning_of(mtmp))
         return -1;
 
-    if (mtmp->m_ap_type) {
+    if (M_AP_TYPE(mtmp)) {
         seemimic(mtmp);
         found_something = TRUE;
     } else if (!canspotmon(mtmp)) {
@@ -1862,7 +1862,7 @@ int default_glyph, which_subset;
                 /* look for a mimic here posing as furniture;
                    if we don't find one, we'll have to fake it */
                 if ((mtmp = m_at(x, y)) != 0
-                    && mtmp->m_ap_type == M_AP_FURNITURE) {
+                    && M_AP_TYPE(mtmp) == M_AP_FURNITURE) {
                     glyph = cmap_to_glyph(mtmp->mappearance);
                 } else {
                     /* we have a topology type but we want a screen

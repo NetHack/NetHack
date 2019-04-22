@@ -421,7 +421,7 @@ int how;
                                    ? &mons[mtmp->cham]
                                    : mptr);
     boolean distorted = (boolean) (Hallucination && canspotmon(mtmp)),
-            mimicker = (mtmp->m_ap_type == M_AP_MONSTER),
+            mimicker = (M_AP_TYPE(mtmp) == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
 
     You((how == STONING) ? "turn to stone..." : "die...");

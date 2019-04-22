@@ -412,8 +412,8 @@ invault()
             mongone(guard);
             return;
         }
-        if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
-            if (youmonst.m_ap_type == M_AP_OBJECT
+        if (U_AP_TYPE == M_AP_OBJECT || u.uundetected) {
+            if (U_AP_TYPE == M_AP_OBJECT
                 && youmonst.mappearance != GOLD_PIECE)
                 if (!Deaf)
                     verbalize("Hey!  Who left that %s in here?",

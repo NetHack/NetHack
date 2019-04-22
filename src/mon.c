@@ -799,8 +799,8 @@ movemon()
             /* unwatched mimics and piercers may hide again  [MRS] */
             if (restrap(mtmp))
                 continue;
-            if (mtmp->m_ap_type == M_AP_FURNITURE
-                || mtmp->m_ap_type == M_AP_OBJECT)
+            if (M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                || M_AP_TYPE(mtmp) == M_AP_OBJECT)
                 continue;
             if (mtmp->mundetected)
                 continue;
@@ -1682,7 +1682,7 @@ struct monst **monst_list; /* &migrating_mons or &mydogs or null */
            clone can continue imitating some other monster form); also,
            might be imitating a boulder so need line-of-sight unblocking */
         mon->mundetected = 0;
-        if (mon->m_ap_type && mon->m_ap_type != M_AP_MONSTER)
+        if (M_AP_TYPE(mon) && M_AP_TYPE(mon) != M_AP_MONSTER)
             seemimic(mon);
     }
 
@@ -1821,7 +1821,7 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
     }
     if (emits_light(mptr))
         del_light_source(LS_MONSTER, monst_to_any(mtmp));
-    if (mtmp->m_ap_type)
+    if (M_AP_TYPE(mtmp))
         seemimic(mtmp);
     if (onmap)
         newsym(mtmp->mx, mtmp->my);
@@ -2870,7 +2870,7 @@ register struct monst *mtmp;
 boolean via_attack;
 {
     mtmp->msleeping = 0;
-    if (mtmp->m_ap_type) {
+    if (M_AP_TYPE(mtmp)) {
         seemimic(mtmp);
     } else if (context.forcefight && !context.mon_moving
                && mtmp->mundetected) {
@@ -2958,7 +2958,7 @@ rescham()
         }
         if (is_were(mtmp->data) && mtmp->data->mlet != S_HUMAN)
             new_were(mtmp);
-        if (mtmp->m_ap_type && cansee(mtmp->mx, mtmp->my)) {
+        if (M_AP_TYPE(mtmp) && cansee(mtmp->mx, mtmp->my)) {
             seemimic(mtmp);
             /* we pretend that the mimic doesn't
                know that it has been unmasked */
@@ -3015,7 +3015,7 @@ register struct monst *mtmp;
 {
     struct trap *t;
 
-    if (mtmp->mcan || mtmp->m_ap_type || cansee(mtmp->mx, mtmp->my)
+    if (mtmp->mcan || M_AP_TYPE(mtmp) || cansee(mtmp->mx, mtmp->my)
         || rn2(3) || mtmp == u.ustuck
         /* can't hide while trapped except in pits */
         || (mtmp->mtrapped && (t = t_at(mtmp->mx, mtmp->my)) != 0
@@ -3076,7 +3076,7 @@ struct monst *mon;
     boolean hider_under = hides_under(mon->data) || mon->data->mlet == S_EEL;
 
     if ((is_hider(mon->data) || hider_under)
-        && !(mon->mundetected || mon->m_ap_type)) {
+        && !(mon->mundetected || M_AP_TYPE(mon))) {
         xchar x = mon->mx, y = mon->my;
         char save_viz = viz_array[y][x];
 
@@ -3085,7 +3085,7 @@ struct monst *mon;
         if (is_hider(mon->data))
             (void) restrap(mon);
         /* try again if mimic missed its 1/3 chance to hide */
-        if (mon->data->mlet == S_MIMIC && !mon->m_ap_type)
+        if (mon->data->mlet == S_MIMIC && !M_AP_TYPE(mon))
             (void) restrap(mon);
         if (hider_under)
             (void) hideunder(mon);
@@ -3551,7 +3551,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
         wormgone(mtmp);
         place_monster(mtmp, mtmp->mx, mtmp->my);
     }
-    if (mtmp->m_ap_type && mdat->mlet != S_MIMIC)
+    if (M_AP_TYPE(mtmp) && mdat->mlet != S_MIMIC)
         seemimic(mtmp); /* revert to normal monster */
 
     /* (this code used to try to adjust the monster's health based on
@@ -3940,7 +3940,7 @@ short otyp;
 {
     short ap = mtmp->mappearance;
 
-    switch (mtmp->m_ap_type) {
+    switch (M_AP_TYPE(mtmp)) {
     case M_AP_NOTHING:
     case M_AP_FURNITURE:
     case M_AP_MONSTER:

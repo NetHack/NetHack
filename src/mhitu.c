@@ -525,7 +525,7 @@ register struct monst *mtmp;
     }
 
     /* hero might be a mimic, concealed via #monster */
-    if (youmonst.data->mlet == S_MIMIC && youmonst.m_ap_type && !range2
+    if (youmonst.data->mlet == S_MIMIC && U_AP_TYPE && !range2
         && foundyou && !u.uswallow) {
         boolean sticky = sticks(youmonst.data);
 
@@ -545,7 +545,7 @@ register struct monst *mtmp;
     }
 
     /* non-mimic hero might be mimicking an object after eating m corpse */
-    if (youmonst.m_ap_type == M_AP_OBJECT && !range2 && foundyou
+    if (U_AP_TYPE == M_AP_OBJECT && !range2 && foundyou
         && !u.uswallow) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
