@@ -632,7 +632,7 @@ int *fail_reason;
     if (has_oname(statue) && !unique_corpstat(mon->data))
         mon = christen_monst(mon, ONAME(statue));
     /* mimic statue becomes seen mimic; other hiders won't be hidden */
-    if (mon->m_ap_type)
+    if (M_AP_TYPE(mon))
         seemimic(mon);
     else
         mon->mundetected = FALSE;
@@ -4444,8 +4444,8 @@ boolean force;
                     return 1;
                 }
                 if ((mtmp = m_at(x, y)) != 0
-                    && (mtmp->m_ap_type == M_AP_FURNITURE
-                        || mtmp->m_ap_type == M_AP_OBJECT)) {
+                    && (M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                        || M_AP_TYPE(mtmp) == M_AP_OBJECT)) {
                     stumble_onto_mimic(mtmp);
                     return 1;
                 }

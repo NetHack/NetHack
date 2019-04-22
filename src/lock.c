@@ -453,8 +453,8 @@ struct obj *pick;
 
         door = &levl[cc.x][cc.y];
         mtmp = m_at(cc.x, cc.y);
-        if (mtmp && canseemon(mtmp) && mtmp->m_ap_type != M_AP_FURNITURE
-            && mtmp->m_ap_type != M_AP_OBJECT) {
+        if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+            && M_AP_TYPE(mtmp) != M_AP_OBJECT) {
             if (picktyp == CREDIT_CARD
                 && (mtmp->isshk || mtmp->data == &mons[PM_ORACLE]))
                 verbalize("No checks, no credit, no problem.");
@@ -745,8 +745,8 @@ boolean quietly;
 {
     register struct monst *mtmp = m_at(x, y);
 
-    if (mtmp && mtmp->m_ap_type != M_AP_FURNITURE) {
-        if (mtmp->m_ap_type == M_AP_OBJECT)
+    if (mtmp && M_AP_TYPE(mtmp) != M_AP_FURNITURE) {
+        if (M_AP_TYPE(mtmp) == M_AP_OBJECT)
             goto objhere;
         if (!quietly) {
             if ((mtmp->mx != x) || (mtmp->my != y)) {

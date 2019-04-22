@@ -50,6 +50,13 @@ enum m_ap_types {
     M_AP_MONSTER   = 3  /* a monster; mostly used for cloned Wizard */
 };
 
+#define M_AP_TYPMASK  0x7
+#define M_AP_F_DKNOWN 0x8
+#define U_AP_TYPE (youmonst.m_ap_type & M_AP_TYPMASK)
+#define U_AP_FLAG (youmonst.m_ap_type & ~M_AP_TYPMASK)
+#define M_AP_TYPE(m) ((m)->m_ap_type & M_AP_TYPMASK)
+#define M_AP_FLAG(m) ((m)->m_ap_type & ~M_AP_TYPMASK)
+
 struct monst {
     struct monst *nmon;
     struct permonst *data;
@@ -170,15 +177,15 @@ struct monst {
 /* mimic appearances that block vision/light */
 #define is_lightblocker_mappear(mon)                       \
     (is_obj_mappear(mon, BOULDER)                          \
-     || ((mon)->m_ap_type == M_AP_FURNITURE                \
+     || (M_AP_TYPE(mon) == M_AP_FURNITURE                    \
          && ((mon)->mappearance == S_hcdoor                \
              || (mon)->mappearance == S_vcdoor             \
              || (mon)->mappearance < S_ndoor /* = walls */ \
              || (mon)->mappearance == S_tree)))
-#define is_door_mappear(mon) ((mon)->m_ap_type == M_AP_FURNITURE \
+#define is_door_mappear(mon) (M_AP_TYPE(mon) == M_AP_FURNITURE   \
                               && ((mon)->mappearance == S_hcdoor \
                                   || (mon)->mappearance == S_vcdoor))
-#define is_obj_mappear(mon,otyp) ((mon)->m_ap_type == M_AP_OBJECT \
+#define is_obj_mappear(mon,otyp) (M_AP_TYPE(mon) == M_AP_OBJECT \
                                   && (mon)->mappearance == (otyp))
 
 #endif /* MONST_H */

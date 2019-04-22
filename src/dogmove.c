@@ -1361,7 +1361,7 @@ finish_meating(mtmp)
 struct monst *mtmp;
 {
     mtmp->meating = 0;
-    if (mtmp->m_ap_type && mtmp->mappearance && mtmp->cham == NON_PM) {
+    if (M_AP_TYPE(mtmp) && mtmp->mappearance && mtmp->cham == NON_PM) {
         /* was eating a mimic and now appearance needs resetting */
         mtmp->m_ap_type = 0;
         mtmp->mappearance = 0;
@@ -1415,15 +1415,15 @@ struct monst *mtmp;
         newsym(mtmp->mx, mtmp->my);
         You("%s %s %sappear%s where %s was!",
             cansee(mtmp->mx, mtmp->my) ? "see" : "sense that",
-            (mtmp->m_ap_type == M_AP_FURNITURE)
+            (M_AP_TYPE(mtmp) == M_AP_FURNITURE)
                 ? an(defsyms[mtmp->mappearance].explanation)
-                : (mtmp->m_ap_type == M_AP_OBJECT
+                : (M_AP_TYPE(mtmp) == M_AP_OBJECT
                    && OBJ_DESCR(objects[mtmp->mappearance]))
                       ? an(OBJ_DESCR(objects[mtmp->mappearance]))
-                      : (mtmp->m_ap_type == M_AP_OBJECT
+                      : (M_AP_TYPE(mtmp) == M_AP_OBJECT
                          && OBJ_NAME(objects[mtmp->mappearance]))
                             ? an(OBJ_NAME(objects[mtmp->mappearance]))
-                            : (mtmp->m_ap_type == M_AP_MONSTER)
+                            : (M_AP_TYPE(mtmp) == M_AP_MONSTER)
                                   ? an(mons[mtmp->mappearance].mname)
                                   : something,
             cansee(mtmp->mx, mtmp->my) ? "" : "has ",
