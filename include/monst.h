@@ -47,7 +47,7 @@ enum m_ap_types {
     M_AP_NOTHING   = 0, /* mappearance unused--monster appears as itself */
     M_AP_FURNITURE = 1, /* stairs, a door, an altar, etc. */
     M_AP_OBJECT    = 2, /* an object */
-    M_AP_MONSTER   = 3, /* a monster; mostly used for cloned Wizard */
+    M_AP_MONSTER   = 3  /* a monster; mostly used for cloned Wizard */
 };
 
 #define M_AP_TYPMASK  0x7
