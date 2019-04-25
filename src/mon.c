@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1555552629 2019/04/18 01:57:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.282 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1556139724 2019/04/24 21:02:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.284 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1935,9 +1935,7 @@ register struct monst *mtmp;
             Sprintf(buf, "%s suddenly %s and rises as %%s!",
                     x_monnam(mtmp, ARTICLE_THE,
                              spec_mon ? (char *) 0 : "seemingly dead",
-                             SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
-                                 | SUPPRESS_INVISIBLE | SUPPRESS_IT,
-                             FALSE),
+                             (SUPPRESS_INVISIBLE | SUPPRESS_IT), FALSE),
                     spec_death ? "reconstitutes" : "transforms");
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
@@ -1965,13 +1963,13 @@ register struct monst *mtmp;
             else
                 mtmp->cham = mndx;
             if (canspotmon(mtmp)) {
-                const char *whom = mtmp->data->mname;
-
-                /* was using a_monnam(mtmp) but that's weird if mtmp is named:
-                   "Dracula suddenly transforms and rises as Dracula" */
-                if (!type_is_pname(mtmp->data))
-                    whom = an(whom);
-                pline(upstart(buf), whom);
+                /* 3.6.0 used a_monnam(mtmp); that was weird if mtmp was
+                   named: "Dracula suddenly transforms and rises as Dracula";
+                   3.6.1 used mtmp->data->mname; that ignored hallucination */
+                pline(upstart(buf),
+                      x_monnam(mtmp, ARTICLE_A, (char *) 0,
+                               (SUPPRESS_NAME | SUPPRESS_IT
+                                | SUPPRESS_INVISIBLE), FALSE));
                 vamp_rise_msg = TRUE;
             }
             newsym(x, y);

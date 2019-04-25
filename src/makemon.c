@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1555801218 2019/04/20 23:00:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1556150377 2019/04/24 23:59:37 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.134 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1282,22 +1282,19 @@ int mmflags;
     if (mndx == PM_VLAD_THE_IMPALER)
         mitem = CANDELABRUM_OF_INVOCATION;
     mtmp->cham = NON_PM; /* default is "not a shapechanger" */
-    if ((mcham = pm_to_cham(mndx)) != NON_PM) {
+    if (!Protection_from_shape_changers
+        && (mcham = pm_to_cham(mndx)) != NON_PM) {
         /* this is a shapechanger after all */
-        if (Protection_from_shape_changers
-            || mndx == PM_VLAD_THE_IMPALER) {
-            ; /* stuck in its natural form (NON_PM) */
-        } else {
-            mtmp->cham = mcham;
-            /* Note: shapechanger's initial form used to be
-               chosen here with rndmonst(), yielding a monster
-               which was appropriate to the level's difficulty
-               but ignored the changer's usual type selection
-               so would be inappropriate for vampshifters.
+        mtmp->cham = mcham;
+        /* Vlad stays in his normal shape so he can carry the Candelabrum */
+        if (mndx != PM_VLAD_THE_IMPALER
+            /* Note:  shapechanger's initial form used to be chosen here
+               with rndmonst(), yielding a monster which was appropriate
+               to the level's difficulty but ignoring the changer's usual
+               type selection, so was inappropriate for vampshifters.
                Let newcham() pick the shape. */
-            if (newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
-                allow_minvent = FALSE;
-        }
+            && newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
+            allow_minvent = FALSE;
     } else if (mndx == PM_WIZARD_OF_YENDOR) {
         mtmp->iswiz = TRUE;
         context.no_of_wizards++;
