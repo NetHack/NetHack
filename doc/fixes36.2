@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.310 $ $NHDT-Date: 1556201496 2019/04/25 14:11:36 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.311 $ $NHDT-Date: 1556497911 2019/04/29 00:31:51 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -514,6 +514,9 @@ tty: when clipping was used to show a subset of the map on a small display,
 	would ask the core to generate a new view of the map rather than use
 	whatever was currently shown, bringing back suppressed monsters/
 	objects/traps for #terrain and new hallucinatory monsters for farlook
+Qt5, perhaps others: avoid "status 'reassess' before init" panic near start
+	of new game (triggered from set_uasmon() if core was built with
+	STATUS_HILITES enabled but current interface doesn't support that)
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
 X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
