@@ -340,6 +340,7 @@ boolean foundyou;
 STATIC_OVL int
 m_cure_self(mtmp, dmg)
 struct monst *mtmp;
+int dmg;
 {
     if (mtmp->mhp < mtmp->mhpmax) {
         if (canseemon(mtmp))
