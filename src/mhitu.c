@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1555720104 2019/04/20 00:28:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1556649298 2019/04/30 18:34:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -152,7 +152,7 @@ struct attack *mattk;
     /* maybe it's attacking an image around the corner? */
 
     compat = ((mattk->adtyp == AD_SEDU || mattk->adtyp == AD_SSEX)
-              ? could_seduce(mtmp, &g.youmonst, (struct attack *) 0) : 0);
+              ? could_seduce(mtmp, &g.youmonst, mattk) : 0);
     Monst_name = Monnam(mtmp);
 
     if (!mtmp->mcansee || (Invis && !perceives(mtmp->data))) {
@@ -541,8 +541,7 @@ register struct monst *mtmp;
     }
 
     /* non-mimic hero might be mimicking an object after eating m corpse */
-    if (U_AP_TYPE == M_AP_OBJECT && !range2 && foundyou
-        && !u.uswallow) {
+    if (U_AP_TYPE == M_AP_OBJECT && !range2 && foundyou && !u.uswallow) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         if (!youseeit)
@@ -638,9 +637,9 @@ register struct monst *mtmp;
 
     if (u.uinvulnerable) {
         /* monsters won't attack you */
-        if (mtmp == u.ustuck)
+        if (mtmp == u.ustuck) {
             pline("%s loosens its grip slightly.", Monnam(mtmp));
-        else if (!range2) {
+        } else if (!range2) {
             if (youseeit || sensemon(mtmp))
                 pline("%s starts to attack you, but pulls back.",
                       Monnam(mtmp));
@@ -2370,12 +2369,12 @@ int n;
 int
 could_seduce(magr, mdef, mattk)
 struct monst *magr, *mdef;
-struct attack *mattk;
+struct attack *mattk; /* non-Null: current attack; Null: general capability */
 {
     struct permonst *pagr;
     boolean agrinvis, defperc;
     xchar genagr, gendef;
-    int adtyp = mattk ? mattk->adtyp : AD_PHYS;
+    int adtyp;
 
     if (is_animal(magr->data))
         return 0;
@@ -2395,6 +2394,11 @@ struct attack *mattk;
         defperc = perceives(mdef->data);
         gendef = gender(mdef);
     }
+
+    adtyp = mattk ? mattk->adtyp
+            : dmgtype(pagr, AD_SSEX) ? AD_SSEX
+              : dmgtype(pagr, AD_SEDU) ? AD_SEDU
+                : AD_PHYS;
     if (adtyp == AD_SSEX && !SYSOPT_SEDUCE)
         adtyp = AD_SEDU;
 
