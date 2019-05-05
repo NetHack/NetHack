@@ -37,7 +37,7 @@
         [.sys   .os2]   -- OS/2
         [.sys   .share   .sounds] -- AIFF format audio files
         [.sys   .unix]  -- guess :-)
-	[.sys   .unit    .hints] -- configuration data for setup.sh
+        [.sys   .unit    .hints] -- configuration data for setup.sh
         [.sys   .wince] -- Windows CE
         [.sys   .wince   .ceinc] -- more WinCE
         [.sys   .wince   .ceinc   .sys] -- ditto
@@ -71,18 +71,27 @@
     The distributed copy of config.h will work successfully on VMS;
     vmsconf.h has conditional code to deal with the UNIX-specific items.
 
-4.  If you have the programming utilities lex or flex and yacc or bison,
-    you may edit the procedure [.sys.vms]spec_lev.com and execute it to
-    process several source files for NetHack's special level and dungeon
-    compilers.  If you use the version of these utilities from the OpenVMS
-    freeware CD you will have to remove the include <stdlib.h> that yacc
-    places at the top of each file.  The provided spec_lev.com will default
-    to copy pre-processed versions of the appropriate files (dgn_lex.c, lev_lex.c,
-    dgn_yacc.c, lev_yacc.c, dgn_comp.h, and lev_comp.h) from [.sys.share]
-    into [.util]*.c and [.include]*.h.
-    If you choose to modify spec_lev.com, you want to run and test your
-    changes prior to executing vmsbuild.com; otherwise, vmsbuild.com will
-    do so for you and the results might not be what you expect.
+4.  vmsbuild.com checks for several source files in [.util] and if it doesn't
+    find them, it uses [.sys.vms]spec_lev.com to generate them.  If you have
+    the programming utilities lex or flex and yacc or bison, they be will
+    used if symbols are set up to run them.  Or if you have them but do not
+    have symbols set up, you may edit spec_lev.com to have it run them.
+    If neither of those situations applies, spec_lev.com will default to
+    copying pre-genearated versions of the appropriate files (dgn_lex.c,
+    lev_lex.c, dgn_yacc.c, lev_yacc.c, dgn_comp.h, and lev_comp.h) from
+    [.sys.share] into [.util]*.c and [.include]*.h.
+
+    Once the file lev_yacc.c is in place, vmsbuild.com won't execute
+    spec_lev.com to make any of them, so if you decide to modify *_comp.l
+    and/or *_comp.y then you'll either need to execute spec_lev.com before
+    vmsbuild.com or remove [.util]lev_yacc.c so vmsbuild.com will do so.
+
+    If you use the versions of the lex and yacc utilities from the OpenVMS
+    freeware CD, you will need to pass "/Define=_DECC_V4_SOURCE" as the
+    third argument to vmsbuild.com in step #5.  The version of yacc
+    or bison in that distribution places '#include <stdlib.h>' in the
+    generated code, before nethack's '#include "config.h"', leading to
+    conflicts that prevent compilation from completing.
 
 5.  To build NETHACK.EXE and its auxiliary programs, execute the
     following DCL command:
@@ -138,7 +147,7 @@ Notes:
 
 1.  Save files and bones files from 3.4.x and earlier versions
     will not work with 3.6.2, but save files and bones file from 3.6.0
-    and 3.6.1 should work. The scoreboard file (RECORD) from 3.6.0 or 
+    and 3.6.1 should work. The scoreboard file (RECORD) from 3.6.0 or
     3.4.x or 3.3.x will work.
 
 2.  To specify user-preference options in your environment, define the
@@ -212,6 +221,9 @@ Notes:
     is the preferred way to compile because it's guaranteed to compile
     and link everything.
 
+    [Note:  Makefile.* have been updated occasionally but not exercised
+    for a long time, so might not be in working order.]
+
 4.  termcap is an ASCII data file containing descriptions of terminal
     capabilities and the escape sequences that software must use to take
     advantage of them.  If you do not already have a termcap file in use
@@ -240,7 +252,11 @@ Notes:
     termcap file, otherwise a message about "Unknown terminal type" will
     be printed and NetHack will exit.
 
-5.  NetHack contains code which attempts to make it secure in case it's
+5.  Both vmsbuild.com and Makefile.src have provisions to build nethack's
+    'curses' interface, but the source code for it won't compile using
+    the implementation of curses which is supplied with VMS.
+
+6.  NetHack contains code which attempts to make it secure in case it's
     installed with privileges (to allow the playground to be protected
     against world write access).  This has only undergone limited testing,
     so install NetHack with privileges at your own risk.  If you discover
@@ -293,7 +309,7 @@ Notes:
     built NetHack, you can relink with tracebacks disabled by doing
        $ @[.SYS.VMS]VMSBUILD "LINK" "" "" "/noTrace/noDebug"
 
-6.  If you can't or won't install nethack.exe with privileges and if you
+7.  If you can't or won't install nethack.exe with privileges and if you
     don't have access to a privileged account yourself, then if you intend
     to allow other users to access your copy of NetHack you should probably
     place an ACL on the playground directory and its save subdirectory.
@@ -326,7 +342,7 @@ Notes:
     you to run recover.exe on behalf of other users, because you won't be
     able to create files owned by them unless you have elevated privileges.
 
-7.  Many NetHack commands can be aborted by sending it the <escape>
+8.  Many NetHack commands can be aborted by sending it the <escape>
     character when it wants input.  This is displayed as ESC inside the
     game.  Digital VK201 keyboards (used by VT2xx and VT3xx and older
     VAXstations) and VK401 keyboards (used by VT4xx, newer VAXstations,
@@ -366,16 +382,18 @@ Notes:
     be sure to remember to eventually reattach to the NetHack subprocess;
     otherwise the game in progress won't get saved when you logout.
 
-8.  NetHack optionally maintains a logfile which receives one line appended
+9.  NetHack optionally maintains a logfile which receives one line appended
     to it whenever a game ends.  This can be disabled entirely by adding
     an "#undef LOGFILE" directive to vmsconf.h prior to building the
     program, or it can be disabled later by removing the file(s) LOGFILE.;*
     from the playground directory.  If not disabled prior to compilation,
     the logfile can be reinitialized by simply creating an empty file
     named LOGFILE in the playground, but make sure that users are able
-    to write into it, or new entries will not be appended.
+    to write into it, or new entries will not be appended.  A somewhat
+    more elaborate log file named XLOGFILE containing more information is
+    handled similarly.
 
-9.  Some attempt at support for VMS versions earlier than V4.6 has been
+10. Some attempt at support for VMS versions earlier than V4.6 has been
     included, but no such obsolete system was available for testing it.
     vmsbuild.com detects the need for the extra support routines and
     arranges automatically for them to be compiled.  The reason that
@@ -383,7 +401,10 @@ Notes:
     underwent a major revision for VMS V4.6 and several routines which
     NetHack utilizes were not available prior to that upgrade.
 
-10. vmsbuild.com collects almost all of the object files (xxx.OBJ) into
+    [That was written many years ago and the chance of it still working
+    is very small.]
+
+11. vmsbuild.com collects almost all of the object files (xxx.OBJ) into
     an object library (NETHACK.OLB) as it compiles the source files.
     This should prevent the quota-exceeded problems from the linker
     that some sites have reported for prior versions.  Note that if you
@@ -395,7 +416,7 @@ Notes:
     If you forget to replace the library entry, your newly compiled code
     will not be included in the new executable image.
 
-11. To access "wizard mode"--intended for debugging purposes, not to
+12. To access "wizard mode"--intended for debugging purposes, not to
     spoil the game with unlimited wishes--you must be running from the
     username compiled into the game via Local_WIZARD in vmsconf.h, and
     you must specify "-D" on the command line when invoking NetHack.
@@ -405,7 +426,11 @@ Notes:
        $ @hackdir:nethack "-D"
     Any character name you specify will be ignored in favor of "wizard".
 
-12. At program startup time, NetHack uses the empty file PERM to prevent
+    [More out of date information.  Rather than compile-time Local_WIZARD,
+    uses(s) allowed to entre wizard mode are now controlled by the entry
+    WIZARDS in the file SYSCONF.]
+
+13. At program startup time, NetHack uses the empty file PERM to prevent
     two different processes from using the same character name (under the
     same UIC ownership) at the same time.  It does this by temporarily
     giving that file a second directory entry named PERM.LOCK, then
@@ -447,7 +472,7 @@ Notes:
     is accomplished using temporary entry RECORD.LOCK and LOGFILE using
     entry LOGFILE.LOCK.
 
-13. Unless you have both Motif and the Athena Widget set from MIT, you
+14. Unless you have both Motif and the Athena Widget set from MIT, you
     will not be able to use the X11 interface on VMS.  Even if you do
     have both those things, such a configuration has not been tested and
     there are no provisions for it in vmsbuild.com.  Makefile.src does
@@ -473,14 +498,15 @@ Notes:
     window manager in order for any changes to take effect; it's easiest
     to just make the session manager quit and then log in again.
 
-14. If necessary, send problem reports via e-mail to
+15. If necessary, send problem reports via e-mail to
        <devteam@nethack.org>
     Always include version information for NetHack, the operating system,
     and the C compiler used.
 
 20-OCT-2003
 minimally updated 9-NOV-2015...
+and again 5-MAY-2019...
 
-# NetHack 3.6  Install.vms       $NHDT-Date: 1524689427 2018/04/25 20:50:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $
+# NetHack 3.6  Install.vms       $NHDT-Date: 1557100606 2019/05/05 23:56:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.14 $
 # Copyright (c) 2003 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
