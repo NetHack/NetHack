@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1554045810 2019/03/31 15:23:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1556835736 2019/05/02 22:22:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -37,9 +37,15 @@
  *              background
  *
  *      If the location is out of sight, display in order:
- *              sensed monsters (telepathy)
+ *              sensed monsters (via telepathy or persistent detection)
+ *              warning (partly-sensed monster shown as an abstraction)
  *              memory
  *
+ *      "Remembered, unseen monster" is handled like an object rather
+ *      than a monster, and stays displayed whether or not it is in sight.
+ *      It is removed when a visible or sensed or warned-of monster gets
+ *      shown at its location or when searching or fighting reveals that
+ *      no monster is there.
  *
  *
  * Here is a list of the major routines in this file to be used externally:
@@ -309,9 +315,9 @@ register int x, y;
     if (!g.level.flags.hero_memory)
         return;
 
-    if ((trap = t_at(x, y)) != 0 && trap->tseen && !covers_traps(x, y))
+    if ((trap = t_at(x, y)) != 0 && trap->tseen && !covers_traps(x, y)) {
         map_trap(trap, 0);
-    else if (levl[x][y].seenv) {
+    } else if (levl[x][y].seenv) {
         struct rm *lev = &levl[x][y];
 
         map_background(x, y, 0);
@@ -320,8 +326,9 @@ register int x, y;
         if (!lev->waslit && lev->glyph == cmap_to_glyph(S_room)
             && lev->typ == ROOM)
             lev->glyph = cmap_to_glyph(S_stone);
-    } else
+    } else {
         levl[x][y].glyph = cmap_to_glyph(S_stone); /* default val */
+    }
 }
 
 /*
@@ -332,7 +339,7 @@ register int x, y;
  *
  * Internal to display.c, this is a #define for speed.
  */
-#define _map_location(x, y, show)                                           \
+#define _map_location(x, y, show) \
     {                                                                       \
         register struct obj *obj;                                           \
         register struct trap *trap;                                         \
@@ -440,8 +447,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
         }
     }
 
-    /* If the mimic is unsuccessfully mimicing something, display the monster.
-     */
+    /* If mimic is unsuccessfully mimicing something, display the monster. */
     if (!mon_mimic || sensed) {
         int num;
 
@@ -461,13 +467,13 @@ xchar worm_tail;            /* mon is actually a worm tail */
         } else if (sightflags == DETECTED) {
             if (worm_tail)
                 num = detected_monnum_to_glyph(
-                    what_mon(PM_LONG_WORM_TAIL, rn2_on_display_rng));
+                             what_mon(PM_LONG_WORM_TAIL, rn2_on_display_rng));
             else
                 num = detected_mon_to_glyph(mon, rn2_on_display_rng);
         } else {
             if (worm_tail)
                 num = monnum_to_glyph(
-                    what_mon(PM_LONG_WORM_TAIL, rn2_on_display_rng));
+                             what_mon(PM_LONG_WORM_TAIL, rn2_on_display_rng));
             else
                 num = mon_to_glyph(mon, rn2_on_display_rng);
         }
@@ -618,10 +624,9 @@ xchar x, y;
              * floor symbol.
              *
              * Similarly, if the hero digs a hole in a wall or feels a
-             * location
-             * that used to contain an unseen monster.  In these cases,
-             * there's no reason to assume anything was underneath, so
-             * just show the appropriate floor symbol.  If something was
+             * location that used to contain an unseen monster.  In these
+             * cases, there's no reason to assume anything was underneath,
+             * so just show the appropriate floor symbol.  If something was
              * embedded in the wall, the glyph will probably already
              * reflect that.  Don't change the symbol in this case.
              *
@@ -860,7 +865,7 @@ register int x, y;
             else
                 goto show_mem;
         } else {
-        show_mem:
+ show_mem:
             show_glyph(x, y, lev->glyph);
         }
     }
@@ -910,24 +915,22 @@ int x, y;
  * but explode() wants to delay].
  *
  * Call:
- *      (DISP_BEAM,   glyph)    open, initialize glyph
- *      (DISP_FLASH,  glyph)    open, initialize glyph
- *      (DISP_ALWAYS, glyph)    open, initialize glyph
- *      (DISP_CHANGE, glyph)    change glyph
- *      (DISP_END,    0)        close & clean up (second argument doesn't
- *                              matter)
- *      (DISP_FREEMEM, 0)       only used to prevent memory leak during
- *                              exit)
+ *      (DISP_BEAM,    glyph)   open, initialize glyph
+ *      (DISP_FLASH,   glyph)   open, initialize glyph
+ *      (DISP_ALWAYS,  glyph)   open, initialize glyph
+ *      (DISP_CHANGE,  glyph)   change glyph
+ *      (DISP_END,     0)       close & clean up (2nd argument doesn't matter)
+ *      (DISP_FREEMEM, 0)       only used to prevent memory leak during exit)
  *      (x, y)                  display the glyph at the location
  *
- * DISP_BEAM  - Display the given glyph at each location, but do not erase
- *              any until the close call.
- * DISP_TETHER- Display a tether glyph at each location, and the tethered
- *              object at the farthest location, but do not erase any
- *              until the return trip or close.
- * DISP_FLASH - Display the given glyph at each location, but erase the
- *              previous location's glyph.
- * DISP_ALWAYS- Like DISP_FLASH, but vision is not taken into account.
+ * DISP_BEAM   - Display the given glyph at each location, but do not erase
+ *               any until the close call.
+ * DISP_TETHER - Display a tether glyph at each location, and the tethered
+ *               object at the farthest location, but do not erase any
+ *               until the return trip or close.
+ * DISP_FLASH  - Display the given glyph at each location, but erase the
+ *               previous location's glyph.
+ * DISP_ALWAYS - Like DISP_FLASH, but vision is not taken into account.
  */
 
 #define TMP_AT_MAX_GLYPHS (COLNO * 2)
@@ -956,7 +959,7 @@ int x, y;
         if (!tglyph)
             tmp = &tgfirst;
         else /* nested effect; we need dynamic memory */
-            tmp = (struct tmp_glyph *) alloc(sizeof(struct tmp_glyph));
+            tmp = (struct tmp_glyph *) alloc(sizeof *tmp);
         tmp->prev = tglyph;
         tglyph = tmp;
         tglyph->sidx = 0;
@@ -1584,8 +1587,8 @@ int cursor_on_u;
     /* Prevent infinite loops on errors:
      *      flush_screen->print_glyph->impossible->pline->flush_screen
      */
-    static boolean flushing = 0;
-    static boolean delay_flushing = 0;
+    static int flushing = 0;
+    static int delay_flushing = 0;
     register int x, y;
 
     if (cursor_on_u == -1)
@@ -1602,7 +1605,7 @@ int cursor_on_u;
 
     for (y = 0; y < ROWNO; y++) {
         register gbuf_entry *gptr = &g.gbuf[y][x = g.gbuf_start[y]];
-        for (; x <= g.gbuf_stop[y]; gptr++, x++)
+
             if (gptr->gnew) {
                 print_glyph(WIN_MAP, x, y, gptr->glyph, get_bk_glyph(x, y));
                 gptr->gnew = 0;
@@ -1843,7 +1846,7 @@ xchar x, y;
     struct rm *lev = &levl[x][y];
 
     if (iflags.use_background_glyph && lev->seenv != 0
-            && g.gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
+        && g.gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
         switch (lev->typ) {
         case SCORR:
         case STONE:
@@ -1894,10 +1897,8 @@ xchar x, y;
     return bkglyph;
 }
 
-/* -------------------------------------------------------------------------
- */
-/* Wall Angle --------------------------------------------------------------
- */
+/* ------------------------------------------------------------------------ */
+/* Wall Angle ------------------------------------------------------------- */
 
 #ifdef WA_VERBOSE
 
@@ -1943,6 +1944,7 @@ check_pos(x, y, which)
 int x, y, which;
 {
     int type;
+
     if (!isok(x, y))
         return which;
     type = levl[x][y].typ;
@@ -1977,8 +1979,11 @@ int x1, y1, x2, y2, x3, y3;
 {
     int wmode, is_1, is_2, is_3;
 
+#ifndef WA_VERBOSE
+    /* non-verbose more_than_one() doesn't use these */
     nhUse(x0);
     nhUse(y0);
+#endif
 
     is_1 = check_pos(x1, y1, WM_T_LONG);
     is_2 = check_pos(x2, y2, WM_T_BL);
@@ -2157,8 +2162,7 @@ set_wall_state()
 #endif /* WA_VERBOSE */
 }
 
-/* -------------------------------------------------------------------------
- */
+/* ------------------------------------------------------------------------ */
 /* This matrix is used here and in vision.c. */
 unsigned char seenv_matrix[3][3] = { { SV2, SV1, SV0 },
                                      { SV3, SVALL, SV7 },
@@ -2189,8 +2193,7 @@ int x0, y0, x1, y1; /* from, to; abs(x1-x0)==1 && abs(y0-y1)==1 */
     lev->seenv &= ~seenv_matrix[dy + 1][dx + 1];
 }
 
-/* -------------------------------------------------------------------------
- */
+/* ------------------------------------------------------------------------ */
 
 /* T wall types, one for each row in wall_matrix[][]. */
 #define T_d 0
@@ -2304,7 +2307,7 @@ struct rm *lev;
         goto do_twall;
     case TDWALL:
         row = wall_matrix[T_d];
-    do_twall:
+ do_twall:
         switch (lev->wall_info & WM_MASK) {
         case 0:
             if (seenv == SV4) {
@@ -2338,13 +2341,14 @@ struct rm *lev;
             break;
         case WM_T_BL:
 #if 0  /* older method, fixed */
-            if (only(seenv, SV4|SV5)) {
+            if (only(seenv, SV4 | SV5)) {
                 col = T_tlcorn;
-            } else if ((seenv & (SV0|SV1|SV2))
-                       && only(seenv, SV0|SV1|SV2|SV6|SV7)) {
+            } else if ((seenv & (SV0 | SV1 | SV2))
+                       && only(seenv, SV0 | SV1 | SV2 | SV6 | SV7)) {
                 col = T_hwall;
             } else if ((seenv & SV3)
-                       || ((seenv & (SV0|SV1|SV2)) && (seenv & (SV4|SV5)))) {
+                       || ((seenv & (SV0 | SV1 | SV2))
+                           && (seenv & (SV4 | SV5)))) {
                 col = T_tdwall;
             } else {
                 if (seenv != SV6)
@@ -2364,13 +2368,14 @@ struct rm *lev;
             break;
         case WM_T_BR:
 #if 0  /* older method, fixed */
-            if (only(seenv, SV5|SV6)) {
+            if (only(seenv, SV5 | SV6)) {
                 col = T_trcorn;
-            } else if ((seenv & (SV0|SV1|SV2))
-                       && only(seenv, SV0|SV1|SV2|SV3|SV4)) {
+            } else if ((seenv & (SV0 | SV1 | SV2))
+                       && only(seenv, SV0 | SV1 | SV2 | SV3 | SV4)) {
                 col = T_hwall;
             } else if ((seenv & SV7)
-                       || ((seenv & (SV0|SV1|SV2)) && (seenv & (SV5|SV6)))) {
+                       || ((seenv & (SV0 | SV1 | SV2))
+                           && (seenv & (SV5 | SV6)))) {
                 col = T_tdwall;
             } else {
                 if (seenv != SV4)
@@ -2401,7 +2406,7 @@ struct rm *lev;
     case SDOOR:
         if (lev->horizontal)
             goto horiz;
-    /* fall through */
+        /*FALLTHRU*/
     case VWALL:
         switch (lev->wall_info & WM_MASK) {
         case 0:
@@ -2422,7 +2427,7 @@ struct rm *lev;
         break;
 
     case HWALL:
-    horiz:
+ horiz:
         switch (lev->wall_info & WM_MASK) {
         case 0:
             idx = seenv ? S_hwall : S_stone;
@@ -2513,10 +2518,10 @@ struct rm *lev;
             goto do_crwall;
         case WM_X_BR:
             row = cross_matrix[C_br];
-        do_crwall:
-            if (seenv == SV4)
+ do_crwall:
+            if (seenv == SV4) {
                 idx = S_stone;
-            else {
+            } else {
                 seenv = seenv & ~SV4; /* strip SV4 */
                 if (seenv == SV0) {
                     col = C_brcorn;
