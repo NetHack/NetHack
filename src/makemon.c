@@ -842,6 +842,8 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
     m2->mx = mm.x;
     m2->my = mm.y;
 
+    m2->mundetected = 0;
+    m2->mtrapped = 0;
     m2->mcloned = 1;
     m2->minvent = (struct obj *) 0; /* objects don't clone */
     m2->mleashed = FALSE;

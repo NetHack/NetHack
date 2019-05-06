@@ -1,4 +1,4 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1539653203 2018/10/16 01:26:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1557092711 2019/05/05 21:45:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -212,8 +212,8 @@ char *namebuf;
 /* called by savebones(); also by finish_paybill(shk.c) */
 void
 drop_upon_death(mtmp, cont, x, y)
-struct monst *mtmp;
-struct obj *cont;
+struct monst *mtmp; /* monster if hero turned into one (other than ghost) */
+struct obj *cont; /* container if hero is turned into a statue */
 int x, y;
 {
     struct obj *otmp;
@@ -221,9 +221,13 @@ int x, y;
     u.twoweap = 0; /* ensure curse() won't cause swapwep to drop twice */
     while ((otmp = g.invent) != 0) {
         obj_extract_self(otmp);
-        obj_no_longer_held(otmp);
+        /* when turning into green slime, all gear remains held;
+           other types "arise from the dead" do aren't holding
+           equipment during their brief interval as a corpse */
+        if (!mtmp || is_undead(mtmp->data))
+            obj_no_longer_held(otmp);
 
-        otmp->owornmask = 0;
+        otmp->owornmask = 0L;
         /* lamps don't go out when dropped */
         if ((cont || artifact_light(otmp)) && obj_is_burning(otmp))
             end_burn(otmp, TRUE); /* smother in statue */
@@ -363,7 +367,7 @@ struct obj *corpse;
         return;
     }
 
-make_bones:
+ make_bones:
     unleash_all();
     /* in case these characters are not in their home bases */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -388,7 +392,7 @@ make_bones:
 
     /* check iron balls separately--maybe they're not carrying it */
     if (uball)
-        uball->owornmask = uchain->owornmask = 0;
+        uball->owornmask = uchain->owornmask = 0L;
 
     /* dispose of your possessions, usually cursed */
     if (u.ugrave_arise == (NON_PM - 1)) {
@@ -420,21 +424,21 @@ make_bones:
         g.in_mklev = TRUE; /* use <u.ux,u.uy> as-is */
         mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MINVENT);
         g.in_mklev = FALSE;
-        if (!mtmp) {
+        if (!mtmp) { /* arise-type might have been genocided */
             drop_upon_death((struct monst *) 0, (struct obj *) 0, u.ux, u.uy);
             u.ugrave_arise = NON_PM; /* in case caller cares */
             return;
         }
-        /* give mummy-from-hero a wrapping unless hero already
-           carries one; don't bother forcing it to become worn */
-        if (mtmp->data->mlet == S_MUMMY && !carrying(MUMMY_WRAPPING))
-            (void) mongets(mtmp, MUMMY_WRAPPING);
         mtmp = christen_monst(mtmp, g.plname);
         newsym(u.ux, u.uy);
         /* ["Your body rises from the dead as an <mname>..." used
            to be given here, but it has been moved to done() so that
            it gets delivered even when savebones() isn't called] */
         drop_upon_death(mtmp, (struct obj *) 0, u.ux, u.uy);
+        /* 'mtmp' now has hero's inventory; if 'mtmp' is a mummy, give it
+           a wrapping unless already carrying one */
+        if (mtmp->data->mlet == S_MUMMY && !m_carrying(mtmp, MUMMY_WRAPPING))
+            (void) mongets(mtmp, MUMMY_WRAPPING);
         m_dowear(mtmp, TRUE);
     }
     if (mtmp) {

@@ -1685,6 +1685,7 @@ struct monst **monst_list; /* &g.migrating_mons or &g.mydogs or null */
     }
 
     if (on_map) {
+        mon->mtrapped = 0;
         if (mon->wormno)
             remove_worm(mon);
         else
