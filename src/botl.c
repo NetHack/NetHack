@@ -781,6 +781,7 @@ boolean *valsetlist;
          *  ought to force the windowport to treat current HP as changed
          *  if hitpointbar is On, in order for that to be re-rendered.
          */
+   if (g.update_all || chg || reset) {
         idxmax = curr->idxmax;
         pc = (idxmax >= 0) ? percentage(curr, &g.blstats[idx][idxmax]) : 0;
 
