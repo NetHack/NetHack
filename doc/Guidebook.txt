@@ -4091,9 +4091,9 @@
 
 
 
-          NetHack Guidebook                                              63
 
           NetHack Guidebook                                              63
+
 
 
           verbose
@@ -4217,9 +4217,9 @@
           font_map
             if NetHack can, it should use a font by the chosen name for the
 
+
           NetHack 3.6                                         April 9, 2019
 
-          NetHack 3.6                                        March 24, 2019
 
 
 
@@ -4413,20 +4413,14 @@
             If NetHack can, it should wrap long lines of text if they don't
             fit in the visible area of the window.
 
-          wraptext
-            If NetHack can, it should wrap long lines of text if they don't
-            fit in the visible area of the window.
 
 
-
-          NetHack 3.6                                        March 24, 2019
 
           NetHack 3.6                                         April 9, 2019
 
 
 
 
-          NetHack Guidebook                                              68
 
           NetHack Guidebook                                              68
 
@@ -4487,16 +4481,15 @@
           soundcard
             (default on, PC NetHack only).  Cannot  be  set  with  the  `O'
 
+
           NetHack 3.6                                         April 9, 2019
 
-          NetHack 3.6                                        March 24, 2019
 
 
 
 
           NetHack Guidebook                                              69
 
-          NetHack Guidebook                                              69
 
 
             command.
@@ -4961,8 +4954,6 @@
 
 
 
-
-
           9.13.  Configuring Status Hilites
 
                Your copy of NetHack may have been compiled with support for
@@ -5002,6 +4993,7 @@
                To specify both a color and an attribute, use `&' to combine
           them.   To specify multiple attributes, use `+' to combine those.
           For example: "magenta&inverse+dim".
+
                Note that the display may substitute  or  ignore  particular
           attributes  depending  upon  its capabilities, and in general may
           interpret the attributes any way it wants.  For example, on  some
@@ -5015,10 +5007,18 @@
 
                You  can  adjust  the  appearance  of  the  following status
           fields:
+
+
+
           NetHack 3.6                                         April 9, 2019
 
 
+
+
+
           NetHack Guidebook                                              77
+
+
 
                      title       dungeon-level   experience-level
                     strength         gold           experience
@@ -5034,10 +5034,11 @@
             dice", an approximation  of  experience  level  displayed  when
             polymorphed.   "experience", "time", and "score" are condition-
             ally displayed depending upon your other option settings.
+
             Instead of a behavior, "condition" takes the  following  condi-
             tion  flags:  stone,  slime,  strngl, foodpois, termill, blind,
-            deaf,  stun, conf, hallu, lev, fly, and ride.  You can use "ma-
-            jor_troubles" as an  alias  for  stone  through  termill,  "mi-
+            deaf, stun, conf, hallu, lev, fly, and ride.  You can use  "ma-
+            jor_troubles"  as  an  alias  for  stone  through termill, "mi-
             nor_troubles" for blind through hallu, "movement" for lev, fly,
             and ride, and "all" for every condition.
 
@@ -5046,39 +5047,28 @@
 
                * "always" will set the default attributes for that field.
 
-               * "up" and "down" set the  field  attributes  for  when  the
-                 field  value changes upwards or downwards.  This attribute
+               * "up"  and  "down"  set  the  field attributes for when the
+                 field value changes upwards or downwards.  This  attribute
                  times out after statushilites turns.
 
-
-          NetHack 3.6                                        March 24, 2019
-
-
-
-
-
-          NetHack Guidebook                                              77
-
-
-
                * "changed" sets the field attribute for when the field val-
-                 ue  changes.  This attribute times out after statushilites
-                 turns.  (If a field has both a "changed" rule and an  "up"
-                 or  "down" rule which matches a change in the field's val-
+                 ue changes.  This attribute times out after  statushilites
+                 turns.   (If a field has both a "changed" rule and an "up"
+                 or "down" rule which matches a change in the field's  val-
                  ue, the "up" or "down" one takes precedence.)
 
-               * percentage sets the field attribute when the  field  value
-                 matches  the  percentage.  It is specified as a number be-
-                 tween 0 and 100, followed by `%' (percent sign).   If  the
-                 percentage  is prefixed with `<=' or `>=', it also matches
-                 when value is below or above the percentage.   Use  prefix
-                 `<'  or  `>'  to match when strictly below or above.  (The
-                 numeric limit is relaxed  slightly  for  those:  >-1%  and
+               * percentage  sets  the field attribute when the field value
+                 matches the percentage.  It is specified as a  number  be-
+                 tween  0  and 100, followed by `%' (percent sign).  If the
+                 percentage is prefixed with `<=' or `>=', it also  matches
+                 when  value  is below or above the percentage.  Use prefix
+                 `<' or `>' to match when strictly below  or  above.   (The
+                 numeric  limit  is  relaxed  slightly  for those: >-1% and
                  <101% are allowed.)  Only valid for "hitpoints" and  "pow-
                  er" fields.
 
-               * absolute value sets the attribute  when  the  field  value
-                 matches  that number.  The number must be 0 or higher, ex-
+               * absolute  value  sets  the  attribute when the field value
+                 matches that number.  The number must be 0 or higher,  ex-
                  cept  for  "armor-class' which allows negative values, and
                  may optionally be preceded by `='.  If the number is  pre-
                  ceded  by `<=' or `>=' instead, it also matches when value
@@ -5087,9 +5077,6 @@
 
 
           NetHack 3.6                                         April 9, 2019
-            tushilites to 0.
-
-            Example hilites:
 
 
 
@@ -5112,14 +5099,6 @@
           tushilites to 0.
 
                Example hilites:
-
-
-
-
-
-          NetHack Guidebook                                              78
-
-
 
                OPTION=hilite_status: gold/up/yellow/down/brown
                OPTION=hilite_status: characteristics/up/green/down/red
@@ -5160,11 +5139,6 @@
           ------------------------------------------------------------------------
                   S_air                  (air)
              _    S_altar                (altar)
-             B    S_bat                  (bat or bird)
-             ^    S_bear_trap            (bear trap)
-             -    S_blcorn               (bottom left corner)
-             b    S_blob                 (blob)
-             +    S_book                 (spellbook)
 
 
 
@@ -5187,6 +5161,11 @@
              ^    S_arrow_trap           (arrow trap)
              0    S_ball                 (iron ball)
              #    S_bars                 (iron bars)
+             B    S_bat                  (bat or bird)
+             ^    S_bear_trap            (bear trap)
+             -    S_blcorn               (bottom left corner)
+             b    S_blob                 (blob)
+             +    S_book                 (spellbook)
              )    S_boomleft             (boomerang open left)
              (    S_boomright            (boomerang open right)
              `    S_boulder              (boulder)
@@ -5226,11 +5205,6 @@
              {    S_fountain             (fountain)
              F    S_fungus               (fungus or mold)
              *    S_gem                  (gem or rock)
-             .    S_hodbridge            (horizontal lowered drawbridge)
-             |    S_hodoor               (open door in horizontal wall)
-             ^    S_hole                 (hole)
-             @    S_human                (human or elf)
-             h    S_humanoid             (humanoid)
 
 
 
@@ -5253,6 +5227,11 @@
              -    S_hbeam                (horizontal beam [zap animation])
              #    S_hcdbridge            (horizontal raised drawbridge)
              +    S_hcdoor               (closed door in horizontal wall)
+             .    S_hodbridge            (horizontal lowered drawbridge)
+             |    S_hodoor               (open door in horizontal wall)
+             ^    S_hole                 (hole)
+             @    S_human                (human or elf)
+             h    S_humanoid             (humanoid)
              -    S_hwall                (horizontal wall)
              .    S_ice                  (ice)
              i    S_imp                  (imp or minor demon)
@@ -5292,11 +5271,6 @@
              =    S_ring                 (ring)
              `    S_rock                 (boulder or statue)
              r    S_rodent               (rodent)
-             s    S_spider               (arachnid or centipede)
-             ^    S_spiked_pit           (spiked pit)
-             ^    S_squeaky_board        (squeaky board)
-             0    S_ss1                  (magic shield 1 of 4)
-             #    S_ss2                  (magic shield 2 of 4)
 
 
 
@@ -5319,6 +5293,11 @@
              #    S_sink                 (sink)
              ^    S_sleeping_gas_trap    (sleeping gas trap)
              S    S_snake                (snake)
+             s    S_spider               (arachnid or centipede)
+             ^    S_spiked_pit           (spiked pit)
+             ^    S_squeaky_board        (squeaky board)
+             0    S_ss1                  (magic shield 1 of 4)
+             #    S_ss2                  (magic shield 2 of 4)
              @    S_ss3                  (magic shield 3 of 4)
              *    S_ss4                  (magic shield 4 of 4)
              ^    S_statue_trap          (statue trap)
@@ -5358,23 +5337,17 @@
              .    S_vodbridge            (vertical lowered drawbridge)
              -    S_vodoor               (open door in vertical wall)
              v    S_vortex               (vortex)
-             X    S_xorn                 (xorn)
-             Y    S_yeti                 (apelike creature)
-             Z    S_zombie               (zombie)
-             z    S_zruty                (zruty)
 
 
 
           NetHack 3.6                                         April 9, 2019
 
-          NetHack 3.6                                        March 24, 2019
 
 
 
 
           NetHack Guidebook                                              82
 
-          NetHack Guidebook                                              82
 
 
              |    S_vwall                (vertical wall)
@@ -5386,6 +5359,10 @@
              ~    S_worm_tail            (long worm tail)
              W    S_wraith               (wraith)
              x    S_xan                  (xan or other mythical/fantastic insect)
+             X    S_xorn                 (xorn)
+             Y    S_yeti                 (apelike creature)
+             Z    S_zombie               (zombie)
+             z    S_zruty                (zruty)
 
                There is  one  additional  class  of  object,  described  as
           "strange  object",  which will occasionally be the shape taken on
@@ -5428,21 +5405,16 @@
                While it is not difficult for experienced users to edit  the
           defaults.nh  file  to accomplish this, novices may find this task
 
-          symset:NHAccess
-            Load a symbol set appropriate for use by blind players.
 
           NetHack 3.6                                         April 9, 2019
-            Load a symbol set for the rogue level that is  appropriate  for
-
-
-          NetHack 3.6                                        March 24, 2019
 
 
 
-          NetHack Guidebook                                              83
 
 
           NetHack Guidebook                                              83
+
+
 
           somewhat daunting.  Included within the "symbols" file of all of-
           ficial distributions of NetHack is a symset called NHAccess.  Se-
@@ -5453,7 +5425,10 @@
           file to better suit your preferences.  The most crucial  settings
           to make the game accessible are:
 
+          symset:NHAccess
+            Load a symbol set appropriate for use by blind players.
 
+          roguesymset:NHAccess
             Load  a  symbol set for the rogue level that is appropriate for
             use by blind players.
 
@@ -5496,14 +5471,9 @@
 
 
 
-            WIZARDS = A space-separated list of user names who are  allowed
-            to play in debug mode (commonly referred to as wizard mode).  A
-            value of a single asterisk (*) allows anyone to start a game in
-            debug mode.
 
           NetHack 3.6                                         April 9, 2019
 
-          NetHack 3.6                                        March 24, 2019
 
 
 
@@ -5511,7 +5481,6 @@
           NetHack Guidebook                                              84
 
 
-          NetHack Guidebook                                              84
 
           9.16.  Global Configuration for System Administrators
 
@@ -5525,6 +5494,9 @@
           system).
 
             WIZARDS = A  space-separated list of user names who are allowed
+            to play in debug mode (commonly referred to as wizard mode).  A
+            value of a single asterisk (*) allows anyone to start a game in
+            debug mode.
 
             SHELLERS = A list of users who are allowed to use the shell es-
             cape command (!).  The syntax is the same as WIZARDS.
@@ -5567,11 +5539,6 @@
 
 
           NetHack 3.6                                         April 9, 2019
-            %u - game UID
-            %t - game start time, UNIX timestamp format
-            %T - current time, UNIX timestamp format
-            %d - game start time, YYYYMMDDhhmmss format
-            %D - current time, YYYYMMDDhhmmss format
 
 
 
@@ -5591,6 +5558,11 @@
 
             %% - literal `%'
             %v - version (eg. "3.6.2-0")
+            %u - game UID
+            %t - game start time, UNIX timestamp format
+            %T - current time, UNIX timestamp format
+            %d - game start time, YYYYMMDDhhmmss format
+            %D - current time, YYYYMMDDhhmmss format
             %n - player name
             %N - first character of player name
 
@@ -5633,11 +5605,6 @@
 
 
           NetHack 3.6                                         April 9, 2019
-          commands  listed  among the command descriptions.  It is intended
-          for tracking down problems within the program rather than to pro-
-          vide  god-like  powers to your character, and players who attempt
-          debugging are expected to figure out how to  use  it  themselves.
-          It  is  initiated  by  starting the game with the -D command-line
 
 
 
@@ -5658,6 +5625,7 @@
                Debug mode, also known as wizard mode, is undocumented aside
           from  this  brief  description  and the various "debug mode only"
           commands listed among the command descriptions.  It  is  intended
+          for tracking down problems within the program rather than to pro-
           vide god-like powers to your character, and players  who  attempt
           debugging  are  expected  to figure out how to use it themselves.
           It is initiated by starting the game  with  the  -D  command-line
@@ -5703,14 +5671,9 @@
 
 
           NetHack 3.6                                         April 9, 2019
-          of them and Kevin Darcy later joined the main NetHack Development
-          Team to produce subsequent revisions of 3.0.
-
-               Olaf  Seibert ported NetHack 2.3 and 3.0 to the Amiga.  Norm
-          Meluch, Stephen Spackman and Pierre  Martineau  designed  overlay
 
 
-          NetHack 3.6                                        March 24, 2019
+
 
 
           NetHack Guidebook                                              87
@@ -5727,6 +5690,8 @@
 
                NetHack  3.0  was  ported  to the Atari by Eric R. Smith, to
           OS/2 by Timo Hakulinen, and to VMS by David Gentzel.   The  three
+          of them and Kevin Darcy later joined the main NetHack Development
+          Team to produce subsequent revisions of 3.0.
 
                Olaf Seibert ported NetHack 2.3 and 3.0 to the Amiga.   Norm
           Meluch,  Stephen  Spackman  and Pierre Martineau designed overlay
@@ -5770,11 +5735,6 @@
           velopment  Team  and  tile  support was then added to other plat-
           forms.
 
-          Team remained on the team at the start of work on  that  release.
-          During  the interval between the release of 3.1.3 and 3.2, one of
-          the founding members of the NetHack Development Team, Dr.  Izchak
-          Miller,  was diagnosed with cancer and passed away.  That release
-          of the game was dedicated to him by the development  and  porting
 
           NetHack 3.6                                         April 9, 2019
 
@@ -5843,13 +5803,9 @@
 
 
           NetHack 3.6                                         April 9, 2019
-          as a whole as well as supporting ports on the different platforms
-          that NetHack runs on:
 
 
 
-
-          NetHack 3.6                                        March 24, 2019
 
 
           NetHack Guidebook                                              89
@@ -5866,6 +5822,8 @@
           the release of NetHack 3.4.0 in March 2002.
 
                As  with version 3.3, various people contributed to the game
+          as a whole as well as supporting ports on the different platforms
+          that NetHack runs on:
 
                Pat Rankin maintained 3.4 for VMS.
 
@@ -5908,11 +5866,7 @@
 
                In September 2014, an interim snapshot of the code under de-
           velopment was released publicly by other parties. Since that code
-               In  January  2015,  preparation  began  for  the  release of
-          NetHack 3.6.
 
-               At the beginning of development for  what  would  eventually
-          get  released as 3.6.0, the NetHack Development Team consisted of
 
           NetHack 3.6                                         April 9, 2019
 
@@ -5922,7 +5876,7 @@
 
           NetHack Guidebook                                              90
 
-          NetHack Guidebook                                              90
+
 
           was a work-in-progress and had not gone through  the  process  of
           debugging  it as a suitable release, it was decided that the ver-
@@ -5933,6 +5887,7 @@
           3.4.4, 3.5, or 3.5.0 official release version.
 
                In January  2015,  preparation  began  for  the  release  of
+          NetHack 3.6.
 
                At  the  beginning  of development for what would eventually
           get released as 3.6.0, the NetHack Development Team consisted  of
@@ -5977,17 +5932,12 @@
           (V8.4 as of this writing) on Alpha and Integrity (aka Itanium aka
           IA64) but not VAX.
 
-          12.1.  SPECIAL THANKS
 
-               On behalf of the NetHack community, thank you very much once
-          again to M. Drew Streib and Pasi Kallinen for providing a  public
-          NetHack  server  at  nethack.alt.org. Thanks to Keith Simpson and
-          Andy Thomson for hardfought.org. Thanks to all those unnamed dun-
-          geoneers  who  invest  their  time and effort into annual NetHack
 
           NetHack 3.6                                         April 9, 2019
 
-          NetHack 3.6                                        March 24, 2019
+
+
 
 
           NetHack Guidebook                                              91
@@ -6000,9 +5950,12 @@
                The official NetHack web site is maintained by Ken Lorber at
           http://www.nethack.org/.
 
+          12.1.  SPECIAL THANKS
 
+               On behalf of the NetHack community, thank you very much once
           again  to M. Drew Streib and Pasi Kallinen for providing a public
           NetHack server at nethack.alt.org. Thanks to  Keith  Simpson  and
+          Andy Thomson for hardfought.org. Thanks to all those unnamed dun-
           geoneers who invest their time and  effort  into  annual  NetHack
           tournaments  such  as  Junethack, The November NetHack Tournament
           and in days past, devnull.net (gone for now, but not  forgotten).
@@ -6044,8 +5997,19 @@
             Eric Hendrickson          Mark Gooderum          Stephen White
               Eric R. Smith            Mark Modrall           Steve Creps
              Eric S. Raymond         Marvin Bressler         Steve Linhart
+
+
+
           NetHack 3.6                                         April 9, 2019
+
+
+
+
+
           NetHack Guidebook                                              92
+
+
+
               Erik Andersen            Matthew Day         Steve VanDevender
             Frederick Roeber           Merlyn LeRoy           Teemu Suikki
                Gil Neiger            Michael Allison           Tim Lennan
@@ -6062,9 +6026,47 @@
           marks of their respective holders.
 
 
-          NetHack 3.6                                        March 24, 2019
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
           NetHack 3.6                                         April 9, 2019
+
+
+
