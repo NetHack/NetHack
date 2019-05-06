@@ -432,7 +432,7 @@ boolean border;
             w += (int) strlen(text);
             /* if preceding field has any trailing spaces, don't add extra;
                (should only apply to prev==title; status_update() handles
-               others that used to have trailing spaces by stripping such */
+               others that used to have trailing spaces by stripping such) */
             if (spacing[fld] > 0 && prev_fld != BL_FLUSH
                 && *(p = status_vals[prev_fld]) && *(eos(p) - 1) == ' '
                 && (prev_fld != BL_TITLE || !iflags.wc2_hitpointbar))

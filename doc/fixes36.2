@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.312 $ $NHDT-Date: 1556649298 2019/04/30 18:34:58 $
+$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.315 $ $NHDT-Date: 1557091781 2019/05/05 21:29:41 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -421,6 +421,11 @@ message given when shape-shifted vampire cheats death by reverting to its
 Vlad wasn't set up as a vampshifter properly
 poly'd hero capable of spitting venom would leave intact venom object if it
 	reached end of range at a 'soft' location such as water
+avoid impossible if monster cannot be relocated from teleport region
+fix cloned monster trapped and hiding states
+split monster could be placed on trap without triggering it
+turning into green slime would make wielded or carried crysknives revert to
+	worm teeth in bones data even though they remained carried
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository

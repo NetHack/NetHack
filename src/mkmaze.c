@@ -326,6 +326,8 @@ xchar rtype;
 boolean oneshot;
 d_level *lev;
 {
+    struct monst *mtmp;
+
     if (bad_location(x, y, nlx, nly, nhx, nhy)) {
         if (!oneshot) {
             return FALSE; /* caller should try again */
@@ -346,11 +348,12 @@ d_level *lev;
     case LR_UPTELE:
     case LR_DOWNTELE:
         /* "something" means the player in this case */
-        if (MON_AT(x, y)) {
+        if ((mtmp = m_at(x, y)) != 0) {
             /* move the monster if no choice, or just try again */
-            if (oneshot)
-                (void) rloc(m_at(x, y), FALSE);
-            else
+            if (oneshot) {
+                if (!rloc(mtmp, TRUE))
+                    m_into_limbo(mtmp);
+            } else
                 return FALSE;
         }
         u_on_newpos(x, y);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1555702074 2019/04/19 19:27:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1557088734 2019/05/05 20:38:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.203 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2396,7 +2396,7 @@ winid window;
     case NHW_MESSAGE:
         if (ttyDisplay->toplin)
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
-    /*FALLTHRU*/
+        /*FALLTHRU*/
     case NHW_STATUS:
     case NHW_BASE:
     case NHW_MAP:
@@ -3849,7 +3849,7 @@ unsigned long *colormasks;
     switch (fldidx) {
     case BL_RESET:
         reset_state = FORCE_RESET;
-        /* FALLTHRU */
+        /*FALLTHRU*/
     case BL_FLUSH:
         if (make_things_fit(reset_state) || truncation_expected)
             render_status();
@@ -3931,7 +3931,7 @@ unsigned long *colormasks;
             tty_status[NOW][fldidx].lth = 30 + 2; /* '[' and ']' */
         break;
     case BL_GOLD:
-        /* \GXXXXNNNN counts as 1 */
+        /* \GXXXXNNNN counts as 1 [moot since we use decode_mixed() above] */
         if ((p = index(status_vals[fldidx], '\\')) != 0 && p[1] == 'G')
             tty_status[NOW][fldidx].lth -= (10 - 1);
         break;
@@ -4038,7 +4038,7 @@ int sz[3];
 
             /* On a change to the field location, everything further
                to the right must be updated as well.  (Not necessarily
-               everything; it's possible for complementary changes to
+               everything; it's possible for complementary changes across
                multiple fields to put stuff further right back in sync.) */
             if (tty_status[NOW][idx].x + tty_status[NOW][idx].lth
                 != tty_status[BEFORE][idx].x + tty_status[BEFORE][idx].lth)
@@ -4503,7 +4503,7 @@ render_status(VOID_ARGS)
                 x += tlth;
             }
             finalx[row][NOW] = x - 1;
-            /* reset .redraw, .dirty, .padright now that they're rendered */
+            /* reset .redraw and .dirty now that they're rendered */
             tty_status[NOW][idx].dirty  = FALSE;
             tty_status[NOW][idx].redraw = FALSE;
             /*
