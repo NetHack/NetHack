@@ -188,15 +188,8 @@ Terry Pratchett, passed away.  NetHack 3.6.0 introduced a tribute to him.
 team since the release of 3.4.3 with some of the beloved community patches.
 Many bugs were fixed and some code was restructured.
 
-In late April 2018, several hundred bug fixes for 3.6.0 and some new
-features were assembled and released as NetHack 3.6.1.
-The NetHack Development Team at the time of release of 3.6.1 consisted of
-Warwick Allison, Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet,
-Pasi Kallinen, Ken Lorber, Dean Luick, Patric Mueller, Pat Rankin,
-Derek S. Ray, Alex Smith, Mike Stephenson, Janet Walz and Paul Winner.
-
 The NetHack Development Team, as well as Steve VanDevender and 
-Kevin Smolkowski ensured that NetHack 3.6.1 continued to operate on various
+Kevin Smolkowski ensured that NetHack 3.6 continued to operate on various
 Unix flavors as well as maintaining the X11 interface.
 
 Ken Lorber, Haoyang Wang, Pat Rankin, and Dean Luick maintained the port
@@ -204,15 +197,25 @@ of NetHack 3.6.1 for Mac OSX.
 
 Michael Allison, David Cohrs, Barton House, Pasi Kallinen, Alex Kompel,
 Dion Nicolaas, Derek S. Ray and Yitzhak Sapir maintained the port of
-NetHack 3.6.1 for Microsoft Windows.
+NetHack 3.6 for Microsoft Windows.
 
-Pat Rankin attempted to keep the VMS port running for NetHack 3.6.1,
+Pat Rankin attempted to keep the VMS port running for NetHack 3.6,
 hindered by limited access.  Kevin Smolkowski has updated and tested it
 for the most recent version of OpenVMS (V8.4 as of this writing) on Alpha
 and Integrity (aka Itanium aka IA64) but not VAX.
 
-Ray Chason resurrected the msdos port for 3.6.1 and contributed the
+Ray Chason resurrected the msdos port for 3.6 and contributed the
 necessary updates to the community at large.
+
+In late April 2018, several hundred bug fixes for 3.6.0 and some new
+features were assembled and released as NetHack 3.6.1.
+The NetHack Development Team at the time of release of 3.6.1 consisted of
+Warwick Allison, Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet,
+Pasi Kallinen, Ken Lorber, Dean Luick, Patric Mueller, Pat Rankin,
+Derek S. Ray, Alex Smith, Mike Stephenson, Janet Walz and Paul Winner.
+
+In early May 2019, another 320 bug fixes along with some enhancements and 
+the adopted curses window port, were released as 3.6.2.
 
 The official NetHack web site is maintained by Ken Lorber at
 http://www.nethack.org/.
