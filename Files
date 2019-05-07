@@ -1,4 +1,3 @@
-sh: dat/GENFILES: No such file or directory
 This is a listing of all files in a full NetHack 3.6 distribution, organized
 in their standard manner on a UNIX system.  It indicates which files are
 necessary for which versions, so that you can tell which files may be deleted
@@ -31,15 +30,15 @@ prepare-commit-msg
 
 dat:
 (files for all versions)
-Arch.des      Barb.des      Caveman.des   Healer.des    Knight.des
-Monk.des      Priest.des    Ranger.des    Rogue.des     Samurai.des
-Tourist.des   Valkyrie.des  Wizard.des    bigroom.des   bogusmon.txt
-castle.des    cmdhelp       data.base     dungeon.def   endgame.des
-engrave.txt   epitaph.txt   gehennom.des  help          hh
-history       keyhelp       knox.des      license       medusa.des
-mines.des     opthelp       oracle.des    oracles.txt   quest.txt
-rumors.fal    rumors.tru    sokoban.des   symbols       tower.des
-tribute       wizhelp       yendor.des
+Arch.des      Barb.des      Caveman.des   GENFILES      Healer.des
+Knight.des    Monk.des      Priest.des    Ranger.des    Rogue.des
+Samurai.des   Tourist.des   Valkyrie.des  Wizard.des    bigroom.des
+bogusmon.txt  castle.des    cmdhelp       data.base     dungeon.def
+endgame.des   engrave.txt   epitaph.txt   gehennom.des  help
+hh            history       keyhelp       knox.des      license
+medusa.des    mines.des     opthelp       oracle.des    oracles.txt
+quest.txt     rumors.fal    rumors.tru    sokoban.des   symbols
+tower.des     tribute       wizhelp       yendor.des
 
 doc:
 (files for all versions)
@@ -74,16 +73,16 @@ beconf.h      botl.h        color.h       config.h      config1.h
 context.h     coord.h       decl.h        def_os2.h     dgn_file.h
 display.h     dlb.h         dungeon.h     engrave.h     extern.h
 flag.h        func_tab.h    global.h      hack.h        integer.h
-lev.h         lint.h        mail.h        mextra.h      mfndpos.h
-micro.h       mkroom.h      monattk.h     mondata.h     monflag.h
-monst.h       monsym.h      ntconf.h      obj.h         objclass.h
-os2conf.h     patchlevel.h  pcconf.h      permonst.h    prop.h
-qtext.h       quest.h       rect.h        region.h      rm.h
-skills.h      sp_lev.h      spell.h       sys.h         system.h
-tcap.h        tileset.h     timeout.h     tosconf.h     tradstdc.h
-trampoli.h    trap.h        unixconf.h    vision.h      vmsconf.h
-wceconf.h     winami.h      wincurs.h     winprocs.h    wintype.h
-you.h         youprop.h
+isaac64.h     lev.h         lint.h        mail.h        mextra.h
+mfndpos.h     micro.h       mkroom.h      monattk.h     mondata.h
+monflag.h     monst.h       monsym.h      ntconf.h      obj.h
+objclass.h    os2conf.h     patchlevel.h  pcconf.h      permonst.h
+prop.h        qtext.h       quest.h       rect.h        region.h
+rm.h          skills.h      sp_lev.h      spell.h       sys.h
+system.h      tcap.h        tileset.h     timeout.h     tosconf.h
+tradstdc.h    trampoli.h    trap.h        unixconf.h    vision.h
+vmsconf.h     wceconf.h     winami.h      wincurs.h     winprocs.h
+wintype.h     you.h         youprop.h
 
 (file for tty versions)
 wintty.h
@@ -99,19 +98,19 @@ bones.c     botl.c      cmd.c       dbridge.c   decl.c      detect.c
 dig.c       display.c   dlb.c       do.c        do_name.c   do_wear.c
 dog.c       dogmove.c   dokick.c    dothrow.c   drawing.c   dungeon.c
 eat.c       end.c       engrave.c   exper.c     explode.c   extralev.c
-files.c     fountain.c  hack.c      hacklib.c   invent.c    light.c
-lock.c      mail.c      makemon.c   mapglyph.c  mcastu.c    mhitm.c
-mhitu.c     minion.c    mklev.c     mkmap.c     mkmaze.c    mkobj.c
-mkroom.c    mon.c       mondata.c   monmove.c   monst.c     mplayer.c
-mthrowu.c   muse.c      music.c     o_init.c    objects.c   objnam.c
-options.c   pager.c     pickup.c    pline.c     polyself.c  potion.c
-pray.c      priest.c    quest.c     questpgr.c  read.c      rect.c
-region.c    restore.c   rip.c       rnd.c       role.c      rumors.c
-save.c      shk.c       shknam.c    sit.c       sounds.c    sp_lev.c
-spell.c     steal.c     steed.c     sys.c       teleport.c  timeout.c
-topten.c    track.c     trap.c      u_init.c    uhitm.c     vault.c
-version.c   vision.c    weapon.c    were.c      wield.c     windows.c
-wizard.c    worm.c      worn.c      write.c     zap.c
+files.c     fountain.c  hack.c      hacklib.c   invent.c    isaac64.c
+light.c     lock.c      mail.c      makemon.c   mapglyph.c  mcastu.c
+mhitm.c     mhitu.c     minion.c    mklev.c     mkmap.c     mkmaze.c
+mkobj.c     mkroom.c    mon.c       mondata.c   monmove.c   monst.c
+mplayer.c   mthrowu.c   muse.c      music.c     o_init.c    objects.c
+objnam.c    options.c   pager.c     pickup.c    pline.c     polyself.c
+potion.c    pray.c      priest.c    quest.c     questpgr.c  read.c
+rect.c      region.c    restore.c   rip.c       rnd.c       role.c
+rumors.c    save.c      shk.c       shknam.c    sit.c       sounds.c
+sp_lev.c    spell.c     steal.c     steed.c     sys.c       teleport.c
+timeout.c   topten.c    track.c     trap.c      u_init.c    uhitm.c
+vault.c     version.c   vision.c    weapon.c    were.c      wield.c
+windows.c   wizard.c    worm.c      worn.c      write.c     zap.c
 
 sys/amiga:
 (files for Amiga versions - untested for 3.6.2)
@@ -393,6 +392,54 @@ tiles.vcxproj       uudecode.vcxproj
 
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.
+
+dat:
+(file generated by dgn_comp at playground creation time)
+dungeon
+
+(files generated by lev_comp at playground creation time)
+Arc-fila.lev  Arc-filb.lev  Arc-goal.lev  Arc-loca.lev  Arc-strt.lev
+Bar-fila.lev  Bar-filb.lev  Bar-goal.lev  Bar-loca.lev  Bar-strt.lev
+Cav-fila.lev  Cav-filb.lev  Cav-goal.lev  Cav-loca.lev  Cav-strt.lev
+Hea-fila.lev  Hea-filb.lev  Hea-goal.lev  Hea-loca.lev  Hea-strt.lev
+Kni-fila.lev  Kni-filb.lev  Kni-goal.lev  Kni-loca.lev  Kni-strt.lev
+Mon-fila.lev  Mon-filb.lev  Mon-goal.lev  Mon-loca.lev  Mon-strt.lev
+Pri-fila.lev  Pri-filb.lev  Pri-goal.lev  Pri-loca.lev  Pri-strt.lev
+Ran-fila.lev  Ran-filb.lev  Ran-goal.lev  Ran-loca.lev  Ran-strt.lev
+Rog-fila.lev  Rog-filb.lev  Rog-goal.lev  Rog-loca.lev  Rog-strt.lev
+Sam-fila.lev  Sam-filb.lev  Sam-goal.lev  Sam-loca.lev  Sam-strt.lev
+Tou-fila.lev  Tou-filb.lev  Tou-goal.lev  Tou-loca.lev  Tou-strt.lev
+Val-fila.lev  Val-filb.lev  Val-goal.lev  Val-loca.lev  Val-strt.lev
+Wiz-fila.lev  Wiz-filb.lev  Wiz-goal.lev  Wiz-loca.lev  Wiz-strt.lev
+air.lev       asmodeus.lev  astral.lev    baalz.lev     bigrm-1.lev
+bigrm-2.lev   bigrm-3.lev   bigrm-4.lev   bigrm-5.lev   bigrm-6.lev
+bigrm-7.lev   bigrm-8.lev   bigrm-9.lev   bigrm-10.lev  castle.lev
+earth.lev     fakewiz1.lev  fakewiz2.lev  fire.lev      juiblex.lev
+knox.lev      medusa-1.lev  medusa-2.lev  medusa-3.lev  medusa-4.lev
+minefill.lev  minend-1.lev  minend-2.lev  minend-3.lev  minetn-1.lev
+minetn-2.lev  minetn-3.lev  minetn-4.lev  minetn-5.lev  minetn-6.lev
+minetn-7.lev  oracle.lev    orcus.lev     sanctum.lev   soko1-1.lev
+soko1-2.lev   soko2-1.lev   soko2-2.lev   soko3-1.lev   soko3-2.lev
+soko4-1.lev   soko4-2.lev   tower1.lev    tower2.lev    tower3.lev
+valley.lev    water.lev     wizard1.lev   wizard2.lev   wizard3.lev
+
+(files generated by makedefs at playground creation time)
+data         dungeon.pdf  options      oracles      quest.dat    rumors
+
+(files generated for Qt interface on Mac OS X)
+Info.plist    nethack.icns
+
+(files generated for win32 at compile time)
+dlb.lst   porthelp
+
+(files generated for win32 gui at compile time)
+guioptions
+
+(files generated for win32 tty at compile time)
+ttyoptions
+
+(tile files optionally generated for X ports at playground creation time)
+pet_mark.xbm  rip.xpm       x11tiles
 
 include:
 (file for tiles support copied from win/share at compile time)
