@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.304 $ $NHDT-Date: 1554849951 2019/04/09 22:45:51 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.305 $ $NHDT-Date: 1557251604 2019/05/07 17:53:24 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -4211,8 +4211,8 @@ Allowed attributes are none, bold, dim, underline, blink, and inverse.
 combination with any of the other attributes.
 .pg
 To specify both a color and an attribute, use \(oq&\(cq to combine them.
-To specify multiple attributes, use \(oq\+\(cq to combine those.
-For example: \(lqmagenta&inverse\+dim\(rq.
+To specify multiple attributes, use \(oq+\(cq to combine those.
+For example: \(lqmagenta&inverse+dim\(rq.
 .pg
 Note that the display may substitute or ignore particular attributes
 depending upon its capabilities, and in general may interpret the
