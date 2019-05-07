@@ -443,36 +443,6 @@ ttyoptions
 (tile files optionally generated for X ports at playground creation time)
 pet_mark.xbm  rip.xpm       x11tiles
 
-Arc-fila.lev  Arc-filb.lev  Arc-goal.lev  Arc-loca.lev  Arc-strt.lev
-Bar-fila.lev  Bar-filb.lev  Bar-goal.lev  Bar-loca.lev  Bar-strt.lev
-Cav-fila.lev  Cav-filb.lev  Cav-goal.lev  Cav-loca.lev  Cav-strt.lev
-Hea-fila.lev  Hea-filb.lev  Hea-goal.lev  Hea-loca.lev  Hea-strt.lev
-Kni-fila.lev  Kni-filb.lev  Kni-goal.lev  Kni-loca.lev  Kni-strt.lev
-Mon-fila.lev  Mon-filb.lev  Mon-goal.lev  Mon-loca.lev  Mon-strt.lev
-Pri-fila.lev  Pri-filb.lev  Pri-goal.lev  Pri-loca.lev  Pri-strt.lev
-Ran-fila.lev  Ran-filb.lev  Ran-goal.lev  Ran-loca.lev  Ran-strt.lev
-Rog-fila.lev  Rog-filb.lev  Rog-goal.lev  Rog-loca.lev  Rog-strt.lev
-Sam-fila.lev  Sam-filb.lev  Sam-goal.lev  Sam-loca.lev  Sam-strt.lev
-Tou-fila.lev  Tou-filb.lev  Tou-goal.lev  Tou-loca.lev  Tou-strt.lev
-Val-fila.lev  Val-filb.lev  Val-goal.lev  Val-loca.lev  Val-strt.lev
-Wiz-fila.lev  Wiz-filb.lev  Wiz-goal.lev  Wiz-loca.lev  Wiz-strt.lev
-air.lev       asmodeus.lev  astral.lev    baalz.lev     bigrm-1.lev
-bigrm-2.lev   bigrm-3.lev   bigrm-4.lev   bigrm-5.lev   bigrm-6.lev
-bigrm-7.lev   bigrm-8.lev   bigrm-9.lev   bigrm-10.lev  castle.lev
-earth.lev     fakewiz1.lev  fakewiz2.lev  fire.lev      juiblex.lev
-knox.lev      medusa-1.lev  medusa-2.lev  medusa-3.lev  medusa-4.lev
-minefill.lev  minend-1.lev  minend-2.lev  minend-3.lev  minetn-1.lev
-minetn-2.lev  minetn-3.lev  minetn-4.lev  minetn-5.lev  minetn-6.lev
-minetn-7.lev  oracle.lev    orcus.lev     sanctum.lev   soko1-1.lev
-soko1-2.lev   soko2-1.lev   soko2-2.lev   soko3-1.lev   soko3-2.lev
-soko4-1.lev   soko4-2.lev   tower1.lev    tower2.lev    tower3.lev
-valley.lev    water.lev     wizard1.lev   wizard2.lev   wizard3.lev
-data         dungeon.pdf  options      oracles      quest.dat    rumors
-Info.plist    nethack.icns
-dlb.lst   porthelp
-guioptions
-ttyoptions
-pet_mark.xbm  rip.xpm       x11tiles
 include:
 (file for tiles support copied from win/share at compile time)
 tile.h
