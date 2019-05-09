@@ -314,7 +314,7 @@ struct xwindow *wp;
              XtParseTranslationTable(text_translations));
     num_args++;
 
-    wp->w = XtCreateManagedWidget(killer.name[0] && WIN_MAP == WIN_ERR
+    wp->w = XtCreateManagedWidget(g.killer.name[0] && WIN_MAP == WIN_ERR
                                       ? "tombstone"
                                       : "text_text", /* name */
                                   asciiTextWidgetClass,
@@ -496,7 +496,7 @@ calculate_rip_text(int how, time_t when)
     Sprintf(rip_line[NAME_LINE], "%s", g.plname);
 
     /* Put $ on stone */
-    Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);
+    Sprintf(rip_line[GOLD_LINE], "%ld Au", g.done_money);
     /* Put together death description */
     formatkiller(buf, sizeof buf, how, FALSE);
 

@@ -1074,11 +1074,11 @@ long new_value;
                 }
                 Strcat(buf, mname);
             } else
-                Strcat(buf, rank_of(u.ulevel, pl_character[0], flags.female));
+                Strcat(buf, rank_of(u.ulevel, g.pl_character[0], flags.female));
 
         } else if (attr_rec == &shown_stats[F_DLEVEL]) {
             if (!describe_level(buf)) {
-                Strcpy(buf, dungeons[u.uz.dnum].dname);
+                Strcpy(buf, g.dungeons[u.uz.dnum].dname);
                 Sprintf(eos(buf), ", level %d", depth(&u.uz));
             }
         } else {

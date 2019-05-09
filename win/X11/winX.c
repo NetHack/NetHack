@@ -1961,7 +1961,7 @@ boolean complain;
     wp = &window_list[newwin];
     X11_start_menu(newwin);
 
-    any = zeroany;
+    any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
         X11_add_menu(newwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      line, MENU_UNSELECTED);
