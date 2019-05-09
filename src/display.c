@@ -1606,6 +1606,7 @@ int cursor_on_u;
     for (y = 0; y < ROWNO; y++) {
         register gbuf_entry *gptr = &g.gbuf[y][x = g.gbuf_start[y]];
 
+        for (; x <= g.gbuf_stop[y]; gptr++, x++)
             if (gptr->gnew) {
                 print_glyph(WIN_MAP, x, y, gptr->glyph, get_bk_glyph(x, y));
                 gptr->gnew = 0;
