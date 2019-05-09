@@ -1039,7 +1039,11 @@ struct instance_globals {
     /* questpgr.c */
     char cvt_buf[CVT_BUF_SIZE];
     struct qtlists qt_list;
+#ifdef DLB
     struct dlb_handle *msg_file;
+#else
+    FILE *msg_file;
+#endif
     /* used by ldrname() and neminame(), then copied into cvt_buf */
     char nambuf[CVT_BUF_SIZE];
 
