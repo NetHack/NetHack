@@ -468,7 +468,8 @@ long nmv; /* number of moves */
 {
     int imv = 0; /* avoid zillions of casts and lint warnings */
 
-#if defined(DEBUG) || defined(BETA)
+#if defined(DEBUG) || (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+
     if (nmv < 0L) { /* crash likely... */
         panic("catchup from future time?");
         /*NOTREACHED*/

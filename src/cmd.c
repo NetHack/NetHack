@@ -582,11 +582,11 @@ extcmd_via_menu()
                 if ((len = (int) strlen(efp->ef_desc)) > biggest)
                     biggest = len;
                 if (++i > MAX_EXT_CMD) {
-#if defined(BETA)
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
                     impossible(
       "Exceeded %d extended commands in doextcmd() menu; 'extmenu' disabled.",
                                MAX_EXT_CMD);
-#endif /* BETA */
+#endif /* NH_DEVEL_STATUS != NH_STATUS_RELEASED */
                     iflags.extmenu = 0;
                     return -1;
                 }
@@ -660,7 +660,7 @@ extcmd_via_menu()
         if (n == 1) {
             if (matchlevel > (QBUFSZ - 2)) {
                 free((genericptr_t) pick_list);
-#if defined(BETA)
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
                 impossible("Too many chars (%d) entered in extcmd_via_menu()",
                            matchlevel);
 #endif

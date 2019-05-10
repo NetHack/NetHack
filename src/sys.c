@@ -63,7 +63,7 @@ sys_early_init()
     /* panic options */
     sysopt.gdbpath = dupstr(GDBPATH);
     sysopt.greppath = dupstr(GREPPATH);
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     sysopt.panictrace_gdb = 1;
 #ifdef PANICTRACE_LIBC
     sysopt.panictrace_libc = 2;

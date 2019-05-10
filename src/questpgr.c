@@ -565,7 +565,7 @@ int how;
     if (qt_msg->summary_size) {
         (void) dlb_fgets(in_line, sizeof in_line, msg_file);
         convert_line(in_line, out_line);
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     } else if (qt_msg->delivery == 'c') { /* skip for 'qtdump' of 'p' */
         /* delivery 'c' and !summary_size, summary expected but not present;
            this doesn't prefix the number with role code vs 'general'

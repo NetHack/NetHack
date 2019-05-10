@@ -2476,7 +2476,7 @@ STATIC_OVL void
 sanity_check_worn(obj)
 struct obj *obj;
 {
-#if defined(BETA) || defined(DEBUG)
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
     static unsigned long wearbits[] = {
         W_ARM,    W_ARMC,   W_ARMH,    W_ARMS, W_ARMG,  W_ARMF,  W_ARMU,
         W_WEP,    W_QUIVER, W_SWAPWEP, W_AMUL, W_RINGL, W_RINGR, W_TOOL,
@@ -2659,7 +2659,7 @@ struct obj *obj;
             insane_object(obj, ofmt0, maskbuf, mon);
         }
     }
-#else /* not (BETA || DEBUG) */
+#else /* not (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || DEBUG) */
     /* dummy use of obj to avoid "arg not used" complaint */
     if (!obj)
         insane_object(obj, ofmt0, "<null>", (struct monst *) 0);
