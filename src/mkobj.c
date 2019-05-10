@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1548978605 2019/01/31 23:50:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.142 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1557526914 2019/05/10 22:21:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1726,15 +1726,25 @@ int x, y;
         panic("place_object: obj not free");
 
     obj_no_longer_held(otmp);
-    /* (could bypass this vision update if there is already a boulder here) */
-    if (otmp->otyp == BOULDER)
-        block_point(x, y); /* vision */
+    if (otmp->otyp == BOULDER) {
+        if (!otmp2 || otmp2->otyp != BOULDER)
+            block_point(x, y); /* vision */
+    }
 
-    /* obj goes under boulders */
-    if (otmp2 && (otmp2->otyp == BOULDER)) {
+    /* non-boulder object goes under boulders so that map will show boulder
+       here without display code needing to traverse pile chain to find one */
+    if (otmp2 && otmp2->otyp == BOULDER && otmp->otyp != BOULDER) {
+        /* 3.6.3: put otmp under last consecutive boulder rather than under
+           just the first one; multiple boulders at same spot in new games
+           will be consecutive due to this, ones in old games saved before
+           this change might not be; can affect the map display if the top
+           boulder is moved/removed by some means other than pushing */
+        while (otmp2->nexthere && otmp2->nexthere->otyp == BOULDER)
+            otmp2 = otmp2->nexthere;
         otmp->nexthere = otmp2->nexthere;
         otmp2->nexthere = otmp;
     } else {
+        /* put on top of current pile */
         otmp->nexthere = otmp2;
         level.objects[x][y] = otmp;
     }
@@ -1742,7 +1752,6 @@ int x, y;
     /* set the new object's location */
     otmp->ox = x;
     otmp->oy = y;
-
     otmp->where = OBJ_FLOOR;
 
     /* add to floor chain */
