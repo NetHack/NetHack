@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1555201699 2019/04/14 00:28:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.159 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1557508281 2019/05/10 17:11:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.161 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -942,7 +942,12 @@ register struct obj *obj, *merge;
         bpm = onbill(merge, shkp, FALSE);
         if (!bpm) {
             /* this used to be a rename */
-            impossible("obfree: not on bill??");
+            /* !merge already returned */
+            impossible("obfree: not on bill, %s = (%d,%d,%ld,%d) (%d,%d,%ld,%d)??",
+                        "otyp,where,quan,unpaid",
+                        obj->otyp, obj->where, obj->quan, obj->unpaid ? 1 : 0,
+                        merge->otyp, merge->where, merge->quan,
+                            merge->unpaid ? 1 : 0);
             return;
         } else {
             /* this was a merger */
