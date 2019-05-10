@@ -1169,7 +1169,7 @@ const char *delim;
 {
     Sprintf(outbuf, "%d%s%d%s%d", VERSION_MAJOR, delim, VERSION_MINOR, delim,
             PATCHLEVEL);
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     Sprintf(eos(outbuf), "-%d", EDITLEVEL);
 #endif
     return outbuf;
@@ -1183,8 +1183,12 @@ const char *build_date;
     char subbuf[64], versbuf[64];
     char betabuf[64];
 
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+#if (NH_DEVEL_STATUS == NH_STATUS_BETA)
     Strcpy(betabuf, " Beta");
+#else
+    Strcpy(betabuf, " Work-in-progress");
+#endif
 #else
     betabuf[0] = '\0';
 #endif
@@ -1213,8 +1217,12 @@ const char *build_date;
     subbuf[0] = ' ';
     Strcpy(&subbuf[1], PORT_SUB_ID);
 #endif
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+#if (NH_DEVEL_STATUS == NH_STATUS_BETA)
     Strcat(subbuf, " Beta");
+#else
+    Strcat(subbuf, " Work-in-progress");
+#endif
 #endif
 
     Sprintf(outbuf, "         Version %s %s%s, %s %s.",
@@ -1800,8 +1808,12 @@ do_options()
     Fprintf(ofp, "\n%sNetHack version %d.%d.%d%s\n",
             opt_indent,
             VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+#if (NH_DEVEL_STATUS == NH_STATUS_BETA)
             " [beta]"
+#else
+            " [work-in-progress]"
+#endif
 #else
             ""
 #endif

@@ -8,7 +8,17 @@
 
 #include <stdio.h>
 
-#define BETA   /* development or beta testing [MRS] */
+/*
+ * Development status possibilities.
+ */
+#define NH_STATUS_RELEASED 0         /* Released */
+#define NH_STATUS_WIP      1         /* Work in progress */
+#define NH_STATUS_BETA     2         /* BETA testing */
+
+/*
+ * Development status of this NetHack version.
+ */
+#define NH_DEVEL_STATUS NH_STATUS_WIP
 
 #ifndef DEBUG  /* allow tool chains to define without causing warnings */
 #define DEBUG
@@ -339,9 +349,9 @@ struct savefile_info {
 #define MAXMONNO 120 /* extinct monst after this number created */
 #define MHPMAX 500   /* maximum monster hp */
 
-/* PANICTRACE: Always defined for BETA but only for supported platforms. */
+/* PANICTRACE: Always defined for NH_DEVEL_STATUS == NH_STATUS_BETA but only for supported platforms. */
 #ifdef UNIX
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 /* see end.c */
 #ifndef PANICTRACE
 #define PANICTRACE

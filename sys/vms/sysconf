@@ -71,7 +71,8 @@
 
 # Try to get more info in case of a program bug or crash.  Only used
 # if the program is built with the PANICTRACE compile-time option enabled.
-# By default PANICTRACE is enabled if BETA is defined, otherwise disabled.
+# By default PANICTRACE is enabled if (NH_DEVEL_STATUS != NH_STATUS_RELEASED), 
+# otherwise disabled.
 # (GDBPATH, GREPPATH, and PANICTRACE_LIBC aren't used on VMS.
 # PANICTRACE_GDB is repurposed, with nothing to do with 'gdb'.
 # Values are 1: show traceback and exit, 2: show traceback and
