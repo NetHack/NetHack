@@ -1,4 +1,4 @@
-/* NetHack 3.6	global.h	$NHDT-Date: 1557402408 2019/05/09 11:46:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1557510460 2019/05/10 17:47:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-#define BETA  /* development or beta testing [MRS] */
+#define BETA   /* development or beta testing [MRS] */
 
 #ifndef DEBUG  /* allow tool chains to define without causing warnings */
 #define DEBUG
