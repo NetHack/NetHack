@@ -349,7 +349,8 @@ struct savefile_info {
 #define MAXMONNO 120 /* extinct monst after this number created */
 #define MHPMAX 500   /* maximum monster hp */
 
-/* PANICTRACE: Always defined for NH_DEVEL_STATUS == NH_STATUS_BETA but only for supported platforms. */
+/* PANICTRACE: Always defined for NH_DEVEL_STATUS != NH_STATUS_RELEASED
+   but only for supported platforms. */
 #ifdef UNIX
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 /* see end.c */
