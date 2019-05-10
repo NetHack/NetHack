@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1545269451 2018/12/20 01:30:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1549921171 2019/02/11 21:39:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,7 +10,6 @@ STATIC_DCL void blackout(int, int);
 STATIC_DCL void restfakecorr(struct monst *);
 STATIC_DCL void parkguard(struct monst *);
 STATIC_DCL boolean in_fcorridor(struct monst *, int, int);
-STATIC_DCL struct monst *findgd(void);
 STATIC_DCL boolean find_guard_dest(struct monst *, xchar *, xchar *);
 STATIC_DCL void move_gold(struct obj *, int);
 STATIC_DCL void wallify_vault(struct monst *);
@@ -46,7 +45,8 @@ clear_fcorr(struct monst *grd, boolean forceshow)
 {
     register int fcx, fcy, fcbeg;
     struct monst *mtmp;
-    boolean sawcorridor = FALSE;
+    boolean sawcorridor = FALSE,
+            silently = program_state.stopprint ? TRUE : FALSE;
     struct egd *egrd = EGD(grd);
     struct trap *trap;
     struct rm *lev;
@@ -98,9 +98,13 @@ clear_fcorr(struct monst *grd, boolean forceshow)
         vision_full_recalc = 1;
         egrd->fcbeg++;
     }
-    if (sawcorridor)
+    if (sawcorridor && !silently)
         pline_The("corridor disappears.");
-    if (IS_ROCK(levl[u.ux][u.uy].typ))
+    /* only give encased message if hero is still alive (might get here
+       via paygd() -> mongone() -> grddead() when game is over;
+       died: no message, quit: message) */
+    if (IS_ROCK(levl[u.ux][u.uy].typ) && (Upolyd ? u.mh : u.uhp) > 0
+        && !silently)
         You("are encased in rock.");
     return TRUE;
 }
@@ -189,7 +193,6 @@ in_fcorridor(struct monst *grd, int x, int y)
     return FALSE;
 }
 
-STATIC_OVL
 struct monst *
 findgd()
 {
@@ -220,6 +223,33 @@ vault_occupied(char *array)
         if (rooms[*ptr - ROOMOFFSET].rtype == VAULT)
             return *ptr;
     return '\0';
+}
+
+/* hero has teleported out of vault while a guard is active */
+void
+uleftvault(grd)
+struct monst *grd;
+{
+    /* only called if caller has checked vault_occupied() and findgd() */
+    if (!grd || !grd->isgd || DEADMONSTER(grd)) {
+        impossible("escaping vault without guard?");
+        return;
+    }
+    /* if carrying gold and arriving anywhere other than next to the guard,
+       set the guard loose */
+    if ((money_cnt(invent) || hidden_gold())
+        && um_dist(grd->mx, grd->my, 1)) {
+        if (grd->mpeaceful) {
+            if (canspotmon(grd)) /* see or sense via telepathy */
+                pline("%s becomes irate.", Monnam(grd));
+            grd->mpeaceful = 0; /* bypass setmangry() */
+        }
+        /* if arriving outside guard's temporary corridor, give the
+           guard an extra move to deliver message(s) and to teleport
+           out of and remove that corridor */
+        if (!in_fcorridor(grd, u.ux, u.uy))
+            (void) gd_move(grd);
+    }
 }
 
 STATIC_OVL boolean
@@ -369,8 +399,8 @@ invault()
             mongone(guard);
             return;
         }
-        if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
-            if (youmonst.m_ap_type == M_AP_OBJECT
+        if (U_AP_TYPE == M_AP_OBJECT || u.uundetected) {
+            if (U_AP_TYPE == M_AP_OBJECT
                 && youmonst.mappearance != GOLD_PIECE)
                 if (!Deaf)
                     verbalize("Hey!  Who left that %s in here?",
@@ -1014,7 +1044,7 @@ gd_move(register struct monst *grd)
 
 /* Routine when dying or quitting with a vault guard around */
 void
-paygd()
+paygd(boolean silently)
 {
     register struct monst *grd = findgd();
     long umoney = money_cnt(invent);
@@ -1026,17 +1056,18 @@ paygd()
         return;
 
     if (u.uinvault) {
-        Your("%ld %s goes into the Magic Memory Vault.", umoney,
-             currency(umoney));
+        if (!silently)
+            Your("%ld %s goes into the Magic Memory Vault.",
+                 umoney, currency(umoney));
         gx = u.ux;
         gy = u.uy;
     } else {
-        if (grd->mpeaceful) { /* guard has no "right" to your gold */
-            mongone(grd);
-            return;
-        }
+        if (grd->mpeaceful) /* peaceful guard has no "right" to your gold */
+            goto remove_guard;
+
         mnexto(grd);
-        pline("%s remits your gold to the vault.", Monnam(grd));
+        if (!silently)
+            pline("%s remits your gold to the vault.", Monnam(grd));
         gx = rooms[EGD(grd)->vroom].lx + rn2(2);
         gy = rooms[EGD(grd)->vroom].ly + rn2(2);
         Sprintf(buf, "To Croesus: here's the gold recovered from %s the %s.",
@@ -1051,7 +1082,9 @@ paygd()
             stackobj(coins);
         }
     }
+ remove_guard:
     mongone(grd);
+    return;
 }
 
 long

@@ -1,4 +1,4 @@
-/* NetHack 3.6  monsym.h        $NHDT-Date: 1524689515 2018/04/25 20:51:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.6  monsym.h        $NHDT-Date: 1547428769 2019/01/14 01:19:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $ */
 /*      Copyright (c) 2016 by Pasi Kallinen              */
 /* NetHack may be freely redistributed.  See license for details. */
 /*      Monster symbols and creation information rev 1.0          */
@@ -12,69 +12,69 @@
  * NULL character.
  */
 enum mon_class_types {
-    S_ANT = 1,
-    S_BLOB,
-    S_COCKATRICE,
-    S_DOG,
-    S_EYE,
-    S_FELINE,
-    S_GREMLIN,
-    S_HUMANOID,
-    S_IMP,
-    S_JELLY,
-    S_KOBOLD,
-    S_LEPRECHAUN,
-    S_MIMIC,
-    S_NYMPH,
-    S_ORC,
-    S_PIERCER,
-    S_QUADRUPED,
-    S_RODENT,
-    S_SPIDER,
-    S_TRAPPER,
-    S_UNICORN,
-    S_VORTEX,
-    S_WORM,
-    S_XAN,
-    S_LIGHT,
-    S_ZRUTY,
-    S_ANGEL,
-    S_BAT,
-    S_CENTAUR,
-    S_DRAGON,
-    S_ELEMENTAL,
-    S_FUNGUS,
-    S_GNOME,
-    S_GIANT,
-    S_invisible,    /* non-class present in def_monsyms[] */
-    S_JABBERWOCK,
-    S_KOP,
-    S_LICH,
-    S_MUMMY,
-    S_NAGA,
-    S_OGRE,
-    S_PUDDING,
-    S_QUANTMECH,
-    S_RUSTMONST,
-    S_SNAKE,
-    S_TROLL,
-    S_UMBER,
-    S_VAMPIRE,
-    S_WRAITH,
-    S_XORN,
-    S_YETI,
-    S_ZOMBIE,
-    S_HUMAN,
-    S_GHOST,
-    S_GOLEM,
-    S_DEMON,
-    S_EEL,
-    S_LIZARD,
+    S_ANT        =  1, /* a */
+    S_BLOB       =  2, /* b */
+    S_COCKATRICE =  3, /* c */
+    S_DOG        =  4, /* d */
+    S_EYE        =  5, /* e */
+    S_FELINE     =  6, /* f: cats */
+    S_GREMLIN    =  7, /* g */
+    S_HUMANOID   =  8, /* h: small humanoids: hobbit, dwarf */
+    S_IMP        =  9, /* i: minor demons */
+    S_JELLY      = 10, /* j */
+    S_KOBOLD     = 11, /* k */
+    S_LEPRECHAUN = 12, /* l */
+    S_MIMIC      = 13, /* m */
+    S_NYMPH      = 14, /* n */
+    S_ORC        = 15, /* o */
+    S_PIERCER    = 16, /* p */
+    S_QUADRUPED  = 17, /* q: excludes horses */
+    S_RODENT     = 18, /* r */
+    S_SPIDER     = 19, /* s */
+    S_TRAPPER    = 20, /* t */
+    S_UNICORN    = 21, /* u: includes horses */
+    S_VORTEX     = 22, /* v */
+    S_WORM       = 23, /* w */
+    S_XAN        = 24, /* x */
+    S_LIGHT      = 25, /* y: yellow light, black light */
+    S_ZRUTY      = 26, /* z */
+    S_ANGEL      = 27, /* A */
+    S_BAT        = 28, /* B */
+    S_CENTAUR    = 29, /* C */
+    S_DRAGON     = 30, /* D */
+    S_ELEMENTAL  = 31, /* E: includes invisible stalker */
+    S_FUNGUS     = 32, /* F */
+    S_GNOME      = 33, /* G */
+    S_GIANT      = 34, /* H: large humanoid: giant, ettin, minotaur */
+    S_invisible  = 35, /* I: non-class present in def_monsyms[] */
+    S_JABBERWOCK = 36, /* J */
+    S_KOP        = 37, /* K */
+    S_LICH       = 38, /* L */
+    S_MUMMY      = 39, /* M */
+    S_NAGA       = 40, /* N */
+    S_OGRE       = 41, /* O */
+    S_PUDDING    = 42, /* P */
+    S_QUANTMECH  = 43, /* Q */
+    S_RUSTMONST  = 44, /* R */
+    S_SNAKE      = 45, /* S */
+    S_TROLL      = 46, /* T */
+    S_UMBER      = 47, /* U: umber hulk */
+    S_VAMPIRE    = 48, /* V */
+    S_WRAITH     = 49, /* W */
+    S_XORN       = 50, /* X */
+    S_YETI       = 51, /* Y: includes owlbear, monkey */
+    S_ZOMBIE     = 52, /* Z */
+    S_HUMAN      = 53, /* @ */
+    S_GHOST      = 54, /* <space> */
+    S_GOLEM      = 55, /* ' */
+    S_DEMON      = 56, /* & */
+    S_EEL        = 57, /* ; (fish) */
+    S_LIZARD     = 58, /* : (reptiles) */
 
-    S_WORM_TAIL,
-    S_MIMIC_DEF,
+    S_WORM_TAIL  = 59, /* ~ */
+    S_MIMIC_DEF  = 60, /* ] */
 
-    MAXMCLASSES /* number of monster classes */
+    MAXMCLASSES  = 61  /* number of monster classes */
 };
 
 /*

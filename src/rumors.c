@@ -123,12 +123,12 @@ getrumor(int truth, /* 1=true, -1=false, 0=either */
             case 2: /*(might let a bogus input arg sneak thru)*/
             case 1:
                 beginning = (long) true_rumor_start;
-                tidbit = Rand() % true_rumor_size;
+                tidbit = rn2(true_rumor_size);
                 break;
             case 0: /* once here, 0 => false rather than "either"*/
             case -1:
                 beginning = (long) false_rumor_start;
-                tidbit = Rand() % false_rumor_size;
+                tidbit = rn2(false_rumor_size);
                 break;
             default:
                 impossible("strange truth value for rumor");
@@ -278,9 +278,10 @@ rumor_check()
     }
 }
 
-/* Gets a random line of text from file 'fname', and returns it. */
+/* Gets a random line of text from file 'fname', and returns it.
+   rng is the random number generator to use, and should act like rn2 does. */
 char *
-get_rnd_text(const char *fname, char *buf)
+get_rnd_text(const char *fname, char *buf, int (*rng)(int))
 {
     dlb *fh;
 
@@ -301,7 +302,7 @@ get_rnd_text(const char *fname, char *buf)
         (void) dlb_fseek(fh, 0L, SEEK_END);
         endtxt = dlb_ftell(fh);
         sizetxt = endtxt - starttxt;
-        tidbit = Rand() % sizetxt;
+        tidbit = rng(sizetxt);
 
         (void) dlb_fseek(fh, starttxt + tidbit, SEEK_SET);
         (void) dlb_fgets(line, sizeof line, fh);

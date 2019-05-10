@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1546220381 2018/12/31 01:39:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1550876124 2019/02/22 22:55:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.70 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -441,9 +441,9 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
 	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
-	   files.c fountain.c hack.c hacklib.c invent.c light.c lock.c \
-	   mail.c makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c minion.c \
-	   mklev.c mkmap.c \
+	   files.c fountain.c hack.c hacklib.c invent.c isaac64.c light.c \
+	   lock.c mail.c makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c \
+	   minion.c mklev.c mkmap.c \
 	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
 	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
@@ -471,7 +471,7 @@ WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINQT4SRC) $(WINBESRC)
 
-# Files for window system chaining.  Requires SYSCF; include via HINTSRC/HINTOBJ
+# Files for window system chaining. Requires SYSCF; include via HINTSRC/HINTOBJ
 CHAINSRC = ../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
 	   ../win/chain/wc_trace.c
 CHAINOBJ = wc_chainin.o wc_chainout.o wc_trace.o
@@ -496,9 +496,9 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h \
 	rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h \
 	tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
-	winX.h winprocs.h wintype.h you.h youprop.h
+	wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
-HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
+HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h \
 		lev_comp.h dgn_comp.h dgn_file.h
 
 # the following .o's _must_ be made before any others (for makedefs)
@@ -508,8 +508,8 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
 	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
-	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o \
-	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
+	extralev.o files.o fountain.o hack.o hacklib.o invent.o isaac64.o \
+	light.o lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
 	minion.o mklev.o mkmap.o \
 	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
@@ -1013,6 +1013,7 @@ fountain.o: fountain.c $(HACK_H)
 hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
 invent.o: invent.c $(HACK_H)
+isaac64.o: isaac64.c $(CONFIG_H) ../include/isaac64.h ../include/integer.h
 light.o: light.c $(HACK_H) ../include/lev.h
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) ../include/mail.h

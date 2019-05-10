@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.h	$NHDT-Date: 1433806583 2015/06/08 23:36:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	wintty.h	$NHDT-Date: 1553858470 2019/03/29 11:21:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) David Cohrs, 1991,1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -79,7 +79,7 @@ struct tty_status_fields {
     boolean valid;
     boolean dirty;
     boolean redraw;
-    boolean last_on_row;
+    boolean _not_used; /* was 'last_in_row' */
 };
 #endif
 
@@ -164,6 +164,8 @@ E int has_color(int color);
 
 /* ### topl.c ### */
 
+E void show_topl(const char *);
+E void remember_topl(void);
 E void addtopl(const char *);
 E void more(void);
 E void update_topl(const char *);
@@ -180,6 +182,7 @@ E void win_tty_init(int);
 
 /* external declarations */
 E void tty_init_nhwindows(int *, char **);
+E void tty_preference_update(const char *);
 E void tty_player_selection(void);
 E void tty_askname(void);
 E void tty_get_nh_event(void);

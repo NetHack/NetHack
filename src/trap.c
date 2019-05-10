@@ -618,7 +618,7 @@ animate_statue(struct obj *statue, xchar x, xchar y, int cause, int *fail_reason
     if (has_oname(statue) && !unique_corpstat(mon->data))
         mon = christen_monst(mon, ONAME(statue));
     /* mimic statue becomes seen mimic; other hiders won't be hidden */
-    if (mon->m_ap_type)
+    if (M_AP_TYPE(mon))
         seemimic(mon);
     else
         mon->mundetected = FALSE;
@@ -1780,7 +1780,7 @@ launch_obj(short otyp, register int x1, register int y1, register int x2, regist
             delaycnt = 1;
         if (!cansee(bhitpos.x, bhitpos.y))
             curs_on_u();
-        tmp_at(DISP_FLASH, obj_to_glyph(singleobj));
+        tmp_at(DISP_FLASH, obj_to_glyph(singleobj, rn2_on_display_rng));
         tmp_at(bhitpos.x, bhitpos.y);
     }
     /* Mark a spot to place object in bones files to prevent
@@ -2377,7 +2377,7 @@ mintrap(register struct monst *mtmp)
                 You("smell smoke.");
             if (is_ice(mtmp->mx, mtmp->my))
                 melt_ice(mtmp->mx, mtmp->my, (char *) 0);
-            if (see_it)
+            if (see_it && t_at(mtmp->mx, mtmp->my))
                 seetrap(trap);
             break;
         case PIT:
@@ -4355,8 +4355,8 @@ untrap(boolean force)
                     return 1;
                 }
                 if ((mtmp = m_at(x, y)) != 0
-                    && (mtmp->m_ap_type == M_AP_FURNITURE
-                        || mtmp->m_ap_type == M_AP_OBJECT)) {
+                    && (M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                        || M_AP_TYPE(mtmp) == M_AP_OBJECT)) {
                     stumble_onto_mimic(mtmp);
                     return 1;
                 }

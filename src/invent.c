@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1546467443 2019/01/02 22:17:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1555196229 2019/04/13 22:57:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.253 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -424,7 +424,7 @@ sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
             return val2 - val1; /* bigger is better */
     }
 
-tiebreak:
+ tiebreak:
     /* They're identical, as far as we're concerned.  We want
        to force a deterministic order, and do so by producing a
        stable sort: maintain the original order of equal items. */
@@ -931,7 +931,7 @@ addinv(struct obj *obj)
         && obj->oartifact != ART_MJOLLNIR
         && (throwing_weapon(obj) || is_ammo(obj)))
         setuqwep(obj);
-added:
+ added:
     addinv_core2(obj);
     carry_obj_effects(obj); /* carrying affects the obj */
     update_inventory();
@@ -1673,9 +1673,9 @@ getobj(register const char *let, register const char *word)
                 You("mime %s something%s%s.", ing_suffix(bp), suf ? " " : "",
                     suf ? suf : "");
             }
-            return (allownone ? &zeroobj : (struct obj *) 0);
+            return (allownone ? (struct obj *) &zeroobj : (struct obj *) 0);
         }
-redo_menu:
+ redo_menu:
         /* since gold is now kept in inventory, we need to do processing for
            select-from-invent before checking whether gold has been picked */
         if (ilet == '?' || ilet == '*') {
@@ -1706,7 +1706,7 @@ redo_menu:
             if (!ilet)
                 continue;
             if (ilet == HANDS_SYM)
-                return &zeroobj;
+                return (struct obj *) &zeroobj; /* cast away 'const' */
             if (ilet == '\033') {
                 if (flags.verbose)
                     pline1(Never_mind);
@@ -2105,7 +2105,7 @@ askchain(struct obj **objchn, /* *objchn might change */
      * For example, if a person specifies =/ then first all rings
      * will be asked about followed by all wands.  -dgk
      */
-nextclass:
+ nextclass:
     ilet = 'a' - 1;
     if (*objchn && (*objchn)->oclass == COIN_CLASS)
         ilet--;                     /* extra iteration */
@@ -2215,7 +2215,7 @@ nextclass:
         pline("That was all.");
     else if (!dud && !cnt)
         pline("No applicable objects.");
-ret:
+ ret:
     unsortloot(&sortedchn);
     bypass_objlist(*objchn, FALSE);
     return cnt;
@@ -2625,7 +2625,7 @@ display_pickinv(register const char *lets,
         add_menu(win, NO_GLYPH, &any, HANDS_SYM, 0, ATR_NONE,
                  xtra_choice, MENU_UNSELECTED);
     }
-nextclass:
+ nextclass:
     classcount = 0;
     for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         if (lets && !index(lets, otmp->invlet))
@@ -2646,8 +2646,9 @@ nextclass:
                 any.a_obj = otmp;
             else
                 any.a_char = ilet;
-            add_menu(win, obj_to_glyph(otmp), &any, ilet, 0, ATR_NONE,
-                     doname(otmp), MENU_UNSELECTED);
+            add_menu(win, obj_to_glyph(otmp, rn2_on_display_rng), &any, ilet,
+                     wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
+                     ATR_NONE, doname(otmp), MENU_UNSELECTED);
         }
     }
     if (flags.sortpack) {
@@ -2757,7 +2758,8 @@ display_used_invlets(char avoidlet)
                         classcount++;
                     }
                     any.a_char = ilet;
-                    add_menu(win, obj_to_glyph(otmp), &any, ilet, 0, ATR_NONE,
+                    add_menu(win, obj_to_glyph(otmp, rn2_on_display_rng),
+                             &any, ilet, 0, ATR_NONE,
                              doname(otmp), MENU_UNSELECTED);
                 }
             }
@@ -2882,7 +2884,8 @@ count_contents(struct obj *container,
     long count = 0L;
 
     if (!everything) {
-        for (topc = container; topc->ocontainer; topc = topc->ocontainer)
+        for (topc = container; topc->where == OBJ_CONTAINED;
+             topc = topc->ocontainer)
             continue;
         if (topc->where == OBJ_FLOOR) {
             xchar x, y;
@@ -4030,7 +4033,7 @@ doorganize() /* inventory organizer by Del Lamb */
                compatible stacks get collected along the way,
                but splitting to same slot is not */
             || (splitting && let == obj->invlet)) {
-        noadjust:
+ noadjust:
             if (splitting)
                 (void) merged(&splitting, &obj);
             if (!ever_mind)
@@ -4226,12 +4229,17 @@ display_minventory(register struct monst *mon, int dflags, char *title)
          * displaying 'weapon in claw', etc. properly.
          */
         youmonst.data = mon->data;
+        /* in case inside a shop, don't append "for sale" prices */
+        iflags.suppress_price++;
 
         n = query_objlist(title ? title : tmp, &(mon->minvent),
                           (INVORDER_SORT | (incl_hero ? INCLUDE_HERO : 0)),
                           &selected, pickings,
                           do_all ? allow_all : worn_wield_only);
-        set_uasmon();
+
+        iflags.suppress_price--;
+        /* was 'set_uasmon();' but that potentially has side-effects */
+        youmonst.data = &mons[u.umonnum]; /* most basic part of set_uasmon */
     } else {
         invdisp_nothing(title ? title : tmp, "(none)");
         n = 0;

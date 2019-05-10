@@ -1,4 +1,4 @@
-# NetHack 3.6	Valkyrie.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+# NetHack 3.6	Valkyrie.des	$NHDT-Date: 1553807172 2019/03/28 21:06:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.15 $
 #	Copyright (c) 1989 by Jean-Christophe Collet
 #	Copyright (c) 1991-2 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
@@ -216,9 +216,14 @@ REGION:(00,00,34,16),lit,"ordinary"
 STAIR:(45,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,34,16)
-# Drawbridges
+# Drawbridges; northern one opens from the south (portcullis) to further
+# north (lowered span), southern one from the north to further south
 DRAWBRIDGE:(17,02),south,random
-DRAWBRIDGE:(17,14),north,open
+IF [75%] {
+   DRAWBRIDGE:(17,14),north,open
+} ELSE {
+   DRAWBRIDGE:(17,14),north,random
+}
 # Objects
 OBJECT:('(',"crystal ball"),(17,08),blessed,5,name:"The Orb of Fate"
 OBJECT:random,random

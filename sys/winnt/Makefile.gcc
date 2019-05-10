@@ -4,13 +4,12 @@
 #
 #==============================================================================
 #
-#   Win32 Compilers Tested:
-#                  === TDM-GCC Compiler Suite for Windows ===
-#                  ---        GCC 4.6 & 4.7 Series        ---
-#                  ***   Standard MinGW 32-bit Edition    ***
+#   Win32 Compilers Tested with this Makefile.gcc:
+#       mingw-w64
+#   from:
+#       https://sourceforge.net/p/mingw-w64/wiki2/GeneralUsageInstructions/
+#           Toolchain for Windows 32-bit target
 #
-#   If you don't have this compiler, you can get it at:
-#		http://tdm-gcc.tdragon.net/
 #
 #==============================================================================
 #   This is used for building two versions of NetHack:
@@ -91,8 +90,8 @@ TARGET_CPU=x86
 #    of your PDCurses C files which must already be resident on 
 #    your machine.
 #
-ADD_CURSES=Y
-PDCURSES_TOP=..\..\pdcurses
+#ADD_CURSES=Y
+#PDCURSES_TOP=../../pdcurses
 
 #4b Qt
 #
@@ -180,6 +179,7 @@ OBJ = o
 
 RANDOM  = $(OBJ)/random.o
 #RANDOM =
+BCRYPT=-lbcrypt
 
 WINPFLAG   = -DTILES -DMSWIN_GRAPHICS -DWIN32CON -D_WIN32_IE=0x0400 -D_WIN32_WINNT=0x0501
 ifeq "$(WANT_WIN_QT4)" "Y"
@@ -288,7 +288,7 @@ VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o
 VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
 VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
 VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o    
-VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o
+VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)isaac64.o
 VOBJ11 = $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o
 VOBJ12 = $(O)mklev.o    $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o
 VOBJ13 = $(O)mkroom.o   $(O)mon.o      $(O)mondata.o  $(O)monmove.o
@@ -321,8 +321,8 @@ else
 CURSESOBJ=
 endif
 
-SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
-	$(SOUND) $(O)pcmain.o $(O)nhlan.o
+SOBJ   = $(O)windmain.o $(O)winnt.o $(O)win10.o \
+	$(O)safeproc.o $(O)nhlan.o $(SOUND) 
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	 $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
@@ -475,10 +475,10 @@ endif
 #==========================================
 #==========================================
 
-cc     = gcc
+cc     = i686-w64-mingw32-gcc.exe
 cxx    = g++
 rc     = windres
-link   = gcc
+link   = i686-w64-mingw32-gcc.exe
 ifeq "$(WANT_WIN_QT4)" "Y"
     link = g++
 endif
@@ -497,7 +497,7 @@ CFLAGSBASE  = -c $(cflags) $(WINPINC) $(cdebug) $(CURSESDEF)
 #LFLAGSBASEC = $(linkdebug)
 #LFLAGSBASEG = $(linkdebug) -mwindows
 
-conlibs = -lgdi32 -lwinmm
+conlibs = -lgdi32 -lwinmm $(BCRYPT)
 guilibs = -lcomctl32 -lwinmm
 ifeq "$(WANT_WIN_QT4)" "Y"
     # Might be either Qt 4 or Qt 5
@@ -541,7 +541,7 @@ LFLAGSU = $(LFLAGSBASEC)
 # - Game build
 #==========================================
 
-CFLAGS   = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
+CFLAGS   = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG) -DSAFEPROCS
 lflags  = $(LFLAGSBASEC) $(linkdebuf)
 
 CXXFLAGS = $(CFLAGS)
@@ -750,10 +750,8 @@ endif
 	$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR))
 	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
 	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
-	$(U)makedefs -c
-	$(subst /,\,if not exist $(GAMEDIR)/defaults.nh copy fixed_defaults.nh   $(GAMEDIR)/defaults.nh)
 	$(subst /,\,if not exist $(GAMEDIR)/defaults.nh copy $(MSWSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
-	$(subst /,\,-if not exist $(GAMEDIR)/record. goto>$(GAMEDIR)/record.)
+	$(subst /,\,-if not exist $(GAMEDIR)/record. echo.>$(GAMEDIR)/record.)
 #
 #
 	$(subst /,\,echo install done > $@)
@@ -1544,9 +1542,9 @@ $(O)topl.o: ../win/tty/topl.c $(HACK_H) $(INCL)/tcap.h
 $(O)wintty.o: ../win/tty/wintty.c $(HACK_H) $(INCL)/dlb.h \
 		$(INCL)/date.h $(INCL)/patchlevel.h $(INCL)/tcap.h
 	$(cc) $(CFLAGS) -o$@ ../win/tty/wintty.c
-$(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
-		$(CONFIG_H)
-	$(cc) $(CFLAGS) -o$@ ../win/X11/Window.c
+#$(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
+#		$(CONFIG_H)
+#	$(cc) $(CFLAGS) -o$@ ../win/X11/Window.c
 $(O)dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
 	$(cc) $(CFLAGS) -o$@ ../win/X11/dialogs.c
 $(O)winX.o: ../win/X11/winX.c $(HACK_H) $(INCL)/winX.h $(INCL)/dlb.h \

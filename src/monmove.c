@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1545596010 2018/12/23 20:13:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1557094802 2019/05/05 22:20:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -219,8 +219,8 @@ disturb(register struct monst *mtmp)
               || mtmp->data->mlet == S_LEPRECHAUN) || !rn2(50))
         && (Aggravate_monster
             || (mtmp->data->mlet == S_DOG || mtmp->data->mlet == S_HUMAN)
-            || (!rn2(7) && mtmp->m_ap_type != M_AP_FURNITURE
-                && mtmp->m_ap_type != M_AP_OBJECT))) {
+            || (!rn2(7) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+                && M_AP_TYPE(mtmp) != M_AP_OBJECT))) {
         mtmp->msleeping = 0;
         return 1;
     }
@@ -272,8 +272,8 @@ monflee(struct monst *mtmp, int fleetime, boolean first, boolean fleemsg)
             mtmp->mfleetim = (unsigned) min(fleetime, 127);
         }
         if (!mtmp->mflee && fleemsg && canseemon(mtmp)
-            && mtmp->m_ap_type != M_AP_FURNITURE
-            && mtmp->m_ap_type != M_AP_OBJECT) {
+            && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+            && M_AP_TYPE(mtmp) != M_AP_OBJECT) {
             /* unfortunately we can't distinguish between temporary
                sleep and temporary paralysis, so both conditions
                receive the same alternate message */
@@ -520,7 +520,7 @@ dochug(register struct monst *mtmp)
             }
         }
     }
-toofar:
+ toofar:
 
     /* If monster is nearby you, and has to wield a weapon, do so.   This
      * costs the monster a move, of course.
@@ -956,7 +956,7 @@ m_move(register struct monst *mtmp, register int after)
         if ((likegold || likegems || likeobjs || likemagic || likerock
              || conceals) && (!*in_rooms(omx, omy, SHOPBASE)
                               || (!rn2(25) && !mtmp->isshk))) {
-        look_for_obj:
+ look_for_obj:
             oomx = min(COLNO - 1, omx + minr);
             oomy = min(ROWNO - 1, omy + minr);
             lmx = max(1, omx - minr);
@@ -1542,6 +1542,7 @@ set_apparxy(register struct monst *mtmp)
 
     if (!gotu) {
         register int try_cnt = 0;
+
         do {
             if (++try_cnt > 200)
                 goto found_you; /* punt */
@@ -1555,7 +1556,7 @@ set_apparxy(register struct monst *mtmp)
                               && (can_ooze(mtmp) || can_fog(mtmp)))))
                  || !couldsee(mx, my));
     } else {
-    found_you:
+ found_you:
         mx = u.ux;
         my = u.uy;
     }

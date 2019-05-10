@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1546137492 2018/12/30 02:38:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1547086250 2019/01/10 02:10:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -786,9 +786,16 @@ validrole(int rolenum)
 }
 
 int
-randrole()
+randrole(for_display)
+boolean for_display;
 {
-    return rn2(SIZE(roles) - 1);
+    int res = SIZE(roles) - 1;
+
+    if (for_display)
+        res = rn2_on_display_rng(res);
+    else
+        res = rn2(res);
+    return res;
 }
 
 STATIC_OVL int
@@ -804,7 +811,7 @@ randrole_filtered()
             && ok_gend(i, ROLE_NONE, ROLE_RANDOM, ROLE_NONE)
             && ok_align(i, ROLE_NONE, ROLE_NONE, ROLE_RANDOM))
             set[n++] = i;
-    return n ? set[rn2(n)] : randrole();
+    return n ? set[rn2(n)] : randrole(FALSE);
 }
 
 int
@@ -2052,7 +2059,7 @@ role_init()
     if (flags.pantheon == -1) {             /* new game */
         flags.pantheon = flags.initrole;    /* use own gods */
         while (!roles[flags.pantheon].lgod) /* unless they're missing */
-            flags.pantheon = randrole();
+            flags.pantheon = randrole(FALSE);
     }
     if (!urole.lgod) {
         urole.lgod = roles[flags.pantheon].lgod;
@@ -2062,6 +2069,14 @@ role_init()
     /* 0 or 1; no gods are neuter, nor is gender randomized */
     quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
 
+#if 0
+/*
+ * Disable this fixup so that mons[] can be const.  The only
+ * place where it actually matters for the hero is in set_uasmon()
+ * and that can use mons[race] rather than mons[role] for this
+ * particular property.  Despite the comment, it is checked--where
+ * needed--via instrinsic 'Infravision' which set_uasmon() manages.
+ */
     /* Fix up infravision */
     if (mons[urace.malenum].mflags3 & M3_INFRAVISION) {
         /* although an infravision intrinsic is possible, infravision
@@ -2077,6 +2092,7 @@ role_init()
         if (urole.femalenum != NON_PM)
             mons[urole.femalenum].mflags3 |= M3_INFRAVISION;
     }
+#endif /*0*/
 
     /* Artifacts are fixed in hack_artifacts() */
 

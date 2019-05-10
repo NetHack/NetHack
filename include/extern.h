@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1546687295 2019/01/05 11:21:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.681 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1557088399 2019/05/05 20:33:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.703 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -135,6 +135,7 @@ E boolean drag_ball(xchar, xchar, int *, xchar *, xchar *,
                             xchar *, xchar *, boolean *, boolean);
 E void drop_ball(xchar, xchar);
 E void drag_down(void);
+E void bc_sanity_check(void);
 
 /* ### bones.c ### */
 
@@ -146,27 +147,30 @@ E int getbones(void);
 
 /* ### botl.c ### */
 
-E const char *bl_idx_to_fldname(int);
 E char *do_statusline1(void);
 E void check_gold_symbol(void);
 E char *do_statusline2(void);
+E void bot(void);
+E void timebot(void);
 E int xlev_to_rank(int);
+E const char *rank_of(int, short, boolean);
 E int title_to_mon(const char *, int *, int *);
 E void max_rank_sz(void);
 #ifdef SCORE_ON_BOTL
 E long botl_score(void);
 #endif
 E int describe_level(char *);
-E const char *rank_of(int, short, boolean);
-E void bot(void);
 E void status_initialize(boolean);
 E void status_finish(void);
-E void status_notify_windowport(boolean);
-E void status_eval_next_unhilite(void);
+E int stat_cap_indx(void);
+E int stat_hunger_indx(void);
+E const char *bl_idx_to_fldname(int);
 #ifdef STATUS_HILITES
-E boolean parse_status_hl1(char *op, boolean);
-E void clear_status_hilites(void);
+E void status_eval_next_unhilite(void);
 E void reset_status_hilites(void);
+E boolean parse_status_hl1(char *op, boolean);
+E void status_notify_windowport(boolean);
+E void clear_status_hilites(void);
 E int count_status_hilites(void);
 E boolean status_hilite_menu(void);
 #endif
@@ -350,6 +354,7 @@ E void see_traps(void);
 E void curs_on_u(void);
 E int doredraw(void);
 E void docrt(void);
+E void redraw_map(void);
 E void show_glyph(int, int, int);
 E void clear_glyph_buffer(void);
 E void row_refresh(int, int, int);
@@ -383,9 +388,10 @@ E int doup(void);
 #ifdef INSURANCE
 E void save_currentstate(void);
 #endif
+E void u_collide_m(struct monst *);
 E void goto_level(d_level *, boolean, boolean, boolean);
 E void schedule_goto(d_level *, boolean, boolean, int,
-                     const char *, const char *);
+                             const char *, const char *);
 E void deferred_goto(void);
 E boolean revive_corpse(struct obj *);
 E void revive_mon(ANY_P *, long);
@@ -922,7 +928,8 @@ E char *strstri(const char *, const char *);
 #endif
 E boolean
 fuzzymatch(const char *, const char *, const char *, boolean);
-E void setrandom(void);
+E void init_random(int (*fn)(int));
+E void reseed_random(int (*fn)(int));
 E time_t getnow(void);
 E int getyear(void);
 #if 0
@@ -1069,7 +1076,7 @@ E boolean picking_lock(int *, int *);
 E boolean picking_at(int, int);
 E void breakchestlock(struct obj *, boolean);
 E void reset_pick(void);
-E void maybe_reset_pick(void);
+E void maybe_reset_pick(struct obj *);
 E int pick_lock(struct obj *);
 E int doforce(void);
 E boolean boxlock(struct obj *, struct obj *);
@@ -1172,7 +1179,7 @@ E boolean usmellmon(struct permonst *);
 
 E int mapglyph(int, int *, int *, unsigned *, int, int);
 E char *encglyph(int);
-E const char *decode_mixed(char *,const char *);
+E char *decode_mixed(char *, const char *);
 E void genl_putmixed(winid, int, const char *);
 
 /* ### mcastu.c ### */
@@ -1402,7 +1409,7 @@ E void mon_to_stone(struct monst *);
 E void m_into_limbo(struct monst *);
 E void mnexto(struct monst *);
 E void maybe_mnexto(struct monst *);
-E boolean mnearto(struct monst *, xchar, xchar, boolean);
+E int mnearto(struct monst *, xchar, xchar, boolean);
 E void m_respond(struct monst *);
 E void setmangry(struct monst *, boolean);
 E void wakeup(struct monst *, boolean);
@@ -1432,7 +1439,7 @@ E boolean vamp_stone(struct monst *);
 
 /* ### mondata.c ### */
 
-E void set_mon_data(struct monst *, struct permonst *, int);
+E void set_mon_data(struct monst *, struct permonst *);
 E struct attack *attacktype_fordmg(struct permonst *, int, int);
 E boolean attacktype(struct permonst *, int);
 E boolean noattacks(struct permonst *);
@@ -1901,6 +1908,7 @@ E int dogaze(void);
 E int dohide(void);
 E int dopoly(void);
 E int domindblast(void);
+E void uunstick(void);
 E void skinback(boolean);
 E const char *mbodypart(struct monst *, int);
 E const char *body_part(int);
@@ -2096,7 +2104,12 @@ E void genl_outrip(winid, int, time_t);
 
 /* ### rnd.c ### */
 
+#ifdef USE_ISAAC64
+E void init_isaac64(unsigned long, int (*fn)(int));
+E long nhrand(void);
+#endif
 E int rn2(int);
+E int rn2_on_display_rng(int);
 E int rnl(int);
 E int rnd(int);
 E int d(int, int);
@@ -2109,7 +2122,7 @@ E boolean validrole(int);
 E boolean validrace(int, int);
 E boolean validgend(int, int, int);
 E boolean validalign(int, int, int);
-E int randrole(void);
+E int randrole(boolean);
 E int randrace(int);
 E int randgend(int, int);
 E int randalign(int, int);
@@ -2141,7 +2154,7 @@ E const char *Goodbye(void);
 /* ### rumors.c ### */
 
 E char *getrumor(int, char *, boolean);
-E char *get_rnd_text(const char *, char *);
+E char *get_rnd_text(const char *, char *, int (*)(int));
 E void outrumor(int, int);
 E void outoracle(boolean, boolean);
 E void save_oracles(int, int);
@@ -2209,7 +2222,7 @@ E void make_happy_shoppers(boolean);
 E void hot_pursuit(struct monst *);
 E void make_angry_shk(struct monst *, xchar, xchar);
 E int dopay(void);
-E boolean paybill(int);
+E boolean paybill(int, boolean);
 E void finish_paybill(void);
 E struct obj *find_oid(unsigned);
 E long contained_cost
@@ -2230,7 +2243,8 @@ E void sellobj(struct obj *, xchar, xchar);
 E int doinvbill(int);
 E struct monst *shkcatch(struct obj *, xchar, xchar);
 E void add_damage(xchar, xchar, long);
-E int repair_damage(struct monst *, struct damage *, boolean);
+E int repair_damage(struct monst *, struct damage *, int *,
+                            boolean);
 E int shk_move(struct monst *);
 E void after_shk_move(struct monst *);
 E boolean is_fshk(struct monst *);
@@ -2243,7 +2257,7 @@ E void shk_chat(struct monst *);
 E void check_unpaid_usage(struct obj *, boolean);
 E void check_unpaid(struct obj *);
 E void costly_gold(xchar, xchar, long);
-E long get_cost_of_shop_item(struct obj *);
+E long get_cost_of_shop_item(struct obj *, int *);
 E int oid_price_adjustment(struct obj *, unsigned);
 E boolean block_door(xchar, xchar);
 E boolean block_entry(xchar, xchar);
@@ -2505,12 +2519,14 @@ E void u_init(void);
 E void erode_armor(struct monst *, int);
 E boolean attack_checks(struct monst *, struct obj *);
 E void check_caitiff(struct monst *);
-E int find_roll_to_hit(struct monst *, uchar, struct obj *, int *, int *);
+E int find_roll_to_hit(struct monst *, uchar, struct obj *,
+                               int *, int *);
 E boolean attack(struct monst *);
 E boolean hmon(struct monst *, struct obj *, int, int);
-E int damageum(struct monst *, struct attack *);
+E int damageum(struct monst *, struct attack *, int);
 E void missum(struct monst *, struct attack *, boolean);
-E int passive(struct monst *, struct obj *, boolean, int, uchar, boolean);
+E int passive(struct monst *, struct obj *, boolean, int,
+                      uchar, boolean);
 E void passive_obj(struct monst *, struct obj *, struct attack *);
 E void stumble_onto_mimic(struct monst *);
 E int flash_hits_mon(struct monst *, struct obj *);
@@ -2571,11 +2587,13 @@ E int hide_privileges(boolean);
 E void newegd(struct monst *);
 E void free_egd(struct monst *);
 E boolean grddead(struct monst *);
+E struct monst *findgd(void);
 E void vault_summon_gd(void);
 E char vault_occupied(char *);
+E void uleftvault(struct monst *);
 E void invault(void);
 E int gd_move(struct monst *);
-E void paygd(void);
+E void paygd(boolean);
 E long hidden_gold(void);
 E boolean gd_sound(void);
 E void vault_gd_watching(unsigned int);
@@ -2724,6 +2742,8 @@ E int vms_get_saved_games(const char *, char ***);
 E const char *weapon_descr(struct obj *);
 E int hitval(struct obj *, struct monst *);
 E int dmgval(struct obj *, struct monst *);
+E int special_dmgval(struct monst *, struct monst *, long, long *);
+E void silver_sears(struct monst *, struct monst *, long);
 E struct obj *select_rwep(struct monst *);
 E boolean monmightthrowwep(struct obj *);
 E struct obj *select_hwep(struct monst *);

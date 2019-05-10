@@ -1,4 +1,4 @@
-/* NetHack 3.6	mextra.h	$NHDT-Date: 1451836000 2016/01/03 15:46:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.6	mextra.h	$NHDT-Date: 1547428759 2019/01/14 01:19:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -144,16 +144,16 @@ struct emin {
 /***
  **     formerly edog.h -- pet extension
  */
-/*      various types of pet food, the lower, the better liked */
+/*      various types of pet food, the lower the value, the better liked */
 enum dogfood_types {
     DOGFOOD = 0,
-    CADAVER,
-    ACCFOOD,
-    MANFOOD,
-    APPORT,
-    POISON,
-    UNDEF,
-    TABU
+    CADAVER = 1,
+    ACCFOOD = 2,
+    MANFOOD = 3,
+    APPORT  = 4,
+    POISON  = 5,
+    UNDEF   = 6,
+    TABU    = 7
 };
 
 struct edog {

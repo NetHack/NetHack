@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixtty.c	$NHDT-Date: 1450916700 2015/12/24 00:25:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	unixtty.c	$NHDT-Date: 1548372343 2019/01/24 23:25:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -121,6 +121,18 @@
 struct tchars inittyb2, curttyb2;
 
 #endif /* V7 */
+
+/*
+ * Old curses.h relied on implicit declaration of has_colors().
+ * Modern compilers tend to warn about implicit declarations and
+ * modern curses.h declares has_colors() explicitly.  However, the
+ * declaration it uses is not one we can simply clone (requires
+ * <stdbool.h>).  This simpler declaration suffices but can't be
+ * used unconditionally because it conflicts with the 'bool' one.
+ */
+#ifdef NEED_HAS_COLORS_DECL
+int has_colors();
+#endif
 
 #if defined(TTY_GRAPHICS) && ((!defined(SYSV) && !defined(HPUX)) \
                               || defined(UNIXPC) || defined(SVR4))

@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1544998885 2018/12/16 22:21:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1556150377 2019/04/24 23:59:37 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.134 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -830,6 +830,8 @@ clone_mon(struct monst *mon,
     m2->mx = mm.x;
     m2->my = mm.y;
 
+    m2->mundetected = 0;
+    m2->mtrapped = 0;
     m2->mcloned = 1;
     m2->minvent = (struct obj *) 0; /* objects don't clone */
     m2->mleashed = FALSE;
@@ -1062,7 +1064,7 @@ makemon_rnd_goodpos(struct monst *mon, unsigned gpflags, coord *cc)
             }
         }
     } else {
-    gotgood:
+ gotgood:
         cc->x = nx;
         cc->y = ny;
         return TRUE;
@@ -1176,7 +1178,7 @@ makemon(register struct permonst *ptr, register int x, register int y, int mmfla
     mtmp->m_id = context.ident++;
     if (!mtmp->m_id)
         mtmp->m_id = context.ident++; /* ident overflowed */
-    set_mon_data(mtmp, ptr, 0);
+    set_mon_data(mtmp, ptr); /* mtmp->data = ptr; */
     if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
         quest_status.leader_m_id = mtmp->m_id;
     mtmp->mnum = mndx;
@@ -1258,22 +1260,19 @@ makemon(register struct permonst *ptr, register int x, register int y, int mmfla
     if (mndx == PM_VLAD_THE_IMPALER)
         mitem = CANDELABRUM_OF_INVOCATION;
     mtmp->cham = NON_PM; /* default is "not a shapechanger" */
-    if ((mcham = pm_to_cham(mndx)) != NON_PM) {
+    if (!Protection_from_shape_changers
+        && (mcham = pm_to_cham(mndx)) != NON_PM) {
         /* this is a shapechanger after all */
-        if (Protection_from_shape_changers
-            || mndx == PM_VLAD_THE_IMPALER) {
-            ; /* stuck in its natural form (NON_PM) */
-        } else {
-            mtmp->cham = mcham;
-            /* Note: shapechanger's initial form used to be
-               chosen here with rndmonst(), yielding a monster
-               which was appropriate to the level's difficulty
-               but ignored the changer's usual type selection
-               so would be inappropriate for vampshifters.
+        mtmp->cham = mcham;
+        /* Vlad stays in his normal shape so he can carry the Candelabrum */
+        if (mndx != PM_VLAD_THE_IMPALER
+            /* Note:  shapechanger's initial form used to be chosen here
+               with rndmonst(), yielding a monster which was appropriate
+               to the level's difficulty but ignoring the changer's usual
+               type selection, so was inappropriate for vampshifters.
                Let newcham() pick the shape. */
-            if (newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
-                allow_minvent = FALSE;
-        }
+            && newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
+            allow_minvent = FALSE;
     } else if (mndx == PM_WIZARD_OF_YENDOR) {
         mtmp->iswiz = TRUE;
         context.no_of_wizards++;
@@ -1830,7 +1829,7 @@ grow_up(struct monst *mtmp, struct monst *victim)
                 pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
                       an(ptr->mname), mhe(mtmp),
                       nonliving(ptr) ? "expires" : "dies");
-            set_mon_data(mtmp, ptr, -1); /* keep mvitals[] accurate */
+            set_mon_data(mtmp, ptr); /* keep mvitals[] accurate */
             mondied(mtmp);
             return (struct permonst *) 0;
         } else if (canspotmon(mtmp)) {
@@ -1853,7 +1852,7 @@ grow_up(struct monst *mtmp, struct monst *victim)
                                                         : "grows up into",
                   an(buf));
         }
-        set_mon_data(mtmp, ptr, 1);    /* preserve intrinsics */
+        set_mon_data(mtmp, ptr);
         newsym(mtmp->mx, mtmp->my);    /* color may change */
         lev_limit = (int) mtmp->m_lev; /* never undo increment */
 
@@ -2167,7 +2166,7 @@ set_mimic_sym(register struct monst *mtmp)
         }
     } else {
         s_sym = syms[rn2((int) sizeof(syms))];
-    assign_sym:
+ assign_sym:
         if (s_sym == MAXOCLASSES || s_sym == MAXOCLASSES + 1) {
             ap_type = M_AP_FURNITURE;
             appear = (s_sym == MAXOCLASSES) ? S_upstair : S_dnstair;
@@ -2187,12 +2186,21 @@ set_mimic_sym(register struct monst *mtmp)
     }
     mtmp->m_ap_type = ap_type;
     mtmp->mappearance = appear;
-    if (ap_type == M_AP_OBJECT && (appear == STATUE || appear == CORPSE
-                                   || appear == FIGURINE || appear == EGG)) {
+    /* when appearing as an object based on a monster type, pick a shape */
+    if (ap_type == M_AP_OBJECT
+        && (appear == STATUE || appear == FIGURINE
+            || appear == CORPSE || appear == EGG || appear == TIN)) {
+        int mndx = rndmonnum(),
+            nocorpse_ndx = (mvitals[mndx].mvflags & G_NOCORPSE) != 0;
+
+        if (appear == CORPSE && nocorpse_ndx)
+            mndx = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
+        else if ((appear == EGG && !can_be_hatched(mndx))
+                 || (appear == TIN && nocorpse_ndx))
+            mndx = NON_PM; /* revert to generic egg or empty tin */
+
         newmcorpsenm(mtmp);
-        MCORPSENM(mtmp) = rndmonnum();
-        if (appear == EGG && !can_be_hatched(MCORPSENM(mtmp)))
-            MCORPSENM(mtmp) = NON_PM; /* revert to generic egg */
+        MCORPSENM(mtmp) = mndx;
     }
 
     if (does_block(mx, my, &levl[mx][my]))

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1526429201 2018/05/16 00:06:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1552945095 2019/03/18 21:38:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -245,26 +245,14 @@ encglyph(int glyph)
     return encbuf;
 }
 
-/*
- * This differs from putstr() because the str parameter can
- * contain a sequence of characters representing:
- *        \GXXXXNNNN    a glyph value, encoded by encglyph().
- *
- * For window ports that haven't yet written their own
- * XXX_putmixed() routine, this general one can be used.
- * It replaces the encoded glyph sequence with a single
- * showsyms[] char, then just passes that string onto
- * putstr().
- */
-
-const char *
+char *
 decode_mixed(char *buf, const char *str)
 {
     static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
     char *put = buf;
 
-    if (!put || !str)
-        return "";
+    if (!str)
+        return strcpy(buf, "");
 
     while (*str) {
         if (*str == '\\') {

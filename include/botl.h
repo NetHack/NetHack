@@ -1,4 +1,4 @@
-/* NetHack 3.6  botl.h  $NHDT-Date: 1526907469 2018/05/21 12:57:49 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6  botl.h  $NHDT-Date: 1554591222 2019/04/06 22:53:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,6 +27,11 @@ Astral Plane \GXXXXNNNN:123456 HP:1234(1234) Pw:1234(1234) AC:-127
 #define MAXCO (COLNO + 40)
 #endif
 
+struct condmap {
+    const char *id;
+    unsigned long bitmask;
+};
+
 enum statusfields {
     BL_CHARACTERISTICS = -3, /* alias for BL_STR..BL_CH */
     BL_RESET = -2,           /* Force everything to redisplay */
@@ -36,7 +41,7 @@ enum statusfields {
     BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, /* 7..12 */
     BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, /* 13..18 */
     BL_HPMAX, BL_LEVELDESC, BL_EXP, BL_CONDITION, /* 19..22 */
-    MAXBLSTATS
+    MAXBLSTATS /* [23] */
 };
 
 enum relationships { NO_LTEQGT = -1,
@@ -64,6 +69,9 @@ enum relationships { NO_LTEQGT = -1,
 #define BL_MASK_RIDE            0x00001000L
 #define BL_MASK_BITS            13 /* number of mask bits that can be set */
 /* clang-format on */
+
+#define VIA_WINDOWPORT() \
+    ((windowprocs.wincap2 & (WC2_HILITE_STATUS | WC2_FLUSH_STATUS)) != 0)
 
 #define REASSESS_ONLY TRUE
 

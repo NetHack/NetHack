@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1546655319 2019/01/05 02:28:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1553885439 2019/03/29 18:50:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -120,7 +120,7 @@ enexto_core(coord *cc, register xchar xx, register xchar yy, struct permonst *md
         mdat = &mons[u.umonster];
     }
     fakemon = zeromonst;
-    set_mon_data(&fakemon, mdat, -1); /* set up for goodpos */
+    set_mon_data(&fakemon, mdat); /* set up for goodpos */
 
     good_ptr = good;
     range = 1;
@@ -237,6 +237,7 @@ void
 teleds(register int nux, register int nuy, boolean allow_drag)
 {
     boolean ball_active, ball_still_in_range;
+    struct monst *vault_guard = vault_occupied(u.urooms) ? findgd() : 0;
 
     if (u.utraptype == TT_BURIEDBALL) {
         /* unearth it */
@@ -339,6 +340,21 @@ teleds(register int nux, register int nuy, boolean allow_drag)
         else
             telescroll = 0; /* no discovery by scrolltele()'s caller */
     }
+    /* sequencing issue:  we want guard's alarm, if any, to occur before
+       room entry message, if any, so need to check for vault exit prior
+       to spoteffects; but spoteffects() sets up new value for u.urooms
+       and vault code depends upon that value, so we need to fake it */
+    if (vault_guard) {
+        char save_urooms[5]; /* [sizeof u.urooms] */
+
+        Strcpy(save_urooms, u.urooms);
+        Strcpy(u.urooms, in_rooms(u.ux, u.uy, VAULT));
+        /* if hero has left vault, make guard notice */
+        if (!vault_occupied(u.urooms))
+            uleftvault(vault_guard);
+        Strcpy(u.urooms, save_urooms); /* reset prior to spoteffects() */
+    }
+    /* possible shop entry message comes after guard's shrill whistle */
     spoteffects(TRUE);
     invocation_message();
 }
@@ -443,7 +459,7 @@ scrolltele(struct obj *scroll)
             Strcpy(whobuf, "you");
             if (u.usteed)
                 Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
-            pline("To what position do %s want to be teleported?", whobuf);
+            pline("Where do %s want to be teleported?", whobuf);
             cc.x = u.ux;
             cc.y = u.uy;
             if (getpos(&cc, TRUE, "the desired position") < 0)

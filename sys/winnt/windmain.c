@@ -33,8 +33,8 @@ E void mswin_destroy_reg(void);
 #endif
 #ifdef TTY_GRAPHICS
 extern void backsp(void);
-extern void clear_screen(void);
 #endif
+extern void clear_screen(void);
 #undef E
 
 #ifdef PC_LOCKING
@@ -45,7 +45,7 @@ void windows_nhbell(void);
 int windows_nh_poskey(int *, int *, int *);
 void windows_raw_print(const char *);
 char windows_yn_function(const char *, const char *, char);
-void windows_getlin(const char *, char *);
+static void windows_getlin(const char *, char *);
 extern int windows_console_custom_nhgetch(void);
 void safe_routines(void);
 

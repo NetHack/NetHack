@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1545946257 2018/12/27 21:30:57 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1553787633 2019/03/28 15:40:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.111 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1692,7 +1692,7 @@ create_monster(monster *m, struct mkroom *croom)
                     struct permonst *olddata = mtmp->data;
 
                     mgender_from_permonst(mtmp, mdat);
-                    set_mon_data(mtmp, mdat, 0);
+                    set_mon_data(mtmp, mdat);
                     if (emits_light(olddata) != emits_light(mtmp->data)) {
                         /* used to give light, now doesn't, or vice versa,
                            or light's range has changed */
@@ -4548,13 +4548,16 @@ spo_drawbridge(struct sp_coder *coder)
 {
     static const char nhFunc[] = "spo_drawbridge";
     xchar x, y;
+    int dopen;
     struct opvar *dir, *db_open, *dcoord;
 
     if (!OV_pop_i(dir) || !OV_pop_i(db_open) || !OV_pop_c(dcoord))
         return;
 
     get_location_coord(&x, &y, DRY | WET | HOT, coder->croom, OV_i(dcoord));
-    if (!create_drawbridge(x, y, OV_i(dir), OV_i(db_open)))
+    if ((dopen = OV_i(db_open)) == -1)
+        dopen = !rn2(2);
+    if (!create_drawbridge(x, y, OV_i(dir), dopen ? TRUE : FALSE))
         impossible("Cannot create drawbridge.");
     SpLev_Map[x][y] = 1;
 

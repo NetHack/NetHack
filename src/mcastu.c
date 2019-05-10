@@ -38,6 +38,7 @@ enum mcast_cleric_spells {
 STATIC_DCL void cursetxt(struct monst *, boolean);
 STATIC_DCL int choose_magic_spell(int);
 STATIC_DCL int choose_clerical_spell(int);
+STATIC_DCL int m_cure_self(struct monst *, int);
 STATIC_DCL void cast_wizard_spell(struct monst *, int, int);
 STATIC_DCL void cast_cleric_spell(struct monst *, int, int);
 STATIC_DCL boolean is_undirected_spell(unsigned int, int);
@@ -329,6 +330,22 @@ castmu(register struct monst *mtmp, register struct attack *mattk,
     return (ret);
 }
 
+STATIC_OVL int
+m_cure_self(mtmp, dmg)
+struct monst *mtmp;
+int dmg;
+{
+    if (mtmp->mhp < mtmp->mhpmax) {
+        if (canseemon(mtmp))
+            pline("%s looks better.", Monnam(mtmp));
+        /* note: player healing does 6d4; this used to do 1d8 */
+        if ((mtmp->mhp += d(3, 6)) > mtmp->mhpmax)
+            mtmp->mhp = mtmp->mhpmax;
+        dmg = 0;
+    }
+    return dmg;
+}
+
 /* monster wizard and cleric spellcasting functions */
 /*
    If dmg is zero, then the monster is not casting at you.
@@ -464,14 +481,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
         dmg = 0;
         break;
     case MGC_CURE_SELF:
-        if (mtmp->mhp < mtmp->mhpmax) {
-            if (canseemon(mtmp))
-                pline("%s looks better.", Monnam(mtmp));
-            /* note: player healing does 6d4; this used to do 1d8 */
-            if ((mtmp->mhp += d(3, 6)) > mtmp->mhpmax)
-                mtmp->mhp = mtmp->mhpmax;
-            dmg = 0;
-        }
+        dmg = m_cure_self(mtmp, dmg);
         break;
     case MGC_PSI_BOLT:
         /* prior to 3.4.0 Antimagic was setting the damage to 1--this
@@ -682,14 +692,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
         dmg = 0;
         break;
     case CLC_CURE_SELF:
-        if (mtmp->mhp < mtmp->mhpmax) {
-            if (canseemon(mtmp))
-                pline("%s looks better.", Monnam(mtmp));
-            /* note: player healing does 6d4; this used to do 1d8 */
-            if ((mtmp->mhp += d(3, 6)) > mtmp->mhpmax)
-                mtmp->mhp = mtmp->mhpmax;
-            dmg = 0;
-        }
+        dmg = m_cure_self(mtmp, dmg);
         break;
     case CLC_OPEN_WOUNDS:
         if (Antimagic) {

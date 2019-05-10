@@ -380,10 +380,10 @@ safe_status_init()
     return;
 }
 
-void
+boolean
 safe_can_suspend()
 {
-    return;
+    return FALSE;
 }
 
 void
@@ -408,7 +408,7 @@ char def;
 }
 
 /*ARGSUSED*/
-static void
+void
 safe_getlin(prompt, outbuf)
 const char *prompt UNUSED;
 char *outbuf;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1545786454 2018/12/26 01:07:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1557094801 2019/05/05 22:20:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.170 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -64,7 +64,7 @@ STATIC_DCL void dump_plines(void);
 STATIC_DCL void dump_everything(int, time_t);
 STATIC_DCL int num_extinct(void);
 
-#if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(__BEOS__) || defined(MICRO) || defined(OS2)
 extern void nethack_exit(int);
 #else
 #define nethack_exit exit
@@ -135,8 +135,9 @@ panictrace_handler(sig_unused)
 int sig_unused UNUSED;
 {
 #define SIG_MSG "\nSignal received.\n"
-    int f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
-
+    int f2;
+    
+    f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
     nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
     NH_abort(); /* ... and we're already in the process of quitting? */
 }
@@ -414,7 +415,7 @@ done_in_by(struct monst *mtmp, int how)
                                    ? &mons[mtmp->cham]
                                    : mptr);
     boolean distorted = (boolean) (Hallucination && canspotmon(mtmp)),
-            mimicker = (mtmp->m_ap_type == M_AP_MONSTER),
+            mimicker = (M_AP_TYPE(mtmp) == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
 
     You((how == STONING) ? "turn to stone..." : "die...");
@@ -493,6 +494,15 @@ done_in_by(struct monst *mtmp, int how)
     }
 
     Strcpy(killer.name, buf);
+    /*
+     * Chicken and egg issue:
+     *  Ordinarily Unchanging ought to override something like this,
+     *  but the transformation occurs at death.  With the current code,
+     *  the effectiveness of Unchanging stops first, but a case could
+     *  be made that it should last long enough to prevent undead
+     *  transformation.  (Turning to slime isn't an issue here because
+     *  Unchanging prevents that from happening.)
+     */
     if (mptr->mlet == S_WRAITH)
         u.ugrave_arise = PM_WRAITH;
     else if (mptr->mlet == S_MUMMY && urace.mummynum != NON_PM)
@@ -1028,7 +1038,7 @@ done(int how)
 #endif
         ) {
         /* skip status update if panicking or disconnected */
-        context.botl = context.botlx = FALSE;
+        context.botl = context.botlx = iflags.time_botl = FALSE;
     } else {
         /* otherwise force full status update */
         context.botlx = TRUE;
@@ -1066,10 +1076,11 @@ done(int how)
     if (how < PANICKED) {
         u.umortality++;
         /* in case caller hasn't already done this */
-        if (u.uhp > 0 || (Upolyd && u.mh > 0)) {
-            /* for deaths not triggered by loss of hit points, force
-               current HP to zero (0 HP when turning into green slime
-               is iffy but we don't have much choice--that is fatal) */
+        if (u.uhp != 0 || (Upolyd && u.mh != 0)) {
+            /* force HP to zero in case it is still positive (some
+               deaths aren't triggered by loss of hit points), or
+               negative (-1 is used as a flag in some circumstances
+               which don't apply when actually dying due to HP loss) */
             u.uhp = u.mh = 0;
             context.botl = 1;
         }
@@ -1129,6 +1140,10 @@ really_done(int how)
     program_state.gameover = 1;
     /* in case of a subsequent panic(), there's no point trying to save */
     program_state.something_worth_saving = 0;
+#ifdef HANGUPHANDLING
+    if (program_state.done_hup)
+        done_stopprint++;
+#endif
     /* render vision subsystem inoperative */
     iflags.vision_inited = 0;
 
@@ -1153,8 +1168,8 @@ really_done(int how)
      * On those rare occasions you get hosed immediately, go out
      * smiling... :-)  -3.
      */
-    if (moves <= 1 && how < PANICKED) /* You die... --More-- */
-        pline("Do not pass go.  Do not collect 200 %s.", currency(200L));
+    if (moves <= 1 && how < PANICKED && !done_stopprint)
+        pline("Do not pass Go.  Do not collect 200 %s.", currency(200L));
 
     if (have_windows)
         wait_synch(); /* flush screen output */
@@ -1200,9 +1215,11 @@ really_done(int how)
     fixup_death(how); /* actually, fixup multi_reason */
 
     if (how != PANICKED) {
+        boolean silently = done_stopprint ? TRUE : FALSE;
+
         /* these affect score and/or bones, but avoid them during panic */
-        taken = paybill((how == ESCAPED) ? -1 : (how != QUIT));
-        paygd();
+        taken = paybill((how == ESCAPED) ? -1 : (how != QUIT), silently);
+        paygd(silently);
         clearpriests();
     } else
         taken = FALSE; /* lint; assert( !bones_ok ); */
@@ -1309,7 +1326,7 @@ really_done(int how)
         }
     }
 
-    if (u.ugrave_arise >= LOW_PM) {
+    if (u.ugrave_arise >= LOW_PM && !done_stopprint) {
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
@@ -1344,9 +1361,8 @@ really_done(int how)
         }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP);  WIN_MAP = WIN_ERR;
-#ifndef STATUS_HILITES
-        destroy_nhwindow(WIN_STATUS);  WIN_STATUS = WIN_ERR;
-#endif
+        if (WIN_STATUS != WIN_ERR)
+            destroy_nhwindow(WIN_STATUS),  WIN_STATUS = WIN_ERR;
         destroy_nhwindow(WIN_MESSAGE);  WIN_MESSAGE = WIN_ERR;
 
         if (!done_stopprint || flags.tombstone)

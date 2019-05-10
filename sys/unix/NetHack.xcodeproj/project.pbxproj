@@ -158,6 +158,7 @@
 		31B8A46221A26B020055BD01 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
 		31B8A46621A2820F0055BD01 /* dgn_comp.y in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A46421A278AC0055BD01 /* dgn_comp.y */; };
 		31B8A46921A288770055BD01 /* dgn_comp.l in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A46821A288770055BD01 /* dgn_comp.l */; };
+		54FCE8292223261F00F393C8 /* isaac64.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FCE8282223261F00F393C8 /* isaac64.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -586,6 +587,7 @@
 		31B8A45F21A26AE70055BD01 /* dlb_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlb_main.c; path = ../../util/dlb_main.c; sourceTree = "<group>"; };
 		31B8A46421A278AC0055BD01 /* dgn_comp.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = dgn_comp.y; path = ../../util/dgn_comp.y; sourceTree = "<group>"; };
 		31B8A46821A288770055BD01 /* dgn_comp.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = dgn_comp.l; path = ../../util/dgn_comp.l; sourceTree = "<group>"; };
+		54FCE8282223261F00F393C8 /* isaac64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = isaac64.c; path = ../../src/isaac64.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -700,6 +702,7 @@
 				31B8A35821A238040055BD01 /* hack.c */,
 				31B8A36421A238040055BD01 /* hacklib.c */,
 				31B8A33121A238010055BD01 /* invent.c */,
+				54FCE8282223261F00F393C8 /* isaac64.c */,
 				31B8A32B21A238010055BD01 /* light.c */,
 				31B8A34921A238030055BD01 /* lock.c */,
 				31B8A33221A238010055BD01 /* mail.c */,
@@ -1729,6 +1732,7 @@
 				31B8A3DE21A238060055BD01 /* sys.c in Sources */,
 				31B8A38021A238060055BD01 /* sit.c in Sources */,
 				31B8A3AF21A238060055BD01 /* lock.c in Sources */,
+				54FCE8292223261F00F393C8 /* isaac64.c in Sources */,
 				31B8A38C21A238060055BD01 /* trap.c in Sources */,
 				31B8A3AE21A238060055BD01 /* worn.c in Sources */,
 				31B8A3B821A238060055BD01 /* dokick.c in Sources */,
@@ -1984,7 +1988,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = ansi;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2066,7 +2070,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = ansi;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -2107,6 +2111,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -2115,6 +2120,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

@@ -1,10 +1,11 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1543545915 2018/11/30 02:45:15 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.32 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1550876198 2019/02/22 22:56:38 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
-#  The default configuration is for building with DEC C (aka Compaq C).
+#  The default configuration is for building with DEC C (aka Compaq C,
+#  then HP C).
 #  If you change CC or CFLAGS, make similar changes in [.util]Makefile.
 #
 #  Note:  modifying this Makefile will cause crtl.opt to be rebuilt,
@@ -22,6 +23,7 @@ INC = [-.include]
 SYSSHR = [-.sys.share]
 SRC = [-.src]
 TTY = [-.win.tty]
+CURSES = [-.win.curses]
 UTL = [-.util]
 VMS = [-.sys.vms]
 WINSHR = [-.win.share]
@@ -73,6 +75,13 @@ WINTTYSRC = $(TTY)getline.c $(TTY)termcap.c $(TTY)topl.c $(TTY)wintty.c \
 	$(TERMCAPSRC)
 WINTTYOBJ = getline.obj,termcap.obj,topl.obj,wintty.obj $(TERMCAPOBJ)
 #
+# curses; doesn't use termcap; may or may not support TERMTABLE for non-DEC tty
+WINCURSESSRC = $(CURSES)cursdial.c $(CURSES)cursmesg.c $(CURSES)cursinit.c \
+	$(CURSES)cursmisc.c $(CURSES)cursinvt.c $(CURSES)cursstat.c \
+	$(CURSES)cursmain.c $(CURSES)curswins.c
+WINCURSESOBJ = cursdial.obj,cursmesg.obj,cursinit.obj,cursmisc.obj, \
+	cursinvt.obj,cursstat.obj,cursmain.obj,curswins.obj
+#
 # an X11 port (not supported under DECwindows)
 WINX11SRC = $(X11)Window.c $(X11)dialogs.c $(X11)winX.c $(X11)winmap.c \
 	$(X11)winmenu.c $(X11)winmesg.c $(X11)winmisc.c $(X11)winstat.c \
@@ -81,16 +90,41 @@ WINX11OBJ = Window.obj,dialogs.obj,winX.obj,winmap.obj,winmenu.obj,\
 	winmesg.obj,winmisc.obj,winstat.obj,wintext.obj,winval.obj,tile.obj
 #
 #
+# make sure both WANT_WIN_TTY and WANT_WIN_CURSES have a value
+.ifndef WANT_WIN_CURSES
+WANT_WIN_CURSES=0
+.endif
+.ifndef WANT_WIN_TTY
+.if WANT_WIN_CURSES
+WANT_WIN_TTY=0
+.else
+WANT_WIN_TTY=1
+.endif
+.endif
+
+.if WANT_WIN_TTY
 WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)
+.if WANT_WIN_CURSES
+WINSRC +=,$(WINCURSESSRC)
+WINOBJ += $(WINCURSESOBJ)
+.endif
+.else
+.if WANT_WIN_CURSES
+WINSRC = $(WINCURSESSRC)
+WINOBJ = $(WINCURSESOBJ)
+.else
+# Neither WANT_WIN_TTY nor WANT_WIN_CURSES?
+.endif
+.endif
 
 # make NetHack for VMS
 SYSTEM	= SysVMS.timestamp;
 GAME	= $(SRC)nethack.exe;
 
-# RANDOM is defined in vmsconf.h
-RANDSRC = random.c
-RANDOBJ = random.obj
+# RANDOM is defined in vmsconf.h, USE_ISAAC64 might be defined in config.h;
+RANDSRC = isaac64.c random.c
+RANDOBJ = isaac64.obj,random.obj
 
 # ----------------------------------------
 #
@@ -343,18 +377,35 @@ vmsfiles.obj :	$(VMS)vmsfiles.c $(CONFIG_H)
 vmsmail.obj :	$(VMS)vmsmail.c $(CONFIG_H) $(INC)mail.h \
 		$(INC)wintype.h $(INC)winprocs.h
 #	conditionally used code -- VMS always wants these
+isaac64.obj :	isaac64.c $(CONFIG_H) $(INC)isaac64.h
 random.obj :	random.c $(HACK_H)
 random.c :	$(SYSSHR)random.c
 	copy $(SYSSHR)random.c random.c
 tclib.obj :	tclib.c $(CONFIG_H)
 tclib.c :	$(SYSSHR)tclib.c
 	copy $(SYSSHR)tclib.c tclib.c
-#	user interface code -- VMS uses tty (1st 4) only
+#	user interface code -- VMS uses tty or curses or both, not X11
 getline.obj :	$(TTY)getline.c $(HACK_H) $(INC)func_tab.h
 termcap.obj :	$(TTY)termcap.c $(HACK_H) $(INC)tcap.h
 topl.obj :	$(TTY)topl.c $(HACK_H) $(INC)tcap.h
 wintty.obj :	$(TTY)wintty.c $(HACK_H) $(INC)dlb.h \
 		$(INC)date.h $(INC)patchlevel.h $(INC)tcap.h
+cursmain.obj :	$(CURSES)cursmain.c $(HACK_H) $(INC)patchlevel.h \
+		$(INC)wincurs.h
+curswins.obj : 	$(CURSES)curswins.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)curswins.h
+cursmisc.obj : 	$(CURSES)cursmisc.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursmisc.h $(INC)func_tab.h $(INC)dlb.h
+cursdial.obj : 	$(CURSES)cursdial.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursdial.h ../include/func_tab.h
+cursstat.obj : 	$(CURSES)cursstat.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursstat.h
+cursinit.obj : 	$(CURSES)cursinit.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursinit.h
+cursmesg.obj : 	$(CURSES)cursmesg.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursmesg.h
+cursinvt.obj : 	$(CURSES)cursinvt.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursinvt.h
 Window.obj :	$(X11)Window.c $(INC)xwindowp.h $(INC)xwindow.h $(CONFIG_H)
 dialogs.obj :	$(X11)dialogs.c $(CONFIG_H)
 winX.obj :	$(X11)winX.c $(HACK_H) $(INC)winX.h $(INC)dlb.h \

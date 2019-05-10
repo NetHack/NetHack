@@ -1,4 +1,4 @@
-/* NetHack 3.6	system.h	$NHDT-Date: 1501723401 2017/08/03 01:23:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.6	system.h	$NHDT-Date: 1550268586 2019/02/15 22:09:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -165,20 +165,18 @@ E long lseek(int, off_t, int);
 /* Ultrix 3.0 man page mistakenly says it returns an int. */
 E int write(int, char *, int);
 E int link(const char *, const char *);
-#else
-#ifndef bsdi
+#else /*!ULTRIX*/
+#if !(defined(bsdi) || defined(VMS))
 E long lseek(int, long, int);
-#endif
 #if defined(POSIX_TYPES) || defined(__TURBOC__)
-#ifndef bsdi
 E int write(int, const void *, unsigned);
-#endif
 #else
 #ifndef __MWERKS__ /* metrowerks defines write via universal headers */
 E int write(int, genericptr_t, unsigned);
 #endif
-#endif
-#endif /* ULTRIX */
+#endif /*?(POSIX_TYPES || __TURBOC__)*/
+#endif /*!(bsdi || VMS)*/
+#endif /*?ULTRIX*/
 
 #ifdef OS2_CSET2 /* IBM CSet/2 */
 #ifdef OS2_CSET2_VER_1
@@ -273,7 +271,7 @@ E int creat(const char *, unsigned, ...);
 E int delete(const char *);
 E int fstat(/*_ int, stat_t * _*/);
 E int isatty(int); /* 1==yes, 0==no, -1==error */
-E long lseek(int, long, int);
+E off_t lseek(int, long, int);
 E int open(const char *, int, unsigned, ...);
 E int read(int, genericptr_t, unsigned);
 E int rename(const char *, const char *);

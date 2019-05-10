@@ -1,5 +1,5 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1546174708 2018/12/30 12:58:28 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
-#       Copyright (c) NetHack PC Development Team 1993-2018
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1554784482 2019/04/09 04:34:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.153 $ */
+#       Copyright (c) NetHack PC Development Team 1993-2019
 #
 #==============================================================================
 # Build Tools Environment
@@ -7,9 +7,8 @@
 #       NetHack 3.6.x Makefile for MS Visual Studio Visual C++ compiler
 #  
 #       Visual Studio Compilers Tested:
-#            - Microsoft Visual Studio 2010 Express, with the Platform SDK
-#            - Microsoft Visual Studio 2013 Express
 #            - Microsoft Visual Studio 2017 Community Edition
+#            - Microsoft Visual Studio 2019 Community Edition
 #
 #==============================================================================
 #   This is used for building two versions of NetHack:
@@ -131,7 +130,7 @@ OBJ     = o
 
 RANDOM	= $(OBJ)\random.o
 #RANDOM	=
-
+BCRYPT=bcrypt.lib
 WINPFLAG= -DTILES -DMSWIN_GRAPHICS -DWIN32CON
 
 # To store all the level files,
@@ -219,7 +218,7 @@ VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o
 VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
 VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
 VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
-VOBJ14 = $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
+VOBJ14 = $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o     $(O)isaac64.o
 VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
 VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
 VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  
@@ -452,7 +451,7 @@ CL_RECENT=-sdl
 #----------------------------------------------------------------
 
 !IF "$(ADD_CURSES)" == "Y"
-CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
 !ELSE
 CURSDEF=
 CURSESLIB=
@@ -460,11 +459,12 @@ CURSESLIB=
 
 ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
 	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
-	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" $(CURSESDEF) \
+	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" \
+	-DHAS_STDINT_H -DHAS_INLINE $(CURSESDEF) \
 	-EHsc -fp:precise -Gd -GF -GS -Gy \
 	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
-cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
-crelease= -analyze- -D"_MBCS" -errorReport:prompt -Gm- -MT -O2 -Ot -Ox -Oy
+cdebug= -analyze- -D"_DEBUG" -MTd -RTC1 -Od
+crelease= -analyze- -D"_MBCS" -errorReport:prompt -MT -O2 -Ot -Ox -Oy
 
 lcommon= /NOLOGO /INCREMENTAL:NO
 
@@ -801,7 +801,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
         @echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
-		$(LIBS) $(PDCLIB) $(conlibs) -out:$@ @<<$(@B).lnk
+		$(LIBS) $(PDCLIB) $(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(TTYOBJ)
 		$(O)nttty.o
@@ -824,7 +824,7 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
-		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(guilibs) $(COMCTRL) -out:$@ @<<$(@B).lnk
+		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(GUIOBJ)
 		$(O)tile.o
@@ -1514,6 +1514,8 @@ $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\atari\tos.c
 $(O)pctty.o: ..\sys\share\pctty.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pctty.c
+$(O)isaac64.o: ..\src\isaac64.c $(HACK_H) $(INCL)\isaac64.h $(INCL)\integer.h
+	@$(CC) $(cflagsBuild) -Fo$@ ..\src\isaac64.c
 $(O)random.o: ..\sys\share\random.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\random.c
 $(O)ioctl.o: ..\sys\share\ioctl.c $(HACK_H) $(INCL)\tcap.h

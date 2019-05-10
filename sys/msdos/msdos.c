@@ -513,4 +513,15 @@ dos_ioctl(int handle, int mode, unsigned setvalue)
     return (regs.x.dx);
 }
 
+unsigned long
+sys_random_seed(VOID_ARGS)
+{
+    unsigned long ourseed = 0UL;
+    time_t datetime = 0;
+
+    (void) time(&datetime);
+    ourseed = (unsigned long) datetime;
+    return ourseed;
+}
+
 #endif /* MSDOS */

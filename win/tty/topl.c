@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1540934784 2018/10/30 21:26:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1549333449 2019/02/05 02:24:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,7 +16,6 @@
 
 STATIC_DCL void redotoplin(const char *);
 STATIC_DCL void topl_putsym(char);
-STATIC_DCL void remember_topl(void);
 STATIC_DCL void removetopl(int);
 STATIC_DCL void msghistory_snapshot(boolean);
 STATIC_DCL void free_msghistory_snapshot(boolean);
@@ -25,9 +24,9 @@ int
 tty_doprev_message()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
-
     winid prevmsg_win;
     int i;
+
     if ((iflags.prevmsg_window != 's')
         && !ttyDisplay->inread) {           /* not single */
         if (iflags.prevmsg_window == 'f') { /* full */
@@ -143,7 +142,23 @@ redotoplin(const char *str)
         more();
 }
 
-STATIC_OVL void
+/* for use by tty_putstr() */
+void
+show_topl(str)
+const char *str;
+{
+    struct WinDesc *cw = wins[WIN_MESSAGE];
+
+    if (!(cw->flags & WIN_STOP)) {
+        cw->curx = cw->cury = 0;
+        home();
+        cl_end();
+        addtopl(str);
+    }
+}
+
+/* used by update_topl(); also by tty_putstr() */
+void
 remember_topl()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
@@ -228,7 +243,8 @@ update_topl(register const char *bp)
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
     n0 = strlen(bp);
-    if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP)) && cw->cury == 0
+    if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP))
+        && cw->cury == 0
         && n0 + (int) strlen(toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
         Strcat(toplines, "  ");

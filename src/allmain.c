@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1539804859 2018/10/17 19:34:19 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1555552624 2019/04/18 01:57:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -105,21 +105,24 @@ moveloop(boolean resuming)
                 context.mon_moving = FALSE;
 
                 if (!monscanmove && youmonst.movement < NORMAL_SPEED) {
-                    /* both you and the monsters are out of steam this round
-                     */
-                    /* set up for a new turn */
+                    /* both hero and monsters are out of steam this round */
                     struct monst *mtmp;
+
+                    /* set up for a new turn */
                     mcalcdistress(); /* adjust monsters' trap, blind, etc */
 
-                    /* reallocate movement rations to monsters */
+                    /* reallocate movement rations to monsters; don't need
+                       to skip dead monsters here because they will have
+                       been purged at end of their previous round of moving */
                     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
                         mtmp->movement += mcalcmove(mtmp);
 
-                    if (!rn2(u.uevent.udemigod
-                                 ? 25
-                                 : (depth(&u.uz) > depth(&stronghold_level))
-                                       ? 50
-                                       : 70))
+                    /* occasionally add another monster; since this takes
+                       place after movement has been allotted, the new
+                       monster effectively loses its first turn */
+                    if (!rn2(u.uevent.udemigod ? 25
+                             : (depth(&u.uz) > depth(&stronghold_level)) ? 50
+                               : 70))
                         (void) makemon((struct permonst *) 0, 0, 0,
                                        NO_MM_FLAGS);
 
@@ -130,11 +133,11 @@ moveloop(boolean resuming)
                     } else {
                         moveamt = youmonst.data->mmove;
 
-                        if (Very_fast) { /* speed boots or potion */
+                        if (Very_fast) { /* speed boots, potion, or spell */
                             /* gain a free action on 2/3 of turns */
                             if (rn2(3) != 0)
                                 moveamt += NORMAL_SPEED;
-                        } else if (Fast) {
+                        } else if (Fast) { /* intrinsic */
                             /* gain a free action on 1/3 of turns */
                             if (rn2(3) == 0)
                                 moveamt += NORMAL_SPEED;
@@ -180,7 +183,7 @@ moveloop(boolean resuming)
                     if (u.ublesscnt)
                         u.ublesscnt--;
                     if (flags.time && !context.run)
-                        context.botl = 1;
+                        iflags.time_botl = TRUE;
 
                     /* One possible result of prayer is healing.  Whether or
                      * not you get healed depends on your current hit points.
@@ -206,8 +209,10 @@ moveloop(boolean resuming)
                                                    : moves % 10)) {
                             if (Upolyd && u.mh > 1) {
                                 u.mh--;
+                                context.botl = TRUE;
                             } else if (!Upolyd && u.uhp > 1) {
                                 u.uhp--;
+                                context.botl = TRUE;
                             } else {
                                 You("pass out from exertion!");
                                 exercise(A_CON, FALSE);
@@ -225,7 +230,7 @@ moveloop(boolean resuming)
                             (int) (ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1, 1);
                         if (u.uen > u.uenmax)
                             u.uen = u.uenmax;
-                        context.botl = 1;
+                        context.botl = TRUE;
                         if (u.uen == u.uenmax)
                             interrupt_multi("You feel full of energy.");
                     }
@@ -233,6 +238,7 @@ moveloop(boolean resuming)
                     if (!u.uinvulnerable) {
                         if (Teleportation && !rn2(85)) {
                             xchar old_ux = u.ux, old_uy = u.uy;
+
                             tele();
                             if (u.ux != old_ux || u.uy != old_uy) {
                                 if (!next_to_u()) {
@@ -309,14 +315,16 @@ moveloop(boolean resuming)
                         }
                     }
                 }
-            } while (youmonst.movement
-                     < NORMAL_SPEED); /* hero can't move loop */
+            } while (youmonst.movement < NORMAL_SPEED); /* hero can't move */
 
             /******************************************/
             /* once-per-hero-took-time things go here */
             /******************************************/
 
-            status_eval_next_unhilite();
+#ifdef STATUS_HILITES
+            if (iflags.hilite_delta)
+                status_eval_next_unhilite();
+#endif
             if (context.bypasses)
                 clear_bypasses();
             if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
@@ -354,6 +362,9 @@ moveloop(boolean resuming)
         }
         if (context.botl || context.botlx) {
             bot();
+            curs_on_u();
+        } else if (iflags.time_botl) {
+            timebot();
             curs_on_u();
         }
 
@@ -404,7 +415,7 @@ moveloop(boolean resuming)
                 /* lookaround may clear multi */
                 context.move = 0;
                 if (flags.time)
-                    context.botl = 1;
+                    context.botl = TRUE;
                 continue;
             }
             if (context.mv) {
@@ -426,7 +437,7 @@ moveloop(boolean resuming)
             deferred_goto(); /* after rhack() */
         /* !context.move here: multiple movement command stopped */
         else if (flags.time && (!context.move || !context.mv))
-            context.botl = 1;
+            context.botl = TRUE;
 
         if (vision_full_recalc)
             vision_recalc(0); /* vision! */
@@ -434,7 +445,8 @@ moveloop(boolean resuming)
         if ((!context.run || flags.runmode == RUN_TPORT)
             && (multi && (!context.travel ? !(multi % 7) : !(moves % 7L)))) {
             if (flags.time && context.run)
-                context.botl = 1;
+                context.botl = TRUE;
+            /* [should this be flush_screen() instead?] */
             display_nhwindow(WIN_MAP, FALSE);
         }
     }
@@ -464,7 +476,7 @@ int wtcap;
                 heal = 1;
         }
         if (heal) {
-            context.botl = 1;
+            context.botl = TRUE;
             u.mh += heal;
             reached_full = (u.mh == u.mhmax);
         }
@@ -496,7 +508,7 @@ int wtcap;
                 heal = 1;
 
             if (heal) {
-                context.botl = 1;
+                context.botl = TRUE;
                 u.uhp += heal;
                 if (u.uhp > u.uhpmax)
                     u.uhp = u.uhpmax;
@@ -517,7 +529,7 @@ stop_occupation()
         if (!maybe_finished_meal(TRUE))
             You("stop %s.", occtxt);
         occupation = 0;
-        context.botl = 1; /* in case u.uhs changed */
+        context.botl = TRUE; /* in case u.uhs changed */
         nomul(0);
         pushch(0);
     } else if (multi >= 0) {
@@ -529,11 +541,11 @@ void
 display_gamewindows()
 {
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
-#ifdef STATUS_HILITES
-    status_initialize(0);
-#else
-    WIN_STATUS = create_nhwindow(NHW_STATUS);
-#endif
+    if (VIA_WINDOWPORT()) {
+        status_initialize(0);
+    } else {
+        WIN_STATUS = create_nhwindow(NHW_STATUS);
+    }
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
     /* in case of early quit where WIN_INVEN could be destroyed before
@@ -570,7 +582,7 @@ newgame()
     gameDiskPrompt();
 #endif
 
-    context.botlx = 1;
+    context.botlx = TRUE;
     context.ident = 1;
     context.stethoscope_move = -1L;
     context.warnlevel = 1;

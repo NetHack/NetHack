@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1446975463 2015/11/08 09:37:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1547025164 2019/01/09 09:12:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -120,6 +120,7 @@ NEARDATA boolean mrg_to_wielded = FALSE;
 /* weapon picked is merged with wielded one */
 
 NEARDATA boolean in_steed_dismounting = FALSE;
+NEARDATA boolean has_strong_rngseed = FALSE;
 
 NEARDATA coord bhitpos = DUMMY;
 NEARDATA coord doors[DOORMAX] = { DUMMY };
@@ -198,10 +199,10 @@ NEARDATA struct obj *migrating_objs = (struct obj *) 0;
 NEARDATA struct obj *billobjs = (struct obj *) 0;
 
 /* used to zero all elements of a struct obj and a struct monst */
-NEARDATA struct obj zeroobj = DUMMY;
-NEARDATA struct monst zeromonst = DUMMY;
+NEARDATA const struct obj zeroobj = DUMMY;
+NEARDATA const struct monst zeromonst = DUMMY;
 /* used to zero out union any; initializer deliberately omitted */
-NEARDATA anything zeroany;
+NEARDATA const anything zeroany;
 
 /* originally from dog.c */
 NEARDATA char dogname[PL_PSIZ] = DUMMY;
@@ -214,6 +215,8 @@ NEARDATA struct monst *mydogs = (struct monst *) 0;
 NEARDATA struct monst *migrating_mons = (struct monst *) 0;
 
 NEARDATA struct mvitals mvitals[NUMMONS];
+NEARDATA long domove_attempting = 0L;
+NEARDATA long domove_succeeded = 0L;
 
 NEARDATA struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
@@ -277,7 +280,7 @@ char *fqn_prefix[PREFIX_COUNT] = { (char *) 0, (char *) 0, (char *) 0,
                                    (char *) 0, (char *) 0, (char *) 0,
                                    (char *) 0, (char *) 0, (char *) 0,
                                    (char *) 0 };
-
+                                   
 #ifdef PREFIXES_IN_USE
 char *fqn_prefix_names[PREFIX_COUNT] = {
     "hackdir",  "leveldir", "savedir",    "bonesdir",  "datadir",

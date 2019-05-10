@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1546657409 2019/01/05 03:03:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.351 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1554591224 2019/04/06 22:53:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.363 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,7 +28,8 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 #endif
 
 #ifdef CURSES_GRAPHICS
-extern int curses_read_attrs(char *attrs);
+extern int curses_read_attrs(const char *attrs);
+extern char *curses_fmt_attrs(char *);
 #endif
 
 enum window_option_types {
@@ -113,7 +114,7 @@ static struct Bool_Opt {
     { "confirm", &flags.confirm, TRUE, SET_IN_GAME },
     { "dark_room", &flags.dark_room, TRUE, SET_IN_GAME },
     { "eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_GAME }, /*WC*/
-#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS) || defined(X11_GRAPHICS)
     { "extmenu", &iflags.extmenu, FALSE, SET_IN_GAME },
 #else
     { "extmenu", (boolean *) 0, FALSE, SET_IN_FILE },
@@ -131,9 +132,9 @@ static struct Bool_Opt {
     { "flush", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
     { "force_invmenu", &iflags.force_invmenu, FALSE, SET_IN_GAME },
-    { "fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE },
+    { "fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE }, /*WC2*/
     { "goldX", &iflags.goldX, FALSE, SET_IN_GAME },
-    { "guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME},
+    { "guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME}, /*WC2*/
     { "help", &flags.help, TRUE, SET_IN_GAME },
     { "herecmd_menu", &iflags.herecmd_menu, FALSE, SET_IN_GAME },
     { "hilite_pet", &iflags.wc_hilite_pet, FALSE, SET_IN_GAME }, /*WC*/
@@ -209,7 +210,7 @@ static struct Bool_Opt {
     { "showscore", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
     { "silent", &flags.silent, TRUE, SET_IN_GAME },
-    { "softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE },
+    { "softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE }, /*WC2*/
     { "sortpack", &flags.sortpack, TRUE, SET_IN_GAME },
     { "sparkle", &flags.sparkle, TRUE, SET_IN_GAME },
     { "splash_screen", &iflags.wc_splash_screen, TRUE, DISP_IN_GAME }, /*WC*/
@@ -228,7 +229,7 @@ static struct Bool_Opt {
 #ifdef DEBUG
     { "travel_debug", &iflags.trav_debug, FALSE, SET_IN_WIZGAME }, /*hack.c*/
 #endif
-    { "use_darkgray", &iflags.wc2_darkgray, TRUE, SET_IN_FILE },
+    { "use_darkgray", &iflags.wc2_darkgray, TRUE, SET_IN_FILE }, /*WC2*/
 #ifdef WIN32
     { "use_inverse", &iflags.wc_inverse, TRUE, SET_IN_GAME }, /*WC*/
 #else
@@ -243,7 +244,7 @@ static struct Bool_Opt {
     { "whatis_menu", &iflags.getloc_usemenu, FALSE, SET_IN_GAME },
     { "whatis_moveskip", &iflags.getloc_moveskip, FALSE, SET_IN_GAME },
     { "wizweight", &iflags.wizweight, FALSE, SET_IN_WIZGAME },
-    { "wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME },
+    { "wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME }, /*WC2*/
 #ifdef ZEROCOMP
     { "zerocomp", &iflags.zerocomp,
 #if defined(COMPRESS) || defined(ZLIB_COMP)
@@ -344,19 +345,18 @@ static struct Comp_Opt {
 #ifdef CHANGE_COLOR
     { "palette",
 #ifndef WIN32
-      "palette (00c/880/-fff is blue/yellow/reverse white)", 15,
-      SET_IN_GAME },
+      "palette (00c/880/-fff is blue/yellow/reverse white)", 15, SET_IN_GAME
 #else
-      "palette (adjust an RGB color in palette (color-R-G-B)", 15,
-      SET_IN_FILE },
+      "palette (adjust an RGB color in palette (color-R-G-B)", 15, SET_IN_FILE
 #endif
+    },
 #if defined(MAC)
     { "hicolor", "same as palette, only order is reversed", 15, SET_IN_FILE },
 #endif
 #endif
     { "paranoid_confirmation", "extra prompting in certain situations", 28,
       SET_IN_GAME },
-    { "petattr",  "attributes for highlighting pets", 12, SET_IN_FILE },
+    { "petattr",  "attributes for highlighting pets", 88, SET_IN_GAME },
     { "pettype", "your preferred initial pet type", 4, DISP_IN_GAME },
     { "pickup_burden", "maximum burden picked up before prompt", 20,
       SET_IN_GAME },
@@ -385,20 +385,23 @@ static struct Comp_Opt {
 #ifdef MSDOS
     { "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
-#ifdef STATUS_HILITES
     { "statushilites",
+#ifdef STATUS_HILITES
       "0=no status highlighting, N=show highlights for N turns",
-      20, SET_IN_GAME },
+      20, SET_IN_GAME
 #else
-    { "statushilites", "highlight control", 20, SET_IN_FILE },
+    "highlight control", 20, SET_IN_FILE
 #endif
-#ifdef CURSES_GRAPHICS
+    },
     { "statuslines",
-      "0,1,2 = classic behavior, 3 = alternative behavior",
-      20, DISP_IN_GAME },
+#ifdef CURSES_GRAPHICS
+      "2 or 3 lines for horizonal (bottom or top) status display",
+      20, SET_IN_GAME
 #else
-    { "statuslines", "# of status lines", 20, SET_IN_FILE },
+      "2 or 3 lines for status display",
+      20, SET_IN_FILE
 #endif
+    }, /*WC2*/
     { "symset", "load a set of display symbols from the symbols file", 70,
       SET_IN_GAME },
     { "roguesymset",
@@ -409,6 +412,9 @@ static struct Comp_Opt {
 #endif
     { "suppress_alert", "suppress alerts about version-specific features", 8,
       SET_IN_GAME },
+    /* term_cols,term_rows -> WC2_TERM_SIZE (6: room to format 1..32767) */
+    { "term_cols", "number of columns", 6, SET_IN_FILE }, /*WC2*/
+    { "term_rows", "number of rows", 6, SET_IN_FILE }, /*WC2*/
     { "tile_width", "width of tiles", 20, DISP_IN_GAME },   /*WC*/
     { "tile_height", "height of tiles", 20, DISP_IN_GAME }, /*WC*/
     { "tile_file", "name of tile file", 70, DISP_IN_GAME }, /*WC*/
@@ -430,6 +436,7 @@ static struct Comp_Opt {
     { "whatis_filter",
       "filter coordinate locations when targeting next or previous",
       1, SET_IN_GAME },
+    { "windowborders", "0 (off), 1 (on), 2 (auto)", 9, SET_IN_GAME }, /*WC2*/
     { "windowcolors", "the foreground/background colors of windows", /*WC*/
       80, DISP_IN_GAME },
     { "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
@@ -440,7 +447,7 @@ static struct Comp_Opt {
     { "DECgraphics", "load DECGraphics display symbols", 70, SET_IN_FILE },
     { "IBMgraphics", "load IBMGraphics display symbols", 70, SET_IN_FILE },
 #ifdef CURSES_GRAPHICS
-    {"cursesgraphics", "load curses display symbols", 70, SET_IN_FILE},
+    { "cursesgraphics", "load curses display symbols", 70, SET_IN_FILE },
 #endif
 #ifdef MAC_GRAPHICS_ENV
     { "Macgraphics", "load MACGraphics display symbols", 70, SET_IN_FILE },
@@ -687,8 +694,9 @@ initoptions_init()
     /* set up the command parsing */
     reset_commands(TRUE); /* init */
 
-    /* initialize the random number generator */
-    setrandom();
+    /* initialize the random number generator(s) */
+    init_random(rn2);
+    init_random(rn2_on_display_rng);
 
     /* for detection of configfile options specified multiple times */
     iflags.opt_booldup = iflags.opt_compdup = (int *) 0;
@@ -725,8 +733,13 @@ initoptions_init()
     flags.pile_limit = PILE_LIMIT_DFLT;  /* 5 */
     flags.runmode = RUN_LEAP;
     iflags.msg_history = 20;
+    /* msg_window has conflicting defaults for multi-interface binary */
 #ifdef TTY_GRAPHICS
     iflags.prevmsg_window = 's';
+#else
+#ifdef CURSES_GRAPHICS
+    iflags.prevmsg_window = 'r';
+#endif
 #endif
     iflags.menu_headings = ATR_INVERSE;
     iflags.getpos_coords = GPCOORDS_NONE;
@@ -807,6 +820,12 @@ initoptions_init()
     switch_symbols(TRUE);
 #endif /* MAC_GRAPHICS_ENV */
     flags.menu_style = MENU_FULL;
+
+    iflags.wc_align_message = ALIGN_TOP;
+    iflags.wc_align_status = ALIGN_BOTTOM;
+    /* these are currently only used by curses */
+    iflags.wc2_statuslines = 2;
+    iflags.wc2_windowborders = 2; /* 'Auto' */
 
     /* since this is done before init_objects(), do partial init here */
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
@@ -1339,7 +1358,8 @@ static const struct {
     { "inverse", ATR_INVERSE },
     { NULL, ATR_NONE }, /* everything after this is an alias */
     { "normal", ATR_NONE },
-    { "uline", ATR_ULINE }
+    { "uline", ATR_ULINE },
+    { "reverse", ATR_INVERSE },
 };
 
 const char *
@@ -1471,14 +1491,14 @@ query_attr(const char *prompt)
                                                      : MENU_UNSELECTED);
     }
     end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick an attribute");
-    pick_cnt = select_menu(tmpwin, allow_many ? PICK_ANY: PICK_ONE, &picks);
+    pick_cnt = select_menu(tmpwin, allow_many ? PICK_ANY : PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
         int j, k = 0;
 
         if (allow_many) {
-            /* PICK_ANY, with one preselected entry which should be
-               excluded if any other choices were picked */
+            /* PICK_ANY, with one preselected entry (ATR_NONE) which
+               should be excluded if any other choices were picked */
             for (i = 0; i < pick_cnt; ++i) {
                 j = picks[i].item.a_int - 1;
                 if (attrnames[j].attr != ATR_NONE || pick_cnt == 1) {
@@ -2344,19 +2364,18 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
         case 's': /* single message history cycle (default if negated) */
             iflags.prevmsg_window = 's';
             break;
-        case 'c': /* combination: two singles, then full page reversed */
+        case 'c': /* combination: two singles, then full page */
             iflags.prevmsg_window = 'c';
             break;
-        case 'f': /* full page (default if no opts) */
+        case 'f': /* full page (default if specified without argument) */
             iflags.prevmsg_window = 'f';
             break;
         case 'r': /* full page (reversed) */
             iflags.prevmsg_window = 'r';
             break;
-        default: {
+        default:
             config_error_add("Unknown %s parameter '%s'", fullname, op);
-            return FALSE;
-        }
+            retval = FALSE;
         }
 #endif
         return retval;
@@ -3244,8 +3263,10 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
         } else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
             return FALSE;
         }
-        if (!assign_videocolors(opts)) /* TODO: error msg */
+        if (!assign_videocolors(opts)) {
+            config_error_add("Unknown error handling '%s'", fullname);
             return FALSE;
+        }
         return retval;
     }
     /* videoshades:string */
@@ -3259,11 +3280,14 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
         } else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
             return FALSE;
         }
-        if (!assign_videoshades(opts)) /* TODO: error msg */
+        if (!assign_videoshades(opts)) {
+            config_error_add("Unknown error handling '%s'", fullname);
             return FALSE;
+        }
         return retval;
     }
 #endif /* VIDEOSHADES */
+
 #ifdef MSDOS
 #ifdef NO_TERMS
     /* video:string -- must be after longer tests */
@@ -3277,8 +3301,10 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
         } else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
             return FALSE;
         }
-        if (!assign_video(opts)) /* TODO: error msg */
+        if (!assign_video(opts)) {
+            config_error_add("Unknown error handling '%s'", fullname);
             return FALSE;
+        }
         return retval;
     }
 #endif /* NO_TERMS */
@@ -3293,8 +3319,10 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
         } else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
             return FALSE;
         }
-        if (!assign_soundcard(opts)) /* TODO: error msg */
+        if (!assign_soundcard(opts)) {
+            config_error_add("Unknown error handling '%s'", fullname);
             return FALSE;
+        }
         return retval;
     }
 #endif /* MSDOS */
@@ -3382,8 +3410,8 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
         if (negated) {
             bad_negation(fullname, FALSE);
             return FALSE;
-        } else {
 #if defined(WIN32)
+        } else {
             op = string_for_opt(opts, 0);
             if (!op)
                 return FALSE;
@@ -3518,32 +3546,45 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
         if (duplicate)
             complain_about_duplicate(opts, 1);
         if ((op = string_for_opt(opts, FALSE)) != 0) {
-            if (!wc_set_window_colors(op)) /* TODO: error msg*/
+            if (!wc_set_window_colors(op)) {
+                config_error_add("Could not set %s '%s'", fullname, op);
                 return FALSE;
-        } else if (negated)
+            }
+        } else if (negated) {
             bad_negation(fullname, TRUE);
-        return retval;
-    }
-#ifdef CURSES_GRAPHICS
-    /* WINCAP2
-     * term_cols:amount */
-    fullname = "term_cols";
-    if (match_optname(opts, fullname, sizeof "term_cols" - 1, TRUE)) {
-        op = string_for_opt(opts, negated);
-        iflags.wc2_term_cols = atoi(op);
-        if (negated)
-           bad_negation(fullname, FALSE);
+            return FALSE;
+        }
         return retval;
     }
 
+#ifdef CURSES_GRAPHICS
     /* WINCAP2
-     * term_rows:amount */
-    fullname = "term_rows";
-    if (match_optname(opts, fullname, sizeof "term_rows" - 1, TRUE)) {
+     * term_cols:amount or term_rows:amount */
+    fullname = "term_cols";
+    if (match_optname(opts, fullname, 8, TRUE)
+        /* alternate spelling */
+        || match_optname(opts, "term_columns", 9, TRUE)
+        /* different option but identical handlng */
+        || (fullname = "term_rows", match_optname(opts, fullname, 8, TRUE))) {
+        long ltmp;
+
         op = string_for_opt(opts, negated);
-        iflags.wc2_term_rows = atoi(op);
-        if (negated)
+        ltmp = atol(op);
+        if (negated) {
             bad_negation(fullname, FALSE);
+            retval = FALSE;
+
+        /* this just checks atol() sanity, not logical window size sanity */
+        } else if (ltmp <= 0L || ltmp >= (long) LARGEST_INT) {
+            config_error_add("Invalid %s: %ld", fullname, ltmp);
+            retval = FALSE;
+
+        } else {
+            if (!strcmp(fullname, "term_rows"))
+                iflags.wc2_term_rows = (int) ltmp;
+            else /* !strcmp(fullname, "term_cols") */
+                iflags.wc2_term_cols = (int) ltmp;
+        }
         return retval;
     }
 
@@ -3552,45 +3593,89 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
     fullname = "petattr";
     if (match_optname(opts, fullname, sizeof "petattr" - 1, TRUE)) {
         op = string_for_opt(opts, negated);
-        if (op && !negated) {
+        if (op && negated) {
+            bad_negation(fullname, TRUE);
+            retval = FALSE;
+        } else if (op) {
 #ifdef CURSES_GRAPHICS
-            iflags.wc2_petattr = curses_read_attrs(op);
-            if (!curses_read_attrs(op))
+            int itmp = curses_read_attrs(op);
+
+            if (itmp == -1) {
                 config_error_add("Unknown %s parameter '%s'", fullname, opts);
-                return FALSE;
+                retval = FALSE;
+            } else
+                iflags.wc2_petattr = itmp;
 #else
             /* non-curses windowports will not use this flag anyway
              * but the above will not compile if we don't have curses.
              * Just set it to a sensible default: */
-            iflags.wc2_petattr = ATR_INVERSE
+            iflags.wc2_petattr = ATR_INVERSE;
 #endif
-        } else if (negated) bad_negation(fullname, TRUE);
+        } else if (negated) {
+            iflags.wc2_petattr = ATR_NONE;
+        }
+        if (retval) {
+            iflags.hilite_pet = (iflags.wc2_petattr != ATR_NONE);
+            if (!initial)
+                need_redraw = TRUE;
+        }
         return retval;
     }
 
     /* WINCAP2
      * windowborders:n */
     fullname = "windowborders";
-    if (match_optname(opts, fullname, sizeof "windowborders" - 1, TRUE)) {
+    if (match_optname(opts, fullname, 10, TRUE)) {
         op = string_for_opt(opts, negated);
-        if (negated && op)
+        if (negated && op) {
             bad_negation(fullname, TRUE);
-        else {
+            retval = FALSE;
+        } else {
+            int itmp;
+
             if (negated)
-                iflags.wc2_windowborders = 2; /* Off */
+                itmp = 0; /* Off */
             else if (!op)
-                iflags.wc2_windowborders = 1; /* On */
-            else    /* Value supplied */
-                iflags.wc2_windowborders = atoi(op);
-            if ((iflags.wc2_windowborders > 3)
-                || (iflags.wc2_windowborders < 1)) {
-                    iflags.wc2_windowborders = 0;
-                    config_error_add("Badoption - windowborders %s.", opts);
+                itmp = 1; /* On */
+            else    /* Value supplied; expect 0 (off), 1 (on), or 2 (auto) */
+                itmp = atoi(op);
+
+            if (itmp < 0 || itmp > 2) {
+                config_error_add("Invalid %s (should be 0, 1, or 2): %s",
+                                 fullname, opts);
+                retval = FALSE;
+            } else {
+                iflags.wc2_windowborders = itmp;
             }
         }
         return retval;
     }
-#endif
+#endif /* CURSES_GRAPHICS */
+
+    /* WINCAP2
+     * statuslines:n */
+    fullname = "statuslines";
+    if (match_optname(opts, fullname, 11, TRUE)) {
+        int itmp = 0;
+
+        op = string_for_opt(opts, negated);
+        if (negated) {
+            bad_negation(fullname, TRUE);
+            itmp = 2;
+            retval = FALSE;
+        } else if (op) {
+            itmp = atoi(op);
+        }
+        if (itmp < 2 || itmp > 3) {
+            config_error_add("'%s' requires a value of 2 and 3", fullname);
+            retval = FALSE;
+        } else {
+            iflags.wc2_statuslines = itmp;
+            if (!initial)
+                need_redraw = TRUE;
+        }
+        return retval;
+    }
 
     /* menustyle:traditional or combination or full or partial */
     fullname = "menustyle";
@@ -3903,13 +3988,15 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
                 || boolopt[i].addr == &flags.showscore
 #endif
                 || boolopt[i].addr == &flags.showexp) {
-#ifdef STATUS_HILITES
-                status_initialize(REASSESS_ONLY);
-#endif
+                if (VIA_WINDOWPORT())
+                    status_initialize(REASSESS_ONLY);
                 context.botl = TRUE;
             } else if (boolopt[i].addr == &flags.invlet_constant) {
-                if (flags.invlet_constant)
+                if (flags.invlet_constant) {
                     reassign();
+                    if (iflags.perm_invent)
+                        need_redraw = TRUE;
+                }
             } else if (boolopt[i].addr == &flags.lit_corridor
                        || boolopt[i].addr == &flags.dark_room) {
                 /*
@@ -3926,19 +4013,30 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
             } else if (boolopt[i].addr == &flags.showrace
                        || boolopt[i].addr == &iflags.use_inverse
                        || boolopt[i].addr == &iflags.hilite_pile
-                       || boolopt[i].addr == &iflags.hilite_pet
+                       || boolopt[i].addr == &iflags.perm_invent
+#ifdef CURSES_GRAPHICS
+                       || boolopt[i].addr == &iflags.cursesgraphics
+#endif
                        || boolopt[i].addr == &iflags.wc_ascii_map
                        || boolopt[i].addr == &iflags.wc_tiled_map) {
                 need_redraw = TRUE;
-#ifdef STATUS_HILITES
-            } else if (boolopt[i].addr == &iflags.wc2_hitpointbar) {
-                status_initialize(REASSESS_ONLY);
-                need_redraw = TRUE;
-#endif
+            } else if (boolopt[i].addr == &iflags.hilite_pet) {
 #ifdef CURSES_GRAPHICS
-            } else if ((boolopt[i].addr) == &iflags.cursesgraphics) {
-                need_redraw = TRUE;
+                if (WINDOWPORT("curses")) {
+                    /* if we're enabling hilite_pet and petattr isn't set,
+                       set it to Inverse; if we're disabling, leave petattr
+                       alone so that re-enabling will get current value back */
+                    if (iflags.hilite_pet && !iflags.wc2_petattr)
+                        iflags.wc2_petattr = curses_read_attrs("I");
+                }
 #endif
+                need_redraw = TRUE;
+            } else if (boolopt[i].addr == &iflags.wc2_hitpointbar) {
+                if (VIA_WINDOWPORT()) {
+                    /* [is reassessment really needed here?] */
+                    status_initialize(REASSESS_ONLY);
+                    need_redraw = TRUE;
+                }
 #ifdef TEXTCOLOR
             } else if (boolopt[i].addr == &iflags.use_color) {
                 need_redraw = TRUE;
@@ -4786,32 +4884,38 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
         }
         destroy_nhwindow(tmpwin);
     } else if (!strcmp("msg_window", optname)) {
-#ifdef TTY_GRAPHICS
-        /* by Christian W. Cooper */
-        menu_item *window_pick = (menu_item *) 0;
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+        if (WINDOWPORT("tty") || WINDOWPORT("curses")) {
+            /* by Christian W. Cooper */
+            menu_item *window_pick = (menu_item *) 0;
 
-        tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
-        any = zeroany;
-        any.a_char = 's';
-        add_menu(tmpwin, NO_GLYPH, &any, 's', 0, ATR_NONE, "single",
-                 MENU_UNSELECTED);
-        any.a_char = 'c';
-        add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE, "combination",
-                 MENU_UNSELECTED);
-        any.a_char = 'f';
-        add_menu(tmpwin, NO_GLYPH, &any, 'f', 0, ATR_NONE, "full",
-                 MENU_UNSELECTED);
-        any.a_char = 'r';
-        add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "reversed",
-                 MENU_UNSELECTED);
-        end_menu(tmpwin, "Select message history display type:");
-        if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
-            iflags.prevmsg_window = window_pick->item.a_char;
-            free((genericptr_t) window_pick);
-        }
-        destroy_nhwindow(tmpwin);
-#endif
+            tmpwin = create_nhwindow(NHW_MENU);
+            start_menu(tmpwin);
+            any = zeroany;
+            if (!WINDOWPORT("curses")) {
+                any.a_char = 's';
+                add_menu(tmpwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
+                         "single", MENU_UNSELECTED);
+                any.a_char = 'c';
+                add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE,
+                         "combination", MENU_UNSELECTED);
+            }
+            any.a_char = 'f';
+            add_menu(tmpwin, NO_GLYPH, &any, 'f', 0, ATR_NONE, "full",
+                     MENU_UNSELECTED);
+            any.a_char = 'r';
+            add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "reversed",
+                     MENU_UNSELECTED);
+            end_menu(tmpwin, "Select message history display type:");
+            if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
+                iflags.prevmsg_window = window_pick->item.a_char;
+                free((genericptr_t) window_pick);
+            }
+            destroy_nhwindow(tmpwin);
+        } else
+#endif /* msg_window for tty or curses */
+            pline("'%s' option is not supported for '%s'.",
+                  optname, windowprocs.name);
     } else if (!strcmp("sortloot", optname)) {
         const char *sortl_name;
         menu_item *sortl_pick = (menu_item *) 0;
@@ -5292,29 +5396,17 @@ get_compopt_value(const char *optname, char *buf)
     int i;
 
     buf[0] = '\0';
-    if (!strcmp(optname, "align_message"))
+    if (!strcmp(optname, "align_message")
+        || !strcmp(optname, "align_status")) {
+        int which = !strcmp(optname, "align_status") ? iflags.wc_align_status
+                                                     : iflags.wc_align_message;
         Sprintf(buf, "%s",
-                iflags.wc_align_message == ALIGN_TOP
-                    ? "top"
-                    : iflags.wc_align_message == ALIGN_LEFT
-                          ? "left"
-                          : iflags.wc_align_message == ALIGN_BOTTOM
-                                ? "bottom"
-                                : iflags.wc_align_message == ALIGN_RIGHT
-                                      ? "right"
-                                      : defopt);
-    else if (!strcmp(optname, "align_status"))
-        Sprintf(buf, "%s",
-                iflags.wc_align_status == ALIGN_TOP
-                    ? "top"
-                    : iflags.wc_align_status == ALIGN_LEFT
-                          ? "left"
-                          : iflags.wc_align_status == ALIGN_BOTTOM
-                                ? "bottom"
-                                : iflags.wc_align_status == ALIGN_RIGHT
-                                      ? "right"
-                                      : defopt);
-    else if (!strcmp(optname, "align"))
+                (which == ALIGN_TOP) ? "top"
+                : (which == ALIGN_LEFT) ? "left"
+                  : (which == ALIGN_BOTTOM) ? "bottom"
+                    : (which == ALIGN_RIGHT) ? "right"
+                      : defopt);
+    } else if (!strcmp(optname, "align"))
         Sprintf(buf, "%s", rolestring(flags.initalign, aligns, adj));
 #ifdef WIN32
     else if (!strcmp(optname, "altkeyhandler"))
@@ -5492,6 +5584,18 @@ get_compopt_value(const char *optname, char *buf)
             if (flags.paranoia_bits & paranoia[i].flagmask)
                 Sprintf(eos(tmpbuf), " %s", paranoia[i].argname);
         Strcpy(buf, tmpbuf[0] ? &tmpbuf[1] : "none");
+    } else if (!strcmp(optname, "petattr")) {
+#ifdef CURSES_GRAPHICS
+        if (WINDOWPORT("curses")) {
+            char tmpbuf[QBUFSZ];
+
+            Strcpy(buf, curses_fmt_attrs(tmpbuf));
+        } else
+#endif
+        if (iflags.wc2_petattr != 0)
+            Sprintf(buf, "0x%08x", iflags.wc2_petattr);
+        else
+            Strcpy(buf, defopt);
     } else if (!strcmp(optname, "pettype")) {
         Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat"
                            : (preferred_pet == 'd') ? "dog"
@@ -5563,6 +5667,10 @@ get_compopt_value(const char *optname, char *buf)
             Sprintf(buf, "%ld (on: highlight status for %ld turns)",
                     iflags.hilite_delta, iflags.hilite_delta);
 #endif
+    } else if (!strcmp(optname,"statuslines")) {
+        if (wc2_supported(optname))
+            Strcpy(buf, (iflags.wc2_statuslines < 3) ? "2" : "3");
+        /* else default to "unknown" */
     } else if (!strcmp(optname, "suppress_alert")) {
         if (flags.suppress_alert == 0L)
             Strcpy(buf, none);
@@ -5574,7 +5682,6 @@ get_compopt_value(const char *optname, char *buf)
                 symset[PRIMARY].name ? symset[PRIMARY].name : "default");
         if (currentgraphics == PRIMARY && symset[PRIMARY].name)
             Strcat(buf, ", active");
-#ifdef CURSES_GRAPHICS
     } else if (!strcmp(optname, "term_cols")) {
         if (iflags.wc2_term_cols)
             Sprintf(buf, "%d", iflags.wc2_term_cols);
@@ -5582,10 +5689,9 @@ get_compopt_value(const char *optname, char *buf)
             Strcpy(buf, defopt);
     } else if (!strcmp(optname, "term_rows")) {
         if (iflags.wc2_term_rows)
-            Sprintf(buf, "%d",iflags.wc2_term_rows);
+            Sprintf(buf, "%d", iflags.wc2_term_rows);
         else
             Strcpy(buf, defopt);
-#endif
     } else if (!strcmp(optname, "tile_file")) {
         Sprintf(buf, "%s",
                 iflags.wc_tile_file ? iflags.wc_tile_file : defopt);
@@ -5622,14 +5728,12 @@ get_compopt_value(const char *optname, char *buf)
                 ttycolors[CLR_YELLOW], ttycolors[CLR_BRIGHT_BLUE],
                 ttycolors[CLR_BRIGHT_MAGENTA], ttycolors[CLR_BRIGHT_CYAN]);
 #endif /* VIDEOSHADES */
-#ifdef CURSES_GRAPHICS
     } else if (!strcmp(optname,"windowborders")) {
         Sprintf(buf, "%s",
-                (iflags.wc2_windowborders == 1) ? "1=on"
-                : (iflags.wc2_windowborders == 2) ? "2=off"
-                  : (iflags.wc2_windowborders == 3) ? "3=auto"
+                (iflags.wc2_windowborders == 0) ? "0=off"
+                : (iflags.wc2_windowborders == 1) ? "1=on"
+                  : (iflags.wc2_windowborders == 2) ? "2=auto"
                     : defopt);
-#endif
     } else if (!strcmp(optname, "windowtype")) {
         Sprintf(buf, "%s", windowprocs.name);
     } else if (!strcmp(optname, "windowcolors")) {
@@ -6316,9 +6420,12 @@ static struct wc_Opt wc2_options[] = {
     { "status hilite rules", WC2_HILITE_STATUS },
     /* statushilites doesn't have its own bit */
     { "statushilites", WC2_HILITE_STATUS },
-#ifdef CURSES_GRAPHICS
-    {"windowborders", WC2_WINDOWBORDERS},
-#endif
+    { "term_cols", WC2_TERM_SIZE },
+    { "term_rows", WC2_TERM_SIZE },
+    { "petattr", WC2_PETATTR },
+    { "guicolor", WC2_GUICOLOR },
+    { "statuslines", WC2_STATUSLINES },
+    { "windowborders", WC2_WINDOWBORDERS },
     { (char *) 0, 0L }
 };
 

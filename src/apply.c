@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1544442708 2018/12/10 11:51:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.269 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1553363415 2019/03/23 17:50:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.272 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -238,7 +238,7 @@ its_dead(int rx, int ry, int*resp)
         int visglyph, corpseglyph;
 
         visglyph = glyph_at(rx, ry);
-        corpseglyph = obj_to_glyph(corpse);
+        corpseglyph = obj_to_glyph(corpse, rn2);
 
         if (Blind && (visglyph != corpseglyph))
             map_object(corpse, TRUE);
@@ -380,7 +380,7 @@ use_stethoscope(register struct obj *obj)
         } else if (mtmp->mappearance) {
             const char *what = "thing";
 
-            switch (mtmp->m_ap_type) {
+            switch (M_AP_TYPE(mtmp)) {
             case M_AP_OBJECT:
                 what = simple_typename(mtmp->mappearance);
                 break;
@@ -480,7 +480,7 @@ use_magic_whistle(struct obj *obj)
                 }
                 /* mimic must be revealed before we know whether it
                    actually moves because line-of-sight may change */
-                if (mtmp->m_ap_type)
+                if (M_AP_TYPE(mtmp))
                     seemimic(mtmp);
                 omx = mtmp->mx; omy = mtmp->my;
                 mnexto(mtmp);
@@ -1890,7 +1890,6 @@ use_unicorn_horn(struct obj *obj)
             if (Deaf) /* make_deaf() won't give feedback when already deaf */
                 pline("Nothing seems to happen.");
             make_deaf((HDeaf & TIMEOUT) + lcount, TRUE);
-            context.botl = TRUE;
             break;
         }
         return;
@@ -2017,6 +2016,8 @@ use_unicorn_horn(struct obj *obj)
         }
     }
 
+    if (did_attr || did_prop)
+        context.botl = TRUE;
     if (did_attr)
         pline("This makes you feel %s!",
               (did_prop + did_attr) == (trouble_count + unfixable_trbl)
@@ -2025,7 +2026,6 @@ use_unicorn_horn(struct obj *obj)
     else if (!did_prop)
         pline("Nothing seems to happen.");
 
-    context.botl = (did_attr || did_prop);
 #undef PROP_COUNT
 #undef ATTR_COUNT
 #undef prop2trbl
@@ -2075,7 +2075,7 @@ fig_transform(anything *arg, long timeout)
         and_vanish[0] = '\0';
         if ((mtmp->minvis && !See_invisible)
             || (mtmp->data->mlet == S_MIMIC
-                && mtmp->m_ap_type != M_AP_NOTHING))
+                && M_AP_TYPE(mtmp) != M_AP_NOTHING))
             suppress_see = TRUE;
 
         if (mtmp->mundetected) {
@@ -2460,7 +2460,7 @@ use_trap(struct obj *otmp)
     ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
     if (otmp == trapinfo.tobj && u.ux == trapinfo.tx && u.uy == trapinfo.ty) {
         You("resume setting %s%s.", shk_your(buf, otmp),
-            defsyms[trap_to_defsym(what_trap(ttyp))].explanation);
+            defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation);
         set_occupation(set_trap, occutext, 0);
         return;
     }
@@ -2485,7 +2485,8 @@ use_trap(struct obj *otmp)
             chance = (rnl(10) > 5);
         You("aren't very skilled at reaching from %s.", mon_nam(u.usteed));
         Sprintf(buf, "Continue your attempt to set %s?",
-                the(defsyms[trap_to_defsym(what_trap(ttyp))].explanation));
+                the(defsyms[trap_to_defsym(what_trap(ttyp, rn2))]
+                    .explanation));
         if (yn(buf) == 'y') {
             if (chance) {
                 switch (ttyp) {
@@ -2496,7 +2497,7 @@ use_trap(struct obj *otmp)
                 case BEAR_TRAP: /* drop it without arming it */
                     reset_trapset();
                     You("drop %s!",
-                        the(defsyms[trap_to_defsym(what_trap(ttyp))]
+                        the(defsyms[trap_to_defsym(what_trap(ttyp, rn2))]
                                 .explanation));
                     dropx(otmp);
                     return;
@@ -2508,7 +2509,7 @@ use_trap(struct obj *otmp)
         }
     }
     You("begin setting %s%s.", shk_your(buf, otmp),
-        defsyms[trap_to_defsym(what_trap(ttyp))].explanation);
+        defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation);
     set_occupation(set_trap, occutext, 0);
     return;
 }
@@ -2541,7 +2542,7 @@ set_trap()
         }
         if (!trapinfo.force_bungle)
             You("finish arming %s.",
-                the(defsyms[trap_to_defsym(what_trap(ttyp))].explanation));
+                the(defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation));
         if (((otmp->cursed || Fumbling) && (rnl(10) > 5))
             || trapinfo.force_bungle)
             dotrap(ttmp,
@@ -2644,7 +2645,6 @@ use_whip(struct obj *obj)
         You("hit your %s with your bullwhip.", body_part(FOOT));
         Sprintf(buf, "killed %sself with %s bullwhip", uhim(), uhis());
         losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
-        context.botl = 1;
         return 1;
 
     } else if ((Fumbling || Glib) && !rn2(5)) {
@@ -2798,7 +2798,7 @@ use_whip(struct obj *obj)
             }
             wakeup(mtmp, TRUE);
         } else {
-            if (mtmp->m_ap_type && !Protection_from_shape_changers
+            if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers
                 && !sensemon(mtmp))
                 stumble_onto_mimic(mtmp);
             else

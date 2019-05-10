@@ -307,7 +307,7 @@ ohitmon(struct monst *mtmp, /* accidental target, located at <bhitpos.x,.y> */
     struct obj *mon_launcher = archer ? MON_WEP(archer) : NULL;
 
     notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
-    ismimic = mtmp->m_ap_type && mtmp->m_ap_type != M_AP_MONSTER;
+    ismimic = M_AP_TYPE(mtmp) && M_AP_TYPE(mtmp) != M_AP_MONSTER;
     vis = cansee(bhitpos.x, bhitpos.y);
 
     tmp = 5 + find_mac(mtmp) + omon_adj(mtmp, otmp, FALSE);
@@ -527,7 +527,7 @@ m_throw(struct monst *mon,  /* launching monster */
      * be careful not to use either one after it's been freed.
      */
     if (sym)
-        tmp_at(DISP_FLASH, obj_to_glyph(singleobj));
+        tmp_at(DISP_FLASH, obj_to_glyph(singleobj, rn2_on_display_rng));
     while (range-- > 0) { /* Actually the loop is always exited by break */
         bhitpos.x += dx;
         bhitpos.y += dy;
@@ -1053,8 +1053,8 @@ lined_up(register struct monst *mtmp)
 
     /* hero concealment usually trumps monst awareness of being lined up */
     if (Upolyd && rn2(25)
-        && (u.uundetected || (youmonst.m_ap_type != M_AP_NOTHING
-                              && youmonst.m_ap_type != M_AP_MONSTER)))
+        && (u.uundetected || (U_AP_TYPE != M_AP_NOTHING
+                              && U_AP_TYPE != M_AP_MONSTER)))
         return FALSE;
 
     ignore_boulders = (throws_rocks(mtmp->data)

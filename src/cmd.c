@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1546565813 2019/01/04 01:36:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.324 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1557088405 2019/05/05 20:33:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.333 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -789,36 +789,89 @@ wiz_identify(VOID_ARGS)
     return 0;
 }
 
+/* #wizmakemap - discard current dungeon level and replace with a new one */
 STATIC_PTR int
 wiz_makemap(VOID_ARGS)
 {
-    /* FIXME: doesn't handle riding */
     if (wizard) {
         struct monst *mtmp;
+        boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
 
         rm_mapseen(ledger_no(&u.uz));
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (mtmp->isgd) { /* vault is going away; get rid of guard */
+                mtmp->isgd = 0;
+                mongone(mtmp);
+            }
+            if (DEADMONSTER(mtmp))
+                continue;
             if (mtmp->isshk)
                 setpaid(mtmp);
+            /* TODO?
+             *  Reduce 'born' tally for each monster about to be discarded
+             *  by savelev(), otherwise replacing heavily populated levels
+             *  tends to make their inhabitants become extinct.
+             */
+        }
         if (Punished) {
             ballrelease(FALSE);
             unplacebc();
         }
-        reset_utrap(FALSE); /* also done by safe_teleds() for new level */
-        check_special_room(TRUE);
-        dmonsfree();
+        /* reset lock picking unless it's for a carried container */
+        maybe_reset_pick((struct obj *) 0);
+        /* reset interrupted digging if it was taking place on this level */
+        if (on_level(&context.digging.level, &u.uz))
+            (void) memset((genericptr_t) &context.digging, 0,
+                          sizeof (struct dig_info));
+        /* reset cached targets */
+        iflags.travelcc.x = iflags.travelcc.y = 0; /* travel destination */
+        context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+        /* escape from trap */
+        reset_utrap(FALSE);
+        check_special_room(TRUE); /* room exit */
+        u.ustuck = (struct monst *) 0;
+        u.uswallow = 0;
+        u.uinwater = 0;
+        u.uundetected = 0; /* not hidden, even if means are available */
+        dmonsfree(); /* purge dead monsters from 'fmon' */
+        /* keep steed and other adjacent pets after releasing them
+           from traps, stopping eating, &c as if hero were ascending */
+        keepdogs(TRUE); /* (pets-only; normally we'd be using 'FALSE' here) */
+
+        /* discard current level; "saving" is used to release dynamic data */
         savelev(-1, ledger_no(&u.uz), FREE_SAVE);
+        /* create a new level; various things like bestowing a guardian
+           angel on Astral or setting off alarm on Ft.Ludios are handled
+           by goto_level(do.c) so won't occur for replacement levels */
         mklev();
+
         vision_reset();
         vision_full_recalc = 1;
         cls();
-        (void) safe_teleds(TRUE);
+        /* was using safe_teleds() but that doesn't honor arrival region
+           on levels which have such; we don't force stairs, just area */
+        u_on_rndspot((u.uhave.amulet ? 1 : 0) /* 'going up' flag */
+                     | (was_in_W_tower ? 2 : 0));
+        losedogs();
+        /* u_on_rndspot() might pick a spot that has a monster, or losedogs()
+           might pick the hero's spot (only if there isn't already a monster
+           there), so we might have to move hero or the co-located monster */
+        if ((mtmp = m_at(u.ux, u.uy)) != 0)
+            u_collide_m(mtmp);
+        initrack();
         if (Punished) {
             unplacebc();
             placebc();
         }
         docrt();
         flush_screen(1);
+        deliver_splev_message(); /* level entry */
+        check_special_room(FALSE); /* room entry */
+#ifdef INSURANCE
+        save_currentstate();
+#endif
+    } else {
+        pline(unavailcmd, "#wizmakemap");
     }
     return 0;
 }
@@ -2195,7 +2248,7 @@ status_enlightenment(int mode, int final)
                   : surface(u.ux, u.uy)); /* catchall; shouldn't happen */
         you_are(buf, from_what(WWALKING));
     }
-    if (Upolyd && (u.uundetected || youmonst.m_ap_type != M_AP_NOTHING))
+    if (Upolyd && (u.uundetected || U_AP_TYPE != M_AP_NOTHING))
         youhiding(TRUE, final);
 
     /* internal troubles, mostly in the order that prayer ranks them */
@@ -3014,16 +3067,16 @@ youhiding(boolean via_enlghtmt, /* englightment line vs topl message */
     char *bp, buf[BUFSZ];
 
     Strcpy(buf, "hiding");
-    if (youmonst.m_ap_type != M_AP_NOTHING) {
+    if (U_AP_TYPE != M_AP_NOTHING) {
         /* mimic; hero is only able to mimic a strange object or gold
            or hallucinatory alternative to gold, so we skip the details
            for the hypothetical furniture and monster cases */
         bp = eos(strcpy(buf, "mimicking"));
-        if (youmonst.m_ap_type == M_AP_OBJECT) {
+        if (U_AP_TYPE == M_AP_OBJECT) {
             Sprintf(bp, " %s", an(simple_typename(youmonst.mappearance)));
-        } else if (youmonst.m_ap_type == M_AP_FURNITURE) {
+        } else if (U_AP_TYPE == M_AP_FURNITURE) {
             Strcpy(bp, " something");
-        } else if (youmonst.m_ap_type == M_AP_MONSTER) {
+        } else if (U_AP_TYPE == M_AP_MONSTER) {
             Strcpy(bp, " someone");
         } else {
             ; /* something unexpected; leave 'buf' as-is */
@@ -3984,6 +4037,7 @@ sanity_check()
     timer_sanity_check();
     mon_sanity_check();
     light_sources_sanity_check();
+    bc_sanity_check();
 }
 
 #ifdef DEBUG_MIGRATING_MONS
@@ -4409,7 +4463,7 @@ void
 rhack(register char *cmd)
 {
     int spkey;
-    boolean do_walk, do_rush, prefix_seen, bad_command,
+    boolean prefix_seen, bad_command,
         firsttime = (cmd == 0);
 
     iflags.menu_requested = FALSE;
@@ -4440,7 +4494,7 @@ rhack(register char *cmd)
     }
 
     /* handle most movement commands */
-    do_walk = do_rush = prefix_seen = FALSE;
+    prefix_seen = FALSE;
     context.travel = context.travel1 = 0;
     spkey = ch2spkeys(*cmd, NHKF_RUN, NHKF_CLICKLOOK);
 
@@ -4448,7 +4502,7 @@ rhack(register char *cmd)
     case NHKF_RUSH:
         if (movecmd(cmd[1])) {
             context.run = 2;
-            do_rush = TRUE;
+            domove_attempting |= DOMOVE_RUSH;
         } else
             prefix_seen = TRUE;
         break;
@@ -4459,7 +4513,7 @@ rhack(register char *cmd)
     case NHKF_RUN:
         if (movecmd(lowc(cmd[1]))) {
             context.run = 3;
-            do_rush = TRUE;
+            domove_attempting |= DOMOVE_RUSH;
         } else
             prefix_seen = TRUE;
         break;
@@ -4475,7 +4529,7 @@ rhack(register char *cmd)
     case NHKF_FIGHT:
         if (movecmd(cmd[1])) {
             context.forcefight = 1;
-            do_walk = TRUE;
+            domove_attempting |= DOMOVE_WALK;
         } else
             prefix_seen = TRUE;
         break;
@@ -4484,7 +4538,7 @@ rhack(register char *cmd)
             context.run = 0;
             context.nopick = 1;
             if (!u.dz)
-                do_walk = TRUE;
+                domove_attempting |= DOMOVE_WALK;
             else
                 cmd[0] = cmd[1]; /* "m<" or "m>" */
         } else
@@ -4494,7 +4548,7 @@ rhack(register char *cmd)
         if (movecmd(lowc(cmd[1]))) {
             context.run = 1;
             context.nopick = 1;
-            do_rush = TRUE;
+            domove_attempting |= DOMOVE_RUSH;
         } else
             prefix_seen = TRUE;
         break;
@@ -4517,20 +4571,20 @@ rhack(register char *cmd)
             context.travel1 = 1;
             context.run = 8;
             context.nopick = 1;
-            do_rush = TRUE;
+            domove_attempting |= DOMOVE_RUSH;
             break;
         }
         /*FALLTHRU*/
     default:
         if (movecmd(*cmd)) { /* ordinary movement */
             context.run = 0; /* only matters here if it was 8 */
-            do_walk = TRUE;
+            domove_attempting |= DOMOVE_WALK;
         } else if (movecmd(Cmd.num_pad ? unmeta(*cmd) : lowc(*cmd))) {
             context.run = 1;
-            do_rush = TRUE;
+            domove_attempting |= DOMOVE_RUSH;
         } else if (movecmd(unctrl(*cmd))) {
             context.run = 3;
-            do_rush = TRUE;
+            domove_attempting |= DOMOVE_RUSH;
         }
         break;
     }
@@ -4548,7 +4602,8 @@ rhack(register char *cmd)
         }
     }
 
-    if ((do_walk || do_rush) && !context.travel && !dxdy_moveok()) {
+    if (((domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
+                            && !context.travel && !dxdy_moveok()) {
         /* trying to move diagonally as a grid bug;
            this used to be treated by movecmd() as not being
            a movement attempt, but that didn't provide for any
@@ -4562,13 +4617,13 @@ rhack(register char *cmd)
         return;
     }
 
-    if (do_walk) {
+    if ((domove_attempting & DOMOVE_WALK) != 0L) {
         if (multi)
             context.mv = TRUE;
         domove();
         context.forcefight = 0;
         return;
-    } else if (do_rush) {
+    } else if ((domove_attempting & DOMOVE_RUSH) != 0L) {
         if (firsttime) {
             if (!multi)
                 multi = max(COLNO, ROWNO);
@@ -5420,9 +5475,7 @@ boolean historical /* whether to include in message history: True => yes */)
                 Sprintf(qbuf, "Count: %ld", cnt);
                 backspaced = FALSE;
             }
-            /* bypassing pline() keeps intermediate prompt out of
-               DUMPLOG message history */
-            putstr(WIN_MESSAGE, 0, qbuf);
+            custompline(SUPPRESS_HISTORY, "%s", qbuf);
             mark_synch();
         }
     }

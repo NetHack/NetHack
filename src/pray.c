@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1540596912 2018/10/26 23:35:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1549074257 2019/02/02 02:24:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -156,7 +156,7 @@ stuck_in_wall()
             y = u.uy + j;
             if (!isok(x, y)
                 || (IS_ROCK(levl[x][y].typ)
-                    && (levl[x][y].typ != SDOOR || levl[x][y].typ != SCORR))
+                    && (levl[x][y].typ != SDOOR && levl[x][y].typ != SCORR))
                 || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
                 ++count;
         }
@@ -246,6 +246,11 @@ in_trouble()
         && (!u.uswallow
             || !attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
         return TROUBLE_BLIND;
+    /* deafness isn't it's own trouble; healing magic cures deafness
+       when it cures blindness, so do the same with trouble repair */
+    if ((HDeaf & TIMEOUT) > 1L)
+        return TROUBLE_BLIND;
+
     for (i = 0; i < A_MAX; i++)
         if (ABASE(i) < AMAX(i))
             return TROUBLE_POISONED;
@@ -511,14 +516,27 @@ fix_worst_trouble(int trouble)
         }
         (void) encumber_msg();
         break;
-    case TROUBLE_BLIND: {
+    case TROUBLE_BLIND: { /* handles deafness as well as blindness */
+        char msgbuf[BUFSZ];
         const char *eyes = body_part(EYE);
+        boolean cure_deaf = (HDeaf & TIMEOUT) ? TRUE : FALSE;
 
-        if (eyecount(youmonst.data) != 1)
-            eyes = makeplural(eyes);
-        Your("%s %s better.", eyes, vtense(eyes, "feel"));
-        u.ucreamed = 0;
-        make_blinded(0L, FALSE);
+        msgbuf[0] = '\0';
+        if (Blinded) {
+            if (eyecount(youmonst.data) != 1)
+                eyes = makeplural(eyes);
+            Sprintf(msgbuf, "Your %s %s better", eyes, vtense(eyes, "feel"));
+            u.ucreamed = 0;
+            make_blinded(0L, FALSE);
+        }
+        if (cure_deaf) {
+            make_deaf(0L, FALSE);
+            if (!Deaf)
+                Sprintf(eos(msgbuf), "%s can hear again",
+                        !*msgbuf ? "You" : " and you");
+        }
+        if (*msgbuf)
+            pline("%s.", msgbuf);
         break;
     }
     case TROUBLE_WOUNDED_LEGS:
@@ -2077,13 +2095,16 @@ halu_gname(aligntyp alignment)
     if (!Hallucination)
         return align_gname(alignment);
 
-    /* The priest may not have initialized god names. If this is the
-     * case, and we roll priest, we need to try again. */
+    /* Some roles (Priest) don't have a pantheon unless we're playing as
+       that role, so keep trying until we get a role which does have one.
+       [If playing a Priest, the current pantheon will be twice as likely
+       to get picked as any of the others.  That's not significant enough
+       to bother dealing with.] */
     do
-        which = randrole();
+        which = randrole(TRUE);
     while (!roles[which].lgod);
 
-    switch (rn2(9)) {
+    switch (rn2_on_display_rng(9)) {
     case 0:
     case 1:
         gnam = roles[which].lgod;
@@ -2098,7 +2119,7 @@ halu_gname(aligntyp alignment)
         break;
     case 6:
     case 7:
-        gnam = hallu_gods[rn2(sizeof hallu_gods / sizeof *hallu_gods)];
+        gnam = hallu_gods[rn2_on_display_rng(SIZE(hallu_gods))];
         break;
     case 8:
         gnam = Moloch;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1539804880 2018/10/17 19:34:40 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1547025167 2019/01/09 09:12:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.92 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -467,7 +467,7 @@ find_defensive(struct monst *mtmp)
                 }
             }
         }
-    toot:
+ toot:
         ;
     }
 
@@ -575,7 +575,7 @@ find_defensive(struct monst *mtmp)
             m.has_defense = MUSE_SCR_CREATE_MONSTER;
         }
     }
-botm:
+ botm:
     return (boolean) !!m.has_defense;
 #undef nomore
 }
@@ -637,7 +637,7 @@ use_defensive(struct monst *mtmp)
         mzapmsg(mtmp, otmp, TRUE);
         otmp->spe--;
         how = WAN_TELEPORTATION;
-    mon_tele:
+ mon_tele:
         if (tele_restrict(mtmp)) { /* mysterious force... */
             if (vismon && how)     /* mentions 'teleport' */
                 makeknown(how);
@@ -875,7 +875,7 @@ use_defensive(struct monst *mtmp)
     case MUSE_SSTAIRS:
         m_flee(mtmp);
         if (ledger_no(&u.uz) == 1) {
-        escape:
+ escape:
             /* Monsters without the Amulet escape the dungeon and
              * are gone for good when they leave up the up stairs.
              * A monster with the Amulet would leave it behind
@@ -983,7 +983,7 @@ rnd_defensive_item(struct monst *mtmp)
     if (is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
         || pm->mlet == S_GHOST || pm->mlet == S_KOP)
         return 0;
-try_again:
+ try_again:
     switch (rn2(8 + (difficulty > 3) + (difficulty > 6) + (difficulty > 8))) {
     case 6:
     case 9:
@@ -1770,7 +1770,7 @@ use_misc(struct monst *mtmp)
                                  (coord *) 0);
                 return 2;
             } else {
-            skipmsg:
+ skipmsg:
                 if (vismon) {
                     pline("%s looks uneasy.", Monnam(mtmp));
                     if (!objects[POT_GAIN_LEVEL].oc_name_known
@@ -1954,7 +1954,7 @@ you_aggravate(struct monst *mtmp)
 #ifdef CLIPPING
     cliparound(mtmp->mx, mtmp->my);
 #endif
-    show_glyph(mtmp->mx, mtmp->my, mon_to_glyph(mtmp));
+    show_glyph(mtmp->mx, mtmp->my, mon_to_glyph(mtmp, rn2));
     display_self();
     You_feel("aggravated at %s.", noit_mon_nam(mtmp));
     display_nhwindow(WIN_MAP, TRUE);
@@ -2371,7 +2371,7 @@ munslime(struct monst *mon, boolean by_you)
             }
         }
         if (t && t->ttyp == FIRE_TRAP)
-            return muse_unslime(mon, &zeroobj, t, by_you);
+            return muse_unslime(mon, (struct obj *) &zeroobj, t, by_you);
 
     } /* MUSE */
 

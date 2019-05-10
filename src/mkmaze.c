@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1543185071 2018/11/25 22:31:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1555022325 2019/04/11 22:38:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -305,6 +305,8 @@ place_lregion(xchar lx, xchar ly, xchar hx, xchar hy, xchar nlx, xchar nly,
 STATIC_OVL boolean
 put_lregion_here(xchar x, xchar y, xchar nlx, xchar nly, xchar nhx, xchar nhy, xchar rtype, boolean oneshot, d_level *lev)
 {
+    struct monst *mtmp;
+
     if (bad_location(x, y, nlx, nly, nhx, nhy)) {
         if (!oneshot) {
             return FALSE; /* caller should try again */
@@ -325,11 +327,12 @@ put_lregion_here(xchar x, xchar y, xchar nlx, xchar nly, xchar nhx, xchar nhy, x
     case LR_UPTELE:
     case LR_DOWNTELE:
         /* "something" means the player in this case */
-        if (MON_AT(x, y)) {
+        if ((mtmp = m_at(x, y)) != 0) {
             /* move the monster if no choice, or just try again */
-            if (oneshot)
-                (void) rloc(m_at(x, y), FALSE);
-            else
+            if (oneshot) {
+                if (!rloc(mtmp, TRUE))
+                    m_into_limbo(mtmp);
+            } else
                 return FALSE;
         }
         u_on_newpos(x, y);
@@ -1836,6 +1839,7 @@ mv_bubble(struct bubble *b, int dx, int dy, boolean ini)
 
             case CONS_MON: {
                 struct monst *mon = (struct monst *) cons->list;
+
                 (void) mnearto(mon, cons->x, cons->y, TRUE);
                 break;
             }

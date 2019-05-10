@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1543185069 2018/11/25 22:31:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1555627306 2019/04/18 22:41:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.145 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -49,9 +49,9 @@ getpos_sethilite(void (*gp_hilitef)(int), boolean (*gp_getvalidf)(int,int))
 }
 
 static const char *const gloc_descr[NUM_GLOCS][4] = {
-    { "any monsters", "monster", "next monster", "monsters" },
-    { "any items", "item", "next object", "objects" },
-    { "any doors", "door", "next door or doorway", "doors or doorways" },
+    { "any monsters", "monster", "next/previous monster", "monsters" },
+    { "any items", "item", "next/previous object", "objects" },
+    { "any doors", "door", "next/previous door or doorway", "doors or doorways" },
     { "any unexplored areas", "unexplored area", "unexplored location",
       "unexplored locations" },
     { "anything interesting", "interesting thing", "anything interesting",
@@ -71,7 +71,7 @@ getpos_help_keyxhelp(winid tmpwin, const char *k1, const char *k2, int gloc)
 {
     char sbuf[BUFSZ];
 
-    Sprintf(sbuf, "Use '%s' or '%s' to %s%s%s.",
+    Sprintf(sbuf, "Use '%s'/'%s' to %s%s%s.",
             k1, k2,
             iflags.getloc_usemenu ? "get a menu of "
                                   : "move the cursor to ",
@@ -368,7 +368,7 @@ gather_locs_interesting(int x, int y, int gloc)
                     || IS_UNEXPLORED_LOC(x, y - 1)));
     case GLOC_VALID:
         if (getpos_getvalid)
-            return (getpos_getvalid(x,y));
+            return (*getpos_getvalid)(x,y);
         /*FALLTHRU*/
     case GLOC_INTERESTING:
         return gather_locs_interesting(x,y, GLOC_DOOR)
@@ -529,7 +529,7 @@ auto_describe(int cx, int cy)
         custompline(SUPPRESS_HISTORY,
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
-                     && getpos_getvalid && !getpos_getvalid(cx, cy))
+                     && getpos_getvalid && !(*getpos_getvalid)(cx, cy))
                       ? " (illegal)" : "",
                     (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
                       ? " (no travel path)" : "");
@@ -584,10 +584,10 @@ getpos_menu(coord *ccp, int gloc)
         }
     }
 
-    Sprintf(tmpbuf, "Pick a target %s%s%s",
-            gloc_descr[gloc][1],
+    Sprintf(tmpbuf, "Pick %s%s%s",
+            an(gloc_descr[gloc][1]),
             gloc_filtertxt[iflags.getloc_filter],
-            iflags.getloc_travelmode ? " for travel" : "");
+            iflags.getloc_travelmode ? " for travel destination" : "");
     end_menu(tmpwin, tmpbuf);
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
@@ -604,7 +604,7 @@ int
 getpos(coord *ccp, boolean force, const char *goal)
 {
     const char *cp;
-    struct {
+    static struct {
         int nhkf, ret;
     } const pick_chars_def[] = {
         { NHKF_GETPOS_PICK, LOOK_TRADITIONAL },
@@ -612,7 +612,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         { NHKF_GETPOS_PICK_O, LOOK_ONCE },
         { NHKF_GETPOS_PICK_V, LOOK_VERBOSE }
     };
-    const int mMoOdDxX_def[] = {
+    static const int mMoOdDxX_def[] = {
         NHKF_GETPOS_MON_NEXT,
         NHKF_GETPOS_MON_PREV,
         NHKF_GETPOS_OBJ_NEXT,
@@ -783,8 +783,8 @@ getpos(coord *ccp, boolean force, const char *goal)
         } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
             static const char *const view_filters[NUM_GFILTER] = {
                 "Not limiting targets",
-                "Limiting targets to in sight",
-                "Limiting targets to in same area"
+                "Limiting targets to those in sight",
+                "Limiting targets to those in same area"
             };
 
             iflags.getloc_filter = (iflags.getloc_filter + 1) % NUM_GFILTER;
@@ -800,8 +800,10 @@ getpos(coord *ccp, boolean force, const char *goal)
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_MENU]) {
             iflags.getloc_usemenu = !iflags.getloc_usemenu;
-            pline("%s a menu to show possible targets.",
-                  iflags.getloc_usemenu ? "Using" : "Not using");
+            pline("%s a menu to show possible targets%s.",
+                  iflags.getloc_usemenu ? "Using" : "Not using",
+                  iflags.getloc_usemenu
+                      ? " for 'm|M', 'o|O', 'd|D', and 'x|X'" : "");
             msg_given = TRUE;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_SELF]) {
@@ -1111,8 +1113,8 @@ do_mname()
     if (!mtmp
         || (!sensemon(mtmp)
             && (!(cansee(cx, cy) || see_with_infrared(mtmp))
-                || mtmp->mundetected || mtmp->m_ap_type == M_AP_FURNITURE
-                || mtmp->m_ap_type == M_AP_OBJECT
+                || mtmp->mundetected || M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                || M_AP_TYPE(mtmp) == M_AP_OBJECT
                 || (mtmp->minvis && !See_invisible)))) {
         pline("I see no monster there.");
         return;
@@ -1211,7 +1213,7 @@ do_oname(register struct obj *obj)
         /* for "the Foo of Bar", only scuff "Foo of Bar" part */
         bufp = !strncmpi(bufcpy, "the ", 4) ? (buf + 4) : buf;
         do {
-            wipeout_text(bufp, rnd(2), (unsigned) 0);
+            wipeout_text(bufp, rn2_on_display_rng(2), (unsigned) 0);
         } while (!strcmp(buf, bufcpy));
         pline("While engraving, your %s slips.", body_part(HAND));
         display_nhwindow(WIN_MESSAGE, FALSE);
@@ -1494,8 +1496,12 @@ namefloorobj()
         unames[0] = ((Upolyd ? u.mfemale : flags.female) && urole.name.f)
                      ? urole.name.f
                      : urole.name.m;
-        /* random rank title for hero's role */
-        unames[1] = rank_of(rnd(30), Role_switch, flags.female);
+        /* random rank title for hero's role
+
+           note: the 30 is hardcoded in xlev_to_rank, so should be
+           hardcoded here too */
+        unames[1] = rank_of(rn2_on_display_rng(30) + 1,
+                            Role_switch, flags.female);
         /* random fake monster */
         unames[2] = bogusmon(tmpbuf, (char *) 0);
         /* increased chance for fake monster */
@@ -1506,7 +1512,7 @@ namefloorobj()
         unames[5] = "Wibbly Wobbly";
         pline("%s %s to call you \"%s.\"",
               The(buf), use_plural ? "decide" : "decides",
-              unames[rn2(SIZE(unames))]);
+              unames[rn2_on_display_rng(SIZE(unames))]);
     } else if (!objtyp_is_callable(obj->otyp)) {
         pline("%s %s can't be assigned a type name.",
               use_plural ? "Those" : "That", buf);
@@ -1516,8 +1522,10 @@ namefloorobj()
     } else {
         docall(obj);
     }
-    if (fakeobj)
+    if (fakeobj) {
+        obj->where = OBJ_FREE; /* object_from_map() sets it to OBJ_FLOOR */
         dealloc_obj(obj);
+    }
 }
 
 static const char *const ghostnames[] = {
@@ -1870,7 +1878,7 @@ bogusmon(char *buf, char *code)
 {
     char *mname = buf;
 
-    get_rnd_text(BOGUSMONFILE, buf);
+    get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng);
     /* strip prefix if present */
     if (!letter(*mname)) {
         if (code)
@@ -1896,7 +1904,7 @@ rndmonnam(char *code)
         *code = '\0';
 
     do {
-        name = rn1(SPECIAL_PM + BOGUSMONSIZE - LOW_PM, LOW_PM);
+        name = rn2_on_display_rng(SPECIAL_PM + BOGUSMONSIZE - LOW_PM) + LOW_PM;
     } while (name < SPECIAL_PM
              && (type_is_pname(&mons[name]) || (mons[name].geno & G_NOGEN)));
 
@@ -1950,8 +1958,9 @@ static NEARDATA const char *const hcolors[] = {
 const char *
 hcolor(const char *colorpref)
 {
-    return (Hallucination || !colorpref) ? hcolors[rn2(SIZE(hcolors))]
-                                         : colorpref;
+    return (Hallucination || !colorpref)
+        ? hcolors[rn2_on_display_rng(SIZE(hcolors))]
+        : colorpref;
 }
 
 /* return a random real color unless hallucinating */

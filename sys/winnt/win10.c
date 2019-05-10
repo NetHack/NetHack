@@ -2,6 +2,7 @@
 /* Copyright (C) 2018 by Bart House 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#ifdef _MSC_VER
 #include "win10.h"
 #include <process.h>
 #include <VersionHelpers.h>
@@ -79,3 +80,4 @@ void win10_monitor_info(HWND hWnd, MonitorInfo * monitorInfo)
     monitorInfo->left = info.rcMonitor.left;
     monitorInfo->top = info.rcMonitor.top;
 }
+#endif /* _MSC_VER */

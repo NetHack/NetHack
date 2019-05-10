@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1546656413 2019/01/05 02:46:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.203 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1551137618 2019/02/25 23:33:38 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,6 +16,8 @@ STATIC_DCL boolean trapmove(int, int, struct trap *);
 STATIC_DCL struct monst *monstinroom(struct permonst *, int);
 STATIC_DCL boolean doorless_door(int, int);
 STATIC_DCL void move_update(boolean);
+STATIC_DCL void maybe_smudge_engr(int, int, int, int);
+STATIC_DCL void domove_core(void);
 
 #define IS_SHOP(x) (rooms[x].rtype >= SHOPBASE)
 
@@ -1309,6 +1311,19 @@ u_rooted()
 void
 domove()
 {
+        int ux1 = u.ux, uy1 = u.uy;
+
+        domove_succeeded = 0L;
+        domove_core();
+        /* domove_succeeded is available for making assessments now */
+        if ((domove_succeeded & (DOMOVE_RUSH | DOMOVE_WALK)) != 0)
+            maybe_smudge_engr(ux1, uy1, u.ux, u.uy);
+        domove_attempting = 0L;
+}
+
+void
+domove_core()
+{
     register struct monst *mtmp;
     register struct rm *tmpr;
     register xchar x, y;
@@ -1319,8 +1334,6 @@ domove()
           ballx = 0, bally = 0;         /* ball&chain new positions */
     int bc_control = 0;                 /* control for ball&chain */
     boolean cause_delay = FALSE;        /* dragging ball will skip a move */
-
-    u_wipe_engr(rnd(5));
 
     if (context.travel) {
         if (!findtravelpath(FALSE))
@@ -1432,7 +1445,7 @@ domove()
             if (context.run >= 2) {
                 if (iflags.mention_walls) {
                     if (trap && trap->tseen) {
-                        int tt = what_trap(trap->ttyp);
+                        int tt = what_trap(trap->ttyp, rn2_on_display_rng);
 
                         You("stop in front of %s.",
                             an(defsyms[trap_to_defsym(tt)].explanation));
@@ -1499,8 +1512,8 @@ domove()
             /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
             if (context.run && ((!Blind && mon_visible(mtmp)
-                                 && ((mtmp->m_ap_type != M_AP_FURNITURE
-                                      && mtmp->m_ap_type != M_AP_OBJECT)
+                                 && ((M_AP_TYPE(mtmp) != M_AP_FURNITURE
+                                      && M_AP_TYPE(mtmp) != M_AP_OBJECT)
                                      || Protection_from_shape_changers))
                                 || sensemon(mtmp))) {
                 nomul(0);
@@ -1540,7 +1553,7 @@ domove()
          */
         if (context.nopick && !context.travel
             && (canspotmon(mtmp) || glyph_is_invisible(levl[x][y].glyph))) {
-            if (mtmp->m_ap_type && !Protection_from_shape_changers
+            if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers
                 && !sensemon(mtmp))
                 stumble_onto_mimic(mtmp);
             else if (mtmp->mpeaceful && !Hallucination)
@@ -1728,7 +1741,7 @@ domove()
            cancel the swap below (we can ignore steed mx,my here) */
         u.ux = u.ux0; u.uy = u.uy0;
         mtmp->mundetected = 0;
-        if (mtmp->m_ap_type)
+        if (M_AP_TYPE(mtmp))
             seemimic(mtmp);
         else if (!mtmp->mtame)
             newsym(mtmp->mx, mtmp->my);
@@ -1835,13 +1848,15 @@ domove()
      * imitating something that doesn't move.  We could extend this
      * to non-moving monsters...
      */
-    if ((u.dx || u.dy) && (youmonst.m_ap_type == M_AP_OBJECT
-                           || youmonst.m_ap_type == M_AP_FURNITURE))
+    if ((u.dx || u.dy) && (U_AP_TYPE == M_AP_OBJECT
+                           || U_AP_TYPE == M_AP_FURNITURE))
         youmonst.m_ap_type = M_AP_NOTHING;
 
     check_leash(u.ux0, u.uy0);
 
     if (u.ux0 != u.ux || u.uy0 != u.uy) {
+        /* let caller know so that an evaluation may take place */
+        domove_succeeded |= (domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK));
         u.umoved = TRUE;
         /* Clean old position -- vision_recalc() will print our new one. */
         newsym(u.ux0, u.uy0);
@@ -1878,6 +1893,21 @@ domove()
                 delay_output();
             }
         }
+    }
+}
+
+void
+maybe_smudge_engr(x1,y1,x2,y2)
+int x1, y1, x2, y2;
+{
+    struct engr *ep;
+
+    if (can_reach_floor(TRUE)) {
+        if ((ep = engr_at(x1, y1)) && ep->engr_type != HEADSTONE)
+            wipe_engr_at(x1, y1, rnd(5), FALSE);
+        if ((x2 != x1 || y2 != y1)
+                && (ep = engr_at(x2, y2)) && ep->engr_type != HEADSTONE)
+            wipe_engr_at(x2, y2, rnd(5), FALSE);
     }
 }
 
@@ -2215,9 +2245,9 @@ in_rooms(register xchar x, register xchar y, register int typewanted)
     int typefound, min_x, min_y, max_x, max_y_offset, step;
     register struct rm *lev;
 
-#define goodtype(rno)   \
-    (!typewanted                                                    \
-     || (typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted   \
+#define goodtype(rno) \
+    (!typewanted                                                   \
+     || (typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted  \
      || (typewanted == SHOPBASE && typefound > SHOPBASE))
 
     switch (rno = levl[x][y].roomno) {
@@ -2598,8 +2628,8 @@ lookaround()
                 continue;
 
             if ((mtmp = m_at(x, y)) != 0
-                && mtmp->m_ap_type != M_AP_FURNITURE
-                && mtmp->m_ap_type != M_AP_OBJECT
+                && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+                && M_AP_TYPE(mtmp) != M_AP_OBJECT
                 && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
                 if ((context.run != 1 && !mtmp->mtame)
                     || (x == u.ux + u.dx && y == u.uy + u.dy
@@ -2652,7 +2682,7 @@ lookaround()
                     goto bcorr; /* if you must */
                 if (x == u.ux + u.dx && y == u.uy + u.dy) {
                     if (iflags.mention_walls) {
-                        int tt = what_trap(trap->ttyp);
+                        int tt = what_trap(trap->ttyp, rn2_on_display_rng);
                         You("stop in front of %s.",
                             an(defsyms[trap_to_defsym(tt)].explanation));
                     }
@@ -2779,8 +2809,8 @@ monster_nearby()
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
             if (!isok(x, y) || (x == u.ux && y == u.uy))
                 continue;
-            if ((mtmp = m_at(x, y)) && mtmp->m_ap_type != M_AP_FURNITURE
-                && mtmp->m_ap_type != M_AP_OBJECT
+            if ((mtmp = m_at(x, y)) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+                && M_AP_TYPE(mtmp) != M_AP_OBJECT
                 && (!mtmp->mpeaceful || Hallucination)
                 && (!is_hider(mtmp->data) || !mtmp->mundetected)
                 && !noattacks(mtmp->data) && mtmp->mcanmove
@@ -2825,6 +2855,8 @@ unmul(const char *msg_override)
            encumbrance hack for levitation--see weight_cap()) */
         afternmv = (int (*)(void)) 0;
         (void) (*f)();
+        /* for finishing Armor/Boots/&c_on() */
+        update_inventory();
     }
 }
 

@@ -79,7 +79,8 @@ curses_create_window(int width, int height, orient orientation)
     height += 2;
 
     if ((width > term_cols) || (height > term_rows)) {
-        impossible("curses_create_window: Terminal too small for dialog window");
+        impossible(
+                "curses_create_window: Terminal too small for dialog window");
         width = term_cols;
         height = term_rows;
     }
@@ -146,7 +147,7 @@ curses_create_window(int width, int height, orient orientation)
 /* Erase and delete curses window, and refresh standard windows */
 
 void
-curses_destroy_win(WINDOW * win)
+curses_destroy_win(WINDOW *win)
 {
     werase(win);
     wrefresh(win);
@@ -193,7 +194,8 @@ WINDOW *
 curses_get_nhwin(winid wid)
 {
     if (!is_main_window(wid)) {
-        impossible("curses_get_nhwin: wid %d out of range. Not a main window.", wid);
+        impossible("curses_get_nhwin: wid %d out of range. Not a main window.",
+                   wid);
         return NULL;
     }
 
@@ -212,7 +214,8 @@ curses_add_nhwin(winid wid, int height, int width, int y, int x,
     int real_height = height;
 
     if (!is_main_window(wid)) {
-        impossible("curses_add_nhwin: wid %d out of range. Not a main window.", wid);
+        impossible("curses_add_nhwin: wid %d out of range. Not a main window.",
+                   wid);
         return;
     }
 
@@ -266,7 +269,7 @@ curses_add_wid(winid wid)
     nethack_wid *new_wid;
     nethack_wid *widptr = nhwids;
 
-    new_wid = malloc(sizeof (nethack_wid));
+    new_wid = (nethack_wid *) alloc((unsigned) sizeof (nethack_wid));
     new_wid->nhwid = wid;
 
     new_wid->next_wid = NULL;
@@ -300,15 +303,18 @@ void
 curses_del_nhwin(winid wid)
 {
     if (curses_is_menu(wid) || curses_is_text(wid)) {
-        curses_del_menu(wid);
+        curses_del_menu(wid, TRUE);
         return;
+    } else if (wid == INV_WIN) {
+        curses_del_menu(wid, TRUE);
+        /* don't return yet */
     }
 
     if (!is_main_window(wid)) {
-        impossible("curses_del_nhwin: wid %d out of range. Not a main window.", wid);
+        impossible("curses_del_nhwin: wid %d out of range. Not a main window.",
+                   wid);
         return;
     }
-
     nhwins[wid].curwin = NULL;
     nhwins[wid].nhwin = -1;
 }
@@ -320,31 +326,35 @@ void
 curses_del_wid(winid wid)
 {
     nethack_wid *tmpwid;
-    nethack_wid *widptr = nhwids;
+    nethack_wid *widptr;
 
     if (curses_is_menu(wid) || curses_is_text(wid)) {
-        curses_del_menu(wid);
+        curses_del_menu(wid, FALSE);
     }
 
-    while (widptr != NULL) {
+    for (widptr = nhwids; widptr; widptr = widptr->next_wid) {
         if (widptr->nhwid == wid) {
-            if (widptr->prev_wid != NULL) {
-                tmpwid = widptr->prev_wid;
+            if ((tmpwid = widptr->prev_wid) != NULL) {
                 tmpwid->next_wid = widptr->next_wid;
             } else {
                 nhwids = widptr->next_wid;      /* New head mode, or NULL */
             }
-            if (widptr->next_wid != NULL) {
-                tmpwid = widptr->next_wid;
+            if ((tmpwid = widptr->next_wid) != NULL) {
                 tmpwid->prev_wid = widptr->prev_wid;
             }
             free(widptr);
             break;
         }
-        widptr = widptr->next_wid;
     }
 }
 
+/* called by destroy_nhwindows() prior to exit */
+void
+curs_destroy_all_wins()
+{
+    while (nhwids)
+        curses_del_wid(nhwids->nhwid);
+}
 
 /* Print a single character in the given window at the given coordinates */
 
@@ -396,7 +406,9 @@ void
 curses_get_window_xy(winid wid, int *x, int *y)
 {
     if (!is_main_window(wid)) {
-        impossible("curses_get_window_xy: wid %d out of range. Not a main window.", wid);
+        impossible(
+              "curses_get_window_xy: wid %d out of range. Not a main window.",
+                   wid);
         *x = 0;
         *y = 0;
         return;
@@ -431,15 +443,11 @@ curses_window_has_border(winid wid)
 boolean
 curses_window_exists(winid wid)
 {
-    nethack_wid *widptr = nhwids;
+    nethack_wid *widptr;
 
-    while (widptr != NULL) {
-        if (widptr->nhwid == wid) {
+    for (widptr = nhwids; widptr; widptr = widptr->next_wid)
+        if (widptr->nhwid == wid)
             return TRUE;
-        }
-
-        widptr = widptr->next_wid;
-    }
 
     return FALSE;
 }
@@ -451,8 +459,9 @@ int
 curses_get_window_orientation(winid wid)
 {
     if (!is_main_window(wid)) {
-        impossible
-            ("curses_get_window_orientation: wid %d out of range. Not a main window.", wid);
+        impossible(
+     "curses_get_window_orientation: wid %d out of range. Not a main window.",
+                   wid);
         return CENTER;
     }
 
@@ -461,12 +470,12 @@ curses_get_window_orientation(winid wid)
 
 
 /* Output a line of text to specified NetHack window with given coordinates
-and text attributes */
+   and text attributes */
 
 void
 curses_puts(winid wid, int attr, const char *text)
 {
-    anything *identifier;
+    anything Id;
     WINDOW *win = NULL;
 
     if (is_main_window(wid)) {
@@ -481,22 +490,19 @@ curses_puts(winid wid, int attr, const char *text)
 #if 0
     if (wid == STATUS_WIN) {
         curses_update_stats();     /* We will do the write ourselves */
-        /* Inventory updating isn't performed on redraws, so
-           also update inventory here... */
-        curses_update_inventory();
         return;
     }
 #endif
 
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         if (!curses_menu_exists(wid)) {
-            impossible("curses_puts: Attempted write to nonexistant window %d!", wid);
+            impossible(
+                     "curses_puts: Attempted write to nonexistant window %d!",
+                       wid);
             return;
         }
-        identifier = malloc(sizeof (anything));
-        identifier->a_void = NULL;
-        curses_add_nhmenu_item(wid, NO_GLYPH, identifier, 0, 0, attr, text,
-                               FALSE);
+        Id = zeroany;
+        curses_add_nhmenu_item(wid, NO_GLYPH, &Id, 0, 0, attr, text, FALSE);
     } else {
         waddstr(win, text);
         wnoutrefresh(win);
@@ -555,11 +561,11 @@ curses_alert_main_borders(boolean onoff)
 static boolean
 is_main_window(winid wid)
 {
-    if ((wid == MESSAGE_WIN) || (wid == MAP_WIN) || (wid == STATUS_WIN) || wid == INV_WIN) {
+    if (wid == MESSAGE_WIN || wid == MAP_WIN
+        || wid == STATUS_WIN || wid == INV_WIN)
         return TRUE;
-    } else {
-        return FALSE;
-    }
+
+    return FALSE;
 }
 
 

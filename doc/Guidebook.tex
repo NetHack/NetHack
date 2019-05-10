@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{December 15, 2018}
+\date{May 7, 2019}
 
 \maketitle
 
@@ -702,6 +702,8 @@ and go straight to checking inventory,
 or (for ``{\tt \#loot}'' to remove a saddle),
 skip containers and go straight to adjacent monsters. The prefix will
 make ``{\tt \#travel}'' command show a menu of interesting targets in sight.
+In debug mode (aka ``wizard mode''), the `{\tt m}' prefix may also be
+used with the ``{\tt \#teleport}'' and ``{\tt \#wizlevelport}'' commands.
 %.lp
 \item[\tb{F[yuhjklbn]}]
 Prefix:  fight a monster (even if you only guess one is there).
@@ -759,7 +761,7 @@ Panic button.  Quit the game.
 %.lp
 \item[\tb{d}]
 Drop something.\\
-{\tt d7a} --- drop seven items of object
+For example {\tt d7a} --- drop seven items of object
 {\it a}.
 %.lp
 \item[\tb{D}]
@@ -881,7 +883,8 @@ choices but will accept an accessory and attempt to put that on.)
 Repeat previous message.\\
 %.lp ""
 Subsequent {\tt \^{}P}'s repeat earlier messages.
-The behavior can be varied via the {\it msg\verb+_+window\/} option.
+For some interfaces, the behavior can be varied via the
+{\it msg\verb+_+window\/} option.
 %.lp
 \item[\tb{q}]
 Quaff (drink) something (potion, water, etc).
@@ -1765,7 +1768,7 @@ not restricted in this fashion.
 
 %.pg
 Doors can be useful for shutting out monsters.  Most monsters cannot
-open doors, although a few don't need to (ex.\ ghosts can walk through
+open doors, although a few don't need to (for example, ghosts can walk through
 doors).
 
 %.pg
@@ -1890,7 +1893,7 @@ While the shopkeeper watches you like a hawk, he will generally ignore
 any other customers.
 %.lp \(bu 2
 \item[$\bullet$]
-If a shop is ``closed for inventory'', it will not open of its own accord.
+If a shop is ``closed for inventory,'' it will not open of its own accord.
 %.lp \(bu 2
 \item[$\bullet$]
 Shops do not get restocked with new items, regardless of inventory depletion.
@@ -2371,7 +2374,7 @@ leather jacket         & 9 &                   & no armor              & 10\\
 \end{center}
 
 %.pg
-\nd You can also wear other pieces of armor (ex.\ helmets, boots,
+\nd You can also wear other pieces of armor (for example, helmets, boots,
 shields, cloaks)
 to lower your armor class even further, but you can only wear one item
 of each category (one suit of armor, one cloak, one helmet, one
@@ -2431,7 +2434,7 @@ The command to eat food is `{\tt e}'.
 
 %.pg
 Scrolls are labeled with various titles, probably chosen by ancient wizards
-for their amusement value (ex.\ ``READ ME,'' or ``THANX MAUD'' backwards).
+for their amusement value (for example, ``READ ME,'' or ``THANX MAUD'' backwards).
 Scrolls disappear after you read them (except for blank ones, without
 magic spells on them).
 
@@ -2883,7 +2886,8 @@ Prefix a boolean option with `no' or `!' to turn it off.
 For compound options, the option name and value are separated by a colon.
 Some options are persistent, and apply only to new games.
 You can specify multiple OPTIONS statements, and multiple options
-in a single OPTIONS statement.
+separated by commas in a single OPTIONS statement.
+(Comma separated options are processed from right to left.)
 
 %.pg
 Example:
@@ -3074,6 +3078,14 @@ to that shell), or the pair of commands
 \nd in {\it sh}, {\it ksh}, or {\it bash}.
 
 %.pg
+The NETHACKOPTIONS value is effectively the same as a single OPTIONS
+statement in a configuration file.
+The ``OPTIONS='' prefix is implied and comma separated options are
+processed from right to left.
+Other types of configuration statements such as BIND or MSGTYPE are
+not allowed.
+
+%.pg
 Instead of a comma-separated list of options,
 NETHACKOPTIONS can be set to the full name of a configuration file you
 want to use.
@@ -3150,11 +3162,11 @@ Set the character used to display boulders (default is the ``large rock''
 class symbol, `{\tt `}').
 %.lp
 \item[\ib{catname}]
-Name your starting cat (ex.\ ``{\tt catname:Morris}'').
+Name your starting cat (for example, ``{\tt catname:Morris}'').
 Cannot be set with the `{\tt O}' command.
 %.lp character
 \item[\ib{character}]
-Pick your type of character (ex.\ ``{\tt character:Monk}'');
+Pick your type of character (for example, ``{\tt character:Monk}'');
 synonym for ``{\it role\/}''.  See {\it role\/} for more details.
 %.lp
 \item[\ib{checkpoint}]
@@ -3232,7 +3244,7 @@ from high level to low level.\\
 .lp ""
 
 %.lp ""
-(ex.\ ``{\tt disclose:yi na +v -g o}'')
+(for example, ``{\tt disclose:yi na +v -g o}'')
 The example sets
 {\tt inventory} to {\it prompt\/} and default to {\it yes\/},
 {\tt attributes} to {\it prompt\/} and default to {\it no\/},
@@ -3248,14 +3260,19 @@ And the dungeon overview shows all levels you had visited but does not
 reveal things about them that you hadn't discovered.
 %.lp
 \item[\ib{dogname}]
-Name your starting dog (ex.\ ``{\tt dogname:Fang}'').
+Name your starting dog (for example, ``{\tt dogname:Fang}'').
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{extmenu}]
 Changes the extended commands interface to pop-up a menu of available commands.
 It is keystroke compatible with the traditional interface except that it does
-not require that you hit Enter.  It is implemented only by the tty port
-(default off), when the game has been compiled to support tty graphics.
+not require that you hit Enter.
+It is implemented for the tty interface (default off).
+.lp ""
+For the X11 interface, which always uses a menu for choosing an extended
+command, it controls whether the menu shows all available commands (on)
+or just the subset of commands which have traditionally been considered
+extended ones (off).
 %.lp
 \item[\ib{female}]
 An obsolete synonym for ``{\tt gender:female}''.  Cannot be set with the
@@ -3271,7 +3288,7 @@ Commands asking for an inventory item show a menu instead of
 a text query with possible menu letters. Default is off.
 %.lp
 \item[\ib{fruit}]
-Name a fruit after something you enjoy eating (ex.\ ``{\tt fruit:mango}'')
+Name a fruit after something you enjoy eating (for example, ``{\tt fruit:mango}'')
 (default ``{\tt slime mold}''). Basically a nostalgic whimsy that
 {\it NetHack\/} uses from time to time.  You should set this to something you
 find more appetizing than slime mold.  Apples, oranges, pears, bananas, and
@@ -3311,6 +3328,10 @@ Visually distinguish pets from similar animals (default off).
 The behavior of this option depends on the type of windowing you use.
 In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a heart symbol near pets.
+%.lp ""
+With the curses interface, the {\it petattr\/}
+option controls how to highlight pets and setting it will turn the
+{\it hilite\verb+_+pet\/} option on or off as warranted.
 %.lp
 \item[\ib{hilite\verb+_+pile}]
 Visually distinguish piles of objects from individual objects (default off).
@@ -3320,7 +3341,7 @@ with tiles, generally displays a small plus-symbol beside the object
 on the top of the pile.
 %.lp
 \item[\ib{horsename}]
-Name your starting horse (ex.\ ``{\tt horsename:Trigger}'').
+Name your starting horse (for example, ``{\tt horsename:Trigger}'').
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{hitpointbar}]
@@ -3451,16 +3472,13 @@ Valid settings are:
 
 %.sd
 %.si
-\newlength{\mwidth}
-\settowidth{\mwidth}{\tt -0}
-\newcommand{\numbox}[1]{\makebox[\mwidth][r]{{\tt #1}}}
-\numbox{0} --- disabled\\
-\numbox{1} --- enabled and make OS adjustment to support mouse use in the game\\
-\numbox{2} --- enabled like {\tt 1}, but does not make any OS adjustments\\
+{\tt 0} --- disabled\\
+{\tt 1} --- enabled and make OS adjustment to support mouse use in the game\\
+{\tt 2} --- enabled like {\tt 1}, but does not make any OS adjustments\\
 %.ei
 %.ed
 
-For backward compatibility, omitting a value is the same as specifying {\tt 1}
+Omitting a value is the same as specifying {\tt 1}
 and negating
 {\it mouse\verb+_+support\/}
 is the same as specifying {\tt 0}.
@@ -3472,7 +3490,9 @@ Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{msg\verb+_+window}]
 Allows you to change the way recalled messages are displayed.
-(It is currently implemented for tty only.) The possible values are:
+Currently it is only supported for tty (all four choices) and for curses
+(`{\tt f}' and `{\tt r}' choices, default `{\tt r}').
+The possible values are:
 
 %.sd
 %.si
@@ -3506,6 +3526,37 @@ Start the character with no armor (default false).  Persistent.
 %.lp
 \item[\ib{null}]
 Send padding nulls to the terminal (default on).  Persistent.
+%.lp
+\item[\ib{number\verb+_+pad}]
+Use digit keys instead of letters to move (default 0 or off).\\
+Valid settings are:
+
+%.sd
+%.si
+\newlength{\mwidth}
+\settowidth{\mwidth}{\tt -0}
+\newcommand{\numbox}[1]{\makebox[\mwidth][r]{{\tt #1}}}
+\numbox{0} --- move by letters; `{\tt yuhjklbn}'\\
+\numbox{1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix\\
+\numbox{2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'\\
+\numbox{3} --- by numbers using phone key layout; {\tt 123} above, {\tt 789} below\\
+\numbox{4} --- combines {\tt 3} with {\tt 2}; phone layout plus MS-DOS compatibility\\
+\numbox{-1} --- by letters but use `{\tt z}' to go northwest, `{\tt y}' to zap wands
+%.ei
+%.ed
+
+For backward compatibility, omitting a value is the same as specifying {\tt 1}
+and negating
+{\it number\verb+_+pad\/}
+is the same as specifying {\tt 0}.
+(Settings {\tt 2} and {\tt 4} are for compatibility with MS-DOS or old PC Hack;
+in addition to the different behavior for `{\tt 5}', `{\tt Alt-5}' acts as `{\tt G}'
+and `{\tt Alt-0}' acts as `{\tt I}'.
+Setting {\tt -1} is to accommodate some QWERTZ keyboards which have the
+location of the `{\tt y}' and `{\tt z}' keys swapped.)
+When moving by numbers, to enter a count prefix for those commands
+which accept one (such as ``{\tt 12s}'' to search twelve times), precede it
+with the letter `{\tt n}' (``{\tt n12s}'').
 %.lp
 \item[\ib{packorder}]
 Specify the order to list object types in (default
@@ -3565,6 +3616,39 @@ such as ``{\it par\-a\-noid\verb+_+con\-fir\-ma\-tion:attack~pray~Remove}''.
 \item[\ib{perm\verb+_+invent}]
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
+%.lp
+%.\" petattr is a wincap option but we'll document it here...
+\item[\ib{petattr}]
+Specifies one or more text highlighting attributes to use when showing
+pets on the map.
+Effectively a superset of the {\it hilite\verb+_+pet\/} boolean option.
+Curses interface only; value is one or more of the following letters.
+
+%.sd
+%.si
+{\tt n} --- Normal text (no highlighting)\\
+{\tt i} --- Inverse video (default)\\
+{\tt b} --- Bold text\\
+{\tt u} --- Underlined text\\
+{\tt k} --- blinKing text\\
+{\tt d} --- Dim text\\
+{\tt t} --- iTalic text\\
+{\tt l} --- Left line indicator\\
+{\tt r} --- Right line indicator\\
+%.ei
+%.ed
+
+Some of those choices might not work, particularly the final three,
+depending upon terminal hardware or terminal emulation software.
+
+%.lp ""
+Currently multiple highlight-style letters can be combined by simply
+stringing them together (for example, ``bk''), but in the future
+they might require being separated by plus signs (such as ``b\verb&+&k'',
+which works already).
+When using the `n' choice, it should be specified on its own,
+not in combination with any of the other letters.
+
 %.lp
 \item[\ib{pettype}]
 Specify the type of your initial pet, if you are playing a character class
@@ -3630,7 +3714,7 @@ Make the space bar a synonym for the `{\tt .}' (\#wait) command (default off).
 Persistent.
 %.lp
 \item[\ib{role}]
-Pick your type of character (ex.\ ``{\tt role:Samurai}'');
+Pick your type of character (for example, ``{\tt role:Samurai}'');
 synonym for ``{\it character\/}''.  See ``{\it name\/}'' for an alternate method
 of specifying your role.  Normally only the first letter of the
 value is examined; `r' is an exception with ``{\tt Rogue}'', {\tt Ranger}'',
@@ -3674,11 +3758,11 @@ depend upon the window port used or on the type of terminal.  Persistent.
 Prevent you from (knowingly) attacking your pets (default on).  Persistent.
 %+.lp
 \item[\ib{sanity\verb+_+check}]
-+Evaluate monsters, objects, and map prior to each turn (default off).
-+Debug mode only.
+Evaluate monsters, objects, and map prior to each turn (default off).
+Debug mode only.
 %.lp
 \item[\ib{scores}]
-Control what parts of the score list you are shown at the end (ex.\
+Control what parts of the score list you are shown at the end (for example,
 ``{\tt scores:5top scores/4around my score/own scores}'').  Only the first
 letter of each category (`{\tt t}', `{\tt a}' or `{\tt o}') is necessary.
 Persistent.
@@ -3736,7 +3820,7 @@ Allow updates to the status lines at the bottom of the screen (default true).
 \item[\ib{suppress\verb+_+alert}]
 This option may be set to a {\it NetHack\/} version level to suppress
 alert notification messages about feature changes for that
-and prior versions (ex.\ ``{\tt suppress\verb+_+alert:3.3.1}'')
+and prior versions (for example, ``{\tt suppress\verb+_+alert:3.3.1}'')
 %.lp
 \item[\ib{symset}]
 This option may be used to select one of the named symbol sets found within
@@ -3839,6 +3923,14 @@ When the program has been built to support multiple interfaces,
 select whichone to use, such as ``{\tt tty}'' or ``{\tt X11}''
 (default depends on build-time settings; use ``{\tt \#version}'' to check).
 Cannot be set with the `{\tt O}' command.
+
+%.lp ""
+When used, it should be the first option set since its value might
+enable or disable the availability of various other options.
+For multiple lines in a configuration file, that would be the first
+non-comment line.
+For a comma-separated list in NETHACKOPTIONS or an OPTIONS line in a
+configuration file, that would be the {\it rightmost\/} option in the list.
 %.lp
 \item[\ib{wizweight}]
 Augment object descriptions with their objects' weight (default off).
@@ -3923,6 +4015,11 @@ If {\it NetHack\/} can, it should use this size font for text windows.
 \item[\ib{fullscreen}]
 If {\it NetHack\/} can, it should try and display on the entire screen rather than in a window.
 %.lp
+\item[\ib{guicolor}]
+Use color text and/or highlighting attributes when displaying some
+non-map data (such as menu selector letters).
+Curses interface only; default is on.
+%.lp
 \item[\ib{large\verb+_+font}]
 If {\it NetHack\/} can, it should use a large font.
 %.lp
@@ -3955,10 +4052,26 @@ If {\it NetHack\/} can, it should display a menu of existing saved games for the
 choose from at game startup, if it can. Not all ports support this option.
 %.lp
 \item[\ib{softkeyboard}]
-If {\it NetHack\/} can, it should display an onscreen keyboard.  Handhelds are most likely to support this option.
+If {\it NetHack\/} can, it should display an onscreen keyboard.
+Handhelds are most likely to support this option.
 %.lp
 \item[\ib{splash\verb+_+screen}]
-If {\it NetHack\/} can, it should display an opening splash screen when it starts up (default yes).
+If {\it NetHack\/} can, it should display an opening splash screen when
+it starts up (default yes).
+%.lp
+\item[\ib{statuslines}]
+Number of lines for traditional below-the-map status display.
+Acceptable values are 2 and 3 (default is 2).
+Curses and tty interfaces only.
+%.lp
+\item[\ib{term\verb+_+cols}\ \ {\it and}]"
+%.lp
+\item[\ib{term\verb+_+rows}]
+Curses interface only.
+Number of columns and rows to use for the display.
+Curses will attempt to resize to the values specified but will settle
+for smaller sizes if they are too big.
+Default is the current window size.
 %.lp
 \item[\ib{tiled\verb+_+map}]
 If {\it NetHack\/} can, it should display a tiled map if it can.
@@ -3981,6 +4094,28 @@ If {\it NetHack\/} can, it should display inverse when the game specifies it.
 \item[\ib{vary\verb+_+msgcount}]
 If {\it NetHack\/} can, it should display this number of messages at a time
 in the message window.
+%.lp
+\item[\ib{windowborders}]
+Whether to draw boxes around the map, status area, message area, and
+persistent inventory window if enabled.
+Curses interface only.
+Acceptable values are
+
+%.sd
+%.si
+{\tt 0} --- off, never show borders\\
+{\tt 1} --- on, always show borders\\
+{\tt 2} --- auto, on display is at least
+(\verb&24+2&)x(\verb&80+2&)\ \ (default)\\
+%.ei
+%.ed
+
+%.lp "
+(The 26x82 size threshold for `2' refers to number of rows and
+columns of the display.
+A width of at least 110 columns (\verb&80+2+26+2&) is needed for
+{\it align_status\/}
+set to {tt left} or {\tt right}.)
 %.lp
 \item[\ib{windowcolors}]
 If {\it NetHack\/} can, it should display windows with the specified
@@ -4447,12 +4582,15 @@ The pattern should be a regular expression.
 %.lp ""
 Allowed colors are {\it black}, {\it red}, {\it green}, {\it brown},
 {\it blue}, {\it magenta}, {\it cyan}, {\it gray}, {\it orange},
-{\it lightgreen}, {\it yellow}, {\it lightblue}, {\it lightmagenta},
-{\it lightcyan}, and {\it white}.
+{\it light-green}, {\it yellow}, {\it light-blue}, {\it light-magenta},
+{\it light-cyan}, and {\it white}.
+And {\it no-color}, the default foreground color, which isn't necessarily
+the same as any of the other colors.
 
 %.lp ""
 Allowed attributes are {\it none}, {\it bold}, {\it dim}, {\it underline},
 {\it blink}, and {\it inverse}.
+{\it Normal\/} is a synonym for {\it none}.
 Note that the platform used may interpret the attributes any way it
 wants.
 
@@ -4522,40 +4660,68 @@ The pattern should be a regular expression.
 \subsection*{Configuring Status Hilites}
 
 %.pg
-Your copy of {\it NetHack\/} may have been compiled with support for {\it Status Hilites}.
+Your copy of {\it NetHack\/} may have been compiled with support
+for {\it Status Hilites}.
 If so, you can customize your game display by setting thresholds to
 change the color or appearance of fields in the status display.
-%.pg
-The format for defining status colors is:
+
+The format for defining status colors is:\\
 \begin{verbatim}
-    OPTION=hilite_status: field-name/behavior/color&attributes
+OPTION=hilite_status:field-name/behavior/color&attributes
 \end{verbatim}
-%.pg
-For example, the following line in your config file will cause
+
+For example, the following line in your configuration file will cause
 the hitpoints field to display in the color red if your hitpoints
-drop to or below a threshold of 30%:
+drop to or below a threshold of 30%:\\
 \begin{verbatim}
-    OPTION=hilite_status: hitpoints/<=30%/red/normal
+OPTION=hilite_status:hitpoints/<=30%/red/normal
 \end{verbatim}
-%.pg
-For another example, the following line in your config file will cause
-wisdom to be displayed red if it drops and green if it rises.
+(That example is actually specifying {\tt red\&normal} for  {\tt <=30\%}
+and {\tt no-color\&normal} for {\tt >30\%}.)\\
+
+For another example, the following line in your configuration file will cause
+wisdom to be displayed red if it drops and green if it rises:\\
 \begin{verbatim}
-    OPTION=hilite_status: wisdom/down/red/up/green
+OPTION=hilite_status:wisdom/down/red/up/green
 \end{verbatim}
+
+Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
+orange, light-green, yellow, light-blue, light-magenta, light-cyan, and white.
+And {\it no-color}, the default foreground color on the display, which
+is not necessarily the same as black or white or any of the other colors.
+
+Allowed attributes are none, bold, dim, underline, blink, and inverse.
+``Normal'' is a synonym for ``none''; they should not be used in
+combination with any of the other attributes.
+
+To specify both a color and an attribute, use `\&' to combine them.
+To specify multiple attributes, use `+' to combine those.
+For example: {\tt magenta\&inverse+dim}.
+
+Note that the display may substitute or ignore particular attributes
+depending upon its capabilities, and in general may interpret the
+attributes any way it wants.
+For example, on some display systems a request for bold might yield
+blink or vice versa.
+On others, issuing an attribute request while another is already
+set up will replace the earlier attribute rather than combine with it.
+Since nethack issues attribute requests sequentially (at least with
+the {\it tty} interface) rather than all at once, the only way a
+situation like that can be controlled is to specify just one attribute.
+
 You can adjust the display of the following status fields:
 %.sd
 \begin{center}
 \begin{tabular}{lll}
 %TABLE_START
-title & strength & dexterity\\
-constitution & intelligence & wisdom\\
-charisma & alignment & score\\
-carrying-capacity & gold & power\\
-power-max & experience-level & armor-class\\
-HD & time & hunger\\
-hitpoints & hitpoints-max & dungeon-level\\
-experience & condition\\
+title & dungeon-level & experience-level\\
+strength & gold & experience\\
+dexterity & hitpoints & HD\\
+constitution & hitpoints-max & time\\
+intelligence & power & hunger\\
+wisdom & power-max & carrying-capacity\\
+charisma & armor-class & condition\\
+alignment &  & score\\
 %TABLE_END  Do not delete this line.
 \end{tabular}
 \end{center}
@@ -4571,7 +4737,8 @@ depending upon your other option settings.
 Instead of a behavior, `condition' takes the following condition flags:
 {\it stone}, {\it slime}, {\it strngl}, {\it foodpois}, {\it termill},
 {\it blind}, {\it deaf}, {\it stun}, {\it conf}, {\it hallu},
-{\it lev}, {\it fly}, and {\it ride}.  You can use `major\_troubles' as an alias
+{\it lev}, {\it fly}, and {\it ride}.
+You can use `major\_troubles' as an alias
 for stone through termill, `minor\_troubles' for blind through hallu,
 `movement' for lev, fly, and ride, and `all' for every condition.
 
@@ -4606,14 +4773,14 @@ it also matches when value is below or above the percentage.
 Use prefix `{\tt <}' or `{\tt >}' to match when strictly below or above.
 (The numeric limit is relaxed slightly for those: {\tt >-1\%}
 and {\tt <101\%} are allowed.)
-Only valid for ``{\it power\/}'' and ``{\it hitpoints\/}'' fields.
+Only valid for ``{\it hitpoints\/}'' and ``{\it power\/}'' fields.
 %.lp "*"
 \item{\bb{}}
 absolute value sets the attribute when the field value
 matches that number.
 The number must be 0 or higher, except for ``{\it armor-class\/} which
-allows negative values.
-If the number is prefixed with `{\tt <=}' or `{\tt >=}',
+allows negative values, and may optionally be preceded by `{\tt =}'.
+If the number is preceded by `{\tt <=}' or `{\tt >=}' instead,
 it also matches when value is below or above.
 If the prefix is `{\tt <}' or `{\tt >}', only match when strictly
 above or below.
@@ -4628,26 +4795,11 @@ is tested; the character's name is ignored.
 %.ei
 \elist
 
-%.lp ""
-Allowed colors are {\it black}, {\it red}, {\it green}, {\it brown},
-{\it blue}, {\it magenta}, {\it cyan}, {\it gray}, {\it orange},
-{\it lightgreen}, {\it yellow}, {\it lightblue}, {\it lightmagenta},
-{\it lightcyan}, and {\it white}.
-
-%.lp ""
-Allowed attributes are {\it bold}, {\it inverse}, {\it underline},
-{\it blink}, {\it dim}, and {\it normal}.
-Note that the platform used may interpret the attributes any way it
-wants.
-
-%.lp ""
 The in-game options menu can help you determine the correct syntax for a
 config file.
 
-%.lp ""
 The whole feature can be disable by setting option {\it statushilites} to 0.
 
-%.lp ""
 Example hilites:
 \begin{verbatim}
     OPTION=hilite_status: gold/up/yellow/down/brown
@@ -5205,7 +5357,7 @@ NetHack\/} 3.0c.
 \medskip
 \nd {\it NetHack\/} 3.0 was ported to the Atari by {\it Eric R. Smith}, to OS/2 by
 {\it Timo Hakulinen}, and to VMS by {\it David Gentzel}.  The three of them
-and {\it Kevin Darcy\/} later joined the main development team to produce
+and {\it Kevin Darcy\/} later joined the main {\it NetHack Development Team} to produce
 subsequent revisions of 3.0.
 
 %.pg
@@ -5220,7 +5372,7 @@ revisions of 3.0.
 %.pg
 \medskip
 \nd Headed by {\it Mike Stephenson\/} and coordinated by {\it Izchak Miller\/} and
-{\it Janet Walz}, the development team which now included {\it Ken Arromdee},
+{\it Janet Walz}, the {\it NetHack Development Team} which now included {\it Ken Arromdee},
 {\it David Cohrs}, {\it Jean-Christophe Collet}, {\it Kevin Darcy},
 {\it Matt Day}, {\it Timo Hakulinen}, {\it Steve Linhart}, {\it Dean Luick},
 {\it Pat Rankin}, {\it Eric Raymond}, and {\it Eric Smith\/} undertook a radical
@@ -5263,12 +5415,12 @@ was responsible for the VMS version of {\it NetHack\/} 3.1.
 \nd {\it Dean Luick}, with help from {\it David Cohrs}, developed {\it NetHack\/}
 3.1 for X11.
 {\it Warwick Allison} wrote a tiled version of {\it NetHack\/} for the Atari;
-he later contributed the tiles to the DevTeam and tile support was
+he later contributed the tiles to the {\it NetHack Development Team} and tile support was
 then added to other platforms.
 
 %.pg
 \medskip
-\nd The 3.2 development team, comprised of {\it Michael Allison}, {\it Ken
+\nd The 3.2 {\it NetHack Development Team}, comprised of {\it Michael Allison}, {\it Ken
 Arromdee}, {\it David Cohrs}, {\it Jessie Collet}, {\it Steve Creps}, {\it
 Kevin Darcy}, {\it Timo Hakulinen}, {\it Steve Linhart}, {\it Dean Luick},
 {\it Pat Rankin}, {\it Eric Smith}, {\it Mike Stephenson}, {\it Janet Walz},
@@ -5278,9 +5430,9 @@ and {\it Paul Winner}, released version 3.2 in April of 1996.
 \medskip
 \nd Version 3.2 marked the tenth anniversary of the formation of the development
 team.  In a testament to their dedication to the game, all thirteen members
-of the original development team remained on the team at the start of work on
+of the original {\it NetHack Development Team} remained on the team at the start of work on
 that release.  During the interval between the release of 3.1.3 and 3.2,
-one of the founding members of the development team, {\it Dr. Izchak Miller},
+one of the founding members of the {\it NetHack Development Team}, {\it Dr. Izchak Miller},
 was diagnosed with cancer and passed away.  That release of the game was
 dedicated to him by the development and porting teams.
 
@@ -5308,7 +5460,7 @@ casting system with the Wizard Patch.
 to produce {\it Slash'EM\/}, and
 with the help of {\it Kevin Hugo}, added more features.
 Kevin later joined the
-DevTeam and incorporated the best of these ideas into {\it NetHack\/} 3.3.
+{\it NetHack Development Team} and incorporated the best of these ideas into {\it NetHack\/} 3.3.
 
 %.pg
 \medskip
@@ -5317,7 +5469,7 @@ simultaneously with 3.3.0 in December 1999 just in time for the Year 2000.
 
 %.pg
 \medskip
-The 3.3 development team, consisting of {\it Michael Allison}, {\it Ken Arromdee},
+The 3.3 {\it NetHack Development Team}, consisting of {\it Michael Allison}, {\it Ken Arromdee},
 {\it David Cohrs}, {\it Jessie Collet}, {\it Steve Creps}, {\it Kevin Darcy},
 {\it Timo Hakulinen}, {\it Kevin Hugo}, {\it Steve Linhart}, {\it Ken Lorber},
 {\it Dean Luick}, {\it Pat Rankin}, {\it Eric Smith}, {\it Mike Stephenson},
@@ -5339,7 +5491,7 @@ more than a year and a half.
 
 %.pg
 \medskip
-The 3.4 development team initially consisted of
+The 3.4 {\it NetHack Development Team} initially consisted of
 {\it Michael Allison}, {\it Ken Arromdee},
 {\it David Cohrs}, {\it Jessie Collet}, {\it Kevin Hugo}, {\it Ken Lorber},
 {\it Dean Luick}, {\it Pat Rankin}, {\it Mike Stephenson},
@@ -5400,7 +5552,7 @@ resurrected it for 3.3.1.
 The release of {\it NetHack\/} 3.4.3 in December 2003 marked the beginning of
 a long release hiatus. 3.4.3 proved to be a remarkably stable version that
 provided continued enjoyment by the community for more than a decade. The
-devteam slowly and quietly continued to work on the game behind the scenes
+{\it NetHack Development Team} slowly and quietly continued to work on the game behind the scenes
 during the tenure of 3.4.3. It was during that same period that several new
 variants emerged within the {\it NetHack\/} community. Notably sporkhack by
 Derek S. Ray, {\it unnethack\/} by Patric Mueller, {\it nitrohack\/} and its
@@ -5415,7 +5567,7 @@ released publicly by other parties. Since that code was a work-in-progress
 and had not gone through the process of debugging it as a suitable release,
 it was decided that the version numbers present on that code snapshot would
 be retired and never used in an official {\it NetHack\/} release. An
-announcement was posted on the devteam's official {\it nethack.org\/} website
+announcement was posted on the {\it NetHack Development Team}'s official {\it nethack.org\/} website
 to that effect, stating that there would never be a 3.4.4, 3.5, or 3.5.0
 official release version.
 
@@ -5426,7 +5578,7 @@ In January 2015, preparation began for the release of NetHack 3.6.
 %.pg
 \medskip
 At the beginning of development for what would eventually get released
-as 3.6.0, the development team consisted of {\it Warwick Allison},
+as 3.6.0, the {\it NetHack Development Team} consisted of {\it Warwick Allison},
 {\it Michael Allison}, {\it Ken Arromdee},
 {\it David Cohrs}, {\it Jessie Collet},
 {\it Ken Lorber}, {\it Dean Luick}, {\it Pat Rankin},
@@ -5450,19 +5602,7 @@ patches.  Many bugs were fixed and some code was restructured.
 
 %.pg
 \medskip
-In late April 2018, several hundred bug fixes for 3.6.0 and some new features
-were assembled and released as NetHack 3.6.1. The development team at the
-time of release of 3.6.1 consisted of
-{\it Warwick Allison}, {\it Michael Allison}, {\it Ken Arromdee},
-{\it David Cohrs}, {\it Jessie Collet},
-{\it Pasi Kallinen}, {\it Ken Lorber}, {\it Dean Luick},
-{\it Patric Mueller}, {\it Pat Rankin}, {\it Derek S. Ray},
-{\it Alex Smith}, {\it Mike Stephenson}, {\it Janet Walz}, and
-{\it Paul Winner}.
-
-%.pg
-\medskip
-The development team, as well as {\it Steve VanDevender} and
+The {\it NetHack Development Team}, as well as {\it Steve VanDevender} and
 {\it Kevin Smolkowski}, ensured that {\it NetHack\/} 3.6 continued to
 operate on various Unix flavors and maintained the X11 interface.
 
@@ -5480,15 +5620,32 @@ maintained the port of  {\it NetHack\/} 3.6 for Microsoft Windows.
 
 %.pg
 \medskip
-{\it Pat Rankin} attempted to keep the VMS port running for NetHack 3.6.1,
+{\it Pat Rankin} attempted to keep the VMS port running for NetHack 3.6,
 hindered by limited access.  {\it Kevin Smolkowski} has updated and tested it
 for the most recent version of OpenVMS (V8.4 as of this writing) on Alpha
 and Integrity (aka Itanium aka IA64) but not VAX.
 
 %.pg
 \medskip
-{\it Ray Chason}  resurrected the msdos port for 3.6.1 and contributed the
+{\it Ray Chason}  resurrected the msdos port for 3.6 and contributed the
 necessary updates to the community at large.
+
+%.pg
+\medskip
+In late April 2018, several hundred bug fixes for 3.6.0 and some new features
+were assembled and released as NetHack 3.6.1. The {\it NetHack Development Team} at the
+time of release of 3.6.1 consisted of
+{\it Warwick Allison}, {\it Michael Allison}, {\it Ken Arromdee},
+{\it David Cohrs}, {\it Jessie Collet},
+{\it Pasi Kallinen}, {\it Ken Lorber}, {\it Dean Luick},
+{\it Patric Mueller}, {\it Pat Rankin}, {\it Derek S. Ray},
+{\it Alex Smith}, {\it Mike Stephenson}, {\it Janet Walz}, and
+{\it Paul Winner}.
+
+%.pg
+\medskip
+In early May 2019, another 320 bug fixes along with some enhancements and 
+the adopted curses window port, were released as 3.6.2.
 
 %.pg
 \medskip
@@ -5517,9 +5674,9 @@ unnamed dungeoneers who invest their time and effort into annual
 \section*{Dungeoneers}
 %.pg
 \nd From time to time, some depraved individual out there in netland sends a
-particularly intriguing modification to help out with the game.  The Gods of
-the Dungeon sometimes make note of the names of the worst of these miscreants
-in this, the list of Dungeoneers:
+particularly intriguing modification to help out with the game.  The 
+{\it NetHack Development Team} sometimes makes note of the names of the worst
+of these miscreants in this, the list of Dungeoneers:
 %.sd
 \begin{center}
 \begin{tabular}{llll}
@@ -5578,7 +5735,7 @@ J. Ali Harlow & Mikko Juola
 %UNIX is a registered trademark of AT\&T.\\
 %Lattice is a trademark of Lattice, Inc.\\
 %Atari and 1040ST are trademarks of Atari, Inc.\\
-%AMIGA is a trademark of Commodore-Amiga, Inc.\\
+%Amiga is a trademark of Commodore-Amiga, Inc.\\
 %%.sm
 %Brand and product names are trademarks or registered trademarks
 %of their respective holders.

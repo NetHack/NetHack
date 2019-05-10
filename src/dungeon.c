@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1523308357 2018/04/09 21:12:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1554341477 2019/04/04 01:31:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -937,7 +937,7 @@ init_dungeons()
         if (dunlevs_in_dungeon(&x->dlevel) > 1 - dungeons[i].depth_start)
             dungeons[i].depth_start -= 1;
         /* TODO: strip "dummy" out all the way here,
-           so that it's hidden from <ctrl/O> feedback. */
+           so that it's hidden from '#wizwhere' feedback. */
     }
 
 #ifdef DEBUG
@@ -1161,7 +1161,7 @@ u_on_newpos(int x, int y)
     }
 }
 
-/* place you on a random location */
+/* place you on a random location when arriving on a level */
 void
 u_on_rndspot(int upflag)
 {
@@ -1188,6 +1188,9 @@ u_on_rndspot(int upflag)
         place_lregion(dndest.lx, dndest.ly, dndest.hx, dndest.hy,
                       dndest.nlx, dndest.nly, dndest.nhx, dndest.nhy,
                       LR_DOWNTELE, (d_level *) 0);
+
+    /* might have just left solid rock and unblocked levitation */
+    switch_terrain();
 }
 
 /* place you on the special staircase */
@@ -1591,7 +1594,7 @@ lev_by_name(const char *nam)
             *(eos(buf) - 6) = '\0';
         }
         /* hell is the old name, and wouldn't match; gehennom would match its
-           branch, yielding the castle level instead of the valley of the dead */
+           branch, yielding the castle level instead of valley of the dead */
         if (!strcmpi(nam, "gehennom") || !strcmpi(nam, "hell")) {
             if (In_V_tower(&u.uz))
                 nam = " to Vlad's tower"; /* branch to... */
@@ -2103,7 +2106,7 @@ save_mapseen(int fd, mapseen *mptr)
     bwrite(fd, (genericptr_t) &mptr->custom_lth, sizeof mptr->custom_lth);
     if (mptr->custom_lth)
         bwrite(fd, (genericptr_t) mptr->custom, mptr->custom_lth);
-    bwrite(fd, (genericptr_t) &mptr->msrooms, sizeof mptr->msrooms);
+    bwrite(fd, (genericptr_t) mptr->msrooms, sizeof mptr->msrooms);
     savecemetery(fd, WRITE_SAVE, &mptr->final_resting_place);
 }
 
@@ -2133,7 +2136,7 @@ load_mapseen(int fd)
         load->custom[load->custom_lth] = '\0';
     } else
         load->custom = 0;
-    mread(fd, (genericptr_t) &load->msrooms, sizeof load->msrooms);
+    mread(fd, (genericptr_t) load->msrooms, sizeof load->msrooms);
     restcemetery(fd, &load->final_resting_place);
 
     return load;
@@ -2413,7 +2416,7 @@ recalc_mapseen()
                 if (ltyp == DRAWBRIDGE_UP)
                     ltyp = db_under_typ(levl[x][y].drawbridgemask);
                 if ((mtmp = m_at(x, y)) != 0
-                    && mtmp->m_ap_type == M_AP_FURNITURE && canseemon(mtmp))
+                    && M_AP_TYPE(mtmp) == M_AP_FURNITURE && canseemon(mtmp))
                     ltyp = cmap_to_type(mtmp->mappearance);
                 lastseentyp[x][y] = ltyp;
             }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1545130893 2018/12/18 11:01:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.160 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1556649298 2019/04/30 18:34:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -145,7 +145,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
     /* maybe it's attacking an image around the corner? */
 
     compat = ((mattk->adtyp == AD_SEDU || mattk->adtyp == AD_SSEX)
-              ? could_seduce(mtmp, &youmonst, (struct attack *) 0) : 0);
+              ? could_seduce(mtmp, &youmonst, mattk) : 0);
     Monst_name = Monnam(mtmp);
 
     if (!mtmp->mcansee || (Invis && !perceives(mtmp->data))) {
@@ -253,6 +253,23 @@ getmattk(struct monst *magr, struct monst *mdef,
     struct permonst *mptr = magr->data;
     struct attack *attk = &mptr->mattk[indx];
     struct obj *weap = (magr == &youmonst) ? uwep : MON_WEP(magr);
+
+    /* honor SEDUCE=0 */
+    if (!SYSOPT_SEDUCE) {
+        extern const struct attack sa_no[NATTK];
+
+        /* if the first attack is for SSEX damage, all six attacks will be
+           substituted (expected succubus/incubus handling); if it isn't
+           but another one is, only that other one will be substituted */
+        if (mptr->mattk[0].adtyp == AD_SSEX) {
+            *alt_attk_buf = sa_no[indx];
+            attk = alt_attk_buf;
+        } else if (attk->adtyp == AD_SSEX) {
+            *alt_attk_buf = *attk;
+            attk = alt_attk_buf;
+            attk->adtyp = AD_DRLI;
+        }
+    }
 
     /* prevent a monster with two consecutive disease or hunger attacks
        from hitting with both of them on the same turn; if the first has
@@ -493,7 +510,7 @@ mattacku(register struct monst *mtmp)
     }
 
     /* hero might be a mimic, concealed via #monster */
-    if (youmonst.data->mlet == S_MIMIC && youmonst.m_ap_type && !range2
+    if (youmonst.data->mlet == S_MIMIC && U_AP_TYPE && !range2
         && foundyou && !u.uswallow) {
         boolean sticky = sticks(youmonst.data);
 
@@ -513,8 +530,7 @@ mattacku(register struct monst *mtmp)
     }
 
     /* non-mimic hero might be mimicking an object after eating m corpse */
-    if (youmonst.m_ap_type == M_AP_OBJECT && !range2 && foundyou
-        && !u.uswallow) {
+    if (U_AP_TYPE == M_AP_OBJECT && !range2 && foundyou && !u.uswallow) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         if (!youseeit)
@@ -610,9 +626,9 @@ mattacku(register struct monst *mtmp)
 
     if (u.uinvulnerable) {
         /* monsters won't attack you */
-        if (mtmp == u.ustuck)
+        if (mtmp == u.ustuck) {
             pline("%s loosens its grip slightly.", Monnam(mtmp));
-        else if (!range2) {
+        } else if (!range2) {
             if (youseeit || sensemon(mtmp))
                 pline("%s starts to attack you, but pulls back.",
                       Monnam(mtmp));
@@ -887,7 +903,7 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
 {
     struct permonst *mdat = mtmp->data;
     int uncancelled, ptmp;
-    int dmg, armpro, permdmg;
+    int dmg, armpro, permdmg, tmphp;
     char buf[BUFSZ];
     struct permonst *olduasmon = youmonst.data;
     int res;
@@ -1094,7 +1110,7 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
         goto dopois;
     case AD_DRCO:
         ptmp = A_CON;
-    dopois:
+ dopois:
         hitmsg(mtmp, mattk);
         if (uncancelled && !rn2(8)) {
             Sprintf(buf, "%s %s", s_suffix(Monnam(mtmp)),
@@ -1213,7 +1229,7 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
                     You_hear("%s hissing!", s_suffix(mon_nam(mtmp)));
                 if (!rn2(10)
                     || (flags.moonphase == NEW_MOON && !have_lizard())) {
-                do_stone:
+ do_stone:
                     if (!Stoned && !Stone_resistance
                         && !(poly_when_stoned(youmonst.data)
                              && polymon(PM_STONE_GOLEM))) {
@@ -1305,7 +1321,10 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
                 break;
             /* Continue below */
         } else if (dmgtype(youmonst.data, AD_SEDU)
-                   || (SYSOPT_SEDUCE && dmgtype(youmonst.data, AD_SSEX))) {
+                   /* !SYSOPT_SEDUCE: when hero is attacking and AD_SSEX
+                      is disabled, it would be changed to another damage
+                      type, but when defending, it remains as-is */
+                   || dmgtype(youmonst.data, AD_SSEX)) {
             pline("%s %s.", Monnam(mtmp),
                   Deaf ? "says something but you can't hear it"
                        : mtmp->minvent
@@ -1359,8 +1378,39 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
         hitmsg(mtmp, mattk);
         if (uncancelled) {
             if (flags.verbose)
-                Your("position suddenly seems very uncertain!");
+                Your("position suddenly seems %suncertain!",
+                     (Teleport_control && !Stunned && !unconscious()) ? ""
+                     : "very ");
             tele();
+            /* 3.6.2:  make sure damage isn't fatal; previously, it
+               was possible to be teleported and then drop dead at
+               the destination when QM's 1d4 damage gets applied below;
+               even though that wasn't "wrong", it seemed strange,
+               particularly if the teleportation had been controlled
+               [applying the damage first and not teleporting if fatal
+               is another alternative but it has its own complications] */
+            if ((Half_physical_damage ? (dmg - 1) / 2 : dmg)
+                >= (tmphp = (Upolyd ? u.mh : u.uhp))) {
+                dmg = tmphp - 1;
+                if (Half_physical_damage)
+                    dmg *= 2; /* doesn't actually increase damage; we only
+                               * get here if half the original damage would
+                               * would have been fatal, so double reduced
+                               * damage will be less than original damage */
+                if (dmg < 1) { /* implies (tmphp <= 1) */
+                    dmg = 1;
+                    /* this might increase current HP beyond maximum HP but
+                       it will be immediately reduced below, so that should
+                       be indistinguishable from zero damage; we don't drop
+                       damage all the way to zero because that inhibits any
+                       passive counterattack if poly'd hero has one */
+                    if (Upolyd && u.mh == 1)
+                        ++u.mh;
+                    else if (!Upolyd && u.uhp == 1)
+                        ++u.uhp;
+                    /* [don't set context.botl here] */
+                }
+            }
         }
         break;
     case AD_RUST:
@@ -1993,7 +2043,7 @@ explmu(struct monst *mtmp, struct attack *mattk, boolean ufound)
                static analysis complains that 'physical_damage' is always
                False when tested below; it's right, but having that in
                place means one less thing to update if AD_PHYS gets added */
-        common:
+ common:
 
             if (!not_affected) {
                 if (ACURR(A_DEX) > rnd(20)) {
@@ -2291,11 +2341,12 @@ mdamageu(struct monst *mtmp, int n)
  *         2 if wrong gender for nymph
  */
 int
-could_seduce(struct monst *magr, struct monst *mdef, struct attack *mattk)
+could_seduce(struct monst *magr, struct monst *mdef, struct attack *mattk /* non-Null: current attack; Null: general capability */)
 {
     struct permonst *pagr;
     boolean agrinvis, defperc;
     xchar genagr, gendef;
+    int adtyp;
 
     if (is_animal(magr->data))
         return 0;
@@ -2316,19 +2367,22 @@ could_seduce(struct monst *magr, struct monst *mdef, struct attack *mattk)
         gendef = gender(mdef);
     }
 
-    if (agrinvis && !defperc
-        && (!SYSOPT_SEDUCE || (mattk && mattk->adtyp != AD_SSEX)))
+    adtyp = mattk ? mattk->adtyp
+            : dmgtype(pagr, AD_SSEX) ? AD_SSEX
+              : dmgtype(pagr, AD_SEDU) ? AD_SEDU
+                : AD_PHYS;
+    if (adtyp == AD_SSEX && !SYSOPT_SEDUCE)
+        adtyp = AD_SEDU;
+
+    if (agrinvis && !defperc && adtyp == AD_SEDU)
         return 0;
 
-    if (pagr->mlet != S_NYMPH
-        && ((pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
-            || (SYSOPT_SEDUCE && mattk && mattk->adtyp != AD_SSEX)))
+    if ((pagr->mlet != S_NYMPH
+         && pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
+        || (adtyp != AD_SEDU && adtyp != AD_SSEX))
         return 0;
 
-    if (genagr == 1 - gendef)
-        return 1;
-    else
-        return (pagr->mlet == S_NYMPH) ? 2 : 0;
+    return (genagr == 1 - gendef) ? 1 : (pagr->mlet == S_NYMPH) ? 2 : 0;
 }
 
 /* returns 1 if monster teleported (or hero leaves monster's vicinity) */
@@ -2849,7 +2903,7 @@ passiveum(struct permonst *olduasmon, struct monst *mtmp, struct attack *mattk)
     else
         tmp = 0;
 
-assess_dmg:
+ assess_dmg:
     if ((mtmp->mhp -= tmp) <= 0) {
         pline("%s dies!", Monnam(mtmp));
         xkilled(mtmp, XKILL_NOMSG);

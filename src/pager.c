@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1546656415 2019/01/05 02:46:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.147 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1555627307 2019/04/18 22:41:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -85,7 +85,7 @@ self_lookat(char *outbuf)
             mons[u.umonnum].mname, plname);
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
-    if (u.uundetected || (Upolyd && youmonst.m_ap_type))
+    if (u.uundetected || (Upolyd && U_AP_TYPE))
         mhidden_description(&youmonst, FALSE, eos(outbuf));
     return outbuf;
 }
@@ -104,12 +104,12 @@ mhidden_description(struct monst *mon,
                                                     : glyph_at(x, y);
 
     *outbuf = '\0';
-    if (mon->m_ap_type == M_AP_FURNITURE
-        || mon->m_ap_type == M_AP_OBJECT) {
+    if (M_AP_TYPE(mon) == M_AP_FURNITURE
+        || M_AP_TYPE(mon) == M_AP_OBJECT) {
         Strcpy(outbuf, ", mimicking ");
-        if (mon->m_ap_type == M_AP_FURNITURE) {
+        if (M_AP_TYPE(mon) == M_AP_FURNITURE) {
             Strcat(outbuf, an(defsyms[mon->mappearance].explanation));
-        } else if (mon->m_ap_type == M_AP_OBJECT
+        } else if (M_AP_TYPE(mon) == M_AP_OBJECT
                    /* remembered glyph, not glyph_at() which is 'mon' */
                    && glyph_is_object(glyph)) {
  objfrommap:
@@ -118,12 +118,14 @@ mhidden_description(struct monst *mon,
             Strcat(outbuf, (otmp && otmp->otyp != STRANGE_OBJECT)
                               ? ansimpleoname(otmp)
                               : an(obj_descr[STRANGE_OBJECT].oc_name));
-            if (fakeobj)
+            if (fakeobj) {
+                otmp->where = OBJ_FREE; /* object_from_map set to OBJ_FLOOR */
                 dealloc_obj(otmp);
+            }
         } else {
             Strcat(outbuf, something);
         }
-    } else if (mon->m_ap_type == M_AP_MONSTER) {
+    } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
         if (altmon)
             Sprintf(outbuf, ", masquerading as %s",
                     an(mons[mon->mappearance].mname));
@@ -151,7 +153,7 @@ mhidden_description(struct monst *mon,
 boolean
 object_from_map(int glyph, int x, int y, struct obj **obj_p)
 {
-    boolean fakeobj = FALSE;
+    boolean fakeobj = FALSE, mimic_obj = FALSE;
     struct monst *mtmp;
     struct obj *otmp;
     int glyphotyp = glyph_to_obj(glyph);
@@ -165,9 +167,10 @@ object_from_map(int glyph, int x, int y, struct obj **obj_p)
 
     /* there might be a mimic here posing as an object */
     mtmp = m_at(x, y);
-    if (mtmp && is_obj_mappear(mtmp, (unsigned) glyphotyp))
+    if (mtmp && is_obj_mappear(mtmp, (unsigned) glyphotyp)) {
         otmp = 0;
-    else
+        mimic_obj = TRUE;
+    } else
         mtmp = 0;
 
     if (!otmp || otmp->otyp != glyphotyp) {
@@ -180,14 +183,18 @@ object_from_map(int glyph, int x, int y, struct obj **obj_p)
             otmp->quan = 2L; /* to force pluralization */
         else if (otmp->otyp == SLIME_MOLD)
             otmp->spe = context.current_fruit; /* give it a type */
-        else if (otmp->otyp == LEASH)
-            otmp->leashmon = 0;
         if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
             otmp->corpsenm = MCORPSENM(mtmp);
         else if (otmp->otyp == CORPSE && glyph_is_body(glyph))
             otmp->corpsenm = glyph - GLYPH_BODY_OFF;
         else if (otmp->otyp == STATUE && glyph_is_statue(glyph))
             otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
+        if (otmp->otyp == LEASH)
+            otmp->leashmon = 0;
+        /* extra fields needed for shop price with doname() formatting */
+        otmp->where = OBJ_FLOOR;
+        otmp->ox = x, otmp->oy = y;
+        otmp->no_charge = (otmp->otyp == STRANGE_OBJECT && costly_spot(x, y));
     }
     /* if located at adjacent spot, mark it as having been seen up close
        (corpse type will be known even if dknown is 0, so we don't need a
@@ -201,7 +208,11 @@ object_from_map(int glyph, int x, int y, struct obj **obj_p)
         /* terrain mode views what's already known, doesn't learn new stuff */
         && !iflags.terrainmode) /* so don't set dknown when in terrain mode */
         otmp->dknown = 1; /* if a pile, clearly see the top item only */
-
+    if (fakeobj && mtmp && mimic_obj &&
+        (otmp->dknown || (M_AP_FLAG(mtmp) & M_AP_F_DKNOWN))) {
+            mtmp->m_ap_type |= M_AP_F_DKNOWN;
+            otmp->dknown = 1;
+    }
     *obj_p = otmp;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
@@ -219,6 +230,7 @@ look_at_object(char *buf, /* output buffer */
                                                        : doname_vague_quan)
                      : obj_descr[STRANGE_OBJECT].oc_name);
         if (fakeobj) {
+            otmp->where = OBJ_FREE; /* object_from_map set it to OBJ_FLOOR */
             dealloc_obj(otmp); otmp = 0;
         }
     } else
@@ -284,7 +296,7 @@ look_at_monster(char *buf,      /* output */
 
     /* we know the hero sees a monster at this location, but if it's shown
        due to persistant monster detection he might remember something else */
-    if (mtmp->mundetected || mtmp->m_ap_type)
+    if (mtmp->mundetected || M_AP_TYPE(mtmp))
         mhidden_description(mtmp, FALSE, eos(buf));
 
     if (monbuf) {
@@ -372,7 +384,8 @@ lookat(int x, int y, char *buf, char *monbuf)
     buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
     if (u.ux == x && u.uy == y && canspotself()
-        && !(iflags.save_uswallow && glyph == mon_to_glyph(u.ustuck))
+        && !(iflags.save_uswallow &&
+             glyph == mon_to_glyph(u.ustuck, rn2_on_display_rng))
         && (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
         /* fill in buf[] */
         (void) self_lookat(buf);
@@ -426,7 +439,7 @@ lookat(int x, int y, char *buf, char *monbuf)
     } else if (glyph_is_object(glyph)) {
         look_at_object(buf, x, y, glyph); /* fill in buf[] */
     } else if (glyph_is_trap(glyph)) {
-        int tnum = what_trap(glyph_to_trap(glyph));
+        int tnum = what_trap(glyph_to_trap(glyph), rn2_on_display_rng);
 
         /* Trap detection displays a bear trap at locations having
          * a trapped door or trapped container or both.
@@ -1222,6 +1235,21 @@ do_look(int mode, coord *click_cc)
         if (found) {
             /* use putmixed() because there may be an encoded glyph present */
             putmixed(WIN_MESSAGE, 0, out_str);
+#ifdef DUMPLOG
+            {
+                char dmpbuf[BUFSZ];
+
+                /* putmixed() bypasses pline() so doesn't write to DUMPLOG;
+                   tty puts it into ^P recall, so it ought to be there;
+                   DUMPLOG is plain text, so override graphics character;
+                   at present, force space, but we ought to use defsyms[]
+                   value for the glyph the graphics character came from */
+                (void) decode_mixed(dmpbuf, out_str);
+                if (dmpbuf[0] < ' ' || dmpbuf[0] >= 127) /* ASCII isprint() */
+                    dmpbuf[0] = ' ';
+                dumplogmsg(dmpbuf);
+            }
+#endif
 
             /* check the data file for information about this thing */
             if (found == 1 && ans != LOOK_QUICK && ans != LOOK_ONCE
@@ -1467,7 +1495,7 @@ doidtrap()
                 if (u.dz < 0 ? is_hole(tt) : tt == ROCKTRAP)
                     break;
             }
-            tt = what_trap(tt);
+            tt = what_trap(tt, rn2_on_display_rng);
             pline("That is %s%s%s.",
                   an(defsyms[trap_to_defsym(tt)].explanation),
                   !trap->madeby_u

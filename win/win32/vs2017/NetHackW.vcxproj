@@ -28,7 +28,7 @@
     </ResourceCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>$(WinWin32Dir)NethackW.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -70,6 +70,7 @@
     <ClCompile Include="$(SrcDir)hack.c" />
     <ClCompile Include="$(SrcDir)hacklib.c" />
     <ClCompile Include="$(SrcDir)invent.c" />
+    <ClCompile Include="$(SrcDir)isaac64.c" />
     <ClCompile Include="$(SrcDir)light.c" />
     <ClCompile Include="$(SrcDir)lock.c" />
     <ClCompile Include="$(SrcDir)mail.c" />
