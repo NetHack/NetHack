@@ -49,7 +49,7 @@ SHELL=/bin/sh
 # for UNIX systems
 SYSSRC = ../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c
-SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
+SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o liblua.a
 #
 # for Systos
 # SYSSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
@@ -172,6 +172,10 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 
 #CFLAGS = -O -I../include
 #LFLAGS = 
+
+CFLAGS += -I../lib/lua-5.3.5/src
+# -lm required by lua
+LIBS += -lm
 
 # The Qt and Be window systems are written in C++, while the rest of
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
@@ -360,7 +364,7 @@ WINCURSESLIB = -lncurses
 # If ZLIB_COMP is defined in config.h this is necessary to link with zlib.
 # LIBS = -lz
 #
-LIBS =
+# LIBS =
 
 # make NetHack
 GAME     = nethack
@@ -443,7 +447,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
 	   files.c fountain.c hack.c hacklib.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c \
-	   minion.c mklev.c mkmap.c \
+	   minion.c mklev.c mkmap.c nhlua.c nhlsel.c \
 	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
 	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
@@ -487,7 +491,7 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 
 # all .h files except date.h, onames.h, pm.h, and vis_tab.h which would
 # cause dependency loops if run through "make depend"
-# and dgn_comp.h, dgn_file.h, lev_comp.h, special level & dungeon files.
+# and dgn_comp.h, dgn_file.h, special level & dungeon files.
 #
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h def_os2.h \
@@ -501,7 +505,7 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h \
-		lev_comp.h dgn_comp.h dgn_file.h
+		dgn_comp.h dgn_file.h
 
 # the following .o's _must_ be made before any others (for makedefs)
 FIRSTOBJ = monst.o objects.o
@@ -512,7 +516,7 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
 	extralev.o files.o fountain.o hack.o hacklib.o invent.o isaac64.o \
 	light.o lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
-	minion.o mklev.o mkmap.o \
+	minion.o mklev.o mkmap.o nhlua.o nhlsel.o \
 	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
@@ -1061,6 +1065,8 @@ mplayer.o: mplayer.c $(HACK_H)
 mthrowu.o: mthrowu.c $(HACK_H)
 muse.o: muse.c $(HACK_H)
 music.o: music.c $(HACK_H) #interp.c
+nhlua.o: nhlua.c $(HACK_H)
+nhlsel.o: nhlsel.c $(HACK_H)
 o_init.o: o_init.c $(HACK_H) ../include/lev.h
 objects.o: objects.c $(CONFIG_H) ../include/obj.h ../include/objclass.h \
 		../include/prop.h ../include/skills.h ../include/color.h

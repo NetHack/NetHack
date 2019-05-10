@@ -16,10 +16,9 @@ goto err_set
 echo Checking to see if directories are set up properly ...
 if not exist ..\..\include\hack.h  goto err_dir
 if not exist ..\..\src\hack.c      goto err_dir
-if not exist ..\..\dat\wizard.des  goto err_dir
+if not exist ..\..\dat\wizard1.lua  goto err_dir
 if not exist ..\..\util\makedefs.c goto err_dir
 if not exist ..\..\win\tty\wintty.c goto err_dir
-if not exist ..\share\lev_yacc.c   goto err_dir
 echo Directories OK.
 
 if not exist ..\..\binary\* mkdir ..\..\binary

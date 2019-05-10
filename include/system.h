@@ -6,8 +6,8 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#if !defined(WIN32)
 #if !defined(__cplusplus) && !defined(__GO32__)
-
 #define E extern
 
 /* some old <sys/types.h> may not define off_t and size_t; if your system is
@@ -339,7 +339,7 @@ E int FDECL(memcmp, (const void *, const void *, size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
 E void *FDECL(memset, (void *, int, size_t));
 #else
-#if defined(AZTEC_50) || defined(NHSTDC) || defined(WIN32)
+#if defined(AZTEC_50) || defined(NHSTDC))
 E int FDECL(memcmp, (const void *, const void *, size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
 E void *FDECL(memset, (void *, int, size_t));
@@ -453,7 +453,7 @@ E char *FDECL(rindex, (const char *, int));
  * If your system defines sprintf, et al, in stdio.h, add to the initial
  * #if.
  */
-#if defined(ULTRIX) || defined(__DECC) || defined(__SASC_60) || defined(WIN32)
+#if defined(ULTRIX) || defined(__DECC) || defined(__SASC_60)
 #define SPRINTF_PROTO
 #endif
 #if (defined(SUNOS4) && defined(__STDC__)) || defined(_AIX32)
@@ -567,5 +567,10 @@ E int FDECL(atoi, (const char *));
 #undef E
 
 #endif /*  !__cplusplus && !__GO32__ */
+#endif /* WIN32 */
+
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 
 #endif /* SYSTEM_H */

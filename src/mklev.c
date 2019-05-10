@@ -14,7 +14,6 @@ STATIC_DCL void FDECL(mksink, (struct mkroom *));
 STATIC_DCL void FDECL(mkaltar, (struct mkroom *));
 STATIC_DCL void FDECL(mkgrave, (struct mkroom *));
 STATIC_DCL void NDECL(makevtele);
-STATIC_DCL void NDECL(clear_level_structures);
 STATIC_DCL void NDECL(makelevel);
 STATIC_DCL boolean FDECL(bydoor, (XCHAR_P, XCHAR_P));
 STATIC_DCL struct mkroom *FDECL(find_branch_room, (coord *));
@@ -354,6 +353,14 @@ register struct mkroom *aroom;
     register int tmp;
     int i;
 
+    if (aroom->doorct) {
+        for (i = 0; i < aroom->doorct; i++) {
+            tmp = aroom->fdoor + i;
+            if (g.doors[tmp].x == x && g.doors[tmp].y == y)
+                return;
+        }
+    }
+
     if (aroom->doorct == 0)
         aroom->fdoor = g.doorindex;
 
@@ -573,7 +580,7 @@ makevtele()
  * special) but it's easier to put it all in one place than make sure
  * each type initializes what it needs to separately.
  */
-STATIC_OVL void
+void
 clear_level_structures()
 {
     static struct rm zerorm = { cmap_to_glyph(S_stone),
@@ -637,6 +644,14 @@ clear_level_structures()
     xdnladder = ydnladder = xupladder = yupladder = 0;
     g.made_branch = FALSE;
     clear_regions();
+    g.xstart = 1;
+    g.ystart = 0;
+    g.xsize = COLNO - 1;
+    g.ysize = ROWNO;
+    if (g.lev_message) {
+        free(g.lev_message);
+        g.lev_message = (char *) 0;
+    }
 }
 
 STATIC_OVL void

@@ -97,6 +97,9 @@ NHSROOT=..
 #CFLAGS = -O -I../include
 #LFLAGS =
 
+CFLAGS += -I../lib/lua-5.3.5/src
+LFLAGS += -lm
+
 # we specify C preprocessor flags via CFLAGS; files built with default rules
 # might include $(CPPFLAGS) which could get a value from user's environment;
 # we avoid that by forcing it empty rather than by overriding default rules
@@ -183,11 +186,10 @@ HACK_H	 = ../src/hack.h-t
 
 # utility .c files
 MAKESRC = makedefs.c
-SPLEVSRC = lev_yacc.c lev_lex.c lev_main.c
 DGNCOMPSRC = dgn_yacc.c dgn_lex.c dgn_main.c
 RECOVSRC = recover.c
 DLBSRC = dlb_main.c
-UTILSRCS = $(MAKESRC) panic.c $(SPLEVSRC) $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
+UTILSRCS = $(MAKESRC) panic.c $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
 READTAGSSRC = readtags.c
 
 # files that define all monsters and objects
@@ -202,9 +204,6 @@ OALLOC = $(OBJDIR)/alloc.o panic.o
 
 # object files for makedefs
 MAKEOBJS = makedefs.o $(OMONOBJ)
-
-# object files for special levels compiler
-SPLEVOBJS = lev_yacc.o lev_lex.o lev_main.o $(OALLOC) $(ONAMING)
 
 # object files for dungeon compiler
 DGNCOMPOBJS = dgn_yacc.o dgn_lex.o dgn_main.o $(OALLOC)
@@ -266,52 +265,6 @@ lintdefs:
 
 # support code used by several of the utility programs (but not makedefs)
 panic.o:     panic.c $(CONFIG_H)
-
-
-#	dependencies for lev_comp
-#
-lev_comp:  $(SPLEVOBJS)
-	$(CC) $(LFLAGS) -o lev_comp $(SPLEVOBJS) $(LIBS)
-
-lev_yacc.o:  lev_yacc.c $(HACK_H) ../include/sp_lev.h
-lev_main.o:  lev_main.c $(HACK_H) ../include/sp_lev.h ../include/tcap.h \
-		../include/date.h
-
-# see lev_comp.l for WEIRD_LEX discussion
-# egrep will return failure if it doesn't find anything, but we know there
-# is one "_cplusplus" inside a comment
-lev_lex.o:   lev_lex.c $(HACK_H) ../include/lev_comp.h ../include/sp_lev.h
-	$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus lev_lex.c` lev_lex.c
-
-# '$(YACC) -d' generates both $(YTABC) and $(YTABH) in one run
-../include/lev_comp.h: lev_yacc.c
-
-lev_yacc.c: lev_comp.y
-	$(YACC) $(YACCDIST) -d lev_comp.y
-	sed -e 's#"$(YTABC)"#"$@"#' -e 's#$(YTABC):#$@:#' $(YTABC) > $@ \
-		&& rm $(YTABC)
-	sed -e 's#"$(YTABH)"#"lev_comp.h"#' $(YTABH) > ../include/lev_comp.h \
-		&& rm $(YTABH)
-
-lev_lex.c: lev_comp.l
-	$(LEX) $(FLEXDIST) lev_comp.l
-	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' \
-	    -e 's#static void yyunput#void yyunput#' $(LEXYYC) > $@ \
-		&& rm $(LEXYYC)
-#	note: flex code construction using m4 macros results in some trailing
-#	spaces; <space><space><star> is basic RE substitute for <space><plus>
-#	and we don't bother stripping trailing tabs because that gets messy;
-#	make expands <dollar><dollar> into <dollar> which is RE end-of-line.
-#	flex also creates yyunput() as a static routine, but lev_comp doesn't
-#	use it so compiler complaints can ensue; recent flex versions honor
-#	NO_YY_UNPUT to suppress it, but older ones don't; making it global to
-#	avoid an "unused function" warning is simpler than trying to remove
-#	the whole thing (although full 'lint' may still complain).
-
-# with all of extern.h's functions to complain about, we drown in
-# 'defined but not used' without -u
-lintlev:
-	@lint -axhu -I../include -DLINT $(SPLEVSRC) $(CALLOC) $(CNAMING) | sed '/_flsbuf/d'
 
 
 #	dependencies for dgn_comp
@@ -550,12 +503,6 @@ $(CONFIG_H): ../include/config.h
 
 # 'make dist' => put generated lex and yacc sources into place for distribution
 SYSSHARE=../sys/share/
-$(SYSSHARE)lev_lex.c: lev_lex.c
-	cp lev_lex.c $@
-$(SYSSHARE)lev_yacc.c: lev_yacc.c
-	cp lev_yacc.c $@
-$(SYSSHARE)lev_comp.h: ../include/lev_comp.h
-	cp ../include/lev_comp.h $@
 $(SYSSHARE)dgn_lex.c: dgn_lex.c
 	cp dgn_lex.c $@
 $(SYSSHARE)dgn_yacc.c: dgn_yacc.c
@@ -563,8 +510,7 @@ $(SYSSHARE)dgn_yacc.c: dgn_yacc.c
 $(SYSSHARE)dgn_comp.h: ../include/dgn_comp.h
 	cp ../include/dgn_comp.h $@
 
-dist:	$(SYSSHARE)lev_lex.c $(SYSSHARE)lev_yacc.c $(SYSSHARE)lev_comp.h \
-	$(SYSSHARE)dgn_lex.c $(SYSSHARE)dgn_yacc.c $(SYSSHARE)dgn_comp.h
+dist:	$(SYSSHARE)dgn_lex.c $(SYSSHARE)dgn_yacc.c $(SYSSHARE)dgn_comp.h
 	@echo 'pre-generated lex and yacc sources are in place in sys/share'
 
 tags: $(UTILSRCS)
@@ -574,9 +520,9 @@ clean:
 	-rm -f *.o
 
 spotless: clean
-	-rm -f lev_lex.c lev_yacc.c dgn_lex.c dgn_yacc.c
-	-rm -f ../include/lev_comp.h ../include/dgn_comp.h
+	-rm -f dgn_lex.c dgn_yacc.c
+	-rm -f ../include/dgn_comp.h
 	-rm -f ../include/tile.h tiletxt.c
-	-rm -f makedefs lev_comp dgn_comp recover dlb
+	-rm -f makedefs dgn_comp recover dlb
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
 		tilemap tileedit tile2bmp

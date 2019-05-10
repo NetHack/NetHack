@@ -662,10 +662,14 @@ xchar lev;
     saveobjchn(nhfp, g.billobjs);
     if (release_data(nhfp)) {
         int x,y;
-
+        /* TODO: maybe use clear_level_structures() */
         for (y = 0; y < ROWNO; y++)
-            for (x = 0; x < COLNO; x++)
+            for (x = 0; x < COLNO; x++) {
                 g.level.monsters[x][y] = 0;
+                g.level.objects[x][y] = 0;
+                levl[x][y].seenv = 0;
+                levl[x][y].glyph = cmap_to_glyph(S_stone);
+            }
         fmon = 0;
         g.ftrap = 0;
         fobj = 0;

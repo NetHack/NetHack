@@ -417,12 +417,9 @@ E struct restore_info restoreinfo;
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
-struct opvar {
-    xchar spovartyp; /* one of SPOVAR_foo */
-    union {
-        char *str;
-        long l;
-    } vardata;
+struct selectionvar {
+    int wid, hei;
+    char *map;
 };
 
 struct autopickup_exception {
@@ -867,7 +864,7 @@ struct instance_globals {
     d_level save_dlevel;
 
     /* do_name.c */
-    struct opvar *gloc_filter_map;
+    struct selectionvar *gloc_filter_map;
     int gloc_filter_floodfill_match_glyph;
     int via_naming;
 
@@ -1178,6 +1175,7 @@ struct instance_globals {
     int num_lregions;
     /* positions touched by level elements explicitly defined in the des-file */
     char SpLev_Map[COLNO][ROWNO];
+    struct sp_coder *coder;
     xchar xstart, ystart;
     char xsize, ysize;
     boolean splev_init_present;
@@ -1187,7 +1185,6 @@ struct instance_globals {
     struct obj *container_obj[MAX_CONTAINMENT];
     int container_idx;
     struct monst *invent_carrying_monster;
-    aligntyp ralign[3];
 
     /* spells.c */
     int spl_sortmode;   /* index into spl_sortchoices[] */

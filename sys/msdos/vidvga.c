@@ -435,7 +435,7 @@ static void
 vga_cliparound(x, y)
 int x, y;
 {
-    extern boolean restoring;
+/*    extern boolean g.restoring; */
     int oldx = clipx;
 
     if (!iflags.tile_view || iflags.over_view || iflags.traditional_view)
@@ -449,7 +449,7 @@ int x, y;
         clipx = clipxmax - (viewport_size - 1);
     }
     if (clipx != oldx) {
-        if (on_level(&u.uz0, &u.uz) && !restoring)
+        if (on_level(&u.uz0, &u.uz) && !g.restoring)
             /* (void) doredraw(); */
             vga_redrawmap(1);
     }

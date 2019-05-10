@@ -254,6 +254,7 @@ E void NDECL(sanity_check);
 E char* FDECL(key2txt, (UCHAR_P, char *));
 E char FDECL(yn_function, (const char *, const char *, CHAR_P));
 E boolean FDECL(paranoid_query, (BOOLEAN_P, const char *));
+E void FDECL(makemap_prepost, (BOOLEAN_P, BOOLEAN_P));
 
 /* ### dbridge.c ### */
 
@@ -915,8 +916,10 @@ E char *FDECL(mungspaces, (char *));
 E char *FDECL(trimspaces, (char *));
 E char *FDECL(strip_newline, (char *));
 E char *FDECL(stripchars, (char *, const char *, const char *));
+E char *FDECL(stripdigits, (char *));
 E char *FDECL(eos, (char *));
 E boolean FDECL(str_end_is, (const char *, const char *));
+E int FDECL(str_lines_maxlen, (const char *));
 E char *FDECL(strkitten, (char *, CHAR_P));
 E void FDECL(copynchars, (char *, const char *, int));
 E char FDECL(chrcasecpy, (int, int));
@@ -1262,6 +1265,7 @@ E void FDECL(add_subroom, (struct mkroom *, int, int, int, int, BOOLEAN_P,
                            SCHAR_P, BOOLEAN_P));
 E void NDECL(makecorridors);
 E void FDECL(add_door, (int, int, struct mkroom *));
+E void NDECL(clear_level_structures);
 E void NDECL(mklev);
 #ifdef SPECIALIZATION
 E void FDECL(topologize, (struct mkroom *, BOOLEAN_P));
@@ -1645,6 +1649,28 @@ E int FDECL(do_play_instrument, (struct obj *));
 E void NDECL(init_lan_features);
 E char *NDECL(lan_username);
 #endif
+
+/* ### nhlsel.c ### */
+E struct selectionvar *FDECL(l_selection_check, (lua_State *, int));
+E int FDECL(l_selection_register, (lua_State *));
+
+/* ### nhlua.c ### */
+E boolean FDECL(load_lua, (const char *));
+E void FDECL(nhl_error, (lua_State *, const char *));
+E void FDECL(lcheck_param_table, (lua_State *));
+E schar FDECL(get_table_mapchr, (lua_State *, const char *));
+E schar FDECL(get_table_mapchr_opt, (lua_State *, const char *, SCHAR_P));
+E schar FDECL(splev_chr2typ, (CHAR_P));
+E schar FDECL(check_mapchr, (const char *));
+E int FDECL(get_table_int, (lua_State *, const char *));
+E int FDECL(get_table_int_opt, (lua_State *, const char *, int));
+E char *FDECL(get_table_str, (lua_State *, const char *));
+E char *FDECL(get_table_str_opt, (lua_State *, const char *, char *));
+E int FDECL(get_table_boolean, (lua_State *, const char *));
+E int FDECL(get_table_boolean_opt, (lua_State *, const char *, int));
+E int FDECL(get_table_option, (lua_State *, const char *, const char *, const char *const *));
+E int FDECL(str_lines_max_width, (const char *));
+E char *FDECL(stripdigits, (char *));
 
 /* ### nhregex.c ### */
 E struct nhregex *NDECL(regex_init);
@@ -2371,11 +2397,26 @@ E boolean
 FDECL(dig_corridor, (coord *, coord *, BOOLEAN_P, SCHAR_P, SCHAR_P));
 E void FDECL(fill_room, (struct mkroom *, BOOLEAN_P));
 E boolean FDECL(load_special, (const char *));
-E xchar FDECL(selection_getpoint, (int, int, struct opvar *));
-E struct opvar *FDECL(selection_opvar, (char *));
-E void FDECL(opvar_free_x, (struct opvar *));
+E xchar FDECL(selection_getpoint, (int, int, struct selectionvar *));
+E struct selectionvar *NDECL(selection_new);
+E void FDECL(selection_free, (struct selectionvar *));
+#if !defined(IN_SP_LEV_C)
 E void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
-E void FDECL(selection_floodfill, (struct opvar *, int, int, BOOLEAN_P));
+#endif
+E void FDECL(selection_floodfill, (struct selectionvar *, int, int, BOOLEAN_P));
+E void FDECL(get_location_coord, (schar *, schar *, int, struct mkroom *, long));
+E void FDECL(selection_setpoint, (int, int, struct selectionvar *, XCHAR_P));
+E struct selectionvar * FDECL(selection_not, (struct selectionvar *));
+E void FDECL(selection_filter_percent, (struct selectionvar *, int));
+E int FDECL(selection_rndcoord, (struct selectionvar *, schar *, schar *, BOOLEAN_P));
+E void FDECL(selection_do_grow, (struct selectionvar *, int));
+E void FDECL(selection_do_line, (SCHAR_P, SCHAR_P, SCHAR_P, SCHAR_P, struct selectionvar *));
+E void FDECL(selection_do_randline, (SCHAR_P, SCHAR_P, SCHAR_P, SCHAR_P, SCHAR_P, SCHAR_P, struct selectionvar *));
+E struct selectionvar *FDECL(selection_filter_mapchar, (struct selectionvar *, XCHAR_P, int));
+E void FDECL(set_floodfillchk_match_under, (XCHAR_P));
+E void FDECL(selection_do_ellipse, (struct selectionvar *, int, int, int, int, int));
+E void NDECL(update_croom);
+E void FDECL(l_register_des, (lua_State *));
 
 /* ### spell.c ### */
 

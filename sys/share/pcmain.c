@@ -185,17 +185,17 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         int fd;
         boolean have_syscf = FALSE;
 
-        (void) strncpy(hackdir, dir, PATHLEN - 1);
-        hackdir[PATHLEN - 1] = '\0';
+        (void) strncpy(g.hackdir, dir, PATHLEN - 1);
+        g.hackdir[PATHLEN - 1] = '\0';
 #ifdef NOCWD_ASSUMPTIONS
         {
             int prefcnt;
 
-            fqn_prefix[0] = (char *) alloc(strlen(hackdir) + 2);
-            Strcpy(fqn_prefix[0], hackdir);
-            append_slash(fqn_prefix[0]);
+            g.fqn_prefix[0] = (char *) alloc(strlen(g.hackdir) + 2);
+            Strcpy(g.fqn_prefix[0], g.hackdir);
+            append_slash(g.fqn_prefix[0]);
             for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++)
-                fqn_prefix[prefcnt] = fqn_prefix[0];
+                g.fqn_prefix[prefcnt] = g.fqn_prefix[0];
 
 #if defined(MSDOS)
             /* sysconf should be searched for in this location */
@@ -204,11 +204,11 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 if ((sptr = index(envp, ';')) != 0)
                     *sptr = '\0';
                 if (strlen(envp) > 0) {
-                    fqn_prefix[SYSCONFPREFIX] =
+                    g.fqn_prefix[SYSCONFPREFIX] =
                         (char *) alloc(strlen(envp) + 10);
-                    Strcpy(fqn_prefix[SYSCONFPREFIX], envp);
-                    append_slash(fqn_prefix[SYSCONFPREFIX]);
-                    Strcat(fqn_prefix[SYSCONFPREFIX], "NetHack\\");
+                    Strcpy(g.fqn_prefix[SYSCONFPREFIX], envp);
+                    append_slash(g.fqn_prefix[SYSCONFPREFIX]);
+                    Strcat(g.fqn_prefix[SYSCONFPREFIX], "NetHack\\");
                 }
             }
 
@@ -229,7 +229,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 /* No SYSCF_FILE where there should be one, and
                    without an installer, a user may not be able
                    to place one there. So, let's try somewhere else... */
-                fqn_prefix[SYSCONFPREFIX] = fqn_prefix[0];
+                g.fqn_prefix[SYSCONFPREFIX] = g.fqn_prefix[0];
 
                 /* Is there a SYSCF_FILE there? */
                 fd = open(fqname(SYSCF_FILE, SYSCONFPREFIX, 0), O_RDONLY);
@@ -247,10 +247,10 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 if ((sptr = index(envp, ';')) != 0)
                     *sptr = '\0';
                 if (strlen(envp) > 0) {
-                    fqn_prefix[CONFIGPREFIX] =
+                    g.fqn_prefix[CONFIGPREFIX] =
                         (char *) alloc(strlen(envp) + 2);
-                    Strcpy(fqn_prefix[CONFIGPREFIX], envp);
-                    append_slash(fqn_prefix[CONFIGPREFIX]);
+                    Strcpy(g.fqn_prefix[CONFIGPREFIX], envp);
+                    append_slash(g.fqn_prefix[CONFIGPREFIX]);
                 }
             }
 #endif
@@ -286,11 +286,11 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (iflags.BIOS && iflags.use_color)
         set_colors();
 #endif
-    if (!hackdir[0])
+    if (!g.hackdir[0])
 #if !defined(LATTICE) && !defined(AMIGA)
-        Strcpy(hackdir, orgdir);
+        Strcpy(g.hackdir, orgdir);
 #else
-        Strcpy(hackdir, HACKDIR);
+        Strcpy(g.hackdir, HACKDIR);
 #endif
     if (argc > 1) {
         if (argcheck(argc, argv, ARG_VERSION) == 2)
@@ -317,7 +317,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             }
             if (!*dir)
                 error("Flag -d must be followed by a directory name.");
-            Strcpy(hackdir, dir);
+            Strcpy(g.hackdir, dir);
         }
         if (argc > 1) {
             /*
@@ -326,7 +326,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
              */
             if (!strncmp(argv[1], "-s", 2)) {
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-                chdirx(hackdir, 0);
+                chdirx(g.hackdir, 0);
 #endif
 #ifdef SYSCF
                 initoptions();
@@ -366,7 +366,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
  * code parallel to other ports.
  */
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-    chdirx(hackdir, 1);
+    chdirx(g.hackdir, 1);
 #endif
 
 #if defined(MSDOS)

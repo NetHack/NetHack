@@ -22,8 +22,10 @@
         char *          trimspaces      (char *)
         char *          strip_newline   (char *)
         char *          stripchars      (char *, const char *, const char *)
+        char *          stripdigits     (char *)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
+        int             str_lines_maxlen (const char *)
         char *          strkitten       (char *,char)
         void            copynchars      (char *,const char *,int)
         char            chrcasecpy      (int,int)
@@ -222,6 +224,31 @@ const char *str, *chkstr;
     if ((int) strlen(str) >= clen)
         return (boolean) (!strncmp(eos((char *) str) - clen, chkstr, clen));
     return FALSE;
+}
+
+/* return the max line length from buffer comprising of newline-separated strings */
+int
+str_lines_maxlen(str)
+const char *str;
+{
+    const char *s1, *s2;
+    int len, max_len = 0;
+
+    s1 = str;
+    while (s1 && *s1) {
+        s2 = index(s1, '\n');
+        if (s2) {
+            len = (int) (s2 - s1);
+            s1 = s2 + 1;
+        } else {
+            len = (int) strlen(s1);
+            s1 = (char *) 0;
+        }
+        if (len > max_len)
+            max_len = len;
+    }
+
+    return max_len;
 }
 
 /* append a character to a string (in place): strcat(s, {c,'\0'}); */
@@ -466,6 +493,21 @@ const char *stuff_to_strip, *orig;
     } else
         impossible("no output buf in stripchars");
     return bp;
+}
+
+/* remove digits from string */
+char *
+stripdigits(s)
+char *s;
+{
+    char *s1, *s2;
+
+    for (s1 = s2 = s; *s1; s1++)
+        if (*s1 < '0' || *s1 > '9')
+            *s2++ = *s1;
+    *s2 = '\0';
+
+    return s;
 }
 
 /* substitute a word or phrase in a string (in place) */

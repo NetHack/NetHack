@@ -306,7 +306,7 @@ gloc_filter_init()
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
         if (!g.gloc_filter_map) {
-            g.gloc_filter_map = selection_opvar((char *) 0);
+            g.gloc_filter_map = selection_new();
         }
         /* special case: if we're in a doorway, try to figure out which
            direction we're moving, and use that side of the doorway */
@@ -326,8 +326,8 @@ void
 gloc_filter_done()
 {
     if (g.gloc_filter_map) {
-        opvar_free_x(g.gloc_filter_map);
-        g.gloc_filter_map = (struct opvar *) 0;
+        selection_free(g.gloc_filter_map);
+        g.gloc_filter_map = (struct selectionvar *) 0;
 
     }
 }

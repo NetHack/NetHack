@@ -42,147 +42,8 @@ enum lvlinit_types {
     LVLINIT_ROGUE
 };
 
-/* max. # of random registers */
-#define MAX_REGISTERS 10
-
 /* max. nested depth of subrooms */
 #define MAX_NESTED_ROOMS 5
-
-/* max. # of opcodes per special level */
-#define SPCODER_MAX_RUNTIME 65536
-
-/* Opcodes for creating the level
- * If you change these, also change opcodestr[] in util/lev_main.c
- */
-enum opcode_defs {
-    SPO_NULL = 0,
-    SPO_MESSAGE,
-    SPO_MONSTER,
-    SPO_OBJECT,
-    SPO_ENGRAVING,
-    SPO_ROOM,
-    SPO_SUBROOM,
-    SPO_DOOR,
-    SPO_STAIR,
-    SPO_LADDER,
-    SPO_ALTAR,
-    SPO_FOUNTAIN,
-    SPO_SINK,
-    SPO_POOL,
-    SPO_TRAP,
-    SPO_GOLD,
-    SPO_CORRIDOR,
-    SPO_LEVREGION,
-    SPO_DRAWBRIDGE,
-    SPO_MAZEWALK,
-    SPO_NON_DIGGABLE,
-    SPO_NON_PASSWALL,
-    SPO_WALLIFY,
-    SPO_MAP,
-    SPO_ROOM_DOOR,
-    SPO_REGION,
-    SPO_MINERALIZE,
-    SPO_CMP,
-    SPO_JMP,
-    SPO_JL,
-    SPO_JLE,
-    SPO_JG,
-    SPO_JGE,
-    SPO_JE,
-    SPO_JNE,
-    SPO_TERRAIN,
-    SPO_REPLACETERRAIN,
-    SPO_EXIT,
-    SPO_ENDROOM,
-    SPO_POP_CONTAINER,
-    SPO_PUSH,
-    SPO_POP,
-    SPO_RN2,
-    SPO_DEC,
-    SPO_INC,
-    SPO_MATH_ADD,
-    SPO_MATH_SUB,
-    SPO_MATH_MUL,
-    SPO_MATH_DIV,
-    SPO_MATH_MOD,
-    SPO_MATH_SIGN,
-    SPO_COPY,
-    SPO_END_MONINVENT,
-    SPO_GRAVE,
-    SPO_FRAME_PUSH,
-    SPO_FRAME_POP,
-    SPO_CALL,
-    SPO_RETURN,
-    SPO_INITLEVEL,
-    SPO_LEVEL_FLAGS,
-    SPO_VAR_INIT, /* variable_name data */
-    SPO_SHUFFLE_ARRAY,
-    SPO_DICE,
-
-    SPO_SEL_ADD,
-    SPO_SEL_POINT,
-    SPO_SEL_RECT,
-    SPO_SEL_FILLRECT,
-    SPO_SEL_LINE,
-    SPO_SEL_RNDLINE,
-    SPO_SEL_GROW,
-    SPO_SEL_FLOOD,
-    SPO_SEL_RNDCOORD,
-    SPO_SEL_ELLIPSE,
-    SPO_SEL_FILTER,
-    SPO_SEL_GRADIENT,
-    SPO_SEL_COMPLEMENT,
-
-    MAX_SP_OPCODES
-};
-
-/* MONSTER and OBJECT can take a variable number of parameters,
- * they also pop different # of values from the stack. So,
- * first we pop a value that tells what the _next_ value will
- * mean.
- */
-/* MONSTER */
-enum sp_mon_var_flags {
-    SP_M_V_PEACEFUL = 0,
-    SP_M_V_ALIGN,
-    SP_M_V_ASLEEP,
-    SP_M_V_APPEAR,
-    SP_M_V_NAME,
-    SP_M_V_FEMALE,
-    SP_M_V_INVIS,
-    SP_M_V_CANCELLED,
-    SP_M_V_REVIVED,
-    SP_M_V_AVENGE,
-    SP_M_V_FLEEING,
-    SP_M_V_BLINDED,
-    SP_M_V_PARALYZED,
-    SP_M_V_STUNNED,
-    SP_M_V_CONFUSED,
-    SP_M_V_SEENTRAPS,
-
-    SP_M_V_END
-};
-
-/* OBJECT */
-enum sp_obj_var_flags {
-    SP_O_V_SPE = 0,
-    SP_O_V_CURSE,
-    SP_O_V_CORPSENM,
-    SP_O_V_NAME,
-    SP_O_V_QUAN,
-    SP_O_V_BURIED,
-    SP_O_V_LIT,
-    SP_O_V_ERODED,
-    SP_O_V_LOCKED,
-    SP_O_V_TRAPPED,
-    SP_O_V_RECHARGED,
-    SP_O_V_INVIS,
-    SP_O_V_GREASED,
-    SP_O_V_BROKEN,
-    SP_O_V_COORD,
-
-    SP_O_V_END
-};
 
 /* When creating objects, we need to know whether
  * it's a container and/or contents.
@@ -198,25 +59,6 @@ enum sp_obj_var_flags {
 /* gradient filter types */
 #define SEL_GRADIENT_RADIAL 0
 #define SEL_GRADIENT_SQUARE 1
-
-/* variable types */
-#define SPOVAR_NULL 0x00
-#define SPOVAR_INT 0x01      /* l */
-#define SPOVAR_STRING 0x02   /* str */
-#define SPOVAR_VARIABLE 0x03 /* str (contains the variable name) */
-#define SPOVAR_COORD \
-    0x04 /* coordinate, encoded in l; use SP_COORD_X() and SP_COORD_Y() */
-#define SPOVAR_REGION 0x05  /* region, encoded in l; use SP_REGION_X1() etc \
-                               */
-#define SPOVAR_MAPCHAR 0x06 /* map char, in l */
-#define SPOVAR_MONST                                                         \
-    0x07 /* monster class & specific monster, encoded in l; use SP_MONST_... \
-            */
-#define SPOVAR_OBJ                                                 \
-    0x08 /* object class & specific object type, encoded in l; use \
-            SP_OBJ_... */
-#define SPOVAR_SEL 0x09   /* selection. char[COLNO][ROWNO] in str */
-#define SPOVAR_ARRAY 0x40 /* used in splev_var & lc_vardefs, not in opvar */
 
 #define SP_COORD_IS_RANDOM 0x01000000L
 /* Humidity flags for get_location() and friends, used with
@@ -234,75 +76,17 @@ enum sp_obj_var_flags {
 #define SP_COORD_PACK(x, y) (((x) & 0xff) + (((y) & 0xff) << 16))
 #define SP_COORD_PACK_RANDOM(f) (SP_COORD_IS_RANDOM | (f))
 
-#define SP_REGION_X1(l) (l & 0xff)
-#define SP_REGION_Y1(l) ((l >> 8) & 0xff)
-#define SP_REGION_X2(l) ((l >> 16) & 0xff)
-#define SP_REGION_Y2(l) ((l >> 24) & 0xff)
-#define SP_REGION_PACK(x1, y1, x2, y2) \
-    (((x1) & 0xff) + (((y1) & 0xff) << 8) + (((x2) & 0xff) << 16) \
-     + (((y2) & 0xff) << 24))
-
-/* permonst index, object index, and lit value might be negative;
- * add 10 to accept -1 through -9 while forcing non-negative for bit shift
- */
-#define SP_MONST_CLASS(l) ((l) & 0xff)
-#define SP_MONST_PM(l) ((((l) >> 8) & 0xffff) - 10)
-#define SP_MONST_PACK(pm, cls) (((10 + (pm)) << 8) | ((cls) & 0xff))
-
-#define SP_OBJ_CLASS(l) ((l) & 0xff)
-#define SP_OBJ_TYP(l) ((((l) >> 8) & 0xffff) - 10)
-#define SP_OBJ_PACK(ob, cls) (((10 + (ob)) << 8) | ((cls) & 0xff))
-
-#define SP_MAPCHAR_TYP(l) ((l) & 0xff)
-#define SP_MAPCHAR_LIT(l) ((((l) >> 8) & 0xffff) - 10)
-#define SP_MAPCHAR_PACK(typ, lit) (((10 + (lit)) << 8) | ((typ) & 0xff))
-
-struct splev_var {
-    struct splev_var *next;
-    char *name;
-    xchar svtyp; /* SPOVAR_foo */
-    union {
-        struct opvar *value;
-        struct opvar **arrayvalues;
-    } data;
-    long array_len;
-};
-
-struct splevstack {
-    long depth;
-    long depth_alloc;
-    struct opvar **stackdata;
-};
-
-struct sp_frame {
-    struct sp_frame *next;
-    struct splevstack *stack;
-    struct splev_var *variables;
-    long n_opcode;
-};
-
 struct sp_coder {
-    struct splevstack *stack;
-    struct sp_frame *frame;
     int premapped;
     boolean solidify;
     struct mkroom *croom;
+    int room_stack;
     struct mkroom *tmproomlist[MAX_NESTED_ROOMS + 1];
     boolean failed_room[MAX_NESTED_ROOMS + 1];
     int n_subroom;
-    boolean exit_script;
     int lvl_is_joined;
     boolean check_inaccessibles;
-
-    int opcode;          /* current opcode */
-    struct opvar *opdat; /* current push data (req. opcode == SPO_PUSH) */
 };
-
-/* special level coder CPU flags */
-#define SP_CPUFLAG_LT 1
-#define SP_CPUFLAG_GT 2
-#define SP_CPUFLAG_EQ 4
-#define SP_CPUFLAG_ZERO 8
 
 /*
  * Structures manipulated by the special levels loader & compiler
@@ -314,15 +98,6 @@ typedef struct {
     long getloc_flags;
     int x, y;
 } unpacked_coord;
-
-typedef struct {
-    int cmp_what;
-    int cmp_val;
-} opcmp;
-
-typedef struct {
-    long jmp_target;
-} opjmp;
 
 typedef struct {
     xchar init_style; /* one of LVLINIT_foo */
@@ -415,123 +190,5 @@ typedef struct {
     char xsize, ysize;
     char **map;
 } mazepart;
-
-typedef struct {
-    int opcode;
-    struct opvar *opdat;
-} _opcode;
-
-typedef struct {
-    _opcode *opcodes;
-    long n_opcodes;
-} sp_lev;
-
-typedef struct {
-    xchar x, y, direction, count, lit;
-    char typ;
-} spill;
-
-/* only used by lev_comp */
-struct lc_funcdefs_parm {
-    char *name;
-    char parmtype;
-    struct lc_funcdefs_parm *next;
-};
-
-struct lc_funcdefs {
-    struct lc_funcdefs *next;
-    char *name;
-    long addr;
-    sp_lev code;
-    long n_called;
-    struct lc_funcdefs_parm *params;
-    long n_params;
-};
-
-struct lc_vardefs {
-    struct lc_vardefs *next;
-    char *name;
-    long var_type; /* SPOVAR_foo */
-    long n_used;
-};
-
-struct lc_breakdef {
-    struct lc_breakdef *next;
-    struct opvar *breakpoint;
-    int break_depth;
-};
-
-/*
- * Quick! Avert your eyes while you still have a chance!
- */
-#ifdef SPEC_LEV
-/* compiling lev_comp rather than nethack */
-/* clang format off */
-#ifdef USE_OLDARGS
-#ifndef VA_TYPE
-typedef const char *vA;
-#define VA_TYPE
-#endif
-/* hack to avoid "warning: cast to 'vA' (aka 'const char *') from smaller
-   integer type 'int' [-Wint-to-pointer-cast]" */
-#define vA_(a) ((vA) (long) a)
-#undef VA_ARGS  /* redefine with the maximum number actually used */
-#undef VA_SHIFT /* ditto */
-#undef VA_PASS1
-#define VA_ARGS                                                         \
-    arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, \
-        arg12, arg13, arg14
-/* Unlike in the core, lev_comp's VA_SHIFT should be completely safe,
-   because callers always pass all these arguments. */
-#define VA_SHIFT()                                                       \
-    (arg1 = arg2, arg2 = arg3, arg3 = arg4, arg4 = arg5, arg5 = arg6,    \
-     arg6 = arg7, arg7 = arg8, arg8 = arg9, arg9 = arg10, arg10 = arg11, \
-     arg11 = arg12, arg12 = arg13, arg13 = arg14, arg14 = 0)
-/* standard NULL may be either (void *)0 or plain 0, both of
-   which would need to be explicitly cast to (char *) here */
-#define VA_PASS1(a1) \
-    vA_(a1), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0),    \
-        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
-#define VA_PASS2(a1,a2) \
-    vA_(a1), vA_(a2), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0),   \
-        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
-#define VA_PASS3(a1,a2,a3) \
-    vA_(a1), vA_(a2), vA_(a3), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0),  \
-        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
-#define VA_PASS4(a1,a2,a3,a4) \
-    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(0), vA_(0), vA_(0), vA_(0), \
-        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
-#define VA_PASS5(a1,a2,a3,a4,a5) \
-    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(0), vA_(0), vA_(0), \
-        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
-#define VA_PASS7(a1,a2,a3,a4,a5,a6,a7) \
-    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(a6), vA_(a7), vA_(0), \
-        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
-#define VA_PASS8(a1,a2,a3,a4,a5,a6,a7,a8) \
-    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(a6), vA_(a7), vA_(a8), \
-        vA_(0), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
-#define VA_PASS9(a1,a2,a3,a4,a5,a6,a7,a8,a9) \
-    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(a6), vA_(a7), vA_(a8), \
-        vA_(a9), vA_(0), vA_(0), vA_(0), vA_(0), vA_(0)
-#define VA_PASS14(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14) \
-    vA_(a1), vA_(a2), vA_(a3), vA_(a4), vA_(a5), vA_(a6), vA_(a7), vA_(a8), \
-        vA_(a9), vA_(a10), vA_(a11), vA_(a12), vA_(a13), vA_(a14)
-#else /*!USE_OLDARGS*/
-/* USE_STDARG and USE_VARARGS don't need to pass dummy arguments
-   or cast real ones */
-#define VA_PASS1(a1) a1
-#define VA_PASS2(a1,a2) a1, a2
-#define VA_PASS3(a1,a2,a3) a1, a2, a3
-#define VA_PASS4(a1,a2,a3,a4) a1, a2, a3, a4
-#define VA_PASS5(a1,a2,a3,a4,a5) a1, a2, a3, a4, a5
-#define VA_PASS7(a1,a2,a3,a4,a5,a6,a7) a1, a2, a3, a4, a5, a6, a7
-#define VA_PASS8(a1,a2,a3,a4,a5,a6,a7,a8) a1, a2, a3, a4, a5, a6, a7, a8
-#define VA_PASS9(a1,a2,a3,a4,a5,a6,a7,a8,a9) a1, a2, a3, a4, a5, a6, a7, a8, a9
-#define VA_PASS14(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14) \
-    a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14
-#endif /*?USE_OLDARGS*/
-/* clang format on */
-/* You were warned to avert your eyes.... */
-#endif /*SPEC_LEV*/
 
 #endif /* SP_LEV_H */

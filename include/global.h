@@ -46,7 +46,7 @@
 #define ENGRAVEFILE "engrave"   /* random engravings on the floor */
 #define BOGUSMONFILE "bogusmon" /* hallucinatory monsters */
 #define TRIBUTEFILE "tribute"   /* 3.6 tribute to Terry Pratchett */
-#define LEV_EXT ".lev"          /* extension for special level files */
+#define LEV_EXT ".lua"          /* extension for special level files */
 
 /* Assorted definitions that may depend on selections in config.h. */
 

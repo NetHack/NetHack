@@ -4,7 +4,7 @@
 #==============================================================================
 # Build Tools Environment
 #
-#       NetHack 3.6.x Makefile for MS Visual Studio Visual C++ compiler
+#       NetHack 3.7 Makefile for MS Visual Studio Visual C++ compiler
 #  
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2017 Community Edition
@@ -29,14 +29,21 @@
 #   If you have any questions read the sys/winnt/Install.nt file included 
 #   with the distribution.
 #========================================================================================
-# BUILD DECISIONS SECTION
+# DECISIONS SECTION
 #
-# There are currently only 4 decisions that you can choose to make, and none are 
-# absolutely required because defaults are in place:
+# Build Options Decisions
+#
+#       There are currently 4 decisions that you can choose to make. 
+#       none of the 4 decisions are absolutely required because defaults are in place:
 #	1. Where do you want your build to end up?
 #	2. Do you want debug information in the executable?
 #	3. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
 #       4. Do you want to include the optional curses port?
+#
+# Mandatory LUA source Location
+#
+#       LUA source code or is required to build NetHack-3.7.
+#       LUATOP must point to the location of the LUA sources.
 #
 #-----------------------------------------------------------------------------------------
 #=========================================================================================
@@ -72,8 +79,21 @@ DEBUGINFO = Y
 #    PDCurses header (.h) files and PDCURSES_C to the location
 #    of your PDCurses C files.
 #
-#ADD_CURSES=Y
-#PDCURSES_TOP=..\..\pdcurses
+ADD_CURSES=Y
+PDCURSES_TOP=..\..\pdcurses
+#
+#---------------------------------------------------------------
+# Location of LUA
+#
+# Original source needs to be obtained from: 
+#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#
+#    This build assumes that the LUA sources are located
+#    at the specified location. If they are actually elsewhere
+#    you'll need to specify the correct spot below in order to
+#    successfully build NetHack-3.7.
+#
+LUATOP=..\..\lua-5.3.5
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -88,7 +108,6 @@ DEBUGINFO = Y
 # Nothing below here should have to be changed.#
 #                                              #
 ################################################
-
 #
 #==============================================================================
 #
@@ -181,8 +200,10 @@ MAKESRC       = $(U)makedefs.c
 
 MAKEOBJS      = $(O)makedefs.o $(O)monst.o $(O)objects.o
 
+!IFDEF OBSOLETE_LEVEL_COMPILER
 LEVCOMPOBJS   = $(O)lev_yacc.o	$(O)lev_lex.o	$(O)lev_main.o	\
 		$(O)alloc.o $(O)decl.o	$(O)drawing.o	$(O)monst.o	$(O)objects.o	$(O)panic.o
+!ENDIF
 
 DGNCOMPOBJS   = $(O)dgn_yacc.o	$(O)dgn_lex.o	$(O)dgn_main.o	\
 		$(O)alloc.o	$(O)panic.o
@@ -239,6 +260,8 @@ VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
 VOBJ28 = $(O)sfbase.o   $(O)sfdata.o   
 VOBJ29 = $(O)sfstruct.o $(O)sfascii.o  $(O)sflendian.o
 
+LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+
 DLBOBJ = $(O)dlb.o
 
 REGEX  = $(O)cppregex.o
@@ -287,9 +310,37 @@ SOUND = $(OBJ)\ntsound.o
 
 VVOBJ  = $(O)version.o
 
-ALLOBJ  = $(SOBJ) $(DLBOBJ)  $(WOBJ) $(OBJS) $(VVOBJ)
+ALLOBJ  = $(SOBJ) $(DLBOBJ)  $(WOBJ) $(OBJS) $(VVOBJ) $(LUAOBJ)
 
 OPTIONS_FILE = $(DAT)\options
+
+#===============-=================================================
+# LUA library
+# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#=================================================================
+
+LUASRC   = $(LUATOP)\src
+LUALIB   = $(O)lua5.3.5-static.lib
+LUADLL   = $(O)lua5.3.5.dll
+LUAINCL  = /I$(LUASRC)
+LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
+
+LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
+		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
+		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
+		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
+		loslib.c lparser.c lstate.c lstring.c lstrlib.c  \
+		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
+		lvm.c lzio.c
+
+LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
+		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
+		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
+		$(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
+		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o \
+		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
+		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
 
 !IF "$(ADD_CURSES)" == "Y"	
 #===============-=================================================
@@ -349,7 +400,9 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h $(INCL)\context.h \
 
 LEV_H       = $(INCL)\lev.h
 DGN_FILE_H  = $(INCL)\dgn_file.h
+!IFDEF OBSOLETE_LEVEL_COMPILER
 LEV_COMP_H  = $(INCL)\lev_comp.h
+!ENDIF
 SP_LEV_H    = $(INCL)\sp_lev.h
 TILE_H      = ..\win\share\tile.h
 
@@ -548,11 +601,7 @@ conlibs     = $(baselibs)
 guilibs     = $(winlibs)
 #
 
-!IFNDEF ADD_CURSES
-INCLDIR= /I..\include /I..\sys\winnt
-!ELSE
-INCLDIR= /I..\include /I..\sys\winnt
-!ENDIF
+INCLDIR= /I..\include /I..\sys\winnt $(LUAINCL)
 
 #==========================================
 # Util builds
@@ -668,6 +717,13 @@ DLB =
 	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
 
 #==========================================
+# Rules for LUA files
+#==========================================
+
+{$(LUASRC)}.c{$(OBJ)}.o:
+	@$(cc) $(cflagsBuild) -Fo$@ $<
+
+#==========================================
 #=============== TARGETS ==================
 #==========================================
 
@@ -679,7 +735,6 @@ default : install
 #
 #  The game target.
 #
-
 #
 #  Everything
 #
@@ -689,92 +744,8 @@ all :	install
 install: $(O)envchk.tag $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe $(O)install.tag
 	 @echo Done.
 
-$(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
-	 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
-! IF ("$(USE_DLB)"=="Y")
-	copy nhdat$(NHV)          $(GAMEDIR)
-	copy $(DAT)\license       $(GAMEDIR)
-	copy $(DAT)\opthelp       $(GAMEDIR)
-! ELSE
-	copy $(DAT)\*.            $(GAMEDIR)
-	copy $(DAT)\*.dat         $(GAMEDIR)
-	copy $(DAT)\*.lev         $(GAMEDIR)
-	if exist $(GAMEDIR)\makefile del $(GAMEDIR)\makefile
-! ENDIF
-	if not exist $(GAMEDIR)\sysconf copy $(MSWSYS)\sysconf $(GAMEDIR)
-	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
-	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
-	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
-	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
-	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
-	-if not exist $(GAMEDIR)\defaults.nh copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
-	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
-	echo install done > $@
-
-#	copy $(MSWSYS)\winnt.hlp    $(GAMEDIR)
-
-recover: $(U)recover.exe
-	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
-	if exist $(DOC)\recover.txt copy $(DOC)\recover.txt $(GAMEDIR)\recover.txt
-
-$(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
-	$(DAT)\endgame.des $(DAT)\gehennom.des $(DAT)\knox.des   \
-	$(DAT)\medusa.des  $(DAT)\oracle.des   $(DAT)\tower.des  \
-	$(DAT)\yendor.des  $(DAT)\arch.des     $(DAT)\barb.des   \
-	$(DAT)\caveman.des $(DAT)\healer.des   $(DAT)\knight.des \
-	$(DAT)\monk.des    $(DAT)\priest.des   $(DAT)\ranger.des \
-	$(DAT)\rogue.des   $(DAT)\samurai.des  $(DAT)\sokoban.des \
-	$(DAT)\tourist.des $(DAT)\valkyrie.des $(DAT)\wizard.des
-	cd $(DAT)
-	$(U)levcomp bigroom.des
-	$(U)levcomp castle.des
-	$(U)levcomp endgame.des
-	$(U)levcomp gehennom.des
-	$(U)levcomp knox.des
-	$(U)levcomp mines.des
-	$(U)levcomp medusa.des
-	$(U)levcomp oracle.des
-	$(U)levcomp sokoban.des
-	$(U)levcomp tower.des
-	$(U)levcomp yendor.des
-	$(U)levcomp arch.des
-	$(U)levcomp barb.des
-	$(U)levcomp caveman.des
-	$(U)levcomp healer.des
-	$(U)levcomp knight.des
-	$(U)levcomp monk.des
-	$(U)levcomp priest.des
-	$(U)levcomp ranger.des
-	$(U)levcomp rogue.des
-	$(U)levcomp samurai.des
-	$(U)levcomp tourist.des
-	$(U)levcomp valkyrie.des
-	$(U)levcomp wizard.des
-	cd $(SRC)
-	echo sp_levs done > $(O)sp_lev.tag
-
-$(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
-		$(SRC)\vis_tab.c  \
-		$(U)levcomp.exe	$(INCL)\vis_tab.h \
-		$(U)dgncomp.exe $(TILEUTIL16)
-             @echo utilities made >$@
-	     @echo utilities made.
-
-tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
-	@echo Optional tile development utilities are up to date.
-
-$(O)NetHackW.res: $(TILEBMP16) $(MSWIN)\NetHackW.rc $(MSWIN)\mnsel.bmp \
-	$(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
-	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico $(MSWIN)\rip.bmp \
-	$(MSWIN)\splash.bmp
-	@$(rc) -r -fo$@ -i$(MSWIN) -dNDEBUG $(MSWIN)\NetHackW.rc
-
-$(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
-	@$(rc) -r -fo$@ -i$(MSWSYS) -dNDEBUG $(MSWSYS)\console.rc
-
-
 #==========================================
-#  The game targets.
+#  Main game targets.
 #==========================================
 
 #  The section for linking the NetHack image looks a little strange at 
@@ -818,11 +789,13 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 
 
 $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)console.res $(KEYDLLS)
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)console.res $(KEYDLLS) \
+			$(LUATARGETS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
         @echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
-		$(LIBS) $(PDCLIB) $(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
+		$(LIBS) $(PDCLIB) $(LUALIB) \
+		$(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(TTYOBJ)
 		$(O)nttty.o
@@ -834,18 +807,21 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 
 # NetHackW
 # full tty linkage libs:
-#    libs: $(LIBS) $(guilibs) $(COMCTRL)
+#    libs: $(LIBS) $(PDCLIB) $(LUALIB) $(guilibs) $(COMCTRL)
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(TTYOBJ) $(O)tile.o $(O)nttty.o
 # otherwise:
-#    libs: $(LIBS) $(guilibs) $(COMCTRL)
+#    libs: $(LIBS) $(PDCLIB) $(LUALIB) $(guilibs) $(COMCTRL)
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
 $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)NetHackW.res $(O)gamedir.tag $(KEYDLLS)
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)NetHackW.res \
+			$(O)gamedir.tag $(KEYDLLS) \
+			$(LUATARGETS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
-		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
+		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(LUALIB) \
+		$(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(GUIOBJ)
 		$(O)tile.o
@@ -914,6 +890,92 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
+
+$(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
+	 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
+! IF ("$(USE_DLB)"=="Y")
+	copy nhdat$(NHV)          $(GAMEDIR)
+	copy $(DAT)\license       $(GAMEDIR)
+	copy $(DAT)\opthelp       $(GAMEDIR)
+! ELSE
+	copy $(DAT)\*.            $(GAMEDIR)
+	copy $(DAT)\*.dat         $(GAMEDIR)
+	if exist $(GAMEDIR)\makefile del $(GAMEDIR)\makefile
+! ENDIF
+	if not exist $(GAMEDIR)\sysconf copy $(MSWSYS)\sysconf $(GAMEDIR)
+	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
+	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
+	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
+	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
+	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
+	-if not exist $(GAMEDIR)\defaults.nh copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
+	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
+	echo install done > $@
+
+#	copy $(MSWSYS)\winnt.hlp    $(GAMEDIR)
+
+recover: $(U)recover.exe
+	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
+	if exist $(DOC)\recover.txt copy $(DOC)\recover.txt $(GAMEDIR)\recover.txt
+
+!IFDEF OBSOLETE_LEVEL_COMPILER
+$(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
+	$(DAT)\endgame.des $(DAT)\gehennom.des $(DAT)\knox.des   \
+	$(DAT)\medusa.des  $(DAT)\oracle.des   $(DAT)\tower.des  \
+	$(DAT)\yendor.des  $(DAT)\arch.des     $(DAT)\barb.des   \
+	$(DAT)\caveman.des $(DAT)\healer.des   $(DAT)\knight.des \
+	$(DAT)\monk.des    $(DAT)\priest.des   $(DAT)\ranger.des \
+	$(DAT)\rogue.des   $(DAT)\samurai.des  $(DAT)\sokoban.des \
+	$(DAT)\tourist.des $(DAT)\valkyrie.des $(DAT)\wizard.des
+	cd $(DAT)
+	$(U)levcomp bigroom.des
+	$(U)levcomp castle.des
+	$(U)levcomp endgame.des
+	$(U)levcomp gehennom.des
+	$(U)levcomp knox.des
+	$(U)levcomp mines.des
+	$(U)levcomp medusa.des
+	$(U)levcomp oracle.des
+	$(U)levcomp sokoban.des
+	$(U)levcomp tower.des
+	$(U)levcomp yendor.des
+	$(U)levcomp arch.des
+	$(U)levcomp barb.des
+	$(U)levcomp caveman.des
+	$(U)levcomp healer.des
+	$(U)levcomp knight.des
+	$(U)levcomp monk.des
+	$(U)levcomp priest.des
+	$(U)levcomp ranger.des
+	$(U)levcomp rogue.des
+	$(U)levcomp samurai.des
+	$(U)levcomp tourist.des
+	$(U)levcomp valkyrie.des
+	$(U)levcomp wizard.des
+	cd $(SRC)
+	echo sp_levs done > $(O)sp_lev.tag
+!ELSE
+$(O)sp_lev.tag:
+	echo sp_levs done > $(O)sp_lev.tag
+!ENDIF
+
+$(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
+		$(SRC)\vis_tab.c $(INCL)\vis_tab.h \
+		$(U)dgncomp.exe $(TILEUTIL16)
+             @echo utilities made >$@
+	     @echo utilities made.
+
+tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
+	@echo Optional tile development utilities are up to date.
+
+$(O)NetHackW.res: $(TILEBMP16) $(MSWIN)\NetHackW.rc $(MSWIN)\mnsel.bmp \
+	$(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
+	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico $(MSWIN)\rip.bmp \
+	$(MSWIN)\splash.bmp
+	@$(rc) -r -fo$@ -i$(MSWIN) -dNDEBUG $(MSWIN)\NetHackW.rc
+
+$(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
+	@$(rc) -r -fo$@ -i$(MSWSYS) -dNDEBUG $(MSWSYS)\console.rc
 
 #
 #  Secondary Targets.
@@ -1023,6 +1085,7 @@ $(MSWIN)\splash.bmp: $(U)uudecode.exe $(MSWIN)\splash.uu
 # defer to the steps in ..\win\win32\levstuff.mak
 #
 
+!IFDEF OBSOLETE_LEVEL_COMPILER
 $(U)lev_yacc.c: $(U)lev_comp.y
 	nmake -nologo -f ..\win\win32\levstuff.mak $(U)lev_yacc.c
 
@@ -1047,6 +1110,7 @@ $(U)levcomp.exe: $(LEVCOMPOBJS)
  		$(LEVCOMPOBJS:^	=^
 		)
 <<
+!ENDIF
 
 #=================================================
 # Dungeon Compiler Stuff
@@ -1153,10 +1217,6 @@ nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	if exist porthelp echo porthelp >>dlb.lst
 	echo quest.dat >>dlb.lst
 	echo rumors >>dlb.lst
-	echo engrave >>dlb.lst
-	echo epitaph >>dlb.lst
-	echo bogusmon >>dlb.lst
-	echo tribute >>dlb.lst
 	echo help >>dlb.lst
 	echo hh >>dlb.lst
 	echo cmdhelp >>dlb.lst
@@ -1166,7 +1226,11 @@ nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	echo wizhelp >>dlb.lst
 	echo dungeon >>dlb.lst
 	echo license >>dlb.lst
-	for %%N in (*.lev) do echo %%N >>dlb.lst
+	echo engrave >>dlb.lst
+	echo epitaph >>dlb.lst
+	echo bogusmon >>dlb.lst
+	echo tribute >>dlb.lst
+	for %%N in (*.lua) do echo %%N >>dlb.lst
 	$(U)dlb_main cIf dlb.lst $(SRC)\nhdat
 	cd $(SRC)
 
@@ -1289,6 +1353,25 @@ $(O)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c $(MSWSYS)\stub-pdcscr
 	$(cc) $(PDCINCL) $(cflagsBuild) -Fo$@ $(MSWSYS)\stub-pdcscrn.c
 
 #===============================================================================
+# LUA
+#===============================================================================
+
+lua.exe: $(O)lua.o $(LUALIB)
+	link /OUT:$@ $(O)lua.o $(LUALIB)
+
+luac.exe: $(O)luac.o $(LUALIB)
+	link /OUT:$@ $(O)luac.o $(LUALIB)
+
+$(O)lua5.3.5.dll: $(LUAOBJFILES)
+	link /DLL /IMPLIB:lua5.3.5.lib /OUT:$@ $(LUAOBJFILES)
+
+$(O)lua5.3.5-static.lib: $(LUAOBJFILES)
+	lib /OUT:$@ $(LUAOBJFILES)
+
+$(O)lua.o: $(LUASRC)\lua.c
+$(O)luac.o: $(LUASRC)\luac.c
+
+#===============================================================================
 # Housekeeping
 #===============================================================================
 
@@ -1315,40 +1398,6 @@ spotless: clean
 	if exist $(DAT)\engrave          del $(DAT)\engrave
 	if exist $(DAT)\epitaph          del $(DAT)\epitaph
 	if exist $(DAT)\bogusmon         del $(DAT)\bogusmon
-	if exist $(DAT)\???-fil?.lev	 del $(DAT)\???-fil?.lev
-	if exist $(DAT)\???-goal.lev	 del $(DAT)\???-goal.lev
-	if exist $(DAT)\???-loca.lev	 del $(DAT)\???-loca.lev
-	if exist $(DAT)\???-strt.lev	 del $(DAT)\???-strt.lev
-	if exist $(DAT)\air.lev		 del $(DAT)\air.lev
-	if exist $(DAT)\asmodeus.lev	 del $(DAT)\asmodeus.lev
-	if exist $(DAT)\astral.lev	 del $(DAT)\astral.lev
-	if exist $(DAT)\baalz.lev	 del $(DAT)\baalz.lev
-	if exist $(DAT)\bigrm-*.lev	 del $(DAT)\bigrm-*.lev
-	if exist $(DAT)\castle.lev	 del $(DAT)\castle.lev
-	if exist $(DAT)\data		 del $(DAT)\data
-	if exist $(DAT)\dungeon		 del $(DAT)\dungeon
-	if exist $(DAT)\dungeon.pdf	 del $(DAT)\dungeon.pdf
-	if exist $(DAT)\earth.lev	 del $(DAT)\earth.lev
-	if exist $(DAT)\fakewiz?.lev	 del $(DAT)\fakewiz?.lev
-	if exist $(DAT)\fire.lev	 del $(DAT)\fire.lev
-	if exist $(DAT)\juiblex.lev	 del $(DAT)\juiblex.lev
-	if exist $(DAT)\knox.lev	 del $(DAT)\knox.lev
-	if exist $(DAT)\medusa-?.lev	 del $(DAT)\medusa-?.lev
-	if exist $(DAT)\mine*.lev	 del $(DAT)\mine*.lev
-	if exist $(DAT)\options		 del $(DAT)\options
-	if exist $(DAT)\ttyoptions	 del $(DAT)\ttyoptions
-	if exist $(DAT)\guioptions	 del $(DAT)\guioptions
-	if exist $(DAT)\oracle.lev	 del $(DAT)\oracle.lev
-	if exist $(DAT)\oracles		 del $(DAT)\oracles
-	if exist $(DAT)\orcus.lev	 del $(DAT)\orcus.lev
-	if exist $(DAT)\rumors		 del $(DAT)\rumors
-	if exist $(DAT)\quest.dat	 del $(DAT)\quest.dat
-	if exist $(DAT)\sanctum.lev	 del $(DAT)\sanctum.lev
-	if exist $(DAT)\soko?-?.lev	 del $(DAT)\soko?-?.lev
-	if exist $(DAT)\tower?.lev	 del $(DAT)\tower?.lev
-	if exist $(DAT)\valley.lev	 del $(DAT)\valley.lev
-	if exist $(DAT)\water.lev	 del $(DAT)\water.lev
-	if exist $(DAT)\wizard?.lev	 del $(DAT)\wizard?.lev
 	if exist $(DAT)\dlb.lst		 del $(DAT)\dlb.lst
 	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
 	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
@@ -1375,11 +1424,49 @@ spotless: clean
 !IF "$(ADD_CURSES)" == "Y"	
 	if exist $(O)pdcurses.lib        del $(O)pdcurses.lib
 !ENDIF
+	if exist $(DAT)\oracles		 del $(DAT)\oracles
+	if exist $(DAT)\rumors		 del $(DAT)\rumors
+	if exist $(DAT)\quest.dat	 del $(DAT)\quest.dat
+	if exist $(DAT)\options		 del $(DAT)\options
+	if exist $(DAT)\ttyoptions	 del $(DAT)\ttyoptions
+	if exist $(DAT)\guioptions	 del $(DAT)\guioptions
+	if exist $(DAT)\data		 del $(DAT)\data
+	if exist $(DAT)\dungeon		 del $(DAT)\dungeon
+	if exist $(DAT)\dungeon.pdf	 del $(DAT)\dungeon.pdf
+!IFDEF OBSOLETE_LEVEL_COMPILER
+	if exist $(DAT)\???-fil?.lev	 del $(DAT)\???-fil?.lev
+	if exist $(DAT)\???-goal.lev	 del $(DAT)\???-goal.lev
+	if exist $(DAT)\???-loca.lev	 del $(DAT)\???-loca.lev
+	if exist $(DAT)\???-strt.lev	 del $(DAT)\???-strt.lev
+	if exist $(DAT)\air.lev		 del $(DAT)\air.lev
+	if exist $(DAT)\asmodeus.lev	 del $(DAT)\asmodeus.lev
+	if exist $(DAT)\astral.lev	 del $(DAT)\astral.lev
+	if exist $(DAT)\baalz.lev	 del $(DAT)\baalz.lev
+	if exist $(DAT)\bigrm-*.lev	 del $(DAT)\bigrm-*.lev
+	if exist $(DAT)\castle.lev	 del $(DAT)\castle.lev
+	if exist $(DAT)\earth.lev	 del $(DAT)\earth.lev
+	if exist $(DAT)\fakewiz?.lev	 del $(DAT)\fakewiz?.lev
+	if exist $(DAT)\fire.lev	 del $(DAT)\fire.lev
+	if exist $(DAT)\juiblex.lev	 del $(DAT)\juiblex.lev
+	if exist $(DAT)\knox.lev	 del $(DAT)\knox.lev
+	if exist $(DAT)\medusa-?.lev	 del $(DAT)\medusa-?.lev
+	if exist $(DAT)\mine*.lev	 del $(DAT)\mine*.lev
+	if exist $(DAT)\oracle.lev	 del $(DAT)\oracle.lev
+	if exist $(DAT)\orcus.lev	 del $(DAT)\orcus.lev
+	if exist $(DAT)\sanctum.lev	 del $(DAT)\sanctum.lev
+	if exist $(DAT)\soko?-?.lev	 del $(DAT)\soko?-?.lev
+	if exist $(DAT)\tower?.lev	 del $(DAT)\tower?.lev
+	if exist $(DAT)\valley.lev	 del $(DAT)\valley.lev
+	if exist $(DAT)\water.lev	 del $(DAT)\water.lev
+	if exist $(DAT)\wizard?.lev	 del $(DAT)\wizard?.lev
+!ENDIF
 clean:
 	if exist $(O)*.o del $(O)*.o
 	if exist $(O)utility.tag   del $(O)utility.tag
 	if exist $(U)makedefs.exe  del $(U)makedefs.exe
+!IFDEF OBSOLETE_LEVEL_COMPILER
 	if exist $(U)levcomp.exe   del $(U)levcomp.exe
+!ENDIF
 	if exist $(U)dgncomp.exe   del $(U)dgncomp.exe
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
@@ -1390,8 +1477,10 @@ clean:
 	if exist $(O)dlb_main.MAP del $(O)dlb_main.MAP
 	if exist $(O)dlb_main.PDB del $(O)dlb_main.PDB
 	if exist $(O)gamedir.tag  del $(O)gamedir.tag
+!IFDEF OBSOLETE_LEVEL_COMPILER
 	if exist $(O)levcomp.MAP  del $(O)levcomp.MAP
 	if exist $(O)levcomp.PDB  del $(O)levcomp.PDB
+!ENDIF
 	if exist $(O)makedefs.MAP del $(O)makedefs.MAP
 	if exist $(O)makedefs.PDB del $(O)makedefs.PDB
 	if exist $(O)NetHack.MAP  del $(O)NetHack.MAP
@@ -1802,6 +1891,8 @@ $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H)
 $(O)music.o: music.c $(HACK_H) #interp.c
+$(O)nhlua.o: nhlua.c $(HACK_H)
+$(O)nhlsel.o: nhlsel.c $(HACK_H)
 $(O)o_init.o: o_init.c $(HACK_H) $(INCL)\lev.h
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h

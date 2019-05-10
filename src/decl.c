@@ -617,7 +617,8 @@ const struct instance_globals g_init = {
     NULL, /* lev_message */
     NULL, /* lregions */
     0, /* num_lregions */
-    UNDEFINED_VALUES, /* SplLev_Map */
+    UNDEFINED_VALUES, /* SpLev_Map */
+    NULL, /* coder */
     UNDEFINED_VALUE, /* xstart */
     UNDEFINED_VALUE, /* ystart */
     UNDEFINED_VALUE, /* xsize */
@@ -629,7 +630,6 @@ const struct instance_globals g_init = {
     { UNDEFINED_PTR }, /* container_obj */
     0, /* container_idx */
     NULL, /* invent_carrying_monster */
-    { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL }, /* ralign */
 
     /* spells.c */
     0, /* spl_sortmode */
