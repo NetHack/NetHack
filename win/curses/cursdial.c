@@ -108,6 +108,12 @@ static int menu_max_height(void);
 
 static nhmenu *nhmenus = NULL;  /* NetHack menu array */
 
+/* maximum number of selector entries per page; if '$' is present
+   it isn't counted toward maximum, so actual max per page is 53 */
+#define MAX_ACCEL_PER_PAGE 52 /* 'a'..'z' + 'A'..'Z' */
+/* TODO?  limit per page should be ignored for perm_invent, which might
+   have some '#' overflow entries and isn't used to select items */
+
 
 /* Get a line of text from the player, such as asking for a character name
    or a wish */
@@ -118,7 +124,7 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
     int map_height, map_width, maxwidth, remaining_buf, winx, winy, count;
     WINDOW *askwin, *bwin;
     char *tmpstr;
-    int prompt_width = strlen(prompt) + buffer + 1;
+    int prompt_width = (int) strlen(prompt) + buffer + 1;
     int prompt_height = 1;
     int height = prompt_height;
     char input[BUFSZ];
@@ -146,7 +152,7 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
         height = prompt_height;
         prompt_width = maxwidth;
         tmpstr = curses_break_str(prompt, maxwidth, prompt_height);
-        remaining_buf = buffer - (strlen(tmpstr) - 1);
+        remaining_buf = buffer - ((int) strlen(tmpstr) - 1);
         if (remaining_buf > 0) {
             height += (remaining_buf / prompt_width);
             if ((remaining_buf % prompt_width) > 0) {
@@ -203,7 +209,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
     char *linestr;
     char askstr[BUFSZ + QBUFSZ];
     char choicestr[QBUFSZ];
-    int prompt_width = strlen(prompt);
+    int prompt_width;
     int prompt_height = 1;
     boolean any_choice = FALSE;
     boolean accept_count = FALSE;
@@ -257,7 +263,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         any_choice = TRUE;
     }
 
-    prompt_width = strlen(askstr);
+    prompt_width = (int) strlen(askstr);
 
     if ((prompt_width + 2) > maxwidth) {
         prompt_height = curses_num_lines(askstr, maxwidth);
@@ -332,16 +338,8 @@ curses_character_input_dialog(const char *prompt, const char *choices,
             break;
         }
 
-        if (choices != NULL) {
-            for (count = 0; (size_t) count < strlen(choices); count++) {
-                if (choices[count] == answer) {
-                    break;
-                }
-            }
-            if (choices[count] == answer) {
-                break;
-            }
-        }
+        if (choices != NULL && answer != '\0' && index(choices, answer))
+            break;
     }
 
     if (iflags.wc_popup_dialog) {
@@ -413,22 +411,23 @@ curses_ext_cmd()
         waddstr(extwin, "# ");
         wmove(extwin, starty, startx + 2);
         waddstr(extwin, cur_choice);
-        wmove(extwin, starty, strlen(cur_choice) + startx + 2);
+        wmove(extwin, starty, (int) strlen(cur_choice) + startx + 2);
         wprintw(extwin, "             ");
 
         /* if we have an autocomplete command, AND it matches uniquely */
         if (matches == 1) {
             curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, ON);
-            wmove(extwin, starty, strlen(cur_choice) + startx + 2);
-            wprintw(extwin, "%s", extcmdlist[ret].ef_txt + strlen(cur_choice));
+            wmove(extwin, starty, (int) strlen(cur_choice) + startx + 2);
+            wprintw(extwin, "%s",
+                    extcmdlist[ret].ef_txt + (int) strlen(cur_choice));
             curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, OFF);
             mvwprintw(extwin, starty,
-                      strlen(extcmdlist[ret].ef_txt) + 2, "          ");
+                      (int) strlen(extcmdlist[ret].ef_txt) + 2, "          ");
         }
 
         wrefresh(extwin);
         letter = getch();
-        prompt_width = strlen(cur_choice);
+        prompt_width = (int) strlen(cur_choice);
         matches = 0;
 
         if (letter == '\033' || letter == ERR) {
@@ -470,7 +469,7 @@ curses_ext_cmd()
                 continue;
             if (!(extcmdlist[count].flags & AUTOCOMPLETE))
                 continue;
-            if (strlen(extcmdlist[count].ef_txt) > (size_t) prompt_width) {
+            if ((int) strlen(extcmdlist[count].ef_txt) > prompt_width) {
                 if (strncasecmp(cur_choice, extcmdlist[count].ef_txt,
                                 prompt_width) == 0) {
                     if ((extcmdlist[count].ef_txt[prompt_width] ==
@@ -566,7 +565,7 @@ curs_new_menu_item(winid wid, const char *str)
     new_item->wid = wid;
     new_item->glyph = NO_GLYPH;
     new_item->identifier = zeroany;
-    new_item->accelerator = '\0';;
+    new_item->accelerator = '\0';
     new_item->group_accel = '\0';
     new_item->attr = 0;
     new_item->str = new_str;
@@ -869,8 +868,8 @@ get_menu(winid wid)
 static char
 menu_get_accel(boolean first)
 {
+    static char next_letter;
     char ret;
-    static char next_letter = 'a';
 
     if (first) {
         next_letter = 'a';
@@ -879,13 +878,12 @@ menu_get_accel(boolean first)
     ret = next_letter;
 
     if ((next_letter < 'z' && next_letter >= 'a')
-        || (next_letter < 'Z' && next_letter >= 'A')
-        || (next_letter < '9' && next_letter >= '0')) {
+        || (next_letter < 'Z' && next_letter >= 'A')) {
         next_letter++;
     } else if (next_letter == 'z') {
         next_letter = 'A';
     } else if (next_letter == 'Z') {
-        next_letter = '0';
+        next_letter = 'a'; /* wrap to beginning */
     }
 
     return ret;
@@ -898,35 +896,34 @@ static boolean
 menu_is_multipage(nhmenu *menu, int width, int height)
 {
     int num_lines;
-    int curline = 0;
+    int curline = 0, accel_per_page = 0;
     nhmenu_item *menu_item_ptr = menu->entries;
 
     if (*menu->prompt) {
         curline += curses_num_lines(menu->prompt, width) + 1;
     }
 
-    if (menu->num_entries <= (height - curline)) {
-        while (menu_item_ptr != NULL) {
-            menu_item_ptr->line_num = curline;
-            if (menu_item_ptr->identifier.a_void == NULL) {
-                num_lines = curses_num_lines(menu_item_ptr->str, width);
-            } else {
-                /* Add space for accelerator */
-                num_lines = curses_num_lines(menu_item_ptr->str, width - 4);
+    while (menu_item_ptr != NULL) {
+        menu_item_ptr->line_num = curline;
+        if (menu_item_ptr->identifier.a_void == NULL) {
+            num_lines = curses_num_lines(menu_item_ptr->str, width);
+        } else {
+            if (menu_item_ptr->accelerator != GOLD_SYM) {
+                if (++accel_per_page > MAX_ACCEL_PER_PAGE)
+                    break;
             }
-            menu_item_ptr->num_lines = num_lines;
-            curline += num_lines;
-            menu_item_ptr = menu_item_ptr->next_item;
-            if (curline > height
-                || (curline > height - 2 && height == menu_max_height())) {
-                break;
-            }
+            /* Add space for accelerator */
+            num_lines = curses_num_lines(menu_item_ptr->str, width - 4);
         }
-        if (menu_item_ptr == NULL) {
-            return FALSE;
+        menu_item_ptr->num_lines = num_lines;
+        curline += num_lines;
+        menu_item_ptr = menu_item_ptr->next_item;
+        if (curline > height
+            || (curline > height - 2 && height == menu_max_height())) {
+            break;
         }
     }
-    return TRUE;
+    return (menu_item_ptr != NULL) ? TRUE : FALSE;
 }
 
 
@@ -935,7 +932,7 @@ menu_is_multipage(nhmenu *menu, int width, int height)
 static void
 menu_determine_pages(nhmenu *menu)
 {
-    int tmpline, num_lines;
+    int tmpline, num_lines, accel_per_page;
     int curline = 0;
     int page_num = 1;
     nhmenu_item *menu_item_ptr = menu->entries;
@@ -947,34 +944,35 @@ menu_determine_pages(nhmenu *menu)
     if (*menu->prompt) {
         curline += curses_num_lines(menu->prompt, width) + 1;
     }
-
     tmpline = curline;
 
     if (menu_is_multipage(menu, width, height)) {
         page_end -= 2;          /* Room to display current page number */
     }
+    accel_per_page = 0;
 
     /* Determine what entries belong on which page */
-    menu_item_ptr = menu->entries;
-
-    while (menu_item_ptr != NULL) {
+    for (menu_item_ptr = menu->entries; menu_item_ptr != NULL;
+         menu_item_ptr = menu_item_ptr->next_item) {
         menu_item_ptr->page_num = page_num;
         menu_item_ptr->line_num = curline;
         if (menu_item_ptr->identifier.a_void == NULL) {
             num_lines = curses_num_lines(menu_item_ptr->str, width);
         } else {
+            if (menu_item_ptr->accelerator != GOLD_SYM)
+                ++accel_per_page;
             /* Add space for accelerator */
             num_lines = curses_num_lines(menu_item_ptr->str, width - 4);
         }
         menu_item_ptr->num_lines = num_lines;
         curline += num_lines;
-        if (curline > page_end) {
-            page_num++;
+        if (curline > page_end || accel_per_page > MAX_ACCEL_PER_PAGE) {
+            ++page_num;
+            accel_per_page = 0; /* reset */
             curline = tmpline;
             /* Move ptr back so entry will be reprocessed on new page */
             menu_item_ptr = menu_item_ptr->prev_item;
         }
-        menu_item_ptr = menu_item_ptr->next_item;
     }
 
     menu->num_pages = page_num;
@@ -987,30 +985,27 @@ static void
 menu_win_size(nhmenu *menu)
 {
     int width, height, maxwidth, maxheight, curentrywidth, lastline;
-    int maxentrywidth = strlen(menu->prompt);
+    int maxentrywidth = (int) strlen(menu->prompt);
     int maxheaderwidth = 0;
-    nhmenu_item *menu_item_ptr = menu->entries;
+    nhmenu_item *menu_item_ptr;
 
     maxwidth = 38;              /* Reasonable minimum usable width */
-
     if ((term_cols / 2) > maxwidth) {
         maxwidth = (term_cols / 2);     /* Half the screen */
     }
-
     maxheight = menu_max_height();
 
     /* First, determine the width of the longest menu entry */
-    while (menu_item_ptr != NULL)
-    {
+    for (menu_item_ptr = menu->entries; menu_item_ptr != NULL;
+         menu_item_ptr = menu_item_ptr->next_item) {
+        curentrywidth = (int) strlen(menu_item_ptr->str);
         if (menu_item_ptr->identifier.a_void == NULL) {
-            curentrywidth = strlen(menu_item_ptr->str);
-
             if (curentrywidth > maxheaderwidth) {
                 maxheaderwidth = curentrywidth;
             }
         } else {
             /* Add space for accelerator */
-            curentrywidth = strlen(menu_item_ptr->str) + 4;
+            curentrywidth += 4;
 #if 0 /* FIXME: menu glyphs */
             if (menu_item_ptr->glyph != NO_GLYPH && iflags.use_menu_glyphs)
                 curentrywidth += 2;
@@ -1019,7 +1014,6 @@ menu_win_size(nhmenu *menu)
         if (curentrywidth > maxentrywidth) {
             maxentrywidth = curentrywidth;
         }
-        menu_item_ptr = menu_item_ptr->next_item;
     }
 
     /* If widest entry is smaller than maxwidth, reduce maxwidth accordingly */
@@ -1071,8 +1065,7 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num)
     int count, curletter, entry_cols, start_col, num_lines;
     char *tmpstr;
     boolean first_accel = TRUE;
-    int color = NO_COLOR;
-    int attr = A_NORMAL;
+    int color = NO_COLOR, attr = A_NORMAL;
     boolean menu_color = FALSE;
 
     /* Cycle through entries until we are on the correct page */
@@ -1343,7 +1336,7 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
             touchwin(win);
             wrefresh(win);
 
-            if (strlen(search_key) == 0) {
+            if (!*search_key) {
                 break;
             }
 
@@ -1476,7 +1469,6 @@ menu_operation(WINDOW * win, nhmenu *menu, menu_op
     }
 
     /* Cycle through entries until we are on the correct page */
-
     while (menu_item_ptr != NULL) {
         if (menu_item_ptr->page_num == first_page) {
             break;
