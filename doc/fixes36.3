@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1557526914 2019/05/10 22:21:54 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.1 $ $NHDT-Date: 1557569075 2019/05/11 10:04:35 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -19,6 +19,9 @@ Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
 
 Platform- and/or Interface-Specific Fixes or Features
 -----------------------------------------------------
+curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
+	but 0-9 should be reserved for counts and if the display was tall
+	enough for more than 62 entries, arbitrary ASCII punctuation got used
 
 
 General New Features
