@@ -226,7 +226,7 @@ VOBJ21 = wintty.o   wizard.o   worm.o	  worn.o     write.o
 VOBJ22 = zap.o	    light.o    dlb.o      dig.o      teleport.o
 VOBJ23 = random.o   region.o   sys.o
 
-SOBJ   = msdos.o    sound.o    pcsys.o	  tty.o	     unix.o    video.o \
+SOBJ   = msdos.o    pcsys.o	  tty.o	     unix.o    video.o \
 	vidtxt.o    pckeys.o
 
 VVOBJ  = version.o
@@ -527,7 +527,6 @@ spotless: clean
 	if exist $(SRC)\msdos.c	   del $(SRC)\msdos.c
 	if exist $(SRC)\pckeys.c   del $(SRC)\pckeys.c
 	if exist $(SRC)\video.c	   del $(SRC)\video.c
-	if exist $(SRC)\sound.c	   del $(SRC)\sound.c
 	if exist $(SRC)\tilemap.c  del $(SRC)\tilemap.c
 	if exist $(SRC)\gifread.c  del $(SRC)\gifread.c
 	if exist $(SRC)\ppmwrite.c del $(SRC)\ppmwrite.c
@@ -1086,8 +1085,6 @@ pckeys.o : $(HACK_H)  $(MSYS)\pckeys.c
 	@$(CC) $(CFLAGS) $(SPECOPTS) /Fo$@ $(MSYS)\pckeys.c
 pctiles.o : $(HACK_H)  $(MSYS)\pctiles.c $(MSYS)\portio.h
 	@$(CC) $(CFLAGS) $(SPECOPTS) /Fo$@ $(MSYS)\pctiles.c
-sound.o : $(HACK_H)  $(MSYS)\sound.c $(MSYS)\portio.h
-	@$(CC) $(CFLAGS) $(SPECOPTS) /Fo$@ $(MSYS)\sound.c
 video.o : $(HACK_H)  $(MSYS)\pcvideo.h $(MSYS)\portio.h $(MSYS)\video.c
 	@$(CC) $(CFLAGS) $(SPECOPTS) /Fo$@ $(MSYS)\video.c
 vidvga.o : $(HACK_H)  $(MSYS)\pcvideo.h $(MSYS)\portio.h $(TILE_H) \

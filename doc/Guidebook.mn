@@ -3768,9 +3768,6 @@ bulletproof input (MS-DOS sometimes treats \(oq\(haP\(cq as a printer toggle
 without it) (default off, OS/2, PC, and ST NetHack only).
 Note:  DEC Rainbows hang if this is turned on.
 Cannot be set with the \(oqO\(cq command.
-.lp soundcard
-(default on, PC NetHack only).
-Cannot be set with the \(oqO\(cq command.
 .lp subkeyvalue
 (Win32 tty NetHack only).
 May be used to alter the value of keystrokes that the operating system

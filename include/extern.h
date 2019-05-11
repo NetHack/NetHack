@@ -1106,10 +1106,6 @@ E int FDECL(macunlink, (const char *));
 
 E boolean NDECL(authorize_wizard_mode);
 
-/* ### macsnd.c ### */
-
-E void FDECL(mac_speaker, (struct obj *, char *));
-
 /* ### macunix.c ### */
 
 E void FDECL(regularize, (char *));
@@ -2308,12 +2304,6 @@ E void FDECL(play_sound_for_message, (const char *));
 E void NDECL(sys_early_init);
 E void NDECL(sysopt_release);
 E void FDECL(sysopt_seduce_set, (int));
-
-/* ### sys/msdos/sound.c ### */
-
-#ifdef MSDOS
-E int FDECL(assign_soundcard, (char *));
-#endif
 
 /* ### sp_lev.c ### */
 

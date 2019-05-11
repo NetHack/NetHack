@@ -382,9 +382,6 @@ static struct Comp_Opt {
       DISP_IN_GAME }, /*WC*/
     { "sortloot", "sort object selection lists by description", 4,
       SET_IN_GAME },
-#ifdef MSDOS
-    { "soundcard", "type of sound card to use", 20, SET_IN_FILE },
-#endif
     { "statushilites",
 #ifdef STATUS_HILITES
       "0=no status highlighting, N=show highlights for N turns",
@@ -3354,23 +3351,6 @@ boolean tinitial, tfrom_file;
         return retval;
     }
 #endif /* NO_TERMS */
-    /* soundcard:string -- careful not to match boolean 'sound' */
-    fullname = "soundcard";
-    if (match_optname(opts, fullname, 6, TRUE)) {
-        if (duplicate)
-            complain_about_duplicate(opts, 1);
-        if (negated) {
-            bad_negation(fullname, FALSE);
-            return FALSE;
-        } else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
-            return FALSE;
-        }
-        if (!assign_soundcard(opts)) {
-            config_error_add("Unknown error handling '%s'", fullname);
-            return FALSE;
-        }
-        return retval;
-    }
 #endif /* MSDOS */
 
     /* WINCAP
@@ -5715,10 +5695,6 @@ char *buf;
             }
     } else if (!strcmp(optname, "player_selection")) {
         Sprintf(buf, "%s", iflags.wc_player_selection ? "prompts" : "dialog");
-#ifdef MSDOS
-    } else if (!strcmp(optname, "soundcard")) {
-        Sprintf(buf, "%s", to_be_done);
-#endif
 #ifdef STATUS_HILITES
     } else if (!strcmp("statushilites", optname)) {
         if (!iflags.hilite_delta)

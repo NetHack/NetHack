@@ -777,7 +777,7 @@ OBJ01 =	$(O)alloc.o	$(RANDOM)	$(O)decl.o     	$(O)objects.o	\
 	$(O)music.o	$(O)rumors.o	$(O)dlb.o	$(O)sit.o 	\
 	$(O)bones.o	$(O)mklev.o	$(O)save.o	$(O)restore.o 	\
 	$(O)mkmaze.o	$(O)mkmap.o	$(O)end.o	$(O)o_init.o	\
-	$(O)options.o	$(O)rip.o       $(O)sound.o	$(O)teleport.o	\
+	$(O)options.o	$(O)rip.o       $(O)teleport.o	\
 	$(O)topten.o	$(O)tty.o	$(O)u_init.o	$(O)extralev.o 	\
 	$(O)sp_lev.o	$(O)dig.o	$(O)pckeys.o	$(O)role.o	\
 	$(O)steed.o	$(O)region.o
@@ -1707,12 +1707,6 @@ $(O)pctiles.B: $(PCHB) $(MSYS)\pctiles.c $(HACK_H) $(TILE_H) $(PCVIDEO_H)
 	@echo $(BCOPTS1) >> $(VROOMMCFG)
 	@echo $(BCOPTS2) $(CFLAGUB) >> $(VROOMMCFG)
 	$(CC) $(FLAGUB) $(COBJNAM)$@ $(MSYS)\pctiles.c
-
-$(O)sound.o: $(PCH0) $(MSYS)\sound.c   $(HACK_H) $(INCL)\portio.h
-	@type schema$(SCHEMA).bc | find "$(@B)_o" > $(VROOMMCFG)
-	@echo $(BCOPTS1) >> $(VROOMMCFG)
-	@echo $(BCOPTS2) $(CFLAGUO) >> $(VROOMMCFG)
-	$(CC) $(FLAGUO) $(COBJNAM)$@ $(MSYS)\sound.c
 
 $(O)pckeys.o: $(PCHO) $(MSYS)\pckeys.c   $(HACK_H) $(PCVIDEO_H)
 	@type schema$(SCHEMA).bc | find "$(@B)_o" > $(VROOMMCFG)

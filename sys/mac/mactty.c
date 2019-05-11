@@ -13,6 +13,7 @@
 #include "hack.h" /* to get flags */
 #include "mttypriv.h"
 #if !TARGET_API_MAC_CARBON
+#include <Sound.h>
 #include <Resources.h>
 #endif
 
@@ -322,6 +323,19 @@ do_set_port_font(tty_record *record)
     } else {
         TextMode(srcCopy);
     }
+}
+
+void
+tty_nhbell(void)
+{
+    Handle h = GetNamedResource('snd ', "\pNetHack Bell");
+
+    if (h) {
+        HLock(h);
+        SndPlay((SndChannelPtr) 0, (SndListHandle) h, 0);
+        ReleaseResource(h);
+    } else
+        SysBeep(30);
 }
 
 /*

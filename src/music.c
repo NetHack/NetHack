@@ -36,23 +36,6 @@ STATIC_DCL void FDECL(charm_monsters, (int));
 STATIC_DCL void FDECL(do_earthquake, (int));
 STATIC_DCL int FDECL(do_improvisation, (struct obj *));
 
-#ifdef UNIX386MUSIC
-STATIC_DCL int NDECL(atconsole);
-STATIC_DCL void FDECL(speaker, (struct obj *, char *));
-#endif
-#ifdef VPIX_MUSIC
-extern int sco_flag_console; /* will need changing if not _M_UNIX */
-STATIC_DCL void NDECL(playinit);
-STATIC_DCL void FDECL(playstring, (char *, size_t));
-STATIC_DCL void FDECL(speaker, (struct obj *, char *));
-#endif
-#ifdef PCMUSIC
-void FDECL(pc_speaker, (struct obj *, char *));
-#endif
-#ifdef AMIGA
-void FDECL(amii_speaker, (struct obj *, char *, int));
-#endif
-
 /*
  * Wake every monster in range...
  */
@@ -483,19 +466,6 @@ struct obj *instr;
             itmp.otyp -= 1;
             mundane = TRUE;
         }
-#ifdef MAC
-    mac_speaker(&itmp, "C");
-#endif
-#ifdef AMIGA
-    amii_speaker(&itmp, "Cw", AMII_OKAY_VOLUME);
-#endif
-#ifdef VPIX_MUSIC
-    if (sco_flag_console)
-        speaker(&itmp, "C");
-#endif
-#ifdef PCMUSIC
-    pc_speaker(&itmp, "C");
-#endif
 
 #define PLAY_NORMAL   0x00
 #define PLAY_STUNNED  0x01
@@ -674,46 +644,13 @@ struct obj *instr;
 
             /* convert to uppercase and change any "H" to the expected "B" */
             for (s = buf; *s; s++) {
-#ifndef AMIGA
                 *s = highc(*s);
-#else
-                /* The AMIGA supports two octaves of notes */
-                if (*s == 'h')
-                    *s = 'b';
-#endif
                 if (*s == 'H')
                     *s = 'B';
             }
         }
         You("extract a strange sound from %s!", the(xname(instr)));
-#ifdef UNIX386MUSIC
-        /* if user is at the console, play through the console speaker */
-        if (atconsole())
-            speaker(instr, buf);
-#endif
-#ifdef VPIX_MUSIC
-        if (sco_flag_console)
-            speaker(instr, buf);
-#endif
-#ifdef MAC
-        mac_speaker(instr, buf);
-#endif
-#ifdef PCMUSIC
-        pc_speaker(instr, buf);
-#endif
-#ifdef AMIGA
-        {
-            char nbuf[20];
-            int i;
 
-            for (i = 0; buf[i] && i < 5; ++i) {
-                nbuf[i * 2] = buf[i];
-                nbuf[(i * 2) + 1] = 'h';
-            }
-            nbuf[i * 2] = 0;
-            amii_speaker(instr, nbuf, AMII_OKAY_VOLUME);
-        }
-#endif
         /* Check if there was the Stronghold drawbridge near
          * and if the tune conforms to what we're waiting for.
          */
@@ -795,146 +732,5 @@ nevermind:
     pline1(Never_mind);
     return 0;
 }
-
-#ifdef UNIX386MUSIC
-/*
- * Play audible music on the machine's speaker if appropriate.
- */
-
-STATIC_OVL int
-atconsole()
-{
-    /*
-     * Kluge alert: This code assumes that your [34]86 has no X terminals
-     * attached and that the console tty type is AT386 (this is always true
-     * under AT&T UNIX for these boxen). The theory here is that your remote
-     * ttys will have terminal type `ansi' or something else other than
-     * `AT386' or `xterm'. We'd like to do better than this, but testing
-     * to see if we're running on the console physical terminal is quite
-     * difficult given the presence of virtual consoles and other modern
-     * UNIX impedimenta...
-     */
-    char *termtype = nh_getenv("TERM");
-
-    return (!strcmp(termtype, "AT386") || !strcmp(termtype, "xterm"));
-}
-
-STATIC_OVL void
-speaker(instr, buf)
-struct obj *instr;
-char *buf;
-{
-    /*
-     * For this to work, you need to have installed the PD speaker-control
-     * driver for PC-compatible UNIX boxes that I (esr@snark.thyrsus.com)
-     * posted to comp.sources.unix in Feb 1990.  A copy should be included
-     * with your nethack distribution.
-     */
-    int fd;
-
-    if ((fd = open("/dev/speaker", 1)) != -1) {
-        /* send a prefix to modify instrumental `timbre' */
-        switch (instr->otyp) {
-        case WOODEN_FLUTE:
-        case MAGIC_FLUTE:
-            (void) write(fd, ">ol", 1); /* up one octave & lock */
-            break;
-        case TOOLED_HORN:
-        case FROST_HORN:
-        case FIRE_HORN:
-            (void) write(fd, "<<ol", 2); /* drop two octaves & lock */
-            break;
-        case BUGLE:
-            (void) write(fd, "ol", 2); /* octave lock */
-            break;
-        case WOODEN_HARP:
-        case MAGIC_HARP:
-            (void) write(fd, "l8mlol", 4); /* fast, legato, octave lock */
-            break;
-        }
-        (void) write(fd, buf, strlen(buf));
-        (void) nhclose(fd);
-    }
-}
-#endif /* UNIX386MUSIC */
-
-#ifdef VPIX_MUSIC
-
-#if 0
-#include <sys/types.h>
-#include <sys/console.h>
-#include <sys/vtkd.h>
-#else
-#define KIOC ('K' << 8)
-#define KDMKTONE (KIOC | 8)
-#endif
-
-#define noDEBUG
-
-/* emit tone of frequency hz for given number of ticks */
-STATIC_OVL void
-tone(hz, ticks)
-unsigned int hz, ticks;
-{
-    ioctl(0, KDMKTONE, hz | ((ticks * 10) << 16));
-#ifdef DEBUG
-    printf("TONE: %6d %6d\n", hz, ticks * 10);
-#endif
-    nap(ticks * 10);
-}
-
-/* rest for given number of ticks */
-STATIC_OVL void
-rest(ticks)
-int ticks;
-{
-    nap(ticks * 10);
-#ifdef DEBUG
-    printf("REST:        %6d\n", ticks * 10);
-#endif
-}
-
-#include "interp.c" /* from snd86unx.shr */
-
-STATIC_OVL void
-speaker(instr, buf)
-struct obj *instr;
-char *buf;
-{
-    /* emit a prefix to modify instrumental `timbre' */
-    playinit();
-    switch (instr->otyp) {
-    case WOODEN_FLUTE:
-    case MAGIC_FLUTE:
-        playstring(">ol", 1); /* up one octave & lock */
-        break;
-    case TOOLED_HORN:
-    case FROST_HORN:
-    case FIRE_HORN:
-        playstring("<<ol", 2); /* drop two octaves & lock */
-        break;
-    case BUGLE:
-        playstring("ol", 2); /* octave lock */
-        break;
-    case WOODEN_HARP:
-    case MAGIC_HARP:
-        playstring("l8mlol", 4); /* fast, legato, octave lock */
-        break;
-    }
-    playstring(buf, strlen(buf));
-}
-
-#ifdef VPIX_DEBUG
-main(argc, argv)
-int argc;
-char *argv[];
-{
-    if (argc == 2) {
-        playinit();
-        playstring(argv[1], strlen(argv[1]));
-    }
-}
-#endif
-#endif /* VPIX_MUSIC */
 
 /*music.c*/

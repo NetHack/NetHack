@@ -341,7 +341,7 @@ VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
 VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
 VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)
 
-SOBJ   = $(O)msdos.o    $(O)sound.o   $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
+SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
 
 VVOBJ  = $(O)version.o
@@ -1056,9 +1056,6 @@ $(O)pckeys.o : $(HACK_H)  $(MSYS)/pckeys.c
 
 $(O)pctiles.o : $(HACK_H)  $(MSYS)/pctiles.c $(MSYS)/portio.h
 	$(CC) $(cflags) -I$(MSYS) -I$(WSHR) -o$@ $(MSYS)/pctiles.c
-
-$(O)sound.o : $(HACK_H)  $(MSYS)/sound.c $(MSYS)/portio.h
-#	$(CC) $(cflags) -o$@ $(MSYS)/sound.c
 
 $(O)video.o : $(HACK_H)  $(MSYS)/pcvideo.h $(MSYS)/portio.h $(MSYS)/video.c
 #	$(CC) $(cflags) -o$@ -I$(MSYS) $(MSYS)/video.c
