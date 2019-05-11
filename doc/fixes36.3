@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1557358216 2019/05/08 23:30:16 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1557526914 2019/05/10 22:21:54 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -7,6 +7,10 @@ focus will shift to the next major release.
 
 General Fixes and Modified Features
 -----------------------------------
+when place_object() puts a non-boulder on the map at a spot which contains
+	other objects, put it under all boulders in the pile rather than just
+	under the top one; previously, map wasn't showing a boulder there if
+	the top one got moved by means other than pushing
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -19,6 +23,8 @@ Platform- and/or Interface-Specific Fixes or Features
 
 General New Features
 --------------------
+classify sources as released, beta, or work-in-progress via NH_DEVEL_STATUS
+	rather than just released vs beta via BETA
 
 
 NetHack Community Patches (or Variation) Included
