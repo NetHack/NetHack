@@ -43,6 +43,8 @@
 /* #define SHORT_FILENAMES */ /* All NT filesystems support long names now
  */
 
+#define VERSION_IN_DLB_FILENAME     /* Append version digits to nhdat */
+
 #ifdef MICRO
 #undef MICRO /* never define this! */
 #endif
