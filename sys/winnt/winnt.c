@@ -212,6 +212,9 @@ return &szFullPath[0];
 }
 #endif
 
+extern void NDECL(mswin_raw_print_flush);
+extern void FDECL(mswin_raw_print, (const char *));
+
 /* fatal error */
 /*VARARGS1*/
 void error
@@ -233,6 +236,8 @@ VA_DECL(const char *, s)
         Strcat(buf, "\n");
         raw_printf(buf);
     }
+    if (windowprocs.win_raw_print == mswin_raw_print)
+        mswin_raw_print_flush();
     VA_END();
     exit(EXIT_FAILURE);
 }
