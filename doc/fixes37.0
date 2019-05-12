@@ -1,11 +1,11 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $ $NHDT-Date: 1557663016 2019/05/12 12:10:16 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ $NHDT-Date: 1557663358 2019/05/12 12:15:58 $
 
 General Fixes and Modified Features
 -----------------------------------
 fix compile when DLB isn't defined
 
 
-Fixes to Post-3.7.0 Problems that Were Exposed Via git Repository
+Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
 
 
