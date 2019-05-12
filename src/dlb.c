@@ -4,6 +4,9 @@
 
 #include "config.h"
 #include "dlb.h"
+#if defined(VERSION_IN_DLB_FILENAME)
+#include "patchlevel.h"
+#endif
 
 #ifdef __DJGPP__
 #include <string.h>
@@ -37,6 +40,10 @@ typedef struct dlb_procs {
     int FDECL((*dlb_fgetc_proc), (DLB_P));
     long FDECL((*dlb_ftell_proc), (DLB_P));
 } dlb_procs_t;
+
+#if defined(VERSION_IN_DLB_FILENAME)
+char dlbfilename[MAX_DLB_FILENAME];
+#endif
 
 /* without extern.h via hack.h, these haven't been declared for us */
 extern FILE *FDECL(fopen_datafile, (const char *, const char *, int));
@@ -240,7 +247,9 @@ lib_dlb_init(VOID_ARGS)
 {
     /* zero out array */
     (void) memset((char *) &dlb_libs[0], 0, sizeof(dlb_libs));
-
+#ifdef VERSION_IN_DLB_FILENAME
+    build_dlb_filename((const char *) 0);
+#endif
     /* To open more than one library, add open library calls here. */
     if (!open_library(DLBFILE, &dlb_libs[0]))
         return FALSE;
@@ -262,6 +271,17 @@ lib_dlb_cleanup(VOID_ARGS)
     for (i = 0; i < MAX_LIBS && dlb_libs[i].fdata; i++)
         close_library(&dlb_libs[i]);
 }
+
+#ifdef VERSION_IN_DLB_FILENAME
+char *
+build_dlb_filename(lf)
+const char *lf;
+{
+    Sprintf(dlbfilename, "%s%d%d%d",
+            lf ? lf : DLBBASENAME, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+    return dlbfilename;
+}
+#endif
 
 /*ARGSUSED*/
 STATIC_OVL boolean

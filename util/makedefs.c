@@ -1522,7 +1522,11 @@ static const char *build_opts[] = {
     "ZLIB data file compression",
 #endif
 #ifdef DLB
+#ifndef VERSION_IN_DLB_FILENAME
     "data librarian",
+#else
+    "data librarian with a version-dependent name",
+#endif
 #endif
 #ifdef DUMPLOG
     "end-of-game dumplogs",

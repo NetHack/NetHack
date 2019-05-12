@@ -198,6 +198,9 @@ char **argv;
             if (ap == argc)
                 usage();
             library_file = argv[ap++];
+#ifdef VERSION_IN_DLB_FILENAME
+            library_file = build_dlb_filename(library_file);
+#endif
             if (fseen)
                 printf("Warning: multiple f options.  Previous ignored.\n");
             fseen = 1;
