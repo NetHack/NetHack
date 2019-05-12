@@ -282,4 +282,5 @@ extern void FDECL(nhassert_failed, (const char * exp, const char * file,
 
 #define nethack_enter(argc, argv) nethack_enter_winnt()
 extern void FDECL(nethack_exit, (int)) NORETURN;
+extern boolean FDECL(file_exists, (const char *));
 #endif /* NTCONF_H */

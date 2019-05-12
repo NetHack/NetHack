@@ -240,35 +240,34 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 /*
  * It seems you really want to play.
  */
-
     if (argc >= 1
         && !strcmpi(default_window_sys, "mswin")
         && (strstri(argv[0], "nethackw.exe") || GUILaunched))
-            iflags.windowtype_locked = TRUE;
-
+        iflags.windowtype_locked = TRUE;
     windowtype = default_window_sys;
+
+    if (!dlb_init()) {
+        pline("%s\n%s\n%s\n%s\n\n",
+              copyright_banner_line(1), copyright_banner_line(2),
+              copyright_banner_line(3), copyright_banner_line(4));
+        pline("NetHack was unable to open the required file \"%s\"",DLBFILE);
+        if (file_exists(DLBFILE))
+            pline("\nAre you perhaps trying to run NetHack within a zip utility?");
+        error("dlb_init failure.");
+    }
+
     if (!iflags.windowtype_locked) {
 #if defined(TTY_GRAPHICS)
         Strcpy(default_window_sys, "tty");
 #else
 #if defined(CURSES_GRAPHICS)
-        Strcpy(default_window_sys, "curses");    
+        Strcpy(default_window_sys, "curses");
 #endif /* CURSES */
 #endif /* TTY */
         if (iflags.windowtype_deferred && chosen_windowtype[0])
             windowtype = chosen_windowtype;
     }
     choose_windows(windowtype);
-
-    if (!dlb_init()) {
-        pline(
-            "%s\n%s\n%s\n%s\n\nNetHack was unable to open the required file "
-            "\"%s\".%s",
-            copyright_banner_line(1), copyright_banner_line(2),
-            copyright_banner_line(3), copyright_banner_line(4), DLBFILE,
-            "\nAre you perhaps trying to run NetHack within a zip utility?");
-        error("dlb_init failure.");
-    }
 
     u.uhp = 1; /* prevent RIP on early quits */
     u.ux = 0;  /* prevent flush_screen() */
@@ -930,5 +929,18 @@ gotlock:
     }
 }
 #endif /* PC_LOCKING */
+
+boolean
+file_exists(path)
+const char *path;
+{
+    struct stat sb;
+
+    /* Just see if it's there */
+    if (stat(path, &sb)) {
+        return FALSE;
+    }
+    return TRUE;
+}
 
 /*windmain.c*/
