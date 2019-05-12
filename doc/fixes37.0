@@ -1,7 +1,8 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $ $NHDT-Date: 1544917667 2018/12/15 23:47:47 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $ $NHDT-Date: 1557663016 2019/05/12 12:10:16 $
 
 General Fixes and Modified Features
 -----------------------------------
+fix compile when DLB isn't defined
 
 
 Fixes to Post-3.7.0 Problems that Were Exposed Via git Repository
@@ -28,3 +29,6 @@ NetHack Community Patches (or Variation) Included
 
 Code Cleanup and Reorganization
 -------------------------------
+move majority of global variables into instance_globals struct g
+move zeroobj, zeromonst, zeroany into const_globals struct cg
+
