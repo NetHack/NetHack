@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1555627307 2019/04/18 22:41:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1558045586 2019/05/16 22:26:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1042,7 +1042,10 @@ struct permonst **for_supplement;
      */
 
     if (found > 4)
-        Sprintf(out_str, "%s", "That can be many things");
+        /* 3.6.3: this used to be "That can be many things" (without prefix)
+           which turned it into a sentence that lacked its terminating period;
+           we could add one below but reinstating the prefix here is better */
+        Sprintf(out_str, "%scan be many things", prefix);
 
  didlook:
     if (looked) {
