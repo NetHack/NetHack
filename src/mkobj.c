@@ -2837,7 +2837,12 @@ struct obj *otmp2;
              * they'll be out of our view (minvent or container)
              * so don't actually show anything */
         } else if (onfloor || inpack) {
-            pline("The %s coalesce%s.", makeplural(obj_typename(otmp->otyp)),
+            boolean adj = ((otmp->ox != u.ux || otmp->oy != u.uy) &&
+                              (otmp2->ox != u.ux || otmp2->oy != u.uy));
+
+            pline("The %s%s coalesce%s.",
+                  (onfloor && adj) ? "adjacent " : "",
+                  makeplural(obj_typename(otmp->otyp)),
                   inpack ? " inside your pack" : "");
         }
     } else {
