@@ -4203,7 +4203,7 @@ struct obj *otmp;
 char *buf;
 {
     if (otmp && buf && otmp->globby && otmp->quan == 1L) {
-        Sprintf(buf, "%ld aum, ", otmp->owt);
+        Sprintf(buf, "%d aum, ", (int) otmp->owt);
         return buf;
     }
     return "";
