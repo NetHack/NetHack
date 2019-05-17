@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1557526914 2019/05/10 22:21:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1558124913 2019/05/17 20:28:33 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,6 +18,7 @@ STATIC_DCL const char *FDECL(where_name, (struct obj *));
 STATIC_DCL void FDECL(insane_object, (struct obj *, const char *,
                                       const char *, struct monst *));
 STATIC_DCL void FDECL(check_contained, (struct obj *, const char *));
+STATIC_DCL void FDECL(check_glob, (struct obj *, const char *));
 STATIC_DCL void FDECL(sanity_check_worn, (struct obj *));
 
 struct icp {
@@ -2352,6 +2353,8 @@ const char *mesg;
                 }
                 break;
             }
+            if (obj->globby)
+                check_glob(obj, mesg);
         }
     }
 }
@@ -2366,7 +2369,8 @@ const char *mesg;
     struct obj *obj, *mwep;
 
     for (mon = monlist; mon; mon = mon->nmon) {
-        if (DEADMONSTER(mon)) continue;
+        if (DEADMONSTER(mon))
+            continue;
         mwep = MON_WEP(mon);
         if (mwep) {
             if (!mcarried(mwep))
@@ -2379,6 +2383,8 @@ const char *mesg;
                 insane_object(obj, mfmt1, mesg, mon);
             if (obj->ocarry != mon)
                 insane_object(obj, mfmt2, mesg, mon);
+            if (obj->globby)
+                check_glob(obj, mesg);
             check_contained(obj, mesg);
         }
     }
@@ -2429,7 +2435,8 @@ struct monst *mon;
         impossible(altfmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj),
               objnm, fmt_ptr((genericptr_t) mon), monnm);
     } else {
-        impossible(fmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj), objnm);
+        impossible(fmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj),
+                   objnm);
     }
 }
 
@@ -2461,6 +2468,8 @@ const char *mesg;
                   fmt_ptr((genericptr_t) obj),
                   fmt_ptr((genericptr_t) obj->ocontainer),
                   fmt_ptr((genericptr_t) container));
+        if (obj->globby)
+            check_glob(obj, mesg);
 
         if (Has_contents(obj)) {
             /* catch most likely indirect cycle; we won't notice if
@@ -2472,11 +2481,33 @@ const char *mesg;
                and "nested contained..." to "nested nested contained..." */
             Strcpy(nestedmesg, "nested ");
             copynchars(eos(nestedmesg), mesg, (int) sizeof nestedmesg
-                                                  - (int) strlen(nestedmesg)
-                                                  - 1);
+                                              - (int) strlen(nestedmesg) - 1);
             /* recursively check contents */
             check_contained(obj, nestedmesg);
         }
+    }
+}
+
+/* called when 'obj->globby' is set so we don't recheck it here */
+STATIC_OVL void
+check_glob(obj, mesg)
+struct obj *obj;
+const char *mesg;
+{
+#define LOWEST_GLOB GLOB_OF_GRAY_OOZE
+#define HIGHEST_GLOB GLOB_OF_BLACK_PUDDING
+    if (obj->quan != 1L || obj->owt == 0
+        || obj->otyp < LOWEST_GLOB || obj->otyp > HIGHEST_GLOB
+        /* a partially eaten glob could have any non-zero weight but an
+           intact one should weigh an exact multiple of base weight (20) */
+        || ((obj->owt % objects[obj->otyp].oc_weight) != 0 && !obj->oeaten)) {
+        char mesgbuf[BUFSZ], globbuf[QBUFSZ];
+
+        Sprintf(globbuf, " glob %d,quan=%ld,owt=%u ",
+                obj->otyp, obj->quan, obj->owt);
+        mesg = strsubst(strcpy(mesgbuf, mesg), " obj ", globbuf);
+        insane_object(obj, ofmt0, mesg,
+                      (obj->where == OBJ_MINVENT) ? obj->ocarry : 0);
     }
 }
 
