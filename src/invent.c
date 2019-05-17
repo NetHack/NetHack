@@ -715,7 +715,8 @@ struct obj **potmp, **pobj;
             otmp->age = ((otmp->age * otmp->quan) + (obj->age * obj->quan))
                         / (otmp->quan + obj->quan);
 
-        otmp->quan += obj->quan;
+        if (!otmp->globby)
+            otmp->quan += obj->quan;
         /* temporary special case for gold objects!!!! */
         if (otmp->oclass == COIN_CLASS)
             otmp->owt = weight(otmp), otmp->bknown = 0;

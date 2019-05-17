@@ -25,6 +25,7 @@ STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
 STATIC_DCL char *FDECL(singplur_compound, (char *));
 STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
 STATIC_DCL boolean FDECL(badman, (const char *, BOOLEAN_P));
+STATIC_DCL char *FDECL(globwt, (struct obj *, char *));
 
 struct Jitem {
     int item;
@@ -1214,11 +1215,12 @@ unsigned doname_flags;
     } else if (with_price) { /* on floor or in container on floor */
         int nochrg = 0;
         long price = get_cost_of_shop_item(obj, &nochrg);
+        char globbuf[BUFSZ];
 
         if (price > 0L)
-            Sprintf(eos(bp), " (%s, %ld %s)",
+            Sprintf(eos(bp), " (%s, %s%ld %s)",
                     nochrg ? "contents" : "for sale",
-                    price, currency(price));
+                    globwt(obj, globbuf), price, currency(price));
         else if (nochrg > 0)
             Strcat(bp, " (no charge)");
     }
@@ -4193,6 +4195,18 @@ const char *lastR;
     }
     /* assert( strlen(qbuf) < QBUFSZ ); */
     return qbuf;
+}
+
+STATIC_OVL char *
+globwt(otmp, buf)
+struct obj *otmp;
+char *buf;
+{
+    if (otmp && buf && otmp->globby && otmp->quan == 1L) {
+        Sprintf(buf, "%ld aum, ", otmp->owt);
+        return buf;
+    }
+    return "";
 }
 
 /*objnam.c*/

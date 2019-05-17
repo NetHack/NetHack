@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.1 $ $NHDT-Date: 1557569075 2019/05/11 10:04:35 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.3 $ $NHDT-Date: 1558045586 2019/05/16 22:26:26 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -11,6 +11,10 @@ when place_object() puts a non-boulder on the map at a spot which contains
 	other objects, put it under all boulders in the pile rather than just
 	under the top one; previously, map wasn't showing a boulder there if
 	the top one got moved by means other than pushing
+when examining the map with '/' or ';', picking a symbol which is used for
+	more than 4 things yielded a sentence lacking its terminating period
+billing and payment issue as a result of glob coalescing
+glob pricing did not consider weight properly
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
