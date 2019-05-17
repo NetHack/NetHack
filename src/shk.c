@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1557508281 2019/05/10 17:11:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.161 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1558124088 2019/05/17 20:14:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4802,8 +4802,8 @@ sasc_bug(struct obj *op, unsigned x)
 
 /*
  * When one glob is absorbed by another glob, the two become
- * become indistinguishable and the remaining glob grows in
- * mass, the product of both.
+ * indistinguishable and the remaining glob grows in mass,
+ * the product of both.
  *
  * The original billed item is lost to the absorption and the
  * original billed amount for the object being absorbed gets
@@ -4875,7 +4875,6 @@ struct obj *obj_absorber, *obj_absorbed;
     if (obj_absorber->where == OBJ_FLOOR
             && costly_spot(obj_absorber->ox, obj_absorber->oy)) {
         int x = obj_absorber->ox, y = obj_absorber->oy;
-        char *o_shop = in_rooms(x, y, SHOPBASE);
         struct monst *shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
         struct eshk *eshkp = ESHK(shkp);
         long amount, per_unit_cost = get_cost(obj_absorbed, shkp);
