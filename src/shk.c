@@ -75,6 +75,7 @@ STATIC_DCL void FDECL(deserted_shop, (char *));
 STATIC_DCL boolean FDECL(special_stock, (struct obj *, struct monst *,
                                          BOOLEAN_P));
 STATIC_DCL const char *FDECL(cad, (BOOLEAN_P));
+STATIC_DCL long FDECL(get_pricing_units, (struct obj *obj));
 
 /*
         invariants: obj->unpaid iff onbill(obj) [unless bp->useup]
@@ -2015,12 +2016,32 @@ int *nochrg; /* alternate return value: 1: no charge, 0: shop owned,        */
            items on freespot are implicitly 'no charge' */
         *nochrg = (top->where == OBJ_FLOOR && (obj->no_charge || freespot));
 
-        if (carried(top) ? (int) obj->unpaid : !*nochrg)
-            cost = obj->quan * get_cost(obj, shkp);
+        if (carried(top) ? (int) obj->unpaid : !*nochrg) {
+            long per_unit_cost = get_cost(obj, shkp);
+
+            cost = get_pricing_units(obj) * per_unit_cost;
+        }
         if (Has_contents(obj) && !freespot)
             cost += contained_cost(obj, shkp, 0L, FALSE, TRUE);
     }
     return cost;
+}
+
+STATIC_OVL long
+get_pricing_units(obj)
+struct obj *obj;
+{
+    long units = obj->quan;
+
+    if (obj->globby) {
+        /* globs must be sold by weight not by volume */
+        int unit_weight = (int) objects[obj->otyp].oc_weight,
+            wt = (obj->owt > 0) ? obj->owt : weight(obj);
+
+        if (unit_weight)
+            units = wt / unit_weight;
+    }
+    return units;
 }
 
 /* decide whether to apply a surcharge (or hypothetically, a discount) to obj
@@ -2191,7 +2212,7 @@ boolean unpaid_only;
                items on freespot are implicitly 'no charge' */
             if (on_floor ? (!otmp->no_charge && !freespot)
                          : (otmp->unpaid || !unpaid_only))
-                price += get_cost(otmp, shkp) * otmp->quan;
+                price += get_cost(otmp, shkp) * get_pricing_units(otmp);
         }
 
         if (Has_contents(otmp))
@@ -2304,7 +2325,9 @@ set_cost(obj, shkp)
 register struct obj *obj;
 register struct monst *shkp;
 {
-    long tmp = getprice(obj, TRUE) * obj->quan, multiplier = 1L, divisor = 1L;
+    long tmp, unit_price = getprice(obj, TRUE), multiplier = 1L, divisor = 1L;
+
+    tmp = get_pricing_units(obj) * unit_price;
 
     if (uarmh && uarmh->otyp == DUNCE_CAP)
         divisor *= 3L;
@@ -2480,6 +2503,9 @@ struct monst *shkp;
     } else
         bp->useup = 0;
     bp->price = get_cost(obj, shkp);
+    if (obj->globby)
+        /* for globs, the amt charged for quan 1 depends on owt */
+        bp->price *= get_pricing_units(obj);
     eshkp->billct++;
     obj->unpaid = 1;
 }
@@ -2621,9 +2647,11 @@ boolean ininv, dummy, silent;
     ltmp = cltmp = gltmp = 0L;
     container = Has_contents(obj);
 
-    if (!obj->no_charge)
+    if (!obj->no_charge) {
         ltmp = get_cost(obj, shkp);
-
+        if (obj->globby)
+            ltmp *= get_pricing_units(obj);
+    }
     if (obj->no_charge && !container) {
         obj->no_charge = 0;
         return;
@@ -2851,7 +2879,7 @@ boolean ininv;
         if (billamt)
             price += billamt;
         else if (ininv ? otmp->unpaid : !otmp->no_charge)
-            price += otmp->quan * get_cost(otmp, shkp);
+            price += get_pricing_units(otmp) * get_cost(otmp, shkp);
 
         if (Has_contents(otmp))
             price = stolen_container(otmp, shkp, price, ininv);
@@ -2898,7 +2926,7 @@ boolean peaceful, silent;
         if (billamt)
             value += billamt;
         else if (!obj->no_charge)
-            value += obj->quan * get_cost(obj, shkp);
+            value += get_pricing_units(obj) * get_cost(obj, shkp);
 
         if (Has_contents(obj)) {
             boolean ininv =
@@ -4277,6 +4305,8 @@ register struct obj *first_obj;
         contentsonly = !cost;
         if (Has_contents(otmp))
             cost += contained_cost(otmp, shkp, 0L, FALSE, FALSE);
+        if (otmp->globby)
+            cost *= get_pricing_units(otmp);  /* always quan 1, vary by wt */
         if (!cost) {
             Strcpy(price, "no charge");
             contentsonly = FALSE;
@@ -4769,5 +4799,122 @@ sasc_bug(struct obj *op, unsigned x)
     op->unpaid = x;
 }
 #endif
+
+/*
+ * When one glob is absorbed by another glob, the two become
+ * become indistinguishable and the remaining glob grows in
+ * mass, the product of both.
+ *
+ * The original billed item is lost to the absorption and the
+ * original billed amount for the object being absorbed gets
+ * added to the cost owing for the absorber, and the separate
+ * cost for the absorbed object goes away.
+ */
+void
+globby_bill_fixup(obj_absorber, obj_absorbed)
+struct obj *obj_absorber, *obj_absorbed;
+{
+    struct bill_x *bp, *bp_absorber = (struct bill_x *) 0;
+    struct monst *shkp = 0;
+
+    if (!obj_absorber->globby)
+        impossible("globby_bill_fixup called for non-globby object");
+
+    if (obj_absorber->unpaid) {
+        /* look for a shopkeeper who owns this object */
+        for (shkp = next_shkp(fmon, TRUE); shkp;
+             shkp = next_shkp(shkp->nmon, TRUE))
+            if (onbill(obj_absorber, shkp, TRUE))
+                break;
+    }
+    /* sanity check, in case obj is on bill but not marked 'unpaid' */
+    if (!shkp)
+        shkp = shop_keeper(*u.ushops);
+
+    if ((bp_absorber = onbill(obj_absorber, shkp, FALSE)) != 0) {
+        bp = onbill(obj_absorbed, shkp, FALSE);
+        if (bp) {
+            bp_absorber->price += bp->price;
+            ESHK(shkp)->billct--;
+#ifdef DUMB
+            {
+                /* DRS/NS 2.2.6 messes up -- Peter Kendell */
+                int indx = ESHK(shkp)->billct;
+
+                *bp = ESHK(shkp)->bill_p[indx];
+            }
+#else
+            *bp = ESHK(shkp)->bill_p[ESHK(shkp)->billct];
+#endif
+            clear_unpaid_obj(shkp, obj_absorbed);
+        } else {
+            /* should never happen */
+            bp_absorber->price += get_cost(obj_absorbed, shkp)
+                                    * get_pricing_units(obj_absorbed);
+        }
+    }
+}
+
+/*
+ * The caller is about to make obj_absorbed go away.
+ *
+ * There's no way for you (or a shopkeeper) to prevent globs
+ * from merging with each other on the floor due to the
+ * inherent nature of globs so it irretrievably becomes part
+ * of the floor glob mass.
+ *
+ * globby_donation() needs to handle whether/how to
+ * compensate you for that.
+ *
+ * unpaid globs don't end up here.
+ */
+void
+globby_donation(obj_absorber, obj_absorbed)
+struct obj *obj_absorber, *obj_absorbed;
+{
+    if (obj_absorber->where == OBJ_FLOOR
+            && costly_spot(obj_absorber->ox, obj_absorber->oy)) {
+        int x = obj_absorber->ox, y = obj_absorber->oy;
+        char *o_shop = in_rooms(x, y, SHOPBASE);
+        struct monst *shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
+        struct eshk *eshkp = ESHK(shkp);
+        long amount, per_unit_cost = get_cost(obj_absorbed, shkp);
+
+        if (saleable(shkp, obj_absorbed)) {
+            amount = get_pricing_units(obj_absorbed) * per_unit_cost;
+            if (eshkp->debit >= amount) {
+                if (eshkp->loan) { /* you carry shop's gold */
+                    if (eshkp->loan >= amount)
+                        eshkp->loan -= amount;
+                    else
+                        eshkp->loan = 0L;
+                }
+                eshkp->debit -= amount;
+                pline_The("donated %s %spays off your debt.",
+                          obj_typename(obj_absorbed->otyp),
+                          eshkp->debit ? "partially " : "");
+            } else {
+                long delta = amount - eshkp->debit;
+
+                eshkp->credit += delta;
+                if (eshkp->debit) {
+                    eshkp->debit = 0L;
+                    eshkp->loan = 0L;
+                    Your("debt is paid off.");
+                }
+                if (eshkp->credit == delta)
+                    pline_The("%s established %ld %s credit.",
+                              obj_typename(obj_absorbed->otyp),
+                              delta, currency(delta));
+                else
+                    pline_The("%s added %ld %s %s %ld %s.",
+                              obj_typename(obj_absorbed->otyp),
+                              delta, currency(delta),
+                              "to your credit; total is now",
+                              eshkp->credit, currency(eshkp->credit));
+            }
+        }
+    }
+}
 
 /*shk.c*/

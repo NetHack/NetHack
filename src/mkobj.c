@@ -2755,6 +2755,10 @@ struct obj **obj1, **obj2;
         otmp1 = *obj1;
         otmp2 = *obj2;
         if (otmp1 && otmp2 && otmp1 != otmp2) {
+            if (otmp1->unpaid || otmp2->unpaid)
+                globby_bill_fixup(otmp1, otmp2);
+            else if (costly_spot(otmp1->ox, otmp1->oy))
+                globby_donation(otmp1, otmp2);
             if (otmp1->bknown != otmp2->bknown)
                 otmp1->bknown = otmp2->bknown = 0;
             if (otmp1->rknown != otmp2->rknown)
