@@ -398,15 +398,27 @@ curses_count_window(const char *count_text)
 
     /* if most recent message (probably prompt leading to this instance of
        counting window) is going to be covered up, scroll mesgs up a line */
-    if (!counting && my + 1 >= border + messageh) {
+    if (!counting && my >= border + (messageh - 1)) {
         scroll_window(MESSAGE_WIN);
-        /* last position within the message window */
-        my = border + (messageh - 1) - 1;
-        mx = border;
+        if (messageh > 1) {
+            /* handling for next message will behave as if we're currently
+               positioned at the end of next to last line of message window */
+            my = border + (messageh - 1) - 1;
+            mx = border + (messagew - 1); /* (0 + 80 - 1) or (1 + 78 - 1) */
+        } else {
+            /* for a one-line window, use beginning of only line instead */
+            my = mx = border; /* 0 or 1 */
+        }
         /* wmove(curses_get_nhwin(MESSAGE_WIN), my, mx); -- not needed */
     }
-    counting = TRUE;
+    /* in case we're being called from clear_nhwindow(MESSAGE_WIN)
+       which gets called for every command keystroke; it sends an
+       empty string to get the scroll-up-one-line effect above and
+       we want to avoid the curses overhead for the operations below... */
+    if (!*count_text)
+        return;
 
+    counting = TRUE;
 #ifdef PDCURSES
     if (countwin)
         curses_destroy_win(countwin), countwin = NULL;
