@@ -260,6 +260,9 @@ curses_create_main_windows()
 
         if (curses_get_nhwin(STATUS_WIN)) {
             curses_del_nhwin(STATUS_WIN);
+            /* 'count window' overlays last line of mesg win;
+               asking it to display a Null string removes it */
+            curses_count_window((char *) 0);
             curses_del_nhwin(MESSAGE_WIN);
             curses_del_nhwin(MAP_WIN);
             curses_del_nhwin(INV_WIN);

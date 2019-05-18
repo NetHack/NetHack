@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.3 $ $NHDT-Date: 1558045586 2019/05/16 22:26:26 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.5 $ $NHDT-Date: 1558171542 2019/05/18 09:25:42 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -26,6 +26,12 @@ Platform- and/or Interface-Specific Fixes or Features
 curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
 	but 0-9 should be reserved for counts and if the display was tall
 	enough for more than 62 entries, arbitrary ASCII punctuation got used
+curses: when all available lines in the message window are in use,
+	autodescribe feedback for 'pick a position with cursor' overwrote
+	the last line (usually the 'pick a position' prompt/hint), sometimes
+	leaving part of longer underlying line's text visible
+curses: if message window is only one line, cancelling some prompts with ESC
+	left the prompts visible on the message line instead of erasing them
 Windows: some startup error messages were not being delivered successfully
 
 

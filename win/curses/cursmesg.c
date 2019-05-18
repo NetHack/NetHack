@@ -164,7 +164,7 @@ curses_got_input(void)
 
     /* misleadingly named; represents number of lines delivered since
        player was sure to have had a chance to read them; if player
-       has just given input then there aren't any such lines right;
+       has just given input then there aren't any such lines right now;
        that includes responding to More>> even though it stays same turn */
     turn_lines = 0;
 }
@@ -375,8 +375,8 @@ void
 curses_count_window(const char *count_text)
 {
     static WINDOW *countwin = NULL;
-    int startx, starty, winx, winy;
-    int messageh, messagew;
+    int winx, winy;
+    int messageh, messagew, border;
 
     if (!count_text) {
         if (countwin)
@@ -384,17 +384,28 @@ curses_count_window(const char *count_text)
         counting = FALSE;
         return;
     }
-    counting = TRUE;
 
+    /* position of message window, not current position within message window
+       (so <0,0> for align_message:Top but will vary for other alignings) */
     curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
+    /* size of message window, with space for borders already subtracted */
     curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
 
-    if (curses_window_has_border(MESSAGE_WIN)) {
-        winx++;
-        winy++;
-    }
+    /* decide where to put the one-line counting window */
+    border = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
+    winx += border; /* first writeable message column */
+    winy += border + (messageh - 1); /* last writable message line */
 
-    winy += messageh - 1;
+    /* if most recent message (probably prompt leading to this instance of
+       counting window) is going to be covered up, scroll mesgs up a line */
+    if (!counting && my + 1 >= border + messageh) {
+        scroll_window(MESSAGE_WIN);
+        /* last position within the message window */
+        my = border + (messageh - 1) - 1;
+        mx = border;
+        /* wmove(curses_get_nhwin(MESSAGE_WIN), my, mx); -- not needed */
+    }
+    counting = TRUE;
 
 #ifdef PDCURSES
     if (countwin)
@@ -404,10 +415,9 @@ curses_count_window(const char *count_text)
        but not for dolook's autodescribe when it refers to a named monster */
     if (!countwin)
         countwin = newwin(1, messagew, winy, winx);
-    startx = 0;
-    starty = 0;
+    werase(countwin);
 
-    mvwprintw(countwin, starty, startx, "%s", count_text);
+    mvwprintw(countwin, 0, 0, "%s", count_text);
     wrefresh(countwin);
 }
 
