@@ -164,7 +164,7 @@ curses_got_input(void)
 
     /* misleadingly named; represents number of lines delivered since
        player was sure to have had a chance to read them; if player
-       has just given input then there aren't any such lines right;
+       has just given input then there aren't any such lines right now;
        that includes responding to More>> even though it stays same turn */
     turn_lines = 0;
 }
@@ -375,8 +375,8 @@ void
 curses_count_window(const char *count_text)
 {
     static WINDOW *countwin = NULL;
-    int startx, starty, winx, winy;
-    int messageh, messagew;
+    int winx, winy;
+    int messageh, messagew, border;
 
     if (!count_text) {
         if (countwin)
@@ -384,18 +384,41 @@ curses_count_window(const char *count_text)
         counting = FALSE;
         return;
     }
-    counting = TRUE;
 
+    /* position of message window, not current position within message window
+       (so <0,0> for align_message:Top but will vary for other alignings) */
     curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
+    /* size of message window, with space for borders already subtracted */
     curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
 
-    if (curses_window_has_border(MESSAGE_WIN)) {
-        winx++;
-        winy++;
+    /* decide where to put the one-line counting window */
+    border = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
+    winx += border; /* first writeable message column */
+    winy += border + (messageh - 1); /* last writable message line */
+
+    /* if most recent message (probably prompt leading to this instance of
+       counting window) is going to be covered up, scroll mesgs up a line */
+    if (!counting && my >= border + (messageh - 1)) {
+        scroll_window(MESSAGE_WIN);
+        if (messageh > 1) {
+            /* handling for next message will behave as if we're currently
+               positioned at the end of next to last line of message window */
+            my = border + (messageh - 1) - 1;
+            mx = border + (messagew - 1); /* (0 + 80 - 1) or (1 + 78 - 1) */
+        } else {
+            /* for a one-line window, use beginning of only line instead */
+            my = mx = border; /* 0 or 1 */
+        }
+        /* wmove(curses_get_nhwin(MESSAGE_WIN), my, mx); -- not needed */
     }
+    /* in case we're being called from clear_nhwindow(MESSAGE_WIN)
+       which gets called for every command keystroke; it sends an
+       empty string to get the scroll-up-one-line effect above and
+       we want to avoid the curses overhead for the operations below... */
+    if (!*count_text)
+        return;
 
-    winy += messageh - 1;
-
+    counting = TRUE;
 #ifdef PDCURSES
     if (countwin)
         curses_destroy_win(countwin), countwin = NULL;
@@ -404,10 +427,9 @@ curses_count_window(const char *count_text)
        but not for dolook's autodescribe when it refers to a named monster */
     if (!countwin)
         countwin = newwin(1, messagew, winy, winx);
-    startx = 0;
-    starty = 0;
+    werase(countwin);
 
-    mvwprintw(countwin, starty, startx, "%s", count_text);
+    mvwprintw(countwin, 0, 0, "%s", count_text);
     wrefresh(countwin);
 }
 

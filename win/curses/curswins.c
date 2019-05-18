@@ -352,6 +352,8 @@ curses_del_wid(winid wid)
 void
 curs_destroy_all_wins()
 {
+    curses_count_window((char *) 0); /* clean up orphan */
+
     while (nhwids)
         curses_del_wid(nhwids->nhwid);
 }
@@ -483,6 +485,10 @@ curses_puts(winid wid, int attr, const char *text)
     }
 
     if (wid == MESSAGE_WIN) {
+        /* if a no-history message is being shown, remove it */
+        if (counting)
+            curses_count_window((char *) 0);
+
         curses_message_win_puts(text, FALSE);
         return;
     }

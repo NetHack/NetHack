@@ -3569,11 +3569,7 @@ register struct obj *otmp, *obj;
     if (obj->oclass == COIN_CLASS)
         return TRUE;
 
-    if (obj->unpaid != otmp->unpaid || obj->spe != otmp->spe
-        || obj->cursed != otmp->cursed || obj->blessed != otmp->blessed
-        || obj->no_charge != otmp->no_charge || obj->obroken != otmp->obroken
-        || obj->otrapped != otmp->otrapped || obj->lamplit != otmp->lamplit
-        || obj->bypass != otmp->bypass)
+    if (obj->bypass != otmp->bypass)
         return FALSE;
 
     if (obj->globby)
@@ -3581,6 +3577,12 @@ register struct obj *otmp, *obj;
     /* Checks beyond this point either aren't applicable to globs
      * or don't inhibit their merger.
      */
+
+    if (obj->unpaid != otmp->unpaid || obj->spe != otmp->spe
+        || obj->cursed != otmp->cursed || obj->blessed != otmp->blessed
+        || obj->no_charge != otmp->no_charge || obj->obroken != otmp->obroken
+        || obj->otrapped != otmp->otrapped || obj->lamplit != otmp->lamplit)
+        return FALSE;
 
     if (obj->oclass == FOOD_CLASS
         && (obj->oeaten != otmp->oeaten || obj->orotten != otmp->orotten))

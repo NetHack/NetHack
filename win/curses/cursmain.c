@@ -301,6 +301,11 @@ curses_clear_nhwindow(winid wid)
 {
     if (wid != NHW_MESSAGE) {
         curses_clear_nhwin(wid);
+    } else {
+        /* scroll the message window one line if it's full */
+        curses_count_window("");
+        /* remove 'countwin', leaving last message line blank */
+        curses_count_window((char *) 0);
     }
 }
 
@@ -585,6 +590,7 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
 void
 curses_wait_synch()
 {
+    /* [do we need 'if (counting) curses_count_window((char *)0);' here?] */
 }
 
 /*

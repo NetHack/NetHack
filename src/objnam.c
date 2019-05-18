@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1551138256 2019/02/25 23:44:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1558125504 2019/05/17 20:38:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -905,7 +905,7 @@ unsigned doname_flags;
             vague_quan = (doname_flags & DONAME_VAGUE_QUAN) != 0;
     boolean known, dknown, cknown, bknown, lknown;
     int omndx = obj->corpsenm;
-    char prefix[PREFIX];
+    char prefix[PREFIX], globbuf[QBUFSZ];
     char tmpbuf[PREFIX + 1]; /* for when we have to add something at
                                 the start of prefix instead of the
                                 end (Strcat is used on the end) */
@@ -1203,26 +1203,27 @@ unsigned doname_flags;
         }
     }
     /* treat 'restoring' like suppress_price because shopkeeper and
-       bill might not be available yet while restore is in progress */
+       bill might not be available yet while restore is in progress
+       (objects won't normally be formatted during that time, but if
+       'perm_invent' is enabled then they might be) */
     if (iflags.suppress_price || g.restoring) {
         ; /* don't attempt to obtain any stop pricing, even if 'with_price' */
     } else if (is_unpaid(obj)) { /* in inventory or in container in invent */
         long quotedprice = unpaid_cost(obj, TRUE);
 
-        Sprintf(eos(bp), " (%s, %ld %s)",
+        Sprintf(eos(bp), " (%s, %s%ld %s)",
                 obj->unpaid ? "unpaid" : "contents",
-                quotedprice, currency(quotedprice));
+                globwt(obj, globbuf), quotedprice, currency(quotedprice));
     } else if (with_price) { /* on floor or in container on floor */
         int nochrg = 0;
         long price = get_cost_of_shop_item(obj, &nochrg);
-        char globbuf[BUFSZ];
 
         if (price > 0L)
             Sprintf(eos(bp), " (%s, %s%ld %s)",
                     nochrg ? "contents" : "for sale",
                     globwt(obj, globbuf), price, currency(price));
         else if (nochrg > 0)
-            Strcat(bp, " (no charge)");
+            Sprintf(eos(bp), " (%sno charge)", globwt(obj, globbuf));
     }
     if (!strncmp(prefix, "a ", 2)) {
         /* save current prefix, without "a "; might be empty */
@@ -1236,7 +1237,8 @@ unsigned doname_flags;
     /* show weight for items (debug tourist info)
      * aum is stolen from Crawl's "Arbitrary Unit of Measure" */
     if (wizard && iflags.wizweight) {
-        Sprintf(eos(bp), " (%d aum)", obj->owt);
+        if (!obj->globby)   /* aum already apparent for globs */
+            Sprintf(eos(bp), " (%d aum)", obj->owt);
     }
     bp = strprepend(bp, prefix);
     return bp;
@@ -4202,11 +4204,11 @@ globwt(otmp, buf)
 struct obj *otmp;
 char *buf;
 {
-    if (otmp && buf && otmp->globby && otmp->quan == 1L) {
-        Sprintf(buf, "%d aum, ", (int) otmp->owt);
-        return buf;
+    *buf = '\0';
+    if (otmp->globby) {
+        Sprintf(buf, "%u aum, ", otmp->owt);
     }
-    return "";
+    return buf;
 }
 
 /*objnam.c*/
