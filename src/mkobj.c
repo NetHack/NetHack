@@ -2786,10 +2786,7 @@ struct obj **obj1, **obj2;
         otmp1 = *obj1;
         otmp2 = *obj2;
         if (otmp1 && otmp2 && otmp1 != otmp2) {
-            if (otmp1->unpaid || otmp2->unpaid)
-                globby_bill_fixup(otmp1, otmp2);
-            else if (costly_spot(otmp1->ox, otmp1->oy))
-                globby_donation(otmp1, otmp2);
+            globby_bill_fixup(otmp1, otmp2);
             if (otmp1->bknown != otmp2->bknown)
                 otmp1->bknown = otmp2->bknown = 0;
             if (otmp1->rknown != otmp2->rknown)
@@ -2823,7 +2820,10 @@ struct obj **obj1, **obj2;
 }
 
 /*
- * Causes the heavier object to absorb the lighter object;
+ * Causes the heavier object to absorb the lighter object in
+ * most cases, but if one object is OBJ_FREE and the other is
+ * on the floor, the floor object goes first.
+ *
  * wrapper for obj_absorb so that floor_effects works more
  * cleanly (since we don't know which we want to stay around)
  */
@@ -2837,8 +2837,9 @@ struct obj **obj1, **obj2;
         otmp1 = *obj1;
         otmp2 = *obj2;
         if (otmp1 && otmp2 && otmp1 != otmp2) {
-            if (otmp1->owt > otmp2->owt
-                || (otmp1->owt == otmp2->owt && rn2(2))) {
+            if (!(otmp2->where == OBJ_FLOOR && otmp1->where == OBJ_FREE) &&
+                (otmp1->owt > otmp2->owt
+                 || (otmp1->owt == otmp2->owt && rn2(2)))) {
                 return obj_absorb(obj1, obj2);
             }
             return obj_absorb(obj2, obj1);

@@ -1228,7 +1228,7 @@ unsigned doname_flags;
                     nochrg ? "contents" : "for sale",
                     globwt(obj, globbuf), price, currency(price));
         else if (nochrg > 0)
-            Strcat(bp, " (no charge)");
+            Sprintf(eos(bp), " (%sno charge)", globwt(obj, globbuf));
     }
     if (!strncmp(prefix, "a ", 2)) {
         /* save current prefix, without "a "; might be empty */
@@ -1242,7 +1242,8 @@ unsigned doname_flags;
     /* show weight for items (debug tourist info)
      * aum is stolen from Crawl's "Arbitrary Unit of Measure" */
     if (wizard && iflags.wizweight) {
-        Sprintf(eos(bp), " (%d aum)", obj->owt);
+        if (!obj->globby)   /* aum already apparent for globs */
+            Sprintf(eos(bp), " (%d aum)", obj->owt);
     }
     bp = strprepend(bp, prefix);
     return bp;

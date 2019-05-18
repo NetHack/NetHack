@@ -4801,91 +4801,108 @@ sasc_bug(struct obj *op, unsigned x)
 #endif
 
 /*
- * When one glob is absorbed by another glob, the two become
- * indistinguishable and the remaining glob grows in mass,
- * the product of both.
+ * The caller is about to make obj_absorbed go away.
  *
- * The original billed item is lost to the absorption and the
- * original billed amount for the object being absorbed gets
- * added to the cost owing for the absorber, and the separate
- * cost for the absorbed object goes away.
+ * There's no way for you (or a shopkeeper) to prevent globs
+ * from merging with each other on the floor due to the
+ * inherent nature of globs so it irretrievably becomes part
+ * of the floor glob mass. When one glob is absorbed by another
+ * glob, the two become indistinguishable and the remaining
+ * glob object grows in mass, the product of both.
+ *
+ * billing admin, player compensation, shopkeeper compensation
+ * all need to be considered.
+ *
+ * Any original billed item is lost to the absorption so the
+ * original billed amount for the object being absorbed must
+ * get added to the cost owing for the absorber, and the
+ * separate cost for the object being absorbed goes away.
+ *
+ * There are four scenarios to deal with:
+ *     1. shop_owned glob merging into shop_owned glob
+ *     2. player_owned glob merging into shop_owned glob
+ *     3. shop_owned glob merging into player_owned glob
+ *     4. player_owned glob merging into player_owned glob
  */
 void
 globby_bill_fixup(obj_absorber, obj_absorbed)
 struct obj *obj_absorber, *obj_absorbed;
 {
+    int x, y;
     struct bill_x *bp, *bp_absorber = (struct bill_x *) 0;
     struct monst *shkp = 0;
+    struct eshk *eshkp;
+    long amount, per_unit_cost = set_cost(obj_absorbed, shkp);
+    boolean floor_absorber = (obj_absorber->where == OBJ_FLOOR);
 
     if (!obj_absorber->globby)
         impossible("globby_bill_fixup called for non-globby object");
 
+    if (floor_absorber) {
+        x = obj_absorber->ox, y = obj_absorber->oy;
+    }
     if (obj_absorber->unpaid) {
         /* look for a shopkeeper who owns this object */
         for (shkp = next_shkp(fmon, TRUE); shkp;
              shkp = next_shkp(shkp->nmon, TRUE))
             if (onbill(obj_absorber, shkp, TRUE))
                 break;
+    } else if (obj_absorbed->unpaid) {
+        if (obj_absorbed->where == OBJ_FREE
+             && floor_absorber && costly_spot(x, y)) {
+            shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
+        }
     }
     /* sanity check, in case obj is on bill but not marked 'unpaid' */
     if (!shkp)
         shkp = shop_keeper(*u.ushops);
+    if (!shkp)
+        return;
+    bp_absorber = onbill(obj_absorber, shkp, FALSE);
+    bp = onbill(obj_absorbed, shkp, FALSE);
+    eshkp = ESHK(shkp);
 
-    if ((bp_absorber = onbill(obj_absorber, shkp, FALSE)) != 0) {
-        bp = onbill(obj_absorbed, shkp, FALSE);
-        if (bp) {
-            bp_absorber->price += bp->price;
-            ESHK(shkp)->billct--;
+    /**************************************************************
+     * Scenario 1. Shop-owned glob absorbing into shop-owned glob
+     **************************************************************/
+    if (bp && (!obj_absorber->no_charge
+                || billable(&shkp, obj_absorber, eshkp->shoproom, FALSE))) {
+        /* the glob being absorbed has a billing record */
+        amount = bp->price;
+        eshkp->billct--;
 #ifdef DUMB
-            {
-                /* DRS/NS 2.2.6 messes up -- Peter Kendell */
-                int indx = ESHK(shkp)->billct;
+        {
+            /* DRS/NS 2.2.6 messes up -- Peter Kendell */
+            int indx = eshkp->billct;
 
-                *bp = ESHK(shkp)->bill_p[indx];
-            }
-#else
-            *bp = ESHK(shkp)->bill_p[ESHK(shkp)->billct];
-#endif
-            clear_unpaid_obj(shkp, obj_absorbed);
-        } else {
-            /* should never happen */
-            bp_absorber->price += get_cost(obj_absorbed, shkp)
-                                    * get_pricing_units(obj_absorbed);
+            *bp = eshkp->bill_p[indx];
         }
+#else
+        *bp = eshkp->bill_p[eshkp->billct];
+#endif
+        clear_unpaid_obj(shkp, obj_absorbed);
+
+        if (bp_absorber) {
+            /* the absorber has a billing record */
+            bp_absorber->price += amount;           
+        } else {
+            /* the absorber has no billing record */
+            ;
+        }
+        return;
     }
-}
-
-/*
- * The caller is about to make obj_absorbed go away.
- *
- * There's no way for you (or a shopkeeper) to prevent globs
- * from merging with each other on the floor due to the
- * inherent nature of globs so it irretrievably becomes part
- * of the floor glob mass.
- *
- * globby_donation() needs to handle whether/how to
- * compensate you for that.
- *
- * unpaid globs don't end up here.
- */
-void
-globby_donation(obj_absorber, obj_absorbed)
-struct obj *obj_absorber, *obj_absorbed;
-{
-    if (obj_absorber->where == OBJ_FLOOR
-            && costly_spot(obj_absorber->ox, obj_absorber->oy)) {
-        int x = obj_absorber->ox, y = obj_absorber->oy;
-        struct monst *shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
-        struct eshk *eshkp = ESHK(shkp);
-        long amount, per_unit_cost = get_cost(obj_absorbed, shkp);
-
+    /**************************************************************
+     * Scenario 2. Player-owned glob absorbing into shop-owned glob 
+     **************************************************************/
+    if (!bp_absorber && !bp && !obj_absorber->no_charge) {
+        /* there are no billing records */
+        amount = get_pricing_units(obj_absorbed) * per_unit_cost;
         if (saleable(shkp, obj_absorbed)) {
-            amount = get_pricing_units(obj_absorbed) * per_unit_cost;
             if (eshkp->debit >= amount) {
                 if (eshkp->loan) { /* you carry shop's gold */
-                    if (eshkp->loan >= amount)
+                   if (eshkp->loan >= amount)
                         eshkp->loan -= amount;
-                    else
+                   else
                         eshkp->loan = 0L;
                 }
                 eshkp->debit -= amount;
@@ -4913,7 +4930,34 @@ struct obj *obj_absorber, *obj_absorbed;
                               eshkp->credit, currency(eshkp->credit));
             }
         }
+        return;
+    } else if (bp_absorber) {
+        /* absorber has a billing record */
+        bp_absorber->price += per_unit_cost * get_pricing_units(obj_absorbed);
+        return;
     }
+    /**************************************************************
+     * Scenario 3. shop_owned glob merging into player_owned glob
+     **************************************************************/
+    if (bp &&
+        (obj_absorber->no_charge
+            || (floor_absorber && !costly_spot(x, y)))) {
+        amount = bp->price;
+        bill_dummy_object(obj_absorbed);
+        verbalize(
+                  "You owe me %ld %s for my %s that %s with your%s",
+                    amount, currency(amount), obj_typename(obj_absorbed->otyp),
+                    ANGRY(shkp) ? "had the audacity to mix" :
+                                  "just mixed",
+                    ANGRY(shkp) ? " stinking batch!" :
+                                  "s.");
+        return;
+    }
+    /**************************************************************
+     * Scenario 4. player_owned glob merging into player_owned glob
+     **************************************************************/
+
+    return;
 }
 
 /*shk.c*/
