@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.7 $ $NHDT-Date: 1558234580 2019/05/19 02:56:20 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.8 $ $NHDT-Date: 1558248715 2019/05/19 06:51:55 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -33,6 +33,8 @@ curses: when all available lines in the message window are in use,
 	leaving part of longer underlying line's text visible
 curses: if message window is only one line, cancelling some prompts with ESC
 	left the prompts visible on the message line instead of erasing them
+curses: support EDIT_GETLIN (but like with tty, it's disabled by default) to
+	pre-load an earlier response as the default answer for some prompts
 Windows: some startup error messages were not being delivered successfully
 
 
