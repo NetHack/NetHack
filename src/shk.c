@@ -4932,7 +4932,7 @@ struct obj *obj_absorber, *obj_absorbed;
         amount = bp->price;
         bill_dummy_object(obj_absorbed);
         verbalize(
-                  "You owe me %ld %s for my %s that %s with your%s",
+                  "You owe me %ld %s for my %s that you %s with your%s",
                     amount, currency(amount), obj_typename(obj_absorbed->otyp),
                     ANGRY(shkp) ? "had the audacity to mix" :
                                   "just mixed",

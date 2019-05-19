@@ -448,15 +448,14 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     int ch;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     int border_space = 0;
-    int len = 0; /* of answer string */
+    int len; /* of answer string */
     boolean border = curses_window_has_border(MESSAGE_WIN);
 
-    *answer = '\0';
     orig_cursor = curs_set(0);
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     if (border) {
-        height -= 2, width -= 2;
+        /* height -= 2, width -= 2; -- sizes already account for border */
         border_space = 1;
         if (mx < 1)
             mx = 1;
@@ -470,10 +469,21 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     maxlines = buffer / width * 2;
     Strcpy(tmpbuf, prompt);
     Strcat(tmpbuf, " ");
+    p_answer = tmpbuf + strlen(tmpbuf);
+#ifdef EDIT_GETLIN
+    len = (int) strlen(answer);
+    if (len >= buffer) {
+        len = buffer - 1;
+        answer[len] = '\0';
+    }
+    Strcpy(p_answer, answer);
+#else
+    len = 0;
+    *answer = '\0';
+#endif
     nlines = curses_num_lines(tmpbuf, width);
     maxlines += nlines * 2;
     linestarts = (char **) alloc((unsigned) (maxlines * sizeof (char *)));
-    p_answer = tmpbuf + strlen(tmpbuf);
     linestarts[0] = tmpbuf;
 
     if (mx > border_space) { /* newline */
@@ -531,7 +541,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         wmove(win, my, mx);
         curs_set(1);
         wrefresh(win);
-        curses_got_input(); /* despite its name, before rathre than after... */
+        curses_got_input(); /* despite its name, before rather than after... */
 #ifdef PDCURSES
         ch = wgetch(win);
 #else

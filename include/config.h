@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1478740241 2016/11/10 01:10:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1558248715 2019/05/19 06:51:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -80,7 +80,7 @@
 #ifdef __BEOS__
 #define BEOS_GRAPHICS             /* (optional) */
 #define DEFAULT_WINDOW_SYS "BeOS" /* "tty" */
-#ifndef HACKDIR                   /* override the default g.hackdir below */
+#ifndef HACKDIR                   /* override the default hackdir below */
 #define HACKDIR "/boot/apps/NetHack"
 #endif
 #endif
@@ -526,9 +526,15 @@ typedef unsigned char uchar;
  * probably not useful for normal play */
 /* #define EXTRA_SANITY_CHECKS */
 
-/* EDIT_GETLIN makes the string input in TTY, Qt4, and X11
-   so some prompts will remember the previously input text
-   (within the same session) */
+/* EDIT_GETLIN makes the string input in TTY, curses, Qt4, and X11
+   for some prompts be pre-loaded with previously input text (from
+   a previous instance of the same prompt) as the default response.
+   In some cases, the previous instance can only be within the same
+   session; in others, such as #annotate, the previous input can be
+   from any session because the response is saved and restored with
+   the map.  The 'edit' capability is just <delete> or <backspace>
+   to strip off characters at the end, or <escape> to discard the
+   whole thing, then type a new end for the text. */
 /* #define EDIT_GETLIN */
 
 /* #define DUMPLOG */  /* End-of-game dump logs */
