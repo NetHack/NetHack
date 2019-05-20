@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1558330407 2019/05/20 05:33:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1558355176 2019/05/20 12:26:16 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4065,10 +4065,10 @@ int sz[3];
                  *  - Is the additional processing time for this worth it?
                  */
                 if (do_field_opt
-                    /* These color/attr checks aren't right for
-                       'condition'; is it safe to assume that same text
-                       means same highlighting for that field?  If not,
-                       we'd end up redrawing conditions every time. */
+                    /* color/attr checks aren't right for 'condition'
+                       and neither is examining status_vals[BL_CONDITION]
+                       so skip same-contents optimization for conditions */
+                    && idx != BL_CONDITION
                     && (tty_status[NOW][idx].color
                         == tty_status[BEFORE][idx].color)
                     && (tty_status[NOW][idx].attr
@@ -4123,7 +4123,7 @@ status_sanity_check(VOID_ARGS)
 {
     int i;
     static boolean in_sanity_check = FALSE;
-    static const char *idxtext[] = {
+    static const char *const idxtext[] = {
         "BL_TITLE", "BL_STR", "BL_DX", "BL_CO", "BL_IN", "BL_WI", /* 0.. 5   */
         "BL_CH","BL_ALIGN", "BL_SCORE", "BL_CAP", "BL_GOLD",     /* 6.. 10  */
         "BL_ENE", "BL_ENEMAX", "BL_XP", "BL_AC", "BL_HD",       /* 11.. 15 */
@@ -4151,7 +4151,7 @@ status_sanity_check(VOID_ARGS)
              * a recent code change has caused a failure to reach
              * the bottom of render_status(), at least for the BL_
              * field identified in the impossible() message.
-
+             *
              * That could be because of the addition of a continue
              * statement within the render_status() for-loop, or a
              * premature return from render_status() before it finished
@@ -4384,8 +4384,8 @@ render_status(VOID_ARGS)
             if (!status_activefields[idx])
                 continue;
             x = tty_status[NOW][idx].x;
-            text = status_vals[idx];
-            tlth = (int) tty_status[NOW][idx].lth;
+            text = status_vals[idx]; /* always "" for BL_CONDITION */
+            tlth = (int) tty_status[NOW][idx].lth; /* valid for BL_CONDITION */
 
             if (tty_status[NOW][idx].redraw || !do_field_opt) {
                 boolean hitpointbar = (idx == BL_TITLE
@@ -4397,7 +4397,11 @@ render_status(VOID_ARGS)
                      * | Condition Codes |
                      * +-----------------+
                      */
-                    if (num_rows == 3) {
+                    bits = tty_condition_bits;
+                    /* if no bits are set, we can fall through condition
+                       rendering code to finalx[] handling (and subsequent
+                       rest-of-line erasure if line is shorter than before) */
+                    if (num_rows == 3 && bits != 0L) {
                         int k;
                         char *dat = &cw->data[y][0];
 
@@ -4424,8 +4428,7 @@ render_status(VOID_ARGS)
                         tty_status[NOW][BL_CONDITION].x = x;
                         tty_curs(WIN_STATUS, x, y);
                     }
-                    bits = tty_condition_bits;
-                    for (c = 0; c < SIZE(conditions); ++c) {
+                    for (c = 0; c < SIZE(conditions) && bits != 0L; ++c) {
                         mask = conditions[c].mask;
                         if (bits & mask) {
                             const char *condtext;
@@ -4441,8 +4444,10 @@ render_status(VOID_ARGS)
                             condtext = conditions[c].text[cond_shrinklvl];
                             if (x >= cw->cols && !truncation_expected) {
                                 impossible(
-                                   "Unexpected condition placement overflow");
+                         "Unexpected condition placement overflow for \"%s\"",
+                                           condtext);
                                 condtext = "";
+                                bits = 0L; /* skip any remaining conditions */
                             }
                             tty_putstatusfield(condtext, x, y);
                             x += (int) strlen(condtext);
@@ -4451,8 +4456,7 @@ render_status(VOID_ARGS)
                                     term_end_color();
                                 End_Attr(attrmask);
                             }
-                            if (!(bits &= ~mask))
-                                break;
+                            bits &= ~mask;
                         }
                     }
                     /* 'x' is 1-based and 'cols' and 'data' are 0-based,
@@ -4553,7 +4557,7 @@ render_status(VOID_ARGS)
                 x += tlth;
             }
             finalx[row][NOW] = x - 1;
-            /* reset .redraw and .dirty now that they're rendered */
+            /* reset .redraw and .dirty now that field has been rendered */
             tty_status[NOW][idx].dirty  = FALSE;
             tty_status[NOW][idx].redraw = FALSE;
             tty_status[NOW][idx].sanitycheck = FALSE;
