@@ -4345,8 +4345,6 @@ render_status(VOID_ARGS)
                      * | Condition Codes |
                      * +-----------------+
                      */
-                    if (!tty_condition_bits)
-                        continue;
                     if (num_rows == 3) {
                         int k;
                         char *dat = &cw->data[y][0];
