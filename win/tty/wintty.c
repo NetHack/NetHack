@@ -210,7 +210,9 @@ STATIC_DCL int NDECL(condition_size);
 STATIC_DCL int FDECL(make_things_fit, (BOOLEAN_P));
 STATIC_DCL void FDECL(shrink_enc, (int));
 STATIC_DCL void FDECL(shrink_dlvl, (int));
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 STATIC_DCL void NDECL(status_sanity_check);
+#endif /* NH_DEVEL_STATUS */
 #endif
 
 /*
@@ -3857,7 +3859,9 @@ unsigned long *colormasks;
     case BL_FLUSH:
         if (make_things_fit(reset_state) || truncation_expected) {
             render_status();
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
             status_sanity_check();
+#endif
         }
         return;
     case BL_CONDITION:
@@ -4118,6 +4122,7 @@ int sz[3];
     return valid;
 }
 
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 STATIC_OVL void
 status_sanity_check(VOID_ARGS)
 {
@@ -4161,6 +4166,7 @@ status_sanity_check(VOID_ARGS)
     }
     in_sanity_check = FALSE;
 }
+#endif /* NHDEVEL_STATUS */
 
 /*
  * This is what places a field on the tty display.
