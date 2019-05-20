@@ -91,9 +91,13 @@ DEBUGINFO = Y
 
 #
 #==============================================================================
+#
+#  The version of the game this Makefile was designed for
+NETHACK_VERSION="3.6.3"
 
-#  Set the gamedir according to your preference.  
-#  If not present prior to compilation it gets created.
+# A brief version for use in macros
+NHV=$(NETHACK_VERSION:.=)
+NHV=$(NHV:"=)
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -549,7 +553,7 @@ lflagsBuild = $(lflags) $(conlibs) $(MACHINE)
 LIBS= user32.lib winmm.lib $(ZLIB) $(CURSESLIB)
 
 ! IF ("$(USE_DLB)"=="Y")
-DLB = nhdat
+DLB = nhdat$(NHV)
 ! ELSE
 DLB =
 ! ENDIF
@@ -673,7 +677,7 @@ install: $(O)envchk.tag $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAM
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
 ! IF ("$(USE_DLB)"=="Y")
-	copy nhdat*               $(GAMEDIR)
+	copy nhdat$(NHV)          $(GAMEDIR)
 	copy $(DAT)\license       $(GAMEDIR)
 	copy $(DAT)\opthelp       $(GAMEDIR)
 ! ELSE
@@ -1100,7 +1104,7 @@ $(O)envchk.tag: $(O)obj.tag
 #==========================================
 
 #==========================================
-# DLB utility and nhdat file creation
+# DLB utility and nhdatNNN file creation
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
@@ -1121,7 +1125,7 @@ $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
 
-nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
+nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon $(DAT)\porthelp \
 	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
@@ -1281,7 +1285,7 @@ spotless: clean
 	if exist $(GAMEDIR)\nhraykey.dll del $(GAMEDIR)\nhraykey.dll
 	if exist $(GAMEDIR)\NetHack.exe  del $(GAMEDIR)\NetHack.exe
 	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
-	if exist $(GAMEDIR)\nhdat*       del $(GAMEDIR)\nhdat*
+	if exist $(GAMEDIR)\nhdat$(NHV)  del $(GAMEDIR)\nhdat$(NHV)
 ! ENDIF
 	if exist $(INCL)\date.h          del $(INCL)\date.h
 	if exist $(INCL)\onames.h        del $(INCL)\onames.h
@@ -1334,7 +1338,7 @@ spotless: clean
 	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
 	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
 	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
-	if exist nhdat*.	         del nhdat*.
+	if exist nhdat$(NHV).	         del nhdat$(NHV).
 	if exist $(O)obj.tag             del $(O)obj.tag
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
 	if exist $(O)nh*key.lib          del $(O)nh*key.lib
