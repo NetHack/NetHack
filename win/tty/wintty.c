@@ -3622,7 +3622,7 @@ char *posbar;
  *
  *  render_status
  *
- *      Goes through each of the two status row's fields and
+ *      Goes through each of the status row's fields and
  *      calls tty_putstatusfield() to place them on the display.
  *          ->tty_putstatusfield()
  *      At the end of the for-loop, the NOW values get copied
