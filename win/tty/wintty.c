@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1557088734 2019/05/05 20:38:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.203 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1558330407 2019/05/20 05:33:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.205 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -210,6 +210,7 @@ STATIC_DCL int NDECL(condition_size);
 STATIC_DCL int FDECL(make_things_fit, (BOOLEAN_P));
 STATIC_DCL void FDECL(shrink_enc, (int));
 STATIC_DCL void FDECL(shrink_dlvl, (int));
+STATIC_DCL void NDECL(status_sanity_check);
 #endif
 
 /*
@@ -3622,6 +3623,8 @@ char *posbar;
  *      Goes through each of the two status row's fields and
  *      calls tty_putstatusfield() to place them on the display.
  *          ->tty_putstatusfield()
+ *      At the end of the for-loop, the NOW values get copied
+ *      to BEFORE values.
  *
  *  tty_putstatusfield()
  *
@@ -3748,6 +3751,7 @@ tty_status_init()
         tty_status[NOW][i].valid  = FALSE;
         tty_status[NOW][i].dirty  = FALSE;
         tty_status[NOW][i].redraw = FALSE;
+        tty_status[NOW][i].sanitycheck = FALSE;
         tty_status[BEFORE][i] = tty_status[NOW][i];
     }
     tty_condition_bits = 0L;
@@ -3851,8 +3855,10 @@ unsigned long *colormasks;
         reset_state = FORCE_RESET;
         /*FALLTHRU*/
     case BL_FLUSH:
-        if (make_things_fit(reset_state) || truncation_expected)
+        if (make_things_fit(reset_state) || truncation_expected) {
             render_status();
+            status_sanity_check();
+        }
         return;
     case BL_CONDITION:
         tty_status[NOW][fldidx].idx = fldidx;
@@ -3860,6 +3866,7 @@ unsigned long *colormasks;
         tty_colormasks = colormasks;
         tty_status[NOW][fldidx].valid = TRUE;
         tty_status[NOW][fldidx].dirty = TRUE;
+        tty_status[NOW][fldidx].sanitycheck = TRUE;
         truncation_expected = FALSE;
         break;
     case BL_GOLD:
@@ -3887,6 +3894,7 @@ unsigned long *colormasks;
         tty_status[NOW][fldidx].lth = strlen(status_vals[fldidx]);
         tty_status[NOW][fldidx].valid = TRUE;
         tty_status[NOW][fldidx].dirty = TRUE;
+        tty_status[NOW][fldidx].sanitycheck = TRUE;
         break;
     }
 
@@ -4108,6 +4116,50 @@ int sz[3];
         sz[row] = col;
     }
     return valid;
+}
+
+STATIC_OVL void
+status_sanity_check(VOID_ARGS)
+{
+    int i;
+    static boolean in_sanity_check = FALSE;
+    static const char *idxtext[] = {
+        "BL_TITLE", "BL_STR", "BL_DX", "BL_CO", "BL_IN", "BL_WI", /* 0.. 5   */
+        "BL_CH","BL_ALIGN", "BL_SCORE", "BL_CAP", "BL_GOLD",     /* 6.. 10  */
+        "BL_ENE", "BL_ENEMAX", "BL_XP", "BL_AC", "BL_HD",       /* 11.. 15 */
+        "BL_TIME", "BL_HUNGER", "BL_HP", "BL_HPMAX",           /* 16.. 19 */
+        "BL_LEVELDESC", "BL_EXP", "BL_CONDITION"              /* 20.. 22 */
+    };
+   
+    if (in_sanity_check)
+        return;
+    in_sanity_check = TRUE;
+    /*
+     * Make sure that every field made it down to the
+     * bottom of the render_status() for-loop.
+     */
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        if (tty_status[NOW][i].sanitycheck) {
+            char panicmsg[BUFSZ];
+
+            Sprintf(panicmsg, "failed on tty_status[NOW][%s].", idxtext[i]);
+            paniclog("status_sanity_check", panicmsg);
+            tty_status[NOW][i].sanitycheck = FALSE;
+            /*
+             * Attention developers: If you encounter the above
+             * message in paniclog, it almost certainly means that
+             * a recent code change has caused a failure to reach
+             * the bottom of render_status(), at least for the BL_
+             * field identified in the impossible() message.
+
+             * That could be because of the addition of a continue
+             * statement within the render_status() for-loop, or a
+             * premature return from render_status() before it finished
+             * its housekeeping chores.
+             */
+        }
+    }
+    in_sanity_check = FALSE;
 }
 
 /*
@@ -4504,6 +4556,7 @@ render_status(VOID_ARGS)
             /* reset .redraw and .dirty now that they're rendered */
             tty_status[NOW][idx].dirty  = FALSE;
             tty_status[NOW][idx].redraw = FALSE;
+            tty_status[NOW][idx].sanitycheck = FALSE;
             /*
              * For comparison of current and previous:
              * - Copy the entire tty_status struct.
