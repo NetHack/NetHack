@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1558355176 2019/05/20 12:26:16 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1558400902 2019/05/21 01:08:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.209 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2924,7 +2924,7 @@ boolean preselected;        /* item is marked as selected */
 
     cw->nitems++;
     if (identifier->a_void) {
-        int len = strlen(str);
+        int len = (int) strlen(str);
 
         if (len >= BUFSZ) {
             /* We *think* everything's coming in off at most BUFSZ bufs... */
@@ -2938,7 +2938,7 @@ boolean preselected;        /* item is marked as selected */
     } else
         newstr = str;
 
-    item = (tty_menu_item *) alloc(sizeof(tty_menu_item));
+    item = (tty_menu_item *) alloc(sizeof *item);
     item->identifier = *identifier;
     item->count = -1L;
     item->selected = preselected;
@@ -3002,12 +3002,21 @@ const char *prompt; /* prompt to for menu */
                      MENU_UNSELECTED);
     }
 
-    /* XXX another magic number? 52 */
+    /* 52: 'a'..'z' and 'A'..'Z'; avoids selector duplication within a page */
     lmax = min(52, (int) ttyDisplay->rows - 1);    /* # lines per page */
     cw->npages = (cw->nitems + (lmax - 1)) / lmax; /* # of pages */
+    /*
+     * TODO?
+     *  For really tall page, allow 53 if '$' or '#' is present and
+     *  54 if both are.  [Only for single page menu, otherwise pages
+     *  without those could try to use too many letters.]
+     *  Probably not worth bothering with; anyone with a display big
+     *  for this to matter will likely switch from tty to curses for
+     *  multi-line message window and/or persistent inventory window.
+     */
 
     /* make sure page list is large enough */
-    if (cw->plist_size < cw->npages + 1 /*need 1 slot beyond last*/) {
+    if (cw->plist_size < cw->npages + 1) { /* +1: need one slot beyond last */
         if (cw->plist)
             free((genericptr_t) cw->plist);
         cw->plist_size = cw->npages + 1;
