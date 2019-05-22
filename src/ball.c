@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1557088406 2019/05/05 20:33:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1558485648 2019/05/22 00:40:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -850,7 +850,6 @@ void
 bc_sanity_check()
 {
     int otyp;
-    unsigned save_nameknown;
     const char *onam;
 
     if (Punished && (!uball || !uchain)) {
@@ -872,15 +871,7 @@ bc_sanity_check()
                   || (uball->owornmask & W_BALL) == 0L
                   || (uball->owornmask & ~(W_BALL | W_WEAPON)) != 0L)) {
         otyp = uball->otyp;
-        if (otyp < STRANGE_OBJECT || otyp >= NUM_OBJECTS
-            || !OBJ_NAME(objects[otyp])) {
-            onam = "glorkum";
-        } else {
-            save_nameknown = objects[otyp].oc_name_known;
-            objects[otyp].oc_name_known = 1;
-            onam = simple_typename(otyp);
-            objects[otyp].oc_name_known = save_nameknown;
-        }
+        onam = safe_typename(otyp);
         impossible("uball: type %d (%s), where %d, wornmask=0x%08lx",
                    otyp, onam, uball->where, uball->owornmask);
     }
@@ -892,15 +883,7 @@ bc_sanity_check()
                    || (uchain->owornmask & W_CHAIN) == 0L
                    || (uchain->owornmask & ~W_CHAIN) != 0L)) {
         otyp = uchain->otyp;
-        if (otyp < STRANGE_OBJECT || otyp >= NUM_OBJECTS
-            || !OBJ_NAME(objects[otyp])) {
-            onam = "glorkum";
-        } else {
-            save_nameknown = objects[otyp].oc_name_known;
-            objects[otyp].oc_name_known = 1;
-            onam = simple_typename(otyp);
-            objects[otyp].oc_name_known = save_nameknown;
-        }
+        onam = safe_typename(otyp);
         impossible("uchain: type %d (%s), where %d, wornmask=0x%08lx",
                    otyp, onam, uchain->where, uchain->owornmask);
     }
