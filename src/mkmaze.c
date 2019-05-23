@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1555022325 2019/04/11 22:38:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1558562368 2019/05/22 21:59:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -495,7 +495,7 @@ fixup_special()
 
         case LR_UPSTAIR:
         case LR_DOWNSTAIR:
-        place_it:
+ place_it:
             place_lregion(r->inarea.x1, r->inarea.y1, r->inarea.x2,
                           r->inarea.y2, r->delarea.x1, r->delarea.y1,
                           r->delarea.x2, r->delarea.y2, r->rtype, &lev);
@@ -1387,14 +1387,15 @@ STATIC_DCL void FDECL(mv_bubble, (struct bubble *, int, int, BOOLEAN_P));
 void
 movebubbles()
 {
-    static boolean up;
-    struct bubble *b;
-    int x, y, i, j;
-    struct trap *btrap;
     static const struct rm water_pos = { cmap_to_glyph(S_water), WATER, 0, 0,
                                          0, 0, 0, 0, 0, 0 };
     static const struct rm air_pos = { cmap_to_glyph(S_cloud), AIR, 0, 0, 0,
                                        1, 0, 0, 0, 0 };
+    static boolean up = FALSE;
+    struct bubble *b;
+    struct container *cons;
+    struct trap *btrap;
+    int x, y, i, j;
 
     /* set up the portal the first time bubbles are moved */
     if (!g.wportal)
@@ -1425,9 +1426,6 @@ movebubbles()
                         /* pick up objects, monsters, hero, and traps */
                         if (OBJ_AT(x, y)) {
                             struct obj *olist = (struct obj *) 0, *otmp;
-                            struct container *cons =
-                                (struct container *) alloc(
-                                    sizeof(struct container));
 
                             while ((otmp = g.level.objects[x][y]) != 0) {
                                 remove_object(otmp);
@@ -1436,6 +1434,7 @@ movebubbles()
                                 olist = otmp;
                             }
 
+                            cons = (struct container *) alloc(sizeof *cons);
                             cons->x = x;
                             cons->y = y;
                             cons->what = CONS_OBJ;
@@ -1445,10 +1444,8 @@ movebubbles()
                         }
                         if (MON_AT(x, y)) {
                             struct monst *mon = m_at(x, y);
-                            struct container *cons =
-                                (struct container *) alloc(
-                                    sizeof(struct container));
 
+                            cons = (struct container *) alloc(sizeof *cons);
                             cons->x = x;
                             cons->y = y;
                             cons->what = CONS_MON;
@@ -1466,10 +1463,7 @@ movebubbles()
                             mon->mx = mon->my = 0;
                         }
                         if (!u.uswallow && x == u.ux && y == u.uy) {
-                            struct container *cons =
-                                (struct container *) alloc(
-                                    sizeof(struct container));
-
+                            cons = (struct container *) alloc(sizeof *cons);
                             cons->x = x;
                             cons->y = y;
                             cons->what = CONS_HERO;
@@ -1479,10 +1473,7 @@ movebubbles()
                             b->cons = cons;
                         }
                         if ((btrap = t_at(x, y)) != 0) {
-                            struct container *cons =
-                                (struct container *) alloc(
-                                    sizeof(struct container));
-
+                            cons = (struct container *) alloc(sizeof *cons);
                             cons->x = x;
                             cons->y = y;
                             cons->what = CONS_TRAP;
@@ -1875,21 +1866,21 @@ boolean ini;
             }
 
             case CONS_HERO: {
+                struct monst *mtmp = m_at(cons->x, cons->y);
                 int ux0 = u.ux, uy0 = u.uy;
 
-                /* change u.ux0 and u.uy0? */
-                u.ux = cons->x;
-                u.uy = cons->y;
+                u_on_newpos(cons->x, cons->y);
                 newsym(ux0, uy0); /* clean up old position */
 
-                if (MON_AT(cons->x, cons->y)) {
-                    mnexto(m_at(cons->x, cons->y));
+                if (mtmp) {
+                    mnexto(mtmp);
                 }
                 break;
             }
 
             case CONS_TRAP: {
                 struct trap *btrap = (struct trap *) cons->list;
+
                 btrap->tx = cons->x;
                 btrap->ty = cons->y;
                 break;
