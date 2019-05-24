@@ -290,17 +290,18 @@ curses_last_messages()
      *  to start and stop because curses_message_win_puts() combines short
      *  lines.  So we can end up with blank lines at bottom of the message
      *  window, missing out on one or more older messages which could have
-     *  been included at the top.
+     *  been included at the top.  Also long messages might wrap and take
+     *  more than one line apiece.
      *
-     *  3.6.2 showed oldest available N lines (by starting at
+     *  3.6.2 showed oldest available N-1 lines (by starting at
      *  num_mesages - 1 and working back toward 0 until window height was
-     *  reached [via index 'j' which is gone now]) rather than most recent
-     *  N (start at height - 1 and work way up through 0) so showed wrong
-     *  lines even if N lines had been the right way to handle this.
+     *  reached [via index 'j' which is gone now]) plus the latest line
+     *  (via toplines[]), rather than most recent N (start at height - 1
+     *  and work way up through 0).  So it showed wrong subset of lines
+     *  even if 'N lines' had been the right way to handle this.
      */
     ++last_messages;
-    i = min(height, num_messages) - 1;
-    for ( ; i > 0; --i) {
+    for (i = min(height, num_messages) - 1; i > 0; --i) {
         mesg = get_msg_line(TRUE, i);
         if (mesg && mesg->str && *mesg->str)
             curses_message_win_puts(mesg->str, TRUE);
@@ -417,7 +418,7 @@ curses_count_window(const char *count_text)
 
     /* if most recent message (probably prompt leading to this instance of
        counting window) is going to be covered up, scroll mesgs up a line */
-    if (!counting && my >= border + (messageh - 1)) {
+    if (!counting && my == border + (messageh - 1) && mx > border) {
         scroll_window(MESSAGE_WIN);
         if (messageh > 1) {
             /* handling for next message will behave as if we're currently
