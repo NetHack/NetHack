@@ -22,7 +22,7 @@ struct window_procs curses_procs = {
 #if defined(STATUS_HILITES)
      | WC2_HILITE_STATUS
 #endif
-     | WC2_HITPOINTBAR | WC2_FLUSH_STATUS | WC2_TERM_SIZE
+     | WC2_FLUSH_STATUS | WC2_TERM_SIZE
      | WC2_STATUSLINES | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR
      | WC2_SUPPRESS_HIST),
     curses_init_nhwindows,
