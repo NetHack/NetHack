@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $ $NHDT-Date: 1558562367 2019/05/22 21:59:27 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.14 $ $NHDT-Date: 1558662976 2019/05/24 01:56:16 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -37,6 +37,12 @@ curses: if message window is only one line, cancelling some prompts with ESC
 	left the prompts visible on the message line instead of erasing them
 curses: support EDIT_GETLIN (but like with tty, it's disabled by default) to
 	pre-load an earlier response as the default answer for some prompts
+curses: when display windows get reconfigured (after setting align_status,
+	align_message, statuslines, windowborders or due to external resize),
+	the message window was being refreshed with the oldest available N
+	messages rather than most recent N.  [Still room for improvement;
+	when feasible it combines short lines, resulting in N messages on
+	fewer than N lines and leaving some of the available lines blank.]
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new

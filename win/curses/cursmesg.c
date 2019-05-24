@@ -275,25 +275,42 @@ curses_clear_unhighlight_message_window()
 void
 curses_last_messages()
 {
-    boolean border = curses_window_has_border(MESSAGE_WIN);
     nhprev_mesg *mesg;
-    int i, j, height, width;
+    int i, height, width;
+    int border = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
+    WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
+    werase(win);
+    mx = my = border;
 
-    if (border)
-        mx = my = 1;
-    else
-        mx = my = 0;
-
+    /*
+     * FIXME!
+     *  This shouldn't be relying on a naive line count to decide where
+     *  to start and stop because curses_message_win_puts() combines short
+     *  lines.  So we can end up with blank lines at bottom of the message
+     *  window, missing out on one or more older messages which could have
+     *  been included at the top.
+     *
+     *  3.6.2 showed oldest available N lines (by starting at
+     *  num_mesages - 1 and working back toward 0 until window height was
+     *  reached [via index 'j' which is gone now]) rather than most recent
+     *  N (start at height - 1 and work way up through 0) so showed wrong
+     *  lines even if N lines had been the right way to handle this.
+     */
     ++last_messages;
-    for (j = 0, i = num_messages - 1; i > 0 && j < height; --i, ++j) {
+    i = min(height, num_messages) - 1;
+    for ( ; i > 0; --i) {
         mesg = get_msg_line(TRUE, i);
         if (mesg && mesg->str && *mesg->str)
             curses_message_win_puts(mesg->str, TRUE);
     }
     curses_message_win_puts(toplines, TRUE);
     --last_messages;
+
+    if (border)
+        box(win, 0, 0);
+    wrefresh(win);
 }
 
 
@@ -329,7 +346,7 @@ curses_teardown_messages(void)
     num_messages = 0;
 }
 
-/* Display previous message window messages in reverse chron order */
+/* Display previous messages in a popup (via menu so can scroll backwards) */
 
 void
 curses_prev_mesg()
@@ -362,6 +379,8 @@ curses_prev_mesg()
     if (!do_lifo)
         curs_menu_set_bottom_heavy(wid);
     curses_select_menu(wid, PICK_NONE, &selected);
+    if (selected) /* should always be null for PICK_NONE but be paranoid */
+        free((genericptr_t) selected);
     curses_del_wid(wid);
 }
 
@@ -712,6 +731,7 @@ mesg_add_line(const char *mline)
         /* create a new list element */
         current_mesg = (nhprev_mesg *) alloc((unsigned) sizeof (nhprev_mesg));
         current_mesg->str = dupstr(mline);
+        current_mesg->next_mesg = current_mesg->prev_mesg = (nhprev_mesg *) 0;
     } else {
         /* instead of discarding list element being forced out, reuse it */
         current_mesg = first_mesg;
