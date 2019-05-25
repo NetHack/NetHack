@@ -2044,11 +2044,13 @@ struct mkroom *croom;
            might be short-circuited if a monster brings object to hero) */
         if (Is_mineend_level(&u.uz)) {
             if (otmp->otyp == iflags.mines_prize_type) {
-                otmp->record_achieve_special = MINES_PRIZE;
-                /* prevent stacking; cleared when achievement is recorded */
-                otmp->nomerge = 1;
-                if (++mines_prize_count > 1)
-                    impossible(prize_warning, "mines end");
+                if (!mines_prize_count++) {
+                    /* Note: the first luckstone on lev will become the prize
+                             even if its not the explicit one, but random */
+                    otmp->record_achieve_special = MINES_PRIZE;
+                    /* prevent stacking; cleared when achievement is recorded */
+                    otmp->nomerge = 1;
+                }
             }
         } else if (Is_sokoend_level(&u.uz)) {
             if (otmp->otyp == iflags.soko_prize_type1) {
