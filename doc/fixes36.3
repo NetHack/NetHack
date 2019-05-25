@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.15 $ $NHDT-Date: 1558686805 2019/05/24 08:33:25 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.18 $ $NHDT-Date: 1558794988 2019/05/25 14:36:28 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -47,6 +47,7 @@ curses: when display windows get reconfigured (after setting align_status,
 	messages rather than most recent N.  [Still room for improvement;
 	when feasible it combines short lines, resulting in N messages on
 	fewer than N lines and leaving some of the available lines blank.]
+curses: plug memory leak when getting a line of input is cancelled by ESC
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new

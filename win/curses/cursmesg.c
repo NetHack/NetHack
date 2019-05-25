@@ -86,7 +86,7 @@ curses_message_win_puts(const char *message, boolean recursed)
             scroll_window(MESSAGE_WIN);
             mx = width;
             my--;
-            strcpy(toplines, message);
+            Strcpy(toplines, message);
         }
         return;
     }
@@ -466,10 +466,10 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     char *tmpstr; /* for free() */
     int maxy, maxx; /* linewrap / scroll */
     int ch;
-    WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     int border_space = 0;
     int len; /* of answer string */
     boolean border = curses_window_has_border(MESSAGE_WIN);
+    WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
 
     orig_cursor = curs_set(0);
 
@@ -485,6 +485,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     maxy = height - 1 + border_space;
     maxx = width - 1 + border_space;
 
+    /* +2? buffer already includes room for terminator; +1: "prompt answer" */
     tmpbuf = (char *) alloc((unsigned) ((int) strlen(prompt) + buffer + 2));
     maxlines = buffer / width * 2;
     Strcpy(tmpbuf, prompt);
@@ -585,7 +586,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             /* if there isn't any input yet, return ESC */
             if (len == 0) {
                 Strcpy(answer, "\033");
-                return;
+                goto alldone;
             }
             /* otherwise, discard current input and start over;
                first need to blank it from the screen */
@@ -609,27 +610,19 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             break;
         case ERR: /* should not happen */
             *answer = '\0';
-            free(tmpbuf);
-            free(linestarts);
-            curs_set(orig_cursor);
-            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
-            return;
+            goto alldone;
         case '\r':
         case '\n':
-            free(linestarts);
             (void) strncpy(answer, p_answer, buffer);
             answer[buffer - 1] = '\0';
             Strcpy(toplines, tmpbuf);
             mesg_add_line(tmpbuf);
-            free(tmpbuf);
-            curs_set(orig_cursor);
-            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
             if (++my > maxy) {
                 scroll_window(MESSAGE_WIN);
                 my--;
             }
             mx = border_space;
-            return;
+            goto alldone;
         case '\177': /* DEL/Rubout */
         case KEY_DC: /* delete-character */
         case '\b': /* ^H (Backspace: '\011') */
@@ -666,6 +659,13 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             p_answer[len] = '\0';
         }
     }
+
+ alldone:
+    free(linestarts);
+    free(tmpbuf);
+    curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+    curs_set(orig_cursor);
+    return;
 }
 
 /* Scroll lines upward in given window, or clear window if only one line. */
