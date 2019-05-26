@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1558854699 2019/05/26 07:11:39 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1558856435 2019/05/26 07:40:35 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1301,38 +1301,25 @@ freedynamicdata()
     msgtype_free();
     tmp_at(DISP_FREEMEM, 0); /* temporary display effects */
 #ifdef FREE_ALL_MEMORY
+#define free_current_level() savelev(-1, -1, FREE_SAVE)
 #define freeobjchn(X) (saveobjchn(0, X, FREE_SAVE), X = 0)
 #define freemonchn(X) (savemonchn(0, X, FREE_SAVE), X = 0)
-#define freetrapchn(X) (savetrapchn(0, X, FREE_SAVE), X = 0)
 #define freefruitchn() savefruitchn(0, FREE_SAVE)
 #define freenames() savenames(0, FREE_SAVE)
 #define free_killers() save_killers(0, FREE_SAVE)
 #define free_oracles() save_oracles(0, FREE_SAVE)
 #define free_waterlevel() save_waterlevel(0, FREE_SAVE)
-#define free_worm() save_worm(0, FREE_SAVE)
 #define free_timers(R) save_timers(0, FREE_SAVE, R)
-#define free_light_sources(R) save_light_sources(0, FREE_SAVE, R);
-#define free_engravings() save_engravings(0, FREE_SAVE)
-#define freedamage() savedamage(0, FREE_SAVE)
+#define free_light_sources(R) save_light_sources(0, FREE_SAVE, R)
 #define free_animals() mon_animal_list(FALSE)
 
     /* move-specific data */
     dmonsfree(); /* release dead monsters */
 
     /* level-specific data */
-    free_timers(RANGE_LEVEL);
-    free_light_sources(RANGE_LEVEL);
-    clear_regions();
-    freemonchn(fmon);
-    free_worm(); /* release worm segment information */
-    freetrapchn(ftrap);
-    freeobjchn(fobj);
-    freeobjchn(level.buriedobjlist);
-    freeobjchn(billobjs);
-    free_engravings();
-    freedamage();
+    free_current_level();
 
-    /* game-state data */
+    /* game-state data [ought to reorganize savegamestate() to handle this] */
     free_killers();
     free_timers(RANGE_GLOBAL);
     free_light_sources(RANGE_GLOBAL);
@@ -1350,17 +1337,18 @@ freedynamicdata()
 
     /* some pointers in iflags */
     if (iflags.wc_font_map)
-        free(iflags.wc_font_map);
+        free((genericptr_t) iflags.wc_font_map), iflags.wc_font_map = 0;
     if (iflags.wc_font_message)
-        free(iflags.wc_font_message);
+        free((genericptr_t) iflags.wc_font_message),
+        iflags.wc_font_message = 0;
     if (iflags.wc_font_text)
-        free(iflags.wc_font_text);
+        free((genericptr_t) iflags.wc_font_text), iflags.wc_font_text = 0;
     if (iflags.wc_font_menu)
-        free(iflags.wc_font_menu);
+        free((genericptr_t) iflags.wc_font_menu), iflags.wc_font_menu = 0;
     if (iflags.wc_font_status)
-        free(iflags.wc_font_status);
+        free((genericptr_t) iflags.wc_font_status), iflags.wc_font_status = 0;
     if (iflags.wc_tile_file)
-        free(iflags.wc_tile_file);
+        free((genericptr_t) iflags.wc_tile_file), iflags.wc_tile_file = 0;
     free_autopickup_exceptions();
 
     /* miscellaneous */
