@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1558856435 2019/05/26 07:40:35 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1558880688 2019/05/26 14:24:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.120 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -136,8 +136,7 @@ dosave0()
         return 0;
 #endif
 
-    HUP if (iflags.window_inited)
-    {
+    HUP if (iflags.window_inited) {
         nh_uncompress(fq_save);
         fd = open_savefile();
         if (fd > 0) {
@@ -472,35 +471,59 @@ int mode;
     short tlev;
 #endif
 
-    /* if we're tearing down the current level without saving anything
-       (which happens upon entrance to the endgame or after an aborted
-       restore attempt) then we don't want to do any actual I/O */
-    if (mode == FREE_SAVE)
+    /*
+     *  Level file contents:
+     *    version info (handled by caller);
+     *    save file info (compression type; also by caller);
+     *    process ID;
+     *    internal level number (ledger number);
+     *    bones info;
+     *    actual level data.
+     *
+     *  If we're tearing down the current level without saving anything
+     *  (which happens at end of game or upon entrance to endgame or
+     *  after an aborted restore attempt) then we don't want to do any
+     *  actual I/O.  So when only freeing, we skip to the bones info
+     *  portion (which has some freeing to do), then jump quite a bit
+     *  further ahead to the middle of the 'actual level data' portion.
+     */
+    if (mode != FREE_SAVE) {
+        /* WRITE_SAVE (probably ORed with FREE_SAVE), or COUNT_SAVE */
+
+        /* purge any dead monsters (necessary if we're starting
+           a panic save rather than a normal one, or sometimes
+           when changing levels without taking time -- e.g.
+           create statue trap then immediately level teleport) */
+        if (iflags.purge_monsters)
+            dmonsfree();
+
+        if (fd < 0)
+            panic("Save on bad file!"); /* impossible */
+#ifdef MFLOPPY
+        count_only = (mode & COUNT_SAVE);
+#endif
+        if (lev >= 0 && lev <= maxledgerno())
+            g.level_info[lev].flags |= VISITED;
+        bwrite(fd, (genericptr_t) &g.hackpid, sizeof g.hackpid);
+#ifdef TOS
+        tlev = lev;
+        tlev &= 0x00ff;
+        bwrite(fd, (genericptr_t) &tlev, sizeof tlev);
+#else
+        bwrite(fd, (genericptr_t) &lev, sizeof lev);
+#endif
+    }
+
+    /* bones info comes before level data; the intent is for an external
+       program ('hearse') to be able to match a bones file with the
+       corresponding log file entry--or perhaps just skip that?--without
+       the guessing that was needed in 3.4.3 and without having to
+       interpret level data to find where to start; unfortunately it
+       still needs to handle all the data compression schemes */
+    savecemetery(fd, mode, &g.level.bonesinfo);
+    if (mode == FREE_SAVE) /* see above */
         goto skip_lots;
 
-    /* purge any dead monsters (necessary if we're starting
-       a panic save rather than a normal one, or sometimes
-       when changing levels without taking time -- e.g.
-       create statue trap then immediately level teleport) */
-    if (iflags.purge_monsters)
-        dmonsfree();
-
-    if (fd < 0)
-        panic("Save on bad file!"); /* impossible */
-#ifdef MFLOPPY
-    count_only = (mode & COUNT_SAVE);
-#endif
-    if (lev >= 0 && lev <= maxledgerno())
-        g.level_info[lev].flags |= VISITED;
-    bwrite(fd, (genericptr_t) &g.hackpid, sizeof g.hackpid);
-#ifdef TOS
-    tlev = lev;
-    tlev &= 0x00ff;
-    bwrite(fd, (genericptr_t) &tlev, sizeof tlev);
-#else
-    bwrite(fd, (genericptr_t) &lev, sizeof lev);
-#endif
-    savecemetery(fd, mode, &g.level.bonesinfo);
     savelevl(fd, (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     bwrite(fd, (genericptr_t) g.lastseentyp, sizeof g.lastseentyp);
     bwrite(fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
@@ -517,10 +540,7 @@ int mode;
 
     /* from here on out, saving also involves allocated memory cleanup */
  skip_lots:
-    /* this comes before the map, so need cleanup here if we skipped */
-    if (mode == FREE_SAVE)
-        savecemetery(fd, mode, &g.level.bonesinfo);
-    /* must be saved before mons, objs, and buried objs */
+    /* timers and lights must be saved before monsters and objects */
     save_timers(fd, mode, RANGE_LEVEL);
     save_light_sources(fd, mode, RANGE_LEVEL);
 
@@ -544,7 +564,7 @@ int mode;
         /* level.bonesinfo = 0; -- handled by savecemetery() */
     }
     save_engravings(fd, mode);
-    savedamage(fd, mode);
+    savedamage(fd, mode); /* pending shop wall and/or floor repair */
     save_regions(fd, mode);
     if (mode != FREE_SAVE)
         bflush(fd);
