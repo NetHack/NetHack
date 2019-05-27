@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.23 $ $NHDT-Date: 1558856435 2019/05/26 07:40:35 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.24 $ $NHDT-Date: 1558921075 2019/05/27 01:37:55 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -26,6 +26,10 @@ on rare occasions, multiple mine's end luckstones were being marked as the
 make sure the correct luckstone is the prize in mine's end
 free dungeon overview's bones information at end of game
 free current level's bones information at end of game
+free ball and chain if Punished hero dies while descending stairs or dies or
+	quits while swallowed; put ball and chain in bones for the stairs case
+if hero dies while a thrown or kicked object is in transit, put that object
+	on the map in case bones data gets saved
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
