@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1558485648 2019/05/22 00:40:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1558920171 2019/05/27 01:22:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -373,20 +373,7 @@ xchar ballx, bally, chainx, chainy; /* only matter !before */
     }
 }
 
-/* return TRUE if the caller needs to place the ball and chain down again
- *
- *  Should not be called while swallowed.  Should be called before movement,
- *  because we might want to move the ball or chain to the hero's old
- * position.
- *
- * It is called if we are moving.  It is also called if we are teleporting
- * *if* the ball doesn't move and we thus must drag the chain.  It is not
- * called for ordinary teleportation.
- *
- * allow_drag is only used in the ugly special case where teleporting must
- * drag the chain, while an identical-looking movement must drag both the ball
- * and chain.
- */
+/* return TRUE if the caller needs to place the ball and chain down again */
 boolean
 drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, cause_delay,
           allow_drag)
@@ -398,6 +385,20 @@ boolean allow_drag;
 {
     struct trap *t = (struct trap *) 0;
     boolean already_in_rock;
+
+    /*
+     * Should not be called while swallowed.  Should be called before
+     * movement, because we might want to move the ball or chain to the
+     * hero's old position.
+     *
+     * It is called if we are moving.  It is also called if we are
+     * teleporting *if* the ball doesn't move and we thus must drag the
+     * chain.  It is not called for ordinary teleportation.
+     *
+     * 'allow_drag' is only used in the ugly special case where teleporting
+     * must drag the chain, while an identical-looking movement must drag
+     * both the ball and chain.
+     */
 
     *ballx = uball->ox;
     *bally = uball->oy;
@@ -425,6 +426,7 @@ boolean allow_drag;
             }
             return TRUE;
         }
+
 #define CHAIN_IN_MIDDLE(chx, chy) \
     (distmin(x, y, chx, chy) <= 1 \
      && distmin(chx, chy, uball->ox, uball->oy) <= 1)
@@ -432,19 +434,21 @@ boolean allow_drag;
     (IS_ROCK(levl[x][y].typ)     \
      || (IS_DOOR(levl[x][y].typ) \
          && (levl[x][y].doormask & (D_CLOSED | D_LOCKED))))
-/* Don't ever move the chain into solid rock.  If we have to, then instead
- * undo the move_bc() and jump to the drag ball code.  Note that this also
- * means the "cannot carry and drag" message will not appear, since unless we
- * moved at least two squares there is no possibility of the chain position
- * being in solid rock.
- */
-#define SKIP_TO_DRAG                                               \
-    {                                                              \
+    /*
+     * Don't ever move the chain into solid rock.  If we have to, then
+     * instead undo the move_bc() and jump to the drag ball code.  Note
+     * that this also means the "cannot carry and drag" message will not
+     * appear, since unless we moved at least two squares there is no
+     * possibility of the chain position being in solid rock.
+     */
+#define SKIP_TO_DRAG \
+    do {                                                           \
         *chainx = oldchainx;                                       \
         *chainy = oldchainy;                                       \
         move_bc(0, *bc_control, *ballx, *bally, *chainx, *chainy); \
         goto drag;                                                 \
-    }
+    } while (0)
+
         if (IS_CHAIN_ROCK(u.ux, u.uy) || IS_CHAIN_ROCK(*chainx, *chainy)
             || IS_CHAIN_ROCK(uball->ox, uball->oy))
             already_in_rock = TRUE;
@@ -469,8 +473,8 @@ boolean allow_drag;
         case 5: {
             xchar tempx, tempy, tempx2, tempy2;
 
-            /* find position closest to current position of chain */
-            /* no effect if current position is already OK */
+            /* find position closest to current position of chain;
+               no effect if current position is already OK */
             if (abs(x - uball->ox) == 1) {
                 tempx = x;
                 tempx2 = uball->ox;
