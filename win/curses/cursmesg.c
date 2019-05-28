@@ -96,12 +96,15 @@ curses_message_win_puts(const char *message, boolean recursed)
         mesg_add_line(message);
     }
 
-    linespace = width - 3 - (mx - border_space);
+    /* -2: room for trailing ">>" (if More>> is needed) or leading "  "
+       (if combining this message with preceding one) */
+    linespace = (width - 1) - 2 - (mx - border_space);
 
     if (linespace < message_length) {
         if (my - border_space >= height - 1) {
             /* bottom of message win */
-            if (++turn_lines >= height) { /* || height == 1) */
+            if (++turn_lines > height
+                || (turn_lines == height && mx > border_space)) {
                 /* Pause until key is hit - Esc suppresses any further
                    messages that turn */
                 if (curses_more() == '\033') {
@@ -118,6 +121,13 @@ curses_message_win_puts(const char *message, boolean recursed)
                 mx = border_space;
                 ++turn_lines;
             }
+        }
+    } else { /* don't need to move to next line */
+        /* if we aren't at the start of the line, we're combining multiple
+           messages on one line; use 2-space separation */
+        if (mx > border_space) {
+            waddstr(win, "  ");
+            mx += 2;
         }
     }
 
@@ -142,14 +152,6 @@ curses_message_win_puts(const char *message, boolean recursed)
         free(tmpstr);
     } else {
         mvwprintw(win, my, mx, "%s", message), mx += message_length;
-        /* two spaces to separate this message from next one if they happen
-           to fit on the same line; (FIXME:  it would be better if this was
-           done at start of next message rather than end of this one since
-           it impacts placement of "More>>") */
-        if (mx < width - 2) {
-            if (++mx < width - 2)
-                ++mx;
-        }
         if (bold)
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
     }
@@ -705,10 +707,7 @@ directional_scroll(winid wid, int nlines)
     wscrl(win, nlines);
     scrollok(win, FALSE);
     if (wid == MESSAGE_WIN) {
-        if (border)
-            mx = 1;
-        else
-            mx = 0;
+        mx = border ? 1 : 0;
     }
     if (border) {
         box(win, 0, 0);
