@@ -584,6 +584,9 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
 #endif
         curs_set(0);
         switch (ch) {
+        case ERR: /* should not happen */
+            *answer = '\0';
+            goto alldone;
         case '\033': /* DOESCAPE */
             /* if there isn't any input yet, return ESC */
             if (len == 0) {
@@ -610,20 +613,25 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             *p_answer = '\0';
             len = 0;
             break;
-        case ERR: /* should not happen */
-            *answer = '\0';
-            goto alldone;
         case '\r':
         case '\n':
             (void) strncpy(answer, p_answer, buffer);
             answer[buffer - 1] = '\0';
             Strcpy(toplines, tmpbuf);
             mesg_add_line(tmpbuf);
+#if 1
+            /* position at end of current line so next message will be
+               written on next line regardless of whether it could fit here */
+            mx = border_space ? (width + 1) : (width - 1);
+            wmove(win, my, mx);
+#else       /* after various other changes, this resulted in getline()
+             * prompt+answer being following by a blank message line */
             if (++my > maxy) {
                 scroll_window(MESSAGE_WIN);
                 my--;
             }
             mx = border_space;
+#endif /*0*/
             goto alldone;
         case '\177': /* DEL/Rubout */
         case KEY_DC: /* delete-character */
