@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1558562368 2019/05/22 21:59:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559088524 2019/05/29 00:08:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -460,8 +460,6 @@ baalz_fixup()
     bughack.inarea.y2 = bughack.delarea.y2 = 0;
 }
 
-static boolean was_waterlevel; /* ugh... this shouldn't be needed */
-
 /* this is special stuff that the level compiler cannot (yet) handle */
 void
 fixup_special()
@@ -472,14 +470,8 @@ fixup_special()
     struct mkroom *croom;
     boolean added_branch = FALSE;
 
-    if (was_waterlevel) {
-        was_waterlevel = FALSE;
-        u.uinwater = 0;
-        unsetup_waterlevel();
-    }
     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
         level.flags.hero_memory = 0;
-        was_waterlevel = TRUE;
         /* water level is an odd beast - it has to be set up
            before calling place_lregions etc. */
         setup_waterlevel();
@@ -497,6 +489,7 @@ fixup_special()
                 lev.dlevel = atoi(r->rname.str);
             } else {
                 s_level *sp = find_level(r->rname.str);
+
                 lev = sp->dlevel;
             }
             /*FALLTHRU*/
@@ -1574,13 +1567,13 @@ int fd, mode;
         int n = 0;
         for (b = bbubbles; b; b = b->next)
             ++n;
-        bwrite(fd, (genericptr_t) &n, sizeof(int));
-        bwrite(fd, (genericptr_t) &xmin, sizeof(int));
-        bwrite(fd, (genericptr_t) &ymin, sizeof(int));
-        bwrite(fd, (genericptr_t) &xmax, sizeof(int));
-        bwrite(fd, (genericptr_t) &ymax, sizeof(int));
+        bwrite(fd, (genericptr_t) &n, sizeof n);
+        bwrite(fd, (genericptr_t) &xmin, sizeof xmin);
+        bwrite(fd, (genericptr_t) &ymin, sizeof ymin);
+        bwrite(fd, (genericptr_t) &xmax, sizeof xmax);
+        bwrite(fd, (genericptr_t) &ymax, sizeof ymax);
         for (b = bbubbles; b; b = b->next)
-            bwrite(fd, (genericptr_t) b, sizeof(struct bubble));
+            bwrite(fd, (genericptr_t) b, sizeof *b);
     }
     if (release_data(mode))
         unsetup_waterlevel();
@@ -1597,15 +1590,15 @@ int fd;
         return;
 
     set_wportal();
-    mread(fd, (genericptr_t) &n, sizeof(int));
-    mread(fd, (genericptr_t) &xmin, sizeof(int));
-    mread(fd, (genericptr_t) &ymin, sizeof(int));
-    mread(fd, (genericptr_t) &xmax, sizeof(int));
-    mread(fd, (genericptr_t) &ymax, sizeof(int));
+    mread(fd, (genericptr_t) &n, sizeof n);
+    mread(fd, (genericptr_t) &xmin, sizeof xmin);
+    mread(fd, (genericptr_t) &ymin, sizeof ymin);
+    mread(fd, (genericptr_t) &xmax, sizeof xmax);
+    mread(fd, (genericptr_t) &ymax, sizeof ymax);
     for (i = 0; i < n; i++) {
         btmp = b;
-        b = (struct bubble *) alloc(sizeof(struct bubble));
-        mread(fd, (genericptr_t) b, sizeof(struct bubble));
+        b = (struct bubble *) alloc(sizeof *b);
+        mread(fd, (genericptr_t) b, sizeof *b);
         if (bbubbles) {
             btmp->next = b;
             b->prev = btmp;
@@ -1617,7 +1610,6 @@ int fd;
     }
     ebubbles = b;
     b->next = (struct bubble *) 0;
-    was_waterlevel = TRUE;
 }
 
 const char *
@@ -1740,7 +1732,7 @@ int x, y, n;
     if (bmask[n][1] > MAX_BMASK) {
         panic("bmask size is larger than MAX_BMASK");
     }
-    b = (struct bubble *) alloc(sizeof(struct bubble));
+    b = (struct bubble *) alloc(sizeof *b);
     if ((x + (int) bmask[n][0] - 1) > bxmax)
         x = bxmax - bmask[n][0] + 1;
     if ((y + (int) bmask[n][1] - 1) > bymax)
@@ -1751,7 +1743,7 @@ int x, y, n;
     b->dy = 1 - rn2(3);
     /* y dimension is the length of bitmap data - see bmask above */
     (void) memcpy((genericptr_t) b->bm, (genericptr_t) bmask[n],
-                  (bmask[n][1] + 2) * sizeof(b->bm[0]));
+                  (bmask[n][1] + 2) * sizeof (b->bm[0]));
     b->cons = 0;
     if (!bbubbles)
         bbubbles = b;
