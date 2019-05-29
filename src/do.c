@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1548978604 2019/01/31 23:50:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.189 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1559088523 2019/05/29 00:08:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1365,6 +1365,16 @@ boolean at_stairs, falling, portal;
     }
     savelev(fd, ledger_no(&u.uz),
             cant_go_back ? FREE_SAVE : (WRITE_SAVE | FREE_SAVE));
+    /* air bubbles and clouds are saved in game-state rather than with the
+       level they're used on; in normal play, you can't leave and return
+       to any endgame level--bubbles aren't needed once you move to the
+       next level so used to be discarded when the next special level was
+       loaded; but in wizard mode you can leave and return, and since they
+       aren't saved with the level and restored upon return (new ones are
+       created instead), we need to discard them to avoid a memory leak;
+       so bubbles are now discarded as we leave the level they're used on */
+    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
+        save_waterlevel(fd, FREE_SAVE); /* note: doesn't use 'fd' */
     bclose(fd);
     if (cant_go_back) {
         /* discard unreachable levels; keep #0 */
@@ -1428,6 +1438,7 @@ boolean at_stairs, falling, portal;
         oinit(); /* reassign level dependent obj probabilities */
     }
     reglyph_darkroom();
+    u.uinwater = 0;
     /* do this prior to level-change pline messages */
     vision_reset();         /* clear old level's line-of-sight */
     vision_full_recalc = 0; /* don't let that reenable vision yet */
