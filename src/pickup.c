@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1545785547 2018/12/26 00:52:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.222 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1559130050 2019/05/29 11:40:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.226 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -187,7 +187,7 @@ int *menu_on_demand;
         const char *where = 0;
         char sym, oc_of_sym, *p;
 
-    ask_again:
+ ask_again:
         oclasses[oclassct = 0] = '\0';
         *one_at_a_time = *everything = FALSE;
         not_everything = filtered = FALSE;
@@ -586,7 +586,7 @@ int what; /* should be a long */
                               &pick_list, PICK_ANY, all_but_uchain);
         }
 
-    menu_pickup:
+ menu_pickup:
         n_tried = n;
         for (n_picked = i = 0; i < n; i++) {
             res = pickup_object(pick_list[i].item.a_obj, pick_list[i].count,
@@ -690,7 +690,7 @@ int what; /* should be a long */
                 break;
             n_picked += res;
         }
-    end_query:
+ end_query:
         ; /* statement required after label */
     }
 
@@ -899,6 +899,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
                 && will_feel_cockatrice(curr, FALSE)) {
                 destroy_nhwindow(win); /* stop the menu and revert */
                 (void) look_here(0, FALSE);
+                unsortloot(&sortedolist);
                 return 0;
             }
             if ((*allow)(curr)) {
@@ -1938,8 +1939,7 @@ reverse_loot()
         if (g_at(x, y))
             pline("Ok, now there is loot here.");
     } else {
-        /* find original coffers chest if present, otherwise use nearest one
-         */
+        /* find original coffers chest if present, otherwise use nearest one */
         otmp = 0;
         for (coffers = fobj; coffers; coffers = coffers->nobj)
             if (coffers->otyp == CHEST) {
@@ -2569,7 +2569,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
      * or
      * <The/Your/Shk's container> is empty.  Do what with it? [:irs nq or ?]
      */
-    for (;;) { /* repeats iff '?' or ":' gets chosen */
+    for (;;) { /* repeats iff '?' or ':' gets chosen */
         outmaybe = (outokay || !current_container->cknown);
         if (!outmaybe)
             (void) safe_qbuf(qbuf, (char *) 0, " is empty.  Do what with it?",
@@ -2697,7 +2697,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         }
     }
 
-containerdone:
+ containerdone:
     if (used) {
         /* Not completely correct; if we put something in without knowing
            whatever was already inside, now we suddenly do.  That can't
