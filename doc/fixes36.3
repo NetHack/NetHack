@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.25 $ $NHDT-Date: 1559035655 2019/05/28 09:27:35 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.26 $ $NHDT-Date: 1559088523 2019/05/29 00:08:43 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -30,6 +30,8 @@ free ball and chain if Punished hero dies while descending stairs or dies or
 	quits while swallowed; put ball and chain in bones for the stairs case
 if hero dies while a thrown or kicked object is in transit, put that object
 	on the map in case bones data gets saved
+fix a memory leak that occurred if player used wizard mode to leave and return
+	to the Plane of Air or Plane of Water (not possible in normal play)
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository

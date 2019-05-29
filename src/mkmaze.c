@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1558562368 2019/05/22 21:59:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559088524 2019/05/29 00:08:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -464,14 +464,8 @@ fixup_special()
     struct mkroom *croom;
     boolean added_branch = FALSE;
 
-    if (g.was_waterlevel) {
-        g.was_waterlevel = FALSE;
-        u.uinwater = 0;
-        unsetup_waterlevel();
-    }
     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
         g.level.flags.hero_memory = 0;
-        g.was_waterlevel = TRUE;
         /* water level is an odd beast - it has to be set up
            before calling place_lregions etc. */
         setup_waterlevel();
@@ -489,6 +483,7 @@ fixup_special()
                 lev.dlevel = atoi(r->rname.str);
             } else {
                 s_level *sp = find_level(r->rname.str);
+
                 lev = sp->dlevel;
             }
             /*FALLTHRU*/
@@ -1562,13 +1557,13 @@ int fd, mode;
         int n = 0;
         for (b = g.bbubbles; b; b = b->next)
             ++n;
-        bwrite(fd, (genericptr_t) &n, sizeof(int));
-        bwrite(fd, (genericptr_t) &g.xmin, sizeof(int));
-        bwrite(fd, (genericptr_t) &g.ymin, sizeof(int));
-        bwrite(fd, (genericptr_t) &g.xmax, sizeof(int));
-        bwrite(fd, (genericptr_t) &g.ymax, sizeof(int));
+        bwrite(fd, (genericptr_t) &n, sizeof n);
+        bwrite(fd, (genericptr_t) &g.xmin, sizeof g.xmin);
+        bwrite(fd, (genericptr_t) &g.ymin, sizeof g.ymin);
+        bwrite(fd, (genericptr_t) &g.xmax, sizeof g.xmax);
+        bwrite(fd, (genericptr_t) &g.ymax, sizeof g.ymax);
         for (b = g.bbubbles; b; b = b->next)
-            bwrite(fd, (genericptr_t) b, sizeof(struct bubble));
+            bwrite(fd, (genericptr_t) b, sizeof *b);
     }
     if (release_data(mode))
         unsetup_waterlevel();
@@ -1585,15 +1580,15 @@ int fd;
         return;
 
     set_wportal();
-    mread(fd, (genericptr_t) &n, sizeof(int));
-    mread(fd, (genericptr_t) &g.xmin, sizeof(int));
-    mread(fd, (genericptr_t) &g.ymin, sizeof(int));
-    mread(fd, (genericptr_t) &g.xmax, sizeof(int));
-    mread(fd, (genericptr_t) &g.ymax, sizeof(int));
+    mread(fd, (genericptr_t) &n, sizeof n);
+    mread(fd, (genericptr_t) &g.xmin, sizeof g.xmin);
+    mread(fd, (genericptr_t) &g.ymin, sizeof g.ymin);
+    mread(fd, (genericptr_t) &g.xmax, sizeof g.xmax);
+    mread(fd, (genericptr_t) &g.ymax, sizeof g.ymax);
     for (i = 0; i < n; i++) {
         btmp = b;
-        b = (struct bubble *) alloc(sizeof(struct bubble));
-        mread(fd, (genericptr_t) b, sizeof(struct bubble));
+        b = (struct bubble *) alloc(sizeof *b);
+        mread(fd, (genericptr_t) b, sizeof *b);
         if (g.bbubbles) {
             btmp->next = b;
             b->prev = btmp;
@@ -1605,7 +1600,6 @@ int fd;
     }
     g.ebubbles = b;
     b->next = (struct bubble *) 0;
-    g.was_waterlevel = TRUE;
 }
 
 const char *
@@ -1728,7 +1722,7 @@ int x, y, n;
     if (bmask[n][1] > MAX_BMASK) {
         panic("bmask size is larger than MAX_BMASK");
     }
-    b = (struct bubble *) alloc(sizeof(struct bubble));
+    b = (struct bubble *) alloc(sizeof *b);
     if ((x + (int) bmask[n][0] - 1) > gbxmax)
         x = gbxmax - bmask[n][0] + 1;
     if ((y + (int) bmask[n][1] - 1) > gbymax)
@@ -1739,7 +1733,7 @@ int x, y, n;
     b->dy = 1 - rn2(3);
     /* y dimension is the length of bitmap data - see bmask above */
     (void) memcpy((genericptr_t) b->bm, (genericptr_t) bmask[n],
-                  (bmask[n][1] + 2) * sizeof(b->bm[0]));
+                  (bmask[n][1] + 2) * sizeof (b->bm[0]));
     b->cons = 0;
     if (!g.bbubbles)
         g.bbubbles = b;

@@ -54,6 +54,7 @@ static HWND GetConsoleHwnd(void);
 extern void NDECL(backsp);
 #endif
 int NDECL(windows_console_custom_nhgetch);
+extern void NDECL(safe_routines);
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
@@ -251,35 +252,18 @@ Delay(int ms)
 void
 win32_abort()
 {
-    boolean is_tty = FALSE;
+    int c;
 
-#ifdef TTY_GRAPHICS
-    is_tty = WINDOWPORT("tty");
-#endif
+    if (WINDOWPORT("mswin") || WINDOWPORT("tty")) {
+        if (iflags.window_inited)
+            exit_nhwindows((char *) 0);
+        iflags.window_inited = FALSE;
+    }
+    if (!WINDOWPORT("mswin") && !WINDOWPORT("safe-startup"))
+        safe_routines();
     if (wizard) {
-        int c, ci, ct;
-
-        if (!iflags.window_inited)
-            c = 'n';
-        ct = 0;
-        msmsg("Execute debug breakpoint wizard?");
-        while ((ci = nhgetch()) != '\n') {
-            if (ct > 0) {
-                if (is_tty)
-                    backsp(); /* \b is visible on NT console */
-                (void) putchar(' ');
-                if (is_tty)
-                    backsp();
-                ct = 0;
-                c = 'n';
-            }
-            if (ci == 'y' || ci == 'n' || ci == 'Y' || ci == 'N') {
-                ct = 1;
-                c = ci;
-                msmsg("%c", c);
-            }
-        }
-        if (c == 'y')
+        raw_print("Execute debug breakpoint wizard?");
+        if ((c = nhgetch()) == 'y' || c == 'Y')
             DebugBreak();
     }
     abort();
@@ -540,13 +524,16 @@ void
 getreturn(str)
 const char *str;
 {
+    static boolean in_getreturn = FALSE;
     char buf[BUFSZ];
 
-    if (!getreturn_enabled)
+    if (in_getreturn || !getreturn_enabled)
         return;
+    in_getreturn = TRUE;
     Sprintf(buf,"Hit <Enter> %s.", str);
     raw_print(buf);
     wait_synch();
+    in_getreturn = FALSE;
     return;
 }
 
