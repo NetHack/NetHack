@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1549327459 2019/02/05 00:44:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1559227823 2019/05/30 14:50:23 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,10 +17,7 @@
 #define OFF 0
 #define BOLT_LIM 8        /* from this distance ranged attacks will be made */
 #define MAX_CARR_CAP 1000 /* so that boulders can be heavier */
-#define DUMMY \
-    {         \
-        0     \
-    }
+#define DUMMY { 0 }       /* array initializer, letting [1..N-1] default */
 
 /* symbolic names for capacity levels */
 enum encumbrance_types {
@@ -244,24 +241,25 @@ typedef struct sortloot_item Loot;
 #include "extern.h"
 #endif /* USE_TRAMPOLI */
 
-/* flags to control makemon() */
+/* flags to control makemon(); goodpos() uses some plus has some of its own */
 #define NO_MM_FLAGS 0x00000 /* use this rather than plain 0 */
-#define NO_MINVENT 0x00001  /* suppress minvent when creating mon */
-#define MM_NOWAIT 0x00002   /* don't set STRAT_WAITMASK flags */
-#define MM_NOCOUNTBIRTH \
-    0x00004 /* don't increment born counter (for revival) */
-#define MM_IGNOREWATER 0x00008 /* ignore water when positioning */
-#define MM_ADJACENTOK \
-    0x00010               /* it is acceptable to use adjacent coordinates */
-#define MM_ANGRY  0x00020  /* monster is created angry */
-#define MM_NONAME 0x00040 /* monster is not christened */
-#define MM_EGD    0x00100    /* add egd structure */
-#define MM_EPRI   0x00200   /* add epri structure */
-#define MM_ESHK   0x00400   /* add eshk structure */
-#define MM_EMIN   0x00800   /* add emin structure */
-#define MM_EDOG   0x01000   /* add edog structure */
-#define MM_ASLEEP 0x02000   /* monsters should be generated asleep */
-#define MM_NOGRP  0x04000   /* suppress creation of monster groups */
+#define NO_MINVENT  0x00001 /* suppress minvent when creating mon */
+#define MM_NOWAIT   0x00002 /* don't set STRAT_WAITMASK flags */
+#define MM_NOCOUNTBIRTH 0x00004 /* don't increment born count (for revival) */
+#define MM_IGNOREWATER  0x00008 /* ignore water when positioning */
+#define MM_ADJACENTOK   0x00010 /* acceptable to use adjacent coordinates */
+#define MM_ANGRY    0x00020 /* monster is created angry */
+#define MM_NONAME   0x00040 /* monster is not christened */
+#define MM_EGD      0x00100 /* add egd structure */
+#define MM_EPRI     0x00200 /* add epri structure */
+#define MM_ESHK     0x00400 /* add eshk structure */
+#define MM_EMIN     0x00800 /* add emin structure */
+#define MM_EDOG     0x01000 /* add edog structure */
+#define MM_ASLEEP   0x02000 /* monsters should be generated asleep */
+#define MM_NOGRP    0x04000 /* suppress creation of monster groups */
+/* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
+#define GP_ALLOW_XY 0x08000 /* [actually used by enexto() to decide whether
+                             * to make an extra call to goodpos()]          */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00
@@ -293,27 +291,27 @@ typedef struct sortloot_item Loot;
 #define ALL_FINISHED 0x01 /* called routine already finished the job */
 
 /* flags to control query_objlist() */
-#define BY_NEXTHERE 0x1       /* follow objlist by nexthere field */
-#define AUTOSELECT_SINGLE 0x2 /* if only 1 object, don't ask */
-#define USE_INVLET 0x4        /* use object's invlet */
-#define INVORDER_SORT 0x8     /* sort objects by packorder */
-#define SIGNAL_NOMENU 0x10    /* return -1 rather than 0 if none allowed */
-#define SIGNAL_ESCAPE 0x20    /* return -2 rather than 0 for ESC */
-#define FEEL_COCKATRICE 0x40  /* engage cockatrice checks and react */
-#define INCLUDE_HERO 0x80     /* show hero among engulfer's inventory */
+#define BY_NEXTHERE     0x01   /* follow objlist by nexthere field */
+#define AUTOSELECT_SINGLE 0x02 /* if only 1 object, don't ask */
+#define USE_INVLET      0x04   /* use object's invlet */
+#define INVORDER_SORT   0x08   /* sort objects by packorder */
+#define SIGNAL_NOMENU   0x10   /* return -1 rather than 0 if none allowed */
+#define SIGNAL_ESCAPE   0x20   /* return -2 rather than 0 for ESC */
+#define FEEL_COCKATRICE 0x40   /* engage cockatrice checks and react */
+#define INCLUDE_HERO    0x80   /* show hero among engulfer's inventory */
 
 /* Flags to control query_category() */
 /* BY_NEXTHERE used by query_category() too, so skip 0x01 */
-#define UNPAID_TYPES 0x02
-#define GOLD_TYPES 0x04
-#define WORN_TYPES 0x08
-#define ALL_TYPES 0x10
-#define BILLED_TYPES 0x20
-#define CHOOSE_ALL 0x40
-#define BUC_BLESSED 0x80
-#define BUC_CURSED 0x100
+#define UNPAID_TYPES 0x002
+#define GOLD_TYPES   0x004
+#define WORN_TYPES   0x008
+#define ALL_TYPES    0x010
+#define BILLED_TYPES 0x020
+#define CHOOSE_ALL   0x040
+#define BUC_BLESSED  0x080
+#define BUC_CURSED   0x100
 #define BUC_UNCURSED 0x200
-#define BUC_UNKNOWN 0x400
+#define BUC_UNKNOWN  0x400
 #define BUC_ALLBKNOWN (BUC_BLESSED | BUC_CURSED | BUC_UNCURSED)
 #define BUCX_TYPES (BUC_ALLBKNOWN | BUC_UNKNOWN)
 #define ALL_TYPES_SELECTED -2

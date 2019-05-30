@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1556139724 2019/04/24 21:02:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.284 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1559227828 2019/05/30 14:50:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2595,12 +2595,11 @@ struct monst *mtmp;
         return;
     }
 
-    if (!enexto(&mm, u.ux, u.uy, mtmp->data)) {
+    if (!enexto(&mm, u.ux, u.uy, mtmp->data) || !isok(mm.x, mm.y)) {
+        debugpline1("mnexto: sending %s into limbo", m_monnam(mtmp));
         m_into_limbo(mtmp);
         return;
     }
-    if (!isok(mm.x, mm.y))
-        return;
     rloc_to(mtmp, mm.x, mm.y);
     if (!in_mklev && (mtmp->mstrategy & STRAT_APPEARMSG)) {
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
@@ -2674,9 +2673,7 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
          * Migrating_mons that need to be placed will cause
          * no end of trouble.
          */
-        if (!enexto(&mm, newx, newy, mtmp->data))
-            return 0;
-        if (!isok(mm.x, mm.y))
+        if (!enexto(&mm, newx, newy, mtmp->data) || !isok(mm.x, mm.y))
             return 0;
         newx = mm.x;
         newy = mm.y;
@@ -2685,8 +2682,10 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
 
     if (move_other && othermon) {
         res = 2; /* moving another monster out of the way */
-        if (!mnearto(othermon, x, y, FALSE)) /* no 'move_other' this time */
+        if (!mnearto(othermon, x, y, FALSE)) { /* no 'move_other' this time */
+            debugpline1("mnearto: sending %s into limbo", m_monnam(othermon));
             m_into_limbo(othermon);
+        }
     }
 
     return res;
