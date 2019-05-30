@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559088524 2019/05/29 00:08:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559227829 2019/05/30 14:50:29 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1848,6 +1848,7 @@ boolean ini;
                 for (olist = (struct obj *) cons->list; olist; olist = otmp) {
                     otmp = olist->nexthere;
                     place_object(olist, cons->x, cons->y);
+                    stackobj(olist);
                 }
                 break;
             }
@@ -1855,7 +1856,12 @@ boolean ini;
             case CONS_MON: {
                 struct monst *mon = (struct monst *) cons->list;
 
-                (void) mnearto(mon, cons->x, cons->y, TRUE);
+                /* mnearto() might fail, and putting the monster into limbo
+                   to try next time hero comes to this level makes no sense
+                   because we can't leave and return (outside wizard mode) */
+                if (!mnearto(mon, cons->x, cons->y, TRUE)) {
+                    ; /* ? */
+                }
                 break;
             }
 
