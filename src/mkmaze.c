@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559227829 2019/05/30 14:50:29 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559299316 2019/05/31 10:41:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1493,10 +1493,22 @@ movebubbles()
                     }
         }
     } else if (Is_airlevel(&u.uz)) {
-        for (x = 0; x < COLNO; x++)
-            for (y = 0; y < ROWNO; y++) {
+        boolean xedge, yedge;
+
+        for (x = 1; x <= (COLNO - 1); x++)
+            for (y = 0; y <= (ROWNO - 1); y++) {
                 levl[x][y] = air_pos;
                 unblock_point(x, y);
+                /* all air or all cloud around the perimeter of the Air
+                   level tends to look strange; break up the pattern */
+                xedge = (boolean) (x < bxmin || x > bxmax);
+                yedge = (boolean) (y < bymin || y > bymax);
+                if (xedge || yedge) {
+                    if (!rn2(xedge ? 3 : 5)) {
+                        levl[x][y].typ = CLOUD;
+                        block_point(x, y);
+                    }
+                }
             }
     }
 
@@ -1589,6 +1601,14 @@ int fd;
     if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
         return;
 
+    if (fd == -1) { /* special handling for restore in goto_level() */
+        if (!wizard)
+            impossible("restore_waterlevel: returning to %s?",
+                       Is_waterlevel(&u.uz) ? "Water" : "Air");
+        setup_waterlevel();
+        return;
+    }
+
     set_wportal();
     mread(fd, (genericptr_t) &n, sizeof n);
     mread(fd, (genericptr_t) &xmin, sizeof xmin);
@@ -1655,26 +1675,37 @@ set_wportal()
 STATIC_OVL void
 setup_waterlevel()
 {
-    int x, y;
-    int xskip, yskip;
-    int water_glyph = cmap_to_glyph(S_water),
-        air_glyph = cmap_to_glyph(S_air);
+    int x, y, xskip, yskip, typ, glyph;
 
-    /* ouch, hardcoded... */
+    if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
+        panic("setup_waterlevel(): [%d:%d] neither 'Water' nor 'Air'",
+              (int) u.uz.dnum, (int) u.uz.dlevel);
 
+    /* ouch, hardcoded... (file scope statics and used in bxmin,bymax,&c) */
     xmin = 3;
     ymin = 1;
+    /* use separate statements so that compiler won't complain about min()
+       comparing two constants; the alternative is to do this in the
+       preprocessor: #if (20 > ROWNO-1) ymax=ROWNO-1 #else ymax=20 #endif */
     xmax = 78;
+    xmax = min(xmax, (COLNO - 1) - 1);
     ymax = 20;
+    ymax = min(ymax, (ROWNO - 1));
 
-    /* set hero's memory to water */
+    /* entire level is remembered as one glyph and any unspecified portion
+       should default to level's base element rather than to usual stone */
+    glyph = cmap_to_glyph(Is_waterlevel(&u.uz) ? S_water : S_air);
+    typ = Is_waterlevel(&u.uz) ? WATER : AIR;
 
-    for (x = xmin; x <= xmax; x++)
-        for (y = ymin; y <= ymax; y++)
-            levl[x][y].glyph = Is_waterlevel(&u.uz) ? water_glyph : air_glyph;
+    /* set unspecified terrain (stone) and hero's memory to water or air */
+    for (x = 1; x <= COLNO - 1; x++)
+        for (y = 0; y <= ROWNO - 1; y++) {
+            levl[x][y].glyph = glyph;
+            if (levl[x][y].typ == STONE)
+                levl[x][y].typ = typ;
+        }
 
     /* make bubbles */
-
     if (Is_waterlevel(&u.uz)) {
         xskip = 10 + rn2(10);
         yskip = 4 + rn2(4);
@@ -1694,7 +1725,6 @@ unsetup_waterlevel()
     struct bubble *b, *bb;
 
     /* free bubbles */
-
     for (b = bbubbles; b; b = bb) {
         bb = b->next;
         free((genericptr_t) b);
@@ -1713,14 +1743,15 @@ int x, y, n;
      * in situ, either.  The first two elements tell the dimensions of
      * the bubble's bounding box.
      */
-    static uchar bm2[] = { 2, 1, 0x3 },
-                 bm3[] = { 3, 2, 0x7, 0x7 },
-                 bm4[] = { 4, 3, 0x6, 0xf, 0x6 },
-                 bm5[] = { 5, 3, 0xe, 0x1f, 0xe },
-                 bm6[] = { 6, 4, 0x1e, 0x3f, 0x3f, 0x1e },
-                 bm7[] = { 7, 4, 0x3e, 0x7f, 0x7f, 0x3e },
-                 bm8[] = { 8, 4, 0x7e, 0xff, 0xff, 0x7e },
-                 *bmask[] = { bm2, bm3, bm4, bm5, bm6, bm7, bm8 };
+    static const uchar
+        bm2[] = { 2, 1, 0x3 },
+        bm3[] = { 3, 2, 0x7, 0x7 },
+        bm4[] = { 4, 3, 0x6, 0xf, 0x6 },
+        bm5[] = { 5, 3, 0xe, 0x1f, 0xe },
+        bm6[] = { 6, 4, 0x1e, 0x3f, 0x3f, 0x1e },
+        bm7[] = { 7, 4, 0x3e, 0x7f, 0x7f, 0x3e },
+        bm8[] = { 8, 4, 0x7e, 0xff, 0xff, 0x7e },
+        *const bmask[] = { bm2, bm3, bm4, bm5, bm6, bm7, bm8 };
     struct bubble *b;
 
     if (x >= bxmax || y >= bymax)
@@ -1911,7 +1942,8 @@ boolean ini;
         b->dy = -b->dy;
         break;
     case 3:
-        b->dy = -b->dy; /* fall through */
+        b->dy = -b->dy;
+        /*FALLTHRU*/
     case 2:
         b->dx = -b->dx;
         break;
