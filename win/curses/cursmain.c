@@ -202,6 +202,7 @@ curses_player_selection()
 void
 curses_askname()
 {
+    g.plname[0] = '\0';
     curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
 }
 

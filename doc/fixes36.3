@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.27 $ $NHDT-Date: 1559130050 2019/05/29 11:40:50 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.29 $ $NHDT-Date: 1559313320 2019/05/31 14:35:20 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -33,6 +33,8 @@ if hero dies while a thrown or kicked object is in transit, put that object
 fix a memory leak that occurred if player used wizard mode to leave and return
 	to the Plane of Air or Plane of Water (not possible in normal play)
 free sortloot data if object handling is short-circuited by cockatrice corpse
+on the Plane of Water, make water go all the way to the edges of the level
+on the Plane of Air, make clouds disrupt line of sight along the edges
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -73,6 +75,8 @@ General New Features
 --------------------
 classify sources as released, beta, or work-in-progress via NH_DEVEL_STATUS
 	rather than just released vs beta via BETA
+if you reach the edge of a level (relatively uncommon) and try to move off,
+	report that you can't go farther if the 'mention_walls' option is set
 
 
 NetHack Community Patches (or Variation) Included

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1559088523 2019/05/29 00:08:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1559299314 2019/05/31 10:41:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.191 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1367,7 +1367,7 @@ boolean at_stairs, falling, portal;
        created instead), we need to discard them to avoid a memory leak;
        so bubbles are now discarded as we leave the level they're used on */
     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
-        save_waterlevel(fd, FREE_SAVE); /* note: doesn't use 'fd' */
+        save_waterlevel(-1, FREE_SAVE);
     bclose(fd);
     if (cant_go_back) {
         /* discard unreachable levels; keep #0 */
@@ -1427,6 +1427,11 @@ boolean at_stairs, falling, portal;
         reseed_random(rn2_on_display_rng);
         minit(); /* ZEROCOMP */
         getlev(fd, g.hackpid, new_ledger, FALSE);
+        /* when in wizard mode, it is possible to leave from and return to
+           any level in the endgame; above, we discarded bubble/cloud info
+           when leaving Plane of Water or Air so recreate some now */
+        if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
+            restore_waterlevel(-1);
         (void) nhclose(fd);
         oinit(); /* reassign level dependent obj probabilities */
     }
