@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.29 $ $NHDT-Date: 1559313320 2019/05/31 14:35:20 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.31 $ $NHDT-Date: 1559422205 2019/06/01 20:50:05 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -35,6 +35,9 @@ fix a memory leak that occurred if player used wizard mode to leave and return
 free sortloot data if object handling is short-circuited by cockatrice corpse
 on the Plane of Water, make water go all the way to the edges of the level
 on the Plane of Air, make clouds disrupt line of sight along the edges
+have '&' (whatdoes) command describe movement keystrokes instead of reporting
+	them as unknown or showing their number_pad action when that is Off
+some improvement to the handling of endgame levels filling up with monsters
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository

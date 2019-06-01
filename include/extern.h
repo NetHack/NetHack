@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1558485640 2019/05/22 00:40:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.706 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1559422206 2019/06/01 20:50:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.707 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1391,6 +1391,7 @@ E int FDECL(can_carry, (struct monst *, struct obj *));
 E int FDECL(mfndpos, (struct monst *, coord *, long *, long));
 E boolean FDECL(monnear, (struct monst *, int, int));
 E void NDECL(dmonsfree);
+E void FDECL(elemental_clog, (struct monst *));
 E int FDECL(mcalcmove, (struct monst *));
 E void NDECL(mcalcdistress);
 E void FDECL(replmon, (struct monst *, struct monst *));

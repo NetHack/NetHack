@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559299316 2019/05/31 10:41:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559422240 2019/06/01 20:50:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -644,14 +644,14 @@ unsigned long mflags;
         /* once in a blue moon, he won't be at the very bottom */
         if (!rn2(40))
             nlev--;
-        mtmp->mspare1 = MIGR_LEFTOVERS;
+        mtmp->mspare1 |= MIGR_LEFTOVERS;
     } else {
         nlev = rn2((max_depth - cur_depth) + 1) + cur_depth;
         if (nlev == cur_depth)
             nlev++;
         if (nlev > max_depth)
             nlev = max_depth;
-        mtmp->mspare1 = 0L;
+        mtmp->mspare1 = (mtmp->mspare1 & ~MIGR_LEFTOVERS);
     }
     get_level(&dest, nlev);
     migrate_to_level(mtmp, ledger_no(&dest), MIGR_RANDOM, (coord *) 0);
@@ -1456,6 +1456,7 @@ movebubbles()
 
                             newsym(x, y); /* clean up old position */
                             mon->mx = mon->my = 0;
+                            mon->mstate |= MON_BUBBLEMOVE;
                         }
                         if (!u.uswallow && x == u.ux && y == u.uy) {
                             cons = (struct container *) alloc(sizeof *cons);
@@ -1887,12 +1888,10 @@ boolean ini;
             case CONS_MON: {
                 struct monst *mon = (struct monst *) cons->list;
 
-                /* mnearto() might fail, and putting the monster into limbo
-                   to try next time hero comes to this level makes no sense
-                   because we can't leave and return (outside wizard mode) */
-                if (!mnearto(mon, cons->x, cons->y, TRUE)) {
-                    ; /* ? */
-                }
+                /* mnearto() might fail. We can jump right to elemental_clog
+                   from here rather than deal_with_overcrowding() */
+                if (!mnearto(mon, cons->x, cons->y, TRUE))
+                    elemental_clog(mon);
                 break;
             }
 
