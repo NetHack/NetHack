@@ -25,8 +25,10 @@ General commands:
 ?       help    display one of several informative texts
 #quit   quit    end the game without saving current game
 S       save    save the game (to be continued later) and exit
-!       sh      escape to some SHELL (if allowed)
+                [to restore, play again and use the same character name]
+!       sh      escape to some SHELL (if allowed; 'exit' to resume play)
 ^Z      suspend suspend the game (independent of your current suspend char)
+                [on UNIX(tm)-based systems, use the 'fg' command to resume]
 O       options set options
 /       what-is tell what a map symbol represents
 \       known   display list of what's been discovered
