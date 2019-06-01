@@ -2648,12 +2648,8 @@ struct monst *mon;
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
-            if (mtmp->mx == 0 && mtmp->my == 0) {
-                /* DEBUG ONLY - PLEASE REMOVE LATER */
-                if ((mtmp->mstate & 0x7) == MON_DETACH)
-                    pline("skipping m_detach() monster");
+            if (mtmp->mx == 0 && mtmp->my == 0)
                 continue;
-            }
             if (mon_has_amulet(mtmp) || !ok_to_obliterate(mtmp))
                 continue;
             if (mtmp->data->mlet == S_ELEMENTAL) {
