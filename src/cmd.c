@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1557088405 2019/05/05 20:33:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.333 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1559382745 2019/06/01 09:52:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.335 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -22,6 +22,9 @@
 #ifndef C
 #define C(c) (0x1f & (c))
 #endif
+
+#define unctrl(c) ((c) <= C('z') ? (0x60 | (c)) : (c))
+#define unmeta(c) (0x7f & (c))
 
 #ifdef ALTMETA
 STATIC_VAR boolean alt_esc = FALSE;
@@ -3459,14 +3462,71 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', (char *) 0, (char *) 0, donull, 0, (char *) 0 } /* sentinel */
 };
 
+/* for key2extcmddesc() to support dowhatdoes() */
+struct movcmd {
+    uchar k1, k2, k3, k4; /* 'normal', 'qwertz', 'numpad', 'phone' */
+    const char *txt, *alt; /* compass direction, screen direction */
+};
+static const struct movcmd movtab[] = {
+    { 'h', 'h', '4', '4', "west",      "left" },
+    { 'j', 'j', '2', '8', "south",     "down" },
+    { 'k', 'k', '8', '2', "north",     "up" },
+    { 'l', 'l', '6', '6', "east",      "right" },
+    { 'b', 'b', '1', '7', "southwest", "lower left" },
+    { 'n', 'n', '3', '9', "southeast", "lower right" },
+    { 'u', 'u', '9', '3', "northeast", "upper right" },
+    { 'y', 'z', '7', '1', "northwest", "upper left" },
+    {   0,   0,   0,   0,  (char *) 0, (char *) 0 }
+};
+
 int extcmdlist_length = SIZE(extcmdlist) - 1;
 
 const char *
 key2extcmddesc(key)
 uchar key;
 {
-    if (Cmd.commands[key] && Cmd.commands[key]->ef_txt)
-        return Cmd.commands[key]->ef_desc;
+    static char key2cmdbuf[48];
+    const struct movcmd *mov;
+    int k, c;
+    uchar M_5 = (uchar) M('5'), M_0 = (uchar) M('0');
+
+    /* need to check for movement commands before checking the extended
+       commands table because it contains entries for number_pad commands
+       that match !number_pad movement (like 'j' for "jump") */
+    key2cmdbuf[0] = '\0';
+    if (movecmd(k = key))
+        Strcpy(key2cmdbuf, "move"); /* "move or attack"? */
+    else if (movecmd(k = unctrl(key)))
+        Strcpy(key2cmdbuf, "rush");
+    else if (movecmd(k = (Cmd.num_pad ? unmeta(key) : lowc(key))))
+        Strcpy(key2cmdbuf, "run");
+    if (*key2cmdbuf) {
+        for (mov = &movtab[0]; mov->k1; ++mov) {
+            c = !Cmd.num_pad ? (!Cmd.swap_yz ? mov->k1 : mov->k2)
+                             : (!Cmd.phone_layout ? mov->k3 : mov->k4);
+            if (c == k) {
+                Sprintf(eos(key2cmdbuf), " %s (screen %s)",
+                        mov->txt, mov->alt);
+                return key2cmdbuf;
+            }
+        }
+    } else if (digit(key) || (Cmd.num_pad && digit(unmeta(key)))) {
+        key2cmdbuf[0] = '\0';
+        if (!Cmd.num_pad)
+            Strcpy(key2cmdbuf, "start of, or continuation of, a count");
+        else if (key == '5' || key == M_5)
+            Sprintf(key2cmdbuf, "%s prefix",
+                    (!!Cmd.pcHack_compat ^ (key == M_5)) ? "run" : "rush");
+        else if (key == '0' || (Cmd.pcHack_compat && key == M_0))
+            Strcpy(key2cmdbuf, "synonym for 'i'");
+        if (*key2cmdbuf)
+            return key2cmdbuf;
+    }
+    if (Cmd.commands[key]) {
+        if (Cmd.commands[key]->ef_txt)
+            return Cmd.commands[key]->ef_desc;
+
+    }
     return (char *) 0;
 }
 
@@ -4136,9 +4196,6 @@ wiz_migrate_mons()
     return 0;
 }
 #endif
-
-#define unctrl(c) ((c) <= C('z') ? (0x60 | (c)) : (c))
-#define unmeta(c) (0x7f & (c))
 
 struct {
     int nhkf;
