@@ -749,7 +749,7 @@ int x, y;
        vault guards (either living or dead) are parked at <0,0> */
     if (!isok(x, y) && (x != 0 || y != 0 || !mon->isgd)) {
         describe_level(buf);
-        impossible("trying to place monster at <%d,%d> mstate:%x on %s",
+        impossible("trying to place monster at <%d,%d> mstate:%lx on %s",
                     x, y, mon->mstate, buf);
         x = y = 0;
     }
@@ -757,14 +757,14 @@ int x, y;
         /* special case is for convoluted vault guard handling */
         || (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
         describe_level(buf);
-        impossible("placing %s onto map, mstate:%x, on %s?",
+        impossible("placing %s onto map, mstate:%lx, on %s?",
                    (mon == u.usteed) ? "steed" : "defunct monster",
                    mon->mstate, buf);
         return;
     }
     if (level.monsters[x][y]) {
         describe_level(buf);
-        impossible("placing monster over another at <%d,%d>, mstates:%x %x on %s?",
+        impossible("placing monster over another at <%d,%d>, mstates:%lx %lx on %s?",
                     x, y, level.monsters[x][y]->mstate, mon->mstate, buf);
     }
     mon->mx = x, mon->my = y;
