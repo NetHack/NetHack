@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1559227828 2019/05/30 14:50:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.286 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1559422247 2019/06/01 20:50:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.287 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,6 +28,9 @@ STATIC_DCL struct permonst *FDECL(accept_newcham_form, (int));
 STATIC_DCL struct obj *FDECL(make_corpse, (struct monst *, unsigned));
 STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
 STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
+STATIC_DCL void FDECL(migrate_mon, (struct monst *, XCHAR_P, XCHAR_P));
+STATIC_DCL boolean FDECL(ok_to_obliterate, (struct monst *));
+STATIC_DCL void FDECL(deal_with_overcrowding, (struct monst *));
 
 /* note: duplicated in dog.c */
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
@@ -614,7 +617,8 @@ register struct monst *mtmp;
                 xkilled(mtmp, XKILL_NOMSG);
             if (!DEADMONSTER(mtmp)) {
                 water_damage_chain(mtmp->minvent, FALSE);
-                (void) rloc(mtmp, FALSE);
+                if (!rloc(mtmp, TRUE))
+                    deal_with_overcrowding(mtmp);
                 return 0;
             }
             return 1;
@@ -1601,7 +1605,9 @@ dmonsfree()
 {
     struct monst **mtmp, *freetmp;
     int count = 0;
+    char buf[QBUFSZ];
 
+    buf[0] = '\0';
     for (mtmp = &fmon; *mtmp;) {
         freetmp = *mtmp;
         if (DEADMONSTER(freetmp) && !freetmp->isgd) {
@@ -1613,9 +1619,11 @@ dmonsfree()
             mtmp = &(freetmp->nmon);
     }
 
-    if (count != iflags.purge_monsters)
-        impossible("dmonsfree: %d removed doesn't match %d pending",
-                   count, iflags.purge_monsters);
+    if (count != iflags.purge_monsters) {
+        describe_level(buf);
+        impossible("dmonsfree: %d removed doesn't match %d pending on %s",
+                   count, iflags.purge_monsters, buf);
+    }
     iflags.purge_monsters = 0;
 }
 
@@ -1791,8 +1799,13 @@ void
 dealloc_monst(mon)
 struct monst *mon;
 {
-    if (mon->nmon)
-        panic("dealloc_monst with nmon");
+    char buf[QBUFSZ];
+
+    buf[0] = '\0';
+    if (mon->nmon) {
+        describe_level(buf);
+        panic("dealloc_monst with nmon on %s", buf);
+    }
     if (mon->mextra)
         dealloc_mextra(mon);
     free((genericptr_t) mon);
@@ -1834,6 +1847,11 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
         shkgone(mtmp);
     if (mtmp->wormno)
         wormgone(mtmp);
+    if (In_endgame(&u.uz)) {
+        mtmp->mx = mtmp->my = 0;
+        mtmp->mstate |= MON_ENDGAME_FREE;
+    }
+    mtmp->mstate |= MON_DETACH;
     iflags.purge_monsters++;
 }
 
@@ -2574,9 +2592,124 @@ void
 m_into_limbo(mtmp)
 struct monst *mtmp;
 {
+    xchar target_lev = ledger_no(&u.uz), xyloc = MIGR_APPROX_XY;
+
+    mtmp->mstate |= MON_LIMBO;
+    migrate_mon(mtmp, target_lev, xyloc);
+}
+
+STATIC_OVL void
+migrate_mon(mtmp, target_lev, xyloc)
+struct monst *mtmp;
+xchar target_lev, xyloc;
+{
     unstuck(mtmp);
     mdrop_special_objs(mtmp);
-    migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_APPROX_XY, (coord *) 0);
+    migrate_to_level(mtmp, target_lev, xyloc, (coord *) 0);
+    mtmp->mstate |= MON_MIGRATING;
+}
+
+STATIC_OVL boolean
+ok_to_obliterate(mtmp)
+struct monst *mtmp;
+{
+    /*
+     * Add checks for monsters that should not be obliterated
+     * here (return FALSE).
+     */
+    if (mtmp->data == &mons[PM_WIZARD_OF_YENDOR] || is_rider(mtmp->data)
+        || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp))
+        return FALSE;
+    return TRUE;
+}
+
+void
+elemental_clog(mon)
+struct monst *mon;
+{
+    int m_lev = 0;
+    static long msgmv = 0L;
+    struct monst *mtmp, *m1, *m2, *m3, *m4, *m5, *zm;
+
+    if (In_endgame(&u.uz)) {
+        m1 = m2 = m3 = m4 = m5 = zm = (struct monst *) 0;
+        if (!msgmv || (moves - msgmv) > 200L) {
+            if (!msgmv || rn2(2))
+                You("feel besieged.");
+            msgmv = moves;
+        }
+        /*
+         * m1 an elemental from another plane.
+         * m2 an elemental from this plane.
+         * m3 the least powerful monst encountered in loop so far.
+         * m4 some other non-tame monster.
+         * m5 a pet.
+         */
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp))
+                continue;
+            if (mtmp->mx == 0 && mtmp->my == 0) {
+                /* DEBUG ONLY - PLEASE REMOVE LATER */
+                if ((mtmp->mstate & 0x7) == MON_DETACH)
+                    pline("skipping m_detach() monster");
+                continue;
+            }
+            if (mon_has_amulet(mtmp) || !ok_to_obliterate(mtmp))
+                continue;
+            if (mtmp->data->mlet == S_ELEMENTAL) {
+                if (!is_home_elemental(mtmp->data)) {
+                    if (!m1)
+                        m1 = mtmp;
+                } else {
+                    if (!m2)
+                        m2 = mtmp;
+                }
+            } else {
+                if (!mtmp->mtame) {
+                    if (!m_lev || mtmp->m_lev < m_lev) {
+                        m_lev = mtmp->m_lev;
+                        m3 = mtmp;
+                    } else if (!m4) {
+                        m4 = mtmp;
+                    }
+                } else {
+                    if (!m5)
+                        m5 = mtmp;
+                    break;
+                }
+            }
+        }
+        mtmp = m1 ? m1 : m2 ? m2 : m3 ? m3 : m4 ? m4 : m5 ? m5 : zm;
+        if (mtmp) {
+            int mx = mtmp->mx, my = mtmp->my;
+
+            mtmp->mstate |= MON_OBLITERATE;
+            mongone(mtmp);
+            mtmp->mx = mtmp->my = 0;
+            rloc_to(mon, mx, my);
+        } else {
+            /* last resort - migrate mon to the next plane */
+            if (Is_waterlevel(&u.uz) || Is_firelevel(&u.uz) || Is_earthlevel(&u.uz)) {
+                /* try sending mon on to the next plane */
+                xchar target_lev = 0, xyloc = 0;
+                struct trap *trap = ftrap;
+
+                while (trap) {
+                    if (trap->ttyp == MAGIC_PORTAL)
+                        break;
+                    trap = trap->ntrap;
+                }
+                if (trap) {
+                    target_lev = ledger_no(&trap->dst);
+                    xyloc = MIGR_RANDOM;
+                }
+                if (target_lev) {
+                    mon->mstate |= MON_ENDGAME_MIGR;
+                    migrate_mon(mon, target_lev, xyloc);
+                }
+            }
+        }
+    }
 }
 
 /* make monster mtmp next to you (if possible);
@@ -2596,8 +2729,7 @@ struct monst *mtmp;
     }
 
     if (!enexto(&mm, u.ux, u.uy, mtmp->data) || !isok(mm.x, mm.y)) {
-        debugpline1("mnexto: sending %s into limbo", m_monnam(mtmp));
-        m_into_limbo(mtmp);
+        deal_with_overcrowding(mtmp);
         return;
     }
     rloc_to(mtmp, mm.x, mm.y);
@@ -2608,6 +2740,19 @@ struct monst *mtmp;
                   !Blind ? "appears" : "arrives");
     }
     return;
+}
+
+void
+deal_with_overcrowding(mtmp)
+struct monst *mtmp;
+{
+    if (In_endgame(&u.uz)) {
+        debugpline1("overcrowding: elemental_clog on %s", m_monnam(mtmp));
+        elemental_clog(mtmp);
+    } else {
+        debugpline1("overcrowding: sending %s into limbo", m_monnam(mtmp));
+        m_into_limbo(mtmp);
+    }
 }
 
 /* like mnexto() but requires destination to be directly accessible */
@@ -2664,6 +2809,7 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
             remove_monster(x, y);
 
         othermon->mx = othermon->my = 0; /* 'othermon' is not on the map */
+        othermon->mstate |= MON_OFFMAP;
     }
 
     newx = x;
@@ -2673,8 +2819,16 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
          * Migrating_mons that need to be placed will cause
          * no end of trouble.
          */
-        if (!enexto(&mm, newx, newy, mtmp->data) || !isok(mm.x, mm.y))
+        if (!enexto(&mm, newx, newy, mtmp->data) || !isok(mm.x, mm.y)) {
+            if (othermon) {
+                /* othermon already had its mx, my set to 0 above
+                 * and this would shortly cause a sanity check to fail
+                 * if we just return 0 here. The caller only possesses
+                 * awareness of mtmp, not othermon. */
+                deal_with_overcrowding(othermon);
+            }
             return 0;
+        }
         newx = mm.x;
         newy = mm.y;
     }
@@ -2682,10 +2836,8 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
 
     if (move_other && othermon) {
         res = 2; /* moving another monster out of the way */
-        if (!mnearto(othermon, x, y, FALSE)) { /* no 'move_other' this time */
-            debugpline1("mnearto: sending %s into limbo", m_monnam(othermon));
-            m_into_limbo(othermon);
-        }
+        if (!mnearto(othermon, x, y, FALSE))  /* no 'move_other' this time */
+            deal_with_overcrowding(othermon);
     }
 
     return res;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1545441042 2018/12/22 01:10:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1559422254 2019/06/01 20:50:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -742,23 +742,35 @@ place_monster(mon, x, y)
 struct monst *mon;
 int x, y;
 {
+    char buf[QBUFSZ];
+
+    buf[0] = '\0';
     /* normal map bounds are <1..COLNO-1,0..ROWNO-1> but sometimes
        vault guards (either living or dead) are parked at <0,0> */
     if (!isok(x, y) && (x != 0 || y != 0 || !mon->isgd)) {
-        impossible("trying to place monster at <%d,%d>", x, y);
+        describe_level(buf);
+        impossible("trying to place monster at <%d,%d> mstate:%x on %s",
+                    x, y, mon->mstate, buf);
         x = y = 0;
     }
     if (mon == u.usteed
         /* special case is for convoluted vault guard handling */
         || (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
-        impossible("placing %s onto map?",
-                   (mon == u.usteed) ? "steed" : "defunct monster");
+        describe_level(buf);
+        impossible("placing %s onto map, mstate:%x, on %s?",
+                   (mon == u.usteed) ? "steed" : "defunct monster",
+                   mon->mstate, buf);
         return;
     }
-    if (level.monsters[x][y])
-        impossible("placing monster over another at <%d,%d>?", x, y);
+    if (level.monsters[x][y]) {
+        describe_level(buf);
+        impossible("placing monster over another at <%d,%d>, mstates:%x %x on %s?",
+                    x, y, level.monsters[x][y]->mstate, mon->mstate, buf);
+    }
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
+    mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO | MON_BUBBLEMOVE
+                     | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
 }
 
 /*steed.c*/
