@@ -1847,10 +1847,9 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
         shkgone(mtmp);
     if (mtmp->wormno)
         wormgone(mtmp);
-    if (In_endgame(&u.uz)) {
-        mtmp->mx = mtmp->my = 0;
+    if (In_endgame(&u.uz))
         mtmp->mstate |= MON_ENDGAME_FREE;
-    }
+
     mtmp->mstate |= MON_DETACH;
     iflags.purge_monsters++;
 }
@@ -2681,8 +2680,9 @@ struct monst *mon;
 
             mtmp->mstate |= MON_OBLITERATE;
             mongone(mtmp);
-            mtmp->mx = mtmp->my = 0;
-            rloc_to(mon, mx, my);
+            /* some places in the code might still reference mtmp->mx, mtmp->my */
+            /* mtmp->mx = mtmp->my = 0; */ 
+            rloc_to(mon, mx, my);           /* note: mon, not mtmp */
         } else {
             /* last resort - migrate mon to the next plane */
             if (Is_waterlevel(&u.uz) || Is_firelevel(&u.uz) || Is_earthlevel(&u.uz)) {
