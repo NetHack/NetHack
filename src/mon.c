@@ -2635,7 +2635,7 @@ struct monst *mon;
         m1 = m2 = m3 = m4 = m5 = zm = (struct monst *) 0;
         if (!msgmv || (moves - msgmv) > 200L) {
             if (!msgmv || rn2(2))
-                You("feel besieged.");
+                You_feel("besieged.");
             msgmv = moves;
         }
         /*
@@ -2646,7 +2646,7 @@ struct monst *mon;
          * m5 a pet.
          */
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-            if (DEADMONSTER(mtmp))
+            if (DEADMONSTER(mtmp) || mtmp == mon)
                 continue;
             if (mtmp->mx == 0 && mtmp->my == 0)
                 continue;

@@ -42,6 +42,8 @@ some improvement to the handling of endgame levels filling up with monsters
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
+elemental_clog() loop needed to guard against obliteration of the monster
+	that was trying to be placed
 curses: sometimes the message window would show a blank line after a prompt
 
 
