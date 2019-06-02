@@ -924,7 +924,7 @@ $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objcla
 		 $(U)makedefs.c
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	@$(cc) $(cflagsBuild) -Fo$@ $(U)makedefs.c
+	@$(cc) -DENUM_PM $(cflagsBuild) -Fo$@ $(U)makedefs.c
 
 #
 #  date.h should be remade every time any of the source or include
