@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1558124913 2019/05/17 20:28:33 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.147 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1559476922 2019/06/02 12:02:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1723,8 +1723,17 @@ int x, y;
 {
     register struct obj *otmp2 = level.objects[x][y];
 
+    if (!isok(x, y)) { /* validate location */
+        void VDECL((*func), (const char *, ...)) PRINTF_F(1, 2);
+
+        func = (x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1) ? panic
+               : impossible;
+        (*func)("place_object: \"%s\" [%d] off map <%d,%d>",
+                safe_typename(otmp->otyp), otmp->where, x, y);
+    }
     if (otmp->where != OBJ_FREE)
-        panic("place_object: obj not free");
+        panic("place_object: obj \"%s\" [%d] not free",
+              safe_typename(otmp->otyp), otmp->where);
 
     obj_no_longer_held(otmp);
     if (otmp->otyp == BOULDER) {
