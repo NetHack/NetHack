@@ -205,9 +205,9 @@ int linenum;
 {
 #if 0
     if (uball && bcubreadcrumbs.in_effect && uball->where == OBJ_FREE) {
-        impossible("placebc collision from %s:%d, already placed by %s:%d",
+        impossible("unplacebc collision from %s:%d, already placed by %s:%d",
                    funcnm, linenum,
-                   bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+                   bcubreadcrumbs.funcnm, bcubreadcrumbs.linenum);
         return;
     }
 #endif
