@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1559554598 2019/06/03 09:36:38 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1559601027 2019/06/03 22:30:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,6 +10,13 @@
 
 STATIC_DCL int NDECL(bc_order);
 STATIC_DCL void NDECL(litter);
+STATIC_OVL void NDECL(placebc_core);
+STATIC_OVL void NDECL(unplacebc_core);
+
+#ifdef BREADCRUMBS
+static struct breadcrumbs bcpbreadcrumbs = { (const char *) 0, 0, FALSE},
+                          bcubreadcrumbs = { (const char *) 0, 0, FALSE};
+#endif
 
 void
 ballrelease(showmsg)
@@ -106,8 +113,8 @@ ballfall()
  *
  *  Should not be called while swallowed except on waterlevel.
  */
-void
-placebc()
+STATIC_OVL void
+placebc_core()
 {
     if (!uchain || !uball) {
         impossible("Where are your ball and chain?");
@@ -132,8 +139,34 @@ placebc()
     newsym(u.ux, u.uy);
 }
 
+#ifdef BREADCRUMBS
 void
-unplacebc()
+Placebc(funcnm, linenum)
+const char *funcnm;
+int linenum;
+{
+    if (uball && bcpbreadcrumbs.in_effect && uball->where == OBJ_FLOOR) {
+        impossible("placebc collision from %s:%d, already placed by %s:%d",
+                   funcnm, linenum,
+                   bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        return;
+    }
+    bcpbreadcrumbs.in_effect = TRUE;
+    bcubreadcrumbs.in_effect = FALSE;
+    bcpbreadcrumbs.funcnm = funcnm;
+    bcpbreadcrumbs.linenum = linenum;
+    placebc_core();
+}
+#else
+void
+placebc()
+{
+    placebc_core();
+}
+#endif
+
+STATIC_OVL void
+unplacebc_core()
 {
     if (u.uswallow) {
         if (Is_waterlevel(&u.uz)) {
@@ -163,6 +196,34 @@ unplacebc()
     newsym(uchain->ox, uchain->oy);
     u.bc_felt = 0; /* feel nothing */
 }
+
+#ifdef BREADCRUMBS
+void
+Unplacebc(funcnm, linenum)
+const char *funcnm;
+int linenum;
+{
+#if 0
+    if (uball && bcubreadcrumbs.in_effect && uball->where == OBJ_FREE) {
+        impossible("placebc collision from %s:%d, already placed by %s:%d",
+                   funcnm, linenum,
+                   bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        return;
+    }
+#endif
+    bcpbreadcrumbs.in_effect = FALSE;
+    bcubreadcrumbs.in_effect = TRUE;
+    bcubreadcrumbs.funcnm = funcnm;
+    bcubreadcrumbs.linenum = linenum;
+    unplacebc_core();
+}
+#else
+void
+unplacebc()
+{
+    unplacebc_core();
+}
+#endif
 
 /*
  *  Return the stacking of the hero's ball & chain.  This assumes that the

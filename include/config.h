@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1558248715 2019/05/19 06:51:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.122 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1559601008 2019/06/03 22:30:08 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -525,6 +525,12 @@ typedef unsigned char uchar;
 /* EXTRA_SANITY_CHECKS adds extra impossible calls,
  * probably not useful for normal play */
 /* #define EXTRA_SANITY_CHECKS */
+
+/* BREADCRUMBS employs the use of predefined compiler macros
+ * __FUNCTION__ and __LINE__ to store some caller breadcrumbs
+ * for use during heavy debugging sessions. Only define if your
+ * compiler supports those predefined macros and you are debugging */
+/* #define BREADCRUMBS */
 
 /* EDIT_GETLIN makes the string input in TTY, curses, Qt4, and X11
    for some prompts be pre-loaded with previously input text (from
