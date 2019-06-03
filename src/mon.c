@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1559422247 2019/06/01 20:50:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.287 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1559596286 2019/06/03 21:11:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.291 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2617,7 +2617,8 @@ struct monst *mtmp;
      * here (return FALSE).
      */
     if (mtmp->data == &mons[PM_WIZARD_OF_YENDOR] || is_rider(mtmp->data)
-        || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp))
+        || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp)
+        || (u.ustuck == mtmp) || (u.usteed == mtmp))
         return FALSE;
     return TRUE;
 }
