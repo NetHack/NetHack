@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1558920171 2019/05/27 01:22:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1559554598 2019/06/03 09:36:38 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -853,7 +853,7 @@ drag_down()
 void
 bc_sanity_check()
 {
-    int otyp;
+    int otyp, freeball, freechain;
     const char *onam;
 
     if (Punished && (!uball || !uchain)) {
@@ -867,11 +867,18 @@ bc_sanity_check()
                    (uchain && uball) ? " and " : "",
                    uball ? "iron ball" : "");
     }
-    /* ball is free when swallowed, changing levels, other times? */
+    /* ball is free when swallowed, when changing levels or during air bubble
+       management on Plane of Water (both of which start and end in between
+       sanity checking cycles, so shouldn't be relevant), other times? */
+    freechain = (!uchain || uchain->where == OBJ_FREE);
+    freeball = (!uball || uball->where == OBJ_FREE
+                /* lie to simplify the testing logic */
+                || (freechain && uball->where == OBJ_INVENT));
     if (uball && (uball->otyp != HEAVY_IRON_BALL
                   || (uball->where != OBJ_FLOOR
                       && uball->where != OBJ_INVENT
                       && uball->where != OBJ_FREE)
+                  || (freeball ^ freechain)
                   || (uball->owornmask & W_BALL) == 0L
                   || (uball->owornmask & ~(W_BALL | W_WEAPON)) != 0L)) {
         otyp = uball->otyp;
@@ -883,6 +890,7 @@ bc_sanity_check()
     if (uchain && (uchain->otyp != IRON_CHAIN
                    || (uchain->where != OBJ_FLOOR
                        && uchain->where != OBJ_FREE)
+                   || (freechain ^ freeball)
                    /* [could simplify this to owornmask != W_CHAIN] */
                    || (uchain->owornmask & W_CHAIN) == 0L
                    || (uchain->owornmask & ~W_CHAIN) != 0L)) {
@@ -890,6 +898,25 @@ bc_sanity_check()
         onam = safe_typename(otyp);
         impossible("uchain: type %d (%s), where %d, wornmask=0x%08lx",
                    otyp, onam, uchain->where, uchain->owornmask);
+    }
+    if (uball && uchain && !(freeball && freechain)) {
+        int bx, by, cx, cy, bdx, bdy, cdx, cdy;
+
+        /* non-free chain should be under or next to the hero;
+           non-free ball should be on or next to the chain or else carried */
+        cx = uchain->ox, cy = uchain->oy;
+        cdx = cx - u.ux, cdy = cy - u.uy;
+        cdx = abs(cdx), cdy = abs(cdy);
+        if (uball->where == OBJ_INVENT) /* carried(uball) */
+            bx = u.ux, by = u.uy; /* get_obj_location() */
+        else
+            bx = uball->ox, by = uball->oy;
+        bdx = bx - cx, bdy = by - cy;
+        bdx = abs(bdx), bdy = abs(bdy);
+        if (cdx > 1 || cdy > 1 || bdx > 1 || bdy > 1)
+            impossible(
+                     "b&c distance: you@<%d,%d>, chain@<%d,%d>, ball@<%d,%d>",
+                       u.ux, u.uy, cx, cy, bx, by);
     }
     /* [check bc_order too?] */
 }
