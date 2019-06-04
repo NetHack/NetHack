@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.34 $ $NHDT-Date: 1559664948 2019/06/04 16:15:48 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.35 $ $NHDT-Date: 1559670600 2019/06/04 17:50:00 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -42,6 +42,10 @@ if you survive turning into green slime due to life-saving (surviving as a
 	green slime) then die again due to green slimes having been genocided,
 	the feedback was strange because it assumed that the prior message
 	came from answering No to "Really die?" in explore or wizard mode
+various cases where objects had their bless/curse state become known weren't
+	updating persistent inventory window, when enabled, to reflect changes
+	(cited case was trying to remove cursed armor and being told of the
+	curse but there were lots of other situations with the same issue)
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository

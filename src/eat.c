@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1542765357 2018/11/21 01:55:57 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1559670604 2019/06/04 17:50:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2503,7 +2503,7 @@ doeat()
          * against the possibility just in case.
          */
         if (welded(otmp) || (otmp->cursed && (otmp->owornmask & W_RING))) {
-            otmp->bknown = 1; /* for ring; welded() does this for weapon */
+            set_bknown(otmp, 1); /* for ring; welded() does this for weapon */
             You("spit out %s.", the(xname(otmp)));
         } else {
             You("spit %s out onto the %s.", the(xname(otmp)),

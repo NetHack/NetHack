@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1551138255 2019/02/25 23:44:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1559670603 2019/06/04 17:50:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.109 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1515,7 +1515,7 @@ doremring()
 /* Check if something worn is cursed _and_ unremovable. */
 int
 cursed(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     if (!otmp) {
         impossible("cursed without otmp");
@@ -1527,7 +1527,7 @@ register struct obj *otmp;
                               || otmp->otyp == LENSES || otmp->quan > 1L);
 
         You("can't.  %s cursed.", use_plural ? "They are" : "It is");
-        otmp->bknown = TRUE;
+        set_bknown(otmp, 1);
         return 1;
     }
     return 0;
@@ -1535,7 +1535,7 @@ register struct obj *otmp;
 
 int
 armoroff(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     register int delay = -objects[otmp->otyp].oc_delay;
 
@@ -1859,7 +1859,7 @@ struct obj *obj;
             }
             if (uarmg && uarmg->cursed) {
                 res = !uarmg->bknown;
-                uarmg->bknown = 1;
+                set_bknown(uarmg, 1);
                 You("cannot remove your gloves to put on the ring.");
                 return res; /* uses move iff we learned gloves are cursed */
             }
@@ -2249,7 +2249,7 @@ register struct obj *otmp;
         }
         if (why) {
             You("cannot %s to remove the ring.", buf);
-            why->bknown = TRUE;
+            set_bknown(why, 1);
             return 0;
         }
     }
@@ -2258,7 +2258,7 @@ register struct obj *otmp;
         if (welded(uwep)) {
             You("are unable to take off your %s while wielding that %s.",
                 c_gloves, is_sword(uwep) ? c_sword : c_weapon);
-            uwep->bknown = TRUE;
+            set_bknown(uwep, 1);
             return 0;
         } else if (Glib) {
             You_cant("take off the slippery %s with your slippery %s.",
@@ -2296,7 +2296,7 @@ register struct obj *otmp;
         }
         if (why) {
             You("cannot %s to take off %s.", buf, the(xname(otmp)));
-            why->bknown = TRUE;
+            set_bknown(why, 1);
             return 0;
         }
     }

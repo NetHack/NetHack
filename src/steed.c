@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1559422254 2019/06/01 20:50:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1559670610 2019/06/04 17:50:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -525,7 +525,7 @@ int reason; /* Player was thrown off etc. */
         if (otmp && otmp->cursed) {
             You("can't.  The saddle %s cursed.",
                 otmp->bknown ? "is" : "seems to be");
-            otmp->bknown = TRUE;
+            otmp->bknown = 1; /* ok to skip set_bknown() here */
             return;
         }
         if (!have_spot) {
