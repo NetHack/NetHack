@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1546465285 2019/01/02 21:41:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1559679496 2019/06/04 20:18:16 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1284,6 +1284,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 
                 /* gold isn't subject to cursing and blessing */
                 if (obj->oclass == COIN_CLASS)
+                    continue;
+                /* hide current scroll from itself so that perm_invent won't
+                   show known blessed scroll losing bknown when confused */
+                if (obj == sobj && obj->quan == 1L)
                     continue;
                 wornmask = (obj->owornmask & ~(W_BALL | W_ART | W_ARTI));
                 if (wornmask && !sblessed) {
