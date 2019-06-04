@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.33 $ $NHDT-Date: 1559601004 2019/06/03 22:30:04 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.34 $ $NHDT-Date: 1559664948 2019/06/04 16:15:48 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -38,6 +38,10 @@ on the Plane of Air, make clouds disrupt line of sight along the edges
 have '&' (whatdoes) command describe movement keystrokes instead of reporting
 	them as unknown or showing their number_pad action when that is Off
 some improvement to the handling of endgame levels filling up with monsters
+if you survive turning into green slime due to life-saving (surviving as a
+	green slime) then die again due to green slimes having been genocided,
+	the feedback was strange because it assumed that the prior message
+	came from answering No to "Really die?" in explore or wizard mode
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -60,6 +64,7 @@ curses: if message window is only one line, cancelling some prompts with ESC
 	left the prompts visible on the message line instead of erasing them
 curses: support EDIT_GETLIN (but like with tty, it's disabled by default) to
 	pre-load an earlier response as the default answer for some prompts
+	(however, it's skipped if the 'popup_dialog' option is On)
 curses: when display windows get reconfigured (after setting align_status,
 	align_message, statuslines, windowborders or due to external resize),
 	the message window was being refreshed with the oldest available N

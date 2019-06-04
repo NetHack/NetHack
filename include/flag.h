@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1554155745 2019/04/01 21:55:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1559664948 2019/06/04 16:15:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -484,7 +484,8 @@ enum plnmsg_types {
     PLNMSG_TOWER_OF_FLAME,      /* scroll of fire */
     PLNMSG_CAUGHT_IN_EXPLOSION, /* explode() feedback */
     PLNMSG_OBJ_GLOWS,           /* "the <obj> glows <color>" */
-    PLNMSG_OBJNAM_ONLY          /* xname/doname only, for #tip */
+    PLNMSG_OBJNAM_ONLY,         /* xname/doname only, for #tip */
+    PLNMSG_OK_DONT_DIE          /* overriding death in explore/wizard mode */
 };
 
 /* runmode options */

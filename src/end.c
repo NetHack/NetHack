@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1558921075 2019/05/27 01:37:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1559664950 2019/06/04 16:15:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1177,6 +1177,7 @@ int how;
     if (!survive && (wizard || discover) && how <= GENOCIDED
         && !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
+        iflags.last_msg = PLNMSG_OK_DONT_DIE;
         savelife(how);
         survive = TRUE;
     }

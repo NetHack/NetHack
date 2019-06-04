@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1545182148 2018/12/19 01:15:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1559664953 2019/06/04 16:15:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -403,6 +403,7 @@ struct kinfo *kptr;
         del_light_source(LS_MONSTER, monst_to_any(&youmonst));
     save_mvflags = mvitals[PM_GREEN_SLIME].mvflags;
     mvitals[PM_GREEN_SLIME].mvflags = save_mvflags & ~G_GENOD;
+    /* become a green slime; also resets youmonst.m_ap_type+.mappearance */
     (void) polymon(PM_GREEN_SLIME);
     mvitals[PM_GREEN_SLIME].mvflags = save_mvflags;
     done(TURNED_SLIME);
@@ -410,10 +411,20 @@ struct kinfo *kptr;
     /* life-saved; even so, hero still has turned into green slime;
        player may have genocided green slimes after being infected */
     if ((mvitals[PM_GREEN_SLIME].mvflags & G_GENOD) != 0) {
+        char slimebuf[BUFSZ];
+
         killer.format = KILLED_BY;
         Strcpy(killer.name, "slimicide");
-        /* immediately follows "OK, so you don't die." */
-        pline("Yes, you do.  Green slime has been genocided...");
+        /* vary the message depending upon whether life-save was due to
+           amulet or due to declining to die in explore or wizard mode */
+        Strcpy(slimebuf, "green slime has been genocided...");
+        if (iflags.last_msg == PLNMSG_OK_DONT_DIE)
+            /* follows "OK, so you don't die." and arg is second sentence */
+            pline("Yes, you do.  %s", upstart(slimebuf));
+        else
+            /* follows "The medallion crumbles to dust." */
+            pline("Unfortunately, %s", slimebuf);
+        /* die again; no possibility of amulet this time */
         done(GENOCIDED);
         /* could be life-saved again (only in explore or wizard mode)
            but green slimes are gone; just stay in current form */
