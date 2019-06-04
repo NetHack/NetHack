@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1559675618 2019/06/04 19:13:38 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.309 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1559685281 2019/06/04 21:54:41 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.310 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -584,11 +584,8 @@ struct obj *obj;
 coord *cc;
 boolean adjacentok; /* False: at obj's spot only, True: nearby is allowed */
 {
-    struct monst *mtmp = (struct monst *) 0;
-    struct monst *mtmp2 = (struct monst *) 0;
+    struct monst *mtmp, *mtmp2 = has_omonst(obj) ? get_mtraits(obj, TRUE) : 0;
 
-    if (has_omonst(obj))
-        mtmp2 = get_mtraits(obj, TRUE);
     if (mtmp2) {
         /* save_mtraits() validated mtmp2->mnum */
         mtmp2->data = &mons[mtmp2->mnum];
@@ -597,8 +594,12 @@ boolean adjacentok; /* False: at obj's spot only, True: nearby is allowed */
         mtmp = makemon(mtmp2->data, cc->x, cc->y,
                        (NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH
                         | (adjacentok ? MM_ADJACENTOK : 0)));
-        if (!mtmp)
-            return mtmp;
+        if (!mtmp) {
+            /* mtmp2 is a copy of obj's object->oextra->omonst extension
+               and is not on the map or on any monst lists */
+            dealloc_monst(mtmp2);
+            return (struct monst *) 0;
+        }
 
         /* heal the monster */
         if (mtmp->mhpmax > mtmp2->mhpmax && is_rider(mtmp2->data))
