@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1551395521 2019/02/28 23:12:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.307 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1559675618 2019/06/04 19:13:38 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.309 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -126,6 +126,7 @@ struct obj *obj;
             if (obj->dknown)
                 makeknown(obj->otyp);
         }
+        update_inventory();
     }
 }
 
@@ -1899,9 +1900,9 @@ struct obj *obj, *otmp;
                 (void) boxlock(obj, otmp);
 
             if (obj_shudders(obj)) {
-                boolean cover =
-                    ((obj == level.objects[u.ux][u.uy]) && u.uundetected
-                     && hides_under(youmonst.data));
+                boolean cover = ((obj == level.objects[u.ux][u.uy])
+                                 && u.uundetected
+                                 && hides_under(youmonst.data));
 
                 if (cansee(obj->ox, obj->oy))
                     learn_it = TRUE;
@@ -1934,6 +1935,7 @@ struct obj *obj, *otmp;
                     obj->cknown = 0;
                 } else {
                     struct obj *o;
+
                     /* view contents (not recursively) */
                     for (o = obj->cobj; o; o = o->nobj)
                         o->dknown = 1; /* "seen", even if blind */
@@ -2494,22 +2496,39 @@ boolean ordinary;
             learn_it = TRUE;
             unpunish();
         }
-        if (u.utrap) { /* escape web or bear trap */
-            (void) openholdingtrap(&youmonst, &learn_it);
-        } else {
+        /* invent is hit iff hero doesn't escape from a trap */
+        if (!u.utrap || !openholdingtrap(&youmonst, &learn_it)) {
             struct obj *otmp;
+            boolean boxing = FALSE;
+
             /* unlock carried boxes */
             for (otmp = invent; otmp; otmp = otmp->nobj)
-                if (Is_box(otmp))
+                if (Is_box(otmp)) {
                     (void) boxlock(otmp, obj);
+                    boxing = TRUE;
+                }
+            if (boxing)
+                update_inventory(); /* in case any box->lknown has changed */
+
             /* trigger previously escaped trapdoor */
             (void) openfallingtrap(&youmonst, TRUE, &learn_it);
         }
         break;
     case WAN_LOCKING:
     case SPE_WIZARD_LOCK:
-        if (!u.utrap) {
-            (void) closeholdingtrap(&youmonst, &learn_it);
+        /* similar logic to opening; invent is hit iff no trap triggered */
+        if (u.utrap || !closeholdingtrap(&youmonst, &learn_it)) {
+            struct obj *otmp;
+            boolean boxing = FALSE;
+
+            /* lock carried boxes */
+            for (otmp = invent; otmp; otmp = otmp->nobj)
+                if (Is_box(otmp)) {
+                    (void) boxlock(otmp, obj);
+                    boxing = TRUE;
+                }
+            if (boxing)
+                update_inventory(); /* in case any box->lknown has changed */
         }
         break;
     case WAN_DIGGING:
@@ -2528,6 +2547,7 @@ boolean ordinary;
                     otmp->cknown = 1;
             }
         }
+        update_inventory();
         learn_it = TRUE;
         ustatusline();
         break;

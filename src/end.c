@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1559664950 2019/06/04 16:15:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1559675615 2019/06/04 19:13:35 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.176 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1621,9 +1621,12 @@ boolean identified, all_containers, reportempty;
 
     for (box = list; box; box = box->nobj) {
         if (Is_container(box) || box->otyp == STATUE) {
-            box->cknown = 1; /* we're looking at the contents now */
-            if (identified)
-                box->lknown = 1;
+            if (!box->cknown || (identified && !box->lknown)) {
+                box->cknown = 1; /* we're looking at the contents now */
+                if (identified)
+                    box->lknown = 1;
+                update_inventory();
+            }
             if (box->otyp == BAG_OF_TRICKS) {
                 continue; /* wrong type of container */
             } else if (box->cobj) {
