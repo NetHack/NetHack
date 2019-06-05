@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.38 $ $NHDT-Date: 1559685281 2019/06/04 21:54:41 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.41 $ $NHDT-Date: 1559733390 2019/06/05 11:16:30 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -53,6 +53,10 @@ blessed scroll of remove curse read while confused might be shown to operate
 fix memory leak if corpse auto-revival attempt failed ("you feel less hassled")
 allow a parent function to issue an an unplacebc() call that restricts
 	subsequent placebc() calls to that parent only
+flying monsters could enter water on the Plane of Water but then they'd drown
+	unless they could also swim or else didn't need to breathe
+when finding a place to put a monster on the Plane of Water, don't pick a
+	water location for flyers or floaters (levitate) or clingers (ceiling)
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
