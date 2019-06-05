@@ -1041,7 +1041,8 @@ done_object_cleanup()
        swallowed, uball and uchain will be in limbo; put them on floor
        so bones will have them and object list cleanup finds them */
     if (uchain && uchain->where == OBJ_FREE) {
-        placebc();
+        /* placebc(); */
+        lift_covet_and_placebc(override_restriction);
     }
     return;
 }
