@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1546144856 2018/12/30 04:40:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1559670605 2019/06/04 17:50:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2889,7 +2889,7 @@ struct obj *obj;
     /* subset of starting inventory pre-ID */
     obj->dknown = 1;
     if (Role_if(PM_PRIEST))
-        obj->bknown = 1;
+        obj->bknown = 1; /* ok to bypass set_bknown() */
     /* same criteria as lift_object()'s check for available inventory slot */
     if (obj->oclass != COIN_CLASS && inv_cnt(FALSE) >= 52
         && !merge_choice(g.invent, obj)) {

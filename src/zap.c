@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1551395521 2019/02/28 23:12:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.307 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1559685281 2019/06/04 21:54:41 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.310 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -118,6 +118,7 @@ struct obj *obj;
             if (obj->dknown)
                 makeknown(obj->otyp);
         }
+        update_inventory();
     }
 }
 
@@ -575,11 +576,8 @@ struct obj *obj;
 coord *cc;
 boolean adjacentok; /* False: at obj's spot only, True: nearby is allowed */
 {
-    struct monst *mtmp = (struct monst *) 0;
-    struct monst *mtmp2 = (struct monst *) 0;
+    struct monst *mtmp, *mtmp2 = has_omonst(obj) ? get_mtraits(obj, TRUE) : 0;
 
-    if (has_omonst(obj))
-        mtmp2 = get_mtraits(obj, TRUE);
     if (mtmp2) {
         /* save_mtraits() validated mtmp2->mnum */
         mtmp2->data = &mons[mtmp2->mnum];
@@ -588,8 +586,12 @@ boolean adjacentok; /* False: at obj's spot only, True: nearby is allowed */
         mtmp = makemon(mtmp2->data, cc->x, cc->y,
                        (NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH
                         | (adjacentok ? MM_ADJACENTOK : 0)));
-        if (!mtmp)
-            return mtmp;
+        if (!mtmp) {
+            /* mtmp2 is a copy of obj's object->oextra->omonst extension
+               and is not on the map or on any monst lists */
+            dealloc_monst(mtmp2);
+            return (struct monst *) 0;
+        }
 
         /* heal the monster */
         if (mtmp->mhpmax > mtmp2->mhpmax && is_rider(mtmp2->data))
@@ -1891,9 +1893,9 @@ struct obj *obj, *otmp;
                 (void) boxlock(obj, otmp);
 
             if (obj_shudders(obj)) {
-                boolean cover =
-                    ((obj == g.level.objects[u.ux][u.uy]) && u.uundetected
-                     && hides_under(g.youmonst.data));
+                boolean cover = ((obj == g.level.objects[u.ux][u.uy])
+                                 && u.uundetected
+                                 && hides_under(g.youmonst.data));
 
                 if (cansee(obj->ox, obj->oy))
                     learn_it = TRUE;
@@ -1926,6 +1928,7 @@ struct obj *obj, *otmp;
                     obj->cknown = 0;
                 } else {
                     struct obj *o;
+
                     /* view contents (not recursively) */
                     for (o = obj->cobj; o; o = o->nobj)
                         o->dknown = 1; /* "seen", even if blind */
@@ -2486,22 +2489,39 @@ boolean ordinary;
             learn_it = TRUE;
             unpunish();
         }
-        if (u.utrap) { /* escape web or bear trap */
-            (void) openholdingtrap(&g.youmonst, &learn_it);
-        } else {
+        /* invent is hit iff hero doesn't escape from a trap */
+        if (!u.utrap || !openholdingtrap(&g.youmonst, &learn_it)) {
             struct obj *otmp;
+            boolean boxing = FALSE;
+
             /* unlock carried boxes */
             for (otmp = g.invent; otmp; otmp = otmp->nobj)
-                if (Is_box(otmp))
+                if (Is_box(otmp)) {
                     (void) boxlock(otmp, obj);
+                    boxing = TRUE;
+                }
+            if (boxing)
+                update_inventory(); /* in case any box->lknown has changed */
+
             /* trigger previously escaped trapdoor */
             (void) openfallingtrap(&g.youmonst, TRUE, &learn_it);
         }
         break;
     case WAN_LOCKING:
     case SPE_WIZARD_LOCK:
-        if (!u.utrap) {
-            (void) closeholdingtrap(&g.youmonst, &learn_it);
+        /* similar logic to opening; invent is hit iff no trap triggered */
+        if (u.utrap || !closeholdingtrap(&g.youmonst, &learn_it)) {
+            struct obj *otmp;
+            boolean boxing = FALSE;
+
+            /* lock carried boxes */
+            for (otmp = g.invent; otmp; otmp = otmp->nobj)
+                if (Is_box(otmp)) {
+                    (void) boxlock(otmp, obj);
+                    boxing = TRUE;
+                }
+            if (boxing)
+                update_inventory(); /* in case any box->lknown has changed */
         }
         break;
     case WAN_DIGGING:
@@ -2520,6 +2540,7 @@ boolean ordinary;
                     otmp->cknown = 1;
             }
         }
+        update_inventory();
         learn_it = TRUE;
         ustatusline();
         break;

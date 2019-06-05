@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1558920171 2019/05/27 01:22:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1559601027 2019/06/03 22:30:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,6 +10,14 @@
 
 STATIC_DCL int NDECL(bc_order);
 STATIC_DCL void NDECL(litter);
+STATIC_OVL void NDECL(placebc_core);
+STATIC_OVL void NDECL(unplacebc_core);
+STATIC_DCL boolean FDECL(check_restriction, (int));
+
+static int bcrestriction = 0;
+#ifdef BREADCRUMBS
+static struct breadcrumbs bcpbreadcrumbs = {0}, bcubreadcrumbs = {0};
+#endif
 
 void
 ballrelease(showmsg)
@@ -106,8 +114,8 @@ ballfall()
  *
  *  Should not be called while swallowed except on waterlevel.
  */
-void
-placebc()
+STATIC_OVL void
+placebc_core()
 {
     if (!uchain || !uball) {
         impossible("Where are your ball and chain?");
@@ -130,10 +138,11 @@ placebc()
     u.bglyph = u.cglyph = levl[u.ux][u.uy].glyph; /* pick up glyph */
 
     newsym(u.ux, u.uy);
+    bcrestriction = 0;
 }
 
-void
-unplacebc()
+STATIC_OVL void
+unplacebc_core()
 {
     if (u.uswallow) {
         if (Is_waterlevel(&u.uz)) {
@@ -163,6 +172,191 @@ unplacebc()
     newsym(uchain->ox, uchain->oy);
     u.bc_felt = 0; /* feel nothing */
 }
+
+STATIC_OVL boolean
+check_restriction(restriction)
+int restriction;
+{
+    boolean ret = FALSE;
+    
+    if (!bcrestriction || (restriction == override_restriction))
+        ret = TRUE;
+    else
+        ret = (bcrestriction == restriction) ? TRUE : FALSE;
+    return ret;
+}
+
+#ifndef BREADCRUMBS
+void
+placebc()
+{
+    if (!check_restriction(0)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, 
+            "placebc denied, restriction in effect");
+        paniclog("placebc", panicbuf);
+#endif
+        return;
+    }
+    if (uchain && uchain->where != OBJ_FREE) {
+        impossible("bc already placed?");
+        return;
+    }
+    placebc_core();
+}
+
+void
+unplacebc()
+{
+    if (bcrestriction) {
+        impossible("unplacebc denied, restriction in place");
+        return;
+    }
+    unplacebc_core();
+}
+
+int
+unplacebc_and_covet_placebc()
+{
+    int restriction = 0;
+
+    if (bcrestriction) {
+        impossible("unplacebc_and_covet_placebc denied, already restricted");
+    } else {
+        restriction = bcrestriction = rnd(400);
+        unplacebc_core();
+    }
+    return restriction;
+}
+
+void
+lift_covet_and_placebc(pin)
+int pin;
+{
+    if (!check_restriction(pin)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, 
+                "lift_covet_and_placebc denied, %s",
+                (pin != bcrestriction) ?
+                "pin mismatch" : "restriction in effect");
+        paniclog("placebc", panicbuf);
+#endif
+        return;
+    }
+    if (uchain && uchain->where != OBJ_FREE) {
+        impossible("bc already placed?");
+        return;
+    }
+    placebc_core();
+}
+
+#else  /* BREADCRUMBS */
+
+void
+Placebc(funcnm, linenum)
+const char *funcnm;
+int linenum;
+{
+    if (!check_restriction(0)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, 
+            "Placebc denied to %s:%d, restricted by %s:%d",
+                funcnm, linenum,
+                bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        paniclog("Placebc", panicbuf);
+#endif
+        return;
+    }
+    if ((uchain && uchain->where != OBJ_FREE)
+                   && bcpbreadcrumbs.in_effect) {
+        impossible("Placebc collision at %s:%d, already placed by %s:%d",
+                   funcnm, linenum,
+                   bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        return;
+    }
+    bcpbreadcrumbs.in_effect = TRUE;
+    bcubreadcrumbs.in_effect = FALSE;
+    bcpbreadcrumbs.funcnm = funcnm;
+    bcpbreadcrumbs.linenum = linenum;
+    placebc_core();
+}
+
+void
+Unplacebc(funcnm, linenum)
+const char *funcnm;
+int linenum;
+{
+
+    if (bcrestriction) {
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf,
+          "Unplacebc from %s:%d, when restricted to %s:%d",
+                   funcnm, linenum,
+                   bcubreadcrumbs.funcnm, bcubreadcrumbs.linenum);
+        paniclog("Unplacebc", panicbuf);
+    }
+    bcpbreadcrumbs.in_effect = FALSE;
+    bcubreadcrumbs.in_effect = TRUE;
+    bcubreadcrumbs.funcnm = funcnm;
+    bcubreadcrumbs.linenum = linenum;
+    unplacebc_core();
+}
+
+int
+Unplacebc_and_covet_placebc(funcnm, linenum)
+const char *funcnm;
+int linenum;
+{
+    int restriction = 0;
+
+    if (bcrestriction) {
+        impossible(
+          "Unplacebc_and_covet_placebc denied to %s:%d, restricted by %s:%d",
+                   funcnm, linenum,
+                   bcubreadcrumbs.funcnm, bcubreadcrumbs.linenum);
+    } else {
+        restriction = bcrestriction = rnd(400);
+        bcpbreadcrumbs.in_effect = FALSE;
+        bcubreadcrumbs.in_effect = TRUE;
+        bcubreadcrumbs.funcnm = funcnm;
+        bcubreadcrumbs.linenum = linenum;
+        unplacebc_core();
+    }
+    return restriction;
+}
+
+void
+Lift_covet_and_placebc(pin, funcnm, linenum)
+int pin;
+char *funcnm;
+int linenum;
+{
+    if (!check_restriction(pin)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, 
+            "Lift_covet_and_placebc denied to %s:%d, restricted by %s:%d",
+                funcnm, linenum,
+                bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        paniclog("Lift_covet_and_placebc", panicbuf);
+#endif
+        return;
+    }
+    if (uchain && uchain->where != OBJ_FREE) {
+        impossible("bc already placed?");
+        return;
+    }
+    placebc_core();
+}
+#endif /* BREADCRUMBS */
 
 /*
  *  Return the stacking of the hero's ball & chain.  This assumes that the
@@ -853,7 +1047,7 @@ drag_down()
 void
 bc_sanity_check()
 {
-    int otyp;
+    int otyp, freeball, freechain;
     const char *onam;
 
     if (Punished && (!uball || !uchain)) {
@@ -867,11 +1061,18 @@ bc_sanity_check()
                    (uchain && uball) ? " and " : "",
                    uball ? "iron ball" : "");
     }
-    /* ball is free when swallowed, changing levels, other times? */
+    /* ball is free when swallowed, when changing levels or during air bubble
+       management on Plane of Water (both of which start and end in between
+       sanity checking cycles, so shouldn't be relevant), other times? */
+    freechain = (!uchain || uchain->where == OBJ_FREE);
+    freeball = (!uball || uball->where == OBJ_FREE
+                /* lie to simplify the testing logic */
+                || (freechain && uball->where == OBJ_INVENT));
     if (uball && (uball->otyp != HEAVY_IRON_BALL
                   || (uball->where != OBJ_FLOOR
                       && uball->where != OBJ_INVENT
                       && uball->where != OBJ_FREE)
+                  || (freeball ^ freechain)
                   || (uball->owornmask & W_BALL) == 0L
                   || (uball->owornmask & ~(W_BALL | W_WEAPON)) != 0L)) {
         otyp = uball->otyp;
@@ -883,6 +1084,7 @@ bc_sanity_check()
     if (uchain && (uchain->otyp != IRON_CHAIN
                    || (uchain->where != OBJ_FLOOR
                        && uchain->where != OBJ_FREE)
+                   || (freechain ^ freeball)
                    /* [could simplify this to owornmask != W_CHAIN] */
                    || (uchain->owornmask & W_CHAIN) == 0L
                    || (uchain->owornmask & ~W_CHAIN) != 0L)) {
@@ -890,6 +1092,25 @@ bc_sanity_check()
         onam = safe_typename(otyp);
         impossible("uchain: type %d (%s), where %d, wornmask=0x%08lx",
                    otyp, onam, uchain->where, uchain->owornmask);
+    }
+    if (uball && uchain && !(freeball && freechain)) {
+        int bx, by, cx, cy, bdx, bdy, cdx, cdy;
+
+        /* non-free chain should be under or next to the hero;
+           non-free ball should be on or next to the chain or else carried */
+        cx = uchain->ox, cy = uchain->oy;
+        cdx = cx - u.ux, cdy = cy - u.uy;
+        cdx = abs(cdx), cdy = abs(cdy);
+        if (uball->where == OBJ_INVENT) /* carried(uball) */
+            bx = u.ux, by = u.uy; /* get_obj_location() */
+        else
+            bx = uball->ox, by = uball->oy;
+        bdx = bx - cx, bdy = by - cy;
+        bdx = abs(bdx), bdy = abs(bdy);
+        if (cdx > 1 || cdy > 1 || bdx > 1 || bdy > 1)
+            impossible(
+                     "b&c distance: you@<%d,%d>, chain@<%d,%d>, ball@<%d,%d>",
+                       u.ux, u.uy, cx, cy, bx, by);
     }
     /* [check bc_order too?] */
 }

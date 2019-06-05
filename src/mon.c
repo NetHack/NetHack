@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1559422247 2019/06/01 20:50:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.287 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1559733390 2019/06/05 11:16:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.292 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -491,7 +491,7 @@ register struct monst *mtmp;
 {
     boolean inpool, inlava, infountain;
 
-    /* [what about ceiling clingers?] */
+    /* [ceiling clingers are handled below] */
     inpool = (is_pool(mtmp->mx, mtmp->my)
               && (!(is_flyer(mtmp->data) || is_floater(mtmp->data))
                   /* there's no "above the surface" on the plane of water */
@@ -1324,10 +1324,16 @@ long flag;
     nowtyp = levl[x][y].typ;
 
     nodiag = NODIAG(mdat - mons);
-    wantpool = mdat->mlet == S_EEL;
-    poolok = (is_flyer(mdat) || is_clinger(mdat)
+    wantpool = (mdat->mlet == S_EEL);
+    poolok = ((!Is_waterlevel(&u.uz)
+               && (is_flyer(mdat) || is_floater(mdat) || is_clinger(mdat)))
               || (is_swimmer(mdat) && !wantpool));
-    lavaok = (is_flyer(mdat) || is_clinger(mdat) || likes_lava(mdat));
+    /* note: floating eye is the only is_floater() so this could be
+       simplified, but then adding another floater would be error prone */
+    lavaok = (is_flyer(mdat) || is_floater(mdat) || is_clinger(mdat)
+              || likes_lava(mdat));
+    if (mdat == &mons[PM_FLOATING_EYE]) /* prefers to avoid heat */
+        lavaok = FALSE;
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);
     poisongas_ok = ((nonliving(mdat) || is_vampshifter(mon)
                      || breathless(mdat)) || resists_poison(mon));
@@ -2615,7 +2621,8 @@ struct monst *mtmp;
      * here (return FALSE).
      */
     if (mtmp->data == &mons[PM_WIZARD_OF_YENDOR] || is_rider(mtmp->data)
-        || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp))
+        || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp)
+        || (u.ustuck == mtmp) || (u.usteed == mtmp))
         return FALSE;
     return TRUE;
 }
@@ -2683,7 +2690,8 @@ struct monst *mon;
             rloc_to(mon, mx, my);           /* note: mon, not mtmp */
         } else {
             /* last resort - migrate mon to the next plane */
-            if (Is_waterlevel(&u.uz) || Is_firelevel(&u.uz) || Is_earthlevel(&u.uz)) {
+            if (Is_waterlevel(&u.uz) || Is_firelevel(&u.uz)
+                || Is_earthlevel(&u.uz)) {
                 /* try sending mon on to the next plane */
                 xchar target_lev = 0, xyloc = 0;
                 struct trap *trap = g.ftrap;

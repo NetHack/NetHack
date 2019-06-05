@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.31 $ $NHDT-Date: 1559422205 2019/06/01 20:50:05 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.41 $ $NHDT-Date: 1559733390 2019/06/05 11:16:30 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -38,6 +38,25 @@ on the Plane of Air, make clouds disrupt line of sight along the edges
 have '&' (whatdoes) command describe movement keystrokes instead of reporting
 	them as unknown or showing their number_pad action when that is Off
 some improvement to the handling of endgame levels filling up with monsters
+if you survive turning into green slime due to life-saving (surviving as a
+	green slime) then die again due to green slimes having been genocided,
+	the feedback was strange because it assumed that the prior message
+	came from answering No to "Really die?" in explore or wizard mode
+various cases where objects had their bless/curse state become known weren't
+	updating persistent inventory window, when enabled, to reflect changes
+	(cited case was trying to remove cursed armor and being told of the
+	curse but there were lots of other situations with the same issue)
+similar perm_invent issue when lock state known and/or contents known become
+	set for carried container
+blessed scroll of remove curse read while confused might be shown to operate
+	on itself by perm_invent after player is told that it has disappeared
+fix memory leak if corpse auto-revival attempt failed ("you feel less hassled")
+allow a parent function to issue an an unplacebc() call that restricts
+	subsequent placebc() calls to that parent only
+flying monsters could enter water on the Plane of Water but then they'd drown
+	unless they could also swim or else didn't need to breathe
+when finding a place to put a monster on the Plane of Water, don't pick a
+	water location for flyers or floaters (levitate) or clingers (ceiling)
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -60,6 +79,7 @@ curses: if message window is only one line, cancelling some prompts with ESC
 	left the prompts visible on the message line instead of erasing them
 curses: support EDIT_GETLIN (but like with tty, it's disabled by default) to
 	pre-load an earlier response as the default answer for some prompts
+	(however, it's skipped if the 'popup_dialog' option is On)
 curses: when display windows get reconfigured (after setting align_status,
 	align_message, statuslines, windowborders or due to external resize),
 	the message window was being refreshed with the oldest available N
@@ -91,4 +111,6 @@ add a couple of engraving suggestions in pull request #79
 
 Code Cleanup and Reorganization
 -------------------------------
+began to add some function caller BREADCRUMBS to aid debugging
+
 

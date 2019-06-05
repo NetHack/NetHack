@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1559130050 2019/05/29 11:40:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.226 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1559675617 2019/06/04 19:13:37 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.228 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -396,8 +396,8 @@ struct obj *obj;
                           ? TRUE : FALSE)
                        : TRUE; /* catchall: no filters specified, so accept */
 
-    if (Role_if(PM_PRIEST))
-        obj->bknown = TRUE;
+    if (Role_if(PM_PRIEST) && !obj->bknown)
+        set_bknown(obj, 1);
 
     /*
      * There are three types of filters possible and the first and
@@ -1691,7 +1691,7 @@ int cindex, ccount; /* index of this container (1..N), number of them (N) */
         cobj->lknown = 1;
         return 0;
     }
-    cobj->lknown = 1;
+    cobj->lknown = 1; /* floor container, so no need for update_inventory() */
 
     if (cobj->otyp == BAG_OF_TRICKS) {
         int tmp;
@@ -2100,7 +2100,7 @@ register struct obj *obj;
               Icebox ? "refrigerate" : "stash", something);
         return 0;
     } else if ((obj->otyp == LOADSTONE) && obj->cursed) {
-        obj->bknown = 1;
+        set_bknown(obj, 1);
         pline_The("stone%s won't leave your person.", plur(obj->quan));
         return 0;
     } else if (obj->otyp == AMULET_OF_YENDOR
@@ -2480,16 +2480,19 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
     if (!u_handsy())
         return 0;
 
+    if (!obj->lknown) { /* do this in advance */
+        obj->lknown = 1;
+        if (held)
+            update_inventory();
+    }
     if (obj->olocked) {
         pline("%s locked.", Tobjnam(obj, "are"));
         if (held)
             You("must put it down to unlock.");
-        obj->lknown = 1;
         return 0;
     } else if (obj->otrapped) {
         if (held)
             You("open %s...", the(xname(obj)));
-        obj->lknown = 1;
         (void) chest_trap(obj, HAND, FALSE);
         /* even if the trap fails, you've used up this turn */
         if (g.multi >= 0) { /* in case we didn't become paralyzed */
@@ -2500,7 +2503,6 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         g.abort_looting = TRUE;
         return 1;
     }
-    obj->lknown = 1;
 
     g.current_container = obj; /* for use by in/out_container */
     /*
@@ -3092,7 +3094,11 @@ struct obj *box; /* or bag */
     /* caveat: this assumes that cknown, lknown, olocked, and otrapped
        fields haven't been overloaded to mean something special for the
        non-standard "container" horn of plenty */
-    box->lknown = 1;
+    if (!box->lknown) {
+        box->lknown = 1;
+        if (carried(box))
+            update_inventory(); /* jumping the gun slightly; hope that's ok */
+    }
     if (box->olocked) {
         pline("It's locked.");
     } else if (box->otrapped) {
@@ -3213,6 +3219,8 @@ struct obj *box; /* or bag */
         if (held)
             (void) encumber_msg();
     }
+    if (carried(box)) /* box is now empty with cknown set */
+        update_inventory();
 }
 
 /*pickup.c*/

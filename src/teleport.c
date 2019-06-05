@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1559227830 2019/05/30 14:50:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1559733391 2019/06/05 11:16:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -59,16 +59,26 @@ unsigned gpflags;
 
         mdat = mtmp->data;
         if (is_pool(x, y) && !ignorewater) {
+            /* [what about Breathless?] */
             if (mtmp == &g.youmonst)
-                return (Levitation || Flying || Wwalking || Swimming
-                        || Amphibious);
+                return (Swimming || Amphibious
+                        || (!Is_waterlevel(&u.uz)
+                            /* water on the Plane of Water has no surface
+                               so there's no way to be on or above that */
+                            && (Levitation || Flying || Wwalking)));
             else
-                return (is_floater(mdat) || is_flyer(mdat) || is_swimmer(mdat)
-                        || is_clinger(mdat));
+                return (is_swimmer(mdat)
+                        || (!Is_waterlevel(&u.uz)
+                            && (is_floater(mdat) || is_flyer(mdat)
+                                || is_clinger(mdat))));
         } else if (mdat->mlet == S_EEL && rn2(13) && !ignorewater) {
             return FALSE;
         } else if (is_lava(x, y)) {
-            if (mtmp == &g.youmonst)
+            /* 3.6.3: floating eye can levitate over lava but it avoids
+               that due the effect of the heat causing it to dry out */
+            if (mdat == &mons[PM_FLOATING_EYE])
+                return FALSE;
+            else if (mtmp == &g.youmonst)
                 return (Levitation || Flying
                         || (Fire_resistance && Wwalking && uarmf
                             && uarmf->oerodeproof)

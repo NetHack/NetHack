@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1553363415 2019/03/23 17:50:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.272 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1559670602 2019/06/04 17:50:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -662,7 +662,7 @@ struct obj *obj;
             pline("This leash is not attached to that creature.");
         } else if (obj->cursed) {
             pline_The("leash would not come off!");
-            obj->bknown = 1;
+            set_bknown(obj, 1);
         } else {
             mtmp->mleashed = 0;
             obj->leashmon = 0;
@@ -2744,7 +2744,7 @@ struct obj *obj;
                 pline("%s welded to %s %s%c",
                       (otmp->quan == 1L) ? "It is" : "They are", mhis(mtmp),
                       mon_hand, !otmp->bknown ? '!' : '.');
-                otmp->bknown = 1;
+                set_bknown(otmp, 1);
                 gotit = FALSE; /* can't pull it free */
             }
             if (gotit) {
@@ -3597,7 +3597,7 @@ doapply()
             if (!rn2(49)) {
                 if (!Blind) {
                     pline("%s %s.", Yobjnam2(obj, "glow"), hcolor("brown"));
-                    obj->bknown = 1;
+                    set_bknown(obj, 1);
                 }
                 unbless(obj);
             }

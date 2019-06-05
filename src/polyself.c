@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1556497911 2019/04/29 00:31:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1559664952 2019/06/04 16:15:52 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.133 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -159,7 +159,7 @@ polyman(fmt, arg)
 const char *fmt, *arg;
 {
     boolean sticky = (sticks(g.youmonst.data) && u.ustuck && !u.uswallow),
-            was_mimicking = (U_AP_TYPE == M_AP_OBJECT);
+            was_mimicking = (U_AP_TYPE != M_AP_NOTHING);
     boolean was_blind = !!Blind;
 
     if (Upolyd) {
@@ -182,6 +182,7 @@ const char *fmt, *arg;
         if (g.multi < 0)
             unmul("");
         g.youmonst.m_ap_type = M_AP_NOTHING;
+        g.youmonst.mappearance = 0;
     }
 
     newsym(u.ux, u.uy);
@@ -629,6 +630,7 @@ int mntmp;
     if (mons[mntmp].mlet != S_MIMIC) {
         /* as in polyman() */
         g.youmonst.m_ap_type = M_AP_NOTHING;
+        g.youmonst.mappearance = 0;
     }
     if (is_male(&mons[mntmp])) {
         if (flags.female)

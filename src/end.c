@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1558921075 2019/05/27 01:37:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1559675615 2019/06/04 19:13:35 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.176 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1018,7 +1018,8 @@ done_object_cleanup()
        swallowed, uball and uchain will be in limbo; put them on floor
        so bones will have them and object list cleanup finds them */
     if (uchain && uchain->where == OBJ_FREE) {
-        placebc();
+        /* placebc(); */
+        lift_covet_and_placebc(override_restriction);
     }
     return;
 }
@@ -1154,6 +1155,7 @@ int how;
     if (!survive && (wizard || discover) && how <= GENOCIDED
         && !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
+        iflags.last_msg = PLNMSG_OK_DONT_DIE;
         savelife(how);
         survive = TRUE;
     }
@@ -1597,9 +1599,12 @@ boolean identified, all_containers, reportempty;
 
     for (box = list; box; box = box->nobj) {
         if (Is_container(box) || box->otyp == STATUE) {
-            box->cknown = 1; /* we're looking at the contents now */
-            if (identified)
-                box->lknown = 1;
+            if (!box->cknown || (identified && !box->lknown)) {
+                box->cknown = 1; /* we're looking at the contents now */
+                if (identified)
+                    box->lknown = 1;
+                update_inventory();
+            }
             if (box->otyp == BAG_OF_TRICKS) {
                 continue; /* wrong type of container */
             } else if (box->cobj) {

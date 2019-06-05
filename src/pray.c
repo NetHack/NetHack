@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1549074257 2019/02/02 02:24:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1559670608 2019/06/04 17:50:08 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -494,7 +494,7 @@ int trouble;
                   what ? what : (const char *) Yobjnam2(otmp, "softly glow"),
                   hcolor(NH_AMBER));
             iflags.last_msg = PLNMSG_OBJ_GLOWS;
-            otmp->bknown = !Hallucination;
+            otmp->bknown = !Hallucination; /* ok to skip set_bknown() */
         }
         uncurse(otmp);
         update_inventory();
@@ -553,7 +553,7 @@ int trouble;
         otmp = which_armor(u.usteed, W_SADDLE);
         if (!Blind) {
             pline("%s %s.", Yobjnam2(otmp, "softly glow"), hcolor(NH_AMBER));
-            otmp->bknown = TRUE;
+            set_bknown(otmp, 1);
         }
         uncurse(otmp);
         break;
@@ -800,7 +800,7 @@ gcrownu()
     make_splbk:
         obj = mksobj(class_gift, TRUE, FALSE);
         bless(obj);
-        obj->bknown = TRUE;
+        obj->bknown = 1; /* ok to skip set_bknown() */
         at_your_feet("A spellbook");
         dropy(obj);
         u.ugifts++;
@@ -887,7 +887,7 @@ gcrownu()
         bless(obj);
         obj->oeroded = obj->oeroded2 = 0;
         obj->oerodeproof = TRUE;
-        obj->bknown = obj->rknown = TRUE;
+        obj->bknown = obj->rknown = 1; /* ok to skip set_bknown() */
         if (obj->spe < 1)
             obj->spe = 1;
         /* acquire skill in this weapon */
@@ -1019,7 +1019,7 @@ aligntyp g_align;
                         You_feel("the power of %s over %s.", u_gname(),
                                  yname(uwep));
                     uncurse(uwep);
-                    uwep->bknown = TRUE;
+                    uwep->bknown = 1; /* ok to bypass set_bknown() */
                     *repair_buf = '\0';
                 } else if (!uwep->blessed) {
                     if (!Blind) {
@@ -1031,7 +1031,7 @@ aligntyp g_align;
                         You_feel("the blessing of %s over %s.", u_gname(),
                                  yname(uwep));
                     bless(uwep);
-                    uwep->bknown = TRUE;
+                    uwep->bknown = 1; /* ok to bypass set_bknown() */
                     *repair_buf = '\0';
                 }
 
@@ -1122,7 +1122,7 @@ aligntyp g_align;
                         pline("%s %s.", Yobjnam2(otmp, "softly glow"),
                               hcolor(NH_AMBER));
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
-                        otmp->bknown = TRUE;
+                        otmp->bknown = 1; /* ok to bypass set_bknown() */
                         ++any;
                     }
                     uncurse(otmp);
@@ -1229,7 +1229,7 @@ boolean bless_water;
             && (bless_water ? !otmp->blessed : !otmp->cursed)) {
             otmp->blessed = bless_water;
             otmp->cursed = !bless_water;
-            otmp->bknown = bc_known;
+            otmp->bknown = bc_known; /* ok to bypass set_bknown() */
             changed += otmp->quan;
         } else if (otmp->oclass == POTION_CLASS)
             other = TRUE;
