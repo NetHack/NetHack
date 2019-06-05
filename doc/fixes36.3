@@ -51,7 +51,8 @@ similar perm_invent issue when lock state known and/or contents known become
 blessed scroll of remove curse read while confused might be shown to operate
 	on itself by perm_invent after player is told that it has disappeared
 fix memory leak if corpse auto-revival attempt failed ("you feel less hassled")
-
+allow a parent function to issue an an unplacebc() call that restricts
+	subsequent placebc() calls to that parent only
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------

@@ -1400,7 +1400,7 @@ movebubbles()
     struct bubble *b;
     struct container *cons;
     struct trap *btrap;
-    int x, y, i, j;
+    int x, y, i, j, bcpin;
 
     /* set up the portal the first time bubbles are moved */
     if (!wportal)
@@ -1411,7 +1411,7 @@ movebubbles()
     if (Is_waterlevel(&u.uz)) {
         /* keep attached ball&chain separate from bubble objects */
         if (Punished)
-            unplacebc();
+            bcpin = unplacebc_and_covet_placebc();
 
         /*
          * Pick up everything inside of a bubble then fill all bubble
@@ -1528,7 +1528,7 @@ movebubbles()
 
     /* put attached ball&chain back */
     if (Is_waterlevel(&u.uz) && Punished)
-        placebc();
+        lift_covet_and_placebc(bcpin);
     vision_full_recalc = 1;
 }
 

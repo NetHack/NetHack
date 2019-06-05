@@ -12,10 +12,11 @@ STATIC_DCL int NDECL(bc_order);
 STATIC_DCL void NDECL(litter);
 STATIC_OVL void NDECL(placebc_core);
 STATIC_OVL void NDECL(unplacebc_core);
+STATIC_DCL boolean FDECL(check_restriction, (int));
 
+static int bcrestriction = 0;
 #ifdef BREADCRUMBS
-static struct breadcrumbs bcpbreadcrumbs = { (const char *) 0, 0, FALSE},
-                          bcubreadcrumbs = { (const char *) 0, 0, FALSE};
+static struct breadcrumbs bcpbreadcrumbs = {0}, bcubreadcrumbs = {0};
 #endif
 
 void
@@ -137,33 +138,8 @@ placebc_core()
     u.bglyph = u.cglyph = levl[u.ux][u.uy].glyph; /* pick up glyph */
 
     newsym(u.ux, u.uy);
+    bcrestriction = 0;
 }
-
-#ifdef BREADCRUMBS
-void
-Placebc(funcnm, linenum)
-const char *funcnm;
-int linenum;
-{
-    if (uball && bcpbreadcrumbs.in_effect && uball->where == OBJ_FLOOR) {
-        impossible("placebc collision from %s:%d, already placed by %s:%d",
-                   funcnm, linenum,
-                   bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
-        return;
-    }
-    bcpbreadcrumbs.in_effect = TRUE;
-    bcubreadcrumbs.in_effect = FALSE;
-    bcpbreadcrumbs.funcnm = funcnm;
-    bcpbreadcrumbs.linenum = linenum;
-    placebc_core();
-}
-#else
-void
-placebc()
-{
-    placebc_core();
-}
-#endif
 
 STATIC_OVL void
 unplacebc_core()
@@ -197,33 +173,190 @@ unplacebc_core()
     u.bc_felt = 0; /* feel nothing */
 }
 
-#ifdef BREADCRUMBS
+STATIC_OVL boolean
+check_restriction(restriction)
+int restriction;
+{
+    boolean ret = FALSE;
+    
+    if (!bcrestriction || (restriction == override_restriction))
+        ret = TRUE;
+    else
+        ret = (bcrestriction == restriction) ? TRUE : FALSE;
+    return ret;
+}
+
+#ifndef BREADCRUMBS
+void
+placebc()
+{
+    if (!check_restriction(0)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, 
+            "placebc denied, restriction in effect");
+        paniclog("placebc", panicbuf);
+#endif
+        return;
+    }
+    if (uchain && uchain->where != OBJ_FREE) {
+        impossible("bc already placed?");
+        return;
+    }
+    placebc_core();
+}
+
+void
+unplacebc()
+{
+    if (bcrestriction) {
+        impossible("unplacebc denied, restriction in place");
+        return;
+    }
+    unplacebc_core();
+}
+
+int
+unplacebc_and_covet_placebc()
+{
+    int restriction = 0;
+
+    if (bcrestriction) {
+        impossible("unplacebc_and_covet_placebc denied, already restricted");
+    } else {
+        restriction = bcrestriction = rnd(400);
+        unplacebc_core();
+    }
+    return restriction;
+}
+
+void
+lift_covet_and_placebc(pin)
+int pin;
+{
+    if (!check_restriction(pin)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, 
+                "lift_covet_and_placebc denied, %s",
+                (pin != bcrestriction) ?
+                "pin mismatch" : "restriction in effect");
+        paniclog("placebc", panicbuf);
+#endif
+        return;
+    }
+    if (uchain && uchain->where != OBJ_FREE) {
+        impossible("bc already placed?");
+        return;
+    }
+    placebc_core();
+}
+
+#else  /* BREADCRUMBS */
+
+void
+Placebc(funcnm, linenum)
+const char *funcnm;
+int linenum;
+{
+    if (!check_restriction(0)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, 
+            "Placebc denied to %s:%d, restricted by %s:%d",
+                funcnm, linenum,
+                bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        paniclog("Placebc", panicbuf);
+#endif
+        return;
+    }
+    if ((uchain && uchain->where != OBJ_FREE)
+                   && bcpbreadcrumbs.in_effect) {
+        impossible("Placebc collision at %s:%d, already placed by %s:%d",
+                   funcnm, linenum,
+                   bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        return;
+    }
+    bcpbreadcrumbs.in_effect = TRUE;
+    bcubreadcrumbs.in_effect = FALSE;
+    bcpbreadcrumbs.funcnm = funcnm;
+    bcpbreadcrumbs.linenum = linenum;
+    placebc_core();
+}
+
 void
 Unplacebc(funcnm, linenum)
 const char *funcnm;
 int linenum;
 {
-#if 0
-    if (uball && bcubreadcrumbs.in_effect && uball->where == OBJ_FREE) {
-        impossible("unplacebc collision from %s:%d, already placed by %s:%d",
+
+    if (bcrestriction) {
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf,
+          "Unplacebc from %s:%d, when restricted to %s:%d",
                    funcnm, linenum,
                    bcubreadcrumbs.funcnm, bcubreadcrumbs.linenum);
-        return;
+        paniclog("Unplacebc", panicbuf);
     }
-#endif
     bcpbreadcrumbs.in_effect = FALSE;
     bcubreadcrumbs.in_effect = TRUE;
     bcubreadcrumbs.funcnm = funcnm;
     bcubreadcrumbs.linenum = linenum;
     unplacebc_core();
 }
-#else
-void
-unplacebc()
+
+int
+Unplacebc_and_covet_placebc(funcnm, linenum)
+const char *funcnm;
+int linenum;
 {
-    unplacebc_core();
+    int restriction = 0;
+
+    if (bcrestriction) {
+        impossible(
+          "Unplacebc_and_covet_placebc denied to %s:%d, restricted by %s:%d",
+                   funcnm, linenum,
+                   bcubreadcrumbs.funcnm, bcubreadcrumbs.linenum);
+    } else {
+        restriction = bcrestriction = rnd(400);
+        bcpbreadcrumbs.in_effect = FALSE;
+        bcubreadcrumbs.in_effect = TRUE;
+        bcubreadcrumbs.funcnm = funcnm;
+        bcubreadcrumbs.linenum = linenum;
+        unplacebc_core();
+    }
+    return restriction;
 }
+
+void
+Lift_covet_and_placebc(pin, funcnm, linenum)
+int pin;
+char *funcnm;
+int linenum;
+{
+    if (!check_restriction(pin)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, 
+            "Lift_covet_and_placebc denied to %s:%d, restricted by %s:%d",
+                funcnm, linenum,
+                bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        paniclog("Lift_covet_and_placebc", panicbuf);
 #endif
+        return;
+    }
+    if (uchain && uchain->where != OBJ_FREE) {
+        impossible("bc already placed?");
+        return;
+    }
+    placebc_core();
+}
+#endif /* BREADCRUMBS */
 
 /*
  *  Return the stacking of the hero's ball & chain.  This assumes that the
