@@ -1952,7 +1952,7 @@ doturn()
     Gname = halu_gname(u.ualign.type);
 
     /* [What about needing free hands (does #turn involve any gesturing)?] */
-    if (!can_chant(&youmonst)) {
+    if (!can_chant(&g.youmonst)) {
         /* "evilness": "demons and undead" is too verbose and too precise */
         You("are %s upon %s to turn aside evilness.",
             Strangled ? "not able to call" : "incapable of calling", Gname);
