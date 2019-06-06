@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1559785004 2019/06/06 01:36:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1559853037 2019/06/06 20:30:37 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2050,14 +2050,19 @@ doturn()
     }
 
     /*
-     * TODO?
-     *  Shouldn't there be some detrimental effect on self for
-     *  successful #turn while in demon or undead form?
+     *  There is no detrimental effect on self for successful #turn
+     *  while in demon or undead form.  That can only be done while
+     *  chaotic oneself (see "For some reason" above) and chaotic
+     *  turning only makes targets peaceful.
      *
      *  Paralysis duration probably ought to be based on the strengh
      *  of turned creatures rather than on turner's level.
      *  Why doesn't this honor Free_action?  [Because being able to
-     *  repeat #turn every turn would be too powerful.]
+     *  repeat #turn every turn would be too powerful.  Maybe instead
+     *  of nomul(-N) we should add the equivalent of mon->mspec_used
+     *  for the hero and refuse to #turn when it's non-zero?  Or have
+     *  both and u.uspec_used only matters when Free_action prevents
+     *  the brief paralysis?]
      */
     nomul(-(5 - ((u.ulevel - 1) / 6))); /* -5 .. -1 */
     multi_reason = "trying to turn the monsters";
