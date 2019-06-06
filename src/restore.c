@@ -593,6 +593,7 @@ unsigned int *stuckid, *steedid;
     amii_setpens(amii_numcolors); /* use colors from save file */
 #endif
     mread(fd, (genericptr_t) &u, sizeof(struct you));
+    g.youmonst.cham = u.mcham;
 
 #define ReadTimebuf(foo)                   \
     mread(fd, (genericptr_t) timebuf, 14); \
@@ -626,6 +627,7 @@ unsigned int *stuckid, *steedid;
         sysflags = newgamesysflags;
 #endif
         g.context = newgamecontext;
+        g.youmonst = cg.zeromonst;
         return FALSE;
     }
     /* in case hangup save occurred in midst of level change */

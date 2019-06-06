@@ -184,6 +184,7 @@ struct monst {
 #define is_vampshifter(mon)                                      \
     ((mon)->cham == PM_VAMPIRE || (mon)->cham == PM_VAMPIRE_LORD \
      || (mon)->cham == PM_VLAD_THE_IMPALER)
+#define vampshifted(mon) (is_vampshifter((mon)) && !is_vampire((mon)->data))
 
 /* mimic appearances that block vision/light */
 #define is_lightblocker_mappear(mon)                       \

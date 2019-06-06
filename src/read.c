@@ -2108,6 +2108,10 @@ do_class_genocide()
                     kill_genocided_monsters();
                     update_inventory(); /* eggs & tins */
                     pline("Wiped out all %s.", nam);
+                    if (Upolyd && vampshifted(&g.youmonst)
+                        /* current shifted form or base vampire form */
+                        && (i == u.umonnum || i == g.youmonst.cham))
+                        polyself(3); /* vampshifter back to vampire */
                     if (Upolyd && i == u.umonnum) {
                         u.mh = -1;
                         if (Unchanging) {
@@ -2226,6 +2230,10 @@ int how;
                 continue;
             }
             ptr = &mons[mndx];
+            /* first revert if current shifted form or base vampire form */
+            if (Upolyd && vampshifted(&g.youmonst)
+                && (mndx == u.umonnum || mndx == g.youmonst.cham))
+                polyself(3); /* vampshifter (bat, &c) back to vampire */
             /* Although "genus" is Latin for race, the hero benefits
              * from both race and role; thus genocide affects either.
              */

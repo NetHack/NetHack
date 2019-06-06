@@ -821,6 +821,8 @@ struct obj *obj;
     if (obj->cursed && !rn2(2)) {
         if (!Blind)
             pline_The("%s fogs up and doesn't reflect!", mirror);
+        else
+            pline("Nothing seems to happen.");
         return 1;
     }
     if (!u.dx && !u.dy && !u.dz) {
@@ -841,19 +843,23 @@ struct obj *obj;
                     }
                     g.nomovemsg = 0; /* default, "you can move again" */
                 }
-            } else if (g.youmonst.data->mlet == S_VAMPIRE)
+            } else if (is_vampire(g.youmonst.data)
+                       || is_vampshifter(&g.youmonst)) {
                 You("don't have a reflection.");
-            else if (u.umonnum == PM_UMBER_HULK) {
+            } else if (u.umonnum == PM_UMBER_HULK) {
                 pline("Huh?  That doesn't look like you!");
                 make_confused(HConfusion + d(3, 4), FALSE);
-            } else if (Hallucination)
+            } else if (Hallucination) {
                 You(look_str, hcolor((char *) 0));
-            else if (Sick)
+            } else if (Sick) {
                 You(look_str, "peaked");
-            else if (u.uhs >= WEAK)
+            } else if (u.uhs >= WEAK) {
                 You(look_str, "undernourished");
-            else
+            } else if (Upolyd) {
+                You("look like %s.", an(mons[u.umonnum].mname));
+            } else {
                 You("look as %s as ever.", uvisage);
+            }
         }
         return 1;
     }
@@ -884,8 +890,8 @@ struct obj *obj;
     /* couldsee(mtmp->mx, mtmp->my) is implied by the fact that bhit()
        targetted it, so we can ignore possibility of X-ray vision */
     vis = canseemon(mtmp);
-/* ways to directly see monster (excludes X-ray vision, telepathy,
-   extended detection, type-specific warning) */
+    /* ways to directly see monster (excludes X-ray vision, telepathy,
+       extended detection, type-specific warning) */
 #define SEENMON (MONSEEN_NORMAL | MONSEEN_SEEINVIS | MONSEEN_INFRAVIS)
     how_seen = vis ? howmonseen(mtmp) : 0;
     /* whether monster is able to use its vision-based capabilities */
@@ -953,7 +959,8 @@ struct obj *obj;
             if (vis)
                 You("discern no obvious reaction from %s.", mon_nam(mtmp));
             else
-                You_feel("a bit silly gesturing the mirror in that direction.");
+                You_feel(
+                       "a bit silly gesturing the mirror in that direction.");
             do_react = FALSE;
         }
         if (do_react) {

@@ -707,12 +707,13 @@ domonability(VOID_ARGS)
             pline("Unfortunately sound does not carry well through rock.");
         else
             aggravate();
-    } else if (g.youmonst.data->mlet == S_VAMPIRE)
+    } else if (is_vampire(g.youmonst.data) || is_vampshifter(&g.youmonst)) {
         return dopoly();
-    else if (Upolyd)
+    } else if (Upolyd) {
         pline("Any special ability you may have is purely reflexive.");
-    else
+    } else {
         You("don't have a special ability in your normal form!");
+    }
     return 0;
 }
 
@@ -1830,14 +1831,19 @@ int final;
        (with countdown timer appended for wizard mode); we really want
        the player to know he's not a samurai at the moment... */
     if (Upolyd) {
+        char anbuf[20]; /* includes trailing space; [4] suffices */
         struct permonst *uasmon = g.youmonst.data;
+        boolean altphrasing = vampshifted(&g.youmonst);
 
         tmpbuf[0] = '\0';
         /* here we always use current gender, not saved role gender */
         if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon))
             Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
-        Sprintf(buf, "%sin %s%s form", !final ? "currently " : "", tmpbuf,
-                uasmon->mname);
+        if (altphrasing)
+            Sprintf(eos(tmpbuf), "%s in ", mons[g.youmonst.cham].mname);
+        Sprintf(buf, "%s%s%s%s form", !final ? "currently " : "",
+                altphrasing ? just_an(anbuf, tmpbuf) : "in ",
+                tmpbuf, uasmon->mname);
         you_are(buf, "");
     }
 
@@ -2804,7 +2810,11 @@ int final;
         && !(final == ENL_GAMEOVERDEAD
              && u.umonnum == PM_GREEN_SLIME && !Unchanging)) {
         /* foreign shape (except were-form which is handled below) */
-        Sprintf(buf, "polymorphed into %s", an(g.youmonst.data->mname));
+        if (!vampshifted(&g.youmonst))
+            Sprintf(buf, "polymorphed into %s", an(g.youmonst.data->mname));
+        else
+            Sprintf(buf, "polymorphed into %s in %s form",
+                    an(mons[g.youmonst.cham].mname), g.youmonst.data->mname);
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
         you_are(buf, "");

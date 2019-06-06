@@ -37,8 +37,18 @@ void
 set_uasmon()
 {
     struct permonst *mdat = &mons[u.umonnum];
+    boolean was_vampshifter = valid_vampshiftform(g.youmonst.cham, u.umonnum);
 
     set_mon_data(&g.youmonst, mdat);
+
+    if (Protection_from_shape_changers)
+        g.youmonst.cham = NON_PM;
+    else if (is_vampire(g.youmonst.data))
+        g.youmonst.cham = g.youmonst.mnum;
+    /* assume hero-as-chameleon/doppelganger/sandestin doesn't change shape */
+    else if (!was_vampshifter)
+        g.youmonst.cham = NON_PM;
+    u.mcham = g.youmonst.cham; /* for save/restore since youmonst isn't */
 
 #define PROPSET(PropIndx, ON)                          \
     do {                                               \
@@ -348,8 +358,7 @@ newman()
             if (u.uhp <= 0)
                 u.uhp = 1;
         } else {
-        dead: /* we come directly here if their experience level went to 0 or
-                 less */
+ dead:      /* we come directly here if experience level went to 0 or less */
             Your("new form doesn't seem healthy enough to survive.");
             g.killer.format = KILLED_BY_AN;
             Strcpy(g.killer.name, "unsuccessful polymorph");
@@ -386,9 +395,13 @@ int psflags;
 {
     char buf[BUFSZ] = DUMMY;
     int old_light, new_light, mntmp, class, tryct;
-    boolean forcecontrol = (psflags == 1), monsterpoly = (psflags == 2),
+    boolean forcecontrol = (psflags == 1),
+            monsterpoly = (psflags == 2),
+            formrevert = (psflags == 3),
             draconian = (uarm && Is_dragon_armor(uarm)),
-            iswere = (u.ulycn >= LOW_PM), isvamp = is_vampire(g.youmonst.data),
+            iswere = (u.ulycn >= LOW_PM),
+            isvamp = (is_vampire(g.youmonst.data)
+                      || is_vampshifter(&g.youmonst)),
             controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
     if (Unchanging) {
@@ -408,6 +421,11 @@ int psflags;
     old_light = emits_light(g.youmonst.data);
     mntmp = NON_PM;
 
+    if (formrevert){
+        mntmp = g.youmonst.cham;
+        monsterpoly = TRUE;
+        controllable_poly = FALSE;
+    }
     if (monsterpoly && isvamp)
         goto do_vampyr;
 
@@ -433,7 +451,7 @@ int psflags;
             class = 0;
             mntmp = name_to_mon(buf);
             if (mntmp < LOW_PM) {
-            by_class:
+ by_class:
                 class = name_to_monclass(buf, &mntmp);
                 if (class && mntmp == NON_PM)
                     mntmp = mkclass_poly(class);
@@ -486,7 +504,7 @@ int psflags;
     } else if (draconian || iswere || isvamp) {
         /* special changes that don't require polyok() */
         if (draconian) {
-        do_merge:
+ do_merge:
             mntmp = armor_to_dragon(uarm->otyp);
             if (!(g.mvitals[mntmp].mvflags & G_GENOD)) {
                 /* allow G_EXTINCT */
@@ -521,17 +539,21 @@ int psflags;
                 update_inventory();
             }
         } else if (iswere) {
-        do_shift:
+ do_shift:
             if (Upolyd && were_beastie(mntmp) != u.ulycn)
                 mntmp = PM_HUMAN; /* Illegal; force newman() */
             else
                 mntmp = u.ulycn;
         } else if (isvamp) {
-        do_vampyr:
-            if (mntmp < LOW_PM || (mons[mntmp].geno & G_UNIQ))
-                mntmp = (g.youmonst.data != &mons[PM_VAMPIRE] && !rn2(10))
+ do_vampyr:
+            if (mntmp < LOW_PM || (mons[mntmp].geno & G_UNIQ)) {
+                mntmp = (g.youmonst.data == &mons[PM_VAMPIRE_LORD] && !rn2(10))
                             ? PM_WOLF
                             : !rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
+                if (g.youmonst.cham >= LOW_PM
+                    && !is_vampire(g.youmonst.data) && !rn2(2))
+                    mntmp = g.youmonst.cham;
+            }
             if (controllable_poly) {
                 Sprintf(buf, "Become %s?", an(mons[mntmp].mname));
                 if (yn(buf) != 'y')
@@ -570,7 +592,7 @@ int psflags;
     }
     g.sex_change_ok--; /* reset */
 
-made_change:
+ made_change:
     new_light = emits_light(g.youmonst.data);
     if (old_light != new_light) {
         if (old_light)
@@ -780,7 +802,7 @@ int mntmp;
             pline(use_thec, monsterc, "emit a mental blast");
         if (g.youmonst.data->msound == MS_SHRIEK) /* worthless, actually */
             pline(use_thec, monsterc, "shriek");
-        if (is_vampire(g.youmonst.data))
+        if (is_vampire(g.youmonst.data) || is_vampshifter(&g.youmonst))
             pline(use_thec, monsterc, "change shape");
 
         if (lays_eggs(g.youmonst.data) && flags.female &&
@@ -1024,6 +1046,8 @@ int alone;
     }
 }
 
+/* return to original form, usually either due to polymorph timing out
+   or dying from loss of hit points while being polymorphed */
 void
 rehumanize()
 {
@@ -1041,6 +1065,11 @@ rehumanize()
             makeknown(AMULET_OF_UNCHANGING);
         }
     }
+
+    /*
+     * Right now, dying while being a shifted vampire (bat, cloud, wolf)
+     * reverts to human rather than to vampire.
+     */
 
     if (emits_light(g.youmonst.data))
         del_light_source(LS_MONSTER, monst_to_any(&g.youmonst));
@@ -1490,7 +1519,7 @@ dopoly()
 {
     struct permonst *savedat = g.youmonst.data;
 
-    if (is_vampire(g.youmonst.data)) {
+    if (is_vampire(g.youmonst.data) || is_vampshifter(&g.youmonst)) {
         polyself(2);
         if (savedat != g.youmonst.data) {
             You("transform into %s.", an(g.youmonst.data->mname));

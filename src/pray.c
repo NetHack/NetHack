@@ -1962,7 +1962,8 @@ doturn()
         return (u.uconduct.gnostic == 1);
     }
     if ((u.ualign.type != A_CHAOTIC
-         && (is_demon(g.youmonst.data) || is_undead(g.youmonst.data)))
+         && (is_demon(g.youmonst.data)
+             || is_undead(g.youmonst.data) || is_vampshifter(&g.youmonst)))
         || u.ugangr > 6) { /* "Die, mortal!" */
         pline("For some reason, %s seems to ignore you.", Gname);
         aggravate();

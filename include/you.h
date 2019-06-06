@@ -392,6 +392,7 @@ struct you {
     xchar skill_record[P_SKILL_LIMIT]; /* skill advancements */
     struct skills weapon_skills[P_NUM_SKILLS];
     boolean twoweap;         /* KMH -- Using two-weapon combat */
+    short mcham;             /* vampire mndx if shapeshifted to bat/cloud */
 
 }; /* end of `struct you' */
 

@@ -498,7 +498,7 @@ doengrave()
     maxelen = BUFSZ - 1;
     if (oep)
         oetype = oep->engr_type;
-    if (is_demon(g.youmonst.data) || g.youmonst.data->mlet == S_VAMPIRE)
+    if (is_demon(g.youmonst.data) || is_vampire(g.youmonst.data))
         type = ENGR_BLOOD;
 
     /* Can the adventurer engrave at all? */

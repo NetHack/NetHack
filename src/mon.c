@@ -3414,7 +3414,21 @@ int mndx;
     return TRUE; /* potential new form is ok */
 }
 
-/* prevent wizard mode user from specifying invalid vampshifter shape */
+/* used for hero polyself handling */
+boolean
+valid_vampshiftform(base, form)
+int base, form;
+{
+    if (base >= LOW_PM && is_vampire(&mons[base])) {
+        if (form == PM_VAMPIRE_BAT || form == PM_FOG_CLOUD
+            || (form == PM_WOLF && base != PM_VAMPIRE))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+/* prevent wizard mode user from specifying invalid vampshifter shape
+   when using monpolycontrol to assign a new form to a vampshifter */
 boolean
 validvamp(mon, mndx_p, monclass)
 struct monst *mon;

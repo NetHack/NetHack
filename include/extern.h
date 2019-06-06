@@ -1439,6 +1439,7 @@ E void FDECL(restore_cham, (struct monst *));
 E boolean FDECL(hideunder, (struct monst *));
 E void FDECL(hide_monst, (struct monst *));
 E void FDECL(mon_animal_list, (BOOLEAN_P));
+E boolean FDECL(valid_vampshiftform, (int, int));
 E boolean FDECL(validvamp, (struct monst *, int *, int));
 E int FDECL(select_newcham_form, (struct monst *));
 E void FDECL(mgender_from_permonst, (struct monst *, struct permonst *));
@@ -1708,6 +1709,7 @@ E char *FDECL(killer_xname, (struct obj *));
 E char *FDECL(short_oname,
               (struct obj *, char *(*)(OBJ_P), char *(*)(OBJ_P), unsigned));
 E const char *FDECL(singular, (struct obj *, char *(*)(OBJ_P)));
+E char *FDECL(just_an, (char *, const char *));
 E char *FDECL(an, (const char *));
 E char *FDECL(An, (const char *));
 E char *FDECL(The, (const char *));

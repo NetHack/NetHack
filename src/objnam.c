@@ -19,7 +19,6 @@ STATIC_DCL void FDECL(releaseobuf, (char *));
 STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
 STATIC_DCL char *FDECL(doname_base, (struct obj *obj, unsigned));
-STATIC_DCL char *FDECL(just_an, (char *str, const char *));
 STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
                                            const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
@@ -1628,7 +1627,7 @@ char *FDECL((*func), (OBJ_P));
 }
 
 /* pick "", "a ", or "an " as article for 'str'; used by an() and doname() */
-STATIC_OVL char *
+char *
 just_an(outbuf, str)
 char *outbuf;
 const char *str;
