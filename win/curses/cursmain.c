@@ -143,6 +143,7 @@ curses_init_nhwindows(int *argcp UNUSED,
 #endif
     noecho();
     raw();
+    nonl();
     meta(stdscr, TRUE);
     orig_cursor = curs_set(0);
     keypad(stdscr, TRUE);

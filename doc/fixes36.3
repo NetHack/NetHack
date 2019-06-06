@@ -89,6 +89,11 @@ curses: when display windows get reconfigured (after setting align_status,
 curses: plug memory leak when getting a line of input is cancelled by ESC
 curses: after requesting a line of input from player, next line of message
 	window could end up being skipped
+curses: disable carriage return into newline conversion by default, to allow
+	player to use Ctrl+M for answering prompts while not causing
+	character to run towards bottom edge of map if pressed while on map.
+	Also, players can configure their terminal to issue carriage returns
+	instead of newlines on Enter keypress to further remedy this.
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new
