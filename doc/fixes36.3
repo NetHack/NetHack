@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.41 $ $NHDT-Date: 1559733390 2019/06/05 11:16:30 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.42 $ $NHDT-Date: 1559851954 2019/06/06 20:12:34 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -57,6 +57,8 @@ flying monsters could enter water on the Plane of Water but then they'd drown
 	unless they could also swim or else didn't need to breathe
 when finding a place to put a monster on the Plane of Water, don't pick a
 	water location for flyers or floaters (levitate) or clingers (ceiling)
+#turn worked when unable to speak despite "you chant an arcane formula"
+#turn implicitly required sight due to wrong check for avoiding spanning walls
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
