@@ -500,7 +500,7 @@ X11_player_selection_randomize()
 {
     int nrole = plsel_n_roles;
     int nrace = plsel_n_races;
-    int ro, ra, a, g;
+    int ro, ra, al, ge;
     boolean fully_specified_role, choose_race_first;
     boolean picksomething = (flags.initrole == ROLE_NONE
                              || flags.initrace == ROLE_NONE
@@ -543,7 +543,7 @@ X11_player_selection_randomize()
         choose_race_first = TRUE;
     }
 
-    while (!validrace(ro,ra)) {
+    while (!validrace(ro, ra)) {
         if (choose_race_first) {
             ro = rn2(nrole);
             if (flags.initrole != ROLE_RANDOM) {
@@ -557,26 +557,26 @@ X11_player_selection_randomize()
         }
     }
 
-    g = flags.initgend;
-    if (g == ROLE_NONE) {
-        g = rn2(ROLE_GENDERS);
+    ge = flags.initgend;
+    if (ge == ROLE_NONE) {
+        ge = rn2(ROLE_GENDERS);
         fully_specified_role = FALSE;
     }
-    while (!validgend(ro,ra,g)) {
-        g = rn2(ROLE_GENDERS);
+    while (!validgend(ro, ra, ge)) {
+        ge = rn2(ROLE_GENDERS);
     }
 
-    a = flags.initalign;
-    if (a == ROLE_NONE) {
-        a = rn2(ROLE_ALIGNS);
+    al = flags.initalign;
+    if (al == ROLE_NONE) {
+        al = rn2(ROLE_ALIGNS);
         fully_specified_role = FALSE;
     }
-    while (!validalign(ro,ra,a)) {
-        a = rn2(ROLE_ALIGNS);
+    while (!validalign(ro, ra, al)) {
+        al = rn2(ROLE_ALIGNS);
     }
 
-    XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(g + 1));
-    XawToggleSetCurrent(plsel_align_radios[0], i2xtp(a + 1));
+    XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(ge + 1));
+    XawToggleSetCurrent(plsel_align_radios[0], i2xtp(al + 1));
     XawToggleSetCurrent(plsel_race_radios[0], i2xtp(ra + 1));
     XawToggleSetCurrent(plsel_role_radios[0], i2xtp(ro + 1));
     plsel_set_sensitivities(FALSE);

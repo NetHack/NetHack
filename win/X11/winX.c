@@ -2583,12 +2583,12 @@ init_standard_windows()
 }
 
 void
-nh_XtPopup(w, g, childwid)
+nh_XtPopup(w, grb, childwid)
 Widget w;        /* widget */
-int g;           /* type of grab */
+int grb;         /* type of grab */
 Widget childwid; /* child to receive focus (can be None) */
 {
-    XtPopup(w, (XtGrabKind) g);
+    XtPopup(w, (XtGrabKind) grb);
     XSetWMProtocols(XtDisplay(w), XtWindow(w), &wm_delete_window, 1);
     if (appResources.autofocus)
         XtSetKeyboardFocus(toplevel, childwid);
