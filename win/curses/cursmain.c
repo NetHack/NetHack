@@ -143,6 +143,8 @@ curses_init_nhwindows(int *argcp UNUSED,
 #endif
     noecho();
     raw();
+    nonl(); /* don't force ^M into newline (^J); input accepts them both
+             * but as a command, accidental <enter> won't run South */
     meta(stdscr, TRUE);
     orig_cursor = curs_set(0);
     keypad(stdscr, TRUE);
