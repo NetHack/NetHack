@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.h	$NHDT-Date: 1559422218 2019/06/01 20:50:18 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	monst.h	$NHDT-Date: 1559994623 2019/06/08 11:50:23 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.32 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -97,11 +97,13 @@ struct monst {
     Bitfield(perminvis, 1);   /* intrinsic minvis value */
     Bitfield(mcan, 1);        /* has been cancelled */
     Bitfield(mburied, 1);     /* has been buried */
+#define mtemplit mburied      /* since buried isn't implemented, use bit for
+                               * monsters shown by transcient light source;
+                               * only valid during bhit() execution         */
     Bitfield(mundetected, 1); /* not seen in present hiding place;
                                * implies one of M1_CONCEAL or M1_HIDE,
                                * but not mimic (that is, snake, spider,
-                               * trapper, piercer, eel)
-                               */
+                               * trapper, piercer, eel) */
     Bitfield(mcansee, 1);   /* cansee 1, temp.blinded 0, blind 0 */
 
     Bitfield(mspeed, 2);    /* current speed */

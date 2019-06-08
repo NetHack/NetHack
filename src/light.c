@@ -1,4 +1,4 @@
-/* NetHack 3.6	light.c	$NHDT-Date: 1446191876 2015/10/30 07:57:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	light.c	$NHDT-Date: 1559994625 2019/06/08 11:50:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Dean Luick, 1994                                       */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -65,7 +65,7 @@ anything *id;
         return;
     }
 
-    ls = (light_source *) alloc(sizeof(light_source));
+    ls = (light_source *) alloc(sizeof *ls);
 
     ls->next = light_base;
     ls->x = x;
@@ -154,8 +154,8 @@ char **cs_rows;
                 ls->flags |= LSF_SHOW;
         }
 
-        /* minor optimization: don't bother with duplicate light sources */
-        /* at hero */
+        /* minor optimization: don't bother with duplicate light sources
+           at hero */
         if (ls->x == u.ux && ls->y == u.uy) {
             if (at_hero_range >= ls->range)
                 ls->flags &= ~LSF_SHOW;
@@ -192,7 +192,7 @@ char **cs_rows;
                      * this optimization, is that it allows the vision
                      * system to correct problems with clear_path().
                      * The function clear_path() is a simple LOS
-                     * path checker that doesn't go out of its way
+                     * path checker that doesn't go out of its way to
                      * make things look "correct".  The vision system
                      * does this.
                      */
@@ -207,6 +207,80 @@ char **cs_rows;
                 }
             }
         }
+    }
+}
+
+/* lit 'obj' has been thrown or kicked and is passing through x,y on the
+   way to its destination; show its light so that hero has a chance to
+   remember terrain, objects, and monsters being revealed */
+void
+show_transient_light(obj, x, y)
+struct obj *obj;
+int x, y;
+{
+    light_source *ls;
+    struct monst *mon;
+    int radius_squared;
+
+    /* caller has verified obj->lamplit and that hero is not Blind;
+       validate light source and obtain its radius (for monster sightings) */
+    for (ls = light_base; ls; ls = ls->next) {
+        if (ls->type != LS_OBJECT)
+            continue;
+        if (ls->id.a_obj == obj)
+            break;
+    }
+    if (!ls || obj->where != OBJ_FREE) {
+        impossible("transient light %s %s is not %s?",
+                   obj->lamplit ? "lit" : "unlit", xname(obj),
+                   !ls ? "a light source" : "free");
+    } else {
+        /* "expensive" but rare */
+        place_object(obj, bhitpos.x, bhitpos.y); /* temporarily put on map */
+        vision_recalc(0);
+        flush_screen(0);
+        delay_output();
+        remove_object(obj); /* take back off of map */
+
+        radius_squared = ls->range * ls->range;
+        for (mon = fmon; mon; mon = mon->nmon) {
+            if (DEADMONSTER(mon))
+                continue;
+            /* light range is the radius of a circle and we're limiting
+               canseemon() to a square exclosing that circle, but setting
+               mtemplit 'erroneously' for a seen monster is not a problem;
+               it just flags monsters for another canseemon() check when
+               'obj' has reached its destination after missile traversal */
+            if (dist2(mon->mx, mon->my, x, y) <= radius_squared
+                && canseemon(mon))
+                mon->mtemplit = 1;
+            /* [what about worm tails?] */
+        }
+    }
+}
+
+/* draw "remembered, unseen monster" glyph at locations where a monster
+   was flagged for being visible during transient light movement but can't
+   be seen now */
+void
+transient_light_cleanup()
+{
+    struct monst *mon;
+    int mtempcount = 0;
+
+    for (mon = fmon; mon; mon = mon->nmon) {
+        if (DEADMONSTER(mon))
+            continue;
+        if (mon->mtemplit) {
+            mon->mtemplit = 0;
+            ++mtempcount;
+            if (!canseemon(mon))
+                map_invisible(mon->mx, mon->my);
+        }
+    }
+    if (mtempcount) {
+        vision_recalc(0);
+        flush_screen(0);
     }
 }
 

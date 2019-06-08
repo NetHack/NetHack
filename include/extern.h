@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1559670600 2019/06/04 17:50:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.709 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1559994622 2019/06/08 11:50:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.711 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1064,6 +1064,8 @@ E int NDECL(dosuspend);
 E void FDECL(new_light_source, (XCHAR_P, XCHAR_P, int, int, ANY_P *));
 E void FDECL(del_light_source, (int, ANY_P *));
 E void FDECL(do_light_sources, (char **));
+E void FDECL(show_transient_light, (struct obj *, int, int));
+E void NDECL(transient_light_cleanup);
 E struct monst *FDECL(find_mid, (unsigned, unsigned));
 E void FDECL(save_light_sources, (int, int, int));
 E void FDECL(restore_light_sources, (int));

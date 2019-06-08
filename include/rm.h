@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1547255911 2019/01/12 01:18:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1559994624 2019/06/08 11:50:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -624,12 +624,16 @@ extern dlevel_t level; /* structure describing the current level */
 /*
  * Macros for encapsulation of level.monsters references.
  */
+#if 0
 #define MON_AT(x, y)                            \
     (level.monsters[x][y] != (struct monst *) 0 \
      && !(level.monsters[x][y])->mburied)
 #define MON_BURIED_AT(x, y)                     \
     (level.monsters[x][y] != (struct monst *) 0 \
      && (level.monsters[x][y])->mburied)
+#else   /* without 'mburied' */
+#define MON_AT(x, y) (level.monsters[x][y] != (struct monst *) 0)
+#endif
 #ifdef EXTRA_SANITY_CHECKS
 #define place_worm_seg(m, x, y) \
     do {                                                        \
