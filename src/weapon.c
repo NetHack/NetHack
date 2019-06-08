@@ -1,4 +1,4 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1548209744 2019/01/23 02:15:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1559998716 2019/06/08 12:58:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -831,8 +831,18 @@ register struct monst *mon;
         setmnotwielded(mon, mw_tmp);
         mon->weapon_check = NEED_WEAPON;
         if (canseemon(mon)) {
+            boolean newly_welded;
+
             pline("%s wields %s!", Monnam(mon), doname(obj));
-            if (mwelded(mw_tmp)) {
+            /* 3.6.3: mwelded() predicate expects the object to have its
+               W_WEP bit set in owormmask, but the pline here and for
+               artifact_light don't want that because they'd have '(weapon
+               in hand/claw)' appended; so we set it for the mwelded test
+               and then clear it, until finally setting it for good below */
+            obj->owornmask |= W_WEP;
+            newly_welded = mwelded(obj);
+            obj->owornmask &= ~W_WEP;
+            if (newly_welded) {
                 pline("%s %s to %s %s!", Tobjnam(obj, "weld"),
                       is_plural(obj) ? "themselves" : "itself",
                       s_suffix(mon_nam(mon)), mbodypart(mon, HAND));
@@ -845,6 +855,12 @@ register struct monst *mon;
                 pline("%s %s in %s %s!", Tobjnam(obj, "shine"),
                       arti_light_description(obj), s_suffix(mon_nam(mon)),
                       mbodypart(mon, HAND));
+            /* 3.6.3: artifact might be getting wielded by invisible monst */
+            else if (cansee(mon->mx, mon->my))
+                pline("Light begins shining %s.",
+                      (distu(mon->mx, mon->my) <= 5 * 5)
+                          ? "nearby"
+                          : "in the distance");
         }
         obj->owornmask = W_WEP;
         return 1;
