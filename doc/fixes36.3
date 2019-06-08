@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.42 $ $NHDT-Date: 1559851954 2019/06/06 20:12:34 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.44 $ $NHDT-Date: 1559998716 2019/06/08 12:58:36 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -59,6 +59,13 @@ when finding a place to put a monster on the Plane of Water, don't pick a
 	water location for flyers or floaters (levitate) or clingers (ceiling)
 #turn worked when unable to speak despite "you chant an arcane formula"
 #turn implicitly required sight due to wrong check for avoiding spanning walls
+thrown or kicked light source (lit lamp, candle, oil) should emit light as it
+	traverses the map; dungeon features, objects, or monsters seen while
+	it's in transit will become part of hero's memory of the level, and
+	any messages delivered won't have stale light from it around the hero
+unlike watching a monster trying to swap out a cursed weapon for some other
+	weapon and failing, watching it wield a cursed weapon didn't report
+	that weapon becoming welded to the monster's hand/claw/whatever
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository

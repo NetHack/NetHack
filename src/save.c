@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1558880688 2019/05/26 14:24:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.120 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1559994625 2019/06/08 11:50:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1076,6 +1076,8 @@ struct monst *mtmp;
 {
     int buflen;
 
+    mtmp->mtemplit = 0; /* normally clear; if set here then a panic save
+                         * is being written while bhit() was executing */
     buflen = (int) sizeof (struct monst);
     bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
     bwrite(fd, (genericptr_t) mtmp, buflen);
