@@ -97,9 +97,6 @@ struct monst {
     Bitfield(perminvis, 1);   /* intrinsic minvis value */
     Bitfield(mcan, 1);        /* has been cancelled */
     Bitfield(mburied, 1);     /* has been buried */
-#define mtemplit mburied      /* since buried isn't implemented, use bit for
-                               * monsters shown by transcient light source;
-                               * only valid during bhit() execution         */
     Bitfield(mundetected, 1); /* not seen in present hiding place;
                                * implies one of M1_CONCEAL or M1_HIDE,
                                * but not mimic (that is, snake, spider,
@@ -133,7 +130,8 @@ struct monst {
 
     Bitfield(iswiz, 1);     /* is the Wizard of Yendor */
     Bitfield(wormno, 5);    /* at most 31 worms on any level */
-    /* 2 free bits */
+    Bitfield(mtemplit, 1);  /* temporarily seen; only valid during bhit() */
+    /* 1 free bit */
 
 #define MAX_NUM_WORMS 32    /* should be 2^(wormno bitfield size) */
 
