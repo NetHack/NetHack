@@ -2522,7 +2522,7 @@ create_particular_creation(d)
 struct _create_particular_data *d;
 {
     struct permonst *whichpm = NULL;
-    int i, saveglyph, firstchoice = NON_PM;
+    int i, flashglyph, firstchoice = NON_PM;
     struct monst *mtmp;
     boolean madeany = FALSE, doflash = FALSE;
 
@@ -2553,6 +2553,7 @@ struct _create_particular_data *d;
             /* otherwise try again */
             continue;
         }
+        flashglyph = mon_to_glyph(mtmp, rn2_on_display_rng);
         /* 'is_FOO()' ought to be called 'always_FOO()' */
         if (d->fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data))
             mtmp->female = d->fem; /* ignored for is_neuter() */
@@ -2570,20 +2571,16 @@ struct _create_particular_data *d;
         }
         if (d->invisible) {
             int mx = mtmp->mx, my = mtmp->my;
-            saveglyph = glyph_at(mx, my);
+
             mon_set_minvis(mtmp);
             if (does_block(mx, my, &levl[mx][my]))
                 block_point(mx, my);
             else
                 unblock_point(mx, my);
-            if (saveglyph == glyph_at(mx, my))
-                saveglyph = mon_to_glyph(mtmp, rn2_on_display_rng);
             doflash = TRUE;
         }
         if (d->hidden && is_hider(mtmp->data)) {
-            saveglyph = glyph_at(mtmp->mx, mtmp->my);
             mtmp->mundetected = 1;
-            newsym(mtmp->mx, mtmp->my);
             doflash = TRUE;
         }
         if (d->sleeping)
@@ -2591,7 +2588,7 @@ struct _create_particular_data *d;
         if (doflash) {
             if (wizard && cansee(mtmp->mx, mtmp->my))
                 if (!canseemon(mtmp) && !sensemon(mtmp))
-                    flash_glyph_at(mtmp->mx, mtmp->my, saveglyph);
+                    flash_glyph_at(mtmp->mx, mtmp->my, flashglyph);
         }
         madeany = TRUE;
         /* in case we got a doppelganger instead of what was asked
