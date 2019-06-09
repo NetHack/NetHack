@@ -1080,7 +1080,7 @@ int x, y, tg;
      int i, glyph[2];
 
      glyph[0] = tg;
-     glyph[1] = (level.flags.hero_memory)
+     glyph[1] = (g.level.flags.hero_memory)
                     ? levl[x][y].glyph
                         : back_to_glyph(x, y);
      for (i = 0; i < 15; i++) {
