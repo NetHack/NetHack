@@ -2522,9 +2522,9 @@ create_particular_creation(d)
 struct _create_particular_data *d;
 {
     struct permonst *whichpm = NULL;
-    int i, firstchoice = NON_PM;
+    int i, saveglyph, firstchoice = NON_PM;
     struct monst *mtmp;
-    boolean madeany = FALSE;
+    boolean madeany = FALSE, doflash = FALSE;
 
     if (!d->randmonst) {
         firstchoice = d->which;
@@ -2570,19 +2570,25 @@ struct _create_particular_data *d;
         }
         if (d->invisible) {
             int mx = mtmp->mx, my = mtmp->my;
+            saveglyph = glyph_at(mx, my);
             mon_set_minvis(mtmp);
             if (does_block(mx, my, &levl[mx][my]))
                 block_point(mx, my);
             else
                 unblock_point(mx, my);
+            if (saveglyph == glyph_at(mx, my))
+                saveglyph = mon_to_glyph(mtmp, rn2_on_display_rng);
+            doflash = TRUE;
+        }
+        if (d->hidden && is_hider(mtmp->data)) {
+            saveglyph = glyph_at(mtmp->mx, mtmp->my);
+            mtmp->mundetected = 1;
+            newsym(mtmp->mx, mtmp->my);
+            doflash = TRUE;
         }
         if (d->sleeping)
             mtmp->msleeping = 1;
-        if (d->hidden && is_hider(mtmp->data)) {
-            int saveglyph = glyph_at(mtmp->mx, mtmp->my);
-
-            mtmp->mundetected = 1;
-            newsym(mtmp->mx, mtmp->my);
+        if (doflash) {
             if (wizard && cansee(mtmp->mx, mtmp->my))
                 if (!canseemon(mtmp) && !sensemon(mtmp))
                     flash_glyph_at(mtmp->mx, mtmp->my, saveglyph);
