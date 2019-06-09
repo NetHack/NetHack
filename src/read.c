@@ -2434,7 +2434,7 @@ struct _create_particular_data {
     char monclass;
     boolean randmonst;
     boolean maketame, makepeaceful, makehostile;
-    boolean sleeping, saddled, invisible;
+    boolean sleeping, saddled, invisible, hidden;
 };
 
 boolean
@@ -2463,6 +2463,10 @@ struct _create_particular_data *d;
     if ((tmpp = strstri(bufp, "invisible ")) != 0) {
         d->invisible = TRUE;
         (void) memset(tmpp, ' ', sizeof "invisible " - 1);
+    }
+    if ((tmpp = strstri(bufp, "hidden ")) != 0) {
+        d->hidden = TRUE;
+        (void) memset(tmpp, ' ', sizeof "hidden " - 1);
     }
     /* check "female" before "male" to avoid false hit mid-word */
     if ((tmpp = strstri(bufp, "female ")) != 0) {
@@ -2574,6 +2578,10 @@ struct _create_particular_data *d;
         }
         if (d->sleeping)
             mtmp->msleeping = 1;
+        if (d->hidden && is_hider(mtmp->data)) {
+            mtmp->mundetected = 1;
+            newsym(mtmp->mx, mtmp->my);
+        }
         madeany = TRUE;
         /* in case we got a doppelganger instead of what was asked
            for, make it start out looking like what was asked for */
