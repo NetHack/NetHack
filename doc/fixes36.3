@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.48 $ $NHDT-Date: 1560085861 2019/06/09 13:11:01 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.49 $ $NHDT-Date: 1560089250 2019/06/09 14:07:30 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -109,6 +109,8 @@ curses: don't convert ^M (or <return> or <enter> key) into ^J; both ^J and ^M
 	commands, ^J means run toward bottom of screen (when number_pad is
 	off) and ^M is not bound to any command, so accidental <return> won't
 	cause the hero to try to move
+curses+EDIT_GETLIN: when a prompt's answer was preloaded, using ESC to discard
+	it deleted it from the answer buffer but didn't erase it from screen
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new

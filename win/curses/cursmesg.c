@@ -469,7 +469,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     int maxy, maxx; /* linewrap / scroll */
     int ch;
     int border_space = 0;
-    int len; /* of answer string */
+    int ltmp, len; /* of answer string */
     boolean border = curses_window_has_border(MESSAGE_WIN);
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
 
@@ -531,9 +531,30 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             my--;
         }
     }
-    mvwaddstr(win, my, mx, linestarts[nlines - 1]);
-    mx = promptx = (int) strlen(linestarts[nlines - 1]) + border_space;
     promptline = nlines - 1;
+    mvwaddstr(win, my, mx, linestarts[promptline]);
+    ltmp = (int) strlen(linestarts[promptline]);
+    mx = promptx = ltmp + border_space;
+#ifdef EDIT_GETLIN
+    if (len <= ltmp) {
+        /* preloaded answer fits on same line as [last line of] prompt */
+        promptx -= len;
+    } else {
+        int ltmp2 = len;
+
+        /* preloaded answer spans lines so will be trickier to erase
+           if that is called for; find where the end of the prompt will
+           be without the answer appended */
+        while (ltmp2 > 0) {
+            ltmp2 -= ltmp;
+            promptline -= 1;
+            ltmp = (int) strlen(linestarts[promptline]);
+        }
+        if (ltmp2 < 0)
+            ltmp = -ltmp2;
+        promptx = ltmp + border_space;
+    }
+#endif
 
     while (1) {
         mx = (int) strlen(linestarts[nlines - 1]) + border_space;
