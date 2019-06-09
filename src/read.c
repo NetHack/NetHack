@@ -2440,7 +2440,7 @@ struct _create_particular_data {
     char monclass;
     boolean randmonst;
     boolean maketame, makepeaceful, makehostile;
-    boolean sleeping, saddled, invisible;
+    boolean sleeping, saddled, invisible, hidden;
 };
 
 boolean
@@ -2469,6 +2469,10 @@ struct _create_particular_data *d;
     if ((tmpp = strstri(bufp, "invisible ")) != 0) {
         d->invisible = TRUE;
         (void) memset(tmpp, ' ', sizeof "invisible " - 1);
+    }
+    if ((tmpp = strstri(bufp, "hidden ")) != 0) {
+        d->hidden = TRUE;
+        (void) memset(tmpp, ' ', sizeof "hidden " - 1);
     }
     /* check "female" before "male" to avoid false hit mid-word */
     if ((tmpp = strstri(bufp, "female ")) != 0) {
@@ -2524,9 +2528,9 @@ create_particular_creation(d)
 struct _create_particular_data *d;
 {
     struct permonst *whichpm = NULL;
-    int i, firstchoice = NON_PM;
+    int i, flashglyph, firstchoice = NON_PM;
     struct monst *mtmp;
-    boolean madeany = FALSE;
+    boolean madeany = FALSE, doflash = FALSE;
 
     if (!d->randmonst) {
         firstchoice = d->which;
@@ -2555,6 +2559,7 @@ struct _create_particular_data *d;
             /* otherwise try again */
             continue;
         }
+        flashglyph = mon_to_glyph(mtmp, rn2_on_display_rng);
         /* 'is_FOO()' ought to be called 'always_FOO()' */
         if (d->fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data))
             mtmp->female = d->fem; /* ignored for is_neuter() */
@@ -2572,14 +2577,25 @@ struct _create_particular_data *d;
         }
         if (d->invisible) {
             int mx = mtmp->mx, my = mtmp->my;
+
             mon_set_minvis(mtmp);
             if (does_block(mx, my, &levl[mx][my]))
                 block_point(mx, my);
             else
                 unblock_point(mx, my);
+            doflash = TRUE;
+        }
+        if (d->hidden && is_hider(mtmp->data)) {
+            mtmp->mundetected = 1;
+            doflash = TRUE;
         }
         if (d->sleeping)
             mtmp->msleeping = 1;
+        if (doflash) {
+            if (wizard && cansee(mtmp->mx, mtmp->my))
+                if (!canseemon(mtmp) && !sensemon(mtmp))
+                    flash_glyph_at(mtmp->mx, mtmp->my, flashglyph);
+        }
         madeany = TRUE;
         /* in case we got a doppelganger instead of what was asked
            for, make it start out looking like what was asked for */
