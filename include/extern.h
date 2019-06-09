@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1559994622 2019/06/08 11:50:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.711 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1560085861 2019/06/09 13:11:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.713 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -360,7 +360,7 @@ E void FDECL(newsym, (int, int));
 E void FDECL(newsym_force, (int, int));
 E void FDECL(shieldeff, (XCHAR_P, XCHAR_P));
 E void FDECL(tmp_at, (int, int));
-E void FDECL(flash_glyph_at, (int, int, int));
+E void FDECL(flash_glyph_at, (int, int, int, int));
 E void FDECL(swallowed, (int));
 E void FDECL(under_ground, (int));
 E void FDECL(under_water, (int));
