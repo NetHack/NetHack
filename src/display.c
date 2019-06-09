@@ -1068,6 +1068,28 @@ int x, y;
 }
 
 /*
+ * flash_glyph_at(x, y, glyph)
+ *
+ * Briefly flash between the passed glyph and the glyph that's
+ * meant to be at the location.
+ */
+void
+flash_glyph_at(x, y, tg)
+int x, y, tg;
+{
+     int i, glyph[2];
+
+     glyph[0] = tg;
+     glyph[1] = glyph_at(x, y);
+     for (i = 0; i < 15; i++) {
+         show_glyph(x, y, glyph[i % 2]);
+         flush_screen(1);
+         delay_output();
+     }
+     newsym(x, y);
+}
+
+/*
  * swallowed()
  *
  * The hero is swallowed.  Show a special graphics sequence for this.  This
