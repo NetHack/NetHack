@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1556835736 2019/05/02 22:22:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1560085863 2019/06/09 13:11:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1068,27 +1068,30 @@ int x, y;
 }
 
 /*
- * flash_glyph_at(x, y, glyph)
+ * flash_glyph_at(x, y, glyph, repeatcount)
  *
  * Briefly flash between the passed glyph and the glyph that's
  * meant to be at the location.
  */
 void
-flash_glyph_at(x, y, tg)
-int x, y, tg;
+flash_glyph_at(x, y, tg, rpt)
+int x, y;
+int tg, rpt;
 {
-     int i, glyph[2];
+    int i, glyph[2];
 
-     glyph[0] = tg;
-     glyph[1] = (g.level.flags.hero_memory)
-                    ? levl[x][y].glyph
-                        : back_to_glyph(x, y);
-     for (i = 0; i < 15; i++) {
-         show_glyph(x, y, glyph[i % 2]);
-         flush_screen(1);
-         delay_output();
-     }
-     newsym(x, y);
+    rpt *= 2; /* two loop iterations per 'count' */
+    glyph[0] = tg;
+    glyph[1] = (g.level.flags.hero_memory) ? levl[x][y].glyph
+                                         : back_to_glyph(x, y);
+    /* even iteration count (guaranteed) ends with glyph[1] showing;
+       caller might want to override that, but no newsym() calls here
+       in case caller has tinkered with location visibility */
+    for (i = 0; i < rpt; i++) {
+        show_glyph(x, y, glyph[i % 2]);
+        flush_screen(1);
+        delay_output();
+    }
 }
 
 /*

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.45 $ $NHDT-Date: 1560009340 2019/06/08 15:55:40 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.48 $ $NHDT-Date: 1560085861 2019/06/09 13:11:01 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -66,13 +66,18 @@ thrown or kicked light source (lit lamp, candle, oil) should emit light as it
 unlike watching a monster trying to swap out a cursed weapon for some other
 	weapon and failing, watching it wield a cursed weapon didn't report
 	that weapon becoming welded to the monster's hand/claw/whatever
-wizard-mode: wish for hidden monsters that pass is_hider test
+accept "hidden" as an attribute for wizard mode ^G monster creation; created
+	monsters which can't be seen will have their locations highlighted
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
 elemental_clog() loop needed to guard against obliteration of the monster
 	that was trying to be placed
+using ^G to create "hidden mimic" shouldn't have marked it as undetected since
+	mimics 'hide' be appearing to be something else; honor "hidden" for
+	'hides_under' creatures if/when created at location with object(s),
+	also for eels and other fish if/when created at water location
 curses: sometimes the message window would show a blank line after a prompt
 
 
