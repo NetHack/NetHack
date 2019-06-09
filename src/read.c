@@ -2579,7 +2579,20 @@ struct _create_particular_data *d;
         if (d->sleeping)
             mtmp->msleeping = 1;
         if (d->hidden && is_hider(mtmp->data)) {
-            mtmp->mundetected = 1;
+            if (wizard && cansee(mtmp->mx, mtmp->my)) {
+                int i, glyph[2];
+
+                glyph[0] = glyph_at(mtmp->mx, mtmp->my);
+                mtmp->mundetected = 1;
+                newsym(mtmp->mx, mtmp->my);
+                glyph[1] = glyph_at(mtmp->mx, mtmp->my);
+                if (!canseemon(mtmp) && !sensemon(mtmp))
+                    for (i = 0; i < 15; i++) {
+                        show_glyph(mtmp->mx, mtmp->my, glyph[i % 2]);
+                        flush_screen(1);
+                        delay_output();
+                    }
+            }
             newsym(mtmp->mx, mtmp->my);
         }
         madeany = TRUE;
