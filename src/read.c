@@ -2594,13 +2594,13 @@ struct _create_particular_data *d;
            or vision issues (line-of-sight, invisibility, blindness) */
         if (d->hidden && !canspotmon(mtmp)) {
             int count = couldsee(mx, my) ? 8 : 4;
-            char saveviz = viz_array[my][mx];
+            char saveviz = g.viz_array[my][mx];
 
             if (!flags.sparkle)
                 count /= 2;
-            viz_array[my][mx] |= (IN_SIGHT | COULD_SEE);
+            g.viz_array[my][mx] |= (IN_SIGHT | COULD_SEE);
             flash_glyph_at(mx, my, mon_to_glyph(mtmp, newsym_rn2), count);
-            viz_array[my][mx] = saveviz;
+            g.viz_array[my][mx] = saveviz;
             newsym(mx, my);
         }
         madeany = TRUE;
