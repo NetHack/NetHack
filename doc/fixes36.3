@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.49 $ $NHDT-Date: 1560089250 2019/06/09 14:07:30 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.50 $ $NHDT-Date: 1560161804 2019/06/10 10:16:44 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -68,6 +68,11 @@ unlike watching a monster trying to swap out a cursed weapon for some other
 	that weapon becoming welded to the monster's hand/claw/whatever
 accept "hidden" as an attribute for wizard mode ^G monster creation; created
 	monsters which can't be seen will have their locations highlighted
+don't give feedback for monster zapping a wand if a monster plays a fire horn
+	directed at self to burn away slime
+if hero knows the number of charges in a wand or magical horn and a monster
+	acquires it and zaps/plays it when not in view, remove the hero's
+	memory of the number of charges
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
