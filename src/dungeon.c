@@ -1702,11 +1702,12 @@ const char *nam;
         if (idx >= 0) {
             idxtoo = (idx >> 8) & 0x00FF;
             idx &= 0x00FF;
-            if (/* either wizard mode, or else _both_ sides of branch seen */
-                wizard
-                || ((g.level_info[idx].flags & (FORGOTTEN | VISITED)) == VISITED
-                    && (g.level_info[idxtoo].flags & (FORGOTTEN | VISITED))
-                           == VISITED)) {
+            /* either wizard mode, or else _both_ sides of branch seen */
+            if (wizard
+                || (((g.level_info[idx].flags & (FORGOTTEN | VISITED))
+                     == VISITED)
+                    && ((g.level_info[idxtoo].flags & (FORGOTTEN | VISITED))
+                        == VISITED))) {
                 if (ledger_to_dnum(idxtoo) == u.uz.dnum)
                     idx = idxtoo;
                 dlev.dnum = ledger_to_dnum(idx);
@@ -2369,7 +2370,8 @@ mapseen *mptr;
         return FALSE;
     /* level is of interest if it has an auto-generated annotation */
     if (mptr->flags.oracle || mptr->flags.bigroom || mptr->flags.roguelevel
-        || mptr->flags.castle || mptr->flags.valley || mptr->flags.msanctum
+        || mptr->flags.castle || mptr->flags.valley
+        || mptr->flags.msanctum || mptr->flags.vibrating_square
         || mptr->flags.quest_summons || mptr->flags.questing)
         return TRUE;
     /* when in Sokoban, list all sokoban levels visited; when not in it,
@@ -2400,9 +2402,10 @@ mapseen *mptr;
 void
 recalc_mapseen()
 {
-    mapseen *mptr;
+    mapseen *mptr, *oth_mptr;
     struct monst *mtmp;
     struct cemetery *bp, **bonesaddr;
+    struct trap *t;
     unsigned i, ridx;
     int x, y, ltyp, count, atmp;
 
@@ -2443,7 +2446,7 @@ recalc_mapseen()
     mptr->flags.roguelevel = Is_rogue_level(&u.uz);
     mptr->flags.oracle = 0; /* recalculated during room traversal below */
     mptr->flags.castletune = 0;
-    /* flags.castle, flags.valley, flags.msanctum retain previous value */
+    /* flags.castle retains previous value */
     mptr->flags.forgot = 0;
     /* flags.quest_summons disabled once quest finished */
     mptr->flags.quest_summons = (at_dgn_entrance("The Quest")
@@ -2453,6 +2456,7 @@ recalc_mapseen()
                                       || g.quest_status.leader_is_dead));
     mptr->flags.questing = (on_level(&u.uz, &qstart_level)
                             && g.quest_status.got_quest);
+    /* flags.msanctum, .valley, and .vibrating_square handled below */
 
     /* track rooms the hero is in */
     for (i = 0; i < SIZE(u.urooms); ++i) {
@@ -2631,6 +2635,46 @@ recalc_mapseen()
                 break;
             }
         }
+    }
+
+    /* Moloch's Sanctum and the Valley of the Dead are normally given an
+       automatic annotation when you enter a temple attended by a priest,
+       but it is possible for the priest to be killed prior to that; we
+       assume that both of those levels only contain one altar, so add the
+       annotation if that altar has been mapped (seen or magic mapping) */
+    if (Is_valley(&u.uz)) {
+        /* don't clear valley if naltar==0; maybe altar got destroyed? */
+        if (mptr->feat.naltar > 0)
+            mptr->flags.valley = 1;
+
+    /* Sanctum and Gateway-to-Sanctum are mutually exclusive automatic
+       annotations but handling that is tricky because they're stored
+       with data for different levels */
+    } else if (Is_sanctum(&u.uz)) {
+        if (mptr->feat.naltar > 0)
+            mptr->flags.msanctum = 1;
+
+        if (mptr->flags.msanctum) {
+            d_level invocat_lvl;
+
+            invocat_lvl = u.uz;
+            invocat_lvl.dlevel -= 1;
+            if ((oth_mptr = find_mapseen(&invocat_lvl)) != 0)
+                oth_mptr->flags.vibrating_square = 0;
+        }
+    } else if (Invocation_lev(&u.uz)) {
+        /* annotate vibrating square's level if vibr_sqr 'trap' has been
+           found or if that trap is gone (indicating that invocation has
+           happened) provided that the sanctum's annotation hasn't been
+           added (either hero hasn't descended to that level yet or hasn't
+           mapped its temple) */
+        for (t = g.ftrap; t; t = t->ntrap)
+            if (t->ttyp == VIBRATING_SQUARE)
+                break;
+        mptr->flags.vibrating_square = t ? t->tseen
+                      /* no trap implies that invocation has been performed */
+                             : ((oth_mptr = find_mapseen(&sanctum_level)) == 0
+                                || !oth_mptr->flags.msanctum);
     }
 
     if (g.level.bonesinfo && !mptr->final_resting_place) {
@@ -3042,6 +3086,8 @@ boolean printdun;
         Sprintf(buf, "%sThe castle%s.", PREFIX, tunesuffix(mptr, tmpbuf));
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
+    } else if (mptr->flags.vibrating_square) {
+        Sprintf(buf, "%sGateway to Moloch's Sanctum.", PREFIX);
     } else if (mptr->flags.msanctum) {
         Sprintf(buf, "%sMoloch's Sanctum.", PREFIX);
     }

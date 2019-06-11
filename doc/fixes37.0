@@ -3,6 +3,10 @@ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ $NHDT-Date: 1557663358 2019/05
 General Fixes and Modified Features
 -----------------------------------
 fix compile when DLB isn't defined
+hero polymorphed into a vampire can use #monster to shape-shift rather than
+	just do a one-shot polymorph into bat/cloud/wolf and shifted vampire
+	hero can use #monster again to take on another form (randomly chosen
+	among the shiftable shapes and true vampire form)
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
@@ -17,6 +21,9 @@ General New Features
 --------------------
 if a killer bee encounters a lump of royal jelly and there is no queen bee on
 	the level, the bee will eat the jelly and become a new queen
+automatic annotation "gateway to Moloch's Sanctum" for vibrating square level
+	once that square's location becomes known (found or magic mapped);
+	goes away once sanctum temple is found (entered or high altar mapped)
 
 
 Platform- and/or Interface-Specific New Features
