@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1549333449 2019/02/05 02:24:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1560387439 2019/06/13 00:57:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -155,6 +155,9 @@ const char *str;
         home();
         cl_end();
         addtopl(str);
+
+        if (ttyDisplay->cury && ttyDisplay->toplin != 3)
+            more();
     }
 }
 
