@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.51 $ $NHDT-Date: 1560185545 2019/06/10 16:52:25 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.54 $ $NHDT-Date: 1560600663 2019/06/15 12:11:03 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -73,6 +73,9 @@ don't give feedback for monster zapping a wand if a monster plays a fire horn
 if hero knows the number of charges in a wand or magical horn and a monster
 	acquires it and zaps/plays it when not in view, remove the hero's
 	memory of the number of charges
+for wizard mode 'monpolycontrol', allow usually disallowed type 'chameleon',
+	'doppelganger', or 'sandestin' as answer to "change <monster> @ <x,y>
+	into what?" prompt when <monster> is really that type of creature
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -86,10 +89,17 @@ using ^G to create "hidden mimic" shouldn't have marked it as undetected since
 for wizard mode 'wizweight' option, glob weight wasn't shown unless glob had
 	shop price information attached
 curses: sometimes the message window would show a blank line after a prompt
+tty: revert the attempt to fix "message line anomaly: if autodecribe feedback
+	wrapped to second line, the wrapped portion wasn't erased when a
+	shorter line was shown or getpos was dismissed" because it disrupted
+	prompts that spanned more than one line, a more significant issue
 
 
 Platform- and/or Interface-Specific Fixes or Features
 -----------------------------------------------------
+EDIT_GETLIN: wizard mode 'monpolycontrol' was using the getlin() answer buffer
+	to format the coordinate portion of the "change <monster> @ <x,y> into
+	what kind of monster?" prompt, resulting in "<x,y>" as default answer
 curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
 	but 0-9 should be reserved for counts and if the display was tall
 	enough for more than 62 entries, arbitrary ASCII punctuation got used

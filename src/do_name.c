@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1560161806 2019/06/10 10:16:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.147 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1560387831 2019/06/13 01:03:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1116,7 +1116,7 @@ char *monnambuf, *usrbuf;
 STATIC_OVL void
 do_mname()
 {
-    char buf[BUFSZ] = DUMMY, monnambuf[BUFSZ], qbuf[QBUFSZ];
+    char buf[BUFSZ], monnambuf[BUFSZ], qbuf[QBUFSZ];
     coord cc;
     int cx, cy;
     struct monst *mtmp = 0;
@@ -1128,9 +1128,9 @@ do_mname()
     cc.x = u.ux;
     cc.y = u.uy;
     if (getpos(&cc, FALSE, "the monster you want to name") < 0
-        || (cx = cc.x) < 0)
+        || !isok(cc.x, cc.y))
         return;
-    cy = cc.y;
+    cx = cc.x, cy = cc.y;
 
     if (cx == u.ux && cy == u.uy) {
         if (u.usteed && canspotmon(u.usteed)) {
@@ -1155,6 +1155,7 @@ do_mname()
     /* special case similar to the one in lookat() */
     Sprintf(qbuf, "What do you want to call %s?",
             distant_monnam(mtmp, ARTICLE_THE, monnambuf));
+    buf[0] = '\0';
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')
         return;
