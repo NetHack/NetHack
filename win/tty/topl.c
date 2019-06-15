@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1560387439 2019/06/13 00:57:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1560600658 2019/06/15 12:10:58 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -156,8 +156,10 @@ const char *str;
         cl_end();
         addtopl(str);
 
+#if 0   /* this doesn't work as intended; it disrupts multi-line prompts */
         if (ttyDisplay->cury && ttyDisplay->toplin != 3)
             more();
+#endif
     }
 }
 
