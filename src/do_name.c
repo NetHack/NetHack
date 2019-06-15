@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1560387831 2019/06/13 01:03:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1560611967 2019/06/15 15:19:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1156,6 +1156,11 @@ do_mname()
     Sprintf(qbuf, "What do you want to call %s?",
             distant_monnam(mtmp, ARTICLE_THE, monnambuf));
     buf[0] = '\0';
+#ifdef EDIT_GETLIN
+    /* if there's an existing name, make it be the default answer */
+    if (has_mname(mtmp))
+        Strcpy(buf, MNAME(mtmp));
+#endif
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')
         return;
@@ -1168,6 +1173,9 @@ do_mname()
      *
      * Don't say the name is being rejected if it happens to match
      * the existing name.
+     *
+     * TODO: should have an alternate message when the attempt is to
+     * remove existing name without assigning a new one.
      */
     if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest) {
         if (!alreadynamed(mtmp, monnambuf, buf))
@@ -1194,7 +1202,7 @@ void
 do_oname(obj)
 register struct obj *obj;
 {
-    char *bufp, buf[BUFSZ] = DUMMY, bufcpy[BUFSZ], qbuf[QBUFSZ];
+    char *bufp, buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
     const char *aname;
     short objtyp;
 
@@ -1207,6 +1215,12 @@ register struct obj *obj;
     Sprintf(qbuf, "What do you want to name %s ",
             is_plural(obj) ? "these" : "this");
     (void) safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
+    buf[0] = '\0';
+#ifdef EDIT_GETLIN
+    /* if there's an existing name, make it be the default answer */
+    if (has_oname(obj))
+        Strcpy(buf, ONAME(obj));
+#endif
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')
         return;
@@ -1449,7 +1463,7 @@ void
 docall(obj)
 struct obj *obj;
 {
-    char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
+    char buf[BUFSZ], qbuf[QBUFSZ];
     char **str1;
 
     if (!obj->dknown)
@@ -1462,12 +1476,19 @@ struct obj *obj;
     else
         (void) safe_qbuf(qbuf, "Call ", ":", obj,
                          docall_xname, simpleonames, "thing");
+    /* pointer to old name */
+    str1 = &(objects[obj->otyp].oc_uname);
+    buf[0] = '\0';
+#ifdef EDIT_GETLIN
+    /* if there's an existing name, make it be the default answer */
+    if (*str1)
+        Strcpy(buf, *str1);
+#endif
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')
         return;
 
     /* clear old name */
-    str1 = &(objects[obj->otyp].oc_uname);
     if (*str1)
         free((genericptr_t) *str1);
 

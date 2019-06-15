@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.54 $ $NHDT-Date: 1560600663 2019/06/15 12:11:03 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.56 $ $NHDT-Date: 1560611967 2019/06/15 15:19:27 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -100,6 +100,8 @@ Platform- and/or Interface-Specific Fixes or Features
 EDIT_GETLIN: wizard mode 'monpolycontrol' was using the getlin() answer buffer
 	to format the coordinate portion of the "change <monster> @ <x,y> into
 	what kind of monster?" prompt, resulting in "<x,y>" as default answer
+EDIT_GETLIN: when naming an object or a monster use the existing name, if
+	there is one, as the default answer
 curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
 	but 0-9 should be reserved for counts and if the display was tall
 	enough for more than 62 entries, arbitrary ASCII punctuation got used
@@ -132,6 +134,9 @@ tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new
 	status condition wouldn't be shown unless a screen redraw was forced
+tty: take two, if/when autodecribe feedback wraps past top line, clear
+	continuation lines and redraw map if needed when top line is cleared
+	['exposed by git' section has an entry for reversal of 'take one']
 Windows: some startup error messages were not being delivered successfully
 
 
