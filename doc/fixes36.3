@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.52 $ $NHDT-Date: 1560387439 2019/06/13 00:57:19 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.53 $ $NHDT-Date: 1560597210 2019/06/15 11:13:30 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -73,6 +73,9 @@ don't give feedback for monster zapping a wand if a monster plays a fire horn
 if hero knows the number of charges in a wand or magical horn and a monster
 	acquires it and zaps/plays it when not in view, remove the hero's
 	memory of the number of charges
+for wizard mode 'monpolycontrol', allow usually disallowed type 'chameleon',
+	'doppelganger', or 'sandestin' as answer to "change <monster> @ <x,y>
+	into what?" prompt when <monster> is really that type of creature
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -90,6 +93,9 @@ curses: sometimes the message window would show a blank line after a prompt
 
 Platform- and/or Interface-Specific Fixes or Features
 -----------------------------------------------------
+EDIT_GETLIN: wizard mode 'monpolycontrol' was using the getlin() answer buffer
+	to format the coordinate portion of the "change <monster> @ <x,y> into
+	what kind of monster?" prompt, resulting in "<x,y>" as default answer
 curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
 	but 0-9 should be reserved for counts and if the display was tall
 	enough for more than 62 entries, arbitrary ASCII punctuation got used
