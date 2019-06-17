@@ -4559,9 +4559,9 @@ randomkey()
     case 10:
     case 11:
     case 12:
-        c = Cmd.dirchars[rn2(8)];
+        c = g.Cmd.dirchars[rn2(8)];
         if (!rn2(7))
-            c = !Cmd.num_pad ? (!rn2(3) ? C(c) : (c + 'A' - 'a')) : M(c);
+            c = !g.Cmd.num_pad ? (!rn2(3) ? C(c) : (c + 'A' - 'a')) : M(c);
         break;
     case 13:
         c = (char) rn1('9' - '0' + 1, '0');

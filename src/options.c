@@ -3979,7 +3979,7 @@ boolean tinitial, tfrom_file;
                     return FALSE;
                 }
             }
-            if (iflags.debug_fuzzer && !initial) {
+            if (iflags.debug_fuzzer && !g.opt_initial) {
                 /* don't randomly toggle this/these */
                 if (boolopt[i].addr == &flags.silent)
                     return TRUE;
