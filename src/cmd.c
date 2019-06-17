@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1559382745 2019/06/01 09:52:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.335 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1560789049 2019/06/17 16:30:49 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.336 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4530,21 +4530,50 @@ int NDECL((*cmd_func));
 char
 randomkey()
 {
-    static int i = 0;
+    static unsigned i = 0;
     char c;
 
-    switch (rn2(12)) {
-    default: c = '\033'; break;
-    case 0: c = '\n'; break;
+    switch (rn2(16)) {
+    default:
+        c = '\033';
+        break;
+    case 0:
+        c = '\n';
+        break;
     case 1:
     case 2:
     case 3:
-    case 4: c = (char)(' ' + rn2((int)('~' - ' '))); break;
-    case 5: c = '\t'; break;
-    case 6: c = (char)('a' + rn2((int)('z' - 'a'))); break;
-    case 7: c = (char)('A' + rn2((int)('Z' - 'A'))); break;
-    case 8: c = extcmdlist[(i++) % SIZE(extcmdlist)].key; break;
-    case 9: c = '#'; break;
+    case 4:
+        c = (char) rn1('~' - ' ' + 1, ' ');
+        break;
+    case 5:
+        c = (char) (rn2(2) ? '\t' : ' ');
+        break;
+    case 6:
+        c = (char) rn1('z' - 'a' + 1, 'a');
+        break;
+    case 7:
+        c = (char) rn1('Z' - 'A' + 1, 'A');
+        break;
+    case 8:
+        c = extcmdlist[i++ % SIZE(extcmdlist)].key;
+        break;
+    case 9:
+        c = '#';
+        break;
+    case 10:
+    case 11:
+    case 12:
+        c = Cmd.dirchars[rn2(8)];
+        if (!rn2(7))
+            c = !Cmd.num_pad ? (!rn2(3) ? C(c) : (c + 'A' - 'a')) : M(c);
+        break;
+    case 13:
+        c = (char) rn1('9' - '0' + 1, '0');
+        break;
+    case 14:
+        c = (char) rn2(iflags.wc_eight_bit_input ? 256 : 128);
+        break;
     }
 
     return c;
