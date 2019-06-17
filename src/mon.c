@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1560597210 2019/06/15 11:13:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.293 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1560791350 2019/06/17 17:09:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.294 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2685,31 +2685,20 @@ struct monst *mon;
 
             mtmp->mstate |= MON_OBLITERATE;
             mongone(mtmp);
-            /* some places in the code might still reference mtmp->mx, mtmp->my */
+            /* places in the code might still reference mtmp->mx, mtmp->my */
             /* mtmp->mx = mtmp->my = 0; */ 
             rloc_to(mon, mx, my);           /* note: mon, not mtmp */
-        } else {
-            /* last resort - migrate mon to the next plane */
-            if (Is_waterlevel(&u.uz) || Is_firelevel(&u.uz)
-                || Is_earthlevel(&u.uz)) {
-                /* try sending mon on to the next plane */
-                xchar target_lev = 0, xyloc = 0;
-                struct trap *trap = g.ftrap;
 
-                while (trap) {
-                    if (trap->ttyp == MAGIC_PORTAL)
-                        break;
-                    trap = trap->ntrap;
-                }
-                if (trap) {
-                    target_lev = ledger_no(&trap->dst);
-                    xyloc = MIGR_RANDOM;
-                }
-                if (target_lev) {
-                    mon->mstate |= MON_ENDGAME_MIGR;
-                    migrate_mon(mon, target_lev, xyloc);
-                }
-            }
+        /* last resort - migrate mon to the next plane */
+        } else if (!Is_astralevel(&u.uz)) {
+            d_level dest;
+            xchar target_lev;
+
+            dest = u.uz;
+            dest.dlevel--;
+            target_lev = ledger_no(&dest);
+            mon->mstate |= MON_ENDGAME_MIGR;
+            migrate_mon(mon, target_lev, MIGR_RANDOM);
         }
     }
 }

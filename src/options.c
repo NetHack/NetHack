@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1554591224 2019/04/06 22:53:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.363 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1560789054 2019/06/17 16:30:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.364 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3963,7 +3963,6 @@ boolean tinitial, tfrom_file;
             }
 
             op = string_for_opt(opts, TRUE);
-
             if (op) {
                 if (negated) {
                     config_error_add(
@@ -3979,6 +3978,11 @@ boolean tinitial, tfrom_file;
                     config_error_add("Illegal parameter for a boolean");
                     return FALSE;
                 }
+            }
+            if (iflags.debug_fuzzer && !initial) {
+                /* don't randomly toggle this/these */
+                if (boolopt[i].addr == &flags.silent)
+                    return TRUE;
             }
 
             *(boolopt[i].addr) = !negated;
