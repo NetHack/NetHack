@@ -363,10 +363,10 @@ curs_destroy_all_wins()
 void
 curses_putch(winid wid, int x, int y, int ch, int color, int attr)
 {
+    static boolean map_initted = FALSE;
     int sx, sy, ex, ey;
     boolean border = curses_window_has_border(wid);
     nethack_char nch;
-    static boolean map_initted = FALSE;
 /*
     if (wid == STATUS_WIN) {
         curses_update_stats();
@@ -381,6 +381,7 @@ curses_putch(winid wid, int x, int y, int ch, int color, int attr)
         map_initted = TRUE;
     }
 
+    --x; /* map column [0] is not used; draw column [1] in first screen col */
     map[y][x].ch = ch;
     map[y][x].color = color;
     map[y][x].attr = attr;

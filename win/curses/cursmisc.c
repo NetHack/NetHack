@@ -519,6 +519,8 @@ curses_move_cursor(winid wid, int x, int y)
 
     if (wid != MAP_WIN) {
         return;
+    } else {
+        --x; /* map column [0] isn't used, so shift everything over 1 col */
     }
 #ifdef PDCURSES
     /* PDCurses seems to not handle wmove correctly, so we use move and
