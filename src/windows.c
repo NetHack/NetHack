@@ -61,7 +61,7 @@ extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
 static void FDECL(def_raw_print, (const char *s));
 static void NDECL(def_wait_synch);
 
-#ifdef DUMPLOG
+#if defined(DUMPLOG) || defined(DUMPHTML)
 static winid FDECL(dump_create_nhwindow, (int));
 static void FDECL(dump_clear_nhwindow, (winid));
 static void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
@@ -72,6 +72,15 @@ static void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P,
 static void FDECL(dump_end_menu, (winid, const char *));
 static int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
 static void FDECL(dump_putstr, (winid, int, const char *));
+static void NDECL(dump_headers);
+static void NDECL(dump_footers);
+static void FDECL(dump_set_color_attr, (int, int, BOOLEAN_P));
+#ifdef DUMPHTML
+static void NDECL(html_init_sym);
+static void NDECL(dump_css);
+static void FDECL(dump_outrip, (winid, int, time_t));
+#endif
+
 #endif /* DUMPLOG */
 
 #ifdef HANGUPHANDLING
@@ -1101,9 +1110,12 @@ unsigned long *colormasks UNUSED;
 }
 
 static struct window_procs dumplog_windowprocs_backup;
-static FILE *dumplog_file;
+static int menu_headings_backup;
 
-#ifdef DUMPLOG
+static FILE *dumplog_file;
+static FILE *dumphtml_file;
+
+#if defined(DUMPLOG) || defined(DUMPHTML)
 static time_t dumplog_now;
 
 char *
@@ -1221,38 +1233,771 @@ boolean fullsubs; /* True -> full substitution for file name, False ->
     *bp = '\0';
     return buf;
 }
-#endif /* DUMPLOG */
+#endif /* DUMPLOG || DUMPHTML */
+
+#ifdef DUMPHTML
+/****************************/
+/* HTML DUMP LOG processing */
+/****************************/
+
+/* various tags - These were in a 2D array, but this is more readable */
+#define HEAD_S "<h2>"
+#define HEAD_E "</h2>"
+#define SUBH_S "<h3>"
+#define SUBH_E "</h3>"
+#define PREF_S "<pre>"
+#define PREF_E "</pre>"
+#define LIST_S "<ul>"
+#define LIST_E "</ul>"
+#define LITM_S "<li>"
+#define LITM_E "</li>"
+#define BOLD_S "<b>"
+#define BOLD_E "</b>"
+#define UNDL_S "<u>"
+#define UNDL_E "</u>"
+/* Blinking text on webpages is gross (and tedious), replace with italics */
+#define BLNK_S "<i>"
+#define BLNK_E "</i>"
+#define SPAN_E "</span>"
+#define LINEBREAK "<br />"
+
+/** HTML putstr() handling **/
+
+/* If we're using the NHW_MENU window,
+   try to make a bullet-list of the contents.
+   [Note, the inventory code uses the add_menu codepath
+   and is not processed here. This is for container contents,
+   dungeon overview, conduct, etc]
+   When we get a heading or subheading we close any existing list with </ul>,
+   and any preformatted block with </pre>.
+   Then print the heading.
+   For non-headings, we start a list if we don't already have one with <ul>
+   then delimit the item with <li></li>
+   for preformatted text, we don't mess with any existing bullet list, but try to
+   keep consecutive preformatted strings in a single block.  */
+static
+void
+html_write_tags(fp, win, attr, before)
+FILE *fp;
+winid win;
+int attr;
+boolean before; /* Tags before/after string */
+{
+    static boolean in_list = FALSE;
+    static boolean in_preform = FALSE;
+    if (!fp) return;
+    if (before) { /* before next string is written,
+                     close any finished blocks
+                     and open a new block if necessary */
+        if (attr & ATR_PREFORM) {
+            if (!in_preform) {
+                fprintf(fp, "%s", PREF_S);
+                in_preform = TRUE;
+            }
+            return;
+        }
+        if (in_preform) {
+            fprintf(fp, PREF_E);
+            in_preform = FALSE;
+        }
+        if (!(attr & (ATR_HEADING | ATR_SUBHEAD)) && win == NHW_MENU) {
+            /* This is a bullet point */
+            if (!in_list) {
+                fprintf(fp, "%s\n", LIST_S);
+                in_list = TRUE;
+            }
+            fprintf(fp, LITM_S);
+            return;
+        }
+        if (in_list) {
+            fprintf(fp, "%s\n", LIST_E);
+            in_list = FALSE;
+        }
+        fprintf(fp, "%s", attr & ATR_HEADING ? HEAD_S :
+                          attr & ATR_SUBHEAD ? SUBH_S : "");
+        return;
+    }
+    /* after string is written */
+    if (in_preform) {
+        fprintf(fp, LINEBREAK); /* preform still gets <br /> at end of line */
+        return; /* don't write </pre> until we get the next thing */
+    }
+    if (in_list) {
+        fprintf (fp, "%s\n", LITM_E); /* </li>, but not </ul> yet */
+        return;
+    }
+    fprintf(fp, "%s", attr & ATR_HEADING ? HEAD_E :
+                      attr & ATR_SUBHEAD ? SUBH_E : LINEBREAK);
+}
+
+/* Write HTML-escaped char to a file */
+static void
+html_dump_char(fp, c)
+FILE *fp;
+char c;
+{
+    if (!fp) return;
+    switch (c) {
+        case '<':
+            fprintf(fp, "&lt;");
+            break;
+        case '>':
+            fprintf(fp, "&gt;");
+            break;
+        case '&':
+            fprintf(fp, "&amp;");
+            break;
+        case '\"':
+            fprintf(fp, "&quot;");
+            break;
+        case '\'':
+            fprintf(fp, "&#39;");
+            break;
+        case '\n':
+            fprintf(fp, "<br />\n");
+            break;
+        default:
+            fprintf(fp, "%c", c);
+    }
+}
+
+/* Write HTML-escaped string to a file */
+static void
+html_dump_str(fp, str)
+FILE *fp;
+const char *str;
+{
+    const char *p;
+    if (!fp) return;
+    for (p = str; *p; p++)
+        html_dump_char(fp, *p);
+}
+
+static void
+html_dump_line(fp, win, attr, str)
+FILE *fp;
+winid win;
+int attr;
+const char *str;
+{
+    if (strlen(str) == 0) {
+       /* if it's a blank line, just print a blank line */
+       fprintf(fp, "%s\n", LINEBREAK);
+       return;
+    }
+    html_write_tags(fp, win, attr, TRUE);
+    html_dump_str(fp, str);
+    html_write_tags(fp, win, attr, FALSE);
+}
+
+#endif
+
+/** HTML Map and status bar (collectively, the 'screendump') **/
+
+void
+dump_start_screendump()
+{
+#ifdef DUMPHTML
+    if (!dumphtml_file) return;
+    html_init_sym();
+    fprintf(dumphtml_file, "<pre class=\"nh_screen\">\n");
+#endif
+}
+
+void
+dump_end_screendump()
+{
+#ifdef DUMPHTML
+    if (dumphtml_file)
+        fprintf(dumphtml_file, "%s\n", PREF_E);
+#endif
+}
+
+/* Status and map highlighting */
+static void
+dump_set_color_attr(coloridx, attrmask, onoff)
+int coloridx, attrmask;
+boolean onoff;
+{
+#ifdef DUMPHTML
+    if (!dumphtml_file) return;
+    if (onoff) {
+        if (attrmask & HL_BOLD)
+            fprintf(dumphtml_file, BOLD_S);
+        if (attrmask & HL_ULINE)
+            fprintf(dumphtml_file, UNDL_S);
+        if (attrmask & HL_BLINK)
+            fprintf(dumphtml_file, BLNK_S);
+        if (attrmask & HL_INVERSE)
+            fprintf(dumphtml_file, "<span class=\"nh_inv_%d\">", coloridx);
+        else if (coloridx != NO_COLOR)
+            fprintf(dumphtml_file, "<span class=\"nh_color_%d\">", coloridx);
+        /* ignore HL_DIM */
+    } else {
+        /* reverse order for nesting */
+        if ((attrmask & HL_INVERSE) || coloridx != NO_COLOR)
+            fprintf(dumphtml_file, SPAN_E);
+        if (attrmask & HL_BLINK)
+            fprintf(dumphtml_file, BLNK_E);
+        if (attrmask & HL_ULINE)
+            fprintf(dumphtml_file, UNDL_E);
+        if (attrmask & HL_BOLD)
+            fprintf(dumphtml_file, BOLD_E);
+    }
+#endif
+}
+
+#ifdef DUMPHTML
+/** HTML Map **/
+
+/* Construct a symset for HTML line-drawing symbols.
+   dat/symbols can't be used here because nhsym is uchar,
+   and we require 16 bit values */
+
+static int htmlsym[SYM_MAX] = DUMMY;
+
+static void
+html_init_sym()
+{
+    /* see https://html-css-js.com/html/character-codes/drawing/ */
+
+    /* Minimal set, based on IBMGraphics_1 set.
+       Add more as required. */
+    htmlsym[S_vwall] = 9474;
+    htmlsym[S_hwall] = 9472;
+    htmlsym[S_tlcorn] = 9484;
+    htmlsym[S_trcorn] = 9488;
+    htmlsym[S_blcorn] = 9492;
+    htmlsym[S_brcorn] = 9496;
+    htmlsym[S_crwall] = 9532;
+    htmlsym[S_tuwall] = 9524;
+    htmlsym[S_tdwall] = 9516;
+    htmlsym[S_tlwall] = 9508;
+    htmlsym[S_trwall] = 9500;
+    htmlsym[S_vbeam] = 9474;
+    htmlsym[S_hbeam] = 9472;
+    htmlsym[S_sw_ml] = 9474;
+    htmlsym[S_sw_mr] = 9474;
+    htmlsym[S_explode4] = 9474;
+    htmlsym[S_explode6] = 9474;
+    /* and some extras */
+    htmlsym[S_corr] = 9617;
+    htmlsym[S_litcorr] = 9618;
+}
+
+/* convert 'special' flags returned from mapglyph to
+  highlight attrs (currently just inverse) */
+static unsigned
+mg_hl_attr(special)
+unsigned special;
+{
+    unsigned hl = 0;
+    if ((special & MG_PET) && iflags.hilite_pet)
+        hl |= HL_INVERSE; /* Could use wc2_petattr from curses here */
+    if ((special & MG_DETECT) && iflags.use_inverse)
+        hl |= HL_INVERSE;
+    if ((special & MG_OBJPILE) && iflags.hilite_pile)
+        hl |= HL_INVERSE;
+    if ((special & MG_BW_LAVA) && iflags.use_inverse)
+        hl |= HL_INVERSE;
+    return hl;
+}
+
+void
+html_dump_glyph(x, y, sym, ch, color, special)
+int x, y, sym, ch, color;
+unsigned special;
+{
+    char buf[BUFSZ]; /* do_screen_description requires this :( */
+    const char *firstmatch = "unknown"; /* and this */
+    coord cc;
+    int desc_found = 0;
+    unsigned attr;
+
+    if (!dumphtml_file) return;
+
+    if (x == 1) /* start row */
+        fprintf(dumphtml_file, "<span class=\"nh_screen\">  "); /* 2 space left margin */
+    cc.x = x;
+    cc.y = y;
+    desc_found = do_screen_description(cc, TRUE, ch, buf, &firstmatch, (struct permonst **) 0);
+    if (desc_found)
+        fprintf(dumphtml_file, "<div class=\"tooltip\">");
+    attr = mg_hl_attr(special);
+    dump_set_color_attr(color, attr, TRUE);
+    if (htmlsym[sym])
+        fprintf(dumphtml_file, "&#%d;", htmlsym[sym]);
+    else
+        html_dump_char(dumphtml_file, (char)ch);
+    dump_set_color_attr(color, attr, FALSE);
+    if (desc_found)
+       fprintf(dumphtml_file, "<span class=\"tooltiptext\">%s</span></div>", firstmatch);
+    if (x == COLNO-1)
+        fprintf(dumphtml_file, "  </span>\n"); /* 2 trailing spaces and newline */
+}
+
+#endif /* DUMPHTML */
+
+/** Status bar (botl) **/
+
+/* Status field ordering for 2 or 3 lines, from tty windowport */
+#define blPAD BL_FLUSH
+#define MAX_PER_ROW 15
+static const enum statusfields
+    twolineorder[3][MAX_PER_ROW] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD },
+    { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+      BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
+      BL_CAP, BL_CONDITION, BL_FLUSH },
+    { BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
+},
+    threelineorder[3][MAX_PER_ROW] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
+      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
+    { BL_ALIGN, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+      BL_AC, BL_XP, BL_EXP, BL_HD, BL_HUNGER,
+      BL_CAP, BL_FLUSH, blPAD, blPAD },
+    { BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_FLUSH, blPAD, blPAD,
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
+};
+static const enum statusfields (*fieldorder)[MAX_PER_ROW];
+
+struct dump_status_fields {
+    int idx;
+    int color;
+    int attr;
+};
+
+static unsigned long *dump_colormasks;
+static long dump_condition_bits;
+static struct dump_status_fields dump_status[MAXBLSTATS];
+static int hpbar_percent, hpbar_color;
+
+/* condcolor and condattr are needed to render the HTML status bar.
+   These static routines exist verbatim in at least two other window
+   ports. They should be promoted to the core (maybe botl.c).
+   Please delete this comment after the above suggestion has been enacted
+   or ignored.
+ */
+
+static int
+condcolor(bm, bmarray)
+long bm;
+unsigned long *bmarray;
+{
+#if defined(STATUS_HILITES) && defined(TEXTCOLOR)
+    int i;
+
+    if (bm && bmarray)
+        for (i = 0; i < CLR_MAX; ++i) {
+            if ((bmarray[i] & bm) != 0)
+                return i;
+        }
+#endif
+    return NO_COLOR;
+}
+
+static int
+condattr(bm, bmarray)
+long bm;
+unsigned long *bmarray;
+{
+    int attr = 0;
+#ifdef STATUS_HILITES
+    int i;
+
+    if (bm && bmarray) {
+        for (i = HL_ATTCLR_DIM; i < BL_ATTCLR_MAX; ++i) {
+            if ((bmarray[i] & bm) != 0) {
+                switch (i) {
+                case HL_ATTCLR_DIM:
+                    attr |= HL_DIM;
+                    break;
+                case HL_ATTCLR_BLINK:
+                    attr |= HL_BLINK;
+                    break;
+                case HL_ATTCLR_ULINE:
+                    attr |= HL_ULINE;
+                    break;
+                case HL_ATTCLR_INVERSE:
+                    attr |= HL_INVERSE;
+                    break;
+                case HL_ATTCLR_BOLD:
+                    attr |= HL_BOLD;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
+#endif /* STATUS_HILITES */
+    return attr;
+}
+
+/* This is copied from tty_status_update/render_status and simplified.
+   No truncation is done as we'd prefer to see all info in the dumplog
+   and allow the lines to be a little longer if necessary */
+
+static void
+dump_render_status()
+{
+    long mask, bits;
+    int i, idx, c, row, num_rows, coloridx = 0, attrmask = 0;
+    char *text;
+    struct condition_t { /* auto, since this only gets called once */
+        long mask;
+        const char *text;
+    } conditions[] = {
+        /* The sequence order of these matters */
+        { BL_MASK_STONE,     "Stone"    },
+        { BL_MASK_SLIME,     "Slime"    },
+        { BL_MASK_STRNGL,    "Strngl"   },
+        { BL_MASK_FOODPOIS,  "FoodPois" },
+        { BL_MASK_TERMILL,   "TermIll"  },
+        { BL_MASK_BLIND,     "Blind"    },
+        { BL_MASK_DEAF,      "Deaf"     },
+        { BL_MASK_STUN,      "Stun"     },
+        { BL_MASK_CONF,      "Conf"     },
+        { BL_MASK_HALLU,     "Hallu"    },
+        { BL_MASK_LEV,       "Lev"      },
+        { BL_MASK_FLY,       "Fly"      },
+        { BL_MASK_RIDE,      "Ride"     }
+    };
+
+    num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    for (row = 0; row < num_rows; ++row) {
+        int pad = COLNO + 1;
+        if (dumphtml_file)
+            fprintf(dumphtml_file, "<span class=\"nh_screen\">  "); /* 2 space left margin */
+        for (i = 0; (idx = fieldorder[row][i]) != BL_FLUSH; ++i) {
+            boolean hitpointbar = (idx == BL_TITLE
+                                   && iflags.wc2_hitpointbar);
+
+            if (!status_activefields[idx])
+                continue;
+            text = status_vals[idx]; /* always "" for BL_CONDITION */
+
+            if (idx == BL_CONDITION) {
+                /* | Condition Codes | */
+                bits = dump_condition_bits;
+                for (c = 0; c < SIZE(conditions) && bits != 0L; ++c) {
+                    mask = conditions[c].mask;
+                    if (bits & mask) {
+                        putstr(NHW_STATUS, 0, " ");
+                        pad--;
+#ifdef STATUS_HILITES
+                        if (iflags.hilite_delta) {
+                            attrmask = condattr(mask, dump_colormasks);
+                            coloridx = condcolor(mask, dump_colormasks);
+                            dump_set_color_attr(coloridx, attrmask, TRUE);
+                        }
+#endif
+                        putstr(NHW_STATUS, 0, conditions[c].text);
+                        pad -= strlen(conditions[c].text);
+#ifdef STATUS_HILITES
+                        if (iflags.hilite_delta) {
+                            dump_set_color_attr(coloridx, attrmask, FALSE);
+                        }
+#endif
+                        bits &= ~mask;
+                     }
+                }
+            } else if (hitpointbar) {
+                /* | Title with Hitpoint Bar | */
+                /* hitpointbar using hp percent calculation */
+                int bar_len, bar_pos = 0;
+                char bar[MAXCO], *bar2 = (char *) 0, savedch = '\0';
+                boolean twoparts = (hpbar_percent < 100);
+
+                /* force exactly 30 characters, padded with spaces
+                   if shorter or truncated if longer */
+                if (strlen(text) != 30) {
+                    Sprintf(bar, "%-30.30s", text);
+                    Strcpy(status_vals[BL_TITLE], bar);
+                } else
+                    Strcpy(bar, text);
+                bar_len = (int) strlen(bar); /* always 30 */
+                /* when at full HP, the whole title will be highlighted;
+                   when injured or dead, there will be a second portion
+                   which is not highlighted */
+                if (twoparts) {
+                    /* figure out where to separate the two parts */
+                    bar_pos = (bar_len * hpbar_percent) / 100;
+                    if (bar_pos < 1 && hpbar_percent > 0)
+                       bar_pos = 1;
+                    if (bar_pos >= bar_len && hpbar_percent < 100)
+                        bar_pos = bar_len - 1;
+                    bar2 = &bar[bar_pos];
+                    savedch = *bar2;
+                    *bar2 = '\0';
+                }
+                putstr(NHW_STATUS, 0, "[");
+                if (*bar) { /* always True, unless twoparts+dead (0 HP) */
+                    dump_set_color_attr(hpbar_color, HL_INVERSE, TRUE);
+                    putstr(NHW_STATUS, 0, bar);
+                    dump_set_color_attr(hpbar_color, HL_INVERSE, FALSE);
+                }
+                if (twoparts) { /* no highlighting for second part */
+                    *bar2 = savedch;
+                    putstr(NHW_STATUS, 0, bar2);
+                }
+                putstr(NHW_STATUS, 0, "]");
+                pad -= (bar_len + 2);
+            } else {
+                /* | Everything else not in a special case above | */
+#ifdef STATUS_HILITES
+                if (iflags.hilite_delta) {
+                    while (*text == ' ') {
+                        putstr(NHW_STATUS, 0, " ");
+                        text++;
+                        pad--;
+                    }
+                    if (*text == '/' && idx == BL_EXP) {
+                        putstr(NHW_STATUS, 0, "/");
+                        text++;
+                        pad--;
+                    }
+                    attrmask = dump_status[idx].attr;
+                    coloridx = dump_status[idx].color;
+                    dump_set_color_attr(coloridx, attrmask, TRUE);
+                }
+#endif
+                putstr(NHW_STATUS, 0, text);
+                pad -= strlen(text);
+#ifdef STATUS_HILITES
+                if (iflags.hilite_delta) {
+                    dump_set_color_attr(coloridx, attrmask, FALSE);
+                }
+#endif
+            }
+        }
+        if (dumphtml_file)
+            fprintf(dumphtml_file, "%*s</span>\n", pad, " ");
+    }
+    return;
+}
+
+void
+dump_status_update(fldidx, ptr, chg, percent, color, colormasks)
+int fldidx, chg UNUSED, percent, color;
+genericptr_t ptr;
+unsigned long *colormasks;
+{
+    int attrmask;
+    long *condptr = (long *) ptr;
+    char *text = (char *) ptr;
+    char goldbuf[40], *lastchar, *p;
+    const char *fmt;
+
+    /* we don't have an init routine, so do it on the first run through */
+    static boolean inited = FALSE;
+
+    if (!inited) {
+        int i, num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+        fieldorder = (num_rows != 3) ? twolineorder : threelineorder;
+        for (i = 0; i < MAXBLSTATS; ++i) {
+            dump_status[i].idx = BL_FLUSH;
+            dump_status[i].color = NO_COLOR;
+            dump_status[i].attr = ATR_NONE;
+        }
+        dump_condition_bits = 0L;
+        hpbar_percent = 0, hpbar_color = NO_COLOR;
+        inited = TRUE;
+    }
+
+    if ((fldidx < BL_RESET) || (fldidx >= MAXBLSTATS))
+        return;
+
+    if ((fldidx >= 0 && fldidx < MAXBLSTATS) && !status_activefields[fldidx])
+        return;
+
+    switch (fldidx) {
+    case BL_RESET:
+    case BL_FLUSH:
+        dump_render_status();
+        return;
+    case BL_CONDITION:
+        dump_status[fldidx].idx = fldidx;
+        dump_condition_bits = *condptr;
+        dump_colormasks = colormasks;
+        break;
+    case BL_GOLD:
+        text = decode_mixed(goldbuf, text);
+        /*FALLTHRU*/
+    default:
+        attrmask = (color >> 8) & 0x00FF;
+#ifndef TEXTCOLOR
+        color = NO_COLOR;
+#endif
+        fmt = status_fieldfmt[fldidx];
+        if (!fmt)
+            fmt = "%s";
+        if (*fmt == ' ' && (fldidx == fieldorder[0][0]
+                            || fldidx == fieldorder[1][0]
+                            || fldidx == fieldorder[2][0]))
+            ++fmt; /* skip leading space for first field on line */
+        Sprintf(status_vals[fldidx], fmt, text);
+        dump_status[fldidx].idx = fldidx;
+        dump_status[fldidx].color = (color & 0x00FF);
+        dump_status[fldidx].attr = attrmask;
+        break;
+    }
+
+    /* default processing above was required before these */
+    switch (fldidx) {
+    case BL_HP:
+        if (iflags.wc2_hitpointbar) {
+            /* Special additional processing for hitpointbar */
+            hpbar_percent = percent;
+            hpbar_color = (color & 0x00FF);
+            dump_status[BL_TITLE].color = hpbar_color;
+        }
+        break;
+    case BL_CAP:
+    case BL_LEVELDESC:
+    case BL_HUNGER:
+        /* The core sends trailing blanks for some fields.
+           Let's suppress the trailing blanks */
+        p = status_vals[fldidx];
+        for (lastchar = eos(p); lastchar > p && *--lastchar == ' '; ) {
+            *lastchar = '\0';
+        }
+        break;
+    }
+    /* 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
+    return;
+}
+
+/** HTML Headers and footers **/
+
+static void
+dump_headers()
+{
+#ifdef DUMPHTML
+    char vers[16]; /* buffer for short version string */
+
+    /* TODO: make portable routine for getting iso8601 datetime */
+    struct tm *t;
+    char iso8601[32];
+    t = localtime(&dumplog_now);
+    strftime(iso8601, 32, "%Y-%m-%dT%H:%M:%S%z", t);
+
+    if (!dumphtml_file) return;
+
+    fprintf(dumphtml_file, "<!DOCTYPE html>\n");
+    fprintf(dumphtml_file, "<head>\n");
+    fprintf(dumphtml_file, "<title>NetHack %s</title>\n",  version_string(vers));
+    fprintf(dumphtml_file, "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\n");
+    fprintf(dumphtml_file, "<meta name=\"generator\" content=\"NetHack %s \" />\n", vers);
+    fprintf(dumphtml_file, "<meta name=\"date\" content=\"%s\" />\n", iso8601);
+    fprintf(dumphtml_file, "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n");
+    fprintf(dumphtml_file, "<link href=\"https://cdn.jsdelivr.net/gh/maxwell-k/dejavu-sans-mono-web-font@2.37/index.css\" title=\"Default\" rel=\"stylesheet\" type=\"text/css\" media=\"all\" />\n");
+    fprintf(dumphtml_file, "<style type=\"text/css\">\n");
+    dump_css();
+    fprintf(dumphtml_file, "</style>\n</head>\n<body>\n");
+
+#endif
+}
+
+static void
+dump_footers()
+{
+#ifdef DUMPHTML
+    if (dumphtml_file) {
+        html_write_tags(dumphtml_file, 0, 0, TRUE); /* close </ul> and </pre> if open */
+        fprintf(dumphtml_file, "</body>\n</html>\n");
+    }
+#endif
+}
+
+#ifdef DUMPHTML
+static void
+dump_css()
+{
+    int c = 0;
+    FILE *css;
+    if (!dumphtml_file) return;
+    css = fopen_datafile("NHdump.css", "r", DATAPREFIX);
+    if (!css) {
+        pline("Can't open css file for input.");
+        pline("CSS file not included.");
+        return;
+    }
+    while ((c=fgetc(css))!=EOF) {
+        fputc(c, dumphtml_file);
+    }
+    fclose(css);
+}
+
+static void
+dump_outrip(win, how, when)
+winid win;
+int how;
+time_t when;
+{
+   if (dumphtml_file) {
+       html_write_tags(dumphtml_file, 0, 0, TRUE); /* </ul>, </pre> if needed */
+       fprintf(dumphtml_file, "%s\n", PREF_S);
+   }
+   genl_outrip(win, how, when);
+   if (dumphtml_file)
+       fprintf(dumphtml_file, "%s\n", PREF_E);
+
+}
+
+#endif
+
+/** Dump file handling **/
 
 void
 dump_open_log(now)
 time_t now;
 {
-#ifdef DUMPLOG
+#if defined(DUMPLOG) || defined(DUMPHTML)
+#ifdef SYSCF
+#undef DUMPLOG_FILE
+#undef DUMPHTML_FILE
+#define DUMPLOG_FILE sysopt.dumplogfile
+#define DUMPHTML_FILE sysopt.dumphtmlfile
+#endif
     char buf[BUFSZ];
-    char *fname;
+    char *fname = (char *)0;
 
     dumplog_now = now;
-#ifdef SYSCF
-    if (!sysopt.dumplogfile)
-        return;
-    fname = dump_fmtstr(sysopt.dumplogfile, buf, TRUE);
-#else
+#ifdef DUMPLOG
     fname = dump_fmtstr(DUMPLOG_FILE, buf, TRUE);
+    if (fname)
+        dumplog_file = fopen(fname, "w");
 #endif
-    dumplog_file = fopen(fname, "w");
-    dumplog_windowprocs_backup = windowprocs;
-
-#else /*!DUMPLOG*/
+#ifdef DUMPHTML
+    fname = dump_fmtstr(DUMPHTML_FILE, buf, TRUE);
+    if (fname)
+        dumphtml_file = fopen(fname, "w");
+#endif
+    if (dumplog_file || dumphtml_file) {
+        dumplog_windowprocs_backup = windowprocs;
+        menu_headings_backup = iflags.menu_headings;
+    }
+    dump_headers();
+#else /*!DUMPLOG/HTML*/
     nhUse(now);
-#endif /*?DUMPLOG*/
+#endif /*?DUMPLOG/HTML*/
 }
 
 void
 dump_close_log()
 {
+    dump_footers();
     if (dumplog_file) {
         (void) fclose(dumplog_file);
         dumplog_file = (FILE *) 0;
+    }
+    if (dumphtml_file) {
+        (void) fclose(dumphtml_file);
+        dumphtml_file = (FILE *) 0;
     }
 }
 
@@ -1263,21 +2008,32 @@ int attr;
 const char *str;
 int no_forward;
 {
-    if (dumplog_file)
-        fprintf(dumplog_file, "%s\n", str);
+#if defined(DUMPLOG) || defined (DUMPHTML)
+    dump_putstr(win, attr, str);
+#endif
     if (!no_forward)
         putstr(win, attr, str);
 }
 
+#if defined(DUMPLOG) || defined (DUMPHTML)
 /*ARGSUSED*/
 static void
 dump_putstr(win, attr, str)
-winid win UNUSED;
-int attr UNUSED;
+winid win;
+int attr;
 const char *str;
 {
-    if (dumplog_file)
+    /* Suppress newline for NHW_STATUS
+       Send NHW_STATUS to HTML only */
+    if (dumplog_file && win != NHW_STATUS && win != NHW_DUMPHTML)
         fprintf(dumplog_file, "%s\n", str);
+#ifdef DUMPHTML
+    if (dumphtml_file && win != NHW_DUMPTXT)
+        if (win == NHW_STATUS)
+            html_dump_str(dumphtml_file, str);
+        else
+            html_dump_line(dumphtml_file, win, attr, str);
+#endif
 }
 
 static winid
@@ -1323,12 +2079,12 @@ winid win UNUSED;
 /*ARGSUSED*/
 static void
 dump_add_menu(win, glyph, identifier, ch, gch, attr, str, itemflags)
-winid win UNUSED;
+winid win;
 int glyph;
 const anything *identifier UNUSED;
 char ch;
 char gch UNUSED;
-int attr UNUSED;
+int attr;
 const char *str;
 unsigned int itemflags UNUSED;
 {
@@ -1338,6 +2094,26 @@ unsigned int itemflags UNUSED;
         else
             fprintf(dumplog_file, "  %c - %s\n", ch, str);
     }
+#ifdef DUMPHTML
+    if (dumphtml_file) {
+        int color;
+        boolean iscolor = FALSE;
+        /* Don't use NHW_MENU for inv items as this makes bullet points */
+        if (!attr && glyph != NO_GLYPH)
+            win = (winid)0;
+        html_write_tags(dumphtml_file, win, attr, TRUE);
+        if (iflags.use_menu_color && get_menu_coloring(str, &color, &attr)) {
+            iscolor = TRUE;
+            fprintf(dumphtml_file, "<span class=\"nh_color_%d\">", color);
+        }
+        if (glyph != NO_GLYPH) {
+            fprintf(dumphtml_file, "<span class=\"nh_item_letter\">%c</span> - ", ch);
+        }
+        html_dump_str(dumphtml_file, str);
+        fprintf(dumphtml_file, "%s", iscolor ? "</span>" : "");
+        html_write_tags(dumphtml_file, win, attr, FALSE);
+    }
+#endif
 }
 
 /*ARGSUSED*/
@@ -1352,6 +2128,10 @@ const char *str;
         else
             fputs("\n", dumplog_file);
     }
+#ifdef DUMPHTML
+    if (dumphtml_file)
+        html_dump_line(dumphtml_file, 0, 0, str ? str : "");
+#endif
 }
 
 static int
@@ -1368,7 +2148,7 @@ void
 dump_redirect(onoff_flag)
 boolean onoff_flag;
 {
-    if (dumplog_file) {
+    if (dumplog_file || dumphtml_file) {
         if (onoff_flag) {
             windowprocs.win_create_nhwindow = dump_create_nhwindow;
             windowprocs.win_clear_nhwindow = dump_clear_nhwindow;
@@ -1379,14 +2159,21 @@ boolean onoff_flag;
             windowprocs.win_end_menu = dump_end_menu;
             windowprocs.win_select_menu = dump_select_menu;
             windowprocs.win_putstr = dump_putstr;
+#ifdef DUMPHTML
+            windowprocs.win_outrip = dump_outrip;
+#endif
+            windowprocs.win_status_update = dump_status_update;
         } else {
             windowprocs = dumplog_windowprocs_backup;
+            iflags.menu_headings = menu_headings_backup;
         }
         iflags.in_dumplog = onoff_flag;
+        iflags.menu_headings |= ATR_SUBHEAD; /* ATR_SUBHEAD changes with in_dumplog */
     } else {
         iflags.in_dumplog = FALSE;
     }
 }
+#endif
 
 #ifdef TTY_GRAPHICS
 #ifdef TEXTCOLOR

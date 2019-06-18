@@ -1159,7 +1159,7 @@ freedynamicdata()
 #endif /* FREE_ALL_MEMORY */
     if (VIA_WINDOWPORT())
         status_finish();
-#ifdef DUMPLOG
+#if defined(DUMPLOG) || defined(DUMPHTML)
     dumplogfreemessages();
 #endif
 

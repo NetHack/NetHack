@@ -27,6 +27,10 @@ static int FDECL(mfind0, (struct monst *, BOOLEAN_P));
 static int FDECL(reveal_terrain_getglyph, (int, int, int,
                                                unsigned, int, int));
 
+#ifdef DUMPHTML
+extern void FDECL(html_dump_glyph, (int, int, int, int, int, unsigned));
+#endif
+
 /* bring hero out from underwater or underground or being engulfed;
    return True iff any change occurred */
 static boolean
@@ -1918,7 +1922,7 @@ int default_glyph, which_subset;
     return glyph;
 }
 
-#ifdef DUMPLOG
+#if defined(DUMPLOG) || defined(DUMPHTML)
 void
 dump_map()
 {
@@ -1934,7 +1938,6 @@ dump_map()
      * (our caller has already printed a separator).  If there is
      * more than one blank map row at the bottom, keep just one.
      * Any blank rows within the middle of the map are kept.
-     * Note: putstr() with winid==0 is for dumplog.
      */
     skippedrows = 0;
     toprow = TRUE;
@@ -1942,12 +1945,18 @@ dump_map()
         blankrow = TRUE; /* assume blank until we discover otherwise */
         lastnonblank = -1; /* buf[] index rather than map's x */
         for (x = 1; x < COLNO; x++) {
-            int ch, color;
+            int ch, color, sym;
             unsigned special;
 
             glyph = reveal_terrain_getglyph(x, y, FALSE, u.uswallow,
                                             default_glyph, subset);
-            (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
+            sym = mapglyph(glyph, &ch, &color, &special, x, y, 0);
+
+#ifdef DUMPHTML
+            /* HTML map prints in a defined rectangle, so
+               just render every glyph - no skipping. */
+            html_dump_glyph(x, y, sym, ch, color, special);
+#endif
             buf[x - 1] = ch;
             if (ch != ' ') {
                 blankrow = FALSE;
@@ -1961,17 +1970,17 @@ dump_map()
                 toprow = FALSE;
             }
             for (x = 0; x < skippedrows; x++)
-                putstr(0, 0, "");
-            putstr(0, 0, buf); /* map row #y */
+                putstr(NHW_DUMPTXT, 0, "");
+            putstr(NHW_DUMPTXT, 0, buf); /* map row #y */
             skippedrows = 0;
         } else {
             ++skippedrows;
         }
     }
     if (skippedrows)
-        putstr(0, 0, "");
+        putstr(NHW_DUMPTXT, 0, "");
 }
-#endif /* DUMPLOG */
+#endif /* DUMPLOG || DUMPHTML */
 
 /* idea from crawl; show known portion of map without any monsters,
    objects, or traps occluding the view of the underlying terrain */

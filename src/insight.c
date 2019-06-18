@@ -55,17 +55,24 @@ static const char have_been[] = "have been ", have_never[] = "have never ",
     enl_msg(You_, have, (const char *) "", something, "")
 
 static void
-enlght_out(buf)
+enlght_out_attr(attr, buf)
 const char *buf;
-{
+int attr;
+{   
     if (g.en_via_menu) {
         anything any;
 
         any = cg.zeroany;
-        add_menu(g.en_win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(g.en_win, NO_GLYPH, &any, 0, 0, attr, buf, FALSE);
     } else
-        putstr(g.en_win, 0, buf);
+        putstr(g.en_win, attr, buf);
+}
+
+static void
+enlght_out(buf)
+const char *buf;
+{   
+    enlght_out_attr(ATR_NONE, buf);
 }
 
 static void
@@ -247,7 +254,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
                 : g.urole.name.m);
 
     /* title */
-    enlght_out(buf); /* "Conan the Archeologist's attributes:" */
+    enlght_out_attr(ATR_HEADING, buf); /* "Conan the Archeologist's attributes:" */
     /* background and characteristics; ^X or end-of-game disclosure */
     if (mode & BASICENLIGHTENMENT) {
         /* role, race, alignment, deities, dungeon level, time, experience */
@@ -303,7 +310,7 @@ int final;
     rank_titl = rank_of(u.ulevel, Role_switch, innategend);
 
     enlght_out(""); /* separator after title */
-    enlght_out("Background:");
+    enlght_out_attr(ATR_SUBHEAD, "Background:");
 
     /* if polymorphed, report current shape before underlying role;
        will be repeated as first status: "you are transformed" and also
@@ -548,7 +555,7 @@ int final;
         pwmax = u.uenmax, hpmax = (Upolyd ? u.mhmax : u.uhpmax);
 
     enlght_out(""); /* separator after background */
-    enlght_out("Basics:");
+    enlght_out_attr(ATR_SUBHEAD, "Basics:");
 
     if (hp < 0)
         hp = 0;
@@ -627,7 +634,7 @@ int final;
 
     enlght_out("");
     Sprintf(buf, "%s Characteristics:", !final ? "Current" : "Final");
-    enlght_out(buf);
+    enlght_out_attr(ATR_SUBHEAD, buf);
 
     /* bottom line order */
     one_characteristic(mode, final, A_STR); /* strength */
@@ -759,7 +766,7 @@ int final;
      *     should be discernible to the hero hence to the player)
     \*/
     enlght_out(""); /* separator after title or characteristics */
-    enlght_out(final ? "Final Status:" : "Current Status:");
+    enlght_out_attr(ATR_SUBHEAD, final ? "Final Status:" : "Current Status:");
 
     Strcpy(youtoo, You_);
     /* not a traditional status but inherently obvious to player; more
@@ -1074,7 +1081,7 @@ int final;
      *  Attributes
     \*/
     enlght_out("");
-    enlght_out(final ? "Final Attributes:" : "Current Attributes:");
+    enlght_out_attr(ATR_SUBHEAD, final ? "Final Attributes:" : "Current Attributes:");
 
     if (u.uevent.uhand_of_elbereth) {
         static const char *const hofe_titles[3] = { "the Hand of Elbereth",
@@ -1597,7 +1604,7 @@ int final;
 
     /* Create the conduct window */
     g.en_win = create_nhwindow(NHW_MENU);
-    putstr(g.en_win, 0, "Voluntary challenges:");
+    putstr(g.en_win, ATR_HEADING, "Voluntary challenges:");
 
     if (u.uroleplay.blind)
         you_have_been("blind from birth");
@@ -1729,7 +1736,7 @@ int final; /* used "behind the curtain" by enl_foo() macros */
         awin = create_nhwindow(NHW_MENU);
     }
     Sprintf(title, "Achievement%s:", plur(acnt));
-    putstr(awin, 0, title);
+    putstr(awin, ATR_HEADING, title);
 
     /* display achievements in the order in which they were recorded;
        lone exception is to defer the Amulet if we just ascended;
@@ -2079,7 +2086,7 @@ boolean ask;
                             || g.vanq_sortmode == VANQ_MCLS_HTOL);
 
             klwin = create_nhwindow(NHW_MENU);
-            putstr(klwin, 0, "Vanquished creatures:");
+            putstr(klwin, ATR_HEADING, "Vanquished creatures:");
             if (!dumping)
                 putstr(klwin, 0, "");
 
@@ -2143,7 +2150,7 @@ boolean ask;
                 if (!dumping)
                     putstr(klwin, 0, "");
                 Sprintf(buf, "%ld creatures vanquished.", total_killed);
-                putstr(klwin, 0, buf);
+                putstr(klwin, ATR_PREFORM, buf);
             }
             display_nhwindow(klwin, TRUE);
             destroy_nhwindow(klwin);
@@ -2151,7 +2158,7 @@ boolean ask;
     } else if (defquery == 'a') {
         /* #dovanquished rather than final disclosure, so pline() is ok */
         pline("No creatures have been vanquished.");
-#ifdef DUMPLOG
+#if defined(DUMPLOG) || defined(DUMPHTML)
     } else if (dumping) {
         putstr(0, 0, "No creatures were vanquished."); /* not pline() */
 #endif
@@ -2222,7 +2229,7 @@ boolean ask;
             Sprintf(buf, "%s%s species:",
                     (ngenocided) ? "Genocided" : "Extinct",
                     (nextinct && ngenocided) ? " or extinct" : "");
-            putstr(klwin, 0, buf);
+            putstr(klwin, ATR_SUBHEAD, buf);
             if (!dumping)
                 putstr(klwin, 0, "");
 
@@ -2248,17 +2255,17 @@ boolean ask;
                 putstr(klwin, 0, "");
             if (ngenocided > 0) {
                 Sprintf(buf, "%d species genocided.", ngenocided);
-                putstr(klwin, 0, buf);
+                putstr(klwin, ATR_PREFORM, buf);
             }
             if (nextinct > 0) {
                 Sprintf(buf, "%d species extinct.", nextinct);
-                putstr(klwin, 0, buf);
+                putstr(klwin, ATR_PREFORM, buf);
             }
 
             display_nhwindow(klwin, TRUE);
             destroy_nhwindow(klwin);
         }
-#ifdef DUMPLOG
+#if defined (DUMPLOG) || defined (DUMPHTML)
     } else if (dumping) {
         putstr(0, 0, "No species were genocided or became extinct.");
 #endif
