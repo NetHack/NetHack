@@ -88,7 +88,7 @@ enum roomtype_types {
 #define ROOMOFFSET  3 /* (levl[x][y].roomno - ROOMOFFSET) gives g.rooms[] index,
                        * for inside-squares and non-shared boundaries */
 
-#define IS_ROOM_PTR(x)      ((x) >= rooms && (x) < g.rooms + MAXNROFROOMS)
+#define IS_ROOM_PTR(x)      ((x) >= g.rooms && (x) < g.rooms + MAXNROFROOMS)
 #define IS_ROOM_INDEX(x)    ((x) >= 0 && (x) < MAXNROFROOMS)
 #define IS_SUBROOM_PTR(x)   ((x) >= g.subrooms && (x) < g.subrooms + MAXNROFROOMS)
 #define IS_SUBROOM_INDEX(x) ((x) > MAXNROFROOMS && (x) < (MAXNROFROOMS * 2))
