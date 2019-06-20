@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1559853037 2019/06/06 20:30:37 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1561061321 2019/06/20 20:08:41 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -489,7 +489,7 @@ int trouble;
             what = rightglow;
         else if (otmp == uleft)
             what = leftglow;
-    decurse:
+ decurse:
         if (!otmp) {
             impossible("fix_worst_trouble: nothing to uncurse.");
             return;
@@ -721,8 +721,9 @@ aligntyp resp_god;
                   (on_altar() && (a_align(u.ux, u.uy) != resp_god))
                       ? "scorn"
                       : "call upon");
+        /* [why isn't this using verbalize()?] */
         pline("\"Then die, %s!\"",
-              youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
+              (youmonst.data->mlet == S_HUMAN) ? "mortal" : "creature");
         summon_minion(resp_god, FALSE);
         break;
 
@@ -802,7 +803,7 @@ gcrownu()
                       && uwep->oartifact != ART_STORMBRINGER))
         && !carrying(SPE_FINGER_OF_DEATH)) {
         class_gift = SPE_FINGER_OF_DEATH;
-    make_splbk:
+ make_splbk:
         obj = mksobj(class_gift, TRUE, FALSE);
         bless(obj);
         obj->bknown = 1; /* ok to skip set_bknown() */
@@ -1488,7 +1489,7 @@ dosacrifice()
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
         if (!highaltar) {
-        too_soon:
+ too_soon:
             if (altaralign == A_NONE && Inhell)
                 /* hero has left Moloch's Sanctum so is in the process
                    of getting away with the Amulet (outside of Gehennom,
@@ -1584,7 +1585,7 @@ dosacrifice()
     }
 
     if (altaralign != u.ualign.type && highaltar) {
-    desecrate_high_altar:
+ desecrate_high_altar:
         /*
          * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
          * gets the god who owns it truly pissed off.
