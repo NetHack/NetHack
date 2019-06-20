@@ -1025,8 +1025,11 @@ menu_win_size(nhmenu *menu)
     /* Try not to wrap headers/normal text lines if possible.  We can
        go wider than half the screen for this purpose if need be */
 
-    if ((maxheaderwidth > maxwidth) && (maxheaderwidth < (term_cols - 2))) {
-        maxwidth = maxheaderwidth;
+    if (maxheaderwidth > maxwidth) {
+        if (maxheaderwidth < (term_cols - 2))
+            maxwidth = maxheaderwidth;
+        else
+            maxwidth = term_cols - 2;
     }
 
     width = maxwidth;
