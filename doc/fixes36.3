@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.57 $ $NHDT-Date: 1560855142 2019/06/18 10:52:22 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.59 $ $NHDT-Date: 1561022792 2019/06/20 09:26:32 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -76,6 +76,7 @@ if hero knows the number of charges in a wand or magical horn and a monster
 for wizard mode 'monpolycontrol', allow usually disallowed type 'chameleon',
 	'doppelganger', or 'sandestin' as answer to "change <monster> @ <x,y>
 	into what?" prompt when <monster> is really that type of creature
+add Space, Return, and Escape to '? k' (help for menu control keys)
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -129,6 +130,7 @@ curses: don't convert ^M (or <return> or <enter> key) into ^J; both ^J and ^M
 	off) and ^M is not bound to any command, so accidental <return> won't
 	cause the hero to try to move
 curses: draw map in screen columns 1..79 like tty, rather than in 2..80
+curses: make text windows wider so that help feedback is more readable
 curses+EDIT_GETLIN: when a prompt's answer was preloaded, using ESC to discard
 	it deleted it from the answer buffer but didn't erase it from screen
 tty: re-do one optimization used when status conditions have all been removed
