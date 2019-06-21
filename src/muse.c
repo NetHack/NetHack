@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1560161807 2019/06/10 10:16:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1561053256 2019/06/20 17:54:16 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.97 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -2487,7 +2487,10 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
             dmg = 0; /* damage has been applied by explode() */
         }
     } else { /* wand/horn of fire w/ positive charge count */
-        mplayhorn(mon, obj, TRUE);
+        if (obj->otyp == FIRE_HORN)
+            mplayhorn(mon, obj, TRUE);
+        else
+            mzapwand(mon, obj, TRUE);
         /* -1 => monster's wand of fire; 2 => # of damage dice */
         dmg = zhitm(mon, by_you ? 1 : -1, 2, &odummyp);
     }

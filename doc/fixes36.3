@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.59 $ $NHDT-Date: 1561022792 2019/06/20 09:26:32 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.62 $ $NHDT-Date: 1561081353 2019/06/21 01:42:33 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -77,6 +77,8 @@ for wizard mode 'monpolycontrol', allow usually disallowed type 'chameleon',
 	'doppelganger', or 'sandestin' as answer to "change <monster> @ <x,y>
 	into what?" prompt when <monster> is really that type of creature
 add Space, Return, and Escape to '? k' (help for menu control keys)
+hero can no longer negotiate a bribe with a demon lord when deaf
+wishing for "foo amulet" now yields an "amulet of foo" rather than random one
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -89,6 +91,8 @@ using ^G to create "hidden mimic" shouldn't have marked it as undetected since
 	also for eels and other fish if/when created at water location
 for wizard mode 'wizweight' option, glob weight wasn't shown unless glob had
 	shop price information attached
+fix for feedback when a monster plays a fire horn at self to cure green slime
+	ended up being used for zapping a wand of fire at self too
 curses: sometimes the message window would show a blank line after a prompt
 tty: revert the attempt to fix "message line anomaly: if autodecribe feedback
 	wrapped to second line, the wrapped portion wasn't erased when a

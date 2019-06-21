@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1560185545 2019/06/10 16:52:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.243 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1561081353 2019/06/21 01:42:33 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2812,7 +2812,7 @@ int xtra_prob; /* to force 0% random generation items to also be considered */
      * probabilities are not very useful because they don't take
      * the class generation probability into account.  [If 10%
      * of spellbooks were blank and 1% of scrolls were blank,
-     * "blank" would have 10/11 chance to yield a blook even though
+     * "blank" would have 10/11 chance to yield a book even though
      * scrolls are supposed to be much more common than books.]
      */
     for (i = oclass ? g.bases[(int) oclass] : STRANGE_OBJECT + 1;
@@ -3347,6 +3347,7 @@ struct obj *no_wish;
         for (i = 0; i < (int) (sizeof wrpsym); i++) {
             register int j = strlen(wrp[i]);
 
+            /* check for "<class> [ of ] something" */
             if (!strncmpi(bp, wrp[i], j)) {
                 oclass = wrpsym[i];
                 if (oclass != AMULET_CLASS) {
@@ -3358,12 +3359,27 @@ struct obj *no_wish;
                     actualn = bp;
                 goto srch;
             }
+            /* check for "something <class>" */
             if (!BSTRCMPI(bp, p - j, wrp[i])) {
                 oclass = wrpsym[i];
-                p -= j;
-                *p = 0;
-                if (p > bp && p[-1] == ' ')
-                    p[-1] = 0;
+                /* for "foo amulet", leave the class name so that
+                   wishymatch() can do "of inversion" to try matching
+                   "amulet of foo"; other classes don't include their
+                   class name in their full object names (where
+                   "potion of healing" is just "healing", for instance) */
+                if (oclass != AMULET_CLASS) {
+                    p -= j;
+                    *p = '\0';
+                    if (p > bp && p[-1] == ' ')
+                        p[-1] = '\0';
+                } else {
+                    /* amulet without "of"; convoluted wording but better a
+                       special case that's handled than one that's missing */
+                    if (!strncmpi(bp, "versus poison ", 14)) {
+                        typ = AMULET_VERSUS_POISON;
+                        goto typfnd;
+                    }
+                }
                 actualn = dn = bp;
                 goto srch;
             }
