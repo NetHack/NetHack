@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.62 $ $NHDT-Date: 1561081353 2019/06/21 01:42:33 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $ $NHDT-Date: 1561233801 2019/06/22 20:03:21 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -80,6 +80,10 @@ add Space, Return, and Escape to '? k' (help for menu control keys)
 hero can no longer negotiate a bribe with a demon lord when deaf
 wishing for "foo amulet" now yields an "amulet of foo" rather than random one
 code in parse_conf_file() to trim trailing blanks/cr was skipping over them
+partly eaten food with one bite left had message anomalies when eaten; the
+	usual "you resume your meal" case lacked the "you're finished" message
+	when done; eating something else in between to clobber meal context
+	resulted in no messages at all when restarting and finishing last bite
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
