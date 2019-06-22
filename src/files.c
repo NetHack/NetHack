@@ -3051,9 +3051,9 @@ boolean FDECL((*proc), (char *));
                     *ep = '\0';
 
                 /* trim off spaces at end of line */
-                while (--ep >= inbuf
+                while (ep >= inbuf
                        && (*ep == ' ' || *ep == '\t' || *ep == '\r'))
-                    *ep = '\0';
+                    *ep-- = '\0';
 
                 if (!config_error_nextline(inbuf)) {
                     rv = FALSE;
