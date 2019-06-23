@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $ $NHDT-Date: 1561233801 2019/06/22 20:03:21 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.65 $ $NHDT-Date: 1561314651 2019/06/23 18:30:51 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -84,6 +84,9 @@ partly eaten food with one bite left had message anomalies when eaten; the
 	usual "you resume your meal" case lacked the "you're finished" message
 	when done; eating something else in between to clobber meal context
 	resulted in no messages at all when restarting and finishing last bite
+wizard mode ^I menu could list "Not carrying anything" after inventory items
+	if perm_invent option was On (even on tty where that's not supported)
+change #adjust to treat carrying only gold as not having anything to adjust
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
