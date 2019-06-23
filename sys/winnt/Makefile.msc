@@ -236,7 +236,8 @@ VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
 VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
 VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
-VOBJ28 = 
+VOBJ28 = $(O)sfbase.o   $(O)sfdata.o   $(O)sfascii.o  $(O)sflendian.o
+#VOBJ29 = 
 
 DLBOBJ = $(O)dlb.o
 
@@ -259,8 +260,8 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
          $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
          $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEX)  \
-         $(CURSESOBJ)
+         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(VOBJ30) \
+         $(REGEX)  $(CURSESOBJ)
 
 GUIOBJ	= $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
@@ -363,6 +364,19 @@ DATABASE = $(DAT)\data.base
 # Setting up the compiler and linker
 #==========================================
 #==========================================
+
+#
+# ctags options
+#
+#CTAGSCMD=ctags-orig.exe
+CTAGSCMD=..\..\..\ctags\ctags.exe
+CTAGSOPT =--language-force=c --sort=no -D"Bitfield(x,n)=unsigned x : n" --excmd=pattern
+#
+# ctags wants unix-style pathnames
+#
+TINC = $(INCL:\=/)
+TSRC = $(SRC:\=/)
+ 
 
 cc=cl
 link=link
@@ -1066,6 +1080,7 @@ $(U)dgncomp.exe: $(DGNCOMPOBJS)
 		)
 <<
 
+ 
 #=================================================
 # Create directory for holding object files
 #=================================================
@@ -1476,6 +1491,93 @@ $(O)NetHackW.o: $(HACK_H) $(MSWIN)\NetHackW.c
 
 $(O)ttystub.o: $(HACK_H) $(MSWSYS)\stubs.c
 	@$(cc) $(cflagsBuild) -DTTYSTUB -Fo$@ $(MSWSYS)\stubs.c
+
+#
+#============================================
+# fieldlevel save dependencies
+#============================================
+
+$(O)sfbase.o: $(HACK_H) $(INCL)\sfproto.h $(INCL)\sfprocs.h \
+		$(SRC)\sfbase.c
+	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfbase.c
+
+$(O)sfdata.o: $(HACK_H) $(INCL)\sfprocs.h $(SRC)\sfdata.c
+	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfdata.c
+
+$(O)sfascii.o: $(HACK_H) $(INCL)\sfprocs.h $(SRC)\sfascii.c
+	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfascii.c
+
+$(O)sflendian.o: $(HACK_H) $(INCL)\sfprocs.h $(SRC)\sflendian.c
+	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sflendian.c
+
+$(SRC)\sfdata.c: $(U)readtags.exe $(U)nethack.tags
+        $(U)readtags.exe
+
+$(INCL)\sfproto.h: $(U)readtags.exe $(U)nethack.tags
+        $(U)readtags.exe
+
+$(U)readtags.exe: $(O)readtags.o
+	@$(link) $(lflagsBuild) -out:$@ $(O)readtags.o
+
+$(O)readtags.o: $(U)readtags.c $(U)nethack.tags $(CONFIG_H) $(PATCHLEVEL_H)
+	@$(cc) $(cflagsBuild) $(TEMPL)  -Fo$@ $(U)readtags.c
+
+#
+#tested only with exuberant ctags from http://ctags.sourceforge.net
+#
+CTAGDEP = $(TINC)/align.h    $(TINC)/artifact.h $(TSRC)/artifact.c \
+	  $(TINC)/artilist.h $(TINC)/attrib.h   $(TSRC)/bones.c    \
+	  $(TINC)/context.h  $(TINC)/coord.h    $(TINC)/decl.h     \
+	  $(TSRC)/decl.c     $(TINC)/dungeon.h  $(TINC)/engrave.h  \
+	  $(TSRC)/engrave.c  $(TINC)/flag.h     $(TINC)/func_tab.h \
+	  $(TINC)/global.h   $(TINC)/hack.h     $(TINC)/lev.h      \
+	  $(TINC)/mextra.h   $(TINC)/mkroom.h   $(TINC)/monst.h    \
+	  $(TINC)/monsym.h   $(TINC)/obj.h      $(TINC)/objclass.h \
+	  $(TINC)/permonst.h $(TINC)/prop.h     $(TINC)/quest.h    \
+	  $(TINC)/rect.h     $(TINC)/region.h   $(TINC)/rm.h       \
+	  $(TINC)/skills.h   $(TINC)/spell.h    $(TINC)/sys.h      \
+	  $(TINC)/timeout.h  $(TINC)/trap.h     $(TINC)/you.h      \
+	  $(TINC)/onames.h   $(TINC)/wintype.h 
+
+$(U)nethack.tags: $(CTAGDEP)
+	$(CTAGSCMD) $(CTAGSOPT) -f $(U)nethack.tags $(TINC)/align.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/artifact.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TSRC)/artifact.c
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/artilist.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/attrib.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TSRC)/bones.c
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/context.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/coord.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/decl.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TSRC)/decl.c
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/dungeon.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/engrave.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TSRC)/engrave.c
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/flag.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/func_tab.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/global.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/hack.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/lev.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/mextra.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/mkroom.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/monst.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/monsym.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/obj.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/objclass.h
+#	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/permonst.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/prop.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/quest.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/rect.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/region.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/rm.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/skills.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/spell.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/sys.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/timeout.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/trap.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/you.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/onames.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $(U)nethack.tags $(TINC)/wintype.h
 
 # 
 # util dependencies

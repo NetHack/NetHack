@@ -5,6 +5,8 @@
 
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
+#include "sfproto.h"
+
 
 STATIC_DCL void NDECL(stoned_dialogue);
 STATIC_DCL void NDECL(vomiting_dialogue);
@@ -1631,13 +1633,13 @@ do_storms()
  *      Call timers that have timed out.
  *
  * Save/Restore:
- *  void save_timers(int fd, int mode, int range)
+ *  void save_timers(NHFILE *, int range)
  *      Save all timers of range 'range'.  Range is either global
  *      or local.  Global timers follow game play, local timers
  *      are saved with a level.  Object and monster timers are
  *      saved using their respective id's instead of pointers.
  *
- *  void restore_timers(int fd, int range, boolean ghostly, long adjust)
+ *  void restore_timers(NHFILE *, int range, boolean ghostly, long adjust)
  *      Restore timers of range 'range'.  If from a ghost pile,
  *      adjust the timeout by 'adjust'.  The object and monster
  *      ids are not restored until later.
@@ -1665,10 +1667,10 @@ STATIC_DCL void FDECL(print_queue, (winid, timer_element *));
 STATIC_DCL void FDECL(insert_timer, (timer_element *));
 STATIC_DCL timer_element *FDECL(remove_timer,
                                 (timer_element **, SHORT_P, ANY_P *));
-STATIC_DCL void FDECL(write_timer, (int, timer_element *));
+STATIC_DCL void FDECL(write_timer, (NHFILE *, timer_element *));
 STATIC_DCL boolean FDECL(mon_is_local, (struct monst *));
 STATIC_DCL boolean FDECL(timer_is_local, (timer_element *));
-STATIC_DCL int FDECL(maybe_write_timer, (int, int, BOOLEAN_P));
+STATIC_DCL int FDECL(maybe_write_timer, (NHFILE *, int, BOOLEAN_P));
 
 /* If defined, then include names when printing out the timer queue */
 #define VERBOSE_TIMER
@@ -2110,8 +2112,8 @@ anything *arg;
 }
 
 STATIC_OVL void
-write_timer(fd, timer)
-int fd;
+write_timer(nhfp, timer)
+NHFILE *nhfp;
 timer_element *timer;
 {
     anything arg_save;
@@ -2121,34 +2123,49 @@ timer_element *timer;
     case TIMER_GLOBAL:
     case TIMER_LEVEL:
         /* assume no pointers in arg */
-        bwrite(fd, (genericptr_t) timer, sizeof(timer_element));
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) timer, sizeof(timer_element));
+        if (nhfp->fieldlevel)
+            sfo_fe(nhfp, timer, "timers", "timer", 1);
         break;
 
     case TIMER_OBJECT:
-        if (timer->needs_fixup)
-            bwrite(fd, (genericptr_t) timer, sizeof(timer_element));
-        else {
+        if (timer->needs_fixup) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
+            if (nhfp->fieldlevel)
+                sfo_fe(nhfp, timer, "timers", "timer", 1);
+        } else {
             /* replace object pointer with id */
             arg_save.a_obj = timer->arg.a_obj;
             timer->arg = cg.zeroany;
             timer->arg.a_uint = (arg_save.a_obj)->o_id;
             timer->needs_fixup = 1;
-            bwrite(fd, (genericptr_t) timer, sizeof(timer_element));
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
+            if (nhfp->fieldlevel)
+                sfo_fe(nhfp, timer, "timers", "timer", 1);
             timer->arg.a_obj = arg_save.a_obj;
             timer->needs_fixup = 0;
         }
         break;
 
     case TIMER_MONSTER:
-        if (timer->needs_fixup)
-            bwrite(fd, (genericptr_t) timer, sizeof(timer_element));
-        else {
+        if (timer->needs_fixup) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
+            if (nhfp->fieldlevel)
+                sfo_fe(nhfp, timer, "timers", "timer", 1);
+        } else {
             /* replace monster pointer with id */
             arg_save.a_monst = timer->arg.a_monst;
             timer->arg = cg.zeroany;
             timer->arg.a_uint = (arg_save.a_monst)->m_id;
             timer->needs_fixup = 1;
-            bwrite(fd, (genericptr_t) timer, sizeof(timer_element));
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
+            if (nhfp->fieldlevel)
+                sfo_fe(nhfp, timer, "timers", "timer", 1);
             timer->arg.a_monst = arg_save.a_monst;
             timer->needs_fixup = 0;
         }
@@ -2231,8 +2248,9 @@ timer_element *timer;
  * be written.  If write_it is true, actually write the timer.
  */
 STATIC_OVL int
-maybe_write_timer(fd, range, write_it)
-int fd, range;
+maybe_write_timer(nhfp, range, write_it)
+NHFILE *nhfp;
+int range;
 boolean write_it;
 {
     int count = 0;
@@ -2244,23 +2262,21 @@ boolean write_it;
 
             if (!timer_is_local(curr)) {
                 count++;
-                if (write_it)
-                    write_timer(fd, curr);
+                if (write_it) write_timer(nhfp, curr);
             }
-
         } else {
             /* local timers */
 
             if (timer_is_local(curr)) {
                 count++;
-                if (write_it)
-                    write_timer(fd, curr);
+                if (write_it) write_timer(nhfp, curr);
             }
         }
     }
 
     return count;
 }
+
 
 /*
  * Save part of the timer list.  The parameter 'range' specifies either
@@ -2276,22 +2292,29 @@ boolean write_it;
  *      + timeouts that stay with the level (obj & monst)
  */
 void
-save_timers(fd, mode, range)
-int fd, mode, range;
+save_timers(nhfp, range)
+NHFILE *nhfp;
+int range;
 {
     timer_element *curr, *prev, *next_timer = 0;
     int count;
 
-    if (perform_bwrite(mode)) {
-        if (range == RANGE_GLOBAL)
-            bwrite(fd, (genericptr_t) &g.timer_id, sizeof(g.timer_id));
-
-        count = maybe_write_timer(fd, range, FALSE);
-        bwrite(fd, (genericptr_t) &count, sizeof count);
-        (void) maybe_write_timer(fd, range, TRUE);
+    if (perform_bwrite(nhfp)) {
+        if (range == RANGE_GLOBAL) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) &g.timer_id, sizeof(g.timer_id));
+            if (nhfp->fieldlevel)
+                sfo_ulong(nhfp, &g.timer_id, "timers", "g.timer_id", 1);
+        }
+        count = maybe_write_timer(nhfp, range, FALSE);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &count, "timers", "timer_count", 1);
+        (void) maybe_write_timer(nhfp, range, TRUE);
     }
 
-    if (release_data(mode)) {
+    if (release_data(nhfp)) {
         for (prev = 0, curr = g.timer_base; curr; curr = next_timer) {
             next_timer = curr->next; /* in case curr is removed */
 
@@ -2314,22 +2337,34 @@ int fd, mode, range;
  * monster pointers.
  */
 void
-restore_timers(fd, range, ghostly, adjust)
-int fd, range;
+restore_timers(nhfp, range, ghostly, adjust)
+NHFILE *nhfp;
+int range;
 boolean ghostly; /* restoring from a ghost level */
 long adjust;     /* how much to adjust timeout */
 {
     int count;
     timer_element *curr;
 
-    if (range == RANGE_GLOBAL)
-        mread(fd, (genericptr_t) &g.timer_id, sizeof g.timer_id);
+    if (range == RANGE_GLOBAL) {
+        if (nhfp->structlevel)
+            mread(nhfp->fd, (genericptr_t) &g.timer_id, sizeof g.timer_id);
+        if (nhfp->fieldlevel)
+            sfi_ulong(nhfp, &g.timer_id, "timers", "g.timer_id", 1);
+    }
 
     /* restore elements */
-    mread(fd, (genericptr_t) &count, sizeof count);
+    if (nhfp->structlevel)
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
+    if (nhfp->fieldlevel)
+        sfi_int(nhfp, &count, "timers", "timer_count", 1);
+       
     while (count-- > 0) {
         curr = (timer_element *) alloc(sizeof(timer_element));
-        mread(fd, (genericptr_t) curr, sizeof(timer_element));
+        if (nhfp->structlevel)
+            mread(nhfp->fd, (genericptr_t) curr, sizeof(timer_element));
+        if (nhfp->fieldlevel)
+            sfi_fe(nhfp, curr, "timers", "timer", 1);
         if (ghostly)
             curr->timeout += adjust;
         insert_timer(curr);

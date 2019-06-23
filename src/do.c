@@ -15,7 +15,7 @@ STATIC_DCL void FDECL(dosinkring, (struct obj *));
 STATIC_PTR int FDECL(drop, (struct obj *));
 STATIC_PTR int NDECL(wipeoff);
 STATIC_DCL int FDECL(menu_drop, (int));
-STATIC_DCL int NDECL(currentlevel_rewrite);
+STATIC_DCL NHFILE *NDECL(currentlevel_rewrite);
 STATIC_DCL void NDECL(final_level);
 /* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
 
@@ -1114,18 +1114,21 @@ doup()
 }
 
 /* check that we can write out the current level */
-STATIC_OVL int
+STATIC_OVL NHFILE *
 currentlevel_rewrite()
 {
-    register int fd;
+    NHFILE *nhfp;
     char whynot[BUFSZ];
+#ifdef MFLOPPY
+    int savemode;
+#endif
 
     /* since level change might be a bit slow, flush any buffered screen
      *  output (like "you fall through a trap door") */
     mark_synch();
 
-    fd = create_levelfile(ledger_no(&u.uz), whynot);
-    if (fd < 0) {
+    nhfp = create_levelfile(ledger_no(&u.uz), whynot);
+    if (!nhfp) {
         /*
          * This is not quite impossible: e.g., we may have
          * exceeded our quota. If that is the case then we
@@ -1134,35 +1137,39 @@ currentlevel_rewrite()
          * writable.
          */
         pline1(whynot);
-        return -1;
+        return (NHFILE *) 0;
     }
 
 #ifdef MFLOPPY
-    if (!savelev(fd, ledger_no(&u.uz), COUNT_SAVE)) {
-        (void) nhclose(fd);
+    savemode = nhfp->mode;
+    nhfp->mode = COUNTING;
+    if (!savelev(nhfp, ledger_no(&u.uz))) {
+        close_nhfile(nhfp);
         delete_levelfile(ledger_no(&u.uz));
         pline("NetHack is out of disk space for making levels!");
         You("can save, quit, or continue playing.");
         return -1;
     }
+    nhfp->mode = savemode;
 #endif
-    return fd;
+    return nhfp;
 }
 
 #ifdef INSURANCE
 void
 save_currentstate()
 {
-    int fd;
+    NHFILE *nhfp;
 
     if (flags.ins_chkpt) {
         /* write out just-attained level, with pets and everything */
-        fd = currentlevel_rewrite();
-        if (fd < 0)
+        nhfp = currentlevel_rewrite();
+        if (!nhfp)
             return;
-        bufon(fd);
-        savelev(fd, ledger_no(&u.uz), WRITE_SAVE);
-        bclose(fd);
+        bufon(nhfp->fd);
+        nhfp->mode = WRITING;
+        savelev(nhfp,ledger_no(&u.uz));
+        close_nhfile(nhfp);
     }
 
     /* write out non-level state */
@@ -1226,7 +1233,8 @@ goto_level(newlevel, at_stairs, falling, portal)
 d_level *newlevel;
 boolean at_stairs, falling, portal;
 {
-    int fd, l_idx;
+    int l_idx, save_mode;
+    NHFILE *nhfp;
     xchar new_ledger;
     boolean cant_go_back, great_effort,
             up = (depth(newlevel) < depth(&u.uz)),
@@ -1307,8 +1315,8 @@ boolean at_stairs, falling, portal;
     if (u.utrap && u.utraptype == TT_BURIEDBALL)
         buried_ball_to_punishment(); /* (before we save/leave old level) */
 
-    fd = currentlevel_rewrite();
-    if (fd < 0)
+    nhfp = currentlevel_rewrite();
+    if (!nhfp)
         return;
 
     /* discard context which applies to the level we're leaving;
@@ -1354,10 +1362,12 @@ boolean at_stairs, falling, portal;
     cant_go_back = (newdungeon && In_endgame(newlevel));
     if (!cant_go_back) {
         update_mlstmv(); /* current monsters are becoming inactive */
-        bufon(fd);       /* use buffered output */
+        bufon(nhfp->fd);       /* use buffered output */
     }
-    savelev(fd, ledger_no(&u.uz),
-            cant_go_back ? FREE_SAVE : (WRITE_SAVE | FREE_SAVE));
+    save_mode = nhfp->mode;
+    nhfp->mode = cant_go_back ? FREEING : (WRITING | FREEING);
+    savelev(nhfp, ledger_no(&u.uz));
+    nhfp->mode = save_mode;
     /* air bubbles and clouds are saved in game-state rather than with the
        level they're used on; in normal play, you can't leave and return
        to any endgame level--bubbles aren't needed once you move to the
@@ -1366,9 +1376,15 @@ boolean at_stairs, falling, portal;
        aren't saved with the level and restored upon return (new ones are
        created instead), we need to discard them to avoid a memory leak;
        so bubbles are now discarded as we leave the level they're used on */
-    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
-        save_waterlevel(-1, FREE_SAVE);
-    bclose(fd);
+    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
+        NHFILE tmpnhfp;
+
+        zero_nhfile(&tmpnhfp);
+        tmpnhfp.fd = -1;
+        tmpnhfp.mode = FREEING;
+        save_waterlevel(&tmpnhfp);
+    }
+    close_nhfile(nhfp);
     if (cant_go_back) {
         /* discard unreachable levels; keep #0 */
         for (l_idx = maxledgerno(); l_idx > 0; --l_idx)
@@ -1418,21 +1434,26 @@ boolean at_stairs, falling, portal;
         new = TRUE; /* made the level */
     } else {
         /* returning to previously visited level; reload it */
-        fd = open_levelfile(new_ledger, whynot);
-        if (tricked_fileremoved(fd, whynot)) {
+        nhfp = open_levelfile(new_ledger, whynot);
+        if (tricked_fileremoved(nhfp, whynot)) {
             /* we'll reach here if running in wizard mode */
             error("Cannot continue this game.");
         }
         reseed_random(rn2);
         reseed_random(rn2_on_display_rng);
         minit(); /* ZEROCOMP */
-        getlev(fd, g.hackpid, new_ledger, FALSE);
+        getlev(nhfp, g.hackpid, new_ledger, FALSE);
         /* when in wizard mode, it is possible to leave from and return to
            any level in the endgame; above, we discarded bubble/cloud info
            when leaving Plane of Water or Air so recreate some now */
-        if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
-            restore_waterlevel(-1);
-        (void) nhclose(fd);
+        if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
+            NHFILE tmpnhfp;
+
+            zero_nhfile(&tmpnhfp);
+            tmpnhfp.fd = -1;
+            restore_waterlevel(&tmpnhfp);
+        }
+        close_nhfile(nhfp);
         oinit(); /* reassign level dependent obj probabilities */
     }
     reglyph_darkroom();

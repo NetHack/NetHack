@@ -5,6 +5,8 @@
 
 #include "hack.h"
 #include "lev.h" /* save & restore info */
+#include "sfproto.h"
+
 
 STATIC_DCL void FDECL(setgemprobs, (d_level *));
 STATIC_DCL void FDECL(shuffle, (int, int, BOOLEAN_P));
@@ -286,29 +288,46 @@ oinit()
 }
 
 void
-savenames(fd, mode)
-int fd, mode;
+savenames(nhfp)
+NHFILE *nhfp;
 {
-    register int i;
+    int i, j;
     unsigned int len;
 
-    if (perform_bwrite(mode)) {
-        bwrite(fd, (genericptr_t) g.bases, sizeof g.bases);
-        bwrite(fd, (genericptr_t) g.disco, sizeof g.disco);
-        bwrite(fd, (genericptr_t) objects,
-               sizeof(struct objclass) * NUM_OBJECTS);
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t)g.bases, sizeof g.bases);
+            bwrite(nhfp->fd, (genericptr_t)g.disco, sizeof g.disco);
+            bwrite(nhfp->fd, (genericptr_t)objects,
+                   sizeof(struct objclass) * NUM_OBJECTS);
+        }
+        if (nhfp->fieldlevel) {
+            for (i = 0; i < MAXOCLASSES; ++i)
+                sfo_int(nhfp, &g.bases[i], "names", "g.bases", 1);
+            for (i = 0; i < NUM_OBJECTS; ++i)
+                sfo_short(nhfp, &g.disco[i], "names", "g.disco", 1);
+            for (i = 0; i < NUM_OBJECTS; ++i)
+                sfo_objclass(nhfp, &objects[i], "names", "objclass", 1);
+        }
     }
     /* as long as we use only one version of Hack we
        need not save oc_name and oc_descr, but we must save
        oc_uname for all objects */
     for (i = 0; i < NUM_OBJECTS; i++)
         if (objects[i].oc_uname) {
-            if (perform_bwrite(mode)) {
+            if (perform_bwrite(nhfp)) {
                 len = strlen(objects[i].oc_uname) + 1;
-                bwrite(fd, (genericptr_t) &len, sizeof len);
-                bwrite(fd, (genericptr_t) objects[i].oc_uname, len);
+                if (nhfp->structlevel) {
+                    bwrite(nhfp->fd, (genericptr_t)&len, sizeof len);
+                    bwrite(nhfp->fd, (genericptr_t)objects[i].oc_uname, len);
+                }
+                if (nhfp->fieldlevel) {
+                    sfo_unsigned(nhfp, &len, "names", "len", 1);
+                    for (j = 0; (unsigned) j < len; ++j)
+                        sfo_char(nhfp, &objects[i].oc_uname[j], "names", "oc_uname", 1);
+                }
             }
-            if (release_data(mode)) {
+            if (release_data(nhfp)) {
                 free((genericptr_t) objects[i].oc_uname);
                 objects[i].oc_uname = 0;
             }
@@ -316,21 +335,45 @@ int fd, mode;
 }
 
 void
-restnames(fd)
-register int fd;
+restnames(nhfp)
+NHFILE *nhfp;
 {
-    register int i;
+    int i, j;
     unsigned int len;
 
-    mread(fd, (genericptr_t)g.bases, sizeof g.bases);
-    mread(fd, (genericptr_t) g.disco, sizeof g.disco);
-    mread(fd, (genericptr_t) objects, sizeof(struct objclass) * NUM_OBJECTS);
-    for (i = 0; i < NUM_OBJECTS; i++)
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) g.bases, sizeof g.bases);
+        mread(nhfp->fd, (genericptr_t) g.disco, sizeof g.disco);
+        mread(nhfp->fd, (genericptr_t) objects,
+                sizeof(struct objclass) * NUM_OBJECTS);
+    }
+    if (nhfp->fieldlevel) {
+        for (i = 0; i < MAXOCLASSES; ++i)
+            sfi_int(nhfp, &g.bases[i], "names", "g.bases", 1);
+        for (i = 0; i < NUM_OBJECTS; ++i)
+            sfi_short(nhfp, &g.disco[i], "names", "g.disco", 1);
+        for (i = 0; i < NUM_OBJECTS; ++i)
+            sfi_objclass(nhfp, &objects[i], "names", "objclass", 1);
+    }
+    for (i = 0; i < NUM_OBJECTS; i++) {
         if (objects[i].oc_uname) {
-            mread(fd, (genericptr_t) &len, sizeof len);
+            if (nhfp->structlevel) {
+                mread(nhfp->fd, (genericptr_t) &len, sizeof len);
+            }
+            if (nhfp->fieldlevel) {
+                sfi_unsigned(nhfp, &len, "names", "len", 1);
+            }
             objects[i].oc_uname = (char *) alloc(len);
-            mread(fd, (genericptr_t) objects[i].oc_uname, len);
-        }
+            if (nhfp->structlevel) {
+                mread(nhfp->fd, (genericptr_t)objects[i].oc_uname, len);
+            }
+            if (nhfp->fieldlevel) {
+                for (j = 0; (unsigned) j < len; ++j)
+                    sfi_char(nhfp, &objects[i].oc_uname[j],
+                                "names", "oc_uname", 1);
+            }
+	}
+    }
 #ifdef USE_TILES
     shuffle_tiles();
 #endif

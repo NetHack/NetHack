@@ -5,6 +5,8 @@
 
 #include "hack.h"
 #include "lev.h"
+#include "sfproto.h"
+
 
 #ifdef MFLOPPY
 extern long bytes_counted;
@@ -338,7 +340,7 @@ int how;
 time_t when;
 struct obj *corpse;
 {
-    int fd, x, y;
+    int x, y;
     struct trap *ttmp;
     struct monst *mtmp;
     struct permonst *mptr;
@@ -346,13 +348,14 @@ struct obj *corpse;
     struct cemetery *newbones;
     char c, *bonesid;
     char whynot[BUFSZ];
+    NHFILE *nhfp;
 
     /* caller has already checked `can_make_bones()' */
 
     clear_bypasses();
-    fd = open_bonesfile(&u.uz, &bonesid);
-    if (fd >= 0) {
-        (void) nhclose(fd);
+    nhfp = open_bonesfile(&u.uz, &bonesid);
+    if (nhfp) {
+        close_nhfile(nhfp);
         if (wizard) {
             if (yn("Bones file already exists.  Replace it?") == 'y') {
                 if (delete_bonesfile(&u.uz))
@@ -500,8 +503,8 @@ struct obj *corpse;
     if (wizard)
         g.level.flags.wizard_bones = 1;
 
-    fd = create_bonesfile(&u.uz, &bonesid, whynot);
-    if (fd < 0) {
+    nhfp = create_bonesfile(&u.uz, &bonesid, whynot);
+    if (!nhfp) {
         if (wizard)
             pline1(whynot);
         /* bones file creation problems are silent to the player.
@@ -514,7 +517,10 @@ struct obj *corpse;
 
 #ifdef MFLOPPY /* check whether there is room */
     if (iflags.checkspace) {
-        savelev(fd, ledger_no(&u.uz), COUNT_SAVE);
+        int savemode = nhfp->mode;
+
+        nhfp->mode = COUNTING;
+        savelev(nhfp, ledger_no(&u.uz));
         /* savelev() initializes bytes_counted to 0, so it must come
          * first here even though it does not in the real save.  the
          * resulting extra bflush() at the end of savelev() may increase
@@ -525,31 +531,47 @@ struct obj *corpse;
          * this code would have to know the size of the version
          * information itself.
          */
-        store_version(fd);
-        store_savefileinfo(fd);
-        bwrite(fd, (genericptr_t) &c, sizeof c);
-        bwrite(fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nnn */
-        savefruitchn(fd, COUNT_SAVE);
-        bflush(fd);
+        store_version(nhfp);
+        store_savefileinfo(nhfp);
+    	if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
+            bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nnn */
+        }
+        if (nhfp->fieldlevel) {
+            sfo_char(nhfp, &c, "bones", "bones_count", 1);
+            sfo_char(nhfp, bonesid, "bones", "bonesid", (int) c);
+        }
+        savefruitchn(nhfp);
+        if (nhfp->structlevel)
+            bflush(nhfp->fd);
         if (bytes_counted > freediskspace(bones)) { /* not enough room */
             if (wizard)
                 pline("Insufficient space to create bones file.");
-            (void) nhclose(fd);
+	    close_nhfile(nhfp);
             cancel_bonesfile();
             return;
         }
         co_false(); /* make sure stuff before savelev() gets written */
+        nhfp->mode = savemode;
     }
 #endif /* MFLOPPY */
 
-    store_version(fd);
-    store_savefileinfo(fd);
-    bwrite(fd, (genericptr_t) &c, sizeof c);
-    bwrite(fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nnn */
-    savefruitchn(fd, WRITE_SAVE | FREE_SAVE);
+    nhfp->mode = WRITING | FREEING;
+    store_version(nhfp);
+    store_savefileinfo(nhfp);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
+        bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c);	/* DD.nnn */
+        savefruitchn(nhfp);
+    }
+    if (nhfp->fieldlevel) {
+        sfo_char(nhfp, &c, "bones", "bones_count", 1);
+        sfo_char(nhfp, bonesid, "bones", "bonesid", (int) c); 	/* DD.nnn */
+        savefruitchn(nhfp);
+    }
     update_mlstmv(); /* update monsters for eventual restoration */
-    savelev(fd, ledger_no(&u.uz), WRITE_SAVE | FREE_SAVE);
-    bclose(fd);
+    savelev(nhfp, ledger_no(&u.uz));
+    close_nhfile(nhfp);
     commit_bonesfile(&u.uz);
     compress_bonesfile();
 }
@@ -557,8 +579,8 @@ struct obj *corpse;
 int
 getbones()
 {
-    register int fd;
-    register int ok;
+    int ok, i;
+    NHFILE *nhfp = (NHFILE *) 0;
     char c, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
     if (discover) /* save bones files for real games */
@@ -572,11 +594,18 @@ getbones()
         return 0;
     if (no_bones_level(&u.uz))
         return 0;
-    fd = open_bonesfile(&u.uz, &bonesid);
-    if (fd < 0)
-        return 0;
 
-    if (validate(fd, g.bones) != 0) {
+    nhfp = open_bonesfile(&u.uz, &bonesid);
+    if (!nhfp)
+        return 0;
+    if (nhfp && nhfp->structlevel && nhfp->fd < 0)
+        return 0;
+    if (nhfp && nhfp->fieldlevel) {
+        if (nhfp->style.deflt && !nhfp->fpdef)
+        return 0;
+    }
+
+    if (validate(nhfp, g.bones) != 0) {
         if (!wizard)
             pline("Discarding unuseable bones; no need to panic...");
         ok = FALSE;
@@ -584,13 +613,20 @@ getbones()
         ok = TRUE;
         if (wizard) {
             if (yn("Get bones?") == 'n') {
-                (void) nhclose(fd);
+                close_nhfile(nhfp);
                 compress_bonesfile();
                 return 0;
             }
         }
-        mread(fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
-        mread(fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
+            mread(nhfp->fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
+        }
+        if (nhfp->fieldlevel) {
+            sfi_char(nhfp, &c, "bones", "bones_count", 1); /* length incl. '\0' */
+            for (i = 0; i < (int) c; ++i)
+                sfi_char(nhfp, &oldbonesid[i], "bones", "bonesid", 1);
+	}
         if (strcmp(bonesid, oldbonesid) != 0
             /* from 3.3.0 through 3.6.0, bones in the quest branch stored
                a bogus bonesid in the file; 3.6.1 fixed that, but for
@@ -612,7 +648,7 @@ getbones()
         } else {
             register struct monst *mtmp;
 
-            getlev(fd, 0, 0, TRUE);
+            getlev(nhfp, 0, 0, TRUE);
 
             /* Note that getlev() now keeps tabs on unique
              * monsters such as demon lords, and tracks the
@@ -638,7 +674,7 @@ getbones()
             resetobjs(g.level.buriedobjlist, TRUE);
         }
     }
-    (void) nhclose(fd);
+    close_nhfile(nhfp);
     sanitize_engravings();
     u.uroleplay.numbones++;
 

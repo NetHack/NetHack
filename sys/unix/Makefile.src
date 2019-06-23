@@ -448,7 +448,9 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
-	   rip.c rnd.c role.c rumors.c save.c shk.c shknam.c sit.c sounds.c \
+	   rip.c rnd.c role.c rumors.c save.c \
+	   sfbase.c sfdata.c sfascii.c sflendian.c \
+	   shk.c shknam.c sit.c sounds.c \
 	   sp_lev.c spell.c steal.c steed.c sys.c teleport.c timeout.c \
 	   topten.c track.c trap.c u_init.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
@@ -464,7 +466,7 @@ SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 SYSCXXSRC = ../sys/share/cppregex.cpp
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = vis_tab.c	#tile.c
+GENCSRC = vis_tab.c	sfdata.c #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
@@ -515,8 +517,9 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
-	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
-	sys.o \
+	role.o rumors.o save.o \
+	sfbase.o sfdata.o sfascii.o sflendian.o \
+	shk.o shknam.o sit.o sounds.o sp_lev.o spell.o sys.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
 	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
 	wizard.o worm.o worn.o write.o zap.o \
@@ -658,6 +661,26 @@ tile.c: ../win/share/tilemap.c $(HACK_H)
 ../win/gnome/gn_rip.h: ../win/X11/rip.xpm
 	cp ../win/X11/rip.xpm ../win/gnome/gn_rip.h
 
+# readtags dependencies
+#
+#
+../util/readtags:
+	@( cd ../util ; $(MAKE) readtags )
+
+../util/nethack.tags:
+	@( cd ../util ; $(MAKE) nethack.tags )
+
+sfbase.o: sfbase.c $(HACK_H) ../include/sfproto.h ../include/sfprocs.h
+sfascii.o: sfascii.c $(HACK_H) ../include/sfprocs.h
+sflendian.o: sflendian.c $(HACK_H) ../include/sfprocs.h
+sfdata.o: sfdata.c $(HACK_H) ../include/sfprocs.h
+
+sfdata.c: ../util/readtags ../util/nethack.tags
+	@( cd ../util ; ./readtags )
+
+../include/sfproto.h: ../util/readtags ../util/nethack.tags
+	@( cd ../util ; ./readtags )
+
 #	date.h should be remade any time any of the source or include code
 #	is modified.  Unfortunately, this would make the contents of this
 #	file far more complex.  Since "hack.h" depends on most of the include
@@ -671,7 +694,6 @@ tile.c: ../win/share/tilemap.c $(HACK_H)
 ../include/date.h:	$(VERSOURCES) $(HACK_H)
 	-$(SHELL) ../sys/unix/gitinfo.sh $(GITINFO) #before 'makedefs -v'
 	../util/makedefs -v
-
 
 lint:
 # lint cannot have -p here because (i) capitals are meaningful:

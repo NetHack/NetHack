@@ -6032,7 +6032,7 @@ const char *name;
     if (!fd)
         return FALSE;
     Fread((genericptr_t) &vers_info, sizeof vers_info, 1, fd);
-    if (!check_version(&vers_info, name, TRUE)) {
+    if (!check_version(&vers_info, name, TRUE, UTD_CHECKSIZES)) {
         (void) dlb_fclose(fd);
         goto give_up;
     }

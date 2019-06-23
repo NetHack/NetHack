@@ -90,7 +90,7 @@ pcmain(argc, argv)
 int argc;
 char *argv[];
 {
-    register int fd;
+    NHFILE *nhfp;
     register char *dir;
 #if defined(MSDOS)
     char *envp = NULL;
@@ -444,13 +444,16 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
     /* Set up level 0 file to keep the game state.
      */
-    fd = create_levelfile(0, (char *) 0);
-    if (fd < 0) {
+    nhfp = create_levelfile(0, (char *) 0);
+    if (!nhfp) {
         raw_print("Cannot create lock file");
     } else {
         g.hackpid = 1;
-        write(fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
-        nhclose(fd);
+        if (nhfp->structlevel)
+            write(nhfp->fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
+        if (nhfp->fieldlevel)
+            sfi_int(nhfp, &g.hackpid, "locking", "g.hackpid", 1);
+        close_nhfile(nhfp);
     }
 #ifdef MFLOPPY
     level_info[0].where = ACTIVE;
@@ -468,7 +471,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
  * We'll return here if new game player_selection() renames the hero.
  */
 attempt_restore:
-    if ((fd = restore_saved_game()) >= 0) {
+    if ((nhfp = restore_saved_game()) > 0) {
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
@@ -481,7 +484,7 @@ attempt_restore:
         pline("Restoring save file...");
         mark_synch(); /* flush output */
 
-        if (dorecover(fd)) {
+        if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             if (discover)
                 You("are in non-scoring discovery mode.");

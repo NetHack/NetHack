@@ -54,6 +54,7 @@ char *argv[];
 #ifdef CHDIR
     register char *dir;
 #endif
+    NHFILE *nhfp;
     boolean exact_username;
     boolean resuming = FALSE; /* assume new game */
     boolean plsel_once = FALSE;
@@ -280,7 +281,7 @@ attempt_restore:
         g.program_state.preserve_locks = 0; /* after getlock() */
     }
 
-    if (*g.plname && (fd = restore_saved_game()) >= 0) {
+    if (*g.plname && (nhfp = restore_saved_game()) != 0) {
         const char *fq_save = fqname(g.SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
@@ -295,7 +296,7 @@ attempt_restore:
 #endif
         pline("Restoring save file...");
         mark_synch(); /* flush output */
-        if (dorecover(fd)) {
+        if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             wd_message();
             if (discover || wizard) {

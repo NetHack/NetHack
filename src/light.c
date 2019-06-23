@@ -4,6 +4,8 @@
 
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
+#include "sfproto.h"
+
 
 /*
  * Mobile light sources.
@@ -42,25 +44,27 @@
 #define LSF_SHOW 0x1        /* display the light source */
 #define LSF_NEEDS_FIXUP 0x2 /* need oid fixup */
 
-STATIC_DCL void FDECL(write_ls, (int, light_source *));
-STATIC_DCL int FDECL(maybe_write_ls, (int, int, BOOLEAN_P));
+/* SAVE2018 */
+STATIC_DCL void FDECL(write_ls, (NHFILE *, light_source *));
+STATIC_DCL int FDECL(maybe_write_ls, (NHFILE *, int, BOOLEAN_P));
 
 /* imported from vision.c, for small circles */
 extern char circle_data[];
 extern char circle_start[];
 
+
 /* Create a new light source.  */
 void
 new_light_source(x, y, range, type, id)
-xchar x, y;
-int range, type;
-anything *id;
+    xchar x, y;
+    int range, type;
+    anything *id;
 {
     light_source *ls;
 
     if (range > MAX_RADIUS || range < 1) {
-        impossible("new_light_source:  illegal range %d", range);
-        return;
+	impossible("new_light_source:  illegal range %d", range);
+	return;
     }
 
     ls = (light_source *) alloc(sizeof *ls);
@@ -311,22 +315,28 @@ unsigned fmflags;
 
 /* Save all light sources of the given range. */
 void
-save_light_sources(fd, mode, range)
-int fd, mode, range;
+save_light_sources(nhfp, range)
+NHFILE *nhfp;
+int range;
 {
     int count, actual, is_global;
     light_source **prev, *curr;
 
-    if (perform_bwrite(mode)) {
-        count = maybe_write_ls(fd, range, FALSE);
-        bwrite(fd, (genericptr_t) &count, sizeof count);
-        actual = maybe_write_ls(fd, range, TRUE);
+    if (perform_bwrite(nhfp)) {
+        count = maybe_write_ls(nhfp, range, FALSE);
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
+        }
+        if (nhfp->fieldlevel) {
+            sfo_int(nhfp, &count, "lightsources", "lightsource_count", 1);
+        }
+        actual = maybe_write_ls(nhfp, range, TRUE);
         if (actual != count)
             panic("counted %d light sources, wrote %d! [range=%d]", count,
                   actual, range);
     }
-
-    if (release_data(mode)) {
+    
+     if (release_data(nhfp)) {
         for (prev = &g.light_base; (curr = *prev) != 0;) {
             if (!curr->id.a_monst) {
                 impossible("save_light_sources: no id! [range=%d]", range);
@@ -361,18 +371,24 @@ int fd, mode, range;
  * pointers.
  */
 void
-restore_light_sources(fd)
-int fd;
+restore_light_sources(nhfp)
+NHFILE *nhfp;
 {
     int count;
     light_source *ls;
 
     /* restore elements */
-    mread(fd, (genericptr_t) &count, sizeof count);
+    if (nhfp->structlevel)
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
+    if (nhfp->fieldlevel)
+        sfi_int(nhfp, &count, "lightsources", "lightsource_count", 1);
 
     while (count-- > 0) {
         ls = (light_source *) alloc(sizeof(light_source));
-        mread(fd, (genericptr_t) ls, sizeof(light_source));
+        if (nhfp->structlevel)
+            mread(nhfp->fd, (genericptr_t) ls, sizeof(light_source));
+        if (nhfp->fieldlevel)
+            sfi_ls_t(nhfp, ls, "lightsources", "lightsource", 1);
         ls->next = g.light_base;
         g.light_base = ls;
     }
@@ -430,14 +446,17 @@ boolean ghostly;
     }
 }
 
+/* SAVE2018 */
+
 /*
  * Part of the light source save routine.  Count up the number of light
  * sources that would be written.  If write_it is true, actually write
  * the light source out.
  */
 STATIC_OVL int
-maybe_write_ls(fd, range, write_it)
-int fd, range;
+maybe_write_ls(nhfp, range, write_it)
+NHFILE *nhfp;
+int range;
 boolean write_it;
 {
     int count = 0, is_global;
@@ -465,7 +484,7 @@ boolean write_it;
         if (is_global ^ (range == RANGE_LEVEL)) {
             count++;
             if (write_it)
-                write_ls(fd, ls);
+                write_ls(nhfp, ls);
         }
     }
 
@@ -499,10 +518,18 @@ light_sources_sanity_check()
     }
 }
 
-/* Write a light source structure to disk. */
+/* SAVE2018 */
+#if 0
 STATIC_OVL void
 write_ls(fd, ls)
 int fd;
+light_source *ls;
+#endif /* 0 */
+
+/* Write a light source structure to disk. */
+STATIC_OVL void
+write_ls(nhfp, ls)
+NHFILE *nhfp;
 light_source *ls;
 {
     anything arg_save;
@@ -511,7 +538,10 @@ light_source *ls;
 
     if (ls->type == LS_OBJECT || ls->type == LS_MONSTER) {
         if (ls->flags & LSF_NEEDS_FIXUP) {
-            bwrite(fd, (genericptr_t) ls, sizeof(light_source));
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) ls, sizeof(light_source));
+            if (nhfp->fieldlevel)
+                sfo_ls_t(nhfp, ls, "lightsources", "lightsource", 1);
         } else {
             /* replace object pointer with id for write, then put back */
             arg_save = ls->id;
@@ -531,7 +561,10 @@ light_source *ls;
                                ls->id.a_uint);
             }
             ls->flags |= LSF_NEEDS_FIXUP;
-            bwrite(fd, (genericptr_t) ls, sizeof(light_source));
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) ls, sizeof(light_source));
+            if (nhfp->fieldlevel)
+                sfo_ls_t(nhfp, ls, "lightsources", "lightsource", 1);
             ls->id = arg_save;
             ls->flags &= ~LSF_NEEDS_FIXUP;
         }

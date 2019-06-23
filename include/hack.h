@@ -232,6 +232,13 @@ enum hmon_atkmode_types {
     HMON_DRAGGED = 4  /* attached iron ball, pulled into mon */
 };
 
+enum saveformats {
+    invalid = 0,
+    historical = 1,     /* entire struct, binary, as-is */
+    lendian = 2,        /* each field, binary, little-endian */
+    ascii = 3           /* each field, ascii text (just proof of concept) */
+};
+
 /* sortloot() return type; needed before extern.h */
 struct sortloot_item {
     struct obj *obj;

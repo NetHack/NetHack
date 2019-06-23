@@ -80,6 +80,7 @@
                      * objects being thrown when the hangup occurs.    \
                      */
 
+#define MAIL
 /* Stuff to help the user with some common, yet significant errors */
 #define INTERJECT_PANIC 0
 #define INTERJECTION_TYPES (INTERJECT_PANIC + 1)
@@ -104,6 +105,7 @@ extern void NDECL(getlock);
 #endif
  
 #ifdef _MSC_VER
+#define HAS_STDINT
 #if (_MSC_VER > 1000)
 /* Visual C 8 warning elimination */
 #ifndef _CRT_SECURE_NO_DEPRECATE

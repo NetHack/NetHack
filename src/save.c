@@ -5,6 +5,8 @@
 
 #include "hack.h"
 #include "lev.h"
+#include "sfproto.h"
+
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -18,25 +20,35 @@ long bytes_counted;
 static int count_only;
 #endif
 
+/*SAVE2018*/
+extern void FDECL(nhout, (int, const char *,
+                    const char *, int, genericptr_t, int));
+extern int NDECL(nhdatatypes_size);
+
 #ifdef MICRO
 int dotcnt, dotrow; /* also used in restore */
 #endif
 
-STATIC_DCL void FDECL(savelevchn, (int, int));
-STATIC_DCL void FDECL(savedamage, (int, int));
-STATIC_DCL void FDECL(saveobj, (int, struct obj *));
-STATIC_DCL void FDECL(saveobjchn, (int, struct obj *, int));
-STATIC_DCL void FDECL(savemon, (int, struct monst *));
-STATIC_DCL void FDECL(savemonchn, (int, struct monst *, int));
-STATIC_DCL void FDECL(savetrapchn, (int, struct trap *, int));
-STATIC_DCL void FDECL(savegamestate, (int, int));
-STATIC_OVL void FDECL(save_msghistory, (int, int));
+STATIC_DCL void FDECL(savelevchn, (NHFILE *));
+STATIC_DCL void FDECL(savedamage, (NHFILE *));
+/* STATIC_DCL void FDECL(saveobj, (NHFILE *,struct obj *)); */
+/* STATIC_DCL void FDECL(savemon, (NHFILE *,struct monst *)); */
+/* STATIC_DCL void FDECL(savelevl, (NHFILE *, BOOLEAN_P)); */
+STATIC_DCL void FDECL(saveobj, (NHFILE *,struct obj *));
+STATIC_DCL void FDECL(savemon, (NHFILE *,struct monst *));
+STATIC_DCL void FDECL(savelevl, (NHFILE *,BOOLEAN_P));
+STATIC_DCL void FDECL(saveobjchn, (NHFILE *,struct obj *));
+STATIC_DCL void FDECL(savemonchn, (NHFILE *,struct monst *));
+STATIC_DCL void FDECL(savetrapchn, (NHFILE *,struct trap *));
+STATIC_DCL void FDECL(savegamestate, (NHFILE *));
+STATIC_OVL void FDECL(save_msghistory, (NHFILE *));
+
 #ifdef MFLOPPY
-STATIC_DCL void FDECL(savelev0, (int, XCHAR_P, int));
+STATIC_DCL void FDECL(savelev0, (NHFILE *, XCHAR_P, int));
 STATIC_DCL boolean NDECL(swapout_oldest);
 STATIC_DCL void FDECL(copyfile, (char *, char *));
 #endif /* MFLOPPY */
-STATIC_DCL void FDECL(savelevl, (int fd, BOOLEAN_P));
+/* STATIC_DCL void FDECL(savelevl, (int fd, BOOLEAN_P)); */
 STATIC_DCL void FDECL(def_bufon, (int));
 STATIC_DCL void FDECL(def_bufoff, (int));
 STATIC_DCL void FDECL(def_bflush, (int));
@@ -104,10 +116,11 @@ int
 dosave0()
 {
     const char *fq_save;
-    register int fd, ofd;
     xchar ltmp;
     d_level uz_save;
-    char whynot[BUFSZ];
+    char whynot[BUFSZ], indicate;
+    NHFILE *nhfp, *onhfp;
+    int cmc = 0;
 
     /* we may get here via hangup signal, in which case we want to fix up
        a few of things before saving so that they won't be restored in
@@ -138,9 +151,9 @@ dosave0()
 
     HUP if (iflags.window_inited) {
         nh_uncompress(fq_save);
-        fd = open_savefile();
-        if (fd > 0) {
-            (void) nhclose(fd);
+        nhfp = open_savefile();
+        if (nhfp) {
+            close_nhfile(nhfp);
             clear_nhwindow(WIN_MESSAGE);
             There("seems to be an old save file.");
             if (yn("Overwrite the old file?") == 'n') {
@@ -152,12 +165,16 @@ dosave0()
 
     HUP mark_synch(); /* flush any buffered screen output */
 
-    fd = create_savefile();
-    if (fd < 0) {
+    nhfp = create_savefile();
+    if (!nhfp) {
         HUP pline("Cannot open save file.");
         (void) delete_savefile(); /* ab@unido */
         return 0;
     }
+#ifdef SAVEFILE_DEBUGGING
+    if (nhfp && nhfp->fieldlevel && nhfp->fplog)
+        (void) fprintf(nhfp->fplog, "# just opened\n");
+#endif
 
     vision_recalc(2); /* shut down vision to prevent problems
                          in the event of an impossible() call */
@@ -182,8 +199,9 @@ dosave0()
     if (iflags.checkspace) {
         long fds, needed;
 
-        savelev(fd, ledger_no(&u.uz), COUNT_SAVE);
-        savegamestate(fd, COUNT_SAVE);
+        nhfp->mode = COUNTING;
+        savelev(nhfp, ledger_no(&u.uz));
+        savegamestate(nhfp);
         needed = bytes_counted;
 
         for (ltmp = 1; ltmp <= maxledgerno(); ltmp++)
@@ -197,7 +215,7 @@ dosave0()
                 pline("Require %ld bytes but only have %ld.", needed, fds);
             }
             flushout();
-            (void) nhclose(fd);
+            close_nhfile(nhfp);
             (void) delete_savefile();
             return 0;
         }
@@ -206,13 +224,36 @@ dosave0()
     }
 #endif /* MFLOPPY */
 
-    store_version(fd);
-    store_savefileinfo(fd);
-    store_plname_in_file(fd);
+    if (nhfp->fieldlevel && nhfp->addinfo && (nhfp->mode & WRITING))
+        sfo_addinfo(nhfp, "NetHack", "start", "savefile", 0);
+
+    nhfp->mode = WRITING | FREEING;
+    if (nhfp->mode & WRITING) {
+        if (nhfp->fieldlevel && nhfp->mode & WRITING) {
+            indicate = (nhfp->fnidx == lendian) ? 'l'
+                       : (nhfp->fnidx == ascii) ? 'a' : 'u';
+            sfo_char(nhfp, &indicate, "indicate", "format", 1);
+            cmc = critical_members_count();
+            {
+                pline("critical-members=%d.", cmc);
+            }
+            sfo_int(nhfp, &cmc, "validate", "critical_members_count", 1);
+        }
+        if (nhfp->structlevel && nhfp->mode & WRITING) {
+            indicate = 'h';     /* historical */
+            bwrite(nhfp->fd, (genericptr_t) &indicate, sizeof indicate);
+            bwrite(nhfp->fd, (genericptr_t) &cmc, sizeof cmc);
+        }
+    }
+    store_version(nhfp);
+    store_savefileinfo(nhfp);
+    if (nhfp && nhfp->fplog)
+        (void) fprintf(nhfp->fplog, "# post-validation\n");
+    store_plname_in_file(nhfp);
     g.ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
     g.usteed_id = (u.usteed ? u.usteed->m_id : 0);
-    savelev(fd, ledger_no(&u.uz), WRITE_SAVE | FREE_SAVE);
-    savegamestate(fd, WRITE_SAVE | FREE_SAVE);
+    savelev(nhfp, ledger_no(&u.uz));
+    savegamestate(nhfp);
 
     /* While copying level files around, zero out u.uz to keep
      * parts of the restore code from completely initializing all
@@ -243,23 +284,26 @@ dosave0()
         }
         mark_synch();
 #endif
-        ofd = open_levelfile(ltmp, whynot);
-        if (ofd < 0) {
+        onhfp = open_levelfile(ltmp, whynot);
+        if (!onhfp) {
             HUP pline1(whynot);
-            (void) nhclose(fd);
+            close_nhfile(nhfp);
             (void) delete_savefile();
             HUP Strcpy(g.killer.name, whynot);
             HUP done(TRICKED);
             return 0;
         }
         minit(); /* ZEROCOMP */
-        getlev(ofd, g.hackpid, ltmp, FALSE);
-        (void) nhclose(ofd);
-        bwrite(fd, (genericptr_t) &ltmp, sizeof ltmp); /* level number*/
-        savelev(fd, ltmp, WRITE_SAVE | FREE_SAVE);     /* actual level*/
+        getlev(onhfp, g.hackpid, ltmp, FALSE);
+        close_nhfile(onhfp);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp); /* level number*/
+        if (nhfp->fieldlevel)
+            sfo_xchar(nhfp, &ltmp, "gamestate", "level_number", 1);         /* xchar */
+        savelev(nhfp, ltmp);     /* actual level*/
         delete_levelfile(ltmp);
     }
-    bclose(fd);
+    close_nhfile(nhfp);
 
     u.uz = uz_save;
 
@@ -273,84 +317,141 @@ dosave0()
 }
 
 STATIC_OVL void
-savegamestate(fd, mode)
-register int fd, mode;
+savegamestate(nhfp)
+NHFILE *nhfp;
 {
     unsigned long uid;
 
 #ifdef MFLOPPY
-    count_only = (mode & COUNT_SAVE);
+    count_only = (nhfp->mode & COUNTING);
 #endif
     uid = (unsigned long) getuid();
-    bwrite(fd, (genericptr_t) &uid, sizeof uid);
-    bwrite(fd, (genericptr_t) &g.context, sizeof g.context);
-    bwrite(fd, (genericptr_t) &flags, sizeof flags);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &uid, sizeof uid);
+        bwrite(nhfp->fd, (genericptr_t) &g.context, sizeof g.context);
+        bwrite(nhfp->fd, (genericptr_t) &flags, sizeof flags);
 #ifdef SYSFLAGS
-    bwrite(fd, (genericptr_t) &sysflags, sysflags);
+        bwrite(nhfp->fd, (genericptr_t) &sysflags, sysflags);
 #endif
+    }
+    if (nhfp->fieldlevel) {
+        sfo_ulong(nhfp, &uid, "gamestate", "uid", 1);
+        sfo_context_info(nhfp, &g.context, "gamestate", "g.context", 1);
+        sfo_flag(nhfp, &flags, "gamestate" , "flags", 1);
+#ifdef SYSFLAGS
+        sfo_flag(nhfp, &sysflags, "gamestate" , "sysflags", 1);
+#endif
+    }
+    urealtime.finish_time = getnow();
+    urealtime.realtime += (long) (urealtime.finish_time
+                                    - urealtime.start_timing);
+
     urealtime.finish_time = getnow();
     urealtime.realtime += (long) (urealtime.finish_time
                                   - urealtime.start_timing);
-    bwrite(fd, (genericptr_t) &u, sizeof u);
-    bwrite(fd, yyyymmddhhmmss(ubirthday), 14);
-    bwrite(fd, (genericptr_t) &urealtime.realtime, sizeof urealtime.realtime);
-    bwrite(fd, yyyymmddhhmmss(urealtime.start_timing), 14);  /** Why? **/
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &u, sizeof u);
+        bwrite(nhfp->fd, yyyymmddhhmmss(ubirthday), 14);
+        bwrite(nhfp->fd, (genericptr_t) &urealtime.realtime,
+               sizeof urealtime.realtime);
+        bwrite(nhfp->fd, yyyymmddhhmmss(urealtime.start_timing), 14);
+    }
+    if (nhfp->fieldlevel) {
+        sfo_you(nhfp, &u, "gamestate", "you", 1);
+        sfo_str(nhfp, yyyymmddhhmmss(ubirthday), "gamestate", "ubirthday", 14);
+        sfo_long(nhfp, &urealtime.realtime, "gamestate", "realtime", 1);
+        sfo_str(nhfp, yyyymmddhhmmss(urealtime.start_timing), "gamestate", "start_timing", 14);
+    }
     /* this is the value to use for the next update of urealtime.realtime */
     urealtime.start_timing = urealtime.finish_time;
-    save_killers(fd, mode);
+    save_killers(nhfp);
 
     /* must come before g.migrating_objs and g.migrating_mons are freed */
-    save_timers(fd, mode, RANGE_GLOBAL);
-    save_light_sources(fd, mode, RANGE_GLOBAL);
+    save_timers(nhfp, RANGE_GLOBAL);
+    save_light_sources(nhfp, RANGE_GLOBAL);
 
-    saveobjchn(fd, g.invent, mode);
+    saveobjchn(nhfp, g.invent);
     if (BALL_IN_MON) {
         /* prevent loss of ball & chain when swallowed */
         uball->nobj = uchain;
         uchain->nobj = (struct obj *) 0;
-        saveobjchn(fd, uball, mode);
+        saveobjchn(nhfp, uball);
     } else {
-        saveobjchn(fd, (struct obj *) 0, mode);
+        saveobjchn(nhfp, (struct obj *) 0);
     }
 
-    saveobjchn(fd, g.migrating_objs, mode);
-    savemonchn(fd, g.migrating_mons, mode);
-    if (release_data(mode)) {
+    saveobjchn(nhfp, g.migrating_objs);
+    savemonchn(nhfp, g.migrating_mons);
+    if (release_data(nhfp)) {
         g.invent = 0;
         g.migrating_objs = 0;
         g.migrating_mons = 0;
     }
-    bwrite(fd, (genericptr_t) g.mvitals, sizeof g.mvitals);
+    if (nhfp->structlevel)
+        bwrite(nhfp->fd, (genericptr_t) g.mvitals, sizeof g.mvitals);
+    if (nhfp->fieldlevel) {
+        int i;
 
-    save_dungeon(fd, (boolean) !!perform_bwrite(mode),
-                 (boolean) !!release_data(mode));
-    savelevchn(fd, mode);
-    bwrite(fd, (genericptr_t) &g.moves, sizeof g.moves);
-    bwrite(fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
-    bwrite(fd, (genericptr_t) &g.quest_status, sizeof g.quest_status);
-    bwrite(fd, (genericptr_t) g.spl_book,
-           sizeof(struct spell) * (MAXSPELL + 1));
-    save_artifacts(fd);
-    save_oracles(fd, mode);
-    if (g.ustuck_id)
-        bwrite(fd, (genericptr_t) &g.ustuck_id, sizeof g.ustuck_id);
-    if (g.usteed_id)
-        bwrite(fd, (genericptr_t) &g.usteed_id, sizeof g.usteed_id);
-    bwrite(fd, (genericptr_t) g.pl_character, sizeof g.pl_character);
-    bwrite(fd, (genericptr_t) g.pl_fruit, sizeof g.pl_fruit);
-    savefruitchn(fd, mode);
-    savenames(fd, mode);
-    save_waterlevel(fd, mode);
-    save_msghistory(fd, mode);
-    bflush(fd);
+        for (i = 0; i < NUMMONS; ++i)
+            sfo_mvitals(nhfp, &g.mvitals[i], "gamestate", "g.mvitals", 1);
+    }            
+    save_dungeon(nhfp, (boolean) !!perform_bwrite(nhfp),
+                 (boolean) !!release_data(nhfp));
+    savelevchn(nhfp);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &g.moves, sizeof g.moves);
+        bwrite(nhfp->fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
+        bwrite(nhfp->fd, (genericptr_t) &g.quest_status, sizeof g.quest_status);
+        bwrite(nhfp->fd, (genericptr_t) g.spl_book,
+               sizeof (struct spell) * (MAXSPELL + 1));
+    }
+    if (nhfp->fieldlevel) {
+        int i;
+        struct spell *sptmp;
+
+        sfo_long(nhfp, &g.moves, "gamestate", "g.moves", 1);
+        sfo_long(nhfp, &g.monstermoves, "gamestate", "g.monstermoves", 1);
+        sfo_q_score(nhfp, &g.quest_status, "gamestate", "g.quest_status", 1);
+        sptmp = g.spl_book;
+        for (i = 0; i < (MAXSPELL + 1); ++i)
+            sfo_spell(nhfp, sptmp++, "gamestate", "g.spl_book", 1);
+    }
+    save_artifacts(nhfp);
+    save_oracles(nhfp);
+    if (g.ustuck_id) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &g.ustuck_id, sizeof g.ustuck_id);
+        if (nhfp->fieldlevel)
+            sfo_unsigned(nhfp, &g.ustuck_id, "gamestate", "g.ustuck_id", 1);
+    }
+    if (g.usteed_id) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &g.usteed_id, sizeof g.usteed_id);
+        if (nhfp->fieldlevel)
+            sfo_unsigned(nhfp, &g.usteed_id, "gamestate", "g.usteed_id", 1);
+    }
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) g.pl_character, sizeof g.pl_character);
+        bwrite(nhfp->fd, (genericptr_t) g.pl_fruit, sizeof g.pl_fruit);
+    }
+    if (nhfp->fieldlevel) {
+        sfo_char(nhfp, g.pl_character, "gamestate", "g.pl_character", sizeof g.pl_character);
+        sfo_char(nhfp, g.pl_fruit, "gamestate", "g.pl_fruit", sizeof g.pl_fruit); 
+    }
+    savefruitchn(nhfp);
+    savenames(nhfp);
+    save_waterlevel(nhfp);
+    save_msghistory(nhfp);
+    if (nhfp->structlevel)
+        bflush(nhfp->fd);
 }
 
 boolean
-tricked_fileremoved(fd, whynot)
-int fd;
+tricked_fileremoved(nhfp, whynot)
+NHFILE *nhfp;
 char *whynot;
 {
-    if (fd < 0) {
+    if (!nhfp) {
         pline1(whynot);
         pline("Probably someone removed it.");
         Strcpy(g.killer.name, whynot);
@@ -364,8 +465,10 @@ char *whynot;
 void
 savestateinlock()
 {
-    int fd, hpid;
+    int hpid;
+    static boolean havestate = TRUE;
     char whynot[BUFSZ];
+    NHFILE *nhfp;
 
     /* When checkpointing is on, the full state needs to be written
      * on each checkpoint.  When checkpointing is off, only the pid
@@ -385,11 +488,12 @@ savestateinlock()
          * to any internal compression schemes since they must be
          * readable by an external utility
          */
-        fd = open_levelfile(0, whynot);
-        if (tricked_fileremoved(fd, whynot))
+        nhfp = open_levelfile(0, whynot);
+        if (tricked_fileremoved(nhfp, whynot))
             return;
 
-        (void) read(fd, (genericptr_t) &hpid, sizeof hpid);
+        if (nhfp->structlevel)
+            (void) read(nhfp->fd, (genericptr_t) &hpid, sizeof hpid);
         if (g.hackpid != hpid) {
             Sprintf(whynot, "Level #0 pid (%d) doesn't match ours (%d)!",
                     hpid, g.hackpid);
@@ -397,30 +501,37 @@ savestateinlock()
             Strcpy(g.killer.name, whynot);
             done(TRICKED);
         }
-        (void) nhclose(fd);
+        close_nhfile(nhfp);
 
-        fd = create_levelfile(0, whynot);
-        if (fd < 0) {
+        nhfp = create_levelfile(0, whynot);
+        if (!nhfp) {
             pline1(whynot);
             Strcpy(g.killer.name, whynot);
             done(TRICKED);
             return;
         }
-        (void) write(fd, (genericptr_t) &g.hackpid, sizeof g.hackpid);
+        nhfp->mode = WRITING;
+        if (nhfp->structlevel)
+            (void) write(nhfp->fd, (genericptr_t) &g.hackpid, sizeof g.hackpid);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &g.hackpid, "gamestate", "g.hackpid", 1);
         if (flags.ins_chkpt) {
             int currlev = ledger_no(&u.uz);
 
-            (void) write(fd, (genericptr_t) &currlev, sizeof currlev);
-            save_savefile_name(fd);
-            store_version(fd);
-            store_savefileinfo(fd);
-            store_plname_in_file(fd);
+            if (nhfp->structlevel)
+                (void) write(nhfp->fd, (genericptr_t) &currlev, sizeof currlev);
+            if (nhfp->fieldlevel)
+                sfo_int(nhfp, &currlev, "gamestate", "savestateinlock", 1);
+            save_savefile_name(nhfp);
+            store_version(nhfp);
+            store_savefileinfo(nhfp);
+            store_plname_in_file(nhfp);
 
             g.ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
             g.usteed_id = (u.usteed ? u.usteed->m_id : 0);
-            savegamestate(fd, WRITE_SAVE);
+            savegamestate(nhfp);
         }
-        bclose(fd);
+        close_nhfile(nhfp);
     }
     g.havestate = flags.ins_chkpt;
 }
@@ -428,14 +539,15 @@ savestateinlock()
 
 #ifdef MFLOPPY
 boolean
-savelev(fd, lev, mode)
-int fd;
+savelev(nhfp, lev)
+NHFILE *nhfp;
 xchar lev;
-int mode;
 {
-    if (mode & COUNT_SAVE) {
+    if (nhfp->mode & COUNTING) {
+        int savemode = nhfp->mode;
+
         bytes_counted = 0;
-        savelev0(fd, lev, COUNT_SAVE);
+        savelev0(nhfp, lev);
         /* probably bytes_counted will be filled in again by an
          * immediately following WRITE_SAVE anyway, but we'll
          * leave it out of checkspace just in case */
@@ -445,11 +557,11 @@ int mode;
                     return FALSE;
         }
     }
-    if (mode & (WRITE_SAVE | FREE_SAVE)) {
+    if (nhfp->mode & (WRITING | FREEING)) {
         bytes_counted = 0;
-        savelev0(fd, lev, mode);
+        savelev0(nhfp, lev);
     }
-    if (mode != FREE_SAVE) {
+    if (nhfp->mode != FREEING) {
         g.level_info[lev].where = ACTIVE;
         g.level_info[lev].time = g.moves;
         g.level_info[lev].size = bytes_counted;
@@ -458,14 +570,13 @@ int mode;
 }
 
 STATIC_OVL void
-savelev0(fd, lev, mode)
+savelev0(nhfp, lev)
 #else
 void
-savelev(fd, lev, mode)
+savelev(nhfp, lev)
 #endif
-int fd;
+NHFILE *nhfp;
 xchar lev;
-int mode;
 {
 #ifdef TOS
     short tlev;
@@ -487,8 +598,8 @@ int mode;
      *  portion (which has some freeing to do), then jump quite a bit
      *  further ahead to the middle of the 'actual level data' portion.
      */
-    if (mode != FREE_SAVE) {
-        /* WRITE_SAVE (probably ORed with FREE_SAVE), or COUNT_SAVE */
+    if (nhfp->mode != FREEING) {
+        /* WRITING (probably ORed with FREEING), or COUNTING */
 
         /* purge any dead monsters (necessary if we're starting
            a panic save rather than a normal one, or sometimes
@@ -497,20 +608,29 @@ int mode;
         if (iflags.purge_monsters)
             dmonsfree();
 
-        if (fd < 0)
+        if (!nhfp)
             panic("Save on bad file!"); /* impossible */
 #ifdef MFLOPPY
-        count_only = (mode & COUNT_SAVE);
+        count_only = (nhfp->mode & COUNTING);
 #endif
         if (lev >= 0 && lev <= maxledgerno())
             g.level_info[lev].flags |= VISITED;
-        bwrite(fd, (genericptr_t) &g.hackpid, sizeof g.hackpid);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &g.hackpid, sizeof g.hackpid);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &g.hackpid, "gamestate", "g.hackpid", 1);
 #ifdef TOS
         tlev = lev;
         tlev &= 0x00ff;
-        bwrite(fd, (genericptr_t) &tlev, sizeof tlev);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &tlev, sizeof tlev);
+        if (nhfp->fieldlevel)
+            sfo_short(nhfp, &tlev, "gamestate", "tlev", 1);
 #else
-        bwrite(fd, (genericptr_t) &lev, sizeof lev);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &lev, sizeof lev);
+        if (nhfp->fieldlevel)
+            sfo_xchar(nhfp, &lev, "gamestate", "dlvl", 1);
 #endif
     }
 
@@ -520,37 +640,57 @@ int mode;
        the guessing that was needed in 3.4.3 and without having to
        interpret level data to find where to start; unfortunately it
        still needs to handle all the data compression schemes */
-    savecemetery(fd, mode, &g.level.bonesinfo);
-    if (mode == FREE_SAVE) /* see above */
+    savecemetery(nhfp, &g.level.bonesinfo);
+    if (nhfp->mode == FREEING) /* see above */
         goto skip_lots;
 
-    savelevl(fd, (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
-    bwrite(fd, (genericptr_t) g.lastseentyp, sizeof g.lastseentyp);
-    bwrite(fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
-    bwrite(fd, (genericptr_t) &g.upstair, sizeof (stairway));
-    bwrite(fd, (genericptr_t) &g.dnstair, sizeof (stairway));
-    bwrite(fd, (genericptr_t) &g.upladder, sizeof (stairway));
-    bwrite(fd, (genericptr_t) &g.dnladder, sizeof (stairway));
-    bwrite(fd, (genericptr_t) &g.sstairs, sizeof (stairway));
-    bwrite(fd, (genericptr_t) &g.updest, sizeof (dest_area));
-    bwrite(fd, (genericptr_t) &g.dndest, sizeof (dest_area));
-    bwrite(fd, (genericptr_t) &g.level.flags, sizeof g.level.flags);
-    bwrite(fd, (genericptr_t) g.doors, sizeof g.doors);
-    save_rooms(fd); /* no dynamic memory to reclaim */
+    savelevl(nhfp, (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) g.lastseentyp, sizeof g.lastseentyp);
+        bwrite(nhfp->fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
+        bwrite(nhfp->fd, (genericptr_t) &g.upstair, sizeof (stairway));
+        bwrite(nhfp->fd, (genericptr_t) &g.dnstair, sizeof (stairway));
+        bwrite(nhfp->fd, (genericptr_t) &g.upladder, sizeof (stairway));
+        bwrite(nhfp->fd, (genericptr_t) &g.dnladder, sizeof (stairway));
+        bwrite(nhfp->fd, (genericptr_t) &g.sstairs, sizeof (stairway));
+        bwrite(nhfp->fd, (genericptr_t) &g.updest, sizeof (dest_area));
+        bwrite(nhfp->fd, (genericptr_t) &g.dndest, sizeof (dest_area));
+        bwrite(nhfp->fd, (genericptr_t) &g.level.flags, sizeof g.level.flags);
+        bwrite(nhfp->fd, (genericptr_t) g.doors, sizeof g.doors);
+    }
+    if (nhfp->fieldlevel) {
+        int i, c, r;
+
+        for (c = 0; c < COLNO; ++c)
+            for (r = 0; r < ROWNO; ++r)
+                sfo_schar(nhfp, &g.lastseentyp[c][r], "lev", "g.lastseentyp", 1);
+        sfo_long(nhfp, &g.monstermoves, "lev", "timestmp", 1);
+        sfo_stairway(nhfp, &g.upstair, "lev", "g.upstair", 1);
+        sfo_stairway(nhfp, &g.dnstair, "lev", "g.dnstair", 1);
+        sfo_stairway(nhfp, &g.upladder, "lev", "g.upladder", 1);
+        sfo_stairway(nhfp, &g.dnladder, "lev", "g.dnladder", 1);
+        sfo_stairway(nhfp, &g.sstairs, "lev", "g.sstairs", 1);
+        sfo_dest_area(nhfp, &g.updest, "lev", "g.updest", 1);
+        sfo_dest_area(nhfp, &g.dndest, "lev", "g.dndest", 1);
+        sfo_levelflags(nhfp, &g.level.flags, "lev", "g.level.flags", 1);
+        for (i = 0; i < DOORMAX; ++i)
+            sfo_nhcoord(nhfp, &g.doors[i], "lev", "door", 1);
+    }
+    save_rooms(nhfp); /* no dynamic memory to reclaim */
 
     /* from here on out, saving also involves allocated memory cleanup */
  skip_lots:
     /* timers and lights must be saved before monsters and objects */
-    save_timers(fd, mode, RANGE_LEVEL);
-    save_light_sources(fd, mode, RANGE_LEVEL);
+    save_timers(nhfp, RANGE_LEVEL);
+    save_light_sources(nhfp, RANGE_LEVEL);
 
-    savemonchn(fd, fmon, mode);
-    save_worm(fd, mode); /* save worm information */
-    savetrapchn(fd, g.ftrap, mode);
-    saveobjchn(fd, fobj, mode);
-    saveobjchn(fd, g.level.buriedobjlist, mode);
-    saveobjchn(fd, g.billobjs, mode);
-    if (release_data(mode)) {
+    savemonchn(nhfp, fmon);
+    save_worm(nhfp); /* save worm information */
+    savetrapchn(nhfp, g.ftrap);
+    saveobjchn(nhfp, fobj);
+    saveobjchn(nhfp, g.level.buriedobjlist);
+    saveobjchn(nhfp, g.billobjs);
+    if (release_data(nhfp)) {
         int x,y;
 
         for (y = 0; y < ROWNO; y++)
@@ -563,16 +703,18 @@ int mode;
         g.billobjs = 0;
         /* level.bonesinfo = 0; -- handled by savecemetery() */
     }
-    save_engravings(fd, mode);
-    savedamage(fd, mode); /* pending shop wall and/or floor repair */
-    save_regions(fd, mode);
-    if (mode != FREE_SAVE)
-        bflush(fd);
+    save_engravings(nhfp);
+    savedamage(nhfp); /* pending shop wall and/or floor repair */
+    save_regions(nhfp);
+    if (nhfp->mode != FREEING) {
+        if (nhfp->structlevel)
+            bflush(nhfp->fd);
+    }
 }
 
 STATIC_OVL void
-savelevl(fd, rlecomp)
-int fd;
+savelevl(nhfp, rlecomp)
+NHFILE *nhfp;
 boolean rlecomp;
 {
 #ifdef RLECOMP
@@ -604,8 +746,14 @@ boolean rlecomp;
                 } else {
                     /* run has been broken, write out run-length encoding */
  writeout:
-                    bwrite(fd, (genericptr_t) &match, sizeof (uchar));
-                    bwrite(fd, (genericptr_t) rgrm, sizeof (struct rm));
+                    if (nhfp->structlevel) {
+                        bwrite(nhfp->fd, (genericptr_t) &match, sizeof (uchar));
+                        bwrite(nhfp->fd, (genericptr_t) rgrm, sizeof (struct rm));
+		    }
+		    if (nhfp->fieldlevel) {
+                        sfo_uchar(nhfp, &match, "levl", "match", 1);
+                        sfo_rm(nhfp, rgrm, "levl", "rgrm", 1);
+		    }
                     /* start encoding again. we have at least 1 rm
                        in the next run, viz. this one. */
                     match = 1;
@@ -614,15 +762,30 @@ boolean rlecomp;
             }
         }
         if (match > 0) {
-            bwrite(fd, (genericptr_t) &match, sizeof (uchar));
-            bwrite(fd, (genericptr_t) rgrm, sizeof (struct rm));
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) &match, sizeof (uchar));
+                bwrite(nhfp->fd, (genericptr_t) rgrm, sizeof (struct rm));
+            }
+            if (nhfp->fieldlevel) {
+                sfo_uchar(nhfp, &match, "levl", "match", 1);
+                sfo_rm(nhfp, rgrm, "levl", "rgrm", 1);
+            }
         }
         return;
     }
 #else /* !RLECOMP */
     nhUse(rlecomp);
 #endif /* ?RLECOMP */
-    bwrite(fd, (genericptr_t) levl, sizeof levl);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) levl, sizeof levl);
+    }
+    if (nhfp->fieldlevel) {
+        int c, r;
+
+        for (c = 0; c < COLNO; ++c)
+            for (r = 0; r < ROWNO; ++r)
+                sfo_rm(nhfp, &g.level.locations[c][r], "room", "levl", 1);
+    }
 }
 
 /*ARGSUSED*/
@@ -676,14 +839,14 @@ static boolean buffering = FALSE;
 
 STATIC_OVL void
 def_bufon(fd)
-int fd;
+    int fd;
 {
 #ifdef UNIX
-    if (bw_fd != fd) {
-        if (bw_fd >= 0)
+    if(bw_fd != fd) {
+        if(bw_fd >= 0)
             panic("double buffering unexpected");
         bw_fd = fd;
-        if ((bw_FILE = fdopen(fd, "w")) == 0)
+        if((bw_FILE = fdopen(fd, "w")) == 0)
             panic("buffering of file %d failed", fd);
     }
 #endif
@@ -777,11 +940,11 @@ int fd;
  * file is written out.
  */
 
-#define RLESC '\0' /* Leading character for run of LRESC's */
+#define RLESC '\0'    /* Leading character for run of LRESC's */
 #define flushoutrun(ln) (zerocomp_bputc(RLESC), zerocomp_bputc(ln), ln = -1)
 
 #ifndef ZEROCOMP_BUFSIZ
-#define ZEROCOMP_BUFSIZ BUFSZ
+# define ZEROCOMP_BUFSIZ BUFSZ
 #endif
 static NEARDATA unsigned char outbuf[ZEROCOMP_BUFSIZ];
 static NEARDATA unsigned short outbufp = 0;
@@ -801,18 +964,18 @@ int c;
 #ifdef MFLOPPY
     bytes_counted++;
     if (count_only)
-        return;
+      return;
 #endif
     if (outbufp >= sizeof outbuf) {
         (void) write(bwritefd, outbuf, sizeof outbuf);
         outbufp = 0;
     }
-    outbuf[outbufp++] = (unsigned char) c;
+    outbuf[outbufp++] = (unsigned char)c;
 }
 
 /*ARGSUSED*/
-void STATIC_OVL
-zerocomp_bufon(fd)
+void
+STATIC_OVL zerocomp_bufon(fd)
 int fd;
 {
     compressing = TRUE;
@@ -910,56 +1073,70 @@ int fd;
 #endif /* ZEROCOMP */
 
 STATIC_OVL void
-savelevchn(fd, mode)
-register int fd, mode;
+savelevchn(nhfp)
+NHFILE *nhfp;
 {
     s_level *tmplev, *tmplev2;
     int cnt = 0;
 
     for (tmplev = g.sp_levchn; tmplev; tmplev = tmplev->next)
         cnt++;
-    if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &cnt, sizeof cnt);
-
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &cnt, sizeof cnt);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &cnt, "levchn", "lev_count", 1);
+    }
     for (tmplev = g.sp_levchn; tmplev; tmplev = tmplev2) {
         tmplev2 = tmplev->next;
-        if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) tmplev, sizeof *tmplev);
-        if (release_data(mode))
+        if (perform_bwrite(nhfp)) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) tmplev, sizeof *tmplev);
+            if (nhfp->fieldlevel)
+                sfo_s_level(nhfp, tmplev, "levchn", "s_level", 1);
+	}
+        if (release_data(nhfp))
             free((genericptr_t) tmplev);
     }
-    if (release_data(mode))
+    if (release_data(nhfp))
         g.sp_levchn = 0;
 }
 
 /* used when saving a level and also when saving dungeon overview data */
 void
-savecemetery(fd, mode, cemeteryaddr)
-int fd;
-int mode;
+savecemetery(nhfp, cemeteryaddr)
+NHFILE *nhfp;
 struct cemetery **cemeteryaddr;
 {
     struct cemetery *thisbones, *nextbones;
     int flag;
 
     flag = *cemeteryaddr ? 0 : -1;
-    if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &flag, sizeof flag);
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &flag, sizeof flag);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &flag, "cemetery", "cemetery_flag", 1);
+    }
     nextbones = *cemeteryaddr;
     while ((thisbones = nextbones) != 0) {
         nextbones = thisbones->next;
-        if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) thisbones, sizeof *thisbones);
-        if (release_data(mode))
+        if (perform_bwrite(nhfp)) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) thisbones, sizeof *thisbones);
+            if (nhfp->fieldlevel)
+                sfo_cemetery(nhfp, thisbones, "cemetery", "cemetery", 1);
+	}
+        if (release_data(nhfp))
             free((genericptr_t) thisbones);
     }
-    if (release_data(mode))
+    if (release_data(nhfp))
         *cemeteryaddr = 0;
 }
 
 STATIC_OVL void
-savedamage(fd, mode)
-register int fd, mode;
+savedamage(nhfp)
+NHFILE *nhfp;
 {
     register struct damage *damageptr, *tmp_dam;
     unsigned int xl = 0;
@@ -967,64 +1144,107 @@ register int fd, mode;
     damageptr = g.level.damagelist;
     for (tmp_dam = damageptr; tmp_dam; tmp_dam = tmp_dam->next)
         xl++;
-    if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &xl, sizeof xl);
-
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &xl, sizeof xl);
+        if (nhfp->fieldlevel)
+            sfo_unsigned(nhfp, &xl, "damage", "damage_count", 1);
+    }
     while (xl--) {
-        if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) damageptr, sizeof *damageptr);
+        if (perform_bwrite(nhfp)) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) damageptr, sizeof *damageptr);
+            if (nhfp->fieldlevel)
+                sfo_damage(nhfp, damageptr, "damage", "damage", 1);
+	}
         tmp_dam = damageptr;
         damageptr = damageptr->next;
-        if (release_data(mode))
+        if (release_data(nhfp))
             free((genericptr_t) tmp_dam);
     }
-    if (release_data(mode))
+    if (release_data(nhfp))
         g.level.damagelist = 0;
 }
 
 STATIC_OVL void
-saveobj(fd, otmp)
-int fd;
+saveobj(nhfp, otmp)
+NHFILE *nhfp;
 struct obj *otmp;
 {
     int buflen, zerobuf = 0;
 
     buflen = (int) sizeof (struct obj);
-    bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-    bwrite(fd, (genericptr_t) otmp, buflen);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        bwrite(nhfp->fd, (genericptr_t) otmp, buflen);
+    }
+    if (nhfp->fieldlevel) {
+        sfo_int(nhfp, &buflen, "obj", "obj_length", 1);
+        sfo_obj(nhfp, otmp, "obj", "obj", 1);
+    }
     if (otmp->oextra) {
         buflen = ONAME(otmp) ? (int) strlen(ONAME(otmp)) + 1 : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) ONAME(otmp), buflen);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "obj", "oname_length", 1);
 
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) ONAME(otmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_str(nhfp, ONAME(otmp), "obj", "oname", buflen);
+        }
         /* defer to savemon() for this one */
-        if (OMONST(otmp))
-            savemon(fd, OMONST(otmp));
-        else
-            bwrite(fd, (genericptr_t) &zerobuf, sizeof zerobuf);
-
+        if (OMONST(otmp)) {
+            savemon(nhfp, OMONST(otmp));
+        } else {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) &zerobuf, sizeof zerobuf);
+            if (nhfp->fieldlevel)
+                sfo_int(nhfp, &zerobuf, "obj", "omonst_length", 1);
+	}
         buflen = OMID(otmp) ? (int) sizeof (unsigned) : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) OMID(otmp), buflen);
-
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "obj", "omid_length", 1);            
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) OMID(otmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_int(nhfp, &buflen, "obj", "omid_length", 1);
+	}
         /* TODO: post 3.6.x, get rid of this */
         buflen = OLONG(otmp) ? (int) sizeof (long) : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) OLONG(otmp), buflen);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "obj", "olong_length", 1);
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) OLONG(otmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_long(nhfp, OLONG(otmp), "obj", "olong", 1);
+	}
 
         buflen = OMAILCMD(otmp) ? (int) strlen(OMAILCMD(otmp)) + 1 : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) OMAILCMD(otmp), buflen);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "obj", "omailcmd_length", 1);
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                  bwrite(nhfp->fd, (genericptr_t) OMAILCMD(otmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_str(nhfp, OMAILCMD(otmp), "obj", "omailcmd", buflen);
+        }
     }
 }
 
 STATIC_OVL void
-saveobjchn(fd, otmp, mode)
-register int fd, mode;
+saveobjchn(nhfp, otmp)
+NHFILE *nhfp;
 register struct obj *otmp;
 {
     register struct obj *otmp2;
@@ -1032,12 +1252,12 @@ register struct obj *otmp;
 
     while (otmp) {
         otmp2 = otmp->nobj;
-        if (perform_bwrite(mode)) {
-            saveobj(fd, otmp);
+        if (perform_bwrite(nhfp)) {
+            saveobj(nhfp, otmp);
         }
         if (Has_contents(otmp))
-            saveobjchn(fd, otmp->cobj, mode);
-        if (release_data(mode)) {
+            saveobjchn(nhfp, otmp->cobj);
+        if (release_data(nhfp)) {
             /*
              * If these are on the floor, the discarding could be
              * due to game save, or we could just be changing levels.
@@ -1065,13 +1285,17 @@ register struct obj *otmp;
         }
         otmp = otmp2;
     }
-    if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &minusone, sizeof (int));
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &minusone, sizeof (int));
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &minusone, "obj", "obj_length", 1);
+    }
 }
 
 STATIC_OVL void
-savemon(fd, mtmp)
-int fd;
+savemon(nhfp, mtmp)
+NHFILE *nhfp;
 struct monst *mtmp;
 {
     int buflen;
@@ -1079,42 +1303,93 @@ struct monst *mtmp;
     mtmp->mtemplit = 0; /* normally clear; if set here then a panic save
                          * is being written while bhit() was executing */
     buflen = (int) sizeof (struct monst);
-    bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-    bwrite(fd, (genericptr_t) mtmp, buflen);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        bwrite(nhfp->fd, (genericptr_t) mtmp, buflen);
+    }
+    if (nhfp->fieldlevel) {
+        sfo_int(nhfp, &buflen, "mon", "monst_length", 1);
+        sfo_monst(nhfp, mtmp, "mon", "monst", 1);
+    }
     if (mtmp->mextra) {
         buflen = MNAME(mtmp) ? (int) strlen(MNAME(mtmp)) + 1 : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) MNAME(mtmp), buflen);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "mon", "mname_length", 1);
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) MNAME(mtmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_str(nhfp, MNAME(mtmp), "mon", "mname", buflen);
+        }
         buflen = EGD(mtmp) ? (int) sizeof (struct egd) : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) EGD(mtmp), buflen);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "mon", "egd_length", 1);
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) EGD(mtmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_egd(nhfp, EGD(mtmp), "mon", "egd", 1);
+        }
         buflen = EPRI(mtmp) ? (int) sizeof (struct epri) : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) EPRI(mtmp), buflen);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "mon", "epri_length", 1);
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) EPRI(mtmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_epri(nhfp, EPRI(mtmp), "mon", "epri", 1);
+        }
         buflen = ESHK(mtmp) ? (int) sizeof (struct eshk) : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) ESHK(mtmp), buflen);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof (int));
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "mon", "eshk_length", 1);
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) ESHK(mtmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_eshk(nhfp, ESHK(mtmp), "mon", "eshk", 1);
+        }
         buflen = EMIN(mtmp) ? (int) sizeof (struct emin) : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) EMIN(mtmp), buflen);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof (int));
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "mon", "emin_length", 1);
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) EMIN(mtmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_emin(nhfp, EMIN(mtmp), "mon", "emin", 1);
+        }
         buflen = EDOG(mtmp) ? (int) sizeof (struct edog) : 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
-        if (buflen > 0)
-            bwrite(fd, (genericptr_t) EDOG(mtmp), buflen);
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof (int));
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &buflen, "mon", "edog_length", 1);
+        if (buflen > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) EDOG(mtmp), buflen);
+            if (nhfp->fieldlevel)
+                sfo_edog(nhfp, EDOG(mtmp), "mon", "edog", 1);
+	}
         /* mcorpsenm is inline int rather than pointer to something,
            so doesn't need to be preceded by a length field */
-        bwrite(fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &MCORPSENM(mtmp), "mon", "mcorpsenm", 1);
     }
 }
 
 STATIC_OVL void
-savemonchn(fd, mtmp, mode)
-register int fd, mode;
+savemonchn(nhfp, mtmp)
+NHFILE *nhfp;
 register struct monst *mtmp;
 {
     register struct monst *mtmp2;
@@ -1122,15 +1397,15 @@ register struct monst *mtmp;
 
     while (mtmp) {
         mtmp2 = mtmp->nmon;
-        if (perform_bwrite(mode)) {
+        if (perform_bwrite(nhfp)) {
             mtmp->mnum = monsndx(mtmp->data);
             if (mtmp->ispriest)
                 forget_temple_entry(mtmp); /* EPRI() */
-            savemon(fd, mtmp);
+            savemon(nhfp, mtmp);
         }
         if (mtmp->minvent)
-            saveobjchn(fd, mtmp->minvent, mode);
-        if (release_data(mode)) {
+            saveobjchn(nhfp, mtmp->minvent);
+        if (release_data(nhfp)) {
             if (mtmp == g.context.polearm.hitmon) {
                 g.context.polearm.m_id = mtmp->m_id;
                 g.context.polearm.hitmon = NULL;
@@ -1140,30 +1415,41 @@ register struct monst *mtmp;
         }
         mtmp = mtmp2;
     }
-    if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &minusone, sizeof (int));
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &minusone, sizeof (int));
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &minusone, "mon", "monst_length", 1);
+    }
 }
 
 /* save traps; g.ftrap is the only trap chain so the 2nd arg is superfluous */
 STATIC_OVL void
-savetrapchn(fd, trap, mode)
-int fd;
+savetrapchn(nhfp, trap)
+NHFILE *nhfp;
 register struct trap *trap;
-int mode;
 {
     static struct trap zerotrap;
     register struct trap *trap2;
 
     while (trap) {
         trap2 = trap->ntrap;
-        if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) trap, sizeof *trap);
-        if (release_data(mode))
+        if (perform_bwrite(nhfp)) {
+            if (nhfp->structlevel)  
+                bwrite(nhfp->fd, (genericptr_t) trap, sizeof *trap);
+            if (nhfp->fieldlevel)
+                sfo_trap(nhfp, trap, "trap", "trap", 1);
+	}
+        if (release_data(nhfp))
             dealloc_trap(trap);
         trap = trap2;
     }
-    if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &zerotrap, sizeof zerotrap);
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &zerotrap, sizeof zerotrap);
+        if (nhfp->fieldlevel)
+            sfo_trap(nhfp, &zerotrap, "trap", "trap", 1);
+    }
 }
 
 /* save all the fruit names and ID's; this is used only in saving whole games
@@ -1172,8 +1458,8 @@ int mode;
  * level routine marks nonexistent fruits by making the fid negative.
  */
 void
-savefruitchn(fd, mode)
-int fd, mode;
+savefruitchn(nhfp)
+NHFILE *nhfp;
 {
     static struct fruit zerofruit;
     register struct fruit *f2, *f1;
@@ -1181,42 +1467,56 @@ int fd, mode;
     f1 = g.ffruit;
     while (f1) {
         f2 = f1->nextf;
-        if (f1->fid >= 0 && perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) f1, sizeof *f1);
-        if (release_data(mode))
+        if (f1->fid >= 0 && perform_bwrite(nhfp)) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) f1, sizeof *f1);
+            if (nhfp->fieldlevel)
+                sfo_fruit(nhfp, f1, "fruit", "fruit", 1);
+	}
+        if (release_data(nhfp))
             dealloc_fruit(f1);
         f1 = f2;
     }
-    if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &zerofruit, sizeof zerofruit);
-    if (release_data(mode))
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &zerofruit, sizeof zerofruit);
+        if (nhfp->fieldlevel)
+            sfo_fruit(nhfp, &zerofruit, "fruit", "terminator", 1);
+    }
+    if (release_data(nhfp))
         g.ffruit = 0;
 }
 
 void
-store_plname_in_file(fd)
-int fd;
+store_plname_in_file(nhfp)
+NHFILE *nhfp;
 {
     int plsiztmp = PL_NSIZ;
 
-    bufoff(fd);
-    /* bwrite() before bufon() uses plain write() */
-    bwrite(fd, (genericptr_t) &plsiztmp, sizeof plsiztmp);
-    bwrite(fd, (genericptr_t) g.plname, plsiztmp);
-    bufon(fd);
+    if (nhfp->structlevel) {
+        bufoff(nhfp->fd);
+        /* bwrite() before bufon() uses plain write() */
+        bwrite(nhfp->fd, (genericptr_t) &plsiztmp, sizeof plsiztmp);
+        bwrite(nhfp->fd, (genericptr_t) g.plname, plsiztmp);
+        bufon(nhfp->fd);
+    }
+    if (nhfp->fieldlevel) {
+        sfo_int(nhfp, &plsiztmp, "plname", "plname_size", 1);
+        sfo_str(nhfp, g.plname, "plname", "g.plname", plsiztmp);
+    }
     return;
 }
 
 STATIC_OVL void
-save_msghistory(fd, mode)
-int fd, mode;
+save_msghistory(nhfp)
+NHFILE *nhfp;
 {
     char *msg;
     int msgcount = 0, msglen;
     int minusone = -1;
     boolean init = TRUE;
 
-    if (perform_bwrite(mode)) {
+    if (perform_bwrite(nhfp)) {
         /* ask window port for each message in sequence */
         while ((msg = getmsghistory(init)) != 0) {
             init = FALSE;
@@ -1227,19 +1527,28 @@ int fd, mode;
                no need to modify msg[] since terminator isn't written */
             if (msglen > BUFSZ - 1)
                 msglen = BUFSZ - 1;
-            bwrite(fd, (genericptr_t) &msglen, sizeof msglen);
-            bwrite(fd, (genericptr_t) msg, msglen);
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) &msglen, sizeof msglen);
+                bwrite(nhfp->fd, (genericptr_t) msg, msglen);
+            }
+            if (nhfp->fieldlevel) {
+                sfo_int(nhfp, &msglen, "msghistory", "msghistory_length", 1);
+                sfo_str(nhfp, msg, "msghistory", "msg", msglen);
+            }
             ++msgcount;
         }
-        bwrite(fd, (genericptr_t) &minusone, sizeof (int));
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &minusone, sizeof (int));
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &minusone, "msghistory", "msghistory_length", 1);
     }
     debugpline1("Stored %d messages into savefile.", msgcount);
     /* note: we don't attempt to handle release_data() here */
 }
 
 void
-store_savefileinfo(fd)
-int fd;
+store_savefileinfo(nhfp)
+NHFILE *nhfp;
 {
     /* sfcap (decl.c) describes the savefile feature capabilities
      * that are supported by this port/platform build.
@@ -1252,10 +1561,15 @@ int fd;
      * being used to read the information from an existing savefile.
      */
 
-    bufoff(fd);
-    /* bwrite() before bufon() uses plain write() */
-    bwrite(fd, (genericptr_t) &sfsaveinfo, (unsigned) sizeof sfsaveinfo);
-    bufon(fd);
+    if (nhfp->structlevel) {
+        bufoff(nhfp->fd);
+        /* bwrite() before bufon() uses plain write() */
+        bwrite(nhfp->fd, (genericptr_t) &sfsaveinfo, (unsigned) sizeof sfsaveinfo);
+        bufon(nhfp->fd);
+    }
+    if (nhfp->fieldlevel) {
+        sfo_savefile_info(nhfp, &sfsaveinfo, "savefileinfo", "savefile_info", 1);
+    }
     return;
 }
 
@@ -1300,8 +1614,12 @@ void
 free_dungeons()
 {
 #ifdef FREE_ALL_MEMORY
-    savelevchn(0, FREE_SAVE);
-    save_dungeon(0, FALSE, TRUE);
+    NHFILE tnhfp;
+
+    zero_nhfile(&tnhfp);    /* also sets fd to -1 */
+    tnhfp.mode = FREEING;
+    savelevchn(&tnhfp);
+    save_dungeon(&tnhfp, FALSE, TRUE);
 #endif
     return;
 }
@@ -1309,9 +1627,13 @@ free_dungeons()
 void
 freedynamicdata()
 {
+    NHFILE tnhfp;
+
 #if defined(UNIX) && defined(MAIL)
     free_maildata();
 #endif
+    zero_nhfile(&tnhfp);    /* also sets fd to -1 */
+    tnhfp.mode = FREEING;
     unload_qtlist();
     free_menu_coloring();
     free_invbuf();           /* let_to_name (invent.c) */
@@ -1319,16 +1641,16 @@ freedynamicdata()
     msgtype_free();
     tmp_at(DISP_FREEMEM, 0); /* temporary display effects */
 #ifdef FREE_ALL_MEMORY
-#define free_current_level() savelev(-1, -1, FREE_SAVE)
-#define freeobjchn(X) (saveobjchn(0, X, FREE_SAVE), X = 0)
-#define freemonchn(X) (savemonchn(0, X, FREE_SAVE), X = 0)
-#define freefruitchn() savefruitchn(0, FREE_SAVE)
-#define freenames() savenames(0, FREE_SAVE)
-#define free_killers() save_killers(0, FREE_SAVE)
-#define free_oracles() save_oracles(0, FREE_SAVE)
-#define free_waterlevel() save_waterlevel(0, FREE_SAVE)
-#define free_timers(R) save_timers(0, FREE_SAVE, R)
-#define free_light_sources(R) save_light_sources(0, FREE_SAVE, R)
+#define free_current_level() savelev(&tnhfp, -1)
+#define freeobjchn(X) (saveobjchn(&tnhfp, X), X = 0)
+#define freemonchn(X) (savemonchn(&tnhfp, X), X = 0)
+#define freefruitchn() savefruitchn(&tnhfp)
+#define freenames() savenames(&tnhfp)
+#define free_killers() save_killers(&tnhfp)
+#define free_oracles() save_oracles(&tnhfp)
+#define free_waterlevel() save_waterlevel(&tnhfp)
+#define free_timers(R) save_timers(&tnhfp, R)
+#define free_light_sources(R) save_light_sources(&tnhfp, R)
 #define free_animals() mon_animal_list(FALSE)
 
     /* move-specific data */

@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{May 7, 2019}
+\date{June 20, 2019}
 
 \maketitle
 
@@ -5160,6 +5160,22 @@ The syntax is the same as WIZARDS.
 %.lp
 \item[\ib{MAXPLAYERS}]
 Limit the maximum number of games that can be running at the same time.
+%.lp
+\item[\ib{SAVEFORMAT}]
+A list of up to two save file formats separated by space. 
+The first format in the list will written as well as read. The second format 
+will be read only if no save file in the first format exists.
+Valid choices are ``{\tt historical}'' for binary writing of entire structs, 
+``{\tt lendian}'' for binary writing of each field in little-endian order,
+``{\tt ascii}'' for writing the save file content in ascii text.
+%.lp
+\item[\ib{BONESFORMAT}]
+A list of up to two bones file formats separated by space. 
+The first format in the list will written as well as read. The second
+format will be read only if no bones files in the first format exist.
+Valid choices are ``{\tt historical}'' for binary writing of entire structs, 
+``{\tt lendian}'' for binary writing of each field in little-endian order,
+``{\tt ascii}'' for writing the bones file content in ascii text.
 %.lp
 \item[\ib{SUPPORT}]
 A string explainign how to get local support (no default value).

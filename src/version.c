@@ -6,6 +6,10 @@
 #include "hack.h"
 #include "dlb.h"
 #include "date.h"
+#include "lev.h"
+#include "sfproto.h"
+
+
 /*
  * All the references to the contents of patchlevel.h have been moved
  * into makedefs....
@@ -250,10 +254,11 @@ long filetime;
 #endif
 
 boolean
-check_version(version_data, filename, complain)
+check_version(version_data, filename, complain, utdflags)
 struct version_info *version_data;
 const char *filename;
 boolean complain;
+unsigned long utdflags;
 {
     if (
 #ifdef VERSION_COMPATIBILITY
@@ -273,9 +278,12 @@ boolean complain;
         (version_data->feature_set & ~IGNORED_FEATURES)
             != (VERSION_FEATURES & ~IGNORED_FEATURES)
 #endif
-        || version_data->entity_count != VERSION_SANITY1
-        || version_data->struct_sizes1 != VERSION_SANITY2
-        || version_data->struct_sizes2 != VERSION_SANITY3) {
+        || ((utdflags & UTD_SKIP_SANITY1) == 0
+             && version_data->entity_count != VERSION_SANITY1)
+        || ((utdflags & UTD_CHECKSIZES) &&
+            (version_data->struct_sizes1 != VERSION_SANITY2))
+        || ((utdflags & UTD_CHECKSIZES) &&
+            (version_data->struct_sizes2 != VERSION_SANITY3))) {
         if (complain)
             pline("Configuration incompatibility for file \"%s\".", filename);
         return FALSE;
@@ -286,24 +294,47 @@ boolean complain;
 /* this used to be based on file date and somewhat OS-dependant,
    but now examines the initial part of the file's contents */
 boolean
-uptodate(fd, name)
-int fd;
+uptodate(nhfp, name, utdflags)
+NHFILE *nhfp;
 const char *name;
+unsigned long utdflags;
 {
-    int rlen;
+    int rlen, cmc = 0, filecmc = 0;
     struct version_info vers_info;
     boolean verbose = name ? TRUE : FALSE;
+    char indicator;
 
-    rlen = read(fd, (genericptr_t) &vers_info, sizeof vers_info);
-    minit(); /* ZEROCOMP */
-    if (rlen == 0) {
-        if (verbose) {
-            pline("File \"%s\" is empty?", name);
-            wait_synch();
-        }
-        return FALSE;
+    if (nhfp->structlevel) {
+        rlen = read(nhfp->fd, (genericptr_t) &indicator, sizeof indicator);
+        rlen = read(nhfp->fd, (genericptr_t) &filecmc, sizeof filecmc);
+        if (rlen == 0)
+            return FALSE;
     }
-    if (!check_version(&vers_info, name, verbose)) {
+    if (nhfp->fieldlevel) {
+        sfi_char(nhfp, &indicator, "indicate", "format", 1);
+        sfi_int(nhfp, &filecmc, "validate", "critical_members_count", 1);
+        cmc = critical_members_count();
+    }
+    if (cmc != filecmc)
+        return FALSE;
+
+    if (nhfp->fieldlevel && (nhfp->fnidx > historical)) {
+            sfi_version_info(nhfp, &vers_info, "version", "version_info", 1);
+    } else {
+        int rlen;
+
+        rlen = read(nhfp->fd, (genericptr_t) &vers_info, sizeof vers_info);
+        minit();                /* ZEROCOMP */
+        if (rlen == 0) {
+            if (verbose) {
+                pline("File \"%s\" is empty?", name);
+                wait_synch();
+            }
+            return FALSE;
+        }
+    }
+
+    if (!check_version(&vers_info, name, verbose, utdflags)) {
         if (verbose)
             wait_synch();
         return FALSE;
@@ -312,19 +343,25 @@ const char *name;
 }
 
 void
-store_version(fd)
-int fd;
+store_version(nhfp)
+NHFILE *nhfp;
 {
     static const struct version_info version_data = {
         VERSION_NUMBER, VERSION_FEATURES,
         VERSION_SANITY1, VERSION_SANITY2, VERSION_SANITY3
     };
 
-    bufoff(fd);
-    /* bwrite() before bufon() uses plain write() */
-    bwrite(fd, (genericptr_t) &version_data,
-           (unsigned) (sizeof version_data));
-    bufon(fd);
+    if (nhfp->structlevel) {
+        bufoff(nhfp->fd);
+        /* bwrite() before bufon() uses plain write() */
+        bwrite(nhfp->fd,(genericptr_t) &version_data,
+               (unsigned) (sizeof version_data));
+        bufon(nhfp->fd);
+    }
+    if (nhfp->fieldlevel) {
+        sfo_version_info(nhfp, (struct version_info *) &version_data,
+                         "version", "version_info", 1);
+    }
     return;
 }
 

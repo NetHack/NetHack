@@ -8,7 +8,7 @@
 
 #define E extern
 
-#if !defined(MFLOPPY) && !defined(VMS) && !defined(WIN32)
+#if !defined(MFLOPPY) && !defined(VMS)
 #define LOCKNAMESIZE (PL_NSIZ + 14) /* long enough for uid+name+.99 */
 #define LOCKNAMEINIT "1lock"
 #define BONESINIT "bonesnn.xxx"
@@ -26,22 +26,18 @@
 #define BONESINIT "bonesnn.xxx;1"
 #define BONESSIZE sizeof(BONESINIT)
 #endif
-#if defined(WIN32)
-#define LOCKNAMESIZE (PL_NSIZ + 25) /* long enough for username+-+name+.99 */
-#define LOCKNAMEINIT ""
-#define BONESINIT "bonesnn.xxx"
-#define BONESSIZE sizeof(BONESINIT)
-#endif
 #endif
 
+/* This is written to a savefile by a defined size on some platforms,
+   so let's not create an automatic and unnecessary incompatibility */
 #if defined(UNIX) || defined(__BEOS__)
-#define SAVESIZE (PL_NSIZ + 13) /* save/99999player.e */
+#define SAVESIZE (PL_NSIZ + 50) /* save/99999player.e */
 #else
 #ifdef VMS
-#define SAVESIZE (PL_NSIZ + 22) /* [.save]<uid>player.e;1 */
+#define SAVESIZE (PL_NSIZ + 50) /* [.save]<uid>player.e;1 */
 #else
 #if defined(WIN32)
-#define SAVESIZE (PL_NSIZ + 40) /* username-player.NetHack-saved-game */
+#define SAVESIZE (PL_NSIZ + 50) /* username-player.NetHack-saved-game */
 #else
 #define SAVESIZE FILENAME /* from macconf.h or pcconf.h */
 #endif
@@ -161,6 +157,52 @@ struct sinfo {
 #endif
     int wizkit_wishing;
 };
+
+/* Flags for controlling uptodate */
+#define UTD_CHECKSIZES                 0x01
+#define UTD_CHECKFIELDCOUNTS           0x02
+#define UTD_SKIP_SANITY1               0x04
+#define UTD_SKIP_SAVEFILEINFO          0x08
+
+/* NetHack ftypes */
+#define NHF_LEVELFILE       1
+#define NHF_SAVEFILE        2 
+#define NHF_BONESFILE       3
+/* modes */
+#define READING  0x0
+#define COUNTING 0x1
+#define WRITING  0x2
+#define FREEING  0x4
+#define MAX_BMASK 4
+/* operations of the various saveXXXchn & co. routines */
+#define perform_bwrite(nhfp) ((nhfp)->mode & (COUNTING | WRITING))
+#define release_data(nhfp) ((nhfp)->mode & FREEING)
+
+/* Content types for fieldlevel files */
+struct fieldlevel_content {
+    boolean deflt;        /* individual fields */
+    boolean binary;       /* binary rather than text */
+    boolean json;         /* JSON */
+};
+    
+typedef struct {
+    int fd;               /* for traditional structlevel binary writes */
+    int mode;             /* holds READING, WRITING, or FREEING modes  */
+    int ftype;            /* NHF_LEVELFILE, NHF_SAVEFILE, or NHF_BONESFILE */
+    int fnidx;            /* index of procs for fieldlevel saves */
+    long count;           /* holds current line count for default style file,
+                             field count for binary style */
+    boolean structlevel;  /* traditional structure binary saves */
+    boolean fieldlevel;   /* fieldlevel saves saves each field individually */
+    boolean addinfo;      /* if set, some additional context info from core */
+    boolean eof;          /* place to mark eof reached */
+    boolean bendian;      /* set to true if executing on a big-endian machine */
+    FILE *fpdef;          /* file pointer for fieldlevel default style */
+    FILE *fpdefmap;       /* file pointer mapfile for def format */
+    FILE *fplog;          /* file pointer logfile */
+    FILE *fpdebug;        /* file pointer debug info */
+    struct fieldlevel_content style;
+} NHFILE;
 
 E const char quitchars[];
 E const char vowels[];
@@ -348,6 +390,14 @@ E const char *const monexplain[], invisexplain[], *const oclass_names[];
 #ifdef PREFIXES_IN_USE
 E const char *fqn_prefix_names[PREFIX_COUNT];
 #endif
+
+struct restore_procs {
+	const char *name;
+	int mread_flags;
+	void NDECL((*restore_minit));
+	void FDECL((*restore_mread), (int,genericptr_t,unsigned int));
+	void FDECL((*restore_bclose), (int));
+};
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 

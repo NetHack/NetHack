@@ -18,6 +18,7 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 #include "tcap.h"
 #include <ctype.h>
 #endif
+#include "sfprocs.h"
 
 #define BACKWARD_COMPAT
 
@@ -698,6 +699,9 @@ initoptions_init()
         if (boolopt[i].addr)
             *(boolopt[i].addr) = boolopt[i].initvalue;
     }
+    /* initialize the function pointers for fieldlevel saves */
+    sf_init();
+
 #if defined(COMPRESS) || defined(ZLIB_COMP)
     set_savepref("externalcomp");
     set_restpref("externalcomp");

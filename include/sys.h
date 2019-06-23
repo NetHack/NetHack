@@ -41,6 +41,10 @@ struct sysopt {
     char *greppath;
     int panictrace_gdb;
     int panictrace_libc;
+
+    /* save and bones format */
+    int saveformat[2];    /* primary and onetime conversion */
+    int bonesformat[2];   /* primary and onetime conversion */
 };
 
 extern struct sysopt sysopt;

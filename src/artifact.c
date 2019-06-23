@@ -6,6 +6,8 @@
 #include "hack.h"
 #include "artifact.h"
 #include "artilist.h"
+#include "sfproto.h"
+
 
 /*
  * Note:  both artilist[] and artiexist[] have a dummy element #0,
@@ -76,20 +78,42 @@ init_artifacts()
 }
 
 void
-save_artifacts(fd)
-int fd;
+save_artifacts(nhfp)
+NHFILE *nhfp;
 {
-    bwrite(fd, (genericptr_t) g.artiexist, sizeof g.artiexist);
-    bwrite(fd, (genericptr_t) g.artidisco, sizeof g.artidisco);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) g.artiexist, sizeof g.artiexist);
+        bwrite(nhfp->fd, (genericptr_t) g.artidisco, sizeof g.artidisco);
+    }
+    if (nhfp->fieldlevel) {
+        int i;
+
+        for (i = 0; i < (1 + NROFARTIFACTS + 1); ++i)
+            sfo_boolean(nhfp, &g.artiexist[i], "artifacts", "g.artiexist", 1);
+
+        for (i = 0; i < NROFARTIFACTS; ++i)
+            sfo_xchar(nhfp, &g.artidisco[i], "artifacts", "g.artidisco", 1);
+    }
 }
 
 void
-restore_artifacts(fd)
-int fd;
+restore_artifacts(nhfp)
+NHFILE *nhfp;
 {
-    mread(fd, (genericptr_t) g.artiexist, sizeof g.artiexist);
-    mread(fd, (genericptr_t) g.artidisco, sizeof g.artidisco);
-    hack_artifacts(); /* redo non-saved special cases */
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) g.artiexist, sizeof g.artiexist);
+        mread(nhfp->fd, (genericptr_t) g.artidisco, sizeof g.artidisco);
+    }
+    if (nhfp->fieldlevel) {
+        int i;
+
+        for (i = 0; i < (1 + NROFARTIFACTS + 1); ++i)
+            sfi_boolean(nhfp, &g.artiexist[i], "artifacts", "g.artiexist", 1);
+
+        for (i = 0; i < NROFARTIFACTS; ++i)
+            sfi_xchar(nhfp, &g.artidisco[i], "artifacts", "g.artidisco", 1);
+    }
+    hack_artifacts();	/* redo non-saved special cases */
 }
 
 const char *

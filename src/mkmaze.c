@@ -6,6 +6,8 @@
 #include "hack.h"
 #include "sp_lev.h"
 #include "lev.h" /* save & restore info */
+#include "sfproto.h"
+
 
 STATIC_DCL int FDECL(iswall, (int, int));
 STATIC_DCL int FDECL(iswall_or_stone, (int, int));
@@ -1558,33 +1560,46 @@ water_friction()
 }
 
 void
-save_waterlevel(fd, mode)
-int fd, mode;
+save_waterlevel(nhfp)
+NHFILE *nhfp;
 {
     struct bubble *b;
 
     if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
         return;
 
-    if (perform_bwrite(mode)) {
+    if (perform_bwrite(nhfp)) {
         int n = 0;
         for (b = g.bbubbles; b; b = b->next)
             ++n;
-        bwrite(fd, (genericptr_t) &n, sizeof n);
-        bwrite(fd, (genericptr_t) &g.xmin, sizeof g.xmin);
-        bwrite(fd, (genericptr_t) &g.ymin, sizeof g.ymin);
-        bwrite(fd, (genericptr_t) &g.xmax, sizeof g.xmax);
-        bwrite(fd, (genericptr_t) &g.ymax, sizeof g.ymax);
-        for (b = g.bbubbles; b; b = b->next)
-            bwrite(fd, (genericptr_t) b, sizeof *b);
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &n, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &g.xmin, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &g.ymin, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &g.xmax, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &g.ymax, sizeof(int));
+        }
+        if (nhfp->fieldlevel) {
+            sfo_int(nhfp, &n, "waterlevel", "bubble_count", 1);
+            sfo_int(nhfp, &g.xmin, "waterlevel", "g.xmin", 1);
+            sfo_int(nhfp, &g.ymin, "waterlevel", "g.ymin", 1);
+            sfo_int(nhfp, &g.xmax, "waterlevel", "g.xmax", 1);
+            sfo_int(nhfp, &g.ymax, "waterlevel", "g.ymax", 1);
+        }
+        for (b = g.bbubbles; b; b = b->next) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) b, sizeof(struct bubble));
+            if (nhfp->fieldlevel)
+                sfo_bubble(nhfp, b, "waterlevel", "bubble", 1);
+        }
     }
-    if (release_data(mode))
+    if (release_data(nhfp))
         unsetup_waterlevel();
 }
 
 void
-restore_waterlevel(fd)
-int fd;
+restore_waterlevel(nhfp)
+NHFILE *nhfp;
 {
     struct bubble *b = (struct bubble *) 0, *btmp;
     int i, n;
@@ -1592,7 +1607,7 @@ int fd;
     if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
         return;
 
-    if (fd == -1) { /* special handling for restore in goto_level() */
+    if (nhfp->fd == -1) { /* special handling for restore in goto_level() */
         if (!wizard)
             impossible("restore_waterlevel: returning to %s?",
                        Is_waterlevel(&u.uz) ? "Water" : "Air");
@@ -1601,23 +1616,35 @@ int fd;
     }
 
     set_wportal();
-    mread(fd, (genericptr_t) &n, sizeof n);
-    mread(fd, (genericptr_t) &g.xmin, sizeof g.xmin);
-    mread(fd, (genericptr_t) &g.ymin, sizeof g.ymin);
-    mread(fd, (genericptr_t) &g.xmax, sizeof g.xmax);
-    mread(fd, (genericptr_t) &g.ymax, sizeof g.ymax);
+    if (nhfp->structlevel) {
+        mread(nhfp->fd,(genericptr_t)&n,sizeof(int));
+        mread(nhfp->fd,(genericptr_t)&g.xmin,sizeof(int));
+        mread(nhfp->fd,(genericptr_t)&g.ymin,sizeof(int));
+        mread(nhfp->fd,(genericptr_t)&g.xmax,sizeof(int));
+        mread(nhfp->fd,(genericptr_t)&g.ymax,sizeof(int));
+    }
+    if (nhfp->fieldlevel) {
+        sfi_int(nhfp, &n, "waterlevel", "bubble_count", 1);
+        sfi_int(nhfp, &g.xmin, "waterlevel", "g.xmin", 1);
+        sfi_int(nhfp, &g.ymin, "waterlevel", "g.ymin", 1);
+        sfi_int(nhfp, &g.xmax, "waterlevel", "g.xmax", 1);
+        sfi_int(nhfp, &g.ymax, "waterlevel", "g.ymax", 1);
+    }
     for (i = 0; i < n; i++) {
         btmp = b;
-        b = (struct bubble *) alloc(sizeof *b);
-        mread(fd, (genericptr_t) b, sizeof *b);
-        if (g.bbubbles) {
-            btmp->next = b;
-            b->prev = btmp;
-        } else {
-            g.bbubbles = b;
-            b->prev = (struct bubble *) 0;
-        }
-        mv_bubble(b, 0, 0, TRUE);
+        b = (struct bubble *) alloc(sizeof(struct bubble));
+        if (nhfp->structlevel)
+            mread(nhfp->fd,(genericptr_t) b, sizeof(struct bubble));
+        if (nhfp->fieldlevel)
+            sfi_bubble(nhfp, b, "waterlevel", "bubble", 1);
+      if (g.bbubbles) {
+          btmp->next = b;
+          b->prev = btmp;
+      } else {
+          g.bbubbles = b;
+          b->prev = (struct bubble *) 0;
+      }
+      mv_bubble(b, 0, 0, TRUE);
     }
     g.ebubbles = b;
     b->next = (struct bubble *) 0;

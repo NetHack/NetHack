@@ -82,7 +82,7 @@ int argc;
 char *argv[];
 {
     boolean resuming = FALSE; /* assume new game */
-    int fd;
+    NHFILE *nhfp;
     char *windowtype = NULL;
     char *envp = NULL;
     char *sptr = NULL;
@@ -291,9 +291,11 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
        setting of renameallowed; when False, player_selection()
        won't resent renaming as an option */
     iflags.renameallowed = FALSE;
+#if 0
     /* Obtain the name of the logged on user and incorporate
      * it into the name. */
-    Sprintf(fnamebuf, "%s-%s", get_username(0), g.plname);
+#endif
+    Sprintf(fnamebuf, "%s", g.plname);
     (void) fname_encode(
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.", '%',
         fnamebuf, encodedfnamebuf, BUFSZ);
@@ -303,13 +305,13 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
     /* Set up level 0 file to keep the game state.
      */
-    fd = create_levelfile(0, (char *) 0);
-    if (fd < 0) {
+    nhfp = create_levelfile(0, (char *) 0);
+    if (!nhfp) {
         raw_print("Cannot create lock file");
     } else {
         g.hackpid = GetCurrentProcessId();
-        write(fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
-        nhclose(fd);
+        write(nhfp->fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
+        close_nhfile(nhfp);
     }
     /*
      *  Initialize the vision system.  This must be before mklev() on a
@@ -322,7 +324,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
      * We'll return here if new game player_selection() renames the hero.
      */
 attempt_restore:
-    if ((fd = restore_saved_game()) >= 0) {
+    if ((nhfp = restore_saved_game()) != 0) {
 #ifdef NEWS
         if (iflags.news) {
             display_file(NEWS, FALSE);
@@ -331,7 +333,7 @@ attempt_restore:
 #endif
         pline("Restoring save file...");
         mark_synch(); /* flush output */
-        if (dorecover(fd)) {
+        if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             if (discover)
                 You("are in non-scoring discovery mode.");

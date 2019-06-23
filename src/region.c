@@ -4,6 +4,8 @@
 
 #include "hack.h"
 #include "lev.h"
+#include "sfproto.h"
+
 
 /*
  * This should really go into the level structure, but
@@ -613,64 +615,126 @@ xchar x, y;
  * save_regions :
  */
 void
-save_regions(fd, mode)
-int fd;
-int mode;
+save_regions(nhfp)
+NHFILE *nhfp;
 {
     int i, j;
     unsigned n;
 
-    if (!perform_bwrite(mode))
+    if (!perform_bwrite(nhfp))
         goto skip_lots;
-
-    bwrite(fd, (genericptr_t) &g.moves, sizeof(g.moves)); /* timestamp */
-    bwrite(fd, (genericptr_t) &g.n_regions, sizeof(g.n_regions));
-    for (i = 0; i < g.n_regions; i++) {
-        bwrite(fd, (genericptr_t) &g.regions[i]->bounding_box, sizeof(NhRect));
-        bwrite(fd, (genericptr_t) &g.regions[i]->nrects, sizeof(short));
-        for (j = 0; j < g.regions[i]->nrects; j++)
-            bwrite(fd, (genericptr_t) &g.regions[i]->rects[j], sizeof(NhRect));
-        bwrite(fd, (genericptr_t) &g.regions[i]->attach_2_u, sizeof(boolean));
-        n = 0;
-        bwrite(fd, (genericptr_t) &g.regions[i]->attach_2_m, sizeof(unsigned));
-        n = g.regions[i]->enter_msg != (const char *) 0
-                ? strlen(g.regions[i]->enter_msg)
-                : 0;
-        bwrite(fd, (genericptr_t) &n, sizeof n);
-        if (n > 0)
-            bwrite(fd, (genericptr_t) g.regions[i]->enter_msg, n);
-        n = g.regions[i]->leave_msg != (const char *) 0
-                ? strlen(g.regions[i]->leave_msg)
-                : 0;
-        bwrite(fd, (genericptr_t) &n, sizeof n);
-        if (n > 0)
-            bwrite(fd, (genericptr_t) g.regions[i]->leave_msg, n);
-        bwrite(fd, (genericptr_t) &g.regions[i]->ttl, sizeof(long));
-        bwrite(fd, (genericptr_t) &g.regions[i]->expire_f, sizeof(short));
-        bwrite(fd, (genericptr_t) &g.regions[i]->can_enter_f, sizeof(short));
-        bwrite(fd, (genericptr_t) &g.regions[i]->enter_f, sizeof(short));
-        bwrite(fd, (genericptr_t) &g.regions[i]->can_leave_f, sizeof(short));
-        bwrite(fd, (genericptr_t) &g.regions[i]->leave_f, sizeof(short));
-        bwrite(fd, (genericptr_t) &g.regions[i]->inside_f, sizeof(short));
-        bwrite(fd, (genericptr_t) &g.regions[i]->player_flags,
-               sizeof(unsigned int));
-        bwrite(fd, (genericptr_t) &g.regions[i]->n_monst, sizeof(short));
-        for (j = 0; j < g.regions[i]->n_monst; j++)
-            bwrite(fd, (genericptr_t) &g.regions[i]->monsters[j],
-                   sizeof(unsigned));
-        bwrite(fd, (genericptr_t) &g.regions[i]->visible, sizeof(boolean));
-        bwrite(fd, (genericptr_t) &g.regions[i]->glyph, sizeof(int));
-        bwrite(fd, (genericptr_t) &g.regions[i]->arg, sizeof(anything));
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &g.moves, sizeof (g.moves));	/* timestamp */
+        bwrite(nhfp->fd, (genericptr_t) &g.n_regions, sizeof (g.n_regions));
     }
+    if (nhfp->fieldlevel) {
+        sfo_long(nhfp, &g.moves, "regions", "tmstamp", 1);
+        sfo_int(nhfp, &g.n_regions, "regions", "region_count", 1);
+    }
+    for (i = 0; i < g.n_regions; i++) {
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->bounding_box, sizeof (NhRect));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->nrects, sizeof (short));
+        }
+        if (nhfp->fieldlevel) {
+            sfo_nhrect(nhfp, &g.regions[i]->bounding_box, "g.regions", "bounding_box", 1);
+            sfo_short(nhfp, &g.regions[i]->nrects, "g.regions", "nrects", 1);
+        }
+        for (j = 0; j < g.regions[i]->nrects; j++) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->rects[j], sizeof (NhRect));
+            if (nhfp->fieldlevel)
+                sfo_nhrect(nhfp, &g.regions[i]->rects[j], "g.regions", "rect", 1);
+        }
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_u, sizeof (boolean));
+        if (nhfp->fieldlevel)
+            sfo_boolean(nhfp, &g.regions[i]->attach_2_u, "g.regions", "attach_2_u", 1);
+        n = 0;
 
-skip_lots:
-    if (release_data(mode))
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_m, sizeof (unsigned));
+        if (nhfp->fieldlevel)
+            sfo_unsigned(nhfp, &g.regions[i]->attach_2_m, "g.regions", "attach_2_m", 1);
+
+        n = g.regions[i]->enter_msg != (const char *)0 ?
+                                        strlen(g.regions[i]->enter_msg) : 0;
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &n, sizeof n);
+        if (nhfp->fieldlevel)
+            sfo_unsigned(nhfp, &n, "g.regions", "enter_msg_length", 1);
+
+        if (n > 0) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) g.regions[i]->enter_msg, n);
+            if (nhfp->fieldlevel)
+                sfo_char(nhfp, g.regions[i]->enter_msg, "g.regions", "enter_msg", 1);
+        }
+        n = g.regions[i]->leave_msg != (const char *)0 ?
+                                        strlen(g.regions[i]->leave_msg) : 0;
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &n, sizeof n);
+        if (nhfp->fieldlevel)
+            sfo_unsigned(nhfp, &n, "g.regions", "leave_msg_length", 1);
+
+        if (n > 0) {
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) g.regions[i]->leave_msg, n);
+            }
+            if (nhfp->fieldlevel) {
+                for (j = 0; j < (int) n; ++j)
+                    sfo_char(nhfp, &g.regions[i]->leave_msg[j], "g.regions", "leave_msg", 1);
+            }
+        }
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->ttl, sizeof (long));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->expire_f, sizeof (short));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->can_enter_f, sizeof (short));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->enter_f, sizeof (short));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->can_leave_f, sizeof (short));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->leave_f, sizeof (short));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->inside_f, sizeof (short));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->player_flags, sizeof (unsigned int));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->n_monst, sizeof (short));
+        }
+        if (nhfp->fieldlevel) {
+            sfo_long(nhfp, &g.regions[i]->ttl, "g.regions", "ttl", 1);
+            sfo_short(nhfp, &g.regions[i]->expire_f, "g.regions", "expire_f", 1);
+            sfo_short(nhfp, &g.regions[i]->can_enter_f, "g.regions", "can_enter_f", 1);
+            sfo_short(nhfp, &g.regions[i]->enter_f, "g.regions", "enter_f", 1);
+            sfo_short(nhfp, &g.regions[i]->can_leave_f, "g.regions", "can_leave_f", 1);
+            sfo_short(nhfp, &g.regions[i]->leave_f, "g.regions", "leave_f", 1);
+            sfo_short(nhfp, &g.regions[i]->inside_f, "g.regions", "inside_f", 1);
+            sfo_unsigned(nhfp, &g.regions[i]->player_flags, "g.regions", "player_flags", 1);
+            sfo_short(nhfp, &g.regions[i]->n_monst, "g.regions", "monster_count", 1);
+        }
+        for (j = 0; j < g.regions[i]->n_monst; j++) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->monsters[j],
+                        sizeof (unsigned));
+            if (nhfp->fieldlevel)
+                sfo_unsigned(nhfp, &g.regions[i]->monsters[j], "g.regions", "monster", 1);
+        }
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->visible, sizeof (boolean));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->glyph, sizeof (int));
+            bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->arg, sizeof (anything));
+        }
+        if (nhfp->fieldlevel) {
+            sfo_boolean(nhfp, &g.regions[i]->visible, "g.regions", "visible", 1);
+            sfo_int(nhfp, &g.regions[i]->glyph, "g.regions", "glyph", 1);
+            sfo_any(nhfp, &g.regions[i]->arg, "g.regions", "arg", 1);
+        }
+    }
+  
+  skip_lots:
+    if (release_data(nhfp))
         clear_regions();
 }
 
 void
-rest_regions(fd, ghostly)
-int fd;
+rest_regions(nhfp, ghostly)
+NHFILE *nhfp;
 boolean ghostly; /* If a bones file restore */
 {
     int i, j;
@@ -678,77 +742,152 @@ boolean ghostly; /* If a bones file restore */
     long tmstamp;
     char *msg_buf;
 
-    clear_regions(); /* Just for security */
-    mread(fd, (genericptr_t) &tmstamp, sizeof(tmstamp));
+    clear_regions();		/* Just for security */
+    if (nhfp->structlevel)
+        mread(nhfp->fd, (genericptr_t) &tmstamp, sizeof (tmstamp));
+    if (nhfp->fieldlevel)
+        sfi_long(nhfp, &tmstamp, "regions", "tmstamp", 1);
     if (ghostly)
         tmstamp = 0;
     else
         tmstamp = (g.moves - tmstamp);
-    mread(fd, (genericptr_t) &g.n_regions, sizeof(g.n_regions));
+
+    if (nhfp->structlevel)
+        mread(nhfp->fd, (genericptr_t) &g.n_regions, sizeof (g.n_regions));
+    if (nhfp->fieldlevel)
+        sfi_int(nhfp, &g.n_regions, "regions", "region_count", 1);
+
     g.max_regions = g.n_regions;
     if (g.n_regions > 0)
-        g.regions = (NhRegion **) alloc(sizeof(NhRegion *) * g.n_regions);
+        g.regions = (NhRegion **) alloc(sizeof (NhRegion *) * g.n_regions);
     for (i = 0; i < g.n_regions; i++) {
-        g.regions[i] = (NhRegion *) alloc(sizeof(NhRegion));
-        mread(fd, (genericptr_t) &g.regions[i]->bounding_box, sizeof(NhRect));
-        mread(fd, (genericptr_t) &g.regions[i]->nrects, sizeof(short));
-
+        g.regions[i] = (NhRegion *) alloc(sizeof (NhRegion));
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->bounding_box, sizeof (NhRect));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->nrects, sizeof (short));
+        }
+        if (nhfp->fieldlevel) {
+            sfi_nhrect(nhfp, &g.regions[i]->bounding_box, "g.regions", "bounding box", 1);
+            sfi_short(nhfp, &g.regions[i]->nrects, "g.regions", "nrects", 1);
+        }
         if (g.regions[i]->nrects > 0)
-            g.regions[i]->rects =
-                (NhRect *) alloc(sizeof(NhRect) * g.regions[i]->nrects);
-        for (j = 0; j < g.regions[i]->nrects; j++)
-            mread(fd, (genericptr_t) &g.regions[i]->rects[j], sizeof(NhRect));
-        mread(fd, (genericptr_t) &g.regions[i]->attach_2_u, sizeof(boolean));
-        mread(fd, (genericptr_t) &g.regions[i]->attach_2_m, sizeof(unsigned));
+            g.regions[i]->rects = (NhRect *)
+                                 alloc(sizeof (NhRect) * g.regions[i]->nrects);
+        for (j = 0; j < g.regions[i]->nrects; j++) {
+            if (nhfp->structlevel)
+                mread(nhfp->fd, (genericptr_t) &g.regions[i]->rects[j], sizeof (NhRect));
+            if (nhfp->fieldlevel)
+                sfi_nhrect(nhfp, &g.regions[i]->rects[j], "g.regions", "rect", 1);
+        }
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_u, sizeof (boolean));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_m, sizeof (unsigned));
+        }
+        if (nhfp->fieldlevel) {
+            sfi_boolean(nhfp, &g.regions[i]->attach_2_u, "g.regions", "attach_2_u", 1);
+            sfi_unsigned(nhfp, &g.regions[i]->attach_2_m, "g.regions", "attach_2_m", 1);
+        }
 
-        mread(fd, (genericptr_t) &n, sizeof n);
+        if (nhfp->structlevel)
+            mread(nhfp->fd, (genericptr_t) &n, sizeof n);
+        if (nhfp->fieldlevel)
+            sfi_unsigned(nhfp, &n, "g.regions", "enter_msg_length", 1);
         if (n > 0) {
             msg_buf = (char *) alloc(n + 1);
-            mread(fd, (genericptr_t) msg_buf, n);
+            if (nhfp->structlevel) {
+                mread(nhfp->fd, (genericptr_t) msg_buf, n);
+            }
+            if (nhfp->fieldlevel) {
+                for (j = 0; (unsigned) j < n; ++j)
+                    sfi_char(nhfp, &msg_buf[j], "g.regions", "enter_msg", 1);
+            }
             msg_buf[n] = '\0';
             g.regions[i]->enter_msg = (const char *) msg_buf;
         } else
-            g.regions[i]->enter_msg = (const char *) 0;
+            g.regions[i]->enter_msg = (const char *)0;
 
-        mread(fd, (genericptr_t) &n, sizeof n);
+        if (nhfp->structlevel)
+            mread(nhfp->fd, (genericptr_t) &n, sizeof n);
+        if (nhfp->fieldlevel)
+            sfi_unsigned(nhfp, &n, "g.regions", "leave_msg_length", 1);
         if (n > 0) {
             msg_buf = (char *) alloc(n + 1);
-            mread(fd, (genericptr_t) msg_buf, n);
+            if (nhfp->structlevel) {
+                mread(nhfp->fd, (genericptr_t) msg_buf, n);
+            }
+            if (nhfp->fieldlevel) {
+                for (j = 0; (unsigned) j < n; ++j)
+                    sfi_char(nhfp, &msg_buf[j], "g.regions", "leave_msg", 1);
+            }
             msg_buf[n] = '\0';
-            g.regions[i]->leave_msg = (const char *) msg_buf;
+	    g.regions[i]->leave_msg = (const char *) msg_buf;
         } else
-            g.regions[i]->leave_msg = (const char *) 0;
+            g.regions[i]->leave_msg = (const char *)0;
 
-        mread(fd, (genericptr_t) &g.regions[i]->ttl, sizeof(long));
+        if (nhfp->structlevel)
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->ttl, sizeof (long));
+        if (nhfp->fieldlevel)
+            sfi_long(nhfp, &g.regions[i]->ttl, "g.regions", "ttl", 1);
         /* check for expired region */
         if (g.regions[i]->ttl >= 0L)
             g.regions[i]->ttl =
-                (g.regions[i]->ttl > tmstamp) ? g.regions[i]->ttl - tmstamp : 0L;
-        mread(fd, (genericptr_t) &g.regions[i]->expire_f, sizeof(short));
-        mread(fd, (genericptr_t) &g.regions[i]->can_enter_f, sizeof(short));
-        mread(fd, (genericptr_t) &g.regions[i]->enter_f, sizeof(short));
-        mread(fd, (genericptr_t) &g.regions[i]->can_leave_f, sizeof(short));
-        mread(fd, (genericptr_t) &g.regions[i]->leave_f, sizeof(short));
-        mread(fd, (genericptr_t) &g.regions[i]->inside_f, sizeof(short));
-        mread(fd, (genericptr_t) &g.regions[i]->player_flags,
-              sizeof(unsigned int));
-        if (ghostly) { /* settings pertained to old player */
+		(g.regions[i]->ttl > tmstamp) ? g.regions[i]->ttl - tmstamp : 0L;
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->expire_f,
+                    sizeof (short));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->can_enter_f,
+                    sizeof (short));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->enter_f,
+                    sizeof (short));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->can_leave_f,
+                    sizeof (short));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->leave_f,
+                    sizeof (short));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->inside_f,
+                    sizeof (short));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->player_flags,
+                    sizeof (unsigned int));
+        }
+        if (nhfp->fieldlevel) {
+            sfi_short(nhfp, &g.regions[i]->expire_f, "g.regions", "expire_f", 1);
+            sfi_short(nhfp, &g.regions[i]->can_enter_f, "g.regions", "can_enter_f", 1);
+            sfi_short(nhfp, &g.regions[i]->enter_f, "g.regions", "enter_f", 1);
+            sfi_short(nhfp, &g.regions[i]->can_leave_f, "g.regions", "can_leave_f", 1);
+            sfi_short(nhfp, &g.regions[i]->leave_f, "g.regions", "leave_f", 1);
+            sfi_short(nhfp, &g.regions[i]->inside_f, "g.regions", "inside_f", 1);
+            sfi_unsigned(nhfp, &g.regions[i]->player_flags, "g.regions", "player_flags", 1);
+        }
+        if (ghostly) {	/* settings pertained to old player */
             clear_hero_inside(g.regions[i]);
             clear_heros_fault(g.regions[i]);
         }
-        mread(fd, (genericptr_t) &g.regions[i]->n_monst, sizeof(short));
+        if (nhfp->structlevel)
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->n_monst, sizeof (short));
+        if (nhfp->fieldlevel)
+            sfi_short(nhfp, &g.regions[i]->n_monst, "g.regions", "monster_count", 1);
         if (g.regions[i]->n_monst > 0)
             g.regions[i]->monsters =
-                (unsigned *) alloc(sizeof(unsigned) * g.regions[i]->n_monst);
+                        (unsigned *) alloc(sizeof (unsigned) * g.regions[i]->n_monst);
         else
-            g.regions[i]->monsters = (unsigned int *) 0;
+            g.regions[i]->monsters = (unsigned int *)0;
         g.regions[i]->max_monst = g.regions[i]->n_monst;
-        for (j = 0; j < g.regions[i]->n_monst; j++)
-            mread(fd, (genericptr_t) &g.regions[i]->monsters[j],
-                  sizeof(unsigned));
-        mread(fd, (genericptr_t) &g.regions[i]->visible, sizeof(boolean));
-        mread(fd, (genericptr_t) &g.regions[i]->glyph, sizeof(int));
-        mread(fd, (genericptr_t) &g.regions[i]->arg, sizeof(anything));
+        for (j = 0; j < g.regions[i]->n_monst; j++) {
+            if (nhfp->structlevel)
+                mread(nhfp->fd, (genericptr_t) &g.regions[i]->monsters[j],
+                        sizeof (unsigned));
+            if (nhfp->fieldlevel)
+                sfi_unsigned(nhfp, &g.regions[i]->monsters[j], "g.regions", "monster", 1);
+        }
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->visible, sizeof (boolean));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->glyph, sizeof (int));
+            mread(nhfp->fd, (genericptr_t) &g.regions[i]->arg, sizeof (anything));
+        }
+        if (nhfp->fieldlevel) {
+            sfi_boolean(nhfp, &g.regions[i]->visible, "g.regions", "visible", 1);
+            sfi_int(nhfp, &g.regions[i]->glyph, "g.regions", "glyph", 1);
+            sfi_any(nhfp, &g.regions[i]->arg, "g.regions", "arg", 1);
+        }
     }
     /* remove expired regions, do not trigger the expire_f callback (yet!);
        also update monster lists if this data is coming from a bones file */

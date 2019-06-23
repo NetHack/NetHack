@@ -789,6 +789,8 @@ wiz_identify(VOID_ARGS)
 STATIC_PTR int
 wiz_makemap(VOID_ARGS)
 {
+    NHFILE tmpnhfp;
+
     if (wizard) {
         struct monst *mtmp;
         boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
@@ -835,7 +837,9 @@ wiz_makemap(VOID_ARGS)
         keepdogs(TRUE); /* (pets-only; normally we'd be using 'FALSE' here) */
 
         /* discard current level; "saving" is used to release dynamic data */
-        savelev(-1, ledger_no(&u.uz), FREE_SAVE);
+        zero_nhfile(&tmpnhfp);  /* also sets fd to -1 as desired */
+        tmpnhfp.mode = FREEING;
+        savelev(&tmpnhfp, ledger_no(&u.uz));
         /* create a new level; various things like bestowing a guardian
            angel on Astral or setting off alarm on Ft.Ludios are handled
            by goto_level(do.c) so won't occur for replacement levels */
