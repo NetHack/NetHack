@@ -5,6 +5,11 @@
 
 #include "hack.h"
 
+/*
+ * historical structlevel savefile writing and reading routines follow.
+ * These were moved here from save.c and restore.c between 3.6.3 and 3.7.0.
+ */
+
 #ifdef TRACE_BUFFERING
 #ifdef bufon
 #undef bufon
@@ -36,47 +41,165 @@ void FDECL(mread, (int, genericptr_t, unsigned int));
 void NDECL(minit);
 void FDECL(bclose, (int));
 #endif /* TRACE_BUFFERING */
+STATIC_DCL int FDECL(getidx, (int, int));
 
 #if defined(UNIX) || defined(WIN32)
 #define USE_BUFFERING
 #endif
 
-/*
- * historical structlevel savefile writing and reading routines follow.
- * These were moved here from save.c and restore.c between 3.6.3 and 3.7.0.
- */
-
 struct restore_info restoreinfo = {
 	"externalcomp", 0,
 };
 
+#define MAXFD 5
+enum {NOFLG = 0, NOSLOT = 1};
+static int bw_sticky[MAXFD] = {-1,-1,-1,-1,-1};
+static int bw_buffered[MAXFD] = {0,0,0,0,0};
+#ifdef USE_BUFFERING
+static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
+#endif
 
-static int bw_fd = -1;
-static FILE *bw_FILE = 0;
-static boolean buffering = FALSE;
+/*
+ * Presumably, the fdopen() to allow use of stdio fwrite()
+ * over write() was done for performance or functionality
+ * reasons to help some particular platform long ago.
+ *
+ * There have been some issues being encountered with the
+ * implementation due to having an individual set of
+ * tracking variables, even though there were nested
+ * sets of open fd (like INSURANCE).
+ *
+ * This uses an individual tracking entry for each fd
+ * being used.
+ *
+ * Some notes:
+ *
+ * Once buffered IO (stdio) has been enabled on the file
+ * associated with a descriptor via fdopen(): 
+ *                          
+ *    1. If you use bufoff and bufon to try and toggle the
+ *       use of write vs fwrite; the code just tracks which
+ *       routine is to be called through the tracking
+ *       variables and acts accordingly.
+ *             bw_sticky[]    -  used to find the index number for
+ *                               the fd that is stored in it, or -1
+ *                               if it is a free slot.
+ *             bw_buffered[]  -  indicator that buffered IO routines
+ *                               are available for use.
+ *             bw_FILE[]      -  the non-zero FILE * for use in calling 
+ *                               fwrite() when bw_buffered[] is also
+ *                               non-zero.
+ *
+ *    2. It is illegal to call close(fd) after fdopen(), you
+ *       must always use fclose() on the FILE * from
+ *       that point on, so care must be taken to never call
+ *       close(fd) on the underlying fd or bad things will
+ *       happen.
+ */
+
+STATIC_OVL int
+getidx(fd, flg)
+int fd, flg;
+{
+    int i, retval = -1;
+
+    for (i = 0; i < MAXFD; ++i)
+        if (bw_sticky[i] == fd)
+            return i;
+    if (flg == NOSLOT)
+        return retval;
+    for (i = 0; i < MAXFD; ++i)
+        if (bw_sticky[i] < 0) {
+            bw_sticky[i] = fd;
+            retval = i;
+            break;
+        }
+    return retval;
+}
+
+/* Let caller know that bclose() should handle it (TRUE) */
+boolean
+close_check(fd)
+int fd;
+{
+    int idx = getidx(fd, NOSLOT);
+    boolean retval = FALSE;
+
+    if (idx >= 0)
+        retval = TRUE;
+    return retval;
+}
 
 void
 bufon(fd)
-    int fd;
+int fd;
 {
+    int idx = getidx(fd, NOFLG);
+
+    if (idx >= 0) {
+        bw_sticky[idx] = fd;
 #ifdef USE_BUFFERING
-    if(bw_fd != fd) {
-        if(bw_fd >= 0)
-            panic("double buffering unexpected");
-        bw_fd = fd;
-        if((bw_FILE = fdopen(fd, "w")) == 0)
-            panic("buffering of file %d failed", fd);
-    }
+        if (bw_buffered[idx])
+            panic("buffering already enabled");
+        if (!bw_FILE[idx]) {
+            if ((bw_FILE[idx] = fdopen(fd, "w")) == 0)
+                panic("buffering of file %d failed", fd);
+        }
+        bw_buffered[idx] = (bw_FILE[idx] > 0);
+#else
+        bw_buffered[idx] = 1;
 #endif
-    buffering = TRUE;
+    }
 }
 
 void
 bufoff(fd)
 int fd;
 {
-    bflush(fd);
-    buffering = FALSE;
+    int idx = getidx(fd, NOFLG);
+
+    if (idx >= 0) {
+        bflush(fd);
+        bw_buffered[idx] = 0;     /* just a flag that says "use write(fd)" */
+    }
+}
+
+void
+bclose(fd)
+int fd;
+{
+    int idx = getidx(fd, NOSLOT);
+
+    bufoff(fd);     /* sets bw_buffered[idx] = 0 */
+    if (idx >= 0) {
+#ifdef USE_BUFFERING
+        if (bw_FILE[idx]) {
+            (void) fclose(bw_FILE[idx]);
+            bw_FILE[idx] = 0;
+        } else
+#endif
+            close(fd);
+        /* return the idx to the pool */
+        bw_sticky[idx] = -1;
+    }
+    return;
+}
+
+void
+bflush(fd)
+int fd;
+{
+    int idx = getidx(fd, NOFLG);
+
+    if (idx >= 0) {
+#ifdef USE_BUFFERING
+        if (bw_FILE[idx]) {
+           if (fflush(bw_FILE[idx]) == EOF)
+               panic("flush of savefile failed!");
+        }
+#endif
+    }
+    return;
 }
 
 void
@@ -86,68 +209,40 @@ register genericptr_t loc;
 register unsigned num;
 {
     boolean failed;
+    int idx = getidx(fd, NOFLG);
 
+    if (idx >= 0) {
 #ifdef MFLOPPY
-    bytes_counted += num;
-    if (count_only)
-        return;
+        bytes_counted += num;
+        if (count_only)
+            return;
 #endif
-
 #ifdef USE_BUFFERING
-    if (buffering) {
-        if (fd != bw_fd)
-            panic("unbuffered write to fd %d (!= %d)", fd, bw_fd);
-
-        failed = (fwrite(loc, (int) num, 1, bw_FILE) != 1);
-    } else
-#endif /* USE_BUFFERING */
-    {
-        /* lint wants 3rd arg of write to be an int; lint -p an unsigned */
+        if (bw_buffered[idx] && bw_FILE[idx]) {
+            failed = (fwrite(loc, (int) num, 1, bw_FILE[idx]) != 1);
+        } else
+#endif /* UNIX */
+        {
+            /* lint wants 3rd arg of write to be an int; lint -p an unsigned */
 #if defined(BSD) || defined(ULTRIX) || defined(WIN32) || defined(_MSC_VER)
-        failed = ((long) write(fd, loc, (int) num) != (long) num);
+            failed = ((long) write(fd, loc, (int) num) != (long) num);
 #else /* e.g. SYSV, __TURBOC__ */
-        failed = ((long) write(fd, loc, num) != (long) num);
+            failed = ((long) write(fd, loc, num) != (long) num);
 #endif
-    }
-
-    if (failed) {
+        }
+        if (failed) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
-        if (g.program_state.done_hup)
-            nh_terminate(EXIT_FAILURE);
-        else
+            if (g.program_state.done_hup)
+                nh_terminate(EXIT_FAILURE);
+            else
 #endif
-            panic("cannot write %u bytes to file #%d", num, fd);
-    }
-}
-
-void
-bflush(fd)
-int fd;
-{
-#ifdef USE_BUFFERING
-    if (fd == bw_fd) {
-        if (fflush(bw_FILE) == EOF)
-            panic("flush of savefile failed!");
-    }
-#endif
-    return;
-}
-
-void
-bclose(fd)
-int fd;
-{
-    bufoff(fd);
-#ifdef USE_BUFFERING
-    if (fd == bw_fd) {
-        (void) fclose(bw_FILE);
-        bw_fd = -1;
-        bw_FILE = 0;
+                panic("cannot write %u bytes to file #%d", num, fd);
+        }
     } else
-#endif
-        (void) nhclose(fd);
-    return;
+        impossible("fd not in list (%d)?", fd);
 }
+
+/*  ===================================================== */
 
 void
 minit()

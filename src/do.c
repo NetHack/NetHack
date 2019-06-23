@@ -1166,7 +1166,8 @@ save_currentstate()
         nhfp = currentlevel_rewrite();
         if (!nhfp)
             return;
-        bufon(nhfp->fd);
+        if (nhfp->structlevel)
+            bufon(nhfp->fd);
         nhfp->mode = WRITING;
         savelev(nhfp,ledger_no(&u.uz));
         close_nhfile(nhfp);
@@ -1362,7 +1363,8 @@ boolean at_stairs, falling, portal;
     cant_go_back = (newdungeon && In_endgame(newlevel));
     if (!cant_go_back) {
         update_mlstmv(); /* current monsters are becoming inactive */
-        bufon(nhfp->fd);       /* use buffered output */
+        if (nhfp->structlevel)
+            bufon(nhfp->fd);       /* use buffered output */
     }
     save_mode = nhfp->mode;
     nhfp->mode = cant_go_back ? FREEING : (WRITING | FREEING);

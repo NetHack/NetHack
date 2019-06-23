@@ -20,6 +20,10 @@ long bytes_counted;
 static int count_only;
 #endif
 
+#if defined(UNIX) || defined(WIN32)
+#define USE_BUFFERING
+#endif
+
 /*SAVE2018*/
 extern void FDECL(nhout, (int, const char *,
                     const char *, int, genericptr_t, int));
@@ -48,11 +52,7 @@ STATIC_DCL void FDECL(savelev0, (NHFILE *, XCHAR_P, int));
 STATIC_DCL boolean NDECL(swapout_oldest);
 STATIC_DCL void FDECL(copyfile, (char *, char *));
 #endif /* MFLOPPY */
-/* STATIC_DCL void FDECL(savelevl, (int fd, BOOLEAN_P)); */
-STATIC_DCL void FDECL(def_bufon, (int));
-STATIC_DCL void FDECL(def_bufoff, (int));
-STATIC_DCL void FDECL(def_bflush, (int));
-STATIC_DCL void FDECL(def_bwrite, (int, genericptr_t, unsigned int));
+
 #ifdef ZEROCOMP
 STATIC_DCL void FDECL(zerocomp_bufon, (int));
 STATIC_DCL void FDECL(zerocomp_bufoff, (int));
@@ -60,22 +60,6 @@ STATIC_DCL void FDECL(zerocomp_bflush, (int));
 STATIC_DCL void FDECL(zerocomp_bwrite, (int, genericptr_t, unsigned int));
 STATIC_DCL void FDECL(zerocomp_bputc, (int));
 #endif
-
-static struct save_procs {
-    const char *name;
-    void FDECL((*save_bufon), (int));
-    void FDECL((*save_bufoff), (int));
-    void FDECL((*save_bflush), (int));
-    void FDECL((*save_bwrite), (int, genericptr_t, unsigned int));
-    void FDECL((*save_bclose), (int));
-} saveprocs = {
-#if !defined(ZEROCOMP) || (defined(COMPRESS) || defined(ZLIB_COMP))
-    "externalcomp", def_bufon, def_bufoff, def_bflush, def_bwrite, def_bclose,
-#else
-    "zerocomp",      zerocomp_bufon,  zerocomp_bufoff,
-    zerocomp_bflush, zerocomp_bwrite, zerocomp_bclose,
-#endif
-};
 
 #if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
 #define HUP if (!g.program_state.done_hup)
@@ -118,9 +102,8 @@ dosave0()
     const char *fq_save;
     xchar ltmp;
     d_level uz_save;
-    char whynot[BUFSZ], indicate;
+    char whynot[BUFSZ];
     NHFILE *nhfp, *onhfp;
-    int cmc = 0;
 
     /* we may get here via hangup signal, in which case we want to fix up
        a few of things before saving so that they won't be restored in
@@ -228,23 +211,6 @@ dosave0()
         sfo_addinfo(nhfp, "NetHack", "start", "savefile", 0);
 
     nhfp->mode = WRITING | FREEING;
-    if (nhfp->mode & WRITING) {
-        if (nhfp->fieldlevel && nhfp->mode & WRITING) {
-            indicate = (nhfp->fnidx == lendian) ? 'l'
-                       : (nhfp->fnidx == ascii) ? 'a' : 'u';
-            sfo_char(nhfp, &indicate, "indicate", "format", 1);
-            cmc = critical_members_count();
-            {
-                pline("critical-members=%d.", cmc);
-            }
-            sfo_int(nhfp, &cmc, "validate", "critical_members_count", 1);
-        }
-        if (nhfp->structlevel && nhfp->mode & WRITING) {
-            indicate = 'h';     /* historical */
-            bwrite(nhfp->fd, (genericptr_t) &indicate, sizeof indicate);
-            bwrite(nhfp->fd, (genericptr_t) &cmc, sizeof cmc);
-        }
-    }
     store_version(nhfp);
     store_savefileinfo(nhfp);
     if (nhfp && nhfp->fplog)
@@ -788,320 +754,6 @@ boolean rlecomp;
     }
 }
 
-/*ARGSUSED*/
-void
-bufon(fd)
-int fd;
-{
-    (*saveprocs.save_bufon)(fd);
-    return;
-}
-
-/*ARGSUSED*/
-void
-bufoff(fd)
-int fd;
-{
-    (*saveprocs.save_bufoff)(fd);
-    return;
-}
-
-/* flush run and buffer */
-void
-bflush(fd)
-register int fd;
-{
-    (*saveprocs.save_bflush)(fd);
-    return;
-}
-
-void
-bwrite(fd, loc, num)
-int fd;
-genericptr_t loc;
-register unsigned num;
-{
-    (*saveprocs.save_bwrite)(fd, loc, num);
-    return;
-}
-
-void
-bclose(fd)
-int fd;
-{
-    (*saveprocs.save_bclose)(fd);
-    return;
-}
-
-static int bw_fd = -1;
-static FILE *bw_FILE = 0;
-static boolean buffering = FALSE;
-
-STATIC_OVL void
-def_bufon(fd)
-    int fd;
-{
-#ifdef UNIX
-    if(bw_fd != fd) {
-        if(bw_fd >= 0)
-            panic("double buffering unexpected");
-        bw_fd = fd;
-        if((bw_FILE = fdopen(fd, "w")) == 0)
-            panic("buffering of file %d failed", fd);
-    }
-#endif
-    buffering = TRUE;
-}
-
-STATIC_OVL void
-def_bufoff(fd)
-int fd;
-{
-    def_bflush(fd);
-    buffering = FALSE;
-}
-
-STATIC_OVL void
-def_bflush(fd)
-int fd;
-{
-#ifdef UNIX
-    if (fd == bw_fd) {
-        if (fflush(bw_FILE) == EOF)
-            panic("flush of savefile failed!");
-    }
-#endif
-    return;
-}
-
-STATIC_OVL void
-def_bwrite(fd, loc, num)
-register int fd;
-register genericptr_t loc;
-register unsigned num;
-{
-    boolean failed;
-
-#ifdef MFLOPPY
-    bytes_counted += num;
-    if (count_only)
-        return;
-#endif
-
-#ifdef UNIX
-    if (buffering) {
-        if (fd != bw_fd)
-            panic("unbuffered write to fd %d (!= %d)", fd, bw_fd);
-
-        failed = (fwrite(loc, (int) num, 1, bw_FILE) != 1);
-    } else
-#endif /* UNIX */
-    {
-        /* lint wants 3rd arg of write to be an int; lint -p an unsigned */
-#if defined(BSD) || defined(ULTRIX) || defined(WIN32) || defined(_MSC_VER)
-        failed = ((long) write(fd, loc, (int) num) != (long) num);
-#else /* e.g. SYSV, __TURBOC__ */
-        failed = ((long) write(fd, loc, num) != (long) num);
-#endif
-    }
-
-    if (failed) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
-        if (g.program_state.done_hup)
-            nh_terminate(EXIT_FAILURE);
-        else
-#endif
-            panic("cannot write %u bytes to file #%d", num, fd);
-    }
-}
-
-void
-def_bclose(fd)
-int fd;
-{
-    bufoff(fd);
-#ifdef UNIX
-    if (fd == bw_fd) {
-        (void) fclose(bw_FILE);
-        bw_fd = -1;
-        bw_FILE = 0;
-    } else
-#endif
-        (void) nhclose(fd);
-    return;
-}
-
-#ifdef ZEROCOMP
-/* The runs of zero-run compression are flushed after the game state or a
- * level is written out.  This adds a couple bytes to a save file, where
- * the runs could be mashed together, but it allows gluing together game
- * state and level files to form a save file, and it means the flushing
- * does not need to be specifically called for every other time a level
- * file is written out.
- */
-
-#define RLESC '\0'    /* Leading character for run of LRESC's */
-#define flushoutrun(ln) (zerocomp_bputc(RLESC), zerocomp_bputc(ln), ln = -1)
-
-#ifndef ZEROCOMP_BUFSIZ
-# define ZEROCOMP_BUFSIZ BUFSZ
-#endif
-static NEARDATA unsigned char outbuf[ZEROCOMP_BUFSIZ];
-static NEARDATA unsigned short outbufp = 0;
-static NEARDATA short outrunlength = -1;
-static NEARDATA int bwritefd;
-static NEARDATA boolean compressing = FALSE;
-
-/*dbg()
-{
-    HUP printf("outbufp %d outrunlength %d\n", outbufp,outrunlength);
-}*/
-
-STATIC_OVL void
-zerocomp_bputc(c)
-int c;
-{
-#ifdef MFLOPPY
-    bytes_counted++;
-    if (count_only)
-      return;
-#endif
-    if (outbufp >= sizeof outbuf) {
-        (void) write(bwritefd, outbuf, sizeof outbuf);
-        outbufp = 0;
-    }
-    outbuf[outbufp++] = (unsigned char)c;
-}
-
-/*ARGSUSED*/
-void
-STATIC_OVL zerocomp_bufon(fd)
-int fd;
-{
-    compressing = TRUE;
-    return;
-}
-
-/*ARGSUSED*/
-STATIC_OVL void
-zerocomp_bufoff(fd)
-int fd;
-{
-    if (outbufp) {
-        outbufp = 0;
-        panic("closing file with buffered data still unwritten");
-    }
-    outrunlength = -1;
-    compressing = FALSE;
-    return;
-}
-
-/* flush run and buffer */
-STATIC_OVL void
-zerocomp_bflush(fd)
-register int fd;
-{
-    bwritefd = fd;
-    if (outrunlength >= 0) { /* flush run */
-        flushoutrun(outrunlength);
-    }
-#ifdef MFLOPPY
-    if (count_only)
-        outbufp = 0;
-#endif
-
-    if (outbufp) {
-        if (write(fd, outbuf, outbufp) != outbufp) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
-            if (g.program_state.done_hup)
-                nh_terminate(EXIT_FAILURE);
-            else
-#endif
-                zerocomp_bclose(fd); /* panic (outbufp != 0) */
-        }
-        outbufp = 0;
-    }
-}
-
-STATIC_OVL void
-zerocomp_bwrite(fd, loc, num)
-int fd;
-genericptr_t loc;
-register unsigned num;
-{
-    register unsigned char *bp = (unsigned char *) loc;
-
-    if (!compressing) {
-#ifdef MFLOPPY
-        bytes_counted += num;
-        if (count_only)
-            return;
-#endif
-        if ((unsigned) write(fd, loc, num) != num) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
-            if (g.program_state.done_hup)
-                nh_terminate(EXIT_FAILURE);
-            else
-#endif
-                panic("cannot write %u bytes to file #%d", num, fd);
-        }
-    } else {
-        bwritefd = fd;
-        for (; num; num--, bp++) {
-            if (*bp == RLESC) { /* One more char in run */
-                if (++outrunlength == 0xFF) {
-                    flushoutrun(outrunlength);
-                }
-            } else {                     /* end of run */
-                if (outrunlength >= 0) { /* flush run */
-                    flushoutrun(outrunlength);
-                }
-                zerocomp_bputc(*bp);
-            }
-        }
-    }
-}
-
-void
-zerocomp_bclose(fd)
-int fd;
-{
-    zerocomp_bufoff(fd);
-    (void) nhclose(fd);
-    return;
-}
-#endif /* ZEROCOMP */
-
-STATIC_OVL void
-savelevchn(nhfp)
-NHFILE *nhfp;
-{
-    s_level *tmplev, *tmplev2;
-    int cnt = 0;
-
-    for (tmplev = g.sp_levchn; tmplev; tmplev = tmplev->next)
-        cnt++;
-    if (perform_bwrite(nhfp)) {
-        if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &cnt, sizeof cnt);
-        if (nhfp->fieldlevel)
-            sfo_int(nhfp, &cnt, "levchn", "lev_count", 1);
-    }
-    for (tmplev = g.sp_levchn; tmplev; tmplev = tmplev2) {
-        tmplev2 = tmplev->next;
-        if (perform_bwrite(nhfp)) {
-            if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) tmplev, sizeof *tmplev);
-            if (nhfp->fieldlevel)
-                sfo_s_level(nhfp, tmplev, "levchn", "s_level", 1);
-	}
-        if (release_data(nhfp))
-            free((genericptr_t) tmplev);
-    }
-    if (release_data(nhfp))
-        g.sp_levchn = 0;
-}
-
 /* used when saving a level and also when saving dungeon overview data */
 void
 savecemetery(nhfp, cemeteryaddr)
@@ -1487,6 +1139,38 @@ NHFILE *nhfp;
         g.ffruit = 0;
 }
 
+
+
+STATIC_OVL void
+savelevchn(nhfp)
+NHFILE *nhfp;
+{
+    s_level *tmplev, *tmplev2;
+    int cnt = 0;
+
+    for (tmplev = g.sp_levchn; tmplev; tmplev = tmplev->next)
+        cnt++;
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &cnt, sizeof cnt);
+        if (nhfp->fieldlevel)
+            sfo_int(nhfp, &cnt, "levchn", "lev_count", 1);
+    }
+    for (tmplev = g.sp_levchn; tmplev; tmplev = tmplev2) {
+        tmplev2 = tmplev->next;
+        if (perform_bwrite(nhfp)) {
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) tmplev, sizeof *tmplev);
+            if (nhfp->fieldlevel)
+                sfo_s_level(nhfp, tmplev, "levchn", "s_level", 1);
+	}
+        if (release_data(nhfp))
+            free((genericptr_t) tmplev);
+    }
+    if (release_data(nhfp))
+        g.sp_levchn = 0;
+}
+
 void
 store_plname_in_file(nhfp)
 NHFILE *nhfp;
@@ -1571,42 +1255,6 @@ NHFILE *nhfp;
         sfo_savefile_info(nhfp, &sfsaveinfo, "savefileinfo", "savefile_info", 1);
     }
     return;
-}
-
-void
-set_savepref(suitename)
-const char *suitename;
-{
-    if (!strcmpi(suitename, "externalcomp")) {
-        saveprocs.name = "externalcomp";
-        saveprocs.save_bufon = def_bufon;
-        saveprocs.save_bufoff = def_bufoff;
-        saveprocs.save_bflush = def_bflush;
-        saveprocs.save_bwrite = def_bwrite;
-        saveprocs.save_bclose = def_bclose;
-        sfsaveinfo.sfi1 |= SFI1_EXTERNALCOMP;
-        sfsaveinfo.sfi1 &= ~SFI1_ZEROCOMP;
-    }
-    if (!strcmpi(suitename, "!rlecomp")) {
-        sfsaveinfo.sfi1 &= ~SFI1_RLECOMP;
-    }
-#ifdef ZEROCOMP
-    if (!strcmpi(suitename, "zerocomp")) {
-        saveprocs.name = "zerocomp";
-        saveprocs.save_bufon = zerocomp_bufon;
-        saveprocs.save_bufoff = zerocomp_bufoff;
-        saveprocs.save_bflush = zerocomp_bflush;
-        saveprocs.save_bwrite = zerocomp_bwrite;
-        saveprocs.save_bclose = zerocomp_bclose;
-        sfsaveinfo.sfi1 |= SFI1_ZEROCOMP;
-        sfsaveinfo.sfi1 &= ~SFI1_EXTERNALCOMP;
-    }
-#endif
-#ifdef RLECOMP
-    if (!strcmpi(suitename, "rlecomp")) {
-        sfsaveinfo.sfi1 |= SFI1_RLECOMP;
-    }
-#endif
 }
 
 /* also called by prscore(); this probably belongs in dungeon.c... */
@@ -1800,5 +1448,4 @@ co_false()
 }
 
 #endif /* MFLOPPY */
-
 /*save.c*/

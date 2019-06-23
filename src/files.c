@@ -80,11 +80,9 @@ static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #endif
 #endif
 
-#ifdef HOLD_LOCKFILE_OPEN
 #if defined(WIN32)
 #include <share.h>
 #endif
-#endif /*HOLD_LOCKFILE_OPEN*/
 
 STATIC_DCL FILE *NDECL(fopen_wizkit_file);
 STATIC_DCL void FDECL(wizkit_addinv, (struct obj *));
@@ -168,9 +166,6 @@ STATIC_DCL void FDECL(parseformat, (int *, char *));
 
 #ifdef SELF_RECOVER
 STATIC_DCL boolean FDECL(copy_bytes, (int, int));
-#endif
-#ifdef HOLD_LOCKFILE_OPEN
-STATIC_DCL int FDECL(open_levelfile_exclusively, (const char *, int, int));
 #endif
 STATIC_DCL NHFILE *FDECL(viable_nhfile, (NHFILE *));
 
@@ -415,25 +410,6 @@ NHFILE *nhfp;
     }
 }
 
-#if 0
-E void FDECL(sfi_init, (struct sf_procs *));
-E void FDECL(sfo_init, (struct sf_procs *));
-E struct sf_procs sfoprocs, sfiprocs;
-#ifdef SYSCF
-    if (sysopt.saveformat[0] > 1) {
-        /* initialize the function pointers for fieldlevel saves */
-        if (sysopt.saveformat[0] == lendian) {
-            sfi_init(&lendian_sfi_procs);
-            sfo_init(&lendian_sfo_procs);
-        }
-        if (sysopt.saveformat[0] == ascii) {
-            sfi_init(&ascii_sfi_procs);
-            sfo_init(&ascii_sfo_procs);
-        }
-    }
-#endif
-#endif
-
 NHFILE *
 new_nhfile()
 {
@@ -465,7 +441,7 @@ NHFILE *nhfp;
                 (void) fclose(nhfp->fpdef);
                 nhfp->fpdef = (FILE *) 0;
             }
-	}
+        }
         if (nhfp->fplog)
             (void) fprintf(nhfp->fplog, "# closing\n");
         if (nhfp->fplog)
@@ -493,7 +469,7 @@ NHFILE *nhfp;
             rewind(nhfp->fpdef);
             nhfp->count = 0L;
             nhfp->eof = FALSE;
-	}
+        }
     }
 }
 
@@ -610,13 +586,7 @@ char errbuf[];
         /* Use O_TRUNC to force the file to be shortened if it already
          * exists and is currently longer.
          */
-#ifdef HOLD_LOCKFILE_OPEN
-        if (lev == 0)
-            nhfp->fd = open_levelfile_exclusively(
-                fq_lock, lev, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY);
-        else
-#endif
-            nhfp->fd = open(fq_lock, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK);
+        nhfp->fd = open(fq_lock, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 #else
 #ifdef MAC
         nhfp->fd = maccreat(fq_lock, LEVL_TYPE);
@@ -668,12 +638,7 @@ char errbuf[];
 #ifdef MAC
         nhfp->fd = macopen(fq_lock, O_RDONLY | O_BINARY, LEVL_TYPE);
 #else
-#ifdef HOLD_LOCKFILE_OPEN
-        if (lev == 0)
-            nhfp->fd = open_levelfile_exclusively(fq_lock, lev, O_RDONLY | O_BINARY);
-        else
-#endif
-            nhfp->fd = open(fq_lock, O_RDONLY | O_BINARY, 0);
+        nhfp->fd = open(fq_lock, O_RDONLY | O_BINARY, 0);
 #endif
 
         /* for failure, return an explanation that our caller can use;
@@ -697,10 +662,6 @@ int lev;
      */
     if (lev == 0 || (g.level_info[lev].flags & LFILE_EXISTS)) {
         set_levelfile_name(g.lock, lev);
-#ifdef HOLD_LOCKFILE_OPEN
-        if (lev == 0)
-            really_close();
-#endif
         (void) unlink(fqname(g.lock, LEVELPREFIX, 0));
         g.level_info[lev].flags &= ~LFILE_EXISTS;
     }
@@ -749,88 +710,20 @@ const void *q;
 }
 #endif
 
-#ifdef HOLD_LOCKFILE_OPEN
-STATIC_OVL int
-open_levelfile_exclusively(name, lev, oflag)
-const char *name;
-int lev, oflag;
-{
-    int reslt, fd;
-
-    if (!g.lftrack.init) {
-        g.lftrack.init = 1;
-        g.lftrack.fd = -1;
-    }
-    if (g.lftrack.fd >= 0) {
-        /* check for compatible access */
-        if (g.lftrack.oflag == oflag) {
-            fd = g.lftrack.fd;
-            reslt = lseek(fd, 0L, SEEK_SET);
-            if (reslt == -1L)
-                panic("open_levelfile_exclusively: lseek failed %d", errno);
-            g.lftrack.nethack_thinks_it_is_open = TRUE;
-        } else {
-            really_close();
-            fd = sopen(name, oflag, SH_DENYRW, FCMASK);
-            g.lftrack.fd = fd;
-            g.lftrack.oflag = oflag;
-            g.lftrack.nethack_thinks_it_is_open = TRUE;
-        }
-    } else {
-        fd = sopen(name, oflag, SH_DENYRW, FCMASK);
-        g.lftrack.fd = fd;
-        g.lftrack.oflag = oflag;
-        if (fd >= 0)
-            g.lftrack.nethack_thinks_it_is_open = TRUE;
-    }
-    return fd;
-}
-
-void
-really_close()
-{
-    int fd;
-
-    if (g.lftrack.init) {
-        fd = g.lftrack.fd;
-
-        g.lftrack.nethack_thinks_it_is_open = FALSE;
-        g.lftrack.fd = -1;
-        g.lftrack.oflag = 0;
-        if (fd != -1)
-            (void) close(fd);
-    }
-    return;
-}
-
 int
 nhclose(fd)
 int fd;
 {
-    NHFILE *nhfp, tnhfp;
+    int retval = 0;
 
-    if (g.lftrack.fd == fd) {
-        really_close(); /* close it, but reopen it to hold it */
-        nhfp = open_levelfile(0, (char *) 0);
-        if (nhfp) {
-            tnhfp = *nhfp;
-            free(nhfp);
-            g.lftrack.fd = tnhfp.fd;
-        }
-        g.lftrack.nethack_thinks_it_is_open = FALSE;
-        return 0;
+    if (fd >= 0) {
+        if (close_check(fd))
+            bclose(fd);
+        else
+            retval = close(fd);
     }
-    return close(fd);
+    return retval;
 }
-#else /* !HOLD_LOCKFILE_OPEN */
-
-int
-nhclose(fd)
-int fd;
-{
-    return close(fd);
-}
-#endif /* ?HOLD_LOCKFILE_OPEN */
 
 /* ----------  END LEVEL FILE HANDLING ----------- */
 
@@ -974,7 +867,7 @@ char errbuf[];
 #endif
             if (nhfp->fd < 0)
                 failed = errno;
-	}
+        }
         if (failed && errbuf)  /* failure explanation */
             Sprintf(errbuf, "Cannot create bones \"%s\", id %s (errno %d).",
                     g.lock, *bonesid, errno);
@@ -1114,70 +1007,98 @@ void
 set_savefile_name(regularize_it)
 boolean regularize_it;
 {
-    int idx = 0;
+    int idx = 0, regoffset = 0, overflow = 0,  
+        indicator_spot = 0; /* 0=no indicator, 1=before ext, 2=after ext */
+    const char *postappend = (const char *) 0,
+               *sfindicator = (const char *) 0;
 
-#ifdef VMS
-    Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
 #ifdef SYSCF
     idx = sysopt.saveformat[0];
     if (idx > historical && idx <= ascii)
-        Strcat(g.SAVEF, sfoprocs[idx].ext);
+        sfindicator = sfoprocs[idx].ext;
 #endif
-    if (regularize_it)
-        regularize(g.SAVEF + 7);
-    Strcat(g.SAVEF, ";1");
-#else
-#if defined(MICRO)
-    Strcpy(g.SAVEF, g.SAVEP);
+#ifdef VMS
+    Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
+    regoffset = 7;
+    indicator_spot = 1;
+    postappend = ";1");
+#endif
+#if defined(WIN32)
+    if (regularize_it) {
+        static const char okchars[] =
+            "*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.";
+        const char *legal = okchars;
+        char tmp[BUFSZ];
+
+        ++legal; /* skip '*' wildcard character */
+        (void) fname_encode(legal, '%', g.plname, tmp, sizeof tmp);
+        if (strlen(tmp) < (SAVESIZE - 1))
+            Strcpy(g.SAVEF, tmp);
+        else
+            overflow = 1;
+        indicator_spot = 1;
+        regularize_it = FALSE;
+    }
+#endif
+#ifdef UNIX
+    Sprintf(g.SAVEF, "save/%d%s", (int) getuid(), g.plname);
+    regoffset = 5;
+    indicator_spot = 2;
+#endif
+#if defined(MICRO) && !defined(VMS) && !defined(WIN32)
+    if (strlen(g.SAVEP) < (SAVESIZE - 1))
+        Strcpy(g.SAVEF, g.SAVEP);
+    else
 #ifdef AMIGA
-    strncat(g.SAVEF, bbs_id, PATHLEN);
+        if (strlen(g.SAVEP) + strlen(bbs_id) < (SAVESIZE - 1))
+            strncat(g.SAVEF, bbs_id, PATHLEN);
 #endif
     {
         int i = strlen(g.SAVEP);
 #ifdef AMIGA
         /* g.plname has to share space with g.SAVEP and ".sav" */
-        (void) strncat(g.SAVEF, g.plname, FILENAME - i - 4);
+        (void) strncat(g.SAVEF, g.plname,
+                       FILENAME - i - strlen(SAVE_EXTENSION));
 #else
         (void) strncat(g.SAVEF, g.plname, 8);
 #endif
-#ifdef SYSCF
-        idx = sysopt.saveformat[0];
-        if (idx > historical && idx <= ascii)
-            Strcat(g.SAVEF, sfoprocs[idx].ext);
-#endif
-        if (regularize_it)
-            regularize(g.SAVEF + i);
+        regoffset = i;
     }
-    Strcat(g.SAVEF, SAVE_EXTENSION);
-#else
-#if defined(WIN32)
-    {
-        static const char okchars[] =
-            "*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.";
-        const char *legal = okchars;
-
-        if (regularize_it)
-            ++legal; /* skip '*' wildcard character */
-        (void) fname_encode(legal, '%', g.plname, g.SAVEF, sizeof g.SAVEF);
-        Strcat(g.SAVEF, SAVE_EXTENSION);
-#ifdef SYSCF
-        idx = sysopt.saveformat[0];
-        if (idx > historical && idx <= ascii)
-            Strcat(g.SAVEF, sfoprocs[idx].ext);
-#endif
-    }
-#else  /* not VMS or MICRO or WIN32 */
-    Sprintf(g.SAVEF, "save/%d%s", (int) getuid(), g.plname);
-#ifdef SYSCF
-    idx = sysopt.saveformat[0];
-    if (idx > historical && idx <= ascii)
-        Strcat(g.SAVEF, sfoprocs[idx].ext);
-#endif
-    if (regularize_it)
-        regularize(g.SAVEF + 5); /* avoid . or / in name */
-#endif /* WIN32 */
 #endif /* MICRO */
-#endif /* VMS   */
+
+    if (regularize_it)
+         regularize(g.SAVEF + regoffset);
+    if (indicator_spot == 1 && sfindicator && !overflow) {
+        if (strlen(g.SAVEF) + strlen(sfindicator) < (SAVESIZE - 1))
+            Strcat(g.SAVEF, sfindicator);
+        else
+            overflow = 2;
+    }
+#ifdef SAVE_EXTENSION
+    if (strlen(SAVE_EXTENSION) > 0 && !overflow) {
+        if (strlen(g.SAVEF) + strlen(SAVE_EXTENSION) < (SAVESIZE - 1))
+            Strcat(g.SAVEF, SAVE_EXTENSION);
+        else
+            overflow = 3;
+    }
+#endif
+    if (indicator_spot == 2 && sfindicator && !overflow) {
+        if (strlen(g.SAVEF) + strlen(sfindicator) < (SAVESIZE - 1))
+           Strcat(g.SAVEF, sfindicator);
+        else
+            overflow = 4;
+    }
+    if (postappend && !overflow) {
+        if (strlen(g.SAVEF) + strlen(postappend) < (SAVESIZE - 1))
+            Strcat(g.SAVEF, postappend);
+        else
+            overflow = 5;
+    }
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+    if (overflow)
+        impossible("set_savefile_name() couldn't complete without overlow %d",
+                    overflow);
+#endif
 }
 
 #ifdef INSURANCE
@@ -1229,10 +1150,10 @@ create_savefile()
         nhfp->structlevel = TRUE;
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
+        nhfp->mode = WRITING;
 #ifdef SYSCF
         if (sysopt.saveformat[0] > historical &&
             sysopt.saveformat[0] <= ascii) {
-            nhfp->mode = WRITING;
             nhfp->structlevel = FALSE;
             nhfp->fieldlevel = TRUE;
             nhfp->addinfo = TRUE;
@@ -1248,7 +1169,7 @@ create_savefile()
             } else {
                 failed = errno;
             }
-	}
+        }
 #endif /* SYSCF */
         if (nhfp->structlevel) {
 #if defined(MICRO) || defined(WIN32)
@@ -1262,7 +1183,7 @@ create_savefile()
 #endif /* MICRO || WIN32 */
             if (nhfp->fd < 0)
                 failed = errno;
-	}
+        }
     }
 #if defined(VMS) && !defined(SECURE)
     /*
@@ -1293,10 +1214,10 @@ open_savefile()
         nhfp->structlevel = TRUE;
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
+        nhfp->mode = READING;
 #ifdef SYSCF
         if (sysopt.saveformat[0] > historical &&
             sysopt.saveformat[0] <= ascii) {
-            nhfp->mode = READING;
             nhfp->structlevel = FALSE;
             nhfp->fieldlevel = TRUE;
             nhfp->addinfo = TRUE;
@@ -1343,7 +1264,6 @@ restore_saved_game()
     const char *fq_save;
     NHFILE *nhfp = (NHFILE *) 0;
 
-    reset_restpref();
     set_savefile_name(TRUE);
 #ifdef MFLOPPY
     if (!saveDiskPrompt(1))
@@ -3708,7 +3628,7 @@ char *str;
         while (*p && isspace((uchar) *p)) {
             *p = '\0';
             p++;
-	}
+        }
         if (*p) {
             words++;
             if (kwi < 2)
@@ -3726,7 +3646,7 @@ char *str;
             for (i = 0; i < SIZE(legal); ++i) {
                if (!strcmpi(keywords[kwi], legal[i]))
                    arr[kwi] = i + 1;
-	    }
+            }
         }
 }
 
@@ -4081,10 +4001,6 @@ recover_savefile()
         }
     }
     close_nhfile(snhfp);
-
-#ifdef HOLD_LOCKFILE_OPEN
-    really_close();
-#endif
     /*
      * We have a successful savefile!
      * Only now do we erase the level files.

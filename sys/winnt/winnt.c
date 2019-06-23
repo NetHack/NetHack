@@ -505,8 +505,10 @@ int code;
            a little cleaner than the stdio one */
         windowprocs.win_nhgetch = windows_console_custom_nhgetch;
     }
-    if (getreturn_enabled)
+    if (getreturn_enabled) {
+        raw_print("\n");
         wait_synch();
+    }
     exit(code);
 }
 

@@ -95,12 +95,14 @@ typedef uchar nhsym;
 #endif
 #endif
 
+#if 0
 /* comment out to test effects of each #define -- these will probably
  * disappear eventually
  */
 #ifdef INTERNAL_COMP
 #define RLECOMP  /* run-length compression of levl array - JLee */
 #define ZEROCOMP /* zero-run compression of everything - Olaf Seibert */
+#endif
 #endif
 
 /* #define SPECIALIZATION */ /* do "specialized" version of new topology */

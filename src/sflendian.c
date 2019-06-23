@@ -65,7 +65,7 @@
 #endif
 
 struct sf_procs lendian_sfo_procs = {
-    "-le",
+    ".le",
     {
         lendian_sfo_aligntyp,
         lendian_sfo_any,
@@ -92,7 +92,7 @@ struct sf_procs lendian_sfo_procs = {
 
 struct sf_procs lendian_sfi_procs =
 {
-    "-le",
+    ".le",
     {
         lendian_sfi_aligntyp,
         lendian_sfi_any,

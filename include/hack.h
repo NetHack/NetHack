@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1561019041 2019/06/20 08:24:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.106 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1559227823 2019/05/30 14:50:23 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -572,6 +572,6 @@ enum bodypart_types {
 #endif
 
 #define DEVTEAM_EMAIL "devteam@nethack.org"
-#define DEVTEAM_URL "https://www.nethack.org/"
+#define DEVTEAM_URL "http://www.nethack.org"
 
 #endif /* HACK_H */

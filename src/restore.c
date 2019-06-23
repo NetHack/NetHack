@@ -25,9 +25,6 @@ STATIC_DCL void FDECL(zerocomp_mread, (int, genericptr_t, unsigned int));
 STATIC_DCL int NDECL(zerocomp_mgetc);
 #endif
 
-STATIC_DCL void NDECL(def_minit);
-STATIC_DCL void FDECL(def_mread, (int, genericptr_t, unsigned int));
-
 STATIC_DCL void NDECL(find_lev_obj);
 STATIC_DCL void FDECL(restlevchn, (NHFILE *));
 STATIC_DCL void FDECL(restdamage, (NHFILE *, BOOLEAN_P));
@@ -44,27 +41,6 @@ STATIC_DCL int FDECL(restlevelfile, (NHFILE *, XCHAR_P));
 STATIC_OVL void FDECL(restore_msghistory, (NHFILE *));
 STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
 STATIC_DCL void FDECL(rest_levl, (NHFILE *, BOOLEAN_P));
-
-#if 0
-extern int FDECL(nhin, (NHFILE *,char *,int,const char *, genericptr_t,int));
-int FDECL(dorecover, (NHFILE *));
-extern char *FDECL(sfdt2txt,(int));
-extern size_t FDECL(sfdtsz,(int));
-#endif
-
-static struct restore_procs restoreprocs = {
-#if !defined(ZEROCOMP) || (defined(COMPRESS) || defined(ZLIB_COMP))
-	"externalcomp", 0,
-	def_minit,
-	def_mread,
-        def_bclose,
-#else
-	"zerocomp", 0,
-	zerocomp_minit,
-	zerocomp_mread,
-	zerocomp_bclose,
-#endif
-};
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -993,6 +969,7 @@ xchar ltmp;
         pline("Be seeing you...");
         nh_terminate(EXIT_SUCCESS);
     }
+    nnhfp->mode = savemode;
 #endif /* MFLOPPY */
     bufon(nnhfp->fd);
     nnhfp->mode = WRITING | FREEING;
@@ -1067,11 +1044,11 @@ NHFILE *nhfp;
     if (!WINDOWPORT("X11"))
         putstr(WIN_MAP, 0, "Restoring:");
 #endif
-    restoreprocs.mread_flags = 1; /* return despite error */
+    restoreinfo.mread_flags = 1; /* return despite error */
     while (1) {
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp);
-            if (restoreprocs.mread_flags == -1)
+            if (restoreinfo.mread_flags == -1)
                 break;
         }
         if (nhfp->fieldlevel) {
@@ -1095,7 +1072,7 @@ NHFILE *nhfp;
         if (rtmp < 2)
             return rtmp; /* dorecover called recursively */
     }
-    restoreprocs.mread_flags = 0;
+    restoreinfo.mread_flags = 0;
     if (nhfp->fieldlevel && nhfp->addinfo)
         sfi_addinfo(nhfp, "NetHack", "end", "savefile", 0);
 
@@ -1105,11 +1082,6 @@ NHFILE *nhfp;
 
     getlev(nhfp, 0, (xchar) 0, FALSE);
     close_nhfile(nhfp);
-    /* Now set the restore settings to match the
-     * settings used by the save file output routines
-     */
-    reset_restpref();
-
     restlevelstate(stuckid, steedid);
     g.program_state.something_worth_saving = 1; /* useful data now exists */
 
@@ -1500,18 +1472,8 @@ char *plbuf;
         (void) read(nhfp->fd, (genericptr_t) plbuf, pltmpsiz);
     }
     if (nhfp->fieldlevel) {
-#if 0
-        if ((nhfp->mode & WRITING) != 0) {
-#endif
             sfi_int(nhfp, &pltmpsiz, "plname", "plname_size", 1);
             sfi_str(nhfp, plbuf, "plname", "g.plname", pltmpsiz);
-#if 0
-        } else {
-            /* int rlen; */
-            (void) read(nhfp->fd, (genericptr_t) &pltmpsiz, sizeof(pltmpsiz));
-            (void) read(nhfp->fd, (genericptr_t) plbuf, pltmpsiz);
-        }
-#endif
     }
     return;
 }
@@ -1709,41 +1671,6 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
 }
 #endif /* SELECTSAVED */
 
-void
-minit()
-{
-    (*restoreprocs.restore_minit)();
-    return;
-}
-
-void
-mread(fd, buf, len)
-register int fd;
-register genericptr_t buf;
-register unsigned int len;
-{
-
-#ifdef TROUBLESHOOTING
-    int n;
-    static int mcatch;
-    n = mcatch;
-again:
-    mcatch=rn2(500);
-    if (mcatch == n) goto again;
-#endif
-
-    (*restoreprocs.restore_mread)(fd, buf, len);
-    return;
-}
-
-/* examine the version info and the savefile_info data
-   that immediately follows it.
-   Return 0 if it passed the checks.
-   Return 1 if it failed the version check.
-   Return 2 if it failed the savefile feature check.
-   Return -1 if it failed for some unknown reason.
- */
-
 int
 validate(nhfp, name)
 NHFILE *nhfp;
@@ -1751,7 +1678,7 @@ const char *name;
 {
     int rlen;
     struct savefile_info sfi;
-    unsigned long compatible, utdflags = 0L;
+    unsigned long utdflags = 0L;
     boolean verbose = name ? TRUE : FALSE, reslt = FALSE;
 
     if (nhfp->structlevel)
@@ -1780,200 +1707,7 @@ const char *name;
 	    return -1;
         }
     }
-    if ((utdflags & UTD_SKIP_SAVEFILEINFO) != 0)
-        return 0;
-
-    compatible = (sfi.sfi1 & sfcap.sfi1);
-    if ((sfi.sfi1 & SFI1_ZEROCOMP) == SFI1_ZEROCOMP) {
-	if ((compatible & SFI1_ZEROCOMP) != SFI1_ZEROCOMP) {
-	    if (verbose) {
-		pline("File \"%s\" has incompatible ZEROCOMP compression.", name);
-		wait_synch();
-	    }
-	    return 2;
-	} else if ((sfrestinfo.sfi1 & SFI1_ZEROCOMP) != SFI1_ZEROCOMP) {
-	    set_restpref("zerocomp");
-	}
-    }
-
-    if ((sfi.sfi1 & SFI1_EXTERNALCOMP) == SFI1_EXTERNALCOMP) {
-	if ((compatible & SFI1_EXTERNALCOMP) != SFI1_EXTERNALCOMP) {
-	    if (verbose) {
-		pline("File \"%s\" lacks required internal compression.", name);
-		wait_synch();
-	    }
-	    return 2;
-	} else if ((sfrestinfo.sfi1 & SFI1_EXTERNALCOMP) != SFI1_EXTERNALCOMP) {
-	    set_restpref("externalcomp");
-	}
-    }
-
-    /* RLECOMP check must be last, after ZEROCOMP or INTERNALCOMP adjustments */
-    if ((sfi.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP) {
-	if ((compatible & SFI1_RLECOMP) != SFI1_RLECOMP) {
-	    if (verbose) {
-		pline("File \"%s\" has incompatible run-length compression.", name);
-		wait_synch();
-	    }
-	    return 2;
-	} else if ((sfrestinfo.sfi1 & SFI1_RLECOMP) != SFI1_RLECOMP) {
-	    set_restpref("rlecomp");
-        }
-    }
-    /* savefile does not have RLECOMP level location compression, so adjust */
-    else
-	set_restpref("!rlecomp");
-
     return 0;
-}
-
-void
-reset_restpref()
-{
-#ifdef ZEROCOMP
-	if (iflags.zerocomp)
-		set_restpref("zerocomp");
-	else 
-#endif
-		set_restpref("externalcomp");
-#ifdef RLECOMP
-	if (iflags.rlecomp)
-		set_restpref("rlecomp");
-	else
-#endif
-		set_restpref("!rlecomp");
-}
-
-void
-set_restpref(suitename)
-const char *suitename;
-{
-	if (!strcmpi(suitename, "externalcomp")) {
-		restoreprocs.name = "externalcomp";
-    		restoreprocs.restore_mread = def_mread;
-    		restoreprocs.restore_minit = def_minit;
-		sfrestinfo.sfi1 |= SFI1_EXTERNALCOMP;
-		sfrestinfo.sfi1 &= ~SFI1_ZEROCOMP;
-		def_minit();
-	}
-	if (!strcmpi(suitename, "!rlecomp")) {
-		sfrestinfo.sfi1 &= ~SFI1_RLECOMP;
-	}
-#ifdef ZEROCOMP
-	if (!strcmpi(suitename, "zerocomp")) {
-		restoreprocs.name = "zerocomp";
-    		restoreprocs.restore_mread = zerocomp_mread;
-    		restoreprocs.restore_minit = zerocomp_minit;
-		sfrestinfo.sfi1 |= SFI1_ZEROCOMP;
-		sfrestinfo.sfi1 &= ~SFI1_EXTERNALCOMP;
-		zerocomp_minit();
-	}
-#endif
-#ifdef RLECOMP
-	if (!strcmpi(suitename, "rlecomp")) {
-		sfrestinfo.sfi1 |= SFI1_RLECOMP;
-	}
-#endif
-}
-
-#ifdef ZEROCOMP
-#define RLESC '\0'	/* Leading character for run of RLESC's */
-
-#ifndef ZEROCOMP_BUFSIZ
-#define ZEROCOMP_BUFSIZ BUFSZ
-#endif
-static NEARDATA unsigned char inbuf[ZEROCOMP_BUFSIZ];
-static NEARDATA unsigned short inbufp = 0;
-static NEARDATA unsigned short inbufsz = 0;
-static NEARDATA short inrunlength = -1;
-static NEARDATA int mreadfd;
-
-STATIC_OVL int
-zerocomp_mgetc()
-{
-    if (inbufp >= inbufsz) {
-	inbufsz = read(mreadfd, (genericptr_t)inbuf, sizeof inbuf);
-	if (!inbufsz) {
-	    if (inbufp > sizeof inbuf)
-		error("EOF on file #%d.\n", mreadfd);
-	    inbufp = 1 + sizeof inbuf;  /* exactly one warning :-) */
-	    return -1;
-	}
-	inbufp = 0;
-    }
-    return inbuf[inbufp++];
-}
-
-STATIC_OVL void
-zerocomp_minit()
-{
-    inbufsz = 0;
-    inbufp = 0;
-    inrunlength = -1;
-}
-
-STATIC_OVL void
-zerocomp_mread(fd, buf, len)
-int fd;
-genericptr_t buf;
-register unsigned len;
-{
-    /*register int readlen = 0;*/
-    if (fd < 0) error("Restore error; mread attempting to read file %d.", fd);
-    mreadfd = fd;
-    while (len--) {
-	if (inrunlength > 0) {
-	    inrunlength--;
-	    *(*((char **)&buf))++ = '\0';
-	} else {
-	    register short ch = zerocomp_mgetc();
-	    if (ch < 0) {
-		restoreprocs.mread_flags = -1;
-		return;
-	    }
-	    if ((*(*(char **)&buf)++ = (char)ch) == RLESC) {
-		inrunlength = zerocomp_mgetc();
-	    }
-	}
-	/*readlen++;*/
-    }
-}
-#endif /* ZEROCOMP */
-
-STATIC_OVL void
-def_minit()
-{
-    return;
-}
-
-STATIC_OVL void
-def_mread(fd, buf, len)
-register int fd;
-register genericptr_t buf;
-register unsigned int len;
-{
-    register int rlen;
-#if defined(BSD) || defined(ULTRIX)
-#define readLenType int
-#else /* e.g. SYSV, __TURBOC__ */
-#define readLenType unsigned
-#endif
-
-    rlen = read(fd, buf, (readLenType) len);
-    if ((readLenType) rlen != (readLenType) len) {
-        if (restoreprocs.mread_flags == 1) { /* means "return anyway" */
-            restoreprocs.mread_flags = -1;
-            return;
-        } else {
-            pline("Read %d instead of %u bytes.", rlen, len);
-            if (g.restoring) {
-                (void) nhclose(fd);
-                (void) delete_savefile();
-                error("Error restoring old game.");
-            }
-            panic("Error reading level file.");
-        }
-    }
 }
 
 /*restore.c*/

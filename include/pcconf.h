@@ -180,7 +180,6 @@
 #undef lock
 #include <pc.h> /* kbhit() */
 #define PC_LOCKING
-#define HOLD_LOCKFILE_OPEN
 #define SELF_RECOVER /* NetHack itself can recover games */
 #endif
 

@@ -7,8 +7,7 @@
 #define DECL_H
 
 #define E extern
-
-#if !defined(MFLOPPY) && !defined(VMS)
+#if !defined(MFLOPPY) && !defined(VMS) && !defined(WIN32)
 #define LOCKNAMESIZE (PL_NSIZ + 14) /* long enough for uid+name+.99 */
 #define LOCKNAMEINIT "1lock"
 #define BONESINIT "bonesnn.xxx"
@@ -26,32 +25,51 @@
 #define BONESINIT "bonesnn.xxx;1"
 #define BONESSIZE sizeof(BONESINIT)
 #endif
-#endif
-
-/* This is written to a savefile by a defined size on some platforms,
-   so let's not create an automatic and unnecessary incompatibility */
-#if defined(UNIX) || defined(__BEOS__)
-#define SAVESIZE (PL_NSIZ + 50) /* save/99999player.e */
-#else
-#ifdef VMS
-#define SAVESIZE (PL_NSIZ + 50) /* [.save]<uid>player.e;1 */
-#else
 #if defined(WIN32)
-#define SAVESIZE (PL_NSIZ + 50) /* username-player.NetHack-saved-game */
-#else
-#define SAVESIZE FILENAME /* from macconf.h or pcconf.h */
-#endif
+#define LOCKNAMESIZE (PL_NSIZ + 25) /* long enough for username+-+name+.99 */
+#define LOCKNAMEINIT ""
+#define BONESINIT "bonesnn.xxx"
+#define BONESSIZE sizeof(BONESINIT)
 #endif
 #endif
 
-/* used in files.c */
-#ifdef HOLD_LOCKFILE_OPEN
-struct level_ftrack {
-    int init;
-    int fd;    /* file descriptor for level file     */
-    int oflag; /* open flags                         */
-    boolean nethack_thinks_it_is_open; /* Does NetHack think it's open? */
-};
+#define INDEXT ".xxxxxx"           /* largest indicator suffix */
+#define INDSIZE sizeof(INDEXT)
+
+#if defined(UNIX) || defined(__BEOS__)
+#define SAVEX "save/99999.e"
+#ifndef SAVE_EXTENSION
+#define SAVE_EXTENSION ""
+#endif
+#else /* UNIX || __BEOS__ */
+#ifdef VMS
+#define SAVEX "[.save]nnnnn.e;1"
+#ifndef SAVE_EXTENSION
+#define SAVE_EXTENSION ""
+#endif
+#else /* VMS */
+#if defined(WIN32) || defined(MICRO)
+#define SAVEX ""
+#if !defined(SAVE_EXTENSION)
+#ifdef MICRO
+#define SAVE_EXTENSION ".sav"
+#endif
+#ifdef WIN32
+#define SAVE_EXTENSION ".NetHack-saved-game"
+#endif
+#endif /* !SAVE_EXTENSION */
+#endif /* WIN32 || MICRO */
+#endif /* else !VMS */
+#endif /* else !(UNIX || __BEOS__) */
+
+#ifndef SAVE_EXTENSION
+#define SAVE_EXTENSION ""
+#endif
+
+#ifndef MICRO
+#define SAVESIZE (PL_NSIZ + sizeof(SAVEX) + sizeof(SAVE_EXTENSION) + INDSIZE)
+#else
+#define SAVESIZE FILENAME
 #endif
 
 /* max size of a windowtype option */
@@ -391,13 +409,11 @@ E const char *const monexplain[], invisexplain[], *const oclass_names[];
 E const char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
-struct restore_procs {
+struct restore_info {
 	const char *name;
 	int mread_flags;
-	void NDECL((*restore_minit));
-	void FDECL((*restore_mread), (int,genericptr_t,unsigned int));
-	void FDECL((*restore_bclose), (int));
 };
+E struct restore_info restoreinfo;
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
@@ -915,9 +931,6 @@ struct instance_globals {
     boolean chosen_symset_start;
     boolean chosen_symset_end;
     int symset_which_set;
-#ifdef HOLD_LOCKFILE_OPEN
-    struct level_ftrack lftrack;
-#endif /*HOLD_LOCKFILE_OPEN*/
     char SAVEF[SAVESIZE]; /* holds relative path of save file from playground */
 #ifdef MICRO
     char SAVEP[SAVESIZE]; /* holds path of directory for save file */

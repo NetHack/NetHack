@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1561017215 2019/06/20 07:53:35 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.337 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1560789049 2019/06/17 16:30:49 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.336 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4571,8 +4571,7 @@ randomkey()
         c = (char) rn1('9' - '0' + 1, '0');
         break;
     case 14:
-        /* any char, but avoid '\0' because it's used for mouse click */
-        c = (char) rnd(iflags.wc_eight_bit_input ? 255 : 127);
+        c = (char) rn2(iflags.wc_eight_bit_input ? 256 : 128);
         break;
     }
 

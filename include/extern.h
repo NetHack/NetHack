@@ -838,9 +838,6 @@ E boolean NDECL(recover_savefile);
 E void NDECL(assure_syscf_file);
 #endif
 E int FDECL(nhclose, (int));
-#ifdef HOLD_LOCKFILE_OPEN
-E void NDECL(really_close);
-#endif
 #ifdef DEBUG
 E boolean FDECL(debugcore, (const char *, BOOLEAN_P));
 #endif
@@ -2121,8 +2118,6 @@ E int FDECL(restore_menu, (winid));
 #endif
 E void NDECL(minit);
 E boolean FDECL(lookup_id_mapping, (unsigned, unsigned *));
-E void FDECL(mread, (int, genericptr_t, unsigned int));
-E void FDECL(newread, (NHFILE *, int, int, genericptr_t, unsigned int));
 E int FDECL(validate, (NHFILE *, const char *));
 E void NDECL(reset_restpref);
 E void FDECL(set_restpref, (const char *));
@@ -2208,17 +2203,7 @@ E void NDECL(co_false);
 E void FDECL(savelev, (NHFILE *, XCHAR_P));
 #endif
 E genericptr_t FDECL(mon_to_buffer, (struct monst *, int *));
-E void FDECL(bufon, (int));
-E void FDECL(bufoff, (int));
-E void FDECL(bflush, (int));
-E void FDECL(bwrite, (int, genericptr_t, unsigned int));
-E void FDECL(bclose, (int));
-E void FDECL(def_bclose, (int));
-E void FDECL(newwrite, (NHFILE *, int, int, genericptr_t, unsigned int));
-E void FDECL(newclose, (NHFILE *));
-#if defined(ZEROCOMP)
-E void FDECL(zerocomp_bclose, (int));
-#endif
+E boolean FDECL(close_check, (int));
 E void FDECL(savecemetery, (NHFILE *, struct cemetery **));
 E void FDECL(savefruitchn, (NHFILE *));
 E void FDECL(store_plname_in_file, (NHFILE *));
@@ -2230,6 +2215,40 @@ E int NDECL(nhdatatypes_size);
 E void FDECL(assignlog, (char *, char*, int));
 E FILE *FDECL(getlog, (NHFILE *));
 E void FDECL(closelog, (NHFILE *));
+
+
+/* ### sfstruct.c ### */
+
+#ifndef TRACE_BUFFERING
+E void FDECL(newread, (NHFILE *, int, int, genericptr_t, unsigned int));
+E void FDECL(bufon, (int));
+E void FDECL(bufoff, (int));
+E void FDECL(bflush, (int));
+E void FDECL(bwrite, (int, genericptr_t, unsigned int));
+E void FDECL(mread, (int, genericptr_t, unsigned int));
+E void NDECL(minit);
+E void FDECL(bclose, (int));
+#else
+#define bufon(x) Bufon(x,__FUNCTION__, __LINE__)
+#define bufoff(x) Bufoff(x,__FUNCTION__, __LINE__)
+#define bflush(x) Bflush(x,__FUNCTION__, __LINE__)
+#define bwrite(x,y,z) Bwrite(x,y,z,__FUNCTION__, __LINE__)
+#define bclose(x) Bclose(x,__FUNCTION__, __LINE__)
+#define mread(x,y,z) Mread(x,y,z,__FUNCTION__, __LINE__)
+#define minit() Minit(__FUNCTION__, __LINE__)
+#endif
+E void FDECL(Bufon, (int, const char *, int));
+E void FDECL(Bufoff, (int, const char *, int));
+E void FDECL(Bflush, (int, const char *, int));
+E void FDECL(Bwrite, (int, genericptr_t, unsigned int, const char *, int));
+E void FDECL(Bread, (int, genericptr_t, unsigned int, const char *, int));
+E void FDECL(Binit,(const char *, int));
+E void FDECL(Bclose, (int, const char *, int));
+E void FDECL(Mread, (int, genericptr_t, unsigned int, const char *, int));
+E void FDECL(Minit, (const char *, int));
+#if defined(ZEROCOMP)
+E void FDECL(zerocomp_bclose, (int));
+#endif
 
 /* ### shk.c ### */
 
@@ -2643,6 +2662,7 @@ E boolean FDECL(comp_times, (long));
 E boolean
 FDECL(check_version, (struct version_info *, const char *, BOOLEAN_P, unsigned long));
 E boolean FDECL(uptodate, (NHFILE *, const char *, unsigned long));
+E void FDECL(store_formatindicator, (NHFILE *));
 E void FDECL(store_version, (NHFILE *));
 E unsigned long FDECL(get_feature_notice_ver, (char *));
 E unsigned long NDECL(get_current_feature_ver);

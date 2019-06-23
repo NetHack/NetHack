@@ -236,8 +236,8 @@ VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
 VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
 VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
-VOBJ28 = $(O)sfbase.o   $(O)sfdata.o   $(O)sfascii.o  $(O)sflendian.o
-#VOBJ29 = 
+VOBJ28 = $(O)sfbase.o   $(O)sfdata.o   
+VOBJ29 = $(O)sfstruct.o $(O)sfascii.o  $(O)sflendian.o
 
 DLBOBJ = $(O)dlb.o
 
@@ -1503,6 +1503,9 @@ $(O)sfbase.o: $(HACK_H) $(INCL)\sfproto.h $(INCL)\sfprocs.h \
 
 $(O)sfdata.o: $(HACK_H) $(INCL)\sfprocs.h $(SRC)\sfdata.c
 	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfdata.c
+
+$(O)sfstruct.o: $(HACK_H) $(SRC)\sfstruct.c
+	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfstruct.c
 
 $(O)sfascii.o: $(HACK_H) $(INCL)\sfprocs.h $(SRC)\sfascii.c
 	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfascii.c

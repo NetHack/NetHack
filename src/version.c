@@ -9,7 +9,6 @@
 #include "lev.h"
 #include "sfproto.h"
 
-
 /*
  * All the references to the contents of patchlevel.h have been moved
  * into makedefs....
@@ -343,6 +342,33 @@ unsigned long utdflags;
 }
 
 void
+store_formatindicator(nhfp)
+NHFILE *nhfp;
+{
+    char indicate = 'u';
+    int cmc = 0;
+
+    if (nhfp->mode & WRITING) {
+        if (nhfp->fieldlevel) {
+            indicate = (nhfp->fnidx == ascii) ? 'a' : 'l';
+            sfo_char(nhfp, &indicate, "indicate", "format", 1);
+            cmc = critical_members_count();
+            {
+#if 0
+                pline("critical-members=%d.", cmc);
+#endif
+            }
+            sfo_int(nhfp, &cmc, "validate", "critical_members_count", 1);
+        }
+        if (nhfp->structlevel) {
+            indicate = 'h';     /* historical */
+            bwrite(nhfp->fd, (genericptr_t) &indicate, sizeof indicate);
+            bwrite(nhfp->fd, (genericptr_t) &cmc, sizeof cmc);
+        }
+    }
+}
+
+void
 store_version(nhfp)
 NHFILE *nhfp;
 {
@@ -354,11 +380,13 @@ NHFILE *nhfp;
     if (nhfp->structlevel) {
         bufoff(nhfp->fd);
         /* bwrite() before bufon() uses plain write() */
+        store_formatindicator(nhfp);
         bwrite(nhfp->fd,(genericptr_t) &version_data,
                (unsigned) (sizeof version_data));
         bufon(nhfp->fd);
     }
     if (nhfp->fieldlevel) {
+        store_formatindicator(nhfp);
         sfo_version_info(nhfp, (struct version_info *) &version_data,
                          "version", "version_info", 1);
     }

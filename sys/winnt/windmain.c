@@ -798,7 +798,7 @@ getlock()
     }
 
     /* regularize(lock); */ /* already done in pcmain */
-    Sprintf(tbuf, "%s", fqname(g.lock, LEVELPREFIX, 0));
+    /*Sprintf(tbuf, "%s", fqname(g.lock, LEVELPREFIX, 0)); */
     set_levelfile_name(g.lock, 0);
     fq_lock = fqname(g.lock, LEVELPREFIX, 1);
     if ((fd = open(fq_lock, 0)) == -1) {
@@ -807,21 +807,7 @@ getlock()
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-#if defined(HOLD_LOCKFILE_OPEN)
-        if (errno == EACCES) {
-            Strcpy(
-                oops,
-                "\nThere are files from a game in progress under your name.");
-            Strcat(oops, "\nThe files are locked or inaccessible.");
-            Strcat(oops, " Is the other game still running?\n");
-            if (strlen(fq_lock) < ((OOPS_BUFSZ - 16) - strlen(oops)))
-                Sprintf(eos(oops), "Cannot open %s", fq_lock);
-            Strcat(oops, "\n");
-            unlock_file(HLOCK);
-            raw_print(oops);
-        } else
-#endif
-            error("Bad directory or name: %s\n%s\n", fq_lock,
+        error("Bad directory or name: %s\n%s\n", fq_lock,
                   strerror(errno));
         unlock_file(HLOCK);
         Sprintf(oops, "Cannot open %s", fq_lock);

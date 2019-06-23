@@ -12,8 +12,8 @@
 #include "wintype.h"
 #include "sfproto.h"
 
-#define BUILD_DATE "Sat Jun 22 23:55:47 2019"
-#define BUILD_TIME (1561262147L)
+#define BUILD_DATE "Sat Jun 22 22:53:12 2019"
+#define BUILD_TIME (1561258392L)
 
 #define NHTYPE_SIMPLE    1
 #define NHTYPE_COMPLEX   2
