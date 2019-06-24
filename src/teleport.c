@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1559733391 2019/06/05 11:16:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.88 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1561336020 2019/06/24 00:27:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1353,8 +1353,9 @@ int in_sight;
                 get_level(&tolevel, depth(&u.uz) + 1);
             }
         } else if (tt == MAGIC_PORTAL) {
-            if (In_endgame(&u.uz)
-                && (mon_has_amulet(mtmp) || is_home_elemental(mtmp->data))) {
+            if (In_endgame(&u.uz) && (mon_has_amulet(mtmp)
+                                      || is_home_elemental(mtmp->data)
+                                      || rn2(7))) {
                 if (in_sight && mtmp->data->mlet != S_ELEMENTAL) {
                     pline("%s seems to shimmer for a moment.", Monnam(mtmp));
                     seetrap(trap);
