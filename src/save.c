@@ -277,6 +277,7 @@ savegamestate(fd, mode)
 register int fd, mode;
 {
     unsigned long uid;
+    struct obj * bc_objs = (struct obj *)0;
 
 #ifdef MFLOPPY
     count_only = (mode & COUNT_SAVE);
@@ -304,14 +305,18 @@ register int fd, mode;
     save_light_sources(fd, mode, RANGE_GLOBAL);
 
     saveobjchn(fd, g.invent, mode);
-    if (BALL_IN_MON) {
-        /* prevent loss of ball & chain when swallowed */
-        uball->nobj = uchain;
-        uchain->nobj = (struct obj *) 0;
-        saveobjchn(fd, uball, mode);
-    } else {
-        saveobjchn(fd, (struct obj *) 0, mode);
+
+    /* save ball and chain if they are currently dangling free (i.e. not on
+       floor or in inventory) */
+    if (CHAIN_IN_MON) {
+        uchain->nobj = bc_objs;
+        bc_objs = uchain;
     }
+    if (BALL_IN_MON) {
+        uball->nobj = bc_objs;
+        bc_objs = uball;
+    }
+    saveobjchn(fd, bc_objs, mode);
 
     saveobjchn(fd, g.migrating_objs, mode);
     savemonchn(fd, g.migrating_mons, mode);

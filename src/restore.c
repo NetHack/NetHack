@@ -533,7 +533,8 @@ unsigned int *stuckid, *steedid;
     struct sysflag newgamesysflags;
 #endif
     struct context_info newgamecontext; /* all 0, but has some pointers */
-    struct obj *otmp, *tmp_bc;
+    struct obj *otmp;
+    struct obj *bc_obj;
     char timebuf[15];
     unsigned long uid;
     boolean defer_perm_invent;
@@ -638,17 +639,15 @@ unsigned int *stuckid, *steedid;
     restore_timers(fd, RANGE_GLOBAL, FALSE, 0L);
     restore_light_sources(fd);
     g.invent = restobjchn(fd, FALSE, FALSE);
-    /* tmp_bc only gets set here if the ball & chain were orphaned
-       because you were swallowed; otherwise they will be on the floor
-       or in your inventory */
-    tmp_bc = restobjchn(fd, FALSE, FALSE);
-    if (tmp_bc) {
-        for (otmp = tmp_bc; otmp; otmp = otmp->nobj) {
-            if (otmp->owornmask)
-                setworn(otmp, otmp->owornmask);
-        }
-        if (!uball || !uchain)
-            impossible("restgamestate: lost ball & chain");
+
+    /* restore dangling (not on floor or in inventory) ball and/or chain */
+    bc_obj = restobjchn(fd, FALSE, FALSE);
+    while(bc_obj) {
+        struct obj * nobj = bc_obj->nobj;
+        if (bc_obj->owornmask)
+            setworn(bc_obj, bc_obj->owornmask);
+        bc_obj->nobj = (struct obj *)0;
+        bc_obj = nobj;
     }
 
     g.migrating_objs = restobjchn(fd, FALSE, FALSE);
@@ -666,6 +665,10 @@ unsigned int *stuckid, *steedid;
     for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if (otmp->owornmask)
             setworn(otmp, otmp->owornmask);
+
+    if ((uball && !uchain) || (uchain && !uball))
+        impossible("restgamestate: lost ball & chain");
+
     /* reset weapon so that player will get a reminder about "bashing"
        during next fight when bare-handed or wielding an unconventional
        item; for pick-axe, we aren't able to distinguish between having
