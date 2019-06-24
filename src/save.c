@@ -287,6 +287,7 @@ savegamestate(nhfp)
 NHFILE *nhfp;
 {
     unsigned long uid;
+    struct obj * bc_objs = (struct obj *)0;
 
 #ifdef MFLOPPY
     count_only = (nhfp->mode & COUNTING);
@@ -337,14 +338,18 @@ NHFILE *nhfp;
     save_light_sources(nhfp, RANGE_GLOBAL);
 
     saveobjchn(nhfp, g.invent);
-    if (BALL_IN_MON) {
-        /* prevent loss of ball & chain when swallowed */
-        uball->nobj = uchain;
-        uchain->nobj = (struct obj *) 0;
-        saveobjchn(nhfp, uball);
-    } else {
-        saveobjchn(nhfp, (struct obj *) 0);
+
+    /* save ball and chain if they are currently dangling free (i.e. not on
+       floor or in inventory) */
+    if (CHAIN_IN_MON) {
+        uchain->nobj = bc_objs;
+        bc_objs = uchain;
     }
+    if (BALL_IN_MON) {
+        uball->nobj = bc_objs;
+        bc_objs = uball;
+    }
+    saveobjchn(nhfp, bc_objs);
 
     saveobjchn(nhfp, g.migrating_objs);
     savemonchn(nhfp, g.migrating_mons);

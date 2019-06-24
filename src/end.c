@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1559675615 2019/06/04 19:13:35 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.176 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1561414303 2019/06/24 22:11:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.178 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1023,6 +1023,12 @@ done_object_cleanup()
         /* placebc(); */
         lift_covet_and_placebc(override_restriction);
     }
+    /* persistent inventory window now obsolete since disclosure uses
+       a normal popup one; avoids "Bad fruit #n" when saving bones */
+    if (iflags.perm_invent) {
+        iflags.perm_invent = FALSE;
+        update_inventory(); /* make interface notice the change */
+    }
     return;
 }
 
@@ -1202,6 +1208,8 @@ int how;
        deal with ball and chain possibly being temporarily off the map */
     if (!g.program_state.panicking)
         done_object_cleanup();
+    /* in case we're panicking; normally cleared by done_object_cleanup() */
+    iflags.perm_invent = FALSE;
 
     /* remember time of death here instead of having bones, rip, and
        topten figure it out separately and possibly getting different
