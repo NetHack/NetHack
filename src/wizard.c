@@ -1,4 +1,4 @@
-/* NetHack 3.6	wizard.c	$NHDT-Date: 1539804905 2018/10/17 19:35:05 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	wizard.c	$NHDT-Date: 1561336025 2019/06/24 00:27:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -356,7 +356,6 @@ xchar *sy;
         *sx = x;
         *sy = y;
     }
-
 }
 
 int
@@ -364,28 +363,33 @@ tactics(mtmp)
 register struct monst *mtmp;
 {
     unsigned long strat = strategy(mtmp);
-    xchar sx = 0, sy = 0;
+    xchar sx = 0, sy = 0, mx, my;
 
     mtmp->mstrategy =
         (mtmp->mstrategy & (STRAT_WAITMASK | STRAT_APPEARMSG)) | strat;
 
     switch (strat) {
     case STRAT_HEAL: /* hide and recover */
+        mx = mtmp->mx, my = mtmp->my;
         /* if wounded, hole up on or near the stairs (to block them) */
         choose_stairs(&sx, &sy);
         mtmp->mavenge = 1; /* covetous monsters attack while fleeing */
-        if (In_W_tower(mtmp->mx, mtmp->my, &u.uz)
+        if (In_W_tower(mx, my, &u.uz)
             || (mtmp->iswiz && !sx && !mon_has_amulet(mtmp))) {
             if (!rn2(3 + mtmp->mhp / 10))
                 (void) rloc(mtmp, TRUE);
-        } else if (sx && (mtmp->mx != sx || mtmp->my != sy)) {
+        } else if (sx && (mx != sx || my != sy)) {
             if (!mnearto(mtmp, sx, sy, TRUE)) {
-                m_into_limbo(mtmp);
+                /* couldn't move to the target spot for some reason,
+                   so stay where we are (don't actually need rloc_to()
+                   because mtmp is still on the map at <mx,my>... */
+                rloc_to(mtmp, mx, my);
                 return 0;
             }
+            mx = mtmp->mx, my = mtmp->my; /* update cached location */
         }
         /* if you're not around, cast healing spells */
-        if (distu(mtmp->mx, mtmp->my) > (BOLT_LIM * BOLT_LIM))
+        if (distu(mx, my) > (BOLT_LIM * BOLT_LIM))
             if (mtmp->mhp <= mtmp->mhpmax - 8) {
                 mtmp->mhp += rnd(8);
                 return 1;
@@ -435,12 +439,13 @@ register struct monst *mtmp;
                 return 0;
             }
         } else { /* a monster has it - 'port beside it. */
+            mx = mtmp->mx, my = mtmp->my;
             if (!mnearto(mtmp, tx, ty, FALSE))
-                m_into_limbo(mtmp);
+                rloc_to(mtmp, mx, my); /* no room? stay put */
             return 0;
         }
-    }
-    }
+    } /* default case */
+    } /* switch */
     /*NOTREACHED*/
     return 0;
 }
