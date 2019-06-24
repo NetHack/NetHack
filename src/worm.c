@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1543892216 2018/12/04 02:56:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	worm.c	$NHDT-Date: 1561340880 2019/06/24 01:48:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -669,7 +669,6 @@ xchar x, y;
         char tryct = 0;
 
         /* pick a random direction from x, y and search for goodpos() */
-
         do {
             random_dir(ox, oy, &nx, &ny);
         } while (!goodpos(nx, ny, worm, 0) && (tryct++ < 50));
@@ -700,21 +699,26 @@ xchar x, y;
 STATIC_OVL
 void
 random_dir(x, y, nx, ny)
-register xchar x, y;
-register xchar *nx, *ny;
+xchar x, y;
+xchar *nx, *ny;
 {
-    *nx = x;
-    *ny = y;
-
-    *nx += (x > 1                     /* extreme left ? */
-              ? (x < COLNO            /* extreme right ? */
-                   ? (rn2(3) - 1)     /* neither so +1, 0, or -1 */
-                   : -rn2(2))         /* 0, or -1 */
-              : rn2(2));              /* 0, or 1 */
-
-    *ny += (*nx == x                  /* same kind of thing with y */
-              ? (y > 1 ? (y < ROWNO ? (rn2(2) ? 1 : -1) : -1) : 1)
-              : (y > 1 ? (y < ROWNO ? (rn2(3) - 1) : -rn2(2)) : rn2(2)));
+    *nx = x + (x > 1                /* extreme left ? */
+               ? (x < COLNO - 1     /* extreme right ? */
+                  ? (rn2(3) - 1)    /* neither so +1, 0, or -1 */
+                  : -rn2(2))        /* right edge, use -1 or 0 */
+               : rn2(2));           /* left edge, use 0 or 1 */
+    if (*nx != x) /* if x has changed, do same thing with y */
+        *ny = y + (y > 0             /* y==0 is ok (x==0 is not) */
+                   ? (y < ROWNO - 1
+                      ? (rn2(3) - 1)
+                      : -rn2(2))
+                   : rn2(2));
+    else /* when x has remained the same, force y to change */
+        *ny = y + (y > 0
+                   ? (y < ROWNO - 1
+                      ? (rn2(2) ? 1 : -1)   /* not at edge, so +1 or -1 */
+                      : -1)                 /* bottom, use -1 */
+                   : 1);                    /* top, use +1 */
 }
 
 /* for size_monst(cmd.c) to support #stats */
