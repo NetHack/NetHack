@@ -519,8 +519,6 @@ curses_move_cursor(winid wid, int x, int y)
 
     if (wid != MAP_WIN) {
         return;
-    } else {
-        --x; /* map column [0] isn't used, so shift everything over 1 col */
     }
 #ifdef PDCURSES
     /* PDCurses seems to not handle wmove correctly, so we use move and
@@ -536,8 +534,9 @@ curses_move_cursor(winid wid, int x, int y)
         curs_y++;
     }
 
-    if ((x >= sx) && (x <= ex) && (y >= sy) && (y <= ey)) {
-        curs_x -= sx;
+    if (x >= sx && x <= ex && y >= sy && y <= ey) {
+        /* map column #0 isn't used; shift column #1 to first screen column */
+        curs_x -= (sx + 1);
         curs_y -= sy;
 #ifdef PDCURSES
         move(curs_y, curs_x);
