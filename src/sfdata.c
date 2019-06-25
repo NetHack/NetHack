@@ -12,8 +12,8 @@
 #include "wintype.h"
 #include "sfproto.h"
 
-#define BUILD_DATE "Mon Jun 24 23:46:06 2019"
-#define BUILD_TIME (1561434366L)
+#define BUILD_DATE "Tue Jun 25 00:42:33 2019"
+#define BUILD_TIME (1561437753L)
 
 #define NHTYPE_SIMPLE    1
 #define NHTYPE_COMPLEX   2
@@ -35,6 +35,8 @@ int cnt;
 {
     const char *parent = "align";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "align", 1);
 
@@ -55,6 +57,8 @@ int cnt;
 {
     const char *parent = "attribs";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "attribs", 1);
 
@@ -74,6 +78,8 @@ int cnt;
 {
     const char *parent = "bill_x";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "bill_x", 1);
 
@@ -96,6 +102,8 @@ int cnt;
 {
     const char *parent = "book_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "book_info", 1);
 
@@ -117,6 +125,8 @@ int cnt;
 {
     const char *parent = "branch";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "branch", 1);
 
@@ -141,6 +151,8 @@ int cnt;
 {
     const char *parent = "bubble";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "bubble", 1);
 
@@ -167,6 +179,8 @@ int cnt;
 {
     const char *parent = "cemetery";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "cemetery", 1);
 
@@ -192,6 +206,8 @@ int cnt;
 {
     const char *parent = "context_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "context_info", 1);
 
@@ -242,6 +258,8 @@ int cnt;
 {
     const char *parent = "d_flags";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "d_flags", 1);
 
@@ -272,6 +290,8 @@ int cnt;
 {
     const char *parent = "d_level";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "d_level", 1);
 
@@ -292,6 +312,8 @@ int cnt;
 {
     const char *parent = "damage";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "damage", 1);
 
@@ -315,6 +337,8 @@ int cnt;
 {
     const char *parent = "dest_area";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "dest_area", 1);
 
@@ -341,6 +365,8 @@ int cnt;
 {
     const char *parent = "dgn_topology";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "dgn_topology", 1);
 
@@ -389,6 +415,8 @@ int cnt;
 {
     const char *parent = "dig_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "dig_info", 1);
 
@@ -415,6 +443,8 @@ int cnt;
 {
     const char *parent = "dungeon";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "dungeon", 1);
 
@@ -442,6 +472,8 @@ int cnt;
 {
     const char *parent = "edog";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "edog", 1);
 
@@ -472,6 +504,8 @@ int cnt;
     const char *parent = "egd";
     int i;
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "egd", 1);
 
@@ -507,6 +541,8 @@ int cnt;
 {
     const char *parent = "emin";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "emin", 1);
 
@@ -527,6 +563,8 @@ int cnt;
 {
     const char *parent = "engr";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "engr", 1);
 
@@ -552,6 +590,8 @@ int cnt;
 {
     const char *parent = "epri";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "epri", 1);
 
@@ -579,6 +619,8 @@ int cnt;
     const char *parent = "eshk";
     int i;
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "eshk", 1);
 
@@ -617,6 +659,8 @@ int cnt;
 {
     const char *parent = "fakecorridor";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "fakecorridor", 1);
 
@@ -638,6 +682,8 @@ int cnt;
 {
     const char *parent = "fe";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "fe", 1);
 
@@ -664,6 +710,8 @@ int cnt;
 {
     const char *parent = "flag";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "flag", 1);
 
@@ -743,6 +791,8 @@ int cnt;
 {
     const char *parent = "fruit";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "fruit", 1);
 
@@ -764,6 +814,8 @@ int cnt;
 {
     const char *parent = "kinfo";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "kinfo", 1);
 
@@ -786,6 +838,8 @@ int cnt;
 {
     const char *parent = "levelflags";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "levelflags", 1);
 
@@ -848,6 +902,8 @@ int cnt;
 {
     const char *parent = "linfo";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "linfo", 1);
 
@@ -872,6 +928,8 @@ int cnt;
 {
     const char *parent = "ls_t";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "ls_t", 1);
 
@@ -897,6 +955,8 @@ int cnt;
 {
     const char *parent = "mapseen_feat";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "mapseen_feat", 1);
 
@@ -941,6 +1001,8 @@ int cnt;
 {
     const char *parent = "mapseen_flags";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "mapseen_flags", 1);
 
@@ -991,6 +1053,8 @@ int cnt;
 {
     const char *parent = "mapseen_rooms";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "mapseen_rooms", 1);
 
@@ -1014,6 +1078,8 @@ int cnt;
     const char *parent = "mapseen";
     int i;
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "mapseen", 1);
 
@@ -1042,6 +1108,8 @@ int cnt;
 {
     const char *parent = "mextra";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "mextra", 1);
 
@@ -1067,6 +1135,8 @@ int cnt;
 {
     const char *parent = "mkroom";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "mkroom", 1);
 
@@ -1101,6 +1171,8 @@ int cnt;
     const char *parent = "monst";
     int i;
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "monst", 1);
 
@@ -1212,6 +1284,8 @@ int cnt;
 {
     const char *parent = "mvitals";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "mvitals", 1);
 
@@ -1233,6 +1307,8 @@ int cnt;
 {
     const char *parent = "nhcoord";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "nhcoord", 1);
 
@@ -1253,6 +1329,8 @@ int cnt;
 {
     const char *parent = "nhrect";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "nhrect", 1);
 
@@ -1275,6 +1353,8 @@ int cnt;
 {
     const char *parent = "novel_tracking";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "novel_tracking", 1);
 
@@ -1296,6 +1376,8 @@ int cnt;
 {
     const char *parent = "obj";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "obj", 1);
 
@@ -1383,6 +1465,8 @@ int cnt;
 {
     const char *parent = "objclass";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "objclass", 1);
 
@@ -1441,6 +1525,8 @@ int cnt;
 {
     const char *parent = "obj_split";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "obj_split", 1);
 
@@ -1461,6 +1547,8 @@ int cnt;
 {
     const char *parent = "oextra";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "oextra", 1);
 
@@ -1484,6 +1572,8 @@ int cnt;
 {
     const char *parent = "polearm_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "polearm_info", 1);
 
@@ -1504,6 +1594,8 @@ int cnt;
 {
     const char *parent = "prop";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "prop", 1);
 
@@ -1525,6 +1617,8 @@ int cnt;
 {
     const char *parent = "q_score";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "q_score", 1);
 
@@ -1584,6 +1678,8 @@ int cnt;
 {
     const char *parent = "rm";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "rm", 1);
 
@@ -1619,6 +1715,8 @@ int cnt;
 {
     const char *parent = "s_level";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "s_level", 1);
 
@@ -1643,6 +1741,8 @@ int cnt;
 {
     const char *parent = "savefile_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "savefile_info", 1);
 
@@ -1664,6 +1764,8 @@ int cnt;
 {
     const char *parent = "skills";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "skills", 1);
 
@@ -1685,6 +1787,8 @@ int cnt;
 {
     const char *parent = "spell";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "spell", 1);
 
@@ -1706,6 +1810,8 @@ int cnt;
 {
     const char *parent = "stairway";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "stairway", 1);
 
@@ -1728,6 +1834,8 @@ int cnt;
 {
     const char *parent = "takeoff_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "takeoff_info", 1);
 
@@ -1751,6 +1859,8 @@ int cnt;
 {
     const char *parent = "tin_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "tin_info", 1);
 
@@ -1773,6 +1883,8 @@ int cnt;
 {
     const char *parent = "trap";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "trap", 1);
 
@@ -1805,6 +1917,8 @@ int cnt;
 {
     const char *parent = "tribute_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "tribute_info", 1);
 
@@ -1829,6 +1943,8 @@ int cnt;
 {
     const char *parent = "u_achieve";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "u_achieve", 1);
 
@@ -1865,6 +1981,8 @@ int cnt;
 {
     const char *parent = "u_conduct";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "u_conduct", 1);
 
@@ -1894,6 +2012,8 @@ int cnt;
 {
     const char *parent = "u_event";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "u_event", 1);
 
@@ -1940,6 +2060,8 @@ int cnt;
 {
     const char *parent = "u_have";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "u_have", 1);
 
@@ -1970,6 +2092,8 @@ int cnt;
 {
     const char *parent = "u_realtime";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "u_realtime", 1);
 
@@ -1991,6 +2115,8 @@ int cnt;
 {
     const char *parent = "u_roleplay";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "u_roleplay", 1);
 
@@ -2012,6 +2138,8 @@ int cnt;
 {
     const char *parent = "version_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "version_info", 1);
 
@@ -2035,6 +2163,8 @@ int cnt;
 {
     const char *parent = "victual_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "victual_info", 1);
 
@@ -2066,6 +2196,8 @@ int cnt;
 {
     const char *parent = "vlaunchinfo";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "vlaunchinfo", 1);
 
@@ -2088,6 +2220,8 @@ int cnt;
 {
     const char *parent = "vptrs";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "vptrs", 1);
 
@@ -2109,6 +2243,8 @@ int cnt;
 {
     const char *parent = "warntype_info";
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "warntype_info", 1);
 
@@ -2132,6 +2268,8 @@ int cnt;
     const char *parent = "you";
     int i;
 
+    nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfo_addinfo(nhfp, myparent, "start", "you", 1);
 
@@ -2267,6 +2405,7 @@ int cnt;
     const char *parent = "align";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "align", 1);
 
@@ -2288,6 +2427,7 @@ int cnt;
     const char *parent = "attribs";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "attribs", 1);
 
@@ -2308,6 +2448,7 @@ int cnt;
     const char *parent = "bill_x";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "bill_x", 1);
 
@@ -2331,6 +2472,7 @@ int cnt;
     const char *parent = "book_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "book_info", 1);
 
@@ -2353,6 +2495,7 @@ int cnt;
     const char *parent = "branch";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "branch", 1);
 
@@ -2378,6 +2521,7 @@ int cnt;
     const char *parent = "bubble";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "bubble", 1);
 
@@ -2405,6 +2549,7 @@ int cnt;
     const char *parent = "cemetery";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "cemetery", 1);
 
@@ -2431,6 +2576,7 @@ int cnt;
     const char *parent = "context_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "context_info", 1);
 
@@ -2482,6 +2628,7 @@ int cnt;
     const char *parent = "d_flags";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "d_flags", 1);
 
@@ -2525,6 +2672,7 @@ int cnt;
     const char *parent = "d_level";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "d_level", 1);
 
@@ -2546,6 +2694,7 @@ int cnt;
     const char *parent = "damage";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "damage", 1);
 
@@ -2570,6 +2719,7 @@ int cnt;
     const char *parent = "dest_area";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "dest_area", 1);
 
@@ -2597,6 +2747,7 @@ int cnt;
     const char *parent = "dgn_topology";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "dgn_topology", 1);
 
@@ -2646,6 +2797,7 @@ int cnt;
     const char *parent = "dig_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "dig_info", 1);
 
@@ -2673,6 +2825,7 @@ int cnt;
     const char *parent = "dungeon";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "dungeon", 1);
 
@@ -2701,6 +2854,7 @@ int cnt;
     const char *parent = "edog";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "edog", 1);
 
@@ -2734,6 +2888,7 @@ int cnt;
     int i;
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "egd", 1);
 
@@ -2776,6 +2931,7 @@ int cnt;
     const char *parent = "emin";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "emin", 1);
 
@@ -2797,6 +2953,7 @@ int cnt;
     const char *parent = "engr";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "engr", 1);
 
@@ -2823,6 +2980,7 @@ int cnt;
     const char *parent = "epri";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "epri", 1);
 
@@ -2851,6 +3009,7 @@ int cnt;
     int i;
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "eshk", 1);
 
@@ -2890,6 +3049,7 @@ int cnt;
     const char *parent = "fakecorridor";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "fakecorridor", 1);
 
@@ -2912,6 +3072,7 @@ int cnt;
     const char *parent = "fe";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "fe", 1);
 
@@ -2941,6 +3102,7 @@ int cnt;
     const char *parent = "flag";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "flag", 1);
 
@@ -3021,6 +3183,7 @@ int cnt;
     const char *parent = "fruit";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "fruit", 1);
 
@@ -3043,6 +3206,7 @@ int cnt;
     const char *parent = "kinfo";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "kinfo", 1);
 
@@ -3066,6 +3230,7 @@ int cnt;
     const char *parent = "levelflags";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "levelflags", 1);
 
@@ -3171,6 +3336,7 @@ int cnt;
     const char *parent = "linfo";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "linfo", 1);
 
@@ -3196,6 +3362,7 @@ int cnt;
     const char *parent = "ls_t";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "ls_t", 1);
 
@@ -3222,6 +3389,7 @@ int cnt;
     const char *parent = "mapseen_feat";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "mapseen_feat", 1);
 
@@ -3293,6 +3461,7 @@ int cnt;
     const char *parent = "mapseen_flags";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "mapseen_flags", 1);
 
@@ -3376,6 +3545,7 @@ int cnt;
     const char *parent = "mapseen_rooms";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "mapseen_rooms", 1);
 
@@ -3404,6 +3574,7 @@ int cnt;
     int i;
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "mapseen", 1);
 
@@ -3433,6 +3604,7 @@ int cnt;
     const char *parent = "mextra";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "mextra", 1);
 
@@ -3459,6 +3631,7 @@ int cnt;
     const char *parent = "mkroom";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "mkroom", 1);
 
@@ -3494,6 +3667,7 @@ int cnt;
     int i;
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "monst", 1);
 
@@ -3668,6 +3842,7 @@ int cnt;
     const char *parent = "mvitals";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "mvitals", 1);
 
@@ -3690,6 +3865,7 @@ int cnt;
     const char *parent = "nhcoord";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "nhcoord", 1);
 
@@ -3711,6 +3887,7 @@ int cnt;
     const char *parent = "nhrect";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "nhrect", 1);
 
@@ -3734,6 +3911,7 @@ int cnt;
     const char *parent = "novel_tracking";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "novel_tracking", 1);
 
@@ -3756,6 +3934,7 @@ int cnt;
     const char *parent = "obj";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "obj", 1);
 
@@ -3892,6 +4071,7 @@ int cnt;
     const char *parent = "objclass";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "objclass", 1);
 
@@ -3975,6 +4155,7 @@ int cnt;
     const char *parent = "obj_split";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "obj_split", 1);
 
@@ -3996,6 +4177,7 @@ int cnt;
     const char *parent = "oextra";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "oextra", 1);
 
@@ -4020,6 +4202,7 @@ int cnt;
     const char *parent = "polearm_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "polearm_info", 1);
 
@@ -4041,6 +4224,7 @@ int cnt;
     const char *parent = "prop";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "prop", 1);
 
@@ -4063,6 +4247,7 @@ int cnt;
     const char *parent = "q_score";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "q_score", 1);
 
@@ -4163,6 +4348,7 @@ int cnt;
     const char *parent = "rm";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "rm", 1);
 
@@ -4213,6 +4399,7 @@ int cnt;
     const char *parent = "s_level";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "s_level", 1);
 
@@ -4238,6 +4425,7 @@ int cnt;
     const char *parent = "savefile_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "savefile_info", 1);
 
@@ -4260,6 +4448,7 @@ int cnt;
     const char *parent = "skills";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "skills", 1);
 
@@ -4282,6 +4471,7 @@ int cnt;
     const char *parent = "spell";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "spell", 1);
 
@@ -4304,6 +4494,7 @@ int cnt;
     const char *parent = "stairway";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "stairway", 1);
 
@@ -4327,6 +4518,7 @@ int cnt;
     const char *parent = "takeoff_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "takeoff_info", 1);
 
@@ -4351,6 +4543,7 @@ int cnt;
     const char *parent = "tin_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "tin_info", 1);
 
@@ -4374,6 +4567,7 @@ int cnt;
     const char *parent = "trap";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "trap", 1);
 
@@ -4415,6 +4609,7 @@ int cnt;
     const char *parent = "tribute_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "tribute_info", 1);
 
@@ -4444,6 +4639,7 @@ int cnt;
     const char *parent = "u_achieve";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "u_achieve", 1);
 
@@ -4499,6 +4695,7 @@ int cnt;
     const char *parent = "u_conduct";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "u_conduct", 1);
 
@@ -4529,6 +4726,7 @@ int cnt;
     const char *parent = "u_event";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "u_event", 1);
 
@@ -4604,6 +4802,7 @@ int cnt;
     const char *parent = "u_have";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "u_have", 1);
 
@@ -4647,6 +4846,7 @@ int cnt;
     const char *parent = "u_realtime";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "u_realtime", 1);
 
@@ -4669,6 +4869,7 @@ int cnt;
     const char *parent = "u_roleplay";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "u_roleplay", 1);
 
@@ -4691,6 +4892,7 @@ int cnt;
     const char *parent = "version_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "version_info", 1);
 
@@ -4715,6 +4917,7 @@ int cnt;
     const char *parent = "victual_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "victual_info", 1);
 
@@ -4755,6 +4958,7 @@ int cnt;
     const char *parent = "vlaunchinfo";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "vlaunchinfo", 1);
 
@@ -4778,6 +4982,7 @@ int cnt;
     const char *parent = "vptrs";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "vptrs", 1);
 
@@ -4800,6 +5005,7 @@ int cnt;
     const char *parent = "warntype_info";
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "warntype_info", 1);
 
@@ -4824,6 +5030,7 @@ int cnt;
     int i;
 
     nhUse(myname);
+    nhUse(cnt);
     if (nhfp->addinfo)
         sfi_addinfo(nhfp, myparent, "start", "you", 1);
 

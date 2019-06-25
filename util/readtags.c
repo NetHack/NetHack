@@ -1077,13 +1077,15 @@ static void generate_c_files()
         Fprintf(SFO_DATA, "\n");
         Fprintf(SFI_DATA, "\n");
 
+        Fprintf(SFO_DATA, "    nhUse(myname);\n    nhUse(cnt);\n");
         Fprintf(SFO_DATA,
                 "    if (nhfp->addinfo)\n"
                 "        sfo_addinfo(nhfp, myparent, \"start\", \"%s\", 1);\n",
                 readtagstypes[k].dtype);
 
+        Fprintf(SFI_DATA, "    nhUse(myname);\n    nhUse(cnt);\n");
         Fprintf(SFI_DATA,
-                "    nhUse(myname);\n    if (nhfp->addinfo)\n"
+                "    if (nhfp->addinfo)\n"
                 "        sfi_addinfo(nhfp, myparent, \"start\", \"%s\", 1);\n",
                 readtagstypes[k].dtype);
 
