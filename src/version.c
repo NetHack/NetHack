@@ -298,7 +298,7 @@ NHFILE *nhfp;
 const char *name;
 unsigned long utdflags;
 {
-    int rlen, cmc = 0, filecmc = 0;
+    int rlen = 0, cmc = 0, filecmc = 0;
     struct version_info vers_info;
     boolean verbose = name ? TRUE : FALSE;
     char indicator;
@@ -320,8 +320,6 @@ unsigned long utdflags;
     if (nhfp->fieldlevel && (nhfp->fnidx > historical)) {
             sfi_version_info(nhfp, &vers_info, "version", "version_info", 1);
     } else {
-        int rlen;
-
         rlen = read(nhfp->fd, (genericptr_t) &vers_info, sizeof vers_info);
         minit();                /* ZEROCOMP */
         if (rlen == 0) {
