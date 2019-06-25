@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ $NHDT-Date: 1561455021 2019/06/25 09:30:21 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.71 $ $NHDT-Date: 1561457861 2019/06/25 10:17:41 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -151,6 +151,11 @@ curses: make text windows wider so that help feedback is more readable
 curses: using ':' for search string matching to toggle menu items in a multple
 	page menu would highlight arbitrary items on the currently visible
 	page in sync with the lines that matching items had on other pages
+curses: when map window was clipped, the 'scrollbars' shown to indicate which
+	part of the map was in view didn't work as intended, always drawing
+	"*--------------" for horizontal (and comparable '*' with multiple '|'
+	underneath for vertical) when it meant to show "---******------" if
+	the 2nd and 3rd fifths (for example) were currently within view
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with
