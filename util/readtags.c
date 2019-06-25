@@ -1035,7 +1035,7 @@ static void generate_c_files()
                 deblank(readtagstypes[k].dtype));
                         
         Fprintf(SFO_DATA,
-                "    char *parent = \"%s\";\n",
+                "    const char *parent = \"%s\";\n",
                 readtagstypes[k].dtype);
 
         Fprintf(SFI_PROTO,
@@ -1059,7 +1059,7 @@ static void generate_c_files()
                 deblank(readtagstypes[k].dtype));                    
 
         Fprintf(SFI_DATA,
-                "    char *parent = \"%s\";\n",
+                "    const char *parent = \"%s\";\n",
                 readtagstypes[k].dtype);
 
         Sprintf(sfparent, "%s %s", pt, readtagstypes[k].dtype);
@@ -1083,7 +1083,7 @@ static void generate_c_files()
                 readtagstypes[k].dtype);
 
         Fprintf(SFI_DATA,
-                "    if (nhfp->addinfo)\n"
+                "    nhUse(myname);\n    if (nhfp->addinfo)\n"
                 "        sfi_addinfo(nhfp, myparent, \"start\", \"%s\", 1);\n",
                 readtagstypes[k].dtype);
 

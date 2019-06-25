@@ -635,6 +635,12 @@ int cnt;
             (void) fprintf(nhfp->fpdebug, "%s %s %s cnt=%d ", t1, t2, t3, cnt);
     }
 #endif
+#else
+    nhUse(nhfp);
+    nhUse(t1);
+    nhUse(t2);
+    nhUse(t3);
+    nhUse(cnt);
 #endif
 }
 

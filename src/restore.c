@@ -1679,7 +1679,7 @@ validate(nhfp, name)
 NHFILE *nhfp;
 const char *name;
 {
-    int rlen;
+    int rlen = 0;
     struct savefile_info sfi;
     unsigned long utdflags = 0L;
     boolean verbose = name ? TRUE : FALSE, reslt = FALSE;

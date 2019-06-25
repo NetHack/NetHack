@@ -145,7 +145,7 @@ int fd;
             if ((bw_FILE[idx] = fdopen(fd, "w")) == 0)
                 panic("buffering of file %d failed", fd);
         }
-        bw_buffered[idx] = (bw_FILE[idx] > 0);
+        bw_buffered[idx] = (bw_FILE[idx] != 0);
 #else
         bw_buffered[idx] = 1;
 #endif

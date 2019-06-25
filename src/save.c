@@ -436,7 +436,7 @@ char *whynot;
 void
 savestateinlock()
 {
-    int hpid;
+    int hpid = 0;
     static boolean havestate = TRUE;
     char whynot[BUFSZ];
     NHFILE *nhfp;
