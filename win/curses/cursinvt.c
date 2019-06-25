@@ -53,7 +53,7 @@ curses_update_inv(void)
     wnoutrefresh(win);
 }
 
-/* Adds an inventory item. */
+/* Adds an inventory item.  'y' is 1 rather than 0 for the first item. */
 void
 curses_add_inv(int y,
                int glyph UNUSED,
@@ -61,21 +61,59 @@ curses_add_inv(int y,
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
     int color = NO_COLOR;
-    int x = 0;
+    int x = 0, width, height, available_width,
+        border = curses_window_has_border(INV_WIN) ? 1 : 0;
 
     /* Figure out where to draw the line */
-    if (curses_window_has_border(INV_WIN)) {
-        x++;
-    }
+    x += border; /* x starts at 0 and is incremented for border */
+    y -= 1 - border; /* y starts at 1 and is decremented for non-border */
+
+    curses_get_window_size(INV_WIN, &height, &width);
+    /*
+     * TODO:
+     *  If border is On and 'y' is too big, turn border Off in order to
+     *  get two more lines of perm_invent.
+     *
+     *  And/or implement a way to switch focus from map to inventory
+     *  so that the latter can be scrolled.  Must not require use of a
+     *  mouse.
+     *
+     *  Also, when entries are omitted due to lack of space, mark the
+     *  last line to indicate "there's more that you can't see" (like
+     *  horizontal status window does for excess status conditions).
+     *  Normal menu does this via 'page M of N'.
+     */
+    if (y - border >= height) /* 'height' is already -2 for Top+Btm borders */
+        return;
+    available_width = width; /* 'width' also already -2 for Lft+Rgt borders */
 
     wmove(win, y, x);
     if (accelerator) {
+#if 0
         attr_t bold = A_BOLD;
 
         wattron(win, bold);
         waddch(win, accelerator);
         wattroff(win, bold);
         wprintw(win, ") ");
+#else
+        /* despite being shown as a menu, nothing is selectable from the
+           persistent inventory window so don't highlight inventory letters */
+        wprintw(win, "%c) ", accelerator);
+#endif
+        available_width -= 3;
+
+        /* narrow the entries to fit more of the interesting text; do so
+           unconditionally rather than trying to figure whether it's needed;
+           when 'sortpack' is enabled we could also strip out "<class> of"
+           from "<prefix><class> of <item><suffix> but if that's to be done,
+           core ought to do it */
+        if (!strncmpi(str, "a ", 2))
+            str += 2;
+        else if (!strncmpi(str, "an ", 3))
+            str += 3;
+        else if (!strncmpi(str, "the ", 4))
+            str +=4;
     }
 #if 0 /* FIXME: MENU GLYPHS */
     if (accelerator && glyph != NO_GLYPH && iflags.use_menu_glyphs) {
@@ -84,27 +122,25 @@ curses_add_inv(int y,
         int symbol = 0;
         attr_t glyphclr;
 
-        mapglyph(glyph, &symbol, &color, &dummy,
-                     u.ux, u.uy);
+        mapglyph(glyph, &symbol, &color, &dummy, u.ux, u.uy);
         glyphclr = curses_color_attr(color, 0);
         wattron(win, glyphclr);
         wprintw(win, "%c ", symbol);
         wattroff(win, glyphclr);
+        available_width -= 2;
     }
 #endif
     if (accelerator /* Don't colorize categories */
         && iflags.use_menu_color) {
-        char str_mutable[BUFSZ];
-
-        Strcpy(str_mutable, str);
         attr = 0;
-        get_menu_coloring(str_mutable, &color, (int *) &attr);
+        get_menu_coloring(str, &color, (int *) &attr);
         attr = curses_convert_attr(attr);
     }
-    if (color == NO_COLOR) color = NONE;
+    if (color == NO_COLOR)
+        color = NONE;
     curses_toggle_color_attr(win, color, attr, ON);
     /* wattron(win, attr); */
-    wprintw(win, "%s", str);
+    wprintw(win, "%.*s", available_width, str);
     /* wattroff(win, attr); */
     curses_toggle_color_attr(win, color, attr, OFF);
     wclrtoeol(win);
