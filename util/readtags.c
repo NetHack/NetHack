@@ -808,7 +808,7 @@ FILE *fp1;
 
     for (k = 0; k < SIZE(readtagstypes); ++k) {
         if (readtagstypes[k].dtclass == NHTYPE_SIMPLE) {
-            Fprintf(fp1,"\t{NHTYPE_SIMPLE,\"%s\", sizeof(%s)},\n",
+            Fprintf(fp1,"\t{NHTYPE_SIMPLE, (char *) \"%s\", sizeof(%s)},\n",
                 readtagstypes[k].dtype,
                 (strncmpi(readtagstypes[k].dtype, "Bitfield", 8) == 0) ?
                 "uint8_t" :
@@ -834,7 +834,7 @@ FILE *fp1;
             }
             if (cnt > 0)
                 Fprintf(fp1, "%s", ",\n");
-            Fprintf(fp1, "\t{NHTYPE_COMPLEX,\"%s\", sizeof(%s %s)}",
+            Fprintf(fp1, "\t{NHTYPE_COMPLEX, (char *) \"%s\", sizeof(%s %s)}",
                     t->tag,
                     (t->tagtype == 's') ? "struct" : "union", t->tag);
             cnt += 1;
@@ -966,7 +966,7 @@ static void generate_c_files()
     Fprintf(SFDATA,"static uint8_t bitfield = 0;\n");
 
     output_types(SFDATATMP);
-    Fprintf(SFDATATMP,"char *critical_members[] = {\n");
+    Fprintf(SFDATATMP,"const char *critical_members[] = {\n");
 
     k = 0;
     opening = 1;
