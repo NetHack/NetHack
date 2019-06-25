@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1560789054 2019/06/17 16:30:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.364 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1561427671 2019/06/25 01:54:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.366 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4009,12 +4009,12 @@ boolean tinitial, tfrom_file;
                 if (VIA_WINDOWPORT())
                     status_initialize(REASSESS_ONLY);
                 g.context.botl = TRUE;
-            } else if (boolopt[i].addr == &flags.invlet_constant) {
-                if (flags.invlet_constant) {
+            } else if (boolopt[i].addr == &flags.invlet_constant
+                       || boolopt[i].addr == &flags.sortpack) {
+                if (!flags.invlet_constant)
                     reassign();
-                    if (iflags.perm_invent)
-                        g.opt_need_redraw = TRUE;
-                }
+                if (iflags.perm_invent)
+                    update_inventory();
             } else if (boolopt[i].addr == &flags.lit_corridor
                        || boolopt[i].addr == &flags.dark_room) {
                 /*

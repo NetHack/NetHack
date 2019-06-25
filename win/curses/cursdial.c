@@ -101,7 +101,7 @@ static void menu_display_page(nhmenu *menu, WINDOW * win, int page_num,
                               char *);
 static int menu_get_selections(WINDOW * win, nhmenu *menu, int how);
 static void menu_select_deselect(WINDOW * win, nhmenu_item *item,
-                                 menu_op operation);
+                                 menu_op operation, int);
 static int menu_operation(WINDOW * win, nhmenu *menu, menu_op operation,
                           int page_num);
 static void menu_clear_selections(nhmenu *menu);
@@ -1257,7 +1257,6 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
                     num_selected = -1;
                 } else {
                     num_selected = 0;
-
                 }
                 dismiss = TRUE;
                 break;
@@ -1361,12 +1360,14 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
                         && strstri(menu_item_ptr->str, search_key)) {
                         if (how == PICK_ONE) {
                             menu_clear_selections(menu);
-                            menu_select_deselect(win, menu_item_ptr, SELECT);
+                            menu_select_deselect(win, menu_item_ptr,
+                                                 SELECT, curpage);
                             num_selected = 1;
                             dismiss = TRUE;
                             break;
                         } else {
-                            menu_select_deselect(win, menu_item_ptr, INVERT);
+                            menu_select_deselect(win, menu_item_ptr,
+                                                 INVERT, curpage);
                         }
                     }
 
@@ -1399,19 +1400,22 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
 
                     if (how == PICK_ONE) {
                         menu_clear_selections(menu);
-                        menu_select_deselect(win, menu_item_ptr, SELECT);
+                        menu_select_deselect(win, menu_item_ptr,
+                                             SELECT, curpage);
                         if (count)
                             menu_item_ptr->count = count;
                         num_selected = 1;
                         dismiss = TRUE;
                         break;
                     } else if (how == PICK_ANY && curletter == count_letter) {
-                        menu_select_deselect(win, menu_item_ptr, SELECT);
+                        menu_select_deselect(win, menu_item_ptr,
+                                             SELECT, curpage);
                         menu_item_ptr->count = count;
                         count = 0;
                         count_letter = '\0';
                     } else {
-                        menu_select_deselect(win, menu_item_ptr, INVERT);
+                        menu_select_deselect(win, menu_item_ptr,
+                                             INVERT, curpage);
                     }
                 }
             }
@@ -1437,30 +1441,38 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
 }
 
 
-/* Select, deselect, or toggle selected for the given menu entry */
+/* Select, deselect, or toggle selected for the given menu entry.
+   For search operations, the toggled entry might be on a different
+   page than the one currently shown. */
 
 static void
-menu_select_deselect(WINDOW * win, nhmenu_item *item, menu_op operation)
+menu_select_deselect(WINDOW *win, nhmenu_item *item,
+                     menu_op operation, int current_page)
 {
     int curletter = item->accelerator;
+    boolean visible = (item->page_num == current_page);
 
-    if ((operation == DESELECT) || (item->selected && (operation == INVERT))) {
+    if (operation == DESELECT || (item->selected && operation == INVERT)) {
         item->selected = FALSE;
-        mvwaddch(win, item->line_num + 1, 1, ' ');
-        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
-        mvwaddch(win, item->line_num + 1, 2, curletter);
-        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
-        mvwaddch(win, item->line_num + 1, 3, ')');
+        if (visible) {
+            mvwaddch(win, item->line_num + 1, 1, ' ');
+            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+            mvwaddch(win, item->line_num + 1, 2, curletter);
+            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+            mvwaddch(win, item->line_num + 1, 3, ')');
+        }
     } else {
         item->selected = TRUE;
-        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, ON);
-        mvwaddch(win, item->line_num + 1, 1, '<');
-        mvwaddch(win, item->line_num + 1, 2, curletter);
-        mvwaddch(win, item->line_num + 1, 3, '>');
-        curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, OFF);
+        if (visible) {
+            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, ON);
+            mvwaddch(win, item->line_num + 1, 1, '<');
+            mvwaddch(win, item->line_num + 1, 2, curletter);
+            mvwaddch(win, item->line_num + 1, 3, '>');
+            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, OFF);
+        }
     }
-
-    wrefresh(win);
+    if (visible)
+        wrefresh(win);
 }
 
 
@@ -1513,7 +1525,7 @@ menu_operation(WINDOW * win, nhmenu *menu, menu_op
         }
 
         if (menu_item_ptr->identifier.a_void != NULL) {
-            menu_select_deselect(win, menu_item_ptr, operation);
+            menu_select_deselect(win, menu_item_ptr, operation, current_page);
         }
 
         menu_item_ptr = menu_item_ptr->next_item;
