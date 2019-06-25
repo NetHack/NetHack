@@ -1,4 +1,4 @@
-/* NetHack 3.6	restore.c	$NHDT-Date: 1555201698 2019/04/14 00:28:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	restore.c	$NHDT-Date: 1561485720 2019/06/25 18:02:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -786,18 +786,19 @@ unsigned int *stuckid, *steedid;
 
     /* restore dangling (not on floor or in inventory) ball and/or chain */
     bc_obj = restobjchn(nhfp, FALSE, FALSE);
-    while(bc_obj) {
-        struct obj * nobj = bc_obj->nobj;
+    while (bc_obj) {
+        struct obj *nobj = bc_obj->nobj;
+
         if (bc_obj->owornmask)
             setworn(bc_obj, bc_obj->owornmask);
-        bc_obj->nobj = (struct obj *)0;
+        bc_obj->nobj = (struct obj *) 0;
         bc_obj = nobj;
     }
     g.migrating_objs = restobjchn(nhfp, FALSE, FALSE);
     g.migrating_mons = restmonchn(nhfp, FALSE);
 
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) g.mvitals, sizeof(g.mvitals));
+        mread(nhfp->fd, (genericptr_t) g.mvitals, sizeof g.mvitals);
     }
     if (nhfp->fieldlevel) {
         int i;
@@ -818,8 +819,12 @@ unsigned int *stuckid, *steedid;
         if (otmp->owornmask)
             setworn(otmp, otmp->owornmask);
 
-    if ((uball && !uchain) || (uchain && !uball))
+    if ((uball && !uchain) || (uchain && !uball)) {
         impossible("restgamestate: lost ball & chain");
+        /* poor man's unpunish() */
+        setworn((struct obj *) 0, W_CHAIN);
+        setworn((struct obj *) 0, W_BALL);
+    }
 
     /* reset weapon so that player will get a reminder about "bashing"
        during next fight when bare-handed or wielding an unconventional
