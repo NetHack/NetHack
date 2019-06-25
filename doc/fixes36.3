@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.69 $ $NHDT-Date: 1561429723 2019/06/25 02:28:43 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ $NHDT-Date: 1561455021 2019/06/25 09:30:21 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -104,6 +104,9 @@ for wizard mode 'wizweight' option, glob weight wasn't shown unless glob had
 fix for feedback when a monster plays a fire horn at self to cure green slime
 	ended up being used for zapping a wand of fire at self too
 curses: sometimes the message window would show a blank line after a prompt
+curses: the change to show map in columns 1..79 instead of 2..80 made the
+	highlight for '@' show up in the wrong place if clipped map had been
+	panned horizontally
 tty: revert the attempt to fix "message line anomaly: if autodecribe feedback
 	wrapped to second line, the wrapped portion wasn't erased when a
 	shorter line was shown or getpos was dismissed" because it disrupted
