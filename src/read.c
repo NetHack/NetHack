@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1560085864 2019/06/09 13:11:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1561485713 2019/06/25 18:01:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.172 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2391,12 +2391,14 @@ unpunish()
 {
     struct obj *savechain = uchain;
 
+    /* chain goes away */
     obj_extract_self(uchain);
     newsym(uchain->ox, uchain->oy);
-    setworn((struct obj *) 0, W_CHAIN);
+    setworn((struct obj *) 0, W_CHAIN); /* sets 'uchain' to Null */
     dealloc_obj(savechain);
+    /* ball persists */
     uball->spe = 0;
-    setworn((struct obj *) 0, W_BALL);
+    setworn((struct obj *) 0, W_BALL); /* sets 'uball' to Null */
 }
 
 /* some creatures have special data structures that only make sense in their
