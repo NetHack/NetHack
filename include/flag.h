@@ -70,21 +70,6 @@ struct flag {
      * and get rid of these comments...) once 3.6.0 savefile compatibility
      * eventually ends.
      */
-#ifndef SKIP_BOOLEAN
-    /* this is the normal configuration; assigning a character constant
-       for a normal letter to an 'xchar' variable should always work even
-       if 'char' is unsigned since character constants are actually 'int'
-       and letters are within the range where signedness shouldn't matter */
-    xchar   sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
-#else
-    /* with SKIP_BOOLEAN, we have no idea what underlying type is being
-       used, other than it isn't 'xchar' (although its size might match
-       that) or a bitfield (because it must be directly addressable);
-       it's probably either 'char' for compactness or 'int' for access,
-       but we don't know which and it might be something else anyway;
-       flip a coin here and guess 'char' for compactness */
-    char    sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
-#endif
     boolean sortpack;        /* sorted inventory */
     boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */
@@ -108,6 +93,7 @@ struct flag {
 #define PARANOID_WERECHANGE 0x0100
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
+    char    sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
     char inv_order[MAXOCLASSES];
     char pickup_types[MAXOCLASSES];
 #define NUM_DISCLOSURE_OPTIONS 6 /* i,a,v,g,c,o (decl.c) */

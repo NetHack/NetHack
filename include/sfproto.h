@@ -1,4 +1,4 @@
-/* NetHack 3.7 sfproto.h	Sat Jun 22 22:53:12 2019 */
+/* NetHack 3.7 sfproto.h	Tue Jun 25 09:57:33 2019 */
 /* Copyright (c) NetHack Development Team 2018.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 

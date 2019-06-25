@@ -12,8 +12,8 @@
 #include "wintype.h"
 #include "sfproto.h"
 
-#define BUILD_DATE "Tue Jun 25 01:06:17 2019"
-#define BUILD_TIME (1561439177L)
+#define BUILD_DATE "Tue Jun 25 09:57:33 2019"
+#define BUILD_TIME (1561471053L)
 
 #define NHTYPE_SIMPLE    1
 #define NHTYPE_COMPLEX   2
@@ -746,8 +746,6 @@ int cnt;
     sfo_boolean(nhfp, &d_flag->showexp, parent, "showexp", 1);   /* (boolean) */
     sfo_boolean(nhfp, &d_flag->showscore, parent, "showscore", 1);/* (boolean) */
     sfo_boolean(nhfp, &d_flag->silent, parent, "silent", 1);     /* (boolean) */
-    sfo_xchar(nhfp, &d_flag->sortloot, parent, "sortloot", 1);   /* (xchar) */
-    sfo_char(nhfp, &d_flag->sortloot, parent, "sortloot", 1);    /* (char) */
     sfo_boolean(nhfp, &d_flag->sortpack, parent, "sortpack", 1); /* (boolean) */
     sfo_boolean(nhfp, &d_flag->sparkle, parent, "sparkle", 1);   /* (boolean) */
     sfo_boolean(nhfp, &d_flag->standout, parent, "standout", 1); /* (boolean) */
@@ -761,6 +759,7 @@ int cnt;
     sfo_unsigned(nhfp, &d_flag->paranoia_bits, parent, "paranoia_bits", 1);/* (unsigned) */
     sfo_int(nhfp, &d_flag->pickup_burden, parent, "pickup_burden", 1);/* (int) */
     sfo_int(nhfp, &d_flag->pile_limit, parent, "pile_limit", 1); /* (int) */
+    sfo_char(nhfp, &d_flag->sortloot, parent, "sortloot", 1);    /* (char) */
     sfo_char(nhfp, d_flag->inv_order, parent, "inv_order", MAXOCLASSES);/* (char) */
     sfo_char(nhfp, d_flag->pickup_types, parent, "pickup_types", MAXOCLASSES);/* (char) */
     sfo_char(nhfp, d_flag->end_disclose, parent, "end_disclose", NUM_DISCLOSURE_OPTIONS + 1);/* (char) */
@@ -3137,8 +3136,6 @@ int cnt;
     sfi_boolean(nhfp, &d_flag->showexp, parent, "showexp", 1);
     sfi_boolean(nhfp, &d_flag->showscore, parent, "showscore", 1);
     sfi_boolean(nhfp, &d_flag->silent, parent, "silent", 1);
-    sfi_xchar(nhfp, &d_flag->sortloot, parent, "sortloot", 1);
-    sfi_char(nhfp, &d_flag->sortloot, parent, "sortloot", 1);
     sfi_boolean(nhfp, &d_flag->sortpack, parent, "sortpack", 1);
     sfi_boolean(nhfp, &d_flag->sparkle, parent, "sparkle", 1);
     sfi_boolean(nhfp, &d_flag->standout, parent, "standout", 1);
@@ -3152,6 +3149,7 @@ int cnt;
     sfi_unsigned(nhfp, &d_flag->paranoia_bits, parent, "paranoia_bits", 1);
     sfi_int(nhfp, &d_flag->pickup_burden, parent, "pickup_burden", 1);
     sfi_int(nhfp, &d_flag->pile_limit, parent, "pile_limit", 1);
+    sfi_char(nhfp, &d_flag->sortloot, parent, "sortloot", 1);
     sfi_char(nhfp, d_flag->inv_order, parent, "inv_order", MAXOCLASSES);
     sfi_char(nhfp, d_flag->pickup_types, parent, "pickup_types", MAXOCLASSES);
     sfi_char(nhfp, d_flag->end_disclose, parent, "end_disclose", NUM_DISCLOSURE_OPTIONS + 1);
@@ -5499,8 +5497,6 @@ const char *critical_members[] = {
 	"struct flag:showexp:boolean",
 	"struct flag:showscore:boolean",
 	"struct flag:silent:boolean",
-	"struct flag:sortloot:xchar",
-	"struct flag:sortloot:char",
 	"struct flag:sortpack:boolean",
 	"struct flag:sparkle:boolean",
 	"struct flag:standout:boolean",
@@ -5514,6 +5510,7 @@ const char *critical_members[] = {
 	"struct flag:paranoia_bits:unsigned",
 	"struct flag:pickup_burden:int",
 	"struct flag:pile_limit:int",
+	"struct flag:sortloot:char",
 	"struct flag:inv_order:char",
 	"struct flag:pickup_types:char",
 	"struct flag:end_disclose:char",
