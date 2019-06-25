@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.68 $ $NHDT-Date: 1561427671 2019/06/25 01:54:31 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.69 $ $NHDT-Date: 1561429723 2019/06/25 02:28:43 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -145,6 +145,9 @@ curses: don't convert ^M (or <return> or <enter> key) into ^J; both ^J and ^M
 	cause the hero to try to move
 curses: draw map in screen columns 1..79 like tty, rather than in 2..80
 curses: make text windows wider so that help feedback is more readable
+curses: using ':' for search string matching to toggle menu items in a multple
+	page menu would highlight arbitrary items on the currently visible
+	page in sync with the lines that matching items had on other pages
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with
