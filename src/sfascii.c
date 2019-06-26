@@ -13,7 +13,7 @@ void FDECL(report_problem_ascii, (NHFILE *, const char *, const char *, const ch
 #endif
 
 struct sf_procs ascii_sfo_procs = {
-    "-ascii",
+    ".ascii",
     {
         ascii_sfo_aligntyp,
         ascii_sfo_any,
@@ -40,7 +40,7 @@ struct sf_procs ascii_sfo_procs = {
 
 struct sf_procs ascii_sfi_procs =
 {
-    "-ascii",
+    ".ascii",
     {
         ascii_sfi_aligntyp,
         ascii_sfi_any,
@@ -87,6 +87,7 @@ int cnt;
 {
     const char *parent = "any";
 
+    nhUse(parent);
     Sprintf(outbuf, "%llx", (unsigned long long) d_any->a_void);
     put_savefield(nhfp, outbuf, BUFSZ);
 
@@ -136,6 +137,7 @@ int cnt;
     int itmp;
     const char *parent = "aligntyp";
 
+    nhUse(parent);
     itmp = (int) *d_aligntyp;
     Sprintf(outbuf, "%d", (short) itmp);
     put_savefield(nhfp, outbuf, BUFSZ);
@@ -151,6 +153,7 @@ int cnt;
 {
     const char *parent = "bitfield";
 
+    nhUse(parent);
     /* for bitfields, cnt is the number of bits, not an array */
     Sprintf(outbuf, "%hu", (unsigned short) *d_bitfield);
     put_savefield(nhfp, outbuf, BUFSZ);
@@ -167,6 +170,7 @@ int cnt;
     int i;
     const char *parent = "boolean";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         if (nhfp->fpdebug)
             fprintf(nhfp->fpdebug, "(%s)\n", (*d_boolean) ? "TRUE" : "FALSE");
@@ -187,6 +191,7 @@ int cnt;
     int i = cnt;
     const char *parent = "char";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         if (nhfp->fpdebug)
             fprintf(nhfp->fpdebug, "(%s)\n", d_char ? d_char : "");
@@ -209,6 +214,7 @@ int cnt;
     char *byteptr = (char *) d_genericptr;
     const char *parent = "genericptr";
 
+    nhUse(parent);
     /*
      * sbrooms is an array of pointers to mkroom.
      * That array dimension is MAX_SUBROOMS.
@@ -238,6 +244,7 @@ int cnt;
     int i;
     const char *parent = "int";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         Sprintf(outbuf, "%d", *d_int);
         put_savefield(nhfp, outbuf, BUFSZ);
@@ -256,6 +263,7 @@ int cnt;
     int i;
     const char *parent = "long";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         Sprintf(outbuf, "%ld", *d_long);
         put_savefield(nhfp, outbuf, BUFSZ);
@@ -274,6 +282,7 @@ int cnt;
     int i, itmp;
     const char *parent = "schar";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         itmp = (int) *d_schar;
         Sprintf(outbuf, "%d", itmp);
@@ -293,6 +302,7 @@ int cnt;
     int i;
     const char *parent = "short";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         Sprintf(outbuf, "%hd", *d_short);
         put_savefield(nhfp, outbuf, BUFSZ);
@@ -311,6 +321,7 @@ int cnt;
     int i;
     const char *parent = "size_t";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         unsigned long ul = (unsigned long) *d_size_t;
 
@@ -330,6 +341,7 @@ int cnt UNUSED;
 {
     const char *parent = "time_t";
 
+    nhUse(parent);
     Sprintf(outbuf, "%s", yyyymmddhhmmss(*d_time_t));
     put_savefield(nhfp, outbuf, BUFSZ);
 }
@@ -356,6 +368,7 @@ int cnt;
     int i;
     const char *parent = "uchar";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         unsigned short us = (unsigned short) *d_uchar;
 
@@ -376,6 +389,7 @@ int cnt;
     int i;
     const char *parent = "uint";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         Sprintf(outbuf, "%u", *d_uint);
         put_savefield(nhfp, outbuf, BUFSZ);
@@ -394,6 +408,7 @@ int cnt;
     int i;
     const char *parent = "ulong";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         Sprintf(outbuf, "%lu", *d_ulong);
         put_savefield(nhfp, outbuf, BUFSZ);
@@ -412,6 +427,7 @@ int cnt;
     int i;
     const char *parent = "ushort";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         Sprintf(outbuf, "%hu", *d_ushort);
         put_savefield(nhfp, outbuf, BUFSZ);
@@ -430,6 +446,7 @@ int cnt;
     int i;
     const char *parent = "xchar";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         short tmp;
 
@@ -454,6 +471,7 @@ int cnt;
     const char *parent = "str";
     char sval[QBUFSZ], *src = d_str, *dest = strbuf;
 
+    nhUse(parent);
     /* cnt is the number of characters */
     for (i = 0; i < cnt; ++i) {
         if ((*src < 32) || (*src == '\\') || (*src > 128)) {
@@ -472,7 +490,7 @@ int cnt;
 void
 ascii_sfo_addinfo(nhfp, parent, action, myname, index)
 NHFILE *nhfp;
-const char *parent, *action, *myname;
+const char *parent UNUSED, *action UNUSED, *myname UNUSED;
 int index;
 {
     /* ignored */
@@ -507,6 +525,7 @@ int cnt;
     long long tmp;
     const char *parent = "any";
 
+    nhUse(parent);
     rstr = get_savefield(nhfp, linebuf, BUFSZ);
     tmp = atoll(rstr);
     d_any->a_void = (void *) tmp;
@@ -561,6 +580,7 @@ int cnt;
     long long lltmp;
     const char *parent = "aligntyp";
 
+    nhUse(parent);
     rstr = get_savefield(nhfp, linebuf, BUFSZ);
     lltmp = atoll(rstr);
     tmp = (aligntyp) lltmp;
@@ -584,6 +604,7 @@ int cnt;
     uint8_t tmp;
     const char *parent = "bitfield";
 
+    nhUse(parent);
     /* cnt is the number of bits in the bitfield, not an array dimension */
     rstr = get_savefield(nhfp, linebuf, BUFSZ);
     tmp = (uint8_t) atoi(rstr);
@@ -607,6 +628,7 @@ int cnt;
     int i;
     const char *parent = "boolean";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
 #ifdef SAVEFILE_DEBUGGING
@@ -636,6 +658,7 @@ int cnt;
     char tmp;
     const char *parent = "char";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         tmp = (char) atoi(rstr);
@@ -664,6 +687,7 @@ int cnt;
     static char *glorkum = "glorkum";
     char *byteptr = (char *) d_genericptr;
 
+    nhUse(parent);
     /*
      * sbrooms is an array of pointers to mkroom.
      * That array dimension is MAX_SUBROOMS.
@@ -697,6 +721,7 @@ int cnt;
     long long lltmp;
     const char *parent = "int";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         lltmp = atoll(rstr);
@@ -725,6 +750,7 @@ int cnt;
     char *rstr;
     const char *parent = "long";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         lltmp = atoll(rstr);
@@ -752,6 +778,7 @@ int cnt;
     char *rstr;
     const char *parent = "schar";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         tmp = (schar) atoi(rstr);
@@ -778,6 +805,7 @@ int cnt;
     char *rstr;
     const char *parent = "short";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         tmp = (short) atoi(rstr);
@@ -804,6 +832,7 @@ int cnt;
     char *rstr;
     const char *parent = "size_t";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         tmp = (size_t) atol(rstr);
@@ -830,6 +859,7 @@ int cnt UNUSED;
     char *rstr;
     const char *parent = "time_t";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         tmp = time_from_yyyymmddhhmmss(rstr);
@@ -868,6 +898,7 @@ int cnt;
     char *rstr;
     const char *parent = "uchar";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         itmp = atoi(rstr);
@@ -896,6 +927,7 @@ int cnt;
     long long lltmp;
     const char *parent = "uint";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         lltmp = atoll(rstr);
@@ -924,6 +956,7 @@ int cnt;
     char *rstr;
     const char *parent = "ulong";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         lltmp = atoll(rstr);
@@ -952,6 +985,7 @@ int cnt;
     char *rstr;
     const char *parent = "ushort";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         lltmp = atoll(rstr);
@@ -979,6 +1013,7 @@ int cnt;
     char *rstr;
     const char *parent = "xchar";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         rstr = get_savefield(nhfp, linebuf, BUFSZ);
         itmp = atoi(rstr);
@@ -1012,6 +1047,7 @@ int cnt;
     char testbuf[BUFSZ];
 #endif
 
+    nhUse(parent);
     /* cnt is the length of the string */
     rstr = get_savefield(nhfp, strbuf, BUFSZ * 4);
     src = rstr;
@@ -1060,7 +1096,7 @@ int cnt;
 void
 ascii_sfi_addinfo(nhfp, myparent, action, myname, index)
 NHFILE *nhfp;
-const char *myparent, *action, *myname;
+const char *myparent UNUSED, *action UNUSED, *myname UNUSED;
 int index;
 {
     /* not doing anything here */
