@@ -83,7 +83,7 @@ NHFILE *nhfp;
 union any *d_any;
 const char *myparent UNUSED;
 const char *myname UNUSED;
-int cnt;
+int cnt UNUSED;
 {
     const char *parent = "any";
 
@@ -132,7 +132,7 @@ NHFILE *nhfp;
 aligntyp *d_aligntyp;
 const char *myparent UNUSED;
 const char *myname UNUSED;
-int cnt;
+int cnt UNUSED;
 {
     int itmp;
     const char *parent = "aligntyp";
@@ -149,7 +149,7 @@ NHFILE *nhfp;
 uint8_t *d_bitfield;
 const char *myparent UNUSED;
 const char *myname UNUSED;
-int cnt;
+int cnt UNUSED;
 {
     const char *parent = "bitfield";
 
@@ -474,7 +474,7 @@ int cnt;
     nhUse(parent);
     /* cnt is the number of characters */
     for (i = 0; i < cnt; ++i) {
-        if ((*src < 32) || (*src == '\\') || (*src > 128)) {
+        if ((*src < 32) || (*src == '\\') || (*src > 127)) {
             *dest++ = '\\';
             intval = (int) *src++;
             Sprintf(sval, "%03d", intval);
@@ -488,10 +488,10 @@ int cnt;
 }
 
 void
-ascii_sfo_addinfo(nhfp, parent, action, myname, index)
-NHFILE *nhfp;
+ascii_sfo_addinfo(nhfp, parent, action, myname, indx)
+NHFILE *nhfp UNUSED;
 const char *parent UNUSED, *action UNUSED, *myname UNUSED;
-int index;
+int indx UNUSED;
 {
     /* ignored */
 }
@@ -1094,10 +1094,10 @@ int cnt;
 }
  
 void
-ascii_sfi_addinfo(nhfp, myparent, action, myname, index)
-NHFILE *nhfp;
+ascii_sfi_addinfo(nhfp, myparent, action, myname, indx)
+NHFILE *nhfp UNUSED;
 const char *myparent UNUSED, *action UNUSED, *myname UNUSED;
-int index;
+int indx UNUSED;
 {
     /* not doing anything here */
 }
@@ -1108,7 +1108,6 @@ NHFILE *nhfp;
 char *inbuf;
 size_t inbufsz;
 {
-    boolean rv = TRUE; /* assume successful parse */
     char *ep, *sep;
 
     if (fgets(inbuf, (int) inbufsz, nhfp->fpdef)) {

@@ -145,6 +145,8 @@ int cnt;
     uint32_t ui32;
     int32_t i32;
     int8_t i8;
+
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
         ui64 = (uint64_t) d_any->a_void;
         fwrite(&ui64, sizeof ui64, 1, nhfp->fpdef);
@@ -214,7 +216,7 @@ NHFILE *nhfp;
 uint8_t *d_bitfield;
 const char *myparent UNUSED;
 const char *myname UNUSED;
-int cnt;
+int cnt UNUSED;
 {
     const char *parent = "bitfield";
 
@@ -289,7 +291,6 @@ int cnt;
     int i;
     int8_t p;
 
-    nhUse(parent);
     /*
      * sbrooms is an array of pointers to mkroom.
      * That array dimension is MAX_SUBROOMS.
@@ -622,7 +623,7 @@ int cnt;
     nhUse(parent);
     /* cnt is the number of characters */
     for (i = 0; i < cnt; ++i) {
-        if ((*src < 32) || (*src == '\\') || (*src > 128)) {
+        if ((*src < 32) || (*src == '\\') || (*src > 127)) {
             *dest++ = '\\';
             outcount++;
             intval = (int) *src++;
@@ -653,10 +654,10 @@ int cnt;
 }
 
 void
-lendian_sfo_addinfo(nhfp, parent, action, myname, index)
-NHFILE *nhfp;
+lendian_sfo_addinfo(nhfp, parent, action, myname, indx)
+NHFILE *nhfp UNUSED;
 const char *parent UNUSED, *action UNUSED, *myname UNUSED;
-int index;
+int indx UNUSED;
 {
     /* ignored */
 }
@@ -1323,10 +1324,10 @@ int cnt;
 }
  
 void
-lendian_sfi_addinfo(nhfp, myparent, action, myname, index)
-NHFILE *nhfp;
-const char *myparent, *action, *myname;
-int index;
+lendian_sfi_addinfo(nhfp, myparent, action, myname, indx)
+NHFILE *nhfp UNUSED;
+const char *myparent UNUSED, *action UNUSED, *myname UNUSED;
+int indx UNUSED;
 {
     /* not doing anything here */
 }
