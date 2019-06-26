@@ -786,7 +786,7 @@ NHFILE *nhfp;
 uint8_t *d_bitfield;
 const char *myparent UNUSED;
 const char *myname UNUSED;
-int cnt;
+int cnt UNUSED;
 {
     const char *parent = "bitfield";
 
@@ -877,7 +877,7 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    static char *glorkum = "glorkum";
+    static const char *glorkum = "glorkum";
     int8_t p;
 
     for (i = 0; i < cnt; ++i) {
@@ -1034,6 +1034,7 @@ int cnt;
     uint64_t ui64, val;
     const char *parent = "size_t";
 
+    nhUse(parent);
     for (i = 0; i < cnt; ++i) {
 #ifdef SAVEFILE_DEBUGGING
         floc = ftell(nhfp->fpdef);
@@ -1066,6 +1067,7 @@ int cnt UNUSED;
     char buf[BUFSZ];
     const char *parent = "time_t";
 
+    nhUse(parent);
 #ifdef SAVEFILE_DEBUGGING
     floc = ftell(nhfp->fpdef);
 #endif
@@ -1268,6 +1270,7 @@ int cnt;
     char *src, *dest;
     int16_t i16, incount = 0;
 
+    nhUse(parent);
 #ifdef SAVEFILE_DEBUGGING
     floc = ftell(nhfp->fpdef);
 #endif

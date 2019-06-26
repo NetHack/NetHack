@@ -6,6 +6,10 @@
 #include "integer.h"
 #include "sfprocs.h"
 
+#ifdef MACOSX
+extern long long FDECL(atoll, (const char *));
+#endif
+
 static void FDECL(put_savefield, (NHFILE *, char *, size_t));
 char *FDECL(get_savefield, (NHFILE *, char *, size_t));
 #ifdef SAVEFILE_DEBUGGING
@@ -498,13 +502,13 @@ int indx UNUSED;
 
 
 static void
-put_savefield(nhfp, outbuf, outbufsz)
+put_savefield(nhfp, obuf, outbufsz)
 NHFILE *nhfp;
-char *outbuf;
-size_t outbufsz;
+char *obuf;
+size_t outbufsz UNUSED;
 {
     nhfp->count++;
-    fprintf(nhfp->fpdef, "%07ld|%s\n", nhfp->count, outbuf);
+    fprintf(nhfp->fpdef, "%07ld|%s\n", nhfp->count, obuf);
 }
 
 /*
@@ -573,7 +577,7 @@ NHFILE *nhfp;
 aligntyp *d_aligntyp;
 const char *myparent UNUSED;
 const char *myname UNUSED;
-int cnt;
+int cnt UNUSED;
 {
     char *rstr;
     aligntyp tmp;
@@ -598,7 +602,7 @@ NHFILE *nhfp;
 uint8_t *d_bitfield;
 const char *myparent UNUSED;
 const char *myname UNUSED;
-int cnt;
+int cnt UNUSED;
 {
     char *rstr;
     uint8_t tmp;
@@ -684,7 +688,7 @@ int cnt;
     long long lltmp;
     char *rstr;
     const char *parent = "genericptr";
-    static char *glorkum = "glorkum";
+    static const char *glorkum = "glorkum";
     char *byteptr = (char *) d_genericptr;
 
     nhUse(parent);
