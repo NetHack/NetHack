@@ -885,11 +885,36 @@ curses_get_mouse(int *mousex, int *mousey, int *mod)
     MEVENT event;
 
     if (getmouse(&event) == OK) { /* When the user clicks left mouse button */
-        if (event.bstate & BUTTON1_CLICKED) {
+        if (event.bstate & (BUTTON1_CLICKED | BUTTON2_CLICKED)) {
+        /*
+         * The ncurses man page documents wmouse_trafo() incorrectly.
+         * It says that last argument 'TRUE' translates from screen
+         * to window and 'FALSE' translates from window to screen,
+         * but those are backwards.  The mouse_trafo() macro calls
+         * last argument 'to_screen', suggesting that the backwards
+         * implementation is the intended behavior and the man page
+         * is describing it wrong.
+         */
             /* See if coords are in map window & convert coords */
-            if (wmouse_trafo(mapwin, &event.y, &event.x, TRUE)) {
+            if (wmouse_trafo(mapwin, &event.y, &event.x,
+#ifdef PDCURSES
+        /*
+         * Not sure whether PDCurses matches the ncurses implementation
+         * or the ncurses documentation, so keep the 'bad' argument for
+         * it until we find out.  [Mouse can be used successfully with
+         * 'bad' coordinate translation via align_message:bottom (and
+         * avoiding align_status:left) so that the subset of the screen
+         * corresponding to the map needs no translation.  Adding instead
+         * of subtracting or vice versa makes no difference when amount
+         * involved is 0.]
+         */
+                             TRUE
+#else
+                             FALSE
+#endif
+                             )) {
                 key = 0;        /* Flag mouse click */
-                *mousex = event.x;
+                *mousex = event.x + 1; /* +1: screen 0..78 is map 1..79 */
                 *mousey = event.y;
 
                 if (curses_window_has_border(MAP_WIN)) {
@@ -897,7 +922,7 @@ curses_get_mouse(int *mousex, int *mousey, int *mod)
                     (*mousey)--;
                 }
 
-                *mod = CLICK_1;
+                *mod = (event.bstate & BUTTON1_CLICKED) ? CLICK_1 : CLICK_2;
             }
         }
     }
@@ -906,6 +931,24 @@ curses_get_mouse(int *mousex, int *mousey, int *mod)
     return key;
 }
 
+void
+curses_mouse_support(mode)
+int mode; /* 0: off, 1: on, 2: alternate on */
+{
+#ifdef NCURSES_MOUSE_VERSION
+    mmask_t result, oldmask, newmask;
+
+    if (!mode)
+        newmask = 0;
+    else
+        newmask = BUTTON1_CLICKED | BUTTON2_CLICKED;
+
+    result = mousemask(newmask, &oldmask);
+    nhUse(result);
+#else
+    nhUse(mode);
+#endif
+}
 
 static int
 parse_escape_sequence(void)

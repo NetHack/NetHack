@@ -17,6 +17,9 @@ extern long curs_mesg_suppress_turn; /* from cursmesg.c */
 struct window_procs curses_procs = {
     "curses",
     (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_HILITE_PET
+#ifdef NCURSES_MOUSE_VERSION /* (this macro name works for PDCURSES too) */
+     | WC_MOUSE_SUPPORT
+#endif
      | WC_PERM_INVENT | WC_POPUP_DIALOG | WC_SPLASH_SCREEN),
     (WC2_DARKGRAY | WC2_HITPOINTBAR
 #if defined(STATUS_HILITES)
@@ -893,6 +896,8 @@ curses_preference_update(const char *pref)
         redo_status = TRUE;
     else if (!strcmp(pref, "align_message"))
         redo_main = TRUE;
+    else if (!strcmp(pref, "mouse_support"))
+        curses_mouse_support(iflags.wc_mouse_support);
 
     if (redo_main || redo_status)
         curs_reset_windows(redo_main, redo_status);
