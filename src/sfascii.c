@@ -523,7 +523,7 @@ NHFILE *nhfp;
 union any *d_any;
 const char *myparent UNUSED;
 const char *myname UNUSED;
-int cnt;
+int cnt UNUSED;
 {
     char *rstr;
     long long tmp;
