@@ -437,7 +437,6 @@ void
 savestateinlock()
 {
     int hpid = 0;
-    static boolean havestate = TRUE;
     char whynot[BUFSZ];
     NHFILE *nhfp;
 
@@ -448,7 +447,7 @@ savestateinlock()
      * a game, however, the file has to be rewritten once to truncate
      * it and avoid restoring from outdated information.
      *
-     * Restricting havestate to this routine means that an additional
+     * Restricting g.havestate to this routine means that an additional
      * noop pid rewriting will take place on the first "checkpoint" after
      * the game is started or restored, if checkpointing is off.
      */

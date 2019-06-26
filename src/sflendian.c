@@ -134,11 +134,11 @@ void
 lendian_sfo_any(nhfp, d_any, myparent, myname, cnt)
 NHFILE *nhfp;
 union any *d_any;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
-    char *parent = "any";
+    const char *parent = "any";
     int i;
     uint64_t ui64;
     int64_t i64;
@@ -187,8 +187,8 @@ void
 lendian_sfo_aligntyp(nhfp, d_aligntyp, myparent, myname, cnt)
 NHFILE *nhfp;
 aligntyp *d_aligntyp;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     const char *parent = "aligntyp";
@@ -211,8 +211,8 @@ void
 lendian_sfo_bitfield(nhfp, d_bitfield, myparent, myname, cnt)
 NHFILE *nhfp;
 uint8_t *d_bitfield;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     const char *parent = "bitfield";
@@ -230,8 +230,8 @@ void
 lendian_sfo_boolean(nhfp, d_boolean, myparent, myname, cnt)
 NHFILE *nhfp;
 boolean *d_boolean;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     const char *parent = "boolean";
@@ -254,8 +254,8 @@ void
 lendian_sfo_char(nhfp, d_char, myparent, myname, cnt)
 NHFILE *nhfp;
 char *d_char;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -278,8 +278,8 @@ void
 lendian_sfo_genericptr(nhfp, d_genericptr, myparent, myname, cnt)
 NHFILE *nhfp;
 genericptr_t *d_genericptr;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -314,8 +314,8 @@ void
 lendian_sfo_int(nhfp, d_int, myparent, myname, cnt)
 NHFILE *nhfp;
 int *d_int;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -339,8 +339,8 @@ void
 lendian_sfo_long(nhfp, d_long, myparent, myname, cnt)
 NHFILE *nhfp;
 long *d_long;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -364,8 +364,8 @@ void
 lendian_sfo_schar(nhfp, d_schar, myparent, myname, cnt)
 NHFILE *nhfp;
 schar *d_schar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -388,8 +388,8 @@ void
 lendian_sfo_short(nhfp, d_short, myparent, myname, cnt)
 NHFILE *nhfp;
 short *d_short;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -412,8 +412,8 @@ void
 lendian_sfo_size_t(nhfp, d_size_t, myparent, myname, cnt)
 NHFILE *nhfp;
 size_t *d_size_t;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -437,9 +437,9 @@ void
 lendian_sfo_time_t(nhfp, d_time_t, myparent, myname, cnt)
 NHFILE *nhfp;
 time_t *d_time_t;
-const char *myparent;
-const char *myname;
-int cnt;
+const char *myparent UNUSED;
+const char *myname UNUSED;
+int cnt UNUSED;
 {
     char buf[BUFSZ];
     const char *parent = "time_t";
@@ -457,8 +457,8 @@ void
 lendian_sfo_unsigned(nhfp, d_unsigned, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned *d_unsigned;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     lendian_sfo_uint(nhfp, d_unsigned, myparent, myname, cnt);
@@ -468,8 +468,8 @@ void
 lendian_sfo_uchar(nhfp, d_uchar, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned char *d_uchar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -491,8 +491,8 @@ void
 lendian_sfo_uint(nhfp, d_uint, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned int *d_uint;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -516,8 +516,8 @@ void
 lendian_sfo_ulong(nhfp, d_ulong, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned long *d_ulong;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -541,8 +541,8 @@ void
 lendian_sfo_ushort(nhfp, d_ushort, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned short *d_ushort;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -566,8 +566,8 @@ void
 lendian_sfo_xchar(nhfp, d_xchar, myparent, myname, cnt)
 NHFILE *nhfp;
 xchar *d_xchar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -593,8 +593,8 @@ void
 lendian_sfo_str(nhfp, d_str, myparent, myname, cnt)
 NHFILE *nhfp;
 char *d_str;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i, j, intval;
@@ -654,8 +654,8 @@ void
 lendian_sfi_any(nhfp, d_any, myparent, myname, cnt)
 NHFILE *nhfp;
 union any *d_any;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     const char *parent = "any";
@@ -730,8 +730,8 @@ void
 lendian_sfi_aligntyp(nhfp, d_aligntyp, myparent, myname, cnt)
 NHFILE *nhfp;
 aligntyp *d_aligntyp;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     const char *parent = "aligntyp";
@@ -762,8 +762,8 @@ void
 lendian_sfi_bitfield(nhfp, d_bitfield, myparent, myname, cnt)
 NHFILE *nhfp;
 uint8_t *d_bitfield;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     const char *parent = "bitfield";
@@ -787,8 +787,8 @@ void
 lendian_sfi_boolean(nhfp, d_boolean, myparent, myname, cnt)
 NHFILE *nhfp;
 boolean *d_boolean;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -818,8 +818,8 @@ void
 lendian_sfi_char(nhfp, d_char, myparent, myname, cnt)
 NHFILE *nhfp;
 char *d_char;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -849,8 +849,8 @@ void
 lendian_sfi_genericptr(nhfp, d_genericptr, myparent, myname, cnt)
 NHFILE *nhfp;
 genericptr_t *d_genericptr;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -880,8 +880,8 @@ void
 lendian_sfi_int(nhfp, d_int, myparent, myname, cnt)
 NHFILE *nhfp;
 int *d_int;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -911,8 +911,8 @@ void
 lendian_sfi_long(nhfp, d_long, myparent, myname, cnt)
 NHFILE *nhfp;
 long *d_long;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -942,8 +942,8 @@ void
 lendian_sfi_schar(nhfp, d_schar, myparent, myname, cnt)
 NHFILE *nhfp;
 schar *d_schar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -972,8 +972,8 @@ void
 lendian_sfi_short(nhfp, d_short, myparent, myname, cnt)
 NHFILE *nhfp;
 short *d_short;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -1003,8 +1003,8 @@ void
 lendian_sfi_size_t(nhfp, d_size_t, myparent, myname, cnt)
 NHFILE *nhfp;
 size_t *d_size_t;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -1035,9 +1035,9 @@ void
 lendian_sfi_time_t(nhfp, d_time_t, myparent, myname, cnt)
 NHFILE *nhfp;
 time_t *d_time_t;
-const char *myparent;
-const char *myname;
-int cnt;
+const char *myparent UNUSED;
+const char *myname UNUSED;
+int cnt UNUSED;
 {
     time_t tmp;
     char buf[BUFSZ];
@@ -1064,8 +1064,8 @@ void
 lendian_sfi_unsigned(nhfp, d_unsigned, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned *d_unsigned;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     /* deferal */
@@ -1076,8 +1076,8 @@ void
 lendian_sfi_uchar(nhfp, d_uchar, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned char *d_uchar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -1106,8 +1106,8 @@ void
 lendian_sfi_uint(nhfp, d_uint, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned int *d_uint;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -1137,8 +1137,8 @@ void
 lendian_sfi_ulong(nhfp, d_ulong, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned long *d_ulong;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -1168,8 +1168,8 @@ void
 lendian_sfi_ushort(nhfp, d_ushort, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned short *d_ushort;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -1199,8 +1199,8 @@ void
 lendian_sfi_xchar(nhfp, d_xchar, myparent, myname, cnt)
 NHFILE *nhfp;
 xchar *d_xchar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -1232,8 +1232,8 @@ void
 lendian_sfi_str(nhfp, d_str, myparent, myname, cnt)
 NHFILE *nhfp;
 char *d_str;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
 #ifdef SAVEFILE_DEBUGGING

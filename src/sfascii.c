@@ -81,11 +81,11 @@ void
 ascii_sfo_any(nhfp, d_any, myparent, myname, cnt)
 NHFILE *nhfp;
 union any *d_any;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
-    char *parent = "any";
+    const char *parent = "any";
 
     Sprintf(outbuf, "%llx", (unsigned long long) d_any->a_void);
     put_savefield(nhfp, outbuf, BUFSZ);
@@ -129,8 +129,8 @@ void
 ascii_sfo_aligntyp(nhfp, d_aligntyp, myparent, myname, cnt)
 NHFILE *nhfp;
 aligntyp *d_aligntyp;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int itmp;
@@ -145,8 +145,8 @@ void
 ascii_sfo_bitfield(nhfp, d_bitfield, myparent, myname, cnt)
 NHFILE *nhfp;
 uint8_t *d_bitfield;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     const char *parent = "bitfield";
@@ -160,8 +160,8 @@ void
 ascii_sfo_boolean(nhfp, d_boolean, myparent, myname, cnt)
 NHFILE *nhfp;
 boolean *d_boolean;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -180,8 +180,8 @@ void
 ascii_sfo_char(nhfp, d_char, myparent, myname, cnt)
 NHFILE *nhfp;
 char *d_char;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i = cnt;
@@ -200,8 +200,8 @@ void
 ascii_sfo_genericptr(nhfp, d_genericptr, myparent, myname, cnt)
 NHFILE *nhfp;
 genericptr_t *d_genericptr;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -231,8 +231,8 @@ void
 ascii_sfo_int(nhfp, d_int, myparent, myname, cnt)
 NHFILE *nhfp;
 int *d_int;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -249,8 +249,8 @@ void
 ascii_sfo_long(nhfp, d_long, myparent, myname, cnt)
 NHFILE *nhfp;
 long *d_long;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -267,8 +267,8 @@ void
 ascii_sfo_schar(nhfp, d_schar, myparent, myname, cnt)
 NHFILE *nhfp;
 schar *d_schar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i, itmp;
@@ -286,8 +286,8 @@ void
 ascii_sfo_short(nhfp, d_short, myparent, myname, cnt)
 NHFILE *nhfp;
 short *d_short;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -304,8 +304,8 @@ void
 ascii_sfo_size_t(nhfp, d_size_t, myparent, myname, cnt)
 NHFILE *nhfp;
 size_t *d_size_t;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -324,9 +324,9 @@ void
 ascii_sfo_time_t(nhfp, d_time_t, myparent, myname, cnt)
 NHFILE *nhfp;
 time_t *d_time_t;
-const char *myparent;
-const char *myname;
-int cnt;
+const char *myparent UNUSED;
+const char *myname UNUSED;
+int cnt UNUSED;
 {
     const char *parent = "time_t";
 
@@ -349,8 +349,8 @@ void
 ascii_sfo_uchar(nhfp, d_uchar, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned char *d_uchar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -369,8 +369,8 @@ void
 ascii_sfo_uint(nhfp, d_uint, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned int *d_uint;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -387,8 +387,8 @@ void
 ascii_sfo_ulong(nhfp, d_ulong, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned long *d_ulong;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -405,8 +405,8 @@ void
 ascii_sfo_ushort(nhfp, d_ushort, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned short *d_ushort;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -423,8 +423,8 @@ void
 ascii_sfo_xchar(nhfp, d_xchar, myparent, myname, cnt)
 NHFILE *nhfp;
 xchar *d_xchar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -446,8 +446,8 @@ void
 ascii_sfo_str(nhfp, d_str, myparent, myname, cnt)
 NHFILE *nhfp;
 char *d_str;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i, j, intval;
@@ -499,8 +499,8 @@ void
 ascii_sfi_any(nhfp, d_any, myparent, myname, cnt)
 NHFILE *nhfp;
 union any *d_any;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     char *rstr;
@@ -552,8 +552,8 @@ void
 ascii_sfi_aligntyp(nhfp, d_aligntyp, myparent, myname, cnt)
 NHFILE *nhfp;
 aligntyp *d_aligntyp;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     char *rstr;
@@ -576,8 +576,8 @@ void
 ascii_sfi_bitfield(nhfp, d_bitfield, myparent, myname, cnt)
 NHFILE *nhfp;
 uint8_t *d_bitfield;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     char *rstr;
@@ -599,8 +599,8 @@ void
 ascii_sfi_boolean(nhfp, d_boolean, myparent, myname, cnt)
 NHFILE *nhfp;
 boolean *d_boolean;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     char *rstr;
@@ -627,8 +627,8 @@ void
 ascii_sfi_char(nhfp, d_char, myparent, myname, cnt)
 NHFILE *nhfp;
 char *d_char;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     char *rstr;
@@ -653,8 +653,8 @@ void
 ascii_sfi_genericptr(nhfp, d_genericptr, myparent, myname, cnt)
 NHFILE *nhfp;
 genericptr_t *d_genericptr;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -688,8 +688,8 @@ void
 ascii_sfi_int(nhfp, d_int, myparent, myname, cnt)
 NHFILE *nhfp;
 int *d_int;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i, tmp;
@@ -715,8 +715,8 @@ void
 ascii_sfi_long(nhfp, d_long, myparent, myname, cnt)
 NHFILE *nhfp;
 long *d_long;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -743,8 +743,8 @@ void
 ascii_sfi_schar(nhfp, d_schar, myparent, myname, cnt)
 NHFILE *nhfp;
 schar *d_schar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -769,8 +769,8 @@ void
 ascii_sfi_short(nhfp, d_short, myparent, myname, cnt)
 NHFILE *nhfp;
 short *d_short;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -795,8 +795,8 @@ void
 ascii_sfi_size_t(nhfp, d_size_t, myparent, myname, cnt)
 NHFILE *nhfp;
 size_t *d_size_t;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -821,9 +821,9 @@ void
 ascii_sfi_time_t(nhfp, d_time_t, myparent, myname, cnt)
 NHFILE *nhfp;
 time_t *d_time_t;
-const char *myparent;
-const char *myname;
-int cnt;
+const char *myparent UNUSED;
+const char *myname UNUSED;
+int cnt UNUSED;
 {
     int i;
     time_t tmp;
@@ -859,8 +859,8 @@ void
 ascii_sfi_uchar(nhfp, d_uchar, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned char *d_uchar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     uchar tmp;
@@ -886,8 +886,8 @@ void
 ascii_sfi_uint(nhfp, d_uint, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned int *d_uint;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -914,8 +914,8 @@ void
 ascii_sfi_ulong(nhfp, d_ulong, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned long *d_ulong;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -942,8 +942,8 @@ void
 ascii_sfi_ushort(nhfp, d_ushort, myparent, myname, cnt)
 NHFILE *nhfp;
 unsigned short *d_ushort;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i;
@@ -970,8 +970,8 @@ void
 ascii_sfi_xchar(nhfp, d_xchar, myparent, myname, cnt)
 NHFILE *nhfp;
 xchar *d_xchar;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     xchar tmp;
@@ -999,8 +999,8 @@ void
 ascii_sfi_str(nhfp, d_str, myparent, myname, cnt)
 NHFILE *nhfp;
 char *d_str;
-const char *myparent;
-const char *myname;
+const char *myparent UNUSED;
+const char *myname UNUSED;
 int cnt;
 {
     int i, j, sval;
