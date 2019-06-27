@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1559670606 2019/06/04 17:50:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1561588627 2019/06/26 22:37:07 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -873,6 +873,7 @@ boolean artif;
                 break;
             }
             if (Is_pudding(otmp)) {
+                otmp->quan = 1L; /* for emphasis; glob quantity is always 1 */
                 otmp->globby = 1;
                 otmp->known = otmp->dknown = 1;
                 otmp->corpsenm = PM_GRAY_OOZE
@@ -2826,11 +2827,10 @@ struct obj **obj1, **obj2;
                       / (o1wt + o2wt));
             otmp1->age = g.moves - agetmp; /* conv. relative back to absolute */
             otmp1->owt += o2wt;
-            if (otmp1->oeaten)
-                otmp1->oeaten += o2wt;
+            if (otmp1->oeaten || otmp2->oeaten)
+                otmp1->oeaten = o1wt + o2wt;
             otmp1->quan = 1L;
             obj_extract_self(otmp2);
-            newsym(otmp2->ox, otmp2->oy); /* in case of floor */
             dealloc_obj(otmp2);
             *obj2 = (struct obj *) 0;
             return otmp1;
@@ -2853,23 +2853,44 @@ struct obj *
 obj_meld(obj1, obj2)
 struct obj **obj1, **obj2;
 {
-    struct obj *otmp1, *otmp2;
+    struct obj *otmp1, *otmp2, *result = 0;
+    int ox, oy;
 
     if (obj1 && obj2) {
         otmp1 = *obj1;
         otmp2 = *obj2;
         if (otmp1 && otmp2 && otmp1 != otmp2) {
-            if (!(otmp2->where == OBJ_FLOOR && otmp1->where == OBJ_FREE) &&
-                (otmp1->owt > otmp2->owt
-                 || (otmp1->owt == otmp2->owt && rn2(2)))) {
-                return obj_absorb(obj1, obj2);
+            ox = oy = 0;
+            /*
+             * FIXME?
+             *  If one of the objects is free because it's being dropped,
+             *  we should really finish a full drop and then absorb/meld
+             *  if it survives the flooreffects().  Then lighter-melds-into-
+             *  heavier will be true even when heavier is the one dropped.
+             *
+             *  [Also, what about when one of the globs is on the shore
+             *  and we drop the other into adjacent pool or vice versa?]
+             */
+            if (!(otmp2->where == OBJ_FLOOR && otmp1->where == OBJ_FREE)
+                && (otmp1->owt > otmp2->owt
+                    || (otmp1->owt == otmp2->owt && rn2(2)))) {
+                if (otmp2->where == OBJ_FLOOR)
+                    ox = otmp2->ox, oy = otmp2->oy;
+                result = obj_absorb(obj1, obj2);
+            } else {
+                if (otmp1->where == OBJ_FLOOR)
+                    ox = otmp1->ox, oy = otmp1->oy;
+                result = obj_absorb(obj2, obj1);
             }
-            return obj_absorb(obj2, obj1);
+            /* callers really ought to take care of this; glob melding is
+               a bookkeeping issue rather than a display one */
+            if (ox && cansee(ox, oy))
+                newsym(ox, oy);
         }
+    } else {
+        impossible("obj_meld: not called with two actual objects");
     }
-
-    impossible("obj_meld: not called with two actual objects");
-    return (struct obj *) 0;
+    return result;
 }
 
 /* give a message if hero notices two globs merging [used to be in pline.c] */
@@ -2895,8 +2916,8 @@ struct obj *otmp2;
              * they'll be out of our view (minvent or container)
              * so don't actually show anything */
         } else if (onfloor || inpack) {
-            boolean adj = ((otmp->ox != u.ux || otmp->oy != u.uy) &&
-                              (otmp2->ox != u.ux || otmp2->oy != u.uy));
+            boolean adj = ((otmp->ox != u.ux || otmp->oy != u.uy)
+                           && (otmp2->ox != u.ux || otmp2->oy != u.uy));
 
             pline("The %s%s coalesce%s.",
                   (onfloor && adj) ? "adjacent " : "",
