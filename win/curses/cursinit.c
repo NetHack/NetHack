@@ -838,8 +838,10 @@ curses_init_options()
 
 #ifdef NCURSES_MOUSE_VERSION
     if (iflags.wc_mouse_support) {
-        mousemask(BUTTON1_CLICKED, NULL);
+        curses_mouse_support(iflags.wc_mouse_support);
     }
+#else
+    iflags.wc_mouse_support = 0;
 #endif
 }
 
