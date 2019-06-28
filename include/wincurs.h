@@ -38,12 +38,6 @@ extern WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows  */
 #endif  /* !__APPLE__ && !PDCURSES */
 #define CURSES_DARK_GRAY    17
 #define MAP_SCROLLBARS
-#ifdef PDCURSES
-# define getmouse nc_getmouse
-# ifndef NCURSES_MOUSE_VERSION
-#  define NCURSES_MOUSE_VERSION
-# endif
-#endif
 
 #if !defined(A_LEFTLINE) && defined(A_LEFT)
 #define A_LEFTLINE A_LEFT
