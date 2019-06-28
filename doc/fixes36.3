@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.76 $ $NHDT-Date: 1561750114 2019/06/28 19:28:34 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.77 $ $NHDT-Date: 1561751390 2019/06/28 19:49:50 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -86,6 +86,9 @@ partly eaten food with one bite left had message anomalies when eaten; the
 	resulted in no messages at all when restarting and finishing last bite
 wizard mode ^I menu could list "Not carrying anything" after inventory items
 	if perm_invent option was On (even on tty where that's not supported)
+wizard mode ^I with 'perm_invent' On would unintentionally filter the content
+	of the persistent inventory window to unIDed items if any item got
+	chosen to be identified (^R would fix it, as would any invent change)
 change #adjust to treat carrying only gold as not having anything to adjust
 saving bones with 'perm_invent' On could result in "Bad fruit #N" warnings
 update persistent inventory window immediately if 'sortpack' option is toggled
@@ -103,6 +106,8 @@ for wizard mode 'wizweight' option, glob weight wasn't shown unless glob had
 	shop price information attached
 fix for feedback when a monster plays a fire horn at self to cure green slime
 	ended up being used for zapping a wand of fire at self too
+wizard mode ^I "not carrying anything" still claimed "not carrying anything"
+	if "(all items are already identified)" was given
 curses: sometimes the message window would show a blank line after a prompt
 curses: the change to show map in columns 1..79 instead of 2..80 made the
 	highlight for '@' show up in the wrong place if clipped map had been
