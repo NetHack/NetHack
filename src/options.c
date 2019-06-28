@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1561427671 2019/06/25 01:54:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.366 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1561682566 2019/06/28 00:42:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.367 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -678,7 +678,7 @@ initoptions()
 void
 initoptions_init()
 {
-#if defined(UNIX) || defined(VMS)
+#if (defined(UNIX) || defined(VMS)) && defined(TTY_GRAPHICS)
     char *opts;
 #endif
     int i;
