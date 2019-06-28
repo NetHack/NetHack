@@ -903,22 +903,7 @@ curses_get_mouse(int *mousex, int *mousey, int *mod)
          * is describing it wrong.
          */
             /* See if coords are in map window & convert coords */
-            if (wmouse_trafo(mapwin, &event.y, &event.x,
-#ifdef PDCURSES
-        /*
-         * Not sure whether PDCurses matches the ncurses implementation
-         * or the ncurses documentation, so keep the 'bad' argument for
-         * it until we find out.  [Mouse can be used successfully with
-         * 'bad' coordinate translation via align_message:bottom (and
-         * avoiding align_status:top or left) so that the subset of the
-         * screen corresponding to the map needs no translation.  Adding
-         * instead of subtracting makes no difference when amount is 0.]
-         */
-                             TRUE
-#else
-                             FALSE
-#endif
-                             )) {
+            if (wmouse_trafo(mapwin, &event.y, &event.x, FALSE)) {
                 key = '\0'; /* core uses this to detect a mouse click */
                 *mousex = event.x + 1; /* +1: screen 0..78 is map 1..79 */
                 *mousey = event.y;
