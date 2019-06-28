@@ -9,6 +9,15 @@
 #include "color.h"
 #include "wincurs.h"
 
+/* define this if not linking with <foo>tty.o|.obj for some reason */
+#ifdef CURSES_DEFINE_ERASE_CHAR
+char erase_char, kill_char;
+#else
+/* defined in sys/<foo>/<foo>tty.o|.obj which gets linked into
+   tty-only, tty+curses, and curses-only binaries */
+extern char erase_char, kill_char;
+#endif
+
 extern long curs_mesg_suppress_turn; /* from cursmesg.c */
 
 /* Public functions for curses NetHack interface */
@@ -183,6 +192,10 @@ curses_init_nhwindows(int *argcp UNUSED,
     if ((term_rows < 15) || (term_cols < 40)) {
         panic("Terminal too small.  Must be minumum 40 width and 15 height");
     }
+    /* during line input, deletes the most recently typed character */
+    erase_char = erasechar(); /* <delete>/<rubout> or possibly <backspace> */
+    /* during line input, deletes all typed characters */
+    kill_char = killchar(); /* ^U (back in prehistoric times, '@') */
 
     curses_create_main_windows();
     curses_init_mesg_history();
