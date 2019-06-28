@@ -870,6 +870,13 @@ curses_convert_keys(int key)
     return ret;
 }
 
+/* we treat buttons 2 and 3 as equivalent so that it doesn't matter which
+   one is for right-click and which for middle-click; the core uses CLICK_2
+   for right-click ("not left" click) even though 2 might be middle button;
+   we also support Ctrl+left-click as another way to get "not left" click
+   since Mac is traditionally saddled with a one button mouse or trackpad */
+#define MOUSEBUTTONS ((BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED) \
+                      | BUTTON_CTRL)
 
 /* Process mouse events.  Mouse movement is processed until no further
 mouse movement events are available.  Returns 0 for a mouse click
@@ -884,12 +891,21 @@ curses_get_mouse(int *mousex, int *mousey, int *mod)
 #ifdef NCURSES_MOUSE_VERSION
     MEVENT event;
 
-    if (getmouse(&event) == OK) { /* When the user clicks left mouse button */
-        if (event.bstate & BUTTON1_CLICKED) {
+    if (getmouse(&event) == OK) { /* True if user has clicked */
+        if ((event.bstate & MOUSEBUTTONS) != 0) {
+        /*
+         * The ncurses man page documents wmouse_trafo() incorrectly.
+         * It says that last argument 'TRUE' translates from screen
+         * to window and 'FALSE' translates from window to screen,
+         * but those are backwards.  The mouse_trafo() macro calls
+         * last argument 'to_screen', suggesting that the backwards
+         * implementation is the intended behavior and the man page
+         * is describing it wrong.
+         */
             /* See if coords are in map window & convert coords */
-            if (wmouse_trafo(mapwin, &event.y, &event.x, TRUE)) {
-                key = 0;        /* Flag mouse click */
-                *mousex = event.x;
+            if (wmouse_trafo(mapwin, &event.y, &event.x, FALSE)) {
+                key = '\0'; /* core uses this to detect a mouse click */
+                *mousex = event.x + 1; /* +1: screen 0..78 is map 1..79 */
                 *mousey = event.y;
 
                 if (curses_window_has_border(MAP_WIN)) {
@@ -897,7 +913,8 @@ curses_get_mouse(int *mousex, int *mousey, int *mod)
                     (*mousey)--;
                 }
 
-                *mod = CLICK_1;
+                *mod = ((event.bstate & (BUTTON1_CLICKED | BUTTON_CTRL))
+                        == BUTTON1_CLICKED) ? CLICK_1 : CLICK_2;
             }
         }
     }
@@ -906,6 +923,24 @@ curses_get_mouse(int *mousex, int *mousey, int *mod)
     return key;
 }
 
+void
+curses_mouse_support(mode)
+int mode; /* 0: off, 1: on, 2: alternate on */
+{
+#ifdef NCURSES_MOUSE_VERSION
+    mmask_t result, oldmask, newmask;
+
+    if (!mode)
+        newmask = 0;
+    else
+        newmask = MOUSEBUTTONS; /* buttons 1, 2, and 3 */
+
+    result = mousemask(newmask, &oldmask);
+    nhUse(result);
+#else
+    nhUse(mode);
+#endif
+}
 
 static int
 parse_escape_sequence(void)
