@@ -992,7 +992,7 @@ menu_win_size(nhmenu *menu)
     int maxheaderwidth = 0;
     nhmenu_item *menu_item_ptr;
 
-    if (program_state.gameover) {
+    if (g.program_state.gameover) {
         /* for final inventory disclosure, use full width */
         maxwidth = term_cols - 2;
     } else {
