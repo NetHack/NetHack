@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.74 $ $NHDT-Date: 1561717038 2019/06/28 10:17:18 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.75 $ $NHDT-Date: 1561748351 2019/06/28 18:59:11 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -188,6 +188,8 @@ if you reach the edge of a level (relatively uncommon) and try to move off,
 	report that you can't go farther if the 'mention_walls' option is set
 wizard-mode: display effect to show where an unseen wished-for monster landed
 curses: enable latent mouse support
+curses: give menus and text windows a minimum size of 5x25 since tiny ones can
+	sometimes be overlooked when shown over old messages rather than map
 curses+'perm_invent': since persistent inventory is narrow, strip off "a",
 	"an", or "the" prefix on inventory entries shown there so that a tiny
 	bit more of the interesting portion is visible

@@ -135,7 +135,7 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
     curses_got_input();
 
     if (buffer > (int) sizeof input)
-         buffer = (int) sizeof input;
+        buffer = (int) sizeof input;
     maxwidth = term_cols - 2;
 
     if (iflags.window_inited) {
@@ -388,7 +388,8 @@ curses_ext_cmd()
         getbegyx(extwin2, y0, x0);
         getmaxyx(extwin2, h, w);
         extwin = newwin(1, w - 2, y0 + 1, x0 + 1);
-        if (w - 4 < maxlen) maxlen = w - 4;
+        if (w - 4 < maxlen)
+            maxlen = w - 4;
     } else {
         curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
         curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
@@ -985,14 +986,24 @@ menu_determine_pages(nhmenu *menu)
 static void
 menu_win_size(nhmenu *menu)
 {
-    int width, height, maxwidth, maxheight, curentrywidth, lastline;
+    int maxwidth, maxheight, curentrywidth, lastline;
     int maxentrywidth = (int) strlen(menu->prompt);
     int maxheaderwidth = 0;
     nhmenu_item *menu_item_ptr;
 
-    maxwidth = 38;              /* Reasonable minimum usable width */
-    if ((term_cols / 2) > maxwidth) {
-        maxwidth = (term_cols / 2);     /* Half the screen */
+    if (program_state.gameover) {
+        /* for final inventory disclosure, use full width */
+        maxwidth = term_cols - 2;
+    } else {
+        /* this used to be 38, which is 80/2 - 2 (half a 'normal' sized
+           screen minus room for a border box), but some data files
+           have been manually formatted for 80 columns (usually limited
+           to 78 but sometimes 79, rarely 80 itself) and using a value
+           less that 40 meant that a full line would wrap twice:
+           1..38, 39..76, and 77..80 */
+        maxwidth = 40; /* Reasonable minimum usable width */
+        if ((term_cols / 2) > maxwidth)
+            maxwidth = (term_cols / 2); /* Half the screen */
     }
     maxheight = menu_max_height();
 
@@ -1017,7 +1028,8 @@ menu_win_size(nhmenu *menu)
         }
     }
 
-    /* If widest entry is smaller than maxwidth, reduce maxwidth accordingly */
+    /* If widest entry is smaller than maxwidth, reduce maxwidth
+       accordingly (but not too far; minimum width will be applied below) */
     if (maxentrywidth < maxwidth) {
         maxwidth = maxentrywidth;
     }
@@ -1032,8 +1044,6 @@ menu_win_size(nhmenu *menu)
             maxwidth = term_cols - 2;
     }
 
-    width = maxwidth;
-
     /* Possibly reduce height if only 1 page */
     if (!menu_is_multipage(menu, maxwidth, maxheight)) {
         menu_item_ptr = menu->entries;
@@ -1047,16 +1057,16 @@ menu_win_size(nhmenu *menu)
         if (lastline < maxheight) {
             maxheight = lastline;
         }
-    } else { /* If multipage, make sure we have enough width for page footer */
-
-        if (width < 20) {
-            width = 20;
-        }
     }
 
-    height = maxheight;
-    menu->width = width;
-    menu->height = height;
+    /* avoid a tiny popup window; when it's shown over the endings of
+       old messsages rather than over the map, it is fairly easy for
+       the player to overlook it, particularly when walking around and
+       stepping on a pile of 2 items; also, multi-page menus need enough
+       room for "(Page M of N) => " even if all entries are narrower
+       than that; we specify same minimum width even when single page */
+    menu->width = max(maxwidth, 25);
+    menu->height = max(maxheight, 5);
 }
 
 
