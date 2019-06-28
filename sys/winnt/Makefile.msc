@@ -648,7 +648,8 @@ DLB =
 #==========================================
 
 {$(WCURSES)}.c{$(OBJ)}.o:
-	@$(cc) -DPDC_NCMOUSE $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) -DPDC_NCMOUSE -DCURSES_DEFINE_ERASE_CHAR \
+            $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
 
 #{$(WCURSES)}.txt{$(DAT)}.txt:
 #	@copy $< $@
