@@ -264,7 +264,8 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         any_choice = TRUE;
     }
 
-    prompt_width = (int) strlen(askstr);
+    /* +1: room for a trailing space where the cursor will rest */
+    prompt_width = (int) strlen(askstr) + 1;
 
     if ((prompt_width + 2) > maxwidth) {
         prompt_height = curses_num_lines(askstr, maxwidth);
@@ -284,11 +285,11 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         /* TODO: add SUPPRESS_HISTORY flag, then after getting a response,
            append it and use put_msghistory() on combined prompt+answer */
         custompline(OVERRIDE_MSGTYPE, "%s", askstr);
-        curs_set(1);
     }
 
     /*curses_stupid_hack = 0; */
 
+    curs_set(1);
     while (1) {
 #ifdef PDCURSES
         answer = wgetch(message_window);
@@ -342,6 +343,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         if (choices != NULL && answer != '\0' && index(choices, answer))
             break;
     }
+    curs_set(0);
 
     if (iflags.wc_popup_dialog) {
         /* Kludge to make prompt visible after window is dismissed
@@ -354,7 +356,6 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         curses_destroy_win(askwin);
     } else {
         curses_clear_unhighlight_message_window();
-        curs_set(0);
     }
 
     return answer;

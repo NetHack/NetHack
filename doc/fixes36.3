@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.75 $ $NHDT-Date: 1561748351 2019/06/28 18:59:11 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.76 $ $NHDT-Date: 1561750114 2019/06/28 19:28:34 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -168,6 +168,8 @@ curses+'perm_invent': if too many entries for window height, last one which
 curses+'perm_invent': top line was wasted (left blank) when borders Off
 curses+'perm_invent': don't highlight inventory letters since nothing is
 	selectable from the menu comprising the persistent inventory window
+curses+'popup_dialog': show the text cursor at the end of prompts for single
+	character input
 curses+EDIT_GETLIN: when a prompt's answer was preloaded, using ESC to discard
 	it deleted it from the answer buffer but didn't erase it from screen
 tty: re-do one optimization used when status conditions have all been removed
