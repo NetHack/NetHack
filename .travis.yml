@@ -1,6 +1,23 @@
 language: c
 os: windows
 
+jobs:
+  include:
+    - os: windows
+      install: choco install mingw
+      script: 
+        - cd sys/winnt
+        - copy Makefile.gcc ../../src
+        - cd src
+        - nmake -f Makefile.gcc
+
+#    - script: mingw32-make 
+#
+#
+#    - env: 
+#      language: sh
+#      before_install:
+
 #script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && QT_SELECT=5 make MOC=moc install"
 #
 #matrix:
