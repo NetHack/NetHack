@@ -45,7 +45,8 @@
 # 1. Where do you want the game to be built (which folder)?
 
 GAMEDIR = ..\binary               # Default game build directory
- 
+
+# 
 #---------------------------------------------------------------
 # 2. Do you want debug information available to the executable?
   
