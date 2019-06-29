@@ -1,4 +1,4 @@
-# NetHack 3.6	knox.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
+# NetHack 3.6	knox.des	$NHDT-Date: 1547343821 2019/01/13 01:43:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.13 $
 #	Copyright (c) 1989 by Jean-Christophe Collet
 #	Copyright (c) 1992 by Izchak Miller
 # NetHack may be freely redistributed.  See license for details.
@@ -70,6 +70,30 @@ REGION:(03,10,07,13),lit,"zoo",filled,irregular
 #   arrival chamber; needs to be a real room to control migrating monsters,
 #   and `unfilled' is a kludge to force an ordinary room to remain a room
 REGION:(06,15,09,16),unlit,"ordinary",unfilled
+
+#   3.6.2:  Entering level carrying a lit candle would show the whole entry
+#   chamber except for its top right corner even though some of the revealed
+#   spots are farther away than that is.  This is because the lit treasure zoo
+#   is forcing the walls around it to be lit too (see light_region(sp_lev.c)),
+#   and lit walls show up when light reaches the spot next to them.  The unlit
+#   corner is beyond candle range and isn't flagged as lit so it doesn't show
+#   up until light reaches it rather than when light gets next to it.
+#
+#   Force left and top walls of the arrival chamber to be unlit in order to
+#   hide this lighting quirk.
+REGION:(05,14,05,17),unlit,"ordinary"
+REGION:(05,14,09,14),unlit,"ordinary"
+#   (Entering the treasure zoo while blind and then regaining sight might
+#   expose the new oddity of these walls not appearing when on the lit side
+#   but that's even less likely to occur than the rare instance of entering
+#   the level with a candle.  They'll almost always be mapped from the arrival
+#   side before entering the treasure zoo.
+#
+#   A prior workaround lit the top right corner wall and then jumped through
+#   hoops to suppress the extra light in the 3x3 lit area that produced.
+#   This is simpler and makes the short range candle light behave more like
+#   it is expected to work.)
+
 #   Barracks
 REGION:(62,03,71,04),lit,"barracks",filled,irregular
 # Doors

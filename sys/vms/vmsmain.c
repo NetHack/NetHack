@@ -415,7 +415,7 @@ genericptr_t sigargs, mechargs; /* [0] is argc, [1..argc] are the real args */
         || (condition >= SS$_ASTFLT && condition <= SS$_TBIT)
         || (condition >= SS$_ARTRES && condition <= SS$_INHCHME)) {
         program_state.done_hup = TRUE; /* pretend hangup has been attempted */
-#ifndef BETA
+#if (NH_DEVEL_STATUS == NH_STATUS_RELEASED)
         if (wizard)
 #endif
             abort(); /* enter the debugger */
@@ -463,6 +463,22 @@ wd_message()
         wizard = 0, discover = 1; /* (paranoia) */
     } else if (discover)
         You("are in non-scoring explore/discovery mode.");
+}
+
+unsigned long
+sys_random_seed()
+{
+    unsigned long seed;
+    unsigned long pid = (unsigned long) getpid();
+
+    seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+    /* Quick dirty band-aid to prevent PRNG prediction */
+    if (pid) {
+        if (!(pid & 3L))
+            pid -= 1L;
+        seed *= pid;
+    }
+    return seed;
 }
 
 /*vmsmain.c*/

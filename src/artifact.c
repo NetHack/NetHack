@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1543745353 2018/12/02 10:09:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1553363416 2019/03/23 17:50:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1039,20 +1039,20 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                 if (youmonst.data != old_uasmon)
                     *dmgptr = 0; /* rehumanized, so no more damage */
                 if (u.uenmax > 0) {
-                    You("lose magical energy!");
                     u.uenmax--;
                     if (u.uen > 0)
                         u.uen--;
-                    context.botl = 1;
+                    context.botl = TRUE;
+                    You("lose magical energy!");
                 }
             } else {
                 if (mdef->data == &mons[PM_CLAY_GOLEM])
                     mdef->mhp = 1; /* cancelled clay golems will die */
                 if (youattack && attacktype(mdef->data, AT_MAGC)) {
-                    You("absorb magical energy!");
                     u.uenmax++;
                     u.uen++;
-                    context.botl = 1;
+                    context.botl = TRUE;
+                    You("absorb magical energy!");
                 }
             }
         }
@@ -1474,19 +1474,20 @@ struct obj *obj;
                 make_slimed(0L, (char *) 0);
             if (Blinded > creamed)
                 make_blinded(creamed, FALSE);
-            context.botl = 1;
+            context.botl = TRUE;
             break;
         }
         case ENERGY_BOOST: {
             int epboost = (u.uenmax + 1 - u.uen) / 2;
+
             if (epboost > 120)
                 epboost = 120; /* arbitrary */
             else if (epboost < 12)
                 epboost = u.uenmax - u.uen;
             if (epboost) {
-                You_feel("re-energized.");
                 u.uen += epboost;
-                context.botl = 1;
+                context.botl = TRUE;
+                You_feel("re-energized.");
             } else
                 goto nothing_special;
             break;
@@ -1598,6 +1599,7 @@ struct obj *obj;
             otmp->owt = weight(otmp);
             otmp = hold_another_object(otmp, "Suddenly %s out.",
                                        aobjnam(otmp, "fall"), (char *) 0);
+            nhUse(otmp);
             break;
         }
         }
@@ -1621,7 +1623,7 @@ struct obj *obj;
         }
 
         if ((eprop & ~W_ARTI) || iprop) {
-        nothing_special:
+ nothing_special:
             /* you had the property from some other source too */
             if (carried(obj))
                 You_feel("a surge of power, but nothing seems to happen.");
@@ -1975,7 +1977,7 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
     if (loseit && obj) {
         if (Levitation) {
             freeinv(obj);
-            hitfloor(obj);
+            hitfloor(obj, TRUE);
         } else {
             /* dropx gives a message iff item lands on an altar */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))

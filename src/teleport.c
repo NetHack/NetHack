@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1544401270 2018/12/10 00:21:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1561336020 2019/06/24 00:27:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -39,7 +39,8 @@ unsigned gpflags;
      * which could be co-located and thus get restricted a bit too much.
      * oh well.
      */
-    if (mtmp != &youmonst && x == u.ux && y == u.uy
+    if (x == u.ux && y == u.uy
+        && mtmp != &youmonst && (mtmp != u.ustuck || !u.uswallow)
         && (!u.usteed || mtmp != u.usteed))
         return FALSE;
 
@@ -61,16 +62,26 @@ unsigned gpflags;
 
         mdat = mtmp->data;
         if (is_pool(x, y) && !ignorewater) {
+            /* [what about Breathless?] */
             if (mtmp == &youmonst)
-                return (Levitation || Flying || Wwalking || Swimming
-                        || Amphibious);
+                return (Swimming || Amphibious
+                        || (!Is_waterlevel(&u.uz)
+                            /* water on the Plane of Water has no surface
+                               so there's no way to be on or above that */
+                            && (Levitation || Flying || Wwalking)));
             else
-                return (is_floater(mdat) || is_flyer(mdat) || is_swimmer(mdat)
-                        || is_clinger(mdat));
+                return (is_swimmer(mdat)
+                        || (!Is_waterlevel(&u.uz)
+                            && (is_floater(mdat) || is_flyer(mdat)
+                                || is_clinger(mdat))));
         } else if (mdat->mlet == S_EEL && rn2(13) && !ignorewater) {
             return FALSE;
         } else if (is_lava(x, y)) {
-            if (mtmp == &youmonst)
+            /* 3.6.3: floating eye can levitate over lava but it avoids
+               that due the effect of the heat causing it to dry out */
+            if (mdat == &mons[PM_FLOATING_EYE])
+                return FALSE;
+            else if (mtmp == &youmonst)
                 return (Levitation || Flying
                         || (Fire_resistance && Wwalking && uarmf
                             && uarmf->oerodeproof)
@@ -108,30 +119,39 @@ coord *cc;
 register xchar xx, yy;
 struct permonst *mdat;
 {
-    return enexto_core(cc, xx, yy, mdat, 0);
+    return enexto_core(cc, xx, yy, mdat, NO_MM_FLAGS);
 }
 
 boolean
 enexto_core(cc, xx, yy, mdat, entflags)
 coord *cc;
-register xchar xx, yy;
+xchar xx, yy;
 struct permonst *mdat;
 unsigned entflags;
 {
 #define MAX_GOOD 15
     coord good[MAX_GOOD], *good_ptr;
     int x, y, range, i;
-    int xmin, xmax, ymin, ymax;
+    int xmin, xmax, ymin, ymax, rangemax;
     struct monst fakemon; /* dummy monster */
+    boolean allow_xx_yy = (boolean) ((entflags & GP_ALLOW_XY) != 0);
 
+    entflags &= ~GP_ALLOW_XY;
     if (!mdat) {
         debugpline0("enexto() called with null mdat");
         /* default to player's original monster type */
         mdat = &mons[u.umonster];
     }
     fakemon = zeromonst;
-    set_mon_data(&fakemon, mdat, -1); /* set up for goodpos */
+    set_mon_data(&fakemon, mdat); /* set up for goodpos */
 
+    /* used to use 'if (range > ROWNO && range > COLNO) return FALSE' below,
+       so effectively 'max(ROWNO, COLNO)' which performs useless iterations
+       (possibly many iterations if <xx,yy> is in the center of the map) */
+    xmax = max(xx - 1, (COLNO - 1) - xx);
+    ymax = max(yy - 0, (ROWNO - 1) - yy);
+    rangemax = max(xmax, ymax);
+    /* setup: no suitable spots yet, first iteration checks adjacent spots */
     good_ptr = good;
     range = 1;
     /*
@@ -144,7 +164,7 @@ unsigned entflags;
         ymin = max(0, yy - range);
         ymax = min(ROWNO - 1, yy + range);
 
-        for (x = xmin; x <= xmax; x++)
+        for (x = xmin; x <= xmax; x++) {
             if (goodpos(x, ymin, &fakemon, entflags)) {
                 good_ptr->x = x;
                 good_ptr->y = ymin;
@@ -152,38 +172,46 @@ unsigned entflags;
                 if (good_ptr++ == &good[MAX_GOOD - 1])
                     goto full;
             }
-        for (x = xmin; x <= xmax; x++)
             if (goodpos(x, ymax, &fakemon, entflags)) {
                 good_ptr->x = x;
                 good_ptr->y = ymax;
-                /* beware of accessing beyond segment boundaries.. */
                 if (good_ptr++ == &good[MAX_GOOD - 1])
                     goto full;
             }
-        for (y = ymin + 1; y < ymax; y++)
+        }
+        /* 3.6.3: this used to use 'ymin+1' which left top row unchecked */
+        for (y = ymin; y < ymax; y++) {
             if (goodpos(xmin, y, &fakemon, entflags)) {
                 good_ptr->x = xmin;
                 good_ptr->y = y;
-                /* beware of accessing beyond segment boundaries.. */
                 if (good_ptr++ == &good[MAX_GOOD - 1])
                     goto full;
             }
-        for (y = ymin + 1; y < ymax; y++)
             if (goodpos(xmax, y, &fakemon, entflags)) {
                 good_ptr->x = xmax;
                 good_ptr->y = y;
-                /* beware of accessing beyond segment boundaries.. */
                 if (good_ptr++ == &good[MAX_GOOD - 1])
                     goto full;
             }
-        range++;
+        }
+    } while (++range <= rangemax && good_ptr == good);
 
-        /* return if we've grown too big (nothing is valid) */
-        if (range > ROWNO && range > COLNO)
+    /* return False if we exhausted 'range' without finding anything */
+    if (good_ptr == good) {
+        /* 3.6.3: earlier versions didn't have the option to try <xx,yy>,
+           and left 'cc' uninitialized when returning False */
+        cc->x = xx, cc->y = yy;
+        /* if every spot other than <xx,yy> has failed, try <xx,yy> itself */
+        if (allow_xx_yy && goodpos(xx, yy, &fakemon, entflags)) {
+            return TRUE; /* 'cc' is set */
+        } else {
+            debugpline3("enexto(\"%s\",%d,%d) failed", mdat->mname, xx, yy);
             return FALSE;
-    } while (good_ptr == good);
+        }
+    }
 
-full:
+ full:
+    /* we've got between 1 and SIZE(good) candidates; choose one */
     i = rn2((int) (good_ptr - good));
     cc->x = good[i].x;
     cc->y = good[i].y;
@@ -252,6 +280,7 @@ register int nux, nuy;
 boolean allow_drag;
 {
     boolean ball_active, ball_still_in_range;
+    struct monst *vault_guard = vault_occupied(u.urooms) ? findgd() : 0;
 
     if (u.utraptype == TT_BURIEDBALL) {
         /* unearth it */
@@ -354,6 +383,21 @@ boolean allow_drag;
         else
             telescroll = 0; /* no discovery by scrolltele()'s caller */
     }
+    /* sequencing issue:  we want guard's alarm, if any, to occur before
+       room entry message, if any, so need to check for vault exit prior
+       to spoteffects; but spoteffects() sets up new value for u.urooms
+       and vault code depends upon that value, so we need to fake it */
+    if (vault_guard) {
+        char save_urooms[5]; /* [sizeof u.urooms] */
+
+        Strcpy(save_urooms, u.urooms);
+        Strcpy(u.urooms, in_rooms(u.ux, u.uy, VAULT));
+        /* if hero has left vault, make guard notice */
+        if (!vault_occupied(u.urooms))
+            uleftvault(vault_guard);
+        Strcpy(u.urooms, save_urooms); /* reset prior to spoteffects() */
+    }
+    /* possible shop entry message comes after guard's shrill whistle */
     spoteffects(TRUE);
     invocation_message();
 }
@@ -410,7 +454,7 @@ boolean force_it;
             return FALSE;
         } else {
             Your("leash goes slack.");
-        release_it:
+ release_it:
             m_unleash(mtmp, FALSE);
             return TRUE;
         }
@@ -462,7 +506,7 @@ struct obj *scroll;
             Strcpy(whobuf, "you");
             if (u.usteed)
                 Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
-            pline("To what position do %s want to be teleported?", whobuf);
+            pline("Where do %s want to be teleported?", whobuf);
             cc.x = u.ux;
             cc.y = u.uy;
             if (getpos(&cc, TRUE, "the desired position") < 0)
@@ -496,17 +540,123 @@ struct obj *scroll;
     return result;
 }
 
+/* ^T command; 'm ^T' == choose among several teleport modes */
 int
 dotelecmd()
 {
-    return dotele((wizard) ? TRUE : FALSE);
+    long save_HTele, save_ETele;
+    int res, added, hidden;
+    boolean ignore_restrictions = FALSE;
+/* also defined in spell.c */
+#define NOOP_SPELL  0
+#define HIDE_SPELL  1
+#define ADD_SPELL   2
+#define UNHIDESPELL 3
+#define REMOVESPELL 4
+
+    /* normal mode; ignore 'm' prefix if it was given */
+    if (!wizard)
+        return dotele(FALSE);
+
+    added = hidden = NOOP_SPELL;
+    save_HTele = HTeleportation, save_ETele = ETeleportation;
+    if (!iflags.menu_requested) {
+        ignore_restrictions = TRUE;
+    } else {
+        static const struct tporttypes {
+            char menulet;
+            const char *menudesc;
+        } tports[] = {
+            /*
+             * Potential combinations:
+             *  1) attempt ^T without intrinsic, not know spell;
+             *  2) via intrinsic, not know spell, obey restrictions;
+             *  3) via intrinsic, not know spell, ignore restrictions;
+             *  4) via intrinsic, know spell, obey restrictions;
+             *  5) via intrinsic, know spell, ignore restrictions;
+             *  6) via spell, not have intrinsic, obey restrictions;
+             *  7) via spell, not have intrinsic, ignore restrictions;
+             *  8) force, obey other restrictions;
+             *  9) force, ignore restrictions.
+             * We only support the 1st (t), 2nd (n), 6th (s), and 9th (w).
+             *
+             * This ignores the fact that there is an experience level
+             * (or poly-form) requirement which might make normal ^T fail.
+             */
+            { 'n', "normal ^T on demand; no spell, obey restrictions" },
+            { 's', "via spellcast; no intrinsic teleport" },
+            { 't', "try ^T without having it; no spell" },
+            { 'w', "debug mode; ignore restrictions" }, /* trad wizard mode */
+        };
+        menu_item *picks = (menu_item *) 0;
+        anything any;
+        winid win;
+        int i, tmode;
+
+        win = create_nhwindow(NHW_MENU);
+        start_menu(win);
+        any = zeroany;
+        for (i = 0; i < SIZE(tports); ++i) {
+            any.a_int = (int) tports[i].menulet;
+            add_menu(win, NO_GLYPH, &any, (char) any.a_int, 0, ATR_NONE,
+                     tports[i].menudesc,
+                     (tports[i].menulet == 'w') ? MENU_SELECTED
+                                                : MENU_UNSELECTED);
+        }
+        end_menu(win, "Which way do you want to teleport?");
+        i = select_menu(win, PICK_ONE, &picks);
+        destroy_nhwindow(win);
+        if (i > 0) {
+            tmode = picks[0].item.a_int;
+            /* if we got 2, use the one which wasn't preselected */
+            if (i > 1 && tmode == 'w')
+                tmode = picks[1].item.a_int;
+            free((genericptr_t) picks);
+        } else if (i == 0) {
+            /* preselected one was explicitly chosen and got toggled off */
+            tmode = 'w';
+        } else { /* ESC */
+            return 0;
+        }
+        switch (tmode) {
+        case 'n':
+            HTeleportation |= I_SPECIAL; /* confer intrinsic teleportation */
+            hidden = tport_spell(HIDE_SPELL); /* hide teleport-away */
+            break;
+        case 's':
+            HTeleportation = ETeleportation = 0L; /* suppress intrinsic */
+            added = tport_spell(ADD_SPELL); /* add teleport-away */
+            break;
+        case 't':
+            HTeleportation = ETeleportation = 0L; /* suppress intrinsic */
+            hidden = tport_spell(HIDE_SPELL); /* hide teleport-away */
+            break;
+        case 'w':
+            ignore_restrictions = TRUE;
+            break;
+        }
+    }
+
+    /* if dotele() can be fatal, final disclosure might lie about
+       intrinsic teleportation; we should be able to live with that
+       since the menu finagling is only applicable in wizard mode */
+    res = dotele(ignore_restrictions);
+
+    HTeleportation = save_HTele;
+    ETeleportation = save_ETele;
+    if (added != NOOP_SPELL || hidden != NOOP_SPELL)
+        /* can't both be non-NOOP so addition will yield the non-NOOP one */
+        (void) tport_spell(added + hidden - NOOP_SPELL);
+
+    return res;
 }
 
 int
 dotele(break_the_rules)
-boolean break_the_rules;
+boolean break_the_rules; /* True: wizard mode ^T */
 {
     struct trap *trap;
+    const char *cantdoit;
     boolean trap_once = FALSE;
 
     trap = t_at(u.ux, u.uy);
@@ -517,9 +667,9 @@ boolean break_the_rules;
         trap_once = trap->once; /* trap may get deleted, save this */
         if (trap->once) {
             pline("This is a vault teleport, usable once only.");
-            if (yn("Jump in?") == 'n')
+            if (yn("Jump in?") == 'n') {
                 trap = 0;
-            else {
+            } else {
                 deltrap(trap);
                 newsym(u.ux, u.uy);
             }
@@ -534,58 +684,72 @@ boolean break_the_rules;
 
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(youmonst.data))) {
-            /* Try to use teleport away spell. */
-            if (objects[SPE_TELEPORT_AWAY].oc_name_known && !Confusion)
-                for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
-                    if (spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY) {
-                        castit = TRUE;
-                        break;
-                    }
-            if (!break_the_rules) {
-                if (!castit) {
-                    if (!Teleportation)
-                        You("don't know that spell.");
-                    else
-                        You("are not able to teleport at will.");
-                    return 0;
-                }
+            /* Try to use teleport away spell.
+               3.6.2: this used to require that you know the spellbook
+               (probably just intended as an optimization to skip the
+               lookup loop) but it is possible to know and cast a spell
+               after forgetting its book due to amnesia. */
+            for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
+                if (spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY)
+                    break;
+            /* casting isn't inhibited by being Stunned (...it ought to be) */
+            castit = (sp_no < MAXSPELL && !Confusion);
+            if (!castit && !break_the_rules) {
+                You("%s.",
+                    !Teleportation ? ((sp_no < MAXSPELL)
+                                        ? "can't cast that spell"
+                                        : "don't know that spell")
+                                   : "are not able to teleport at will");
+                return 0;
             }
         }
 
-        if (u.uhunger <= 100 || ACURR(A_STR) < 6) {
-            if (!break_the_rules) {
-                You("lack the strength %s.",
-                    castit ? "for a teleport spell" : "to teleport");
-                return 1;
-            }
+        cantdoit = 0;
+        /* 3.6.2: the magic numbers for hunger, strength, and energy
+           have been changed to match the ones used in spelleffects().
+           Also, failing these tests used to return 1 and use a move
+           even though casting failure due to these reasons doesn't.
+           [Note: this spellev() is different from the one in spell.c
+           but they both yield the same result.] */
+#define spellev(spell_otyp) ((int) objects[spell_otyp].oc_level)
+        energy = 5 * spellev(SPE_TELEPORT_AWAY);
+        if (break_the_rules) {
+            if (!castit)
+                energy = 0;
+            /* spell will cost more if carrying the Amulet, but the
+               amount is rnd(2 * energy) so we can't know by how much;
+               average is twice the normal cost, but could be triple;
+               the extra energy is spent even if that results in not
+               having enough to cast (which also uses the move) */
+            else if (u.uen < energy)
+                u.uen = energy;
+        } else if (u.uhunger <= 10) {
+            cantdoit = "are too weak from hunger";
+        } else if (ACURR(A_STR) < 4) {
+            cantdoit = "lack the strength";
+        } else if (energy > u.uen) {
+            cantdoit = "lack the energy";
         }
-
-        energy = objects[SPE_TELEPORT_AWAY].oc_level * 7 / 2 - 2;
-        if (u.uen <= energy) {
-            if (break_the_rules)
-                energy = u.uen;
-            else {
-                You("lack the energy %s.",
-                    castit ? "for a teleport spell" : "to teleport");
-                return 1;
-            }
+        if (cantdoit) {
+            You("%s %s.", cantdoit,
+                castit ? "for a teleport spell" : "to teleport");
+            return 0;
+        } else if (check_capacity(
+                       "Your concentration falters from carrying so much.")) {
+            return 1; /* this failure in spelleffects() also uses the move */
         }
-
-        if (check_capacity(
-                "Your concentration falters from carrying so much."))
-            return 1;
 
         if (castit) {
+            /* energy cost is deducted in spelleffects() */
             exercise(A_WIS, TRUE);
             if (spelleffects(sp_no, TRUE))
                 return 1;
             else if (!break_the_rules)
                 return 0;
         } else {
-            if (!break_the_rules) {
-                u.uen -= energy;
-                context.botl = 1;
-            }
+            /* bypassing spelleffects(); apply energy cost directly */
+            u.uen -= energy;
+            context.botl = 1;
         }
     }
 
@@ -596,7 +760,7 @@ boolean break_the_rules;
             tele();
         (void) next_to_u();
     } else {
-        You1(shudder_for_moment);
+        You("%s", shudder_for_moment);
         return 0;
     }
     if (!trap)
@@ -659,7 +823,7 @@ level_tele()
                 schar destlev;
                 xchar destdnum;
 
-            levTport_menu:
+ levTport_menu:
                 destlev = 0;
                 destdnum = 0;
                 newlev = (int) print_dungeon(TRUE, &destlev, &destdnum);
@@ -727,7 +891,7 @@ level_tele()
         if (In_quest(&u.uz) && newlev > 0)
             newlev = newlev + dungeons[u.uz.dnum].depth_start - 1;
     } else { /* involuntary level tele */
-    random_levtport:
+ random_levtport:
         newlev = random_teleport_level();
         if (newlev == depth(&u.uz)) {
             You1(shudder_for_moment);
@@ -1010,7 +1174,7 @@ register int x, y;
     register int oldx = mtmp->mx, oldy = mtmp->my;
     boolean resident_shk = mtmp->isshk && inhishop(mtmp);
 
-    if (x == mtmp->mx && y == mtmp->my && m_at(x,y) == mtmp)
+    if (x == mtmp->mx && y == mtmp->my && m_at(x, y) == mtmp)
         return; /* that was easy */
 
     if (oldx) { /* "pick up" monster */
@@ -1031,11 +1195,11 @@ register int x, y;
 
     if (u.ustuck == mtmp) {
         if (u.uswallow) {
-            u.ux = x;
-            u.uy = y;
+            u_on_newpos(mtmp->mx, mtmp->my);
             docrt();
-        } else
-            u.ustuck = 0;
+        } else if (distu(mtmp->mx, mtmp->my) > 2) {
+           unstuck(mtmp);
+        }
     }
 
     newsym(x, y);      /* update new location */
@@ -1096,7 +1260,7 @@ boolean suppress_impossible;
         impossible("rloc(): couldn't relocate monster");
     return FALSE;
 
-found_xy:
+ found_xy:
     rloc_to(mtmp, x, y);
     return TRUE;
 }
@@ -1105,7 +1269,7 @@ STATIC_OVL void
 mvault_tele(mtmp)
 struct monst *mtmp;
 {
-    register struct mkroom *croom = search_special(VAULT);
+    struct mkroom *croom = search_special(VAULT);
     coord c;
 
     if (croom && somexy(croom, &c) && goodpos(c.x, c.y, mtmp, 0)) {
@@ -1189,8 +1353,9 @@ int in_sight;
                 get_level(&tolevel, depth(&u.uz) + 1);
             }
         } else if (tt == MAGIC_PORTAL) {
-            if (In_endgame(&u.uz)
-                && (mon_has_amulet(mtmp) || is_home_elemental(mtmp->data))) {
+            if (In_endgame(&u.uz) && (mon_has_amulet(mtmp)
+                                      || is_home_elemental(mtmp->data)
+                                      || rn2(7))) {
                 if (in_sight && mtmp->data->mlet != S_ELEMENTAL) {
                     pline("%s seems to shimmer for a moment.", Monnam(mtmp));
                     seetrap(trap);

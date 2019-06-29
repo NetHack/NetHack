@@ -1,5 +1,5 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1520858848 2018/03/12 12:47:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
-#       Copyright (c) NetHack PC Development Team 1993-2018
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1554784482 2019/04/09 04:34:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.153 $ */
+#       Copyright (c) NetHack PC Development Team 1993-2019
 #
 #==============================================================================
 # Build Tools Environment
@@ -7,9 +7,8 @@
 #       NetHack 3.6.x Makefile for MS Visual Studio Visual C++ compiler
 #  
 #       Visual Studio Compilers Tested:
-#            - Microsoft Visual Studio 2010 Express, with the Platform SDK
-#            - Microsoft Visual Studio 2013 Express
 #            - Microsoft Visual Studio 2017 Community Edition
+#            - Microsoft Visual Studio 2019 Community Edition
 #
 #==============================================================================
 #   This is used for building two versions of NetHack:
@@ -92,9 +91,13 @@ DEBUGINFO = Y
 
 #
 #==============================================================================
+#
+#  The version of the game this Makefile was designed for
+NETHACK_VERSION="3.6.3"
 
-#  Set the gamedir according to your preference.  
-#  If not present prior to compilation it gets created.
+# A brief version for use in macros
+NHV=$(NETHACK_VERSION:.=)
+NHV=$(NHV:"=)
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -131,7 +134,7 @@ OBJ     = o
 
 RANDOM	= $(OBJ)\random.o
 #RANDOM	=
-
+BCRYPT=bcrypt.lib
 WINPFLAG= -DTILES -DMSWIN_GRAPHICS -DWIN32CON
 
 # To store all the level files,
@@ -219,7 +222,7 @@ VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o
 VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
 VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
 VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
-VOBJ14 = $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
+VOBJ14 = $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o     $(O)isaac64.o
 VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
 VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
 VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  
@@ -233,7 +236,7 @@ VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
 VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
 VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
-VOBJ28 = $(O)win10.o    $(O)safeproc.o $(O)windmain.o
+VOBJ28 = 
 
 DLBOBJ = $(O)dlb.o
 
@@ -248,7 +251,8 @@ CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
 	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o
 !ENDIF
 
-SOBJ   = $(O)winnt.o $(O)pcsys.o $(SOUND) $(O)nhlan.o
+SOBJ   = $(O)windmain.o $(O)winnt.o $(O)win10.o \
+	$(O)safeproc.o $(O)nhlan.o $(SOUND) 
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
@@ -261,7 +265,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 GUIOBJ	= $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
-	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
+	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)NetHackW.o
 
 GUIHDR	= $(MSWIN)\mhaskyn.h $(MSWIN)\mhdlg.h $(MSWIN)\mhfont.h \
 	$(MSWIN)\mhinput.h $(MSWIN)\mhmain.h $(MSWIN)\mhmap.h $(MSWIN)\mhmenu.h \
@@ -368,7 +372,7 @@ rc=Rc
 # Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
 # is too old or untested.
 #
-#NMAKE version 1414264330 is distributed with VS 15.7.5
+#NMAKE version 1421277022 is distributed with latest VS 2019
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
@@ -379,7 +383,7 @@ MAKEVERSION=$(MAKEVERSION: =)
 #!MESSAGE $(_NMAKE_VER)
 #!MESSAGE $(MAKEVERSION)
 
-VSNEWEST=2017
+VSNEWEST=2019
 !IF ($(MAKEVERSION) < 1000000000)
 VSVER=0000		#untested ancient version
 !ELSEIF ($(MAKEVERSION) > 1000000000) && ($(MAKEVERSION) < 1100000000)
@@ -390,9 +394,11 @@ VSVER=2012
 VSVER=2013
 !ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
 VSVER=2015
-!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1414264331)
+!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270312)
+VSVER=2017
+!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1421277023)
 VSVER=$(VSNEWEST)
-!ELSEIF ($(MAKEVERSION) > 1414264330)
+!ELSEIF ($(MAKEVERSION) > 1421277022)
 VSVER=2999              #untested future version
 !ENDIF
 
@@ -451,7 +457,7 @@ CL_RECENT=-sdl
 #----------------------------------------------------------------
 
 !IF "$(ADD_CURSES)" == "Y"
-CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
 !ELSE
 CURSDEF=
 CURSESLIB=
@@ -459,11 +465,12 @@ CURSESLIB=
 
 ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
 	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
-	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" $(CURSESDEF) \
+	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" \
+	-DHAS_STDINT_H -DHAS_INLINE $(CURSESDEF) \
 	-EHsc -fp:precise -Gd -GF -GS -Gy \
 	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
-cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
-crelease= -analyze- -D"_MBCS" -errorReport:prompt -Gm- -MT -O2 -Ot -Ox -Oy
+cdebug= -analyze- -D"_DEBUG" -MTd -RTC1 -Od
+crelease= -analyze- -D"_MBCS" -errorReport:prompt -MT -O2 -Ot -Ox -Oy
 
 lcommon= /NOLOGO /INCREMENTAL:NO
 
@@ -546,7 +553,7 @@ lflagsBuild = $(lflags) $(conlibs) $(MACHINE)
 LIBS= user32.lib winmm.lib $(ZLIB) $(CURSESLIB)
 
 ! IF ("$(USE_DLB)"=="Y")
-DLB = nhdat
+DLB = nhdat$(NHV)
 ! ELSE
 DLB =
 ! ENDIF
@@ -627,7 +634,8 @@ DLB =
 #==========================================
 
 {$(WCURSES)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) -DPDC_NCMOUSE -DCURSES_DEFINE_ERASE_CHAR \
+            $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
 
 #{$(WCURSES)}.txt{$(DAT)}.txt:
 #	@copy $< $@
@@ -670,7 +678,7 @@ install: $(O)envchk.tag $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAM
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
 ! IF ("$(USE_DLB)"=="Y")
-	copy nhdat                $(GAMEDIR)
+	copy nhdat$(NHV)          $(GAMEDIR)
 	copy $(DAT)\license       $(GAMEDIR)
 	copy $(DAT)\opthelp       $(GAMEDIR)
 ! ELSE
@@ -741,11 +749,11 @@ $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
 tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
-$(O)winhack.res: $(TILEBMP16) $(MSWIN)\winhack.rc $(MSWIN)\mnsel.bmp \
+$(O)NetHackW.res: $(TILEBMP16) $(MSWIN)\NetHackW.rc $(MSWIN)\mnsel.bmp \
 	$(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
 	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico $(MSWIN)\rip.bmp \
 	$(MSWIN)\splash.bmp
-	@$(rc) -r -fo$@ -i$(MSWIN) -dNDEBUG $(MSWIN)\winhack.rc
+	@$(rc) -r -fo$@ -i$(MSWIN) -dNDEBUG $(MSWIN)\NetHackW.rc
 
 $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 	@$(rc) -r -fo$@ -i$(MSWSYS) -dNDEBUG $(MSWSYS)\console.rc
@@ -800,7 +808,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
         @echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
-		$(LIBS) $(PDCLIB) $(conlibs) -out:$@ @<<$(@B).lnk
+		$(LIBS) $(PDCLIB) $(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(TTYOBJ)
 		$(O)nttty.o
@@ -819,16 +827,16 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
 $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winhack.res $(O)gamedir.tag $(KEYDLLS)
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)NetHackW.res $(O)gamedir.tag $(KEYDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
-		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(guilibs) $(COMCTRL) -out:$@ @<<$(@B).lnk
+		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(GUIOBJ)
 		$(O)tile.o
 		$(O)ttystub.o
-		$(O)winhack.res
+		$(O)NetHackW.res
 <<
 	@if exist $(O)install.tag del $(O)install.tag
 
@@ -917,7 +925,7 @@ $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objcla
 		 $(U)makedefs.c
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	@$(cc) $(cflagsBuild) -Fo$@ $(U)makedefs.c
+	@$(cc) -DENUM_PM $(cflagsBuild) -Fo$@ $(U)makedefs.c
 
 #
 #  date.h should be remade every time any of the source or include
@@ -1097,7 +1105,7 @@ $(O)envchk.tag: $(O)obj.tag
 #==========================================
 
 #==========================================
-# DLB utility and nhdat file creation
+# DLB utility and nhdatNNN file creation
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
@@ -1118,7 +1126,7 @@ $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
 
-nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
+nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon $(DAT)\porthelp \
 	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
@@ -1278,7 +1286,7 @@ spotless: clean
 	if exist $(GAMEDIR)\nhraykey.dll del $(GAMEDIR)\nhraykey.dll
 	if exist $(GAMEDIR)\NetHack.exe  del $(GAMEDIR)\NetHack.exe
 	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
-	if exist $(GAMEDIR)\nhdat        del $(GAMEDIR)\nhdat
+	if exist $(GAMEDIR)\nhdat$(NHV)  del $(GAMEDIR)\nhdat$(NHV)
 ! ENDIF
 	if exist $(INCL)\date.h          del $(INCL)\date.h
 	if exist $(INCL)\onames.h        del $(INCL)\onames.h
@@ -1331,7 +1339,7 @@ spotless: clean
 	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
 	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
 	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
-	if exist nhdat.			 del nhdat.
+	if exist nhdat$(NHV).	         del nhdat$(NHV).
 	if exist $(O)obj.tag             del $(O)obj.tag
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
 	if exist $(O)nh*key.lib          del $(O)nh*key.lib
@@ -1461,8 +1469,8 @@ $(O)guistub.o: $(HACK_H) $(MSWSYS)\stubs.c
 # WIN32 dependencies
 #
 
-$(O)winhack.o: $(HACK_H) $(MSWIN)\winhack.c
-	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\winhack.c
+$(O)NetHackW.o: $(HACK_H) $(MSWIN)\NetHackW.c
+	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\NetHackW.c
 
 #if you aren't linking in the full tty then
 #include the following stub for proper linkage.
@@ -1487,14 +1495,14 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 # 
 # curses window port dependencies
 #
-$(O)\cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
-$(O)\cursinit.c: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
-$(O)\cursinvt.c: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
-$(O)\cursmain.c: $(WCURSES)\cursmain.c $(WCURSES)\cursmain.h $(INCL)\wincurs.h
-$(O)\cursmesg.c: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
-$(O)\cursmisc.c: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
-$(O)\cursstat.c: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
-$(O)\curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
+$(O)cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
+$(O)cursinit.o: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
+$(O)cursinvt.o: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
+$(O)cursmain.o: $(WCURSES)\cursmain.c $(INCL)\wincurs.h
+$(O)cursmesg.o: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
+$(O)cursmisc.o: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
+$(O)cursstat.o: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
+$(O)curswins.o: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
 #
 # The rest are stolen from sys/unix/Makefile.src, 
 # with the following changes:
@@ -1511,10 +1519,10 @@ $(O)\curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
 
 $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\atari\tos.c
-$(O)pcsys.o: ..\sys\share\pcsys.c $(HACK_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pcsys.c
 $(O)pctty.o: ..\sys\share\pctty.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pctty.c
+$(O)isaac64.o: ..\src\isaac64.c $(HACK_H) $(INCL)\isaac64.h $(INCL)\integer.h
+	@$(CC) $(cflagsBuild) -Fo$@ ..\src\isaac64.c
 $(O)random.o: ..\sys\share\random.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\random.c
 $(O)ioctl.o: ..\sys\share\ioctl.c $(HACK_H) $(INCL)\tcap.h

@@ -54,7 +54,7 @@ static HWND GetConsoleHwnd(void);
 extern void NDECL(backsp);
 #endif
 int NDECL(windows_console_custom_nhgetch);
-extern struct window_procs *FDECL(get_safe_procs, (int));
+extern void NDECL(safe_routines);
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
@@ -213,6 +213,9 @@ return &szFullPath[0];
 }
 #endif
 
+extern void NDECL(mswin_raw_print_flush);
+extern void FDECL(mswin_raw_print, (const char *));
+
 /* fatal error */
 /*VARARGS1*/
 void error
@@ -234,6 +237,8 @@ VA_DECL(const char *, s)
         Strcat(buf, "\n");
         raw_printf(buf);
     }
+    if (windowprocs.win_raw_print == mswin_raw_print)
+        mswin_raw_print_flush();
     VA_END();
     exit(EXIT_FAILURE);
 }
@@ -247,35 +252,18 @@ Delay(int ms)
 void
 win32_abort()
 {
-    boolean is_tty = FALSE;
+    int c;
 
-#ifdef TTY_GRAPHICS
-    is_tty = WINDOWPORT("tty");
-#endif
+    if (WINDOWPORT("mswin") || WINDOWPORT("tty")) {
+        if (iflags.window_inited)
+            exit_nhwindows((char *) 0);
+        iflags.window_inited = FALSE;
+    }
+    if (!WINDOWPORT("mswin") && !WINDOWPORT("safe-startup"))
+        safe_routines();
     if (wizard) {
-        int c, ci, ct;
-
-        if (!iflags.window_inited)
-            c = 'n';
-        ct = 0;
-        msmsg("Execute debug breakpoint wizard?");
-        while ((ci = nhgetch()) != '\n') {
-            if (ct > 0) {
-                if (is_tty)
-                    backsp(); /* \b is visible on NT console */
-                (void) putchar(' ');
-                if (is_tty)
-                    backsp();
-                ct = 0;
-                c = 'n';
-            }
-            if (ci == 'y' || ci == 'n' || ci == 'Y' || ci == 'N') {
-                ct = 1;
-                c = ci;
-                msmsg("%c", c);
-            }
-        }
-        if (c == 'y')
+        raw_print("Execute debug breakpoint wizard?");
+        if ((c = nhgetch()) == 'y' || c == 'Y')
             DebugBreak();
     }
     abort();
@@ -536,13 +524,16 @@ void
 getreturn(str)
 const char *str;
 {
+    static boolean in_getreturn = FALSE;
     char buf[BUFSZ];
 
-    if (!getreturn_enabled)
+    if (in_getreturn || !getreturn_enabled)
         return;
+    in_getreturn = TRUE;
     Sprintf(buf,"Hit <Enter> %s.", str);
     raw_print(buf);
     wait_synch();
+    in_getreturn = FALSE;
     return;
 }
 
@@ -661,6 +652,74 @@ const char *window_opt;
     }
     return 0;
 }
+
+/*
+ * Add a backslash to any name not ending in /, \ or :	 There must
+ * be room for the \
+ */
+void
+append_slash(name)
+char *name;
+{
+    char *ptr;
+
+    if (!*name)
+        return;
+    ptr = name + (strlen(name) - 1);
+    if (*ptr != '\\' && *ptr != '/' && *ptr != ':') {
+        *++ptr = '\\';
+        *++ptr = '\0';
+    }
+    return;
+}
+
+#include <bcrypt.h>     /* Windows Crypto Next Gen (CNG) */
+
+#ifndef STATUS_SUCCESS
+#define STATUS_SUCCESS 0
+#endif
+#ifndef STATUS_NOT_FOUND
+#define STATUS_NOT_FOUND 0xC0000225
+#endif
+#ifndef STATUS_UNSUCCESSFUL
+#define STATUS_UNSUCCESSFUL 0xC0000001
+#endif
+
+unsigned long
+sys_random_seed(VOID_ARGS)
+{
+    unsigned long ourseed = 0UL;
+    BCRYPT_ALG_HANDLE hRa = (BCRYPT_ALG_HANDLE) 0;
+    NTSTATUS status = STATUS_UNSUCCESSFUL;
+    boolean Plan_B = TRUE;
+
+    status = BCryptOpenAlgorithmProvider(&hRa, BCRYPT_RNG_ALGORITHM,
+                                         (LPCWSTR) 0, 0);
+    if (hRa && status == STATUS_SUCCESS) {
+        status = BCryptGenRandom(hRa, (PUCHAR) &ourseed,
+                                 (ULONG) sizeof ourseed, 0);
+        if (status == STATUS_SUCCESS) {
+            BCryptCloseAlgorithmProvider(hRa,0);
+            has_strong_rngseed = TRUE;
+            Plan_B = FALSE;
+        }
+    }
+
+    if (Plan_B) {
+        time_t datetime = 0;
+        const char *emsg;
+
+        if (status == STATUS_NOT_FOUND)
+            emsg = "BCRYPT_RNG_ALGORITHM not avail, falling back";
+        else
+            emsg = "Other failure than algorithm not avail";
+        paniclog("sys_random_seed", emsg); /* leaves clue, doesn't exit */
+        (void) time(&datetime);
+        ourseed = (unsigned long) datetime;
+    }
+    return ourseed;
+}
+
 #endif /* WIN32 */
 
 /*winnt.c*/

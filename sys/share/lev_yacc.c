@@ -11,7 +11,7 @@
 #define yyerrok (yyerrflag=0)
 #define YYRECOVERING (yyerrflag!=0)
 #define YYPREFIX "yy"
-/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1543372951 2018/11/28 02:42:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1551901401 2019/03/06 19:43:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.26 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3942,7 +3942,7 @@ break;
 case 240:
 {
 		      add_opvars(splev, "ii",
-                                 VA_PASS2((int) (yyvsp[0].i), SP_O_V_TRAPPED));
+                                 VA_PASS2((int) yyvsp[0].i, SP_O_V_TRAPPED));
 		      yyval.i = 0x0400;
 		  }
 break;

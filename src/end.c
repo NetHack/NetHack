@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1544917598 2018/12/15 23:46:38 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1561414303 2019/06/24 22:11:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.178 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -49,6 +49,7 @@ static void FDECL(done_hangup, (int));
 STATIC_DCL void FDECL(disclose, (int, BOOLEAN_P));
 STATIC_DCL void FDECL(get_valuables, (struct obj *));
 STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *, int));
+STATIC_DCL void NDECL(done_object_cleanup);
 STATIC_DCL void FDECL(artifact_score, (struct obj *, BOOLEAN_P, winid));
 STATIC_DCL void FDECL(really_done, (int)) NORETURN;
 STATIC_DCL void FDECL(savelife, (int));
@@ -64,7 +65,7 @@ STATIC_DCL void NDECL(dump_plines);
 STATIC_DCL void FDECL(dump_everything, (int, time_t));
 STATIC_DCL int NDECL(num_extinct);
 
-#if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(__BEOS__) || defined(MICRO) || defined(OS2)
 extern void FDECL(nethack_exit, (int));
 #else
 #define nethack_exit exit
@@ -128,14 +129,18 @@ static boolean NDECL(NH_panictrace_libc);
 static boolean NDECL(NH_panictrace_gdb);
 
 #ifndef NO_SIGNAL
-/*ARGSUSED*/
-void panictrace_handler(
-    sig_unused) /* called as signal() handler, so sent at least one arg */
+/* called as signal() handler, so sent at least one arg */
+/*ARGUSED*/
+void
+panictrace_handler(sig_unused)
 int sig_unused UNUSED;
 {
 #define SIG_MSG "\nSignal received.\n"
-    (void) write(2, SIG_MSG, sizeof(SIG_MSG) - 1);
-    NH_abort();
+    int f2;
+    
+    f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
+    nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
+    NH_abort(); /* ... and we're already in the process of quitting? */
 }
 
 void
@@ -201,7 +206,7 @@ NH_abort()
        traceback and exit; 2 = show traceback and stay in debugger */
     /* if (wizard && gdb_prio == 1) gdb_prio = 2; */
     vms_traceback(gdb_prio);
-    (void) libc_prio; /* half-hearted attempt at lint suppression */
+    nhUse(libc_prio);
 
 #endif /* ?VMS */
 
@@ -417,7 +422,7 @@ int how;
                                    ? &mons[mtmp->cham]
                                    : mptr);
     boolean distorted = (boolean) (Hallucination && canspotmon(mtmp)),
-            mimicker = (mtmp->m_ap_type == M_AP_MONSTER),
+            mimicker = (M_AP_TYPE(mtmp) == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
 
     You((how == STONING) ? "turn to stone..." : "die...");
@@ -496,6 +501,15 @@ int how;
     }
 
     Strcpy(killer.name, buf);
+    /*
+     * Chicken and egg issue:
+     *  Ordinarily Unchanging ought to override something like this,
+     *  but the transformation occurs at death.  With the current code,
+     *  the effectiveness of Unchanging stops first, but a case could
+     *  be made that it should last long enough to prevent undead
+     *  transformation.  (Turning to slime isn't an issue here because
+     *  Unchanging prevents that from happening.)
+     */
     if (mptr->mlet == S_WRAITH)
         u.ugrave_arise = PM_WRAITH;
     else if (mptr->mlet == S_MUMMY && urace.mummynum != NON_PM)
@@ -856,16 +870,13 @@ int how;
     u.uhp = u.uhpmax;
     if (Upolyd) /* Unchanging, or death which bypasses losing hit points */
         u.mh = u.mhmax;
-    if (u.uhunger < 500) {
-        u.uhunger = 500;
-        newuhs(FALSE);
+    if (u.uhunger < 500 || how == CHOKING) {
+        init_uhunger();
     }
     /* cure impending doom of sickness hero won't have time to fix */
     if ((Sick & TIMEOUT) == 1L) {
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);
     }
-    if (how == CHOKING)
-        init_uhunger();
     nomovemsg = "You survived that attempt on your life.";
     context.move = 0;
     if (multi > 0)
@@ -986,6 +997,62 @@ int what;
 }
 #endif
 
+/* deal with some objects which may be in an abnormal state at end of game */
+STATIC_OVL void
+done_object_cleanup()
+{
+    int ox, oy;
+
+    /* might have been killed while using a disposable item, so make sure
+       it's gone prior to inventory disclosure and creation of bones */
+    inven_inuse(TRUE);
+    /*
+     * Hero can die when throwing an object (by hitting an adjacent
+     * gas spore, for instance, or being hit by mis-returning Mjollnir),
+     * or while in transit (from falling down stairs).  If that happens,
+     * some object(s) might be in limbo rather than on the map or in
+     * any inventory.  Saving bones with an active light source in limbo
+     * would trigger an 'object not local' panic.
+     *
+     * We used to use dealloc_obj() on thrownobj and kickedobj but
+     * that keeps them out of bones and could leave uball in a confused
+     * state (gone but still attached).  Place them on the map but
+     * bypass flooreffects().  That could lead to minor anomalies in
+     * bones, like undamaged paper at water or lava locations or piles
+     * not being knocked down holes, but it seems better to get this
+     * game over with than risk being tangled up in more and more details.
+     */
+    ox = u.ux + u.dx, oy = u.uy + u.dy;
+    if (!isok(ox, oy) || !accessible(ox, oy))
+        ox = u.ux, oy = u.uy;
+    /* put thrown or kicked object on map (for bones); location might
+       be incorrect (perhaps killed by divine lightning when throwing at
+       a temple priest?) but this should be better than just vanishing
+       (fragile stuff should be taken care of before getting here) */
+    if (thrownobj && thrownobj->where == OBJ_FREE) {
+        place_object(thrownobj, ox, oy);
+        stackobj(thrownobj), thrownobj = 0;
+    }
+    if (kickedobj && kickedobj->where == OBJ_FREE) {
+        place_object(kickedobj, ox, oy);
+        stackobj(kickedobj), kickedobj = 0;
+    }
+    /* if Punished hero dies during level change or dies or quits while
+       swallowed, uball and uchain will be in limbo; put them on floor
+       so bones will have them and object list cleanup finds them */
+    if (uchain && uchain->where == OBJ_FREE) {
+        /* placebc(); */
+        lift_covet_and_placebc(override_restriction);
+    }
+    /* persistent inventory window now obsolete since disclosure uses
+       a normal popup one; avoids "Bad fruit #n" when saving bones */
+    if (iflags.perm_invent) {
+        iflags.perm_invent = FALSE;
+        update_inventory(); /* make interface notice the change */
+    }
+    return;
+}
+
 /* called twice; first to calculate total, then to list relevant items */
 STATIC_OVL void
 artifact_score(list, counting, endwin)
@@ -1047,7 +1114,7 @@ int how;
 #endif
         ) {
         /* skip status update if panicking or disconnected */
-        context.botl = context.botlx = FALSE;
+        context.botl = context.botlx = iflags.time_botl = FALSE;
     } else {
         /* otherwise force full status update */
         context.botlx = TRUE;
@@ -1057,9 +1124,12 @@ int how;
     if (iflags.debug_fuzzer) {
         if (!(program_state.panicking || how == PANICKED)) {
             savelife(how);
-            /* periodically restore characteristics and lost exp levels */
+            /* periodically restore characteristics and lost exp levels
+               or cure lycanthropy */
             if (!rn2(10)) {
-                struct obj *potion = mksobj(POT_RESTORE_ABILITY, TRUE, FALSE);
+                struct obj *potion = mksobj((u.ulycn > LOW_PM && !rn2(3))
+                                            ? POT_WATER : POT_RESTORE_ABILITY,
+                                            TRUE, FALSE);
 
                 bless(potion);
                 (void) peffects(potion); /* always -1 for restore ability */
@@ -1082,10 +1152,11 @@ int how;
     if (how < PANICKED) {
         u.umortality++;
         /* in case caller hasn't already done this */
-        if (u.uhp > 0 || (Upolyd && u.mh > 0)) {
-            /* for deaths not triggered by loss of hit points, force
-               current HP to zero (0 HP when turning into green slime
-               is iffy but we don't have much choice--that is fatal) */
+        if (u.uhp != 0 || (Upolyd && u.mh != 0)) {
+            /* force HP to zero in case it is still positive (some
+               deaths aren't triggered by loss of hit points), or
+               negative (-1 is used as a flag in some circumstances
+               which don't apply when actually dying due to HP loss) */
             u.uhp = u.mh = 0;
             context.botl = 1;
         }
@@ -1113,6 +1184,7 @@ int how;
     if (!survive && (wizard || discover) && how <= GENOCIDED
         && !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
+        iflags.last_msg = PLNMSG_OK_DONT_DIE;
         savelife(how);
         survive = TRUE;
     }
@@ -1146,18 +1218,19 @@ int how;
     program_state.gameover = 1;
     /* in case of a subsequent panic(), there's no point trying to save */
     program_state.something_worth_saving = 0;
+#ifdef HANGUPHANDLING
+    if (program_state.done_hup)
+        done_stopprint++;
+#endif
     /* render vision subsystem inoperative */
     iflags.vision_inited = 0;
 
-    /* might have been killed while using a disposable item, so make sure
-       it's gone prior to inventory disclosure and creation of bones data */
-    inven_inuse(TRUE);
-    /* maybe not on object lists; if an active light source, would cause
-       big trouble (`obj_is_local' panic) for savebones() -> savelev() */
-    if (thrownobj && thrownobj->where == OBJ_FREE)
-        dealloc_obj(thrownobj);
-    if (kickedobj && kickedobj->where == OBJ_FREE)
-        dealloc_obj(kickedobj);
+    /* maybe use up active invent item(s), place thrown/kicked missile,
+       deal with ball and chain possibly being temporarily off the map */
+    if (!program_state.panicking)
+        done_object_cleanup();
+    /* in case we're panicking; normally cleared by done_object_cleanup() */
+    iflags.perm_invent = FALSE;
 
     /* remember time of death here instead of having bones, rip, and
        topten figure it out separately and possibly getting different
@@ -1170,8 +1243,8 @@ int how;
      * On those rare occasions you get hosed immediately, go out
      * smiling... :-)  -3.
      */
-    if (moves <= 1 && how < PANICKED) /* You die... --More-- */
-        pline("Do not pass go.  Do not collect 200 %s.", currency(200L));
+    if (moves <= 1 && how < PANICKED && !done_stopprint)
+        pline("Do not pass Go.  Do not collect 200 %s.", currency(200L));
 
     if (have_windows)
         wait_synch(); /* flush screen output */
@@ -1217,9 +1290,11 @@ int how;
     fixup_death(how); /* actually, fixup multi_reason */
 
     if (how != PANICKED) {
+        boolean silently = done_stopprint ? TRUE : FALSE;
+
         /* these affect score and/or bones, but avoid them during panic */
-        taken = paybill((how == ESCAPED) ? -1 : (how != QUIT));
-        paygd();
+        taken = paybill((how == ESCAPED) ? -1 : (how != QUIT), silently);
+        paygd(silently);
         clearpriests();
     } else
         taken = FALSE; /* lint; assert( !bones_ok ); */
@@ -1282,10 +1357,8 @@ int how;
         int mnum = u.umonnum;
 
         if (!Upolyd) {
-            /* Base corpse on race when not poly'd since original
-             * u.umonnum is based on role, and all role monsters
-             * are human.
-             */
+            /* Base corpse on race when not poly'd since original u.umonnum
+               is based on role, and all role monsters are human. */
             mnum = (flags.female && urace.femalenum != NON_PM)
                        ? urace.femalenum
                        : urace.malenum;
@@ -1326,7 +1399,7 @@ int how;
         }
     }
 
-    if (u.ugrave_arise >= LOW_PM) {
+    if (u.ugrave_arise >= LOW_PM && !done_stopprint) {
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
@@ -1361,9 +1434,8 @@ int how;
         }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;
-#ifndef STATUS_HILITES
-        destroy_nhwindow(WIN_STATUS),  WIN_STATUS = WIN_ERR;
-#endif
+        if (WIN_STATUS != WIN_ERR)
+            destroy_nhwindow(WIN_STATUS),  WIN_STATUS = WIN_ERR;
         destroy_nhwindow(WIN_MESSAGE),  WIN_MESSAGE = WIN_ERR;
 
         if (!done_stopprint || flags.tombstone)
@@ -1554,18 +1626,16 @@ boolean identified, all_containers, reportempty;
 {
     register struct obj *box, *obj;
     char buf[BUFSZ];
-    boolean cat,
-            dumping =
-#ifdef DUMPLOG
-                     iflags.in_dumplog ? TRUE :
-#endif
-                     FALSE;
+    boolean cat, dumping = iflags.in_dumplog;
 
     for (box = list; box; box = box->nobj) {
         if (Is_container(box) || box->otyp == STATUE) {
-            box->cknown = 1; /* we're looking at the contents now */
-            if (identified)
-                box->lknown = 1;
+            if (!box->cknown || (identified && !box->lknown)) {
+                box->cknown = 1; /* we're looking at the contents now */
+                if (identified)
+                    box->lknown = 1;
+                update_inventory();
+            }
             if (box->otyp == BAG_OF_TRICKS) {
                 continue; /* wrong type of container */
             } else if (box->cobj) {
@@ -1601,7 +1671,7 @@ boolean identified, all_containers, reportempty;
                             if (Is_container(obj) || obj->otyp == STATUE)
                                 obj->cknown = obj->lknown = 1;
                         }
-                        Strcpy(&buf[2], doname(obj));
+                        Strcpy(&buf[2], doname_with_price(obj));
                         putstr(tmpwin, 0, buf);
                     }
                     unsortloot(&sortedcobj);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1544401269 2018/12/10 00:21:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1559664951 2019/06/04 16:15:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.213 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,6 +16,8 @@ STATIC_DCL boolean FDECL(trapmove, (int, int, struct trap *));
 STATIC_DCL struct monst *FDECL(monstinroom, (struct permonst *, int));
 STATIC_DCL boolean FDECL(doorless_door, (int, int));
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
+STATIC_DCL void FDECL(maybe_smudge_engr, (int, int, int, int));
+STATIC_DCL void NDECL(domove_core);
 
 #define IS_SHOP(x) (rooms[x].rtype >= SHOPBASE)
 
@@ -279,7 +281,7 @@ moverock()
                 /* note: reset to zero after save/restore cycle */
                 static NEARDATA long lastmovetime;
 #endif
-            dopush:
+ dopush:
                 if (!u.usteed) {
                     if (moves > lastmovetime + 2 || moves < lastmovetime)
                         pline("With %s effort you move %s.",
@@ -304,7 +306,7 @@ moverock()
                 newsym(sx, sy);
             }
         } else {
-        nopushmsg:
+ nopushmsg:
             if (u.usteed)
                 pline("%s tries to move %s, but cannot.",
                       upstart(y_monnam(u.usteed)), the(xname(otmp)));
@@ -312,7 +314,7 @@ moverock()
                 You("try to move %s, but in vain.", the(xname(otmp)));
             if (Blind)
                 feel_location(sx, sy);
-        cannot_push:
+ cannot_push:
             if (throws_rocks(youmonst.data)) {
                 boolean
                     canpickup = (!Sokoban
@@ -797,7 +799,7 @@ int mode;
                 return FALSE;
             }
         } else {
-        testdiag:
+ testdiag:
             if (dx && dy && !Passes_walls
                 && (!doorless_door(x, y) || block_door(x, y))) {
                 /* Diagonal moves into a door are not allowed. */
@@ -955,8 +957,8 @@ int mode;
             uy = u.uy;
         }
 
-    noguess:
-        (void) memset((genericptr_t) travel, 0, sizeof(travel));
+ noguess:
+        (void) memset((genericptr_t) travel, 0, sizeof travel);
         travelstepx[0][0] = tx;
         travelstepy[0][0] = ty;
 
@@ -1141,7 +1143,7 @@ int mode;
         return FALSE;
     }
 
-found:
+ found:
     u.dx = 0;
     u.dy = 0;
     nomul(0);
@@ -1156,6 +1158,7 @@ int x,y;
     int ty = u.ty;
     boolean ret;
     int g = glyph_at(x,y);
+
     if (x == u.ux && y == u.uy)
         return TRUE;
     if (isok(x,y) && glyph_is_cmap(g) && S_stone == glyph_to_cmap(g)
@@ -1294,7 +1297,7 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
                     Norep("You are %s %s.", predicament, culprit);
             }
         } else {
-wriggle_free:
+ wriggle_free:
             if (u.usteed)
                 pline("%s finally %s free.", upstart(steedname),
                       !anchored ? "lurches" : "wrenches the ball");
@@ -1330,6 +1333,19 @@ u_rooted()
 void
 domove()
 {
+        int ux1 = u.ux, uy1 = u.uy;
+
+        domove_succeeded = 0L;
+        domove_core();
+        /* domove_succeeded is available for making assessments now */
+        if ((domove_succeeded & (DOMOVE_RUSH | DOMOVE_WALK)) != 0)
+            maybe_smudge_engr(ux1, uy1, u.ux, u.uy);
+        domove_attempting = 0L;
+}
+
+void
+domove_core()
+{
     register struct monst *mtmp;
     register struct rm *tmpr;
     register xchar x, y;
@@ -1339,9 +1355,8 @@ domove()
     xchar chainx = 0, chainy = 0,
           ballx = 0, bally = 0;         /* ball&chain new positions */
     int bc_control = 0;                 /* control for ball&chain */
-    boolean cause_delay = FALSE;        /* dragging ball will skip a move */
-
-    u_wipe_engr(rnd(5));
+    boolean cause_delay = FALSE,        /* dragging ball will skip a move */
+            u_with_boulder = (sobj_at(BOULDER, u.ux, u.uy) != 0);
 
     if (context.travel) {
         if (!findtravelpath(FALSE))
@@ -1429,8 +1444,36 @@ domove()
             }
             x = u.ux + u.dx;
             y = u.uy + u.dy;
+
+            /* are we trying to move out of water while carrying too much? */
+            if (isok(x, y) && !is_pool(x, y) && !Is_waterlevel(&u.uz)
+                && wtcap > (Swimming ? MOD_ENCUMBER : SLT_ENCUMBER)) {
+                /* when escaping from drowning you need to be unencumbered
+                   in order to crawl out of water, but when not drowning,
+                   doing so while encumbered is feasible; if in an aquatic
+                   form, stressed or less is allowed; otherwise (magical
+                   breathing), only burdened is allowed */
+                You("are carrying too much to climb out of the water.");
+                nomul(0);
+                return;
+            }
         }
         if (!isok(x, y)) {
+            if (iflags.mention_walls) {
+                int dx = u.dx, dy = u.dy;
+
+                if (dx && dy) { /* diagonal */
+                    /* only as far as possible diagonally if in very
+                       corner; otherwise just report whichever of the
+                       cardinal directions has reached its limit */
+                    if (isok(x, u.uy))
+                        dx = 0;
+                    else if (isok(u.ux, y))
+                        dy = 0;
+                }
+                You("have already gone as far %s as possible.",
+                    directionname(xytod(dx, dy)));
+            }
             nomul(0);
             return;
         }
@@ -1440,7 +1483,8 @@ domove()
             if (context.run >= 2) {
                 if (iflags.mention_walls) {
                     if (trap && trap->tseen) {
-                        int tt = what_trap(trap->ttyp);
+                        int tt = what_trap(trap->ttyp, rn2_on_display_rng);
+
                         You("stop in front of %s.",
                             an(defsyms[trap_to_defsym(tt)].explanation));
                     } else if (is_pool_or_lava(x,y) && levl[x][y].seenv) {
@@ -1479,7 +1523,7 @@ domove()
                 case 0:
                 case 1:
                 case 2:
-                pull_free:
+ pull_free:
                     You("pull free from %s.", mon_nam(u.ustuck));
                     u.ustuck = 0;
                     break;
@@ -1506,8 +1550,8 @@ domove()
             /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
             if (context.run && ((!Blind && mon_visible(mtmp)
-                                 && ((mtmp->m_ap_type != M_AP_FURNITURE
-                                      && mtmp->m_ap_type != M_AP_OBJECT)
+                                 && ((M_AP_TYPE(mtmp) != M_AP_FURNITURE
+                                      && M_AP_TYPE(mtmp) != M_AP_OBJECT)
                                      || Protection_from_shape_changers))
                                 || sensemon(mtmp))) {
                 nomul(0);
@@ -1547,7 +1591,7 @@ domove()
          */
         if (context.nopick && !context.travel
             && (canspotmon(mtmp) || glyph_is_invisible(levl[x][y].glyph))) {
-            if (mtmp->m_ap_type && !Protection_from_shape_changers
+            if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers
                 && !sensemon(mtmp))
                 stumble_onto_mimic(mtmp);
             else if (mtmp->mpeaceful && !Hallucination)
@@ -1735,7 +1779,7 @@ domove()
            cancel the swap below (we can ignore steed mx,my here) */
         u.ux = u.ux0, u.uy = u.uy0;
         mtmp->mundetected = 0;
-        if (mtmp->m_ap_type)
+        if (M_AP_TYPE(mtmp))
             seemimic(mtmp);
         else if (!mtmp->mtame)
             newsym(mtmp->mx, mtmp->my);
@@ -1754,6 +1798,15 @@ domove()
             if (u.usteed)
                 u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
+        } else if (u_with_boulder
+                    && !(verysmall(mtmp->data)
+                         && (!mtmp->minvent || (curr_mon_load(mtmp) <= 600)))) {
+            /* can't swap places when pet won't fit there with the boulder */
+            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+            You("stop.  %s won't fit into the same spot that you're at.",
+                 upstart(y_monnam(mtmp)));
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
@@ -1839,13 +1892,15 @@ domove()
      * imitating something that doesn't move.  We could extend this
      * to non-moving monsters...
      */
-    if ((u.dx || u.dy) && (youmonst.m_ap_type == M_AP_OBJECT
-                           || youmonst.m_ap_type == M_AP_FURNITURE))
+    if ((u.dx || u.dy) && (U_AP_TYPE == M_AP_OBJECT
+                           || U_AP_TYPE == M_AP_FURNITURE))
         youmonst.m_ap_type = M_AP_NOTHING;
 
     check_leash(u.ux0, u.uy0);
 
     if (u.ux0 != u.ux || u.uy0 != u.uy) {
+        /* let caller know so that an evaluation may take place */
+        domove_succeeded |= (domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK));
         u.umoved = TRUE;
         /* Clean old position -- vision_recalc() will print our new one. */
         newsym(u.ux0, u.uy0);
@@ -1882,6 +1937,21 @@ domove()
                 delay_output();
             }
         }
+    }
+}
+
+void
+maybe_smudge_engr(x1,y1,x2,y2)
+int x1, y1, x2, y2;
+{
+    struct engr *ep;
+
+    if (can_reach_floor(TRUE)) {
+        if ((ep = engr_at(x1, y1)) && ep->engr_type != HEADSTONE)
+            wipe_engr_at(x1, y1, rnd(5), FALSE);
+        if ((x2 != x1 || y2 != y1)
+                && (ep = engr_at(x2, y2)) && ep->engr_type != HEADSTONE)
+            wipe_engr_at(x2, y2, rnd(5), FALSE);
     }
 }
 
@@ -2189,7 +2259,7 @@ boolean pick;
         }
         mnexto(mtmp); /* have to move the monster */
     }
-spotdone:
+ spotdone:
     if (!--inspoteffects) {
         spotterrain = STONE; /* 0 */
         spotloc.x = spotloc.y = 0;
@@ -2225,9 +2295,9 @@ register int typewanted;
     int typefound, min_x, min_y, max_x, max_y_offset, step;
     register struct rm *lev;
 
-#define goodtype(rno)   \
-    (!typewanted                                                    \
-     || (typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted   \
+#define goodtype(rno) \
+    (!typewanted                                                   \
+     || (typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted  \
      || (typewanted == SHOPBASE && typefound > SHOPBASE))
 
     switch (rno = levl[x][y].roomno) {
@@ -2567,7 +2637,8 @@ dopickup(VOID_ARGS)
     int count, tmpcount, ret;
 
     /* awful kludge to work around parse()'s pre-decrement */
-    count = (multi || (save_cm && *save_cm == cmd_from_func(dopickup))) ? multi + 1 : 0;
+    count = (multi || (save_cm && *save_cm == cmd_from_func(dopickup)))
+              ? multi + 1 : 0;
     multi = 0; /* always reset */
 
     if ((ret = pickup_checks() >= 0))
@@ -2610,8 +2681,8 @@ lookaround()
                 continue;
 
             if ((mtmp = m_at(x, y)) != 0
-                && mtmp->m_ap_type != M_AP_FURNITURE
-                && mtmp->m_ap_type != M_AP_OBJECT
+                && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+                && M_AP_TYPE(mtmp) != M_AP_OBJECT
                 && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
                 if ((context.run != 1 && !mtmp->mtame)
                     || (x == u.ux + u.dx && y == u.uy + u.dy
@@ -2640,7 +2711,7 @@ lookaround()
                 }
                 goto bcorr;
             } else if (levl[x][y].typ == CORR) {
-            bcorr:
+ bcorr:
                 if (levl[u.ux][u.uy].typ != ROOM) {
                     if (context.run == 1 || context.run == 3
                         || context.run == 8) {
@@ -2664,7 +2735,8 @@ lookaround()
                     goto bcorr; /* if you must */
                 if (x == u.ux + u.dx && y == u.uy + u.dy) {
                     if (iflags.mention_walls) {
-                        int tt = what_trap(trap->ttyp);
+                        int tt = what_trap(trap->ttyp, rn2_on_display_rng);
+
                         You("stop in front of %s.",
                             an(defsyms[trap_to_defsym(tt)].explanation));
                     }
@@ -2698,7 +2770,7 @@ lookaround()
                     || ((y == u.uy - u.dy) && (x != u.ux + u.dx)))
                     continue;
             }
-        stop:
+ stop:
             nomul(0);
             return;
         } /* end for loops */
@@ -2793,8 +2865,8 @@ monster_nearby()
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
             if (!isok(x, y) || (x == u.ux && y == u.uy))
                 continue;
-            if ((mtmp = m_at(x, y)) && mtmp->m_ap_type != M_AP_FURNITURE
-                && mtmp->m_ap_type != M_AP_OBJECT
+            if ((mtmp = m_at(x, y)) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+                && M_AP_TYPE(mtmp) != M_AP_OBJECT
                 && (!mtmp->mpeaceful || Hallucination)
                 && (!is_hider(mtmp->data) || !mtmp->mundetected)
                 && !noattacks(mtmp->data) && mtmp->mcanmove
@@ -2829,8 +2901,16 @@ const char *msg_override;
         nomovemsg = msg_override;
     else if (!nomovemsg)
         nomovemsg = You_can_move_again;
-    if (*nomovemsg)
+    if (*nomovemsg) {
         pline("%s", nomovemsg);
+        /* follow "you survived that attempt on your life" with a message
+           about current form if it's not the default; primarily for
+           life-saving while turning into green slime but is also a reminder
+           if life-saved while poly'd and Unchanging (explore or wizard mode
+           declining to die since can't be both Unchanging and Lifesaved) */
+        if (Upolyd && !strncmpi(nomovemsg, "You survived that ", 18))
+            You("are %s", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
+    }
     nomovemsg = 0;
     u.usleep = 0;
     multi_reason = NULL;
@@ -2841,6 +2921,8 @@ const char *msg_override;
            encumbrance hack for levitation--see weight_cap()) */
         afternmv = (int NDECL((*))) 0;
         (void) (*f)();
+        /* for finishing Armor/Boots/&c_on() */
+        update_inventory();
     }
 }
 

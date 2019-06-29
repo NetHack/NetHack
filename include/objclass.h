@@ -1,4 +1,4 @@
-/* NetHack 3.6	objclass.h	$NHDT-Date: 1462067744 2016/05/01 01:55:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6	objclass.h	$NHDT-Date: 1547255901 2019/01/12 01:18:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,46 +6,48 @@
 #ifndef OBJCLASS_H
 #define OBJCLASS_H
 
-/* [misnamed] definition of a type of object */
+/* [misnamed] definition of a type of object; many objects are composites
+   (liquid potion inside glass bottle, metal arrowhead on wooden shaft)
+   and object definitions only specify one type on a best-fit basis */
 enum obj_material_types {
-    LIQUID = 1, /* currently only for venom */
-    WAX,
-    VEGGY, /* foodstuffs */
-    FLESH, /*   ditto    */
-    PAPER,
-    CLOTH,
-    LEATHER,
-    WOOD,
-    BONE,
-    DRAGON_HIDE, /* not leather! */
-    IRON,        /* Fe - includes steel */
-    METAL,       /* Sn, &c. */
-    COPPER,      /* Cu - includes brass */
-    SILVER,      /* Ag */
-    GOLD,        /* Au */
-    PLATINUM,    /* Pt */
-    MITHRIL,
-    PLASTIC,
-    GLASS,
-    GEMSTONE,
-    MINERAL
+    LIQUID      =  1, /* currently only for venom */
+    WAX         =  2,
+    VEGGY       =  3, /* foodstuffs */
+    FLESH       =  4, /*   ditto    */
+    PAPER       =  5,
+    CLOTH       =  6,
+    LEATHER     =  7,
+    WOOD        =  8,
+    BONE        =  9,
+    DRAGON_HIDE = 10, /* not leather! */
+    IRON        = 11, /* Fe - includes steel */
+    METAL       = 12, /* Sn, &c. */
+    COPPER      = 13, /* Cu - includes brass */
+    SILVER      = 14, /* Ag */
+    GOLD        = 15, /* Au */
+    PLATINUM    = 16, /* Pt */
+    MITHRIL     = 17,
+    PLASTIC     = 18,
+    GLASS       = 19,
+    GEMSTONE    = 20,
+    MINERAL     = 21
 };
 
 enum obj_armor_types {
-    ARM_SUIT = 0,
-    ARM_SHIELD,        /* needed for special wear function */
-    ARM_HELM,
-    ARM_GLOVES,
-    ARM_BOOTS,
-    ARM_CLOAK,
-    ARM_SHIRT
+    ARM_SUIT   = 0,
+    ARM_SHIELD = 1,        /* needed for special wear function */
+    ARM_HELM   = 2,
+    ARM_GLOVES = 3,
+    ARM_BOOTS  = 4,
+    ARM_CLOAK  = 5,
+    ARM_SHIRT  = 6
 };
 
 struct objclass {
     short oc_name_idx;              /* index of actual name */
     short oc_descr_idx;             /* description when name unknown */
     char *oc_uname;                 /* called by user */
-    Bitfield(oc_name_known, 1);
+    Bitfield(oc_name_known, 1);     /* discovered */
     Bitfield(oc_merge, 1);          /* merge otherwise equal objects */
     Bitfield(oc_uses_known, 1);     /* obj->known affects full description;
                                        otherwise, obj->dknown and obj->bknown
@@ -72,7 +74,7 @@ struct objclass {
 #define SLASH 2  /* (latter includes iron ball & chain) */
 #define WHACK 0
 
-    /*Bitfield(oc_subtyp,3);*/ /* Now too big for a bitfield... see below */
+    /* 4 free bits */
 
     Bitfield(oc_material, 5); /* one of obj_material_types */
 
@@ -94,12 +96,14 @@ struct objclass {
     (is_rustprone(otmp) || is_flammable(otmp) || is_rottable(otmp) \
      || is_corrodeable(otmp))
 
+    /* 3 free bits */
+
     schar oc_subtyp;
 #define oc_skill oc_subtyp  /* Skills of weapons, spellbooks, tools, gems */
-#define oc_armcat oc_subtyp /* for armor */
+#define oc_armcat oc_subtyp /* for armor (enum obj_armor_types) */
 
     uchar oc_oprop; /* property (invis, &c.) conveyed */
-    char oc_class;  /* object class */
+    char  oc_class; /* object class (enum obj_class_types) */
     schar oc_delay; /* delay when using such an object */
     uchar oc_color; /* color of the object */
 
@@ -138,26 +142,26 @@ extern NEARDATA struct objdescr obj_descr[];
  * symbol below.
  */
 enum obj_class_types {
-    RANDOM_CLASS = 0, /* used for generating random objects */
-    ILLOBJ_CLASS,
-    WEAPON_CLASS,
-    ARMOR_CLASS,
-    RING_CLASS,
-    AMULET_CLASS,
-    TOOL_CLASS,
-    FOOD_CLASS,
-    POTION_CLASS,
-    SCROLL_CLASS,
-    SPBOOK_CLASS, /* actually SPELL-book */
-    WAND_CLASS,
-    COIN_CLASS,
-    GEM_CLASS,
-    ROCK_CLASS,
-    BALL_CLASS,
-    CHAIN_CLASS,
-    VENOM_CLASS,
+    RANDOM_CLASS =  0, /* used for generating random objects */
+    ILLOBJ_CLASS =  1,
+    WEAPON_CLASS =  2,
+    ARMOR_CLASS  =  3,
+    RING_CLASS   =  4,
+    AMULET_CLASS =  5,
+    TOOL_CLASS   =  6,
+    FOOD_CLASS   =  7,
+    POTION_CLASS =  8,
+    SCROLL_CLASS =  9,
+    SPBOOK_CLASS = 10, /* actually SPELL-book */
+    WAND_CLASS   = 11,
+    COIN_CLASS   = 12,
+    GEM_CLASS    = 13,
+    ROCK_CLASS   = 14,
+    BALL_CLASS   = 15,
+    CHAIN_CLASS  = 16,
+    VENOM_CLASS  = 17,
 
-    MAXOCLASSES
+    MAXOCLASSES  = 18
 };
 
 #define ALLOW_COUNT (MAXOCLASSES + 1) /* Can be used in the object class    */

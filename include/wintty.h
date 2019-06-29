@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.h	$NHDT-Date: 1433806583 2015/06/08 23:36:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	wintty.h	$NHDT-Date: 1558330405 2019/05/20 05:33:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) David Cohrs, 1991,1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -79,7 +79,7 @@ struct tty_status_fields {
     boolean valid;
     boolean dirty;
     boolean redraw;
-    boolean last_on_row;
+    boolean sanitycheck; /* was 'last_in_row' */
 };
 #endif
 
@@ -151,6 +151,7 @@ E void NDECL(cl_eos);
  * a color or whatever.  wintty.c should concern itself with WHERE to put
  * stuff in a window.
  */
+E int FDECL(term_attr_fixup, (int));
 E void FDECL(term_start_attr, (int attr));
 E void FDECL(term_end_attr, (int attr));
 E void NDECL(term_start_raw_bold);
@@ -164,6 +165,8 @@ E int FDECL(has_color, (int color));
 
 /* ### topl.c ### */
 
+E void FDECL(show_topl, (const char *));
+E void NDECL(remember_topl);
 E void FDECL(addtopl, (const char *));
 E void NDECL(more);
 E void FDECL(update_topl, (const char *));
@@ -180,6 +183,7 @@ E void FDECL(win_tty_init, (int));
 
 /* external declarations */
 E void FDECL(tty_init_nhwindows, (int *, char **));
+E void FDECL(tty_preference_update, (const char *));
 E void NDECL(tty_player_selection);
 E void NDECL(tty_askname);
 E void NDECL(tty_get_nh_event);

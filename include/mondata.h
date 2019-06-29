@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.h	$NHDT-Date: 1513297342 2017/12/15 00:22:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	mondata.h	$NHDT-Date: 1550524558 2019/02/18 21:15:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,14 +10,22 @@
 
 #define pm_resistance(ptr, typ) (((ptr)->mresists & (typ)) != 0)
 
-#define resists_fire(mon) (((mon)->mintrinsics & MR_FIRE) != 0)
-#define resists_cold(mon) (((mon)->mintrinsics & MR_COLD) != 0)
-#define resists_sleep(mon) (((mon)->mintrinsics & MR_SLEEP) != 0)
-#define resists_disint(mon) (((mon)->mintrinsics & MR_DISINT) != 0)
-#define resists_elec(mon) (((mon)->mintrinsics & MR_ELEC) != 0)
-#define resists_poison(mon) (((mon)->mintrinsics & MR_POISON) != 0)
-#define resists_acid(mon) (((mon)->mintrinsics & MR_ACID) != 0)
-#define resists_ston(mon) (((mon)->mintrinsics & MR_STONE) != 0)
+#define resists_fire(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_FIRE) != 0)
+#define resists_cold(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_COLD) != 0)
+#define resists_sleep(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_SLEEP) != 0)
+#define resists_disint(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_DISINT) != 0)
+#define resists_elec(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_ELEC) != 0)
+#define resists_poison(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_POISON) != 0)
+#define resists_acid(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_ACID) != 0)
+#define resists_ston(mon) \
+    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_STONE) != 0)
 
 #define is_lminion(mon) \
     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)
@@ -59,9 +67,12 @@
 #define slithy(ptr) (((ptr)->mflags1 & M1_SLITHY) != 0L)
 #define is_wooden(ptr) ((ptr) == &mons[PM_WOOD_GOLEM])
 #define thick_skinned(ptr) (((ptr)->mflags1 & M1_THICK_HIDE) != 0L)
+#define hug_throttles(ptr) ((ptr) == &mons[PM_ROPE_GOLEM])
 #define slimeproof(ptr) \
     ((ptr) == &mons[PM_GREEN_SLIME] || flaming(ptr) || noncorporeal(ptr))
 #define lays_eggs(ptr) (((ptr)->mflags1 & M1_OVIPAROUS) != 0L)
+#define eggs_in_water(ptr) \
+    (lays_eggs(ptr) && (ptr)->mlet == S_EEL && is_swimmer(ptr))
 #define regenerates(ptr) (((ptr)->mflags1 & M1_REGEN) != 0L)
 #define perceives(ptr) (((ptr)->mflags1 & M1_SEE_INVIS) != 0L)
 #define can_teleport(ptr) (((ptr)->mflags1 & M1_TPORT) != 0L)
@@ -127,9 +138,9 @@
 #define is_longworm(ptr)                                                   \
     (((ptr) == &mons[PM_BABY_LONG_WORM]) || ((ptr) == &mons[PM_LONG_WORM]) \
      || ((ptr) == &mons[PM_LONG_WORM_TAIL]))
-#define is_covetous(ptr) ((ptr->mflags3 & M3_COVETOUS))
-#define infravision(ptr) ((ptr->mflags3 & M3_INFRAVISION))
-#define infravisible(ptr) ((ptr->mflags3 & M3_INFRAVISIBLE))
+#define is_covetous(ptr) (((ptr)->mflags3 & M3_COVETOUS))
+#define infravision(ptr) (((ptr)->mflags3 & M3_INFRAVISION))
+#define infravisible(ptr) (((ptr)->mflags3 & M3_INFRAVISIBLE))
 #define is_displacer(ptr) (((ptr)->mflags3 & M3_DISPLACES) != 0L)
 #define is_mplayer(ptr) \
     (((ptr) >= &mons[PM_ARCHEOLOGIST]) && ((ptr) <= &mons[PM_WIZARD]))

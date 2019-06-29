@@ -1,4 +1,4 @@
-/* NetHack 3.6	winfuncs.c	$NHDT-Date: 1433806596 2015/06/08 23:36:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	winfuncs.c	$NHDT-Date: 1553895320 2019/03/29 21:35:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2131,13 +2131,13 @@ void
 amii_cliparound(x, y)
 register int x, y;
 {
-    extern boolean restoring;
 #ifdef CLIPPING
     int oldx = clipx, oldy = clipy;
     int oldxmax = clipxmax, oldymax = clipymax;
     int COx, LIx;
 #define SCROLLCNT 1            /* Get there in 3 moves... */
     int scrollcnt = SCROLLCNT; /* ...or 1 if we changed level */
+
     if (!clipping) /* And 1 in anycase, cleaner, simpler, quicker */
         return;
 
@@ -2306,8 +2306,7 @@ register int x, y;
                 clipymax += incy;
 
                 /* Draw the exposed portion */
-                if (on_level(&u.uz0, &u.uz) && !restoring)
-                    (void) doredraw();
+                redraw_map();
                 flush_glyph_buffer(amii_wins[WIN_MAP]->win);
             }
         }
@@ -2317,8 +2316,7 @@ register int x, y;
         clipymax = saveymax;
         clipxmax = savexmax;
 #endif
-        if (on_level(&u.uz0, &u.uz) && !restoring && moves > 1)
-            (void) doredraw();
+        redraw_map();
         flush_glyph_buffer(amii_wins[WIN_MAP]->win);
     }
     reclip = 0;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1524287226 2018/04/21 05:07:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1553787633 2019/03/28 15:40:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.111 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1754,7 +1754,7 @@ struct mkroom *croom;
                     struct permonst *olddata = mtmp->data;
 
                     mgender_from_permonst(mtmp, mdat);
-                    set_mon_data(mtmp, mdat, 0);
+                    set_mon_data(mtmp, mdat);
                     if (emits_light(olddata) != emits_light(mtmp->data)) {
                         /* used to give light, now doesn't, or vice versa,
                            or light's range has changed */
@@ -2044,17 +2044,23 @@ struct mkroom *croom;
            might be short-circuited if a monster brings object to hero) */
         if (Is_mineend_level(&u.uz)) {
             if (otmp->otyp == iflags.mines_prize_type) {
-                otmp->record_achieve_special = MINES_PRIZE;
-                if (++mines_prize_count > 1)
-                    impossible(prize_warning, "mines end");
+                if (!mines_prize_count++) {
+                    /* Note: the first luckstone on lev will become the prize
+                             even if its not the explicit one, but random */
+                    otmp->record_achieve_special = MINES_PRIZE;
+                    /* prevent stacking; cleared when achievement is recorded */
+                    otmp->nomerge = 1;
+                }
             }
         } else if (Is_sokoend_level(&u.uz)) {
             if (otmp->otyp == iflags.soko_prize_type1) {
                 otmp->record_achieve_special = SOKO_PRIZE1;
+                otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
                 if (++soko_prize_count > 1)
                     impossible(prize_warning, "sokoban end");
             } else if (otmp->otyp == iflags.soko_prize_type2) {
                 otmp->record_achieve_special = SOKO_PRIZE2;
+                otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
                 if (++soko_prize_count > 1)
                     impossible(prize_warning, "sokoban end");
             }
@@ -4707,13 +4713,16 @@ struct sp_coder *coder;
 {
     static const char nhFunc[] = "spo_drawbridge";
     xchar x, y;
+    int dopen;
     struct opvar *dir, *db_open, *dcoord;
 
     if (!OV_pop_i(dir) || !OV_pop_i(db_open) || !OV_pop_c(dcoord))
         return;
 
     get_location_coord(&x, &y, DRY | WET | HOT, coder->croom, OV_i(dcoord));
-    if (!create_drawbridge(x, y, OV_i(dir), OV_i(db_open)))
+    if ((dopen = OV_i(db_open)) == -1)
+        dopen = !rn2(2);
+    if (!create_drawbridge(x, y, OV_i(dir), dopen ? TRUE : FALSE))
         impossible("Cannot create drawbridge.");
     SpLev_Map[x][y] = 1;
 

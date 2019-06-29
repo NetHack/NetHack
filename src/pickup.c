@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1543188989 2018/11/25 23:36:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1559675617 2019/06/04 19:13:37 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.228 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -187,7 +187,7 @@ int *menu_on_demand;
         const char *where = 0;
         char sym, oc_of_sym, *p;
 
-    ask_again:
+ ask_again:
         oclasses[oclassct = 0] = '\0';
         *one_at_a_time = *everything = FALSE;
         not_everything = filtered = FALSE;
@@ -408,8 +408,8 @@ struct obj *obj;
                           ? TRUE : FALSE)
                        : TRUE; /* catchall: no filters specified, so accept */
 
-    if (Role_if(PM_PRIEST))
-        obj->bknown = TRUE;
+    if (Role_if(PM_PRIEST) && !obj->bknown)
+        set_bknown(obj, 1);
 
     /*
      * There are three types of filters possible and the first and
@@ -586,7 +586,7 @@ int what; /* should be a long */
                               &pick_list, PICK_ANY, all_but_uchain);
         }
 
-    menu_pickup:
+ menu_pickup:
         n_tried = n;
         for (n_picked = i = 0; i < n; i++) {
             res = pickup_object(pick_list[i].item.a_obj, pick_list[i].count,
@@ -690,7 +690,7 @@ int what; /* should be a long */
                 break;
             n_picked += res;
         }
-    end_query:
+ end_query:
         ; /* statement required after label */
     }
 
@@ -899,6 +899,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
                 && will_feel_cockatrice(curr, FALSE)) {
                 destroy_nhwindow(win); /* stop the menu and revert */
                 (void) look_here(0, FALSE);
+                unsortloot(&sortedolist);
                 return 0;
             }
             if ((*allow)(curr)) {
@@ -914,7 +915,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
                 }
 
                 any.a_obj = curr;
-                add_menu(win, obj_to_glyph(curr), &any,
+                add_menu(win, obj_to_glyph(curr, rn2_on_display_rng), &any,
                          (qflags & USE_INVLET) ? curr->invlet
                            : (first && curr->oclass == COIN_CLASS) ? '$' : 0,
                          def_oc_syms[(int) objects[curr->otyp].oc_class].sym,
@@ -939,7 +940,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
         fake_hero_object = zeroobj;
         fake_hero_object.quan = 1L; /* not strictly necessary... */
         any.a_obj = &fake_hero_object;
-        add_menu(win, mon_to_glyph(&youmonst), &any,
+        add_menu(win, mon_to_glyph(&youmonst, rn2_on_display_rng), &any,
                  /* fake inventory letter, no group accelerator */
                  CONTAINED_SYM, 0, ATR_NONE, an(self_lookat(buf)),
                  MENU_UNSELECTED);
@@ -1703,7 +1704,7 @@ int cindex, ccount; /* index of this container (1..N), number of them (N) */
         cobj->lknown = 1;
         return 0;
     }
-    cobj->lknown = 1;
+    cobj->lknown = 1; /* floor container, so no need for update_inventory() */
 
     if (cobj->otyp == BAG_OF_TRICKS) {
         int tmp;
@@ -1938,8 +1939,7 @@ reverse_loot()
         if (g_at(x, y))
             pline("Ok, now there is loot here.");
     } else {
-        /* find original coffers chest if present, otherwise use nearest one
-         */
+        /* find original coffers chest if present, otherwise use nearest one */
         otmp = 0;
         for (coffers = fobj; coffers; coffers = coffers->nobj)
             if (coffers->otyp == CHEST) {
@@ -2023,6 +2023,7 @@ boolean *prev_loot;
             }
             otmp = hold_another_object(otmp, "You drop %s!", doname(otmp),
                                        (const char *) 0);
+            nhUse(otmp);
             timepassed = rnd(3);
             if (prev_loot)
                 *prev_loot = TRUE;
@@ -2112,7 +2113,7 @@ register struct obj *obj;
               Icebox ? "refrigerate" : "stash", something);
         return 0;
     } else if ((obj->otyp == LOADSTONE) && obj->cursed) {
-        obj->bknown = 1;
+        set_bknown(obj, 1);
         pline_The("stone%s won't leave your person.", plur(obj->quan));
         return 0;
     } else if (obj->otyp == AMULET_OF_YENDOR
@@ -2200,6 +2201,19 @@ register struct obj *obj;
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);
         obfree(obj, (struct obj *) 0);
+        /* if carried, shop goods will be flagged 'unpaid' and obfree() will
+           handle bill issues, but if on floor, we need to put them on bill
+           before deleting them (non-shop items will be flagged 'no_charge') */
+        if (floor_container
+            && costly_spot(current_container->ox, current_container->oy)) {
+            struct obj save_no_charge;
+
+            save_no_charge.no_charge = current_container->no_charge;
+            addtobill(current_container, FALSE, FALSE, FALSE);
+            /* addtobill() clears no charge; we need to set it back
+               so that useupf() doesn't double bill */
+            current_container->no_charge = save_no_charge.no_charge;
+        }
         delete_contents(current_container);
         if (!floor_container)
             useup(current_container);
@@ -2479,16 +2493,19 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
     if (!u_handsy())
         return 0;
 
+    if (!obj->lknown) { /* do this in advance */
+        obj->lknown = 1;
+        if (held)
+            update_inventory();
+    }
     if (obj->olocked) {
         pline("%s locked.", Tobjnam(obj, "are"));
         if (held)
             You("must put it down to unlock.");
-        obj->lknown = 1;
         return 0;
     } else if (obj->otrapped) {
         if (held)
             You("open %s...", the(xname(obj)));
-        obj->lknown = 1;
         (void) chest_trap(obj, HAND, FALSE);
         /* even if the trap fails, you've used up this turn */
         if (multi >= 0) { /* in case we didn't become paralyzed */
@@ -2499,7 +2516,6 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         abort_looting = TRUE;
         return 1;
     }
-    obj->lknown = 1;
 
     current_container = obj; /* for use by in/out_container */
     /*
@@ -2555,7 +2571,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
      * or
      * <The/Your/Shk's container> is empty.  Do what with it? [:irs nq or ?]
      */
-    for (;;) { /* repeats iff '?' or ":' gets chosen */
+    for (;;) { /* repeats iff '?' or ':' gets chosen */
         outmaybe = (outokay || !current_container->cknown);
         if (!outmaybe)
             (void) safe_qbuf(qbuf, (char *) 0, " is empty.  Do what with it?",
@@ -2683,7 +2699,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         }
     }
 
-containerdone:
+ containerdone:
     if (used) {
         /* Not completely correct; if we put something in without knowing
            whatever was already inside, now we suddenly do.  That can't
@@ -3091,7 +3107,11 @@ struct obj *box; /* or bag */
     /* caveat: this assumes that cknown, lknown, olocked, and otrapped
        fields haven't been overloaded to mean something special for the
        non-standard "container" horn of plenty */
-    box->lknown = 1;
+    if (!box->lknown) {
+        box->lknown = 1;
+        if (carried(box))
+            update_inventory(); /* jumping the gun slightly; hope that's ok */
+    }
     if (box->olocked) {
         pline("It's locked.");
     } else if (box->otrapped) {
@@ -3188,7 +3208,7 @@ struct obj *box; /* or bag */
 
             if (highdrop) {
                 /* might break or fall down stairs; handles altars itself */
-                hitfloor(otmp);
+                hitfloor(otmp, TRUE);
             } else {
                 if (altarizing) {
                     doaltarobj(otmp);
@@ -3212,6 +3232,8 @@ struct obj *box; /* or bag */
         if (held)
             (void) encumber_msg();
     }
+    if (carried(box)) /* box is now empty with cknown set */
+        update_inventory();
 }
 
 /*pickup.c*/

@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1447728911 2015/11/17 02:55:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1559601008 2019/06/03 22:30:08 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -526,9 +526,21 @@ typedef unsigned char uchar;
  * probably not useful for normal play */
 /* #define EXTRA_SANITY_CHECKS */
 
-/* EDIT_GETLIN makes the string input in TTY, Qt4, and X11
-   so some prompts will remember the previously input text
-   (within the same session) */
+/* BREADCRUMBS employs the use of predefined compiler macros
+ * __FUNCTION__ and __LINE__ to store some caller breadcrumbs
+ * for use during heavy debugging sessions. Only define if your
+ * compiler supports those predefined macros and you are debugging */
+/* #define BREADCRUMBS */
+
+/* EDIT_GETLIN makes the string input in TTY, curses, Qt4, and X11
+   for some prompts be pre-loaded with previously input text (from
+   a previous instance of the same prompt) as the default response.
+   In some cases, the previous instance can only be within the same
+   session; in others, such as #annotate, the previous input can be
+   from any session because the response is saved and restored with
+   the map.  The 'edit' capability is just <delete> or <backspace>
+   to strip off characters at the end, or <escape> to discard the
+   whole thing, then type a new end for the text. */
 /* #define EDIT_GETLIN */
 
 /* #define DUMPLOG */  /* End-of-game dump logs */
@@ -556,6 +568,7 @@ typedef unsigned char uchar;
 
 #endif
 
+#define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 
 /* End of Section 4 */
 

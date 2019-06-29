@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1524931557 2018/04/28 16:05:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1554215932 2019/04/02 14:38:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -83,6 +83,7 @@ static void NDECL(check_and_set_font);
 static boolean NDECL(check_font_widths);
 static void NDECL(set_known_good_console_font);
 static void NDECL(restore_original_console_font);
+extern void NDECL(safe_routines);
 
 /* Win32 Screen buffer,coordinate,console I/O information */
 COORD ntcoord;
@@ -411,6 +412,13 @@ int mode; // unused
     CO = console.width;
 
     really_move_cursor();
+}
+
+void
+nttty_exit()
+{
+    /* go back to using the safe routines */
+    safe_routines();
 }
 
 int
@@ -792,6 +800,12 @@ has_color(int color)
 #endif
     else
         return 0;
+}
+
+int
+term_attr_fixup(int attrmask)
+{
+    return attrmask;
 }
 
 void
@@ -1701,6 +1715,7 @@ void set_cp_map()
     }
 }
 
+#if 0
 /* early_raw_print() is used during early game intialization prior to the
  * setting up of the windowing system.  This allows early errors and panics
  * to have there messages displayed.
@@ -1760,8 +1775,10 @@ void early_raw_print(const char *s)
     SetConsoleCursorPosition(console.hConOut, console.cursor);
 
 }
+#endif
 
-/* nethack_enter_nttty() is the first thing that is called from main.
+/* nethack_enter_nttty() is the first thing that is called from main
+ * once the tty port is confirmed.
  *
  * We initialize all console state to support rendering to the console
  * through out flipping support at this time.  This allows us to support
@@ -1787,9 +1804,10 @@ void early_raw_print(const char *s)
 
 void nethack_enter_nttty()
 {
+#if 0
     /* set up state needed by early_raw_print() */
     windowprocs.win_raw_print = early_raw_print;
-
+#endif
     console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
     nhassert(console.hConOut != NULL); // NOTE: this assert will not print
 

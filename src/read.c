@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1526728750 2018/05/19 11:19:10 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1561485713 2019/06/25 18:01:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.172 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1285,6 +1285,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 /* gold isn't subject to cursing and blessing */
                 if (obj->oclass == COIN_CLASS)
                     continue;
+                /* hide current scroll from itself so that perm_invent won't
+                   show known blessed scroll losing bknown when confused */
+                if (obj == sobj && obj->quan == 1L)
+                    continue;
                 wornmask = (obj->owornmask & ~(W_BALL | W_ART | W_ARTI));
                 if (wornmask && !sblessed) {
                     /* handle a couple of special cases; we don't
@@ -2387,12 +2391,14 @@ unpunish()
 {
     struct obj *savechain = uchain;
 
+    /* chain goes away */
     obj_extract_self(uchain);
     newsym(uchain->ox, uchain->oy);
-    setworn((struct obj *) 0, W_CHAIN);
+    setworn((struct obj *) 0, W_CHAIN); /* sets 'uchain' to Null */
     dealloc_obj(savechain);
+    /* ball persists */
     uball->spe = 0;
-    setworn((struct obj *) 0, W_BALL);
+    setworn((struct obj *) 0, W_BALL); /* sets 'uball' to Null */
 }
 
 /* some creatures have special data structures that only make sense in their
@@ -2430,7 +2436,7 @@ struct _create_particular_data {
     char monclass;
     boolean randmonst;
     boolean maketame, makepeaceful, makehostile;
-    boolean sleeping, saddled, invisible;
+    boolean sleeping, saddled, invisible, hidden;
 };
 
 boolean
@@ -2446,7 +2452,7 @@ struct _create_particular_data *d;
     d->fem = -1; /* gender not specified */
     d->randmonst = FALSE;
     d->maketame = d->makepeaceful = d->makehostile = FALSE;
-    d->sleeping = d->saddled = d->invisible = FALSE;
+    d->sleeping = d->saddled = d->invisible = d->hidden = FALSE;
 
     if ((tmpp = strstri(bufp, "saddled ")) != 0) {
         d->saddled = TRUE;
@@ -2459,6 +2465,10 @@ struct _create_particular_data *d;
     if ((tmpp = strstri(bufp, "invisible ")) != 0) {
         d->invisible = TRUE;
         (void) memset(tmpp, ' ', sizeof "invisible " - 1);
+    }
+    if ((tmpp = strstri(bufp, "hidden ")) != 0) {
+        d->hidden = TRUE;
+        (void) memset(tmpp, ' ', sizeof "hidden " - 1);
     }
     /* check "female" before "male" to avoid false hit mid-word */
     if ((tmpp = strstri(bufp, "female ")) != 0) {
@@ -2490,8 +2500,17 @@ struct _create_particular_data *d;
     if (d->which >= LOW_PM)
         return TRUE; /* got one */
     d->monclass = name_to_monclass(bufp, &d->which);
+
     if (d->which >= LOW_PM) {
         d->monclass = MAXMCLASSES; /* matters below */
+        return TRUE;
+    } else if (d->monclass == S_invisible) { /* not an actual monster class */
+        d->which = PM_STALKER;
+        d->monclass = MAXMCLASSES;
+        return TRUE;
+    } else if (d->monclass == S_WORM_TAIL) { /* empty monster class */
+        d->which = PM_LONG_WORM;
+        d->monclass = MAXMCLASSES;
         return TRUE;
     } else if (d->monclass > 0) {
         d->which = urole.malenum; /* reset from NON_PM */
@@ -2505,13 +2524,14 @@ create_particular_creation(d)
 struct _create_particular_data *d;
 {
     struct permonst *whichpm = NULL;
-    int i, firstchoice = NON_PM;
+    int i, mx, my, firstchoice = NON_PM;
     struct monst *mtmp;
     boolean madeany = FALSE;
 
     if (!d->randmonst) {
         firstchoice = d->which;
-        if (cant_revive(&d->which, FALSE, (struct obj *) 0)) {
+        if (cant_revive(&d->which, FALSE, (struct obj *) 0)
+            && firstchoice != PM_LONG_WORM_TAIL) {
             /* wizard mode can override handling of special monsters */
             char buf[BUFSZ];
 
@@ -2535,6 +2555,7 @@ struct _create_particular_data *d;
             /* otherwise try again */
             continue;
         }
+        mx = mtmp->mx, my = mtmp->my;
         /* 'is_FOO()' ought to be called 'always_FOO()' */
         if (d->fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data))
             mtmp->female = d->fem; /* ignored for is_neuter() */
@@ -2551,15 +2572,33 @@ struct _create_particular_data *d;
             put_saddle_on_mon(otmp, mtmp);
         }
         if (d->invisible) {
-            int mx = mtmp->mx, my = mtmp->my;
             mon_set_minvis(mtmp);
             if (does_block(mx, my, &levl[mx][my]))
                 block_point(mx, my);
             else
                 unblock_point(mx, my);
         }
+       if (d->hidden
+           && ((is_hider(mtmp->data) && mtmp->data->mlet != S_MIMIC)
+               || (hides_under(mtmp->data) && OBJ_AT(mx, my))
+               || (mtmp->data->mlet == S_EEL && is_pool(mx, my))))
+            mtmp->mundetected = 1;
         if (d->sleeping)
             mtmp->msleeping = 1;
+        /* iff asking for 'hidden', show locaton of every created monster
+           that can't be seen--whether that's due to successfully hiding
+           or vision issues (line-of-sight, invisibility, blindness) */
+        if (d->hidden && !canspotmon(mtmp)) {
+            int count = couldsee(mx, my) ? 8 : 4;
+            char saveviz = viz_array[my][mx];
+
+            if (!flags.sparkle)
+                count /= 2;
+            viz_array[my][mx] |= (IN_SIGHT | COULD_SEE);
+            flash_glyph_at(mx, my, mon_to_glyph(mtmp, newsym_rn2), count);
+            viz_array[my][mx] = saveviz;
+            newsym(mx, my);
+        }
         madeany = TRUE;
         /* in case we got a doppelganger instead of what was asked
            for, make it start out looking like what was asked for */

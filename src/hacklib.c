@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1518922474 2018/02/18 02:54:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1552639487 2019/03/15 08:44:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -51,6 +51,8 @@
         boolean         fuzzymatch      (const char *, const char *,
                                          const char *, boolean)
         void            setrandom       (void)
+        void            init_random     (fn)
+        void            reseed_random   (fn)
         time_t          getnow          (void)
         int             getyear         (void)
         char *          yymmdd          (time_t)
@@ -168,13 +170,14 @@ char *bp;
     return bp;
 }
 
-/* remove leading and trailing whitespace, in place */
-char*
+/* skip leading whitespace; remove trailing whitespace, in place */
+char *
 trimspaces(txt)
-char* txt;
+char *txt;
 {
-    char* end;
+    char *end;
 
+    /* leading whitespace will remain in the buffer */
     while (*txt == ' ' || *txt == '\t')
         txt++;
     end = eos(txt);
@@ -848,44 +851,74 @@ extern struct tm *FDECL(localtime, (time_t *));
 #endif
 STATIC_DCL struct tm *NDECL(getlt);
 
-void
-setrandom()
+/* Sets the seed for the random number generator */
+#ifdef USE_ISAAC64
+
+static void
+set_random(seed, fn)
+unsigned long seed;
+int FDECL((*fn), (int));
 {
-    unsigned long seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+    init_isaac64(seed, fn);
+}
 
-#if defined(UNIX) || defined(VMS)
-    {
-        unsigned long pid = (unsigned long) getpid();
+#else /* USE_ISAAC64 */
 
-        /* Quick dirty band-aid to prevent PRNG prediction */
-        if (pid) {
-            if (!(pid & 3L))
-                pid -= 1L;
-            seed *= pid;
-        }
-    }
-#endif
-
+/*ARGSUSED*/
+static void
+set_random(seed, fn)
+unsigned long seed;
+int FDECL((*fn), (int)) UNUSED;
+{
     /* the types are different enough here that sweeping the different
      * routine names into one via #defines is even more confusing
      */
-#ifdef RANDOM /* srandom() from sys/share/random.c */
+# ifdef RANDOM /* srandom() from sys/share/random.c */
     srandom((unsigned int) seed);
-#else
-#if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) \
+# else
+#  if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) \
     || defined(CYGWIN32) /* system srandom() */
-#if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
+#   if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
     (void)
-#endif
+#   endif
         srandom((int) seed);
-#else
-#ifdef UNIX /* system srand48() */
+#  else
+#   ifdef UNIX /* system srand48() */
     srand48((long) seed);
-#else       /* poor quality system routine */
+#   else       /* poor quality system routine */
     srand((int) seed);
-#endif
-#endif
-#endif
+#   endif
+#  endif
+# endif
+}
+
+#endif /* USE_ISAAC64 */
+
+/* An appropriate version of this must always be provided in
+   port-specific code somewhere. It returns a number suitable
+   as seed for the random number generator */
+extern unsigned long NDECL(sys_random_seed);
+
+/*
+ * Initializes the random number generator.
+ * Only call once.
+ */
+void
+init_random(fn)
+int FDECL((*fn), (int));
+{
+    set_random(sys_random_seed(), fn);
+}
+
+/* Reshuffles the random number generator. */
+void
+reseed_random(fn)
+int FDECL((*fn), (int));
+{
+   /* only reseed if we are certain that the seed generation is unguessable
+    * by the players. */
+    if (has_strong_rngseed)
+        init_random(fn);
 }
 
 time_t

@@ -1059,8 +1059,8 @@ dochat()
         return 0;
     }
 
-    if (!mtmp || mtmp->mundetected || mtmp->m_ap_type == M_AP_FURNITURE
-        || mtmp->m_ap_type == M_AP_OBJECT)
+    if (!mtmp || mtmp->mundetected || M_AP_TYPE(mtmp) == M_AP_FURNITURE
+        || M_AP_TYPE(mtmp) == M_AP_OBJECT)
         return 0;
 
     /* sleeping monsters won't talk, except priests (who wake up) */

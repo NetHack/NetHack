@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1463706747 2016/05/20 01:12:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1546656404 2019/01/05 02:46:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -357,9 +357,13 @@ init_symbols()
 void
 update_bouldersym()
 {
-    showsyms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
-    l_syms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
-    r_syms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
+    nhsym boulder = (nhsym) iflags.bouldersym;
+
+    if (!boulder)
+        boulder = def_oc_syms[ROCK_CLASS].sym; /* (nhsym) ROCK_SYM */
+    showsyms[SYM_BOULDER + SYM_OFF_X] = boulder;
+    l_syms[SYM_BOULDER + SYM_OFF_X] = boulder;
+    r_syms[SYM_BOULDER + SYM_OFF_X] = boulder;
 }
 
 void
@@ -501,7 +505,7 @@ int nondefault;
 #endif
 # ifdef CURSES_GRAPHICS
         if (SYMHANDLING(H_CURS) && cursesgraphics_mode_callback)
-            (*cursesgraphics_mode_callback)();		
+            (*cursesgraphics_mode_callback)();
 # endif
     } else {
         init_l_symbols();

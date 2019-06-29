@@ -7,7 +7,6 @@
 
 /* #define SHELL */	/* nt use of pcsys routines caused a hang */
 
-#define RANDOM    /* have Berkeley random(3) */
 #define TEXTCOLOR /* Color text */
 
 #define EXEPATH              /* Allow .exe location to be used as HACKDIR */
@@ -25,8 +24,7 @@
                         game */
 
 #define SYSCF                /* Use a global configuration */
-#define SYSCF_FILE "sysconf" /* Use a file to hold the SYSCF configuration \
-                                */
+#define SYSCF_FILE "sysconf" /* Use a file to hold the SYSCF configuration */
 
 #define DUMPLOG      /* Enable dumplog files */
 /*#define DUMPLOG_FILE "nethack-%n-%d.log"*/
@@ -35,9 +33,8 @@
 #define USER_SOUNDS
 
 /*#define CHANGE_COLOR*/ /* allow palette changes */
-#define SELECTSAVED /* Provide menu of saved games to choose from at start \
-                       */
-
+#define SELECTSAVED /* Provide menu of saved games to choose from at start */
+ 
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.
@@ -45,6 +42,8 @@
  */
 /* #define SHORT_FILENAMES */ /* All NT filesystems support long names now
  */
+
+#define VERSION_IN_DLB_FILENAME     /* Append version digits to nhdat */
 
 #ifdef MICRO
 #undef MICRO /* never define this! */
@@ -101,6 +100,7 @@ extern void FDECL(interject, (int));
 #ifdef strcasecmp
 #undef strcasecmp
 #endif
+extern void NDECL(getlock);
 #endif
  
 #ifdef _MSC_VER
@@ -130,6 +130,9 @@ extern void FDECL(interject, (int));
 #ifdef __cplusplus
 /* suppress a warning in cppregex.cpp */
 #pragma warning(disable : 4101) /* unreferenced local variable */
+#endif
+#ifndef HAS_STDINT_H
+#define HAS_STDINT_H    /* force include of stdint.h in integer.h */
 #endif
 #endif /* _MSC_VER */
 
@@ -180,10 +183,17 @@ extern void FDECL(interject, (int));
 #include <time.h>
 
 #define USE_STDARG
-#ifdef RANDOM
+
 /* Use the high quality random number routines. */
-#define Rand() random()
+#ifdef USE_ISAAC64
+#undef RANDOM
 #else
+#define RANDOM
+#define Rand() random()
+#endif
+
+/* Fall back to C's if nothing else, but this really isn't acceptable */
+#if !defined(USE_ISAAC64) && !defined(RANDOM)
 #define Rand() rand()
 #endif
 
@@ -273,5 +283,6 @@ extern void FDECL(nhassert_failed, (const char * exp, const char * file,
 #endif
 
 #define nethack_enter(argc, argv) nethack_enter_winnt()
-
+extern void FDECL(nethack_exit, (int)) NORETURN;
+extern boolean FDECL(file_exists, (const char *));
 #endif /* NTCONF_H */

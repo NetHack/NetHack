@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1544666049 2018/12/13 01:54:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1559670610 2019/06/04 17:50:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -238,8 +238,8 @@ boolean force;      /* Quietly force this animal */
 
     /* Can the player reach and see the monster? */
     if (!mtmp || (!force && ((Blind && !Blind_telepat) || mtmp->mundetected
-                             || mtmp->m_ap_type == M_AP_FURNITURE
-                             || mtmp->m_ap_type == M_AP_OBJECT))) {
+                             || M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                             || M_AP_TYPE(mtmp) == M_AP_OBJECT))) {
         pline("I see nobody there.");
         return (FALSE);
     }
@@ -366,7 +366,7 @@ exercise_steed()
         return;
 
     /* It takes many turns of riding to exercise skill */
-    if (u.urideturns++ >= 100) {
+    if (++u.urideturns >= 100) {
         u.urideturns = 0;
         use_skill(P_RIDING, 1);
     }
@@ -525,7 +525,7 @@ int reason; /* Player was thrown off etc. */
         if (otmp && otmp->cursed) {
             You("can't.  The saddle %s cursed.",
                 otmp->bknown ? "is" : "seems to be");
-            otmp->bknown = TRUE;
+            otmp->bknown = 1; /* ok to skip set_bknown() here */
             return;
         }
         if (!have_spot) {
@@ -742,23 +742,35 @@ place_monster(mon, x, y)
 struct monst *mon;
 int x, y;
 {
+    char buf[QBUFSZ];
+
+    buf[0] = '\0';
     /* normal map bounds are <1..COLNO-1,0..ROWNO-1> but sometimes
        vault guards (either living or dead) are parked at <0,0> */
     if (!isok(x, y) && (x != 0 || y != 0 || !mon->isgd)) {
-        impossible("trying to place monster at <%d,%d>", x, y);
+        describe_level(buf);
+        impossible("trying to place monster at <%d,%d> mstate:%lx on %s",
+                    x, y, mon->mstate, buf);
         x = y = 0;
     }
     if (mon == u.usteed
         /* special case is for convoluted vault guard handling */
         || (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
-        impossible("placing %s onto map?",
-                   (mon == u.usteed) ? "steed" : "defunct monster");
+        describe_level(buf);
+        impossible("placing %s onto map, mstate:%lx, on %s?",
+                   (mon == u.usteed) ? "steed" : "defunct monster",
+                   mon->mstate, buf);
         return;
     }
-    if (level.monsters[x][y])
-        impossible("placing monster over another at <%d,%d>?", x, y);
+    if (level.monsters[x][y]) {
+        describe_level(buf);
+        impossible("placing monster over another at <%d,%d>, mstates:%lx %lx on %s?",
+                    x, y, level.monsters[x][y]->mstate, mon->mstate, buf);
+    }
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
+    mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO | MON_BUBBLEMOVE
+                     | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
 }
 
 /*steed.c*/

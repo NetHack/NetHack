@@ -362,8 +362,8 @@ dlb_main.o: dlb_main.c $(CONFIG_H) ../include/dlb.h ../include/date.h
 #	dependencies for tile utilities
 #
 TEXT_IO = tiletext.o tiletxt.o $(OALLOC) $(ONAMING)
-GIFREADERS = gifread.o $(OALLOC)
-PPMWRITERS = ppmwrite.o $(OALLOC)
+GIFREADERS = gifread.o
+PPMWRITERS = ppmwrite.o
 
 tileutils: tilemap gif2txt txt2ppm tile2x11
 

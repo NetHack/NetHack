@@ -9,6 +9,18 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="NetHackProperties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="NetHackProperties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="NetHackProperties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="NetHackProperties.props" />
+  </ImportGroup>
   <Import Project="console.props" />
   <Import Project="common.props" />
   <Import Project="dirs.props" />
@@ -19,12 +31,12 @@
   <ItemDefinitionGroup Condition="Exists('$(PDCURSES)')">
     <ClCompile>
       <AdditionalIncludeDirectories>$(PDCURSES);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-	  <PreprocessorDefinitions>CURSES_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURSES_GRAPHICS;CHTYPE_32;PDC_NCMOUSE;CURSES_DEFINE_ERASE_CHAR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-	<Link>
+    <Link>
       <AdditionalLibraryDirectories>$(ToolsDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>PDCurses.lib;%(AdditionalDependencies)</AdditionalDependencies>
-	  </Link>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -37,7 +49,7 @@
       <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;SAFEPROCS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -76,6 +88,7 @@
     <ClCompile Include="$(SrcDir)hack.c" />
     <ClCompile Include="$(SrcDir)hacklib.c" />
     <ClCompile Include="$(SrcDir)invent.c" />
+    <ClCompile Include="$(SrcDir)isaac64.c" />
     <ClCompile Include="$(SrcDir)light.c" />
     <ClCompile Include="$(SrcDir)lock.c" />
     <ClCompile Include="$(SrcDir)mail.c" />
@@ -151,7 +164,6 @@
     <ClCompile Include="$(SrcDir)zap.c" />
     <ClCompile Include="$(SysShareDir)cppregex.cpp" />
     <ClCompile Include="$(SysShareDir)nhlan.c" />
-    <ClCompile Include="$(SysShareDir)pcsys.c" />
     <ClCompile Include="$(SysShareDir)random.c" />
     <ClCompile Include="$(SysWinntDir)ntsound.c" />
     <ClCompile Include="$(SysWinntDir)nttty.c" />
@@ -195,6 +207,7 @@
     <ClInclude Include="$(IncDir)func_tab.h" />
     <ClInclude Include="$(IncDir)global.h" />
     <ClInclude Include="$(IncDir)hack.h" />
+    <ClInclude Include="$(IncDir)isaac64.h" />
     <ClInclude Include="$(IncDir)lev.h" />
     <ClInclude Include="$(IncDir)mextra.h" />
     <ClInclude Include="$(IncDir)mfndpos.h" />

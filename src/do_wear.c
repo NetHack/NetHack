@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1543745354 2018/12/02 10:09:14 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1559670603 2019/06/04 17:50:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.109 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -197,6 +197,7 @@ Boots_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_boots, uarmf->otyp);
     }
+    uarmf->known = 1; /* boots' +/- evident because of status line AC */
     return 0;
 }
 
@@ -310,6 +311,7 @@ Cloak_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_cloak, uarmc->otyp);
     }
+    uarmc->known = 1; /* cloak's +/- evident because of status line AC */
     return 0;
 }
 
@@ -425,6 +427,7 @@ Helmet_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_helmet, uarmh->otyp);
     }
+    uarmh->known = 1; /* helmet's +/- evident because of status line AC */
     return 0;
 }
 
@@ -497,6 +500,7 @@ Gloves_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_gloves, uarmg->otyp);
     }
+    uarmg->known = 1; /* gloves' +/- evident because of status line AC */
     return 0;
 }
 
@@ -572,7 +576,9 @@ STATIC_PTR int
 Shield_on(VOID_ARGS)
 {
     /* no shield currently requires special handling when put on, but we
-       keep this uncommented in case somebody adds a new one which does */
+       keep this uncommented in case somebody adds a new one which does
+       [reflection is handled by setting u.uprops[REFLECTION].extrinsic
+       in setworn() called by armor_or_accessory_on() before Shield_on()] */
     switch (uarms->otyp) {
     case SMALL_SHIELD:
     case ELVEN_SHIELD:
@@ -585,7 +591,7 @@ Shield_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_shield, uarms->otyp);
     }
-
+    uarms->known = 1; /* shield's +/- evident because of status line AC */
     return 0;
 }
 
@@ -625,7 +631,7 @@ Shirt_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_shirt, uarmu->otyp);
     }
-
+    uarmu->known = 1; /* shirt's +/- evident because of status line AC */
     return 0;
 }
 
@@ -648,14 +654,16 @@ Shirt_off(VOID_ARGS)
     return 0;
 }
 
-/* This must be done in worn.c, because one of the possible intrinsics
- * conferred is fire resistance, and we have to immediately set
- * HFire_resistance in worn.c since worn.c will check it before returning.
- */
 STATIC_PTR
 int
 Armor_on(VOID_ARGS)
 {
+    /*
+     * No suits require special handling.  Special properties conferred by
+     * suits are set up as intrinsics (actually 'extrinsics') by setworn()
+     * which is called by armor_or_accessory_on() before Armor_on().
+     */
+    uarm->known = 1; /* suit's +/- evident because of status line AC */
     return 0;
 }
 
@@ -669,7 +677,10 @@ Armor_off(VOID_ARGS)
 }
 
 /* The gone functions differ from the off functions in that if you die from
- * taking it off and have life saving, you still die.
+ * taking it off and have life saving, you still die.  [Obsolete reference
+ * to lack of fire resistance being fatal in hell (nethack 3.0) and life
+ * saving putting a removed item back on to prevent that from immediately
+ * repeating.]
  */
 int
 Armor_gone()
@@ -920,7 +931,7 @@ register struct obj *obj;
         goto adjust_attrib;
     case RIN_ADORNMENT:
         which = A_CHA;
-    adjust_attrib:
+ adjust_attrib:
         old_attrib = ACURR(which);
         ABON(which) += obj->spe;
         observable = (old_attrib != ACURR(which));
@@ -1034,7 +1045,7 @@ boolean gone;
         goto adjust_attrib;
     case RIN_ADORNMENT:
         which = A_CHA;
-    adjust_attrib:
+ adjust_attrib:
         old_attrib = ACURR(which);
         ABON(which) -= obj->spe;
         observable = (old_attrib != ACURR(which));
@@ -1082,7 +1093,7 @@ struct obj *obj;
 
 void
 Blindf_on(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     boolean already_blind = Blind, changed = FALSE;
 
@@ -1118,7 +1129,7 @@ register struct obj *otmp;
 
 void
 Blindf_off(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     boolean was_blind = Blind, changed = FALSE;
 
@@ -1220,7 +1231,8 @@ struct obj *otmp;
 }
 
 /* check whether the target object is currently being taken off,
-   so that stop_donning() and steal() can vary messages */
+   so that stop_donning() and steal() can vary messages and doname()
+   can vary "(being worn)" suffix */
 boolean
 doffing(otmp)
 struct obj *otmp;
@@ -1503,7 +1515,7 @@ doremring()
 /* Check if something worn is cursed _and_ unremovable. */
 int
 cursed(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     if (!otmp) {
         impossible("cursed without otmp");
@@ -1515,7 +1527,7 @@ register struct obj *otmp;
                               || otmp->otyp == LENSES || otmp->quan > 1L);
 
         You("can't.  %s cursed.", use_plural ? "They are" : "It is");
-        otmp->bknown = TRUE;
+        set_bknown(otmp, 1);
         return 1;
     }
     return 0;
@@ -1523,7 +1535,7 @@ register struct obj *otmp;
 
 int
 armoroff(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     register int delay = -objects[otmp->otyp].oc_delay;
 
@@ -1847,7 +1859,7 @@ struct obj *obj;
             }
             if (uarmg && uarmg->cursed) {
                 res = !uarmg->bknown;
-                uarmg->bknown = 1;
+                set_bknown(uarmg, 1);
                 You("cannot remove your gloves to put on the ring.");
                 return res; /* uses move iff we learned gloves are cursed */
             }
@@ -1902,31 +1914,46 @@ struct obj *obj;
     if (armor) {
         int delay;
 
-        obj->known = 1; /* since AC is shown on the status line */
-        /* if the armor is wielded, release it for wearing */
+        /* if the armor is wielded, release it for wearing (won't be
+           welded even if cursed; that only happens for weapons/weptools) */
         if (obj->owornmask & W_WEAPON)
             remove_worn_item(obj, FALSE);
+        /*
+         * Setting obj->known=1 is done because setworn() causes hero's AC
+         * to change so armor's +/- value is evident via the status line.
+         * We used to set it here because of that, but then it would stick
+         * if a nymph stole the armor before it was fully worn.  Delay it
+         * until the aftermv action.  The player may still know this armor's
+         * +/- amount if donning gets interrupted, but the hero won't.
+         *
+        obj->known = 1;
+         */
         setworn(obj, mask);
+        /* if there's no delay, we'll execute 'aftermv' immediately */
+        if (obj == uarm)
+            afternmv = Armor_on;
+        else if (obj == uarmh)
+            afternmv = Helmet_on;
+        else if (obj == uarmg)
+            afternmv = Gloves_on;
+        else if (obj == uarmf)
+            afternmv = Boots_on;
+        else if (obj == uarms)
+            afternmv = Shield_on;
+        else if (obj == uarmc)
+            afternmv = Cloak_on;
+        else if (obj == uarmu)
+            afternmv = Shirt_on;
+        else
+            panic("wearing armor not worn as armor? [%08lx]", obj->owornmask);
+
         delay = -objects[obj->otyp].oc_delay;
         if (delay) {
             nomul(delay);
             multi_reason = "dressing up";
-            if (is_boots(obj))
-                afternmv = Boots_on;
-            if (is_helmet(obj))
-                afternmv = Helmet_on;
-            if (is_gloves(obj))
-                afternmv = Gloves_on;
-            if (obj == uarm)
-                afternmv = Armor_on;
             nomovemsg = "You finish your dressing maneuver.";
         } else {
-            if (is_cloak(obj))
-                (void) Cloak_on();
-            if (is_shield(obj))
-                (void) Shield_on();
-            if (is_shirt(obj))
-                (void) Shirt_on();
+            unmul(""); /* call (*aftermv)(), clear it+nomovemsg+multi_reason */
             on_msg(obj);
         }
         context.takeoff.mask = context.takeoff.what = 0L;
@@ -2222,7 +2249,7 @@ register struct obj *otmp;
         }
         if (why) {
             You("cannot %s to remove the ring.", buf);
-            why->bknown = TRUE;
+            set_bknown(why, 1);
             return 0;
         }
     }
@@ -2231,7 +2258,7 @@ register struct obj *otmp;
         if (welded(uwep)) {
             You("are unable to take off your %s while wielding that %s.",
                 c_gloves, is_sword(uwep) ? c_sword : c_weapon);
-            uwep->bknown = TRUE;
+            set_bknown(uwep, 1);
             return 0;
         } else if (Glib) {
             You_cant("take off the slippery %s with your slippery %s.",
@@ -2269,7 +2296,7 @@ register struct obj *otmp;
         }
         if (why) {
             You("cannot %s to take off %s.", buf, the(xname(otmp)));
-            why->bknown = TRUE;
+            set_bknown(why, 1);
             return 0;
         }
     }

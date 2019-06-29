@@ -1,0 +1,217 @@
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.78 $ $NHDT-Date: 1561766416 2019/06/29 00:00:16 $
+
+This fixes36.3 file is here to capture information about updates in the 3.6.x
+lineage following the release of 3.6.2 in May 2019. Please note, however,
+that another 3.6.x release is not anticipated, and most developer
+focus will shift to the next major release.
+
+General Fixes and Modified Features
+-----------------------------------
+when place_object() puts a non-boulder on the map at a spot which contains
+	other objects, put it under all boulders in the pile rather than just
+	under the top one; previously, map wasn't showing a boulder there if
+	the top one got moved by means other than pushing
+when examining the map with '/' or ';', picking a symbol which is used for
+	more than 4 things yielded a sentence lacking its terminating period
+billing and payment issue as a result of glob coalescing
+glob pricing did not consider weight properly
+glob shop interaction improved to handle more of the expected scenarios
+non-flying steed on Plane of Water would drown when air bubble moved hero
+xans fly, but could not reach your feet if you flew
+adjust vortex database entry to be consistent with fire and energy vortices
+when co-located with a boulder you could sometimes swap places with pets of
+	any size
+on rare occasions, multiple mine's end luckstones were being marked as the
+	prize and triggering an impossible() on a public server
+make sure the correct luckstone is the prize in mine's end
+free dungeon overview's bones information at end of game
+free current level's bones information at end of game
+free ball and chain if Punished hero dies while descending stairs or dies or
+	quits while swallowed; put ball and chain in bones for the stairs case
+if hero dies while a thrown or kicked object is in transit, put that object
+	on the map in case bones data gets saved
+fix a memory leak that occurred if player used wizard mode to leave and return
+	to the Plane of Air or Plane of Water (not possible in normal play)
+free sortloot data if object handling is short-circuited by cockatrice corpse
+on the Plane of Water, make water go all the way to the edges of the level
+on the Plane of Air, make clouds disrupt line of sight along the edges
+have '&' (whatdoes) command describe movement keystrokes instead of reporting
+	them as unknown or showing their number_pad action when that is Off
+some improvement to the handling of endgame levels filling up with monsters
+if you survive turning into green slime due to life-saving (surviving as a
+	green slime) then die again due to green slimes having been genocided,
+	the feedback was strange because it assumed that the prior message
+	came from answering No to "Really die?" in explore or wizard mode
+various cases where objects had their bless/curse state become known weren't
+	updating persistent inventory window, when enabled, to reflect changes
+	(cited case was trying to remove cursed armor and being told of the
+	curse but there were lots of other situations with the same issue)
+similar perm_invent issue when lock state known and/or contents known become
+	set for carried container
+blessed scroll of remove curse read while confused might be shown to operate
+	on itself by perm_invent after player is told that it has disappeared
+fix memory leak if corpse auto-revival attempt failed ("you feel less hassled")
+allow a parent function to issue an an unplacebc() call that restricts
+	subsequent placebc() calls to that parent only
+flying monsters could enter water on the Plane of Water but then they'd drown
+	unless they could also swim or else didn't need to breathe
+when finding a place to put a monster on the Plane of Water, don't pick a
+	water location for flyers or floaters (levitate) or clingers (ceiling)
+#turn worked when unable to speak despite "you chant an arcane formula"
+#turn implicitly required sight due to wrong check for avoiding spanning walls
+thrown or kicked light source (lit lamp, candle, oil) should emit light as it
+	traverses the map; dungeon features, objects, or monsters seen while
+	it's in transit will become part of hero's memory of the level, and
+	any messages delivered won't have stale light from it around the hero
+unlike watching a monster trying to swap out a cursed weapon for some other
+	weapon and failing, watching it wield a cursed weapon didn't report
+	that weapon becoming welded to the monster's hand/claw/whatever
+accept "hidden" as an attribute for wizard mode ^G monster creation; created
+	monsters which can't be seen will have their locations highlighted
+don't give feedback for monster zapping a wand if a monster plays a fire horn
+	directed at self to burn away slime
+if hero knows the number of charges in a wand or magical horn and a monster
+	acquires it and zaps/plays it when not in view, remove the hero's
+	memory of the number of charges
+for wizard mode 'monpolycontrol', allow usually disallowed type 'chameleon',
+	'doppelganger', or 'sandestin' as answer to "change <monster> @ <x,y>
+	into what?" prompt when <monster> is really that type of creature
+add Space, Return, and Escape to '? k' (help for menu control keys)
+hero can no longer negotiate a bribe with a demon lord when deaf
+wishing for "foo amulet" now yields an "amulet of foo" rather than random one
+code in parse_conf_file() to trim trailing blanks/cr was skipping over them
+partly eaten food with one bite left had message anomalies when eaten; the
+	usual "you resume your meal" case lacked the "you're finished" message
+	when done; eating something else in between to clobber meal context
+	resulted in no messages at all when restarting and finishing last bite
+wizard mode ^I menu could list "Not carrying anything" after inventory items
+	if perm_invent option was On (even on tty where that's not supported)
+wizard mode ^I with 'perm_invent' On would unintentionally filter the content
+	of the persistent inventory window to unIDed items if any item got
+	chosen to be identified (^R would fix it, as would any invent change)
+change #adjust to treat carrying only gold as not having anything to adjust
+saving bones with 'perm_invent' On could result in "Bad fruit #N" warnings
+update persistent inventory window immediately if 'sortpack' option is toggled
+
+
+Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
+------------------------------------------------------------------
+elemental_clog() loop needed to guard against obliteration of the monster
+	that was trying to be placed
+using ^G to create "hidden mimic" shouldn't have marked it as undetected since
+	mimics 'hide' be appearing to be something else; honor "hidden" for
+	'hides_under' creatures if/when created at location with object(s),
+	also for eels and other fish if/when created at water location
+for wizard mode 'wizweight' option, glob weight wasn't shown unless glob had
+	shop price information attached
+fix for feedback when a monster plays a fire horn at self to cure green slime
+	ended up being used for zapping a wand of fire at self too
+wizard mode ^I "not carrying anything" still claimed "not carrying anything"
+	if "(all items are already identified)" was given
+curses: sometimes the message window would show a blank line after a prompt
+curses: the change to show map in columns 1..79 instead of 2..80 made the
+	highlight for '@' show up in the wrong place if clipped map had been
+	panned horizontally
+tty: revert the attempt to fix "message line anomaly: if autodecribe feedback
+	wrapped to second line, the wrapped portion wasn't erased when a
+	shorter line was shown or getpos was dismissed" because it disrupted
+	prompts that spanned more than one line, a more significant issue
+
+
+Platform- and/or Interface-Specific Fixes or Features
+-----------------------------------------------------
+EDIT_GETLIN: wizard mode 'monpolycontrol' was using the getlin() answer buffer
+	to format the coordinate portion of the "change <monster> @ <x,y> into
+	what kind of monster?" prompt, resulting in "<x,y>" as default answer
+EDIT_GETLIN: when naming an object or a monster use the existing name, if
+	there is one, as the default answer
+curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
+	but 0-9 should be reserved for counts and if the display was tall
+	enough for more than 62 entries, arbitrary ASCII punctuation got used
+curses: when all available lines in the message window are in use,
+	autodescribe feedback for 'pick a position with cursor' overwrote
+	the last line (usually the 'pick a position' prompt/hint), sometimes
+	leaving part of longer underlying line's text visible
+curses: if message window is only one line, cancelling some prompts with ESC
+	left the prompts visible on the message line instead of erasing them
+curses: support EDIT_GETLIN (but like with tty, it's disabled by default) to
+	pre-load an earlier response as the default answer for some prompts
+	(however, it's skipped if the 'popup_dialog' option is On)
+curses: when display windows get reconfigured (after setting align_status,
+	align_message, statuslines, windowborders or due to external resize),
+	the message window was being refreshed with the oldest available N
+	messages rather than most recent N.  [Still room for improvement;
+	when feasible it combines short lines, resulting in N messages on
+	fewer than N lines and leaving some of the available lines blank.]
+curses: plug memory leak when getting a line of input is cancelled by ESC
+curses: after requesting a line of input from player, next line of message
+	window could end up being skipped
+curses: don't convert ^M (or <return> or <enter> key) into ^J; both ^J and ^M
+	indicate end of input when typing a line of text but as nethack
+	commands, ^J means run toward bottom of screen (when number_pad is
+	off) and ^M is not bound to any command, so accidental <return> won't
+	cause the hero to try to move
+curses: draw map in screen columns 1..79 like tty, rather than in 2..80
+curses: make text windows wider so that help feedback is more readable
+curses: using ':' for search string matching to toggle menu items in a multple
+	page menu would highlight arbitrary items on the currently visible
+	page in sync with the lines that matching items had on other pages
+curses: when map window was clipped, the 'scrollbars' shown to indicate which
+	part of the map was in view didn't work as intended, always drawing
+	"*--------------" for horizontal (and comparable '*' with multiple '|'
+	underneath for vertical) when it meant to show "---******------" if
+	the 2nd and 3rd fifths (for example) were currently within view
+curses: support users's setting for erase char and kill char when getting a
+	line of input with 'popup_dialog' Off (already supported for popup On)
+curses+'perm_invent': entries were wrapping without any control; usually not
+	noticeable because next entry overwrote, but visible for final entry
+	when whole inventory fit within the available height; looked ok with
+	borders Off but clearly wrong for borders On
+curses+'perm_invent': if too many entries for window height, last one which
+	fit had the next one appended (including hightlighted selector letter)
+	when window borders were Off
+curses+'perm_invent': top line was wasted (left blank) when borders Off
+curses+'perm_invent': don't highlight inventory letters since nothing is
+	selectable from the menu comprising the persistent inventory window
+curses+'popup_dialog': show the text cursor at the end of prompts for single
+	character input
+curses+EDIT_GETLIN: when a prompt's answer was preloaded, using ESC to discard
+	it deleted it from the answer buffer but didn't erase it from screen
+curses+EDIT_GETLIN: the preceding fix handled an answer which spanned more
+	than one line but didn't remove the answer properly if the prompt
+	portion of prompt+answer spanned more than one line
+tty: re-do one optimization used when status conditions have all been removed
+	and remove another that tried to check whether condition text to be
+	displayed next was the same as the existing value; sometimes new
+	status condition wouldn't be shown unless a screen redraw was forced
+tty: take two, if/when autodecribe feedback wraps past top line, clear
+	continuation lines and redraw map if needed when top line is cleared
+	['exposed by git' section has an entry for reversal of 'take one']
+Windows: some startup error messages were not being delivered successfully
+
+
+General New Features
+--------------------
+classify sources as released, beta, or work-in-progress via NH_DEVEL_STATUS
+	rather than just released vs beta via BETA
+if you reach the edge of a level (relatively uncommon) and try to move off,
+	report that you can't go farther if the 'mention_walls' option is set
+wizard-mode: display effect to show where an unseen wished-for monster landed
+curses: enable latent mouse support
+curses: give menus and text windows a minimum size of 5x25 since tiny ones can
+	sometimes be overlooked when shown over old messages rather than map
+curses+'perm_invent': since persistent inventory is narrow, strip off "a",
+	"an", or "the" prefix on inventory entries shown there so that a tiny
+	bit more of the interesting portion is visible
+
+
+NetHack Community Patches (or Variation) Included
+-------------------------------------------------
+add a couple of engraving suggestions in pull request #79
+
+
+Code Cleanup and Reorganization
+-------------------------------
+began to add some function caller BREADCRUMBS to aid debugging
+
+

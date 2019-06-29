@@ -7,7 +7,7 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursinit.h"
-#include "patchlevel.h"
+/*#include "patchlevel.h"*/
 
 #include <ctype.h>
 
@@ -59,11 +59,13 @@ nhrgb orig_hiwhite;
 "|_| \\_| \\___| \\__||_|  |_| \\__,_| \\___||_|\\_\\"
 
 
-/* win* is size and placement of window to change, x/y/w/h is baseline which can
-   decrease depending on alignment of win* in orientation.
-   Negative minh/minw: as much as possible, but at least as much as specified. */
+/* win* is size and placement of window to change, x/y/w/h is baseline
+   which can decrease depending on alignment of win* in orientation.
+   Negative minh/minw: as much as possible, but at least as much as
+   specified. */
 static void
-set_window_position(int *winx, int *winy, int *winw, int *winh, int orientation,
+set_window_position(int *winx, int *winy, int *winw, int *winh,
+                    int orientation,
                     int *x, int *y, int *w, int *h, int border_space,
                     int minh, int minw)
 {
@@ -105,8 +107,7 @@ set_window_position(int *winx, int *winy, int *winw, int *winh, int orientation,
     }
 }
 
-/* Create the "main" nonvolitile windows used by nethack */
-
+/* Create the "main" nonvolatile windows used by nethack */
 void
 curses_create_main_windows()
 {
@@ -118,21 +119,18 @@ curses_create_main_windows()
     boolean borders = FALSE;
 
     switch (iflags.wc2_windowborders) {
+    case 0:                     /* Off */
+        borders = FALSE;
+        break;
     case 1:                     /* On */
         borders = TRUE;
         break;
-    case 2:                     /* Off */
-        borders = FALSE;
-        break;
-    case 3:                     /* Auto */
-        if ((term_cols > 81) && (term_rows > 25)) {
-            borders = TRUE;
-        }
+    case 2:                     /* Auto */
+        borders = (term_cols > 81 && term_rows > 25);
         break;
     default:
         borders = FALSE;
     }
-
 
     if (borders) {
         border_space = 2;
@@ -144,43 +142,53 @@ curses_create_main_windows()
     }
 
     /* Determine status window orientation */
-    if (!iflags.wc_align_status || (iflags.wc_align_status == ALIGN_TOP)
-        || (iflags.wc_align_status == ALIGN_BOTTOM)) {
-        if (!iflags.wc_align_status) {
-            iflags.wc_align_status = ALIGN_BOTTOM;
-        }
+    if (!iflags.wc_align_status)
+        iflags.wc_align_status = ALIGN_BOTTOM;
+    if (iflags.wc_align_status == ALIGN_TOP
+        || iflags.wc_align_status == ALIGN_BOTTOM) {
         status_orientation = iflags.wc_align_status;
-    } else {                    /* left or right alignment */
-
-        /* Max space for player name and title horizontally */
-        if ((hspace >= 26) && (term_rows >= 24)) {
+    } else { /* left or right alignment */
+        /*
+         * Max space for player name and title horizontally.
+         * [Width of 26 gives enough room for a 24 character
+         * hitpoint bar (horizontal layout uses 30 for that) and
+         * can accommodate widest field ("Experience  : 30/123456789")
+         * other than title without truncating anything.
+         * Height originally required at least 24 lines, but 21
+         * suffices and 20 can be made to work by suppressing score.]
+         */
+        if (hspace >= 26 && term_rows >= 20) {
             status_orientation = iflags.wc_align_status;
             hspace -= (26 + border_space);
         } else {
+            /* orientation won't match option setting, making 'O' command's
+               list of settings seem inaccurate; but leaving the requested
+               setting in iflags might allow it to take effect if the main
+               window gets resized */
             status_orientation = ALIGN_BOTTOM;
         }
     }
 
     /* Determine message window orientation */
-    if (!iflags.wc_align_message || (iflags.wc_align_message == ALIGN_TOP)
-        || (iflags.wc_align_message == ALIGN_BOTTOM)) {
-        if (!iflags.wc_align_message) {
-            iflags.wc_align_message = ALIGN_TOP;
-        }
+    if (!iflags.wc_align_message)
+        iflags.wc_align_message = ALIGN_TOP;
+    if (iflags.wc_align_message == ALIGN_TOP
+        || iflags.wc_align_message == ALIGN_BOTTOM) {
         message_orientation = iflags.wc_align_message;
-    } else {                    /* left or right alignment */
-
+    } else { /* left or right alignment */
         if ((hspace - border_space) >= 25) {    /* Arbitrary */
             message_orientation = iflags.wc_align_message;
         } else {
+            /* orientation won't match option setting (see above) */
             message_orientation = ALIGN_TOP;
         }
     }
 
-    /* Figure out window positions and placements. Status and message area can be aligned
-       based on configuration. The priority alignment-wise is: status > msgarea > game.
-       Define everything as taking as much space as possible and shrink/move based on
-       alignment positions. */
+    /* Figure out window positions and placements. Status and message area
+       can be aligned based on configuration. The priority alignment-wise
+       is: status > msgarea > game.
+       Define everything as taking as much space as possible and shrink/move
+       based on alignment positions. */
     {
         int message_x = 0;
         int message_y = 0;
@@ -190,7 +198,6 @@ curses_create_main_windows()
         int inv_y = 0;
         int map_x = 0;
         int map_y = 0;
-
         int message_height = 0;
         int message_width = 0;
         int status_height = 0;
@@ -199,66 +206,66 @@ curses_create_main_windows()
         int inv_width = 0;
         int map_height = (term_rows - border_space);
         int map_width = (term_cols - border_space);
-        int statusheight = 3;
-
-        boolean status_vertical = FALSE;
-        boolean msg_vertical = FALSE;
-        if (status_orientation == ALIGN_LEFT ||
-            status_orientation == ALIGN_RIGHT)
-            status_vertical = TRUE;
-        if (message_orientation == ALIGN_LEFT ||
-            message_orientation == ALIGN_RIGHT)
-            msg_vertical = TRUE;
-
-        if (iflags.statuslines < 3)
-            statusheight = 2;
+        int statusheight = (iflags.wc2_statuslines < 3) ? 2 : 3;
+        boolean status_vertical = (status_orientation == ALIGN_LEFT
+                                   || status_orientation == ALIGN_RIGHT);
+        boolean msg_vertical = (message_orientation == ALIGN_LEFT
+                                || message_orientation == ALIGN_RIGHT);
 
         /* Vertical windows have priority. Otherwise, priotity is:
            status > inv > msg */
         if (status_vertical)
-            set_window_position(&status_x, &status_y, &status_width, &status_height,
-                                status_orientation, &map_x, &map_y, &map_width, &map_height,
-                                border_space, statusheight, 26);
+            set_window_position(&status_x, &status_y,
+                                &status_width, &status_height,
+                                status_orientation,
+                                &map_x, &map_y, &map_width, &map_height,
+                                border_space, 20, 26);
 
         if (iflags.perm_invent) {
             /* Take up all width unless msgbar is also vertical. */
-            int width = -25;
-            if (msg_vertical)
-                width = 25;
+            int width = msg_vertical ? 25 : -25;
 
             set_window_position(&inv_x, &inv_y, &inv_width, &inv_height,
-                                ALIGN_RIGHT, &map_x, &map_y, &map_width, &map_height,
+                                ALIGN_RIGHT, &map_x, &map_y,
+                                &map_width, &map_height,
                                 border_space, -1, width);
         }
 
         if (msg_vertical)
-            set_window_position(&message_x, &message_y, &message_width, &message_height,
-                                message_orientation, &map_x, &map_y, &map_width, &map_height,
+            set_window_position(&message_x, &message_y,
+                                &message_width, &message_height,
+                                message_orientation,
+                                &map_x, &map_y, &map_width, &map_height,
                                 border_space, -1, -25);
 
         /* Now draw horizontal windows */
         if (!status_vertical)
-            set_window_position(&status_x, &status_y, &status_width, &status_height,
-                                status_orientation, &map_x, &map_y, &map_width, &map_height,
-                                border_space, statusheight, 26);
+            set_window_position(&status_x, &status_y,
+                                &status_width, &status_height,
+                                status_orientation,
+                                &map_x, &map_y, &map_width, &map_height,
+                                border_space, statusheight, 0);
 
         if (!msg_vertical)
-            set_window_position(&message_x, &message_y, &message_width, &message_height,
-                                message_orientation, &map_x, &map_y, &map_width, &map_height,
+            set_window_position(&message_x, &message_y,
+                                &message_width, &message_height,
+                                message_orientation,
+                                &map_x, &map_y, &map_width, &map_height,
                                 border_space, -1, -25);
 
         if (map_width > COLNO)
             map_width = COLNO;
-
         if (map_height > ROWNO)
             map_height = ROWNO;
 
         if (curses_get_nhwin(STATUS_WIN)) {
             curses_del_nhwin(STATUS_WIN);
+            /* 'count window' overlays last line of mesg win;
+               asking it to display a Null string removes it */
+            curses_count_window((char *) 0);
             curses_del_nhwin(MESSAGE_WIN);
             curses_del_nhwin(MAP_WIN);
             curses_del_nhwin(INV_WIN);
-
             clear();
         }
 
@@ -272,7 +279,8 @@ curses_create_main_windows()
             curses_add_nhwin(INV_WIN, inv_height, inv_width, inv_y, inv_x,
                              ALIGN_RIGHT, borders);
 
-        curses_add_nhwin(MAP_WIN, map_height, map_width, map_y, map_x, 0, borders);
+        curses_add_nhwin(MAP_WIN, map_height, map_width,
+                         map_y, map_x, 0, borders);
 
         refresh();
 
@@ -289,9 +297,7 @@ curses_create_main_windows()
     }
 }
 
-
 /* Initialize curses colors to colors used by NetHack */
-
 void
 curses_init_nhcolors()
 {
@@ -311,7 +317,7 @@ curses_init_nhcolors()
             int i;
             boolean hicolor = FALSE;
 
-            int clr_remap[16] = {
+            static const int clr_remap[16] = {
                 COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
                 COLOR_BLUE,
                 COLOR_MAGENTA, COLOR_CYAN, -1, COLOR_WHITE,
@@ -328,7 +334,8 @@ curses_init_nhcolors()
             if (COLORS >= 16)
                 hicolor = TRUE;
 
-            /* Work around the crazy definitions above for more background colors... */
+            /* Work around the crazy definitions above for more background
+               colors... */
             for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
                 init_pair((hicolor ? 49 : 9) + i, clr_remap[i], COLOR_GREEN);
                 init_pair((hicolor ? 65 : 33) + i, clr_remap[i], COLOR_YELLOW);
@@ -402,10 +409,8 @@ curses_init_nhcolors()
 #endif
 }
 
-
 /* Allow player to pick character's role, race, gender, and alignment.
-Borrowed from the Gnome window port. */
-
+   Borrowed from the Gnome window port. */
 void
 curses_choose_character()
 {
@@ -426,7 +431,6 @@ curses_choose_character()
     /* This part is irritating: we have to strip the choices off of
        the string and put them in a separate string in order to use
        curses_character_input_dialog for this prompt. */
-
     while (cur_character != '[') {
         cur_character = prompt[count];
         count++;
@@ -454,7 +458,6 @@ curses_choose_character()
     }
 
     /* Add capital letters as choices that aren't displayed */
-
     for (count = 0; tmpchoice[count]; count++) {
         tmpchoice[count] = toupper(tmpchoice[count]);
     }
@@ -492,7 +495,8 @@ curses_choose_character()
         pickmap = (int *) alloc(sizeof (int) * (n + 1));
         for (;;) {
             for (n = 0, i = 0; roles[i].name.m; i++) {
-                if (ok_role(i, flags.initrace, flags.initgend, flags.initalign)) {
+                if (ok_role(i, flags.initrace,
+                            flags.initgend, flags.initalign)) {
                     if (flags.initgend >= 0 && flags.female && roles[i].name.f)
                         choices[n] = roles[i].name.f;
                     else
@@ -513,8 +517,7 @@ curses_choose_character()
         }
         choices[n] = (const char *) 0;
         if (n > 1)
-            sel =
-                curses_character_dialog(choices,
+            sel = curses_character_dialog(choices,
                                         "Choose one of the following roles:");
         else
             sel = 0;
@@ -535,7 +538,7 @@ curses_choose_character()
         sel = pick_role(flags.initrace, flags.initgend,
                         flags.initalign, PICK_RANDOM);
         if (sel < 0)
-            sel = randrole();
+            sel = randrole(FALSE);
     }
 
     flags.initrole = sel;
@@ -553,7 +556,8 @@ curses_choose_character()
             /* Count the number of valid races */
             n = 0;              /* number valid */
             for (i = 0; races[i].noun; i++) {
-                if (ok_race(flags.initrole, i, flags.initgend, flags.initalign))
+                if (ok_race(flags.initrole, i,
+                            flags.initgend, flags.initalign))
                     n++;
             }
             if (n == 0) {
@@ -566,7 +570,8 @@ curses_choose_character()
             choices = (const char **) alloc(sizeof (char *) * (n + 1));
             pickmap = (int *) alloc(sizeof (int) * (n + 1));
             for (n = 0, i = 0; races[i].noun; i++) {
-                if (ok_race(flags.initrole, i, flags.initgend, flags.initalign)) {
+                if (ok_race(flags.initrole, i,
+                            flags.initgend, flags.initalign)) {
                     choices[n] = races[i].noun;
                     pickmap[n++] = i;
                 }
@@ -574,9 +579,8 @@ curses_choose_character()
             choices[n] = (const char *) 0;
             /* Permit the user to pick, if there is more than one */
             if (n > 1)
-                sel =
-                    curses_character_dialog(choices,
-                                            "Choose one of the following races:");
+                sel = curses_character_dialog(choices,
+                                        "Choose one of the following races:");
             else
                 sel = 0;
             if (sel >= 0)
@@ -612,7 +616,8 @@ curses_choose_character()
             /* Count the number of valid genders */
             n = 0;              /* number valid */
             for (i = 0; i < ROLE_GENDERS; i++) {
-                if (ok_gend(flags.initrole, flags.initrace, i, flags.initalign))
+                if (ok_gend(flags.initrole, flags.initrace,
+                            i, flags.initalign))
                     n++;
             }
             if (n == 0) {
@@ -625,7 +630,8 @@ curses_choose_character()
             choices = (const char **) alloc(sizeof (char *) * (n + 1));
             pickmap = (int *) alloc(sizeof (int) * (n + 1));
             for (n = 0, i = 0; i < ROLE_GENDERS; i++) {
-                if (ok_gend(flags.initrole, flags.initrace, i, flags.initalign)) {
+                if (ok_gend(flags.initrole, flags.initrace,
+                            i, flags.initalign)) {
                     choices[n] = genders[i].adj;
                     pickmap[n++] = i;
                 }
@@ -633,9 +639,8 @@ curses_choose_character()
             choices[n] = (const char *) 0;
             /* Permit the user to pick, if there is more than one */
             if (n > 1)
-                sel =
-                    curses_character_dialog(choices,
-                                            "Choose one of the following genders:");
+                sel = curses_character_dialog(choices,
+                                      "Choose one of the following genders:");
             else
                 sel = 0;
             if (sel >= 0)
@@ -670,7 +675,8 @@ curses_choose_character()
             /* Count the number of valid alignments */
             n = 0;              /* number valid */
             for (i = 0; i < ROLE_ALIGNS; i++) {
-                if (ok_align(flags.initrole, flags.initrace, flags.initgend, i))
+                if (ok_align(flags.initrole, flags.initrace,
+                             flags.initgend, i))
                     n++;
             }
             if (n == 0) {
@@ -682,7 +688,8 @@ curses_choose_character()
             choices = (const char **) alloc(sizeof (char *) * (n + 1));
             pickmap = (int *) alloc(sizeof (int) * (n + 1));
             for (n = 0, i = 0; i < ROLE_ALIGNS; i++) {
-                if (ok_align(flags.initrole, flags.initrace, flags.initgend, i)) {
+                if (ok_align(flags.initrole, flags.initrace,
+                             flags.initgend, i)) {
                     choices[n] = aligns[i].adj;
                     pickmap[n++] = i;
                 }
@@ -690,9 +697,8 @@ curses_choose_character()
             choices[n] = (const char *) 0;
             /* Permit the user to pick, if there is more than one */
             if (n > 1)
-                sel =
-                    curses_character_dialog(choices,
-                                            "Choose one of the following alignments:");
+                sel = curses_character_dialog(choices,
+                                   "Choose one of the following alignments:");
             else
                 sel = 0;
             if (sel >= 0)
@@ -715,9 +721,7 @@ curses_choose_character()
     }
 }
 
-
 /* Prompt user for character race, role, alignment, or gender */
-
 int
 curses_character_dialog(const char **choices, const char *prompt)
 {
@@ -770,43 +774,34 @@ curses_character_dialog(const char **choices, const char *prompt)
     return ret;
 }
 
-
 /* Initialize and display options appropriately */
-
 void
 curses_init_options()
 {
-    set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR |
-                             WC_HILITE_PET | WC_POPUP_DIALOG, SET_IN_GAME);
-
-    set_wc2_option_mod_status(WC2_GUICOLOR, SET_IN_GAME);
+    /* change these from DISP_IN_GAME to SET_IN_GAME */
+    set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS, SET_IN_GAME);
 
     /* Remove a few options that are irrelevant to this windowport */
     /*set_option_mod_status("DECgraphics", SET_IN_FILE); */
     set_option_mod_status("eight_bit_tty", SET_IN_FILE);
 
-    /* Add those that are */
-    set_option_mod_status("statuslines", SET_IN_GAME);
-
     /* Make sure that DECgraphics is not set to true via the config
        file, as this will cause display issues.  We can't disable it in
        options.c in case the game is compiled with both tty and curses. */
-    if (!symset[PRIMARY].name || !strcmpi(symset[PRIMARY].name, "DECgraphics")) {
-        load_symset("curses",PRIMARY);
-        load_symset("default",ROGUESET);
+    if (!symset[PRIMARY].name
+        || !strcmpi(symset[PRIMARY].name, "DECgraphics")) {
+        load_symset("curses", PRIMARY);
+        load_symset("default", ROGUESET);
     }
 #ifdef PDCURSES
     /* PDCurses for SDL, win32 and OS/2 has the ability to set the
        terminal size programatically.  If the user does not specify a
-       size in the config file, we will set it to a nice big 110x32 to
+       size in the config file, we will set it to a nice big 32x110 to
        take advantage of some of the nice features of this windowport. */
-    if (iflags.wc2_term_cols == 0) {
+    if (iflags.wc2_term_cols == 0)
         iflags.wc2_term_cols = 110;
-    }
-
-    if (iflags.wc2_term_rows == 0) {
+    if (iflags.wc2_term_rows == 0)
         iflags.wc2_term_rows = 32;
-    }
 
     resize_term(iflags.wc2_term_rows, iflags.wc2_term_cols);
     getmaxyx(base_term, term_rows, term_cols);
@@ -823,32 +818,38 @@ curses_init_options()
     }
 */
 #endif /* PDCURSES */
-    if (!iflags.wc2_windowborders) {
-        iflags.wc2_windowborders = 3;   /* Set to auto if not specified */
-    }
 
-    if (!iflags.wc2_petattr) {
-        iflags.wc2_petattr = A_REVERSE;
-    } else {                    /* Pet attribute specified, so hilite_pet should be true */
-
+    /* fix up pet highlighting */
+    if (iflags.wc2_petattr == -1) /* shouldn't happen */
+        iflags.wc2_petattr = A_NORMAL;
+    if (iflags.wc2_petattr != A_NORMAL) {
+        /* Pet attribute specified, so hilite_pet should be true */
         iflags.hilite_pet = TRUE;
+    } else if (iflags.hilite_pet) {
+        /* pet highlighting specified, so don't leave petattr at A_NORMAL */
+        iflags.wc2_petattr = A_REVERSE;
     }
+
+    /* curses doesn't support 's' (single message at a time; successive
+       ^P's go back to earlier messages) and 'c' (combination; single
+       on first and second of consecutive ^P's, full on third) */
+    if (iflags.prevmsg_window != 'f')
+        iflags.prevmsg_window = 'r';
 
 #ifdef NCURSES_MOUSE_VERSION
     if (iflags.wc_mouse_support) {
-        mousemask(BUTTON1_CLICKED, NULL);
+        curses_mouse_support(iflags.wc_mouse_support);
     }
+#else
+    iflags.wc_mouse_support = 0;
 #endif
 }
 
-
 /* Display an ASCII splash screen if the splash_screen option is set */
-
 void
 curses_display_splash_window()
 {
-    int x_start;
-    int y_start;
+     int i, x_start, y_start;
 
     curses_get_window_xy(MAP_WIN, &x_start, &y_start);
 
@@ -856,8 +857,9 @@ curses_display_splash_window()
         iflags.wc_splash_screen = FALSE;        /* No room for s.s. */
     }
 
-    curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, ON);
     if (iflags.wc_splash_screen) {
+         if (iflags.wc2_guicolor)
+              curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, ON);
         mvaddstr(y_start, x_start, NETHACK_SPLASH_A);
         mvaddstr(y_start + 1, x_start, NETHACK_SPLASH_B);
         mvaddstr(y_start + 2, x_start, NETHACK_SPLASH_C);
@@ -866,34 +868,18 @@ curses_display_splash_window()
         mvaddstr(y_start + 5, x_start, NETHACK_SPLASH_F);
         y_start += 7;
     }
+    if (iflags.wc2_guicolor)
+         curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, OFF);
 
-    curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, OFF);
+    for (i = 1; i <= 4; ++i) {
+         mvaddstr(y_start, x_start, copyright_banner_line(i));
+         y_start++;
+    }
 
-#ifdef COPYRIGHT_BANNER_A
-    mvaddstr(y_start, x_start, COPYRIGHT_BANNER_A);
-    y_start++;
-#endif
-
-#ifdef COPYRIGHT_BANNER_B
-    mvaddstr(y_start, x_start, COPYRIGHT_BANNER_B);
-    y_start++;
-#endif
-
-#ifdef COPYRIGHT_BANNER_C
-    mvaddstr(y_start, x_start, COPYRIGHT_BANNER_C);
-    y_start++;
-#endif
-
-#ifdef COPYRIGHT_BANNER_D       /* Just in case */
-    mvaddstr(y_start, x_start, COPYRIGHT_BANNER_D);
-    y_start++;
-#endif
     refresh();
 }
 
-
 /* Resore colors and cursor state before exiting */
-
 void
 curses_cleanup()
 {

@@ -1,6 +1,6 @@
 Boolean options not under specific compile flags (with default values in []):
 (You can learn which options exist in your version by checking your current
-option setting, which is reached via the 'O' cmd.)
+option setting, which is reached via the 'O' command.)
 
 acoustics      can your character hear anything                   [TRUE]
 autodescribe   describe the terrain under cursor                  [FALSE]
@@ -17,7 +17,8 @@ cmdassist      give help for errors on direction & other commands [TRUE]
 confirm        ask before hitting tame or peaceful monsters       [TRUE]
 dark_room      show floor not in sight in different color         [TRUE]
 eight_bit_tty  send 8-bit characters straight to terminal         [FALSE]
-extmenu        use a menu for selecting extended commands (#)     [FALSE]
+extmenu        tty, curses: use menu for # (extended commands)    [FALSE]
+               X11: menu has all commands (T) or traditional subset (F)
 fixinv         try to retain the same letter for the same object  [TRUE]
 force_invmenu  commands asking for inventory item show a menu     [FALSE]
 goldX          when filtering objects by bless/curse state,       [FALSE]

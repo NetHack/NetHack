@@ -320,8 +320,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,6,1,0
- PRODUCTVERSION 3,6,1,0
+ FILEVERSION 3,6,3,0
+ PRODUCTVERSION 3,6,3,0
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -337,13 +337,13 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "NetHack for Windows - Graphical Interface"
-            VALUE "FileVersion", "3.6.1"
+            VALUE "FileVersion", "3.6.3"
             VALUE "InternalName", "NetHackW"
-            VALUE "LegalCopyright", "Copyright (C) 1985 - 2018.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
+            VALUE "LegalCopyright", "Copyright (C) 1985 - 2019.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
             VALUE "OriginalFilename", "NetHackW.exe"
             VALUE "PrivateBuild", "140606"
             VALUE "ProductName", "NetHack"
-            VALUE "ProductVersion", "3.6.1"
+            VALUE "ProductVersion", "3.6.3"
         END
     END
     BLOCK "VarFileInfo"

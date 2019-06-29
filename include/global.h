@@ -1,4 +1,4 @@
-/* NetHack 3.6	global.h	$NHDT-Date: 1524690661 2018/04/25 21:11:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	global.h	$NHDT-Date: 1557510460 2019/05/10 17:47:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,7 +8,17 @@
 
 #include <stdio.h>
 
-#define BETA   /* development or beta testing [MRS] */
+/*
+ * Development status possibilities.
+ */
+#define NH_STATUS_RELEASED 0         /* Released */
+#define NH_STATUS_WIP      1         /* Work in progress */
+#define NH_STATUS_BETA     2         /* BETA testing */
+
+/*
+ * Development status of this NetHack version.
+ */
+#define NH_DEVEL_STATUS NH_STATUS_WIP
 
 #ifndef DEBUG  /* allow tool chains to define without causing warnings */
 #define DEBUG
@@ -339,9 +349,10 @@ struct savefile_info {
 #define MAXMONNO 120 /* extinct monst after this number created */
 #define MHPMAX 500   /* maximum monster hp */
 
-/* PANICTRACE: Always defined for BETA but only for supported platforms. */
+/* PANICTRACE: Always defined for NH_DEVEL_STATUS != NH_STATUS_RELEASED
+   but only for supported platforms. */
 #ifdef UNIX
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 /* see end.c */
 #ifndef PANICTRACE
 #define PANICTRACE

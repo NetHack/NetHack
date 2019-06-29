@@ -1,4 +1,4 @@
-/* NetHack 3.6	sit.c	$NHDT-Date: 1544442714 2018/12/10 11:51:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	sit.c	$NHDT-Date: 1559670609 2019/06/04 17:50:09 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -116,12 +116,13 @@ dosit()
             You("sit down.");
             dotrap(trap, VIASITTING);
         }
-    } else if (Underwater || Is_waterlevel(&u.uz)) {
+    } else if ((Underwater || Is_waterlevel(&u.uz))
+                && !eggs_in_water(youmonst.data)) {
         if (Is_waterlevel(&u.uz))
             There("are no cushions floating nearby.");
         else
             You("sit down on the muddy bottom.");
-    } else if (is_pool(u.ux, u.uy)) {
+    } else if (is_pool(u.ux, u.uy) && !eggs_in_water(youmonst.data)) {
     in_water:
         You("sit in the %s.", hliquid("water"));
         if (!rn2(10) && uarm)
@@ -297,8 +298,18 @@ dosit()
         } else if (u.uhunger < (int) objects[EGG].oc_nutrition) {
             You("don't have enough energy to lay an egg.");
             return 0;
+        } else if (eggs_in_water(youmonst.data)) {
+            if (!(Underwater || Is_waterlevel(&u.uz))) {
+                pline("A splash tetra you are not.");
+                return 0;
+            }
+            if (Upolyd &&
+                (youmonst.data == &mons[PM_GIANT_EEL]
+                 || youmonst.data == &mons[PM_ELECTRIC_EEL])) {
+                You("yearn for the Sargasso Sea.");
+                return 0;
+            }
         }
-
         uegg = mksobj(EGG, FALSE, FALSE);
         uegg->spe = 1;
         uegg->quan = 1L;
@@ -306,7 +317,7 @@ dosit()
         /* this sets hatch timers if appropriate */
         set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
         uegg->known = uegg->dknown = 1;
-        You("lay an egg.");
+        You("%s an egg.", eggs_in_water(youmonst.data) ? "spawn" : "lay");
         dropy(uegg);
         stackobj(uegg);
         morehungry((int) objects[EGG].oc_nutrition);
@@ -381,7 +392,7 @@ rndcurse()
         if (!Blind) {
             pline("%s %s.", Yobjnam2(otmp, "glow"),
                   hcolor(otmp->cursed ? NH_BLACK : (const char *) "brown"));
-            otmp->bknown = TRUE;
+            otmp->bknown = 1; /* ok to bypass set_bknown() here */
         }
     }
 }

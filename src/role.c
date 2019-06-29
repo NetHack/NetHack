@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1463561393 2016/05/18 08:49:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1547086250 2019/01/10 02:10:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -787,9 +787,16 @@ int rolenum;
 }
 
 int
-randrole()
+randrole(for_display)
+boolean for_display;
 {
-    return rn2(SIZE(roles) - 1);
+    int res = SIZE(roles) - 1;
+
+    if (for_display)
+        res = rn2_on_display_rng(res);
+    else
+        res = rn2(res);
+    return res;
 }
 
 STATIC_OVL int
@@ -805,7 +812,7 @@ randrole_filtered()
             && ok_gend(i, ROLE_NONE, ROLE_RANDOM, ROLE_NONE)
             && ok_align(i, ROLE_NONE, ROLE_NONE, ROLE_RANDOM))
             set[n++] = i;
-    return n ? set[rn2(n)] : randrole();
+    return n ? set[rn2(n)] : randrole(FALSE);
 }
 
 int
@@ -1631,13 +1638,16 @@ int buflen, rolenum, racenum, gendnum, alignnum;
     Strcpy(tmpbuf, "Shall I pick ");
     if (racenum != ROLE_NONE || validrole(rolenum))
         Strcat(tmpbuf, "your ");
-    else {
+    else
         Strcat(tmpbuf, "a ");
-    }
     /* <your> */
 
     (void) root_plselection_prompt(eos(tmpbuf), buflen - strlen(tmpbuf),
                                    rolenum, racenum, gendnum, alignnum);
+    /* "Shall I pick a character's role, race, gender, and alignment for you?"
+       plus " [ynaq] (y)" is a little too long for a conventional 80 columns;
+       also, "pick a character's <anything>" sounds a bit stilted */
+    strsubst(tmpbuf, "pick a character", "pick character");
     Sprintf(buf, "%s", s_suffix(tmpbuf));
     /* don't bother splitting caveman/cavewoman or priest/priestess
        in order to apply possessive suffix to both halves, but do
@@ -2085,7 +2095,7 @@ role_init()
     if (flags.pantheon == -1) {             /* new game */
         flags.pantheon = flags.initrole;    /* use own gods */
         while (!roles[flags.pantheon].lgod) /* unless they're missing */
-            flags.pantheon = randrole();
+            flags.pantheon = randrole(FALSE);
     }
     if (!urole.lgod) {
         urole.lgod = roles[flags.pantheon].lgod;
@@ -2095,6 +2105,14 @@ role_init()
     /* 0 or 1; no gods are neuter, nor is gender randomized */
     quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
 
+#if 0
+/*
+ * Disable this fixup so that mons[] can be const.  The only
+ * place where it actually matters for the hero is in set_uasmon()
+ * and that can use mons[race] rather than mons[role] for this
+ * particular property.  Despite the comment, it is checked--where
+ * needed--via instrinsic 'Infravision' which set_uasmon() manages.
+ */
     /* Fix up infravision */
     if (mons[urace.malenum].mflags3 & M3_INFRAVISION) {
         /* although an infravision intrinsic is possible, infravision
@@ -2110,6 +2128,7 @@ role_init()
         if (urole.femalenum != NON_PM)
             mons[urole.femalenum].mflags3 |= M3_INFRAVISION;
     }
+#endif /*0*/
 
     /* Artifacts are fixed in hack_artifacts() */
 

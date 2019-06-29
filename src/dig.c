@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1544442710 2018/12/10 11:51:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1547421446 2019/01/13 23:17:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -612,10 +612,16 @@ int ttyp;
                 You("dig a pit in the %s.", surface_type);
             if (shopdoor)
                 pay_for_damage("ruin", FALSE);
-        } else if (!madeby_obj && canseemon(madeby))
+        } else if (!madeby_obj && canseemon(madeby)) {
             pline("%s digs a pit in the %s.", Monnam(madeby), surface_type);
-        else if (cansee(x, y) && flags.verbose)
+        } else if (cansee(x, y) && flags.verbose) {
             pline("A pit appears in the %s.", surface_type);
+        }
+        /* in case we're digging down while encased in solid rock
+           which is blocking levitation or flight */
+        switch_terrain();
+        if (Levitation || Flying)
+            wont_fall = TRUE;
 
         if (at_u) {
             if (!wont_fall) {
@@ -644,6 +650,13 @@ int ttyp;
             pline("A hole appears in the %s.", surface_type);
 
         if (at_u) {
+            /* in case we're digging down while encased in solid rock
+               which is blocking levitation or flight */
+            switch_terrain();
+            if (Levitation || Flying)
+                wont_fall = TRUE;
+
+            /* check for leashed pet that can't fall right now */
             if (!u.ustuck && !wont_fall && !next_to_u()) {
                 You("are jerked back by your pet!");
                 wont_fall = TRUE;

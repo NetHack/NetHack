@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1543515862 2018/11/29 18:24:22 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.312 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1545259936 2018/12/19 22:52:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.313 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -632,7 +632,7 @@ int *fail_reason;
     if (has_oname(statue) && !unique_corpstat(mon->data))
         mon = christen_monst(mon, ONAME(statue));
     /* mimic statue becomes seen mimic; other hiders won't be hidden */
-    if (mon->m_ap_type)
+    if (M_AP_TYPE(mon))
         seemimic(mon);
     else
         mon->mundetected = FALSE;
@@ -1814,7 +1814,7 @@ int style;
             delaycnt = 1;
         if (!cansee(bhitpos.x, bhitpos.y))
             curs_on_u();
-        tmp_at(DISP_FLASH, obj_to_glyph(singleobj));
+        tmp_at(DISP_FLASH, obj_to_glyph(singleobj, rn2_on_display_rng));
         tmp_at(bhitpos.x, bhitpos.y);
     }
     /* Mark a spot to place object in bones files to prevent
@@ -2421,7 +2421,7 @@ register struct monst *mtmp;
                 You("smell smoke.");
             if (is_ice(mtmp->mx, mtmp->my))
                 melt_ice(mtmp->mx, mtmp->my, (char *) 0);
-            if (see_it)
+            if (see_it && t_at(mtmp->mx, mtmp->my))
                 seetrap(trap);
             break;
         case PIT:
@@ -2691,13 +2691,29 @@ register struct monst *mtmp;
             break;
         case VIBRATING_SQUARE:
             if (see_it && !Blind) {
-                if (in_sight)
-                    pline("You see a strange vibration beneath %s %s.",
-                          s_suffix(mon_nam(mtmp)),
-                          makeplural(mbodypart(mtmp, FOOT)));
-                else
-                    pline("You see the ground vibrate in the distance.");
-                seetrap(trap);
+                seetrap(trap); /* before messages */
+                if (in_sight) {
+                    char buf[BUFSZ], *p, *monnm = mon_nam(mtmp);
+
+                    if (nolimbs(mtmp->data)
+                        || is_floater(mtmp->data) || is_flyer(mtmp->data)) {
+                        /* just "beneath <mon>" */
+                        Strcpy(buf, monnm);
+                    } else {
+                        Strcpy(buf, s_suffix(monnm));
+                        p = eos(strcat(buf, " "));
+                        Strcpy(p, makeplural(mbodypart(mtmp, FOOT)));
+                        /* avoid "beneath 'rear paws'" or 'rear hooves' */
+                        (void) strsubst(p, "rear ", "");
+                    }
+                    You_see("a strange vibration beneath %s.", buf);
+                } else {
+                    /* notice something (hearing uses a larger threshold
+                       for 'nearby') */
+                    You_see("the ground vibrate %s.",
+                            (distu(mtmp->mx, mtmp->my) <= 2 * 2)
+                               ? "nearby" : "in the distance");
+                }
             }
             break;
         default:
@@ -4428,8 +4444,8 @@ boolean force;
                     return 1;
                 }
                 if ((mtmp = m_at(x, y)) != 0
-                    && (mtmp->m_ap_type == M_AP_FURNITURE
-                        || mtmp->m_ap_type == M_AP_OBJECT)) {
+                    && (M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                        || M_AP_TYPE(mtmp) == M_AP_OBJECT)) {
                     stumble_onto_mimic(mtmp);
                     return 1;
                 }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1543972194 2018/12/05 01:09:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.115 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1559994625 2019/06/08 11:50:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -139,8 +139,7 @@ dosave0()
         return 0;
 #endif
 
-    HUP if (iflags.window_inited)
-    {
+    HUP if (iflags.window_inited) {
         nh_uncompress(fq_save);
         fd = open_savefile();
         if (fd > 0) {
@@ -281,21 +280,22 @@ savegamestate(fd, mode)
 register int fd, mode;
 {
     unsigned long uid;
+    struct obj * bc_objs = (struct obj *)0;
 
 #ifdef MFLOPPY
     count_only = (mode & COUNT_SAVE);
 #endif
     uid = (unsigned long) getuid();
     bwrite(fd, (genericptr_t) &uid, sizeof uid);
-    bwrite(fd, (genericptr_t) &context, sizeof(struct context_info));
-    bwrite(fd, (genericptr_t) &flags, sizeof(struct flag));
+    bwrite(fd, (genericptr_t) &context, sizeof context);
+    bwrite(fd, (genericptr_t) &flags, sizeof flags);
 #ifdef SYSFLAGS
-    bwrite(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
+    bwrite(fd, (genericptr_t) &sysflags, sysflags);
 #endif
     urealtime.finish_time = getnow();
     urealtime.realtime += (long) (urealtime.finish_time
                                   - urealtime.start_timing);
-    bwrite(fd, (genericptr_t) &u, sizeof(struct you));
+    bwrite(fd, (genericptr_t) &u, sizeof u);
     bwrite(fd, yyyymmddhhmmss(ubirthday), 14);
     bwrite(fd, (genericptr_t) &urealtime.realtime, sizeof urealtime.realtime);
     bwrite(fd, yyyymmddhhmmss(urealtime.start_timing), 14);  /** Why? **/
@@ -308,14 +308,18 @@ register int fd, mode;
     save_light_sources(fd, mode, RANGE_GLOBAL);
 
     saveobjchn(fd, invent, mode);
-    if (BALL_IN_MON) {
-        /* prevent loss of ball & chain when swallowed */
-        uball->nobj = uchain;
-        uchain->nobj = (struct obj *) 0;
-        saveobjchn(fd, uball, mode);
-    } else {
-        saveobjchn(fd, (struct obj *) 0, mode);
+
+    /* save ball and chain if they are currently dangling free (i.e. not on
+       floor or in inventory) */
+    if (CHAIN_IN_MON) {
+        uchain->nobj = bc_objs;
+        bc_objs = uchain;
     }
+    if (BALL_IN_MON) {
+        uball->nobj = bc_objs;
+        bc_objs = uball;
+    }
+    saveobjchn(fd, bc_objs, mode);
 
     saveobjchn(fd, migrating_objs, mode);
     savemonchn(fd, migrating_mons, mode);
@@ -324,14 +328,14 @@ register int fd, mode;
         migrating_objs = 0;
         migrating_mons = 0;
     }
-    bwrite(fd, (genericptr_t) mvitals, sizeof(mvitals));
+    bwrite(fd, (genericptr_t) mvitals, sizeof mvitals);
 
     save_dungeon(fd, (boolean) !!perform_bwrite(mode),
                  (boolean) !!release_data(mode));
     savelevchn(fd, mode);
     bwrite(fd, (genericptr_t) &moves, sizeof moves);
     bwrite(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
-    bwrite(fd, (genericptr_t) &quest_status, sizeof(struct q_score));
+    bwrite(fd, (genericptr_t) &quest_status, sizeof quest_status);
     bwrite(fd, (genericptr_t) spl_book,
            sizeof(struct spell) * (MAXSPELL + 1));
     save_artifacts(fd);
@@ -394,7 +398,7 @@ savestateinlock()
         if (tricked_fileremoved(fd, whynot))
             return;
 
-        (void) read(fd, (genericptr_t) &hpid, sizeof(hpid));
+        (void) read(fd, (genericptr_t) &hpid, sizeof hpid);
         if (hackpid != hpid) {
             Sprintf(whynot, "Level #0 pid (%d) doesn't match ours (%d)!",
                     hpid, hackpid);
@@ -411,11 +415,11 @@ savestateinlock()
             done(TRICKED);
             return;
         }
-        (void) write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
+        (void) write(fd, (genericptr_t) &hackpid, sizeof hackpid);
         if (flags.ins_chkpt) {
             int currlev = ledger_no(&u.uz);
 
-            (void) write(fd, (genericptr_t) &currlev, sizeof(currlev));
+            (void) write(fd, (genericptr_t) &currlev, sizeof currlev);
             save_savefile_name(fd);
             store_version(fd);
             store_savefileinfo(fd);
@@ -476,56 +480,76 @@ int mode;
     short tlev;
 #endif
 
-    /* if we're tearing down the current level without saving anything
-       (which happens upon entrance to the endgame or after an aborted
-       restore attempt) then we don't want to do any actual I/O */
-    if (mode == FREE_SAVE)
+    /*
+     *  Level file contents:
+     *    version info (handled by caller);
+     *    save file info (compression type; also by caller);
+     *    process ID;
+     *    internal level number (ledger number);
+     *    bones info;
+     *    actual level data.
+     *
+     *  If we're tearing down the current level without saving anything
+     *  (which happens at end of game or upon entrance to endgame or
+     *  after an aborted restore attempt) then we don't want to do any
+     *  actual I/O.  So when only freeing, we skip to the bones info
+     *  portion (which has some freeing to do), then jump quite a bit
+     *  further ahead to the middle of the 'actual level data' portion.
+     */
+    if (mode != FREE_SAVE) {
+        /* WRITE_SAVE (probably ORed with FREE_SAVE), or COUNT_SAVE */
+
+        /* purge any dead monsters (necessary if we're starting
+           a panic save rather than a normal one, or sometimes
+           when changing levels without taking time -- e.g.
+           create statue trap then immediately level teleport) */
+        if (iflags.purge_monsters)
+            dmonsfree();
+
+        if (fd < 0)
+            panic("Save on bad file!"); /* impossible */
+#ifdef MFLOPPY
+        count_only = (mode & COUNT_SAVE);
+#endif
+        if (lev >= 0 && lev <= maxledgerno())
+            level_info[lev].flags |= VISITED;
+        bwrite(fd, (genericptr_t) &hackpid, sizeof hackpid);
+#ifdef TOS
+        tlev = lev;
+        tlev &= 0x00ff;
+        bwrite(fd, (genericptr_t) &tlev, sizeof tlev);
+#else
+        bwrite(fd, (genericptr_t) &lev, sizeof lev);
+#endif
+    }
+
+    /* bones info comes before level data; the intent is for an external
+       program ('hearse') to be able to match a bones file with the
+       corresponding log file entry--or perhaps just skip that?--without
+       the guessing that was needed in 3.4.3 and without having to
+       interpret level data to find where to start; unfortunately it
+       still needs to handle all the data compression schemes */
+    savecemetery(fd, mode, &level.bonesinfo);
+    if (mode == FREE_SAVE) /* see above */
         goto skip_lots;
 
-    /* purge any dead monsters (necessary if we're starting
-       a panic save rather than a normal one, or sometimes
-       when changing levels without taking time -- e.g.
-       create statue trap then immediately level teleport) */
-    if (iflags.purge_monsters)
-        dmonsfree();
-
-    if (fd < 0)
-        panic("Save on bad file!"); /* impossible */
-#ifdef MFLOPPY
-    count_only = (mode & COUNT_SAVE);
-#endif
-    if (lev >= 0 && lev <= maxledgerno())
-        level_info[lev].flags |= VISITED;
-    bwrite(fd, (genericptr_t) &hackpid, sizeof(hackpid));
-#ifdef TOS
-    tlev = lev;
-    tlev &= 0x00ff;
-    bwrite(fd, (genericptr_t) &tlev, sizeof(tlev));
-#else
-    bwrite(fd, (genericptr_t) &lev, sizeof(lev));
-#endif
-    savecemetery(fd, mode, &level.bonesinfo);
-    savelevl(fd,
-             (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
-    bwrite(fd, (genericptr_t) lastseentyp, sizeof(lastseentyp));
-    bwrite(fd, (genericptr_t) &monstermoves, sizeof(monstermoves));
-    bwrite(fd, (genericptr_t) &upstair, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &dnstair, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &upladder, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &dnladder, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &sstairs, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &updest, sizeof(dest_area));
-    bwrite(fd, (genericptr_t) &dndest, sizeof(dest_area));
-    bwrite(fd, (genericptr_t) &level.flags, sizeof(level.flags));
-    bwrite(fd, (genericptr_t) doors, sizeof(doors));
+    savelevl(fd, (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
+    bwrite(fd, (genericptr_t) lastseentyp, sizeof lastseentyp);
+    bwrite(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
+    bwrite(fd, (genericptr_t) &upstair, sizeof (stairway));
+    bwrite(fd, (genericptr_t) &dnstair, sizeof (stairway));
+    bwrite(fd, (genericptr_t) &upladder, sizeof (stairway));
+    bwrite(fd, (genericptr_t) &dnladder, sizeof (stairway));
+    bwrite(fd, (genericptr_t) &sstairs, sizeof (stairway));
+    bwrite(fd, (genericptr_t) &updest, sizeof (dest_area));
+    bwrite(fd, (genericptr_t) &dndest, sizeof (dest_area));
+    bwrite(fd, (genericptr_t) &level.flags, sizeof level.flags);
+    bwrite(fd, (genericptr_t) doors, sizeof doors);
     save_rooms(fd); /* no dynamic memory to reclaim */
 
-/* from here on out, saving also involves allocated memory cleanup */
-skip_lots:
-    /* this comes before the map, so need cleanup here if we skipped */
-    if (mode == FREE_SAVE)
-        savecemetery(fd, mode, &level.bonesinfo);
-    /* must be saved before mons, objs, and buried objs */
+    /* from here on out, saving also involves allocated memory cleanup */
+ skip_lots:
+    /* timers and lights must be saved before monsters and objects */
     save_timers(fd, mode, RANGE_LEVEL);
     save_light_sources(fd, mode, RANGE_LEVEL);
 
@@ -543,13 +567,11 @@ skip_lots:
                 level.monsters[x][y] = 0;
         fmon = 0;
         ftrap = 0;
-        fobj = 0;
-        level.buriedobjlist = 0;
-        billobjs = 0;
+        fobj = level.buriedobjlist = billobjs = 0;
         /* level.bonesinfo = 0; -- handled by savecemetery() */
     }
     save_engravings(fd, mode);
-    savedamage(fd, mode);
+    savedamage(fd, mode); /* pending shop wall and/or floor repair */
     save_regions(fd, mode);
     if (mode != FREE_SAVE)
         bflush(fd);
@@ -587,21 +609,20 @@ boolean rlecomp;
                         goto writeout;
                     }
                 } else {
-                /* the run has been broken,
-                 * write out run-length encoding */
-                writeout:
-                    bwrite(fd, (genericptr_t) &match, sizeof(uchar));
-                    bwrite(fd, (genericptr_t) rgrm, sizeof(struct rm));
+                    /* run has been broken, write out run-length encoding */
+ writeout:
+                    bwrite(fd, (genericptr_t) &match, sizeof (uchar));
+                    bwrite(fd, (genericptr_t) rgrm, sizeof (struct rm));
                     /* start encoding again. we have at least 1 rm
-                     * in the next run, viz. this one. */
+                       in the next run, viz. this one. */
                     match = 1;
                     rgrm = prm;
                 }
             }
         }
         if (match > 0) {
-            bwrite(fd, (genericptr_t) &match, sizeof(uchar));
-            bwrite(fd, (genericptr_t) rgrm, sizeof(struct rm));
+            bwrite(fd, (genericptr_t) &match, sizeof (uchar));
+            bwrite(fd, (genericptr_t) rgrm, sizeof (struct rm));
         }
         return;
     }
@@ -905,12 +926,12 @@ register int fd, mode;
     for (tmplev = sp_levchn; tmplev; tmplev = tmplev->next)
         cnt++;
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &cnt, sizeof(int));
+        bwrite(fd, (genericptr_t) &cnt, sizeof cnt);
 
     for (tmplev = sp_levchn; tmplev; tmplev = tmplev2) {
         tmplev2 = tmplev->next;
         if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) tmplev, sizeof(s_level));
+            bwrite(fd, (genericptr_t) tmplev, sizeof *tmplev);
         if (release_data(mode))
             free((genericptr_t) tmplev);
     }
@@ -954,11 +975,11 @@ register int fd, mode;
     for (tmp_dam = damageptr; tmp_dam; tmp_dam = tmp_dam->next)
         xl++;
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &xl, sizeof(xl));
+        bwrite(fd, (genericptr_t) &xl, sizeof xl);
 
     while (xl--) {
         if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) damageptr, sizeof(*damageptr));
+            bwrite(fd, (genericptr_t) damageptr, sizeof *damageptr);
         tmp_dam = damageptr;
         damageptr = damageptr->next;
         if (release_data(mode))
@@ -975,14 +996,11 @@ struct obj *otmp;
 {
     int buflen, zerobuf = 0;
 
-    buflen = sizeof(struct obj);
-    bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+    buflen = (int) sizeof (struct obj);
+    bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
     bwrite(fd, (genericptr_t) otmp, buflen);
     if (otmp->oextra) {
-        if (ONAME(otmp))
-            buflen = strlen(ONAME(otmp)) + 1;
-        else
-            buflen = 0;
+        buflen = ONAME(otmp) ? (int) strlen(ONAME(otmp)) + 1 : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
         if (buflen > 0)
             bwrite(fd, (genericptr_t) ONAME(otmp), buflen);
@@ -993,26 +1011,18 @@ struct obj *otmp;
         else
             bwrite(fd, (genericptr_t) &zerobuf, sizeof zerobuf);
 
-        if (OMID(otmp))
-            buflen = sizeof(unsigned);
-        else
-            buflen = 0;
+        buflen = OMID(otmp) ? (int) sizeof (unsigned) : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
         if (buflen > 0)
             bwrite(fd, (genericptr_t) OMID(otmp), buflen);
 
-        if (OLONG(otmp))
-            buflen = sizeof(long);
-        else
-            buflen = 0;
+        /* TODO: post 3.6.x, get rid of this */
+        buflen = OLONG(otmp) ? (int) sizeof (long) : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
         if (buflen > 0)
             bwrite(fd, (genericptr_t) OLONG(otmp), buflen);
 
-        if (OMAILCMD(otmp))
-            buflen = strlen(OMAILCMD(otmp)) + 1;
-        else
-            buflen = 0;
+        buflen = OMAILCMD(otmp) ? (int) strlen(OMAILCMD(otmp)) + 1 : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
         if (buflen > 0)
             bwrite(fd, (genericptr_t) OMAILCMD(otmp), buflen);
@@ -1063,7 +1073,7 @@ register struct obj *otmp;
         otmp = otmp2;
     }
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &minusone, sizeof(int));
+        bwrite(fd, (genericptr_t) &minusone, sizeof (int));
 }
 
 STATIC_OVL void
@@ -1073,58 +1083,36 @@ struct monst *mtmp;
 {
     int buflen;
 
-    buflen = sizeof(struct monst);
-    bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+    mtmp->mtemplit = 0; /* normally clear; if set here then a panic save
+                         * is being written while bhit() was executing */
+    buflen = (int) sizeof (struct monst);
+    bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
     bwrite(fd, (genericptr_t) mtmp, buflen);
     if (mtmp->mextra) {
-        if (MNAME(mtmp))
-            buflen = strlen(MNAME(mtmp)) + 1;
-        else
-            buflen = 0;
+        buflen = MNAME(mtmp) ? (int) strlen(MNAME(mtmp)) + 1 : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
         if (buflen > 0)
             bwrite(fd, (genericptr_t) MNAME(mtmp), buflen);
-
-        if (EGD(mtmp))
-            buflen = sizeof(struct egd);
-        else
-            buflen = 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+        buflen = EGD(mtmp) ? (int) sizeof (struct egd) : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
         if (buflen > 0)
             bwrite(fd, (genericptr_t) EGD(mtmp), buflen);
-
-        if (EPRI(mtmp))
-            buflen = sizeof(struct epri);
-        else
-            buflen = 0;
-        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+        buflen = EPRI(mtmp) ? (int) sizeof (struct epri) : 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
         if (buflen > 0)
             bwrite(fd, (genericptr_t) EPRI(mtmp), buflen);
-
-        if (ESHK(mtmp))
-            buflen = sizeof(struct eshk);
-        else
-            buflen = 0;
+        buflen = ESHK(mtmp) ? (int) sizeof (struct eshk) : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof(int));
         if (buflen > 0)
             bwrite(fd, (genericptr_t) ESHK(mtmp), buflen);
-
-        if (EMIN(mtmp))
-            buflen = sizeof(struct emin);
-        else
-            buflen = 0;
+        buflen = EMIN(mtmp) ? (int) sizeof (struct emin) : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof(int));
         if (buflen > 0)
             bwrite(fd, (genericptr_t) EMIN(mtmp), buflen);
-
-        if (EDOG(mtmp))
-            buflen = sizeof(struct edog);
-        else
-            buflen = 0;
+        buflen = EDOG(mtmp) ? (int) sizeof (struct edog) : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof(int));
         if (buflen > 0)
             bwrite(fd, (genericptr_t) EDOG(mtmp), buflen);
-
         /* mcorpsenm is inline int rather than pointer to something,
            so doesn't need to be preceded by a length field */
         bwrite(fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
@@ -1160,7 +1148,7 @@ register struct monst *mtmp;
         mtmp = mtmp2;
     }
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) &minusone, sizeof(int));
+        bwrite(fd, (genericptr_t) &minusone, sizeof (int));
 }
 
 /* save traps; ftrap is the only trap chain so the 2nd arg is superfluous */
@@ -1176,7 +1164,7 @@ int mode;
     while (trap) {
         trap2 = trap->ntrap;
         if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) trap, sizeof (struct trap));
+            bwrite(fd, (genericptr_t) trap, sizeof *trap);
         if (release_data(mode))
             dealloc_trap(trap);
         trap = trap2;
@@ -1201,7 +1189,7 @@ int fd, mode;
     while (f1) {
         f2 = f1->nextf;
         if (f1->fid >= 0 && perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) f1, sizeof (struct fruit));
+            bwrite(fd, (genericptr_t) f1, sizeof *f1);
         if (release_data(mode))
             dealloc_fruit(f1);
         f1 = f2;
@@ -1220,7 +1208,7 @@ int fd;
 
     bufoff(fd);
     /* bwrite() before bufon() uses plain write() */
-    bwrite(fd, (genericptr_t) &plsiztmp, sizeof(plsiztmp));
+    bwrite(fd, (genericptr_t) &plsiztmp, sizeof plsiztmp);
     bwrite(fd, (genericptr_t) plname, plsiztmp);
     bufon(fd);
     return;
@@ -1240,15 +1228,17 @@ int fd, mode;
         while ((msg = getmsghistory(init)) != 0) {
             init = FALSE;
             msglen = strlen(msg);
+            if (msglen < 1)
+                continue;
             /* sanity: truncate if necessary (shouldn't happen);
                no need to modify msg[] since terminator isn't written */
             if (msglen > BUFSZ - 1)
                 msglen = BUFSZ - 1;
-            bwrite(fd, (genericptr_t) &msglen, sizeof(msglen));
+            bwrite(fd, (genericptr_t) &msglen, sizeof msglen);
             bwrite(fd, (genericptr_t) msg, msglen);
             ++msgcount;
         }
-        bwrite(fd, (genericptr_t) &minusone, sizeof(int));
+        bwrite(fd, (genericptr_t) &minusone, sizeof (int));
     }
     debugpline1("Stored %d messages into savefile.", msgcount);
     /* note: we don't attempt to handle release_data() here */
@@ -1264,15 +1254,14 @@ int fd;
      * sfsaveinfo (decl.c) describes the savefile info that actually
      * gets written into the savefile, and is used to determine the
      * save file being written.
-
+     *
      * sfrestinfo (decl.c) describes the savefile info that is
      * being used to read the information from an existing savefile.
-     *
      */
 
     bufoff(fd);
     /* bwrite() before bufon() uses plain write() */
-    bwrite(fd, (genericptr_t) &sfsaveinfo, (unsigned) (sizeof sfsaveinfo));
+    bwrite(fd, (genericptr_t) &sfsaveinfo, (unsigned) sizeof sfsaveinfo);
     bufon(fd);
     return;
 }
@@ -1337,38 +1326,25 @@ freedynamicdata()
     msgtype_free();
     tmp_at(DISP_FREEMEM, 0); /* temporary display effects */
 #ifdef FREE_ALL_MEMORY
+#define free_current_level() savelev(-1, -1, FREE_SAVE)
 #define freeobjchn(X) (saveobjchn(0, X, FREE_SAVE), X = 0)
 #define freemonchn(X) (savemonchn(0, X, FREE_SAVE), X = 0)
-#define freetrapchn(X) (savetrapchn(0, X, FREE_SAVE), X = 0)
 #define freefruitchn() savefruitchn(0, FREE_SAVE)
 #define freenames() savenames(0, FREE_SAVE)
 #define free_killers() save_killers(0, FREE_SAVE)
 #define free_oracles() save_oracles(0, FREE_SAVE)
 #define free_waterlevel() save_waterlevel(0, FREE_SAVE)
-#define free_worm() save_worm(0, FREE_SAVE)
 #define free_timers(R) save_timers(0, FREE_SAVE, R)
-#define free_light_sources(R) save_light_sources(0, FREE_SAVE, R);
-#define free_engravings() save_engravings(0, FREE_SAVE)
-#define freedamage() savedamage(0, FREE_SAVE)
+#define free_light_sources(R) save_light_sources(0, FREE_SAVE, R)
 #define free_animals() mon_animal_list(FALSE)
 
     /* move-specific data */
     dmonsfree(); /* release dead monsters */
 
     /* level-specific data */
-    free_timers(RANGE_LEVEL);
-    free_light_sources(RANGE_LEVEL);
-    clear_regions();
-    freemonchn(fmon);
-    free_worm(); /* release worm segment information */
-    freetrapchn(ftrap);
-    freeobjchn(fobj);
-    freeobjchn(level.buriedobjlist);
-    freeobjchn(billobjs);
-    free_engravings();
-    freedamage();
+    free_current_level();
 
-    /* game-state data */
+    /* game-state data [ought to reorganize savegamestate() to handle this] */
     free_killers();
     free_timers(RANGE_GLOBAL);
     free_light_sources(RANGE_GLOBAL);
@@ -1386,26 +1362,26 @@ freedynamicdata()
 
     /* some pointers in iflags */
     if (iflags.wc_font_map)
-        free(iflags.wc_font_map);
+        free((genericptr_t) iflags.wc_font_map), iflags.wc_font_map = 0;
     if (iflags.wc_font_message)
-        free(iflags.wc_font_message);
+        free((genericptr_t) iflags.wc_font_message),
+        iflags.wc_font_message = 0;
     if (iflags.wc_font_text)
-        free(iflags.wc_font_text);
+        free((genericptr_t) iflags.wc_font_text), iflags.wc_font_text = 0;
     if (iflags.wc_font_menu)
-        free(iflags.wc_font_menu);
+        free((genericptr_t) iflags.wc_font_menu), iflags.wc_font_menu = 0;
     if (iflags.wc_font_status)
-        free(iflags.wc_font_status);
+        free((genericptr_t) iflags.wc_font_status), iflags.wc_font_status = 0;
     if (iflags.wc_tile_file)
-        free(iflags.wc_tile_file);
+        free((genericptr_t) iflags.wc_tile_file), iflags.wc_tile_file = 0;
     free_autopickup_exceptions();
 
     /* miscellaneous */
     /* free_pickinv_cache();  --  now done from really_done()... */
     free_symsets();
 #endif /* FREE_ALL_MEMORY */
-#ifdef STATUS_HILITES
-    status_finish();
-#endif
+    if (VIA_WINDOWPORT())
+        status_finish();
 #ifdef DUMPLOG
     dumplogfreemessages();
 #endif

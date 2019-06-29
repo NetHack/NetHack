@@ -210,7 +210,7 @@ const char *path, *files;
     BPTR dirLock, dirLock2;
     struct FileInfoBlock *fibp;
     int chklen;
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if(files != alllevels)panic("eraseall");
 #endif
     chklen=(int)index(files,'*')-(int)files;

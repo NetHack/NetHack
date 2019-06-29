@@ -125,21 +125,24 @@ Commands:
         O       Review current options and possibly change them.
                 A menu displaying the option settings will be displayed
                 and most can be changed by simply selecting their entry.
-                Options are usually set before the game with a NETHACKOPTIONS
-                environment variable, or via a config file (defaults.nh,
-                NetHack Defaults, nethack.cnf, .nethackrc, etc.), not with 
-                the 'O' command.
+                Options are usually set before the game with NETHACKOPTIONS
+                environment variable or via a configuration file (defaults.nh,
+                NetHack Defaults, nethack.cnf, ~/.nethackrc, etc.) rather
+                than with the 'O' command.
         p       Pay your shopping bill.
         P       Put on an accessory (ring, amulet, etc).
         ^P      Repeat last message (subsequent ^P's repeat earlier messages).
                 The behavior can be varied via the msg_window option.
         q       Drink (quaff) something (potion, water, etc).
         Q       Select ammunition for quiver.
+        #quit   Exit the program without saving the current game.
         r       Read a scroll or spellbook.
         R       Remove an accessory (ring, amulet, etc).
         ^R      Redraw the screen.
         s       Search for secret doors and traps around you.
-        S       Save the game.
+        S       Save the game.  Also exits the program.
+                [To restore, just play again and use the same character name.]
+                [There is no "save current data but keep playing" capability.]
         t       Throw an object or shoot a projectile.
         T       Take off armor.
         ^T      Teleport, if you are able.
@@ -151,9 +154,12 @@ Commands:
         x       Swap wielded and secondary weapons.
         X       Toggle two-weapon combat.
         ^X      Show your attributes.
+        #explore  Switch to Explore Mode (aka Discovery Mode) where dying and
+                deleting the save file during restore can both be overridden.
         z       Zap a wand.  (Use y instead of z if number_pad is -1.)
         Z       Cast a spell.  (Use Y instead of Z if number_pad is -1.)
         ^Z      Suspend the game.  (^Y instead of ^Z if number_pad is -1.)
+                [To resume, use the shell command 'fg'.]
         :       Look at what is here.
         ;       Look at what is somewhere else.
         ,       Pick up some things.
@@ -170,6 +176,7 @@ Commands:
         \       Show what types of objects have been discovered.
         `       Show discovered types for one class of objects.
         !       Escape to a shell, if supported in your version and OS.
+                [To resume play, terminate the shell subprocess via 'exit'.]
         #       Introduces one of the "extended" commands.  To get a list of
                 the commands you can use with "#" type "#?".  The extended
                 commands you can use depends upon what options the game was
@@ -192,7 +199,7 @@ Commands:
         u       Untrap a trapped object or door.
 
         You can put a number before a command to repeat it that many times,
-        as in "40." or "20s.".  If you have the number_pad option set, you
+        as in "40." or "20s".  If you have the number_pad option set, you
         must type 'n' to prefix the count, as in "n40." or "n20s".
 
 

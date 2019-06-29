@@ -1,4 +1,4 @@
-/* NetHack 3.6	vision.h	$NHDT-Date: 1432512777 2015/05/25 00:12:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
+/* NetHack 3.6	vision.h	$NHDT-Date: 1559994624 2019/06/08 11:50:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.	*/
 
@@ -43,11 +43,17 @@ extern char *viz_rmax;			/* max could see indices */
  */
 #define m_cansee(mtmp, x2, y2) clear_path((mtmp)->mx, (mtmp)->my, (x2), (y2))
 
-#define m_canseeu(m)                                       \
+#if 0
+#define m_canseeu(m) \
     ((!Invis || perceives((m)->data))                      \
-             && !(Underwater || u.uburied || (m)->mburied) \
-         ? couldsee((m)->mx, (m)->my)                      \
-         : 0)
+     && !(Underwater || u.uburied || (m)->mburied)         \
+     && couldsee((m)->mx, (m)->my))
+#else   /* without 'uburied' and 'mburied' */
+#define m_canseeu(m) \
+    ((!Invis || perceives((m)->data))                      \
+     && !Underwater                                        \
+     && couldsee((m)->mx, (m)->my))
+#endif
 
 /*
  *  Circle information
@@ -58,12 +64,12 @@ extern char *viz_rmax;			/* max could see indices */
 #define circle_ptr(z) (&circle_data[(int) circle_start[z]])
 
 /* howmonseen() bitmask values */
-#define MONSEEN_NORMAL 0x0001   /* normal vision */
+#define MONSEEN_NORMAL   0x0001 /* normal vision */
 #define MONSEEN_SEEINVIS 0x0002 /* seeing invisible */
 #define MONSEEN_INFRAVIS 0x0004 /* via infravision */
-#define MONSEEN_TELEPAT 0x0008  /* via telepathy */
-#define MONSEEN_XRAYVIS 0x0010  /* via Xray vision */
-#define MONSEEN_DETECT 0x0020   /* via extended monster detection */
-#define MONSEEN_WARNMON 0x0040  /* via type-specific warning */
+#define MONSEEN_TELEPAT  0x0008 /* via telepathy */
+#define MONSEEN_XRAYVIS  0x0010 /* via Xray vision */
+#define MONSEEN_DETECT   0x0020 /* via extended monster detection */
+#define MONSEEN_WARNMON  0x0040 /* via type-specific warning */
 
 #endif /* VISION_H */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixconf.h	$NHDT-Date: 1520099325 2018/03/03 17:48:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.6	unixconf.h	$NHDT-Date: 1555361298 2019/04/15 20:48:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -57,7 +57,9 @@
                         * the Makefile */
 #define TEXTCOLOR      /* Use System V r3.2 terminfo color support
                         * and/or ANSI color support on termcap systems
-                        * and/or X11 color */
+                        * and/or X11 color.  Note:  if you get compiler
+                        * warnings about 'has_colors()' being implicitly
+                        * declared, uncomment NEED_HAS_COLORS_DECL below. */
 #define POSIX_JOB_CONTROL /* use System V / Solaris 2.x / POSIX job control
                            * (e.g., VSUSP) */
 #define POSIX_TYPES /* use POSIX types for system calls and termios */
@@ -345,11 +347,14 @@
 #endif
 
 /* Use the high quality random number routines. */
-#if defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) \
-    || defined(RANDOM) || defined(__APPLE__)
-#define Rand() random()
-#else
-#define Rand() lrand48()
+/* the high quality random number routines */
+#ifndef USE_ISAAC64
+# if defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) \
+    || defined(RANDOM) || defined(MACOSX)
+#  define Rand() random()
+# else
+#  define Rand() lrand48()
+# endif
 #endif
 
 #ifdef TIMED_DELAY
@@ -360,6 +365,16 @@
 #define msleep(k) napms(k)
 #endif
 #endif
+
+/* Relevant for some systems which enable TEXTCOLOR:  some older versions
+   of curses (the run-time library optionally used by nethack's tty
+   interface in addition to its curses interface) supply 'has_colors()'
+   but corresponding <curses.h> doesn't declare it.  has_colors() is used
+   in unixtty.c by init_sco_cons() and init_linux_cons().  If the compiler
+   complains about has_colors() not being declared, try uncommenting
+   NEED_HAS_COLORS_DECL.  If the linker complains about has_colors not
+   being found, switch to ncurses() or update to newer version of curses. */
+/* #define NEED_HAS_COLORS_DECL */
 
 #ifdef hc /* older versions of the MetaWare High-C compiler define this */
 #ifdef __HC__
@@ -392,8 +407,22 @@
 #endif /* LINUX */
 #endif /* GNOME_GRAPHICS */
 
-#ifdef __APPLE__
+#ifdef MACOSX
 # define RUNTIME_PASTEBUF_SUPPORT
+#endif
+
+/*
+ * /dev/random is blocking on Linux, so there we default to /dev/urandom which
+ * should still be good enough.
+ * BSD systems usually have /dev/random that is supposed to be used.
+ * OSX is based on NetBSD kernel and has both /dev/random and /dev/urandom.
+ */
+#ifdef LINUX
+# define DEV_RANDOM "/dev/urandom"
+#else
+# if defined(BSD) || defined(MACOSX)
+#  define DEV_RANDOM "/dev/random"
+# endif
 #endif
 
 #endif /* UNIXCONF_H */

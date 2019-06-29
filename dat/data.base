@@ -1,5 +1,5 @@
 # NetHack 3.6	data.base
-# $NHDT-Date: 1524683801 2018/04/25 19:16:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $
+# $NHDT-Date: 1545359287 2018/12/21 02:28:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.87 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -424,9 +424,6 @@ barbarian
 	things.  He excelled them even in lithe economy of motion.
 	They were wolves, but he was a tiger.
 		[ Conan - The Warrior, by Robert E. Howard ]
-barbed devil
-	Barbed devils lack any real special abilities, though they
-	are quite difficult to kill.
 # takes "bat or bird" when specifying 'B'
 ~*combat
 ~*wombat
@@ -894,19 +891,19 @@ tiamat
 citrine*
 	A pale yellow variety of crystalline quartz resembling topaz.
 clay golem
-        It was a warm spring night when a fist knocked at the door so
-        hard that the hinges bent.
-        A man opened it and peered out into the street. There was
-        mist coming off the river and it was a cloudy night. He might
-        as well have tried to see through white velvet.
-        But he thought afterwards that there had been shapes out
-        there, just beyond the light spilling out into the road. A
-        lot of shapes, watching him carefully. He thought maybe
-        there'd been very faint points of light...
-        There was no mistaking the shape right in front of him,
-        though. It was big and dark red and looked like a child's
-        clay model of a man. Its eyes were two embers.
-                [ Feet of Clay, by Terry Pratchett ]
+	It was a warm spring night when a fist knocked at the door so
+	hard that the hinges bent.
+	A man opened it and peered out into the street. There was
+	mist coming off the river and it was a cloudy night. He might
+	as well have tried to see through white velvet.
+	But he thought afterwards that there had been shapes out
+	there, just beyond the light spilling out into the road. A
+	lot of shapes, watching him carefully. He thought maybe
+	there'd been very faint points of light...
+	There was no mistaking the shape right in front of him,
+	though. It was big and dark red and looked like a child's
+	clay model of a man. Its eyes were two embers.
+		[ Feet of Clay, by Terry Pratchett ]
 cleaver
 	Hither came Conan, the Cimmerian, black-haired, sullen-eyed,
 	sword in hand, a thief, a reaver, a slayer, with gigantic
@@ -1629,9 +1626,19 @@ eye of the aethiopica
 	the power to instantly open a portal to any other area of the
 	dungeon, allowing its invoker to travel quickly between
 	areas.
+# note:  The Eyes of the Overworld is the title of Jack Vance's sequel
+# to The Dying Earth and in it the 'Eyes' were separate "cusps" that
+# needed to be worn like contact lenses, one on each eyeball.  Wearing
+# just one and attempting to look with both eyes caused instant stun.
+# And when wearing two you couldn't see normal world, only a projection
+# of it that had similar topology but where everything was "better".
+# NetHack simplifies things:  a pair of lenses is a single item like
+# spectacles (eyeglasses), and the effect of wearing these lenses has
+# been changed to be useful to game play (Xray vision).  [The quote is
+# not derived from the book.]
 eyes of the overworld
-	... and finally there is "the Eyes of the Overworld".  This
-	obscure artifact pushes the wearer's view sense into the
+	The Eyes of the Overworld is a rather obscure artifact.
+	These magical lenses push the wearer's view sense into the
 	"overworld" -- another name for a segment of the Astral Plane.
 	Usually, there is nothing to be seen.  However, the wearer
 	is also able to look back and see the area around herself,
@@ -4377,7 +4384,7 @@ dwarven root
 	are greedy and thriftless, and would not spare till all the
 	plants had perished; whereas now they pass them by as they go
 	blundering in the wild. No more will you learn of me; but you
-	may have enough of my bounty, as long as you speak fair and 
+	may have enough of my bounty, as long as you speak fair and
 	do not spy or steal." Then again he laughed in his throat.
 	
 	"They are of great worth." he said. "More than gold in the
@@ -5337,11 +5344,26 @@ valkyrie
 vampire
 ~vampire bat
 vampire lord
+	He can transform himself to wolf, as we gather from the ship
+	arrival in Whitby, when he tear open the dog; he can be as
+	bat, as Madam Mina saw him on the window at Whitby, and as
+	friend John saw him fly from this so near house, and as my
+	friend Quincey saw him at the window of Miss Lucy. He can come
+	in mist which he create--that noble ship's captain proved him
+	of this; but, from what we know, the distance he can make this
+	mist is limited, and it can only be round himself. He come on
+	moonlight rays as elemental dust--as again Jonathan saw those
+	sisters in the castle of Dracula. He become so small--we
+	ourselves saw Miss Lucy, ere she was at peace, slip through a
+	hairbreadth space at the tomb door.
+		[ Dracula, by Bram Stoker ]
+
 	The Oxford English Dictionary is quite unequivocal:
 	_vampire_ - "a preternatural being of a malignant nature (in
 	the original and usual form of the belief, a reanimated
 	corpse), supposed to seek nourishment, or do harm, by sucking
 	the blood of sleeping persons. ..."
+		[]
 venus
 	Venus, the goddess of love and beauty, was the daughter of
 	Jupiter and Dione.  Others say that Venus sprang from the
@@ -5367,11 +5389,10 @@ vlad*
 *vortex
 vortices
 	Swirling clouds of pure elemental energies, the vortices are
-	thought to be related to the larger elementals.  Though the
-	vortices do no damage when touched, they are noted for being
-	able to envelop unwary travellers.  The hapless fool thus
-	swallowed by a vortex will soon perish from exposure to the
-	element the vortex is composed of.
+	thought to be related to the larger elementals.  They are
+	noted for being able to envelop unwary travellers.  The
+	hapless fool thus swallowed by a vortex will soon perish from
+	exposure to the element the vortex is composed of.
 vrock
 	The vrock is one of the weaker forms of demon.  It resembles
 	a cross between a human being and a vulture and does physical

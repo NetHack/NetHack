@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1524693365 2018/04/25 21:56:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1552353060 2019/03/12 01:11:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,10 +17,10 @@
 #endif
 
 #if defined(NETHACK_GIT_SHA)
-const char * NetHack_git_sha = NETHACK_GIT_SHA;
+const char *NetHack_git_sha = NETHACK_GIT_SHA;
 #endif
 #if defined(NETHACK_GIT_BRANCH)
-const char * NetHack_git_branch = NETHACK_GIT_BRANCH;
+const char *NetHack_git_branch = NETHACK_GIT_BRANCH;
 #endif
 
 STATIC_DCL void FDECL(insert_rtoption, (char *));
@@ -38,24 +38,21 @@ char *
 getversionstring(buf)
 char *buf;
 {
-    boolean details = FALSE;
-
     Strcpy(buf, VERSION_ID);
-#if defined(RUNTIME_PORT_ID) || \
-    defined(NETHACK_GIT_SHA) || defined(NETHACK_GIT_BRANCH)
-    details = TRUE;
-#endif
 
-    if (details) {
-#if defined(RUNTIME_PORT_ID) || defined(NETHACK_GIT_SHA) || defined(NETHACK_GIT_BRANCH)
+#if defined(RUNTIME_PORT_ID) \
+    || defined(NETHACK_GIT_SHA) || defined(NETHACK_GIT_BRANCH)
+    {
         int c = 0;
-#endif
 #if defined(RUNTIME_PORT_ID)
-        char tmpbuf[BUFSZ];
-        char *tmp = (char *)0;
+        char tmpbuf[BUFSZ], *tmp;
 #endif
+        char *p = eos(buf);
+        boolean dotoff = (p > buf && p[-1] == '.');
 
-        Sprintf(eos(buf), " (");
+        if (dotoff)
+            --p;
+        Strcpy(p, " (");
 #if defined(RUNTIME_PORT_ID)
         tmp = get_port_id(tmpbuf);
         if (tmp)
@@ -66,13 +63,21 @@ char *buf;
             Sprintf(eos(buf), "%s%s", c++ ? "," : "", NetHack_git_sha);
 #endif
 #if defined(NETHACK_GIT_BRANCH)
-#if defined(BETA)
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
         if (NetHack_git_branch)
-            Sprintf(eos(buf), "%sbranch:%s", c++ ? "," : "", NetHack_git_branch);
+            Sprintf(eos(buf), "%sbranch:%s",
+                    c++ ? "," : "", NetHack_git_branch);
 #endif
 #endif
-        Sprintf(eos(buf), ")");
+        if (c)
+            Strcat(buf, ")");
+        else /* if nothing has been added, strip " (" back off */
+            *p = '\0';
+        if (dotoff)
+            Strcat(buf, ".");
     }
+#endif /* RUNTIME_PORT_ID || NETHACK_GIT_SHA || NETHACK_GIT_BRANCH */
+
     return buf;
 }
 
@@ -91,12 +96,25 @@ int
 doextversion()
 {
     dlb *f;
-    char buf[BUFSZ];
+    char buf[BUFSZ], *p = 0;
     winid win = create_nhwindow(NHW_TEXT);
 
     /* instead of using ``display_file(OPTIONS_USED,TRUE)'' we handle
        the file manually so we can include dynamic version info */
-    putstr(win, 0, getversionstring(buf));
+
+    (void) getversionstring(buf);
+    /* if extra text (git info) is present, put it on separate line */
+    if (strlen(buf) >= COLNO)
+        p = rindex(buf, '(');
+    if (p && p > buf && p[-1] == ' ')
+        p[-1] = '\0';
+    else
+        p = 0;
+    putstr(win, 0, buf);
+    if (p) {
+        *--p = ' ';
+        putstr(win, 0, p);
+    }
 
     f = dlb_fopen(OPTIONS_USED, "r");
     if (!f) {
