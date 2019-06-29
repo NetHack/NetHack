@@ -6,10 +6,9 @@ jobs:
     - os: windows
       install: choco install mingw
       script: 
-        - cd sys/winnt
-        - copy Makefile.gcc ../../src
-        - cd src
-        - nmake -f Makefile.gcc
+        - chdir src
+        - cp sys/winnt/Makefile.gcc .
+        - mingw32-make -f Makefile.gcc
 
 #    - script: mingw32-make 
 #
