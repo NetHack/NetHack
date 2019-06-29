@@ -6,11 +6,18 @@ jobs:
     - os: windows
       install: choco install mingw
       script: 
-        - chdir src
+        - pwd
+        - cd src
         - cp sys/winnt/Makefile.gcc .
         - mingw32-make -f Makefile.gcc
+    - os: windows
+      install: choco install microsoft-build-tools
+      script: 
+        - pwd
+        - cd src
+        - cp sys/winnt/Makefile.msc ./Makefile
+        - nmake install
 
-#    - script: mingw32-make 
 #
 #
 #    - env: 
