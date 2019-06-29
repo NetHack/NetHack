@@ -550,12 +550,13 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
            if that is called for; find where the end of the prompt will
            be without the answer appended */
         while (ltmp2 > 0) {
-            ltmp2 -= ltmp;
+            if ((ltmp2 -= ltmp) < 0) {
+                ltmp = -ltmp2;
+                break;
+            }
             promptline -= 1;
-            ltmp = (int) strlen(linestarts[promptline]);
+            ltmp = linestarts[promptline + 1] - linestarts[promptline];
         }
-        if (ltmp2 < 0)
-            ltmp = -ltmp2;
         promptx = ltmp + border_space;
     }
 #endif
@@ -597,11 +598,11 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
 #endif
         curs_set(0);
 
-        if (erase_char && ch == erase_char) {
+        if (erase_char && ch == (int) (uchar) erase_char) {
             ch = '\177'; /* match switch-case below */
 
         /* honor kill_char if it's ^U or similar, but not if it's '@' */
-        } else if (kill_char && ch == kill_char
+        } else if (kill_char && ch == (int) (uchar) kill_char
                    && (ch < ' ' || ch >= '\177')) { /*ASCII*/
             if (len == 0) /* nothing to kill; just start over */
                 continue;
