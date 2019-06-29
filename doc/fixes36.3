@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.77 $ $NHDT-Date: 1561751390 2019/06/28 19:49:50 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.78 $ $NHDT-Date: 1561766416 2019/06/29 00:00:16 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -177,6 +177,9 @@ curses+'popup_dialog': show the text cursor at the end of prompts for single
 	character input
 curses+EDIT_GETLIN: when a prompt's answer was preloaded, using ESC to discard
 	it deleted it from the answer buffer but didn't erase it from screen
+curses+EDIT_GETLIN: the preceding fix handled an answer which spanned more
+	than one line but didn't remove the answer properly if the prompt
+	portion of prompt+answer spanned more than one line
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new
