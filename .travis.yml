@@ -10,11 +10,11 @@ jobs:
         - cp ../sys/winnt/Makefile.gcc .
         - mingw32-make -f Makefile.gcc
     - os: windows
-      install: choco install microsoft-build-tools
+      install: choco install visualstudio2017-workload-vctools
       script: 
         - cd src
         - cp ../sys/winnt/Makefile.msc ./Makefile
-        - nmake install
+        - "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\%VCToolsVersion%\bin\Hostx64\x64\nmake.exe" install
 
 #
 #
