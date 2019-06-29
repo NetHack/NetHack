@@ -54,6 +54,7 @@ static HWND GetConsoleHwnd(void);
 extern void NDECL(backsp);
 #endif
 int NDECL(windows_console_custom_nhgetch);
+extern struct window_procs *FDECL(get_safe_procs, (int));
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
