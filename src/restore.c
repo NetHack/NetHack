@@ -1140,7 +1140,7 @@ boolean ghostly;
            them is different now than when the level was saved */
         restore_cham(mtmp);
         /* give hiders a chance to hide before their next move */
-        if (ghostly || elapsed > (long) rnd(10))
+        if (ghostly || (elapsed > 00 && elapsed > (long) rnd(10)))
             hide_monst(mtmp);
     }
 
