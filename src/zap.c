@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1559994626 2019/06/08 11:50:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.311 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1561927499 2019/06/30 20:44:59 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.312 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4115,7 +4115,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                 break;
             if (type >= 0)
                 mon->mstrategy &= ~STRAT_WAITMASK;
-        buzzmonst:
+ buzzmonst:
             notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
             if (zap_hit(find_mac(mon), spell_type)) {
                 if (mon_reflects(mon, (char *) 0)) {
@@ -4235,7 +4235,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
             uchar rmn;
             boolean fireball;
 
-        make_bounce:
+ make_bounce:
             bchance = (levl[sx][sy].typ == STONE) ? 10
                 : (In_mines(&u.uz) && IS_WALL(levl[sx][sy].typ)) ? 20
                 : 75;
@@ -4638,7 +4638,7 @@ short exploding_wand_typ;
             hear_txt = "crackling.";
             break;
         default:
-        def_case:
+ def_case:
             if (exploding_wand_typ > 0) {
                 /* Magical explosion from misc exploding wand */
                 if (exploding_wand_typ == WAN_STRIKING) {
@@ -5282,7 +5282,7 @@ makewish()
     nothing = zeroobj; /* lint suppression; only its address matters */
     if (flags.verbose)
         You("may wish for an object.");
-retry:
+ retry:
     Strcpy(promptbuf, "For what do you wish");
     if (iflags.cmdassist && tries > 0)
         Strcat(promptbuf, " (enter 'help' for assistance)");
@@ -5293,6 +5293,7 @@ retry:
         buf[0] = '\0';
     } else if (!strcmpi(buf, "help")) {
         wishcmdassist(MAXWISHTRY - tries);
+        buf[0] = '\0'; /* for EDIT_GETLIN */
         goto retry;
     }
     /*
