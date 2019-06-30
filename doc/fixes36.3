@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.78 $ $NHDT-Date: 1561766416 2019/06/29 00:00:16 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.79 $ $NHDT-Date: 1561917056 2019/06/30 17:50:56 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -92,6 +92,8 @@ wizard mode ^I with 'perm_invent' On would unintentionally filter the content
 change #adjust to treat carrying only gold as not having anything to adjust
 saving bones with 'perm_invent' On could result in "Bad fruit #N" warnings
 update persistent inventory window immediately if 'sortpack' option is toggled
+grammar bit for wizard mode final disclosure; attribute section could show
+	"You had N experience points, 1 more were needed to attain level X+1."
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -196,6 +198,9 @@ classify sources as released, beta, or work-in-progress via NH_DEVEL_STATUS
 	rather than just released vs beta via BETA
 if you reach the edge of a level (relatively uncommon) and try to move off,
 	report that you can't go farther if the 'mention_walls' option is set
+'attributes' disclosure at end of game includes number of experience points
+	that were needed to reach the next experience level (new for normal
+	play and explore mode; previously only shown for wizard mode)
 wizard-mode: display effect to show where an unseen wished-for monster landed
 curses: enable latent mouse support
 curses: give menus and text windows a minimum size of 5x25 since tiny ones can
