@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.79 $ $NHDT-Date: 1561917056 2019/06/30 17:50:56 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.80 $ $NHDT-Date: 1561920590 2019/06/30 18:49:50 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -177,6 +177,8 @@ curses+'perm_invent': don't highlight inventory letters since nothing is
 	selectable from the menu comprising the persistent inventory window
 curses+'popup_dialog': show the text cursor at the end of prompts for single
 	character input
+curses+DUMPLOG: pass along old messages from save file and quest message
+	summaries to dumplog message history
 curses+EDIT_GETLIN: when a prompt's answer was preloaded, using ESC to discard
 	it deleted it from the answer buffer but didn't erase it from screen
 curses+EDIT_GETLIN: the preceding fix handled an answer which spanned more
