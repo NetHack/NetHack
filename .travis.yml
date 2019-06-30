@@ -50,7 +50,7 @@ matrix:
               make install
               cat dat/options
     - os: windows
-      env: HINTS=Windows-visual-studio
+      env: HINTS=windows-visual-studio
       language: shell
       script:
 #       - find /c/Program\ Files\ \(x86\) -iname 'rc.exe' -print
@@ -86,7 +86,7 @@ matrix:
         - nmake install
     - os: windows
 #     install: choco install mingw
-      env: HINTS=Windows-mingw
+      env: HINTS=windows-mingw
       script:
         - cd src
         - cp ../sys/winnt/Makefile.gcc ./Makefile
