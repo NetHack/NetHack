@@ -1,16 +1,20 @@
 language: c
-
-script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && QT_SELECT=5 make MOC=moc install"
-
 matrix:
   include:
-    - env: HINTS=linux
+    - os: linux
+      env: HINTS=linux
       compiler: gcc
-    - env: HINTS=linux
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: linux
+      env: HINTS=linux
       compiler: clang
-    - env: HINTS=linux-x11
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: linux
+      env: HINTS=linux-x11
       compiler: gcc
-    - env: HINTS=linux-qt5
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: linux
+      env: HINTS=linux-qt5
       compiler: gcc
       addons:
         apt:
@@ -18,7 +22,9 @@ matrix:
             - qtbase5-dev
             - qtmultimedia5-dev
             - qtbase5-dev-tools
-    - env: HINTS=linux-minimal
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && QT_SELECT=5 make MOC=moc install"
+    - os: linux
+      env: HINTS=linux-minimal
       compiler: gcc
       script: |
               cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
@@ -43,10 +49,59 @@ matrix:
               sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
               make install
               cat dat/options
-
+    - os: windows
+      env: HINTS=windows-visual-studio
+      language: shell
+      script:
+#       - find /c/Program\ Files\ \(x86\) -iname 'rc.exe' -print
+#       - export
+        - export VSVER=2017
+        - export MSVER=14.16.27023
+        - export SDKVER=10.0.17763.0
+        - export FRAMEVER=4.0.30319
+        - export NETFXVER=4.6.1
+        - export WKITVER=10.0.17134.0
+#       - export TOOLSVER=Community
+        - export TOOLSVER=BuildTools
+        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/Common7/IDE/VC/VCPackages:$PATH
+        - export PATH=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/$WKITVER/x64:$PATH
+        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/bin/HostX64/x64:$PATH
+        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/bin/HostX64/x86:$PATH
+        - export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/Common7/IDE/CommonExtensions/Microsoft/TestWindow
+        - export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/MSBuild/Current/bin/Roslyn
+        - export INCLUDE=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/$TOOLSVER/VC/Tools/MSVC/$MSVER/include
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Include/$WKITVER/ucrt
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/ucrt
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/shared
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/um
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/winrt
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/cppwinrt
+        - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/ATLMFC/lib/x86
+        - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/lib/x86:$LIB
+        - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/ucrt/x86:$LIB
+        - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
+#       - export
+        - cd src
+        - cp ../sys/winnt/Makefile.msc ./Makefile
+        - nmake install
+    - os: windows
+#     install: choco install mingw
+      env: HINTS=windows-mingw
+      script:
+        - cd src
+        - cp ../sys/winnt/Makefile.gcc ./Makefile
+        - mingw32-make install
+  exclude:
+    - os: osx
+      osx_image: xcode10.2
+      env: HINTS=macosx10.14
+      compiler: clang
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+#
 sudo: false
-
 notifications:
   email:
     recipients:
-      - devteam@nethack.org
+#      - devteam@nethack.org
+
+

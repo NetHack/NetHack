@@ -365,6 +365,7 @@ DATABASE = $(DAT)\data.base
 #==========================================
 
 cc=cl
+cpp=cpp
 link=link
 rc=Rc
 
@@ -582,7 +583,7 @@ DLB =
 	@$(cc) $(cflagsBuild)  -Fo$@  $<
 
 {$(SSYS)}.cpp{$(OBJ)}.o:
-	@$(CC) $(cflagsBuild) /EHsc -Fo$@  $<
+	@$(cc) $(cflagsBuild) /EHsc -Fo$@  $<
 
 #==========================================
 # Rules for files in sys\winnt
@@ -634,8 +635,7 @@ DLB =
 #==========================================
 
 {$(WCURSES)}.c{$(OBJ)}.o:
-	@$(cc) -DPDC_NCMOUSE -DCURSES_DEFINE_ERASE_CHAR \
-            $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) -DPDC_NCMOUSE $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
 
 #{$(WCURSES)}.txt{$(DAT)}.txt:
 #	@copy $< $@
@@ -838,7 +838,6 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 		$(O)ttystub.o
 		$(O)NetHackW.res
 <<
-	@if exist $(O)install.tag del $(O)install.tag
 
 $(O)gamedir.tag:
 	@if not exist $(GAMEDIR)\*.* echo creating directory $(GAMEDIR:\=/)
