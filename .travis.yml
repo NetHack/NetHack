@@ -81,7 +81,7 @@ matrix:
         - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/ucrt/x86:$LIB
         - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
 #       - export
-        - git clone https://github.com/wmcbrine/PDCurses.git ../pdcurses
+        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
         - export ADD_CURSES=Y
         - export PDCURSES_TOP=../../pdcurses
         - cd src
@@ -91,7 +91,7 @@ matrix:
 #     install: choco install mingw
       env: HINTS=windows-mingw
       script:
-        - git clone https://github.com/wmcbrine/PDCurses.git ../pdcurses
+        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
         - export ADD_CURSES=Y
         - export PDCURSES_TOP=../../pdcurses
         - cd src
@@ -109,4 +109,5 @@ notifications:
   email:
     recipients:
 #      - devteam@nethack.org
+
 
