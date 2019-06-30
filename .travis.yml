@@ -108,6 +108,6 @@ sudo: false
 notifications:
   email:
     recipients:
-#      - devteam@nethack.org
+      - devteam@nethack.org
 
 
