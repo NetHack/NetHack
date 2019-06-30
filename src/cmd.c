@@ -1977,19 +1977,28 @@ int final;
         enlght_line(You_, "entered ", buf, "");
     }
     if (!Upolyd) {
-        /* flags.showexp does not matter */
+        int ulvl = (int) u.ulevel;
+        /* [flags.showexp currently does not matter; should it?] */
+
         /* experience level is already shown above */
         Sprintf(buf, "%-1ld experience point%s", u.uexp, plur(u.uexp));
-        if (wizard) {
-            if (u.ulevel < 30) {
-                int ulvl = (int) u.ulevel;
-                long nxtlvl = newuexp(ulvl);
-                /* long oldlvl = (ulvl > 1) ? newuexp(ulvl - 1) : 0; */
+        /* TODO?
+         *  Remove wizard-mode restriction since patient players can
+         *  determine the numbers needed without resorting to spoilers
+         *  (even before this started being disclosed for 'final';
+         *  just enable 'showexp' and look at normal status lines
+         *  after drinking gain level potions or eating wraith corpses
+         *  or being level-drained by vampires).
+         */
+        if (ulvl < 30 && (final || wizard)) {
+            long nxtlvl = newuexp(ulvl), delta = nxtlvl - u.uexp;
 
-                Sprintf(eos(buf), ", %ld %s%sneeded to attain level %d",
-                        (nxtlvl - u.uexp), (u.uexp > 0) ? "more " : "",
-                        !final ? "" : "were ", (ulvl + 1));
-            }
+            Sprintf(eos(buf), ", %ld %s%sneeded %s level %d",
+                    delta, (u.uexp > 0) ? "more " : "",
+                    /* present tense=="needed", past tense=="were needed" */
+                    !final ? "" : (delta == 1L) ? "was " : "were ",
+                    /* "for": grammatically iffy but less likely to wrap */
+                    (ulvl < 18) ? "to attain" : "for", (ulvl + 1));
         }
         you_have(buf, "");
     }
