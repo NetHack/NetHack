@@ -72,8 +72,8 @@ DEBUGINFO = Y
 #    PDCurses header (.h) files and PDCURSES_C to the location
 #    of your PDCurses C files.
 #
-ADD_CURSES=Y
-PDCURSES_TOP=..\..\pdcurses
+#ADD_CURSES=Y
+#PDCURSES_TOP=..\..\pdcurses
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
