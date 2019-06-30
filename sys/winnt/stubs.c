@@ -64,6 +64,9 @@ HANDLE hConIn;
 HANDLE hConOut;
 int GUILaunched;
 struct window_procs tty_procs = { "-ttystubs" };
+#ifdef CURSES_GRAPHICS
+char erase_char, kill_char;
+#endif
 
 void
 win_tty_init(dir)
