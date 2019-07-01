@@ -819,13 +819,6 @@ unsigned int *stuckid, *steedid;
         if (otmp->owornmask)
             setworn(otmp, otmp->owornmask);
 
-    if ((uball && !uchain) || (uchain && !uball)) {
-        impossible("restgamestate: lost ball & chain");
-        /* poor man's unpunish() */
-        setworn((struct obj *) 0, W_CHAIN);
-        setworn((struct obj *) 0, W_BALL);
-    }
-
     /* reset weapon so that player will get a reminder about "bashing"
        during next fight when bare-handed or wielding an unconventional
        item; for pick-axe, we aren't able to distinguish between having
@@ -1108,6 +1101,13 @@ NHFILE *nhfp;
     for (otmp = fobj; otmp; otmp = otmp->nobj)
         if (otmp->owornmask)
             setworn(otmp, otmp->owornmask);
+
+    if ((uball && !uchain) || (uchain && !uball)) {
+        impossible("restgamestate: lost ball & chain");
+        /* poor man's unpunish() */
+        setworn((struct obj *) 0, W_CHAIN);
+        setworn((struct obj *) 0, W_BALL);
+    }
 
     /* in_use processing must be after:
      *    + The inventory has been read so that freeinv() works.
@@ -1401,7 +1401,7 @@ boolean ghostly;
            them is different now than when the level was saved */
         restore_cham(mtmp);
         /* give hiders a chance to hide before their next move */
-        if (ghostly || elapsed > (long) rnd(10))
+        if (ghostly || (elapsed > 00 && elapsed > (long) rnd(10)))
             hide_monst(mtmp);
     }
     restdamage(nhfp, ghostly);
