@@ -1,4 +1,4 @@
-/* NetHack 3.6	termcap.c	$NHDT-Date: 1554841008 2019/04/09 20:16:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.6	termcap.c	$NHDT-Date: 1562056615 2019/07/02 08:36:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1216,18 +1216,18 @@ term_attr_fixup(msk)
 int msk;
 {
     /* underline is converted to bold if its start sequence isn't available */
-    if ((msk & (1 << ATR_ULINE)) && (!nh_US || !*nh_US)) {
-        msk |= (1 << ATR_BOLD);
-        msk &= ~(1 << ATR_ULINE);
+    if ((msk & HL_ULINE) && (!nh_US || !*nh_US)) {
+        msk |= HL_BOLD;
+        msk &= ~HL_ULINE;
     }
     /* blink used to be converted to bold unconditionally; now depends on MB */
-    if (msk & (1 << ATR_BLINK) && (!MB || !*MB)) {
-        msk |= (1 << ATR_BOLD);
-        msk &= ~(1 << ATR_BLINK);
+    if ((msk & HL_BLINK) && (!MB || !*MB)) {
+        msk |= HL_BOLD;
+        msk &= ~HL_BLINK;
     }
     /* dim is ignored if its start sequence isn't available */
-    if (msk & (1 << ATR_DIM) && (!MH || !*MH)) {
-        msk &= ~(1 << ATR_DIM);
+    if ((msk & HL_DIM) && (!MH || !*MH)) {
+        msk &= ~HL_DIM;
     }
     return msk;
 }
