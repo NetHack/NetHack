@@ -1,5 +1,5 @@
 # NetHack 3.6	Makefile.GCC	$NHDT-Date: 1519600525 2018/02/25 23:15:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.34 $
-#	Copyright (c) NetHack PC Development Team 1996-2006.
+#	Copyright (c) NetHack PC Development Team 1996-2019.
 #	PC NetHack 3.6 Makefile for djgpp V2
 #
 #	Gnu gcc compiler for msdos (djgpp)
@@ -25,6 +25,23 @@ GAME = nethack
 # The GNU Make has a problem if you include a drive spec below (unfortunately).
 GAMEDIR =../binary
 
+# Optional PDCurses support
+#    Uncomment these and set them appropriately if you want to
+#    include curses port support alongside TTY support in your
+#    NetHack.exe binary. 
+#
+#    You'll have to set PDCURSES_H to the correct location of the 
+#    PDCurses header (.h) files and PDCURSES_C to the location
+#    of your PDCurses C files which must already be resident on 
+#    your machine.
+#
+ADD_CURSES=Y
+PDCURSES_TOP=../../pdcurses
+
+#
+#==============================================================================
+# This marks the end of the BUILD DECISIONS section.
+#==============================================================================
 #
 # Directories, gcc likes unix style directory specs
 #
@@ -38,6 +55,7 @@ SRC  = ../src
 SSHR = ../sys/share
 UTIL = ../util
 WIN  = ../win/tty
+WCURSES = ../win/curses
 WSHR = ../win/share
 
 #
@@ -67,7 +85,8 @@ LIBRARIES = $(LIBS) $(TERMLIB)
 # If you have yacc/lex or a work-alike set YACC_LEX to Y
 #
 YACC_LEX = N
-ifeq ($(YACC_LEX),Y)
+
+ifeq "$(YACC_LEX)" "Y"
 DO_YACC = YACC_ACT
 DO_LEX  = LEX_ACT
 endif
@@ -138,90 +157,14 @@ SUPPRESS_GRAPHICS =
 GAMEFILE = $(GAMEDIR)/$(GAME).exe
 
 # Changing this conditional block is not recommended
-ifeq ($(USE_DLB),Y)
+ifeq "$(USE_DLB)" "Y"
 DLBFLG = -DDLB
 else
 DLBFLG =
 endif
 
-#
-#  Flags.
-#
-ifeq ($(SUPPRESS_GRAPHICS),Y)
 TERMLIB =
 # Build NetHack suitable for blind players
-
-# Debugging
-#cflags = -pg -c -I../include $(DLBFLG) -DSUPPRESS_GRAPHICS
-#LFLAGS = -pg
-
-cflags = -c -O -I../include $(DLBFLG) -DSUPPRESS_GRAPHICS
-LFLAGS =
-
-else
-
-# Debugging
-#cflags = -g -c -I../include $(DLBFLG) -DUSE_TILES
-#LFLAGS = -g
-
-#    Normal
-cflags = -c -O -I../include $(DLBFLG) -DUSE_TILES
-LFLAGS =
-endif
-
-#==========================================
-#================ RULES ==================
-#==========================================
-
-.SUFFIXES: .exe .o .til .uu .c .y .l
-
-#==========================================
-# Rules for files in src
-#==========================================
-
-$(OBJ)/%.o : /%.c
-	$(CC) $(cflags) -o$@ $<
-
-$(OBJ)/%.o : $(SRC)/%.c
-	$(CC) $(cflags) -o$@ $<
-
-#==========================================
-# Rules for files in sys/share
-#==========================================
-
-$(OBJ)/%.o : $(SSHR)/%.c
-	$(CC) $(cflags) -o$@ $<
-
-#==========================================
-# Rules for files in sys/msdos
-#==========================================
-
-$(OBJ)/%.o : $(MSYS)/%.c
-	$(CC) $(cflags) -I../sys/msdos -o$@ $<
-
-#==========================================
-# Rules for files in util
-#==========================================
-
-$(OBJ)/%.o : $(UTIL)/%.c
-	$(CC) $(cflags) -o$@ $<
-
-#==========================================
-# Rules for files in win/share
-#==========================================
-
-$(OBJ)/%.o : $(WSHR)/%.c
-	$(CC) $(cflags) -I../win/share -o$@ $<
-
-#{$(WSHR)}.txt{$(DAT)}.txt:
-#	copy $< $@
-
-#==========================================
-# Rules for files in win/tty
-#==========================================
-
-$(OBJ)/%.o : $(TTY)/%.c
-	$(CC) $(cflags) -o$@ $<
 
 #==========================================
 #================ MACROS ==================
@@ -229,6 +172,24 @@ $(OBJ)/%.o : $(TTY)/%.c
 # This section creates shorthand macros for many objects
 # referenced later on in the Makefile.
 #
+# Have windows path styles available for use in commands
+#
+W_OBJ     =$(subst /,\, $(OBJ))
+W_INCL    =$(subst /,\, $(INCL))
+W_DAT     =$(subst /,\, $(DAT))
+W_DOC     =$(subst /,\, $(DOC))
+W_UTIL    =$(subst /,\, $(UTIL))
+W_SRC     =$(subst /,\, $(SRC))
+W_SSYS    =$(subst /,\, $(SSYS))
+W_MSWSYS  =$(subst /,\, $(MSWSYS))
+W_TTY     =$(subst /,\, $(TTY))
+W_MSWIN   =$(subst /,\, $(MSWIN))
+ifeq "$(ADD_CURSES)" "Y"
+W_WCURSES =$(subst /,\, $(WCURSES))
+endif
+W_WSHR    =$(subst /,\, $(WSHR))
+W_GAMEDIR =$(subst /,\, $(GAMEDIR))
+
 #
 # Shorten up the location for some files
 #
@@ -249,7 +210,7 @@ SPLEVSRC    = lev_yacc.c  lev_$(LEX).c	 lev_main.c  panic.c
 
 DGNCOMPSRC  = dgn_yacc.c  dgn_$(LEX).c	 dgn_main.c
 
-MAKEOBJS    = $(O)makedefs.o  $(O)monst.o	 $(O)objects.o
+MAKEDEFSOBJS    = $(O)makedefs.o  $(O)monst.o	 $(O)objects.o
 
 SPLEVOBJS   = $(O)lev_yacc.o  $(O)lev_$(LEX).o	$(O)lev_main.o  $(O)alloc.o	\
 		$(O)monst.o	    $(O)objects.o	    $(O)panic.o  \
@@ -339,20 +300,58 @@ VOBJ19 = $(O)trap.o     $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
 VOBJ20 = $(O)vis_tab.o  $(O)weapon.o  $(O)were.o     $(O)wield.o    $(O)windows.o
 VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
 VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
-VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)
+VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)       $(O)isaac64.o
 
 SOBJ   = $(O)msdos.o    $(O)sound.o   $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
 
 VVOBJ  = $(O)version.o
 
+ifeq "$(ADD_CURSES)" "Y"
+CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
+	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o
+else
+CURSESOBJ=
+endif
+
 VOBJ  = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
 	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
-	$(VOBJ21) $(VOBJ22) $(VOBJ23)
+	$(VOBJ21) $(VOBJ22) $(VOBJ23) \
+	$(CURSESOBJ)
 
 ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
+
+ifeq "$(ADD_CURSES)" "Y"
+#==========================================
+# PDCurses build macros
+#==========================================
+PDCURSES_CURSES_H	= $(PDCURSES_TOP)/curses.h
+PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)/curspriv.h
+PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
+PDCSRC                  = $(PDCURSES_TOP)/pdcurses
+PDCDOS               = $(PDCURSES_TOP)/dos
+PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o             \
+	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
+	$(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o                  \
+	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o   \
+	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o     \
+	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
+	$(O)slk.o $(O)termattr.o $(O)touch.o $(O)util.o $(O)window.o $(O)debug.o
+
+PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o \
+	$(O)pdcscrn.o $(O)pdcsetsc.o $(O)pdcutil.o
+
+#PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o \
+#	  $(O)pdcsetsc.o $(O)pdcutil.o
+
+PDCLIB = $(O)pdcurses.a
+
+PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC) -I$(PDCDOS)
+else
+PDCLIB = 
+endif
 
 #==========================================
 # Header file macros
@@ -411,6 +410,108 @@ CWSDPMI = $(subst /,\,$(DJ1))bin\CWSDPMI.*
 endif
 
 #==========================================
+# More compiler setup macros
+#==========================================
+#
+ifeq "$(ADD_CURSES)" "Y"
+CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+else
+CURSESDEF=
+CURSESLIB=
+endif
+
+INCLDIR=-I../include -I../sys/msdos
+
+# Debugging
+#cflags = -pg -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
+#LFLAGS = -pg
+
+cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
+LFLAGS =
+
+# Debugging
+#cflags = -g -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES
+#LFLAGS = -g
+
+#    Normal
+cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES
+LFLAGS =
+
+#==========================================
+#================ RULES ==================
+#==========================================
+
+.SUFFIXES: .exe .o .til .uu .c .y .l
+
+#==========================================
+# Rules for files in src
+#==========================================
+
+$(OBJ)/%.o : /%.c
+	$(CC) $(cflags) -o$@ $<
+
+$(OBJ)/%.o : $(SRC)/%.c
+	$(CC) $(cflags) -o$@ $<
+
+#==========================================
+# Rules for files in sys/share
+#==========================================
+
+$(OBJ)/%.o : $(SSHR)/%.c
+	$(CC) $(cflags) -o$@ $<
+
+#==========================================
+# Rules for files in sys/msdos
+#==========================================
+
+$(OBJ)/%.o : $(MSYS)/%.c
+	$(CC) $(cflags) -I../sys/msdos -o$@ $<
+
+#==========================================
+# Rules for files in util
+#==========================================
+
+$(OBJ)/%.o : $(UTIL)/%.c
+	$(CC) $(cflags) -o$@ $<
+
+#==========================================
+# Rules for files in win/share
+#==========================================
+
+$(OBJ)/%.o : $(WSHR)/%.c
+	$(CC) $(cflags) -I../win/share -o$@ $<
+
+#{$(WSHR)}.txt{$(DAT)}.txt:
+#	copy $< $@
+
+#==========================================
+# Rules for files in win/tty
+#==========================================
+
+$(OBJ)/%.o : $(TTY)/%.c
+	$(CC) $(cflags) -o$@ $<
+
+#==========================================
+# Rules for files in win/curses
+#==========================================
+
+$(OBJ)/%.o : $(WCURSES)/%.c
+	$(CC) -DPDC_NCMOUSE $(PDCINCL) $(cflags) -o$@  $<
+
+#==========================================
+# Rules for files in PDCurses
+#==========================================
+
+$(OBJ)/%.o : $(PDCURSES_TOP)/%.c
+	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
+
+$(OBJ)/%.o : $(PDCSRC)/%.c
+	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
+
+$(OBJ)/%.o : $(PDCDOS)/%.c
+	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
+
+#==========================================
 #  Primary Targets.
 #==========================================
 
@@ -425,9 +526,11 @@ default: $(GAMEFILE)
 
 util: $(O)utility.tag
 
-$(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h	       \
-	$(INCL)/pm.h	  monstr.c   vis_tab.c	\
-	$(U)lev_comp.exe $(U)dgn_comp.exe $(TILEUTIL)
+LEVCOMPEXE = $(U)lev_comp.exe
+
+$(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h \
+	$(INCL)/pm.h	  monstr.c   vis_tab.c	$(LEVCOMPEXE) \
+	$(U)dgn_comp.exe $(TILEUTIL)
 	$(subst /,\,echo utilities made > $@)
 
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
@@ -455,7 +558,7 @@ endif
 	@$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR))
 	@$(subst /,\,copy $(SSHR)/NetHack.cnf  $(GAMEDIR)/defaults.nh)
 	-@$(subst /,\,touch $(GAMEDIR)/record)
-	@$(subst /,\,copy $(DOC)/guidebo*.txt  $(GAMEDIR))
+	@$(subst /,\,copy $(DOC)/guideb*.txt  $(GAMEDIR))
 	@$(subst /,\,copy ../sys/winnt/sysconf  $(GAMEDIR))
 	@$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR))
 ifdef CWSDPMI
@@ -469,7 +572,8 @@ endif
 #  The main target.
 #==========================================
 
-$(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
+$(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(PDCLIB) \
+	$(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
 	 @if exist temp.a del temp.a
 	 @ar ru temp.a $(VOBJ01)
 	 @ar ru temp.a $(VOBJ02)
@@ -494,11 +598,17 @@ $(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
 	 @ar ru temp.a $(VOBJ21)
 	 @ar ru temp.a $(VOBJ22)
 	 @ar ru temp.a $(VOBJ23)
+	 @ar ru temp.a $(VOBJ24)
+	 @ar ru temp.a $(VOBJ25)
 	 @ar ru temp.a $(SOBJ)
 	 @ar ru temp.a $(TILOBJ)
 	 @ar ru temp.a $(TILOBJ2)
 	 @ar ru temp.a $(VVOBJ)
-	$(LINK) $(LFLAGS) -o$(GAME).exe temp.a $(LIBRARIES) $(ZLIB)
+ifeq "$(ADD_CURSES)" "Y"
+	 @ar ru temp.a $(CURSESOBJ)
+endif
+	$(LINK) $(LFLAGS) -o$(GAME).exe temp.a \
+	$(PDCLIB) $(LIBRARIES) $(ZLIB)
 	@$(subst /,\,stubedit $(GAME).exe minstack=2048K)
 	@$(subst /,\,copy $(GAME).exe $(GAMEFILE))
 	@$(subst /,\,del $(GAME).exe)
@@ -527,86 +637,15 @@ $(O)$(GAME).lnk: $(ALLOBJ)
 	 echo $(VOBJ21) >> $(subst /,\,$@)
 	 echo $(VOBJ22) >> $(subst /,\,$@)
 	 echo $(VOBJ23) >> $(subst /,\,$@)
+	 echo $(VOBJ24) >> $(subst /,\,$@)
+	 echo $(VOBJ25) >> $(subst /,\,$@)
 	 echo $(SOBJ)   >> $(subst /,\,$@)
 	 echo $(TILOBJ) >> $(subst /,\,$@)
 	 echo $(TILOBJ2) >> $(subst /,\,$@)
 	 echo $(VVOBJ)  >> $(subst /,\,$@)
-
-
-#==========================================
-#  Housekeeping.
-#==========================================
-
-clean:
-	$(subst /,\,if exist $(O)*.o del $(O)*.o)
-	$(subst /,\,if exist $(O)dat.tag del $(O)dat.tag)
-	$(subst /,\,if exist $(O)install.tag del $(O)install.tag)
-	$(subst /,\,if exist $(O)$(GAME).lnk del $(O)$(GAME).lnk)
-	$(subst /,\,if exist $(O)obj.tag del $(O)obj.tag)
-	$(subst /,\,if exist $(O)sp_lev.tag del $(O)sp_lev.tag)
-	$(subst /,\,if exist $(O)thintile.tag del $(O)thintile.tag)
-	$(subst /,\,if exist $(O)utility.tag del $(O)utility.tag)
-	$(subst /,\,if exist temp.a del temp.a)
-
-spotless: clean
-
-	$(subst /,\,if exist $(U)lev_flex.c del $(U)lev_flex.c)
-	$(subst /,\,if exist $(U)lev_lex.c del $(U)lev_lex.c)
-	$(subst /,\,if exist $(U)lev_yacc.c del $(U)lev_yacc.c)
-	$(subst /,\,if exist $(U)dgn_flex.c del $(U)dgn_flex.c)
-	$(subst /,\,if exist $(U)dgn_lex.c del $(U)dgn_lex.c)
-	$(subst /,\,if exist $(U)dgn_yacc.c del $(U)lev_yacc.c)
-	$(subst /,\,if exist $(U)makedefs.exe del $(U)makedefs.exe)
-	$(subst /,\,if exist $(U)lev_comp.exe del $(U)lev_comp.exe)
-	$(subst /,\,if exist $(U)dgn_comp.exe del $(U)dgn_comp.exe)
-	$(subst /,\,if exist $(U)recover.exe del $(U)recover.exe)
-	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
-	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
-	$(subst /,\,if exist $(U)tile2bin.exe del $(U)tile2bin.exe)
-	$(subst /,\,if exist $(U)til2bin2.exe del $(U)til2bin2.exe)
-	$(subst /,\,if exist $(U)thintile.exe del $(U)thintile.exe)
-	$(subst /,\,if exist $(U)dlb_main.exe del $(U)dlb_main.exe)
-	$(subst /,\,if exist $(INCL)/vis_tab.h del $(INCL)/vis_tab.h)
-	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
-	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
-	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
-	$(subst /,\,if exist $(INCL)/dgn_comp.h del $(INCL)/dgn_comp.h)
-	$(subst /,\,if exist $(INCL)/lev_comp.h del $(INCL)/lev_comp.h)
-	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
-	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
-	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
-	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
-	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
-	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
-	$(subst /,\,if exist $(DAT)/dungeon.pdf del $(DAT)/dungeon.pdf)
-	$(subst /,\,if exist $(DAT)/dungeon del $(DAT)/dungeon)
-	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
-	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
-	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
-	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
-	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
-	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
-	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
-	$(subst /,\,if exist $(DAT)/*.lev del $(DAT)/*.lev)
-	$(subst /,\,if exist $(TILE_BMP) del $(TILE_BMP))
-	$(subst /,\,if exist $(WSHR)/monthin.txt del $(WSHR)/monthin.txt)
-	$(subst /,\,if exist $(WSHR)/objthin.txt del $(WSHR)/objthin.txt)
-	$(subst /,\,if exist $(WSHR)/oththin.txt del $(WSHR)/oththin.txt)
-
-#==========================================
-# Create directory for holding object files
-#==========================================
-
-$(O)obj.tag:
-	-$(subst /,\,@if not exist $(OBJ)/*.* mkdir $(OBJ))
-	@$(subst /,\,@echo directory created > $@)
-
-#===========================================
-# Work around some djgpp long file name woes
-#===========================================
-
-$(PATCHLEV_H):
-	@$(subst /,\,if not exist $@ copy $(INCL)/patchlevel.h $(INCL)/patchlev.h)
+ifeq "$(ADD_CURSES)" "Y"
+	 echo $(CURSESOBJ) >> $(subst /,\,$@)
+endif
 
 #==========================================
 #=========== SECONDARY TARGETS ============
@@ -640,8 +679,8 @@ vis_tab.c: $(U)makedefs.exe
 #  Makedefs Stuff
 #==========================================
 
-$(U)makedefs.exe:  $(MAKEOBJS)
-	$(LINK) $(LFLAGS) -o$@ $(MAKEOBJS)
+$(U)makedefs.exe:  $(MAKEDEFSOBJS)
+	$(LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS)
 
 $(O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
 		$(INCL)/monsym.h   $(INCL)/qtext.h $(U)makedefs.c
@@ -901,6 +940,13 @@ $(O)viewtib.o: $(MSYS)/viewtib.c
 endif
 
 #==========================================
+# PDCurses Library
+#==========================================
+
+$(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
+	ar rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
+
+#==========================================
 #  Other Util Dependencies.
 #==========================================
 
@@ -954,7 +1000,8 @@ $(DAT)/engrave:	     $(O)utility.tag    $(DAT)/engrave.txt
 $(DAT)/epitaph:	     $(O)utility.tag    $(DAT)/epitaph.txt
 	@$(subst /,\,$(U)makedefs.exe -s)
 
-$(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
+$(O)sp_lev.tag: $(O)utility.tag \
+	$(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des \
 	$(DAT)/medusa.des  $(DAT)/oracle.des   $(DAT)/tower.des \
 	$(DAT)/yendor.des  $(DAT)/arch.des     $(DAT)/barb.des \
@@ -1020,6 +1067,76 @@ $(U)dlb_main.exe: $(DLBOBJS)
 
 $(O)dlb_main.o: $(U)dlb_main.c $(INCL)/config.h $(DLB_H)
 	$(CC) $(cflags) -o$@ $(U)dlb_main.c
+
+#==========================================
+#  Housekeeping.
+#==========================================
+
+clean:
+	$(subst /,\,if exist $(O)*.o del $(O)*.o)
+	$(subst /,\,if exist $(O)dat.tag del $(O)dat.tag)
+	$(subst /,\,if exist $(O)install.tag del $(O)install.tag)
+	$(subst /,\,if exist $(O)$(GAME).lnk del $(O)$(GAME).lnk)
+	$(subst /,\,if exist $(O)obj.tag del $(O)obj.tag)
+	$(subst /,\,if exist $(O)sp_lev.tag del $(O)sp_lev.tag)
+	$(subst /,\,if exist $(O)thintile.tag del $(O)thintile.tag)
+	$(subst /,\,if exist $(O)utility.tag del $(O)utility.tag)
+	$(subst /,\,if exist temp.a del temp.a)
+
+spotless: clean
+
+	$(subst /,\,if exist $(U)dgn_flex.c del $(U)dgn_flex.c)
+	$(subst /,\,if exist $(U)dgn_lex.c del $(U)dgn_lex.c)
+	$(subst /,\,if exist $(U)makedefs.exe del $(U)makedefs.exe)
+	$(subst /,\,if exist $(U)dgn_comp.exe del $(U)dgn_comp.exe)
+	$(subst /,\,if exist $(U)recover.exe del $(U)recover.exe)
+	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
+	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
+	$(subst /,\,if exist $(U)tile2bin.exe del $(U)tile2bin.exe)
+	$(subst /,\,if exist $(U)til2bin2.exe del $(U)til2bin2.exe)
+	$(subst /,\,if exist $(U)thintile.exe del $(U)thintile.exe)
+	$(subst /,\,if exist $(U)dlb_main.exe del $(U)dlb_main.exe)
+	$(subst /,\,if exist $(INCL)/vis_tab.h del $(INCL)/vis_tab.h)
+	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
+	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
+	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
+	$(subst /,\,if exist $(INCL)/dgn_comp.h del $(INCL)/dgn_comp.h)
+	$(subst /,\,if exist $(INCL)/lev_comp.h del $(INCL)/lev_comp.h)
+	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
+	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
+	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
+	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
+	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
+	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
+	$(subst /,\,if exist $(DAT)/dungeon.pdf del $(DAT)/dungeon.pdf)
+	$(subst /,\,if exist $(DAT)/dungeon del $(DAT)/dungeon)
+	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
+	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
+	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
+	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
+	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
+	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
+	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
+	$(subst /,\,if exist $(DAT)/*.lev del $(DAT)/*.lev)
+	$(subst /,\,if exist $(TILE_BMP) del $(TILE_BMP))
+	$(subst /,\,if exist $(WSHR)/monthin.txt del $(WSHR)/monthin.txt)
+	$(subst /,\,if exist $(WSHR)/objthin.txt del $(WSHR)/objthin.txt)
+	$(subst /,\,if exist $(WSHR)/oththin.txt del $(WSHR)/oththin.txt)
+
+#==========================================
+# Create directory for holding object files
+#==========================================
+
+$(O)obj.tag:
+	-$(subst /,\,@if not exist $(OBJ)/*.* mkdir $(OBJ))
+	@$(subst /,\,@echo directory created > $@)
+
+#===========================================
+# Work around some djgpp long file name woes
+#===========================================
+
+$(PATCHLEV_H):
+	@$(subst /,\,if not exist $@ copy $(INCL)/patchlevel.h $(INCL)/patchlev.h)
 
 #==========================================
 # Game Dependencies

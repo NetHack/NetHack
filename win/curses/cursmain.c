@@ -5,7 +5,11 @@
 
 #include "curses.h"
 #include "hack.h"
+#ifdef SHORT_FILENAMES
+#include "patchlev.h"
+#else
 #include "patchlevel.h"
+#endif
 #include "color.h"
 #include "wincurs.h"
 

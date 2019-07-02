@@ -184,6 +184,7 @@ curses+EDIT_GETLIN: when a prompt's answer was preloaded, using ESC to discard
 curses+EDIT_GETLIN: the preceding fix handled an answer which spanned more
 	than one line but didn't remove the answer properly if the prompt
 	portion of prompt+answer spanned more than one line
+msdos:  code fixes to allow a build with curses and PDCurses
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new
