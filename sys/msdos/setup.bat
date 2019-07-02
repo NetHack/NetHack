@@ -1,10 +1,10 @@
 @echo off
 REM    NetHack 3.6 setup.bat   $NHDT-Date: 1432512792 2015/05/25 00:13:12 $ $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
-REM    Copyright (c) NetHack PC Development Team 1990 - 2018
+REM    Copyright (c) NetHack PC Development Team 1990 - 2019
 REM    NetHack may be freely redistributed.  See license for details.
 
 echo.
-echo   Copyright (c) NetHack PC Development Team 1990 - 2018
+echo   Copyright (c) NetHack PC Development Team 1990 - 2019
 echo   NetHack may be freely redistributed.  See license for details.
 echo.
 REM setup batch file for msdos, see Install.dos for details.
@@ -19,7 +19,6 @@ if not exist ..\..\src\hack.c      goto err_dir
 if not exist ..\..\dat\wizard.des  goto err_dir
 if not exist ..\..\util\makedefs.c goto err_dir
 if not exist ..\..\win\tty\wintty.c goto err_dir
-if not exist ..\share\lev_yacc.c   goto err_dir
 echo Directories OK.
 
 if not exist ..\..\binary\* mkdir ..\..\binary
@@ -81,7 +80,7 @@ ren ..\..\sys\share\posixregex.c posixreg.c
 goto long4ok
 :long4b
 echo "Renaming ..\..\sys\share\posixr~1.c -> ..\..\sys\share\posixreg.c"
-ren ..\..\sys\share\posixr~1.h posixreg.c
+ren ..\..\sys\share\posixr~1.c posixreg.c
 :long4ok
 
 if "%1"=="GCC"   goto ok_gcc
