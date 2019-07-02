@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.80 $ $NHDT-Date: 1561920590 2019/06/30 18:49:50 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.81 $ $NHDT-Date: 1562056615 2019/07/02 08:36:55 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -191,6 +191,8 @@ tty: re-do one optimization used when status conditions have all been removed
 tty: take two, if/when autodecribe feedback wraps past top line, clear
 	continuation lines and redraw map if needed when top line is cleared
 	['exposed by git' section has an entry for reversal of 'take one']
+tty: video attributes (bold, inverse, &c) for status highlighting sometimes
+	were scrambled
 Windows: some startup error messages were not being delivered successfully
 
 
