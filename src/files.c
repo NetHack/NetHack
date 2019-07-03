@@ -1045,7 +1045,14 @@ boolean regularize_it;
     regoffset = 5;
     indicator_spot = 2;
 #endif
-#if defined(MICRO) && !defined(VMS) && !defined(WIN32)
+#if defined(MSDOS)
+    if (strlen(g.SAVEP) < (SAVESIZE - 1))
+        Strcpy(g.SAVEF, g.SAVEP);
+    if (strlen(g.SAVEF) < (SAVESIZE - 1))
+        (void) strncat(g.SAVEF, g.plname,
+			(SAVESIZE - strlen(g.SAVEF)));
+#endif
+#if defined(MICRO) && !defined(VMS) && !defined(WIN32) && !defined(MSDOS)
     if (strlen(g.SAVEP) < (SAVESIZE - 1))
         Strcpy(g.SAVEF, g.SAVEP);
     else
@@ -1076,9 +1083,20 @@ boolean regularize_it;
     }
 #ifdef SAVE_EXTENSION
     if (strlen(SAVE_EXTENSION) > 0 && !overflow) {
-        if (strlen(g.SAVEF) + strlen(SAVE_EXTENSION) < (SAVESIZE - 1))
+        if (strlen(g.SAVEF) + strlen(SAVE_EXTENSION) < (SAVESIZE - 1)) {
             Strcat(g.SAVEF, SAVE_EXTENSION);
-        else
+#ifdef MSDOS
+#ifdef SYSCF
+ 	if (idx >= historical && idx <= ascii) {
+	    /* we did leave room for the extra char in SAVE_EXTENSION */
+	    g.SAVEF[strlen(g.SAVEF)-1] =
+	    	(idx == lendian) ? 'l' :
+	    	(idx == ascii)   ? 'a' : '\0';
+	}
+        sfindicator = sfoprocs[idx].ext;
+#endif
+#endif
+        } else
             overflow = 3;
     }
 #endif

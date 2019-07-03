@@ -7,13 +7,13 @@
 #define DECL_H
 
 #define E extern
-#if !defined(MFLOPPY) && !defined(VMS) && !defined(WIN32)
+#if !defined(MICRO) && !defined(VMS) && !defined(WIN32)
 #define LOCKNAMESIZE (PL_NSIZ + 14) /* long enough for uid+name+.99 */
 #define LOCKNAMEINIT "1lock"
 #define BONESINIT "bonesnn.xxx"
 #define BONESSIZE sizeof(BONESINIT)
 #else
-#if defined(MFLOPPY)
+#if defined(MICRO)
 #define LOCKNAMESIZE FILENAME
 #define LOCKNAMEINIT ""
 #define BONESINIT ""
@@ -52,7 +52,7 @@
 #define SAVEX ""
 #if !defined(SAVE_EXTENSION)
 #ifdef MICRO
-#define SAVE_EXTENSION ".sav"
+#define SAVE_EXTENSION ".svh"
 #endif
 #ifdef WIN32
 #define SAVE_EXTENSION ".NetHack-saved-game"
