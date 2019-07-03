@@ -887,7 +887,7 @@ boolean restoring_msghist;
     static int stash_count;
     static nhprev_mesg *stash_head = 0;
 #ifdef DUMPLOG
-    extern unsigned saved_pline_index; /* pline.c */
+/*    extern unsigned g.saved_pline_index; */ /* pline.c */
 #endif
 
     if (restoring_msghist && !initd) {
@@ -900,7 +900,7 @@ boolean restoring_msghist;
         initd = TRUE;
 #ifdef DUMPLOG
         /* this suffices; there's no need to scrub saved_pline[] pointers */
-        saved_pline_index = 0;
+        g.saved_pline_index = 0;
 #endif
     }
 
