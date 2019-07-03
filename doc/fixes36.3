@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.81 $ $NHDT-Date: 1562056615 2019/07/02 08:36:55 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.83 $ $NHDT-Date: 1562114348 2019/07/03 00:39:08 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -206,6 +206,10 @@ if you reach the edge of a level (relatively uncommon) and try to move off,
 'attributes' disclosure at end of game includes number of experience points
 	that were needed to reach the next experience level (new for normal
 	play and explore mode; previously only shown for wizard mode)
+status highlighting using percentage rules now supported for experience level
+	and experience points; for both, percent is based on Exp progress from
+	the start of the current Xp level to the start of the next Xp level;
+	100% isn't possible so used as special case for next_Xp_lvl - 1 Exp_pt
 wizard-mode: display effect to show where an unseen wished-for monster landed
 curses: enable latent mouse support
 curses: give menus and text windows a minimum size of 5x25 since tiny ones can

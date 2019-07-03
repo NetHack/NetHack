@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.305 $ $NHDT-Date: 1557251604 2019/05/07 17:53:24 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.310 $ $NHDT-Date: 1562114349 2019/07/03 00:39:09 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -4284,7 +4284,24 @@ it also matches when value is below or above the percentage.
 Use prefix \(oq<\(cq or \(oq>\(cq to match when strictly below or above.
 (The numeric limit is relaxed slightly for those: \f(CR>-1%\fP
 and \f(CR<101%\fP are allowed.)
-Only valid for \(lqhitpoints\(rq and \(lqpower\(rq fields.
+Only four fields support percentage rules.
+Percentages for \(lqhitpoints\(rq and \(lqpower\(rq are
+straightforward; they're based on the corresponding maximum field.
+Percentage highlight rules are also allowed for \(lqexperience level\(rq
+and \(lqexperience points\(rq (valid when the
+.op showexp
+option is enabled).
+For those, the percentage is based on the progress from the start of
+the current experience level to the start of the next level.
+So if level 2 starts at 20 points and level 3 starts at 40 points,
+having 30 points is 50% and 35 points is 75%.
+100% is unattainable for experience because you'll gain a level and
+the calculations will be reset for that new level, but a rule for
+\f(CR=100%\fP is allowed and matches the special case of being
+exactly 1 experience point short of the next level.
+.\" (If you manage to reach level 30, there is no next level and the
+.\" percentage will remain at 0% no matter have many additional experience
+.\" points you earn.)
 .lp "*"
 absolute value sets the attribute when the field value matches
 that number.

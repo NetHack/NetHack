@@ -4773,7 +4773,24 @@ it also matches when value is below or above the percentage.
 Use prefix `{\tt <}' or `{\tt >}' to match when strictly below or above.
 (The numeric limit is relaxed slightly for those: {\tt >-1\%}
 and {\tt <101\%} are allowed.)
-Only valid for ``{\it hitpoints\/}'' and ``{\it power\/}'' fields.
+Only four fields support percentage rules.
+Percentages for ``{\it hitpoints\/}'' and ``{\it power\/}'' are
+straightforward; they're based on the corresponding maximum field.
+Percentage highlight rules are also allowed for ``{\it experience level\/}''
+and ``{\it experience points\/}'' (valid when the
+(\it showexp\/}
+option is enabled).
+For those, the percentage is based on the progress from the start of
+the current experience level to the start of the next level.
+So if level 2 starts at 20 points and level 3 starts at 40 points,
+having 30 points is 50\% and 35 points is 75\%.
+100\% is unattainable for experience because you'll gain a level and
+the calculations will be reset for that new level, but a rule for
+{\tt =100\%} is allowed and matches the special case of being
+exactly 1 experience point short of the next level.
+% (If you manage to reach level 30, there is no next level and the
+% percentage will remain at 0\% no matter have many additional experience
+% points you earn.)
 %.lp "*"
 \item{\bb{}}
 absolute value sets the attribute when the field value

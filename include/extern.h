@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1560161804 2019/06/10 10:16:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.714 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1562114349 2019/07/03 00:39:09 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.715 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -177,6 +177,7 @@ E long NDECL(botl_score);
 E int FDECL(describe_level, (char *));
 E void FDECL(status_initialize, (BOOLEAN_P));
 E void NDECL(status_finish);
+E boolean NDECL(exp_percent_changing);
 E int NDECL(stat_cap_indx);
 E int NDECL(stat_hunger_indx);
 E const char *FDECL(bl_idx_to_fldname, (int));
