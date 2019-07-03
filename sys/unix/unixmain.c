@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixmain.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.6	unixmain.c	$NHDT-Date: 1562187898 2019/07/03 21:04:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -50,7 +50,6 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    register int fd;
 #ifdef CHDIR
     register char *dir;
 #endif

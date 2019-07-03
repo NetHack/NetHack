@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1559476918 2019/06/02 12:01:58 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1562187890 2019/07/03 21:04:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -153,7 +153,7 @@ boolean perform_write, free_data;
             for (i = 0; i < g.n_dgns; ++i)
                 sfo_dungeon(nhfp, &g.dungeons[i], "dungeon", "dungeon", 1);
             sfo_dgn_topology(nhfp, &g.dungeon_topology, "dungeon", "g.dungeon_topology", 1);
-            for (i = 0; i < sizeof tune; ++i)
+            for (i = 0; i < (int) sizeof tune; ++i)
                 sfo_char(nhfp, &g.tune[i], "dungeon", "tune", 1);
         }
         for (count = 0, curr = g.branches; curr; curr = curr->next)
@@ -234,7 +234,7 @@ NHFILE *nhfp;
         for (i = 0; i < g.n_dgns; ++i)
             sfi_dungeon(nhfp, &g.dungeons[i], "dungeon", "dungeon", 1);
         sfi_dgn_topology(nhfp, &g.dungeon_topology, "dungeon", "g.dungeon_topology", 1);
-        for (i = 0; i < sizeof tune; ++i)
+        for (i = 0; i < (int) sizeof tune; ++i)
             sfi_char(nhfp, &g.tune[i], "dungeon", "tune", 1);
     }
     last = g.branches = (branch *) 0;
