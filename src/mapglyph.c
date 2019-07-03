@@ -313,6 +313,15 @@ const char *str;
 #endif
             case '\\':
                 break;
+            case '\0':
+                /* String ended with '\\'.  This can happen when someone
+                   names an object with a name ending with '\\', drops the
+                   named object on the floor nearby and does a look at all
+                   nearby objects. */
+                /* brh - should we perhaps not allow things to have names
+                   that contain '\\' */
+                str = save_str;
+                break;
             }
         }
         *put++ = *str++;
