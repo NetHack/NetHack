@@ -126,6 +126,8 @@ struct istat_s {
     const char *fldfmt;
     long time;  /* moves when this field hilite times out */
     boolean chg; /* need to recalc time? */
+    boolean percent_matters;
+    short percent_value;
     unsigned anytype;
     anything a;
     char *val;
