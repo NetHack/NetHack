@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.83 $ $NHDT-Date: 1562114348 2019/07/03 00:39:08 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.84 $ $NHDT-Date: 1562203850 2019/07/04 01:30:50 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -94,6 +94,10 @@ saving bones with 'perm_invent' On could result in "Bad fruit #N" warnings
 update persistent inventory window immediately if 'sortpack' option is toggled
 grammar bit for wizard mode final disclosure; attribute section could show
 	"You had N experience points, 1 more were needed to attain level X+1."
+if an engulfer has any worn items, hero could pick them up from inside and
+	they wouldn't be unworn properly, eventually triggering warnings or
+	worse (Juiblex will wear an amulet if created with one; a shapechanger
+	might wear one and then turn into an engulfer)
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository

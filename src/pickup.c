@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1559675617 2019/06/04 19:13:37 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.228 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1562203851 2019/07/04 01:30:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.229 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -840,7 +840,8 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
     anything any;
     boolean printed_type_name, first,
             sorted = (qflags & INVORDER_SORT) != 0,
-            engulfer = (qflags & INCLUDE_HERO) != 0;
+            engulfer = (qflags & INCLUDE_HERO) != 0,
+            engulfer_minvent;
     unsigned sortflags;
     Loot *sortedolist, *srtoli;
 
@@ -854,6 +855,13 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
             last = curr;
             n++;
         }
+    /* can't depend upon 'engulfer' because that's used to indicate whether
+       hero should be shown as an extra, fake item */
+    engulfer_minvent = (olist && olist->where == OBJ_MINVENT
+                        && u.uswallow && olist->ocarry == u.ustuck);
+    if (engulfer_minvent && n == 1 && olist->owornmask != 0L) {
+        qflags &= ~AUTOSELECT_SINGLE;
+    }
     if (engulfer) {
         ++n;
         /* don't autoselect swallowed hero if it's the only choice */
@@ -957,10 +965,20 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
         /* fix up counts:  -1 means no count used => pick all;
            if fake_hero_object was picked, discard that choice */
         for (i = k = 0, mi = *pick_list; i < n; i++, mi++) {
-            if (mi->item.a_obj == &fake_hero_object)
+            curr = mi->item.a_obj;
+            if (curr == &fake_hero_object) {
+                /* this isn't actually possible; fake item representing
+                   hero is only included for look here (':'), not pickup,
+                   and that's PICK_NONE so we can't get here from there */
+                You_cant("pick yourself up!");
                 continue;
-            if (mi->count == -1L || mi->count > mi->item.a_obj->quan)
-                mi->count = mi->item.a_obj->quan;
+            }
+            if (engulfer_minvent && curr->owornmask != 0L) {
+                You_cant("pick %s up.", ysimple_name(curr));
+                continue;
+            }
+            if (mi->count == -1L || mi->count > curr->quan)
+                mi->count = curr->quan;
             if (k < i)
                 (*pick_list)[k] = *mi;
             ++k;
@@ -971,10 +989,14 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
             *pick_list = 0;
             n = 0;
         } else if (k < n) {
-            /* other stuff plus fake_hero; last slot is now unused */
-            (*pick_list)[k].item = zeroany;
-            (*pick_list)[k].count = 0L;
-            n = k;
+            /* other stuff plus fake_hero; last slot is now unused
+               (could be more than one if player tried to pick items
+               worn by engulfer) */
+            while (n > k) {
+                --n;
+                (*pick_list)[n].item = zeroany;
+                (*pick_list)[n].count = 0L;
+            }
         }
     } else if (n < 0) {
         /* -1 is used for SIGNAL_NOMENU, so callers don't expect it
@@ -1473,6 +1495,10 @@ boolean telekinesis; /* not picking it up directly by hand */
         obj->dknown = 1;
 
     if (obj == uchain) { /* do not pick up attached chain */
+        return 0;
+    } else if (obj->where == OBJ_MINVENT && obj->owornmask != 0L
+               && u.uswallow && obj->ocarry == u.ustuck) {
+        You_cant("pick %s up.", ysimple_name(obj));
         return 0;
     } else if (obj->oartifact && !touch_artifact(obj, &youmonst)) {
         return 0;
