@@ -1129,7 +1129,7 @@ friday_13th()
 int
 night()
 {
-    register int hour = (iflags.debug_fuzzer ? (moves / 1000) % 24 :
+    register int hour = (iflags.debug_fuzzer ? (g.moves / 1000) % 24 :
                                                getlt()->tm_hour);
 
     return (hour < 6 || hour > 21);
@@ -1138,7 +1138,7 @@ night()
 int
 midnight()
 {
-    register int hour = (iflags.debug_fuzzer ? (moves / 1000) % 24 :
+    register int hour = (iflags.debug_fuzzer ? (g.moves / 1000) % 24 :
                                                getlt()->tm_hour);
 
     return (hour == 0);
