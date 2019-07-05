@@ -1129,7 +1129,8 @@ friday_13th()
 int
 night()
 {
-    register int hour = getlt()->tm_hour;
+    register int hour = (iflags.debug_fuzzer ? (moves / 1000) % 24 :
+                                               getlt()->tm_hour);
 
     return (hour < 6 || hour > 21);
 }
@@ -1137,7 +1138,10 @@ night()
 int
 midnight()
 {
-    return (getlt()->tm_hour == 0);
+    register int hour = (iflags.debug_fuzzer ? (moves / 1000) % 24 :
+                                               getlt()->tm_hour);
+
+    return (hour == 0);
 }
 
 /* strbuf_init() initializes strbuf state for use */

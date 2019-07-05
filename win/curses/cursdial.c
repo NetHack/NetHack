@@ -125,9 +125,7 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
     int map_height, map_width, maxwidth, remaining_buf, winx, winy, count;
     WINDOW *askwin, *bwin;
     char *tmpstr;
-    int prompt_width = (int) strlen(prompt) + buffer + 1;
-    int prompt_height = 1;
-    int height = prompt_height;
+    int prompt_width, prompt_height = 1, height = prompt_height;
     char input[BUFSZ];
 
     /* if messages were being suppressed for the remainder of the turn,
@@ -136,6 +134,8 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
 
     if (buffer > (int) sizeof input)
         buffer = (int) sizeof input;
+    /* +1: space between prompt and answer; buffer already accounts for \0 */
+    prompt_width = (int) strlen(prompt) + 1 + buffer;
     maxwidth = term_cols - 2;
 
     if (iflags.window_inited) {
@@ -163,23 +163,20 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
         free(tmpstr);
     }
 
-    if (iflags.window_inited) {
-        bwin = curses_create_window(prompt_width, height, UP);
-        wrefresh(bwin);
-        getbegyx(bwin, winy, winx);
-        askwin = newwin(height, prompt_width, winy + 1, winx + 1);
-    } else {
-        bwin = curses_create_window(prompt_width, height, CENTER);
-        wrefresh(bwin);
-        getbegyx(bwin, winy, winx);
-        askwin = newwin(height, prompt_width, winy + 1, winx + 1);
-    }
+    bwin = curses_create_window(prompt_width, height,
+                                iflags.window_inited ? UP : CENTER);
+    wrefresh(bwin);
+    getbegyx(bwin, winy, winx);
+    askwin = newwin(height, prompt_width, winy + 1, winx + 1);
+
     for (count = 0; count < prompt_height; count++) {
         tmpstr = curses_break_str(prompt, maxwidth, count + 1);
-        if (count == (prompt_height - 1)) { /* Last line */
-            mvwprintw(askwin, count, 0, "%s ", tmpstr);
-        } else {
-            mvwaddstr(askwin, count, 0, tmpstr);
+        mvwaddstr(askwin, count, 0, tmpstr);
+        if (count == prompt_height - 1) { /* Last line */
+            if ((int) strlen(tmpstr) < maxwidth)
+                waddch(askwin, ' ');
+            else
+                wmove(askwin, count + 1, 0);
         }
         free(tmpstr);
     }
@@ -188,7 +185,7 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
     curs_set(1);
     wgetnstr(askwin, input, buffer - 1);
     curs_set(0);
-    strcpy(answer, input);
+    Strcpy(answer, input);
     werase(bwin);
     delwin(bwin);
     curses_destroy_win(askwin);
