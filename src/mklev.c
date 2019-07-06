@@ -1,4 +1,4 @@
-/* NetHack 3.6	mklev.c	$NHDT-Date: 1560304468 2019/06/12 01:54:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	mklev.c	$NHDT-Date: 1562455089 2019/07/06 23:18:09 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -583,6 +583,10 @@ clear_level_structures()
     register int x, y;
     register struct rm *lev;
 
+    /* note:  normally we'd start at x=1 because map column #0 isn't used
+       (except for placing vault guard at <0,0> when removed from the map
+       but not from the level); explicitly reset column #0 along with the
+       rest so that we start the new level with a completely clean slate */
     for (x = 0; x < COLNO; x++) {
         lev = &levl[x][0];
         for (y = 0; y < ROWNO; y++) {
@@ -637,6 +641,7 @@ clear_level_structures()
     xdnstair = ydnstair = xupstair = yupstair = 0;
     sstairs.sx = sstairs.sy = 0;
     xdnladder = ydnladder = xupladder = yupladder = 0;
+    dnstairs_room = upstairs_room = sstairs_room = (struct mkroom *) 0;
     made_branch = FALSE;
     clear_regions();
 }
@@ -1016,9 +1021,12 @@ mklev()
     for (ridx = 0; ridx < SIZE(rooms); ridx++)
         rooms[ridx].orig_rtype = rooms[ridx].rtype;
 
-    dnstairs_room = NULL;
-    upstairs_room = NULL;
-    sstairs_room = NULL;
+    /* something like this usually belongs in clear_level_structures()
+       but these aren't saved and restored so might not retain their
+       values for the life of the current level; reset them to default
+       now so that they never do and no one will be tempted to introduce
+       a new use of them for anything on this level */
+    dnstairs_room = upstairs_room = sstairs_room = (struct mkroom *) 0;
 
     reseed_random(rn2);
     reseed_random(rn2_on_display_rng);
