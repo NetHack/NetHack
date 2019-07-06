@@ -1016,6 +1016,10 @@ mklev()
     for (ridx = 0; ridx < SIZE(rooms); ridx++)
         rooms[ridx].orig_rtype = rooms[ridx].rtype;
 
+    dnstairs_room = NULL;
+    upstairs_room = NULL;
+    sstairs_room = NULL;
+
     reseed_random(rn2);
     reseed_random(rn2_on_display_rng);
 }
