@@ -1826,7 +1826,7 @@ domove_core()
             newsym(x, y);
             newsym(u.ux0, u.uy0);
 
-            You("%s %s.", mtmp->mtame ? "swap places with" : "frighten",
+            You("%s %s.", mtmp->mtame ? "displaced" : "frighten",
                 pnambuf);
 
             /* check for displacing it into pools and traps */
