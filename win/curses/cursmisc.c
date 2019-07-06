@@ -792,6 +792,13 @@ curses_convert_keys(int key)
 
     /* Handle arrow keys */
     switch (key) {
+    case KEY_BACKSPACE:
+        /* we can't distinguish between a separate backspace key and
+           explicit Ctrl+H intended to rush to the left; without this,
+           a value for ^H greater than 255 is passed back to core's
+           readchar() and stripping the value down to 0..255 yields ^G! */
+        ret = C('H');
+        break;
     case KEY_LEFT:
         if (iflags.num_pad) {
             ret = '4';

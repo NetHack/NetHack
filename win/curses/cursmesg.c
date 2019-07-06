@@ -661,7 +661,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             goto alldone;
         case '\177': /* DEL/Rubout */
         case KEY_DC: /* delete-character */
-        case '\b': /* ^H (Backspace: '\011') */
+        case '\b': /* ^H (Backspace: '\010') */
         case KEY_BACKSPACE:
             if (len < 1) {
                 len = 1;

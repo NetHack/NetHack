@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.84 $ $NHDT-Date: 1562203850 2019/07/04 01:30:50 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.85 $ $NHDT-Date: 1562456458 2019/07/06 23:40:58 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -169,6 +169,7 @@ curses: when map window was clipped, the 'scrollbars' shown to indicate which
 	the 2nd and 3rd fifths (for example) were currently within view
 curses: support users's setting for erase char and kill char when getting a
 	line of input with 'popup_dialog' Off (already supported for popup On)
+curses: attempting to use ^H to rush left actually executed ^G (#wizgenesis)
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with
