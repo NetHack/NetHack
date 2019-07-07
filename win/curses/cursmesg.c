@@ -661,7 +661,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             goto alldone;
         case '\177': /* DEL/Rubout */
         case KEY_DC: /* delete-character */
-        case '\b': /* ^H (Backspace: '\011') */
+        case '\b': /* ^H (Backspace: '\010') */
         case KEY_BACKSPACE:
             if (len < 1) {
                 len = 1;
@@ -887,7 +887,7 @@ boolean restoring_msghist;
     static int stash_count;
     static nhprev_mesg *stash_head = 0;
 #ifdef DUMPLOG
-    extern unsigned saved_pline_index; /* pline.c */
+    /* extern unsigned g.saved_pline_index; */ /* pline.c */
 #endif
 
     if (restoring_msghist && !initd) {
@@ -899,8 +899,8 @@ boolean restoring_msghist;
         last_mesg = (nhprev_mesg *) 0; /* no need to remember the tail */
         initd = TRUE;
 #ifdef DUMPLOG
-        /* this suffices; there's no need to scrub saved_pline[] pointers */
-        saved_pline_index = 0;
+        /* this suffices; there's no need to scrub g.saved_pline[] pointers */
+        g.saved_pline_index = 0;
 #endif
     }
 

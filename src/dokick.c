@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1551920353 2019/03/07 00:59:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1562462061 2019/07/07 01:14:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1053,9 +1053,9 @@ dokick()
             if (Levitation)
                 goto dumb;
             You("kick %s.", (Blind ? something : "the altar"));
+            altar_wrath(x, y);
             if (!rn2(3))
                 goto ouch;
-            altar_wrath(x, y);
             exercise(A_DEX, TRUE);
             return 1;
         }

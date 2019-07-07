@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.84 $ $NHDT-Date: 1562203850 2019/07/04 01:30:50 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.86 $ $NHDT-Date: 1562462061 2019/07/07 01:14:21 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -98,6 +98,7 @@ if an engulfer has any worn items, hero could pick them up from inside and
 	they wouldn't be unworn properly, eventually triggering warnings or
 	worse (Juiblex will wear an amulet if created with one; a shapechanger
 	might wear one and then turn into an engulfer)
+kicking an altar ignored god's wrath if hero injured himself during the kick
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -169,6 +170,7 @@ curses: when map window was clipped, the 'scrollbars' shown to indicate which
 	the 2nd and 3rd fifths (for example) were currently within view
 curses: support users's setting for erase char and kill char when getting a
 	line of input with 'popup_dialog' Off (already supported for popup On)
+curses: attempting to use ^H to rush left actually executed ^G (#wizgenesis)
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with
