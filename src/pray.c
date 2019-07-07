@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1559853037 2019/06/06 20:30:37 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1562462064 2019/07/07 01:14:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2221,13 +2221,21 @@ register int x, y;
 {
     aligntyp altaralign = a_align(x, y);
 
-    if (!strcmp(align_gname(altaralign), u_gname())) {
+    if (u.ualign.type == altaralign && u.ualign.record > -rn2(4)) {
         godvoice(altaralign, "How darest thou desecrate my altar!");
         (void) adjattrib(A_WIS, -1, FALSE);
+        u.ualign.record--;
     } else {
-        pline("A voice (could it be %s?) whispers:", align_gname(altaralign));
+        pline("%s %s%s:",
+              !Deaf ? "A voice (could it be"
+                    : "Despite your deafness, you seem to hear",
+              align_gname(altaralign),
+              !Deaf ? "?) whispers" : " say");
         verbalize("Thou shalt pay, infidel!");
-        change_luck(-1);
+        /* higher luck is more likely to be reduced; as it approaches -5
+           the chance to lose another point drops down, eventually to 0 */
+        if (Luck > -5 && rn2(Luck + 6))
+            change_luck(rn2(20) ? -1 : -2);
     }
 }
 

@@ -5947,8 +5947,8 @@ char def;
     res = (*windowprocs.win_yn_function)(query, resp, def);
 #ifdef DUMPLOG
     if (idx == g.saved_pline_index) {
-        /* when idx is still the same as saved_pline_index, the interface
-           didn't put the prompt into saved_plines[]; we put a simplified
+        /* when idx is still the same as g.saved_pline_index, the interface
+           didn't put the prompt into g.saved_plines[]; we put a simplified
            version in there now (without response choices or default) */
         Sprintf(dumplog_buf, "%s ", query);
         (void) key2txt((uchar) res, eos(dumplog_buf));
