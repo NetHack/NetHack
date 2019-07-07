@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1559664948 2019/06/04 16:15:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1562532730 2019/07/07 20:52:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.152 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -241,6 +241,8 @@ struct instance_flags {
     boolean defer_plname;  /* X11 hack: askname() might not set plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
+    int at_midnight;       /* only valid during end of game disclosure */
+    int at_night;          /* also only valid during end of game disclosure */
     int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
     int in_lava_effects;   /* hack for Boots_off() */
     int last_msg;          /* indicator of last message player saw */

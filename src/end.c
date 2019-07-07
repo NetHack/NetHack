@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1561414303 2019/06/24 22:11:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1562532734 2019/07/07 20:52:14 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1237,6 +1237,9 @@ int how;
        time or even day if player is slow responding to --More-- */
     urealtime.finish_time = endtime = getnow();
     urealtime.realtime += (long) (endtime - urealtime.start_timing);
+    /* collect these for end of game disclosure (not used during play) */
+    iflags.at_night = night();
+    iflags.at_midnight = midnight();
 
     dump_open_log(endtime);
     /* Sometimes you die on the first move.  Life's not fair.
