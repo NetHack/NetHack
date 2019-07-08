@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.86 $ $NHDT-Date: 1562462061 2019/07/07 01:14:21 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.87 $ $NHDT-Date: 1562532730 2019/07/07 20:52:10 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -212,6 +212,13 @@ if you reach the edge of a level (relatively uncommon) and try to move off,
 'attributes' disclosure at end of game includes number of experience points
 	that were needed to reach the next experience level (new for normal
 	play and explore mode; previously only shown for wizard mode)
+report Friday-13th/phase-of-moon/time-of-day for ^X and final disclosure when
+	their values matter to game play (date and moon are from the start of
+	current session and are not dynamically updated as real time elapses;
+	night is a fixed range of hours using the computer's conception of
+	local time which could differ from player's if there are time zone or
+	system clock issues or simply seasonal variation based on latitude;
+	not new but needs to be documented somewhere other than spoilers...)
 status highlighting using percentage rules now supported for experience level
 	and experience points; for both, percent is based on Exp progress from
 	the start of the current Xp level to the start of the next Xp level;
