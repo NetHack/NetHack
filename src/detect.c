@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1544437284 2018/12/10 10:21:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1562630266 2019/07/08 23:57:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -379,7 +379,7 @@ register struct obj *sobj;
     You("notice some gold between your %s.", makeplural(body_part(FOOT)));
     return 0;
 
-outgoldmap:
+ outgoldmap:
     cls();
 
     (void) unconstrain_map();
@@ -993,7 +993,7 @@ struct obj *sobj; /* null if crystal ball, *scroll if gold detection scroll */
     Your("%s itch.", makeplural(body_part(TOE)));
     return 0;
 
-outtrapmap:
+ outtrapmap:
     cls();
 
     (void) unconstrain_map();
@@ -1441,6 +1441,8 @@ struct rm *lev;
     lev->doormask = newmask;
 }
 
+/* find something at one location; it should find all somethings there
+   since it is used for magical detection rather than physical searching */
 STATIC_PTR void
 findone(zx, zy, num)
 int zx, zy;
@@ -1448,6 +1450,13 @@ genericptr_t num;
 {
     register struct trap *ttmp;
     register struct monst *mtmp;
+
+    /*
+     * This used to use if/else-if/else-if/else/end-if but that only
+     * found the first hidden thing at the location.  Two hidden things
+     * at the same spot is uncommon, but it's possible for an undetected
+     * monster to be hiding at the location of an unseen trap.
+     */
 
     if (levl[zx][zy].typ == SDOOR) {
         cvt_sdoor_to_door(&levl[zx][zy]); /* .typ = DOOR */
@@ -1460,19 +1469,25 @@ genericptr_t num;
         magic_map_background(zx, zy, 0);
         newsym(zx, zy);
         (*(int *) num)++;
-    } else if ((ttmp = t_at(zx, zy)) != 0) {
-        if (!ttmp->tseen && ttmp->ttyp != STATUE_TRAP) {
-            ttmp->tseen = 1;
-            newsym(zx, zy);
-            (*(int *) num)++;
-        }
-    } else if ((mtmp = m_at(zx, zy)) != 0) {
+    }
+
+    if ((ttmp = t_at(zx, zy)) != 0 && !ttmp->tseen
+        /* [shouldn't successful 'find' reveal and activate statue traps?] */
+        && ttmp->ttyp != STATUE_TRAP) {
+        ttmp->tseen = 1;
+        newsym(zx, zy);
+        (*(int *) num)++;
+    }
+
+    if ((mtmp = m_at(zx, zy)) != 0
+        /* brings hidden monster out of hiding even if already sensed */
+        && (!canspotmon(mtmp) || mtmp->mundetected || M_AP_TYPE(mtmp))) {
         if (M_AP_TYPE(mtmp)) {
             seemimic(mtmp);
             (*(int *) num)++;
-        }
-        if (mtmp->mundetected
-            && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
+        } else if (mtmp->mundetected && (is_hider(mtmp->data)
+                                         || hides_under(mtmp->data)
+                                         || mtmp->data->mlet == S_EEL)) {
             mtmp->mundetected = 0;
             newsym(zx, zy);
             (*(int *) num)++;
@@ -1600,8 +1615,7 @@ struct trap *trap;
 
     /* The "Hallucination ||" is to preserve 3.6.1 behaviour, but this
        behaviour might need a rework in the hallucination case
-       (e.g. to not prompt if any trap glyph appears on the
-       square). */
+       (e.g. to not prompt if any trap glyph appears on the square). */
     if (Hallucination ||
         levl[trap->tx][trap->ty].glyph !=
         trap_to_glyph(trap, rn2_on_display_rng)) {
@@ -1634,18 +1648,22 @@ boolean via_warning;
     if (M_AP_TYPE(mtmp)) {
         seemimic(mtmp);
         found_something = TRUE;
-    } else if (!canspotmon(mtmp)) {
-        if (mtmp->mundetected
-            && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
+    } else {
+        /* this used to only be executed if a !canspotmon() test passed
+           but that failed to bring sensed monsters out of hiding */
+        found_something = !canspotmon(mtmp);
+        if (mtmp->mundetected && (is_hider(mtmp->data)
+                                  || hides_under(mtmp->data)
+                                  || mtmp->data->mlet == S_EEL)) {
             if (via_warning) {
                 Your("warning senses cause you to take a second %s.",
                      Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
             mtmp->mundetected = 0;
+            found_something = TRUE;
         }
         newsym(x, y);
-        found_something = TRUE;
     }
 
     if (found_something) {
