@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.89 $ $NHDT-Date: 1562632673 2019/07/09 00:37:53 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.90 $ $NHDT-Date: 1562723693 2019/07/10 01:54:53 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -174,6 +174,10 @@ curses: when map window was clipped, the 'scrollbars' shown to indicate which
 curses: support users's setting for erase char and kill char when getting a
 	line of input with 'popup_dialog' Off (already supported for popup On)
 curses: attempting to use ^H to rush left actually executed ^G (#wizgenesis)
+curses: disable the attempt to support Ctrl+Left_click as an alternate way
+	to generate Right_click for systems with one-button mouse or trackpad;
+	the mouse data passed to nethack didn't match the curses (ncurses on
+	OSX 10.11) documentation and things didn't work as intended
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with

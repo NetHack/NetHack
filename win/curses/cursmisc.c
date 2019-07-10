@@ -877,13 +877,20 @@ curses_convert_keys(int key)
     return ret;
 }
 
-/* we treat buttons 2 and 3 as equivalent so that it doesn't matter which
-   one is for right-click and which for middle-click; the core uses CLICK_2
-   for right-click ("not left" click) even though 2 might be middle button;
-   we also support Ctrl+left-click as another way to get "not left" click
-   since Mac is traditionally saddled with a one button mouse or trackpad */
-#define MOUSEBUTTONS ((BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED) \
-                      | BUTTON_CTRL)
+/*
+ * We treat buttons 2 and 3 as equivalent so that it doesn't matter which
+ * one is for right-click and which for middle-click.  The core uses CLICK_2
+ * for right-click ("not left"-click) even though 2 might be middle button.
+ *
+ * BUTTON_CTRL was enabled at one point but was not working as intended.
+ * Ctrl+left_click was generating pairs of duplicated events with Ctrl and
+ * Report_mouse_position bits set (even though Report_mouse_position wasn't
+ * enabled) but no button click bit set.  (It sort of worked because Ctrl+
+ * Report_mouse_position wasn't a left click so passed along CLICK_2, but
+ * the duplication made that too annoying to use.  Attempting to immediately
+ * drain the second one wasn't working as intended either.)
+ */
+#define MOUSEBUTTONS (BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED)
 
 /* Process mouse events.  Mouse movement is processed until no further
 mouse movement events are available.  Returns 0 for a mouse click
