@@ -56,6 +56,7 @@ extern void NDECL(backsp);
 int NDECL(windows_console_custom_nhgetch);
 extern void NDECL(safe_routines);
 
+#ifndef NEW_KEYBOARD_HIT
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
  * For the tty port it is tty_kbhit() [from nttty.c]
@@ -65,6 +66,7 @@ extern void NDECL(safe_routines);
 
 int def_kbhit(void);
 int (*nt_kbhit)() = def_kbhit;
+#endif
 
 char
 switchar()
@@ -158,11 +160,13 @@ max_filename()
         return 0;
 }
 
+#ifndef NEW_KEYBOARD_HIT
 int
 def_kbhit()
 {
     return 0;
 }
+#endif
 
 /*
  * Strip out troublesome file system characters.
@@ -510,7 +514,9 @@ int code;
     exit(code);
 }
 
+#ifndef NEW_KEYBOARD_HIT
 #undef kbhit
+#endif
 #include <conio.h>
 
 int
@@ -719,7 +725,6 @@ sys_random_seed(VOID_ARGS)
     }
     return ourseed;
 }
-
 #endif /* WIN32 */
 
 /*winnt.c*/
