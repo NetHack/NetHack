@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.310 $ $NHDT-Date: 1562114349 2019/07/03 00:39:09 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.311 $ $NHDT-Date: 1562719337 2019/07/10 00:42:17 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "May 7, 2019
+.ds f2 "July 9, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4554,14 +4554,6 @@ Z	S_zombie	(zombie)
 z	S_zruty	(zruty)
 .\"TABLE_END  Do not delete this line.
 .TE
-.pg
-There is one additional class of object, described as \(lqstrange object\(rq,
-which will occasionally be the shape taken on by mimics and shown
-as \(oq]\(cq for maps displayed as text characters.
-Although the displayed character is the same as the default value for
-\(lqS_mimic_def\(rq, it is a different symbol and there is no corresponding
-\(lqS_strange_object\(rq symbol nor any way to assign an alternate value
-for it.
 .pg
 .hn 2
 Configuring NetHack for Play by the Blind
