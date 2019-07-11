@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1562806586 2019/07/11 00:56:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.210 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1562876956 2019/07/11 20:29:16 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.211 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1517,6 +1517,7 @@ struct attack *mattk;
             }
         *minvent_ptr = stealoid; /* put armor back into minvent */
     }
+    gold = findgold(mdef->minvent);
 
     if (stealoid) { /* we will be taking everything */
         if (gender(mdef) == (int) u.mfemale && g.youmonst.data->mlet == S_NYMPH)
@@ -1533,11 +1534,11 @@ struct attack *mattk;
        stolen c'trice corpse or monster wielding one and having gloves
        stolen) is less bookkeeping than skipping it within the loop or
        taking it out once and then trying to figure out how to put it back */
-    if ((gold = findgold(mdef->minvent)) != 0)
+    if (gold)
         obj_extract_self(gold);
 
     while ((otmp = mdef->minvent) != 0) {
-        if (gold) /* put 'mdef's gold back */
+        if (gold) /* put 'mdef's gold back after remembering mdef->minvent */
             mpickobj(mdef, gold), gold = 0;
         if (!Upolyd)
             break; /* no longer have ability to steal */
