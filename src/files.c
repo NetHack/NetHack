@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1559670605 2019/06/04 17:50:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.250 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1562719337 2019/07/10 00:42:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.252 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3151,7 +3151,7 @@ char *buf;
 int which_set;
 {
     int val, i;
-    struct symparse *symp = (struct symparse *) 0;
+    struct symparse *symp;
     char *bufp, *commentp, *altp;
 
     /* convert each instance of whitespace (tabs, consecutive spaces)
