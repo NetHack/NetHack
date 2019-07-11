@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1562532731 2019/07/07 20:52:11 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.339 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1562838823 2019/07/11 09:53:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.340 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -990,7 +990,8 @@ wiz_panic(VOID_ARGS)
         u.uen = u.uenmax = 1000;
         return 0;
     }
-    if (yn("Do you want to call panic() and end your game?") == 'y')
+    if (paranoid_query(ParanoidQuit,
+                       "Do you want to call panic() and end your game?"))
         panic("Crash test.");
     return 0;
 }
