@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.311 $ $NHDT-Date: 1562719337 2019/07/10 00:42:17 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.312 $ $NHDT-Date: 1562838836 2019/07/11 09:53:56 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -1104,6 +1104,12 @@ Autocompletes.
 Default key is \(oqM-e\(cq.
 .lp #exploremode
 Enter the explore mode.
+.lp ""
+Requires confirmation; default response is \f(CRn\fP (no).
+To really switch to explore mode, respond with \f(CRy\fP.
+You can set the
+.op paranoid_confirmation:quit
+option to require a response of \f(CRyes\fP instead.
 .lp "#fire    "
 Fire ammunition from quiver.
 Default key is \(oqf\(cq.
@@ -1211,6 +1217,12 @@ Test the panic routine.
 Terminates the current game.
 Autocompletes.
 Debug mode only.
+.lp ""
+Asks for confirmation; default is \f(CRn\fP (no); continue playing.
+To really panic, respond with \f(CRy\fP.
+You can set the
+.op paranoid_confirmation:quit
+option to require a response of \f(CRyes\fP instead.
 .lp "#pay     "
 Pay your shopping bill.
 Default key is \(oqp\(cq.
@@ -1251,10 +1263,11 @@ Default key is \(oqM-q\(cq.
 .lp ""
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.
-By default a response of \(oqy\(cq acknowledges that intent.
+Default response is \f(CRn\fP (no); continue playing.
+To really quit, respond with \f(CRy\fP.
 You can set the
-.op paranoid_confirmation
-option to require a response of \(lqyes\(rq instead.
+.op paranoid_confirmation:quit
+option to require a response of \f(CRyes\fP instead.
 .lp "#quiver  "
 Select ammunition for quiver.
 Default key is \(oqQ\(cq.
