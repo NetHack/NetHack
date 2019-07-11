@@ -1216,7 +1216,13 @@ Advance or check weapon and spell skills. Autocompletes.
 Default key is `{\tt M-e}'.
 %.lp
 \item[\tb{\#exploremode}]
-Enter the explore mode.
+Enter the explore mode.\\
+%.lp ""
+Requires confirmation; default response is `{\tt n}' (no).
+To really switch to explore mode, respond with `{\tt y}'.
+You can set the
+{\it paranoid\verb+_+confirmation:quit\/}
+option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#fire}]
 Fire ammunition from quiver. Default key is `{\tt f}'.
@@ -1324,7 +1330,13 @@ Default keys are `{\tt \^{}O}', and `{\tt M-O}'.
 Test the panic routine.
 Terminates the current game.
 Autocompletes.
-Debug mode only.
+Debug mode only.\\
+%.lp ""
+Asks for confirmation; default is `{\tt n}' (no); continue playing.
+To really panic, respond with `{\tt y}''.
+You can set the
+{\it paranoid\verb+_+confirmation:quit\/}
+option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#pay}]
 Pay your shopping bill. Default key is `{\tt p}'.
@@ -1361,12 +1373,14 @@ Quaff (drink) something. Default key is `{\tt q}'.
 %.lp
 \item[\tb{\#quit}]
 Quit the program without saving your game. Autocompletes.
-Default key is `{\tt M-q}'.
+Default key is `{\tt M-q}'.\\
 %.lp ""
 Since using this command by accident would throw away the current game,
-you are asked to confirm your intent before quitting.  By default a
-response of `{\tt y}' acknowledges that intent.  You can set the
-{\it paranoid\verb+_+confirmation\/}
+you are asked to confirm your intent before quitting.
+Default response is `{\tt n}' (no); continue playing.
+To really quit, respond with `{\tt y}'.
+You can set the
+{\it paranoid\verb+_+confirmation:quit\/}
 option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#quiver}]
