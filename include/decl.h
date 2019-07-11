@@ -455,6 +455,12 @@ struct early_opt {
     boolean valallowed;
 };
 
+/* topline states */
+#define TOPLINE_EMPTY          0 /* empty */
+#define TOPLINE_NEED_MORE      1 /* non-empty, need --More-- */
+#define TOPLINE_NON_EMPTY      2 /* non-empty, no --More-- required */
+#define TOPLINE_SPECIAL_PROMPT 3 /* special prompt state */
+
 #undef E
 
 #endif /* DECL_H */
