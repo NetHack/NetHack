@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1555720104 2019/04/20 00:28:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1562806586 2019/07/11 00:56:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.210 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1498,10 +1498,11 @@ steal_it(mdef, mattk)
 struct monst *mdef;
 struct attack *mattk;
 {
-    struct obj *otmp, *stealoid, **minvent_ptr;
+    struct obj *otmp, *gold = 0, *stealoid, **minvent_ptr;
     long unwornmask;
 
-    if (!mdef->minvent)
+    otmp = mdef->minvent;
+    if (!otmp || (otmp->oclass == COIN_CLASS && !otmp->nobj))
         return; /* nothing to take */
 
     /* look for worn body armor */
@@ -1524,14 +1525,25 @@ struct attack *mattk;
 
     if (stealoid) { /* we will be taking everything */
         if (gender(mdef) == (int) u.mfemale && youmonst.data->mlet == S_NYMPH)
-            You("charm %s.  She gladly hands over her possessions.",
-                mon_nam(mdef));
+            You("charm %s.  She gladly hands over %sher possessions.",
+                mon_nam(mdef), !gold ? "" : "most of ");
         else
             You("seduce %s and %s starts to take off %s clothes.",
                 mon_nam(mdef), mhe(mdef), mhis(mdef));
     }
 
+    /* prevent gold from being stolen so that steal-item isn't a superset
+       of steal-gold; shuffling it out of minvent before selecting next
+       item, and then back in case hero or monster dies (hero touching
+       stolen c'trice corpse or monster wielding one and having gloves
+       stolen) is less bookkeeping than skipping it within the loop or
+       taking it out once and then trying to figure out how to put it back */
+    if ((gold = findgold(mdef->minvent)) != 0)
+        obj_extract_self(gold);
+
     while ((otmp = mdef->minvent) != 0) {
+        if (gold) /* put 'mdef's gold back */
+            mpickobj(mdef, gold), gold = 0;
         if (!Upolyd)
             break; /* no longer have ability to steal */
         /* take the object away from the monster */
@@ -1564,12 +1576,25 @@ struct attack *mattk;
         } else if (unwornmask & W_ARMG) { /* stole worn gloves */
             mselftouch(mdef, (const char *) 0, TRUE);
             if (DEADMONSTER(mdef)) /* it's now a statue */
-                return;         /* can't continue stealing */
+                break; /* can't continue stealing */
         }
 
         if (!stealoid)
             break; /* only taking one item */
+
+        /* take gold out of minvent before making next selection; if it
+           is the only thing left, the loop will terminate and it will be
+           put back below */
+        if ((gold = findgold(mdef->minvent)) != 0)
+            obj_extract_self(gold);
     }
+
+    /* put gold back; won't happen if either hero or 'mdef' dies because
+       gold will be back in monster's inventory at either of those times
+       (so will be present in mdef's minvent for bones, or in its statue
+       now if it has just been turned into one) */
+    if (gold)
+        mpickobj(mdef, gold);
 }
 
 int
