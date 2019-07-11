@@ -1144,6 +1144,9 @@ E void NDECL(gettty);
 E void NDECL(setftty);
 E void FDECL(settty, (const char *));
 E int NDECL(tgetch);
+#ifdef NEW_KEYBOARD_HIT
+E boolean NDECL(tkbhit);
+#endif
 E void FDECL(cmov, (int x, int y));
 E void FDECL(nocmov, (int x, int y));
 
@@ -1550,6 +1553,9 @@ E void FDECL(mplayer_talk, (struct monst *));
 
 #ifndef WIN32
 E int NDECL(tgetch);
+#ifdef NEW_KEYBOARD_HIT
+E boolean NDECL(tkbhit);
+#endif
 #endif
 #ifndef TOS
 E char NDECL(switchar);
@@ -1580,7 +1586,9 @@ E void FDECL(gotoxy, (int, int));
 #endif
 #ifdef TOS
 E int FDECL(_copyfile, (char *, char *));
+#ifndef NEW_KEYBOARD_HIT
 E int NDECL(kbhit);
+#endif
 E void NDECL(set_colors);
 E void NDECL(restore_colors);
 #ifdef SUSPEND
@@ -1590,7 +1598,9 @@ E int NDECL(dosuspend);
 #ifdef WIN32
 E char *FDECL(get_username, (int *));
 E void FDECL(nt_regularize, (char *));
+#ifndef NEW_KEYBOARD_HIT
 E int NDECL((*nt_kbhit));
+#endif
 E void FDECL(Delay, (int));
 #endif /* WIN32 */
 #endif /* MICRO || WIN32 */
@@ -1658,10 +1668,15 @@ E void FDECL(regex_free, (struct nhregex *));
 
 #ifdef WIN32
 E void NDECL(get_scr_size);
+#ifndef NEW_KEYBOARD_HIT
 E int NDECL(nttty_kbhit);
+#endif
 E void FDECL(nttty_open, (int));
 E void NDECL(nttty_rubout);
 E int NDECL(tgetch);
+#ifdef NEW_KEYBOARD_HIT
+E boolean NDECL(tkbhit);
+#endif
 E int FDECL(ntposkey, (int *, int *, int *));
 E void FDECL(set_output_mode, (int));
 E void NDECL(synch_cursor);

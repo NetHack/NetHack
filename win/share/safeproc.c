@@ -101,6 +101,9 @@ struct window_procs safe_procs = {
     safe_status_update,
 #endif
     safe_can_suspend,
+#ifdef NEW_KEYBOARD_HIT
+    safe_keyboard_hit
+#endif
 };
 
 struct window_procs *
@@ -385,6 +388,14 @@ safe_can_suspend()
 {
     return FALSE;
 }
+
+#ifdef NEW_KEYBOARD_HIT
+boolean
+safe_keyboard_hit()
+{
+    return FALSE;
+}
+#endif
 
 void
 safe_nhbell()

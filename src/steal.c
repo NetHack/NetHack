@@ -1,4 +1,4 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1561588404 2019/06/26 22:33:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	steal.c	$NHDT-Date: 1562806584 2019/07/11 00:56:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -247,7 +247,8 @@ struct monst *mtmp;
 char *objnambuf;
 {
     struct obj *otmp;
-    int tmp, could_petrify, armordelay, olddelay, named = 0, retrycnt = 0;
+    int tmp, could_petrify, armordelay, olddelay, icnt,
+        named = 0, retrycnt = 0;
     boolean monkey_business, /* true iff an animal is doing the thievery */
             was_doffing, was_punished = Punished;
 
@@ -263,11 +264,15 @@ char *objnambuf;
     if (g.occupation)
         (void) maybe_finished_meal(FALSE);
 
-    if (!g.invent || (inv_cnt(FALSE) == 1 && uskin)) {
+    icnt = inv_cnt(FALSE); /* don't include gold */
+    if (!icnt || (icnt == 1 && uskin)) {
  nothing_to_steal:
         /* Not even a thousand men in armor can strip a naked man. */
         if (Blind)
             pline("Somebody tries to rob you, but finds nothing to steal.");
+        else if (inv_cnt(TRUE) > inv_cnt(FALSE)) /* ('icnt' might be stale) */
+            pline("%s tries to rob you, but isn't interested in gold.",
+                  Monnam(mtmp));
         else
             pline("%s tries to rob you, but there is nothing to steal!",
                   Monnam(mtmp));

@@ -398,10 +398,12 @@ int mode; // unused
 {
     DWORD cmode;
 
+#ifndef NEW_KEYBOARD_HIT
     /* Initialize the function pointer that points to
      * the kbhit() equivalent, in this TTY case nttty_kbhit()
      */
     nt_kbhit = nttty_kbhit;
+#endif
 
     if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE) CtrlHandler, TRUE)) {
         /* Unable to set control handler */
@@ -436,11 +438,19 @@ int portdebug;
     return ch;
 }
 
+#ifndef NEW_KEYBOARD_HIT
 int
 nttty_kbhit()
 {
     return keyboard_handler.pNHkbhit(console.hConIn, &ir);
 }
+#else
+boolean
+tkbhit()
+{
+    return keyboard_handler.pNHkbhit(console.hConIn, &ir) != 0;
+}
+#endif
 
 int
 tgetch()
