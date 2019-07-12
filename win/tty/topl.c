@@ -139,7 +139,7 @@ const char *str;
     putsyms(str);
     cl_end();
     ttyDisplay->toplin = TOPLINE_NEED_MORE;
-    if (ttyDisplay->cury && otoplin != 3)
+    if (ttyDisplay->cury && otoplin != TOPLINE_SPECIAL_PROMPT)
         more();
 }
 
@@ -204,11 +204,14 @@ more()
 {
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
-    /* avoid recursion -- only happens from interrupts */
-    if (ttyDisplay->inmore++)
-        return;
     if (iflags.debug_fuzzer)
         return;
+
+    /* avoid recursion -- only happens from interrupts */
+    if (ttyDisplay->inmore)
+        return;
+
+    ttyDisplay->inmore++;
 
     if (ttyDisplay->toplin) {
         tty_curs(BASE_WINDOW, cw->curx + 1, cw->cury);
@@ -256,6 +259,7 @@ register const char *bp;
         && cw->cury == 0
         && n0 + (int) strlen(toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
+        nhassert(strlen(toplines) == cw->curx);
         Strcat(toplines, "  ");
         Strcat(toplines, bp);
         cw->curx += 2;
@@ -309,6 +313,7 @@ char c;
         if (ttyDisplay->curx == 0 && ttyDisplay->cury > 0)
             tty_curs(BASE_WINDOW, CO, (int) ttyDisplay->cury - 1);
         backsp();
+        nhassert(ttyDisplay->curx > 0);
         ttyDisplay->curx--;
         cw->curx = ttyDisplay->curx;
         return;
@@ -689,6 +694,13 @@ boolean restoring_msghist;
     }
 
     if (msg) {
+        /* Caller is asking us to remember a top line that needed more.
+           Should we call more?  This can happen when the player has set
+           iflags.force_invmenu and they attempt to shoot with nothing in
+           the quiver. */
+        if (ttyDisplay && ttyDisplay->toplin == TOPLINE_NEED_MORE)
+            ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+
         /* move most recent message to history, make this become most recent */
         remember_topl();
         Strcpy(toplines, msg);
@@ -696,6 +708,9 @@ boolean restoring_msghist;
         dumplogmsg(toplines);
 #endif
     } else if (snapshot_mesgs) {
+        nhassert(ttyDisplay == NULL ||
+                 ttyDisplay->toplin != TOPLINE_NEED_MORE);
+
         /* done putting arbitrary messages in; put the snapshot ones back */
         for (idx = 0; snapshot_mesgs[idx]; ++idx) {
             remember_topl();
