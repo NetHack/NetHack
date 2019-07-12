@@ -475,16 +475,6 @@ char *buf;
 }
 #endif /* RUNTIME_PORT_ID */
 
-/* nhassert_failed is called when an nhassert's condition is false */
-void nhassert_failed(const char * exp, const char * file, int line)
-{
-    char message[BUFSZ];
-    snprintf(message, sizeof(message),
-                "NHASSERT(%s) in '%s' at line %d", exp, file, line);
-
-    impossible(message);
-}
-
 void
 nethack_exit(code)
 int code;
