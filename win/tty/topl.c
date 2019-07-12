@@ -259,7 +259,7 @@ register const char *bp;
         && cw->cury == 0
         && n0 + (int) strlen(toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
-        nhassert(strlen(toplines) == cw->curx);
+        /* nhassert(strlen(toplines) == cw->curx); */
         Strcat(toplines, "  ");
         Strcat(toplines, bp);
         cw->curx += 2;
@@ -313,7 +313,7 @@ char c;
         if (ttyDisplay->curx == 0 && ttyDisplay->cury > 0)
             tty_curs(BASE_WINDOW, CO, (int) ttyDisplay->cury - 1);
         backsp();
-        nhassert(ttyDisplay->curx > 0);
+        /* nhassert(ttyDisplay->curx > 0); */
         ttyDisplay->curx--;
         cw->curx = ttyDisplay->curx;
         return;
@@ -708,8 +708,8 @@ boolean restoring_msghist;
         dumplogmsg(toplines);
 #endif
     } else if (snapshot_mesgs) {
-        nhassert(ttyDisplay == NULL ||
-                 ttyDisplay->toplin != TOPLINE_NEED_MORE);
+        /* nhassert(ttyDisplay == NULL ||
+                 ttyDisplay->toplin != TOPLINE_NEED_MORE); */
 
         /* done putting arbitrary messages in; put the snapshot ones back */
         for (idx = 0; snapshot_mesgs[idx]; ++idx) {
