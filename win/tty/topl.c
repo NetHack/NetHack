@@ -260,7 +260,7 @@ register const char *bp;
         && n0 + (int) strlen(g.toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
         nhassert((long) strlen(g.toplines) == cw->curx);
-        Strcat(toplines, "  ");
+        Strcat(g.toplines, "  ");
         Strcat(g.toplines, bp);
         cw->curx += 2;
         if (!(cw->flags & WIN_STOP))
