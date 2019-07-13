@@ -617,115 +617,6 @@ boolean purged; /* True: took history's pointers, False: just cloned them */
     }
 }
 
-#if 0
-/*
- * This is called by the core save routines.
- * Each time we are called, we return one string from the
- * message history starting with the oldest message first.
- * When none are left, we return a final null string.
- *
- * History is collected at the time of the first call.
- * Any new messages issued after that point will not be
- * included among the output of the subsequent calls.
- */
-char *
-tty_getmsghistory(init)
-boolean init;
-{
-    static int nxtidx;
-    char *nextmesg;
-    char *result = 0;
-
-    if (init) {
-        msghistory_snapshot(FALSE);
-        nxtidx = 0;
-    }
-
-    if (snapshot_mesgs) {
-        nextmesg = snapshot_mesgs[nxtidx++];
-        if (nextmesg) {
-            result = (char *) nextmesg;
-        } else {
-            free_msghistory_snapshot(FALSE);
-        }
-    }
-    return result;
-}
-
-/*
- * This is called by the core savefile restore routines.
- * Each time we are called, we stuff the string into our message
- * history recall buffer. The core will send the oldest message
- * first (actually it sends them in the order they exist in the
- * save file, but that is supposed to be the oldest first).
- * These messages get pushed behind any which have been issued
- * since this session with the program has been started, since
- * they come from a previous session and logically precede
- * anything (like "Restoring save file...") that's happened now.
- *
- * Called with a null pointer to finish up restoration.
- *
- * It's also called by the quest pager code when a block message
- * has a one-line summary specified.  We put that line directly
- * into message history for ^P recall without having displayed it.
- */
-void
-tty_putmsghistory(msg, restoring_msghist)
-const char *msg;
-boolean restoring_msghist;
-{
-    static boolean initd = FALSE;
-    int idx;
-#ifdef DUMPLOG
-    extern unsigned saved_pline_index; /* pline.c */
-#endif
-
-    if (restoring_msghist && !initd) {
-        /* we're restoring history from the previous session, but new
-           messages have already been issued this session ("Restoring...",
-           for instance); collect current history (ie, those new messages),
-           and also clear it out so that nothing will be present when the
-           restored ones are being put into place */
-        msghistory_snapshot(TRUE);
-        initd = TRUE;
-#ifdef DUMPLOG
-        /* this suffices; there's no need to scrub saved_pline[] pointers */
-        saved_pline_index = 0;
-#endif
-    }
-
-    if (msg) {
-        /* Caller is asking us to remember a top line that needed more.
-           Should we call more?  This can happen when the player has set
-           iflags.force_invmenu and they attempt to shoot with nothing in
-           the quiver. */
-        if (ttyDisplay && ttyDisplay->toplin == TOPLINE_NEED_MORE)
-            ttyDisplay->toplin = TOPLINE_NON_EMPTY;
-
-        /* move most recent message to history, make this become most recent */
-        remember_topl();
-        Strcpy(toplines, msg);
-#ifdef DUMPLOG
-        dumplogmsg(toplines);
-#endif
-    } else if (snapshot_mesgs) {
-        nhassert(ttyDisplay == NULL ||
-                 ttyDisplay->toplin != TOPLINE_NEED_MORE);
-
-        /* done putting arbitrary messages in; put the snapshot ones back */
-        for (idx = 0; snapshot_mesgs[idx]; ++idx) {
-            remember_topl();
-            Strcpy(toplines, snapshot_mesgs[idx]);
-#ifdef DUMPLOG
-            dumplogmsg(toplines);
-#endif
-        }
-        /* now release the snapshot */
-        free_msghistory_snapshot(TRUE);
-        initd = FALSE; /* reset */
-    }
-}
-#else
 STATIC_OVL ptr_array_t *
 get_message_history()
 {
@@ -919,7 +810,6 @@ boolean restoring_msghist;
     }
 
 }
-#endif
 
 #endif /* TTY_GRAPHICS */
 
