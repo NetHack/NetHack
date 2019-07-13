@@ -134,6 +134,8 @@ extern void NDECL(getlock);
 #ifndef HAS_STDINT_H
 #define HAS_STDINT_H    /* force include of stdint.h in integer.h */
 #endif
+/* Turn on some additional warnings */
+#pragma warning(3:4389)
 #endif /* _MSC_VER */
 
 /* The following is needed for prototypes of certain functions */
@@ -146,14 +148,6 @@ extern void NDECL(getlock);
 #define strncmpi(a, b, c) strnicmp(a, b, c)
 #endif
 
-#ifdef _MSC_VER
-/* Visual Studio defines this in their own headers, which we don't use */
-#ifndef snprintf
-#define snprintf _snprintf
-#pragma warning( \
-    disable : 4996) /* deprecation warning suggesting snprintf_s */
-#endif
-#endif
 
 #include <sys/types.h>
 #include <stdlib.h>
@@ -274,17 +268,17 @@ extern int FDECL(set_win32_option, (const char *, const char *));
 extern int FDECL(alternative_palette, (char *));
 #endif
 
-#ifdef NDEBUG
-#define nhassert(expression) ((void)0)
-#else
-extern void FDECL(nhassert_failed, (const char * exp, const char * file,
-                                    int line));
-
-#define nhassert(expression) (void)((!!(expression)) || \
-        (nhassert_failed(#expression, __FILE__, __LINE__), 0))
-#endif
-
 #define nethack_enter(argc, argv) nethack_enter_winnt()
 extern void FDECL(nethack_exit, (int)) NORETURN;
 extern boolean FDECL(file_exists, (const char *));
+
+/* Override the default version of nhassert.  The default version is unable
+ * to generate a string form of the expression due to the need to be
+ * compatible with compilers which do not support macro stringization (i.e.
+ * #x to turn x into its string form).
+ */
+extern void FDECL(nt_assert_failed, (const char *, const char *, int));
+#define nhassert(expression) (void)((!!(expression)) || \
+        (nt_assert_failed(#expression, __FILE__, __LINE__), 0))
+
 #endif /* NTCONF_H */

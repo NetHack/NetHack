@@ -520,7 +520,7 @@ STATIC_VAR struct istat_s initblstats[MAXBLSTATS] = {
  * without STATUS_HILITES.
  */
 
-void
+STATIC_OVL void
 bot_via_windowport()
 {
     char buf[BUFSZ];
@@ -2769,7 +2769,7 @@ status_hilite_linestr_gather()
 }
 
 
-char *
+STATIC_OVL char *
 status_hilite2str(hl)
 struct hilite_s *hl;
 {
