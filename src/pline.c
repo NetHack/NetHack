@@ -583,9 +583,20 @@ VA_DECL(const char *, str)
 }
 
 /* nhassert_failed is called when an nhassert's condition is false */
-void nhassert_failed(const char * exp, const char * file, int line)
+void
+nhassert_failed(filepath, line)
+    const char * filepath;
+    int line;
 {
-    impossible("NHASSERT(%s) in '%s' at line %d", exp, file, line);
+    const char * filename;
+
+    /* attempt to get filename from path.  TODO: we really need a port provided
+     * function to return a filename from a path */
+    filename = strrchr(filepath, '/');
+    filename = (filename == NULL ? strrchr(filepath, '\\') : filename);
+    filename = (filename == NULL ? filepath : filename + 1);
+
+    impossible("nhassert failed in file '%s' at line %d", filename, line);
 }
 
 /*pline.c*/

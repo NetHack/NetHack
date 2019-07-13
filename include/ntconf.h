@@ -134,6 +134,8 @@ extern void NDECL(getlock);
 #ifndef HAS_STDINT_H
 #define HAS_STDINT_H    /* force include of stdint.h in integer.h */
 #endif
+/* Turn on some additional warnings */
+#pragma warning(3:4389)
 #endif /* _MSC_VER */
 
 /* The following is needed for prototypes of certain functions */
@@ -270,4 +272,14 @@ extern int FDECL(alternative_palette, (char *));
 #define nethack_enter(argc, argv) nethack_enter_winnt()
 extern void FDECL(nethack_exit, (int)) NORETURN;
 extern boolean FDECL(file_exists, (const char *));
+
+/* Override the default version of nhassert.  The default version is unable
+ * to generate a string form of the expression due to the need to be
+ * compatible with compilers which do not support macro stringization (i.e.
+ * #x to turn x into its string form).
+ */
+extern void FDECL(nt_assert_failed, (const char *, const char *, int));
+#define nhassert(expression) (void)((!!(expression)) || \
+        (nt_assert_failed(#expression, __FILE__, __LINE__), 0))
+
 #endif /* NTCONF_H */
