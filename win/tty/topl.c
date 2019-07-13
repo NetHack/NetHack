@@ -617,6 +617,7 @@ boolean purged; /* True: took history's pointers, False: just cloned them */
     }
 }
 
+#if 0
 /*
  * This is called by the core save routines.
  * Each time we are called, we return one string from the
@@ -724,6 +725,201 @@ boolean restoring_msghist;
         initd = FALSE; /* reset */
     }
 }
+#else
+STATIC_OVL ptr_array_t *
+get_message_history()
+{
+    char *mesg;
+    int i;
+    struct WinDesc *cw;
+    size_t max_length;
+    ptr_array_t * a;
+
+    nhassert(WIN_MESSAGE != WIN_ERR);
+    nhassert(wins[WIN_MESSAGE] != NULL);
+
+    /* paranoia (too early or too late panic save attempt?) */
+    if (WIN_MESSAGE == WIN_ERR || !wins[WIN_MESSAGE])
+        return NULL;
+
+    cw = wins[WIN_MESSAGE];
+
+    max_length = cw->rows;
+
+    if (*toplines) max_length++;
+
+    a = ptr_array_new(max_length);
+
+    nhassert(cw->maxrow <= cw->rows);
+    for (i = 0; i < cw->rows; ++i) {
+        mesg = cw->data[(i + cw->maxrow) % cw->rows];
+        if (mesg && *mesg)
+            a->elements[a->length++] = strdup(mesg);
+    }
+    if (*toplines)
+        a->elements[a->length++] = strdup(toplines);
+
+    return a;
+}
+
+STATIC_OVL void
+purge_message_history()
+{
+    int i;
+    struct WinDesc *cw;
+
+    nhassert(WIN_MESSAGE != WIN_ERR);
+    nhassert(wins[WIN_MESSAGE] != NULL);
+
+    cw = wins[WIN_MESSAGE];
+
+    *toplines = '\0';
+
+    for (i = 0; i < cw->rows; ++i) {
+        if (cw->data[i]) {
+            free(cw->data[i]);
+            cw->data[i] = (char *) 0;
+            cw->datlen[i] = 0;
+        }
+    }
+
+    cw->maxcol = cw->maxrow = 0;
+}
+
+/*
+ * This is called by the core save routines.
+ * Each time we are called, we return one string from the
+ * message history starting with the oldest message first.
+ * When none are left, we return a final null string.
+ *
+ * History is collected at the time of the first call.
+ * Any new messages issued after that point will not be
+ * included among the output of the subsequent calls.
+ */
+char *
+tty_getmsghistory(init)
+boolean init;
+{
+    static size_t nxtidx;
+    static ptr_array_t * saved_messages = NULL;
+    char *result = NULL;
+
+    if (init) {
+        nhassert(saved_messages == NULL);
+        saved_messages = get_message_history();
+        nxtidx = 0;
+        wins[WIN_MESSAGE]->flags |= WIN_LOCKHISTORY;
+    }
+
+    if (saved_messages) {
+        if (nxtidx < saved_messages->length)
+            result = saved_messages->elements[nxtidx++];
+
+        if (result == NULL) {
+            ptr_array_free(saved_messages);
+            saved_messages = NULL;
+            wins[WIN_MESSAGE]->flags &= ~WIN_LOCKHISTORY;
+        }
+    }
+    return result;
+}
+
+/*
+ * This is called by the core savefile restore routines.
+ * Each time we are called, we stuff the string into our message
+ * history recall buffer. The core will send the oldest message
+ * first (actually it sends them in the order they exist in the
+ * save file, but that is supposed to be the oldest first).
+ * These messages get pushed behind any which have been issued
+ * since this session with the program has been started, since
+ * they come from a previous session and logically precede
+ * anything (like "Restoring save file...") that's happened now.
+ *
+ * Called with a null pointer to finish up restoration.
+ *
+ * It's also called by the quest pager code when a block message
+ * has a one-line summary specified.  We put that line directly
+ * into message history for ^P recall without having displayed it.
+ */
+void
+tty_putmsghistory(msg, restoring_msghist)
+const char *msg;
+boolean restoring_msghist;
+{
+    static boolean initd = FALSE;
+    static ptr_array_t * saved_messages = NULL;
+    size_t i;
+#ifdef DUMPLOG
+    extern unsigned saved_pline_index; /* pline.c */
+#endif
+
+    nhassert(!(wins[WIN_MESSAGE]->flags & WIN_LOCKHISTORY));
+
+    if (restoring_msghist && !initd) {
+        /* we're restoring history from the previous session, but new
+           messages have already been issued this session ("Restoring...",
+           for instance); collect current history (ie, those new messages),
+           and also clear it out so that nothing will be present when the
+           restored ones are being put into place */
+        nhassert(saved_messages == NULL);
+        saved_messages = get_message_history();
+        purge_message_history();
+        initd = TRUE;
+#ifdef DUMPLOG
+        /* this suffices; there's no need to scrub saved_pline[] pointers */
+        saved_pline_index = 0;
+#endif
+    }
+
+    if (msg) {
+        /* Caller is asking us to remember a top line that needed more.
+           Should we call more?  This can happen when the player has set
+           iflags.force_invmenu and they attempt to shoot with nothing in
+           the quiver. */
+        if (ttyDisplay && ttyDisplay->toplin == TOPLINE_NEED_MORE)
+            ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+
+        /* move most recent message to history, make this become most recent */
+        remember_topl();
+        Strcpy(toplines, msg);
+#ifdef DUMPLOG
+        dumplogmsg(toplines);
+#endif
+        return;
+    }
+
+    /* tty_putmsghistory() is called with msg==NULL to indidate that
+     * we are finished restoring the message history.  If we saved
+     * some message history when we started, its time now to appened
+     * those saved messages.
+     *
+     * We don't otherwise expect to get called with msg==NULL.
+     *
+     */
+    nhassert(restoring_msghist && initd);
+
+    if (initd && restoring_msghist) {
+        if (saved_messages) {
+            nhassert(ttyDisplay == NULL ||
+                        ttyDisplay->toplin != TOPLINE_NEED_MORE);
+
+            for (i = 0; i<saved_messages->length; i++) {
+                const char * mesg = saved_messages->elements[i];
+                remember_topl();
+                nhassert(mesg);
+                Strcpy(toplines, mesg);
+#ifdef DUMPLOG
+                dumplogmsg(toplines);
+#endif
+            }
+            ptr_array_free(saved_messages);
+            saved_messages = NULL;
+            }
+        initd = FALSE;
+    }
+
+}
+#endif
 
 #endif /* TTY_GRAPHICS */
 
