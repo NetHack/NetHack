@@ -259,7 +259,7 @@ register const char *bp;
         && cw->cury == 0
         && n0 + (int) strlen(toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
-        nhassert(strlen(toplines) == cw->curx);
+        nhassert((long) strlen(toplines) == cw->curx);
         Strcat(toplines, "  ");
         Strcat(toplines, bp);
         cw->curx += 2;
