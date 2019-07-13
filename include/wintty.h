@@ -50,6 +50,12 @@ struct WinDesc {
 #define WIN_STOP 1        /* for NHW_MESSAGE; stops output */
 #define WIN_LOCKHISTORY 2 /* for NHW_MESSAGE; suppress history updates */
 
+/* topline states */
+#define TOPLINE_EMPTY          0 /* empty */
+#define TOPLINE_NEED_MORE      1 /* non-empty, need --More-- */
+#define TOPLINE_NON_EMPTY      2 /* non-empty, no --More-- required */
+#define TOPLINE_SPECIAL_PROMPT 3 /* special prompt state */
+
 /* descriptor for tty-based displays -- all the per-display data */
 struct DisplayDesc {
     short rows, cols; /* width and height of tty display */

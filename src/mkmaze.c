@@ -613,7 +613,7 @@ fixup_special()
     g.num_lregions = 0;
 }
 
-void
+STATIC_OVL void
 check_ransacked(s)
 char *s;
 {
@@ -624,7 +624,7 @@ char *s;
 #define ORC_LEADER 1
 static const char *orcfruit[] = { "paddle cactus", "dwarven root" };
 
-void
+STATIC_OVL void
 migrate_orc(mtmp, mflags)
 struct monst *mtmp;
 unsigned long mflags;
@@ -689,7 +689,7 @@ struct monst *mtmp;
             add_to_minv(mtmp, otmp);
     }
 }
-void
+STATIC_OVL void
 migr_booty_item(otyp, gang)
 int otyp;
 const char *gang;
@@ -710,7 +710,7 @@ const char *gang;
     }
 }
 
-void
+STATIC_OVL void
 stolen_booty(VOID_ARGS)
 {
     char *gang, gang_name[BUFSZ];

@@ -938,7 +938,7 @@ unsigned long old_rumor_offset;
     return rumor_offset;
 }
 
-void
+static void
 do_rnd_access_file(fname)
 const char *fname;
 {
@@ -1403,7 +1403,7 @@ do_date()
     return;
 }
 
-boolean
+static boolean
 get_gitinfo(githash, gitbranch)
 char *githash, *gitbranch;
 {
