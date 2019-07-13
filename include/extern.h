@@ -968,6 +968,8 @@ E void FDECL(strbuf_append, (strbuf_t *, const char *));
 E void FDECL(strbuf_reserve, (strbuf_t *, int));
 E void FDECL(strbuf_empty, (strbuf_t *));
 E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
+E struct ptr_array * FDECL(ptr_array_new, (size_t length));
+E void FDECL(ptr_array_free, (struct ptr_array *));
 
 /* ### invent.c ### */
 

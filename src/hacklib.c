@@ -1223,4 +1223,38 @@ strbuf_t *strbuf;
     }
 }
 
+ptr_array_t *
+ptr_array_new(max_length)
+    size_t max_length;
+{
+    size_t esize = max_length * sizeof(void *);
+    ptr_array_t * a = (ptr_array_t *) malloc(sizeof(ptr_array_t) + esize);
+    a->elements = (void **)(a + 1);
+    a->length = 0;
+    a->max_length = max_length;
+    memset(a->elements, 0, esize);
+    return a;
+}
+
+void
+ptr_array_free(a)
+    ptr_array_t * a;
+{
+    size_t i;
+
+    nhassert(a->length <= a->max_length);
+
+    for(i = 0; i < a->length; i++)
+        if(a->elements[i])
+            free(a->elements[i]);
+
+    for (i = a->length; i < a->max_length; i++) {
+        nhassert(a->elements[i] == NULL);
+        if(a->elements[i])
+            free(a->elements[i]);
+    }
+
+    free(a);
+}
+
 /*hacklib.c*/
