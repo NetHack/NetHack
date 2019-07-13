@@ -703,8 +703,16 @@ decl_globals_init()
     g.valuables[2].list = NULL;
     g.valuables[2].size = 0;
 
-    nhassert(g_init.magic == IVMAGIC);
-    nhassert(g_init.havestate == TRUE);
+    if (g_init.magic != IVMAGIC) {
+        printf("decl_globals_init: g_init.magic in unexpected state (%lx)\n",
+                g_init.magic);
+        exit(1);
+    }
+
+    if (g_init.havestate != TRUE) {
+        printf("decl_globals_init: g_init..havestate not TRUE\n");
+        exit(1);
+    }
 
     sfcap = default_sfinfo;
     sfrestinfo = default_sfinfo;
