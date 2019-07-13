@@ -3763,7 +3763,7 @@ struct opvar *mc;
 {
     int x, y;
     schar mapc;
-    xchar lit;
+    uchar lit;
     struct opvar *ret = selection_opvar((char *) 0);
 
     if (!ov || !mc || !ret)
