@@ -1409,7 +1409,7 @@ static const char *suptext2[] = {
     (char *) 0,
 };
 
-void
+STATIC_OVL void
 do_supplemental_info(name, pm, without_asking)
 char *name;
 struct permonst *pm;
@@ -1885,61 +1885,61 @@ docontact(VOID_ARGS)
     destroy_nhwindow(cwin);
 }
 
-void
+STATIC_OVL void
 dispfile_help(VOID_ARGS)
 {
     display_file(HELP, TRUE);
 }
 
-void
+STATIC_OVL void
 dispfile_shelp(VOID_ARGS)
 {
     display_file(SHELP, TRUE);
 }
 
-void
+STATIC_OVL void
 dispfile_optionfile(VOID_ARGS)
 {
     display_file(OPTIONFILE, TRUE);
 }
 
-void
+STATIC_OVL void
 dispfile_license(VOID_ARGS)
 {
     display_file(LICENSE, TRUE);
 }
 
-void
+STATIC_OVL void
 dispfile_debughelp(VOID_ARGS)
 {
     display_file(DEBUGHELP, TRUE);
 }
 
-void
+STATIC_OVL void
 hmenu_doextversion(VOID_ARGS)
 {
     (void) doextversion();
 }
 
-void
+STATIC_OVL void
 hmenu_dohistory(VOID_ARGS)
 {
     (void) dohistory();
 }
 
-void
+STATIC_OVL void
 hmenu_dowhatis(VOID_ARGS)
 {
     (void) dowhatis();
 }
 
-void
+STATIC_OVL void
 hmenu_dowhatdoes(VOID_ARGS)
 {
     (void) dowhatdoes();
 }
 
-void
+STATIC_OVL void
 hmenu_doextlist(VOID_ARGS)
 {
     (void) doextlist();

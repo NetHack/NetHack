@@ -4132,7 +4132,7 @@ boolean force_update;
  * must be updated because they need to change.
  * This is now done at an individual field case-by-case level.
  */
-boolean
+STATIC_OVL boolean
 check_fields(forcefields, sz)
 boolean forcefields;
 int sz[3];

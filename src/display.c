@@ -897,7 +897,7 @@ xchar x, y;
     }
 }
 
-int
+STATIC_OVL int
 tether_glyph(x, y)
 int x, y;
 {

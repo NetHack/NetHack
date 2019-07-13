@@ -2576,7 +2576,7 @@ int final;
 }
 
 /* attributes: intrinsics and the like, other non-obvious capabilities */
-void
+STATIC_OVL void
 attributes_enlightenment(unused_mode, final)
 int unused_mode UNUSED;
 int final;

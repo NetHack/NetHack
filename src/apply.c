@@ -1611,7 +1611,7 @@ int x,y;
             && is_valid_jump_pos(x, y, jumping_is_magic, FALSE));
 }
 
-void
+STATIC_OVL void
 display_jump_positions(state)
 int state;
 {
@@ -2870,7 +2870,7 @@ static const char
     cant_reach[] = "can't reach that spot from here.";
 
 /* find pos of monster in range, if only one monster */
-boolean
+STATIC_OVL boolean
 find_poleable_mon(pos, min_range, max_range)
 coord *pos;
 int min_range, max_range;
@@ -2926,7 +2926,7 @@ int x, y;
             && distu(x, y) <= polearm_range_max);
 }
 
-void
+STATIC_OVL void
 display_polearm_positions(state)
 int state;
 {

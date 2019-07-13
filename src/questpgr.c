@@ -578,7 +578,7 @@ int how;
         putmsghistory(out_line, FALSE);
 }
 
-boolean
+STATIC_OVL boolean
 skip_pager(common)
 boolean common;
 {

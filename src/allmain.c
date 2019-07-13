@@ -876,7 +876,7 @@ enum earlyarg e_arg;
  *                    optimization so that display output
  *                    can be debugged without buffering.
  */
-void
+STATIC_OVL void
 debug_fields(opts)
 const char *opts;
 {

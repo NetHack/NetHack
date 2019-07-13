@@ -561,7 +561,7 @@ static long bl_hilite_moves = 0L;
 static unsigned long cond_hilites[BL_ATTCLR_MAX];
 static int now_or_before_idx = 0; /* 0..1 for array[2][] first index */
 
-void
+STATIC_OVL void
 bot_via_windowport()
 {
     char buf[BUFSZ];
@@ -2812,7 +2812,7 @@ status_hilite_linestr_gather()
 }
 
 
-char *
+STATIC_OVL char *
 status_hilite2str(hl)
 struct hilite_s *hl;
 {

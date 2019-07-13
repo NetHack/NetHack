@@ -417,7 +417,7 @@ struct obj *obj;
     return xname_flags(obj, CXN_NORMAL);
 }
 
-char *
+STATIC_OVL char *
 xname_flags(obj, cxn_flags)
 register struct obj *obj;
 unsigned cxn_flags; /* bitmask of CXN_xxx values */
@@ -2576,7 +2576,7 @@ const char *oldstr;
     return bp;
 }
 
-boolean
+STATIC_OVL boolean
 badman(basestr, to_plural)
 const char *basestr;
 boolean to_plural;            /* true => makeplural, false => makesingular */

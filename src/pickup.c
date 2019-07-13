@@ -1710,7 +1710,7 @@ int x, y;
     return FALSE;
 }
 
-int
+STATIC_OVL int
 do_loot_cont(cobjp, cindex, ccount)
 struct obj **cobjp;
 int cindex, ccount; /* index of this container (1..N), number of them (N) */
