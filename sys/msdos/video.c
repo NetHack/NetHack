@@ -122,7 +122,7 @@ void FDECL(get_cursor, (int *, int *));
 void FDECL(adjust_cursor_flags, (struct WinDesc *));
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
-STATIC_DCL void NDECL(init_ttycolor);
+static void NDECL(init_ttycolor);
 
 int savevmode;               /* store the original video mode in here */
 int curcol, currow;          /* graphics mode current cursor locations */
@@ -719,7 +719,7 @@ char *schoice[3] = { "dark", "normal", "light" };
 char *shade[3];
 #endif /* VIDEOSHADES */
 
-STATIC_OVL void
+static void
 init_ttycolor()
 {
 #ifdef VIDEOSHADES
