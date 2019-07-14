@@ -1509,6 +1509,8 @@ NHFILE *nhfp;
         if (nhfp->fieldlevel)
             sfi_str(nhfp, msg, "msghistory", "msg", msgsize);
         msg[msgsize] = '\0';
+        if(fuzzer_msg_history(msg))
+            continue;
         putmsghistory(msg, TRUE);
         ++msgcount;
     }
