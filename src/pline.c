@@ -636,7 +636,7 @@ VA_DECL2(int, lvl, const char *, str)
         return;
 
     if (iflags.verbose_logging_start != 0 &&
-        moves >= iflags.verbose_logging_start)
+        g.moves >= iflags.verbose_logging_start)
         g_fuzzer_log_level = LOG_VERBOSE;
 
     if (lvl <= g_fuzzer_log_level)
