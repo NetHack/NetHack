@@ -1231,6 +1231,8 @@ register int fd;
             panic("restore_msghistory: msg too big (%d)", msgsize);
         mread(fd, (genericptr_t) msg, msgsize);
         msg[msgsize] = '\0';
+        if(fuzzer_msg_history(msg))
+            continue;
         putmsghistory(msg, TRUE);
         ++msgcount;
     }

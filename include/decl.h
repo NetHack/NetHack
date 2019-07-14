@@ -462,6 +462,10 @@ struct ptr_array {
 };
 typedef struct ptr_array ptr_array_t;
 
+/* logging verbosity levels */
+#define LOG_MINIMAL 0
+#define LOG_VERBOSE 1
+
 #undef E
 
 #endif /* DECL_H */

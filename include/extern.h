@@ -27,6 +27,13 @@ E void NDECL(newgame);
 E void FDECL(welcome, (BOOLEAN_P));
 E time_t NDECL(get_realtime);
 E int FDECL(argcheck, (int, char **, enum earlyarg));
+E void NDECL(fuzzer_start);
+E void NDECL(fuzzer_stop);
+E void NDECL(fuzzer_toggle);
+E void VDECL(fuzzer_log, (int, const char *, ...)) PRINTF_F(2, 3);
+E void NDECL(fuzzer_check);
+E void NDECL(fuzzer_auto_start);
+E boolean FDECL(fuzzer_msg_history, (const char *));
 
 /* ### apply.c ### */
 
@@ -950,6 +957,7 @@ E boolean
 FDECL(fuzzymatch, (const char *, const char *, const char *, BOOLEAN_P));
 E void FDECL(init_random, (int FDECL((*fn), (int))));
 E void FDECL(reseed_random, (int FDECL((*fn), (int))));
+E void FDECL(set_random, (unsigned long, int FDECL((*fn), (int))));
 E time_t NDECL(getnow);
 E int NDECL(getyear);
 #if 0
@@ -2161,6 +2169,7 @@ E int FDECL(rnd, (int));
 E int FDECL(d, (int, int));
 E int FDECL(rne, (int));
 E int FDECL(rnz, (int));
+E unsigned long NDECL(rul);
 
 /* ### role.c ### */
 
