@@ -45,8 +45,8 @@
 #define LSF_NEEDS_FIXUP 0x2 /* need oid fixup */
 
 /* SAVE2018 */
-STATIC_DCL void FDECL(write_ls, (NHFILE *, light_source *));
-STATIC_DCL int FDECL(maybe_write_ls, (NHFILE *, int, BOOLEAN_P));
+static void FDECL(write_ls, (NHFILE *, light_source *));
+static int FDECL(maybe_write_ls, (NHFILE *, int, BOOLEAN_P));
 
 /* imported from vision.c, for small circles */
 extern char circle_data[];
@@ -453,7 +453,7 @@ boolean ghostly;
  * sources that would be written.  If write_it is true, actually write
  * the light source out.
  */
-STATIC_OVL int
+static int
 maybe_write_ls(nhfp, range, write_it)
 NHFILE *nhfp;
 int range;
@@ -520,14 +520,14 @@ light_sources_sanity_check()
 
 /* SAVE2018 */
 #if 0
-STATIC_OVL void
+static void
 write_ls(fd, ls)
 int fd;
 light_source *ls;
 #endif /* 0 */
 
 /* Write a light source structure to disk. */
-STATIC_OVL void
+static void
 write_ls(nhfp, ls)
 NHFILE *nhfp;
 light_source *ls;

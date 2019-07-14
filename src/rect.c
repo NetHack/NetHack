@@ -6,7 +6,7 @@
 
 int FDECL(get_rect_ind, (NhRect *));
 
-STATIC_DCL boolean FDECL(intersect, (NhRect *, NhRect *, NhRect *));
+static boolean FDECL(intersect, (NhRect *, NhRect *, NhRect *));
 
 /*
  * In this file, we will handle the various rectangle functions we
@@ -97,7 +97,7 @@ rnd_rect()
  * otherwise returns FALSE
  */
 
-STATIC_OVL boolean
+static boolean
 intersect(r1, r2, r3)
 NhRect *r1, *r2, *r3;
 {

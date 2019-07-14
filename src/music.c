@@ -28,19 +28,19 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(awaken_monsters, (int));
-STATIC_DCL void FDECL(put_monsters_to_sleep, (int));
-STATIC_DCL void FDECL(charm_snakes, (int));
-STATIC_DCL void FDECL(calm_nymphs, (int));
-STATIC_DCL void FDECL(charm_monsters, (int));
-STATIC_DCL void FDECL(do_earthquake, (int));
-STATIC_DCL int FDECL(do_improvisation, (struct obj *));
+static void FDECL(awaken_monsters, (int));
+static void FDECL(put_monsters_to_sleep, (int));
+static void FDECL(charm_snakes, (int));
+static void FDECL(calm_nymphs, (int));
+static void FDECL(charm_monsters, (int));
+static void FDECL(do_earthquake, (int));
+static int FDECL(do_improvisation, (struct obj *));
 
 /*
  * Wake every monster in range...
  */
 
-STATIC_OVL void
+static void
 awaken_monsters(distance)
 int distance;
 {
@@ -71,7 +71,7 @@ int distance;
  * Make monsters fall asleep.  Note that they may resist the spell.
  */
 
-STATIC_OVL void
+static void
 put_monsters_to_sleep(distance)
 int distance;
 {
@@ -92,7 +92,7 @@ int distance;
  * Charm snakes in range.  Note that the snakes are NOT tamed.
  */
 
-STATIC_OVL void
+static void
 charm_snakes(distance)
 int distance;
 {
@@ -127,7 +127,7 @@ int distance;
  * Calm nymphs in range.
  */
 
-STATIC_OVL void
+static void
 calm_nymphs(distance)
 int distance;
 {
@@ -193,7 +193,7 @@ struct monst *bugler; /* monster that played instrument */
 /* Charm monsters in range.  Note that they may resist the spell.
  * If swallowed, range is reduced to 0.
  */
-STATIC_OVL void
+static void
 charm_monsters(distance)
 int distance;
 {
@@ -219,7 +219,7 @@ int distance;
 /* Generate earthquake :-) of desired force.
  * That is:  create random chasms (pits).
  */
-STATIC_OVL void
+static void
 do_earthquake(force)
 int force;
 {
@@ -447,7 +447,7 @@ const char *beats[] = {
 /*
  * The player is trying to extract something from his/her instrument.
  */
-STATIC_OVL int
+static int
 do_improvisation(instr)
 struct obj *instr;
 {

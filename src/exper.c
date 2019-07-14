@@ -8,7 +8,7 @@
 #include <limits.h>
 #endif
 
-STATIC_DCL int FDECL(enermod, (int));
+static int FDECL(enermod, (int));
 
 long
 newuexp(lev)
@@ -23,7 +23,7 @@ int lev;
     return (10000000L * ((long) (lev - 19)));
 }
 
-STATIC_OVL int
+static int
 enermod(en)
 int en;
 {

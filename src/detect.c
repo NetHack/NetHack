@@ -11,25 +11,25 @@
 #include "hack.h"
 #include "artifact.h"
 
-STATIC_DCL boolean NDECL(unconstrain_map);
-STATIC_DCL void NDECL(reconstrain_map);
-STATIC_DCL void FDECL(browse_map, (int, const char *));
-STATIC_DCL void FDECL(map_monst, (struct monst *, BOOLEAN_P));
-STATIC_DCL void FDECL(do_dknown_of, (struct obj *));
-STATIC_DCL boolean FDECL(check_map_spot, (int, int, CHAR_P, unsigned));
-STATIC_DCL boolean FDECL(clear_stale_map, (CHAR_P, unsigned));
-STATIC_DCL void FDECL(sense_trap, (struct trap *, XCHAR_P, XCHAR_P, int));
-STATIC_DCL int FDECL(detect_obj_traps, (struct obj *, BOOLEAN_P, int));
-STATIC_DCL void FDECL(show_map_spot, (int, int));
-STATIC_PTR void FDECL(findone, (int, int, genericptr_t));
-STATIC_PTR void FDECL(openone, (int, int, genericptr_t));
-STATIC_DCL int FDECL(mfind0, (struct monst *, BOOLEAN_P));
-STATIC_DCL int FDECL(reveal_terrain_getglyph, (int, int, int,
+static boolean NDECL(unconstrain_map);
+static void NDECL(reconstrain_map);
+static void FDECL(browse_map, (int, const char *));
+static void FDECL(map_monst, (struct monst *, BOOLEAN_P));
+static void FDECL(do_dknown_of, (struct obj *));
+static boolean FDECL(check_map_spot, (int, int, CHAR_P, unsigned));
+static boolean FDECL(clear_stale_map, (CHAR_P, unsigned));
+static void FDECL(sense_trap, (struct trap *, XCHAR_P, XCHAR_P, int));
+static int FDECL(detect_obj_traps, (struct obj *, BOOLEAN_P, int));
+static void FDECL(show_map_spot, (int, int));
+static void FDECL(findone, (int, int, genericptr_t));
+static void FDECL(openone, (int, int, genericptr_t));
+static int FDECL(mfind0, (struct monst *, BOOLEAN_P));
+static int FDECL(reveal_terrain_getglyph, (int, int, int,
                                                unsigned, int, int));
 
 /* bring hero out from underwater or underground or being engulfed;
    return True iff any change occurred */
-STATIC_OVL boolean
+static boolean
 unconstrain_map()
 {
     boolean res = u.uinwater || u.uburied || u.uswallow;
@@ -43,7 +43,7 @@ unconstrain_map()
 }
 
 /* put hero back underwater or underground or engulfed */
-STATIC_OVL void
+static void
 reconstrain_map()
 {
     u.uinwater = iflags.save_uinwater, iflags.save_uinwater = 0;
@@ -52,7 +52,7 @@ reconstrain_map()
 }
 
 /* use getpos()'s 'autodescribe' to view whatever is currently shown on map */
-STATIC_DCL void
+static void
 browse_map(ter_typ, ter_explain)
 int ter_typ;
 const char *ter_explain;
@@ -70,7 +70,7 @@ const char *ter_explain;
 }
 
 /* extracted from monster_detection() so can be shared by do_vicinity_map() */
-STATIC_DCL void
+static void
 map_monst(mtmp, showtail)
 struct monst *mtmp;
 boolean showtail;
@@ -207,7 +207,7 @@ unsigned material;
     return (struct obj *) 0;
 }
 
-STATIC_OVL void
+static void
 do_dknown_of(obj)
 struct obj *obj;
 {
@@ -221,7 +221,7 @@ struct obj *obj;
 }
 
 /* Check whether the location has an outdated object displayed on it. */
-STATIC_OVL boolean
+static boolean
 check_map_spot(x, y, oclass, material)
 int x, y;
 char oclass;
@@ -278,7 +278,7 @@ unsigned material;
  * reappear after the detection has completed.  Return true if noticeable
  * change occurs.
  */
-STATIC_OVL boolean
+static boolean
 clear_stale_map(oclass, material)
 char oclass;
 unsigned material;
@@ -850,7 +850,7 @@ int mclass;                /* monster class, 0 for all */
     return 0;
 }
 
-STATIC_OVL void
+static void
 sense_trap(trap, x, y, src_cursed)
 struct trap *trap;
 xchar x, y;
@@ -893,7 +893,7 @@ int src_cursed;
 /* check a list of objects for chest traps; return 1 if found at <ux,uy>,
    2 if found at some other spot, 3 if both, 0 otherwise; optionally
    update the map to show where such traps were found */
-STATIC_OVL int
+static int
 detect_obj_traps(objlist, show_them, how)
 struct obj *objlist;
 boolean show_them;
@@ -1231,7 +1231,7 @@ struct obj **optr;
     return;
 }
 
-STATIC_OVL void
+static void
 show_map_spot(x, y)
 register int x, y;
 {
@@ -1443,7 +1443,7 @@ struct rm *lev;
 
 /* find something at one location; it should find all somethings there
    since it is used for magical detection rather than physical searching */
-STATIC_PTR void
+static void
 findone(zx, zy, num)
 int zx, zy;
 genericptr_t num;
@@ -1499,7 +1499,7 @@ genericptr_t num;
     }
 }
 
-STATIC_PTR void
+static void
 openone(zx, zy, num)
 int zx, zy;
 genericptr_t num;
@@ -1634,7 +1634,7 @@ struct trap *trap;
     }
 }
 
-STATIC_OVL int
+static int
 mfind0(mtmp, via_warning)
 struct monst *mtmp;
 boolean via_warning;
@@ -1822,7 +1822,7 @@ sokoban_detect()
     }
 }
 
-STATIC_DCL int
+static int
 reveal_terrain_getglyph(x, y, full, swallowed, default_glyph, which_subset)
 int x, y, full;
 unsigned swallowed;

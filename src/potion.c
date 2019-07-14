@@ -7,15 +7,15 @@
 
 static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
 
-STATIC_DCL long FDECL(itimeout, (long));
-STATIC_DCL long FDECL(itimeout_incr, (long, int));
-STATIC_DCL void NDECL(ghost_from_bottle);
-STATIC_DCL boolean
+static long FDECL(itimeout, (long));
+static long FDECL(itimeout_incr, (long, int));
+static void NDECL(ghost_from_bottle);
+static boolean
 FDECL(H2Opotion_dip, (struct obj *, struct obj *, BOOLEAN_P, const char *));
-STATIC_DCL short FDECL(mixtype, (struct obj *, struct obj *));
+static short FDECL(mixtype, (struct obj *, struct obj *));
 
 /* force `val' to be within valid range for intrinsic timeout value */
-STATIC_OVL long
+static long
 itimeout(val)
 long val;
 {
@@ -28,7 +28,7 @@ long val;
 }
 
 /* increment `old' by `incr' and force result to be valid intrinsic timeout */
-STATIC_OVL long
+static long
 itimeout_incr(old, incr)
 long old;
 int incr;
@@ -447,7 +447,7 @@ self_invis_message()
                         : "can't see yourself");
 }
 
-STATIC_OVL void
+static void
 ghost_from_bottle()
 {
     struct monst *mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, NO_MM_FLAGS);
@@ -1207,7 +1207,7 @@ bottlename()
 }
 
 /* handle item dipped into water potion or steed saddle splashed by same */
-STATIC_OVL boolean
+static boolean
 H2Opotion_dip(potion, targobj, useeit, objphrase)
 struct obj *potion, *targobj;
 boolean useeit;
@@ -1762,7 +1762,7 @@ register struct obj *obj;
 }
 
 /* returns the potion type when o1 is dipped in o2 */
-STATIC_OVL short
+static short
 mixtype(o1, o2)
 register struct obj *o1, *o2;
 {

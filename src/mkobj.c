@@ -5,21 +5,21 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(mkbox_cnts, (struct obj *));
-STATIC_DCL unsigned FDECL(nextoid, (struct obj *, struct obj *));
-STATIC_DCL void FDECL(maybe_adjust_light, (struct obj *, int));
-STATIC_DCL void FDECL(obj_timer_checks, (struct obj *,
+static void FDECL(mkbox_cnts, (struct obj *));
+static unsigned FDECL(nextoid, (struct obj *, struct obj *));
+static void FDECL(maybe_adjust_light, (struct obj *, int));
+static void FDECL(obj_timer_checks, (struct obj *,
                                          XCHAR_P, XCHAR_P, int));
-STATIC_DCL void FDECL(container_weight, (struct obj *));
-STATIC_DCL struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
-STATIC_DCL void FDECL(objlist_sanity, (struct obj *, int, const char *));
-STATIC_DCL void FDECL(mon_obj_sanity, (struct monst *, const char *));
-STATIC_DCL const char *FDECL(where_name, (struct obj *));
-STATIC_DCL void FDECL(insane_object, (struct obj *, const char *,
+static void FDECL(container_weight, (struct obj *));
+static struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
+static void FDECL(objlist_sanity, (struct obj *, int, const char *));
+static void FDECL(mon_obj_sanity, (struct monst *, const char *));
+static const char *FDECL(where_name, (struct obj *));
+static void FDECL(insane_object, (struct obj *, const char *,
                                       const char *, struct monst *));
-STATIC_DCL void FDECL(check_contained, (struct obj *, const char *));
-STATIC_DCL void FDECL(check_glob, (struct obj *, const char *));
-STATIC_DCL void FDECL(sanity_check_worn, (struct obj *));
+static void FDECL(check_contained, (struct obj *, const char *));
+static void FDECL(check_glob, (struct obj *, const char *));
+static void FDECL(sanity_check_worn, (struct obj *));
 
 struct icp {
     int iprob;   /* probability of an item type */
@@ -272,7 +272,7 @@ boolean artif;
     return mksobj(i, TRUE, artif);
 }
 
-STATIC_OVL void
+static void
 mkbox_cnts(box)
 struct obj *box;
 {
@@ -468,7 +468,7 @@ long num;
 
 /* when splitting a stack that has o_id-based shop prices, pick an
    o_id value for the new stack that will maintain the same price */
-STATIC_OVL unsigned
+static unsigned
 nextoid(oldobj, newobj)
 struct obj *oldobj, *newobj;
 {
@@ -1222,7 +1222,7 @@ struct obj *body;
     (void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
 }
 
-STATIC_OVL void
+static void
 maybe_adjust_light(obj, old_range)
 struct obj *obj;
 int old_range;
@@ -1836,7 +1836,7 @@ struct obj *otmp;
     return retval;
 }
 
-STATIC_OVL void
+static void
 obj_timer_checks(otmp, x, y, force)
 struct obj *otmp;
 xchar x, y;
@@ -2131,7 +2131,7 @@ struct obj *obj;
 }
 
 /* Recalculate the weight of this container and all of _its_ containers. */
-STATIC_OVL void
+static void
 container_weight(container)
 struct obj *container;
 {
@@ -2331,7 +2331,7 @@ obj_sanity_check()
 }
 
 /* sanity check for objects on specified list (fobj, &c) */
-STATIC_OVL void
+static void
 objlist_sanity(objlist, wheretype, mesg)
 struct obj *objlist;
 int wheretype;
@@ -2383,7 +2383,7 @@ const char *mesg;
 }
 
 /* sanity check for objects carried by all monsters in specified list */
-STATIC_OVL void
+static void
 mon_obj_sanity(monlist, mesg)
 struct monst *monlist;
 const char *mesg;
@@ -2419,7 +2419,7 @@ static const char *obj_state_names[NOBJ_STATES] = { "free",      "floor",
                                                     "minvent",   "migrating",
                                                     "buried",    "onbill" };
 
-STATIC_OVL const char *
+static const char *
 where_name(obj)
 struct obj *obj;
 {
@@ -2436,7 +2436,7 @@ struct obj *obj;
     return obj_state_names[where];
 }
 
-STATIC_OVL void
+static void
 insane_object(obj, fmt, mesg, mon)
 struct obj *obj;
 const char *fmt, *mesg;
@@ -2464,7 +2464,7 @@ struct monst *mon;
 }
 
 /* obj sanity check: check objects inside container */
-STATIC_OVL void
+static void
 check_contained(container, mesg)
 struct obj *container;
 const char *mesg;
@@ -2512,7 +2512,7 @@ const char *mesg;
 }
 
 /* called when 'obj->globby' is set so we don't recheck it here */
-STATIC_OVL void
+static void
 check_glob(obj, mesg)
 struct obj *obj;
 const char *mesg;
@@ -2535,7 +2535,7 @@ const char *mesg;
 }
 
 /* check an object in hero's or monster's inventory which has worn mask set */
-STATIC_OVL void
+static void
 sanity_check_worn(obj)
 struct obj *obj;
 {

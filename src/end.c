@@ -22,29 +22,29 @@
 #define nowrap_add(a, b) (a = ((a + b) < 0 ? LONG_MAX : (a + b)))
 
 #ifndef NO_SIGNAL
-STATIC_PTR void FDECL(done_intr, (int));
+static void FDECL(done_intr, (int));
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
 static void FDECL(done_hangup, (int));
 #endif
 #endif
-STATIC_DCL void FDECL(disclose, (int, BOOLEAN_P));
-STATIC_DCL void FDECL(get_valuables, (struct obj *));
-STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *, int));
-STATIC_DCL void NDECL(done_object_cleanup);
-STATIC_DCL void FDECL(artifact_score, (struct obj *, BOOLEAN_P, winid));
-STATIC_DCL void FDECL(really_done, (int)) NORETURN;
-STATIC_DCL void FDECL(savelife, (int));
-STATIC_PTR int FDECL(CFDECLSPEC vanqsort_cmp, (const genericptr,
+static void FDECL(disclose, (int, BOOLEAN_P));
+static void FDECL(get_valuables, (struct obj *));
+static void FDECL(sort_valuables, (struct valuable_data *, int));
+static void NDECL(done_object_cleanup);
+static void FDECL(artifact_score, (struct obj *, BOOLEAN_P, winid));
+static void FDECL(really_done, (int)) NORETURN;
+static void FDECL(savelife, (int));
+static int FDECL(CFDECLSPEC vanqsort_cmp, (const genericptr,
                                                const genericptr));
-STATIC_DCL int NDECL(set_vanq_order);
-STATIC_DCL void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
-STATIC_DCL void FDECL(list_genocided, (CHAR_P, BOOLEAN_P));
-STATIC_DCL boolean FDECL(should_query_disclose_option, (int, char *));
+static int NDECL(set_vanq_order);
+static void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
+static void FDECL(list_genocided, (CHAR_P, BOOLEAN_P));
+static boolean FDECL(should_query_disclose_option, (int, char *));
 #ifdef DUMPLOG
-STATIC_DCL void NDECL(dump_plines);
+static void NDECL(dump_plines);
 #endif
-STATIC_DCL void FDECL(dump_everything, (int, time_t));
-STATIC_DCL int NDECL(num_extinct);
+static void FDECL(dump_everything, (int, time_t));
+static int NDECL(num_extinct);
 
 #if defined(__BEOS__) || defined(MICRO) || defined(OS2) || defined(WIN32)
 extern void FDECL(nethack_exit, (int));
@@ -366,7 +366,7 @@ done2()
 
 #ifndef NO_SIGNAL
 /*ARGSUSED*/
-STATIC_PTR void
+static void
 done_intr(sig_unused) /* called as signal() handler, so sent at least 1 arg */
 int sig_unused UNUSED;
 {
@@ -526,7 +526,7 @@ static const struct {
 
 /* clear away while-helpless when the cause of death caused that
    helplessness (ie, "petrified by <foo> while getting stoned") */
-STATIC_DCL void
+static void
 fixup_death(how)
 int how;
 {
@@ -627,7 +627,7 @@ VA_DECL(const char *, str)
     really_done(PANICKED);
 }
 
-STATIC_OVL boolean
+static boolean
 should_query_disclose_option(category, defquery)
 int category;
 char *defquery;
@@ -671,7 +671,7 @@ char *defquery;
 }
 
 #ifdef DUMPLOG
-STATIC_OVL void
+static void
 dump_plines()
 {
     int i, j;
@@ -694,7 +694,7 @@ dump_plines()
 #endif
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 dump_everything(how, when)
 int how;
 time_t when; /* date+time at end of game */
@@ -764,7 +764,7 @@ time_t when; /* date+time at end of game */
 #endif
 }
 
-STATIC_OVL void
+static void
 disclose(how, taken)
 int how;
 boolean taken;
@@ -838,7 +838,7 @@ boolean taken;
 }
 
 /* try to get the player back in a viable state after being killed */
-STATIC_OVL void
+static void
 savelife(how)
 int how;
 {
@@ -886,7 +886,7 @@ int how;
  * Get valuables from the given list.  Revised code: the list always remains
  * intact.
  */
-STATIC_OVL void
+static void
 get_valuables(list)
 struct obj *list; /* inventory or container contents */
 {
@@ -921,7 +921,7 @@ struct obj *list; /* inventory or container contents */
  *  Sort collected valuables, most frequent to least.  We could just
  *  as easily use qsort, but we don't care about efficiency here.
  */
-STATIC_OVL void
+static void
 sort_valuables(list, size)
 struct valuable_data list[];
 int size; /* max value is less than 20 */
@@ -950,11 +950,11 @@ int size; /* max value is less than 20 */
  * odds_and_ends() was used for 3.6.0 and 3.6.1.
  * Schroedinger's Cat is handled differently starting with 3.6.2.
  */
-STATIC_DCL boolean FDECL(odds_and_ends, (struct obj *, int));
+static boolean FDECL(odds_and_ends, (struct obj *, int));
 
 #define CAT_CHECK 2
 
-STATIC_OVL boolean
+static boolean
 odds_and_ends(list, what)
 struct obj *list;
 int what;
@@ -977,7 +977,7 @@ int what;
 #endif
 
 /* deal with some objects which may be in an abnormal state at end of game */
-STATIC_OVL void
+static void
 done_object_cleanup()
 {
     int ox, oy;
@@ -1033,7 +1033,7 @@ done_object_cleanup()
 }
 
 /* called twice; first to calculate total, then to list relevant items */
-STATIC_OVL void
+static void
 artifact_score(list, counting, endwin)
 struct obj *list;
 boolean counting; /* true => add up points; false => display them */
@@ -1178,7 +1178,7 @@ int how;
 }
 
 /* separated from done() in order to specify the __noreturn__ attribute */
-STATIC_OVL void
+static void
 really_done(how)
 int how;
 {
@@ -1720,7 +1720,7 @@ static const char *vanqorders[NUM_VANQ_ORDER_MODES] = {
     "by count, low to high, by internal index within tied count",
 };
 
-STATIC_PTR int CFDECLSPEC
+static int CFDECLSPEC
 vanqsort_cmp(vptr1, vptr2)
 const genericptr vptr1;
 const genericptr vptr2;
@@ -1801,7 +1801,7 @@ const genericptr vptr2;
 }
 
 /* returns -1 if cancelled via ESC */
-STATIC_OVL int
+static int
 set_vanq_order()
 {
     winid tmpwin;
@@ -1846,7 +1846,7 @@ dovanquished()
 #define UniqCritterIndx(mndx) ((mons[mndx].geno & G_UNIQ) \
                                && mndx != PM_HIGH_PRIEST)
 
-STATIC_OVL void
+static void
 list_vanquished(defquery, ask)
 char defquery;
 boolean ask;
@@ -1994,7 +1994,7 @@ num_genocides()
     return n;
 }
 
-STATIC_OVL int
+static int
 num_extinct()
 {
     int i, n = 0;
@@ -2008,7 +2008,7 @@ num_extinct()
     return n;
 }
 
-STATIC_OVL void
+static void
 list_genocided(defquery, ask)
 char defquery;
 boolean ask;

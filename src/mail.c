@@ -36,10 +36,10 @@
  *                       random intervals.
  */
 
-STATIC_DCL boolean FDECL(md_start, (coord *));
-STATIC_DCL boolean FDECL(md_stop, (coord *, coord *));
-STATIC_DCL boolean FDECL(md_rush, (struct monst *, int, int));
-STATIC_DCL void FDECL(newmail, (struct mail_info *));
+static boolean FDECL(md_start, (coord *));
+static boolean FDECL(md_stop, (coord *, coord *));
+static boolean FDECL(md_rush, (struct monst *, int, int));
+static void FDECL(newmail, (struct mail_info *));
 
 #if !defined(UNIX) && !defined(VMS)
 int mustgetmail = -1;
@@ -138,7 +138,7 @@ getmailstatus()
  * Pick coordinates for a starting position for the mail daemon.  Called
  * from newmail() and newphone().
  */
-STATIC_OVL boolean
+static boolean
 md_start(startp)
 coord *startp;
 {
@@ -238,7 +238,7 @@ coord *startp;
  * enexto().  Use enexto() as a last resort because enexto() chooses
  * its point randomly, which is not what we want.
  */
-STATIC_OVL boolean
+static boolean
 md_stop(stopp, startp)
 coord *stopp;  /* stopping position (we fill it in) */
 coord *startp; /* starting position (read only) */
@@ -279,7 +279,7 @@ static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
  * FALSE if the md gets stuck in a position where there is a monster.  Return
  * TRUE otherwise.
  */
-STATIC_OVL boolean
+static boolean
 md_rush(md, tx, ty)
 struct monst *md;
 register int tx, ty; /* destination of mail daemon */
@@ -382,7 +382,7 @@ register int tx, ty; /* destination of mail daemon */
 
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 newmail(info)
 struct mail_info *info;
 {

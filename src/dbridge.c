@@ -19,19 +19,19 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(get_wall_for_db, (int *, int *));
-STATIC_DCL struct entity *FDECL(e_at, (int, int));
-STATIC_DCL void FDECL(m_to_e, (struct monst *, int, int, struct entity *));
-STATIC_DCL void FDECL(u_to_e, (struct entity *));
-STATIC_DCL void FDECL(set_entity, (int, int, struct entity *));
-STATIC_DCL const char *FDECL(e_nam, (struct entity *));
-STATIC_DCL const char *FDECL(E_phrase, (struct entity *, const char *));
-STATIC_DCL boolean FDECL(e_survives_at, (struct entity *, int, int));
-STATIC_DCL void FDECL(e_died, (struct entity *, int, int));
-STATIC_DCL boolean FDECL(automiss, (struct entity *));
-STATIC_DCL boolean FDECL(e_missed, (struct entity *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(e_jumps, (struct entity *));
-STATIC_DCL void FDECL(do_entity, (struct entity *));
+static void FDECL(get_wall_for_db, (int *, int *));
+static struct entity *FDECL(e_at, (int, int));
+static void FDECL(m_to_e, (struct monst *, int, int, struct entity *));
+static void FDECL(u_to_e, (struct entity *));
+static void FDECL(set_entity, (int, int, struct entity *));
+static const char *FDECL(e_nam, (struct entity *));
+static const char *FDECL(E_phrase, (struct entity *, const char *));
+static boolean FDECL(e_survives_at, (struct entity *, int, int));
+static void FDECL(e_died, (struct entity *, int, int));
+static boolean FDECL(automiss, (struct entity *));
+static boolean FDECL(e_missed, (struct entity *, BOOLEAN_P));
+static boolean FDECL(e_jumps, (struct entity *));
+static void FDECL(do_entity, (struct entity *));
 
 boolean
 is_pool(x, y)
@@ -205,7 +205,7 @@ int *x, *y;
 /*
  * Find the drawbridge wall associated with a drawbridge.
  */
-STATIC_OVL void
+static void
 get_wall_for_db(x, y)
 int *x, *y;
 {
@@ -282,7 +282,7 @@ boolean flag;
     return  TRUE;
 }
 
-STATIC_OVL
+static
 struct entity *
 e_at(x, y)
 int x, y;
@@ -301,7 +301,7 @@ int x, y;
                                    : &(g.occupants[entitycnt]);
 }
 
-STATIC_OVL void
+static void
 m_to_e(mtmp, x, y, etmp)
 struct monst *mtmp;
 int x, y;
@@ -319,7 +319,7 @@ struct entity *etmp;
         etmp->edata = (struct permonst *) 0;
 }
 
-STATIC_OVL void
+static void
 u_to_e(etmp)
 struct entity *etmp;
 {
@@ -329,7 +329,7 @@ struct entity *etmp;
     etmp->edata = g.youmonst.data;
 }
 
-STATIC_OVL void
+static void
 set_entity(x, y, etmp)
 int x, y;
 struct entity *etmp;
@@ -353,7 +353,7 @@ struct entity *etmp;
 
 /* #define e_strg(etmp, func) (is_u(etmp)? (char *)0 : func(etmp->emon)) */
 
-STATIC_OVL const char *
+static const char *
 e_nam(etmp)
 struct entity *etmp;
 {
@@ -364,7 +364,7 @@ struct entity *etmp;
  * Generates capitalized entity name, makes 2nd -> 3rd person conversion on
  * verb, where necessary.
  */
-STATIC_OVL const char *
+static const char *
 E_phrase(etmp, verb)
 struct entity *etmp;
 const char *verb;
@@ -385,7 +385,7 @@ const char *verb;
 /*
  * Simple-minded "can it be here?" routine
  */
-STATIC_OVL boolean
+static boolean
 e_survives_at(etmp, x, y)
 struct entity *etmp;
 int x, y;
@@ -409,7 +409,7 @@ int x, y;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 e_died(etmp, xkill_flags, how)
 struct entity *etmp;
 int xkill_flags, how;
@@ -473,7 +473,7 @@ int xkill_flags, how;
 /*
  * These are never directly affected by a bridge or portcullis.
  */
-STATIC_OVL boolean
+static boolean
 automiss(etmp)
 struct entity *etmp;
 {
@@ -484,7 +484,7 @@ struct entity *etmp;
 /*
  * Does falling drawbridge or portcullis miss etmp?
  */
-STATIC_OVL boolean
+static boolean
 e_missed(etmp, chunks)
 struct entity *etmp;
 boolean chunks;
@@ -521,7 +521,7 @@ boolean chunks;
 /*
  * Can etmp jump from death?
  */
-STATIC_OVL boolean
+static boolean
 e_jumps(etmp)
 struct entity *etmp;
 {
@@ -545,7 +545,7 @@ struct entity *etmp;
     return (tmp >= rnd(10)) ? TRUE : FALSE;
 }
 
-STATIC_OVL void
+static void
 do_entity(etmp)
 struct entity *etmp;
 {

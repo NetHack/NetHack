@@ -34,15 +34,15 @@ static void NDECL(kill_hilite);
 /* (see tcap.h) -- nh_CM, nh_ND, nh_CD, nh_HI,nh_HE, nh_US,nh_UE, ul_hack */
 struct tc_lcl_data tc_lcl_data = { 0, 0, 0, 0, 0, 0, 0, FALSE };
 
-STATIC_VAR char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
-STATIC_VAR char *VS, *VE;
-STATIC_VAR char *ME, *MR, *MB, *MH, *MD;
+static char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
+static char *VS, *VE;
+static char *ME, *MR, *MB, *MH, *MD;
 
 #ifdef TERMLIB
 boolean dynamic_HIHE = FALSE;
-STATIC_VAR int SG;
-STATIC_OVL char PC = '\0';
-STATIC_VAR char tbuf[512];
+static int SG;
+static char PC = '\0';
+static char tbuf[512];
 #endif /*TERMLIB*/
 
 #ifdef TEXTCOLOR
@@ -61,7 +61,7 @@ extern boolean HE_resets_AS;
 #endif
 
 #ifndef TERMLIB
-STATIC_VAR char tgotobuf[20];
+static char tgotobuf[20];
 #ifdef TOS
 #define tgoto(fmt, x, y) (Sprintf(tgotobuf, fmt, y + ' ', x + ' '), tgotobuf)
 #else

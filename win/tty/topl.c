@@ -14,9 +14,11 @@
 #define C(c) (0x1f & (c))
 #endif
 
-STATIC_DCL void FDECL(redotoplin, (const char *));
-STATIC_DCL void FDECL(topl_putsym, (CHAR_P));
-STATIC_DCL void FDECL(removetopl, (int));
+static void FDECL(redotoplin, (const char *));
+static void FDECL(topl_putsym, (CHAR_P));
+static void FDECL(removetopl, (int));
+static void FDECL(msghistory_snapshot, (BOOLEAN_P));
+static void FDECL(free_msghistory_snapshot, (BOOLEAN_P));
 
 int
 tty_doprev_message()
@@ -120,7 +122,7 @@ tty_doprev_message()
     return 0;
 }
 
-STATIC_OVL void
+static void
 redotoplin(str)
 const char *str;
 {
@@ -296,7 +298,7 @@ register const char *bp;
         redotoplin(g.toplines);
 }
 
-STATIC_OVL
+static
 void
 topl_putsym(c)
 char c;
@@ -348,7 +350,7 @@ const char *str;
         topl_putsym(*str++);
 }
 
-STATIC_OVL void
+static void
 removetopl(n)
 register int n;
 {
@@ -543,7 +545,7 @@ char def;
     return q;
 }
 
-STATIC_OVL ptr_array_t *
+static ptr_array_t *
 get_message_history()
 {
     char *mesg;
@@ -579,7 +581,7 @@ get_message_history()
     return a;
 }
 
-STATIC_OVL void
+static void
 purge_message_history()
 {
     int i;

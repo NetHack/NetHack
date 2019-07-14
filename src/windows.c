@@ -58,20 +58,20 @@ extern void FDECL(trace_procs_init, (int));
 extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
 #endif
 
-STATIC_DCL void FDECL(def_raw_print, (const char *s));
-STATIC_DCL void NDECL(def_wait_synch);
+static void FDECL(def_raw_print, (const char *s));
+static void NDECL(def_wait_synch);
 
 #ifdef DUMPLOG
-STATIC_DCL winid FDECL(dump_create_nhwindow, (int));
-STATIC_DCL void FDECL(dump_clear_nhwindow, (winid));
-STATIC_DCL void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
-STATIC_DCL void FDECL(dump_destroy_nhwindow, (winid));
-STATIC_DCL void FDECL(dump_start_menu, (winid));
-STATIC_DCL void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P,
+static winid FDECL(dump_create_nhwindow, (int));
+static void FDECL(dump_clear_nhwindow, (winid));
+static void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
+static void FDECL(dump_destroy_nhwindow, (winid));
+static void FDECL(dump_start_menu, (winid));
+static void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P,
                                       CHAR_P, int, const char *, BOOLEAN_P));
-STATIC_DCL void FDECL(dump_end_menu, (winid, const char *));
-STATIC_DCL int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
-STATIC_DCL void FDECL(dump_putstr, (winid, int, const char *));
+static void FDECL(dump_end_menu, (winid, const char *));
+static int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
+static void FDECL(dump_putstr, (winid, int, const char *));
 #endif /* DUMPLOG */
 
 #ifdef HANGUPHANDLING
@@ -197,7 +197,7 @@ genl_can_suspend_yes(VOID_ARGS)
     return TRUE;
 }
 
-STATIC_OVL
+static
 void
 def_raw_print(s)
 const char *s;
@@ -205,7 +205,7 @@ const char *s;
     puts(s);
 }
 
-STATIC_OVL
+static
 void
 def_wait_synch(VOID_ARGS)
 {
@@ -1097,15 +1097,15 @@ unsigned long *colormasks UNUSED;
     putmixed(WIN_STATUS, 0, newbot2); /* putmixed() due to GOLD glyph */
 }
 
-STATIC_VAR struct window_procs dumplog_windowprocs_backup;
-STATIC_VAR FILE *dumplog_file;
+static struct window_procs dumplog_windowprocs_backup;
+static FILE *dumplog_file;
 
 #ifdef DUMPLOG
-STATIC_VAR time_t dumplog_now;
+static time_t dumplog_now;
 
-STATIC_DCL char *FDECL(dump_fmtstr, (const char *, char *));
+static char *FDECL(dump_fmtstr, (const char *, char *));
 
-STATIC_OVL char *
+static char *
 dump_fmtstr(fmt, buf)
 const char *fmt;
 char *buf;
@@ -1236,7 +1236,7 @@ int no_forward;
 }
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 dump_putstr(win, attr, str)
 winid win UNUSED;
 int attr UNUSED;
@@ -1246,7 +1246,7 @@ const char *str;
         fprintf(dumplog_file, "%s\n", str);
 }
 
-STATIC_OVL winid
+static winid
 dump_create_nhwindow(dummy)
 int dummy;
 {
@@ -1254,7 +1254,7 @@ int dummy;
 }
 
 /*ARGUSED*/
-STATIC_OVL void
+static void
 dump_clear_nhwindow(win)
 winid win UNUSED;
 {
@@ -1262,7 +1262,7 @@ winid win UNUSED;
 }
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 dump_display_nhwindow(win, p)
 winid win UNUSED;
 boolean p UNUSED;
@@ -1271,7 +1271,7 @@ boolean p UNUSED;
 }
 
 /*ARGUSED*/
-STATIC_OVL void
+static void
 dump_destroy_nhwindow(win)
 winid win UNUSED;
 {
@@ -1279,7 +1279,7 @@ winid win UNUSED;
 }
 
 /*ARGUSED*/
-STATIC_OVL void
+static void
 dump_start_menu(win)
 winid win UNUSED;
 {
@@ -1287,7 +1287,7 @@ winid win UNUSED;
 }
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 dump_add_menu(win, glyph, identifier, ch, gch, attr, str, preselected)
 winid win UNUSED;
 int glyph;
@@ -1307,7 +1307,7 @@ boolean preselected UNUSED;
 }
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 dump_end_menu(win, str)
 winid win UNUSED;
 const char *str;
@@ -1320,7 +1320,7 @@ const char *str;
     }
 }
 
-STATIC_OVL int
+static int
 dump_select_menu(win, how, item)
 winid win UNUSED;
 int how UNUSED;

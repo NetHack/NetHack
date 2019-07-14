@@ -527,48 +527,48 @@ static const menu_cmd_t default_menu_cmd_info[] = {
  { "menu_search", MENU_SEARCH, "Search and toggle matching items" },
 };
 
-STATIC_DCL void FDECL(nmcpy, (char *, const char *, int));
-STATIC_DCL void FDECL(escapes, (const char *, char *));
-STATIC_DCL void FDECL(rejectoption, (const char *));
-STATIC_DCL char *FDECL(string_for_opt, (char *, BOOLEAN_P));
-STATIC_DCL char *FDECL(string_for_env_opt, (const char *, char *, BOOLEAN_P));
-STATIC_DCL void FDECL(bad_negation, (const char *, BOOLEAN_P));
-STATIC_DCL int FDECL(change_inv_order, (char *));
-STATIC_DCL boolean FDECL(warning_opts, (char *, const char *));
-STATIC_DCL int FDECL(feature_alert_opts, (char *, const char *));
-STATIC_DCL boolean FDECL(duplicate_opt_detection, (const char *, int));
-STATIC_DCL void FDECL(complain_about_duplicate, (const char *, int));
+static void FDECL(nmcpy, (char *, const char *, int));
+static void FDECL(escapes, (const char *, char *));
+static void FDECL(rejectoption, (const char *));
+static char *FDECL(string_for_opt, (char *, BOOLEAN_P));
+static char *FDECL(string_for_env_opt, (const char *, char *, BOOLEAN_P));
+static void FDECL(bad_negation, (const char *, BOOLEAN_P));
+static int FDECL(change_inv_order, (char *));
+static boolean FDECL(warning_opts, (char *, const char *));
+static int FDECL(feature_alert_opts, (char *, const char *));
+static boolean FDECL(duplicate_opt_detection, (const char *, int));
+static void FDECL(complain_about_duplicate, (const char *, int));
 
-STATIC_DCL const char *FDECL(attr2attrname, (int));
-STATIC_DCL const char * FDECL(msgtype2name, (int));
-STATIC_DCL int NDECL(query_msgtype);
-STATIC_DCL boolean FDECL(msgtype_add, (int, char *));
-STATIC_DCL void FDECL(free_one_msgtype, (int));
-STATIC_DCL int NDECL(msgtype_count);
-STATIC_DCL boolean FDECL(test_regex_pattern, (const char *, const char *));
-STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
-STATIC_DCL void FDECL(free_one_menu_coloring, (int));
-STATIC_DCL int NDECL(count_menucolors);
-STATIC_DCL boolean FDECL(parse_role_opts, (BOOLEAN_P, const char *,
+static const char *FDECL(attr2attrname, (int));
+static const char * FDECL(msgtype2name, (int));
+static int NDECL(query_msgtype);
+static boolean FDECL(msgtype_add, (int, char *));
+static void FDECL(free_one_msgtype, (int));
+static int NDECL(msgtype_count);
+static boolean FDECL(test_regex_pattern, (const char *, const char *));
+static boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
+static void FDECL(free_one_menu_coloring, (int));
+static int NDECL(count_menucolors);
+static boolean FDECL(parse_role_opts, (BOOLEAN_P, const char *,
                                            char *, char **));
 
-STATIC_DCL void FDECL(doset_add_menu, (winid, const char *, int));
-STATIC_DCL void FDECL(opts_add_others, (winid, const char *, int,
+static void FDECL(doset_add_menu, (winid, const char *, int));
+static void FDECL(opts_add_others, (winid, const char *, int,
                                         char *, int));
-STATIC_DCL int FDECL(handle_add_list_remove, (const char *, int));
-STATIC_DCL boolean FDECL(special_handling, (const char *,
+static int FDECL(handle_add_list_remove, (const char *, int));
+static boolean FDECL(special_handling, (const char *,
                                             BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL const char *FDECL(get_compopt_value, (const char *, char *));
-STATIC_DCL void FDECL(remove_autopickup_exception,
+static const char *FDECL(get_compopt_value, (const char *, char *));
+static void FDECL(remove_autopickup_exception,
                       (struct autopickup_exception *));
-STATIC_DCL int FDECL(count_ape_maps, (int *, int *));
+static int FDECL(count_ape_maps, (int *, int *));
 
-STATIC_DCL boolean FDECL(is_wc_option, (const char *));
-STATIC_DCL boolean FDECL(wc_supported, (const char *));
-STATIC_DCL boolean FDECL(is_wc2_option, (const char *));
-STATIC_DCL boolean FDECL(wc2_supported, (const char *));
-STATIC_DCL void FDECL(wc_set_font_name, (int, char *));
-STATIC_DCL int FDECL(wc_set_window_colors, (char *));
+static boolean FDECL(is_wc_option, (const char *));
+static boolean FDECL(wc_supported, (const char *));
+static boolean FDECL(is_wc2_option, (const char *));
+static boolean FDECL(wc2_supported, (const char *));
+static void FDECL(wc_set_font_name, (int, char *));
+static int FDECL(wc_set_window_colors, (char *));
 
 void
 reglyph_darkroom()
@@ -885,7 +885,7 @@ initoptions_finish()
 
 /* copy up to maxlen-1 characters; 'dest' must be able to hold maxlen;
    treat comma as alternate end of 'src' */
-STATIC_OVL void
+static void
 nmcpy(dest, src, maxlen)
 char *dest;
 const char *src;
@@ -923,7 +923,7 @@ int maxlen;
  * an appropriate digit will also fall through to \<other> and yield 'X'
  * or 'O', plus stop if the non-digit is end-of-string.
  */
-STATIC_OVL void
+static void
 escapes(cp, tp)
 const char *cp;
 char *tp;
@@ -996,7 +996,7 @@ char *tp;
     *tp = '\0';
 }
 
-STATIC_OVL void
+static void
 rejectoption(optname)
 const char *optname;
 {
@@ -1027,7 +1027,7 @@ OPTIONS=gender
 
 */
 
-STATIC_OVL char *
+static char *
 string_for_opt(opts, val_optional)
 char *opts;
 boolean val_optional;
@@ -1047,7 +1047,7 @@ boolean val_optional;
     return colon;
 }
 
-STATIC_OVL char *
+static char *
 string_for_env_opt(optname, opts, val_optional)
 const char *optname;
 char *opts;
@@ -1060,7 +1060,7 @@ boolean val_optional;
     return string_for_opt(opts, val_optional);
 }
 
-STATIC_OVL void
+static void
 bad_negation(optname, with_parameter)
 const char *optname;
 boolean with_parameter;
@@ -1078,7 +1078,7 @@ boolean with_parameter;
  * This routine returns 1 unless there is a duplicate or bad char in
  * the string.
  */
-STATIC_OVL int
+static int
 change_inv_order(op)
 char *op;
 {
@@ -1126,7 +1126,7 @@ char *op;
     return retval;
 }
 
-STATIC_OVL boolean
+static boolean
 warning_opts(opts, optype)
 register char *opts;
 const char *optype;
@@ -1159,7 +1159,7 @@ register uchar *graph_chars;
             g.warnsyms[i] = graph_chars[i];
 }
 
-STATIC_OVL int
+static int
 feature_alert_opts(op, optn)
 char *op;
 const char *optn;
@@ -1223,7 +1223,7 @@ int on_or_off;
     }
 }
 
-STATIC_OVL boolean
+static boolean
 duplicate_opt_detection(opts, iscompound)
 const char *opts;
 int iscompound; /* 0 == boolean option, 1 == compound */
@@ -1257,7 +1257,7 @@ int iscompound; /* 0 == boolean option, 1 == compound */
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 complain_about_duplicate(opts, iscompound)
 const char *opts;
 int iscompound; /* 0 == boolean option, 1 == compound */
@@ -1275,7 +1275,7 @@ int iscompound; /* 0 == boolean option, 1 == compound */
 }
 
 /* paranoia[] - used by parseoptions() and special_handling() */
-STATIC_VAR const struct paranoia_opts {
+static const struct paranoia_opts {
     int flagmask;        /* which paranoid option */
     const char *argname; /* primary name */
     int argMinLen;       /* minimum number of letters to match */
@@ -1399,7 +1399,7 @@ char *str;
     return c;
 }
 
-STATIC_OVL const char *
+static const char *
 attr2attrname(attr)
 int attr;
 {
@@ -1565,7 +1565,7 @@ static const struct {
     { "norep", MSGTYP_NOREP, "Do not repeat the message" }
 };
 
-STATIC_OVL const char *
+static const char *
 msgtype2name(typ)
 int typ;
 {
@@ -1577,7 +1577,7 @@ int typ;
     return (char *) 0;
 }
 
-STATIC_OVL int
+static int
 query_msgtype()
 {
     winid tmpwin;
@@ -1605,7 +1605,7 @@ query_msgtype()
     return -1;
 }
 
-STATIC_OVL boolean
+static boolean
 msgtype_add(typ, pattern)
 int typ;
 char *pattern;
@@ -1642,7 +1642,7 @@ msgtype_free()
     g.plinemsg_types = (struct plinemsg_type *) 0;
 }
 
-STATIC_OVL void
+static void
 free_one_msgtype(idx)
 int idx; /* 0 .. */
 {
@@ -1705,7 +1705,7 @@ int hide_mask;
     }
 }
 
-STATIC_OVL int
+static int
 msgtype_count(VOID_ARGS)
 {
     int c = 0;
@@ -1744,7 +1744,7 @@ char *str;
     return FALSE;
 }
 
-STATIC_OVL boolean
+static boolean
 test_regex_pattern(str, errmsg)
 const char *str;
 const char *errmsg;
@@ -1771,7 +1771,7 @@ const char *errmsg;
     return retval;
 }
 
-STATIC_OVL boolean
+static boolean
 add_menu_coloring_parsed(str, c, a)
 char *str;
 int c, a;
@@ -1875,7 +1875,7 @@ free_menu_coloring()
     }
 }
 
-STATIC_OVL void
+static void
 free_one_menu_coloring(idx)
 int idx; /* 0 .. */
 {
@@ -1901,7 +1901,7 @@ int idx; /* 0 .. */
     }
 }
 
-STATIC_OVL int
+static int
 count_menucolors(VOID_ARGS)
 {
     struct menucoloring *tmp;
@@ -1912,7 +1912,7 @@ count_menucolors(VOID_ARGS)
     return count;
 }
 
-STATIC_OVL boolean
+static boolean
 parse_role_opts(negated, fullname, opts, opp)
 boolean negated;
 const char *fullname;
@@ -4282,7 +4282,7 @@ static char fmtstr_doset_tab[] = "%s\t[%s]";
 static char n_currently_set[] = "(%d currently set)";
 
 /* doset('O' command) menu entries for compound options */
-STATIC_OVL void
+static void
 doset_add_menu(win, option, indexoffset)
 winid win;          /* window to add to */
 const char *option; /* option name */
@@ -4322,7 +4322,7 @@ int indexoffset;    /* value to add to index in compopt[], or zero
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 }
 
-STATIC_OVL void
+static void
 opts_add_others(win, name, id, bufx, nset)
 winid win;
 const char *name;
@@ -4582,7 +4582,7 @@ doset() /* changing options via menu by Per Liboriussen */
 }
 
 /* common to msg-types, menu-colors, autopickup-exceptions */
-STATIC_OVL int
+static int
 handle_add_list_remove(optname, numtotal)
 const char *optname;
 int numtotal;
@@ -4629,7 +4629,7 @@ int numtotal;
     return opt_idx;
 }
 
-STATIC_OVL boolean
+static boolean
 special_handling(optname, setinitial, setfromfile)
 const char *optname;
 boolean setinitial, setfromfile;
@@ -5416,7 +5416,7 @@ boolean setinitial, setfromfile;
 
 /* This is ugly. We have all the option names in the compopt[] array,
    but we need to look at each option individually to get the value. */
-STATIC_OVL const char *
+static const char *
 get_compopt_value(optname, buf)
 const char *optname;
 char *buf;
@@ -5862,7 +5862,7 @@ const char *mapping;
     return 1;
 }
 
-STATIC_OVL void
+static void
 remove_autopickup_exception(whichape)
 struct autopickup_exception *whichape;
 {
@@ -5887,7 +5887,7 @@ struct autopickup_exception *whichape;
     }
 }
 
-STATIC_OVL int
+static int
 count_ape_maps(leave, grab)
 int *leave, *grab;
 {
@@ -6535,7 +6535,7 @@ int status;
     }
 }
 
-STATIC_OVL boolean
+static boolean
 is_wc_option(optnam)
 const char *optnam;
 {
@@ -6549,7 +6549,7 @@ const char *optnam;
     return FALSE;
 }
 
-STATIC_OVL boolean
+static boolean
 wc_supported(optnam)
 const char *optnam;
 {
@@ -6593,7 +6593,7 @@ int status;
     }
 }
 
-STATIC_OVL boolean
+static boolean
 is_wc2_option(optnam)
 const char *optnam;
 {
@@ -6607,7 +6607,7 @@ const char *optnam;
     return FALSE;
 }
 
-STATIC_OVL boolean
+static boolean
 wc2_supported(optnam)
 const char *optnam;
 {
@@ -6621,7 +6621,7 @@ const char *optnam;
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 wc_set_font_name(opttype, fontname)
 int opttype;
 char *fontname;
@@ -6657,7 +6657,7 @@ char *fontname;
     return;
 }
 
-STATIC_OVL int
+static int
 wc_set_window_colors(op)
 char *op;
 {

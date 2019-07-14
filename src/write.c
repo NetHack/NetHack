@@ -3,14 +3,14 @@
 
 #include "hack.h"
 
-STATIC_DCL int FDECL(cost, (struct obj *));
-STATIC_DCL boolean FDECL(label_known, (int, struct obj *));
-STATIC_DCL char *FDECL(new_book_description, (int, char *));
+static int FDECL(cost, (struct obj *));
+static boolean FDECL(label_known, (int, struct obj *));
+static char *FDECL(new_book_description, (int, char *));
 
 /*
  * returns basecost of a scroll or a spellbook
  */
-STATIC_OVL int
+static int
 cost(otmp)
 register struct obj *otmp;
 {
@@ -61,7 +61,7 @@ register struct obj *otmp;
    unfortunately, we can't track things that haven't been added to
    the discoveries list and aren't present in current inventory,
    so some scrolls with ought to yield True will end up False */
-STATIC_OVL boolean
+static boolean
 label_known(scrolltype, objlist)
 int scrolltype;
 struct obj *objlist;
@@ -359,7 +359,7 @@ found:
    looks funny, so we want to insert "into " prior to such descriptions;
    even that's rather iffy, indicating that such descriptions probably
    ought to be eliminated (especially "cloth"!) */
-STATIC_OVL char *
+static char *
 new_book_description(booktype, outbuf)
 int booktype;
 char *outbuf;

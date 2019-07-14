@@ -57,26 +57,26 @@ struct toptenentry {
    room for separating space or trailing newline plus string terminator */
 #define SCANBUFSZ (4 * (ROLESZ + 1) + (NAMSZ + 1) + (DTHSZ + 1) + 1)
 
-STATIC_DCL void FDECL(topten_print, (const char *));
-STATIC_DCL void FDECL(topten_print_bold, (const char *));
-STATIC_DCL void NDECL(outheader);
-STATIC_DCL void FDECL(outentry, (int, struct toptenentry *, BOOLEAN_P));
-STATIC_DCL void FDECL(discardexcess, (FILE *));
-STATIC_DCL void FDECL(readentry, (FILE *, struct toptenentry *));
-STATIC_DCL void FDECL(writeentry, (FILE *, struct toptenentry *));
+static void FDECL(topten_print, (const char *));
+static void FDECL(topten_print_bold, (const char *));
+static void NDECL(outheader);
+static void FDECL(outentry, (int, struct toptenentry *, BOOLEAN_P));
+static void FDECL(discardexcess, (FILE *));
+static void FDECL(readentry, (FILE *, struct toptenentry *));
+static void FDECL(writeentry, (FILE *, struct toptenentry *));
 #ifdef XLOGFILE
-STATIC_DCL void FDECL(writexlentry, (FILE *, struct toptenentry *, int));
-STATIC_DCL long NDECL(encodexlogflags);
-STATIC_DCL long NDECL(encodeconduct);
-STATIC_DCL long NDECL(encodeachieve);
+static void FDECL(writexlentry, (FILE *, struct toptenentry *, int));
+static long NDECL(encodexlogflags);
+static long NDECL(encodeconduct);
+static long NDECL(encodeachieve);
 #endif
-STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
-STATIC_DCL int FDECL(classmon, (char *, BOOLEAN_P));
-STATIC_DCL int FDECL(score_wanted, (BOOLEAN_P, int, struct toptenentry *, int,
+static void FDECL(free_ttlist, (struct toptenentry *));
+static int FDECL(classmon, (char *, BOOLEAN_P));
+static int FDECL(score_wanted, (BOOLEAN_P, int, struct toptenentry *, int,
                                     const char **, int));
 #ifdef NO_SCAN_BRACK
-STATIC_DCL void FDECL(nsb_mung_line, (char *));
-STATIC_DCL void FDECL(nsb_unmung_line, (char *));
+static void FDECL(nsb_mung_line, (char *));
+static void FDECL(nsb_unmung_line, (char *));
 #endif
 
 /* "killed by",&c ["an"] 'g.killer.name' */
@@ -152,7 +152,7 @@ boolean incl_helpless;
     }
 }
 
-STATIC_OVL void
+static void
 topten_print(x)
 const char *x;
 {
@@ -162,7 +162,7 @@ const char *x;
         putstr(g.toptenwin, ATR_NONE, x);
 }
 
-STATIC_OVL void
+static void
 topten_print_bold(x)
 const char *x;
 {
@@ -198,7 +198,7 @@ d_level *lev;
 }
 
 /* throw away characters until current record has been entirely consumed */
-STATIC_OVL void
+static void
 discardexcess(rfile)
 FILE *rfile;
 {
@@ -209,7 +209,7 @@ FILE *rfile;
     } while (c != '\n' && c != EOF);
 }
 
-STATIC_OVL void
+static void
 readentry(rfile, tt)
 FILE *rfile;
 struct toptenentry *tt;
@@ -292,7 +292,7 @@ struct toptenentry *tt;
     }
 }
 
-STATIC_OVL void
+static void
 writeentry(rfile, tt)
 FILE *rfile;
 struct toptenentry *tt;
@@ -331,7 +331,7 @@ struct toptenentry *tt;
 #ifdef XLOGFILE
 
 /* as tab is never used in eg. g.plname or death, no need to mangle those. */
-STATIC_OVL void
+static void
 writexlentry(rfile, tt, how)
 FILE *rfile;
 struct toptenentry *tt;
@@ -375,7 +375,7 @@ int how;
 #undef XLOG_SEP
 }
 
-STATIC_OVL long
+static long
 encodexlogflags()
 {
     long e = 0L;
@@ -390,7 +390,7 @@ encodexlogflags()
     return e;
 }
 
-STATIC_OVL long
+static long
 encodeconduct()
 {
     long e = 0L;
@@ -423,7 +423,7 @@ encodeconduct()
     return e;
 }
 
-STATIC_OVL long
+static long
 encodeachieve()
 {
     long r = 0L;
@@ -462,7 +462,7 @@ encodeachieve()
 
 #endif /* XLOGFILE */
 
-STATIC_OVL void
+static void
 free_ttlist(tt)
 struct toptenentry *tt;
 {
@@ -774,7 +774,7 @@ destroywin:
     }
 }
 
-STATIC_OVL void
+static void
 outheader()
 {
     char linebuf[BUFSZ];
@@ -789,7 +789,7 @@ outheader()
 }
 
 /* so>0: standout line; so=0: ordinary line */
-STATIC_OVL void
+static void
 outentry(rank, t1, so)
 struct toptenentry *t1;
 int rank;
@@ -952,7 +952,7 @@ boolean so;
         topten_print(linebuf);
 }
 
-STATIC_OVL int
+static int
 score_wanted(current_ver, rank, t1, playerct, players, uid)
 boolean current_ver;
 int rank;
@@ -1144,7 +1144,7 @@ char **argv;
 #endif
 }
 
-STATIC_OVL int
+static int
 classmon(plch, fem)
 char *plch;
 boolean fem;
@@ -1236,7 +1236,7 @@ struct obj *otmp;
 /* Lattice scanf isn't up to reading the scorefile.  What */
 /* follows deals with that; I admit it's ugly. (KL) */
 /* Now generally available (KL) */
-STATIC_OVL void
+static void
 nsb_mung_line(p)
 char *p;
 {
@@ -1244,7 +1244,7 @@ char *p;
         *p = '|';
 }
 
-STATIC_OVL void
+static void
 nsb_unmung_line(p)
 char *p;
 {

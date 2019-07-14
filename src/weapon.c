@@ -10,11 +10,11 @@
  */
 #include "hack.h"
 
-STATIC_DCL void FDECL(give_may_advance_msg, (int));
-STATIC_DCL boolean FDECL(could_advance, (int));
-STATIC_DCL boolean FDECL(peaked_skill, (int));
-STATIC_DCL int FDECL(slots_required, (int));
-STATIC_DCL void FDECL(skill_advance, (int));
+static void FDECL(give_may_advance_msg, (int));
+static boolean FDECL(could_advance, (int));
+static boolean FDECL(peaked_skill, (int));
+static int FDECL(slots_required, (int));
+static void FDECL(skill_advance, (int));
 
 /* Categories whose names don't come from OBJ_NAME(objects[type])
  */
@@ -33,7 +33,7 @@ STATIC_DCL void FDECL(skill_advance, (int));
 #define PN_ESCAPE_SPELL (-13)
 #define PN_MATTER_SPELL (-14)
 
-STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
+static NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
     0, DAGGER, KNIFE, AXE, PICK_AXE, SHORT_SWORD, BROADSWORD, LONG_SWORD,
     TWO_HANDED_SWORD, SCIMITAR, PN_SABER, CLUB, MACE, MORNING_STAR, FLAIL,
     PN_HAMMER, QUARTERSTAFF, PN_POLEARMS, SPEAR, TRIDENT, LANCE, BOW, SLING,
@@ -44,14 +44,14 @@ STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 };
 
 /* note: entry [0] isn't used */
-STATIC_VAR NEARDATA const char *const odd_skill_names[] = {
+static NEARDATA const char *const odd_skill_names[] = {
     "no skill", "bare hands", /* use barehands_or_martial[] instead */
     "two weapon combat", "riding", "polearms", "saber", "hammer", "whip",
     "attack spells", "healing spells", "divination spells",
     "enchantment spells", "clerical spells", "escape spells", "matter spells",
 };
 /* indexed vis `is_martial() */
-STATIC_VAR NEARDATA const char *const barehands_or_martial[] = {
+static NEARDATA const char *const barehands_or_martial[] = {
     "bare handed combat", "martial arts"
 };
 
@@ -65,7 +65,7 @@ STATIC_VAR NEARDATA const char *const barehands_or_martial[] = {
 static NEARDATA const char kebabable[] = { S_XORN, S_DRAGON, S_JABBERWOCK,
                                            S_NAGA, S_GIANT,  '\0' };
 
-STATIC_OVL void
+static void
 give_may_advance_msg(skill)
 int skill;
 {
@@ -461,12 +461,12 @@ long silverhit;
     }
 }
 
-STATIC_DCL struct obj *FDECL(oselect, (struct monst *, int));
+static struct obj *FDECL(oselect, (struct monst *, int));
 #define Oselect(x)                      \
     if ((otmp = oselect(mtmp, x)) != 0) \
         return otmp;
 
-STATIC_OVL struct obj *
+static struct obj *
 oselect(mtmp, x)
 struct monst *mtmp;
 int x;
@@ -1050,7 +1050,7 @@ int skill;
 }
 
 /* return the # of slots required to advance the skill */
-STATIC_OVL int
+static int
 slots_required(skill)
 int skill;
 {
@@ -1094,7 +1094,7 @@ boolean speedy;
 }
 
 /* return true if this skill could be advanced if more slots were available */
-STATIC_OVL boolean
+static boolean
 could_advance(skill)
 int skill;
 {
@@ -1109,7 +1109,7 @@ int skill;
 
 /* return true if this skill has reached its maximum and there's been enough
    practice to become eligible for the next step if that had been possible */
-STATIC_OVL boolean
+static boolean
 peaked_skill(skill)
 int skill;
 {
@@ -1121,7 +1121,7 @@ int skill;
                           >= practice_needed_to_advance(P_SKILL(skill))));
 }
 
-STATIC_OVL void
+static void
 skill_advance(skill)
 int skill;
 {

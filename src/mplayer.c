@@ -4,9 +4,9 @@
 
 #include "hack.h"
 
-STATIC_DCL const char *NDECL(dev_name);
-STATIC_DCL void FDECL(get_mplname, (struct monst *, char *));
-STATIC_DCL void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
+static const char *NDECL(dev_name);
+static void FDECL(get_mplname, (struct monst *, char *));
+static void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
 
 /* These are the names of those who
  * contributed to the development of NetHack 3.2/3.3/3.4/3.6.
@@ -40,7 +40,7 @@ static const char *developers[] = {
 };
 
 /* return a randomly chosen developer name */
-STATIC_OVL const char *
+static const char *
 dev_name()
 {
     register int i, m = 0, n = SIZE(developers);
@@ -67,7 +67,7 @@ dev_name()
     return (developers[i]);
 }
 
-STATIC_OVL void
+static void
 get_mplname(mtmp, nam)
 register struct monst *mtmp;
 char *nam;
@@ -92,7 +92,7 @@ char *nam;
                         (boolean) mtmp->female));
 }
 
-STATIC_OVL void
+static void
 mk_mplayer_armor(mon, typ)
 struct monst *mon;
 short typ;

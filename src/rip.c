@@ -16,7 +16,7 @@
 #endif
 
 #ifdef TEXT_TOMBSTONE
-STATIC_DCL void FDECL(center, (int, char *));
+static void FDECL(center, (int, char *));
 
 #ifndef NH320_DEDICATION
 /* A normal tombstone for end of game display. */
@@ -69,7 +69,7 @@ static const char *rip_txt[] = {
 #define DEATH_LINE 8 /* *char[] line # for death description */
 #define YEAR_LINE 12 /* *char[] line # for year */
 
-STATIC_OVL void
+static void
 center(line, text)
 int line;
 char *text;

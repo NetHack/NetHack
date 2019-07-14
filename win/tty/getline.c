@@ -15,12 +15,12 @@
 #include "func_tab.h"
 
 char morc = 0; /* tell the outside world what char you chose */
-STATIC_VAR boolean suppress_history;
-STATIC_DCL boolean FDECL(ext_cmd_getlin_hook, (char *));
+static boolean suppress_history;
+static boolean FDECL(ext_cmd_getlin_hook, (char *));
 
 typedef boolean FDECL((*getlin_hook_proc), (char *));
 
-STATIC_DCL void FDECL(hooked_tty_getlin,
+static void FDECL(hooked_tty_getlin,
                       (const char *, char *, getlin_hook_proc));
 extern int NDECL(extcmd_via_menu); /* cmd.c */
 
@@ -41,7 +41,7 @@ register char *bufp;
     hooked_tty_getlin(query, bufp, (getlin_hook_proc) 0);
 }
 
-STATIC_OVL void
+static void
 hooked_tty_getlin(query, bufp, hook)
 const char *query;
 register char *bufp;
@@ -252,7 +252,7 @@ register const char *s; /* chars allowed besides return */
  *	+ we don't change the characters that are already in base
  *	+ base has enough room to hold our string
  */
-STATIC_OVL boolean
+static boolean
 ext_cmd_getlin_hook(base)
 char *base;
 {

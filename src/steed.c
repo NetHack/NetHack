@@ -9,8 +9,8 @@ static NEARDATA const char steeds[] = { S_QUADRUPED, S_UNICORN, S_ANGEL,
                                         S_CENTAUR,   S_DRAGON,  S_JABBERWOCK,
                                         '\0' };
 
-STATIC_DCL boolean FDECL(landing_spot, (coord *, int, int));
-STATIC_DCL void FDECL(maybewakesteed, (struct monst *));
+static boolean FDECL(landing_spot, (coord *, int, int));
+static void FDECL(maybewakesteed, (struct monst *));
 
 /* caller has decided that hero can't reach something while mounted */
 void
@@ -430,7 +430,7 @@ kick_steed()
  * room's walls, which is not what we want.
  * Adapted from mail daemon code.
  */
-STATIC_OVL boolean
+static boolean
 landing_spot(spot, reason, forceit)
 coord *spot; /* landing position (we fill it in) */
 int reason;
@@ -689,7 +689,7 @@ int reason; /* Player was thrown off etc. */
 
 /* when attempting to saddle or mount a sleeping steed, try to wake it up
    (for the saddling case, it won't be u.usteed yet) */
-STATIC_OVL void
+static void
 maybewakesteed(steed)
 struct monst *steed;
 {

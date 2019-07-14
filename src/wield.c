@@ -52,8 +52,8 @@
  * No item may be in more than one of these slots.
  */
 
-STATIC_DCL boolean FDECL(cant_wield_corpse, (struct obj *));
-STATIC_DCL int FDECL(ready_weapon, (struct obj *));
+static boolean FDECL(cant_wield_corpse, (struct obj *));
+static int FDECL(ready_weapon, (struct obj *));
 
 /* used by will_weld() */
 /* probably should be renamed */
@@ -114,7 +114,7 @@ register struct obj *obj;
         g.unweapon = TRUE; /* for "bare hands" message */
 }
 
-STATIC_OVL boolean
+static boolean
 cant_wield_corpse(obj)
 struct obj *obj;
 {
@@ -133,7 +133,7 @@ struct obj *obj;
     return TRUE;
 }
 
-STATIC_OVL int
+static int
 ready_weapon(wep)
 struct obj *wep;
 {

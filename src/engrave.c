@@ -8,8 +8,8 @@
 #include "sfproto.h"
 
 
-STATIC_VAR NEARDATA struct engr *head_engr;
-STATIC_DCL const char *NDECL(blengr);
+static NEARDATA struct engr *head_engr;
+static const char *NDECL(blengr);
 
 char *
 random_engraving(outbuf)
@@ -1343,7 +1343,7 @@ static const char blind_writing[][21] = {
      0x69, 0x76, 0x6b, 0x66, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 };
 
-STATIC_OVL const char *
+static const char *
 blengr(VOID_ARGS)
 {
     return blind_writing[rn2(SIZE(blind_writing))];

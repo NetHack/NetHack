@@ -9,8 +9,8 @@
 #define ALGN_SINNED (-4) /* worse than strayed (-1..-3) */
 #define ALGN_PIOUS 14    /* better than fervent (9..13) */
 
-STATIC_DCL boolean FDECL(histemple_at, (struct monst *, XCHAR_P, XCHAR_P));
-STATIC_DCL boolean FDECL(has_shrine, (struct monst *));
+static boolean FDECL(histemple_at, (struct monst *, XCHAR_P, XCHAR_P));
+static boolean FDECL(has_shrine, (struct monst *));
 
 void
 newepri(mtmp)
@@ -149,7 +149,7 @@ register char *array;
     return '\0';
 }
 
-STATIC_OVL boolean
+static boolean
 histemple_at(priest, x, y)
 register struct monst *priest;
 register xchar x, y;
@@ -349,7 +349,7 @@ struct monst *priest;
     return (boolean) (u.ualign.type == mon_aligntyp(priest));
 }
 
-STATIC_OVL boolean
+static boolean
 has_shrine(pri)
 struct monst *pri;
 {
