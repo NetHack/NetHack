@@ -4,7 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* various code that was replicated in *main.c */
-#define NEED_VARARGS
 #include "hack.h"
 #include <ctype.h>
 
@@ -932,38 +931,6 @@ const char *opts;
     return;
 }
 
-static FILE * g_fuzzer_log_file = NULL;
-static int g_fuzzer_log_level = LOG_MINIMAL;
-
-/* fuzzer_start() starts the fuzzer opening the fuzzer log file */
-void
-fuzzer_start()
-{
-    if (!iflags.debug_fuzzer) {
-        const char * fq_replay;
-
-        iflags.debug_fuzzer = TRUE;
-        iflags.fuzzer_auto_start = FALSE;
-
-        nhassert(g_fuzzer_log_file == NULL);
-        fq_replay = fqname("fuzzer.log", SAVEPREFIX, 0);
-
-        g_fuzzer_log_file = fopen(fq_replay, "w");
-    }
-}
-
-/* fuzzer_stop() stops the fuzzer and close the fuzzer log file */
-void
-fuzzer_stop()
-{
-    if (iflags.debug_fuzzer) {
-        if(g_fuzzer_log_file != NULL) {
-            fclose(g_fuzzer_log_file);
-            g_fuzzer_log_file = NULL;
-        }
-    }
-}
-
 /* fuzzer_toggle() toggles fuzzer state */
 void
 fuzzer_toggle()
@@ -974,29 +941,6 @@ fuzzer_toggle()
         fuzzer_start();
 }
 
-/* fuzzer_log() is used to place messages in the file 'fuzzer.log'.  This
- * log is the primary tool for monitoring fuzzer activity and tracking down
- * issues that the fuzzer is able to reproduce.
- */
-void
-fuzzer_log
-VA_DECL2(int, level, const char *, str)
-{
-    VA_START(str);
-    VA_INIT(str, char *);
-
-    if (!g_fuzzer_log_file)
-        return;
-
-    if (iflags.verbose_logging_start != 0 && g.moves >= iflags.verbose_logging_start)
-        g_fuzzer_log_level = LOG_VERBOSE;
-
-    if (level <= g_fuzzer_log_level)
-        Vfprintf(g_fuzzer_log_file, str, VA_ARGS);
-
-    VA_END();
-}
-
 /* fuzzer_check() is called prior to rhack(0) to allow the fuzzer to
  * check if it should stop and to allow it to reseed the game.
  */
@@ -1005,6 +949,7 @@ fuzzer_check()
 {
     if (iflags.debug_fuzzer)
     {
+        unsigned long seed;
         if (g.moves >= iflags.fuzzer_stop_and_save) {
             iflags.fuzzer_saving = TRUE;
             dosave0();
@@ -1013,7 +958,7 @@ fuzzer_check()
             nh_terminate(EXIT_SUCCESS);
         }
 
-        unsigned long seed = rul();
+        seed = rul();
         set_random(seed, rn2);
         fuzzer_log(LOG_MINIMAL, "SEED:%ld:%lu\n", g.moves, seed);
 
@@ -1027,9 +972,10 @@ void
 fuzzer_auto_start()
 {
     if (iflags.fuzzer_auto_start) {
+        unsigned long seed;
         nhassert(!iflags.debug_fuzzer);
         fuzzer_start();
-        unsigned long seed = rul();
+        seed = rul();
         set_random(seed, rn2);
         fuzzer_log(LOG_MINIMAL, "START:%ld:%lu\n", g.moves, seed);
     }
