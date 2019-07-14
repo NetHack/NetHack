@@ -1655,6 +1655,8 @@ E struct selectionvar *FDECL(l_selection_check, (lua_State *, int));
 E int FDECL(l_selection_register, (lua_State *));
 
 /* ### nhlua.c ### */
+E lua_State * NDECL(nhl_init);
+E boolean FDECL(nhl_loadlua, (lua_State *, const char *));
 E boolean FDECL(load_lua, (const char *));
 E void FDECL(nhl_error, (lua_State *, const char *));
 E void FDECL(lcheck_param_table, (lua_State *));

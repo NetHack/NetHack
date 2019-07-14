@@ -11,13 +11,10 @@ NHSROOT=..
 
 VARDAT = bogusmon data engrave epitaph rumors quest.dat oracles options
 
-all:	$(VARDAT) spec_levs quest_levs dungeon
+all:	$(VARDAT) spec_levs quest_levs
 
 ../util/makedefs:
 	(cd ../util ; $(MAKE) makedefs)
-
-../util/dgn_comp:
-	(cd ../util ; $(MAKE) dgn_comp)
 
 ../util/tile2x11:
 	(cd ../util ; $(MAKE) tile2x11)
@@ -129,12 +126,8 @@ spec_levs:
 quest_levs:
 	touch quest_levs
 
-dungeon: dungeon.def ../util/makedefs ../util/dgn_comp
-	../util/makedefs -e
-	../util/dgn_comp dungeon.pdf
-
 spotless:
-	-rm -f spec_levs quest_levs *.lev $(VARDAT) dungeon dungeon.pdf
+	-rm -f spec_levs quest_levs *.lev $(VARDAT)
 	-rm -f nhdat x11tiles beostiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm
 	-rm -f rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad
 	-rm -f nhsplash.xpm nhtiles.bmp

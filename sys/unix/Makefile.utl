@@ -186,7 +186,6 @@ HACK_H	 = ../src/hack.h-t
 
 # utility .c files
 MAKESRC = makedefs.c
-DGNCOMPSRC = dgn_yacc.c dgn_lex.c dgn_main.c
 RECOVSRC = recover.c
 DLBSRC = dlb_main.c
 UTILSRCS = $(MAKESRC) panic.c $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
@@ -204,9 +203,6 @@ OALLOC = $(OBJDIR)/alloc.o panic.o
 
 # object files for makedefs
 MAKEOBJS = makedefs.o $(OMONOBJ)
-
-# object files for dungeon compiler
-DGNCOMPOBJS = dgn_yacc.o dgn_lex.o dgn_main.o $(OALLOC)
 
 # object files for recovery utility
 RECOVOBJS = recover.o
@@ -266,35 +262,6 @@ lintdefs:
 # support code used by several of the utility programs (but not makedefs)
 panic.o:     panic.c $(CONFIG_H)
 
-
-#	dependencies for dgn_comp
-#
-dgn_comp:  $(DGNCOMPOBJS)
-	$(CC) $(LFLAGS) -o dgn_comp $(DGNCOMPOBJS) $(LIBS)
-
-dgn_yacc.o:  dgn_yacc.c $(CONFIG_H) ../include/dgn_file.h ../include/date.h
-dgn_main.o:  dgn_main.c $(CONFIG_H) ../include/dlb.h
-
-# see dgn_comp.l for WEIRD_LEX discussion
-dgn_lex.o:   dgn_lex.c $(CONFIG_H) ../include/dgn_comp.h ../include/dgn_file.h
-	$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus dgn_lex.c` dgn_lex.c
-
-# '$(YACC) -d' generates both $(YTABC) and $(YTABH) in one run
-../include/dgn_comp.h: dgn_yacc.c
-
-dgn_yacc.c: dgn_comp.y
-	$(YACC) $(YACCDIST) -d dgn_comp.y
-	sed -e 's#"$(YTABC)"#"$@"#' -e 's#$(YTABC):#$@:#' $(YTABC) > $@ \
-		&& rm $(YTABC)
-	sed -e 's#"$(YTABH)"#"dgn_comp.h"#' $(YTABH) > ../include/dgn_comp.h \
-		&& rm $(YTABH)
-
-dgn_lex.c: dgn_comp.l
-	$(LEX) $(FLEXDIST) dgn_comp.l
-	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' \
-	    -e 's#static void yyunput#void yyunput#' $(LEXYYC) > $@ \
-		&& rm $(LEXYYC)
-#	note: <space><space><star> is basic RE substitute for <space><plus>
 
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
@@ -501,17 +468,7 @@ $(HACK_H): $(CONFIG_H)
 $(CONFIG_H): ../include/config.h
 	@( cd ../src ; $(MAKE) $(CONFIG_H) )
 
-# 'make dist' => put generated lex and yacc sources into place for distribution
 SYSSHARE=../sys/share/
-$(SYSSHARE)dgn_lex.c: dgn_lex.c
-	cp dgn_lex.c $@
-$(SYSSHARE)dgn_yacc.c: dgn_yacc.c
-	cp dgn_yacc.c $@
-$(SYSSHARE)dgn_comp.h: ../include/dgn_comp.h
-	cp ../include/dgn_comp.h $@
-
-dist:	$(SYSSHARE)dgn_lex.c $(SYSSHARE)dgn_yacc.c $(SYSSHARE)dgn_comp.h
-	@echo 'pre-generated lex and yacc sources are in place in sys/share'
 
 tags: $(UTILSRCS)
 	@ctags -tw $(UTILSRCS)
@@ -520,9 +477,7 @@ clean:
 	-rm -f *.o
 
 spotless: clean
-	-rm -f dgn_lex.c dgn_yacc.c
-	-rm -f ../include/dgn_comp.h
 	-rm -f ../include/tile.h tiletxt.c
-	-rm -f makedefs dgn_comp recover dlb
+	-rm -f makedefs recover dlb
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
 		tilemap tileedit tile2bmp

@@ -503,7 +503,7 @@ const char *name;
 {
     int ret;
 
-    lua_getfield(L, 1, name);
+    lua_getfield(L, -1, name);
     ret = (int) luaL_checkinteger(L, -1);
     lua_pop(L, 1);
     return ret;
@@ -518,7 +518,7 @@ int defval;
 {
     int ret = defval;
 
-    lua_getfield(L, 1, name);
+    lua_getfield(L, -1, name);
     if (!lua_isnil(L, -1)) {
         ret = (int) luaL_checkinteger(L, -1);
     }
@@ -533,7 +533,7 @@ const char *name;
 {
     char *ret;
 
-    lua_getfield(L, 1, name);
+    lua_getfield(L, -1, name);
     ret = dupstr(luaL_checkstring(L, -1));
     lua_pop(L, 1);
     return ret;
@@ -549,10 +549,12 @@ char *defval;
 {
     const char *ret;
 
-    lua_getfield(L, 1, name);
+    lua_getfield(L, -1, name);
     ret = luaL_optstring(L, -1, defval);
+    if (ret)
+        ret = dupstr(ret);
     lua_pop(L, 1);
-    return ret ? dupstr(ret) : NULL;
+    return ret;
 }
 
 int
@@ -563,7 +565,7 @@ const char *name;
     int ltyp;
     int ret = -1;
 
-    lua_getfield(L, 1, name);
+    lua_getfield(L, -1, name);
     ltyp = lua_type(L, -1);
     if (ltyp == LUA_TSTRING) {
         const char *const boolstr[] = { "true", "false", "yes", "no", NULL };
@@ -590,7 +592,7 @@ int defval;
 {
     int ret = defval;
 
-    lua_getfield(L, 1, name);
+    lua_getfield(L, -1, name);
     if (lua_type(L, -1) != LUA_TNIL) {
         lua_pop(L, 1);
         return get_table_boolean(L, name);
@@ -608,7 +610,7 @@ const char *const opts[]; /* NULL-terminated list */
 {
     int ret;
 
-    lua_getfield(L, 1, name);
+    lua_getfield(L, -1, name);
     ret = luaL_checkoption(L, -1, defval, opts);
     lua_pop(L, 1);
     return ret;
@@ -842,11 +844,9 @@ give_up:
     return ret;
 }
 
-boolean
-load_lua(name)
-const char *name;
+lua_State *
+nhl_init()
 {
-    boolean ret = TRUE;
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
 
@@ -867,6 +867,21 @@ const char *name;
     l_register_des(L);
 
     if (!nhl_loadlua(L, "nhlib.lua")) {
+        lua_close(L);
+        return (lua_State *) 0;
+    }
+
+    return L;
+}
+
+boolean
+load_lua(name)
+const char *name;
+{
+    boolean ret = TRUE;
+    lua_State *L = nhl_init();
+
+    if (!L) {
         ret = FALSE;
         goto give_up;
     }

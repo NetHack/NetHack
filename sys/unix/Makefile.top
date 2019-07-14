@@ -88,14 +88,14 @@ SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 QUEST_LEVS = ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua
 
 DATNODLB = $(VARDATND) license symbols
-DATDLB = $(DATHELP) dungeon tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
+DATDLB = $(DATHELP) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
 $(GAME):
 	( cd lib/lua-5.3.5/src && make a && cp liblua.a ../../../src/ )
 	( cd src ; $(MAKE) )
 
-all:	$(GAME) recover Guidebook $(VARDAT) dungeon spec_levs check-dlb
+all:	$(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
 	true; $(MOREALL)
 	@echo "Done."
 
@@ -133,13 +133,9 @@ options: $(GAME)
 quest.dat: $(GAME)
 	( cd dat ; $(MAKE) quest.dat )
 
-spec_levs: dungeon
+spec_levs:
 	( cd dat ; $(MAKE) spec_levs )
 	( cd dat ; $(MAKE) quest_levs )
-
-dungeon: $(GAME)
-	( cd util ; $(MAKE) dgn_comp )
-	( cd dat ; $(MAKE) dungeon )
 
 nhtiles.bmp: $(GAME)
 	( cd dat ; $(MAKE) nhtiles.bmp )
@@ -237,7 +233,7 @@ dofiles-nodlb:
 			$(CHGRP) $(GAMEGRP) $(DAT) ; \
 			chmod $(FILEPERM) $(DAT) )
 
-update: $(GAME) recover $(VARDAT) dungeon spec_levs
+update: $(GAME) recover $(VARDAT) spec_levs
 #	(don't yank the old version out from under people who're playing it)
 	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old
 #	quest.dat is also kept open and has the same problems over NFS
@@ -256,7 +252,7 @@ update: $(GAME) recover $(VARDAT) dungeon spec_levs
 rootcheck:
 	@true; $(ROOTCHECK)
 
-install: rootcheck $(GAME) recover $(VARDAT) dungeon spec_levs
+install: rootcheck $(GAME) recover $(VARDAT) spec_levs
 	true; $(PREINSTALL)
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory

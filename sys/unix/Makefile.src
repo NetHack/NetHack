@@ -491,7 +491,7 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 
 # all .h files except date.h, onames.h, pm.h, and vis_tab.h which would
 # cause dependency loops if run through "make depend"
-# and dgn_comp.h, dgn_file.h, special level & dungeon files.
+# and dgn_file.h, special level & dungeon files.
 #
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h def_os2.h \
@@ -505,7 +505,7 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h \
-		dgn_comp.h dgn_file.h
+		dgn_file.h
 
 # the following .o's _must_ be made before any others (for makedefs)
 FIRSTOBJ = monst.o objects.o

@@ -67,26 +67,23 @@ MANEXT	= 6
 
 # manual installation for most BSD-style systems
 GAMEMANCREATE = cat nethack.6 | $(NHGREP) >
-DGNMANCREATE = cat dgn_comp.6 | $(NHGREP) >
 RCVRMANCREATE = cat recover.6 | $(NHGREP) >
 DLBMANCREATE = cat dlb.6 | $(NHGREP) >
 MDMANCREATE = cat makedefs.6 | $(NHGREP) >
 # manual installation for most SYSV-style systems
 # GAMEMANCREATE = cat nethack.6 | $(NHGREP) | nroff -man - >
-# DGNMANCREATE = cat dgn_comp.6 | $(NHGREP) | nroff -man - >
 # RCVRMANCREATE = cat recover.6 | $(NHGREP) | nroff -man - >
 # DLBMANCREATE = cat dlb.6 | $(NHGREP) | nroff -man - >
 # MDMANCREATE = cat makedefs.6 | $(NHGREP) | nroff -man - >
 
 manpages:
 	-$(GAMEMANCREATE) $(MANDIR)/$(GAME).$(MANEXT)
-	-$(DGNMANCREATE) $(MANDIR)/dgn_comp.$(MANEXT)
 	-$(RCVRMANCREATE) $(MANDIR)/recover.$(MANEXT)
 	-$(DLBMANCREATE) $(MANDIR)/dlb.$(MANEXT)
 	-$(MDMANCREATE) $(MANDIR)/makedefs.$(MANEXT)
 
 # manual creation for distribution
-DISTRIB = Guidebook.txt nethack.txt dgn_comp.txt recover.txt \
+DISTRIB = Guidebook.txt nethack.txt recover.txt \
 	dlb.txt makedefs.txt
 
 distrib: $(DISTRIB)
@@ -97,8 +94,6 @@ Guidebook.txt	: Guidebook.mn tmac.n tmac.nh
 MAN2TXT = $(NHGREP) | nroff -man - | $(COLCMD)
 nethack.txt	: nethack.6
 	cat nethack.6 | $(MAN2TXT) > nethack.txt
-dgn_comp.txt	: dgn_comp.6
-	cat dgn_comp.6 | $(MAN2TXT) > dgn_comp.txt
 recover.txt	: recover.6
 	cat recover.6 | $(MAN2TXT) > recover.txt
 dlb.txt		: dlb.6
