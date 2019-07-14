@@ -9,35 +9,35 @@
 #include "hack.h"
 #include "dlb.h"
 
-STATIC_DCL boolean FDECL(is_swallow_sym, (int));
-STATIC_DCL int FDECL(append_str, (char *, const char *));
-STATIC_DCL void FDECL(look_at_object, (char *, int, int, int));
-STATIC_DCL void FDECL(look_at_monster, (char *, char *,
+static boolean FDECL(is_swallow_sym, (int));
+static int FDECL(append_str, (char *, const char *));
+static void FDECL(look_at_object, (char *, int, int, int));
+static void FDECL(look_at_monster, (char *, char *,
                                         struct monst *, int, int));
-STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
-STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
+static struct permonst *FDECL(lookat, (int, int, char *, char *));
+static void FDECL(checkfile, (char *, struct permonst *,
                                   BOOLEAN_P, BOOLEAN_P, char *));
-STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
-STATIC_DCL void FDECL(do_supplemental_info, (char *, struct permonst *,
+static void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
+static void FDECL(do_supplemental_info, (char *, struct permonst *,
                                              BOOLEAN_P));
-STATIC_DCL void NDECL(whatdoes_help);
-STATIC_DCL void NDECL(docontact);
-STATIC_DCL void NDECL(dispfile_help);
-STATIC_DCL void NDECL(dispfile_shelp);
-STATIC_DCL void NDECL(dispfile_optionfile);
-STATIC_DCL void NDECL(dispfile_license);
-STATIC_DCL void NDECL(dispfile_debughelp);
-STATIC_DCL void NDECL(hmenu_doextversion);
-STATIC_DCL void NDECL(hmenu_dohistory);
-STATIC_DCL void NDECL(hmenu_dowhatis);
-STATIC_DCL void NDECL(hmenu_dowhatdoes);
-STATIC_DCL void NDECL(hmenu_doextlist);
+static void NDECL(whatdoes_help);
+static void NDECL(docontact);
+static void NDECL(dispfile_help);
+static void NDECL(dispfile_shelp);
+static void NDECL(dispfile_optionfile);
+static void NDECL(dispfile_license);
+static void NDECL(dispfile_debughelp);
+static void NDECL(hmenu_doextversion);
+static void NDECL(hmenu_dohistory);
+static void NDECL(hmenu_dowhatis);
+static void NDECL(hmenu_dowhatdoes);
+static void NDECL(hmenu_doextlist);
 #ifdef PORT_HELP
 extern void NDECL(port_help);
 #endif
 
 /* Returns "true" for characters that could represent a monster's stomach. */
-STATIC_OVL boolean
+static boolean
 is_swallow_sym(c)
 int c;
 {
@@ -54,7 +54,7 @@ int c;
  * a substring of buf.  Return 1 if the string was appended, 0 otherwise.
  * It is expected that buf is of size BUFSZ.
  */
-STATIC_OVL int
+static int
 append_str(buf, new_str)
 char *buf;
 const char *new_str;
@@ -224,7 +224,7 @@ struct obj **obj_p;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
 
-STATIC_OVL void
+static void
 look_at_object(buf, x, y, glyph)
 char *buf; /* output buffer */
 int x, y, glyph;
@@ -259,7 +259,7 @@ int x, y, glyph;
     return;
 }
 
-STATIC_OVL void
+static void
 look_at_monster(buf, monbuf, mtmp, x, y)
 char *buf, *monbuf; /* buf: output, monbuf: optional output */
 struct monst *mtmp;
@@ -384,7 +384,7 @@ int x, y;
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
  */
-STATIC_OVL struct permonst *
+static struct permonst *
 lookat(x, y, buf, monbuf)
 int x, y;
 char *buf, *monbuf;
@@ -529,7 +529,7 @@ char *buf, *monbuf;
  *       lcase() for data.base lookup so that we can have a clean key.
  *       Therefore, we create a copy of inp _just_ for data.base lookup.
  */
-STATIC_OVL void
+static void
 checkfile(inp, pm, user_typed_name, without_asking, supplemental_name)
 char *inp;
 struct permonst *pm;
@@ -1299,7 +1299,7 @@ coord *click_cc;
     return 0;
 }
 
-STATIC_OVL void
+static void
 look_all(nearby, do_mons)
 boolean nearby; /* True => within BOLTLIM, False => entire map */
 boolean do_mons; /* True => monsters, False => objects */
@@ -1409,7 +1409,7 @@ static const char *suptext2[] = {
     (char *) 0,
 };
 
-STATIC_OVL void
+static void
 do_supplemental_info(name, pm, without_asking)
 char *name;
 struct permonst *pm;
@@ -1570,7 +1570,7 @@ doidtrap()
     rest_on_space, #if SHELL, #if SUSPEND) are booleans.
 */
 
-STATIC_DCL void
+static void
 whatdoes_help()
 {
     dlb *fp;
@@ -1604,10 +1604,10 @@ struct wd_stack_frame {
     Bitfield(else_seen, 1);
 };
 
-STATIC_DCL boolean FDECL(whatdoes_cond, (char *, struct wd_stack_frame *,
+static boolean FDECL(whatdoes_cond, (char *, struct wd_stack_frame *,
                                          int *, int));
 
-STATIC_OVL boolean
+static boolean
 whatdoes_cond(buf, stack, depth, lnum)
 char *buf;
 struct wd_stack_frame *stack;
@@ -1855,7 +1855,7 @@ dowhatdoes()
     return 0;
 }
 
-STATIC_OVL void
+static void
 docontact(VOID_ARGS)
 {
     winid cwin = create_nhwindow(NHW_TEXT);
@@ -1885,61 +1885,61 @@ docontact(VOID_ARGS)
     destroy_nhwindow(cwin);
 }
 
-STATIC_OVL void
+static void
 dispfile_help(VOID_ARGS)
 {
     display_file(HELP, TRUE);
 }
 
-STATIC_OVL void
+static void
 dispfile_shelp(VOID_ARGS)
 {
     display_file(SHELP, TRUE);
 }
 
-STATIC_OVL void
+static void
 dispfile_optionfile(VOID_ARGS)
 {
     display_file(OPTIONFILE, TRUE);
 }
 
-STATIC_OVL void
+static void
 dispfile_license(VOID_ARGS)
 {
     display_file(LICENSE, TRUE);
 }
 
-STATIC_OVL void
+static void
 dispfile_debughelp(VOID_ARGS)
 {
     display_file(DEBUGHELP, TRUE);
 }
 
-STATIC_OVL void
+static void
 hmenu_doextversion(VOID_ARGS)
 {
     (void) doextversion();
 }
 
-STATIC_OVL void
+static void
 hmenu_dohistory(VOID_ARGS)
 {
     (void) dohistory();
 }
 
-STATIC_OVL void
+static void
 hmenu_dowhatis(VOID_ARGS)
 {
     (void) dowhatis();
 }
 
-STATIC_OVL void
+static void
 hmenu_dowhatdoes(VOID_ARGS)
 {
     (void) dowhatdoes();
 }
 
-STATIC_OVL void
+static void
 hmenu_doextlist(VOID_ARGS)
 {
     (void) doextlist();

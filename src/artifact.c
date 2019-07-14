@@ -19,17 +19,17 @@
 #define get_artifact(o) \
     (((o) && (o)->oartifact) ? &artilist[(int) (o)->oartifact] : 0)
 
-STATIC_DCL boolean FDECL(bane_applies, (const struct artifact *,
+static boolean FDECL(bane_applies, (const struct artifact *,
                                         struct monst *));
-STATIC_DCL int FDECL(spec_applies, (const struct artifact *, struct monst *));
-STATIC_DCL int FDECL(arti_invoke, (struct obj *));
-STATIC_DCL boolean FDECL(Mb_hit, (struct monst * magr, struct monst *mdef,
+static int FDECL(spec_applies, (const struct artifact *, struct monst *));
+static int FDECL(arti_invoke, (struct obj *));
+static boolean FDECL(Mb_hit, (struct monst * magr, struct monst *mdef,
                                 struct obj *, int *, int, BOOLEAN_P, char *));
-STATIC_DCL unsigned long FDECL(abil_to_spfx, (long *));
-STATIC_DCL uchar FDECL(abil_to_adtyp, (long *));
-STATIC_DCL int FDECL(glow_strength, (int));
-STATIC_DCL boolean FDECL(untouchable, (struct obj *, BOOLEAN_P));
-STATIC_DCL int FDECL(count_surround_traps, (int, int));
+static unsigned long FDECL(abil_to_spfx, (long *));
+static uchar FDECL(abil_to_adtyp, (long *));
+static int FDECL(glow_strength, (int));
+static boolean FDECL(untouchable, (struct obj *, BOOLEAN_P));
+static int FDECL(count_surround_traps, (int, int));
 
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.
@@ -41,11 +41,11 @@ STATIC_DCL int FDECL(count_surround_traps, (int, int));
    of hit points that will fit in a 15 bit integer. */
 #define FATAL_DAMAGE_MODIFIER 200
 
-STATIC_DCL void NDECL(hack_artifacts);
-STATIC_DCL boolean FDECL(attacks, (int, struct obj *));
+static void NDECL(hack_artifacts);
+static boolean FDECL(attacks, (int, struct obj *));
 
 /* handle some special cases; must be called after u_init() */
-STATIC_OVL void
+static void
 hack_artifacts()
 {
     struct artifact *art;
@@ -418,7 +418,7 @@ const char *name;
     return FALSE;
 }
 
-STATIC_OVL boolean
+static boolean
 attacks(adtyp, otmp)
 int adtyp;
 struct obj *otmp;
@@ -649,7 +649,7 @@ long wp_mask;
 /* touch_artifact()'s return value isn't sufficient to tell whether it
    dished out damage, and tracking changes to u.uhp, u.mh, Lifesaved
    when trying to avoid second wounding is too cumbersome */
-STATIC_VAR boolean touch_blasted; /* for retouch_object() */
+static boolean touch_blasted; /* for retouch_object() */
 
 /*
  * creature (usually hero) tries to touch (pick up or wield) an artifact obj.
@@ -747,7 +747,7 @@ int dtyp;
                       || weap->cary.adtyp == dtyp);
 }
 
-STATIC_OVL boolean
+static boolean
 bane_applies(oart, mon)
 const struct artifact *oart;
 struct monst *mon;
@@ -764,7 +764,7 @@ struct monst *mon;
 }
 
 /* decide whether an artifact's special attacks apply against mtmp */
-STATIC_OVL int
+static int
 spec_applies(weap, mtmp)
 register const struct artifact *weap;
 struct monst *mtmp;
@@ -973,7 +973,7 @@ static const char *const mb_verb[2][NUM_MB_INDICES] = {
 };
 
 /* called when someone is being hit by Magicbane */
-STATIC_OVL boolean
+static boolean
 Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee)
 struct monst *magr, *mdef; /* attacker and defender */
 struct obj *mb;            /* Magicbane */
@@ -1427,7 +1427,7 @@ doinvoke()
     return arti_invoke(obj);
 }
 
-STATIC_OVL int
+static int
 arti_invoke(obj)
 struct obj *obj;
 {
@@ -1752,7 +1752,7 @@ struct obj *otmp;
         return (100L * (long) objects[otmp->otyp].oc_cost);
 }
 
-STATIC_OVL uchar
+static uchar
 abil_to_adtyp(abil)
 long *abil;
 {
@@ -1777,7 +1777,7 @@ long *abil;
     return 0;
 }
 
-STATIC_OVL unsigned long
+static unsigned long
 abil_to_spfx(abil)
 long *abil;
 {
@@ -1874,7 +1874,7 @@ static const char *glow_verbs[] = {
 };
 
 /* relative strength that Sting is glowing (0..3), to select verb */
-STATIC_OVL int
+static int
 glow_strength(count)
 int count;
 {
@@ -2007,7 +2007,7 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
    something via being carried or which has an #invoke effect
    currently in operation undergoes a touch test; if it fails,
    it will be unworn/unwielded and revoked but not dropped */
-STATIC_OVL boolean
+static boolean
 untouchable(obj, drop_untouchable)
 struct obj *obj;
 boolean drop_untouchable;
@@ -2114,7 +2114,7 @@ int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
         clear_bypasses(); /* reset upon final exit */
 }
 
-STATIC_OVL int
+static int
 count_surround_traps(x, y)
 int x, y;
 {

@@ -5,14 +5,14 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean NDECL(rm_waslit);
-STATIC_DCL void FDECL(mkcavepos,
+static boolean NDECL(rm_waslit);
+static void FDECL(mkcavepos,
                       (XCHAR_P, XCHAR_P, int, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL void FDECL(mkcavearea, (BOOLEAN_P));
-STATIC_DCL int NDECL(dig);
-STATIC_DCL void FDECL(dig_up_grave, (coord *));
-STATIC_DCL int FDECL(adj_pit_checks, (coord *, char *));
-STATIC_DCL void FDECL(pit_flow, (struct trap *, SCHAR_P));
+static void FDECL(mkcavearea, (BOOLEAN_P));
+static int NDECL(dig);
+static void FDECL(dig_up_grave, (coord *));
+static int FDECL(adj_pit_checks, (coord *, char *));
+static void FDECL(pit_flow, (struct trap *, SCHAR_P));
 
 /* Indices returned by dig_typ() */
 enum dig_types {
@@ -24,7 +24,7 @@ enum dig_types {
     DIGTYP_TREE
 };
 
-STATIC_OVL boolean
+static boolean
 rm_waslit()
 {
     register xchar x, y;
@@ -42,7 +42,7 @@ rm_waslit()
  * boulders in the name of a nice effect.  Vision will get fixed up again
  * immediately after the effect is complete.
  */
-STATIC_OVL void
+static void
 mkcavepos(x, y, dist, waslit, rockit)
 xchar x, y;
 int dist;
@@ -85,7 +85,7 @@ boolean waslit, rockit;
     feel_newsym(x, y);
 }
 
-STATIC_OVL void
+static void
 mkcavearea(rockit)
 register boolean rockit;
 {
@@ -235,7 +235,7 @@ int x, y;
     return TRUE;
 }
 
-STATIC_OVL int
+static int
 dig(VOID_ARGS)
 {
     register struct rm *lev;
@@ -893,7 +893,7 @@ coord *cc;
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 dig_up_grave(cc)
 coord *cc;
 {
@@ -1593,7 +1593,7 @@ zap_dig()
  * you're zapping a wand of digging laterally while
  * down in the pit.
  */
-STATIC_OVL int
+static int
 adj_pit_checks(cc, msg)
 coord *cc;
 char *msg;
@@ -1684,7 +1684,7 @@ char *msg;
 /*
  * Ensure that all conjoined pits fill up.
  */
-STATIC_OVL void
+static void
 pit_flow(trap, filltyp)
 struct trap *trap;
 schar filltyp;

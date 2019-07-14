@@ -11,20 +11,20 @@
 
 /* g.kickedobj (decl.c) tracks a kicked object until placed or destroyed */
 
-STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(maybe_kick_monster, (struct monst *,
+static void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
+static boolean FDECL(maybe_kick_monster, (struct monst *,
                                               XCHAR_P, XCHAR_P));
-STATIC_DCL void FDECL(kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
-STATIC_DCL int FDECL(kick_object, (XCHAR_P, XCHAR_P, char *));
-STATIC_DCL int FDECL(really_kick_object, (XCHAR_P, XCHAR_P));
-STATIC_DCL char *FDECL(kickstr, (char *, const char *));
-STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
-STATIC_DCL void FDECL(drop_to, (coord *, SCHAR_P));
+static void FDECL(kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
+static int FDECL(kick_object, (XCHAR_P, XCHAR_P, char *));
+static int FDECL(really_kick_object, (XCHAR_P, XCHAR_P));
+static char *FDECL(kickstr, (char *, const char *));
+static void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
+static void FDECL(drop_to, (coord *, SCHAR_P));
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 
 /* kicking damage when not poly'd into a form with a kick attack */
-STATIC_OVL void
+static void
 kickdmg(mon, clumsy)
 struct monst *mon;
 boolean clumsy;
@@ -117,7 +117,7 @@ boolean clumsy;
         use_skill(kick_skill, 1);
 }
 
-STATIC_OVL boolean
+static boolean
 maybe_kick_monster(mon, x, y)
 struct monst *mon;
 xchar x, y;
@@ -139,7 +139,7 @@ xchar x, y;
     return (boolean) (mon != 0);
 }
 
-STATIC_OVL void
+static void
 kick_monster(mon, x, y)
 struct monst *mon;
 xchar x, y;
@@ -453,7 +453,7 @@ xchar x, y; /* coordinates where object was before the impact, not after */
 }
 
 /* jacket around really_kick_object */
-STATIC_OVL int
+static int
 kick_object(x, y, kickobjnam)
 xchar x, y;
 char *kickobjnam;
@@ -473,7 +473,7 @@ char *kickobjnam;
 }
 
 /* guts of kick_object */
-STATIC_OVL int
+static int
 really_kick_object(x, y)
 xchar x, y;
 {
@@ -720,7 +720,7 @@ xchar x, y;
 }
 
 /* cause of death if kicking kills kicker */
-STATIC_OVL char *
+static char *
 kickstr(buf, kickobjnam)
 char *buf;
 const char *kickobjnam;
@@ -1322,7 +1322,7 @@ dokick()
     return 1;
 }
 
-STATIC_OVL void
+static void
 drop_to(cc, loc)
 coord *cc;
 schar loc;
@@ -1733,7 +1733,7 @@ unsigned long deliverflags;
     }
 }
 
-STATIC_OVL void
+static void
 otransit_msg(otmp, nodrop, num)
 register struct obj *otmp;
 register boolean nodrop;

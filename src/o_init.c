@@ -8,14 +8,14 @@
 #include "sfproto.h"
 
 
-STATIC_DCL void FDECL(setgemprobs, (d_level *));
-STATIC_DCL void FDECL(shuffle, (int, int, BOOLEAN_P));
-STATIC_DCL void NDECL(shuffle_all);
-STATIC_DCL boolean FDECL(interesting_to_discover, (int));
-STATIC_DCL char *FDECL(oclass_to_name, (CHAR_P, char *));
+static void FDECL(setgemprobs, (d_level *));
+static void FDECL(shuffle, (int, int, BOOLEAN_P));
+static void NDECL(shuffle_all);
+static boolean FDECL(interesting_to_discover, (int));
+static char *FDECL(oclass_to_name, (CHAR_P, char *));
 
 #ifdef USE_TILES
-STATIC_DCL void NDECL(shuffle_tiles);
+static void NDECL(shuffle_tiles);
 extern short glyph2tile[]; /* from tile.c */
 
 /* Shuffle tile assignments to match descriptions, so a red potion isn't
@@ -27,7 +27,7 @@ extern short glyph2tile[]; /* from tile.c */
  * is restored.  So might as well do that the first time instead of writing
  * another routine.
  */
-STATIC_OVL void
+static void
 shuffle_tiles()
 {
     int i;
@@ -41,7 +41,7 @@ shuffle_tiles()
 }
 #endif /* USE_TILES */
 
-STATIC_OVL void
+static void
 setgemprobs(dlev)
 d_level *dlev;
 {
@@ -68,7 +68,7 @@ d_level *dlev;
 }
 
 /* shuffle descriptions on objects o_low to o_high */
-STATIC_OVL void
+static void
 shuffle(o_low, o_high, domaterial)
 int o_low, o_high;
 boolean domaterial;
@@ -238,7 +238,7 @@ int *lo_p, *hi_p; /* output: range that item belongs among */
 }
 
 /* randomize object descriptions */
-STATIC_OVL void
+static void
 shuffle_all()
 {
     /* entire classes; obj_shuffle_range() handles their exceptions */
@@ -441,7 +441,7 @@ register int oindx;
     }
 }
 
-STATIC_OVL boolean
+static boolean
 interesting_to_discover(i)
 register int i;
 {
@@ -517,7 +517,7 @@ dodiscovered() /* free after Robert Viduya */
 }
 
 /* lower case let_to_name() output, which differs from def_oc_syms[].name */
-STATIC_OVL char *
+static char *
 oclass_to_name(oclass, buf)
 char oclass;
 char *buf;

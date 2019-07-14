@@ -12,12 +12,12 @@
 extern long bytes_counted;
 #endif
 
-STATIC_DCL boolean FDECL(no_bones_level, (d_level *));
-STATIC_DCL void FDECL(goodfruit, (int));
-STATIC_DCL void FDECL(resetobjs, (struct obj *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(fixuporacle, (struct monst *));
+static boolean FDECL(no_bones_level, (d_level *));
+static void FDECL(goodfruit, (int));
+static void FDECL(resetobjs, (struct obj *, BOOLEAN_P));
+static boolean FDECL(fixuporacle, (struct monst *));
 
-STATIC_OVL boolean
+static boolean
 no_bones_level(lev)
 d_level *lev;
 {
@@ -42,7 +42,7 @@ d_level *lev;
  * ID is positive instead of negative).  This way, when we later save the
  * chain of fruit types, we know to only save the types that exist.
  */
-STATIC_OVL void
+static void
 goodfruit(id)
 int id;
 {
@@ -52,7 +52,7 @@ int id;
         f->fid = id;
 }
 
-STATIC_OVL void
+static void
 resetobjs(ochain, restore)
 struct obj *ochain;
 boolean restore;
@@ -252,7 +252,7 @@ int x, y;
 
 /* possibly restore oracle's room and/or put her back inside it; returns
    False if she's on the wrong level and should be removed, True otherwise */
-STATIC_OVL boolean
+static boolean
 fixuporacle(oracle)
 struct monst *oracle;
 {

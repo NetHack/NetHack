@@ -84,8 +84,8 @@ static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #include <share.h>
 #endif
 
-STATIC_DCL FILE *NDECL(fopen_wizkit_file);
-STATIC_DCL void FDECL(wizkit_addinv, (struct obj *));
+static FILE *NDECL(fopen_wizkit_file);
+static void FDECL(wizkit_addinv, (struct obj *));
 
 #ifdef AMIGA
 extern char PATH[]; /* see sys/amiga/amidos.c */
@@ -127,47 +127,47 @@ extern char *sounddir;
 #endif
 
 #ifdef SELECTSAVED
-STATIC_PTR int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
+static int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
 #endif
-STATIC_DCL char *FDECL(set_bonesfile_name, (char *, d_level *));
-STATIC_DCL char *NDECL(set_bonestemp_name);
+static char *FDECL(set_bonesfile_name, (char *, d_level *));
+static char *NDECL(set_bonestemp_name);
 #ifdef COMPRESS
-STATIC_DCL void FDECL(redirect, (const char *, const char *, FILE *,
+static void FDECL(redirect, (const char *, const char *, FILE *,
                                  BOOLEAN_P));
 #endif
 #if defined(COMPRESS) || defined(ZLIB_COMP)
-STATIC_DCL void FDECL(docompress_file, (const char *, BOOLEAN_P));
+static void FDECL(docompress_file, (const char *, BOOLEAN_P));
 #endif
 #if defined(ZLIB_COMP)
-STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
+static boolean FDECL(make_compressed_name, (const char *, char *));
 #endif
 #ifndef USE_FCNTL
-STATIC_DCL char *FDECL(make_lockname, (const char *, char *));
+static char *FDECL(make_lockname, (const char *, char *));
 #endif
-STATIC_DCL void FDECL(set_configfile_name, (const char *));
-STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
-STATIC_DCL int FDECL(get_uchars, (char *, uchar *, BOOLEAN_P,
+static void FDECL(set_configfile_name, (const char *));
+static FILE *FDECL(fopen_config_file, (const char *, int));
+static int FDECL(get_uchars, (char *, uchar *, BOOLEAN_P,
                                   int, const char *));
 boolean FDECL(proc_wizkit_line, (char *));
 boolean FDECL(parse_config_line, (char *));
-STATIC_DCL boolean FDECL(parse_conf_file, (FILE *, boolean (*proc)(char *)));
-STATIC_DCL FILE *NDECL(fopen_sym_file);
+static boolean FDECL(parse_conf_file, (FILE *, boolean (*proc)(char *)));
+static FILE *NDECL(fopen_sym_file);
 boolean FDECL(proc_symset_line, (char *));
-STATIC_DCL void FDECL(set_symhandling, (char *, int));
+static void FDECL(set_symhandling, (char *, int));
 #ifdef NOCWD_ASSUMPTIONS
-STATIC_DCL void FDECL(adjust_prefix, (char *, int));
+static void FDECL(adjust_prefix, (char *, int));
 #endif
-STATIC_DCL boolean FDECL(config_error_nextline, (const char *));
-STATIC_DCL void NDECL(free_config_sections);
-STATIC_DCL char *FDECL(choose_random_part, (char *, CHAR_P));
-STATIC_DCL boolean FDECL(is_config_section, (const char *));
-STATIC_DCL boolean FDECL(handle_config_section, (char *));
-STATIC_DCL void FDECL(parseformat, (int *, char *));
+static boolean FDECL(config_error_nextline, (const char *));
+static void NDECL(free_config_sections);
+static char *FDECL(choose_random_part, (char *, CHAR_P));
+static boolean FDECL(is_config_section, (const char *));
+static boolean FDECL(handle_config_section, (char *));
+static void FDECL(parseformat, (int *, char *));
 
 #ifdef SELF_RECOVER
-STATIC_DCL boolean FDECL(copy_bytes, (int, int));
+static boolean FDECL(copy_bytes, (int, int));
 #endif
-STATIC_DCL NHFILE *FDECL(viable_nhfile, (NHFILE *));
+static NHFILE *FDECL(viable_nhfile, (NHFILE *));
 
 /*
  * fname_encode()
@@ -697,7 +697,7 @@ clearlocks()
 
 #if defined(SELECTSAVED)
 /* qsort comparison routine */
-STATIC_OVL int CFDECLSPEC
+static int CFDECLSPEC
 strcmp_wrap(p, q)
 const void *p;
 const void *q;
@@ -732,7 +732,7 @@ int fd;
 /* set up "file" to be file name for retrieving bones, and return a
  * bonesid to be read/written in the bones file.
  */
-STATIC_OVL char *
+static char *
 set_bonesfile_name(file, lev)
 char *file;
 d_level *lev;
@@ -795,7 +795,7 @@ d_level *lev;
  * (we are not reading or writing level files while writing bones files, so
  * the same array may be used instead of copying.)
  */
-STATIC_OVL char *
+static char *
 set_bonestemp_name()
 {
     char *tf;
@@ -1478,7 +1478,7 @@ char **saved;
 
 #ifdef COMPRESS
 
-STATIC_OVL void
+static void
 redirect(filename, mode, stream, uncomp)
 const char *filename, *mode;
 FILE *stream;
@@ -1498,7 +1498,7 @@ boolean uncomp;
  *
  * cf. child() in unixunix.c.
  */
-STATIC_OVL void
+static void
 docompress_file(filename, uncomp)
 const char *filename;
 boolean uncomp;
@@ -1683,7 +1683,7 @@ const char *filename UNUSED_if_not_COMPRESS;
 }
 
 #ifdef ZLIB_COMP /* RLC 09 Mar 1999: Support internal ZLIB */
-STATIC_OVL boolean
+static boolean
 make_compressed_name(filename, cfn)
 const char *filename;
 char *cfn;
@@ -1716,7 +1716,7 @@ char *cfn;
 #endif /* SHORT_FILENAMES */
 }
 
-STATIC_OVL void
+static void
 docompress_file(filename, uncomp)
 const char *filename;
 boolean uncomp;
@@ -1856,7 +1856,7 @@ struct flock sflock; /* for unlocking, same as above */
 #define HUP if (!g.program_state.done_hup)
 
 #ifndef USE_FCNTL
-STATIC_OVL char *
+static char *
 make_lockname(filename, lockname)
 const char *filename;
 char *lockname;
@@ -2136,7 +2136,7 @@ const char *backward_compat_configfile = "nethack.cnf";
 
 /* remember the name of the file we're accessing;
    if may be used in option reject messages */
-STATIC_OVL void
+static void
 set_configfile_name(fname)
 const char *fname;
 {
@@ -2148,7 +2148,7 @@ const char *fname;
 #define fopenp fopen
 #endif
 
-STATIC_OVL FILE *
+static FILE *
 fopen_config_file(filename, src)
 const char *filename;
 int src;
@@ -2291,7 +2291,7 @@ int src;
  * NOTE: zeros are inserted unless modlist is TRUE, in which case the list
  *  location is unchanged.  Callers must handle zeros if modlist is FALSE.
  */
-STATIC_OVL int
+static int
 get_uchars(bufp, list, modlist, size, name)
 char *bufp;       /* current pointer */
 uchar *list;      /* return list */
@@ -2352,7 +2352,7 @@ const char *name; /* name of option for error message */
 }
 
 #ifdef NOCWD_ASSUMPTIONS
-STATIC_OVL void
+static void
 adjust_prefix(bufp, prefixid)
 char *bufp;
 int prefixid;
@@ -2373,7 +2373,7 @@ int prefixid;
 #endif
 
 /* Choose at random one of the sep separated parts from str. Mangles str. */
-STATIC_OVL char *
+static char *
 choose_random_part(str,sep)
 char *str;
 char sep;
@@ -2413,7 +2413,7 @@ char sep;
     return (char *) 0;
 }
 
-STATIC_OVL void
+static void
 free_config_sections()
 {
     if (g.config_section_chosen) {
@@ -2426,7 +2426,7 @@ free_config_sections()
     }
 }
 
-STATIC_OVL boolean
+static boolean
 is_config_section(str)
 const char *str;
 {
@@ -2435,7 +2435,7 @@ const char *str;
     return (a && *str == '[' && *(a+1) == '\0' && (int)(a - str) > 0);
 }
 
-STATIC_OVL boolean
+static boolean
 handle_config_section(buf)
 char *buf;
 {
@@ -2998,7 +2998,7 @@ boolean secure;
     config_error_data = tmp;
 }
 
-STATIC_OVL boolean
+static boolean
 config_error_nextline(line)
 const char *line;
 {
@@ -3099,7 +3099,7 @@ int src;
     return rv;
 }
 
-STATIC_OVL FILE *
+static FILE *
 fopen_wizkit_file()
 {
     FILE *fp;
@@ -3171,7 +3171,7 @@ fopen_wizkit_file()
 }
 
 /* add to hero's inventory if there's room, otherwise put item on floor */
-STATIC_DCL void
+static void
 wizkit_addinv(obj)
 struct obj *obj;
 {
@@ -3242,7 +3242,7 @@ read_wizkit()
  *
  * Continued lines are merged together with one space in between.
  */
-STATIC_OVL boolean
+static boolean
 parse_conf_file(fp, proc)
 FILE *fp;
 boolean FDECL((*proc), (char *));
@@ -3377,7 +3377,7 @@ boolean FDECL((*proc), (char *));
 extern const char *known_handling[];     /* drawing.c */
 extern const char *known_restrictions[]; /* drawing.c */
 
-STATIC_OVL
+static
 FILE *
 fopen_sym_file()
 {
@@ -3616,7 +3616,7 @@ int which_set;
     return 1;
 }
 
-STATIC_OVL void
+static void
 set_symhandling(handling, which_set)
 char *handling;
 int which_set;

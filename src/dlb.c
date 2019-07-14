@@ -14,14 +14,6 @@
 
 #define DATAPREFIX 4		/* see decl.h */
 
-#if defined(OVERLAY)
-#define STATIC_DCL extern
-#define STATIC_OVL
-#else /* !OVERLAY */
-#define STATIC_DCL static
-#define STATIC_OVL static
-#endif /* OVERLAY */
-
 #ifdef DLB
 /*
  * Data librarian.  Present a STDIO-like interface to NetHack while
@@ -68,18 +60,18 @@ extern FILE *FDECL(fopen_datafile, (const char *, const char *, int));
 #define MAX_LIBS 4
 static library dlb_libs[MAX_LIBS];
 
-STATIC_DCL boolean FDECL(readlibdir, (library * lp));
-STATIC_DCL boolean FDECL(find_file, (const char *name, library **lib,
+static boolean FDECL(readlibdir, (library * lp));
+static boolean FDECL(find_file, (const char *name, library **lib,
                                      long *startp, long *sizep));
-STATIC_DCL boolean NDECL(lib_dlb_init);
-STATIC_DCL void NDECL(lib_dlb_cleanup);
-STATIC_DCL boolean FDECL(lib_dlb_fopen, (dlb *, const char *, const char *));
-STATIC_DCL int FDECL(lib_dlb_fclose, (dlb *));
-STATIC_DCL int FDECL(lib_dlb_fread, (char *, int, int, dlb *));
-STATIC_DCL int FDECL(lib_dlb_fseek, (dlb *, long, int));
-STATIC_DCL char *FDECL(lib_dlb_fgets, (char *, int, dlb *));
-STATIC_DCL int FDECL(lib_dlb_fgetc, (dlb *));
-STATIC_DCL long FDECL(lib_dlb_ftell, (dlb *));
+static boolean NDECL(lib_dlb_init);
+static void NDECL(lib_dlb_cleanup);
+static boolean FDECL(lib_dlb_fopen, (dlb *, const char *, const char *));
+static int FDECL(lib_dlb_fclose, (dlb *));
+static int FDECL(lib_dlb_fread, (char *, int, int, dlb *));
+static int FDECL(lib_dlb_fseek, (dlb *, long, int));
+static char *FDECL(lib_dlb_fgets, (char *, int, dlb *));
+static int FDECL(lib_dlb_fgetc, (dlb *));
+static long FDECL(lib_dlb_ftell, (dlb *));
 
 /* not static because shared with dlb_main.c */
 boolean FDECL(open_library, (const char *lib_name, library *lp));
@@ -130,7 +122,7 @@ extern char *FDECL(eos, (char *));
  *
  * Return TRUE on success, FALSE on failure.
  */
-STATIC_OVL boolean
+static boolean
 readlibdir(lp)
 library *lp; /* library pointer to fill in */
 {
@@ -179,7 +171,7 @@ library *lp; /* library pointer to fill in */
  * Look for the file in our directory structure.  Return 1 if successful,
  * 0 if not found.  Fill in the size and starting position.
  */
-STATIC_OVL boolean
+static boolean
 find_file(name, lib, startp, sizep)
 const char *name;
 library **lib;
@@ -242,7 +234,7 @@ library *lp;
  * Open the library file once using stdio.  Keep it open, but
  * keep track of the file position.
  */
-STATIC_OVL boolean
+static boolean
 lib_dlb_init(VOID_ARGS)
 {
     /* zero out array */
@@ -262,7 +254,7 @@ lib_dlb_init(VOID_ARGS)
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 lib_dlb_cleanup(VOID_ARGS)
 {
     int i;
@@ -284,7 +276,7 @@ const char *lf;
 #endif
 
 /*ARGSUSED*/
-STATIC_OVL boolean
+static boolean
 lib_dlb_fopen(dp, name, mode)
 dlb *dp;
 const char *name;
@@ -306,7 +298,7 @@ const char *mode UNUSED;
 }
 
 /*ARGUSED*/
-STATIC_OVL int
+static int
 lib_dlb_fclose(dp)
 dlb *dp UNUSED;
 {
@@ -314,7 +306,7 @@ dlb *dp UNUSED;
     return 0;
 }
 
-STATIC_OVL int
+static int
 lib_dlb_fread(buf, size, quan, dp)
 char *buf;
 int size, quan;
@@ -342,7 +334,7 @@ dlb *dp;
     return nread;
 }
 
-STATIC_OVL int
+static int
 lib_dlb_fseek(dp, pos, whence)
 dlb *dp;
 long pos;
@@ -370,7 +362,7 @@ int whence;
     return 0;
 }
 
-STATIC_OVL char *
+static char *
 lib_dlb_fgets(buf, len, dp)
 char *buf;
 int len;
@@ -405,7 +397,7 @@ dlb *dp;
     return buf;
 }
 
-STATIC_OVL int
+static int
 lib_dlb_fgetc(dp)
 dlb *dp;
 {
@@ -416,7 +408,7 @@ dlb *dp;
     return (int) c;
 }
 
-STATIC_OVL long
+static long
 lib_dlb_ftell(dp)
 dlb *dp;
 {

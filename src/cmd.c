@@ -27,7 +27,7 @@
 #define unmeta(c) (0x7f & (c))
 
 #ifdef ALTMETA
-STATIC_VAR boolean alt_esc = FALSE;
+static boolean alt_esc = FALSE;
 #endif
 
 extern const char *hu_stat[];  /* hunger status from eat.c */
@@ -129,79 +129,79 @@ extern int NDECL(doorganize);         /**/
 
 static int NDECL((*timed_occ_fn));
 
-STATIC_PTR int NDECL(dosuspend_core);
-STATIC_PTR int NDECL(dosh_core);
-STATIC_PTR int NDECL(doherecmdmenu);
-STATIC_PTR int NDECL(dotherecmdmenu);
-STATIC_PTR int NDECL(doprev_message);
-STATIC_PTR int NDECL(timed_occupation);
-STATIC_PTR int NDECL(doextcmd);
-STATIC_PTR int NDECL(dotravel);
-STATIC_PTR int NDECL(doterrain);
-STATIC_PTR int NDECL(wiz_wish);
-STATIC_PTR int NDECL(wiz_identify);
-STATIC_PTR int NDECL(wiz_intrinsic);
-STATIC_PTR int NDECL(wiz_map);
-STATIC_PTR int NDECL(wiz_makemap);
-STATIC_PTR int NDECL(wiz_genesis);
-STATIC_PTR int NDECL(wiz_where);
-STATIC_PTR int NDECL(wiz_detect);
-STATIC_PTR int NDECL(wiz_panic);
-STATIC_PTR int NDECL(wiz_polyself);
-STATIC_PTR int NDECL(wiz_level_tele);
-STATIC_PTR int NDECL(wiz_level_change);
-STATIC_PTR int NDECL(wiz_show_seenv);
-STATIC_PTR int NDECL(wiz_show_vision);
-STATIC_PTR int NDECL(wiz_smell);
-STATIC_PTR int NDECL(wiz_intrinsic);
-STATIC_PTR int NDECL(wiz_show_wmodes);
-STATIC_DCL void NDECL(wiz_map_levltyp);
-STATIC_DCL void NDECL(wiz_levltyp_legend);
+static int NDECL(dosuspend_core);
+static int NDECL(dosh_core);
+static int NDECL(doherecmdmenu);
+static int NDECL(dotherecmdmenu);
+static int NDECL(doprev_message);
+static int NDECL(timed_occupation);
+static int NDECL(doextcmd);
+static int NDECL(dotravel);
+static int NDECL(doterrain);
+static int NDECL(wiz_wish);
+static int NDECL(wiz_identify);
+static int NDECL(wiz_intrinsic);
+static int NDECL(wiz_map);
+static int NDECL(wiz_makemap);
+static int NDECL(wiz_genesis);
+static int NDECL(wiz_where);
+static int NDECL(wiz_detect);
+static int NDECL(wiz_panic);
+static int NDECL(wiz_polyself);
+static int NDECL(wiz_level_tele);
+static int NDECL(wiz_level_change);
+static int NDECL(wiz_show_seenv);
+static int NDECL(wiz_show_vision);
+static int NDECL(wiz_smell);
+static int NDECL(wiz_intrinsic);
+static int NDECL(wiz_show_wmodes);
+static void NDECL(wiz_map_levltyp);
+static void NDECL(wiz_levltyp_legend);
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern void FDECL(show_borlandc_stats, (winid));
 #endif
 #ifdef DEBUG_MIGRATING_MONS
-STATIC_PTR int NDECL(wiz_migrate_mons);
+static int NDECL(wiz_migrate_mons);
 #endif
-STATIC_DCL int FDECL(size_monst, (struct monst *, BOOLEAN_P));
-STATIC_DCL int FDECL(size_obj, (struct obj *));
-STATIC_DCL void FDECL(count_obj, (struct obj *, long *, long *,
+static int FDECL(size_monst, (struct monst *, BOOLEAN_P));
+static int FDECL(size_obj, (struct obj *));
+static void FDECL(count_obj, (struct obj *, long *, long *,
                                   BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL void FDECL(obj_chain, (winid, const char *, struct obj *,
+static void FDECL(obj_chain, (winid, const char *, struct obj *,
                                   BOOLEAN_P, long *, long *));
-STATIC_DCL void FDECL(mon_invent_chain, (winid, const char *, struct monst *,
+static void FDECL(mon_invent_chain, (winid, const char *, struct monst *,
                                          long *, long *));
-STATIC_DCL void FDECL(mon_chain, (winid, const char *, struct monst *,
+static void FDECL(mon_chain, (winid, const char *, struct monst *,
                                   BOOLEAN_P, long *, long *));
-STATIC_DCL void FDECL(contained_stats, (winid, const char *, long *, long *));
-STATIC_DCL void FDECL(misc_stats, (winid, long *, long *));
-STATIC_PTR int NDECL(wiz_show_stats);
-STATIC_DCL boolean FDECL(accept_menu_prefix, (int NDECL((*))));
-STATIC_PTR int NDECL(wiz_rumor_check);
-STATIC_PTR int NDECL(doattributes);
+static void FDECL(contained_stats, (winid, const char *, long *, long *));
+static void FDECL(misc_stats, (winid, long *, long *));
+static int NDECL(wiz_show_stats);
+static boolean FDECL(accept_menu_prefix, (int NDECL((*))));
+static int NDECL(wiz_rumor_check);
+static int NDECL(doattributes);
 
-STATIC_DCL void FDECL(enlght_out, (const char *));
-STATIC_DCL void FDECL(enlght_line, (const char *, const char *, const char *,
+static void FDECL(enlght_out, (const char *));
+static void FDECL(enlght_line, (const char *, const char *, const char *,
                                     const char *));
-STATIC_DCL char *FDECL(enlght_combatinc, (const char *, int, int, char *));
-STATIC_DCL void FDECL(enlght_halfdmg, (int, int));
-STATIC_DCL boolean NDECL(walking_on_water);
-STATIC_DCL boolean FDECL(cause_known, (int));
-STATIC_DCL char *FDECL(attrval, (int, int, char *));
-STATIC_DCL void FDECL(background_enlightenment, (int, int));
-STATIC_DCL void FDECL(basics_enlightenment, (int, int));
-STATIC_DCL void FDECL(characteristics_enlightenment, (int, int));
-STATIC_DCL void FDECL(one_characteristic, (int, int, int));
-STATIC_DCL void FDECL(status_enlightenment, (int, int));
-STATIC_DCL void FDECL(attributes_enlightenment, (int, int));
+static char *FDECL(enlght_combatinc, (const char *, int, int, char *));
+static void FDECL(enlght_halfdmg, (int, int));
+static boolean NDECL(walking_on_water);
+static boolean FDECL(cause_known, (int));
+static char *FDECL(attrval, (int, int, char *));
+static void FDECL(background_enlightenment, (int, int));
+static void FDECL(basics_enlightenment, (int, int));
+static void FDECL(characteristics_enlightenment, (int, int));
+static void FDECL(one_characteristic, (int, int, int));
+static void FDECL(status_enlightenment, (int, int));
+static void FDECL(attributes_enlightenment, (int, int));
 
-STATIC_DCL void FDECL(add_herecmd_menuitem, (winid, int NDECL((*)),
+static void FDECL(add_herecmd_menuitem, (winid, int NDECL((*)),
                                              const char *));
-STATIC_DCL char FDECL(here_cmd_menu, (BOOLEAN_P));
-STATIC_DCL char FDECL(there_cmd_menu, (BOOLEAN_P, int, int));
-STATIC_DCL char *NDECL(parse);
-STATIC_DCL void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
-STATIC_DCL boolean FDECL(help_dir, (CHAR_P, int, const char *));
+static char FDECL(here_cmd_menu, (BOOLEAN_P));
+static char FDECL(there_cmd_menu, (BOOLEAN_P, int, int));
+static char *NDECL(parse);
+static void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
+static boolean FDECL(help_dir, (CHAR_P, int, const char *));
 
 static const char *readchar_queue = "";
 /* for rejecting attempts to use wizard mode commands */
@@ -209,14 +209,14 @@ static const char unavailcmd[] = "Unavailable command '%s'.";
 /* for rejecting #if !SHELL, !SUSPEND */
 static const char cmdnotavail[] = "'%s' command not available.";
 
-STATIC_PTR int
+static int
 doprev_message(VOID_ARGS)
 {
     return nh_doprev_message();
 }
 
 /* Count down by decrementing multi */
-STATIC_PTR int
+static int
 timed_occupation(VOID_ARGS)
 {
     (*timed_occ_fn)();
@@ -266,9 +266,9 @@ int xtime;
     return;
 }
 
-STATIC_DCL char NDECL(popch);
+static char NDECL(popch);
 
-STATIC_OVL char
+static char
 popch()
 {
     /* If occupied, return '\0', letting tgetch know a character should
@@ -325,7 +325,7 @@ char ch;
 }
 
 /* here after # - now read a full-word command */
-STATIC_PTR int
+static int
 doextcmd(VOID_ARGS)
 {
     int idx, retval;
@@ -750,7 +750,7 @@ enter_explore_mode(VOID_ARGS)
 }
 
 /* ^W command - wish for something */
-STATIC_PTR int
+static int
 wiz_wish(VOID_ARGS) /* Unlimited wishes for debug mode by Paul Polderman */
 {
     if (wizard) {
@@ -766,7 +766,7 @@ wiz_wish(VOID_ARGS) /* Unlimited wishes for debug mode by Paul Polderman */
 }
 
 /* ^I command - reveal and optionally identify hero's inventory */
-STATIC_PTR int
+static int
 wiz_identify(VOID_ARGS)
 {
     if (wizard) {
@@ -786,7 +786,7 @@ wiz_identify(VOID_ARGS)
 }
 
 /* #wizmakemap - discard current dungeon level and replace with a new one */
-STATIC_PTR int
+static int
 wiz_makemap(VOID_ARGS)
 {
     NHFILE tmpnhfp;
@@ -877,7 +877,7 @@ wiz_makemap(VOID_ARGS)
 }
 
 /* ^F command - reveal the level map and any traps on it */
-STATIC_PTR int
+static int
 wiz_map(VOID_ARGS)
 {
     if (wizard) {
@@ -898,7 +898,7 @@ wiz_map(VOID_ARGS)
 }
 
 /* ^G command - generate monster(s); a count prefix will be honored */
-STATIC_PTR int
+static int
 wiz_genesis(VOID_ARGS)
 {
     if (wizard)
@@ -909,7 +909,7 @@ wiz_genesis(VOID_ARGS)
 }
 
 /* ^O command - display dungeon layout */
-STATIC_PTR int
+static int
 wiz_where(VOID_ARGS)
 {
     if (wizard)
@@ -920,7 +920,7 @@ wiz_where(VOID_ARGS)
 }
 
 /* ^E command - detect unseen (secret doors, traps, hidden monsters) */
-STATIC_PTR int
+static int
 wiz_detect(VOID_ARGS)
 {
     if (wizard)
@@ -931,7 +931,7 @@ wiz_detect(VOID_ARGS)
 }
 
 /* ^V command - level teleport */
-STATIC_PTR int
+static int
 wiz_level_tele(VOID_ARGS)
 {
     if (wizard)
@@ -942,7 +942,7 @@ wiz_level_tele(VOID_ARGS)
 }
 
 /* #levelchange command - adjust hero's experience level */
-STATIC_PTR int
+static int
 wiz_level_change(VOID_ARGS)
 {
     char buf[BUFSZ] = DUMMY;
@@ -986,7 +986,7 @@ wiz_level_change(VOID_ARGS)
 }
 
 /* #panic command - test program's panic handling */
-STATIC_PTR int
+static int
 wiz_panic(VOID_ARGS)
 {
     if (iflags.debug_fuzzer) {
@@ -1001,7 +1001,7 @@ wiz_panic(VOID_ARGS)
 }
 
 /* #polyself command - change hero's form */
-STATIC_PTR int
+static int
 wiz_polyself(VOID_ARGS)
 {
     polyself(1);
@@ -1009,7 +1009,7 @@ wiz_polyself(VOID_ARGS)
 }
 
 /* #seenv command */
-STATIC_PTR int
+static int
 wiz_show_seenv(VOID_ARGS)
 {
     winid win;
@@ -1053,7 +1053,7 @@ wiz_show_seenv(VOID_ARGS)
 }
 
 /* #vision command */
-STATIC_PTR int
+static int
 wiz_show_vision(VOID_ARGS)
 {
     winid win;
@@ -1091,7 +1091,7 @@ wiz_show_vision(VOID_ARGS)
 }
 
 /* #wmode command */
-STATIC_PTR int
+static int
 wiz_show_wmodes(VOID_ARGS)
 {
     winid win;
@@ -1127,7 +1127,7 @@ wiz_show_wmodes(VOID_ARGS)
 }
 
 /* wizard mode variant of #terrain; internal levl[][].typ values in base-36 */
-STATIC_OVL void
+static void
 wiz_map_levltyp(VOID_ARGS)
 {
     winid win;
@@ -1290,7 +1290,7 @@ static const char *levltyp[] = {
 };
 
 /* explanation of base-36 output from wiz_map_levltyp() */
-STATIC_OVL void
+static void
 wiz_levltyp_legend(VOID_ARGS)
 {
     winid win;
@@ -1330,7 +1330,7 @@ wiz_levltyp_legend(VOID_ARGS)
 }
 
 /* #wizsmell command - test usmellmon(). */
-STATIC_PTR int
+static int
 wiz_smell(VOID_ARGS)
 {
     int ans = 0;
@@ -1370,7 +1370,7 @@ wiz_smell(VOID_ARGS)
 }
 
 /* #wizinstrinsic command to set some intrinsics for testing */
-STATIC_PTR int
+static int
 wiz_intrinsic(VOID_ARGS)
 {
     if (wizard) {
@@ -1498,7 +1498,7 @@ wiz_intrinsic(VOID_ARGS)
 }
 
 /* #wizrumorcheck command - verify each rumor access */
-STATIC_PTR int
+static int
 wiz_rumor_check(VOID_ARGS)
 {
     rumor_check();
@@ -1506,7 +1506,7 @@ wiz_rumor_check(VOID_ARGS)
 }
 
 /* #terrain command -- show known map, inspired by crawl's '|' command */
-STATIC_PTR int
+static int
 doterrain(VOID_ARGS)
 {
     winid men;
@@ -1679,7 +1679,7 @@ char *outbuf;
 }
 
 /* report half physical or half spell damage */
-STATIC_OVL void
+static void
 enlght_halfdmg(category, final)
 int category;
 int final;
@@ -1704,7 +1704,7 @@ int final;
 }
 
 /* is hero actively using water walking capability on water (or lava)? */
-STATIC_OVL boolean
+static boolean
 walking_on_water()
 {
     if (u.uinwater || Levitation || Flying)
@@ -1716,7 +1716,7 @@ walking_on_water()
 /* check whether hero is wearing something that player definitely knows
    confers the target property; item must have been seen and its type
    discovered but it doesn't necessarily have to be fully identified */
-STATIC_OVL boolean
+static boolean
 cause_known(propindx)
 int propindx; /* index of a property which can be conveyed by worn item */
 {
@@ -1736,7 +1736,7 @@ int propindx; /* index of a property which can be conveyed by worn item */
 }
 
 /* format a characteristic value, accommodating Strength's strangeness */
-STATIC_OVL char *
+static char *
 attrval(attrindx, attrvalue, resultbuf)
 int attrindx, attrvalue;
 char resultbuf[]; /* should be at least [7] to hold "18/100\0" */
@@ -1811,7 +1811,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
 
 /*ARGSUSED*/
 /* display role, race, alignment and such to en_win */
-STATIC_OVL void
+static void
 background_enlightenment(unused_mode, final)
 int unused_mode UNUSED;
 int final;
@@ -2061,7 +2061,7 @@ int final;
 /* hit points, energy points, armor class -- essential information which
    doesn't fit very well in other categories */
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 basics_enlightenment(mode, final)
 int mode UNUSED;
 int final;
@@ -2143,7 +2143,7 @@ int final;
 }
 
 /* characteristics: expanded version of bottom line strength, dexterity, &c */
-STATIC_OVL void
+static void
 characteristics_enlightenment(mode, final)
 int mode;
 int final;
@@ -2164,7 +2164,7 @@ int final;
 }
 
 /* display one attribute value for characteristics_enlightenment() */
-STATIC_OVL void
+static void
 one_characteristic(mode, final, attrindx)
 int mode, final, attrindx;
 {
@@ -2259,7 +2259,7 @@ int mode, final, attrindx;
 }
 
 /* status: selected obvious capabilities, assorted troubles */
-STATIC_OVL void
+static void
 status_enlightenment(mode, final)
 int mode;
 int final;
@@ -2571,7 +2571,7 @@ int final;
 }
 
 /* attributes: intrinsics and the like, other non-obvious capabilities */
-STATIC_OVL void
+static void
 attributes_enlightenment(unused_mode, final)
 int unused_mode UNUSED;
 int final;
@@ -3016,14 +3016,14 @@ int final;
 }
 
 #if 0  /* no longer used */
-STATIC_DCL boolean NDECL(minimal_enlightenment);
+static boolean NDECL(minimal_enlightenment);
 
 /*
  * Courtesy function for non-debug, non-explorer mode players
  * to help refresh them about who/what they are.
  * Returns FALSE if menu cancelled (dismissed with ESC), TRUE otherwise.
  */
-STATIC_OVL boolean
+static boolean
 minimal_enlightenment()
 {
     winid tmpwin;
@@ -3129,7 +3129,7 @@ minimal_enlightenment()
 #endif /*0*/
 
 /* ^X command */
-STATIC_PTR int
+static int
 doattributes(VOID_ARGS)
 {
     int mode = BASICENLIGHTENMENT;
@@ -3826,7 +3826,7 @@ static const char template[] = "%-27s  %4ld  %6ld";
 static const char stats_hdr[] = "                             count  bytes";
 static const char stats_sep[] = "---------------------------  ----- -------";
 
-STATIC_OVL int
+static int
 size_obj(otmp)
 struct obj *otmp;
 {
@@ -3848,7 +3848,7 @@ struct obj *otmp;
     return sz;
 }
 
-STATIC_OVL void
+static void
 count_obj(chain, total_count, total_size, top, recurse)
 struct obj *chain;
 long *total_count;
@@ -3871,7 +3871,7 @@ boolean recurse;
     *total_size += size;
 }
 
-STATIC_OVL void
+static void
 obj_chain(win, src, chain, force, total_count, total_size)
 winid win;
 const char *src;
@@ -3893,7 +3893,7 @@ long *total_size;
     }
 }
 
-STATIC_OVL void
+static void
 mon_invent_chain(win, src, chain, total_count, total_size)
 winid win;
 const char *src;
@@ -3916,7 +3916,7 @@ long *total_size;
     }
 }
 
-STATIC_OVL void
+static void
 contained_stats(win, src, total_count, total_size)
 winid win;
 const char *src;
@@ -3946,7 +3946,7 @@ long *total_size;
     }
 }
 
-STATIC_OVL int
+static int
 size_monst(mtmp, incl_wsegs)
 struct monst *mtmp;
 boolean incl_wsegs;
@@ -3975,7 +3975,7 @@ boolean incl_wsegs;
     return sz;
 }
 
-STATIC_OVL void
+static void
 mon_chain(win, src, chain, force, total_count, total_size)
 winid win;
 const char *src;
@@ -4003,7 +4003,7 @@ long *total_size;
     }
 }
 
-STATIC_OVL void
+static void
 misc_stats(win, total_count, total_size)
 winid win;
 long *total_count;
@@ -4558,7 +4558,7 @@ boolean initial;
 }
 
 /* non-movement commands which accept 'm' prefix to request menu operation */
-STATIC_OVL boolean
+static boolean
 accept_menu_prefix(cmd_func)
 int NDECL((*cmd_func));
 {
@@ -5064,7 +5064,7 @@ retry:
     return 1;
 }
 
-STATIC_OVL void
+static void
 show_direction_keys(win, centerchar, nodiag)
 winid win; /* should specify a window which is using a fixed-width font... */
 char centerchar; /* '.' or '@' or ' ' */
@@ -5103,7 +5103,7 @@ boolean nodiag;
 /* explain choices if player has asked for getdir() help or has given
    an invalid direction after a prefix key ('F', 'g', 'm', &c), which
    might be bogus but could be up, down, or self when not applicable */
-STATIC_OVL boolean
+static boolean
 help_dir(sym, spkey, msg)
 char sym;
 int spkey; /* NHKF_ code for prefix key, if one was used, or for ESC */
@@ -5285,7 +5285,7 @@ register int x, y;
 }
 
 /* #herecmdmenu command */
-STATIC_PTR int
+static int
 doherecmdmenu(VOID_ARGS)
 {
     char ch = here_cmd_menu(TRUE);
@@ -5294,7 +5294,7 @@ doherecmdmenu(VOID_ARGS)
 }
 
 /* #therecmdmenu command, a way to test there_cmd_menu without mouse */
-STATIC_PTR int
+static int
 dotherecmdmenu(VOID_ARGS)
 {
     char ch;
@@ -5310,7 +5310,7 @@ dotherecmdmenu(VOID_ARGS)
     return ch ? 1 : 0;
 }
 
-STATIC_OVL void
+static void
 add_herecmd_menuitem(win, func, text)
 winid win;
 int NDECL((*func));
@@ -5326,7 +5326,7 @@ const char *text;
     }
 }
 
-STATIC_OVL char
+static char
 there_cmd_menu(doit, x, y)
 boolean doit;
 int x, y;
@@ -5429,7 +5429,7 @@ int x, y;
     return ch;
 }
 
-STATIC_OVL char
+static char
 here_cmd_menu(doit)
 boolean doit;
 {
@@ -5724,7 +5724,7 @@ boolean historical; /* whether to include in message history: True => yes */
 }
 
 
-STATIC_OVL char *
+static char *
 parse()
 {
 #ifdef LINT /* static char in_line[COLNO]; */
@@ -5913,7 +5913,7 @@ readchar()
 }
 
 /* '_' command, #travel, via keyboard rather than mouse click */
-STATIC_PTR int
+static int
 dotravel(VOID_ARGS)
 {
     static char cmd[2];
@@ -6042,7 +6042,7 @@ const char *prompt;
 }
 
 /* ^Z command, #suspend */
-STATIC_PTR int
+static int
 dosuspend_core(VOID_ARGS)
 {
 #ifdef SUSPEND
@@ -6057,7 +6057,7 @@ dosuspend_core(VOID_ARGS)
 }
 
 /* '!' command, #shell */
-STATIC_PTR int
+static int
 dosh_core(VOID_ARGS)
 {
 #ifdef SHELL

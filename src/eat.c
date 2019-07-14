@@ -5,39 +5,39 @@
 
 #include "hack.h"
 
-STATIC_PTR int NDECL(eatmdone);
-STATIC_PTR int NDECL(eatfood);
-STATIC_PTR struct obj *FDECL(costly_tin, (int));
-STATIC_PTR int NDECL(opentin);
-STATIC_PTR int NDECL(unfaint);
+static int NDECL(eatmdone);
+static int NDECL(eatfood);
+static struct obj *FDECL(costly_tin, (int));
+static int NDECL(opentin);
+static int NDECL(unfaint);
 
-STATIC_DCL const char *FDECL(food_xname, (struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(choke, (struct obj *));
-STATIC_DCL void NDECL(recalc_wt);
-STATIC_DCL unsigned FDECL(obj_nutrition, (struct obj *));
-STATIC_DCL struct obj *FDECL(touchfood, (struct obj *));
-STATIC_DCL void NDECL(do_reset_eat);
-STATIC_DCL void FDECL(done_eating, (BOOLEAN_P));
-STATIC_DCL void FDECL(cprefx, (int));
-STATIC_DCL int FDECL(intrinsic_possible, (int, struct permonst *));
-STATIC_DCL void FDECL(givit, (int, struct permonst *));
-STATIC_DCL void FDECL(cpostfx, (int));
-STATIC_DCL void FDECL(consume_tin, (const char *));
-STATIC_DCL void FDECL(start_tin, (struct obj *));
-STATIC_DCL int FDECL(eatcorpse, (struct obj *));
-STATIC_DCL void FDECL(start_eating, (struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(fprefx, (struct obj *));
-STATIC_DCL void FDECL(fpostfx, (struct obj *));
-STATIC_DCL int NDECL(bite);
-STATIC_DCL int FDECL(edibility_prompts, (struct obj *));
-STATIC_DCL int FDECL(rottenfood, (struct obj *));
-STATIC_DCL void NDECL(eatspecial);
-STATIC_DCL int FDECL(bounded_increase, (int, int, int));
-STATIC_DCL void FDECL(accessory_has_effect, (struct obj *));
-STATIC_DCL void FDECL(eataccessory, (struct obj *));
-STATIC_DCL const char *FDECL(foodword, (struct obj *));
-STATIC_DCL int FDECL(tin_variety, (struct obj *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(maybe_cannibal, (int, BOOLEAN_P));
+static const char *FDECL(food_xname, (struct obj *, BOOLEAN_P));
+static void FDECL(choke, (struct obj *));
+static void NDECL(recalc_wt);
+static unsigned FDECL(obj_nutrition, (struct obj *));
+static struct obj *FDECL(touchfood, (struct obj *));
+static void NDECL(do_reset_eat);
+static void FDECL(done_eating, (BOOLEAN_P));
+static void FDECL(cprefx, (int));
+static int FDECL(intrinsic_possible, (int, struct permonst *));
+static void FDECL(givit, (int, struct permonst *));
+static void FDECL(cpostfx, (int));
+static void FDECL(consume_tin, (const char *));
+static void FDECL(start_tin, (struct obj *));
+static int FDECL(eatcorpse, (struct obj *));
+static void FDECL(start_eating, (struct obj *, BOOLEAN_P));
+static void FDECL(fprefx, (struct obj *));
+static void FDECL(fpostfx, (struct obj *));
+static int NDECL(bite);
+static int FDECL(edibility_prompts, (struct obj *));
+static int FDECL(rottenfood, (struct obj *));
+static void NDECL(eatspecial);
+static int FDECL(bounded_increase, (int, int, int));
+static void FDECL(accessory_has_effect, (struct obj *));
+static void FDECL(eataccessory, (struct obj *));
+static const char *FDECL(foodword, (struct obj *));
+static int FDECL(tin_variety, (struct obj *, BOOLEAN_P));
+static boolean FDECL(maybe_cannibal, (int, BOOLEAN_P));
 
 /* also used to see if you're allowed to eat cats and dogs */
 #define CANNIBAL_ALLOWED() (Role_if(PM_CAVEMAN) || Race_if(PM_ORC))
@@ -55,12 +55,12 @@ STATIC_DCL boolean FDECL(maybe_cannibal, (int, BOOLEAN_P));
 #define nonrotting_food(otyp) \
     ((otyp) == LEMBAS_WAFER || (otyp) == CRAM_RATION)
 
-STATIC_OVL NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
-STATIC_OVL NEARDATA const char offerfodder[] = { FOOD_CLASS, AMULET_CLASS,
+static NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
+static NEARDATA const char offerfodder[] = { FOOD_CLASS, AMULET_CLASS,
                                                  0 };
 
 /* Gold must come first for getobj(). */
-STATIC_OVL NEARDATA const char allobj[] = {
+static NEARDATA const char allobj[] = {
     COIN_CLASS,   WEAPON_CLASS, ARMOR_CLASS,  POTION_CLASS,
     SCROLL_CLASS, WAND_CLASS,   RING_CLASS,   AMULET_CLASS,
     FOOD_CLASS,   TOOL_CLASS,   GEM_CLASS,    ROCK_CLASS,
@@ -145,7 +145,7 @@ static const struct {
 #define TTSZ SIZE(tintxts)
 
 /* called after mimicing is over */
-STATIC_PTR int
+static int
 eatmdone(VOID_ARGS)
 {
     /* release `eatmbuf' */
@@ -198,7 +198,7 @@ eatmupdate()
 }
 
 /* ``[the(] singular(food, xname) [)]'' */
-STATIC_OVL const char *
+static const char *
 food_xname(food, the_pfx)
 struct obj *food;
 boolean the_pfx;
@@ -228,7 +228,7 @@ boolean the_pfx;
  *
  * To a full belly all food is bad. (It.)
  */
-STATIC_OVL void
+static void
 choke(food)
 struct obj *food;
 {
@@ -276,7 +276,7 @@ struct obj *food;
 }
 
 /* modify object wt. depending on time spent consuming it */
-STATIC_OVL void
+static void
 recalc_wt()
 {
     struct obj *piece = g.context.victual.piece;
@@ -306,7 +306,7 @@ reset_eat()
 }
 
 /* base nutrition of a food-class object */
-STATIC_OVL unsigned
+static unsigned
 obj_nutrition(otmp)
 struct obj *otmp;
 {
@@ -331,7 +331,7 @@ struct obj *otmp;
     return nut;
 }
 
-STATIC_OVL struct obj *
+static struct obj *
 touchfood(otmp)
 struct obj *otmp;
 {
@@ -397,7 +397,7 @@ struct obj *old_obj, *new_obj;
     }
 }
 
-STATIC_OVL void
+static void
 do_reset_eat()
 {
     debugpline0("do_reset_eat...");
@@ -420,7 +420,7 @@ do_reset_eat()
 }
 
 /* called each move during eating process */
-STATIC_PTR int
+static int
 eatfood(VOID_ARGS)
 {
     if (!g.context.victual.piece
@@ -443,7 +443,7 @@ eatfood(VOID_ARGS)
     }
 }
 
-STATIC_OVL void
+static void
 done_eating(message)
 boolean message;
 {
@@ -632,7 +632,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
 }
 
 /* eating a corpse or egg of one's own species is usually naughty */
-STATIC_OVL boolean
+static boolean
 maybe_cannibal(pm, allowmsg)
 int pm;
 boolean allowmsg;
@@ -667,7 +667,7 @@ boolean allowmsg;
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 cprefx(pm)
 register int pm;
 {
@@ -758,7 +758,7 @@ fix_petrification()
  */
 
 /* intrinsic_possible() returns TRUE iff a monster can give an intrinsic. */
-STATIC_OVL int
+static int
 intrinsic_possible(type, ptr)
 int type;
 register struct permonst *ptr;
@@ -822,7 +822,7 @@ register struct permonst *ptr;
 /* givit() tries to give you an intrinsic based on the monster's level
  * and what type of intrinsic it is trying to give you.
  */
-STATIC_OVL void
+static void
 givit(type, ptr)
 int type;
 register struct permonst *ptr;
@@ -935,7 +935,7 @@ register struct permonst *ptr;
 }
 
 /* called after completely consuming a corpse */
-STATIC_OVL void
+static void
 cpostfx(pm)
 int pm;
 {
@@ -1162,7 +1162,7 @@ violated_vegetarian()
 
 /* common code to check and possibly charge for 1 g.context.tin.tin,
  * will split() g.context.tin.tin if necessary */
-STATIC_PTR struct obj *
+static struct obj *
 costly_tin(alter_type)
 int alter_type; /* COST_xxx */
 {
@@ -1268,7 +1268,7 @@ int forcetype;
     obj->spe = -(r + 1); /* offset by 1 to allow index 0 */
 }
 
-STATIC_OVL int
+static int
 tin_variety(obj, disp)
 struct obj *obj;
 boolean disp; /* we're just displaying so leave things alone */
@@ -1293,7 +1293,7 @@ boolean disp; /* we're just displaying so leave things alone */
     return r;
 }
 
-STATIC_OVL void
+static void
 consume_tin(mesg)
 const char *mesg;
 {
@@ -1428,7 +1428,7 @@ const char *mesg;
 }
 
 /* called during each move whilst opening a tin */
-STATIC_PTR int
+static int
 opentin(VOID_ARGS)
 {
     /* perhaps it was stolen (although that should cause interruption) */
@@ -1447,7 +1447,7 @@ opentin(VOID_ARGS)
 }
 
 /* called when starting to open a tin */
-STATIC_OVL void
+static void
 start_tin(otmp)
 struct obj *otmp;
 {
@@ -1538,7 +1538,7 @@ Hear_again(VOID_ARGS)
 }
 
 /* called on the "first bite" of rotten food */
-STATIC_OVL int
+static int
 rottenfood(obj)
 struct obj *obj;
 {
@@ -1580,7 +1580,7 @@ struct obj *obj;
 }
 
 /* called when a corpse is selected as food */
-STATIC_OVL int
+static int
 eatcorpse(otmp)
 struct obj *otmp;
 {
@@ -1719,7 +1719,7 @@ struct obj *otmp;
 }
 
 /* called as you start to eat */
-STATIC_OVL void
+static void
 start_eating(otmp, already_partly_eaten)
 struct obj *otmp;
 boolean already_partly_eaten;
@@ -1782,7 +1782,7 @@ boolean already_partly_eaten;
  * Messages should use present tense since multi-turn food won't be
  * finishing at the time they're issued.
  */
-STATIC_OVL void
+static void
 fprefx(otmp)
 struct obj *otmp;
 {
@@ -1890,7 +1890,7 @@ struct obj *otmp;
 }
 
 /* increment a combat intrinsic with limits on its growth */
-STATIC_OVL int
+static int
 bounded_increase(old, inc, typ)
 int old, inc, typ;
 {
@@ -1928,7 +1928,7 @@ int old, inc, typ;
     return old + inc;
 }
 
-STATIC_OVL void
+static void
 accessory_has_effect(otmp)
 struct obj *otmp;
 {
@@ -1936,7 +1936,7 @@ struct obj *otmp;
           (otmp->oclass == RING_CLASS) ? "ring" : "amulet");
 }
 
-STATIC_OVL void
+static void
 eataccessory(otmp)
 struct obj *otmp;
 {
@@ -2081,7 +2081,7 @@ struct obj *otmp;
 }
 
 /* called after eating non-food */
-STATIC_OVL void
+static void
 eatspecial()
 {
     struct obj *otmp = g.context.victual.piece;
@@ -2166,7 +2166,7 @@ static const char *foodwords[] = {
     "plastic", "glass",   "rich food", "stone"
 };
 
-STATIC_OVL const char *
+static const char *
 foodword(otmp)
 struct obj *otmp;
 {
@@ -2179,7 +2179,7 @@ struct obj *otmp;
 }
 
 /* called after consuming (non-corpse) food */
-STATIC_OVL void
+static void
 fpostfx(otmp)
 struct obj *otmp;
 {
@@ -2267,9 +2267,9 @@ struct obj *otmp;
 /* intended for eating a spellbook while polymorphed, but not used;
    "leather" applied to appearance, not composition, and has been
    changed to "leathery" to reflect that */
-STATIC_DCL boolean FDECL(leather_cover, (struct obj *));
+static boolean FDECL(leather_cover, (struct obj *));
 
-STATIC_OVL boolean
+static boolean
 leather_cover(otmp)
 struct obj *otmp;
 {
@@ -2288,7 +2288,7 @@ struct obj *otmp;
  * return 1 if the food was dangerous and you chose to stop.
  * return 2 if the food was dangerous and you chose to eat it anyway.
  */
-STATIC_OVL int
+static int
 edibility_prompts(otmp)
 struct obj *otmp;
 {
@@ -2754,7 +2754,7 @@ struct obj *obj;
 /* Take a single bite from a piece of food, checking for choking and
  * modifying usedtime.  Returns 1 if they choked and survived, 0 otherwise.
  */
-STATIC_OVL int
+static int
 bite()
 {
     if (g.context.victual.canchoke && u.uhunger >= 2000) {
@@ -2895,8 +2895,7 @@ int num;
     newuhs(FALSE);
 }
 
-STATIC_PTR
-int
+static int
 unfaint(VOID_ARGS)
 {
     (void) Hear_again();

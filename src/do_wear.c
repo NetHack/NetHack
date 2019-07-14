@@ -20,29 +20,29 @@ static NEARDATA const long takeoff_order[] = {
     WORN_SHIRT,  WORN_BOOTS, W_SWAPWEP,   W_QUIVER,    0L
 };
 
-STATIC_DCL void FDECL(on_msg, (struct obj *));
-STATIC_DCL void FDECL(toggle_stealth, (struct obj *, long, BOOLEAN_P));
-STATIC_DCL void FDECL(toggle_displacement, (struct obj *, long, BOOLEAN_P));
-STATIC_PTR int NDECL(Armor_on);
+static void FDECL(on_msg, (struct obj *));
+static void FDECL(toggle_stealth, (struct obj *, long, BOOLEAN_P));
+static void FDECL(toggle_displacement, (struct obj *, long, BOOLEAN_P));
+static int NDECL(Armor_on);
 /* int NDECL(Boots_on); -- moved to extern.h */
-STATIC_PTR int NDECL(Cloak_on);
-STATIC_PTR int NDECL(Helmet_on);
-STATIC_PTR int NDECL(Gloves_on);
-STATIC_DCL void FDECL(wielding_corpse, (struct obj *, BOOLEAN_P));
-STATIC_PTR int NDECL(Shield_on);
-STATIC_PTR int NDECL(Shirt_on);
-STATIC_DCL void NDECL(Amulet_on);
-STATIC_DCL void FDECL(learnring, (struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(Ring_off_or_gone, (struct obj *, BOOLEAN_P));
-STATIC_PTR int FDECL(select_off, (struct obj *));
-STATIC_DCL struct obj *NDECL(do_takeoff);
-STATIC_PTR int NDECL(take_off);
-STATIC_DCL int FDECL(menu_remarm, (int));
-STATIC_DCL void FDECL(count_worn_stuff, (struct obj **, BOOLEAN_P));
-STATIC_PTR int FDECL(armor_or_accessory_off, (struct obj *));
-STATIC_PTR int FDECL(accessory_or_armor_on, (struct obj *));
-STATIC_DCL void FDECL(already_wearing, (const char *));
-STATIC_DCL void FDECL(already_wearing2, (const char *, const char *));
+static int NDECL(Cloak_on);
+static int NDECL(Helmet_on);
+static int NDECL(Gloves_on);
+static void FDECL(wielding_corpse, (struct obj *, BOOLEAN_P));
+static int NDECL(Shield_on);
+static int NDECL(Shirt_on);
+static void NDECL(Amulet_on);
+static void FDECL(learnring, (struct obj *, BOOLEAN_P));
+static void FDECL(Ring_off_or_gone, (struct obj *, BOOLEAN_P));
+static int FDECL(select_off, (struct obj *));
+static struct obj *NDECL(do_takeoff);
+static int NDECL(take_off);
+static int FDECL(menu_remarm, (int));
+static void FDECL(count_worn_stuff, (struct obj **, BOOLEAN_P));
+static int FDECL(armor_or_accessory_off, (struct obj *));
+static int FDECL(accessory_or_armor_on, (struct obj *));
+static void FDECL(already_wearing, (const char *));
+static void FDECL(already_wearing2, (const char *, const char *));
 
 void
 off_msg(otmp)
@@ -53,7 +53,7 @@ struct obj *otmp;
 }
 
 /* for items that involve no delay */
-STATIC_OVL void
+static void
 on_msg(otmp)
 struct obj *otmp;
 {
@@ -73,7 +73,7 @@ struct obj *otmp;
 
 /* putting on or taking off an item which confers stealth;
    give feedback and discover it iff stealth state is changing */
-STATIC_OVL
+static
 void
 toggle_stealth(obj, oldprop, on)
 struct obj *obj;
@@ -107,7 +107,7 @@ boolean on;
 /* putting on or taking off an item which confers displacement;
    give feedback and discover it iff displacement state is changing *and*
    hero is able to see self (or sense monsters) */
-STATIC_OVL
+static
 void
 toggle_displacement(obj, oldprop, on)
 struct obj *obj;
@@ -257,7 +257,7 @@ Boots_off(VOID_ARGS)
     return 0;
 }
 
-STATIC_PTR int
+static int
 Cloak_on(VOID_ARGS)
 {
     long oldprop =
@@ -362,7 +362,7 @@ Cloak_off(VOID_ARGS)
     return 0;
 }
 
-STATIC_PTR
+static
 int
 Helmet_on(VOID_ARGS)
 {
@@ -472,7 +472,7 @@ Helmet_off(VOID_ARGS)
     return 0;
 }
 
-STATIC_PTR
+static
 int
 Gloves_on(VOID_ARGS)
 {
@@ -500,7 +500,7 @@ Gloves_on(VOID_ARGS)
     return 0;
 }
 
-STATIC_OVL void
+static void
 wielding_corpse(obj, voluntary)
 struct obj *obj;
 boolean voluntary; /* taking gloves off on purpose? */
@@ -568,7 +568,7 @@ Gloves_off(VOID_ARGS)
     return 0;
 }
 
-STATIC_PTR int
+static int
 Shield_on(VOID_ARGS)
 {
     /* no shield currently requires special handling when put on, but we
@@ -615,7 +615,7 @@ Shield_off(VOID_ARGS)
     return 0;
 }
 
-STATIC_PTR int
+static int
 Shirt_on(VOID_ARGS)
 {
     /* no shirt currently requires special handling when put on, but we
@@ -650,7 +650,7 @@ Shirt_off(VOID_ARGS)
     return 0;
 }
 
-STATIC_PTR
+static
 int
 Armor_on(VOID_ARGS)
 {
@@ -687,7 +687,7 @@ Armor_gone()
     return 0;
 }
 
-STATIC_OVL void
+static void
 Amulet_on()
 {
     /* make sure amulet isn't wielded; can't use remove_worn_item()
@@ -812,7 +812,7 @@ Amulet_off()
 }
 
 /* handle ring discovery; comparable to learnwand() */
-STATIC_OVL void
+static void
 learnring(ring, observed)
 struct obj *ring;
 boolean observed;
@@ -961,7 +961,7 @@ register struct obj *obj;
     }
 }
 
-STATIC_OVL void
+static void
 Ring_off_or_gone(obj, gone)
 register struct obj *obj;
 boolean gone;
@@ -1361,10 +1361,10 @@ static NEARDATA const char clothes[] = {
 static NEARDATA const char accessories[] = {
     RING_CLASS, AMULET_CLASS, TOOL_CLASS, FOOD_CLASS, ARMOR_CLASS, 0
 };
-STATIC_VAR NEARDATA int Narmorpieces, Naccessories;
+static NEARDATA int Narmorpieces, Naccessories;
 
 /* assign values to Narmorpieces and Naccessories */
-STATIC_OVL void
+static void
 count_worn_stuff(which, accessorizing)
 struct obj **which; /* caller wants this when count is 1 */
 boolean accessorizing;
@@ -1402,7 +1402,7 @@ boolean accessorizing;
 
 /* take off one piece or armor or one accessory;
    shared by dotakeoff('T') and doremring('R') */
-STATIC_OVL int
+static int
 armor_or_accessory_off(obj)
 struct obj *obj;
 {
@@ -1586,14 +1586,14 @@ struct obj *otmp;
     return 1;
 }
 
-STATIC_OVL void
+static void
 already_wearing(cc)
 const char *cc;
 {
     You("are already wearing %s%c", cc, (cc == c_that_) ? '!' : '.');
 }
 
-STATIC_OVL void
+static void
 already_wearing2(cc1, cc2)
 const char *cc1, *cc2;
 {
@@ -1782,7 +1782,7 @@ boolean noisy;
     return !err;
 }
 
-STATIC_OVL int
+static int
 accessory_or_armor_on(obj)
 struct obj *obj;
 {
@@ -2217,7 +2217,7 @@ unchanger()
     return 0;
 }
 
-STATIC_PTR
+static
 int
 select_off(otmp)
 register struct obj *otmp;
@@ -2340,7 +2340,7 @@ register struct obj *otmp;
     return 0;
 }
 
-STATIC_OVL struct obj *
+static struct obj *
 do_takeoff()
 {
     struct obj *otmp = (struct obj *) 0;
@@ -2412,7 +2412,7 @@ do_takeoff()
 }
 
 /* occupation callback for 'A' */
-STATIC_PTR
+static
 int
 take_off(VOID_ARGS)
 {
@@ -2550,7 +2550,7 @@ doddoremarm()
     return 0;
 }
 
-STATIC_OVL int
+static int
 menu_remarm(retry)
 int retry;
 {

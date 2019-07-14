@@ -10,21 +10,21 @@
 #define SCHAR_LIM 127
 #define NUMOBUF 12
 
-STATIC_DCL char *FDECL(strprepend, (char *, const char *));
-STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
-STATIC_DCL short FDECL(rnd_otyp_by_namedesc, (const char *, CHAR_P, int));
-STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
-STATIC_DCL char *NDECL(nextobuf);
-STATIC_DCL void FDECL(releaseobuf, (char *));
-STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
-STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
-STATIC_DCL char *FDECL(doname_base, (struct obj *obj, unsigned));
-STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
+static char *FDECL(strprepend, (char *, const char *));
+static short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
+static short FDECL(rnd_otyp_by_namedesc, (const char *, CHAR_P, int));
+static boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
+static char *NDECL(nextobuf);
+static void FDECL(releaseobuf, (char *));
+static char *FDECL(minimal_xname, (struct obj *));
+static void FDECL(add_erosion_words, (struct obj *, char *));
+static char *FDECL(doname_base, (struct obj *obj, unsigned));
+static boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
                                            const char *const *));
-STATIC_DCL char *FDECL(singplur_compound, (char *));
-STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
-STATIC_DCL boolean FDECL(badman, (const char *, BOOLEAN_P));
-STATIC_DCL char *FDECL(globwt, (struct obj *, char *, boolean *));
+static char *FDECL(singplur_compound, (char *));
+static char *FDECL(xname_flags, (struct obj *, unsigned));
+static boolean FDECL(badman, (const char *, BOOLEAN_P));
+static char *FDECL(globwt, (struct obj *, char *, boolean *));
 
 struct Jitem {
     int item;
@@ -44,7 +44,7 @@ struct Jitem {
              && typ != SAPPHIRE && typ != BLACK_OPAL && typ != EMERALD \
              && typ != OPAL)))
 
-STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
+static struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { BROADSWORD, "ninja-to" },
                                              { FLAIL, "nunchaku" },
                                              { GLAIVE, "naginata" },
@@ -58,9 +58,9 @@ STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { POT_BOOZE, "sake" },
                                              { 0, "" } };
 
-STATIC_DCL const char *FDECL(Japanese_item_name, (int i));
+static const char *FDECL(Japanese_item_name, (int i));
 
-STATIC_OVL char *
+static char *
 strprepend(s, pref)
 register char *s;
 register const char *pref;
@@ -80,7 +80,7 @@ register const char *pref;
 static char NEARDATA obufs[NUMOBUF][BUFSZ];
 static int obufidx = 0;
 
-STATIC_OVL char *
+static char *
 nextobuf()
 {
     obufidx = (obufidx + 1) % NUMOBUF;
@@ -88,7 +88,7 @@ nextobuf()
 }
 
 /* put the most recently allocated buffer back if possible */
-STATIC_OVL void
+static void
 releaseobuf(bufp)
 char *bufp;
 {
@@ -411,7 +411,7 @@ struct obj *obj;
     return xname_flags(obj, CXN_NORMAL);
 }
 
-STATIC_OVL char *
+static char *
 xname_flags(obj, cxn_flags)
 register struct obj *obj;
 unsigned cxn_flags; /* bitmask of CXN_xxx values */
@@ -740,7 +740,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
      brown potion               -- if oc_name_known not set
      potion of object detection -- if discovered
  */
-STATIC_OVL char *
+static char *
 minimal_xname(obj)
 struct obj *obj;
 {
@@ -841,7 +841,7 @@ struct permonst *ptr;
     return uniq;
 }
 
-STATIC_OVL void
+static void
 add_erosion_words(obj, prefix)
 struct obj *obj;
 char *prefix;
@@ -919,7 +919,7 @@ struct obj *obj;
 #define DONAME_WITH_PRICE 1
 #define DONAME_VAGUE_QUAN 2
 
-STATIC_OVL char *
+static char *
 doname_base(obj, doname_flags)
 struct obj *obj;
 unsigned doname_flags;
@@ -2168,7 +2168,7 @@ static const char *const as_is[] = {
 };
 
 /* singularize/pluralize decisions common to both makesingular & makeplural */
-STATIC_OVL boolean
+static boolean
 singplur_lookup(basestr, endstring, to_plural, alt_as_is)
 char *basestr, *endstring;    /* base string, pointer to eos(string) */
 boolean to_plural;            /* true => makeplural, false => makesingular */
@@ -2239,7 +2239,7 @@ const char *const *alt_as_is; /* another set like as_is[] */
 }
 
 /* searches for common compounds, ex. lump of royal jelly */
-STATIC_OVL char *
+static char *
 singplur_compound(str)
 char *str;
 {
@@ -2570,7 +2570,7 @@ const char *oldstr;
     return bp;
 }
 
-STATIC_OVL boolean
+static boolean
 badman(basestr, to_plural)
 const char *basestr;
 boolean to_plural;            /* true => makeplural, false => makesingular */
@@ -2619,7 +2619,7 @@ boolean to_plural;            /* true => makeplural, false => makesingular */
 }
 
 /* compare user string against object name string using fuzzy matching */
-STATIC_OVL boolean
+static boolean
 wishymatch(u_str, o_str, retry_inverted)
 const char *u_str;      /* from user, so might be variant spelling */
 const char *o_str;      /* from objects[], so is in canonical form */
@@ -2718,7 +2718,7 @@ struct o_range {
 };
 
 /* wishable subranges of objects */
-STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
+static NEARDATA const struct o_range o_ranges[] = {
     { "bag", TOOL_CLASS, SACK, BAG_OF_TRICKS },
     { "lamp", TOOL_CLASS, OIL_LAMP, MAGIC_LAMP },
     { "candle", TOOL_CLASS, TALLOW_CANDLE, WAX_CANDLE },
@@ -2791,7 +2791,7 @@ static const struct alt_spellings {
     { (const char *) 0, 0 },
 };
 
-STATIC_OVL short
+static short
 rnd_otyp_by_wpnskill(skill)
 schar skill;
 {
@@ -2815,7 +2815,7 @@ schar skill;
     return otyp;
 }
 
-STATIC_OVL short
+static short
 rnd_otyp_by_namedesc(name, oclass, xtra_prob)
 const char *name;
 char oclass;
@@ -4083,7 +4083,7 @@ int first, last;
     return 0;
 }
 
-STATIC_OVL const char *
+static const char *
 Japanese_item_name(i)
 int i;
 {
@@ -4253,7 +4253,7 @@ const char *lastR;
     return qbuf;
 }
 
-STATIC_OVL char *
+static char *
 globwt(otmp, buf, weightformatted_p)
 struct obj *otmp;
 char *buf;

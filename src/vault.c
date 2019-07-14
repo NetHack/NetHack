@@ -5,16 +5,16 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(clear_fcorr, (struct monst *, BOOLEAN_P));
-STATIC_DCL void FDECL(blackout, (int, int));
-STATIC_DCL void FDECL(restfakecorr, (struct monst *));
-STATIC_DCL void FDECL(parkguard, (struct monst *));
-STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *, int, int));
-STATIC_DCL boolean FDECL(find_guard_dest, (struct monst *, xchar *, xchar *));
-STATIC_DCL void FDECL(move_gold, (struct obj *, int));
-STATIC_DCL void FDECL(wallify_vault, (struct monst *));
-STATIC_DCL void FDECL(gd_mv_monaway, (struct monst *, int, int));
-STATIC_OVL void FDECL(gd_pick_corridor_gold, (struct monst *, int, int));
+static boolean FDECL(clear_fcorr, (struct monst *, BOOLEAN_P));
+static void FDECL(blackout, (int, int));
+static void FDECL(restfakecorr, (struct monst *));
+static void FDECL(parkguard, (struct monst *));
+static boolean FDECL(in_fcorridor, (struct monst *, int, int));
+static boolean FDECL(find_guard_dest, (struct monst *, xchar *, xchar *));
+static void FDECL(move_gold, (struct obj *, int));
+static void FDECL(wallify_vault, (struct monst *));
+static void FDECL(gd_mv_monaway, (struct monst *, int, int));
+static void FDECL(gd_pick_corridor_gold, (struct monst *, int, int));
 
 void
 newegd(mtmp)
@@ -42,7 +42,7 @@ struct monst *mtmp;
 /* try to remove the temporary corridor (from vault to rest of map) being
    maintained by guard 'grd'; if guard is still in it, removal will fail,
    to be tried again later */
-STATIC_OVL boolean
+static boolean
 clear_fcorr(grd, forceshow)
 struct monst *grd;
 boolean forceshow;
@@ -117,7 +117,7 @@ boolean forceshow;
    spots to unlit; if player used scroll/wand/spell of light while inside
    the corridor, we don't want the light to reappear if/when a new tunnel
    goes through the same area */
-STATIC_OVL void
+static void
 blackout(x, y)
 int x, y;
 {
@@ -139,7 +139,7 @@ int x, y;
         }
 }
 
-STATIC_OVL void
+static void
 restfakecorr(grd)
 struct monst *grd;
 {
@@ -151,7 +151,7 @@ struct monst *grd;
 }
 
 /* move guard--dead to alive--to <0,0> until temporary corridor is removed */
-STATIC_OVL void
+static void
 parkguard(grd)
 struct monst *grd;
 {
@@ -189,7 +189,7 @@ struct monst *grd;
     return dispose;
 }
 
-STATIC_OVL boolean
+static boolean
 in_fcorridor(grd, x, y)
 struct monst *grd;
 int x, y;
@@ -263,7 +263,7 @@ struct monst *grd;
     }
 }
 
-STATIC_OVL boolean
+static boolean
 find_guard_dest(guard, rx, ry)
 struct monst *guard;
 xchar *rx, *ry;
@@ -550,7 +550,7 @@ invault()
     }
 }
 
-STATIC_OVL void
+static void
 move_gold(gold, vroom)
 struct obj *gold;
 int vroom;
@@ -566,7 +566,7 @@ int vroom;
     newsym(nx, ny);
 }
 
-STATIC_OVL void
+static void
 wallify_vault(grd)
 struct monst *grd;
 {
@@ -634,7 +634,7 @@ struct monst *grd;
     }
 }
 
-STATIC_OVL void
+static void
 gd_mv_monaway(grd, nx, ny)
 register struct monst *grd;
 int nx, ny;
@@ -649,7 +649,7 @@ int nx, ny;
 
 /* have guard pick gold off the floor, possibly moving to the gold's
    position before message and back to his current spot after */
-STATIC_OVL void
+static void
 gd_pick_corridor_gold(grd, goldx, goldy)
 struct monst *grd;
 int goldx, goldy; /* <gold->ox, gold->oy> */

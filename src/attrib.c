@@ -103,11 +103,11 @@ static const struct innate {
 
   hum_abil[] = { { 0, 0, 0, 0 } };
 
-STATIC_DCL void NDECL(exerper);
-STATIC_DCL void FDECL(postadjabil, (long *));
-STATIC_DCL const struct innate *FDECL(role_abil, (int));
-STATIC_DCL const struct innate *FDECL(check_innate_abil, (long *, long));
-STATIC_DCL int FDECL(innately, (long *));
+static void NDECL(exerper);
+static void FDECL(postadjabil, (long *));
+static const struct innate *FDECL(role_abil, (int));
+static const struct innate *FDECL(check_innate_abil, (long *, long));
+static int FDECL(innately, (long *));
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -443,7 +443,7 @@ boolean inc_or_dec;
         (void) encumber_msg();
 }
 
-STATIC_OVL void
+static void
 exerper()
 {
     if (!(g.moves % 10)) {
@@ -683,7 +683,7 @@ redist_attr()
     (void) encumber_msg();
 }
 
-STATIC_OVL
+static
 void
 postadjabil(ability)
 long *ability;
@@ -694,7 +694,7 @@ long *ability;
         see_monsters();
 }
 
-STATIC_OVL const struct innate *
+static const struct innate *
 role_abil(r)
 int r;
 {
@@ -724,7 +724,7 @@ int r;
     return roleabils[i].abil;
 }
 
-STATIC_OVL const struct innate *
+static const struct innate *
 check_innate_abil(ability, frommask)
 long *ability;
 long frommask;
@@ -772,7 +772,7 @@ long frommask;
 #define FROM_LYCN 6
 
 /* check whether particular ability has been obtained via innate attribute */
-STATIC_OVL int
+static int
 innately(ability)
 long *ability;
 {

@@ -6,11 +6,11 @@
 
 #include "hack.h"
 
-STATIC_DCL void NDECL(dowatersnakes);
-STATIC_DCL void NDECL(dowaterdemon);
-STATIC_DCL void NDECL(dowaternymph);
-STATIC_PTR void FDECL(gush, (int, int, genericptr_t));
-STATIC_DCL void NDECL(dofindgem);
+static void NDECL(dowatersnakes);
+static void NDECL(dowaterdemon);
+static void NDECL(dowaternymph);
+static void FDECL(gush, (int, int, genericptr_t));
+static void NDECL(dofindgem);
 
 /* used when trying to dip in or drink from fountain or sink or pool while
    levitating above it, or when trying to move downwards in that state */
@@ -30,7 +30,7 @@ const char *what;
 }
 
 /* Fountain of snakes! */
-STATIC_OVL void
+static void
 dowatersnakes()
 {
     register int num = rn1(5, 2);
@@ -52,7 +52,7 @@ dowatersnakes()
 }
 
 /* Water demon */
-STATIC_OVL void
+static void
 dowaterdemon()
 {
     struct monst *mtmp;
@@ -80,7 +80,7 @@ dowaterdemon()
 }
 
 /* Water Nymph */
-STATIC_OVL void
+static void
 dowaternymph()
 {
     register struct monst *mtmp;
@@ -117,7 +117,7 @@ int drinking;
     }
 }
 
-STATIC_PTR void
+static void
 gush(x, y, poolcnt)
 int x, y;
 genericptr_t poolcnt;
@@ -149,7 +149,7 @@ genericptr_t poolcnt;
 }
 
 /* Find a gem in the sparkling waters. */
-STATIC_OVL void
+static void
 dofindgem()
 {
     if (!Blind)

@@ -7,13 +7,13 @@
 #include "mfndpos.h"
 #include "artifact.h"
 
-STATIC_DCL void FDECL(watch_on_duty, (struct monst *));
-STATIC_DCL int FDECL(disturb, (struct monst *));
-STATIC_DCL void FDECL(release_hero, (struct monst *));
-STATIC_DCL void FDECL(distfleeck, (struct monst *, int *, int *, int *));
-STATIC_DCL int FDECL(m_arrival, (struct monst *));
-STATIC_DCL boolean FDECL(stuff_prevents_passage, (struct monst *));
-STATIC_DCL int FDECL(vamp_shift, (struct monst *, struct permonst *,
+static void FDECL(watch_on_duty, (struct monst *));
+static int FDECL(disturb, (struct monst *));
+static void FDECL(release_hero, (struct monst *));
+static void FDECL(distfleeck, (struct monst *, int *, int *, int *));
+static int FDECL(m_arrival, (struct monst *));
+static boolean FDECL(stuff_prevents_passage, (struct monst *));
+static int FDECL(vamp_shift, (struct monst *, struct permonst *,
                                   BOOLEAN_P));
 
 /* True if mtmp died */
@@ -76,7 +76,7 @@ const char *shout;
     }
 }
 
-STATIC_OVL void
+static void
 watch_on_duty(mtmp)
 register struct monst *mtmp;
 {
@@ -203,7 +203,7 @@ boolean digest_meal;
  * Possibly awaken the given monster.  Return a 1 if the monster has been
  * jolted awake.
  */
-STATIC_OVL int
+static int
 disturb(mtmp)
 register struct monst *mtmp;
 {
@@ -238,7 +238,7 @@ register struct monst *mtmp;
 }
 
 /* ungrab/expel held/swallowed hero */
-STATIC_OVL void
+static void
 release_hero(mon)
 struct monst *mon;
 {
@@ -351,7 +351,7 @@ boolean fleemsg;
     memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
 }
 
-STATIC_OVL void
+static void
 distfleeck(mtmp, inrange, nearby, scared)
 register struct monst *mtmp;
 int *inrange, *nearby, *scared;
@@ -392,7 +392,7 @@ int *inrange, *nearby, *scared;
 
 /* perform a special one-time action for a monster; returns -1 if nothing
    special happened, 0 if monster uses up its turn, 1 if monster is killed */
-STATIC_OVL int
+static int
 m_arrival(mon)
 struct monst *mon;
 {
@@ -1680,7 +1680,7 @@ xchar x, y;
  * Inventory prevents passage under door.
  * Used by can_ooze() and can_fog().
  */
-STATIC_OVL boolean
+static boolean
 stuff_prevents_passage(mtmp)
 struct monst *mtmp;
 {
@@ -1738,7 +1738,7 @@ struct monst *mtmp;
     return FALSE;
 }
 
-STATIC_OVL int
+static int
 vamp_shift(mon, ptr, domsg)
 struct monst *mon;
 struct permonst *ptr;

@@ -13,11 +13,11 @@
 #define LEFT 4
 #define RIGHT 8
 
-STATIC_DCL void FDECL(roguejoin, (int, int, int, int, int));
-STATIC_DCL void FDECL(roguecorr, (int, int, int));
-STATIC_DCL void FDECL(miniwalk, (int, int));
+static void FDECL(roguejoin, (int, int, int, int, int));
+static void FDECL(roguecorr, (int, int, int));
+static void FDECL(miniwalk, (int, int));
 
-STATIC_OVL
+static
 void
 roguejoin(x1, y1, x2, y2, horiz)
 int x1, y1, x2, y2;
@@ -43,7 +43,7 @@ int horiz;
     }
 }
 
-STATIC_OVL
+static
 void
 roguecorr(x, y, dir)
 int x, y, dir;
@@ -139,7 +139,7 @@ int x, y, dir;
 }
 
 /* Modified walkfrom() from mkmaze.c */
-STATIC_OVL
+static
 void
 miniwalk(x, y)
 int x, y;

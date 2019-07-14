@@ -41,7 +41,7 @@ boolean FDECL(enter_force_field, (genericptr,genericptr));
 NhRegion *FDECL(create_force_field, (XCHAR_P,XCHAR_P,int,long));
 #endif
 
-STATIC_DCL void FDECL(reset_region_mids, (NhRegion *));
+static void FDECL(reset_region_mids, (NhRegion *));
 
 static const callback_proc callbacks[] = {
 #define INSIDE_GAS_CLOUD 0
@@ -925,7 +925,7 @@ long *count, *size;
 }
 
 /* update monster IDs for region being loaded from bones; `ghostly' implied */
-STATIC_OVL void
+static void
 reset_region_mids(reg)
 NhRegion *reg;
 {

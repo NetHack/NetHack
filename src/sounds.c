@@ -4,13 +4,13 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));
-STATIC_DCL int FDECL(domonnoise, (struct monst *));
-STATIC_DCL int NDECL(dochat);
-STATIC_DCL int FDECL(mon_in_room, (struct monst *, int));
+static boolean FDECL(mon_is_gecko, (struct monst *));
+static int FDECL(domonnoise, (struct monst *));
+static int NDECL(dochat);
+static int FDECL(mon_in_room, (struct monst *, int));
 
 /* this easily could be a macro, but it might overtax dumb compilers */
-STATIC_OVL int
+static int
 mon_in_room(mon, rmtyp)
 struct monst *mon;
 int rmtyp;
@@ -468,7 +468,7 @@ register struct monst *mtmp;
 }
 
 /* return True if mon is a gecko or seems to look like one (hallucination) */
-STATIC_OVL boolean
+static boolean
 mon_is_gecko(mon)
 struct monst *mon;
 {
@@ -487,7 +487,7 @@ struct monst *mon;
     return (boolean) (glyph_to_mon(glyph) == PM_GECKO);
 }
 
-STATIC_OVL int
+static int
 domonnoise(mtmp)
 register struct monst *mtmp;
 {
@@ -967,7 +967,7 @@ dotalk()
     return result;
 }
 
-STATIC_OVL int
+static int
 dochat()
 {
     struct monst *mtmp;

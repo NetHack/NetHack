@@ -5,10 +5,10 @@
 
 #include "hack.h"
 
-STATIC_DCL int FDECL(monmulti, (struct monst *, struct obj *, struct obj *));
-STATIC_DCL void FDECL(monshoot, (struct monst *, struct obj *, struct obj *));
-STATIC_DCL int FDECL(drop_throw, (struct obj *, BOOLEAN_P, int, int));
-STATIC_DCL boolean FDECL(m_lined_up, (struct monst *, struct monst *));
+static int FDECL(monmulti, (struct monst *, struct obj *, struct obj *));
+static void FDECL(monshoot, (struct monst *, struct obj *, struct obj *));
+static int FDECL(drop_throw, (struct obj *, BOOLEAN_P, int, int));
+static boolean FDECL(m_lined_up, (struct monst *, struct monst *));
 
 #define URETREATING(x, y) \
     (distmin(u.ux, u.uy, x, y) > distmin(u.ux0, u.uy0, x, y))
@@ -20,7 +20,7 @@ STATIC_DCL boolean FDECL(m_lined_up, (struct monst *, struct monst *));
 /*
  * Keep consistent with breath weapons in zap.c, and AD_* in monattk.h.
  */
-STATIC_OVL NEARDATA const char *breathwep[] = {
+static NEARDATA const char *breathwep[] = {
     "fragments", "fire", "frost", "sleep gas", "a disintegration blast",
     "lightning", "poison gas", "acid", "strange breath #8",
     "strange breath #9"
@@ -102,7 +102,7 @@ const char *name; /* if null, then format `*objp' */
  * dothrow.c (for consistency). --KAA
  * Returns 0 if object still exists (not destroyed).
  */
-STATIC_OVL int
+static int
 drop_throw(obj, ohit, x, y)
 register struct obj *obj;
 boolean ohit;
@@ -146,7 +146,7 @@ int x, y;
 
 /* calculate multishot volley count for mtmp throwing otmp (if not ammo) or
    shooting otmp with mwep (if otmp is ammo and mwep appropriate launcher) */
-STATIC_OVL int
+static int
 monmulti(mtmp, otmp, mwep)
 struct monst *mtmp;
 struct obj *otmp, *mwep;
@@ -231,7 +231,7 @@ struct obj *otmp, *mwep;
 }
 
 /* mtmp throws otmp, or shoots otmp with mwep, at hero or at monster mtarg */
-STATIC_OVL void
+static void
 monshoot(mtmp, otmp, mwep)
 struct monst *mtmp;
 struct obj *otmp, *mwep;
@@ -1048,7 +1048,7 @@ int boulderhandling; /* 0=block, 1=ignore, 2=conditionally block */
     return FALSE;
 }
 
-STATIC_OVL boolean
+static boolean
 m_lined_up(mtarg, mtmp)
 struct monst *mtarg, *mtmp;
 {

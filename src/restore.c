@@ -20,27 +20,27 @@ extern void FDECL(substitute_tiles, (d_level *)); /* from tile.c */
 #endif
 
 #ifdef ZEROCOMP
-STATIC_DCL void NDECL(zerocomp_minit);
-STATIC_DCL void FDECL(zerocomp_mread, (int, genericptr_t, unsigned int));
-STATIC_DCL int NDECL(zerocomp_mgetc);
+static void NDECL(zerocomp_minit);
+static void FDECL(zerocomp_mread, (int, genericptr_t, unsigned int));
+static int NDECL(zerocomp_mgetc);
 #endif
 
-STATIC_DCL void NDECL(find_lev_obj);
-STATIC_DCL void FDECL(restlevchn, (NHFILE *));
-STATIC_DCL void FDECL(restdamage, (NHFILE *, BOOLEAN_P));
-STATIC_DCL void FDECL(restobj, (NHFILE *, struct obj *));
-STATIC_DCL struct obj *FDECL(restobjchn, (NHFILE *, BOOLEAN_P, BOOLEAN_P));
-STATIC_OVL void FDECL(restmon, (NHFILE *, struct monst *));
-STATIC_DCL struct monst *FDECL(restmonchn, (NHFILE *, BOOLEAN_P));
-STATIC_DCL struct fruit *FDECL(loadfruitchn, (NHFILE *));
-STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
-STATIC_DCL void FDECL(ghostfruit, (struct obj *));
-STATIC_DCL boolean FDECL(restgamestate, (NHFILE *, unsigned int *, unsigned int *));
-STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
-STATIC_DCL int FDECL(restlevelfile, (NHFILE *, XCHAR_P));
-STATIC_OVL void FDECL(restore_msghistory, (NHFILE *));
-STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
-STATIC_DCL void FDECL(rest_levl, (NHFILE *, BOOLEAN_P));
+static void NDECL(find_lev_obj);
+static void FDECL(restlevchn, (NHFILE *));
+static void FDECL(restdamage, (NHFILE *, BOOLEAN_P));
+static void FDECL(restobj, (NHFILE *, struct obj *));
+static struct obj *FDECL(restobjchn, (NHFILE *, BOOLEAN_P, BOOLEAN_P));
+static void FDECL(restmon, (NHFILE *, struct monst *));
+static struct monst *FDECL(restmonchn, (NHFILE *, BOOLEAN_P));
+static struct fruit *FDECL(loadfruitchn, (NHFILE *));
+static void FDECL(freefruitchn, (struct fruit *));
+static void FDECL(ghostfruit, (struct obj *));
+static boolean FDECL(restgamestate, (NHFILE *, unsigned int *, unsigned int *));
+static void FDECL(restlevelstate, (unsigned int, unsigned int));
+static int FDECL(restlevelfile, (NHFILE *, XCHAR_P));
+static void FDECL(restore_msghistory, (NHFILE *));
+static void FDECL(reset_oattached_mids, (BOOLEAN_P));
+static void FDECL(rest_levl, (NHFILE *, BOOLEAN_P));
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -55,8 +55,8 @@ struct bucket {
     } map[N_PER_BUCKET];
 };
 
-STATIC_DCL void NDECL(clear_id_mapping);
-STATIC_DCL void FDECL(add_id_mapping, (unsigned, unsigned));
+static void NDECL(clear_id_mapping);
+static void FDECL(add_id_mapping, (unsigned, unsigned));
 
 #ifdef AMII_GRAPHICS
 void FDECL(amii_setpens, (int)); /* use colors from save file */
@@ -68,7 +68,7 @@ extern int amii_numcolors;
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
 
 /* Recalculate g.level.objects[x][y], since this info was not saved. */
-STATIC_OVL void
+static void
 find_lev_obj()
 {
     register struct obj *fobjtmp = (struct obj *) 0;
@@ -118,7 +118,7 @@ boolean quietly;
     }
 }
 
-STATIC_OVL void
+static void
 restlevchn(nhfp)
 NHFILE *nhfp;
 {
@@ -151,7 +151,7 @@ NHFILE *nhfp;
 
 /* SAVE2018 */
 
-STATIC_OVL void
+static void
 restdamage(nhfp, ghostly)
 NHFILE *nhfp;
 boolean ghostly;
@@ -207,7 +207,7 @@ boolean ghostly;
 /* SAVE2018 */
 
 /* restore one object */
-STATIC_OVL void
+static void
 restobj(nhfp, otmp)
 NHFILE *nhfp;
 struct obj *otmp;
@@ -299,7 +299,7 @@ struct obj *otmp;
 
 /* SAVE2018 */
 
-STATIC_OVL struct obj *
+static struct obj *
 restobjchn(nhfp, ghostly, frozen)
 NHFILE *nhfp;
 boolean ghostly, frozen;
@@ -392,7 +392,7 @@ boolean ghostly, frozen;
 /* SAVE2018 */
 
 /* restore one monster */
-STATIC_OVL void
+static void
 restmon(nhfp, mtmp)
 NHFILE *nhfp;
 struct monst *mtmp;
@@ -494,7 +494,7 @@ struct monst *mtmp;
 
 /* SAVE2018 */
 
-STATIC_OVL struct monst *
+static struct monst *
 restmonchn(nhfp, ghostly)
 NHFILE *nhfp;
 boolean ghostly;
@@ -573,7 +573,7 @@ boolean ghostly;
 
 /* SAVE2018 */
 
-STATIC_OVL struct fruit *
+static struct fruit *
 loadfruitchn(nhfp)
 NHFILE *nhfp;
 {
@@ -597,7 +597,7 @@ NHFILE *nhfp;
     return flist;
 }
 
-STATIC_OVL void
+static void
 freefruitchn(flist)
 register struct fruit *flist;
 {
@@ -610,7 +610,7 @@ register struct fruit *flist;
     }
 }
 
-STATIC_OVL void
+static void
 ghostfruit(otmp)
 register struct obj *otmp;
 {
@@ -632,7 +632,7 @@ register struct obj *otmp;
 #define SYSOPT_CHECK_SAVE_UID TRUE
 #endif
 
-STATIC_OVL
+static
 boolean
 restgamestate(nhfp, stuckid, steedid)
 NHFILE *nhfp;
@@ -889,7 +889,7 @@ unsigned int *stuckid, *steedid;
 /* update game state pointers to those valid for the current level (so we
  * don't dereference a wild u.ustuck when saving the game state, for instance)
  */
-STATIC_OVL void
+static void
 restlevelstate(stuckid, steedid)
 unsigned int stuckid, steedid;
 {
@@ -915,7 +915,7 @@ unsigned int stuckid, steedid;
 }
 
 /*ARGSUSED*/
-STATIC_OVL int
+static int
 restlevelfile(nhfp, ltmp)
 NHFILE *nhfp; /* used in MFLOPPY only */
 xchar ltmp;
@@ -1167,7 +1167,7 @@ struct cemetery **cemeteryaddr;
 /* SAVE2018 */
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 rest_levl(nhfp, rlecomp)
 NHFILE *nhfp;
 boolean rlecomp;
@@ -1488,7 +1488,7 @@ char *plbuf;
 
 /* SAVE2018 */
 
-STATIC_OVL void
+static void
 restore_msghistory(nhfp)
 NHFILE *nhfp;
 {
@@ -1520,7 +1520,7 @@ NHFILE *nhfp;
 }
 
 /* Clear all structures for object and monster ID mapping. */
-STATIC_OVL void
+static void
 clear_id_mapping()
 {
     struct bucket *curr;
@@ -1533,7 +1533,7 @@ clear_id_mapping()
 }
 
 /* Add a mapping to the ID map. */
-STATIC_OVL void
+static void
 add_id_mapping(gid, nid)
 unsigned gid, nid;
 {
@@ -1585,7 +1585,7 @@ unsigned gid, *nidp;
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 reset_oattached_mids(ghostly)
 boolean ghostly;
 {

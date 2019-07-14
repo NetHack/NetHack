@@ -35,20 +35,20 @@ enum mcast_cleric_spells {
     CLC_GEYSER
 };
 
-STATIC_DCL void FDECL(cursetxt, (struct monst *, BOOLEAN_P));
-STATIC_DCL int FDECL(choose_magic_spell, (int));
-STATIC_DCL int FDECL(choose_clerical_spell, (int));
-STATIC_DCL int FDECL(m_cure_self, (struct monst *, int));
-STATIC_DCL void FDECL(cast_wizard_spell, (struct monst *, int, int));
-STATIC_DCL void FDECL(cast_cleric_spell, (struct monst *, int, int));
-STATIC_DCL boolean FDECL(is_undirected_spell, (unsigned int, int));
-STATIC_DCL boolean
+static void FDECL(cursetxt, (struct monst *, BOOLEAN_P));
+static int FDECL(choose_magic_spell, (int));
+static int FDECL(choose_clerical_spell, (int));
+static int FDECL(m_cure_self, (struct monst *, int));
+static void FDECL(cast_wizard_spell, (struct monst *, int, int));
+static void FDECL(cast_cleric_spell, (struct monst *, int, int));
+static boolean FDECL(is_undirected_spell, (unsigned int, int));
+static boolean
 FDECL(spell_would_be_useless, (struct monst *, unsigned int, int));
 
 extern const char *const flash_types[]; /* from zap.c */
 
 /* feedback when frustrated monster couldn't cast a spell */
-STATIC_OVL
+static
 void
 cursetxt(mtmp, undirected)
 struct monst *mtmp;
@@ -78,7 +78,7 @@ boolean undirected;
 
 /* convert a level based random selection into a specific mage spell;
    inappropriate choices will be screened out by spell_would_be_useless() */
-STATIC_OVL int
+static int
 choose_magic_spell(spellval)
 int spellval;
 {
@@ -133,7 +133,7 @@ int spellval;
 }
 
 /* convert a level based random selection into a specific cleric spell */
-STATIC_OVL int
+static int
 choose_clerical_spell(spellnum)
 int spellnum;
 {
@@ -337,7 +337,7 @@ boolean foundyou;
     return (ret);
 }
 
-STATIC_OVL int
+static int
 m_cure_self(mtmp, dmg)
 struct monst *mtmp;
 int dmg;
@@ -362,7 +362,7 @@ int dmg;
    If you modify either of these, be sure to change is_undirected_spell()
    and spell_would_be_useless().
  */
-STATIC_OVL
+static
 void
 cast_wizard_spell(mtmp, dmg, spellnum)
 struct monst *mtmp;
@@ -519,7 +519,7 @@ int spellnum;
         mdamageu(mtmp, dmg);
 }
 
-STATIC_OVL
+static
 void
 cast_cleric_spell(mtmp, dmg, spellnum)
 struct monst *mtmp;
@@ -731,7 +731,7 @@ int spellnum;
         mdamageu(mtmp, dmg);
 }
 
-STATIC_DCL
+static
 boolean
 is_undirected_spell(adtyp, spellnum)
 unsigned int adtyp;
@@ -762,7 +762,7 @@ int spellnum;
 }
 
 /* Some spells are useless under some circumstances. */
-STATIC_DCL
+static
 boolean
 spell_would_be_useless(mtmp, adtyp, spellnum)
 struct monst *mtmp;

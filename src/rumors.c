@@ -43,11 +43,11 @@
  * and placed there by 'makedefs'.
  */
 
-STATIC_DCL void FDECL(init_rumors, (dlb *));
-STATIC_DCL void FDECL(init_oracles, (dlb *));
-STATIC_DCL void FDECL(couldnt_open_file, (const char *));
+static void FDECL(init_rumors, (dlb *));
+static void FDECL(init_oracles, (dlb *));
+static void FDECL(couldnt_open_file, (const char *));
 
-STATIC_OVL void
+static void
 init_rumors(fp)
 dlb *fp;
 {
@@ -362,7 +362,7 @@ int mechanism;
     pline1(line);
 }
 
-STATIC_OVL void
+static void
 init_oracles(fp)
 dlb *fp;
 {
@@ -567,7 +567,7 @@ struct monst *oracl;
     return 1;
 }
 
-STATIC_OVL void
+static void
 couldnt_open_file(filename)
 const char *filename;
 {
