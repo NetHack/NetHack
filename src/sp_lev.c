@@ -3763,7 +3763,7 @@ struct opvar *mc;
 {
     int x, y;
     schar mapc;
-    uchar lit;
+    xchar lit;
     struct opvar *ret = selection_opvar((char *) 0);
 
     if (!ov || !mc || !ret)
@@ -3783,7 +3783,7 @@ struct opvar *mc;
                     break;
                 case 0:
                 case 1:
-                    if (levl[x][y].lit == lit)
+                    if (levl[x][y].lit == (unsigned int) lit)
                         selection_setpoint(x, y, ret, 1);
                     break;
                 }
