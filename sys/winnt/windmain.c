@@ -374,7 +374,7 @@ attempt_restore:
     return 0;
 }
 
-STATIC_OVL void
+static void
 process_options(argc, argv)
 int argc;
 char *argv[];
@@ -550,7 +550,7 @@ char *argv[];
     }
 }
 
-STATIC_OVL void
+static void
 nhusage()
 {
     char buf1[BUFSZ], buf2[BUFSZ], *bufptr;
