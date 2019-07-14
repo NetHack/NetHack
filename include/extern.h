@@ -28,10 +28,7 @@ E void FDECL(welcome, (BOOLEAN_P));
 E time_t NDECL(get_realtime);
 E int FDECL(argcheck, (int, char **, enum earlyarg));
 E void NDECL(early_init);
-E void NDECL(fuzzer_start);
-E void NDECL(fuzzer_stop);
 E void NDECL(fuzzer_toggle);
-E void VDECL(fuzzer_log, (int, const char *, ...)) PRINTF_F(2, 3);
 E void NDECL(fuzzer_check);
 E void NDECL(fuzzer_auto_start);
 E boolean FDECL(fuzzer_msg_history, (const char *));
@@ -1942,6 +1939,9 @@ E void VDECL(raw_printf, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(impossible, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(config_error_add, (const char *, ...)) PRINTF_F(1, 2);
 E void FDECL(nhassert_failed, (const char *, int));
+E void NDECL(fuzzer_start);
+E void NDECL(fuzzer_stop);
+E void VDECL(fuzzer_log, (int, const char *, ...)) PRINTF_F(2, 3);
 
 /* ### polyself.c ### */
 
