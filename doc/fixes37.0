@@ -38,4 +38,5 @@ Code Cleanup and Reorganization
 -------------------------------
 move majority of global variables into instance_globals struct g
 move zeroobj, zeromonst, zeroany into const_globals struct cg
+remove STATIC_DCL, STATIC_OVL, STATIC_VAR, STATIC_PTR
 
