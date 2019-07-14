@@ -1,7 +1,7 @@
 REM
 REM runtill target_move
 REM 
-echo off
+echo on
 
 SETLOCAL ENABLEEXTENSIONS
 SETLOCAL ENABLEDELAYEDEXPANSION
@@ -13,13 +13,7 @@ if %TARGET_MOVE% == "" (
   goto :eof
 )
 
-set BIN_DIR=..\..\..\..\bin\Debug\Win32
-set SAVED_GAME=%USERNAME%-wizard.NetHack-saved-game
-set LOG_FILE=%BIN_DIR%\runtil.log
-set FUZZER_LOG=%BIN_DIR%\fuzzer.log
-set FUZZER_DIR=%BIN_DIR%\fuzzer
-set SAVE_DIR=%FUZZER_DIR%\save
-set BASELINE=%FUZZER_DIR%\fuzzer.log
+call setenv.bat
 
 if not exist %FUZZER_DIR% mkdir %FUZZER_DIR%
 if not exist %SAVE_DIR% mkdir %SAVE_DIR%
@@ -37,7 +31,6 @@ call restore.bat
 
 %BIN_DIR%\nethack -D -F %TARGET_MOVE%
 
-move %BIN_DIR%\*.snap %BIN_DIR%\snapshots
 copy %FUZZER_LOG% %BASELINE%
 
 for /f "tokens=2,3 delims=: usebackq" %%i in (`findstr /c:START %BASELINE%`) do (

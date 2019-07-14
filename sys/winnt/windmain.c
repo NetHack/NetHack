@@ -471,6 +471,11 @@ char *argv[];
                     argv++;
                     iflags.fuzzer_stop_and_save = atoi(*argv);
 
+                    /* turn off getreturn_enabled so that game does not
+                     * prompt for input when exiting
+                     */
+                    getreturn_enabled = FALSE;
+
                     if (argc > 1 && argv[1][0] != '-') {
                         argc--;
                         argv++;
@@ -800,7 +805,9 @@ getlock()
 {
     register int fd, c, ci, ct, ern;
     int fcmask = FCMASK;
+#ifndef SELF_RECOVER
     char tbuf[BUFSZ];
+#endif
     const char *fq_lock;
 #define OOPS_BUFSZ 512
     char oops[OOPS_BUFSZ];
