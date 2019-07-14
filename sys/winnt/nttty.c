@@ -475,9 +475,16 @@ int *x, *y, *mod;
     coord cc;
     DWORD count;
     really_move_cursor();
-    if (iflags.debug_fuzzer)
-        return randomkey();
-    ch = (g.program_state.done_hup)
+    if (iflags.debug_fuzzer) {
+        int poskey = randomkey();
+
+        if (poskey == 0) {
+            *x = rn2(console.width);
+            *y = rn2(console.height);
+        }
+        return poskey;
+    }
+    ch = (program_state.done_hup)
              ? '\033'
              : keyboard_handler.pCheckInput(
                    console.hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);

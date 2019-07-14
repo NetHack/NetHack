@@ -447,6 +447,10 @@ struct instance_flags {
                                     chosen_windowport[], but do not switch to
                                     it in the midst of options processing */
     boolean obsolete;  /* obsolete options can point at this, it isn't used */
+    boolean fuzzer_auto_start; /* start fuzzer automatically */
+    int fuzzer_stop_and_save;  /* move when fuzzer stops and saves game */
+    boolean fuzzer_saving;     /* fuzzer is saving game */
+    int verbose_logging_start; /* move when verbose fuzzer logging starts */
 };
 
 /*
