@@ -708,23 +708,6 @@ sys_random_seed(VOID_ARGS)
     }
     return ourseed;
 }
-
-/* nt_assert_failed is called when an nhassert's condition is false */
-void
-nt_assert_failed(expression, filepath, line)
-    const char * expression;
-    const char * filepath;
-    int line;
-{
-    const char * filename;
-
-    /* get file name from path */
-    filename = strrchr(filepath, '\\');
-    filename = (filename == NULL ? filepath : filename + 1);
-    impossible("nhassert(%s) failed in file '%s' at line %d",
-                expression, filename, line);
-}
-
 #endif /* WIN32 */
 
 /*winnt.c*/
