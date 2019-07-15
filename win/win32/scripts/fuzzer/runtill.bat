@@ -18,11 +18,9 @@ set SAVED_GAME=%USERNAME%-wizard.NetHack-saved-game
 set LOG_FILE=%BIN_DIR%\runtil.log
 set FUZZER_LOG=%BIN_DIR%\fuzzer.log
 set FUZZER_DIR=%BIN_DIR%\fuzzer
-set SAVE_DIR=%FUZZER_DIR%\save
 set BASELINE=%FUZZER_DIR%\fuzzer.log
 
 if not exist %FUZZER_DIR% mkdir %FUZZER_DIR%
-if not exist %SAVE_DIR% mkdir %SAVE_DIR%
 
 call clean.bat
 
@@ -30,7 +28,6 @@ if not exist %FUZZER_DIR%\%SAVED_GAME% (
 	%BIN_DIR%\nethack -D -F 0
 
 	copy %BIN_DIR%\%SAVED_GAME% %FUZZER_DIR%
-	copy %BIN_DIR%\%SAVED_GAME% %SAVE_DIR%\0.save
 )
 
 call restore.bat
@@ -71,7 +68,6 @@ if ERRORLEVEL 1 (
 del /q %FUZZER_DIR%\%SAVED_GAME%
 
 copy %BIN_DIR%\%SAVED_GAME% %FUZZER_DIR%
-copy %BIN_DIR%\%SAVED_GAME% %SAVE_DIR%\!STOP_MOVE!.save
 
 echo !START_MOVE! to !STOP_MOVE!.
 echo SUCCESS.
