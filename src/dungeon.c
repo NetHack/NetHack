@@ -58,7 +58,6 @@ static const char *FDECL(br_string, (int));
 static char FDECL(chr_u_on_lvl, (d_level *));
 static void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P,
                                      struct lchoice *));
-/* SAVE2018 */
 static mapseen *FDECL(load_mapseen, (NHFILE *));
 static void FDECL(save_mapseen, (NHFILE *, mapseen *));
 static mapseen *FDECL(find_mapseen, (d_level *));

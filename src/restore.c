@@ -149,8 +149,6 @@ NHFILE *nhfp;
     }
 }
 
-/* SAVE2018 */
-
 static void
 restdamage(nhfp, ghostly)
 NHFILE *nhfp;
@@ -204,8 +202,6 @@ boolean ghostly;
     free((genericptr_t) tmp_dam);
 }
 
-/* SAVE2018 */
-
 /* restore one object */
 static void
 restobj(nhfp, otmp)
@@ -249,7 +245,7 @@ struct obj *otmp;
             newomonst(otmp);
             /* this is actually a monst struct, so we
                can just defer to restmon() here */
-            restmon(nhfp, OMONST(otmp));    /* SAVE2018 */
+            restmon(nhfp, OMONST(otmp));
         }
 
         /* omid - monster id number, connecting corpse to ghost */
@@ -297,8 +293,6 @@ struct obj *otmp;
     }
 }
 
-/* SAVE2018 */
-
 static struct obj *
 restobjchn(nhfp, ghostly, frozen)
 NHFILE *nhfp;
@@ -318,7 +312,7 @@ boolean ghostly, frozen;
             break;
 
         otmp = newobj();
-        restobj(nhfp, otmp); /* SAVE2018 */
+        restobj(nhfp, otmp);
         if (!first)
             first = otmp;
         else
@@ -388,8 +382,6 @@ boolean ghostly, frozen;
 
     return first;
 }
-
-/* SAVE2018 */
 
 /* restore one monster */
 static void
@@ -492,8 +484,6 @@ struct monst *mtmp;
     } /* mextra */
 }
 
-/* SAVE2018 */
-
 static struct monst *
 restmonchn(nhfp, ghostly)
 NHFILE *nhfp;
@@ -570,8 +560,6 @@ boolean ghostly;
     }
     return first;
 }
-
-/* SAVE2018 */
 
 static struct fruit *
 loadfruitchn(nhfp)
@@ -1134,8 +1122,6 @@ NHFILE *nhfp;
     return 1;
 }
 
-/* SAVE2018 */
-
 void
 restcemetery(nhfp, cemeteryaddr)
 NHFILE *nhfp;
@@ -1163,8 +1149,6 @@ struct cemetery **cemeteryaddr;
         *cemeteryaddr = 0;
     }
 }
-
-/* SAVE2018 */
 
 /*ARGSUSED*/
 static void
@@ -1362,7 +1346,7 @@ boolean ghostly;
             keepgoing = FALSE;
     }
     dealloc_trap(trap);
-    fobj = restobjchn(nhfp, ghostly, FALSE);    /* SAVE2018 */
+    fobj = restobjchn(nhfp, ghostly, FALSE);
     find_lev_obj();
     /* restobjchn()'s `frozen' argument probably ought to be a callback
        routine so that we can check for objects being buried under ice */
@@ -1466,8 +1450,6 @@ boolean ghostly;
         clear_id_mapping();
 }
 
-/* SAVE2018 */
-
 void
 get_plname_from_file(nhfp, plbuf)
 NHFILE *nhfp;
@@ -1485,8 +1467,6 @@ char *plbuf;
     }
     return;
 }
-
-/* SAVE2018 */
 
 static void
 restore_msghistory(nhfp)

@@ -26,9 +26,6 @@ static void NDECL(mktemple);
 static coord *FDECL(shrine_pos, (int));
 static struct permonst *NDECL(morguemon);
 static struct permonst *NDECL(squadmon);
-/* SAVE2018 */
-/* static void FDECL(save_room, (int,struct mkroom *)); */
-/* static void FDECL(rest_room, (int,struct mkroom *)); */
 static void FDECL(save_room, (NHFILE *, struct mkroom *));
 static void FDECL(rest_room, (NHFILE *, struct mkroom *));
 

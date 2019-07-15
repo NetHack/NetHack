@@ -24,11 +24,6 @@ static int count_only;
 #define USE_BUFFERING
 #endif
 
-/*SAVE2018*/
-extern void FDECL(nhout, (int, const char *,
-                    const char *, int, genericptr_t, int));
-extern int NDECL(nhdatatypes_size);
-
 #ifdef MICRO
 int dotcnt, dotrow; /* also used in restore */
 #endif

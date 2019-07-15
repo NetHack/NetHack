@@ -535,8 +535,6 @@ NHFILE *nhfp;
     }
 }
 
-/* SAVE2018 */
-
 /*
  *  rest_worm()
  *
