@@ -718,19 +718,9 @@ nt_assert_failed(expression, filepath, line)
 {
     const char * filename;
 
+    /* get file name from path */
     filename = strrchr(filepath, '\\');
     filename = (filename == NULL ? filepath : filename + 1);
-
-    if (IsDebuggerPresent()) {
-        char message[BUFSIZ];
-        snprintf(message, sizeof(message), 
-            "nhassert(%s) failed in file '%s' at line %d",
-            expression, filename, line);
-        OutputDebugStringA(message);
-        DebugBreak();
-    }
-
-    /* get file name from path */
     impossible("nhassert(%s) failed in file '%s' at line %d",
                 expression, filename, line);
 }
