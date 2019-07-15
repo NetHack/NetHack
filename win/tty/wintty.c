@@ -2321,7 +2321,7 @@ boolean blocking; /* with ttys, all windows are blocking */
             more();
             ttyDisplay->toplin = TOPLINE_NEED_MORE; /* more resets this */
             tty_clear_nhwindow(window);
-            /* nhassert(ttyDisplay->toplin == TOPLINE_EMPTY); */
+            nhassert(ttyDisplay->toplin == TOPLINE_EMPTY);
         } else
             ttyDisplay->toplin = TOPLINE_EMPTY;
         cw->curx = cw->cury = 0;
@@ -2409,7 +2409,7 @@ winid window;
     case NHW_MESSAGE:
         if (ttyDisplay->toplin != TOPLINE_EMPTY)
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
-        /* nhassert(ttyDisplay->toplin == TOPLINE_EMPTY); */
+        nhassert(ttyDisplay->toplin == TOPLINE_EMPTY);
         /*FALLTHRU*/
     case NHW_STATUS:
     case NHW_BASE:
@@ -3164,7 +3164,7 @@ const char *mesg;
         more();
         ttyDisplay->toplin = TOPLINE_NEED_MORE; /* more resets this */
         tty_clear_nhwindow(WIN_MESSAGE);
-        /* nhassert(ttyDisplay->toplin == TOPLINE_EMPTY); */
+        nhassert(ttyDisplay->toplin == TOPLINE_EMPTY);
     }
     /* normally <ESC> means skip further messages, but in this case
        it means cancel the current prompt; any other messages should
