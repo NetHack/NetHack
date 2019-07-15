@@ -455,13 +455,6 @@ struct early_opt {
     boolean valallowed;
 };
 
-struct ptr_array {
-    size_t  length;
-    size_t  max_length;
-    void ** elements;
-};
-typedef struct ptr_array ptr_array_t;
-
 #undef E
 
 #endif /* DECL_H */
