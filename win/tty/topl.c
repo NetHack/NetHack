@@ -138,7 +138,7 @@ const char *str;
     end_glyphout(); /* in case message printed during graphics output */
     putsyms(str);
     cl_end();
-    ttyDisplay->toplin = TOPLINE_NEED_MORE;
+    ttyDisplay->toplin = 1;
     if (ttyDisplay->cury && otoplin != 3)
         more();
 }
@@ -151,7 +151,7 @@ const char *str;
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
     if (!(cw->flags & WIN_STOP)) {
-        if (ttyDisplay->cury && ttyDisplay->toplin == TOPLINE_NON_EMPTY)
+        if (ttyDisplay->cury && ttyDisplay->toplin == 2)
             tty_clear_nhwindow(WIN_MESSAGE);
 
         cw->curx = cw->cury = 0;
@@ -159,8 +159,8 @@ const char *str;
         cl_end();
         addtopl(str);
 
-        if (ttyDisplay->cury && ttyDisplay->toplin != TOPLINE_SPECIAL_PROMPT)
-            ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+        if (ttyDisplay->cury && ttyDisplay->toplin != 3)
+            ttyDisplay->toplin = 2;
     }
 }
 
@@ -196,7 +196,7 @@ const char *s;
     tty_curs(BASE_WINDOW, cw->curx + 1, cw->cury);
     putsyms(s);
     cl_end();
-    ttyDisplay->toplin = TOPLINE_NEED_MORE;
+    ttyDisplay->toplin = 1;
 }
 
 void
@@ -236,7 +236,7 @@ more()
         home();
         cl_end();
     }
-    ttyDisplay->toplin = TOPLINE_EMPTY;
+    ttyDisplay->toplin = 0;
     ttyDisplay->inmore = 0;
 }
 
@@ -252,7 +252,7 @@ register const char *bp;
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
     n0 = strlen(bp);
-    if ((ttyDisplay->toplin == TOPLINE_NEED_MORE || (cw->flags & WIN_STOP))
+    if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP))
         && cw->cury == 0
         && n0 + (int) strlen(toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
@@ -263,9 +263,9 @@ register const char *bp;
             addtopl(bp);
         return;
     } else if (!(cw->flags & WIN_STOP)) {
-        if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
+        if (ttyDisplay->toplin == 1) {
             more();
-        } else if (cw->cury) { /* for toplin == TOPLINE_NON_EMPTY && cury > 1 */
+        } else if (cw->cury) { /* for when flags.toplin == 2 && cury > 1 */
             docorner(1, cw->cury + 1); /* reset cury = 0 if redraw screen */
             cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n) */
         }
@@ -381,10 +381,10 @@ char def;
     char prompt[BUFSZ];
 
     yn_number = 0L;
-    if (ttyDisplay->toplin == TOPLINE_NEED_MORE && !(cw->flags & WIN_STOP))
+    if (ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP))
         more();
     cw->flags &= ~WIN_STOP;
-    ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
+    ttyDisplay->toplin = 3; /* special prompt state */
     ttyDisplay->inread++;
     if (resp) {
         char *rb, respbuf[QBUFSZ];
@@ -531,7 +531,7 @@ char def;
     dumplogmsg(toplines);
 #endif
     ttyDisplay->inread--;
-    ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+    ttyDisplay->toplin = 2;
     if (ttyDisplay->intr)
         ttyDisplay->intr--;
     if (wins[WIN_MESSAGE]->cury)

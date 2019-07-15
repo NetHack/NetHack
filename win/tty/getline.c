@@ -52,10 +52,10 @@ getlin_hook_proc hook;
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = 0;
 
-    if (ttyDisplay->toplin == TOPLINE_NEED_MORE && !(cw->flags & WIN_STOP))
+    if (ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP))
         more();
     cw->flags &= ~WIN_STOP;
-    ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
+    ttyDisplay->toplin = 3; /* special prompt state */
     ttyDisplay->inread++;
 
     /* issue the prompt */
@@ -193,7 +193,7 @@ getlin_hook_proc hook;
         } else
             tty_nhbell();
     }
-    ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+    ttyDisplay->toplin = 2; /* nonempty, no --More-- required */
     ttyDisplay->inread--;
     clear_nhwindow(WIN_MESSAGE); /* clean up after ourselves */
 
