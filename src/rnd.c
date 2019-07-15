@@ -62,7 +62,7 @@ rul()
     unsigned long value;
 
     value = (unsigned long) isaac64_next_uint64(&rnglist[CORE].rng_state);
-    fuzzer_log(LOG_VERBOSE, "RANDOM:%lu\n", value);
+    fuzzer_log(LOG_VERBOSE, "RANDOM:%llu\n", value);
 
     return value;
 }
