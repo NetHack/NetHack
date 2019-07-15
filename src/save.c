@@ -132,7 +132,7 @@ dosave0()
         return 0;
 #endif
 
-    HUP if (!iflags.debug_fuzzer && iflags.window_inited) {
+    HUP if (iflags.window_inited) {
         nh_uncompress(fq_save);
         nhfp = open_savefile();
         if (nhfp) {
@@ -1224,25 +1224,6 @@ NHFILE *nhfp;
                 sfo_str(nhfp, msg, "msghistory", "msg", msglen);
             }
             ++msgcount;
-        }
-        /* If the fuzzer is stopping and saving, save a seed as a message.
-           In 3.7, we will modify the save file format and save the seed
-           directly in the saved game state. */
-        if (iflags.fuzzer_saving) {
-            char message[BUFSIZ];
-            unsigned long seed = rul();
-
-            sprintf(message, "SEED:%ld:%lu", g.moves, seed);
-            fuzzer_log(LOG_MINIMAL, "STOP:%ld:%lu\n", g.moves, seed);
-            msglen = strlen(message);
-            if (nhfp->structlevel) {
-                bwrite(nhfp->fd, (genericptr_t) &msglen, sizeof msglen);
-                bwrite(nhfp->fd, (genericptr_t) message, msglen);
-	    }
-	    if (nhfp->fieldlevel) {
-	        sfo_int(nhfp, &msglen, "msghistory", "msghistory_length", 1);
-	        sfo_str(nhfp, message, "msghistory", "msg", msglen);
-	    }
         }
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &minusone, sizeof (int));

@@ -564,13 +564,9 @@ typedef unsigned char uchar;
    %N first character of player name
    DUMPLOG_FILE is not used if SYSCF is defined
 */
-#endif /* DUMPLOG_FILE */
+#endif
 
-#endif /* DUMPLOG */
-
-/* NEW_KEYBOARD_HIT adds new window proc to return whether keyboard has been hit
-   and character input is available */
-/* #define NEW_KEYBOARD_HIT */
+#endif
 
 #define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 

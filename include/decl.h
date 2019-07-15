@@ -470,17 +470,6 @@ struct early_opt {
     boolean valallowed;
 };
 
-struct ptr_array {
-    size_t  length;
-    size_t  max_length;
-    void ** elements;
-};
-typedef struct ptr_array ptr_array_t;
-
-/* logging verbosity levels */
-#define LOG_MINIMAL 0
-#define LOG_VERBOSE 1
-
 /* special key functions */
 enum nh_keyfunc {
     NHKF_ESC = 0,

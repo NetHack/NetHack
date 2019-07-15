@@ -28,10 +28,6 @@ E void FDECL(welcome, (BOOLEAN_P));
 E time_t NDECL(get_realtime);
 E int FDECL(argcheck, (int, char **, enum earlyarg));
 E void NDECL(early_init);
-E void NDECL(fuzzer_toggle);
-E void NDECL(fuzzer_check);
-E void NDECL(fuzzer_auto_start);
-E boolean FDECL(fuzzer_msg_history, (const char *));
 
 /* ### apply.c ### */
 
@@ -955,7 +951,6 @@ E boolean
 FDECL(fuzzymatch, (const char *, const char *, const char *, BOOLEAN_P));
 E void FDECL(init_random, (int FDECL((*fn), (int))));
 E void FDECL(reseed_random, (int FDECL((*fn), (int))));
-E void FDECL(set_random, (unsigned long, int FDECL((*fn), (int))));
 E time_t NDECL(getnow);
 E int NDECL(getyear);
 #if 0
@@ -974,8 +969,6 @@ E void FDECL(strbuf_append, (strbuf_t *, const char *));
 E void FDECL(strbuf_reserve, (strbuf_t *, int));
 E void FDECL(strbuf_empty, (strbuf_t *));
 E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
-E struct ptr_array * FDECL(ptr_array_new, (size_t length));
-E void FDECL(ptr_array_free, (struct ptr_array *));
 
 /* ### invent.c ### */
 
@@ -1151,9 +1144,6 @@ E void NDECL(gettty);
 E void NDECL(setftty);
 E void FDECL(settty, (const char *));
 E int NDECL(tgetch);
-#ifdef NEW_KEYBOARD_HIT
-E boolean NDECL(tkbhit);
-#endif
 E void FDECL(cmov, (int x, int y));
 E void FDECL(nocmov, (int x, int y));
 
@@ -1560,9 +1550,6 @@ E void FDECL(mplayer_talk, (struct monst *));
 
 #ifndef WIN32
 E int NDECL(tgetch);
-#ifdef NEW_KEYBOARD_HIT
-E boolean NDECL(tkbhit);
-#endif
 #endif
 #ifndef TOS
 E char NDECL(switchar);
@@ -1593,9 +1580,7 @@ E void FDECL(gotoxy, (int, int));
 #endif
 #ifdef TOS
 E int FDECL(_copyfile, (char *, char *));
-#ifndef NEW_KEYBOARD_HIT
 E int NDECL(kbhit);
-#endif
 E void NDECL(set_colors);
 E void NDECL(restore_colors);
 #ifdef SUSPEND
@@ -1605,9 +1590,7 @@ E int NDECL(dosuspend);
 #ifdef WIN32
 E char *FDECL(get_username, (int *));
 E void FDECL(nt_regularize, (char *));
-#ifndef NEW_KEYBOARD_HIT
 E int NDECL((*nt_kbhit));
-#endif
 E void FDECL(Delay, (int));
 #endif /* WIN32 */
 #endif /* MICRO || WIN32 */
@@ -1675,15 +1658,10 @@ E void FDECL(regex_free, (struct nhregex *));
 
 #ifdef WIN32
 E void NDECL(get_scr_size);
-#ifndef NEW_KEYBOARD_HIT
 E int NDECL(nttty_kbhit);
-#endif
 E void FDECL(nttty_open, (int));
 E void NDECL(nttty_rubout);
 E int NDECL(tgetch);
-#ifdef NEW_KEYBOARD_HIT
-E boolean NDECL(tkbhit);
-#endif
 E int FDECL(ntposkey, (int *, int *, int *));
 E void FDECL(set_output_mode, (int));
 E void NDECL(synch_cursor);
@@ -1938,10 +1916,6 @@ E void VDECL(verbalize, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(raw_printf, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(impossible, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(config_error_add, (const char *, ...)) PRINTF_F(1, 2);
-E void FDECL(nhassert_failed, (const char *, int));
-E void NDECL(fuzzer_start);
-E void NDECL(fuzzer_stop);
-E void VDECL(fuzzer_log, (int, const char *, ...)) PRINTF_F(2, 3);
 
 /* ### polyself.c ### */
 
@@ -2167,7 +2141,6 @@ E int FDECL(rnd, (int));
 E int FDECL(d, (int, int));
 E int FDECL(rne, (int));
 E int FDECL(rnz, (int));
-E unsigned long NDECL(rul);
 
 /* ### role.c ### */
 

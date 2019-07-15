@@ -138,8 +138,8 @@ const char *str;
     end_glyphout(); /* in case message printed during graphics output */
     putsyms(str);
     cl_end();
-    ttyDisplay->toplin = TOPLINE_NEED_MORE;
-    if (ttyDisplay->cury && otoplin != TOPLINE_SPECIAL_PROMPT)
+    ttyDisplay->toplin = 1;
+    if (ttyDisplay->cury && otoplin != 3)
         more();
 }
 
@@ -151,7 +151,7 @@ const char *str;
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
     if (!(cw->flags & WIN_STOP)) {
-        if (ttyDisplay->cury && ttyDisplay->toplin == TOPLINE_NON_EMPTY)
+        if (ttyDisplay->cury && ttyDisplay->toplin == 2)
             tty_clear_nhwindow(WIN_MESSAGE);
 
         cw->curx = cw->cury = 0;
@@ -159,8 +159,8 @@ const char *str;
         cl_end();
         addtopl(str);
 
-        if (ttyDisplay->cury && ttyDisplay->toplin != TOPLINE_SPECIAL_PROMPT)
-            ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+        if (ttyDisplay->cury && ttyDisplay->toplin != 3)
+            ttyDisplay->toplin = 2;
     }
 }
 
@@ -196,7 +196,7 @@ const char *s;
     tty_curs(BASE_WINDOW, cw->curx + 1, cw->cury);
     putsyms(s);
     cl_end();
-    ttyDisplay->toplin = TOPLINE_NEED_MORE;
+    ttyDisplay->toplin = 1;
 }
 
 void
@@ -204,14 +204,11 @@ more()
 {
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
+    /* avoid recursion -- only happens from interrupts */
+    if (ttyDisplay->inmore++)
+        return;
     if (iflags.debug_fuzzer)
         return;
-
-    /* avoid recursion -- only happens from interrupts */
-    if (ttyDisplay->inmore)
-        return;
-
-    ttyDisplay->inmore++;
 
     if (ttyDisplay->toplin) {
         tty_curs(BASE_WINDOW, cw->curx + 1, cw->cury);
@@ -239,7 +236,7 @@ more()
         home();
         cl_end();
     }
-    ttyDisplay->toplin = TOPLINE_EMPTY;
+    ttyDisplay->toplin = 0;
     ttyDisplay->inmore = 0;
 }
 
@@ -255,11 +252,10 @@ register const char *bp;
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
     n0 = strlen(bp);
-    if ((ttyDisplay->toplin == TOPLINE_NEED_MORE || (cw->flags & WIN_STOP))
+    if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP))
         && cw->cury == 0
         && n0 + (int) strlen(g.toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
-        /* nhassert((long) strlen(g.toplines) == cw->curx); */
         Strcat(g.toplines, "  ");
         Strcat(g.toplines, bp);
         cw->curx += 2;
@@ -267,9 +263,9 @@ register const char *bp;
             addtopl(bp);
         return;
     } else if (!(cw->flags & WIN_STOP)) {
-        if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
+        if (ttyDisplay->toplin == 1) {
             more();
-        } else if (cw->cury) { /* for toplin == TOPLINE_NON_EMPTY && cury > 1 */
+        } else if (cw->cury) { /* for when flags.toplin == 2 && cury > 1 */
             docorner(1, cw->cury + 1); /* reset cury = 0 if redraw screen */
             cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n) */
         }
@@ -313,7 +309,6 @@ char c;
         if (ttyDisplay->curx == 0 && ttyDisplay->cury > 0)
             tty_curs(BASE_WINDOW, CO, (int) ttyDisplay->cury - 1);
         backsp();
-        nhassert(ttyDisplay->curx > 0);
         ttyDisplay->curx--;
         cw->curx = ttyDisplay->curx;
         return;
@@ -386,10 +381,10 @@ char def;
     char prompt[BUFSZ];
 
     yn_number = 0L;
-    if (ttyDisplay->toplin == TOPLINE_NEED_MORE && !(cw->flags & WIN_STOP))
+    if (ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP))
         more();
     cw->flags &= ~WIN_STOP;
-    ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
+    ttyDisplay->toplin = 3; /* special prompt state */
     ttyDisplay->inread++;
     if (resp) {
         char *rb, respbuf[QBUFSZ];
@@ -536,7 +531,7 @@ char def;
     dumplogmsg(g.toplines);
 #endif
     ttyDisplay->inread--;
-    ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+    ttyDisplay->toplin = 2;
     if (ttyDisplay->intr)
         ttyDisplay->intr--;
     if (wins[WIN_MESSAGE]->cury)
@@ -545,64 +540,76 @@ char def;
     return q;
 }
 
-static ptr_array_t *
-get_message_history()
+/* shared by tty_getmsghistory() and tty_putmsghistory() */
+static char **snapshot_mesgs = 0;
+
+/* collect currently available message history data into a sequential array;
+   optionally, purge that data from the active circular buffer set as we go */
+static void
+msghistory_snapshot(purge)
+boolean purge; /* clear message history buffer as we copy it */
 {
     char *mesg;
-    int i;
+    int i, inidx, outidx;
     struct WinDesc *cw;
-    size_t max_length;
-    ptr_array_t * a;
-
-    nhassert(WIN_MESSAGE != WIN_ERR);
-    nhassert(wins[WIN_MESSAGE] != NULL);
 
     /* paranoia (too early or too late panic save attempt?) */
     if (WIN_MESSAGE == WIN_ERR || !wins[WIN_MESSAGE])
-        return NULL;
-
+        return;
     cw = wins[WIN_MESSAGE];
 
-    max_length = cw->rows;
+    /* flush g.toplines[], moving most recent message to history */
+    remember_topl();
 
-    if (*g.toplines) max_length++;
+    /* for a passive snapshot, we just copy pointers, so can't allow further
+       history updating to take place because that could clobber them */
+    if (!purge)
+        cw->flags |= WIN_LOCKHISTORY;
 
-    a = ptr_array_new(max_length);
-
-    nhassert(cw->maxrow <= cw->rows);
+    snapshot_mesgs = (char **) alloc((cw->rows + 1) * sizeof(char *));
+    outidx = 0;
+    inidx = cw->maxrow;
     for (i = 0; i < cw->rows; ++i) {
-        mesg = cw->data[(i + cw->maxrow) % cw->rows];
-        if (mesg && *mesg)
-            a->elements[a->length++] = strdup(mesg);
+        snapshot_mesgs[i] = (char *) 0;
+        mesg = cw->data[inidx];
+        if (mesg && *mesg) {
+            snapshot_mesgs[outidx++] = mesg;
+            if (purge) {
+                /* we're taking this pointer away; subsequest history
+                   updates will eventually allocate a new one to replace it */
+                cw->data[inidx] = (char *) 0;
+                cw->datlen[inidx] = 0;
+            }
+        }
+        inidx = (inidx + 1) % cw->rows;
     }
-    if (*g.toplines)
-        a->elements[a->length++] = strdup(g.toplines);
+    snapshot_mesgs[cw->rows] = (char *) 0; /* sentinel */
 
-    return a;
+    /* for a destructive snapshot, history is now completely empty */
+    if (purge)
+        cw->maxcol = cw->maxrow = 0;
 }
 
+/* release memory allocated to message history snapshot */
 static void
-purge_message_history()
+free_msghistory_snapshot(purged)
+boolean purged; /* True: took history's pointers, False: just cloned them */
 {
-    int i;
-    struct WinDesc *cw;
+    if (snapshot_mesgs) {
+        /* snapshot pointers are no longer in use */
+        if (purged) {
+            int i;
 
-    nhassert(WIN_MESSAGE != WIN_ERR);
-    nhassert(wins[WIN_MESSAGE] != NULL);
-
-    cw = wins[WIN_MESSAGE];
-
-    *g.toplines = '\0';
-
-    for (i = 0; i < cw->rows; ++i) {
-        if (cw->data[i]) {
-            free(cw->data[i]);
-            cw->data[i] = (char *) 0;
-            cw->datlen[i] = 0;
+            for (i = 0; snapshot_mesgs[i]; ++i)
+                free((genericptr_t) snapshot_mesgs[i]);
         }
-    }
 
-    cw->maxcol = cw->maxrow = 0;
+        free((genericptr_t) snapshot_mesgs), snapshot_mesgs = (char **) 0;
+
+        /* history can resume being updated at will now... */
+        if (!purged)
+            wins[WIN_MESSAGE]->flags &= ~WIN_LOCKHISTORY;
+    }
 }
 
 /*
@@ -619,25 +626,21 @@ char *
 tty_getmsghistory(init)
 boolean init;
 {
-    static size_t nxtidx;
-    static ptr_array_t * saved_messages = NULL;
-    char *result = NULL;
+    static int nxtidx;
+    char *nextmesg;
+    char *result = 0;
 
     if (init) {
-        nhassert(saved_messages == NULL);
-        saved_messages = get_message_history();
+        msghistory_snapshot(FALSE);
         nxtidx = 0;
-        wins[WIN_MESSAGE]->flags |= WIN_LOCKHISTORY;
     }
 
-    if (saved_messages) {
-        if (nxtidx < saved_messages->length)
-            result = saved_messages->elements[nxtidx++];
-
-        if (result == NULL) {
-            ptr_array_free(saved_messages);
-            saved_messages = NULL;
-            wins[WIN_MESSAGE]->flags &= ~WIN_LOCKHISTORY;
+    if (snapshot_mesgs) {
+        nextmesg = snapshot_mesgs[nxtidx++];
+        if (nextmesg) {
+            result = (char *) nextmesg;
+        } else {
+            free_msghistory_snapshot(FALSE);
         }
     }
     return result;
@@ -666,10 +669,7 @@ const char *msg;
 boolean restoring_msghist;
 {
     static boolean initd = FALSE;
-    static ptr_array_t * saved_messages = NULL;
-    size_t i;
-
-    nhassert(!(wins[WIN_MESSAGE]->flags & WIN_LOCKHISTORY));
+    int idx;
 
     if (restoring_msghist && !initd) {
         /* we're restoring history from the previous session, but new
@@ -677,9 +677,7 @@ boolean restoring_msghist;
            for instance); collect current history (ie, those new messages),
            and also clear it out so that nothing will be present when the
            restored ones are being put into place */
-        nhassert(saved_messages == NULL);
-        saved_messages = get_message_history();
-        purge_message_history();
+        msghistory_snapshot(TRUE);
         initd = TRUE;
 #ifdef DUMPLOG
         /* this suffices; there's no need to scrub saved_pline[] pointers */
@@ -688,52 +686,25 @@ boolean restoring_msghist;
     }
 
     if (msg) {
-        /* Caller is asking us to remember a top line that needed more.
-           Should we call more?  This can happen when the player has set
-           iflags.force_invmenu and they attempt to shoot with nothing in
-           the quiver. */
-        if (ttyDisplay && ttyDisplay->toplin == TOPLINE_NEED_MORE)
-            ttyDisplay->toplin = TOPLINE_NON_EMPTY;
-
         /* move most recent message to history, make this become most recent */
         remember_topl();
         Strcpy(g.toplines, msg);
 #ifdef DUMPLOG
         dumplogmsg(g.toplines);
 #endif
-        return;
-    }
-
-    /* tty_putmsghistory() is called with msg==NULL to indidate that
-     * we are finished restoring the message history.  If we saved
-     * some message history when we started, its time now to appened
-     * those saved messages.
-     *
-     * We don't otherwise expect to get called with msg==NULL.
-     *
-     */
-    nhassert(restoring_msghist && initd);
-
-    if (initd && restoring_msghist) {
-        if (saved_messages) {
-            nhassert(ttyDisplay == NULL ||
-                        ttyDisplay->toplin != TOPLINE_NEED_MORE);
-
-            for (i = 0; i < saved_messages->length; i++) {
-                const char * mesg = saved_messages->elements[i];
-                remember_topl();
-                nhassert(mesg);
-                Strcpy(g.toplines, mesg);
+    } else if (snapshot_mesgs) {
+        /* done putting arbitrary messages in; put the snapshot ones back */
+        for (idx = 0; snapshot_mesgs[idx]; ++idx) {
+            remember_topl();
+            Strcpy(g.toplines, snapshot_mesgs[idx]);
 #ifdef DUMPLOG
-                dumplogmsg(g.toplines);
+            dumplogmsg(g.toplines);
 #endif
-            }
-            ptr_array_free(saved_messages);
-            saved_messages = NULL;
-            }
-        initd = FALSE;
+        }
+        /* now release the snapshot */
+        free_msghistory_snapshot(TRUE);
+        initd = FALSE; /* reset */
     }
-
 }
 
 #endif /* TTY_GRAPHICS */
