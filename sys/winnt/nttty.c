@@ -475,14 +475,8 @@ int *x, *y, *mod;
     coord cc;
     DWORD count;
     really_move_cursor();
-    if (iflags.debug_fuzzer) {
-        int poskey = randomkey();
-        if (poskey == 0) {
-            *x = rn2(console.width);
-            *y = rn2(console.height);
-        }
-        return poskey;
-    }
+    if (iflags.debug_fuzzer)
+        return randomkey();
     ch = (program_state.done_hup)
              ? '\033'
              : keyboard_handler.pCheckInput(

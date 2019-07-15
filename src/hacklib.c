@@ -854,7 +854,7 @@ STATIC_DCL struct tm *NDECL(getlt);
 /* Sets the seed for the random number generator */
 #ifdef USE_ISAAC64
 
-void
+static void
 set_random(seed, fn)
 unsigned long seed;
 int FDECL((*fn), (int));
@@ -865,7 +865,7 @@ int FDECL((*fn), (int));
 #else /* USE_ISAAC64 */
 
 /*ARGSUSED*/
-void
+static void
 set_random(seed, fn)
 unsigned long seed;
 int FDECL((*fn), (int)) UNUSED;
@@ -917,7 +917,7 @@ int FDECL((*fn), (int));
 {
    /* only reseed if we are certain that the seed generation is unguessable
     * by the players. */
-    if (has_strong_rngseed && !iflags.debug_fuzzer)
+    if (has_strong_rngseed)
         init_random(fn);
 }
 
@@ -1108,9 +1108,6 @@ phase_of_the_moon() /* 0-7, with 0: new, 4: full */
     register struct tm *lt = getlt();
     register int epact, diy, goldn;
 
-    if(iflags.debug_fuzzer)
-        return rn2(8);
-
     diy = lt->tm_yday;
     goldn = (lt->tm_year % 19) + 1;
     epact = (11 * goldn + 18) % 30;
@@ -1124,9 +1121,6 @@ boolean
 friday_13th()
 {
     register struct tm *lt = getlt();
-
-    if(iflags.debug_fuzzer)
-        return rn2(30);
 
     /* tm_wday (day of week; 0==Sunday) == 5 => Friday */
     return (boolean) (lt->tm_wday == 5 && lt->tm_mday == 13);
