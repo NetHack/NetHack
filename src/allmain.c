@@ -4,7 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* various code that was replicated in *main.c */
-#define NEED_VARARGS
+
 #include "hack.h"
 #include <ctype.h>
 
