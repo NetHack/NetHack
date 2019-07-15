@@ -36,12 +36,6 @@ extern void msmsg(const char *, ...);
 #endif
 #endif
 
-#ifdef NEW_KEYBOARD_HIT
-#if defined(UNIX)
-#include <fcntl.h>
-#endif
-#endif
-
 #ifdef TTY_TILES_ESCCODES
 extern short glyph2tile[];
 #define TILE_ANSI_COMMAND 'z'
@@ -139,9 +133,6 @@ struct window_procs tty_procs = {
     genl_status_update,
 #endif
     genl_can_suspend_yes,
-#ifdef NEW_KEYBOARD_HIT
-    tty_keyboard_hit
-#endif
 };
 
 static int maxwin = 0; /* number of windows in use */
@@ -3488,7 +3479,6 @@ const char *str;
 #endif
 }
 
-#ifndef NEW_KEYBOARD_HIT
 int
 tty_nhgetch()
 {
@@ -3543,93 +3533,6 @@ tty_nhgetch()
 #endif /* TTY_TILES_ESCCODES */
     return i;
 }
-#else /* NEW_KEYBOARD_HIT */
-#ifdef UNIX
-static boolean stdin_non_blocking = FALSE;
-
-int
-tgetch()
-{
-    static volatile int nesting = 0;
-    int i;
-    char nestbuf;
-
-    if (stdin_non_blocking) {
-        fcntl(0, F_SETFL, fcntl(0, F_GETFL) & ~O_NONBLOCK);
-        stdin_non_blocking = FALSE;
-    }
-
-    /* kludge alert: Some Unix variants return funny values if getc()
-     * is called, interrupted, and then called again.  There
-     * is non-reentrant code in the internal _filbuf() routine, called by
-     * getc().
-     */
-   i = (++nesting == 1)
-          ? getchar()
-          : (read(fileno(stdin), (genericptr_t) &nestbuf, 1) == 1)
-              ? (int) nestbuf : EOF;
-    --nesting;
-
-    return i;
-}
-
-boolean
-tkbhit()
-{
-    int i;
-    if (!stdin_non_blocking) {
-        fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
-        stdin_non_blocking = TRUE;
-    }
-    i = getchar();
-    if (i != EOF) ungetc(i, stdin);
-    return (i != EOF);
- }
-#endif
-
-int
-tty_nhgetch()
-{
-    int i;
-    HUPSKIP_RESULT('\033');
-    print_vt_code1(AVTC_INLINE_SYNC);
-    (void) fflush(stdout);
-    /* Note: if raw_print() and wait_synch() get called to report terminal
-     * initialization problems, then wins[] and ttyDisplay might not be
-     * available yet.  Such problems will probably be fatal before we get
-     * here, but validate those pointers just in case...
-     */
-    if (WIN_MESSAGE != WIN_ERR && wins[WIN_MESSAGE])
-        wins[WIN_MESSAGE]->flags &= ~WIN_STOP;
-    if (iflags.debug_fuzzer) {
-        i = randomkey();
-    } else {
-        i = tgetch();
-    }
-    if (!i)
-        i = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
-    else if (i == EOF)
-        i = '\033'; /* same for EOF */
-    if (ttyDisplay && ttyDisplay->toplin == 1)
-        ttyDisplay->toplin = 2;
-#ifdef TTY_TILES_ESCCODES
-    {
-        /* hack to force output of the window select code */
-        int tmp = vt_tile_current_window;
-
-        vt_tile_current_window++;
-        print_vt_code2(AVTC_SELECT_WINDOW, tmp);
-    }
-#endif /* TTY_TILES_ESCCODES */
-    return i;
-}
-
-boolean tty_keyboard_hit()
-{
-    /* tgetch provider needs to also provide tkbhit() */
-    return tkbhit();
-}
-#endif /* NEW_KEYBOARD_HIT */
 
 /*
  * return a key, or 0, in which case a mouse button was pressed

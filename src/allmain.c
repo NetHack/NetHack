@@ -374,11 +374,7 @@ boolean resuming;
         if (multi >= 0 && occupation) {
 #if defined(MICRO) || defined(WIN32)
             abort_lev = 0;
-#ifdef NEW_KEYBOARD_HIT
-            if (keyboard_hit()) {
-#else
             if (kbhit()) {
-#endif
                 if ((ch = pgetchar()) == ABORT)
                     abort_lev++;
                 else

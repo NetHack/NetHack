@@ -247,10 +247,6 @@ E void FDECL(genl_outrip, (winid, int, time_t));
 E char *FDECL(tty_getmsghistory, (BOOLEAN_P));
 E void FDECL(tty_putmsghistory, (const char *, BOOLEAN_P));
 
-#ifdef NEW_KEYBOARD_HIT
-E boolean NDECL(tty_keyboard_hit);
-#endif
-
 #ifdef NO_TERMS
 #ifdef MAC
 #ifdef putchar

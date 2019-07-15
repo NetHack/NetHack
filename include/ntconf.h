@@ -252,11 +252,8 @@ int _RTLENTRY _EXPFUNC read(int __handle, void _FAR *__buf, unsigned __len);
 #ifndef CURSES_GRAPHICS
 #include <conio.h>      /* conflicting definitions with curses.h */
 #endif
-
-#ifndef NEW_KEYBOARD_HIT
 #undef kbhit /* Use our special NT kbhit */
 #define kbhit (*nt_kbhit)
-#endif
 
 #ifdef LAN_FEATURES
 #define MAX_LAN_USERNAME 20
