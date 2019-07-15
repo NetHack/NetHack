@@ -17,6 +17,8 @@
 STATIC_DCL void FDECL(redotoplin, (const char *));
 STATIC_DCL void FDECL(topl_putsym, (CHAR_P));
 STATIC_DCL void FDECL(removetopl, (int));
+STATIC_DCL void FDECL(msghistory_snapshot, (BOOLEAN_P));
+STATIC_DCL void FDECL(free_msghistory_snapshot, (BOOLEAN_P));
 
 int
 tty_doprev_message()
@@ -541,6 +543,78 @@ char def;
         tty_clear_nhwindow(WIN_MESSAGE);
 
     return q;
+}
+
+/* shared by tty_getmsghistory() and tty_putmsghistory() */
+static char **snapshot_mesgs = 0;
+
+/* collect currently available message history data into a sequential array;
+   optionally, purge that data from the active circular buffer set as we go */
+STATIC_OVL void
+msghistory_snapshot(purge)
+boolean purge; /* clear message history buffer as we copy it */
+{
+    char *mesg;
+    int i, inidx, outidx;
+    struct WinDesc *cw;
+
+    /* paranoia (too early or too late panic save attempt?) */
+    if (WIN_MESSAGE == WIN_ERR || !wins[WIN_MESSAGE])
+        return;
+    cw = wins[WIN_MESSAGE];
+
+    /* flush toplines[], moving most recent message to history */
+    remember_topl();
+
+    /* for a passive snapshot, we just copy pointers, so can't allow further
+       history updating to take place because that could clobber them */
+    if (!purge)
+        cw->flags |= WIN_LOCKHISTORY;
+
+    snapshot_mesgs = (char **) alloc((cw->rows + 1) * sizeof(char *));
+    outidx = 0;
+    inidx = cw->maxrow;
+    for (i = 0; i < cw->rows; ++i) {
+        snapshot_mesgs[i] = (char *) 0;
+        mesg = cw->data[inidx];
+        if (mesg && *mesg) {
+            snapshot_mesgs[outidx++] = mesg;
+            if (purge) {
+                /* we're taking this pointer away; subsequest history
+                   updates will eventually allocate a new one to replace it */
+                cw->data[inidx] = (char *) 0;
+                cw->datlen[inidx] = 0;
+            }
+        }
+        inidx = (inidx + 1) % cw->rows;
+    }
+    snapshot_mesgs[cw->rows] = (char *) 0; /* sentinel */
+
+    /* for a destructive snapshot, history is now completely empty */
+    if (purge)
+        cw->maxcol = cw->maxrow = 0;
+}
+
+/* release memory allocated to message history snapshot */
+STATIC_OVL void
+free_msghistory_snapshot(purged)
+boolean purged; /* True: took history's pointers, False: just cloned them */
+{
+    if (snapshot_mesgs) {
+        /* snapshot pointers are no longer in use */
+        if (purged) {
+            int i;
+
+            for (i = 0; snapshot_mesgs[i]; ++i)
+                free((genericptr_t) snapshot_mesgs[i]);
+        }
+
+        free((genericptr_t) snapshot_mesgs), snapshot_mesgs = (char **) 0;
+
+        /* history can resume being updated at will now... */
+        if (!purged)
+            wins[WIN_MESSAGE]->flags &= ~WIN_LOCKHISTORY;
+    }
 }
 
 STATIC_OVL ptr_array_t *
