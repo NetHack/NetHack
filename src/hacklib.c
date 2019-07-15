@@ -854,7 +854,7 @@ STATIC_DCL struct tm *NDECL(getlt);
 /* Sets the seed for the random number generator */
 #ifdef USE_ISAAC64
 
-void
+static void
 set_random(seed, fn)
 unsigned long seed;
 int FDECL((*fn), (int));
@@ -865,7 +865,7 @@ int FDECL((*fn), (int));
 #else /* USE_ISAAC64 */
 
 /*ARGSUSED*/
-void
+static void
 set_random(seed, fn)
 unsigned long seed;
 int FDECL((*fn), (int)) UNUSED;
@@ -917,7 +917,7 @@ int FDECL((*fn), (int));
 {
    /* only reseed if we are certain that the seed generation is unguessable
     * by the players. */
-    if (has_strong_rngseed && !iflags.debug_fuzzer)
+    if (has_strong_rngseed)
         init_random(fn);
 }
 
@@ -1108,9 +1108,6 @@ phase_of_the_moon() /* 0-7, with 0: new, 4: full */
     register struct tm *lt = getlt();
     register int epact, diy, goldn;
 
-    if(iflags.debug_fuzzer)
-        return rn2(8);
-
     diy = lt->tm_yday;
     goldn = (lt->tm_year % 19) + 1;
     epact = (11 * goldn + 18) % 30;
@@ -1125,9 +1122,6 @@ friday_13th()
 {
     register struct tm *lt = getlt();
 
-    if(iflags.debug_fuzzer)
-        return rn2(30);
-
     /* tm_wday (day of week; 0==Sunday) == 5 => Friday */
     return (boolean) (lt->tm_wday == 5 && lt->tm_mday == 13);
 }
@@ -1135,8 +1129,7 @@ friday_13th()
 int
 night()
 {
-    register int hour = (iflags.debug_fuzzer ? (g.moves / 1000) % 24 :
-                                               getlt()->tm_hour);
+    register int hour = getlt()->tm_hour;
 
     return (hour < 6 || hour > 21);
 }
@@ -1144,10 +1137,7 @@ night()
 int
 midnight()
 {
-    register int hour = (iflags.debug_fuzzer ? (g.moves / 1000) % 24 :
-                                               getlt()->tm_hour);
-
-    return (hour == 0);
+    return (getlt()->tm_hour == 0);
 }
 
 /* strbuf_init() initializes strbuf state for use */
@@ -1227,40 +1217,6 @@ strbuf_t *strbuf;
                 }
         }
     }
-}
-
-ptr_array_t *
-ptr_array_new(max_length)
-    size_t max_length;
-{
-    size_t esize = max_length * sizeof(void *);
-    ptr_array_t * a = (ptr_array_t *) malloc(sizeof(ptr_array_t) + esize);
-    a->elements = (void **)(a + 1);
-    a->length = 0;
-    a->max_length = max_length;
-    memset(a->elements, 0, esize);
-    return a;
-}
-
-void
-ptr_array_free(a)
-    ptr_array_t * a;
-{
-    size_t i;
-
-    nhassert(a->length <= a->max_length);
-
-    for(i = 0; i < a->length; i++)
-        if(a->elements[i])
-            free(a->elements[i]);
-
-    for (i = a->length; i < a->max_length; i++) {
-        nhassert(a->elements[i] == NULL);
-        if(a->elements[i])
-            free(a->elements[i]);
-    }
-
-    free(a);
 }
 
 /*hacklib.c*/

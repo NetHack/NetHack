@@ -56,7 +56,6 @@ extern void NDECL(backsp);
 int NDECL(windows_console_custom_nhgetch);
 extern void NDECL(safe_routines);
 
-#ifndef NEW_KEYBOARD_HIT
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
  * For the tty port it is tty_kbhit() [from nttty.c]
@@ -66,7 +65,6 @@ extern void NDECL(safe_routines);
 
 int def_kbhit(void);
 int (*nt_kbhit)() = def_kbhit;
-#endif
 
 char
 switchar()
@@ -160,13 +158,11 @@ max_filename()
         return 0;
 }
 
-#ifndef NEW_KEYBOARD_HIT
 int
 def_kbhit()
 {
     return 0;
 }
-#endif
 
 /*
  * Strip out troublesome file system characters.
@@ -475,6 +471,23 @@ char *buf;
 }
 #endif /* RUNTIME_PORT_ID */
 
+/* nhassert_failed is called when an nhassert's condition is false */
+void nhassert_failed(const char * exp, const char * file, int line)
+{
+    char message[128];
+    _snprintf(message, sizeof(message),
+                "NHASSERT(%s) in '%s' at line %d\n", exp, file, line);
+
+    if (IsDebuggerPresent()) {
+        OutputDebugStringA(message);
+        DebugBreak();
+    }
+
+    // strip off the newline
+    message[strlen(message) - 1] = '\0';
+    error(message);
+}
+
 void
 nethack_exit(code)
 int code;
@@ -499,9 +512,7 @@ int code;
     exit(code);
 }
 
-#ifndef NEW_KEYBOARD_HIT
 #undef kbhit
-#endif
 #include <conio.h>
 
 int
@@ -709,32 +720,6 @@ sys_random_seed(VOID_ARGS)
         ourseed = (unsigned long) datetime;
     }
     return ourseed;
-}
-
-/* nt_assert_failed is called when an nhassert's condition is false */
-void
-nt_assert_failed(expression, filepath, line)
-    const char * expression;
-    const char * filepath;
-    int line;
-{
-    const char * filename;
-
-    filename = strrchr(filepath, '\\');
-    filename = (filename == NULL ? filepath : filename + 1);
-
-    if (IsDebuggerPresent()) {
-        char message[BUFSIZ];
-        snprintf(message, sizeof(message), 
-            "nhassert(%s) failed in file '%s' at line %d",
-            expression, filename, line);
-        OutputDebugStringA(message);
-        DebugBreak();
-    }
-
-    /* get file name from path */
-    impossible("nhassert(%s) failed in file '%s' at line %d",
-                expression, filename, line);
 }
 
 #endif /* WIN32 */

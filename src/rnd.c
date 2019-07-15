@@ -56,21 +56,10 @@ int FDECL((*fn), (int));
                  (int) sizeof seed);
 }
 
-unsigned long
-rul()
-{
-    unsigned long value;
-
-    value = (unsigned long) isaac64_next_uint64(&rnglist[CORE].rng_state);
-    fuzzer_log(LOG_VERBOSE, "RANDOM:%lu\n", value);
-
-    return value;
-}
-
 static int
 RND(int x)
 {
-    return (rul() % x);
+    return (isaac64_next_uint64(&rnglist[CORE].rng_state) % x);
 }
 
 /* 0 <= rn2(x) < x, but on a different sequence from the "main" rn2;
@@ -80,8 +69,6 @@ int
 rn2_on_display_rng(x)
 register int x;
 {
-    if (iflags.debug_fuzzer)
-        return rn2(x);
     return (isaac64_next_uint64(&rnglist[DISP].rng_state) % x);
 }
 
@@ -106,20 +93,6 @@ register int x;
     static unsigned seed = 1;
     seed *= 2739110765;
     return (int)((seed >> 16) % (unsigned)x);
-}
-
-unsigned long
-rul()
-{
-#if defined(LINT) && defined(UNIX)
-    return (unsigned long) rand();
-#else /* LINT */
-#if defined(UNIX) || defined(RANDOM)
-    return (unsigned long) Rand();
-#else
-    return (unsigned long) (Rand() >> 3);
-#endif /* defined(UNIX) || defined(RANDOM) */
-#endif /* LINT */
 }
 #endif  /* USE_ISAAC64 */
 

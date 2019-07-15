@@ -305,9 +305,7 @@
 
 #define HLOCK "perm" /* an empty file used for locking purposes */
 
-#ifndef NEW_KEYBOARD_HIT
 #define tgetch getchar
-#endif
 
 #ifndef NOSHELL
 #define SHELL /* do not delete the '!' command */

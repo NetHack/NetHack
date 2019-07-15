@@ -116,9 +116,6 @@ struct window_procs mswin_procs = {
     mswin_status_init, mswin_status_finish, mswin_status_enablefield,
     mswin_status_update,
     genl_can_suspend_yes,
-#ifdef NEW_KEYBOARD_HIT
-    mswin_keyboard_hit
-#endif
 };
 
 /*
@@ -1404,15 +1401,6 @@ mswin_nhgetch()
     key = event->kbd.ch;
     return (key);
 }
-
-#ifdef NEW_KEYBOARD_HIT
-/* boolean keyboard_hit() -- returns TRUE if input is available */
-boolean
-mswin_keyboard_hit()
-{
-    return mswin_have_input() != 0;
-}
-#endif
 
 /*
 int nh_poskey(int *x, int *y, int *mod)

@@ -337,7 +337,7 @@ attempt_restore:
             resuming = TRUE; /* not starting new game */
             if (discover)
                 You("are in non-scoring discovery mode.");
-            if ((discover || wizard) && !iflags.fuzzer_auto_start) {
+            if (discover || wizard) {
                 if (yn("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
                 else {
@@ -461,23 +461,6 @@ char *argv[];
             break;
         case 'X':
             discover = TRUE, wizard = FALSE;
-            break;
-        case 'F':
-            {
-                iflags.fuzzer_auto_start = 1;
-
-                if (argc > 1 && argv[1][0] != '-') {
-                    argc--;
-                    argv++;
-                    iflags.fuzzer_stop_and_save = atoi(*argv);
-
-                    if (argc > 1 && argv[1][0] != '-') {
-                        argc--;
-                        argv++;
-                        iflags.verbose_logging_start = atoi(*argv);
-                    }
-                }
-            }
             break;
 #ifdef NEWS
         case 'n':

@@ -521,9 +521,6 @@ static void NDECL(hup_void_ndecl);
 static void FDECL(hup_void_fdecl_int, (int));
 static void FDECL(hup_void_fdecl_winid, (winid));
 static void FDECL(hup_void_fdecl_constchar_p, (const char *));
-#ifdef NEW_KEYBOARD_HIT
-static boolean NDECL(hup_keyboard_hit);
-#endif
 
 static struct window_procs hup_procs = {
     "hup", 0L, 0L, hup_init_nhwindows,
@@ -571,9 +568,6 @@ static struct window_procs hup_procs = {
     hup_void_ndecl,                                   /* status_finish */
     genl_status_enablefield, hup_status_update,
     genl_can_suspend_no,
-#ifdef NEW_KEYBOARD_HIT
-    hup_keyboard_hit
-#endif
 };
 
 static void FDECL((*previnterface_exit_nhwindows), (const char *)) = 0;
@@ -627,14 +621,6 @@ hup_nhgetch(VOID_ARGS)
 {
     return '\033'; /* ESC */
 }
-
-#ifdef NEW_KEYBOARD_HIT
-static boolean
-hup_keyboard_hit(VOID_ARGS)
-{
-    return FALSE;
-}
-#endif
 
 /*ARGSUSED*/
 static char

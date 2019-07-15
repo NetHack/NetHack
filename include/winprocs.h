@@ -79,9 +79,6 @@ struct window_procs {
                (int, const char *, const char *, BOOLEAN_P));
     void FDECL((*win_status_update), (int, genericptr_t, int, int, int, unsigned long *));
     boolean NDECL((*win_can_suspend));
-#ifdef NEW_KEYBOARD_HIT
-    boolean NDECL((*win_keyboard_hit));
-#endif
 };
 
 extern
@@ -163,9 +160,6 @@ extern
  */
 #define status_enablefield (*windowprocs.win_status_enablefield)
 #define status_update (*windowprocs.win_status_update)
-#ifdef NEW_KEYBOARD_HIT
-#define keyboard_hit (*windowprocs.win_keyboard_hit)
-#endif
 
 /*
  * WINCAP
@@ -385,9 +379,6 @@ struct chain_procs {
                (CARGS, int, const char *, const char *, BOOLEAN_P));
     void FDECL((*win_status_update), (CARGS, int, genericptr_t, int, int, int, unsigned long *));
     boolean FDECL((*win_can_suspend), (CARGS));
-#ifdef NEW_KEYBOARD_HIT
-    boolean FDECL((*keyboard_hit), (CARGS));
-#endif
 };
 #endif /* WINCHAIN */
 
@@ -458,9 +449,6 @@ extern void FDECL(safe_status_enablefield,
                     (int, const char *, const char *, BOOLEAN_P));
 extern void FDECL(safe_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 extern boolean NDECL(safe_can_suspend);
-#ifdef NEW_KEYBOARD_HIT
-extern boolean NDECL(safe_keyboard_hit);
-#endif
 extern void FDECL(stdio_raw_print, (const char *));
 extern void FDECL(stdio_raw_print_bold, (const char *));
 extern void NDECL(stdio_wait_synch);

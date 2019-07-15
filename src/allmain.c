@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* various code that was replicated in *main.c */
+
 #include "hack.h"
 #include <ctype.h>
 
@@ -378,11 +379,7 @@ boolean resuming;
         if (g.multi >= 0 && g.occupation) {
 #if defined(MICRO) || defined(WIN32)
             abort_lev = 0;
-#ifdef NEW_KEYBOARD_HIT
-            if (keyboard_hit()) {
-#else
             if (kbhit()) {
-#endif
                 if ((ch = pgetchar()) == ABORT)
                     abort_lev++;
                 else
@@ -440,8 +437,6 @@ boolean resuming;
 #ifdef MAIL
             ckmailstatus();
 #endif
-            fuzzer_check();
-
             rhack((char *) 0);
         }
         if (u.utotype)       /* change dungeon level */
@@ -588,8 +583,6 @@ void
 newgame()
 {
     int i;
-
-    fuzzer_auto_start();
 
 #ifdef MFLOPPY
     gameDiskPrompt();
@@ -929,79 +922,5 @@ const char *opts;
         iflags.debug.immediateflips = negated ? FALSE : TRUE;
 #endif
     return;
-}
-
-/* fuzzer_toggle() toggles fuzzer state */
-void
-fuzzer_toggle()
-{
-    if (iflags.debug_fuzzer)
-        fuzzer_stop();
-    else
-        fuzzer_start();
-}
-
-/* fuzzer_check() is called prior to rhack(0) to allow the fuzzer to
- * check if it should stop and to allow it to reseed the game.
- */
-void
-fuzzer_check()
-{
-    if (iflags.debug_fuzzer)
-    {
-        unsigned long seed;
-        if (g.moves >= iflags.fuzzer_stop_and_save) {
-            iflags.fuzzer_saving = TRUE;
-            dosave0();
-            exit_nhwindows("Goodbye from the fuzzer...");
-            fuzzer_stop();
-            nh_terminate(EXIT_SUCCESS);
-        }
-
-        seed = rul();
-        set_random(seed, rn2);
-        fuzzer_log(LOG_MINIMAL, "SEED:%ld:%lu\n", g.moves, seed);
-
-    }
-}
-
-/* fuzzer_auto_start is called when creating a new game to allow
- * the fuzzer to start itself.
- */
-void
-fuzzer_auto_start()
-{
-    if (iflags.fuzzer_auto_start) {
-        unsigned long seed;
-        nhassert(!iflags.debug_fuzzer);
-        fuzzer_start();
-        seed = rul();
-        set_random(seed, rn2);
-        fuzzer_log(LOG_MINIMAL, "START:%ld:%lu\n", g.moves, seed);
-    }
-}
-
-/* fuzzer_msg_history is called during save file recovery to allow
- * the fuzzer to snoop the messages being recovered.  The fuzzer
- * saves a seed as a message in save files and this is the mechanism
- * used to recover that seed if the fuzzer is being auto started.
- */
-boolean
-fuzzer_msg_history(msg)
-    const char * msg;
-{
-    long saved_moves;
-    unsigned long saved_seed;
-    if (sscanf(msg, "SEED:%ld:%lu", &saved_moves, &saved_seed) == 2) {
-        nhassert(saved_moves == g.moves);
-        if (iflags.fuzzer_auto_start) {
-            fuzzer_start();
-            set_random(saved_seed, rn2);
-            fuzzer_log(LOG_MINIMAL, "START:%ld:%lu\n", g.moves, saved_seed);
-        }
-        return TRUE;
-    }
-
-    return FALSE;
 }
 /*allmain.c*/
