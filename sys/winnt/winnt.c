@@ -478,11 +478,18 @@ char *buf;
 /* nhassert_failed is called when an nhassert's condition is false */
 void nhassert_failed(const char * exp, const char * file, int line)
 {
-    char message[BUFSZ];
-    snprintf(message, sizeof(message),
-                "NHASSERT(%s) in '%s' at line %d", exp, file, line);
+    char message[128];
+    _snprintf(message, sizeof(message),
+                "NHASSERT(%s) in '%s' at line %d\n", exp, file, line);
 
-    impossible(message);
+    if (IsDebuggerPresent()) {
+        OutputDebugStringA(message);
+        DebugBreak();
+    }
+
+    // strip off the newline
+    message[strlen(message) - 1] = '\0';
+    error(message);
 }
 
 void
