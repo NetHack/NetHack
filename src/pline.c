@@ -582,10 +582,4 @@ VA_DECL(const char *, str)
 #endif
 }
 
-/* nhassert_failed is called when an nhassert's condition is false */
-void nhassert_failed(const char * exp, const char * file, int line)
-{
-    impossible("NHASSERT(%s) in '%s' at line %d", exp, file, line);
-}
-
 /*pline.c*/
