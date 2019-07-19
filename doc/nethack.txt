@@ -71,7 +71,7 @@ DESCRIPTION
        the first three letters of the profession (this can also  be  specified
        using  a  separate -p profession option).  "rrr" are at least the first
        three letters of the character's race (this can also be specified using
-       a  separate -r race option).  "aaa" are at last the first three letters
+       a separate -r race option).  "aaa" are at least the first three letters
        of the character's alignment, and "ggg" are at least  the  first  three
        letters  of the character's gender.  Any of the parts of the suffix may
        be left out.
