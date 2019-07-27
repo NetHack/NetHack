@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	timeout.h	$NHDT-Date: 1564269131 2019/07/27 23:12:11 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $ */
 /* Copyright 1994, Dean Luick					  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,10 +10,11 @@ typedef void FDECL((*timeout_proc), (ANY_P *, long));
 
 /* kind of timer */
 enum timer_type {
-    TIMER_LEVEL = 0,   /* event specific to level */
-    TIMER_GLOBAL,  /* event follows current play */
-    TIMER_OBJECT,  /* event follows a object */
-    TIMER_MONSTER /* event follows a monster */
+    TIMER_LEVEL = 0,   /* event specific to level [melting ice] */
+    TIMER_GLOBAL = 1,  /* event follows current play [not used] */
+    TIMER_OBJECT = 2,  /* event follows an object [various] */
+    TIMER_MONSTER = 3, /* event follows a monster [not used] */
+    NUM_TIMER_KINDS    /* 4 */
 };
 
 /* save/restore timer ranges */
