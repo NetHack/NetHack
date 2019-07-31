@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1542765360 2018/11/21 01:56:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1564608121 2019/07/31 21:22:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -183,7 +183,10 @@ struct obj *otmp, *mwep;
         /* Elven Craftsmanship makes for light, quick bows */
         if (otmp->otyp == ELVEN_ARROW && !otmp->cursed)
             multishot++;
-        if (ammo_and_launcher(otmp, uwep) && mwep->otyp == ELVEN_BOW
+        /* for arrow, we checked bow&arrow at start of block, but for
+           bow, so far we've only validated that otmp is a weapon stack;
+           need to verify that it's a stack of arrows rather than darts */
+        if (mwep->otyp == ELVEN_BOW && ammo_and_launcher(otmp, mwep)
             && !mwep->cursed)
             multishot++;
         /* 1/3 of launcher enchantment */
