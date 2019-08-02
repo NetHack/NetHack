@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.97 $ $NHDT-Date: 1564608120 2019/07/31 21:22:00 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.98 $ $NHDT-Date: 1564767725 2019/08/02 17:42:05 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -128,6 +128,8 @@ fix for feedback when a monster plays a fire horn at self to cure green slime
 	ended up being used for zapping a wand of fire at self too
 wizard mode ^I "not carrying anything" still claimed "not carrying anything"
 	if "(all items are already identified)" was given
+monster throwing from stack of missiles (darts, daggers, spears) would cause
+	crash if it wasn't wielding a weapon (bug in multi-shot shooting fix)
 curses: sometimes the message window would show a blank line after a prompt
 curses: the change to show map in columns 1..79 instead of 2..80 made the
 	highlight for '@' show up in the wrong place if clipped map had been
