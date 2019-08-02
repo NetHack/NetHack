@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1561336020 2019/06/24 00:27:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1564771880 2019/08/02 18:51:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1450,6 +1450,9 @@ register struct obj *obj;
                                            dndest.nhx, dndest.nhy)));
 
     if (flooreffects(obj, tx, ty, "fall")) {
+        /* update old location since flooreffects() couldn't;
+           unblock_point() for boulder handled by obj_extract_self() */
+        newsym(otx, oty);
         return FALSE;
     } else if (otx == 0 && oty == 0) {
         ; /* fell through a trap door; no update of old loc needed */
@@ -1466,6 +1469,7 @@ register struct obj *obj;
         newsym(otx, oty); /* update old location */
     }
     place_object(obj, tx, ty);
+    /* note: block_point() for boulder handled by place_object() */
     newsym(tx, ty);
     return TRUE;
 }
