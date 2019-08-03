@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.94 $ $NHDT-Date: 1562838835 2019/07/11 09:53:55 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.99 $ $NHDT-Date: 1564771880 2019/08/02 18:51:20 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -105,6 +105,16 @@ when farlook describes a monster at a visible spot as trapped, reveal the trap
 fix theft when poly'd into nymph form; 3.6.2 change made that anger the victim
 hero poly'd into nymph would steal gold along with other items
 change wizard mode #panic to require "yes" if 'paranoid_confirm:quit' is set
+add some additional validation checks when setting up a new timer (triggered
+	by an ancient source comment rather than by any observed problems)
+if a chaotic monk or wizard gets crowned and is given a spellbook rather than
+	Stormbringer as the crowning gift, don't describe the hero as having
+	been "chosen to steal souls for [Arioch's] glory"
+for multi-shot shooting by monsters, a typo checked hero's weapon for
+	compatibility with ammo when monster was wielding an elven bow
+when a boulder was teleported, if it landed in a pit or trap door or hole its
+	former location wasn't updated to show that it wasn't there anymore
+	(noticed in Sokoban but not limited to there)
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -121,6 +131,8 @@ fix for feedback when a monster plays a fire horn at self to cure green slime
 	ended up being used for zapping a wand of fire at self too
 wizard mode ^I "not carrying anything" still claimed "not carrying anything"
 	if "(all items are already identified)" was given
+monster throwing from stack of missiles (darts, daggers, spears) would cause
+	crash if it wasn't wielding a weapon (bug in multi-shot shooting fix)
 curses: sometimes the message window would show a blank line after a prompt
 curses: the change to show map in columns 1..79 instead of 2..80 made the
 	highlight for '@' show up in the wrong place if clipped map had been
