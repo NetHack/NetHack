@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1562838823 2019/07/11 09:53:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.340 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1565287308 2019/08/08 18:01:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.342 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5848,7 +5848,7 @@ end_of_input()
 #ifdef NOSAVEONHANGUP
 #ifdef INSURANCE
     if (flags.ins_chkpt && program_state.something_worth_saving)
-        program_statue.preserve_locks = 1; /* keep files for recovery */
+        program_state.preserve_locks = 1; /* keep files for recovery */
 #endif
     program_state.something_worth_saving = 0; /* don't save */
 #endif
