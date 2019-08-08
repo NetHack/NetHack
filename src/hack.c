@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1559664951 2019/06/04 16:15:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.213 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1565288730 2019/08/08 18:25:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2641,9 +2641,9 @@ dopickup(VOID_ARGS)
               ? multi + 1 : 0;
     multi = 0; /* always reset */
 
-    if ((ret = pickup_checks() >= 0))
+    if ((ret = pickup_checks()) >= 0) {
         return ret;
-    else if (ret == -2) {
+    } else if (ret == -2) {
         tmpcount = -count;
         return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
     } /* else ret == -1 */
