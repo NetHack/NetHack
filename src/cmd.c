@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1565287308 2019/08/08 18:01:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.342 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1565574994 2019/08/12 01:56:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.343 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2333,26 +2333,50 @@ int final;
         youhiding(TRUE, final);
 
     /* internal troubles, mostly in the order that prayer ranks them */
-    if (Stoned)
-        you_are("turning to stone", "");
-    if (Slimed)
-        you_are("turning into slime", "");
+    if (Stoned) {
+        if (final && (Stoned & I_SPECIAL))
+            enlght_out(" You turned into stone.");
+        else
+            you_are("turning to stone", "");
+    }
+    if (Slimed) {
+        if (final && (Slimed & I_SPECIAL))
+            enlght_out(" You turned into slime.");
+        else
+            you_are("turning into slime", "");
+    }
     if (Strangled) {
         if (u.uburied) {
             you_are("buried", "");
         } else {
-            Strcpy(buf, "being strangled");
-            if (wizard)
-                Sprintf(eos(buf), " (%ld)", (Strangled & TIMEOUT));
-            you_are(buf, from_what(STRANGLED));
+            if (final && (Strangled & I_SPECIAL)) {
+                enlght_out(" You died from strangulation.");
+            } else {
+                Strcpy(buf, "being strangled");
+                if (wizard)
+                    Sprintf(eos(buf), " (%ld)", (Strangled & TIMEOUT));
+                you_are(buf, from_what(STRANGLED));
+            }
         }
     }
     if (Sick) {
-        /* prayer lumps these together; botl puts Ill before FoodPois */
-        if (u.usick_type & SICK_NONVOMITABLE)
-            you_are("terminally sick from illness", "");
-        if (u.usick_type & SICK_VOMITABLE)
-            you_are("terminally sick from food poisoning", "");
+        /* the two types of sickness are lumped together; hero can be
+           afflicted by both but there is only one timeout; botl status
+           puts TermIll before FoodPois and death due to timeout reports
+           terminal illness if both are in effect, so do the same here */
+        if (final && (Sick & I_SPECIAL)) {
+            Sprintf(buf, " %sdied from %s.", You_, /* has trailing space */
+                    (u.usick_type & SICK_NONVOMITABLE)
+                    ? "terminal illness" : "food poisoning");
+            enlght_out(buf);
+        } else {
+            /* unlike death due to sickness, report the two cases separately
+               because it is possible to cure one without curing the other */
+            if (u.usick_type & SICK_NONVOMITABLE)
+                you_are("terminally sick from illness", "");
+            if (u.usick_type & SICK_VOMITABLE)
+                you_are("terminally sick from food poisoning", "");
+        }
     }
     if (Vomiting)
         you_are("nauseated", "");

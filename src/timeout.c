@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1564269133 2019/07/27 23:12:13 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1565574996 2019/08/12 01:56:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,6 +12,8 @@ STATIC_DCL void NDECL(choke_dialogue);
 STATIC_DCL void NDECL(levitation_dialogue);
 STATIC_DCL void NDECL(slime_dialogue);
 STATIC_DCL void FDECL(slimed_to_death, (struct kinfo *));
+STATIC_DCL void NDECL(phaze_dialogue);
+STATIC_DCL void FDECL(done_timeout, (int, int));
 STATIC_DCL void NDECL(slip_or_trip);
 STATIC_DCL void FDECL(see_lamp_flicker, (struct obj *, const char *));
 STATIC_DCL void FDECL(lantern_message, (struct obj *));
@@ -406,7 +408,7 @@ struct kinfo *kptr;
     /* become a green slime; also resets youmonst.m_ap_type+.mappearance */
     (void) polymon(PM_GREEN_SLIME);
     mvitals[PM_GREEN_SLIME].mvflags = save_mvflags;
-    done(TURNED_SLIME);
+    done_timeout(TURNED_SLIME, SLIMED);
 
     /* life-saved; even so, hero still has turned into green slime;
        player may have genocided green slimes after being infected */
@@ -425,7 +427,7 @@ struct kinfo *kptr;
             /* follows "The medallion crumbles to dust." */
             pline("Unfortunately, %s", slimebuf);
         /* die again; no possibility of amulet this time */
-        done(GENOCIDED);
+        done(GENOCIDED); /* [should it be done_timeout(GENOCIDED, SLIMED)?] */
         /* could be life-saved again (only in explore or wizard mode)
            but green slimes are gone; just stay in current form */
     }
@@ -454,6 +456,23 @@ phaze_dialogue()
 
     if (((HPasses_walls & TIMEOUT) % 2L) && i > 0L && i <= SIZE(phaze_texts))
         pline1(phaze_texts[SIZE(phaze_texts) - i]);
+}
+
+/* when a status timeout is fatal, keep the status line indicator shown
+   during end of game rundown (and potential dumplog);
+   timeout has already counted down to 0 by the time we get here */
+STATIC_OVL void
+done_timeout(how, which)
+int how, which;
+{
+    long *intrinsic_p = &u.uprops[which].intrinsic;
+
+    *intrinsic_p |= I_SPECIAL; /* affects final disclosure */
+    done(how);
+
+    /* life-saved */
+    *intrinsic_p &= ~I_SPECIAL;
+    context.botl = TRUE;
 }
 
 void
@@ -541,10 +560,10 @@ nh_timeout()
                 }
                 dealloc_killer(kptr);
                 /* (unlike sliming, you aren't changing form here) */
-                done(STONING);
+                done_timeout(STONING, STONED);
                 break;
             case SLIMED:
-                slimed_to_death(kptr); /* done(TURNED_SLIME) */
+                slimed_to_death(kptr); /* done_timeout(TURNED_SLIME,SLIMED) */
                 break;
             case VOMITING:
                 make_vomiting(0L, TRUE);
@@ -568,8 +587,8 @@ nh_timeout()
                         killer.format = KILLED_BY;
                     }
                 }
+                done_timeout(POISONING, SICK);
                 u.usick_type = 0;
-                done(POISONING);
                 break;
             case FAST:
                 if (!Very_fast)
@@ -672,7 +691,7 @@ nh_timeout()
                 killer.format = KILLED_BY;
                 Strcpy(killer.name,
                        (u.uburied) ? "suffocation" : "strangulation");
-                done(DIED);
+                done_timeout(DIED, STRANGLED);
                 /* must be declining to die in explore|wizard mode;
                    treat like being cured of strangulation by prayer */
                 if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
