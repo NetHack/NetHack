@@ -13,6 +13,7 @@ static void NDECL(vomiting_dialogue);
 static void NDECL(choke_dialogue);
 static void NDECL(levitation_dialogue);
 static void NDECL(slime_dialogue);
+static void FDECL(slimed_to_death, (struct kinfo *));
 static void NDECL(phaze_dialogue);
 static void FDECL(done_timeout, (int, int));
 static void NDECL(slip_or_trip);
