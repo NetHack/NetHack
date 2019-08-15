@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.102 $ $NHDT-Date: 1565574993 2019/08/12 01:56:33 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.103 $ $NHDT-Date: 1565833748 2019/08/15 01:49:08 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -120,6 +120,11 @@ fix typo in end_of_input() present since 3.6.0 that would prevent compilation
 	for NOSAVEONHANGUP+INSURANCE configuration
 when a status condition becomes fatal, keep it listed as an active condition
 	during disclosure and/or dumplog rather than having it already reset
+when a shape-shifted sandestin was turned to stone, it died and reverted to
+	sandestin form with 0 HP; that confused known_hitum() because
+	sandestins are immune to stoning; net result was monster dying twice,
+	triggering "dmonsfree: N removed doesn't match N+1 pending" warning;
+	instead of dying, make it revert to sandestin form with full health
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
