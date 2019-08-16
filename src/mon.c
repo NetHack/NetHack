@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1560791350 2019/06/17 17:09:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.294 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1565833749 2019/08/15 01:49:09 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1361,8 +1361,8 @@ long flag;
             thrudoor = TRUE;
     }
 
-nexttry: /* eels prefer the water, but if there is no water nearby,
-            they will crawl over land */
+ nexttry: /* eels prefer the water, but if there is no water nearby,
+             they will crawl over land */
     if (mon->mconf) {
         flag |= ALLOW_ALL;
         flag &= ~NOTONL;
@@ -2183,7 +2183,9 @@ struct monst *mdef;
     xchar x = mdef->mx, y = mdef->my;
     boolean wasinside = FALSE;
 
-    if (!vamp_stone(mdef)) /* vampshifter reverts to vampire */
+    /* vampshifter reverts to vampire;
+       3.6.3: also used to unshift shape-changed sandestin */
+    if (!vamp_stone(mdef))
         return;
 
     /* we have to make the statue before calling mondead, to be able to
@@ -2452,7 +2454,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     /* monster is gone, corpse or other object might now be visible */
     newsym(x, y);
 
-cleanup:
+ cleanup:
     /* punish bad behaviour */
     if (is_human(mdat)
         && (!always_hostile(mdat) && mtmp->malign <= 0)
@@ -2586,6 +2588,18 @@ struct monst *mtmp;
             newsym(mtmp->mx, mtmp->my);
             return FALSE;   /* didn't petrify */
         }
+    } else if (mtmp->cham >= LOW_PM
+               && (mons[mtmp->cham].mresists & MR_STONE)) {
+        /* sandestins are stoning-immune so if hit by stoning damage
+           they revert to innate shape rather than become a statue */
+        mtmp->mcanmove = 1;
+        mtmp->mfrozen = 0;
+        if (mtmp->mhpmax <= 0)
+            mtmp->mhpmax = 10;
+        mtmp->mhp = mtmp->mhpmax;
+        (void) newcham(mtmp, &mons[mtmp->cham], FALSE, TRUE);
+        newsym(mtmp->mx, mtmp->my);
+        return FALSE;   /* didn't petrify */
     }
     return TRUE;
 }
@@ -2686,7 +2700,7 @@ struct monst *mon;
             mtmp->mstate |= MON_OBLITERATE;
             mongone(mtmp);
             /* places in the code might still reference mtmp->mx, mtmp->my */
-            /* mtmp->mx = mtmp->my = 0; */ 
+            /* mtmp->mx = mtmp->my = 0; */
             rloc_to(mon, mx, my);           /* note: mon, not mtmp */
 
         /* last resort - migrate mon to the next plane */
