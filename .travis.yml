@@ -12,6 +12,12 @@ matrix:
     - os: linux
       env: HINTS=linux-x11
       compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
     - os: linux
       env: HINTS=linux-qt5
@@ -19,6 +25,9 @@ matrix:
       addons:
         apt:
           packages:
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
             - qtbase5-dev
             - qtmultimedia5-dev
             - qtbase5-dev-tools
