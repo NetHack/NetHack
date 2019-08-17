@@ -6,7 +6,7 @@ matrix:
       compiler: gcc
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
     - os: linux
-      env: DESCR=linux-xenial-gcc HINTS=linux
+      env: DESCR=linux-xenial-clang HINTS=linux
       compiler: clang
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
     - os: linux
