@@ -18,7 +18,7 @@ VARDIR = $(HACKDIR)
 
 
 POSTINSTALL= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
-POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir -x .lev);
 
 CFLAGS=-g -O -I../include -DNOTPARMDECL
 CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
