@@ -1400,7 +1400,7 @@ movebubbles()
     struct bubble *b;
     struct container *cons;
     struct trap *btrap;
-    int x, y, i, j, bcpin;
+    int x, y, i, j, bcpin = 0;
 
     /* set up the portal the first time bubbles are moved */
     if (!wportal)
