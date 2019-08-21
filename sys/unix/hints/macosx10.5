@@ -1,11 +1,12 @@
 #
-# NetHack 3.6  macosx10.5 $NHDT-Date: 1546082882 2018/12/29 11:28:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $
+# NetHack 3.6  macosx10.5 $NHDT-Date: 1566346606 2019/08/21 00:16:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.32 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009.
 # NetHack may be freely redistributed.  See license for details.
 #
 #-PRE
 # Mac OS X (Darwin) hints file
-# This is for Mac OS X 10.5.3 (Darwin 9.3).  If this doesn't work for some
+# This is for Mac OS X 10.5 (Darwin 9.3) and also 10.6.
+# If this doesn't work for some
 # other version of either Darwin or Mac OS X, make a new file for that OS,
 # don't change this one.  And let us know about it.
 # Useful info: http://www.opensource.apple.com/darwinsource/index.html
@@ -78,7 +79,7 @@ endif	# !WANT_WIN_TTY
 ifdef WANT_WIN_X11
 WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
-POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; ( cd $(INSTDIR); mkfontdir -x .lev );
 CFLAGS += -DX11_GRAPHICS
 ifdef USE_XPM
 CFLAGS += -DUSE_XPM
@@ -176,7 +177,7 @@ VARFILEPERM = 0600
 VARDIRPERM = 0700
 ifdef WANT_WIN_X11
 # install nethack.rc as ~/.nethackrc if no ~/.nethackrc exists
-PREINSTALL= cp -n win/X11/nethack.rc ~/.nethackrc
+PREINSTALL= cp -n win/X11/nethack.rc ~/.nethackrc || true
 endif	# WANT_WIN_X11
 POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
