@@ -2909,7 +2909,7 @@ const char *msg_override;
            if life-saved while poly'd and Unchanging (explore or wizard mode
            declining to die since can't be both Unchanging and Lifesaved) */
         if (Upolyd && !strncmpi(nomovemsg, "You survived that ", 18))
-            You("are %s", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
+            You("are %s.", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
     }
     nomovemsg = 0;
     u.usleep = 0;
