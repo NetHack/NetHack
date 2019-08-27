@@ -471,11 +471,11 @@ struct obj *otmp UNUSED;
         "**FR33 P0T10N 0F FULL H34L1NG**",
         "Please return to sender (Asmodeus)",
      "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!",
-        "Invitation: Visit the NetHack web site at http://www.nethack.org!"
+        "Invitation: Visit the NetHack web site at " DEVTEAM_URL
     };
 
     /* XXX replace with more general substitution code and add local
-     * contact message.  Also use DEVTEAM_URL */
+     * contact message.*/
     if (junk[0] == NULL) {
 #define BUGS_FORMAT "Report bugs to <%s>."
         /* +2 from '%s' suffices as substitute for usual +1 for terminator */
