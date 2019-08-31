@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.104 $ $NHDT-Date: 1567213888 2019/08/31 01:11:28 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.105 $ $NHDT-Date: 1567240693 2019/08/31 08:38:13 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -127,6 +127,12 @@ when a shape-shifted sandestin was turned to stone, it died and reverted to
 	instead of dying, make it revert to sandestin form with full health
 toggling perm_invent (where supported) while swallowed or underwater didn't
 	necessarily update the persistent inventory window right away
+have 'O' update persistent inventory window if 'implicit_uncursed',
+	'menucolors', or 'guicolors' (curses) is toggled or if menucolors is
+	On and any menu color patterns are added or removed
+'O's "set <option> to what?" could be used to force a buffer overflow
+'O's response to bad 'statuslines' value said "must be 2 and 3" (at one point
+	it was "must be between 2 and 3", change it to "must be 2 or 3")
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -162,6 +168,9 @@ EDIT_GETLIN: wizard mode 'monpolycontrol' was using the getlin() answer buffer
 	what kind of monster?" prompt, resulting in "<x,y>" as default answer
 EDIT_GETLIN: when naming an object or a monster use the existing name, if
 	there is one, as the default answer
+EDIT_GETLIN: using 'O' to set message types or menu colors was overloading the
+	answer buffer with other stuff, resulting in bogus default response
+	during repeat prompting
 curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
 	but 0-9 should be reserved for counts and if the display was tall
 	enough for more than 62 entries, arbitrary ASCII punctuation got used
