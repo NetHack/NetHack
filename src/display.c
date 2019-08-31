@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1560085863 2019/06/09 13:11:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1567213890 2019/08/31 01:11:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1368,15 +1368,15 @@ docrt()
 
     if (u.uswallow) {
         swallowed(1);
-        return;
+        goto post_map;
     }
     if (Underwater && !Is_waterlevel(&u.uz)) {
         under_water(1);
-        return;
+        goto post_map;
     }
     if (u.uburied) {
         under_ground(1);
-        return;
+        goto post_map;
     }
 
     /* shut down vision */
@@ -1402,6 +1402,8 @@ docrt()
 
     /* overlay with monsters */
     see_monsters();
+
+ post_map:
 
     /* perm_invent */
     update_inventory();

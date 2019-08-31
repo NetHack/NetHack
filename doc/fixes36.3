@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.103 $ $NHDT-Date: 1565833748 2019/08/15 01:49:08 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.104 $ $NHDT-Date: 1567213888 2019/08/31 01:11:28 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -125,6 +125,8 @@ when a shape-shifted sandestin was turned to stone, it died and reverted to
 	sandestins are immune to stoning; net result was monster dying twice,
 	triggering "dmonsfree: N removed doesn't match N+1 pending" warning;
 	instead of dying, make it revert to sandestin form with full health
+toggling perm_invent (where supported) while swallowed or underwater didn't
+	necessarily update the persistent inventory window right away
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -214,6 +216,9 @@ curses+'perm_invent': if too many entries for window height, last one which
 curses+'perm_invent': top line was wasted (left blank) when borders Off
 curses+'perm_invent': don't highlight inventory letters since nothing is
 	selectable from the menu comprising the persistent inventory window
+curses+'perm_invent': could crash during restore if game was saved while
+	hero was swallowed (invalid u.ustuck pointer; suppressing attempts to
+	update persistent inventory window during restore hides the problem)
 curses+'popup_dialog': show the text cursor at the end of prompts for single
 	character input
 curses+DUMPLOG: pass along old messages from save file and quest message
