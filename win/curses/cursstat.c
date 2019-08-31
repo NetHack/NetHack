@@ -907,7 +907,7 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
 {
 #ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
-    int coloridx;
+    int coloridx = 0;
 #endif
 #endif /* STATUS_HILITES */
     int k, bar_pos;

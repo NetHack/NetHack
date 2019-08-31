@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1562203850 2019/07/04 01:30:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.261 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1567213892 2019/08/31 01:11:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.262 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2391,6 +2391,26 @@ learn_unseen_invent()
          */
     }
     update_inventory();
+}
+
+/* persistent inventory window is maintained by interface code;
+   'update_inventory' used to be a macro for
+   (*windowprocs.win_update_inventory) but the restore hackery
+   was getting out of hand; this is now a central call point */
+void
+update_inventory()
+{
+    if (restoring)
+        return;
+
+    /*
+     * Ought to check (windowprocs.wincap2 & WC2_PERM_INVENT) here....
+     *
+     * We currently don't skip this call when iflags.perm_invent is False
+     * because curses uses that to disable a previous perm_invent window
+     * (after toggle via 'O'; perhaps the options code should handle that).
+     */
+    (*windowprocs.win_update_inventory)();
 }
 
 /* should of course only be called for things in invent */

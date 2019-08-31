@@ -4815,7 +4815,7 @@ void
 globby_bill_fixup(obj_absorber, obj_absorbed)
 struct obj *obj_absorber, *obj_absorbed;
 {
-    int x, y;
+    int x = 0, y = 0;
     struct bill_x *bp, *bp_absorber = (struct bill_x *) 0;
     struct monst *shkp = 0;
     struct eshk *eshkp;
