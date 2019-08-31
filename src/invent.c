@@ -2400,7 +2400,7 @@ learn_unseen_invent()
 void
 update_inventory()
 {
-    if (restoring)
+    if (g.restoring)
         return;
 
     /*
