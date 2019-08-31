@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.105 $ $NHDT-Date: 1567240693 2019/08/31 08:38:13 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.106 $ $NHDT-Date: 1567273590 2019/08/31 17:46:30 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -155,6 +155,10 @@ curses: sometimes the message window would show a blank line after a prompt
 curses: the change to show map in columns 1..79 instead of 2..80 made the
 	highlight for '@' show up in the wrong place if clipped map had been
 	panned horizontally
+curses+'perm_invent': menu coloring patterns which match ordinary inventory
+	menu might fail to match persistent inventory window because leading
+	article and space ("a ", "an ", "the ") is stripped off for brevity;
+	perform the pattern matching tests before stripping doname() prefix
 tty: revert the attempt to fix "message line anomaly: if autodecribe feedback
 	wrapped to second line, the wrapped portion wasn't erased when a
 	shorter line was shown or getpos was dismissed" because it disrupted
@@ -228,6 +232,8 @@ curses+'perm_invent': don't highlight inventory letters since nothing is
 curses+'perm_invent': could crash during restore if game was saved while
 	hero was swallowed (invalid u.ustuck pointer; suppressing attempts to
 	update persistent inventory window during restore hides the problem)
+curses+'perm_invent': menu coloring required that both 'menucolors' and
+	'guicolor' be On; override guicolor with more-specific menucolors
 curses+'popup_dialog': show the text cursor at the end of prompts for single
 	character input
 curses+DUMPLOG: pass along old messages from save file and quest message

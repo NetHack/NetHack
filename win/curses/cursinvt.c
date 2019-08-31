@@ -60,8 +60,9 @@ curses_add_inv(int y,
                CHAR_P accelerator, attr_t attr, const char *str)
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
+    boolean save_guicolor;
     int color = NO_COLOR;
-    int x = 0, width, height, available_width,
+    int x = 0, width, height, available_width, stroffset = 0,
         border = curses_window_has_border(INV_WIN) ? 1 : 0;
 
     /* Figure out where to draw the line */
@@ -101,19 +102,22 @@ curses_add_inv(int y,
            persistent inventory window so don't highlight inventory letters */
         wprintw(win, "%c) ", accelerator);
 #endif
-        available_width -= 3;
+        available_width -= 3; /* letter+parenthesis+space */
 
         /* narrow the entries to fit more of the interesting text; do so
            unconditionally rather than trying to figure whether it's needed;
            when 'sortpack' is enabled we could also strip out "<class> of"
            from "<prefix><class> of <item><suffix> but if that's to be done,
-           core ought to do it */
+           core ought to do it;
+           'stroffset': defer skipping the article prefix until after menu
+           color pattern matching has taken place so that the persistent
+           inventory window always gets same coloring as regular inventory */
         if (!strncmpi(str, "a ", 2))
-            str += 2;
+            stroffset = 2;
         else if (!strncmpi(str, "an ", 3))
-            str += 3;
+            stroffset = 3;
         else if (!strncmpi(str, "the ", 4))
-            str +=4;
+            stroffset = 4;
     }
 #if 0 /* FIXME: MENU GLYPHS */
     if (accelerator && glyph != NO_GLYPH && iflags.use_menu_glyphs) {
@@ -138,10 +142,16 @@ curses_add_inv(int y,
     }
     if (color == NO_COLOR)
         color = NONE;
+    /* curses_toggle_color_attr() uses 'guicolor' to decide whether to
+       honor specified color, but persistent inventory window has its own
+       more-specific control, 'menucolors', so override with that here */
+    save_guicolor = iflags.wc2_guicolor;
+    iflags.wc2_guicolor = iflags.use_menu_color;
     curses_toggle_color_attr(win, color, attr, ON);
     /* wattron(win, attr); */
-    wprintw(win, "%.*s", available_width, str);
+    wprintw(win, "%.*s", available_width, str + stroffset);
     /* wattroff(win, attr); */
     curses_toggle_color_attr(win, color, attr, OFF);
+    iflags.wc2_guicolor = save_guicolor;
     wclrtoeol(win);
 }
