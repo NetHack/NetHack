@@ -60,7 +60,6 @@ curses_add_inv(int y,
                CHAR_P accelerator, attr_t attr, const char *str)
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
-    boolean save_guicolor;
     int color = NO_COLOR;
     int x = 0, width, height, available_width, stroffset = 0,
         border = curses_window_has_border(INV_WIN) ? 1 : 0;
@@ -142,16 +141,8 @@ curses_add_inv(int y,
     }
     if (color == NO_COLOR)
         color = NONE;
-    /* curses_toggle_color_attr() uses 'guicolor' to decide whether to
-       honor specified color, but persistent inventory window has its own
-       more-specific control, 'menucolors', so override with that here */
-    save_guicolor = iflags.wc2_guicolor;
-    iflags.wc2_guicolor = iflags.use_menu_color;
-    curses_toggle_color_attr(win, color, attr, ON);
-    /* wattron(win, attr); */
+    curses_menu_color_attr(win, color, attr, ON);
     wprintw(win, "%.*s", available_width, str + stroffset);
-    /* wattroff(win, attr); */
-    curses_toggle_color_attr(win, color, attr, OFF);
-    iflags.wc2_guicolor = save_guicolor;
+    curses_menu_color_attr(win, color, attr, OFF);
     wclrtoeol(win);
 }
