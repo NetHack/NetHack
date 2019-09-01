@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1561682566 2019/06/28 00:42:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.367 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1567240693 2019/08/31 08:38:13 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.369 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3681,7 +3681,7 @@ boolean tinitial, tfrom_file;
             itmp = atoi(op);
         }
         if (itmp < 2 || itmp > 3) {
-            config_error_add("'%s' requires a value of 2 and 3", fullname);
+            config_error_add("'%s' requires a value of 2 or 3", fullname);
             retval = FALSE;
         } else {
             iflags.wc2_statuslines = itmp;
@@ -4010,11 +4010,11 @@ boolean tinitial, tfrom_file;
                     status_initialize(REASSESS_ONLY);
                 g.context.botl = TRUE;
             } else if (boolopt[i].addr == &flags.invlet_constant
-                       || boolopt[i].addr == &flags.sortpack) {
+                       || boolopt[i].addr == &flags.sortpack
+                       || boolopt[i].addr == &iflags.implicit_uncursed) {
                 if (!flags.invlet_constant)
                     reassign();
-                if (iflags.perm_invent)
-                    update_inventory();
+                update_inventory();
             } else if (boolopt[i].addr == &flags.lit_corridor
                        || boolopt[i].addr == &flags.dark_room) {
                 /*
@@ -4065,6 +4065,9 @@ boolean tinitial, tfrom_file;
                         set_colors();
                 }
 #endif
+            } else if (boolopt[i].addr == &iflags.use_menu_color
+                       || boolopt[i].addr == &iflags.wc2_guicolor) {
+                update_inventory();
 #endif /* TEXTCOLOR */
             }
             return retval;
@@ -4381,7 +4384,7 @@ int
 doset() /* changing options via menu by Per Liboriussen */
 {
     static boolean made_fmtstr = FALSE;
-    char buf[BUFSZ], buf2[BUFSZ] = DUMMY;
+    char buf[BUFSZ];
     const char *name;
     int i = 0, pass, boolcount, pick_cnt, pick_idx, opt_indx;
     boolean *bool_p;
@@ -4556,11 +4559,16 @@ doset() /* changing options via menu by Per Liboriussen */
 
                 if (!special_handling(compopt[opt_indx].name, setinitial,
                                       fromfile)) {
+                    char abuf[BUFSZ];
+
                     Sprintf(buf, "Set %s to what?", compopt[opt_indx].name);
-                    getlin(buf, buf2);
-                    if (buf2[0] == '\033')
+                    abuf[0] = '\0';
+                    getlin(buf, abuf);
+                    if (abuf[0] == '\033')
                         continue;
-                    Sprintf(buf, "%s:%s", compopt[opt_indx].name, buf2);
+                    Sprintf(buf, "%s:", compopt[opt_indx].name);
+                    (void) strncat(eos(buf), abuf,
+                                   (sizeof buf - 1 - strlen(buf)));
                     /* pass the buck */
                     (void) parseoptions(buf, setinitial, fromfile);
                 }
@@ -5061,7 +5069,7 @@ boolean setinitial, setfromfile;
             iflags.menu_headings = mhattr;
     } else if (!strcmp("msgtype", optname)) {
         int opt_idx, nmt, mttyp;
-        char mtbuf[BUFSZ] = DUMMY;
+        char mtbuf[BUFSZ];
 
  msgtypes_again:
         nmt = msgtype_count();
@@ -5069,6 +5077,7 @@ boolean setinitial, setfromfile;
         if (opt_idx == 3) { /* done */
             return TRUE;
         } else if (opt_idx == 0) { /* add new */
+            mtbuf[0] = '\0';
             getlin("What new message pattern?", mtbuf);
             if (*mtbuf == '\033')
                 return TRUE;
@@ -5123,18 +5132,29 @@ boolean setinitial, setfromfile;
         }
     } else if (!strcmp("menu_colors", optname)) {
         int opt_idx, nmc, mcclr, mcattr;
-        char mcbuf[BUFSZ] = DUMMY;
+        char mcbuf[BUFSZ];
 
  menucolors_again:
         nmc = count_menucolors();
         opt_idx = handle_add_list_remove("menucolor", nmc);
         if (opt_idx == 3) { /* done */
  menucolors_done:
-            if (nmc > 0 && !iflags.use_menu_color)
+            /* in case we've made a change which impacts current persistent
+               inventory window; we don't track whether an actual changed
+               occurred, so just assume there was one and that it matters;
+               if we're wrong, a redundant update is cheap... */
+            if (iflags.use_menu_color)
+                update_inventory();
+
+            /* menu colors aren't being used; if any are defined, remind
+               player how to use them */
+            else if (nmc > 0)
                 pline(
     "To have menu colors become active, toggle 'menucolors' option to True.");
             return TRUE;
+
         } else if (opt_idx == 0) { /* add new */
+            mcbuf[0] = '\0';
             getlin("What new menucolor pattern?", mcbuf);
             if (*mcbuf == '\033')
                 goto menucolors_done;
@@ -5147,6 +5167,7 @@ boolean setinitial, setfromfile;
                 wait_synch();
             }
             goto menucolors_again;
+
         } else { /* list (1) or remove (2) */
             int pick_idx, pick_cnt;
             int mc_idx;
