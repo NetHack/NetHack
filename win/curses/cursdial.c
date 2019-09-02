@@ -1185,21 +1185,20 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
             start_col += 2;
         }
 #endif
-        if (iflags.use_menu_color
-            && (menu_color = get_menu_coloring(menu_item_ptr->str,
-                                               &color, &attr)) != 0) {
-            if (color != NO_COLOR) {
-                curses_toggle_color_attr(win, color, NONE, ON);
-            }
+        color = NO_COLOR;
+        menu_color = iflags.use_menu_color
+                     && get_menu_coloring(menu_item_ptr->str, &color, &attr);
+        if (menu_color) {
             attr = curses_convert_attr(attr);
-            if (attr != A_NORMAL) {
-                menu_item_ptr->attr = menu_item_ptr->attr | attr;
-            }
+            if (color != NO_COLOR || attr != A_NORMAL)
+                curses_menu_color_attr(win, color, attr, ON);
+        } else {
+            attr = menu_item_ptr->attr;
+            if (color != NO_COLOR || attr != A_NORMAL)
+                curses_toggle_color_attr(win, color, attr, ON);
         }
-        curses_toggle_color_attr(win, NONE, menu_item_ptr->attr, ON);
 
         num_lines = curses_num_lines(menu_item_ptr->str, entry_cols);
-
         for (count = 0; count < num_lines; count++) {
             if (menu_item_ptr->str && *menu_item_ptr->str) {
                 tmpstr = curses_break_str(menu_item_ptr->str,
@@ -1209,10 +1208,13 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
                 free(tmpstr);
             }
         }
-        if (menu_color && (color != NO_COLOR)) {
-            curses_toggle_color_attr(win, color, NONE, OFF);
+        if (color != NO_COLOR || attr != A_NORMAL) {
+            if (menu_color)
+                curses_menu_color_attr(win, color, attr, OFF);
+            else
+                curses_toggle_color_attr(win, color, attr, OFF);
         }
-        curses_toggle_color_attr(win, NONE, menu_item_ptr->attr, OFF);
+
         menu_item_ptr = menu_item_ptr->next_item;
     }
 

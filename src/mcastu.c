@@ -1,4 +1,4 @@
-/* NetHack 3.6	mcastu.c	$NHDT-Date: 1436753517 2015/07/13 02:11:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	mcastu.c	$NHDT-Date: 1567418129 2019/09/02 09:55:29 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -264,7 +264,7 @@ boolean foundyou;
               canspotmon(mtmp) ? Monnam(mtmp) : "Something",
               is_undirected_spell(mattk->adtyp, spellnum)
                   ? ""
-                  : (Invisible && !perceives(mtmp->data)
+                  : (Invis && !perceives(mtmp->data)
                      && (mtmp->mux != u.ux || mtmp->muy != u.uy))
                         ? " at a spot near you"
                         : (Displaced
@@ -406,15 +406,15 @@ int spellnum;
         int count;
 
         count = nasty(mtmp); /* summon something nasty */
-        if (mtmp->iswiz)
+        if (mtmp->iswiz) {
             verbalize("Destroy the thief, my pet%s!", plur(count));
-        else {
-            const char *mappear =
-                (count == 1) ? "A monster appears" : "Monsters appear";
+        } else {
+            const char *mappear = (count == 1) ? "A monster appears"
+                                               : "Monsters appear";
 
             /* messages not quite right if plural monsters created but
                only a single monster is seen */
-            if (Invisible && !perceives(mtmp->data)
+            if (Invis && !perceives(mtmp->data)
                 && (mtmp->mux != u.ux || mtmp->muy != u.uy))
                 pline("%s around a spot near you!", mappear);
             else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
@@ -631,16 +631,16 @@ int spellnum;
                     pline("%s %s.", upstart(arg), vtense(arg, "appear"));
             }
 
-            /* seen caster, possibly producing unseen--or just one--critters;
-               hero is told what the caster is doing and doesn't necessarily
-               observe complete accuracy of that caster's results (in other
-               words, no need to fuss with visibility or singularization;
-               player is told what's happening even if hero is unconscious) */
+        /* seen caster, possibly producing unseen--or just one--critters;
+           hero is told what the caster is doing and doesn't necessarily
+           observe complete accuracy of that caster's results (in other
+           words, no need to fuss with visibility or singularization;
+           player is told what's happening even if hero is unconscious) */
         } else if (!success)
             fmt = "%s casts at a clump of sticks, but nothing happens.";
         else if (let == S_SNAKE)
             fmt = "%s transforms a clump of sticks into snakes!";
-        else if (Invisible && !perceives(mtmp->data)
+        else if (Invis && !perceives(mtmp->data)
                  && (mtmp->mux != u.ux || mtmp->muy != u.uy))
             fmt = "%s summons insects around a spot near you!";
         else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
