@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.107 $ $NHDT-Date: 1567302620 2019/09/01 01:50:20 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.108 $ $NHDT-Date: 1567418344 2019/09/02 09:59:04 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -133,6 +133,9 @@ have 'O' update persistent inventory window if 'implicit_uncursed',
 'O's "set <option> to what?" could be used to force a buffer overflow
 'O's response to bad 'statuslines' value said "must be 2 and 3" (at one point
 	it was "must be between 2 and 3", change it to "must be 2 or 3")
+when spellcasting monster aimed at wrong spot due to not being able to see
+	invisible hero, feedback could be erroneous if hero could see self
+	[messages used 'if (Invisible)' test where 'if (Invis)' was meant]
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
