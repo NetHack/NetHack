@@ -2971,7 +2971,7 @@ boolean wep_was_destroyed;
                     if (ureflects("%s gaze is reflected by your %s.",
                                   s_suffix(Monnam(mon)))) {
                         ;
-                    } else if (Hallucination && rn2(4)) {
+                    } else if (Hallucination) {
                         /* [it's the hero who should be getting paralyzed
                            and isn't; this message describes the monster's
                            reaction rather than the hero's escape] */
