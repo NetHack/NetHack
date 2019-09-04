@@ -26,7 +26,7 @@ static void FDECL(backfire, (struct obj *));
 static void FDECL(boxlock_invent, (struct obj *));
 static int FDECL(spell_hit_bonus, (int));
 static void FDECL(destroy_one_item, (struct obj *, int, int));
-static void FDECL(wishcmdassist, (int));
+static void NDECL(wishcmdassist);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
 #define ZT_FIRE (AD_FIRE - 1)
@@ -5343,11 +5343,8 @@ int damage, tell;
     return resisted;
 }
 
-#define MAXWISHTRY 5
-
 static void
-wishcmdassist(triesleft)
-int triesleft;
+wishcmdassist()
 {
     static NEARDATA const char *
         wishinfo[] = {
@@ -5369,16 +5366,12 @@ int triesleft;
   0,
     },
         preserve_wishless[] = "Doing so will preserve 'wishless' conduct.",
-        retry_info[] =
-                    "If you specify an unrecognized object name %s%s time%s,",
-        retry_too[] = "a randomly chosen item will be granted.",
         suppress_cmdassist[] =
             "(Suppress this assistance with !cmdassist in your config file.)",
         *cardinals[] = { "zero",  "one",  "two", "three", "four", "five" },
         too_many[] = "too many";
     int i;
     winid win;
-    char buf[BUFSZ];
 
     win = create_nhwindow(NHW_TEXT);
     if (!win)
@@ -5388,14 +5381,6 @@ int triesleft;
     if (!u.uconduct.wishes)
         putstr(win, 0, preserve_wishless);
     putstr(win, 0, "");
-    Sprintf(buf, retry_info,
-            (triesleft >= 0 && triesleft < SIZE(cardinals))
-               ? cardinals[triesleft]
-               : too_many,
-            (triesleft < MAXWISHTRY) ? " more" : "",
-            plur(triesleft));
-    putstr(win, 0, buf);
-    putstr(win, 0, retry_too);
     putstr(win, 0, "");
     if (iflags.cmdassist)
         putstr(win, 0, suppress_cmdassist);
@@ -5425,7 +5410,7 @@ makewish()
     if (buf[0] == '\033') {
         buf[0] = '\0';
     } else if (!strcmpi(buf, "help")) {
-        wishcmdassist(MAXWISHTRY - tries);
+        wishcmdassist();
         buf[0] = '\0'; /* for EDIT_GETLIN */
         goto retry;
     }
@@ -5444,12 +5429,8 @@ makewish()
     otmp = readobjnam(buf, &nothing);
     if (!otmp) {
         pline("Nothing fitting that description exists in the game.");
-        if (++tries < MAXWISHTRY)
-            goto retry;
-        pline1(thats_enough_tries);
-        otmp = readobjnam((char *) 0, (struct obj *) 0);
-        if (!otmp)
-            return; /* for safety; should never happen */
+        tries++;
+        goto retry;
     } else if (otmp == &nothing) {
         /* explicitly wished for "nothing", presumably attempting
            to retain wishless conduct */
