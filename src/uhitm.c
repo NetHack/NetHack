@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1562876956 2019/07/11 20:29:16 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.211 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1567805813 2019/09/06 21:36:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2854,13 +2854,16 @@ boolean wep_was_destroyed;
                     if (ureflects("%s gaze is reflected by your %s.",
                                   s_suffix(Monnam(mon)))) {
                         ;
-                    } else if (Free_action) {
-                        You("momentarily stiffen under %s gaze!",
-                            s_suffix(mon_nam(mon)));
                     } else if (Hallucination && rn2(4)) {
+                        /* [it's the hero who should be getting paralyzed
+                           and isn't; this message describes the monster's
+                           reaction rather than the hero's escape] */
                         pline("%s looks %s%s.", Monnam(mon),
                               !rn2(2) ? "" : "rather ",
                               !rn2(2) ? "numb" : "stupified");
+                    } else if (Free_action) {
+                        You("momentarily stiffen under %s gaze!",
+                            s_suffix(mon_nam(mon)));
                     } else {
                         You("are frozen by %s gaze!", s_suffix(mon_nam(mon)));
                         nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
