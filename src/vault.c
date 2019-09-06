@@ -79,7 +79,8 @@ boolean forceshow;
             } else if (!in_fcorridor(grd, u.ux, u.uy)) {
                 if (mtmp->mtame)
                     yelp(mtmp);
-                (void) rloc(mtmp, FALSE);
+                if (!rloc(mtmp, TRUE))
+                    m_into_limbo(mtmp);
             }
         }
         lev = &levl[fcx][fcy];
