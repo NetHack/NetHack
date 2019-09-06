@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1553787633 2019/03/28 15:40:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1567805254 2019/09/06 21:27:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.117 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1937,7 +1937,7 @@ struct mkroom *croom;
         otmp->owt = weight(otmp);
     }
 
-    /* contents */
+    /* contents (of a container or monster's inventory) */
     if (o->containment & SP_OBJ_CONTENT) {
         if (!container_idx) {
             if (!invent_carrying_monster) {
@@ -1949,27 +1949,10 @@ struct mkroom *croom;
                    outside the des-file.  Maybe another data file that
                    determines what inventories monsters get by default?
                  */
+                ; /* ['otmp' remains on floor] */
             } else {
-                int ci;
-                struct obj *objcheck = otmp;
-                int inuse = -1;
-
-                for (ci = 0; ci < container_idx; ci++)
-                    if (container_obj[ci] == objcheck)
-                        inuse = ci;
                 remove_object(otmp);
-                if (mpickobj(invent_carrying_monster, otmp)) {
-                    if (inuse > -1) {
-                        impossible(
-                     "container given to monster was merged or deallocated.");
-                        for (ci = inuse; ci < container_idx - 1; ci++)
-                            container_obj[ci] = container_obj[ci + 1];
-                        container_obj[container_idx] = NULL;
-                        container_idx--;
-                    }
-                    /* we lost track of it. */
-                    return;
-                }
+                (void) mpickobj(invent_carrying_monster, otmp);
             }
         } else {
             struct obj *cobj = container_obj[container_idx - 1];
