@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.108 $ $NHDT-Date: 1567418344 2019/09/02 09:59:04 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.110 $ $NHDT-Date: 1567805962 2019/09/06 21:39:22 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -136,6 +136,9 @@ have 'O' update persistent inventory window if 'implicit_uncursed',
 when spellcasting monster aimed at wrong spot due to not being able to see
 	invisible hero, feedback could be erroneous if hero could see self
 	[messages used 'if (Invisible)' test where 'if (Invis)' was meant]
+prevent impossible when guard tries to relocate a monster on a full level
+hallucination provides partial protection from passive gaze counterattack
+	against hero's attack; check for that before checking for free action
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
