@@ -1,0 +1,18 @@
+# clang plugin for nethack-i18n; verify varargs calls to add_opvars
+
+default: opvars-plugin.so
+
+LIB = opvars-plugin.so
+
+CXX = /usr/bin/clang
+CXXFLAGS = -Wall -g -I/usr/lib/llvm-6.0/include
+LDFLAGS = -std=c++11 -fPIC -fno-rtti
+
+$(LIB) : opvars-plugin.o
+	$(CXX) $(LDFLAGS) -shared -o opvars-plugin.so opvars-plugin.o
+
+opvars-plugin.o : opvars-plugin.cpp compat.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o opvars-plugin.o opvars-plugin.cpp
+
+clean:
+	rm -f $(LIB) opvars-plugin.o
