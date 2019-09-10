@@ -45,8 +45,6 @@ static boolean FDECL(is_undirected_spell, (unsigned int, int));
 static boolean
 FDECL(spell_would_be_useless, (struct monst *, unsigned int, int));
 
-extern const char *const flash_types[]; /* from zap.c */
-
 /* feedback when frustrated monster couldn't cast a spell */
 static
 void
@@ -859,9 +857,10 @@ register struct attack *mattk;
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
         if (mattk->adtyp && (mattk->adtyp < 11)) { /* no cf unsigned >0 */
-            if (canseemon(mtmp))
+            if (canseemon(mtmp)) {
                 pline("%s zaps you with a %s!", Monnam(mtmp),
-                      flash_types[ad_to_typ(mattk->adtyp)]);
+                      flash_str(ad_to_typ(mattk->adtyp), FALSE));
+            }
             buzz(-ad_to_typ(mattk->adtyp), (int) mattk->damn, mtmp->mx,
                  mtmp->my, sgn(g.tbx), sgn(g.tby));
         } else

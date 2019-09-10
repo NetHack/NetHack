@@ -26,6 +26,19 @@ static NEARDATA const char *breathwep[] = {
     "strange breath #9"
 };
 
+/* also used extern in zap.c
+ * need exact number because both files need to do rn2(SIZE(hallublasts)) */
+const char* const hallublasts[49] = {
+    "bubbles", "butterflies", "champagne", "chaos", "coins", "cotton candy",
+    "crumbs", "dark matter", "darkness", "emotions", "flowers", "fog",
+    "gelatin", "gemstones", "ghosts", "glass shards", "glitter", "gravel",
+    "gravity", "gravy", "holy light", "hornets", "hyphens", "laser beams",
+    "magma", "mathematics", "meteors", "music", "needles", "noise", "nostalgia",
+    "oil", "plasma", "prismatic light", "purple", "rope", "salt", "sand",
+    "scrolls", "sludge", "snowflakes", "sparkles", "spores", "steam",
+    "tetrahedrons", "text", "toxic waste", "water", "wind"
+};
+
 boolean
 m_has_launcher_and_ammo(mtmp)
 struct monst *mtmp;
@@ -790,6 +803,19 @@ struct attack *mattk;
     return 0;
 }
 
+/* Return the name of a breath weapon. If the player is hallucinating, return
+ * a silly name instead.
+ * typ is AD_MAGM, AD_FIRE, etc */
+static const char*
+breathwep_name(typ)
+int typ;
+{
+    if (Hallucination)
+        return hallublasts[rn2(SIZE(hallublasts))];
+
+    return breathwep[typ - 1];
+}
+
 /* monster breathes at monster (ranged) */
 int
 breamm(mtmp, mattk, mtarg)
@@ -813,7 +839,7 @@ struct attack  *mattk;
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
                 boolean utarget = (mtarg == &g.youmonst);
                 if (canseemon(mtmp))
-                    pline("%s breathes %s!", Monnam(mtmp), breathwep[typ - 1]);
+                    pline("%s breathes %s!", Monnam(mtmp), breathwep_name(typ));
                 dobuzz((int) (-20 - (typ - 1)), (int) mattk->damn,
                        mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby), utarget);
                 nomul(0);
