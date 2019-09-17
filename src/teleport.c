@@ -996,6 +996,10 @@ level_tele()
     /* calls done(ESCAPED) if newlevel==0 */
     if (escape_by_flying) {
         You("%s.", escape_by_flying);
+        /* Why can't you just walk back into the dungeon?
+         * This doesn't give an answer to that, but at least it states that
+         * there's some reason that you can't. */
+        pline("But mortals cannot enter the Mazes of Menace more than once...");
         /* [dlevel used to be set to 1, but it doesn't make sense to
             teleport out of the dungeon and float or fly down to the
             surface but then actually arrive back inside the dungeon] */
