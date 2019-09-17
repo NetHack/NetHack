@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1565288730 2019/08/08 18:25:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1568509227 2019/09/15 01:00:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2908,7 +2908,7 @@ const char *msg_override;
            if life-saved while poly'd and Unchanging (explore or wizard mode
            declining to die since can't be both Unchanging and Lifesaved) */
         if (Upolyd && !strncmpi(g.nomovemsg, "You survived that ", 18))
-            You("are %s", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
+            You("are %s.", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
     }
     g.nomovemsg = 0;
     u.usleep = 0;
