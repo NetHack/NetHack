@@ -622,35 +622,52 @@ register struct monst *mtmp;
                 break;
             }
 
+#define add_ac(otmp) \
+    if (otmp) { mac += ARM_BONUS(otmp); } \
+    otmp = (struct obj *) 0;
+
+            /* round 1: give them body armor */
             if (mac < -1 && rn2(5))
-                mac += 7 + mongets(mtmp, (rn2(5)) ? PLATE_MAIL
-                                                  : CRYSTAL_PLATE_MAIL);
+                otmp = mongets(mtmp, (rn2(5)) ? PLATE_MAIL
+                                              : CRYSTAL_PLATE_MAIL);
             else if (mac < 3 && rn2(5))
-                mac +=
-                    6 + mongets(mtmp, (rn2(3)) ? SPLINT_MAIL : BANDED_MAIL);
+                otmp = mongets(mtmp, (rn2(3)) ? SPLINT_MAIL : BANDED_MAIL);
             else if (rn2(5))
-                mac += 3 + mongets(mtmp, (rn2(3)) ? RING_MAIL
-                                                  : STUDDED_LEATHER_ARMOR);
+                otmp = mongets(mtmp, (rn2(3)) ? RING_MAIL
+                                              : STUDDED_LEATHER_ARMOR);
             else
-                mac += 2 + mongets(mtmp, LEATHER_ARMOR);
+                otmp = mongets(mtmp, LEATHER_ARMOR);
+            add_ac(otmp);
 
+            /* round 2: helmets */
             if (mac < 10 && rn2(3))
-                mac += 1 + mongets(mtmp, HELMET);
+                otmp = mongets(mtmp, HELMET);
             else if (mac < 10 && rn2(2))
-                mac += 1 + mongets(mtmp, DENTED_POT);
-            if (mac < 10 && rn2(3))
-                mac += 1 + mongets(mtmp, SMALL_SHIELD);
-            else if (mac < 10 && rn2(2))
-                mac += 2 + mongets(mtmp, LARGE_SHIELD);
-            if (mac < 10 && rn2(3))
-                mac += 1 + mongets(mtmp, LOW_BOOTS);
-            else if (mac < 10 && rn2(2))
-                mac += 2 + mongets(mtmp, HIGH_BOOTS);
-            if (mac < 10 && rn2(3))
-                mac += 1 + mongets(mtmp, LEATHER_GLOVES);
-            else if (mac < 10 && rn2(2))
-                mac += 1 + mongets(mtmp, LEATHER_CLOAK);
+                otmp = mongets(mtmp, DENTED_POT);
+            add_ac(otmp);
 
+            /* round 3: shields */
+            if (mac < 10 && rn2(3))
+                otmp = mongets(mtmp, SMALL_SHIELD);
+            else if (mac < 10 && rn2(2))
+                otmp = mongets(mtmp, LARGE_SHIELD);
+            add_ac(otmp);
+
+            /* round 4: boots */
+            if (mac < 10 && rn2(3))
+                otmp = mongets(mtmp, LOW_BOOTS);
+            else if (mac < 10 && rn2(2))
+                otmp = mongets(mtmp, HIGH_BOOTS);
+            add_ac(otmp);
+
+            /* round 5: gloves + cloak */
+            if (mac < 10 && rn2(3))
+                otmp = mongets(mtmp, LEATHER_GLOVES);
+            else if (mac < 10 && rn2(2))
+                otmp = mongets(mtmp, LEATHER_CLOAK);
+            add_ac(otmp); /* not technically needed */
+
+#undef add_ac
             nhUse(mac); /* suppress 'dead increment' from static analyzer */
 
             if (ptr == &mons[PM_WATCH_CAPTAIN]) {
@@ -1913,7 +1930,7 @@ struct monst *mtmp, *victim;
     return ptr;
 }
 
-int
+struct obj *
 mongets(mtmp, otyp)
 register struct monst *mtmp;
 int otyp;
@@ -1922,7 +1939,7 @@ int otyp;
     int spe;
 
     if (!otyp)
-        return 0;
+        return (struct obj *) 0;
     otmp = mksobj(otyp, TRUE, FALSE);
     if (otmp) {
         if (mtmp->data->mlet == S_DEMON) {
@@ -1961,9 +1978,8 @@ int otyp;
 
         spe = otmp->spe;
         (void) mpickobj(mtmp, otmp); /* might free otmp */
-        return spe;
     }
-    return 0;
+    return otmp;
 }
 
 int
