@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.112 $ $NHDT-Date: 1568509226 2019/09/15 01:00:26 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.113 $ $NHDT-Date: 1568831820 2019/09/18 18:37:00 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -139,6 +139,8 @@ when spellcasting monster aimed at wrong spot due to not being able to see
 prevent impossible when guard tries to relocate a monster on a full level
 hallucination provides partial protection from passive gaze counterattack
 	against hero's attack; check for that before checking for free action
+feedback from blessed potion of restore ability never reported "you feel great"
+	due to bad logic for not-unihorn case in unfixable_trouble_count()
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository

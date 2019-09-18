@@ -1,4 +1,4 @@
-/* NetHack 3.6	youprop.h	$NHDT-Date: 1433291407 2015/06/03 00:30:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6	youprop.h	$NHDT-Date: 1568831820 2019/09/18 18:37:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -75,8 +75,8 @@
 /* Pseudo-property */
 #define Punished (uball != 0)
 
-/* Those implemented solely as timeouts (we use just intrinsic) */
-#define HStun u.uprops[STUNNED].intrinsic
+/* Many are implemented solely as timeouts (we use just intrinsic) */
+#define HStun u.uprops[STUNNED].intrinsic /* timed or FROMFORM */
 #define Stunned HStun
 
 #define HConfusion u.uprops[CONFUSION].intrinsic
