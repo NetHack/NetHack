@@ -1936,7 +1936,6 @@ register struct monst *mtmp;
 int otyp;
 {
     register struct obj *otmp;
-    int spe;
 
     if (!otyp)
         return (struct obj *) 0;
@@ -1976,7 +1975,6 @@ int otyp;
                 otmp->spe = 0;
         }
 
-        spe = otmp->spe;
         (void) mpickobj(mtmp, otmp); /* might free otmp */
     }
     return otmp;
