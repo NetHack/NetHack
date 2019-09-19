@@ -1975,7 +1975,10 @@ int otyp;
                 otmp->spe = 0;
         }
 
-        (void) mpickobj(mtmp, otmp); /* might free otmp */
+        if (mpickobj(mtmp, otmp)) {
+            /* otmp was freed via merging with something else */
+            otmp = (struct obj *) 0;
+        }
     }
     return otmp;
 }
