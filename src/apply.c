@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1568831822 2019/09/18 18:37:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.276 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1568922511 2019/09/19 19:48:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.277 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2317,13 +2317,14 @@ STATIC_OVL void
 use_stone(tstone)
 struct obj *tstone;
 {
+    static const char scritch[] = "\"scritch, scritch\"";
+    static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
+    static const char coins_gems[3] = { COIN_CLASS, GEM_CLASS, 0 };
     struct obj *obj;
     boolean do_scratch;
     const char *streak_color, *choices;
     char stonebuf[QBUFSZ];
-    static const char scritch[] = "\"scritch, scritch\"";
-    static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
-    static const char coins_gems[3] = { COIN_CLASS, GEM_CLASS, 0 };
+    int oclass;
 
     /* in case it was acquired while blinded */
     if (!Blind)
@@ -2368,7 +2369,14 @@ struct obj *tstone;
     do_scratch = FALSE;
     streak_color = 0;
 
-    switch (obj->oclass) {
+    oclass = obj->oclass;
+    /* prevent non-gemstone rings from being treated like gems */
+    if (oclass == RING_CLASS
+        && objects[obj->otyp].oc_material != GEMSTONE
+        && objects[obj->otyp].oc_material != MINERAL)
+        oclass = RANDOM_CLASS; /* something that's neither gem nor ring */
+
+    switch (oclass) {
     case GEM_CLASS: /* these have class-specific handling below */
     case RING_CLASS:
         if (tstone->otyp != TOUCHSTONE) {

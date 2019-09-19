@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.113 $ $NHDT-Date: 1568831820 2019/09/18 18:37:00 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.114 $ $NHDT-Date: 1568922510 2019/09/19 19:48:30 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -141,6 +141,10 @@ hallucination provides partial protection from passive gaze counterattack
 	against hero's attack; check for that before checking for free action
 feedback from blessed potion of restore ability never reported "you feel great"
 	due to bad logic for not-unihorn case in unfixable_trouble_count()
+when rubbing a ring on a touchstone, all types of rings were treated as if
+	they were gems; an iron ring made a cyan streak instead of yielding
+	"scritch, scritch" and a gold ring made a yellow streak rather than
+	a golden scratch
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
