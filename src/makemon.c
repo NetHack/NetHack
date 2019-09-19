@@ -79,41 +79,17 @@ int x, y, n, mmflags;
 {
     coord mm;
     register int cnt = rnd(n);
+    int diff = level_difficulty();
     struct monst *mon;
-#if defined(__GNUC__) && (defined(HPUX) || defined(DGUX))
-    /* There is an unresolved problem with several people finding that
-     * the game hangs eating CPU; if interrupted and restored, the level
-     * will be filled with monsters.  Of those reports giving system type,
-     * there were two DG/UX and two HP-UX, all using gcc as the compiler.
-     * hcroft@hpopb1.cern.ch, using gcc 2.6.3 on HP-UX, says that the
-     * problem went away for him and another reporter-to-newsgroup
-     * after adding this debugging code.  This has almost got to be a
-     * compiler bug, but until somebody tracks it down and gets it fixed,
-     * might as well go with the "but it went away when I tried to find
-     * it" code.
-     */
-    int cnttmp, cntdiv;
-
-    cnttmp = cnt;
-    debugpline4("init group call <%d,%d>, n=%d, cnt=%d.", x, y, n, cnt);
-    cntdiv = ((u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1);
-#endif
-    /* Tuning: cut down on swarming at low character levels [mrs] */
-    cnt /= (u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1;
-#if defined(__GNUC__) && (defined(HPUX) || defined(DGUX))
-    if (cnt != (cnttmp / cntdiv)) {
-        pline("cnt=%d using %d, cnttmp=%d, cntdiv=%d", cnt,
-              (u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1, cnttmp, cntdiv);
-    }
-#endif
-    if (!cnt)
+    /* Tuning: cut down on swarming at low dungeon levels */
+    if (diff < 3)
+        cnt /= 4;
+    else if (diff < 5)
+        cnt /= 2;
+    else if (diff < 7)
+        cnt = (cnt * 3) / 4;
+    if (cnt <= 0)
         cnt++;
-#if defined(__GNUC__) && (defined(HPUX) || defined(DGUX))
-    if (cnt < 0)
-        cnt = 1;
-    if (cnt > 10)
-        cnt = 10;
-#endif
 
     mm.x = x;
     mm.y = y;
