@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1545259936 2018/12/19 22:52:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.313 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1569189770 2019/09/22 22:02:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.317 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4612,7 +4612,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
     t = t_at(ishero ? u.ux : mon->mx, ishero ? u.uy : mon->my);
 
     if (ishero && u.utrap) { /* all u.utraptype values are holding traps */
-        which = "";
+        which = the_your[(!t || !t->tseen || !t->madeby_u) ? 0 : 1];
         switch (u.utraptype) {
         case TT_LAVA:
             trapdescr = "molten lava";
@@ -4623,6 +4623,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
             break;
         case TT_BURIEDBALL:
             trapdescr = "your anchor";
+            which = "";
             break;
         case TT_BEARTRAP:
         case TT_PIT:
@@ -4657,8 +4658,9 @@ boolean *noticed; /* set to true iff hero notices the effect; */
             Sprintf(buf, "%s is", noit_Monnam(u.usteed));
         else
             Strcpy(buf, "You are");
-        pline("%s released from %s%s.", buf, which, trapdescr);
         reset_utrap(TRUE);
+        vision_full_recalc = 1; /* vision limits can change (pit escape) */
+        pline("%s released from %s%s.", buf, which, trapdescr);
     } else {
         if (!mon->mtrapped)
             return FALSE;
