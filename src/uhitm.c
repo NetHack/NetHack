@@ -2860,7 +2860,7 @@ boolean wep_was_destroyed;
                            reaction rather than the hero's escape] */
                         pline("%s looks %s%s.", Monnam(mon),
                               !rn2(2) ? "" : "rather ",
-                              !rn2(2) ? "numb" : "stupified");
+                              !rn2(2) ? "numb" : "stupefied");
                     } else if (Free_action) {
                         You("momentarily stiffen under %s gaze!",
                             s_suffix(mon_nam(mon)));
