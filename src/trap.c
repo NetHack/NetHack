@@ -4638,7 +4638,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         else
             Strcpy(buf, "You are");
         reset_utrap(TRUE);
-        vision_full_recalc = 1; /* vision limits can change (pit escape) */
+        g.vision_full_recalc = 1; /* vision limits can change (pit escape) */
         pline("%s released from %s%s.", buf, which, trapdescr);
     } else {
         if (!mon->mtrapped)
