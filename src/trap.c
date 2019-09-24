@@ -1067,9 +1067,12 @@ unsigned trflags;
             }
         } else {
             seetrap(trap);
-            pline("A board beneath you %s%s%s.",
-                  Deaf ? "vibrates" : "squeaks ",
-                  Deaf ? "" : trapnote(trap, 0), Deaf ? "" : " loudly");
+            if (Hallucination)
+                You("accidentally step on a squeaky toy!");
+            else
+                pline("A board beneath you %s%s%s.",
+                    Deaf ? "vibrates" : "squeaks ",
+                    Deaf ? "" : trapnote(trap, 0), Deaf ? "" : " loudly");
             wake_nearby();
         }
         break;
@@ -2259,8 +2262,12 @@ register struct monst *mtmp;
             /* stepped on a squeaky board */
             if (in_sight) {
                 if (!Deaf) {
-                    pline("A board beneath %s squeaks %s loudly.",
-                          mon_nam(mtmp), trapnote(trap, 0));
+                    if (Hallucination)
+                        pline("%s accidentally steps on a squeaky toy!",
+                              Monnam(mtmp));
+                    else
+                        pline("A board beneath %s squeaks %s loudly.",
+                            mon_nam(mtmp), trapnote(trap, 0));
                     seetrap(trap);
                 } else {
                     pline("%s stops momentarily and appears to cringe.",

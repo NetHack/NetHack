@@ -575,9 +575,8 @@ struct obj *instr;
     switch (itmp.otyp) { /* note: itmp.otyp might differ from instr->otyp */
     case MAGIC_FLUTE: /* Make monster fall asleep */
         consume_obj_charge(instr, TRUE);
-
         You("%sproduce %s music.", !Deaf ? "" : "seem to ",
-            Hallucination ? "piped" : "soft");
+            Hallucination ? "elevator" : "soft");
         put_monsters_to_sleep(u.ulevel * 5);
         exercise(A_DEX, TRUE);
         break;
