@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.115 $ $NHDT-Date: 1569189769 2019/09/22 22:02:49 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.116 $ $NHDT-Date: 1569276988 2019/09/23 22:16:28 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -149,6 +149,9 @@ zapping self with wand of opening or spell of knock to escape from a trap
 	reported "you're released from <trap>" rather than "from the <trap>"
 zapping self with wand of opening or spell of knock to escape from a pit trap
 	didn't reset vision limits--only spots adjacent to pit were visible
+wielded aklys that returned to hero when thrown while inside an engulfer left
+	a stale 'thrownobj' pointer that triggered "add_to_minv: obj not free"
+	panic if same weapon killed any engulfer via melee from inside
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1556201496 2019/04/25 14:11:36 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.160 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1569276989 2019/09/23 22:16:29 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.161 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1096,10 +1096,11 @@ long wep_mask; /* used to re-equip returning boomerang */
 boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 {
     register struct monst *mon;
-    register int range, urange;
-    boolean crossbowing, impaired = (Confusion || Stunned || Blind
-                                     || Hallucination || Fumbling);
-    boolean tethered_weapon = (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0);
+    int range, urange;
+    boolean crossbowing, clear_thrownobj = FALSE,
+            impaired = (Confusion || Stunned || Blind
+                        || Hallucination || Fumbling),
+            tethered_weapon = (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0);
 
     g.notonhead = FALSE; /* reset potentially stale value */
     if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
@@ -1140,6 +1141,12 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 
     g.thrownobj = obj;
     g.thrownobj->was_thrown = 1;
+    iflags.returning_missile = ((obj->oartifact == ART_MJOLLNIR
+                                 && Role_if(PM_VALKYRIE))
+                                || tethered_weapon) ? (genericptr_t) obj
+                                                    : (genericptr_t) 0;
+    /* NOTE:  No early returns after this point or returning_missile
+       will be left with a stale pointer. */
 
     if (u.uswallow) {
         mon = u.ustuck;
@@ -1151,8 +1158,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         if (u.dz < 0
             /* Mjollnir must we wielded to be thrown--caller verifies this;
                aklys must we wielded as primary to return when thrown */
-            && ((Role_if(PM_VALKYRIE) && obj->oartifact == ART_MJOLLNIR)
-                || tethered_weapon)
+            && iflags.returning_missile
             && !impaired) {
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
                   ceiling(u.ux, u.uy));
@@ -1172,8 +1178,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         } else {
             hitfloor(obj, TRUE);
         }
-        g.thrownobj = (struct obj *) 0;
-        return;
+        clear_thrownobj = TRUE;
+        goto throwit_return;
 
     } else if (obj->otyp == BOOMERANG && !Underwater) {
         if (Is_airlevel(&u.uz) || Levitation)
@@ -1187,8 +1193,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                 setworn(obj, wep_mask);
                 u.twoweap = twoweap;
             }
-            g.thrownobj = (struct obj *) 0;
-            return;
+            clear_thrownobj = TRUE;
+            goto throwit_return;
         }
     } else {
         /* crossbow range is independent of strength */
@@ -1263,7 +1269,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                we're about to return */
             if (tethered_weapon)
                 tmp_at(DISP_END, 0);
-            return;
+            goto throwit_return;
         }
     }
 
@@ -1271,8 +1277,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         boolean obj_gone;
 
         if (mon->isshk && obj->where == OBJ_MINVENT && obj->ocarry == mon) {
-            g.thrownobj = (struct obj *) 0;
-            return; /* alert shk caught it */
+            clear_thrownobj = TRUE;
+            goto throwit_return; /* alert shk caught it */
         }
         (void) snuff_candle(obj);
         g.notonhead = (g.bhitpos.x != mon->mx || g.bhitpos.y != mon->my);
@@ -1287,33 +1293,22 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             hot_pursuit(mon);
 
         if (obj_gone)
-            g.thrownobj = 0;
+            g.thrownobj = (struct obj *) 0;
     }
 
     if (!g.thrownobj) {
         /* missile has already been handled */
-        if (tethered_weapon) tmp_at(DISP_END, 0);
-    } else if (u.uswallow) {
-        if (tethered_weapon) {
+        if (tethered_weapon)
             tmp_at(DISP_END, 0);
-            pline("%s returns to your hand!", The(xname(g.thrownobj)));
-            g.thrownobj = addinv(g.thrownobj);
-            (void) encumber_msg();
-            /* in case addinv() autoquivered */
-            if (g.thrownobj->owornmask & W_QUIVER)
-                setuqwep((struct obj *) 0);
-            setuwep(g.thrownobj);
-        } else {
-            /* ball is not picked up by monster */
-            if (obj != uball)
-                (void) mpickobj(u.ustuck, obj);
-            g.thrownobj = (struct obj *) 0;
-        }
+    } else if (u.uswallow && !iflags.returning_missile) {
+ swallowit:
+        if (obj != uball)
+            (void) mpickobj(u.ustuck, obj); /* clears 'g.thrownobj' */
+        goto throwit_return;
     } else {
         /* Mjollnir must we wielded to be thrown--caller verifies this;
            aklys must we wielded as primary to return when thrown */
-        if ((obj->oartifact == ART_MJOLLNIR && Role_if(PM_VALKYRIE))
-            || tethered_weapon) {
+        if (iflags.returning_missile) { /* Mjollnir or aklys */
             if (rn2(100)) {
                 if (tethered_weapon)
                     tmp_at(DISP_END, BACKTRACK);
@@ -1353,14 +1348,14 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                         losehp(Maybe_Half_Phys(dmg), killer_xname(obj),
                                KILLED_BY);
                     }
-                    if (ship_object(obj, u.ux, u.uy, FALSE)) {
-                        g.thrownobj = (struct obj *) 0;
-                        return;
-                    }
-                    dropy(obj);
+
+                    if (u.uswallow)
+                        goto swallowit;
+                    if (!ship_object(obj, u.ux, u.uy, FALSE))
+                        dropy(obj);
                 }
-                g.thrownobj = (struct obj *) 0;
-                return;
+                clear_thrownobj = TRUE;
+                goto throwit_return;
             } else {
                 if (tethered_weapon)
                     tmp_at(DISP_END, 0);
@@ -1372,6 +1367,9 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                    explicitly rewield the weapon to get throw-and-return
                    capability back anyway, quivered or not shouldn't matter */
                 pline("%s to return!", Tobjnam(obj, "fail"));
+
+                if (u.uswallow)
+                    goto swallowit;
                 /* continue below with placing 'obj' at target location */
             }
         }
@@ -1386,12 +1384,12 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             tmp_at(DISP_END, 0);
             breakmsg(obj, cansee(g.bhitpos.x, g.bhitpos.y));
             breakobj(obj, g.bhitpos.x, g.bhitpos.y, TRUE, TRUE);
-            g.thrownobj = (struct obj *) 0;
-            return;
+            clear_thrownobj = TRUE;
+            goto throwit_return;
         }
         if (flooreffects(obj, g.bhitpos.x, g.bhitpos.y, "fall")) {
-            g.thrownobj = (struct obj *) 0;
-            return;
+            clear_thrownobj = TRUE;
+            goto throwit_return;
         }
         obj_no_longer_held(obj);
         if (mon && mon->isshk && is_pick(obj)) {
@@ -1400,13 +1398,13 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             if (*u.ushops || obj->unpaid)
                 check_shop_obj(obj, g.bhitpos.x, g.bhitpos.y, FALSE);
             (void) mpickobj(mon, obj); /* may merge and free obj */
-            g.thrownobj = (struct obj *) 0;
-            return;
+            clear_thrownobj = TRUE;
+            goto throwit_return;
         }
         (void) snuff_candle(obj);
         if (!mon && ship_object(obj, g.bhitpos.x, g.bhitpos.y, FALSE)) {
-            g.thrownobj = (struct obj *) 0;
-            return;
+            clear_thrownobj = TRUE;
+            goto throwit_return;
         }
         g.thrownobj = (struct obj *) 0;
         place_object(obj, g.bhitpos.x, g.bhitpos.y);
@@ -1429,6 +1427,12 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         if (obj_sheds_light(obj))
             g.vision_full_recalc = 1;
     }
+
+ throwit_return:
+    iflags.returning_missile = (genericptr_t) 0;
+    if (clear_thrownobj)
+        g.thrownobj = (struct obj *) 0;
+    return;
 }
 
 /* an object may hit a monster; various factors adjust chance of hitting */
