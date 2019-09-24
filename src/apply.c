@@ -477,6 +477,8 @@ use_magic_whistle(struct obj *obj)
     if (!can_blow(&g.youmonst)) {
         You("are incapable of using the whistle.");
     } else if (obj->cursed && !rn2(2)) {
+        if (Hallucination && !Deaf)
+            You("play a kazoo symphony.");
         You("produce a %shigh-%s.", Underwater ? "very " : "",
             Deaf ? "frequency vibration" : "pitched humming noise");
         wake_nearby();

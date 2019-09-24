@@ -1760,6 +1760,9 @@ eatcorpse(struct obj *otmp)
         if (mnum == PM_LONG_WORM || mnum == PM_BABY_LONG_WORM) {
             taste = "spicy";
         }
+        if ((yummy || palatable) && mnum == PM_BROWN_PUDDING) {
+            taste = "like chocolate";
+        }
 
         if (!strncmpi(pmxnam, "the ", 4))
             pmxnam += 4;

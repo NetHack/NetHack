@@ -23,8 +23,12 @@ void
 ballrelease(boolean showmsg)
 {
     if (carried(uball)) {
-        if (showmsg)
-            pline("Startled, you drop the iron ball.");
+        if (showmsg) {
+            if (Hallucination)
+                pline("Wow, you really dropped the ball.");
+            else
+                pline("Startled, you drop the iron ball.");
+        }
         if (uwep == uball)
             setuwep((struct obj *) 0);
         if (uswapwep == uball)

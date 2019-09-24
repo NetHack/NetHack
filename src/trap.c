@@ -592,7 +592,7 @@ fall_through(
 struct monst *
 animate_statue(
     struct obj *statue,
-    xchar x, 
+    xchar x,
     xchar y,
     int cause,
     int *fail_reason)
@@ -772,7 +772,7 @@ animate_statue(
 struct monst *
 activate_statue_trap(
     struct trap *trap,
-    xchar x, 
+    xchar x,
     xchar y,
     boolean shatter)
 {
@@ -1133,10 +1133,13 @@ trapeffect_sqky_board(
             }
         } else {
             seetrap(trap);
-            pline("A board beneath you %s%s%s.",
-                  Deaf ? "vibrates" : "squeaks ",
-                  Deaf ? "" : trapnote(trap, FALSE),
-                  Deaf ? "" : " loudly");
+            if (Hallucination && !Deaf)
+                You("accidentally step on a squeaky toy!");
+            else
+                pline("A board beneath you %s%s%s.",
+                      Deaf ? "vibrates" : "squeaks ",
+                      Deaf ? "" : trapnote(trap, FALSE),
+                      Deaf ? "" : " loudly");
             wake_nearby();
         }
     } else {
@@ -1147,8 +1150,12 @@ trapeffect_sqky_board(
         /* stepped on a squeaky board */
         if (in_sight) {
             if (!Deaf) {
-                pline("A board beneath %s squeaks %s loudly.",
-                      mon_nam(mtmp), trapnote(trap, FALSE));
+                if (Hallucination)
+                    pline("%s accidentally steps on a squeaky toy!",
+                          Monnam(mtmp));
+                else
+                    pline("A board beneath %s squeaks %s loudly.",
+                          mon_nam(mtmp), trapnote(trap, FALSE));
                 seetrap(trap);
             } else {
                 pline("%s stops momentarily and appears to cringe.",
@@ -2946,7 +2953,7 @@ feeltrap(struct trap* trap)
 static int
 mkroll_launch(
     struct trap *ttmp,
-    xchar x, 
+    xchar x,
     xchar y,
     short otyp,
     long ocount)
@@ -3794,7 +3801,7 @@ fire_damage(
 int
 fire_damage_chain(
     struct obj *chain,
-    boolean force, 
+    boolean force,
     boolean here,
     xchar x,
     xchar y)

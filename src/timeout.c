@@ -747,7 +747,10 @@ nh_timeout(void)
                      * to this number must be thoroughly play tested.
                      */
                     if ((inv_weight() > -500)) {
-                        You("make a lot of noise!");
+                        if (Hallucination)
+                            You("forget the rules to Charades!");
+                        else
+                            You("make a lot of noise!");
                         wake_nearby();
                     }
                 }
@@ -1145,7 +1148,10 @@ lantern_message(struct obj* obj)
             pline("Batteries have not been invented yet.");
         break;
     case OBJ_FLOOR:
-        You_see("a lantern getting dim.");
+        if (Hallucination)
+            You("witness the force of entropy at work.");
+        else
+            You_see("a lantern getting dim.");
         break;
     case OBJ_MINVENT:
         pline("%s lantern is getting dim.", s_suffix(Monnam(obj->ocarry)));
