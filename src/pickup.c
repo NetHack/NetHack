@@ -711,28 +711,20 @@ int what; /* should be a long */
     return (n_tried > 0);
 }
 
-boolean
-is_autopickup_exception(obj, grab)
+struct autopickup_exception *
+check_autopickup_exceptions(obj)
 struct obj *obj;
-boolean grab; /* forced pickup, rather than forced leave behind? */
 {
     /*
      *  Does the text description of this match an exception?
      */
     struct autopickup_exception
-        *ape = (grab) ? iflags.autopickup_exceptions[AP_GRAB]
-                      : iflags.autopickup_exceptions[AP_LEAVE];
-
+        *ape = iflags.autopickup_exceptions;
     if (ape) {
         char *objdesc = makesingular(doname(obj));
-
-        while (ape) {
-            if (regex_match(objdesc, ape->regex))
-                return TRUE;
-            ape = ape->next;
-        }
+        do if (regex_match(objdesc, ape->regex)) return ape;
+        while (ape = ape->next);
     }
-    return FALSE;
 }
 
 boolean
@@ -755,12 +747,13 @@ boolean calc_costly;
 
     /* check for pickup_types */
     pickit = (!*otypes || index(otypes, otmp->oclass));
-    /* check for "always pick up */
-    if (!pickit)
-        pickit = is_autopickup_exception(otmp, TRUE);
-    /* then for "never pick up */
-    if (pickit)
-        pickit = !is_autopickup_exception(otmp, FALSE);
+
+    /* check for autopickup excpetions */
+    struct autopickup_exception
+        *ape = check_autopickup_exceptions(otmp);
+    if (ape)
+        pickit = ape->grab;
+
     /* pickup_thrown overrides pickup_types and exceptions */
     if (!pickit)
         pickit = (flags.pickup_thrown && otmp->was_thrown);
