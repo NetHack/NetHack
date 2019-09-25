@@ -388,6 +388,7 @@ Helmet_on(VOID_ARGS)
         makeknown(uarmh->otyp);
         break;
     case HELM_OF_OPPOSITE_ALIGNMENT:
+        uarmh->known = 1; /* do this here because uarmh could get cleared */
         /* changing alignment can toggle off active artifact
            properties, including levitation; uarmh could get
            dropped or destroyed here */
@@ -423,7 +424,9 @@ Helmet_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_helmet, uarmh->otyp);
     }
-    uarmh->known = 1; /* helmet's +/- evident because of status line AC */
+    /* uarmh could be zero due to uchangealign() */
+    if (uarmh)
+        uarmh->known = 1; /* helmet's +/- evident because of status line AC */
     return 0;
 }
 
