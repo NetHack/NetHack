@@ -573,7 +573,7 @@ STATIC_DCL boolean FDECL(special_handling, (const char *,
 STATIC_DCL const char *FDECL(get_compopt_value, (const char *, char *));
 STATIC_DCL void FDECL(remove_autopickup_exception,
                       (struct autopickup_exception *));
-STATIC_DCL int NDECL(count_ape_maps); /* VE edit: APE overhaul */
+STATIC_DCL int NDECL(count_ape_maps);
 
 STATIC_DCL boolean FDECL(is_wc_option, (const char *));
 STATIC_DCL boolean FDECL(wc_supported, (const char *));
@@ -4411,7 +4411,6 @@ int nset;
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 }
 
-/* VE edit: APE overhaul */
 int
 count_apes(VOID_ARGS)
 {
@@ -5903,7 +5902,6 @@ dotogglepickup()
     return 0;
 }
 
-/* VE edit: APE overhaul */
 int
 add_autopickup_exception(mapping)
 const char *mapping;
@@ -5952,7 +5950,6 @@ const char *mapping;
     return 1;
 }
 
-/* VE edit: APE overhaul */
 STATIC_OVL void
 remove_autopickup_exception(whichape)
 struct autopickup_exception *whichape;
@@ -5977,7 +5974,6 @@ struct autopickup_exception *whichape;
     }
 }
 
-/* VE edit: APE overhaul */
 STATIC_OVL int
 count_ape_maps()
 {
@@ -5992,7 +5988,6 @@ count_ape_maps()
     return numapes;
 }
 
-/* VE edit: APE overhaul */
 void
 free_autopickup_exceptions()
 {
