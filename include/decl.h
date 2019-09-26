@@ -302,7 +302,8 @@ E struct c_common_strings {
     const char *const c_nothing_happens, *const c_thats_enough_tries,
         *const c_silly_thing_to, *const c_shudder_for_moment,
         *const c_something, *const c_Something, *const c_You_can_move_again,
-        *const c_Never_mind, *c_vision_clears, *const c_the_your[2];
+        *const c_Never_mind, *c_vision_clears, *const c_the_your[2],
+        *const c_fakename[2];
 } c_common_strings;
 #define nothing_happens c_common_strings.c_nothing_happens
 #define thats_enough_tries c_common_strings.c_thats_enough_tries
@@ -314,6 +315,9 @@ E struct c_common_strings {
 #define Never_mind c_common_strings.c_Never_mind
 #define vision_clears c_common_strings.c_vision_clears
 #define the_your c_common_strings.c_the_your
+/* fakename[] used occasionally so vtense() won't be fooled by an assigned
+   name ending in 's' */
+#define fakename c_common_strings.c_fakename
 
 /* material strings */
 E const char *materialnm[];
