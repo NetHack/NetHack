@@ -5285,7 +5285,7 @@ boolean setinitial, setfromfile;
                 goto menucolors_again;
         }
     } else if (!strcmp("autopickup_exception", optname)) {
-        int opt_idx, pass, numapes = 0;
+        int opt_idx, numapes = 0;
         char apebuf[2 + BUFSZ]; /* so &apebuf[1] is BUFSZ long for getlin() */
         struct autopickup_exception *ape;
 
