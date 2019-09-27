@@ -722,9 +722,9 @@ struct obj *obj;
         *ape = iflags.autopickup_exceptions;
     if (ape) {
         char *objdesc = makesingular(doname(obj));
-        do if (regex_match(objdesc, ape->regex)) return ape;
-        while (ape = ape->next);
+        while (ape && !regex_match(objdesc, ape->regex)) ape = ape->next;
     }
+    return ape;
 }
 
 boolean
