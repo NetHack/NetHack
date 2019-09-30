@@ -233,8 +233,7 @@ register struct monst *mtmp;
                    || quest_mon_represents_role(ptr, PM_PRIEST)) {
             otmp = mksobj(MACE, FALSE, FALSE);
             otmp->spe = rnd(3);
-            if (!rn2(2))
-                curse(otmp);
+            otmp->cursed = 0;
             (void) mpickobj(mtmp, otmp);
         } else if (mm == PM_NINJA) { /* extra quest villains */
             (void) mongets(mtmp, rn2(4) ? SHURIKEN : DART);
