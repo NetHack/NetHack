@@ -2139,8 +2139,7 @@ int final;
                 *ocl ? "'" : "", *ocl ? ocl : "all types", *ocl ? "'" : "");
         if (flags.pickup_thrown && *ocl) /* *ocl: don't show if 'all types' */
             Strcat(buf, " plus thrown");
-        if (iflags.autopickup_exceptions[AP_GRAB]
-            || iflags.autopickup_exceptions[AP_LEAVE])
+        if (iflags.autopickup_exceptions)
             Strcat(buf, ", with exceptions");
     } else
         Strcpy(buf, "off");
