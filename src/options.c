@@ -4414,7 +4414,7 @@ int
 count_apes(VOID_ARGS)
 {
     int numapes = 0;
-    struct autopickup_exception *ape = iflags.autopickup_exceptions;
+    struct autopickup_exception *ape = apelist;
 
     while (ape) {
       numapes++;
@@ -5327,7 +5327,7 @@ boolean setinitial, setfromfile;
             start_menu(tmpwin);
             if (numapes) {
                 ape = (struct autopickup_exception *)
-                    iflags.autopickup_exceptions;
+                    apelist;
                 any = zeroany;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                          "Always pickup '<'; never pickup '>'",
@@ -5897,7 +5897,7 @@ dotogglepickup()
     if (flags.pickup) {
         oc_to_str(flags.pickup_types, ocl);
         Sprintf(buf, "ON, for %s objects%s", ocl[0] ? ocl : "all",
-                (iflags.autopickup_exceptions)
+                (apelist)
                     ? ((count_apes() == 1)
                            ? ", with one exception"
                            : ", with some exceptions")
@@ -5952,8 +5952,8 @@ const char *mapping;
 
     ape->pattern = dupstr(text);
     ape->grab = grab;
-    ape->next = (struct autopickup_exception *) iflags.autopickup_exceptions;
-    iflags.autopickup_exceptions = (struct autopickup_exception *) ape;
+    ape->next = (struct autopickup_exception *) apelist;
+    apelist = (struct autopickup_exception *) ape;
     return 1;
 }
 
@@ -5963,14 +5963,14 @@ struct autopickup_exception *whichape;
 {
     struct autopickup_exception *ape, *freeape, *prev = 0;
 
-    for (ape = iflags.autopickup_exceptions; ape;) {
+    for (ape = apelist; ape;) {
         if (ape == whichape) {
             freeape = ape;
             ape = ape->next;
             if (prev)
                 prev->next = ape;
             else
-                iflags.autopickup_exceptions = ape;
+                apelist = ape;
             regex_free(freeape->regex);
             free((genericptr_t) freeape->pattern);
             free((genericptr_t) freeape);
@@ -5984,11 +5984,11 @@ struct autopickup_exception *whichape;
 void
 free_autopickup_exceptions()
 {
-    struct autopickup_exception *ape = iflags.autopickup_exceptions;
-    while ((ape = iflags.autopickup_exceptions) != 0) {
+    struct autopickup_exception *ape = apelist;
+    while ((ape = apelist) != 0) {
       regex_free(ape->regex);
       free((genericptr_t) ape->pattern);
-      iflags.autopickup_exceptions = ape->next;
+      apelist = ape->next;
       free((genericptr_t) ape);
     }
 }

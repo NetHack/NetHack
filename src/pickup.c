@@ -718,11 +718,13 @@ struct obj *obj;
     /*
      *  Does the text description of this match an exception?
      */
-    struct autopickup_exception
-        *ape = iflags.autopickup_exceptions;
+    struct autopickup_exception *ape = apelist;
+
     if (ape) {
         char *objdesc = makesingular(doname(obj));
-        while (ape && !regex_match(objdesc, ape->regex)) ape = ape->next;
+
+        while (ape && !regex_match(objdesc, ape->regex))
+            ape = ape->next;
     }
     return ape;
 }
@@ -732,6 +734,7 @@ autopick_testobj(otmp, calc_costly)
 struct obj *otmp;
 boolean calc_costly;
 {
+    struct autopickup_exception *ape;
     static boolean costly = FALSE;
     const char *otypes = flags.pickup_types;
     boolean pickit;
@@ -748,9 +751,8 @@ boolean calc_costly;
     /* check for pickup_types */
     pickit = (!*otypes || index(otypes, otmp->oclass));
 
-    /* check for autopickup excpetions */
-    struct autopickup_exception
-        *ape = check_autopickup_exceptions(otmp);
+    /* check for autopickup exceptions */
+    ape = check_autopickup_exceptions(otmp);
     if (ape)
         pickit = ape->grab;
 

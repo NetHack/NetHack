@@ -418,6 +418,7 @@ struct autopickup_exception {
     boolean grab;
     struct autopickup_exception *next;
 };
+E struct autopickup_exception *apelist;
 
 struct plinemsg_type {
     xchar msgtype;  /* one of MSGTYP_foo */
