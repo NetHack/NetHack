@@ -573,7 +573,6 @@ STATIC_DCL boolean FDECL(special_handling, (const char *,
 STATIC_DCL const char *FDECL(get_compopt_value, (const char *, char *));
 STATIC_DCL void FDECL(remove_autopickup_exception,
                       (struct autopickup_exception *));
-STATIC_DCL int NDECL(count_ape_maps);
 
 STATIC_DCL boolean FDECL(is_wc_option, (const char *));
 STATIC_DCL boolean FDECL(wc_supported, (const char *));
@@ -4414,7 +4413,15 @@ int nset;
 int
 count_apes(VOID_ARGS)
 {
-    return count_ape_maps();
+    int numapes = 0;
+    struct autopickup_exception *ape = iflags.autopickup_exceptions;
+
+    while (ape) {
+      numapes++;
+      ape = ape->next;
+    }
+
+    return numapes;
 }
 
 enum opt_other_enums {
@@ -5290,7 +5297,7 @@ boolean setinitial, setfromfile;
         struct autopickup_exception *ape;
 
  ape_again:
-        numapes = count_ape_maps();
+        numapes = count_apes();
         opt_idx = handle_add_list_remove("autopickup exception", numapes);
         if (opt_idx == 3) { /* done */
             return TRUE;
@@ -5891,7 +5898,7 @@ dotogglepickup()
         oc_to_str(flags.pickup_types, ocl);
         Sprintf(buf, "ON, for %s objects%s", ocl[0] ? ocl : "all",
                 (iflags.autopickup_exceptions)
-                    ? ((count_ape_maps() == 1)
+                    ? ((count_apes() == 1)
                            ? ", with one exception"
                            : ", with some exceptions")
                     : "");
@@ -5972,20 +5979,6 @@ struct autopickup_exception *whichape;
             ape = ape->next;
         }
     }
-}
-
-STATIC_OVL int
-count_ape_maps()
-{
-    int numapes = 0;
-    struct autopickup_exception *ape = iflags.autopickup_exceptions;
-
-    while (ape) {
-      numapes++;
-      ape = ape->next;
-    }
-
-    return numapes;
 }
 
 void
