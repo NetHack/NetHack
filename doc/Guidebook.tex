@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{July 9, 2019}
+\date{October 1, 2019}
 
 \maketitle
 
@@ -4293,12 +4293,14 @@ character in the pattern, specifically:
 %.ei
 %.ed
 
-A ``never pickup'' rule takes precedence over an ``always pickup'' rule if
-both match.
+The {\it autopickup\verb+_+exception\/} rules are processed in the order 
+in which they appear in your config file, thus allowing a later rule to override
+an earlier rule.
 
 %.lp ""
-Exceptions can be set with the `{\tt O}' command, but ones set that way will
-not be preserved across saves and restores.
+Exceptions can be set with the `{\tt O}' command, but because they are not included
+in your config file, they won't be in effect if you save and then restore your game.
+{\it autopickup\verb+_+exception\/} rules are not saved with the game.
 \elist
 
 %.lp "Here are some examples:"

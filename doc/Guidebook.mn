@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "July 9, 2019
+.ds f2 "October 1, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -3852,11 +3852,16 @@ character in the pattern, specifically:
 .CC > "never pickup an object that matches rest of pattern."
 .ei
 .ed
-A \(lqnever pickup\(rq rule takes precedence over an \(lqalways pickup\(rq
-rule if both match.
+The
+.op autopickup_exception
+rules are processed in the order in which they appear in your config file,
+thus allowing a later rule to override an earlier rule.
 .lp ""
-Exceptions can be set with the \(oqO\(cq command, but ones set that way will
-not be preserved across saves and restores.
+Exceptions can be set with the \(oqO\(cq command, but because they are not
+included in your config file, they won't be in effect if you save and then
+restore your game. 
+.op autopickup_exception
+rules and not saved with the game.
 .\" end of ``.lp autopickup_exception'' entry; continue enclosing page...
 .\" use .lp "text" to make an unindented paragraph ("text" should be short)
 .lp "Here are some examples:"
