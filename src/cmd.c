@@ -2513,7 +2513,7 @@ int final;
             Strcpy(predicament, "trapped");
             if ((t = t_at(u.ux, u.uy)) != 0)
                 Sprintf(eos(predicament), " in %s",
-                        an(defsyms[trap_to_defsym(t->ttyp)].explanation));
+                        an(trapname(t->ttyp, FALSE)));
         }
         if (u.usteed) { /* not `Riding' here */
             Sprintf(buf, "%s%s ", anchored ? "you and " : "", steedname);
