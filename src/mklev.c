@@ -2043,8 +2043,8 @@ xchar x, y;
         source = &br->end1;
     }
 
-    /* Already set or 2/3 chance of deferring until a later level. */
-    if (source->dnum < g.n_dgns || (rn2(3) && !wizard))
+    /* Already set. */
+    if (source->dnum < g.n_dgns)
         return;
 
     if (!(u.uz.dnum == oracle_level.dnum      /* in main dungeon */
