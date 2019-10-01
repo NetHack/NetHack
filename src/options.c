@@ -5326,8 +5326,7 @@ boolean setinitial, setfromfile;
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
             if (numapes) {
-                ape = (struct autopickup_exception *)
-                    apelist;
+                ape = apelist;
                 any = zeroany;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                          "Always pickup '<'; never pickup '>'",
@@ -5952,8 +5951,8 @@ const char *mapping;
 
     ape->pattern = dupstr(text);
     ape->grab = grab;
-    ape->next = (struct autopickup_exception *) apelist;
-    apelist = (struct autopickup_exception *) ape;
+    ape->next = apelist;
+    apelist = ape;
     return 1;
 }
 
@@ -5985,6 +5984,7 @@ void
 free_autopickup_exceptions()
 {
     struct autopickup_exception *ape = apelist;
+
     while ((ape = apelist) != 0) {
       regex_free(ape->regex);
       free((genericptr_t) ape->pattern);
