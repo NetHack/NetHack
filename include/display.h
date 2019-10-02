@@ -149,25 +149,21 @@
 /*
  * random_monster()
  * random_object()
- * random_trap()
  *
- * Respectively return a random monster, object, or trap number.
+ * Respectively return a random monster or object.
  */
 #define random_monster(rng) rng(NUMMONS)
 #define random_object(rng) (rng(NUM_OBJECTS - 1) + 1)
-#define random_trap(rng) (rng(TRAPNUM - 1) + 1)
 
 /*
  * what_obj()
  * what_mon()
- * what_trap()
  *
  * If hallucinating, choose a random object/monster, otherwise, use the one
  * given. Use the given rng to handle hallucination.
  */
 #define what_obj(obj, rng) (Hallucination ? random_object(rng) : obj)
 #define what_mon(mon, rng) (Hallucination ? random_monster(rng) : mon)
-#define what_trap(trp, rng) (Hallucination ? random_trap(rng) : trp)
 
 /*
  * newsym_rn2
@@ -338,8 +334,8 @@
 #define explosion_to_glyph(expltype, idx) \
     ((((expltype) * MAXEXPCHARS) + ((idx) - S_explode1)) + GLYPH_EXPLODE_OFF)
 
-#define trap_to_glyph(trap, rng)                                \
-    cmap_to_glyph(trap_to_defsym(what_trap((trap)->ttyp, rng)))
+#define trap_to_glyph(trap)                                \
+    cmap_to_glyph(trap_to_defsym((trap)->ttyp))
 
 /* Not affected by hallucination.  Gives a generic body for CORPSE */
 /* MRKR: ...and the generic statue */

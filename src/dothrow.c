@@ -756,8 +756,7 @@ int x, y;
             return TRUE;
         } else {
             if (ttmp->tseen)
-                You("pass right over %s.",
-                    an(defsyms[trap_to_defsym(ttmp->ttyp)].explanation));
+                You("pass right over %s.", an(trapname(ttmp->ttyp, FALSE)));
         }
     }
     if (--*range < 0) /* make sure our range never goes negative */

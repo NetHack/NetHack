@@ -2487,7 +2487,7 @@ struct obj *otmp;
     if (otmp == g.trapinfo.tobj && u.ux == g.trapinfo.tx 
                                 && u.uy == g.trapinfo.ty) {
         You("resume setting %s%s.", shk_your(buf, otmp),
-            defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation);
+            trapname(ttyp, FALSE));
         set_occupation(set_trap, occutext, 0);
         return;
     }
@@ -2512,7 +2512,7 @@ struct obj *otmp;
             chance = (rnl(10) > 5);
         You("aren't very skilled at reaching from %s.", mon_nam(u.usteed));
         Sprintf(buf, "Continue your attempt to set %s?",
-                the(defsyms[trap_to_defsym(what_trap(ttyp, rn2))]
+                the(trapname(ttyp, FALSE)));
                     .explanation));
         if (yn(buf) == 'y') {
             if (chance) {
@@ -2523,9 +2523,7 @@ struct obj *otmp;
                     break;
                 case BEAR_TRAP: /* drop it without arming it */
                     reset_trapset();
-                    You("drop %s!",
-                        the(defsyms[trap_to_defsym(what_trap(ttyp, rn2))]
-                                .explanation));
+                    You("drop %s!", the(trapname(ttyp, FALSE)));
                     dropx(otmp);
                     return;
                 }
@@ -2535,8 +2533,7 @@ struct obj *otmp;
             return;
         }
     }
-    You("begin setting %s%s.", shk_your(buf, otmp),
-        defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation);
+    You("begin setting %s%s.", shk_your(buf, otmp), trapname(ttyp, FALSE));
     set_occupation(set_trap, occutext, 0);
     return;
 }
@@ -2567,8 +2564,7 @@ set_trap()
             add_damage(u.ux, u.uy, 0L); /* schedule removal */
         }
         if (!g.trapinfo.force_bungle)
-            You("finish arming %s.",
-                the(defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation));
+            You("finish arming %s.", the(trapname(ttyp, FALSE)));
         if (((otmp->cursed || Fumbling) && (rnl(10) > 5))
             || g.trapinfo.force_bungle)
             dotrap(ttmp,

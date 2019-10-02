@@ -1606,7 +1606,6 @@ void
 find_trap(trap)
 struct trap *trap;
 {
-    int tt = what_trap(trap->ttyp, rn2);
     boolean cleared = FALSE;
 
     trap->tseen = 1;
@@ -1626,7 +1625,7 @@ struct trap *trap;
         cleared = TRUE;
     }
 
-    You("find %s.", an(defsyms[trap_to_defsym(tt)].explanation));
+    You("find %s.", an(trapname(trap->ttyp, FALSE)));
 
     if (cleared) {
         display_nhwindow(WIN_MAP, TRUE); /* wait */
