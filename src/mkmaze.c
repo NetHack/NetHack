@@ -691,7 +691,7 @@ struct monst *mtmp;
     }
     if (is_captain || !rn2(8)) {
         otyp = shiny_obj(RING_CLASS);
-        if (otyp != STRANGE_OBJECT && (otmp = mksobj(otyp, FALSE, FALSE)) != 0)
+        if (otyp != STRANGE_OBJECT && (otmp = mksobj(otyp, TRUE, FALSE)) != 0)
             add_to_minv(mtmp, otmp);
     }
 }
