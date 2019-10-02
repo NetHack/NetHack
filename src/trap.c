@@ -5454,7 +5454,7 @@ boolean override;
         "pile of poo", "honey trap", "tourist trap"
     };
     int total_names = TRAPNUM + SIZE(halu_trapnames);
-    int nameidx = rn2(total_names);
+    int nameidx = rn2_on_display_rng(total_names);
     if (override || !Hallucination) {
         return defsyms[trap_to_defsym(ttyp)].explanation;
     }
