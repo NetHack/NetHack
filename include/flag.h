@@ -20,6 +20,7 @@ struct flag {
     boolean autodig;    /* MRKR: Automatically dig */
     boolean autoquiver; /* Automatically fill quiver */
     boolean autoopen;   /* open doors by walking into them */
+    boolean autounlock; /* automatically apply unlocking tools */
     boolean beginner;
     boolean biff;      /* enable checking for mail */
     boolean bones;     /* allow saving/loading bones */
