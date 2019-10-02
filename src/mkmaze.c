@@ -675,7 +675,7 @@ struct monst *mtmp;
     goldprob = is_captain ? 600 : 300;
     gemprob = goldprob / 4;
     if (rn2(1000) < goldprob) {
-        if ((otmp = mksobj(GOLD_PIECE, FALSE, FALSE)) != 0) {
+        if ((otmp = mksobj(GOLD_PIECE, TRUE, FALSE)) != 0) {
             otmp->quan = 1L + rnd(goldprob);
             otmp->owt = weight(otmp);
             add_to_minv(mtmp, otmp);
