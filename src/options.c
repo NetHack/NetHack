@@ -561,7 +561,6 @@ static boolean FDECL(special_handling, (const char *,
 static const char *FDECL(get_compopt_value, (const char *, char *));
 static void FDECL(remove_autopickup_exception,
                       (struct autopickup_exception *));
-static int FDECL(count_ape_maps, (int *, int *));
 
 static boolean FDECL(is_wc_option, (const char *));
 static boolean FDECL(wc_supported, (const char *));
@@ -4352,7 +4351,15 @@ int nset;
 int
 count_apes(VOID_ARGS)
 {
-    return count_ape_maps((int *) 0, (int *) 0);
+    int numapes = 0;
+    struct autopickup_exception *ape = g.apelist;
+
+    while (ape) {
+      numapes++;
+      ape = ape->next;
+    }
+
+    return numapes;
 }
 
 enum opt_other_enums {
@@ -5220,13 +5227,13 @@ boolean setinitial, setfromfile;
                 goto menucolors_again;
         }
     } else if (!strcmp("autopickup_exception", optname)) {
-        int opt_idx, pass, totalapes = 0, numapes[2] = { 0, 0 };
-        char apebuf[1 + BUFSZ]; /* so &apebuf[1] is BUFSZ long for getlin() */
+        int opt_idx, numapes = 0;
+        char apebuf[2 + BUFSZ]; /* so &apebuf[1] is BUFSZ long for getlin() */
         struct autopickup_exception *ape;
 
  ape_again:
-        totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
-        opt_idx = handle_add_list_remove("autopickup exception", totalapes);
+        numapes = count_apes();
+        opt_idx = handle_add_list_remove("autopickup exception", numapes);
         if (opt_idx == 3) { /* done */
             return TRUE;
         } else if (opt_idx == 0) { /* add new */
@@ -5242,7 +5249,7 @@ boolean setinitial, setfromfile;
                 /* guarantee room for \" prefix and \"\0 suffix;
                    -2 is good enough for apebuf[] but -3 makes
                    sure the whole thing fits within normal BUFSZ */
-                apebuf[sizeof apebuf - 3] = '\0';
+                apebuf[sizeof apebuf - 2] = '\0';
                 Strcat(apebuf, "\"");
                 add_autopickup_exception(apebuf);
             }
@@ -5253,18 +5260,18 @@ boolean setinitial, setfromfile;
 
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
-            for (pass = AP_LEAVE; pass <= AP_GRAB; ++pass) {
-                if (numapes[pass] == 0)
-                    continue;
-                ape = iflags.autopickup_exceptions[pass];
+            if (numapes) {
+                ape = g.apelist;
                 any = cg.zeroany;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-                         (pass == 0) ? "Never pickup" : "Always pickup",
+                         "Always pickup '<'; never pickup '>'",
                          MENU_UNSELECTED);
-                for (i = 0; i < numapes[pass] && ape; i++) {
+                for (i = 0; i < numapes && ape; i++) {
                     any.a_void = (opt_idx == 1) ? 0 : ape;
-                    /* length of pattern plus quotes is less than BUFSZ */
-                    Sprintf(apebuf, "\"%s\"", ape->pattern);
+                    /* length of pattern plus quotes (plus '<'/'>') is less than
+                       BUFSZ */
+                    Sprintf(apebuf, "\"%c%s\"", ape->grab ? '<' : '>',
+                            ape->pattern);
                     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, apebuf,
                              MENU_UNSELECTED);
                     ape = ape->next;
@@ -5820,9 +5827,8 @@ dotogglepickup()
     if (flags.pickup) {
         oc_to_str(flags.pickup_types, ocl);
         Sprintf(buf, "ON, for %s objects%s", ocl[0] ? ocl : "all",
-                (iflags.autopickup_exceptions[AP_LEAVE]
-                 || iflags.autopickup_exceptions[AP_GRAB])
-                    ? ((count_ape_maps((int *) 0, (int *) 0) == 1)
+                (g.apelist)
+                    ? ((count_apes() == 1)
                            ? ", with one exception"
                            : ", with some exceptions")
                     : "");
@@ -5841,7 +5847,7 @@ const char *mapping;
         APE_regex_error[] = "regex error in AUTOPICKUP_EXCEPTION",
         APE_syntax_error[] = "syntax error in AUTOPICKUP_EXCEPTION";
 
-    struct autopickup_exception *ape, **apehead;
+    struct autopickup_exception *ape;
     char text[256], end;
     int n;
     boolean grab = FALSE;
@@ -5873,13 +5879,11 @@ const char *mapping;
         free((genericptr_t) ape);
         return 0;
     }
-    apehead = (grab) ? &iflags.autopickup_exceptions[AP_GRAB]
-                     : &iflags.autopickup_exceptions[AP_LEAVE];
 
     ape->pattern = dupstr(text);
     ape->grab = grab;
-    ape->next = *apehead;
-    *apehead = ape;
+    ape->next = g.apelist;
+    g.apelist = ape;
     return 1;
 }
 
@@ -5888,16 +5892,15 @@ remove_autopickup_exception(whichape)
 struct autopickup_exception *whichape;
 {
     struct autopickup_exception *ape, *freeape, *prev = 0;
-    int chain = whichape->grab ? AP_GRAB : AP_LEAVE;
 
-    for (ape = iflags.autopickup_exceptions[chain]; ape;) {
+    for (ape = g.apelist; ape;) {
         if (ape == whichape) {
             freeape = ape;
             ape = ape->next;
             if (prev)
                 prev->next = ape;
             else
-                iflags.autopickup_exceptions[chain] = ape;
+                g.apelist = ape;
             regex_free(freeape->regex);
             free((genericptr_t) freeape->pattern);
             free((genericptr_t) freeape);
@@ -5908,42 +5911,16 @@ struct autopickup_exception *whichape;
     }
 }
 
-static int
-count_ape_maps(leave, grab)
-int *leave, *grab;
-{
-    struct autopickup_exception *ape;
-    int pass, totalapes, numapes[2];
-
-    numapes[0] = numapes[1] = 0;
-    for (pass = AP_LEAVE; pass <= AP_GRAB; ++pass) {
-        ape = iflags.autopickup_exceptions[pass];
-        while (ape) {
-            ape = ape->next;
-            numapes[pass]++;
-        }
-    }
-    totalapes = numapes[AP_LEAVE] + numapes[AP_GRAB];
-    if (leave)
-        *leave = numapes[AP_LEAVE];
-    if (grab)
-        *grab = numapes[AP_GRAB];
-    return totalapes;
-}
-
 void
 free_autopickup_exceptions()
 {
     struct autopickup_exception *ape;
-    int pass;
 
-    for (pass = AP_LEAVE; pass <= AP_GRAB; ++pass) {
-        while ((ape = iflags.autopickup_exceptions[pass]) != 0) {
-            regex_free(ape->regex);
-            free((genericptr_t) ape->pattern);
-            iflags.autopickup_exceptions[pass] = ape->next;
-            free((genericptr_t) ape);
-        }
+    while ((ape = g.apelist) != 0) {
+      regex_free(ape->regex);
+      free((genericptr_t) ape->pattern);
+      g.apelist = ape->next;
+      free((genericptr_t) ape);
     }
 }
 

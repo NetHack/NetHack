@@ -891,6 +891,7 @@ struct instance_globals {
     char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */    
     struct monst *mydogs; /* monsters that went down/up together with @ */
     struct monst *migrating_mons; /* monsters moving to another level */
+    struct autopickup_exception *apelist;
     struct mvitals mvitals[NUMMONS];
 
     /* dokick.c */

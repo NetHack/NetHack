@@ -376,6 +376,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* preferred_pet */
     NULL, /* mydogs */
     NULL, /* migrating_mons */
+    NULL, /* apelist */
     UNDEFINED_VALUES, /* mvitals */
 
     /* dokick.c */

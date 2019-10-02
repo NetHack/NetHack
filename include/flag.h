@@ -409,9 +409,6 @@ struct instance_flags {
     int wc2_statuslines;        /* default = 2, curses can handle 3 */
     int wc2_windowborders;	/* display borders on NetHack windows */
     int wc2_petattr;            /* text attributes for pet */
-    struct autopickup_exception *autopickup_exceptions[2];
-#define AP_LEAVE 0
-#define AP_GRAB 1
 #ifdef WIN32
 #define MAX_ALTKEYHANDLER 25
     char altkeyhandler[MAX_ALTKEYHANDLER];
