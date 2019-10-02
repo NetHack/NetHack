@@ -228,7 +228,7 @@ register struct trap *trap;
 register int show;
 {
     register int x = trap->tx, y = trap->ty;
-    register int glyph = trap_to_glyph(trap, newsym_rn2);
+    register int glyph = trap_to_glyph(trap);
 
     if (g.level.flags.hero_memory)
         levl[x][y].glyph = glyph;

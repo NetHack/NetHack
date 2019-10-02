@@ -2513,7 +2513,6 @@ struct obj *otmp;
         You("aren't very skilled at reaching from %s.", mon_nam(u.usteed));
         Sprintf(buf, "Continue your attempt to set %s?",
                 the(trapname(ttyp, FALSE)));
-                    .explanation));
         if (yn(buf) == 'y') {
             if (chance) {
                 switch (ttyp) {

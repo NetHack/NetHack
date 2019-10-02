@@ -1616,8 +1616,7 @@ struct trap *trap;
        behaviour might need a rework in the hallucination case
        (e.g. to not prompt if any trap glyph appears on the square). */
     if (Hallucination ||
-        levl[trap->tx][trap->ty].glyph !=
-        trap_to_glyph(trap, rn2_on_display_rng)) {
+        levl[trap->tx][trap->ty].glyph != trap_to_glyph(trap)) {
         /* There's too much clutter to see your find otherwise */
         cls();
         map_trap(trap, 1);
@@ -1864,7 +1863,7 @@ int default_glyph, which_subset;
              || glyph_is_invisible(glyph))
             && keep_traps && !covers_traps(x, y)) {
             if ((t = t_at(x, y)) != 0 && t->tseen)
-                glyph = trap_to_glyph(t, rn2_on_display_rng);
+                glyph = trap_to_glyph(t);
         }
         if ((glyph_is_object(glyph) && !keep_objs)
             || (glyph_is_trap(glyph) && !keep_traps)
