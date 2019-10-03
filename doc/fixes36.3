@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.116 $ $NHDT-Date: 1569276988 2019/09/23 22:16:28 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.121 $ $NHDT-Date: 1570142734 2019/10/03 22:45:34 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -157,6 +157,12 @@ uarmh null pointer dereference if a helm of opposite alignment came off due
 verb tense was inappropriate in some messages when a mon/pet had a name 
 	ending in 's'
 orctown booty items should have been initialized in mksobj()
+query_category() and whatdoes_help() had early returns which could each leave
+	a temporary window around, which in turn might eventually lead to a
+	panic due to lack of window slots [probably moot for unmodified 3.6.x;
+	the query one couldn't happen unless there is a coding error for
+	object classes somewhere and the help one couldn't happen unless the
+	installed data files left 'keyhelp' missing]
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
