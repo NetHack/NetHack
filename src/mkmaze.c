@@ -671,7 +671,7 @@ struct monst *mtmp;
     goldprob = is_captain ? 600 : 300;
     gemprob = goldprob / 4;
     if (rn2(1000) < goldprob) {
-        if ((otmp = mksobj(GOLD_PIECE, FALSE, FALSE)) != 0) {
+        if ((otmp = mksobj(GOLD_PIECE, TRUE, FALSE)) != 0) {
             otmp->quan = 1L + rnd(goldprob);
             otmp->owt = weight(otmp);
             add_to_minv(mtmp, otmp);
@@ -687,7 +687,7 @@ struct monst *mtmp;
     }
     if (is_captain || !rn2(8)) {
         otyp = shiny_obj(RING_CLASS);
-        if (otyp != STRANGE_OBJECT && (otmp = mksobj(otyp, FALSE, FALSE)) != 0)
+        if (otyp != STRANGE_OBJECT && (otmp = mksobj(otyp, TRUE, FALSE)) != 0)
             add_to_minv(mtmp, otmp);
     }
 }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1562632673 2019/07/09 00:37:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1570142734 2019/10/03 22:45:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1575,7 +1575,7 @@ whatdoes_help()
 {
     dlb *fp;
     char *p, buf[BUFSZ];
-    winid tmpwin = create_nhwindow(NHW_TEXT);
+    winid tmpwin;
 
     fp = dlb_fopen(KEYHELP, "r");
     if (!fp) {
@@ -1583,6 +1583,7 @@ whatdoes_help()
         display_nhwindow(WIN_MESSAGE, TRUE);
         return;
     }
+    tmpwin = create_nhwindow(NHW_TEXT);
     while (dlb_fgets(buf, (int) sizeof buf, fp)) {
         if (*buf == '#')
             continue;

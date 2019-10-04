@@ -61,7 +61,15 @@ If you have problems, send us some email.
 
 nethack-bugs@nethack.org
 
+Recommended steps:
 
+1.  cd sys/unix
+2.  sh setup.sh hints/linux
+3.  cd ../..
+4.  make all; su; make install
+
+
+The older instructions are retained below...
 
 Steps used to build this binary release, in addition to the basic
 instructions found in sys/unix/Install.unx.  The step numbers below
@@ -69,7 +77,7 @@ correspond to the step numbers in sys/unix/Install.unx.
 
 System:  gcc-3.2, XFree86-libs-4.2.1, ncurses-5.2, glibc-2.3.2 (GLIBC_2.3)
 
-3.  Edit include/config.h and include/unixconf.h
+1.  Edit include/config.h and include/unixconf.h
     config.h: define X11_GRAPHICS window support.
               define USE_XPM support.
               define COMPRESS as /bin/gzip as that is where it
@@ -80,12 +88,12 @@ System:  gcc-3.2, XFree86-libs-4.2.1, ncurses-5.2, glibc-2.3.2 (GLIBC_2.3)
     unixconf.h: define LINUX
                 define TIMED_DELAY
 
-6.  Makefile.src: define modern, non-BSD Linux and linux options throughout
+2.  Makefile.src: define modern, non-BSD Linux and linux options throughout
 		  CC = gcc
 		  LFLAGS = -L/usr/X11R6/lib
 		  WINSRC = $(WINTTYSRC) $(WINX11SRC)
 		  WINOBJ = $(WINTTYOBJ) $(WINX11OBJ)
-		  WINTTYLIB = /usr/lib/libncurses.a
+		  WINTTYLIB = -lncurses
 		  WINX11LIB = -lXaw -lXmu -lXext -lXt -lXpm -lX11
 		  WINLIB = $(WINTTYLIB) $(WINX11LIB)
 
@@ -96,7 +104,7 @@ System:  gcc-3.2, XFree86-libs-4.2.1, ncurses-5.2, glibc-2.3.2 (GLIBC_2.3)
 		  YACC = bison -y
 		  LEX = flex
 
-7.  Makefile.top: GAMEGRP = games
+3.  Makefile.top: GAMEGRP = games
 		  GAMEPERM = 02755
 		  FILEPERM = 0664
 		  EXEPERM = 0755
@@ -105,5 +113,5 @@ System:  gcc-3.2, XFree86-libs-4.2.1, ncurses-5.2, glibc-2.3.2 (GLIBC_2.3)
 
     make all; su; make install
 
-9.  Additional step: As discussed in win/X11/Install.X11, convert nh10.bdf
+4.  Additional step: As discussed in win/X11/Install.X11, convert nh10.bdf
     and ibm.bdf to proper font files and place in font path.
