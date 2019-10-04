@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.122 $ $NHDT-Date: 1570227405 2019/10/04 22:16:45 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.123 $ $NHDT-Date: 1570230710 2019/10/04 23:11:50 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -168,6 +168,9 @@ ball and chain could end up too far from punished hero (triggering b&c warning
 	water failed because dropping stuff left hero overly encumbered and
 	hero was life saved--or player declined to die--if the hero got
 	teleported one step further from ball and chain's current location
+avoid 'object lost' panic when polymorph causes loss of levitation boots or
+	water walking boots which dumps hero into water where emergency
+	disrobing/dropping in order to crawl out chooses to drop those boots
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
