@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1567213892 2019/08/31 01:11:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.262 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1570232224 2019/10/04 23:37:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -141,8 +141,10 @@ struct obj *obj;
             case DRUM_OF_EARTHQUAKE:
             case HORN_OF_PLENTY: /* not a musical instrument */
                 k = 3; /* instrument or unknown horn of plenty */
+                break;
             default:
                 k = 4; /* 'other' tool */
+                break;
             }
         break;
     case FOOD_CLASS:
