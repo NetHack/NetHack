@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.121 $ $NHDT-Date: 1570142734 2019/10/03 22:45:34 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.122 $ $NHDT-Date: 1570227405 2019/10/04 22:16:45 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -163,6 +163,11 @@ query_category() and whatdoes_help() had early returns which could each leave
 	the query one couldn't happen unless there is a coding error for
 	object classes somewhere and the help one couldn't happen unless the
 	installed data files left 'keyhelp' missing]
+ball and chain could end up too far from punished hero (triggering b&c warning
+	for wizard mode with sanity checking active) when crawling out of
+	water failed because dropping stuff left hero overly encumbered and
+	hero was life saved--or player declined to die--if the hero got
+	teleported one step further from ball and chain's current location
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -170,7 +175,7 @@ Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
 elemental_clog() loop needed to guard against obliteration of the monster
 	that was trying to be placed
 using ^G to create "hidden mimic" shouldn't have marked it as undetected since
-	mimics 'hide' be appearing to be something else; honor "hidden" for
+	mimics 'hide' by appearing to be something else; honor "hidden" for
 	'hides_under' creatures if/when created at location with object(s),
 	also for eels and other fish if/when created at water location
 for wizard mode 'wizweight' option, glob weight wasn't shown unless glob had
