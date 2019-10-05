@@ -1,4 +1,4 @@
-/* NetHack 3.6	dlb_main.c	$NHDT-Date: 1432512785 2015/05/25 00:13:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	dlb_main.c	$NHDT-Date: 1570258542 2019/10/05 06:55:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,7 +15,7 @@
 #endif
 
 static void FDECL(grow_ld, (libdir **, int *, int));
-static void FDECL(xexit, (int));
+static void FDECL(xexit, (int)) NORETURN;
 
 #ifdef DLB
 #ifdef DLBLIB
@@ -31,10 +31,9 @@ char *FDECL(eos, (char *)); /* also used by dlb.c */
 FILE *FDECL(fopen_datafile, (const char *, const char *));
 
 static void FDECL(Write, (int, char *, long));
-static void NDECL(usage);
-static void NDECL(verbose_help);
-static void FDECL(write_dlb_directory,
-                  (int, int, libdir *, long, long, long));
+static void NDECL(usage) NORETURN;
+static void NDECL(verbose_help) NORETURN;
+static void FDECL(write_dlb_directory, (int, int, libdir *, long, long, long));
 
 static char default_progname[] = "dlb";
 static char *progname = default_progname;
@@ -84,12 +83,13 @@ usage()
     (void) printf("  default library is %s\n", library_file);
     (void) printf("  default list file is %s\n", list_file);
     xexit(EXIT_FAILURE);
+    /*NOTREACHED*/
 }
 
 static void
 verbose_help()
 {
-    static const char *long_help[] = {
+    static const char *const long_help[] = {
         "", "dlb COMMANDoptions args... files...", "  commands:",
         "    dlb ?   print this text", "    dlb h   ditto",
         "    dlb x   extract all files", "    dlb c   create the archive",
@@ -100,11 +100,12 @@ verbose_help()
         "    C dir   change directory before processing any files", "",
         (char *) 0
     };
-    const char **str;
+    const char *const *str;
 
     for (str = long_help; *str; str++)
         (void) printf("%s\n", *str);
     usage();
+    /*NOTREACHED*/
 }
 
 static void
@@ -180,11 +181,14 @@ char **argv;
         switch (argv[1][cp]) {
         default:
             usage(); /* doesn't return */
+            /*NOTREACHED*/
+            break;
         case '-':    /* silently ignore */
             break;
         case '?':
         case 'h':
             verbose_help();
+            /*NOTREACHED*/
             break;
         case 'I':
             if (ap == argc)
@@ -243,7 +247,9 @@ char **argv;
     default:
         printf("Internal error - action.\n");
         xexit(EXIT_FAILURE);
+        /*NOTREACHED*/
         break;
+
     case 't': /* list archive */
         if (!open_library(library_file, &lib)) {
             printf("Can't open dlb file\n");
@@ -263,7 +269,8 @@ char **argv;
                    lib.nentries, lib.strsize);
 
         close_library(&lib);
-        xexit(EXIT_SUCCESS);
+        /* xexit(EXIT_SUCCESS); */
+        break;
 
     case 'x': { /* extract archive contents */
         int f, n;
@@ -331,7 +338,8 @@ char **argv;
         }
 
         close_library(&lib);
-        xexit(EXIT_SUCCESS);
+        /* xexit(EXIT_SUCCESS); */
+        break;
     }
 
     case 'c': /* create archive */
@@ -403,8 +411,8 @@ char **argv;
         }
 
         /* open output file */
-        out =
-            open(library_file, O_RDWR | O_TRUNC | O_BINARY | O_CREAT, FCMASK);
+        out = open(library_file,
+                   O_RDWR | O_TRUNC | O_BINARY | O_CREAT, FCMASK);
         if (out < 0) {
             printf("Can't open %s for output\n", library_file);
             xexit(EXIT_FAILURE);
@@ -462,9 +470,10 @@ char **argv;
         free((genericptr_t) ld), ldlimit = 0;
 
         (void) close(out);
-        xexit(EXIT_SUCCESS);
-    }
-    }
+        /* xexit(EXIT_SUCCESS); */
+        break;
+    } /* case 'c' */
+    } /* switch */
 #endif /* DLBLIB */
 #endif /* DLB */
 
@@ -540,6 +549,7 @@ int retcd;
 #endif
 #endif
     exit(retcd);
+    /*NOTREACHED*/
 }
 
 #ifdef AMIGA
