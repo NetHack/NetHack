@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1560850774 2019/06/18 09:39:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1570235292 2019/10/05 00:28:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1766,41 +1766,33 @@ static short
 mixtype(o1, o2)
 register struct obj *o1, *o2;
 {
+    int o1typ = o1->otyp, o2typ = o2->otyp;
+
     /* cut down on the number of cases below */
     if (o1->oclass == POTION_CLASS
-        && (o2->otyp == POT_GAIN_LEVEL || o2->otyp == POT_GAIN_ENERGY
-            || o2->otyp == POT_HEALING || o2->otyp == POT_EXTRA_HEALING
-            || o2->otyp == POT_FULL_HEALING || o2->otyp == POT_ENLIGHTENMENT
-            || o2->otyp == POT_FRUIT_JUICE)) {
-        struct obj *swp;
-
-        swp = o1;
-        o1 = o2;
-        o2 = swp;
+        && (o2typ == POT_GAIN_LEVEL || o2typ == POT_GAIN_ENERGY
+            || o2typ == POT_HEALING || o2typ == POT_EXTRA_HEALING
+            || o2typ == POT_FULL_HEALING || o2typ == POT_ENLIGHTENMENT
+            || o2typ == POT_FRUIT_JUICE)) {
+        /* swap o1 and o2 */
+        o1typ = o2->otyp;
+        o2typ = o1->otyp;
     }
 
-    switch (o1->otyp) {
+    switch (o1typ) {
     case POT_HEALING:
-        switch (o2->otyp) {
-        case POT_SPEED:
-        case POT_GAIN_LEVEL:
-        case POT_GAIN_ENERGY:
+        if (o2typ == POT_SPEED)
             return POT_EXTRA_HEALING;
-        }
+        /*FALLTHRU*/
     case POT_EXTRA_HEALING:
-        switch (o2->otyp) {
-        case POT_GAIN_LEVEL:
-        case POT_GAIN_ENERGY:
-            return POT_FULL_HEALING;
-        }
     case POT_FULL_HEALING:
-        switch (o2->otyp) {
-        case POT_GAIN_LEVEL:
-        case POT_GAIN_ENERGY:
-            return POT_GAIN_ABILITY;
-        }
+        if (o2typ == POT_GAIN_LEVEL || o2typ == POT_GAIN_ENERGY)
+            return (o1typ == POT_HEALING) ? POT_EXTRA_HEALING
+                   : (o1typ == POT_EXTRA_HEALING) ? POT_FULL_HEALING
+                     : POT_GAIN_ABILITY;
+        /*FALLTHRU*/
     case UNICORN_HORN:
-        switch (o2->otyp) {
+        switch (o2typ) {
         case POT_SICKNESS:
             return POT_FRUIT_JUICE;
         case POT_HALLUCINATION:
@@ -1810,12 +1802,12 @@ register struct obj *o1, *o2;
         }
         break;
     case AMETHYST: /* "a-methyst" == "not intoxicated" */
-        if (o2->otyp == POT_BOOZE)
+        if (o2typ == POT_BOOZE)
             return POT_FRUIT_JUICE;
         break;
     case POT_GAIN_LEVEL:
     case POT_GAIN_ENERGY:
-        switch (o2->otyp) {
+        switch (o2typ) {
         case POT_CONFUSION:
             return (rn2(3) ? POT_BOOZE : POT_ENLIGHTENMENT);
         case POT_HEALING:
@@ -1831,7 +1823,7 @@ register struct obj *o1, *o2;
         }
         break;
     case POT_FRUIT_JUICE:
-        switch (o2->otyp) {
+        switch (o2typ) {
         case POT_SICKNESS:
             return POT_SICKNESS;
         case POT_ENLIGHTENMENT:
@@ -1843,7 +1835,7 @@ register struct obj *o1, *o2;
         }
         break;
     case POT_ENLIGHTENMENT:
-        switch (o2->otyp) {
+        switch (o2typ) {
         case POT_LEVITATION:
             if (rn2(3))
                 return POT_GAIN_LEVEL;

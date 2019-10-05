@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1558124088 2019/05/17 20:14:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1570236762 2019/10/05 00:52:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2029,11 +2029,11 @@ struct obj *obj;
 
     if (obj->globby) {
         /* globs must be sold by weight not by volume */
-        int unit_weight = (int) objects[obj->otyp].oc_weight,
-            wt = (obj->owt > 0) ? obj->owt : weight(obj);
+        long unit_weight = (long) objects[obj->otyp].oc_weight,
+             wt = (obj->owt > 0) ? (long) obj->owt : (long) weight(obj);
 
         if (unit_weight)
-            units = wt / unit_weight;
+            units = (wt + unit_weight - 1L) / unit_weight;
     }
     return units;
 }
