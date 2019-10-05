@@ -27,7 +27,7 @@ int FDECL(tgetnum, (const char *));
 char *FDECL(tgetstr, (const char *, char **));
 char *FDECL(tgoto, (const char *, int, int));
 char *FDECL(tparam, (const char *, char *, int, int, int, int, int));
-void FDECL(tputs, (const char *, int, int (*)()));
+void FDECL(tputs, (const char *, int, int (*)(int)));
 
 /* local support data */
 static char *tc_entry;
@@ -502,9 +502,10 @@ int row, col, row2, col2;
 /* send a string to the terminal, possibly padded with trailing NULs */
 void
 tputs(string, range, output_func)
-const char *string;   /* characters to output */
-int range;            /* number of lines affected, used for `*' delays */
-int (*output_func)(); /* actual output routine; return value ignored */
+const char *string; /* characters to output */
+int range;          /* number of lines affected, used for `*' delays */
+int FDECL((*output_func),(int)); /* actual output routine;
+                                  * return value ignored */
 {
     register int c, num = 0;
     register const char *p = string;

@@ -530,12 +530,14 @@ int x, y;
     set_console_cursor(x, y);
 }
 
-void
+/* same signature as 'putchar()' with potential failure result ignored */
+int
 xputc(ch)
-char ch;
+int ch;
 {
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-    xputc_core(ch);
+    xputc_core((char) ch);
+    return 0;
 }
 
 void
@@ -543,7 +545,7 @@ xputs(s)
 const char *s;
 {
     int k;
-    int slen = strlen(s);
+    int slen = (int) strlen(s);
 
     if (ttyDisplay)
         set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);

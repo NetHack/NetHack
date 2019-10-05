@@ -82,11 +82,11 @@ int mode;
     return;
 }
 
-void
+int
 xputc(ch)
-char ch;
+int ch;
 {
-    return;
+    return 0;
 }
 
 void
