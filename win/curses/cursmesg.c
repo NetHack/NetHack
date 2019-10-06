@@ -202,7 +202,7 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
         prev_x = mx, prev_y = my;
         blink = 0;
     }
-    moreattr = !iflags.wc2_guicolor ? A_REVERSE : NONE;
+    moreattr = !iflags.wc2_guicolor ? (int) A_REVERSE : NONE;
     curses_toggle_color_attr(win, MORECOLOR, moreattr, ON);
     if (blink) {
         wattron(win, A_BLINK);

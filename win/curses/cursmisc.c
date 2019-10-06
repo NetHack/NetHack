@@ -40,13 +40,18 @@ static int parse_escape_sequence(void);
 int
 curses_read_char()
 {
-    int ch, tmpch;
+    int ch;
+#if defined(ALT_0) || defined(ALT_9) || defined(ALT_A) || defined(ALT_Z)
+    int tmpch;
+#endif
 
     /* cancel message suppression; all messages have had a chance to be read */
     curses_got_input();
 
     ch = getch();
+#if defined(ALT_0) || defined(ALT_9) || defined(ALT_A) || defined(ALT_Z)
     tmpch = ch;
+#endif
     ch = curses_convert_keys(ch);
 
     if (ch == 0) {
@@ -372,7 +377,6 @@ curses_str_remainder(const char *str, int width, int line_num)
     int strsize = strlen(str) + 1;
 #if __STDC_VERSION__ >= 199901L
     char substr[strsize];
-    char curstr[strsize];
     char tmpstr[strsize];
 
     strcpy(substr, str);
@@ -381,7 +385,6 @@ curses_str_remainder(const char *str, int width, int line_num)
 #define BUFSZ 256
 #endif
     char substr[BUFSZ * 2];
-    char curstr[BUFSZ * 2];
     char tmpstr[BUFSZ * 2];
 
     if (strsize > (BUFSZ * 2) - 1) {
@@ -409,10 +412,6 @@ curses_str_remainder(const char *str, int width, int line_num)
         if (last_space == 0) {  /* No spaces found */
             last_space = count - 1;
         }
-        for (count = 0; count < last_space; count++) {
-            curstr[count] = substr[count];
-        }
-        curstr[count] = '\0';
         if (substr[count] == '\0') {
             break;
         }
