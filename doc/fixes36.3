@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.124 $ $NHDT-Date: 1570232224 2019/10/04 23:37:04 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.125 $ $NHDT-Date: 1570318925 2019/10/05 23:42:05 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -173,6 +173,10 @@ avoid 'object lost' panic when polymorph causes loss of levitation boots or
 	disrobing/dropping in order to crawl out chooses to drop those boots
 'sortloot's attempt to group musical instruments separately from other tools
 	didn't work as intended due to missing 'break' in sortloot_classify()
+<shift><letter> running told player about engravings as they were being moved
+	over but buffered output didn't show it until hero stopped, so it
+	wasn't possible to tell where they were, unlike all other forms of
+	multiple movement; stop running if/when an engraving is reached
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository

@@ -462,7 +462,7 @@ curses_choose_character()
         tmpchoice[count] = toupper(tmpchoice[count]);
     }
 
-    sprintf(choice, "%s%s", choice, tmpchoice);
+    strcat(choice, tmpchoice);
 
     /* prevent an unnecessary prompt */
     rigid_role_checks();

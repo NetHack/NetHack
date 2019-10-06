@@ -571,8 +571,10 @@ const char *s;
     }
 }
 
-void xputc(ch) /* write out character (and attribute) */
-char ch;
+/* same signature as 'putchar()' with potential failure result ignored */
+int
+xputc(ch) /* write out character (and attribute) */
+int ch;
 {
     int i;
     char attribute;
@@ -591,16 +593,17 @@ char ch;
         vesa_xputc(ch, attribute);
 #endif /*SCREEN_VESA*/
     }
+    return 0;
 }
 
-void xputg(glyphnum, ch,
-           special) /* write out a glyph picture at current location */
+/* write out a glyph picture at current location */
+void xputg(glyphnum, ch, special)
 int glyphnum;
 int ch;
 unsigned special;
 {
     if (!iflags.grmode || !iflags.tile_view) {
-        xputc((char) ch);
+        (void) xputc((char) ch);
 #ifdef SCREEN_VGA
     } else if (iflags.grmode && iflags.usevga) {
         vga_xputg(glyphnum, ch, special);
