@@ -206,7 +206,7 @@ STATIC_DCL boolean FDECL(check_fields, (BOOLEAN_P, int *));
 STATIC_DCL void NDECL(render_status);
 STATIC_DCL void FDECL(tty_putstatusfield, (const char *, int, int));
 STATIC_DCL boolean NDECL(check_windowdata);
-STATIC_DCL int NDECL(condition_size);
+STATIC_DCL void NDECL(set_condition_length);
 STATIC_DCL int FDECL(make_things_fit, (BOOLEAN_P));
 STATIC_DCL void FDECL(shrink_enc, (int));
 STATIC_DCL void FDECL(shrink_dlvl, (int));
@@ -3615,7 +3615,7 @@ char *posbar;
  *      and tries a few different ways to squish a representation
  *      of the status window values onto the 80 column tty display.
  *          ->check_fields()
- *          ->condition_size()  - get the width of all conditions
+ *          ->set_condition_length()  - update the width of conditions
  *          ->shrink_enc()      - shrink encumbrance message word
  *          ->shrink_dlvl()     - reduce the width of Dlvl:42
  *
@@ -3969,7 +3969,7 @@ STATIC_OVL int
 make_things_fit(force_update)
 boolean force_update;
 {
-    int trycnt, fitting = 0, condsz, requirement;
+    int trycnt, fitting = 0, requirement;
     int rowsz[3], num_rows, condrow, otheroptions = 0;
 
     num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
@@ -3979,7 +3979,7 @@ boolean force_update;
         shrink_enc(0);
     if (dlvl_shrinklvl > 0)
         shrink_dlvl(0);
-    condsz = condition_size();
+    set_condition_length();
     for (trycnt = 0; trycnt < 6 && !fitting; ++trycnt) {
         /* FIXME: this remeasures each line every time even though it
            is only attempting to shrink one of them and the other one
@@ -3997,7 +3997,7 @@ boolean force_update;
         if (trycnt < 2) {
             if (cond_shrinklvl < trycnt + 1) {
                 cond_shrinklvl = trycnt + 1;
-                condsz = condition_size();
+                set_condition_length();
             }
             continue;
         }
@@ -4219,13 +4219,12 @@ int x, y;
 }
 
 /* caller must set cond_shrinklvl (0..2) before calling us */
-STATIC_OVL int
-condition_size()
+STATIC_OVL void
+set_condition_length()
 {
     long mask;
-    int c, lth;
+    int c, lth = 0;
 
-    lth = 0;
     if (tty_condition_bits) {
         for (c = 0; c < SIZE(conditions); ++c) {
             mask = conditions[c].mask;
@@ -4234,7 +4233,6 @@ condition_size()
         }
     }
     tty_status[NOW][BL_CONDITION].lth = lth;
-    return lth;
 }
 
 STATIC_OVL void
