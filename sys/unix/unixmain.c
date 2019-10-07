@@ -651,7 +651,7 @@ boolean
 check_user_string(optstr)
 char *optstr;
 {
-    struct passwd *pw = get_unix_pw();
+    struct passwd *pw;
     int pwlen;
     char *eop, *w;
     char *pwname = 0;
