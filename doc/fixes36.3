@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.125 $ $NHDT-Date: 1570318925 2019/10/05 23:42:05 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.126 $ $NHDT-Date: 1570408209 2019/10/07 00:30:09 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -209,6 +209,8 @@ tty: revert the attempt to fix "message line anomaly: if autodecribe feedback
 	wrapped to second line, the wrapped portion wasn't erased when a
 	shorter line was shown or getpos was dismissed" because it disrupted
 	prompts that spanned more than one line, a more significant issue
+unix: sysconf CHECK_PLNAME=1 wouldn't work if attempt to obtain unix username
+	failed even though it didn't need that username
 
 
 Platform- and/or Interface-Specific Fixes or Features
