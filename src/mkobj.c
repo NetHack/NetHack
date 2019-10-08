@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1570566379 2019/10/08 20:26:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1570569798 2019/10/08 21:23:18 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1064,6 +1064,7 @@ boolean artif;
         default:
             impossible("impossible mkobj %d, sym '%c'.", otmp->otyp,
                        objects[otmp->otyp].oc_class);
+            dealloc_obj(otmp); /* free() would suffice here */
             return (struct obj *) 0;
         }
     }
