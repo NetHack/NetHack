@@ -621,6 +621,13 @@ struct obj *obj; /* only scatter this obj        */
                    obj->ox, obj->oy, sx, sy);
 
     while ((otmp = (individual_object ? obj : level.objects[sx][sy])) != 0) {
+        if (otmp == uball || otmp == uchain) {
+            boolean waschain = (otmp == uchain);
+            pline_The("chain shatters!");
+            unpunish();
+            if (waschain)
+                continue;
+        }
         if (otmp->quan > 1L) {
             qtmp = otmp->quan - 1L;
             if (qtmp > LARGEST_INT)
