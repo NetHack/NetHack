@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1561588627 2019/06/26 22:37:07 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1570566379 2019/10/08 20:26:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.152 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2572,7 +2572,7 @@ struct obj *obj;
     }
     if (n == 2 && carried(obj)
         && obj == uball && (owornmask & W_BALL) != 0L
-        && (owornmask & W_WEAPON) != 0L) {
+        && (owornmask & W_WEAPONS) != 0L) {
         /* chained ball can be wielded/alt-wielded/quivered; if so,
           pretend it's not chained in order to check the weapon pointer
           (we've already verified the ball pointer by successfully passing
@@ -2681,7 +2681,7 @@ struct obj *obj;
                becoming embedded in poly'd hero's skin */
             if (embedded && !Is_dragon_scales(obj))
                 what = "skin";
-        } else if (owornmask & W_WEAPON) {
+        } else if (owornmask & W_WEAPONS) {
             /* monsters don't maintain alternate weapon or quiver */
             if (mcarried(obj) && (owornmask & (W_SWAPWEP | W_QUIVER)) != 0L)
                 what = (owornmask & W_SWAPWEP) != 0L ? "monst alt weapon?"

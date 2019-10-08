@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1559601027 2019/06/03 22:30:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1570566373 2019/10/08 20:26:13 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1074,7 +1074,7 @@ bc_sanity_check()
                       && uball->where != OBJ_FREE)
                   || (freeball ^ freechain)
                   || (uball->owornmask & W_BALL) == 0L
-                  || (uball->owornmask & ~(W_BALL | W_WEAPON)) != 0L)) {
+                  || (uball->owornmask & ~(W_BALL | W_WEAPONS)) != 0L)) {
         otyp = uball->otyp;
         onam = safe_typename(otyp);
         impossible("uball: type %d (%s), where %d, wornmask=0x%08lx",
