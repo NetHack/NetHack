@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1559670603 2019/06/04 17:50:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1570566377 2019/10/08 20:26:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1097,7 +1097,7 @@ struct obj *otmp;
     boolean already_blind = Blind, changed = FALSE;
 
     /* blindfold might be wielded; release it for wearing */
-    if (otmp->owornmask & W_WEAPON)
+    if (otmp->owornmask & W_WEAPONS)
         remove_worn_item(otmp, FALSE);
     setworn(otmp, W_TOOL);
     on_msg(otmp);
@@ -1915,7 +1915,7 @@ struct obj *obj;
 
         /* if the armor is wielded, release it for wearing (won't be
            welded even if cursed; that only happens for weapons/weptools) */
-        if (obj->owornmask & W_WEAPON)
+        if (obj->owornmask & W_WEAPONS)
             remove_worn_item(obj, FALSE);
         /*
          * Setting obj->known=1 is done because setworn() causes hero's AC
@@ -2541,7 +2541,7 @@ doddoremarm()
            possibly combined with weapons */
         (void) strncpy(g.context.takeoff.disrobing, "disrobing", CONTEXTVERBSZ);
         /* specific activity when handling weapons only */
-        if (!(g.context.takeoff.mask & ~W_WEAPON))
+        if (!(g.context.takeoff.mask & ~W_WEAPONS))
             (void) strncpy(g.context.takeoff.disrobing, "disarming",
                            CONTEXTVERBSZ);
         (void) take_off();

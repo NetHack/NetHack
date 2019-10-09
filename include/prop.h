@@ -1,4 +1,4 @@
-/* NetHack 3.6	prop.h	$NHDT-Date: 1547514641 2019/01/15 01:10:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	prop.h	$NHDT-Date: 1570566360 2019/10/08 20:26:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -106,7 +106,7 @@ struct prop {
 #define W_WEP 0x00000100L     /* Wielded weapon */
 #define W_QUIVER 0x00000200L  /* Quiver for (f)iring ammo */
 #define W_SWAPWEP 0x00000400L /* Secondary weapon */
-#define W_WEAPON (W_WEP | W_SWAPWEP | W_QUIVER)
+#define W_WEAPONS (W_WEP | W_SWAPWEP | W_QUIVER)
 #define W_ART 0x00001000L     /* Carrying artifact (not really worn) */
 #define W_ARTI 0x00002000L    /* Invoked artifact  (not really worn) */
 /* Amulets, rings, tools, and other items */
