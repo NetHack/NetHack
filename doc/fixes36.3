@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.126 $ $NHDT-Date: 1570408209 2019/10/07 00:30:09 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.128 $ $NHDT-Date: 1570652307 2019/10/09 20:18:27 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -210,8 +210,6 @@ tty: revert the attempt to fix "message line anomaly: if autodecribe feedback
 	wrapped to second line, the wrapped portion wasn't erased when a
 	shorter line was shown or getpos was dismissed" because it disrupted
 	prompts that spanned more than one line, a more significant issue
-unix: sysconf CHECK_PLNAME=1 wouldn't work if attempt to obtain unix username
-	failed even though it didn't need that username
 
 
 Platform- and/or Interface-Specific Fixes or Features
@@ -302,6 +300,10 @@ tty: take two, if/when autodecribe feedback wraps past top line, clear
 	['exposed by git' section has an entry for reversal of 'take one']
 tty: video attributes (bold, inverse, &c) for status highlighting sometimes
 	were scrambled
+unix: sysconf CHECK_PLNAME=1 wouldn't work if attempt to obtain unix username
+	failed even though it didn't need that username
+unix+curses: startup error only reset terminal for tty; one noticeable
+	example was answering 'n' to "Destroy old game?"
 Windows: some startup error messages were not being delivered successfully
 
 
