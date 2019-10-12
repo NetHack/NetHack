@@ -86,13 +86,13 @@ struct flag {
     char    sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
 #endif
     boolean sortpack;        /* sorted inventory */
-    boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */
     boolean time;            /* display elapsed 'time' */
     boolean tombstone;       /* print tombstone */
     boolean verbose;         /* max battle info */
     int end_top, end_around; /* describe desired score list */
     unsigned moonphase;
+    int sparkle;             /* number frames of sparkle animation */
     unsigned long suppress_alert;
 #define NEW_MOON 0
 #define FULL_MOON 4
