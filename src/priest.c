@@ -118,6 +118,8 @@ pick_move:
     }
 
     if (nix != omx || niy != omy) {
+        if (MON_AT(nix, niy))
+            return 0;
         remove_monster(omx, omy);
         place_monster(mtmp, nix, niy);
         newsym(nix, niy);
