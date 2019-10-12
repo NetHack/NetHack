@@ -463,65 +463,94 @@ curses_is_text(winid wid)
     }
 }
 
-
 /* Replace certain characters with portable drawing characters if
-cursesgraphics option is enabled */
-
+   cursesgraphics option is enabled, or special curses handling for
+   DECgraphics */
 int
-curses_convert_glyph(int ch, int glyph)
+curses_convert_glyph(boolean decgraphics, int ch, int glyph)
 {
-    int symbol;
+    int retch, symbol;
 
-    if (Is_rogue_level(&u.uz)) {
+    int cursesglyphs[MAXPCHARS] = {
+        [S_vwall] = ACS_VLINE,
+        [S_hwall] = ACS_HLINE,
+        [S_tlcorn] = ACS_ULCORNER,
+        [S_trcorn] = ACS_URCORNER,
+        [S_blcorn] = ACS_LLCORNER,
+        [S_brcorn] = ACS_LRCORNER,
+        [S_crwall] = ACS_PLUS,
+        [S_tuwall] = ACS_BTEE,
+        [S_tdwall] = ACS_TTEE,
+        /* yes, the left/right Ts are inverted nethack vs curses */
+        [S_tlwall] = ACS_RTEE,
+        [S_trwall] = ACS_LTEE,
+        [S_tree] = ACS_PLMINUS,
+        [S_corr] = ACS_CKBOARD,
+        [S_litcorr] = ACS_CKBOARD,
+    };
+
+    /* Curses has complete access to all characters that DECgraphics use.
+       However, their character value isn't consistent between terminals
+       and implementations. Instead, we use the below (combined with
+       cursesglyphs) to get the correct glyphs. */
+    int decglyphs[MAXPCHARS] = {
+        [S_ndoor] = ACS_BULLET,
+        [S_vodoor] = ACS_CKBOARD,
+        [S_hodoor] = ACS_CKBOARD,
+        [S_bars] = ACS_PI,
+        [S_room] = ACS_BULLET,
+        [S_darkroom] = ACS_BULLET,
+        [S_upladder] = ACS_GEQUAL,
+        [S_dnladder] = ACS_LEQUAL,
+        [S_pool] = ACS_DIAMOND,
+        [S_ice] = ACS_BULLET,
+        [S_lava] = ACS_DIAMOND,
+        [S_vodbridge] = ACS_BULLET,
+        [S_hodbridge] = ACS_BULLET,
+        [S_water] = ACS_DIAMOND,
+        [S_vbeam] = ACS_VLINE,
+        [S_hbeam] = ACS_HLINE,
+        [S_sw_tc] = ACS_S1,
+        [S_sw_ml] = ACS_VLINE,
+        [S_sw_mr] = ACS_VLINE,
+        [S_sw_bc] = ACS_S9,
+        [S_explode2] = ACS_S1,
+        [S_explode4] = ACS_VLINE,
+        [S_explode6] = ACS_VLINE,
+        [S_explode8] = ACS_S9,
+    };
+
+    if (Is_rogue_level(&u.uz))
         return ch;
-    }
 
     /* Save some processing time by returning if the glyph represents
        an object that we don't have custom characters for */
-    if (!glyph_is_cmap(glyph)) {
+    if (!glyph_is_cmap(glyph))
         return ch;
-    }
 
     symbol = glyph_to_cmap(glyph);
 
     /* If user selected a custom character for this object, don't
        override this. */
-    if (((glyph_is_cmap(glyph)) && (ch != showsyms[symbol]))) {
+    if (((glyph_is_cmap(glyph)) && (ch != showsyms[symbol])))
         return ch;
+
+    retch = cursesglyphs[symbol];
+
+    /* In DECgraphics, these use the basic glyph */
+    if (decgraphics &&
+        (symbol == S_corr || symbol == S_litcorr))
+        retch = 0;
+
+    if (!retch) {
+        if (decgraphics)
+            retch = decglyphs[symbol];
+
+        if (!retch)
+            return ch;
     }
 
-    switch (symbol) {
-    case S_vwall:
-        return ACS_VLINE;
-    case S_hwall:
-        return ACS_HLINE;
-    case S_tlcorn:
-        return ACS_ULCORNER;
-    case S_trcorn:
-        return ACS_URCORNER;
-    case S_blcorn:
-        return ACS_LLCORNER;
-    case S_brcorn:
-        return ACS_LRCORNER;
-    case S_crwall:
-        return ACS_PLUS;
-    case S_tuwall:
-        return ACS_BTEE;
-    case S_tdwall:
-        return ACS_TTEE;
-    case S_tlwall:
-        return ACS_RTEE;
-    case S_trwall:
-        return ACS_LTEE;
-    case S_tree:
-        return ACS_PLMINUS;
-    case S_corr:
-        return ACS_CKBOARD;
-    case S_litcorr:
-        return ACS_CKBOARD;
-    }
-
-    return ch;
+    return retch;
 }
 
 
