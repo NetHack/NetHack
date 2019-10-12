@@ -1,4 +1,4 @@
-# NetHack 3.6  symbols       $NHDT-Date: 1524689580 2018/04/25 20:53:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $
+# NetHack 3.6  symbols       $NHDT-Date: 1570919632 2019/10/12 22:33:52 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.17 $
 # Copyright (c) 2006 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -35,8 +35,8 @@ start: DECgraphics
 	S_bars: \xfb			# meta-{, small pi
 	S_tree: \xe7			# meta-g, plus-or-minus
 	S_room: \xfe			# meta-~, centered dot
-	S_upladder: \xf9		# meta-y, greater-than-or-equals
-	S_dnladder: \xfa		# meta-z, less-than-or-equals
+	S_upladder: \xf9		# meta-y, less-than-or-equals
+	S_dnladder: \xfa		# meta-z, greater-than-or-equals
 	S_pool: \xe0			# meta-\, diamond
 	S_ice: \xfe			# meta-~, centered dot
 	S_lava: \xe0			# meta-\, diamond
