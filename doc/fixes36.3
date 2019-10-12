@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.128 $ $NHDT-Date: 1570652307 2019/10/09 20:18:27 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.132 $ $NHDT-Date: 1570872701 2019/10/12 09:31:41 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -201,6 +201,7 @@ monster throwing from stack of missiles (darts, daggers, spears) would cause
 	crash if it wasn't wielding a weapon (bug in multi-shot shooting fix)
 surviving death while polymorphed would yield "You are a <foo>" without
 	terminating period
+'mksobj failure' commit resulted in wrong corpse types for dying monsters
 curses: sometimes the message window would show a blank line after a prompt
 curses: the change to show map in columns 1..79 instead of 2..80 made the
 	highlight for '@' show up in the wrong place if clipped map had been

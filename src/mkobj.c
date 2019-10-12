@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1570754586 2019/10/11 00:43:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1570872702 2019/10/12 09:31:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1540,18 +1540,20 @@ unsigned corpstatflags;
         otmp = mksobj_at(objtype, x, y, init, FALSE);
     }
 
-    /* when 'mtmp' is non-null make a corpse or statue of that monster,
-       otherwise keep the random type chosen by mksobj() */
+    /* when 'mtmp' is non-null save the monster's details with the
+       corpse or statue; it will also force the 'ptr' override below */
     if (mtmp) {
-        int old_corpsenm = otmp->corpsenm;
-
         /* save_mtraits updates otmp->oextra->omonst in place */
         (void) save_mtraits(otmp, mtmp);
 
-        /* when 'ptr' is non-null use the type specified by our caller,
-           otherwise use the monster's species for the corpse */
         if (!ptr)
             ptr = mtmp->data;
+    }
+
+    /* when 'ptr' is non-null it comes from our caller or from 'mtmp';
+       override mkobjs()'s initialization of a random monster type */
+    if (ptr) {
+        int old_corpsenm = otmp->corpsenm;
 
         otmp->corpsenm = monsndx(ptr);
         otmp->owt = weight(otmp);
