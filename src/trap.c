@@ -4346,8 +4346,8 @@ struct trap *ttmp;
 
     You("pull %s out of the pit.", mon_nam(mtmp));
     mtmp->mtrapped = 0;
-    fill_pit(mtmp->mx, mtmp->my);
     reward_untrap(ttmp, mtmp);
+    fill_pit(mtmp->mx, mtmp->my);
     return 1;
 }
 
