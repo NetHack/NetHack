@@ -1840,7 +1840,6 @@ int style;
 
         bhitpos.x += dx;
         bhitpos.y += dy;
-        t = t_at(bhitpos.x, bhitpos.y);
 
         if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
             if (otyp == BOULDER && throws_rocks(mtmp->data)) {
@@ -1875,7 +1874,7 @@ int style;
                     break;
                 }
             }
-            if (t && otyp == BOULDER) {
+            if ((t = t_at(bhitpos.x, bhitpos.y)) != 0 && otyp == BOULDER) {
                 switch (t->ttyp) {
                 case LANDMINE:
                     if (rn2(10) > 2) {
