@@ -810,6 +810,9 @@ curses_init_options()
 */
 #endif /* PDCURSES */
 
+    /* FIXME: this overrides explicit OPTIONS=!use_inverse */
+    iflags.wc_inverse = TRUE; /* aka iflags.use_inverse; default is False */
+
     /* fix up pet highlighting */
     if (iflags.wc2_petattr == -1) /* shouldn't happen */
         iflags.wc2_petattr = A_NORMAL;

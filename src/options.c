@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1567240693 2019/08/31 08:38:13 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.369 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1571045295 2019/10/14 09:28:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.376 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -826,8 +826,9 @@ initoptions_init()
 
     iflags.wc_align_message = ALIGN_TOP;
     iflags.wc_align_status = ALIGN_BOTTOM;
-    /* these are currently only used by curses */
+    /* used by tty and curses */
     iflags.wc2_statuslines = 2;
+    /* only used by curses */
     iflags.wc2_windowborders = 2; /* 'Auto' */
 
     /* since this is done before init_objects(), do partial init here */

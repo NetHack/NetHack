@@ -29,7 +29,8 @@ extern long curs_mesg_suppress_turn; /* from cursmesg.c */
 /* Interface definition, for windows.c */
 struct window_procs curses_procs = {
     "curses",
-    (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_HILITE_PET
+    (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_INVERSE
+     | WC_HILITE_PET
 #ifdef NCURSES_MOUSE_VERSION /* (this macro name works for PDCURSES too) */
      | WC_MOUSE_SUPPORT
 #endif
@@ -674,6 +675,11 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
                 color = 16 + (color * 2) + 1;
             else
                 attr = A_REVERSE;
+        }
+        /* water and lava look the same except for color; when color is off,
+           render lava in inverse video so that they look different */
+        if ((special & MG_BW_LAVA) && iflags.use_inverse) {
+            attr = A_REVERSE; /* mapglyph() only sets this if color is off */
         }
     }
 

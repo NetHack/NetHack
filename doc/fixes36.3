@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.132 $ $NHDT-Date: 1570872701 2019/10/12 09:31:41 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.137 $ $NHDT-Date: 1571045295 2019/10/14 09:28:15 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -276,6 +276,10 @@ curses: disable the attempt to support Ctrl+Left_click as an alternate way
 	OSX 10.11) documentation and things didn't work as intended
 curses: menu coloring required that both 'menucolors' and 'guicolor' be On;
 	for menus, override guicolor with more-specific menucolors
+curses: support symset:DECgraphics for map display
+curses: enable the 'use_inverse' boolean option (via wincap WC_INVERSE flag)
+	for extended monster detection and black&white lava; forced to True
+	to override default of False (for tty's benefit)
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with
