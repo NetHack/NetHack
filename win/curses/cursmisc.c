@@ -595,7 +595,7 @@ curses_convert_glyph(boolean decgraphics, int ch, int glyph)
             convindx = ch - 0x5f;
             /* if it's in the lower case block of ASCII (which includes
                a few punctuation characters), use the conversion table */
-            if (convindx >= 0 && convindx <= SIZE(decchars)) {
+            if (convindx >= 0 && convindx < SIZE(decchars)) {
                 ch = decchars[convindx];
                 /* in case ACS_foo maps to 0 when current terminal is unable
                    to handle a particular character; if so, revert to default
