@@ -518,7 +518,7 @@ curses_convert_glyph(boolean decgraphics, int ch, int glyph)
        Curses remaps the characters instead. */
     if (decgraphics) {
         /* the DEC line drawing characters use 0x5f through 0x7e instead
-           of the much more straightforward 0x60 though 0x7f, possibly
+           of the much more straightforward 0x60 through 0x7f, possibly
            because 0x7f is effectively a control character (Rubout);
            nethack ORs 0x80 to flag line drawing--that's stripped below */
         static int decchars[33]; /* for chars 0x5f through 0x7f (95..127) */
