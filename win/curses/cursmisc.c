@@ -463,65 +463,165 @@ curses_is_text(winid wid)
     }
 }
 
-
 /* Replace certain characters with portable drawing characters if
-cursesgraphics option is enabled */
-
+   cursesgraphics option is enabled, or special curses handling for
+   DECgraphics */
 int
-curses_convert_glyph(int ch, int glyph)
+curses_convert_glyph(boolean decgraphics, int ch, int glyph)
 {
-    int symbol;
+    static int cursesglyphs[MAXPCHARS], cursesglyphsinited = 0;
+    int retch, symbol;
 
-    if (Is_rogue_level(&u.uz)) {
+    /* FIXME?  we don't support any special characters in roguesymset */
+    if (Is_rogue_level(&u.uz))
         return ch;
-    }
 
     /* Save some processing time by returning if the glyph represents
        an object that we don't have custom characters for */
-    if (!glyph_is_cmap(glyph)) {
+    if (!glyph_is_cmap(glyph))
         return ch;
-    }
 
     symbol = glyph_to_cmap(glyph);
 
-    /* If user selected a custom character for this object, don't
-       override this. */
-    if (((glyph_is_cmap(glyph)) && (ch != showsyms[symbol]))) {
+    /*
+     * FIXME:
+     *  'cursesgraphics' should be a symbol set so that users can
+     *  modify it without having to edit this source file and rebuild
+     *  the program.  Unfortunately these ACS values are 32-bit ones
+     *  and not user-friendly.
+     */
+    if (!cursesglyphsinited) { /* one-time initialization */
+        cursesglyphsinited = 1;
+        cursesglyphs[S_vwall] = ACS_VLINE;
+        cursesglyphs[S_hwall] = ACS_HLINE;
+        cursesglyphs[S_tlcorn] = ACS_ULCORNER;
+        cursesglyphs[S_trcorn] = ACS_URCORNER;
+        cursesglyphs[S_blcorn] = ACS_LLCORNER;
+        cursesglyphs[S_brcorn] = ACS_LRCORNER;
+        cursesglyphs[S_crwall] = ACS_PLUS;
+        cursesglyphs[S_tuwall] = ACS_BTEE;
+        cursesglyphs[S_tdwall] = ACS_TTEE;
+        /* yes, the left/right Ts are inverted nethack vs curses */
+        cursesglyphs[S_tlwall] = ACS_RTEE;
+        cursesglyphs[S_trwall] = ACS_LTEE;
+        cursesglyphs[S_tree] = ACS_PLMINUS;
+        cursesglyphs[S_corr] = ACS_CKBOARD;
+        cursesglyphs[S_litcorr] = ACS_CKBOARD;
+    }
+
+    /* Curses has complete access to all characters that DECgraphics uses.
+       However, their character value isn't consistent between terminals
+       and implementations.  For actual DEC terminals and faithful emulators,
+       line-drawing characters are specified as lowercase letters (mostly)
+       and a control code is sent to the terminal telling it to switch
+       character sets (that's how the tty interface handles them).
+       Curses remaps the characters instead. */
+    if (decgraphics) {
+        /* the DEC line drawing characters use 0x5f through 0x7e instead
+           of the much more straightforward 0x60 though 0x7f, possibly
+           because 0x7f is effectively a control character (Rubout);
+           nethack ORs 0x80 to flag line drawing--that's stripped below */
+        static int decchars[33]; /* for chars 0x5f through 0x7f (95..127) */
+
+        /* one-time initialization; some ACS_x aren't compile-time constant */
+        if (!decchars[0]) {
+            /* [0] is non-breakable space; irrelevant to nethack */
+            decchars[0x5f - 0x5f] = ' '; /* NBSP */
+            decchars[0x60 - 0x5f] = ACS_DIAMOND; /* [1] solid diamond */
+            decchars[0x61 - 0x5f] = ACS_CKBOARD; /* [2] checkerboard */
+            /* several "line drawing" characters are two-letter glyphs
+               which could be substituted for invisible control codes;
+               nethack's DECgraphics doesn't use any of them so we're
+               satisfied with conversion to a simple letter;
+               [3] "HT" as one char, with small raised upper case H over
+               and/or preceding small lowered upper case T */
+            decchars[0x62 - 0x5f] = 'H'; /* "HT" (horizontal tab) */
+            decchars[0x63 - 0x5f] = 'F'; /* "FF" as one char (form feed) */
+            decchars[0x64 - 0x5f] = 'C'; /* "CR" as one (carriage return) */
+            decchars[0x65 - 0x5f] = 'L'; /* [6] "LF" as one (line feed) */
+            decchars[0x66 - 0x5f] = ACS_DEGREE; /* small raised circle */
+            /* [8] plus or minus sign, '+' with horizontal line below */
+            decchars[0x67 - 0x5f] = ACS_PLMINUS;
+            decchars[0x68 - 0x5f] = 'N'; /* [9] "NL" as one char (new line) */
+            decchars[0x69 - 0x5f] = 'V'; /* [10] "VT" as one (vertical tab) */
+            decchars[0x6a - 0x5f] = ACS_LRCORNER; /* lower right corner */
+            decchars[0x6b - 0x5f] = ACS_URCORNER; /* upper right corner */
+            decchars[0x6c - 0x5f] = ACS_ULCORNER; /* upper left corner */
+            decchars[0x6d - 0x5f] = ACS_LLCORNER; /* lower left corner, 'L' */
+            /* [15] center cross, like big '+' sign */
+            decchars[0x6e - 0x5f] = ACS_PLUS;
+            decchars[0x6f - 0x5f] = ACS_S1; /* very high horizontal line */
+            decchars[0x70 - 0x5f] = ACS_S3; /* medium high horizontal line */
+            decchars[0x71 - 0x5f] = ACS_HLINE; /* centered horizontal line */
+            decchars[0x72 - 0x5f] = ACS_S7; /* medium low horizontal line */
+            decchars[0x73 - 0x5f] = ACS_S9; /* very low horizontal line */
+            /* [21] left tee, 'H' with right-hand vertical stroke removed;
+               note on left vs right:  the ACS name (also DEC's terminal
+               documentation) refers to vertical bar rather than cross stroke,
+               nethack's left/right refers to direction of the cross stroke */
+            decchars[0x74 - 0x5f] = ACS_LTEE; /* ACS left tee, NH right tee */
+            /* [22] right tee, 'H' with left-hand vertical stroke removed */
+            decchars[0x75 - 0x5f] = ACS_RTEE; /* ACS right tee, NH left tee */
+            /* [23] bottom tee, '+' with lower half of vertical stroke
+               removed and remaining stroke pointed up (unside-down 'T');
+               nethack is inconsistent here--unlike with left/right, its
+               bottom/top directions agree with ACS */
+            decchars[0x76 - 0x5f] = ACS_BTEE; /* bottom tee, stroke up */
+            /* [24] top tee, '+' with upper half of vertical stroke removed */
+            decchars[0x77 - 0x5f] = ACS_TTEE; /* top tee, stroke down, 'T' */
+            decchars[0x78 - 0x5f] = ACS_VLINE; /* centered vertical line */
+            decchars[0x79 - 0x5f] = ACS_LEQUAL; /* less than or equal to */
+            /* [27] greater than or equal to, '>' with underscore */
+            decchars[0x7a - 0x5f] = ACS_GEQUAL;
+            /* [28] Greek pi ('n'-like; case is ambiguous: small size
+               suggests lower case but flat top suggests upper case) */
+            decchars[0x7b - 0x5f] = ACS_PI;
+            /* [29] not equal sign, combination of '=' and '/' */
+            decchars[0x7c - 0x5f] = ACS_NEQUAL;
+            /* [30] British pound sign (curly 'L' with embellishments) */
+            decchars[0x7d - 0x5f] = ACS_STERLING;
+            decchars[0x7e - 0x5f] = ACS_BULLET; /* [31] centered dot */
+            /* [32] is not used for DEC line drawing but is a potential
+               value for someone who assumes that 0x60..0x7f is the valid
+               range, so we're prepared to accept--and sanitize--it */
+            decchars[0x7f - 0x5f] = '?';
+        }
+
+        /* high bit set means special handling */
+        if (ch & 0x80) {
+            int convindx;
+
+            ch &= ~0x80; /* force plain ASCII for last resort */
+            convindx = ch - 0x5f;
+            /* if it's in the lower case block of ASCII (which includes
+               a few punctuation characters), use the conversion table */
+            if (convindx >= 0 && convindx <= SIZE(decchars)) {
+                ch = decchars[convindx];
+                /* in case ACS_foo maps to 0 when current terminal is unable
+                   to handle a particular character; if so, revert to default
+                   rather than using DECgr value with high bit stripped */
+                if (!ch)
+                    ch = (int) defsyms[symbol].sym;
+            }
+        }
         return ch;
     }
 
-    switch (symbol) {
-    case S_vwall:
-        return ACS_VLINE;
-    case S_hwall:
-        return ACS_HLINE;
-    case S_tlcorn:
-        return ACS_ULCORNER;
-    case S_trcorn:
-        return ACS_URCORNER;
-    case S_blcorn:
-        return ACS_LLCORNER;
-    case S_brcorn:
-        return ACS_LRCORNER;
-    case S_crwall:
-        return ACS_PLUS;
-    case S_tuwall:
-        return ACS_BTEE;
-    case S_tdwall:
-        return ACS_TTEE;
-    case S_tlwall:
-        return ACS_RTEE;
-    case S_trwall:
-        return ACS_LTEE;
-    case S_tree:
-        return ACS_PLMINUS;
-    case S_corr:
-        return ACS_CKBOARD;
-    case S_litcorr:
-        return ACS_CKBOARD;
+    /*
+     * [Is this correct?  How did mapglyph() supply the value if it
+     * isn't coming from showsyms[]?  glyph_is_cmap() test commented
+     * out because of the nothing-else-gets-here optimization above.]
+     */
+    /* If user selected a custom character for this object, don't
+       override this. */
+    if (/*glyph_is_cmap(glyph) &&*/ ch != showsyms[symbol]) {
+        retch = ch;
+    } else {
+        retch = (symbol >= 0 && symbol < MAXPCHARS) ? cursesglyphs[symbol] : 0;
+        if (!retch)
+            retch = ch;
     }
-
-    return ch;
+    return retch;
 }
 
 
