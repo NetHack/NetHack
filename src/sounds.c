@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1542765362 2018/11/21 01:56:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1570844005 2019/10/12 01:33:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.83 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -496,7 +496,7 @@ register struct monst *mtmp;
         *verbl_msg = 0,                 /* verbalize() */
         *verbl_msg_mcan = 0;            /* verbalize() if cancelled */
     struct permonst *ptr = mtmp->data;
-    int msound = ptr->msound;
+    int msound = ptr->msound, gnomeplan = 0;
 
     /* presumably nearness and sleep checks have already been made */
     if (Deaf)
@@ -512,8 +512,9 @@ register struct monst *mtmp;
         msound = mons[genus(monsndx(ptr), 1)].msound;
     /* some normally non-speaking types can/will speak if hero is similar */
     else if (msound == MS_ORC         /* note: MS_ORC is same as MS_GRUNT */
-             && (same_race(ptr, youmonst.data)           /* current form, */
-                 || same_race(ptr, &mons[Race_switch]))) /* unpoly'd form */
+             && ((same_race(ptr, youmonst.data)          /* current form, */
+                  || same_race(ptr, &mons[Race_switch])) /* unpoly'd form */
+                 || Hallucination))
         msound = MS_HUMANOID;
     /* silliness, with slight chance to interfere with shopping */
     else if (Hallucination && mon_is_gecko(mtmp))
@@ -588,13 +589,14 @@ register struct monst *mtmp;
             } else
                 verbl_msg = "I only drink... potions.";
         } else {
-            int vampindex;
             static const char *const vampmsg[] = {
                 /* These first two (0 and 1) are specially handled below */
                 "I vant to suck your %s!",
                 "I vill come after %s without regret!",
                 /* other famous vampire quotes can follow here if desired */
             };
+            int vampindex;
+
             if (kindred)
                 verbl_msg =
                     "This is my hunting ground that you dare to prowl!";
@@ -803,6 +805,18 @@ register struct monst *mtmp;
             pline_msg = "talks about spellcraft.";
         else if (ptr->mlet == S_CENTAUR)
             pline_msg = "discusses hunting.";
+        else if (is_gnome(ptr) && Hallucination && (gnomeplan = rn2(4)) % 2)
+            /* skipped for rn2(4) result of 0 or 2;
+               gag from an early episode of South Park called "Gnomes";
+               initially, Tweek (introduced in that episode) is the only
+               one aware of the tiny gnomes after spotting them sneaking
+               about; they are embarked upon a three-step business plan;
+               a diagram of the plan shows:
+                         Phase 1         Phase 2      Phase 3
+                   Collect underpants       ?          Profit
+               and they never verbalize step 2 so we don't either */
+            verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
+                                         : "Phase three, profit!";
         else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:

@@ -782,17 +782,8 @@ curses_init_options()
     set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS, SET_IN_GAME);
 
     /* Remove a few options that are irrelevant to this windowport */
-    /*set_option_mod_status("DECgraphics", SET_IN_FILE); */
     set_option_mod_status("eight_bit_tty", SET_IN_FILE);
 
-    /* Make sure that DECgraphics is not set to true via the config
-       file, as this will cause display issues.  We can't disable it in
-       options.c in case the game is compiled with both tty and curses. */
-    if (!symset[PRIMARY].name
-        || !strcmpi(symset[PRIMARY].name, "DECgraphics")) {
-        load_symset("curses", PRIMARY);
-        load_symset("default", ROGUESET);
-    }
 #ifdef PDCURSES
     /* PDCurses for SDL, win32 and OS/2 has the ability to set the
        terminal size programatically.  If the user does not specify a
@@ -818,6 +809,9 @@ curses_init_options()
     }
 */
 #endif /* PDCURSES */
+
+    /* FIXME: this overrides explicit OPTIONS=!use_inverse */
+    iflags.wc_inverse = TRUE; /* aka iflags.use_inverse; default is False */
 
     /* fix up pet highlighting */
     if (iflags.wc2_petattr == -1) /* shouldn't happen */

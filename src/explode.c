@@ -771,6 +771,9 @@ struct obj *obj; /* only scatter this obj        */
         newsym(x, y);
     }
     newsym(sx, sy);
+    if (sx == u.ux && sy == u.uy && u.uundetected
+        && hides_under(youmonst.data))
+        (void) hideunder(&youmonst);
     return total;
 }
 
