@@ -476,11 +476,6 @@ curses_convert_glyph(boolean decgraphics, int ch, int glyph)
     if (Is_rogue_level(&u.uz))
         return ch;
 
-    /* Save some processing time by returning if the glyph represents
-       an object that we don't have custom characters for */
-    if (!glyph_is_cmap(glyph))
-        return ch;
-
     symbol = glyph_to_cmap(glyph);
 
     /*
