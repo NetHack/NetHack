@@ -15,6 +15,11 @@
 # NetHack encodes the request to use the alternate font here by
 # having the high bit set (in hexadecimal, \x80 is combined with
 # a character code between \x60 and \x7f).
+#
+# curses is an approximation of IBMgraphics which relies on DEC
+# mode of operation, with a few characters missing. It is based
+# on an old graphics mode for the Curses mode and is the default
+# on that windowport if no symset is specified.
 
 start: DECgraphics
 	Handling: DEC
@@ -53,6 +58,35 @@ start: DECgraphics
 	S_explode4: \xf8		# meta-x, vertical rule
 	S_explode6: \xf8		# meta-x, vertical rule
 	S_explode8: \xf3		# meta-s, low horizontal line
+finish
+
+start: curses
+	Handling: DEC
+	S_vwall: \xf8			# meta-x, vertical rule
+	S_hwall: \xf1			# meta-q, horizontal rule
+	S_tlcorn: \xec			# meta-l, top left corner
+	S_trcorn: \xeb			# meta-k, top right corner
+	S_blcorn: \xed			# meta-m, bottom left
+	S_brcorn: \xea			# meta-j, bottom right
+	S_crwall: \xee			# meta-n, cross
+	S_tuwall: \xf6			# meta-v, T up
+	S_tdwall: \xf7			# meta-w, T down
+	S_tlwall: \xf5			# meta-u, T left
+	S_trwall: \xf4			# meta-t, T right
+	S_ndoor: \xfe			# meta-z, centered dot
+	S_tree: \xf1			# plus or minus symbol
+	S_room: \xfe			# meta-z, centered dot
+	S_corr: \xe1			# meta-a, solid block
+	S_litcorr: \xe1			# meta-a, solid block
+	S_ice: \xfe			# meta-z, centered dot
+	S_vodbridge: \xfe		# meta-z, centered dot
+	S_hodbridge: \xfe		# meta-z, centered dot
+	S_vbeam: \xf8			# meta-3, vertical rule
+	S_hbeam: \xf1			# meta-D, horizontal rule
+	S_sw_ml: \xf8			# meta-3, vertical rule
+	S_sw_mr: \xf8			# meta-3, vertical rule
+	S_explode4: \xf8		# meta-3, vertical rule
+	S_explode6: \xf8		# meta-3, vertical rule
 finish
 
 start: IBMgraphics

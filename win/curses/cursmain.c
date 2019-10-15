@@ -660,9 +660,7 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
         attr = A_REVERSE;
     }
     if (SYMHANDLING(H_DEC))
-        ch = curses_convert_glyph(TRUE, ch, glyph);
-    else if (!symset[PRIMARY].name || !strcmpi(symset[PRIMARY].name, "curses"))
-        ch = curses_convert_glyph(FALSE, ch, glyph);
+        ch = curses_convert_glyph(ch, glyph);
 
     if (wid == NHW_MAP) {
 /* hilite stairs not in 3.6, yet
