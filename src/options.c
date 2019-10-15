@@ -2381,7 +2381,7 @@ boolean tinitial, tfrom_file;
     if (match_optname(opts, fullname, 4, TRUE)) {
         if (duplicate)
             complain_about_duplicate(opts, 1);
-        op = string_for_opt(opts, negated);
+        op = string_for_opt(opts, TRUE);
         if ((negated && !op) || (!negated && op))
             flags.sparkle = negated ? 0 : atoi(op);
         else if (negated) {
