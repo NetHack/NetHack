@@ -543,6 +543,7 @@ boolean name_too;
     /* initialize restriction bits */
     symset[which_set].primary = 0;
     symset[which_set].rogue = 0;
+    symset[which_set].fallback = TRUE;
 
     if (name_too) {
         if (symset[which_set].name)
