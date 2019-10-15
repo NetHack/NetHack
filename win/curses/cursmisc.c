@@ -74,7 +74,7 @@ curses_read_char()
 #ifdef KEY_RESIZE
     /* Handle resize events via get_nh_event, not this code */
     if (ch == KEY_RESIZE) {
-        ch = '\033'; /* NetHack doesn't know what to do with KEY_RESIZE */
+        ch = C('r'); /* NetHack doesn't know what to do with KEY_RESIZE */
     }
 #endif
 
