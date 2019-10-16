@@ -278,7 +278,8 @@ struct symsetentry {
     Bitfield(nocolor, 1);     /* don't use color if set               */
     Bitfield(primary, 1);     /* restricted for use as primary set    */
     Bitfield(rogue, 1);       /* restricted for use as rogue lev set  */
-                              /* 5 free bits */
+    Bitfield(fallback, 1);    /* no explicit symset set               */
+                              /* 4 free bits */
 };
 
 /*

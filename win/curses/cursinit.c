@@ -784,6 +784,11 @@ curses_init_options()
     /* Remove a few options that are irrelevant to this windowport */
     set_option_mod_status("eight_bit_tty", SET_IN_FILE);
 
+    /* If we don't have a symset defined, load the curses symset by default */
+    if (symset[PRIMARY].fallback) {
+        load_symset("curses", PRIMARY);
+        load_symset("default", ROGUESET);
+    }
 #ifdef PDCURSES
     /* PDCurses for SDL, win32 and OS/2 has the ability to set the
        terminal size programatically.  If the user does not specify a
