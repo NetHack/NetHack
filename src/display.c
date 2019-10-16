@@ -883,13 +883,15 @@ void
 shieldeff(x, y)
 xchar x, y;
 {
-    register int i;
+    register int i, k;
 
     if (!flags.sparkle)
         return;
     if (cansee(x, y)) { /* Don't see anything if can't see the location */
+        k = random() % SHIELD_COUNT; /* Start on a random frame */
         for (i = 0; i < flags.sparkle; i++) {
-            show_glyph(x, y, cmap_to_glyph(shield_static[i % SHIELD_COUNT]));
+            show_glyph(x, y,
+                    cmap_to_glyph(shield_static[(k+i) % SHIELD_COUNT]));
             flush_screen(1); /* make sure the glyph shows up */
             delay_output();
         }

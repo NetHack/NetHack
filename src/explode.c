@@ -32,7 +32,7 @@ int dam;
 char olet;
 int expltype;
 {
-    int i, j, k, damu = dam;
+    int i, j, k, o, damu = dam;
     boolean starting = 1;
     boolean visible, any_shield;
     int uhurt = 0; /* 0=unhurt, 1=items damaged, 2=you and items damaged */
@@ -268,6 +268,7 @@ int expltype;
         curs_on_u(); /* will flush screen and output */
 
         if (any_shield && flags.sparkle) { /* simulate shield effect */
+            o = random() % SHIELD_COUNT; /* randomly select starting  frame */
             for (k = 0; k < flags.sparkle; k++) {
                 for (i = 0; i < 3; i++)
                     for (j = 0; j < 3; j++) {
@@ -278,7 +279,7 @@ int expltype;
                              * will clean up the location for us later.
                              */
                             show_glyph(i + x - 1, j + y - 1,
-                                       cmap_to_glyph(shield_static[k % SHIELD_COUNT]));
+                                       cmap_to_glyph(shield_static[(o+k) % SHIELD_COUNT]));
                     }
                 curs_on_u(); /* will flush screen and output */
                 delay_output();
