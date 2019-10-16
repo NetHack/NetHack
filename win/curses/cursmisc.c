@@ -463,13 +463,16 @@ curses_is_text(winid wid)
     }
 }
 
-/* Replace certain characters with portable drawing characters if
-   cursesgraphics option is enabled, or special curses handling for
-   DECgraphics */
+/* convert nethack's DECgraphics encoding into curses' ACS encoding */
 int
 curses_convert_glyph(int ch, int glyph)
 {
-    int retch, symbol;
+    /* The DEC line drawing characters use 0x5f through 0x7e instead
+       of the much more straightforward 0x60 through 0x7f, possibly
+       because 0x7f is effectively a control character (Rubout);
+       nethack ORs 0x80 to flag line drawing--that's stripped below */
+    static int decchars[33]; /* for chars 0x5f through 0x7f (95..127) */
+    int symbol;
 
     /* FIXME?  we don't support any special characters in roguesymset */
     if (Is_rogue_level(&u.uz))
@@ -483,13 +486,7 @@ curses_convert_glyph(int ch, int glyph)
        line-drawing characters are specified as lowercase letters (mostly)
        and a control code is sent to the terminal telling it to switch
        character sets (that's how the tty interface handles them).
-       Curses remaps the characters instead.
-
-       The DEC line drawing characters use 0x5f through 0x7e instead
-       of the much more straightforward 0x60 through 0x7f, possibly
-       because 0x7f is effectively a control character (Rubout);
-       nethack ORs 0x80 to flag line drawing--that's stripped below */
-    static int decchars[33]; /* for chars 0x5f through 0x7f (95..127) */
+       Curses remaps the characters instead. */
 
     /* one-time initialization; some ACS_x aren't compile-time constant */
     if (!decchars[0]) {

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.137 $ $NHDT-Date: 1571045295 2019/10/14 09:28:15 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.138 $ $NHDT-Date: 1571267989 2019/10/16 23:19:49 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -346,6 +346,9 @@ curses: give menus and text windows a minimum size of 5x25 since tiny ones can
 curses+'perm_invent': since persistent inventory is narrow, strip off "a",
 	"an", or "the" prefix on inventory entries shown there so that a tiny
 	bit more of the interesting portion is visible
+curses+'curses': change the curses map display to use new symbol set 'curses'
+	instead of hard-coded values; it attempts to show IBMgraphics-style
+	map using DECgraphics characters; DECgraphics can also be used as-is
 
 
 NetHack Community Patches (or Variation) Included
