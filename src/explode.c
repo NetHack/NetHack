@@ -268,7 +268,7 @@ int expltype;
         curs_on_u(); /* will flush screen and output */
 
         if (any_shield && flags.sparkle) { /* simulate shield effect */
-            o = random() % SHIELD_COUNT; /* randomly select starting  frame */
+            o = rand() % SHIELD_COUNT; /* randomly select starting frame */
             for (k = 0; k < flags.sparkle; k++) {
                 for (i = 0; i < 3; i++)
                     for (j = 0; j < 3; j++) {

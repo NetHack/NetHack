@@ -888,7 +888,7 @@ xchar x, y;
     if (!flags.sparkle)
         return;
     if (cansee(x, y)) { /* Don't see anything if can't see the location */
-        k = random() % SHIELD_COUNT; /* Start on a random frame */
+        k = rand() % SHIELD_COUNT; /* randomly select starting frame */
         for (i = 0; i < flags.sparkle; i++) {
             show_glyph(x, y,
                     cmap_to_glyph(shield_static[(k+i) % SHIELD_COUNT]));
