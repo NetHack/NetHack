@@ -3166,9 +3166,11 @@ int which_set;
 {
     FILE *fp;
 
+    symset[which_set].explicitly = FALSE;
     if (!(fp = fopen_sym_file()))
         return 0;
 
+    symset[which_set].explicitly = TRUE;
     symset_count = 0;
     chosen_symset_start = chosen_symset_end = FALSE;
     symset_which_set = which_set;
@@ -3188,7 +3190,14 @@ int which_set;
                 || !strcmpi(symset[which_set].name, "default")))
             clear_symsetentry(which_set, TRUE);
         config_error_done();
-        return (symset[which_set].name == 0) ? 1 : 0;
+
+        /* If name was defined, it was invalid... Then we're loading fallback */
+        if (symset[which_set].name) {
+            symset[which_set].explicitly = FALSE;
+            return 0;
+        }
+
+        return 1;
     }
     if (!chosen_symset_end)
         config_error_add("Missing finish for symset \"%s\"",
