@@ -472,21 +472,29 @@ curses_convert_glyph(int ch, int glyph)
        because 0x7f is effectively a control character (Rubout);
        nethack ORs 0x80 to flag line drawing--that's stripped below */
     static int decchars[33]; /* for chars 0x5f through 0x7f (95..127) */
-    int symbol;
 
-    /* FIXME?  we don't support any special characters in roguesymset */
-    if (Is_rogue_level(&u.uz))
+    ch &= 0xff; /* 0..255 only */
+    if (!(ch & 0x80))
+        return ch; /* no conversion needed */
+
+    /* this conversion routine is only called for SYMHANDLING(H_DEC) and
+       we decline to support special graphics symbols on the rogue level */
+    if (Is_rogue_level(&u.uz)) {
+        /* attempting to use line drawing characters will end up being
+           rendered as lowercase gibberish */
+        ch &= ~0x80;
         return ch;
+    }
 
-    symbol = glyph_to_cmap(glyph);
-
-    /* Curses has complete access to all characters that DECgraphics uses.
-       However, their character value isn't consistent between terminals
-       and implementations.  For actual DEC terminals and faithful emulators,
-       line-drawing characters are specified as lowercase letters (mostly)
-       and a control code is sent to the terminal telling it to switch
-       character sets (that's how the tty interface handles them).
-       Curses remaps the characters instead. */
+    /*
+     * Curses has complete access to all characters that DECgraphics uses.
+     * However, their character value isn't consistent between terminals
+     * and implementations.  For actual DEC terminals and faithful emulators,
+     * line-drawing characters are specified as lowercase letters (mostly)
+     * and a control code is sent to the terminal telling it to switch
+     * character sets (that's how the tty interface handles them).
+     * Curses remaps the characters instead.
+     */
 
     /* one-time initialization; some ACS_x aren't compile-time constant */
     if (!decchars[0]) {
@@ -510,7 +518,7 @@ curses_convert_glyph(int ch, int glyph)
         decchars[0x68 - 0x5f] = 'N'; /* [9] "NL" as one char (new line) */
         decchars[0x69 - 0x5f] = 'V'; /* [10] "VT" as one (vertical tab) */
         decchars[0x6a - 0x5f] = ACS_LRCORNER; /* lower right corner */
-        decchars[0x6b - 0x5f] = ACS_URCORNER; /* upper right corner */
+        decchars[0x6b - 0x5f] = ACS_URCORNER; /* upper right corner, 7-ish */
         decchars[0x6c - 0x5f] = ACS_ULCORNER; /* upper left corner */
         decchars[0x6d - 0x5f] = ACS_LLCORNER; /* lower left corner, 'L' */
         /* [15] center cross, like big '+' sign */
@@ -554,7 +562,7 @@ curses_convert_glyph(int ch, int glyph)
 
     /* high bit set means special handling */
     if (ch & 0x80) {
-        int convindx;
+        int convindx, symbol;
 
         ch &= ~0x80; /* force plain ASCII for last resort */
         convindx = ch - 0x5f;
@@ -565,8 +573,10 @@ curses_convert_glyph(int ch, int glyph)
             /* in case ACS_foo maps to 0 when current terminal is unable
                to handle a particular character; if so, revert to default
                rather than using DECgr value with high bit stripped */
-            if (!ch)
+            if (!ch) {
+                symbol = glyph_to_cmap(glyph);
                 ch = (int) defsyms[symbol].sym;
+            }
         }
     }
 

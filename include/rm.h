@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1559994624 2019/06/08 11:50:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1571313651 2019/10/17 12:00:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -299,6 +299,8 @@ struct symsetentry {
 #define H_IBM     1
 #define H_DEC     2
 #define H_CURS    3
+#define H_MAC     4 /* obsolete; needed so that the listing of available
+                     * symsets by 'O' can skip it for !MAC_GRAPHICS_ENV */
 
 extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];
