@@ -42,11 +42,6 @@ enum window_option_types {
 
 #define PILE_LIMIT_DFLT 5
 
-#ifndef DISPLAY_H
-#include "display.h" /* for SHIELD_COUNT */
-#endif
-#define SPARKLE_DFLT SHIELD_COUNT
-
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
  *  options help (option_help()), the long options help (dat/opthelp),
@@ -217,6 +212,7 @@ static struct Bool_Opt {
     { "silent", &flags.silent, TRUE, SET_IN_GAME },
     { "softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE }, /*WC2*/
     { "sortpack", &flags.sortpack, TRUE, SET_IN_GAME },
+    { "sparkle", &flags.sparkle, TRUE, SET_IN_GAME },
     { "splash_screen", &iflags.wc_splash_screen, TRUE, DISP_IN_GAME }, /*WC*/
     { "standout", &flags.standout, FALSE, SET_IN_GAME },
     { "status_updates", &iflags.status_updates, TRUE, DISP_IN_GAME },
@@ -389,9 +385,6 @@ static struct Comp_Opt {
 #ifdef MSDOS
     { "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
-    { "sparkle", "display this many frames of resistance animation",
-      20, SET_IN_GAME
-    },
     { "statushilites",
 #ifdef STATUS_HILITES
       "0=no status highlighting, N=show highlights for N turns",
@@ -2374,24 +2367,6 @@ boolean tinitial, tfrom_file;
             }
         } else
             return FALSE;
-        return retval;
-    }
-
-    fullname = "sparkle";
-    if (match_optname(opts, fullname, 4, TRUE)) {
-        if (duplicate)
-            complain_about_duplicate(opts, 1);
-        op = string_for_opt(opts, negated);
-        if ((negated && !op) || (!negated && op))
-            flags.sparkle = negated ? 0 : atoi(op);
-        else if (negated) {
-            bad_negation(fullname, TRUE);
-            return FALSE;
-        } else /* !op */
-            flags.sparkle = SPARKLE_DFLT;
-        /* sanity check */
-        if (flags.sparkle < 0)
-            flags.sparkle = SPARKLE_DFLT;
         return retval;
     }
 
@@ -5804,8 +5779,6 @@ char *buf;
                 Strcpy(buf, sortltype[i]);
                 break;
             }
-    } else if (!strcmp(optname, "sparkle")) {
-        Sprintf(buf, "%d", flags.sparkle);
     } else if (!strcmp(optname, "player_selection")) {
         Sprintf(buf, "%s", iflags.wc_player_selection ? "prompts" : "dialog");
 #ifdef MSDOS

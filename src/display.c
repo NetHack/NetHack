@@ -888,8 +888,8 @@ xchar x, y;
     if (!flags.sparkle)
         return;
     if (cansee(x, y)) { /* Don't see anything if can't see the location */
-        for (i = 0; i < flags.sparkle; i++) {
-            show_glyph(x, y, cmap_to_glyph(shield_static[i % SHIELD_COUNT]));
+        for (i = 0; i < SHIELD_COUNT; i++) {
+            show_glyph(x, y, cmap_to_glyph(shield_static[i]));
             flush_screen(1); /* make sure the glyph shows up */
             delay_output();
         }

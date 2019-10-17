@@ -268,7 +268,7 @@ int expltype;
         curs_on_u(); /* will flush screen and output */
 
         if (any_shield && flags.sparkle) { /* simulate shield effect */
-            for (k = 0; k < flags.sparkle; k++) {
+            for (k = 0; k < SHIELD_COUNT; k++) {
                 for (i = 0; i < 3; i++)
                     for (j = 0; j < 3; j++) {
                         if (explmask[i][j] == 1)
@@ -278,7 +278,7 @@ int expltype;
                              * will clean up the location for us later.
                              */
                             show_glyph(i + x - 1, j + y - 1,
-                                       cmap_to_glyph(shield_static[k % SHIELD_COUNT]));
+                                       cmap_to_glyph(shield_static[k]));
                     }
                 curs_on_u(); /* will flush screen and output */
                 delay_output();

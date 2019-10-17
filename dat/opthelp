@@ -51,6 +51,8 @@ showexp        display your accumulated experience points         [FALSE]
 showrace       show yourself by your race rather than by role     [FALSE]
 silent         don't use your terminal's bell sound               [TRUE]
 sortpack       group similar kinds of objects in inventory        [TRUE]
+sparkle        display sparkly effect for resisted magical        [TRUE]
+               attacks (e.g. fire attack on fire-resistant monster)
 standout       use standout mode for --More-- on messages         [FALSE]
 status_updates update the status lines                            [TRUE]
 time           display elapsed game time, in moves                [FALSE]
@@ -177,9 +179,6 @@ scores        the parts of the score list you wish    [!own/3 top/2 around]
               to see when the game ends.  You choose a combination of
               top scores, scores around the top scores, and all of your
               own scores.
-sparkle       number of animation frames of sparkly effect for         [21]
-              resisted magical attacks (e.g. fire attack on
-              fire-resistant monster)
 suppress_alert disable various version-specific warnings about changes   []
               in game play or the user interface, such as notification given
               for the 'Q' command that quitting is now done via #quit
