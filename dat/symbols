@@ -1,4 +1,4 @@
-# NetHack 3.6  symbols       $NHDT-Date: 1571313649 2019/10/17 12:00:49 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.19 $
+# NetHack 3.6  symbols       $NHDT-Date: 1571314611 2019/10/17 12:16:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.20 $
 # Copyright (c) 2006 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -23,8 +23,8 @@
 # on that windowport if no symset is specified.  The Curses interface
 # can also use DECgraphics as-is; IBMgraphics probably won't work.
 
-# plain looks decent for wall+corridor levels where there aren't a lot
-# of room corners and ones present tend to be spread out, but it looks
+# plain looks decent for room+corridor levels where there aren't a lot
+# of wall corners and ones present tend to be spread out, but it looks
 # awful for wallified mazes
 start: plain
 	Description: same as default symbols, except '+' for corner walls
