@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1571313651 2019/10/17 12:00:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1571347960 2019/10/17 21:32:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -278,7 +278,7 @@ struct symsetentry {
     Bitfield(nocolor, 1);     /* don't use color if set               */
     Bitfield(primary, 1);     /* restricted for use as primary set    */
     Bitfield(rogue, 1);       /* restricted for use as rogue lev set  */
-    Bitfield(fallback, 1);    /* no explicit symset set               */
+    Bitfield(explicitly, 1);  /* explicit symset set                  */
                               /* 4 free bits */
 };
 

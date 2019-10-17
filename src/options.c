@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1571313653 2019/10/17 12:00:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.378 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1571347977 2019/10/17 21:32:57 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.379 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2315,7 +2315,6 @@ boolean tinitial, tfrom_file;
             } else {
                 if (!initial && Is_rogue_level(&u.uz))
                     assign_graphics(ROGUESET);
-                symset[ROGUESET].fallback = FALSE;
                 need_redraw = TRUE;
             }
         } else
@@ -2340,7 +2339,6 @@ boolean tinitial, tfrom_file;
                 return FALSE;
             } else {
                 switch_symbols(symset[PRIMARY].name != (char *) 0);
-                symset[PRIMARY].fallback = FALSE;
                 need_redraw = TRUE;
             }
         } else
@@ -6061,10 +6059,8 @@ int which_set;
 
     if (read_sym_file(which_set)) {
         switch_symbols(TRUE);
-        symset[which_set].fallback = FALSE;
     } else {
         clear_symsetentry(which_set, TRUE);
-        symset[which_set].fallback = TRUE;
         return 0;
     }
     return 1;

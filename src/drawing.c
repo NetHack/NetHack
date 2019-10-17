@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1571313651 2019/10/17 12:00:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1571347973 2019/10/17 21:32:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -548,7 +548,6 @@ boolean name_too;
     /* initialize restriction bits */
     symset[which_set].primary = 0;
     symset[which_set].rogue = 0;
-    symset[which_set].fallback = TRUE;
 
     if (name_too) {
         if (symset[which_set].name)
