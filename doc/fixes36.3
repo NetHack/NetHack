@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.138 $ $NHDT-Date: 1571267989 2019/10/16 23:19:49 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.139 $ $NHDT-Date: 1571313651 2019/10/17 12:00:51 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -185,6 +185,8 @@ fix hero still hiding under a statue shattered by a land mine
 fix helping a monster out of a pit addressing a deleted trap
 fix launched rolling boulder code accessing deleted trap
 fix monster stepping on a land mine code accessing deleted trap
+revise 'O' to show symbol sets in the same order they appear in the symbols
+	file and order the sets in dat/symbols to yield a sensible symset menu
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -280,6 +282,8 @@ curses: support symset:DECgraphics for map display
 curses: enable the 'use_inverse' boolean option (via wincap WC_INVERSE flag)
 	for extended monster detection and black&white lava; forced to True
 	to override default of False (for tty's benefit)
+curses: force 'O' command's menus for 'symset' and 'roguesymset' options to
+	be wider so that fewer entries with set descriptions will wrap
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with
