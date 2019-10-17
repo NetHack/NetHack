@@ -33,21 +33,44 @@
 /* the tty color setup code.  (IMHO, it should be removed - dean).    */
 #define BRIGHT 8
 
-/* these can be configured */
-#define HI_OBJ CLR_MAGENTA
-#define HI_METAL CLR_CYAN
-#define HI_COPPER CLR_YELLOW
-#define HI_SILVER CLR_GRAY
-#define HI_GOLD CLR_YELLOW
-#define HI_LEATHER CLR_BROWN
-#define HI_CLOTH CLR_BROWN
-#define HI_ORGANIC CLR_BROWN
-#define HI_WOOD CLR_BROWN
-#define HI_PAPER CLR_WHITE
-#define HI_GLASS CLR_BRIGHT_CYAN
-#define HI_MINERAL CLR_GRAY
-#define DRAGON_SILVER CLR_BRIGHT_CYAN
-#define HI_ZAP CLR_BRIGHT_BLUE
+/* Configurable colors are below. */
+/* Object materials: */
+#define HI_OBJ              CLR_MAGENTA
+#define HI_METAL            CLR_CYAN
+#define HI_COPPER           CLR_YELLOW
+#define HI_SILVER           CLR_GRAY
+#define HI_GOLD             CLR_YELLOW
+#define HI_LEATHER          CLR_BROWN
+#define HI_CLOTH            CLR_BROWN
+#define HI_ORGANIC          CLR_BROWN
+#define HI_WOOD             CLR_BROWN
+#define HI_PAPER            CLR_WHITE
+#define HI_GLASS            CLR_BRIGHT_CYAN
+#define HI_MINERAL          CLR_GRAY
+#define DRAGON_SILVER       CLR_BRIGHT_CYAN
+
+/* The general-purpose Colour of Magic.  It is used for the resistance sparkle
+   animation and, by default, for magic missiles and sleep rays. */
+#define HI_ZAP              CLR_BRIGHT_BLUE
+
+/* Beam types: */
+#define HI_BEAM_MISSILE     HI_ZAP
+#define HI_BEAM_FIRE        CLR_ORANGE
+#define HI_BEAM_FROST       CLR_WHITE
+#define HI_BEAM_SLEEP       HI_ZAP
+#define HI_BEAM_DEATH       CLR_BLACK
+#define HI_BEAM_LIGHTNING   CLR_WHITE
+#define HI_BEAM_POISON      CLR_YELLOW
+#define HI_BEAM_ACID        CLR_GREEN
+
+/* Explosion types: */
+#define HI_EXPL_DARK        CLR_BLACK
+#define HI_EXPL_NOXIOUS     CLR_GREEN
+#define HI_EXPL_MUDDY       CLR_BROWN
+#define HI_EXPL_WET         CLR_BLUE
+#define HI_EXPL_MAGICAL     CLR_MAGENTA
+#define HI_EXPL_FIERY       HI_BEAM_FIRE
+#define HI_EXPL_FROSTY      HI_BEAM_FROST
 
 struct menucoloring {
     struct nhregex *match;

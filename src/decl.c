@@ -170,14 +170,14 @@ NEARDATA struct obj
  *  This must be the same order as used for buzz() in zap.c.
  */
 const int zapcolors[NUM_ZAP] = {
-    HI_ZAP,     /* 0 - missile */
-    CLR_ORANGE, /* 1 - fire */
-    CLR_WHITE,  /* 2 - frost */
-    HI_ZAP,     /* 3 - sleep */
-    CLR_BLACK,  /* 4 - death */
-    CLR_WHITE,  /* 5 - lightning */
-    CLR_YELLOW, /* 6 - poison gas */
-    CLR_GREEN,  /* 7 - acid */
+    HI_BEAM_MISSILE,    /* 0 - missile */
+    HI_BEAM_FIRE,       /* 1 - fire */
+    HI_BEAM_FROST,      /* 2 - frost */
+    HI_BEAM_SLEEP,      /* 3 - sleep */
+    HI_BEAM_DEATH,      /* 4 - death */
+    HI_BEAM_LIGHTNING,  /* 5 - lightning */
+    HI_BEAM_POISON,     /* 6 - poison gas */
+    HI_BEAM_ACID,       /* 7 - acid */
 };
 #endif /* text color */
 
