@@ -1503,6 +1503,7 @@ int type;
         panic("No window slots!");
         return WIN_ERR;
     }
+    maxwin = max(newid + 1, maxwin);
 
     if (newwin->maxrow) {
         newwin->data = (char **) alloc(
