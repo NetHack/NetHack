@@ -3066,7 +3066,7 @@ boolean FDECL((*proc), (char *));
                 while (*ep == ' ' || *ep == '\t')
                     ++ep;
 
-                /* ingore empty lines and full-line comment lines */
+                /* ignore empty lines and full-line comment lines */
                 if (!*ep || *ep == '#')
                     ignoreline = TRUE;
 
