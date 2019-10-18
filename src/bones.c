@@ -1,4 +1,4 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1557092711 2019/05/05 21:45:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1571363147 2019/10/18 01:45:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -84,6 +84,24 @@ boolean restore;
                 }
             } else if (has_oname(otmp)) {
                 sanitize_name(ONAME(otmp));
+            }
+            /* 3.6.3: set no_charge for partly eaten food in shop;
+               all other items become goods for sale if in a shop */
+            if (otmp->oclass == FOOD_CLASS && otmp->oeaten) {
+                struct obj *top;
+                char *p;
+                xchar ox, oy;
+
+                for (top = otmp; top->where == OBJ_CONTAINED;
+                     top = top->ocontainer)
+                    continue;
+                otmp->no_charge = (top->where == OBJ_FLOOR
+                                   && get_obj_location(top, &ox, &oy, 0)
+                                   /* can't use costly_spot() since its
+                                      result depends upon hero's location */
+                                   && inside_shop(ox, oy)
+                                   && *(p = in_rooms(ox, oy, SHOPBASE))
+                                   && tended_shop(&rooms[*p - ROOMOFFSET]));
             }
         } else { /* saving */
             /* do not zero out o_ids for ghost levels anymore */
