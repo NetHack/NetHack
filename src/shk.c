@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1571363148 2019/10/18 01:45:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1571363715 2019/10/18 01:55:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.170 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2033,9 +2033,7 @@ struct obj *obj;
 {
     long units = obj->quan;
 
-    if (obj->oclass == FOOD_CLASS && obj->oeaten) {
-        units = 0L;
-    } else if (obj->globby) {
+    if (obj->globby) {
         /* globs must be sold by weight not by volume */
         long unit_weight = (long) objects[obj->otyp].oc_weight,
              wt = (obj->owt > 0) ? (long) obj->owt : (long) weight(obj);
