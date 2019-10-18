@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1562719337 2019/07/10 00:42:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.252 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1571347976 2019/10/17 21:32:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.254 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2342,7 +2342,7 @@ const char *name; /* name of option for error message */
             break;
 
         default:
-        gi_error:
+ gi_error:
             raw_printf("Syntax error in %s", name);
             wait_synch();
             return count;
@@ -3298,9 +3298,10 @@ boolean FDECL((*proc), (char *));
                 }
 
                 ep = inbuf;
-                while (*ep == ' ' || *ep == '\t') ep++;
+                while (*ep == ' ' || *ep == '\t')
+                    ++ep;
 
-                /* lines beginning with '#' are comments. ignore empty lines. */
+                /* ingore empty lines and full-line comment lines */
                 if (!*ep || *ep == '#')
                     ignoreline = TRUE;
 
@@ -3309,9 +3310,9 @@ boolean FDECL((*proc), (char *));
 
                 /* merge now read line with previous ones, if necessary */
                 if (!ignoreline) {
-                    len = strlen(inbuf) + 1;
+                    len = (int) strlen(inbuf) + 1;
                     if (buf)
-                        len += strlen(buf);
+                        len += (int) strlen(buf);
                     tmpbuf = (char *) alloc(len);
                     if (buf) {
                         Sprintf(tmpbuf, "%s %s", buf, inbuf);
@@ -3335,6 +3336,7 @@ boolean FDECL((*proc), (char *));
                 if (match_varname(buf, "CHOOSE", 6)) {
                     char *section;
                     char *bufp = find_optparam(buf);
+
                     if (!bufp) {
                         config_error_add(
                                     "Format is CHOOSE=section1,section2,...");
@@ -3397,10 +3399,11 @@ int which_set;
 {
     FILE *fp;
 
+    g.symset[which_set].explicitly = FALSE;
     if (!(fp = fopen_sym_file()))
         return 0;
 
-    g.symset_count = 0;
+    g.symset[which_set].explicitly = TRUE;
     g.chosen_symset_start = g.chosen_symset_end = FALSE;
     g.symset_which_set = which_set;
 
@@ -3419,7 +3422,14 @@ int which_set;
                 || !strcmpi(g.symset[which_set].name, "default")))
             clear_symsetentry(which_set, TRUE);
         config_error_done();
-        return (g.symset[which_set].name == 0) ? 1 : 0;
+
+        /* If name was defined, it was invalid... Then we're loading fallback */
+        if (g.symset[which_set].name) {
+            g.symset[which_set].explicitly = FALSE;
+            return 0;
+        }
+
+        return 1;
     }
     if (!g.chosen_symset_end)
         config_error_add("Missing finish for symset \"%s\"",
@@ -3490,14 +3500,19 @@ int which_set;
            building a pick-list of possible symset
            values from the file, so only do that */
         if (symp->range == SYM_CONTROL) {
-            struct symsetentry *tmpsp;
+            struct symsetentry *tmpsp, *lastsp;
 
+            for (lastsp = g.symset_list; lastsp; lastsp = lastsp->next)
+                if (!lastsp->next)
+                    break;
             switch (symp->idx) {
             case 0:
                 tmpsp = (struct symsetentry *) alloc(sizeof *tmpsp);
-                tmpsp->next = g.symset_list;
-                g.symset_list = tmpsp;
-                tmpsp->idx = g.symset_count++;
+                tmpsp->next = (struct symsetentry *) 0;
+                if (!lastsp)
+                    g.symset_list = tmpsp;
+                else
+                    lastsp->next = tmpsp;
                 tmpsp->name = dupstr(bufp);
                 tmpsp->desc = (char *) 0;
                 tmpsp->handling = H_UNK;
@@ -3508,21 +3523,22 @@ int which_set;
                 break;
             case 2:
                 /* handler type identified */
-                tmpsp = g.symset_list; /* most recent symset */
+                tmpsp = lastsp; /* most recent symset */
                 for (i = 0; known_handling[i]; ++i)
                     if (!strcmpi(known_handling[i], bufp)) {
                         tmpsp->handling = i;
                         break; /* for loop */
                     }
                 break;
-            case 3:                  /* description:something */
-                tmpsp = g.symset_list; /* most recent symset */
+            case 3:
+                /* description:something */
+                tmpsp = lastsp; /* most recent symset */
                 if (tmpsp && !tmpsp->desc)
                     tmpsp->desc = dupstr(bufp);
                 break;
             case 5:
                 /* restrictions: xxxx*/
-                tmpsp = g.symset_list; /* most recent symset */
+                tmpsp = lastsp; /* most recent symset */
                 for (i = 0; known_restrictions[i]; ++i) {
                     if (!strcmpi(known_restrictions[i], bufp)) {
                         switch (i) {
@@ -4366,7 +4382,7 @@ unsigned oid; /* book identifier */
         }
     }
 
-cleanup:
+ cleanup:
     (void) dlb_fclose(fp);
     if (nowin_buf) {
         /* one-line buffer */

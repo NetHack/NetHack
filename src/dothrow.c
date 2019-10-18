@@ -1292,7 +1292,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                 || !index(in_rooms(mon->mx, mon->my, SHOPBASE), *u.ushops)))
             hot_pursuit(mon);
 
-        if (obj_gone)
+        if (obj_gone || obj == uball)
             g.thrownobj = (struct obj *) 0;
     }
 

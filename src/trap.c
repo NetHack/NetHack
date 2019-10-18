@@ -1827,7 +1827,6 @@ int style;
 
         g.bhitpos.x += dx;
         g.bhitpos.y += dy;
-        t = t_at(g.bhitpos.x, g.bhitpos.y);
 
         if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
             if (otyp == BOULDER && throws_rocks(mtmp->data)) {
@@ -1862,7 +1861,7 @@ int style;
                     break;
                 }
             }
-            if (t && otyp == BOULDER) {
+            if ((t = t_at(g.bhitpos.x, g.bhitpos.y)) != 0 && otyp == BOULDER) {
                 switch (t->ttyp) {
                 case LANDMINE:
                     if (rn2(10) > 2) {
@@ -2155,6 +2154,7 @@ register struct monst *mtmp;
             inescapable = g.force_mintrap || ((tt == HOLE || tt == PIT)
                                             && Sokoban && !trap->madeby_u);
         const char *fallverb;
+        xchar tx = trap->tx, ty = trap->ty;
 
         /* true when called from dotrap, inescapable is not an option */
         if (mtmp == u.usteed)
@@ -2637,7 +2637,7 @@ register struct monst *mtmp;
                     trapkilled = TRUE;
             }
             /* a boulder may fill the new pit, crushing monster */
-            fill_pit(trap->tx, trap->ty);
+            fill_pit(tx, ty); /* thitm may have already destroyed the trap */
             if (DEADMONSTER(mtmp))
                 trapkilled = TRUE;
             if (unconscious()) {
@@ -4325,8 +4325,8 @@ struct trap *ttmp;
 
     You("pull %s out of the pit.", mon_nam(mtmp));
     mtmp->mtrapped = 0;
-    fill_pit(mtmp->mx, mtmp->my);
     reward_untrap(ttmp, mtmp);
+    fill_pit(mtmp->mx, mtmp->my);
     return 1;
 }
 

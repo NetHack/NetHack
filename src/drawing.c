@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1546656404 2019/01/05 02:46:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1571347973 2019/10/17 21:32:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -246,9 +246,9 @@ static const uchar def_r_oc_syms[MAXOCLASSES] = {
 
 #undef C
 
-#ifdef TERMLIB
+#if defined(TERMLIB) || defined(CURSES_GRAPHICS)
 void NDECL((*decgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
-#endif /* TERMLIB */
+#endif /* TERMLIB || CURSES */
 
 #ifdef PC9800
 void NDECL((*ibmgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
@@ -487,17 +487,22 @@ int nondefault;
 #ifdef PC9800
         if (SYMHANDLING(H_IBM) && ibmgraphics_mode_callback)
             (*ibmgraphics_mode_callback)();
-        else if (!g.symset[g.currentgraphics].name && ascgraphics_mode_callback)
+        else if (SYMHANDLING(H_UNK) && ascgraphics_mode_callback)
             (*ascgraphics_mode_callback)();
 #endif
-#ifdef TERMLIB
+#if defined(TERMLIB) || defined(CURSES_GRAPHICS)
+        /* curses doesn't assign any routine to dec..._callback but
+           probably does the expected initialization under the hood
+           for terminals capable of rendering DECgraphics */
         if (SYMHANDLING(H_DEC) && decgraphics_mode_callback)
             (*decgraphics_mode_callback)();
-#endif
 # ifdef CURSES_GRAPHICS
+        /* there aren't any symbol sets with CURS handling, and the
+           curses interface never assigns a routine to curses..._callback */
         if (SYMHANDLING(H_CURS) && cursesgraphics_mode_callback)
             (*cursesgraphics_mode_callback)();
 # endif
+#endif
     } else {
         init_l_symbols();
         init_showsyms();
@@ -553,6 +558,7 @@ const char *known_handling[] = {
     "IBM",     /* H_IBM  */
     "DEC",     /* H_DEC  */
     "CURS",    /* H_CURS */
+    "MAC",     /* H_MAC  -- pre-OSX MACgraphics */
     (const char *) 0,
 };
 

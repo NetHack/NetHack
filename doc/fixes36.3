@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.126 $ $NHDT-Date: 1570408209 2019/10/07 00:30:09 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.140 $ $NHDT-Date: 1571352531 2019/10/17 22:48:51 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -178,6 +178,16 @@ avoid 'object lost' panic when polymorph causes loss of levitation boots or
 	wasn't possible to tell where they were, unlike all other forms of
 	multiple movement; stop running if/when an engraving is reached
 fix exploding land mine moving ball or chain and causing a sanity error
+fix firing attached iron ball when swallowed causing a sanity error
+fix vault guard impossible when he could not relocate in certain situation
+fix temple priests or shopkeepers moving over other monsters
+fix hero still hiding under a statue shattered by a land mine
+fix helping a monster out of a pit addressing a deleted trap
+fix launched rolling boulder code accessing deleted trap
+fix monster stepping on a land mine code accessing deleted trap
+revise 'O' to show symbol sets in the same order they appear in the symbols
+	file and order the sets in dat/symbols to yield a sensible symset menu
+yellow dragons had green breath
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -198,6 +208,7 @@ monster throwing from stack of missiles (darts, daggers, spears) would cause
 	crash if it wasn't wielding a weapon (bug in multi-shot shooting fix)
 surviving death while polymorphed would yield "You are a <foo>" without
 	terminating period
+'mksobj failure' commit resulted in wrong corpse types for dying monsters
 curses: sometimes the message window would show a blank line after a prompt
 curses: the change to show map in columns 1..79 instead of 2..80 made the
 	highlight for '@' show up in the wrong place if clipped map had been
@@ -210,8 +221,6 @@ tty: revert the attempt to fix "message line anomaly: if autodecribe feedback
 	wrapped to second line, the wrapped portion wasn't erased when a
 	shorter line was shown or getpos was dismissed" because it disrupted
 	prompts that spanned more than one line, a more significant issue
-unix: sysconf CHECK_PLNAME=1 wouldn't work if attempt to obtain unix username
-	failed even though it didn't need that username
 
 
 Platform- and/or Interface-Specific Fixes or Features
@@ -270,6 +279,12 @@ curses: disable the attempt to support Ctrl+Left_click as an alternate way
 	OSX 10.11) documentation and things didn't work as intended
 curses: menu coloring required that both 'menucolors' and 'guicolor' be On;
 	for menus, override guicolor with more-specific menucolors
+curses: support symset:DECgraphics for map display
+curses: enable the 'use_inverse' boolean option (via wincap WC_INVERSE flag)
+	for extended monster detection and black&white lava; forced to True
+	to override default of False (for tty's benefit)
+curses: force 'O' command's menus for 'symset' and 'roguesymset' options to
+	be wider so that fewer entries with set descriptions will wrap
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with
@@ -302,6 +317,10 @@ tty: take two, if/when autodecribe feedback wraps past top line, clear
 	['exposed by git' section has an entry for reversal of 'take one']
 tty: video attributes (bold, inverse, &c) for status highlighting sometimes
 	were scrambled
+unix: sysconf CHECK_PLNAME=1 wouldn't work if attempt to obtain unix username
+	failed even though it didn't need that username
+unix+curses: startup error only reset terminal for tty; one noticeable
+	example was answering 'n' to "Destroy old game?"
 Windows: some startup error messages were not being delivered successfully
 
 
@@ -332,6 +351,9 @@ curses: give menus and text windows a minimum size of 5x25 since tiny ones can
 curses+'perm_invent': since persistent inventory is narrow, strip off "a",
 	"an", or "the" prefix on inventory entries shown there so that a tiny
 	bit more of the interesting portion is visible
+curses+'curses': change the curses map display to use new symbol set 'curses'
+	instead of hard-coded values; it attempts to show IBMgraphics-style
+	map using DECgraphics characters; DECgraphics can also be used as-is
 
 
 NetHack Community Patches (or Variation) Included

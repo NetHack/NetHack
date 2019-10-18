@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1567240693 2019/08/31 08:38:13 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.369 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1571347977 2019/10/17 21:32:57 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.379 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -803,8 +803,9 @@ initoptions_init()
 
     iflags.wc_align_message = ALIGN_TOP;
     iflags.wc_align_status = ALIGN_BOTTOM;
-    /* these are currently only used by curses */
+    /* used by tty and curses */
     iflags.wc2_statuslines = 2;
+    /* only used by curses */
     iflags.wc2_windowborders = 2; /* 'Auto' */
 
     /* since this is done before init_objects(), do partial init here */
@@ -5268,8 +5269,8 @@ boolean setinitial, setfromfile;
                          MENU_UNSELECTED);
                 for (i = 0; i < numapes && ape; i++) {
                     any.a_void = (opt_idx == 1) ? 0 : ape;
-                    /* length of pattern plus quotes (plus '<'/'>') is less than
-                       BUFSZ */
+                    /* length of pattern plus quotes (plus '<'/'>') is
+                       less than BUFSZ */
                     Sprintf(apebuf, "\"%c%s\"", ape->grab ? '<' : '>',
                             ape->pattern);
                     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, apebuf,
@@ -5315,18 +5316,27 @@ boolean setinitial, setfromfile;
         g.symset[which_set].name = symset_name;
 
         if (res && g.symset_list) {
-            int thissize, biggest = 0;
+            int thissize,
+                biggest = (int) (sizeof "Default Symbols" - sizeof ""),
+                big_desc = 0;
 
             for (sl = g.symset_list; sl; sl = sl->next) {
                 /* check restrictions */
                 if (rogueflag ? sl->primary : sl->rogue)
                     continue;
+#ifndef MAC_GRAPHICS_ENV
+                if (sl->handling == H_MAC)
+                    continue;
+#endif
 
                 setcount++;
                 /* find biggest name */
                 thissize = sl->name ? (int) strlen(sl->name) : 0;
                 if (thissize > biggest)
                     biggest = thissize;
+                thissize = sl->desc ? (int) strlen(sl->desc) : 0;
+                if (thissize > big_desc)
+                    big_desc = thissize;
             }
             if (!setcount) {
                 pline("There are no appropriate %s symbol sets available.",
@@ -5334,10 +5344,48 @@ boolean setinitial, setfromfile;
                 return TRUE;
             }
 
-            Sprintf(fmtstr, "%%-%ds %%s", biggest + 5);
+            Sprintf(fmtstr, "%%-%ds %%s", biggest + 2);
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
             any = cg.zeroany;
+#ifdef CURSES_GRAPHICS /* this ought to be handled within curses... */
+            /*
+             * Symbol sets are formatted in two columns, "name description",
+             * on selectable lines.  curses bases menu width on the length
+             * of non-selectable lines (main header, separators if present,
+             * with trailing spaces ignored) and defaults to half the map.
+             * Without something like this separator (shown after the menu
+             * title and a blank line which follows that) to force a wider
+             * menu, entries with long descriptions wrap.  That would be
+             * ok if wrapping operated on the same two columns, but the
+             * menu doesn't know anything about those and the description
+             * is wrapping into the next line's name column, making long
+             * descriptions--and menus containing them--hard to read.
+             */
+            if (WINDOWPORT("curses")) {
+                char tmp1[BUFSZ], tmp2[BUFSZ], bigbuf[BUFSZ + 1 + BUFSZ];
+
+                /* 4: room for space+letter+paren+space, fake selector;
+                   2: added to 'biggest' when constructing 'fmtstr';
+                   1: space between symset name+2 and symset description */
+                if (4 + biggest + 2 + 1 > (int) sizeof tmp1 - 1)
+                    biggest = (int) sizeof tmp1 - 1 - (4 + 2 + 1);
+                (void) memset((genericptr_t) tmp1, '-', biggest);
+                tmp1[biggest] = '\0';
+                if (big_desc > (int) sizeof tmp2 - 1)
+                    big_desc = (int) sizeof tmp2 - 1;
+                (void) memset((genericptr_t) tmp2, '-', big_desc);
+                tmp2[big_desc] = '\0';
+                Sprintf(bigbuf, "%4s", "");
+                Sprintf(eos(bigbuf), fmtstr, tmp1, tmp2);
+                bigbuf[BUFSZ - 1] = '\0';
+                any.a_int = 0;
+                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                         bigbuf, MENU_UNSELECTED);
+            }
+#else
+            nhUse(big_desc);
+#endif
             any.a_int = 1;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "Default Symbols", MENU_UNSELECTED);
@@ -5346,6 +5394,10 @@ boolean setinitial, setfromfile;
                 /* check restrictions */
                 if (rogueflag ? sl->primary : sl->rogue)
                     continue;
+#ifndef MAC_GRAPHICS_ENV
+                if (sl->handling == H_MAC)
+                    continue;
+#endif
 
                 if (sl->name) {
                     any.a_int = sl->idx + 2;
