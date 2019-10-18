@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.140 $ $NHDT-Date: 1571352531 2019/10/17 22:48:51 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.141 $ $NHDT-Date: 1571363147 2019/10/18 01:45:47 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -188,6 +188,9 @@ fix monster stepping on a land mine code accessing deleted trap
 revise 'O' to show symbol sets in the same order they appear in the symbols
 	file and order the sets in dat/symbols to yield a sensible symset menu
 yellow dragons had green breath
+partly eaten food in a bones level shop would show a non-zero sale price
+	while on the floor but not be placed on shop bill if picked up;
+	sale price should have been "no charge"
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository

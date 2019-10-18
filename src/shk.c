@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1570236762 2019/10/05 00:52:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.168 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1571363715 2019/10/18 01:55:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.170 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -54,9 +54,10 @@ static long FDECL(stolen_container, (struct obj *, struct monst *,
 static long FDECL(getprice, (struct obj *, BOOLEAN_P));
 static void FDECL(shk_names_obj, (struct monst *, struct obj *,
                                       const char *, long, const char *));
-static struct obj *FDECL(bp_to_obj, (struct bill_x *));
 static boolean FDECL(inherits, (struct monst *, int, int, BOOLEAN_P));
 static void FDECL(set_repo_loc, (struct monst *));
+static struct obj *FDECL(bp_to_obj, (struct bill_x *));
+static long FDECL(get_pricing_units, (struct obj *));
 static boolean NDECL(angry_shk_exists);
 static void FDECL(rile_shk, (struct monst *));
 static void FDECL(rouse_shk, (struct monst *, BOOLEAN_P));
@@ -74,7 +75,6 @@ static void FDECL(deserted_shop, (char *));
 static boolean FDECL(special_stock, (struct obj *, struct monst *,
                                          BOOLEAN_P));
 static const char *FDECL(cad, (BOOLEAN_P));
-static long FDECL(get_pricing_units, (struct obj *obj));
 
 /*
         invariants: obj->unpaid iff onbill(obj) [unless bp->useup]
@@ -4853,7 +4853,7 @@ struct obj *obj_absorber, *obj_absorbed;
      * Scenario 1. Shop-owned glob absorbing into shop-owned glob
      **************************************************************/
     if (bp && (!obj_absorber->no_charge
-                || billable(&shkp, obj_absorber, eshkp->shoproom, FALSE))) {
+               || billable(&shkp, obj_absorber, eshkp->shoproom, FALSE))) {
         /* the glob being absorbed has a billing record */
         amount = bp->price;
         eshkp->billct--;
@@ -4926,18 +4926,14 @@ struct obj *obj_absorber, *obj_absorbed;
     /**************************************************************
      * Scenario 3. shop_owned glob merging into player_owned glob
      **************************************************************/
-    if (bp &&
-        (obj_absorber->no_charge
-            || (floor_absorber && !costly_spot(x, y)))) {
+    if (bp && (obj_absorber->no_charge
+               || (floor_absorber && !costly_spot(x, y)))) {
         amount = bp->price;
         bill_dummy_object(obj_absorbed);
-        verbalize(
-                  "You owe me %ld %s for my %s that you %s with your%s",
-                    amount, currency(amount), obj_typename(obj_absorbed->otyp),
-                    ANGRY(shkp) ? "had the audacity to mix" :
-                                  "just mixed",
-                    ANGRY(shkp) ? " stinking batch!" :
-                                  "s.");
+        verbalize("You owe me %ld %s for my %s that you %s with your%s",
+                  amount, currency(amount), obj_typename(obj_absorbed->otyp),
+                  ANGRY(shkp) ? "had the audacity to mix" : "just mixed",
+                  ANGRY(shkp) ? " stinking batch!" : "s.");
         return;
     }
     /**************************************************************
