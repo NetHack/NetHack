@@ -51,11 +51,11 @@
 
 /* The general-purpose Colour of Magic.  It is used for the resistance sparkle
    animation and, by default, for magic missiles and sleep rays. */
-#define HI_ZAP              CLR_BRIGHT_BLUE
+#define HI_ZAP              CLR_MAGENTA
 
 /* Beam types: */
 #define HI_BEAM_MISSILE     HI_ZAP
-#define HI_BEAM_FIRE        CLR_ORANGE
+#define HI_BEAM_FIRE        CLR_BRIGHT_GREEN
 #define HI_BEAM_FROST       CLR_WHITE
 #define HI_BEAM_SLEEP       HI_ZAP
 #define HI_BEAM_DEATH       CLR_BLACK

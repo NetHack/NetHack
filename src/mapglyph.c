@@ -15,13 +15,13 @@
 
 #ifdef TEXTCOLOR
 static const int explcolors[] = {
-    HI_EXPL_DARK,    /* dark    */
-    HI_EXPL_NOXIOUS, /* noxious */
-    HI_EXPL_MUDDY,   /* muddy   */
-    HI_EXPL_WET,     /* wet     */
-    HI_EXPL_MAGICAL, /* magical */
-    HI_EXPL_FIERY,   /* fiery   */
-    HI_EXPL_FROSTY,  /* frosty  */
+    HI_EXPL_DARK,
+    HI_EXPL_NOXIOUS,
+    HI_EXPL_MUDDY,
+    HI_EXPL_WET,
+    HI_EXPL_MAGICAL,
+    HI_EXPL_FIERY,
+    HI_EXPL_FROSTY,
 };
 
 #define zap_color(n) color = iflags.use_color ? zapcolors[n] : NO_COLOR
