@@ -60,8 +60,8 @@
 #define HI_BEAM_SLEEP       HI_ZAP
 #define HI_BEAM_DEATH       CLR_BLACK
 #define HI_BEAM_LIGHTNING   CLR_WHITE
-#define HI_BEAM_POISON      CLR_YELLOW
-#define HI_BEAM_ACID        CLR_GREEN
+#define HI_BEAM_POISON      CLR_GREEN
+#define HI_BEAM_ACID        CLR_YELLOW
 
 /* Explosion types: */
 #define HI_EXPL_DARK        CLR_BLACK

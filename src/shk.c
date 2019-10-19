@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1570236762 2019/10/05 00:52:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.168 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1571436007 2019/10/18 22:00:07 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.171 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -55,9 +55,10 @@ STATIC_DCL long FDECL(stolen_container, (struct obj *, struct monst *,
 STATIC_DCL long FDECL(getprice, (struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(shk_names_obj, (struct monst *, struct obj *,
                                       const char *, long, const char *));
-STATIC_DCL struct obj *FDECL(bp_to_obj, (struct bill_x *));
 STATIC_DCL boolean FDECL(inherits, (struct monst *, int, int, BOOLEAN_P));
 STATIC_DCL void FDECL(set_repo_loc, (struct monst *));
+STATIC_DCL struct obj *FDECL(bp_to_obj, (struct bill_x *));
+STATIC_DCL long FDECL(get_pricing_units, (struct obj *));
 STATIC_DCL boolean NDECL(angry_shk_exists);
 STATIC_DCL void FDECL(rile_shk, (struct monst *));
 STATIC_DCL void FDECL(rouse_shk, (struct monst *, BOOLEAN_P));
@@ -75,7 +76,6 @@ STATIC_DCL void FDECL(deserted_shop, (char *));
 STATIC_DCL boolean FDECL(special_stock, (struct obj *, struct monst *,
                                          BOOLEAN_P));
 STATIC_DCL const char *FDECL(cad, (BOOLEAN_P));
-STATIC_DCL long FDECL(get_pricing_units, (struct obj *obj));
 
 /*
         invariants: obj->unpaid iff onbill(obj) [unless bp->useup]
@@ -2904,8 +2904,8 @@ boolean peaceful, silent;
     /* gather information for message(s) prior to manipulating bill */
     was_unpaid = obj->unpaid ? TRUE : FALSE;
     if (Has_contents(obj)) {
-        c_count = count_contents(obj, TRUE, FALSE, TRUE);
-        u_count = count_contents(obj, TRUE, FALSE, FALSE);
+        c_count = count_contents(obj, TRUE, FALSE, TRUE, FALSE);
+        u_count = count_contents(obj, TRUE, FALSE, FALSE, FALSE);
     }
 
     if (!billable(&shkp, obj, roomno, FALSE)) {
@@ -3209,9 +3209,9 @@ xchar x, y;
 
             if (container) {
                 /* number of items owned by shk */
-                shksc = count_contents(obj, TRUE, TRUE, FALSE);
+                shksc = count_contents(obj, TRUE, TRUE, FALSE, TRUE);
                 /* number of items owned by you (total - shksc) */
-                yourc = count_contents(obj, TRUE, TRUE, TRUE) - shksc;
+                yourc = count_contents(obj, TRUE, TRUE, TRUE, TRUE) - shksc;
                 only_partially_your_contents = shksc && yourc;
             }
             /*
@@ -3227,14 +3227,27 @@ xchar x, y;
                (The case where it has contents already entirely owned
                by the shk is treated the same was if it were empty
                since the hero isn't selling any of those contents.)
-               Your container:
+               Your container and shk is willing to buy it:
                 "... your <empty bag>.  Sell it?"
                 "... your <bag> and its contents.  Sell them?"
                 "... your <bag> and item inside.  Sell them?"
                 "... your <bag> and items inside.  Sell them?"
+               Your container but shk only cares about the contents:
+                "... your item in your <bag>.  Sell it?"
+                "... your items in your <bag>.  Sell them?"
                Shk's container:
                 "... your item in the <bag>.  Sell it?"
                 "... your items in the <bag>.  Sell them?"
+              FIXME:
+               "your items" should sometimes be "some of your items"
+               (when container has some stuff the shk is willing to buy
+               and other stuff he or she doesn't care about); likewise,
+               "your item" should sometimes be "one of your items".
+               That would make the prompting even more verbose so
+               living without it might be a good thing.
+              FIXME too:
+               when container's contents are unknown, plural "items"
+               should be used to not give away information.
              */
             Sprintf(qbuf, "%s offers%s %ld gold piece%s for %s%s ",
                     Shknam(shkp), short_funds ? " only" : "", offer,
@@ -3243,7 +3256,7 @@ xchar x, y;
                         ? ((yourc == 1L) ? "your item in " : "your items in ")
                         : "",
                     obj->unpaid ? "the" : "your");
-            one = obj->unpaid ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
+            one = !ltmp ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
             Sprintf(qsfx, "%s.  Sell %s?",
                     (cltmp && ltmp)
                         ? (only_partially_your_contents
@@ -4866,7 +4879,7 @@ struct obj *obj_absorber, *obj_absorbed;
      * Scenario 1. Shop-owned glob absorbing into shop-owned glob
      **************************************************************/
     if (bp && (!obj_absorber->no_charge
-                || billable(&shkp, obj_absorber, eshkp->shoproom, FALSE))) {
+               || billable(&shkp, obj_absorber, eshkp->shoproom, FALSE))) {
         /* the glob being absorbed has a billing record */
         amount = bp->price;
         eshkp->billct--;
@@ -4939,18 +4952,14 @@ struct obj *obj_absorber, *obj_absorbed;
     /**************************************************************
      * Scenario 3. shop_owned glob merging into player_owned glob
      **************************************************************/
-    if (bp &&
-        (obj_absorber->no_charge
-            || (floor_absorber && !costly_spot(x, y)))) {
+    if (bp && (obj_absorber->no_charge
+               || (floor_absorber && !costly_spot(x, y)))) {
         amount = bp->price;
         bill_dummy_object(obj_absorbed);
-        verbalize(
-                  "You owe me %ld %s for my %s that you %s with your%s",
-                    amount, currency(amount), obj_typename(obj_absorbed->otyp),
-                    ANGRY(shkp) ? "had the audacity to mix" :
-                                  "just mixed",
-                    ANGRY(shkp) ? " stinking batch!" :
-                                  "s.");
+        verbalize("You owe me %ld %s for my %s that you %s with your%s",
+                  amount, currency(amount), obj_typename(obj_absorbed->otyp),
+                  ANGRY(shkp) ? "had the audacity to mix" : "just mixed",
+                  ANGRY(shkp) ? " stinking batch!" : "s.");
         return;
     }
     /**************************************************************

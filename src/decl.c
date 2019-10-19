@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1547025164 2019/01/09 09:12:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1571352532 2019/10/17 22:48:52 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -168,6 +168,7 @@ NEARDATA struct obj
 #ifdef TEXTCOLOR
 /*
  *  This must be the same order as used for buzz() in zap.c.
+ *  (They're only used in mapglyph.c so probably shouldn't be here.)
  */
 const int zapcolors[NUM_ZAP] = {
     HI_BEAM_MISSILE,    /* 0 - missile */

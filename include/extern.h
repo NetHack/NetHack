@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1567213888 2019/08/31 01:11:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.728 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1571436000 2019/10/18 22:00:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.730 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1047,7 +1047,8 @@ E int FDECL(count_unpaid, (struct obj *));
 E int FDECL(count_buc, (struct obj *, int, boolean (*)(OBJ_P)));
 E void FDECL(tally_BUCX, (struct obj *, BOOLEAN_P,
                           int *, int *, int *, int *, int *));
-E long FDECL(count_contents, (struct obj *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
+E long FDECL(count_contents, (struct obj *,
+                              BOOLEAN_P, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(carry_obj_effects, (struct obj *));
 E const char *FDECL(currency, (long));
 E void FDECL(silly_thing, (const char *, struct obj *));
