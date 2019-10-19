@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1571347977 2019/10/17 21:32:57 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.379 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1571448220 2019/10/19 01:23:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.380 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -761,9 +761,9 @@ initoptions_init()
      */
     /* this detects the IBM-compatible console on most 386 boxes */
     if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
-        if (!g.symset[PRIMARY].name)
+        if (!g.symset[PRIMARY].explicitly)
             load_symset("IBMGraphics", PRIMARY);
-        if (!g.symset[ROGUESET].name)
+        if (!g.symset[ROGUESET].explicitly)
             load_symset("RogueIBM", ROGUESET);
         switch_symbols(TRUE);
 #ifdef TEXTCOLOR
@@ -778,7 +778,7 @@ initoptions_init()
         /* [could also check "xterm" which emulates vtXXX by default] */
         && !strncmpi(opts, "vt", 2)
         && AS && AE && index(AS, '\016') && index(AE, '\017')) {
-        if (!g.symset[PRIMARY].name)
+        if (!g.symset[PRIMARY].explicitly)
             load_symset("DECGraphics", PRIMARY);
         switch_symbols(TRUE);
     }
@@ -787,15 +787,13 @@ initoptions_init()
 
 #if defined(MSDOS) || defined(WIN32)
     /* Use IBM defaults. Can be overridden via config file */
-    if (!g.symset[PRIMARY].name) {
+    if (!g.symset[PRIMARY].explicitly)
         load_symset("IBMGraphics_2", PRIMARY);
-    }
-    if (!g.symset[ROGUESET].name) {
+    if (!g.symset[ROGUESET].explicitly)
         load_symset("RogueEpyx", ROGUESET);
-    }
 #endif
 #ifdef MAC_GRAPHICS_ENV
-    if (!symset[PRIMARY].name)
+    if (!g.symset[PRIMARY].explicitly)
         load_symset("MACGraphics", PRIMARY);
     switch_symbols(TRUE);
 #endif /* MAC_GRAPHICS_ENV */
@@ -5303,7 +5301,7 @@ boolean setinitial, setfromfile;
                 nothing_to_do = FALSE;
         char *symset_name, fmtstr[20];
         struct symsetentry *sl;
-        int res, which_set, setcount = 0, chosen = -2;
+        int res, which_set, setcount = 0, chosen = -2, defindx = 0;
 
         which_set = rogueflag ? ROGUESET : PRIMARY;
         g.symset_list = (struct symsetentry *) 0;
@@ -5386,9 +5384,13 @@ boolean setinitial, setfromfile;
 #else
             nhUse(big_desc);
 #endif
-            any.a_int = 1;
+            any.a_int = 1; /* -1 + 2 [see 'if (sl->name) {' below]*/
+            if (!symset_name)
+                defindx = any.a_int;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     "Default Symbols", MENU_UNSELECTED);
+                     "Default Symbols",
+                     (any.a_int == defindx) ? MENU_SELECTED
+                                            : MENU_UNSELECTED);
 
             for (sl = g.symset_list; sl; sl = sl->next) {
                 /* check restrictions */
@@ -5398,20 +5400,34 @@ boolean setinitial, setfromfile;
                 if (sl->handling == H_MAC)
                     continue;
 #endif
-
                 if (sl->name) {
+                    /* +2: sl->idx runs from 0 to N-1 for N symsets;
+                       +1 because Defaults are implicitly in slot [0];
+                       +1 again so that valid data is never 0 */
                     any.a_int = sl->idx + 2;
+                    if (symset_name && !strcmpi(sl->name, symset_name))
+                        defindx = any.a_int;
                     Sprintf(buf, fmtstr, sl->name, sl->desc ? sl->desc : "");
-                    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                             buf, MENU_UNSELECTED);
+                    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+                             (any.a_int == defindx) ? MENU_SELECTED
+                                                    : MENU_UNSELECTED);
                 }
             }
             Sprintf(buf, "Select %ssymbol set:",
                     rogueflag ? "rogue level " : "");
             end_menu(tmpwin, buf);
-            if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
-                chosen = symset_pick->item.a_int - 2;
+            n = select_menu(tmpwin, PICK_ONE, &symset_pick);
+            if (n > 0) {
+                chosen = symset_pick[0].item.a_int;
+                /* if picking non-preselected entry yields 2, make sure
+                   that we're going with the non-preselected one */
+                if (n == 2 && chosen == defindx)
+                    chosen = symset_pick[1].item.a_int;
+                chosen -= 2; /* convert menu index to symset index;
+                              * "Default symbols" have index -1 */
                 free((genericptr_t) symset_pick);
+            } else if (n == 0 && defindx > 0) {
+                chosen = defindx - 2;
             }
             destroy_nhwindow(tmpwin);
 

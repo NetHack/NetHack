@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1570566378 2019/10/08 20:26:18 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.264 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1571436003 2019/10/18 22:00:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2951,30 +2951,32 @@ int *bcp, *ucp, *ccp, *xcp, *ocp;
 
 /* count everything inside a container, or just shop-owned items inside */
 long
-count_contents(container, nested, quantity, everything)
+count_contents(container, nested, quantity, everything, newdrop)
 struct obj *container;
 boolean nested, /* include contents of any nested containers */
     quantity,   /* count all vs count separate stacks */
-    everything; /* all objects vs only unpaid objects */
+    everything, /* all objects vs only unpaid objects */
+    newdrop;    /* on floor, but hero-owned items haven't been marked
+                 * no_charge yet and shop-owned items are still marked
+                 * unpaid -- used when asking the player whether to sell */
 {
     struct obj *otmp, *topc;
     boolean shoppy = FALSE;
     long count = 0L;
 
-    if (!everything) {
+    if (!everything && !newdrop) {
+        xchar x, y;
+
         for (topc = container; topc->where == OBJ_CONTAINED;
              topc = topc->ocontainer)
             continue;
-        if (topc->where == OBJ_FLOOR) {
-            xchar x, y;
-
-            (void) get_obj_location(topc, &x, &y, CONTAINED_TOO);
+        if (topc->where == OBJ_FLOOR && get_obj_location(topc, &x, &y, 0))
             shoppy = costly_spot(x, y);
-        }
     }
     for (otmp = container->cobj; otmp; otmp = otmp->nobj) {
         if (nested && Has_contents(otmp))
-            count += count_contents(otmp, nested, quantity, everything);
+            count += count_contents(otmp, nested, quantity, everything,
+                                    newdrop);
         if (everything || otmp->unpaid || (shoppy && !otmp->no_charge))
             count += quantity ? otmp->quan : 1L;
     }
