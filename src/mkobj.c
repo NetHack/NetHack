@@ -2470,6 +2470,38 @@ struct monst *mon;
     }
 }
 
+/*
+ * Initialize a dummy obj with just enough info
+ * to allow some of the tests in obj.h that
+ * take an obj pointer to work.
+ *
+ */
+struct obj *
+init_dummyobj(obj, otyp, oquan)
+struct obj *obj;
+short otyp;
+long oquan;
+{
+     if (obj) {
+         *obj = zeroobj;
+         obj->otyp = otyp;
+         obj->oclass = objects[otyp].oc_class;
+         /* obj->dknown = 0; */
+         /* suppress known except for amulets (needed for fakes and real A-of-Y) */
+         obj->known = (obj->oclass == AMULET_CLASS)
+                       ? obj->known
+                         /* default is "on" for types which don't use it */
+                         : !objects[otyp].oc_uses_known;
+         obj->quan = oquan ? oquan : 1L;
+         obj->corpsenm = NON_PM; /* suppress statue and figurine details */
+         /* but suppressing fruit details leads to "bad fruit #0"
+            [perhaps we should force "slime mold" rather than use xname?] */
+         if (obj->otyp == SLIME_MOLD)
+             obj->spe = 1;
+     }
+     return obj;
+}
+
 /* obj sanity check: check objects inside container */
 STATIC_OVL void
 check_contained(container, mesg)
