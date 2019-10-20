@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1570142734 2019/10/03 22:45:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1571531890 2019/10/20 00:38:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -190,12 +190,19 @@ struct obj **obj_p;
             otmp->quan = 2L; /* to force pluralization */
         else if (otmp->otyp == SLIME_MOLD)
             otmp->spe = context.current_fruit; /* give it a type */
-        if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
-            otmp->corpsenm = MCORPSENM(mtmp);
-        else if (otmp->otyp == CORPSE && glyph_is_body(glyph))
+        if (mtmp && has_mcorpsenm(mtmp)) { /* mimic as corpse/statue */
+            if (otmp->otyp == SLIME_MOLD)
+                /* override context.current_fruit to avoid
+                     look, use 'O' to make new named fruit, look again
+                   giving different results when current_fruit changes */
+                otmp->spe = MCORPSENM(mtmp);
+            else
+                otmp->corpsenm = MCORPSENM(mtmp);
+        } else if (otmp->otyp == CORPSE && glyph_is_body(glyph)) {
             otmp->corpsenm = glyph - GLYPH_BODY_OFF;
-        else if (otmp->otyp == STATUE && glyph_is_statue(glyph))
+        } else if (otmp->otyp == STATUE && glyph_is_statue(glyph)) {
             otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
+        }
         if (otmp->otyp == LEASH)
             otmp->leashmon = 0;
         /* extra fields needed for shop price with doname() formatting */

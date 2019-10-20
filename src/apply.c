@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1568922511 2019/09/19 19:48:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.277 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1571531886 2019/10/20 00:38:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.279 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -388,8 +388,20 @@ register struct obj *obj;
 
             switch (M_AP_TYPE(mtmp)) {
             case M_AP_OBJECT:
+                /* FIXME?
+                 *  we should probably be using object_from_map() here
+                 */
                 odummy = init_dummyobj(&dummyobj, mtmp->mappearance, 1L);
-                what = simple_typename(odummy->otyp);
+                /* simple_typename() yields "fruit" for any named fruit;
+                   we want the same thing '//' or ';' shows: "slime mold"
+                   or "grape" or "slice of pizza" */
+                if (odummy->otyp == SLIME_MOLD
+                    && has_mcorpsenm(mtmp) && MCORPSENM(mtmp) != NON_PM) {
+                    odummy->spe = MCORPSENM(mtmp);
+                    what = simpleonames(odummy);
+                } else {
+                    what = simple_typename(odummy->otyp);
+                }
                 use_plural = (is_boots(odummy) || is_gloves(odummy)
                               || odummy->otyp == LENSES);
                 break;

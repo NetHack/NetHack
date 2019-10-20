@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1570872702 2019/10/12 09:31:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1571531889 2019/10/20 00:38:09 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2474,7 +2474,6 @@ struct monst *mon;
  * Initialize a dummy obj with just enough info
  * to allow some of the tests in obj.h that
  * take an obj pointer to work.
- *
  */
 struct obj *
 init_dummyobj(obj, otyp, oquan)
@@ -2487,17 +2486,16 @@ long oquan;
          obj->otyp = otyp;
          obj->oclass = objects[otyp].oc_class;
          /* obj->dknown = 0; */
-         /* suppress known except for amulets (needed for fakes and real A-of-Y) */
+         /* suppress known except for amulets (needed for fakes & real AoY) */
          obj->known = (obj->oclass == AMULET_CLASS)
                        ? obj->known
                          /* default is "on" for types which don't use it */
                          : !objects[otyp].oc_uses_known;
          obj->quan = oquan ? oquan : 1L;
          obj->corpsenm = NON_PM; /* suppress statue and figurine details */
-         /* but suppressing fruit details leads to "bad fruit #0"
-            [perhaps we should force "slime mold" rather than use xname?] */
+         /* but suppressing fruit details leads to "bad fruit #0" */
          if (obj->otyp == SLIME_MOLD)
-             obj->spe = 1;
+             obj->spe = context.current_fruit;
      }
      return obj;
 }
