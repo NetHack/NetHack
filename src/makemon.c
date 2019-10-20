@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1570569787 2019/10/08 21:23:07 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.140 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1571531888 2019/10/20 00:38:08 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2242,6 +2242,18 @@ register struct monst *mtmp;
 
         newmcorpsenm(mtmp);
         MCORPSENM(mtmp) = mndx;
+    } else if (ap_type == M_AP_OBJECT && appear == SLIME_MOLD) {
+        newmcorpsenm(mtmp);
+        MCORPSENM(mtmp) = g.context.current_fruit;
+        /* if no objects of this fruit type have been created yet,
+           context.current_fruit is available for re-use when the player
+           assigns a new fruit name; override that--having a mimic as the
+           current_fruit is equivalent to creating an instance of that
+           fruit (no-op if a fruit of this type has actually been made) */
+        flags.made_fruit = TRUE;
+    } else if (has_mcorpsenm(mtmp)) {
+        /* don't retain stale value from a previously mimicked shape */
+        MCORPSENM(mtmp) = NON_PM;
     }
 
     if (does_block(mx, my, &levl[mx][my]))
