@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1558400902 2019/05/21 01:08:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.209 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1571787079 2019/10/22 23:31:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -135,7 +135,6 @@ struct window_procs tty_procs = {
     genl_can_suspend_yes,
 };
 
-static int maxwin = 0; /* number of windows in use */
 winid BASE_WINDOW;
 struct WinDesc *wins[MAXWIN];
 struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
@@ -1420,10 +1419,18 @@ int type;
     int i, rowoffset;
     int newid;
 
-    if (maxwin == MAXWIN)
+    for (newid = 0; newid < MAXWIN; ++newid)
+        if (wins[newid] == 0)
+            break;
+    if (newid == MAXWIN) {
+        panic("No window slots!");
+        /*NOTREACHED*/
         return WIN_ERR;
+    }
 
-    newwin = (struct WinDesc *) alloc(sizeof(struct WinDesc));
+    newwin = (struct WinDesc *) alloc(sizeof (struct WinDesc));
+    wins[newid] = newwin;
+
     newwin->type = type;
     newwin->flags = 0;
     newwin->active = FALSE;
@@ -1490,17 +1497,7 @@ int type;
         break;
     default:
         panic("Tried to create window type %d\n", (int) type);
-        return WIN_ERR;
-    }
-
-    for (newid = 0; newid < MAXWIN; newid++) {
-        if (wins[newid] == 0) {
-            wins[newid] = newwin;
-            break;
-        }
-    }
-    if (newid == MAXWIN) {
-        panic("No window slots!");
+        /*NOTREACHED*/
         return WIN_ERR;
     }
 
@@ -2447,7 +2444,7 @@ winid window;
 
     free_window_info(cw, TRUE);
     free((genericptr_t) cw);
-    wins[window] = 0;
+    wins[window] = 0; /* available for re-use */
 }
 
 void
