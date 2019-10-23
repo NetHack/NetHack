@@ -225,6 +225,8 @@ monster throwing from stack of missiles (darts, daggers, spears) would cause
 surviving death while polymorphed would yield "You are a <foo>" without
 	terminating period
 'mksobj failure' commit resulted in wrong corpse types for dying monsters
+a recent intended sanity check fix inadvertently bypassed placing 
+	a thrown chained ball back onto the floor
 curses: sometimes the message window would show a blank line after a prompt
 curses: the change to show map in columns 1..79 instead of 2..80 made the
 	highlight for '@' show up in the wrong place if clipped map had been
