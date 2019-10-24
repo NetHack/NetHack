@@ -35,15 +35,14 @@ if ($version ne '') {
 
 my $tilecount = 0;
 
-unless ($infile ne '') {
+if ($infile eq '') {
     $infile = $debug ? "objects.txt" : "objects.bak";
 }
-unless ($outfile ne '') {
+if ($outfile eq '') {
     $outfile = $debug ? "-" : "objects.txt";
 }
 
-
-unless ($debug ne '') {
+if ($debug eq '') {
     die "something didn't clean up $infile from last time; stopping\n" if -e "$infile";
     rename($outfile, $infile) or die "couldn't move $outfile to $infile; stopping\n";
 }
@@ -63,7 +62,7 @@ while (my $line = <INFILE>) {
 close(INFILE);
 close(OUTFILE);
 
-unless ($debug ne '') {unlink $infile;}
+if ($debug eq '') {unlink $infile;}
 
 sub printHelpMessage() {
     print <<"STARTHELP";
@@ -89,7 +88,7 @@ STARTHELP
 
 sub bail {
     my $message = shift;
-    unless ($debug ne '') {
+    if ($debug eq '') {
         unlink $outfile;
         rename($infile, $outfile);
     }
