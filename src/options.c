@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1571448220 2019/10/19 01:23:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.380 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1572070255 2019/10/26 06:10:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.381 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3262,8 +3262,12 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
-            while (letter(*++op) || *op == ' ')
-                continue;
+            /* "3a" is sufficient but accept "3around" (or "3abracadabra") */
+            while (letter(*op))
+                op++;
+            /* t, a, and o can be separated by space(s) or slash or both */
+            while (*op == ' ')
+                op++;
             if (*op == '/')
                 op++;
         }

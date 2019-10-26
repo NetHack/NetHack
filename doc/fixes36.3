@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.145 $ $NHDT-Date: 1571531885 2019/10/20 00:38:05 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.147 $ $NHDT-Date: 1572070254 2019/10/26 06:10:54 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -204,6 +204,9 @@ grammar correction for "That walking shoes is really a small mimic" when
 	applying a stethoscope
 mimic immitating a slime mold would change fruit type when player assigned new
 	named fruit
+parsing for the argument to 'scores' option was sloppy; "3a/o" (slash) and
+	"3a 1o" (space and digit one, not lowercase L) both worked but "3a o"
+	(just space) was supposed to but didn't
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
