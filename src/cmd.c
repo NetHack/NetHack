@@ -861,6 +861,7 @@ wiz_makemap(VOID_ARGS)
         u_on_rndspot((u.uhave.amulet ? 1 : 0) /* 'going up' flag */
                      | (was_in_W_tower ? 2 : 0));
         losedogs();
+        kill_genocided_monsters();
         /* u_on_rndspot() might pick a spot that has a monster, or losedogs()
            might pick the hero's spot (only if there isn't already a monster
            there), so we might have to move hero or the co-located monster */
