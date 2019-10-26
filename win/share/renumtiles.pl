@@ -5,32 +5,40 @@
 # NetHack may be freely redistributed.  See license for details.
 #
 
+use strict;
+use warnings;
+
 use Getopt::Long;
+use Pod::Usage;
 
-my $ver = "1.0";
+$main::VERSION = 1.0;
 
-my %commands_descriptions = (
-    'd' => 'debug mode; parse objects.txt to stdout instead of updating',
-);
+sub bail($);
 
-my $debug = '';
-my $help = '';
-my $version = '';
-my $outfile = '';
-my $infile = '';
+my ($infile, $outfile) = ('') x 2;
 
 GetOptions(
-    "debug"   => \$debug,
-    "help"    => \$help,
-    "version" => \$version
+    debug   => \my $debug,
+    help    => \my $help,
+    version => \my $version,
 );
 
-if ($help ne '') {
-    printHelpMessage();
-}
+pod2usage() if $help;
 
-if ($version ne '') {
-    printVersionMessage();
+if ($version) {
+    open(my $mem_fh, '>', \my $ver_info);
+
+    pod2usage(
+        -verbose  => 99,
+        -sections => 'NAME',
+        -output   => $mem_fh,
+        -exitval  => 'NOEXIT',
+    );
+
+    close $mem_fh;
+
+    $ver_info =~ s/\$main::VERSION/"sprintf '%.1f', $&" /ee;
+    print $ver_info;
 }
 
 my $tilecount = 0;
@@ -42,17 +50,17 @@ if ($outfile eq '') {
     $outfile = $debug ? "-" : "objects.txt";
 }
 
-if ($debug eq '') {
-    die "something didn't clean up $infile from last time; stopping\n" if -e "$infile";
-    rename($outfile, $infile) or die "couldn't move $outfile to $infile; stopping\n";
+unless ($debug) {
+    die "something didn't clean up objects.bak from last time; stopping\n" if -e $infile;
+    rename($outfile, $infile) or die "couldn't move objects.txt to objects.bak; stopping\n";
 }
 
 open(INFILE, "<$infile") or bail("couldn't open $infile; bailing");
 open(OUTFILE, ">$outfile") or bail("couldn't open $outfile; bailing");
 
 while (my $line = <INFILE>) {
-    if (my $tiletext = $line =~ /^# tile \d+ (.*)/) {
-        $line = "# tile $tilecount $tiletext\n";
+    if ($line =~ /^# tile \d+ (.*)/) {
+        $line = "# tile $tilecount $1\n";
         $tilecount++;
     }
 
@@ -62,36 +70,27 @@ while (my $line = <INFILE>) {
 close(INFILE);
 close(OUTFILE);
 
-if ($debug eq '') {unlink $infile;}
+unlink $infile unless $debug;
 
-sub printHelpMessage() {
-    print <<"STARTHELP";
-Usage: renumtiles.pl [OPTIONS] <textfile>
-
-STARTHELP
-    foreach my $cmd (keys(%commands_descriptions)) {
-        printf("%10s          %s\n", '-' . $cmd, $commands_descriptions{$cmd});
-    }
-    print <<"ENDHELP";
-
-\t--help      display this help message and exit
-\t--version   display version and exit
-ENDHELP
-    exit;
-}
-
-sub printVersionMessage() {
-    print <<"STARTHELP";
-renumtiles $ver -- tile-renumbering utility for NetHack
-STARTHELP
-}
-
-sub bail {
+sub bail($) {
     my $message = shift;
-    if ($debug eq '') {
+    if ($debug) {
         unlink $outfile;
         rename($infile, $outfile);
     }
     die "$message\n";
 }
+__END__
+=head1 NAME
 
+renumtiles.pl $main::VERSION -- tile-renumbering utility for NetHack
+
+=head1 SYNOPSIS
+
+renumtiles.pl [OPTIONS] <textfile>
+
+    -d          debug mode; parse objects.txt to stdout instead of updating
+    --help      display this help message and exit
+    --version   display version and exit
+
+=cut
