@@ -30,4 +30,4 @@ cd src
 cp ../sys/winnt/Makefile.msc ./Makefile
 nmake install
 cd ..
-powershell -Command "Compress-Archive -U -LiteralPath binary -DestinationPath NetHack.zip"
+powershell -Command "Compress-Archive -U -Path binary/*.* -DestinationPath NetHack.zip"
