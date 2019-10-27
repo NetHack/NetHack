@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.145 $ $NHDT-Date: 1571531885 2019/10/20 00:38:05 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ $NHDT-Date: 1572141706 2019/10/27 02:01:46 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -204,6 +204,10 @@ grammar correction for "That walking shoes is really a small mimic" when
 	applying a stethoscope
 mimic immitating a slime mold would change fruit type when player assigned new
 	named fruit
+parsing for the argument to 'scores' option was sloppy; "3a/o" (slash) and
+	"3a 1o" (space and digit one, not lowercase L) both worked but "3a o"
+	(just space) was supposed to but didn't
+wizmakemap could leave genocided monsters on map
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -251,6 +255,8 @@ EDIT_GETLIN: when naming an object or a monster use the existing name, if
 EDIT_GETLIN: using 'O' to set message types or menu colors was overloading the
 	answer buffer with other stuff, resulting in bogus default response
 	during repeat prompting
+EDIT_GETLIN: for paranoid confirmation, if answer was neither "yes" nor "no",
+	don't supply the rejected answer as the default when retrying
 curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
 	but 0-9 should be reserved for counts and if the display was tall
 	enough for more than 62 entries, arbitrary ASCII punctuation got used
