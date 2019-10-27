@@ -95,7 +95,7 @@ sudo: false
 notifications:
   email:
     recipients:
-      - bart@barthouse.com
+      - devteam@nethack.org
 #
 deploy:
   provider: releases
