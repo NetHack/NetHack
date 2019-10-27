@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1565574994 2019/08/12 01:56:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.343 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1572141702 2019/10/27 02:01:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6045,19 +6045,27 @@ const char *prompt;
        to give the go-ahead for this query; default is "no" unless the
        ParanoidConfirm flag is set in which case there's no default */
     if (be_paranoid) {
-        char qbuf[QBUFSZ], ans[BUFSZ] = DUMMY;
-        const char *promptprefix = "", *responsetype = ParanoidConfirm
-                                                           ? "(yes|no)"
-                                                           : "(yes) [no]";
-        int trylimit = 6; /* 1 normal, 5 more with "Yes or No:" prefix */
+        char pbuf[BUFSZ], qbuf[QBUFSZ], ans[BUFSZ];
+        const char *promptprefix = "",
+                *responsetype = ParanoidConfirm ? "(yes|no)" : "(yes) [no]";
+        int k, trylimit = 6; /* 1 normal, 5 more with "Yes or No:" prefix */
 
+        copynchars(pbuf, prompt, BUFSZ - 1);
         /* in addition to being paranoid about this particular
            query, we might be even more paranoid about all paranoia
            responses (ie, ParanoidConfirm is set) in which case we
            require "no" to reject in addition to "yes" to confirm
            (except we won't loop if response is ESC; it means no) */
         do {
-            Sprintf(qbuf, "%s%s %s", promptprefix, prompt, responsetype);
+            /* make sure we won't overflow a QBUFSZ sized buffer */
+            k = (int) (strlen(promptprefix) + 1 + strlen(responsetype));
+            if ((int) strlen(pbuf) + k > QBUFSZ - 1) {
+                /* chop off some at the end */
+                Strcpy(pbuf + (QBUFSZ - 1) - k - 4, "...?"); /* -4: "...?" */
+            }
+
+            Sprintf(qbuf, "%s%s %s", promptprefix, pbuf, responsetype);
+            *ans = '\0';
             getlin(qbuf, ans);
             (void) mungspaces(ans);
             confirmed_ok = !strcmpi(ans, "yes");
