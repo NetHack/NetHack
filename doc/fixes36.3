@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.147 $ $NHDT-Date: 1572070254 2019/10/26 06:10:54 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ $NHDT-Date: 1572141706 2019/10/27 02:01:46 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -255,6 +255,8 @@ EDIT_GETLIN: when naming an object or a monster use the existing name, if
 EDIT_GETLIN: using 'O' to set message types or menu colors was overloading the
 	answer buffer with other stuff, resulting in bogus default response
 	during repeat prompting
+EDIT_GETLIN: for paranoid confirmation, if answer was neither "yes" nor "no",
+	don't supply the rejected answer as the default when retrying
 curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
 	but 0-9 should be reserved for counts and if the display was tall
 	enough for more than 62 entries, arbitrary ASCII punctuation got used
