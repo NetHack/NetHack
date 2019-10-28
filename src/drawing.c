@@ -17,10 +17,6 @@
 #define C(n)
 #endif
 
-nhsym primary_syms[SYM_MAX] = DUMMY;   /* primary symbols          */
-nhsym rogue_syms[SYM_MAX] = DUMMY;   /* rogue symbols           */
-nhsym ov_primary_syms[SYM_MAX] = DUMMY;   /* overides via config SYMBOL */
-nhsym ov_rogue_syms[SYM_MAX] = DUMMY;   /* overides via config ROGUESYMBOL */
 const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
            
@@ -317,8 +313,8 @@ char ch;
  *
  *                     If (arg != 0), which is the normal expected
  *                     usage, then showsyms are taken from the
- *                     adjustable display symbols found in primary_syms.
- *                     primary_syms may have been loaded from an external
+ *                     adjustable display symbols found in g.primary_syms.
+ *                     g.primary_syms may have been loaded from an external
  *                     symbol file by config file options or interactively
  *                     in the Options menu.
  *
@@ -328,10 +324,10 @@ char ch;
  *                     out of other {rogue} level display modes.
  *
  *                     If arg is ROGUESET, this places the rogue level
- *                     symbols from rogue_syms into showsyms.
+ *                     symbols from g.rogue_syms into g.showsyms.
  *
  *                     If arg is PRIMARY, this places the symbols
- *                     from l_monsyms into showsyms.
+ *                     from g.primary_syms into g.showsyms.
  *
  * update_primary_symset()
  *                     Update a member of the primary(primary_*) symbol set.
@@ -381,7 +377,7 @@ init_ov_rogue_symbols()
     register int i;
 
     for (i = 0; i < SYM_MAX; i++)
-        ov_rogue_syms[i] = (nhsym) 0;
+        g.ov_rogue_syms[i] = (nhsym) 0;
 }
 /* initialize defaults for the overrides to the primary symset */
 void
@@ -390,7 +386,7 @@ init_ov_primary_symbols()
     register int i;
 
     for (i = 0; i < SYM_MAX; i++)
-        ov_primary_syms[i] = (nhsym) 0;
+        g.ov_primary_syms[i] = (nhsym) 0;
 }
 
 nhsym
@@ -401,11 +397,11 @@ int idx, which_set;
     int oidx = idx + SYM_OFF_X;
 
     if (which_set == ROGUESET)
-        sym = ov_rogue_syms[oidx] ? ov_rogue_syms[oidx]
-                                  : rogue_syms[oidx];
+        sym = g.ov_rogue_syms[oidx] ? g.ov_rogue_syms[oidx]
+                                  : g.rogue_syms[oidx];
     else
-        sym = ov_primary_syms[oidx] ? ov_primary_syms[oidx]
-                                  : primary_syms[oidx];
+        sym = g.ov_primary_syms[oidx] ? g.ov_primary_syms[oidx]
+                                  : g.primary_syms[oidx];
     if (!sym) {
         switch(idx) {
             case SYM_BOULDER:
@@ -426,15 +422,15 @@ init_primary_symbols()
     register int i;
 
     for (i = 0; i < MAXPCHARS; i++)
-        primary_syms[i + SYM_OFF_P] = defsyms[i].sym;
+        g.primary_syms[i + SYM_OFF_P] = defsyms[i].sym;
     for (i = 0; i < MAXOCLASSES; i++)
-        primary_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
+        g.primary_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
     for (i = 0; i < MAXMCLASSES; i++)
-        primary_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
+        g.primary_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
     for (i = 0; i < WARNCOUNT; i++)
-        primary_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+        g.primary_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
     for (i = 0; i < MAXOTHER; i++)
-        primary_syms[i + SYM_OFF_X] = get_othersym(i, PRIMARY);
+        g.primary_syms[i + SYM_OFF_X] = get_othersym(i, PRIMARY);
 
     clear_symsetentry(PRIMARY, FALSE);
 }
@@ -449,18 +445,18 @@ init_rogue_symbols()
        later by the roguesymbols option */
 
     for (i = 0; i < MAXPCHARS; i++)
-        rogue_syms[i + SYM_OFF_P] = defsyms[i].sym;
-    rogue_syms[S_vodoor] = rogue_syms[S_hodoor] = rogue_syms[S_ndoor] = '+';
-    rogue_syms[S_upstair] = rogue_syms[S_dnstair] = '%';
+        g.rogue_syms[i + SYM_OFF_P] = defsyms[i].sym;
+    g.rogue_syms[S_vodoor] = g.rogue_syms[S_hodoor] = g.rogue_syms[S_ndoor] = '+';
+    g.rogue_syms[S_upstair] = g.rogue_syms[S_dnstair] = '%';
 
     for (i = 0; i < MAXOCLASSES; i++)
-        rogue_syms[i + SYM_OFF_O] = def_r_oc_syms[i];
+        g.rogue_syms[i + SYM_OFF_O] = def_r_oc_syms[i];
     for (i = 0; i < MAXMCLASSES; i++)
-        rogue_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
+        g.rogue_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
     for (i = 0; i < WARNCOUNT; i++)
-        rogue_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+        g.rogue_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
     for (i = 0; i < MAXOTHER; i++)
-        rogue_syms[i + SYM_OFF_X] = get_othersym(i, ROGUESET);
+        g.rogue_syms[i + SYM_OFF_X] = get_othersym(i, ROGUESET);
 
     clear_symsetentry(ROGUESET, FALSE);
     /* default on Rogue level is no color
@@ -480,8 +476,8 @@ int whichset;
         /* Adjust graphics display characters on Rogue levels */
 
         for (i = 0; i < SYM_MAX; i++)
-            g.showsyms[i] = ov_rogue_syms[i] ? ov_rogue_syms[i]
-                                           : rogue_syms[i];
+            g.showsyms[i] = g.ov_rogue_syms[i] ? g.ov_rogue_syms[i]
+                                           : g.rogue_syms[i];
 
 #if defined(MSDOS) && defined(USE_TILES)
         if (iflags.grmode)
@@ -493,8 +489,8 @@ int whichset;
     case PRIMARY:
     default:
         for (i = 0; i < SYM_MAX; i++)
-            g.showsyms[i] = ov_primary_syms[i] ? ov_primary_syms[i]
-                                             : primary_syms[i];
+            g.showsyms[i] = g.ov_primary_syms[i] ? g.ov_primary_syms[i]
+                                             : g.primary_syms[i];
 
 #if defined(MSDOS) && defined(USE_TILES)
         if (iflags.grmode)
@@ -513,8 +509,8 @@ int nondefault;
 
     if (nondefault) {
         for (i = 0; i < SYM_MAX; i++)
-            g.showsyms[i] = ov_primary_syms[i] ? ov_primary_syms[i]
-                                             : primary_syms[i];
+            g.showsyms[i] = g.ov_primary_syms[i] ? g.ov_primary_syms[i]
+                                             : g.primary_syms[i];
 #ifdef PC9800
         if (SYMHANDLING(H_IBM) && ibmgraphics_mode_callback)
             (*ibmgraphics_mode_callback)();
@@ -545,7 +541,7 @@ update_ov_primary_symset(symp, val)
 struct symparse *symp;
 int val;
 {
-    ov_primary_syms[symp->idx] = val;
+    g.ov_primary_syms[symp->idx] = val;
 }
 
 void
@@ -553,7 +549,7 @@ update_ov_rogue_symset(symp, val)
 struct symparse *symp;
 int val;
 {
-    ov_rogue_syms[symp->idx] = val;
+    g.ov_rogue_syms[symp->idx] = val;
 }
 
 void
@@ -561,7 +557,7 @@ update_primary_symset(symp, val)
 struct symparse *symp;
 int val;
 {
-    primary_syms[symp->idx] = val;
+    g.primary_syms[symp->idx] = val;
 }
 
 void
@@ -569,7 +565,7 @@ update_rogue_symset(symp, val)
 struct symparse *symp;
 int val;
 {
-    rogue_syms[symp->idx] = val;
+    g.rogue_syms[symp->idx] = val;
 }
 
 void
