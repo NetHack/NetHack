@@ -903,8 +903,10 @@ struct instance_globals {
     struct symsetentry symset[NUM_GRAPHICS];
     int currentgraphics;
     nhsym showsyms[SYM_MAX]; /* symbols to be displayed */
-    nhsym l_syms[SYM_MAX];   /* loaded symbols          */
-    nhsym r_syms[SYM_MAX];   /* rogue symbols           */
+    nhsym primary_syms[SYM_MAX];   /* loaded primary symbols          */
+    nhsym rogue_syms[SYM_MAX];   /* loaded rogue symbols           */
+    nhsym ov_primary_syms[SYM_MAX];   /* loaded primary symbols          */
+    nhsym ov_rogue_syms[SYM_MAX];   /* loaded rogue symbols           */
     nhsym warnsyms[WARNCOUNT]; /* the current warning display symbols */
 
     /* dungeon.c */

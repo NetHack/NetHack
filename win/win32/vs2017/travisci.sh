@@ -1,3 +1,4 @@
+set -x
 export VSVER=2017
 export MSVER=14.16.27023
 export SDKVER=10.0.17763.0
@@ -26,8 +27,10 @@ export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
 git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
 export ADD_CURSES=Y
 export PDCURSES_TOP=../../pdcurses
+export
 cd src
 cp ../sys/winnt/Makefile.msc ./Makefile
 nmake install
 cd ..
-powershell -Command "Compress-Archive -U -Path binary/*.* -DestinationPath NetHack.zip"
+powershell -Command "Compress-Archive -U -Path binary/*.* -DestinationPath NetHack-x86-beta$TRAVIS_TAG.zip"
+

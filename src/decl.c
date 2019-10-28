@@ -391,8 +391,10 @@ const struct instance_globals g_init = {
     DUMMY, /* symset */
     0, /* currentgraphics */
     DUMMY, /* showsyms */
-    DUMMY, /* l_syms */
-    DUMMY, /* r_syms */
+    DUMMY, /* primary_syms */
+    DUMMY, /* rogue_syms */
+    DUMMY, /* ov_primary_syms */
+    DUMMY, /* ov_rogue_syms */
     DUMMY, /* warnsyms */
 
     /* dungeon.c */

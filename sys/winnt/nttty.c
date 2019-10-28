@@ -1606,8 +1606,8 @@ check_font_widths()
     boolean used[256];
     memset(used, 0, sizeof(used));
     for (int i = 0; i < SYM_MAX; i++) {
-        used[g.l_syms[i]] = TRUE;
-        used[g.r_syms[i]] = TRUE;
+        used[g.primary_syms[i]] = TRUE;
+        used[g.rogue_syms[i]] = TRUE;
     }
 
     int wcUsedCount = 0;

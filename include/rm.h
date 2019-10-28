@@ -266,7 +266,9 @@ struct symparse {
 /* misc symbol definitions */
 #define SYM_BOULDER 0
 #define SYM_INVISIBLE 1
-#define MAXOTHER 2
+#define SYM_PET_OVERRIDE 2
+#define SYM_PLAYER_OVERRIDE 3
+#define MAXOTHER 4
 
 /* linked list of symsets and their characteristics */
 struct symsetentry {
@@ -306,6 +308,10 @@ extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 #define WARNCOUNT 6 /* number of different warning levels */
 extern const struct symdef def_warnsyms[WARNCOUNT];
 #define SYMHANDLING(ht) (g.symset[g.currentgraphics].handling == (ht))
+extern nhsym primary_syms[];
+extern nhsym rogue_syms[];
+extern nhsym ov_primary_syms[];
+extern nhsym ov_rogue_syms[];
 
 /*
  * The 5 possible states of doors

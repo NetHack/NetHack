@@ -66,11 +66,12 @@ unsigned *ospecial;
 {
     register int offset, idx;
     int color = NO_COLOR;
-    nhsym ch;
+    nhsym ch, ovsym;
     unsigned special = 0;
     /* condense multiple tests in macro version down to single */
-    boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS;
-    boolean has_rogue_color = (has_rogue_ibm_graphics
+    boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS,
+            is_you = (x == u.ux && y == u.uy),
+            has_rogue_color = (has_rogue_ibm_graphics
                                && g.symset[g.currentgraphics].nocolor == 0);
 
     /*
@@ -206,7 +207,7 @@ unsigned *ospecial;
     } else { /* a monster */
         idx = mons[glyph].mlet + SYM_OFF_M;
         if (has_rogue_color && iflags.use_color) {
-            if (x == u.ux && y == u.uy)
+            if (is_you)
                 /* actually player should be yellow-on-gray if in corridor */
                 color = CLR_YELLOW;
             else
@@ -215,11 +216,24 @@ unsigned *ospecial;
             mon_color(glyph);
 #ifdef TEXTCOLOR
             /* special case the hero for `showrace' option */
-            if (iflags.use_color && x == u.ux && y == u.uy
-                && flags.showrace && !Upolyd)
+            if (iflags.use_color && is_you && flags.showrace && !Upolyd)
                 color = HI_DOMESTIC;
 #endif
         }
+    }
+
+    /* These were requested by a blind player to enhance screen reader use */
+    if (sysopt.accessibility == 1) {
+        ovsym = Is_rogue_level(&u.uz)
+                    ? g.ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X]
+                    : g.ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X];
+        if (ovsym && (special & MG_PET))
+            idx = SYM_PET_OVERRIDE + SYM_OFF_X;
+        ovsym = Is_rogue_level(&u.uz)
+                    ? g.ov_rogue_syms[SYM_PLAYER_OVERRIDE + SYM_OFF_X]
+                    : g.ov_primary_syms[SYM_PLAYER_OVERRIDE + SYM_OFF_X];
+        if (ovsym && is_you)
+            idx = SYM_PLAYER_OVERRIDE + SYM_OFF_X;
     }
 
     ch = g.showsyms[idx];
