@@ -108,5 +108,5 @@ deploy:
   on:
     tags: true
   prerelease: true
-  name: "Pre-release travis_test of NetHack 3.6.3"
-  body: "This is auto generated pre-release travis_test build of NetHack 3.6.3."
+ name: "Pre-release build of NetHack 3.6.3"
+ body: "This is auto generated pre-release build of NetHack 3.6.3 and as such has not been tested."
