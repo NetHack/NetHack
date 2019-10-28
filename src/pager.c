@@ -813,11 +813,12 @@ struct permonst **for_supplement;
                       unreconnoitered[] = "unreconnoitered";
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
-    int i, alt_i, glyph = NO_GLYPH,
+    int i, alt_i, j, glyph = NO_GLYPH,
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
             submerged = (Underwater && !Is_waterlevel(&u.uz));
     const char *x_str;
+    nhsym tmpsym;
 
     if (looked) {
         int oc;
@@ -881,7 +882,7 @@ struct permonst **for_supplement;
         if (x_str == unreconnoitered)
             goto didlook;
     }
-
+ check_monsters:
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 1; i < MAXMCLASSES; i++) {
@@ -1034,8 +1035,53 @@ struct permonst **for_supplement;
         }
     }
 
+    /* Finally, handle some optional overriding symbols */
+    for (j = SYM_OFF_X; j < SYM_MAX; ++j) {
+        if (j == (SYM_INVISIBLE + SYM_OFF_X))
+            continue;       /* already handled above */
+        tmpsym = Is_rogue_level(&u.uz) ? ov_rogue_syms[j] : ov_primary_syms[j];                    
+        if (tmpsym && sym == tmpsym) {
+            switch(j) {
+                case SYM_BOULDER + SYM_OFF_X:
+                        if (!found) {
+                            *firstmatch = "boulder";
+                            Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
+                            found++;
+                        } else {
+                            found += append_str(out_str, "boulder");
+                        }
+                        break;
+                case SYM_PET_OVERRIDE + SYM_OFF_X:
+                        if (looked) {
+                            int oc = 0;
+                            unsigned os = 0;
+                            nhsym save_override;
+
+                            if (Is_rogue_level(&u.uz)) {
+                                save_override = ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X];
+                                ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = 0;
+                            } else {
+                                save_override = ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X];
+                                ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = 0;
+                            }
+                            /* convert to symbol without the override in effect */
+                            (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
+                            if (Is_rogue_level(&u.uz))
+                                ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = save_override;
+                            else
+                                ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = save_override;
+                            goto check_monsters;
+                        }
+                        break;
+                case SYM_PLAYER_OVERRIDE + SYM_OFF_X:
+                        sym = showsyms[S_HUMAN + SYM_OFF_M];
+                        goto check_monsters;
+            }
+        }
+    }
+#if 0
     /* handle optional boulder symbol as a special case */
-    if (iflags.bouldersym && sym == iflags.bouldersym) {
+    if (o_syms[SYM_BOULDER + SYM_OFF_X] && sym == o_syms[SYM_BOULDER + SYM_OFF_X]) {
         if (!found) {
             *firstmatch = "boulder";
             Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
@@ -1044,6 +1090,7 @@ struct permonst **for_supplement;
             found += append_str(out_str, "boulder");
         }
     }
+#endif
 
     /*
      * If we are looking at the screen, follow multiple possibilities or

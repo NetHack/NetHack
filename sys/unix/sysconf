@@ -61,6 +61,11 @@ MAXPLAYERS=10
 # incubi to use nymphs' charm behavior rather than their own seduce behavior.
 #SEDUCE=0
 
+# Uncomment the next line to enable some accessibility features such
+# as S_player_override and S_pet_override symbols for screen readers
+# in the user config file.
+#ACCESSIBILITY=1
+
 # Uncomment to disable savefile UID checking.
 #CHECK_SAVE_UID=0
 

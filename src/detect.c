@@ -600,13 +600,13 @@ int class;            /* an object class, 0 for all */
     }
 
     /* Special boulder symbol check - does the class symbol happen
-     * to match iflags.bouldersym which is a user-defined?
+     * to match showsyms[SYM_BOULDER + SYM_OFF_X] which is user-defined.
      * If so, that means we aren't sure what they really wanted to
      * detect. Rather than trump anything, show both possibilities.
      * We can exclude checking the buried obj chain for boulders below.
      */
     sym = class ? def_oc_syms[class].sym : 0;
-    if (sym && iflags.bouldersym && sym == iflags.bouldersym)
+    if (sym && showsyms[SYM_BOULDER + SYM_OFF_X] && sym == showsyms[SYM_BOULDER + SYM_OFF_X])
         boulder = ROCK_CLASS;
 
     if (Hallucination || (Confusion && class == SCROLL_CLASS))
@@ -1208,7 +1208,8 @@ struct obj **optr;
             ret = object_detect((struct obj *) 0, class);
         else if ((class = def_char_to_monclass(ch)) != MAXMCLASSES)
             ret = monster_detect((struct obj *) 0, class);
-        else if (iflags.bouldersym && (ch == iflags.bouldersym))
+        else if (showsyms[SYM_BOULDER + SYM_OFF_X]
+                 && (ch == showsyms[SYM_BOULDER + SYM_OFF_X]))
             ret = object_detect((struct obj *) 0, ROCK_CLASS);
         else
             switch (ch) {

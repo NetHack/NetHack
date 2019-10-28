@@ -751,11 +751,12 @@ initoptions_init()
     flags.initrole = flags.initrace = flags.initgend = flags.initalign
         = ROLE_NONE;
 
+    init_ov_primary_symbols();
+    init_ov_rogue_symbols();
     /* Set the default monster and object class symbols. */
     init_symbols();
     for (i = 0; i < WARNCOUNT; i++)
         warnsyms[i] = def_warnsyms[i].sym;
-    iflags.bouldersym = 0;
 
     /* for "special achievement" tracking (see obj.h,
        create_object(sp_lev.c), addinv_core1(invent.c) */
@@ -773,7 +774,7 @@ initoptions_init()
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
         flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
     switch_symbols(FALSE); /* set default characters */
-    init_r_symbols();
+    init_rogue_symbols();
 #if defined(UNIX) && defined(TTY_GRAPHICS)
     /*
      * Set defaults for some options depending on what we can
@@ -837,6 +838,7 @@ initoptions_init()
 void
 initoptions_finish()
 {
+    nhsym sym = 0;
 #ifndef MAC
     char *opts = getenv("NETHACKOPTIONS");
 
@@ -880,8 +882,10 @@ initoptions_finish()
      */
     obj_descr[SLIME_MOLD].oc_name = "fruit";
 
-    if (iflags.bouldersym)
-        update_bouldersym();
+    sym = get_othersym(SYM_BOULDER,
+                Is_rogue_level(&u.uz) ? ROGUESET : PRIMARY);
+    if (sym)
+        showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
     reglyph_darkroom();
 
 #ifdef STATUS_HILITES
@@ -2754,12 +2758,16 @@ boolean tinitial, tfrom_file;
             /*
              * Override the default boulder symbol.
              */
-            iflags.bouldersym = (uchar) opts[0];
-            /* for 'initial', update_bouldersym() is done in
+            ov_primary_syms[SYM_BOULDER + SYM_OFF_X] = (nhsym) opts[0];
+            ov_rogue_syms[SYM_BOULDER + SYM_OFF_X] = (nhsym) opts[0];
+            /* for 'initial', update of BOULDER symbol is done in
                initoptions_finish(), after all symset options
                have been processed */
             if (!initial) {
-                update_bouldersym();
+                nhsym sym = get_othersym(SYM_BOULDER,
+                                Is_rogue_level(&u.uz) ? ROGUESET : PRIMARY);
+                if (sym)
+                    showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
                 need_redraw = TRUE;
             }
         }
@@ -4119,12 +4127,14 @@ boolean tinitial, tfrom_file;
         }
     }
 
+#if 0
     /* Is it a symbol? */
-    if (strstr(opts, "S_") == opts && parsesymbols(opts)) {
+    if (strstr(opts, "S_") == opts && parsesymbols(opts, PRIMARY)) {
         switch_symbols(TRUE);
         check_gold_symbol();
         return retval;
     }
+#endif
 
     /* out of valid options */
     config_error_add("Unknown option '%s'", opts);
@@ -5544,9 +5554,9 @@ boolean setinitial, setfromfile;
 
         /* Set default symbols and clear the handling value */
         if (rogueflag)
-            init_r_symbols();
+            init_rogue_symbols();
         else
-            init_l_symbols();
+            init_primary_symbols();
 
         if (symset[which_set].name) {
             /* non-default symbols */
@@ -5613,8 +5623,8 @@ char *buf;
 #ifdef BACKWARD_COMPAT
     else if (!strcmp(optname, "boulder"))
         Sprintf(buf, "%c",
-                iflags.bouldersym
-                    ? iflags.bouldersym
+                ov_primary_syms[SYM_BOULDER + SYM_OFF_X]
+                    ? ov_primary_syms[SYM_BOULDER + SYM_OFF_X]
                     : showsyms[(int) objects[BOULDER].oc_class + SYM_OFF_O]);
 #endif
     else if (!strcmp(optname, "catname"))
@@ -6099,16 +6109,20 @@ free_symsets()
 
 /* Parse the value of a SYMBOLS line from a config file */
 boolean
-parsesymbols(opts)
+parsesymbols(opts, which_set)
 register char *opts;
+int which_set;
 {
     int val;
     char *op, *symname, *strval;
     struct symparse *symp;
+#ifdef DEBUG
+    int sym_max = SYM_MAX;
+#endif
 
     if ((op = index(opts, ',')) != 0) {
         *op++ = 0;
-        if (!parsesymbols(op))
+        if (!parsesymbols(op, which_set))
             return FALSE;
     }
 
@@ -6131,7 +6145,10 @@ register char *opts;
 
     if (symp->range && symp->range != SYM_CONTROL) {
         val = sym_val(strval);
-        update_l_symset(symp, val);
+        if (which_set == ROGUESET)
+            update_ov_rogue_symset(symp, val);
+        else
+            update_ov_primary_symset(symp, val);
     }
     return TRUE;
 }

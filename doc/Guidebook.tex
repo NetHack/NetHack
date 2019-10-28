@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{October 1, 2019}
+\date{October 22, 2019}
 
 \maketitle
 
@@ -3000,7 +3000,7 @@ See the ``Configuring Message Types`` section.
 Highlight menu lines with different colors.
 See the ``Configuring Menu Colors`` section.
 %.lp
-\item[\bb{SYMBOLS}]
+\item[\bb{SYMBOLS},\bb{ROGUESYMBOLS}]
 Override one or more symbols in the symbols files.
 See the ``Modifying {\it NetHack\/} Symbols'' section.
 %.pg
@@ -4870,11 +4870,12 @@ Set the name of the symbol set that you want to load for display
 on the rogue level.
 \elist
 
-You can also override one or more symbols using the {\it SYMBOLS\/} config
-file option. Symbols are specified as {\it name:value\/} pairs. Note that
-{\it NetHack\/} escape-processes the {\it value\/} string in conventional C
-fashion.  This means that `\verb+\+' is a prefix to take the following
-character literally.  Thus `\verb+\+' needs to be represented as `\verb+\\+'.
+You can also override one or more symbols using the {\it SYMBOLS\/} and
+{\it ROGUESYMBOLS\/} config file options. Symbols are specified as 
+{\it name:value\/} pairs. Note that {\it NetHack\/} escape-processes 
+the {\it value\/} string in conventional C fashion.  This means that `\verb+\+' 
+is a prefix to take the following character literally.  Thus `\verb+\+' needs 
+to be represented as `\verb+\\+'.
 The special prefix
 `\verb+\m+' switches on the meta bit in the symbol value, and the
 `{\tt \^{}}' prefix causes the following character to be treated as a control
@@ -5060,7 +5061,9 @@ Default                      & Symbol Name                & Description\\
 \verb@X@ & S\verb+_+xorn                    &	(xorn)\\
 \verb@Y@ & S\verb+_+yeti                    &	(apelike creature)\\
 \verb@Z@ & S\verb+_+zombie                  &	(zombie)\\
-\verb@z@ & S\verb+_+zruty                   &	(zruty)
+\verb@z@ & S\verb+_+zruty                   &	(zruty)\\
+\verb@ @ & S\verb+_+pet\verb+_+override     &	(pet override if sysconf accessibility is set)\\
+\verb@ @ & S\verb+_+player\verb+_+override  &	(player override if sysconf accessibility is set)
 \end{longtable}%
 }
 
@@ -5105,7 +5108,12 @@ is a symset called {\it NHAccess\/}.  Selecting that symset in your
 configuration file will cause the game to run in a manner accessible
 to the blind. After you have gained some experience with the game
 and with editing files, you may want to alter settings via {\it SYMBOLS=\/}
+and {\it ROGUESYMBOLS=\/}
 in your configuration file to better suit your preferences.
+See the previous section for the special symbols S\verb+_+pet\verb+_+override
+to force a consistent symbol for all pets and S\verb+_+player\verb+_+override
+to force a unique symbol for the player character if {\it accessibility\/}
+is enabled in the {\it sysconf\/} file.
 The most crucial settings to make the game accessible are:
 %.pg
 \blist{}

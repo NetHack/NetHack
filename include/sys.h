@@ -41,6 +41,9 @@ struct sysopt {
     char *greppath;
     int panictrace_gdb;
     int panictrace_libc;
+
+    /* enable accessibility options */
+    int accessibility;
 };
 
 extern struct sysopt sysopt;

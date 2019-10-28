@@ -52,6 +52,11 @@ WIZARDS=*
 # Uncomment the next line to disable the SEDUCE option.
 #SEDUCE=0
 
+# Uncomment the next line to enable some accessibility features such
+# as S_player_override and S_pet_override symbols for screen readers
+# in the user config file.
+#ACCESSIBILITY=1
+
 # Record (high score) file options.
 # CAUTION: changing these after people have started playing games can
 #  lead to lost high scores!
