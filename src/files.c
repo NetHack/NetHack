@@ -2541,7 +2541,7 @@ char *origbuf;
             free((genericptr_t) sysopt.greppath);
         sysopt.greppath = dupstr(bufp);
     } else if (src == SET_IN_SYS
-               && match_varname(buf, "ACCESSIBILITY", 19)) {
+               && match_varname(buf, "ACCESSIBILITY", 13)) {
         n = atoi(bufp);
         if (n < 0 || n > 1) {
             config_error_add("Illegal value in ACCESSIBILITY (not 0,1).");
