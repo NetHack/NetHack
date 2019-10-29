@@ -108,7 +108,7 @@ deploy:
     secure: "U0Dt2CXrcG8Yi4taUCT/6AnM+0IJtdCv6IVG/2rGooUY3pZjNWE9XDM6X9ZeAmbI79aN6FPTppjUf3KbB/upYeJt+8mrjnxEk/ZTO1xXDDW8iL/DiqnczoFsMGmPsTM+Fkeak8bu0SifI7Qkx9i1N+zOyl2VdlaxGjchPfl/OJw2jcQs7rOGRfr23/rapZKTcFq+BFlxMiIHa0dXbCJ9vagdlyAeclOCtPjw1VoH/Cb/+0/Xlx2MFPncw4/1P+bO/fPantHyehh3/WCDVCnI4M7ftONpsTVRrQ+Hml89teUH9/1xXUOpbCeVghWr1rumLcQzMqLKNj2lP/gm9co2/DKpxiUPUzBfO/9Jvl1CNoEwPYQBRNb38kggDvAT4vKX38Oi5sZvumFEO4L0y7o4cW6SA4/CYIykfxOdkrryt8ltfWwopdy3I/DothYw31vJ9GsZOCAShFRAy3hJxYUbHhT+7SDUBadVSEkb4UqxQ+7zntAVT+Lp4DXLAfvsWxZGrQoP/IrWAgNOLRKILubpzh+YpadMH3Ygha2JRAeJAEZ3DnXf3vOOAucWnk4mNXDbW35GTDTAJDWMvddZCfsrUI/uHxgaRjFs9fLX1X5tqhGnsr27sKLWyX+zrIPVV0TPl3AzYPAf6Bc8Okeu+JEGQERvvgSasCuYcmhgYznBVJI="
   file_glob: true
   file: 
-    - "NetHack-x86-beta$TRAVIS_TAG.zip"
+    - "$TRAVIS_TAG.x86.zip"
   skip_cleanup: true
   on:
     tags: true

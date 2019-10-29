@@ -32,5 +32,4 @@ cd src
 cp ../sys/winnt/Makefile.msc ./Makefile
 nmake install
 cd ..
-powershell -Command "Compress-Archive -U -Path binary/*.* -DestinationPath NetHack-x86-beta$TRAVIS_TAG.zip"
-
+powershell -Command "Compress-Archive -U -Path binary/*.* -DestinationPath $TRAVIS_TAG.x86.zip"
