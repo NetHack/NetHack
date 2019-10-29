@@ -1,24 +1,24 @@
-                NetHack 3.6.2 -- General information
+         NetHack 3.6.3 work-in-progress -- General information
 
 NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.2 contains a collection of about 320 bug fixes to NetHack 3.6.1
-and more than 20 enhancements. The file doc/fixes36.2 in the source
-distribution has a full list of them. The text in there was written for the
-development team's own use and is provided  "as is", so please do not ask us
-to further explain the entries in that file. Some entries might be considered
-"spoilers", particularly in the "new features" section.
+NetHack 3.6.3 work-in-progress is not an official release of NetHack. It 
+currently contains a collection of over 140 bug fixes to NetHack 3.6.2
+and more than 16 enhancements and community contributions. The file 
+doc/fixes36.3 in the source distribution has a full list of them. 
+The text in there was written for the development team's own use and is
+provided  "as is", so please do not ask us to further explain the entries
+in that file. Some entries might be considered "spoilers", particularly in
+the "new features" section.
 
 Below you will find some other general notes that were not considered
 spoilers:
-* Performance optimizations with tty including the ability to do per field 
-  updating
-* sys/winnt/nttty performance improvements mainly through the introduction
-  of a back buffer approach
-* a couple of windows crash bug fixes
-* adoption of the curses window port that was in use in the community
+
+* Over 30 refinements to the curses window port.
+* Some refinements to status highlights.
+* A couple of fixes to prevent potential game crashes.
 
                         - - - - - - - - - - -
 
@@ -125,8 +125,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
 If you have problems building the game, or you find bugs in it, we recommend 
 filing a bug report from our "Contact Us" web page at:
-    https://www.nethack.org/common/contact.html or
-    http://www.nethack.org/common/contact.html
+    https://www.nethack.org/common/contact.html
 Please include the version information from #version or the command line
 option --version in the appropriate field.
 
@@ -167,6 +166,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1557077369 2019/05/05 17:29:29 $ $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.55 $
+# $NHDT-Date: 1572309271 2019/10/29 00:34:31 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.57 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.

@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1572070255 2019/10/26 06:10:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.381 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1572303730 2019/10/28 23:02:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.383 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6047,9 +6047,6 @@ int which_set;
     int val;
     char *op, *symname, *strval;
     struct symparse *symp;
-#ifdef DEBUG
-    int sym_max = SYM_MAX;
-#endif
 
     if ((op = index(opts, ',')) != 0) {
         *op++ = 0;
