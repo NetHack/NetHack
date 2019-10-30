@@ -142,6 +142,7 @@ mswin_init_nhwindows(int *argc, char **argv)
 # ifdef _DEBUG
     if (showdebug(NHTRACE_LOG) && !_s_debugfp) {
         /* truncate trace file */
+        /* BUG: this relies on current working directory */
         _s_debugfp = fopen(NHTRACE_LOG, "w");
     }
 # endif

@@ -1825,6 +1825,8 @@ E int NDECL(dohistory);
 E void FDECL(chdirx, (char *, BOOLEAN_P));
 #endif /* CHDIR */
 E boolean NDECL(authorize_wizard_mode);
+E boolean NDECL(is_desktop_bridge_application);
+
 #endif /* MICRO || WIN32 */
 
 /* ### pcsys.c ### */

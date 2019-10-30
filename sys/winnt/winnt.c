@@ -188,15 +188,21 @@ get_username(lan_username_size)
 int *lan_username_size;
 {
     static TCHAR username_buffer[BUFSZ];
-    unsigned int status;
     DWORD i = BUFSZ - 1;
 
-    /* i gets updated with actual size */
-    status = GetUserName(username_buffer, &i);
-    if (status)
-        username_buffer[i] = '\0';
-    else
-        Strcpy(username_buffer, "NetHack");
+    Strcpy(username_buffer, "NetHack");
+
+    /* Our privacy policy for the windows store version of nethack makes
+     * a promise about not collecting any personally identifiable information.
+     * Do not allow getting user name if we being run from windows store
+     * version of nethack.  In 3.7, we should remove use of username.
+     */
+    if (!is_desktop_bridge_application()) {
+        /* i gets updated with actual size */
+        if (GetUserName(username_buffer, &i))
+            username_buffer[i] = '\0';
+    }
+
     if (lan_username_size)
         *lan_username_size = strlen(username_buffer);
     return username_buffer;
