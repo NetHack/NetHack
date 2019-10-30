@@ -510,9 +510,9 @@ endif
 CFLAGSBASE  = -c $(cflags) $(WINPINC) $(cdebug) $(CURSESDEF)
 #LFLAGSBASEC = $(linkdebug)
 #LFLAGSBASEG = $(linkdebug) -mwindows
-
-conlibs = -lgdi32 -lwinmm $(BCRYPT)
-guilibs = -lcomctl32 -lwinmm
+baselibs = -lwinmm -lshell32 -lole32
+conlibs = -lgdi32 $(baselibs) $(BCRYPT)
+guilibs = -lcomctl32 $(baselibs)
 ifeq "$(WANT_WIN_QT4)" "Y"
     # Might be either Qt 4 or Qt 5
     ifeq "$(HAVE_QT5)" "Y"
