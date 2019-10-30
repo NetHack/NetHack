@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.312 $ $NHDT-Date: 1562838836 2019/07/11 09:53:56 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.317 $ $NHDT-Date: 1572448817 2019/10/30 15:20:17 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -2642,6 +2642,7 @@ of which can be used multiple times.
 In general, the statements are
 written in capital letters, followed by an equals sign, followed by
 settings particular to that statement.
+.pg
 Here is a list of allowed statements:
 .lp OPTIONS
 There are two types of options, boolean and compound options.
@@ -2653,7 +2654,7 @@ Some options are persistent, and apply only to new games.
 You can specify multiple OPTIONS statements, and multiple options
 separated by commas in a single OPTIONS statement.
 (Comma separated options are processed from right to left.)
-.pg
+.lp ""
 Example:
 .sd
 .ft CR
@@ -2682,6 +2683,7 @@ HACKDIR, must be writable.
 .lp TROUBLEDIR
 The location that a record of game aborts and self-diagnosed game problems
 is kept. Defaults to HACKDIR, must be writable.
+.\" config file entries beyond this point are shown alphabetically
 .lp AUTOCOMPLETE
 Enable or disable an extended command autocompletion.
 Autocompletion has no effect for the X11 windowport.
@@ -2689,7 +2691,7 @@ You can specify multiple autocompletions.
 To enable autocompletion, list the extended command.
 Prefix the command with \(lq!\(rq to disable the autocompletion
 for that command.
-.pg
+.lp ""
 Example:
 .sd
 \f(CRAUTOCOMPLETE=zap,!annotate\fP
@@ -2705,7 +2707,7 @@ extended commands.
 You can specify multiple bindings.
 Format is key followed by the command, separated by a colon.
 See the \(lqChanging Key Bindings\(rq section for more information.
-.pg
+.lp ""
 Example:
 .sd
 \f(CRBIND=\(haX:getpos.autodescribe\fP
@@ -2713,7 +2715,7 @@ Example:
 .lp CHOOSE
 Chooses at random one of the comma-separated parameters as an active
 section name. Lines in other sections are ignored.
-.pg
+.lp ""
 Example:
 .sd
 .ft CR \" constant-width Roman
@@ -2725,37 +2727,43 @@ OPTIONS=role:arc,race:dwa,align:law,gender:fem
 OPTIONS=role:wiz,race:elf,align:cha,gender:mal
 .ft \" revert to previous font
 .ed
-.lp MSGTYPE
-Change the way messages are shown in the top status line.
-See the \(lqConfiguring Message Types\(rq section.
 .lp MENUCOLOR
 Highlight menu lines with different colors.
 See the \(lqConfiguring Menu Colors\(rq section.
-.lp SYMBOLS, ROGUESYMBOLS
-Override one or more symbols in the symbols files.
+.lp MSGTYPE
+Change the way messages are shown in the top status line.
+See the \(lqConfiguring Message Types\(rq section.
+.lp ROGUESYMBOLS
+Custom symbols for for the rogue level's symbol set.
+See \fISYMBOLS\fP below.
+.lp SOUND
+Define a sound mapping.
+See the \(lqConfiguring User Sounds\(rq section.
+.lp SOUNDDIR
+Define the directory that contains the sound files.
+See the \(lqConfiguring User Sounds\(rq section.
+.lp SYMBOLS
+Override one or more symbols in the symbol set used for all dungeon
+levels except for the special rogue level.
 See the \(lqModifying NetHack Symbols\(rq section.
-.pg
+.lp ""
 Example:
 .sd
-\f(CRSYMBOLS=S_boulder:0\fP
+\f(CR# replace small punctuation (tick marks) with easier to see digits\fP
+\f(CRSYMBOLS=S_boulder:0,S_golem:7\fP
 .ed
 .lp WIZKIT
 Debug mode only:  extra items to add to initial inventory.
 Value is the name of a text file containing a list of item names,
 one per line, up to a maximum of 128 lines.
 Each line is processed by the function that handles wishing.
-.pg
+.lp ""
 Example:
 .sd
 \f(CRWIZKIT=\(ti/wizkit.txt\fP \" \(ti == '~'
 .ed
-.lp SOUNDDIR
-Define the directory that contains the sound files.
-See the \(lqConfiguring User Sounds\(rq section.
-.lp SOUND
-Define a sound mapping.
-See the \(lqConfiguring User Sounds\(rq section.
-.pg
+.lp ""
+.pg \" this would look better outdented
 Here is a short example of config file contents:
 .sd
 .ft CR \" set font to constant-width Roman
@@ -4376,7 +4384,8 @@ Set the name of the symbol set that you want to load for display
 on the rogue level.
 .pg
 You can also override one or more symbols using the SYMBOLS and
-ROGUESYMBOLS config file options. Symbols are specified as name:value pairs.
+ROGUESYMBOLS config file options.
+Symbols are specified as name:value pairs.
 Note that
 NetHack escape-processes the value string in conventional C fashion.
 This means that \\ is a prefix to take the following character literally.
