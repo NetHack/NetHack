@@ -2866,12 +2866,21 @@ for system administrators.
 \subsection*{Using a configuration file}
 
 %.pg
-The default name of the configuration file varies on different
-operating systems. On MS-DOS and Windows, it is \mbox{``defaults.nh''} in
+The default name and location of the configuration file varies on different
+operating systems. If you manually installed on MS-DOS and Windows,
+it is \mbox{``defaults.nh''} in
 the same folder as \mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}.
+If you installed using the Microsoft Store, it is \mbox{``defaults.nh''} in
+the folder \mbox{{``\%USERPROFILE\%\textbackslash NetHack''}}.
 On Unix, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home
 directory. The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
+
+%.pg
+If you installed using the Microsoft Store, you will find that we provide
+a starting template for you to use to create your \mbox{``defaults.nh''}
+configuration file.  It is \mbox{``defaults.tmp''} also in the folder
+\mbox{{``\%USERPROFILE\%\textbackslash NetHack''}}.
 
 %.pg
 Any line in the configuration file starting with `{\tt \#}' is treated as a comment.
@@ -4867,10 +4876,10 @@ on the rogue level.
 \elist
 
 You can also override one or more symbols using the {\it SYMBOLS\/} and
-{\it ROGUESYMBOLS\/} config file options. Symbols are specified as 
-{\it name:value\/} pairs. Note that {\it NetHack\/} escape-processes 
-the {\it value\/} string in conventional C fashion.  This means that `\verb+\+' 
-is a prefix to take the following character literally.  Thus `\verb+\+' needs 
+{\it ROGUESYMBOLS\/} config file options. Symbols are specified as
+{\it name:value\/} pairs. Note that {\it NetHack\/} escape-processes
+the {\it value\/} string in conventional C fashion.  This means that `\verb+\+'
+is a prefix to take the following character literally.  Thus `\verb+\+' needs
 to be represented as `\verb+\\+'.
 The special prefix
 `\verb+\m+' switches on the meta bit in the symbol value, and the

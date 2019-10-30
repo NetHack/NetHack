@@ -170,6 +170,7 @@ mswin_display_splash_window(BOOL show_ver)
             FILE *nf;
 
             iflags.news = 0; /* prevent newgame() from re-displaying news */
+            /* BUG: this relies on current working directory */
             nf = fopen(NEWS, "r");
             if (nf != NULL) {
                 char line[LLEN + 1];
