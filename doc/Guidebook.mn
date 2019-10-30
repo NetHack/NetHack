@@ -4617,7 +4617,7 @@ and with editing files, you may want to alter settings via \fBSYMBOLS=\fP
 and \fBROGUESYMBOLS=\fP
 in your configuration file to better suit your preferences.
 See the previous section for the special symbols S_pet_override
-to force a consistent symbol for all pets and and
+to force a consistent symbol for all pets and
 S_player_override to force a unique symbol for the player character
 if \fBaccessibility\fP is enabled in the sysconf file.
 The most crucial settings to make the game accessible are:
