@@ -300,7 +300,8 @@ update_file(
     const char * dst_folder,
     const char * dst_name,
     const char * src_folder,
-    const char * src_name)
+    const char * src_name,
+    BOOL save_copy)
 {
     char dst_path[MAX_PATH];
     strcpy(dst_path, dst_folder);
@@ -310,11 +311,19 @@ update_file(
     strcpy(src_path, src_folder);
     strcat(src_path, src_name);
 
+    char save_path[MAX_PATH];
+    strcpy(save_path, dst_folder);
+    strcat(save_path, dst_name);
+    strcat(save_path, ".save");
+
     if(!file_exists(src_path))
         error("Unable to copy file '%s' as it does not exist", src_path);
 
     if (!file_newer(src_path, dst_path))
         return;
+
+    if (file_exists(dst_path) && save_copy)
+        CopyFileA(dst_path, save_path, FALSE);
 
     BOOL success = CopyFileA(src_path, dst_path, FALSE);
     if(!success) error("Failed to update '%s' to '%s'", src_path, dst_path);
@@ -324,37 +333,39 @@ update_file(
 void copy_config_content()
 {
     /* Keep templates up to date */
-    update_file(g.fqn_prefix[CONFIGPREFIX], "defaults.tmp",
-        g.fqn_prefix[DATAPREFIX], "defaults.nh");
-    update_file(g.fqn_prefix[SYSCONFPREFIX], "sysconf.tmp",
-        g.fqn_prefix[DATAPREFIX], SYSCF_FILE);
+    /* TODO: Update the package to store config file as .nethackrc */
+    update_file(g.fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
+        g.fqn_prefix[DATAPREFIX], CONFIG_FILE, FALSE);
+    update_file(g.fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
+        g.fqn_prefix[DATAPREFIX], SYSCF_FILE, FALSE);
 
     /* If the required early game file does not exist, copy it */
-    copy_file(g.fqn_prefix[CONFIGPREFIX], "defaults.nh",
-        g.fqn_prefix[DATAPREFIX], "defaults.nh");
+    /* NOTE: We never replace .nethackrc or sysconf */
+    copy_file(g.fqn_prefix[CONFIGPREFIX], CONFIG_FILE,
+        g.fqn_prefix[DATAPREFIX], CONFIG_FILE);
     copy_file(g.fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
         g.fqn_prefix[DATAPREFIX], SYSCF_FILE);
 
-    /* If a required game file does not exist, copy it */
+    /* Update symbols and save a copy if we are replacing */
     /* TODO: Can't HACKDIR be changed during option parsing
        causing us to perhaps be checking options against the wrong
        symbols file? */
-    copy_file(g.fqn_prefix[HACKPREFIX], SYMBOLS,
-        g.fqn_prefix[DATAPREFIX], SYMBOLS);
+    update_file(g.fqn_prefix[HACKPREFIX], SYMBOLS,
+        g.fqn_prefix[DATAPREFIX], SYMBOLS, TRUE);
 }
 
 void
 copy_hack_content()
 {
     /* Keep Guidebook and opthelp up to date */
-    update_file(g.fqn_prefix[HACKPREFIX], "Guidebook.txt",
-        g.fqn_prefix[DATAPREFIX], "Guidebook.txt");
-    update_file(g.fqn_prefix[HACKPREFIX], "opthelp",
-        g.fqn_prefix[DATAPREFIX], "opthelp");
+    update_file(g.fqn_prefix[HACKPREFIX], GUIDEBOOK_FILE,
+        g.fqn_prefix[DATAPREFIX], GUIDEBOOK_FILE, FALSE);
+    update_file(g.fqn_prefix[HACKPREFIX], OPTIONFILE,
+        g.fqn_prefix[DATAPREFIX], OPTIONFILE, FALSE);
 
     /* Keep templates up to date */
-    update_file(g.fqn_prefix[HACKPREFIX], "symbols.tmp",
-        g.fqn_prefix[DATAPREFIX], "symbols");
+    update_file(g.fqn_prefix[HACKPREFIX], SYMBOLS_TEMPLATE,
+        g.fqn_prefix[DATAPREFIX], SYMBOLS, FALSE);
 
 }
 
