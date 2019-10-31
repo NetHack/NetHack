@@ -1,4 +1,4 @@
-/* NetHack 3.6	minion.c	$NHDT-Date: 1561061319 2019/06/20 20:08:39 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	minion.c	$NHDT-Date: 1572530226 2019/10/31 13:57:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -481,15 +481,18 @@ gain_guardian_angel()
             && (mtmp = mk_roamer(&mons[PM_ANGEL], u.ualign.type, mm.x, mm.y,
                                  TRUE)) != 0) {
             mtmp->mstrategy &= ~STRAT_APPEARMSG;
+            /* guardian angel -- the one case mtame doesn't imply an
+             * edog structure, so we don't want to call tamedog().
+             * [Note: this predates mon->mextra which allows a monster
+             * to have both emin and edog at the same time.]
+             */
+            mtmp->mtame = 10;
+            /* for 'hilite_pet'; after making tame, before next message */
+            newsym(mtmp->mx, mtmp->my);
             if (!Blind)
                 pline("An angel appears near you.");
             else
                 You_feel("the presence of a friendly angel near you.");
-            /* guardian angel -- the one case mtame doesn't
-             * imply an edog structure, so we don't want to
-             * call tamedog().
-             */
-            mtmp->mtame = 10;
             /* make him strong enough vs. endgame foes */
             mtmp->m_lev = rn1(8, 15);
             mtmp->mhp = mtmp->mhpmax =
