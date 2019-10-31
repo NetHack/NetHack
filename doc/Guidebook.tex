@@ -2895,9 +2895,13 @@ Section names are case insensitive.
 
 %.pg
 You can use different configuration statements in the file, some
-of which can be used multiple times. In general, the statements are
+of which can be used multiple times.
+In general, the statements are
 written in capital letters, followed by an equals sign, followed by
-settings particular to that statement. Here is a list of allowed statements:
+settings particular to that statement.
+
+%.pg
+Here is a list of allowed statements:
 
 %.lp
 \blist{}
@@ -2912,7 +2916,7 @@ You can specify multiple OPTIONS statements, and multiple options
 separated by commas in a single OPTIONS statement.
 (Comma separated options are processed from right to left.)
 
-%.pg
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
@@ -2946,6 +2950,9 @@ HACKDIR, must be writable.
 \item[\bb{TROUBLEDIR}]
 The location that a record of game aborts and self-diagnosed game problems
 is kept. Defaults to HACKDIR, must be writable.
+%
+% config file entries beyond this point are shown alphabetically
+%
 %.lp
 \item[\bb{AUTOCOMPLETE}]
 Enable or disable an extended command autocompletion.
@@ -2955,11 +2962,11 @@ autocompletion, list the extended command. Prefix the
 command with ``{{\tt !}}'' to disable the autocompletion
 for that command.
 
-%.pg
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
-    AUTOCOMPLETE=zap,!annotate
+   AUTOCOMPLETE=zap,!annotate
 \end{verbatim}
 %.ed
 
@@ -2974,7 +2981,7 @@ extended commands. You can specify multiple bindings. Format is key
 followed by the command, separated by a colon.
 See the ``Changing Key Bindings`` section for more information.
 
-%.pg
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
@@ -2987,7 +2994,7 @@ Example:
 Chooses at random one of the comma-separated parameters as an active
 section name. Lines in other sections are ignored.
 
-%.pg
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
@@ -3001,22 +3008,36 @@ Example:
 %.ed
 
 %.lp
-\item[\bb{MSGTYPE}]
-Change the way messages are shown in the top status line.
-See the ``Configuring Message Types`` section.
-%.lp
 \item[\bb{MENUCOLOR}]
 Highlight menu lines with different colors.
 See the ``Configuring Menu Colors`` section.
 %.lp
-\item[\bb{SYMBOLS},\bb{ROGUESYMBOLS}]
-Override one or more symbols in the symbols files.
+\item[\bb{MSGTYPE}]
+Change the way messages are shown in the top status line.
+See the ``Configuring Message Types`` section.
+%.lp
+\item[\bb{ROGUESYMBOLS}]
+Custom symbols for for the rogue level's symbol set.
+See {\it SYMBOLS} below.
+%.lp
+\item[\bb{SOUND}]
+Define a sound mapping.
+See the ``Configuring User Sounds'' section.
+%.lp
+\item[\bb{SOUNDDIR}]
+Define the directory that contains the sound files.
+See the ``Configuring User Sounds'' section.
+%.lp
+\item[\bb{SYMBOLS}
+Override one or more symbols in the symbol set used for all dungeon
+levels except for the special rogue level.
 See the ``Modifying {\it NetHack\/} Symbols'' section.
 %.pg
 Example:
 %.sd
 \begin{verbatim}
-    SYMBOLS=S_boulder:0
+   # replace small punctuation (tick marks) with digits
+   SYMBOLS=S_boulder:0,S_golem:7
 \end{verbatim}
 %.ed
 
@@ -3026,22 +3047,17 @@ Debug mode only:  extra items to add to initial inventory.
 Value is the name of a text file containing a list of item names,
 one per line, up to a maximum of 128 lines.
 Each line is processed by the function that handles wishing.
-%.pg
+
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
-    WIZKIT=~/wizkit.txt
+   WIZKIT=~/wizkit.txt
 \end{verbatim}
 %.ed
-%.lp
-\item[\bb{SOUNDDIR}]
-Define the directory that contains the sound files.
-See the ``Configuring User Sounds'' section.
-%.lp
-\item[\bb{SOUND}]
-Define a sound mapping. See the ``Configuring User Sounds'' section.
 \elist
 
+%.lp ""
 %.pg
 Here is a short example of config file contents:
 %.sd
@@ -4880,11 +4896,13 @@ on the rogue level.
 \elist
 
 You can also override one or more symbols using the {\it SYMBOLS\/} and
-{\it ROGUESYMBOLS\/} config file options. Symbols are specified as
-{\it name:value\/} pairs. Note that {\it NetHack\/} escape-processes
-the {\it value\/} string in conventional C fashion.  This means that `\verb+\+'
-is a prefix to take the following character literally.  Thus `\verb+\+' needs
-to be represented as `\verb+\\+'.
+{\it ROGUESYMBOLS\/} config file options.
+Symbols are specified as {\it name:value\/} pairs.
+Note that {\it NetHack\/} escape-processes
+the {\it value\/} string in conventional C fashion.
+This means that `\verb+\+' is a prefix to take the following character
+literally.
+Thus `\verb+\+' needs to be represented as `\verb+\\+'.
 The special prefix
 `\verb+\m+' switches on the meta bit in the symbol value, and the
 `{\tt \^{}}' prefix causes the following character to be treated as a control
@@ -5071,8 +5089,8 @@ Default                      & Symbol Name                & Description\\
 \verb@Y@ & S\verb+_+yeti                    &	(apelike creature)\\
 \verb@Z@ & S\verb+_+zombie                  &	(zombie)\\
 \verb@z@ & S\verb+_+zruty                   &	(zruty)\\
-\verb@ @ & S\verb+_+pet\verb+_+override     &	(pet override if sysconf accessibility is set)\\
-\verb@ @ & S\verb+_+player\verb+_+override  &	(player override if sysconf accessibility is set)
+\verb@ @ & S\verb+_+pet\verb+_+override     &	(any pet if sysconf accessibility is set)\\
+\verb@ @ & S\verb+_+player\verb+_+override  &	(hero if sysconf accessibility is set)
 \end{longtable}%
 }
 

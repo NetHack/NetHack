@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.318 $ $NHDT-Date: 1572482202 2019/10/31 00:36:42 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.319 $ $NHDT-Date: 1572525093 2019/10/31 12:31:33 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -2683,7 +2683,9 @@ HACKDIR, must be writable.
 .lp TROUBLEDIR
 The location that a record of game aborts and self-diagnosed game problems
 is kept. Defaults to HACKDIR, must be writable.
+.\"
 .\" config file entries beyond this point are shown alphabetically
+.\"
 .lp AUTOCOMPLETE
 Enable or disable an extended command autocompletion.
 Autocompletion has no effect for the X11 windowport.
