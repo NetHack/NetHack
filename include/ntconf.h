@@ -80,6 +80,12 @@
                      * objects being thrown when the hangup occurs.    \
                      */
 
+#define CONFIG_FILE "defaults.nh"
+#define CONFIG_TEMPLATE "defaults.template"
+#define SYSCF_TEMPLATE "sysconf.template"
+#define SYMBOLS_TEMPLATE "symbols.template"
+#define GUIDEBOOK_FILE "Guidebook.txt"
+
 /* Stuff to help the user with some common, yet significant errors */
 #define INTERJECT_PANIC 0
 #define INTERJECTION_TYPES (INTERJECT_PANIC + 1)
