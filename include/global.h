@@ -70,9 +70,10 @@
  * since otherwise comparisons with signed quantities are done incorrectly
  */
 typedef schar xchar;
-#if defined(__GNUC__) && defined(WIN32) && defined(__cplusplus)
+
+#ifdef __MINGW32__
 /* Resolve conflict with Qt 5 and MinGW-w32 */
-typedef uchar boolean; /* 0 or 1 */
+typedef unsigned char boolean; /* 0 or 1 */
 #else
 #ifndef SKIP_BOOLEAN
 typedef xchar boolean; /* 0 or 1 */
