@@ -50,9 +50,9 @@ fixes30.pl08   fixes30.pl09   fixes30.pl10   fixes31.1      fixes31.2
 fixes31.3      fixes32.0      fixes32.1      fixes32.2      fixes32.3
 fixes33.0      fixes33.1      fixes34.0      fixes34.1      fixes34.2
 fixes34.3      fixes35.0      fixes36.0      fixes36.1      fixes36.2
-lev_comp.6     lev_comp.txt   makedefs.6     makedefs.txt   mn.7
-mnh.7          nethack.6      nethack.txt    recover.6      recover.txt
-tmac.n         tmac.nh        window.doc
+fixes36.3      lev_comp.6     lev_comp.txt   makedefs.6     makedefs.txt
+mn.7           mnh.7          nethack.6      nethack.txt    recover.6
+recover.txt    tmac.n         tmac.nh        window.doc
 
 include:
 (files for GEM versions)
@@ -236,10 +236,12 @@ NetHack.xcscheme   makedefs.xcscheme  recover.xcscheme
 
 sys/unix/hints:
 (files for configuring UNIX NetHack versions)
-linux           linux-chroot    linux-minimal   linux-qt4
-linux-qt5       linux-x11       macosx          macosx.sh
-macosx10.5      macosx10.7      macosx10.8      macosx10.10
-macosx10.10-qt  macosx10.14     unix
+linux               linux-chroot        linux-minimal
+linux-qt4           linux-qt5           linux-x11
+macosx              macosx.sh           macosx10.5
+macosx10.7          macosx10.8          macosx10.10
+macosx10.10-qt      macosx10.14         solaris
+solaris-playground  unix
 
 sys/vms:
 (files for VMS version)
@@ -357,38 +359,102 @@ getline.c  termcap.c  topl.c     wintty.c
 
 win/win32:
 (files for Windows versions - tested up to Windows 10)
-NetHackW.exe.manifest  dgnstuff-mingw32.mak   dgnstuff.mak
-levstuff-mingw32.mak   levstuff.mak           mhaskyn.c
-mhaskyn.h              mhdlg.c                mhdlg.h
-mhfont.c               mhfont.h               mhinput.c
-mhinput.h              mhmain.c               mhmain.h
-mhmap.c                mhmap.h                mhmenu.c
-mhmenu.h               mhmsg.h                mhmsgwnd.c
-mhmsgwnd.h             mhrip.c                mhrip.h
-mhsplash.c             mhsplash.h             mhstatus.c
-mhstatus.h             mhtext.c               mhtext.h
-mnsel.uu               mnselcnt.uu            mnunsel.uu
-mswproc.c              nethack.rc             nhresource.h
-petmark.uu             pilemark.uu            record.uu
-resource.h             rip.uu                 splash.uu
-tiles-mingw32.mak      tiles.mak              winMS.h
-winhack.c              winhack.rc
+NetHackW.c             NetHackW.exe.manifest  NetHackW.rc
+dgnstuff-mingw32.mak   dgnstuff.mak           levstuff-mingw32.mak
+levstuff.mak           mhaskyn.c              mhaskyn.h
+mhdlg.c                mhdlg.h                mhfont.c
+mhfont.h               mhinput.c              mhinput.h
+mhmain.c               mhmain.h               mhmap.c
+mhmap.h                mhmenu.c               mhmenu.h
+mhmsg.h                mhmsgwnd.c             mhmsgwnd.h
+mhrip.c                mhrip.h                mhsplash.c
+mhsplash.h             mhstatus.c             mhstatus.h
+mhtext.c               mhtext.h               mnsel.uu
+mnselcnt.uu            mnunsel.uu             mswproc.c
+nethack.rc             nhresource.h           petmark.uu
+pilemark.uu            record.uu              resource.h
+rip.uu                 splash.uu              tiles-mingw32.mak
+tiles.mak              winMS.h
 
 win/win32/vs2017:
 (files for Visual Studio 2017 Community Edition builds)
-NetHack.sln         NetHack.vcxproj     NetHackW.vcxproj
-PDCurses.vcxproj    afterdgncomp.proj   afterdlb.proj
-afterlevcomp.proj   aftermakedefs.proj  afternethack.proj
-afterrecover.proj   aftertile2bmp.proj  aftertilemap.proj
-afteruudecode.proj  build.bat           common.props
-config.props        console.props       default.props
-default_dll.props   default_lib.props   dgncomp.vcxproj
-dirs.props          dlb.vcxproj         dll.props
-files.props         levcomp.vcxproj     makedefs.vcxproj
-nh340key.def        nh340key.vcxproj    nhdefkey.def
-nhdefkey.vcxproj    nhraykey.def        nhraykey.vcxproj
-recover.vcxproj     tile2bmp.vcxproj    tilemap.vcxproj
-tiles.vcxproj       uudecode.vcxproj
+NetHack.sln                   NetHack.vcxproj
+NetHackPackage.appxmanifest   NetHackPackage.wapproj
+NetHackProperties.props       NetHackW.vcxproj
+PDCurses.vcxproj              Package.StoreAssociation.xml
+ScreenShot.PNG                afterdgncomp.proj
+afterdlb.proj                 afterlevcomp.proj
+aftermakedefs.proj            afternethack.proj
+afterrecover.proj             aftertile2bmp.proj
+aftertilemap.proj             afteruudecode.proj
+build.bat                     common.props
+config.props                  console.props
+default.props                 default_dll.props
+default_lib.props             dgncomp.vcxproj
+dirs.props                    dlb.vcxproj
+dll.props                     files.props
+levcomp.vcxproj               makedefs.vcxproj
+nh340key.def                  nh340key.vcxproj
+nhdefkey.def                  nhdefkey.vcxproj
+nhraykey.def                  nhraykey.vcxproj
+recover.vcxproj               tile2bmp.vcxproj
+tilemap.vcxproj               tiles.vcxproj
+travisci.sh                   uudecode.vcxproj
+
+win/win32/vs2017/Images:
+(files for Visual Studio 2017 Community Edition builds)
+BadgeLogo.scale-100.png
+BadgeLogo.scale-125.png
+BadgeLogo.scale-150.png
+BadgeLogo.scale-200.png
+BadgeLogo.scale-400.png
+LargeTile.scale-100.png
+LargeTile.scale-125.png
+LargeTile.scale-150.png
+LargeTile.scale-200.png
+LargeTile.scale-400.png
+LockScreenLogo.scale-200.png
+SmallTile.scale-100.png
+SmallTile.scale-125.png
+SmallTile.scale-150.png
+SmallTile.scale-200.png
+SmallTile.scale-400.png
+SplashScreen.scale-100.png
+SplashScreen.scale-125.png
+SplashScreen.scale-150.png
+SplashScreen.scale-200.png
+SplashScreen.scale-400.png
+Square150x150Logo.scale-100.png
+Square150x150Logo.scale-125.png
+Square150x150Logo.scale-150.png
+Square150x150Logo.scale-200.png
+Square150x150Logo.scale-400.png
+Square44x44Logo.altform-unplated_targetsize-16.png
+Square44x44Logo.altform-unplated_targetsize-256.png
+Square44x44Logo.altform-unplated_targetsize-32.png
+Square44x44Logo.altform-unplated_targetsize-48.png
+Square44x44Logo.scale-100.png
+Square44x44Logo.scale-125.png
+Square44x44Logo.scale-150.png
+Square44x44Logo.scale-200.png
+Square44x44Logo.scale-400.png
+Square44x44Logo.targetsize-16.png
+Square44x44Logo.targetsize-24.png
+Square44x44Logo.targetsize-24_altform-unplated.png
+Square44x44Logo.targetsize-256.png
+Square44x44Logo.targetsize-32.png
+Square44x44Logo.targetsize-48.png
+StoreLogo.backup.png
+StoreLogo.scale-100.png
+StoreLogo.scale-125.png
+StoreLogo.scale-150.png
+StoreLogo.scale-200.png
+StoreLogo.scale-400.png
+Wide310x150Logo.scale-100.png
+Wide310x150Logo.scale-125.png
+Wide310x150Logo.scale-150.png
+Wide310x150Logo.scale-200.png
+Wide310x150Logo.scale-400.png
 
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.
