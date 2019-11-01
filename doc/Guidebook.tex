@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{October 22, 2019}
+\date{October 31, 2019}
 
 \maketitle
 
@@ -1130,7 +1130,7 @@ slot to another so that it has a letter which is more meaningful for you
 or that it will appear in a particular location when inventory listings
 are displayed.
 You can move to a currently empty slot, or if the destination is
-occupied--and won't merge--the item there will swap slots with the one
+occupied---and won't merge---the item there will swap slots with the one
 being moved.
 ``{\tt \#adjust}'' can also be used to split a stack of objects; when
 choosing the item to adjust, enter a count prior to its letter.\\
@@ -2044,9 +2044,9 @@ will result in it disappearing from your map, similarly if it is the
 one who moved rather than you.
 
 %.pg
-However, if you encounter a monster which you can't see or sense--
-perhaps it is invisible and has just tapped you on the noggin--
-a special ``remembered, unseen monster'' marker will be displayed at
+However, if you encounter a monster which you can't see or 
+sense---perhaps it is invisible and has just tapped you on the 
+noggin---a special ``remembered, unseen monster'' marker will be displayed at
 the location where you think it is.
 That will persist until you have
 proven that there is no monster there, even if the unseen monster
@@ -2326,7 +2326,7 @@ But first you need to have a weapon in each hand.
 (Note that your two weapons are not fully equal; the one in the
 hand you normally wield with is considered primary and the other
 one is considered secondary.  The most noticeable difference is
-after you stop--or before you begin, for that matter--wielding
+after you stop---or before you begin, for that matter---wielding
 two weapons at once.  The primary is your wielded weapon and the
 secondary is just an item in your inventory that's been designated
 as alternate weapon.)
@@ -2558,7 +2558,7 @@ The commands to use rings are `{\tt P}' (put on) and `{\tt R}' (remove).
 %.pg
 Spellbooks are tomes of mighty magic.  When studied with the `{\tt r}' (read)
 command, they transfer to the reader the knowledge of a spell (and
-therefore eventually become unreadable) --- unless the attempt backfires.
+therefore eventually become unreadable)---unless the attempt backfires.
 Reading a cursed spellbook or one with mystic runes beyond
 your ken can be harmful to your health!
 
@@ -2701,9 +2701,9 @@ you are carrying (shopkeepers aside).
 Normally, if you have seen an object at a particular map location and
 move to another location where you can't directly see that object any
 more, if will continue to be displayed on your map.
-That remains the case even if it is not actually there any more--
-perhaps a monster has picked it up or it has rotted away--
-until you can see or feel that location again.
+That remains the case even if it is not actually there any 
+more---perhaps a monster has picked it up or it has rotted 
+away---until you can see or feel that location again.
 One notable exception is that if the object gets covered by the
 ``remembered, unseen monster'' marker.
 When that marker is later removed
@@ -3028,11 +3028,13 @@ See the ``Configuring User Sounds'' section.
 Define the directory that contains the sound files.
 See the ``Configuring User Sounds'' section.
 %.lp
-\item[\bb{SYMBOLS}
+\item[\bb{SYMBOLS}]
 Override one or more symbols in the symbol set used for all dungeon
 levels except for the special rogue level.
 See the ``Modifying {\it NetHack\/} Symbols'' section.
 %.pg
+
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
@@ -4378,157 +4380,157 @@ Below are the special commands you can rebind. Some of them can be bound to
 same keys with no problems, others are in the same ``context'', and if bound
 to same keys, only one of those commands will be available. Special command
 can only be bound to a single key.
+\elist
 
 %.pg
-\blist{}
+\blist{\itemindent 10mm \labelwidth 15mm \rightmargin 20mm}
 %.lp
-\item{\bb{count}}
+\item[{\bb{count}}]
 Prefix key to start a count, to repeat a command this many times.
 With {\it number\verb+_+pad\/} only. Default is `{\tt n}'.
 %.lp
-\item{\bb{doinv}}
+\item[{\bb{doinv}}]
 Show inventory. With {\it number\verb+_+pad\/} only. Default is `{\tt 0}'.
 %.lp
-\item{\bb{fight}}
+\item[{\bb{fight}}]
 Prefix key to force fight a direction. Default is `{\tt F}'.
 %.lp
-\item{\bb{fight.numpad}}
+\item[{\bb{fight.numpad}}]
 Prefix key to force fight a direction. With {\it number\verb+_+pad\/} only.
 Default is `{\tt -}'.
 %.lp
-\item{\bb{getdir.help}}
+\item[{\bb{getdir.help}}]
 When asked for a direction, the key to show the help. Default is `{\tt ?}'.
 %.lp
-\item{\bb{getdir.self}}
+\item[{\bb{getdir.self}}]
 When asked for a direction, the key to target yourself. Default is `{\tt .}'.
 %.lp
-\item{\bb{getdir.self2}}
+\item[{\bb{getdir.self2}}]
 When asked for a direction, the key to target yourself. Default is `{\tt s}'.
 %.lp
-\item{\bb{getpos.autodescribe}}
+\item[{\bb{getpos.autodescribe}}]
 When asked for a location, the key to toggle {\it autodescribe\/}.
 Default is `{\tt \#}'.
 %.lp
-\item{\bb{getpos.all.next}}
+\item[{\bb{getpos.all.next}}]
 When asked for a location, the key to go to next closest interesting thing.
 Default is `{\tt a}'.
 %.lp
-\item{\bb{getpos.all.prev}}
+\item[{\bb{getpos.all.prev}}]
 When asked for a location, the key to go to previous closest interesting thing.
 Default is `{\tt A}'.
 %.lp
-\item{\bb{getpos.door.next}}
+\item[{\bb{getpos.door.next}}]
 When asked for a location, the key to go to next closest door or doorway.
 Default is `{\tt d}'.
 %.lp
-\item{\bb{getpos.door.prev}}
+\item[{\bb{getpos.door.prev}}]
 When asked for a location, the key to go to previous closest door or doorway.
 Default is `{\tt D}'.
 %.lp
-\item{\bb{getpos.help}}
+\item[{\bb{getpos.help}}]
 When asked for a location, the key to show help. Default is `{\tt ?}'.
 %.lp
-\item{\bb{getpos.mon.next}}
+\item[{\bb{getpos.mon.next}}]
 When asked for a location, the key to go to next closest monster.
 Default is `{\tt m}'.
 %.lp
-\item{\bb{getpos.mon.prev}}
+\item[{\bb{getpos.mon.prev}}]
 When asked for a location, the key to go to previous closest monster.
 Default is `{\tt M}'.
 %.lp
-\item{\bb{getpos.obj.next}}
+\item[{\bb{getpos.obj.next}}]
 When asked for a location, the key to go to next closest object.
 Default is `{\tt o}'.
 %.lp
-\item{\bb{getpos.obj.prev}}
+\item[{\bb{getpos.obj.prev}}]
 When asked for a location, the key to go to previous closest object.
 Default is `{\tt O}'.
 %.lp
-\item{\bb{getpos.menu}}
+\item[{\bb{getpos.menu}}]
 When asked for a location, and using one of the next or previous keys to
 cycle through targets, toggle showing a menu instead. Default is `{\tt !}'.
 %.lp
-\item{\bb{getpos.moveskip}}
+\item[{\bb{getpos.moveskip}}]
 When asked for a location, and using the shifted movement keys or
 meta-digit keys to fast-move around, move by skipping the same glyphs
 instead of by 8 units.
 Default is `{\tt *}'.
 %.lp
-\item{\bb{getpos.filter}}
+\item[{\bb{getpos.filter}}]
 When asked for a location, change the filtering mode when using one of
 the next or previous keys to cycle through targets. Toggles between no
 filtering, in view only, and in the same area only. Default is `{\tt "}'.
 %.lp
-\item{\bb{getpos.pick}}
+\item[{\bb{getpos.pick}}]
 When asked for a location, the key to choose the location, and possibly
 ask for more info. Default is `{\tt .}'.
 %.lp
-\item{\bb{getpos.pick.once}}
+\item[{\bb{getpos.pick.once}}]
 When asked for a location, the key to choose the location, and skip
 asking for more info. Default is `{\tt ,}'.
 %.lp
-\item{\bb{getpos.pick.quick}}
+\item[{\bb{getpos.pick.quick}}]
 When asked for a location, the key to choose the location, skip asking
 for more info, and exit the location asking loop. Default is `{\tt ;}'.
 %.lp
-\item{\bb{getpos.pick.verbose}}
+\item[{\bb{getpos.pick.verbose}}]
 When asked for a location, the key to choose the location, and show more
 info without asking. Default is `{\tt :}'.
 %.lp
-\item{\bb{getpos.self}}
+\item[{\bb{getpos.self}}]
 When asked for a location, the key to go to your location.
 Default is `{\tt @}'.
 %.lp
-\item{\bb{getpos.unexplored.next}}
+\item[{\bb{getpos.unexplored.next}}]
 When asked for a location, the key to go to next closest unexplored location.
 Default is `{\tt x}'.
 %.lp
-\item{\bb{getpos.unexplored.prev}}
+\item[{\bb{getpos.unexplored.prev}}]
 When asked for a location, the key to go to previous closest unexplored
 location. Default is `{\tt X}'.
 %.lp
-\item{\bb{getpos.valid}}
+\item[{\bb{getpos.valid}}]
 When asked for a location, the key to go to show valid target locations.
 Default is `{\tt \$}'.
 %.lp
-\item{\bb{getpos.valid.next}}
+\item[{\bb{getpos.valid.next}}]
 When asked for a location, the key to go to next closest valid location.
 Default is `{\tt z}'.
 %.lp
-\item{\bb{getpos.valid.prev}}
+\item[{\bb{getpos.valid.prev}}]
 When asked for a location, the key to go to previous closest valid location.
 Default is `{\tt Z}'.
 %.lp
-\item{\bb{nopickup}}
+\item[{\bb{nopickup}}]
 Prefix key to move without picking up items. Default is `{\tt m}'.
 %.lp
-\item{\bb{redraw}}
+\item[{\bb{redraw}}]
 Key to redraw the screen. Default is `{\tt \^{}R}'.
 %.lp
-\item{\bb{redraw.numpad}}
+\item[{\bb{redraw.numpad}}]
 Key to redraw the screen. With {\it number\verb+_+pad\/} only.
 Default is `{\tt \^{}L}'.
 %.lp
-\item{\bb{repeat}}
+\item[{\bb{repeat}}]
 Key to repeat previous command. Default is `{\tt \^{}A}'.
 %.lp
-\item{\bb{reqmenu}}
+\item[{\bb{reqmenu}}]
 Prefix key to request menu from some commands. Default is `{\tt m}'.
 %.lp
-\item{\bb{run}}
+\item[{\bb{run}}]
 Prefix key to run towards a direction. Default is `{\tt G}'.
 %.lp
-\item{\bb{run.nopickup}}
+\item[{\bb{run.nopickup}}]
 Prefix key to run towards a direction without picking up items on the way.
 Default is `{\tt M}'.
 %.lp
-\item{\bb{run.numpad}}
+\item[{\bb{run.numpad}}]
 Prefix key to run towards a direction. With {\it number\verb+_+pad\/} only.
 Default is `{\tt 5}'.
 %.lp
-\item{\bb{rush}}
+\item[{\bb{rush}}]
 Prefix key to rush towards a direction. Default is `{\tt g}'.
-\elist
 \elist
 
 
@@ -4733,6 +4735,8 @@ combination with any of the other attributes.
 
 To specify both a color and an attribute, use `\&' to combine them.
 To specify multiple attributes, use `+' to combine those.
+
+%.lp ""
 For example: {\tt magenta\&inverse+dim}.
 
 Note that the display may substitute or ignore particular attributes
@@ -4785,23 +4789,19 @@ percentage or absolute number threshold, or text to match against.
 
 \blist{}
 %.lp "*"
-\item{\bb{}}
-``{\tt always}'' will set the default attributes for that field.
+\item[{\tt always}] will set the default attributes for that field.
 %.lp "*"
-\item{\bb{}}
-``{\tt up}'' and ``{\tt down}'' set the field attributes for when the field
+\item[{\tt up} and ``{\tt down}''] set the field attributes for when the field
 value changes upwards or downwards. This attribute times out after
 {\tt statushilites} turns.
 %.lp "*"
-\item{\bb{}}
-``{\tt changed}'' sets the field attribute for when the field value
+\item[{\tt changed}] sets the field attribute for when the field value
 changes. This attribute times out after {\tt statushilites} turns.
 (If a field has both a ``changed'' rule and an ``up'' or ``down''
 rule which matches a change in the field's value,
 the ``up'' or ``down'' one takes precedence.)
 %.lp "*"
-\item{\bb{}}
-percentage sets the field attribute when the field value
+\item[{\tt percentage}] sets the field attribute when the field value
 matches the percentage.
 It is specified as a number between 0 and 100, followed by `{\tt \%}'
 (percent sign).
@@ -4829,8 +4829,7 @@ exactly 1 experience point short of the next level.
 % percentage will remain at 0\% no matter have many additional experience
 % points you earn.)
 %.lp "*"
-\item{\bb{}}
-absolute value sets the attribute when the field value
+\item[{\tt absolute}] value sets the attribute when the field value
 matches that number.
 The number must be 0 or higher, except for ``{\it armor-class\/} which
 allows negative values, and may optionally be preceded by `{\tt =}'.
@@ -4839,8 +4838,7 @@ it also matches when value is below or above.
 If the prefix is `{\tt <}' or `{\tt >}', only match when strictly
 above or below.
 %.lp "*"
-\item{\bb{}}
-text match sets the attribute when the field value matches the text.
+\item[{\tt text}] match sets the attribute when the field value matches the text.
 Text matches can only be used for ``{\it alignment\/}'',
 ``{\it carrying-capacity\/}'', ``{\it hunger\/}'', ``{\it dungeon-level\/}'',
 and ``{\it title\/}''.
@@ -5469,7 +5467,7 @@ with help from {\it Ross Brown}, {\it Mike Engber}, {\it David Hairston},
 {\it Michael Hamel}, {\it Jonathan Handler}, {\it Johnny Lee},
 {\it Tim Lennan}, {\it Rob Menke}, and {\it Andy Swanson},
 developed {\it NetHack\/} 3.1 for the Macintosh, porting it for MPW.
-Building on their development, {\it Barton House} added a Think C port.
+Building on their development, {\it Bart House} added a Think C port.
 
 %.pg
 \medskip
@@ -5682,7 +5680,7 @@ maintained the port of {\it NetHack\/} 3.6 for Mac OSX.
 
 %.pg
 \medskip
-{\it Michael Allison}, {\it David Cohrs}, {\it Barton House},
+{\it Michael Allison}, {\it David Cohrs}, {\it Bart House},
 {\it Pasi Kallinen}, {\it Alex Kompel}, {\it Dion Nicolaas},
 {\it Derek S. Ray} and  {\it Yitzhak Sapir}
 maintained the port of  {\it NetHack\/} 3.6 for Microsoft Windows.
@@ -5715,6 +5713,11 @@ time of release of 3.6.1 consisted of
 \medskip
 In early May 2019, another 320 bug fixes along with some enhancements and 
 the adopted curses window port, were released as 3.6.2.
+
+%.pg
+\medskip
+{\it Bart House}, who had contributed to the game as a porting team participant
+for decades, joined the {\it NetHack Development Team} in late May 2019.
 
 %.pg
 \medskip
@@ -5757,7 +5760,7 @@ Andreas Dorn & Jeff Bailey & Pasi Kallinen\\
 Andy Church & Jochen Erwied & Pat Rankin\\
 Andy Swanson & John Kallen & Patric Mueller\\
 Ari Huttunen & John Rupley & Paul Winner\\
-Barton House & John S. Bien & Pierre Martineau\\
+Bart House & John S. Bien & Pierre Martineau\\
 Benson I. Margulies & Johnny Lee & Ralf Brown\\
 Bill Dyer & Jon W\{tte & Ray Chason\\
 Boudewijn Waijers & Jonathan Handler & Richard Addison\\

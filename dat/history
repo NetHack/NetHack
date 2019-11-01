@@ -57,7 +57,7 @@ Spackman, Steve VanDevender, and Paul Winner, ported NetHack 3.1 to the PC.
 Jon W{tte and Hao-yang Wang, with help from Ross Brown, Mike Engber, David
 Hairston, Michael Hamel, Jonathan Handler, Johnny Lee, Tim Lennan, Rob Menke,
 and Andy Swanson developed NetHack 3.1 for the Macintosh, porting it for
-MPW.  Building on their development, Barton House added a Think C port.
+MPW.  Building on their development, Bart House added a Think C port.
 
 Timo Hakulinen ported NetHack 3.1 to OS/2.  Eric Smith ported NetHack 3.1
 to the Atari.  Pat Rankin, with help from Joshua Delahunty, is responsible
@@ -195,7 +195,7 @@ Unix flavors as well as maintaining the X11 interface.
 Ken Lorber, Haoyang Wang, Pat Rankin, and Dean Luick maintained the port
 of NetHack 3.6.1 for Mac OSX.
 
-Michael Allison, David Cohrs, Barton House, Pasi Kallinen, Alex Kompel,
+Michael Allison, David Cohrs, Bart House, Pasi Kallinen, Alex Kompel,
 Dion Nicolaas, Derek S. Ray and Yitzhak Sapir maintained the port of
 NetHack 3.6 for Microsoft Windows.
 
@@ -216,6 +216,9 @@ Derek S. Ray, Alex Smith, Mike Stephenson, Janet Walz and Paul Winner.
 
 In early May 2019, another 320 bug fixes along with some enhancements and 
 the adopted curses window port, were released as 3.6.2.
+
+Bart House, who had contributed to the game as a porting team participant 
+for decades, joined the NetHack Development Team in late May 2019.
 
 The official NetHack web site is maintained by Ken Lorber at
 http://www.nethack.org/.
@@ -241,7 +244,7 @@ of these miscreants in this, the list of Dungeoneers:
     Andy Church               Jochen Erwied             Pat Rankin
     Andy Swanson              John Kallen               Patric Mueller
     Ari Huttunen              John Rupley               Paul Winner
-    Barton House              John S. Bien              Pierre Martineau
+    Bart House                John S. Bien              Pierre Martineau
     Benson I. Margulies       Johnny Lee                Ralf Brown
     Bill Dyer                 Jon W{tte                 Ray Chason
     Boudewijn Waijers         Jonathan Handler          Richard Addison
