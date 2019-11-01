@@ -595,7 +595,7 @@ unleash_all()
  *  This ought to exclude various other things, such as lights and gas
  *  spore, is_whirly() critters, ethereal creatures, possibly others.
  */
-static boolean
+boolean
 leashable(mtmp)
 struct monst *mtmp;
 {
