@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.318 $ $NHDT-Date: 1572482202 2019/10/31 00:36:42 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.319 $ $NHDT-Date: 1572525093 2019/10/31 12:31:33 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "October 27, 2019
+.ds f2 "October 31, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -2683,7 +2683,9 @@ HACKDIR, must be writable.
 .lp TROUBLEDIR
 The location that a record of game aborts and self-diagnosed game problems
 is kept. Defaults to HACKDIR, must be writable.
+.\"
 .\" config file entries beyond this point are shown alphabetically
+.\"
 .lp AUTOCOMPLETE
 Enable or disable an extended command autocompletion.
 Autocompletion has no effect for the X11 windowport.
@@ -4898,7 +4900,7 @@ and \fBPaul Winner\fP, ported NetHack 3.1 to the PC.
 \fBMike Engber\fP, \fBDavid Hairston\fP, \fBMichael Hamel\fP,
 \fBJonathan Handler\fP, \fBJohnny Lee\fP, \fBTim Lennan\fP, \fBRob Menke\fP,
 and \fBAndy Swanson\fP, developed NetHack 3.1 for the Macintosh,
-porting it for MPW.  Building on their development, \fBBarton House\fP
+porting it for MPW.  Building on their development, \fBBart House\fP
 added a Think C port.
 .pg
 \fBTimo Hakulinen\fP ported NetHack 3.1 to OS/2.  \fBEric Smith\fP
@@ -5057,7 +5059,7 @@ flavors and maintained the X11 interface.
 \fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP
 maintained the port of NetHack 3.6 for Mac OSX.
 .pg
-\fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBBarton House\fP,
+\fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBBart House\fP,
 \fBPasi Kallinen\fP, \fBAlex Kompel\fP, \fBDion Nicolaas\fP,
 \fBDerek S. Ray\fP and \fBYitzhak Sapir\fP maintained the port of
 NetHack 3.6 for Microsoft Windows.
@@ -5081,6 +5083,9 @@ The NetHack Development Team at the time of release of 3.6.1 consisted of
 .pg
 In early May 2019, another 320 bug fixes along with some enhancements and 
 the adopted curses window port, were released as 3.6.2.
+.pg
+\fBBart House\fP, who had contributed to the game as a porting team
+participant for decades, joined the NetHack Development Team in late May 2019.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP
 at
@@ -5117,7 +5122,7 @@ Andreas Dorn	Jeff Bailey	Pasi Kallinen
 Andy Church	Jochen Erwied	Pat Rankin
 Andy Swanson	John Kallen	Patric Mueller
 Ari Huttunen	John Rupley	Paul Winner
-Barton House	John S. Bien	Pierre Martineau
+Bart House	John S. Bien	Pierre Martineau
 Benson I. Margulies	Johnny Lee	Ralf Brown
 Bill Dyer	Jon W{tte	Ray Chason
 Boudewijn Waijers	Jonathan Handler	Richard Addison

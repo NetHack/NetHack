@@ -21,6 +21,11 @@
  *	Note: 3.6.x was not verified with Symantec C.
  */
 
+#if defined(MSDOS)
+#define CONFIG_FILE "defaults.nh"
+#define GUIDEBOOK_FILE "Guidebook.txt"
+#endif
+ 
 /*
  *  The following options are somewhat configurable depending on
  *  your compiler.
