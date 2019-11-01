@@ -4,6 +4,7 @@
 
 /* various dialog boxes are defined here */
 
+#include "win10.h"
 #include "winMS.h"
 #include "hack.h"
 #include "func_tab.h"
@@ -11,6 +12,7 @@
 #include "mhdlg.h"
 
 #include <assert.h>
+
 
 /*---------------------------------------------------------------*/
 /* data for getlin dialog */
@@ -276,22 +278,68 @@ ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 /*---------------------------------------------------------------*/
 /* player selector dialog */
+
+/* NOTE: this enumeration is in control tab order */
+enum player_selector_control {
+    psc_name_group,
+    psc_role_group,
+    psc_race_group,
+    psc_alignment_group,
+    psc_gender_group,
+    psc_name_box,
+    psc_role_list,
+    psc_race_list,
+    psc_lawful_button,
+    psc_neutral_button,
+    psc_chaotic_button,
+    psc_male_button,
+    psc_female_button,
+    psc_play_button,
+    psc_random_button,
+    psc_quit_button,
+    psc_control_count
+};
+
+static const s_psc_id[psc_control_count] = {
+    IDC_PLSEL_NAME_GROUP,
+    IDC_PLSEL_ROLE_GROUP,
+    IDC_PLSEL_RACE_GROUP,
+    IDC_PLSEL_ALIGNMENT_GROUP,
+    IDC_PLSEL_GENDER_GROUP,
+    IDC_PLSEL_NAME,
+    IDC_PLSEL_ROLE_LIST,
+    IDC_PLSEL_RACE_LIST,
+    IDC_PLSEL_ALIGN_LAWFUL,
+    IDC_PLSEL_ALIGN_NEUTRAL,
+    IDC_PLSEL_ALIGN_CHAOTIC,
+    IDC_PLSEL_GENDER_MALE,
+    IDC_PLSEL_GENDER_FEMALE,
+    IDOK,
+    IDC_PLSEL_RANDOM,
+    IDCANCEL
+};
+
+typedef struct {
+    int     id;
+    POINT   pos;
+    SIZE    size;
+    HWND    hWnd;
+} control_t;
+
 typedef struct plsel_data {
+    HWND dialog;
+    HWND focus;
+    control_t controls[psc_control_count];
+    SIZE client_size;
     int config_race;
     int config_role;
     int config_gender;
     int config_alignment;
-    HWND control_role;
-    HWND control_race;
-    HWND control_genders[ROLE_GENDERS];
-    HWND control_aligns[ROLE_ALIGNS];
     int role_count;
     int race_count;
-    HWND focus;
 } plsel_data_t;
 
 INT_PTR CALLBACK PlayerSelectorDlgProc(HWND, UINT, WPARAM, LPARAM);
-static void plselInitDialog(HWND hWnd);
 static void plselAdjustSelections(HWND hWnd);
 static boolean plselRandomize(plsel_data_t * data);
 static BOOL plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
@@ -322,38 +370,314 @@ mswin_player_selection_window()
     return ok;
 }
 
+int
+list_view_height(HWND hWnd, int count)
+{
+    return (ListView_ApproximateViewRect(hWnd, -1, -1, count)) >> 16;
+}
+
+/* calculate the size and position of the controls taking into account
+   the per-monitor DPI expressed as a scaling factor on sizes at 96 DPI */
+void 
+calculate_player_selector_layout(plsel_data_t * data)
+{
+    MonitorInfo monitorInfo;
+    win10_monitor_info(data->dialog, &monitorInfo);
+
+    double scale = monitorInfo.scale;
+
+    /* Note these hard coded sizes are in 96DPI pixels and must be 
+       scaled by the per-monitor DPI scaling factor */
+    int list_width = (int) (120 * scale);
+    int group_border = (int) (16 * scale);
+    int client_border = (int) (16 * scale);
+    int group_spacing = (int) (16 * scale);
+    int button_width = (int) (80 * scale);
+    int button_height = (int) (28 * scale);
+
+    /* set control sizes */
+    control_t * name_box = &data->controls[psc_name_box];
+    name_box->size.cx = (int) (280 * scale);
+    name_box->size.cy = (int) (24 * scale);
+
+    control_t * role_list = &data->controls[psc_role_list];
+    /* NOTE: we dont' scale the list view reported height as it appears these
+             values are the actual size the control will be drawn at using the
+             existing DPI value */
+    role_list->size.cy = list_view_height(role_list->hWnd, data->role_count);
+    role_list->size.cx = list_width;
+
+    control_t * race_list = &data->controls[psc_race_list];
+    race_list->size.cy = list_view_height(race_list->hWnd, data->race_count);
+    race_list->size.cx = list_width;
+
+    for(int i = psc_lawful_button; i <= psc_quit_button; i++) {
+        data->controls[i].size.cx = button_width;
+        data->controls[i].size.cy = button_height;
+    }
+
+    for(int i = 0; i < 3; i++) {
+        control_t * group_control = &data->controls[psc_name_group + i];
+        control_t * inner_control = &data->controls[psc_name_box + i];
+        group_control->size.cx = inner_control->size.cx + (2 * group_border);
+        group_control->size.cy = inner_control->size.cy + (2 * group_border);
+    }
+
+    control_t * alignment_group = &data->controls[psc_alignment_group];
+    alignment_group->size.cx = button_width + (2 * group_border);
+    alignment_group->size.cy = (3 * button_height) + (2 * group_border);
+
+    control_t * gender_group = &data->controls[psc_gender_group];
+    gender_group->size.cx = button_width + (2 * group_border);
+    gender_group->size.cy = (2 * button_height) + (2 * group_border);
+
+    /* set control positions */
+    control_t * name_group = &data->controls[psc_name_group];
+    name_group->pos.x = client_border;
+    name_group->pos.y = client_border;
+
+    control_t * role_group = &data->controls[psc_role_group];
+    role_group->pos.x = client_border;
+    role_group->pos.y = name_group->pos.y + name_group->size.cy + group_spacing;
+
+    control_t * race_group = &data->controls[psc_race_group];
+    race_group->pos.x = role_group->pos.x + role_group->size.cx + group_spacing;
+    race_group->pos.y = role_group->pos.y;
+
+    for(int i = 0; i < 3; i++) {
+        control_t * group_control = &data->controls[psc_name_group + i];
+        control_t * inner_control = &data->controls[psc_name_box + i];
+        inner_control->pos.x = group_control->pos.x + group_border;
+        inner_control->pos.y = group_control->pos.y + group_border;
+    }
+
+    alignment_group->pos.x = race_group->pos.x + race_group->size.cx + group_spacing;
+    alignment_group->pos.y = race_group->pos.y;
+
+    for(int i = psc_lawful_button; i <= psc_chaotic_button; i++) {
+        data->controls[i].pos.x = alignment_group->pos.x + group_border;
+        data->controls[i].pos.y = alignment_group->pos.y + group_border + 
+                                  ((i -psc_lawful_button) * button_height);
+    }
+
+    gender_group->pos.x = alignment_group->pos.x;
+    gender_group->pos.y = alignment_group->pos.y + alignment_group->size.cy + group_spacing;
+
+    for(int i = psc_male_button; i <= psc_female_button; i++) {
+        data->controls[i].pos.x = gender_group->pos.x + group_border;
+        data->controls[i].pos.y = gender_group->pos.y + group_border + 
+                                  ((i - psc_male_button)  * button_height);
+    }
+
+    int group_bottom = role_group->pos.y + role_group->size.cy;
+    if (group_bottom < race_group->pos.y + race_group->size.cy) 
+        group_bottom = race_group->pos.y + race_group->size.cy;
+    if (group_bottom < gender_group->pos.y + gender_group->size.cy) 
+        group_bottom = gender_group->pos.y + gender_group->size.cy;
+
+    control_t * play_button = &data->controls[psc_play_button];
+    play_button->pos.y = group_bottom + group_spacing;
+    play_button->pos.x = role_group->pos.x;
+
+    control_t * random_button = &data->controls[psc_random_button];
+    random_button->pos.y = play_button->pos.y;
+    random_button->pos.x = race_list->pos.x;
+
+    control_t * quit_button = &data->controls[psc_quit_button];
+    quit_button->pos.y = play_button->pos.y;
+    quit_button->pos.x = data->controls[psc_female_button].pos.x;
+
+    data->client_size.cx = alignment_group->pos.x + alignment_group->size.cx;
+    data->client_size.cy = quit_button->pos.y + quit_button->size.cy;
+    data->client_size.cx += client_border;
+    data->client_size.cy += client_border;
+}
+
+void 
+get_rect_size(RECT * rect, SIZE * size)
+{
+    size->cx = rect->right - rect->left + 1;
+    size->cy = rect->bottom - rect->top + 1;
+}
+
+/* center given dialog in the main window */
+void 
+center_dialog(HWND dialog)
+{
+    RECT main_rect;
+    SIZE main_size;
+    RECT dialog_rect;
+    SIZE dialog_size;
+    POINT pos;
+
+    GetWindowRect(GetNHApp()->hMainWnd, &main_rect);
+    get_rect_size(&main_rect, &main_size);
+
+    GetWindowRect(dialog, &dialog_rect);
+    get_rect_size(&dialog_rect, &dialog_size);
+
+    pos.x = main_rect.left + (main_size.cx - dialog_size.cx) / 2;
+    pos.y = main_rect.top + (main_size.cy - dialog_size.cy) / 2;
+
+    MoveWindow(dialog, pos.x, pos.y, dialog_size.cx,  dialog_size.cy,
+        TRUE);
+}
+
+/* size the dialog such that it has the given client rect size */
+void 
+size_dialog(HWND dialog, SIZE new_client_size)
+{
+    RECT dialog_rect;
+    SIZE dialog_size;
+    RECT client_rect;
+    SIZE client_size;
+
+    GetWindowRect(dialog, &dialog_rect);
+    get_rect_size(&dialog_rect, &dialog_size);
+
+    GetClientRect(dialog, &client_rect);
+    get_rect_size(&client_rect, &client_size);
+
+    dialog_size.cx += new_client_size.cx - client_size.cx;
+    dialog_size.cy += new_client_size.cy - client_size.cy;
+
+    MoveWindow(dialog, dialog_rect.left, dialog_rect.top,
+                       dialog_size.cx,  dialog_size.cy, TRUE);
+}
+
+/* helper routine to move all controls according to there position
+   and size information */
+void 
+move_controls(control_t * controls, int count)
+{
+    control_t * control = controls;
+    while(count-- > 0) {
+        MoveWindow(control->hWnd, control->pos.x, control->pos.y,
+            control->size.cx, control->size.cy, TRUE);
+        control++;
+    }
+}
+
+/* adjust the size and positions of all controls in the player
+   selection dialog taking into account the per-monitor DPI. */
+void
+do_player_selector_layout(plsel_data_t * data)
+{
+    calculate_player_selector_layout(data);
+    move_controls(data->controls, psc_control_count);
+    size_dialog(data->dialog, data->client_size);
+}
+
+/* initialize player selector dialog */
+void
+plselInitDialog(struct plsel_data * data)
+{
+    TCHAR wbuf[BUFSZ];
+    LVCOLUMN lvcol;
+
+    SetWindowLongPtr(data->dialog, GWLP_USERDATA, (LONG_PTR) data);
+
+    for(int i = 0; i < psc_control_count; i++) {
+        data->controls[i].id = s_psc_id[i];
+        data->controls[i].hWnd = GetDlgItem(data->dialog, s_psc_id[i]);
+    }
+
+    control_t * role_list = &data->controls[psc_role_list];
+
+    ZeroMemory(&lvcol, sizeof(lvcol));
+    lvcol.mask = LVCF_WIDTH;
+    lvcol.cx = 1024;
+
+    /* build role list */
+    ListView_InsertColumn(role_list->hWnd, 0, &lvcol);
+    data->role_count = 0;
+    for (int i = 0; roles[i].name.m; i++) {
+        LVITEM lvitem;
+        ZeroMemory(&lvitem, sizeof(lvitem));
+
+        lvitem.mask = LVIF_STATE | LVIF_TEXT;
+        lvitem.iItem = i;
+        lvitem.iSubItem = 0;
+        lvitem.state = 0;
+        lvitem.stateMask = LVIS_FOCUSED;
+        if (flags.female && roles[i].name.f)
+            lvitem.pszText = NH_A2W(roles[i].name.f, wbuf, BUFSZ);
+        else
+            lvitem.pszText = NH_A2W(roles[i].name.m, wbuf, BUFSZ);
+        if (ListView_InsertItem(role_list->hWnd, &lvitem) == -1) {
+            panic("cannot insert menu item");
+        }
+        data->role_count++;
+    }
+
+    /* build race list */
+    control_t * race_list = &data->controls[psc_race_list];
+    ListView_InsertColumn(race_list->hWnd, 0, &lvcol);
+    data->race_count = 0;
+    for (int i = 0; races[i].noun; i++) {
+        LVITEM lvitem;
+        ZeroMemory(&lvitem, sizeof(lvitem));
+
+        lvitem.mask = LVIF_STATE | LVIF_TEXT;
+        lvitem.iItem = i;
+        lvitem.iSubItem = 0;
+        lvitem.state = 0;
+        lvitem.stateMask = LVIS_FOCUSED;
+        lvitem.pszText = NH_A2W(races[i].noun, wbuf, BUFSZ);
+        if (ListView_InsertItem(race_list->hWnd, &lvitem) == -1) {
+            panic("cannot insert menu item");
+        }
+        data->race_count++;
+    }
+
+    /* set gender radio button state */
+    control_t * gender_buttons = &data->controls[psc_male_button];
+    for (int i = 0; i < ROLE_GENDERS; i++)
+        Button_Enable(gender_buttons[i].hWnd, TRUE);
+
+    Button_SetCheck(data->controls[psc_male_button].hWnd, BST_CHECKED);
+
+    /* set alignment radio button state */
+    control_t * alignment_buttons = &data->controls[psc_lawful_button];
+    for (int i = 0; i < ROLE_ALIGNS; i++)
+        Button_Enable(alignment_buttons[i].hWnd, TRUE);
+
+    Button_SetCheck(data->controls[psc_lawful_button].hWnd, BST_CHECKED);
+
+    /* set player name */
+    control_t * name_box = &data->controls[psc_name_box];
+    SetDlgItemText(data->dialog, name_box->id, NH_A2W(plname, wbuf, sizeof(wbuf)));
+
+    plselRandomize(data);
+
+    /* populate select boxes */
+    plselAdjustSelections(data->dialog);
+
+    /* set tab order */
+    control_t * control = &data->controls[psc_quit_button];
+    for(int i = psc_quit_button; i >= psc_name_box; i--, control++)
+        SetWindowPos(control->hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+    do_player_selector_layout(data);
+
+    center_dialog(data->dialog);
+}
+
 INT_PTR CALLBACK
 PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    struct plsel_data *data;
-    RECT main_rt, dlg_rt;
-    SIZE dlg_sz;
+    plsel_data_t *data;
 
     switch (message) {
     case WM_INITDIALOG:
-        data = (struct plsel_data *) lParam;
-        SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
 
-        /* center dialog in the main window */
-        GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
-        GetWindowRect(hWnd, &dlg_rt);
-        dlg_sz.cx = dlg_rt.right - dlg_rt.left;
-        dlg_sz.cy = dlg_rt.bottom - dlg_rt.top;
+        data = (plsel_data_t *) lParam;
+        data->dialog = hWnd;
 
-        dlg_rt.left = (main_rt.left + main_rt.right - dlg_sz.cx) / 2;
-        dlg_rt.right = dlg_rt.left + dlg_sz.cx;
-        dlg_rt.top = (main_rt.top + main_rt.bottom - dlg_sz.cy) / 2;
-        dlg_rt.bottom = dlg_rt.top + dlg_sz.cy;
-        MoveWindow(hWnd, (main_rt.left + main_rt.right - dlg_sz.cx) / 2,
-                   (main_rt.top + main_rt.bottom - dlg_sz.cy) / 2, dlg_sz.cx,
-                   dlg_sz.cy, TRUE);
-
-        /* init dialog */
-        plselInitDialog(hWnd);
+        plselInitDialog(data);
 
         /* tell windows to set the focus */
         return TRUE;
-        break;
 
     case WM_DRAWITEM:
         if (wParam == IDC_PLSEL_ROLE_LIST ||  wParam == IDC_PLSEL_RACE_LIST)
@@ -367,20 +691,23 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             data = (struct plsel_data *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
+            control_t * role_control = &data->controls[psc_role_list];
+            control_t * race_control = &data->controls[psc_race_list];
+
             switch (nmhdr->code) {
             case LVN_KEYDOWN:
                 {
                     LPNMLVKEYDOWN lpnmkeydown = (LPNMLVKEYDOWN) lParam;
 
                     if (lpnmkeydown->wVKey == ' ') {
-                        if (control == data->control_role) {
-                            int i = ListView_GetNextItem(data->control_role, -1, LVNI_FOCUSED);
-                            assert(i == -1 || ListView_GetNextItem(data->control_role, i, LVNI_FOCUSED) == -1);
+                        if (control == role_control->hWnd) {
+                            int i = ListView_GetNextItem(control, -1, LVNI_FOCUSED);
+                            assert(i == -1 || ListView_GetNextItem(control, i, LVNI_FOCUSED) == -1);
                             flags.initrole = i;
                             plselAdjustSelections(hWnd);
-                        } else if (control == data->control_race) {
-                            int i = ListView_GetNextItem(data->control_race, -1, LVNI_FOCUSED);
-                            assert(i == -1 || ListView_GetNextItem(data->control_race, i, LVNI_FOCUSED) == -1);
+                        } else if (control == race_control->hWnd) {
+                            int i = ListView_GetNextItem(control, -1, LVNI_FOCUSED);
+                            assert(i == -1 || ListView_GetNextItem(control, i, LVNI_FOCUSED) == -1);
                             if (ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM)) {
                                 flags.initrace = i;
                                 plselAdjustSelections(hWnd);
@@ -395,10 +722,10 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     int i = lpnmitem->iItem;
                     if (i == -1)
                         return FALSE;
-                    if (control == data->control_role) {
+                    if (control == role_control->hWnd) {
                         flags.initrole = i;
                         plselAdjustSelections(hWnd);
-                    } else if(control == data->control_race) {
+                    } else if(control == race_control->hWnd) {
                         if (ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM)) {
                             flags.initrace = i;
                             plselAdjustSelections(hWnd);
@@ -408,12 +735,12 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case NM_KILLFOCUS:
                 {
-                    if (data->focus == data->control_race) {
+                    if (data->focus == race_control->hWnd) {
                         data->focus = NULL;
-                        ListView_RedrawItems(data->control_race, 0, data->race_count - 1);
-                    } else if (data->focus == data->control_role) {
+                        ListView_RedrawItems(race_control->hWnd, 0, data->race_count - 1);
+                    } else if (data->focus == role_control->hWnd) {
                         data->focus = NULL;
-                        ListView_RedrawItems(data->control_role, 0, data->role_count - 1);
+                        ListView_RedrawItems(role_control->hWnd, 0, data->role_count - 1);
                     }
                 }
                 break;
@@ -421,11 +748,11 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     data->focus = control;
 
-                    if (control == data->control_race) {
-                        data->focus = data->control_race;
+                    if (control == race_control->hWnd) {
+                        data->focus = control;
                         plselAdjustSelections(hWnd);
-                    } else if (control == data->control_role) {
-                        data->focus = data->control_role;
+                    } else if (control == role_control->hWnd) {
+                        data->focus = control;
                         plselAdjustSelections(hWnd);
                     }
                 }
@@ -478,108 +805,28 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         }
         break;
+
+    case WM_DPICHANGED:
+        {
+            data = (struct plsel_data *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+            do_player_selector_layout(data);
+
+            InvalidateRect(hWnd, NULL, TRUE);
+        } break;
     }
+
     return FALSE;
 }
 
-/* initialize player selector dialog */
-void
-plselInitDialog(HWND hWnd)
-{
-    struct plsel_data * data = (plsel_data_t *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
-    TCHAR wbuf[BUFSZ];
-    LVCOLUMN lvcol;
-    data->control_role = GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST);
-    data->control_race = GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST);
-
-    ZeroMemory(&lvcol, sizeof(lvcol));
-    lvcol.mask = LVCF_WIDTH;
-    lvcol.cx = GetSystemMetrics(SM_CXFULLSCREEN);
-
-    /* build role list */
-    ListView_InsertColumn(data->control_role, 0, &lvcol);
-    data->role_count = 0;
-    for (int i = 0; roles[i].name.m; i++) {
-        LVITEM lvitem;
-        ZeroMemory(&lvitem, sizeof(lvitem));
-
-        lvitem.mask = LVIF_STATE | LVIF_TEXT;
-        lvitem.iItem = i;
-        lvitem.iSubItem = 0;
-        lvitem.state = 0;
-        lvitem.stateMask = LVIS_FOCUSED;
-        if (flags.female && roles[i].name.f)
-            lvitem.pszText = NH_A2W(roles[i].name.f, wbuf, BUFSZ);
-        else
-            lvitem.pszText = NH_A2W(roles[i].name.m, wbuf, BUFSZ);
-        if (ListView_InsertItem(data->control_role, &lvitem) == -1) {
-            panic("cannot insert menu item");
-        }
-        data->role_count++;
-    }
-
-    /* build race list */
-    ListView_InsertColumn(data->control_race, 0, &lvcol);
-    data->race_count = 0;
-    for (int i = 0; races[i].noun; i++) {
-        LVITEM lvitem;
-        ZeroMemory(&lvitem, sizeof(lvitem));
-
-        lvitem.mask = LVIF_STATE | LVIF_TEXT;
-        lvitem.iItem = i;
-        lvitem.iSubItem = 0;
-        lvitem.state = 0;
-        lvitem.stateMask = LVIS_FOCUSED;
-        lvitem.pszText = NH_A2W(races[i].noun, wbuf, BUFSZ);
-        if (ListView_InsertItem(data->control_race, &lvitem) == -1) {
-            panic("cannot insert menu item");
-        }
-        data->race_count++;
-    }
-
-    for(int i = 0; i < ROLE_GENDERS; i++)
-        data->control_genders[i] = GetDlgItem(hWnd, IDC_PLSEL_GENDER_MALE + i);
-
-    for(int i = 0; i < ROLE_ALIGNS; i++)
-        data->control_aligns[i] = GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LAWFUL + i);
-
-    /* set gender radio button state */
-    for (int i = 0; i < ROLE_GENDERS; i++)
-        Button_Enable(data->control_genders[i], TRUE);
-
-    Button_SetCheck(data->control_genders[0], BST_CHECKED);
-
-    /* set alignment radio button state */
-    for (int i = 0; i < ROLE_ALIGNS; i++)
-        Button_Enable(data->control_aligns[i], TRUE);
-
-    Button_SetCheck(data->control_aligns[0], BST_CHECKED);
-
-    /* set player name */
-    SetDlgItemText(hWnd, IDC_PLSEL_NAME, NH_A2W(plname, wbuf, sizeof(wbuf)));
-
-    plselRandomize(data);
-
-    /* populate select boxes */
-    plselAdjustSelections(hWnd);
-
-    /* set tab order */
-    SetWindowPos(GetDlgItem(hWnd, IDCANCEL), NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    SetWindowPos(GetDlgItem(hWnd, IDC_PLSEL_RANDOM), NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    SetWindowPos(GetDlgItem(hWnd, IDOK), NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    for(int i = ROLE_GENDERS - 1; i >= 0; i--)
-        SetWindowPos(data->control_genders[i], NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    for(int i = ROLE_ALIGNS - 1; i >= 0; i--)
-        SetWindowPos(data->control_aligns[i], NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    SetWindowPos(data->control_race, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    SetWindowPos(data->control_role, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-
-}
 
 void
 plselAdjustSelections(HWND hWnd)
 {
     struct plsel_data * data = (plsel_data_t *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+    control_t * role_control = &data->controls[psc_role_list];
+    control_t * race_control = &data->controls[psc_race_list];
 
     if (!ok_race(flags.initrole, flags.initrace, ROLE_RANDOM, ROLE_RANDOM))
         flags.initrace = pick_race(flags.initrole, ROLE_RANDOM, ROLE_RANDOM, ROLE_RANDOM);
@@ -590,29 +837,31 @@ plselAdjustSelections(HWND hWnd)
     if (!ok_align(flags.initrole, flags.initrace, flags.initgend, flags.initalign))
         flags.initalign = pick_align(flags.initrole, flags.initrace, flags.initgend , ROLE_RANDOM);
 
-    ListView_RedrawItems(data->control_role, 0, data->role_count - 1);
-    ListView_RedrawItems(data->control_race, 0, data->race_count - 1);
+    ListView_RedrawItems(role_control->hWnd, 0, data->role_count - 1);
+    ListView_RedrawItems(race_control->hWnd, 0, data->race_count - 1);
 
     /* set gender radio button state */
     for (int i = 0; i < ROLE_GENDERS; i++) {
+        HWND button = data->controls[psc_male_button+i].hWnd;
         BOOL enable = ok_gend(flags.initrole, flags.initrace, i, flags.initalign);
-        Button_Enable(data->control_genders[i], enable);
-        LRESULT state = Button_GetCheck(data->control_genders[i]);
+        Button_Enable(button, enable);
+        LRESULT state = Button_GetCheck(button);
         if (state == BST_CHECKED && flags.initgend != i)
-            Button_SetCheck(data->control_genders[i], BST_UNCHECKED);
+            Button_SetCheck(button, BST_UNCHECKED);
         if (state == BST_UNCHECKED && flags.initgend == i)
-            Button_SetCheck(data->control_genders[i], BST_CHECKED);
+            Button_SetCheck(button, BST_CHECKED);
     }
 
     /* set alignment radio button state */
     for (int i = 0; i < ROLE_ALIGNS; i++) {
+        HWND button = data->controls[psc_lawful_button+i].hWnd;
         BOOL enable = ok_align(flags.initrole, flags.initrace, flags.initgend, i);
-        Button_Enable(data->control_aligns[i], enable);
-        LRESULT state = Button_GetCheck(data->control_aligns[i]);
+        Button_Enable(button, enable);
+        LRESULT state = Button_GetCheck(button);
         if (state == BST_CHECKED && flags.initalign != i)
-            Button_SetCheck(data->control_aligns[i], BST_UNCHECKED);
+            Button_SetCheck(button, BST_UNCHECKED);
         if (state == BST_UNCHECKED && flags.initalign == i)
-            Button_SetCheck(data->control_aligns[i], BST_CHECKED);
+            Button_SetCheck(button, BST_CHECKED);
     }
 
 }
