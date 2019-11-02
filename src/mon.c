@@ -3771,6 +3771,9 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     /* take on the new form... */
     set_mon_data(mtmp, mdat);
 
+    if (!leashable(mtmp))
+        m_unleash(mtmp, TRUE);
+
     if (emits_light(olddata) != emits_light(mtmp->data)) {
         /* used to give light, now doesn't, or vice versa,
            or light's range has changed */

@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{October 31, 2019}
+\date{November 2, 2019}
 
 \maketitle
 
@@ -2867,27 +2867,32 @@ for system administrators.
 
 %.pg
 The default name and location of the configuration file varies on different
-operating systems. If you manually installed on MS-DOS and Windows,
-it is \mbox{``defaults.nh''} in
-the same folder as \mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}.
-If you installed using the Microsoft Store, it is \mbox{``defaults.nh''} in
-the folder \mbox{{``\%USERPROFILE\%\textbackslash NetHack''}}.
+operating systems.\\
+
+%.lp ""
 On Unix, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home
 directory. The file may not exist, but it is a normal ASCII text file and
-can be created with any text editor.
+can be created with any text editor.\\
 
-%.pg
-If you installed using the Microsoft Store, you will find that we provide
-a starting template for you to use to create your \mbox{``defaults.nh''}
-configuration file.  It is \mbox{``defaults.tmp''} also in the folder
+%.lp ""
+On Windows, if you manually installed from the zip file, 
+it is \mbox{``defaults.nh''} in the same folder as 
+\mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}.
+If you installed using the Microsoft Store, it is \mbox{``defaults.nh''} in
+the following folder:
 \mbox{{``\%USERPROFILE\%\textbackslash NetHack''}}.
+There, a starting template is provided for you to use to create your 
+\mbox{``defaults.nh''} configuration file.  It is \mbox{``defaults.tmp''} 
+also in the following folder:
+\mbox{{``\%USERPROFILE\%\textbackslash NetHack''}}.\\
 
-%.pg
+%.lp ""
+On MS-DOS it is \mbox{``defaults.nh''} in the same folder as 
+\mbox{{\it nethack.exe\/}}.\\
+
+%.lp ""
 Any line in the configuration file starting with `{\tt \#}' is treated as a comment.
-Empty lines are ignored.
-
-%.pg
-Any line beginning with `{\tt [}' and ending in `{\tt ]}' is considered a section
+Empty lines are ignored. Any line beginning with `{\tt [}' and ending in `{\tt ]}' is considered a section
 marker. The text between the square brackets is the section name.
 Lines after a section marker belong to that section, and are
 ignored unless a CHOOSE -statement was used to select that section.
@@ -4105,7 +4110,7 @@ Number of lines for traditional below-the-map status display.
 Acceptable values are 2 and 3 (default is 2).
 Curses and tty interfaces only.
 %.lp
-\item[\ib{term\verb+_+cols}\ \ {\it and}]"
+\item[\ib{term\verb+_+cols} {\normalfont and}]
 %.lp
 \item[\ib{term\verb+_+rows}]
 Curses interface only.
@@ -4383,154 +4388,154 @@ can only be bound to a single key.
 \elist
 
 %.pg
-\blist{\itemindent 10mm \labelwidth 15mm \rightmargin 20mm}
+\blist{\itemindent 10mm \labelwidth 15mm \rightmargin 15mm}
 %.lp
 \item[{\bb{count}}]
 Prefix key to start a count, to repeat a command this many times.
-With {\it number\verb+_+pad\/} only. Default is `{\tt n}'.
+With {\it number\verb+_+pad\/} only. Default is~`{\tt n}'.
 %.lp
 \item[{\bb{doinv}}]
-Show inventory. With {\it number\verb+_+pad\/} only. Default is `{\tt 0}'.
+Show inventory. With {\it number\verb+_+pad\/} only. Default is~`{\tt 0}'.
 %.lp
 \item[{\bb{fight}}]
-Prefix key to force fight a direction. Default is `{\tt F}'.
+Prefix key to force fight a direction. Default is~`{\tt F}'.
 %.lp
 \item[{\bb{fight.numpad}}]
 Prefix key to force fight a direction. With {\it number\verb+_+pad\/} only.
-Default is `{\tt -}'.
+Default is~`{\tt -}'.
 %.lp
 \item[{\bb{getdir.help}}]
-When asked for a direction, the key to show the help. Default is `{\tt ?}'.
+When asked for a direction, the key to show the help. Default is~`{\tt ?}'.
 %.lp
 \item[{\bb{getdir.self}}]
-When asked for a direction, the key to target yourself. Default is `{\tt .}'.
+When asked for a direction, the key to target yourself. Default is~`{\tt .}'.
 %.lp
 \item[{\bb{getdir.self2}}]
-When asked for a direction, the key to target yourself. Default is `{\tt s}'.
+When asked for a direction, the key to target yourself. Default is~`{\tt s}'.
 %.lp
 \item[{\bb{getpos.autodescribe}}]
 When asked for a location, the key to toggle {\it autodescribe\/}.
-Default is `{\tt \#}'.
+Default is~`{\tt \#}'.
 %.lp
 \item[{\bb{getpos.all.next}}]
 When asked for a location, the key to go to next closest interesting thing.
-Default is `{\tt a}'.
+Default is~`{\tt a}'.
 %.lp
 \item[{\bb{getpos.all.prev}}]
 When asked for a location, the key to go to previous closest interesting thing.
-Default is `{\tt A}'.
+Default is~`{\tt A}'.
 %.lp
 \item[{\bb{getpos.door.next}}]
 When asked for a location, the key to go to next closest door or doorway.
-Default is `{\tt d}'.
+Default is~`{\tt d}'.
 %.lp
 \item[{\bb{getpos.door.prev}}]
 When asked for a location, the key to go to previous closest door or doorway.
-Default is `{\tt D}'.
+Default is~`{\tt D}'.
 %.lp
 \item[{\bb{getpos.help}}]
-When asked for a location, the key to show help. Default is `{\tt ?}'.
+When asked for a location, the key to show help. Default is~`{\tt ?}'.
 %.lp
 \item[{\bb{getpos.mon.next}}]
 When asked for a location, the key to go to next closest monster.
-Default is `{\tt m}'.
+Default is~`{\tt m}'.
 %.lp
 \item[{\bb{getpos.mon.prev}}]
 When asked for a location, the key to go to previous closest monster.
-Default is `{\tt M}'.
+Default is~`{\tt M}'.
 %.lp
 \item[{\bb{getpos.obj.next}}]
 When asked for a location, the key to go to next closest object.
-Default is `{\tt o}'.
+Default is~`{\tt o}'.
 %.lp
 \item[{\bb{getpos.obj.prev}}]
 When asked for a location, the key to go to previous closest object.
-Default is `{\tt O}'.
+Default is~`{\tt O}'.
 %.lp
 \item[{\bb{getpos.menu}}]
 When asked for a location, and using one of the next or previous keys to
-cycle through targets, toggle showing a menu instead. Default is `{\tt !}'.
+cycle through targets, toggle showing a menu instead. Default is~`{\tt !}'.
 %.lp
 \item[{\bb{getpos.moveskip}}]
 When asked for a location, and using the shifted movement keys or
 meta-digit keys to fast-move around, move by skipping the same glyphs
 instead of by 8 units.
-Default is `{\tt *}'.
+Default is~`{\tt *}'.
 %.lp
 \item[{\bb{getpos.filter}}]
 When asked for a location, change the filtering mode when using one of
 the next or previous keys to cycle through targets. Toggles between no
-filtering, in view only, and in the same area only. Default is `{\tt "}'.
+filtering, in view only, and in the same area only. Default is~`{\tt "}'.
 %.lp
 \item[{\bb{getpos.pick}}]
 When asked for a location, the key to choose the location, and possibly
-ask for more info. Default is `{\tt .}'.
+ask for more info. Default is~`{\tt .}'.
 %.lp
 \item[{\bb{getpos.pick.once}}]
 When asked for a location, the key to choose the location, and skip
-asking for more info. Default is `{\tt ,}'.
+asking for more info. Default is~`{\tt ,}'.
 %.lp
 \item[{\bb{getpos.pick.quick}}]
 When asked for a location, the key to choose the location, skip asking
-for more info, and exit the location asking loop. Default is `{\tt ;}'.
+for more info, and exit the location asking loop. Default is~`{\tt ;}'.
 %.lp
 \item[{\bb{getpos.pick.verbose}}]
 When asked for a location, the key to choose the location, and show more
-info without asking. Default is `{\tt :}'.
+info without asking. Default is~`{\tt :}'.
 %.lp
 \item[{\bb{getpos.self}}]
 When asked for a location, the key to go to your location.
-Default is `{\tt @}'.
+Default is~`{\tt @}'.
 %.lp
 \item[{\bb{getpos.unexplored.next}}]
 When asked for a location, the key to go to next closest unexplored location.
-Default is `{\tt x}'.
+Default is~`{\tt x}'.
 %.lp
 \item[{\bb{getpos.unexplored.prev}}]
 When asked for a location, the key to go to previous closest unexplored
-location. Default is `{\tt X}'.
+location. Default is~`{\tt X}'.
 %.lp
 \item[{\bb{getpos.valid}}]
 When asked for a location, the key to go to show valid target locations.
-Default is `{\tt \$}'.
+Default is~`{\tt \$}'.
 %.lp
 \item[{\bb{getpos.valid.next}}]
 When asked for a location, the key to go to next closest valid location.
-Default is `{\tt z}'.
+Default is~`{\tt z}'.
 %.lp
 \item[{\bb{getpos.valid.prev}}]
 When asked for a location, the key to go to previous closest valid location.
-Default is `{\tt Z}'.
+Default is~`{\tt Z}'.
 %.lp
 \item[{\bb{nopickup}}]
-Prefix key to move without picking up items. Default is `{\tt m}'.
+Prefix key to move without picking up items. Default is~`{\tt m}'.
 %.lp
 \item[{\bb{redraw}}]
-Key to redraw the screen. Default is `{\tt \^{}R}'.
+Key to redraw the screen. Default is~`{\tt \^{}R}'.
 %.lp
 \item[{\bb{redraw.numpad}}]
 Key to redraw the screen. With {\it number\verb+_+pad\/} only.
-Default is `{\tt \^{}L}'.
+Default is~`{\tt \^{}L}'.
 %.lp
 \item[{\bb{repeat}}]
-Key to repeat previous command. Default is `{\tt \^{}A}'.
+Key to repeat previous command. Default is~`{\tt \^{}A}'.
 %.lp
 \item[{\bb{reqmenu}}]
-Prefix key to request menu from some commands. Default is `{\tt m}'.
+Prefix key to request menu from some commands. Default is~`{\tt m}'.
 %.lp
 \item[{\bb{run}}]
-Prefix key to run towards a direction. Default is `{\tt G}'.
+Prefix key to run towards a direction. Default is~`{\tt G}'.
 %.lp
 \item[{\bb{run.nopickup}}]
 Prefix key to run towards a direction without picking up items on the way.
-Default is `{\tt M}'.
+Default is~`{\tt M}'.
 %.lp
 \item[{\bb{run.numpad}}]
 Prefix key to run towards a direction. With {\it number\verb+_+pad\/} only.
-Default is `{\tt 5}'.
+Default is~`{\tt 5}'.
 %.lp
 \item[{\bb{rush}}]
-Prefix key to rush towards a direction. Default is `{\tt g}'.
+Prefix key to rush towards a direction. Default is~`{\tt g}'.
 \elist
 
 
@@ -4791,9 +4796,9 @@ percentage or absolute number threshold, or text to match against.
 %.lp "*"
 \item[{\tt always}] will set the default attributes for that field.
 %.lp "*"
-\item[{\tt up} and ``{\tt down}''] set the field attributes for when the field
-value changes upwards or downwards. This attribute times out after
-{\tt statushilites} turns.
+\item[{\tt up}{\normalfont, }{\tt down}] set the field attributes
+for when the field value changes upwards or downwards. This attribute
+times out after {\tt statushilites} turns.
 %.lp "*"
 \item[{\tt changed}] sets the field attribute for when the field value
 changes. This attribute times out after {\tt statushilites} turns.
@@ -5753,12 +5758,13 @@ of these miscreants in this, the list of Dungeoneers:
 \begin{center}
 \begin{tabular}{llll}
 %TABLE_START
-Adam Aronow & Janet Walz & Nathan Eady\\
-Alex Kompel & Janne Salmij\"{a}rvi & Norm Meluch\\
-Alex Smith & Jean-Christophe Collet & Olaf Seibert\\
-Andreas Dorn & Jeff Bailey & Pasi Kallinen\\
-Andy Church & Jochen Erwied & Pat Rankin\\
-Andy Swanson & John Kallen & Patric Mueller\\
+Adam Aronow & J. Ali Harlow & Mikko Juola\\
+Alex Kompel & Janet Walz & Nathan Eady\\
+Alex Smith & Janne Salmij\"{a}rvi & Norm Meluch\\
+Andreas Dorn & Jean-Christophe Collet & Olaf Seibert\\
+Andy Church & Jeff Bailey & Pasi Kallinen\\
+Andy Swanson & Jochen Erwied & Pat Rankin\\
+Andy Thomson & John Kallen & Patric Mueller\\
 Ari Huttunen & John Rupley & Paul Winner\\
 Bart House & John S. Bien & Pierre Martineau\\
 Benson I. Margulies & Johnny Lee & Ralf Brown\\
@@ -5767,33 +5773,33 @@ Boudewijn Waijers & Jonathan Handler & Richard Addison\\
 Bruce Cox & Joshua Delahunty & Richard Beigel\\
 Bruce Holloway & Karl Garrison & Richard P. Hughey\\
 Bruce Mewborne & Keizo Yamamoto & Rob Menke\\
-Carl Schelin & Ken Arnold & Robin Bandy\\
-Chris Russo & Ken Arromdee & Robin Johnson\\
-David Cohrs & Ken Lorber & Roderick Schertler\\
-David Damerell & Ken Washikita & Roland McGrath\\
-David Gentzel & Kevin Darcy & Ron Van Iwaarden\\
-David Hairston & Kevin Hugo & Ronnen Miller\\
-Dean Luick & Kevin Sitze & Ross Brown\\
-Del Lamb & Kevin Smolkowski & Sascha Wostmann\\
-Derek S. Ray & Kevin Sweet & Scott Bigham\\
-Deron Meranda & Lars Huttar & Scott R. Turner\\
-Dion Nicolaas & Leon Arnott & Sean Hunt\\
-Dylan O'Donnell & M. Drew Streib & Stephen Spackman\\
-Eric Backus & Malcolm Ryan & Stefan Thielscher\\
-Eric Hendrickson & Mark Gooderum & Stephen White\\
-Eric R. Smith & Mark Modrall & Steve Creps\\
-Eric S. Raymond & Marvin Bressler & Steve Linhart\\
-Erik Andersen & Matthew Day & Steve VanDevender\\
-Frederick Roeber & Merlyn LeRoy & Teemu Suikki\\
-Gil Neiger & Michael Allison & Tim Lennan\\
-Greg Laskin & Michael Feir & Timo Hakulinen\\
-Greg Olson & Michael Hamel & Tom Almy\\
-Gregg Wonderly & Michael Sokolov & Tom West\\
-Hao-yang Wang & Mike Engber & Warren Cheung\\
-Helge Hafting & Mike Gallop & Warwick Allison\\
-Irina Rempt-Drijfhout & Mike Passaretti & Yitzhak Sapir\\
-Izchak Miller & Mike Stephenson\\
-J. Ali Harlow & Mikko Juola
+Carl Schelin & Keith Simpson & Robin Bandy\\
+Chris Russo & Ken Arnold & Robin Johnson\\
+David Cohrs & Ken Arromdee & Roderick Schertler\\
+David Damerell & Ken Lorber & Roland McGrath\\
+David Gentzel & Ken Washikita & Ron Van Iwaarden\\
+David Hairston & Kevin Darcy & Ronnen Miller\\
+Dean Luick & Kevin Hugo & Ross Brown\\
+Del Lamb & Kevin Sitze & Sascha Wostmann\\
+Derek S. Ray & Kevin Smolkowski & Scott Bigham\\
+Deron Meranda & Kevin Sweet & Scott R. Turner\\
+Dion Nicolaas & Lars Huttar & Sean Hunt\\
+Dylan O'Donnell & Leon Arnott & Stephen Spackman\\
+Eric Backus & M. Drew Streib & Stefan Thielscher\\
+Eric Hendrickson & Malcolm Ryan & Stephen White\\
+Eric R. Smith & Mark Gooderum & Steve Creps\\
+Eric S. Raymond & Mark Modrall & Steve Linhart\\
+Erik Andersen & Marvin Bressler & Steve VanDevender\\
+Fredrik Ljungdahl & Matthew Day & Teemu Suikki\\
+Frederick Roeber & Merlyn LeRoy & Tim Lennan\\
+Gil Neiger & Michael Allison & Timo Hakulinen\\
+Greg Laskin & Michael Feir & Tom Almy\\
+Greg Olson & Michael Hamel & Tom West\\
+Gregg Wonderly & Michael Sokolov & Warren Cheung\\
+Hao-yang Wang & Mike Engber & Warwick Allison\\
+Helge Hafting & Mike Gallop & Yitzhak Sapir\\
+Irina Rempt-Drijfhout & Mike Passaretti\\
+Izchak Miller & Mike Stephenson
 %TABLE_END  Do not delete this line.
 \end{tabular}
 \end{center}

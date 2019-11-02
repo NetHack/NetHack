@@ -39,6 +39,7 @@ E int NDECL(number_leashed);
 E void FDECL(o_unleash, (struct obj *));
 E void FDECL(m_unleash, (struct monst *, BOOLEAN_P));
 E void NDECL(unleash_all);
+E boolean FDECL(leashable, (struct monst *));
 E boolean NDECL(next_to_u);
 E struct obj *FDECL(get_mleash, (struct monst *));
 E const char *NDECL(beautiful);

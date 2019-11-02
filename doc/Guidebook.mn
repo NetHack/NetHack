@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "October 31, 2019
+.ds f2 "November 2, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -2617,14 +2617,26 @@ Using a configuration file
 .hw .nethackrc defaults.nh nethack.exe nethackW.exe
 The default name of the configuration file varies on different
 operating systems.
-On MS-DOS and Windows, it is \(lqdefaults.nh\(rq
-in the same folder as nethack.exe or nethackW.exe.
+.pg
 On
 .UX ,
 Linux,
 and Mac OS X it is \(lq.nethackrc\(rq in the user's home directory.
 The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
+.pg
+On Windows, if you manually installed from the zip file,
+it is \(lqdefaults.nh\(rq
+in the same folder as nethack.exe or nethackW.exe.
+If you installed using the Microsoft Store, it is 
+\(lqdefaults.nh\(rq in the following folder: 
+\(lq\\%USERPROFILE%\\NetHack\(rq. There, a starting template is 
+provided for you to use to create your \(lqdefaults.nh\(rq 
+configuration file. It is \(lqdefaults.tmp\(rq also in the following 
+folder: 
+\(lq\\%USERPROFILE%\\NetHack\(rq
+.pg
+On MS-DOS, it is \(lqdefaults.nh\(rq in the same folder as nethack.exe.
 .pg
 Any line in the configuration file starting with \(oq#\(cq is treated
 as a comment.
@@ -4286,7 +4298,7 @@ text to match against.
 .lp "*"
 \(lqalways\(rq will set the default attributes for that field.
 .lp "*"
-\(lqup\(rq and \(lqdown\(rq set the field attributes for when the field
+\(lqup\(rq, \(lqdown\(rq set the field attributes for when the field
 value changes upwards or downwards.
 This attribute times out after
 .op statushilites
@@ -5126,12 +5138,13 @@ miscreants in this, the list of Dungeoneers:
 center;
 c c c.
 .\"TABLE_START
-Adam Aronow	Janet Walz	Nathan Eady
-Alex Kompel	Janne Salmijarvi	Norm Meluch
-Alex Smith	Jean-Christophe Collet	Olaf Seibert
-Andreas Dorn	Jeff Bailey	Pasi Kallinen
-Andy Church	Jochen Erwied	Pat Rankin
-Andy Swanson	John Kallen	Patric Mueller
+Adam Aronow	J. Ali Harlow	Mikko Juola
+Alex Kompel	Janet Walz	Nathan Eady
+Alex Smith	Janne Salmijarvi	Norm Meluch
+Andreas Dorn	Jean-Christophe Collet	Olaf Seibert
+Andy Church	Jeff Bailey	Pasi Kallinen
+Andy Swanson	Jochen Erwied	Pat Rankin
+Andy Thomson	John Kallen	Patric Mueller
 Ari Huttunen	John Rupley	Paul Winner
 Bart House	John S. Bien	Pierre Martineau
 Benson I. Margulies	Johnny Lee	Ralf Brown
@@ -5140,33 +5153,33 @@ Boudewijn Waijers	Jonathan Handler	Richard Addison
 Bruce Cox	Joshua Delahunty	Richard Beigel
 Bruce Holloway	Karl Garrison	Richard P. Hughey
 Bruce Mewborne	Keizo Yamamoto	Rob Menke
-Carl Schelin	Ken Arnold	Robin Bandy
-Chris Russo	Ken Arromdee	Robin Johnson
-David Cohrs	Ken Lorber	Roderick Schertler
-David Damerell	Ken Washikita	Roland McGrath
-David Gentzel	Kevin Darcy	Ron Van Iwaarden
-David Hairston	Kevin Hugo	Ronnen Miller
-Dean Luick	Kevin Sitze	Ross Brown
-Del Lamb	Kevin Smolkowski	Sascha Wostmann
-Derek S. Ray	Kevin Sweet	Scott Bigham
-Deron Meranda	Lars Huttar	Scott R. Turner
-Dion Nicolaas	Leon Arnott	Sean Hunt
-Dylan O'Donnell	M. Drew Streib	Stephen Spackman
-Eric Backus	Malcolm Ryan	Stefan Thielscher
-Eric Hendrickson	Mark Gooderum	Stephen White
-Eric R. Smith	Mark Modrall	Steve Creps
-Eric S. Raymond	Marvin Bressler	Steve Linhart
-Erik Andersen	Matthew Day	Steve VanDevender
-Frederick Roeber	Merlyn LeRoy	Teemu Suikki
-Gil Neiger	Michael Allison	Tim Lennan
-Greg Laskin	Michael Feir	Timo Hakulinen
-Greg Olson	Michael Hamel	Tom Almy
-Gregg Wonderly	Michael Sokolov	Tom West
-Hao-yang Wang	Mike Engber	Warren Cheung
-Helge Hafting	Mike Gallop	Warwick Allison
-Irina Rempt-Drijfhout	Mike Passaretti	Yitzhak Sapir
+Carl Schelin	Keith Simpson	Robin Bandy
+Chris Russo	Ken Arnold	Robin Johnson
+David Cohrs	Ken Arromdee	Roderick Schertler
+David Damerell	Ken Lorber	Roland McGrath
+David Gentzel	Ken Washikita	Ron Van Iwaarden
+David Hairston	Kevin Darcy	Ronnen Miller
+Dean Luick	Kevin Hugo	Ross Brown
+Del Lamb	Kevin Sitze	Sascha Wostmann
+Derek S. Ray	Kevin Smolkowski	Scott Bigham
+Deron Meranda	Kevin Sweet	Scott R. Turner
+Dion Nicolaas	Lars Huttar	Sean Hunt
+Dylan O'Donnell	Leon Arnott	Stephen Spackman
+Eric Backus	M. Drew Streib	Stefan Thielscher
+Eric Hendrickson	Malcolm Ryan	Stephen White
+Eric R. Smith	Mark Gooderum	Steve Creps
+Eric S. Raymond	Mark Modrall	Steve Linhart
+Erik Andersen	Marvin Bressler	Steve VanDevender
+Fredrik Ljungdahl	Matthew Day	Teemu Suikki
+Frederick Roeber	Merlyn LeRoy	Tim Lennan
+Gil Neiger	Michael Allison	Timo Hakulinen
+Greg Laskin	Michael Feir	Tom Almy
+Greg Olson	Michael Hamel	Tom West
+Gregg Wonderly	Michael Sokolov	Warren Cheung
+Hao-yang Wang	Mike Engber	Warwick Allison
+Helge Hafting	Mike Gallop	Yitzhak Sapir
+Irina Rempt-Drijfhout	Mike Passaretti
 Izchak Miller	Mike Stephenson
-J. Ali Harlow	Mikko Juola
 .\"TABLE_END  Do not delete this line.
 .TE
 .pg
