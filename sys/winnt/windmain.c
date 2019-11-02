@@ -11,28 +11,13 @@
 #include <stdlib.h>
 #include <sys\stat.h>
 #include <errno.h>
-#ifndef __MINGW32__
-#include <appmodel.h>
-#endif
 #include <ShlObj.h>
 
 #ifdef __MINGW32__
 extern LONG GetCurrentPackageFullName(UINT32 *packageFullNameLength,
                       PWSTR  packageFullName);
-extern HRESULT SHGetKnownFolderPath(REFKNOWNFOLDERID rfid,
-                      DWORD dwFlags, HANDLE hToken, PWSTR  *ppszPath);
-#ifdef INITGUID
-#define DEFINE_KNOWN_FOLDER(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) const GUID DECLSPEC_SELECTANY name = { l, w1, w2,{ b1, b2, b3, b4, b5, b6, b7, b8 } }
 #else
-#define DEFINE_KNOWN_FOLDER(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) const GUID name
-#endif
-DEFINE_KNOWN_FOLDER (FOLDERID_ProgramData, 0x62ab5d82, 0xfdc1, 0x4dc3, 0xa9, 0xdd, 0x07, 0x0d, 0x1d, 0x49, 0x5d, 0x97);
-DEFINE_KNOWN_FOLDER (FOLDERID_LocalAppData, 0xf1b32785, 0x6fba, 0x4fcf, 0x9d, 0x55, 0x7b, 0x8e, 0x7f, 0x15, 0x70, 0x91);
-DEFINE_KNOWN_FOLDER (FOLDERID_Profile, 0x5e6c858f, 0x0e22, 0x4760, 0x9a, 0xfe, 0xea, 0x33, 0x17, 0xb6, 0x71, 0x73);
-#endif
-
-#if 0
-#include "wintty.h"
+# include <appmodel.h>
 #endif
 
 #if !defined(SAFEPROCS)
