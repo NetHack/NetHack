@@ -11,6 +11,7 @@
  *
  */
 
+#include "win10.h"
 #include "winos.h"
 
 #define NEED_VARARGS
@@ -189,15 +190,20 @@ int *lan_username_size;
 {
     static TCHAR username_buffer[BUFSZ];
     DWORD i = BUFSZ - 1;
+    BOOL allowUserName = TRUE;
 
     Strcpy(username_buffer, "NetHack");
 
+#ifndef WIN32CON
     /* Our privacy policy for the windows store version of nethack makes
      * a promise about not collecting any personally identifiable information.
      * Do not allow getting user name if we being run from windows store
      * version of nethack.  In 3.7, we should remove use of username.
      */
-    if (!is_desktop_bridge_application()) {
+    allowUserName = !win10_is_desktop_bridge_application();
+#endif
+
+    if (allowUserName) {
         /* i gets updated with actual size */
         if (GetUserName(username_buffer, &i))
             username_buffer[i] = '\0';

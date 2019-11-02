@@ -13,13 +13,6 @@
 #include <errno.h>
 #include <ShlObj.h>
 
-#ifdef __MINGW32__
-extern LONG GetCurrentPackageFullName(UINT32 *packageFullNameLength,
-                      PWSTR  packageFullName);
-#else
-# include <appmodel.h>
-#endif
-
 #if !defined(SAFEPROCS)
 #error You must #define SAFEPROCS to build windmain.c
 #endif
@@ -69,15 +62,6 @@ static struct stat hbuf;
 #endif
 
 extern char orgdir[];
-
-boolean
-is_desktop_bridge_application()
-{
-    UINT32 length = 0;
-    LONG rc = GetCurrentPackageFullName(&length, NULL);
-
-    return (rc == ERROR_INSUFFICIENT_BUFFER);
-}
 
 void
 get_known_folder_path(

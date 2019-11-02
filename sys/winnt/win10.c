@@ -34,6 +34,17 @@ void win10_init()
 
         FreeLibrary(hUser32);
 
+        HINSTANCE hKernel32 = LoadLibraryA("kernel32.dll");
+
+        if (hKernel32 == NULL) 
+            panic("Unable to load user32.dll");
+
+        gWin10.GetCurrentPackageFullName = (GetCurrentPackageFullNameProc) GetProcAddress(hKernel32, "GetCurrentPackageFullName");
+        if (gWin10.GetCurrentPackageFullName == NULL)
+            panic("Unable to get address of GetCurrentPackageFullName");
+
+        FreeLibrary(hKernel32);
+
         gWin10.Valid = TRUE;
     }
 
@@ -80,4 +91,19 @@ void win10_monitor_info(HWND hWnd, MonitorInfo * monitorInfo)
     monitorInfo->left = info.rcMonitor.left;
     monitorInfo->top = info.rcMonitor.top;
 }
+
+BOOL
+win10_is_desktop_bridge_application()
+{
+    if (gWin10.Valid) {
+        UINT32 length = 0;
+        LONG rc = gWin10.GetCurrentPackageFullName(&length, NULL);
+
+        return (rc == ERROR_INSUFFICIENT_BUFFER);
+    }
+
+    return FALSE;
+}
+
+
 #endif /* _MSC_VER */
