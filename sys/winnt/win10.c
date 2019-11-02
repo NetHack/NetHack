@@ -37,7 +37,7 @@ void win10_init()
         HINSTANCE hKernel32 = LoadLibraryA("kernel32.dll");
 
         if (hKernel32 == NULL) 
-            panic("Unable to load user32.dll");
+            panic("Unable to load kernel32.dll");
 
         gWin10.GetCurrentPackageFullName = (GetCurrentPackageFullNameProc) GetProcAddress(hKernel32, "GetCurrentPackageFullName");
         if (gWin10.GetCurrentPackageFullName == NULL)
