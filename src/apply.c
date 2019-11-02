@@ -591,15 +591,13 @@ unleash_all()
 
 #define MAXLEASHED 2
 
-/* TODO:
- *  This ought to exclude various other things, such as lights and gas
- *  spore, is_whirly() critters, ethereal creatures, possibly others.
- */
 boolean
 leashable(mtmp)
 struct monst *mtmp;
 {
-    return (boolean) (mtmp->mnum != PM_LONG_WORM);
+    return (boolean) (mtmp->mnum != PM_LONG_WORM
+                       && !unsolid(mtmp->data)
+                       && (!nolimbs(mtmp->data) || has_head(mtmp->data)));
 }
 
 /* ARGSUSED */
@@ -671,6 +669,11 @@ struct obj *obj;
         if (mtmp->mleashed) {
             pline("This %s is already leashed.",
                   spotmon ? l_monnam(mtmp) : "creature");
+        } else if (unsolid(mtmp->data)) {
+            pline("The leash would just fall off.");
+        } else if (nolimbs(mtmp->data) && !has_head(mtmp->data)) {
+            pline("%s has no extremities the leash would fit.",
+                  Monnam(mtmp));
         } else if (!leashable(mtmp)) {
             pline("The leash won't fit onto %s%s.", spotmon ? "your " : "",
                   l_monnam(mtmp));
