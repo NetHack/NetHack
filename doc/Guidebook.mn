@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.319 $ $NHDT-Date: 1572525093 2019/10/31 12:31:33 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.324 $ $NHDT-Date: 1572690738 2019/11/02 10:32:18 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -4408,16 +4408,23 @@ The special prefix form \\m switches on the meta bit in the symbol value,
 and the \(ha prefix causes the following character to be treated as a
 control character.
 .pg
+.\" Table is centered.
+.\" First line (title) is left justified and spans second and third columns;
+.\" it used to be centered but tended to look as if too far to the right.
+.\" Remaining lines are left justified in each of three columns.  First
+.\" line (second overall) contains column labels; the first column has a
+.\" dummy label of two spaces.  (That used to be "Default" but it made all
+.\" the lines wider because of the label's width and caused several lines
+.\" to be too wide when generating plain text output.  Two spaces leaves
+.\" some room between the symbol character and name.)  Entries in first
+.\" column now use constant-width Roman font to approximate TeX tt font.
 .TS S
 center;
-c s s
-c1 l1 l.
+l s s
+l1fCR l1 l.
 .\"TABLE_START
-.\" because description is wide, centered title seems off, so pad it a bit
-.\" note that each backslash precedes one space of padding (including the
-.\" last one; in other words, there's a trailing space here)
-NetHack Symbols\ \ \ \ \ \ \ 
-Default	Symbol Name	Description
+NetHack Symbols
+\ \ 	Symbol Name	Description
 \_	\_	\_
 \ 	S_air	(air)
 \&_	S_altar	(altar)
@@ -4544,7 +4551,8 @@ s	S_spider	(arachnid or centipede)
 @	S_ss3	(magic shield 3 of 4)
 *	S_ss4	(magic shield 4 of 4)
 \(ha	S_statue_trap	(statue trap)
-\ 	S_stone	(dark part of a room)
+\ 	S_stone	(solid rock or unexplored terrain
+\ 	\ 	\ or dark part of a room)
 ]	S_strange_obj	(strange object)
 \-	S_sw_bc	(swallow bottom center)
 \\	S_sw_bl	(swallow bottom left)
@@ -4588,15 +4596,28 @@ v	S_vortex	(vortex)
 w	S_worm	(worm)
 \(ti	S_worm_tail	(long worm tail)
 W	S_wraith	(wraith)
-x	S_xan	(xan or other mythical/fantastic insect)
+x	S_xan	(xan or other extraordinary insect)
 X	S_xorn	(xorn)
 Y	S_yeti	(apelike creature)
 Z	S_zombie	(zombie)
 z	S_zruty	(zruty)
-\ 	S_pet_override	(any pet if sysconf accessibility is set)
-\ 	S_player_override	(hero if sysconf accessibility is set)
+\ 	S_pet_override	(any pet if ACCESSIBILITY=1 is set)
+\ 	S_player_override	(hero if ACCESSIBILITY=1 is set)
 .\"TABLE_END  Do not delete this line.
 .TE
+.\" don't hyphenate file name across lines
+.hw sysconf
+.pg
+Notes:  several symbols in this table appear to be blank.  They are the
+space character, except for S_pet_override and S_player_override which
+don't have any default value and can only be used if enabled in the
+\(lqsysconf\(rq file.
+.pg
+S_rock is misleadingly named; rocks and stones use S_gem.
+Statues and boulders are the rock being referred to, but since
+version 3.6.0, statues are displayed as the monster they depict.
+So S_rock is only used for boulders and not used at all if
+overridden by the more specific S_boulder.
 .pg
 .hn 2
 Configuring NetHack for Play by the Blind
@@ -4643,7 +4664,8 @@ See the previous section for the special symbols S_pet_override
 to force a consistent symbol for all pets and
 S_player_override to force a unique symbol for the player character
 if \fBaccessibility\fP is enabled in the sysconf file.
-The most crucial settings to make the game accessible are:
+.pg
+The most crucial settings to make the game more accessible are:
 .pg
 .lp symset:NHAccess
 Load a symbol set appropriate for use by blind players.
