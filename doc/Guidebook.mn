@@ -2625,16 +2625,17 @@ and Mac OS X it is \(lq.nethackrc\(rq in the user's home directory.
 The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
 .pg
-On Windows, if you manually installed from the zip file,
-it is \(lqdefaults.nh\(rq
-in the same folder as nethack.exe or nethackW.exe.
-If you installed using the Microsoft Store, it is 
-\(lqdefaults.nh\(rq in the following folder: 
-\(lq\\%USERPROFILE%\\NetHack\(rq. There, a starting template is 
-provided for you to use to create your \(lqdefaults.nh\(rq 
-configuration file. It is \(lqdefaults.tmp\(rq also in the following 
-folder: 
-\(lq\\%USERPROFILE%\\NetHack\(rq
+On Windows, it is \(lq.nethackrc\(rq in
+\(lq\\%USERPROFILE%\\NetHack\\3.6\(rq.  The file may not exist,
+but it is a normal ASCII text file can can be created with any
+text editor.
+.pg
+After running NetHack for the first time, you should find a default
+template for the configuration file named \(lq.nethackrc.template\(rq
+in \(lq\\%USERPROFILE%\\NetHack\\3.6\(rq.
+.pg
+If you had not created the configuration file, NetHack will create
+the configuration file for you using the default template file.
 .pg
 On MS-DOS, it is \(lqdefaults.nh\(rq in the same folder as nethack.exe.
 .pg
