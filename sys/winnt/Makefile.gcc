@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1546174698 2018/12/30 12:58:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.71 $
+# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1572748375 2019/11/03 02:32:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.80 $
 # Copyright (c) 2010 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -764,11 +764,11 @@ else
 	$(subst /,\,copy $(DAT)/*.lev         $(GAMEDIR))
 	$(subst /,\,if exist $(GAMEDIR)/makefile del $(GAMEDIR)/makefile)
 endif
-	$(subst /,\,if not exist $(GAMEDIR)/sysconf copy $(MSWSYS)/sysconf $(GAMEDIR))
-	$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR))
+	$(subst /,\,if exist $(MSWSYS)/sysconf.template copy $(MSWSYS)/sysconf.template $(GAMEDIR))
+	$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR)/symbols.template)
 	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
 	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
-	$(subst /,\,if not exist $(GAMEDIR)/defaults.nh copy $(MSWSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
+	$(subst /,\,if exist $(MSWSYS)/.nethackrc.template copy $(MSWSYS)/.nethackrc.template $(GAMEDIR))
 	$(subst /,\,-if not exist $(GAMEDIR)/record. echo.>$(GAMEDIR)/record.)
 #
 #
