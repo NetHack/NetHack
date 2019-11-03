@@ -305,23 +305,23 @@ void copy_config_content()
     /* Keep templates up to date */
     /* TODO: Update the package to store config file as .nethackrc */
     update_file(fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
-        fqn_prefix[DATAPREFIX], CONFIG_FILE, FALSE);
+        fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
     update_file(fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
-        fqn_prefix[DATAPREFIX], SYSCF_FILE, FALSE);
+        fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
 
     /* If the required early game file does not exist, copy it */
     /* NOTE: We never replace .nethackrc or sysconf */
     copy_file(fqn_prefix[CONFIGPREFIX], CONFIG_FILE,
-        fqn_prefix[DATAPREFIX], CONFIG_FILE);
+        fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE);
     copy_file(fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
-        fqn_prefix[DATAPREFIX], SYSCF_FILE);
+        fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
 
     /* Update symbols and save a copy if we are replacing */
     /* TODO: Can't HACKDIR be changed during option parsing
        causing us to perhaps be checking options against the wrong
        symbols file? */
     update_file(fqn_prefix[HACKPREFIX], SYMBOLS,
-        fqn_prefix[DATAPREFIX], SYMBOLS, TRUE);
+        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
 }
 
 void
@@ -335,7 +335,7 @@ copy_hack_content()
 
     /* Keep templates up to date */
     update_file(fqn_prefix[HACKPREFIX], SYMBOLS_TEMPLATE,
-        fqn_prefix[DATAPREFIX], SYMBOLS, FALSE);
+        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
 
 }
 
