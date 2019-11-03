@@ -9,6 +9,21 @@
 
 #include "hack.h"
 
+typedef DPI_AWARENESS_CONTEXT(WINAPI *GetThreadDpiAwarenessContextProc)(VOID);
+typedef BOOL(WINAPI *AreDpiAwarenessContextsEqualProc)(
+    DPI_AWARENESS_CONTEXT dpiContextA, DPI_AWARENESS_CONTEXT dpiContextB);
+typedef UINT(WINAPI *GetDpiForWindowProc)(HWND hwnd);
+typedef LONG (WINAPI *GetCurrentPackageFullNameProc)(UINT32 *packageFullNameLength,
+    PWSTR  packageFullName);
+
+typedef struct {
+    BOOL Valid;
+    GetThreadDpiAwarenessContextProc GetThreadDpiAwarenessContext;
+    AreDpiAwarenessContextsEqualProc AreDpiAwarenessContextsEqual;
+    GetDpiForWindowProc GetDpiForWindow;
+    GetCurrentPackageFullNameProc GetCurrentPackageFullName;
+} Win10;
+
 Win10 gWin10 = { 0 };
 
 void win10_init()
@@ -37,7 +52,7 @@ void win10_init()
         HINSTANCE hKernel32 = LoadLibraryA("kernel32.dll");
 
         if (hKernel32 == NULL) 
-            panic("Unable to load user32.dll");
+            panic("Unable to load kernel32.dll");
 
         gWin10.GetCurrentPackageFullName = (GetCurrentPackageFullNameProc) GetProcAddress(hKernel32, "GetCurrentPackageFullName");
         if (gWin10.GetCurrentPackageFullName == NULL)

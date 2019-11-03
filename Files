@@ -273,12 +273,12 @@ stat.h
 
 sys/winnt:
 (files for Windows 7/8.x/10 version)
-Install.nt      Makefile.gcc    Makefile.msc    console.rc
-defaults.nh     nethack.def     nh340key.c      nhdefkey.c
-nhico.uu        nhraykey.c      nhsetup.bat     ntsound.c
-nttty.c         porthelp        stub-pdcscrn.c  stubs.c
-sysconf         win10.c         win10.h         win32api.h
-windmain.c      winnt.c         winos.h
+Install.nt          Makefile.gcc    Makefile.msc    console.rc
+.nethackrc.template nethack.def     nh340key.c      nhdefkey.c
+nhico.uu            nhraykey.c      nhsetup.bat     ntsound.c
+nttty.c             porthelp        stub-pdcscrn.c  stubs.c
+sysconf.template    win10.c         win10.h         win32api.h
+windmain.c          winnt.c         winos.h
 
 util:
 (files for all versions)

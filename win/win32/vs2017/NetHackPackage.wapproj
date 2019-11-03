@@ -113,8 +113,8 @@
     <Content Include="Images\Wide310x150Logo.scale-125.png" />
     <Content Include="Images\Wide310x150Logo.scale-150.png" />
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
-    <Content Include="$(BinDir)defaults.nh">
-      <Link>NetHackW\defaults.nh</Link>
+    <Content Include="$(BinDir).nethackrc.template">
+      <Link>NetHackW\.nethackrc.template</Link>
     </Content>
     <Content Include="$(BinDir)Guidebook.txt">
       <Link>NetHackW\Guidebook.txt</Link>
@@ -128,11 +128,11 @@
     <Content Include="$(BinDir)opthelp">
       <Link>NetHackW\opthelp</Link>
     </Content>
-    <Content Include="$(BinDir)symbols">
-      <Link>NetHackW\symbols</Link>
+    <Content Include="$(BinDir)symbols.template">
+      <Link>NetHackW\symbols.template</Link>
     </Content>
-    <Content Include="$(BinDir)sysconf">
-      <Link>NetHackW\sysconf</Link>
+    <Content Include="$(BinDir)sysconf.template">
+      <Link>NetHackW\sysconf.template</Link>
     </Content>
     <Content Include="Images\Wide310x150Logo.scale-400.png" />
     <None Include="NetHackPackage_StoreKey.pfx" />

@@ -2875,16 +2875,19 @@ directory. The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.\\
 
 %.lp ""
-On Windows, if you manually installed from the zip file, 
-it is \mbox{``defaults.nh''} in the same folder as 
-\mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}.
-If you installed using the Microsoft Store, it is \mbox{``defaults.nh''} in
-the following folder:
-\mbox{{``\%USERPROFILE\%\textbackslash NetHack''}}.
-There, a starting template is provided for you to use to create your 
-\mbox{``defaults.nh''} configuration file.  It is \mbox{``defaults.tmp''} 
-also in the following folder:
-\mbox{{``\%USERPROFILE\%\textbackslash NetHack''}}.\\
+On Windows, it is \mbox{``.nethackrc''} in the foler 
+\mbox{{``\%USERPROFILE\%\textbackslash NetHack\textbackslash 3.6''}}. The
+file may not exist, but it is a normal ASCII text file and can be created
+with any text editor.\\
+
+%.lp ""
+After runing {\it NetHack\/} for the first time, you should find a default
+template for ths configuration file named \mbox{``.nethackrc.template''} in
+\mbox{{``\%USERPROFILE\%\textbackslash NetHack\textbackslash 3.6''}}.
+
+%.lp ""
+If you had not created the configuration file, {\it NetHack\/} will create
+the configuration file for you using the default template file.
 
 %.lp ""
 On MS-DOS it is \mbox{``defaults.nh''} in the same folder as 
@@ -5039,7 +5042,8 @@ Default                      & Symbol Name                & Description\\
 \verb+@+ & S\verb+_+ss3                     &	(magic shield 3 of 4)\\
 \verb@*@ & S\verb+_+ss4                     &	(magic shield 4 of 4)\\
 \verb@^@ & S\verb+_+statue\verb+_+trap            &	(statue trap)\\
-\verb@ @ & S\verb+_+stone                   &	(dark part of a room)\\
+\verb@ @ & S\verb+_+stone                   &	(solid rock or unexplored terrain\\
+         &                                  &   \,or dark part of a room)\\
 \verb@]@ & S\verb+_+strange\verb+_+obj      &	(strange object)\\
 \verb@-@ & S\verb+_+sw\verb+_+bc                  &	(swallow bottom center)\\
 \verb@\@ & S\verb+_+sw\verb+_+bl                  &	(swallow bottom left)\\
@@ -5054,7 +5058,7 @@ Default                      & Symbol Name                & Description\\
 \verb@\@ & S\verb+_+throne                  &	(opulent throne)\\
 \verb@-@ & S\verb+_+tlcorn                  &	(top left corner)\\
 \verb@|@ & S\verb+_+tlwall                  &	(wall)\\
-\verb@(@ & S\verb+_+tool                    &	(useful item (pick-axe\, key\, lamp...))\\
+\verb@(@ & S\verb+_+tool                    &	(useful item (pick-axe, key, lamp...))\\
 \verb@^@ & S\verb+_+trap\verb+_+door              &	(trap door)\\
 \verb@t@ & S\verb+_+trapper                 &	(trapper or lurker above)\\
 \verb@-@ & S\verb+_+trcorn                  &	(top right corner)\\
@@ -5083,15 +5087,29 @@ Default                      & Symbol Name                & Description\\
 \verb@w@ & S\verb+_+worm                    &	(worm)\\
 \verb@~@ & S\verb+_+worm\verb+_+tail              &	(long worm tail)\\
 \verb@W@ & S\verb+_+wraith                  &	(wraith)\\
-\verb@x@ & S\verb+_+xan                     &	(xan or other mythical/fantastic insect)\\
+\verb@x@ & S\verb+_+xan                     &	(xan or other extraordinary insect)\\
 \verb@X@ & S\verb+_+xorn                    &	(xorn)\\
 \verb@Y@ & S\verb+_+yeti                    &	(apelike creature)\\
 \verb@Z@ & S\verb+_+zombie                  &	(zombie)\\
 \verb@z@ & S\verb+_+zruty                   &	(zruty)\\
-\verb@ @ & S\verb+_+pet\verb+_+override     &	(any pet if sysconf accessibility is set)\\
-\verb@ @ & S\verb+_+player\verb+_+override  &	(hero if sysconf accessibility is set)
+\verb@ @ & S\verb+_+pet\verb+_+override     &	(any pet if ACCESSIBILITY=1 is set)\\
+\verb@ @ & S\verb+_+player\verb+_+override  &	(hero if ACCESSIBILITY=1 is set)
 \end{longtable}%
 }
+
+\hyphenation{sysconf}	%no syllable breaks => don't hyphenate file name
+%.pg
+Notes:  several symbols in this table appear to be blank.
+They are the space character, except for S\verb+_+pet\verb+_+override
+and S\verb+_+player\verb+_+override which don't have any default value
+and can only be used if enabled in the ``sysconf'' file.
+
+%.pg
+S\verb+_+rock is misleadingly named; rocks and stones use S\verb+_+gem.
+Statues and boulders are the rock being referred to, but since
+version 3.6.0, statues are displayed as the monster they depict.
+So S\verb+_+rock is only used for boulders and not used at all if
+overridden by the more specific S\verb+_+boulder.
 
 %.pg
 %.hn 2
@@ -5140,7 +5158,9 @@ See the previous section for the special symbols S\verb+_+pet\verb+_+override
 to force a consistent symbol for all pets and S\verb+_+player\verb+_+override
 to force a unique symbol for the player character if {\it accessibility\/}
 is enabled in the {\it sysconf\/} file.
-The most crucial settings to make the game accessible are:
+
+%.pg
+The most crucial settings to make the game more accessible are:
 %.pg
 \blist{}
 %.lp

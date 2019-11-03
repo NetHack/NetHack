@@ -78,9 +78,8 @@
                      * objects being thrown when the hangup occurs.    \
                      */
 
-#define MAIL
-#define CONFIG_FILE "defaults.nh"
-#define CONFIG_TEMPLATE "defaults.template"
+#define CONFIG_FILE ".nethackrc"
+#define CONFIG_TEMPLATE ".nethackrc.template"
 #define SYSCF_TEMPLATE "sysconf.template"
 #define SYMBOLS_TEMPLATE "symbols.template"
 #define GUIDEBOOK_FILE "Guidebook.txt"
