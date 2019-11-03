@@ -2158,6 +2158,8 @@ int prefixid;
 
     if (!bufp)
         return;
+    if (fqn_prefix_locked[prefixid])
+        return;
     /* Backward compatibility, ignore trailing ;n */
     if ((ptr = index(bufp, ';')) != 0)
         *ptr = '\0';
@@ -3196,7 +3198,7 @@ fopen_sym_file()
 {
     FILE *fp;
 
-    fp = fopen_datafile(SYMBOLS, "r", HACKPREFIX);
+    fp = fopen_datafile(SYMBOLS, "r", CONFIGPREFIX);
 
     return fp;
 }
@@ -3860,6 +3862,9 @@ void
 assure_syscf_file()
 {
     int fd;
+
+    /* We are checking that the sysconf exists ... lock the path */
+    fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
 
     /*
      * All we really care about is the end result - can we read the file?

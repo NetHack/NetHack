@@ -97,13 +97,16 @@ void
 build_known_folder_path(
     const KNOWNFOLDERID * folder_id,
     char * path,
-    size_t path_size)
+    size_t path_size,
+    boolean versioned)
 {
     get_known_folder_path(folder_id, path, path_size);
     strcat(path, "\\NetHack\\");
     create_directory(path);
-    strcat(path, "3.6\\");
-    create_directory(path);
+    if (versioned) {
+        strcat(path, "3.6\\");
+        create_directory(path);
+    }
 }
 
 void
@@ -190,51 +193,37 @@ set_default_prefix_locations(const char *programPath)
     char *envp = NULL;
     char *sptr = NULL;
 
-    static char hack_path[MAX_PATH];
     static char executable_path[MAX_PATH];
-    static char nethack_profile_path[MAX_PATH];
-    static char nethack_per_user_data_path[MAX_PATH];
-    static char nethack_global_data_path[MAX_PATH];
-    static char sysconf_path[MAX_PATH];
+    static char profile_path[MAX_PATH];
+    static char versioned_profile_path[MAX_PATH];
+    static char versioned_user_data_path[MAX_PATH];
+    static char versioned_global_data_path[MAX_PATH];
 
     strcpy(executable_path, get_executable_path());
     append_slash(executable_path);
 
-    build_environment_path("NETHACKDIR", NULL, hack_path, sizeof(hack_path));
+    build_known_folder_path(&FOLDERID_Profile, profile_path,
+        sizeof(profile_path), FALSE);
 
-    if (hack_path[0] == '\0')
-        build_environment_path("HACKDIR", NULL, hack_path, sizeof(hack_path));
-
-    build_known_folder_path(&FOLDERID_Profile, nethack_profile_path,
-        sizeof(nethack_profile_path));
+    build_known_folder_path(&FOLDERID_Profile, versioned_profile_path,
+        sizeof(profile_path), TRUE);
 
     build_known_folder_path(&FOLDERID_LocalAppData,
-        nethack_per_user_data_path, sizeof(nethack_per_user_data_path));
+        versioned_user_data_path, sizeof(versioned_user_data_path), TRUE);
 
     build_known_folder_path(&FOLDERID_ProgramData,
-        nethack_global_data_path, sizeof(nethack_global_data_path));
+        versioned_global_data_path, sizeof(versioned_global_data_path), TRUE);
 
-    if (hack_path[0] == '\0')
-        strcpy(hack_path, nethack_profile_path);
-
-    fqn_prefix[LEVELPREFIX] = nethack_per_user_data_path;
-    fqn_prefix[SAVEPREFIX] = nethack_per_user_data_path;
-    fqn_prefix[BONESPREFIX] = nethack_global_data_path;
+    fqn_prefix[LEVELPREFIX] = versioned_user_data_path;
+    fqn_prefix[SAVEPREFIX] = versioned_user_data_path;
+    fqn_prefix[BONESPREFIX] = versioned_global_data_path;
     fqn_prefix[DATAPREFIX] = executable_path;
-    fqn_prefix[SCOREPREFIX] = nethack_global_data_path;
-    fqn_prefix[LOCKPREFIX] = nethack_global_data_path;
-    fqn_prefix[CONFIGPREFIX] = nethack_profile_path;
-
-    fqn_prefix[HACKPREFIX] = hack_path;
-    fqn_prefix[TROUBLEPREFIX] = hack_path;
-
-    build_environment_path("COMMONPROGRAMFILES", "NetHack\\3.6", sysconf_path,
-        sizeof(sysconf_path));
-
-    if(!folder_file_exists(sysconf_path, SYSCF_FILE))
-        strcpy(sysconf_path, hack_path);
-
-    fqn_prefix[SYSCONFPREFIX] = sysconf_path;
+    fqn_prefix[SCOREPREFIX] = versioned_global_data_path;
+    fqn_prefix[LOCKPREFIX] = versioned_global_data_path;
+    fqn_prefix[CONFIGPREFIX] = profile_path;
+    fqn_prefix[HACKPREFIX] = versioned_profile_path;
+    fqn_prefix[TROUBLEPREFIX] = versioned_profile_path;
+    fqn_prefix[SYSCONFPREFIX] = versioned_global_data_path;
 
 }
 
@@ -300,43 +289,51 @@ update_file(
 
 }
 
-void copy_config_content()
+void copy_sysconf_content()
 {
-    /* Keep templates up to date */
-    /* TODO: Update the package to store config file as .nethackrc */
-    update_file(fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
-        fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
+    /* Using the SYSCONFPREFIX path, lock it so that it does not change */
+    fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
+
     update_file(fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
         fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
+
+    /* If the required early game file does not exist, copy it */
+    copy_file(fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
+        fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
+}
+
+void copy_config_content()
+{
+    /* Using the CONFIGPREFIX path, lock it so that it does not change */
+    fqn_prefix_locked[CONFIGPREFIX] = TRUE;
+
+    /* Keep templates up to date */
+    update_file(fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
+        fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
+
+    update_file(fqn_prefix[CONFIGPREFIX], SYMBOLS_TEMPLATE,
+        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
 
     /* If the required early game file does not exist, copy it */
     /* NOTE: We never replace .nethackrc or sysconf */
     copy_file(fqn_prefix[CONFIGPREFIX], CONFIG_FILE,
         fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE);
-    copy_file(fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
-        fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
 
-    /* Update symbols and save a copy if we are replacing */
-    /* TODO: Can't HACKDIR be changed during option parsing
-       causing us to perhaps be checking options against the wrong
-       symbols file? */
-    update_file(fqn_prefix[HACKPREFIX], SYMBOLS,
+    update_file(fqn_prefix[CONFIGPREFIX], SYMBOLS,
         fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
+
 }
 
 void
 copy_hack_content()
 {
+    nhassert(fqn_prefix_locked[HACKPREFIX]);
+
     /* Keep Guidebook and opthelp up to date */
     update_file(fqn_prefix[HACKPREFIX], GUIDEBOOK_FILE,
         fqn_prefix[DATAPREFIX], GUIDEBOOK_FILE, FALSE);
     update_file(fqn_prefix[HACKPREFIX], OPTIONFILE,
         fqn_prefix[DATAPREFIX], OPTIONFILE, FALSE);
-
-    /* Keep templates up to date */
-    update_file(fqn_prefix[HACKPREFIX], SYMBOLS_TEMPLATE,
-        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
-
 }
 
 /*
@@ -407,21 +404,25 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     chdir(fqn_prefix[HACKPREFIX]);
 #endif
 
-    copy_config_content();
-
     if (GUILaunched || IsDebuggerPresent())
         getreturn_enabled = TRUE;
 
     check_recordfile((char *) 0);
     iflags.windowtype_deferred = TRUE;
+    copy_sysconf_content();
     initoptions();                  
+    copy_config_content();
+    process_options(argc, argv);
+
+    /* Finished processing options, lock all directory paths */
+    for(int i = 0; i < PREFIX_COUNT; i++)
+        fqn_prefix_locked[i] = TRUE;
+
     if (!validate_prefix_locations(failbuf)) {
         raw_printf("Some invalid directory locations were specified:\n\t%s\n",
                    failbuf);
         nethack_exit(EXIT_FAILURE);
     }
-
-    process_options(argc, argv);
 
     copy_hack_content();
 
