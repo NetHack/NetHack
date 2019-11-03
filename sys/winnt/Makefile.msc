@@ -688,13 +688,13 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	copy $(DAT)\*.lev         $(GAMEDIR)
 	if exist $(GAMEDIR)\makefile del $(GAMEDIR)\makefile
 ! ENDIF
-	if exist $(MSWSYS)\sysconf copy $(MSWSYS)\sysconf $(GAMEDIR)\sysconf.template
+	if exist $(MSWSYS)\sysconf.template copy $(MSWSYS)\sysconf.template $(GAMEDIR)
 	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)\symbols.template
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
 	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
 	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
-	if exist $(MSWSYS)\defaults.nh copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\.nethackrc.template
+	if exist $(MSWSYS)\.nethackrc.template copy $(MSWSYS)\.nethackrc.template $(GAMEDIR)
 	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
 	echo install done > $@
 

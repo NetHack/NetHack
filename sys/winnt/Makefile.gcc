@@ -764,11 +764,11 @@ else
 	$(subst /,\,copy $(DAT)/*.lev         $(GAMEDIR))
 	$(subst /,\,if exist $(GAMEDIR)/makefile del $(GAMEDIR)/makefile)
 endif
-	$(subst /,\,if exist $(MSWSYS)/sysconf copy $(MSWSYS)/sysconf $(GAMEDIR)/sysconf.template)
+	$(subst /,\,if exist $(MSWSYS)/sysconf.template copy $(MSWSYS)/sysconf.template $(GAMEDIR))
 	$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR)/symbols.template)
 	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
 	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
-	$(subst /,\,if exist $(MSWSYS)/defaults.nh copy $(MSWSYS)/defaults.nh   $(GAMEDIR)/.nethackrc.template)
+	$(subst /,\,if exist $(MSWSYS)/.nethackrc.template copy $(MSWSYS)/.nethackrc.template $(GAMEDIR))
 	$(subst /,\,-if not exist $(GAMEDIR)/record. echo.>$(GAMEDIR)/record.)
 #
 #
