@@ -410,7 +410,12 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     check_recordfile((char *) 0);
     iflags.windowtype_deferred = TRUE;
     copy_sysconf_content();
-    initoptions();                  
+    initoptions();
+
+    /* Now that sysconf has had a chance to set the TROUBLEPREFIX, don't
+       allow it to be changed from here on out. */
+    fqn_prefix_locked[TROUBLEPREFIX] = TRUE;
+
     copy_config_content();
     process_options(argc, argv);
 
