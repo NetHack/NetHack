@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1570235292 2019/10/05 00:28:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1572887644 2019/11/04 17:14:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1268,6 +1268,15 @@ const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
                 pline("%s %s.", objphrase, glowcolor);
             iflags.last_msg = PLNMSG_OBJ_GLOWS;
             targobj->bknown = !Hallucination;
+        } else {
+            /* didn't see what happened:  forget the BUC state if that was
+               known unless the bless/curse state of the water is known;
+               without this, hero would know the new state even without
+               seeing the glow; priest[ess] will immediately relearn it */
+            if (!potion->bknown || !potion->dknown)
+                targobj->bknown = 0;
+            /* [should the bknown+dknown exception require that water
+               be discovered or at least named?] */
         }
         /* potions of water are the only shop goods whose price depends
            on their curse/bless state */
