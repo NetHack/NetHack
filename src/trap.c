@@ -2637,7 +2637,8 @@ register struct monst *mtmp;
                       a_your[trap->madeby_u]);
             }
             if (!in_sight && !Deaf)
-                pline("Kaablamm!  You hear an explosion in the distance!");
+                pline("Kaablamm!  %s an explosion in the distance!",
+                      "You hear");  /* Deaf-aware */
             blow_up_landmine(trap);
             /* explosion might have destroyed a drawbridge; don't
                dish out more damage if monster is already dead */

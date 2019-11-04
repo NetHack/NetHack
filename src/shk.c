@@ -2990,7 +2990,7 @@ boolean peaceful, silent;
                 Norep("%s booms: \"%s, you are a thief!\"",
                       Shknam(shkp), plname);
             } else if (!Deaf) {
-                Norep("You hear a scream, \"Thief!\"");
+                Norep("You hear a scream, \"Thief!\"");  /* Deaf-aware */
             }
         }
         hot_pursuit(shkp);

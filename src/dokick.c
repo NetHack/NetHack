@@ -1205,7 +1205,7 @@ dokick()
                       !Blind
                           ? "Muddy waste pops up from the drain"
                           : !Deaf
-                              ? "You hear a sloshing sound"
+                              ? "You hear a sloshing sound"  /* Deaf-aware */
                               : "Something splashes you in the", buf);
                 if (!(maploc->looted & S_LRING)) { /* once per sink */
                     if (!Blind)

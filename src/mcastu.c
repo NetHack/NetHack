@@ -72,7 +72,7 @@ boolean undirected;
         pline("%s points %s.", Monnam(mtmp), point_msg);
     } else if ((!(moves % 4) || !rn2(4))) {
         if (!Deaf)
-            Norep("You hear a mumbled curse.");
+            Norep("You hear a mumbled curse.");   /* Deaf-aware */
     }
 }
 
