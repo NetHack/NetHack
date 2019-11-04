@@ -2989,8 +2989,9 @@ boolean peaceful, silent;
             if (canseemon(shkp)) {
                 Norep("%s booms: \"%s, you are a thief!\"",
                       Shknam(shkp), plname);
-            } else
+            } else if (!Deaf) {
                 Norep("You hear a scream, \"Thief!\"");
+            }
         }
         hot_pursuit(shkp);
         (void) angry_guards(FALSE);
