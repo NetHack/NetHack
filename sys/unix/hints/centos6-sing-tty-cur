@@ -1,0 +1,56 @@
+#
+# NetHack 3.6 centos6-sing-tty-cur $NHDT-Date: 1572857839 2019/11/04 08:57:19 $  $NHDT-Branch: LOH-centos6 $:$NHDT-Revision: 1.0 $
+# NetHack may be freely redistributed.  See license for details. 
+#
+#-PRE
+# Linux hints file
+# CentOS 6 build for tty + curses, single-user
+
+# install under $HOME (~)
+#   ~/lib/nethackdir
+#   ~/bin/nethack
+#
+PREFIX   = $(wildcard ~)
+HACKDIR  = $(PREFIX)/lib/$(GAME)dir
+SHELLDIR = $(PREFIX)/bin
+INSTDIR  = $(HACKDIR)
+VARDIR   = $(HACKDIR)
+
+POSTINSTALL = \
+    cp -n sys/unix/sysconf $(INSTDIR)/sysconf; \
+    $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; \
+    $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; \
+    chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+
+CC     = gcc -std=gnu99
+CFLAGS = -g -O2 -I../include
+
+LINK = $(CC)
+LFLAGS = -lncurses
+
+# extras - TTY_GRAPHICS defined by default
+CFLAGS += -DHACKDIR=\"$(HACKDIR)\"
+CFLAGS += -DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+CFLAGS += -DTIMED_DELAY
+CFLAGS += -DCURSES_GRAPHICS
+CFLAGS += -DDEFAULT_WINDOW_SYS=\"curses\"
+CFLAGS += -DSCORE_ON_BOTL
+CFLAGS += -DCOMPRESS=\"/usr/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+CFLAGS += -DDLB
+
+WINSRC = $(WINTTYSRC) $(WINCURSESSRC)
+WINOBJ = $(WINTTYOBJ) $(WINCURSESOBJ)
+WINLIB = $(WINTTYLIB) $(WINCURSESLIB)
+
+WINTTYLIB    = -lncurses
+WINCURSESLIB = -lncurses
+
+# 'true' (nop for personal install)
+CHOWN = true
+CHGRP = true
+
+VARDIRPERM  = 0755
+VARFILEPERM = 0600
+GAMEPERM    = 0755
+
+# end centos6-tty
