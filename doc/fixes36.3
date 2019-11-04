@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.155 $ $NHDT-Date: 1572833562 2019/11/04 02:12:42 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.157 $ $NHDT-Date: 1572887643 2019/11/04 17:14:03 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -214,6 +214,9 @@ fix a leashed pet polymorphed into a long worm staying leashed
 prevent leashing unsolid monsters and monsters with no extremities
 playing musical instruments gave feedback which ignored deafness
 some other deafness-related message corrections
+when dipping into holy/unholy water while blind (where the glow message is
+	suppressed), clear dipped item's bknown flag unless water potion's
+	bless/curse state is known
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
