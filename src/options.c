@@ -3354,7 +3354,8 @@ boolean tinitial, tfrom_file;
     /* WINCAP
      *
      *  map_mode:[tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|ascii7x12
-     *            |ascii8x12|ascii16x12|ascii12x16|ascii10x18|fit_to_screen]
+     *            |ascii8x12|ascii16x12|ascii12x16|ascii10x18|fit_to_screen
+     *            |ascii_fit_to_screen|tiles_fit_to_screen]
      */
     fullname = "map_mode";
     if (match_optname(opts, fullname, sizeof "map_mode" - 1, TRUE)) {
@@ -3362,7 +3363,7 @@ boolean tinitial, tfrom_file;
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
         if (op && !negated) {
-            if (!strncmpi(op, "tiles", sizeof "tiles" - 1))
+            if (!strcmpi(op, "tiles"))
                 iflags.wc_map_mode = MAP_MODE_TILES;
             else if (!strncmpi(op, "ascii4x6", sizeof "ascii4x6" - 1))
                 iflags.wc_map_mode = MAP_MODE_ASCII4x6;
@@ -3385,6 +3386,12 @@ boolean tinitial, tfrom_file;
             else if (!strncmpi(op, "fit_to_screen",
                                sizeof "fit_to_screen" - 1))
                 iflags.wc_map_mode = MAP_MODE_ASCII_FIT_TO_SCREEN;
+            else if (!strncmpi(op, "ascii_fit_to_screen",
+                               sizeof "ascii_fit_to_screen" - 1))
+                iflags.wc_map_mode = MAP_MODE_ASCII_FIT_TO_SCREEN;
+            else if (!strncmpi(op, "tiles_fit_to_screen",
+                               sizeof "tiles_fit_to_screen" - 1))
+                iflags.wc_map_mode = MAP_MODE_TILES_FIT_TO_SCREEN;
             else {
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;

@@ -1192,9 +1192,16 @@ dokick()
                 exercise(A_DEX, TRUE);
                 return 1;
             } else if (!rn2(3)) {
-                pline("Flupp!  %s.",
-                      (Blind ? "You hear a sloshing sound"
-                             : "Muddy waste pops up from the drain"));
+                if (Blind && Deaf)
+                    Sprintf(buf, " %s", body_part(FACE));
+                else
+                    buf[0] = '\0';
+                pline("%s%s%s.", !Deaf ? "Flupp! " : "",
+                      !Blind
+                          ? "Muddy waste pops up from the drain"
+                          : !Deaf
+                              ? "You hear a sloshing sound"
+                              : "Something splashes you in the", buf);
                 if (!(g.maploc->looted & S_LRING)) { /* once per sink */
                     if (!Blind)
                         You_see("a ring shining in its midst.");

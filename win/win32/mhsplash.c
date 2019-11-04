@@ -259,6 +259,7 @@ NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_COMMAND:
         switch (LOWORD(wParam)) {
+        case IDCANCEL:
         case IDOK:
             mswin_window_mark_dead(mswin_winid_from_handle(hWnd));
             if (GetNHApp()->hMainWnd == hWnd)
