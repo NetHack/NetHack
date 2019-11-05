@@ -149,44 +149,6 @@ folder_file_exists(const char * folder, const char * file_name)
     return file_exists(path);
 }
 
-/*
- * Rules for setting prefix locations
- *
- * COMMON_NETHACK_PATH = %COMMONPROGRAMFILES%\NetHack\3.6\
- * PROFILE_PATH = %SystemDrive%\Users\%USERNAME%\
- *
- * NETHACK_PROFILE_PATH = PROFILE_PATH\NetHack\3.6\
- * NETHACK_PER_USER_DATA_PATH = PROFILE_PATH\AppData\Local\NetHack\3.6\
- * NETHACK_GLOBAL_DATA_PATH = %SystemDrive%\ProgramData\NetHack\3.6\
- * EXECUTABLE_PATH = path to where .exe lives
- *
- * HACKPREFIX:
- *   - use environment variable NETHACKDIR if variable is defined
- *   - otherwise use environment variable HACKDIR if variable is defined
- *   - otherwise if store install use NETHACK_PROFILE_PATH
- *   - otherwise if manual install use EXECUTABLE_PATH
- *
- * LEVELPREFIX, SAVEPREFIX:
- *   - if store install use NETHACK_PER_USER_DATA_PATH
- *   - if manual install use HACKPREFIX
- *
- * BONESPREFIX, SCOREPREFIX, LOCKPREFIX:
- *   - if store install use NETHACK_GLOBAL_DATA_PATH
- *   - if manual install use HACKPREFIX
- *
- * DATAPREFIX
- *   - if store install use EXECUTABLE_PATH
- *   - if manual install use HACKPREFIX
- *
- * SYSCONFPREFIX
- *   - use COMMON_NETHACK_PATH if sysconf present
- *   - otherwise use HACKPREFIX
- *
- * CONFIGPREFIX
- *    - if manual install use PROFILE_PATH
- *    - if store install use NETHACK_PROFILE_PATH
- */
-
 void
 set_default_prefix_locations(const char *programPath)
 {
@@ -214,16 +176,16 @@ set_default_prefix_locations(const char *programPath)
     build_known_folder_path(&FOLDERID_ProgramData,
         versioned_global_data_path, sizeof(versioned_global_data_path), TRUE);
 
-    fqn_prefix[LEVELPREFIX] = versioned_user_data_path;
-    fqn_prefix[SAVEPREFIX] = versioned_user_data_path;
-    fqn_prefix[BONESPREFIX] = versioned_global_data_path;
-    fqn_prefix[DATAPREFIX] = executable_path;
-    fqn_prefix[SCOREPREFIX] = versioned_global_data_path;
-    fqn_prefix[LOCKPREFIX] = versioned_global_data_path;
+    fqn_prefix[SYSCONFPREFIX] = versioned_global_data_path;
     fqn_prefix[CONFIGPREFIX] = profile_path;
     fqn_prefix[HACKPREFIX] = versioned_profile_path;
+    fqn_prefix[SAVEPREFIX] = versioned_user_data_path;
+    fqn_prefix[LEVELPREFIX] = versioned_user_data_path;
+    fqn_prefix[BONESPREFIX] = versioned_global_data_path;
+    fqn_prefix[SCOREPREFIX] = versioned_global_data_path;
+    fqn_prefix[LOCKPREFIX] = versioned_global_data_path;
     fqn_prefix[TROUBLEPREFIX] = versioned_profile_path;
-    fqn_prefix[SYSCONFPREFIX] = versioned_global_data_path;
+    fqn_prefix[DATAPREFIX] = executable_path;
 
 }
 
@@ -297,9 +259,15 @@ void copy_sysconf_content()
     update_file(fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
         fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
 
+    update_file(fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
+        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
+
     /* If the required early game file does not exist, copy it */
     copy_file(fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
         fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
+
+    update_file(fqn_prefix[SYSCONFPREFIX], SYMBOLS,
+        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
 }
 
 void copy_config_content()
@@ -311,17 +279,10 @@ void copy_config_content()
     update_file(fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
         fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
 
-    update_file(fqn_prefix[CONFIGPREFIX], SYMBOLS_TEMPLATE,
-        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
-
     /* If the required early game file does not exist, copy it */
     /* NOTE: We never replace .nethackrc or sysconf */
     copy_file(fqn_prefix[CONFIGPREFIX], CONFIG_FILE,
         fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE);
-
-    update_file(fqn_prefix[CONFIGPREFIX], SYMBOLS,
-        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
-
 }
 
 void
