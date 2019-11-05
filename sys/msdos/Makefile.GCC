@@ -332,13 +332,17 @@ PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)/curspriv.h
 PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
 PDCSRC                  = $(PDCURSES_TOP)/pdcurses
 PDCDOS               = $(PDCURSES_TOP)/dos
-PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o             \
+PDCLIBOBJS1 = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o            \
 	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
-	$(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o                  \
-	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o   \
-	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o     \
-	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
-	$(O)slk.o $(O)termattr.o $(O)touch.o $(O)util.o $(O)window.o $(O)debug.o
+	$(O)getch.o
+PDCLIBOBJS2 = $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o $(O)initscr.o \
+	$(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o        \
+	$(O)keyname.o $(O)mouse.o
+PDCLIBOBJS3 = $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o $(O)panel.o \
+	$(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
+	$(O)slk.o $(O)termattr.o
+PDCLIBOBJS4 = $(O)touch.o $(O)util.o $(O)window.o $(O)debug.o
+PDCLIBOBJS = $(PDCLIBOBJS1) $(PDCLIBOBJS2) $(PDCLIBOBJS3) $(PDCLIBOBJS4)
 
 PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o \
 	$(O)pdcscrn.o $(O)pdcsetsc.o $(O)pdcutil.o
@@ -944,7 +948,11 @@ endif
 #==========================================
 
 $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
-	ar rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
+	ar rcS $@ $(PDCLIBOBJS1)
+	ar rcS $@ $(PDCLIBOBJS2)
+	ar rcS $@ $(PDCLIBOBJS3)
+	ar rcS $@ $(PDCLIBOBJS4)
+	ar rcs $@ $(PDCOBJS)
 
 #==========================================
 #  Other Util Dependencies.

@@ -1,4 +1,4 @@
-# NetHack 3.6  symbols       $NHDT-Date: 1571314611 2019/10/17 12:16:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.20 $
+# NetHack 3.6  symbols       $NHDT-Date: 1572892906 2019/11/04 18:41:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.21 $
 # Copyright (c) 2006 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -340,7 +340,7 @@ start: IBMgraphics
 	S_pool: \xf7			# meta-w, approx. equals
 	S_ice: \xfa			# meta-z, centered dot
 	S_lava: \xf7			# meta-w, approx. equals
-	S_vodbridge: \xfa 		# meta-z, centered dot
+	S_vodbridge: \xfa		# meta-z, centered dot
 	S_hodbridge: \xfa		# meta-z, centered dot
 	S_water: \xf7			# meta-w, approx. equals
 	S_vbeam: \xb3			# meta-3, vertical rule
@@ -548,7 +548,8 @@ start: curses
 	S_tlwall: \xf5			# meta-u, T left
 	S_trwall: \xf4			# meta-t, T right
 	S_ndoor: \xfe			# meta-z, centered dot
-	S_tree: \xf1			# plus or minus symbol
+	S_bars: \xfc			# meta-|, not-equals sign (was '#')
+	S_tree: \xe7			# meta-g, plus or minus sign
 	S_room: \xfe			# meta-z, centered dot
 	S_corr: \xe1			# meta-a, solid block
 	S_litcorr: \xe1			# meta-a, solid block
@@ -581,11 +582,12 @@ start: DECgraphics
 	S_ndoor: \xfe			# meta-~, centered dot
 	S_vodoor: \xe1			# meta-a, solid block
 	S_hodoor: \xe1			# meta-a, solid block
-	S_bars: \xfb			# meta-{, small pi
+	S_bars: \xfc			# meta-|, not-equals (used to be pi)
 	S_tree: \xe7			# meta-g, plus-or-minus
 	S_room: \xfe			# meta-~, centered dot
 	S_upladder: \xf9		# meta-y, less-than-or-equals
 	S_dnladder: \xfa		# meta-z, greater-than-or-equals
+	S_altar: \xfb			# meta-{, pi (used to default to '_')
 	S_pool: \xe0			# meta-\, diamond
 	S_ice: \xfe			# meta-~, centered dot
 	S_lava: \xe0			# meta-\, diamond
@@ -603,27 +605,6 @@ start: DECgraphics
 	S_explode6: \xf8		# meta-x, vertical rule
 	S_explode8: \xf3		# meta-s, low horizontal line
 finish
-
-#
-# This is commented out because specifying alternate default set isn't
-# implemented.
-#
-# DECgraphics_2:  underscore (default for altar) can be hard to see if
-# hero or highlighted pet is on the spot below (south of) it, making
-# it look like part of slightly bigger block cursor.  Bars are usually
-# within walls and we have something else for doorless doorway so '#'
-# for bars shouldn't be mistaken for the corridor symbol even by someone
-# used to DECgraphics, at least not often enough to pose a problem.
-# The pi symbol is small like lowercase but flat-topped like uppercase
-# so could represent a side view of a raised platform or table.
-#
-# start: DECgraphics_2
-# 	Defaults: DECgraphics		# includes 'Handling: DEC'
-# 	Description: variation of DECgraphics (iron bars:#, altar:pi)
-# 	S_bars: '#'			# (switch from pi to plain '#')
-# 	S_altar: \xfb			# meta-{, pi (switch from underscore)
-# finish
-#
 
 start: MACgraphics
 #	Description: (pre-OSX: obsolete?)

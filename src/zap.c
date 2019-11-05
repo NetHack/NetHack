@@ -4434,7 +4434,7 @@ short exploding_wand_typ;
             melt_ice(x, y, (char *) 0);
         } else if (is_pool(x, y)) {
             const char *msgtxt = (!Deaf)
-                                     ? "You hear hissing gas."
+                                     ? "You hear hissing gas." /* Deaf-aware */
                                      : "That seemed remarkably uneventful.";
 
             if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP */

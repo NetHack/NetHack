@@ -171,7 +171,8 @@ struct monst *bugler; /* monster that played instrument */
             if (canseemon(mtmp))
                 pline("%s is now ready for battle!", Monnam(mtmp));
             else if (!Deaf)
-                Norep("You hear the rattle of battle gear being readied.");
+                Norep("%s the rattle of battle gear being readied.",
+                      "You hear");  /* Deaf-aware */
         } else if ((distm = ((bugler == &g.youmonst)
                                  ? distu(mtmp->mx, mtmp->my)
                                  : dist2(bugler->mx, bugler->my, mtmp->mx,
