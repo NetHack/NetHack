@@ -96,39 +96,11 @@ matrix:
       compiler: clang
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
 #
-        - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/ATLMFC/lib/x86
-        - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/lib/x86:$LIB
-        - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/ucrt/x86:$LIB
-        - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
-#       - export
-        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
-        - export ADD_CURSES=Y
-        - export PDCURSES_TOP=../../pdcurses
-        - cd src
-        - cp ../sys/winnt/Makefile.msc ./Makefile
-        - nmake install
-    - os: windows
-#     install: choco install mingw
-      env: HINTS=windows-mingw
-      script:
-        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
-        - export ADD_CURSES=Y
-        - export PDCURSES_TOP=../../pdcurses
-        - cd src
-        - cp ../sys/winnt/Makefile.gcc ./Makefile
-        - mingw32-make install
-  exclude:
-    - os: osx
-      osx_image: xcode10.2
-      env: HINTS=macosx10.14
-      compiler: clang
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
-#
 sudo: false
 notifications:
   email:
     recipients:
-#      - devteam@nethack.org
+      - devteam@nethack.org
 #
 deploy:
   provider: releases
