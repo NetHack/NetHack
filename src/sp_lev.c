@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1553787633 2019/03/28 15:40:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1567805254 2019/09/06 21:27:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.117 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,71 +23,71 @@ typedef void FDECL((*select_iter_func), (int, int, genericptr));
 
 extern void FDECL(mkmap, (lev_init *));
 
-STATIC_DCL void NDECL(create_des_coder);
-STATIC_DCL void NDECL(solidify_map);
-STATIC_DCL void FDECL(lvlfill_maze_grid, (int, int, int, int, SCHAR_P));
-STATIC_DCL void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
-STATIC_DCL void FDECL(set_wall_property, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
+static void NDECL(create_des_coder); 
+static void NDECL(solidify_map);
+static void FDECL(lvlfill_maze_grid, (int, int, int, int, SCHAR_P));
+static void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
+static void FDECL(set_wall_property, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                                           int));
-STATIC_DCL void NDECL(count_features);
-STATIC_DCL void NDECL(remove_boundary_syms);
-STATIC_DCL void FDECL(set_door_orientation, (int, int));
-STATIC_DCL void FDECL(maybe_add_door, (int, int, struct mkroom *));
-STATIC_DCL void NDECL(link_doors_rooms);
-STATIC_DCL void NDECL(fill_rooms);
-STATIC_DCL int NDECL(rnddoor);
-STATIC_DCL int NDECL(rndtrap);
-STATIC_DCL void FDECL(get_location, (schar *, schar *, int, struct mkroom *));
-STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
-STATIC_DCL unpacked_coord FDECL(get_unpacked_coord, (long, int));
-STATIC_DCL void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
-STATIC_DCL void FDECL(get_free_room_loc, (schar *, schar *,
+static void NDECL(count_features);
+static void NDECL(remove_boundary_syms);
+static void FDECL(set_door_orientation, (int, int));
+static void FDECL(maybe_add_door, (int, int, struct mkroom *));
+static void NDECL(link_doors_rooms);
+static void NDECL(fill_rooms);
+static int NDECL(rnddoor);
+static int NDECL(rndtrap);
+static void FDECL(get_location, (schar *, schar *, int, struct mkroom *));
+static boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
+static unpacked_coord FDECL(get_unpacked_coord, (long, int));
+static void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
+static void FDECL(get_free_room_loc, (schar *, schar *,
                                           struct mkroom *, packed_coord));
-STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
+static boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
                                           XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
-STATIC_DCL void FDECL(create_door, (room_door *, struct mkroom *));
-STATIC_DCL void FDECL(create_trap, (spltrap *, struct mkroom *));
-STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
-STATIC_DCL boolean FDECL(m_bad_boulder_spot, (int, int));
-STATIC_DCL int FDECL(pm_to_humidity, (struct permonst *));
-STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
-STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
-STATIC_DCL void FDECL(create_altar, (altar *, struct mkroom *));
-STATIC_DCL void FDECL(replace_terrain, (replaceterrain *, struct mkroom *));
-STATIC_DCL boolean FDECL(search_door, (struct mkroom *,
+static void FDECL(create_door, (room_door *, struct mkroom *));
+static void FDECL(create_trap, (spltrap *, struct mkroom *));
+static int FDECL(noncoalignment, (ALIGNTYP_P));
+static boolean FDECL(m_bad_boulder_spot, (int, int));
+static int FDECL(pm_to_humidity, (struct permonst *));
+static void FDECL(create_monster, (monster *, struct mkroom *));
+static void FDECL(create_object, (object *, struct mkroom *));
+static void FDECL(create_altar, (altar *, struct mkroom *));
+static void FDECL(replace_terrain, (replaceterrain *, struct mkroom *));
+static boolean FDECL(search_door, (struct mkroom *,
                                        xchar *, xchar *, XCHAR_P, int));
-STATIC_DCL void NDECL(fix_stair_rooms);
-STATIC_DCL void FDECL(create_corridor, (corridor *));
-STATIC_DCL struct mkroom *FDECL(build_room, (room *, struct mkroom *));
-STATIC_DCL void FDECL(light_region, (region *));
-STATIC_DCL void FDECL(wallify_map, (int, int, int, int));
-STATIC_DCL void FDECL(maze1xy, (coord *, int));
-STATIC_DCL void NDECL(fill_empty_maze);
-STATIC_DCL void FDECL(splev_initlev, (lev_init *));
-STATIC_DCL long FDECL(sp_code_jmpaddr, (long, long));
-STATIC_DCL void NDECL(spo_end_moninvent);
-STATIC_DCL void NDECL(spo_pop_container);
-STATIC_DCL void FDECL(spo_room, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_endroom, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_trap, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_gold, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_corridor, (struct sp_coder *));
-STATIC_DCL void FDECL(sel_set_ter, (int, int, genericptr_t));
-STATIC_DCL void FDECL(sel_set_feature, (int, int, genericptr_t));
-STATIC_DCL void FDECL(sel_set_door, (int, int, genericptr_t));
-STATIC_DCL void FDECL(spo_feature, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_terrain, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_replace_terrain, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_levregion, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_region, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_drawbridge, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_mazewalk, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_wall_property, (struct sp_coder *));
-STATIC_DCL void FDECL(spo_room_door, (struct sp_coder *));
-STATIC_DCL void FDECL(sel_set_wallify, (int, int, genericptr_t));
-STATIC_DCL void FDECL(spo_wallify, (struct sp_coder *));
-STATIC_DCL int FDECL(get_coord, (lua_State *, int, int *, int *));
-STATIC_DCL int FDECL(get_table_region, (lua_State *, const char *, int *, int *, int *, int *, BOOLEAN_P));
+static void NDECL(fix_stair_rooms);
+static void FDECL(create_corridor, (corridor *));
+static struct mkroom *FDECL(build_room, (room *, struct mkroom *));
+static void FDECL(light_region, (region *));
+static void FDECL(wallify_map, (int, int, int, int));
+static void FDECL(maze1xy, (coord *, int));
+static void NDECL(fill_empty_maze);
+static void FDECL(splev_initlev, (lev_init *));
+static long FDECL(sp_code_jmpaddr, (long, long));
+static void NDECL(spo_end_moninvent);
+static void NDECL(spo_pop_container);
+static void FDECL(spo_room, (struct sp_coder *));
+static void FDECL(spo_endroom, (struct sp_coder *));
+static void FDECL(spo_trap, (struct sp_coder *));
+static void FDECL(spo_gold, (struct sp_coder *));
+static void FDECL(spo_corridor, (struct sp_coder *));
+static void FDECL(sel_set_ter, (int, int, genericptr_t));
+static void FDECL(sel_set_feature, (int, int, genericptr_t));
+static void FDECL(sel_set_door, (int, int, genericptr_t));
+static void FDECL(spo_feature, (struct sp_coder *));
+static void FDECL(spo_terrain, (struct sp_coder *));
+static void FDECL(spo_replace_terrain, (struct sp_coder *));
+static void FDECL(spo_levregion, (struct sp_coder *));
+static void FDECL(spo_region, (struct sp_coder *));
+static void FDECL(spo_drawbridge, (struct sp_coder *));
+static void FDECL(spo_mazewalk, (struct sp_coder *));
+static void FDECL(spo_wall_property, (struct sp_coder *));
+static void FDECL(spo_room_door, (struct sp_coder *));
+static void FDECL(sel_set_wallify, (int, int, genericptr_t));
+static void FDECL(spo_wallify, (struct sp_coder *));
+static int FDECL(get_coord, (lua_State *, int, int *, int *));
+static int FDECL(get_table_region, (lua_State *, const char *, int *, int *, int *, int *, BOOLEAN_P));
 
 /* lua_CFunction prototypes */
 int FDECL(lspo_altar, (lua_State *));
@@ -207,7 +207,7 @@ genericptr_t arg;
 /*
  * Make walls of the area (x1, y1, x2, y2) non diggable/non passwall-able
  */
-STATIC_OVL void
+static void
 set_wall_property(x1, y1, x2, y2, prop)
 xchar x1, y1, x2, y2;
 int prop;
@@ -228,7 +228,7 @@ int prop;
 /*
  * Count the different features (sinks, fountains) in the level.
  */
-STATIC_OVL void
+static void
 count_features()
 {
     xchar x, y;
@@ -270,7 +270,7 @@ remove_boundary_syms()
 }
 
 /* used by sel_set_door() and link_doors_rooms() */
-STATIC_OVL void
+static void
 set_door_orientation(x, y)
 int x, y;
 {
@@ -317,7 +317,7 @@ int x, y;
     levl[x][y].horizontal = ((wleft || wright) && !(wup && wdown)) ? 1 : 0;
 }
 
-STATIC_OVL void
+static void
 maybe_add_door(x, y, droom)
 int x, y;
 struct mkroom *droom;
@@ -326,7 +326,7 @@ struct mkroom *droom;
         add_door(x, y, droom);
 }
 
-STATIC_OVL void
+static void
 link_doors_rooms()
 {
     int x, y;
@@ -366,7 +366,7 @@ fill_rooms()
 /*
  * Choose randomly the state (nodoor, open, closed or locked) for a door
  */
-STATIC_OVL int
+static int
 rnddoor()
 {
     int i = 1 << rn2(5);
@@ -378,7 +378,7 @@ rnddoor()
 /*
  * Select a random trap
  */
-STATIC_OVL int
+static int
 rndtrap()
 {
     int rtrap;
@@ -417,7 +417,7 @@ rndtrap()
  *      The "humidity" flag is used to insure that engravings aren't
  *      created underwater, or eels on dry land.
  */
-STATIC_OVL void
+static void
 get_location(x, y, humidity, croom)
 schar *x, *y;
 int humidity;
@@ -487,7 +487,7 @@ found_it:
     }
 }
 
-STATIC_OVL boolean
+static boolean
 is_ok_location(x, y, humidity)
 register schar x, y;
 register int humidity;
@@ -564,7 +564,7 @@ long crd;
  * negative values for x or y means RANDOM!
  */
 
-STATIC_OVL void
+static void
 get_room_loc(x, y, croom)
 schar *x, *y;
 struct mkroom *croom;
@@ -591,7 +591,7 @@ struct mkroom *croom;
  * Get a relative position inside a room.
  * negative values for x or y means RANDOM!
  */
-STATIC_OVL void
+static void
 get_free_room_loc(x, y, croom, pos)
 schar *x, *y;
 struct mkroom *croom;
@@ -848,7 +848,7 @@ xchar rtype, rlit;
  * Create a subroom in room proom at pos x,y with width w & height h.
  * x & y are relative to the parent room.
  */
-STATIC_OVL boolean
+static boolean
 create_subroom(proom, x, y, w, h, rtype, rlit)
 struct mkroom *proom;
 xchar x, y;
@@ -895,7 +895,7 @@ xchar rtype, rlit;
  * Create a new door in a room.
  * It's placed on a wall (north, south, east or west).
  */
-STATIC_OVL void
+static void
 create_door(dd, broom)
 room_door *dd;
 struct mkroom *broom;
@@ -1049,7 +1049,7 @@ xchar walls; /* any of W_NORTH | W_SOUTH | W_EAST | W_WEST (or W_ANY) */
 /*
  * Create a trap in a room.
  */
-STATIC_OVL void
+static void
 create_trap(t, croom)
 spltrap *t;
 struct mkroom *croom;
@@ -1078,7 +1078,7 @@ struct mkroom *croom;
 /*
  * Create a monster in a room.
  */
-STATIC_OVL int
+static int
 noncoalignment(alignment)
 aligntyp alignment;
 {
@@ -1091,7 +1091,7 @@ aligntyp alignment;
 }
 
 /* attempt to screen out locations where a mimic-as-boulder shouldn't occur */
-STATIC_OVL boolean
+static boolean
 m_bad_boulder_spot(x, y)
 int x, y;
 {
@@ -1112,7 +1112,7 @@ int x, y;
     return FALSE;
 }
 
-STATIC_OVL int
+static int
 pm_to_humidity(pm)
 struct permonst *pm;
 {
@@ -1130,7 +1130,7 @@ struct permonst *pm;
     return loc;
 }
 
-STATIC_OVL void
+static void
 create_monster(m, croom)
 monster *m;
 struct mkroom *croom;
@@ -1389,7 +1389,7 @@ struct mkroom *croom;
 /*
  * Create an object in a room.
  */
-STATIC_OVL void
+static void
 create_object(o, croom)
 object *o;
 struct mkroom *croom;
@@ -1486,7 +1486,7 @@ struct mkroom *croom;
         otmp->owt = weight(otmp);
     }
 
-    /* contents */
+    /* contents (of a container or monster's inventory) */
     if (o->containment & SP_OBJ_CONTENT || g.invent_carrying_monster) {
         if (!g.container_idx) {
             if (!g.invent_carrying_monster) {
@@ -1498,27 +1498,10 @@ struct mkroom *croom;
                    outside the des-file.  Maybe another data file that
                    determines what inventories monsters get by default?
                  */
+                ; /* ['otmp' remains on floor] */
             } else {
-                int ci;
-                struct obj *objcheck = otmp;
-                int inuse = -1;
-
-                for (ci = 0; ci < g.container_idx; ci++)
-                    if (g.container_obj[ci] == objcheck)
-                        inuse = ci;
                 remove_object(otmp);
-                if (mpickobj(g.invent_carrying_monster, otmp)) {
-                    if (inuse > -1) {
-                        impossible(
-                     "container given to monster was merged or deallocated.");
-                        for (ci = inuse; ci < g.container_idx - 1; ci++)
-                            g.container_obj[ci] = g.container_obj[ci + 1];
-                        g.container_obj[g.container_idx] = NULL;
-                        g.container_idx--;
-                    }
-                    /* we lost track of it. */
-                    return;
-                }
+                (void) mpickobj(g.invent_carrying_monster, otmp);
             }
         } else {
             struct obj *cobj = g.container_obj[g.container_idx - 1];
@@ -1635,7 +1618,7 @@ struct mkroom *croom;
 /*
  * Create an altar in a room.
  */
-STATIC_OVL void
+static void
 create_altar(a, croom)
 altar *a;
 struct mkroom *croom;
@@ -1721,7 +1704,7 @@ struct mkroom *croom;
 /*
  * Search for a door in a room on a specified wall.
  */
-STATIC_OVL boolean
+static boolean
 search_door(croom, x, y, wall, cnt)
 struct mkroom *croom;
 xchar *x, *y;
@@ -1893,7 +1876,7 @@ schar ftyp, btyp;
  * and g.dnstairs_room after the rooms have been sorted.  On normal levels,
  * stairs don't get created until _after_ sorting takes place.
  */
-STATIC_OVL void
+static void
 fix_stair_rooms()
 {
     int i;
@@ -1936,7 +1919,7 @@ fix_stair_rooms()
  * Basically we search for door coordinates or for endpoints coordinates
  * (from a distance).
  */
-STATIC_OVL void
+static void
 create_corridor(c)
 corridor *c;
 {
@@ -2089,7 +2072,7 @@ struct mkroom *mkr;
 /*
  * set lighting in a region that will not become a room.
  */
-STATIC_OVL void
+static void
 light_region(tmpregion)
 region *tmpregion;
 {
@@ -2117,7 +2100,7 @@ region *tmpregion;
     }
 }
 
-STATIC_OVL void
+static void
 wallify_map(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
@@ -2153,7 +2136,7 @@ int x1, y1, x2, y2;
  * We want a place not 'touched' by the loader.  That is, a place in
  * the maze outside every part of the special level.
  */
-STATIC_OVL void
+static void
 maze1xy(m, humidity)
 coord *m;
 int humidity;
@@ -2181,7 +2164,7 @@ int humidity;
  * Makes the number of traps, monsters, etc. proportional
  * to the size of the maze.
  */
-STATIC_OVL void
+static void
 fill_empty_maze()
 {
     int mapcountmax, mapcount, mapfact;
@@ -2232,7 +2215,7 @@ fill_empty_maze()
     }
 }
 
-STATIC_OVL void
+static void
 splev_initlev(linit)
 lev_init *linit;
 {
@@ -3744,8 +3727,8 @@ int dir;
     selection_free(tmp);
 }
 
-STATIC_VAR int FDECL((*selection_flood_check_func), (int, int));
-STATIC_VAR schar floodfillchk_match_under_typ;
+static int FDECL((*selection_flood_check_func), (int, int));
+static schar floodfillchk_match_under_typ;
 
 void
 set_selection_floodfillchk(f)
@@ -3754,7 +3737,7 @@ int FDECL((*f), (int, int));
     selection_flood_check_func = f;
 }
 
-STATIC_OVL int
+static int
 floodfillchk_match_under(x,y)
 int x,y;
 {
@@ -3769,7 +3752,7 @@ xchar typ;
     set_selection_floodfillchk(floodfillchk_match_under);
 }
 
-STATIC_OVL int
+static int
 floodfillchk_match_accessible(x, y)
 int x, y;
 {
@@ -3779,7 +3762,7 @@ int x, y;
 }
 
 /* check whethere <x,y> is already in xs[],ys[] */
-STATIC_OVL boolean
+static boolean
 sel_flood_havepoint(x, y, xs, ys, n)
 int x, y;
 xchar xs[], ys[];
@@ -4423,7 +4406,7 @@ lua_State *L;
     return 0;
 }
 
-STATIC_OVL boolean
+static boolean
 generate_way_out_method(nx,ny, ov)
 int nx,ny;
 struct selectionvar *ov;
@@ -4496,7 +4479,7 @@ struct selectionvar *ov;
     return res;
 }
 
-STATIC_OVL void
+static void
 ensure_way_out()
 {
     struct selectionvar *ov = selection_new();

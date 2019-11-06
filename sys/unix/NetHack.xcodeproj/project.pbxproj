@@ -1158,6 +1158,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 3189576821A1FCC100FB2ABE;
 			productRefGroup = 3189577221A1FCC100FB2ABE /* Products */;

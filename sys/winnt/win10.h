@@ -7,18 +7,6 @@
 
 #include "win32api.h"
 
-typedef DPI_AWARENESS_CONTEXT(WINAPI *GetThreadDpiAwarenessContextProc)(VOID);
-typedef BOOL(WINAPI *AreDpiAwarenessContextsEqualProc)(
-    DPI_AWARENESS_CONTEXT dpiContextA, DPI_AWARENESS_CONTEXT dpiContextB);
-typedef UINT(WINAPI *GetDpiForWindowProc)(HWND hwnd);
-
-typedef struct {
-    BOOL Valid;
-    GetThreadDpiAwarenessContextProc GetThreadDpiAwarenessContext;
-    AreDpiAwarenessContextsEqualProc AreDpiAwarenessContextsEqual;
-    GetDpiForWindowProc GetDpiForWindow;
-} Win10;
-
 typedef struct {
     double  scale;  // dpi of monitor / 96
     int     width;  // in pixels
@@ -27,13 +15,10 @@ typedef struct {
     int     left; // in desktop coordinate pixel space
 } MonitorInfo;
 
-extern Win10 gWin10;
-
 void win10_init();
 int win10_monitor_dpi(HWND hWnd);
 double win10_monitor_scale(HWND hWnd);
-void win10_monitor_size(HWND hWnd, int * width, int * height);
 void win10_monitor_info(HWND hWnd, MonitorInfo * monitorInfo);
-
+BOOL win10_is_desktop_bridge_application(void);
 
 #endif // WIN10_H

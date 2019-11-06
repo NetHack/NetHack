@@ -6,12 +6,12 @@
 #include "hack.h"
 
 /* occupation callbacks */
-STATIC_PTR int NDECL(picklock);
-STATIC_PTR int NDECL(forcelock);
+static int NDECL(picklock);
+static int NDECL(forcelock);
 
-STATIC_DCL const char *NDECL(lock_action);
-STATIC_DCL boolean FDECL(obstructed, (int, int, BOOLEAN_P));
-STATIC_DCL void FDECL(chest_shatter_msg, (struct obj *));
+static const char *NDECL(lock_action);
+static boolean FDECL(obstructed, (int, int, BOOLEAN_P));
+static void FDECL(chest_shatter_msg, (struct obj *));
 
 boolean
 picking_lock(x, y)
@@ -35,7 +35,7 @@ int x, y;
 }
 
 /* produce an occupation string appropriate for the current activity */
-STATIC_OVL const char *
+static const char *
 lock_action()
 {
     /* "unlocking"+2 == "locking" */
@@ -65,7 +65,7 @@ lock_action()
 }
 
 /* try to open/close a lock */
-STATIC_PTR int
+static int
 picklock(VOID_ARGS)
 {
     if (g.xlock.box) {
@@ -211,7 +211,7 @@ boolean destroyit;
 }
 
 /* try to force a locked chest */
-STATIC_PTR int
+static int
 forcelock(VOID_ARGS)
 {
     if ((g.xlock.box->ox != u.ux) || (g.xlock.box->oy != u.uy))
@@ -729,7 +729,7 @@ int x, y;
     return 1;
 }
 
-STATIC_OVL boolean
+static boolean
 obstructed(x, y, quietly)
 register int x, y;
 boolean quietly;
@@ -1061,7 +1061,7 @@ int x, y;
     return res;
 }
 
-STATIC_OVL void
+static void
 chest_shatter_msg(otmp)
 struct obj *otmp;
 {

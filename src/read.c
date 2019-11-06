@@ -16,26 +16,26 @@ static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
                                           SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
-STATIC_DCL boolean FDECL(learnscrolltyp, (SHORT_P));
-STATIC_DCL char *FDECL(erode_obj_text, (struct obj *, char *));
-STATIC_DCL char *FDECL(apron_text, (struct obj *, char *buf));
-STATIC_DCL void FDECL(stripspe, (struct obj *));
-STATIC_DCL void FDECL(p_glow1, (struct obj *));
-STATIC_DCL void FDECL(p_glow2, (struct obj *, const char *));
-STATIC_DCL void FDECL(forget_single_object, (int));
+static boolean FDECL(learnscrolltyp, (SHORT_P));
+static char *FDECL(erode_obj_text, (struct obj *, char *));
+static char *FDECL(apron_text, (struct obj *, char *buf));
+static void FDECL(stripspe, (struct obj *));
+static void FDECL(p_glow1, (struct obj *));
+static void FDECL(p_glow2, (struct obj *, const char *));
+static void FDECL(forget_single_object, (int));
 #if 0 /* not used */
-STATIC_DCL void FDECL(forget_objclass, (int));
+static void FDECL(forget_objclass, (int));
 #endif
-STATIC_DCL void FDECL(randomize, (int *, int));
-STATIC_DCL void FDECL(forget, (int));
-STATIC_DCL int FDECL(maybe_tame, (struct monst *, struct obj *));
-STATIC_DCL boolean FDECL(get_valid_stinking_cloud_pos, (int, int));
-STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
-STATIC_PTR void FDECL(display_stinking_cloud_positions, (int));
-STATIC_PTR void FDECL(set_lit, (int, int, genericptr));
-STATIC_DCL void NDECL(do_class_genocide);
+static void FDECL(randomize, (int *, int));
+static void FDECL(forget, (int));
+static int FDECL(maybe_tame, (struct monst *, struct obj *));
+static boolean FDECL(get_valid_stinking_cloud_pos, (int, int));
+static boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
+static void FDECL(display_stinking_cloud_positions, (int));
+static void FDECL(set_lit, (int, int, genericptr));
+static void NDECL(do_class_genocide);
 
-STATIC_OVL boolean
+static boolean
 learnscrolltyp(scrolltyp)
 short scrolltyp;
 {
@@ -58,7 +58,7 @@ struct obj *sobj;
         (void) learnscrolltyp(sobj->otyp);
 }
 
-STATIC_OVL char *
+static char *
 erode_obj_text(otmp, buf)
 struct obj *otmp;
 char *buf;
@@ -160,7 +160,7 @@ char *buf;
     return erode_obj_text(tshirt, buf);
 }
 
-STATIC_OVL char *
+static char *
 apron_text(apron, buf)
 struct obj *apron;
 char *buf;
@@ -406,7 +406,7 @@ doread()
     return 1;
 }
 
-STATIC_OVL void
+static void
 stripspe(obj)
 register struct obj *obj;
 {
@@ -422,14 +422,14 @@ register struct obj *obj;
     }
 }
 
-STATIC_OVL void
+static void
 p_glow1(otmp)
 register struct obj *otmp;
 {
     pline("%s briefly.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
 }
 
-STATIC_OVL void
+static void
 p_glow2(otmp, color)
 register struct obj *otmp;
 register const char *color;
@@ -712,7 +712,7 @@ int curse_bless;
 }
 
 /* Forget known information about this object type. */
-STATIC_OVL void
+static void
 forget_single_object(obj_id)
 int obj_id;
 {
@@ -729,7 +729,7 @@ int obj_id;
 
 #if 0 /* here if anyone wants it.... */
 /* Forget everything known about a particular object class. */
-STATIC_OVL void
+static void
 forget_objclass(oclass)
 int oclass;
 {
@@ -742,7 +742,7 @@ int oclass;
 #endif
 
 /* randomize the given list of numbers  0 <= i < count */
-STATIC_OVL void
+static void
 randomize(indices, count)
 int *indices;
 int count;
@@ -890,7 +890,7 @@ int percent;
  *      howmuch & ALL_MAP       = forget whole map
  *      howmuch & ALL_SPELLS    = forget all spells
  */
-STATIC_OVL void
+static void
 forget(howmuch)
 int howmuch;
 {
@@ -924,7 +924,7 @@ int howmuch;
 }
 
 /* monster is hit by scroll of taming's effect */
-STATIC_OVL int
+static int
 maybe_tame(mtmp, sobj)
 struct monst *mtmp;
 struct obj *sobj;
@@ -947,7 +947,7 @@ struct obj *sobj;
     return 0;
 }
 
-STATIC_OVL boolean
+static boolean
 get_valid_stinking_cloud_pos(x,y)
 int x,y;
 {
@@ -956,7 +956,7 @@ int x,y;
               || distu(x, y) >= 32));
 }
 
-STATIC_OVL boolean
+static boolean
 is_valid_stinking_cloud_pos(x, y, showmsg)
 int x, y;
 boolean showmsg;
@@ -969,7 +969,7 @@ boolean showmsg;
     return TRUE;
 }
 
-STATIC_PTR void
+static void
 display_stinking_cloud_positions(state)
 int state;
 {
@@ -1897,12 +1897,12 @@ struct litmon {
     struct monst *mon;
     struct litmon *nxt;
 };
-STATIC_VAR struct litmon *gremlins = 0;
+static struct litmon *gremlins = 0;
 
 /*
  * Low-level lit-field update routine.
  */
-STATIC_PTR void
+static void
 set_lit(x, y, val)
 int x, y;
 genericptr_t val;
@@ -2029,7 +2029,7 @@ struct obj *obj;
     }
 }
 
-STATIC_OVL void
+static void
 do_class_genocide()
 {
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;

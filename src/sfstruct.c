@@ -41,7 +41,7 @@ void FDECL(mread, (int, genericptr_t, unsigned int));
 void NDECL(minit);
 void FDECL(bclose, (int));
 #endif /* TRACE_BUFFERING */
-STATIC_DCL int FDECL(getidx, (int, int));
+static int FDECL(getidx, (int, int));
 
 #if defined(UNIX) || defined(WIN32)
 #define USE_BUFFERING
@@ -97,7 +97,7 @@ static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
  *       happen.
  */
 
-STATIC_OVL int
+static int
 getidx(fd, flg)
 int fd, flg;
 {

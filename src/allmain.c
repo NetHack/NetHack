@@ -13,11 +13,11 @@
 #endif
 
 #ifdef POSITIONBAR
-STATIC_DCL void NDECL(do_positionbar);
+static void NDECL(do_positionbar);
 #endif
-STATIC_DCL void FDECL(regen_hp, (int));
-STATIC_DCL void FDECL(interrupt_multi, (const char *));
-STATIC_DCL void FDECL(debug_fields, (const char *));
+static void FDECL(regen_hp, (int));
+static void FDECL(interrupt_multi, (const char *));
+static void FDECL(debug_fields, (const char *));
 
 void
 early_init()
@@ -459,7 +459,7 @@ boolean resuming;
 }
 
 /* maybe recover some lost health (or lose some when an eel out of water) */
-STATIC_OVL void
+static void
 regen_hp(wtcap)
 int wtcap;
 {
@@ -690,7 +690,7 @@ boolean new_game; /* false => restoring an old game */
 }
 
 #ifdef POSITIONBAR
-STATIC_DCL void
+static void
 do_positionbar()
 {
     static char pbar[COLNO];
@@ -745,7 +745,7 @@ do_positionbar()
 }
 #endif
 
-STATIC_DCL void
+static void
 interrupt_multi(msg)
 const char *msg;
 {
@@ -877,7 +877,7 @@ enum earlyarg e_arg;
  *                    optimization so that display output
  *                    can be debugged without buffering.
  */
-void
+static void
 debug_fields(opts)
 const char *opts;
 {

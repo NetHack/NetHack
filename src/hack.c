@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1559664951 2019/06/04 16:15:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.213 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1568509227 2019/09/15 01:00:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,17 +7,17 @@
 
 /* #define DEBUG */ /* uncomment for debugging */
 
-STATIC_DCL void NDECL(maybe_wail);
-STATIC_DCL int NDECL(moverock);
-STATIC_DCL int FDECL(still_chewing, (XCHAR_P, XCHAR_P));
-STATIC_DCL void NDECL(dosinkfall);
-STATIC_DCL boolean FDECL(findtravelpath, (int));
-STATIC_DCL boolean FDECL(trapmove, (int, int, struct trap *));
-STATIC_DCL struct monst *FDECL(monstinroom, (struct permonst *, int));
-STATIC_DCL boolean FDECL(doorless_door, (int, int));
-STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
-STATIC_DCL void FDECL(maybe_smudge_engr, (int, int, int, int));
-STATIC_DCL void NDECL(domove_core);
+static void NDECL(maybe_wail);
+static int NDECL(moverock);
+static int FDECL(still_chewing, (XCHAR_P, XCHAR_P));
+static void NDECL(dosinkfall);
+static boolean FDECL(findtravelpath, (int));
+static boolean FDECL(trapmove, (int, int, struct trap *));
+static struct monst *FDECL(monstinroom, (struct permonst *, int));
+static boolean FDECL(doorless_door, (int, int));
+static void FDECL(move_update, (BOOLEAN_P));
+static void FDECL(maybe_smudge_engr, (int, int, int, int));
+static void NDECL(domove_core);
 
 #define IS_SHOP(x) (g.rooms[x].rtype >= SHOPBASE)
 
@@ -99,7 +99,7 @@ const char *msg;
     return revived;
 }
 
-STATIC_OVL int
+static int
 moverock()
 {
     register xchar rx, ry, sx, sy;
@@ -151,17 +151,35 @@ moverock()
             if (mtmp && !noncorporeal(mtmp->data)
                 && (!mtmp->mtrapped
                     || !(ttmp && is_pit(ttmp->ttyp)))) {
+                boolean deliver_part1 = FALSE;
+
                 if (Blind)
                     feel_location(sx, sy);
                 if (canspotmon(mtmp)) {
                     pline("There's %s on the other side.", a_monnam(mtmp));
+                    deliver_part1 = TRUE;
                 } else {
                     You_hear("a monster behind %s.", the(xname(otmp)));
+                    if (!Deaf)
+                        deliver_part1 = TRUE;
                     map_invisible(rx, ry);
                 }
-                if (flags.verbose)
-                    pline("Perhaps that's why %s cannot move it.",
-                          u.usteed ? y_monnam(u.usteed) : "you");
+                if (flags.verbose) {
+                    char you_or_steed[BUFSZ];
+
+                    Strcpy(you_or_steed,
+                           u.usteed ? y_monnam(u.usteed) : "you");
+                    pline("%s%s cannot move %s.",
+                          deliver_part1
+                              ? "Perhaps that's why "
+                              : "",
+                          deliver_part1
+                              ? you_or_steed
+                              : upstart(you_or_steed),
+                          deliver_part1
+                              ? "it"
+                              : the(xname(otmp)));
+                }
                 goto cannot_push;
             }
 
@@ -366,7 +384,7 @@ moverock()
  *  Chew on a wall, door, or boulder.  [What about statues?]
  *  Returns TRUE if still eating, FALSE when done.
  */
-STATIC_OVL int
+static int
 still_chewing(x, y)
 xchar x, y;
 {
@@ -531,7 +549,7 @@ register xchar ox, oy;
 
 static NEARDATA const char fell_on_sink[] = "fell onto a sink";
 
-STATIC_OVL void
+static void
 dosinkfall()
 {
     register struct obj *obj;
@@ -908,7 +926,7 @@ int mode;
  * inaccessible locations as valid intermediate path points.
  * Returns TRUE if a path was found.
  */
-STATIC_OVL boolean
+static boolean
 findtravelpath(mode)
 int mode;
 {
@@ -1173,7 +1191,7 @@ int x,y;
 /* try to escape being stuck in a trapped state by walking out of it;
    return true iff moving should continue to intended destination
    (all failures and most successful escapes leave hero at original spot) */
-STATIC_OVL boolean
+static boolean
 trapmove(x, y, desttrap)
 int x, y;              /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
 struct trap *desttrap; /* nonnull if another trap at <x,y> */
@@ -1341,7 +1359,7 @@ domove()
         g.domove_attempting = 0L;
 }
 
-void
+static void
 domove_core()
 {
     register struct monst *mtmp;
@@ -1939,7 +1957,7 @@ domove_core()
     }
 }
 
-void
+static void
 maybe_smudge_engr(x1,y1,x2,y2)
 int x1, y1, x2, y2;
 {
@@ -2267,7 +2285,7 @@ boolean pick;
 }
 
 /* returns first matching monster */
-STATIC_OVL struct monst *
+static struct monst *
 monstinroom(mdat, roomno)
 struct permonst *mdat;
 int roomno;
@@ -2378,7 +2396,7 @@ register int x, y;
     return !has_subrooms;
 }
 
-STATIC_OVL void
+static void
 move_update(newlev)
 register boolean newlev;
 {
@@ -2640,9 +2658,9 @@ dopickup(VOID_ARGS)
               ? g.multi + 1 : 0;
     g.multi = 0; /* always reset */
 
-    if ((ret = pickup_checks() >= 0))
+    if ((ret = pickup_checks()) >= 0) {
         return ret;
-    else if (ret == -2) {
+    } else if (ret == -2) {
         tmpcount = -count;
         return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
     } /* else ret == -1 */
@@ -2810,7 +2828,7 @@ lookaround()
 }
 
 /* check for a doorway which lacks its door (NODOOR or BROKEN) */
-STATIC_OVL boolean
+static boolean
 doorless_door(x, y)
 int x, y;
 {
@@ -2908,7 +2926,7 @@ const char *msg_override;
            if life-saved while poly'd and Unchanging (explore or wizard mode
            declining to die since can't be both Unchanging and Lifesaved) */
         if (Upolyd && !strncmpi(g.nomovemsg, "You survived that ", 18))
-            You("are %s", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
+            You("are %s.", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
     }
     g.nomovemsg = 0;
     u.usleep = 0;
@@ -2925,7 +2943,7 @@ const char *msg_override;
     }
 }
 
-STATIC_OVL void
+static void
 maybe_wail()
 {
     static short powers[] = { TELEPORT, SEE_INVIS, POISON_RES, COLD_RES,

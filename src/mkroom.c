@@ -19,24 +19,21 @@
 #include "sfproto.h"
 
 
-STATIC_DCL boolean FDECL(isbig, (struct mkroom *));
-STATIC_DCL struct mkroom *FDECL(pick_room, (BOOLEAN_P));
-STATIC_DCL void NDECL(mkshop), FDECL(mkzoo, (int)), NDECL(mkswamp);
-STATIC_DCL void NDECL(mktemple);
-STATIC_DCL coord *FDECL(shrine_pos, (int));
-STATIC_DCL struct permonst *NDECL(morguemon);
-STATIC_DCL struct permonst *NDECL(squadmon);
-/* SAVE2018 */
-/* STATIC_DCL void FDECL(save_room, (int,struct mkroom *)); */
-/* STATIC_DCL void FDECL(rest_room, (int,struct mkroom *)); */
-STATIC_DCL void FDECL(save_room, (NHFILE *, struct mkroom *));
-STATIC_DCL void FDECL(rest_room, (NHFILE *, struct mkroom *));
+static boolean FDECL(isbig, (struct mkroom *));
+static struct mkroom *FDECL(pick_room, (BOOLEAN_P));
+static void NDECL(mkshop), FDECL(mkzoo, (int)), NDECL(mkswamp);
+static void NDECL(mktemple);
+static coord *FDECL(shrine_pos, (int));
+static struct permonst *NDECL(morguemon);
+static struct permonst *NDECL(squadmon);
+static void FDECL(save_room, (NHFILE *, struct mkroom *));
+static void FDECL(rest_room, (NHFILE *, struct mkroom *));
 
 #define sq(x) ((x) * (x))
 
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
-STATIC_OVL boolean
+static boolean
 isbig(sroom)
 register struct mkroom *sroom;
 {
@@ -90,7 +87,7 @@ int roomtype;
         }
 }
 
-STATIC_OVL void
+static void
 mkshop()
 {
     register struct mkroom *sroom;
@@ -208,7 +205,7 @@ gottype:
 }
 
 /* pick an unused room, preferably with only one door */
-STATIC_OVL struct mkroom *
+static struct mkroom *
 pick_room(strict)
 register boolean strict;
 {
@@ -233,7 +230,7 @@ register boolean strict;
     return (struct mkroom *) 0;
 }
 
-STATIC_OVL void
+static void
 mkzoo(type)
 int type;
 {
@@ -461,7 +458,7 @@ int mm_flags;
     g.level.flags.graveyard = TRUE; /* reduced chance for undead corpse */
 }
 
-STATIC_OVL struct permonst *
+static struct permonst *
 morguemon()
 {
     register int i = rn2(100), hd = rn2(level_difficulty());
@@ -513,7 +510,7 @@ antholemon()
                                              : &mons[mtyp]);
 }
 
-STATIC_OVL void
+static void
 mkswamp() /* Michiel Huisjes & Fred de Wilde */
 {
     register struct mkroom *sroom;
@@ -551,7 +548,7 @@ mkswamp() /* Michiel Huisjes & Fred de Wilde */
     }
 }
 
-STATIC_OVL coord *
+static coord *
 shrine_pos(roomno)
 int roomno;
 {
@@ -573,7 +570,7 @@ int roomno;
     return &buf;
 }
 
-STATIC_OVL void
+static void
 mktemple()
 {
     register struct mkroom *sroom;
@@ -773,7 +770,7 @@ static const struct {
                          { PM_CAPTAIN, 1 } };
 
 /* return soldier types. */
-STATIC_OVL struct permonst *
+static struct permonst *
 squadmon()
 {
     int sel_prob, i, cpro, mndx;
@@ -800,7 +797,7 @@ gotone:
  * save_room : A recursive function that saves a room and its subrooms
  * (if any).
  */
-STATIC_OVL void
+static void
 save_room(nhfp, r)
 NHFILE *nhfp;
 struct mkroom *r;
@@ -839,7 +836,7 @@ NHFILE *nhfp;
         save_room(nhfp, &g.rooms[i]);
 }
 
-STATIC_OVL void
+static void
 rest_room(nhfp, r)
 NHFILE *nhfp;
 struct mkroom *r;

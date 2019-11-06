@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1560791350 2019/06/17 17:09:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.294 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1569276991 2019/09/23 22:16:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.297 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,23 +12,23 @@
 #include "mfndpos.h"
 #include <ctype.h>
 
-STATIC_DCL void FDECL(sanity_check_single_mon, (struct monst *, BOOLEAN_P,
+static void FDECL(sanity_check_single_mon, (struct monst *, BOOLEAN_P,
                                                 const char *));
-STATIC_DCL boolean FDECL(restrap, (struct monst *));
-STATIC_DCL long FDECL(mm_aggression, (struct monst *, struct monst *));
-STATIC_DCL long FDECL(mm_displacement, (struct monst *, struct monst *));
-STATIC_DCL int NDECL(pick_animal);
-STATIC_DCL void FDECL(kill_eggs, (struct obj *));
-STATIC_DCL int FDECL(pickvampshape, (struct monst *));
-STATIC_DCL boolean FDECL(isspecmon, (struct monst *));
-STATIC_DCL boolean FDECL(validspecmon, (struct monst *, int));
-STATIC_DCL struct permonst *FDECL(accept_newcham_form, (struct monst *, int));
-STATIC_DCL struct obj *FDECL(make_corpse, (struct monst *, unsigned));
-STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
-STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
-STATIC_DCL void FDECL(migrate_mon, (struct monst *, XCHAR_P, XCHAR_P));
-STATIC_DCL boolean FDECL(ok_to_obliterate, (struct monst *));
-STATIC_DCL void FDECL(deal_with_overcrowding, (struct monst *));
+static boolean FDECL(restrap, (struct monst *));
+static long FDECL(mm_aggression, (struct monst *, struct monst *));
+static long FDECL(mm_displacement, (struct monst *, struct monst *));
+static int NDECL(pick_animal);
+static void FDECL(kill_eggs, (struct obj *));
+static int FDECL(pickvampshape, (struct monst *));
+static boolean FDECL(isspecmon, (struct monst *));
+static boolean FDECL(validspecmon, (struct monst *, int));
+static struct permonst *FDECL(accept_newcham_form, (struct monst *, int));
+static struct obj *FDECL(make_corpse, (struct monst *, unsigned));
+static void FDECL(m_detach, (struct monst *, struct permonst *));
+static void FDECL(lifesaved_monster, (struct monst *));
+static void FDECL(migrate_mon, (struct monst *, XCHAR_P, XCHAR_P));
+static boolean FDECL(ok_to_obliterate, (struct monst *));
+static void FDECL(deal_with_overcrowding, (struct monst *));
 
 /* note: duplicated in dog.c */
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
@@ -43,7 +43,7 @@ const char *warnings[] = {
 #endif /* 0 */
 
 
-void
+static void
 sanity_check_single_mon(mtmp, chk_geno, msg)
 struct monst *mtmp;
 boolean chk_geno;
@@ -291,7 +291,7 @@ int mndx;
  * G_NOCORPSE set in order to prevent wishing for one, finding tins of one,
  * etc....
  */
-STATIC_OVL struct obj *
+static struct obj *
 make_corpse(mtmp, corpseflags)
 register struct monst *mtmp;
 unsigned corpseflags;
@@ -1361,8 +1361,8 @@ long flag;
             thrudoor = TRUE;
     }
 
-nexttry: /* eels prefer the water, but if there is no water nearby,
-            they will crawl over land */
+ nexttry: /* eels prefer the water, but if there is no water nearby,
+             they will crawl over land */
     if (mon->mconf) {
         flag |= ALLOW_ALL;
         flag &= ~NOTONL;
@@ -1550,7 +1550,7 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
    in the absence of Conflict.  There is no provision for targetting
    other monsters; just hand to hand fighting when they happen to be
    next to each other. */
-STATIC_OVL long
+static long
 mm_aggression(magr, mdef)
 struct monst *magr, /* monster that is currently deciding where to move */
              *mdef; /* another monster which is next to it */
@@ -1567,7 +1567,7 @@ struct monst *magr, /* monster that is currently deciding where to move */
 }
 
 /* Monster displacing another monster out of the way */
-STATIC_OVL long
+static long
 mm_displacement(magr, mdef)
 struct monst *magr, /* monster that is currently deciding where to move */
              *mdef; /* another monster which is next to it */
@@ -1816,7 +1816,7 @@ struct monst *mon;
 }
 
 /* remove effects of mtmp from other data structures */
-STATIC_OVL void
+static void
 m_detach(mtmp, mptr)
 struct monst *mtmp;
 struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
@@ -1872,7 +1872,7 @@ struct monst *mon;
     return (struct obj *) 0;
 }
 
-STATIC_OVL void
+static void
 lifesaved_monster(mtmp)
 struct monst *mtmp;
 {
@@ -2183,7 +2183,9 @@ struct monst *mdef;
     xchar x = mdef->mx, y = mdef->my;
     boolean wasinside = FALSE;
 
-    if (!vamp_stone(mdef)) /* vampshifter reverts to vampire */
+    /* vampshifter reverts to vampire;
+       3.6.3: also used to unshift shape-changed sandestin */
+    if (!vamp_stone(mdef))
         return;
 
     /* we have to make the statue before calling mondead, to be able to
@@ -2366,7 +2368,9 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     if (mtmp->mtame && !mtmp->isminion)
         EDOG(mtmp)->killed_by_u = 1;
 
-    if (wasinside && g.thrownobj && g.thrownobj != uball) {
+    if (wasinside && g.thrownobj && g.thrownobj != uball
+        /* don't give to mon if missile is going to return to hero */
+        && g.thrownobj != (struct obj *) iflags.returning_missile) {
         /* thrown object has killed hero's engulfer; add it to mon's
            inventory now so that it will be placed with mon's other
            stuff prior to lookhere/autopickup when hero is expelled
@@ -2452,7 +2456,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     /* monster is gone, corpse or other object might now be visible */
     newsym(x, y);
 
-cleanup:
+ cleanup:
     /* punish bad behaviour */
     if (is_human(mdat)
         && (!always_hostile(mdat) && mtmp->malign <= 0)
@@ -2586,6 +2590,18 @@ struct monst *mtmp;
             newsym(mtmp->mx, mtmp->my);
             return FALSE;   /* didn't petrify */
         }
+    } else if (mtmp->cham >= LOW_PM
+               && (mons[mtmp->cham].mresists & MR_STONE)) {
+        /* sandestins are stoning-immune so if hit by stoning damage
+           they revert to innate shape rather than become a statue */
+        mtmp->mcanmove = 1;
+        mtmp->mfrozen = 0;
+        if (mtmp->mhpmax <= 0)
+            mtmp->mhpmax = 10;
+        mtmp->mhp = mtmp->mhpmax;
+        (void) newcham(mtmp, &mons[mtmp->cham], FALSE, TRUE);
+        newsym(mtmp->mx, mtmp->my);
+        return FALSE;   /* didn't petrify */
     }
     return TRUE;
 }
@@ -2601,7 +2617,7 @@ struct monst *mtmp;
     migrate_mon(mtmp, target_lev, xyloc);
 }
 
-STATIC_OVL void
+static void
 migrate_mon(mtmp, target_lev, xyloc)
 struct monst *mtmp;
 xchar target_lev, xyloc;
@@ -2612,7 +2628,7 @@ xchar target_lev, xyloc;
     mtmp->mstate |= MON_MIGRATING;
 }
 
-STATIC_OVL boolean
+static boolean
 ok_to_obliterate(mtmp)
 struct monst *mtmp;
 {
@@ -2686,7 +2702,7 @@ struct monst *mon;
             mtmp->mstate |= MON_OBLITERATE;
             mongone(mtmp);
             /* places in the code might still reference mtmp->mx, mtmp->my */
-            /* mtmp->mx = mtmp->my = 0; */ 
+            /* mtmp->mx = mtmp->my = 0; */
             rloc_to(mon, mx, my);           /* note: mon, not mtmp */
 
         /* last resort - migrate mon to the next plane */
@@ -2733,7 +2749,7 @@ struct monst *mtmp;
     return;
 }
 
-void
+static void
 deal_with_overcrowding(mtmp)
 struct monst *mtmp;
 {
@@ -3150,7 +3166,7 @@ struct monst *mon;
 }
 
 /* unwatched hiders may hide again; if so, returns True */
-STATIC_OVL boolean
+static boolean
 restrap(mtmp)
 register struct monst *mtmp;
 {
@@ -3260,7 +3276,7 @@ boolean construct;
     }
 }
 
-STATIC_OVL int
+static int
 pick_animal()
 {
     int res;
@@ -3339,7 +3355,7 @@ int shiftflags;
     }
 }
 
-STATIC_OVL int
+static int
 pickvampshape(mon)
 struct monst *mon;
 {
@@ -3369,7 +3385,7 @@ struct monst *mon;
 }
 
 /* nonshapechangers who warrant special polymorph handling */
-STATIC_OVL boolean
+static boolean
 isspecmon(mon)
 struct monst *mon;
 {
@@ -3380,7 +3396,7 @@ struct monst *mon;
 /* restrict certain special monsters (shopkeepers, aligned priests,
    vault guards) to forms that allow them to behave sensibly (catching
    gold, speaking?) so that they don't need too much extra code */
-STATIC_OVL boolean
+static boolean
 validspecmon(mon, mndx)
 struct monst *mon;
 int mndx;
@@ -3603,7 +3619,7 @@ struct monst *mon;
 }
 
 /* this used to be inline within newcham() but monpolycontrol needs it too */
-STATIC_OVL struct permonst *
+static struct permonst *
 accept_newcham_form(mon, mndx)
 struct monst *mon;
 int mndx;
@@ -3754,6 +3770,9 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 
     /* take on the new form... */
     set_mon_data(mtmp, mdat);
+
+    if (mtmp->mleashed && !leashable(mtmp))
+        m_unleash(mtmp, TRUE);
 
     if (emits_light(olddata) != emits_light(mtmp->data)) {
         /* used to give light, now doesn't, or vice versa,
@@ -3946,7 +3965,7 @@ boolean egg;
 }
 
 /* kill off any eggs of genocided monsters */
-STATIC_OVL void
+static void
 kill_eggs(obj_list)
 struct obj *obj_list;
 {

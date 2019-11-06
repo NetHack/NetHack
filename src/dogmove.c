@@ -7,17 +7,17 @@
 
 #include "mfndpos.h"
 
-STATIC_DCL boolean FDECL(dog_hunger, (struct monst *, struct edog *));
-STATIC_DCL int FDECL(dog_invent, (struct monst *, struct edog *, int));
-STATIC_DCL int FDECL(dog_goal, (struct monst *, struct edog *, int, int, int));
-STATIC_DCL struct monst *FDECL(find_targ, (struct monst *, int, int, int));
-STATIC_OVL int FDECL(find_friends, (struct monst *, struct monst *, int));
-STATIC_DCL struct monst *FDECL(best_target, (struct monst *));
-STATIC_DCL long FDECL(score_targ, (struct monst *, struct monst *));
-STATIC_DCL boolean FDECL(can_reach_location, (struct monst *, XCHAR_P,
+static boolean FDECL(dog_hunger, (struct monst *, struct edog *));
+static int FDECL(dog_invent, (struct monst *, struct edog *, int));
+static int FDECL(dog_goal, (struct monst *, struct edog *, int, int, int));
+static struct monst *FDECL(find_targ, (struct monst *, int, int, int));
+static int FDECL(find_friends, (struct monst *, struct monst *, int));
+static struct monst *FDECL(best_target, (struct monst *));
+static long FDECL(score_targ, (struct monst *, struct monst *));
+static boolean FDECL(can_reach_location, (struct monst *, XCHAR_P,
                                               XCHAR_P, XCHAR_P, XCHAR_P));
-STATIC_DCL boolean FDECL(could_reach_item, (struct monst *, XCHAR_P, XCHAR_P));
-STATIC_DCL void FDECL(quickmimic, (struct monst *));
+static boolean FDECL(could_reach_item, (struct monst *, XCHAR_P, XCHAR_P));
+static void FDECL(quickmimic, (struct monst *));
 
 /* pick a carried item for pet to drop */
 struct obj *
@@ -121,7 +121,7 @@ static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS,
                                          0 };
 
 
-STATIC_PTR void FDECL(wantdoor, (int, int, genericptr_t));
+static void FDECL(wantdoor, (int, int, genericptr_t));
 
 boolean
 cursed_object_at(x, y)
@@ -355,7 +355,7 @@ boolean devour;
 }
 
 /* hunger effects -- returns TRUE on starvation */
-STATIC_OVL boolean
+static boolean
 dog_hunger(mtmp, edog)
 struct monst *mtmp;
 struct edog *edog;
@@ -401,7 +401,7 @@ struct edog *edog;
 /* do something with object (drop, pick up, eat) at current position
  * returns 1 if object eaten (since that counts as dog's move), 2 if died
  */
-STATIC_OVL int
+static int
 dog_invent(mtmp, edog, udist)
 register struct monst *mtmp;
 register struct edog *edog;
@@ -474,7 +474,7 @@ int udist;
 
 /* set dog's goal -- gtyp, gx, gy;
    returns -1/0/1 (dog's desire to approach player) or -2 (abort move) */
-STATIC_OVL int
+static int
 dog_goal(mtmp, edog, after, udist, whappr)
 register struct monst *mtmp;
 struct edog *edog;
@@ -618,7 +618,7 @@ int after, udist, whappr;
     return appr;
 }
 
-STATIC_OVL struct monst *
+static struct monst *
 find_targ(mtmp, dx, dy, maxdist)
 register struct monst *mtmp;
 int dx, dy;
@@ -661,7 +661,7 @@ int maxdist;
     return targ;
 }
 
-STATIC_OVL int
+static int
 find_friends(mtmp, mtarg, maxdist)
 struct monst *mtmp, *mtarg;
 int    maxdist;
@@ -707,7 +707,7 @@ int    maxdist;
     return 0;
 }
 
-STATIC_OVL long
+static long
 score_targ(mtmp, mtarg)
 struct monst *mtmp, *mtarg;
 {
@@ -808,7 +808,7 @@ struct monst *mtmp, *mtarg;
     return score;
 }
 
-STATIC_OVL struct monst *
+static struct monst *
 best_target(mtmp)
 struct monst *mtmp;   /* Pet */
 {
@@ -1268,7 +1268,7 @@ int after; /* this is extra fast monster movement */
 }
 
 /* check if a monster could pick up objects from a location */
-STATIC_OVL boolean
+static boolean
 could_reach_item(mon, nx, ny)
 struct monst *mon;
 xchar nx, ny;
@@ -1287,7 +1287,7 @@ xchar nx, ny;
  * Since the maximum food distance is 5, this should never be more than 5
  * calls deep.
  */
-STATIC_OVL boolean
+static boolean
 can_reach_location(mon, mx, my, fx, fy)
 struct monst *mon;
 xchar mx, my, fx, fy;
@@ -1323,7 +1323,7 @@ xchar mx, my, fx, fy;
 }
 
 /* do_clear_area client */
-STATIC_PTR void
+static void
 wantdoor(x, y, distance)
 int x, y;
 genericptr_t distance;
@@ -1369,7 +1369,7 @@ struct monst *mtmp;
     }
 }
 
-STATIC_OVL void
+static void
 quickmimic(mtmp)
 struct monst *mtmp;
 {

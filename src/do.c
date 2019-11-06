@@ -8,15 +8,15 @@
 #include "hack.h"
 #include "lev.h"
 
-STATIC_DCL void FDECL(trycall, (struct obj *));
-STATIC_DCL void NDECL(polymorph_sink);
-STATIC_DCL boolean NDECL(teleport_sink);
-STATIC_DCL void FDECL(dosinkring, (struct obj *));
-STATIC_PTR int FDECL(drop, (struct obj *));
-STATIC_PTR int NDECL(wipeoff);
-STATIC_DCL int FDECL(menu_drop, (int));
-STATIC_DCL NHFILE *NDECL(currentlevel_rewrite);
-STATIC_DCL void NDECL(final_level);
+static void FDECL(trycall, (struct obj *));
+static void NDECL(polymorph_sink);
+static boolean NDECL(teleport_sink);
+static void FDECL(dosinkring, (struct obj *));
+static int FDECL(drop, (struct obj *));
+static int NDECL(wipeoff);
+static int FDECL(menu_drop, (int));
+static NHFILE *NDECL(currentlevel_rewrite);
+static void NDECL(final_level);
 /* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
 
 static NEARDATA const char drop_types[] = { ALLOW_COUNT, COIN_CLASS,
@@ -292,7 +292,7 @@ register struct obj *obj;
     }
 }
 
-STATIC_OVL void
+static void
 trycall(obj)
 register struct obj *obj;
 {
@@ -302,7 +302,7 @@ register struct obj *obj;
 
 /* Transforms the sink at the player's position into
    a fountain, throne, altar or grave. */
-STATIC_DCL void
+static void
 polymorph_sink()
 {
     uchar sym = S_sink;
@@ -354,7 +354,7 @@ polymorph_sink()
 
 /* Teleports the sink at the player's position;
    return True if sink teleported. */
-STATIC_DCL boolean
+static boolean
 teleport_sink()
 {
     int cx, cy;
@@ -385,7 +385,7 @@ teleport_sink()
 }
 
 /* obj is a ring being dropped over a kitchen sink */
-STATIC_OVL void
+static void
 dosinkring(obj)
 register struct obj *obj;
 {
@@ -589,7 +589,7 @@ const char *word;
     return TRUE;
 }
 
-STATIC_PTR int
+static int
 drop(obj)
 register struct obj *obj;
 {
@@ -810,7 +810,7 @@ doddrop()
 }
 
 /* Drop things from the hero's inventory, using a menu. */
-STATIC_OVL int
+static int
 menu_drop(retry)
 int retry;
 {
@@ -1114,7 +1114,7 @@ doup()
 }
 
 /* check that we can write out the current level */
-STATIC_OVL NHFILE *
+static NHFILE *
 currentlevel_rewrite()
 {
     NHFILE *nhfp;
@@ -1683,7 +1683,7 @@ boolean at_stairs, falling, portal;
     (void) pickup(1);
 }
 
-STATIC_OVL void
+static void
 final_level()
 {
     struct monst *mtmp;
@@ -1908,7 +1908,7 @@ donull()
     return 1; /* Do nothing, but let other things happen */
 }
 
-STATIC_PTR int
+static int
 wipeoff(VOID_ARGS)
 {
     if (u.ucreamed < 4)

@@ -891,7 +891,7 @@ boolean caseblind;
     && !defined(_DCC) && !defined(__GNUC__)
 extern struct tm *FDECL(localtime, (time_t *));
 #endif
-STATIC_DCL struct tm *NDECL(getlt);
+static struct tm *NDECL(getlt);
 
 /* Sets the seed for the random number generator */
 #ifdef USE_ISAAC64
@@ -972,7 +972,7 @@ getnow()
     return datetime;
 }
 
-STATIC_OVL struct tm *
+static struct tm *
 getlt()
 {
     time_t date = getnow();

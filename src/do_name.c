@@ -5,26 +5,26 @@
 
 #include "hack.h"
 
-STATIC_DCL char *NDECL(nextmbuf);
-STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
-STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *, const void *));
-STATIC_DCL boolean FDECL(gather_locs_interesting, (int, int, int));
-STATIC_DCL void FDECL(gather_locs, (coord **, int *, int));
-STATIC_DCL int FDECL(gloc_filter_floodfill_matcharea, (int, int));
-STATIC_DCL void FDECL(auto_describe, (int, int));
-STATIC_DCL void NDECL(do_mname);
-STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
-STATIC_DCL void FDECL(do_oname, (struct obj *));
-STATIC_PTR char *FDECL(docall_xname, (struct obj *));
-STATIC_DCL void NDECL(namefloorobj);
-STATIC_DCL char *FDECL(bogusmon, (char *,char *));
+static char *NDECL(nextmbuf);
+static void FDECL(getpos_help, (BOOLEAN_P, const char *));
+static int FDECL(CFDECLSPEC cmp_coord_distu, (const void *, const void *));
+static boolean FDECL(gather_locs_interesting, (int, int, int));
+static void FDECL(gather_locs, (coord **, int *, int));
+static int FDECL(gloc_filter_floodfill_matcharea, (int, int));
+static void FDECL(auto_describe, (int, int));
+static void NDECL(do_mname);
+static boolean FDECL(alreadynamed, (struct monst *, char *, char *));
+static void FDECL(do_oname, (struct obj *));
+static char *FDECL(docall_xname, (struct obj *));
+static void NDECL(namefloorobj);
+static char *FDECL(bogusmon, (char *,char *));
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */
 
 #define NUMMBUF 5
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
-STATIC_OVL char *
+static char *
 nextmbuf()
 {
     static char NEARDATA bufs[NUMMBUF][BUFSZ];
@@ -87,7 +87,7 @@ int gloc;
 }
 
 /* the response for '?' help request in getpos() */
-STATIC_OVL void
+static void
 getpos_help(force, goal)
 boolean force;
 const char *goal;
@@ -216,7 +216,7 @@ const char *goal;
     destroy_nhwindow(tmpwin);
 }
 
-STATIC_OVL int
+static int
 cmp_coord_distu(a, b)
 const void *a;
 const void *b;
@@ -272,7 +272,7 @@ int glyph;
     return 0;
 }
 
-STATIC_OVL int
+static int
 gloc_filter_floodfill_matcharea(x, y)
 int x, y;
 {
@@ -332,7 +332,7 @@ gloc_filter_done()
     }
 }
 
-STATIC_OVL boolean
+static boolean
 gather_locs_interesting(x, y, gloc)
 int x, y, gloc;
 {
@@ -404,7 +404,7 @@ int x, y, gloc;
 }
 
 /* gather locations for monsters or objects shown on the map */
-STATIC_OVL void
+static void
 gather_locs(arr_p, cnt_p, gloc)
 coord **arr_p;
 int *cnt_p;
@@ -531,7 +531,7 @@ char *outbuf, cmode;
     return outbuf;
 }
 
-STATIC_OVL void
+static void
 auto_describe(cx, cy)
 int cx, cy;
 {
@@ -1083,7 +1083,7 @@ const char *name;
 
 /* check whether user-supplied name matches or nearly matches an unnameable
    monster's name; if so, give an alternate reject message for do_mname() */
-STATIC_OVL boolean
+static boolean
 alreadynamed(mtmp, monnambuf, usrbuf)
 struct monst *mtmp;
 char *monnambuf, *usrbuf;
@@ -1113,7 +1113,7 @@ char *monnambuf, *usrbuf;
 }
 
 /* allow player to assign a name to some chosen monster */
-STATIC_OVL void
+static void
 do_mname()
 {
     char buf[BUFSZ], monnambuf[BUFSZ], qbuf[QBUFSZ];
@@ -1197,7 +1197,7 @@ do_mname()
  * used with extreme care.  Applying a name to an object no longer
  * allocates a replacement object, so that old risk is gone.
  */
-STATIC_OVL
+static
 void
 do_oname(obj)
 register struct obj *obj;
@@ -1427,7 +1427,7 @@ docallcmd()
 }
 
 /* for use by safe_qbuf() */
-STATIC_PTR char *
+static char *
 docall_xname(obj)
 struct obj *obj;
 {
@@ -1507,7 +1507,7 @@ struct obj *obj;
     }
 }
 
-STATIC_OVL void
+static void
 namefloorobj()
 {
     coord cc;
@@ -1974,7 +1974,7 @@ struct monst *mon, *other_mon;
 }
 
 /* fake monsters used to be in a hard-coded array, now in a data file */
-STATIC_OVL char *
+static char *
 bogusmon(buf, code)
 char *buf, *code;
 {

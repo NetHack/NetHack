@@ -14,33 +14,33 @@
  * are confused don't know not to read scrolls, etc....
  */
 
-STATIC_DCL struct permonst *FDECL(muse_newcham_mon, (struct monst *));
-STATIC_DCL int FDECL(precheck, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(mzapwand, (struct monst *, struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(mplayhorn, (struct monst *, struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(mreadmsg, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(mquaffmsg, (struct monst *, struct obj *));
-STATIC_DCL boolean FDECL(m_use_healing, (struct monst *));
-STATIC_PTR int FDECL(mbhitm, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(mbhit, (struct monst *, int,
+static struct permonst *FDECL(muse_newcham_mon, (struct monst *));
+static int FDECL(precheck, (struct monst *, struct obj *));
+static void FDECL(mzapwand, (struct monst *, struct obj *, BOOLEAN_P));
+static void FDECL(mplayhorn, (struct monst *, struct obj *, BOOLEAN_P));
+static void FDECL(mreadmsg, (struct monst *, struct obj *));
+static void FDECL(mquaffmsg, (struct monst *, struct obj *));
+static boolean FDECL(m_use_healing, (struct monst *));
+static int FDECL(mbhitm, (struct monst *, struct obj *));
+static void FDECL(mbhit, (struct monst *, int,
                               int FDECL((*), (MONST_P, OBJ_P)),
                               int FDECL((*), (OBJ_P, OBJ_P)), struct obj *));
-STATIC_DCL void FDECL(you_aggravate, (struct monst *));
-STATIC_DCL void FDECL(mon_consume_unstone, (struct monst *, struct obj *,
+static void FDECL(you_aggravate, (struct monst *));
+static void FDECL(mon_consume_unstone, (struct monst *, struct obj *,
                                             BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL boolean FDECL(cures_stoning, (struct monst *, struct obj *,
+static boolean FDECL(cures_stoning, (struct monst *, struct obj *,
                                          BOOLEAN_P));
-STATIC_DCL boolean FDECL(mcould_eat_tin, (struct monst *));
-STATIC_DCL boolean FDECL(muse_unslime, (struct monst *, struct obj *,
+static boolean FDECL(mcould_eat_tin, (struct monst *));
+static boolean FDECL(muse_unslime, (struct monst *, struct obj *,
                                         struct trap *, BOOLEAN_P));
-STATIC_DCL int FDECL(cures_sliming, (struct monst *, struct obj *));
-STATIC_DCL boolean FDECL(green_mon, (struct monst *));
+static int FDECL(cures_sliming, (struct monst *, struct obj *));
+static boolean FDECL(green_mon, (struct monst *));
 
 /* Any preliminary checks which may result in the monster being unable to use
  * the item.  Returns 0 if nothing happened, 2 if the monster can't do
  * anything (i.e. it teleported) and 1 if it's dead.
  */
-STATIC_OVL int
+static int
 precheck(mon, obj)
 struct monst *mon;
 struct obj *obj;
@@ -147,7 +147,7 @@ struct obj *obj;
 
 /* when a monster zaps a wand give a message, deduct a charge, and if it
    isn't directly seen, remove hero's memory of the number of charges */
-STATIC_OVL void
+static void
 mzapwand(mtmp, otmp, self)
 struct monst *mtmp;
 struct obj *otmp;
@@ -171,7 +171,7 @@ boolean self;
 }
 
 /* similar to mzapwand() but for magical horns (only instrument mons play) */
-STATIC_OVL void
+static void
 mplayhorn(mtmp, otmp, self)
 struct monst *mtmp;
 struct obj *otmp;
@@ -196,7 +196,7 @@ boolean self;
     otmp->spe -= 1; /* use a charge */
 }
 
-STATIC_OVL void
+static void
 mreadmsg(mtmp, otmp)
 struct monst *mtmp;
 struct obj *otmp;
@@ -237,7 +237,7 @@ struct obj *otmp;
               vismon ? mon_nam(mtmp) : mhe(mtmp));
 }
 
-STATIC_OVL void
+static void
 mquaffmsg(mtmp, otmp)
 struct monst *mtmp;
 struct obj *otmp;
@@ -280,7 +280,7 @@ struct obj *otmp;
  * that if you polymorph into one you teleport at will.
  */
 
-STATIC_OVL boolean
+static boolean
 m_use_healing(mtmp)
 struct monst *mtmp;
 {
@@ -827,7 +827,7 @@ struct monst *mtmp;
 
             Mnam = Monnam(mtmp);
             pline("%s %s into a %s!", Mnam,
-                  vtense(Mnam, locomotion(mtmp->data, "jump")),
+                  vtense(fakename[0], locomotion(mtmp->data, "jump")),
                   (t->ttyp == TRAPDOOR) ? "trap door" : "hole");
             if (levl[g.trapx][g.trapy].typ == SCORR) {
                 levl[g.trapx][g.trapy].typ = CORR;
@@ -924,7 +924,7 @@ struct monst *mtmp;
         if (vis) {
             Mnam = Monnam(mtmp);
             pline("%s %s onto a teleport trap!", Mnam,
-                  vtense(Mnam, locomotion(mtmp->data, "jump")));
+                  vtense(fakename[0], locomotion(mtmp->data, "jump")));
             seetrap(t_at(g.trapx, g.trapy));
         }
         /*  don't use rloc_to() because worm tails must "move" */
@@ -1209,7 +1209,7 @@ struct monst *mtmp;
 #undef nomore
 }
 
-STATIC_PTR
+static
 int
 mbhitm(mtmp, otmp)
 register struct monst *mtmp;
@@ -1291,7 +1291,7 @@ register struct obj *otmp;
  * zapping you, so we need a special function for it.  (Unless someone wants
  * to merge the two functions...)
  */
-STATIC_OVL void
+static void
 mbhit(mon, range, fhitm, fhito, obj)
 struct monst *mon;  /* monster shooting the wand */
 register int range; /* direction and range */
@@ -1873,7 +1873,7 @@ struct monst *mtmp;
             const char *Mnam = Monnam(mtmp);
 
             pline("%s deliberately %s onto a polymorph trap!", Mnam,
-                  vtense(Mnam, locomotion(mtmp->data, "jump")));
+                  vtense(fakename[0], locomotion(mtmp->data, "jump")));
         }
         if (vis)
             seetrap(t_at(g.trapx, g.trapy));
@@ -1964,7 +1964,7 @@ struct monst *mtmp;
     return 0;
 }
 
-STATIC_OVL void
+static void
 you_aggravate(mtmp)
 struct monst *mtmp;
 {
@@ -2215,7 +2215,7 @@ boolean by_you;
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 mon_consume_unstone(mon, obj, by_you, stoning)
 struct monst *mon;
 struct obj *obj;
@@ -2295,7 +2295,7 @@ boolean stoning; /* True: stop petrification, False: cure stun && confusion */
 }
 
 /* decide whether obj can cure petrification; also used when picking up */
-STATIC_OVL boolean
+static boolean
 cures_stoning(mon, obj, tinok)
 struct monst *mon;
 struct obj *obj;
@@ -2312,7 +2312,7 @@ boolean tinok;
                               || slimeproof(mon->data))));
 }
 
-STATIC_OVL boolean
+static boolean
 mcould_eat_tin(mon)
 struct monst *mon;
 {
@@ -2418,7 +2418,7 @@ boolean by_you;
 }
 
 /* mon uses an item--selected by caller--to burn away incipient slime */
-STATIC_OVL boolean
+static boolean
 muse_unslime(mon, obj, trap, by_you)
 struct monst *mon;
 struct obj *obj;
@@ -2451,7 +2451,7 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
             newsym(mon->mx, mon->my);
             if (vis)
                 pline("%s %s %s %s fire trap!", Mnam,
-                      vtense(Mnam, locomotion(mon->data, "move")),
+                      vtense(fakename[0], locomotion(mon->data, "move")),
                       is_floater(mon->data) ? "over" : "onto",
                       trap->tseen ? "the" : "a");
         }
@@ -2527,7 +2527,7 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
 }
 
 /* decide whether obj can be used to cure green slime */
-STATIC_OVL int
+static int
 cures_sliming(mon, obj)
 struct monst *mon;
 struct obj *obj;
@@ -2544,7 +2544,7 @@ struct obj *obj;
 /* TRUE if monster appears to be green; for active TEXTCOLOR, we go by
    the display color, otherwise we just pick things that seem plausibly
    green (which doesn't necessarily match the TEXTCOLOR categorization) */
-STATIC_OVL boolean
+static boolean
 green_mon(mon)
 struct monst *mon;
 {

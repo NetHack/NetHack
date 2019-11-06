@@ -228,6 +228,7 @@ draw_status()
             curs_reset_windows(TRUE, TRUE);
             win = curses_get_nhwin(STATUS_WIN);
         }
+        nhUse(ax);  /* getmaxyx macro isn't sufficient */
     }
 
     werase(win);
@@ -513,6 +514,7 @@ boolean border;
                        conditions would go if they were on this line */
                     condstart += (cap_and_hunger == 2) ? spacing[BL_CAP]
                                  : (cap_and_hunger == 0) ? 1 : 0;
+                    nhUse(conddummy);   /* getyx needed 3 args */
                 }
                 if (!(cap_and_hunger & 1))
                     continue;
@@ -533,6 +535,7 @@ boolean border;
                          t = (width - (border ? 0 : 1)) - (ex - 1);
                          ebuf[max(t, 2)] = '\0'; /* might still wrap... */
                      }
+                     nhUse(ey); /* getyx needed 3 args */
                 }
                 break;
             case BL_SCORE:
@@ -907,7 +910,7 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
 {
 #ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
-    int coloridx;
+    int coloridx = 0;
 #endif
 #endif /* STATUS_HILITES */
     int k, bar_pos;

@@ -33,7 +33,7 @@ void FDECL(nethack_exit, (int));
 #else
 #define nethack_exit exit
 #endif
-STATIC_DCL void NDECL(msexit);
+static void NDECL(msexit);
 
 #ifdef MOVERLAY
 extern void __far __cdecl _movepause(void);
@@ -45,9 +45,9 @@ extern unsigned short __far __cdecl _movefpaused;
 #endif                       /* MOVERLAY */
 
 #ifdef MFLOPPY
-STATIC_DCL boolean NDECL(record_exists);
+static boolean NDECL(record_exists);
 #ifndef TOS
-STATIC_DCL boolean NDECL(comspec_exists);
+static boolean NDECL(comspec_exists);
 #endif
 #endif
 
@@ -305,7 +305,7 @@ int start;
 }
 
 /* Return 1 if the record file was found */
-STATIC_OVL boolean
+static boolean
 record_exists()
 {
     FILE *fp;
@@ -324,7 +324,7 @@ record_exists()
 #else
 #ifdef MFLOPPY
 /* Return 1 if the comspec was found */
-STATIC_OVL boolean
+static boolean
 comspec_exists()
 {
     int fd;
@@ -492,7 +492,7 @@ int code;
 extern boolean run_from_desktop; /* set in pcmain.c */
 #endif
 
-STATIC_OVL void
+static void
 msexit()
 {
 #ifdef CHDIR

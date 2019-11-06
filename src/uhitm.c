@@ -1,28 +1,28 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1555720104 2019/04/20 00:28:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1567805813 2019/09/06 21:36:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(known_hitum, (struct monst *, struct obj *, int *,
+static boolean FDECL(known_hitum, (struct monst *, struct obj *, int *,
                                        int, int, struct attack *, int));
-STATIC_DCL boolean FDECL(theft_petrifies, (struct obj *));
-STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
-STATIC_DCL boolean FDECL(hitum_cleave, (struct monst *, struct attack *));
-STATIC_DCL boolean FDECL(hitum, (struct monst *, struct attack *));
-STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int,
+static boolean FDECL(theft_petrifies, (struct obj *));
+static void FDECL(steal_it, (struct monst *, struct attack *));
+static boolean FDECL(hitum_cleave, (struct monst *, struct attack *));
+static boolean FDECL(hitum, (struct monst *, struct attack *));
+static boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int,
                                        int));
-STATIC_DCL int FDECL(joust, (struct monst *, struct obj *));
-STATIC_DCL void NDECL(demonpet);
-STATIC_DCL boolean FDECL(m_slips_free, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(explum, (struct monst *, struct attack *));
-STATIC_DCL void FDECL(start_engulf, (struct monst *));
-STATIC_DCL void NDECL(end_engulf);
-STATIC_DCL int FDECL(gulpum, (struct monst *, struct attack *));
-STATIC_DCL boolean FDECL(hmonas, (struct monst *));
-STATIC_DCL void FDECL(nohandglow, (struct monst *));
-STATIC_DCL boolean FDECL(shade_aware, (struct obj *));
+static int FDECL(joust, (struct monst *, struct obj *));
+static void NDECL(demonpet);
+static boolean FDECL(m_slips_free, (struct monst *, struct attack *));
+static int FDECL(explum, (struct monst *, struct attack *));
+static void FDECL(start_engulf, (struct monst *));
+static void NDECL(end_engulf);
+static int FDECL(gulpum, (struct monst *, struct attack *));
+static boolean FDECL(hmonas, (struct monst *));
+static void FDECL(nohandglow, (struct monst *));
+static boolean FDECL(shade_aware, (struct obj *));
 
 #define PROJECTILE(obj) ((obj) && is_ammo(obj))
 
@@ -453,7 +453,7 @@ register struct monst *mtmp;
 }
 
 /* really hit target monster; returns TRUE if it still lives */
-STATIC_OVL boolean
+static boolean
 known_hitum(mon, weapon, mhit, rollneeded, armorpenalty, uattk, dieroll)
 register struct monst *mon;
 struct obj *weapon;
@@ -513,7 +513,7 @@ int dieroll;
 
 /* hit the monster next to you and the monsters to the left and right of it;
    return False if the primary target is killed, True otherwise */
-STATIC_OVL boolean
+static boolean
 hitum_cleave(target, uattk)
 struct monst *target; /* non-Null; forcefight at nothing doesn't cleave... */
 struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
@@ -594,7 +594,7 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
 }
 
 /* hit target monster; returns TRUE if it still lives */
-STATIC_OVL boolean
+static boolean
 hitum(mon, uattk)
 struct monst *mon;
 struct attack *uattk;
@@ -660,7 +660,7 @@ int dieroll;
 }
 
 /* guts of hmon() */
-STATIC_OVL boolean
+static boolean
 hmon_hitmon(mon, obj, thrown, dieroll)
 struct monst *mon;
 struct obj *obj;
@@ -1339,7 +1339,7 @@ int dieroll;
     return destroyed ? FALSE : TRUE;
 }
 
-STATIC_OVL boolean
+static boolean
 shade_aware(obj)
 struct obj *obj;
 {
@@ -1364,7 +1364,7 @@ struct obj *obj;
 
 /* check whether slippery clothing protects from hug or wrap attack */
 /* [currently assumes that you are the attacker] */
-STATIC_OVL boolean
+static boolean
 m_slips_free(mdef, mattk)
 struct monst *mdef;
 struct attack *mattk;
@@ -1408,7 +1408,7 @@ struct attack *mattk;
 
 /* used when hitting a monster with a lance while mounted;
    1: joust hit; 0: ordinary hit; -1: joust but break lance */
-STATIC_OVL int
+static int
 joust(mon, obj)
 struct monst *mon; /* target */
 struct obj *obj;   /* weapon */
@@ -1446,7 +1446,7 @@ struct obj *obj;   /* weapon */
  * Complex."
  * Pulling it out makes it work.
  */
-STATIC_OVL void
+static void
 demonpet()
 {
     int i;
@@ -1461,7 +1461,7 @@ demonpet()
     exercise(A_WIS, TRUE);
 }
 
-STATIC_OVL boolean
+static boolean
 theft_petrifies(otmp)
 struct obj *otmp;
 {
@@ -1488,15 +1488,16 @@ struct obj *otmp;
  * If the target is wearing body armor, take all of its possessions;
  * otherwise, take one object.  [Is this really the behavior we want?]
  */
-STATIC_OVL void
+static void
 steal_it(mdef, mattk)
 struct monst *mdef;
 struct attack *mattk;
 {
-    struct obj *otmp, *stealoid, **minvent_ptr;
+    struct obj *otmp, *gold = 0, *stealoid, **minvent_ptr;
     long unwornmask;
 
-    if (!mdef->minvent)
+    otmp = mdef->minvent;
+    if (!otmp || (otmp->oclass == COIN_CLASS && !otmp->nobj))
         return; /* nothing to take */
 
     /* look for worn body armor */
@@ -1516,17 +1517,29 @@ struct attack *mattk;
             }
         *minvent_ptr = stealoid; /* put armor back into minvent */
     }
+    gold = findgold(mdef->minvent);
 
     if (stealoid) { /* we will be taking everything */
         if (gender(mdef) == (int) u.mfemale && g.youmonst.data->mlet == S_NYMPH)
-            You("charm %s.  She gladly hands over her possessions.",
-                mon_nam(mdef));
+            You("charm %s.  She gladly hands over %sher possessions.",
+                mon_nam(mdef), !gold ? "" : "most of ");
         else
             You("seduce %s and %s starts to take off %s clothes.",
                 mon_nam(mdef), mhe(mdef), mhis(mdef));
     }
 
+    /* prevent gold from being stolen so that steal-item isn't a superset
+       of steal-gold; shuffling it out of minvent before selecting next
+       item, and then back in case hero or monster dies (hero touching
+       stolen c'trice corpse or monster wielding one and having gloves
+       stolen) is less bookkeeping than skipping it within the loop or
+       taking it out once and then trying to figure out how to put it back */
+    if (gold)
+        obj_extract_self(gold);
+
     while ((otmp = mdef->minvent) != 0) {
+        if (gold) /* put 'mdef's gold back after remembering mdef->minvent */
+            mpickobj(mdef, gold), gold = 0;
         if (!Upolyd)
             break; /* no longer have ability to steal */
         /* take the object away from the monster */
@@ -1559,12 +1572,25 @@ struct attack *mattk;
         } else if (unwornmask & W_ARMG) { /* stole worn gloves */
             mselftouch(mdef, (const char *) 0, TRUE);
             if (DEADMONSTER(mdef)) /* it's now a statue */
-                return;         /* can't continue stealing */
+                break; /* can't continue stealing */
         }
 
         if (!stealoid)
             break; /* only taking one item */
+
+        /* take gold out of minvent before making next selection; if it
+           is the only thing left, the loop will terminate and it will be
+           put back below */
+        if ((gold = findgold(mdef->minvent)) != 0)
+            obj_extract_self(gold);
     }
+
+    /* put gold back; won't happen if either hero or 'mdef' dies because
+       gold will be back in monster's inventory at either of those times
+       (so will be present in mdef's minvent for bones, or in its statue
+       now if it has just been turned into one) */
+    if (gold)
+        mpickobj(mdef, gold);
 }
 
 int
@@ -1972,7 +1998,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     return 1;
 }
 
-STATIC_OVL int
+static int
 explum(mdef, mattk)
 register struct monst *mdef;
 register struct attack *mattk;
@@ -2025,7 +2051,7 @@ register struct attack *mattk;
     return 1;
 }
 
-STATIC_OVL void
+static void
 start_engulf(mdef)
 struct monst *mdef;
 {
@@ -2039,7 +2065,7 @@ struct monst *mdef;
     delay_output();
 }
 
-STATIC_OVL void
+static void
 end_engulf()
 {
     if (!Invisible) {
@@ -2048,7 +2074,7 @@ end_engulf()
     }
 }
 
-STATIC_OVL int
+static int
 gulpum(mdef, mattk)
 register struct monst *mdef;
 register struct attack *mattk;
@@ -2286,7 +2312,7 @@ boolean wouldhavehit;
 }
 
 /* attack monster as a monster; returns True if mon survives */
-STATIC_OVL boolean
+static boolean
 hmonas(mon)
 register struct monst *mon;
 {
@@ -2823,13 +2849,16 @@ boolean wep_was_destroyed;
                     if (ureflects("%s gaze is reflected by your %s.",
                                   s_suffix(Monnam(mon)))) {
                         ;
+                    } else if (Hallucination && rn2(4)) {
+                        /* [it's the hero who should be getting paralyzed
+                           and isn't; this message describes the monster's
+                           reaction rather than the hero's escape] */
+                        pline("%s looks %s%s.", Monnam(mon),
+                              !rn2(2) ? "" : "rather ",
+                              !rn2(2) ? "numb" : "stupefied");
                     } else if (Free_action) {
                         You("momentarily stiffen under %s gaze!",
                             s_suffix(mon_nam(mon)));
-                    } else if (Hallucination && rn2(4)) {
-                        pline("%s looks %s%s.", Monnam(mon),
-                              !rn2(2) ? "" : "rather ",
-                              !rn2(2) ? "numb" : "stupified");
                     } else {
                         You("are frozen by %s gaze!", s_suffix(mon_nam(mon)));
                         nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
@@ -3019,7 +3048,7 @@ struct monst *mtmp;
         map_invisible(mtmp->mx, mtmp->my);
 }
 
-STATIC_OVL void
+static void
 nohandglow(mon)
 struct monst *mon;
 {

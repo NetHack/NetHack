@@ -24,41 +24,36 @@ static int count_only;
 #define USE_BUFFERING
 #endif
 
-/*SAVE2018*/
-extern void FDECL(nhout, (int, const char *,
-                    const char *, int, genericptr_t, int));
-extern int NDECL(nhdatatypes_size);
-
 #ifdef MICRO
 int dotcnt, dotrow; /* also used in restore */
 #endif
 
-STATIC_DCL void FDECL(savelevchn, (NHFILE *));
-STATIC_DCL void FDECL(savedamage, (NHFILE *));
-/* STATIC_DCL void FDECL(saveobj, (NHFILE *,struct obj *)); */
-/* STATIC_DCL void FDECL(savemon, (NHFILE *,struct monst *)); */
-/* STATIC_DCL void FDECL(savelevl, (NHFILE *, BOOLEAN_P)); */
-STATIC_DCL void FDECL(saveobj, (NHFILE *,struct obj *));
-STATIC_DCL void FDECL(savemon, (NHFILE *,struct monst *));
-STATIC_DCL void FDECL(savelevl, (NHFILE *,BOOLEAN_P));
-STATIC_DCL void FDECL(saveobjchn, (NHFILE *,struct obj *));
-STATIC_DCL void FDECL(savemonchn, (NHFILE *,struct monst *));
-STATIC_DCL void FDECL(savetrapchn, (NHFILE *,struct trap *));
-STATIC_DCL void FDECL(savegamestate, (NHFILE *));
-STATIC_OVL void FDECL(save_msghistory, (NHFILE *));
+static void FDECL(savelevchn, (NHFILE *));
+static void FDECL(savedamage, (NHFILE *));
+/* static void FDECL(saveobj, (NHFILE *,struct obj *)); */
+/* static void FDECL(savemon, (NHFILE *,struct monst *)); */
+/* static void FDECL(savelevl, (NHFILE *, BOOLEAN_P)); */
+static void FDECL(saveobj, (NHFILE *,struct obj *));
+static void FDECL(savemon, (NHFILE *,struct monst *));
+static void FDECL(savelevl, (NHFILE *,BOOLEAN_P));
+static void FDECL(saveobjchn, (NHFILE *,struct obj *));
+static void FDECL(savemonchn, (NHFILE *,struct monst *));
+static void FDECL(savetrapchn, (NHFILE *,struct trap *));
+static void FDECL(savegamestate, (NHFILE *));
+static void FDECL(save_msghistory, (NHFILE *));
 
 #ifdef MFLOPPY
-STATIC_DCL void FDECL(savelev0, (NHFILE *, XCHAR_P, int));
-STATIC_DCL boolean NDECL(swapout_oldest);
-STATIC_DCL void FDECL(copyfile, (char *, char *));
+static void FDECL(savelev0, (NHFILE *, XCHAR_P, int));
+static boolean NDECL(swapout_oldest);
+static void FDECL(copyfile, (char *, char *));
 #endif /* MFLOPPY */
 
 #ifdef ZEROCOMP
-STATIC_DCL void FDECL(zerocomp_bufon, (int));
-STATIC_DCL void FDECL(zerocomp_bufoff, (int));
-STATIC_DCL void FDECL(zerocomp_bflush, (int));
-STATIC_DCL void FDECL(zerocomp_bwrite, (int, genericptr_t, unsigned int));
-STATIC_DCL void FDECL(zerocomp_bputc, (int));
+static void FDECL(zerocomp_bufon, (int));
+static void FDECL(zerocomp_bufoff, (int));
+static void FDECL(zerocomp_bflush, (int));
+static void FDECL(zerocomp_bwrite, (int, genericptr_t, unsigned int));
+static void FDECL(zerocomp_bputc, (int));
 #endif
 
 #if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
@@ -282,7 +277,7 @@ dosave0()
     return 1;
 }
 
-STATIC_OVL void
+static void
 savegamestate(nhfp)
 NHFILE *nhfp;
 {
@@ -539,7 +534,7 @@ xchar lev;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 savelev0(nhfp, lev)
 #else
 void
@@ -686,7 +681,7 @@ xchar lev;
     }
 }
 
-STATIC_OVL void
+static void
 savelevl(nhfp, rlecomp)
 NHFILE *nhfp;
 boolean rlecomp;
@@ -794,7 +789,7 @@ struct cemetery **cemeteryaddr;
         *cemeteryaddr = 0;
 }
 
-STATIC_OVL void
+static void
 savedamage(nhfp)
 NHFILE *nhfp;
 {
@@ -826,7 +821,7 @@ NHFILE *nhfp;
         g.level.damagelist = 0;
 }
 
-STATIC_OVL void
+static void
 saveobj(nhfp, otmp)
 NHFILE *nhfp;
 struct obj *otmp;
@@ -902,7 +897,7 @@ struct obj *otmp;
     }
 }
 
-STATIC_OVL void
+static void
 saveobjchn(nhfp, otmp)
 NHFILE *nhfp;
 register struct obj *otmp;
@@ -953,7 +948,7 @@ register struct obj *otmp;
     }
 }
 
-STATIC_OVL void
+static void
 savemon(nhfp, mtmp)
 NHFILE *nhfp;
 struct monst *mtmp;
@@ -1047,7 +1042,7 @@ struct monst *mtmp;
     }
 }
 
-STATIC_OVL void
+static void
 savemonchn(nhfp, mtmp)
 NHFILE *nhfp;
 register struct monst *mtmp;
@@ -1084,7 +1079,7 @@ register struct monst *mtmp;
 }
 
 /* save traps; g.ftrap is the only trap chain so the 2nd arg is superfluous */
-STATIC_OVL void
+static void
 savetrapchn(nhfp, trap)
 NHFILE *nhfp;
 register struct trap *trap;
@@ -1149,7 +1144,7 @@ NHFILE *nhfp;
 
 
 
-STATIC_OVL void
+static void
 savelevchn(nhfp)
 NHFILE *nhfp;
 {
@@ -1199,7 +1194,7 @@ NHFILE *nhfp;
     return;
 }
 
-STATIC_OVL void
+static void
 save_msghistory(nhfp)
 NHFILE *nhfp;
 {
@@ -1389,7 +1384,7 @@ int lev;
     return TRUE;
 }
 
-STATIC_OVL boolean
+static boolean
 swapout_oldest()
 {
     char to[PATHLEN], from[PATHLEN];
@@ -1420,7 +1415,7 @@ swapout_oldest()
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 copyfile(from, to)
 char *from, *to;
 {

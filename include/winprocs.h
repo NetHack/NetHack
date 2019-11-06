@@ -1,4 +1,4 @@
-/* NetHack 3.6	winprocs.h	$NHDT-Date: 1553204011 2019/03/21 21:33:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	winprocs.h	$NHDT-Date: 1567213890 2019/08/31 01:11:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -112,7 +112,7 @@ extern
 #define end_menu (*windowprocs.win_end_menu)
 #define select_menu (*windowprocs.win_select_menu)
 #define message_menu (*windowprocs.win_message_menu)
-#define update_inventory (*windowprocs.win_update_inventory)
+
 #define mark_synch (*windowprocs.win_mark_synch)
 #define wait_synch (*windowprocs.win_wait_synch)
 #ifdef CLIPPING

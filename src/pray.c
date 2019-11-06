@@ -1,25 +1,25 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1559853037 2019/06/06 20:30:37 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1564532667 2019/07/31 00:24:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-STATIC_PTR int NDECL(prayer_done);
-STATIC_DCL struct obj *NDECL(worst_cursed_item);
-STATIC_DCL int NDECL(in_trouble);
-STATIC_DCL void FDECL(fix_worst_trouble, (int));
-STATIC_DCL void FDECL(angrygods, (ALIGNTYP_P));
-STATIC_DCL void FDECL(at_your_feet, (const char *));
-STATIC_DCL void NDECL(gcrownu);
-STATIC_DCL void FDECL(pleased, (ALIGNTYP_P));
-STATIC_DCL void FDECL(godvoice, (ALIGNTYP_P, const char *));
-STATIC_DCL void FDECL(god_zaps_you, (ALIGNTYP_P));
-STATIC_DCL void FDECL(fry_by_god, (ALIGNTYP_P, BOOLEAN_P));
-STATIC_DCL void FDECL(gods_angry, (ALIGNTYP_P));
-STATIC_DCL void FDECL(gods_upset, (ALIGNTYP_P));
-STATIC_DCL void FDECL(consume_offering, (struct obj *));
-STATIC_DCL boolean FDECL(water_prayer, (BOOLEAN_P));
-STATIC_DCL boolean FDECL(blocked_boulder, (int, int));
+static int NDECL(prayer_done);
+static struct obj *NDECL(worst_cursed_item);
+static int NDECL(in_trouble);
+static void FDECL(fix_worst_trouble, (int));
+static void FDECL(angrygods, (ALIGNTYP_P));
+static void FDECL(at_your_feet, (const char *));
+static void NDECL(gcrownu);
+static void FDECL(pleased, (ALIGNTYP_P));
+static void FDECL(godvoice, (ALIGNTYP_P, const char *));
+static void FDECL(god_zaps_you, (ALIGNTYP_P));
+static void FDECL(fry_by_god, (ALIGNTYP_P, BOOLEAN_P));
+static void FDECL(gods_angry, (ALIGNTYP_P));
+static void FDECL(gods_upset, (ALIGNTYP_P));
+static void FDECL(consume_offering, (struct obj *));
+static boolean FDECL(water_prayer, (BOOLEAN_P));
+static boolean FDECL(blocked_boulder, (int, int));
 
 /* simplify a few tests */
 #define Cursed_obj(obj, typ) ((obj) && (obj)->otyp == (typ) && (obj)->cursed)
@@ -174,7 +174,7 @@ stuck_in_wall()
  * 3.4.2: make an exception if polymorphed into a form which lacks
  * hands; that's a case where the ramifications override this doubt.
  */
-STATIC_OVL int
+static int
 in_trouble()
 {
     struct obj *otmp;
@@ -264,7 +264,7 @@ in_trouble()
 }
 
 /* select an item for TROUBLE_CURSED_ITEMS */
-STATIC_OVL struct obj *
+static struct obj *
 worst_cursed_item()
 {
     register struct obj *otmp;
@@ -325,7 +325,7 @@ worst_cursed_item()
     return otmp;
 }
 
-STATIC_OVL void
+static void
 fix_worst_trouble(trouble)
 int trouble;
 {
@@ -567,7 +567,7 @@ int trouble;
  * bathroom walls, but who is foiled by bathrobes." --Bertrand Russell, 1943
  * Divine wrath, dungeon walls, and armor follow the same principle.
  */
-STATIC_OVL void
+static void
 god_zaps_you(resp_god)
 aligntyp resp_god;
 {
@@ -643,7 +643,7 @@ aligntyp resp_god;
     }
 }
 
-STATIC_OVL void
+static void
 fry_by_god(resp_god, via_disintegration)
 aligntyp resp_god;
 boolean via_disintegration;
@@ -655,7 +655,7 @@ boolean via_disintegration;
     done(DIED);
 }
 
-STATIC_OVL void
+static void
 angrygods(resp_god)
 aligntyp resp_god;
 {
@@ -748,7 +748,7 @@ const char *str;
     }
 }
 
-STATIC_OVL void
+static void
 gcrownu()
 {
     struct obj *obj;
@@ -764,6 +764,20 @@ gcrownu()
     HSleep_resistance |= FROMOUTSIDE;
     HPoison_resistance |= FROMOUTSIDE;
     godvoice(u.ualign.type, (char *) 0);
+
+    class_gift = STRANGE_OBJECT;
+    /* 3.3.[01] had this in the A_NEUTRAL case,
+       preventing chaotic wizards from receiving a spellbook */
+    if (Role_if(PM_WIZARD)
+        && (!uwep || (uwep->oartifact != ART_VORPAL_BLADE
+                      && uwep->oartifact != ART_STORMBRINGER))
+        && !carrying(SPE_FINGER_OF_DEATH)) {
+        class_gift = SPE_FINGER_OF_DEATH;
+    } else if (Role_if(PM_MONK) && (!uwep || !uwep->oartifact)
+               && !carrying(SPE_RESTORE_ABILITY)) {
+        /* monks rarely wield a weapon */
+        class_gift = SPE_RESTORE_ABILITY;
+    }
 
     obj = ok_wep(uwep) ? uwep : 0;
     already_exists = in_hand = FALSE; /* lint suppression */
@@ -785,19 +799,13 @@ gcrownu()
         already_exists =
             exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
         verbalize("Thou art chosen to %s for My Glory!",
-                  already_exists && !in_hand ? "take lives" : "steal souls");
+                  ((already_exists && !in_hand)
+                   || class_gift != STRANGE_OBJECT) ? "take lives"
+                  : "steal souls");
         break;
     }
 
-    class_gift = STRANGE_OBJECT;
-    /* 3.3.[01] had this in the A_NEUTRAL case below,
-       preventing chaotic wizards from receiving a spellbook */
-    if (Role_if(PM_WIZARD)
-        && (!uwep || (uwep->oartifact != ART_VORPAL_BLADE
-                      && uwep->oartifact != ART_STORMBRINGER))
-        && !carrying(SPE_FINGER_OF_DEATH)) {
-        class_gift = SPE_FINGER_OF_DEATH;
-    make_splbk:
+    if (objects[class_gift].oc_class == SPBOOK_CLASS) {
         obj = mksobj(class_gift, TRUE, FALSE);
         bless(obj);
         obj->bknown = 1; /* ok to skip set_bknown() */
@@ -812,11 +820,6 @@ gcrownu()
                     obj = uwep; /* to be blessed,&c */
                 break;
             }
-    } else if (Role_if(PM_MONK) && (!uwep || !uwep->oartifact)
-               && !carrying(SPE_RESTORE_ABILITY)) {
-        /* monks rarely wield a weapon */
-        class_gift = SPE_RESTORE_ABILITY;
-        goto make_splbk;
     }
 
     switch (u.ualign.type) {
@@ -904,7 +907,7 @@ gcrownu()
     return;
 }
 
-STATIC_OVL void
+static void
 pleased(g_align)
 aligntyp g_align;
 {
@@ -1215,7 +1218,7 @@ aligntyp g_align;
 /* either blesses or curses water on the altar,
  * returns true if it found any water here.
  */
-STATIC_OVL boolean
+static boolean
 water_prayer(bless_water)
 boolean bless_water;
 {
@@ -1244,7 +1247,7 @@ boolean bless_water;
     return (boolean) (changed > 0L);
 }
 
-STATIC_OVL void
+static void
 godvoice(g_align, words)
 aligntyp g_align;
 const char *words;
@@ -1260,7 +1263,7 @@ const char *words;
               godvoices[rn2(SIZE(godvoices))], quot, words, quot);
 }
 
-STATIC_OVL void
+static void
 gods_angry(g_align)
 aligntyp g_align;
 {
@@ -1268,7 +1271,7 @@ aligntyp g_align;
 }
 
 /* The g_align god is upset with you. */
-STATIC_OVL void
+static void
 gods_upset(g_align)
 aligntyp g_align;
 {
@@ -1279,7 +1282,7 @@ aligntyp g_align;
     angrygods(g_align);
 }
 
-STATIC_OVL void
+static void
 consume_offering(otmp)
 register struct obj *otmp;
 {
@@ -1865,7 +1868,7 @@ dopray()
     return 1;
 }
 
-STATIC_PTR int
+static int
 prayer_done() /* M. Stephenson (1.0.3b) */
 {
     aligntyp alignment = g.p_aligntyp;
@@ -2221,18 +2224,26 @@ register int x, y;
 {
     aligntyp altaralign = a_align(x, y);
 
-    if (!strcmp(align_gname(altaralign), u_gname())) {
+    if (u.ualign.type == altaralign && u.ualign.record > -rn2(4)) {
         godvoice(altaralign, "How darest thou desecrate my altar!");
         (void) adjattrib(A_WIS, -1, FALSE);
+        u.ualign.record--;
     } else {
-        pline("A voice (could it be %s?) whispers:", align_gname(altaralign));
+        pline("%s %s%s:",
+              !Deaf ? "A voice (could it be"
+                    : "Despite your deafness, you seem to hear",
+              align_gname(altaralign),
+              !Deaf ? "?) whispers" : " say");
         verbalize("Thou shalt pay, infidel!");
-        change_luck(-1);
+        /* higher luck is more likely to be reduced; as it approaches -5
+           the chance to lose another point drops down, eventually to 0 */
+        if (Luck > -5 && rn2(Luck + 6))
+            change_luck(rn2(20) ? -1 : -2);
     }
 }
 
 /* assumes isok() at one space away, but not necessarily at two */
-STATIC_OVL boolean
+static boolean
 blocked_boulder(dx, dy)
 int dx, dy;
 {

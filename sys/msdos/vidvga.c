@@ -104,18 +104,18 @@
 
 extern short glyph2tile[];
 
-/* STATIC_DCL void FDECL(vga_NoBorder, (int));  */
+/* static void FDECL(vga_NoBorder, (int));  */
 void FDECL(vga_gotoloc, (int, int)); /* This should be made a macro */
 void NDECL(vga_backsp);
 #ifdef SCROLLMAP
-STATIC_DCL void FDECL(vga_scrollmap, (BOOLEAN_P));
+static void FDECL(vga_scrollmap, (BOOLEAN_P));
 #endif
-STATIC_DCL void FDECL(vga_redrawmap, (BOOLEAN_P));
+static void FDECL(vga_redrawmap, (BOOLEAN_P));
 static void FDECL(vga_cliparound, (int, int));
-STATIC_OVL void FDECL(decal_planar, (struct planar_cell_struct *, unsigned));
+static void FDECL(decal_planar, (struct planar_cell_struct *, unsigned));
 
 #ifdef POSITIONBAR
-STATIC_DCL void NDECL(positionbar);
+static void NDECL(positionbar);
 static void FDECL(vga_special, (int, int, int));
 #endif
 
@@ -147,11 +147,11 @@ extern boolean inmap;           /* in the map window */
  * Global Variables
  */
 
-STATIC_VAR unsigned char __far *font;
-STATIC_VAR char *screentable[SCREENHEIGHT];
+static unsigned char __far *font;
+static char *screentable[SCREENHEIGHT];
 
-STATIC_VAR const struct Pixel *paletteptr;
-STATIC_VAR struct map_struct {
+static const struct Pixel *paletteptr;
+static struct map_struct {
     int glyph;
     int ch;
     int attr;
@@ -171,13 +171,13 @@ STATIC_VAR struct map_struct {
     }
 #define TOP_MAP_ROW 1
 
-STATIC_VAR int vgacmap[CLR_MAX] = {  1, 4, 6, 10, 5, 9, 0, 15,
+static int vgacmap[CLR_MAX] = {  1, 4, 6, 10, 5, 9, 0, 15,
                                     12, 3, 7,  8, 2, 9, 0, 14 };
-STATIC_VAR int viewport_size = 40;
-/* STATIC_VAR char masktable[8]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01}; */
-/* STATIC_VAR char bittable[8]= {0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80}; */
+static int viewport_size = 40;
+/* static char masktable[8]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01}; */
+/* static char bittable[8]= {0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80}; */
 #if 0
-STATIC_VAR char defpalette[] = {	/* Default VGA palette         */
+static char defpalette[] = {	/* Default VGA palette         */
 	0x00, 0x00, 0x00,
 	0x00, 0x00, 0xaa,
 	0x00, 0xaa, 0x00,
@@ -202,10 +202,10 @@ int vp[SCREENPLANES] = { 8, 4, 2, 1 };
 #endif
 int vp2[SCREENPLANES] = { 1, 2, 4, 8 };
 
-STATIC_VAR struct planar_cell_struct planecell;
-STATIC_VAR struct overview_planar_cell_struct planecell_O;
+static struct planar_cell_struct planecell;
+static struct overview_planar_cell_struct planecell_O;
 
-/* STATIC_VAR int  g_attribute;	*/ /* Current attribute to use */
+/* static int  g_attribute;	*/ /* Current attribute to use */
 
 void
 vga_get_scr_size()
@@ -231,25 +231,20 @@ void
 vga_clear_screen(colour)
 int colour;
 {
-    char __far *pch;
-    int y, j;
-    char volatile a;
+    unsigned long __far *pch;
+    unsigned j;
 
-    outportb(0x3ce, 5);
-    outportb(0x3cf, 2);
-
-    for (y = 0; y < SCREENHEIGHT; ++y) {
-        pch = screentable[y];
-        for (j = 0; j < SCREENBYTES; ++j) {
-            outportb(0x3ce, 8);
-            outportb(0x3cf, 255);
-            a = READ_ABSOLUTE(pch); /* Must read , then write */
-            WRITE_ABSOLUTE(pch, (char) colour);
-            ++pch;
-        }
+    egawriteplane(colour);
+    pch = (unsigned long __far *) screentable[0];
+    for (j = 0; j < SCREENHEIGHT * SCREENBYTES / 4; ++j) {
+        WRITE_ABSOLUTE_DWORD(&pch[j], 0xFFFFFFFF);
     }
-    outportb(0x3ce, 5);
-    outportb(0x3cf, 0);
+    egawriteplane(~colour);
+    pch = (unsigned long __far *) screentable[0];
+    for (j = 0; j < SCREENHEIGHT * SCREENBYTES / 4; ++j) {
+        WRITE_ABSOLUTE_DWORD(&pch[j], 0x00000000);
+    }
+    egawriteplane(15);
     if (iflags.tile_view)
         vga_clearmap();
     vga_gotoloc(0, 0); /* is this needed? */
@@ -455,32 +450,26 @@ int x, y;
     }
 }
 
-STATIC_OVL void
+static void
 vga_redrawmap(clearfirst)
 boolean clearfirst;
 {
-    int j, x, y, t;
-    char __far *pch;
-    char volatile a;
+    int x, y, t;
+    unsigned long __far *pch;
 
     if (clearfirst) {
-        /* y here is in pixel rows */
-        outportb(0x3ce, 5);
-        outportb(0x3cf, 2);
+        unsigned j;
         t = TOP_MAP_ROW * ROWS_PER_CELL;
-        for (y = t; y < (ROWNO * ROWS_PER_CELL) + t; ++y) {
-            pch = screentable[y];
-            for (j = 0; j < SCREENBYTES; ++j) {
-                outportb(0x3ce, 8);
-                outportb(0x3cf, 255);
-                /* On VGA mode2, must read first, then write */
-                a = READ_ABSOLUTE(pch);
-                WRITE_ABSOLUTE(pch, (char) BACKGROUND_VGA_COLOR);
-                ++pch;
-            }
+        pch = (unsigned long __far *) screentable[t];
+        egawriteplane(BACKGROUND_VGA_COLOR);
+        for (j = 0; j < ROWNO * ROWS_PER_CELL * SCREENBYTES / 4; ++j) {
+            WRITE_ABSOLUTE_DWORD(&pch[j], 0xFFFFFFFF);
         }
-        outportb(0x3ce, 5);
-        outportb(0x3cf, 0);
+        egawriteplane(~BACKGROUND_VGA_COLOR);
+        for (j = 0; j < ROWNO * ROWS_PER_CELL * SCREENBYTES / 4; ++j) {
+            WRITE_ABSOLUTE_DWORD(&pch[j], 0x00000000);
+        }
+        egawriteplane(15);
     }
 /* y here is in screen rows*/
 #ifdef ROW_BY_ROW
@@ -578,7 +567,7 @@ vga_refresh()
 }
 
 #ifdef SCROLLMAP
-STATIC_OVL void
+static void
 vga_scrollmap(left)
 boolean left;
 {
@@ -724,7 +713,7 @@ unsigned char (*indexes)[TILE_X];
     }
 }
 
-STATIC_OVL void
+static void
 decal_planar(gp, special)
 struct planar_cell_struct *gp;
 unsigned special;
@@ -858,7 +847,7 @@ vga_Finish(void)
  * to a more standard values - MJA 94/04/23.
  *
  */
-STATIC_OVL void 
+static void 
 vga_NoBorder(int bc)
 {
 	union REGS regs;
@@ -941,36 +930,52 @@ int chr, col, row, colour;
     int i;
     int x, pixy;
 
-    char volatile tc;
     char __far *cp;
     unsigned char __far *fp = font;
     unsigned char fnt;
     int actual_colour = vgacmap[colour];
+    int vplane;
 
     x = min(col, (CO - 1));         /* min() used protection from callers */
     pixy = min(row, (LI - 1)) * 16; /* assumes 8 x 16 char set */
     /*	if (chr < ' ') chr = ' ';  */ /* assumes ASCII set */
 
-    outportb(0x3ce, 5);
-    outportb(0x3cf, 2);
-
     chr = chr << 4;
-    for (i = 0; i < MAX_ROWS_PER_CELL; ++i) {
-        cp = screentable[pixy + i] + x;
-        fnt = READ_ABSOLUTE((fp + chr + i));
-        outportb(0x3ce, 8);
-        outportb(0x3cf, fnt);
-        tc = READ_ABSOLUTE(cp); /* wrt mode 2, must read, then write */
-        WRITE_ABSOLUTE(cp, (char) actual_colour);
-        outportb(0x3ce, 8);
-        outportb(0x3cf, ~fnt);
-        tc = READ_ABSOLUTE(cp); /* wrt mode 2, must read, then write */
-        WRITE_ABSOLUTE(cp, (char) BACKGROUND_VGA_COLOR);
+    vplane = ~actual_colour & ~BACKGROUND_VGA_COLOR & 0xF;
+    if (vplane != 0) {
+        egawriteplane(vplane);
+        for (i = 0; i < MAX_ROWS_PER_CELL; ++i) {
+            cp = screentable[pixy + i] + x;
+            WRITE_ABSOLUTE(cp, (char) 0x00);
+        }
     }
-    outportb(0x3ce, 5);
-    outportb(0x3cf, 0);
-    outportb(0x3ce, 8);
-    outportb(0x3cf, 255);
+    vplane =  actual_colour & ~BACKGROUND_VGA_COLOR & 0xF;
+    if (vplane != 0) {
+        egawriteplane(vplane);
+        for (i = 0; i < MAX_ROWS_PER_CELL; ++i) {
+            cp = screentable[pixy + i] + x;
+            fnt =  READ_ABSOLUTE((fp + chr + i));
+            WRITE_ABSOLUTE(cp, (char) fnt);
+        }
+    }
+    vplane = ~actual_colour &  BACKGROUND_VGA_COLOR & 0xF;
+    if (vplane != 0) {
+        egawriteplane(vplane);
+        for (i = 0; i < MAX_ROWS_PER_CELL; ++i) {
+            cp = screentable[pixy + i] + x;
+            fnt = ~READ_ABSOLUTE((fp + chr + i));
+            WRITE_ABSOLUTE(cp, (char) fnt);
+        }
+    }
+    vplane =  actual_colour &  BACKGROUND_VGA_COLOR & 0xF;
+    if (vplane != 0) {
+        egawriteplane(vplane);
+        for (i = 0; i < MAX_ROWS_PER_CELL; ++i) {
+            cp = screentable[pixy + i] + x;
+            WRITE_ABSOLUTE(cp, (char) 0xFF);
+        }
+    }
+    egawriteplane(15);
 }
 
 /*
@@ -1121,7 +1126,7 @@ char *posbar;
     *p = 0;
 }
 
-STATIC_OVL void
+static void
 positionbar()
 {
     char *posbar = pbar;

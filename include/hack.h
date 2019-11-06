@@ -541,27 +541,6 @@ enum bodypart_types {
 #define getlogin() ((char *) 0)
 #endif /* MICRO */
 
-#if defined(OVERLAY)
-#define USE_OVLx
-#define STATIC_DCL extern
-#define STATIC_OVL
-#define STATIC_VAR
-
-#else /* !OVERLAY */
-
-#define STATIC_DCL static
-#define STATIC_OVL static
-#define STATIC_VAR static
-
-#endif /* OVERLAY */
-
-/* Macro for a few items that are only static if we're not overlaid.... */
-#if defined(USE_TRAMPOLI) || defined(USE_OVLx)
-#define STATIC_PTR
-#else
-#define STATIC_PTR static
-#endif
-
 /* The function argument to qsort() requires a particular
  * calling convention under WINCE which is not the default
  * in that environment.

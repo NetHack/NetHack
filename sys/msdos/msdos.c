@@ -49,12 +49,12 @@ void FDECL(get_cursor, (int *, int *));
 
 /* direct bios calls are used only when iflags.BIOS is set */
 
-STATIC_DCL char NDECL(DOSgetch);
-STATIC_DCL char NDECL(BIOSgetch);
+static char NDECL(DOSgetch);
+static char NDECL(BIOSgetch);
 #ifndef __GO32__
-STATIC_DCL char *NDECL(getdta);
+static char *NDECL(getdta);
 #endif
-STATIC_DCL unsigned int FDECL(dos_ioctl, (int, int, unsigned));
+static unsigned int FDECL(dos_ioctl, (int, int, unsigned));
 #ifdef USE_TILES
 extern boolean FDECL(pckeys, (unsigned char, unsigned char)); /* pckeys.c */
 #endif
@@ -243,7 +243,7 @@ static const char numeric_scanmap[] = { /* ... */
 #define ALT 0x8
 #endif /* PC9800 */
 
-STATIC_OVL char
+static char
 BIOSgetch()
 {
     unsigned char scan, shift, ch = 0;
@@ -303,7 +303,7 @@ BIOSgetch()
     return ch;
 }
 
-STATIC_OVL char
+static char
 DOSgetch()
 {
     union REGS regs;
@@ -406,7 +406,7 @@ foundfile_buffer()
 }
 
 /* Get disk transfer area */
-STATIC_OVL char *
+static char *
 getdta()
 {
     union REGS regs;
@@ -503,7 +503,7 @@ enable_ctrlP()
     return;
 }
 
-STATIC_OVL unsigned int
+static unsigned int
 dos_ioctl(handle, mode, setvalue)
 int handle, mode;
 unsigned setvalue;

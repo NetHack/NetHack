@@ -1015,7 +1015,11 @@ endif
 #==========================================
 
 $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
-	ar rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
+	ar rcS $@ $(PDCLIBOBJS1)
+	ar rcS $@ $(PDCLIBOBJS2)
+	ar rcS $@ $(PDCLIBOBJS3)
+	ar rcS $@ $(PDCLIBOBJS4)
+	ar rcs $@ $(PDCOBJS)
 
 #==========================================
 #  Other Util Dependencies.
@@ -1146,6 +1150,76 @@ $(U)dlb_main.exe: $(DLBOBJS)
 
 $(O)dlb_main.o: $(U)dlb_main.c $(INCL)/config.h $(DLB_H)
 	$(CC) $(cflags) -o$@ $(U)dlb_main.c
+
+#==========================================
+#  Housekeeping.
+#==========================================
+
+clean:
+	$(subst /,\,if exist $(O)*.o del $(O)*.o)
+	$(subst /,\,if exist $(O)dat.tag del $(O)dat.tag)
+	$(subst /,\,if exist $(O)install.tag del $(O)install.tag)
+	$(subst /,\,if exist $(O)$(GAME).lnk del $(O)$(GAME).lnk)
+	$(subst /,\,if exist $(O)obj.tag del $(O)obj.tag)
+	$(subst /,\,if exist $(O)sp_lev.tag del $(O)sp_lev.tag)
+	$(subst /,\,if exist $(O)thintile.tag del $(O)thintile.tag)
+	$(subst /,\,if exist $(O)utility.tag del $(O)utility.tag)
+	$(subst /,\,if exist temp.a del temp.a)
+
+spotless: clean
+
+	$(subst /,\,if exist $(U)dgn_flex.c del $(U)dgn_flex.c)
+	$(subst /,\,if exist $(U)dgn_lex.c del $(U)dgn_lex.c)
+	$(subst /,\,if exist $(U)makedefs.exe del $(U)makedefs.exe)
+	$(subst /,\,if exist $(U)dgn_comp.exe del $(U)dgn_comp.exe)
+	$(subst /,\,if exist $(U)recover.exe del $(U)recover.exe)
+	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
+	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
+	$(subst /,\,if exist $(U)tile2bin.exe del $(U)tile2bin.exe)
+	$(subst /,\,if exist $(U)til2bin2.exe del $(U)til2bin2.exe)
+	$(subst /,\,if exist $(U)thintile.exe del $(U)thintile.exe)
+	$(subst /,\,if exist $(U)dlb_main.exe del $(U)dlb_main.exe)
+	$(subst /,\,if exist $(INCL)/vis_tab.h del $(INCL)/vis_tab.h)
+	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
+	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
+	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
+	$(subst /,\,if exist $(INCL)/dgn_comp.h del $(INCL)/dgn_comp.h)
+	$(subst /,\,if exist $(INCL)/lev_comp.h del $(INCL)/lev_comp.h)
+	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
+	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
+	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
+	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
+	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
+	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
+	$(subst /,\,if exist $(DAT)/dungeon.pdf del $(DAT)/dungeon.pdf)
+	$(subst /,\,if exist $(DAT)/dungeon del $(DAT)/dungeon)
+	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
+	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
+	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
+	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
+	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
+	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
+	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
+	$(subst /,\,if exist $(DAT)/*.lev del $(DAT)/*.lev)
+	$(subst /,\,if exist $(TILE_BMP) del $(TILE_BMP))
+	$(subst /,\,if exist $(WSHR)/monthin.txt del $(WSHR)/monthin.txt)
+	$(subst /,\,if exist $(WSHR)/objthin.txt del $(WSHR)/objthin.txt)
+	$(subst /,\,if exist $(WSHR)/oththin.txt del $(WSHR)/oththin.txt)
+
+#==========================================
+# Create directory for holding object files
+#==========================================
+
+$(O)obj.tag:
+	-$(subst /,\,@if not exist $(OBJ)/*.* mkdir $(OBJ))
+	@$(subst /,\,@echo directory created > $@)
+
+#===========================================
+# Work around some djgpp long file name woes
+#===========================================
+
+$(PATCHLEV_H):
+	@$(subst /,\,if not exist $@ copy $(INCL)/patchlevel.h $(INCL)/patchlev.h)
 
 #=============================================================
 # LUA

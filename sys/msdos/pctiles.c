@@ -33,8 +33,8 @@
 #include "tile.h"
 #include "pctiles.h"
 
-STATIC_VAR FILE *tilefile;
-STATIC_VAR FILE *tilefile_O;
+static FILE *tilefile;
+static FILE *tilefile_O;
 extern short glyph2tile[]; /* in tile.c (made from tilemap.c) */
 
 #ifdef TILES_IN_RAM

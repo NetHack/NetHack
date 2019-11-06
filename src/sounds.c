@@ -1,16 +1,16 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1542765362 2018/11/21 01:56:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1570844005 2019/10/12 01:33:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.83 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));
-STATIC_DCL int FDECL(domonnoise, (struct monst *));
-STATIC_DCL int NDECL(dochat);
-STATIC_DCL int FDECL(mon_in_room, (struct monst *, int));
+static boolean FDECL(mon_is_gecko, (struct monst *));
+static int FDECL(domonnoise, (struct monst *));
+static int NDECL(dochat);
+static int FDECL(mon_in_room, (struct monst *, int));
 
 /* this easily could be a macro, but it might overtax dumb compilers */
-STATIC_OVL int
+static int
 mon_in_room(mon, rmtyp)
 struct monst *mon;
 int rmtyp;
@@ -468,7 +468,7 @@ register struct monst *mtmp;
 }
 
 /* return True if mon is a gecko or seems to look like one (hallucination) */
-STATIC_OVL boolean
+static boolean
 mon_is_gecko(mon)
 struct monst *mon;
 {
@@ -487,7 +487,7 @@ struct monst *mon;
     return (boolean) (glyph_to_mon(glyph) == PM_GECKO);
 }
 
-STATIC_OVL int
+static int
 domonnoise(mtmp)
 register struct monst *mtmp;
 {
@@ -496,7 +496,7 @@ register struct monst *mtmp;
         *verbl_msg = 0,                 /* verbalize() */
         *verbl_msg_mcan = 0;            /* verbalize() if cancelled */
     struct permonst *ptr = mtmp->data;
-    int msound = ptr->msound;
+    int msound = ptr->msound, gnomeplan = 0;
 
     /* presumably nearness and sleep checks have already been made */
     if (Deaf)
@@ -512,8 +512,9 @@ register struct monst *mtmp;
         msound = mons[genus(monsndx(ptr), 1)].msound;
     /* some normally non-speaking types can/will speak if hero is similar */
     else if (msound == MS_ORC         /* note: MS_ORC is same as MS_GRUNT */
-             && (same_race(ptr, g.youmonst.data)           /* current form, */
-                 || same_race(ptr, &mons[Race_switch]))) /* unpoly'd form */
+             && ((same_race(ptr, g.youmonst.data)          /* current form, */
+                  || same_race(ptr, &mons[Race_switch])) /* unpoly'd form */
+                 || Hallucination))
         msound = MS_HUMANOID;
     /* silliness, with slight chance to interfere with shopping */
     else if (Hallucination && mon_is_gecko(mtmp))
@@ -588,13 +589,14 @@ register struct monst *mtmp;
             } else
                 verbl_msg = "I only drink... potions.";
         } else {
-            int vampindex;
             static const char *const vampmsg[] = {
                 /* These first two (0 and 1) are specially handled below */
                 "I vant to suck your %s!",
                 "I vill come after %s without regret!",
                 /* other famous vampire quotes can follow here if desired */
             };
+            int vampindex;
+
             if (kindred)
                 verbl_msg =
                     "This is my hunting ground that you dare to prowl!";
@@ -803,6 +805,18 @@ register struct monst *mtmp;
             pline_msg = "talks about spellcraft.";
         else if (ptr->mlet == S_CENTAUR)
             pline_msg = "discusses hunting.";
+        else if (is_gnome(ptr) && Hallucination && (gnomeplan = rn2(4)) % 2)
+            /* skipped for rn2(4) result of 0 or 2;
+               gag from an early episode of South Park called "Gnomes";
+               initially, Tweek (introduced in that episode) is the only
+               one aware of the tiny gnomes after spotting them sneaking
+               about; they are embarked upon a three-step business plan;
+               a diagram of the plan shows:
+                         Phase 1         Phase 2      Phase 3
+                   Collect underpants       ?          Profit
+               and they never verbalize step 2 so we don't either */
+            verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
+                                         : "Phase three, profit!";
         else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:
@@ -967,7 +981,7 @@ dotalk()
     return result;
 }
 
-STATIC_OVL int
+static int
 dochat()
 {
     struct monst *mtmp;

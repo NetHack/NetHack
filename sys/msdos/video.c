@@ -122,7 +122,7 @@ void FDECL(get_cursor, (int *, int *));
 void FDECL(adjust_cursor_flags, (struct WinDesc *));
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
-STATIC_DCL void NDECL(init_ttycolor);
+static void NDECL(init_ttycolor);
 
 int savevmode;               /* store the original video mode in here */
 int curcol, currow;          /* graphics mode current cursor locations */
@@ -571,8 +571,10 @@ const char *s;
     }
 }
 
-void xputc(ch) /* write out character (and attribute) */
-char ch;
+/* same signature as 'putchar()' with potential failure result ignored */
+int
+xputc(ch) /* write out character (and attribute) */
+int ch;
 {
     int i;
     char attribute;
@@ -591,16 +593,17 @@ char ch;
         vesa_xputc(ch, attribute);
 #endif /*SCREEN_VESA*/
     }
+    return 0;
 }
 
-void xputg(glyphnum, ch,
-           special) /* write out a glyph picture at current location */
+/* write out a glyph picture at current location */
+void xputg(glyphnum, ch, special)
 int glyphnum;
 int ch;
 unsigned special;
 {
     if (!iflags.grmode || !iflags.tile_view) {
-        xputc((char) ch);
+        (void) xputc((char) ch);
 #ifdef SCREEN_VGA
     } else if (iflags.grmode && iflags.usevga) {
         vga_xputg(glyphnum, ch, special);
@@ -719,7 +722,7 @@ char *schoice[3] = { "dark", "normal", "light" };
 char *shade[3];
 #endif /* VIDEOSHADES */
 
-STATIC_OVL void
+static void
 init_ttycolor()
 {
 #ifdef VIDEOSHADES

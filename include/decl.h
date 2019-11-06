@@ -7,13 +7,13 @@
 #define DECL_H
 
 #define E extern
-#if !defined(MFLOPPY) && !defined(VMS) && !defined(WIN32)
+#if !defined(MICRO) && !defined(VMS) && !defined(WIN32)
 #define LOCKNAMESIZE (PL_NSIZ + 14) /* long enough for uid+name+.99 */
 #define LOCKNAMEINIT "1lock"
 #define BONESINIT "bonesnn.xxx"
 #define BONESSIZE sizeof(BONESINIT)
 #else
-#if defined(MFLOPPY)
+#if defined(MICRO)
 #define LOCKNAMESIZE FILENAME
 #define LOCKNAMEINIT ""
 #define BONESINIT ""
@@ -52,7 +52,7 @@
 #define SAVEX ""
 #if !defined(SAVE_EXTENSION)
 #ifdef MICRO
-#define SAVE_EXTENSION ".sav"
+#define SAVE_EXTENSION ".svh"
 #endif
 #ifdef WIN32
 #define SAVE_EXTENSION ".NetHack-saved-game"
@@ -316,7 +316,8 @@ struct c_common_strings {
     const char *const c_nothing_happens, *const c_thats_enough_tries,
         *const c_silly_thing_to, *const c_shudder_for_moment,
         *const c_something, *const c_Something, *const c_You_can_move_again,
-        *const c_Never_mind, *c_vision_clears, *const c_the_your[2];
+        *const c_Never_mind, *c_vision_clears, *const c_the_your[2],
+        *const c_fakename[2];
 };
 
 E const struct c_common_strings c_common_strings;
@@ -331,6 +332,9 @@ E const struct c_common_strings c_common_strings;
 #define Never_mind c_common_strings.c_Never_mind
 #define vision_clears c_common_strings.c_vision_clears
 #define the_your c_common_strings.c_the_your
+/* fakename[] used occasionally so vtense() won't be fooled by an assigned
+   name ending in 's' */
+#define fakename c_common_strings.c_fakename
 
 /* material strings */
 E const char *materialnm[];
@@ -884,6 +888,7 @@ struct instance_globals {
     char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */    
     struct monst *mydogs; /* monsters that went down/up together with @ */
     struct monst *migrating_mons; /* monsters moving to another level */
+    struct autopickup_exception *apelist;
     struct mvitals mvitals[NUMMONS];
 
     /* dokick.c */
@@ -895,8 +900,10 @@ struct instance_globals {
     struct symsetentry symset[NUM_GRAPHICS];
     int currentgraphics;
     nhsym showsyms[SYM_MAX]; /* symbols to be displayed */
-    nhsym l_syms[SYM_MAX];   /* loaded symbols          */
-    nhsym r_syms[SYM_MAX];   /* rogue symbols           */
+    nhsym primary_syms[SYM_MAX];   /* loaded primary symbols          */
+    nhsym rogue_syms[SYM_MAX];   /* loaded rogue symbols           */
+    nhsym ov_primary_syms[SYM_MAX];   /* loaded primary symbols          */
+    nhsym ov_rogue_syms[SYM_MAX];   /* loaded rogue symbols           */
     nhsym warnsyms[WARNCOUNT]; /* the current warning display symbols */
 
     /* dungeon.c */

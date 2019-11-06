@@ -17,19 +17,19 @@
 
 static void NDECL(dump_qtlist);
 static void FDECL(Fread, (genericptr_t, int, int, dlb *));
-STATIC_DCL struct qtmsg *FDECL(construct_qtlist, (long));
-STATIC_DCL const char *NDECL(intermed);
-STATIC_DCL struct obj *FDECL(find_qarti, (struct obj *));
-STATIC_DCL const char *NDECL(neminame);
-STATIC_DCL const char *NDECL(guardname);
-STATIC_DCL const char *NDECL(homebase);
-STATIC_DCL void FDECL(qtext_pronoun, (CHAR_P, CHAR_P));
-STATIC_DCL struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
-STATIC_DCL void FDECL(convert_arg, (CHAR_P));
-STATIC_DCL void FDECL(convert_line, (char *,char *));
-STATIC_DCL void FDECL(deliver_by_pline, (struct qtmsg *));
-STATIC_DCL void FDECL(deliver_by_window, (struct qtmsg *, int));
-STATIC_DCL boolean FDECL(skip_pager, (BOOLEAN_P));
+static struct qtmsg *FDECL(construct_qtlist, (long));
+static const char *NDECL(intermed);
+static struct obj *FDECL(find_qarti, (struct obj *));
+static const char *NDECL(neminame);
+static const char *NDECL(guardname);
+static const char *NDECL(homebase);
+static void FDECL(qtext_pronoun, (CHAR_P, CHAR_P));
+static struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
+static void FDECL(convert_arg, (CHAR_P));
+static void FDECL(convert_line, (char *,char *));
+static void FDECL(deliver_by_pline, (struct qtmsg *));
+static void FDECL(deliver_by_window, (struct qtmsg *, int));
+static boolean FDECL(skip_pager, (BOOLEAN_P));
 
 /* dump the character msg list to check appearance;
    build with DEBUG enabled and use DEBUGFILES=questpgr.c
@@ -65,7 +65,7 @@ dlb *stream;
     }
 }
 
-STATIC_OVL struct qtmsg *
+static struct qtmsg *
 construct_qtlist(hdr_offset)
 long hdr_offset;
 {
@@ -175,7 +175,7 @@ ldrname()
 }
 
 /* return your intermediate target string */
-STATIC_OVL const char *
+static const char *
 intermed()
 {
     return g.urole.intermed;
@@ -188,7 +188,7 @@ struct obj *otmp;
     return (boolean) (otmp->oartifact == g.urole.questarti);
 }
 
-STATIC_OVL struct obj *
+static struct obj *
 find_qarti(ochain)
 struct obj *ochain;
 {
@@ -241,7 +241,7 @@ unsigned whichchains;
 }
 
 /* return your role nemesis' name */
-STATIC_OVL const char *
+static const char *
 neminame()
 {
     int i = g.urole.neminum;
@@ -251,7 +251,7 @@ neminame()
     return g.nambuf;
 }
 
-STATIC_OVL const char *
+static const char *
 guardname() /* return your role leader's guard monster name */
 {
     int i = g.urole.guardnum;
@@ -259,7 +259,7 @@ guardname() /* return your role leader's guard monster name */
     return mons[i].mname;
 }
 
-STATIC_OVL const char *
+static const char *
 homebase() /* return your role leader's location */
 {
     return g.urole.homebase;
@@ -267,7 +267,7 @@ homebase() /* return your role leader's location */
 
 /* replace deity, leader, nemesis, or artifact name with pronoun;
    overwrites cvt_buf[] */
-STATIC_OVL void
+static void
 qtext_pronoun(who, which)
 char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
     which; /* 'h'|'H'|'i'|'I'|'j'|'J' */
@@ -304,7 +304,7 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
     return;
 }
 
-STATIC_OVL struct qtmsg *
+static struct qtmsg *
 msg_in(qtm_list, msgnum)
 struct qtmsg *qtm_list;
 int msgnum;
@@ -318,7 +318,7 @@ int msgnum;
     return (struct qtmsg *) 0;
 }
 
-STATIC_OVL void
+static void
 convert_arg(c)
 char c;
 {
@@ -410,7 +410,7 @@ char c;
     Strcpy(g.cvt_buf, str);
 }
 
-STATIC_OVL void
+static void
 convert_line(in_line, out_line)
 char *in_line, *out_line;
 {
@@ -504,7 +504,7 @@ char *in_line, *out_line;
     return;
 }
 
-STATIC_OVL void
+static void
 deliver_by_pline(qt_msg)
 struct qtmsg *qt_msg;
 {
@@ -519,7 +519,7 @@ struct qtmsg *qt_msg;
     }
 }
 
-STATIC_OVL void
+static void
 deliver_by_window(qt_msg, how)
 struct qtmsg *qt_msg;
 int how;
@@ -569,7 +569,7 @@ int how;
         putmsghistory(out_line, FALSE);
 }
 
-boolean
+static boolean
 skip_pager(common)
 boolean common;
 {

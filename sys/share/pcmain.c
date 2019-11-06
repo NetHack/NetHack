@@ -7,6 +7,7 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include "sfproto.h"
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -40,8 +41,8 @@ extern int bigscreen;
 void NDECL(preserve_icon);
 #endif
 
-STATIC_DCL void FDECL(process_options, (int argc, char **argv));
-STATIC_DCL void NDECL(nhusage);
+static void FDECL(process_options, (int argc, char **argv));
+static void NDECL(nhusage);
 
 #if defined(MICRO) || defined(OS2)
 extern void FDECL(nethack_exit, (int));
@@ -50,7 +51,7 @@ extern void FDECL(nethack_exit, (int));
 #endif
 
 #ifdef EXEPATH
-STATIC_DCL char *FDECL(exepath, (char *));
+static char *FDECL(exepath, (char *));
 #endif
 
 int FDECL(main, (int, char **));
@@ -530,7 +531,7 @@ attempt_restore:
     return resuming;
 }
 
-STATIC_OVL void
+static void
 process_options(argc, argv)
 int argc;
 char *argv[];
@@ -661,7 +662,7 @@ char *argv[];
     }
 }
 
-STATIC_OVL void
+static void
 nhusage()
 {
     char buf1[BUFSZ], buf2[BUFSZ], *bufptr;

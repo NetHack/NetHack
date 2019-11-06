@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1559601027 2019/06/03 22:30:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1570566373 2019/10/08 20:26:13 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,11 +8,11 @@
 
 #include "hack.h"
 
-STATIC_DCL int NDECL(bc_order);
-STATIC_DCL void NDECL(litter);
-STATIC_OVL void NDECL(placebc_core);
-STATIC_OVL void NDECL(unplacebc_core);
-STATIC_DCL boolean FDECL(check_restriction, (int));
+static int NDECL(bc_order);
+static void NDECL(litter);
+static void NDECL(placebc_core);
+static void NDECL(unplacebc_core);
+static boolean FDECL(check_restriction, (int));
 
 static int bcrestriction = 0;
 #ifdef BREADCRUMBS
@@ -114,7 +114,7 @@ ballfall()
  *
  *  Should not be called while swallowed except on waterlevel.
  */
-STATIC_OVL void
+static void
 placebc_core()
 {
     if (!uchain || !uball) {
@@ -141,7 +141,7 @@ placebc_core()
     bcrestriction = 0;
 }
 
-STATIC_OVL void
+static void
 unplacebc_core()
 {
     if (u.uswallow) {
@@ -173,7 +173,7 @@ unplacebc_core()
     u.bc_felt = 0; /* feel nothing */
 }
 
-STATIC_OVL boolean
+static boolean
 check_restriction(restriction)
 int restriction;
 {
@@ -362,7 +362,7 @@ int linenum;
  *  Return the stacking of the hero's ball & chain.  This assumes that the
  *  hero is being punished.
  */
-STATIC_OVL int
+static int
 bc_order()
 {
     struct obj *obj;
@@ -977,7 +977,7 @@ xchar x, y;
 }
 
 /* ball&chain cause hero to randomly lose stuff from inventory */
-STATIC_OVL void
+static void
 litter()
 {
     struct obj *otmp, *nextobj = 0;
@@ -1074,7 +1074,7 @@ bc_sanity_check()
                       && uball->where != OBJ_FREE)
                   || (freeball ^ freechain)
                   || (uball->owornmask & W_BALL) == 0L
-                  || (uball->owornmask & ~(W_BALL | W_WEAPON)) != 0L)) {
+                  || (uball->owornmask & ~(W_BALL | W_WEAPONS)) != 0L)) {
         otyp = uball->otyp;
         onam = safe_typename(otyp);
         impossible("uball: type %d (%s), where %d, wornmask=0x%08lx",

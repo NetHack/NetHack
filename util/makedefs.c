@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1557254354 2019/05/07 18:39:14 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.145 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1562180226 2019/07/03 18:57:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -938,7 +938,7 @@ unsigned long old_rumor_offset;
     return rumor_offset;
 }
 
-void
+static void
 do_rnd_access_file(fname)
 const char *fname;
 {
@@ -1403,7 +1403,7 @@ do_date()
     return;
 }
 
-boolean
+static boolean
 get_gitinfo(githash, gitbranch)
 char *githash, *gitbranch;
 {
@@ -1513,8 +1513,10 @@ static const char *build_opts[] = {
 #ifdef TEXTCOLOR
     "color",
 #endif
+#ifdef TTY_GRAPHICS
 #ifdef TTY_TILES_ESCCODES
     "console escape codes for tile hinting",
+#endif
 #endif
 #ifdef COM_COMPL
     "command line completion",
@@ -1640,20 +1642,25 @@ static const char *build_opts[] = {
 #ifdef SUSPEND
     "suspend command",
 #endif
+#ifdef TTY_GRAPHICS
 #ifdef TERMINFO
     "terminal info library",
 #else
-#if defined(TERMLIB) \
-    || ((!defined(MICRO) && !defined(WIN32)) && defined(TTY_GRAPHICS))
+#if defined(TERMLIB) || (!defined(MICRO) && !defined(WIN32))
     "terminal capability library",
 #endif
 #endif
+#endif /*TTY_GRAPHICS*/
+/*#ifdef X11_GRAPHICS*/
 #ifdef USE_XPM
-    "tile_file in XPM format",
+    "tiles file in XPM format",
 #endif
+/*#endif*/
+/*#if (defined(QT_GRAPHICS) || defined(X11_GRAPHICS)*/
 #ifdef GRAPHIC_TOMBSTONE
     "graphical RIP screen",
 #endif
+/*#endif*/
 #ifdef TIMED_DELAY
     "timed wait for display effects",
 #endif
@@ -1706,25 +1713,25 @@ static struct win_info window_opts[] = {
 #ifdef X11_GRAPHICS
     { "X11", "X11" },
 #endif
-#ifdef QT_GRAPHICS
+#ifdef QT_GRAPHICS /* too vague; there are multiple incompatible versions */
     { "Qt", "Qt" },
 #endif
-#ifdef GNOME_GRAPHICS
+#ifdef GNOME_GRAPHICS /* unmaintained/defunct */
     { "Gnome", "Gnome" },
 #endif
-#ifdef MAC
+#ifdef MAC /* defunct OS 9 interface */
     { "mac", "Mac" },
 #endif
-#ifdef AMIGA_INTUITION
+#ifdef AMIGA_INTUITION /* unmaintained/defunct */
     { "amii", "Amiga Intuition" },
 #endif
-#ifdef GEM_GRAPHICS
+#ifdef GEM_GRAPHICS /* defunct Atari interface */
     { "Gem", "Gem" },
 #endif
-#ifdef MSWIN_GRAPHICS
+#ifdef MSWIN_GRAPHICS /* win32 */
     { "mswin", "mswin" },
 #endif
-#ifdef BEOS_GRAPHICS
+#ifdef BEOS_GRAPHICS /* unmaintained/defunct */
     { "BeOS", "BeOS InterfaceKit" },
 #endif
     { 0, 0 }

@@ -7,14 +7,14 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(stock_room_goodpos, (struct mkroom *, int, int, int, int));
-STATIC_DCL boolean FDECL(veggy_item, (struct obj * obj, int));
-STATIC_DCL int NDECL(shkveg);
-STATIC_DCL void FDECL(mkveggy_at, (int, int));
-STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *, int, int,
+static boolean FDECL(stock_room_goodpos, (struct mkroom *, int, int, int, int));
+static boolean FDECL(veggy_item, (struct obj * obj, int));
+static int NDECL(shkveg);
+static void FDECL(mkveggy_at, (int, int));
+static void FDECL(mkshobj_at, (const struct shclass *, int, int,
                                    BOOLEAN_P));
-STATIC_DCL void FDECL(nameshk, (struct monst *, const char *const *));
-STATIC_DCL int FDECL(shkinit, (const struct shclass *, struct mkroom *));
+static void FDECL(nameshk, (struct monst *, const char *const *));
+static int FDECL(shkinit, (const struct shclass *, struct mkroom *));
 
 #define VEGETARIAN_CLASS (MAXOCLASSES + 1)
 
@@ -369,7 +369,7 @@ init_shop_selection()
 
 /* decide whether an object or object type is considered vegetarian;
    for types, items which might go either way are assumed to be veggy */
-STATIC_OVL boolean
+static boolean
 veggy_item(obj, otyp)
 struct obj *obj;
 int otyp; /* used iff obj is null */
@@ -400,7 +400,7 @@ int otyp; /* used iff obj is null */
     return FALSE;
 }
 
-STATIC_OVL int
+static int
 shkveg()
 {
     int i, j, maxprob, prob;
@@ -435,7 +435,7 @@ shkveg()
 }
 
 /* make a random item for health food store */
-STATIC_OVL void
+static void
 mkveggy_at(sx, sy)
 int sx, sy;
 {
@@ -447,7 +447,7 @@ int sx, sy;
 }
 
 /* make an object of the appropriate type for a shop square */
-STATIC_OVL void
+static void
 mkshobj_at(shp, sx, sy, mkspecl)
 const struct shclass *shp;
 int sx, sy;
@@ -487,7 +487,7 @@ boolean mkspecl;
 }
 
 /* extract a shopkeeper name for the given shop type */
-STATIC_OVL void
+static void
 nameshk(shk, nlp)
 struct monst *shk;
 const char *const *nlp;
@@ -585,7 +585,7 @@ struct monst *mtmp;
 }
 
 /* create a new shopkeeper in the given room */
-STATIC_OVL int
+static int
 shkinit(shp, sroom)
 const struct shclass *shp;
 struct mkroom *sroom;
@@ -679,7 +679,7 @@ struct mkroom *sroom;
     return sh;
 }
 
-STATIC_OVL boolean
+static boolean
 stock_room_goodpos(sroom, rmno, sh, sx, sy)
 struct mkroom *sroom;
 int rmno, sh, sx,sy;

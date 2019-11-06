@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1559670605 2019/06/04 17:50:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.250 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1571347976 2019/10/17 21:32:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.254 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -84,8 +84,8 @@ static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #include <share.h>
 #endif
 
-STATIC_DCL FILE *NDECL(fopen_wizkit_file);
-STATIC_DCL void FDECL(wizkit_addinv, (struct obj *));
+static FILE *NDECL(fopen_wizkit_file);
+static void FDECL(wizkit_addinv, (struct obj *));
 
 #ifdef AMIGA
 extern char PATH[]; /* see sys/amiga/amidos.c */
@@ -127,47 +127,47 @@ extern char *sounddir;
 #endif
 
 #ifdef SELECTSAVED
-STATIC_PTR int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
+static int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
 #endif
-STATIC_DCL char *FDECL(set_bonesfile_name, (char *, d_level *));
-STATIC_DCL char *NDECL(set_bonestemp_name);
+static char *FDECL(set_bonesfile_name, (char *, d_level *));
+static char *NDECL(set_bonestemp_name);
 #ifdef COMPRESS
-STATIC_DCL void FDECL(redirect, (const char *, const char *, FILE *,
+static void FDECL(redirect, (const char *, const char *, FILE *,
                                  BOOLEAN_P));
 #endif
 #if defined(COMPRESS) || defined(ZLIB_COMP)
-STATIC_DCL void FDECL(docompress_file, (const char *, BOOLEAN_P));
+static void FDECL(docompress_file, (const char *, BOOLEAN_P));
 #endif
 #if defined(ZLIB_COMP)
-STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
+static boolean FDECL(make_compressed_name, (const char *, char *));
 #endif
 #ifndef USE_FCNTL
-STATIC_DCL char *FDECL(make_lockname, (const char *, char *));
+static char *FDECL(make_lockname, (const char *, char *));
 #endif
-STATIC_DCL void FDECL(set_configfile_name, (const char *));
-STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
-STATIC_DCL int FDECL(get_uchars, (char *, uchar *, BOOLEAN_P,
+static void FDECL(set_configfile_name, (const char *));
+static FILE *FDECL(fopen_config_file, (const char *, int));
+static int FDECL(get_uchars, (char *, uchar *, BOOLEAN_P,
                                   int, const char *));
 boolean FDECL(proc_wizkit_line, (char *));
 boolean FDECL(parse_config_line, (char *));
-STATIC_DCL boolean FDECL(parse_conf_file, (FILE *, boolean (*proc)(char *)));
-STATIC_DCL FILE *NDECL(fopen_sym_file);
+static boolean FDECL(parse_conf_file, (FILE *, boolean (*proc)(char *)));
+static FILE *NDECL(fopen_sym_file);
 boolean FDECL(proc_symset_line, (char *));
-STATIC_DCL void FDECL(set_symhandling, (char *, int));
+static void FDECL(set_symhandling, (char *, int));
 #ifdef NOCWD_ASSUMPTIONS
-STATIC_DCL void FDECL(adjust_prefix, (char *, int));
+static void FDECL(adjust_prefix, (char *, int));
 #endif
-STATIC_DCL boolean FDECL(config_error_nextline, (const char *));
-STATIC_DCL void NDECL(free_config_sections);
-STATIC_DCL char *FDECL(choose_random_part, (char *, CHAR_P));
-STATIC_DCL boolean FDECL(is_config_section, (const char *));
-STATIC_DCL boolean FDECL(handle_config_section, (char *));
-STATIC_DCL void FDECL(parseformat, (int *, char *));
+static boolean FDECL(config_error_nextline, (const char *));
+static void NDECL(free_config_sections);
+static char *FDECL(choose_random_part, (char *, CHAR_P));
+static boolean FDECL(is_config_section, (const char *));
+static boolean FDECL(handle_config_section, (char *));
+static void FDECL(parseformat, (int *, char *));
 
 #ifdef SELF_RECOVER
-STATIC_DCL boolean FDECL(copy_bytes, (int, int));
+static boolean FDECL(copy_bytes, (int, int));
 #endif
-STATIC_DCL NHFILE *FDECL(viable_nhfile, (NHFILE *));
+static NHFILE *FDECL(viable_nhfile, (NHFILE *));
 
 /*
  * fname_encode()
@@ -697,7 +697,7 @@ clearlocks()
 
 #if defined(SELECTSAVED)
 /* qsort comparison routine */
-STATIC_OVL int CFDECLSPEC
+static int CFDECLSPEC
 strcmp_wrap(p, q)
 const void *p;
 const void *q;
@@ -732,7 +732,7 @@ int fd;
 /* set up "file" to be file name for retrieving bones, and return a
  * bonesid to be read/written in the bones file.
  */
-STATIC_OVL char *
+static char *
 set_bonesfile_name(file, lev)
 char *file;
 d_level *lev;
@@ -795,7 +795,7 @@ d_level *lev;
  * (we are not reading or writing level files while writing bones files, so
  * the same array may be used instead of copying.)
  */
-STATIC_OVL char *
+static char *
 set_bonestemp_name()
 {
     char *tf;
@@ -1045,7 +1045,14 @@ boolean regularize_it;
     regoffset = 5;
     indicator_spot = 2;
 #endif
-#if defined(MICRO) && !defined(VMS) && !defined(WIN32)
+#if defined(MSDOS)
+    if (strlen(g.SAVEP) < (SAVESIZE - 1))
+        Strcpy(g.SAVEF, g.SAVEP);
+    if (strlen(g.SAVEF) < (SAVESIZE - 1))
+        (void) strncat(g.SAVEF, g.plname,
+			(SAVESIZE - strlen(g.SAVEF)));
+#endif
+#if defined(MICRO) && !defined(VMS) && !defined(WIN32) && !defined(MSDOS)
     if (strlen(g.SAVEP) < (SAVESIZE - 1))
         Strcpy(g.SAVEF, g.SAVEP);
     else
@@ -1076,9 +1083,20 @@ boolean regularize_it;
     }
 #ifdef SAVE_EXTENSION
     if (strlen(SAVE_EXTENSION) > 0 && !overflow) {
-        if (strlen(g.SAVEF) + strlen(SAVE_EXTENSION) < (SAVESIZE - 1))
+        if (strlen(g.SAVEF) + strlen(SAVE_EXTENSION) < (SAVESIZE - 1)) {
             Strcat(g.SAVEF, SAVE_EXTENSION);
-        else
+#ifdef MSDOS
+#ifdef SYSCF
+ 	if (idx >= historical && idx <= ascii) {
+	    /* we did leave room for the extra char in SAVE_EXTENSION */
+	    g.SAVEF[strlen(g.SAVEF)-1] =
+	    	(idx == lendian) ? 'l' :
+	    	(idx == ascii)   ? 'a' : '\0';
+	}
+        sfindicator = sfoprocs[idx].ext;
+#endif
+#endif
+        } else
             overflow = 3;
     }
 #endif
@@ -1353,6 +1371,10 @@ get_saved_games()
     {
         char *foundfile;
         const char *fq_save;
+        const char *fq_new_save;
+        const char *fq_old_save;
+        char **files = 0;
+        int i;
 
         Strcpy(g.plname, "*");
         set_savefile_name(FALSE);
@@ -1368,20 +1390,44 @@ get_saved_games()
                 ++n;
             } while (findnext());
         }
+
         if (n > 0) {
-            result = (char **) alloc((n + 1) * sizeof(char *)); /* at most */
-            (void) memset((genericptr_t) result, 0, (n + 1) * sizeof(char *));
+            files = (char **) alloc((n + 1) * sizeof(char *)); /* at most */
+            (void) memset((genericptr_t) files, 0, (n + 1) * sizeof(char *));
             if (findfirst((char *) fq_save)) {
-                j = n = 0;
+                i = 0;
                 do {
-                    char *r;
-                    r = plname_from_file(foundfile);
-                    if (r)
-                        result[j++] = r;
-                    ++n;
+                    files[i++] = strdup(foundfile);
                 } while (findnext());
             }
         }
+
+        if (n > 0) {
+            result = (char **) alloc((n + 1) * sizeof(char *)); /* at most */
+            (void) memset((genericptr_t) result, 0, (n + 1) * sizeof(char *));
+            for(i = 0; i < n; i++) {
+                char *r;
+                r = plname_from_file(files[i]);
+
+                if (r) {
+
+                    /* rename file if it is not named as expected */
+                    Strcpy(g.plname, r);
+                    set_savefile_name(FALSE);
+                    fq_new_save = fqname(g.SAVEF, SAVEPREFIX, 0);
+                    fq_old_save = fqname(files[i], SAVEPREFIX, 1);
+
+                    if(strcmp(fq_old_save, fq_new_save) != 0 &&
+                        !file_exists(fq_new_save))
+                        rename(fq_old_save, fq_new_save);
+
+                    result[j++] = r;
+                }
+            }
+        }
+
+        free_saved_games(files);
+
     }
 #endif
 #if defined(UNIX) && defined(QT_GRAPHICS)
@@ -1460,7 +1506,7 @@ char **saved;
 
 #ifdef COMPRESS
 
-STATIC_OVL void
+static void
 redirect(filename, mode, stream, uncomp)
 const char *filename, *mode;
 FILE *stream;
@@ -1480,7 +1526,7 @@ boolean uncomp;
  *
  * cf. child() in unixunix.c.
  */
-STATIC_OVL void
+static void
 docompress_file(filename, uncomp)
 const char *filename;
 boolean uncomp;
@@ -1665,7 +1711,7 @@ const char *filename UNUSED_if_not_COMPRESS;
 }
 
 #ifdef ZLIB_COMP /* RLC 09 Mar 1999: Support internal ZLIB */
-STATIC_OVL boolean
+static boolean
 make_compressed_name(filename, cfn)
 const char *filename;
 char *cfn;
@@ -1698,7 +1744,7 @@ char *cfn;
 #endif /* SHORT_FILENAMES */
 }
 
-STATIC_OVL void
+static void
 docompress_file(filename, uncomp)
 const char *filename;
 boolean uncomp;
@@ -1838,7 +1884,7 @@ struct flock sflock; /* for unlocking, same as above */
 #define HUP if (!g.program_state.done_hup)
 
 #ifndef USE_FCNTL
-STATIC_OVL char *
+static char *
 make_lockname(filename, lockname)
 const char *filename;
 char *lockname;
@@ -2095,7 +2141,7 @@ const char *default_configfile =
     "NetHack Defaults";
 #else
 #if defined(MSDOS) || defined(WIN32)
-    "defaults.nh";
+    CONFIG_FILE;
 #else
     "NetHack.cnf";
 #endif
@@ -2118,7 +2164,7 @@ const char *backward_compat_configfile = "nethack.cnf";
 
 /* remember the name of the file we're accessing;
    if may be used in option reject messages */
-STATIC_OVL void
+static void
 set_configfile_name(fname)
 const char *fname;
 {
@@ -2130,7 +2176,7 @@ const char *fname;
 #define fopenp fopen
 #endif
 
-STATIC_OVL FILE *
+static FILE *
 fopen_config_file(filename, src)
 const char *filename;
 int src;
@@ -2273,7 +2319,7 @@ int src;
  * NOTE: zeros are inserted unless modlist is TRUE, in which case the list
  *  location is unchanged.  Callers must handle zeros if modlist is FALSE.
  */
-STATIC_OVL int
+static int
 get_uchars(bufp, list, modlist, size, name)
 char *bufp;       /* current pointer */
 uchar *list;      /* return list */
@@ -2324,7 +2370,7 @@ const char *name; /* name of option for error message */
             break;
 
         default:
-        gi_error:
+ gi_error:
             raw_printf("Syntax error in %s", name);
             wait_synch();
             return count;
@@ -2334,7 +2380,7 @@ const char *name; /* name of option for error message */
 }
 
 #ifdef NOCWD_ASSUMPTIONS
-STATIC_OVL void
+static void
 adjust_prefix(bufp, prefixid)
 char *bufp;
 int prefixid;
@@ -2355,7 +2401,7 @@ int prefixid;
 #endif
 
 /* Choose at random one of the sep separated parts from str. Mangles str. */
-STATIC_OVL char *
+static char *
 choose_random_part(str,sep)
 char *str;
 char sep;
@@ -2395,7 +2441,7 @@ char sep;
     return (char *) 0;
 }
 
-STATIC_OVL void
+static void
 free_config_sections()
 {
     if (g.config_section_chosen) {
@@ -2408,7 +2454,7 @@ free_config_sections()
     }
 }
 
-STATIC_OVL boolean
+static boolean
 is_config_section(str)
 const char *str;
 {
@@ -2417,7 +2463,7 @@ const char *str;
     return (a && *str == '[' && *(a+1) == '\0' && (int)(a - str) > 0);
 }
 
-STATIC_OVL boolean
+static boolean
 handle_config_section(buf)
 char *buf;
 {
@@ -2757,10 +2803,18 @@ char *origbuf;
     } else if (src == SET_IN_SYS
                && match_varname(buf, "BONESFORMAT", 11)) {
         parseformat(sysopt.bonesformat, bufp);
+    } else if (src == SET_IN_SYS
+               && match_varname(buf, "ACCESSIBILITY", 13)) {
+        n = atoi(bufp);
+        if (n < 0 || n > 1) {
+            config_error_add("Illegal value in ACCESSIBILITY (not 0,1).");
+            return FALSE;
+        }
+        sysopt.accessibility = n;
 #endif /* SYSCF */
 
     } else if (match_varname(buf, "BOULDER", 3)) {
-        (void) get_uchars(bufp, &iflags.bouldersym, TRUE, 1,
+        (void) get_uchars(bufp, &g.ov_primary_syms[SYM_BOULDER + SYM_OFF_X], TRUE, 1,
                           "BOULDER");
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
         if (!add_menu_coloring(bufp))
@@ -2774,8 +2828,14 @@ char *origbuf;
         (void) get_uchars(bufp, translate, FALSE, WARNCOUNT,
                           "WARNINGS");
         assign_warnings(translate);
+    } else if (match_varname(buf, "ROGUESYMBOLS", 4)) {
+        if (!parsesymbols(bufp, ROGUESET)) {
+            config_error_add("Error in ROGUESYMBOLS definition '%s'", bufp);
+            retval = FALSE;
+        }
+        switch_symbols(TRUE);
     } else if (match_varname(buf, "SYMBOLS", 4)) {
-        if (!parsesymbols(bufp)) {
+        if (!parsesymbols(bufp, PRIMARY)) {
             config_error_add("Error in SYMBOLS definition '%s'", bufp);
             retval = FALSE;
         }
@@ -2980,7 +3040,7 @@ boolean secure;
     config_error_data = tmp;
 }
 
-STATIC_OVL boolean
+static boolean
 config_error_nextline(line)
 const char *line;
 {
@@ -3081,7 +3141,7 @@ int src;
     return rv;
 }
 
-STATIC_OVL FILE *
+static FILE *
 fopen_wizkit_file()
 {
     FILE *fp;
@@ -3153,7 +3213,7 @@ fopen_wizkit_file()
 }
 
 /* add to hero's inventory if there's room, otherwise put item on floor */
-STATIC_DCL void
+static void
 wizkit_addinv(obj)
 struct obj *obj;
 {
@@ -3224,7 +3284,7 @@ read_wizkit()
  *
  * Continued lines are merged together with one space in between.
  */
-STATIC_OVL boolean
+static boolean
 parse_conf_file(fp, proc)
 FILE *fp;
 boolean FDECL((*proc), (char *));
@@ -3280,9 +3340,10 @@ boolean FDECL((*proc), (char *));
                 }
 
                 ep = inbuf;
-                while (*ep == ' ' || *ep == '\t') ep++;
+                while (*ep == ' ' || *ep == '\t')
+                    ++ep;
 
-                /* lines beginning with '#' are comments. ignore empty lines. */
+                /* ignore empty lines and full-line comment lines */
                 if (!*ep || *ep == '#')
                     ignoreline = TRUE;
 
@@ -3291,9 +3352,9 @@ boolean FDECL((*proc), (char *));
 
                 /* merge now read line with previous ones, if necessary */
                 if (!ignoreline) {
-                    len = strlen(inbuf) + 1;
+                    len = (int) strlen(inbuf) + 1;
                     if (buf)
-                        len += strlen(buf);
+                        len += (int) strlen(buf);
                     tmpbuf = (char *) alloc(len);
                     if (buf) {
                         Sprintf(tmpbuf, "%s %s", buf, inbuf);
@@ -3317,6 +3378,7 @@ boolean FDECL((*proc), (char *));
                 if (match_varname(buf, "CHOOSE", 6)) {
                     char *section;
                     char *bufp = find_optparam(buf);
+
                     if (!bufp) {
                         config_error_add(
                                     "Format is CHOOSE=section1,section2,...");
@@ -3359,13 +3421,14 @@ boolean FDECL((*proc), (char *));
 extern const char *known_handling[];     /* drawing.c */
 extern const char *known_restrictions[]; /* drawing.c */
 
-STATIC_OVL
+static
 FILE *
 fopen_sym_file()
 {
     FILE *fp;
 
     fp = fopen_datafile(SYMBOLS, "r", HACKPREFIX);
+
     return fp;
 }
 
@@ -3379,10 +3442,11 @@ int which_set;
 {
     FILE *fp;
 
+    g.symset[which_set].explicitly = FALSE;
     if (!(fp = fopen_sym_file()))
         return 0;
 
-    g.symset_count = 0;
+    g.symset[which_set].explicitly = TRUE;
     g.chosen_symset_start = g.chosen_symset_end = FALSE;
     g.symset_which_set = which_set;
 
@@ -3401,7 +3465,14 @@ int which_set;
                 || !strcmpi(g.symset[which_set].name, "default")))
             clear_symsetentry(which_set, TRUE);
         config_error_done();
-        return (g.symset[which_set].name == 0) ? 1 : 0;
+
+        /* If name was defined, it was invalid... Then we're loading fallback */
+        if (g.symset[which_set].name) {
+            g.symset[which_set].explicitly = FALSE;
+            return 0;
+        }
+
+        return 1;
     }
     if (!g.chosen_symset_end)
         config_error_add("Missing finish for symset \"%s\"",
@@ -3425,7 +3496,7 @@ char *buf;
 int which_set;
 {
     int val, i;
-    struct symparse *symp = (struct symparse *) 0;
+    struct symparse *symp;
     char *bufp, *commentp, *altp;
 
     /* convert each instance of whitespace (tabs, consecutive spaces)
@@ -3472,14 +3543,19 @@ int which_set;
            building a pick-list of possible symset
            values from the file, so only do that */
         if (symp->range == SYM_CONTROL) {
-            struct symsetentry *tmpsp;
+            struct symsetentry *tmpsp, *lastsp;
 
+            for (lastsp = g.symset_list; lastsp; lastsp = lastsp->next)
+                if (!lastsp->next)
+                    break;
             switch (symp->idx) {
             case 0:
                 tmpsp = (struct symsetentry *) alloc(sizeof *tmpsp);
-                tmpsp->next = g.symset_list;
-                g.symset_list = tmpsp;
-                tmpsp->idx = g.symset_count++;
+                tmpsp->next = (struct symsetentry *) 0;
+                if (!lastsp)
+                    g.symset_list = tmpsp;
+                else
+                    lastsp->next = tmpsp;
                 tmpsp->name = dupstr(bufp);
                 tmpsp->desc = (char *) 0;
                 tmpsp->handling = H_UNK;
@@ -3490,21 +3566,22 @@ int which_set;
                 break;
             case 2:
                 /* handler type identified */
-                tmpsp = g.symset_list; /* most recent symset */
+                tmpsp = lastsp; /* most recent symset */
                 for (i = 0; known_handling[i]; ++i)
                     if (!strcmpi(known_handling[i], bufp)) {
                         tmpsp->handling = i;
                         break; /* for loop */
                     }
                 break;
-            case 3:                  /* description:something */
-                tmpsp = g.symset_list; /* most recent symset */
+            case 3:
+                /* description:something */
+                tmpsp = lastsp; /* most recent symset */
                 if (tmpsp && !tmpsp->desc)
                     tmpsp->desc = dupstr(bufp);
                 break;
             case 5:
                 /* restrictions: xxxx*/
-                tmpsp = g.symset_list; /* most recent symset */
+                tmpsp = lastsp; /* most recent symset */
                 for (i = 0; known_restrictions[i]; ++i) {
                     if (!strcmpi(known_restrictions[i], bufp)) {
                         switch (i) {
@@ -3533,9 +3610,9 @@ int which_set;
                     g.chosen_symset_start = TRUE;
                     /* these init_*() functions clear symset fields too */
                     if (which_set == ROGUESET)
-                        init_r_symbols();
+                        init_rogue_symbols();
                     else if (which_set == PRIMARY)
-                        init_l_symbols();
+                        init_primary_symbols();
                 }
                 break;
             case 1:
@@ -3588,9 +3665,9 @@ int which_set;
             val = sym_val(bufp);
             if (g.chosen_symset_start) {
                 if (which_set == PRIMARY) {
-                    update_l_symset(symp, val);
+                    update_primary_symset(symp, val);
                 } else if (which_set == ROGUESET) {
-                    update_r_symset(symp, val);
+                    update_rogue_symset(symp, val);
                 }
             }
         }
@@ -3598,7 +3675,7 @@ int which_set;
     return 1;
 }
 
-STATIC_OVL void
+static void
 set_symhandling(handling, which_set)
 char *handling;
 int which_set;
@@ -4348,7 +4425,7 @@ unsigned oid; /* book identifier */
         }
     }
 
-cleanup:
+ cleanup:
     (void) dlb_fclose(fp);
     if (nowin_buf) {
         /* one-line buffer */

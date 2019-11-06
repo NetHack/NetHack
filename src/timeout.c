@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1559664953 2019/06/04 16:15:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1565574996 2019/08/12 01:56:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,16 +8,18 @@
 #include "sfproto.h"
 
 
-STATIC_DCL void NDECL(stoned_dialogue);
-STATIC_DCL void NDECL(vomiting_dialogue);
-STATIC_DCL void NDECL(choke_dialogue);
-STATIC_DCL void NDECL(levitation_dialogue);
-STATIC_DCL void NDECL(slime_dialogue);
-STATIC_DCL void FDECL(slimed_to_death, (struct kinfo *));
-STATIC_DCL void NDECL(slip_or_trip);
-STATIC_DCL void FDECL(see_lamp_flicker, (struct obj *, const char *));
-STATIC_DCL void FDECL(lantern_message, (struct obj *));
-STATIC_DCL void FDECL(cleanup_burn, (ANY_P *, long));
+static void NDECL(stoned_dialogue);
+static void NDECL(vomiting_dialogue);
+static void NDECL(choke_dialogue);
+static void NDECL(levitation_dialogue);
+static void NDECL(slime_dialogue);
+static void FDECL(slimed_to_death, (struct kinfo *));
+static void NDECL(phaze_dialogue);
+static void FDECL(done_timeout, (int, int));
+static void NDECL(slip_or_trip);
+static void FDECL(see_lamp_flicker, (struct obj *, const char *));
+static void FDECL(lantern_message, (struct obj *));
+static void FDECL(cleanup_burn, (ANY_P *, long));
 
 /* used by wizard mode #timeout and #wizintrinsic; order by 'interest'
    for timeout countdown, where most won't occur in normal play */
@@ -107,7 +109,7 @@ static NEARDATA const char *const stoned_texts[] = {
     "You are a statue."                 /* 1 */
 };
 
-STATIC_OVL void
+static void
 stoned_dialogue()
 {
     register long i = (Stoned & TIMEOUT);
@@ -167,7 +169,7 @@ static NEARDATA const char *const vomiting_texts[] = {
     "are about to vomit."            /* 2 */
 };
 
-STATIC_OVL void
+static void
 vomiting_dialogue()
 {
     const char *txt = 0;
@@ -248,7 +250,7 @@ static NEARDATA const char *const choke_texts2[] = {
     "You suffocate."
 };
 
-STATIC_OVL void
+static void
 choke_dialogue()
 {
     register long i = (Strangled & TIMEOUT);
@@ -273,7 +275,7 @@ static NEARDATA const char *const levi_texts[] = {
     "You wobble unsteadily %s the %s."
 };
 
-STATIC_OVL void
+static void
 levitation_dialogue()
 {
     /* -1 because the last message comes via float_down() */
@@ -308,7 +310,7 @@ static NEARDATA const char *const slime_texts[] = {
     "You have become %s."             /* 1 */
 };
 
-STATIC_OVL void
+static void
 slime_dialogue()
 {
     register long i = (Slimed & TIMEOUT) / 2L;
@@ -368,7 +370,7 @@ burn_away_slime()
 }
 
 /* countdown timer for turning into green slime has run out; kill our hero */
-STATIC_OVL void
+static void
 slimed_to_death(kptr)
 struct kinfo *kptr;
 {
@@ -408,7 +410,7 @@ struct kinfo *kptr;
     /* become a green slime; also resets youmonst.m_ap_type+.mappearance */
     (void) polymon(PM_GREEN_SLIME);
     g.mvitals[PM_GREEN_SLIME].mvflags = save_mvflags;
-    done(TURNED_SLIME);
+    done_timeout(TURNED_SLIME, SLIMED);
 
     /* life-saved; even so, hero still has turned into green slime;
        player may have genocided green slimes after being infected */
@@ -427,7 +429,7 @@ struct kinfo *kptr;
             /* follows "The medallion crumbles to dust." */
             pline("Unfortunately, %s", slimebuf);
         /* die again; no possibility of amulet this time */
-        done(GENOCIDED);
+        done(GENOCIDED); /* [should it be done_timeout(GENOCIDED, SLIMED)?] */
         /* could be life-saved again (only in explore or wizard mode)
            but green slimes are gone; just stay in current form */
     }
@@ -446,7 +448,7 @@ static NEARDATA const char *const phaze_texts[] = {
     "You are feeling rather flabby.",
 };
 
-STATIC_OVL void
+static void
 phaze_dialogue()
 {
     long i = ((HPasses_walls & TIMEOUT) / 2L);
@@ -456,6 +458,23 @@ phaze_dialogue()
 
     if (((HPasses_walls & TIMEOUT) % 2L) && i > 0L && i <= SIZE(phaze_texts))
         pline1(phaze_texts[SIZE(phaze_texts) - i]);
+}
+
+/* when a status timeout is fatal, keep the status line indicator shown
+   during end of game rundown (and potential dumplog);
+   timeout has already counted down to 0 by the time we get here */
+static void
+done_timeout(how, which)
+int how, which;
+{
+    long *intrinsic_p = &u.uprops[which].intrinsic;
+
+    *intrinsic_p |= I_SPECIAL; /* affects final disclosure */
+    done(how);
+
+    /* life-saved */
+    *intrinsic_p &= ~I_SPECIAL;
+    g.context.botl = TRUE;
 }
 
 void
@@ -543,10 +562,10 @@ nh_timeout()
                 }
                 dealloc_killer(kptr);
                 /* (unlike sliming, you aren't changing form here) */
-                done(STONING);
+                done_timeout(STONING, STONED);
                 break;
             case SLIMED:
-                slimed_to_death(kptr); /* done(TURNED_SLIME) */
+                slimed_to_death(kptr); /* done_timeout(TURNED_SLIME,SLIMED) */
                 break;
             case VOMITING:
                 make_vomiting(0L, TRUE);
@@ -570,8 +589,8 @@ nh_timeout()
                         g.killer.format = KILLED_BY;
                     }
                 }
+                done_timeout(POISONING, SICK);
                 u.usick_type = 0;
-                done(POISONING);
                 break;
             case FAST:
                 if (!Very_fast)
@@ -674,7 +693,7 @@ nh_timeout()
                 g.killer.format = KILLED_BY;
                 Strcpy(g.killer.name,
                        (u.uburied) ? "suffocation" : "strangulation");
-                done(DIED);
+                done_timeout(DIED, STRANGLED);
                 /* must be declining to die in explore|wizard mode;
                    treat like being cured of strangulation by prayer */
                 if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
@@ -974,7 +993,7 @@ struct obj *figurine;
 }
 
 /* give a fumble message */
-STATIC_OVL void
+static void
 slip_or_trip()
 {
     struct obj *otmp = vobj_at(u.ux, u.uy), *otmp2;
@@ -1065,7 +1084,7 @@ slip_or_trip()
 }
 
 /* Print a lamp flicker message with tailer. */
-STATIC_OVL void
+static void
 see_lamp_flicker(obj, tailer)
 struct obj *obj;
 const char *tailer;
@@ -1082,7 +1101,7 @@ const char *tailer;
 }
 
 /* Print a dimming message for brass lanterns. */
-STATIC_OVL void
+static void
 lantern_message(obj)
 struct obj *obj;
 {
@@ -1662,15 +1681,15 @@ do_storms()
  *      Check whether object has a timer of type timer_type.
  */
 
-STATIC_DCL const char *FDECL(kind_name, (SHORT_P));
-STATIC_DCL void FDECL(print_queue, (winid, timer_element *));
-STATIC_DCL void FDECL(insert_timer, (timer_element *));
-STATIC_DCL timer_element *FDECL(remove_timer,
+static const char *FDECL(kind_name, (SHORT_P));
+static void FDECL(print_queue, (winid, timer_element *));
+static void FDECL(insert_timer, (timer_element *));
+static timer_element *FDECL(remove_timer,
                                 (timer_element **, SHORT_P, ANY_P *));
-STATIC_DCL void FDECL(write_timer, (NHFILE *, timer_element *));
-STATIC_DCL boolean FDECL(mon_is_local, (struct monst *));
-STATIC_DCL boolean FDECL(timer_is_local, (timer_element *));
-STATIC_DCL int FDECL(maybe_write_timer, (NHFILE *, int, BOOLEAN_P));
+static void FDECL(write_timer, (NHFILE *, timer_element *));
+static boolean FDECL(mon_is_local, (struct monst *));
+static boolean FDECL(timer_is_local, (timer_element *));
+static int FDECL(maybe_write_timer, (NHFILE *, int, BOOLEAN_P));
 
 /* If defined, then include names when printing out the timer queue */
 #define VERBOSE_TIMER
@@ -1703,7 +1722,7 @@ static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
 };
 #undef TTAB
 
-STATIC_OVL const char *
+static const char *
 kind_name(kind)
 short kind;
 {
@@ -1720,7 +1739,7 @@ short kind;
     return "unknown";
 }
 
-STATIC_OVL void
+static void
 print_queue(win, base)
 winid win;
 timer_element *base;
@@ -1866,13 +1885,32 @@ short kind;
 short func_index;
 anything *arg;
 {
-    timer_element *gnu;
+    timer_element *gnu, *dup;
 
-    if (func_index < 0 || func_index >= NUM_TIME_FUNCS)
-        panic("start_timer");
+    if (kind < 0 || kind >= NUM_TIMER_KINDS
+        || func_index < 0 || func_index >= NUM_TIME_FUNCS)
+        panic("start_timer (%s: %d)", kind_name(kind), (int) func_index);
 
-    gnu = (timer_element *) alloc(sizeof(timer_element));
-    (void) memset((genericptr_t)gnu, 0, sizeof(timer_element));
+    /* fail if <arg> already has a <func_index> timer running */
+    for (dup = g.timer_base; dup; dup = dup->next)
+        if (dup->kind == kind
+            && dup->func_index == func_index
+            && dup->arg.a_void == arg->a_void)
+            break;
+    if (dup) {
+        char idbuf[QBUFSZ];
+
+#ifdef VERBOSE_TIMER
+        Sprintf(idbuf, "%s timer", timeout_funcs[func_index].name);
+#else
+        Sprintf(idbuf, "%s timer (%d)", kind_name(kind), (int) func_index);
+#endif
+        impossible("Attempted to start duplicate %s, aborted.", idbuf);
+        return FALSE;
+    }
+
+    gnu = (timer_element *) alloc(sizeof *gnu);
+    (void) memset((genericptr_t) gnu, 0, sizeof *gnu);
     gnu->next = 0;
     gnu->tid = g.timer_id++;
     gnu->timeout = g.monstermoves + when;
@@ -1885,7 +1923,6 @@ anything *arg;
     if (kind == TIMER_OBJECT) /* increment object's timed count */
         (arg->a_obj)->timed++;
 
-    /* should check for duplicates and fail if any */
     return TRUE;
 }
 
@@ -2072,7 +2109,7 @@ short func_index;
 }
 
 /* Insert timer into the global queue */
-STATIC_OVL void
+static void
 insert_timer(gnu)
 timer_element *gnu;
 {
@@ -2089,7 +2126,7 @@ timer_element *gnu;
         g.timer_base = gnu;
 }
 
-STATIC_OVL timer_element *
+static timer_element *
 remove_timer(base, func_index, arg)
 timer_element **base;
 short func_index;
@@ -2111,7 +2148,7 @@ anything *arg;
     return curr;
 }
 
-STATIC_OVL void
+static void
 write_timer(nhfp, timer)
 NHFILE *nhfp;
 timer_element *timer;
@@ -2205,7 +2242,7 @@ struct obj *obj;
  * Return TRUE if the given monster will stay on the level when the
  * level is saved.
  */
-STATIC_OVL boolean
+static boolean
 mon_is_local(mon)
 struct monst *mon;
 {
@@ -2225,7 +2262,7 @@ struct monst *mon;
  * Return TRUE if the timer is attached to something that will stay on the
  * level when the level is saved.
  */
-STATIC_OVL boolean
+static boolean
 timer_is_local(timer)
 timer_element *timer;
 {
@@ -2247,7 +2284,7 @@ timer_element *timer;
  * Part of the save routine.  Count up the number of timers that would
  * be written.  If write_it is true, actually write the timer.
  */
-STATIC_OVL int
+static int
 maybe_write_timer(nhfp, range, write_it)
 NHFILE *nhfp;
 int range;

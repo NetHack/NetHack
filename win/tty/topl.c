@@ -14,11 +14,11 @@
 #define C(c) (0x1f & (c))
 #endif
 
-STATIC_DCL void FDECL(redotoplin, (const char *));
-STATIC_DCL void FDECL(topl_putsym, (CHAR_P));
-STATIC_DCL void FDECL(removetopl, (int));
-STATIC_DCL void FDECL(msghistory_snapshot, (BOOLEAN_P));
-STATIC_DCL void FDECL(free_msghistory_snapshot, (BOOLEAN_P));
+static void FDECL(redotoplin, (const char *));
+static void FDECL(topl_putsym, (CHAR_P));
+static void FDECL(removetopl, (int));
+static void FDECL(msghistory_snapshot, (BOOLEAN_P));
+static void FDECL(free_msghistory_snapshot, (BOOLEAN_P));
 
 int
 tty_doprev_message()
@@ -122,7 +122,7 @@ tty_doprev_message()
     return 0;
 }
 
-STATIC_OVL void
+static void
 redotoplin(str)
 const char *str;
 {
@@ -294,7 +294,7 @@ register const char *bp;
         redotoplin(g.toplines);
 }
 
-STATIC_OVL
+static
 void
 topl_putsym(c)
 char c;
@@ -345,7 +345,7 @@ const char *str;
         topl_putsym(*str++);
 }
 
-STATIC_OVL void
+static void
 removetopl(n)
 register int n;
 {
@@ -545,7 +545,7 @@ static char **snapshot_mesgs = 0;
 
 /* collect currently available message history data into a sequential array;
    optionally, purge that data from the active circular buffer set as we go */
-STATIC_OVL void
+static void
 msghistory_snapshot(purge)
 boolean purge; /* clear message history buffer as we copy it */
 {
@@ -591,7 +591,7 @@ boolean purge; /* clear message history buffer as we copy it */
 }
 
 /* release memory allocated to message history snapshot */
-STATIC_OVL void
+static void
 free_msghistory_snapshot(purged)
 boolean purged; /* True: took history's pointers, False: just cloned them */
 {

@@ -13,10 +13,10 @@ struct trobj {
     Bitfield(trbless, 2);
 };
 
-STATIC_DCL void FDECL(ini_inv, (struct trobj *));
-STATIC_DCL void FDECL(knows_object, (int));
-STATIC_DCL void FDECL(knows_class, (CHAR_P));
-STATIC_DCL boolean FDECL(restricted_spell_discipline, (int));
+static void FDECL(ini_inv, (struct trobj *));
+static void FDECL(knows_object, (int));
+static void FDECL(knows_class, (CHAR_P));
+static boolean FDECL(restricted_spell_discipline, (int));
 
 #define UNDEF_TYP 0
 #define UNDEF_SPE '\177'
@@ -557,7 +557,7 @@ static const struct def_skill Skill_W[] = {
     { P_NONE, 0 }
 };
 
-STATIC_OVL void
+static void
 knows_object(obj)
 register int obj;
 {
@@ -568,7 +568,7 @@ register int obj;
 /* Know ordinary (non-magical) objects of a certain class,
  * like all gems except the loadstone and luckstone.
  */
-STATIC_OVL void
+static void
 knows_class(sym)
 register char sym;
 {
@@ -907,7 +907,7 @@ u_init()
 }
 
 /* skills aren't initialized, so we use the role-specific skill lists */
-STATIC_OVL boolean
+static boolean
 restricted_spell_discipline(otyp)
 int otyp;
 {
@@ -967,7 +967,7 @@ int otyp;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 ini_inv(trop)
 register struct trobj *trop;
 {

@@ -26,7 +26,7 @@ const char *NetHack_git_sha = NETHACK_GIT_SHA;
 const char *NetHack_git_branch = NETHACK_GIT_BRANCH;
 #endif
 
-STATIC_DCL void FDECL(insert_rtoption, (char *));
+static void FDECL(insert_rtoption, (char *));
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *
@@ -227,7 +227,7 @@ static struct rt_opt {
  * it depends which of several object files got linked into the
  * game image, so we insert those options here.
  */
-STATIC_OVL void
+static void
 insert_rtoption(buf)
 char *buf;
 {

@@ -1,15 +1,15 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1561588404 2019/06/26 22:33:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	steal.c	$NHDT-Date: 1570566382 2019/10/08 20:26:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-STATIC_PTR int NDECL(stealarm);
+static int NDECL(stealarm);
 
-STATIC_DCL const char *FDECL(equipname, (struct obj *));
+static const char *FDECL(equipname, (struct obj *));
 
-STATIC_OVL const char *
+static const char *
 equipname(otmp)
 register struct obj *otmp;
 {
@@ -143,7 +143,7 @@ register struct monst *mtmp;
 unsigned int stealoid; /* object to be stolen */
 unsigned int stealmid; /* monster doing the stealing */
 
-STATIC_PTR int
+static int
 stealarm(VOID_ARGS)
 {
     register struct monst *mtmp;
@@ -218,7 +218,7 @@ boolean unchain_ball; /* whether to unpunish or just unwield */
         Ring_gone(obj);
     } else if (obj->owornmask & W_TOOL) {
         Blindf_off(obj);
-    } else if (obj->owornmask & W_WEAPON) {
+    } else if (obj->owornmask & W_WEAPONS) {
         if (obj == uwep)
             uwepgone();
         if (obj == uswapwep)
@@ -247,7 +247,8 @@ struct monst *mtmp;
 char *objnambuf;
 {
     struct obj *otmp;
-    int tmp, could_petrify, armordelay, olddelay, named = 0, retrycnt = 0;
+    int tmp, could_petrify, armordelay, olddelay, icnt,
+        named = 0, retrycnt = 0;
     boolean monkey_business, /* true iff an animal is doing the thievery */
             was_doffing, was_punished = Punished;
 
@@ -263,11 +264,15 @@ char *objnambuf;
     if (g.occupation)
         (void) maybe_finished_meal(FALSE);
 
-    if (!g.invent || (inv_cnt(FALSE) == 1 && uskin)) {
+    icnt = inv_cnt(FALSE); /* don't include gold */
+    if (!icnt || (icnt == 1 && uskin)) {
  nothing_to_steal:
         /* Not even a thousand men in armor can strip a naked man. */
         if (Blind)
             pline("Somebody tries to rob you, but finds nothing to steal.");
+        else if (inv_cnt(TRUE) > inv_cnt(FALSE)) /* ('icnt' might be stale) */
+            pline("%s tries to rob you, but isn't interested in gold.",
+                  Monnam(mtmp));
         else
             pline("%s tries to rob you, but there is nothing to steal!",
                   Monnam(mtmp));

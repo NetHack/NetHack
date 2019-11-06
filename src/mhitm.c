@@ -9,26 +9,26 @@
 static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
-STATIC_DCL int FDECL(hitmm, (struct monst *, struct monst *,
+static int FDECL(hitmm, (struct monst *, struct monst *,
                              struct attack *));
-STATIC_DCL int FDECL(gazemm, (struct monst *, struct monst *,
+static int FDECL(gazemm, (struct monst *, struct monst *,
                               struct attack *));
-STATIC_DCL int FDECL(gulpmm, (struct monst *, struct monst *,
+static int FDECL(gulpmm, (struct monst *, struct monst *,
                               struct attack *));
-STATIC_DCL int FDECL(explmm, (struct monst *, struct monst *,
+static int FDECL(explmm, (struct monst *, struct monst *,
                               struct attack *));
-STATIC_DCL int FDECL(mdamagem, (struct monst *, struct monst *,
+static int FDECL(mdamagem, (struct monst *, struct monst *,
                                 struct attack *));
-STATIC_DCL void FDECL(mswingsm, (struct monst *, struct monst *,
+static void FDECL(mswingsm, (struct monst *, struct monst *,
                                  struct obj *));
-STATIC_DCL void FDECL(noises, (struct monst *, struct attack *));
-STATIC_DCL void FDECL(missmm, (struct monst *, struct monst *,
+static void FDECL(noises, (struct monst *, struct attack *));
+static void FDECL(missmm, (struct monst *, struct monst *,
                                struct attack *));
-STATIC_DCL int FDECL(passivemm, (struct monst *, struct monst *,
+static int FDECL(passivemm, (struct monst *, struct monst *,
                                  BOOLEAN_P, int));
 
 
-STATIC_OVL void
+static void
 noises(magr, mattk)
 register struct monst *magr;
 register struct attack *mattk;
@@ -44,7 +44,7 @@ register struct attack *mattk;
     }
 }
 
-STATIC_OVL
+static
 void
 missmm(magr, mdef, mattk)
 register struct monst *magr, *mdef;
@@ -496,7 +496,7 @@ register struct monst *magr, *mdef;
 }
 
 /* Returns the result of mdamagem(). */
-STATIC_OVL int
+static int
 hitmm(magr, mdef, mattk)
 register struct monst *magr, *mdef;
 struct attack *mattk;
@@ -556,7 +556,7 @@ struct attack *mattk;
 }
 
 /* Returns the same values as mdamagem(). */
-STATIC_OVL int
+static int
 gazemm(magr, mdef, mattk)
 register struct monst *magr, *mdef;
 struct attack *mattk;
@@ -642,7 +642,7 @@ struct monst *magr, *mdef;
 }
 
 /* Returns the same values as mattackm(). */
-STATIC_OVL int
+static int
 gulpmm(magr, mdef, mattk)
 register struct monst *magr, *mdef;
 register struct attack *mattk;
@@ -730,7 +730,7 @@ register struct attack *mattk;
     return status;
 }
 
-STATIC_OVL int
+static int
 explmm(magr, mdef, mattk)
 struct monst *magr, *mdef;
 struct attack *mattk;
@@ -1471,7 +1471,7 @@ struct obj *obj;
         (void) erode_obj(obj, (char *) 0, dmgtyp, EF_GREASE | EF_VERBOSE);
 }
 
-STATIC_OVL void
+static void
 mswingsm(magr, mdef, otemp)
 struct monst *magr, *mdef;
 struct obj *otemp;
@@ -1488,7 +1488,7 @@ struct obj *otemp;
  * Passive responses by defenders.  Does not replicate responses already
  * handled above.  Returns same values as mattackm.
  */
-STATIC_OVL int
+static int
 passivemm(magr, mdef, mhit, mdead)
 register struct monst *magr, *mdef;
 boolean mhit;

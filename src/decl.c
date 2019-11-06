@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1547025164 2019/01/09 09:12:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1571352532 2019/10/17 22:48:52 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -40,6 +40,7 @@ NEARDATA struct obj *uwep, *uarm, *uswapwep,
 #ifdef TEXTCOLOR
 /*
  *  This must be the same order as used for buzz() in zap.c.
+ *  (They're only used in mapglyph.c so probably shouldn't be here.)
  */
 const int zapcolors[NUM_ZAP] = {
     HI_ZAP,     /* 0 - missile */
@@ -48,8 +49,10 @@ const int zapcolors[NUM_ZAP] = {
     HI_ZAP,     /* 3 - sleep */
     CLR_BLACK,  /* 4 - death */
     CLR_WHITE,  /* 5 - lightning */
-    CLR_YELLOW, /* 6 - poison gas */
-    CLR_GREEN,  /* 7 - acid */
+    /* 3.6.3: poison gas zap used to be yellow and acid zap was green,
+       which conflicted with the corresponding dragon colors */
+    CLR_GREEN,  /* 6 - poison gas */
+    CLR_YELLOW, /* 7 - acid */
 };
 #endif /* text color */
 
@@ -93,7 +96,8 @@ const struct c_common_strings c_common_strings = { "Nothing happens.",
                                              "You can move again.",
                                              "Never mind.",
                                              "vision quickly clears.",
-                                             { "the", "your" } };
+                                             { "the", "your" },
+                                             { "mon", "you" } };
 
 /* NOTE: the order of these words exactly corresponds to the
    order of oc_material values #define'd in objclass.h. */
@@ -375,6 +379,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* preferred_pet */
     NULL, /* mydogs */
     NULL, /* migrating_mons */
+    NULL, /* apelist */
     UNDEFINED_VALUES, /* mvitals */
 
     /* dokick.c */
@@ -386,8 +391,10 @@ const struct instance_globals g_init = {
     DUMMY, /* symset */
     0, /* currentgraphics */
     DUMMY, /* showsyms */
-    DUMMY, /* l_syms */
-    DUMMY, /* r_syms */
+    DUMMY, /* primary_syms */
+    DUMMY, /* rogue_syms */
+    DUMMY, /* ov_primary_syms */
+    DUMMY, /* ov_rogue_syms */
     DUMMY, /* warnsyms */
 
     /* dungeon.c */
@@ -703,8 +710,16 @@ decl_globals_init()
     g.valuables[2].list = NULL;
     g.valuables[2].size = 0;
 
-    nhassert(g_init.magic == IVMAGIC);
-    nhassert(g_init.havestate == TRUE);
+    if (g_init.magic != IVMAGIC) {
+        printf("decl_globals_init: g_init.magic in unexpected state (%lx)\n",
+                g_init.magic);
+        exit(1);
+    }
+
+    if (g_init.havestate != TRUE) {
+        printf("decl_globals_init: g_init..havestate not TRUE\n");
+        exit(1);
+    }
 
     sfcap = default_sfinfo;
     sfrestinfo = default_sfinfo;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1559476918 2019/06/02 12:01:58 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1562187890 2019/07/03 21:04:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,47 +36,46 @@ struct lchoice {
 };
 
 static void FDECL(Fread, (genericptr_t, int, int, dlb *));
-STATIC_DCL xchar FDECL(dname_to_dnum, (const char *));
-STATIC_DCL int FDECL(find_branch, (const char *, struct proto_dungeon *));
-STATIC_DCL xchar FDECL(parent_dnum, (const char *, struct proto_dungeon *));
-STATIC_DCL int FDECL(level_range, (XCHAR_P, int, int, int,
+static xchar FDECL(dname_to_dnum, (const char *));
+static int FDECL(find_branch, (const char *, struct proto_dungeon *));
+static xchar FDECL(parent_dnum, (const char *, struct proto_dungeon *));
+static int FDECL(level_range, (XCHAR_P, int, int, int,
                                    struct proto_dungeon *, int *));
-STATIC_DCL xchar FDECL(parent_dlevel, (const char *, struct proto_dungeon *));
-STATIC_DCL int FDECL(correct_branch_type, (struct tmpbranch *));
-STATIC_DCL branch *FDECL(add_branch, (int, int, struct proto_dungeon *));
-STATIC_DCL void FDECL(add_level, (s_level *));
-STATIC_DCL void FDECL(init_level, (int, int, struct proto_dungeon *));
-STATIC_DCL int FDECL(possible_places, (int, boolean *,
+static xchar FDECL(parent_dlevel, (const char *, struct proto_dungeon *));
+static int FDECL(correct_branch_type, (struct tmpbranch *));
+static branch *FDECL(add_branch, (int, int, struct proto_dungeon *));
+static void FDECL(add_level, (s_level *));
+static void FDECL(init_level, (int, int, struct proto_dungeon *));
+static int FDECL(possible_places, (int, boolean *,
                                        struct proto_dungeon *));
-STATIC_DCL xchar FDECL(pick_level, (boolean *, int));
-STATIC_DCL boolean FDECL(place_level, (int, struct proto_dungeon *));
-STATIC_DCL boolean FDECL(unplaced_floater, (struct dungeon *));
-STATIC_DCL boolean FDECL(unreachable_level, (d_level *, BOOLEAN_P));
-STATIC_DCL void FDECL(tport_menu, (winid, char *, struct lchoice *, d_level *,
+static xchar FDECL(pick_level, (boolean *, int));
+static boolean FDECL(place_level, (int, struct proto_dungeon *));
+static boolean FDECL(unplaced_floater, (struct dungeon *));
+static boolean FDECL(unreachable_level, (d_level *, BOOLEAN_P));
+static void FDECL(tport_menu, (winid, char *, struct lchoice *, d_level *,
                                    BOOLEAN_P));
-STATIC_DCL const char *FDECL(br_string, (int));
-STATIC_DCL char FDECL(chr_u_on_lvl, (d_level *));
-STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P,
+static const char *FDECL(br_string, (int));
+static char FDECL(chr_u_on_lvl, (d_level *));
+static void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P,
                                      struct lchoice *));
-/* SAVE2018 */
-STATIC_DCL mapseen *FDECL(load_mapseen, (NHFILE *));
-STATIC_DCL void FDECL(save_mapseen, (NHFILE *, mapseen *));
-STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
-STATIC_DCL mapseen *FDECL(find_mapseen_by_str, (const char *));
-STATIC_DCL void FDECL(print_mapseen, (winid, mapseen *, int, int, BOOLEAN_P));
-STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
-STATIC_DCL void FDECL(traverse_mapseenchn, (BOOLEAN_P, winid,
+static mapseen *FDECL(load_mapseen, (NHFILE *));
+static void FDECL(save_mapseen, (NHFILE *, mapseen *));
+static mapseen *FDECL(find_mapseen, (d_level *));
+static mapseen *FDECL(find_mapseen_by_str, (const char *));
+static void FDECL(print_mapseen, (winid, mapseen *, int, int, BOOLEAN_P));
+static boolean FDECL(interest_mapseen, (mapseen *));
+static void FDECL(traverse_mapseenchn, (BOOLEAN_P, winid,
                                             int, int, int *));
-STATIC_DCL const char *FDECL(seen_string, (XCHAR_P, const char *));
-STATIC_DCL const char *FDECL(br_string2, (branch *));
-STATIC_DCL const char *FDECL(shop_string, (int));
-STATIC_DCL char *FDECL(tunesuffix, (mapseen *, char *));
+static const char *FDECL(seen_string, (XCHAR_P, const char *));
+static const char *FDECL(br_string2, (branch *));
+static const char *FDECL(shop_string, (int));
+static char *FDECL(tunesuffix, (mapseen *, char *));
 
 #ifdef DEBUG
 #define DD g.dungeons[i]
-STATIC_DCL void NDECL(dumpit);
+static void NDECL(dumpit);
 
-STATIC_OVL void
+static void
 dumpit()
 {
     int i;
@@ -153,7 +152,7 @@ boolean perform_write, free_data;
             for (i = 0; i < g.n_dgns; ++i)
                 sfo_dungeon(nhfp, &g.dungeons[i], "dungeon", "dungeon", 1);
             sfo_dgn_topology(nhfp, &g.dungeon_topology, "dungeon", "g.dungeon_topology", 1);
-            for (i = 0; i < sizeof tune; ++i)
+            for (i = 0; i < (int) sizeof tune; ++i)
                 sfo_char(nhfp, &g.tune[i], "dungeon", "tune", 1);
         }
         for (count = 0, curr = g.branches; curr; curr = curr->next)
@@ -234,7 +233,7 @@ NHFILE *nhfp;
         for (i = 0; i < g.n_dgns; ++i)
             sfi_dungeon(nhfp, &g.dungeons[i], "dungeon", "dungeon", 1);
         sfi_dgn_topology(nhfp, &g.dungeon_topology, "dungeon", "g.dungeon_topology", 1);
-        for (i = 0; i < sizeof tune; ++i)
+        for (i = 0; i < (int) sizeof tune; ++i)
             sfi_char(nhfp, &g.tune[i], "dungeon", "tune", 1);
     }
     last = g.branches = (branch *) 0;
@@ -310,7 +309,7 @@ dlb *stream;
     }
 }
 
-STATIC_OVL xchar
+static xchar
 dname_to_dnum(s)
 const char *s;
 {
@@ -337,7 +336,7 @@ const char *s;
 }
 
 /* Find the branch that links the named dungeon. */
-STATIC_OVL int
+static int
 find_branch(s, pd)
 const char *s; /* dungeon name */
 struct proto_dungeon *pd;
@@ -370,7 +369,7 @@ struct proto_dungeon *pd;
  * Find the "parent" by searching the prototype branch list for the branch
  * listing, then figuring out to which dungeon it belongs.
  */
-STATIC_OVL xchar
+static xchar
 parent_dnum(s, pd)
 const char *s; /* dungeon name */
 struct proto_dungeon *pd;
@@ -402,7 +401,7 @@ struct proto_dungeon *pd;
  *       a negative random component means from the (adjusted) base to the
  *       end of the dungeon.
  */
-STATIC_OVL int
+static int
 level_range(dgn, base, randc, chain, pd, adjusted_base)
 xchar dgn;
 int base, randc, chain;
@@ -437,7 +436,7 @@ int *adjusted_base;
     return 1;
 }
 
-STATIC_OVL xchar
+static xchar
 parent_dlevel(s, pd)
 const char *s;
 struct proto_dungeon *pd;
@@ -464,7 +463,7 @@ struct proto_dungeon *pd;
 }
 
 /* Convert from the temporary branch type to the dungeon branch type. */
-STATIC_OVL int
+static int
 correct_branch_type(tbr)
 struct tmpbranch *tbr;
 {
@@ -538,7 +537,7 @@ boolean extract_first;
 }
 
 /* Add a dungeon branch to the branch list. */
-STATIC_OVL branch *
+static branch *
 add_branch(dgn, child_entry_level, pd)
 int dgn;
 int child_entry_level;
@@ -570,7 +569,7 @@ struct proto_dungeon *pd;
  * level that has a dungeon number less than the dungeon number of the
  * last entry.
  */
-STATIC_OVL void
+static void
 add_level(new_lev)
 s_level *new_lev;
 {
@@ -592,7 +591,7 @@ s_level *new_lev;
     }
 }
 
-STATIC_OVL void
+static void
 init_level(dgn, proto_index, pd)
 int dgn, proto_index;
 struct proto_dungeon *pd;
@@ -626,7 +625,7 @@ struct proto_dungeon *pd;
     new_level->next = (s_level *) 0;
 }
 
-STATIC_OVL int
+static int
 possible_places(idx, map, pd)
 int idx;      /* prototype index */
 boolean *map; /* array MAXLEVEL+1 in length */
@@ -658,7 +657,7 @@ struct proto_dungeon *pd;
 }
 
 /* Pick the nth TRUE entry in the given boolean array. */
-STATIC_OVL xchar
+static xchar
 pick_level(map, nth)
 boolean *map; /* an array MAXLEVEL+1 in size */
 int nth;
@@ -690,7 +689,7 @@ int d;
  * all possible places have been tried.  If all possible places have
  * been exhausted, return false.
  */
-STATIC_OVL boolean
+static boolean
 place_level(proto_index, pd)
 int proto_index;
 struct proto_dungeon *pd;
@@ -1938,7 +1937,7 @@ const char *nam;
     return lev;
 }
 
-STATIC_OVL boolean
+static boolean
 unplaced_floater(dptr)
 struct dungeon *dptr;
 {
@@ -1954,7 +1953,7 @@ struct dungeon *dptr;
     return FALSE;
 }
 
-STATIC_OVL boolean
+static boolean
 unreachable_level(lvl_p, unplaced)
 d_level *lvl_p;
 boolean unplaced;
@@ -2005,7 +2004,7 @@ boolean unreachable;
 }
 
 /* Convert a branch type to a string usable by print_dungeon(). */
-STATIC_OVL const char *
+static const char *
 br_string(type)
 int type;
 {
@@ -2022,7 +2021,7 @@ int type;
     return " (unknown)";
 }
 
-STATIC_OVL char
+static char
 chr_u_on_lvl(dlev)
 d_level *dlev;
 {
@@ -2030,7 +2029,7 @@ d_level *dlev;
 }
 
 /* Print all child branches between the lower and upper bounds. */
-STATIC_OVL void
+static void
 print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices_p)
 winid win;
 int dnum;
@@ -2315,7 +2314,7 @@ donamelevel()
 }
 
 /* find the particular mapseen object in the chain; may return null */
-STATIC_OVL mapseen *
+static mapseen *
 find_mapseen(lev)
 d_level *lev;
 {
@@ -2328,7 +2327,7 @@ d_level *lev;
     return mptr;
 }
 
-STATIC_OVL mapseen *
+static mapseen *
 find_mapseen_by_str(s)
 const char *s;
 {
@@ -2405,7 +2404,7 @@ int ledger_num;
     }
 }
 
-STATIC_OVL void
+static void
 save_mapseen(nhfp, mptr)
 NHFILE *nhfp;
 mapseen *mptr;
@@ -2453,7 +2452,7 @@ mapseen *mptr;
     savecemetery(nhfp, &mptr->final_resting_place);
 }
 
-STATIC_OVL mapseen *
+static mapseen *
 load_mapseen(nhfp)
 NHFILE *nhfp;
 {
@@ -2627,7 +2626,7 @@ d_level *lev;
   /* || (feat).water || (feat).ice || (feat).lava */
 
 /* returns true if this level has something interesting to print out */
-STATIC_OVL boolean
+static boolean
 interest_mapseen(mptr)
 mapseen *mptr;
 {
@@ -3025,7 +3024,7 @@ int reason; /* how hero died; used when disclosing end-of-game level */
 }
 
 /* display endgame levels or non-endgame levels, not both */
-STATIC_OVL void
+static void
 traverse_mapseenchn(viewendgame, win, why, reason, lastdun_p)
 boolean viewendgame;
 winid win;
@@ -3047,7 +3046,7 @@ int why, reason, *lastdun_p;
     }
 }
 
-STATIC_OVL const char *
+static const char *
 seen_string(x, obj)
 xchar x;
 const char *obj;
@@ -3069,7 +3068,7 @@ const char *obj;
 }
 
 /* better br_string */
-STATIC_OVL const char *
+static const char *
 br_string2(br)
 branch *br;
 {
@@ -3124,7 +3123,7 @@ int indx;
     return outbuf;
 }
 
-STATIC_OVL const char *
+static const char *
 shop_string(rtype)
 int rtype;
 {
@@ -3176,7 +3175,7 @@ int rtype;
 
 /* if player knows about the mastermind tune, append it to Castle annotation;
    if drawbridge has been destroyed, flags.castletune will be zero */
-STATIC_OVL char *
+static char *
 tunesuffix(mptr, outbuf)
 mapseen *mptr;
 char *outbuf;
@@ -3217,7 +3216,7 @@ char *outbuf;
             Sprintf(eos(buf), "%s%s", COMMA, (nam)); \
     } while (0)
 
-STATIC_OVL void
+static void
 print_mapseen(win, mptr, final, how, printdun)
 winid win;
 mapseen *mptr;

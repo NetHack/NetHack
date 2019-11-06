@@ -17,10 +17,10 @@ struct wseg {
     xchar wx, wy; /* the segment's position */
 };
 
-STATIC_DCL void FDECL(toss_wsegs, (struct wseg *, BOOLEAN_P));
-STATIC_DCL void FDECL(shrink_worm, (int));
-STATIC_DCL void FDECL(random_dir, (XCHAR_P, XCHAR_P, xchar *, xchar *));
-STATIC_DCL struct wseg *FDECL(create_worm_tail, (int));
+static void FDECL(toss_wsegs, (struct wseg *, BOOLEAN_P));
+static void FDECL(shrink_worm, (int));
+static void FDECL(random_dir, (XCHAR_P, XCHAR_P, xchar *, xchar *));
+static struct wseg *FDECL(create_worm_tail, (int));
 
 /*  Description of long worm implementation.
  *
@@ -139,7 +139,7 @@ int wseg_count;
  *  Get rid of all worm segments on and following the given pointer curr.
  *  The display may or may not need to be updated as we free the segments.
  */
-STATIC_OVL
+static
 void
 toss_wsegs(curr, display_update)
 register struct wseg *curr;
@@ -172,7 +172,7 @@ register boolean display_update;
  *
  *  Remove the tail segment of the worm (the starting segment of the list).
  */
-STATIC_OVL
+static
 void
 shrink_worm(wnum)
 int wnum; /* worm number */
@@ -535,8 +535,6 @@ NHFILE *nhfp;
     }
 }
 
-/* SAVE2018 */
-
 /*
  *  rest_worm()
  *
@@ -728,7 +726,7 @@ xchar x, y;
  * This function, and the loop it serves, could be eliminated by coding
  * enexto() with a search radius.
  */
-STATIC_OVL
+static
 void
 random_dir(x, y, nx, ny)
 xchar x, y;
@@ -781,7 +779,7 @@ struct monst *mtmp;
 /*  create_worm_tail()
  *  will create a worm tail chain of (num_segs + 1) and return pointer to it.
  */
-STATIC_OVL
+static
 struct wseg *
 create_worm_tail(num_segs)
 int num_segs;

@@ -1,15 +1,15 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1561336020 2019/06/24 00:27:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1570227405 2019/10/04 22:16:45 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(tele_jump_ok, (int, int, int, int));
-STATIC_DCL boolean FDECL(teleok, (int, int, BOOLEAN_P));
-STATIC_DCL void NDECL(vault_tele);
-STATIC_DCL boolean FDECL(rloc_pos_ok, (int, int, struct monst *));
-STATIC_DCL void FDECL(mvault_tele, (struct monst *));
+static boolean FDECL(tele_jump_ok, (int, int, int, int));
+static boolean FDECL(teleok, (int, int, BOOLEAN_P));
+static void NDECL(vault_tele);
+static boolean FDECL(rloc_pos_ok, (int, int, struct monst *));
+static void FDECL(mvault_tele, (struct monst *));
 
 /*
  * Is (x,y) a good position of mtmp?  If mtmp is NULL, then is (x,y) good
@@ -220,7 +220,7 @@ unsigned entflags;
  * need to be augmented to allow deliberate passage in wizard mode, but
  * only for explicitly chosen destinations.)
  */
-STATIC_OVL boolean
+static boolean
 tele_jump_ok(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
@@ -255,7 +255,7 @@ int x1, y1, x2, y2;
     return TRUE;
 }
 
-STATIC_OVL boolean
+static boolean
 teleok(x, y, trapok)
 register int x, y;
 boolean trapok;
@@ -302,9 +302,9 @@ boolean allow_drag;
      * rock in the way), in which case it teleports the ball on its own.
      */
     if (ball_active) {
-        if (!carried(uball) && distmin(nux, nuy, uball->ox, uball->oy) <= 2)
+        if (!carried(uball) && distmin(nux, nuy, uball->ox, uball->oy) <= 2) {
             ball_still_in_range = TRUE; /* don't have to move the ball */
-        else {
+        } else {
             /* have to move the ball */
             if (!allow_drag || distmin(u.ux, u.uy, nux, nuy) > 1) {
                 /* we should not have dist > 1 and allow_drag at the same
@@ -341,8 +341,13 @@ boolean allow_drag;
             boolean cause_delay;
 
             if (drag_ball(nux, nuy, &bc_control, &ballx, &bally, &chainx,
-                          &chainy, &cause_delay, allow_drag))
+                          &chainy, &cause_delay, allow_drag)) {
                 move_bc(0, bc_control, ballx, bally, chainx, chainy);
+            } else {
+                /* dragging fails if hero is encumbered beyond 'burdened' */
+                allow_drag = FALSE; /* teleport b&c to hero's new spot */
+                unplacebc(); /* to match placebc() below */
+            }
         }
     }
     /* must set u.ux, u.uy after drag_ball(), which may need to know
@@ -417,7 +422,7 @@ boolean allow_drag;
         return FALSE;
 }
 
-STATIC_OVL void
+static void
 vault_tele()
 {
     register struct mkroom *croom = search_special(VAULT);
@@ -1098,7 +1103,7 @@ unsigned trflags;
 }
 
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
-STATIC_OVL boolean
+static boolean
 rloc_pos_ok(x, y, mtmp)
 register int x, y; /* coordinates of candidate location */
 struct monst *mtmp;
@@ -1262,7 +1267,7 @@ boolean suppress_impossible;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 mvault_tele(mtmp)
 struct monst *mtmp;
 {
@@ -1447,6 +1452,9 @@ register struct obj *obj;
                                            g.dndest.nhx, g.dndest.nhy)));
 
     if (flooreffects(obj, tx, ty, "fall")) {
+        /* update old location since flooreffects() couldn't;
+           unblock_point() for boulder handled by obj_extract_self() */
+        newsym(otx, oty);
         return FALSE;
     } else if (otx == 0 && oty == 0) {
         ; /* fell through a trap door; no update of old loc needed */
@@ -1463,6 +1471,7 @@ register struct obj *obj;
         newsym(otx, oty); /* update old location */
     }
     place_object(obj, tx, ty);
+    /* note: block_point() for boulder handled by place_object() */
     newsym(tx, ty);
     return TRUE;
 }

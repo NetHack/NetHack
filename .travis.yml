@@ -2,29 +2,49 @@ language: c
 matrix:
   include:
     - os: linux
-      env: HINTS=linux
+      env: DESCR=linux-xenial-gcc HINTS=linux
       compiler: gcc
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
     - os: linux
-      env: HINTS=linux
+      env: DESCR=linux-xenial-clang HINTS=linux
       compiler: clang
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
     - os: linux
-      env: HINTS=linux-x11
-      compiler: gcc
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
-    - os: linux
-      env: HINTS=linux-qt5
+      env: DESCR=linux-xenial-gcc-x11 HINTS=linux-x11
       compiler: gcc
       addons:
         apt:
           packages:
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: linux
+      env: DESCR=linux-xenial-gcc-qt5 HINTS=linux-qt5
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
             - qtbase5-dev
             - qtmultimedia5-dev
             - qtbase5-dev-tools
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && QT_SELECT=5 make MOC=moc install"
     - os: linux
-      env: HINTS=linux-minimal
+      env: DESCR=linux-bionic-gcc-x11 HINTS=linux-x11
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: linux
+      env: DESCR=linux-xenial-gcc-minimal HINTS=linux-minimal
       compiler: gcc
       script: |
               cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
@@ -50,32 +70,32 @@ matrix:
               make install
               cat dat/options
     - os: windows
-      env: HINTS=windows-visual-studio
+      env: DESCR=windows-visualstudio
       language: shell
       script:
-#       - find /c/Program\ Files\ \(x86\) -iname 'rc.exe' -print
-#       - export
-        - export VSVER=2017
-        - export MSVER=14.16.27023
-        - export SDKVER=10.0.17763.0
-        - export FRAMEVER=4.0.30319
-        - export NETFXVER=4.6.1
-        - export WKITVER=10.0.17134.0
-#       - export TOOLSVER=Community
-        - export TOOLSVER=BuildTools
-        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/Common7/IDE/VC/VCPackages:$PATH
-        - export PATH=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/$WKITVER/x64:$PATH
-        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/bin/HostX64/x64:$PATH
-        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/bin/HostX64/x86:$PATH
-        - export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/Common7/IDE/CommonExtensions/Microsoft/TestWindow
-        - export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/MSBuild/Current/bin/Roslyn
-        - export INCLUDE=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/$TOOLSVER/VC/Tools/MSVC/$MSVER/include
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Include/$WKITVER/ucrt
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/ucrt
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/shared
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/um
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/winrt
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/cppwinrt
+        - ./win/win32/vs2017/travisci.sh
+    - os: windows
+#     install: choco install mingw
+      env: DESCR=windows-mingw
+      script:
+        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
+        - export ADD_CURSES=Y
+        - export PDCURSES_TOP=../../pdcurses
+        - cd src
+        - cp ../sys/winnt/Makefile.gcc ./Makefile
+        - mingw32-make install
+  exclude:
+#    - os: osx
+#      osx_image: xcode10.3
+#      env: DESCR=osx-xcode10.3-x11 HINTS=macosx10.14 WANT_WIN_CURSES=1 WANT_WIN_X11=1 USE_XPM=1
+#      compiler: clang
+#      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: osx
+      osx_image: xcode10.2
+      env: HINTS=macosx10.14
+      compiler: clang
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+#
         - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/ATLMFC/lib/x86
         - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/lib/x86:$LIB
         - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/ucrt/x86:$LIB
@@ -109,5 +129,18 @@ notifications:
   email:
     recipients:
 #      - devteam@nethack.org
-
+#
+deploy:
+  provider: releases
+  api_key:
+    secure: "U0Dt2CXrcG8Yi4taUCT/6AnM+0IJtdCv6IVG/2rGooUY3pZjNWE9XDM6X9ZeAmbI79aN6FPTppjUf3KbB/upYeJt+8mrjnxEk/ZTO1xXDDW8iL/DiqnczoFsMGmPsTM+Fkeak8bu0SifI7Qkx9i1N+zOyl2VdlaxGjchPfl/OJw2jcQs7rOGRfr23/rapZKTcFq+BFlxMiIHa0dXbCJ9vagdlyAeclOCtPjw1VoH/Cb/+0/Xlx2MFPncw4/1P+bO/fPantHyehh3/WCDVCnI4M7ftONpsTVRrQ+Hml89teUH9/1xXUOpbCeVghWr1rumLcQzMqLKNj2lP/gm9co2/DKpxiUPUzBfO/9Jvl1CNoEwPYQBRNb38kggDvAT4vKX38Oi5sZvumFEO4L0y7o4cW6SA4/CYIykfxOdkrryt8ltfWwopdy3I/DothYw31vJ9GsZOCAShFRAy3hJxYUbHhT+7SDUBadVSEkb4UqxQ+7zntAVT+Lp4DXLAfvsWxZGrQoP/IrWAgNOLRKILubpzh+YpadMH3Ygha2JRAeJAEZ3DnXf3vOOAucWnk4mNXDbW35GTDTAJDWMvddZCfsrUI/uHxgaRjFs9fLX1X5tqhGnsr27sKLWyX+zrIPVV0TPl3AzYPAf6Bc8Okeu+JEGQERvvgSasCuYcmhgYznBVJI="
+  file_glob: true
+  file: 
+    - "$TRAVIS_TAG.x86.zip"
+  skip_cleanup: true
+  on:
+    tags: true
+  prerelease: true
+  name: "Pre-release build of NetHack 3.6.3"
+  body: "This is auto generated pre-release build of NetHack 3.6.3."
 

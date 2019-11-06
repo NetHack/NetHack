@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1558045586 2019/05/16 22:26:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1571531890 2019/10/20 00:38:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,35 +9,35 @@
 #include "hack.h"
 #include "dlb.h"
 
-STATIC_DCL boolean FDECL(is_swallow_sym, (int));
-STATIC_DCL int FDECL(append_str, (char *, const char *));
-STATIC_DCL void FDECL(look_at_object, (char *, int, int, int));
-STATIC_DCL void FDECL(look_at_monster, (char *, char *,
+static boolean FDECL(is_swallow_sym, (int));
+static int FDECL(append_str, (char *, const char *));
+static void FDECL(look_at_object, (char *, int, int, int));
+static void FDECL(look_at_monster, (char *, char *,
                                         struct monst *, int, int));
-STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
-STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
+static struct permonst *FDECL(lookat, (int, int, char *, char *));
+static void FDECL(checkfile, (char *, struct permonst *,
                                   BOOLEAN_P, BOOLEAN_P, char *));
-STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
-STATIC_DCL void FDECL(do_supplemental_info, (char *, struct permonst *,
+static void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
+static void FDECL(do_supplemental_info, (char *, struct permonst *,
                                              BOOLEAN_P));
-STATIC_DCL void NDECL(whatdoes_help);
-STATIC_DCL void NDECL(docontact);
-STATIC_DCL void NDECL(dispfile_help);
-STATIC_DCL void NDECL(dispfile_shelp);
-STATIC_DCL void NDECL(dispfile_optionfile);
-STATIC_DCL void NDECL(dispfile_license);
-STATIC_DCL void NDECL(dispfile_debughelp);
-STATIC_DCL void NDECL(hmenu_doextversion);
-STATIC_DCL void NDECL(hmenu_dohistory);
-STATIC_DCL void NDECL(hmenu_dowhatis);
-STATIC_DCL void NDECL(hmenu_dowhatdoes);
-STATIC_DCL void NDECL(hmenu_doextlist);
+static void NDECL(whatdoes_help);
+static void NDECL(docontact);
+static void NDECL(dispfile_help);
+static void NDECL(dispfile_shelp);
+static void NDECL(dispfile_optionfile);
+static void NDECL(dispfile_license);
+static void NDECL(dispfile_debughelp);
+static void NDECL(hmenu_doextversion);
+static void NDECL(hmenu_dohistory);
+static void NDECL(hmenu_dowhatis);
+static void NDECL(hmenu_dowhatdoes);
+static void NDECL(hmenu_doextlist);
 #ifdef PORT_HELP
 extern void NDECL(port_help);
 #endif
 
 /* Returns "true" for characters that could represent a monster's stomach. */
-STATIC_OVL boolean
+static boolean
 is_swallow_sym(c)
 int c;
 {
@@ -54,7 +54,7 @@ int c;
  * a substring of buf.  Return 1 if the string was appended, 0 otherwise.
  * It is expected that buf is of size BUFSZ.
  */
-STATIC_OVL int
+static int
 append_str(buf, new_str)
 char *buf;
 const char *new_str;
@@ -190,12 +190,19 @@ struct obj **obj_p;
             otmp->quan = 2L; /* to force pluralization */
         else if (otmp->otyp == SLIME_MOLD)
             otmp->spe = g.context.current_fruit; /* give it a type */
-        if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
-            otmp->corpsenm = MCORPSENM(mtmp);
-        else if (otmp->otyp == CORPSE && glyph_is_body(glyph))
+        if (mtmp && has_mcorpsenm(mtmp)) { /* mimic as corpse/statue */
+            if (otmp->otyp == SLIME_MOLD)
+                /* override g.context.current_fruit to avoid
+                     look, use 'O' to make new named fruit, look again
+                   giving different results when current_fruit changes */
+                otmp->spe = MCORPSENM(mtmp);
+            else
+                otmp->corpsenm = MCORPSENM(mtmp);
+        } else if (otmp->otyp == CORPSE && glyph_is_body(glyph)) {
             otmp->corpsenm = glyph - GLYPH_BODY_OFF;
-        else if (otmp->otyp == STATUE && glyph_is_statue(glyph))
+        } else if (otmp->otyp == STATUE && glyph_is_statue(glyph)) {
             otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
+        }
         if (otmp->otyp == LEASH)
             otmp->leashmon = 0;
         /* extra fields needed for shop price with doname() formatting */
@@ -224,7 +231,7 @@ struct obj **obj_p;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
 
-STATIC_OVL void
+static void
 look_at_object(buf, x, y, glyph)
 char *buf; /* output buffer */
 int x, y, glyph;
@@ -259,7 +266,7 @@ int x, y, glyph;
     return;
 }
 
-STATIC_OVL void
+static void
 look_at_monster(buf, monbuf, mtmp, x, y)
 char *buf, *monbuf; /* buf: output, monbuf: optional output */
 struct monst *mtmp;
@@ -297,9 +304,11 @@ int x, y;
         int tt = t ? t->ttyp : NO_TRAP;
 
         /* newsym lets you know of the trap, so mention it here */
-        if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB)
+        if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB) {
             Sprintf(eos(buf), ", trapped in %s",
                     an(defsyms[trap_to_defsym(tt)].explanation));
+            t->tseen = 1;
+        }
     }
 
     /* we know the hero sees a monster at this location, but if it's shown
@@ -382,7 +391,7 @@ int x, y;
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
  */
-STATIC_OVL struct permonst *
+static struct permonst *
 lookat(x, y, buf, monbuf)
 int x, y;
 char *buf, *monbuf;
@@ -527,7 +536,7 @@ char *buf, *monbuf;
  *       lcase() for data.base lookup so that we can have a clean key.
  *       Therefore, we create a copy of inp _just_ for data.base lookup.
  */
-STATIC_OVL void
+static void
 checkfile(inp, pm, user_typed_name, without_asking, supplemental_name)
 char *inp;
 struct permonst *pm;
@@ -804,11 +813,12 @@ struct permonst **for_supplement;
                       unreconnoitered[] = "unreconnoitered";
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
-    int i, alt_i, glyph = NO_GLYPH,
+    int i, alt_i, j, glyph = NO_GLYPH,
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
             submerged = (Underwater && !Is_waterlevel(&u.uz));
     const char *x_str;
+    nhsym tmpsym;
 
     if (looked) {
         int oc;
@@ -872,7 +882,7 @@ struct permonst **for_supplement;
         if (x_str == unreconnoitered)
             goto didlook;
     }
-
+ check_monsters:
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 1; i < MAXMCLASSES; i++) {
@@ -1025,8 +1035,53 @@ struct permonst **for_supplement;
         }
     }
 
+    /* Finally, handle some optional overriding symbols */
+    for (j = SYM_OFF_X; j < SYM_MAX; ++j) {
+        if (j == (SYM_INVISIBLE + SYM_OFF_X))
+            continue;       /* already handled above */
+        tmpsym = Is_rogue_level(&u.uz) ? g.ov_rogue_syms[j] : g.ov_primary_syms[j];                    
+        if (tmpsym && sym == tmpsym) {
+            switch(j) {
+                case SYM_BOULDER + SYM_OFF_X:
+                        if (!found) {
+                            *firstmatch = "boulder";
+                            Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
+                            found++;
+                        } else {
+                            found += append_str(out_str, "boulder");
+                        }
+                        break;
+                case SYM_PET_OVERRIDE + SYM_OFF_X:
+                        if (looked) {
+                            int oc = 0;
+                            unsigned os = 0;
+                            nhsym save_override;
+
+                            if (Is_rogue_level(&u.uz)) {
+                                save_override = g.ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X];
+                                g.ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = 0;
+                            } else {
+                                save_override = g.ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X];
+                                g.ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = 0;
+                            }
+                            /* convert to symbol without the override in effect */
+                            (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
+                            if (Is_rogue_level(&u.uz))
+                                g.ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = save_override;
+                            else
+                                g.ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = save_override;
+                            goto check_monsters;
+                        }
+                        break;
+                case SYM_PLAYER_OVERRIDE + SYM_OFF_X:
+                        sym = g.showsyms[S_HUMAN + SYM_OFF_M];
+                        goto check_monsters;
+            }
+        }
+    }
+#if 0
     /* handle optional boulder symbol as a special case */
-    if (iflags.bouldersym && sym == iflags.bouldersym) {
+    if (o_syms[SYM_BOULDER + SYM_OFF_X] && sym == o_syms[SYM_BOULDER + SYM_OFF_X]) {
         if (!found) {
             *firstmatch = "boulder";
             Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
@@ -1035,6 +1090,7 @@ struct permonst **for_supplement;
             found += append_str(out_str, "boulder");
         }
     }
+#endif
 
     /*
      * If we are looking at the screen, follow multiple possibilities or
@@ -1297,7 +1353,7 @@ coord *click_cc;
     return 0;
 }
 
-STATIC_OVL void
+static void
 look_all(nearby, do_mons)
 boolean nearby; /* True => within BOLTLIM, False => entire map */
 boolean do_mons; /* True => monsters, False => objects */
@@ -1407,7 +1463,7 @@ static const char *suptext2[] = {
     (char *) 0,
 };
 
-void
+static void
 do_supplemental_info(name, pm, without_asking)
 char *name;
 struct permonst *pm;
@@ -1568,12 +1624,12 @@ doidtrap()
     rest_on_space, #if SHELL, #if SUSPEND) are booleans.
 */
 
-STATIC_DCL void
+static void
 whatdoes_help()
 {
     dlb *fp;
     char *p, buf[BUFSZ];
-    winid tmpwin = create_nhwindow(NHW_TEXT);
+    winid tmpwin;
 
     fp = dlb_fopen(KEYHELP, "r");
     if (!fp) {
@@ -1581,6 +1637,7 @@ whatdoes_help()
         display_nhwindow(WIN_MESSAGE, TRUE);
         return;
     }
+    tmpwin = create_nhwindow(NHW_TEXT);
     while (dlb_fgets(buf, (int) sizeof buf, fp)) {
         if (*buf == '#')
             continue;
@@ -1602,10 +1659,10 @@ struct wd_stack_frame {
     Bitfield(else_seen, 1);
 };
 
-STATIC_DCL boolean FDECL(whatdoes_cond, (char *, struct wd_stack_frame *,
+static boolean FDECL(whatdoes_cond, (char *, struct wd_stack_frame *,
                                          int *, int));
 
-STATIC_OVL boolean
+static boolean
 whatdoes_cond(buf, stack, depth, lnum)
 char *buf;
 struct wd_stack_frame *stack;
@@ -1853,7 +1910,7 @@ dowhatdoes()
     return 0;
 }
 
-STATIC_OVL void
+static void
 docontact(VOID_ARGS)
 {
     winid cwin = create_nhwindow(NHW_TEXT);
@@ -1883,61 +1940,61 @@ docontact(VOID_ARGS)
     destroy_nhwindow(cwin);
 }
 
-void
+static void
 dispfile_help(VOID_ARGS)
 {
     display_file(HELP, TRUE);
 }
 
-void
+static void
 dispfile_shelp(VOID_ARGS)
 {
     display_file(SHELP, TRUE);
 }
 
-void
+static void
 dispfile_optionfile(VOID_ARGS)
 {
     display_file(OPTIONFILE, TRUE);
 }
 
-void
+static void
 dispfile_license(VOID_ARGS)
 {
     display_file(LICENSE, TRUE);
 }
 
-void
+static void
 dispfile_debughelp(VOID_ARGS)
 {
     display_file(DEBUGHELP, TRUE);
 }
 
-void
+static void
 hmenu_doextversion(VOID_ARGS)
 {
     (void) doextversion();
 }
 
-void
+static void
 hmenu_dohistory(VOID_ARGS)
 {
     (void) dohistory();
 }
 
-void
+static void
 hmenu_dowhatis(VOID_ARGS)
 {
     (void) dowhatis();
 }
 
-void
+static void
 hmenu_dowhatdoes(VOID_ARGS)
 {
     (void) dowhatdoes();
 }
 
-void
+static void
 hmenu_doextlist(VOID_ARGS)
 {
     (void) doextlist();

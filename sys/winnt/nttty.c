@@ -465,8 +465,15 @@ int *x, *y, *mod;
     coord cc;
     DWORD count;
     really_move_cursor();
-    if (iflags.debug_fuzzer)
-        return randomkey();
+    if (iflags.debug_fuzzer) {
+        int poskey = randomkey();
+
+        if (poskey == 0) {
+            *x = rn2(console.width);
+            *y = rn2(console.height);
+        }
+        return poskey;
+    }
     ch = (g.program_state.done_hup)
              ? '\033'
              : keyboard_handler.pCheckInput(
@@ -530,12 +537,14 @@ int x, y;
     set_console_cursor(x, y);
 }
 
-void
+/* same signature as 'putchar()' with potential failure result ignored */
+int
 xputc(ch)
-char ch;
+int ch;
 {
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-    xputc_core(ch);
+    xputc_core((char) ch);
+    return 0;
 }
 
 void
@@ -543,7 +552,7 @@ xputs(s)
 const char *s;
 {
     int k;
-    int slen = strlen(s);
+    int slen = (int) strlen(s);
 
     if (ttyDisplay)
         set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
@@ -1597,8 +1606,8 @@ check_font_widths()
     boolean used[256];
     memset(used, 0, sizeof(used));
     for (int i = 0; i < SYM_MAX; i++) {
-        used[g.l_syms[i]] = TRUE;
-        used[g.r_syms[i]] = TRUE;
+        used[g.primary_syms[i]] = TRUE;
+        used[g.rogue_syms[i]] = TRUE;
     }
 
     int wcUsedCount = 0;

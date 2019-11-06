@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1559994624 2019/06/08 11:50:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1571347960 2019/10/17 21:32:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -266,7 +266,9 @@ struct symparse {
 /* misc symbol definitions */
 #define SYM_BOULDER 0
 #define SYM_INVISIBLE 1
-#define MAXOTHER 2
+#define SYM_PET_OVERRIDE 2
+#define SYM_PLAYER_OVERRIDE 3
+#define MAXOTHER 4
 
 /* linked list of symsets and their characteristics */
 struct symsetentry {
@@ -278,7 +280,8 @@ struct symsetentry {
     Bitfield(nocolor, 1);     /* don't use color if set               */
     Bitfield(primary, 1);     /* restricted for use as primary set    */
     Bitfield(rogue, 1);       /* restricted for use as rogue lev set  */
-                              /* 5 free bits */
+    Bitfield(explicitly, 1);  /* explicit symset set                  */
+                              /* 4 free bits */
 };
 
 /*
@@ -298,6 +301,8 @@ struct symsetentry {
 #define H_IBM     1
 #define H_DEC     2
 #define H_CURS    3
+#define H_MAC     4 /* obsolete; needed so that the listing of available
+                     * symsets by 'O' can skip it for !MAC_GRAPHICS_ENV */
 
 extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 #define WARNCOUNT 6 /* number of different warning levels */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1556649298 2019/04/30 18:34:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1562800504 2019/07/10 23:15:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,23 +6,23 @@
 #include "hack.h"
 #include "artifact.h"
 
-STATIC_VAR NEARDATA struct obj *mon_currwep = (struct obj *) 0;
+static NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 
-STATIC_DCL boolean FDECL(u_slip_free, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(passiveum, (struct permonst *, struct monst *,
+static boolean FDECL(u_slip_free, (struct monst *, struct attack *));
+static int FDECL(passiveum, (struct permonst *, struct monst *,
                                  struct attack *));
-STATIC_DCL void FDECL(mayberem, (struct monst *, const char *,
+static void FDECL(mayberem, (struct monst *, const char *,
                                  struct obj *, const char *));
-STATIC_DCL boolean FDECL(diseasemu, (struct permonst *));
-STATIC_DCL int FDECL(hitmu, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(gulpmu, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(explmu, (struct monst *, struct attack *, BOOLEAN_P));
-STATIC_DCL void FDECL(missmu, (struct monst *, BOOLEAN_P, struct attack *));
-STATIC_DCL void FDECL(mswings, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(wildmiss, (struct monst *, struct attack *));
-STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
+static boolean FDECL(diseasemu, (struct permonst *));
+static int FDECL(hitmu, (struct monst *, struct attack *));
+static int FDECL(gulpmu, (struct monst *, struct attack *));
+static int FDECL(explmu, (struct monst *, struct attack *, BOOLEAN_P));
+static void FDECL(missmu, (struct monst *, BOOLEAN_P, struct attack *));
+static void FDECL(mswings, (struct monst *, struct obj *));
+static void FDECL(wildmiss, (struct monst *, struct attack *));
+static void FDECL(hitmsg, (struct monst *, struct attack *));
 
-STATIC_OVL void
+static void
 hitmsg(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
@@ -73,7 +73,7 @@ struct attack *mattk;
 }
 
 /* monster missed you */
-STATIC_OVL void
+static void
 missmu(mtmp, nearmiss, mattk)
 struct monst *mtmp;
 boolean nearmiss;
@@ -92,7 +92,7 @@ struct attack *mattk;
 }
 
 /* monster swings obj */
-STATIC_OVL void
+static void
 mswings(mtmp, otemp)
 struct monst *mtmp;
 struct obj *otemp;
@@ -135,7 +135,7 @@ u_slow_down()
 }
 
 /* monster attacked your displaced image */
-STATIC_OVL void
+static void
 wildmiss(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
@@ -809,7 +809,7 @@ register struct monst *mtmp;
     return 0;
 }
 
-STATIC_OVL boolean
+static boolean
 diseasemu(mdat)
 struct permonst *mdat;
 {
@@ -824,7 +824,7 @@ struct permonst *mdat;
 }
 
 /* check whether slippery clothing protects from hug or wrap attack */
-STATIC_OVL boolean
+static boolean
 u_slip_free(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
@@ -913,7 +913,7 @@ struct monst *mon;
  *        3 if the monster lives but teleported/paralyzed, so it can't keep
  *             attacking you
  */
-STATIC_OVL int
+static int
 hitmu(mtmp, mattk)
 register struct monst *mtmp;
 register struct attack *mattk;
@@ -1772,7 +1772,7 @@ gulp_blnd_check()
 }
 
 /* monster swallows you, or damage if u.uswallow */
-STATIC_OVL int
+static int
 gulpmu(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
@@ -2023,7 +2023,7 @@ struct attack *mattk;
 }
 
 /* monster explodes in your face */
-STATIC_OVL int
+static int
 explmu(mtmp, mattk, ufound)
 struct monst *mtmp;
 struct attack *mattk;
@@ -2404,9 +2404,13 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
     if (agrinvis && !defperc && adtyp == AD_SEDU)
         return 0;
 
+    /* nymphs have two attacks, one for steal-item damage and the other
+       for seduction, both pass the could_seduce() test;
+       incubi/succubi have three attacks, their claw attacks for damage
+       don't pass the test */
     if ((pagr->mlet != S_NYMPH
          && pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
-        || (adtyp != AD_SEDU && adtyp != AD_SSEX))
+        || (adtyp != AD_SEDU && adtyp != AD_SSEX && adtyp != AD_SITM))
         return 0;
 
     return (genagr == 1 - gendef) ? 1 : (pagr->mlet == S_NYMPH) ? 2 : 0;
@@ -2709,7 +2713,7 @@ struct monst *mon;
     return 1;
 }
 
-STATIC_OVL void
+static void
 mayberem(mon, seducer, obj, str)
 struct monst *mon;
 const char *seducer; /* only used for alternate message */
@@ -2762,7 +2766,7 @@ const char *str;
  *  to know whether hero reverted in order to decide whether passive
  *  damage applies.
  */
-STATIC_OVL int
+static int
 passiveum(olduasmon, mtmp, mattk)
 struct permonst *olduasmon;
 struct monst *mtmp;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1551920353 2019/03/07 00:59:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1562462061 2019/07/07 01:14:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,20 +11,20 @@
 
 /* g.kickedobj (decl.c) tracks a kicked object until placed or destroyed */
 
-STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(maybe_kick_monster, (struct monst *,
+static void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
+static boolean FDECL(maybe_kick_monster, (struct monst *,
                                               XCHAR_P, XCHAR_P));
-STATIC_DCL void FDECL(kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
-STATIC_DCL int FDECL(kick_object, (XCHAR_P, XCHAR_P, char *));
-STATIC_DCL int FDECL(really_kick_object, (XCHAR_P, XCHAR_P));
-STATIC_DCL char *FDECL(kickstr, (char *, const char *));
-STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
-STATIC_DCL void FDECL(drop_to, (coord *, SCHAR_P));
+static void FDECL(kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
+static int FDECL(kick_object, (XCHAR_P, XCHAR_P, char *));
+static int FDECL(really_kick_object, (XCHAR_P, XCHAR_P));
+static char *FDECL(kickstr, (char *, const char *));
+static void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
+static void FDECL(drop_to, (coord *, SCHAR_P));
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 
 /* kicking damage when not poly'd into a form with a kick attack */
-STATIC_OVL void
+static void
 kickdmg(mon, clumsy)
 struct monst *mon;
 boolean clumsy;
@@ -117,7 +117,7 @@ boolean clumsy;
         use_skill(kick_skill, 1);
 }
 
-STATIC_OVL boolean
+static boolean
 maybe_kick_monster(mon, x, y)
 struct monst *mon;
 xchar x, y;
@@ -139,7 +139,7 @@ xchar x, y;
     return (boolean) (mon != 0);
 }
 
-STATIC_OVL void
+static void
 kick_monster(mon, x, y)
 struct monst *mon;
 xchar x, y;
@@ -453,7 +453,7 @@ xchar x, y; /* coordinates where object was before the impact, not after */
 }
 
 /* jacket around really_kick_object */
-STATIC_OVL int
+static int
 kick_object(x, y, kickobjnam)
 xchar x, y;
 char *kickobjnam;
@@ -473,7 +473,7 @@ char *kickobjnam;
 }
 
 /* guts of kick_object */
-STATIC_OVL int
+static int
 really_kick_object(x, y)
 xchar x, y;
 {
@@ -720,7 +720,7 @@ xchar x, y;
 }
 
 /* cause of death if kicking kills kicker */
-STATIC_OVL char *
+static char *
 kickstr(buf, kickobjnam)
 char *buf;
 const char *kickobjnam;
@@ -1053,9 +1053,9 @@ dokick()
             if (Levitation)
                 goto dumb;
             You("kick %s.", (Blind ? something : "the altar"));
+            altar_wrath(x, y);
             if (!rn2(3))
                 goto ouch;
-            altar_wrath(x, y);
             exercise(A_DEX, TRUE);
             return 1;
         }
@@ -1192,9 +1192,16 @@ dokick()
                 exercise(A_DEX, TRUE);
                 return 1;
             } else if (!rn2(3)) {
-                pline("Flupp!  %s.",
-                      (Blind ? "You hear a sloshing sound"
-                             : "Muddy waste pops up from the drain"));
+                if (Blind && Deaf)
+                    Sprintf(buf, " %s", body_part(FACE));
+                else
+                    buf[0] = '\0';
+                pline("%s%s%s.", !Deaf ? "Flupp! " : "",
+                      !Blind
+                          ? "Muddy waste pops up from the drain"
+                          : !Deaf
+                              ? "You hear a sloshing sound"  /* Deaf-aware */
+                              : "Something splashes you in the", buf);
                 if (!(g.maploc->looted & S_LRING)) { /* once per sink */
                     if (!Blind)
                         You_see("a ring shining in its midst.");
@@ -1322,7 +1329,7 @@ dokick()
     return 1;
 }
 
-STATIC_OVL void
+static void
 drop_to(cc, loc)
 coord *cc;
 schar loc;
@@ -1733,7 +1740,7 @@ unsigned long deliverflags;
     }
 }
 
-STATIC_OVL void
+static void
 otransit_msg(otmp, nodrop, num)
 register struct obj *otmp;
 register boolean nodrop;

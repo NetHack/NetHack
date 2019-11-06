@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1546656404 2019/01/05 02:46:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1571347973 2019/10/17 21:32:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -19,7 +19,7 @@
 
 const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
-
+           
 /* Default object class symbols.  See objclass.h.
  * {symbol, name, explain}
  *     name:    used in object_detect().
@@ -246,9 +246,9 @@ static const uchar def_r_oc_syms[MAXOCLASSES] = {
 
 #undef C
 
-#ifdef TERMLIB
+#if defined(TERMLIB) || defined(CURSES_GRAPHICS)
 void NDECL((*decgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
-#endif /* TERMLIB */
+#endif /* TERMLIB || CURSES */
 
 #ifdef PC9800
 void NDECL((*ibmgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
@@ -297,7 +297,7 @@ char ch;
  * init_symbols()
  *                     Sets the current display symbols, the
  *                     loadable symbols to the default NetHack
- *                     symbols, including the r_syms rogue level
+ *                     symbols, including the rogue_syms rogue level
  *                     symbols. This would typically be done
  *                     immediately after execution begins. Any
  *                     previously loaded external symbol sets are
@@ -313,8 +313,8 @@ char ch;
  *
  *                     If (arg != 0), which is the normal expected
  *                     usage, then showsyms are taken from the
- *                     adjustable display symbols found in l_syms.
- *                     l_syms may have been loaded from an external
+ *                     adjustable display symbols found in g.primary_syms.
+ *                     g.primary_syms may have been loaded from an external
  *                     symbol file by config file options or interactively
  *                     in the Options menu.
  *
@@ -324,37 +324,33 @@ char ch;
  *                     out of other {rogue} level display modes.
  *
  *                     If arg is ROGUESET, this places the rogue level
- *                     symbols from r_syms into showsyms.
+ *                     symbols from g.rogue_syms into g.showsyms.
  *
  *                     If arg is PRIMARY, this places the symbols
- *                     from l_monsyms into showsyms.
+ *                     from g.primary_syms into g.showsyms.
  *
- * update_l_symset()
- *                     Update a member of the loadable (l_*) symbol set.
+ * update_primary_symset()
+ *                     Update a member of the primary(primary_*) symbol set.
  *
- * update_r_symset()
- *                     Update a member of the rogue (r_*) symbol set.
+ * update_rogue_symset()
+ *                     Update a member of the rogue (rogue_*) symbol set.
+ *
+ * update_ov_primary_symset()
+ *                     Update a member of the overrides for primary symbol set.
+ *
+ * update_ov_rogue_symset()
+ *                     Update a member of the overrides for rogue symbol set.
  *
  */
 
 void
 init_symbols()
 {
-    init_l_symbols();
+    init_ov_primary_symbols();
+    init_ov_rogue_symbols();
+    init_primary_symbols();
     init_showsyms();
-    init_r_symbols();
-}
-
-void
-update_bouldersym()
-{
-    nhsym boulder = (nhsym) iflags.bouldersym;
-
-    if (!boulder)
-        boulder = def_oc_syms[ROCK_CLASS].sym; /* (nhsym) ROCK_SYM */
-    g.showsyms[SYM_BOULDER + SYM_OFF_X] = boulder;
-    g.l_syms[SYM_BOULDER + SYM_OFF_X] = boulder;
-    g.r_syms[SYM_BOULDER + SYM_OFF_X] = boulder;
+    init_rogue_symbols();
 }
 
 void
@@ -370,44 +366,78 @@ init_showsyms()
         g.showsyms[i + SYM_OFF_M] = def_monsyms[i].sym;
     for (i = 0; i < WARNCOUNT; i++)
         g.showsyms[i + SYM_OFF_W] = def_warnsyms[i].sym;
-    for (i = 0; i < MAXOTHER; i++) {
-        if (i == SYM_BOULDER)
-            g.showsyms[i + SYM_OFF_X] = iflags.bouldersym
-                                        ? iflags.bouldersym
-                                        : def_oc_syms[ROCK_CLASS].sym;
-        else if (i == SYM_INVISIBLE)
-            g.showsyms[i + SYM_OFF_X] = DEF_INVISIBLE;
-    }
+    for (i = 0; i < MAXOTHER; i++)
+        g.showsyms[i + SYM_OFF_X] = get_othersym(i, PRIMARY);
 }
 
-/* initialize defaults for the loadable symset */
+/* initialize defaults for the overrides to the rogue symset */
 void
-init_l_symbols()
+init_ov_rogue_symbols()
+{
+    register int i;
+
+    for (i = 0; i < SYM_MAX; i++)
+        g.ov_rogue_syms[i] = (nhsym) 0;
+}
+/* initialize defaults for the overrides to the primary symset */
+void
+init_ov_primary_symbols()
+{
+    register int i;
+
+    for (i = 0; i < SYM_MAX; i++)
+        g.ov_primary_syms[i] = (nhsym) 0;
+}
+
+nhsym
+get_othersym(idx, which_set)
+int idx, which_set;
+{
+    nhsym sym = (nhsym) 0;
+    int oidx = idx + SYM_OFF_X;
+
+    if (which_set == ROGUESET)
+        sym = g.ov_rogue_syms[oidx] ? g.ov_rogue_syms[oidx]
+                                  : g.rogue_syms[oidx];
+    else
+        sym = g.ov_primary_syms[oidx] ? g.ov_primary_syms[oidx]
+                                  : g.primary_syms[oidx];
+    if (!sym) {
+        switch(idx) {
+            case SYM_BOULDER:
+                sym = def_oc_syms[ROCK_CLASS].sym;
+                break;
+            case SYM_INVISIBLE:
+                sym = DEF_INVISIBLE;
+                break;
+        }
+    }
+    return sym;
+}
+
+/* initialize defaults for the primary symset */
+void
+init_primary_symbols()
 {
     register int i;
 
     for (i = 0; i < MAXPCHARS; i++)
-        g.l_syms[i + SYM_OFF_P] = defsyms[i].sym;
+        g.primary_syms[i + SYM_OFF_P] = defsyms[i].sym;
     for (i = 0; i < MAXOCLASSES; i++)
-        g.l_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
+        g.primary_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
     for (i = 0; i < MAXMCLASSES; i++)
-        g.l_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
+        g.primary_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
     for (i = 0; i < WARNCOUNT; i++)
-        g.l_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
-    for (i = 0; i < MAXOTHER; i++) {
-        if (i == SYM_BOULDER)
-            g.l_syms[i + SYM_OFF_X] = iflags.bouldersym
-                                      ? iflags.bouldersym
-                                      : def_oc_syms[ROCK_CLASS].sym;
-        else if (i == SYM_INVISIBLE)
-            g.l_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
-    }
+        g.primary_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+    for (i = 0; i < MAXOTHER; i++)
+        g.primary_syms[i + SYM_OFF_X] = get_othersym(i, PRIMARY);
 
     clear_symsetentry(PRIMARY, FALSE);
 }
 
+/* initialize defaults for the rogue symset */
 void
-init_r_symbols()
+init_rogue_symbols()
 {
     register int i;
 
@@ -415,24 +445,18 @@ init_r_symbols()
        later by the roguesymbols option */
 
     for (i = 0; i < MAXPCHARS; i++)
-        g.r_syms[i + SYM_OFF_P] = defsyms[i].sym;
-    g.r_syms[S_vodoor] = g.r_syms[S_hodoor] = g.r_syms[S_ndoor] = '+';
-    g.r_syms[S_upstair] = g.r_syms[S_dnstair] = '%';
+        g.rogue_syms[i + SYM_OFF_P] = defsyms[i].sym;
+    g.rogue_syms[S_vodoor] = g.rogue_syms[S_hodoor] = g.rogue_syms[S_ndoor] = '+';
+    g.rogue_syms[S_upstair] = g.rogue_syms[S_dnstair] = '%';
 
     for (i = 0; i < MAXOCLASSES; i++)
-        g.r_syms[i + SYM_OFF_O] = def_r_oc_syms[i];
+        g.rogue_syms[i + SYM_OFF_O] = def_r_oc_syms[i];
     for (i = 0; i < MAXMCLASSES; i++)
-        g.r_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
+        g.rogue_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
     for (i = 0; i < WARNCOUNT; i++)
-        g.r_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
-    for (i = 0; i < MAXOTHER; i++) {
-        if (i == SYM_BOULDER)
-            g.r_syms[i + SYM_OFF_X] = iflags.bouldersym
-                                      ? iflags.bouldersym
-                                      : def_oc_syms[ROCK_CLASS].sym;
-        else if (i == SYM_INVISIBLE)
-            g.r_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
-    }
+        g.rogue_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+    for (i = 0; i < MAXOTHER; i++)
+        g.rogue_syms[i + SYM_OFF_X] = get_othersym(i, ROGUESET);
 
     clear_symsetentry(ROGUESET, FALSE);
     /* default on Rogue level is no color
@@ -452,7 +476,8 @@ int whichset;
         /* Adjust graphics display characters on Rogue levels */
 
         for (i = 0; i < SYM_MAX; i++)
-            g.showsyms[i] = g.r_syms[i];
+            g.showsyms[i] = g.ov_rogue_syms[i] ? g.ov_rogue_syms[i]
+                                           : g.rogue_syms[i];
 
 #if defined(MSDOS) && defined(USE_TILES)
         if (iflags.grmode)
@@ -464,7 +489,8 @@ int whichset;
     case PRIMARY:
     default:
         for (i = 0; i < SYM_MAX; i++)
-            g.showsyms[i] = g.l_syms[i];
+            g.showsyms[i] = g.ov_primary_syms[i] ? g.ov_primary_syms[i]
+                                             : g.primary_syms[i];
 
 #if defined(MSDOS) && defined(USE_TILES)
         if (iflags.grmode)
@@ -483,41 +509,63 @@ int nondefault;
 
     if (nondefault) {
         for (i = 0; i < SYM_MAX; i++)
-            g.showsyms[i] = g.l_syms[i];
+            g.showsyms[i] = g.ov_primary_syms[i] ? g.ov_primary_syms[i]
+                                             : g.primary_syms[i];
 #ifdef PC9800
         if (SYMHANDLING(H_IBM) && ibmgraphics_mode_callback)
             (*ibmgraphics_mode_callback)();
-        else if (!g.symset[g.currentgraphics].name && ascgraphics_mode_callback)
+        else if (SYMHANDLING(H_UNK) && ascgraphics_mode_callback)
             (*ascgraphics_mode_callback)();
 #endif
-#ifdef TERMLIB
+#if defined(TERMLIB) || defined(CURSES_GRAPHICS)
+        /* curses doesn't assign any routine to dec..._callback but
+           probably does the expected initialization under the hood
+           for terminals capable of rendering DECgraphics */
         if (SYMHANDLING(H_DEC) && decgraphics_mode_callback)
             (*decgraphics_mode_callback)();
-#endif
 # ifdef CURSES_GRAPHICS
+        /* there aren't any symbol sets with CURS handling, and the
+           curses interface never assigns a routine to curses..._callback */
         if (SYMHANDLING(H_CURS) && cursesgraphics_mode_callback)
             (*cursesgraphics_mode_callback)();
 # endif
+#endif
     } else {
-        init_l_symbols();
+        init_primary_symbols();
         init_showsyms();
     }
 }
 
 void
-update_l_symset(symp, val)
+update_ov_primary_symset(symp, val)
 struct symparse *symp;
 int val;
 {
-    g.l_syms[symp->idx] = val;
+    g.ov_primary_syms[symp->idx] = val;
 }
 
 void
-update_r_symset(symp, val)
+update_ov_rogue_symset(symp, val)
 struct symparse *symp;
 int val;
 {
-    g.r_syms[symp->idx] = val;
+    g.ov_rogue_syms[symp->idx] = val;
+}
+
+void
+update_primary_symset(symp, val)
+struct symparse *symp;
+int val;
+{
+    g.primary_syms[symp->idx] = val;
+}
+
+void
+update_rogue_symset(symp, val)
+struct symparse *symp;
+int val;
+{
+    g.rogue_syms[symp->idx] = val;
 }
 
 void
@@ -553,6 +601,7 @@ const char *known_handling[] = {
     "IBM",     /* H_IBM  */
     "DEC",     /* H_DEC  */
     "CURS",    /* H_CURS */
+    "MAC",     /* H_MAC  -- pre-OSX MACgraphics */
     (const char *) 0,
 };
 
@@ -757,6 +806,8 @@ const struct symparse loadsyms[] = {
     { SYM_MON, S_MIMIC_DEF + SYM_OFF_M, "S_mimic_def" },
     { SYM_OTH, SYM_BOULDER + SYM_OFF_X, "S_boulder" },
     { SYM_OTH, SYM_INVISIBLE + SYM_OFF_X, "S_invisible" },
+    { SYM_OTH, SYM_PET_OVERRIDE + SYM_OFF_X, "S_pet_override" },
+    { SYM_OTH, SYM_PLAYER_OVERRIDE + SYM_OFF_X, "S_player_override" },
     { 0, 0, (const char *) 0 } /* fence post */
 };
 
