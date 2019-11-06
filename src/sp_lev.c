@@ -144,7 +144,7 @@ int FDECL(lspo_wallify, (lua_State *));
 
 extern struct engr *head_engr;
 
-STATIC_OVL void
+static void
 solidify_map()
 {
     xchar x, y;
@@ -155,7 +155,7 @@ solidify_map()
                 levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
 }
 
-STATIC_OVL void
+static void
 lvlfill_maze_grid(x1, y1, x2, y2, filling)
 int x1, y1, x2, y2;
 schar filling;
@@ -172,7 +172,7 @@ schar filling;
         }
 }
 
-STATIC_OVL void
+static void
 lvlfill_solid(filling, lit)
 schar filling;
 schar lit;
@@ -244,7 +244,7 @@ count_features()
         }
 }
 
-STATIC_OVL void
+static void
 remove_boundary_syms()
 {
     /*
@@ -349,7 +349,7 @@ link_doors_rooms()
             }
 }
 
-STATIC_OVL void
+static void
 fill_rooms()
 {
     int tmpi, m;
@@ -519,7 +519,7 @@ register int humidity;
     return FALSE;
 }
 
-STATIC_OVL unpacked_coord
+static unpacked_coord
 get_unpacked_coord(loc, defhumidity)
 long loc;
 int defhumidity;
@@ -1676,7 +1676,7 @@ struct mkroom *croom;
     }
 }
 
-STATIC_OVL void
+static void
 replace_terrain(terr, croom)
 replaceterrain *terr;
 struct mkroom *croom;
@@ -2038,7 +2038,7 @@ boolean prefilled;
     }
 }
 
-STATIC_OVL struct mkroom *
+static struct mkroom *
 build_room(r, mkr)
 room *r;
 struct mkroom *mkr;
@@ -2247,7 +2247,7 @@ lev_init *linit;
     }
 }
 
-STATIC_OVL long
+static long
 sp_code_jmpaddr(curpos, jmpaddr)
 long curpos, jmpaddr;
 {
@@ -2257,7 +2257,7 @@ long curpos, jmpaddr;
 
 
 /*ARGUSED*/
-STATIC_OVL void
+static void
 spo_end_moninvent()
 {
     if (g.invent_carrying_monster)
@@ -2266,7 +2266,7 @@ spo_end_moninvent()
 }
 
 /*ARGUSED*/
-STATIC_OVL void
+static void
 spo_pop_container()
 {
     if (g.container_idx > 0) {
@@ -3053,7 +3053,7 @@ lua_State *L;
     return 0;
 }
 
-STATIC_OVL void
+static void
 spo_endroom(coder)
 struct sp_coder *coder;
 {
@@ -4142,7 +4142,7 @@ lua_State *L;
     }
 }
 
-STATIC_OVL void
+static void
 sel_set_ter(x, y, arg)
 int x, y;
 genericptr_t arg;
@@ -4160,7 +4160,7 @@ genericptr_t arg;
     }
 }
 
-STATIC_OVL void
+static void
 sel_set_feature(x, y, arg)
 int x, y;
 genericptr_t arg;
@@ -4170,7 +4170,7 @@ genericptr_t arg;
     levl[x][y].typ = (*(int *) arg);
 }
 
-STATIC_OVL void
+static void
 sel_set_door(dx, dy, arg)
 int dx, dy;
 genericptr_t arg;
@@ -4545,7 +4545,7 @@ int tableidx, entrynum;
     return ret;
 }
 
-STATIC_OVL int
+static int
 get_table_region(L, name, x1,y1, x2,y2, optional)
 lua_State *L;
 const char *name;
@@ -4581,7 +4581,7 @@ boolean optional;
     return 1;
 }
 
-STATIC_OVL int
+static int
 get_coord(L, index, x, y)
 lua_State *L;
 int index;
@@ -5120,7 +5120,7 @@ lua_State *L;
 }
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 sel_set_wallify(x, y, arg)
 int x, y;
 genericptr_t arg UNUSED;
@@ -5490,7 +5490,7 @@ lua_State *L;
     lua_setglobal(L, "des");
 }
 
-STATIC_OVL void
+static void
 create_des_coder()
 {
     if (!g.coder)
