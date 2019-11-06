@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1572833563 2019/11/04 02:12:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	music.c	$NHDT-Date: 1573063606 2019/11/06 18:06:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.60 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -511,24 +511,41 @@ struct obj *instr;
     if (Hallucination)
         mode |= PLAY_HALLU;
 
+    if (!rn2(2)) {
+        /*
+         * TEMPORARY?  for multiple impairments, don't always
+         * give the generic "it's far from music" message.
+         */
+        /* remove if STUNNED+CONFUSED ever gets its own message below */
+        if (mode == (PLAY_STUNNED | PLAY_CONFUSED))
+            mode = !rn2(2) ? PLAY_STUNNED : PLAY_CONFUSED;
+        /* likewise for stunned and/or confused combined with hallucination */
+        if (mode & PLAY_HALLU)
+            mode = PLAY_HALLU;
+    }
+
+    /* 3.6.3: most of these gave "You produce <blah>" and then many of
+       the instrument-specific messages below which immediately follow
+       also gave "You produce <something>."  That looked strange so we
+       now use a different verb here */
     switch (mode) {
     case PLAY_NORMAL:
         You("start playing %s.", yname(instr));
         break;
     case PLAY_STUNNED:
         if (!Deaf)
-            You("produce an obnoxious droning sound.");
+            You("radiate an obnoxious droning sound.");
         else
             You_feel("a monotonous vibration.");
         break;
     case PLAY_CONFUSED:
         if (!Deaf)
-            You("produce a raucous noise.");
+            You("generate a raucous noise.");
         else
             You_feel("a jarring vibration.");
         break;
     case PLAY_HALLU:
-        You("produce a kaleidoscopic display of floating butterfiles.");
+        You("disseminate a kaleidoscopic display of floating butterflies.");
         break;
     /* TODO? give some or all of these combinations their own feedback;
        hallucination ones should reference senses other than hearing... */
@@ -537,7 +554,7 @@ struct obj *instr;
     case PLAY_CONFUSED | PLAY_HALLU:
     case PLAY_STUNNED | PLAY_CONFUSED | PLAY_HALLU:
     default:
-        pline("What you produce is quite far from music...");
+        pline("What you perform is quite far from music...");
         break;
     }
 #undef PLAY_NORMAL
