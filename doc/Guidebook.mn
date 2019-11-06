@@ -511,8 +511,8 @@ information, then let you pick another location;
 you to choose another location to examine; \(oq:\(cq will show additional
 info, if any, without asking for confirmation.
 When picking a location,
-pressing the ESC key will terminate this command, or pressing \(oq?\(cq
-will give a brief reminder about how it works.
+pressing the ESC key will terminate this command, or pressing \(oq?\(cq will
+give a brief reminder about how it works.
 .lp ""
 If the
 .op autodescribe
