@@ -198,7 +198,7 @@ set_default_prefix_locations(const char *programPath)
     static char nethack_per_user_data_path[MAX_PATH];
     static char nethack_global_data_path[MAX_PATH];
     static char sysconf_path[MAX_PATH];
-    static char versioninfo[8];
+    static char versioninfo[20];
 
     strcpy(executable_path, get_executable_path());
     append_slash(executable_path);
