@@ -12,6 +12,9 @@
 #include <sys\stat.h>
 #include <errno.h>
 #include <ShlObj.h>
+#if !defined(VERSION_MAJOR)
+#include "patchlevel.h"
+#endif
 
 #if !defined(SAFEPROCS)
 #error You must #define SAFEPROCS to build windmain.c
@@ -102,7 +105,7 @@ build_known_folder_path(
     get_known_folder_path(folder_id, path, path_size);
     strcat(path, "\\NetHack\\");
     create_directory(path);
-    strcat(path, "3.6\\");
+    Sprintf(eos(path), "%d.%d\\", VERSION_MAJOR, VERSION_MINOR);
     create_directory(path);
 }
 
@@ -196,6 +199,7 @@ set_default_prefix_locations(const char *programPath)
     static char nethack_per_user_data_path[MAX_PATH];
     static char nethack_global_data_path[MAX_PATH];
     static char sysconf_path[MAX_PATH];
+    static char versioninfo[8];
 
     strcpy(executable_path, get_executable_path());
     append_slash(executable_path);
@@ -228,7 +232,8 @@ set_default_prefix_locations(const char *programPath)
     fqn_prefix[HACKPREFIX] = hack_path;
     fqn_prefix[TROUBLEPREFIX] = hack_path;
 
-    build_environment_path("COMMONPROGRAMFILES", "NetHack\\3.6", sysconf_path,
+    Sprintf(versioninfo, "NetHack\\%d.%d", VERSION_MAJOR, VERSION_MINOR);
+    build_environment_path("COMMONPROGRAMFILES", versioninfo, sysconf_path,
         sizeof(sysconf_path));
 
     if(!folder_file_exists(sysconf_path, SYSCF_FILE))
