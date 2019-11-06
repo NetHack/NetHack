@@ -14,7 +14,7 @@ static void FDECL(mksink, (struct mkroom *));
 static void FDECL(mkaltar, (struct mkroom *));
 static void FDECL(mkgrave, (struct mkroom *));
 static void NDECL(makevtele);
-static void NDECL(clear_level_structures);
+void NDECL(clear_level_structures);
 static void NDECL(makelevel);
 static boolean FDECL(bydoor, (XCHAR_P, XCHAR_P));
 static struct mkroom *FDECL(find_branch_room, (coord *));

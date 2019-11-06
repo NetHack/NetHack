@@ -6,34 +6,34 @@
 #include "sp_lev.h"
 
 /* lua_CFunction prototypes */
-STATIC_DCL int FDECL(l_selection_new, (lua_State *));
-STATIC_DCL int FDECL(l_selection_clone, (lua_State *));
-STATIC_DCL int FDECL(l_selection_getpoint, (lua_State *));
-STATIC_DCL int FDECL(l_selection_setpoint, (lua_State *));
-STATIC_DCL int FDECL(l_selection_not, (lua_State *));
-STATIC_DCL int FDECL(l_selection_filter_percent, (lua_State *));
-STATIC_DCL int FDECL(l_selection_rndcoord, (lua_State *));
-STATIC_DCL int FDECL(l_selection_line, (lua_State *));
-STATIC_DCL int FDECL(l_selection_randline, (lua_State *));
-STATIC_DCL int FDECL(l_selection_rect, (lua_State *));
-STATIC_DCL int FDECL(l_selection_fillrect, (lua_State *));
-STATIC_DCL int FDECL(l_selection_fillrect, (lua_State *));
-STATIC_DCL int FDECL(l_selection_grow, (lua_State *));
-STATIC_DCL int FDECL(l_selection_filter_mapchar, (lua_State *));
-STATIC_DCL int FDECL(l_selection_flood, (lua_State *));
-STATIC_DCL int FDECL(l_selection_circle, (lua_State *));
-STATIC_DCL int FDECL(l_selection_ellipse, (lua_State *));
-STATIC_DCL int FDECL(l_selection_gradient, (lua_State *));
-STATIC_DCL int FDECL(l_selection_iterate, (lua_State *));
-STATIC_DCL int FDECL(l_selection_gc, (lua_State *));
-STATIC_DCL int FDECL(l_selection_not, (lua_State *));
-STATIC_DCL int FDECL(l_selection_and, (lua_State *));
-STATIC_DCL int FDECL(l_selection_or, (lua_State *));
-STATIC_DCL int FDECL(l_selection_xor, (lua_State *));
-STATIC_DCL int FDECL(l_selection_not, (lua_State *));
-STATIC_DCL int FDECL(l_selection_add, (lua_State *));
-STATIC_DCL int FDECL(l_selection_sub, (lua_State *));
-STATIC_DCL int FDECL(l_selection_ipairs, (lua_State *));
+static int FDECL(l_selection_new, (lua_State *));
+static int FDECL(l_selection_clone, (lua_State *));
+static int FDECL(l_selection_getpoint, (lua_State *));
+static int FDECL(l_selection_setpoint, (lua_State *));
+static int FDECL(l_selection_not, (lua_State *));
+static int FDECL(l_selection_filter_percent, (lua_State *));
+static int FDECL(l_selection_rndcoord, (lua_State *));
+static int FDECL(l_selection_line, (lua_State *));
+static int FDECL(l_selection_randline, (lua_State *));
+static int FDECL(l_selection_rect, (lua_State *));
+static int FDECL(l_selection_fillrect, (lua_State *));
+static int FDECL(l_selection_fillrect, (lua_State *));
+static int FDECL(l_selection_grow, (lua_State *));
+static int FDECL(l_selection_filter_mapchar, (lua_State *));
+static int FDECL(l_selection_flood, (lua_State *));
+static int FDECL(l_selection_circle, (lua_State *));
+static int FDECL(l_selection_ellipse, (lua_State *));
+static int FDECL(l_selection_gradient, (lua_State *));
+static int FDECL(l_selection_iterate, (lua_State *));
+static int FDECL(l_selection_gc, (lua_State *));
+static int FDECL(l_selection_not, (lua_State *));
+static int FDECL(l_selection_and, (lua_State *));
+static int FDECL(l_selection_or, (lua_State *));
+static int FDECL(l_selection_xor, (lua_State *));
+static int FDECL(l_selection_not, (lua_State *));
+static int FDECL(l_selection_add, (lua_State *));
+static int FDECL(l_selection_sub, (lua_State *));
+static int FDECL(l_selection_ipairs, (lua_State *));
 
 struct selectionvar *
 l_selection_check(L, index)

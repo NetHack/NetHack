@@ -148,7 +148,7 @@ static int NDECL(wiz_where);
 static int NDECL(wiz_detect);
 static int NDECL(wiz_panic);
 static int NDECL(wiz_polyself);
-STATIC_PTR int NDECL(wiz_load_lua);
+static int NDECL(wiz_load_lua);
 static int NDECL(wiz_level_tele);
 static int NDECL(wiz_level_change);
 static int NDECL(wiz_show_seenv);
@@ -874,7 +874,7 @@ boolean pre, wiztower;
 }
 
 /* #wizmakemap - discard current dungeon level and replace with a new one */
-STATIC_PTR int
+static int
 wiz_makemap(VOID_ARGS)
 {
     if (wizard) {
@@ -945,7 +945,7 @@ wiz_detect(VOID_ARGS)
     return 0;
 }
 
-STATIC_PTR int
+static int
 wiz_load_lua(VOID_ARGS)
 {
     if (wizard) {
@@ -961,7 +961,7 @@ wiz_load_lua(VOID_ARGS)
     return 0;
 }
 
-STATIC_PTR int
+static int
 wiz_load_splua(VOID_ARGS)
 {
     if (wizard) {

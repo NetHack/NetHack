@@ -892,8 +892,8 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
-$(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
-	 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
+$(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	$(DAT)\oracles \
+	 	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
 ! IF ("$(USE_DLB)"=="Y")
 	copy nhdat$(NHV)          $(GAMEDIR)
 	copy $(DAT)\license       $(GAMEDIR)
@@ -903,7 +903,7 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	copy $(DAT)\*.dat         $(GAMEDIR)
 	if exist $(GAMEDIR)\makefile del $(GAMEDIR)\makefile
 ! ENDIF
-	if exist $(MSWSYS)\sysconf.template copy $(MSWSYS)\sysconf.temnplate $(GAMEDIR)
+	if exist $(MSWSYS)\sysconf.template copy $(MSWSYS)\sysconf.template $(GAMEDIR)
 	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)\symbols.template
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
@@ -961,8 +961,7 @@ $(O)sp_lev.tag:
 !ENDIF
 
 $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
-		$(SRC)\vis_tab.c $(INCL)\vis_tab.h \
-		$(U)dgncomp.exe $(TILEUTIL16)
+		$(SRC)\vis_tab.c $(INCL)\vis_tab.h $(TILEUTIL16)
              @echo utilities made >$@
 	     @echo utilities made.
 
@@ -1117,6 +1116,7 @@ $(U)levcomp.exe: $(LEVCOMPOBJS)
 # Dungeon Compiler Stuff
 #=================================================
 #
+!IFDEF OBSOLETE_DGN_COMPILER
 # defer to the steps in ..\win\win32\dgnstuff.mak
 #
 $(U)dgn_yacc.c: $(U)dgn_comp.y
@@ -1144,7 +1144,7 @@ $(U)dgncomp.exe: $(DGNCOMPOBJS)
 		$(DGNCOMPOBJS:^	=^
 		)
 <<
-
+!ENDIF
  
 #=================================================
 # Create directory for holding object files
@@ -1207,7 +1207,7 @@ $(DAT)\porthelp: $(MSWSYS)\porthelp
 
 nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
-	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon $(DAT)\porthelp \
+	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\porthelp \
 	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
 	cd $(DAT)
 	echo data >dlb.lst
@@ -1225,7 +1225,9 @@ nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	echo history >>dlb.lst
 	echo opthelp >>dlb.lst
 	echo wizhelp >>dlb.lst
+!IFDEF OBSOLETE_DGN_COMPILER
 	echo dungeon >>dlb.lst
+!ENDIF
 	echo license >>dlb.lst
 	echo engrave >>dlb.lst
 	echo epitaph >>dlb.lst
@@ -1432,8 +1434,10 @@ spotless: clean
 	if exist $(DAT)\ttyoptions	 del $(DAT)\ttyoptions
 	if exist $(DAT)\guioptions	 del $(DAT)\guioptions
 	if exist $(DAT)\data		 del $(DAT)\data
+!IFDEF OBSOLETE_DGN_COMPILER
 	if exist $(DAT)\dungeon		 del $(DAT)\dungeon
 	if exist $(DAT)\dungeon.pdf	 del $(DAT)\dungeon.pdf
+!ENDIF
 !IFDEF OBSOLETE_LEVEL_COMPILER
 	if exist $(DAT)\???-fil?.lev	 del $(DAT)\???-fil?.lev
 	if exist $(DAT)\???-goal.lev	 del $(DAT)\???-goal.lev
@@ -1467,21 +1471,21 @@ clean:
 	if exist $(U)makedefs.exe  del $(U)makedefs.exe
 !IFDEF OBSOLETE_LEVEL_COMPILER
 	if exist $(U)levcomp.exe   del $(U)levcomp.exe
+	if exist $(O)levcomp.MAP   del $(O)levcomp.MAP
+	if exist $(O)levcomp.PDB   del $(O)levcomp.PDB
 !ENDIF
+!IFDEF OBSOLETE_DGN_COMPILER
 	if exist $(U)dgncomp.exe   del $(U)dgncomp.exe
+	if exist $(O)dgncomp.MAP   del $(O)dgncomp.MAP
+	if exist $(O)dgncomp.PDB   del $(O)dgncomp.PDB
+!ENDIF
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
 	if exist $(O)install.tag   del $(O)install.tag
 	if exist $(O)console.res  del $(O)console.res
-	if exist $(O)dgncomp.MAP  del $(O)dgncomp.MAP
-	if exist $(O)dgncomp.PDB  del $(O)dgncomp.PDB
 	if exist $(O)dlb_main.MAP del $(O)dlb_main.MAP
 	if exist $(O)dlb_main.PDB del $(O)dlb_main.PDB
 	if exist $(O)gamedir.tag  del $(O)gamedir.tag
-!IFDEF OBSOLETE_LEVEL_COMPILER
-	if exist $(O)levcomp.MAP  del $(O)levcomp.MAP
-	if exist $(O)levcomp.PDB  del $(O)levcomp.PDB
-!ENDIF
 	if exist $(O)makedefs.MAP del $(O)makedefs.MAP
 	if exist $(O)makedefs.PDB del $(O)makedefs.PDB
 	if exist $(O)NetHack.MAP  del $(O)NetHack.MAP
@@ -1505,14 +1509,18 @@ clean:
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
 	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
+!IFDEF OBSOLETE_LEVEL_COMPILER
 	rem
 	rem defer to the steps in ..\win\win32\levstuff.mak
 	rem 
 	nmake -nologo -f ..\win\win32\levstuff.mak clean
+!ENDIF
+!IFDEF OBSOLETE_DGN_COMPILER
 	rem
 	rem defer to the steps in ..\win\win32\dgnstuff.mak
 	rem
 	nmake -nologo -f ..\win\win32\dgnstuff.mak clean
+!ENDIF
 	if exist $(TILEBMP16)        del $(TILEBMP16)
 	if exist $(TILEBMP32)        del $(TILEBMP32)
 
@@ -1545,11 +1553,13 @@ $(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
 $(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
 	$(U)makedefs -s
 
+!IFDEF OBSOLETE_DGN_COMPILER
 $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 	$(U)makedefs -e
 	cd $(DAT)
 	$(U)dgncomp dungeon.pdf
 	cd $(SRC)
+!ENDIF
 
 #
 # NT dependencies

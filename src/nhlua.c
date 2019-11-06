@@ -14,21 +14,21 @@
 /*  */
 
 /* lua_CFunction prototypes */
-STATIC_DCL int FDECL(nhl_test, (lua_State *));
-STATIC_DCL int FDECL(nhl_getmap, (lua_State *));
-STATIC_DCL int FDECL(nhl_setmap, (lua_State *));
-STATIC_DCL int FDECL(nhl_pline, (lua_State *));
-STATIC_DCL int FDECL(nhl_verbalize, (lua_State *));
-STATIC_DCL int FDECL(nhl_menu, (lua_State *));
-STATIC_DCL int FDECL(nhl_getlin, (lua_State *));
-STATIC_DCL int FDECL(nhl_makeplural, (lua_State *));
-STATIC_DCL int FDECL(nhl_makesingular, (lua_State *));
-STATIC_DCL int FDECL(nhl_s_suffix, (lua_State *));
-STATIC_DCL int FDECL(nhl_ing_suffix, (lua_State *));
-STATIC_DCL int FDECL(nhl_an, (lua_State *));
-STATIC_DCL int FDECL(nhl_meta_u_index, (lua_State *));
-STATIC_DCL int FDECL(nhl_meta_u_newindex, (lua_State *));
-STATIC_DCL int FDECL(traceback_handler, (lua_State *));
+static int FDECL(nhl_test, (lua_State *));
+static int FDECL(nhl_getmap, (lua_State *));
+static int FDECL(nhl_setmap, (lua_State *));
+static int FDECL(nhl_pline, (lua_State *));
+static int FDECL(nhl_verbalize, (lua_State *));
+static int FDECL(nhl_menu, (lua_State *));
+static int FDECL(nhl_getlin, (lua_State *));
+static int FDECL(nhl_makeplural, (lua_State *));
+static int FDECL(nhl_makesingular, (lua_State *));
+static int FDECL(nhl_s_suffix, (lua_State *));
+static int FDECL(nhl_ing_suffix, (lua_State *));
+static int FDECL(nhl_an, (lua_State *));
+static int FDECL(nhl_meta_u_index, (lua_State *));
+static int FDECL(nhl_meta_u_newindex, (lua_State *));
+static int FDECL(traceback_handler, (lua_State *));
 
 void
 nhl_error(L, msg)
