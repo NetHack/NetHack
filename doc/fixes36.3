@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.159 $ $NHDT-Date: 1572892926 2019/11/04 18:42:06 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.162 $ $NHDT-Date: 1573066356 2019/11/06 18:52:36 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -217,6 +217,7 @@ some other deafness-related message corrections
 when dipping into holy/unholy water while blind (where the glow message is
 	suppressed), clear dipped item's bknown flag unless water potion's
 	bless/curse state is known
+playing music while hallucinating:  message misspelled "butterflies"
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -268,6 +269,7 @@ EDIT_GETLIN: using 'O' to set message types or menu colors was overloading the
 	during repeat prompting
 EDIT_GETLIN: for paranoid confirmation, if answer was neither "yes" nor "no",
 	don't supply the rejected answer as the default when retrying
+USE_FCNTL: nethack wasn't closing lock file 'perm'
 curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
 	but 0-9 should be reserved for counts and if the display was tall
 	enough for more than 62 entries, arbitrary ASCII punctuation got used
