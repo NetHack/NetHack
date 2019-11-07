@@ -551,10 +551,12 @@ char *defval;
 
     lua_getfield(L, -1, name);
     ret = luaL_optstring(L, -1, defval);
-    if (ret)
-        ret = dupstr(ret);
+    if (ret) {
+        lua_pop(L, 1);
+        return dupstr(ret);
+    }
     lua_pop(L, 1);
-    return ret;
+    return NULL;
 }
 
 int
@@ -804,11 +806,6 @@ const char *fname;
     dlb_fseek(fh, 0L, SEEK_END);
     buflen = dlb_ftell(fh);
     buf = (char *) alloc(sizeof(char) * (buflen + 1));
-    if (!buf) {
-        impossible("alloc: Error allocating %i bytes for loading lua file %s", buflen, fname);
-        ret = FALSE;
-        goto give_up;
-    }
     dlb_fseek(fh, 0L, SEEK_SET);
 
     do {
