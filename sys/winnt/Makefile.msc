@@ -1373,6 +1373,8 @@ $(O)lua5.3.5-static.lib: $(LUAOBJFILES)
 
 $(O)lua.o: $(LUASRC)\lua.c
 $(O)luac.o: $(LUASRC)\luac.c
+$(O)lapi.o: $(LUASRC)\lapi.c
+	@$(cc) $(cflagsBuild) -wd4244 -Fo$@ $(LUASRC)\lapi.c
 
 #===============================================================================
 # Housekeeping
