@@ -38,8 +38,8 @@ MAKEFILE= $(SRC)Makefile.
 
 # set option flags for C compiler and linker
 #
-CFLAGS	= /Prefix=All/Incl=$(INC)/noList	# DECC in native mode
-#CFLAGS	= /Include=$(INC)/noList	# VAXC or GNUC
+CFLAGS	= /Prefix=All/Incl=$(INC),$(LUA)/noList	# DECC in native mode
+#CFLAGS	= /Include=$(INC),$(LUA)/noList	# VAXC or GNUC
 #LFLAGS	= /Debug/Map/Cross_Ref			# for development
 #LFLAGS	= /noTraceback/noMap			# for installing w/ privs
 LFLAGS	= /noMap
