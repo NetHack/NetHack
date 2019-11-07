@@ -29,7 +29,7 @@ VMS = [-.sys.vms]
 WINSHR = [-.win.share]
 X11 = [-.win.X11]
 #LUA source tree parallel to NetHack tree in lua535 directory
-LUA = [-.-.lua535]
+LUA = [-.-.lua535.src]
 MAKEFILE= $(SRC)Makefile.
 
 # if you are using gcc as your compiler:
