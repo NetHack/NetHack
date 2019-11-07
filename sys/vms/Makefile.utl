@@ -27,8 +27,8 @@ WINSHR = [-.win.share]
 WINX11 = [-.win.X11]
 # targets, with enough punctuation to keep MCR and DELETE happy
 MAKEDEFS= $(UTL)makedefs.exe;
-LEVCOMP = $(UTL)lev_comp.exe;
-DGNCOMP = $(UTL)dgn_comp.exe;
+#LEVCOMP = $(UTL)lev_comp.exe;
+#DGNCOMP = $(UTL)dgn_comp.exe;
 DLB	= $(UTL)dlb.exe;
 RECOVER = $(UTL)recover.exe;
 # used by $(DAT)Makefile for synchronization
@@ -62,17 +62,17 @@ LINK	= link
 #
 # yacc/lex programs to use to generate *_comp.c, *_comp.h, and *_lex.c.
 # choose xxxOUT that matches xxx tool's output
-YACC	= bison /Define
-LEX	= flex
+#YACC	= bison /Define
+#LEX	= flex
 #YACC	= yacc -d
 #LEX	= lex
 #YACC	= posix/Run posix$bin:yacc. "-d
 #LEX	= posix/Run posix$bin:lex. "
 # blank means foo.y -> foo_tab.c & foo_tab.h
-YACCOUT =		# bison
+#YACCOUT =		# bison
 #YACCOUT = ytab		# VMS POSIX
 #YACCOUT = y_tab	# DEC/Shell
-LEXOUT	= lexyy		# flex
+#LEXOUT	= lexyy		# flex
 #LEXOUT  = lex_yy	# VMS POSIX
 
 
@@ -88,8 +88,8 @@ HACK_H   = $(SRC)hack.h-t
 
 # utility .c files
 MAKESRC    = makedefs.c
-SPLEVSRC   = lev_yacc.c lev_lex.c lev_main.c
-DGNCOMPSRC = dgn_yacc.c dgn_lex.c dgn_main.c
+#SPLEVSRC   = lev_yacc.c lev_lex.c lev_main.c
+#DGNCOMPSRC = dgn_yacc.c dgn_lex.c dgn_main.c
 RECOVSRC   = recover.c
 DLBSRC	   = dlb_main.c
 UTILSRCS   = $(MAKESRC) $(SPLEVSRC) $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC) panic.c
@@ -105,11 +105,11 @@ NAMEOBJS = $(NAMEOBJ1),$(NAMEOBJ2)
 MAKEOBJS = makedefs.obj,$(NAMEOBJ1)
 
 # object files for special levels compiler
-SPLEVOBJS = lev_main.obj,lev_yacc.obj,lev_lex.obj,panic.obj,\
-	    $(SRC)alloc.obj,$(NAMEOBJS)
+#SPLEVOBJS = lev_main.obj,lev_yacc.obj,lev_lex.obj,panic.obj,\
+#	    $(SRC)alloc.obj,$(NAMEOBJS)
 
 # object files for dungeon compiler
-DGNCOMPOBJS = dgn_main.obj,dgn_yacc.obj,dgn_lex.obj,panic.obj,$(SRC)alloc.obj
+#DGNCOMPOBJS = dgn_main.obj,dgn_yacc.obj,dgn_lex.obj,panic.obj,$(SRC)alloc.obj
 
 # object files for recovery utility
 RECOVOBJS = recover.obj
@@ -138,10 +138,10 @@ no_lex :
 #	alternate target names for possible interactive use
 makedefs : $(MAKEDEFS)
       @ $(ECHO) "makedefs is up to date."
-lev_comp : $(LEVCOMP)
-      @ $(ECHO) "lev_comp is up to date."
-dgn_comp : $(DGNCOMP)
-      @ $(ECHO) "dgn_comp is up to date."
+#lev_comp : $(LEVCOMP)
+#      @ $(ECHO) "lev_comp is up to date."
+#dgn_comp : $(DGNCOMP)
+#      @ $(ECHO) "dgn_comp is up to date."
 recover  : $(RECOVER)
       @ $(ECHO) "recover is up to date."
 dlb	 : $(DLB)
@@ -187,66 +187,66 @@ $(INC)date.h :	$(MAKEDEFS)
 
 #	dependencies for lev_comp
 #
-$(LEVCOMP) : $(SPLEVOBJS) $(VMSOBJS) $(LIBOPT) $(ID_OPT)
-	$(LINK)/Exe=$(LEVCOMP) $(LFLAGS) $(SPLEVOBJS),$(VMSOBJS),$(LIBS)
-
-lev_yacc.obj : $(HACK_H) $(INC)sp_lev.h lev_yacc.c
-	$(CC) $(CFLAGS) lev_yacc.c
-lev_lex.obj  : $(HACK_H) $(INC)lev_comp.h $(INC)sp_lev.h lev_lex.c
-	@ if f$search("lev_lex.h").nes."" then	$(MOVE) lev_lex.h stdio.h
-	$(CC) $(CFLAGS) lev_lex.c
-	@ if f$search("stdio.h").nes."" then  $(MOVE) stdio.h lev_lex.h
-lev_main.obj : $(HACK_H) $(INC)sp_lev.h $(INC)tcap.h $(INC)date.h lev_main.c
-	$(CC) $(CFLAGS) lev_main.c
+#$(LEVCOMP) : $(SPLEVOBJS) $(VMSOBJS) $(LIBOPT) $(ID_OPT)
+#	$(LINK)/Exe=$(LEVCOMP) $(LFLAGS) $(SPLEVOBJS),$(VMSOBJS),$(LIBS)
+#
+#lev_yacc.obj : $(HACK_H) $(INC)sp_lev.h lev_yacc.c
+#	$(CC) $(CFLAGS) lev_yacc.c
+#lev_lex.obj  : $(HACK_H) $(INC)lev_comp.h $(INC)sp_lev.h lev_lex.c
+#	@ if f$search("lev_lex.h").nes."" then	$(MOVE) lev_lex.h stdio.h
+#	$(CC) $(CFLAGS) lev_lex.c
+#	@ if f$search("stdio.h").nes."" then  $(MOVE) stdio.h lev_lex.h
+#lev_main.obj : $(HACK_H) $(INC)sp_lev.h $(INC)tcap.h $(INC)date.h lev_main.c
+#	$(CC) $(CFLAGS) lev_main.c
 panic.obj    : $(CONFIG_H)
 	$(CC) $(CFLAGS) panic.c
 
-$(INC)lev_comp.h : lev_yacc.c
-	$(TOUCH) $(INC)lev_comp.h
+#$(INC)lev_comp.h : lev_yacc.c
+#	$(TOUCH) $(INC)lev_comp.h
 
-lev_yacc.c : lev_comp.y
-	$(YACC) lev_comp.y
-	$(MUNG) 'f$parse("$(YACCOUT)","lev_comp_tab.c")' "#module" /Outp=lev_yacc.c
-	@ if f$search("''f$parse("$(YACCOUT)","lev_comp_tab.c")'").nes."" then \
-		$(RM) 'f$parse("$(YACCOUT)","lev_comp_tab.c")'
-	$(MOVE) 'f$parse("$(YACCOUT)","lev_comp_tab.h")' $(INC)lev_comp.h
-
-lev_lex.c : lev_comp.l
-	$(LEX) lev_comp.l
-	$(MUNG) 'f$parse("$(LEXOUT)","lev_comp_lex.c")' "#module" /Outp=lev_lex.c
-	@ if f$search("''f$parse("$(LEXOUT)","lev_comp_lex.c")'").nes."" then \
-		$(RM) 'f$parse("$(LEXOUT)","lev_comp_lex.c")'
-
-
+#lev_yacc.c : lev_comp.y
+#	$(YACC) lev_comp.y
+#	$(MUNG) 'f$parse("$(YACCOUT)","lev_comp_tab.c")' "#module" /Outp=lev_yacc.c
+#	@ if f$search("''f$parse("$(YACCOUT)","lev_comp_tab.c")'").nes."" then \
+#		$(RM) 'f$parse("$(YACCOUT)","lev_comp_tab.c")'
+#	$(MOVE) 'f$parse("$(YACCOUT)","lev_comp_tab.h")' $(INC)lev_comp.h
+#
+#lev_lex.c : lev_comp.l
+#	$(LEX) lev_comp.l
+#	$(MUNG) 'f$parse("$(LEXOUT)","lev_comp_lex.c")' "#module" /Outp=lev_lex.c
+#	@ if f$search("''f$parse("$(LEXOUT)","lev_comp_lex.c")'").nes."" then \
+#		$(RM) 'f$parse("$(LEXOUT)","lev_comp_lex.c")'
+#
+#
 #	dependencies for dgn_comp
 #
-$(DGNCOMP) : $(DGNCOMPOBJS) $(VMSOBJS) $(LIBOPT) $(ID_OPT)
-	$(LINK)/Exe=$(DGNCOMP) $(LFLAGS) $(DGNCOMPOBJS),$(VMSOBJS),$(LIBS)
-
-dgn_yacc.obj : $(CONFIG_H) $(INC)dgn_file.h $(INC)date.h dgn_yacc.c
-	$(CC) $(CFLAGS) dgn_yacc.c
-dgn_lex.obj  : $(CONFIG_H) $(INC)dgn_comp.h $(INC)dgn_file.h dgn_lex.c
-	@ if f$search("lev_lex.h").nes."" then	$(MOVE) lev_lex.h stdio.h
-	$(CC) $(CFLAGS) dgn_lex.c
-	@ if f$search("stdio.h").nes."" then  $(MOVE) stdio.h lev_lex.h
-dgn_main.obj : $(CONFIG_H) dgn_main.c
-	$(CC) $(CFLAGS) dgn_main.c
-
-$(INC)dgn_comp.h : dgn_yacc.c
-	$(TOUCH) $(INC)dgn_comp.h
-
-dgn_yacc.c : dgn_comp.y
-	$(YACC) dgn_comp.y
-	$(MUNG) 'f$parse("$(YACCOUT)","dgn_comp_tab.c")' "#module" /Outp=dgn_yacc.c
-	@ if f$search("''f$parse("$(YACCOUT)","dgn_comp_tab.c")'").nes."" then \
-		$(RM) 'f$parse("$(YACCOUT)","dgn_comp_tab.c")'
-	$(MOVE) 'f$parse("$(YACCOUT)","dgn_comp_tab.h")' $(INC)dgn_comp.h
-
-dgn_lex.c : dgn_comp.l
-	$(LEX) dgn_comp.l
-	$(MUNG) 'f$parse("$(LEXOUT)","dgn_comp_lex.c")' "#module" /Outp=dgn_lex.c
-	@ if f$search("''f$parse("$(LEXOUT)","dgn_comp_lex.c")'").nes."" then \
-		$(RM) 'f$parse("$(LEXOUT)","dgn_comp_lex.c")'
+#$(DGNCOMP) : $(DGNCOMPOBJS) $(VMSOBJS) $(LIBOPT) $(ID_OPT)
+#	$(LINK)/Exe=$(DGNCOMP) $(LFLAGS) $(DGNCOMPOBJS),$(VMSOBJS),$(LIBS)
+#
+#dgn_yacc.obj : $(CONFIG_H) $(INC)dgn_file.h $(INC)date.h dgn_yacc.c
+#	$(CC) $(CFLAGS) dgn_yacc.c
+#dgn_lex.obj  : $(CONFIG_H) $(INC)dgn_comp.h $(INC)dgn_file.h dgn_lex.c
+#	@ if f$search("lev_lex.h").nes."" then	$(MOVE) lev_lex.h stdio.h
+#	$(CC) $(CFLAGS) dgn_lex.c
+#	@ if f$search("stdio.h").nes."" then  $(MOVE) stdio.h lev_lex.h
+#dgn_main.obj : $(CONFIG_H) dgn_main.c
+#	$(CC) $(CFLAGS) dgn_main.c
+#
+#$(INC)dgn_comp.h : dgn_yacc.c
+#	$(TOUCH) $(INC)dgn_comp.h
+#
+#dgn_yacc.c : dgn_comp.y
+#	$(YACC) dgn_comp.y
+#	$(MUNG) 'f$parse("$(YACCOUT)","dgn_comp_tab.c")' "#module" /Outp=dgn_yacc.c
+#	@ if f$search("''f$parse("$(YACCOUT)","dgn_comp_tab.c")'").nes."" then \
+#		$(RM) 'f$parse("$(YACCOUT)","dgn_comp_tab.c")'
+#	$(MOVE) 'f$parse("$(YACCOUT)","dgn_comp_tab.h")' $(INC)dgn_comp.h
+#
+#dgn_lex.c : dgn_comp.l
+#	$(LEX) dgn_comp.l
+#	$(MUNG) 'f$parse("$(LEXOUT)","dgn_comp_lex.c")' "#module" /Outp=dgn_lex.c
+#	@ if f$search("''f$parse("$(LEXOUT)","dgn_comp_lex.c")'").nes."" then \
+#		$(RM) 'f$parse("$(LEXOUT)","dgn_comp_lex.c")'
 
 
 #	dependencies for recover
@@ -363,13 +363,13 @@ clean :
       - if f$search("*.obj") .nes."" then  $(RM) *.obj;
 
 spotless :	clean
-      - if f$search("%%%_lex.c") .nes."" then  $(RM) %%%_lex.c;
-      - if f$search("%%%_yacc.c").nes."" then  $(RM) %%%_yacc.c;
-      - if f$search("$(INC)%%%_comp.h").nes."" then  $(RM) $(INC)%%%_comp.h;*
+#      - if f$search("%%%_lex.c") .nes."" then  $(RM) %%%_lex.c;
+#      - if f$search("%%%_yacc.c").nes."" then  $(RM) %%%_yacc.c;
+#      - if f$search("$(INC)%%%_comp.h").nes."" then  $(RM) $(INC)%%%_comp.h;*
       - if f$search("$(INC)tile.h").nes."" then  $(RM) $(INC)tile.h;*
-      - if f$search("lev_lex.h") .nes."" then  $(RM) lev_lex.h;
+#      - if f$search("lev_lex.h") .nes."" then  $(RM) lev_lex.h;
       - if f$search("*tab.c")	 .nes."" then  $(RM) *tab.c;
       - if f$search("*.exe").nes."" then \
- $(RM) $(MAKEDEFS),$(LEVCOMP),$(DGNCOMP),$(RECOVER),$(DLB)
+ $(RM) $(MAKEDEFS),$(RECOVER),$(DLB)
       - if f$search("*.exe").nes."" then  $(RM) $(TILEUTILS)
       - if f$search("$(MARKER)").nes."" then  $(RM) $(MARKER)
