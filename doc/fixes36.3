@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.162 $ $NHDT-Date: 1573066356 2019/11/06 18:52:36 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.165 $ $NHDT-Date: 1573119743 2019/11/07 09:42:23 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -152,9 +152,9 @@ zapping self with wand of opening or spell of knock to escape from a pit trap
 wielded aklys that returned to hero when thrown while inside an engulfer left
 	a stale 'thrownobj' pointer that triggered "add_to_minv: obj not free"
 	panic if same weapon killed any engulfer via melee from inside
-uarmh null pointer dereference if a helm of opposite alignment came off due 
+uarmh null pointer dereference if a helm of opposite alignment came off due
 	to being polymorphed
-verb tense was inappropriate in some messages when a mon/pet had a name 
+verb tense was inappropriate in some messages when a mon/pet had a name
 	ending in 's'
 orctown booty items should have been initialized in mksobj()
 query_category() and whatdoes_help() had early returns which could each leave
@@ -176,7 +176,7 @@ avoid 'object lost' panic when polymorph causes loss of levitation boots or
 <shift><letter> running told player about engravings as they were being moved
 	over but buffered output didn't show it until hero stopped, so it
 	wasn't possible to tell where they were, unlike all other forms of
-	multiple movement; stop running if/when an engraving is reached
+	multiple movement; so stop running if/when an engraving is reached
 fix exploding land mine moving ball or chain and causing a sanity error
 fix firing attached iron ball when swallowed causing a sanity error
 fix vault guard impossible when he could not relocate in certain situation
@@ -239,8 +239,8 @@ monster throwing from stack of missiles (darts, daggers, spears) would cause
 surviving death while polymorphed would yield "You are a <foo>" without
 	terminating period
 'mksobj failure' commit resulted in wrong corpse types for dying monsters
-a recent intended sanity check fix inadvertently bypassed placing 
-	a thrown chained ball back onto the floor
+a recent intended sanity check fix inadvertently bypassed placing a thrown
+	chained ball back onto the floor
 in symset:curses, symbol S_tree was accidentally set to horizontal line where
 	plus-or-minus sign was meant; also, change S_bars to not-equals sign
 curses: sometimes the message window would show a blank line after a prompt
@@ -284,10 +284,10 @@ curses: support EDIT_GETLIN (but like with tty, it's disabled by default) to
 	(however, it's skipped if the 'popup_dialog' option is On)
 curses: when display windows get reconfigured (after setting align_status,
 	align_message, statuslines, windowborders or due to external resize),
-	the message window was being refreshed with the oldest available N
-	messages rather than most recent N.  [Still room for improvement;
-	when feasible it combines short lines, resulting in N messages on
-	fewer than N lines and leaving some of the available lines blank.]
+	the message window was being refreshed with most recent message and
+	the oldest available N-1 messages rather than next to most recent N-1.
+	[Still room for improvement when short lines are combined or long
+	ones are wrapped, where it still shows a subset of N original lines.]
 curses: plug memory leak when getting a line of input is cancelled by ESC
 curses: after requesting a line of input from player, next line of message
 	window could end up being skipped
@@ -298,10 +298,10 @@ curses: don't convert ^M (or <return> or <enter> key) into ^J; both ^J and ^M
 	cause the hero to try to move
 curses: draw map in screen columns 1..79 like tty, rather than in 2..80
 curses: make text windows wider so that help feedback is more readable
-curses: using ':' for search string matching to toggle menu items in a multple
-	page menu would highlight arbitrary items on the currently visible
-	page in sync with the lines that matching items had on other pages
-curses: when map window was clipped, the 'scrollbars' shown to indicate which
+curses: using ':' for toggling menu items which match a search string, in a
+	multi-page menu it would highlight arbitrary items on the currently
+	visible page in sync with lines that matched items have on other pages
+curses: when map window was clipped, position bars shown to indicate which
 	part of the map was in view didn't work as intended, always drawing
 	"*--------------" for horizontal (and comparable '*' with multiple '|'
 	underneath for vertical) when it meant to show "---******------" if
@@ -315,8 +315,8 @@ curses: disable the attempt to support Ctrl+Left_click as an alternate way
 	the mouse data passed to nethack didn't match the curses (ncurses on
 	OSX 10.11) documentation and things didn't work as intended
 curses: menu coloring required that both 'menucolors' and 'guicolor' be On;
-	for menus, override guicolor with more-specific menucolors
-curses: support symset:DECgraphics for map display
+	for menus, ignore 'guicolor' and honor more-specific 'menucolors'
+curses: support symset:curses and symset:DECgraphics for map display
 curses: enable the 'use_inverse' boolean option (via wincap WC_INVERSE flag)
 	for extended monster detection and black&white lava; forced to True
 	to override default of False (for tty's benefit)
@@ -355,13 +355,13 @@ tty: take two, if/when autodecribe feedback wraps past top line, clear
 tty: video attributes (bold, inverse, &c) for status highlighting sometimes
 	were scrambled
 unix: sysconf CHECK_PLNAME=1 wouldn't work if attempt to obtain unix username
-	failed even though it didn't need that username
+	failed even though it didn't need that to check player character name
 unix+curses: startup error only reset terminal for tty; one noticeable
 	example was answering 'n' to "Destroy old game?"
 Windows: some startup error messages were not being delivered successfully
 WindowsGUI: player selection dialog box layout was not being adjusted for DPI
-Windows: signifiant changes to default directory choices.  see documentation
-    for details.
+Windows: significant changes to default directory choices; see documentation
+	for details
 
 
 General New Features
