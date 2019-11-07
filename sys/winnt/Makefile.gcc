@@ -272,12 +272,7 @@ U  = $(UTIL)/
 
 MAKESRC        = $(U)makedefs.c
 
-DGNCOMPSRC     = $(U)dgn_yacc.c  $(U)dgn_lex.c $(U)dgn_main.c
-
 MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
-
-DGNCOMPOBJS    = $(O)dgn_yacc.o  $(O)dgn_lex.o $(O)dgn_main.o \
-	$(O)alloc.o   $(O)panic.o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -791,8 +786,7 @@ $(O)sp_lev.tag: $(O)utility.tag
 	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
 
 $(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
-	 $(SRC)/vis_tab.c $(INCL)/vis_tab.h \
-	 $(U)dgncomp.exe $(TILEUTIL16)
+	 $(SRC)/vis_tab.c $(INCL)/vis_tab.h $(TILEUTIL16)
 	$(subst /,\,@echo utilities made >$@)
 	@echo utilities made.
 
@@ -941,10 +935,6 @@ $(DAT)/epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
 $(DAT)/bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
-$(DAT)/dungeon: $(O)utility.tag  $(DAT)/dungeon.def
-	$(subst /,\,$(U)makedefs -e)
-	$(subst /,\,$(U)dgncomp $(DAT)/dungeon.pdf)
-
 #==========================================
 # uudecode utility and uuencoded targets
 #==========================================
@@ -997,33 +987,6 @@ $(MSWIN)/splash.bmp: $(U)uudecode.exe $(MSWIN)/splash.uu
 	$(subst /,\,copy splash.bmp $@)
 	del splash.bmp
 
-#==========================================
-# Dungeon Compiler Stuff
-#==========================================
-$(U)dgn_yacc.c: $(U)dgn_comp.y
-	mingw32-make -C ../util -f ../win/win32/dgnstuff-mingw32.mak $(U)dgn_yacc.c
-
-$(INCL)/dgn_comp.h:
-	mingw32-make -C ../include -f ../win/win32/dgnstuff-mingw32.mak $(INCL)/dgn_comp.h
-
-$(U)dgn_lex.c: $(U)dgn_comp.l
-	mingw32-make -C ../util -f ../win/win32/dgnstuff-mingw32.mak $(U)dgn_lex.c
-
-$(O)dgn_yacc.o:	$(HACK_H) $(DGN_FILE_H) $(INCL)/dgn_comp.h $(U)dgn_yacc.c
-	$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_yacc.c
-
-$(O)dgn_lex.o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)\dgn_comp.h \
-	$(U)dgn_lex.c
-	$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_lex.c
-
-$(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
-	$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_main.c
-
-$(U)dgncomp.exe: $(DGNCOMPOBJS)
-	@echo Linking $@...
-	@echo Linking $@...
-	$(link) $(LFLAGSU) -o$@ $(DGNCOMPOBJS)
-
 #=================================================
 # For a couple of devteam utilities
 #=================================================
@@ -1066,7 +1029,7 @@ $(DAT)/porthelp: $(MSWSYS)/porthelp
 
 nhdat$(NHV):  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	 $(DAT)/quest.dat $(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp $(DAT)/keyhelp \
-	 $(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp $(DAT)/dungeon \
+	 $(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp \
 	 $(DAT)/porthelp $(DAT)/license $(DAT)/engrave \
 	 $(DAT)/epitaph $(DAT)/bogusmon $(DAT)/tribute $(O)sp_lev.tag
 	$(subst /,\,echo data >$(DAT)/dlb.lst)
@@ -1084,7 +1047,6 @@ nhdat$(NHV):  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	$(subst /,\,echo history >>$(DAT)/dlb.lst)
 	$(subst /,\,echo opthelp >>$(DAT)/dlb.lst)
 	$(subst /,\,echo wizhelp >>$(DAT)/dlb.lst)
-	$(subst /,\,echo dungeon >>$(DAT)/dlb.lst)
 	$(subst /,\,echo license >>$(DAT)/dlb.lst)
 	$(subst /,\,echo engrave >>$(DAT)/dlb.lst)
 	$(subst /,\,echo epitaph >>$(DAT)/dlb.lst)
@@ -1327,7 +1289,6 @@ clean:
 	if exist $(O)utility.tag del $(O)utility.tag
 ifneq "$(W_UTIL)" ""
 	if exist $(W_UTIL)\makedefs.exe    del $(W_UTIL)\makedefs.exe
-	if exist $(W_UTIL)\dgncomp.exe     del $(W_UTIL)\dgncomp.exe
 endif
 ifneq "$(W_SRC)" ""
 	if exist $(W_SRC)\*.lnk            del $(W_SRC)\*.lnk
@@ -1338,8 +1299,6 @@ ifneq "$(W_OBJ)" ""
 	if exist $(W_OBJ)\utility.tag      del $(W_OBJ)\utility.tag
 	if exist $(W_OBJ)\install.tag      del $(W_OBJ)\install.tag
 	if exist $(W_OBJ)\console.res      del $(W_OBJ)\console.res
-	if exist $(W_OBJ)\dgncomp.MAP      del $(W_OBJ)\dgncomp.MAP
-	if exist $(W_OBJ)\dgncomp.PDB      del $(W_OBJ)\dgncomp.PDB
 	if exist $(W_OBJ)\dlb_main.MAP     del $(W_OBJ)\dlb_main.MAP
 	if exist $(W_OBJ)\dlb_main.PDB     del $(W_OBJ)\dlb_main.PDB
 	if exist $(W_OBJ)\gamedir.tag      del $(W_OBJ)\gamedir.tag
@@ -1367,27 +1326,9 @@ ifneq "$(W_OBJ)" ""
 	if exist $(W_OBJ)\uudecode.MAP     del $(W_OBJ)\uudecode.MAP
 	if exist $(W_OBJ)\uudecode.PDB     del $(W_OBJ)\uudecode.PDB
 endif
-	rem
-	rem defer to the steps in ../win/win32/levstuff-mingw32.mak
-	rem 
-	mingw32-make -f ../win/win32/levstuff-mingw32.mak clean
-	rem
-	rem defer to the steps in ../win/win32/dgnstuff-mingw32.mak
-	mingw32-make -f ../win/win32/dgnstuff-mingw32.mak clean
 	$(subst /,\,if exist $(TILEBMP16) del $(TILEBMP16))
 	$(subst /,\,if exist $(TILEBMP32) del $(TILEBMP32))
 
-#clean:
-#	-test -f $(O)install.tag && del $(O)install.tag
-#	-test -f $(O)utility.tag && del $(O)utility.tag
-#	-test -f $(U)makedefs.exe && del $(U)makedefs.exe
-#	-test -f $(U)levcomp.exe && del $(U)levcomp.exe
-#	-test -f $(U)dgncomp.exe && del $(U)dgncomp.exe
-#	-del $(SRC)/*.lnk
-#	-del $(SRC)/*.map
-#	-test -f $(TILEBMP16) && del $(TILEBMP16)
-#	-test -f $(TILEBMP32) && del $(TILEBMP32)
-# 
 #===================================================================
 # OTHER DEPENDENCIES
 #===================================================================

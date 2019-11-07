@@ -40,6 +40,15 @@ PDCURSES_TOP=../../pdcurses
 
 #---------------------------------------------------------------
 # Location of LUA
+#
+# Original source needs to be obtained from: 
+#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#
+#    This build assumes that the LUA sources are located
+#    at the specified location. If they are actually elsewhere
+#    you'll need to specify the correct spot below in order to
+#    successfully build NetHack-3.7.
+#
 ADD_LUA=Y
 LUATOP=../../lua-535
 
@@ -215,18 +224,7 @@ ifneq "$(ADD_LUA)" "Y"
 SPLEVSRC    = lev_yacc.c  lev_$(LEX).c	 lev_main.c  panic.c
 endif
 
-DGNCOMPSRC  = dgn_yacc.c  dgn_$(LEX).c	 dgn_main.c
-
 MAKEDEFSOBJS    = $(O)makedefs.o  $(O)monst.o	 $(O)objects.o
-
-ifneq "$(ADD_LUA)" "Y"
-SPLEVOBJS   = $(O)lev_yacc.o  $(O)lev_$(LEX).o	$(O)lev_main.o  $(O)alloc.o	\
-		$(O)monst.o	    $(O)objects.o	    $(O)panic.o  \
-		$(O)drawing.o	$(O)decl.o	$(O)stubvid.o
-endif
-
-DGNCOMPOBJS = $(O)dgn_yacc.o  $(O)dgn_$(LEX).o	$(O)dgn_main.o  $(O)alloc.o	 \
-		$(O)panic.o
 
 RECOVOBJS   = $(O)recover.o
 
@@ -588,8 +586,7 @@ else
 LEVCOMPEXE =
 endif
 $(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h \
-	$(INCL)/pm.h	  monstr.c   vis_tab.c	$(LEVCOMPEXE) \
-	$(U)dgn_comp.exe $(TILEUTIL)
+	$(INCL)/pm.h	  monstr.c   vis_tab.c $(TILEUTIL)
 	$(subst /,\,echo utilities made > $@)
 
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
@@ -830,59 +827,6 @@ endif
 endif
 
 #==========================================
-#  Dungeon Dependencies
-#==========================================
-
-$(U)dgn_comp.exe:  $(DGNCOMPOBJS)
-	$(LINK) $(LFLAGS) -o$@ $(DGNCOMPOBJS)
-
-ifeq  "$(DO_YACC)" "YACC_ACT"
-$(U)dgn_yacc.c $(INCL)/dgn_comp.h : $(U)dgn_comp.y
-	@$(subst /,\,chdir $(UTIL))
-	@$(subst /,\,$(YACC) -d dgn_comp.y)
-	@$(subst /,\,copy $(YTABC) dgn_yacc.c)
-	@$(subst /,\,copy $(YTABH) $(INCL)/dgn_comp.h)
-	@$(subst /,\,@del $(YTABC))
-	@$(subst /,\,@del $(YTABH))
-	@$(subst /,\,chdir $(SRC))
-else
-$(U)dgn_yacc.c: $(SSHR)/dgn_yacc.c
-	@echo ---
-	@echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
-	@echo dgn_comp.h from $(SSHR) into $(U) and use that.
-	@$(subst /,\,copy $(SSHR)/dgn_yacc.c $(U)dgn_yacc.c)
-	@$(subst /,\,echo.>>$(U)dgn_yacc.c)
-
-$(INCL)/dgn_comp.h: $(SSHR)/dgn_comp.h
-	@echo ---
-	@echo For now, we will copy the prebuilt dgn_comp.h
-	@echo from $(SSHR) into $(INCL) and use that.
-	@$(subst /,\,copy $(SSHR)/dgn_comp.h $(INCL)/dgn_comp.h)
-	@$(subst /,\,echo.>>$(INCL)/dgn_comp.h)
-
-endif
-
-ifeq  "$(DO_LEX)" "LEX_ACT"
-
-$(U)dgn_$(LEX).c: $(U)dgn_comp.l $(INCL)/dgn_comp.h
-	@$(subst /,\,chdir $(UTIL))
-	@$(subst /,\,$(LEX) $(FLEXSKEL) dgn_comp.l)
-	@$(subst /,\,if exist $@ del $@)
-	@$(subst /,\,copy $(LEXYYC) $@)
-	@$(subst /,\,del $(LEXYYC))
-	@$(subst /,\,chdir $(SRC))
-else
-
-$(U)dgn_$(LEX).c: $(SSHR)/dgn_lex.c $(INCL)/dgn_comp.h
-	@echo ---
-	@echo For now, we will copy the prebuilt dgn_lex.c
-	@echo from $(SSHR) into $(U) and use it.
-	@$(subst /,\,copy $(SSHR)/dgn_lex.c $@)
-	@$(subst /,\,echo.>>$@)
-
-endif
-
-#==========================================
 #  Recover Utility
 #==========================================
 
@@ -1075,52 +1019,8 @@ $(DAT)/engrave:	     $(O)utility.tag    $(DAT)/engrave.txt
 $(DAT)/epitaph:	     $(O)utility.tag    $(DAT)/epitaph.txt
 	@$(subst /,\,$(U)makedefs.exe -s)
 
-ifneq "$(ADD_LUA)" "Y"
-$(O)sp_lev.tag: $(O)utility.tag \
-	$(DAT)/bigroom.des  $(DAT)/castle.des \
-	$(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des \
-	$(DAT)/medusa.des  $(DAT)/oracle.des   $(DAT)/tower.des \
-	$(DAT)/yendor.des  $(DAT)/arch.des     $(DAT)/barb.des \
-	$(DAT)/caveman.des   $(DAT)/healer.des   $(DAT)/knight.des \
-	$(DAT)/monk.des      $(DAT)/priest.des   $(DAT)/ranger.des \
-	$(DAT)/rogue.des     $(DAT)/samurai.des  $(DAT)/tourist.des \
-	$(DAT)/valkyrie.des  $(DAT)/wizard.des
-	@$(subst /,\,cd $(DAT))
-	@$(subst /,\,$(U)lev_comp bigroom.des)
-	@$(subst /,\,$(U)lev_comp castle.des)
-	@$(subst /,\,$(U)lev_comp endgame.des)
-	@$(subst /,\,$(U)lev_comp gehennom.des)
-	@$(subst /,\,$(U)lev_comp knox.des)
-	@$(subst /,\,$(U)lev_comp mines.des)
-	@$(subst /,\,$(U)lev_comp medusa.des)
-	@$(subst /,\,$(U)lev_comp oracle.des)
-	@$(subst /,\,$(U)lev_comp sokoban.des)
-	@$(subst /,\,$(U)lev_comp tower.des)
-	@$(subst /,\,$(U)lev_comp yendor.des)
-	@$(subst /,\,$(U)lev_comp arch.des)
-	@$(subst /,\,$(U)lev_comp barb.des)
-	@$(subst /,\,$(U)lev_comp caveman.des)
-	@$(subst /,\,$(U)lev_comp healer.des)
-	@$(subst /,\,$(U)lev_comp knight.des)
-	@$(subst /,\,$(U)lev_comp monk.des)
-	@$(subst /,\,$(U)lev_comp priest.des)
-	@$(subst /,\,$(U)lev_comp ranger.des)
-	@$(subst /,\,$(U)lev_comp rogue.des)
-	@$(subst /,\,$(U)lev_comp samurai.des)
-	@$(subst /,\,$(U)lev_comp tourist.des)
-	@$(subst /,\,$(U)lev_comp valkyrie.des)
-	@$(subst /,\,$(U)lev_comp wizard.des)
-	@$(subst /,\,cd $(SRC))
-else
 $(O)sp_lev.tag: $(O)utility.tag
-endif
 	@$(subst /,\,echo sp_levs done > $@)
-
-$(DAT)/dungeon:	  $(O)utility.tag  $(DAT)/dungeon.def
-	@$(subst /,\,$(U)makedefs.exe -e)
-	@$(subst /,\,cd $(DAT))
-	@$(subst /,\,$(U)dgn_comp.exe dungeon.pdf)
-	@$(subst /,\,cd $(SRC))
 
 #==========================================
 # DLB stuff
@@ -1128,20 +1028,16 @@ $(DAT)/dungeon:	  $(O)utility.tag  $(DAT)/dungeon.def
 
 #note that dir below assumes bin/dir.exe from djgpp distribution
 #
-$(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors $(DAT)/dungeon \
+$(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
 	    $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag \
 	    $(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
 	@$(subst /,\,echo dat done >$(O)dat.tag)
 	@$(subst /,\,cd $(DAT))
 	@$(subst /,\,copy $(MSYS)/msdoshlp.txt .)
-	@$(LS) data dungeon oracles options quest.dat rumors help hh >dlb.lst
+	@$(LS) data oracles options quest.dat rumors help hh >dlb.lst
 	@$(LS) cmdhelp history opthelp wizhelp license msdoshlp.txt >>dlb.lst
 	@$(LS) bogusmon engrave epitaph tribute >>dlb.lst
-ifeq "$(ADD_LUA)" "Y"
 	$(LS) $(subst /,\,*.lua) >>dlb.lst
-else
-	$(LS) $(subst /,\,*.lev) >>dlb.lst
-endif
 	@$(subst /,\,$(U)dlb_main cvIf dlb.lst nhdat)
 	@$(subst /,\,cd $(SRC))
 
@@ -1168,10 +1064,7 @@ clean:
 
 spotless: clean
 
-	$(subst /,\,if exist $(U)dgn_flex.c del $(U)dgn_flex.c)
-	$(subst /,\,if exist $(U)dgn_lex.c del $(U)dgn_lex.c)
 	$(subst /,\,if exist $(U)makedefs.exe del $(U)makedefs.exe)
-	$(subst /,\,if exist $(U)dgn_comp.exe del $(U)dgn_comp.exe)
 	$(subst /,\,if exist $(U)recover.exe del $(U)recover.exe)
 	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
 	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
@@ -1183,16 +1076,12 @@ spotless: clean
 	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
 	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
 	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
-	$(subst /,\,if exist $(INCL)/dgn_comp.h del $(INCL)/dgn_comp.h)
-	$(subst /,\,if exist $(INCL)/lev_comp.h del $(INCL)/lev_comp.h)
 	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
 	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
 	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
 	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
 	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
 	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
-	$(subst /,\,if exist $(DAT)/dungeon.pdf del $(DAT)/dungeon.pdf)
-	$(subst /,\,if exist $(DAT)/dungeon del $(DAT)/dungeon)
 	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
 	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
 	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
@@ -1200,7 +1089,6 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
 	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
-	$(subst /,\,if exist $(DAT)/*.lev del $(DAT)/*.lev)
 	$(subst /,\,if exist $(TILE_BMP) del $(TILE_BMP))
 	$(subst /,\,if exist $(WSHR)/monthin.txt del $(WSHR)/monthin.txt)
 	$(subst /,\,if exist $(WSHR)/objthin.txt del $(WSHR)/objthin.txt)
@@ -1258,10 +1146,7 @@ clean:
 
 spotless: clean
 
-	$(subst /,\,if exist $(U)dgn_flex.c del $(U)dgn_flex.c)
-	$(subst /,\,if exist $(U)dgn_lex.c del $(U)dgn_lex.c)
 	$(subst /,\,if exist $(U)makedefs.exe del $(U)makedefs.exe)
-	$(subst /,\,if exist $(U)dgn_comp.exe del $(U)dgn_comp.exe)
 	$(subst /,\,if exist $(U)recover.exe del $(U)recover.exe)
 	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
 	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
@@ -1273,18 +1158,12 @@ spotless: clean
 	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
 	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
 	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
-	$(subst /,\,if exist $(INCL)/dgn_comp.h del $(INCL)/dgn_comp.h)
-ifneq "$(ADD_LUA)" "Y"
-	$(subst /,\,if exist $(INCL)/lev_comp.h del $(INCL)/lev_comp.h)
-endif
 	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
 	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
 	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
 	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
 	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
 	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
-	$(subst /,\,if exist $(DAT)/dungeon.pdf del $(DAT)/dungeon.pdf)
-	$(subst /,\,if exist $(DAT)/dungeon del $(DAT)/dungeon)
 	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
 	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
 	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
@@ -1292,9 +1171,6 @@ endif
 	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
 	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
-ifneq "$(ADD_LUA)" "Y"
-	$(subst /,\,if exist $(DAT)/*.lev del $(DAT)/*.lev)
-endif
 	$(subst /,\,if exist $(TILE_BMP) del $(TILE_BMP))
 	$(subst /,\,if exist $(WSHR)/monthin.txt del $(WSHR)/monthin.txt)
 	$(subst /,\,if exist $(WSHR)/objthin.txt del $(WSHR)/objthin.txt)
