@@ -30,7 +30,7 @@ spoilers:
  *  Added several grammar corrections
  *  Improved recognition of deafness for several situations including the
  *     playing of musical instruments and bribing negotiations with demon lords
- *  Fixed ignoring of god's wrath when hero injured himself during alter kick 
+ *  Fixed ignoring of god's wrath when hero injured himself during altar kick 
  *  Fixed several cases where persistent inventory window was not updated
  *  Fixed temple priests or shopkeepers moving over other monsters
  *  Ensured that thrown or kicked objects will end up in bones
