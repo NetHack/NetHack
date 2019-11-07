@@ -229,7 +229,7 @@ LUALIBOBJ1 = lapi.obj,lauxlib.obj,lbaselib.obj,lbitlib.obj, \
 LUALIBOBJ2 = ldebug.obj,ldo.obj,ldump.obj,lfunc.obj, \
 	lgc.obj,linit.obj,liolib.obj,llex.obj
 LUALIBOBJ3 = lmathlib.obj,lmem.obj,loadlib.obj,lobject.obj, \
-	lopcodes.obj,loslib.obj,lparser.obj,lstate.obj,
+	lopcodes.obj,loslib.obj,lparser.obj,lstate.obj
 LUALIBOBJ4 = lstring.obj,lstrlib.obj,ltable.obj,ltablib.obj, \
 	ltm.obj,lundump.obj,lutf8lib.obj,lvm.obj,lzio.obj
 LUALIBOBJ = $(LUALIBOBJ1) $(LUALIBOBJ2) $(LUALIBOBJ3) $(LUALIBOBJ4)
