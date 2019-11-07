@@ -4534,7 +4534,7 @@ int tableidx, entrynum;
     lua_pushinteger(L, entrynum);
     lua_gettable(L, tableidx);
     if (lua_isnumber(L, -1)) {
-        ret = lua_tonumber(L, -1);
+        ret = lua_tointeger(L, -1);
     } else {
         char buf[BUFSZ];
         Sprintf(buf, "Array entry #%i is %s, expected number",
@@ -4564,7 +4564,7 @@ boolean optional;
     luaL_checktype(L, -1, LUA_TTABLE);
 
     lua_len(L, -1);
-    arrlen = lua_tonumber(L, -1);
+    arrlen = lua_tointeger(L, -1);
     lua_pop(L, 1);
     if (arrlen != 4) {
         nhl_error(L, "Not a region");
@@ -4591,7 +4591,7 @@ int *x, *y;
         int arrlen;
 
         lua_len(L, index);
-        arrlen = lua_tonumber(L, -1);
+        arrlen = lua_tointeger(L, -1);
         lua_pop(L, 1);
         if (arrlen != 2) {
             nhl_error(L, "Not a coordinate");

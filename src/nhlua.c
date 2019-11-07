@@ -213,8 +213,8 @@ lua_State *L;
     int argc = lua_gettop(L);
 
     if (argc == 2) {
-        int x = (int) lua_tonumber(L, 1);
-        int y = (int) lua_tonumber(L, 2);
+        int x = lua_tointeger(L, 1);
+        int y = lua_tointeger(L, 2);
 
         if (x >= 0 && x < COLNO && y >= 0 && y < ROWNO) {
             char buf[BUFSZ];

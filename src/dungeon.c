@@ -776,7 +776,7 @@ lua_State *L;
     if (lua_type(L, -1) == LUA_TTABLE) {
         int f, nflags;
         lua_len(L, -1);
-        nflags = lua_tonumber(L, -1);
+        nflags = lua_tointeger(L, -1);
         lua_pop(L, 1);
         for (f = 0; f < nflags; f++) {
             lua_pushinteger(L, f+1);
@@ -851,7 +851,7 @@ init_dungeons()
         panic("dungeon is not a lua table");
 
     lua_len(L, -1);
-    g.n_dgns = lua_tonumber(L, -1);
+    g.n_dgns = lua_tointeger(L, -1);
     lua_pop(L, 1);
 
     pd.start = 0;
@@ -898,7 +898,7 @@ init_dungeons()
         if (lua_type(L, -1) == LUA_TTABLE) {
             int f, nlevels;
             lua_len(L, -1);
-            nlevels = lua_tonumber(L, -1);
+            nlevels = lua_tointeger(L, -1);
             pd.tmpdungeon[i].levels = nlevels;
             lua_pop(L, 1);
             for (f = 0; f < nlevels; f++) {
@@ -954,7 +954,7 @@ init_dungeons()
         if (lua_type(L, -1) == LUA_TTABLE) {
             int f, nbranches;
             lua_len(L, -1);
-            nbranches = lua_tonumber(L, -1);
+            nbranches = lua_tointeger(L, -1);
             pd.tmpdungeon[i].branches = nbranches;
             lua_pop(L, 1);
             for (f = 0; f < nbranches; f++) {
