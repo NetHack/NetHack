@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1557701798 2019/05/12 22:56:38 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1573165004 2019/11/07 22:16:44 $	$NHDT-Branch: paxed-lua-v2-merged $:$NHDT-Revision: 1.38 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -28,7 +28,8 @@ UTL = [-.util]
 VMS = [-.sys.vms]
 WINSHR = [-.win.share]
 X11 = [-.win.X11]
-
+#LUA source tree parallel to NetHack tree in lua535 directory
+LUA = [-.-.lua535]
 MAKEFILE= $(SRC)Makefile.
 
 # if you are using gcc as your compiler:
@@ -210,6 +211,29 @@ HOBJ6 = u_init.obj,uhitm.obj,vault.obj,vision.obj,vis_tab.obj,weapon.obj, \
 HOBJ  = $(FIRSTOBJ) $(SYSOBJ) $(WINOBJ) $(RANDOBJ) \
 	$(HOBJ1) $(HOBJ2) $(HOBJ3) $(HOBJ4) $(HOBJ5) $(HOBJ6)
 
+LUAOBJ = nhlua.o,nhlsel.o
+LUALIBSRC = $(LUA)lapi.c $(LUA)lauxlib.c $(LUA)lbaselib.c \
+	$(LUA)lbitlib.c $(LUA)lcode.c $(LUA)lcorolib.c \
+	$(LUA)lctype.c $(LUA)ldblib.c $(LUA)ldebug.c \
+	$(LUA)ldo.c $(LUA)ldump.c $(LUA)lfunc.c $(LUA)lgc.c \
+	$(LUA)linit.c $(LUA)liolib.c $(LUA)llex.c \
+	$(LUA)lmathlib.c $(LUA)lmem.c $(LUA)loadlib.c \
+	$(LUA)lobject.c $(LUA)lopcodes.c $(LUA)loslib.c \
+	$(LUA)lparser.c $(LUA)lstate.c $(LUA)lstring.c \
+	$(LUA)lstrlib.c $(LUA)ltable.c $(LUA)ltablib.c \
+	$(LUA)ltm.c $(LUA)lundump.c $(LUA)lutf8lib.c \
+	$(LUA)lvm.c $(LUA)lzio.c
+
+LUALIBOBJ1 = lapi.obj,lauxlib.obj,lbaselib.obj,lbitlib.obj, \
+	lcode.obj,lcorolib.obj,lctype.obj,ldblib.obj
+LUALIBOBJ2 = ldebug.obj,ldo.obj,ldump.obj,lfunc.obj, \
+	lgc.obj,linit.obj,liolib.obj,llex.obj
+LUALIBOBJ3 = lmathlib.obj,lmem.obj,loadlib.obj,lobject.obj, \
+	lopcodes.obj,loslib.obj,lparser.obj,lstate.obj,
+LUALIBOBJ4 = lstring.obj,lstrlib.obj,ltable.obj,ltablib.obj, \
+	ltm.obj,lundump.obj,lutf8lib.obj,lvm.obj,lzio.obj
+LUALIBOBJ = $(LUALIBOBJ1) $(LUALIBOBJ2) $(LUALIBOBJ3) $(LUALIBOBJ4)
+
 # simpler target name
 nethack : $(GAME)
       @ $(ECHO) "nethack is up to date."
@@ -217,7 +241,7 @@ nethack : $(GAME)
 $(GAME) :	$(SYSTEM)
       @ $(NOOP)
 
-$(SYSTEM) :	$(LIBOPT) $(ID_OPT) $(HOBJ) nethack.opt
+$(SYSTEM) :	$(LIBOPT) $(ID_OPT) $(HOBJ) $(LUAOBJ) $(LUALIBOBJ) nethack.opt
       @ $(ECHO) "Linking ..."
 	$(LINK)/Exe=$(GAME) $(LFLAGS) nethack.opt/Opt,$(LIBOPT)/Opt,$(ID_OPT)/Opt
 	$(TOUCH) $(SYSTEM)
@@ -239,6 +263,11 @@ nethack.opt :	$(MAKEFILE)	# this file
       @ write f f$edit("$(HOBJ4)","COLLAPSE")
       @ write f f$edit("$(HOBJ5)","COLLAPSE")
       @ write f f$edit("$(HOBJ6)","COLLAPSE")
+      @ write f f$edit("$(LUAOBJ)","COLLAPSE")
+      @ write f f$edit("$(LUALIBOBJ1)","COLLAPSE")
+      @ write f f$edit("$(LUALIBOBJ2)","COLLAPSE")
+      @ write f f$edit("$(LUALIBOBJ3)","COLLAPSE")
+      @ write f f$edit("$(LUALIBOBJ4)","COLLAPSE")
       @ write f "sys$library:starlet.olb/Include=(lib$initialize)
       @ write f "! psect_attributes Usr, noPic, and Long removed"
       @ write f "psect_attr=lib$initialize, Con,Rel,Gbl,noShr,noExe,Rd,noWrt"
@@ -420,6 +449,41 @@ wintext.obj :	$(X11)wintext.c $(HACK_H) $(INC)winX.h $(INC)xwindow.h
 winval.obj :	$(X11)winval.c $(HACK_H) $(INC)winX.h
 tile.obj :	$(SRC)tile.c $(HACK_H)
 vis_tab.obj :	vis_tab.c $(CONFIG_H) $(INC)vis_tab.h
+#	lua 5.3.5 code
+lapi.obj :	$(LUA)lapi.c	
+lauxlib.obj :	$(LUA)lauxlib.c
+lbaselib.obj :	$(LUA)lbaselib.c
+lbitlib.obj :	$(LUA)lbitlib.c
+lcode.obj :	$(LUA)lcode.c
+lcorolib.obj :	$(LUA)lcorolib.c
+lctype.obj :	$(LUA)lctype.c
+ldblib.obj :	$(LUA)ldblib.c
+ldebug.obj :	$(LUA)ldebug.
+ldo.obj :	$(LUA)ldo.c
+ldump.obj :	$(LUA)ldump.c
+lfunc.obj :	$(LUA)lfunc.c
+lgc.obj :	$(LUA)lgc.c
+linit.obj :	$(LUA)linit.c
+liolib.obj :	$(LUA)liolib.c
+llex.obj : 	$(LUA)llex.c
+lmathlib.obj :	$(LUA)lmathlib.c
+lmem.obj :	$(LUA)lmem.c
+loadlib.obj :	$(LUA)loadlib.c
+lobject.obj :	$(LUA)lobject.c
+lopcodes.obj :	$(LUA)lopcodes.c
+loslib.obj :	$(LUA)loslib.c
+lparser.obj :	$(LUA)lparser.c
+lstate.obj :	$(LUA)lstate.c
+lstring.obj :	$(LUA)lstring.c
+lstrlib.obj :	$(LUA)lstrlib.c
+ltable.obj :	$(LUA)ltable.c
+ltablib.obj :	$(LUA)ltablib.c
+ltm.obj :	$(LUA)ltm.c
+lundump.obj :	$(LUA)lundump.c
+lutf8lib.obj :	$(LUA)lutf8lib.c
+lvm.obj :	$(LUA)lvm.c
+lzio.obj :	$(LUA)lzio.c
+
 #	general code
 allmain.obj :	allmain.c $(HACK_H)
 alloc.obj :	alloc.c $(CONFIG_H)
