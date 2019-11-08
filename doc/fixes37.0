@@ -27,6 +27,8 @@ automatic annotation "gateway to Moloch's Sanctum" for vibrating square level
 savefile: add support to deconstruct internal data structures down into their
 	individual fields and save those fields instead of the entire struct
 savefile: use little-endian format for fields where that makes a difference
+replace build-time level compiler and dungeon compiler with run-time loading of
+	the dungeon and level descriptions and interpreting them via LUA
 
 
 Platform- and/or Interface-Specific New Features
