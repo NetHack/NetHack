@@ -794,7 +794,7 @@ doengrave()
                     doblind = TRUE;
                 } else
                     Strcpy(post_engr_text, !Deaf
-                                ? "You hear crackling!"
+                                ? "You hear crackling!"     /* Deaf-aware */
                                 : "Your hair stands up!");
                 break;
 
