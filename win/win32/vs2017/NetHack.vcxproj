@@ -45,7 +45,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);$(LuaDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;SAFEPROCS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -53,6 +53,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="$(LuaDir)lapi.c" />
+    <ClCompile Include="$(LuaDir)lauxlib.c" />
+    <ClCompile Include="$(LuaDir)lbaselib.c" />
+    <ClCompile Include="$(LuaDir)lbitlib.c" />
+    <ClCompile Include="$(LuaDir)lcode.c" />
+    <ClCompile Include="$(LuaDir)lcorolib.c" />
+    <ClCompile Include="$(LuaDir)lctype.c" />
+    <ClCompile Include="$(LuaDir)ldblib.c" />
+    <ClCompile Include="$(LuaDir)ldebug.c" />
+    <ClCompile Include="$(LuaDir)ldo.c" />
+    <ClCompile Include="$(LuaDir)ldump.c" />
+    <ClCompile Include="$(LuaDir)lfunc.c" />
+    <ClCompile Include="$(LuaDir)lgc.c" />
+    <ClCompile Include="$(LuaDir)linit.c" />
+    <ClCompile Include="$(LuaDir)liolib.c" />
+    <ClCompile Include="$(LuaDir)llex.c" />
+    <ClCompile Include="$(LuaDir)lmathlib.c" />
+    <ClCompile Include="$(LuaDir)lmem.c" />
+    <ClCompile Include="$(LuaDir)loadlib.c" />
+    <ClCompile Include="$(LuaDir)lobject.c" />
+    <ClCompile Include="$(LuaDir)lopcodes.c" />
+    <ClCompile Include="$(LuaDir)loslib.c" />
+    <ClCompile Include="$(LuaDir)lparser.c" />
+    <ClCompile Include="$(LuaDir)lstate.c" />
+    <ClCompile Include="$(LuaDir)lstring.c" />
+    <ClCompile Include="$(LuaDir)lstrlib.c" />
+    <ClCompile Include="$(LuaDir)ltable.c" />
+    <ClCompile Include="$(LuaDir)ltablib.c" />
+    <ClCompile Include="$(LuaDir)ltm.c" />
+    <ClCompile Include="$(LuaDir)lundump.c" />
+    <ClCompile Include="$(LuaDir)lutf8lib.c" />
+    <ClCompile Include="$(LuaDir)lvm.c" />
+    <ClCompile Include="$(LuaDir)lzio.c" />
     <ClCompile Include="$(SrcDir)allmain.c" />
     <ClCompile Include="$(SrcDir)alloc.c" />
     <ClCompile Include="$(SrcDir)apply.c" />
@@ -111,6 +144,8 @@
     <ClCompile Include="$(SrcDir)mthrowu.c" />
     <ClCompile Include="$(SrcDir)muse.c" />
     <ClCompile Include="$(SrcDir)music.c" />
+    <ClCompile Include="$(SrcDir)nhlua.c" />
+    <ClCompile Include="$(SrcDir)nhlsel.c" />
     <ClCompile Include="$(SrcDir)objects.c" />
     <ClCompile Include="$(SrcDir)objnam.c" />
     <ClCompile Include="$(SrcDir)options.c" />

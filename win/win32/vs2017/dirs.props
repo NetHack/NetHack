@@ -10,6 +10,7 @@
     <DatDir>$(RootDir)dat\</DatDir>
     <DocDir>$(RootDir)doc\</DocDir>
     <IncDir>$(RootDir)include\</IncDir>
+    <LuaDir>$(RootDir)..\LUA-5.3.5\src\</LuaDir>
     <SrcDir>$(RootDir)src\</SrcDir>
 	<SysDir>$(RootDir)sys\</SysDir>
     <UtilDir>$(RootDir)util\</UtilDir>

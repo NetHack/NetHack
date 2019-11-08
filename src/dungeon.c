@@ -807,7 +807,6 @@ init_dungeons()
     register s_level *x;
     struct proto_dungeon pd;
     struct level_map *lev_map;
-    struct version_info vers_info;
 
     (void) memset(&pd, 0, sizeof(struct proto_dungeon));
     pd.n_levs = pd.n_brs = 0;
