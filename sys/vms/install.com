@@ -35,21 +35,12 @@ $	sysconf_file = "[.sys.vms]sysconf"
 $	guidebook  = "[.doc]Guidebook.txt"
 $	invoc_proc = "[.sys.vms]nethack.com"
 $	trmcp_file = "[.sys.share]termcap"
-$	spec_files = "air.lua,asmodeus.lua,astral.lua,baalz.lua,"	-                 
-		+ "bigrm-1.lua,bigrm-2.lua,bigrm-3.lua,bigrm-4.lua,"	-
-		+ "bigrm-5.lua,bigrm-6.lua,bigrm-7.lua,bigrm-8.lua,"	-
-		+ "bigrm-9.lua,bigrm-10.lua,castle.lua,earth.lua,"	-
-		+ "fakewiz1.lua,fakewiz2.lua,fire.lua,juiblex.lua,"	-
-		+ "knox.lua,medusa-1.lua,medusa-2.lua,medusa-3.lua,"	-
-		+ "medusa-4.lua,minefill.lua,minend-1.lua,"		-
-		+ "minend-2.lua,minend-3.lua,minetn-1.lua,"		-
-		+ "minetn-2.lua,minetn-3.lua,minetn-4.lua,"		-
-		+ "minetn-5.lua,minetn-6.lua,minetn-7.lua,nhlib.lua,"	-
-		+ "oracle.lua,orcus.lua,sanctum.lua,soko1-1.lua,"       -
-		+ "soko1-2.lua,soko2-1.lua,soko2-2.lua,soko3-1.lua,"	-
-		+ "soko3-2.lua,soko4-1.lua,soko4-2.lua,tower1.lua,"	-
-		+ "tower2.lua,tower3.lua,valley.lua,water.lua,"		-
-		+ "wizard1.lua,wizard2.lua,wizard3.lua"
+$	spec_files = "air.lua,asmodeus.lua,astral.lua,baalz.lua,"	-
+		+ "bigrm-*.lua,castle.lua,earth.lua,fakewiz%.lua,"	-
+		+ "fire.lua,juiblex.lua,knox.lua,medusa-%.lua,"		-
+		+ "minefill.lua,minetn-%.lua,minend-%.lua,nhlib.lua,"	-
+		+ "oracle.lua,orcus.lua,sanctum.lua,soko%-%.lua,"	-
+		+ "tower%.lua,valley.lua,water.lua,wizard%.lua"
 $	qstl_files = "%%%-goal.lua,%%%-fil%.lua,%%%-loca.lua,%%%-strt.lua"
 $	dngn_files = "dungeon.lua"
 $!
