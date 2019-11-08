@@ -24,6 +24,9 @@ if a killer bee encounters a lump of royal jelly and there is no queen bee on
 automatic annotation "gateway to Moloch's Sanctum" for vibrating square level
 	once that square's location becomes known (found or magic mapped);
 	goes away once sanctum temple is found (entered or high altar mapped)
+savefile: add support to deconstruct internal data structures down into their
+	individual fields and save those fields instead of the entire struct
+savefile: use little-endian format for fields where that makes a difference
 
 
 Platform- and/or Interface-Specific New Features
@@ -39,4 +42,5 @@ Code Cleanup and Reorganization
 move majority of global variables into instance_globals struct g
 move zeroobj, zeromonst, zeroany into const_globals struct cg
 remove STATIC_DCL, STATIC_OVL, STATIC_VAR, STATIC_PTR
+
 
