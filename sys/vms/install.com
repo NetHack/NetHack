@@ -1,9 +1,9 @@
 $ ! vms/install.com -- set up nethack 'playground'
-$! $NHDT-Date: 1542388600 2018/11/16 17:16:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.11 $
+$! $NHDT-Date: 1573172443 2019/11/08 00:20:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $
 $! Copyright (c) 2016 by Robert Patrick Rankin
 $! NetHack may be freely redistributed.  See license for details.
 $ !
-$ ! $NHDT-Date: 1542388600 2018/11/16 17:16:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.11 $
+$ ! $NHDT-Date: 1573172452 2019/11/08 00:20:52 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $
 $ !
 $ ! Use vmsbuild.com to create nethack.exe, makedefs, and lev_comp *first*.
 $ !

@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1562114350 2019/07/03 00:39:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.146 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1573178085 2019/11/08 01:54:45 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -141,9 +141,9 @@ do_statusline2()
     if (Upolyd)
         Sprintf(expr, "HD:%d", mons[u.umonnum].mlevel);
     else if (flags.showexp)
-        Sprintf(expr, "Xp:%u/%-1ld", u.ulevel, u.uexp);
+        Sprintf(expr, "Xp:%d/%-1ld", u.ulevel, u.uexp);
     else
-        Sprintf(expr, "Exp:%u", u.ulevel);
+        Sprintf(expr, "Exp:%d", u.ulevel);
     xln = strlen(expr);
 
     /* time/move counter */
@@ -809,6 +809,12 @@ boolean *valsetlist;
         if (anytype != ANY_MASK32) {
 #ifdef STATUS_HILITES
             if (chg || *curr->val) {
+                /* if Xp percentage changed, we set 'chg' to 1 above;
+                   reset that if the Xp value hasn't actually changed
+                   or possibly went down rather than up (level loss) */
+                if (chg == 1 && fld == BL_XP)
+                    chg = compare_blstats(prev, curr);
+
                 curr->hilite_rule = get_hilite(idx, fld,
                                                (genericptr_t) &curr->a,
                                                chg, pc, &color);
