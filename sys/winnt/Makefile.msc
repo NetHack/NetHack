@@ -93,7 +93,7 @@ PDCURSES_TOP=..\..\pdcurses
 #    you'll need to specify the correct spot below in order to
 #    successfully build NetHack-3.7.
 #
-#LUATOP=..\..\lua-5.3.5
+LUATOP=..\..\lua-5.3.5
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
