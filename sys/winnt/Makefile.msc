@@ -93,7 +93,7 @@ PDCURSES_TOP=..\..\pdcurses
 #    you'll need to specify the correct spot below in order to
 #    successfully build NetHack-3.7.
 #
-LUATOP=..\..\lua-5.3.5
+#LUATOP=..\..\lua-5.3.5
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -319,13 +319,33 @@ OPTIONS_FILE = $(DAT)\options
 # Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
 #=================================================================
 
+!IFDEF LUATOP
+LUATMP   = $(LUATOP:..\..\lua-=)    #strip leading "..\..\lua-"
+LUATMP   = $(LUATMP:-beta=)         #strip suffix if exists "-beta"
+!IF "$(LUATMP)" == "5.4.0"
+LUAVER   = 5.4.0
+!ENDIF
+!ELSE
+!ERROR NetHack 3.7 requires LUA so LUATOP must be defined
+!ENDIF
+
+!IFNDEF LUAVER
+LUATMP   = $(LUATOP:..\..\LUA-=)    #strip leading "..\..\LUA-"
+LUATMP   = $(LUATMP:-BETA=)         #strip suffix if exists "-BETA"
+!IF "$(LUATMP)" == "5.4.0"
+LUAVER   = 5.4.0
+!ELSE
+LUAVER   = 5.3.5
+!ENDIF
+!ENDIF
+
 LUASRC   = $(LUATOP)\src
-LUALIB   = $(O)lua5.3.5-static.lib
-LUADLL   = $(O)lua5.3.5.dll
+LUALIB   = $(O)lua$(LUAVER)-static.lib
+LUADLL   = $(O)lua$(LUAVER).dll
 LUAINCL  = /I$(LUASRC)
 LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
 
-LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
+LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c              \
 		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
 		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
 		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
@@ -333,7 +353,7 @@ LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
 		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
 		lvm.c lzio.c
 
-LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o                \
 		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
 		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
 		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
@@ -341,6 +361,14 @@ LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
 		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o \
 		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
+
+!IF "$(LUAVER)" == "5.3.5"
+LUASRCFILES = $(LUASRCFILES) lbitlib.c
+LUAOBJFILES =   $(LUAOBJFILES) $(O)lbitlib.o
+!ELSEIF "$(LUAVER)" == "5.4.0"
+#  5.4.0 adds header files ljumptab.h and lopnames.h
+#        and removes lbitlib.c
+!ENDIF
 
 !IF "$(ADD_CURSES)" == "Y"	
 #===============-=================================================
@@ -1365,10 +1393,10 @@ lua.exe: $(O)lua.o $(LUALIB)
 luac.exe: $(O)luac.o $(LUALIB)
 	link /OUT:$@ $(O)luac.o $(LUALIB)
 
-$(O)lua5.3.5.dll: $(LUAOBJFILES)
-	link /DLL /IMPLIB:lua5.3.5.lib /OUT:$@ $(LUAOBJFILES)
+$(O)lua$(LUAVER).dll: $(LUAOBJFILES)
+	link /DLL /IMPLIB:lua$(LUAVER).lib /OUT:$@ $(LUAOBJFILES)
 
-$(O)lua5.3.5-static.lib: $(LUAOBJFILES)
+$(O)lua$(LUAVER)-static.lib: $(LUAOBJFILES)
 	lib /OUT:$@ $(LUAOBJFILES)
 
 $(O)lua.o: $(LUASRC)\lua.c
