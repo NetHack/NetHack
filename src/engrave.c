@@ -5,11 +5,9 @@
 
 #include "hack.h"
 #include "lev.h"
-#include "sfproto.h"
 
-
-static NEARDATA struct engr *head_engr;
-static const char *NDECL(blengr);
+STATIC_VAR NEARDATA struct engr *head_engr;
+STATIC_DCL const char *NDECL(blengr);
 
 char *
 random_engraving(outbuf)
@@ -161,7 +159,7 @@ boolean check_pit;
 
     return (boolean) ((!Levitation || Is_airlevel(&u.uz)
                        || Is_waterlevel(&u.uz))
-                      && (!u.uundetected || !is_hider(g.youmonst.data)
+                      && (!u.uundetected || !is_hider(youmonst.data)
                           || u.umonnum == PM_TRAPPER));
 }
 
@@ -271,7 +269,7 @@ boolean strict;
 {
     register struct engr *ep = engr_at(x, y);
 
-    if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= g.moves) {
+    if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= moves) {
         return strict ? (fuzzymatch(ep->engr_txt, s, "", TRUE))
                       : (strstri(ep->engr_txt, s) != 0);
     }
@@ -380,7 +378,7 @@ int x, y;
                 et = ep->engr_txt;
             }
             You("%s: \"%s\".", (Blind) ? "feel the words" : "read", et);
-            if (g.context.run > 0)
+            if (context.run > 0)
                 nomul(0);
         }
     }
@@ -407,7 +405,7 @@ xchar e_type;
     ep->engr_txt = (char *) (ep + 1);
     Strcpy(ep->engr_txt, s);
     /* engraving Elbereth shows wisdom */
-    if (!g.in_mklev && !strcmp(s, "Elbereth"))
+    if (!in_mklev && !strcmp(s, "Elbereth"))
         exercise(A_WIS, TRUE);
     ep->engr_time = e_time;
     ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE - 1);
@@ -496,8 +494,8 @@ doengrave()
     struct obj *otmp; /* Object selected with which to engrave */
     char *writer;
 
-    g.multi = 0;              /* moves consumed */
-    g.nomovemsg = (char *) 0; /* occupation end message */
+    multi = 0;              /* moves consumed */
+    nomovemsg = (char *) 0; /* occupation end message */
 
     buf[0] = (char) 0;
     ebuf[0] = (char) 0;
@@ -505,7 +503,7 @@ doengrave()
     maxelen = BUFSZ - 1;
     if (oep)
         oetype = oep->engr_type;
-    if (is_demon(g.youmonst.data) || is_vampire(g.youmonst.data))
+    if (is_demon(youmonst.data) || youmonst.data->mlet == S_VAMPIRE)
         type = ENGR_BLOOD;
 
     /* Can the adventurer engrave at all? */
@@ -534,7 +532,7 @@ doengrave()
         You_cant("write here.");
         return 0;
     }
-    if (cantwield(g.youmonst.data)) {
+    if (cantwield(youmonst.data)) {
         You_cant("even hold anything!");
         return 0;
     }
@@ -546,10 +544,10 @@ doengrave()
      */
 
     otmp = getobj(styluses, "write with");
-    if (!otmp) /* otmp == cg.zeroobj if fingers */
+    if (!otmp) /* otmp == zeroobj if fingers */
         return 0;
 
-    if (otmp == &cg.zeroobj) {
+    if (otmp == &zeroobj) {
         Strcat(strcpy(fbuf, "your "), body_part(FINGERTIP));
         writer = fbuf;
     } else
@@ -578,7 +576,7 @@ doengrave()
         return 0;
     }
     if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
-        if (otmp == &cg.zeroobj) { /* using only finger */
+        if (otmp == &zeroobj) { /* using only finger */
             You("would only make a small smudge on the %s.",
                 surface(u.ux, u.uy));
             return 0;
@@ -764,7 +762,7 @@ doengrave()
                                  ? "Chips fly out from the headstone."
                                  : is_ice(u.ux, u.uy)
                                     ? "Ice chips fly up from the ice surface!"
-                                    : (g.level.locations[u.ux][u.uy].typ
+                                    : (level.locations[u.ux][u.uy].typ
                                        == DRAWBRIDGE_DOWN)
                                        ? "Splinters fly up from the bridge."
                                        : "Gravel flies up from the floor.");
@@ -794,7 +792,7 @@ doengrave()
                     doblind = TRUE;
                 } else
                     Strcpy(post_engr_text, !Deaf
-                                ? "You hear crackling!"     /* Deaf-aware */
+                                ? "You hear crackling!"
                                 : "Your hair stands up!");
                 break;
 
@@ -908,7 +906,7 @@ doengrave()
     }
     /* Something has changed the engraving here */
     if (*buf) {
-        make_engr_at(u.ux, u.uy, buf, g.moves, type);
+        make_engr_at(u.ux, u.uy, buf, moves, type);
         if (!Blind)
             pline_The("engraving now reads: \"%s\".", buf);
         ptext = FALSE;
@@ -1015,7 +1013,7 @@ doengrave()
     }
 
     /* Tell adventurer what is going on */
-    if (otmp != &cg.zeroobj)
+    if (otmp != &zeroobj)
         You("%s the %s with %s.", everb, eloc, doname(otmp));
     else
         You("%s the %s with your %s.", everb, eloc, body_part(FINGERTIP));
@@ -1071,21 +1069,21 @@ doengrave()
      */
     switch (type) {
     default:
-        g.multi = -(len / 10);
-        if (g.multi)
-            g.nomovemsg = "You finish your weird engraving.";
+        multi = -(len / 10);
+        if (multi)
+            nomovemsg = "You finish your weird engraving.";
         break;
     case DUST:
-        g.multi = -(len / 10);
-        if (g.multi)
-            g.nomovemsg = "You finish writing in the dust.";
+        multi = -(len / 10);
+        if (multi)
+            nomovemsg = "You finish writing in the dust.";
         break;
     case HEADSTONE:
     case ENGRAVE:
-        g.multi = -(len / 10);
+        multi = -(len / 10);
         if (otmp->oclass == WEAPON_CLASS
             && (otmp->otyp != ATHAME || otmp->cursed)) {
-            g.multi = -len;
+            multi = -len;
             maxelen = ((otmp->spe + 3) * 2) + 1;
             /* -2 => 3, -1 => 5, 0 => 7, +1 => 9, +2 => 11
              * Note: this does not allow a +0 anything (except an athame)
@@ -1095,45 +1093,45 @@ doengrave()
             pline("%s dull.", Yobjnam2(otmp, "get"));
             costly_alteration(otmp, COST_DEGRD);
             if (len > maxelen) {
-                g.multi = -maxelen;
+                multi = -maxelen;
                 otmp->spe = -3;
             } else if (len > 1)
                 otmp->spe -= len >> 1;
             else
                 otmp->spe -= 1; /* Prevent infinite engraving */
         } else if (otmp->oclass == RING_CLASS || otmp->oclass == GEM_CLASS) {
-            g.multi = -len;
+            multi = -len;
         }
-        if (g.multi)
-            g.nomovemsg = "You finish engraving.";
+        if (multi)
+            nomovemsg = "You finish engraving.";
         break;
     case BURN:
-        g.multi = -(len / 10);
-        if (g.multi)
-            g.nomovemsg = is_ice(u.ux, u.uy)
+        multi = -(len / 10);
+        if (multi)
+            nomovemsg = is_ice(u.ux, u.uy)
                           ? "You finish melting your message into the ice."
                           : "You finish burning your message into the floor.";
         break;
     case MARK:
-        g.multi = -(len / 10);
+        multi = -(len / 10);
         if (otmp->otyp == MAGIC_MARKER) {
             maxelen = otmp->spe * 2; /* one charge / 2 letters */
             if (len > maxelen) {
                 Your("marker dries out.");
                 otmp->spe = 0;
-                g.multi = -(maxelen / 10);
+                multi = -(maxelen / 10);
             } else if (len > 1)
                 otmp->spe -= len >> 1;
             else
                 otmp->spe -= 1; /* Prevent infinite graffiti */
         }
-        if (g.multi)
-            g.nomovemsg = "You finish defacing the dungeon.";
+        if (multi)
+            nomovemsg = "You finish defacing the dungeon.";
         break;
     case ENGR_BLOOD:
-        g.multi = -(len / 10);
-        if (g.multi)
-            g.nomovemsg = "You finish scrawling.";
+        multi = -(len / 10);
+        if (multi)
+            nomovemsg = "You finish scrawling.";
         break;
     }
 
@@ -1144,8 +1142,8 @@ doengrave()
                 maxelen--;
         if (!maxelen && *sp) {
             *sp = '\0';
-            if (g.multi)
-                g.nomovemsg = "You cannot write any more.";
+            if (multi)
+                nomovemsg = "You cannot write any more.";
             You("are only able to write \"%s\".", ebuf);
         }
     }
@@ -1154,11 +1152,11 @@ doengrave()
         Strcpy(buf, oep->engr_txt);
     (void) strncat(buf, ebuf, BUFSZ - (int) strlen(buf) - 1);
     /* Put the engraving onto the map */
-    make_engr_at(u.ux, u.uy, buf, g.moves - g.multi, type);
+    make_engr_at(u.ux, u.uy, buf, moves - multi, type);
 
     if (post_engr_text[0])
         pline("%s", post_engr_text);
-    if (doblind && !resists_blnd(&g.youmonst)) {
+    if (doblind && !resists_blnd(&youmonst)) {
         You("are blinded by the flash!");
         make_blinded((long) rnd(50), FALSE);
         if (!Blind)
@@ -1180,70 +1178,49 @@ sanitize_engravings()
 }
 
 void
-save_engravings(nhfp)
-NHFILE *nhfp;
+save_engravings(fd, mode)
+int fd, mode;
 {
     struct engr *ep, *ep2;
     unsigned no_more_engr = 0;
 
     for (ep = head_engr; ep; ep = ep2) {
         ep2 = ep->nxt_engr;
-        if (ep->engr_lth && ep->engr_txt[0] && perform_bwrite(nhfp)) {
-            if (nhfp->structlevel) {
-                bwrite(nhfp->fd, (genericptr_t)&(ep->engr_lth), sizeof(ep->engr_lth));
-                bwrite(nhfp->fd, (genericptr_t)ep, sizeof(struct engr) + ep->engr_lth);
-            }
-            if (nhfp->fieldlevel) {
-                sfo_unsigned(nhfp, &(ep->engr_lth), "engravings", "engr_lth", 1);
-                sfo_engr(nhfp, ep, "engravings", "engr", 1);
-                sfo_str(nhfp, ep->engr_txt, "engravings", "engr_txt", ep->engr_lth);
-            }
+        if (ep->engr_lth && ep->engr_txt[0] && perform_bwrite(mode)) {
+            bwrite(fd, (genericptr_t) &ep->engr_lth, sizeof ep->engr_lth);
+            bwrite(fd, (genericptr_t) ep, sizeof (struct engr) + ep->engr_lth);
         }
-        if (release_data(nhfp))
+        if (release_data(mode))
             dealloc_engr(ep);
     }
-    if (perform_bwrite(nhfp)) {
-        if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t)&no_more_engr, sizeof no_more_engr);
-        if (nhfp->fieldlevel)
-           sfo_unsigned(nhfp, &no_more_engr, "engravings", "engr_lth", 1);
-    }
-    if (release_data(nhfp))
+    if (perform_bwrite(mode))
+        bwrite(fd, (genericptr_t) &no_more_engr, sizeof no_more_engr);
+    if (release_data(mode))
         head_engr = 0;
 }
 
 void
-rest_engravings(nhfp)
-NHFILE *nhfp;
+rest_engravings(fd)
+int fd;
 {
     struct engr *ep;
     unsigned lth;
 
     head_engr = 0;
     while (1) {
-        if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &lth, sizeof(unsigned));
-        if (nhfp->fieldlevel)
-            sfi_unsigned(nhfp, &lth, "engravings", "engr_lth", 1);
-
+        mread(fd, (genericptr_t) &lth, sizeof lth);
         if (lth == 0)
             return;
         ep = newengr(lth);
-        if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) ep, sizeof(struct engr) + lth);
-        }
-        if (nhfp->fieldlevel) {
-            sfi_engr(nhfp, ep, "engravings", "engr", 1);
-            ep->engr_txt = (char *) (ep + 1);
-            sfi_str(nhfp, ep->engr_txt, "engravings", "engr_txt", lth);
-        }
+        mread(fd, (genericptr_t) ep, sizeof (struct engr) + lth);
         ep->nxt_engr = head_engr;
         head_engr = ep;
-        ep->engr_txt = (char *) (ep + 1);	/* Andreas Bormann */
-        /* mark as finished for bones levels -- no problem for
+        ep->engr_txt = (char *) (ep + 1); /* Andreas Bormann */
+        /* Mark as finished for bones levels -- no problem for
          * normal levels as the player must have finished engraving
-         * to be able to move again */
-        ep->engr_time = g.moves;
+         * to be able to move again.
+         */
+        ep->engr_time = moves;
     }
 }
 
@@ -1348,7 +1325,7 @@ static const char blind_writing[][21] = {
      0x69, 0x76, 0x6b, 0x66, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 };
 
-static const char *
+STATIC_OVL const char *
 blengr(VOID_ARGS)
 {
     return blind_writing[rn2(SIZE(blind_writing))];
