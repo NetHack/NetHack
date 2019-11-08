@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.325 $ $NHDT-Date: 1572735924 2019/11/02 23:05:24 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.329 $ $NHDT-Date: 1573171723 2019/11/08 00:08:43 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "November 2, 2019
+.ds f2 "November 7, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -2625,7 +2625,7 @@ and Mac OS X it is \(lq.nethackrc\(rq in the user's home directory.
 The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
 .pg
-On Windows, it is \(lq.nethackrc\(rq in
+On Windows, it is \(lq.nethackrc\(rq in the folder
 \(lq\\%USERPROFILE%\\NetHack\\3.6\(rq.  The file may not exist,
 but it is a normal ASCII text file can can be created with any
 text editor.
@@ -2775,26 +2775,38 @@ Example:
 .sd
 \f(CRWIZKIT=\(ti/wizkit.txt\fP \" \(ti == '~'
 .ed
-.lp ""
-.pg \" this would look better outdented
-Here is a short example of config file contents:
-.sd
+.
+.pg
+\ \" dummy paragraph to force some separation [.BR isn't working as intended]
+.pg
+.SD n \" suppress indentation
+Here is an example of configuration file contents:
+.ED
+.\" [conditional indentation; see description of NETHACKOPTIONS below]
+.ds sD i \" assume proportional, indentation acceptable and preferred
+.\" Check for fixed-width font; 'f' will be same width as 'F'.
+.if (\w'f'p)=(\w'F'p) .ds sD n \" if same width, suppress indentation
+.SD \*(sD \" string variable sD will expand to either 'i' or 'n'
 .ft CR \" set font to constant-width Roman
 # Set your character's role, race, gender, and alignment.
 OPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful
 #
 # Turn on autopickup, set automatically picked up object types
 OPTIONS=autopickup,pickup_types:$"=/!?+
-# Show colored text if possible
-OPTIONS=color
-# Show lit corridors differently
-OPTIONS=lit_corridor
+#
+# Map customization
+OPTIONS=color           # Display things in color if possible
+OPTIONS=lit_corridor    # Show lit corridors differently
+OPTIONS=hilite_pet,hilite_pile
+# Replace small punctuation (tick marks) with digits
+SYMBOLS=S_boulder:0,S_golem:7
 #
 # No startup splash screen. Windows GUI only.
 OPTIONS=!splash_screen
 .ft \" revert to previous font
-.ed
-.BR 2
+.ED
+.pg
+\ \" another dummy paragraph [.BR 2]
 .hn 2
 Using the NETHACKOPTIONS environment variable
 .pg
@@ -3195,7 +3207,7 @@ Valid settings are:
 .sd
 .si
 .CC 0 "disabled"
-.CC 1 "enabled and make OS adjustments to support mouse use in the game"
+.CC 1 "enabled and make OS adjustments to support mouse use"
 .CC 2 "like 1 but does not make any OS adjustments"
 .ei
 .ed
@@ -3612,7 +3624,7 @@ used to customize and change the characteristics of the
 windowtype that you have chosen.
 Character strings that are too long may be truncated.
 Not all window ports will adjust for all settings listed
-here.  You can safely add any of these options to your config
+here.  You can safely add any of these options to your configuration
 file, and if the window port is capable of adjusting to
 suit your preferences, it will attempt to do so. If it
 can't it will silently ignore it.  You can find out if an
@@ -3808,7 +3820,8 @@ May be used to alter the value of keystrokes that the operating system
 returns to NetHack to help compensate for international keyboard issues.
 OPTIONS=subkeyvalue:171/92
 will return 92 to NetHack, if 171 was originally going to be returned.
-You can use multiple subkeyvalue statements in the config file if needed.
+You can use multiple subkeyvalue statements in the configuration file
+if needed.
 Cannot be set with the \(oqO\(cq command.
 .lp video
 Set the video mode used (PC NetHack only).
@@ -3872,12 +3885,12 @@ character in the pattern, specifically:
 .ed
 The
 .op autopickup_exception
-rules are processed in the order in which they appear in your config file,
-thus allowing a later rule to override an earlier rule.
+rules are processed in the order in which they appear in your configuration
+file, thus allowing a later rule to override an earlier rule.
 .lp ""
 Exceptions can be set with the \(oqO\(cq command, but because they are not
-included in your config file, they won't be in effect if you save and then
-restore your game. 
+included in your configuration file, they won't be in effect if you save
+and then restore your game.
 .op autopickup_exception
 rules and not saved with the game.
 .\" end of ``.lp autopickup_exception'' entry; continue enclosing page...
@@ -3920,8 +3933,8 @@ You can bind multiple keys to the same extended command.
 Unbind a key by using \(lqnothing\(rq as the extended command to bind to.
 You can also bind the \(lq<esc>\(rq, \(lq<enter>\(rq, and \(lq<space>\(rq keys.
 .lp "Menu accelerator keys"
-The menu control or accelerator keys can also be rebound via OPTIONS-lines
-in the config file.
+The menu control or accelerator keys can also be rebound via OPTIONS lines
+in the configuration file.
 You cannot bind object symbols into menu accelerators.
 .lp "Special command keys"
 Below are the special commands you can rebind.
@@ -4080,7 +4093,7 @@ Configuring Message Types
 You can change the way the messages are shown in the message area, when
 the message matches a user-defined pattern.
 .pg
-In general, the config file entries to configure the message types
+In general, the configuration file entries to describe the message types
 look like this:
 .si
 MSGTYPE=type "pattern"
@@ -4120,16 +4133,17 @@ the user is prompted with more-prompt, and a message matching
 .\" historical trivia:  "You displaced Fido." was the sort of message you
 .\" got when swapping places with your pet, but that was changed long ago...
 .lp ""
-The order of the defined MSGTYPE-lines is important; the last matching
+The order of the defined MSGTYPE lines is important; the last matching
 rule is used. Put the general case first, exceptions below them.
 .hn 2
 Configuring Menu Colors
 .pg
 Some platforms allow you to define colors used in menu lines when the
-line matches a user-defined pattern. At this time the tty, win32tty and
-win32gui support this.
+line matches a user-defined pattern.
+At this time the tty, curses, win32tty and
+win32gui interfaces support this.
 .pg
-In general, the config file entries to configure the menu color mappings
+In general, the configuration file entries to describe the menu color mappings
 look like this:
 .si
 .lp MENUCOLOR="pattern"=color&attribute
@@ -4172,8 +4186,8 @@ in it will be shown in green color, lines with \(lq\ cursed\ \(rq will be
 shown in red, and lines with \(lq\ cursed\ \(rq followed
 by \(lq(being worn)\(rq
 on the same line will be shown in red color and underlined.
-You can have multiple MENUCOLOR entries in your config file,
-and the last MENUCOLOR-line in your config file that matches
+You can have multiple MENUCOLOR entries in your configuration file,
+and the last MENUCOLOR line that matches
 a menu line will be used for the line.
 .pg
 Note that if you intend to have one or more color specifications match
@@ -4189,7 +4203,7 @@ that matches a user-defined pattern is delivered to the message window.
 At this time the Qt port and the win32tty and win32gui ports support the
 use of user sounds.
 .pg
-The following config file entries are relevant to mapping user sounds
+The following configuration file entries are relevant to mapping user sounds
 to messages:
 .lp SOUNDDIR
 The directory that houses the sound files to be played.
@@ -4358,7 +4372,7 @@ is tested; the character's name is ignored.
 .ei
 .pg
 The in-game options menu can help you determine the correct syntax for a
-config file.
+configuration file.
 .pg
 The whole feature can be disabled by setting option
 .op statushilites
@@ -4394,7 +4408,7 @@ Set the name of the symbol set that you want to load for display
 on the rogue level.
 .pg
 You can also override one or more symbols using the SYMBOLS and
-ROGUESYMBOLS config file options.
+ROGUESYMBOLS configuration file options.
 Symbols are specified as name:value pairs.
 Note that
 NetHack escape-processes the value string in conventional C fashion.
@@ -4604,11 +4618,13 @@ z	S_zruty	(zruty)
 .\" don't hyphenate file name across lines
 .hw sysconf
 .pg
-Notes:  several symbols in this table appear to be blank.
+.lp "Notes:"
+.lp "*"
+Several symbols in this table appear to be blank.
 They are the space character, except for S_pet_override
 and S_player_override which don't have any default value
 and can only be used if enabled in the \(lqsysconf\(rq file.
-.pg
+.lp "*"
 S_rock is misleadingly named; rocks and stones use S_gem.
 Statues and boulders are the rock being referred to, but since
 version 3.6.0, statues are displayed as the monster they depict.
@@ -5125,7 +5141,7 @@ The NetHack Development Team at the time of release of 3.6.1 consisted of
 \fBPat Rankin\fP, \fBDerek S. Ray\fP, \fBAlex Smith\fP,
 \fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
 .pg
-In early May 2019, another 320 bug fixes along with some enhancements and 
+In early May 2019, another 320 bug fixes along with some enhancements and
 the adopted curses window port, were released as 3.6.2.
 .pg
 \fBBart House\fP, who had contributed to the game as a porting team
@@ -5143,7 +5159,7 @@ again to \fBM. Drew Streib\fP and \fBPasi Kallinen\fP for providing a
 public NetHack server at nethack.alt.org. Thanks to \fBKeith Simpson\fP
 and \fBAndy Thomson\fP for hardfought.org. Thanks to all those
 unnamed dungeoneers who invest their time and effort into annual
-NetHack tournaments such as Junethack, The November NetHack Tournament 
+NetHack tournaments such as Junethack, The November NetHack Tournament
 and in days past, devnull.net (gone for now, but not forgotten).
 .pg
 .ce
@@ -5210,3 +5226,4 @@ Izchak Miller	Mike Stephenson
 .\"Amiga is a trademark of Commodore-Amiga, Inc
 .sm "Brand and product names are trademarks or registered trademarks \
 of their respective holders."
+.\"EOF
