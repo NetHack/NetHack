@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1572141702 2019/10/27 02:01:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.347 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1573290415 2019/11/09 09:06:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.348 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1555,15 +1555,21 @@ wiz_intrinsic(VOID_ARGS)
                                          = &mons[g.context.warntype.speciesidx];
                 }
                 goto def_feedback;
+            case GLIB:
+                /* slippery fingers applies to gloves if worn at the time
+                   so persistent inventory might need updating */
+                make_glib((int) newtimeout);
+                goto def_feedback;
             case LEVITATION:
             case FLYING:
                 float_vs_flight();
                 /*FALLTHRU*/
             default:
-            def_feedback:
+ def_feedback:
                 pline("Timeout for %s %s %d.", propertynames[i].prop_name,
                       oldtimeout ? "increased by" : "set to", amt);
-                incr_itimeout(&u.uprops[p].intrinsic, amt);
+                if (p != GLIB)
+                    incr_itimeout(&u.uprops[p].intrinsic, amt);
                 break;
             }
             g.context.botl = 1; /* probably not necessary... */
@@ -2545,7 +2551,11 @@ int final;
         }
     }
     if (Glib) {
-        Sprintf(buf, "slippery %s", makeplural(body_part(FINGER)));
+        Sprintf(buf, "slippery %s",
+                !uarmg ? makeplural(body_part(FINGER))
+                       : gloves_simple_name(uarmg));
+        if (wizard)
+            Sprintf(eos(buf), " (%ld)", (Glib & TIMEOUT));
         you_have(buf, "");
     }
     if (Fumbling) {
@@ -5126,7 +5136,7 @@ const char *s;
     char dirsym;
     int is_mov;
 
-retry:
+ retry:
     if (g.in_doagain || *readchar_queue)
         dirsym = readchar();
     else

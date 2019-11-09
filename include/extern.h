@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1571436000 2019/10/18 22:00:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.730 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1573290414 2019/11/09 09:06:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.736 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -848,6 +848,7 @@ E int FDECL(nhclose, (int));
 #ifdef DEBUG
 E boolean FDECL(debugcore, (const char *, BOOLEAN_P));
 #endif
+E void NDECL(reveal_paths);
 E boolean FDECL(read_tribute, (const char *, const char *, int,
                                char *, int, unsigned));
 E boolean FDECL(Death_quote, (char *, int));
@@ -1777,6 +1778,7 @@ E int FDECL(rnd_class, (int, int));
 E const char *FDECL(suit_simple_name, (struct obj *));
 E const char *FDECL(cloak_simple_name, (struct obj *));
 E const char *FDECL(helm_simple_name, (struct obj *));
+E const char *FDECL(gloves_simple_name, (struct obj *));
 E const char *FDECL(mimic_obj_name, (struct monst *));
 E char *FDECL(safe_qbuf, (char *, const char *, const char *, struct obj *,
                           char *(*)(OBJ_P), char *(*)(OBJ_P), const char *));
@@ -1994,6 +1996,7 @@ E void FDECL(make_blinded, (long, BOOLEAN_P));
 E void NDECL(toggle_blindness);
 E boolean FDECL(make_hallucinated, (long, BOOLEAN_P, long));
 E void FDECL(make_deaf, (long, BOOLEAN_P));
+E void FDECL(make_glib, (int));
 E void NDECL(self_invis_message);
 E int NDECL(dodrink);
 E int FDECL(dopotion, (struct obj *));

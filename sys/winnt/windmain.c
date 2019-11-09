@@ -579,6 +579,11 @@ char *argv[];
         if (argcheck(argc, argv, ARG_VERSION) == 2)
             nethack_exit(EXIT_SUCCESS);
 
+        if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
+            initoptions();
+            reveal_paths();
+            nethack_exit(EXIT_SUCCESS);
+	}
         if (argcheck(argc, argv, ARG_DEBUG) == 1) {
             argc--;
             argv++;
