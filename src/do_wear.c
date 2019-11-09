@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1570566377 2019/10/08 20:26:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1573290416 2019/11/09 09:06:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -561,6 +561,14 @@ Gloves_off(VOID_ARGS)
     setworn((struct obj *) 0, W_ARMG);
     context.takeoff.cancelled_don = FALSE;
     (void) encumber_msg(); /* immediate feedback for GoP */
+
+    /* usually can't remove gloves when they're slippery but it can
+       be done by having them fall off (polymorph), stolen, or
+       destroyed (scroll, overenchantment, monster spell); if that
+       happens, 'cure' slippery fingers so that it doesn't transfer
+       from gloves to bare hands */
+    if (Glib)
+        make_glib(0); /* for update_inventory() */
 
     /* prevent wielding cockatrice when not wearing gloves */
     if (uwep && uwep->otyp == CORPSE)
@@ -1586,7 +1594,7 @@ struct obj *otmp;
         else if (is_shield(otmp))
             (void) Shield_off();
         else
-            setworn((struct obj *) 0, otmp->owornmask & W_ARMOR);
+            (void) Armor_off();
         off_msg(otmp);
     }
     context.takeoff.mask = context.takeoff.what = 0L;
@@ -1736,6 +1744,13 @@ boolean noisy;
                 You("cannot wear gloves over your %s.",
                     is_sword(uwep) ? c_sword : c_weapon);
             err++;
+        } else if (Glib) {
+            /* prevent slippery bare fingers from transferring to
+               gloved fingers */
+            if (noisy)
+                Your("%s are too slippery to pull on %s.",
+                     makeplural(body_part(FINGER)), gloves_simple_name(otmp));
+            err++;
         } else
             *mask = W_ARMG;
     } else if (is_shirt(otmp)) {
@@ -1860,10 +1875,16 @@ struct obj *obj;
                     }
                 } while (!mask);
             }
+            if (uarmg && Glib) {
+                Your(
+              "%s are too slippery to remove, so you cannot put on the ring.",
+                     gloves_simple_name(uarmg));
+                return 1; /* always uses move */
+            }
             if (uarmg && uarmg->cursed) {
                 res = !uarmg->bknown;
                 set_bknown(uarmg, 1);
-                You("cannot remove your gloves to put on the ring.");
+                You("cannot remove your %s to put on the ring.", c_gloves);
                 return res; /* uses move iff we learned gloves are cursed */
             }
             if (uwep) {
@@ -2264,8 +2285,9 @@ register struct obj *otmp;
             set_bknown(uwep, 1);
             return 0;
         } else if (Glib) {
-            You_cant("take off the slippery %s with your slippery %s.",
-                     c_gloves, makeplural(body_part(FINGER)));
+            pline("%s %s are too slippery to take off.",
+                  uarmg->unpaid ? "The" : "Your", /* simplified Shk_Your() */
+                  gloves_simple_name(uarmg));
             return 0;
         }
     }
