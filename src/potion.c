@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1572887644 2019/11/04 17:14:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1573290421 2019/11/09 09:07:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -435,6 +435,17 @@ boolean talk;
         if (talk)
             You(old ? "can hear again." : "are unable to hear anything.");
     }
+}
+
+/* set or clear "slippery fingers" */
+void
+make_glib(xtime)
+int xtime;
+{
+    set_itimeout(&Glib, xtime);
+    /* may change "(being worn)" to "(being worn; slippery)" or vice versa */
+    if (uarmg)
+        update_inventory();
 }
 
 void
@@ -2124,8 +2135,9 @@ dodip()
             fire_damage(obj, TRUE, u.ux, u.uy);
         } else if (potion->cursed) {
             pline_The("potion spills and covers your %s with oil.",
-                      makeplural(body_part(FINGER)));
-            incr_itimeout(&Glib, d(2, 10));
+                      !uarmg ? makeplural(body_part(FINGER))
+                             : gloves_simple_name(uarmg));
+            make_glib((int) (Glib & TIMEOUT) + d(2, 10));
         } else if (obj->oclass != WEAPON_CLASS && !is_weptool(obj)) {
             /* the following cases apply only to weapons */
             goto more_dips;
