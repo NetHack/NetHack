@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1561233801 2019/06/22 20:03:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.203 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1573290417 2019/11/09 09:06:57 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.204 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1378,9 +1378,11 @@ const char *mesg;
 
         if (tintxts[r].greasy) {
             /* Assume !Glib, because you can't open tins when Glib. */
-            incr_itimeout(&Glib, rnd(15));
+            make_glib(rn1(11, 5)); /* 5..15 */
             pline("Eating %s food made your %s very slippery.",
-                  tintxts[r].txt, makeplural(body_part(FINGER)));
+                  tintxts[r].txt,
+                  !uarmg ? makeplural(body_part(FINGER))
+                         : gloves_simple_name(uarmg));
         }
 
     } else { /* spinach... */
