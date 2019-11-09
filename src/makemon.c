@@ -1623,7 +1623,7 @@ int mndx, mvflagsmask, genomask;
         return FALSE;
     if (is_placeholder(ptr))
         return FALSE;
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     /* special levels might ask for random demon type; reject this one */
     if (ptr == &mons[PM_MAIL_DAEMON])
         return FALSE;

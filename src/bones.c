@@ -135,7 +135,7 @@ boolean restore;
 
             if (otmp->otyp == SLIME_MOLD) {
                 goodfruit(otmp->spe);
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
             } else if (otmp->otyp == SCR_MAIL) {
                 /* 0: delivered in-game via external event;
                    1: from bones or wishing; 2: written with marker */

@@ -128,7 +128,7 @@ register int nk;
     if (mtmp->m_lev > 8)
         tmp += 50;
 
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     /* Mail daemons put up no fight. */
     if (mtmp->data == &mons[PM_MAIL_DAEMON])
         tmp = 1;

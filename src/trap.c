@@ -3455,7 +3455,7 @@ struct obj *obj;
         grease_protect(obj, (char *) 0, victim);
     } else if (obj->oclass == SCROLL_CLASS && obj->otyp != SCR_BLANK_PAPER) {
         if (obj->otyp != SCR_BLANK_PAPER
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
             && obj->otyp != SCR_MAIL
 #endif
             ) {
@@ -3531,7 +3531,7 @@ boolean force;
         return ER_NOTHING;
     } else if (obj->oclass == SCROLL_CLASS) {
         if (obj->otyp == SCR_BLANK_PAPER
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
             || obj->otyp == SCR_MAIL
 #endif
            ) return 0;

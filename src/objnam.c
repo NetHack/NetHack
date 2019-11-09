@@ -1013,7 +1013,7 @@ unsigned doname_flags;
                  || ((!known || !objects[obj->otyp].oc_charged
                       || obj->oclass == ARMOR_CLASS
                       || obj->oclass == RING_CLASS)
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
                      && obj->otyp != SCR_MAIL
 #endif
                      && obj->otyp != FAKE_AMULET_OF_YENDOR
@@ -1326,7 +1326,7 @@ struct obj *otmp;
         return FALSE; /* always fully ID'd */
     /* check fundamental ID hallmarks first */
     if (!otmp->known || !otmp->dknown
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
         || (!otmp->bknown && otmp->otyp != SCR_MAIL)
 #else
         || !otmp->bknown
@@ -3861,7 +3861,7 @@ struct obj *no_wish;
     case STATUE:
         /* otmp->cobj already done in mksobj() */
         break;
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     case SCR_MAIL:
         /* 0: delivered in-game via external event (or randomly for fake mail);
            1: from bones or wishing; 2: written with marker */
@@ -3909,7 +3909,7 @@ struct obj *no_wish;
             break;
         case FIGURINE:
             if (!(mons[mntmp].geno & G_UNIQ) && !is_human(&mons[mntmp])
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
                 && mntmp != PM_MAIL_DAEMON
 #endif
                 )

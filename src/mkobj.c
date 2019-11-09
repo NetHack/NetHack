@@ -980,7 +980,7 @@ boolean artif;
             break;
         case POTION_CLASS: /* note: potions get some additional init below */
         case SCROLL_CLASS:
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
             if (otmp->otyp != SCR_MAIL)
 #endif
                 blessorcurse(otmp, 4);

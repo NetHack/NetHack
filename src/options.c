@@ -151,7 +151,7 @@ static const struct Bool_Opt {
     { "legacy", &flags.legacy, TRUE, DISP_IN_GAME },
     { "lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME },
     { "lootabc", &flags.lootabc, FALSE, SET_IN_GAME },
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     { "mail", &flags.biff, TRUE, SET_IN_GAME },
 #else
     { "mail", (boolean *) 0, TRUE, SET_IN_FILE },

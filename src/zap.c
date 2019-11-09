@@ -1231,7 +1231,7 @@ int mat, minwt;
             continue;
         if (obj_resists(otmp, 0, 0))
             continue; /* preserve unique objects */
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
         if (otmp->otyp == SCR_MAIL)
             continue;
 #endif
@@ -1358,7 +1358,7 @@ struct obj *obj;
 {
     long i;
 
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     if (obj->otyp == SCR_MAIL)
         return;
 #endif
@@ -1456,7 +1456,7 @@ int id;
     /* preserve inventory letter if in inventory */
     if (obj_location == OBJ_INVENT)
         otmp->invlet = obj->invlet;
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     /* You can't send yourself 100 mail messages and then
      * polymorph them into useful scrolls
      */

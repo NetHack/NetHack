@@ -1111,7 +1111,7 @@ make_version()
     version.feature_set = (unsigned long) (0L
 /* levels and/or topology (0..4) */
 /* monsters (5..9) */
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
                                            | (1L << 6)
 #endif
 /* objects (10..14) */
@@ -1561,7 +1561,7 @@ static const char *build_opts[] = {
 #ifdef PANICLOG
     "errors and warnings log file",
 #endif
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     "mail daemon",
 #endif
 #ifdef GNUDOS
