@@ -352,6 +352,14 @@ struct savefile_info {
 #define MAXMONNO 120 /* extinct monst after this number created */
 #define MHPMAX 500   /* maximum monster hp */
 
+/*
+ * Version 3.7.x has aspirations of portable file formats. We
+ * make a distinction between MAIL functionality and MAIL_STRUCTURES
+ * so that the underlying structures are consistent, whether MAIL is
+ * defined or not.
+ */
+#define MAIL_STRUCTURES
+
 /* PANICTRACE: Always defined for NH_DEVEL_STATUS != NH_STATUS_RELEASED
    but only for supported platforms. */
 #ifdef UNIX

@@ -925,7 +925,7 @@ register int after;
         mmoved = 0;
     }
 
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     if (ptr == &mons[PM_MAIL_DAEMON]) {
         if (!Deaf && canseemon(mtmp))
             verbalize("I'm late!");

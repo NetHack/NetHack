@@ -80,6 +80,8 @@ sys_early_init()
     sysopt.check_plname = 0;
     sysopt.seduce = 1; /* if it's compiled in, default to on */
     sysopt_seduce_set(sysopt.seduce);
+    /* default to little-endian in 3.7 */
+    sysopt.saveformat[0] = sysopt.bonesformat[0] = lendian;
     sysopt.accessibility = 0;
     return;
 }

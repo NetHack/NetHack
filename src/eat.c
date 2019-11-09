@@ -2104,7 +2104,7 @@ eatspecial()
         return;
     }
     if (objects[otmp->otyp].oc_material == PAPER) {
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
         if (otmp->otyp == SCR_MAIL)
             /* no nutrition */
             pline("This junk mail is less than satisfying.");
@@ -2550,7 +2550,7 @@ doeat()
         /* oc_nutrition is usually weight anyway */
         else
             basenutrit = objects[otmp->otyp].oc_nutrition;
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
         if (otmp->otyp == SCR_MAIL) {
             basenutrit = 0;
             nodelicious = TRUE;

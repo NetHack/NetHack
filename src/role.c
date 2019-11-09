@@ -2084,7 +2084,7 @@ struct monst *mtmp;
         return "Aloha"; /* Hawaiian */
     case PM_VALKYRIE:
         return
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
                (mtmp && mtmp->data == &mons[PM_MAIL_DAEMON]) ? "Hallo" :
 #endif
                "Velkommen"; /* Norse */

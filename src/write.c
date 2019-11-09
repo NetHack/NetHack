@@ -18,7 +18,7 @@ register struct obj *otmp;
         return (10 * objects[otmp->otyp].oc_level);
 
     switch (otmp->otyp) {
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     case SCR_MAIL:
         return 2;
 #endif
@@ -333,7 +333,7 @@ found:
     }
     new_obj->blessed = (curseval > 0);
     new_obj->cursed = (curseval < 0);
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     if (new_obj->otyp == SCR_MAIL)
         /* 0: delivered in-game via external event (or randomly for fake mail);
            1: from bones or wishing; 2: written with marker */
