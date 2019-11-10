@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1564532667 2019/07/31 00:24:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1573346192 2019/11/10 00:36:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -493,6 +493,12 @@ int trouble;
         if (!otmp) {
             impossible("fix_worst_trouble: nothing to uncurse.");
             return;
+        }
+        if (otmp == uarmg && Glib) {
+            make_glib(0);
+            Your("%s are no longer slippery.", gloves_simple_name(uarmg));
+            if (!otmp->cursed)
+                break;
         }
         if (!Blind || (otmp == ublindf && Blindfolded_only)) {
             pline("%s %s.",
