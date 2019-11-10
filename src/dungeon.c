@@ -880,7 +880,7 @@ init_dungeons()
         int dgn_range = get_table_int_opt(L, "range", 0);
         int dgn_align = dgnaligns2i[get_table_option(L, "alignment", "unaligned", dgnaligns)];
         int dgn_entry = get_table_int_opt(L, "entry", 0);
-        int dgn_chance = get_table_int_opt(L, "chance", 0);
+        int dgn_chance = get_table_int_opt(L, "chance", 100);
         int dgn_flags = get_dgn_flags(L);
 
         debugpline4("DUNGEON[%i]: %s, base=(%i,%i)", i, dgn_name, dgn_base, dgn_range);
@@ -910,7 +910,7 @@ init_dungeons()
                     int lvl_base = get_table_int(L, "base");
                     int lvl_range = get_table_int_opt(L, "range", 0);
                     int lvl_nlevels = get_table_int_opt(L, "nlevels", 0);
-                    int lvl_chance = get_table_int_opt(L, "chance", 0);
+                    int lvl_chance = get_table_int_opt(L, "chance", 100);
                     char *lvl_chain = get_table_str_opt(L, "chainlevel", NULL);
                     int lvl_align = dgnaligns2i[get_table_option(L, "alignment", "unaligned", dgnaligns)];
                     int lvl_flags = get_dgn_flags(L);
