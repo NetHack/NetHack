@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1571436003 2019/10/18 22:00:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.265 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1573346190 2019/11/10 00:36:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1719,7 +1719,7 @@ register const char *let, *word;
             if (iflags.force_invmenu)
                 Sprintf(menuquery, "What do you want to %s?", word);
             if (!strcmp(word, "grease"))
-                Sprintf(qbuf, "your %s", makeplural(body_part(FINGER)));
+                Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
             else if (!strcmp(word, "write with"))
                 Sprintf(qbuf, "your %s", body_part(FINGERTIP));
             else if (!strcmp(word, "wield"))
