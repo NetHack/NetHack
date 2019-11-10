@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1573290414 2019/11/09 09:06:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.736 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1573346164 2019/11/10 00:36:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.738 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -476,6 +476,7 @@ E int NDECL(Helmet_on);
 E int FDECL(select_off, (struct obj *));
 E int NDECL(take_off);
 #endif
+E const char *FDECL(fingers_or_gloves, (BOOLEAN_P));
 E void FDECL(off_msg, (struct obj *));
 E void FDECL(set_wear, (struct obj *));
 E boolean FDECL(donning, (struct obj *));

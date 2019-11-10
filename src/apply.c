@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1573290415 2019/11/09 09:06:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.282 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1573346182 2019/11/10 00:36:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.283 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2277,20 +2277,19 @@ struct obj *obj;
 
     if (Glib) {
         pline("%s from your %s.", Tobjnam(obj, "slip"),
-              makeplural(body_part(FINGER)));
+              fingers_or_gloves(FALSE));
         dropx(obj);
         return;
     }
 
     if (obj->spe > 0) {
-        const char *fingers_or_gloves;
         int oldglib;
 
         if ((obj->cursed || Fumbling) && !rn2(2)) {
             consume_obj_charge(obj, TRUE);
 
             pline("%s from your %s.", Tobjnam(obj, "slip"),
-                  makeplural(body_part(FINGER)));
+                  fingers_or_gloves(FALSE));
             dropx(obj);
             return;
         }
@@ -2301,8 +2300,6 @@ struct obj *obj;
             return;
         consume_obj_charge(obj, TRUE);
 
-        fingers_or_gloves = !uarmg ? makeplural(body_part(FINGER))
-                                   : gloves_simple_name(uarmg);
         oldglib = (int) (Glib & TIMEOUT);
         if (otmp != &cg.zeroobj) {
             You("cover %s with a thick layer of grease.", yname(otmp));
@@ -2310,11 +2307,11 @@ struct obj *obj;
             if (obj->cursed && !nohands(g.youmonst.data)) {
                 make_glib(oldglib + rn1(6, 10)); /* + 10..15 */
                 pline("Some of the grease gets all over your %s.",
-                      fingers_or_gloves);
+                      fingers_or_gloves(TRUE));
             }
         } else {
             make_glib(oldglib + rn1(11, 5)); /* + 5..15 */
-            You("coat your %s with grease.", fingers_or_gloves);
+            You("coat your %s with grease.", fingers_or_gloves(TRUE));
         }
     } else {
         if (obj->known)
