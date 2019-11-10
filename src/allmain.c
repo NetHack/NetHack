@@ -307,6 +307,8 @@ moveloop_core(void)
                         warnreveal();
                     mkot_trap_warn();
                     dosounds();
+                    if (Hallucination && !rn2(10000))
+                        You("vaguely feel a vague sense of vagueness.");
                     do_storms();
                     gethungry();
                     age_spells();
