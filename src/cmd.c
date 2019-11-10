@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1573290415 2019/11/09 09:06:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.348 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1573346187 2019/11/10 00:36:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2473,9 +2473,7 @@ int final;
         }
     }
     if (Glib) {
-        Sprintf(buf, "slippery %s",
-                !uarmg ? makeplural(body_part(FINGER))
-                       : gloves_simple_name(uarmg));
+        Sprintf(buf, "slippery %s", fingers_or_gloves(TRUE));
         if (wizard)
             Sprintf(eos(buf), " (%ld)", (Glib & TIMEOUT));
         you_have(buf, "");

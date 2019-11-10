@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1573290421 2019/11/09 09:07:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1573346191 2019/11/10 00:36:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2135,8 +2135,7 @@ dodip()
             fire_damage(obj, TRUE, u.ux, u.uy);
         } else if (potion->cursed) {
             pline_The("potion spills and covers your %s with oil.",
-                      !uarmg ? makeplural(body_part(FINGER))
-                             : gloves_simple_name(uarmg));
+                      fingers_or_gloves(TRUE));
             make_glib((int) (Glib & TIMEOUT) + d(2, 10));
         } else if (obj->oclass != WEAPON_CLASS && !is_weptool(obj)) {
             /* the following cases apply only to weapons */
