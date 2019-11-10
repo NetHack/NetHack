@@ -3972,17 +3972,22 @@ boolean wildcards;
 
 #endif /*DEBUG*/
 
+#ifdef UNIX
+#ifndef PATH_MAX
+#include <limits.h>
+#endif
+#endif
+
 void
 reveal_paths(VOID_ARGS)
 {
-    int i;
-#define PATHBUFSZ 1024
-    char buf[PATHBUFSZ];
+    int i, maxlen = 0;
+    const char *fqn, *filep;
+    char *strp, buf[BUFSZ];
 #ifdef UNIX
-    char *envp, *slash, nhpath[PATHBUFSZ];
+    char *envp, cwdbuf[PATH_MAX];
 #endif
 
-    /* write out path details  */
 #ifdef PREFIXES_IN_USE
     raw_print("Variable playground locations:");
     for (i = 0; i < PREFIX_COUNT; i++)
@@ -3991,75 +3996,93 @@ reveal_paths(VOID_ARGS)
                         ? fqn_prefix[i]
                         : "not set");
 #endif
+
     /* sysconf file */
+
+#ifdef SYSCF
 #ifdef PREFIXES_IN_USE
-    Sprintf(buf, " (in %s)",
-            fqn_prefix_names[SYSCONFPREFIX]);
+    strp = fqn_prefix_names[SYSCONFPREFIX];
+    maxlen = BUFSZ - sizeof " (in )";
+    if (strp && strlen(strp) < (size_t) maxlen)
+        Sprintf(buf, " (in %s)", strp);
 #else
     buf[0] = '\0';
 #endif
     raw_printf("Your system configuration file%s:", buf);
-    set_configfile_name(fqname(SYSCF_FILE, SYSCONFPREFIX, 0));
-    raw_printf("    \"%s\"", configfile);
-#ifdef UNIX
-    Strcpy(nhpath, configfile);
-    slash = rindex(nhpath, '/');
-    if (slash)
-        *slash = '\0';
+#ifdef SYSCF_FILE
+    filep = SYSCF_FILE;
+#else
+    filep = "sysconf";
 #endif
+    fqn = fqname(filep, SYSCONFPREFIX, 0);
+    if (fqn) {
+        set_configfile_name(fqn);
+        filep = configfile;
+    }
+    raw_printf("    \"%s\"", filep);
+#endif /* SYSCF */
 
     /* symbols file */
-#ifdef PREFIXES_IN_USE
-    Sprintf(buf, " (in %s)",
-#ifdef WIN32
-            fqn_prefix_names[SYSCONFPREFIX]);
-#else
-            fqn_prefix_names[HACKPREFIX]);
-#endif /* WIN32 */
-#else /* PREFIXES_IN_USE */
-    buf[0] = '\0';
-#endif
 
-    raw_printf("Your system symbols file%s:", buf);
-#ifdef UNIX
-    Sprintf(buf, "%s/%s", nhpath, SYMBOLS);
-#else
-#ifdef PREFIXES_IN_USE
-    Sprintf(buf, "%s",
-                fqname(SYMBOLS,
-#ifdef WIN32
-                        SYSCONFPREFIX, 2));
-#else
-                        HACKPREFIX, 2));
-#endif
-#endif /* PREFIXES_IN_USE */
-#endif /* UNIX */
-    raw_printf("    \"%s\"", buf);
-    
-    /* configuration file */
-#ifdef PREFIXES_IN_USE
-    Sprintf(buf, " (in %s)",
-            fqn_prefix_names[CONFIGPREFIX]);
-#else /* PREFIXES_IN_USE */
     buf[0] = '\0';
-#endif
+#ifndef UNIX
+#ifdef PREFIXES_IN_USE
+#ifdef WIN32
+    strp = fqn_prefix_names[SYSCONFPREFIX];
+#else
+    strp = fqn_prefix_names[HACKPREFIX];
+#endif /* WIN32 */
+    maxlen = BUFSZ - sizeof " (in )";
+    if (strp && strlen(strp) < (size_t) maxlen)
+        Sprintf(buf, " (in %s)", strp);
+#endif /* PREFIXES_IN_USE */
+    raw_printf("Your game's loadable symbols file%s:", buf);
+#endif /* UNIX */
+
+#ifdef UNIX
+    envp = getcwd(cwdbuf, PATH_MAX);
+    if (envp) {
+        raw_print("Your game's loadable symbols file:");
+        raw_printf("    \"%s/%s\"", envp, SYMBOLS);
+    }
+#else /* UNIX */
+    filep = SYMBOLS;
+#ifdef PREFIXES_IN_USE
+#ifdef WIN32
+    fqn = fqname(filep, SYSCONFPREFIX, 1);
+#else
+    fqn = fqname(filep, HACKPREFIX, 1);
+#endif /* WIN32 */
+    if (fqn)
+        filep = fqn;
+#endif /* PREFIXES_IN_USE */
+    raw_printf("    \"%s\"", filep);
+#endif /* UNIX */
+
+    /* personal configuration file */
+
+    buf[0] = '\0';
+#ifdef PREFIXES_IN_USE
+    strp = fqn_prefix_names[CONFIGPREFIX];
+    maxlen = BUFSZ - sizeof " (in )";
+    if (strp && strlen(strp) < (size_t) maxlen)
+        Sprintf(buf, " (in %s)", strp);
+#endif /* PREFIXES_IN_USE */
     raw_printf("Your personal configuration file%s:", buf);
+
 #ifdef UNIX
     envp = nh_getenv("HOME");
-    if (!envp)
-        Strcpy(nhpath, ".nethackrc");
-    else
-        Sprintf(nhpath, "%s/%s", envp, default_configfile);
-#endif
-    raw_printf("    \"%s\"",
-#ifdef UNIX
-                nhpath);
-#else
+    raw_printf("    \"%s%s%s\"",
+        envp ?
+            envp : "",
+        envp ?
+            "/" : "", default_configfile);
+#else /* UNIX */
+    fqn = (const char *) 0;
 #ifdef PREFIXES_IN_USE
-                fqname(default_configfile, CONFIGPREFIX, 3));
-#else
-                default_configfile);
-#endif  /* PREFIXES_IN_USE */
+    fqn = fqname(default_configfile, CONFIGPREFIX, 2);
+#endif
+    raw_printf("    \"%s\"", fqn ? fqn : default_configfile);
 #endif  /* UNIX */
     raw_print("");
 }

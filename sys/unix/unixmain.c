@@ -115,6 +115,9 @@ char *argv[];
             exit(EXIT_SUCCESS);
 
         if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
+#ifdef CHDIR
+            chdirx((char *) 0, 0);
+#endif
             initoptions();
             reveal_paths();
             exit(EXIT_SUCCESS);
