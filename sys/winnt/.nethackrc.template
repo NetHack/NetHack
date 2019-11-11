@@ -143,28 +143,24 @@ OPTIONS=vary_msgcount:4
 # IMPORTANT: If you change any of these locations, the directories they
 # point at must exist.  NetHack will not create them for you.
 #
-# HACKDIR is the default location for everything.
-# Note: On Windows HACKDIR defaults to the location 
-#       of the NetHack.exe or NetHackw.exe file so
-#       setting HACKDIR below to override that is 
-#       not usually necessary or recommended.
-#HACKDIR=c:\games\nethack
+# The location that documentation and helps files are placed
+#HACKDIR=c:\User\USERNAME\NetHack\3.6
 #
-# The location that level files in progress are stored (default=HACKDIR, writeable)
-#LEVELDIR=c:\nethack\levels
+# The location that level files in progress are stored (writeable)
+#LEVELDIR=c:\User\USERNAME\AppData\Local\NetHack\3.6
 #
-# The location where saved games are kept (default=HACKDIR, writeable)
-#SAVEDIR=c:\nethack\save
+# The location where saved games are kept (writeable)
+#SAVEDIR=c:\User\USERNAME\AppData\Local\NetHack\3.6
 #
-# The location that bones files are kept (default=HACKDIR, writeable)
-#BONESDIR=c:\nethack\save
+# The location that bones files are kept (writeable)
+#BONESDIR=c:\ProgramData\NetHack\3.6
 #
-# The location that file synchronization locks are stored (default=HACKDIR, writeable)
-#LOCKDIR=c:\nethack\levels
+# The location that score files are kept (writeable)
+#SCOREDIR=c:\ProgramData\NetHack\3.6
 #
-# The location that a record of game aborts and self-diagnosed game problems
-# is kept (default=HACKDIR, writeable)
-#TROUBLEDIR=c:\nethack\trouble
+# The location that file synchronization locks are stored (writeable)
+#LOCKDIR=c:\ProgramData\NetHack\3.6
+#
 
 # Finnish keyboards might need these modifications uncommented. 
 # For  \, @, $, [, |

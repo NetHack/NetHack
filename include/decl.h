@@ -409,6 +409,9 @@ E const char *const monexplain[], invisexplain[], *const oclass_names[];
 #define PREFIXES_IN_USE
 #endif
 
+#ifdef WIN32
+E boolean fqn_prefix_locked[PREFIX_COUNT];
+#endif
 #ifdef PREFIXES_IN_USE
 E const char *fqn_prefix_names[PREFIX_COUNT];
 #endif

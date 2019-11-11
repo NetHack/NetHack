@@ -110,7 +110,13 @@ const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
 
 /* Global windowing data, defined here for multi-window-system support */
 NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN;
-                                   
+#ifdef WIN32
+boolean fqn_prefix_locked[PREFIX_COUNT] = { FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE };
+#endif
+
 #ifdef PREFIXES_IN_USE
 const char *fqn_prefix_names[PREFIX_COUNT] = {
     "hackdir",  "leveldir", "savedir",    "bonesdir",  "datadir",

@@ -24,6 +24,7 @@
 static void FDECL(process_options, (int argc, char **argv));
 static void NDECL(nhusage);
 static char *NDECL(get_executable_path);
+char *FDECL(translate_path_variables, (char *, char *));
 char *NDECL(exename);
 boolean NDECL(fakeconsole);
 void NDECL(freefakeconsole);
@@ -61,8 +62,7 @@ char default_window_sys[] = "mswin";
 static struct stat hbuf;
 #endif
 #include <sys/stat.h>
-#if defined(WIN32) || defined(MSDOS)
-#endif
+
 
 extern char orgdir[];
 
@@ -99,13 +99,17 @@ void
 build_known_folder_path(
     const KNOWNFOLDERID * folder_id,
     char * path,
-    size_t path_size)
+    size_t path_size,
+    boolean versioned)
 {
     get_known_folder_path(folder_id, path, path_size);
     strcat(path, "\\NetHack\\");
     create_directory(path);
-    Sprintf(eos(path), "%d.%d\\", VERSION_MAJOR, VERSION_MINOR);
-    create_directory(path);
+    if (versioned) {
+        Sprintf(eos(path), "%d.%d\\", 
+                    VERSION_MAJOR, VERSION_MINOR);
+        create_directory(path);
+    }
 }
 
 void
@@ -148,97 +152,44 @@ folder_file_exists(const char * folder, const char * file_name)
     return file_exists(path);
 }
 
-/*
- * Rules for setting prefix locations
- *
- * COMMON_NETHACK_PATH = %COMMONPROGRAMFILES%\NetHack\3.6\
- * PROFILE_PATH = %SystemDrive%\Users\%USERNAME%\
- *
- * NETHACK_PROFILE_PATH = PROFILE_PATH\NetHack\3.6\
- * NETHACK_PER_USER_DATA_PATH = PROFILE_PATH\AppData\Local\NetHack\3.6\
- * NETHACK_GLOBAL_DATA_PATH = %SystemDrive%\ProgramData\NetHack\3.6\
- * EXECUTABLE_PATH = path to where .exe lives
- *
- * HACKPREFIX:
- *   - use environment variable NETHACKDIR if variable is defined
- *   - otherwise use environment variable HACKDIR if variable is defined
- *   - otherwise if store install use NETHACK_PROFILE_PATH
- *   - otherwise if manual install use EXECUTABLE_PATH
- *
- * LEVELPREFIX, SAVEPREFIX:
- *   - if store install use NETHACK_PER_USER_DATA_PATH
- *   - if manual install use HACKPREFIX
- *
- * BONESPREFIX, SCOREPREFIX, LOCKPREFIX:
- *   - if store install use NETHACK_GLOBAL_DATA_PATH
- *   - if manual install use HACKPREFIX
- *
- * DATAPREFIX
- *   - if store install use EXECUTABLE_PATH
- *   - if manual install use HACKPREFIX
- *
- * SYSCONFPREFIX
- *   - use COMMON_NETHACK_PATH if sysconf present
- *   - otherwise use HACKPREFIX
- *
- * CONFIGPREFIX
- *    - if manual install use PROFILE_PATH
- *    - if store install use NETHACK_PROFILE_PATH
- */
-
 void
 set_default_prefix_locations(const char *programPath)
 {
     char *envp = NULL;
     char *sptr = NULL;
 
-    static char hack_path[MAX_PATH];
     static char executable_path[MAX_PATH];
-    static char nethack_profile_path[MAX_PATH];
-    static char nethack_per_user_data_path[MAX_PATH];
-    static char nethack_global_data_path[MAX_PATH];
-    static char sysconf_path[MAX_PATH];
+    static char profile_path[MAX_PATH];
+    static char versioned_profile_path[MAX_PATH];
+    static char versioned_user_data_path[MAX_PATH];
+    static char versioned_global_data_path[MAX_PATH];
     static char versioninfo[20];
 
     strcpy(executable_path, get_executable_path());
     append_slash(executable_path);
 
-    build_environment_path("NETHACKDIR", NULL, hack_path, sizeof(hack_path));
+    build_known_folder_path(&FOLDERID_Profile, profile_path,
+        sizeof(profile_path), FALSE);
 
-    if (hack_path[0] == '\0')
-        build_environment_path("HACKDIR", NULL, hack_path, sizeof(hack_path));
-
-    build_known_folder_path(&FOLDERID_Profile, nethack_profile_path,
-        sizeof(nethack_profile_path));
+    build_known_folder_path(&FOLDERID_Profile, versioned_profile_path,
+        sizeof(profile_path), TRUE);
 
     build_known_folder_path(&FOLDERID_LocalAppData,
-        nethack_per_user_data_path, sizeof(nethack_per_user_data_path));
+        versioned_user_data_path, sizeof(versioned_user_data_path), TRUE);
 
     build_known_folder_path(&FOLDERID_ProgramData,
-        nethack_global_data_path, sizeof(nethack_global_data_path));
+        versioned_global_data_path, sizeof(versioned_global_data_path), TRUE);
 
-    if (hack_path[0] == '\0')
-        strcpy(hack_path, nethack_profile_path);
-
-    g.fqn_prefix[LEVELPREFIX] = nethack_per_user_data_path;
-    g.fqn_prefix[SAVEPREFIX] = nethack_per_user_data_path;
-    g.fqn_prefix[BONESPREFIX] = nethack_global_data_path;
+    g.fqn_prefix[SYSCONFPREFIX] = versioned_global_data_path;
+    g.fqn_prefix[CONFIGPREFIX] = profile_path;
+    g.fqn_prefix[HACKPREFIX] = versioned_profile_path;
+    g.fqn_prefix[SAVEPREFIX] = versioned_user_data_path;
+    g.fqn_prefix[LEVELPREFIX] = versioned_user_data_path;
+    g.fqn_prefix[BONESPREFIX] = versioned_global_data_path;
+    g.fqn_prefix[SCOREPREFIX] = versioned_global_data_path;
+    g.fqn_prefix[LOCKPREFIX] = versioned_global_data_path;
+    g.fqn_prefix[TROUBLEPREFIX] = versioned_profile_path;
     g.fqn_prefix[DATAPREFIX] = executable_path;
-    g.fqn_prefix[SCOREPREFIX] = nethack_global_data_path;
-    g.fqn_prefix[LOCKPREFIX] = nethack_global_data_path;
-    g.fqn_prefix[CONFIGPREFIX] = nethack_profile_path;
-
-    g.fqn_prefix[HACKPREFIX] = hack_path;
-    g.fqn_prefix[TROUBLEPREFIX] = hack_path;
-
-    Sprintf(versioninfo, "NetHack\\%d.%d", VERSION_MAJOR, VERSION_MINOR);
-    build_environment_path("COMMONPROGRAMFILES", versioninfo, sysconf_path,
-        sizeof(sysconf_path));
-
-    if(!folder_file_exists(sysconf_path, SYSCF_FILE))
-        strcpy(sysconf_path, hack_path);
-
-    g.fqn_prefix[SYSCONFPREFIX] = sysconf_path;
 
 }
 
@@ -304,43 +255,50 @@ update_file(
 
 }
 
-void copy_config_content()
+void copy_sysconf_content()
 {
-    /* Keep templates up to date */
-    /* TODO: Update the package to store config file as .nethackrc */
-    update_file(g.fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
-        g.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
+    /* Using the SYSCONFPREFIX path, lock it so that it does not change */
+    fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
+
     update_file(g.fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
         g.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
+
+    update_file(g.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
+        g.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
+
+    /* If the required early game file does not exist, copy it */
+    copy_file(g.fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
+        g.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
+
+    update_file(g.fqn_prefix[SYSCONFPREFIX], SYMBOLS,
+        g.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
+}
+
+void copy_config_content()
+{
+    /* Using the CONFIGPREFIX path, lock it so that it does not change */
+    fqn_prefix_locked[CONFIGPREFIX] = TRUE;
+
+    /* Keep templates up to date */
+    update_file(g.fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
+        g.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
 
     /* If the required early game file does not exist, copy it */
     /* NOTE: We never replace .nethackrc or sysconf */
     copy_file(g.fqn_prefix[CONFIGPREFIX], CONFIG_FILE,
         g.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE);
-    copy_file(g.fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
-        g.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
-
-    /* Update symbols and save a copy if we are replacing */
-    /* TODO: Can't HACKDIR be changed during option parsing
-       causing us to perhaps be checking options against the wrong
-       symbols file? */
-    update_file(g.fqn_prefix[HACKPREFIX], SYMBOLS,
-        g.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
 }
 
 void
 copy_hack_content()
 {
+    nhassert(fqn_prefix_locked[HACKPREFIX]);
+
     /* Keep Guidebook and opthelp up to date */
     update_file(g.fqn_prefix[HACKPREFIX], GUIDEBOOK_FILE,
         g.fqn_prefix[DATAPREFIX], GUIDEBOOK_FILE, FALSE);
     update_file(g.fqn_prefix[HACKPREFIX], OPTIONFILE,
         g.fqn_prefix[DATAPREFIX], OPTIONFILE, FALSE);
-
-    /* Keep templates up to date */
-    update_file(g.fqn_prefix[HACKPREFIX], SYMBOLS_TEMPLATE,
-        g.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
-
 }
 
 /*
@@ -408,24 +366,33 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     set_default_prefix_locations(argv[0]);
 
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-    chdir(fqn_prefix[HACKPREFIX]);
+    chdir(g.fqn_prefix[HACKPREFIX]);
 #endif
-
-    copy_config_content();
 
     if (GUILaunched || IsDebuggerPresent())
         getreturn_enabled = TRUE;
 
     check_recordfile((char *) 0);
     iflags.windowtype_deferred = TRUE;
-    initoptions();                  
+    copy_sysconf_content();
+    initoptions();
+
+    /* Now that sysconf has had a chance to set the TROUBLEPREFIX, don't
+       allow it to be changed from here on out. */
+    fqn_prefix_locked[TROUBLEPREFIX] = TRUE;
+
+    copy_config_content();
+    process_options(argc, argv);
+
+    /* Finished processing options, lock all directory paths */
+    for(int i = 0; i < PREFIX_COUNT; i++)
+        fqn_prefix_locked[i] = TRUE;
+
     if (!validate_prefix_locations(failbuf)) {
         raw_printf("Some invalid directory locations were specified:\n\t%s\n",
                    failbuf);
         nethack_exit(EXIT_FAILURE);
     }
-
-    process_options(argc, argv);
 
     copy_hack_content();
 
@@ -580,7 +547,9 @@ char *argv[];
             nethack_exit(EXIT_SUCCESS);
 
         if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
+            iflags.initoptions_noterminate = TRUE;
             initoptions();
+            iflags.initoptions_noterminate = FALSE;
             reveal_paths();
             nethack_exit(EXIT_SUCCESS);
 	}
@@ -884,6 +853,61 @@ get_executable_path()
 
     return path_buffer;
 }
+
+char *
+translate_path_variables(str, buf)
+const char *str;
+char *buf;
+{
+    const char *src;
+    char evar[BUFSZ], *dest, *envp, *eptr = (char *) 0;
+    boolean in_evar;
+    size_t ccount, ecount, destcount, slen = str ? strlen(str) : 0;
+
+    if (!slen || !buf) {
+        if (buf)
+            *buf = '\0';
+        return buf;
+    }
+
+    dest = buf;
+    src = str;
+    in_evar = FALSE;
+    destcount = ecount = 0;
+    for (ccount = 0; ccount < slen && destcount < (BUFSZ - 1) &&
+                     ecount < (BUFSZ - 1); ++ccount, ++src) {
+        if (*src == '%') {
+            if (in_evar) {
+                *eptr = '\0';
+                envp = nh_getenv(evar);
+                if (envp) {
+                    size_t elen = strlen(envp);
+
+                    if ((elen + destcount) < (size_t) (BUFSZ - 1)) {
+                        Strcpy(dest, envp);
+                        dest += elen;
+                        destcount += elen;
+                    }
+                }
+            } else {
+                eptr = evar;
+                ecount = 0;
+            }
+            in_evar = !in_evar;
+            continue;
+        }
+        if (in_evar) {
+            *eptr++ = *src;
+            ecount++;
+        } else {
+            *dest++ = *src;
+            destcount++;
+        }
+    }
+    *dest = '\0';
+    return buf;
+}
+
 
 /*ARGSUSED*/
 void
