@@ -2497,8 +2497,8 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
             vis = FALSE;       /* skip makeknown() below */
             res = FALSE;       /* failed to cure sliming */
         } else {
-            m_useup(mon, obj); /* before explode() */
             dmg = (2 * (rn1(3, 3) + 2 * bcsign(obj)) + 1) / 3;
+            m_useup(mon, obj); /* before explode() */
             /* -11 => monster's fireball */
             explode(mon->mx, mon->my, -11, dmg, SCROLL_CLASS,
                     /* by_you: override -11 for mon but not others */
