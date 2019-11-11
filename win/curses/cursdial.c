@@ -759,11 +759,10 @@ curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
     menu_determine_pages(current_menu);
 
     /* Display pre and post-game menus centered */
-    if (((moves <= 1) && !invent) || program_state.gameover) {
+    if ((moves <= 1 && !invent) || program_state.gameover) {
         win = curses_create_window(current_menu->width,
                                    current_menu->height, CENTER);
     } else { /* Display during-game menus on the right out of the way */
-
         win = curses_create_window(current_menu->width,
                                    current_menu->height, RIGHT);
     }
@@ -1000,13 +999,13 @@ static void
 menu_win_size(nhmenu *menu)
 {
     int maxwidth, maxheight, curentrywidth, lastline;
-    int maxentrywidth = (int) strlen(menu->prompt);
-    int maxheaderwidth = 0;
+    int maxentrywidth = 0;
+    int maxheaderwidth = menu->prompt ? (int) strlen(menu->prompt) : 0;
     nhmenu_item *menu_item_ptr;
 
     if (program_state.gameover) {
         /* for final inventory disclosure, use full width */
-        maxwidth = term_cols - 2;
+        maxwidth = term_cols - 2; /* +2: borders assumed */
     } else {
         /* this used to be 38, which is 80/2 - 2 (half a 'normal' sized
            screen minus room for a border box), but some data files
@@ -1029,7 +1028,7 @@ menu_win_size(nhmenu *menu)
                 maxheaderwidth = curentrywidth;
             }
         } else {
-            /* Add space for accelerator */
+            /* Add space for accelerator (selector letter) */
             curentrywidth += 4;
 #if 0 /* FIXME: menu glyphs */
             if (menu_item_ptr->glyph != NO_GLYPH && iflags.use_menu_glyphs)
@@ -1041,20 +1040,20 @@ menu_win_size(nhmenu *menu)
         }
     }
 
-    /* If widest entry is smaller than maxwidth, reduce maxwidth
-       accordingly (but not too far; minimum width will be applied below) */
-    if (maxentrywidth < maxwidth) {
-        maxwidth = maxentrywidth;
-    }
-
-    /* Try not to wrap headers/normal text lines if possible.  We can
-       go wider than half the screen for this purpose if need be */
-
-    if (maxheaderwidth > maxwidth) {
-        if (maxheaderwidth < (term_cols - 2))
-            maxwidth = maxheaderwidth;
-        else
-            maxwidth = term_cols - 2;
+    /*
+     * 3.6.3: This used to set maxwidth to maxheaderwidth when that was
+     * bigger but only set it to maxentrywidth if the latter was smaller,
+     * so entries wider than the default would always wrap unless at
+     * least one header or separator line was long, even when there was
+     * lots of space available to display them without wrapping.  The
+     * reason to force narrow menus isn't known.  It may have been to
+     * reduce the amount of map rewriting when menu is dismissed, but if
+     * so, that was an issue due to excessive screen writing for the map
+     * (output was flushed for each character) which was fixed long ago.
+     */
+    maxwidth = max(maxentrywidth, maxheaderwidth);
+    if (maxwidth > term_cols - 2) { /* -2: space for left and right borders */
+        maxwidth = term_cols - 2;
     }
 
     /* Possibly reduce height if only 1 page */
