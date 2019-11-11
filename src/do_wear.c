@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1570566377 2019/10/08 20:26:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1573346188 2019/11/10 00:36:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -43,6 +43,16 @@ STATIC_PTR int FDECL(armor_or_accessory_off, (struct obj *));
 STATIC_PTR int FDECL(accessory_or_armor_on, (struct obj *));
 STATIC_DCL void FDECL(already_wearing, (const char *));
 STATIC_DCL void FDECL(already_wearing2, (const char *, const char *));
+
+/* plural "fingers" or optionally "gloves" */
+const char *
+fingers_or_gloves(check_gloves)
+boolean check_gloves;
+{
+    return ((check_gloves && uarmg)
+            ? gloves_simple_name(uarmg) /* "gloves" or "gauntlets" */
+            : makeplural(body_part(FINGER))); /* "fingers" */
+}
 
 void
 off_msg(otmp)
@@ -561,6 +571,14 @@ Gloves_off(VOID_ARGS)
     setworn((struct obj *) 0, W_ARMG);
     context.takeoff.cancelled_don = FALSE;
     (void) encumber_msg(); /* immediate feedback for GoP */
+
+    /* usually can't remove gloves when they're slippery but it can
+       be done by having them fall off (polymorph), stolen, or
+       destroyed (scroll, overenchantment, monster spell); if that
+       happens, 'cure' slippery fingers so that it doesn't transfer
+       from gloves to bare hands */
+    if (Glib)
+        make_glib(0); /* for update_inventory() */
 
     /* prevent wielding cockatrice when not wearing gloves */
     if (uwep && uwep->otyp == CORPSE)
@@ -1529,7 +1547,15 @@ struct obj *otmp;
         boolean use_plural = (is_boots(otmp) || is_gloves(otmp)
                               || otmp->otyp == LENSES || otmp->quan > 1L);
 
-        You("can't.  %s cursed.", use_plural ? "They are" : "It is");
+        /* might be trying again after applying grease to hands */
+        if (Glib && otmp->bknown
+            /* for weapon, we'll only get here via 'A )' */
+            && (uarmg ? (otmp == uwep)
+                      : ((otmp->owornmask & (W_WEP | W_RING)) != 0)))
+            pline("Despite your slippery %s, you can't.",
+                  fingers_or_gloves(TRUE));
+        else
+            You("can't.  %s cursed.", use_plural ? "They are" : "It is");
         set_bknown(otmp, 1);
         return 1;
     }
@@ -1586,7 +1612,7 @@ struct obj *otmp;
         else if (is_shield(otmp))
             (void) Shield_off();
         else
-            setworn((struct obj *) 0, otmp->owornmask & W_ARMOR);
+            (void) Armor_off();
         off_msg(otmp);
     }
     context.takeoff.mask = context.takeoff.what = 0L;
@@ -1736,6 +1762,13 @@ boolean noisy;
                 You("cannot wear gloves over your %s.",
                     is_sword(uwep) ? c_sword : c_weapon);
             err++;
+        } else if (Glib) {
+            /* prevent slippery bare fingers from transferring to
+               gloved fingers */
+            if (noisy)
+                Your("%s are too slippery to pull on %s.",
+                     fingers_or_gloves(FALSE), gloves_simple_name(otmp));
+            err++;
         } else
             *mask = W_ARMG;
     } else if (is_shirt(otmp)) {
@@ -1833,7 +1866,7 @@ struct obj *obj;
             if (uleft && uright) {
                 There("are no more %s%s to fill.",
                       humanoid(youmonst.data) ? "ring-" : "",
-                      makeplural(body_part(FINGER)));
+                      fingers_or_gloves(FALSE));
                 return 0;
             }
             if (uleft) {
@@ -1860,10 +1893,16 @@ struct obj *obj;
                     }
                 } while (!mask);
             }
+            if (uarmg && Glib) {
+                Your(
+              "%s are too slippery to remove, so you cannot put on the ring.",
+                     gloves_simple_name(uarmg));
+                return 1; /* always uses move */
+            }
             if (uarmg && uarmg->cursed) {
                 res = !uarmg->bknown;
                 set_bknown(uarmg, 1);
-                You("cannot remove your gloves to put on the ring.");
+                You("cannot remove your %s to put on the ring.", c_gloves);
                 return res; /* uses move iff we learned gloves are cursed */
             }
             if (uwep) {
@@ -2018,7 +2057,7 @@ doputon()
         /* 'P' message doesn't mention armor */
         Your("%s%s are full, and you're already wearing an amulet and %s.",
              humanoid(youmonst.data) ? "ring-" : "",
-             makeplural(body_part(FINGER)),
+             fingers_or_gloves(FALSE),
              (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
         return 0;
     }
@@ -2088,7 +2127,7 @@ glibr()
         /* changed so cursed rings don't fall off, GAN 10/30/86 */
         Your("%s off your %s.",
              (leftfall && rightfall) ? "rings slip" : "ring slips",
-             (leftfall && rightfall) ? makeplural(body_part(FINGER))
+             (leftfall && rightfall) ? fingers_or_gloves(FALSE)
                                      : body_part(FINGER));
         xfl++;
         if (leftfall) {
@@ -2210,6 +2249,10 @@ int otyp;
             return uarmg;
         if (ring->cursed)
             return ring;
+        /* normally outermost layer is processed first, but slippery gloves
+           wears off quickly so uncurse ring itself before handling those */
+        if (uarmg && Glib)
+            return uarmg;
     }
     /* either no ring or not right type or nothing prevents its removal */
     return (struct obj *) 0;
@@ -2238,17 +2281,21 @@ register struct obj *otmp;
 
     /* special ring checks */
     if (otmp == uright || otmp == uleft) {
+        struct obj glibdummy;
+
         if (nolimbs(youmonst.data)) {
             pline_The("ring is stuck.");
             return 0;
         }
+        glibdummy = zeroobj;
         why = 0; /* the item which prevents ring removal */
         if (welded(uwep) && (otmp == uright || bimanual(uwep))) {
             Sprintf(buf, "free a weapon %s", body_part(HAND));
             why = uwep;
-        } else if (uarmg && uarmg->cursed) {
-            Sprintf(buf, "take off your %s", c_gloves);
-            why = uarmg;
+        } else if (uarmg && (uarmg->cursed || Glib)) {
+            Sprintf(buf, "take off your %s%s",
+                    Glib ? "slippery " : "", gloves_simple_name(uarmg));
+            why = !Glib ? uarmg : &glibdummy;
         }
         if (why) {
             You("cannot %s to remove the ring.", buf);
@@ -2264,8 +2311,9 @@ register struct obj *otmp;
             set_bknown(uwep, 1);
             return 0;
         } else if (Glib) {
-            You_cant("take off the slippery %s with your slippery %s.",
-                     c_gloves, makeplural(body_part(FINGER)));
+            pline("%s %s are too slippery to take off.",
+                  uarmg->unpaid ? "The" : "Your", /* simplified Shk_Your() */
+                  gloves_simple_name(uarmg));
             return 0;
         }
     }

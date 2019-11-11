@@ -153,17 +153,35 @@ moverock()
             if (mtmp && !noncorporeal(mtmp->data)
                 && (!mtmp->mtrapped
                     || !(ttmp && is_pit(ttmp->ttyp)))) {
+                boolean deliver_part1 = FALSE;
+
                 if (Blind)
                     feel_location(sx, sy);
                 if (canspotmon(mtmp)) {
                     pline("There's %s on the other side.", a_monnam(mtmp));
+                    deliver_part1 = TRUE;
                 } else {
                     You_hear("a monster behind %s.", the(xname(otmp)));
+                    if (!Deaf)
+                        deliver_part1 = TRUE;
                     map_invisible(rx, ry);
                 }
-                if (flags.verbose)
-                    pline("Perhaps that's why %s cannot move it.",
-                          u.usteed ? y_monnam(u.usteed) : "you");
+                if (flags.verbose) {
+                    char you_or_steed[BUFSZ];
+
+                    Strcpy(you_or_steed,
+                           u.usteed ? y_monnam(u.usteed) : "you");
+                    pline("%s%s cannot move %s.",
+                          deliver_part1
+                              ? "Perhaps that's why "
+                              : "",
+                          deliver_part1
+                              ? you_or_steed
+                              : upstart(you_or_steed),
+                          deliver_part1
+                              ? "it"
+                              : the(xname(otmp)));
+                }
                 goto cannot_push;
             }
 

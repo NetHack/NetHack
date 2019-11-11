@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1570230710 2019/10/04 23:11:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.134 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1573290419 2019/11/09 09:06:59 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.135 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -691,7 +691,7 @@ int mntmp;
     }
     check_strangling(FALSE); /* maybe stop strangling */
     if (nohands(youmonst.data))
-        Glib = 0;
+        make_glib(0);
 
     /*
     mlvl = adj_lev(&mons[mntmp]);
@@ -967,6 +967,7 @@ break_armor()
             You("drop your gloves%s!", uwep ? " and weapon" : "");
             drop_weapon(0);
             (void) Gloves_off();
+            /* Glib manipulation (ends immediately) handled by Gloves_off */
             dropp(otmp);
         }
         if ((otmp = uarms) != 0) {

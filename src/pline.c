@@ -367,7 +367,7 @@ VA_DECL(const char *, line)
     else if (Unaware)
         YouPrefix(tmp, "You dream that you hear ", line);
     else
-        YouPrefix(tmp, "You hear ", line);
+        YouPrefix(tmp, "You hear ", line);  /* Deaf-aware */
     vpline(strcat(tmp, line), VA_ARGS);
     VA_END();
 }

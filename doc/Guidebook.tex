@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{November 2, 2019}
+\date{November 7, 2019}
 
 \maketitle
 
@@ -2044,8 +2044,8 @@ will result in it disappearing from your map, similarly if it is the
 one who moved rather than you.
 
 %.pg
-However, if you encounter a monster which you can't see or 
-sense---perhaps it is invisible and has just tapped you on the 
+However, if you encounter a monster which you can't see or
+sense---perhaps it is invisible and has just tapped you on the
 noggin---a special ``remembered, unseen monster'' marker will be displayed at
 the location where you think it is.
 That will persist until you have
@@ -2701,8 +2701,8 @@ you are carrying (shopkeepers aside).
 Normally, if you have seen an object at a particular map location and
 move to another location where you can't directly see that object any
 more, if will continue to be displayed on your map.
-That remains the case even if it is not actually there any 
-more---perhaps a monster has picked it up or it has rotted 
+That remains the case even if it is not actually there any
+more---perhaps a monster has picked it up or it has rotted
 away---until you can see or feel that location again.
 One notable exception is that if the object gets covered by the
 ``remembered, unseen monster'' marker.
@@ -2875,7 +2875,7 @@ directory. The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.\\
 
 %.lp ""
-On Windows, it is \mbox{``.nethackrc''} in the foler 
+On Windows, it is \mbox{``.nethackrc''} in the folder
 \mbox{{``\%USERPROFILE\%\textbackslash NetHack\textbackslash 3.6''}}. The
 file may not exist, but it is a normal ASCII text file and can be created
 with any text editor.
@@ -2886,7 +2886,7 @@ If you had not created the configuration file, {\it NetHack\/} will create
 the configuration file for you using the default template file.
 
 %.lp ""
-On MS-DOS it is \mbox{``defaults.nh''} in the same folder as 
+On MS-DOS it is \mbox{``defaults.nh''} in the same folder as
 \mbox{{\it nethack.exe\/}}.\\
 
 %.lp ""
@@ -3065,7 +3065,7 @@ Example:
 
 %.lp ""
 %.pg
-Here is a short example of config file contents:
+Here is an example of configuration file contents:
 %.sd
 \begin{verbatim}
     # Set your character's role, race, gender, and alignment.
@@ -3073,10 +3073,13 @@ Here is a short example of config file contents:
 
     # Turn on autopickup, set automatically picked up object types
     OPTIONS=autopickup,pickup_types:$"=/!?+
-    # Show colored text if possible
-    OPTIONS=color
-    # Show lit corridors differently
-    OPTIONS=lit_corridor
+
+    # Map customization
+    OPTIONS=color           # Display things in color if possible
+    OPTIONS=lit_corridor    # Show lit corridors differently
+    OPTIONS=hilite_pet,hilite_pile
+    # Replace small punctuation (tick marks) with digits
+    SYMBOLS=S_boulder:0,S_golem:7
 
     # No startup splash screen. Windows GUI only.
     OPTIONS=!splash_screen
@@ -3518,7 +3521,7 @@ Valid settings are:
 %.sd
 %.si
 {\tt 0} --- disabled\\
-{\tt 1} --- enabled and make OS adjustment to support mouse use in the game\\
+{\tt 1} --- enabled and make OS adjustment to support mouse use\\
 {\tt 2} --- enabled like {\tt 1}, but does not make any OS adjustments\\
 %.ei
 %.ed
@@ -3997,7 +4000,7 @@ windowtype that you have chosen.
 Character strings that are too long may be truncated.
 Not all window ports will adjust for all settings listed
 here.  You can safely add any of these options to your
-config file, and if the window port is capable of adjusting
+configuration file, and if the window port is capable of adjusting
 to suit your preferences, it will attempt to do so. If it
 can't it will silently ignore it.  You can find out if an
 option is supported by the window port that you are currently
@@ -4254,7 +4257,8 @@ returns to {\it NetHack\/} to help compensate for international keyboard
 issues.
 OPTIONS=subkeyvalue:171/92
 will return 92 to {\it NetHack\/}, if 171 was originally going to be returned.
-You can use multiple subkeyvalue statements in the config file if needed.
+You can use multiple subkeyvalue statements in the configuration file
+if needed.
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{video}]
@@ -4324,13 +4328,14 @@ character in the pattern, specifically:
 %.ei
 %.ed
 
-The {\it autopickup\verb+_+exception\/} rules are processed in the order 
-in which they appear in your config file, thus allowing a later rule to override
-an earlier rule.
+The {\it autopickup\verb+_+exception\/} rules are processed in the order
+in which they appear in your configuration file, thus allowing a
+later rule to override an earlier rule.
 
 %.lp ""
-Exceptions can be set with the `{\tt O}' command, but because they are not included
-in your config file, they won't be in effect if you save and then restore your game.
+Exceptions can be set with the `{\tt O}' command, but because they are not
+included in your configuration file, they won't be in effect if you save
+and then restore your game.
 {\it autopickup\verb+_+exception\/} rules are not saved with the game.
 \elist
 
@@ -4379,8 +4384,9 @@ the ``{\tt <esc>}'', ``{\tt <enter>}'', and ``{\tt <space>}'' keys.
 
 %.lp "Menu accelerator keys"
 \item[\tb{Menu accelerator keys}]
-The menu control or accelerator keys can also be rebound via OPTIONS-lines
-in the config file. You cannot bind object symbols into menu accelerators.
+The menu control or accelerator keys can also be rebound via OPTIONS lines
+in the configuration file.
+You cannot bind object symbols into menu accelerators.
 
 %.lp "Special command keys"
 \item[\tb{Special command keys}]
@@ -4550,7 +4556,7 @@ You can change the way the messages are shown in the message area, when
 the message matches a user-defined pattern.
 
 %.pg
-In general, the config file entries to configure the message types
+In general, the configuration file entries to describe the message types
 look like this:
 \begin{verbatim}
     MSGTYPE=type "pattern"
@@ -4588,7 +4594,7 @@ the user is prompted with more-prompt, and a message matching
 ``You displaced  \verb+<+something\verb+>+'' is not shown at all.
 
 %.lp
-The order of the defined MSGTYPE-lines is important; the last matching
+The order of the defined MSGTYPE lines is important; the last matching
 rule is used. Put the general case first, exceptions below them.
 
 %.pg
@@ -4599,11 +4605,12 @@ rule is used. Put the general case first, exceptions below them.
 
 %.pg
 Some platforms allow you to define colors used in menu lines when the
-line matches a user-defined pattern. At this time the tty, win32tty and
-win32gui support this.
+line matches a user-defined pattern.
+At this time the tty, curses, win32tty and
+win32gui interfaces support this.
 
 %.pg
-In general, the config file entries to configure the menu color mappings
+In general, the configuration file entries to describe the menu color mappings
 look like this:
 \begin{verbatim}
     MENUCOLOR="pattern"=color&attribute
@@ -4655,8 +4662,8 @@ specifies that any menu line with ``~blessed~'' contained
 in it will be shown in green color, lines with ``~cursed~'' will be
 shown in red, and lines with ``~cursed~'' followed by ``(being worn)''
 on the same line will be shown in red color and underlined.
-You can have multiple MENUCOLOR entries in your config file,
-and the last MENUCOLOR-line in your config file that matches
+You can have multiple MENUCOLOR entries in your configuration file,
+and the last MENUCOLOR line that matches
 a menu line will be used for the line.
 
 %.pg
@@ -4677,7 +4684,7 @@ At this time the Qt port and the win32tty and win32gui ports support the
 use of user sounds.
 
 %.pg
-The following config file entries are relevant to mapping user sounds
+The following configuration file entries are relevant to mapping user sounds
 to messages:
 
 \blist{}
@@ -4856,7 +4863,7 @@ is tested; the character's name is ignored.
 \elist
 
 The in-game options menu can help you determine the correct syntax for a
-config file.
+configuration file.
 
 The whole feature can be disable by setting option {\it statushilites} to 0.
 
@@ -4898,7 +4905,7 @@ on the rogue level.
 \elist
 
 You can also override one or more symbols using the {\it SYMBOLS\/} and
-{\it ROGUESYMBOLS\/} config file options.
+{\it ROGUESYMBOLS\/} configuration file options.
 Symbols are specified as {\it name:value\/} pairs.
 Note that {\it NetHack\/} escape-processes
 the {\it value\/} string in conventional C fashion.
@@ -5098,13 +5105,16 @@ Default                      & Symbol Name                & Description\\
 }
 
 \hyphenation{sysconf}	%no syllable breaks => don't hyphenate file name
-%.pg
-Notes:  several symbols in this table appear to be blank.
+%.lp
+Notes:
+
+%.lp "*"
+Several symbols in this table appear to be blank.
 They are the space character, except for S\verb+_+pet\verb+_+override
 and S\verb+_+player\verb+_+override which don't have any default value
 and can only be used if enabled in the ``sysconf'' file.
 
-%.pg
+%.lp "*"
 S\verb+_+rock is misleadingly named; rocks and stones use S\verb+_+gem.
 Statues and boulders are the rock being referred to, but since
 version 3.6.0, statues are displayed as the monster they depict.
@@ -5720,7 +5730,7 @@ time of release of 3.6.1 consisted of
 
 %.pg
 \medskip
-In early May 2019, another 320 bug fixes along with some enhancements and 
+In early May 2019, another 320 bug fixes along with some enhancements and
 the adopted curses window port, were released as 3.6.2.
 
 %.pg
@@ -5746,7 +5756,7 @@ again to {\it M. Drew Streib} and {\it Pasi Kallinen} for providing a
 public NetHack server at nethack.alt.org. Thanks to {\it Keith Simpson}
 and {\it Andy Thomson} for hardfought.org. Thanks to all those
 unnamed dungeoneers who invest their time and effort into annual
-{\it NetHack\/} tournaments such as {\it Junethack}, 
+{\it NetHack\/} tournaments such as {\it Junethack},
 {\it The November NetHack Tournament} and in days past,
 {\it devnull.net\/} (gone for now, but not forgotten).
 \clearpage
@@ -5755,7 +5765,7 @@ unnamed dungeoneers who invest their time and effort into annual
 \section*{Dungeoneers}
 %.pg
 \nd From time to time, some depraved individual out there in netland sends a
-particularly intriguing modification to help out with the game.  The 
+particularly intriguing modification to help out with the game.  The
 {\it NetHack Development Team} sometimes makes note of the names of the worst
 of these miscreants in this, the list of Dungeoneers:
 %.sd
@@ -5824,7 +5834,3 @@ Izchak Miller & Mike Stephenson
 %\end{flushleft}
 
 \end{document}
-
-
-
-

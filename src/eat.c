@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1561233801 2019/06/22 20:03:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.203 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1573346189 2019/11/10 00:36:29 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.205 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1378,9 +1378,9 @@ const char *mesg;
 
         if (tintxts[r].greasy) {
             /* Assume !Glib, because you can't open tins when Glib. */
-            incr_itimeout(&Glib, rnd(15));
+            make_glib(rn1(11, 5)); /* 5..15 */
             pline("Eating %s food made your %s very slippery.",
-                  tintxts[r].txt, makeplural(body_part(FINGER)));
+                  tintxts[r].txt, fingers_or_gloves(TRUE));
         }
 
     } else { /* spinach... */
@@ -1505,8 +1505,7 @@ struct obj *otmp;
  no_opener:
         pline("It is not so easy to open this tin.");
         if (Glib) {
-            pline_The("tin slips from your %s.",
-                      makeplural(body_part(FINGER)));
+            pline_The("tin slips from your %s.", fingers_or_gloves(FALSE));
             if (otmp->quan > 1L) {
                 otmp = splitobj(otmp, 1L);
             }

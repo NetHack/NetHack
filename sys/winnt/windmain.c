@@ -12,6 +12,9 @@
 #include <sys\stat.h>
 #include <errno.h>
 #include <ShlObj.h>
+#if !defined(VERSION_MAJOR)
+#include "patchlevel.h"
+#endif
 
 #if !defined(SAFEPROCS)
 #error You must #define SAFEPROCS to build windmain.c
@@ -104,7 +107,8 @@ build_known_folder_path(
     strcat(path, "\\NetHack\\");
     create_directory(path);
     if (versioned) {
-        strcat(path, "3.6\\");
+        Sprintf(eos(path), "%d.%d\\", 
+                    VERSION_MAJOR, VERSION_MINOR);
         create_directory(path);
     }
 }
@@ -160,6 +164,7 @@ set_default_prefix_locations(const char *programPath)
     static char versioned_profile_path[MAX_PATH];
     static char versioned_user_data_path[MAX_PATH];
     static char versioned_global_data_path[MAX_PATH];
+    static char versioninfo[20];
 
     strcpy(executable_path, get_executable_path());
     append_slash(executable_path);
@@ -542,6 +547,11 @@ char *argv[];
         if (argcheck(argc, argv, ARG_VERSION) == 2)
             nethack_exit(EXIT_SUCCESS);
 
+        if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
+            initoptions();
+            reveal_paths();
+            nethack_exit(EXIT_SUCCESS);
+	}
         if (argcheck(argc, argv, ARG_DEBUG) == 1) {
             argc--;
             argv++;

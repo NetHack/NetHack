@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1565574996 2019/08/12 01:56:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1573290422 2019/11/09 09:07:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -724,6 +724,9 @@ nh_timeout()
                 break;
             case DETECT_MONSTERS:
                 see_monsters();
+                break;
+            case GLIB:
+                make_glib(0); /* might update persistent inventory */
                 break;
             }
         }

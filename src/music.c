@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1544442713 2018/12/10 11:51:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.6	music.c	$NHDT-Date: 1573063606 2019/11/06 18:06:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.60 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -187,8 +187,9 @@ struct monst *bugler; /* monster that played instrument */
             mtmp->mstrategy &= ~STRAT_WAITMASK;
             if (canseemon(mtmp))
                 pline("%s is now ready for battle!", Monnam(mtmp));
-            else
-                Norep("You hear the rattle of battle gear being readied.");
+            else if (!Deaf)
+                Norep("%s the rattle of battle gear being readied.",
+                      "You hear");  /* Deaf-aware */
         } else if ((distm = ((bugler == &youmonst)
                                  ? distu(mtmp->mx, mtmp->my)
                                  : dist2(bugler->mx, bugler->my, mtmp->mx,
@@ -301,7 +302,7 @@ int force;
                     /*FALLTHRU*/
                 case ROOM:
                 case CORR: /* Try to make a pit */
-                do_pit:
+ do_pit:
                     chasm = maketrap(x, y, PIT);
                     if (!chasm)
                         break; /* no pit if portal at that location */
@@ -483,6 +484,7 @@ struct obj *instr;
             itmp.otyp -= 1;
             mundane = TRUE;
         }
+
 #ifdef MAC
     mac_speaker(&itmp, "C");
 #endif
@@ -509,18 +511,41 @@ struct obj *instr;
     if (Hallucination)
         mode |= PLAY_HALLU;
 
+    if (!rn2(2)) {
+        /*
+         * TEMPORARY?  for multiple impairments, don't always
+         * give the generic "it's far from music" message.
+         */
+        /* remove if STUNNED+CONFUSED ever gets its own message below */
+        if (mode == (PLAY_STUNNED | PLAY_CONFUSED))
+            mode = !rn2(2) ? PLAY_STUNNED : PLAY_CONFUSED;
+        /* likewise for stunned and/or confused combined with hallucination */
+        if (mode & PLAY_HALLU)
+            mode = PLAY_HALLU;
+    }
+
+    /* 3.6.3: most of these gave "You produce <blah>" and then many of
+       the instrument-specific messages below which immediately follow
+       also gave "You produce <something>."  That looked strange so we
+       now use a different verb here */
     switch (mode) {
     case PLAY_NORMAL:
         You("start playing %s.", yname(instr));
         break;
     case PLAY_STUNNED:
-        You("produce an obnoxious droning sound.");
+        if (!Deaf)
+            You("radiate an obnoxious droning sound.");
+        else
+            You_feel("a monotonous vibration.");
         break;
     case PLAY_CONFUSED:
-        You("produce a raucous noise.");
+        if (!Deaf)
+            You("generate a raucous noise.");
+        else
+            You_feel("a jarring vibration.");
         break;
     case PLAY_HALLU:
-        You("produce a kaleidoscopic display of floating butterfiles.");
+        You("disseminate a kaleidoscopic display of floating butterflies.");
         break;
     /* TODO? give some or all of these combinations their own feedback;
        hallucination ones should reference senses other than hearing... */
@@ -529,7 +554,7 @@ struct obj *instr;
     case PLAY_CONFUSED | PLAY_HALLU:
     case PLAY_STUNNED | PLAY_CONFUSED | PLAY_HALLU:
     default:
-        pline("What you produce is quite far from music...");
+        pline("What you perform is quite far from music...");
         break;
     }
 #undef PLAY_NORMAL
@@ -541,13 +566,17 @@ struct obj *instr;
     case MAGIC_FLUTE: /* Make monster fall asleep */
         consume_obj_charge(instr, TRUE);
 
-        You("produce %s music.", Hallucination ? "piped" : "soft");
+        You("%sproduce %s music.", !Deaf ? "" : "seem to ",
+            Hallucination ? "piped" : "soft");
         put_monsters_to_sleep(u.ulevel * 5);
         exercise(A_DEX, TRUE);
         break;
     case WOODEN_FLUTE: /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
-        pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
+        if (!Deaf)
+            pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
+        else
+            You_feel("%s %s.", yname(instr), do_spec ? "trill" : "toot");
         if (do_spec)
             charm_snakes(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -573,26 +602,38 @@ struct obj *instr;
         makeknown(instr->otyp);
         break;
     case TOOLED_HORN: /* Awaken or scare monsters */
-        You("produce a frightful, grave sound.");
+        if (!Deaf)
+            You("produce a frightful, grave sound.");
+        else
+            You("blow into the horn.");
         awaken_monsters(u.ulevel * 30);
         exercise(A_WIS, FALSE);
         break;
     case BUGLE: /* Awaken & attract soldiers */
-        You("extract a loud noise from %s.", yname(instr));
+        if (!Deaf)
+            You("extract a loud noise from %s.", yname(instr));
+        else
+            You("blow into the bugle.");
         awaken_soldiers(&youmonst);
         exercise(A_WIS, FALSE);
         break;
     case MAGIC_HARP: /* Charm monsters */
         consume_obj_charge(instr, TRUE);
 
-        pline("%s very attractive music.", Tobjnam(instr, "produce"));
+        if (!Deaf)
+            pline("%s very attractive music.", Tobjnam(instr, "produce"));
+        else
+            You_feel("very soothing vibrations.");
         charm_monsters((u.ulevel - 1) / 3 + 1);
         exercise(A_DEX, TRUE);
         break;
     case WOODEN_HARP: /* May calm Nymph */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
-        pline("%s %s.", Yname2(instr),
-              do_spec ? "produces a lilting melody" : "twangs");
+        if (!Deaf)
+            pline("%s %s.", Yname2(instr),
+                  do_spec ? "produces a lilting melody" : "twangs");
+        else
+            You_feel("soothing vibrations.");
         if (do_spec)
             calm_nymphs(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -613,8 +654,12 @@ struct obj *instr;
         break;
     case LEATHER_DRUM: /* Awaken monsters */
         if (!mundane) {
-            You("beat a deafening row!");
-            incr_itimeout(&HDeaf, rn1(20, 30));
+            if (!Deaf) {
+                You("beat a deafening row!");
+                incr_itimeout(&HDeaf, rn1(20, 30));
+            } else {
+                You("pound on the drum.");
+            }
             exercise(A_WIS, FALSE);
         } else
             You("%s %s.",
@@ -685,7 +730,10 @@ struct obj *instr;
                     *s = 'B';
             }
         }
-        You("extract a strange sound from %s!", the(xname(instr)));
+
+        You(!Deaf ? "extract a strange sound from %s!"
+                  : "can feel %s emitting vibrations.", the(xname(instr)));
+
 #ifdef UNIX386MUSIC
         /* if user is at the console, play through the console speaker */
         if (atconsole())
@@ -725,8 +773,8 @@ struct obj *instr;
                     for (x = u.ux - 1; x <= u.ux + 1; x++)
                         if (isok(x, y))
                             if (find_drawbridge(&x, &y)) {
-                                u.uevent.uheard_tune =
-                                    2; /* tune now fully known */
+                                /* tune now fully known */
+                                u.uevent.uheard_tune = 2;
                                 if (levl[x][y].typ == DRAWBRIDGE_DOWN)
                                     close_drawbridge(x, y);
                                 else
@@ -759,7 +807,7 @@ struct obj *instr;
                             if (buf[x] == tune[x]) {
                                 gears++;
                                 matched[x] = TRUE;
-                            } else
+                            } else {
                                 for (y = 0; y < 5; y++)
                                     if (!matched[y] && buf[x] == tune[y]
                                         && buf[y] != tune[y]) {
@@ -767,8 +815,9 @@ struct obj *instr;
                                         matched[y] = TRUE;
                                         break;
                                     }
+                            }
                         }
-                    if (tumblers)
+                    if (tumblers) {
                         if (gears)
                             You_hear("%d tumbler%s click and %d gear%s turn.",
                                      tumblers, plur(tumblers), gears,
@@ -776,7 +825,7 @@ struct obj *instr;
                         else
                             You_hear("%d tumbler%s click.", tumblers,
                                      plur(tumblers));
-                    else if (gears) {
+                    } else if (gears) {
                         You_hear("%d gear%s turn.", gears, plur(gears));
                         /* could only get `gears == 5' by playing five
                            correct notes followed by excess; otherwise,
@@ -791,7 +840,7 @@ struct obj *instr;
     } else
         return do_improvisation(instr);
 
-nevermind:
+ nevermind:
     pline1(Never_mind);
     return 0;
 }

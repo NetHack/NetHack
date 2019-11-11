@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1570235292 2019/10/05 00:28:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1573346191 2019/11/10 00:36:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -438,6 +438,17 @@ boolean talk;
         if (talk)
             You(old ? "can hear again." : "are unable to hear anything.");
     }
+}
+
+/* set or clear "slippery fingers" */
+void
+make_glib(xtime)
+int xtime;
+{
+    set_itimeout(&Glib, xtime);
+    /* may change "(being worn)" to "(being worn; slippery)" or vice versa */
+    if (uarmg)
+        update_inventory();
 }
 
 void
@@ -1268,6 +1279,15 @@ const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
                 pline("%s %s.", objphrase, glowcolor);
             iflags.last_msg = PLNMSG_OBJ_GLOWS;
             targobj->bknown = !Hallucination;
+        } else {
+            /* didn't see what happened:  forget the BUC state if that was
+               known unless the bless/curse state of the water is known;
+               without this, hero would know the new state even without
+               seeing the glow; priest[ess] will immediately relearn it */
+            if (!potion->bknown || !potion->dknown)
+                targobj->bknown = 0;
+            /* [should the bknown+dknown exception require that water
+               be discovered or at least named?] */
         }
         /* potions of water are the only shop goods whose price depends
            on their curse/bless state */
@@ -2118,8 +2138,8 @@ dodip()
             fire_damage(obj, TRUE, u.ux, u.uy);
         } else if (potion->cursed) {
             pline_The("potion spills and covers your %s with oil.",
-                      makeplural(body_part(FINGER)));
-            incr_itimeout(&Glib, d(2, 10));
+                      fingers_or_gloves(TRUE));
+            make_glib((int) (Glib & TIMEOUT) + d(2, 10));
         } else if (obj->oclass != WEAPON_CLASS && !is_weptool(obj)) {
             /* the following cases apply only to weapons */
             goto more_dips;
