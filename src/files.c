@@ -2159,8 +2159,10 @@ int prefixid;
 
     if (!bufp)
         return;
+#ifdef WIN32
     if (fqn_prefix_locked[prefixid])
         return;
+#endif
     /* Backward compatibility, ignore trailing ;n */
     if ((ptr = index(bufp, ';')) != 0)
         *ptr = '\0';
@@ -3870,9 +3872,10 @@ assure_syscf_file()
 {
     int fd;
 
+#ifdef WIN32
     /* We are checking that the sysconf exists ... lock the path */
     fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
-
+#endif
     /*
      * All we really care about is the end result - can we read the file?
      * So just check that directly.
