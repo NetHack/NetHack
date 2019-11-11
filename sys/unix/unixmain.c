@@ -118,7 +118,9 @@ char *argv[];
 #ifdef CHDIR
             chdirx((char *) 0, 0);
 #endif
+            iflags.initoptions_noterminate = TRUE;
             initoptions();
+            iflags.initoptions_noterminate = FALSE;
             reveal_paths();
             exit(EXIT_SUCCESS);
         }

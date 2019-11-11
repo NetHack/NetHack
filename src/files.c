@@ -106,6 +106,10 @@ extern void FDECL(amii_set_text_font, (char *, int));
 #ifndef WIN_CE
 #define DeleteFile unlink
 #endif
+#ifdef WIN32
+/*from windmain.c */
+extern char *FDECL(translate_path_variables, (const char *, char *));
+#endif
 #endif
 
 #ifdef MAC
@@ -299,6 +303,13 @@ const char *basenam;
 int whichprefix UNUSED_if_not_PREFIXES_IN_USE;
 int buffnum UNUSED_if_not_PREFIXES_IN_USE;
 {
+#ifdef PREFIXES_IN_USE
+    char *bufptr;
+#endif
+#ifdef WIN32
+    char tmpbuf[BUFSZ];
+#endif
+
 #ifndef PREFIXES_IN_USE
     return basenam;
 #else
@@ -310,15 +321,19 @@ int buffnum UNUSED_if_not_PREFIXES_IN_USE;
         impossible("Invalid fqn_filename_buffer specified: %d", buffnum);
         buffnum = 0;
     }
-    if (strlen(g.fqn_prefix[whichprefix]) + strlen(basenam)
-        >= FQN_MAX_FILENAME) {
-        impossible("fqname too long: %s + %s", g.fqn_prefix[whichprefix],
-                   basenam);
+    bufptr = g.fqn_prefix[whichprefix];
+#ifdef WIN32
+    if (strchr(g.fqn_prefix[whichprefix], '%')
+        || strchr(g.fqn_prefix[whichprefix], '~'))
+        bufptr = translate_path_variables(g.fqn_prefix[whichprefix], tmpbuf);
+#endif
+    if (strlen(bufptr) + strlen(basenam) >= FQN_MAX_FILENAME) {
+        impossible("fqname too long: %s + %s", bufptr, basenam);
         return basenam; /* XXX */
     }
-    Strcpy(fqn_filename_buffer[buffnum], g.fqn_prefix[whichprefix]);
+    Strcpy(fqn_filename_buffer[buffnum], bufptr);
     return strcat(fqn_filename_buffer[buffnum], basenam);
-#endif
+#endif /* !PREFIXES_IN_USE */
 }
 
 int
@@ -2390,6 +2405,10 @@ int prefixid;
 
     if (!bufp)
         return;
+#ifdef WIN32
+    if (fqn_prefix_locked[prefixid])
+        return;
+#endif
     /* Backward compatibility, ignore trailing ;n */
     if ((ptr = index(bufp, ';')) != 0)
         *ptr = '\0';
@@ -4129,6 +4148,10 @@ assure_syscf_file()
 {
     int fd;
 
+#ifdef WIN32
+    /* We are checking that the sysconf exists ... lock the path */
+    fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
+#endif
     /*
      * All we really care about is the end result - can we read the file?
      * So just check that directly.
