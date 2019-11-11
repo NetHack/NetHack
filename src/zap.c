@@ -4443,7 +4443,9 @@ short exploding_wand_typ;
         } else if (is_pool(x, y)) {
             const char *msgtxt = (!Deaf)
                                      ? "You hear hissing gas." /* Deaf-aware */
-                                     : "That seemed remarkably uneventful.";
+                                     : (type >= 0)
+                                         ? "That seemed remarkably uneventful."
+                                         : (const char *) 0;
 
             if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP */
                 if (see_it)
@@ -4457,7 +4459,8 @@ short exploding_wand_typ;
                 if (see_it)
                     msgtxt = "The water evaporates.";
             }
-            Norep("%s", msgtxt);
+            if (msgtxt)
+                Norep("%s", msgtxt);
             if (lev->typ == ROOM)
                 newsym(x, y);
         } else if (IS_FOUNTAIN(lev->typ)) {
