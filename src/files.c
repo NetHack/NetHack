@@ -151,6 +151,10 @@ static int lockptr;
 #ifndef WIN_CE
 #define DeleteFile unlink
 #endif
+#ifdef WIN32
+/*from windmain.c */
+extern char *FDECL(translate_path_variables, (const char *, char *));
+#endif
 #endif
 
 #ifdef MAC
@@ -350,6 +354,10 @@ const char *basenam;
 int whichprefix UNUSED_if_not_PREFIXES_IN_USE;
 int buffnum UNUSED_if_not_PREFIXES_IN_USE;
 {
+#ifdef WIN32
+    char tmpbuf[BUFSZ];
+
+#endif
 #ifndef PREFIXES_IN_USE
     return basenam;
 #else
@@ -367,9 +375,16 @@ int buffnum UNUSED_if_not_PREFIXES_IN_USE;
                    basenam);
         return basenam; /* XXX */
     }
+#ifdef WIN32
+    if (strchr(fqn_prefix[whichprefix], '%') ||
+        strchr(fqn_prefix[whichprefix], '~'))
+        Strcpy(fqn_filename_buffer[buffnum],
+                translate_path_variables(fqn_prefix[whichprefix], tmpbuf));
+    else
+#endif
     Strcpy(fqn_filename_buffer[buffnum], fqn_prefix[whichprefix]);
     return strcat(fqn_filename_buffer[buffnum], basenam);
-#endif
+#endif /* !PREFIXES_IN_USE */
 }
 
 int

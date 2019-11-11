@@ -24,6 +24,7 @@
 static void FDECL(process_options, (int argc, char **argv));
 static void NDECL(nhusage);
 static char *NDECL(get_executable_path);
+char *FDECL(translate_path_variables, (char *, char *));
 char *NDECL(exename);
 boolean NDECL(fakeconsole);
 void NDECL(freefakeconsole);
@@ -62,8 +63,7 @@ char default_window_sys[] = "mswin";
 static struct stat hbuf;
 #endif
 #include <sys/stat.h>
-#if defined(WIN32) || defined(MSDOS)
-#endif
+
 
 extern char orgdir[];
 
@@ -548,7 +548,9 @@ char *argv[];
             nethack_exit(EXIT_SUCCESS);
 
         if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
+            iflags.initoptions_noterminate = TRUE;
             initoptions();
+            iflags.initoptions_noterminate = FALSE;
             reveal_paths();
             nethack_exit(EXIT_SUCCESS);
 	}
@@ -852,6 +854,61 @@ get_executable_path()
 
     return path_buffer;
 }
+
+char *
+translate_path_variables(str, buf)
+const char *str;
+char *buf;
+{
+    const char *src;
+    char evar[BUFSZ], *dest, *envp, *eptr = (char *) 0;
+    boolean in_evar;
+    size_t ccount, ecount, destcount, slen = str ? strlen(str) : 0;
+
+    if (!slen || !buf) {
+        if (buf)
+            *buf = '\0';
+        return buf;
+    }
+
+    dest = buf;
+    src = str;
+    in_evar = FALSE;
+    destcount = ecount = 0;
+    for (ccount = 0; ccount < slen && destcount < (BUFSZ - 1) &&
+                     ecount < (BUFSZ - 1); ++ccount, ++src) {
+        if (*src == '%') {
+            if (in_evar) {
+                *eptr = '\0';
+                envp = nh_getenv(evar);
+                if (envp) {
+                    size_t elen = strlen(envp);
+
+                    if ((elen + destcount) < (size_t) (BUFSZ - 1)) {
+                        Strcpy(dest, envp);
+                        dest += elen;
+                        destcount += elen;
+                    }
+                }
+            } else {
+                eptr = evar;
+                ecount = 0;
+            }
+            in_evar = !in_evar;
+            continue;
+        }
+        if (in_evar) {
+            *eptr++ = *src;
+            ecount++;
+        } else {
+            *dest++ = *src;
+            destcount++;
+        }
+    }
+    *dest = '\0';
+    return buf;
+}
+
 
 /*ARGSUSED*/
 void

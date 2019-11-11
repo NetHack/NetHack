@@ -673,7 +673,7 @@ initoptions()
 
     /* ... and _must_ parse correctly. */
     if (!read_config_file(SYSCF_FILE, SET_IN_SYS)) {
-        if (config_error_done())
+        if (config_error_done() && !iflags.initoptions_noterminate)
             nh_terminate(EXIT_FAILURE);
     }
     config_error_done();
