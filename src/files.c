@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1573066357 2019/11/06 18:52:37 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.260 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1573358489 2019/11/10 04:01:29 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2252,7 +2252,7 @@ int src;
 /* constructed full path names don't need fqname() */
 #ifdef VMS
     /* no punctuation, so might be a logical name */
-    set_configfile_name(fqname("nethackini", CONFIGPREFIX, 0));
+    set_configfile_name("nethackini");
     if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
         return fp;
     set_configfile_name("sys$login:nethack.ini");
@@ -2288,7 +2288,7 @@ int src;
         set_configfile_name(tmp_config);
         if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
             return fp;
-        /* may be easier for user to edit if filename as '.txt' suffix */
+        /* may be easier for user to edit if filename has '.txt' suffix */
         Sprintf(tmp_config, "%s/%s", envp,
                 "Library/Preferences/NetHack Defaults.txt");
         set_configfile_name(tmp_config);
@@ -4242,20 +4242,21 @@ boolean wildcards;
 void
 reveal_paths(VOID_ARGS)
 {
-    int i, maxlen = 0;
     const char *fqn, *filep, *strp;
     char buf[BUFSZ];
+#if defined(UNIX) || defined(PREFIXES_IN_USE)
+    char *strp;
+#endif
 #ifdef UNIX
     char *envp, cwdbuf[PATH_MAX];
 #endif
-
 #ifdef PREFIXES_IN_USE
+    int i, maxlen = 0;
+
     raw_print("Variable playground locations:");
     for (i = 0; i < PREFIX_COUNT; i++)
         raw_printf("    [%-10s]=\"%s\"", fqn_prefix_names[i],
-                    g.fqn_prefix[i]
-                        ? g.fqn_prefix[i]
-                        : "not set");
+                   g.fqn_prefix[i] ? g.fqn_prefix[i] : "not set");
 #endif
 
     /* sysconf file */
@@ -4281,7 +4282,9 @@ reveal_paths(VOID_ARGS)
         filep = configfile;
     }
     raw_printf("    \"%s\"", filep);
-#endif /* SYSCF */
+#else /* !SYSCF */
+    raw_printf("No system configuration file.");
+#endif /* ?SYSCF */
 
     /* symbols file */
 
@@ -4332,19 +4335,45 @@ reveal_paths(VOID_ARGS)
     raw_printf("Your personal configuration file%s:", buf);
 
 #ifdef UNIX
-    envp = nh_getenv("HOME");
-    raw_printf("    \"%s%s%s\"",
-        envp ?
-            envp : "",
-        envp ?
-            "/" : "", default_configfile);
-#else /* UNIX */
+    buf[0] = '\0';
+    if ((envp = nh_getenv("HOME")) != 0) {
+        copynchars(buf, envp, (int) sizeof buf - 1 - 1);
+        Strcat(buf, "/");
+    }
+    strp = eos(buf);
+    copynchars(strp, default_configfile,
+               (int) (sizeof buf - 1 - strlen(buf)));
+#if defined(__APPLE__) /* UNIX+__APPLE__ => MacOSX aka OSX aka macOS */
+    if (envp) {
+        if (access(buf, 4) == -1) { /* 4: R_OK, -1: failure */
+            /* read access to default failed; might be protected excessively
+               but more likely it doesn't exist; try first alternate:
+               "$HOME/Library/Pref..."; 'strp' points past '/' */
+            copynchars(strp, "Library/Preferences/NetHack Defaults",
+                       (int) (sizeof buf - 1 - strlen(buf)));
+            if (access(buf, 4) == -1) {
+                /* first alternate failed, try second:
+                   ".../NetHack Defaults.txt"; no 'strp', just append */
+                copynchars(eos(buf), ".txt",
+                           (int) (sizeof buf - 1 - strlen(buf)));
+                if (access(buf, 4) == -1) {
+                    /* second alternate failed too, so revert to the
+                       original default ("$HOME/.nethackrc") for message */
+                    copynchars(strp, default_configfile,
+                               (int) (sizeof buf - 1 - strlen(buf)));
+                }
+            }
+        }
+    }
+#endif /* __APPLE__ */
+    raw_printf("    \"%s\"", buf);
+#else /* !UNIX */
     fqn = (const char *) 0;
 #ifdef PREFIXES_IN_USE
     fqn = fqname(default_configfile, CONFIGPREFIX, 2);
 #endif
     raw_printf("    \"%s\"", fqn ? fqn : default_configfile);
-#endif  /* UNIX */
+#endif  /* ?UNIX */
     raw_print("");
 }
 
