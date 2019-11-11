@@ -354,10 +354,13 @@ const char *basenam;
 int whichprefix UNUSED_if_not_PREFIXES_IN_USE;
 int buffnum UNUSED_if_not_PREFIXES_IN_USE;
 {
+#ifdef PREFIXES_IN_USE
+    char *bufptr;
+#endif
 #ifdef WIN32
     char tmpbuf[BUFSZ];
-
 #endif
+
 #ifndef PREFIXES_IN_USE
     return basenam;
 #else
@@ -369,20 +372,17 @@ int buffnum UNUSED_if_not_PREFIXES_IN_USE;
         impossible("Invalid fqn_filename_buffer specified: %d", buffnum);
         buffnum = 0;
     }
-    if (strlen(fqn_prefix[whichprefix]) + strlen(basenam)
-        >= FQN_MAX_FILENAME) {
-        impossible("fqname too long: %s + %s", fqn_prefix[whichprefix],
-                   basenam);
+    bufptr = fqn_prefix[whichprefix];
+#ifdef WIN32
+    if (strchr(fqn_prefix[whichprefix], '%')
+        || strchr(fqn_prefix[whichprefix], '~'))
+        bufptr = translate_path_variables(fqn_prefix[whichprefix], tmpbuf);
+#endif
+    if (strlen(bufptr) + strlen(basenam) >= FQN_MAX_FILENAME) {
+        impossible("fqname too long: %s + %s", bufptr, basenam);
         return basenam; /* XXX */
     }
-#ifdef WIN32
-    if (strchr(fqn_prefix[whichprefix], '%') ||
-        strchr(fqn_prefix[whichprefix], '~'))
-        Strcpy(fqn_filename_buffer[buffnum],
-                translate_path_variables(fqn_prefix[whichprefix], tmpbuf));
-    else
-#endif
-    Strcpy(fqn_filename_buffer[buffnum], fqn_prefix[whichprefix]);
+    Strcpy(fqn_filename_buffer[buffnum], bufptr);
     return strcat(fqn_filename_buffer[buffnum], basenam);
 #endif /* !PREFIXES_IN_USE */
 }
