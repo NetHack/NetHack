@@ -4242,10 +4242,10 @@ boolean wildcards;
 void
 reveal_paths(VOID_ARGS)
 {
-    const char *fqn, *filep, *strp;
+    const char *fqn, *filep;
     char buf[BUFSZ];
 #if defined(UNIX) || defined(PREFIXES_IN_USE)
-    char *strp;
+    const char *strp;
 #endif
 #ifdef UNIX
     char *envp, cwdbuf[PATH_MAX];
