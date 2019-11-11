@@ -4244,8 +4244,11 @@ reveal_paths(VOID_ARGS)
 {
     const char *fqn, *filep;
     char buf[BUFSZ];
-#if defined(UNIX) || defined(PREFIXES_IN_USE)
-    const char *strp;
+#if defined(UNIX) 
+    char *strp;
+#endif
+#if defined(PREFIXES_IN_USE)
+    const char *cstrp;
 #endif
 #ifdef UNIX
     char *envp, cwdbuf[PATH_MAX];
@@ -4263,10 +4266,10 @@ reveal_paths(VOID_ARGS)
 
 #ifdef SYSCF
 #ifdef PREFIXES_IN_USE
-    strp = fqn_prefix_names[SYSCONFPREFIX];
+    cstrp = fqn_prefix_names[SYSCONFPREFIX];
     maxlen = BUFSZ - sizeof " (in )";
-    if (strp && strlen(strp) < (size_t) maxlen)
-        Sprintf(buf, " (in %s)", strp);
+    if (cstrp && strlen(cstrp) < (size_t) maxlen)
+        Sprintf(buf, " (in %s)", cstrp);
 #else
     buf[0] = '\0';
 #endif
@@ -4292,13 +4295,13 @@ reveal_paths(VOID_ARGS)
 #ifndef UNIX
 #ifdef PREFIXES_IN_USE
 #ifdef WIN32
-    strp = fqn_prefix_names[SYSCONFPREFIX];
+    cstrp = fqn_prefix_names[SYSCONFPREFIX];
 #else
-    strp = fqn_prefix_names[HACKPREFIX];
+    cstrp = fqn_prefix_names[HACKPREFIX];
 #endif /* WIN32 */
     maxlen = BUFSZ - sizeof " (in )";
-    if (strp && strlen(strp) < (size_t) maxlen)
-        Sprintf(buf, " (in %s)", strp);
+    if (cstrp && strlen(cstrp) < (size_t) maxlen)
+        Sprintf(buf, " (in %s)", cstrp);
 #endif /* PREFIXES_IN_USE */
     raw_printf("Your game's loadable symbols file%s:", buf);
 #endif /* UNIX */
@@ -4327,10 +4330,10 @@ reveal_paths(VOID_ARGS)
 
     buf[0] = '\0';
 #ifdef PREFIXES_IN_USE
-    strp = fqn_prefix_names[CONFIGPREFIX];
+    cstrp = fqn_prefix_names[CONFIGPREFIX];
     maxlen = BUFSZ - sizeof " (in )";
-    if (strp && strlen(strp) < (size_t) maxlen)
-        Sprintf(buf, " (in %s)", strp);
+    if (cstrp && strlen(cstrp) < (size_t) maxlen)
+        Sprintf(buf, " (in %s)", cstrp);
 #endif /* PREFIXES_IN_USE */
     raw_printf("Your personal configuration file%s:", buf);
 
