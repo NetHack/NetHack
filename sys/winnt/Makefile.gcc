@@ -160,7 +160,7 @@ SKIP_NETHACKW=Y
 #==============================================================================
 
 #  The version of the game this Makefile was designed for
-NETHACK_VERSION="3.6.3"
+NETHACK_VERSION="3.7.0"
 
 # A brief version for use in macros
 NHV1=$(subst .,,$(NETHACK_VERSION))
@@ -328,7 +328,7 @@ VOBJ29 = $(O)sfstruct.o $(O)sfascii.o  $(O)sflendian.o
 #VOBJ31 = $(O)win10.o
 
 ifeq "$(ADD_LUA)" "Y"
-LUAOBJ = $(O)nhlua.c    $(O)nhlsel.c
+LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
 endif
 
 DLBOBJ = $(O)dlb.o
@@ -414,9 +414,10 @@ OPTIONS_FILE = $(DAT)\options
 # Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
 #=================================================================
 
+LUAVER   = 5.3.5
 LUASRC   = $(LUATOP)/src
-LUALIB   = $(O)lua-5.3.5.static.a
-LUADLL   = $(O)lua-5.3.5.a
+LUALIB   = $(O)lua-$(LUAVER).static.a
+LUADLL   = $(O)lua-$(LUAVER).a
 LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
 LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
@@ -730,8 +731,8 @@ SHELL=CMD.EXE
 # Since DOS doesn't allow / as path separator, and GCC doesn't allow \ as
 # path separator, we must change all pathnames when performing DOS commands.
 # This is done by blindly applying $(subst /,\, ...) on every command.
-# Where any command contain / for another reason (switch char, or echoing
-# comment lines to lev/dungeon files) a little more care is taken.
+# Where any command contain / for another reason (switch char, a little 
+# more care is taken.
 
 #
 #  The default make target (so just typing 'nmake' is useful).
@@ -749,8 +750,8 @@ install: initialchk $(O)utility.tag $(GAMEDIR)/NetHack.exe $(NETHACKW_EXE) \
 	@echo NetHack is up to date.
 	@echo Done.
 
-$(O)install.tag:  $(DAT)/data    $(DAT)/rumors    $(DAT)/dungeon \
-	       $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag $(DLB)
+$(O)install.tag:  $(DAT)/data    $(DAT)/rumors $(DAT)/oracles \
+		$(DAT)/quest.dat $(O)sp_lev.tag $(DLB)
 ifdef TRAVIS_COMPILER
 	ls -l $(SRC)
 	ls -l $(DAT)
@@ -1052,7 +1053,7 @@ nhdat$(NHV):  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	$(subst /,\,echo epitaph >>$(DAT)/dlb.lst)
 	$(subst /,\,echo bogusmon >>$(DAT)/dlb.lst)
 	$(subst /,\,echo tribute >>$(DAT)/dlb.lst)
-	dir /l /b /-p $(subst /,\,*.lua >>$(DAT)/dlb.lst)
+	dir /l /b /-p $(subst /,\,$(DAT)/*.lua >>$(DAT)/dlb.lst)
 	$(subst /,\,$(U)dlb_main CcIf $(DAT) dlb.lst $(SRC)/nhdat)
 
 #==========================================
@@ -1158,11 +1159,11 @@ lua.exe: $(O)lua.o $(LUALIB)
 luac.exe: $(O)luac.o $(LUALIB)
 	$(link) $(LFLAGSU) -o$@ $(O)luac.o $(LUALIB)
 
-lua5.3.5.dll: $(LUAOBJFILES)
+$(LUADLL): $(LUAOBJFILES)
 	$(cc) -shared -Wl,--export-all-symbols \
-		-Wl,--add-stdcall-alias -o $@ $<
+		-Wl,--add-stdcall-alias -o $@ $(LUAOBJSFILES)
 
-lua5.3.5-static.a: $(LUAOBJFILES)
+$(LUALIB): $(LUAOBJFILES)
 	ar rcs $@ $(LUAOBJFILES)
 
 $(O)lua.o: $(LUASRC)/lua.c
@@ -1201,8 +1202,10 @@ ifneq "$(W_DAT)" ""
 	if exist $(W_DAT)\oracles          del $(W_DAT)\oracles
 	if exist $(W_DAT)\rumors           del $(W_DAT)\rumors
 	if exist $(W_DAT)\quest.dat	   del $(W_DAT)\quest.dat
+ifdef OBSOLETE_DGN_COMPILER
 	if exist $(W_DAT)\dungeon          del $(W_DAT)\dungeon
 	if exist $(W_DAT)\dungeon.pdf	   del $(W_DAT)\dungeon.pdf
+endif
 	if exist $(W_DAT)\data		   del $(W_DAT)\data
 	if exist $(W_DAT)\options          del $(W_DAT)\options
 	if exist $(W_DAT)\ttyoptions	   del $(W_DAT)\ttyoptions
