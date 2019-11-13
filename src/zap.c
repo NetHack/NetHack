@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1561927499 2019/06/30 20:44:59 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.312 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1573688696 2019/11/13 23:44:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.316 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3349,13 +3349,20 @@ struct obj **pobj; /* object tossed/used, set to NULL
                 if (range > 3) /* another bounce? */
                     skiprange(range, &skiprange_start, &skiprange_end);
             } else if (mtmp && M_IN_WATER(mtmp->data)) {
-                if ((!Blind && canseemon(mtmp)) || sensemon(mtmp))
+                if (!Blind && canspotmon(mtmp))
                     pline("%s %s over %s.", Yname2(obj), otense(obj, "pass"),
                           mon_nam(mtmp));
+                mtmp = (struct monst *) 0;
             }
         }
 
-        if (mtmp && !(in_skip && M_IN_WATER(mtmp->data))) {
+        /* if mtmp is a shade and missile passes harmlessly through it,
+           give message and skip it in order to keep going */
+        if (mtmp && (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
+            && shade_miss(&youmonst, mtmp, obj, TRUE, TRUE))
+            mtmp = (struct monst *) 0;
+
+        if (mtmp) {
             notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
             if (weapon == FLASHED_LIGHT) {
                 /* FLASHED_LIGHT hitting invisible monster should

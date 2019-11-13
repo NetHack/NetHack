@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1567805813 2019/09/06 21:36:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.212 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1573688694 2019/11/13 23:44:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -696,10 +696,8 @@ int dieroll;
     long silverhit = 0L;
     int wtype;
     struct obj *monwep;
-    char unconventional[BUFSZ]; /* substituted for word "attack" in msg */
     char saved_oname[BUFSZ];
 
-    unconventional[0] = '\0';
     saved_oname[0] = '\0';
 
     wakeup(mon, TRUE);
@@ -872,7 +870,6 @@ int dieroll;
         } else {
             if (mdat == &mons[PM_SHADE] && !shade_aware(obj)) {
                 tmp = 0;
-                Strcpy(unconventional, cxname(obj));
             } else {
                 switch (obj->otyp) {
                 case BOULDER:         /* 1d20 */
@@ -1143,21 +1140,14 @@ int dieroll;
             poiskilled = TRUE;
     }
     if (tmp < 1) {
+        boolean mon_is_shade = (mon->data == &mons[PM_SHADE]);
+
         /* make sure that negative damage adjustment can't result
            in inadvertently boosting the victim's hit points */
-        tmp = 0;
-        if (mdat == &mons[PM_SHADE]) {
-            if (!hittxt) {
-                const char *what = *unconventional ? unconventional : "attack";
-
-                Your("%s %s harmlessly through %s.", what,
-                     vtense(what, "pass"), mon_nam(mon));
-                hittxt = TRUE;
-            }
-        } else {
-            if (get_dmg_bonus)
-                tmp = 1;
-        }
+        tmp = (get_dmg_bonus && !mon_is_shade) ? 1 : 0;
+        if (mon_is_shade && !hittxt
+            && thrown != HMON_THROWN && thrown != HMON_KICKED)
+            hittxt = shade_miss(&youmonst, mon, obj, FALSE, TRUE);
     }
 
     if (jousting) {
@@ -1365,6 +1355,44 @@ struct obj *obj;
         || objects[obj->otyp].oc_material == SILVER)
         return TRUE;
     return FALSE;
+}
+
+/* used for hero vs monster and monster vs monster; also handles
+   monster vs hero but that won't happen because hero can't be a shade */
+boolean
+shade_miss(magr, mdef, obj, thrown, verbose)
+struct monst *magr, *mdef;
+struct obj *obj;
+boolean thrown, verbose;
+{
+    const char *what, *whose, *target;
+    boolean youagr = (magr == &youmonst), youdef = (mdef == &youmonst);
+
+    /* we're using dmgval() for zero/not-zero, not for actual damage amount */
+    if (mdef->data != &mons[PM_SHADE] || (obj && dmgval(obj, mdef)))
+        return FALSE;
+
+    if (verbose
+        && ((youdef || cansee(mdef->mx, mdef->my) || sensemon(mdef))
+            || (magr == &youmonst && distu(mdef->mx, mdef->my) <= 2))) {
+        static const char harmless[] = " harmlessly through ";
+
+        what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
+        target = youdef ? "you" : mon_nam(mdef);
+        if (!thrown) {
+            whose = youagr ? "Your" : s_suffix(Monnam(magr));
+            pline("%s %s %s%s%s.", whose, what,
+                  vtense(what, "pass"), harmless, mon_nam(mdef));
+        } else {
+            pline("%s %s%s%s.", The(what), /* note: not pline_The() */
+                  vtense(what, "pass"), harmless, mon_nam(mdef));
+        }
+        if (!youdef && !canspotmon(mdef))
+            map_invisible(mdef->mx, mdef->my);
+    }
+    if (!youdef)
+        mdef->msleeping = 0;
+    return TRUE;
 }
 
 /* check whether slippery clothing protects from hug or wrap attack */
