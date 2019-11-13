@@ -1,4 +1,4 @@
-$ ! vms/vmsbuild.com -- compile and link NetHack 3.6.*			[pr]
+$ ! vms/vmsbuild.com -- compile and link NetHack 3.7.*			[pr]
 $	version_number = "3.7.0"
 $ ! $NHDT-Date: 1557701799 2019/05/12 22:56:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $
 $ ! Copyright (c) 2018 by Robert Patrick Rankin
@@ -34,7 +34,8 @@ $	gnuc_ = "GCC"
 $     if f$type(gcc).eqs."STRING" then  gnuc_ = gcc
 $	gnulib = "gnu_cc:[000000]gcclib/Library"    !(not used w/ vaxc)
 $ ! common CC options (/obj=file doesn't work for GCC 1.36, use rename instead)
-$	c_c_  = "/INCLUDE=([-.INCLUDE],[-.-.LUA535.SRC])/DEFINE=(""LUA_USE_C89"", ""LUA_32BITS"")"
+$ !	c_c_  = "/INCLUDE=([-.INCLUDE],[-.-.LUA535.SRC])/DEFINE=(""LUA_USE_C89"",""LUA_32BITS"")"
+$	c_c_  = "/INCLUDE=([-.INCLUDE],[-.-.LUA535.SRC])/DEFINE=(""LUA_USE_C89"")"
 $	veryold_vms = f$extract(1,1,f$getsyi("VERSION")).eqs."4" -
 		.and. f$extract(3,3,f$getsyi("VERSION")).lts."6"
 $	if veryold_vms then  c_c_ = c_c_ + "/DEFINE=(""VERYOLD_VMS"")"
@@ -303,6 +304,28 @@ $ c_list = "uhitm,vault,vision,vis_tab,weapon,were,wield,windows" -
 	+ ",wizard,worm,worn,write,zap"
 $ gosub compile_list
 $!
+$! Files added in 3.7
+$!
+$ c_list = "sfbase,sfdata,sfstruct,sflendian,sfascii,nhlua,nhlsel"
+$ gosub compile_list
+$!
+$! 3.7 runtime LUA level parser/loader
+$!
+$ c_list = "[-.-.LUA535.SRC]lapi,[-.-.LUA535.SRC]lauxlib,[-.-.LUA535.SRC]lbaselib" -
+	+ ",[-.-.LUA535.SRC]lbitlib,[-.-.LUA535.SRC]lcode,[-.-.LUA535.SRC]lcorolib" -
+	+ ",[-.-.LUA535.SRC]lctype,[-.-.LUA535.SRC]ldblib,[-.-.LUA535.SRC]ldebug" -
+	+ ",[-.-.LUA535.SRC]ldo,[-.-.LUA535.SRC]ldump,[-.-.LUA535.SRC]lfunc" -
+	+ ",[-.-.LUA535.SRC]lgc,[-.-.LUA535.SRC]linit,[-.-.LUA535.SRC]liolib" -
+	+ ",[-.-.LUA535.SRC]llex"
+$ gosub compile_list
+$ c_list = "[-.-.LUA535.SRC]lmathlib,[-.-.LUA535.SRC]lmem,[-.-.LUA535.SRC]loadlib" -
+	+ ",[-.-.LUA535.SRC]lobject,[-.-.LUA535.SRC]lopcodes,[-.-.LUA535.SRC]loslib" -
+	+ ",[-.-.LUA535.SRC]lparser,[-.-.LUA535.SRC]lstate,[-.-.LUA535.SRC]lstring" -
+	+ ",[-.-.LUA535.SRC]lstrlib,[-.-.LUA535.SRC]ltable,[-.-.LUA535.SRC]ltablib" -
+	+ ",[-.-.LUA535.SRC]ltm,[-.-.LUA535.SRC]lundump,[-.-.LUA535.SRC]lutf8lib" -
+	+ ",[-.-.LUA535.SRC]lvm,[-.-.LUA535.SRC]lzio"
+$ gosub compile_list
+$!
 $link:
 $ milestone "<linking...>"
 $ link/Exe=nethack.exe nethack.opt/Options,ident.opt/Options,crtl.opt/Options
@@ -313,19 +336,19 @@ $!
 $! build special level and dungeon compilers
 $!
 $ set default [-.util]
-$ c_list = "#panic,#lev_main,#lev_yacc,#dgn_main,#dgn_yacc"
-$     if c_opt.eq.o_SPCL then  c_list = "[-.sys.vms]vmsfiles," + c_list
-$ gosub compile_list
-$ c_list = "#lev_lex,#dgn_lex"
-$ copy [-.sys.vms]lev_lex.h stdio.*/Prot=(s:rwd,o:rwd)
-$ gosub compile_list
-$ rename stdio.h lev_lex.*
-$ link/exe=lev_comp.exe lev_main.obj,lev_yacc.obj,lev_lex.obj,-
-	panic.obj,'nethacklib'/Lib,[-.src]ident.opt/Opt,[-.src]crtl.opt/Opt
-$ milestone "lev_comp"
-$ link/exe=dgn_comp.exe dgn_main.obj,dgn_yacc.obj,dgn_lex.obj,-
-	panic.obj,'nethacklib'/Lib,[-.src]ident.opt/Opt,[-.src]crtl.opt/Opt
-$ milestone "dgn_comp"
+$! c_list = "#panic,#lev_main,#lev_yacc,#dgn_main,#dgn_yacc"
+$!     if c_opt.eq.o_SPCL then  c_list = "[-.sys.vms]vmsfiles," + c_list
+$! gosub compile_list
+$! c_list = "#lev_lex,#dgn_lex"
+$! copy [-.sys.vms]lev_lex.h stdio.*/Prot=(s:rwd,o:rwd)
+$! gosub compile_list
+$! rename stdio.h lev_lex.*
+$! link/exe=lev_comp.exe lev_main.obj,lev_yacc.obj,lev_lex.obj,-
+$!	panic.obj,'nethacklib'/Lib,[-.src]ident.opt/Opt,[-.src]crtl.opt/Opt
+$! milestone "lev_comp"
+$! link/exe=dgn_comp.exe dgn_main.obj,dgn_yacc.obj,dgn_lex.obj,-
+$!	panic.obj,'nethacklib'/Lib,[-.src]ident.opt/Opt,[-.src]crtl.opt/Opt
+$! milestone "dgn_comp"
 $!
 $ c_list = "#dlb_main,#recover"
 $ gosub compile_list
