@@ -172,7 +172,13 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
  * The remainder of the file should not need to be changed.
  */
 
-/* data librarian defs */
+/* This used to be force-defined for VMS in topten.c, but with
+ * the global variable consolidation into g in 3.7, it has to be 
+ * defined here so that decl.h includes the field in g.
+ */
+#define UPDATE_RECORD_IN_PLACE
+
+/* data librarian defs */                              
 #ifdef DLB
 #define DLBFILE "nh-data.dlb"
 /*

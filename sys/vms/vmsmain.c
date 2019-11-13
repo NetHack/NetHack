@@ -32,7 +32,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    register int fd;
+    NHFILE *nhfp;
 #ifdef CHDIR
     register char *dir;
 #endif
@@ -49,7 +49,7 @@ char *argv[];
     atexit(byebye);
     g.hname = argv[0];
     g.hname = vms_basename(g.hname); /* name used in 'usage' type messages */
-    hackpid = getpid();
+    g.hackpid = getpid();
     (void) umask(0);
 
     choose_windows(DEFAULT_WINDOW_SYS);
@@ -67,8 +67,25 @@ char *argv[];
         dir = nh_getenv("HACKDIR");
 #endif
     if (argc > 1) {
+        if (argcheck(argc, argv, ARG_VERSION) == 2)
+            exit(EXIT_SUCCESS);
+
+        if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
 #ifdef CHDIR
-        if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
+            chdirx((char *) 0, 0);
+#endif
+            iflags.initoptions_noterminate = TRUE;
+            initoptions();
+            iflags.initoptions_noterminate = FALSE;
+            reveal_paths();
+            exit(EXIT_SUCCESS);
+        }
+        if (argcheck(argc, argv, ARG_DEBUG) == 1) {
+            argc--;
+            argv++;
+        }
+#ifdef CHDIR
+        if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
              */
@@ -175,7 +192,7 @@ char *argv[];
  * We'll return here if new game player_selection() renames the hero.
  */
 attempt_restore:
-    if ((fd = restore_saved_game()) >= 0) {
+    if ((nhfp = restore_saved_game()) != 0) {
         const char *fq_save = fqname(g.SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
@@ -188,7 +205,7 @@ attempt_restore:
 #endif
         pline("Restoring save file...");
         mark_synch(); /* flush output */
-        if (dorecover(fd)) {
+        if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             wd_message();
             if (discover || wizard) {

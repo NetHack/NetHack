@@ -1036,7 +1036,7 @@ boolean regularize_it;
     Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
     regoffset = 7;
     indicator_spot = 1;
-    postappend = ";1");
+    postappend = ";1";
 #endif
 #if defined(WIN32)
     if (regularize_it) {

@@ -11,11 +11,13 @@
 #include "patchlevel.h"
 #endif
 
-#ifdef VMS
-/* We don't want to rewrite the whole file, because that entails
-   creating a new version which requires that the old one be deletable. */
-#define UPDATE_RECORD_IN_PLACE
-#endif
+/* If UPDATE_RECORD_IN_PLACE is defined, we don't want to rewrite the 
+ * whole file, because that entails creating a new version which 
+ * requires that the old one be deletable. UPDATE_RECORD_IN_PLACE
+ * had to be defined more centrally in 3.7 to ensure that the 
+ * final_fpos field gets included in struct instance_globals aka 'g'.
+*/
+
 
 /*
  * Updating in place can leave junk at the end of the file in some
