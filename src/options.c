@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1572303730 2019/10/28 23:02:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.383 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1573505739 2019/11/11 20:55:39 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.386 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5367,44 +5367,6 @@ boolean setinitial, setfromfile;
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
             any = cg.zeroany;
-#ifdef CURSES_GRAPHICS /* this ought to be handled within curses... */
-            /*
-             * Symbol sets are formatted in two columns, "name description",
-             * on selectable lines.  curses bases menu width on the length
-             * of non-selectable lines (main header, separators if present,
-             * with trailing spaces ignored) and defaults to half the map.
-             * Without something like this separator (shown after the menu
-             * title and a blank line which follows that) to force a wider
-             * menu, entries with long descriptions wrap.  That would be
-             * ok if wrapping operated on the same two columns, but the
-             * menu doesn't know anything about those and the description
-             * is wrapping into the next line's name column, making long
-             * descriptions--and menus containing them--hard to read.
-             */
-            if (WINDOWPORT("curses")) {
-                char tmp1[BUFSZ], tmp2[BUFSZ], bigbuf[BUFSZ + 1 + BUFSZ];
-
-                /* 4: room for space+letter+paren+space, fake selector;
-                   2: added to 'biggest' when constructing 'fmtstr';
-                   1: space between symset name+2 and symset description */
-                if (4 + biggest + 2 + 1 > (int) sizeof tmp1 - 1)
-                    biggest = (int) sizeof tmp1 - 1 - (4 + 2 + 1);
-                (void) memset((genericptr_t) tmp1, '-', biggest);
-                tmp1[biggest] = '\0';
-                if (big_desc > (int) sizeof tmp2 - 1)
-                    big_desc = (int) sizeof tmp2 - 1;
-                (void) memset((genericptr_t) tmp2, '-', big_desc);
-                tmp2[big_desc] = '\0';
-                Sprintf(bigbuf, "%4s", "");
-                Sprintf(eos(bigbuf), fmtstr, tmp1, tmp2);
-                bigbuf[BUFSZ - 1] = '\0';
-                any.a_int = 0;
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                         bigbuf, MENU_UNSELECTED);
-            }
-#else
-            nhUse(big_desc);
-#endif
             any.a_int = 1; /* -1 + 2 [see 'if (sl->name) {' below]*/
             if (!symset_name)
                 defindx = any.a_int;

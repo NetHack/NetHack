@@ -24,7 +24,7 @@
 static void FDECL(process_options, (int argc, char **argv));
 static void NDECL(nhusage);
 static char *NDECL(get_executable_path);
-char *FDECL(translate_path_variables, (char *, char *));
+char *FDECL(translate_path_variables, (const char *, char *));
 char *NDECL(exename);
 boolean NDECL(fakeconsole);
 void NDECL(freefakeconsole);
