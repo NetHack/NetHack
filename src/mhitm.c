@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1573688692 2019/11/13 23:44:52 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1573773926 2019/11/14 23:25:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -411,9 +411,9 @@ register struct monst *magr, *mdef;
                      || mdef->data == &mons[PM_BROWN_PUDDING])
                     && (otmp && (objects[otmp->otyp].oc_material == IRON
                                  || objects[otmp->otyp].oc_material == METAL))
-                    && mdef->mhp > 1
-                    && !mdef->mcan) {
+                    && mdef->mhp > 1 && !mdef->mcan) {
                     struct monst *mclone;
+
                     if ((mclone = clone_mon(mdef, 0, 0)) != 0) {
                         if (vis && canspotmon(mdef)) {
                             char buf[BUFSZ];
@@ -455,6 +455,13 @@ register struct monst *magr, *mdef;
             break;
 
         case AT_ENGL:
+            if (mdef->data == &mons[PM_SHADE]) { /* no silver teeth... */
+                if (vis)
+                    pline("%s attempt to engulf %s is futile.",
+                          s_suffix(Monnam(magr)), mon_nam(mdef));
+                strike = 0;
+                break;
+            }
             if (u.usteed && mdef == u.usteed) {
                 strike = 0;
                 break;
@@ -572,7 +579,9 @@ struct attack *mattk;
                     mdef->mcansee ? "smiles at" : "talks to");
             pline("%s %s %s.", buf, mon_nam(mdef),
                   compat == 2 ? "engagingly" : "seductively");
-        } else if (!shade_miss(magr, mdef, otmp, FALSE, TRUE)) {
+        } else if (shade_miss(magr, mdef, otmp, FALSE, TRUE)) {
+            return MM_MISS; /* bypass mdamagem() */
+        } else {
             char magr_name[BUFSZ];
 
             Strcpy(magr_name, Monnam(magr));
@@ -851,11 +860,12 @@ mdamagem(magr, mdef, mattk)
 register struct monst *magr, *mdef;
 register struct attack *mattk;
 {
-    struct obj *obj;
+    struct obj *obj, dmgwep;
     char buf[BUFSZ];
     struct permonst *pa = magr->data, *pd = mdef->data;
-    int armpro, num, tmp = d((int) mattk->damn, (int) mattk->damd),
-                     res = MM_MISS;
+    int armpro, num,
+        tmp = d((int) mattk->damn, (int) mattk->damd),
+        res = MM_MISS;
     boolean cancelled;
 
     if ((touch_petrifies(pd) /* or flesh_petrifies() */
@@ -958,16 +968,19 @@ register struct attack *mattk;
     case AD_HEAL:
     case AD_PHYS:
  physical:
-        if (mattk->aatyp == AT_KICK && thick_skinned(pd)) {
+        /* this shade check is necessary in case any attacks which
+           dish out physical damage bypass hitmm() to get here */
+        if ((mattk->aatyp == AT_WEAP || mattk->aatyp == AT_CLAW) && otmp)
+            dmgwep = *otmp;
+        else
+            dmgwep = zeroobj;
+
+        if (shade_miss(magr, mdef, &dmgwep, FALSE, TRUE)) {
+            tmp = 0;
+        } else if (mattk->aatyp == AT_KICK && thick_skinned(pd)) {
             tmp = 0;
         } else if (mattk->aatyp == AT_WEAP
                    || (mattk->aatyp == AT_CLAW && otmp)) {
-            if (mdef->data == &mons[PM_SHADE]
-                && !(otmp && objects[otmp->otyp].oc_material == SILVER)) {
-                /* "passes harmlessly through" given by hitmm() */
-                tmp = 0;
-                break;
-            }
             if (otmp) {
                 struct obj *marmg;
 
