@@ -24,6 +24,15 @@ extern char erase_char, kill_char;
 
 extern long curs_mesg_suppress_turn; /* from cursmesg.c */
 
+/* stubs for curses_procs{} */
+#ifdef POSITIONBAR
+static void dummy_update_position_bar(char *);
+#endif
+#ifdef CHANGE_COLOR
+static void dummy_change_color(int, long, int);
+static char *dummy_get_color_string(VOID_ARGS);
+#endif
+
 /* Public functions for curses NetHack interface */
 
 /* Interface definition, for windows.c */
@@ -69,7 +78,7 @@ struct window_procs curses_procs = {
     curses_cliparound,
 #endif
 #ifdef POSITIONBAR
-    donull,
+    dummy_update_position_bar,
 #endif
     curses_print_glyph,
     curses_raw_print,
@@ -83,9 +92,13 @@ struct window_procs curses_procs = {
     curses_get_ext_cmd,
     curses_number_pad,
     curses_delay_output,
-#ifdef CHANGE_COLOR             /* only a Mac option currently */
-    donull,
-    donull,
+#ifdef CHANGE_COLOR
+    dummy_change_color,
+#ifdef MAC /* old OS 9, not OSX */
+    (void (*)(int)) 0,
+    (short (*)(winid, char *)) 0,
+#endif
+    dummy_get_color_string,
 #endif
     curses_start_screen,
     curses_end_screen,
@@ -944,5 +957,29 @@ curs_reset_windows(boolean redo_main, boolean redo_status)
         doredraw();
     }
 }
+
+/* stubs for curses_procs{} */
+
+#ifdef POSITIONBAR
+static void
+dummy_update_position_bar(char *arg UNUSED)
+{
+    return;
+}
+#endif
+
+#ifdef CHANGE_COLOR
+static void
+dummy_change_color(int a1 UNUSED, long a2 UNUSED, int a3 UNUSED)
+{
+    return;
+}
+
+static char *
+dummy_get_color_string(VOID_ARGS)
+{
+    return (char *) 0;
+}
+#endif
 
 /*cursmain.c*/
