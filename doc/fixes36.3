@@ -355,6 +355,11 @@ curses+EDIT_GETLIN: the preceding fix handled an answer which spanned more
 	than one line but didn't remove the answer properly if the prompt
 	portion of prompt+answer spanned more than one line
 msdos:  code fixes to allow a build with curses and PDCurses
+msdos:  added Makefile1.cross (host portion) and Makefile2.cross (target 
+	platform portion) to assist in moving this port toward a cross-compiled
+	build hosted on linux/OSX/Windows with recent C dialect support; that
+	will also pave the way for CI automation and testing of the msdos port
+	build in future should the port remain on the radar
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new
