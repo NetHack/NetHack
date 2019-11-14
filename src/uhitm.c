@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1573688694 2019/11/13 23:44:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.214 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1573764936 2019/11/14 20:55:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1375,17 +1375,17 @@ boolean thrown, verbose;
     if (verbose
         && ((youdef || cansee(mdef->mx, mdef->my) || sensemon(mdef))
             || (magr == &youmonst && distu(mdef->mx, mdef->my) <= 2))) {
-        static const char harmless[] = " harmlessly through ";
+        static const char harmlessly_thru[] = " harmlessly through ";
 
         what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
         target = youdef ? "you" : mon_nam(mdef);
         if (!thrown) {
             whose = youagr ? "Your" : s_suffix(Monnam(magr));
             pline("%s %s %s%s%s.", whose, what,
-                  vtense(what, "pass"), harmless, mon_nam(mdef));
+                  vtense(what, "pass"), harmlessly_thru, target);
         } else {
             pline("%s %s%s%s.", The(what), /* note: not pline_The() */
-                  vtense(what, "pass"), harmless, mon_nam(mdef));
+                  vtense(what, "pass"), harmlessly_thru, target);
         }
         if (!youdef && !canspotmon(mdef))
             map_invisible(mdef->mx, mdef->my);
