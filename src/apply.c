@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1573346182 2019/11/10 00:36:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.283 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1573778560 2019/11/15 00:42:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.284 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -443,7 +443,8 @@ register struct obj *obj;
     return res;
 }
 
-static const char whistle_str[] = "produce a %s whistling sound.";
+static const char whistle_str[] = "produce a %s whistling sound.",
+                  alt_whistle_str[] = "produce a %s, sharp vibration.";
 
 static void
 use_whistle(obj)
@@ -455,8 +456,7 @@ struct obj *obj;
         You("blow bubbles through %s.", yname(obj));
     } else {
         if (Deaf)
-            You_feel("rushing air tickle your %s.",
-                        body_part(NOSE));
+            You_feel("rushing air tickle your %s.", body_part(NOSE));
         else
             You(whistle_str, obj->cursed ? "shrill" : "high");
         wake_nearby();
@@ -474,16 +474,17 @@ struct obj *obj;
     if (!can_blow(&g.youmonst)) {
         You("are incapable of using the whistle.");
     } else if (obj->cursed && !rn2(2)) {
-        You("produce a %shigh-pitched humming noise.",
-            Underwater ? "very " : "");
+        You("produce a %shigh-%s.", Underwater ? "very " : "",
+            Deaf ? "frequency vibration" : "pitched humming noise");
         wake_nearby();
     } else {
         int pet_cnt = 0, omx, omy;
 
         /* it's magic!  it works underwater too (at a higher pitch) */
-        You(whistle_str,
-            Hallucination ? "normal" : Underwater ? "strange, high-pitched"
-                                                  : "strange");
+        You(Deaf ? alt_whistle_str : whistle_str,
+            Hallucination ? "normal"
+            : (Underwater && !Deaf) ? "strange, high-pitched"
+              : "strange");
         for (mtmp = fmon; mtmp; mtmp = nextmon) {
             nextmon = mtmp->nmon; /* trap might kill mon */
             if (DEADMONSTER(mtmp))
