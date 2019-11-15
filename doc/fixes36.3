@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.177 $ $NHDT-Date: 1573778559 2019/11/15 00:42:39 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.178 $ $NHDT-Date: 1573848574 2019/11/15 20:09:34 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -225,6 +225,13 @@ putting on gloves while having slippery fingers transfered slipperiness to
 when a monster reads a scroll of fire to cure sliming, don't access that
 	scroll's memory after it has been used up (bcsign)
 monster vs monster attacks didn't handle shades or silver weapon feedback
+successful alchemy would show new potion's description (color) even when blind
+dipping some types of objects into oil would yield "<object> gleams with an
+	oily sheen" even when blind
+dipping into an undiscovered potion would offer chance to give a name to the
+	potion even when its description wasn't known (picked up while blind)
+dipping lichen corpse into acid when not blind and acid was undicovered would
+	not offer a chance to give a name to the potion after lichen feedback
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
