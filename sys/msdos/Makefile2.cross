@@ -1,6 +1,6 @@
-# NetHack 3.6	Makefile2.cross	$NHDT-Date:$  $NHDT-Branch:$:$NHDT-Revision:$
+# NetHack 3.6	Makefile2.cross	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
 #       Cross-compile msdos version of NetHack using a 
-#       linux-hosted djgpp cross compiler.
+#       linux-hosted djgpp cross-compiler.
 #
 #       Makefile1.cross is for the host-side obj files and utilities that
 #       will run on the host platform only.
@@ -8,7 +8,7 @@
 #       Makefile2.cross (this file) is the the target platform obj files 
 #       and utilities.
 #
-#   Makefile2 utilizes the djgpp cross compiler from Andrew Wu:
+#   Makefile2 utilizes the djgpp cross-compiler from Andrew Wu:
 #       https://github.com/andrewwutw/build-djgpp
 #
 #   Currently, in NetHack 3.6, the cross-compile for msdos cannot be
