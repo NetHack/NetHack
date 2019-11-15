@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1562800504 2019/07/10 23:15:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1573688693 2019/11/13 23:44:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1789,8 +1789,7 @@ struct attack *mattk;
 
         if (!engulf_target(mtmp, &g.youmonst))
             return 0;
-        if ((t && is_pit(t->ttyp))
-            && sobj_at(BOULDER, u.ux, u.uy))
+        if ((t && is_pit(t->ttyp)) && sobj_at(BOULDER, u.ux, u.uy))
             return 0;
 
         if (Punished)
@@ -1873,6 +1872,14 @@ struct attack *mattk;
 
     if (mtmp != u.ustuck)
         return 0;
+    if (Punished) {
+        /* ball&chain are in limbo while swallowed; update their internal
+           location to be at swallower's spot */
+        if (uchain->where == OBJ_FREE)
+            uchain->ox = mtmp->mx, uchain->oy = mtmp->my;
+        if (uball->where == OBJ_FREE)
+            uball->ox = mtmp->mx, uball->oy = mtmp->my;
+    }
     if (u.uswldtim > 0)
         u.uswldtim -= 1;
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1573346164 2019/11/10 00:36:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.738 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1573688684 2019/11/13 23:44:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.739 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2589,6 +2589,8 @@ E int FDECL(find_roll_to_hit, (struct monst *, UCHAR_P, struct obj *,
                                int *, int *));
 E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *, struct obj *, int, int));
+E boolean FDECL(shade_miss, (struct monst *, struct monst *, struct obj *,
+                             BOOLEAN_P, BOOLEAN_P));
 E int FDECL(damageum, (struct monst *, struct attack *, int));
 E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
 E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,
