@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile2.cross	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.6	Makefile2.cross
 #       Cross-compile msdos version of NetHack using a 
 #       linux-hosted djgpp cross-compiler.
 #
