@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  macosx10.14 $NHDT-Date: 1566346605 2019/08/21 00:16:45 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.59 $
+# NetHack 3.6  macosx10.14 $NHDT-Date: 1573841535 2019/11/15 18:12:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.60 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -229,12 +229,12 @@ ifdef MAKEFILE_TOP
 # Notes:
 # 1) The Apple developer utilities must be installed in the default location.
 # 2) Do a normal build before trying to package the game.
-# 3) This matches the 3.4.3 Term package, but there are some things that should
-#    be changed.
+# 3) This matches the 3.4.3 Term package, but there are some things that
+#    should be changed.
 #
-# Packages that are being distributed must be signed by a Developer ID Installer
-# certificate.  Set DEVELOPER_CERT to the name of the certificate if you wish
-# for your package to be signed for distribution.
+# Packages that are being distributed must be signed by a Developer ID
+# Installer certificate.  Set DEVELOPER_CERT to the name of the certificate
+# if you wish for your package to be signed for distribution.
 #
 # If building a package for signing, you must use sudo approriately.
 # the binaries and package using sudo but you DO NOT use sudo to sign the
@@ -242,7 +242,7 @@ ifdef MAKEFILE_TOP
 #
 #   sudo make all
 #   sudo make build_tty_pkg
-#   sudo sign_tty_pkg
+#   make sign_tty_pkg
 #
 
 
