@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.168 $ $NHDT-Date: 1573290414 2019/11/09 09:06:54 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.176 $ $NHDT-Date: 1573777025 2019/11/15 00:17:05 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -115,7 +115,8 @@ for multi-shot shooting by monsters, a typo checked hero's weapon for
 when a boulder was teleported, if it landed in a pit or trap door or hole its
 	former location wasn't updated to show that it wasn't there anymore
 	(noticed in Sokoban but not limited to there)
-Terry Pratchett tribute, fix typo in passage #4 for Mort ("the" -> "they")
+Terry Pratchett tribute, fix typo in passage #4 for Mort ("the" -> "they");
+	also passage #7 for Soul Music ("genious" -> "genius")
 fix typo in end_of_input() present since 3.6.0 that would prevent compilation
 	for NOSAVEONHANGUP+INSURANCE configuration
 when a status condition becomes fatal, keep it listed as an active condition
@@ -221,6 +222,9 @@ playing music while hallucinating:  message misspelled "butterflies"
 putting on gloves while having slippery fingers transfered slipperiness to
 	those gloves; taking off slippery gloves directly was disallowed but
 	losing them in other ways transfered slipperiness to bare fingers
+when a monster reads a scroll of fire to cure sliming, don't access that
+	scroll's memory after it has been used up (bcsign)
+monster vs monster attacks didn't handle shades or silver weapon feedback
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -249,6 +253,7 @@ in symset:curses, symbol S_tree was accidentally set to horizontal line where
 percentage highlighting for Xp broke up/down/changed highlighting for it;
 	it was flagged as having gone up every time the percentage changed
 deaf change to zap_over_floor needed to be restricted to player actions only
+monster vs shade attack inflicted damage despite "passes harmlessly through"
 curses: sometimes the message window would show a blank line after a prompt
 curses: the change to show map in columns 1..79 instead of 2..80 made the
 	highlight for '@' show up in the wrong place if clipped map had been
@@ -328,6 +333,7 @@ curses: enable the 'use_inverse' boolean option (via wincap WC_INVERSE flag)
 	to override default of False (for tty's benefit)
 curses: force 'O' command's menus for 'symset' and 'roguesymset' options to
 	be wider so that fewer entries with set descriptions will wrap
+curses: stop restricting menu width to half the display width
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with
@@ -351,6 +357,13 @@ curses+EDIT_GETLIN: the preceding fix handled an answer which spanned more
 	than one line but didn't remove the answer properly if the prompt
 	portion of prompt+answer spanned more than one line
 msdos:  code fixes to allow a build with curses and PDCurses
+msdos:  added Makefile1.cross (host portion) and Makefile2.cross (target 
+	platform portion) to assist in moving this port toward a cross-compiled
+	build hosted on linux/OSX/Windows with recent C dialect support; that
+	will also pave the way for CI automation and testing of the msdos port
+	build in future should the port remain on the radar; currently only
+	useful for testing the msdos port compile as it cannot yet build a
+	complete game
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new

@@ -56,7 +56,7 @@ const
 #endif
 
 #if defined(MSDOS) || defined(OS2) || defined(TOS) || defined(WIN32)
-#ifndef GNUDOS
+#ifndef __DJGPP__
 #include <sys\stat.h>
 #else
 #include <sys/stat.h>
