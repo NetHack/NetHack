@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.172 $ $NHDT-Date: 1573688684 2019/11/13 23:44:44 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.174 $ $NHDT-Date: 1573776729 2019/11/15 00:12:09 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -359,7 +359,9 @@ msdos:  added Makefile1.cross (host portion) and Makefile2.cross (target
 	platform portion) to assist in moving this port toward a cross-compiled
 	build hosted on linux/OSX/Windows with recent C dialect support; that
 	will also pave the way for CI automation and testing of the msdos port
-	build in future should the port remain on the radar
+	build in future should the port remain on the radar; currently only
+	useful for testing the msdos port compile as it cannot yet build a
+	complete game
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new

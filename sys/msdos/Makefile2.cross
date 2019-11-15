@@ -11,6 +11,11 @@
 #   Makefile2 utilizes the djgpp cross compiler from Andrew Wu:
 #       https://github.com/andrewwutw/build-djgpp
 #
+#   Currently, in NetHack 3.6, the cross-compile for msdos cannot be
+#   used to build the entire game to a playable point but it is useful
+#   for testing the msdos port build of the evolving NetHack code.
+#
+
 # Game Installation Variables
 # NOTE: Make sure GAMEDIR exists before make is started.
 
