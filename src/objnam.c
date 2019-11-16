@@ -2199,7 +2199,11 @@ const char *const *alt_as_is; /* another set like as_is[] */
         }
     }
 
-    /* avoid false hit on one_off[].plur == "lice" or .sing == "goose";
+   /* Leave "craft" as a suffix as-is (aircraft, hovercraft);
+      "craft" itself is (arguably) not included in our likely context */
+   if ((baselen > 5) && (!BSTRCMPI(basestr, endstring - 5, "craft")))
+       return TRUE;
+   /* avoid false hit on one_off[].plur == "lice" or .sing == "goose";
        if more of these turn up, one_off[] entries will need to flagged
        as to which are whole words and which are matchable as suffices
        then matching in the loop below will end up becoming more complex */
@@ -2429,7 +2433,10 @@ const char *oldstr;
 
     /* Ends in z, x, s, ch, sh; add an "es" */
     if (index("zxs", lo_c)
-        || (len >= 2 && lo_c == 'h' && index("cs", lowc(*(spot - 1))))
+        || (len >= 2 && lo_c == 'h' && index("cs", lowc(*(spot - 1)))
+            /* 21st century k-sound */
+            && !(len >= 4 && !strcmpi(spot - 2, "ech")
+                && index("tm", lowc(*(spot - 4)))))
         /* Kludge to get "tomatoes" and "potatoes" right */
         || (len >= 4 && !strcmpi(spot - 2, "ato"))
         || (len >= 5 && !strcmpi(spot - 4, "dingo"))) {
