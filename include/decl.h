@@ -339,6 +339,9 @@ E const struct c_common_strings c_common_strings;
 /* material strings */
 E const char *materialnm[];
 
+/* empty string that is non-const for parameter use */
+E char emptystr[];
+
 /* Monster name articles */
 #define ARTICLE_NONE 0
 #define ARTICLE_THE 1

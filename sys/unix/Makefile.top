@@ -74,6 +74,9 @@ VARDAT = $(VARDATD) $(VARDATND)
 #CHOWN = chown
 #CHGRP = chgrp
 
+# Lua version
+LUA_VERSION = 5.3.5
+
 #
 # end of configuration
 #
@@ -232,7 +235,15 @@ dofiles-nodlb:
 	-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) $(DAT) ; \
 			$(CHGRP) $(GAMEGRP) $(DAT) ; \
 			chmod $(FILEPERM) $(DAT) )
+#
+# This is not part of the dependency build hierarchy.
+# It requires an explicit "make fetch-Lua".
+fetch-lua: fetch-Lua
 
+fetch-Lua:
+	( mkdir -p lib ; cd lib ; \
+		curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz ; \
+		tar zxf lua-$(LUA_VERSION).tar.gz ; rm -f lua-$(LUA_VERSION).tar.gz )
 update: $(GAME) recover $(VARDAT) spec_levs
 #	(don't yank the old version out from under people who're playing it)
 	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old

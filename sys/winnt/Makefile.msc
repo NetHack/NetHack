@@ -1,17 +1,18 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1572748386 2019/11/03 02:33:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.167 $ */
+# NetHack 3.7 Makefile.msc
 #       Copyright (c) NetHack PC Development Team 1993-2019
 #
 #==============================================================================
 # Build Tools Environment
 #
-#       NetHack 3.7 Makefile for MS Visual Studio Visual C++ compiler
-#  
+#       NetHack 3.7 Work-in-progress Makefile for 
+#       MS Visual Studio Visual C++ compiler
+#
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2017 Community Edition
 #            - Microsoft Visual Studio 2019 Community Edition
 #
 #==============================================================================
-#   This is used for building two versions of NetHack:
+#   This is used for building two distinct executables of NetHack:
 #
 #   A tty port utilizing the Win32 Console I/O subsystem, Console
 #       NetHack.exe
@@ -19,59 +20,77 @@
 #   A Win32 native port built on the Windows API, Graphical NetHack or
 #       NetHackW.exe
 #
-#       In addition to your C compiler,
+#   BEFORE YOU START, in addition to your C compiler and linker,
 #
-#       if you want to change           you will need a
-#       files with suffix               workalike for
-#              .y                           yacc   (such as bison)
-#              .l                           lex    (such as flex)
+#       o You will need a complete Lua source tree parallel to your 
+#         NetHack source tree. Lua is not an optional requirement,
+#         it is required in order to process the level and dungeon
+#         description files during the game. You can obtain the 
+#         Lua source from here: 
+#             https://www.lua.org/download.html
 #
-#   If you have any questions read the sys/winnt/Install.nt file included 
-#   with the distribution.
-#========================================================================================
+#       o If you want to include the curses Window port in the non-GUI
+#         NetHack.exe build, you will need a complete PDCurses source
+#         tree parallel to your NetHack source tree. You can obtain the
+#         PDCurses source from here:
+#             https://sourceforge.net/projects/pdcurses/files/pdcurses/
+#         or via git from here:
+#             git clone https://github.com/wmcbrine/PDCurses.git ../pdcurses
+#
+#       o If you want your build of NetHack to include support for 
+#         compressing your save files, or to be able to exchange and use
+#         compressed save files that originated on another platform such
+#         as Linux or a handheld phone or tablet, then you will need
+#         a copy of the zlib source tree parallel to your NetHack source
+#         tree. You can obtain the zlib source from here:
+#             https://www.zlib.net/zlib1211.zip
+#
+#   If you want to find out more information about Lua, PDCurses, or zlib,
+#   here are the home page links for each at the time of this writing:
+#
+#         Lua:       https://www.lua.org/
+#         PDCurses:  https://pdcurses.org/
+#         zlib:      https://www.zlib.net/
+#
+#   If you have any questions about building NetHack for the Windows platform
+#   please read sys/winnt/Install.nt file included in the distribution.
+#
+#==============================================================================
 # DECISIONS SECTION
 #
 # Build Options Decisions
 #
-#       There are currently 4 decisions that you can choose to make. 
-#       none of the 4 decisions are absolutely required because defaults are in place:
-#	1. Where do you want your build to end up?
-#	2. Do you want debug information in the executable?
-#	3. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
-#       4. Do you want to include the optional curses port?
+#       There are currently 5 decisions that you can choose to make. 
+#       none of the 5 decisions are absolutely required because defaults 
+#       are in place:
 #
-# Mandatory LUA source Location
+#	1. Where do you want your build results to end up?
+#       2. Do you want to include the optional curses port?
+#       3. Do you want to include compressed savefile support to 
+#          transfer compressed savefiles between platforms?
+#	4. Do you want debug information in the executable?
+#	5. Do you want to explicitly override auto-detection of 
+#          a 32-bit or 64-bit target?
 #
-#       LUA source code or is required to build NetHack-3.7.
-#       LUATOP must point to the location of the LUA sources.
+# Mandatory Lua source Location (not optional)
 #
-#-----------------------------------------------------------------------------------------
-#=========================================================================================
-
-#---------------------------------------------------------------
+#       Lua source code or is required to build NetHack-3.7.
+#       LUATOP below must point to the correct location of the LUA sources.
+#       By default it is assumed to be parallel to your NetHack source tree in
+#       the same parent directory/folder.
+#
+#------------------------------------------------------------------------------
+#==============================================================================
+#
+#------------------------------------------------------------------------------
 # 1. Where do you want the game to be built (which folder)?
-
-GAMEDIR = ..\binary               # Default game build directory
- 
-#---------------------------------------------------------------
-# 2. Do you want debug information available to the executable?
-  
-DEBUGINFO = Y
-
-#---------------------------------------------------------------
-# 3. This Makefile will attempt to auto-detect your selected target architecture
-#    based on Visual Studio command prompt configuration settins etc.
-#    However, if you want to manually override generation of a 
-#    32-bit or 64-bit build target, you can uncomment the apppropriate
-#    TARGET_CPU line below.
 #
-#TARGET_CPU=x64
-#TARGET_CPU=x86
-
-#---------------------------------------------------------------
+GAMEDIR = ..\binary               # Default game build directory
+#
+#------------------------------------------------------------------------------
 # OPTIONAL - Curses window port support 
 #
-# 4. Uncomment these and set them appropriately if you want to
+# 2. Uncomment these and set them appropriately if you want to
 #    include curses port support alongside TTY support in your
 #    NetHack.exe binary. 
 #
@@ -79,10 +98,40 @@ DEBUGINFO = Y
 #    PDCurses header (.h) files and PDCURSES_C to the location
 #    of your PDCurses C files.
 #
-ADD_CURSES=Y
-PDCURSES_TOP=..\..\pdcurses
+#ADD_CURSES=Y
+#PDCURSES_TOP=..\..\pdcurses
 #
-#---------------------------------------------------------------
+#------------------------------------------------------------------------------
+# OPTIONAL - zlib support (to allow compressed savefile exchange across platforms
+#
+# 3. Location of zlib sources
+#
+#
+#ADD_ZLIB=Y
+#ZLIBTOP=..\..\zlib
+#
+#------------------------------------------------------------------------------
+# 4. Do you want debug information available to the executable?
+# 
+DEBUGINFO = Y
+#
+#------------------------------------------------------------------------------
+# 5. This Makefile will attempt to auto-detect your selected target architecture
+#    based on Visual Studio command prompt configuration settins etc.
+#    However, if you want to manually override generation of a 
+#    32-bit or 64-bit build target, you can uncomment the apppropriate
+#    TARGET_CPU line below.
+#
+#TARGET_CPU=x64
+#TARGET_CPU=x86
+#
+#
+#==============================================================================
+#==============================================================================
+# This marks the end of the BUILD DECISIONS section.
+#==============================================================================
+#==============================================================================
+#
 # Location of LUA
 #
 # Original source needs to be obtained from: 
@@ -91,23 +140,20 @@ PDCURSES_TOP=..\..\pdcurses
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
 #    you'll need to specify the correct spot below in order to
-#    successfully build NetHack-3.7.
+#    successfully build NetHack-3.7.  You cannot build a functional
+#    version of NetHack-3.7 Work-in-progress without including Lua.
 #
 LUATOP=..\..\lua-5.3.5
 #
 #==============================================================================
-# This marks the end of the BUILD DECISIONS section.
+#======================== End of Modification Section =========================
 #==============================================================================
 #
-#===============================================
-#======= End of Modification Section ===========
-#===============================================
-#
-################################################
-#                                              #
-# Nothing below here should have to be changed.#
-#                                              #
-################################################
+#       #################################################
+#       #                                               #
+#       # Nothing below here should have to be changed. #
+#       #                                               #
+#       #################################################
 #
 #==============================================================================
 #

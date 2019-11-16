@@ -108,6 +108,8 @@ const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
                              "platinum",   "mithril", "plastic",    "glass",
                              "gemstone",   "stone" };
 
+char emptystr[] = {0};       /* non-const */
+
 /* Global windowing data, defined here for multi-window-system support */
 NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN;
 #ifdef WIN32

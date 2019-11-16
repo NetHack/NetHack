@@ -573,4 +573,10 @@ E int FDECL(atoi, (const char *));
 #include "lualib.h"
 #include "lauxlib.h"
 
+#if defined(WIN32)
+#define LUA_INTCAST(i) ((int) i)
+#else
+#define LUA_INTCAST(i) (i)
+#endif
+
 #endif /* SYSTEM_H */
