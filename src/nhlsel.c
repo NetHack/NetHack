@@ -23,17 +23,27 @@ static int FDECL(l_selection_filter_mapchar, (lua_State *));
 static int FDECL(l_selection_flood, (lua_State *));
 static int FDECL(l_selection_circle, (lua_State *));
 static int FDECL(l_selection_ellipse, (lua_State *));
-static int FDECL(l_selection_gradient, (lua_State *));
-static int FDECL(l_selection_iterate, (lua_State *));
 static int FDECL(l_selection_gc, (lua_State *));
 static int FDECL(l_selection_not, (lua_State *));
 static int FDECL(l_selection_and, (lua_State *));
 static int FDECL(l_selection_or, (lua_State *));
 static int FDECL(l_selection_xor, (lua_State *));
 static int FDECL(l_selection_not, (lua_State *));
+#if 0
+/* the following do not appear to currently be
+   used and because they are static, the OSX
+   compiler is complaining about them. I've
+   if ifdef'd out the prototype here and the
+   function body below.
+ */
+static int FDECL(l_selection_gradient, (lua_State *));
+static int FDECL(l_selection_iterate, (lua_State *));
 static int FDECL(l_selection_add, (lua_State *));
 static int FDECL(l_selection_sub, (lua_State *));
 static int FDECL(l_selection_ipairs, (lua_State *));
+/* this prototype was missing but function body was below */
+static struct selectionvar *FDECL(l_selection_to, (lua_State *, int));
+#endif
 
 struct selectionvar *
 l_selection_check(L, index)
@@ -588,6 +598,17 @@ lua_State *L;
         filled = (int) luaL_optinteger(L, 5, 0); /* TODO: boolean */
     } else {
         nhl_error(L, "wrong parameters");
+        /*
+         * FIXME: OSX compiler is issuing a complaint
+         *        about r being passed to selection_do_ellipse()
+         *        below without ever having been initialized
+         *        to something when this else clause is encountered.
+         *        I could have added an initializer to r at the
+         *        top, but I didn't know what it should be initialized
+         *        to in order for selection_do_ellipse() to not
+         *        misbehave. The parameters passed in previous versions
+         *        were related to xaxis and yaxis.
+         */
     }
 
     get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x,y));
@@ -639,6 +660,17 @@ lua_State *L;
         filled = (int) luaL_optinteger(L, 6, 0); /* TODO: boolean */
     } else {
         nhl_error(L, "wrong parameters");
+        /*
+         * FIXME: OSX compiler is issuing a complaint
+         *        about r1 and r2 being passed to selection_do_ellipse()
+         *        below without ever having been initialized
+         *        to something when this else clause is encountered.
+         *        I could have added an initializer to r1,r2 at the
+         *        top, but I didn't know what they should be initialized
+         *        to in order for selection_do_ellipse() to not
+         *        misbehave. The parameters passed in previous versions
+         *        were related to xaxis and yaxis.
+         */
     }
 
     get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x,y));

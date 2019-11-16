@@ -16,7 +16,9 @@
 /* lua_CFunction prototypes */
 static int FDECL(nhl_test, (lua_State *));
 static int FDECL(nhl_getmap, (lua_State *));
+#if 0
 static int FDECL(nhl_setmap, (lua_State *));
+#endif
 static int FDECL(nhl_pline, (lua_State *));
 static int FDECL(nhl_verbalize, (lua_State *));
 static int FDECL(nhl_menu, (lua_State *));
@@ -87,7 +89,7 @@ schar defval;
     char *ter;
     xchar typ;
 
-    ter = get_table_str_opt(L, name, "");
+    ter = get_table_str_opt(L, name, emptystr);
     if (name && *ter) {
         typ = check_mapchr(ter);
         if (typ == INVALID_TYPE)
@@ -213,8 +215,8 @@ lua_State *L;
     int argc = lua_gettop(L);
 
     if (argc == 2) {
-        int x = lua_tointeger(L, 1);
-        int y = lua_tointeger(L, 2);
+        int x = LUA_INTCAST(lua_tointeger(L, 1));
+        int y = LUA_INTCAST(lua_tointeger(L, 2));
 
         if (x >= 0 && x < COLNO && y >= 0 && y < ROWNO) {
             char buf[BUFSZ];
@@ -572,7 +574,9 @@ const char *name;
     if (ltyp == LUA_TSTRING) {
         const char *const boolstr[] = { "true", "false", "yes", "no", NULL };
         const int boolstr2i[] = { TRUE, FALSE, TRUE, FALSE, -1 };
+
         ret = luaL_checkoption(L, -1, NULL, boolstr);
+        nhUse(boolstr2i[0]);
     } else if (ltyp == LUA_TBOOLEAN) {
         ret = lua_toboolean(L, -1);
     } else if (ltyp == LUA_TNUMBER) {
@@ -625,14 +629,17 @@ static int
 nhl_test(L)
 lua_State *L;
 {
+    int x, y;
+    char *name, Player[] = "Player";
+
     /* discard any extra arguments passed in */
     lua_settop(L, 1);
 
     luaL_checktype(L, 1, LUA_TTABLE);
 
-    int x = get_table_int(L, "x");
-    int y = get_table_int(L, "y");
-    char *name = get_table_str_opt(L, "name", "Player");
+    x = get_table_int(L, "x");
+    y = get_table_int(L, "y");
+    name = get_table_str_opt(L, "name", Player);
 
     pline("TEST:{ x=%i, y=%i, name=\"%s\" }", x,y, name);
 
@@ -645,8 +652,9 @@ static const struct luaL_Reg nhl_functions[] = {
     {"test", nhl_test},
 
     {"getmap", nhl_getmap},
-    /*{"setmap", nhl_setmap},*/
-
+#if 0
+    {"setmap", nhl_setmap},
+#endif
     {"pline", nhl_pline},
     {"verbalize", nhl_verbalize},
     {"menu", nhl_menu},

@@ -64,17 +64,13 @@ static void FDECL(wallify_map, (int, int, int, int));
 static void FDECL(maze1xy, (coord *, int));
 static void NDECL(fill_empty_maze);
 static void FDECL(splev_initlev, (lev_init *));
+#if 0
+/* macosx complains that these are unused */
 static long FDECL(sp_code_jmpaddr, (long, long));
-static void NDECL(spo_end_moninvent);
-static void NDECL(spo_pop_container);
 static void FDECL(spo_room, (struct sp_coder *));
-static void FDECL(spo_endroom, (struct sp_coder *));
 static void FDECL(spo_trap, (struct sp_coder *));
 static void FDECL(spo_gold, (struct sp_coder *));
 static void FDECL(spo_corridor, (struct sp_coder *));
-static void FDECL(sel_set_ter, (int, int, genericptr_t));
-static void FDECL(sel_set_feature, (int, int, genericptr_t));
-static void FDECL(sel_set_door, (int, int, genericptr_t));
 static void FDECL(spo_feature, (struct sp_coder *));
 static void FDECL(spo_terrain, (struct sp_coder *));
 static void FDECL(spo_replace_terrain, (struct sp_coder *));
@@ -84,8 +80,15 @@ static void FDECL(spo_drawbridge, (struct sp_coder *));
 static void FDECL(spo_mazewalk, (struct sp_coder *));
 static void FDECL(spo_wall_property, (struct sp_coder *));
 static void FDECL(spo_room_door, (struct sp_coder *));
-static void FDECL(sel_set_wallify, (int, int, genericptr_t));
 static void FDECL(spo_wallify, (struct sp_coder *));
+static void FDECL(sel_set_wallify, (int, int, genericptr_t));
+#endif
+static void NDECL(spo_end_moninvent);
+static void NDECL(spo_pop_container);
+static void FDECL(spo_endroom, (struct sp_coder *));
+static void FDECL(sel_set_ter, (int, int, genericptr_t));
+static void FDECL(sel_set_door, (int, int, genericptr_t));
+static void FDECL(sel_set_feature, (int, int, genericptr_t));
 static int FDECL(get_coord, (lua_State *, int, int *, int *));
 static int FDECL(get_table_region, (lua_State *, const char *, int *, int *, int *, int *, BOOLEAN_P));
 
@@ -2247,13 +2250,14 @@ lev_init *linit;
     }
 }
 
+#if 0
 static long
 sp_code_jmpaddr(curpos, jmpaddr)
 long curpos, jmpaddr;
 {
     return (curpos + jmpaddr);
 }
-
+#endif
 
 
 /*ARGUSED*/
@@ -2282,6 +2286,7 @@ lua_State *L;
 {
     char *levmsg;
     int old_n, n;
+    const char *msg;
 
     int argc = lua_gettop(L);
 
@@ -2292,7 +2297,7 @@ lua_State *L;
 
     create_des_coder();
 
-    const char *msg = luaL_checkstring(L, 1);
+    msg = luaL_checkstring(L, 1);
 
     old_n = g.lev_message ? (strlen(g.lev_message) + 1) : 0;
     n = strlen(msg);
@@ -2315,10 +2320,10 @@ int
 get_table_align(L)
 lua_State *L;
 {
-    const char *const aligns[] = { "noalign", "law", "neutral", "chaos", "coaligned", "noncoaligned", "random", NULL };
+    const char *const gtaligns[] = { "noalign", "law", "neutral", "chaos", "coaligned", "noncoaligned", "random", NULL };
     const int aligns2i[] = { AM_NONE, AM_LAWFUL, AM_NEUTRAL, AM_CHAOTIC, AM_SPLEV_CO, AM_SPLEV_NONCO, AM_SPLEV_RANDOM, 0 };
 
-    int a = aligns2i[get_table_option(L, "align", "random", aligns)];
+    int a = aligns2i[get_table_option(L, "align", "random", gtaligns)];
 
     return a;
 }
@@ -2347,6 +2352,7 @@ const char *s;
     for (i = LOW_PM; i < NUMMONS; i++)
         if (!strcmpi(mons[i].mname, s))
             return i;
+    nhUse(L);
     return NON_PM;
 }
 
@@ -2501,7 +2507,7 @@ lua_State *L;
         tmpmons.coord = SP_COORD_PACK(mx, my);
 
     if (tmpmons.id != NON_PM && tmpmons.class == -1)
-        tmpmons.class = def_monsyms[mons[tmpmons.id].mlet].sym;
+        tmpmons.class = def_monsyms[(int) mons[tmpmons.id].mlet].sym;
 
     create_monster(&tmpmons, g.coder->croom);
 
@@ -2528,6 +2534,7 @@ const char *name;
 int rndval;
 {
     int ret;
+    char buf[BUFSZ];
 
     lua_getfield(L, 1, name);
     if (lua_type(L, -1) == LUA_TNIL) {
@@ -2541,7 +2548,6 @@ int rndval;
             lua_pop(L, 1);
             return rndval;
         }
-        char buf[BUFSZ];
         Sprintf(buf, "Expected integer or \"random\" for \"%s\", got %s", name, tmp);
         nhl_error(L, buf);
         lua_pop(L, 1);
@@ -2626,7 +2632,9 @@ int
 lspo_object(L)
 lua_State *L;
 {
+#if 0
     int nparams = 0;
+#endif
     long quancnt;
     object tmpobj;
     int ox = -1, oy = -1;
@@ -2727,8 +2735,9 @@ lua_State *L;
         tmpobj.id = -1;
 
     if (tmpobj.id == STATUE || tmpobj.id == EGG || tmpobj.id == CORPSE || tmpobj.id == TIN) {
-        int flags = 0;
+        int lflags = 0;
         const char *montype = get_table_str_opt(L, "montype", NULL);
+
         if (montype) {
             struct permonst *pm = NULL;
             if (strlen(montype) == 1 && def_char_to_monclass(*montype) != MAXMCLASSES) {
@@ -2747,10 +2756,10 @@ lua_State *L;
                 nhl_error(L, "Unknown montype");
         }
         if (tmpobj.id == STATUE) {
-            flags |= (get_table_boolean_opt(L, "historic", 0) ? STATUE_HISTORIC : 0x00);
-            flags |= (get_table_boolean_opt(L, "male", 0) ? STATUE_MALE : 0x00);
-            flags |= (get_table_boolean_opt(L, "female", 0) ? STATUE_FEMALE : 0x00);
-            tmpobj.spe = flags;
+            lflags |= (get_table_boolean_opt(L, "historic", 0) ? STATUE_HISTORIC : 0x00);
+            lflags |= (get_table_boolean_opt(L, "male", 0) ? STATUE_MALE : 0x00);
+            lflags |= (get_table_boolean_opt(L, "female", 0) ? STATUE_FEMALE : 0x00);
+            tmpobj.spe = lflags;
         } else if (tmpobj.id == EGG) {
             tmpobj.spe = get_table_boolean_opt(L, "laid_by_you", 0) ? 1 : 0;
         }
@@ -2877,7 +2886,7 @@ int
 lspo_engraving(L)
 lua_State *L;
 {
-    int etyp;
+    int etyp = DUST;
     char *txt = (char *) 0;
     long ecoord;
     const char *const engrtypes[] = { "dust", "engrave", "burn", "mark", "blood", NULL };
@@ -2885,6 +2894,8 @@ lua_State *L;
     xchar x, y;
     int argc = lua_gettop(L);
 
+    x = y = 0;      /* FIXME: quiet a warning for else clause below.
+                        should it actually be -1? */
     create_des_coder();
 
     if (argc == 1) {
@@ -2903,6 +2914,8 @@ lua_State *L;
         txt = dupstr(luaL_checkstring(L, 3));
     } else {
         nhl_error(L, "Wrong parameters");
+        /* FIXME: this clause left etyp uninitialized so initialization
+           to DUST was added above to quiet a macosx warning */
     }
 
     if (x == -1 && y == -1)
@@ -2975,7 +2988,7 @@ lua_State *L;
 const char *name;
 int defval;
 {
-    char *roomstr = get_table_str_opt(L, name, "");
+    char *roomstr = get_table_str_opt(L, name, emptystr);
     if (roomstr && *roomstr) {
         int i;
         for (i = 0; room_types[i].name; i++)
@@ -3055,7 +3068,7 @@ lua_State *L;
 
 static void
 spo_endroom(coder)
-struct sp_coder *coder;
+struct sp_coder *coder UNUSED;
 {
     if (g.coder->n_subroom > 1) {
         g.coder->n_subroom--;
@@ -3095,15 +3108,15 @@ lua_State *L;
     const int stairdirs2i[] = { 0, 1 };
 
     long scoord;
-    int ax = -1,ay = -1;
+    int ax = -1, ay = -1;
     int up;
     int ltype = lua_type(L, 1);
 
     create_des_coder();
 
-    if (argc == 1 && ltype == LUA_TSTRING)
+    if (argc == 1 && ltype == LUA_TSTRING) {
         up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
-    else if (argc == 3 && ltype == LUA_TSTRING) {
+    } else if (argc == 3 && ltype == LUA_TSTRING) {
         up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
         ax = luaL_checkinteger(L, 2);
         ay = luaL_checkinteger(L, 3);
@@ -3154,15 +3167,15 @@ lua_State *L;
     const int stairdirs2i[] = { 0, 1 };
 
     long scoord;
-    int ax, ay;
+    int ax = -1, ay = -1;   /* FIXME: initializers added, macosx warning */
     int up;
     int ltype = lua_type(L, 1);
 
     create_des_coder();
 
-    if (argc == 1 && ltype == LUA_TSTRING)
+    if (argc == 1 && ltype == LUA_TSTRING) {
         up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
-    else if (argc == 3 && ltype == LUA_TSTRING) {
+    } else if (argc == 3 && ltype == LUA_TSTRING) {
         up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
         ax = luaL_checkinteger(L, 2);
         ay = luaL_checkinteger(L, 3);
@@ -3325,7 +3338,7 @@ lua_State *L;
 const char *name;
 int defval;
 {
-    char *trapstr = get_table_str_opt(L, name, "");
+    char *trapstr = get_table_str_opt(L, name, emptystr);
     if (trapstr && *trapstr) {
         int i;
         for (i = 0; trap_types[i].name; i++)
@@ -3474,7 +3487,7 @@ lua_State *L;
 /* random_corridors(); */
 int
 lspo_random_corridors(L)
-lua_State *L;
+lua_State *L UNUSED;
 {
     corridor tc;
 
@@ -5119,6 +5132,7 @@ lua_State *L;
     return 0;
 }
 
+#if 0
 /*ARGSUSED*/
 static void
 sel_set_wallify(x, y, arg)
@@ -5127,6 +5141,7 @@ genericptr_t arg UNUSED;
 {
     wallify_map(x, y, x, y);
 }
+#endif
 
 /* TODO: wallify(selection) */
 /* wallify({ x1=NN,y1=NN, x2=NN,y2=NN }); */
@@ -5161,7 +5176,7 @@ lua_State *L;
 /* reset_level is only needed for testing purposes */
 int
 lspo_reset_level(L)
-lua_State *L;
+lua_State *L UNUSED;   /* macosx complaint needed UNUSED */
 {
     boolean wtower = In_W_tower(u.ux, u.uy, &u.uz);
 

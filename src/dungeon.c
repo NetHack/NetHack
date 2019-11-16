@@ -35,7 +35,9 @@ struct lchoice {
     char menuletter;
 };
 
+#if 0
 static void FDECL(Fread, (genericptr_t, int, int, dlb *));
+#endif
 static xchar FDECL(dname_to_dnum, (const char *));
 static int FDECL(find_branch, (const char *, struct proto_dungeon *));
 static xchar FDECL(parent_dnum, (const char *, struct proto_dungeon *));
@@ -293,6 +295,7 @@ NHFILE *nhfp;
     }
 }
 
+#if 0
 static void
 Fread(ptr, size, nitems, stream)
 genericptr_t ptr;
@@ -308,6 +311,7 @@ dlb *stream;
         nh_terminate(EXIT_FAILURE);
     }
 }
+#endif
 
 static xchar
 dname_to_dnum(s)
@@ -776,7 +780,7 @@ lua_State *L;
     if (lua_type(L, -1) == LUA_TTABLE) {
         int f, nflags;
         lua_len(L, -1);
-        nflags = lua_tointeger(L, -1);
+        nflags = LUA_INTCAST(lua_tointeger(L, -1));
         lua_pop(L, 1);
         for (f = 0; f < nflags; f++) {
             lua_pushinteger(L, f+1);
@@ -807,7 +811,9 @@ init_dungeons()
     register s_level *x;
     struct proto_dungeon pd;
     struct level_map *lev_map;
+    int tidx;
 
+    nhUse(cb);
     (void) memset(&pd, 0, sizeof(struct proto_dungeon));
     pd.n_levs = pd.n_brs = 0;
 
@@ -850,7 +856,7 @@ init_dungeons()
         panic("dungeon is not a lua table");
 
     lua_len(L, -1);
-    g.n_dgns = lua_tointeger(L, -1);
+    g.n_dgns = LUA_INTCAST(lua_tointeger(L, -1));
     lua_pop(L, 1);
 
     pd.start = 0;
@@ -865,23 +871,26 @@ init_dungeons()
     if (g.n_dgns >= MAXDUNGEON)
         panic("init_dungeons: too many dungeons");
 
-    int tidx = lua_gettop(L);
+    tidx = lua_gettop(L);
 
     lua_pushnil(L); /* first key */
     i = 0;
     while (lua_next(L, tidx) != 0) {
+        char *dgn_name, *dgn_bonetag, *dgn_protoname;
+        int dgn_base, dgn_range, dgn_align, dgn_entry, dgn_chance, dgn_flags;
+
         if (!lua_istable(L, -1))
             panic("dungeon[%i] is not a lua table", i);
 
-        char *dgn_name = get_table_str(L, "name");
-        char *dgn_bonetag = get_table_str_opt(L, "bonetag", ""); /* TODO: single char or "none" */
-        char *dgn_protoname = get_table_str_opt(L, "protofile", "");
-        int dgn_base = get_table_int(L, "base");
-        int dgn_range = get_table_int_opt(L, "range", 0);
-        int dgn_align = dgnaligns2i[get_table_option(L, "alignment", "unaligned", dgnaligns)];
-        int dgn_entry = get_table_int_opt(L, "entry", 0);
-        int dgn_chance = get_table_int_opt(L, "chance", 100);
-        int dgn_flags = get_dgn_flags(L);
+        dgn_name = get_table_str(L, "name");
+        dgn_bonetag = get_table_str_opt(L, "bonetag", emptystr); /* TODO: single char or "none" */
+        dgn_protoname = get_table_str_opt(L, "protofile", emptystr);
+        dgn_base = get_table_int(L, "base");
+        dgn_range = get_table_int_opt(L, "range", 0);
+        dgn_align = dgnaligns2i[get_table_option(L, "alignment", "unaligned", dgnaligns)];
+        dgn_entry = get_table_int_opt(L, "entry", 0);
+        dgn_chance = get_table_int_opt(L, "chance", 100);
+        dgn_flags = get_dgn_flags(L);
 
         debugpline4("DUNGEON[%i]: %s, base=(%i,%i)", i, dgn_name, dgn_base, dgn_range);
 
@@ -897,7 +906,7 @@ init_dungeons()
         if (lua_type(L, -1) == LUA_TTABLE) {
             int f, nlevels;
             lua_len(L, -1);
-            nlevels = lua_tointeger(L, -1);
+            nlevels = LUA_INTCAST(lua_tointeger(L, -1));
             pd.tmpdungeon[i].levels = nlevels;
             lua_pop(L, 1);
             for (f = 0; f < nlevels; f++) {
@@ -906,7 +915,7 @@ init_dungeons()
                 if (lua_type(L, -1) == LUA_TTABLE) {
                     int bi;
                     char *lvl_name = get_table_str(L, "name");
-                    char *lvl_bonetag = get_table_str_opt(L, "bonetag", "");
+                    char *lvl_bonetag = get_table_str_opt(L, "bonetag", emptystr);
                     int lvl_base = get_table_int(L, "base");
                     int lvl_range = get_table_int_opt(L, "range", 0);
                     int lvl_nlevels = get_table_int_opt(L, "nlevels", 0);
@@ -915,6 +924,9 @@ init_dungeons()
                     int lvl_align = dgnaligns2i[get_table_option(L, "alignment", "unaligned", dgnaligns)];
                     int lvl_flags = get_dgn_flags(L);
                     struct tmplevel *tmpl = &pd.tmplevel[pd.n_levs + f];
+
+                    nhUse(lvl_bonetag);
+                    nhUse(lvl_align);
                     debugpline4("LEVEL[%i]:%s,(%i,%i)", f, lvl_name, lvl_base, lvl_range);
                     tmpl->name = lvl_name;
                     tmpl->chainlvl = lvl_chain;
@@ -953,7 +965,7 @@ init_dungeons()
         if (lua_type(L, -1) == LUA_TTABLE) {
             int f, nbranches;
             lua_len(L, -1);
-            nbranches = lua_tointeger(L, -1);
+            nbranches = LUA_INTCAST(lua_tointeger(L, -1));
             pd.tmpdungeon[i].branches = nbranches;
             lua_pop(L, 1);
             for (f = 0; f < nbranches; f++) {
