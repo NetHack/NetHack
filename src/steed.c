@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1559670610 2019/06/04 17:50:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1573940541 2019/11/16 21:42:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -742,6 +742,8 @@ place_monster(mon, x, y)
 struct monst *mon;
 int x, y;
 {
+    struct monst *othermon;
+    const char *monnm, *othnm;
     char buf[QBUFSZ];
 
     buf[0] = '\0';
@@ -749,8 +751,8 @@ int x, y;
        vault guards (either living or dead) are parked at <0,0> */
     if (!isok(x, y) && (x != 0 || y != 0 || !mon->isgd)) {
         describe_level(buf);
-        impossible("trying to place monster at <%d,%d> mstate:%lx on %s",
-                    x, y, mon->mstate, buf);
+        impossible("trying to place %s at <%d,%d> mstate:%lx on %s",
+                   minimal_monnam(mon, TRUE), x, y, mon->mstate, buf);
         x = y = 0;
     }
     if (mon == u.usteed
@@ -762,10 +764,12 @@ int x, y;
                    mon->mstate, buf);
         return;
     }
-    if (level.monsters[x][y]) {
+    if ((othermon = level.monsters[x][y]) != 0) {
         describe_level(buf);
-        impossible("placing monster over another at <%d,%d>, mstates:%lx %lx on %s?",
-                    x, y, level.monsters[x][y]->mstate, mon->mstate, buf);
+        monnm = minimal_monnam(mon, FALSE);
+        othnm = (mon != othermon) ? minimal_monnam(othermon, TRUE) : "itself";
+        impossible("placing %s over %s at <%d,%d>, mstates:%lx %lx on %s?",
+                   monnm, othnm, x, y, othermon->mstate, mon->mstate, buf);
     }
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
