@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1562532734 2019/07/07 20:52:14 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.179 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1573869062 2019/11/16 01:51:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -238,8 +238,8 @@ NH_panictrace_gdb()
 #ifdef PANICTRACE_GDB
     /* A (more) generic method to get a stack trace - invoke
      * gdb on ourself. */
-    char *gdbpath = GDBVAR;
-    char *greppath = GREPVAR;
+    const char *gdbpath = GDBVAR;
+    const char *greppath = GREPVAR;
     char buf[BUFSZ];
     FILE *gdb;
 
@@ -248,8 +248,8 @@ NH_panictrace_gdb()
     if (greppath == NULL || greppath[0] == 0)
         return FALSE;
 
-    sprintf(buf, "%s -n -q %s %d 2>&1 | %s '^#'", gdbpath, ARGV0, getpid(),
-            greppath);
+    sprintf(buf, "%s -n -q %s %d 2>&1 | %s '^#'",
+            gdbpath, ARGV0, getpid(), greppath);
     gdb = popen(buf, "w");
     if (gdb) {
         raw_print("Generating more information you may report:\n");

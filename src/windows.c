@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1526933747 2018/05/21 20:15:47 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1573869064 2019/11/16 01:51:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1089,12 +1089,13 @@ static FILE *dumplog_file;
 #ifdef DUMPLOG
 static time_t dumplog_now;
 
-static char *FDECL(dump_fmtstr, (const char *, char *));
-
-static char *
-dump_fmtstr(fmt, buf)
+char *
+dump_fmtstr(fmt, buf, fullsubs)
 const char *fmt;
 char *buf;
+boolean fullsubs; /* True -> full substitution for file name, False ->
+                   * partial substitution for '--showpaths' feedback
+                   * where there's no game in progress when executed */
 {
     const char *fp = fmt;
     char *bp = buf;
@@ -1117,7 +1118,7 @@ char *buf;
      * may or may not interfere with that usage.]
      */
 
-    while (fp && *fp && len < BUFSZ-1) {
+    while (fp && *fp && len < BUFSZ - 1) {
         if (*fp == '%') {
             fp++;
             switch (*fp) {
@@ -1128,17 +1129,29 @@ char *buf;
                 Sprintf(tmpbuf, "%%");
                 break;
             case 't': /* game start, timestamp */
-                Sprintf(tmpbuf, "%lu", (unsigned long) ubirthday);
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%lu", (unsigned long) ubirthday);
+                else
+                    Strcpy(tmpbuf, "{game start cookie}");
                 break;
             case 'T': /* current time, timestamp */
-                Sprintf(tmpbuf, "%lu", (unsigned long) now);
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%lu", (unsigned long) now);
+                else
+                    Strcpy(tmpbuf, "{current time cookie}");
                 break;
             case 'd': /* game start, YYYYMMDDhhmmss */
-                Sprintf(tmpbuf, "%08ld%06ld",
-                        yyyymmdd(ubirthday), hhmmss(ubirthday));
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%08ld%06ld",
+                            yyyymmdd(ubirthday), hhmmss(ubirthday));
+                else
+                    Strcpy(tmpbuf, "{game start date+time}");
                 break;
             case 'D': /* current time, YYYYMMDDhhmmss */
-                Sprintf(tmpbuf, "%08ld%06ld", yyyymmdd(now), hhmmss(now));
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%08ld%06ld", yyyymmdd(now), hhmmss(now));
+                else
+                    Strcpy(tmpbuf, "{current date+time}");
                 break;
             case 'v': /* version, eg. "3.6.2-0" */
                 Sprintf(tmpbuf, "%s", version_string(verbuf));
@@ -1147,19 +1160,37 @@ char *buf;
                 Sprintf(tmpbuf, "%ld", uid);
                 break;
             case 'n': /* player name */
-                Sprintf(tmpbuf, "%s", *g.plname ? g.plname : "unknown");
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%s", *g.plname ? g.plname : "unknown");
+                else
+                    Strcpy(tmpbuf, "{hero name}");
                 break;
             case 'N': /* first character of player name */
-                Sprintf(tmpbuf, "%c", *g.plname ? *g.plname : 'u');
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%c", *g.plname ? *g.plname : 'u');
+                else
+                    Strcpy(tmpbuf, "{hero initial}");
                 break;
             }
+            if (fullsubs) {
+                /* replace potentially troublesome characters (including
+                   <space> even though it might be an acceptable file name
+                   character); user shouldn't be able to get ' ' or '/'
+                   or '\\' into plname[] but play things safe */
+                (void) strNsubst(tmpbuf, " ", "_", 0);
+                (void) strNsubst(tmpbuf, "/", "_", 0);
+                (void) strNsubst(tmpbuf, "\\", "_", 0);
+                /* note: replacements are only done on field substitutions,
+                   not on the template (from sysconf or DUMPLOG_FILE) */
+            }
 
-            slen = strlen(tmpbuf);
-            if (len + slen < BUFSZ-1) {
+            slen = (int) strlen(tmpbuf);
+            if (len + slen < BUFSZ - 1) {
                 len += slen;
                 Sprintf(bp, "%s", tmpbuf);
                 bp += slen;
-                if (*fp) fp++;
+                if (*fp)
+                    fp++;
             } else
                 break;
         } else {
@@ -1187,9 +1218,9 @@ time_t now;
 #ifdef SYSCF
     if (!sysopt.dumplogfile)
         return;
-    fname = dump_fmtstr(sysopt.dumplogfile, buf);
+    fname = dump_fmtstr(sysopt.dumplogfile, buf, TRUE);
 #else
-    fname = dump_fmtstr(DUMPLOG_FILE, buf);
+    fname = dump_fmtstr(DUMPLOG_FILE, buf, TRUE);
 #endif
     dumplog_file = fopen(fname, "w");
     dumplog_windowprocs_backup = windowprocs;

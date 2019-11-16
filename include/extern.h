@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1573688684 2019/11/13 23:44:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.739 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1573869062 2019/11/16 01:51:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.740 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2931,10 +2931,13 @@ E void NDECL(nhwindows_hangup);
 #endif
 E void NDECL(genl_status_init);
 E void NDECL(genl_status_finish);
-E void FDECL(genl_status_enablefield,
-             (int, const char *, const char *, BOOLEAN_P));
-E void FDECL(genl_status_update, (int, genericptr_t, int, int, int, unsigned long *));
-
+E void FDECL(genl_status_enablefield, (int, const char *, const char *,
+                                       BOOLEAN_P));
+E void FDECL(genl_status_update, (int, genericptr_t, int, int, int,
+                                  unsigned long *));
+#ifdef DUMPLOG
+E char *FDECL(dump_fmtstr, (const char *, char *, BOOLEAN_P));
+#endif
 E void FDECL(dump_open_log, (time_t));
 E void NDECL(dump_close_log);
 E void FDECL(dump_redirect, (BOOLEAN_P));
