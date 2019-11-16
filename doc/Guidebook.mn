@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.329 $ $NHDT-Date: 1573171723 2019/11/08 00:08:43 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.331 $ $NHDT-Date: 1573943499 2019/11/16 22:31:39 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -4615,7 +4615,7 @@ Y	S_yeti	(apelike creature)
 Z	S_zombie	(zombie)
 z	S_zruty	(zruty)
 \ 	S_pet_override	(any pet if ACCESSIBILITY=1 is set)
-\ 	S_player_override	(hero if ACCESSIBILITY=1 is set)
+\ 	S_hero_override	(hero if ACCESSIBILITY=1 is set)
 .\"TABLE_END  Do not delete this line.
 .TE
 .\" don't hyphenate file name across lines
@@ -4625,7 +4625,7 @@ z	S_zruty	(zruty)
 .lp "*"
 Several symbols in this table appear to be blank.
 They are the space character, except for S_pet_override
-and S_player_override which don't have any default value
+and S_hero_override which don't have any default value
 and can only be used if enabled in the \(lqsysconf\(rq file.
 .lp "*"
 S_rock is misleadingly named; rocks and stones use S_gem.
@@ -4677,7 +4677,7 @@ and \fBROGUESYMBOLS=\fP
 in your configuration file to better suit your preferences.
 See the previous section for the special symbols S_pet_override
 to force a consistent symbol for all pets and
-S_player_override to force a unique symbol for the player character
+S_hero_override to force a unique symbol for the player character
 if \fBaccessibility\fP is enabled in the sysconf file.
 .pg
 The most crucial settings to make the game more accessible are:

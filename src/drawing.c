@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1571347973 2019/10/17 21:32:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1573943500 2019/11/16 22:31:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -817,7 +817,7 @@ struct symparse loadsyms[] = {
     { SYM_OTH, SYM_BOULDER + SYM_OFF_X, "S_boulder" },
     { SYM_OTH, SYM_INVISIBLE + SYM_OFF_X, "S_invisible" },
     { SYM_OTH, SYM_PET_OVERRIDE + SYM_OFF_X, "S_pet_override" },
-    { SYM_OTH, SYM_PLAYER_OVERRIDE + SYM_OFF_X, "S_player_override" },
+    { SYM_OTH, SYM_HERO_OVERRIDE + SYM_OFF_X, "S_hero_override" },
     { 0, 0, (const char *) 0 } /* fence post */
 };
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1552945095 2019/03/18 21:38:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1573943501 2019/11/16 22:31:41 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -66,7 +66,7 @@ unsigned *ospecial;
 {
     register int offset, idx;
     int color = NO_COLOR;
-    nhsym ch, ovsym;
+    nhsym ch;
     unsigned special = 0;
     /* condense multiple tests in macro version down to single */
     boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS,
@@ -224,16 +224,20 @@ unsigned *ospecial;
 
     /* These were requested by a blind player to enhance screen reader use */
     if (sysopt.accessibility == 1) {
-        ovsym = Is_rogue_level(&u.uz)
-                    ? ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X]
-                    : ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X];
-        if (ovsym && (special & MG_PET))
-            idx = SYM_PET_OVERRIDE + SYM_OFF_X;
-        ovsym = Is_rogue_level(&u.uz)
-                    ? ov_rogue_syms[SYM_PLAYER_OVERRIDE + SYM_OFF_X]
-                    : ov_primary_syms[SYM_PLAYER_OVERRIDE + SYM_OFF_X];
-        if (ovsym && is_you)
-            idx = SYM_PLAYER_OVERRIDE + SYM_OFF_X;
+        int ovidx;
+
+        if ((special & MG_PET) != 0) {
+            ovidx = SYM_PET_OVERRIDE + SYM_OFF_X;
+            if (Is_rogue_level(&u.uz) ? ov_rogue_syms[ovidx]
+                                      : ov_primary_syms[ovidx])
+                idx = ovidx;
+        }
+        if (is_you) {
+            ovidx = SYM_HERO_OVERRIDE + SYM_OFF_X;
+            if (Is_rogue_level(&u.uz) ? ov_rogue_syms[ovidx]
+                                      : ov_primary_syms[ovidx])
+                idx = ovidx;
+        }
     }
 
     ch = showsyms[idx];

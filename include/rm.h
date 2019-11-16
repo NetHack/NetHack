@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1571347960 2019/10/17 21:32:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1573943499 2019/11/16 22:31:39 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -267,7 +267,7 @@ struct symparse {
 #define SYM_BOULDER 0
 #define SYM_INVISIBLE 1
 #define SYM_PET_OVERRIDE 2
-#define SYM_PLAYER_OVERRIDE 3
+#define SYM_HERO_OVERRIDE 3
 #define MAXOTHER 4
 
 /* linked list of symsets and their characteristics */

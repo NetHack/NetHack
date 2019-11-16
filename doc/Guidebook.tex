@@ -5100,7 +5100,7 @@ Default                      & Symbol Name                & Description\\
 \verb@Z@ & S\verb+_+zombie                  &	(zombie)\\
 \verb@z@ & S\verb+_+zruty                   &	(zruty)\\
 \verb@ @ & S\verb+_+pet\verb+_+override     &	(any pet if ACCESSIBILITY=1 is set)\\
-\verb@ @ & S\verb+_+player\verb+_+override  &	(hero if ACCESSIBILITY=1 is set)
+\verb@ @ & S\verb+_+hero\verb+_+override    &	(hero if ACCESSIBILITY=1 is set)
 \end{longtable}%
 }
 
@@ -5111,7 +5111,7 @@ Notes:
 %.lp "*"
 Several symbols in this table appear to be blank.
 They are the space character, except for S\verb+_+pet\verb+_+override
-and S\verb+_+player\verb+_+override which don't have any default value
+and S\verb+_+hero\verb+_+override which don't have any default value
 and can only be used if enabled in the ``sysconf'' file.
 
 %.lp "*"
@@ -5165,7 +5165,7 @@ and with editing files, you may want to alter settings via {\it SYMBOLS=\/}
 and {\it ROGUESYMBOLS=\/}
 in your configuration file to better suit your preferences.
 See the previous section for the special symbols S\verb+_+pet\verb+_+override
-to force a consistent symbol for all pets and S\verb+_+player\verb+_+override
+to force a consistent symbol for all pets and S\verb+_+hero\verb+_+override
 to force a unique symbol for the player character if {\it accessibility\/}
 is enabled in the {\it sysconf\/} file.
 
