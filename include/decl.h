@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1559601011 2019/06/03 22:30:11 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1573869061 2019/11/16 01:51:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -402,7 +402,7 @@ E char *fqn_prefix[PREFIX_COUNT];
 E boolean fqn_prefix_locked[PREFIX_COUNT];
 #endif
 #ifdef PREFIXES_IN_USE
-E char *fqn_prefix_names[PREFIX_COUNT];
+E const char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
