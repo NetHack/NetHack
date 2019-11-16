@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1567213890 2019/08/31 01:11:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.106 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1573934698 2019/11/16 20:04:58 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.107 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -762,12 +762,19 @@ register int x, y;
          */
         lev->waslit = (lev->lit != 0); /* remember lit condition */
 
-        /* normal region shown only on accessible positions, but poison clouds
-         * also shown above lava, pools and moats.
+        mon = m_at(x, y);
+        worm_tail = is_worm_tail(mon);
+
+        /*
+         * Normal region shown only on accessible positions, but
+         * poison clouds also shown above lava, pools and moats.
+         * However, sensed monsters take precedence over all regions.
          */
-        if (reg && (ACCESSIBLE(lev->typ)
-                    || (reg->glyph == cmap_to_glyph(S_poisoncloud)
-                        && is_pool_or_lava(x, y)))) {
+        if (reg
+            && (ACCESSIBLE(lev->typ)
+                || (reg->glyph == cmap_to_glyph(S_poisoncloud)
+                    && is_pool_or_lava(x, y)))
+            && (!mon || worm_tail || !sensemon(mon))) {
             show_region(reg, x, y);
             return;
         }
@@ -782,8 +789,6 @@ register int x, y;
             if (see_self)
                 display_self();
         } else {
-            mon = m_at(x, y);
-            worm_tail = is_worm_tail(mon);
             see_it = mon && (mon_visible(mon)
                              || (!worm_tail && (tp_sensemon(mon)
                                                 || MATCH_WARN_OF_MON(mon))));
