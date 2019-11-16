@@ -53,7 +53,7 @@ WIZARDS=*
 #SEDUCE=0
 
 # Uncomment the next line to enable some accessibility features such
-# as S_player_override and S_pet_override symbols for screen readers
+# as S_hero_override and S_pet_override symbols for screen readers
 # in the user config file.
 #ACCESSIBILITY=1
 

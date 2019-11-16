@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1571531890 2019/10/20 00:38:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1573943502 2019/11/16 22:31:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1053,27 +1053,27 @@ struct permonst **for_supplement;
                         break;
                 case SYM_PET_OVERRIDE + SYM_OFF_X:
                         if (looked) {
-                            int oc = 0;
+                            int oc = 0, idx = SYM_PET_OVERRIDE + SYM_OFF_X;
                             unsigned os = 0;
                             nhsym save_override;
 
                             if (Is_rogue_level(&u.uz)) {
-                                save_override = g.ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X];
-                                g.ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = 0;
+                                save_override = g.ov_rogue_syms[idx];
+                                g.ov_rogue_syms[idx] = 0;
                             } else {
-                                save_override = g.ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X];
-                                g.ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = 0;
+                                save_override = g.ov_primary_syms[idx];
+                                g.ov_primary_syms[idx] = 0;
                             }
-                            /* convert to symbol without the override in effect */
+                            /* convert to symbol without override in effect */
                             (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
                             if (Is_rogue_level(&u.uz))
-                                g.ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = save_override;
+                                g.ov_rogue_syms[idx] = save_override;
                             else
-                                g.ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X] = save_override;
+                                g.ov_primary_syms[idx] = save_override;
                             goto check_monsters;
                         }
                         break;
-                case SYM_PLAYER_OVERRIDE + SYM_OFF_X:
+                case SYM_HERO_OVERRIDE + SYM_OFF_X:
                         sym = g.showsyms[S_HUMAN + SYM_OFF_M];
                         goto check_monsters;
             }
@@ -1081,7 +1081,8 @@ struct permonst **for_supplement;
     }
 #if 0
     /* handle optional boulder symbol as a special case */
-    if (o_syms[SYM_BOULDER + SYM_OFF_X] && sym == o_syms[SYM_BOULDER + SYM_OFF_X]) {
+    if (o_syms[SYM_BOULDER + SYM_OFF_X]
+        && sym == o_syms[SYM_BOULDER + SYM_OFF_X]) {
         if (!found) {
             *firstmatch = "boulder";
             Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
