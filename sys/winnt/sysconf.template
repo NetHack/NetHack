@@ -78,20 +78,20 @@ WIZARDS=*
 # point at must exist.  NetHack will not create them for you.
 #
 # The location that users can adjust their config file startup options
-#CONFIGDIR=c:\User\USERNAME\NetHack
+#CONFIGDIR=%USERPROFILE%\NetHack
 #
 # The location that a record of game aborts and self-diagnosed game problems
 # is kept (default=HACKDIR, writeable)
-#TROUBLEDIR=c:\User\USERNAME\NetHack\3.6
+#TROUBLEDIR=%USERPROFILE%\NetHack\3.6
 #
 # The location that documentation and helps files are placed
-#HACKDIR=c:\User\USERNAME\NetHack\3.6
+#HACKDIR=%USERPROFILE%\NetHack\3.6
 #
 # The location that level files in progress are stored (writeable)
-#LEVELDIR=c:\User\USERNAME\AppData\Local\NetHack\3.6
+LEVELDIR=%USERPROFILE%\AppData\Local\NetHack\3.6
 #
 # The location where saved games are kept (writeable)
-#SAVEDIR=c:\User\USERNAME\AppData\Local\NetHack\3.6
+#SAVEDIR=%USERPROFILE%\AppData\Local\NetHack\3.6
 #
 # The location that bones files are kept (writeable)
 #BONESDIR=c:\ProgramData\NetHack\3.6
