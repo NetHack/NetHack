@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1573943502 2019/11/16 22:31:42 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.159 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1574011494 2019/11/17 17:24:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.161 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1039,32 +1039,33 @@ struct permonst **for_supplement;
     for (j = SYM_OFF_X; j < SYM_MAX; ++j) {
         if (j == (SYM_INVISIBLE + SYM_OFF_X))
             continue;       /* already handled above */
-        tmpsym = Is_rogue_level(&u.uz) ? g.ov_rogue_syms[j] : g.ov_primary_syms[j];                    
+        tmpsym = Is_rogue_level(&u.uz) ? g.ov_rogue_syms[j]
+                                       : g.ov_primary_syms[j];
         if (tmpsym && sym == tmpsym) {
-            switch(j) {
-                case SYM_BOULDER + SYM_OFF_X:
-                        if (!found) {
-                            *firstmatch = "boulder";
-                            Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
-                            found++;
-                        } else {
-                            found += append_str(out_str, "boulder");
-                        }
-                        break;
-                case SYM_PET_OVERRIDE + SYM_OFF_X:
-                        if (looked) {
-                            int oc = 0, idx = SYM_PET_OVERRIDE + SYM_OFF_X;
-                            unsigned os = 0;
+            switch (j) {
+            case SYM_BOULDER + SYM_OFF_X:
+                if (!found) {
+                    *firstmatch = "boulder";
+                    Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
+                    found++;
+                } else {
+                    found += append_str(out_str, "boulder");
+                }
+                break;
+            case SYM_PET_OVERRIDE + SYM_OFF_X:
+                if (looked) {
+                    int oc = 0;
+                    unsigned os = 0;
 
-                            /* convert to symbol without override in effect */
-                            (void) mapglyph(glyph, &sym, &oc, &os,
-                                                cc.x, cc.y, MG_FLAG_NOOVERRIDE);
-                            goto check_monsters;
-                        }
-                        break;
-                case SYM_HERO_OVERRIDE + SYM_OFF_X:
-                        sym = g.showsyms[S_HUMAN + SYM_OFF_M];
-                        goto check_monsters;
+                    /* convert to symbol without override in effect */
+                    (void) mapglyph(glyph, &sym, &oc, &os,
+                                    cc.x, cc.y, MG_FLAG_NOOVERRIDE);
+                    goto check_monsters;
+                }
+                break;
+            case SYM_HERO_OVERRIDE + SYM_OFF_X:
+                sym = g.showsyms[S_HUMAN + SYM_OFF_M];
+                goto check_monsters;
             }
         }
     }
