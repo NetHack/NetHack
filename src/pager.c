@@ -826,7 +826,7 @@ struct permonst **for_supplement;
 
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
-        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
+        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y, 0);
 
         Sprintf(prefix, "%s        ", encglyph(glyph));
     } else
@@ -1055,21 +1055,10 @@ struct permonst **for_supplement;
                         if (looked) {
                             int oc = 0, idx = SYM_PET_OVERRIDE + SYM_OFF_X;
                             unsigned os = 0;
-                            nhsym save_override;
 
-                            if (Is_rogue_level(&u.uz)) {
-                                save_override = ov_rogue_syms[idx];
-                                ov_rogue_syms[idx] = 0;
-                            } else {
-                                save_override = ov_primary_syms[idx];
-                                ov_primary_syms[idx] = 0;
-                            }
                             /* convert to symbol without override in effect */
-                            (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
-                            if (Is_rogue_level(&u.uz))
-                                ov_rogue_syms[idx] = save_override;
-                            else
-                                ov_primary_syms[idx] = save_override;
+                            (void) mapglyph(glyph, &sym, &oc, &os,
+                                                cc.x, cc.y, MG_FLAG_NOOVERRIDE);
                             goto check_monsters;
                         }
                         break;

@@ -59,10 +59,11 @@ static const int explcolors[] = {
 
 /*ARGSUSED*/
 int
-mapglyph(glyph, ochar, ocolor, ospecial, x, y)
+mapglyph(glyph, ochar, ocolor, ospecial, x, y, mgflags)
 int glyph, *ocolor, x, y;
 int *ochar;
 unsigned *ospecial;
+unsigned mgflags;
 {
     register int offset, idx;
     int color = NO_COLOR;
@@ -223,7 +224,7 @@ unsigned *ospecial;
     }
 
     /* These were requested by a blind player to enhance screen reader use */
-    if (sysopt.accessibility == 1) {
+    if (sysopt.accessibility == 1 && !(mgflags & MG_FLAG_NOOVERRIDE)) {
         int ovidx;
 
         if ((special & MG_PET) != 0) {
@@ -300,7 +301,7 @@ const char *str;
                             gv = (gv * 16) + ((int) (dp - hex) / 2);
                         else
                             break;
-                    so = mapglyph(gv, &ch, &oc, &os, 0, 0);
+                    so = mapglyph(gv, &ch, &oc, &os, 0, 0, 0);
                     *put++ = showsyms[so];
                     /* 'str' is ready for the next loop iteration and '*str'
                        should not be copied at the end of this iteration */

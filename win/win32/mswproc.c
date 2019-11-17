@@ -3091,7 +3091,7 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
                 ochar = GOLD_SYM;
             else
                 mapglyph(objnum_to_glyph(GOLD_PIECE),
-                         &ochar, &ocolor, &ospecial, 0, 0);
+                         &ochar, &ocolor, &ospecial, 0, 0, 0);
             buf[0] = ochar;
             p = strchr(text, ':');
             if (p) {

@@ -125,7 +125,7 @@ curses_add_inv(int y,
         int symbol = 0;
         attr_t glyphclr;
 
-        mapglyph(glyph, &symbol, &color, &dummy, u.ux, u.uy);
+        mapglyph(glyph, &symbol, &color, &dummy, u.ux, u.uy, 0);
         glyphclr = curses_color_attr(color, 0);
         wattron(win, glyphclr);
         wprintw(win, "%c ", symbol);

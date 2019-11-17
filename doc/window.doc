@@ -926,7 +926,8 @@ These are not part of the interface. They may be called by your
 window port routines to perform the desired task, instead of duplicating
 the necessary code in each window port.
 
-int mapglyph(int glyph, int *ochar, int *ocolor, unsigned *special, int x, int y)
+int mapglyph(int glyph, int *ochar, int *ocolor, unsigned *special, 
+             int x, int y, unsigned mgflags)
 		-- Maps glyph at x,y to NetHack ascii character and color.
 		   The return value is an index into the showsyms[] array, in
 		   case a port wants to index into its own alternative 

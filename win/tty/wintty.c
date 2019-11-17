@@ -3378,7 +3378,7 @@ int bkglyph UNUSED;
     }
 #endif
     /* map glyph to character and color */
-    (void) mapglyph(glyph, &ch, &color, &special, x, y);
+    (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
 
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
