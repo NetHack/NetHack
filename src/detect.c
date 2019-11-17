@@ -1932,7 +1932,7 @@ dump_map()
 
             glyph = reveal_terrain_getglyph(x, y, FALSE, u.uswallow,
                                             default_glyph, subset);
-            (void) mapglyph(glyph, &ch, &color, &special, x, y);
+            (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
             buf[x - 1] = ch;
             if (ch != ' ') {
                 blankrow = FALSE;

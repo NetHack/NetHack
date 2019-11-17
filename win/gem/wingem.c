@@ -930,7 +930,7 @@ int glyph;
     unsigned special;
 
     /* map glyph to character and color */
-    (void) mapglyph(glyph, &ch, &color, &special, x, y);
+    (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
 
 #ifdef TEXTCOLOR
     /* Turn off color if rogue level. */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1573933605 2019/11/16 19:46:45 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1573957877 2019/11/17 02:31:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -338,6 +338,11 @@ NhRegion *reg;
     if (i == g.n_regions)
         return;
 
+    /* remove region before potential newsym() calls, but don't free it yet */
+    if (--g.n_regions != i)
+        g.regions[i] = g.regions[g.n_regions];
+    g.regions[g.n_regions] = (NhRegion *) 0;
+
     /* Update screen if necessary */
     reg->ttl = -2L; /* for visible_region_at */
     if (reg->visible)
@@ -347,9 +352,6 @@ NhRegion *reg;
                     newsym(x, y);
 
     free_region(reg);
-    g.regions[i] = g.regions[g.n_regions - 1];
-    g.regions[g.n_regions - 1] = (NhRegion *) 0;
-    g.n_regions--;
 }
 
 /*
