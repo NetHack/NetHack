@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1574037901 2019/11/18 00:45:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.270 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1574116097 2019/11/18 22:28:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.272 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4003,10 +4003,13 @@ boolean wildcards;
 void
 reveal_paths(VOID_ARGS)
 {
-    const char *fqn, *gamename = (hname && *hname) ? hname : "NetHack";
+    const char *fqn, *nodumpreason;
     char buf[BUFSZ];
-#if defined(SYSCF) || !defined(UNIX)
+#if defined(SYSCF) || !defined(UNIX) || defined(DLB)
     const char *filep;
+#ifdef SYSCF
+    const char *gamename = (hname && *hname) ? hname : "NetHack";
+#endif
 #endif
 #ifdef UNIX
     char *endp, *envp, cwdbuf[PATH_MAX];
@@ -4116,7 +4119,10 @@ reveal_paths(VOID_ARGS)
 
     /* dumplog */
 
-#ifdef DUMPLOG
+#ifndef DUMPLOG
+    nodumpreason = "not supported";
+#else
+    nodumpreason = "disabled";
 #ifdef SYSCF
     fqn = sysopt.dumplogfile;
 #else  /* !SYSCF */
@@ -4126,14 +4132,14 @@ reveal_paths(VOID_ARGS)
     fqn = (char *) 0;
 #endif
 #endif /* ?SYSCF */
-    if (fqn) {
-        raw_print("Your end-of-game dump file:");
+    if (fqn && *fqn) {
+        raw_print("Your end-of-game disclosure file:");
         (void) dump_fmtstr(fqn, buf, FALSE);
         buf[sizeof buf - sizeof "    \"\""] = '\0';
         raw_printf("    \"%s\"", buf);
     } else
-#endif /* DUMPLOG */
-        raw_print("No end-of-game dump file.");
+#endif /* ?DUMPLOG */
+        raw_printf("No end-of-game disclosure file (%s).", nodumpreason);
 
     /* personal configuration file */
 
