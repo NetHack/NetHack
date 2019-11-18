@@ -1,4 +1,4 @@
-# NetHack 3.6  tribute       $NHDT-Date: 1573777025 2019/11/15 00:17:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.84 $
+# NetHack 3.6  tribute       $NHDT-Date: 1574103673 2019/11/18 19:01:13 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.85 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -549,7 +549,7 @@ explain the observed facts, and they are completely and utterly wrong.
 %e passage
 # p. 205
 %passage 11
-"Where to they all come from?" said Twoflower, as they fled yet another mob.
+"Where do they all come from?" said Twoflower, as they fled yet another mob.
 
 "Inside every sane person there's a madman struggling to get out," said the
 shopkeeper,  "That's what I've always thought.  No one goes mad quicker than
