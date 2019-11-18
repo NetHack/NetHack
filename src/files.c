@@ -4097,6 +4097,14 @@ reveal_paths(VOID_ARGS)
 #ifdef DLB
     raw_printf("Basic data files%s are collected inside:", buf);
     filep = DLBFILE;
+#ifdef VERSION_IN_DLB_FILENAME
+    Strcpy(buf, build_dlb_filename((const char *) 0));
+#ifdef PREFIXES_IN_USE
+    fqn = fqname(buf, DATAPREFIX, 1);
+    if (fqn)
+        filep = fqn;
+#endif /* PREFIXES_IN_USE */
+#endif
     raw_printf("    \"%s\"", filep);
 #ifdef DLBFILE2
     filep = DLBFILE2;
@@ -4105,6 +4113,27 @@ reveal_paths(VOID_ARGS)
 #else /* !DLB */
     raw_printf("Basic data files%s are in many separate files.", buf);
 #endif /* ?DLB */
+
+    /* dumplog */
+
+#ifdef DUMPLOG
+#ifdef SYSCF
+    fqn = sysopt.dumplogfile;
+#else  /* !SYSCF */
+#ifdef DUMPLOG_FILE
+    fqn = DUMPLOG_FILE;
+#else
+    fqn = (char *) 0;
+#endif
+#endif /* ?SYSCF */
+    if (fqn) {
+        raw_print("Your end-of-game dump file:");
+        (void) dump_fmtstr(fqn, buf, FALSE);
+        buf[sizeof buf - sizeof "    \"\""] = '\0';
+        raw_printf("    \"%s\"", buf);
+    } else
+#endif /* DUMPLOG */
+        raw_print("No end-of-game dump file.");
 
     /* personal configuration file */
 
@@ -4157,25 +4186,6 @@ reveal_paths(VOID_ARGS)
 #endif
     raw_printf("    \"%s\"", fqn ? fqn : default_configfile);
 #endif  /* ?UNIX */
-
-#ifdef DUMPLOG
-#ifdef SYSCF
-    fqn = sysopt.dumplogfile;
-#else  /* !SYSCF */
-#ifdef DUMPLOG_FILE
-    fqn = DUMPLOG_FILE;
-#else
-    fqn = (char *) 0;
-#endif
-#endif /* ?SYSCF */
-    if (fqn) {
-        raw_print("Your end-of-game dump file:");
-        (void) dump_fmtstr(fqn, buf, FALSE);
-        buf[sizeof buf - sizeof "    \"\""] = '\0';
-        raw_printf("    \"%s\"", buf);
-    } else
-#endif /* DUMPLOG */
-        raw_print("No end-of-game dump file.");
 
     raw_print("");
 }
