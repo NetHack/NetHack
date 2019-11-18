@@ -4091,14 +4091,12 @@ boolean tinitial, tfrom_file;
         }
     }
 
-#if 0
     /* Is it a symbol? */
     if (strstr(opts, "S_") == opts && parsesymbols(opts, PRIMARY)) {
         switch_symbols(TRUE);
         check_gold_symbol();
         return retval;
     }
-#endif
 
     /* out of valid options */
     config_error_add("Unknown option '%s'", opts);

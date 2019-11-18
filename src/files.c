@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1573869063 2019/11/16 01:51:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.269 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1574037901 2019/11/18 00:45:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.270 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2833,8 +2833,8 @@ char *origbuf;
 #endif /* SYSCF */
 
     } else if (match_varname(buf, "BOULDER", 3)) {
-        (void) get_uchars(bufp, &g.ov_primary_syms[SYM_BOULDER + SYM_OFF_X], TRUE, 1,
-                          "BOULDER");
+        (void) get_uchars(bufp, &g.ov_primary_syms[SYM_BOULDER + SYM_OFF_X],
+                          TRUE, 1, "BOULDER");
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
         if (!add_menu_coloring(bufp))
             retval = FALSE;
@@ -4325,13 +4325,13 @@ reveal_paths(VOID_ARGS)
     if (cstrp && (int) strlen(cstrp) < maxlen)
         Sprintf(buf, " (in %s)", cstrp);
 #endif /* PREFIXES_IN_USE */
-    raw_printf("%s loadable symbols file%s:", s_suffix(gamename), buf);
+    raw_printf("The loadable symbols file%s:", buf);
 #endif /* UNIX */
 
 #ifdef UNIX
     envp = getcwd(cwdbuf, PATH_MAX);
     if (envp) {
-        raw_printf("%s loadable symbols file:", s_suffix(gamename));
+        raw_print("The loadable symbols file:");
         raw_printf("    \"%s/%s\"", envp, SYMBOLS);
     }
 #else /* UNIX */
@@ -4347,6 +4347,27 @@ reveal_paths(VOID_ARGS)
 #endif /* PREFIXES_IN_USE */
     raw_printf("    \"%s\"", filep);
 #endif /* UNIX */
+
+    /* dlb vs non-dlb */
+
+    buf[0] = '\0';
+#ifdef PREFIXES_IN_USE
+    cstrp = fqn_prefix_names[DATAPREFIX];
+    maxlen = BUFSZ - sizeof " (in )";
+    if (cstrp && (int) strlen(cstrp) < maxlen)
+        Sprintf(buf, " (in %s)", cstrp);
+#endif
+#ifdef DLB
+    raw_printf("Basic data files%s are collected inside:", buf);
+    filep = DLBFILE;
+    raw_printf("    \"%s\"", filep);
+#ifdef DLBFILE2
+    filep = DLBFILE2;
+    raw_printf("    \"%s\"", filep);
+#endif
+#else /* !DLB */
+    raw_printf("Basic data files%s are in many separate files.", buf);
+#endif /* ?DLB */
 
     /* personal configuration file */
 
