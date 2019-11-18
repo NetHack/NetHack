@@ -1,11 +1,11 @@
-         NetHack 3.6.3 work-in-progress -- General information
+         NetHack 3.6.3 beta1 -- General information
 
 NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.3 work-in-progress is not an official release of NetHack. It 
-currently contains a collection of over 140 bug fixes to NetHack 3.6.2
+NetHack 3.6.3 beta1 is not an official release of NetHack. It 
+currently contains a collection of over 150 bug fixes to NetHack 3.6.2
 and more than 16 enhancements and community contributions. The file 
 doc/fixes36.3 in the source distribution has a full list of them. 
 The text in there was written for the development team's own use and is
