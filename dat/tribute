@@ -1,4 +1,4 @@
-# NetHack 3.6  tribute       $NHDT-Date: 1573777025 2019/11/15 00:17:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.84 $
+# NetHack 3.6  tribute       $NHDT-Date: 1574107001 2019/11/18 19:56:41 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.86 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -549,7 +549,7 @@ explain the observed facts, and they are completely and utterly wrong.
 %e passage
 # p. 205
 %passage 11
-"Where to they all come from?" said Twoflower, as they fled yet another mob.
+"Where do they all come from?" said Twoflower, as they fled yet another mob.
 
 "Inside every sane person there's a madman struggling to get out," said the
 shopkeeper,  "That's what I've always thought.  No one goes mad quicker than
@@ -786,7 +786,7 @@ back of his skull.
 
   [Equal Rites, by Terry Pratchett]
 %e passage
-# p. 185 (actually uses four periods to mark a sentence ending in a ellipsis)
+# p. 185 (actually uses four periods to mark a sentence ending in an ellipsis)
 %passage 10
 There may be universes where librarianship is considered a peaceful sort of
 occupation, and where the risks are limited to large volumes falling off
@@ -2004,7 +2004,7 @@ road to Hell, and demons were, after all, traditionalists.
 %e passage
 # pp. 9-10 (passage has an interesting start but not much of a finish...)
 %passage 3
-"It's a haunting," he ventured.  "Some short of ghost, maybe.  A bell, book
+"It's a haunting," he ventured.  "Some sort of ghost, maybe.  A bell, book
 and candle job."
 
 The Bursar sighed.  "We tried that, Archchancellor."
@@ -2816,8 +2816,8 @@ It carried on turning, pulling her with it.
 
 Blimey.  Oh, well...
 
-Then she did was neither Granny Weatherwax nor Magrat would have dreamed of
-doing in the circumstances.  But Nanny Ogg's voyages on the sea of
+Then she did what neither Granny Weatherwax nor Magrat would have dreamed
+of doing in the circumstances.  But Nanny Ogg's voyages on the sea of
 intersexual dalliance had gone rather further than twice around the
 lighthouse, and she saw nothing demeaning in getting a man to help her.
 
