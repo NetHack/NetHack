@@ -143,11 +143,13 @@ mttymain.c
 
 sys/msdos:
 (files for MSDOS version - untested for 3.6.2)
-Install.dos   Makefile.BC   Makefile.GCC  Makefile.MSC  SCHEMA35.MSC
-moveinit.pat  msdos.c       msdoshlp.txt  ovlinit.c     pckeys.c
-pctiles.c     pctiles.h     pcvideo.h     portio.h      schema1.BC
-schema2.BC    schema3.MSC   setup.bat     sound.c       tile2bin.c
-vesa.h        video.c       vidtxt.c      vidvesa.c     vidvga.c
+Install.dos      Makefile.BC      Makefile.GCC     Makefile.MSC
+Makefile1.cross  Makefile2.cross  SCHEMA35.MSC     moveinit.pat
+msdos.c          msdoshlp.txt     ovlinit.c        pckeys.c
+pctiles.c        pctiles.h        pcvideo.h        portio.h
+schema1.BC       schema2.BC       schema3.MSC      setup.bat
+sound.c          tile2bin.c       vesa.h           video.c
+vidtxt.c         vidvesa.c        vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
