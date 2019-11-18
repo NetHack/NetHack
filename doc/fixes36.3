@@ -235,6 +235,9 @@ dipping lichen corpse into acid when not blind and acid was undicovered would
 pluralization improvement for words ending in a k-sound like "biotech"
 check for whether a monster was entering a region (gas cloud) erroneously
 	depended upon whether or not the hero was inside the same region
+all Is_*_level tests during early startup would test as true until
+	dungeon_topology was initialized in a new game or restored from 
+	a save file
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
