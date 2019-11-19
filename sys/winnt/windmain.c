@@ -726,6 +726,9 @@ nhusage()
 #ifdef NEWS
     ADD_USAGE(" [-n]");
 #endif
+    (void) Sprintf(buf2, "\n       or\n%s [--showpaths]",
+        hname);
+    ADD_USAGE(buf2);
     if (!iflags.window_inited)
         raw_printf("%s\n", buf1);
     else
