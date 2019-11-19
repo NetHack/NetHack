@@ -925,8 +925,6 @@ init_dungeons()
                     int lvl_flags = get_dgn_flags(L);
                     struct tmplevel *tmpl = &pd.tmplevel[pd.n_levs + f];
 
-                    nhUse(lvl_bonetag);
-                    nhUse(lvl_align);
                     debugpline4("LEVEL[%i]:%s,(%i,%i)", f, lvl_name, lvl_base, lvl_range);
                     tmpl->name = lvl_name;
                     tmpl->chainlvl = lvl_chain;
@@ -934,7 +932,9 @@ init_dungeons()
                     tmpl->lev.rand = lvl_range;
                     tmpl->chance = lvl_chance;
                     tmpl->rndlevs = lvl_nlevels;
-                    tmpl->flags = lvl_flags;
+                    tmpl->flags = lvl_flags | lvl_align;
+                    tmpl->boneschar = *lvl_bonetag ? *lvl_bonetag : 0;
+                    free(lvl_bonetag);
                     tmpl->chain = -1;
                     if (lvl_chain) {
                         debugpline1("CHAINLEVEL: %s", lvl_chain);
@@ -947,6 +947,7 @@ init_dungeons()
                         }
                         if (tmpl->chain == -1)
                             panic("Could not chain level %s to %s", lvl_name, lvl_chain);
+                        free(lvl_chain);
                     }
                 } else
                     panic("dungeon[%i].levels[%i] is not a hash", i, f);
@@ -999,6 +1000,9 @@ init_dungeons()
                                 tmpb->chain = bi;
                                 break;
                             }
+                        if (tmpb->chain == -1)
+                            panic("Could not chain branch %s to level %s", br_name, br_chain);
+                        free(br_chain);
                     }
                 } else
                     panic("dungeon[%i].branches[%i] is not a hash", i, f);
@@ -1025,6 +1029,8 @@ init_dungeons()
         Strcpy(g.dungeons[i].dname, dgn_name); /* FIXME: dname length */
         Strcpy(g.dungeons[i].proto, dgn_protoname); /* FIXME: proto length */
         g.dungeons[i].boneid = *dgn_bonetag ? *dgn_bonetag : 0;
+        free(dgn_protoname);
+        free(dgn_bonetag);
 
         if (dgn_range)
             g.dungeons[i].num_dunlevs = (xchar) rn1(dgn_range, dgn_base);
@@ -1195,6 +1201,16 @@ init_dungeons()
     }
 
     lua_close(L);
+
+    for (i = 0; i < pd.n_brs; i++) {
+        free(pd.tmpbranch[i].name);
+    }
+    for (i = 0; i < pd.n_levs; i++) {
+        free(pd.tmplevel[i].name);
+    }
+    for (i = 0; i < g.n_dgns; i++) {
+        free(pd.tmpdungeon[i].name);
+    }
 
 #ifdef DEBUG
     dumpit();

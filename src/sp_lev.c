@@ -2736,7 +2736,7 @@ lua_State *L;
 
     if (tmpobj.id == STATUE || tmpobj.id == EGG || tmpobj.id == CORPSE || tmpobj.id == TIN) {
         int lflags = 0;
-        const char *montype = get_table_str_opt(L, "montype", NULL);
+        char *montype = get_table_str_opt(L, "montype", NULL);
 
         if (montype) {
             struct permonst *pm = NULL;
@@ -2754,6 +2754,7 @@ lua_State *L;
                 tmpobj.corpsenm = monsndx(pm);
             else
                 nhl_error(L, "Unknown montype");
+            free(montype);
         }
         if (tmpobj.id == STATUE) {
             lflags |= (get_table_boolean_opt(L, "historic", 0) ? STATUE_HISTORIC : 0x00);
