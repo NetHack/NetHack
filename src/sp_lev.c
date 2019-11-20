@@ -3739,6 +3739,7 @@ int dir;
                 selection_setpoint(x, y, ov, 1);
 
     selection_free(tmp);
+    free(tmp);
 }
 
 static int FDECL((*selection_flood_check_func), (int, int));
@@ -3850,6 +3851,7 @@ boolean diagonals;
 #undef SEL_FLOOD_STACK
 #undef SEL_FLOOD_CHKDIR
     selection_free(tmp);
+    free(tmp);
 }
 
 /* McIlroy's Ellipse Algorithm */
@@ -4489,7 +4491,9 @@ struct selectionvar *ov;
     res = FALSE;
  gotitdone:
     selection_free(ov2);
+    free(ov2);
     selection_free(ov3);
+    free(ov3);
     return res;
 }
 
@@ -4534,6 +4538,7 @@ ensure_way_out()
     outhere: ;
     } while (!ret);
     selection_free(ov);
+    free(ov);
 }
 
 int
@@ -5081,6 +5086,7 @@ lua_State *L;
 {
     int prop = W_NONDIGGABLE;
     int argc = lua_gettop(L);
+    boolean freesel = FALSE;
     struct selectionvar *sel = (struct selectionvar *) 0;
                                                   /* REVIEW: compiler warning,
                                                     all assignments conditional
@@ -5091,14 +5097,18 @@ lua_State *L;
     if (argc == 1)
         sel = l_selection_check(L, -1);
     else if (argc == 0) {
+        freesel = TRUE;
         sel = selection_new();
         selection_not(sel);
     }
 
-    if (sel)
+    if (sel) {
         selection_iterate(sel, sel_set_wall_property, (genericptr_t) &prop);
-
-    /* TODO: Free(sel)? */
+        if (freesel) {
+            selection_free(sel);
+            free(sel);
+        }
+    }
 
     return 0;
 }
@@ -5111,6 +5121,7 @@ lua_State *L;
 {
     int prop = W_NONPASSWALL;
     int argc = lua_gettop(L);
+    boolean freesel = FALSE;
     struct selectionvar *sel = (struct selectionvar *) 0;
                                                   /* REVIEW: compiler warning,
                                                     all assignments conditional
@@ -5121,14 +5132,18 @@ lua_State *L;
     if (argc == 1)
         sel = l_selection_check(L, -1);
     else if (argc == 0) {
+        freesel = TRUE;
         sel = selection_new();
         selection_not(sel);
     }
 
-    if (sel)
+    if (sel) {
         selection_iterate(sel, sel_set_wall_property, (genericptr_t) &prop);
-
-    /* TODO: Free(sel)? */
+        if (freesel) {
+            selection_free(sel);
+            free(sel);
+        }
+    }
 
     return 0;
 }

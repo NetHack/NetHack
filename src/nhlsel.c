@@ -93,6 +93,7 @@ lua_State *L;
     sel->hei = tmp->hei;
     sel->map = dupstr(tmp->map);
     selection_free(tmp);
+    free(tmp);
 
     return sel;
 }
