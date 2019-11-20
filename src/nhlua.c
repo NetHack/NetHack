@@ -119,7 +119,7 @@ const char *name;
 const char *value;
 {
     lua_pushstring(L, name);
-    lua_pushstring(L, dupstr(value));
+    lua_pushstring(L, value);
     lua_rawset(L, -3);
 }
 void
