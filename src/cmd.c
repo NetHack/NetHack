@@ -839,10 +839,6 @@ boolean pre, wiztower;
         zero_nhfile(&tmpnhfp);  /* also sets fd to -1 as desired */
         tmpnhfp.mode = FREEING;
         savelev(&tmpnhfp, ledger_no(&u.uz));
-        /* create a new level; various things like bestowing a guardian
-           angel on Astral or setting off alarm on Ft.Ludios are handled
-           by goto_level(do.c) so won't occur for replacement levels */
-        mklev();
     } else {
         vision_reset();
         g.vision_full_recalc = 1;
