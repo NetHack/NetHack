@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1574387027 2019/11/22 01:43:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1574419578 2019/11/22 10:46:18 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.152 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1473,6 +1473,7 @@ struct obj *obj;
 
     if (!obj->dknown)
         return; /* probably blind */
+    flush_screen(1); /* buffered updates might matter to player's response */
 
     if (obj->oclass == POTION_CLASS && obj->fromsink)
         /* kludge, meaning it's sink water */
