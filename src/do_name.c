@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1573940540 2019/11/16 21:42:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1574387027 2019/11/22 01:43:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1733,8 +1733,8 @@ boolean called;
         Strcat(buf, "saddled ");
     has_adjectives = (buf[0] != '\0');
 
-    /* Put the actual monster name or type into the buffer now */
-    /* Be sure to remember whether the buffer starts with a name */
+    /* Put the actual monster name or type into the buffer now.
+       Remember whether the buffer starts with a personal name. */
     if (do_hallu) {
         char rnamecode;
         char *rname = rndmonnam(&rnamecode);
@@ -2014,11 +2014,12 @@ static char *
 bogusmon(buf, code)
 char *buf, *code;
 {
+    static const char bogon_codes[] = "-_+|="; /* see dat/bonusmon.txt */
     char *mname = buf;
 
     get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng);
     /* strip prefix if present */
-    if (!letter(*mname)) {
+    if (index(bogon_codes, *mname)) {
         if (code)
             *code = *mname;
         ++mname;
