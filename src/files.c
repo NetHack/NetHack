@@ -757,12 +757,12 @@ d_level *lev;
     char *dptr;
 
     /*
-     * "bonD0.nn"   = bones for level nn in the main dungeon;
-     * "bonM0.T"    = bones for Minetown;
-     * "bonQBar.n"  = bones for level n in the Barbarian quest;
-     * "bon3D0.nn"  = \
-     * "bon3M0.T"   =  > same as above, but for bones pool #3.
-     * "bon3QBar.n" = /
+     * "bonD0.nn.le"   = bones for level nn in the main dungeon;
+     * "bonM0.T.le"    = bones for Minetown;
+     * "bonQBar.n.le"  = bones for level n in the Barbarian quest;
+     * "bon3D0.nn.le"  = \
+     * "bon3M0.T.le"   =  > same as above, but for bones pool #3.
+     * "bon3QBar.n.le" = /
      *
      * Return value for content validation skips "bon" and the
      * pool number (if present), making it feasible for the admin
@@ -1032,6 +1032,17 @@ boolean regularize_it;
     if (idx > historical && idx <= ascii)
         sfindicator = sfoprocs[idx].ext;
 #endif
+    if (g.program_state.in_self_recover) {
+        /* self_recover needs to be done as historical
+           structlevel content until that process is
+           re-written to use something other than
+           copy_bytes() to retrieve data content from
+           level files (which are structlevel) and
+           place it into the save file.
+        */
+        idx = historical;
+        sfindicator = sfoprocs[idx].ext;
+    }
 #ifdef VMS
     Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
     regoffset = 7;
@@ -1108,7 +1119,7 @@ boolean regularize_it;
 	    	(idx == lendian) ? 'l' :
 	    	(idx == ascii)   ? 'a' : '\0';
 	}
-        sfindicator = sfoprocs[idx].ext;
+        sfindicator = (g.program_state.in_self_recover) ? "" : sfoprocs[idx].ext;
 #endif
 #endif
         } else
@@ -1176,6 +1187,7 @@ create_savefile()
     int failed = 0;
     const char *fq_save;
     NHFILE *nhfp = (NHFILE *) 0;
+    boolean do_historical = TRUE;
 
     fq_save = fqname(g.SAVEF, SAVEPREFIX, 0);
     nhfp = new_nhfile();
@@ -1186,7 +1198,21 @@ create_savefile()
         nhfp->mode = WRITING;
 #ifdef SYSCF
         if (sysopt.saveformat[0] > historical &&
-            sysopt.saveformat[0] <= ascii) {
+            sysopt.saveformat[0] <= ascii)
+            do_historical = FALSE;
+#endif /* SYSCF */
+        if (g.program_state.in_self_recover) {
+            do_historical = TRUE;       /* force it */
+            nhfp->structlevel = TRUE;
+            nhfp->fieldlevel = FALSE;
+            nhfp->addinfo = FALSE;
+            nhfp->style.deflt = FALSE;
+            nhfp->style.binary = TRUE;
+            nhfp->fnidx = historical;
+            nhfp->fd = -1;
+            nhfp->fpdef = (FILE *) 0;
+        }
+        if (!do_historical) {
             nhfp->structlevel = FALSE;
             nhfp->fieldlevel = TRUE;
             nhfp->addinfo = TRUE;
@@ -1203,7 +1229,6 @@ create_savefile()
                 failed = errno;
             }
         }
-#endif /* SYSCF */
         if (nhfp->structlevel) {
 #if defined(MICRO) || defined(WIN32)
             nhfp->fd = open(fq_save, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
@@ -1240,6 +1265,7 @@ open_savefile()
     int failed = 0;
     const char *fq_save;
     NHFILE *nhfp = (NHFILE *) 0;
+    boolean do_historical = TRUE;
 
     fq_save = fqname(g.SAVEF, SAVEPREFIX, 0);
     nhfp = new_nhfile();
@@ -1250,7 +1276,21 @@ open_savefile()
         nhfp->mode = READING;
 #ifdef SYSCF
         if (sysopt.saveformat[0] > historical &&
-            sysopt.saveformat[0] <= ascii) {
+            sysopt.saveformat[0] <= ascii)
+            do_historical = FALSE;
+#endif /* SYSCF */
+        if (g.program_state.in_self_recover) {
+            do_historical = TRUE;       /* force it */
+            nhfp->structlevel = TRUE;
+            nhfp->fieldlevel = FALSE;
+            nhfp->addinfo = FALSE;
+            nhfp->style.deflt = FALSE;
+            nhfp->style.binary = TRUE;
+            nhfp->fnidx = historical;
+            nhfp->fd = -1;
+            nhfp->fpdef = (FILE *) 0;
+        }
+        if (!do_historical) {
             nhfp->structlevel = FALSE;
             nhfp->fieldlevel = TRUE;
             nhfp->addinfo = TRUE;
@@ -1267,7 +1307,6 @@ open_savefile()
                 failed = errno;
             }
         }
-#endif /* SYSCF */
         if (nhfp->structlevel) {
 #ifdef MAC
             nhfp->fd = macopen(fq_save, O_RDONLY | O_BINARY, SAVE_TYPE);
@@ -3943,14 +3982,15 @@ boolean
 recover_savefile()
 {
     NHFILE *gnhfp, *lnhfp, *snhfp;
-    int lev, savelev, hpid, pltmpsiz;
+    int lev, savelev, hpid, pltmpsiz, filecmc;
     xchar levc;
     struct version_info version_data;
     int processed[256];
-    char savename[SAVESIZE], errbuf[BUFSZ];
+    char savename[SAVESIZE], errbuf[BUFSZ], indicator;
     struct savefile_info sfi;
     char tmpplbuf[PL_NSIZ];
-
+    const char *savewrite_failure = (const char *) 0;
+    
     for (lev = 0; lev < 256; lev++)
         processed[lev] = 0;
 
@@ -3985,6 +4025,10 @@ recover_savefile()
     }
     if ((read(gnhfp->fd, (genericptr_t) savename, sizeof savename)
          != sizeof savename)
+        || (read(gnhfp->fd, (genericptr_t) &indicator, sizeof indicator)
+            != sizeof indicator)
+        || (read(gnhfp->fd, (genericptr_t) &filecmc, sizeof filecmc)
+            != sizeof filecmc)
         || (read(gnhfp->fd, (genericptr_t) &version_data, sizeof version_data)
             != sizeof version_data)
         || (read(gnhfp->fd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi)
@@ -3997,6 +4041,7 @@ recover_savefile()
     }
 
     /* save file should contain:
+     *  format indicator and cmc
      *  version info
      *  savefile info
      *  player name
@@ -4004,6 +4049,22 @@ recover_savefile()
      *  (non-level-based) game state
      *  other levels
      */
+
+    /*
+     * Things are different now. We could be in a situation
+     * where the default save file format is not structlevel.
+     * self-recover is currently written to use copy_bytes()
+     * to move content from the level files into the savefile.
+     * Until the code is updated to use something other than
+     * copy_bytes, what we need to do is force the recovery
+     * save to be structlevel, finish creating it, then read
+     * it back in. The save after that can be fieldlevel again.
+     *
+     * Set a flag for the savefile routines to know the
+     * circumstances and act accordingly:
+     *    g.program_state.in_self_recover
+     */
+    g.program_state.in_self_recover = TRUE;
     set_savefile_name(TRUE);
     snhfp = create_savefile();
     if (!snhfp) {
@@ -4021,47 +4082,66 @@ recover_savefile()
         return FALSE;
     }
 
-    if (write(snhfp->fd, (genericptr_t) &version_data, sizeof version_data)
-        != sizeof version_data) {
-        raw_printf("\nError writing %s; recovery failed.", g.SAVEF);
-        close_nhfile(gnhfp);
-        close_nhfile(snhfp);
-        close_nhfile(lnhfp);
-        delete_savefile();
-        return FALSE;
+    /*
+     * Our savefile output format might _not_ be structlevel.
+     * We have to check and use the correct output routine here.
+     */
+    /*store_formatindicator(snhfp); */
+    store_version(snhfp);
+#if 0
+    if (snhfp->structlevel) {
+        if (write(snhfp->fd, (genericptr_t) &version_data, sizeof version_data)
+            != sizeof version_data)
+            savewrite_failure = "version_info";
     }
-
-    if (write(snhfp->fd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi) {
-        raw_printf("\nError writing %s; recovery failed (savefile_info).\n",
-                   g.SAVEF);
-        close_nhfile(gnhfp);
-        close_nhfile(snhfp);
-        close_nhfile(lnhfp);
-        delete_savefile();
-        return FALSE;
+    if (snhfp->fieldlevel) {
+        sfo_version_info(snhfp, (struct version_info *) &version_data,
+                         "version", "version_info", 1);
+        savewrite_failure = (const char *) 0;
     }
+    if (savewrite_failure)
+        goto cleanup;
+#endif
 
-    if (write(snhfp->fd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
-        != sizeof pltmpsiz) {
-        raw_printf("Error writing %s; recovery failed (player name size).\n",
-                   g.SAVEF);
-        close_nhfile(gnhfp);
-        close_nhfile(snhfp);
-        close_nhfile(lnhfp);
-        delete_savefile();
-        return FALSE;
+    if (snhfp->structlevel) {
+        if (write(snhfp->fd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi)
+            savewrite_failure = "savefileinfo";
     }
-
-    if (write(snhfp->fd, (genericptr_t) &tmpplbuf, pltmpsiz) != pltmpsiz) {
-        raw_printf("Error writing %s; recovery failed (player name).\n",
-                   g.SAVEF);
-        close_nhfile(gnhfp);
-        close_nhfile(snhfp);
-        close_nhfile(lnhfp);
-        delete_savefile();
-        return FALSE;
+    if (snhfp->fieldlevel) {
+        sfo_savefile_info(snhfp, &sfsaveinfo, "savefileinfo", "savefile_info", 1);
+        savewrite_failure = (const char *) 0;
     }
+    if (savewrite_failure)
+        goto cleanup;
 
+    if (snhfp->structlevel) {         
+        if (write(snhfp->fd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
+            != sizeof pltmpsiz)
+            savewrite_failure = "player name size";
+    }
+    if (snhfp->fieldlevel) {
+        sfo_int(snhfp, &pltmpsiz, "plname", "plname_size", 1);
+        savewrite_failure = (const char *) 0;
+    }
+    if (savewrite_failure)
+        goto cleanup;
+
+    if (snhfp->structlevel) {
+        if (write(snhfp->fd, (genericptr_t) &tmpplbuf, pltmpsiz) != pltmpsiz)
+            savewrite_failure = "player name";
+    }
+    if (snhfp->fieldlevel) {
+        sfo_str(snhfp, tmpplbuf, "plname", "tmpplbuf", pltmpsiz);
+        savewrite_failure = (const char *) 0;
+    }
+    if (savewrite_failure)
+        goto cleanup;
+
+    /*
+     * copy_bytes isn't good enough anymore.
+     * We could be reading from a structlevel file but
+     * writing into a fieldlevel save file. Yikes!
+     */
     if (!copy_bytes(lnhfp->fd, snhfp->fd)) {
         close_nhfile(gnhfp);
         close_nhfile(snhfp);
@@ -4116,6 +4196,20 @@ recover_savefile()
             (void) unlink(fq_lock);
         }
     }
+ cleanup:
+    if (savewrite_failure) {
+        raw_printf("\nError writing %s; recovery failed (%s).\n",
+                   g.SAVEF, savewrite_failure);
+        close_nhfile(gnhfp);
+        close_nhfile(snhfp);
+        close_nhfile(lnhfp);
+        g.program_state.in_self_recover = FALSE;
+        delete_savefile();
+        return FALSE;
+    }
+    /* we don't clear g.program_state.in_self_recover here, we
+       leave it as a flag to reload the structlevel savefile
+       in the caller. The caller should then clear it. */
     return TRUE;
 }
 

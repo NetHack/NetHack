@@ -7,6 +7,8 @@ hero polymorphed into a vampire can use #monster to shape-shift rather than
 	just do a one-shot polymorph into bat/cloud/wolf and shifted vampire
 	hero can use #monster again to take on another form (randomly chosen
 	among the shiftable shapes and true vampire form)
+adjust bones filename buffer sizes to accommodate suffix
+fix internal self-recover to work with recent fields added to checkpoint file
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository

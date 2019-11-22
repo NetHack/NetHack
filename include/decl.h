@@ -10,7 +10,7 @@
 #if !defined(MICRO) && !defined(VMS) && !defined(WIN32)
 #define LOCKNAMESIZE (PL_NSIZ + 14) /* long enough for uid+name+.99 */
 #define LOCKNAMEINIT "1lock"
-#define BONESINIT "bonesnn.xxx"
+#define BONESINIT "bonesnn.xxx.le"
 #define BONESSIZE sizeof(BONESINIT)
 #else
 #if defined(MICRO)
@@ -22,13 +22,13 @@
 #if defined(VMS)
 #define LOCKNAMESIZE (PL_NSIZ + 17) /* long enough for _uid+name+.99;1 */
 #define LOCKNAMEINIT "1lock"
-#define BONESINIT "bonesnn.xxx;1"
+#define BONESINIT "bonesnn.xxx_le;1"
 #define BONESSIZE sizeof(BONESINIT)
 #endif
 #if defined(WIN32)
 #define LOCKNAMESIZE (PL_NSIZ + 25) /* long enough for username+-+name+.99 */
 #define LOCKNAMEINIT ""
-#define BONESINIT "bonesnn.xxx"
+#define BONESINIT "bonesnn.xxx.le"
 #define BONESSIZE sizeof(BONESINIT)
 #endif
 #endif
@@ -170,6 +170,7 @@ struct sinfo {
     int exiting;                /* an exit handler is executing */
     int in_moveloop;
     int in_impossible;
+    int in_self_recover;
 #ifdef PANICLOG
     int in_paniclog;
 #endif
