@@ -80,6 +80,15 @@ tofurkey
 shrinking violet
 shallow one
 spherical cow
+electric giraffe
+steam dragon
+omnibus
+slinky
+maxotaur
+octahedron
+dungeon core
+quale
+holloway
 
 # Quendor (Zork, &c.)
 grue
@@ -242,6 +251,7 @@ corpulent porpoise
 quokka
 potoo
 lemming
+dhole
 
 # european cryptids
 wolpertinger
@@ -278,6 +288,7 @@ netsplit
 wiki
 peer
 COBOL
+wire shark
 
 # bugs
 bohrbug
@@ -329,6 +340,7 @@ bold face
 boustrophedon
 ligature
 rebus
+dinkus
 
 # Their actual character
 apostrophe golem
@@ -338,6 +350,10 @@ voluptuous ampersand
 +Bob the angry flower
 +Strong Bad
 +Magical Trevor
+
+# Girl Genius
+smakken
+mimmoth
 
 # KoL
 one-winged dewinged stab-bat
@@ -427,6 +443,9 @@ womble
 # Fraggle Rock
 fraggle
 
+# Harry Harrison
+stainless steel rat
+
 # Spoonerism
 mock role
 
@@ -478,6 +497,7 @@ geriatric snake
 gnat ant
 giant bath
 grant beetle
+greater snake
 grind bug
 giant mango
 glossy golem
