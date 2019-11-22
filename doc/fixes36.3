@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.187 $ $NHDT-Date: 1574387029 2019/11/22 01:43:49 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.188 $ $NHDT-Date: 1574419578 2019/11/22 10:46:18 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -292,6 +292,9 @@ fix several tribute typos
 pluralization correction for unlikely epoch and loch
 ensure that --showpaths displays the personal configuration file last
 don't strip leading slash from hallucinatory monster name "/b/tard"
+quaffing unknown potion of see invisible resulted in asking what to call the
+	potion while updated monster display was buffered so not yet shown,
+	hence potentially noticeable effect was concealed from player
 unix: Fix double DLB definition in linux hints file
 windows: fix --showpaths output for the data file which relies on being
 	constructed programmatically to incorporate the version suffix
