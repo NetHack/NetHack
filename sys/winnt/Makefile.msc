@@ -1745,6 +1745,7 @@ $(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
+$(O)windmain.o: $(MSWSYS)\windmain.c $(HACK_H)
 #$(O)windows.o: windows.c $(HACK_H) $(INCL)\wingem.h $(INCL)\winGnome.h
 $(O)wizard.o: wizard.c $(HACK_H) $(INCL)\qtext.h
 $(O)worm.o: worm.c $(HACK_H) $(INCL)\lev.h
