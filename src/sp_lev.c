@@ -216,7 +216,6 @@ xchar x1, y1, x2, y2;
 int prop;
 {
     register xchar x, y;
-    /* struct rm *lev; */   /* REVIEW: unreferenced */
 
     x1 = max(x1, 1);
     x2 = min(x2, COLNO - 1);
@@ -2361,7 +2360,7 @@ get_table_montype(L)
 lua_State *L;
 {
     char *s = get_table_str_opt(L, "id", NULL);
-    int ret = NON_PM /*, i */   /* REVIEW: unreferenced */;
+    int ret = NON_PM;
 
     if (s) {
         ret = find_montype(L, s);
@@ -2892,11 +2891,9 @@ lua_State *L;
     long ecoord;
     const char *const engrtypes[] = { "dust", "engrave", "burn", "mark", "blood", NULL };
     const int engrtypes2i[] = { DUST, ENGRAVE, BURN, MARK, ENGR_BLOOD, 0 };
-    xchar x, y;
+    xchar x = -1, y = -1;
     int argc = lua_gettop(L);
 
-    x = y = 0;      /* FIXME: quiet a warning for else clause below.
-                        should it actually be -1? */
     create_des_coder();
 
     if (argc == 1) {
@@ -2915,8 +2912,6 @@ lua_State *L;
         txt = dupstr(luaL_checkstring(L, 3));
     } else {
         nhl_error(L, "Wrong parameters");
-        /* FIXME: this clause left etyp uninitialized so initialization
-           to DUST was added above to quiet a macosx warning */
     }
 
     if (x == -1 && y == -1)
@@ -3168,7 +3163,7 @@ lua_State *L;
     const int stairdirs2i[] = { 0, 1 };
 
     long scoord;
-    int ax = -1, ay = -1;   /* FIXME: initializers added, macosx warning */
+    int ax = -1, ay = -1;
     int up;
     int ltype = lua_type(L, 1);
 
@@ -3331,7 +3326,8 @@ const struct {
                    { "anti magic", ANTI_MAGIC },
                    { "polymorph", POLY_TRAP },
                    { "vibrating square", VIBRATING_SQUARE },
-                   { 0, 0 } };
+                   { "random", -1 },
+                   { 0, NO_TRAP } };
 
 int
 get_table_traptype_opt(L, name, defval)
@@ -3352,6 +3348,19 @@ int defval;
     return defval;
 }
 
+int
+get_traptype_byname(trapname)
+char *trapname;
+{
+    int i;
+
+    for (i = 0; trap_types[i].name; i++)
+        if (!strcmpi(trapname, trap_types[i].name))
+            return trap_types[i].type;
+
+    return NO_TRAP;
+}
+
 /* trap({ type = "hole", x = 1, y = 1 }); */
 /* trap("hole", 3, 4); */
 /* trap("level teleport", {5, 8}); */
@@ -3363,49 +3372,27 @@ lua_State *L;
 {
     spltrap tmptrap;
     int x, y;
-    /* long tcoord; */   /* REVIEW: unreferenced */
     int argc = lua_gettop(L);
 
     create_des_coder();
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         const char *trapstr = luaL_checkstring(L, 1);
-        int i;
 
-        tmptrap.type = -1;
-        for (i = 0; trap_types[i].name; i++)
-            if (!strcmpi(trapstr, trap_types[i].name)) {
-                tmptrap.type = trap_types[i].type;
-                break;
-            }
+        tmptrap.type = get_traptype_byname(trapstr);
         x = y = -1;
     } else if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
                && lua_type(L, 2) == LUA_TTABLE) {
         const char *trapstr = luaL_checkstring(L, 1);
-        int i;
 
-        tmptrap.type = -1;
-        for (i = 0; trap_types[i].name; i++)
-            if (!strcmpi(trapstr, trap_types[i].name)) {
-                tmptrap.type = trap_types[i].type;
-                break;
-            }
+        tmptrap.type = get_traptype_byname(trapstr);
         get_coord(L, 2, &x, &y);
     } else if (argc == 3) {
         const char *trapstr = luaL_checkstring(L, 1);
-        int i;
-        tmptrap.type = -1;
-        for (i = 0; trap_types[i].name; i++)
-            if (!strcmpi(trapstr, trap_types[i].name)) {
-                tmptrap.type = trap_types[i].type;
-                break;
-            }
+
+        tmptrap.type = get_traptype_byname(trapstr);
         x = luaL_checkinteger(L, 2);
         y = luaL_checkinteger(L, 3);
-
-        if (tmptrap.type == -1)
-            nhl_error(L, "Unknown trap type");
-
     } else {
         lcheck_param_table(L);
 
@@ -3419,6 +3406,9 @@ lua_State *L;
             lua_pop(L, 1);
         }
     }
+
+    if (tmptrap.type == NO_TRAP)
+        nhl_error(L, "Unknown trap type");
 
     if (x == -1 && y == -1)
         tmptrap.coord = SP_COORD_PACK_RANDOM(0);
@@ -4328,11 +4318,12 @@ lua_State *L;
 {
     terrain tmpterrain;
     xchar x, y;
-    /* char *ter; */   /* REVIEW: unreferenced */
     struct selectionvar *sel = NULL;
     int argc = lua_gettop(L);
 
     create_des_coder();
+    tmpterrain.tlit = 0;
+    tmpterrain.ter = INVALID_TYPE;
 
     if (argc == 1) {
         lcheck_param_table(L);
@@ -4357,12 +4348,10 @@ lua_State *L;
     } else if (argc == 2) {
         sel = l_selection_check(L, 1);
         tmpterrain.ter = check_mapchr(luaL_checkstring(L, 2));
-        tmpterrain.tlit = luaL_optinteger(L, 3, 0); /* FIXME: this can never be here, argc==2 */
     } else if (argc == 3) {
         x = luaL_checkinteger(L, 1);
         y = luaL_checkinteger(L, 2);
         tmpterrain.ter = check_mapchr(luaL_checkstring(L, 3));
-        tmpterrain.tlit = 0;
     } else {
         nhl_error(L, "wrong parameters");
     }
@@ -4390,7 +4379,6 @@ lspo_replace_terrain(L)
 lua_State *L;
 {
     replaceterrain rt;
-    /* char *toter, *fromter; */   /* REVIEW: unreferenced */
     xchar totyp, fromtyp;
 
     create_des_coder();
@@ -4571,8 +4559,7 @@ const char *name;
 int *x1, *y1, *x2, *y2;
 boolean optional;
 {
-    int arrlen /*, i*/   /* REVIEW: unreferenced */;
-    /* int retvals[4]; */   /* REVIEW: unreferenced */
+    int arrlen;
 
     lua_getfield(L, 1, name);
     if (optional && lua_type(L, -1) == LUA_TNIL) {
@@ -4904,7 +4891,6 @@ lua_State *L;
     const char *const dbopens[] = { "open", "closed", "random", NULL };
     const int dbopens2i[] = { 1, 0, -1, -2 };
     xchar x, y;
-/*    int dbopen; */
     int mx, my, dir;
     int db_open;
     long dcoord;
@@ -4922,7 +4908,6 @@ lua_State *L;
     y = my;
 
     get_location_coord(&x, &y, DRY | WET | HOT, g.coder->croom, dcoord);
-    /* REVIEW: from here down was using dbopen previously */
     if (db_open == -1)
         db_open = !rn2(2);
     if (!create_drawbridge(x, y, dir, db_open ? TRUE : FALSE))
@@ -5088,9 +5073,6 @@ lua_State *L;
     int argc = lua_gettop(L);
     boolean freesel = FALSE;
     struct selectionvar *sel = (struct selectionvar *) 0;
-                                                  /* REVIEW: compiler warning,
-                                                    all assignments conditional
-                                                    so initializer was added */
 
     create_des_coder();
 
@@ -5123,9 +5105,6 @@ lua_State *L;
     int argc = lua_gettop(L);
     boolean freesel = FALSE;
     struct selectionvar *sel = (struct selectionvar *) 0;
-                                                  /* REVIEW: compiler warning,
-                                                    all assignments conditional
-                                                    so initializer was added */
 
     create_des_coder();
 
@@ -5192,15 +5171,14 @@ lua_State *L;
 /* reset_level is only needed for testing purposes */
 int
 lspo_reset_level(L)
-lua_State *L UNUSED;   /* macosx complaint needed UNUSED */
+lua_State *L UNUSED;
 {
     boolean wtower = In_W_tower(u.ux, u.uy, &u.uz);
 
     create_des_coder();
     makemap_prepost(TRUE, wtower);
     clear_level_structures();
-    return 0;   /* REVIEW: warning, int fn must return value
-                   so added "return 0; " */
+    return 0;
 }
 
 /* map({ x = 10, y = 10, map = [[...]] }); */
@@ -5211,9 +5189,7 @@ lspo_map(L)
 lua_State *L;
 {
     mazepart tmpmazepart;
-    /* xchar halign, valign; */   /* REVIEW: unreferenced */
     xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
-    /* unpacked_coord upc; */   /* REVIEW: unreferenced */
 
     /*
 TODO: allow passing an array of strings as map data
