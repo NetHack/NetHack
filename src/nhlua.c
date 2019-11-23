@@ -789,6 +789,7 @@ traceback_handler(L)
 lua_State *L;
 {
     luaL_traceback(L, L, lua_tostring(L, 1), 0);
+    /* TODO: call impossible() if fuzzing? */
     return 1;
 }
 
