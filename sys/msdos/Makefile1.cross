@@ -5,7 +5,7 @@
 #       Makefile1.cross (this file) is for the host-side obj files and 
 #       utilities that will run on the host platform only.
 #
-#       Makefile2.cross is for the target platform obj files
+#       Makefile2.cross is the the target platform obj files
 #       and utilities.
 #
 #   Makefile2 utilizes the djgpp cross-compiler from Andrew Wu:
@@ -143,8 +143,8 @@ TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O
 TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
 		$(HOST_O)objects.o
 
-PLANAR_TIB  = $(DAT)/NETHACK1.TIB
-OVERVIEW_TIB = $(DAT)/NETHACKO.TIB
+#PLANAR_TIB  = $(DAT)/NETHACK1.TIB
+#OVERVIEW_TIB = $(DAT)/NETHACKO.TIB
 TILE_BMP    = $(DAT)/NHTILES.BMP
 
 TILEUTIL    = $(TILOBJ) $(U)tile2bin $(U)til2bin2 $(TILE_BMP) $(PLANAR_TIB) $(OVERVIEW_TIB)
