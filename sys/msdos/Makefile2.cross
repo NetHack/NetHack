@@ -313,6 +313,8 @@ SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 
 VVOBJ  = $(O)version.o
 
+MDLIB  = $(O)mdlib.o
+
 ifeq "$(ADD_LUA)" "Y"
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
 endif
@@ -329,7 +331,7 @@ VOBJ  = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
 	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-	$(LUAOBJ) $(CURSESOBJ) 
+	$(LUAOBJ) $(CURSESOBJ) $(MDLIB)
 
 ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 
@@ -665,6 +667,7 @@ endif
 ifeq "$(ADD_CURSES)" "Y"
 	@$(TARGET_AR) r temp.a $(CURSESOBJ)
 endif
+	@$(TARGET_AR) r temp.a $(MDLIB)
 	$(TARGET_LINK) $(LFLAGS) -o$(GAME).exe temp.a $(PDCLIB) $(LUALIB) $(LIBRARIES) $(ZLIB)
 	$(TARGET_STUBEDIT) $(GAME).exe minstack=2048K
 	cp $(GAME).exe $(GAMEFILE)

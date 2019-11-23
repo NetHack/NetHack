@@ -39,7 +39,7 @@ if [ ! -d cwsdpmi ]; then
 fi
 cd ../src
 pwd
-mkdir -p ../binary
+mkdir -p ../msdos-binary
 cp ../dat/data.base ../dat/data.bas
 cp ../include/patchlevel.h ../include/patchlev.h
 cp ../doc/Guidebook.txt ../doc/guidebk.txt
@@ -53,8 +53,11 @@ export
 pwd
 make -f Makefile2
 unset GCC_EXEC_PREFIX
-if [ -f $TRAVIS_BUILD_DIR/djgpp/cwsdpmi/bin/cwsdpmi.exe ]; then
-    cp $TRAVIS_BUILD_DIR/djgpp/cwsdpmi/bin/cwsdpmi.exe ../binary/CWSDPMI.EXE;
+pwd
+ls ../djgpp/cwsdpmi/bin 
+ls .
+if [ -f ../djgpp/cwsdpmi/bin/CWSDPMI.EXE ]; then
+    cp  ../djgpp/cwsdpmi/bin/CWSDPMI.EXE ../msdos-binary/CWSDPMI.EXE;
 fi
-ls -l ../binary
+ls -l ../msdos-binary
 
