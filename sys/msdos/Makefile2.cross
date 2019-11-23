@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile2.cross
+# NetHack 3.7	Makefile2.cross
 #       Cross-compile msdos version of NetHack using a 
 #       linux-hosted djgpp cross-compiler.
 #
@@ -11,17 +11,17 @@
 #   Makefile2 utilizes the djgpp cross-compiler from Andrew Wu:
 #       https://github.com/andrewwutw/build-djgpp
 #
-#   Currently, in NetHack 3.6, the cross-compile for msdos cannot be
-#   used to build the entire game to a playable point but it is useful
-#   for testing the msdos port build of the evolving NetHack code.
+#   In NetHack 3.7, the cross-compile for msdos can be used to
+#   build the entire game to a complete ms-dos package and 
+#   result (in theory).
 #
 
 # Game Installation Variables
 # NOTE: Make sure GAMEDIR exists before make is started.
 
-GAME = nethack
+GAME = NETHACK
 # The GNU Make has a problem if you include a drive spec below (unfortunately).
-GAMEDIR =../binary
+GAMEDIR =../msdos-binary
 
 # Optional PDCurses support
 #    Uncomment these and set them appropriately if you want to
@@ -39,6 +39,20 @@ PDCURSES_TOP=../../pdcurses
 # Set top of djgpp if not specified through ENV variables prior to make:
 #DJGPP_TOP = $(HOME)/djgpp
 
+#---------------------------------------------------------------
+# Location of LUA
+#
+# Original source needs to be obtained from: 
+#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#
+#    This build assumes that the LUA sources are located
+#    at the specified location. If they are actually elsewhere
+#    you'll need to specify the correct spot below in order to
+#    successfully build NetHack-3.7.
+#
+ADD_LUA=Y
+LUATOP=../lib/lua-5.3.5
+#
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -47,7 +61,8 @@ PDCURSES_TOP=../../pdcurses
 # Directories, gcc likes unix style directory specs
 #
 
-OBJ  = o
+TARGET = msdos
+OBJ  = $(TARGET)_o
 HOBJ = host_o
 DAT  = ../dat
 DOC  = ../doc
@@ -73,6 +88,7 @@ endif
 TARGET_CC   = $(DJGPP_TOP)/i586-pc-msdosdjgpp/bin/gcc
 TARGET_LINK = $(DJGPP_TOP)/i586-pc-msdosdjgpp/bin/gcc
 TARGET_STUBEDIT = $(DJGPP_TOP)/i586-pc-msdosdjgpp/bin/stubedit
+TARGET_AR = $(DJGPP_TOP)/i586-pc-msdosdjgpp/bin/ar
 MAKEBIN  = make
 
 #
@@ -164,7 +180,7 @@ SUPPRESS_GRAPHICS =
 #                                              #
 ################################################
 
-GAMEFILE = $(GAMEDIR)/$(GAME).exe
+GAMEFILE = $(GAMEDIR)/$(GAME).EXE
 
 # Changing this conditional block is not recommended
 ifeq "$(USE_DLB)" "Y"
@@ -209,81 +225,59 @@ HOST_O = $(HOBJ)/
 U  = $(UTIL)/
 
 #==========================================
-#  Utility Objects.
-#==========================================
-
-VGAOBJ      = $(O)vidvga.o $(O)vidvesa.o
-
-MAKESRC	    = makedefs.c
-
-#SPLEVSRC    = lev_yacc.c  lev_$(LEX).c	 lev_main.c  panic.c
-
-#DGNCOMPSRC  = dgn_yacc.c  dgn_$(LEX).c	 dgn_main.c
-
-MAKEDEFSOBJS    = $(HOST_O)makedefs.o  $(HOST_O)monst.o	 $(HOST_O)objects.o
-
-#SPLEVOBJS   = $(HOST_O)lev_yacc.o $(HOST_O)lev_$(LEX).o $(HOST_O)lev_main.o $(HOST_O)alloc.o \
-#		$(HOST_O)monst.o $(HOST_O)objects.o $(HOST_O)panic.o                     \
-#		$(HOST_O)drawing.o $(HOST_O)decl.o $(O)stubvid.o
-
-#DGNCOMPOBJS = $(HOST_O)dgn_yacc.o  $(HOST_O)dgn_$(LEX).o $(HOST_O)dgn_main.o  $(HOST_O)alloc.o  \
-#		$(HOST_O)panic.o
-
-RECOVOBJS   = $(O)recover.o
-
-
-#==========================================
 #  Tile related object files.
 #==========================================
 
-ifeq ($(SUPPRESS_GRAPHICS),Y)
-TILOBJ       =
-TILOBJ2      =
-TEXTIO       =
-TEXTIO2      =
-TILE_BMP     =
-TILEUTIL     = 
-TILEFILES    = 
-TILEFILES2   = 
-GIFREADERS   = 
-GIFREAD2     = 
-PPMWRITERS   = 
-PPMWRIT2     = 
+#ifeq ($(SUPPRESS_GRAPHICS),Y)
+#TILOBJ       =
+#TILOBJ2      =
+#TEXTIO       =
+#TEXTIO2      =
+#TILE_BMP     =
+#TILEUTIL     = 
+#TILEFILES    = 
+#TILEFILES2   = 
+#GIFREADERS   = 
+#GIFREAD2     = 
+#PPMWRITERS   = 
+#PPMWRIT2     = 
+#
+#else
+#
+#TILOBJ      = $(O)tile.o $(VIDEO_OBJ)
+#
+#TILOBJ2     = $(O)tileset.o $(O)bmptiles.o $(O)giftiles.o
+#
+#TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
+#		$(HOST_O)objects.o $(HOST_O)stubvid.o
+#
+#TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
+#		$(HOST_O)objects.o $(HOST_O)stubvid.o
+#TILEUTIL    = $(TILOBJ) $(U)tile2bin $(U)til2bin2 $(TILE_BMP) $(PLANAR_TIB) $(OVERVIEW_TIB)
+#
+#TILEFILES   = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
+#
+#TILEFILES2  = $(WSHR)/monthin.txt $(WSHR)/objthin.txt $(WSHR)/oththin.txt
+#
+#GIFREADERS  = $(HOST_O)gifread.o $(HOST_O)alloc.o $(HOST_O)panic.o
+#
+#GIFREAD2    = $(HOST_O)gifread2.o $(HOST_O)alloc.o $(HOST_O)panic.o
+#
+#PPMWRITERS  = $(HOST_O)ppmwrite.o $(HOST_O)alloc.o $(HOST_O)panic.o
+#
+#PPMWRIT2    = $(HOST_O)ppmwrit2.o $(HOST_O)alloc.o $(HOST_O)panic.o
+#endif
 
-else
+PLANAR_TIB   = $(DAT)/NETHACK1.tib
+OVERVIEW_TIB = $(DAT)/NETHACKO.tib
+TILE_BMP     = $(DAT)/NHTILES.BMP
 
-TILOBJ      = $(O)tile.o $(VGAOBJ)
-
-TILOBJ2     = $(O)tileset.o $(O)bmptiles.o $(O)giftiles.o
-
-TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
-		$(HOST_O)objects.o $(HOST_O)stubvid.o
-
-TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
-		$(HOST_O)objects.o $(HOST_O)stubvid.o
-
-TILE_BMP    = $(DAT)/nhtiles.bmp
-
-TILEUTIL    = $(TILOBJ) $(U)tile2bin $(U)til2bin2 $(TILE_BMP)
-
-TILEFILES   = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
-
-TILEFILES2  = $(WSHR)/monthin.txt $(WSHR)/objthin.txt $(WSHR)/oththin.txt
-
-GIFREADERS  = $(HOST_O)gifread.o $(HOST_O)alloc.o $(HOST_O)panic.o
-
-GIFREAD2    = $(HOST_O)gifread2.o $(HOST_O)alloc.o $(HOST_O)panic.o
-
-PPMWRITERS  = $(HOST_O)ppmwrite.o $(HOST_O)alloc.o $(HOST_O)panic.o
-
-PPMWRIT2    = $(HOST_O)ppmwrit2.o $(HOST_O)alloc.o $(HOST_O)panic.o
-endif
-
-#REGEX = $(O)pmatchregex.o
-#REGEX = $(O)cppregex.o
-REGEX = $(O)posixreg.o
-
-DLBOBJ = $(O)dlb.o
+##REGEX        = $(O)pmatchregex.o
+##REGEX        = $(O)cppregex.o
+REGEX        = $(O)posixreg.o
+DLBOBJ       = $(O)dlb.o
+VIDEO_OBJ    = $(O)vidvga.o $(O)vidvesa.o $(O)tile.o $(O)tileset.o $(O)bmptiles.o $(O)giftiles.o
+RECOVOBJS    = $(O)recover.o
 
 #  Object files for the game itself.
 
@@ -310,12 +304,18 @@ VOBJ19 = $(O)trap.o     $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
 VOBJ20 = $(O)vis_tab.o  $(O)weapon.o  $(O)were.o     $(O)wield.o    $(O)windows.o
 VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
 VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
-VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)       $(O)isaac64.o
+VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)       $(O)isaac64.o  $(VIDEO_OBJ)
+VOBJ24 = $(O)sfbase.o   $(O)sfdata.o
+VOBJ25 = $(O)sfstruct.o $(O)sfascii.o $(O)sflendian.o 
 
-SOBJ   = $(O)msdos.o    $(O)sound.o   $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
+SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
 
 VVOBJ  = $(O)version.o
+
+ifeq "$(ADD_LUA)" "Y"
+LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+endif
 
 ifeq "$(ADD_CURSES)" "Y"
 CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
@@ -328,10 +328,53 @@ VOBJ  = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
 	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
-	$(VOBJ21) $(VOBJ22) $(VOBJ23) \
-	$(CURSESOBJ)
+	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
+	$(LUAOBJ) $(CURSESOBJ) 
 
 ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
+
+ifeq "$(ADD_LUA)" "Y"
+#===============-=================================================
+# LUA library
+# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#=================================================================
+
+LUASRC   = $(LUATOP)/src
+LUALIB   = $(O)lua535s.a
+#LUADLL   = $(O)lua535.a
+LUAINCL  = -I$(LUASRC)
+#LUAFLAGS = unix added -lm here?
+LUATARGETS = lua.exe luac.exe $(LUALIB)
+#LUATARGETS = $(LUADLL) $(LUALIB)
+
+LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
+		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
+		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
+		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
+		loslib.c lparser.c lstate.c lstring.c lstrlib.c  \
+		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
+		lvm.c lzio.c
+
+LUAOBJFILES1 =  $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o
+LUAOBJFILES2 =  $(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
+		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o
+LUAOBJFILES3 =  $(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
+		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o
+LUAOBJFILES3 =  $(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
+		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
+
+#LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+#		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
+#		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
+#		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
+#		$(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
+#		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o \
+#		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
+#		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
+		
+LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
+endif
 
 ifeq "$(ADD_CURSES)" "Y"
 #==========================================
@@ -419,11 +462,6 @@ DLB =
 DLBOBJS =
 endif
 
-ifdef DJGPP
-DJ1 = $(dir $(DJGPP))
-CWSDPMI = $(subst /,\,$(DJ1))bin\CWSDPMI.*
-endif
-
 #==========================================
 # More compiler setup macros
 #==========================================
@@ -435,21 +473,21 @@ CURSESDEF=
 CURSESLIB=
 endif
 
-INCLDIR=-I../include -I../sys/msdos
+INCLDIR=-I../include -I../sys/msdos $(LUAINCL)
 
 # Debugging
-#cflags = -pg -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
+#cflags = -pg -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS -DCROSSCOMPILE -DCROSSCOMPILE_TARGET
 #LFLAGS = -pg
 
-cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
-LFLAGS =
+#cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS -DCROSSCOMPILE-DCROSSCOMPILE_TARGET
+#LFLAGS =
 
 # Debugging
-#cflags = -g -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES
+#cflags = -g -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET
 #LFLAGS = -g
 
 #    Normal
-cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES
+cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET
 LFLAGS =
 
 #==========================================
@@ -523,6 +561,15 @@ $(OBJ)/%.o : $(PDCSRC)/%.c
 $(OBJ)/%.o : $(PDCDOS)/%.c
 	$(TARGET_CC) $(PDCINCL) $(cflags)  -o$@  $<
 
+ifeq "$(ADD_LUA)" "Y"
+#==========================================
+# Rules for LUA files
+#==========================================
+
+$(OBJ)/%.o : $(LUASRC)/%.c
+	$(TARGET_CC) $(cflags)  -o$@  $<
+endif
+
 #==========================================
 #  Primary Targets.
 #==========================================
@@ -538,8 +585,6 @@ default: $(GAMEFILE)
 
 util: $(O)utility.tag
 
-#LEVCOMPEXE = $(U)lev_comp
-
 $(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h $(INCL)/onames.h \
 	$(INCL)/pm.h vis_tab.c $(TILEUTIL)
 	echo utilities made > $@
@@ -553,201 +598,119 @@ recover.exe: $(U)recover
 
 $(O)install.tag: $(DAT)/nhdat $(GAMEFILE)
 ifeq ($(USE_DLB),Y)
-	cp $(DAT)/nhdat $(GAMEDIR)
-	cp $(DAT)/license $(GAMEDIR)
+	cp $(DAT)/nhdat $(GAMEDIR)/NHDAT
+	cp $(DAT)/license $(GAMEDIR)/LICENSE
 else
 	cp $(DAT)/*. $(GAMEDIR)
 	cp $(DAT)/*.dat $(GAMEDIR)
-	cp $(DAT)/*.lev $(GAMEDIR)
 	cp $(MSYS)/msdoshlp.txt $(GAMEDIR))
+ifeq "$(ADD_LUA)" "Y"
+	cp $(DAT)/*.lua $(GAMEDIR)
+endif
 endif
 ifdef TERMLIB
-	cp $(SSHR)/termcap $(GAMEDIR))
+	cp $(SSHR)/termcap $(GAMEDIR)/TERMCAP)
 endif
 #	if [ -f $(TILE_BMP) ]; then rm $(TILE_BMP); fi;
-	if [ -f $(TILE_BMP) ]; then cp $(TILE_BMP) $(GAMEDIR); fi;
-	if [ -f $(DAT)/symbols ]; then cp $(DAT)/symbols $(GAMEDIR); fi;
-	if [ -f $(SSHR)/NetHack.cnf ]; then cp $(SSHR)/NetHack.cnf $(GAMEDIR); fi;
-	-touch $(GAMEDIR)/record
-	if [ -f ../sys/winnt/sysconf ]; then cp ../sys/winnt/sysconf $(GAMEDIR); fi;
-	if [ -f $(DOC)/nethack.txt ]; then cp $(DOC)/nethack.txt $(GAMEDIR); fi;
-ifdef CWSDPMI
-	if [ -f $(CWSDPMI) ]; then cp $(CWSDPMI) $(GAMEDIR); fi;
-else
-	@echo Could not find a copy of CWSDPMI.EXE to put into $(GAMEDIR)
-endif
+	if [ -f $(TILE_BMP) ]; then cp $(TILE_BMP) $(GAMEDIR)/NHTILES.BMP; fi;
+	if [ -f $(DAT)/symbols ]; then cp $(DAT)/symbols $(GAMEDIR)/SYMBOLS; fi;
+	if [ -f $(SSHR)/NetHack.cnf ]; then cp $(SSHR)/NetHack.cnf $(GAMEDIR)/NETHACK.CNF; fi;
+	-touch $(GAMEDIR)/RECORD
+	if [ -f ../sys/winnt/sysconf ]; then cp ../sys/winnt/sysconf $(GAMEDIR)/SYSCONF; fi;
+	if [ -f $(DOC)/nethack.txt ]; then cp $(DOC)/nethack.txt $(GAMEDIR)/NETHACK.TXT; fi;
+#	if [ -f $(PLANAR_TIB) ]; then cp $(PLANAR_TIB) $(GAMEDIR)/$(PLANAR_TIB^^); fi;
+#	if [ -f $(OVERVIEW_TIB ]; then cp $(OVERVIEW_TIB) $(GAMEDIR)/$(OVERVIEW_TIB^^); fi;
 	@echo install done > $@
 
 #==========================================
 #  The main target.
 #==========================================
 
-$(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(PDCLIB) \
+$(GAMEFILE): $(O)obj.tag $(PDCLIB) $(LUALIB) \
 	$(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
 	if [ -f temp.a ]; then rm temp.a; fi;
-	@ar r temp.a $(VOBJ01)
-	@ar r temp.a $(VOBJ02)
-	@ar r temp.a $(VOBJ03)
-	@ar r temp.a $(VOBJ04)
-	@ar r temp.a $(VOBJ05)
-	@ar r temp.a $(VOBJ06)
-	@ar r temp.a $(VOBJ07)
-	@ar r temp.a $(VOBJ08)
-	@ar r temp.a $(VOBJ09)
-	@ar r temp.a $(VOBJ10)
-	@ar r temp.a $(VOBJ11)
-	@ar r temp.a $(VOBJ12)
-	@ar r temp.a $(VOBJ13)
-	@ar r temp.a $(VOBJ14)
-	@ar r temp.a $(VOBJ15)
-	@ar r temp.a $(VOBJ16)
-	@ar r temp.a $(VOBJ17)
-	@ar r temp.a $(VOBJ18)
-	@ar r temp.a $(VOBJ19)
-	@ar r temp.a $(VOBJ20)
-	@ar r temp.a $(VOBJ21)
-	@ar r temp.a $(VOBJ22)
-	@ar r temp.a $(VOBJ23)
-	@ar r temp.a $(VOBJ24)
-	@ar r temp.a $(VOBJ25)
-	@ar r temp.a $(SOBJ)
-	@ar r temp.a $(TILOBJ)
-	@ar r temp.a $(TILOBJ2)
-	@ar r temp.a $(VVOBJ)
-ifeq "$(ADD_CURSES)" "Y"
-	@ar r temp.a $(CURSESOBJ)
+	@$(TARGET_AR) r temp.a $(VOBJ01)
+	@$(TARGET_AR) r temp.a $(VOBJ02)
+	@$(TARGET_AR) r temp.a $(VOBJ03)
+	@$(TARGET_AR) r temp.a $(VOBJ04)
+	@$(TARGET_AR) r temp.a $(VOBJ05)
+	@$(TARGET_AR) r temp.a $(VOBJ06)
+	@$(TARGET_AR) r temp.a $(VOBJ07)
+	@$(TARGET_AR) r temp.a $(VOBJ08)
+	@$(TARGET_AR) r temp.a $(VOBJ09)
+	@$(TARGET_AR) r temp.a $(VOBJ10)
+	@$(TARGET_AR) r temp.a $(VOBJ11)
+	@$(TARGET_AR) r temp.a $(VOBJ12)
+	@$(TARGET_AR) r temp.a $(VOBJ13)
+	@$(TARGET_AR) r temp.a $(VOBJ14)
+	@$(TARGET_AR) r temp.a $(VOBJ15)
+	@$(TARGET_AR) r temp.a $(VOBJ16)
+	@$(TARGET_AR) r temp.a $(VOBJ17)
+	@$(TARGET_AR) r temp.a $(VOBJ18)
+	@$(TARGET_AR) r temp.a $(VOBJ19)
+	@$(TARGET_AR) r temp.a $(VOBJ20)
+	@$(TARGET_AR) r temp.a $(VOBJ21)
+	@$(TARGET_AR) r temp.a $(VOBJ22)
+	@$(TARGET_AR) r temp.a $(VOBJ23)
+	@$(TARGET_AR) r temp.a $(VOBJ24)
+	@$(TARGET_AR) r temp.a $(VOBJ25)
+	@$(TARGET_AR) r temp.a $(VIDEO_OBJ)
+	@$(TARGET_AR) r temp.a $(SOBJ)
+	@$(TARGET_AR) r temp.a $(TILOBJ)
+	@$(TARGET_AR) r temp.a $(TILOBJ2)
+ifeq "$(ADD_LUA)" "Y"
+	@$(TARGET_AR) r temp.a $(LUAOBJ)
 endif
-	$(TARGET_LINK) $(LFLAGS) -o$(GAME).exe temp.a $(PDCLIB) $(LIBRARIES) $(ZLIB)
+	@$(TARGET_AR) r temp.a $(VVOBJ)
+ifeq "$(ADD_CURSES)" "Y"
+	@$(TARGET_AR) r temp.a $(CURSESOBJ)
+endif
+	$(TARGET_LINK) $(LFLAGS) -o$(GAME).exe temp.a $(PDCLIB) $(LUALIB) $(LIBRARIES) $(ZLIB)
 	$(TARGET_STUBEDIT) $(GAME).exe minstack=2048K
 	cp $(GAME).exe $(GAMEFILE)
 	rm $(GAME).exe
 
 $(O)$(GAME).lnk: $(ALLOBJ)
-	 echo $(VOBJ01) > $(subst /,\,$@)
-	 echo $(VOBJ02) >> $(subst /,\,$@)
-	 echo $(VOBJ03) >> $(subst /,\,$@)
-	 echo $(VOBJ04) >> $(subst /,\,$@)
-	 echo $(VOBJ05) >> $(subst /,\,$@)
-	 echo $(VOBJ06) >> $(subst /,\,$@)
-	 echo $(VOBJ07) >> $(subst /,\,$@)
-	 echo $(VOBJ08) >> $(subst /,\,$@)
-	 echo $(VOBJ09) >> $(subst /,\,$@)
-	 echo $(VOBJ10) >> $(subst /,\,$@)
-	 echo $(VOBJ11) >> $(subst /,\,$@)
-	 echo $(VOBJ12) >> $(subst /,\,$@)
-	 echo $(VOBJ13) >> $(subst /,\,$@)
-	 echo $(VOBJ14) >> $(subst /,\,$@)
-	 echo $(VOBJ15) >> $(subst /,\,$@)
-	 echo $(VOBJ16) >> $(subst /,\,$@)
-	 echo $(VOBJ17) >> $(subst /,\,$@)
-	 echo $(VOBJ18) >> $(subst /,\,$@)
-	 echo $(VOBJ19) >> $(subst /,\,$@)
-	 echo $(VOBJ20) >> $(subst /,\,$@)
-	 echo $(VOBJ21) >> $(subst /,\,$@)
-	 echo $(VOBJ22) >> $(subst /,\,$@)
-	 echo $(VOBJ23) >> $(subst /,\,$@)
-	 echo $(VOBJ24) >> $(subst /,\,$@)
-	 echo $(VOBJ25) >> $(subst /,\,$@)
-	 echo $(SOBJ)   >> $(subst /,\,$@)
-	 echo $(TILOBJ) >> $(subst /,\,$@)
-	 echo $(TILOBJ2) >> $(subst /,\,$@)
-	 echo $(VVOBJ)  >> $(subst /,\,$@)
+	echo $(VOBJ01) >  $@
+	echo $(VOBJ02) >> $@
+	echo $(VOBJ03) >> $@
+	echo $(VOBJ04) >> $@
+	echo $(VOBJ05) >> $@
+	echo $(VOBJ06) >> $@
+	echo $(VOBJ07) >> $@
+	echo $(VOBJ08) >> $@
+	echo $(VOBJ09) >> $@
+	echo $(VOBJ10) >> $@
+	echo $(VOBJ11) >> $@
+	echo $(VOBJ12) >> $@
+	echo $(VOBJ13) >> $@
+	echo $(VOBJ14) >> $@
+	echo $(VOBJ15) >> $@
+	echo $(VOBJ16) >> $@
+	echo $(VOBJ17) >> $@
+	echo $(VOBJ18) >> $@
+	echo $(VOBJ19) >> $@
+	echo $(VOBJ20) >> $@
+	echo $(VOBJ21) >> $@
+	echo $(VOBJ22) >> $@
+	echo $(VOBJ23) >> $@
+	echo $(VOBJ24) >> $@
+	echo $(VOBJ25) >> $@
+	echo $(SOBJ)   >> $@
+	echo $(TILOBJ) >> $@
+	echo $(TILOBJ2) >> $@
+ifeq "$(ADD_LUA)" "Y"
+	echo $(LUAOBJ) >> $@
+endif
+	echo $(VVOBJ)  >> $@
 ifeq "$(ADD_CURSES)" "Y"
-	 echo $(CURSESOBJ) >> $(subst /,\,$@)
+	echo $(CURSESOBJ) >> $@
 endif
 
 #==========================================
 #=========== SECONDARY TARGETS ============
 #==========================================
 #
-#  The following include files depend on makedefs to be created.
-#
-#  date.h should be remade every time any of the source or include
-#  files is modified.
-#
-#
-#$(INCL)/date.h : $(U)makedefs
-#	-$(U)makedefs -v
-#
-#$(INCL)/onames.h: $(U)makedefs
-#	-$(U)makedefs -o
-#
-#$(INCL)/pm.h: $(U)makedefs
-#	-$(U)makedefs -p
-#
-#monstr.c: $(U)makedefs
-#	-$(U)makedefs -m
-#
-#$(INCL)/vis_tab.h: $(U)makedefs
-#	-$(U)makedefs -z
-#
-#vis_tab.c: $(U)makedefs
-#	-$(U)makedefs -z
-#
-#==========================================
-#  Level Compiler Dependencies
-#==========================================
-#
-#$(U)lev_comp:  $(SPLEVOBJS)
-#	-rm -f temp.a
-#	@ar ru temp.a $(SPLEVOBJS)
-#	$(HOST_LINK) $(LFLAGS) -o$@ temp.a
-#
-#$(HOST_O)lev_yacc.o:  $(HACK_H)	 $(SP_LEV_H) $(INCL)/lev_comp.h $(U)lev_yacc.c
-#	$(HOST_CC) $(cflags) -o$@ $(U)lev_yacc.c
-#
-#$(HOST_O)lev_$(LEX).o:  $(HACK_H)   $(SP_LEV_H)	  $(INCL)/lev_comp.h \
-#	$(U)lev_$(LEX).c
-#	$(HOST_CC) $(cflags) -o$@ $(U)lev_$(LEX).c
-#
-#$(HOST_O)lev_main.o:  $(HACK_H) $(INCL)/sp_lev.h $(INCL)/date.h $(U)lev_main.c
-#
-#$(U)lev_yacc.c: $(SSHR)/lev_yacc.c
-#	@echo ---
-#	@echo For now, we will copy the prebuilt
-#	@echo lev_comp.c from $(SSHR) into $(U) and use that.
-#	@cp $(SSHR)/lev_yacc.c $(U)lev_yacc.c
-#	@echo.>>$(U)lev_yacc.c
-#
-#$(INCL)/lev_comp.h : $(SSHR)/lev_comp.h
-#	@echo For now, we will copy the prebuilt lev_comp.h
-#	@echo from $(SSHR) into $(INCL) and use that.
-#	@cp $(SSHR)/lev_comp.h $@
-#$(U)lev_lex.c: $(SSHR)/lev_lex.c
-#	@echo.>>$(INCL)/lev_comp.h
-#	@echo For now, we will copy the prebuilt lev_lex.c
-#	@echo from $(SSHR) into $(U) and use it.
-#	@cp $(SSHR)/lev_lex.c $@
-#	@echo.>>$@
-#
-#==========================================
-#  Dungeon Dependencies
-#==========================================
-#
-#$(U)dgn_comp:  $(DGNCOMPOBJS)
-#	$(HOST_LINK) $(LFLAGS) -o$@ $(DGNCOMPOBJS)
-#
-#$(U)dgn_yacc.c: $(SSHR)/dgn_yacc.c
-#	@echo ---
-#	@echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
-#	@echo dgn_comp.h from $(SSHR) into $(U) and use that.
-#	@cp $(SSHR)/dgn_yacc.c $(U)dgn_yacc.c
-#	@echo.>>$(U)dgn_yacc.c
-#
-#$(INCL)/dgn_comp.h: $(SSHR)/dgn_comp.h
-#	@echo ---
-#	@echo For now, we will copy the prebuilt dgn_comp.h
-#	@echo from $(SSHR) into $(INCL) and use that.
-#	@cp $(SSHR)/dgn_comp.h $@
-#	@echo.>>$(INCL)/dgn_comp.h
-#
-#$(U)dgn_$(LEX).c: $(SSHR)/dgn_lex.c $(INCL)/dgn_comp.h
-#	@echo ---
-#	@echo For now, we will copy the prebuilt dgn_lex.c
-#	@echo from $(SSHR) into $(U) and use it.
-#	@cp $(SSHR)/dgn_lex.c $@
-#	@echo.>>$@
-
 #==========================================
 #  Recover Utility
 #==========================================
@@ -810,109 +773,32 @@ $(O)objects.o: $(CONFIG_H)	      $(INCL)/obj.h	 $(INCL)/objclass.h \
 $(O)dat.tag: $(DAT)/nhdat
 	@echo dat done >$@
 
-#$(HOST_O)monst.o: $(CONFIG_H) $(PERMONST_H) $(INCL)/monsym.h   \
-#	$(INCL)/color.h	 monst.c
-#	$(HOST_CC) $(cflags) -o$@ monst.c
+#=============================================================
+# Lua
+#=============================================================
 
-#$(HOST_O)objects.o: $(CONFIG_H)	      $(INCL)/obj.h	 $(INCL)/objclass.h \
-#	$(INCL)/prop.h	    $(INCL)/color.h    objects.c
-#	$(HOST_CC) $(cflags) -o$@ objects.c
+lua.exe: $(O)lua.o $(LUALIB) 
+	$(TARGET_LINK) $(LFLAGS) -o$@ $(O)lua.o $(LUALIB)
 
-#$(O)panic.o:   $(CONFIG_H)	  $(U)panic.c
+luac.exe: $(O)luac.o $(LUALIB)
+	$(TARGET_LINK) $(LFLAGSU) -o$@ $(O)luac.o $(LUALIB)
 
-# make data.base an 8.3 filename to prevent an make warning
-#DATABASE = $(DAT)/data.bas
-#
-#
-#
-#$(DAT)/data: $(O)utility.tag	$(DATABASE)
-#	$(U)makedefs -d
-#
-#$(DAT)/rumors:	     $(O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
-#	$(U)makedefs -r
-#
-#$(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
-#	$(U)makedefs -q
-#
-#$(DAT)/oracles:	     $(O)utility.tag    $(DAT)/oracles.txt
-#	$(U)makedefs -h
-#
-#$(DAT)/bogusmon:     $(O)utility.tag    $(DAT)/bogusmon.txt
-#	$(U)makedefs -s
-#
-#$(DAT)/engrave:	     $(O)utility.tag    $(DAT)/engrave.txt
-#	$(U)makedefs -s
-#
-#$(DAT)/epitaph:	     $(O)utility.tag    $(DAT)/epitaph.txt
-#	$(U)makedefs -s
-#
-#$(O)sp_lev.tag: $(O)utility.tag \
-#	$(DAT)/bigroom.des  $(DAT)/castle.des \
-#	$(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des \
-#	$(DAT)/medusa.des  $(DAT)/oracle.des   $(DAT)/tower.des \
-#	$(DAT)/yendor.des  $(DAT)/arch.des     $(DAT)/barb.des \
-#	$(DAT)/caveman.des   $(DAT)/healer.des   $(DAT)/knight.des \
-#	$(DAT)/monk.des      $(DAT)/priest.des   $(DAT)/ranger.des \
-#	$(DAT)/rogue.des     $(DAT)/samurai.des  $(DAT)/tourist.des \
-#	$(DAT)/valkyrie.des  $(DAT)/wizard.des
-#	cd $(DAT)
-#	$(U)lev_comp bigroom.des
-#	$(U)lev_comp castle.des
-#	$(U)lev_comp endgame.des
-#	$(U)lev_comp gehennom.des
-#	$(U)lev_comp knox.des
-#	$(U)lev_comp mines.des
-#	$(U)lev_comp medusa.des
-#	$(U)lev_comp oracle.des
-#	$(U)lev_comp sokoban.des
-#	$(U)lev_comp tower.des
-#	$(U)lev_comp yendor.des
-#	$(U)lev_comp arch.des
-#	$(U)lev_comp barb.des
-#	$(U)lev_comp caveman.des
-#	$(U)lev_comp healer.des
-#	$(U)lev_comp knight.des
-#	$(U)lev_comp monk.des
-#	$(U)lev_comp priest.des
-#	$(U)lev_comp ranger.des
-#	$(U)lev_comp rogue.des
-#	$(U)lev_comp samurai.des
-#	$(U)lev_comp tourist.des
-#	$(U)lev_comp valkyrie.des
-#	$(U)lev_comp wizard.des
-#	cd $(SRC)
-#	echo sp_levs done > $@
-#
-#$(DAT)/dungeon:	  $(O)utility.tag  $(DAT)/dungeon.def
-#	$(U)makedefs -e
-#	cd $(DAT)
-#	$(U)dgn_comp dungeon.pdf
-#	cd $(SRC)
+$(O)lua.o: $(LUASRC)/lua.c
+$(O)luac.o: $(LUASRC)/luac.c
 
 #==========================================
-# DLB stuff
+# Lua lib
 #==========================================
 
-#note that dir below assumes bin/dir from djgpp distribution
-#
-#$(DAT)/nhdat:	$(U)dlb_main $(DAT)/data $(DAT)/rumors $(DAT)/dungeon \
-#	    $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag \
-#	    $(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
-#	echo dat done >$(O)dat.tag
-#	cd $(DAT)
-#	copy $(MSYS)/msdoshlp.txt .
-#	@$(LS) data dungeon oracles options quest.dat rumors help hh >dlb.lst
-#	@$(LS) cmdhelp history opthelp wizhelp license msdoshlp.txt >>dlb.lst
-#	@$(LS) bogusmon engrave epitaph tribute >>dlb.lst
-#	$(LS) $(subst /,\,*.lev) >>dlb.lst
-#	$(U)dlb_main cvIf dlb.lst nhdat
-#	cd $(SRC)
-#
-#$(U)dlb_main: $(DLBOBJS)
-#	$(HOST_LINK) $(LFLAGS) -o$@ $(DLBOBJS)
-#
-#$(HOST_O)dlb_main.o: $(U)dlb_main.c $(INCL)/config.h $(DLB_H)
-#	$(HOST_CC) $(cflags) -o$@ $(U)dlb_main.c
+$(LUALIB): $(LUALIBOBJS)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES1)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES2)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES3)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES4)
+
+#$(LUADLL): $(LUALIBOBJS)
+#	$(TARGET_CC) -shared -Wl,--export-all-symbols \
+#		-Wl,--add-stdcall-alias -o $@ $<
 
 #==========================================
 #  Housekeeping.
@@ -927,24 +813,17 @@ clean:
 
 spotless: clean
 
-	if [ -f dgn_flex.c ];          then rm dgn_flex.c; fi;
-	if [ -f dgn_lex.c ];           then rm dgn_lex.c; fi;
-	if [ -f $(U)dgn_comp.exe ];    then rm $(U)dgn_comp.exe; fi;
 	if [ -f $(U)recover.exe ];     then rm $(U)recover.exe; fi;
 	if [ -f $(INCL)/vis_tab.h ];   then rm $(INCL)/vis_tab.h; fi;
 	if [ -f $(INCL)/onames.h ];    then rm $(INCL)/onames.h; fi;
 	if [ -f $(INCL)/pm.h ];        then rm $(INCL)/pm.h; fi;
 	if [ -f $(INCL)/date.h ];      then rm $(INCL)/date.h; fi;
-	if [ -f $(INCL)/dgn_comp.h ];  then rm $(INCL)/dgn_comp.h; fi;
-	if [ -f $(INCL)/lev_comp.h ];  then rm $(INCL)/lev_comp.h; fi;
 #	if [ -f $(SRC)/monstr.c ];     then rm $(SRC)/monstr.c; fi;
 	if [ -f $(SRC)/vis_tab.c ];    then rm $(SRC)/vis_tab.c; fi;
 	if [ -f $(SRC)/tile.c ];       then rm $(SRC)/tile.c; fi;
 	if [ -f $(DAT)/options ];      then rm $(DAT)/options; fi;
 	if [ -f $(DAT)/data ];         then rm $(DAT)/data; fi;
 	if [ -f $(DAT)/rumors ];       then rm $(DAT)/rumors; fi;
-	if [ -f $(DAT)/dungeon.pdf ];  then rm $(DAT)/dungeon.pdf; fi;
-	if [ -f $(DAT)/dungeon ];      then rm $(DAT)/dungeon; fi;
 	if [ -f $(DAT)/oracles ];      then rm $(DAT)/oracles; fi;
 	if [ -f $(DAT)/quest.dat ];    then rm $(DAT)/quest.dat; fi;
 	if [ -f $(DAT)/bogusmon ];     then rm $(DAT)/bogusmon; fi;
@@ -952,10 +831,11 @@ spotless: clean
 	if [ -f $(DAT)/epitaph ];      then rm $(DAT)/epitaph; fi;
 	if [ -f $(DAT)/dlb.lst ];      then rm $(DAT)/dlb.lst; fi;
 	if [ -f $(TILE_BMP) ];         then rm $(TILE_BMP); fi;
+	if [ -f $(PLANAR_TIB) ];       then rm $(PLANAR_TIB); fi;
+	if [ -f $(OVERVIEW_TIB) ];     then rm $(OVERVIEW_TIB); fi;
 	if [ -f $(WSHR)/monthin.txt ]; then rm $(WSHR)/monthin.txt; fi;
 	if [ -f $(WSHR)/objthin.txt ]; then rm $(WSHR)/objthin.txt; fi;
 	if [ -f $(WSHR)/oththin.txt ]; then rm $(WSHR)/oththin.txt; fi;
-	-rm $(DAT)/*.lev
 
 #==========================================
 # Create directory for holding object files
@@ -1077,8 +957,8 @@ $(O)wintext.o: ../win/X11/wintext.c $(HACK_H) $(INCL)/winX.h $(INCL)/xwindow.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/X11/wintext.c
 $(O)winval.o: ../win/X11/winval.c $(HACK_H) $(INCL)/winX.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/X11/winval.c
-$(O)tile.o: tile.c $(HACK_H)
-$(HOST_O)tile.o: tile.c $(HACK_H)
+#$(O)tile.o: tile.c $(HACK_H)
+#$(HOST_O)tile.o: tile.c $(HACK_H)
 $(O)gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
 		../win/gnome/gnmain.h
 	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnaskstr.c
@@ -1130,7 +1010,6 @@ $(O)load_img.o: ../win/gem/load_img.c $(INCL)/load_img.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/gem/load_img.c
 $(O)gr_rect.o: ../win/gem/gr_rect.c $(INCL)/gr_rect.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/gem/gr_rect.c
-$(O)tile.o: tile.c $(HACK_H)
 $(O)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) $(INCL)/func_tab.h \
 		$(INCL)/dlb.h $(PATCHLEV_H) $(INCL)/tile2x11.h \
 		$(INCL)/qt_win.h $(INCL)/qt_clust.h $(INCL)/qt_kde0.h \

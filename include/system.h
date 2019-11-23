@@ -527,7 +527,7 @@ E char *FDECL(tgetstr, (const char *, char **));
 E char *FDECL(tgoto, (const char *, int, int));
 #endif
 
-#if defined(ALLOC_C) || defined(MAKEDEFS_C)
+#if defined(ALLOC_C) || defined(MAKEDEFS_C) || defined(MDLIB_C)
 E genericptr_t FDECL(malloc, (size_t));
 E genericptr_t FDECL(realloc, (genericptr_t, size_t));
 #endif
@@ -569,6 +569,7 @@ E int FDECL(atoi, (const char *));
 #endif /*  !__cplusplus && !__GO32__ */
 #endif /* WIN32 */
 
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -578,5 +579,5 @@ E int FDECL(atoi, (const char *));
 #else
 #define LUA_INTCAST(i) (i)
 #endif
-
+#endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 #endif /* SYSTEM_H */

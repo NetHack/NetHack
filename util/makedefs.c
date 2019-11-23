@@ -53,7 +53,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.6\t2019/05/07";
+static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.7\t2019/11/19";
 #endif
 
 /* names of files to be generated */
@@ -156,7 +156,6 @@ void FDECL(do_makedefs, (char *));
 void NDECL(do_objs);
 void NDECL(do_data);
 void NDECL(do_dungeon);
-void NDECL(do_date);
 void NDECL(do_options);
 void NDECL(do_monstr);
 void NDECL(do_permonst);
@@ -164,6 +163,7 @@ void NDECL(do_questtxt);
 void NDECL(do_rumors);
 void NDECL(do_oracles);
 void NDECL(do_vision);
+void NDECL(do_date);
 
 extern void NDECL(monst_globals_init);   /* monst.c */
 extern void NDECL(objects_globals_init); /* objects.c */
@@ -172,22 +172,13 @@ static char *FDECL(name_file, (const char *, const char *));
 static void FDECL(delete_file, (const char *template, const char *));
 static FILE *FDECL(getfp, (const char *, const char *, const char *));
 static void FDECL(do_ext_makedefs, (int, char **));
-
-static void NDECL(make_version);
-static char *FDECL(version_string, (char *, const char *));
-static char *FDECL(version_id_string, (char *, const char *));
-static char *FDECL(bannerc_string, (char *, const char *));
 static char *FDECL(xcrypt, (const char *));
 static unsigned long FDECL(read_rumors_file,
                            (const char *, int *, long *, unsigned long));
-static boolean FDECL(get_gitinfo, (char *, char *));
 static void FDECL(do_rnd_access_file, (const char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
-static void NDECL(build_savebones_compat_string);
-static void NDECL(windowing_sanity);
 static void FDECL(opt_out_words, (char *, int *));
-
 static boolean FDECL(qt_comment, (char *));
 static boolean FDECL(qt_control, (char *));
 static int FDECL(get_hdr, (char *));
@@ -211,8 +202,8 @@ static int FDECL(clear_path, (int, int, int, int));
 static char *FDECL(fgetline, (FILE*));
 static char *FDECL(tmpdup, (const char *));
 static char *FDECL(limit, (char *, int));
-static char *FDECL(eos, (char *));
-static int FDECL(case_insensitive_comp, (const char *, const char *));
+static void NDECL(windowing_sanity);
+static boolean FDECL(get_gitinfo, (char *, char *));
 
 /* input, output, tmp */
 static FILE *ifp, *ofp, *tfp;
@@ -227,6 +218,22 @@ static boolean use_enum =
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern unsigned _stklen = STKSIZ;
 #endif
+
+/*
+ * Some of the routines in this source file were moved into .../src/mdlib
+ * to facilitate the use of a cross-compiler generation of some of the
+ * information for the target environment during the game compile portion
+ * under the cross-compiler and/or at runtime in some cases.
+ */
+/* These actually reside in src/mdlib.c */
+static int FDECL(case_insensitive_comp, (const char *, const char *));
+static void NDECL(make_version);
+static char *FDECL(version_id_string, (char *, const char *));
+static char *FDECL(version_string, (char *, const char *));
+static char *FDECL(eos, (char *));
+/* REPRODUCIBLE_BUILD will change this to TRUE */
+static boolean date_via_env = FALSE;
+#include "../src/mdlib.c"
 
 #ifdef MACsansMPWTOOL
 int
@@ -295,7 +302,6 @@ char *argv[];
     /*NOTREACHED*/
     return 0;
 }
-
 #endif
 
 void
@@ -1069,180 +1075,6 @@ rumors_failure:
     exit(EXIT_FAILURE);
 }
 
-/*
- * Use this to explicitly mask out features during version checks.
- *
- * ZEROCOMP, RLECOMP, and ZLIB_COMP describe compression features
- * that the port/plaform which wrote the savefile was capable of
- * dealing with. Don't reject a savefile just because the port
- * reading the savefile doesn't match on all/some of them.
- * The actual compression features used to produce the savefile are
- * recorded in the savefile_info structure immediately following the
- * version_info, and that is what needs to be checked against the
- * feature set of the port that is reading the savefile back in.
- * That check is done in src/restore.c now.
- *
- */
-#define IGNORED_FEATURES                 \
-    (0L | (1L << 19) /* SCORE_ON_BOTL */ \
-     | (1L << 27)    /* ZEROCOMP */      \
-     | (1L << 28)    /* RLECOMP */       \
-     )
-
-static void
-make_version()
-{
-    register int i;
-
-    /*
-     * integer version number
-     */
-    version.incarnation = ((unsigned long) VERSION_MAJOR << 24)
-                          | ((unsigned long) VERSION_MINOR << 16)
-                          | ((unsigned long) PATCHLEVEL << 8)
-                          | ((unsigned long) EDITLEVEL);
-    /*
-     * encoded feature list
-     * Note:  if any of these magic numbers are changed or reassigned,
-     * EDITLEVEL in patchlevel.h should be incremented at the same time.
-     * The actual values have no special meaning, and the category
-     * groupings are just for convenience.
-     */
-    version.feature_set = (unsigned long) (0L
-/* levels and/or topology (0..4) */
-/* monsters (5..9) */
-#ifdef MAIL_STRUCTURES
-                                           | (1L << 6)
-#endif
-/* objects (10..14) */
-/* flag bits and/or other global variables (15..26) */
-#ifdef TEXTCOLOR
-                                           | (1L << 17)
-#endif
-#ifdef INSURANCE
-                                           | (1L << 18)
-#endif
-#ifdef SCORE_ON_BOTL
-                                           | (1L << 19)
-#endif
-/* data format (27..31)
- * External compression methods such as COMPRESS and ZLIB_COMP
- * do not affect the contents and are thus excluded from here */
-#ifdef ZEROCOMP
-                                           | (1L << 27)
-#endif
-#ifdef RLECOMP
-                                           | (1L << 28)
-#endif
-                                               );
-    /*
-     * Value used for object & monster sanity check.
-     *    (NROFARTIFACTS<<24) | (NUM_OBJECTS<<12) | (NUMMONS<<0)
-     */
-    for (i = 1; artifact_names[i]; i++)
-        continue;
-    version.entity_count = (unsigned long) (i - 1);
-    for (i = 1; objects[i].oc_class != ILLOBJ_CLASS; i++)
-        continue;
-    version.entity_count = (version.entity_count << 12) | (unsigned long) i;
-    for (i = 0; mons[i].mlet; i++)
-        continue;
-    version.entity_count = (version.entity_count << 12) | (unsigned long) i;
-    /*
-     * Value used for compiler (word size/field alignment/padding) check.
-     */
-    version.struct_sizes1 =
-        (((unsigned long) sizeof(struct context_info) << 24)
-         | ((unsigned long) sizeof(struct obj) << 17)
-         | ((unsigned long) sizeof(struct monst) << 10)
-         | ((unsigned long) sizeof(struct you)));
-    version.struct_sizes2 = (((unsigned long) sizeof(struct flag) << 10) |
-/* free bits in here */
-#ifdef SYSFLAGS
-                             ((unsigned long) sizeof(struct sysflag)));
-#else
-                             ((unsigned long) 0L));
-#endif
-    return;
-}
-
-/* REPRODUCIBLE_BUILD will change this to TRUE */
-static boolean date_via_env = FALSE;
-
-static char *
-version_string(outbuf, delim)
-char *outbuf;
-const char *delim;
-{
-    Sprintf(outbuf, "%d%s%d%s%d", VERSION_MAJOR, delim, VERSION_MINOR, delim,
-            PATCHLEVEL);
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-    Sprintf(eos(outbuf), "-%d", EDITLEVEL);
-#endif
-    return outbuf;
-}
-
-static char *
-version_id_string(outbuf, build_date)
-char *outbuf;
-const char *build_date;
-{
-    char subbuf[64], versbuf[64];
-    char betabuf[64];
-
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-#if (NH_DEVEL_STATUS == NH_STATUS_BETA)
-    Strcpy(betabuf, " Beta");
-#else
-    Strcpy(betabuf, " Work-in-progress");
-#endif
-#else
-    betabuf[0] = '\0';
-#endif
-
-    subbuf[0] = '\0';
-#ifdef PORT_SUB_ID
-    subbuf[0] = ' ';
-    Strcpy(&subbuf[1], PORT_SUB_ID);
-#endif
-
-    Sprintf(outbuf, "%s NetHack%s Version %s%s - last %s %s.", PORT_ID,
-            subbuf, version_string(versbuf, "."), betabuf,
-            date_via_env ? "revision" : "build", build_date);
-    return outbuf;
-}
-
-static char *
-bannerc_string(outbuf, build_date)
-char *outbuf;
-const char *build_date;
-{
-    char subbuf[64], versbuf[64];
-
-    subbuf[0] = '\0';
-#ifdef PORT_SUB_ID
-    subbuf[0] = ' ';
-    Strcpy(&subbuf[1], PORT_SUB_ID);
-#endif
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-#if (NH_DEVEL_STATUS == NH_STATUS_BETA)
-    Strcat(subbuf, " Beta");
-#else
-    Strcat(subbuf, " Work-in-progress");
-#endif
-#endif
-
-    Sprintf(outbuf, "         Version %s %s%s, %s %s.",
-            version_string(versbuf, "."), PORT_ID, subbuf,
-            date_via_env ? "revised" : "built", &build_date[4]);
-#if 0
-    Sprintf(outbuf, "%s NetHack%s %s Copyright 1985-%s (built %s)",
-            PORT_ID, subbuf, version_string(versbuf,"."), RELEASE_YEAR,
-            &build_date[4]);
-#endif
-    return outbuf;
-}
-
 void
 do_date()
 {
@@ -1254,6 +1086,13 @@ do_date()
     char githash[BUFSZ], gitbranch[BUFSZ];
     char *c, cbuf[60], buf[BUFSZ];
     const char *ul_sfx;
+#if defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST)
+    int steps = 0;
+    const char ind[] = "    ";
+    const char *xpref = "HOST_";
+#else
+    const char *xpref = (const char *) 0;
+#endif /* CROSSCOMPILE && CROSSCOMPILE_HOST */
 
     /* before creating date.h, make sure that xxx_GRAPHICS and
        DEFAULT_WINDOW_SYS have been set up in a viable fashion */
@@ -1345,7 +1184,7 @@ do_date()
 #else
     /* ordinary build: use current date+time */
     Strcpy(cbuf, ctime(&clocktim));
-#endif
+#endif /* REPRODUCIBLE_BUILD */
 
     if ((c = index(cbuf, '\n')) != 0)
         *c = '\0'; /* strip off the '\n' */
@@ -1354,6 +1193,20 @@ do_date()
 #else
     ul_sfx = "L";
 #endif
+
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_HOST)
+    Fprintf(ofp, "\n#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_HOST)\n");
+#if 0
+    Fprintf(ofp, "/* On a CROSSCOMPILE build, NetHack is built in two steps:\n");
+    Fprintf(ofp, " *%s%d. %s\n",
+            ind, ++steps, "Build makedefs and its prerequisites, and");
+    Fprintf(ofp, " *%s   %s\n",
+            ind, "execute makedefs to generate date.h, onames.h, and pm.h.");
+    Fprintf(ofp, " *%s%d. %s\n *%s   %s\n */\n\n", ind, ++steps,
+            "Build the rest of NetHack using the cross-compiler",
+            ind, "to generate the game code for target platform.");
+#endif
+#endif /* CROSSCOMPILE || CROSSCOMPILE_HOST */
     if (date_via_env)
         Fprintf(ofp, "#define SOURCE_DATE_EPOCH (%lu%s) /* via getenv() */\n",
                 (unsigned long) clocktim, ul_sfx);
@@ -1368,9 +1221,9 @@ do_date()
             ul_sfx);
     Fprintf(ofp, "#define VERSION_FEATURES 0x%08lx%s\n", version.feature_set,
             ul_sfx);
-#ifdef IGNORED_FEATURES
+#ifdef MD_IGNORED_FEATURES
     Fprintf(ofp, "#define IGNORED_FEATURES 0x%08lx%s\n",
-            (unsigned long) IGNORED_FEATURES, ul_sfx);
+            (unsigned long) MD_IGNORED_FEATURES, ul_sfx);
 #endif
     Fprintf(ofp, "#define VERSION_SANITY1 0x%08lx%s\n", version.entity_count,
             ul_sfx);
@@ -1384,11 +1237,19 @@ do_date()
             version_id_string(buf, cbuf));
     Fprintf(ofp, "#define COPYRIGHT_BANNER_C \\\n \"%s\"\n",
             bannerc_string(buf, cbuf));
-    Fprintf(ofp, "\n");
     if (get_gitinfo(githash, gitbranch)) {
         Fprintf(ofp, "#define NETHACK_GIT_SHA \"%s\"\n", githash);
         Fprintf(ofp, "#define NETHACK_GIT_BRANCH \"%s\"\n", gitbranch);
     }
+    if (xpref && get_gitinfo(githash, gitbranch)) {
+        Fprintf(ofp, "#else /* !CROSSCOMPILE || CROSSCOMPILE_HOST */\n");
+        Fprintf(ofp, "#define NETHACK_%sGIT_SHA \"%s\"\n",
+                xpref, githash);
+        Fprintf(ofp, "#define NETHACK_%sGIT_BRANCH \"%s\"\n",
+                xpref, gitbranch);
+    }
+    Fprintf(ofp, "#endif /* !CROSSCOMPILE || CROSSCOMPILE_HOST */\n");
+    Fprintf(ofp, "\n");
 #ifdef AMIGA
     {
         struct tm *tm = localtime((time_t *) &clocktim);
@@ -1462,280 +1323,27 @@ char *githash, *gitbranch;
     return FALSE;
 }
 
-static int
-case_insensitive_comp(s1, s2)
-const char *s1;
-const char *s2;
+void
+do_options()
 {
-    uchar u1, u2;
+    const char *optline;
+    int infocontext = 0;
 
-    for (;; s1++, s2++) {
-        u1 = (uchar) *s1;
-        if (isupper(u1))
-            u1 = tolower(u1);
-        u2 = (uchar) *s2;
-        if (isupper(u2))
-            u2 = tolower(u2);
-        if (u1 == '\0' || u1 != u2)
-            break;
+    windowing_sanity();
+    filename[0] = '\0';
+#ifdef FILE_PREFIX
+    Strcat(filename, file_prefix);
+#endif
+    Sprintf(eos(filename), DATA_TEMPLATE, OPTIONS_FILE);
+    if (!(ofp = fopen(filename, WRTMODE))) {
+        perror(filename);
+        exit(EXIT_FAILURE);
     }
-    return u1 - u2;
+    while ((optline = do_runtime_info(&infocontext)))
+        Fprintf(ofp, "%s\n", optline);
+    Fclose(ofp);
+    return;
 }
-
-static char save_bones_compat_buf[BUFSZ];
-
-static void
-build_savebones_compat_string()
-{
-#ifdef VERSION_COMPATIBILITY
-    unsigned long uver = VERSION_COMPATIBILITY;
-#endif
-    Strcpy(save_bones_compat_buf,
-           "save and bones files accepted from version");
-#ifdef VERSION_COMPATIBILITY
-    Sprintf(eos(save_bones_compat_buf), "s %lu.%lu.%lu through %d.%d.%d",
-            ((uver & 0xFF000000L) >> 24), ((uver & 0x00FF0000L) >> 16),
-            ((uver & 0x0000FF00L) >> 8), VERSION_MAJOR, VERSION_MINOR,
-            PATCHLEVEL);
-#else
-    Sprintf(eos(save_bones_compat_buf), " %d.%d.%d only", VERSION_MAJOR,
-            VERSION_MINOR, PATCHLEVEL);
-#endif
-}
-
-static const char *build_opts[] = {
-#ifdef AMIGA_WBENCH
-    "Amiga WorkBench support",
-#endif
-#ifdef ANSI_DEFAULT
-    "ANSI default terminal",
-#endif
-#ifdef TEXTCOLOR
-    "color",
-#endif
-#ifdef TTY_GRAPHICS
-#ifdef TTY_TILES_ESCCODES
-    "console escape codes for tile hinting",
-#endif
-#endif
-#ifdef COM_COMPL
-    "command line completion",
-#endif
-#ifdef LIFE
-    "Conway's Game of Life",
-#endif
-#ifdef COMPRESS
-    "data file compression",
-#endif
-#ifdef ZLIB_COMP
-    "ZLIB data file compression",
-#endif
-#ifdef DLB
-#ifndef VERSION_IN_DLB_FILENAME
-    "data librarian",
-#else
-    "data librarian with a version-dependent name",
-#endif
-#endif
-#ifdef DUMPLOG
-    "end-of-game dumplogs",
-#endif
-#ifdef HOLD_LOCKFILE_OPEN
-    "exclusive lock on level 0 file",
-#endif
-#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
-    "external program as a message handler",
-#endif
-#ifdef MFLOPPY
-    "floppy drive support",
-#endif
-#ifdef INSURANCE
-    "insurance files for recovering from crashes",
-#endif
-#ifdef LOGFILE
-    "log file",
-#endif
-#ifdef XLOGFILE
-    "extended log file",
-#endif
-#ifdef PANICLOG
-    "errors and warnings log file",
-#endif
-#ifdef MAIL_STRUCTURES
-    "mail daemon",
-#endif
-#ifdef GNUDOS
-    "MSDOS protected mode",
-#endif
-#ifdef NEWS
-    "news file",
-#endif
-#ifdef OVERLAY
-#ifdef MOVERLAY
-    "MOVE overlays",
-#else
-#ifdef VROOMM
-    "VROOMM overlays",
-#else
-    "overlays",
-#endif
-#endif
-#endif
-    /* pattern matching method will be substituted by nethack at run time */
-    "pattern matching via :PATMATCH:",
-#ifdef USE_ISAAC64
-    "pseudo random numbers generated by ISAAC64",
-#ifdef DEV_RANDOM
-#ifdef NHSTDC
-    /* include which specific one */
-    "strong PRNG seed available from " DEV_RANDOM,
-#else
-    "strong PRNG seed available from DEV_RANDOM",
-#endif
-#else
-#ifdef WIN32
-    "strong PRNG seed available from CNG BCryptGenRandom()",
-#endif
-#endif  /* DEV_RANDOM */    
-#else   /* ISAAC64 */
-#ifdef RANDOM
-    "pseudo random numbers generated by random()",
-#else
-    "pseudo random numbers generated by C rand()",
-#endif
-#endif
-#ifdef SELECTSAVED
-    "restore saved games via menu",
-#endif
-#ifdef SCORE_ON_BOTL
-    "score on status line",
-#endif
-#ifdef CLIPPING
-    "screen clipping",
-#endif
-#ifdef NO_TERMS
-#ifdef MAC
-    "screen control via mactty",
-#endif
-#ifdef SCREEN_BIOS
-    "screen control via BIOS",
-#endif
-#ifdef SCREEN_DJGPPFAST
-    "screen control via DJGPP fast",
-#endif
-#ifdef SCREEN_VGA
-    "screen control via VGA graphics",
-#endif
-#ifdef WIN32CON
-    "screen control via WIN32 console I/O",
-#endif
-#endif
-#ifdef SHELL
-    "shell command",
-#endif
-    "traditional status display",
-#ifdef STATUS_HILITES
-    "status via windowport with highlighting",
-#else
-    "status via windowport without highlighting",
-#endif
-#ifdef SUSPEND
-    "suspend command",
-#endif
-#ifdef TTY_GRAPHICS
-#ifdef TERMINFO
-    "terminal info library",
-#else
-#if defined(TERMLIB) || (!defined(MICRO) && !defined(WIN32))
-    "terminal capability library",
-#endif
-#endif
-#endif /*TTY_GRAPHICS*/
-/*#ifdef X11_GRAPHICS*/
-#ifdef USE_XPM
-    "tiles file in XPM format",
-#endif
-/*#endif*/
-/*#if (defined(QT_GRAPHICS) || defined(X11_GRAPHICS)*/
-#ifdef GRAPHIC_TOMBSTONE
-    "graphical RIP screen",
-#endif
-/*#endif*/
-#ifdef TIMED_DELAY
-    "timed wait for display effects",
-#endif
-#ifdef USER_SOUNDS
-    "user sounds",
-#endif
-#ifdef PREFIXES_IN_USE
-    "variable playground",
-#endif
-#ifdef VISION_TABLES
-    "vision tables",
-#endif
-#ifdef ZEROCOMP
-    "zero-compressed save files",
-#endif
-#ifdef RLECOMP
-    "run-length compression of map in save files",
-#endif
-#ifdef SYSCF
-    "system configuration at run-time",
-#endif
-    save_bones_compat_buf,
-    "and basic NetHack features"
-};
-
-struct win_info {
-    const char *id, /* DEFAULT_WINDOW_SYS string */
-        *name;      /* description, often same as id */
-};
-static struct win_info window_opts[] = {
-#ifdef TTY_GRAPHICS
-    { "tty",
-      /* testing 'USE_TILES' here would bring confusion because it could
-         apply to another interface such as X11, so check MSDOS explicitly
-         instead; even checking TTY_TILES_ESCCODES would probably be
-         confusing to most users (and it will already be listed separately
-         in the compiled options section so users aware of it can find it) */
-#ifdef MSDOS
-      "traditional text with optional 'tiles' graphics"
-#else
-      /* assume that one or more of IBMgraphics, DECgraphics, or MACgraphics
-         can be enabled; we can't tell from here whether that is accurate */
-      "traditional text with optional line-drawing"
-#endif
-    },
-#endif
-#ifdef CURSES_GRAPHICS
-    { "curses", "terminal-based graphics" },
-#endif
-#ifdef X11_GRAPHICS
-    { "X11", "X11" },
-#endif
-#ifdef QT_GRAPHICS /* too vague; there are multiple incompatible versions */
-    { "Qt", "Qt" },
-#endif
-#ifdef GNOME_GRAPHICS /* unmaintained/defunct */
-    { "Gnome", "Gnome" },
-#endif
-#ifdef MAC /* defunct OS 9 interface */
-    { "mac", "Mac" },
-#endif
-#ifdef AMIGA_INTUITION /* unmaintained/defunct */
-    { "amii", "Amiga Intuition" },
-#endif
-#ifdef GEM_GRAPHICS /* defunct Atari interface */
-    { "Gem", "Gem" },
-#endif
-#ifdef MSWIN_GRAPHICS /* win32 */
-    { "mswin", "mswin" },
-#endif
-#ifdef BEOS_GRAPHICS /* unmaintained/defunct */
-    { "BeOS", "BeOS InterfaceKit" },
-#endif
-    { 0, 0 }
-};
 
 static void
 windowing_sanity()
@@ -1774,107 +1382,6 @@ windowing_sanity()
         }
     }
 #endif /*DEFAULT_WINDOW_SYS*/
-}
-
-static const char opt_indent[] = "    ";
-
-static void
-opt_out_words(str, length_p)
-char *str; /* input, but modified during processing */
-int *length_p; /* in/out */
-{
-    char *word;
-
-    while (*str) {
-        word = index(str, ' ');
-#if 0
-        /* treat " (" as unbreakable space */
-        if (word && *(word + 1) == '(')
-            word = index(word + 1,  ' ');
-#endif
-        if (word)
-            *word = '\0';
-        if (*length_p + (int) strlen(str) > COLNO - 5)
-            Fprintf(ofp, "\n%s", opt_indent),
-                *length_p = (int) strlen(opt_indent);
-        else
-            Fprintf(ofp, " "), (*length_p)++;
-        Fprintf(ofp, "%s", str), *length_p += (int) strlen(str);
-        str += strlen(str) + (word ? 1 : 0);
-    }
-}
-
-void
-do_options()
-{
-    char buf[BUFSZ];
-    int i, length, winsyscnt;
-
-    windowing_sanity();
-
-    filename[0] = '\0';
-#ifdef FILE_PREFIX
-    Strcat(filename, file_prefix);
-#endif
-    Sprintf(eos(filename), DATA_TEMPLATE, OPTIONS_FILE);
-    if (!(ofp = fopen(filename, WRTMODE))) {
-        perror(filename);
-        exit(EXIT_FAILURE);
-    }
-
-    build_savebones_compat_string();
-    Fprintf(ofp, "\n%sNetHack version %d.%d.%d%s\n",
-            opt_indent,
-            VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-#if (NH_DEVEL_STATUS == NH_STATUS_BETA)
-            " [beta]"
-#else
-            " [work-in-progress]"
-#endif
-#else
-            ""
-#endif
-            );
-
-    Fprintf(ofp, "\nOptions compiled into this edition:\n");
-    length = COLNO + 1; /* force 1st item onto new line */
-    for (i = 0; i < SIZE(build_opts); i++) {
-        opt_out_words(strcat(strcpy(buf, build_opts[i]),
-                             (i < SIZE(build_opts) - 1) ? "," : "."),
-                      &length);
-    }
-    Fprintf(ofp, "\n"); /* terminate last line of words */
-
-    winsyscnt = SIZE(window_opts) - 1;
-    Fprintf(ofp, "\nSupported windowing system%s:\n",
-            (winsyscnt > 1) ? "s" : "");
-    length = COLNO + 1; /* force 1st item onto new line */
-    for (i = 0; i < winsyscnt; i++) {
-        Sprintf(buf, "\"%s\"", window_opts[i].id);
-        if (strcmp(window_opts[i].name, window_opts[i].id))
-            Sprintf(eos(buf), " (%s)", window_opts[i].name);
-        /*
-         * 1 : foo.
-         * 2 : foo and bar  (note no period; comes from 'with default' below)
-         * 3+: for, bar, and quux
-         */
-        opt_out_words(strcat(buf, (winsyscnt == 1) ? "." /* no 'default' */
-                                  : (winsyscnt == 2 && i == 0) ? " and"
-                                    : (i == winsyscnt - 2) ? ", and"
-                                      : ","),
-                      &length);
-    }
-    if (winsyscnt > 1) {
-        Sprintf(buf, "with a default of \"%s\".", DEFAULT_WINDOW_SYS);
-        opt_out_words(buf, &length);
-    }
-    Fprintf(ofp, "\n"); /* terminate last line of words */
-
-    /* end with a blank line */
-    Fprintf(ofp, "\n");
-    Fclose(ofp);
-    return;
 }
 
 /* routine to decide whether to discard something from data.base */
@@ -2902,15 +2409,6 @@ const char *str;
         return (char *) 0;
     (void) strncpy(buf, str, 127);
     return buf;
-}
-
-static char *
-eos(str)
-char *str;
-{
-    while (*str)
-        str++;
-    return str;
 }
 
 /*

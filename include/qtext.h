@@ -15,7 +15,7 @@ struct qtmsg {
     long offset, size, summary_size;
 };
 
-#ifdef MAKEDEFS_C /***** MAKEDEFS *****/
+#if defined(MAKEDEFS_C) || defined(MDLIB_C) /***** MAKEDEFS *****/
 
 #define N_MSG 100 /* arbitrary */
 
@@ -47,7 +47,7 @@ struct qthdr {
     "Too many messages in class (line %d)\nAdjust N_MSG in qtext.h and " \
     "recompile.\n"
 
-#else /***** !MAKEDEFS *****/
+#else /***** !MAKEDEFS && !MDLIB_C *****/
 
 struct qtlists {
     struct qtmsg *common,
@@ -113,6 +113,6 @@ struct qtlists {
 #define QTN_DEMONIC 20
 
 #define QT_BANISHED 60
-#endif /***** !MAKEDEFS *****/
+#endif /***** !MAKEDEFS && !MDLIB_C *****/
 
 #endif /* QTEXT_H */

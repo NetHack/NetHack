@@ -25,6 +25,9 @@ early_init()
     decl_globals_init();
     objects_globals_init();
     monst_globals_init();
+#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
+    runtime_info_init();
+#endif
     sys_early_init();
 }
 

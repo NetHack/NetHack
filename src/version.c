@@ -19,11 +19,44 @@
 #include "patchlevel.h"
 #endif
 
+#if defined(CROSSCOMPILE)
+struct cross_target_s cross_target = {
+    /* https://groups.google.com/forum/#!original/
+       comp.sources.games/91SfKYg_xzI/dGnR3JnspFkJ */
+    "Tue, 28-Jul-87 13:18:57 EDT",
+    "Version 1.0, built Jul 28 13:18:57 1987.",
+    "0000000000000000000000000000000000000000",
+    "master",
+    "1.0.0-0",
+    "NetHack Version 1.0.0-0 - last build Tue Jul 28 13:18:57 1987.",
+    0x01010000UL,
+    0x00000000UL,
+    0x00000000UL,
+    0x00000000UL,
+    0x00000000UL,
+    0x00000000UL,
+    554476737UL,
+};
+#endif /* CROSSCOMPILE */
+
 #if defined(NETHACK_GIT_SHA)
-const char *NetHack_git_sha = NETHACK_GIT_SHA;
+const char *NetHack_git_sha
+#if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
+                = NETHACK_GIT_SHA
+#else
+                = NETHACK_HOST_GIT_SHA
 #endif
+;
+#endif
+
 #if defined(NETHACK_GIT_BRANCH)
-const char *NetHack_git_branch = NETHACK_GIT_BRANCH;
+const char *NetHack_git_branch
+#if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
+                = NETHACK_GIT_BRANCH
+#else
+                = NETHACK_HOST_GIT_BRANCH
+#endif
+;
 #endif
 
 static void FDECL(insert_rtoption, (char *));
@@ -98,7 +131,12 @@ doversion()
 int
 doextversion()
 {
+#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
+    const char *rtbuf;
+    int rtcontext = 0;
+#else
     dlb *f;
+#endif
     char buf[BUFSZ], *p = 0;
     winid win = create_nhwindow(NHW_TEXT);
 
@@ -119,12 +157,15 @@ doextversion()
         putstr(win, 0, p);
     }
 
+#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
+#else
     f = dlb_fopen(OPTIONS_USED, "r");
     if (!f) {
         putstr(win, 0, "");
         Sprintf(buf, "[Configuration '%s' not available?]", OPTIONS_USED);
         putstr(win, 0, buf);
     } else {
+#endif
         /*
          * already inserted above:
          * + outdented program name and version plus build date and time
@@ -146,8 +187,15 @@ doextversion()
          */
         boolean prolog = TRUE; /* to skip indented program name */
 
+#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
+        while ((rtbuf = do_runtime_info(&rtcontext))) {
+            if ((int) strlen(rtbuf) >= (BUFSZ - 1))
+                continue;
+            Strcpy(buf, rtbuf);
+#else
         while (dlb_fgets(buf, BUFSZ, f)) {
             (void) strip_newline(buf);
+#endif
             if (index(buf, '\t') != 0)
                 (void) tabexpand(buf);
 
@@ -167,10 +215,16 @@ doextversion()
             if (*buf)
                 putstr(win, 0, buf);
         }
+#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
+#else
         (void) dlb_fclose(f);
+#endif
         display_nhwindow(win, FALSE);
         destroy_nhwindow(win);
+#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
+#else
     }
+#endif
     return 0;
 }
 
@@ -370,11 +424,23 @@ void
 store_version(nhfp)
 NHFILE *nhfp;
 {
+#if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
     static const struct version_info version_data = {
         VERSION_NUMBER, VERSION_FEATURES,
         VERSION_SANITY1, VERSION_SANITY2, VERSION_SANITY3
+#else
+    struct version_info version_data = {
+        0UL,0UL,0UL,0UL,0Ul
+#endif
     };
 
+#if defined(CROSSCOMPILE) && !defined(CROSSCOMPILE_HOST)
+    version_data.incarnation = VERSION_NUMBER;    /* actual version number */
+    version_data.feature_set = VERSION_FEATURES;  /* bitmask of config settings */
+    version_data.entity_count  = VERSION_SANITY1; /* # of monsters and objects */
+    version_data.struct_sizes1 = VERSION_SANITY2; /* size of key structs */
+    version_data.struct_sizes2 = VERSION_SANITY3; /* size of more key structs */
+#endif
     if (nhfp->structlevel) {
         bufoff(nhfp->fd);
         /* bwrite() before bufon() uses plain write() */

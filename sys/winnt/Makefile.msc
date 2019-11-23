@@ -145,6 +145,12 @@ DEBUGINFO = Y
 #
 LUATOP=..\..\lua-5.3.5
 #
+#
+#==============================================================================
+#
+#TEST_CROSSCOMPILE=Y
+#OPTIONS_AT_RUNTIME=Y
+#
 #==============================================================================
 #======================== End of Modification Section =========================
 #==============================================================================
@@ -314,6 +320,28 @@ REGEX  = $(O)cppregex.o
 
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
+!IFDEF TEST_CROSSCOMPILE
+CROSSDEFINE_TARGET = -DCROSSCOMPILE_TARGET
+CROSSDEFINE_HOST = -DCROSSCOMPILE_HOST
+CROSSCOMPILE = -DCROSSCOMPILE
+CROSSDEFINES = $(CROSSCOMPILE) $(CROSSDEFINE_HOST) $(CROSSDEFINE_TARGET)
+OPTIONS_AT_RUNTIME=Y
+!ELSE
+CROSSDEFINE_TARGET =
+CROSSDEFINE_HOST =
+CROSSCOMPILE =
+CROSSDEFINES =
+CROSSDEFINES = 
+!ENDIF
+
+!IF "$(OPTIONS_AT_RUNTIME)" == "Y"
+MDLIB = $(O)mdlib.o
+RUNTIMEOPTDEF=-DOPTIONS_AT_RUNTIME
+!ELSE
+MDLIB =
+RUNTIMEOPTDEF=
+!ENDIF
+
 !IFNDEF ADD_CURSES
 CURSESOBJ=
 !ELSE
@@ -330,7 +358,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
          $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
          $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(VOBJ30) \
-         $(REGEX)  $(CURSESOBJ)
+         $(REGEX)  $(CURSESOBJ) $(MDLIB)
 
 GUIOBJ	= $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
@@ -608,7 +636,7 @@ CURSESLIB=
 ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
 	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
 	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" \
-	-DHAS_STDINT_H -DHAS_INLINE $(CURSESDEF) \
+	-DHAS_STDINT_H -DHAS_INLINE $(CURSESDEF) $(RUNTIMEOPTDEF) \
 	-EHsc -fp:precise -Gd -GF -GS -Gy \
 	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
 cdebug= -analyze- -D"_DEBUG" -MTd -RTC1 -Od
@@ -708,20 +736,20 @@ DLB =
 #==========================================
 
 .c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
 
 {$(SRC)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild)   -Fo$@  $<
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES)  -Fo$@  $<
 
 #==========================================
 # Rules for files in sys\share
 #==========================================
 
 {$(SSYS)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild)  -Fo$@  $<
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES)  -Fo$@  $<
 
 {$(SSYS)}.cpp{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) /EHsc -Fo$@  $<
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /EHsc -Fo$@  $<
 
 #==========================================
 # Rules for files in sys\winnt
@@ -738,14 +766,14 @@ DLB =
 #==========================================
 
 {$(UTIL)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) -Fo$@ $<
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
 
 #==========================================
 # Rules for files in win\share
 #==========================================
 
 {$(WSHR)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
 
 {$(WSHR)}.h{$(INCL)}.h:
 	@copy $< $@
@@ -758,7 +786,7 @@ DLB =
 #==========================================
 
 {$(TTY)}.c{$(OBJ)}.o:
-	$(cc) $(cflagsBuild)  -Fo$@  $<
+	$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@  $<
 
 
 #==========================================
@@ -766,14 +794,14 @@ DLB =
 #==========================================
 
 {$(MSWIN)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild)  -Fo$@  $<
+	$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@  $<
 
 #==========================================
 # Rules for files in win\curses
 #==========================================
 
 {$(WCURSES)}.c{$(OBJ)}.o:
-	@$(cc) -DPDC_NCMOUSE $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) -DPDC_NCMOUSE $(PDCINCL) $(cflagsBuild) $(CROSSDEFINES)  -Fo$@ $<
 
 #{$(WCURSES)}.txt{$(DAT)}.txt:
 #	@copy $< $@
@@ -783,20 +811,20 @@ DLB =
 #==========================================
 
 {$(PDCURSES_TOP)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
 
 {$(PDCSRC)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
 
 {$(PDCWINCON)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
 
 #==========================================
 # Rules for LUA files
 #==========================================
 
 {$(LUASRC)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) -Fo$@ $<
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
 
 #==========================================
 #=============== TARGETS ==================
@@ -1063,7 +1091,7 @@ $(U)nhsizes.exe: $(O)nhsizes.o
 	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o
 
 $(O)nhsizes.o: $(CONFIG_H) nhsizes.c
-	@$(cc) $(cflagsBuild) -Fo$@ nhsizes.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ nhsizes.c
 
 $(U)makedefs.exe:	$(MAKEOBJS)
 	@echo Linking $(@:\=/)
@@ -1074,7 +1102,8 @@ $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objcla
 		 $(U)makedefs.c
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	@$(cc) -DENUM_PM $(cflagsBuild) -Fo$@ $(U)makedefs.c
+	$(cc) -DENUM_PM $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $(U)makedefs.c
+#	$(cc) -DENUM_PM $(cflagsBuild) $(CROSSDEFINES) /EP -Fo$@ $(U)makedefs.c >makedefs.c.preprocessed
 
 #
 #  date.h should be remade every time any of the source or include
@@ -1105,7 +1134,7 @@ $(U)uudecode.exe: $(O)uudecode.o
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)\uudecode.c
-	@$(cc) $(cflagsBuild) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
 
 $(MSWSYS)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
 	chdir $(MSWSYS)
@@ -1271,10 +1300,10 @@ $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
 <<
 
 $(O)dlb.o:	$(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
-	@$(cc) $(cflagsBuild) /Fo$@ $(SRC)\dlb.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /Fo$@ $(SRC)\dlb.c
 	
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
-	@$(cc) $(cflagsBuild) /Fo$@ $(UTIL)\dlb_main.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /Fo$@ $(UTIL)\dlb_main.c
 
 $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
@@ -1320,7 +1349,7 @@ $(U)recover.exe: $(RECOVOBJS)
 	$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(MSWSYS)\win32api.h
-	@$(cc) $(cflagsBuild) -Fo$@ $(U)recover.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $(U)recover.c
 
 #==========================================
 #  Tile Mapping
@@ -1335,28 +1364,28 @@ $(U)tilemap.exe: $(O)tilemap.o
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
 $(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
-	@$(cc) $(cflagsBuild) -Fo$@ $(WSHR)\tilemap.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $(WSHR)\tilemap.c
 
 $(O)tiletx32.o: $(WSHR)\tilemap.c $(HACK_H)
-	@$(cc) $(cflagsBuild) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
 
 $(O)tiletxt.o: $(WSHR)\tilemap.c $(HACK_H)
-	@$(cc) $(cflagsBuild) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
 
 $(O)gifread.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
 
 $(O)gifrd32.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
 
 $(O)ppmwrite.o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
 
 $(O)tiletext.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
 
 $(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
 
 #==========================================
 # Optional Tile Utilities
@@ -1414,10 +1443,10 @@ $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
 <<
 
 $(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
-	@$(cc) $(cflagsBuild) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
 
 $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
-	@$(cc) $(cflagsBuild) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
 #===============================================================================
 # PDCurses
@@ -1427,7 +1456,7 @@ $(O)pdcurses.lib : $(PDCLIBOBJS) $(PDCOBJS)
 	lib -nologo /out:$@ $(PDCLIBOBJS) $(PDCOBJS)
 
 $(O)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c $(MSWSYS)\stub-pdcscrn.c
-	$(cc) $(PDCINCL) $(cflagsBuild) -Fo$@ $(MSWSYS)\stub-pdcscrn.c
+	$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $(MSWSYS)\stub-pdcscrn.c
 
 #===============================================================================
 # LUA
@@ -1448,7 +1477,25 @@ $(O)lua$(LUAVER)-static.lib: $(LUAOBJFILES)
 $(O)lua.o: $(LUASRC)\lua.c
 $(O)luac.o: $(LUASRC)\luac.c
 $(O)lapi.o: $(LUASRC)\lapi.c
-	@$(cc) $(cflagsBuild) -wd4244 -Fo$@ $(LUASRC)\lapi.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -wd4244 -Fo$@ $(LUASRC)\lapi.c
+
+#===============================================================================
+# CROSSCOMPILE
+#===============================================================================
+
+# Under a cross-compile, some of the values stored statically into
+# text files cannot be trusted as being representative of the
+# settings and features used on the build of the target binaries.
+#
+# We move some of that stuff into the game run-time by separating
+# out the functions into src\mdlib.c to get some of the required
+# functionality at game runtime instead of from a previously written
+# data file.
+#
+
+$(O)mdlib.o: $(SRC)\mdlib.c
+	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_TARGET) -DMAKEDEFS_MDOBJ -Fo$@ $(SRC)\mdlib.c
+#	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_TARGET) -DMAKEDEFS_MDOBJ /EP -Fo$@ $(SRC)\mdlib.c >mdlib.c.preprocessed
 
 #===============================================================================
 # Housekeeping
@@ -1642,31 +1689,32 @@ $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 #
 
 $(O)nttty.o:   $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h $(MSWSYS)\nttty.c
-	@$(cc) $(cflagsBuild) -I$(WSHR) -Fo$@  $(MSWSYS)\nttty.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) -Fo$@  $(MSWSYS)\nttty.c
 $(O)winnt.o: $(HACK_H) $(MSWSYS)\win32api.h $(MSWSYS)\winnt.c
-	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWSYS)\win10.c
-	@$(cc) $(cflagsBuild) -Fo$@  $(MSWSYS)\winnt.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWSYS)\win10.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@  $(MSWSYS)\winnt.c
 $(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
-	@$(cc) $(cflagsBuild)  -Fo$@ $(MSWSYS)\ntsound.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $(MSWSYS)\ntsound.c
+$(O)windmain.o: $(MSWSYS)\windmain.c $(HACK_H)
 
 #if you aren't linking in the full gui then
 #include the following stub for proper linkage.
 
 $(O)guistub.o: $(HACK_H) $(MSWSYS)\stubs.c
-	@$(cc) $(cflagsBuild) -DGUISTUB -Fo$@ $(MSWSYS)\stubs.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -DGUISTUB -Fo$@ $(MSWSYS)\stubs.c
 
 #
 # WIN32 dependencies
 #
 
 $(O)NetHackW.o: $(HACK_H) $(MSWIN)\NetHackW.c
-	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\NetHackW.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\NetHackW.c
 
 #if you aren't linking in the full tty then
 #include the following stub for proper linkage.
 
 $(O)ttystub.o: $(HACK_H) $(MSWSYS)\stubs.c
-	@$(cc) $(cflagsBuild) -DTTYSTUB -Fo$@ $(MSWSYS)\stubs.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -DTTYSTUB -Fo$@ $(MSWSYS)\stubs.c
 
 #
 #============================================
@@ -1675,19 +1723,19 @@ $(O)ttystub.o: $(HACK_H) $(MSWSYS)\stubs.c
 
 $(O)sfbase.o: $(HACK_H) $(INCL)\sfproto.h $(INCL)\sfprocs.h \
 		$(SRC)\sfbase.c
-	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfbase.c
+#	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfbase.c
 
 $(O)sfdata.o: $(HACK_H) $(INCL)\sfprocs.h $(SRC)\sfdata.c
-	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfdata.c
+#	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfdata.c
 
 $(O)sfstruct.o: $(HACK_H) $(SRC)\sfstruct.c
-	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfstruct.c
+#	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfstruct.c
 
 $(O)sfascii.o: $(HACK_H) $(INCL)\sfprocs.h $(SRC)\sfascii.c
-	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfascii.c
+#	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfascii.c
 
 $(O)sflendian.o: $(HACK_H) $(INCL)\sfprocs.h $(SRC)\sflendian.c
-	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sflendian.c
+#	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sflendian.c
 
 $(SRC)\sfdata.c: $(U)readtags.exe $(U)nethack.tags
         $(U)readtags.exe
@@ -1699,7 +1747,7 @@ $(U)readtags.exe: $(O)readtags.o
 	@$(link) $(lflagsBuild) -out:$@ $(O)readtags.o
 
 $(O)readtags.o: $(U)readtags.c $(U)nethack.tags $(CONFIG_H) $(PATCHLEVEL_H)
-	@$(cc) $(cflagsBuild) $(TEMPL)  -Fo$@ $(U)readtags.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) $(TEMPL)  -Fo$@ $(U)readtags.c
 
 #
 #tested only with exuberant ctags from http://ctags.sourceforge.net
@@ -1763,14 +1811,14 @@ $(U)nethack.tags: $(CTAGDEP)
 #
 
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
-	@$(cc) $(cflagsBuild) -Fo$@ $(U)panic.c
+	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $(U)panic.c
 
 # 
 # sys/share dependencies
 #
 
 (O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\cppregex.cpp
+	@$(CC) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ ..\sys\share\cppregex.cpp
 
 # 
 # curses window port dependencies
@@ -1798,126 +1846,126 @@ $(O)curswins.o: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
 #
 
 $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\atari\tos.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\atari\tos.c
 $(O)pctty.o: ..\sys\share\pctty.c $(HACK_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pctty.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pctty.c
 $(O)isaac64.o: ..\src\isaac64.c $(HACK_H) $(INCL)\isaac64.h $(INCL)\integer.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\src\isaac64.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\src\isaac64.c
 $(O)random.o: ..\sys\share\random.c $(HACK_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\random.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\random.c
 $(O)ioctl.o: ..\sys\share\ioctl.c $(HACK_H) $(INCL)\tcap.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\ioctl.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\ioctl.c
 $(O)unixtty.o: ..\sys\share\unixtty.c $(HACK_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\unixtty.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\unixtty.c
 $(O)unixmain.o: ..\sys\unix\unixmain.c $(HACK_H) $(INCL)\dlb.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\unix\unixmain.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\unix\unixmain.c
 $(O)unixunix.o: ..\sys\unix\unixunix.c $(HACK_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\unix\unixunix.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\unix\unixunix.c
 $(O)unixres.o: ..\sys\unix\unixres.c $(CONFIG_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\unix\unixres.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\unix\unixres.c
 $(O)bemain.o: ..\sys\be\bemain.c $(HACK_H) $(INCL)\dlb.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\be\bemain.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\be\bemain.c
 $(O)getline.o: ..\win\tty\getline.c $(HACK_H) $(INCL)\func_tab.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\getline.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\getline.c
 $(O)termcap.o: ..\win\tty\termcap.c $(HACK_H) $(INCL)\tcap.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\termcap.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\termcap.c
 $(O)topl.o: ..\win\tty\topl.c $(HACK_H) $(INCL)\tcap.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\topl.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\topl.c
 $(O)wintty.o: ..\win\tty\wintty.c $(HACK_H) $(INCL)\dlb.h $(INCL)\tcap.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\wintty.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\wintty.c
 #$(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
 #		$(CONFIG_H)
 #	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\Window.c
 $(O)dialogs.o: ..\win\X11\dialogs.c $(CONFIG_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\dialogs.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\dialogs.c
 $(O)winX.o: ..\win\X11\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
 		..\win\X11\nh72icon ..\win\X11\nh56icon ..\win\X11\nh32icon
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winX.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winX.c
 $(O)winmap.o: ..\win\X11\winmap.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\winX.h $(INCL)\tile2x11.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winmap.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winmap.c
 $(O)winmenu.o: ..\win\X11\winmenu.c $(HACK_H) $(INCL)\winX.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winmenu.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winmenu.c
 $(O)winmesg.o: ..\win\X11\winmesg.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\winX.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winmesg.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winmesg.c
 $(O)winmisc.o: ..\win\X11\winmisc.c $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\winX.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winmisc.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winmisc.c
 $(O)winstat.o: ..\win\X11\winstat.c $(HACK_H) $(INCL)\winX.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winstat.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winstat.c
 $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\wintext.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\wintext.c
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winval.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winval.c
 $(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnmain.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnaskstr.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnaskstr.c
 $(O)gnbind.o: ..\win\gnome\gnbind.c ..\win\gnome\gnbind.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gnmenu.h ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnyesno.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnbind.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnbind.c
 $(O)gnglyph.o: ..\win\gnome\gnglyph.c ..\win\gnome\gnglyph.h $(INCL)\tile2x11.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnglyph.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnglyph.c
 $(O)gnmain.o: ..\win\gnome\gnmain.c ..\win\gnome\gnmain.h ..\win\gnome\gnsignal.h \
 		..\win\gnome\gnbind.h ..\win\gnome\gnopts.h $(HACK_H) \
 		$(INCL)\date.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmain.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmain.c
 $(O)gnmap.o: ..\win\gnome\gnmap.c ..\win\gnome\gnmap.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnsignal.h $(HACK_H)
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmap.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmap.c
 $(O)gnmenu.o: ..\win\gnome\gnmenu.c ..\win\gnome\gnmenu.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gnbind.h $(INCL)\func_tab.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmenu.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmenu.c
 $(O)gnmesg.o: ..\win\gnome\gnmesg.c ..\win\gnome\gnmesg.h ..\win\gnome\gnsignal.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmesg.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmesg.c
 $(O)gnopts.o: ..\win\gnome\gnopts.c ..\win\gnome\gnopts.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnmain.h ..\win\gnome\gnmap.h $(HACK_H)
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnopts.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnopts.c
 $(O)gnplayer.o: ..\win\gnome\gnplayer.c ..\win\gnome\gnplayer.h \
 		..\win\gnome\gnmain.h $(HACK_H)
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnplayer.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnplayer.c
 $(O)gnsignal.o: ..\win\gnome\gnsignal.c ..\win\gnome\gnsignal.h \
 		..\win\gnome\gnmain.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnsignal.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnsignal.c
 $(O)gnstatus.o: ..\win\gnome\gnstatus.c ..\win\gnome\gnstatus.h \
 		..\win\gnome\gnsignal.h ..\win\gnome\gn_xpms.h \
 		..\win\gnome\gnomeprv.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnstatus.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnstatus.c
 $(O)gntext.o: ..\win\gnome\gntext.c ..\win\gnome\gntext.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gn_rip.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gntext.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gntext.c
 $(O)gnyesno.o: ..\win\gnome\gnyesno.c ..\win\gnome\gnbind.h ..\win\gnome\gnyesno.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnyesno.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnyesno.c
 $(O)gnworn.o: ..\win\gnome\gnworn.c ..\win\gnome\gnworn.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnsignal.h ..\win\gnome\gnomeprv.h
-	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnworn.c
+#	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnworn.c
 $(O)wingem.o: ..\win\gem\wingem.c $(HACK_H) $(INCL)\func_tab.h $(INCL)\dlb.h \
 		$(INCL)\patchlevel.h $(INCL)\wingem.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\gem\wingem.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\gem\wingem.c
 $(O)wingem1.o: ..\win\gem\wingem1.c $(INCL)\gem_rsc.h $(INCL)\load_img.h \
 		$(INCL)\gr_rect.h $(INCL)\wintype.h $(INCL)\wingem.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\gem\wingem1.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\gem\wingem1.c
 $(O)load_img.o: ..\win\gem\load_img.c $(INCL)\load_img.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\win\gem\load_img.c
 $(O)gr_rect.o: ..\win\gem\gr_rect.c $(INCL)\gr_rect.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\gem\gr_rect.c
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\gem\gr_rect.c
 $(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\dlb.h $(INCL)\patchlevel.h $(INCL)\tile2x11.h \
 		$(INCL)\qt_win.h $(INCL)\qt_clust.h $(INCL)\qt_kde0.h \
 		$(INCL)\qt_xpms.h qt_win.moc qt_kde0.moc qttableview.moc
-	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qt_win.cpp
+#	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qt_win.cpp
 $(O)qt_clust.o: ..\win\Qt\qt_clust.cpp $(INCL)\qt_clust.h
-	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qt_clust.cpp
+#	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qt_clust.cpp
 $(O)qttableview.o: ..\win\Qt\qttableview.cpp $(INCL)\qttableview.h
-	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qttableview.cpp
+#	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qttableview.cpp
 $(O)wc_chainin.o: ..\win\chain\wc_chainin.c $(HACK_H)
-	@$(cc) $(cflagsBuild) -Fo$@ ..\win\chain\wc_chainin.c
+#	@$(cc) $(cflagsBuild) -Fo$@ ..\win\chain\wc_chainin.c
 $(O)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)
-	@$(cc) $(cflagsBuild) -Fo$@ ..\win\chain\wc_chainout.c
+#	@$(cc) $(cflagsBuild) -Fo$@ ..\win\chain\wc_chainout.c
 $(O)wc_trace.o: ..\win\chain\wc_trace.c $(HACK_H) $(INCL)\func_tab.h
-	@$(cc) $(cflagsBuild) -Fo$@ ..\win\chain\wc_trace.c
+#	@$(cc) $(cflagsBuild) -Fo$@ ..\win\chain\wc_trace.c
 $(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
@@ -2023,11 +2071,11 @@ $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
 $(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h \
 		$(INCL)\patchlevel.h
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_TARGET) -Fo$@ version.c
 $(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
-$(O)windmain.o: $(MSWSYS)\windmain.c $(HACK_H)
 #$(O)windows.o: windows.c $(HACK_H) $(INCL)\wingem.h $(INCL)\winGnome.h
 $(O)wizard.o: wizard.c $(HACK_H) $(INCL)\qtext.h
 $(O)worm.o: worm.c $(HACK_H) $(INCL)\lev.h
