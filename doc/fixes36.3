@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.188 $ $NHDT-Date: 1574419578 2019/11/22 10:46:18 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.189 $ $NHDT-Date: 1574475416 2019/11/23 02:16:56 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -295,6 +295,11 @@ don't strip leading slash from hallucinatory monster name "/b/tard"
 quaffing unknown potion of see invisible resulted in asking what to call the
 	potion while updated monster display was buffered so not yet shown,
 	hence potentially noticeable effect was concealed from player
+when Riders use their bargethrough capability, don't let them swap places with
+	something located at a spot where corpses can't be created (their
+	door opening ability was letting them exchange places with something
+	co-located with a closed door without opening it; if killed there,
+	there'd be no corpse so no auto-revive)
 unix: Fix double DLB definition in linux hints file
 windows: fix --showpaths output for the data file which relies on being
 	constructed programmatically to incorporate the version suffix
