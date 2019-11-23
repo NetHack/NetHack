@@ -5,7 +5,7 @@
 #       Makefile1.cross is for the host-side obj files and utilities that
 #       will run on the host platform only.
 #
-#       Makefile2.cross (this file) is the the target platform obj files 
+#       Makefile2.cross (this file) is for the target platform obj files 
 #       and utilities.
 #
 #   Makefile2 utilizes the djgpp cross-compiler from Andrew Wu:
@@ -13,7 +13,7 @@
 #
 #   In NetHack 3.7, the cross-compile for msdos can be used to
 #   build the entire game to a complete ms-dos package and 
-#   result (in theory).
+#   result (from theory to achieved on Nov 22, 2019).
 #
 
 # Game Installation Variables
