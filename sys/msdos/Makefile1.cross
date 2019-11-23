@@ -1,19 +1,19 @@
-# NetHack 3.6	Makefile1.cross
+# NetHack 3.7	Makefile1.cross
 #       Cross-compile msdos version of NetHack using a 
 #       linux-hosted djgpp cross-compiler.
 #
 #       Makefile1.cross (this file) is for the host-side obj files and 
 #       utilities that will run on the host platform only.
 #
-#       Makefile2.cross is the the target platform obj files
+#       Makefile2.cross is for the target platform obj files
 #       and utilities.
 #
 #   Makefile2 utilizes the djgpp cross-compiler from Andrew Wu:
 #       https://github.com/andrewwutw/build-djgpp
 #
-#   Currently, in NetHack 3.6, the cross-compile for msdos cannot be
-#   used to build the entire game to a playable point but it is useful
-#   for testing the msdos port build of the evolving NetHack code.0
+#   Currently, in NetHack 3.7, it is now feasible to cross-compile
+#   the game in a 2-stage process. Makefile1.cross (this file) carries 
+#   out the 1st stage.
 #
 # The GNU Make has a problem if you include a drive spec below.
 GAMEDIR =../msdos-binary
@@ -358,11 +358,11 @@ $(DAT)/data: $(HOST_O)utility.tag	$(DATABASE)
 $(DAT)/rumors:	     $(HOST_O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
 	$(U)makedefs -r
 
-$(DAT)/quest.dat: $(HOST_O)utility.tag  $(DAT)/quest.txt
-	$(U)makedefs -q
-
 $(DAT)/oracles:	     $(HOST_O)utility.tag    $(DAT)/oracles.txt
 	$(U)makedefs -h
+
+$(DAT)/quest.dat: $(HOST_O)utility.tag  $(DAT)/quest.txt
+	$(U)makedefs -q
 
 $(DAT)/bogusmon:     $(HOST_O)utility.tag    $(DAT)/bogusmon.txt
 	$(U)makedefs -s
@@ -392,73 +392,9 @@ $(HOST_O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
 		$(INCL)/monsym.h   $(INCL)/qtext.h $(U)makedefs.c
 	$(HOST_CC) $(cflags) -o$@ $(U)makedefs.c
 
-#==========================================
-#  Level Compiler Dependencies
-#==========================================
-
-#$(U)lev_comp:  $(SPLEVOBJS)
-#	-rm -f temp.a
-#	ar r temp.a $(SPLEVOBJS)
-#	$(HOST_LINK) $(LFLAGS) -o$@ temp.a
-#
-#$(HOST_O)lev_yacc.o:  $(HACK_H)	 $(SP_LEV_H) $(INCL)/lev_comp.h $(U)lev_yacc.c
-#	$(HOST_CC) $(cflags) -o$@ $(U)lev_yacc.c
-#
-#$(HOST_O)lev_$(LEX).o:  $(HACK_H)   $(SP_LEV_H)	  $(INCL)/lev_comp.h \
-#	$(U)lev_$(LEX).c
-#	$(HOST_CC) $(cflags) -o$@ $(U)lev_$(LEX).c
-#
-#$(HOST_O)lev_main.o:  $(HACK_H) $(INCL)/sp_lev.h $(INCL)/date.h $(U)lev_main.c
-#
-#$(U)lev_yacc.c: $(SSHR)/lev_yacc.c
-#	@echo ---
-#	@echo For now, we will copy the prebuilt
-#	@echo lev_comp.c from $(SSHR) into $(U) and use that.
-#	@cp $(SSHR)/lev_yacc.c $(U)lev_yacc.c
-#	@echo.>>$(U)lev_yacc.c
-#
-#$(INCL)/lev_comp.h : $(SSHR)/lev_comp.h
-#	@echo For now, we will copy the prebuilt lev_comp.h
-#	@echo from $(SSHR) into $(INCL) and use that.
-#	@cp $(SSHR)/lev_comp.h $@
-#$(U)lev_lex.c: $(SSHR)/lev_lex.c
-#	@echo.>>$(INCL)/lev_comp.h
-#	@echo For now, we will copy the prebuilt lev_lex.c
-#	@echo from $(SSHR) into $(U) and use it.
-#	@cp $(SSHR)/lev_lex.c $@
-#	@echo.>>$@
-
-#==========================================
-#  Dungeon Dependencies
-#==========================================
-
-#$(U)dgn_comp:  $(DGNCOMPOBJS)
-#	$(HOST_LINK) $(LFLAGS) -o$@ $(DGNCOMPOBJS)
-#
-#$(U)dgn_yacc.c: $(SSHR)/dgn_yacc.c
-#	@echo ---
-#	@echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
-#	@echo dgn_comp.h from $(SSHR) into $(U) and use that.
-#	@cp $(SSHR)/dgn_yacc.c $(U)dgn_yacc.c
-#	@echo.>>$(U)dgn_yacc.c
-#
-#$(INCL)/dgn_comp.h: $(SSHR)/dgn_comp.h
-#	@echo ---
-#	@echo For now, we will copy the prebuilt dgn_comp.h
-#	@echo from $(SSHR) into $(INCL) and use that.
-#	@cp $(SSHR)/dgn_comp.h $@
-#	@echo.>>$(INCL)/dgn_comp.h
-#
-#$(U)dgn_$(LEX).c: $(SSHR)/dgn_lex.c $(INCL)/dgn_comp.h
-#	@echo ---
-#	@echo For now, we will copy the prebuilt dgn_lex.c
-#	@echo from $(SSHR) into $(U) and use it.
-#	@cp $(SSHR)/dgn_lex.c $@
-#	@echo.>>$@
-
-#==========================================
+#=============================================
 #  Header file moves required for tile support
-#==========================================
+#=============================================
 
 ifeq ($(SUPPRESS_GRAPHICS),Y)
 
@@ -605,49 +541,6 @@ $(HOST_O)objects.o: $(CONFIG_H)	      $(INCL)/obj.h	 $(INCL)/objclass.h \
 
 $(HOST_O)panic.o: $(CONFIG_H) $(U)panic.c
 	$(HOST_CC) $(cflags) -o$@ $(U)panic.c
-
-#$(HOST_O)sp_lev.tag: $(HOST_O)utility.tag \
-#	$(DAT)/bigroom.des  $(DAT)/castle.des \
-#	$(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des \
-#	$(DAT)/medusa.des  $(DAT)/oracle.des   $(DAT)/tower.des \
-#	$(DAT)/yendor.des  $(DAT)/arch.des     $(DAT)/barb.des \
-#	$(DAT)/caveman.des   $(DAT)/healer.des   $(DAT)/knight.des \
-#	$(DAT)/monk.des      $(DAT)/priest.des   $(DAT)/ranger.des \
-#	$(DAT)/rogue.des     $(DAT)/samurai.des  $(DAT)/tourist.des \
-#	$(DAT)/valkyrie.des  $(DAT)/wizard.des
-#	cd $(DAT)
-#	$(U)lev_comp bigroom.des
-#	$(U)lev_comp castle.des
-#	$(U)lev_comp endgame.des
-#	$(U)lev_comp gehennom.des
-#	$(U)lev_comp knox.des
-#	$(U)lev_comp mines.des
-#	$(U)lev_comp medusa.des
-#	$(U)lev_comp oracle.des
-#	$(U)lev_comp sokoban.des
-#	$(U)lev_comp tower.des
-#	$(U)lev_comp yendor.des
-#	$(U)lev_comp arch.des
-#	$(U)lev_comp barb.des
-#	$(U)lev_comp caveman.des
-#	$(U)lev_comp healer.des
-#	$(U)lev_comp knight.des
-#	$(U)lev_comp monk.des
-#	$(U)lev_comp priest.des
-#	$(U)lev_comp ranger.des
-#	$(U)lev_comp rogue.des
-#	$(U)lev_comp samurai.des
-#	$(U)lev_comp tourist.des
-#	$(U)lev_comp valkyrie.des
-#	$(U)lev_comp wizard.des
-#	cd $(SRC)
-#	echo sp_levs done > $@
-
-#$(DAT)/dungeon:	  $(HOST_O)utility.tag  $(DAT)/dungeon.def
-#	$(U)makedefs -e
-#	cd $(DAT)
-#	$(U)dgn_comp dungeon.pdf
-#	cd $(SRC)
 
 #==========================================
 #  Housekeeping for host side.

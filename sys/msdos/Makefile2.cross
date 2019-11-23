@@ -11,9 +11,13 @@
 #   Makefile2 utilizes the djgpp cross-compiler from Andrew Wu:
 #       https://github.com/andrewwutw/build-djgpp
 #
-#   In NetHack 3.7, the cross-compile for msdos can be used to
-#   build the entire game to a complete ms-dos package and 
-#   result (from theory to achieved on Nov 22, 2019).
+#   Currently, in NetHack 3.7, it is now feasible to cross-compile
+#   the game in a 2-stage process. Makefile2.cross (this file) carries 
+#   out the 2nd stage. 
+#
+#   A proof-of-concept to cross-compile NetHack 3.7 was achieved on
+#   November 22, 2019 using the msdos set of Makefiles.
+#
 #
 
 # Game Installation Variables
@@ -618,7 +622,7 @@ endif
 	if [ -f $(DAT)/symbols ]; then cp $(DAT)/symbols $(GAMEDIR)/SYMBOLS; fi;
 	if [ -f $(SSHR)/NetHack.cnf ]; then cp $(SSHR)/NetHack.cnf $(GAMEDIR)/NETHACK.CNF; fi;
 	-touch $(GAMEDIR)/RECORD
-	if [ -f ../sys/winnt/sysconf ]; then cp ../sys/winnt/sysconf $(GAMEDIR)/SYSCONF; fi;
+	if [ -f ../sys/winnt/sysconf.template ]; then cp ../sys/winnt/sysconf.template $(GAMEDIR)/SYSCONF; fi;
 	if [ -f $(DOC)/nethack.txt ]; then cp $(DOC)/nethack.txt $(GAMEDIR)/NETHACK.TXT; fi;
 #	if [ -f $(PLANAR_TIB) ]; then cp $(PLANAR_TIB) $(GAMEDIR)/$(PLANAR_TIB^^); fi;
 #	if [ -f $(OVERVIEW_TIB ]; then cp $(OVERVIEW_TIB) $(GAMEDIR)/$(OVERVIEW_TIB^^); fi;
