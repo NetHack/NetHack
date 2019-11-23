@@ -46,12 +46,12 @@ cp ../doc/Guidebook.txt ../doc/guidebk.txt
 cp ../sys/share/posixregex.c ../sys/share/posixreg.c
 #cp ../sys/msdos/Makefile1.cross ../src/Makefile1
 #cp ../sys/msdos/Makefile2.cross ../src/Makefile2
-make -f ../sys/msdos/Makefile1
+make -f ../sys/msdos/Makefile1.cross
 cat ../include/date.h
 export GCC_EXEC_PREFIX=$DJGPP_TOP/lib/gcc/
 export
 pwd
-make -f ../sys/msdos/Makefile2
+make -f ../sys/msdos/Makefile2.cross
 unset GCC_EXEC_PREFIX
 pwd
 ls ../djgpp/cwsdpmi/bin 
