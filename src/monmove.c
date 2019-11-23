@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1574475416 2019/11/23 02:16:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1574530078 2019/11/23 17:27:58 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1625,15 +1625,16 @@ xchar x, y; /* spot 'mtmp' is considering moving to */
         return TRUE;
     }
 
-    /* oversimplification:  creatures that bargethrough can't do so when
-       target monster is in rock or closed door or water (in particular,
-       avoid moving to spots where mondied() won't leave a corpse) */
+    /* oversimplification:  creatures that bargethrough can't swap places
+       when target monster is in rock or closed door or water (in particular,
+       avoid moving to spots where mondied() won't leave a corpse; doesn't
+       matter whether barger is capable of moving to such a target spot if
+       it were unoccupied) */
     if (!accessible(x, y)
-        /* mondied() allows ispool() as an exception to !accessible(),
-           but we'll only do that if both or neither of mtmp's spot and
-           destination spot are water so that we don't swap a water
-           critter onto land or the inverse */
-        && (!is_pool(x, y) ^ !is_pool(mtmp->mx, mtmp->my)))
+        /* mondied() allows is_pool() as an exception to !accessible(),
+           but we'll only do that if 'mtmp' is already at a water location
+           so that we don't swap a water critter onto land */
+        && !(is_pool(x, y) && is_pool(mtmp->mx, mtmp->my)))
         return TRUE;
 
     return FALSE;
