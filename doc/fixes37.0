@@ -31,6 +31,9 @@ savefile: add support to deconstruct internal data structures down into their
 savefile: use little-endian format for fields where that makes a difference
 replace build-time level compiler and dungeon compiler with run-time loading of
 	the dungeon and level descriptions and interpreting them via LUA
+split off some of the functionality that was in makedefs (compiled-in options
+	build date/time, etc) so that it can be built by a cross-compiler
+	and accessed on the target platform
 
 
 Platform- and/or Interface-Specific New Features
