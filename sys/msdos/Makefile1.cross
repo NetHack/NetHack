@@ -5,7 +5,7 @@
 #       Makefile1.cross (this file) is for the host-side obj files and 
 #       utilities that will run on the host platform only.
 #
-#       Makefile2.cross is the the target platform obj files
+#       Makefile2.cross is for the target platform obj files
 #       and utilities.
 #
 #   Makefile2 utilizes the djgpp cross-compiler from Andrew Wu:
