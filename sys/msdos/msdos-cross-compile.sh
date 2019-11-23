@@ -44,14 +44,14 @@ cp ../dat/data.base ../dat/data.bas
 cp ../include/patchlevel.h ../include/patchlev.h
 cp ../doc/Guidebook.txt ../doc/guidebk.txt
 cp ../sys/share/posixregex.c ../sys/share/posixreg.c
-cp ../sys/msdos/Makefile1.cross ../src/Makefile1
-cp ../sys/msdos/Makefile2.cross ../src/Makefile2
-make -f Makefile1
+#cp ../sys/msdos/Makefile1.cross ../src/Makefile1
+#cp ../sys/msdos/Makefile2.cross ../src/Makefile2
+make -f ../sys/msdos/Makefile1
 cat ../include/date.h
 export GCC_EXEC_PREFIX=$DJGPP_TOP/lib/gcc/
 export
 pwd
-make -f Makefile2
+make -f ../sys/msdos/Makefile2
 unset GCC_EXEC_PREFIX
 pwd
 ls ../djgpp/cwsdpmi/bin 
@@ -60,4 +60,8 @@ if [ -f ../djgpp/cwsdpmi/bin/CWSDPMI.EXE ]; then
     cp  ../djgpp/cwsdpmi/bin/CWSDPMI.EXE ../msdos-binary/CWSDPMI.EXE;
 fi
 ls -l ../msdos-binary
+cd ../msdos-binary
+zip -9 ../NH370DOS.ZIP *
+cd ../
+ls -l NH370DOS.ZIP
 

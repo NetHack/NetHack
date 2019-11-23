@@ -55,3 +55,16 @@ Makefile.gcc-orig
 .vs
 # Win32-specific ignores end
 .DS_Store
+# ms-dos 
+# resulting zip
+NH*DOS.ZIP
+# 8.3 versions
+dat/data.bas
+sys/share/posixreg.c
+include/patchlev.h
+doc/guidebk.txt
+# folders compiler, target objs, binary results
+djgpp/
+src/msdos_o/
+msdos-binary/
+# end of ms-dos
