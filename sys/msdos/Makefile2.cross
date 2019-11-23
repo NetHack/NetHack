@@ -363,7 +363,7 @@ LUAOBJFILES2 =  $(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
 		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o
 LUAOBJFILES3 =  $(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
 		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o
-LUAOBJFILES3 =  $(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
+LUAOBJFILES4 =  $(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
 
 #LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
@@ -374,7 +374,7 @@ LUAOBJFILES3 =  $(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 #		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o \
 #		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 #		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
-		
+	
 LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
 endif
 
@@ -746,11 +746,12 @@ endif
 #==========================================
 
 $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
-	ar rcS $@ $(PDCLIBOBJS1)
-	ar rcS $@ $(PDCLIBOBJS2)
-	ar rcS $@ $(PDCLIBOBJS3)
-	ar rcS $@ $(PDCLIBOBJS4)
-	ar rcs $@ $(PDCOBJS)
+	if [ -f $@ ]; then rm $@; fi;
+	$(TARGET_AR) rcS $@ $(PDCLIBOBJS1)
+	$(TARGET_AR) rcS $@ $(PDCLIBOBJS2)
+	$(TARGET_AR) rcS $@ $(PDCLIBOBJS3)
+	$(TARGET_AR) rcS $@ $(PDCLIBOBJS4)
+	$(TARGET_AR) rcs $@ $(PDCOBJS)
 
 #==========================================
 #  Other Util Dependencies.
@@ -794,10 +795,11 @@ $(O)luac.o: $(LUASRC)/luac.c
 #==========================================
 
 $(LUALIB): $(LUALIBOBJS)
+	if [ -f $@ ]; then rm $@; fi;
 	$(TARGET_AR) rcS $@ $(LUAOBJFILES1)
 	$(TARGET_AR) rcS $@ $(LUAOBJFILES2)
 	$(TARGET_AR) rcS $@ $(LUAOBJFILES3)
-	$(TARGET_AR) rcS $@ $(LUAOBJFILES4)
+	$(TARGET_AR) rcs $@ $(LUAOBJFILES4)
 
 #$(LUADLL): $(LUALIBOBJS)
 #	$(TARGET_CC) -shared -Wl,--export-all-symbols \

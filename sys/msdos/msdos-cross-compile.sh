@@ -10,18 +10,23 @@ if [ ! -d ../djgpp/i586-pc-msdosdjgpp ]; then
     if [ "$(uname)" = "Darwin" ]; then
 	#Mac
 	wget --no-hsts https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/djgpp-osx-gcc550.tar.bz2
+	cd ../
+	tar xjf util/djgpp-osx-gcc550.tar.bz2
     elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
  	#Linux
 	wget --no-hsts https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/djgpp-linux64-gcc550.tar.bz2
+        cd ../
+	tar xjf util/djgpp-linux64-gcc550.tar.bz2
     elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then	    
 	#mingw
 	wget --no-hsts https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/djgpp-mingw-gcc550-standalone.zip
-    fi
-    if [ ! -d djgpp/i586-pc-msdosdjgpp ]; then
-	tar xjf util/djgpp-linux64-gcc550.tar.bz2
+	cd ../
+	tar xjf util/djgpp-mingw-gcc550-standalone.zip
     fi
 fi
+echo after tar
 cd ../
+pwd
 #  PDCurses
 if [ ! -d "../pdcurses" ]; then
 	echo "Getting ../pdcurses from https://github.com/wmcbrine/PDCurses.git"
@@ -37,7 +42,10 @@ if [ ! -d cwsdpmi ]; then
 	cd ../
 	rm csdpmi7b.zip
 fi
-cd ../src
+cd ../
+echo after dos extender
+pwd
+cd src
 pwd
 mkdir -p ../msdos-binary
 cp ../dat/data.base ../dat/data.bas
