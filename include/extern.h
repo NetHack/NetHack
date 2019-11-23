@@ -16,7 +16,7 @@ E char *FDECL(fmt_ptr, (const genericptr));
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */
-#if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(LEV_LEX_C)
 
 /* ### allmain.c ### */
 
@@ -583,10 +583,10 @@ E boolean FDECL(hurtle_jump, (genericptr_t, int, int));
 E boolean FDECL(hurtle_step, (genericptr_t, int, int));
 
 /* ### drawing.c ### */
-#endif /* !MAKEDEFS_C && !LEV_LEX_C */
+#endif /* !MAKEDEFS_C && !MDLIB_C && !LEV_LEX_C */
 E int FDECL(def_char_to_objclass, (CHAR_P));
 E int FDECL(def_char_to_monclass, (CHAR_P));
-#if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(LEV_LEX_C)
 E void FDECL(switch_symbols, (int));
 E void FDECL(assign_graphics, (int));
 E void NDECL(init_symbols);
@@ -713,9 +713,9 @@ E int NDECL(done2);
 E void FDECL(done_intr, (int));
 #endif
 E void FDECL(done_in_by, (struct monst *, int));
-#endif /* !MAKEDEFS_C && !LEV_LEX_C */
+#endif /* !MAKEDEFS_C && MDLIB_C && !LEV_LEX_C */
 E void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2) NORETURN;
-#if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(LEV_LEX_C)
 E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *, BOOLEAN_P,
                                   BOOLEAN_P, BOOLEAN_P));
@@ -1663,10 +1663,14 @@ E char *NDECL(lan_username);
 #endif
 
 /* ### nhlsel.c ### */
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 E struct selectionvar *FDECL(l_selection_check, (lua_State *, int));
 E int FDECL(l_selection_register, (lua_State *));
+#endif
 
 /* ### nhlua.c ### */
+
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 E lua_State * NDECL(nhl_init);
 E boolean FDECL(nhl_loadlua, (lua_State *, const char *));
 E boolean FDECL(load_lua, (const char *));
@@ -1685,13 +1689,20 @@ E int FDECL(get_table_boolean_opt, (lua_State *, const char *, int));
 E int FDECL(get_table_option, (lua_State *, const char *, const char *, const char *const *));
 E int FDECL(str_lines_max_width, (const char *));
 E char *FDECL(stripdigits, (char *));
+#endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 
 /* ### nhregex.c ### */
+
 E struct nhregex *NDECL(regex_init);
 E boolean FDECL(regex_compile, (const char *, struct nhregex *));
 E const char *FDECL(regex_error_desc, (struct nhregex *));
 E boolean FDECL(regex_match, (const char *, struct nhregex *));
 E void FDECL(regex_free, (struct nhregex *));
+
+/* ### mdlib.c ### */
+
+E void NDECL(runtime_info_init);
+E const char *FDECL(do_runtime_info, (int *));
 
 /* ### nttty.c ### */
 
@@ -2405,7 +2416,7 @@ E void NDECL(sysopt_release);
 E void FDECL(sysopt_seduce_set, (int));
 
 /* ### sp_lev.c ### */
-
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 E boolean FDECL(check_room, (xchar *, xchar *, xchar *, xchar *, BOOLEAN_P));
 E boolean FDECL(create_room, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                               XCHAR_P, XCHAR_P, XCHAR_P));
@@ -2434,6 +2445,7 @@ E void FDECL(set_floodfillchk_match_under, (XCHAR_P));
 E void FDECL(selection_do_ellipse, (struct selectionvar *, int, int, int, int, int));
 E void NDECL(update_croom);
 E void FDECL(l_register_des, (lua_State *));
+#endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 
 /* ### spell.c ### */
 
@@ -3069,7 +3081,7 @@ E int FDECL(destroy_mitem, (struct monst *, int, int));
 E int FDECL(resist, (struct monst *, CHAR_P, int, int));
 E void NDECL(makewish);
 
-#endif /* !MAKEDEFS_C && !LEV_LEX_C */
+#endif /* !MAKEDEFS_C && !MDLIB_C && !LEV_LEX_C */
 
 #undef E
 

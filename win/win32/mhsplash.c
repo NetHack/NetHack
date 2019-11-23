@@ -8,7 +8,11 @@
 #include "mhsplash.h"
 #include "mhmsg.h"
 #include "mhfont.h"
+#if !defined(CROSSCOMPILE)
 #include "date.h"
+#else
+#include "config.h"
+#endif
 #include "patchlevel.h"
 #include "dlb.h"
 
