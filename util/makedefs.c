@@ -22,7 +22,6 @@
 #include "context.h"
 #include "flag.h"
 #include "dlb.h"
-#include "integer.h"
 
 /* version information */
 #ifdef SHORT_FILENAMES
@@ -2089,7 +2088,7 @@ static void
 adjust_qt_hdrs()
 {
     int i, j;
-    QTOFFSIZ count = 0L, hdr_offset = sizeof(int)
+    long count = 0L, hdr_offset = sizeof(int)
                                   + (sizeof(char) * LEN_HDR + sizeof(long))
                                         * qt_hdr.n_hdr;
 
@@ -2124,15 +2123,7 @@ put_qt_hdrs()
                   qt_hdr.n_hdr, ofp);
     if (debug) {
         for (i = 0; i < qt_hdr.n_hdr; i++)
-#if (QT_PREPROC == 64)
-#ifdef WIN32
-            Fprintf(stderr, "%s @ %I64d, ", qt_hdr.id[i], qt_hdr.offset[i]);
-#else
-            Fprintf(stderr, "%s @ %I64ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
-#endif
-#else
             Fprintf(stderr, "%s @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
-#endif
         Fprintf(stderr, "\n");
     }
 
@@ -2151,28 +2142,12 @@ put_qt_hdrs()
             int j;
 
             for (j = 0; j < msg_hdr[i].n_msg; j++) {
-#if (QT_PREPROC == 64)
-#ifdef WIN32
-                Fprintf(stderr, "msg %d @ %I64d (%I64d)",
-#else
-                Fprintf(stderr, "msg %d @ %I64ld (%I64ld)",
-#endif
-#else
                 Fprintf(stderr, "msg %d @ %ld (%ld)",
-#endif
                         msg_hdr[i].qt_msg[j].msgnum,
                         msg_hdr[i].qt_msg[j].offset,
                         msg_hdr[i].qt_msg[j].size);
                 if (msg_hdr[i].qt_msg[j].summary_size)
-#if (QT_PREPROC == 64)
-#ifdef WIN32
-                    Fprintf(stderr, " [%I64d]",
-#else
-                    Fprintf(stderr, " [%I64ld]",
-#endif
-#else
                     Fprintf(stderr, " [%ld]",
-#endif
                             msg_hdr[i].qt_msg[j].summary_size);
                 Fprintf(stderr, "\n");
             }
