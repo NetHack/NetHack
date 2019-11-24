@@ -315,9 +315,6 @@ $(HOST_O)prereq.tag: hobj.tag $(U)makedefs $(HOST_O)utility.tag  \
 #
 $(DAT)/nhdat:	$(U)dlb_main $(DAT)/data $(DAT)/rumors \
 		$(DAT)/oracles \
-ifndef LUA_QTEXT_FILE
-		$(DAT)/quest.dat \
-endif
 		$(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
 	cd $(DAT); \
 	pwd; \
@@ -325,9 +322,6 @@ endif
 	ls -1 data oracles options quest.dat rumors help hh  >dlb.lst; \
 	ls -1 cmdhelp history opthelp wizhelp license       >>dlb.lst; \
 	ls -1 bogusmon engrave epitaph tribute msdoshlp.txt >>dlb.lst; \
-ifndef LUA_QTEXT_FILE
-	ls -1 quest.dat >>dlb.lst; \
-endif
 	ls -1 *.lua >>dlb.lst; \
 	$(U)dlb_main cvIf dlb.lst nhdat; \
 	cd $(SRC)

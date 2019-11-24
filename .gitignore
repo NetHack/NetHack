@@ -67,4 +67,17 @@ doc/guidebk.txt
 djgpp/
 src/msdos_o/
 msdos-binary/
+dat/NHTILES.BMP
+dat/msdoshlp.txt
+src/host_o/
+util/djgpp-linux64-gcc550.tar.bz2
+util/djgpp-linux64-gcc550.tar.bz2
+util/djgpp-mingw-gcc550-standalone.zip
+util/dlb_main
+util/thintile
+util/til2bin2
+util/tile2bin
+win/share/monthin.txt
+win/share/objthin.txt
+win/share/oththin.txt
 # end of ms-dos
