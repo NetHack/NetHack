@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.189 $ $NHDT-Date: 1574475416 2019/11/23 02:16:56 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.190 $ $NHDT-Date: 1574638389 2019/11/24 23:33:09 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -300,6 +300,8 @@ when Riders use their bargethrough capability, don't let them swap places with
 	door opening ability was letting them exchange places with something
 	co-located with a closed door without opening it; if killed there,
 	there'd be no corpse so no auto-revive)
+putting on levitation boots while on sink would crash when attempting to set
+	the enchantment known flag on Null 'uarmf' pointer
 unix: Fix double DLB definition in linux hints file
 windows: fix --showpaths output for the data file which relies on being
 	constructed programmatically to incorporate the version suffix
