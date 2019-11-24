@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1562180226 2019/07/03 18:57:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1574634383 2019/11/24 22:26:23 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -1196,16 +1196,6 @@ do_date()
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_HOST)
     Fprintf(ofp, "\n#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_HOST)\n");
-#if 0
-    Fprintf(ofp, "/* On a CROSSCOMPILE build, NetHack is built in two steps:\n");
-    Fprintf(ofp, " *%s%d. %s\n",
-            ind, ++steps, "Build makedefs and its prerequisites, and");
-    Fprintf(ofp, " *%s   %s\n",
-            ind, "execute makedefs to generate date.h, onames.h, and pm.h.");
-    Fprintf(ofp, " *%s%d. %s\n *%s   %s\n */\n\n", ind, ++steps,
-            "Build the rest of NetHack using the cross-compiler",
-            ind, "to generate the game code for target platform.");
-#endif
 #endif /* CROSSCOMPILE || CROSSCOMPILE_HOST */
     if (date_via_env)
         Fprintf(ofp, "#define SOURCE_DATE_EPOCH (%lu%s) /* via getenv() */\n",

@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1505172128 2017/09/11 23:22:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1574634383 2019/11/24 22:26:23 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.63 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,12 +21,14 @@ static const char *NDECL(neminame);
 static const char *NDECL(guardname);
 static const char *NDECL(homebase);
 static void FDECL(qtext_pronoun, (CHAR_P, CHAR_P));
-static struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
 static void FDECL(convert_arg, (CHAR_P));
 static void FDECL(convert_line, (char *,char *));
 static void FDECL(deliver_by_pline, (const char *));
 static void FDECL(deliver_by_window, (const char *, int));
 static boolean FDECL(skip_pager, (BOOLEAN_P));
+#if 0
+static struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
+#endif
 
 short
 quest_info(typ)
@@ -188,6 +190,7 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
     return;
 }
 
+#if 0
 static struct qtmsg *
 msg_in(qtm_list, msgnum)
 struct qtmsg *qtm_list;
@@ -201,6 +204,7 @@ int msgnum;
 
     return (struct qtmsg *) 0;
 }
+#endif
 
 static void
 convert_arg(c)
@@ -428,7 +432,7 @@ int how;
 
 static boolean
 skip_pager(common)
-boolean common;
+boolean common UNUSED;
 {
     /* WIZKIT: suppress plot feedback if starting with quest artifact */
     if (g.program_state.wizkit_wishing)

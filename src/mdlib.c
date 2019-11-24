@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1562180226 2019/07/03 18:57:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1574634382 2019/11/24 22:26:22 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -41,7 +41,10 @@
 #if !defined(AMIGA) || defined(AZTEC_C)
 #define rewind(fp) fseek((fp), 0L, SEEK_SET) /* guarantee a return value */
 #endif  /* AMIGA || AZTEC_C */
-
+#else
+#ifndef GLOBAL_H
+#include "global.h"
+#endif
 #endif  /* !MAKEDEFS_C */
 
 void NDECL(build_options);
@@ -555,15 +558,7 @@ build_options()
 {
     char buf[BUFSZ];
     int i, length, winsyscnt;
-
-    build_savebones_compat_string();
-    opttext[idxopttext] = strdup(optbuf);
-    if (idxopttext < (MAXOPT - 1))
-        idxopttext++;
-    Sprintf(optbuf,
-            "%sNetHack version %d.%d.%d%s\n",
-            opt_indent,
-            VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
+    const char *bosuffix = {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 #if (NH_DEVEL_STATUS == NH_STATUS_BETA)
             " [beta]"
@@ -572,8 +567,16 @@ build_options()
 #endif
 #else
             ""
-#endif /* NH_DEVEL_STATUS == NH_STATUS_RELEASED */
-            );
+#endif
+     };
+
+    build_savebones_compat_string();
+    opttext[idxopttext] = strdup(optbuf);
+    if (idxopttext < (MAXOPT - 1))
+        idxopttext++;
+    (void) sprintf(optbuf,
+            "%sNetHack version %d.%d.%d%s\n",opt_indent,
+            VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, bosuffix);
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
