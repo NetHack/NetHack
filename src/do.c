@@ -1663,9 +1663,9 @@ boolean at_stairs, falling, portal;
                  || g.quest_status.leader_is_dead)) {
             if (!u.uevent.qcalled) {
                 u.uevent.qcalled = 1;
-                com_pager(2); /* main "leader needs help" message */
+                com_pager("quest_portal"); /* main "leader needs help" message */
             } else {          /* reminder message */
-                com_pager(Role_if(PM_ROGUE) ? 4 : 3);
+                com_pager(Role_if(PM_ROGUE) ? "quest_portal_demand" : "quest_portal_again");
             }
         }
     }

@@ -2094,8 +2094,8 @@ E short FDECL(quest_info, (int));
 E const char *NDECL(ldrname);
 E boolean FDECL(is_quest_artifact, (struct obj *));
 E struct obj *FDECL(find_quest_artifact, (unsigned));
-E void FDECL(com_pager, (int));
-E void FDECL(qt_pager, (int));
+E void FDECL(com_pager, (const char *));
+E void FDECL(qt_pager, (const char *));
 E struct permonst *NDECL(qt_montype);
 E void NDECL(deliver_splev_message);
 

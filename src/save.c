@@ -1285,7 +1285,6 @@ freedynamicdata()
 #endif
     zero_nhfile(&tnhfp);    /* also sets fd to -1 */
     tnhfp.mode = FREEING;
-    unload_qtlist();
     free_menu_coloring();
     free_invbuf();           /* let_to_name (invent.c) */
     free_youbuf();           /* You_buf,&c (pline.c) */

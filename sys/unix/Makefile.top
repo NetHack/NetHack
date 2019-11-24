@@ -57,7 +57,7 @@ DIRPERM  = 0755
 # for Gnome
 # VARDATND = x11tiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm
 
-VARDATD = bogusmon data engrave epitaph oracles options quest.dat rumors
+VARDATD = bogusmon data engrave epitaph oracles options quest.lua rumors
 VARDAT = $(VARDATD) $(VARDATND)
 
 # Some versions of make use the SHELL environment variable as the shell
@@ -133,8 +133,7 @@ oracles: $(GAME)
 options: $(GAME)
 	( cd dat ; $(MAKE) options )
 
-quest.dat: $(GAME)
-	( cd dat ; $(MAKE) quest.dat )
+quest.lua: $(GAME)
 
 spec_levs:
 	( cd dat ; $(MAKE) spec_levs )
@@ -247,9 +246,6 @@ fetch-Lua:
 update: $(GAME) recover $(VARDAT) spec_levs
 #	(don't yank the old version out from under people who're playing it)
 	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old
-#	quest.dat is also kept open and has the same problems over NFS
-#	(quest.dat may be inside nhdat if dlb is in use)
-	-mv $(INSTDIR)/quest.dat $(INSTDIR)/quest.dat.old
 	-mv $(INSTDIR)/nhdat $(INSTDIR)/nhdat.old
 # set up new versions of the game files
 	( $(MAKE) dofiles )
