@@ -71,7 +71,7 @@ dat/NHTILES.BMP
 dat/msdoshlp.txt
 src/host_o/
 util/djgpp-linux64-gcc550.tar.bz2
-util/djgpp-linux64-gcc550.tar.bz2
+util/djgpp-osx-gcc550.tar.bz2
 util/djgpp-mingw-gcc550-standalone.zip
 util/dlb_main
 util/thintile
