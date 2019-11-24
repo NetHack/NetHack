@@ -299,7 +299,6 @@ convert_line(in_line, out_line)
 char *in_line, *out_line;
 {
     char *c, *cc;
-    char xbuf[BUFSZ];
 
     cc = out_line;
     for (c = in_line; *c; c++) {
