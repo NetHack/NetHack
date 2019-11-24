@@ -318,6 +318,7 @@ VVOBJ  = $(O)version.o
 
 ifeq "$(ADD_LUA)" "Y"
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+LUA_QTEXT_FILE = "quest.lua"
 endif
 
 ifeq "$(ADD_CURSES)" "Y"
@@ -1004,8 +1005,10 @@ $(DAT)/data: $(O)utility.tag	$(DATABASE)
 $(DAT)/rumors:	     $(O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
 	@$(subst /,\,$(U)makedefs.exe -r)
 
+ifndef LUA_QTEXT_FILE
 $(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
 	@$(subst /,\,$(U)makedefs.exe -q)
+endif
 
 $(DAT)/oracles:	     $(O)utility.tag    $(DAT)/oracles.txt
 	@$(subst /,\,$(U)makedefs.exe -h)
@@ -1029,12 +1032,19 @@ $(O)sp_lev.tag: $(O)utility.tag
 #note that dir below assumes bin/dir.exe from djgpp distribution
 #
 $(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
-	    $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag \
-	    $(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
+		$(DAT)/oracles \
+ifndef LUA_QTEXT_FILE
+		$(DAT)/quest.dat \
+endif
+		$(O)sp_lev.tag \
+		$(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
 	@$(subst /,\,echo dat done >$(O)dat.tag)
 	@$(subst /,\,cd $(DAT))
 	@$(subst /,\,copy $(MSYS)/msdoshlp.txt .)
-	@$(LS) data oracles options quest.dat rumors help hh >dlb.lst
+	@$(LS) data oracles options rumors help hh >dlb.lst
+ifndef LUA_QTEXT_FILE
+	@$(LS) quest.dat >>dlb.lst
+endif
 	@$(LS) cmdhelp history opthelp wizhelp license msdoshlp.txt >>dlb.lst
 	@$(LS) bogusmon engrave epitaph tribute >>dlb.lst
 	$(LS) $(subst /,\,*.lua) >>dlb.lst
@@ -1083,7 +1093,9 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
 	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
 	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
+ifndef LUA_QTEXT_FILE
 	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
+endif
 	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
 	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
 	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
@@ -1165,7 +1177,9 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
 	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
 	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
+ifndef LUA_QTEXT_FILE
 	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
+endif
 	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
 	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
 	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)

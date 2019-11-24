@@ -321,6 +321,7 @@ MDLIB  = $(O)mdlib.o
 
 ifeq "$(ADD_LUA)" "Y"
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+LUA_QTEXT_FILE = "quest.lua"
 endif
 
 ifeq "$(ADD_CURSES)" "Y"
@@ -834,7 +835,9 @@ spotless: clean
 	if [ -f $(DAT)/data ];         then rm $(DAT)/data; fi;
 	if [ -f $(DAT)/rumors ];       then rm $(DAT)/rumors; fi;
 	if [ -f $(DAT)/oracles ];      then rm $(DAT)/oracles; fi;
+ifndef LUA_QTEXT_FILE
 	if [ -f $(DAT)/quest.dat ];    then rm $(DAT)/quest.dat; fi;
+endif
 	if [ -f $(DAT)/bogusmon ];     then rm $(DAT)/bogusmon; fi;
 	if [ -f $(DAT)/engrave ];      then rm $(DAT)/engrave; fi;
 	if [ -f $(DAT)/epitaph ];      then rm $(DAT)/epitaph; fi;
