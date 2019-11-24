@@ -196,7 +196,7 @@ Boots_on(VOID_ARGS)
                                * so uarmf could be Null below; status line
                                * gets updated during brief interval they're
                                * worn so hero and player learn enchantment */
-            context.botl = 1; /* status hilites might mark AC changed */
+            g.context.botl = 1; /* status hilites might mark AC changed */
             makeknown(uarmf->otyp);
             float_up();
             if (Levitation)
