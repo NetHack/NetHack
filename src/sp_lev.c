@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1567805254 2019/09/06 21:27:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1574636502 2019/11/24 23:01:42 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.141 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3373,24 +3373,25 @@ lua_State *L;
     spltrap tmptrap;
     int x, y;
     int argc = lua_gettop(L);
+    char ncbuf[BUFSZ];
 
     create_des_coder();
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         const char *trapstr = luaL_checkstring(L, 1);
 
-        tmptrap.type = get_traptype_byname(trapstr);
+        tmptrap.type = get_traptype_byname(nonconst(trapstr, ncbuf));
         x = y = -1;
     } else if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
                && lua_type(L, 2) == LUA_TTABLE) {
         const char *trapstr = luaL_checkstring(L, 1);
 
-        tmptrap.type = get_traptype_byname(trapstr);
+        tmptrap.type = get_traptype_byname(nonconst(trapstr, ncbuf));
         get_coord(L, 2, &x, &y);
     } else if (argc == 3) {
         const char *trapstr = luaL_checkstring(L, 1);
 
-        tmptrap.type = get_traptype_byname(trapstr);
+        tmptrap.type = get_traptype_byname(nonconst(trapstr, ncbuf));
         x = luaL_checkinteger(L, 2);
         y = luaL_checkinteger(L, 3);
     } else {
