@@ -113,26 +113,26 @@ mactty.h      macwin.h      mttypriv.h
 
 src:
 (files for all versions)
-allmain.c   alloc.c     apply.c     artifact.c  attrib.c    ball.c
-bones.c     botl.c      cmd.c       dbridge.c   decl.c      detect.c
-dig.c       display.c   dlb.c       do.c        do_name.c   do_wear.c
-dog.c       dogmove.c   dokick.c    dothrow.c   drawing.c   dungeon.c
-eat.c       end.c       engrave.c   exper.c     explode.c   extralev.c
-files.c     fountain.c  hack.c      hacklib.c   invent.c    isaac64.c
-light.c     lock.c      mail.c      makemon.c   mapglyph.c  mcastu.c
-mhitm.c     mhitu.c     minion.c    mklev.c     mkmap.c     mkmaze.c
-mkobj.c     mkroom.c    mon.c       mondata.c   monmove.c   monst.c
-mplayer.c    mthrowu.c    muse.c       music.c      nhlsel.c     nhlua.c
-o_init.c     objects.c    objnam.c     options.c    pager.c      pickup.c
-pline.c      polyself.c   potion.c     pray.c       priest.c     quest.c
-questpgr.c   read.c       rect.c       region.c     restore.c    rip.c
-rnd.c        role.c       rumors.c     save.c       sfascii.c    sfbase.c
-sfdata.c     sflendian.c  sfstruct.c   shk.c        shknam.c     sit.c
-sounds.c     sp_lev.c     spell.c      steal.c      steed.c      sys.c
-teleport.c   timeout.c    topten.c     track.c      trap.c       u_init.c
-uhitm.c      vault.c      version.c    vision.c     weapon.c     were.c
-wield.c      windows.c    wizard.c     worm.c       worn.c       write.c
-zap.c
+allmain.c    alloc.c      apply.c      artifact.c   attrib.c     ball.c
+bones.c      botl.c       cmd.c        dbridge.c    decl.c       detect.c
+dig.c        display.c    dlb.c        do.c         do_name.c    do_wear.c
+dog.c        dogmove.c    dokick.c     dothrow.c    drawing.c    dungeon.c
+eat.c        end.c        engrave.c    exper.c      explode.c    extralev.c
+files.c      fountain.c   hack.c       hacklib.c    invent.c     isaac64.c
+light.c      lock.c       mail.c       makemon.c    mapglyph.c   mcastu.c
+mdlib.c      mhitm.c      mhitu.c      minion.c     mklev.c      mkmap.c
+mkmaze.c     mkobj.c      mkroom.c     mon.c        mondata.c    monmove.c
+monst.c      mplayer.c    mthrowu.c    muse.c       music.c      nhlsel.c
+nhlua.c      o_init.c     objects.c    objnam.c     options.c    pager.c
+pickup.c     pline.c      polyself.c   potion.c     pray.c       priest.c
+quest.c      questpgr.c   read.c       rect.c       region.c     restore.c
+rip.c        rnd.c        role.c       rumors.c     save.c       sfascii.c
+sfbase.c     sfdata.c     sflendian.c  sfstruct.c   shk.c        shknam.c
+sit.c        sounds.c     sp_lev.c     spell.c      steal.c      steed.c
+sys.c        teleport.c   timeout.c    topten.c     track.c      trap.c
+u_init.c     uhitm.c      vault.c      version.c    vision.c     weapon.c
+were.c       wield.c      windows.c    wizard.c     worm.c       worn.c
+write.c      zap.c
 
 sys/amiga:
 (files for Amiga versions - untested for 3.6.2)
@@ -165,13 +165,15 @@ mttymain.c
 
 sys/msdos:
 (files for MSDOS version - untested for 3.6.2)
-Install.dos      Makefile.BC      Makefile.GCC     Makefile.MSC
-Makefile1.cross  Makefile2.cross  SCHEMA35.MSC     moveinit.pat
-msdos.c          msdoshlp.txt     ovlinit.c        pckeys.c
-pctiles.c        pctiles.h        pcvideo.h        portio.h
-schema1.BC       schema2.BC       schema3.MSC      setup.bat
-tile2bin.c       vesa.h           video.c          vidtxt.c
-vidvesa.c        vidvga.c
+Install.dos             Makefile.BC             Makefile.GCC
+Makefile.MSC            Makefile1.cross         Makefile2.cross
+SCHEMA35.MSC            moveinit.pat            msdos-cross-compile.sh
+msdos.c                 msdoshlp.txt            ovlinit.c
+pckeys.c                pctiles.c               pctiles.h
+pcvideo.h               portio.h                schema1.BC
+schema2.BC              schema3.MSC             setup.bat
+tile2bin.c              vesa.h                  video.c
+vidtxt.c                vidvesa.c               vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
