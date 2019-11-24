@@ -16,20 +16,26 @@
 #endif
 
 static void NDECL(dump_qtlist);
-static void FDECL(Fread, (genericptr_t, int, int, dlb *));
-static struct qtmsg *FDECL(construct_qtlist, (long));
+static void FDECL(Fread, (genericptr_t, int32_t, int32_t, dlb *));
+static struct qtmsg *FDECL(construct_qtlist, (QTOFFSIZ));
 static const char *NDECL(intermed);
 static struct obj *FDECL(find_qarti, (struct obj *));
 static const char *NDECL(neminame);
 static const char *NDECL(guardname);
 static const char *NDECL(homebase);
 static void FDECL(qtext_pronoun, (CHAR_P, CHAR_P));
-static struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
+static struct qtmsg *FDECL(msg_in, (struct qtmsg *, int32_t));
 static void FDECL(convert_arg, (CHAR_P));
 static void FDECL(convert_line, (char *,char *));
 static void FDECL(deliver_by_pline, (struct qtmsg *));
-static void FDECL(deliver_by_window, (struct qtmsg *, int));
+static void FDECL(deliver_by_window, (struct qtmsg *, int32_t));
 static boolean FDECL(skip_pager, (BOOLEAN_P));
+
+#if (QT_PREPROC == 64) && defined(WIN32)
+#define LONGCAST (long)
+#else
+#define LONGCAST
+#endif
 
 /* dump the character msg list to check appearance;
    build with DEBUG enabled and use DEBUGFILES=questpgr.c
@@ -44,7 +50,7 @@ dump_qtlist()
         return;
 
     for (msg = g.qt_list.chrole; msg->msgnum > 0; msg++) {
-        (void) dlb_fseek(g.msg_file, msg->offset, SEEK_SET);
+        (void) dlb_fseek(g.msg_file, LONGCAST msg->offset, SEEK_SET);
         deliver_by_window(msg, NHW_MAP);
     }
 #endif /* DEBUG */
@@ -54,7 +60,7 @@ dump_qtlist()
 static void
 Fread(ptr, size, nitems, stream)
 genericptr_t ptr;
-int size, nitems;
+int32_t size, nitems;
 dlb *stream;
 {
     int cnt;
@@ -67,13 +73,13 @@ dlb *stream;
 
 static struct qtmsg *
 construct_qtlist(hdr_offset)
-long hdr_offset;
+QTOFFSIZ hdr_offset;
 {
     struct qtmsg *msg_list;
-    int n_msgs;
+    int32_t n_msgs;
 
     (void) dlb_fseek(g.msg_file, hdr_offset, SEEK_SET);
-    Fread(&n_msgs, sizeof(int), 1, g.msg_file);
+    Fread(&n_msgs, sizeof(int32_t), 1, g.msg_file);
     msg_list = (struct qtmsg *) alloc((unsigned) (n_msgs + 1)
                                       * sizeof (struct qtmsg));
 
@@ -83,16 +89,16 @@ long hdr_offset;
     Fread((genericptr_t) msg_list, n_msgs * sizeof (struct qtmsg), 1,
           g.msg_file);
 
-    msg_list[n_msgs].msgnum = -1;
+    msg_list[n_msgs].msgnum = (int32_t) -1;
     return msg_list;
 }
 
 void
 load_qtlist()
 {
-    int n_classes, i;
+    int32_t n_classes, i;
     char qt_classes[N_HDR][LEN_HDR];
-    long qt_offsets[N_HDR];
+    QTOFFSIZ qt_offsets[N_HDR];
 
     g.msg_file = dlb_fopen(QTEXT_FILE, RDBMODE);
     if (!g.msg_file)
@@ -103,9 +109,9 @@ load_qtlist()
      * each header.
      */
 
-    Fread(&n_classes, sizeof (int), 1, g.msg_file);
+    Fread(&n_classes, sizeof (int32_t), 1, g.msg_file);
     Fread(&qt_classes[0][0], sizeof (char) * LEN_HDR, n_classes, g.msg_file);
-    Fread(qt_offsets, sizeof (long), n_classes, g.msg_file);
+    Fread(qt_offsets, sizeof (QTOFFSIZ), n_classes, g.msg_file);
 
     /*
      * Now construct the message lists for quick reference later
@@ -307,7 +313,7 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
 static struct qtmsg *
 msg_in(qtm_list, msgnum)
 struct qtmsg *qtm_list;
-int msgnum;
+int32_t msgnum;
 {
     struct qtmsg *qt_msg;
 
@@ -522,9 +528,9 @@ struct qtmsg *qt_msg;
 static void
 deliver_by_window(qt_msg, how)
 struct qtmsg *qt_msg;
-int how;
+int32_t how;
 {
-    long size;
+    QTOFFSIZ size;
     char in_line[BUFSZ], out_line[BUFSZ];
     boolean qtdump = (how == NHW_MAP);
     winid datawin = create_nhwindow(qtdump ? NHW_TEXT : how);
@@ -542,7 +548,7 @@ int how;
         putstr(datawin, 0, "");
     }
 #endif
-    for (size = 0; size < qt_msg->size; size += (long) strlen(in_line)) {
+    for (size = 0; size < qt_msg->size; size += (QTOFFSIZ) strlen(in_line)) {
         (void) dlb_fgets(in_line, sizeof in_line, g.msg_file);
         convert_line(in_line, out_line);
         putstr(datawin, 0, out_line);
@@ -600,7 +606,7 @@ int msgnum;
         return;
     }
 
-    (void) dlb_fseek(g.msg_file, qt_msg->offset, SEEK_SET);
+    (void) dlb_fseek(g.msg_file, LONGCAST qt_msg->offset, SEEK_SET);
     if (qt_msg->delivery == 'p')
         deliver_by_pline(qt_msg);
     else if (msgnum == 1)
@@ -635,7 +641,7 @@ int msgnum;
         return;
     }
 
-    (void) dlb_fseek(g.msg_file, qt_msg->offset, SEEK_SET);
+    (void) dlb_fseek(g.msg_file, LONGCAST qt_msg->offset, SEEK_SET);
     if (qt_msg->delivery == 'p' && strcmp(windowprocs.name, "X11"))
         deliver_by_pline(qt_msg);
     else

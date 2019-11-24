@@ -5,14 +5,21 @@
 #ifndef QTEXT_H
 #define QTEXT_H
 
+#ifndef INTEGER_H
+#include "integer.h"
+#endif
+
 #define N_HDR 16 /* Maximum number of categories */
 /* (i.e., num roles + 1) */
 #define LEN_HDR 3 /* Maximum length of a category name */
 
+#define QTOFFSIZ int64_t
+#define QT_PREPROC 64
+
 struct qtmsg {
-    int msgnum;
+    int32_t msgnum;
     char delivery;
-    long offset, size, summary_size;
+    QTOFFSIZ offset, size, summary_size;
 };
 
 #if defined(MAKEDEFS_C) || defined(MDLIB_C) /***** MAKEDEFS *****/
@@ -20,14 +27,14 @@ struct qtmsg {
 #define N_MSG 100 /* arbitrary */
 
 struct msghdr {
-    int n_msg;
+    int32_t n_msg;
     struct qtmsg qt_msg[N_MSG];
 };
 
 struct qthdr {
-    int n_hdr;
+    int32_t n_hdr;
     char id[N_HDR][LEN_HDR];
-    long offset[N_HDR];
+    QTOFFSIZ offset[N_HDR];
 };
 
 /* Error message macros */
