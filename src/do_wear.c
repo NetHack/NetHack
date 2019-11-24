@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1573346188 2019/11/10 00:36:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1574638390 2019/11/24 23:33:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -196,18 +196,24 @@ Boots_on(VOID_ARGS)
         break;
     case LEVITATION_BOOTS:
         if (!oldprop && !HLevitation && !(BLevitation & FROMOUTSIDE)) {
+            uarmf->known = 1; /* might come off if putting on over a sink,
+                               * so uarmf could be Null below; status line
+                               * gets updated during brief interval they're
+                               * worn so hero and player learn enchantment */
+            context.botl = 1; /* status hilites might mark AC changed */
             makeknown(uarmf->otyp);
             float_up();
             if (Levitation)
                 spoteffects(FALSE); /* for sink effect */
         } else {
-            float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
+            float_vs_flight(); /* maybe toggle BFlying's I_SPECIAL */
         }
         break;
     default:
         impossible(unknown_type, c_boots, uarmf->otyp);
     }
-    uarmf->known = 1; /* boots' +/- evident because of status line AC */
+    if (uarmf) /* could be Null here (levitation boots put on over a sink) */
+        uarmf->known = 1; /* boots' +/- evident because of status line AC */
     return 0;
 }
 
@@ -321,7 +327,8 @@ Cloak_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_cloak, uarmc->otyp);
     }
-    uarmc->known = 1; /* cloak's +/- evident because of status line AC */
+    if (uarmc) /* no known instance of !uarmc here but play it safe */
+        uarmc->known = 1; /* cloak's +/- evident because of status line AC */
     return 0;
 }
 
@@ -393,24 +400,24 @@ Helmet_on(VOID_ARGS)
         adj_abon(uarmh, uarmh->spe);
         break;
     case CORNUTHAUM:
-        /* people think marked wizards know what they're talking
-         * about, but it takes trained arrogance to pull it off,
-         * and the actual enchantment of the hat is irrelevant.
-         */
+        /* people think marked wizards know what they're talking about,
+           but it takes trained arrogance to pull it off, and the actual
+           enchantment of the hat is irrelevant */
         ABON(A_CHA) += (Role_if(PM_WIZARD) ? 1 : -1);
         context.botl = 1;
         makeknown(uarmh->otyp);
         break;
     case HELM_OF_OPPOSITE_ALIGNMENT:
         uarmh->known = 1; /* do this here because uarmh could get cleared */
-        /* changing alignment can toggle off active artifact
-           properties, including levitation; uarmh could get
-           dropped or destroyed here */
+        /* changing alignment can toggle off active artifact properties,
+           including levitation; uarmh could get dropped or destroyed here
+           by hero falling onto a polymorph trap or into water (emergency
+           disrobe) or maybe lava (probably not, helm isn't 'organic') */
         uchangealign((u.ualign.type != A_NEUTRAL)
                          ? -u.ualign.type
                          : (uarmh->o_id % 2) ? A_CHAOTIC : A_LAWFUL,
                      1);
-    /* makeknown(uarmh->otyp);   -- moved below, after xname() */
+        /* makeknown(HELM_OF_OPPOSITE_ALIGNMENT); -- below, after Tobjnam() */
     /*FALLTHRU*/
     case DUNCE_CAP:
         if (uarmh && !uarmh->cursed) {
@@ -431,14 +438,14 @@ Helmet_on(VOID_ARGS)
                          ? "like sitting in a corner"
                          : "giddy");
         } else {
-            /* [message moved to uchangealign()] */
+            /* [message formerly given here moved to uchangealign()] */
             makeknown(HELM_OF_OPPOSITE_ALIGNMENT);
         }
         break;
     default:
         impossible(unknown_type, c_helmet, uarmh->otyp);
     }
-    /* uarmh could be zero due to uchangealign() */
+    /* uarmh could be Null due to uchangealign() */
     if (uarmh)
         uarmh->known = 1; /* helmet's +/- evident because of status line AC */
     return 0;
@@ -513,7 +520,8 @@ Gloves_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_gloves, uarmg->otyp);
     }
-    uarmg->known = 1; /* gloves' +/- evident because of status line AC */
+    if (uarmg) /* no known instance of !uarmg here but play it safe */
+        uarmg->known = 1; /* gloves' +/- evident because of status line AC */
     return 0;
 }
 
@@ -612,7 +620,8 @@ Shield_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_shield, uarms->otyp);
     }
-    uarms->known = 1; /* shield's +/- evident because of status line AC */
+    if (uarms) /* no known instance of !uarmgs here but play it safe */
+        uarms->known = 1; /* shield's +/- evident because of status line AC */
     return 0;
 }
 
@@ -652,7 +661,8 @@ Shirt_on(VOID_ARGS)
     default:
         impossible(unknown_type, c_shirt, uarmu->otyp);
     }
-    uarmu->known = 1; /* shirt's +/- evident because of status line AC */
+    if (uarmu) /* no known instances of !uarmu here but play it safe */
+        uarmu->known = 1; /* shirt's +/- evident because of status line AC */
     return 0;
 }
 
@@ -684,7 +694,8 @@ Armor_on(VOID_ARGS)
      * suits are set up as intrinsics (actually 'extrinsics') by setworn()
      * which is called by armor_or_accessory_on() before Armor_on().
      */
-    uarm->known = 1; /* suit's +/- evident because of status line AC */
+    if (uarm) /* no known instances of !uarm here but play it safe */
+        uarm->known = 1; /* suit's +/- evident because of status line AC */
     return 0;
 }
 
