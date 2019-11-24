@@ -1,5 +1,5 @@
 #!/bin/sh
-set -x
+#set -x
 if [ -z "$TRAVIS_BUILD_DIR" ]; then
 	export DJGPP_TOP=$(pwd)/djgpp
 else
