@@ -2160,6 +2160,12 @@ do_questtxt()
 {
     char *line;
 
+    /* Make sure they know */
+    printf("DEPRECATION WARNINGS:\n");
+    printf("'makedefs -q' is no longer required.  Remove all references\n");
+    printf("  to it from the build process.\n");
+    printf("'dat/quest.txt' is no longer part of the source tree.\n");
+
     Sprintf(filename, DATA_IN_TEMPLATE, QTXT_I_FILE);
     if (!(ifp = fopen(filename, RDTMODE))) {
         perror(filename);
