@@ -34,6 +34,8 @@ replace build-time level compiler and dungeon compiler with run-time loading of
 split off some of the functionality that was in makedefs (compiled-in options
 	build date/time, etc) so that it can be built by a cross-compiler
 	and accessed on the target platform
+replace quest.txt and associated conversion to quest.dat via makedefs with
+ 	lua quest texts loaded at runtime
 
 
 Platform- and/or Interface-Specific New Features
@@ -49,5 +51,4 @@ Code Cleanup and Reorganization
 move majority of global variables into instance_globals struct g
 move zeroobj, zeromonst, zeroany into const_globals struct cg
 remove STATIC_DCL, STATIC_OVL, STATIC_VAR, STATIC_PTR
-
 
