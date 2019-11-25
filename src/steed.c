@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1573940541 2019/11/16 21:42:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1574648944 2019/11/25 02:29:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -377,7 +377,7 @@ exercise_steed()
 void
 kick_steed()
 {
-    char He[4];
+    char He[BUFSZ]; /* monverbself() appends to the "He"/"She"/"It" value */
     if (!u.usteed)
         return;
 
@@ -400,7 +400,9 @@ kick_steed()
             if (u.usteed->msleeping || !u.usteed->mcanmove)
                 pline("%s stirs.", He);
             else
-                pline("%s rouses %sself!", He, mhim(u.usteed));
+                /* if hallucinating, might yield "He rouses herself" or
+                   "She rouses himself" */
+                pline("%s!", monverbself(u.usteed, He, "rouse", (char *) 0));
         } else
             pline("%s does not respond.", He);
         return;

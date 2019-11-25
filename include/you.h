@@ -1,4 +1,4 @@
-/* NetHack 3.6	you.h	$NHDT-Date: 1547514642 2019/01/15 01:10:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	you.h	$NHDT-Date: 1574648937 2019/11/25 02:28:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -237,14 +237,21 @@ extern const struct Gender genders[]; /* table of available genders */
 #define uhe()      (genders[flags.female ? 1 : 0].he)
 #define uhim()     (genders[flags.female ? 1 : 0].him)
 #define uhis()     (genders[flags.female ? 1 : 0].his)
+/* pronoun_gender() flag masks */
+#define PRONOUN_NORMAL 0 /* none of the below */
+#define PRONOUN_NO_IT  1
+#define PRONOUN_HALLU  2
 /* corresponding pronouns for monsters; yields "it" when mtmp can't be seen */
-#define mhe(mtmp)  (genders[pronoun_gender(mtmp, FALSE)].he)
-#define mhim(mtmp) (genders[pronoun_gender(mtmp, FALSE)].him)
-#define mhis(mtmp) (genders[pronoun_gender(mtmp, FALSE)].his)
+#define mhe(mtmp)  (genders[pronoun_gender(mtmp, PRONOUN_HALLU)].he)
+#define mhim(mtmp) (genders[pronoun_gender(mtmp, PRONOUN_HALLU)].him)
+#define mhis(mtmp) (genders[pronoun_gender(mtmp, PRONOUN_HALLU)].his)
 /* override "it" if reason is lack of visibility rather than neuter species */
-#define noit_mhe(mtmp)  (genders[pronoun_gender(mtmp, TRUE)].he)
-#define noit_mhim(mtmp) (genders[pronoun_gender(mtmp, TRUE)].him)
-#define noit_mhis(mtmp) (genders[pronoun_gender(mtmp, TRUE)].his)
+#define noit_mhe(mtmp) \
+    (genders[pronoun_gender(mtmp, (PRONOUN_NO_IT | PRONOUN_HALLU))].he)
+#define noit_mhim(mtmp) \
+    (genders[pronoun_gender(mtmp, (PRONOUN_NO_IT | PRONOUN_HALLU))].him)
+#define noit_mhis(mtmp) \
+    (genders[pronoun_gender(mtmp, (PRONOUN_NO_IT | PRONOUN_HALLU))].his)
 
 /*** Unified structure specifying alignment information ***/
 struct Align {

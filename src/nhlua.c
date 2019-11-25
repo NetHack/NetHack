@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhlua.c	$NHDT-Date: 1524287226 2018/04/21 05:07:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	nhlua.c	$NHDT-Date: 1574646949 2019/11/25 01:55:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,13 +37,16 @@ nhl_error(L, msg)
 lua_State *L;
 const char *msg;
 {
+    extern int FDECL(lua_error, (lua_State *)) NORETURN;
     lua_Debug ar;
     char buf[BUFSZ];
+
     lua_getstack(L, 1, &ar);
     lua_getinfo(L, "lS", &ar);
     Sprintf(buf, "%s (line %i%s)", msg, ar.currentline, ar.source);
     lua_pushstring(L, buf);
-    lua_error(L);
+    (void) lua_error(L);
+    /*NOTREACHED*/
 }
 
 /* Check that parameters are nothing but single table,

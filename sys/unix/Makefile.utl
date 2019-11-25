@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl    $NHDT-Date: 1539968067 2018/10/19 16:54:27 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.38 $
+# NetHack 3.6  Makefile.utl    $NHDT-Date: 1574646950 2019/11/25 01:55:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -185,7 +185,7 @@ CONFIG_H = ../src/config.h-t
 HACK_H	 = ../src/hack.h-t
 
 # utility .c files
-MAKESRC = makedefs.c
+MAKESRC = makedefs.c ../src/mdlib.c
 RECOVSRC = recover.c
 DLBSRC = dlb_main.c
 UTILSRCS = $(MAKESRC) panic.c $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
@@ -231,7 +231,7 @@ YACCDIST =
 makedefs:	$(MAKEOBJS) mdgrep.h
 	$(CC) $(LFLAGS) -o makedefs $(MAKEOBJS)
 
-makedefs.o: makedefs.c $(CONFIG_H) ../include/permonst.h \
+makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \

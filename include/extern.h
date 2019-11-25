@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1574636502 2019/11/24 23:01:42 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.760 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1574648937 2019/11/25 02:28:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.760 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -452,6 +452,8 @@ E char *FDECL(Amonnam, (struct monst *));
 E char *FDECL(a_monnam, (struct monst *));
 E char *FDECL(distant_monnam, (struct monst *, int, char *));
 E char *FDECL(mon_nam_too, (struct monst *, struct monst *));
+E char *FDECL(monverbself, (struct monst *, char *,
+                            const char *, const char *));
 E char *FDECL(minimal_monnam, (struct monst *, BOOLEAN_P));
 E char *FDECL(rndmonnam, (char *));
 E const char *FDECL(hcolor, (const char *));
@@ -1512,7 +1514,7 @@ E int FDECL(monsndx, (struct permonst *));
 E int FDECL(name_to_mon, (const char *));
 E int FDECL(name_to_monclass, (const char *, int *));
 E int FDECL(gender, (struct monst *));
-E int FDECL(pronoun_gender, (struct monst *, BOOLEAN_P));
+E int FDECL(pronoun_gender, (struct monst *, unsigned));
 E boolean FDECL(levl_follower, (struct monst *));
 E int FDECL(little_to_big, (int));
 E int FDECL(big_to_little, (int));
@@ -1675,7 +1677,7 @@ E int FDECL(l_selection_register, (lua_State *));
 E lua_State * NDECL(nhl_init);
 E boolean FDECL(nhl_loadlua, (lua_State *, const char *));
 E boolean FDECL(load_lua, (const char *));
-E void FDECL(nhl_error, (lua_State *, const char *));
+E void FDECL(nhl_error, (lua_State *, const char *)) NORETURN;
 E void FDECL(lcheck_param_table, (lua_State *));
 E schar FDECL(get_table_mapchr, (lua_State *, const char *));
 E schar FDECL(get_table_mapchr_opt, (lua_State *, const char *, SCHAR_P));

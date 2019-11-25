@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1574634382 2019/11/24 22:26:22 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1574646946 2019/11/25 01:55:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -558,30 +558,26 @@ build_options()
 {
     char buf[BUFSZ];
     int i, length, winsyscnt;
-    const char *bosuffix = {
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-#if (NH_DEVEL_STATUS == NH_STATUS_BETA)
-            " [beta]"
-#else
-            " [work-in-progress]"
-#endif
-#else
-            ""
-#endif
-     };
 
     build_savebones_compat_string();
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
-    (void) sprintf(optbuf,
-            "%sNetHack version %d.%d.%d%s\n",opt_indent,
-            VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, bosuffix);
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+#if (NH_DEVEL_STATUS == NH_STATUS_BETA)
+#define STATUS_ARG " [beta]"
+#else
+#define STATUS_ARG " [work-in-progress]"
+#endif
+#else
+#define STATUS_ARG ""
+#endif /* NH_DEVEL_STATUS == NH_STATUS_RELEASED */
+    Sprintf(optbuf, "%sNetHack version %d.%d.%d%s\n",
+            opt_indent, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, STATUS_ARG);
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
-    Sprintf(optbuf,
-            "Options compiled into this edition:");
+    Sprintf(optbuf, "Options compiled into this edition:");
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;

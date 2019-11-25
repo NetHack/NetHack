@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1574636502 2019/11/24 23:01:42 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1574646949 2019/11/25 01:55:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3336,8 +3336,10 @@ const char *name;
 int defval;
 {
     char *trapstr = get_table_str_opt(L, name, emptystr);
+
     if (trapstr && *trapstr) {
         int i;
+
         for (i = 0; trap_types[i].name; i++)
             if (!strcmpi(trapstr, trap_types[i].name)) {
                 Free(trapstr);
@@ -3350,7 +3352,7 @@ int defval;
 
 int
 get_traptype_byname(trapname)
-char *trapname;
+const char *trapname;
 {
     int i;
 
@@ -3373,25 +3375,24 @@ lua_State *L;
     spltrap tmptrap;
     int x, y;
     int argc = lua_gettop(L);
-    char ncbuf[BUFSZ];
 
     create_des_coder();
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         const char *trapstr = luaL_checkstring(L, 1);
 
-        tmptrap.type = get_traptype_byname(nonconst(trapstr, ncbuf));
+        tmptrap.type = get_traptype_byname(trapstr);
         x = y = -1;
     } else if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
                && lua_type(L, 2) == LUA_TTABLE) {
         const char *trapstr = luaL_checkstring(L, 1);
 
-        tmptrap.type = get_traptype_byname(nonconst(trapstr, ncbuf));
+        tmptrap.type = get_traptype_byname(trapstr);
         get_coord(L, 2, &x, &y);
     } else if (argc == 3) {
         const char *trapstr = luaL_checkstring(L, 1);
 
-        tmptrap.type = get_traptype_byname(nonconst(trapstr, ncbuf));
+        tmptrap.type = get_traptype_byname(trapstr);
         x = luaL_checkinteger(L, 2);
         y = luaL_checkinteger(L, 3);
     } else {

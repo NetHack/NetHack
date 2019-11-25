@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1550525093 2019/02/18 21:24:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1574648940 2019/11/25 02:29:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -910,13 +910,20 @@ register struct monst *mtmp;
     return mtmp->female;
 }
 
-/* Like gender(), but lower animals and such are still "it".
-   This is the one we want to use when printing messages. */
+/* Like gender(), but unseen humanoids are "it" rather than "he" or "she"
+   and lower animals and such are "it" even when seen; hallucination might
+   yield "they".  This is the one we want to use when printing messages. */
 int
-pronoun_gender(mtmp, override_vis)
+pronoun_gender(mtmp, pg_flags)
 register struct monst *mtmp;
-boolean override_vis; /* if True then 'no it' unless neuter */
+unsigned pg_flags; /* flags&1: 'no it' unless neuter,
+                    * flags&2: random if hallucinating */
 {
+    boolean override_vis = (pg_flags & PRONOUN_NO_IT) ? TRUE : FALSE,
+            hallu_rand = (pg_flags & PRONOUN_HALLU) ? TRUE : FALSE;
+
+    if (hallu_rand && Hallucination)
+        return rn2(4); /* 0..3 */
     if (!override_vis && !canspotmon(mtmp))
         return 2;
     if (is_neuter(mtmp->data))
