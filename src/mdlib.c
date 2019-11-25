@@ -728,11 +728,11 @@ runtime_info_init()
             VERSION_STRING = strdup(version_string(tmpbuf, "."));
             VERSION_ID = strdup(version_id_string(tmpbuf, BUILD_DATE));
             COPYRIGHT_BANNER_C = strdup(bannerc_string(tmpbuf, BUILD_DATE));
-#ifdef HOST_NETHACK_GIT_SHA
-            NETHACK_GIT_SHA = strdup(HOST_NETHACK_GIT_SHA);
+#ifdef NETHACK_HOST_GIT_SHA
+            NETHACK_GIT_SHA = strdup(NETHACK_HOST_GIT_SHA);
 #endif
-#ifdef HOST_NETHACK_GIT_BRANCH
-            NETHACK_GIT_BRANCH = strdup(HOST_NETHACK_GIT_BRANCH);
+#ifdef NETHACK_HOST_GIT_BRANCH
+            NETHACK_GIT_BRANCH = strdup(NETHACK_HOST_GIT_BRANCH);
 #endif
 #endif /* CROSSCOMPILE_TARGET && !MAKEDEFS_C */
 	}
