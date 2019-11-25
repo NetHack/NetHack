@@ -6,21 +6,39 @@ NetHack 3.6.
 
 NetHack 3.7.0 work-in-progress is not an official release of NetHack. It
 currently contains a number of enhancements to NetHack 3.6.3. The file
-doc/fixes37.0 in the source distribution has a full list of them. 
-The text in there was written for the development team's own use and is
-provided  "as is", so please do not ask us to further explain the entries
-in that file. Some entries might be considered "spoilers", particularly in
-the "new features" section.
+doc/fixes37.0 in the source distribution has a full list of them. The text in 
+there was written for the development team's own use and is provided  "as is", 
+so please do not ask us to further explain the entries in that file. Some 
+entries might be considered "spoilers", particularly in the "new features"
+section.
 
-Below you will find some other general notes that were not considered
-spoilers:
+Along with the game improvements and bug fixes, NetHack 3.7 strives to make
+some general architectural improvements to the game or to its building 
+process. Among them:
 
- *  automatic annotation "gateway to Moloch's Sanctum" for vibrating square level
+ *  Remove barriers to building NetHack on one platform and operating system,
+    for later execution on another (possibly quite different) platform and/or
+    operating system. That capability is generally known as "cross-compiling."
+    See the file "Cross-compiling" in the top-level folder for more information
+    on that.
+
+ *  Replace the build-time "yacc and lex"-based level compiler, the "yacc and 
+    lex"-based dungeon compiler, and the quest text file processing done
+    by NetHack's "makedefs" utility, with lua text alternatives that are 
+    loaded and processed by the game during play.
+
+ *  Write game savefiles and bonesfiles in a more portable and consistent way
+    to open up the possibility of utilizing them between different platforms,
+    such as between your desktop computer and your hand-held device.
+
+Below you will find some other general notes on the changes in NetHack 3.7 that
+were not considered spoilers:
+ -  automatic annotation "gateway to Moloch's Sanctum" for vibrating square level
         once that square's location becomes known (found or magic mapped);
         goes away once sanctum temple is found (entered or high altar mapped)
- *  savefile: add support to deconstruct internal data structures down into their
+ -  savefile: add support to deconstruct internal data structures down into their
         individual fields and save those fields instead of the entire struct
- *  savefile: use little-endian format for fields where that makes a difference
+ -  savefile: use little-endian format for fields where that makes a difference
 
                         - - - - - - - - - - -
 
@@ -48,7 +66,11 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     "license" in the 'dat' subdirectory.  It is expected that you comply
     with the terms of that license, and we are very serious about it.
 
-4.  If everything is in order, you can now turn to trying to get the program
+4.  If you are attempting to build NetHack on one platform/processor, to
+    produce a game on a different platform/processor it may behoove you to
+    read the file "Cross-compiling" in your Top directory.
+
+5.  If everything is in order, you can now turn to trying to get the program
     to compile and run on your particular system.  It is worth mentioning
     that the default configuration is SysV/Sun/Solaris2.x (simply because
     the code was housed on such a system).
@@ -58,6 +80,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     available, where necessary, to help you in configuring the program
     for particular windowing environments.  Reading them, and the man pages,
     should answer most of your questions.
+
 
     At the time of this release, NetHack 3.6 has been tested to run/compile
     on:
