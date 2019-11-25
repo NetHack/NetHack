@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1574634383 2019/11/24 22:26:23 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1574705221 2019/11/25 18:07:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -69,8 +69,10 @@ static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.7\t2019/11/19";
 #define DGN_I_FILE "dungeon.def"
 #define DGN_O_FILE "dungeon.pdf"
 #define MON_STR_C "monstr.c"
+#if 0
 #define QTXT_I_FILE "quest.txt"
 #define QTXT_O_FILE "quest.dat"
+#endif
 #define VIS_TAB_H "vis_tab.h"
 #define VIS_TAB_C "vis_tab.c"
 #define GITINFO_FILE "gitinfo.txt"
@@ -179,17 +181,6 @@ static void FDECL(do_rnd_access_file, (const char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
 static void FDECL(opt_out_words, (char *, int *));
-static boolean FDECL(qt_comment, (char *));
-static boolean FDECL(qt_control, (char *));
-static int FDECL(get_hdr, (char *));
-static boolean FDECL(new_id, (char *));
-static boolean FDECL(known_msg, (int, int));
-static void FDECL(new_msg, (char *, int, int));
-static char *FDECL(valid_qt_summary, (char *, BOOLEAN_P));
-static void FDECL(do_qt_control, (char *));
-static void FDECL(do_qt_text, (char *));
-static void NDECL(adjust_qt_hdrs);
-static void NDECL(put_qt_hdrs);
 
 #ifdef VISION_TABLES
 static void NDECL(H_close_gen);
