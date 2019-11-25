@@ -24,7 +24,7 @@ process. Among them:
 
  *  Replace the build-time "yacc and lex"-based level compiler, the "yacc and 
     lex"-based dungeon compiler, and the quest text file processing done
-    by NetHack's "makedefs" utility, with lua text alternatives that are 
+    by NetHack's "makedefs" utility, with Lua text alternatives that are 
     loaded and processed by the game during play.
 
  *  Write game savefiles and bonesfiles in a more portable and consistent way
