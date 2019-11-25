@@ -9,6 +9,7 @@ hero polymorphed into a vampire can use #monster to shape-shift rather than
 	among the shiftable shapes and true vampire form)
 adjust bones filename buffer sizes to accommodate suffix
 fix internal self-recover to work with recent fields added to checkpoint file
+improvements to pronoun usage when hallucinating
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
