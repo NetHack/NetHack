@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1550876124 2019/02/22 22:55:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.70 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1574713234 2019/11/25 20:20:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -49,7 +49,7 @@ SHELL=/bin/sh
 # for UNIX systems
 SYSSRC = ../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c
-SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o liblua.a
+SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o ../lib/liblua.a
 #
 # for Systos
 # SYSSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
@@ -173,7 +173,7 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 #CFLAGS = -O -I../include
 #LFLAGS = 
 
-CFLAGS += -I../lib/lua-5.3.5/src
+CFLAGS += -I../lib
 # -lm required by lua
 LIBS += -lm
 
@@ -447,9 +447,9 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
 	   files.c fountain.c hack.c hacklib.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c \
-	   minion.c mklev.c mkmap.c nhlua.c nhlsel.c \
-	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
-	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
+	   minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
+	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
+	   nhlua.c nhlsel.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
 	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
@@ -504,8 +504,10 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
 	wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
-HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h \
-		dgn_file.h
+HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
+
+# relative to src
+LUA_HEADERS = ../lib/lua.h ../lib/luaconf.h ../lib/lualib.h ../lib/lauxlib.h
 
 # the following .o's _must_ be made before any others (for makedefs)
 FIRSTOBJ = monst.o objects.o
@@ -516,9 +518,9 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
 	extralev.o files.o fountain.o hack.o hacklib.o invent.o isaac64.o \
 	light.o lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
-	minion.o mklev.o mkmap.o nhlua.o nhlsel.o \
-	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o \
-	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
+	minion.o mklev.o mkmap.o mkmaze.o mkobj.o mkroom.o mon.o \
+	mondata.o monmove.o mplayer.o mthrowu.o muse.o music.o \
+	nhlua.o nhlsel.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o sfstruct.o \
@@ -587,6 +589,8 @@ DUMB.Setup:	../include/extern.h
 
 all:	$(GAME)
 
+lib/liblua.a $(LUA_HEADERS):
+	@( cd .. ; $(MAKE) lua_support )
 
 #	dependencies for makedefs and its outputs, which the util
 #	Makefile is responsible for keeping up to date
@@ -720,6 +724,7 @@ clean:
 
 spotless: clean
 	-rm -f a.out core $(GAME) Sys*
+	-rm -f ../lib/liblua.a $(LUA_HEADERS)
 	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
 	-rm -f ../include/vis_tab.h vis_tab.c tile.c *.moc
 	-rm -f ../win/gnome/gn_rip.h
@@ -751,7 +756,8 @@ $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/system.h ../include/unixconf.h ../include/os2conf.h \
 		../include/micro.h ../include/pcconf.h ../include/tosconf.h \
 		../include/amiconf.h ../include/macconf.h ../include/beconf.h \
-		../include/wceconf.h ../include/ntconf.h
+		../include/wceconf.h ../include/ntconf.h \
+		../lib/lua.h ../lib/luaconf.h ../lib/lualib.h ../lib/lauxlib.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \

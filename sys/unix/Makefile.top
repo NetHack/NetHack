@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.6  Makefile.top    $NHDT-Date: 1524689449 2018/04/25 20:50:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.36 $
+# NetHack 3.6  Makefile.top    $NHDT-Date: 1574713236 2019/11/25 20:20:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -94,8 +94,23 @@ DATNODLB = $(VARDATND) license symbols
 DATDLB = $(DATHELP) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
-$(GAME):
-	( cd lib/lua-5.3.5/src && make a && cp liblua.a ../../../src/ )
+LUA_HEADERS = lib/lua.h lib/luaconf.h lib/lualib.h lib/lauxlib.h
+lua_support: lib/liblua.a $(LUA_HEADERS)
+	@true
+lib/liblua.a: lib/lua-$(LUA_VERSION)/src/liblua.a
+	@( cd lib/lua-$(LUA_VERSION)/src ; make a ; cd ../../.. )
+	cp lib/lua-$(LUA_VERSION)/src/liblua.a $@
+lib/lua.h: lib/lua-$(LUA_VERSION)/src/lua.h
+	sed -e '/(lua_error)/s/;/ NORETURN;/' \
+		< lib/lua-$(LUA_VERSION)/src/lua.h > $@
+lib/luaconf.h: lib/lua-$(LUA_VERSION)/src/luaconf.h
+	cp lib/lua-$(LUA_VERSION)/src/luaconf.h $@
+lib/lualib.h: lib/lua-$(LUA_VERSION)/src/lualib.h
+	cp lib/lua-$(LUA_VERSION)/src/lualib.h $@
+lib/lauxlib.h: lib/lua-$(LUA_VERSION)/src/lauxlib.h
+	cp lib/lua-$(LUA_VERSION)/src/lauxlib.h $@
+
+$(GAME): lua_support
 	( cd src ; $(MAKE) )
 
 all:	$(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
@@ -238,11 +253,13 @@ dofiles-nodlb:
 # This is not part of the dependency build hierarchy.
 # It requires an explicit "make fetch-Lua".
 fetch-lua: fetch-Lua
+	@true
 
 fetch-Lua:
 	( mkdir -p lib ; cd lib ; \
-		curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz ; \
-		tar zxf lua-$(LUA_VERSION).tar.gz ; rm -f lua-$(LUA_VERSION).tar.gz )
+	  curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz ; \
+	  tar zxf lua-$(LUA_VERSION).tar.gz ; rm -f lua-$(LUA_VERSION).tar.gz )
+
 update: $(GAME) recover $(VARDAT) spec_levs
 #	(don't yank the old version out from under people who're playing it)
 	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old
@@ -291,7 +308,7 @@ clean:
 	( cd src ; $(MAKE) clean )
 	( cd util ; $(MAKE) clean )
 	( cd doc ; $(MAKE) clean )
-	( cd lib/lua-5.3.5/src && $(MAKE) clean )
+	( cd lib/lua-$(LUA_VERSION)/src && $(MAKE) clean )
 
 # 'make spotless' returns the source tree to near-distribution condition.
 # it removes .o files, executables, and compiled data files
