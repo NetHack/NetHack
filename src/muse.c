@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1560161807 2019/06/10 10:16:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1574648940 2019/11/25 02:29:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.115 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -161,7 +161,8 @@ boolean self;
                                  ? "nearby" : "distant");
         otmp->known = 0;
     } else if (self) {
-        pline("%s zaps %sself with %s!", Monnam(mtmp), mhim(mtmp),
+        pline("%s with %s!",
+              monverbself(mtmp, Monnam(mtmp), "zap", (char *) 0),
               doname(otmp));
     } else {
         pline("%s zaps %s!", Monnam(mtmp), an(xname(otmp)));
@@ -186,9 +187,15 @@ boolean self;
                  ? "nearby" : "in the distance");
         otmp->known = 0; /* hero doesn't know how many charges are left */
     } else {
+        char *objnamp, objbuf[BUFSZ];
+
         otmp->dknown = 1;
-        pline("%s plays a %s directed at %s!", Monnam(mtmp), xname(otmp),
-              self ? mon_nam_too(mtmp, mtmp) : (char *) "you");
+        objnamp = xname(otmp);
+        if (strlen(objnamp) >= QBUFSZ)
+            objnamp = simpleonames(otmp);
+        Sprintf(objbuf, "a %s directed at", objnamp);
+        /* "<mon> plays a <horn> directed at himself!" */
+        pline("%s!", monverbself(mtmp, Monnam(mtmp), "play", objbuf));
         makeknown(otmp->otyp); /* (wands handle this slightly differently) */
         if (!self)
             stop_occupation();
@@ -2461,7 +2468,7 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
     } else if (otyp == STRANGE_OBJECT) {
         /* monster is using fire breath on self */
         if (vis)
-            pline("%s breathes fire on %sself.", Monnam(mon), mhim(mon));
+            pline("%s.", monverbself(mon, Monnam(mon), "breath", "fire on"));
         if (!rn2(3))
             mon->mspec_used = rn1(10, 5);
         /* -21 => monster's fire breath; 1 => # of damage dice */

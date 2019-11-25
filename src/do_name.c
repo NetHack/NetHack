@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1574419578 2019/11/22 10:46:18 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1574648939 2019/11/25 02:28:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1959,7 +1959,7 @@ struct monst *mon, *other_mon;
         outbuf = mon_nam(mon);
     } else {
         outbuf = nextmbuf();
-        switch (pronoun_gender(mon, FALSE)) {
+        switch (pronoun_gender(mon, PRONOUN_HALLU)) {
         case 0:
             Strcpy(outbuf, "himself");
             break;
@@ -1967,11 +1967,47 @@ struct monst *mon, *other_mon;
             Strcpy(outbuf, "herself");
             break;
         default:
+        case 2:
             Strcpy(outbuf, "itself");
+            break;
+        case 3: /* could happen when hallucinating */
+            Strcpy(outbuf, "themselves");
             break;
         }
     }
     return outbuf;
+}
+
+/* construct "<monnamtext> <verb> <othertext> {him|her|it}self" which might
+   be distorted by Hallu; if that's plural, adjust monnamtext and verb */
+char *
+monverbself(mon, monnamtext, verb, othertext)
+struct monst *mon;
+char *monnamtext; /* modifiable 'mbuf' with adequare room at end */
+const char *verb, *othertext;
+{
+    char *verbs, selfbuf[40]; /* sizeof "themselves" suffices */
+
+    /* "himself"/"herself"/"itself", maybe "themselves" if hallucinating */
+    Strcpy(selfbuf, mon_nam_too(mon, mon));
+    /* verb starts plural; this will yield singular except for "themselves" */
+    verbs = vtense(selfbuf, verb);
+    if (!strcmp(verb, verbs)) { /* a match indicates that it stayed plural */
+        monnamtext = makeplural(monnamtext);
+        /* for "it", makeplural() produces "them" but we want "they" */
+        if (!strcmpi(monnamtext, genders[3].he)) {
+            boolean capitaliz = (monnamtext[0] == highc(monnamtext[0]));
+
+            Strcpy(monnamtext, genders[3].him);
+            if (capitaliz)
+                monnamtext[0] = highc(monnamtext[0]);
+        }
+    }
+    Strcat(strcat(monnamtext, " "), verbs);
+    if (othertext && *othertext)
+        Strcat(strcat(monnamtext, " "), othertext);
+    Strcat(strcat(monnamtext, " "), selfbuf);
+    return monnamtext;
 }
 
 /* for debugging messages, where data might be suspect and we aren't

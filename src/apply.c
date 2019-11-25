@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1573778560 2019/11/15 00:42:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.284 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1574648938 2019/11/25 02:28:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -212,7 +212,7 @@ int rx, ry, *resp;
             if (mtmp) {
                 mptr = mtmp->data = &mons[mtmp->mnum];
                 /* TRUE: override visibility check--it's not on the map */
-                gndr = pronoun_gender(mtmp, TRUE);
+                gndr = pronoun_gender(mtmp, PRONOUN_NO_IT);
             } else {
                 mptr = &mons[corpse->corpsenm];
                 if (is_female(mptr))
@@ -934,8 +934,9 @@ struct obj *obj;
         /* infravision doesn't produce an image in the mirror */
     } else if ((how_seen & SEENMON) == MONSEEN_INFRAVIS) {
         if (vis) /* (redundant) */
-            pline("%s is too far away to see %sself in the dark.",
-                  Monnam(mtmp), mhim(mtmp));
+            pline("%s in the dark.",
+                  monverbself(mtmp, Monnam(mtmp), "are",
+                              "too far away to see"));
         /* some monsters do special things */
     } else if (mlet == S_VAMPIRE || mlet == S_GHOST || is_vampshifter(mtmp)) {
         if (vis)
@@ -965,7 +966,8 @@ struct obj *obj;
         if (vis) {
             char buf[BUFSZ]; /* "She" or "He" */
 
-            pline("%s admires %sself in your %s.", Monnam(mtmp), mhim(mtmp),
+            pline("%s in your %s.", /* "<mon> admires self in your mirror " */
+                  monverbself(mtmp, Monnam(mtmp), "admire", (char *) 0),
                   mirror);
             pline("%s takes it!", upstart(strcpy(buf, mhe(mtmp))));
         } else

@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1573290418 2019/11/09 09:06:58 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1574648942 2019/11/25 02:29:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.271 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2310,7 +2310,7 @@ const char *oldstr;
     register char *spot;
     char lo_c, *str = nextobuf();
     const char *excess = (char *) 0;
-    int len;
+    int len, i;
 
     if (oldstr)
         while (*oldstr == ' ')
@@ -2320,6 +2320,26 @@ const char *oldstr;
         Strcpy(str, "s");
         return str;
     }
+    /* makeplural() is sometimes used on monsters rather than objects
+       and sometimes pronouns are used for monsters, so check those;
+       unfortunately, "her" (which matches genders[1].him and [1].his)
+       and "it" (which matches genders[2].he and [2].him) are ambiguous;
+       we'll live with that; caller can fix things up if necessary */
+    *str = '\0';
+    for (i = 0; i <= 2; ++i) {
+        if (!strcmpi(genders[i].he, oldstr))
+            Strcpy(str, genders[3].he); /* "they" */
+        else if (!strcmpi(genders[i].him, oldstr))
+            Strcpy(str, genders[3].him); /* "them" */
+        else if (!strcmpi(genders[i].his, oldstr))
+            Strcpy(str, genders[3].his); /* "their" */
+        if (*str) {
+            if (oldstr[0] == highc(oldstr[0]))
+                str[0] = highc(str[0]);
+            return str;
+        }
+    }
+
     Strcpy(str, oldstr);
 
     /*
@@ -2496,6 +2516,20 @@ const char *oldstr;
     if (!oldstr || !*oldstr) {
         impossible("singular of null?");
         str[0] = '\0';
+        return str;
+    }
+    /* makeplural() of pronouns isn't reversible but at least we can
+       force a singular value */
+    *str = '\0';
+    if (!strcmpi(genders[3].he, oldstr)) /* "they" */
+        Strcpy(str, genders[2].he); /* "it" */
+    else if (!strcmpi(genders[3].him, oldstr)) /* "them" */
+        Strcpy(str, genders[2].him); /* also "it" */
+    else if (!strcmpi(genders[3].his, oldstr)) /* "their" */
+        Strcpy(str, genders[2].his); /* "its" */
+    if (*str) {
+        if (oldstr[0] == highc(oldstr[0]))
+            str[0] = highc(str[0]);
         return str;
     }
 
