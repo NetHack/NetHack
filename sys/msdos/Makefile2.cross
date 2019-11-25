@@ -623,10 +623,8 @@ endif
 	if [ -f $(DAT)/symbols ]; then cp $(DAT)/symbols $(GAMEDIR)/SYMBOLS; fi;
 	if [ -f $(SSHR)/NetHack.cnf ]; then cp $(SSHR)/NetHack.cnf $(GAMEDIR)/NETHACK.CNF; fi;
 	-touch $(GAMEDIR)/RECORD
-	if [ -f ../sys/winnt/sysconf.template ]; then cp ../sys/winnt/sysconf.template $(GAMEDIR)/SYSCONF; fi;
+	if [ -f ../sys/msdos/sysconf ]; then cp ../sys/msdos/sysconf $(GAMEDIR)/SYSCONF; fi;
 	if [ -f $(DOC)/nethack.txt ]; then cp $(DOC)/nethack.txt $(GAMEDIR)/NETHACK.TXT; fi;
-#	if [ -f $(PLANAR_TIB) ]; then cp $(PLANAR_TIB) $(GAMEDIR)/$(PLANAR_TIB^^); fi;
-#	if [ -f $(OVERVIEW_TIB ]; then cp $(OVERVIEW_TIB) $(GAMEDIR)/$(OVERVIEW_TIB^^); fi;
 	@echo install done > $@
 
 #==========================================
