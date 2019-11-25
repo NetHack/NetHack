@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1552639487 2019/03/15 08:44:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1574636502 2019/11/24 23:01:42 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -71,6 +71,7 @@
         void            strbuf_reserve  (strbuf *, int)
         void            strbuf_empty    (strbuf *)
         void            strbuf_nl_to_crlf (strbuf_t *)
+        char *          nonconst        (const char *, char *)
 =*/
 #ifdef LINT
 #define Static /* pacify lint */
@@ -1259,6 +1260,21 @@ strbuf_t *strbuf;
                 }
         }
     }
+}
+
+char *
+nonconst(str, buf)
+const char *str;
+char *buf;
+{
+    char *retval = emptystr;
+
+    if (str && buf)
+        if ((int) strlen(str) < BUFSZ - 1) {
+	    Strcpy(buf, str);
+            retval = buf;
+        }
+    return retval;
 }
 
 /*hacklib.c*/

@@ -121,6 +121,8 @@ MAKESRC	    = makedefs.c
 
 MAKEDEFSOBJS    = $(HOST_O)makedefs.o  $(HOST_O)monst.o	 $(HOST_O)objects.o
 
+LUA_QTEXT_FILE = "quest.lua"
+
 #SPLEVSRC    = lev_yacc.c  lev_$(LEX).c	 lev_main.c  panic.c
 #DGNCOMPSRC  = dgn_yacc.c  dgn_$(LEX).c	 dgn_main.c
 #SPLEVOBJS   = $(HOST_O)lev_yacc.o $(HOST_O)lev_$(LEX).o $(HOST_O)lev_main.o $(HOST_O)alloc.o \
@@ -312,8 +314,8 @@ $(HOST_O)prereq.tag: hobj.tag $(U)makedefs $(HOST_O)utility.tag  \
 #note that dir below assumes bin/dir from djgpp distribution
 #
 $(DAT)/nhdat:	$(U)dlb_main $(DAT)/data $(DAT)/rumors \
-	    $(DAT)/oracles $(DAT)/quest.dat \
-	    $(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
+		$(DAT)/oracles \
+		$(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
 	cd $(DAT); \
 	pwd; \
 	cp $(MSYS)/msdoshlp.txt .; \
@@ -321,7 +323,7 @@ $(DAT)/nhdat:	$(U)dlb_main $(DAT)/data $(DAT)/rumors \
 	ls -1 cmdhelp history opthelp wizhelp license       >>dlb.lst; \
 	ls -1 bogusmon engrave epitaph tribute msdoshlp.txt >>dlb.lst; \
 	ls -1 *.lua >>dlb.lst; \
-	$(U)dlb_main cvIf dlb.lst nhdat
+	$(U)dlb_main cvIf dlb.lst nhdat; \
 	cd $(SRC)
 
 $(U)dlb_main: $(DLBOBJS)
@@ -361,8 +363,10 @@ $(DAT)/rumors:	     $(HOST_O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
 $(DAT)/oracles:	     $(HOST_O)utility.tag    $(DAT)/oracles.txt
 	$(U)makedefs -h
 
+ifndef LUA_QTEXT_FILE
 $(DAT)/quest.dat: $(HOST_O)utility.tag  $(DAT)/quest.txt
 	$(U)makedefs -q
+endif
 
 $(DAT)/bogusmon:     $(HOST_O)utility.tag    $(DAT)/bogusmon.txt
 	$(U)makedefs -s
@@ -581,7 +585,7 @@ spotless: clean
 #	if [ -f $(DAT)/dungeon.pdf ];  then rm $(DAT)/dungeon.pdf; fi;
 #	if [ -f $(DAT)/dungeon ];      then rm $(DAT)/dungeon; fi;
 #	if [ -f $(DAT)/oracles ];      then rm $(DAT)/oracles; fi;
-#	if [ -f $(DAT)/quest.dat ];    then rm $(DAT)/quest.dat; fi;
+##	if [ -f $(DAT)/quest.dat ];    then rm $(DAT)/quest.dat; fi;
 #	if [ -f $(DAT)/bogusmon ];     then rm $(DAT)/bogusmon; fi;
 #	if [ -f $(DAT)/engrave ];      then rm $(DAT)/engrave; fi;
 #	if [ -f $(DAT)/epitaph ];      then rm $(DAT)/epitaph; fi;

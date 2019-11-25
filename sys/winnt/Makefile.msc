@@ -313,6 +313,7 @@ VOBJ28 = $(O)sfbase.o   $(O)sfdata.o
 VOBJ29 = $(O)sfstruct.o $(O)sfascii.o  $(O)sflendian.o
 
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+LUA_QTEXT_FILE = "quest.lua"
 
 DLBOBJ = $(O)dlb.o
 
@@ -995,7 +996,10 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	$(DAT)\oracles \
-	 	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
+! IFNDEF LUA_QTEXT_FILE
+		$(DAT)\quest.dat \
+! ENDIF
+		$(O)sp_lev.tag $(DLB)
 ! IF ("$(USE_DLB)"=="Y")
 	copy nhdat$(NHV)          $(GAMEDIR)
 	copy $(DAT)\license       $(GAMEDIR)
@@ -1309,7 +1313,12 @@ $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
 
 nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
-	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
+!IFNDEF LUA_QTEXT_FILE
+	$(DAT)\quest.dat \
+!ELSE
+        $(DAT)\quest.lua \
+!ENDIF
+	$(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\porthelp \
 	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
 	cd $(DAT)
@@ -1319,7 +1328,9 @@ nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	if exist ttyoptions echo ttyoptions >>dlb.lst
 	if exist guioptions echo guioptions >>dlb.lst
 	if exist porthelp echo porthelp >>dlb.lst
+!IFNDEF LUA_QTEXT_FILE
 	echo quest.dat >>dlb.lst
+!ENDIF
 	echo rumors >>dlb.lst
 	echo help >>dlb.lst
 	echo hh >>dlb.lst
@@ -1552,7 +1563,9 @@ spotless: clean
 !ENDIF
 	if exist $(DAT)\oracles		 del $(DAT)\oracles
 	if exist $(DAT)\rumors		 del $(DAT)\rumors
+!IFNDEF LUA_QTEXT_FILE
 	if exist $(DAT)\quest.dat	 del $(DAT)\quest.dat
+!ENDIF
 	if exist $(DAT)\options		 del $(DAT)\options
 	if exist $(DAT)\ttyoptions	 del $(DAT)\ttyoptions
 	if exist $(DAT)\guioptions	 del $(DAT)\guioptions
@@ -1661,8 +1674,10 @@ $(DAT)\data: $(O)utility.tag    $(DATABASE)
 $(DAT)\rumors: $(O)utility.tag    $(DAT)\rumors.tru   $(DAT)\rumors.fal
 	$(U)makedefs -r
 
+!IFNDEF LUA_QTEXT_FILE
 $(DAT)\quest.dat: $(O)utility.tag  $(DAT)\quest.txt
 	$(U)makedefs -q
+!ENDIF
 
 $(DAT)\oracles: $(O)utility.tag    $(DAT)\oracles.txt
 	$(U)makedefs -h

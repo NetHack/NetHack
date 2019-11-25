@@ -982,6 +982,7 @@ E void FDECL(strbuf_append, (strbuf_t *, const char *));
 E void FDECL(strbuf_reserve, (strbuf_t *, int));
 E void FDECL(strbuf_empty, (strbuf_t *));
 E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
+E char *FDECL(nonconst, (const char *, char *));
 
 /* ### invent.c ### */
 
@@ -2096,8 +2097,8 @@ E short FDECL(quest_info, (int));
 E const char *NDECL(ldrname);
 E boolean FDECL(is_quest_artifact, (struct obj *));
 E struct obj *FDECL(find_quest_artifact, (unsigned));
-E void FDECL(com_pager, (int));
-E void FDECL(qt_pager, (int));
+E void FDECL(com_pager, (const char *));
+E void FDECL(qt_pager, (const char *));
 E struct permonst *NDECL(qt_montype);
 E void NDECL(deliver_splev_message);
 

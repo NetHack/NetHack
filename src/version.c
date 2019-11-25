@@ -44,7 +44,9 @@ const char *NetHack_git_sha
 #if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
                 = NETHACK_GIT_SHA
 #else
-                = NETHACK_HOST_GIT_SHA
+#ifdef NETHACK_HOST_GIT_SHA
+		= NETHACK_HOST_GIT_SHA
+#endif
 #endif
 ;
 #endif
@@ -54,7 +56,9 @@ const char *NetHack_git_branch
 #if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
                 = NETHACK_GIT_BRANCH
 #else
+#ifdef NETHACK_HOST_GIT_BRANCH
                 = NETHACK_HOST_GIT_BRANCH
+#endif
 #endif
 ;
 #endif

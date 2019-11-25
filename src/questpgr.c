@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1505172128 2017/09/11 23:22:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1574634383 2019/11/24 22:26:23 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.63 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,140 +9,26 @@
 
 #include "qtext.h"
 
-#define QTEXT_FILE "quest.dat"
+#define QTEXT_FILE "quest.lua"
 
 #ifdef TTY_GRAPHICS
 #include "wintty.h"
 #endif
 
-static void NDECL(dump_qtlist);
-static void FDECL(Fread, (genericptr_t, int, int, dlb *));
-static struct qtmsg *FDECL(construct_qtlist, (long));
 static const char *NDECL(intermed);
 static struct obj *FDECL(find_qarti, (struct obj *));
 static const char *NDECL(neminame);
 static const char *NDECL(guardname);
 static const char *NDECL(homebase);
 static void FDECL(qtext_pronoun, (CHAR_P, CHAR_P));
-static struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
 static void FDECL(convert_arg, (CHAR_P));
 static void FDECL(convert_line, (char *,char *));
-static void FDECL(deliver_by_pline, (struct qtmsg *));
-static void FDECL(deliver_by_window, (struct qtmsg *, int));
+static void FDECL(deliver_by_pline, (const char *));
+static void FDECL(deliver_by_window, (const char *, int));
 static boolean FDECL(skip_pager, (BOOLEAN_P));
-
-/* dump the character msg list to check appearance;
-   build with DEBUG enabled and use DEBUGFILES=questpgr.c
-   in sysconf file or environment */
-static void
-dump_qtlist()
-{
-#ifdef DEBUG
-    struct qtmsg *msg;
-
-    if (!explicitdebug(__FILE__))
-        return;
-
-    for (msg = g.qt_list.chrole; msg->msgnum > 0; msg++) {
-        (void) dlb_fseek(g.msg_file, msg->offset, SEEK_SET);
-        deliver_by_window(msg, NHW_MAP);
-    }
-#endif /* DEBUG */
-    return;
-}
-
-static void
-Fread(ptr, size, nitems, stream)
-genericptr_t ptr;
-int size, nitems;
-dlb *stream;
-{
-    int cnt;
-
-    if ((cnt = dlb_fread(ptr, size, nitems, stream)) != nitems) {
-        panic("PREMATURE EOF ON QUEST TEXT FILE! Expected %d bytes, got %d",
-              (size * nitems), (size * cnt));
-    }
-}
-
-static struct qtmsg *
-construct_qtlist(hdr_offset)
-long hdr_offset;
-{
-    struct qtmsg *msg_list;
-    int n_msgs;
-
-    (void) dlb_fseek(g.msg_file, hdr_offset, SEEK_SET);
-    Fread(&n_msgs, sizeof(int), 1, g.msg_file);
-    msg_list = (struct qtmsg *) alloc((unsigned) (n_msgs + 1)
-                                      * sizeof (struct qtmsg));
-
-    /*
-     * Load up the list.
-     */
-    Fread((genericptr_t) msg_list, n_msgs * sizeof (struct qtmsg), 1,
-          g.msg_file);
-
-    msg_list[n_msgs].msgnum = -1;
-    return msg_list;
-}
-
-void
-load_qtlist()
-{
-    int n_classes, i;
-    char qt_classes[N_HDR][LEN_HDR];
-    long qt_offsets[N_HDR];
-
-    g.msg_file = dlb_fopen(QTEXT_FILE, RDBMODE);
-    if (!g.msg_file)
-        panic("CANNOT OPEN QUEST TEXT FILE %s.", QTEXT_FILE);
-
-    /*
-     * Read in the number of classes, then the ID's & offsets for
-     * each header.
-     */
-
-    Fread(&n_classes, sizeof (int), 1, g.msg_file);
-    Fread(&qt_classes[0][0], sizeof (char) * LEN_HDR, n_classes, g.msg_file);
-    Fread(qt_offsets, sizeof (long), n_classes, g.msg_file);
-
-    /*
-     * Now construct the message lists for quick reference later
-     * on when we are actually paging the messages out.
-     */
-
-    g.qt_list.common = g.qt_list.chrole = (struct qtmsg *) 0;
-
-    for (i = 0; i < n_classes; i++) {
-        if (!strncmp(COMMON_ID, qt_classes[i], LEN_HDR))
-            g.qt_list.common = construct_qtlist(qt_offsets[i]);
-        else if (!strncmp(g.urole.filecode, qt_classes[i], LEN_HDR))
-            g.qt_list.chrole = construct_qtlist(qt_offsets[i]);
-#if 0 /* UNUSED but available */
-        else if (!strncmp(g.urace.filecode, qt_classes[i], LEN_HDR))
-            g.qt_list.chrace = construct_qtlist(qt_offsets[i]);
+#if 0
+static struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
 #endif
-    }
-
-    if (!g.qt_list.common || !g.qt_list.chrole)
-        impossible("load_qtlist: cannot load quest text.");
-    dump_qtlist();
-    return; /* no ***DON'T*** close the msg_file */
-}
-
-/* called at program exit */
-void
-unload_qtlist()
-{
-    if (g.msg_file)
-        (void) dlb_fclose(g.msg_file), g.msg_file = 0;
-    if (g.qt_list.common)
-        free((genericptr_t) g.qt_list.common), g.qt_list.common = 0;
-    if (g.qt_list.chrole)
-        free((genericptr_t) g.qt_list.chrole), g.qt_list.chrole = 0;
-    return;
-}
 
 short
 quest_info(typ)
@@ -304,6 +190,7 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
     return;
 }
 
+#if 0
 static struct qtmsg *
 msg_in(qtm_list, msgnum)
 struct qtmsg *qtm_list;
@@ -317,6 +204,7 @@ int msgnum;
 
     return (struct qtmsg *) 0;
 }
+#endif
 
 static void
 convert_arg(c)
@@ -415,10 +303,9 @@ convert_line(in_line, out_line)
 char *in_line, *out_line;
 {
     char *c, *cc;
-    char xbuf[BUFSZ];
 
     cc = out_line;
-    for (c = xcrypt(in_line, xbuf); *c; c++) {
+    for (c = in_line; *c; c++) {
         *cc = 0;
         switch (*c) {
         case '\r':
@@ -505,142 +392,155 @@ char *in_line, *out_line;
 }
 
 static void
-deliver_by_pline(qt_msg)
-struct qtmsg *qt_msg;
+deliver_by_pline(str)
+const char *str;
 {
-    long size;
     char in_line[BUFSZ], out_line[BUFSZ];
 
-    *in_line = '\0';
-    for (size = 0; size < qt_msg->size; size += (long) strlen(in_line)) {
-        (void) dlb_fgets(in_line, sizeof in_line, g.msg_file);
-        convert_line(in_line, out_line);
-        pline("%s", out_line);
-    }
+    Strcpy(in_line, str);
+    convert_line(in_line, out_line);
+    pline("%s", out_line);
 }
 
 static void
-deliver_by_window(qt_msg, how)
-struct qtmsg *qt_msg;
+deliver_by_window(msg, how)
+const char *msg;
 int how;
 {
-    long size;
+    const char *msgp = msg;
+    const char *msgend = eos((char *)msg);
     char in_line[BUFSZ], out_line[BUFSZ];
-    boolean qtdump = (how == NHW_MAP);
-    winid datawin = create_nhwindow(qtdump ? NHW_TEXT : how);
+    winid datawin = create_nhwindow(how);
 
-#ifdef DEBUG
-    if (qtdump) {
-        char buf[BUFSZ];
-
-        /* when dumping quest messages at startup, all of them are passed to
-         * deliver_by_window(), even if normally given to deliver_by_pline()
-         */
-        Sprintf(buf, "msgnum: %d, delivery: %c",
-                qt_msg->msgnum, qt_msg->delivery);
-        putstr(datawin, 0, buf);
-        putstr(datawin, 0, "");
-    }
-#endif
-    for (size = 0; size < qt_msg->size; size += (long) strlen(in_line)) {
-        (void) dlb_fgets(in_line, sizeof in_line, g.msg_file);
+    while (msgp && msgp != msgend) {
+        int i = 0;
+        while (*msgp != '\0' && *msgp != '\n' && (i < BUFSZ-2)) {
+            in_line[i] = *msgp;
+            i++;
+            msgp++;
+        }
+        if (*msgp == '\n')
+            msgp++;
+        in_line[i] = '\0';
         convert_line(in_line, out_line);
         putstr(datawin, 0, out_line);
     }
+
     display_nhwindow(datawin, TRUE);
     destroy_nhwindow(datawin);
-
-    /* block messages delivered by window aren't kept in message history
-       but have a one-line summary which is put there for ^P recall */
-    *out_line = '\0';
-    if (qt_msg->summary_size) {
-        (void) dlb_fgets(in_line, sizeof in_line, g.msg_file);
-        convert_line(in_line, out_line);
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-    } else if (qt_msg->delivery == 'c') { /* skip for 'qtdump' of 'p' */
-        /* delivery 'c' and !summary_size, summary expected but not present;
-           this doesn't prefix the number with role code vs 'general'
-           but should be good enough for summary verification purposes */
-        Sprintf(out_line, "[missing block message summary for #%05d]",
-                qt_msg->msgnum);
-#endif
-    }
-    if (*out_line)
-        putmsghistory(out_line, FALSE);
 }
 
 static boolean
 skip_pager(common)
-boolean common;
+boolean common UNUSED;
 {
     /* WIZKIT: suppress plot feedback if starting with quest artifact */
     if (g.program_state.wizkit_wishing)
         return TRUE;
-    if (!(common ? g.qt_list.common : g.qt_list.chrole)) {
-        panic("%s: no %s quest text data available",
-              common ? "com_pager" : "qt_pager",
-              common ? "common" : "role-specific");
-        /*NOTREACHED*/
-        return TRUE;
-    }
     return FALSE;
 }
 
-void
-com_pager(msgnum)
-int msgnum;
+boolean
+com_pager_core(section, msgid)
+const char *section;
+const char *msgid;
 {
-    struct qtmsg *qt_msg;
+    const char *const howtoput[] = { "pline", "window", "menu", NULL };
+    const int howtoput2i[] = { 1, 2, 3, 0 };
+    int output;
+    lua_State *L;
+    char *synopsis;
+    char *text;
 
     if (skip_pager(TRUE))
-        return;
+        return FALSE;
 
-    if (!(qt_msg = msg_in(g.qt_list.common, msgnum))) {
-        impossible("com_pager: message %d not found.", msgnum);
-        return;
+    L = nhl_init();
+
+    if (!nhl_loadlua(L, QTEXT_FILE)) {
+        impossible("com_pager: %s not found.", QTEXT_FILE);
+        lua_close(L);
+        return FALSE;
     }
 
-    (void) dlb_fseek(g.msg_file, qt_msg->offset, SEEK_SET);
-    if (qt_msg->delivery == 'p')
-        deliver_by_pline(qt_msg);
-    else if (msgnum == 1)
-        deliver_by_window(qt_msg, NHW_MENU);
+    lua_settop(L, 0);
+    lua_getglobal(L, "questtext");
+    if (!lua_istable(L, -1)) {
+        impossible("com_pager: questtext in %s is not a lua table", QTEXT_FILE);
+        lua_close(L);
+        return FALSE;
+    }
+
+    lua_getfield(L, -1, section);
+    if (!lua_istable(L, -1)) {
+        impossible("com_pager: questtext[%s] in %s is not a lua table", section, QTEXT_FILE);
+        lua_close(L);
+        return FALSE;
+    }
+
+    lua_getfield(L, -1, msgid);
+    if (!lua_istable(L, -1)) {
+        impossible("com_pager: questtext[%s][%s] in %s is not a lua table", section, msgid, QTEXT_FILE);
+        lua_close(L);
+        return FALSE;
+    }
+
+    synopsis = get_table_str_opt(L, "synopsis", NULL);
+    text = get_table_str_opt(L, "text", NULL);
+    output = howtoput2i[get_table_option(L, "output", "pline", howtoput)];
+
+    if (!synopsis && !text) {
+        int nelems;
+        lua_len(L, -1);
+        nelems = LUA_INTCAST(lua_tointeger(L, -1));
+        lua_pop(L, 1);
+        if (nelems < 2) {
+            impossible("com_pager: questtext[%s][%s] in %s in not an array of strings", section, msgid, QTEXT_FILE);
+            lua_close(L);
+            return FALSE;
+        }
+        nelems = rn2(nelems) + 1;
+        lua_pushinteger(L, nelems);
+        lua_gettable(L, -2);
+        text = dupstr(luaL_checkstring(L, -1));
+    }
+
+    if ((index(text, '\n') || (strlen(text) >= (BUFSZ - 1))) && output == 1)
+        output = 2;
+
+    if (output == 1)
+        deliver_by_pline(text);
+    else if (output == 3)
+        deliver_by_window(text, NHW_MENU);
     else
-        deliver_by_window(qt_msg, NHW_TEXT);
-    return;
+        deliver_by_window(text, NHW_TEXT);
+
+    if (synopsis) {
+        char in_line[BUFSZ], out_line[BUFSZ];
+        Strcpy(in_line, synopsis);
+        convert_line(in_line, out_line);
+        putmsghistory(out_line, FALSE);
+    }
+
+    free(synopsis);
+    free(text);
+    lua_close(L);
+    return TRUE;
 }
 
 void
-qt_pager(msgnum)
-int msgnum;
+com_pager(msgid)
+const char *msgid;
 {
-    struct qtmsg *qt_msg;
+    com_pager_core("common", msgid);
+}
 
-    if (skip_pager(FALSE))
-        return;
-
-    qt_msg = msg_in(g.qt_list.chrole, msgnum);
-    if (!qt_msg) {
-        /* some roles have an alternate message for return to the goal
-           level when the quest artifact is absent (handled by caller)
-           but some don't; for the latter, use the normal goal message;
-           note: for first visit, artifact is assumed to always be
-           present which might not be true for wizard mode but we don't
-           worry about quest message references in that situation */
-        if (msgnum == QT_ALTGOAL)
-            qt_msg = msg_in(g.qt_list.chrole, QT_NEXTGOAL);
-    }
-    if (!qt_msg) {
-        impossible("qt_pager: message %d not found.", msgnum);
-        return;
-    }
-
-    (void) dlb_fseek(g.msg_file, qt_msg->offset, SEEK_SET);
-    if (qt_msg->delivery == 'p' && strcmp(windowprocs.name, "X11"))
-        deliver_by_pline(qt_msg);
-    else
-        deliver_by_window(qt_msg, NHW_TEXT);
-    return;
+void
+qt_pager(msgid)
+const char *msgid;
+{
+    if (!com_pager_core(g.urole.filecode, msgid))
+        com_pager_core("common", msgid);
 }
 
 struct permonst *
@@ -674,8 +574,6 @@ deliver_splev_message()
             /* copying will stop at newline if one is present */
             copynchars(in_line, str, (int) (sizeof in_line) - 1);
 
-            /* convert_line() expects encrypted input */
-            (void) xcrypt(in_line, in_line);
             convert_line(in_line, out_line);
             pline("%s", out_line);
 

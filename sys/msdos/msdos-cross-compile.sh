@@ -1,5 +1,5 @@
 #!/bin/sh
-
+#set -x
 if [ -z "$TRAVIS_BUILD_DIR" ]; then
 	export DJGPP_TOP=$(pwd)/djgpp
 else
@@ -27,7 +27,12 @@ DJGPP_URL="$DJGPP_URL$DJGPP_FILE"
 
 cd util
 if [ ! -f "$DJGPP_FILE" ]; then
-    wget --no-hsts "$DJGPP_URL"
+   if [ "$(uname)" = "Darwin" ]; then
+        #Mac
+	curl -L $DJGPP_URL -o $DJGPP_FILE
+   else
+        wget --no-hsts "$DJGPP_URL"
+   fi
 fi
 cd ../
 
@@ -50,12 +55,17 @@ fi
 # DOS-extender for use with djgpp
 cd djgpp
 if [ ! -d cwsdpmi ]; then
+    if [ "$(uname)" = "Darwin" ]; then
+      	#Mac
+	curl http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip -o csdpmi7b.zip
+    else
 	wget --no-hsts http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
-	mkdir -p cwsdpmi
-	cd cwsdpmi
-	unzip ../csdpmi7b.zip
-	cd ../
-	rm csdpmi7b.zip
+    fi
+    mkdir -p cwsdpmi
+    cd cwsdpmi
+    unzip ../csdpmi7b.zip
+    cd ../
+    rm csdpmi7b.zip
 fi
 cd ../
 
