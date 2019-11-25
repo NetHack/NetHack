@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1573940539 2019/11/16 21:42:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.741 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1574646942 2019/11/25 01:55:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.759 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1674,7 +1674,7 @@ E int FDECL(l_selection_register, (lua_State *));
 E lua_State * NDECL(nhl_init);
 E boolean FDECL(nhl_loadlua, (lua_State *, const char *));
 E boolean FDECL(load_lua, (const char *));
-E void FDECL(nhl_error, (lua_State *, const char *));
+E void FDECL(nhl_error, (lua_State *, const char *)) NORETURN;
 E void FDECL(lcheck_param_table, (lua_State *));
 E schar FDECL(get_table_mapchr, (lua_State *, const char *));
 E schar FDECL(get_table_mapchr_opt, (lua_State *, const char *, SCHAR_P));

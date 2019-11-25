@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1567805254 2019/09/06 21:27:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1574646949 2019/11/25 01:55:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3336,8 +3336,10 @@ const char *name;
 int defval;
 {
     char *trapstr = get_table_str_opt(L, name, emptystr);
+
     if (trapstr && *trapstr) {
         int i;
+
         for (i = 0; trap_types[i].name; i++)
             if (!strcmpi(trapstr, trap_types[i].name)) {
                 Free(trapstr);
@@ -3350,7 +3352,7 @@ int defval;
 
 int
 get_traptype_byname(trapname)
-char *trapname;
+const char *trapname;
 {
     int i;
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1562180226 2019/07/03 18:57:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1574646946 2019/11/25 01:55:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -560,25 +560,21 @@ build_options()
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
-    Sprintf(optbuf,
-            "%sNetHack version %d.%d.%d%s\n",
-            opt_indent,
-            VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 #if (NH_DEVEL_STATUS == NH_STATUS_BETA)
-            " [beta]"
+#define STATUS_ARG " [beta]"
 #else
-            " [work-in-progress]"
+#define STATUS_ARG " [work-in-progress]"
 #endif
 #else
-            ""
+#define STATUS_ARG ""
 #endif /* NH_DEVEL_STATUS == NH_STATUS_RELEASED */
-            );
+    Sprintf(optbuf, "%sNetHack version %d.%d.%d%s\n",
+            opt_indent, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, STATUS_ARG);
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
-    Sprintf(optbuf,
-            "Options compiled into this edition:");
+    Sprintf(optbuf, "Options compiled into this edition:");
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;

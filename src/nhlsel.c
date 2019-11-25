@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhlua.c	$NHDT-Date: 1524287226 2018/04/21 05:07:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	nhlua.c	$NHDT-Date: 1574646948 2019/11/25 01:55:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,7 +41,6 @@ static int FDECL(l_selection_iterate, (lua_State *));
 static int FDECL(l_selection_add, (lua_State *));
 static int FDECL(l_selection_sub, (lua_State *));
 static int FDECL(l_selection_ipairs, (lua_State *));
-/* this prototype was missing but function body was below */
 static struct selectionvar *FDECL(l_selection_to, (lua_State *, int));
 #endif
 
@@ -69,16 +68,19 @@ lua_State *L;
     return 0;
 }
 
+#if 0
 static struct selectionvar *
 l_selection_to(L, index)
 lua_State *L;
 int index;
 {
     struct selectionvar *sel = (struct selectionvar *)lua_touserdata(L, index);
+
     if (!sel)
         nhl_error(L, "Selection error");
     return sel;
 }
+#endif
 
 static struct selectionvar *
 l_selection_push(L)
@@ -137,11 +139,10 @@ l_selection_setpoint(L)
 lua_State *L;
 {
     struct selectionvar *sel = (struct selectionvar *) 0;
-                                    /* REVIEW: initializer added */
     schar x = -1, y = -1;
     int val = 1;
     int argc = lua_gettop(L);
-    long coord;
+    long coord = 0L;
 
     if (argc == 0) {
         (void) l_selection_new(L);
@@ -162,6 +163,7 @@ lua_State *L;
 
     if (!sel || !sel->map) {
         nhl_error(L, "Selection setpoint error");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -169,7 +171,8 @@ lua_State *L;
         coord = SP_COORD_PACK_RANDOM(0);
     else
         coord = SP_COORD_PACK(x,y);
-    get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, coord);
+    get_location_coord(&x, &y, ANY_LOC,
+                       g.coder ? g.coder->croom : NULL, coord);
     selection_setpoint(x, y, sel, val);
     lua_settop(L, 1);
     return 1;
@@ -451,7 +454,6 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-                                    /* REVIEW: initializer added */
     schar x1, y1, x2, y2;
     int roughness = 7;
 
@@ -473,10 +475,12 @@ lua_State *L;
         sel = l_selection_check(L, 1);
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
-    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2,y2));
+    get_location_coord(&x1, &y1, ANY_LOC,
+                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1, y1));
+    get_location_coord(&x2, &y2, ANY_LOC,
+                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2, y2));
 
-    selection_do_randline(x1,y1, x2,y2, roughness, 12, sel);
+    selection_do_randline(x1, y1, x2, y2, roughness, 12, sel);
     lua_settop(L, 1);
     return 1;
 }
@@ -533,7 +537,6 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-                                    /* REVIEW: initializer added */
     schar x, y;
 
     if (argc == 3) {
@@ -548,11 +551,13 @@ lua_State *L;
         sel = l_selection_check(L, 1);
     } else {
         nhl_error(L, "wrong parameters");
+        /*NOTREACHED*/
     }
 
-    get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x,y));
+    get_location_coord(&x, &y, ANY_LOC,
+                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x, y));
 
-    if (isok(x,y)) {
+    if (isok(x, y)) {
         set_floodfillchk_match_under(levl[x][y].typ);
         selection_floodfill(sel, x, y, FALSE);
     }
@@ -571,9 +576,8 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-                                    /* REVIEW: initializer added */
-    schar x, y;
-    int r, filled = 0;
+    schar x = 0, y = 0;
+    int r = 0, filled = 0;
 
     if (argc == 3) {
         x = (schar) luaL_checkinteger(L, 1);
@@ -599,22 +603,13 @@ lua_State *L;
         filled = (int) luaL_optinteger(L, 5, 0); /* TODO: boolean */
     } else {
         nhl_error(L, "wrong parameters");
-        /*
-         * FIXME: OSX compiler is issuing a complaint
-         *        about r being passed to selection_do_ellipse()
-         *        below without ever having been initialized
-         *        to something when this else clause is encountered.
-         *        I could have added an initializer to r at the
-         *        top, but I didn't know what it should be initialized
-         *        to in order for selection_do_ellipse() to not
-         *        misbehave. The parameters passed in previous versions
-         *        were related to xaxis and yaxis.
-         */
+        /*NOTREACHED*/
     }
 
-    get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x,y));
+    get_location_coord(&x, &y, ANY_LOC,
+                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x, y));
 
-    selection_do_ellipse(sel, x,y, r,r, !filled);
+    selection_do_ellipse(sel, x, y, r, r, !filled);
 
     lua_settop(L, 1);
     return 1;
@@ -630,9 +625,8 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-                                    /* REVIEW: initializer added */
-    schar x, y;
-    int r1, r2, filled = 0;
+    schar x = 0, y = 0;
+    int r1 = 0, r2 = 0, filled = 0;
 
     if (argc == 4) {
         x = (schar) luaL_checkinteger(L, 1);
@@ -661,22 +655,13 @@ lua_State *L;
         filled = (int) luaL_optinteger(L, 6, 0); /* TODO: boolean */
     } else {
         nhl_error(L, "wrong parameters");
-        /*
-         * FIXME: OSX compiler is issuing a complaint
-         *        about r1 and r2 being passed to selection_do_ellipse()
-         *        below without ever having been initialized
-         *        to something when this else clause is encountered.
-         *        I could have added an initializer to r1,r2 at the
-         *        top, but I didn't know what they should be initialized
-         *        to in order for selection_do_ellipse() to not
-         *        misbehave. The parameters passed in previous versions
-         *        were related to xaxis and yaxis.
-         */
+        /*NOTREACHED*/
     }
 
-    get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x,y));
+    get_location_coord(&x, &y, ANY_LOC,
+                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x, y));
 
-    selection_do_ellipse(sel, x,y, r1,r2, !filled);
+    selection_do_ellipse(sel, x, y, r1, r2, !filled);
 
     lua_settop(L, 1);
     return 1;
@@ -684,43 +669,43 @@ lua_State *L;
 
 
 static const struct luaL_Reg l_selection_methods[] = {
-                                             { "new", l_selection_new },
-                                             { "clone", l_selection_clone },
-                                             { "get", l_selection_getpoint },
-                                             { "set", l_selection_setpoint },
-                                             { "negate", l_selection_not },
-                                             { "percentage", l_selection_filter_percent },
-                                             { "rndcoord", l_selection_rndcoord },
-                                             { "line", l_selection_line },
-                                             { "randline", l_selection_randline },
-                                             { "rect", l_selection_rect },
-                                             { "fillrect", l_selection_fillrect },
-                                             { "area", l_selection_fillrect },
-                                             { "grow", l_selection_grow },
-                                             { "filter_mapchar", l_selection_filter_mapchar },
-                                             { "floodfill", l_selection_flood },
-                                             { "circle", l_selection_circle },
-                                             { "ellipse", l_selection_ellipse },
-                                             /* TODO:
-                                             { "gradient", l_selection_gradient },
-                                             { "iterate", l_selection_iterate },
-                                             */
-                                             { NULL, NULL }
+    { "new", l_selection_new },
+    { "clone", l_selection_clone },
+    { "get", l_selection_getpoint },
+    { "set", l_selection_setpoint },
+    { "negate", l_selection_not },
+    { "percentage", l_selection_filter_percent },
+    { "rndcoord", l_selection_rndcoord },
+    { "line", l_selection_line },
+    { "randline", l_selection_randline },
+    { "rect", l_selection_rect },
+    { "fillrect", l_selection_fillrect },
+    { "area", l_selection_fillrect },
+    { "grow", l_selection_grow },
+    { "filter_mapchar", l_selection_filter_mapchar },
+    { "floodfill", l_selection_flood },
+    { "circle", l_selection_circle },
+    { "ellipse", l_selection_ellipse },
+    /* TODO:
+       { "gradient", l_selection_gradient },
+       { "iterate", l_selection_iterate },
+    */
+    { NULL, NULL }
 };
 
 static const luaL_Reg l_selection_meta[] = {
-                                            { "__gc", l_selection_gc },
-                                            { "__unm", l_selection_not },
-                                            { "__band", l_selection_and },
-                                            { "__bor", l_selection_or },
-                                            { "__bxor", l_selection_xor },
-                                            { "__bnot", l_selection_not },
-                                            /* TODO: http://lua-users.org/wiki/MetatableEvents
-                                            { "__add", l_selection_add },
-                                            { "__sub", l_selection_sub },
-                                            { "__ipairs", l_selection_ipairs },
-                                            */
-                                            { NULL, NULL }
+    { "__gc", l_selection_gc },
+    { "__unm", l_selection_not },
+    { "__band", l_selection_and },
+    { "__bor", l_selection_or },
+    { "__bxor", l_selection_xor },
+    { "__bnot", l_selection_not },
+    /* TODO: http://lua-users.org/wiki/MetatableEvents
+       { "__add", l_selection_add },
+       { "__sub", l_selection_sub },
+       { "__ipairs", l_selection_ipairs },
+    */
+    { NULL, NULL }
 };
 
 int
