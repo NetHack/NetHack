@@ -26,9 +26,6 @@ static void FDECL(convert_line, (char *,char *));
 static void FDECL(deliver_by_pline, (const char *));
 static void FDECL(deliver_by_window, (const char *, int));
 static boolean FDECL(skip_pager, (BOOLEAN_P));
-#if 0
-static struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
-#endif
 
 short
 quest_info(typ)
@@ -189,22 +186,6 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
         g.cvt_buf[0] = highc(g.cvt_buf[0]);
     return;
 }
-
-#if 0
-static struct qtmsg *
-msg_in(qtm_list, msgnum)
-struct qtmsg *qtm_list;
-int msgnum;
-{
-    struct qtmsg *qt_msg;
-
-    for (qt_msg = qtm_list; qt_msg->msgnum > 0; qt_msg++)
-        if (qt_msg->msgnum == msgnum)
-            return qt_msg;
-
-    return (struct qtmsg *) 0;
-}
-#endif
 
 static void
 convert_arg(c)

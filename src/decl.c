@@ -576,8 +576,6 @@ const struct instance_globals g_init = {
 
     /* questpgr.c */
     UNDEFINED_VALUES, /* cvt_buf */
-    UNDEFINED_VALUES, /* qt_list */
-    UNDEFINED_PTR, /* msg_file */
     UNDEFINED_VALUES, /* nambuf */
 
     /* read.c */

@@ -55,3 +55,7 @@ CHGRP=true
 VARDIRPERM = 0755
 VARFILEPERM = 0600
 GAMEPERM = 0755
+
+CC=clang
+CFLAGS+=-fsanitize=address -fno-omit-frame-pointer
+LFLAGS+=-fsanitize=address -fno-omit-frame-pointer
