@@ -1104,7 +1104,6 @@ NHFILE *nhfp;
      */
     inven_inuse(FALSE);
 
-    load_qtlist(); /* re-load the quest text info */
     /* Set up the vision internals, after levl[] data is loaded
        but before docrt(). */
     reglyph_darkroom();

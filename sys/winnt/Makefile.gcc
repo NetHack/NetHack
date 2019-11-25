@@ -329,6 +329,7 @@ VOBJ29 = $(O)sfstruct.o $(O)sfascii.o  $(O)sflendian.o
 
 ifeq "$(ADD_LUA)" "Y"
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+LUA_QTEXT_FILE = "quest.lua"
 endif
 
 DLBOBJ = $(O)dlb.o
@@ -751,7 +752,10 @@ install: initialchk $(O)utility.tag $(GAMEDIR)/NetHack.exe $(NETHACKW_EXE) \
 	@echo Done.
 
 $(O)install.tag:  $(DAT)/data    $(DAT)/rumors $(DAT)/oracles \
-		$(DAT)/quest.dat $(O)sp_lev.tag $(DLB)
+ifndef LUA_QTEXT_FILE
+		$(DAT)/quest.dat \
+endif
+		$(O)sp_lev.tag $(DLB)
 ifdef TRAVIS_COMPILER
 	ls -l $(SRC)
 	ls -l $(DAT)
@@ -921,8 +925,10 @@ $(DAT)/data: $(O)utility.tag    $(DATABASE)
 $(DAT)/rumors: $(O)utility.tag    $(DAT)/rumors.tru   $(DAT)/rumors.fal
 	$(subst /,\,$(U)makedefs -r)
 
+ifndef LUA_QTEXT_FILE
 $(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
 	$(subst /,\,$(U)makedefs -q)
+endif
 
 $(DAT)/oracles: $(O)utility.tag    $(DAT)/oracles.txt
 	$(subst /,\,$(U)makedefs -h)
@@ -1029,17 +1035,22 @@ $(DAT)/porthelp: $(MSWSYS)/porthelp
 	$(subst /,\,@copy $(MSWSYS)/porthelp $@ >nul)
 
 nhdat$(NHV):  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
-	 $(DAT)/quest.dat $(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp $(DAT)/keyhelp \
-	 $(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp \
-	 $(DAT)/porthelp $(DAT)/license $(DAT)/engrave \
-	 $(DAT)/epitaph $(DAT)/bogusmon $(DAT)/tribute $(O)sp_lev.tag
+ifndef LUA_QTEXT_FILE
+	$(DAT)/quest.dat \
+endif
+	$(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp $(DAT)/keyhelp \
+	$(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp \
+	$(DAT)/porthelp $(DAT)/license $(DAT)/engrave \
+	$(DAT)/epitaph $(DAT)/bogusmon $(DAT)/tribute $(O)sp_lev.tag
 	$(subst /,\,echo data >$(DAT)/dlb.lst)
 	$(subst /,\,echo oracles >>$(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/options echo options >>$(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/ttyoptions echo ttyoptions >>$(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/guioptions echo guioptions >>$(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/porthelp echo porthelp >>$(DAT)/dlb.lst)
+ifndef LUA_QTEXT_FILE
 	$(subst /,\,echo quest.dat >>$(DAT)/dlb.lst)
+endif
 	$(subst /,\,echo rumors >>$(DAT)/dlb.lst)
 	$(subst /,\,echo help >>$(DAT)/dlb.lst)
 	$(subst /,\,echo hh >>$(DAT)/dlb.lst)
@@ -1201,7 +1212,9 @@ ifneq "$(W_DAT)" ""
 	if exist $(W_DAT)\bogusmon         del $(W_DAT)\bogusmon
 	if exist $(W_DAT)\oracles          del $(W_DAT)\oracles
 	if exist $(W_DAT)\rumors           del $(W_DAT)\rumors
+ifndef LUA_QTEXT_FILE
 	if exist $(W_DAT)\quest.dat	   del $(W_DAT)\quest.dat
+endif
 ifdef OBSOLETE_DGN_COMPILER
 	if exist $(W_DAT)\dungeon          del $(W_DAT)\dungeon
 	if exist $(W_DAT)\dungeon.pdf	   del $(W_DAT)\dungeon.pdf
