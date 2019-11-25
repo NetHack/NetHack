@@ -395,11 +395,23 @@ static void
 deliver_by_pline(str)
 const char *str;
 {
+    const char *msgp = str;
+    const char *msgend = eos((char *)str);
     char in_line[BUFSZ], out_line[BUFSZ];
 
-    Strcpy(in_line, str);
-    convert_line(in_line, out_line);
-    pline("%s", out_line);
+    while (msgp && msgp != msgend) {
+        int i = 0;
+        while (*msgp != '\0' && *msgp != '\n' && (i < BUFSZ-2)) {
+            in_line[i] = *msgp;
+            i++;
+            msgp++;
+        }
+        if (*msgp == '\n')
+            msgp++;
+        in_line[i] = '\0';
+        convert_line(in_line, out_line);
+        pline("%s", out_line);
+    }
 }
 
 static void
@@ -445,8 +457,8 @@ com_pager_core(section, msgid)
 const char *section;
 const char *msgid;
 {
-    const char *const howtoput[] = { "pline", "window", "menu", NULL };
-    const int howtoput2i[] = { 1, 2, 3, 0 };
+    const char *const howtoput[] = { "pline", "window", "text", "menu", "default", NULL };
+    const int howtoput2i[] = { 1, 2, 2, 3, 0, 0 };
     int output;
     lua_State *L;
     char *synopsis;
@@ -487,7 +499,7 @@ const char *msgid;
 
     synopsis = get_table_str_opt(L, "synopsis", NULL);
     text = get_table_str_opt(L, "text", NULL);
-    output = howtoput2i[get_table_option(L, "output", "pline", howtoput)];
+    output = howtoput2i[get_table_option(L, "output", "default", howtoput)];
 
     if (!synopsis && !text) {
         int nelems;
@@ -505,10 +517,10 @@ const char *msgid;
         text = dupstr(luaL_checkstring(L, -1));
     }
 
-    if ((index(text, '\n') || (strlen(text) >= (BUFSZ - 1))) && output == 1)
+    if (output == 0 && (index(text, '\n') || (strlen(text) >= (BUFSZ - 1))))
         output = 2;
 
-    if (output == 1)
+    if (output == 0 || output == 1)
         deliver_by_pline(text);
     else if (output == 3)
         deliver_by_window(text, NHW_MENU);
