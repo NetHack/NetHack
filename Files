@@ -7,7 +7,8 @@ from or not transferred to your system if you wish.
 
 .:
 (files in top directory)
-.clang-format  .travis.yml    Files          Porting        README
+.clang-format    .travis.yml      Cross-compiling  Files
+Porting          README
 
 DEVEL:
 (files for people developing changes to NetHack)
@@ -53,7 +54,7 @@ keyhelp       knox.lua      license       medusa-1.lua  medusa-2.lua
 medusa-3.lua  medusa-4.lua  minefill.lua  minend-1.lua  minend-2.lua
 minend-3.lua  mines.des     minetn-1.lua  minetn-2.lua  minetn-3.lua
 minetn-4.lua  minetn-5.lua  minetn-6.lua  minetn-7.lua  nhlib.lua
-opthelp       oracle.lua    oracles.txt   orcus.lua     quest.txt
+opthelp       oracle.lua    oracles.txt   orcus.lua     quest.lua
 rumors.fal    rumors.tru    sanctum.lua   soko1-1.lua   soko1-2.lua
 soko2-1.lua   soko2-2.lua   soko3-1.lua   soko3-2.lua   soko4-1.lua
 soko4-2.lua   symbols       tower1.lua    tower2.lua    tower3.lua
@@ -172,8 +173,9 @@ msdos.c                 msdoshlp.txt            ovlinit.c
 pckeys.c                pctiles.c               pctiles.h
 pcvideo.h               portio.h                schema1.BC
 schema2.BC              schema3.MSC             setup.bat
-tile2bin.c              vesa.h                  video.c
-vidtxt.c                vidvesa.c               vidvga.c
+sysconf                 tile2bin.c              vesa.h
+video.c                 vidtxt.c                vidvesa.c
+vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
