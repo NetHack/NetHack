@@ -31,7 +31,7 @@ DJGPP_URL="$DJGPP_URL$DJGPP_FILE"
 
 # export
 
-if [ ! -d lib]; then
+if [ ! -d lib ]; then
 mkdir -p lib
 fi
 

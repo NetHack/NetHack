@@ -291,6 +291,7 @@ char ch;
     return i;
 }
 
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 /*
  * Explanations of the functions found below:
  *
@@ -810,5 +811,6 @@ const struct symparse loadsyms[] = {
     { SYM_OTH, SYM_HERO_OVERRIDE + SYM_OFF_X, "S_hero_override" },
     { 0, 0, (const char *) 0 } /* fence post */
 };
+#endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 
 /*drawing.c*/
