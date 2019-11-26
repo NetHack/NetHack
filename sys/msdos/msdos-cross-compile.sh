@@ -47,7 +47,7 @@ fi
 
 if [ ! -d djgpp/i586-pc-msdosdjgpp ]; then
     tar xjf "$DJGPP_FILE"
-    rm $DJGPP_FILE
+    rm -f $DJGPP_FILE
 fi
 
 # DOS-extender for use with djgpp
@@ -61,7 +61,7 @@ if [ ! -d djgpp/cwsdpmi ]; then
     cd djgpp
     mkdir -p cwsdpmi
     cd cwsdpmi
-    unzip ../csdpmi7b.zip
+    unzip ../../csdpmi7b.zip
     cd ../../
     rm csdpmi7b.zip
 fi
