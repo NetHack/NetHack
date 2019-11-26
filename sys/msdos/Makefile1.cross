@@ -319,7 +319,7 @@ $(DAT)/nhdat:	$(U)dlb_main $(DAT)/data $(DAT)/rumors \
 	cd $(DAT); \
 	pwd; \
 	cp $(MSYS)/msdoshlp.txt .; \
-	ls -1 data oracles options quest.dat rumors help hh  >dlb.lst; \
+	ls -1 data oracles options rumors help hh  >dlb.lst; \
 	ls -1 cmdhelp history opthelp wizhelp license       >>dlb.lst; \
 	ls -1 bogusmon engrave epitaph tribute msdoshlp.txt >>dlb.lst; \
 	ls -1 *.lua >>dlb.lst; \
@@ -362,11 +362,6 @@ $(DAT)/rumors:	     $(HOST_O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
 
 $(DAT)/oracles:	     $(HOST_O)utility.tag    $(DAT)/oracles.txt
 	$(U)makedefs -h
-
-ifndef LUA_QTEXT_FILE
-$(DAT)/quest.dat: $(HOST_O)utility.tag  $(DAT)/quest.txt
-	$(U)makedefs -q
-endif
 
 $(DAT)/bogusmon:     $(HOST_O)utility.tag    $(DAT)/bogusmon.txt
 	$(U)makedefs -s
@@ -560,30 +555,30 @@ clean:
 spotless: clean
 
 	if [ -f $(INCL)/pm.h ];        then rm $(INCL)/pm.h; fi;
-#	if [ -f $(U)dgn_flex.c ];      then rm $(U)dgn_flex.c; fi;
-#	if [ -f $(U)dgn_lex.c ];       then rm $(U)dgn_lex.c; fi;
+##	if [ -f $(U)dgn_flex.c ];      then rm $(U)dgn_flex.c; fi;
+##	if [ -f $(U)dgn_lex.c ];       then rm $(U)dgn_lex.c; fi;
 #	if [ -f $(U)makedefs ];        then rm $(U)makedefs; fi;
-#	if [ -f $(U)dgn_comp ];        then rm $(U)dgn_comp; fi;
+##	if [ -f $(U)dgn_comp ];        then rm $(U)dgn_comp; fi;
 #	if [ -f $(U)recover.exe ];     then rm $(U)recover.exe; fi;
 #	if [ -f $(U)tilemap ];         then rm $(U)tilemap; fi;
 #	if [ -f $(U)tile2bmp ];        then rm $(U)tile2bmp; fi;
-#	if [ -f $(U)tile2bin ];        then rm $(U)tile2bin; fi;
-#	if [ -f $(U)til2bin2 ];        then rm $(U)til2bin2; fi;
-#	if [ -f $(U)thintile ];        then rm $(U)thintile; fi;
+##	if [ -f $(U)tile2bin ];        then rm $(U)tile2bin; fi;
+##	if [ -f $(U)til2bin2 ];        then rm $(U)til2bin2; fi;
+##	if [ -f $(U)thintile ];        then rm $(U)thintile; fi;
 #	if [ -f $(U)dlb_main ];        then rm $(U)dlb_main; fi;
 #	if [ -f $(INCL)/vis_tab.h ];   then rm $(INCL)/vis_tab.h; fi;
 #	if [ -f $(INCL)/onames.h ];    then rm $(INCL)/onames.h; fi;
 #	if [ -f $(INCL)/pm.h ];        then rm $(INCL)/pm.h; fi;
 #	if [ -f $(INCL)/date.h ];      then rm $(INCL)/date.h; fi;
-#	if [ -f $(INCL)/dgn_comp.h ];  then rm $(INCL)/dgn_comp.h; fi;
-#	if [ -f $(INCL)/lev_comp.h ];  then rm $(INCL)/lev_comp.h; fi;
+##	if [ -f $(INCL)/dgn_comp.h ];  then rm $(INCL)/dgn_comp.h; fi;
+##	if [ -f $(INCL)/lev_comp.h ];  then rm $(INCL)/lev_comp.h; fi;
 #	if [ -f $(SRC)/vis_tab.c ];    then rm $(SRC)/vis_tab.c; fi;
 #	if [ -f $(SRC)/tile.c ];       then rm $(SRC)/tile.c; fi;
 #	if [ -f $(DAT)/options ];      then rm $(DAT)/options; fi;
 #	if [ -f $(DAT)/data ];         then rm $(DAT)/data; fi;
 #	if [ -f $(DAT)/rumors ];       then rm $(DAT)/rumors; fi;
-#	if [ -f $(DAT)/dungeon.pdf ];  then rm $(DAT)/dungeon.pdf; fi;
-#	if [ -f $(DAT)/dungeon ];      then rm $(DAT)/dungeon; fi;
+##	if [ -f $(DAT)/dungeon.pdf ];  then rm $(DAT)/dungeon.pdf; fi;
+##	if [ -f $(DAT)/dungeon ];      then rm $(DAT)/dungeon; fi;
 #	if [ -f $(DAT)/oracles ];      then rm $(DAT)/oracles; fi;
 ##	if [ -f $(DAT)/quest.dat ];    then rm $(DAT)/quest.dat; fi;
 #	if [ -f $(DAT)/bogusmon ];     then rm $(DAT)/bogusmon; fi;
