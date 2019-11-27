@@ -38,10 +38,10 @@ GAMEDIR =../msdos-binary
 #    your machine.
 #
 ADD_CURSES=Y
-PDCURSES_TOP=../../pdcurses
+PDCURSES_TOP=../lib/pdcurses
 
 # Set top of djgpp if not specified through ENV variables prior to make:
-#DJGPP_TOP = $(HOME)/djgpp
+#DJGPP_TOP = $(HOME)/lib/djgpp
 
 #---------------------------------------------------------------
 # Location of LUA
@@ -83,9 +83,9 @@ WSHR = ../win/share
 #  Executables.
 ifndef DJGPP_TOP 
 ifdef TRAVIS_BUILD_DIR
-DJGPP_TOP = TRAVIS_BUILD_DIR/djgpp
+DJGPP_TOP = TRAVIS_BUILD_DIR/lib/djgpp
 else
-DJGPP_TOP = $(HOME)/djgpp
+DJGPP_TOP = $(HOME)/lib/djgpp
 endif
 endif
 

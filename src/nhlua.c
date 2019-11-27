@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhlua.c	$NHDT-Date: 1574646949 2019/11/25 01:55:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.6	nhlua.c	$NHDT-Date: 1574825214 2019/11/27 03:26:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,7 +37,6 @@ nhl_error(L, msg)
 lua_State *L;
 const char *msg;
 {
-    extern int FDECL(lua_error, (lua_State *)) NORETURN;
     lua_Debug ar;
     char buf[BUFSZ];
 

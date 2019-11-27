@@ -1,9 +1,15 @@
 #!/bin/sh
 #set -x
+
 if [ -z "$TRAVIS_BUILD_DIR" ]; then
-	export DJGPP_TOP=$(pwd)/djgpp
+	export DJGPP_TOP=$(pwd)/lib/djgpp
 else
-	export DJGPP_TOP="$TRAVIS_BUILD_DIR/djgpp"
+	export DJGPP_TOP="$TRAVIS_BUILD_DIR/lib/djgpp"
+fi
+
+if [ ! -d "$(pwd)/lib" ]; then
+	echo "Set up for Unix build and 'make fetch-lua' first."
+	exit 1
 fi
 
 DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/"
@@ -25,7 +31,11 @@ DJGPP_URL="$DJGPP_URL$DJGPP_FILE"
 
 # export
 
-cd util
+if [ ! -d lib ]; then
+mkdir -p lib
+fi
+
+cd lib
 if [ ! -f "$DJGPP_FILE" ]; then
    if [ "$(uname)" = "Darwin" ]; then
         #Mac
@@ -34,44 +44,37 @@ if [ ! -f "$DJGPP_FILE" ]; then
         wget --no-hsts "$DJGPP_URL"
    fi
 fi
-cd ../
 
-
-if [ ! -d ../djgpp/i586-pc-msdosdjgpp ]; then
-    tar xjf "util/$DJGPP_FILE"
-fi
-
-#echo after tar
-# cd ../
-
-#pwd
-
-#  PDCurses
-if [ ! -d "../pdcurses" ]; then
-	echo "Getting ../pdcurses from https://github.com/wmcbrine/PDCurses.git"
-	git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
+if [ ! -d djgpp/i586-pc-msdosdjgpp ]; then
+    tar xjf "$DJGPP_FILE"
+    rm -f $DJGPP_FILE
 fi
 
 # DOS-extender for use with djgpp
-cd djgpp
-if [ ! -d cwsdpmi ]; then
+if [ ! -d djgpp/cwsdpmi ]; then
     if [ "$(uname)" = "Darwin" ]; then
       	#Mac
 	curl http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip -o csdpmi7b.zip
     else
 	wget --no-hsts http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
     fi
+    cd djgpp
     mkdir -p cwsdpmi
     cd cwsdpmi
-    unzip ../csdpmi7b.zip
-    cd ../
+    unzip ../../csdpmi7b.zip
+    cd ../../
     rm csdpmi7b.zip
 fi
+
+#  PDCurses
+if [ ! -d "pdcurses" ]; then
+	echo "Getting ../pdcurses from https://github.com/wmcbrine/PDCurses.git" ; \
+	git clone --depth 1 https://github.com/wmcbrine/PDCurses.git pdcurses
+fi
+
 cd ../
 
-
 #echo after dos extender
-
 
 cd src
 
@@ -93,16 +96,13 @@ make -f ../sys/msdos/Makefile2.cross
 unset GCC_EXEC_PREFIX
 #pwd
 
-#ls ../djgpp/cwsdpmi/bin 
-#ls .
-
-if [ -f ../djgpp/cwsdpmi/bin/CWSDPMI.EXE ]; then
-    cp  ../djgpp/cwsdpmi/bin/CWSDPMI.EXE ../msdos-binary/CWSDPMI.EXE;
+if [ -f ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE ]; then
+    cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE ../msdos-binary/CWSDPMI.EXE;
 fi
 
 # ls -l ../msdos-binary
 cd ../msdos-binary
-zip -9 ../NH370DOS.ZIP *
+zip -9 ../lib/NH370DOS.ZIP *
 cd ../
-# ls -l NH370DOS.ZIP
+ls -l lib/NH370DOS.ZIP
 

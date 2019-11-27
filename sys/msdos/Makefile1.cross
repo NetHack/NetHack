@@ -145,11 +145,9 @@ TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O
 TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
 		$(HOST_O)objects.o
 
-#PLANAR_TIB  = $(DAT)/NETHACK1.TIB
-#OVERVIEW_TIB = $(DAT)/NETHACKO.TIB
 TILE_BMP    = $(DAT)/NHTILES.BMP
 
-TILEUTIL    = $(TILOBJ) $(U)tile2bin $(U)til2bin2 $(TILE_BMP) $(PLANAR_TIB) $(OVERVIEW_TIB)
+TILEUTIL    = $(TILOBJ) $(TILE_BMP)
 
 TILEFILES   = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
 
@@ -255,7 +253,7 @@ LFLAGS =
 #==========================================
 
 $(HOST_O)%.o : $(SRC)/%.c
-	$(HOST_CC) $(cflags) -o$@ $<
+	$(HOST_CC) $(cflags)  -o$@ $<
 
 #==========================================
 # Rules for host files in sys/msdos
@@ -303,8 +301,7 @@ $(HOST_O)utility.tag: $(INCL)/date.h $(INCL)/trap.h $(INCL)/onames.h \
 tileutil: $(U)gif2txt $(U)txt2ppm
 	@echo Optional tile development utilities are up to date.
 
-$(HOST_O)prereq.tag: hobj.tag $(U)makedefs $(HOST_O)utility.tag  \
-		$(HOST_O)thintile.tag $(DAT)/nhdat
+$(HOST_O)prereq.tag: hobj.tag $(U)makedefs $(HOST_O)utility.tag $(DAT)/nhdat
 	echo prereq done >$@
 
 #==========================================
@@ -319,7 +316,7 @@ $(DAT)/nhdat:	$(U)dlb_main $(DAT)/data $(DAT)/rumors \
 	cd $(DAT); \
 	pwd; \
 	cp $(MSYS)/msdoshlp.txt .; \
-	ls -1 data oracles options quest.dat rumors help hh  >dlb.lst; \
+	ls -1 data oracles options rumors help hh  >dlb.lst; \
 	ls -1 cmdhelp history opthelp wizhelp license       >>dlb.lst; \
 	ls -1 bogusmon engrave epitaph tribute msdoshlp.txt >>dlb.lst; \
 	ls -1 *.lua >>dlb.lst; \
@@ -362,11 +359,6 @@ $(DAT)/rumors:	     $(HOST_O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
 
 $(DAT)/oracles:	     $(HOST_O)utility.tag    $(DAT)/oracles.txt
 	$(U)makedefs -h
-
-ifndef LUA_QTEXT_FILE
-$(DAT)/quest.dat: $(HOST_O)utility.tag  $(DAT)/quest.txt
-	$(U)makedefs -q
-endif
 
 $(DAT)/bogusmon:     $(HOST_O)utility.tag    $(DAT)/bogusmon.txt
 	$(U)makedefs -s
@@ -423,17 +415,17 @@ $(HOST_O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H) $(TILE_H)
 #  Required for tile support
 #==========================================
 
-$(DAT)/NetHack1.tib: $(TILEFILES) $(U)tile2bin
-	@echo Creating binary tile files
-	cd $(DAT)
-	$(U)tile2bin
-	cd $(SRC)
+#$(DAT)/NetHack1.tib: $(TILEFILES) $(U)tile2bin
+#	@echo Creating binary tile files
+#	cd $(DAT)
+#	$(U)tile2bin
+#	cd $(SRC)
 
-$(DAT)/NetHacko.tib: $(HOST_O)thintile.tag $(TILEFILES2) $(U)til2bin2
-	@echo Creating overview binary tile files
-	cd $(DAT)
-	$(U)til2bin2
-	cd $(SRC)
+#$(DAT)/NetHacko.tib: $(HOST_O)thintile.tag $(TILEFILES2) $(U)til2bin2
+#	@echo Creating overview binary tile files
+#	cd $(DAT)
+#	$(U)til2bin2
+#	cd $(SRC)
 
 $(DAT)/NHTILES.BMP: $(TILEFILES) $(U)tile2bmp
 	@echo Creating binary tile files which may take some time
@@ -446,39 +438,39 @@ $(U)tile2bmp: $(HOST_O)tile2bmp.o $(TEXTIO)
 	ar r temp.a $(TEXTIO)
 	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tile2bmp.o temp.a
 
-$(U)tile2bin: $(HOST_O)tile2bin.o $(TEXTIO)
-	-rm -f temp.a
-	ar r temp.a $(TEXTIO)
-	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tile2bin.o temp.a
+#$(U)tile2bin: $(HOST_O)tile2bin.o $(TEXTIO)
+#	-rm -f temp.a
+#	ar r temp.a $(TEXTIO)
+#	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tile2bin.o temp.a
 
-$(U)til2bin2: $(HOST_O)til2bin2.o $(TEXTIO2)
-	-rm -f temp.a
-	ar r temp.a $(TEXTIO2)
-	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)til2bin2.o temp.a
+#$(U)til2bin2: $(HOST_O)til2bin2.o $(TEXTIO2)
+#	-rm -f temp.a
+#	ar r temp.a $(TEXTIO2)
+#	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)til2bin2.o temp.a
 
-$(U)thintile: $(HOST_O)thintile.o
-	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)thintile.o
+#$(U)thintile: $(HOST_O)thintile.o
+#	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)thintile.o
 
 #$(HOST_O)thintile.o:  $(HACK_H) $(WSHR)/tile.h $(WSHR)/thintile.c
 #	-rm -f temp.a
 #	ar r temp.a $(TEXTIO)
 #	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tile2bmp.o temp.a
 
-$(HOST_O)thintile.o:  $(HACK_H) $(WSHR)/tile.h $(WSHR)/thintile.c
-	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILE -DOVERVIEW_FILE -o$@ $(WSHR)/thintile.c
+#$(HOST_O)thintile.o:  $(HACK_H) $(WSHR)/tile.h $(WSHR)/thintile.c
+#	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILE -DOVERVIEW_FILE -o$@ $(WSHR)/thintile.c
 
-$(HOST_O)thintile.tag: $(U)thintile $(TILEFILES)
-	$(U)thintile
-	echo thintiles created >$@
+#$(HOST_O)thintile.tag: $(U)thintile $(TILEFILES)
+#	$(U)thintile
+#	echo thintiles created >$@
 
 $(HOST_O)tile2bmp.o:  $(HACK_H) $(TILE_H) $(WSHR)/tile2bmp.c
 	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -o$@ $(WSHR)/tile2bmp.c
 
-$(HOST_O)tile2bin.o:  $(HACK_H) $(TILE_H) $(MSYS)/pctiles.h $(MSYS)/pcvideo.h $(MSYS)/tile2bin.c
-	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -o$@ $(MSYS)/tile2bin.c
+#$(HOST_O)tile2bin.o:  $(HACK_H) $(TILE_H) $(MSYS)/pctiles.h $(MSYS)/pcvideo.h $(MSYS)/tile2bin.c
+#	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -o$@ $(MSYS)/tile2bin.c
 
-$(HOST_O)til2bin2.o:  $(HACK_H) $(TILE_H) $(MSYS)/pctiles.h $(MSYS)/pcvideo.h $(MSYS)/tile2bin.c
-	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILE_X=8 -DOVERVIEW_FILE -o$@ $(MSYS)/tile2bin.c
+#$(HOST_O)til2bin2.o:  $(HACK_H) $(TILE_H) $(MSYS)/pctiles.h $(MSYS)/pcvideo.h $(MSYS)/tile2bin.c
+#	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILE_X=8 -DOVERVIEW_FILE -o$@ $(MSYS)/tile2bin.c
 
 $(HOST_O)tiletext.o:  $(CONFIG_H) $(TILE_H) $(WSHR)/tiletext.c
 	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -o$@ $(WSHR)/tiletext.c
@@ -560,30 +552,30 @@ clean:
 spotless: clean
 
 	if [ -f $(INCL)/pm.h ];        then rm $(INCL)/pm.h; fi;
-#	if [ -f $(U)dgn_flex.c ];      then rm $(U)dgn_flex.c; fi;
-#	if [ -f $(U)dgn_lex.c ];       then rm $(U)dgn_lex.c; fi;
+##	if [ -f $(U)dgn_flex.c ];      then rm $(U)dgn_flex.c; fi;
+##	if [ -f $(U)dgn_lex.c ];       then rm $(U)dgn_lex.c; fi;
 #	if [ -f $(U)makedefs ];        then rm $(U)makedefs; fi;
-#	if [ -f $(U)dgn_comp ];        then rm $(U)dgn_comp; fi;
+##	if [ -f $(U)dgn_comp ];        then rm $(U)dgn_comp; fi;
 #	if [ -f $(U)recover.exe ];     then rm $(U)recover.exe; fi;
 #	if [ -f $(U)tilemap ];         then rm $(U)tilemap; fi;
 #	if [ -f $(U)tile2bmp ];        then rm $(U)tile2bmp; fi;
-#	if [ -f $(U)tile2bin ];        then rm $(U)tile2bin; fi;
-#	if [ -f $(U)til2bin2 ];        then rm $(U)til2bin2; fi;
-#	if [ -f $(U)thintile ];        then rm $(U)thintile; fi;
+##	if [ -f $(U)tile2bin ];        then rm $(U)tile2bin; fi;
+##	if [ -f $(U)til2bin2 ];        then rm $(U)til2bin2; fi;
+##	if [ -f $(U)thintile ];        then rm $(U)thintile; fi;
 #	if [ -f $(U)dlb_main ];        then rm $(U)dlb_main; fi;
 #	if [ -f $(INCL)/vis_tab.h ];   then rm $(INCL)/vis_tab.h; fi;
 #	if [ -f $(INCL)/onames.h ];    then rm $(INCL)/onames.h; fi;
 #	if [ -f $(INCL)/pm.h ];        then rm $(INCL)/pm.h; fi;
 #	if [ -f $(INCL)/date.h ];      then rm $(INCL)/date.h; fi;
-#	if [ -f $(INCL)/dgn_comp.h ];  then rm $(INCL)/dgn_comp.h; fi;
-#	if [ -f $(INCL)/lev_comp.h ];  then rm $(INCL)/lev_comp.h; fi;
+##	if [ -f $(INCL)/dgn_comp.h ];  then rm $(INCL)/dgn_comp.h; fi;
+##	if [ -f $(INCL)/lev_comp.h ];  then rm $(INCL)/lev_comp.h; fi;
 #	if [ -f $(SRC)/vis_tab.c ];    then rm $(SRC)/vis_tab.c; fi;
 #	if [ -f $(SRC)/tile.c ];       then rm $(SRC)/tile.c; fi;
 #	if [ -f $(DAT)/options ];      then rm $(DAT)/options; fi;
 #	if [ -f $(DAT)/data ];         then rm $(DAT)/data; fi;
 #	if [ -f $(DAT)/rumors ];       then rm $(DAT)/rumors; fi;
-#	if [ -f $(DAT)/dungeon.pdf ];  then rm $(DAT)/dungeon.pdf; fi;
-#	if [ -f $(DAT)/dungeon ];      then rm $(DAT)/dungeon; fi;
+##	if [ -f $(DAT)/dungeon.pdf ];  then rm $(DAT)/dungeon.pdf; fi;
+##	if [ -f $(DAT)/dungeon ];      then rm $(DAT)/dungeon; fi;
 #	if [ -f $(DAT)/oracles ];      then rm $(DAT)/oracles; fi;
 ##	if [ -f $(DAT)/quest.dat ];    then rm $(DAT)/quest.dat; fi;
 #	if [ -f $(DAT)/bogusmon ];     then rm $(DAT)/bogusmon; fi;
