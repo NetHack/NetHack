@@ -6,7 +6,7 @@
 #include "integer.h"
 #include "sfprocs.h"
 
-#ifdef MACOSX
+#if defined(MACOSX) || defined(VMS)
 extern long long FDECL(atoll, (const char *));
 #endif
 
