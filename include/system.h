@@ -1,4 +1,4 @@
-/* NetHack 3.6	system.h	$NHDT-Date: 1550268586 2019/02/15 22:09:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	system.h	$NHDT-Date: 1574825213 2019/11/27 03:26:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -570,9 +570,7 @@ E int FDECL(atoi, (const char *));
 #endif /* WIN32 */
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include "nhlua.h"
 
 #if defined(WIN32)
 #define LUA_INTCAST(i) ((int) i)
@@ -580,4 +578,5 @@ E int FDECL(atoi, (const char *));
 #define LUA_INTCAST(i) (i)
 #endif
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
+
 #endif /* SYSTEM_H */

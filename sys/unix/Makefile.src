@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1574713234 2019/11/25 20:20:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1574825214 2019/11/27 03:26:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -49,7 +49,7 @@ SHELL=/bin/sh
 # for UNIX systems
 SYSSRC = ../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c
-SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o ../lib/liblua.a
+SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o ../lib/lua/liblua.a
 #
 # for Systos
 # SYSSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
@@ -173,7 +173,6 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 #CFLAGS = -O -I../include
 #LFLAGS = 
 
-CFLAGS += -I../lib
 # -lm required by lua
 LIBS += -lm
 
@@ -506,9 +505,6 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
 
-# relative to src
-LUA_HEADERS = ../lib/lua.h ../lib/luaconf.h ../lib/lualib.h ../lib/lauxlib.h
-
 # the following .o's _must_ be made before any others (for makedefs)
 FIRSTOBJ = monst.o objects.o
 
@@ -589,7 +585,7 @@ DUMB.Setup:	../include/extern.h
 
 all:	$(GAME)
 
-lib/liblua.a $(LUA_HEADERS):
+../lib/lua/liblua.a ../include/nhlua.h:
 	@( cd .. ; $(MAKE) lua_support )
 
 #	dependencies for makedefs and its outputs, which the util
@@ -724,7 +720,7 @@ clean:
 
 spotless: clean
 	-rm -f a.out core $(GAME) Sys*
-	-rm -f ../lib/liblua.a $(LUA_HEADERS)
+	-rm -f ../lib/lua/liblua.a ../include/nhlua.h
 	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
 	-rm -f ../include/vis_tab.h vis_tab.c tile.c *.moc
 	-rm -f ../win/gnome/gn_rip.h
@@ -757,7 +753,7 @@ $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/micro.h ../include/pcconf.h ../include/tosconf.h \
 		../include/amiconf.h ../include/macconf.h ../include/beconf.h \
 		../include/wceconf.h ../include/ntconf.h \
-		../lib/lua.h ../lib/luaconf.h ../lib/lualib.h ../lib/lauxlib.h
+		../include/nhlua.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
