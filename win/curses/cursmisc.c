@@ -920,7 +920,7 @@ curses_convert_keys(int key)
         if (iflags.num_pad) {
             ret = '7';
         } else {
-            ret = 'y';
+            ret = !Cmd.swap_yz ? 'y' : 'z';
         }
         break;
 #ifdef KEY_A3
