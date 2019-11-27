@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <RootDir>$(MSBuildProjectDirectory)\..\..\..\</RootDir>
-    <BinDir>$(RootDir)bin\$(Configuration)\$(Platform)\</BinDir>
+    <BinDir>$(RootDir)binary\$(Configuration)\$(Platform)\</BinDir>
     <ObjDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\$(TargetName)\</ObjDir>
     <SymbolsDir>$(ProjectDir)symbols\$(Configuration)\$(Platform)\$(TargetName)\</SymbolsDir>
     <ToolsDir>$(RootDir)tools\$(Configuration)\$(Platform)\</ToolsDir>
@@ -23,7 +23,7 @@
 	<IntDir>$(ObjDir)</IntDir>
 	<WinCursDir>$(RootDir)win\curses\</WinCursDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(PDCURSES)'=='' AND Exists('$(RootDir)bin\PDCurses')">
-	<PDCURSES>$(RootDir)bin\PDCurses\</PDCURSES>
+  <PropertyGroup Condition="'$(PDCURSES)'=='' AND Exists('$(RootDir)lib\PDCurses')">
+	<PDCURSES>$(RootDir)lib\PDCurses\</PDCURSES>
   </PropertyGroup>
 </Project>
