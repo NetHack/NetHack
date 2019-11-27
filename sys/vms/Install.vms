@@ -16,39 +16,40 @@
     structure.  You should set up a directory--referred to as "top" below
     and in some of the assorted files, but which may be a subdirectory--
     that has these subdirectories
-        [.dat]          -- data files
-        [.doc]          -- documentation files
-        [.include]      -- C header files
-        [.src]          -- primary source files
-        [.sys]          -- parent for [.sys.*]
-        [.sys   .share] -- files shared by several ports, including VMS
-        [.sys   .vms]   -- VMS-specific source and support files
-        [.util]         -- sources for essential utility programs
-        [.win]          -- parent for [.win.*]
-        [.win   .tty]   -- "window" routines for ordinary terminals
+        [.dat]           -- data files
+        [.doc]           -- documentation files
+        [.include]       -- C header files
+        [.lib   .lua535] -- Lua distribution from https://www.lua.org/
+        [.src]           -- primary source files
+        [.sys]           -- parent for [.sys.*]
+        [.sys   .share]  -- files shared by several ports, including VMS
+        [.sys   .vms]    -- VMS-specific source and support files
+        [.util]          -- sources for essential utility programs
+        [.win]           -- parent for [.win.*]
+        [.win   .tty]    -- "window" routines for ordinary terminals
                            (including terminal windows on workstations)
     The following subdirectories may be present, but are not useful for
     building NetHack on VMS and are not required:
-        [.sys   .amiga] -- AmigaDOS
-        [.sys   .atari] -- Atari TOS
-        [.sys   .be]    -- BeBox BeOS
-        [.sys   .mac]   -- Macintosh
-        [.sys   .msdos] -- MSDOS for IBM PCs and compatibles
-        [.sys   .os2]   -- OS/2
+        [.sys   .amiga]  -- AmigaDOS
+        [.sys   .atari]  -- Atari TOS
+        [.sys   .be]     -- BeBox BeOS
+        [.sys   .mac]    -- Macintosh
+        [.sys   .msdos]  -- MSDOS for IBM PCs and compatibles
+        [.sys   .os2]    -- OS/2
         [.sys   .share   .sounds] -- AIFF format audio files
-        [.sys   .unix]  -- guess :-)
+        [.sys   .unix]   -- guess :-)
         [.sys   .unit    .hints] -- configuration data for setup.sh
-        [.sys   .wince] -- Windows CE
+        [.sys   .wince]  -- Windows CE
         [.sys   .wince   .ceinc] -- more WinCE
         [.sys   .wince   .ceinc   .sys] -- ditto
-        [.sys   .winnt] -- Windows NT
-        [.win   .gem]   -- window routines for Atari/GEM
-        [.win   .gnome] -- window routines for Unix/GNOME
-        [.win   .Qt]    -- window routines for Qt
-        [.win   .share] -- "tile" graphic support
-        [.win   .win32] -- Windows NT and Windows CE
-        [.win   .X11]   -- window routines for X-Windows; requires X11R4
-                           or later and MIT's Athena Widget set
+        [.sys   .winnt]  -- Windows NT
+        [.win   .gem]    -- window routines for Atari/GEM
+        [.win   .gnome]  -- window routines for Unix/GNOME
+        [.win   .Qt]     -- window routines for Qt
+        [.win   .share]  -- "tile" graphic support
+        [.win   .win32]  -- Windows NT and Windows CE
+        [.win   .X11]    -- window routines for X-Windows; requires X11R4
+                            or later and MIT's Athena Widget set
     You must arrange things in this structure or the supplied procedures
     and instructions in this file will not work properly.  Several DCL
     command files are present in the [.sys.vms] subdirectory and will not
