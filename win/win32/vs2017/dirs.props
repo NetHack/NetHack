@@ -10,7 +10,7 @@
     <DatDir>$(RootDir)dat\</DatDir>
     <DocDir>$(RootDir)doc\</DocDir>
     <IncDir>$(RootDir)include\</IncDir>
-    <LuaDir>$(RootDir)..\LUA-5.3.5\src\</LuaDir>
+    <LuaDir>$(RootDir)lib\lua-5.3.5\src\</LuaDir>
     <SrcDir>$(RootDir)src\</SrcDir>
 	<SysDir>$(RootDir)sys\</SysDir>
     <UtilDir>$(RootDir)util\</UtilDir>
@@ -23,7 +23,7 @@
 	<IntDir>$(ObjDir)</IntDir>
 	<WinCursDir>$(RootDir)win\curses\</WinCursDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(PDCURSES)'=='' AND Exists('$(RootDir)..\PDCurses')">
-	<PDCURSES>$(RootDir)..\PDCurses\</PDCURSES>
+  <PropertyGroup Condition="'$(PDCURSES)'=='' AND Exists('$(RootDir)bin\PDCurses')">
+	<PDCURSES>$(RootDir)bin\PDCurses\</PDCURSES>
   </PropertyGroup>
 </Project>

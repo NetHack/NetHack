@@ -257,6 +257,7 @@
     <ClInclude Include="$(IncDir)monflag.h" />
     <ClInclude Include="$(IncDir)monst.h" />
     <ClInclude Include="$(IncDir)monsym.h" />
+    <ClInclude Include="$(IncDir)nhlua.h" />
     <ClInclude Include="$(IncDir)ntconf.h" />
     <ClInclude Include="$(IncDir)obj.h" />
     <ClInclude Include="$(IncDir)objclass.h" />
