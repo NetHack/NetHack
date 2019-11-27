@@ -325,19 +325,19 @@ $ gosub compile_list
 $!
 $! 3.7 runtime LUA level parser/loader
 $!
-$ c_list = "[-.-.LUA535.SRC]lapi,[-.-.LUA535.SRC]lauxlib,[-.-.LUA535.SRC]lbaselib" -
-	+ ",[-.-.LUA535.SRC]lbitlib,[-.-.LUA535.SRC]lcode,[-.-.LUA535.SRC]lcorolib" -
-	+ ",[-.-.LUA535.SRC]lctype,[-.-.LUA535.SRC]ldblib,[-.-.LUA535.SRC]ldebug" -
-	+ ",[-.-.LUA535.SRC]ldo,[-.-.LUA535.SRC]ldump,[-.-.LUA535.SRC]lfunc" -
-	+ ",[-.-.LUA535.SRC]lgc,[-.-.LUA535.SRC]linit,[-.-.LUA535.SRC]liolib" -
-	+ ",[-.-.LUA535.SRC]llex"
+$ c_list = "[-.lib.lua535.src]lapi,[-.lib.lua535.src]lauxlib,[-.lib.lua535.src]lbaselib" -
+	+ ",[-.lib.lua535.src]lbitlib,[-.lib.lua535.src]lcode,[-.lib.lua535.src]lcorolib" -
+	+ ",[-.lib.lua535.src]lctype,[-.lib.lua535.src]ldblib,[-.lib.lua535.src]ldebug" -
+	+ ",[-.lib.lua535.src]ldo,[-.lib.lua535.src]ldump,[-.lib.lua535.src]lfunc" -
+	+ ",[-.lib.lua535.src]lgc,[-.lib.lua535.src]linit,[-.lib.lua535.src]liolib" -
+	+ ",[-.lib.lua535.src]llex"
 $ gosub compile_list
-$ c_list = "[-.-.LUA535.SRC]lmathlib,[-.-.LUA535.SRC]lmem,[-.-.LUA535.SRC]loadlib" -
-	+ ",[-.-.LUA535.SRC]lobject,[-.-.LUA535.SRC]lopcodes,[-.-.LUA535.SRC]loslib" -
-	+ ",[-.-.LUA535.SRC]lparser,[-.-.LUA535.SRC]lstate,[-.-.LUA535.SRC]lstring" -
-	+ ",[-.-.LUA535.SRC]lstrlib,[-.-.LUA535.SRC]ltable,[-.-.LUA535.SRC]ltablib" -
-	+ ",[-.-.LUA535.SRC]ltm,[-.-.LUA535.SRC]lundump,[-.-.LUA535.SRC]lutf8lib" -
-	+ ",[-.-.LUA535.SRC]lvm,[-.-.LUA535.SRC]lzio"
+$ c_list = "[-.lib.lua535.src]lmathlib,[-.lib.lua535.src]lmem,[-.lib.lua535.src]loadlib" -
+	+ ",[-.lib.lua535.src]lobject,[-.lib.lua535.src]lopcodes,[-.lib.lua535.src]loslib" -
+	+ ",[-.lib.lua535.src]lparser,[-.lib.lua535.src]lstate,[-.lib.lua535.src]lstring" -
+	+ ",[-.lib.lua535.src]lstrlib,[-.lib.lua535.src]ltable,[-.lib.lua535.src]ltablib" -
+	+ ",[-.lib.lua535.src]ltm,[-.lib.lua535.src]lundump,[-.lib.lua535.src]lutf8lib" -
+	+ ",[-.lib.lua535.src]lvm,[-.lib.lua535.src]lzio"
 $ gosub compile_list
 $!
 $link:
