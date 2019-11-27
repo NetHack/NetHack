@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1574011494 2019/11/17 17:24:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.161 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1574722864 2019/11/25 23:01:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -477,17 +477,24 @@ char *buf, *monbuf;
         Strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
-    } else
+    } else {
+        int amsk;
+        aligntyp algn;
+
         switch (glyph_to_cmap(glyph)) {
         case S_altar:
+            amsk = ((mtmp = m_at(x, y)) != 0 && has_mcorpsenm(mtmp)
+                    && M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                    && mtmp->mappearance == S_altar) ? MCORPSENM(mtmp)
+                   : levl[x][y].altarmask;
+            algn = Amask2align(amsk & ~AM_SHRINE);
             Sprintf(buf, "%s %saltar",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */
                     (Is_astralevel(&u.uz) && distu(x, y) > 2)
                         ? "aligned"
-                        : align_str(
-                              Amask2align(levl[x][y].altarmask & ~AM_SHRINE)),
-                    ((levl[x][y].altarmask & AM_SHRINE)
+                        : align_str(algn),
+                    ((amsk & AM_SHRINE) != 0
                      && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))
                         ? "high "
                         : "");
@@ -522,7 +529,7 @@ char *buf, *monbuf;
             Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
             break;
         }
-
+    }
     return (pm && !Hallucination) ? pm : (struct permonst *) 0;
 }
 

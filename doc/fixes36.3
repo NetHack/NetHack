@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.190 $ $NHDT-Date: 1574638389 2019/11/24 23:33:09 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.191 $ $NHDT-Date: 1574722861 2019/11/25 23:01:01 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -302,7 +302,11 @@ when Riders use their bargethrough capability, don't let them swap places with
 	there'd be no corpse so no auto-revive)
 putting on levitation boots while on sink would crash when attempting to set
 	the enchantment known flag on Null 'uarmf' pointer
-unix: Fix double DLB definition in linux hints file
+look-at of mimics mimicking altars got an arbitary alignment from misuse of
+	underlying terrain
+polymorph_sink creating an altar passed a call to rn2() as an argument to a
+	macro which evaluates its parameter more than once
+unix: fix double DLB definition in linux hints file
 windows: fix --showpaths output for the data file which relies on being
 	constructed programmatically to incorporate the version suffix
 
