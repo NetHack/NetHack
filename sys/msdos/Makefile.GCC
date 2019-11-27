@@ -50,7 +50,7 @@ PDCURSES_TOP=../../pdcurses
 #    successfully build NetHack-3.7.
 #
 ADD_LUA=Y
-LUATOP=../../lua-535
+LUATOP=../lib/lua535
 
 #
 #==============================================================================
