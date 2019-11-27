@@ -84,6 +84,15 @@ matrix:
         - cd src
         - cp ../sys/winnt/Makefile.gcc ./Makefile
         - mingw32-make install
+    - os: linux
+      env: DESCR=msdos-cross-on-linux HINTS=linux LUA_VERSION=5.3.5
+      compiler: gcc
+      script:
+#        - export
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua
+        - cd lib/lua-$LUA_VERSION/src && make a && cd ../../.. 
+        - sh sys/msdos/msdos-cross-compile.sh
   exclude:
 #    - os: osx
 #      osx_image: xcode10.3
