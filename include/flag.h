@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1569276988 2019/09/23 22:16:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1574900824 2019/11/28 00:27:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.160 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -106,6 +106,7 @@ struct flag {
 #define PARANOID_REMOVE     0x0040
 #define PARANOID_BREAKWAND  0x0080
 #define PARANOID_WERECHANGE 0x0100
+#define PARANOID_EATING     0x0200
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char inv_order[MAXOCLASSES];
@@ -520,6 +521,9 @@ enum runmode_types {
 /* werechange: accepting randomly timed werecreature change to transform
    from human to creature or vice versa while having polymorph control */
 #define ParanoidWerechange ((flags.paranoia_bits & PARANOID_WERECHANGE) != 0)
+/* continue eating: prompt given _after_first_bite_ when eating something
+   while satiated */
+#define ParanoidEating ((flags.paranoia_bits & PARANOID_EATING) != 0)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */

@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.331 $ $NHDT-Date: 1573943499 2019/11/16 22:31:39 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.333 $ $NHDT-Date: 1574900824 2019/11/28 00:27:04 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "November 17, 2019
+.ds f2 "November 27, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -693,6 +693,14 @@ Normally checks for edible item(s) on the floor, then if none are found
 or none are chosen, checks for edible item(s) in inventory.
 Precede \(oqe\(cq with the \(oqm\(cq prefix to bypass attempting to eat
 anything off the floor.
+.lp ""
+If you attempt to eat while already satiated, you might choke to death.
+If you risk it, you will be asked whether
+to \(lqcontinue eating?\(rq \fIif you survive the first bite\fP.
+You can set the
+.op paranoid_confirmation:eating
+option to require a response of \f(CRyes\fP instead of just \f(CRy\fP.
+.
 .\" Make sure Elbereth is not hyphenated below, the exact spelling matters
 .hw Elbereth
 .lp E
@@ -3307,6 +3315,8 @@ bones data when dying in debug mode;
 require \(lqyes\(rq rather than \(oqy\(cq to confirm attacking a peaceful monster;
 .PL wand-break
 require \(lqyes\(rq rather than \(oqy\(cq to confirm breaking a wand;
+.PL eating
+require \(lqyes\(rq rather than \(oqy\(cq to confirm whether to continue eating;
 .PL Were-change
 require \(lqyes\(rq rather than \(oqy\(cq to confirm changing form due to lycanthropy
 when hero has polymorph control;

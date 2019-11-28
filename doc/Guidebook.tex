@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{November 17, 2019}
+\date{November 27, 2019}
 
 \maketitle
 
@@ -796,7 +796,14 @@ Eat food.\\
 Normally checks for edible item(s) on the floor, then if none are found
 or none are chosen, checks for edible item(s) in inventory.
 Precede `{\tt e}' with the `{\tt m}' prefix to bypass attempting to eat
-anything off the floor.
+anything off the floor.\\
+%.lp ""
+If you attempt to eat while already satiated, you might choke to death.
+If you risk it, you will be asked whether
+to ``continue eating?'' {\it if you survive the first bite\/}.
+You can set the
+{\it paranoid\verb+_+confirmation:eating\/}
+option to require a response of ``{\tt yes}'' instead of just `{\tt y}'.
 %.lp
 % Make sure Elbereth is not hyphenated below, the exact spelling matters.
 % (Only specified here to parallel Guidebook.mn; use of \tt font implicity
@@ -1333,7 +1340,7 @@ Autocompletes.
 Debug mode only.\\
 %.lp ""
 Asks for confirmation; default is `{\tt n}' (no); continue playing.
-To really panic, respond with `{\tt y}''.
+To really panic, respond with `{\tt y}'.
 You can set the
 {\it paranoid\verb+_+confirmation:quit\/}
 option to require a response of ``{\tt yes}'' instead.
@@ -3640,6 +3647,9 @@ a peaceful monster;
 \item[{\tt wand-break}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm breaking
 a wand;
+\item[{\tt eating}]
+require ``{\tt yes}'' rather than `{\tt y}' to confirm whether to
+continue eating;
 \item[{\tt Were-change}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm changing form
 due to lycanthropy

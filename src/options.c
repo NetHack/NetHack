@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1573505739 2019/11/11 20:55:39 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.386 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1574900826 2019/11/28 00:27:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.388 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1313,12 +1313,13 @@ STATIC_VAR const struct paranoia_opts {
        and "d"ie vs "d"eath, synonyms for each other so doesn't matter;
        (also "p"ray vs "P"aranoia, "pray" takes precedence since "Paranoia"
        is just a synonym for "Confirm"); "b"ones vs "br"eak-wand, the
-       latter requires at least two letters; "wand"-break vs "Were"-change,
+       latter requires at least two letters; "e"at vs "ex"plore,
+       "cont"inue eating vs "C"onfirm; "wand"-break vs "Were"-change,
        both require at least two letters during config processing and use
        case-senstivity for 'O's interactive menu */
     { PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
       "for \"yes\" confirmations, require \"no\" to reject" },
-    { PARANOID_QUIT, "quit", 1, "explore", 1,
+    { PARANOID_QUIT, "quit", 1, "explore", 2,
       "yes vs y to quit or to enter explore mode" },
     { PARANOID_DIE, "die", 1, "death", 2,
       "yes vs y to die (explore mode or debug mode)" },
@@ -1328,6 +1329,8 @@ STATIC_VAR const struct paranoia_opts {
       "yes vs y to attack a peaceful monster" },
     { PARANOID_BREAKWAND, "wand-break", 2, "break-wand", 2,
       "yes vs y to break a wand via (a)pply" },
+    { PARANOID_EATING, "eat", 1, "continue", 4,
+      "yes vs y to continue eating after first bite when satiated" },
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
       "yes vs y to change form when lycanthropy is controllable" },
     { PARANOID_PRAY, "pray", 1, 0, 0,
