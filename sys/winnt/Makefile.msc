@@ -244,13 +244,26 @@ O  = $(OBJ)^\
 
 U  = $(UTIL)^\
 
+!IFDEF TEST_CROSSCOMPILE
+CROSSDEFINE_TARGET = -DCROSSCOMPILE_TARGET
+CROSSDEFINE_HOST = -DCROSSCOMPILE_HOST
+CROSSCOMPILE = -DCROSSCOMPILE
+OPTIONS_AT_RUNTIME=Y
+HOST=_host
+!ELSE
+CROSSDEFINE_TARGET =
+CROSSDEFINE_HOST =
+CROSSCOMPILE =
+HOST=
+!ENDIF
+
 #
 # Utility Objects.
 #
 
 MAKESRC       = $(U)makedefs.c
 
-MAKEOBJS      = $(O)makedefs.o $(O)monst.o $(O)objects.o
+MAKEDEFSOBJS  = $(O)makedefs$(HOST).o $(O)monst$(HOST).o $(O)objects$(HOST).o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -259,16 +272,16 @@ TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 #
 # These are not invoked during a normal game build in 3.4
 #
-TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
-		 $(O)decl.o	$(O)monst.o	$(O)objects.o
+TEXT_IO        = $(O)tiletext$(HOST).o	$(O)tiletxt$(HOST).o	$(O)drawing$(HOST).o \
+		 $(O)decl$(HOST).o	$(O)monst$(HOST).o	$(O)objects$(HOST).o
 
-TEXT_IO32      = $(O)tilete32.o $(O)tiletx32.o $(O)drawing.o \
-		 $(O)decl.o	$(O)monst.o	$(O)objects.o
+TEXT_IO32      = $(O)tilete32$(HOST).o $(O)tiletx32$(HOST).o $(O)drawing$(HOST).o \
+		 $(O)decl$(HOST).o $(O)monst$(HOST).o $(O)objects$(HOST).o
 
-GIFREADERS     = $(O)gifread.o	$(O)alloc.o $(O)panic.o
-GIFREADERS32   = $(O)gifrd32.o $(O)alloc.o $(O)panic.o
+GIFREADERS     = $(O)gifread$(HOST).o	$(O)alloc$(HOST).o $(O)panic$(HOST).o
+GIFREADERS32   = $(O)gifrd32$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o
 
-PPMWRITERS     = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
+PPMWRITERS     = $(O)ppmwrite$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o
 
 #
 #  Object files for the game itself.
@@ -307,31 +320,20 @@ VOBJ29 = $(O)sfstruct.o $(O)sfascii.o  $(O)sflendian.o
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
 LUA_QTEXT_FILE = "quest.lua"
 
+!IFDEF CROSSCOMPILE_HOST
+DLBOBJ_HOST = $(O)dlb$(HOST).o
+!ENDIF
 DLBOBJ = $(O)dlb.o
 
 REGEX  = $(O)cppregex.o
 
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
-!IFDEF TEST_CROSSCOMPILE
-CROSSDEFINE_TARGET = -DCROSSCOMPILE_TARGET
-CROSSDEFINE_HOST = -DCROSSCOMPILE_HOST
-CROSSCOMPILE = -DCROSSCOMPILE
-CROSSDEFINES = $(CROSSCOMPILE) $(CROSSDEFINE_HOST) $(CROSSDEFINE_TARGET)
-OPTIONS_AT_RUNTIME=Y
-!ELSE
-CROSSDEFINE_TARGET =
-CROSSDEFINE_HOST =
-CROSSCOMPILE =
-CROSSDEFINES =
-CROSSDEFINES = 
-!ENDIF
+MDLIB = $(O)mdlib.o
 
 !IF "$(OPTIONS_AT_RUNTIME)" == "Y"
-MDLIB = $(O)mdlib.o
 RUNTIMEOPTDEF=-DOPTIONS_AT_RUNTIME
 !ELSE
-MDLIB =
 RUNTIMEOPTDEF=
 !ENDIF
 
@@ -726,20 +728,20 @@ DLB =
 #==========================================
 
 .c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(SRC)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES)  -Fo$@  $<
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@  $<
 
 #==========================================
 # Rules for files in sys\share
 #==========================================
 
 {$(SSYS)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES)  -Fo$@  $<
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET)  -Fo$@  $<
 
 {$(SSYS)}.cpp{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /EHsc -Fo$@  $<
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EHsc -Fo$@  $<
 
 #==========================================
 # Rules for files in sys\winnt
@@ -756,14 +758,14 @@ DLB =
 #==========================================
 
 {$(UTIL)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $<
 
 #==========================================
 # Rules for files in win\share
 #==========================================
 
 {$(WSHR)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(WSHR)}.h{$(INCL)}.h:
 	@copy $< $@
@@ -776,7 +778,7 @@ DLB =
 #==========================================
 
 {$(TTY)}.c{$(OBJ)}.o:
-	$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@  $<
+	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@  $<
 
 
 #==========================================
@@ -784,14 +786,14 @@ DLB =
 #==========================================
 
 {$(MSWIN)}.c{$(OBJ)}.o:
-	$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@  $<
+	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@  $<
 
 #==========================================
 # Rules for files in win\curses
 #==========================================
 
 {$(WCURSES)}.c{$(OBJ)}.o:
-	@$(cc) -DPDC_NCMOUSE $(PDCINCL) $(cflagsBuild) $(CROSSDEFINES)  -Fo$@ $<
+	@$(cc) -DPDC_NCMOUSE $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET)  -Fo$@ $<
 
 #{$(WCURSES)}.txt{$(DAT)}.txt:
 #	@copy $< $@
@@ -801,20 +803,20 @@ DLB =
 #==========================================
 
 {$(PDCURSES_TOP)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
+	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCSRC)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
+	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCWINCON)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
+	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 # Rules for LUA files
 #==========================================
 
 {$(LUASRC)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $<
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 #=============== TARGETS ==================
@@ -1053,14 +1055,14 @@ $(U)nhsizes.exe: $(O)nhsizes.o
 	@echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o
 
-$(O)nhsizes.o: $(CONFIG_H) nhsizes.c
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ nhsizes.c
+$(O)nhsizes$(HOST).o: $(CONFIG_H) nhsizes.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ nhsizes.c
 
 $(U)makedefs.exe:	$(MAKEOBJS)
 	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
 
-$(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
+$(O)makedefs$(HOST).o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
 		 $(INCL)\monsym.h    $(INCL)\qtext.h	$(INCL)\patchlevel.h \
 		 $(U)makedefs.c
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
@@ -1092,11 +1094,11 @@ $(SRC)\vis_tab.c: $(U)makedefs.exe
 # uudecode utility and uuencoded targets
 #==========================================
 
-$(U)uudecode.exe: $(O)uudecode.o
+$(U)uudecode.exe: $(O)uudecode$(HOST).o
 	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
-$(O)uudecode.o: $(SSYS)\uudecode.c
+$(O)uudecode$(HOST).o: $(SSYS)\uudecode.c
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
 
 $(MSWSYS)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
@@ -1185,20 +1187,30 @@ $(O)envchk.tag: $(O)obj.tag
 # DLB utility and nhdatNNN file creation
 #==========================================
 
-$(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
+$(U)dlb_main.exe: $(DLBOBJ_HOST) $(O)dlb$(HOST).o
 	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
-		$(O)dlb_main.o
-		$(O)dlb.o
-		$(O)alloc.o
-		$(O)panic.o
+		$(O)dlb_main$(HOST).o
+		$(O)dlb$(HOST).o
+		$(O)alloc$(HOST).o
+		$(O)panic$(HOST).o
 <<
 
-$(O)dlb.o:	$(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /Fo$@ $(SRC)\dlb.c
+!IFDEF CROSSCOMPILE_HOST
+$(O)dlb$(HOST).o: $(O)dlb_main$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o $(INCL)\dlb.h
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(SRC)\dlb.c
+!ENDIF
+
+$(O)dlb.o: $(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(SRC)\dlb.c
 	
+!IFDEF CROSSCOMPILE_HOST
+$(O)dlb_main$(HOST).o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(UTIL)\dlb_main.c
+!ENDIF
+
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /Fo$@ $(UTIL)\dlb_main.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /Fo$@ $(UTIL)\dlb_main.c
 
 $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
@@ -1258,32 +1270,32 @@ $(SRC)\tile.c: $(U)tilemap.exe
 	@echo A new $(@:\=/) has been created
 	@$(U)tilemap
 
-$(U)tilemap.exe: $(O)tilemap.o
+$(U)tilemap.exe: $(O)tilemap$(HOST).o
 	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
-$(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
+$(O)tilemap$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $(WSHR)\tilemap.c
 
-$(O)tiletx32.o: $(WSHR)\tilemap.c $(HACK_H)
+$(O)tiletx32$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
 
-$(O)tiletxt.o: $(WSHR)\tilemap.c $(HACK_H)
+$(O)tiletxt$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
 
-$(O)gifread.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
+$(O)gifread$(HOST).o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
 
-$(O)gifrd32.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
+$(O)gifrd32$(HOST).o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
 
-$(O)ppmwrite.o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
+$(O)ppmwrite$(HOST).o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
 
-$(O)tiletext.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
+$(O)tiletext$(HOST).o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
 
-$(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
+$(O)tilete32$(HOST).o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
 
 #==========================================
@@ -1325,7 +1337,7 @@ $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
 #	@$(U)til2bm32 $(TILEBMP32)
 
 
-$(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
+$(U)tile2bmp.exe: $(O)tile2bmp$(HOST).o $(TEXT_IO)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)tile2bmp.o
@@ -1333,7 +1345,7 @@ $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 		)
 <<
 
-$(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
+$(U)til2bm32.exe: $(O)til2bm32$(HOST).o $(TEXT_IO32)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)til2bm32.o
@@ -1341,10 +1353,10 @@ $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
 		)
 <<
 
-$(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
+$(O)tile2bmp$(HOST).o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
 
-$(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
+$(O)til2bm32$(HOST).o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
 #===============================================================================
@@ -1392,9 +1404,14 @@ $(O)lapi.o: $(LUASRC)\lapi.c
 # data file.
 #
 
+!IFDEF CROSSCOMPILE_HOST
+$(O)mdlib$(HOST).o: $(SRC)\mdlib.c
+	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_HOST) -Fo$@ $(SRC)\mdlib.c
+!ENDIF
+
 $(O)mdlib.o: $(SRC)\mdlib.c
-	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_TARGET) -DMAKEDEFS_MDOBJ -Fo$@ $(SRC)\mdlib.c
-#	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_TARGET) -DMAKEDEFS_MDOBJ /EP -Fo$@ $(SRC)\mdlib.c >mdlib.c.preprocessed
+	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_TARGET) -Fo$@ $(SRC)\mdlib.c
+#	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_TARGET) /EP -Fo$@ $(SRC)\mdlib.c >mdlib.c.preprocessed
 
 #===============================================================================
 # Housekeeping
@@ -1595,28 +1612,26 @@ $(SRC)\sfdata.c: $(U)readtags.exe $(U)nethack.tags
 $(INCL)\sfproto.h: $(U)readtags.exe $(U)nethack.tags
         $(U)readtags.exe
 
-$(U)readtags.exe: $(O)readtags.o
+$(U)readtags.exe: $(O)readtags$(HOST).o
 	@$(link) $(lflagsBuild) -out:$@ $(O)readtags.o
 
-$(O)readtags.o: $(U)readtags.c $(U)nethack.tags $(CONFIG_H) $(PATCHLEVEL_H)
+$(O)readtags$(HOST).o: $(U)readtags.c $(U)nethack.tags $(CONFIG_H) $(PATCHLEVEL_H)
 	@$(cc) $(cflagsBuild) $(CROSSDEFINES) $(TEMPL)  -Fo$@ $(U)readtags.c
 
 #
 #tested only with exuberant ctags from http://ctags.sourceforge.net
 #
-CTAGDEP = $(TINC)/align.h    $(TINC)/artifact.h $(TSRC)/artifact.c \
-	  $(TINC)/artilist.h $(TINC)/attrib.h   $(TSRC)/bones.c    \
-	  $(TINC)/context.h  $(TINC)/coord.h    $(TINC)/decl.h     \
-	  $(TSRC)/decl.c     $(TINC)/dungeon.h  $(TINC)/engrave.h  \
-	  $(TSRC)/engrave.c  $(TINC)/flag.h     $(TINC)/func_tab.h \
-	  $(TINC)/global.h   $(TINC)/hack.h     $(TINC)/lev.h      \
-	  $(TINC)/mextra.h   $(TINC)/mkroom.h   $(TINC)/monst.h    \
-	  $(TINC)/monsym.h   $(TINC)/obj.h      $(TINC)/objclass.h \
-	  $(TINC)/permonst.h $(TINC)/prop.h     $(TINC)/quest.h    \
-	  $(TINC)/rect.h     $(TINC)/region.h   $(TINC)/rm.h       \
-	  $(TINC)/skills.h   $(TINC)/spell.h    $(TINC)/sys.h      \
-	  $(TINC)/timeout.h  $(TINC)/trap.h     $(TINC)/you.h      \
-	  $(TINC)/onames.h   $(TINC)/wintype.h 
+CTAGDEP = ..\include\align.h  ..\include\artifact.h ..\include\artilist.h \
+	  ..\include\attrib.h ..\include\context.h  ..\include\coord.h    \
+	  ..\include\decl.h   ..\include\dungeon.h  ..\include\engrave.h  \
+	  ..\include\flag.h   ..\include\func_tab.h ..\include\global.h   \
+	  ..\include\hack.h   ..\include\lev.h      ..\include\mextra.h   \
+	  ..\include\mkroom.h ..\include\monst.h    ..\include\monsym.h   \
+	  ..\include\obj.h    ..\include\objclass.h ..\include\prop.h     \
+	  ..\include\quest.h  ..\include\rect.h     ..\include\region.h   \
+	  ..\include\rm.h     ..\include\skills.h   ..\include\spell.h    \
+	  ..\include\sys.h    ..\include\timeout.h  ..\include\trap.h     \
+	  ..\include\you.h    ..\include\onames.h   ..\include\wintype.h
 
 $(U)nethack.tags: $(CTAGDEP)
 	$(CTAGSCMD) $(CTAGSOPT) -f $(U)nethack.tags $(TINC)/align.h
@@ -1662,8 +1677,13 @@ $(U)nethack.tags: $(CTAGDEP)
 # util dependencies
 #
 
+!IFDEF CROSSCOMPILE_HOST
+$(O)panic$(HOST).o:  $(U)panic.c $(CONFIG_H)
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(U)panic.c
+!ENDIF
+
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
-	@$(cc) $(cflagsBuild) $(CROSSDEFINES) -Fo$@ $(U)panic.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(U)panic.c
 
 # 
 # sys/share dependencies
