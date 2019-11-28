@@ -371,20 +371,18 @@ tileedit: tileedit.cpp $(TEXT_IO)
 
 #	dependencies for readtags
 #
-CTAGDEP = ../include/align.h    ../include/artifact.h ../src/artifact.c     \
-	 ../include/artilist.h ../include/attrib.h   ../src/bones.c        \
-	 ../include/context.h  ../include/coord.h    ../include/decl.h     \
-	 ../src/decl.c         ../include/dungeon.h  ../include/engrave.h  \
-	 ../src/engrave.c      ../include/flag.h     ../include/func_tab.h \
-	 ../include/global.h   ../include/hack.h     ../include/lev.h      \
-	 ../include/mextra.h   ../include/mkroom.h   ../include/monst.h    \
-	 ../include/monsym.h   ../include/obj.h      ../include/objclass.h \
-	 ../include/prop.h     ../include/quest.h    ../include/rect.h     \
-	 ../include/region.h   ../include/rm.h       ../include/skills.h   \
-	 ../include/spell.h    ../include/sys.h      ../include/timeout.h  \
-	 ../include/trap.h     ../include/you.h      ../include/onames.h   \
-	 ../include/wintype.h
-#	 ../include/permonst.h
+CTAGDEP = ../include/align.h  ../include/artifact.h ../include/artilist.h \
+	  ../include/attrib.h ../include/context.h  ../include/coord.h    \
+	  ../include/decl.h   ../include/dungeon.h  ../include/engrave.h  \
+	  ../include/flag.h   ../include/func_tab.h ../include/global.h   \
+	  ../include/hack.h   ../include/lev.h      ../include/mextra.h   \
+	  ../include/mkroom.h ../include/monst.h    ../include/monsym.h   \
+	  ../include/obj.h    ../include/objclass.h ../include/prop.h     \
+	  ../include/quest.h  ../include/rect.h     ../include/region.h   \
+	  ../include/rm.h     ../include/skills.h   ../include/spell.h    \
+	  ../include/sys.h    ../include/timeout.h  ../include/trap.h     \
+	  ../include/you.h    ../include/onames.h   ../include/wintype.h
+#	../include/permonst.h
 CTAGSOPT = --language-force=c --sort=no -D"Bitfield(x,n)=unsigned x : n" --excmd=pattern
 
 readtags: $(READTAGSOBJS)
@@ -399,17 +397,13 @@ nethack.tags: $(CTAGDEP)
 #
 	$(CTAGSCMD) $(CTAGSOPT) -f nethack.tags ../include/align.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/artifact.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../src/artifact.c
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/artilist.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/attrib.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../src/bones.c
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/context.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/coord.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/decl.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../src/decl.c
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/dungeon.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/engrave.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../src/engrave.c
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/flag.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/func_tab.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/global.h

@@ -1258,6 +1258,8 @@ int cnt;
     sfo_ulong(nhfp, &d_monst->mstrategy, parent, "mstrategy", 1);/* (unsigned long) */
     sfo_long(nhfp, &d_monst->mtrapseen, parent, "mtrapseen", 1); /* (long) */
     sfo_long(nhfp, &d_monst->mlstmv, parent, "mlstmv", 1);       /* (long) */
+    sfo_long(nhfp, &d_monst->mstate, parent, "mstate", 1);       /* (long) */
+    sfo_long(nhfp, &d_monst->migflags, parent, "migflags", 1);   /* (long) */
     sfo_long(nhfp, &d_monst->mspare1, parent, "mspare1", 1);     /* (long) */
     sfo_genericptr(nhfp, (genericptr_t) &d_monst->minvent, parent, "minvent", 1);/* (struct obj *) */
     sfo_genericptr(nhfp, (genericptr_t) &d_monst->mw, parent, "mw", 1);/* (struct obj *) */
@@ -3814,6 +3816,8 @@ int cnt;
     sfi_ulong(nhfp, &d_monst->mstrategy, parent, "mstrategy", 1);
     sfi_long(nhfp, &d_monst->mtrapseen, parent, "mtrapseen", 1);
     sfi_long(nhfp, &d_monst->mlstmv, parent, "mlstmv", 1);
+    sfi_long(nhfp, &d_monst->mstate, parent, "mstate", 1);
+    sfi_long(nhfp, &d_monst->migflags, parent, "migflags", 1);
     sfi_long(nhfp, &d_monst->mspare1, parent, "mspare1", 1);
     sfi_genericptr(nhfp, (genericptr_t) &d_monst->minvent, parent, "minvent", 1);
     sfi_genericptr(nhfp, (genericptr_t) &d_monst->mw, parent, "mw", 1);
@@ -5682,6 +5686,8 @@ const char *critical_members[] = {
 	"struct monst:mstrategy:unsigned long",
 	"struct monst:mtrapseen:long",
 	"struct monst:mlstmv:long",
+	"struct monst:mstate:long",
+	"struct monst:migflags:long",
 	"struct monst:mspare1:long",
 	"struct monst:minvent:struct obj *",
 	"struct monst:mw:struct obj *",
