@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.191 $ $NHDT-Date: 1574722861 2019/11/25 23:01:01 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.192 $ $NHDT-Date: 1574882658 2019/11/27 19:24:18 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -306,6 +306,14 @@ look-at of mimics mimicking altars got an arbitary alignment from misuse of
 	underlying terrain
 polymorph_sink creating an altar passed a call to rn2() as an argument to a
 	macro which evaluates its parameter more than once
+if a monster (presumably sensed but not seen) was displayed at a location
+	showing "remembered, unseen monster", remove that since hero now knows
+	something else is there (3.6.1 had similar fix for warned-of monsters)
+clairvoyance showed all monsters in range, then after player viewed the map,
+	replaced them with "remembered, unseen monster" glyph and finally
+	did a normal monster refresh; the 'I' glyph step clobbers remembered
+	object at same spot, so skip it for locations where monster refresh
+	is going to immediately redisplay a monster
 unix: fix double DLB definition in linux hints file
 windows: fix --showpaths output for the data file which relies on being
 	constructed programmatically to incorporate the version suffix
@@ -471,6 +479,7 @@ add a couple of engraving suggestions in pull request #79
 chasonr's faster method to write characters to msdos VGA in pull request #220
 chasonr's msdos Makefile.gcc pdcurses build changes in pull request #243
 autopickup exception priority change in pull request #226
+FIQ's curses (PDCurses) number pad changes in pull request #247
 
 
 Code Cleanup and Reorganization

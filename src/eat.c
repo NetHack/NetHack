@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1573346189 2019/11/10 00:36:29 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1574900825 2019/11/28 00:27:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2869,23 +2869,20 @@ int num;
         /* Have lesshungry() report when you're nearly full so all eating
          * warns when you're about to choke.
          */
-        if (u.uhunger >= 1500) {
-            if (!g.context.victual.eating
-                || (g.context.victual.eating && !g.context.victual.fullwarn)) {
-                pline("You're having a hard time getting all of it down.");
-                g.nomovemsg = "You're finally finished.";
-                if (!g.context.victual.eating) {
-                    g.multi = -2;
-                } else {
-                    g.context.victual.fullwarn = TRUE;
-                    if (g.context.victual.canchoke
-                        && g.context.victual.reqtime > 1) {
-                        /* a one-gulp food will not survive a stop */
-                        if (yn_function("Continue eating?", ynchars, 'n')
-                            != 'y') {
-                            reset_eat();
-                            g.nomovemsg = (char *) 0;
-                        }
+        if (u.uhunger >= 1500
+            && (!g.context.victual.eating
+                || (g.context.victual.eating && !g.context.victual.fullwarn))) {
+            pline("You're having a hard time getting all of it down.");
+            g.nomovemsg = "You're finally finished.";
+            if (!g.context.victual.eating) {
+                g.multi = -2;
+            } else {
+                g.context.victual.fullwarn = TRUE;
+                if (g.context.victual.canchoke && g.context.victual.reqtime > 1) {
+                    /* a one-gulp food will not survive a stop */
+                    if (!paranoid_query(ParanoidEating, "Continue eating?")) {
+                        reset_eat();
+                        g.nomovemsg = (char *) 0;
                     }
                 }
             }

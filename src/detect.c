@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1562630266 2019/07/08 23:57:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1574882659 2019/11/27 19:24:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1414,8 +1414,13 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
                 continue;
             newglyph = glyph_at(zx, zy);
             if (glyph_is_monster(newglyph)
-                && glyph_to_mon(newglyph) != PM_LONG_WORM_TAIL)
-                map_invisible(zx, zy);
+                && glyph_to_mon(newglyph) != PM_LONG_WORM_TAIL) {
+                /* map_invisible() was unconditional here but that made
+                   remembered objects be forgotten for the case where a
+                   monster is immediately redrawn by see_monsters() */
+                if ((mtmp = m_at(zx, zy)) == 0 || !canspotmon(mtmp))
+                    map_invisible(zx, zy);
+            }
         }
     see_monsters();
 
