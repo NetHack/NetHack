@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1574900826 2019/11/28 00:27:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.388 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1574982022 2019/11/28 23:00:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.416 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -134,7 +134,7 @@ static const struct Bool_Opt {
 #endif
     { "force_invmenu", &iflags.force_invmenu, FALSE, SET_IN_GAME },
     { "fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE }, /*WC2*/
-    { "goldX", &iflags.goldX, FALSE, SET_IN_GAME },
+    { "goldX", &flags.goldX, FALSE, SET_IN_GAME },
     { "guicolor", &iflags.wc2_guicolor, TRUE, SET_IN_GAME}, /*WC2*/
     { "help", &flags.help, TRUE, SET_IN_GAME },
     { "herecmd_menu", &iflags.herecmd_menu, FALSE, SET_IN_GAME },
@@ -3840,10 +3840,13 @@ boolean tinitial, tfrom_file;
     }
 
     fullname = "DECgraphics";
-    if (match_optname(opts, fullname, 3, TRUE)) {
+    if (match_optname(opts, fullname, 3, FALSE)
+        || match_optname(opts, "cursesgraphics", 4, FALSE)) {
 #ifdef BACKWARD_COMPAT
         boolean badflag = FALSE;
 
+        if (lowc(*opts) == 'c')
+            fullname = "curses"; /* symbol set name is shorter than optname */
         if (duplicate)
             complain_about_duplicate(opts, 1);
         if (!negated) {
@@ -4052,9 +4055,6 @@ boolean tinitial, tfrom_file;
                        || boolopt[i].addr == &iflags.use_inverse
                        || boolopt[i].addr == &iflags.hilite_pile
                        || boolopt[i].addr == &iflags.perm_invent
-#ifdef CURSES_GRAPHICS
-                       || boolopt[i].addr == &iflags.cursesgraphics
-#endif
                        || boolopt[i].addr == &iflags.wc_ascii_map
                        || boolopt[i].addr == &iflags.wc_tiled_map) {
                 g.opt_need_redraw = TRUE;

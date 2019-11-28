@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1557510460 2019/05/10 17:47:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1574982019 2019/11/28 23:00:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,7 +18,7 @@
 /*
  * Development status of this NetHack version.
  */
-#define NH_DEVEL_STATUS NH_STATUS_BETA
+#define NH_DEVEL_STATUS NH_STATUS_WIP
 
 #ifndef DEBUG  /* allow tool chains to define without causing warnings */
 #define DEBUG

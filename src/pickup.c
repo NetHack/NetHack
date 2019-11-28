@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1570566381 2019/10/08 20:26:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1574982023 2019/11/28 23:00:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -392,7 +392,7 @@ struct obj *obj;
                  : g.shop_filter /* coins are never unpaid, but check anyway */
                     ? (obj->unpaid ? TRUE : FALSE)
                     : g.bucx_filter
-                       ? (index(g.valid_menu_classes, iflags.goldX ? 'X' : 'U')
+                       ? (index(g.valid_menu_classes, flags.goldX ? 'X' : 'U')
                           ? TRUE : FALSE)
                        : TRUE; /* catchall: no filters specified, so accept */
 

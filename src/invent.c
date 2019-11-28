@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1573346190 2019/11/10 00:36:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.266 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1574982020 2019/11/28 23:00:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.280 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2895,7 +2895,7 @@ boolean FDECL((*filterfunc), (OBJ_P));
 
         /* coins are either uncursed or unknown based upon option setting */
         if (list->oclass == COIN_CLASS) {
-            if (type == (iflags.goldX ? BUC_UNKNOWN : BUC_UNCURSED))
+            if (type == (flags.goldX ? BUC_UNKNOWN : BUC_UNCURSED))
                 ++count;
             continue;
         }
@@ -2931,7 +2931,7 @@ int *bcp, *ucp, *ccp, *xcp, *ocp;
             list->bknown = (list->oclass != COIN_CLASS);
         /* coins are either uncursed or unknown based upon option setting */
         if (list->oclass == COIN_CLASS) {
-            if (iflags.goldX)
+            if (flags.goldX)
                 ++(*xcp);
             else
                 ++(*ucp);
@@ -3095,7 +3095,7 @@ struct obj *obj;
         /* if filtering by bless/curse state, gold is classified as
            either unknown or uncursed based on user option setting */
         if (g.this_type && index("BUCX", g.this_type))
-            res = (g.this_type == (iflags.goldX ? 'X' : 'U'));
+            res = (g.this_type == (flags.goldX ? 'X' : 'U'));
     } else {
         switch (g.this_type) {
         case 'B':
