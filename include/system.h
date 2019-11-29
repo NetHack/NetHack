@@ -571,12 +571,6 @@ E int FDECL(atoi, (const char *));
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 #include "nhlua.h"
-
-#if defined(WIN32)
-#define LUA_INTCAST(i) ((int) i)
-#else
-#define LUA_INTCAST(i) (i)
 #endif
-#endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 
 #endif /* SYSTEM_H */
