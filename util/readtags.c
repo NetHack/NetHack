@@ -76,20 +76,28 @@ static void quit(void);
 static void out_of_memory(void);
 static void doline(char *);
 static void chain(struct tagstruct *);
+#if 0
 static void showthem(void);
 static char *stripspecial(char *);
+#endif
 static char *deblank(char *);
 static char *deeol(char *);
 static void generate_c_files();
 static char *findtype(char *, char *);
+#if 0
 static boolean FDECL(is_prim, (char *));
+#endif
 static void taglineparse(char *, struct tagstruct *);
 static void parseExtensionFields(struct tagstruct *, char *);
 static void set_member_array_size(struct tagstruct *);
+#if 0
 static char *member_array_dims(struct tagstruct *, char *);
 static char *member_array_size(struct tagstruct *, char *);
+#endif
 static void output_types(FILE *);
+#if 0
 static char *FDECL(dtmacro,(const char *,int));
+#endif
 static char *FDECL(dtfn,(const char *,int, boolean *));
 static char *FDECL(bfsize,(const char *));
 static char *FDECL(fieldfix,(char *,char *));
@@ -242,7 +250,7 @@ struct needs_array_handling nah[] = {
 };
 
 /* conditional code tags - eecch */
-char *condtag[] = {
+const char *condtag[] = {
 #ifdef SYSFLAGS
     "sysflag","altmeta","#ifdef AMIFLUSH", "",
     "sysflag","amiflush","","#endif /*AMIFLUSH*/",
@@ -296,10 +304,10 @@ char *argv[];
     return 0;
 }
 
-static void doline(line)
-char *line;
+static void doline(aline)
+char *aline;
 {
-    char buf[255], *tmp1 = (char *)0;
+    char buf[255];
     struct tagstruct *tmptag = malloc(sizeof(struct tagstruct));
 
     if (!tmptag) {
@@ -307,12 +315,12 @@ char *line;
     }
     *tmptag = zerotag;
     
-    if (!line || (line && *line == '!')) {
+    if (!aline || (aline && *aline == '!')) {
         free(tmptag);
         return;
     }
 
-    strncpy(buf, deeol(line), 254);
+    strncpy(buf, deeol(aline), 254);
     taglineparse(buf,tmptag);
     chain(tmptag);
     return;
@@ -348,6 +356,11 @@ static void out_of_memory()
     quit();
 }
 
+#if 0
+static char empt[] = {0, 0, 0, 0, 0, 0, 0, 0};
+#endif
+
+#if 0
 static char *member_array_dims(struct tagstruct *tmptag, char *buf)
 {
     if (buf && tmptag) {
@@ -357,7 +370,7 @@ static char *member_array_dims(struct tagstruct *tmptag, char *buf)
             Sprintf(eos(buf), "[%s]", tmptag->arraysize2);
         return buf;
     }
-    return "";
+    return empt;
 }
 
 static char *member_array_size(struct tagstruct *tmptag, char *buf)
@@ -369,17 +382,18 @@ static char *member_array_size(struct tagstruct *tmptag, char *buf)
             Sprintf(eos(buf), " * %s", tmptag->arraysize2);
         return buf;
     }
-    return "";
+    return empt;
 }
+#endif
 
 void set_member_array_size(struct tagstruct *tmptag)
 {
     char buf[BUFSZ];
-    static char result[49];
+    /* static char result[49]; */
     char *arr1 = (char *)0, *arr2 = (char *)0, *tmp;
     int cnt = 0;
 
-    if (!tmptag || (tmptag && !tmptag->searchtext)) return;
+    if (!tmptag) return;
     strcpy(buf, tmptag->searchtext);
     
     tmptag->arraysize1[0] = '\0';
@@ -512,7 +526,7 @@ struct tagstruct *tmptag;
     set_member_array_size(tmptag);
 
     /* determine if this is a pointer and mark it as such */
-    if (tmptag->searchtext &&
+    if (tmptag->searchtext[0] &&
         (tmptag->tagtype == 'm' || tmptag->tagtype == 's')) {
         char ptrbuf[BUFSZ], searchbuf[BUFSZ];
 
@@ -558,6 +572,7 @@ char *s;
 
 static char stripbuf[255];
 
+#if 0
 static char *stripspecial(char *st)
 {
     char *out = stripbuf;
@@ -567,11 +582,12 @@ static char *stripspecial(char *st)
         if (*st >= SPACE)
             *out++ = *st++;
         else
-            *st++;
+            st++;
     }
     *out = '\0';
     return stripbuf;
 }
+#endif
 
 static char *deblank(char *st)
 {
@@ -624,6 +640,7 @@ static void showthem()
 }
 #endif
 
+#if 0
 static boolean
 is_prim(sdt)
 char *sdt;
@@ -644,6 +661,7 @@ char *sdt;
     }
     return FALSE;
 }
+#endif
 
 char *
 findtype(st, tag)
@@ -652,7 +670,9 @@ char *tag;
 {
     static char ftbuf[512];
     static char prevbuf[512];
-    char *tmp1, *tmp2, *tmp3, *tmp4, *r;
+    char *tmp1, *tmp2, *tmp3, *tmp4;
+    const char *r;
+
     if (!st) return (char *)0;
     if (st[0] == '/' && st[1] == '^') {
         tmp2 = tmp3 = tmp4 = (char *)0;
@@ -707,7 +727,7 @@ char *tag;
                 tmp2 = strstr(ftbuf, tag);
                 return prevbuf;
             } else {
-            /* a comma means that more than one thing declared on line */
+            /* a comma means that more than one thing declared on ine */
                  tmp3 = strchr(tmp1, ',');
                 tmp2 = strstr(tmp1, tag);
             }
@@ -748,9 +768,9 @@ char *tag;
                 y = 1;
             }
             if (strncmpi(ftbuf, "struct ", 7) == 0)
-                r = ftbuf + 7;
+                r = (const char *) (ftbuf + 7);
             else if (strncmpi(ftbuf, "union ", 6) == 0)
-                r = ftbuf + 6;
+                r = (const char *) (ftbuf + 6);
             /* a couple of kludges follow unfortunately */
             else if (strncmpi(ftbuf, "coord", 5) == 0)
                 r = "nhcoord";
@@ -759,9 +779,9 @@ char *tag;
             else if (strncmpi(ftbuf, "const char", 10) == 0)
                 r = "char";
             else
-                r = ftbuf;
+                r = (const char *) ftbuf;
             strcpy(prevbuf, r);
-            return r;
+            return prevbuf;
         }
     }
     prevbuf[0] = '\0';
@@ -835,7 +855,7 @@ int n;
 static void output_types(fp1)
 FILE *fp1;
 {
-    int k, cnt, hcnt = 1;
+    int k, cnt /*, hcnt = 1 */;
     struct tagstruct *t = first;
 
     Fprintf(fp1, "%s",
@@ -888,12 +908,12 @@ static void generate_c_files()
 #else
     time_t clocktim = 0;
 #endif
-    char *c, cbuf[60], sfparent[BUFSZ], *substruct, *line;
+    char *c, cbuf[60], sfparent[BUFSZ], *substruct, *gline;
     FILE *SFO_DATA, *SFI_DATA, *SFDATATMP, *SFO_PROTO, *SFI_PROTO,
          *SFDATA, *SFPROTO;
-    int k = 0, j, opening, closetag = 0;
-    char *iftxt = "} else ";
-    char *ft, *pt, *layout, *last_ft = (char *)0;
+    int k = 0, j, opening /*, closetag = 0 */;
+    const char *pt;
+    char *ft, *layout, *last_ft = (char *)0;
     int okeydokey, x, a;
     boolean did_i;
 
@@ -1034,7 +1054,8 @@ static void generate_c_files()
             insert_const = TRUE;
 #endif
 
-        pt = layout = (char *)0;
+        pt = (const char *) 0;
+        layout = (char *) 0;
         t = first;
         while(t) {
             if (t->tagtype == 'u' && !strcmp(t->tag, readtagstypes[k].dtype)) {
@@ -1186,14 +1207,14 @@ static void generate_c_files()
                 /*****************  Bitfield *******************/
                 if (!strncmpi(ft, "Bitfield", 8)) {
                     char lbuf[BUFSZ];
-                    int j, z;
+                    int j2, z;
 
                     Sprintf(lbuf, 
                             "    "
                             "bitfield = d_%s->%s;",
                             readtagstypes[k].dtype, t->tag);
                     z = (int) strlen(lbuf);
-                    for (j = 0; j < (65 - z); ++j)
+                    for (j2 = 0; j2 < (65 - z); ++j2)
                         Strcat(lbuf, " ");
                     Sprintf(eos(lbuf), "/* (%s) */\n", ft);
                     Fprintf(SFO_DATA, "%s", lbuf);
@@ -1231,7 +1252,7 @@ static void generate_c_files()
                     char altbuf[BUFSZ];
                     boolean isptr = FALSE, kludge_sbrooms = FALSE;
                     boolean insert_loop = FALSE;
-                    int j, z;
+                    int j2, z;
 
                     /*************** kludge for sbrooms *************/
                     if (!strcmp(t->tag, "sbrooms")) {
@@ -1312,7 +1333,7 @@ static void generate_c_files()
                         arrbuf);
                     /* align comments */
                     z = (int) strlen(lbuf);
-                    for (j = 0; j < (65 - z); ++j)
+                    for (j2 = 0; j2 < (65 - z); ++j2)
                         Strcat(lbuf, " ");
                     Sprintf(eos(lbuf), "/* (%s) */\n", ft);
                     Fprintf(SFO_DATA, "%s", lbuf);
@@ -1381,45 +1402,45 @@ static void generate_c_files()
 
     SFO_DATA = fopen("../src/sfo_data.tmp", "r");
     if (!SFO_DATA) return;
-    while ((line = fgetline(SFO_DATA)) != 0) {
-        (void) fputs(line, SFDATA);
-        free(line);
+    while ((gline = fgetline(SFO_DATA)) != 0) {
+        (void) fputs(gline, SFDATA);
+        free(gline);
     }
     (void) fclose(SFO_DATA);
     (void) remove("../src/sfo_data.tmp");   
 
     SFI_DATA = fopen("../src/sfi_data.tmp", "r");
     if (!SFI_DATA) return;
-    while ((line = fgetline(SFI_DATA)) != 0) {
-        (void) fputs(line, SFDATA);
-        free(line);
+    while ((gline = fgetline(SFI_DATA)) != 0) {
+        (void) fputs(gline, SFDATA);
+        free(gline);
     }
     (void) fclose(SFI_DATA);
     (void) remove("../src/sfi_data.tmp");   
 
     SFO_PROTO = fopen("../include/sfo_proto.tmp", "r");
     if (!SFO_PROTO) return;
-    while ((line = fgetline(SFO_PROTO)) != 0) {
-        (void) fputs(line, SFPROTO);
-        free(line);
+    while ((gline = fgetline(SFO_PROTO)) != 0) {
+        (void) fputs(gline, SFPROTO);
+        free(gline);
     }
     (void) fclose(SFO_PROTO);
     (void) remove("../include/sfo_proto.tmp");   
 
     SFI_PROTO = fopen("../include/sfi_proto.tmp", "r");
     if (!SFI_PROTO) return;
-    while ((line = fgetline(SFI_PROTO)) != 0) {
-        (void) fputs(line, SFPROTO);
-        free(line);
+    while ((gline = fgetline(SFI_PROTO)) != 0) {
+        (void) fputs(gline, SFPROTO);
+        free(gline);
     }
     (void) fclose(SFI_PROTO);
     (void) remove("../include/sfi_proto.tmp");   
 
     SFDATATMP = fopen("../src/sfdata.tmp", "r");
     if (!SFDATATMP) return;
-    while ((line = fgetline(SFDATATMP)) != 0) {
-        (void) fputs(line, SFDATA);
-        free(line);
+    while ((gline = fgetline(SFDATATMP)) != 0) {
+        (void) fputs(gline, SFDATA);
+        free(gline);
     }
     (void) fclose(SFDATATMP);
     (void) remove("../src/sfdata.tmp");   
@@ -1430,6 +1451,7 @@ static void generate_c_files()
     (void) fclose(SFPROTO);
 }
 
+#if 0
 static char *
 dtmacro(str,n)
 const char *str;
@@ -1488,6 +1510,7 @@ int n;     /* 1 = supress appending |SF_PTRMASK */
             (ispointer && (n == 0)) ? " | SF_PTRMASK" : "");
     return buf2;
 }
+#endif
 
 static char *
 dtfn(str,n, isptr)
@@ -1496,7 +1519,8 @@ int n;     /* 1 = supress appending |SF_PTRMASK */
 boolean *isptr;
 {
     static char buf[128], buf2[128];
-    char *nam, *c;
+    const char *nam;
+    char *c;
     int ispointer = 0;
 
     if (!str)
@@ -1537,7 +1561,7 @@ boolean *isptr;
         c = buf;
     }
 
-    for (nam = c; *c; c++) {
+    for (nam = (const char *) c; *c; c++) {
         if (*c >= 'A' && *c <= 'Z')
             *c = tolower(*c);
         else if (*c == ' ')
@@ -1565,7 +1589,7 @@ static char *
 fieldfix(f,ss)
 char *f, *ss;
 {
-    char *c, *dest = fieldfixbuf;
+    char *c /*, *dest = fieldfixbuf */;
 
     if (strcmp(f,"}") == 0 && strlen(ss) > 0 && strlen(ss) < BUFSZ - 1) {
         /* (void)sprintf(fieldfixbuf,"struct %s", ss); */
