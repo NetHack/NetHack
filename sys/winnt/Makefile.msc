@@ -272,7 +272,16 @@ TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 #
 # These are not invoked during a normal game build in 3.4
 #
+
 !IFDEF CROSSCOMPILE_HOST
+DO_UTILS = Y
+!ELSE IFNDEF CROSSCOMPILE
+DO_UTILS = Y
+!ELSE
+DO_UTILS = N
+!ENDIF
+
+!IF "$(DO_UTILS)" == "Y"
 TEXT_IO        = $(O)tiletext$(HOST).o	$(O)tiletxt$(HOST).o	$(O)drawing$(HOST).o \
 		 $(O)decl$(HOST).o	$(O)monst$(HOST).o	$(O)objects$(HOST).o
 
