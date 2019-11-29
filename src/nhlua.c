@@ -804,7 +804,7 @@ const char *fname;
     dlb *fh;
     char *buf = (char *) 0;
     long buflen;
-    int c, llret;
+    int cnt, llret;
     long bufidx = 0;
 
     fh = dlb_fopen(fname, "r");
@@ -819,13 +819,12 @@ const char *fname;
     buf = (char *) alloc(sizeof(char) * (buflen + 1));
     dlb_fseek(fh, 0L, SEEK_SET);
 
-    do {
-        c = dlb_fgetc(fh);
-        if (c == EOF)
-            break;
-        buf[bufidx++] = (char) c;
-    } while (bufidx < buflen);
-    buf[bufidx] = '\0';
+    if ((cnt = dlb_fread(buf, 1, buflen, fh)) != buflen) {
+        impossible("nhl_loadlua: Error loading %s, got %i/%li bytes", fname, cnt, buflen);
+        ret = FALSE;
+        goto give_up;
+    }
+    buf[buflen] = '\0';
     (void) dlb_fclose(fh);
 
     llret = luaL_loadstring(L, buf);
