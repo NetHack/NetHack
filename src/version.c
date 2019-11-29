@@ -238,6 +238,7 @@ doextversion()
                 Strcpy(buf, rtbuf);
             }
         }
+        (void) strip_newline(buf);
         if (index(buf, '\t') != 0)
             (void) tabexpand(buf);
 
