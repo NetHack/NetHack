@@ -484,8 +484,9 @@ const char *msgid;
 
     if (!synopsis && !text) {
         int nelems;
+
         lua_len(L, -1);
-        nelems = LUA_INTCAST(lua_tointeger(L, -1));
+        nelems = (int) lua_tointeger(L, -1);
         lua_pop(L, 1);
         if (nelems < 2) {
             impossible("com_pager: questtext[%s][%s] in %s in not an array of strings", section, msgid, QTEXT_FILE);

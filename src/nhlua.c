@@ -217,8 +217,8 @@ lua_State *L;
     int argc = lua_gettop(L);
 
     if (argc == 2) {
-        int x = LUA_INTCAST(lua_tointeger(L, 1));
-        int y = LUA_INTCAST(lua_tointeger(L, 2));
+        int x = (int) lua_tointeger(L, 1);
+        int y = (int) lua_tointeger(L, 2);
 
         if (x >= 0 && x < COLNO && y >= 0 && y < ROWNO) {
             char buf[BUFSZ];
