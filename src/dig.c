@@ -1169,7 +1169,7 @@ struct obj *obj;
         You("cannot stay under%s long enough.",
             is_pool(u.ux, u.uy) ? "water" : " the lava");
     } else if ((trap = t_at(u.ux, u.uy)) != 0
-               && uteetering_at_seen_pit(trap)) {
+               && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
         dotrap(trap, FORCEBUNGLE);
         /* might escape trap and still be teetering at brink */
         if (!u.utrap)

@@ -521,7 +521,7 @@ int what; /* should be a long */
         if (!can_reach_floor(TRUE)) {
             if ((multi && !context.run) || (autopickup && !flags.pickup)
                 || ((ttmp = t_at(u.ux, u.uy)) != 0
-                    && uteetering_at_seen_pit(ttmp)))
+                    && (uteetering_at_seen_pit(ttmp) || uescaped_shaft(ttmp))))
                 read_engr_at(u.ux, u.uy);
             return 0;
         }
