@@ -2634,8 +2634,10 @@ pickup_checks()
     }
     if (!can_reach_floor(TRUE)) {
         struct trap *traphere = t_at(u.ux, u.uy);
-        if (traphere && uteetering_at_seen_pit(traphere))
-            You("cannot reach the bottom of the pit.");
+        if (traphere
+            && (uteetering_at_seen_pit(traphere) || uescaped_shaft(traphere)))
+            You("cannot reach the bottom of the %s.",
+                is_pit(traphere->ttyp) ? "pit" : "abyss");
         else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
             rider_cant_reach();
         else if (Blind && !can_reach_floor(TRUE))
