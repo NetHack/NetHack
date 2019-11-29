@@ -45,7 +45,7 @@ const char *NetHack_git_sha
                 = NETHACK_GIT_SHA
 #else
 #ifdef NETHACK_HOST_GIT_SHA
-		= NETHACK_HOST_GIT_SHA
+                = NETHACK_HOST_GIT_SHA
 #endif
 #endif
 ;
@@ -135,14 +135,38 @@ doversion()
 int
 doextversion()
 {
-#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
-    const char *rtbuf;
     int rtcontext = 0;
-#else
-    dlb *f;
-#endif
+    const char *rtbuf;
+    dlb *f = (dlb *) 0;
     char buf[BUFSZ], *p = 0;
     winid win = create_nhwindow(NHW_TEXT);
+    boolean use_dlb = TRUE,
+            keepgoing = TRUE,
+            done_rt = FALSE,
+            done_dlb = FALSE,
+            prolog;
+    const char *lua_info[] = {
+ "About Lua: Copyright (c) 1994-2019 Lua.org, PUC-Rio.",
+ /*        1         2         3         4         5         6         7
+  1234567890123456789012345678901234567890123456789012345678901234567890123456789
+  */
+ "    \"Permission is hereby granted, free of charge, to any person obtaining",
+ "     a copy of this software and associated documentation files (the ",
+ "     \"Software\"), to deal in the Software without restriction including",
+ "     without limitation the rights to use, copy, modify, merge, publish,",
+ "     distribute, sublicense, and/or sell copies of the Software, and to ",
+ "     permit persons to whom the Software is furnished to do so, subject to",
+ "     the following conditions:",
+ "     The above copyright notice and this permission notice shall be",
+ "     included in all copies or substantial portions of the Software.\"",
+        (const char *) 0
+  };
+
+#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
+    use_dlb = FALSE;
+#else
+    done_rt = TRUE;
+#endif
 
     /* instead of using ``display_file(OPTIONS_USED,TRUE)'' we handle
        the file manually so we can include dynamic version info */
@@ -161,74 +185,83 @@ doextversion()
         putstr(win, 0, p);
     }
 
-#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
-#else
-    f = dlb_fopen(OPTIONS_USED, "r");
-    if (!f) {
-        putstr(win, 0, "");
-        Sprintf(buf, "[Configuration '%s' not available?]", OPTIONS_USED);
-        putstr(win, 0, buf);
-    } else {
-#endif
-        /*
-         * already inserted above:
-         * + outdented program name and version plus build date and time
-         * dat/options; display contents with lines prefixed by '-' deleted:
-         * - blank-line
-         * -     indented program name and version
-         *   blank-line
-         *   outdented feature header
-         * - blank-line
-         *       indented feature list
-         *       spread over multiple lines
-         *   blank-line
-         *   outdented windowing header
-         * - blank-line
-         *       indented windowing choices with
-         *       optional second line for default
-         * - blank-line
-         * - EOF
-         */
-        boolean prolog = TRUE; /* to skip indented program name */
-
-#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
-        while ((rtbuf = do_runtime_info(&rtcontext))) {
-            if ((int) strlen(rtbuf) >= (BUFSZ - 1))
-                continue;
-            Strcpy(buf, rtbuf);
-#else
-        while (dlb_fgets(buf, BUFSZ, f)) {
-            (void) strip_newline(buf);
-#endif
-            if (index(buf, '\t') != 0)
-                (void) tabexpand(buf);
-
-            if (*buf && *buf != ' ') {
-                /* found outdented header; insert a separator since we'll
-                   have skipped corresponding blank line inside the file */
-                putstr(win, 0, "");
-                prolog = FALSE;
-            }
-            /* skip blank lines and prolog (progame name plus version) */
-            if (prolog || !*buf)
-                continue;
-
-            if (index(buf, ':'))
-                insert_rtoption(buf);
-
-            if (*buf)
-                putstr(win, 0, buf);
+    if (use_dlb) {
+        f = dlb_fopen(OPTIONS_USED, "r");
+        if (!f) {
+            putstr(win, 0, "");
+            Sprintf(buf, "[Configuration '%s' not available?]", OPTIONS_USED);
+            putstr(win, 0, buf);
+            done_dlb = TRUE;
         }
-#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
-#else
-        (void) dlb_fclose(f);
-#endif
-        display_nhwindow(win, FALSE);
-        destroy_nhwindow(win);
-#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
-#else
     }
-#endif
+    /*
+     * already inserted above:
+     * + outdented program name and version plus build date and time
+     * dat/options; display contents with lines prefixed by '-' deleted:
+     * - blank-line
+     * -     indented program name and version
+     *   blank-line
+     *   outdented feature header
+     * - blank-line
+     *       indented feature list
+     *       spread over multiple lines
+     *   blank-line
+     *   outdented windowing header
+     * - blank-line
+     *       indented windowing choices with
+     *       optional second line for default
+     * - blank-line
+     * - EOF
+     */
+
+    prolog = TRUE; /* to skip indented program name */
+    while (keepgoing) {
+        if (use_dlb && !done_dlb) {
+            if (!dlb_fgets(buf, BUFSZ, f)) {
+                done_dlb = TRUE;
+                continue;
+            }
+        } else if (!done_rt) {
+            if (!(rtbuf = do_runtime_info(&rtcontext))) {
+                done_rt = TRUE;
+                continue;
+            } else {
+                if ((int) strlen(rtbuf) >= (BUFSZ - 1))
+                    continue;
+                Strcpy(buf, rtbuf);
+            }
+        } else {
+            if (!(rtbuf = lua_info[rtcontext++])) {
+                keepgoing = FALSE;
+                break;
+            } else {
+                Strcpy(buf, rtbuf);
+            }
+        }
+        (void) strip_newline(buf);
+        if (index(buf, '\t') != 0)
+            (void) tabexpand(buf);
+
+        if (*buf && *buf != ' ') {
+            /* found outdented header; insert a separator since we'll
+               have skipped corresponding blank line inside the file */
+            putstr(win, 0, "");
+            prolog = FALSE;
+        }
+        /* skip blank lines and prolog (progame name plus version) */
+        if (prolog || !*buf)
+            continue;
+
+        if (index(buf, ':'))
+            insert_rtoption(buf);
+
+        if (*buf)
+            putstr(win, 0, buf);
+    }
+    if (use_dlb)
+        (void) dlb_fclose(f);
+    display_nhwindow(win, FALSE);
+    destroy_nhwindow(win);
     return 0;
 }
 
