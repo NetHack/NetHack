@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1574722862 2019/11/25 23:01:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.193 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1575056306 2019/11/29 19:38:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1002,7 +1002,7 @@ dodown()
     }
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
-        if (trap && (uteetering_at_seen_pit(trap) || uescaped_shaft)) {
+        if (trap && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
             dotrap(trap, TOOKPLUNGE);
             return 1;
         } else if (!trap || !is_hole(trap->ttyp)
