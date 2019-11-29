@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1574825214 2019/11/27 03:26:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1575071867 2019/11/29 23:57:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -445,8 +445,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
 	   files.c fountain.c hack.c hacklib.c invent.c isaac64.c light.c \
-	   lock.c mail.c makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c \
-	   minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
+	   lock.c mail.c makemon.c mapglyph.c mcastu.c mdlib.c mhitm.c \
+	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
 	   nhlua.c nhlsel.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
@@ -513,8 +513,8 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
 	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
 	extralev.o files.o fountain.o hack.o hacklib.o invent.o isaac64.o \
-	light.o lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
-	minion.o mklev.o mkmap.o mkmaze.o mkobj.o mkroom.o mon.o \
+	light.o lock.o mail.o makemon.o mapglyph.o mcastu.o mdlib.o mhitm.o \
+	mhitu.o minion.o mklev.o mkmap.o mkmaze.o mkobj.o mkroom.o mon.o \
 	mondata.o monmove.o mplayer.o mthrowu.o muse.o music.o \
 	nhlua.o nhlsel.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
@@ -1049,6 +1049,11 @@ mail.o: mail.c $(HACK_H) ../include/mail.h
 makemon.o: makemon.c $(HACK_H)
 mapglyph.o: mapglyph.c $(HACK_H)
 mcastu.o: mcastu.c $(HACK_H)
+mdlib.o: mdlib.c  $(CONFIG_H) ../include/permonst.h ../include/objclass.h \
+		../include/monsym.h ../include/artilist.h \
+		../include/dungeon.h ../include/obj.h ../include/monst.h \
+		../include/you.h ../include/context.h ../include/flag.h \
+		../include/dlb.h ../include/patchlevel.h
 mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
 mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 minion.o: minion.c $(HACK_H)
