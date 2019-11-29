@@ -1226,7 +1226,7 @@ static void generate_c_files()
                 } else {
                    /**************** not a bitfield ****************/
                     char arrbuf[BUFSZ];
-                    char lbuf[BUFSZ];
+                    char lbuf[BUFSZ * 2];  /* sprintf target for others, gcc complaint */
                     char fnbuf[BUFSZ];
                     char altbuf[BUFSZ];
                     boolean isptr = FALSE, kludge_sbrooms = FALSE;
