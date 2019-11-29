@@ -726,6 +726,7 @@ int cnt;
     sfo_boolean(nhfp, &d_flag->explore, parent, "explore", 1);   /* (boolean) */
     sfo_boolean(nhfp, &d_flag->female, parent, "female", 1);     /* (boolean) */
     sfo_boolean(nhfp, &d_flag->friday13, parent, "friday13", 1); /* (boolean) */
+    sfo_boolean(nhfp, &d_flag->goldX, parent, "goldX", 1);       /* (boolean) */
     sfo_boolean(nhfp, &d_flag->help, parent, "help", 1);         /* (boolean) */
     sfo_boolean(nhfp, &d_flag->ignintr, parent, "ignintr", 1);   /* (boolean) */
     sfo_boolean(nhfp, &d_flag->ins_chkpt, parent, "ins_chkpt", 1);/* (boolean) */
@@ -734,7 +735,6 @@ int cnt;
     sfo_boolean(nhfp, &d_flag->lit_corridor, parent, "lit_corridor", 1);/* (boolean) */
     sfo_boolean(nhfp, &d_flag->nap, parent, "nap", 1);           /* (boolean) */
     sfo_boolean(nhfp, &d_flag->null, parent, "null", 1);         /* (boolean) */
-    sfo_boolean(nhfp, &d_flag->p__obsolete, parent, "p__obsolete", 1);/* (boolean) */
     sfo_boolean(nhfp, &d_flag->pickup, parent, "pickup", 1);     /* (boolean) */
     sfo_boolean(nhfp, &d_flag->pickup_thrown, parent, "pickup_thrown", 1);/* (boolean) */
     sfo_boolean(nhfp, &d_flag->pushweapon, parent, "pushweapon", 1);/* (boolean) */
@@ -3118,6 +3118,7 @@ int cnt;
     sfi_boolean(nhfp, &d_flag->explore, parent, "explore", 1);
     sfi_boolean(nhfp, &d_flag->female, parent, "female", 1);
     sfi_boolean(nhfp, &d_flag->friday13, parent, "friday13", 1);
+    sfi_boolean(nhfp, &d_flag->goldX, parent, "goldX", 1);
     sfi_boolean(nhfp, &d_flag->help, parent, "help", 1);
     sfi_boolean(nhfp, &d_flag->ignintr, parent, "ignintr", 1);
     sfi_boolean(nhfp, &d_flag->ins_chkpt, parent, "ins_chkpt", 1);
@@ -3126,7 +3127,6 @@ int cnt;
     sfi_boolean(nhfp, &d_flag->lit_corridor, parent, "lit_corridor", 1);
     sfi_boolean(nhfp, &d_flag->nap, parent, "nap", 1);
     sfi_boolean(nhfp, &d_flag->null, parent, "null", 1);
-    sfi_boolean(nhfp, &d_flag->p__obsolete, parent, "p__obsolete", 1);
     sfi_boolean(nhfp, &d_flag->pickup, parent, "pickup", 1);
     sfi_boolean(nhfp, &d_flag->pickup_thrown, parent, "pickup_thrown", 1);
     sfi_boolean(nhfp, &d_flag->pushweapon, parent, "pushweapon", 1);
@@ -5481,6 +5481,7 @@ const char *critical_members[] = {
 	"struct flag:explore:boolean",
 	"struct flag:female:boolean",
 	"struct flag:friday13:boolean",
+	"struct flag:goldX:boolean",
 	"struct flag:help:boolean",
 	"struct flag:ignintr:boolean",
 	"struct flag:ins_chkpt:boolean",
@@ -5489,7 +5490,6 @@ const char *critical_members[] = {
 	"struct flag:lit_corridor:boolean",
 	"struct flag:nap:boolean",
 	"struct flag:null:boolean",
-	"struct flag:p__obsolete:boolean",
 	"struct flag:pickup:boolean",
 	"struct flag:pickup_thrown:boolean",
 	"struct flag:pushweapon:boolean",
