@@ -303,6 +303,7 @@ static struct rt_opt {
     const char *token, *value;
 } rt_opts[] = {
     { ":PATMATCH:", regex_id },
+    { ":LUAVERSION:", " 5.3.5"}, /* plan is to get this directly from Lua */
 };
 
 /*
