@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1552353060 2019/03/12 01:11:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1575072301 2019/11/30 00:05:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -141,12 +141,12 @@ doextversion()
     char buf[BUFSZ], *p = 0;
     winid win = create_nhwindow(NHW_TEXT);
     boolean use_dlb = TRUE,
-            keepgoing = TRUE,
             done_rt = FALSE,
             done_dlb = FALSE,
             prolog;
+#if 0   /* moved to util/makedefs.c and rendered via dat/options */
     const char *lua_info[] = {
- "About Lua: Copyright (c) 1994-2019 Lua.org, PUC-Rio.",
+ "About Lua: Copyright (c) 1994-2017 Lua.org, PUC-Rio.",
  /*        1         2         3         4         5         6         7
   1234567890123456789012345678901234567890123456789012345678901234567890123456789
   */
@@ -161,7 +161,7 @@ doextversion()
  "     included in all copies or substantial portions of the Software.\"",
         (const char *) 0
   };
-
+#endif /*0*/
 #if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
     use_dlb = FALSE;
 #else
@@ -215,7 +215,7 @@ doextversion()
      */
 
     prolog = TRUE; /* to skip indented program name */
-    while (keepgoing) {
+    for (;;) {
         if (use_dlb && !done_dlb) {
             if (!dlb_fgets(buf, BUFSZ, f)) {
                 done_dlb = TRUE;
@@ -225,18 +225,15 @@ doextversion()
             if (!(rtbuf = do_runtime_info(&rtcontext))) {
                 done_rt = TRUE;
                 continue;
-            } else {
-                if ((int) strlen(rtbuf) >= (BUFSZ - 1))
-                    continue;
-                Strcpy(buf, rtbuf);
             }
+            (void) strncpy(buf, rtbuf, BUFSZ - 1);
+            buf[BUFSZ - 1] = '\0';
+#if 0   /* handled via dat/options */
+        } else if ((rtbuf = lua_info[rtcontext++]) != 0) {
+            Strcpy(buf, rtbuf);
+#endif /*0*/
         } else {
-            if (!(rtbuf = lua_info[rtcontext++])) {
-                keepgoing = FALSE;
-                break;
-            } else {
-                Strcpy(buf, rtbuf);
-            }
+            break;
         }
         (void) strip_newline(buf);
         if (index(buf, '\t') != 0)
