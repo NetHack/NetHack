@@ -144,7 +144,7 @@ doextversion()
             done_rt = FALSE,
             done_dlb = FALSE,
             prolog;
-#if 0   /* moved to util/makedefs.c and rendered via dat/options */
+#if 0   /* moved to util/mdlib.c and rendered via do_runtime_info() */
     const char *lua_info[] = {
  "About Lua: Copyright (c) 1994-2017 Lua.org, PUC-Rio.",
  /*        1         2         3         4         5         6         7
@@ -228,10 +228,6 @@ doextversion()
             }
             (void) strncpy(buf, rtbuf, BUFSZ - 1);
             buf[BUFSZ - 1] = '\0';
-#if 0   /* handled via dat/options */
-        } else if ((rtbuf = lua_info[rtcontext++]) != 0) {
-            Strcpy(buf, rtbuf);
-#endif /*0*/
         } else {
             break;
         }
