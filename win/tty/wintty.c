@@ -95,6 +95,11 @@ struct window_procs tty_procs = {
      | WC2_RESET_STATUS
 #endif
      | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_STATUSLINES),
+#ifdef TEXTCOLOR
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+#else
+    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+#endif
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
     tty_exit_nhwindows, tty_suspend_nhwindows, tty_resume_nhwindows,
     tty_create_nhwindow, tty_clear_nhwindow, tty_display_nhwindow,
@@ -4304,7 +4309,7 @@ unsigned long *bmarray;
    the condition where this gets used always has the same value */
 #define condcolor(bm,bmarray) NO_COLOR
 #define term_start_color(color) /*empty*/
-#define term_end_color(color) /*empty*/
+#define term_end_color() /*empty*/
 #endif /* TEXTCOLOR */
 
 static int

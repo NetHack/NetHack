@@ -523,7 +523,9 @@ static void FDECL(hup_void_fdecl_winid, (winid));
 static void FDECL(hup_void_fdecl_constchar_p, (const char *));
 
 static struct window_procs hup_procs = {
-    "hup", 0L, 0L, hup_init_nhwindows,
+    "hup", 0L, 0L,
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    hup_init_nhwindows,
     hup_void_ndecl,                                    /* player_selection */
     hup_void_ndecl,                                    /* askname */
     hup_void_ndecl,                                    /* get_nh_event */
@@ -1369,6 +1371,30 @@ boolean onoff_flag;
     } else {
         iflags.in_dumplog = FALSE;
     }
+}
+
+#ifdef TTY_GRAPHICS
+#ifdef TEXTCOLOR
+#ifdef TOS
+extern const char *hilites[CLR_MAX];
+#else
+extern NEARDATA char *hilites[CLR_MAX];
+#endif
+#endif
+#endif
+
+int
+has_color(color)
+int color;
+{
+    return (iflags.use_color && windowprocs.name
+            && (windowprocs.wincap & WC_COLOR) && windowprocs.has_color[color]
+#ifdef TTY_GRAPHICS
+#if defined(TEXTCOLOR) && defined(TERMLIB) && !defined(NO_TERMS)
+             && (hilites[color] != 0)
+#endif
+#endif
+    );
 }
 
 /*windows.c*/

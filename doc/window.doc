@@ -663,6 +663,10 @@ port can access the fields directly.
 
 Your window port identifies what options it will react to and support
 by setting bits in the window_procs wincap mask and/or wincap2 mask. 
+Your window port can also fill in the color-availability table for
+the window port, has_color[CLR_MAX] to flag the colors it supports 
+1 it does, or 0 it doesn't. [CLR_MAX is 16 as of 3.6.3.]
+
 See section IX for details of where the wincap masks reside. 
 
 Two things control whether any preference setting appears in the 
