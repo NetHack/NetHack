@@ -1,4 +1,4 @@
-/* NetHack 3.6	restore.c	$NHDT-Date: 1561485720 2019/06/25 18:02:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	restore.c	$NHDT-Date: 1575081102 2019/11/30 02:31:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -565,12 +565,11 @@ static struct fruit *
 loadfruitchn(nhfp)
 NHFILE *nhfp;
 {
-    register struct fruit *flist, *fnext = (struct fruit *) 0;
-    boolean keepgoing;
+    register struct fruit *flist, *fnext;
 
     flist = 0;
-    keepgoing = TRUE;
-    while (fnext = newfruit(), keepgoing) {
+    for (;;) {
+        fnext = newfruit();
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t)fnext, sizeof *fnext);
         if (nhfp->fieldlevel)
@@ -579,7 +578,7 @@ NHFILE *nhfp;
             fnext->nextf = flist;
             flist = fnext;
         } else
-            keepgoing = FALSE;
+            break;
     }
     dealloc_fruit(fnext);
     return flist;
@@ -1227,7 +1226,6 @@ boolean ghostly;
     int hpid;
     xchar dlvl;
     int x, y;
-    boolean keepgoing;
 #ifdef TOS
     short tlev;
 #endif
@@ -1288,7 +1286,8 @@ boolean ghostly;
 
         for (c = 0; c < COLNO; ++c)
             for (r = 0; r < ROWNO; ++r)
-                sfi_schar(nhfp, &g.lastseentyp[c][r], "lev", "g.lastseentyp", 1);
+                sfi_schar(nhfp, &g.lastseentyp[c][r],
+                          "lev", "g.lastseentyp", 1);
 
         sfi_long(nhfp, &g.omoves, "lev", "timestmp", 1);
     }
@@ -1331,9 +1330,10 @@ boolean ghostly;
 
     /* rest_worm(fd); */    /* restore worm information */
     rest_worm(nhfp);    /* restore worm information */
+
     g.ftrap = 0;
-    keepgoing = TRUE;
-    while (trap = newtrap(), keepgoing) {
+    for (;;) {
+        trap = newtrap();
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t)trap, sizeof(struct trap));
         if (nhfp->fieldlevel)
@@ -1342,9 +1342,10 @@ boolean ghostly;
             trap->ntrap = g.ftrap;
             g.ftrap = trap;
         } else
-            keepgoing = FALSE;
+            break;
     }
     dealloc_trap(trap);
+
     fobj = restobjchn(nhfp, ghostly, FALSE);
     find_lev_obj();
     /* restobjchn()'s `frozen' argument probably ought to be a callback
