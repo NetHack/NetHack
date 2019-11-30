@@ -715,7 +715,6 @@ tty_delay_output()
     }
 }
 
-#ifdef TEXTCOLOR
 /*
  * CLR_BLACK		0
  * CLR_RED		1
@@ -788,7 +787,6 @@ init_ttycolor()
 #endif
     init_ttycolor_completed = TRUE;
 }
-#endif /* TEXTCOLOR */
 
 #if 0
 int

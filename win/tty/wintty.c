@@ -4311,7 +4311,7 @@ unsigned long *bmarray;
    the condition where this gets used always has the same value */
 #define condcolor(bm,bmarray) NO_COLOR
 #define term_start_color(color) /*empty*/
-#define term_end_color(color) /*empty*/
+#define term_end_color() /*empty*/
 #endif /* TEXTCOLOR */
 
 STATIC_OVL int
