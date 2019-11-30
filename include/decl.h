@@ -701,6 +701,7 @@ struct role_filter {
 #define CVT_BUF_SIZE 64
 
 #define LUA_VER_BUFSIZ 20
+#define LUA_COPYRIGHT_BUFSIZ 120
 
 struct instance_globals {
 
@@ -1257,6 +1258,7 @@ struct instance_globals {
 
     /* new stuff */
     char lua_ver[LUA_VER_BUFSIZ];
+    char lua_copyright[LUA_COPYRIGHT_BUFSIZ];
 
     unsigned long magic; /* validate that structure layout is preserved */
 };

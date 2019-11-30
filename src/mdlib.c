@@ -637,7 +637,7 @@ build_options()
     {
         static const char *lua_info[] = {
  "", "NetHack 3.7.* uses the 'Lua' interpreter to process some data:", "",
- "    About Lua:LUAVERSION:: Copyright (c) 1994-2017 Lua.org, PUC-Rio.", "",
+ "    :LUACOPYRIGHT:", "",
  /*        1         2         3         4         5         6         7
   1234567890123456789012345678901234567890123456789012345678901234567890123456
   */

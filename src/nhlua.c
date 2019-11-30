@@ -923,6 +923,10 @@ get_lua_version()
                 Strcpy(g.lua_ver, vs);
         }
         lua_close(L);
+#ifdef LUA_COPYRIGHT
+        if (sizeof LUA_COPYRIGHT < sizeof g.lua_copyright - 1)
+            Strcpy(g.lua_copyright, LUA_COPYRIGHT);
+#endif
     }
     return (const char *) g.lua_ver;
 }

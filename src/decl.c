@@ -693,6 +693,7 @@ const struct instance_globals g_init = {
 
     /* new */
     DUMMY,   /* lua_ver[LUA_VER_BUFSIZ] */
+    DUMMY,   /* lua_copyright[LUA_COPYRIGHT_BUFSIZ] */
 
     IVMAGIC  /* used to validate that structure layout has been preserved */
 };
