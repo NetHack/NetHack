@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1575071867 2019/11/29 23:57:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1575076770 2019/11/30 01:19:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -636,7 +636,8 @@ qt4yndlg.moc : ../win/Qt4/qt4yndlg.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \
-		../util/makedefs.c $(CONFIG_H) ../include/permonst.h \
+		../util/makedefs.c ../src/mdlib.c $(CONFIG_H) \
+		../include/permonst.h \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \

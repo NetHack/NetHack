@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1575072306 2019/11/30 00:05:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1575076769 2019/11/30 01:19:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -1311,24 +1311,7 @@ void
 do_options()
 {
     const char *optline;
-    int i, infocontext = 0;
-    const char *lua_info[] = {
- "NetHack 3.7.* uses the 'Lua' interpreter to process some data:\n",
- "    About Lua: Copyright (c) 1994-2017 Lua.org, PUC-Rio.\n",
- /*        1         2         3         4         5         6         7
-  1234567890123456789012345678901234567890123456789012345678901234567890123456
-  */
- "    \"Permission is hereby granted, free of charge, to any person obtaining",
- "     a copy of this software and associated documentation files (the ",
- "     \"Software\"), to deal in the Software without restriction including",
- "     without limitation the rights to use, copy, modify, merge, publish,",
- "     distribute, sublicense, and/or sell copies of the Software, and to ",
- "     permit persons to whom the Software is furnished to do so, subject to",
- "     the following conditions:",
- "     The above copyright notice and this permission notice shall be",
- "     included in all copies or substantial portions of the Software.\"",
-        (const char *) 0
-    };
+    int infocontext = 0;
 
     windowing_sanity();
     filename[0] = '\0';
@@ -1341,8 +1324,6 @@ do_options()
         exit(EXIT_FAILURE);
     }
     while ((optline = do_runtime_info(&infocontext)) != 0)
-        Fprintf(ofp, "%s\n", optline);
-    for (i = 0; (optline = lua_info[i]) != 0; ++i)
         Fprintf(ofp, "%s\n", optline);
     Fclose(ofp);
     return;

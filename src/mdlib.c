@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1574646946 2019/11/25 01:55:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1575076762 2019/11/30 01:19:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -52,9 +52,9 @@ static char *FDECL(bannerc_string, (char *, const char *));
 static void FDECL(opt_out_words, (char *, int *));
 static void NDECL(build_savebones_compat_string);
 static int idxopttext, done_runtime_opt_init_once = 0;
-#define MAXOPT 30
+#define MAXOPT 40
 static char rttimebuf[MAXOPT];
-static char *opttext[ROWNO] = {0};
+static char *opttext[120] = { 0 };
 char optbuf[BUFSZ];
 static struct version_info version;
 static const char opt_indent[] = "    ";
@@ -328,19 +328,25 @@ static void
 build_savebones_compat_string()
 {
 #ifdef VERSION_COMPATIBILITY
-    unsigned long uver = VERSION_COMPATIBILITY;
+    unsigned long uver = VERSION_COMPATIBILITY,
+                  cver  = (((unsigned long) VERSION_MAJOR << 24)
+                         | ((unsigned long) VERSION_MINOR << 16)
+                         | ((unsigned long) PATCHLEVEL    <<  8));
 #endif
+
     Strcpy(save_bones_compat_buf,
            "save and bones files accepted from version");
 #ifdef VERSION_COMPATIBILITY
-    Sprintf(eos(save_bones_compat_buf), "s %lu.%lu.%lu through %d.%d.%d",
-            ((uver & 0xFF000000L) >> 24), ((uver & 0x00FF0000L) >> 16),
-            ((uver & 0x0000FF00L) >> 8), VERSION_MAJOR, VERSION_MINOR,
-            PATCHLEVEL);
-#else
-    Sprintf(eos(save_bones_compat_buf), " %d.%d.%d only", VERSION_MAJOR,
-            VERSION_MINOR, PATCHLEVEL);
+    if (uver != cver)
+        Sprintf(eos(save_bones_compat_buf), "s %lu.%lu.%lu through %d.%d.%d",
+                ((uver >> 24) & 0x0ffUL),
+                ((uver >> 16) & 0x0ffUL),
+                ((uver >>  8) & 0x0ffUL),
+                VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+    else
 #endif
+        Sprintf(eos(save_bones_compat_buf), " %d.%d.%d only",
+                VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
 }
 
 static const char *build_opts[] = {
@@ -627,11 +633,39 @@ build_options()
         idxopttext++;
     optbuf[0] = '\0';
 
+#if defined(MAKEDEFS_C) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_TARGET))
+    {
+        static const char *lua_info[] = {
+ "", "NetHack 3.7.* uses the 'Lua' interpreter to process some data:", "",
+ "    About Lua: Copyright (c) 1994-2017 Lua.org, PUC-Rio.", "",
+ /*        1         2         3         4         5         6         7
+  1234567890123456789012345678901234567890123456789012345678901234567890123456
+  */
+ "    \"Permission is hereby granted, free of charge, to any person obtaining",
+ "     a copy of this software and associated documentation files (the ",
+ "     \"Software\"), to deal in the Software without restriction including",
+ "     without limitation the rights to use, copy, modify, merge, publish,",
+ "     distribute, sublicense, and/or sell copies of the Software, and to ",
+ "     permit persons to whom the Software is furnished to do so, subject to",
+ "     the following conditions:",
+ "     The above copyright notice and this permission notice shall be",
+ "     included in all copies or substantial portions of the Software.\"",
+            (const char *) 0
+        };
+
+        /* add lua copyright notice */
+        for (i = 0; lua_info[i]; ++i) {
+            opttext[idxopttext] = strdup(lua_info[i]);
+            if (idxopttext < (MAXOPT - 1))
+                idxopttext++;
+        }
+    }
+#endif /* MAKEDEFS_C || (CROSSCOMPILE && CROSSCOMPILE_TARGET) */
+
     /* end with a blank line */
-    opttext[idxopttext] = strdup(optbuf);
+    opttext[idxopttext] = strdup("");
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
-    optbuf[0] = '\0';
     return;
 }
 
