@@ -1062,12 +1062,12 @@ $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 #==========================================
 # Makedefs Stuff
 #==========================================
-$(U)nhsizes.exe: $(O)nhsizes.o
+$(U)nhsizes3.exe: $(O)nhsizes3$(HOST).o
 	@echo Linking $(@:\=/)
-	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o
+	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes$(HOST).o $(O)panic$(HOST).o $(O)alloc$(HOST).o
 
-$(O)nhsizes$(HOST).o: $(CONFIG_H) nhsizes.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ nhsizes.c
+$(O)nhsizes3$(HOST).o: $(CONFIG_H) nhsizes3.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ nhsizes3.c
 
 $(U)makedefs.exe:	$(MAKEDEFSOBJS)
 	@echo Linking $(@:\=/)
@@ -1107,7 +1107,7 @@ $(SRC)\vis_tab.c: $(U)makedefs.exe
 
 $(U)uudecode.exe: $(O)uudecode$(HOST).o
 	@echo Linking $(@:\=/)
-	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
+	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode$(HOST).o
 
 $(O)uudecode$(HOST).o: $(SSYS)\uudecode.c
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
@@ -1283,7 +1283,7 @@ $(SRC)\tile.c: $(U)tilemap.exe
 
 $(U)tilemap.exe: $(O)tilemap$(HOST).o
 	@echo Linking $(@:\=/)
-	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
+	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap$(HOST).o
 
 $(O)tilemap$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(WSHR)\tilemap.c
@@ -1625,7 +1625,7 @@ $(INCL)\sfproto.h: $(U)readtags.exe $(U)nethack.tags
         $(U)readtags.exe
 
 $(U)readtags.exe: $(O)readtags$(HOST).o
-	@$(link) $(lflagsBuild) -out:$@ $(O)readtags.o
+	@$(link) $(lflagsBuild) -out:$@ $(O)readtags$(HOST).o
 
 $(O)readtags$(HOST).o: $(U)readtags.c $(U)nethack.tags $(CONFIG_H) $(PATCHLEVEL_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) $(TEMPL)  -Fo$@ $(U)readtags.c
