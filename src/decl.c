@@ -691,6 +691,9 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* poly_zap */
     UNDEFINED_VALUE,  /* obj_zapped */
 
+    /* new */
+    DUMMY,   /* lua_ver[LUA_VER_BUFSIZ] */
+
     IVMAGIC  /* used to validate that structure layout has been preserved */
 };
 
