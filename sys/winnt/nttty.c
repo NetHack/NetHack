@@ -792,7 +792,7 @@ init_ttycolor()
 
 #if 0
 int
-has_color(int color)
+has_color(int color)        /* this function is commented out */
 {
 #ifdef TEXTCOLOR
     if ((color >= 0) && (color < CLR_MAX))
