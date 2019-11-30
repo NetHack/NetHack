@@ -290,7 +290,6 @@ boolean pastebuf;
 }
 
 extern const char regex_id[];
-extern char lua_ver[];          /* nhlua.c */
 
 /*
  * makedefs should put the first token into dat/options; we'll substitute
