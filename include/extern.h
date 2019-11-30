@@ -1692,6 +1692,7 @@ E int FDECL(get_table_boolean_opt, (lua_State *, const char *, int));
 E int FDECL(get_table_option, (lua_State *, const char *, const char *, const char *const *));
 E int FDECL(str_lines_max_width, (const char *));
 E char *FDECL(stripdigits, (char *));
+E const char *NDECL(get_lua_version);
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 
 /* ### nhregex.c ### */

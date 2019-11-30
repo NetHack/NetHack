@@ -904,3 +904,25 @@ const char *name;
 
     return ret;
 }
+
+const char *
+get_lua_version()
+{
+    size_t len;
+    const char *vs = (const char *) 0;
+    lua_State *L;
+
+    if (g.lua_ver[0] == 0) {
+        L = nhl_init();
+
+        if (L) {
+            lua_getglobal(L, "_VERSION");
+            if (lua_isstring(L, -1))
+                vs = lua_tolstring (L, -1, &len);
+            if (vs && (int) len < sizeof g.lua_ver - 1)
+                Strcpy(g.lua_ver, vs);
+        }
+        lua_close(L);
+    }
+    return (const char *) g.lua_ver;
+}

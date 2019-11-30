@@ -290,6 +290,7 @@ boolean pastebuf;
 }
 
 extern const char regex_id[];
+extern char lua_ver[];          /* nhlua.c */
 
 /*
  * makedefs should put the first token into dat/options; we'll substitute
@@ -303,7 +304,7 @@ static struct rt_opt {
     const char *token, *value;
 } rt_opts[] = {
     { ":PATMATCH:", regex_id },
-    { ":LUAVERSION:", " 5.3.5"}, /* plan is to get this directly from Lua */
+    { ":LUAVERSION:", (const char *) g.lua_ver + 3 }, /* +3 skip past "Lua" */
 };
 
 /*
@@ -318,8 +319,11 @@ char *buf;
 {
     int i;
 
+    if (!g.lua_ver[0])
+        get_lua_version();
+        
     for (i = 0; i < SIZE(rt_opts); ++i) {
-        if (strstri(buf, rt_opts[i].token))
+        if (strstri(buf, rt_opts[i].token) && *rt_opts[i].value)
             (void) strsubst(buf, rt_opts[i].token, rt_opts[i].value);
         /* we don't break out of the loop after a match; there might be
            other matches on the same line */
