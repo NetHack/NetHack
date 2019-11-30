@@ -1282,6 +1282,9 @@ int color;
         xputs(hilites[color]);
 }
 
+#if 0
+/* Replaced by src/windows.c general proc or a macro in 3.6.3 */
+
 /* not to be confused with has_colors() in unixtty.c */
 int
 has_color(color)
@@ -1316,7 +1319,7 @@ int color;
     return hilites[color] != (char *) 0;
 #endif
 }
-
+#endif /* 0 */
 #endif /* TEXTCOLOR */
 
 #endif /* TTY_GRAPHICS && !NO_TERMS */

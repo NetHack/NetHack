@@ -14,6 +14,7 @@ struct window_procs {
                            * '+' are reserved for processors. */
     unsigned long wincap; /* window port capability options supported */
     unsigned long wincap2; /* additional window port capability options */
+    boolean has_color[CLR_MAX];
     void FDECL((*win_init_nhwindows), (int *, char **));
     void NDECL((*win_player_selection));
     void NDECL((*win_askname));

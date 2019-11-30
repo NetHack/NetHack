@@ -790,6 +790,7 @@ init_ttycolor()
 }
 #endif /* TEXTCOLOR */
 
+#if 0
 int
 has_color(int color)
 {
@@ -803,6 +804,7 @@ has_color(int color)
     else
         return 0;
 }
+#endif
 
 int
 term_attr_fixup(int attrmask)
