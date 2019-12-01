@@ -97,7 +97,7 @@ NHSROOT=..
 #CFLAGS = -O -I../include
 #LFLAGS =
 
-CFLAGS += -I../lib/lua-5.3.5/src
+CFLAGS += -I../lib/lua-$(LUA_VERSION)/src
 LFLAGS += -lm
 
 # we specify C preprocessor flags via CFLAGS; files built with default rules
