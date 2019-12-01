@@ -1612,7 +1612,7 @@ struct obj *otmp;
         }
         if (what) {
             Sprintf(offdelaybuf, "You finish taking off your %s.", what);
-            nomovemsg = offdelaybuf;
+            g.nomovemsg = offdelaybuf;
         }
     } else {
         /* Be warned!  We want off_msg after removing the item to
