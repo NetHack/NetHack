@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1575076769 2019/11/30 01:19:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1575161967 2019/12/01 00:59:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -216,14 +216,7 @@ extern unsigned _stklen = STKSIZ;
  * information for the target environment during the game compile portion
  * under the cross-compiler and/or at runtime in some cases.
  */
-/* These actually reside in src/mdlib.c */
-static int FDECL(case_insensitive_comp, (const char *, const char *));
-static void NDECL(make_version);
-static char *FDECL(version_id_string, (char *, const char *));
-static char *FDECL(version_string, (char *, const char *));
-static char *FDECL(eos, (char *));
-/* REPRODUCIBLE_BUILD will change this to TRUE */
-static boolean date_via_env = FALSE;
+
 #include "../src/mdlib.c"
 
 #ifdef MACsansMPWTOOL

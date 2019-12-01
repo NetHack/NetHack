@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1575076767 2019/11/30 01:19:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1575161965 2019/12/01 00:59:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -303,10 +303,8 @@ static struct rt_opt {
     const char *token, *value;
 } rt_opts[] = {
     { ":PATMATCH:", regex_id },
-    { ":LUAVERSION:", (const char *) g.lua_ver + 3 }, /* +3 skip past "Lua" */
-#ifdef LUA_COPYRIGHT
+    { ":LUAVERSION:", (const char *) g.lua_ver },
     { ":LUACOPYRIGHT:", (const char *) g.lua_copyright },
-#endif
 };
 
 /*

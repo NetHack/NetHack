@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhlua.c	$NHDT-Date: 1575071986 2019/11/29 23:59:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	nhlua.c	$NHDT-Date: 1575161963 2019/12/01 00:59:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -815,7 +815,7 @@ const char *fname;
 
     dlb_fseek(fh, 0L, SEEK_END);
     buflen = dlb_ftell(fh);
-    buf = (char *) alloc(sizeof(char) * (buflen + 1));
+    buf = (char *) alloc(buflen + 1);
     dlb_fseek(fh, 0L, SEEK_SET);
 
     if ((cnt = dlb_fread(buf, 1, buflen, fh)) != buflen) {
@@ -919,12 +919,18 @@ get_lua_version()
             lua_getglobal(L, "_VERSION");
             if (lua_isstring(L, -1))
                 vs = lua_tolstring (L, -1, &len);
-            if (vs && (int) len < sizeof g.lua_ver - 1)
+            if (vs && len < sizeof g.lua_ver) {
+                if (!strncmpi(vs, "Lua", 3)) {
+                    vs += 3;
+                    if (*vs == '-')
+                        vs += 1;
+                }
                 Strcpy(g.lua_ver, vs);
+            }
         }
         lua_close(L);
 #ifdef LUA_COPYRIGHT
-        if (sizeof LUA_COPYRIGHT < sizeof g.lua_copyright - 1)
+        if (sizeof LUA_COPYRIGHT <= sizeof g.lua_copyright)
             Strcpy(g.lua_copyright, LUA_COPYRIGHT);
 #endif
     }

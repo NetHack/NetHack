@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1575076762 2019/11/30 01:19:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1575161954 2019/12/01 00:59:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -47,8 +47,20 @@
 #endif
 #endif  /* !MAKEDEFS_C */
 
-void NDECL(build_options);
+#if defined(MAKEDEFS_C) || defined(CROSSCOMPILE_TARGET)
+/* REPRODUCIBLE_BUILD will change this to TRUE */
+static boolean date_via_env = FALSE;
+
+static char *FDECL(version_string, (char *, const char *));
+static char *FDECL(version_id_string, (char *, const char *));
 static char *FDECL(bannerc_string, (char *, const char *));
+
+static int FDECL(case_insensitive_comp, (const char *, const char *));
+static void NDECL(make_version);
+static char *FDECL(eos, (char *));
+#endif /* MAKEDEFS_C || CROSSCOMPILE_TARGET */
+
+void NDECL(build_options);
 static void FDECL(opt_out_words, (char *, int *));
 static void NDECL(build_savebones_compat_string);
 static int idxopttext, done_runtime_opt_init_once = 0;
@@ -58,16 +70,6 @@ static char *opttext[120] = { 0 };
 char optbuf[BUFSZ];
 static struct version_info version;
 static const char opt_indent[] = "    ";
-
-#ifndef MAKEDEFS_C
-static int FDECL(case_insensitive_comp, (const char *, const char *));
-static void NDECL(make_version);
-static char *FDECL(version_id_string, (char *, const char *));
-static char *FDECL(version_string, (char *, const char *));
-static char *FDECL(eos, (char *));
-/* REPRODUCIBLE_BUILD will change this to TRUE */
-static boolean date_via_env = FALSE;
-#endif /* !MAKEDEFS_C */
 
 struct win_info {
     const char *id, /* DEFAULT_WINDOW_SYS string */
@@ -220,6 +222,8 @@ make_version()
     return;
 }
 
+#if defined(MAKEDEFS_C) || defined(CROSSCOMPILE_TARGET)
+
 static char *
 version_string(outbuf, delim)
 char *outbuf;
@@ -262,6 +266,8 @@ const char *build_date;
     return outbuf;
 }
 
+/* still within #if MAKDEFS_C || CROSSCOMPILE_TARGET */
+
 static char *
 bannerc_string(outbuf, build_date)
 char *outbuf;
@@ -292,6 +298,8 @@ const char *build_date;
 #endif
     return outbuf;
 }
+
+#endif /* MAKEDEFS_C || CROSSCOMPILE_TARGET */
 
 static int
 case_insensitive_comp(s1, s2)
@@ -653,7 +661,8 @@ build_options()
             (const char *) 0
         };
 
-        /* add lua copyright notice */
+        /* add lua copyright notice;
+           ":TAG:" substitutions are deferred to caller */
         for (i = 0; lua_info[i]; ++i) {
             opttext[idxopttext] = strdup(lua_info[i]);
             if (idxopttext < (MAXOPT - 1))
