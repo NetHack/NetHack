@@ -227,6 +227,7 @@ register int col, row;
     }
 }
 
+#if 0
 int
 has_color(int color)
 {
@@ -237,6 +238,7 @@ has_color(int color)
     return 0;
 #endif
 }
+#endif
 
 void
 home()
