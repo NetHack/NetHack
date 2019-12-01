@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1575173934 2019/12/01 04:18:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.115 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1575214670 2019/12/01 15:37:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1589,7 +1589,6 @@ struct obj *otmp;
         nomul(delay);
         multi_reason = "disrobing";
         if (is_helmet(otmp)) {
-            /* ick... */
             what = helm_simple_name(otmp);
             afternmv = Helmet_off;
         } else if (is_gloves(otmp)) {
