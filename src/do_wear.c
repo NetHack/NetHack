@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1574638390 2019/11/24 23:33:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1575173934 2019/12/01 04:18:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1577,28 +1577,46 @@ int
 armoroff(otmp)
 struct obj *otmp;
 {
-    register int delay = -objects[otmp->otyp].oc_delay;
+    static char offdelaybuf[60];
+    int delay = -objects[otmp->otyp].oc_delay;
+    const char *what = 0;
 
     if (cursed(otmp))
         return 0;
+    /* this used to make assumptions about which types of armor had
+       delays and which didn't; now both are handled for all types */
     if (delay) {
         nomul(delay);
         multi_reason = "disrobing";
         if (is_helmet(otmp)) {
             /* ick... */
-            nomovemsg = !strcmp(helm_simple_name(otmp), "hat")
-                            ? "You finish taking off your hat."
-                            : "You finish taking off your helmet.";
+            what = helm_simple_name(otmp);
             afternmv = Helmet_off;
         } else if (is_gloves(otmp)) {
-            nomovemsg = "You finish taking off your gloves.";
+            what = gloves_simple_name(otmp);
             afternmv = Gloves_off;
         } else if (is_boots(otmp)) {
-            nomovemsg = "You finish taking off your boots.";
+            what = c_boots;
             afternmv = Boots_off;
-        } else {
-            nomovemsg = "You finish taking off your suit.";
+        } else if (is_suit(otmp)) {
+            what = suit_simple_name(otmp);
             afternmv = Armor_off;
+        } else if (is_cloak(otmp)) {
+            what = cloak_simple_name(otmp);
+            afternmv = Cloak_off;
+        } else if (is_shield(otmp)) {
+            what = c_shield;
+            afternmv = Shield_off;
+        } else if (is_shirt(otmp)) {
+            what = c_shirt;
+            afternmv = Shirt_off;
+        } else {
+            impossible("Taking off unknown armor (%d: %d), delay %d",
+                       otmp->otyp, objects[otmp->otyp].oc_armcat, delay);
+        }
+        if (what) {
+            Sprintf(offdelaybuf, "You finish taking off your %s.", what);
+            nomovemsg = offdelaybuf;
         }
     } else {
         /* Be warned!  We want off_msg after removing the item to
@@ -1622,8 +1640,19 @@ struct obj *otmp;
             (void) Cloak_off();
         else if (is_shield(otmp))
             (void) Shield_off();
-        else
+        else if (is_helmet(otmp))
+            (void) Helmet_off();
+        else if (is_gloves(otmp))
+            (void) Gloves_off();
+        else if (is_boots(otmp))
+            (void) Boots_off();
+        else if (is_shirt(otmp))
+            (void) Shirt_off();
+        else if (is_suit(otmp))
             (void) Armor_off();
+        else
+            impossible("Taking off unknown armor (%d: %d), no delay",
+                       otmp->otyp, objects[otmp->otyp].oc_armcat);
         off_msg(otmp);
     }
     context.takeoff.mask = context.takeoff.what = 0L;
