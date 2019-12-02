@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhlua.c	$NHDT-Date: 1575161963 2019/12/01 00:59:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	nhlua.c	$NHDT-Date: 1575246766 2019/12/02 00:32:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.16 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -922,7 +922,7 @@ get_lua_version()
             if (vs && len < sizeof g.lua_ver) {
                 if (!strncmpi(vs, "Lua", 3)) {
                     vs += 3;
-                    if (*vs == '-')
+                    if (*vs == '-' || *vs == ' ')
                         vs += 1;
                 }
                 Strcpy(g.lua_ver, vs);
