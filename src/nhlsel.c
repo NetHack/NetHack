@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhlua.c	$NHDT-Date: 1574646948 2019/11/25 01:55:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1574646948 2019/11/25 01:55:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
