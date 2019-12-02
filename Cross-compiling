@@ -1,7 +1,197 @@
-Cross-compiling
+Cross-compiling NetHack 3.7 Last edit: December 1, 2019
 
-Placeholder for keeping cross-compiling notes for NetHack
+The NetHack 3.7 build process differs from the build process of previous
+versions in some important ways that make it possible to use a cross-compiler
+running on one platform (the "host" platform of the build) to produce a binary
+NetHack package that can execute on an entirely different platform.
 
-This file will be updated with more information prior
-to release.
+  +----------------------+
+  | Why cross-compile?   |
+  +----------------------+
+
+By using cross-compilers on host platforms with fast processors, plenty of RAM
+and storage resources, and an available cross-compiler, it may be possible to
+keep or resurrect a working version of NetHack on platforms that are now too
+constrained to carry out the build process natively on the platform any more.
+
+Some of the constraints in carrying out a native build on the desired target
+may include, but not necessarily be limited to, any of the following:
+
+  o Access: Somebody with a working knowledge of the NetHack build process may
+    not have the desired target build platform available to them. Conversly,
+    somebody with a keen knowledge of the target platform, and access to it,
+    may not be all that familiar with the NetHack build process.
+
+  o Resources: Address space limitations, insufficient RAM, low amounts of disk
+    storage, slow processor performance, may impede the ability to execute the
+    compile process on the target platform.
+
+  o Compilers: Some of the native compilers on historical platforms may only
+    support the particular dialect of C that was popular when the platform and
+    compiler were in their prime. 
+
+Another useful potential result of cross-compiling, is that it paves the way
+for carrying out test and production builds of NetHack for multiple target
+platforms through automated steps carried out on the host platform(s).
+
+
+  +---------------------------------+
+  | Building NetHack 3.6 (before)   |
+  +---------------------------------+
+
+Very generally, the build of NetHack in past versions required the following
+steps to be carried out:
+
+    1. Compile and link util/makedefs.
+    2. Run makedefs repeatedly with different command line options to produce
+       several output files that are required for:
+        (a) additional build steps to follow, including some header
+            files: pm.h, onames.h, date.h.
+        (b) creation of files, containing information required by,
+            or about the game during its execution, that are stored in a 
+            portable, platform-independent way, that need to be inserted
+            into the game package.
+        (c) creation of files containing information required by, or about
+            the game during its execution, that are stored in an architecture
+            and/or platform and/or operating system dependent way, that need
+            to be inserted into the game package (the quest text format is 
+            one example).
+    3. Compile and link the level compiler. This step needs to execute 
+       work-alike tools to lex and yacc, or needs to build pre-built lex and
+       yacc output (.c, .h files) that are provided in the sys/share part of
+       the NetHack source code tree.
+    4. Execute the level compiler to read dat/*.des files and create
+       a set of binary output files that are architecture and/or operating 
+       system dependent on the build platform, for use by the game during
+       its execution.
+    5. Compile and link the dungeon compiler. Like the level compiler, this
+       step needs to execute work-alike tools to lex and yacc, or needs to 
+       build pre-built lex and yacc output (.c, .h files) that are provided
+       in the sys/share part of the NetHack source code tree.
+    6. Execute the dungeon compiler to read dat/dungeon.def and create 
+       a set of binary output files that are architecture and/or operating
+       system dependent on the build platform, for use by the game during
+       its execution.
+    7. Compile and link several less critical utilities such as uudecode,
+       tile-generation utilities, and so forth, all of which need to execute
+       on the build platform during the build process to produce output files
+       for use during the game, that are reasonably portable (not architecture
+       and/or operating system dependent; only the output of the utilities
+       becomes part of the game package, not the executable utilities
+       themselves.
+    8. Compile and link the game itself.
+    9. Package the game and its required files including the output from
+       previous steps 2b, 2c, 4, 6, 7 and 8 above.
+
+Steps 1, 2a, 2b, 7, and 9 above are not impediments to cross-compiling NetHack.
+
+Steps 2c, 3, 4, 5, 6 and 8 above are impediments to cross-compiling NetHack.
+
+That's because the files that those steps produce are very much tied to the
+platform where the build of NetHack is being carried out. Variations between
+platforms (such as 32-bit vs 64-bit, integer sizes, pointer sizes, processor
+byte order, data alignment requirements, struct padding and the way bitfields
+are stored) impact the portability of those data files between different
+platforms and operating systems. If all those things happen to match, the files
+might, just might, be usable across platforms, but the chances are against it,
+and that certainly cannot be counted on.
+
+  +--------------------------------------+
+  | Building NetHack 3.7 (going forward) |
+  +--------------------------------------+
+
+Again, very generally, the build of NetHack in 3.7 requires the following
+steps to be carried out:
+
+    1. Compile and link util/makedefs.
+    2. Run makedefs repeatedly with different command line options to produce
+       several output files that are required for:
+        (a) additional build steps to follow, including some header
+            files: pm.h, onames.h, date.h.
+        (b) creation of files, containing information required by,
+            or about the game during its execution, that are stored in a 
+            portable, platform-independent way, that need to be inserted
+            into the game package.
+    3. Compile and link several less critical utilities such as uudecode,
+       tile-generation utilities, and so forth, all of which need to execute
+       on the build platform during the build process to produce output files
+       for use during the game, that are reasonably portable (not architecture
+       and/or operating system dependent; only the output of the utilities
+       becomes part of the game package, not the executable utilities
+       themselves.
+    4. Compile and link the game itself.
+    5. Package the game and its required files including the output from
+       previous steps 2b, 2c, 4, 6, 7 and 8 above.
+
+Step 4 is now the only impediment to cross-compiling NetHack, and is resolved
+by executing step 4 using a cross-compiler that runs on the build (host) 
+platform to produce a resulting binary for the target platform, instead of
+executing the native compiler.
+
+  +--------------------------------------------------------+
+  | How was the build procedure reduced to those 5 steps ? |
+  +--------------------------------------------------------+
+
+The following are among several design changes planned in NetHack 3.7,
+and these specific changes are what altered the build process to make
+cross-compiling possible:
+
+    o  There is no creation of platform-dependent files, such as the quest
+       text files, by makedefs during the build process. Instead, the quest
+       text files have been converted to Lua and are inserted into the game
+       package for processing by the embedded Lua <fixme: interpreter?> 
+       during execution of NetHack.
+
+    o  There is no build-time level compiler involved. Instead, the level
+       descriptions have been converted to Lua and are inserted into the game
+       package for processing by the embeded Lua <fixme: interpreter?> 
+       during execution of NetHack. 
+
+    o  There is no build-time dungeon compiler involved. Instead, the dungeon
+       description has been converted to Lua and is inserted into the game
+       package for processing by the embeded Lua <fixme: interpreter?> 
+       during execution of NetHack. 
+
+    o  Some of the build and option information that was formerly produced
+       during build time by makedefs, and contained information about the
+       build-platform specifically, is now produced at runtime within the
+       game under a cross-compiled build. As such, it now produces information
+       applicable to the target NetHack environment, not the build environment.
+
+
+  +--------------------------------------------------------+
+  | How can I help with the cross-compiling initiative?    |
+  +--------------------------------------------------------+
+
+    o  If you have a favourite target platform (let's call it XX-Platform for
+       example purposes) that you'd like to see NetHack be able to run on, do 
+       some research to find out if a cross-compiler exists that:
+           - produces output for XX-Platform.
+           - executes on a platform that you use and love (Linux, Windows,
+             Mac OS X are some examples of platforms that have cross-compilers
+             for other targets available)
+
+       Then, make the community, devteam, and so forth aware that you're starting
+       a cross-compile of NetHack for XX-Platform. You might need to ask some
+       "starting out" questions initially, and as you get deeper into it, you 
+       might need to ask some tougher questions.
+       
+       Perhaps consider forking from NetHack on GitHub, and do the
+       cross-compiler work there in your fork. Strive to get it to a point where
+       its ready to play-test on XX-Platform, or perhaps even use an emulator
+       of XX-Platform if one is available. We live in a time where plenty do.
+
+       Doing your work on a GitHub fork has the following advantages:
+           - It will make it really simple to integrate your work back into
+             the NetHack source tree if that's one of your goals.
+           - It will make it possible and straightforward to merge upstream
+             NetHack changes into your work for the XX-Platform cross-compile
+             so that it stays current with the game as it evolves.
+           - You may get help from others in the form of suggestions, or 
+             pull-requests, or offers to join the development. Chances are,
+             you aren't the only person out there that would like to 
+             establish/resurrect/maintain NetHack on XX-Platform.
+
+       Have fun!
+
 
