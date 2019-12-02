@@ -405,7 +405,7 @@ aligntyp atyp; /* A_NONE is used for 'any alignment' */
     struct permonst *ptr;
 
     /*
-     * As of 3.6.2:  [fix #H2204, 22-Dec-2010, eight years later...]
+     * 3.6.2:  [fixed #H2204, 22-Dec-2010, eight years later...]
      * pick a correctly aligned demon in one try.  This used to
      * use mkclass() to choose a random demon type and keep trying
      * (up to 20 times) until it got one with the desired alignment.
