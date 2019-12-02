@@ -1,4 +1,4 @@
-/* NetHack 3.6	minion.c	$NHDT-Date: 1572530226 2019/10/31 13:57:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	minion.c	$NHDT-Date: 1575245071 2019/12/02 00:04:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -390,7 +390,7 @@ aligntyp atyp; /* A_NONE is used for 'any alignment' */
     struct permonst *ptr;
 
     /*
-     * 3.6.2:  [fix #H2204, 22-Dec-2010, eight years later...]
+     * 3.6.2:  [fixed #H2204, 22-Dec-2010, eight years later...]
      * pick a correctly aligned demon in one try.  This used to
      * use mkclass() to choose a random demon type and keep trying
      * (up to 20 times) until it got one with the desired alignment.

@@ -260,8 +260,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,6,1,0
- PRODUCTVERSION 3,6,1,0
+ FILEVERSION 3,6,3,0
+ PRODUCTVERSION 3,6,3,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -276,17 +276,17 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "NetHack 3.6.2 for Smartphone 2002\0"
+            VALUE "Comments", "NetHack 3.6.3 for Smartphone 2002\0"
             VALUE "CompanyName", " \0"
             VALUE "FileDescription", "nethackm\0"
-            VALUE "FileVersion", "3, 6, 2, 0\0"
+            VALUE "FileVersion", "3, 6, 3, 0\0"
             VALUE "InternalName", "nethackm\0"
-            VALUE "LegalCopyright", "Copyright © 1985-2018\0"
+            VALUE "LegalCopyright", "Copyright © 1985-2019\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "nethackm.exe\0"
             VALUE "PrivateBuild", "090914\0"
             VALUE "ProductName", "NetHack For Smartphone\0"
-            VALUE "ProductVersion", "3, 6, 2, 0\0"
+            VALUE "ProductVersion", "3, 6, 3, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END

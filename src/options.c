@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1574982022 2019/11/28 23:00:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.416 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1575245078 2019/12/02 00:04:38 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.391 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -179,7 +179,7 @@ static const struct Bool_Opt {
 #else
     { "page_wait", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
-    /* 3.6.2: move perm_invent from flags to iflags and out of save file */
+    /* moved perm_invent from flags to iflags and out of save file in 3.6.2 */
     { "perm_invent", &iflags.perm_invent, FALSE, SET_IN_GAME },
     { "pickup_thrown", &flags.pickup_thrown, TRUE, SET_IN_GAME },
     { "popup_dialog", &iflags.wc_popup_dialog, FALSE, SET_IN_GAME },   /*WC*/
@@ -2595,7 +2595,7 @@ boolean tinitial, tfrom_file;
         }
         if (!op)
             return FALSE;
-        /* 3.6.2: strip leading and trailing spaces, condense internal ones */
+        /* stripped leading and trailing spaces, condensed internal ones in 3.6.2 */
         mungspaces(op);
         if (!g.opt_initial) {
             struct fruit *f;

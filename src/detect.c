@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1574882659 2019/11/27 19:24:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1575245054 2019/12/02 00:04:14 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1334,7 +1334,7 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
      * Unlike when casting the spell, it is much too intrustive when
      * in the midst of walking around or combatting monsters.
      *
-     * For 3.6.2, show terrain, then object, then monster like regular
+     * As of 3.6.2, show terrain, then object, then monster like regular
      * map updating, except in this case the map locations get marked
      * as seen from every direction rather than just from direction of
      * hero.  Skilled spell marks revealed objects as 'seen up close'

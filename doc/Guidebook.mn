@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.333 $ $NHDT-Date: 1574900824 2019/11/28 00:27:04 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.334 $ $NHDT-Date: 1575245028 2019/12/02 00:03:48 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "November 27, 2019
+.ds f2 "December 1, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4807,7 +4807,7 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 .PL %%
 literal \(oq\f(CR%\fP\(cq
 .PL %v
-version (eg. \(lq\f(CR3.6.2\-0\fP\(rq)
+version (eg. \(lq\f(CR3.6.3\-0\fP\(rq)
 .PL %u
 game UID
 .PL %t

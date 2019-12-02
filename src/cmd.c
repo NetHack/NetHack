@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1573346187 2019/11/10 00:36:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.349 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1575245052 2019/12/02 00:04:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.350 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2014,7 +2014,7 @@ int final;
         enlght_out(buf);
     }
 
-    /* 3.6.2: dungeon level, so that ^X really has all status info as
+    /* As of 3.6.2: dungeon level, so that ^X really has all status info as
        claimed by the comment below; this reveals more information than
        the basic status display, but that's one of the purposes of ^X;
        similar information is revealed by #overview; the "You died in
