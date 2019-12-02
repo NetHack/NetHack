@@ -1,12 +1,12 @@
-         NetHack 3.6.3 beta1 -- General information
+         NetHack 3.6.3 post-beta1 -- General information
 
 NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.3 beta1 is not an official release of NetHack. It 
-currently contains a collection of over 150 bug fixes to NetHack 3.6.2
-and more than 16 enhancements and community contributions. The file 
+NetHack 3.6.3 post-beta1 is not an official release of NetHack. It 
+currently contains a collection of over 190 bug fixes to NetHack 3.6.2
+and over 22 game enhancements and community contributions. The file 
 doc/fixes36.3 in the source distribution has a full list of them. 
 The text in there was written for the development team's own use and is
 provided  "as is", so please do not ask us to further explain the entries
@@ -33,6 +33,7 @@ spoilers:
  *  Fixed ignoring of god's wrath when hero injured himself during altar kick 
  *  Fixed several cases where persistent inventory window was not updated
  *  Fixed temple priests or shopkeepers moving over other monsters
+ *  Fixed a crash-causing bug when putting on levitation boots over a sink
  *  Ensured that thrown or kicked objects will end up in bones
  *  Made water go all the way to the edges of level on the Plane of Water
  *  Made clouds disrupt line of sight along the edges of the Plane of Air
@@ -42,6 +43,8 @@ spoilers:
  *    the Windows platform
  *  Improved the layout and display of the player selection dialog used on the
  *     Windows graphical implementation
+ *  Improved performance of some tty versions by reducing the number of 
+ *     function calls made from mapglyph
  *  Allowed the msdos implementation to build with curses and PDCurses
  *  Over 100 other fixes and improvements
 
@@ -191,6 +194,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1572309271 2019/10/29 00:34:31 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.57 $
+# $NHDT-Date: 1575306309 2019/12/02 17:05:09 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.62 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
