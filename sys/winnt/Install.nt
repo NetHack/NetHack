@@ -5,7 +5,7 @@
                        NetHack 3.6 on a Windows system
                        (Windows 7/8.x/10 or later only)
          ==============================================================
-          Last revision: $NHDT-Date: 1554784481 2019/04/09 04:34:41 $
+          Last revision: $NHDT-Date: 1575245156 2019/12/02 00:05:56 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -16,7 +16,7 @@ contributed the port.
 
 Alex Kompel, Dion Nicolaas, Yitzhak Sapir, Derek S. Ray, Michael Allison,
 Pasi Kallinen, Bart House, and Janet Walz contributed to the maintainance
-of the tty and graphical windows versions of NetHack 3.6.2.
+of the tty and graphical windows versions of NetHack 3.6.3.
 
 You can build a TTY version of NetHack and a Windows Graphical 
 version.  You can use one of the following build environments:
@@ -93,11 +93,10 @@ using.  Change to the directory win\win32\vs2017 and run "build.bat".
 
  * Optional curses window-port support *
 
-Starting with 3.6.2, the community patch for a window-port that uses
-curses was incorporated into the NetHack source code tree. That window-port,
-which evolved from work originally done by Karl Garrison, has been used in
-several NetHack variants and on nethack.alt.org and on 
-www.hardfought.org/nethack/.
+Since 3.6.2, the community patch for a window-port that uses curses has been
+incorporated into the NetHack source code tree. That window-port, which 
+evolved from work originally done by Karl Garrison, has been used in several
+NetHack variants and on nethack.alt.org and on www.hardfought.org/nethack/.
 
 If you want to include the curses window-port support in your Visual Studio
 build, you will have to first obtain the PDCurses sources from
@@ -152,7 +151,7 @@ a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
 is set up for a 32-bit x86 version, but that's only because it will 
 run on the most number of existing Windows environments.
 
-NetHack's save files and bones files in the 3.6.2 release have not yet
+NetHack's save files and bones files in the 3.6.3 release have not yet
 evolved enough to allow them to interchange between the 32-bit version 
 and the 64-bit version (or between different platforms). Hopefully
 that will change in an upcoming release.
@@ -204,8 +203,8 @@ Setting Up
     source tree.
         cd src
 
-2.  Starting with 3.6.2, the community patch for an optional curses 
-    window-port was incorporated into the NetHack source code tree. That 
+2.  Since 3.6.2, the community patch for an optional curses window-port
+    has been incorporated into the NetHack source code tree. That 
     window-port, which evolved from work originally done by Karl Garrison,
     has been used in several NetHack variants and on nethack.alt.org and 
     on www.hardfought.org/nethack/. The optional curses window-port is 

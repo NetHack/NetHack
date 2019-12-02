@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1573940541 2019/11/16 21:42:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1575245090 2019/12/02 00:04:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -245,7 +245,7 @@ boolean force;      /* Quietly force this animal */
     }
     if (mtmp->data == &mons[PM_LONG_WORM]
         && (u.ux + u.dx != mtmp->mx || u.uy + u.dy != mtmp->my)) {
-        /* 3.6.2:  test_move(below) is used to check for trying to mount
+        /* As of 3.6.2:  test_move(below) is used to check for trying to mount
            diagonally into or out of a doorway or through a tight squeeze;
            attempting to mount a tail segment when hero was not adjacent
            to worm's head could trigger an impossible() in worm_cross()

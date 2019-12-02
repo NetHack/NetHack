@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1570227405 2019/10/04 22:16:45 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1575245091 2019/12/02 00:04:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -690,7 +690,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(youmonst.data))) {
             /* Try to use teleport away spell.
-               3.6.2: this used to require that you know the spellbook
+               Prior to 3.6.2 this used to require that you know the spellbook
                (probably just intended as an optimization to skip the
                lookup loop) but it is possible to know and cast a spell
                after forgetting its book due to amnesia. */

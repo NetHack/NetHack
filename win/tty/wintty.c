@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1571787079 2019/10/22 23:31:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.223 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1575245194 2019/12/02 00:06:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.227 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3963,7 +3963,7 @@ unsigned long *colormasks;
         enclev = stat_cap_indx();
         break;
     }
-    /* 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
+    /* As of 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
     return;
 }
 

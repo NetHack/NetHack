@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1575056306 2019/11/29 19:38:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1575245055 2019/12/02 00:04:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.196 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -167,7 +167,7 @@ const char *verb;
                        since trapped target is a sitting duck */
                     int damage, dieroll = 1;
 
-                    /* 3.6.2: this was calling hmon() unconditionally
+                    /* As of 3.6.2: this was calling hmon() unconditionally
                        so always credited/blamed the hero but the boulder
                        might have been thrown by a giant or launched by
                        a rolling boulder trap triggered by a monster or

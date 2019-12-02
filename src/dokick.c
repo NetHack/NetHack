@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1562462061 2019/07/07 01:14:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1575245057 2019/12/02 00:04:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1763,7 +1763,7 @@ long num;
     Strcpy(obuf, optr);
 
     if (num) { /* means: other objects are impacted */
-        /* 3.6.2: use a separate buffer for the suffix to avoid risk of
+        /* As of 3.6.2: use a separate buffer for the suffix to avoid risk of
            overrunning obuf[] (let pline() handle truncation if necessary) */
         Sprintf(xbuf, " %s %s object%s", otense(otmp, "hit"),
                 (num == 1L) ? "another" : "other", (num > 1L) ? "s" : "");

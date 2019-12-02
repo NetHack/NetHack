@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1573290418 2019/11/09 09:06:58 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1575245076 2019/12/02 00:04:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.255 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -435,7 +435,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     buf = nextobuf() + PREFIX; /* leave room for "17 -3 " */
     if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
         actualn = Japanese_item_name(typ);
-    /* 3.6.2: this used to be part of 'dn's initialization, but it
+    /* As of 3.6.2: this used to be part of 'dn's initialization, but it
        needs to come after possibly overriding 'actualn' */
     if (!dn)
         dn = actualn;

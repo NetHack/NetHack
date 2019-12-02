@@ -147,7 +147,7 @@ Notes:
 
 1.  Save files and bones files from 3.4.x and earlier versions
     will not work with 3.6.3, but save files and bones file from 3.6.0,
-    3.6.1, and 3.6.2 should work. The scoreboard file (RECORD) from 3.6.x
+    through 3.6.2 should work. The scoreboard file (RECORD) from 3.6.x
     or 3.4.x or 3.3.x will work.
 
 2.  To specify user-preference options in your environment, define the
@@ -507,6 +507,6 @@ Notes:
 minimally updated 9-NOV-2015...
 and again 5-MAY-2019...
 
-# NetHack 3.6  Install.vms       $NHDT-Date: 1557701510 2019/05/12 22:51:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.15 $
+# NetHack 3.6  Install.vms       $NHDT-Date: 1575245132 2019/12/02 00:05:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $
 # Copyright (c) 2003 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.

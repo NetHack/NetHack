@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1573346190 2019/11/10 00:36:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.266 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1575245062 2019/12/02 00:04:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.267 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -471,8 +471,8 @@ const genericptr vptr2;
  *      (fragile) or by avoiding sortloot() during inventory display
  *      (more robust).
  *
- *      3.6.2 reverts to the temporary array of ordered obj pointers
- *      but has sortloot() do the counting and allocation.  Callers
+ *      As of 3.6.2: revert to the temporary array of ordered obj pointers
+ *      but have sortloot() do the counting and allocation.  Callers
  *      need to use array traversal instead of linked list traversal
  *      and need to free the temporary array when done.  And the
  *      array contains 'struct sortloot_item' (aka 'Loot') entries

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1573688693 2019/11/13 23:44:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1575245065 2019/12/02 00:04:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1402,7 +1402,7 @@ register struct attack *mattk;
                      (Teleport_control && !Stunned && !unconscious()) ? ""
                      : "very ");
             tele();
-            /* 3.6.2:  make sure damage isn't fatal; previously, it
+            /* As of 3.6.2:  make sure damage isn't fatal; previously, it
                was possible to be teleported and then drop dead at
                the destination when QM's 1d4 damage gets applied below;
                even though that wasn't "wrong", it seemed strange,
@@ -2019,7 +2019,7 @@ struct attack *mattk;
               is_animal(mtmp->data) ? "regurgitates" : "expels");
         expels(mtmp, mtmp->data, FALSE);
     } else if (!u.uswldtim || youmonst.data->msize >= MZ_HUGE) {
-        /* 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
+        /* As of 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
            expels now so the !u.uswldtim case is no longer possible;
            however, polymorphing into a huge form while already
            swallowed is still possible */
