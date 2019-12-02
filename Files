@@ -99,11 +99,11 @@ mfndpos.h     micro.h       mkroom.h      monattk.h     mondata.h
 monflag.h     monst.h       monsym.h      ntconf.h      obj.h
 objclass.h    os2conf.h     patchlevel.h  pcconf.h      permonst.h
 prop.h        qtext.h       quest.h       rect.h        region.h
-rm.h          skills.h      sp_lev.h      spell.h       sys.h
-system.h      tcap.h        tileset.h     timeout.h     tosconf.h
-tradstdc.h    trampoli.h    trap.h        unixconf.h    vision.h
-vmsconf.h     wceconf.h     winami.h      wincurs.h     winprocs.h
-wintype.h     you.h         youprop.h
+rm.h          sfprocs.h     sfproto.h     skills.h      sp_lev.h
+spell.h       sys.h         system.h      tcap.h        tileset.h
+timeout.h     tosconf.h     tradstdc.h    trampoli.h    trap.h
+unixconf.h    vision.h      vmsconf.h     wceconf.h     winami.h
+wincurs.h     winprocs.h    wintype.h     you.h         youprop.h
 
 (file for tty versions)
 wintty.h
@@ -139,12 +139,11 @@ sys/amiga:
 (files for Amiga versions - untested for 3.6.3)
 Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
 amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
-amii.hlp      amimenu.c     amirip.c      amisnd.c      amistack.c
-amitty.c      amiwind.c     amiwind.p     clipwin.c     colorwin.c
-cvtsnd.c      grave16.xpm   ifchange      mkdmake       txt2iff.c
-winami.c      winami.p      winchar.c     windefs.h     winext.h
-winfuncs.c    winkey.c      winmenu.c     winproto.h    winreq.c
-winstr.c      xpm2iff.c
+amii.hlp      amimenu.c     amirip.c      amistack.c    amitty.c
+amiwind.c     amiwind.p     clipwin.c     colorwin.c    grave16.xpm
+ifchange      mkdmake       txt2iff.c     winami.c      winami.p
+winchar.c     windefs.h     winext.h      winfuncs.c    winkey.c
+winmenu.c     winproto.h    winreq.c      winstr.c      xpm2iff.c
 
 sys/atari:
 (files for Atari version - untested for 3.6.3)
@@ -160,9 +159,8 @@ sys/mac:
 Files.r       Install.mw    MacHelp       NHDeflts      NHrsrc.hqx
 NHsound.hqx   News          README        carbon.plist  dprintf.c
 maccurs.c     macerrs.c     macfile.c     machelp.hqx   macmain.c
-macmenu.c     macsnd.c      mactopl.c     mactty.c      macunix.c
-macwin.c      mgetline.c    mmodal.c      mrecover.c    mrecover.hqx
-mttymain.c
+macmenu.c     mactopl.c     mactty.c      macunix.c     macwin.c
+mgetline.c    mmodal.c      mrecover.c    mrecover.hqx  mttymain.c
 
 sys/msdos:
 (files for MSDOS version - tested for 3.6.3 via cross-compile only)
@@ -224,11 +222,6 @@ cppregex.cpp
 (pmatch regex for other versions)
 pmatchregex.c
 
-sys/share/sounds:
-(files for Amiga and Macintosh versions)
-README       bell.uu      bugle.uu     erthdrum.uu  firehorn.uu  frsthorn.uu
-lethdrum.uu  mgcflute.uu  mgcharp.uu   toolhorn.uu  wdnflute.uu  wdnharp.uu
-
 sys/unix:
 (files for UNIX versions)
 Install.unx     Makefile.dat    Makefile.doc    Makefile.src
@@ -239,9 +232,6 @@ unixmain.c      unixres.c       unixunix.c
 
 (files for replacement cpp, only needed by some ancient UNIX systems)
 cpp1.shr  cpp2.shr  cpp3.shr
-
-(file for sound driver for 386 UNIX)
-snd86unx.shr
 
 sys/unix/NetHack.xcodeproj:
 (file for UNIX versions)
