@@ -121,7 +121,7 @@ steps to be carried out:
        themselves.
     4. Compile and link the game itself.
     5. Package the game and its required files including the output from
-       previous steps 2b, 2c, 4, 6, 7 and 8 above.
+       previous steps 2b, 3 and 4 above.
 
 Step 4 is now the only impediment to cross-compiling NetHack, and is resolved
 by executing step 4 using a cross-compiler that runs on the build (host) 
