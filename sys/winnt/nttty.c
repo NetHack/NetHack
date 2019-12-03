@@ -13,7 +13,6 @@
  *
  */
 
-
 #ifdef WIN32
 #define NEED_VARARGS /* Uses ... */
 #include "win32api.h"
@@ -428,8 +427,17 @@ boolean *valid;
 boolean numberpad;
 int portdebug;
 {
-    int ch = keyboard_handler.pProcessKeystroke(
+    int ch;
+
+#ifdef QWERTZ_SUPPORT
+    if (Cmd.swap_yz)
+        numberpad |= 0x10;
+#endif
+    ch = keyboard_handler.pProcessKeystroke(
                     console.hConIn, ir, valid, numberpad, portdebug);
+#ifdef QWERTZ_SUPPORT
+    numberpad &= ~0x10;
+#endif
     /* check for override */
     if (ch && ch < MAX_OVERRIDES && key_overrides[ch])
         ch = key_overrides[ch];
@@ -448,13 +456,20 @@ tgetch()
     int mod;
     coord cc;
     DWORD count;
+    boolean numpad = iflags.num_pad;
+
     really_move_cursor();
     if (iflags.debug_fuzzer)
         return randomkey();
+#ifdef QWERTZ_SUPPORT
+    if (Cmd.swap_yz)
+        numpad |= 0x10;
+#endif
+
     return (g.program_state.done_hup)
                ? '\033'
                : keyboard_handler.pCheckInput(
-                   console.hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
+                   console.hConIn, &ir, &count, numpad, 0, &mod, &cc);
 }
 
 int
@@ -464,6 +479,8 @@ int *x, *y, *mod;
     int ch;
     coord cc;
     DWORD count;
+    boolean numpad = iflags.num_pad;
+
     really_move_cursor();
     if (iflags.debug_fuzzer) {
         int poskey = randomkey();
@@ -471,13 +488,22 @@ int *x, *y, *mod;
         if (poskey == 0) {
             *x = rn2(console.width);
             *y = rn2(console.height);
-        }
+        if (poskey == 0) {
+            *x = rn2(console.width);
+            *y = rn2(console.height);        }
         return poskey;
     }
+#ifdef QWERTZ_SUPPORT
+    if (Cmd.swap_yz)
+        numpad |= 0x10;
+#endif
     ch = (g.program_state.done_hup)
              ? '\033'
              : keyboard_handler.pCheckInput(
-                   console.hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
+                   console.hConIn, &ir, &count, numpad, 1, mod, &cc);
+#ifdef QWERTZ_SUPPORT
+    numpad &= ~0x10;
+#endif
     if (!ch) {
         *x = cc.x;
         *y = cc.y;
@@ -1908,12 +1934,17 @@ void nethack_enter_nttty()
     HKL keyboard_layout = GetKeyboardLayout(0);
     DWORD primary_language = (UINT_PTR) keyboard_layout & 0x3f;
 
-    if (primary_language == LANG_ENGLISH) {
-        if (!load_keyboard_handler("nhdefkey"))
-            error("Unable to load nhdefkey.dll");
-    } else {
-        if (!load_keyboard_handler("nhraykey"))
-            error("Unable to load nhraykey.dll");
+    /* This was overriding the handler that had already
+       been loaded during options parsing. Needs to
+       check first */
+    if (!iflags.altkeyhandler[0]) {
+        if (primary_language == LANG_ENGLISH) {
+            if (!load_keyboard_handler("nhdefkey"))
+                error("Unable to load nhdefkey.dll");
+        } else {
+            if (!load_keyboard_handler("nhraykey"))
+                error("Unable to load nhraykey.dll");
+        }
     }
 }
 #endif /* TTY_GRAPHICS */
