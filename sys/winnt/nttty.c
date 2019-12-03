@@ -430,7 +430,7 @@ int portdebug;
     int ch;
 
 #ifdef QWERTZ_SUPPORT
-    if (Cmd.swap_yz)
+    if (g.Cmd.swap_yz)
         numberpad |= 0x10;
 #endif
     ch = keyboard_handler.pProcessKeystroke(
@@ -462,7 +462,7 @@ tgetch()
     if (iflags.debug_fuzzer)
         return randomkey();
 #ifdef QWERTZ_SUPPORT
-    if (Cmd.swap_yz)
+    if (g.Cmd.swap_yz)
         numpad |= 0x10;
 #endif
 
@@ -488,13 +488,11 @@ int *x, *y, *mod;
         if (poskey == 0) {
             *x = rn2(console.width);
             *y = rn2(console.height);
-        if (poskey == 0) {
-            *x = rn2(console.width);
-            *y = rn2(console.height);        }
+        }
         return poskey;
     }
 #ifdef QWERTZ_SUPPORT
-    if (Cmd.swap_yz)
+    if (g.Cmd.swap_yz)
         numpad |= 0x10;
 #endif
     ch = (g.program_state.done_hup)
