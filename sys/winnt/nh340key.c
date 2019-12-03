@@ -52,6 +52,13 @@ DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 #define PADKEYS (KEYPADHI - KEYPADLO + 1)
 #define iskeypad(x) (KEYPADLO <= (x) && (x) <= KEYPADHI)
 
+#ifdef QWERTZ_SUPPORT
+/* when 'numberpad' is 0 and Cmd.swap_yz is True
+   (signaled by setting 0x10 on boolean numpad argument)
+   treat keypress of numpad 7 as 'z' rather than 'y' */
+static boolean qwertz = FALSE;
+#endif
+
 /*
  * Keypad keys are translated to the normal values below.
  * Shifted keypad keys are translated to the
@@ -110,6 +117,15 @@ int portdebug;
     int altseq = 0;
     const struct pad *kpad;
 
+#ifdef QWERTZ_SUPPORT
+    if (numberpad & 0x10) {
+        numberpad &= ~0x10;
+        qwertz = TRUE;
+    } else {
+        qwertz = FALSE;
+    }
+#endif
+
     shiftstate = 0L;
     ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
     scan = ir->Event.KeyEvent.wVirtualScanCode;
@@ -149,6 +165,14 @@ int portdebug;
         } else {
             ch = kpad[scan - KEYPADLO].normal;
         }
+#ifdef QWERTZ_SUPPORT
+        /* OPTIONS=number_pad:-1 is for qwertz keyboard; for that setting,
+           'numberpad' will be 0; core swaps y to zap, z to move northwest;
+           we want numpad 7 to move northwest, so when qwertz is set,
+           tell core that user who types numpad 7 typed z rather than y */
+        if (qwertz && kpad[scan - KEYPADLO].normal == 'y')
+            ch += 1; /* changes y to z, Y to Z, ^Y to ^Z */
+#endif /*QWERTZ_SUPPORT*/
     } else if (altseq > 0) { /* ALT sequence */
         if (vk == 0xBF)
             ch = M('?');
@@ -238,6 +262,15 @@ coord *cc;
 #endif
     int ch;
     boolean valid = 0, done = 0;
+
+#ifdef QWERTZ_SUPPORT
+    if (numpad & 0x10) {
+        numpad &= ~0x10;
+        qwertz = TRUE;
+    } else {
+        qwertz = FALSE;
+    }
+#endif
     while (!done) {
 #if defined(SAFERHANGUP)
         dwWait = WaitForSingleObjectEx(hConIn,   // event object to wait for
@@ -249,7 +282,14 @@ coord *cc;
         ReadConsoleInput(hConIn, ir, 1, count);
         if (mode == 0) {
             if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
+#ifdef QWERTZ_SUPPORT
+                if (qwertz)
+                    numpad |= 0x10;
+#endif
                 ch = ProcessKeystroke(hConIn, ir, &valid, numpad, 0);
+#ifdef QWERTZ_SUPPORT
+                numpad &= ~0x10;
+#endif                    
                 done = valid;
             }
         } else {
