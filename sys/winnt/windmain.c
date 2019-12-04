@@ -1199,7 +1199,9 @@ tty_self_recover_prompt()
     c = 'n';
     ct = 0;
     saved_procs = windowprocs;
-    safe_routines();
+    if (!WINDOWPORT("safe-startup"))
+        windowprocs = *get_safe_procs(2); /* arg 2 uses no-newline variant */
+    windowprocs.win_nhgetch = windows_console_custom_nhgetch;
     raw_print("\n");
     raw_print("\n");
     raw_print("\n");
