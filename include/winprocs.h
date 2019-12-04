@@ -451,6 +451,7 @@ extern void FDECL(safe_status_enablefield,
 extern void FDECL(safe_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 extern boolean NDECL(safe_can_suspend);
 extern void FDECL(stdio_raw_print, (const char *));
+extern void FDECL(stdio_nonl_raw_print, (const char *));
 extern void FDECL(stdio_raw_print_bold, (const char *));
 extern void NDECL(stdio_wait_synch);
 extern int NDECL(stdio_nhgetch);

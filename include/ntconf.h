@@ -106,7 +106,7 @@ extern void FDECL(interject, (int));
 #ifdef strcasecmp
 #undef strcasecmp
 #endif
-extern void NDECL(getlock);
+/* extern int NDECL(getlock); */
 #endif
  
 #ifdef _MSC_VER
