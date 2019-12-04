@@ -538,7 +538,7 @@ stdio_raw_print(str)
 const char *str;
 {
     if (str)
-        fprintf(stdout, "%s\n", str);
+        fprintf(stdout, "%s", str);
     return;
 }
 

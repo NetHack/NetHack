@@ -38,6 +38,13 @@ extern void NDECL(backsp);
 extern void NDECL(clear_screen);
 #undef E
 
+#ifdef _MSC_VER
+#ifdef kbhit
+#undef kbhit
+#endif
+#include <conio.h.>
+#endif
+
 #ifdef PC_LOCKING
 static int NDECL(eraseoldlocks);
 #endif
@@ -49,6 +56,8 @@ char FDECL(windows_yn_function, (const char *, const char *, CHAR_P));
 static void FDECL(windows_getlin, (const char *, char *));
 extern int NDECL(windows_console_custom_nhgetch);
 void NDECL(safe_routines);
+int NDECL(tty_self_recover_prompt);
+int NDECL(other_self_recover_prompt);
 
 char orgdir[PATHLEN];
 boolean getreturn_enabled;
@@ -459,7 +468,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         fnamebuf, encodedfnamebuf, BUFSZ);
     Sprintf(g.lock, "%s", encodedfnamebuf);
     /* regularize(lock); */ /* we encode now, rather than substitute */
-    getlock();
+    if (getlock() == 0)
+        nethack_exit(EXIT_SUCCESS);
 
     /* Set up level 0 file to keep the game state.
      */
@@ -1000,10 +1010,10 @@ eraseoldlocks()
     return (1);   /* success! */
 }
 
-void
+int
 getlock()
 {
-    register int fd, c, ci, ct, ern;
+    register int fd, ern, prompt_result = 0;
     int fcmask = FCMASK;
 #ifndef SELF_RECOVER
     char tbuf[BUFSZ];
@@ -1011,6 +1021,7 @@ getlock()
     const char *fq_lock;
 #define OOPS_BUFSZ 512
     char oops[OOPS_BUFSZ];
+    boolean istty = WINDOWPORT("tty");
 
     /* we ignore QUIT and INT at this point */
     if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
@@ -1041,56 +1052,41 @@ getlock()
 
     (void) nhclose(fd);
 
-    if (iflags.window_inited || WINDOWPORT("curses")) {
-#ifdef SELF_RECOVER
-        c = yn("There are files from a game in progress under your name. "
-               "Recover?");
-#else
-        pline("There is already a game in progress under your name.");
-        pline("You may be able to use \"recover %s\" to get it back.\n",
-              tbuf);
-        c = yn("Do you want to destroy the old game?");
-#endif
-    } else {
-        c = 'n';
-        ct = 0;
-#ifdef SELF_RECOVER
-        raw_print("There are files from a game in progress under your name. "
-              "Recover? [yn]");
-#else
-        raw_print("\nThere is already a game in progress under your name.\n");
-        raw_print("If this is unexpected, you may be able to use \n");
-        raw_print("\"recover %s\" to get it back.", tbuf);
-        raw_print("\nDo you want to destroy the old game? [yn] ");
-#endif
-        while ((ci = nhgetch()) != '\n') {
-            if (ct > 0) {
-                raw_print("\b \b");
-                ct = 0;
-                c = 'n';
-            }
-            if (ci == 'y' || ci == 'n' || ci == 'Y' || ci == 'N') {
-                ct = 1;
-                c = ci;
-            }
-        }
-    }
-    if (c == 'y' || c == 'Y')
-#ifndef SELF_RECOVER
-        if (eraseoldlocks()) {
-            if (WINDOWPORT("tty"))
-                clear_screen(); /* display gets fouled up otherwise */
-            goto gotlock;
-        } else {
-            unlock_file(HLOCK);
-#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-            chdirx(orgdir, 0);
-#endif
-            raw_print("Couldn't destroy old game.");
-        }
-#else /*SELF_RECOVER*/
+    if (WINDOWPORT("tty"))
+        prompt_result = tty_self_recover_prompt();
+    else
+        prompt_result = other_self_recover_prompt();
+    /*
+     * prompt_result == 1  means recover old game.
+     * prompt_result == -1 means willfully destroy the old game.
+     * prompt_result == 0 should just exit.
+     */
+    Sprintf(oops, "You chose to %s.",
+                (prompt_result == -1)
+                    ? "destroy the old game and start a new one"
+                    : (prompt_result == 1)
+                        ? "recover the old game"
+                        : "not start a new game");
+    if (istty)
+        clear_screen();
+    pline(oops);
+    if (prompt_result == 1) {          /* recover */
         if (recover_savefile()) {
-            if (WINDOWPORT("tty"))
+#if 0
+            if (istty)
+                clear_screen(); /* display gets fouled up otherwise */
+#endif
+            goto gotlock;
+        } else {
+            unlock_file(HLOCK);
+#if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
+            chdirx(orgdir, 0);
+#endif
+            raw_print("Couldn't recover the old game.");
+        }
+    } else if (prompt_result < 0) {    /* destroy old game */
+        if (eraseoldlocks()) {
+            if (istty)
                 clear_screen(); /* display gets fouled up otherwise */
             goto gotlock;
         } else {
@@ -1098,16 +1094,15 @@ getlock()
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif
-            raw_print("Couldn't recover old game.");
+            raw_print("Couldn't destroy the old game.");
+            return 0;
         }
-#endif /*SELF_RECOVER*/
-    else {
+    } else {
         unlock_file(HLOCK);
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-        Sprintf(oops, "%s", "Cannot start a new game.");
-        raw_print(oops);
+        return 0;
     }
 
 gotlock:
@@ -1138,6 +1133,7 @@ gotlock:
             error("cannot close lock (%s)", fq_lock);
         }
     }
+    return 1;
 }
 #endif /* PC_LOCKING */
 
@@ -1178,4 +1174,133 @@ const char * b_path;
     return FALSE;
 }
 
+/*
+ * returns:
+ *     1 if game should be recovered
+ *    -1 if old game should be destroyed, allowing new game to proceed.
+ */
+int
+tty_self_recover_prompt()
+{
+    register int c, ci, ct, pl, retval = 0;
+    /* for saving/replacing functions, if needed */
+    struct window_procs saved_procs = {0};
+
+    pl = 1;
+    c = 'n';
+    ct = 0;
+    saved_procs = windowprocs;
+    safe_routines();
+    raw_print("\n");
+    raw_print("\n");
+    raw_print("\n");
+    raw_print("\n");
+    raw_print("\n");
+    raw_print("There are files from a game in progress under your name. ");
+    raw_print("Recover? [yn] ");
+
+ tty_ask_again:
+
+    while ((ci = nhgetch()) && !(ci == '\n' || ci == 13)) {
+        if (ct > 0) {
+            /* invalid answer */
+            raw_print("\b \b");
+            ct = 0;
+            c = 'n';
+        }
+        if (ci == 'y' || ci == 'n' || ci == 'Y' || ci == 'N') {
+            ct = 1;
+            c = ci;
+#ifdef _MSC_VER
+            _putch(ci);
+#endif
+        }
+    }
+
+    if (pl == 1 && (c == 'n' || c == 'N')) {
+        /* no to recover */
+        raw_print("\n\nAre you sure you wish to destroy the old game rather than try to\n");
+        raw_print("recover it? [yn] ");
+        c = 'n';
+        ct = 0;
+        pl = 2;
+        goto tty_ask_again;
+    }
+
+    if (pl == 2 && (c == 'n' || c == 'N')) {
+        /* no to destruction of old game */
+        retval = 0;
+    } else {
+        /* only yes answers get here */
+        if (pl == 2)
+            retval = -1;  /* yes, do destroy the old game anyway */
+        else
+            retval = 1;   /* yes, do recover the old game */
+    }
+    if (saved_procs.name[0]) {
+        windowprocs = saved_procs;
+        raw_clear_screen();
+    }
+    return retval;
+}
+
+int
+other_self_recover_prompt()
+{
+    register int c, ci, ct, pl, retval = 0;
+    boolean ismswin = WINDOWPORT("mswin"),
+            iscurses = WINDOWPORT("curses");
+
+    pl = 1;
+    c = 'n';
+    ct = 0;
+    if (iflags.window_inited || WINDOWPORT("curses")) {
+        c = yn("There are files from a game in progress under your name. "
+               "Recover?");
+    } else {
+        c = 'n';
+        ct = 0;
+        raw_print("There are files from a game in progress under your name. "
+              "Recover? [yn]");
+    }
+
+ other_ask_again:
+
+    if (!ismswin && !iscurses) {
+        while ((ci = nhgetch()) && !(ci == '\n' || ci == 13)) {
+            if (ct > 0) {
+                /* invalid answer */
+                raw_print("\b \b");
+                ct = 0;
+                c = 'n';
+            }
+            if (ci == 'y' || ci == 'n' || ci == 'Y' || ci == 'N') {
+                ct = 1;
+                c = ci;
+            }
+        }
+    }
+    if (pl == 1 && (c == 'n' || c == 'N')) {
+        /* no to recover */
+        c = yn("Are you sure you wish to destroy the old game, rather than try to "
+                  "recover it? [yn] ");
+        pl = 2;
+        if (!ismswin && !iscurses) {
+            c = 'n';
+            ct = 0;
+            goto other_ask_again;
+        }
+    }
+    if (pl == 2 && (c == 'n' || c == 'N')) {
+        /* no to destruction of old game */
+        retval = 0;
+    } else {
+        /* only yes answers get here */
+        if (pl == 2)
+            retval = -1;  /* yes, do destroy the old game anyway */
+        else
+            retval = 1;   /* yes, do recover the old game */
+    }
+    return retval;
+}
 /*windmain.c*/
