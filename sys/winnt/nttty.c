@@ -680,13 +680,37 @@ cl_end()
 void
 raw_clear_screen()
 {
-    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
+    if (WINDOWPORT("tty")) {
+        cell_t * back = console.back_buffer;
+        cell_t * front = console.front_buffer;
+        COORD pos;
+        DWORD unused;
+
+        for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
+            for (pos.X = 0; pos.X < console.width; pos.X++) {
+                 WriteConsoleOutputAttribute(console.hConOut, &back->attribute,
+                                             1, pos, &unused);
+                 front->attribute = back->attribute;
+                 if (console.has_unicode) {
+                     WriteConsoleOutputCharacterW(console.hConOut,
+                             &back->character, 1, pos, &unused);
+                 } else {
+                     char ch = (char)back->character;
+                     WriteConsoleOutputCharacterA(console.hConOut, &ch, 1, pos,
+                                                         &unused);
+                 }
+                 *front = *back;
+                 back++;
+                 front++;
+            }
+        }
+    }
 }
 
 void
 clear_screen()
 {
-    raw_clear_screen();
+    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);    
     home();
 }
 

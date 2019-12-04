@@ -73,7 +73,7 @@ DEBUGINFO = Y
 #    of your PDCurses C files.
 #
 #ADD_CURSES=Y
-#PDCURSES_TOP=..\..\pdcurses
+#PDCURSES_TOP=..\lib\pdcurses
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
