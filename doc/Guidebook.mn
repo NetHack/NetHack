@@ -5151,7 +5151,7 @@ fixes to NetHack 3.6.2.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP
 at
-.UR http://www.nethack.org/ .
+.UR https://www.nethack.org/ .
 .pg
 .hn 2
 SPECIAL THANKS
