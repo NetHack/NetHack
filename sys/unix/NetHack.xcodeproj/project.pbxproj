@@ -1717,7 +1717,7 @@
 				NH_DOC_DIR = "$(NH_ROOT_DIR)/doc";
 				NH_INC_DIR = "$(NH_ROOT_DIR)/include";
 				NH_INSTALL_DIR = "$(HOME)/nethackdir";
-				NH_LIB_DIR = /Users/mikeallison/Documents/devel/nhdev/NHsource/sys/unix/../../lib;
+				NH_LIB_DIR = "$(NH_ROOT_DIR)/sys/unix/../../lib";
 				NH_ROOT_DIR = "$(SOURCE_ROOT)/../..";
 				NH_SRC_DIR = "$(NH_ROOT_DIR)/src";
 				NH_UNIX_DIR = "$(NH_ROOT_DIR)/sys/unix";
@@ -1794,7 +1794,7 @@
 				NH_DOC_DIR = "$(NH_ROOT_DIR)/doc";
 				NH_INC_DIR = "$(NH_ROOT_DIR)/include";
 				NH_INSTALL_DIR = "$(HOME)/nethackdir";
-				NH_LIB_DIR = /Users/mikeallison/Documents/devel/nhdev/NHsource/sys/unix/../../lib;
+				NH_LIB_DIR = "$(NH_ROOT_DIR)/sys/unix/../../lib";
 				NH_ROOT_DIR = "$(SOURCE_ROOT)/../..";
 				NH_SRC_DIR = "$(NH_ROOT_DIR)/src";
 				NH_UNIX_DIR = "$(NH_ROOT_DIR)/sys/unix";
