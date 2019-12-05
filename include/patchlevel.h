@@ -36,7 +36,7 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
-/*  Patch 3, <insert date here>
+/*  Patch 3, December 5, 2019
  *
  *  Fixed stale 'thrownobj' pointer for returning thrown aklys while engulfed
  *  Fixed uarmh null pointer dereference if a helm of opposite alignment came
@@ -55,6 +55,7 @@
  *  Fixed ignoring of god's wrath when hero injured himself during altar kick 
  *  Fixed several cases where persistent inventory window was not updated
  *  Fixed temple priests or shopkeepers moving over other monsters
+ *  Fixed a crash-causing bug when putting on levitation boots over a sink
  *  Ensured that thrown or kicked objects will end up in bones
  *  Made water go all the way to the edges of level on the Plane of Water
  *  Made clouds disrupt line of sight along the edges of the Plane of Air
@@ -64,6 +65,8 @@
  *    the Windows platform
  *  Improved the layout and display of the player selection dialog used on the
  *     Windows graphical implementation
+ *  Improved performance of some tty versions by reducing the number of 
+ *     function calls made from mapglyph
  *  Allowed the msdos implementation to build with curses and PDCurses
  *  Included over 100 other fixes and improvements as outlined in doc/fixes36.3
  */
