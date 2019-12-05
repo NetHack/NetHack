@@ -7,9 +7,9 @@ NetHack 3.6.
 NetHack 3.7.0 work-in-progress is not a release of NetHack. As a .0 version,
 and still very early in its development cycle, it is quite likely that there
 has been, and will continue to be, quite a number of code changes and/or code
-additions. The code may involve new approaches to things and may may add many
-new features and changes in the weeks and months ahead, and it may alter
-existing behavior. 
+additions. The code may involve new approaches to things and may add many new
+features and changes in the weeks and months ahead, and it may alter existing
+behavior. 
 
 In short -- there are likely to be bugs. Don't treat NetHack-3.7 branch as
 released code, and if stability is paramount, then the most recent 
