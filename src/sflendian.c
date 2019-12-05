@@ -138,7 +138,7 @@ const char *myparent UNUSED;
 const char *myname UNUSED;
 int cnt;
 {
-    const char *parent = "any";
+/*    const char *parent = "any"; */
     int i;
     uint64_t ui64;
     int64_t i64;
@@ -146,7 +146,7 @@ int cnt;
     int32_t i32;
     int8_t i8;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         ui64 = (uint64_t) d_any->a_void;
         fwrite(&ui64, sizeof ui64, 1, nhfp->fpdef);
@@ -193,11 +193,11 @@ const char *myparent UNUSED;
 const char *myname UNUSED;
 int cnt;
 {
-    const char *parent = "aligntyp";
+/*    const char *parent = "aligntyp"; */
     int i;
     int16_t val;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         val = nhfp->bendian ? bswap16(*d_aligntyp) : *d_aligntyp;
 #ifdef SAVEFILE_DEBUGGING
@@ -218,9 +218,9 @@ const char *myparent UNUSED;
 const char *myname UNUSED;
 int cnt UNUSED;
 {
-    const char *parent = "bitfield";
+/*    const char *parent = "bitfield"; */
 
-    nhUse(parent);
+    /* nhUse(parent); */
     /* for bitfields, cnt is the number of bits, not an array */
 #ifdef SAVEFILE_DEBUGGING
     fprintf(nhfp->fpdebug,"%s %s %d %ld %d\n", myname,
@@ -238,11 +238,11 @@ const char *myparent UNUSED;
 const char *myname UNUSED;
 int cnt;
 {
-    const char *parent = "boolean";
+/*    const char *parent = "boolean"; */
     int i;
     int8_t val;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         val = *d_boolean;
 #ifdef SAVEFILE_DEBUGGING
@@ -264,10 +264,10 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    const char *parent = "char";
+/*    const char *parent = "char"; */
     int8_t val;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         val = *d_char;
 #ifdef SAVEFILE_DEBUGGING
@@ -325,10 +325,10 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    const char *parent = "int";
+/*    const char *parent = "int"; */
     int32_t i32, val;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         i32 = (int32_t) *d_int;
         val = nhfp->bendian ? bswap32(i32) : i32;
@@ -351,10 +351,10 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    const char *parent = "long";
+/*    const char *parent = "long"; */
     int64_t i64, val64;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         i64 = (int64_t) *d_long;
         val64 = nhfp->bendian ? bswap64(i64) : i64;
@@ -378,9 +378,9 @@ int cnt;
 {
     int i;
     int8_t itmp;
-    const char *parent = "schar";
+/*    const char *parent = "schar"; */
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         itmp = (int8_t) *d_schar;
 #ifdef SAVEFILE_DEBUGGING
@@ -403,9 +403,9 @@ int cnt;
 {
     int i;
     int16_t itmp;
-    const char *parent = "short";
+/*    const char *parent = "short"; */
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         itmp = (int16_t) *d_short;
 #ifdef SAVEFILE_DEBUGGING
@@ -428,9 +428,9 @@ int cnt;
 {
     int i;
     uint64_t ui64, val;
-    const char *parent = "size_t";
+/*    const char *parent = "size_t"; */
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         ui64 = (uint64_t) *d_size_t;
         val = nhfp->bendian ? bswap64(ui64) : ui64;
@@ -453,9 +453,9 @@ const char *myname UNUSED;
 int cnt UNUSED;
 {
     char buf[BUFSZ];
-    const char *parent = "time_t";
+/*    const char *parent = "time_t"; */
 
-    nhUse(parent);
+    /* nhUse(parent); */
     Sprintf(buf, "%s", yyyymmddhhmmss(*d_time_t));
 #ifdef SAVEFILE_DEBUGGING
         fprintf(nhfp->fpdebug,"%s %s %s %ld %d\n", myname,
@@ -485,10 +485,10 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    const char *parent = "uchar";
+/*    const char *parent = "uchar"; */
     uint8_t ui8;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         ui8 = (uint8_t) *d_uchar;
 #ifdef SAVEFILE_DEBUGGING
@@ -510,10 +510,10 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    const char *parent = "uint";
+/*    const char *parent = "uint"; */
     uint32_t ui32, val;
     
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         ui32 = (uint32_t) *d_uint;
         val = nhfp->bendian ? bswap32(ui32) : ui32;
@@ -536,10 +536,10 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    const char *parent = "ulong";
+/*    const char *parent = "ulong"; */
     uint64_t ul64, val64;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         ul64 = (uint64_t) *d_ulong;
         val64 = nhfp->bendian ? bswap64(ul64) : ul64;
@@ -562,10 +562,10 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    const char *parent = "ushort";
+/*    const char *parent = "ushort"; */
     uint16_t ui16, val16;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         ui16 = (uint16_t) *d_ushort;
         val16 = nhfp->bendian ? bswap16(ui16) : ui16;
@@ -588,10 +588,10 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    const char *parent = "xchar";
+/*    const char *parent = "xchar"; */
     int16_t i16, val16;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         i16 = (int16_t) *d_xchar;
         val16 = nhfp->bendian ? bswap16(i16) : i16;
@@ -617,10 +617,10 @@ int cnt;
 {
     int i, j, intval;
     int16_t i16, outcount = 0;
-    const char *parent = "str";
+/*    const char *parent = "str"; */
     char sval[QBUFSZ], *src = d_str, *dest = strbuf;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     /* cnt is the number of characters */
     for (i = 0; i < cnt; ++i) {
         if ((*src < 32) || (*src == '\\') || (*src > 127)) {
@@ -677,7 +677,7 @@ const char *myparent UNUSED;
 const char *myname UNUSED;
 int cnt;
 {
-    const char *parent = "any";
+/*    const char *parent = "any"; */
     int i;
     uint64_t ui64;
     int64_t i64;
@@ -685,7 +685,7 @@ int cnt;
     int32_t i32;
     int8_t i8;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
         fread(&ui64, sizeof ui64, 1, nhfp->fpdef);
         if (feof(nhfp->fpdef)) {
@@ -755,11 +755,11 @@ const char *myparent UNUSED;
 const char *myname UNUSED;
 int cnt;
 {
-    const char *parent = "aligntyp";
+/*    const char *parent = "aligntyp"; */
     int i;
     int16_t val, i16;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
 #ifdef SAVEFILE_DEBUGGING
         floc = ftell(nhfp->fpdef);
@@ -788,9 +788,9 @@ const char *myparent UNUSED;
 const char *myname UNUSED;
 int cnt UNUSED;
 {
-    const char *parent = "bitfield";
+/*    const char *parent = "bitfield"; */
 
-    nhUse(parent);
+    /* nhUse(parent); */
 #ifdef SAVEFILE_DEBUGGING
     floc = ftell(nhfp->fpdef);
 #endif
@@ -815,10 +815,10 @@ const char *myname UNUSED;
 int cnt;
 {
     int i;
-    const char *parent = "boolean";
+/*    const char *parent = "boolean"; */
     int8_t i8;
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
 #ifdef SAVEFILE_DEBUGGING
         floc = ftell(nhfp->fpdef);
@@ -1032,9 +1032,9 @@ int cnt;
 {
     int i;
     uint64_t ui64, val;
-    const char *parent = "size_t";
+/*    const char *parent = "size_t"; */
 
-    nhUse(parent);
+    /* nhUse(parent); */
     for (i = 0; i < cnt; ++i) {
 #ifdef SAVEFILE_DEBUGGING
         floc = ftell(nhfp->fpdef);
@@ -1065,9 +1065,9 @@ int cnt UNUSED;
 {
     time_t tmp;
     char buf[BUFSZ];
-    const char *parent = "time_t";
+/*    const char *parent = "time_t"; */
 
-    nhUse(parent);
+    /* nhUse(parent); */
 #ifdef SAVEFILE_DEBUGGING
     floc = ftell(nhfp->fpdef);
 #endif
@@ -1265,12 +1265,12 @@ int cnt;
     char testbuf[BUFSZ];
 #endif
     int i, j, sval;
-    const char *parent = "str";
+/*    const char *parent = "str"; */
     char n[4];
     char *src, *dest;
     int16_t i16, incount = 0;
 
-    nhUse(parent);
+    /* nhUse(parent); */
 #ifdef SAVEFILE_DEBUGGING
     floc = ftell(nhfp->fpdef);
 #endif

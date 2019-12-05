@@ -578,7 +578,7 @@ const char *name;
         /* const int boolstr2i[] = { TRUE, FALSE, TRUE, FALSE, -1 }; */
 
         ret = luaL_checkoption(L, -1, NULL, boolstr);
-        nhUse(boolstr2i[0]);
+        /* nhUse(boolstr2i[0]); */
     } else if (ltyp == LUA_TBOOLEAN) {
         ret = lua_toboolean(L, -1);
     } else if (ltyp == LUA_TNUMBER) {
