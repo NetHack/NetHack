@@ -21,7 +21,7 @@ spoilers:
  *  Fixed 'object lost' panic when attempting to crawl of of the water during
  *     emergency disrobing/dropping
  *  Running now stops when moving over engravings so you can tell where they
- *  are
+ *     are
  *  Fixed detection of unseen/secret doors which failed to find monsters hiding
  *     under objects and failed to find monsters hiding at trap locations
  *  Ensured fatal status conditions made it to disclosure and/or dumplog
