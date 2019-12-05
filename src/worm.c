@@ -544,7 +544,7 @@ void
 rest_worm(nhfp)
 NHFILE *nhfp;
 {
-    int i, j, count;
+    int i, j, count = 0;
     struct wseg *curr, *temp;
 
     for (i = 1; i < MAX_NUM_WORMS; i++) {

@@ -599,7 +599,7 @@ getbones()
 {
     int ok, i;
     NHFILE *nhfp = (NHFILE *) 0;
-    char c, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
+    char c = 0, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
     if (discover) /* save bones files for real games */
         return 0;

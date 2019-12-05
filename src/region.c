@@ -428,7 +428,7 @@ boolean
 in_out_region(x, y)
 xchar x, y;
 {
-    int i, f_indx;
+    int i, f_indx = 0;
 
     /* First check if hero can do the move */
     for (i = 0; i < g.n_regions; i++) {
@@ -483,7 +483,7 @@ m_in_out_region(mon, x, y)
 struct monst *mon;
 xchar x, y;
 {
-    int i, f_indx;
+    int i, f_indx = 0;
 
     /* First check if mon can do the move */
     for (i = 0; i < g.n_regions; i++) {
@@ -752,8 +752,8 @@ NHFILE *nhfp;
 boolean ghostly; /* If a bones file restore */
 {
     int i, j;
-    unsigned n;
-    long tmstamp;
+    unsigned n = 0;
+    long tmstamp = 0L;
     char *msg_buf;
 
     clear_regions();		/* Just for security */

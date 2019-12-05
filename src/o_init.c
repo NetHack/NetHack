@@ -339,7 +339,7 @@ restnames(nhfp)
 NHFILE *nhfp;
 {
     int i, j;
-    unsigned int len;
+    unsigned int len = 0;
 
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) g.bases, sizeof g.bases);

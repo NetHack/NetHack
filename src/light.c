@@ -373,7 +373,7 @@ void
 restore_light_sources(nhfp)
 NHFILE *nhfp;
 {
-    int count;
+    int count = 0;
     light_source *ls;
 
     /* restore elements */

@@ -2383,7 +2383,7 @@ int range;
 boolean ghostly; /* restoring from a ghost level */
 long adjust;     /* how much to adjust timeout */
 {
-    int count;
+    int count = 0;
     timer_element *curr;
 
     if (range == RANGE_GLOBAL) {

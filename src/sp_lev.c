@@ -5203,7 +5203,7 @@ TODO: g.coder->croom needs to be updated
     const int l_or_r2i[] = { LEFT, H_LEFT, CENTER, H_RIGHT, RIGHT, -1, -1 };
     const char *const top_or_bot[] = { "top", "center", "bottom", "none", NULL };
     const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1 };
-    int lr, tb, keepregion = 1, x, y;
+    int lr, tb, keepregion = 1, x = -1, y = -1;
     char *tmps, *mapdata;
     int mapwid, maphei = 0;
     int argc = lua_gettop(L);

@@ -1218,7 +1218,7 @@ rest_engravings(nhfp)
 NHFILE *nhfp;
 {
     struct engr *ep;
-    unsigned lth;
+    unsigned lth = 0;
 
     head_engr = 0;
     while (1) {

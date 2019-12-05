@@ -122,7 +122,7 @@ static void
 restlevchn(nhfp)
 NHFILE *nhfp;
 {
-    int cnt;
+    int cnt = 0;
     s_level *tmplev, *x;
 
     g.sp_levchn = (s_level *) 0;
@@ -154,7 +154,7 @@ restdamage(nhfp, ghostly)
 NHFILE *nhfp;
 boolean ghostly;
 {
-    unsigned int dmgcount;
+    unsigned int dmgcount = 0;
     int counter;
     struct damage *tmp_dam;
 
@@ -208,7 +208,7 @@ restobj(nhfp, otmp)
 NHFILE *nhfp;
 struct obj *otmp;
 {
-    int buflen;
+    int buflen = 0;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) otmp, sizeof(struct obj));
@@ -300,7 +300,7 @@ boolean ghostly, frozen;
 {
     register struct obj *otmp, *otmp2 = 0;
     register struct obj *first = (struct obj *) 0;
-    int buflen;
+    int buflen = 0;
 
     while (1) {
         if (nhfp->structlevel)
@@ -389,7 +389,7 @@ restmon(nhfp, mtmp)
 NHFILE *nhfp;
 struct monst *mtmp;
 {
-    int buflen;
+    int buflen = 0;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) mtmp, sizeof(struct monst));
@@ -491,7 +491,7 @@ boolean ghostly;
 {
     register struct monst *mtmp, *mtmp2 = 0;
     register struct monst *first = (struct monst *) 0;
-    int offset, buflen;
+    int offset, buflen = 0;
 
     while (1) {
         if (nhfp->structlevel)
@@ -633,7 +633,7 @@ unsigned int *stuckid, *steedid;
     struct obj *otmp;
     struct obj *bc_obj;
     char timebuf[15];
-    unsigned long uid;
+    unsigned long uid = 0;
     boolean defer_perm_invent;
 
     if (nhfp->fieldlevel && nhfp->addinfo)
@@ -971,7 +971,7 @@ dorecover(nhfp)
 NHFILE *nhfp;
 {
     unsigned int stuckid = 0, steedid = 0; /* not a register */
-    xchar ltmp;
+    xchar ltmp = 0;
     int rtmp;
     struct obj *otmp;
 
@@ -1126,7 +1126,7 @@ NHFILE *nhfp;
 struct cemetery **cemeteryaddr;
 {
     struct cemetery *bonesinfo, **bonesaddr;
-    int cflag;
+    int cflag = 0;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &cflag, sizeof cflag);
@@ -1223,8 +1223,8 @@ boolean ghostly;
     register struct monst *mtmp;
     long elapsed;
     branch *br;
-    int hpid;
-    xchar dlvl;
+    int hpid = 0;
+    xchar dlvl = 0;
     int x, y;
 #ifdef TOS
     short tlev;
@@ -1472,7 +1472,7 @@ static void
 restore_msghistory(nhfp)
 NHFILE *nhfp;
 {
-    int msgsize, msgcount = 0;
+    int msgsize = 0, msgcount = 0;
     char msg[BUFSZ];
 
     while (1) {

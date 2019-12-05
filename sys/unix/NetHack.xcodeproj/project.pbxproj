@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3192867C21A3ACAC00325BEB /* lev_comp.y in Sources */ = {isa = PBXBuildFile; fileRef = 3192867B21A3ACAB00325BEB /* lev_comp.y */; };
-		3192867E21A3ACB800325BEB /* lev_comp.l in Sources */ = {isa = PBXBuildFile; fileRef = 3192867D21A3ACB800325BEB /* lev_comp.l */; };
 		31B8A30C21A20D8B0055BD01 /* makedefs.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30B21A20D8B0055BD01 /* makedefs.c */; };
 		31B8A30F21A20DC10055BD01 /* objects.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30D21A20DC10055BD01 /* objects.c */; };
 		31B8A31021A20DC10055BD01 /* monst.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30E21A20DC10055BD01 /* monst.c */; };
@@ -139,89 +137,24 @@
 		31B8A41721A243E80055BD01 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 31B8A41521A243CC0055BD01 /* libncurses.tbd */; };
 		31B8A41821A2448C0055BD01 /* monst.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30E21A20DC10055BD01 /* monst.c */; };
 		31B8A41921A244940055BD01 /* objects.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30D21A20DC10055BD01 /* objects.c */; };
-		31B8A42921A267E60055BD01 /* lev_yacc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42521A267E60055BD01 /* lev_yacc.c */; };
-		31B8A42A21A267E60055BD01 /* lev_lex.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42621A267E60055BD01 /* lev_lex.c */; };
-		31B8A42B21A267E60055BD01 /* panic.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42721A267E60055BD01 /* panic.c */; };
-		31B8A42C21A267E60055BD01 /* lev_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42821A267E60055BD01 /* lev_main.c */; };
-		31B8A42D21A267F50055BD01 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
-		31B8A42E21A2680B0055BD01 /* drawing.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A33621A238010055BD01 /* drawing.c */; };
-		31B8A42F21A2681E0055BD01 /* decl.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A34621A238020055BD01 /* decl.c */; };
-		31B8A43021A268370055BD01 /* monst.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30E21A20DC10055BD01 /* monst.c */; };
-		31B8A43121A268420055BD01 /* objects.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30D21A20DC10055BD01 /* objects.c */; };
-		31B8A44321A269EA0055BD01 /* dgn_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A44221A269EA0055BD01 /* dgn_main.c */; };
-		31B8A44421A26A020055BD01 /* panic.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42721A267E60055BD01 /* panic.c */; };
-		31B8A44521A26A0A0055BD01 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
 		31B8A45221A26A750055BD01 /* recover.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A45121A26A750055BD01 /* recover.c */; };
 		31B8A45E21A26ACF0055BD01 /* dlb.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A3E321A238B30055BD01 /* dlb.c */; };
 		31B8A46021A26AE70055BD01 /* dlb_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A45F21A26AE70055BD01 /* dlb_main.c */; };
 		31B8A46121A26AF60055BD01 /* panic.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42721A267E60055BD01 /* panic.c */; };
 		31B8A46221A26B020055BD01 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
-		31B8A46621A2820F0055BD01 /* dgn_comp.y in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A46421A278AC0055BD01 /* dgn_comp.y */; };
-		31B8A46921A288770055BD01 /* dgn_comp.l in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A46821A288770055BD01 /* dgn_comp.l */; };
+		544768A323994965004B9739 /* sfascii.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A223994965004B9739 /* sfascii.c */; };
+		544768A5239949A8004B9739 /* sfbase.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A4239949A8004B9739 /* sfbase.c */; };
+		544768A9239949FA004B9739 /* sfdata.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A6239949FA004B9739 /* sfdata.c */; };
+		544768AA239949FA004B9739 /* sflendian.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A7239949FA004B9739 /* sflendian.c */; };
+		544768AB239949FA004B9739 /* sfstruct.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A8239949FA004B9739 /* sfstruct.c */; };
+		544768AE23994A17004B9739 /* nhlsel.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AC23994A17004B9739 /* nhlsel.c */; };
+		544768AF23994A17004B9739 /* nhlua.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AD23994A17004B9739 /* nhlua.c */; };
+		544768B123994A2C004B9739 /* mdlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768B023994A2C004B9739 /* mdlib.c */; };
+		544768BA23995BB7004B9739 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 544768B923995BB7004B9739 /* liblua.a */; };
 		54FCE8292223261F00F393C8 /* isaac64.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FCE8282223261F00F393C8 /* isaac64.c */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXBuildRule section */
-		317E7C5221A3774F00F6E4E5 /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			fileType = sourcecode.yacc;
-			isEditable = 1;
-			outputFiles = (
-				"$(NH_INC_DIR)/lev_comp.h",
-				"$(NH_UTIL_DIR)/lev_yacc.c",
-			);
-			script = "cd ${NH_UTIL_DIR}\nbison -o lev_yacc.c -d lev_comp.y\nmv lev_yacc.h ${NH_INC_DIR}/lev_comp.h \n";
-		};
-		317E7C5321A3796200F6E4E5 /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			fileType = sourcecode.lex;
-			isEditable = 1;
-			outputFiles = (
-				"$(NH_UTIL_DIR)/lev_lex.c",
-			);
-			script = "cd ${NH_UTIL_DIR}\nlex -o lev_lex.c lev_comp.l\nsed -e 's#  *$$##' -e 's#static void yyunput#void yyunput#' lev_lex.c > lev_lex.x\nmv lev_lex.x lev_lex.c\n";
-		};
-		31B8A46321A270680055BD01 /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			filePatterns = dgn_comp.y;
-			fileType = sourcecode.yacc;
-			isEditable = 1;
-			outputFiles = (
-				"$(NH_UTIL_DIR)/dgn_yacc.c",
-				"$(NH_INC_DIR)/dgn_comp.h",
-			);
-			script = "cd ${NH_UTIL_DIR}\nbison -o dgn_yacc.c -d dgn_comp.y\nmv dgn_yacc.h ${NH_INC_DIR}/dgn_comp.h \n";
-		};
-		31B8A46721A286E70055BD01 /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			fileType = sourcecode.lex;
-			isEditable = 1;
-			outputFiles = (
-				"$(NH_UTIL_DIR)/dgn_lex.c",
-			);
-			script = "cd ${NH_UTIL_DIR}\nlex -o dgn_lex.c dgn_comp.l\nsed -e 's#  *$$##' -e 's#static void yyunput#void yyunput#' dgn_lex.c > dgn_lex.x\nmv dgn_lex.x dgn_lex.c\n";
-		};
-/* End PBXBuildRule section */
-
 /* Begin PBXContainerItemProxy section */
-		316B91C621A3BD5000EC3E81 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3189577E21A1FDA400FB2ABE;
-			remoteInfo = makedefs;
-		};
-		316B91C821A3BD5C00EC3E81 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3189577E21A1FDA400FB2ABE;
-			remoteInfo = makedefs;
-		};
 		316B91CA21A3BD7C00EC3E81 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
@@ -250,20 +183,6 @@
 			remoteGlobalIDString = 31B8A45621A26A970055BD01;
 			remoteInfo = dlb;
 		};
-		3192867721A3AB0400325BEB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 31B8A43521A268DF0055BD01;
-			remoteInfo = dgn_comp;
-		};
-		3192867921A3AB0800325BEB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 31B8A41D21A2669A0055BD01;
-			remoteInfo = lev_comp;
-		};
 		31B8A31321A2355C0055BD01 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
@@ -287,24 +206,6 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-		31B8A41C21A2669A0055BD01 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-		31B8A43421A268DF0055BD01 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
 			);
@@ -572,12 +473,10 @@
 		31B8A40921A23EEB0055BD01 /* cursstat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cursstat.c; path = ../../win/curses/cursstat.c; sourceTree = "<group>"; };
 		31B8A40A21A23EEB0055BD01 /* curswins.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = curswins.c; path = ../../win/curses/curswins.c; sourceTree = "<group>"; };
 		31B8A41521A243CC0055BD01 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
-		31B8A41E21A2669A0055BD01 /* lev_comp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lev_comp; sourceTree = BUILT_PRODUCTS_DIR; };
 		31B8A42521A267E60055BD01 /* lev_yacc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lev_yacc.c; path = ../../util/lev_yacc.c; sourceTree = "<group>"; };
 		31B8A42621A267E60055BD01 /* lev_lex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lev_lex.c; path = ../../util/lev_lex.c; sourceTree = "<group>"; };
 		31B8A42721A267E60055BD01 /* panic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = panic.c; path = ../../util/panic.c; sourceTree = "<group>"; };
 		31B8A42821A267E60055BD01 /* lev_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lev_main.c; path = ../../util/lev_main.c; sourceTree = "<group>"; };
-		31B8A43621A268DF0055BD01 /* dgn_comp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = dgn_comp; sourceTree = BUILT_PRODUCTS_DIR; };
 		31B8A43D21A2699B0055BD01 /* dgn_yacc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgn_yacc.c; path = ../../util/dgn_yacc.c; sourceTree = "<group>"; };
 		31B8A44021A269C80055BD01 /* dgn_lex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgn_lex.c; path = ../../util/dgn_lex.c; sourceTree = "<group>"; };
 		31B8A44221A269EA0055BD01 /* dgn_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgn_main.c; path = ../../util/dgn_main.c; sourceTree = "<group>"; };
@@ -587,6 +486,19 @@
 		31B8A45F21A26AE70055BD01 /* dlb_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlb_main.c; path = ../../util/dlb_main.c; sourceTree = "<group>"; };
 		31B8A46421A278AC0055BD01 /* dgn_comp.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = dgn_comp.y; path = ../../util/dgn_comp.y; sourceTree = "<group>"; };
 		31B8A46821A288770055BD01 /* dgn_comp.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = dgn_comp.l; path = ../../util/dgn_comp.l; sourceTree = "<group>"; };
+		544768A223994965004B9739 /* sfascii.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfascii.c; path = ../../src/sfascii.c; sourceTree = "<group>"; };
+		544768A4239949A8004B9739 /* sfbase.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfbase.c; path = ../../src/sfbase.c; sourceTree = "<group>"; };
+		544768A6239949FA004B9739 /* sfdata.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfdata.c; path = ../../src/sfdata.c; sourceTree = "<group>"; };
+		544768A7239949FA004B9739 /* sflendian.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sflendian.c; path = ../../src/sflendian.c; sourceTree = "<group>"; };
+		544768A8239949FA004B9739 /* sfstruct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfstruct.c; path = ../../src/sfstruct.c; sourceTree = "<group>"; };
+		544768AC23994A17004B9739 /* nhlsel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlsel.c; path = ../../src/nhlsel.c; sourceTree = "<group>"; };
+		544768AD23994A17004B9739 /* nhlua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlua.c; path = ../../src/nhlua.c; sourceTree = "<group>"; };
+		544768B023994A2C004B9739 /* mdlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mdlib.c; path = ../../src/mdlib.c; sourceTree = "<group>"; };
+		544768B423995447004B9739 /* isaac64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = isaac64.h; path = ../../include/isaac64.h; sourceTree = "<group>"; };
+		544768B523995488004B9739 /* nhlua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nhlua.h; path = ../../include/nhlua.h; sourceTree = "<group>"; };
+		544768B623995488004B9739 /* sfprocs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sfprocs.h; path = ../../include/sfprocs.h; sourceTree = "<group>"; };
+		544768B723995488004B9739 /* sfproto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sfproto.h; path = ../../include/sfproto.h; sourceTree = "<group>"; };
+		544768B923995BB7004B9739 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../lib/lua/liblua.a; sourceTree = "<group>"; };
 		54FCE8282223261F00F393C8 /* isaac64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = isaac64.c; path = ../../src/isaac64.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -596,24 +508,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				31B8A41721A243E80055BD01 /* libncurses.tbd in Frameworks */,
+				544768BA23995BB7004B9739 /* liblua.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3189577C21A1FDA400FB2ABE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		31B8A41B21A2669A0055BD01 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		31B8A43321A268DF0055BD01 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -656,8 +555,6 @@
 			children = (
 				3189577121A1FCC100FB2ABE /* NetHack */,
 				3189577F21A1FDA400FB2ABE /* makedefs */,
-				31B8A41E21A2669A0055BD01 /* lev_comp */,
-				31B8A43621A268DF0055BD01 /* dgn_comp */,
 				31B8A44A21A26A4B0055BD01 /* recover */,
 				31B8A45721A26A970055BD01 /* dlb */,
 			);
@@ -667,6 +564,14 @@
 		3189578C21A1FF8200FB2ABE /* src */ = {
 			isa = PBXGroup;
 			children = (
+				544768B023994A2C004B9739 /* mdlib.c */,
+				544768AC23994A17004B9739 /* nhlsel.c */,
+				544768AD23994A17004B9739 /* nhlua.c */,
+				544768A6239949FA004B9739 /* sfdata.c */,
+				544768A7239949FA004B9739 /* sflendian.c */,
+				544768A8239949FA004B9739 /* sfstruct.c */,
+				544768A4239949A8004B9739 /* sfbase.c */,
+				544768A223994965004B9739 /* sfascii.c */,
 				31B8A35521A238030055BD01 /* allmain.c */,
 				31B8A36521A238040055BD01 /* alloc.c */,
 				31B8A35E21A238040055BD01 /* apply.c */,
@@ -804,6 +709,10 @@
 		3189579621A2046700FB2ABE /* include */ = {
 			isa = PBXGroup;
 			children = (
+				544768B523995488004B9739 /* nhlua.h */,
+				544768B623995488004B9739 /* sfprocs.h */,
+				544768B723995488004B9739 /* sfproto.h */,
+				544768B423995447004B9739 /* isaac64.h */,
 				3186A3B721A4B0FD0052BF02 /* align.h */,
 				3186A38021A4B0FB0052BF02 /* amiconf.h */,
 				3186A38821A4B0FB0052BF02 /* artifact.h */,
@@ -983,6 +892,7 @@
 		31B8A41421A243CB0055BD01 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				544768B923995BB7004B9739 /* liblua.a */,
 				31B8A41521A243CC0055BD01 /* libncurses.tbd */,
 			);
 			name = Frameworks;
@@ -1007,8 +917,6 @@
 			);
 			dependencies = (
 				31B8A31421A2355C0055BD01 /* PBXTargetDependency */,
-				3192867A21A3AB0800325BEB /* PBXTargetDependency */,
-				3192867821A3AB0400325BEB /* PBXTargetDependency */,
 				3192867621A3AAFE00325BEB /* PBXTargetDependency */,
 				3192867421A3AAFA00325BEB /* PBXTargetDependency */,
 			);
@@ -1021,14 +929,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3189578321A1FDA400FB2ABE /* Build configuration list for PBXNativeTarget "makedefs" */;
 			buildPhases = (
+				544768B223995106004B9739 /* Build nhlua header */,
 				3189577B21A1FDA400FB2ABE /* Sources */,
 				3189577C21A1FDA400FB2ABE /* Frameworks */,
 				3189577D21A1FDA400FB2ABE /* CopyFiles */,
 				317E7C4B21A35F0500F6E4E5 /* Copy makedefs */,
 				319CBA3821A3458100150830 /* Build data */,
 				317E7C4521A3548F00F6E4E5 /* Build rumors */,
-				317E7C4621A355E700F6E4E5 /* Build quest.dat */,
 				317E7C4E21A3697300F6E4E5 /* Build options and headers */,
+				544768B8239954B9004B9739 /* Build Lua library */,
 				317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */,
 				3192867F21A3AF8000325BEB /* Build oracles */,
 			);
@@ -1039,51 +948,6 @@
 			name = makedefs;
 			productName = makedefs;
 			productReference = 3189577F21A1FDA400FB2ABE /* makedefs */;
-			productType = "com.apple.product-type.tool";
-		};
-		31B8A41D21A2669A0055BD01 /* lev_comp */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 31B8A42221A2669A0055BD01 /* Build configuration list for PBXNativeTarget "lev_comp" */;
-			buildPhases = (
-				31B8A41A21A2669A0055BD01 /* Sources */,
-				31B8A41B21A2669A0055BD01 /* Frameworks */,
-				31B8A41C21A2669A0055BD01 /* CopyFiles */,
-				317E7C4C21A3625000F6E4E5 /* Copy lev_comp */,
-				317E7C4A21A35E9400F6E4E5 /* Build special levels */,
-				317E7C4D21A3649B00F6E4E5 /* Build quest levels */,
-			);
-			buildRules = (
-				317E7C5321A3796200F6E4E5 /* PBXBuildRule */,
-				317E7C5221A3774F00F6E4E5 /* PBXBuildRule */,
-			);
-			dependencies = (
-				316B91C921A3BD5C00EC3E81 /* PBXTargetDependency */,
-			);
-			name = lev_comp;
-			productName = lev_comp;
-			productReference = 31B8A41E21A2669A0055BD01 /* lev_comp */;
-			productType = "com.apple.product-type.tool";
-		};
-		31B8A43521A268DF0055BD01 /* dgn_comp */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 31B8A43A21A268E00055BD01 /* Build configuration list for PBXNativeTarget "dgn_comp" */;
-			buildPhases = (
-				31B8A43221A268DF0055BD01 /* Sources */,
-				31B8A43321A268DF0055BD01 /* Frameworks */,
-				31B8A43421A268DF0055BD01 /* CopyFiles */,
-				317E7C5021A3735300F6E4E5 /* Copy dgn_comp */,
-				317E7C5121A373E100F6E4E5 /* Build dungeon */,
-			);
-			buildRules = (
-				31B8A46721A286E70055BD01 /* PBXBuildRule */,
-				31B8A46321A270680055BD01 /* PBXBuildRule */,
-			);
-			dependencies = (
-				316B91C721A3BD5000EC3E81 /* PBXTargetDependency */,
-			);
-			name = dgn_comp;
-			productName = dgn_comp;
-			productReference = 31B8A43621A268DF0055BD01 /* dgn_comp */;
 			productType = "com.apple.product-type.tool";
 		};
 		31B8A44921A26A4B0055BD01 /* recover */ = {
@@ -1129,19 +993,13 @@
 		3189576921A1FCC100FB2ABE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1120;
 				ORGANIZATIONNAME = "Bart House";
 				TargetAttributes = {
 					3189577021A1FCC100FB2ABE = {
 						CreatedOnToolsVersion = 10.1;
 					};
 					3189577E21A1FDA400FB2ABE = {
-						CreatedOnToolsVersion = 10.1;
-					};
-					31B8A41D21A2669A0055BD01 = {
-						CreatedOnToolsVersion = 10.1;
-					};
-					31B8A43521A268DF0055BD01 = {
 						CreatedOnToolsVersion = 10.1;
 					};
 					31B8A44921A26A4B0055BD01 = {
@@ -1167,8 +1025,6 @@
 			targets = (
 				3189577021A1FCC100FB2ABE /* NetHack */,
 				3189577E21A1FDA400FB2ABE /* makedefs */,
-				31B8A41D21A2669A0055BD01 /* lev_comp */,
-				31B8A43521A268DF0055BD01 /* dgn_comp */,
 				31B8A44921A26A4B0055BD01 /* recover */,
 				31B8A45621A26A970055BD01 /* dlb */,
 			);
@@ -1198,57 +1054,6 @@
 			shellPath = /bin/sh;
 			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -r\n";
 		};
-		317E7C4621A355E700F6E4E5 /* Build quest.dat */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(NH_DAT_DIR)/quest.txt",
-				"$(NH_UTIL_DIR)/makedefs",
-			);
-			name = "Build quest.dat";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(NH_DAT_DIR)/quest.dat",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -q\n\n";
-		};
-		317E7C4A21A35E9400F6E4E5 /* Build special levels */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(NH_UTIL_DIR)/lev_comp",
-				"$(NH_DAT_DIR)/bigroom.des",
-				"$(NH_DAT_DIR)/castle.des",
-				"$(NH_DAT_DIR)/endgame.des",
-				"$(NH_DAT_DIR)/knox.des",
-				"$(NH_DAT_DIR)/medusa.des",
-				"$(NH_DAT_DIR)/mines.des",
-				"$(NH_DAT_DIR)/oracle.des",
-				"$(NH_DAT_DIR)/sokoban.des",
-				"$(NH_DAT_DIR)/tower.des",
-				"$(NH_DAT_DIR)/yendor.des",
-			);
-			name = "Build special levels";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(NH_DAT_DIR)/spec_levs",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/lev_comp bigroom.des\n${NH_UTIL_DIR}/lev_comp castle.des\n${NH_UTIL_DIR}/lev_comp endgame.des\n${NH_UTIL_DIR}/lev_comp gehennom.des\n${NH_UTIL_DIR}/lev_comp knox.des\n${NH_UTIL_DIR}/lev_comp medusa.des\n${NH_UTIL_DIR}/lev_comp mines.des\n${NH_UTIL_DIR}/lev_comp oracle.des\n${NH_UTIL_DIR}/lev_comp sokoban.des\n${NH_UTIL_DIR}/lev_comp tower.des\n${NH_UTIL_DIR}/lev_comp yendor.des\ntouch spec_levs\n";
-		};
 		317E7C4B21A35F0500F6E4E5 /* Copy makedefs */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1269,59 +1074,6 @@
 			shellPath = /bin/sh;
 			shellScript = "cp ${BUILT_PRODUCTS_DIR}/makedefs ${NH_UTIL_DIR}/makedefs\n";
 		};
-		317E7C4C21A3625000F6E4E5 /* Copy lev_comp */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/lev_comp",
-			);
-			name = "Copy lev_comp";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(NH_UTIL_DIR)/lev_comp",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cp ${BUILT_PRODUCTS_DIR}/lev_comp ${NH_UTIL_DIR}/lev_comp\n";
-		};
-		317E7C4D21A3649B00F6E4E5 /* Build quest levels */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(NH_UTIL_DIR)/lev_comp",
-				"$(NH_DAT_DIR)/Arch.des",
-				"$(NH_DAT_DIR)/Barb.des",
-				"$(NH_DAT_DIR)/Caveman.des",
-				"$(NH_DAT_DIR)/Healer.des",
-				"$(NH_DAT_DIR)/Knight.des",
-				"$(NH_DAT_DIR)/Monk.des",
-				"$(NH_DAT_DIR)/Priest.des",
-				"$(NH_DAT_DIR)/Ranger.des",
-				"$(NH_DAT_DIR)/Rogue.des",
-				"$(NH_DAT_DIR)/Samurai.des",
-				"$(NH_DAT_DIR)/Tourist.des",
-				"$(NH_DAT_DIR)/Valkyrie.des",
-				"$(NH_DAT_DIR)/Wizard.des",
-			);
-			name = "Build quest levels";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(NH_DAT_DIR)/quest_levs",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/lev_comp Arch.des\n${NH_UTIL_DIR}/lev_comp Barb.des\n${NH_UTIL_DIR}/lev_comp Caveman.des\n${NH_UTIL_DIR}/lev_comp Healer.des\n${NH_UTIL_DIR}/lev_comp Knight.des\n${NH_UTIL_DIR}/lev_comp Monk.des\n${NH_UTIL_DIR}/lev_comp Priest.des\n${NH_UTIL_DIR}/lev_comp Ranger.des\n${NH_UTIL_DIR}/lev_comp Rogue.des\n${NH_UTIL_DIR}/lev_comp Samurai.des\n${NH_UTIL_DIR}/lev_comp Tourist.des\n${NH_UTIL_DIR}/lev_comp Valkyrie.des\n${NH_UTIL_DIR}/lev_comp Wizard.des\ntouch quest_levs\n";
-		};
 		317E7C4E21A3697300F6E4E5 /* Build options and headers */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1339,7 +1091,6 @@
 				"$(NH_UTIL_DIR)/options",
 				"$(NH_INC_DIR)/date.h",
 				"$(NH_INC_DIR)/onames.h",
-				"$(NH_INC_DIR)/pm.h",
 				"$(NH_INC_DIR)/vis_tab.h",
 				"$(NH_SRC_DIR)/vis_tab.c",
 			);
@@ -1370,48 +1121,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -s\n";
-		};
-		317E7C5021A3735300F6E4E5 /* Copy dgn_comp */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/dgn_comp",
-			);
-			name = "Copy dgn_comp";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${NH_UTIL_DIR}/dgn_comp",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cp ${BUILT_PRODUCTS_DIR}/dgn_comp ${NH_UTIL_DIR}/dgn_comp\n";
-		};
-		317E7C5121A373E100F6E4E5 /* Build dungeon */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(NH_UTIL_DIR)/makedefs",
-				"$(NH_UTIL_DIR)/dgn_comp",
-				"$(NH_DAT_DIR)/dungeon.pdf",
-			);
-			name = "Build dungeon";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(NH_DAT_DIR)/dungeon",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -e\n${NH_UTIL_DIR}/dgn_comp dungeon.pdf\n";
 		};
 		317E7C5421A3804400F6E4E5 /* Build Guidebook */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1444,142 +1153,142 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(NH_DAT_DIR)/Arc-fila.lev",
-				"$(NH_DAT_DIR)/Arc-filb.lev",
-				"$(NH_DAT_DIR)/Arc-goal.lev",
-				"$(NH_DAT_DIR)/Arc-loca.lev",
-				"$(NH_DAT_DIR)/Arc-strt.lev",
-				"$(NH_DAT_DIR)/Bar-fila.lev",
-				"$(NH_DAT_DIR)/Bar-filb.lev",
-				"$(NH_DAT_DIR)/Bar-goal.lev",
-				"$(NH_DAT_DIR)/Bar-loca.lev",
-				"$(NH_DAT_DIR)/Bar-strt.lev",
-				"$(NH_DAT_DIR)/Cav-fila.lev",
-				"$(NH_DAT_DIR)/Cav-filb.lev",
-				"$(NH_DAT_DIR)/Cav-goal.lev",
-				"$(NH_DAT_DIR)/Cav-loca.lev",
-				"$(NH_DAT_DIR)/Cav-strt.lev",
-				"$(NH_DAT_DIR)/Hea-fila.lev",
-				"$(NH_DAT_DIR)/Hea-filb.lev",
-				"$(NH_DAT_DIR)/Hea-goal.lev",
-				"$(NH_DAT_DIR)/Hea-loca.lev",
-				"$(NH_DAT_DIR)/Hea-strt.lev",
-				"$(NH_DAT_DIR)/Kni-fila.lev",
-				"$(NH_DAT_DIR)/Kni-filb.lev",
-				"$(NH_DAT_DIR)/Kni-goal.lev",
-				"$(NH_DAT_DIR)/Kni-loca.lev",
-				"$(NH_DAT_DIR)/Kni-strt.lev",
-				"$(NH_DAT_DIR)/Mon-fila.lev",
-				"$(NH_DAT_DIR)/Mon-filb.lev",
-				"$(NH_DAT_DIR)/Mon-goal.lev",
-				"$(NH_DAT_DIR)/Mon-loca.lev",
-				"$(NH_DAT_DIR)/Mon-strt.lev",
-				"$(NH_DAT_DIR)/Pri-fila.lev",
-				"$(NH_DAT_DIR)/Pri-filb.lev",
-				"$(NH_DAT_DIR)/Pri-goal.lev",
-				"$(NH_DAT_DIR)/Pri-loca.lev",
-				"$(NH_DAT_DIR)/Pri-strt.lev",
-				"$(NH_DAT_DIR)/Ran-fila.lev",
-				"$(NH_DAT_DIR)/Ran-filb.lev",
-				"$(NH_DAT_DIR)/Ran-goal.lev",
-				"$(NH_DAT_DIR)/Ran-loca.lev",
-				"$(NH_DAT_DIR)/Ran-strt.lev",
-				"$(NH_DAT_DIR)/Rog-fila.lev",
-				"$(NH_DAT_DIR)/Rog-filb.lev",
-				"$(NH_DAT_DIR)/Rog-goal.lev",
-				"$(NH_DAT_DIR)/Rog-loca.lev",
-				"$(NH_DAT_DIR)/Rog-strt.lev",
-				"$(NH_DAT_DIR)/Sam-fila.lev",
-				"$(NH_DAT_DIR)/Sam-filb.lev",
-				"$(NH_DAT_DIR)/Sam-goal.lev",
-				"$(NH_DAT_DIR)/Sam-loca.lev",
-				"$(NH_DAT_DIR)/Sam-strt.lev",
-				"$(NH_DAT_DIR)/Tou-fila.lev",
-				"$(NH_DAT_DIR)/Tou-filb.lev",
-				"$(NH_DAT_DIR)/Tou-goal.lev",
-				"$(NH_DAT_DIR)/Tou-loca.lev",
-				"$(NH_DAT_DIR)/Tou-strt.lev",
-				"$(NH_DAT_DIR)/Val-fila.lev",
-				"$(NH_DAT_DIR)/Val-filb.lev",
-				"$(NH_DAT_DIR)/Val-goal.lev",
-				"$(NH_DAT_DIR)/Val-loca.lev",
-				"$(NH_DAT_DIR)/Val-strt.lev",
-				"$(NH_DAT_DIR)/Wiz-fila.lev",
-				"$(NH_DAT_DIR)/Wiz-filb.lev",
-				"$(NH_DAT_DIR)/Wiz-goal.lev",
-				"$(NH_DAT_DIR)/Wiz-loca.lev",
-				"$(NH_DAT_DIR)/Wiz-strt.lev",
-				"$(NH_DAT_DIR)/air.lev",
-				"$(NH_DAT_DIR)/asmodeus.lev",
-				"$(NH_DAT_DIR)/astral.lev",
-				"$(NH_DAT_DIR)/baalz.lev",
-				"$(NH_DAT_DIR)/bigrm-1.lev",
-				"$(NH_DAT_DIR)/bigrm-10.lev",
-				"$(NH_DAT_DIR)/bigrm-2.lev",
-				"$(NH_DAT_DIR)/bigrm-3.lev",
-				"$(NH_DAT_DIR)/bigrm-4.lev",
-				"$(NH_DAT_DIR)/bigrm-5.lev",
-				"$(NH_DAT_DIR)/bigrm-6.lev",
-				"$(NH_DAT_DIR)/bigrm-7.lev",
-				"$(NH_DAT_DIR)/bigrm-8.lev",
-				"$(NH_DAT_DIR)/bigrm-9.lev",
+				"$(NH_DAT_DIR)/Arc-fila.lua",
+				"$(NH_DAT_DIR)/Arc-filb.lua",
+				"$(NH_DAT_DIR)/Arc-goal.lua",
+				"$(NH_DAT_DIR)/Arc-loca.lua",
+				"$(NH_DAT_DIR)/Arc-strt.lua",
+				"$(NH_DAT_DIR)/Bar-fila.lua",
+				"$(NH_DAT_DIR)/Bar-filb.lua",
+				"$(NH_DAT_DIR)/Bar-goal.lua",
+				"$(NH_DAT_DIR)/Bar-loca.lua",
+				"$(NH_DAT_DIR)/Bar-strt.lua",
+				"$(NH_DAT_DIR)/Cav-fila.lua",
+				"$(NH_DAT_DIR)/Cav-filb.lua",
+				"$(NH_DAT_DIR)/Cav-goal.lua",
+				"$(NH_DAT_DIR)/Cav-loca.lua",
+				"$(NH_DAT_DIR)/Cav-strt.lua",
+				"$(NH_DAT_DIR)/Hea-fila.lua",
+				"$(NH_DAT_DIR)/Hea-filb.lua",
+				"$(NH_DAT_DIR)/Hea-goal.lua",
+				"$(NH_DAT_DIR)/Hea-loca.lua",
+				"$(NH_DAT_DIR)/Hea-strt.lua",
+				"$(NH_DAT_DIR)/Kni-fila.lua",
+				"$(NH_DAT_DIR)/Kni-filb.lua",
+				"$(NH_DAT_DIR)/Kni-goal.lua",
+				"$(NH_DAT_DIR)/Kni-loca.lua",
+				"$(NH_DAT_DIR)/Kni-strt.lua",
+				"$(NH_DAT_DIR)/Mon-fila.lua",
+				"$(NH_DAT_DIR)/Mon-filb.lua",
+				"$(NH_DAT_DIR)/Mon-goal.lua",
+				"$(NH_DAT_DIR)/Mon-loca.lua",
+				"$(NH_DAT_DIR)/Mon-strt.lua",
+				"$(NH_DAT_DIR)/Pri-fila.lua",
+				"$(NH_DAT_DIR)/Pri-filb.lua",
+				"$(NH_DAT_DIR)/Pri-goal.lua",
+				"$(NH_DAT_DIR)/Pri-loca.lua",
+				"$(NH_DAT_DIR)/Pri-strt.lua",
+				"$(NH_DAT_DIR)/Ran-fila.lua",
+				"$(NH_DAT_DIR)/Ran-filb.lua",
+				"$(NH_DAT_DIR)/Ran-goal.lua",
+				"$(NH_DAT_DIR)/Ran-loca.lua",
+				"$(NH_DAT_DIR)/Ran-strt.lua",
+				"$(NH_DAT_DIR)/Rog-fila.lua",
+				"$(NH_DAT_DIR)/Rog-filb.lua",
+				"$(NH_DAT_DIR)/Rog-goal.lua",
+				"$(NH_DAT_DIR)/Rog-loca.lua",
+				"$(NH_DAT_DIR)/Rog-strt.lua",
+				"$(NH_DAT_DIR)/Sam-fila.lua",
+				"$(NH_DAT_DIR)/Sam-filb.lua",
+				"$(NH_DAT_DIR)/Sam-goal.lua",
+				"$(NH_DAT_DIR)/Sam-loca.lua",
+				"$(NH_DAT_DIR)/Sam-strt.lua",
+				"$(NH_DAT_DIR)/Tou-fila.lua",
+				"$(NH_DAT_DIR)/Tou-filb.lua",
+				"$(NH_DAT_DIR)/Tou-goal.lua",
+				"$(NH_DAT_DIR)/Tou-loca.lua",
+				"$(NH_DAT_DIR)/Tou-strt.lua",
+				"$(NH_DAT_DIR)/Val-fila.lua",
+				"$(NH_DAT_DIR)/Val-filb.lua",
+				"$(NH_DAT_DIR)/Val-goal.lua",
+				"$(NH_DAT_DIR)/Val-loca.lua",
+				"$(NH_DAT_DIR)/Val-strt.lua",
+				"$(NH_DAT_DIR)/Wiz-fila.lua",
+				"$(NH_DAT_DIR)/Wiz-filb.lua",
+				"$(NH_DAT_DIR)/Wiz-goal.lua",
+				"$(NH_DAT_DIR)/Wiz-loca.lua",
+				"$(NH_DAT_DIR)/Wiz-strt.lua",
+				"$(NH_DAT_DIR)/air.lua",
+				"$(NH_DAT_DIR)/asmodeus.lua",
+				"$(NH_DAT_DIR)/astral.lua",
+				"$(NH_DAT_DIR)/baalz.lua",
+				"$(NH_DAT_DIR)/bigrm-1.lua",
+				"$(NH_DAT_DIR)/bigrm-10.lua",
+				"$(NH_DAT_DIR)/bigrm-2.lua",
+				"$(NH_DAT_DIR)/bigrm-3.lua",
+				"$(NH_DAT_DIR)/bigrm-4.lua",
+				"$(NH_DAT_DIR)/bigrm-5.lua",
+				"$(NH_DAT_DIR)/bigrm-6.lua",
+				"$(NH_DAT_DIR)/bigrm-7.lua",
+				"$(NH_DAT_DIR)/bigrm-8.lua",
+				"$(NH_DAT_DIR)/bigrm-9.lua",
 				"$(NH_DAT_DIR)/bogusmon",
-				"$(NH_DAT_DIR)/castle.lev",
+				"$(NH_DAT_DIR)/castle.lua",
 				"$(NH_DAT_DIR)/cmdhelp",
 				"$(NH_DAT_DIR)/data",
-				"$(NH_DAT_DIR)/dungeon",
-				"$(NH_DAT_DIR)/earth.lev",
+				"$(NH_DAT_DIR)/dungeon.lua",
+				"$(NH_DAT_DIR)/earth.lua",
 				"$(NH_DAT_DIR)/engrave",
 				"$(NH_DAT_DIR)/epitaph",
-				"$(NH_DAT_DIR)/fakewiz1.lev",
-				"$(NH_DAT_DIR)/fakewiz2.lev",
-				"$(NH_DAT_DIR)/fire.lev",
+				"$(NH_DAT_DIR)/fakewiz1.lua",
+				"$(NH_DAT_DIR)/fakewiz2.lua",
+				"$(NH_DAT_DIR)/fire.lua",
 				"$(NH_DAT_DIR)/help",
 				"$(NH_DAT_DIR)/hh",
 				"$(NH_DAT_DIR)/history",
-				"$(NH_DAT_DIR)/juiblex.lev",
+				"$(NH_DAT_DIR)/juiblex.lua",
 				"$(NH_DAT_DIR)/keyhelp",
-				"$(NH_DAT_DIR)/knox.lev",
-				"$(NH_DAT_DIR)/medusa-1.lev",
-				"$(NH_DAT_DIR)/medusa-2.lev",
-				"$(NH_DAT_DIR)/medusa-3.lev",
-				"$(NH_DAT_DIR)/medusa-4.lev",
-				"$(NH_DAT_DIR)/minefill.lev",
-				"$(NH_DAT_DIR)/minend-1.lev",
-				"$(NH_DAT_DIR)/minend-2.lev",
-				"$(NH_DAT_DIR)/minend-3.lev",
-				"$(NH_DAT_DIR)/minetn-1.lev",
-				"$(NH_DAT_DIR)/minetn-2.lev",
-				"$(NH_DAT_DIR)/minetn-3.lev",
-				"$(NH_DAT_DIR)/minetn-4.lev",
-				"$(NH_DAT_DIR)/minetn-5.lev",
-				"$(NH_DAT_DIR)/minetn-6.lev",
-				"$(NH_DAT_DIR)/minetn-7.lev",
+				"$(NH_DAT_DIR)/knox.lua",
+				"$(NH_DAT_DIR)/medusa-1.lua",
+				"$(NH_DAT_DIR)/medusa-2.lua",
+				"$(NH_DAT_DIR)/medusa-3.lua",
+				"$(NH_DAT_DIR)/medusa-4.lua",
+				"$(NH_DAT_DIR)/minefill.lua",
+				"$(NH_DAT_DIR)/minend-1.lua",
+				"$(NH_DAT_DIR)/minend-2.lua",
+				"$(NH_DAT_DIR)/minend-3.lua",
+				"$(NH_DAT_DIR)/minetn-1.lua",
+				"$(NH_DAT_DIR)/minetn-2.lua",
+				"$(NH_DAT_DIR)/minetn-3.lua",
+				"$(NH_DAT_DIR)/minetn-4.lua",
+				"$(NH_DAT_DIR)/minetn-5.lua",
+				"$(NH_DAT_DIR)/minetn-6.lua",
+				"$(NH_DAT_DIR)/minetn-7.lua",
 				"$(NH_DAT_DIR)/opthelp",
 				"$(NH_DAT_DIR)/options",
-				"$(NH_DAT_DIR)/oracle.lev",
+				"$(NH_DAT_DIR)/oracle.lua",
 				"$(NH_DAT_DIR)/oracles",
-				"$(NH_DAT_DIR)/orcus.lev",
-				"$(NH_DAT_DIR)/quest.dat",
+				"$(NH_DAT_DIR)/orcus.lua",
+				"$(NH_DAT_DIR)/quest.lua",
 				"$(NH_DAT_DIR)/rumors",
-				"$(NH_DAT_DIR)/sanctum.lev",
-				"$(NH_DAT_DIR)/soko1-1.lev",
-				"$(NH_DAT_DIR)/soko1-2.lev",
-				"$(NH_DAT_DIR)/soko2-1.lev",
-				"$(NH_DAT_DIR)/soko2-2.lev",
-				"$(NH_DAT_DIR)/soko3-1.lev",
-				"$(NH_DAT_DIR)/soko3-2.lev",
-				"$(NH_DAT_DIR)/soko4-1.lev",
-				"$(NH_DAT_DIR)/soko4-2.lev",
-				"$(NH_DAT_DIR)/tower1.lev",
-				"$(NH_DAT_DIR)/tower2.lev",
-				"$(NH_DAT_DIR)/tower3.lev",
+				"$(NH_DAT_DIR)/sanctum.lua",
+				"$(NH_DAT_DIR)/soko1-1.lua",
+				"$(NH_DAT_DIR)/soko1-2.lua",
+				"$(NH_DAT_DIR)/soko2-1.lua",
+				"$(NH_DAT_DIR)/soko2-2.lua",
+				"$(NH_DAT_DIR)/soko3-1.lua",
+				"$(NH_DAT_DIR)/soko3-2.lua",
+				"$(NH_DAT_DIR)/soko4-1.lua",
+				"$(NH_DAT_DIR)/soko4-2.lua",
+				"$(NH_DAT_DIR)/tower1.lua",
+				"$(NH_DAT_DIR)/tower2.lua",
+				"$(NH_DAT_DIR)/tower3.lua",
 				"$(NH_DAT_DIR)/tribute",
-				"$(NH_DAT_DIR)/valley.lev",
-				"$(NH_DAT_DIR)/water.lev",
-				"$(NH_DAT_DIR)/wizard1.lev",
-				"$(NH_DAT_DIR)/wizard2.lev",
-				"$(NH_DAT_DIR)/wizard3.lev",
+				"$(NH_DAT_DIR)/valley.lua",
+				"$(NH_DAT_DIR)/water.lua",
+				"$(NH_DAT_DIR)/wizard1.lua",
+				"$(NH_DAT_DIR)/wizard2.lua",
+				"$(NH_DAT_DIR)/wizard3.lua",
 				"$(NH_DAT_DIR)/wizhelp",
 			);
 			name = "Build nhdat";
@@ -1590,11 +1299,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/dlb cf nhdat help hh cmdhelp keyhelp history opthelp wizhelp dungeon tribute asmodeus.lev baalz.lev bigrm-*.lev castle.lev fakewiz?.lev juiblex.lev knox.lev medusa-?.lev minend-?.lev minefill.lev minetn-?.lev oracle.lev orcus.lev sanctum.lev soko?-?.lev tower?.lev valley.lev wizard?.lev astral.lev air.lev earth.lev fire.lev water.lev ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev bogusmon data engrave epitaph oracles options quest.dat rumors\n\n";
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/dlb cf nhdat help hh cmdhelp keyhelp history opthelp wizhelp dungeon.lua tribute asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua minetn-?.lua oracle.lua orcus.lua sanctum.lua soko?-?.lua tower?.lua valley.lua wizard?.lua astral.lua air.lua earth.lua fire.lua water.lua ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua bogusmon data engrave epitaph oracles options quest.lua rumors\n\n";
 		};
 		3192867021A39F6A00325BEB /* Install */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -1621,7 +1330,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p ${NH_INSTALL_DIR}/save\ncd ${NH_DAT_DIR}\ncp nhdat license symbols ${NH_INSTALL_DIR}\ncp ${NH_SRC_DIR}/nethack ${NH_INSTALL_DIR}\ncp ${NH_UTIL_DIR}/recover ${NH_INSTALL_DIR}\ntouch ${NH_INSTALL_DIR}/perm\ntouch ${NH_INSTALL_DIR}/record\ntouch ${NH_INSTALL_DIR}/logfile\ntouch ${NH_INSTALL_DIR}/xlogfile\ncd ${NH_ROOT_DIR}\nsys/unix/hints/macosx.sh editsysconf sys/unix/sysconf ${NH_INSTALL_DIR}/sysconf\n";
+			shellScript = "mkdir -p ${NH_INSTALL_DIR}/save\ncd ${NH_DAT_DIR}\ncp nhdat license symbols ${NH_INSTALL_DIR}\ncp ${NH_SRC_DIR}/nethack ${NH_INSTALL_DIR}\ncp ${NH_UTIL_DIR}/recover ${NH_INSTALL_DIR}\ntouch ${NH_INSTALL_DIR}/perm\ntouch ${NH_INSTALL_DIR}/record\ntouch ${NH_INSTALL_DIR}/logfile\ntouch ${NH_INSTALL_DIR}/xlogfile\ncd ${NH_UNIX_DIR}\nsh hints/macosx.sh editsysconf sysconf ${NH_INSTALL_DIR}/sysconf\n";
 		};
 		3192867121A3A2D500325BEB /* Copy nethack */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1704,6 +1413,44 @@
 			shellPath = /bin/sh;
 			shellScript = "# make data from data.base\ncd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -d\n";
 		};
+		544768B223995106004B9739 /* Build nhlua header */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build nhlua header";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${NH_INC_DIR}/nhlua.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${NH_INC_DIR}\necho '/* nhlua.h - generated by Xcode script */' > nhlua.h\necho '#include \"../lib/lua-5.3.5/src/lua.h\"' >> nhlua.h\nsed -e '/(lua_error)/!d' -e '/(lua_error)/s/;/ NORETURN;/1' < ${NH_LIB_DIR}/lua-5.3.5/src/lua.h >> nhlua.h\necho '#include \"../lib/lua-5.3.5/src/lualib.h\"' >> nhlua.h\necho '#include \"../lib/lua-5.3.5/src/lauxlib.h\"' >> nhlua.h\necho '/*nhlua.h*/' >> nhlua.h\n";
+		};
+		544768B8239954B9004B9739 /* Build Lua library */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Lua library";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${NH_LIB_DIR}/lua/liblua.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${NH_LIB_DIR}\nmkdir -p lua\ncd ${NH_LIB_DIR}/lua-5.3.5/src\nmake a\ncp liblua.a ../../lua\ncd ../../..\n\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1713,6 +1460,8 @@
 			files = (
 				31B8A3BC21A238060055BD01 /* eat.c in Sources */,
 				31B8A3A921A238060055BD01 /* music.c in Sources */,
+				544768A9239949FA004B9739 /* sfdata.c in Sources */,
+				544768B123994A2C004B9739 /* mdlib.c in Sources */,
 				31B8A3D221A238060055BD01 /* engrave.c in Sources */,
 				31B8A3A021A238060055BD01 /* exper.c in Sources */,
 				31B8A38A21A238060055BD01 /* priest.c in Sources */,
@@ -1730,6 +1479,7 @@
 				31B8A41921A244940055BD01 /* objects.c in Sources */,
 				31B8A3AA21A238060055BD01 /* wizard.c in Sources */,
 				31B8A3D021A238060055BD01 /* explode.c in Sources */,
+				544768A5239949A8004B9739 /* sfbase.c in Sources */,
 				31B8A3DE21A238060055BD01 /* sys.c in Sources */,
 				31B8A38021A238060055BD01 /* sit.c in Sources */,
 				31B8A3AF21A238060055BD01 /* lock.c in Sources */,
@@ -1745,6 +1495,7 @@
 				31B8A3C321A238060055BD01 /* steed.c in Sources */,
 				31B8A39D21A238060055BD01 /* artifact.c in Sources */,
 				31B8A3FF21A23E6E0055BD01 /* topl.c in Sources */,
+				544768AF23994A17004B9739 /* nhlua.c in Sources */,
 				31B8A3C021A238060055BD01 /* dig.c in Sources */,
 				31B8A3CB21A238060055BD01 /* alloc.c in Sources */,
 				31B8A39821A238060055BD01 /* mail.c in Sources */,
@@ -1757,6 +1508,7 @@
 				31B8A40121A23E6E0055BD01 /* wintty.c in Sources */,
 				31B8A3FE21A23E6E0055BD01 /* termcap.c in Sources */,
 				31B8A39621A238060055BD01 /* attrib.c in Sources */,
+				544768AE23994A17004B9739 /* nhlsel.c in Sources */,
 				31B8A40C21A23EEC0055BD01 /* cursdial.c in Sources */,
 				31B8A3A321A238060055BD01 /* mhitm.c in Sources */,
 				31B8A3DC21A238060055BD01 /* polyself.c in Sources */,
@@ -1770,6 +1522,7 @@
 				31B8A3AD21A238060055BD01 /* uhitm.c in Sources */,
 				31B8A3B321A238060055BD01 /* track.c in Sources */,
 				31B8A41221A23EEC0055BD01 /* curswins.c in Sources */,
+				544768AB239949FA004B9739 /* sfstruct.c in Sources */,
 				31B8A3A721A238060055BD01 /* minion.c in Sources */,
 				31B8A3F021A23D420055BD01 /* unixtty.c in Sources */,
 				31B8A37F21A238060055BD01 /* extralev.c in Sources */,
@@ -1827,6 +1580,7 @@
 				31B8A38E21A238060055BD01 /* quest.c in Sources */,
 				31B8A3D621A238060055BD01 /* region.c in Sources */,
 				31B8A3D421A238060055BD01 /* worm.c in Sources */,
+				544768AA239949FA004B9739 /* sflendian.c in Sources */,
 				31B8A3C921A238060055BD01 /* sounds.c in Sources */,
 				31B8A37C21A238060055BD01 /* pager.c in Sources */,
 				31B8A39F21A238060055BD01 /* fountain.c in Sources */,
@@ -1835,6 +1589,7 @@
 				31B8A3D321A238060055BD01 /* cmd.c in Sources */,
 				31B8A3AB21A238060055BD01 /* mplayer.c in Sources */,
 				31B8A3CC21A238060055BD01 /* pickup.c in Sources */,
+				544768A323994965004B9739 /* sfascii.c in Sources */,
 				31B8A39721A238060055BD01 /* invent.c in Sources */,
 				31B8A40021A23E6E0055BD01 /* getline.c in Sources */,
 				31B8A3B521A238060055BD01 /* rect.c in Sources */,
@@ -1848,36 +1603,6 @@
 				31B8A31021A20DC10055BD01 /* monst.c in Sources */,
 				31B8A30F21A20DC10055BD01 /* objects.c in Sources */,
 				31B8A30C21A20D8B0055BD01 /* makedefs.c in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		31B8A41A21A2669A0055BD01 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3192867C21A3ACAC00325BEB /* lev_comp.y in Sources */,
-				31B8A42B21A267E60055BD01 /* panic.c in Sources */,
-				31B8A43021A268370055BD01 /* monst.c in Sources */,
-				31B8A42921A267E60055BD01 /* lev_yacc.c in Sources */,
-				31B8A42C21A267E60055BD01 /* lev_main.c in Sources */,
-				31B8A42D21A267F50055BD01 /* alloc.c in Sources */,
-				31B8A42E21A2680B0055BD01 /* drawing.c in Sources */,
-				3192867E21A3ACB800325BEB /* lev_comp.l in Sources */,
-				31B8A42A21A267E60055BD01 /* lev_lex.c in Sources */,
-				31B8A43121A268420055BD01 /* objects.c in Sources */,
-				31B8A42F21A2681E0055BD01 /* decl.c in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		31B8A43221A268DF0055BD01 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				31B8A46921A288770055BD01 /* dgn_comp.l in Sources */,
-				31B8A46621A2820F0055BD01 /* dgn_comp.y in Sources */,
-				31B8A44321A269EA0055BD01 /* dgn_main.c in Sources */,
-				31B8A44521A26A0A0055BD01 /* alloc.c in Sources */,
-				31B8A44421A26A020055BD01 /* panic.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1903,16 +1628,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		316B91C721A3BD5000EC3E81 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3189577E21A1FDA400FB2ABE /* makedefs */;
-			targetProxy = 316B91C621A3BD5000EC3E81 /* PBXContainerItemProxy */;
-		};
-		316B91C921A3BD5C00EC3E81 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3189577E21A1FDA400FB2ABE /* makedefs */;
-			targetProxy = 316B91C821A3BD5C00EC3E81 /* PBXContainerItemProxy */;
-		};
 		316B91CB21A3BD7C00EC3E81 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3189577E21A1FDA400FB2ABE /* makedefs */;
@@ -1932,16 +1647,6 @@
 			isa = PBXTargetDependency;
 			target = 31B8A45621A26A970055BD01 /* dlb */;
 			targetProxy = 3192867521A3AAFE00325BEB /* PBXContainerItemProxy */;
-		};
-		3192867821A3AB0400325BEB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 31B8A43521A268DF0055BD01 /* dgn_comp */;
-			targetProxy = 3192867721A3AB0400325BEB /* PBXContainerItemProxy */;
-		};
-		3192867A21A3AB0800325BEB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 31B8A41D21A2669A0055BD01 /* lev_comp */;
-			targetProxy = 3192867921A3AB0800325BEB /* PBXContainerItemProxy */;
 		};
 		31B8A31421A2355C0055BD01 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2012,6 +1717,7 @@
 				NH_DOC_DIR = "$(NH_ROOT_DIR)/doc";
 				NH_INC_DIR = "$(NH_ROOT_DIR)/include";
 				NH_INSTALL_DIR = "$(HOME)/nethackdir";
+				NH_LIB_DIR = /Users/mikeallison/Documents/devel/nhdev/NHsource/sys/unix/../../lib;
 				NH_ROOT_DIR = "$(SOURCE_ROOT)/../..";
 				NH_SRC_DIR = "$(NH_ROOT_DIR)/src";
 				NH_UNIX_DIR = "$(NH_ROOT_DIR)/sys/unix";
@@ -2088,6 +1794,7 @@
 				NH_DOC_DIR = "$(NH_ROOT_DIR)/doc";
 				NH_INC_DIR = "$(NH_ROOT_DIR)/include";
 				NH_INSTALL_DIR = "$(HOME)/nethackdir";
+				NH_LIB_DIR = /Users/mikeallison/Documents/devel/nhdev/NHsource/sys/unix/../../lib;
 				NH_ROOT_DIR = "$(SOURCE_ROOT)/../..";
 				NH_SRC_DIR = "$(NH_ROOT_DIR)/src";
 				NH_UNIX_DIR = "$(NH_ROOT_DIR)/sys/unix";
@@ -2111,8 +1818,11 @@
 		3189577921A1FCC100FB2ABE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = c99;
+				INSTALL_PATH = "$(NH_INSTALL_DIR)";
+				"OTHER_LDFLAGS[arch=*]" = "-L${NH_LIB_DIR}/lua";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -2120,8 +1830,11 @@
 		3189577A21A1FCC100FB2ABE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = c99;
+				INSTALL_PATH = "$(NH_INSTALL_DIR)";
+				"OTHER_LDFLAGS[arch=*]" = "-L${NH_LIB_DIR}/lua";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -2129,6 +1842,7 @@
 		3189578421A1FDA400FB2ABE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2137,45 +1851,8 @@
 		3189578521A1FDA400FB2ABE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		31B8A42321A2669A0055BD01 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		31B8A42421A2669A0055BD01 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		31B8A43B21A268E00055BD01 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		31B8A43C21A268E00055BD01 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -2183,6 +1860,7 @@
 		31B8A44F21A26A4B0055BD01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2191,6 +1869,7 @@
 		31B8A45021A26A4B0055BD01 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2199,6 +1878,7 @@
 		31B8A45C21A26A970055BD01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2207,6 +1887,7 @@
 		31B8A45D21A26A970055BD01 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2238,24 +1919,6 @@
 			buildConfigurations = (
 				3189578421A1FDA400FB2ABE /* Debug */,
 				3189578521A1FDA400FB2ABE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		31B8A42221A2669A0055BD01 /* Build configuration list for PBXNativeTarget "lev_comp" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				31B8A42321A2669A0055BD01 /* Debug */,
-				31B8A42421A2669A0055BD01 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		31B8A43A21A268E00055BD01 /* Build configuration list for PBXNativeTarget "dgn_comp" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				31B8A43B21A268E00055BD01 /* Debug */,
-				31B8A43C21A268E00055BD01 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

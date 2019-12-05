@@ -221,7 +221,7 @@ restore_dungeon(nhfp)
 NHFILE *nhfp;
 {
     branch *curr, *last;
-    int count, i;
+    int count = 0, i;
     mapseen *curr_ms, *last_ms;
 
     if (nhfp->structlevel) {
@@ -808,13 +808,12 @@ init_dungeons()
     const char *const dgnaligns[] = { "unaligned", "noalign", "lawful", "neutral", "chaotic", NULL};
     const int dgnaligns2i[] = { D_ALIGN_NONE, D_ALIGN_NONE, D_ALIGN_LAWFUL, D_ALIGN_NEUTRAL, D_ALIGN_CHAOTIC, D_ALIGN_NONE };
     lua_State *L;
-    register int i, cl = 0, cb = 0;
+    register int i, cl = 0;
     register s_level *x;
     struct proto_dungeon pd;
     struct level_map *lev_map;
     int tidx;
 
-    nhUse(cb);
     (void) memset(&pd, 0, sizeof(struct proto_dungeon));
     pd.n_levs = pd.n_brs = 0;
 
@@ -2486,7 +2485,7 @@ static mapseen *
 load_mapseen(nhfp)
 NHFILE *nhfp;
 {
-    int i, branchnum, brindx;
+    int i, branchnum = 0, brindx;
     mapseen *load;
     branch *curr;
 
