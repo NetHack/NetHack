@@ -4,13 +4,27 @@ NetHack 3.7 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.6.
 
-NetHack 3.7.0 work-in-progress is not an official release of NetHack. It
-currently contains a number of enhancements to NetHack 3.6.3. The file
-doc/fixes37.0 in the source distribution has a full list of them. The text in 
-there was written for the development team's own use and is provided  "as is", 
-so please do not ask us to further explain the entries in that file. Some 
-entries might be considered "spoilers", particularly in the "new features"
-section.
+NetHack 3.7.0 work-in-progress is not a release of NetHack. As a .0 version,
+and still very early in its development cycle, it is quite likely that there
+has been, and will continue to be, quite a number of code changes and/or code
+additions. The code may involve new approaches to things and may may add many
+new features and changes in the weeks and months ahead, and it may alter
+existing behavior. 
+
+In short -- there are likely to be bugs. Don't treat NetHack-3.7 branch as
+released code, and if stability is paramount, then the most recent 
+NetHack 3.6.3 release is probably safest for you.
+
+We're making the .0 work-in-progress available so that you can observe its
+development, test it out, and contribute to its development. Constructive
+suggestions, GitHub pull requests, and bug reports are all welcome.
+
+The file doc/fixes37.0 in the source distribution has a full list of bug-fixes
+included so far, as well as brief mentions of some of the other code changes.
+The text in there was written for the development team's own use and is
+provided  "as is", so please do not ask us to further explain the entries in
+that file. Some entries might be considered "spoilers", particularly in the 
+"new features" section.
 
 Along with the game improvements and bug fixes, NetHack 3.7 strives to make
 some general architectural improvements to the game or to its building 
