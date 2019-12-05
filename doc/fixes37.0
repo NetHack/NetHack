@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ $NHDT-Date: 1557663358 2019/05/12 12:15:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ $NHDT-Date: 1575542023 2019/12/05 10:33:43 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -10,6 +10,9 @@ hero polymorphed into a vampire can use #monster to shape-shift rather than
 adjust bones filename buffer sizes to accommodate suffix
 fix internal self-recover to work with recent fields added to checkpoint file
 improvements to pronoun usage when hallucinating
+message "your knapsack can't accomodate any more items" when picking stuff up
+	or removing such from container was inaccurate if there was some gold
+	pending; vary the message rather than add more convoluted pickup code
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
