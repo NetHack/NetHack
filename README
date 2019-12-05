@@ -5,15 +5,12 @@ which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.6.
 
 NetHack 3.7.0 work-in-progress is not a release of NetHack. As a .0 version,
-and still very early in its development cycle, it is quite likely that there
-has been, and will continue to be, quite a number of code changes and/or code
-additions. The code may involve new approaches to things and may add many new
-features and changes in the weeks and months ahead, and it may alter existing
-behavior. 
+and still very early in its development cycle, there has already been changes
+made, and there will continue to be many more prior to an eventual release.
 
 In short -- there are likely to be bugs. Don't treat NetHack-3.7 branch as
 released code, and if stability is paramount, then the most recent 
-NetHack 3.6.3 release is probably safest for you.
+NetHack 3.6.3 release is safest for you.
 
 We're making the .0 work-in-progress available so that you can observe its
 development, test it out, and contribute to its development. Constructive
@@ -45,13 +42,21 @@ process. Among them:
     to open up the possibility of utilizing them between different platforms,
     such as between your desktop computer and your hand-held device.
 
-Below you will find some other general notes on the changes in NetHack 3.7 that
-were not considered spoilers:
- -  automatic annotation "gateway to Moloch's Sanctum" for vibrating square level
-        once that square's location becomes known (found or magic mapped);
-        goes away once sanctum temple is found (entered or high altar mapped)
- -  savefile: add support to deconstruct internal data structures down into their
-        individual fields and save those fields instead of the entire struct
+ *  Add support to make the game restartable without exit (a.k.a. "play again"
+    support). Toward that end, many previously scattered and separate variables
+    have been gathered into a central 'g' structure in decl.h/decl.c. That
+    will benefit the porting effort to some platforms that are under
+    consideration.
+
+Here are some other general notes on the changes in NetHack 3.7 that were not
+considered spoilers:
+ -  automatic annotation "gateway to Moloch's Sanctum" for vibrating square
+        level once that square's location becomes known (found or magic
+        mapped); goes away once sanctum temple is found (entered or high altar
+        mapped)
+ -  savefile: add support to deconstruct internal data structures down into
+        their individual fields and save those fields instead of the entire
+        struct
  -  savefile: use little-endian format for fields where that makes a difference
 
                         - - - - - - - - - - -
