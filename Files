@@ -52,14 +52,14 @@ earth.lua     engrave.txt   epitaph.txt   fakewiz1.lua  fakewiz2.lua
 fire.lua      help          hh            history       juiblex.lua
 keyhelp       knox.lua      license       medusa-1.lua  medusa-2.lua
 medusa-3.lua  medusa-4.lua  minefill.lua  minend-1.lua  minend-2.lua
-minend-3.lua  mines.des     minetn-1.lua  minetn-2.lua  minetn-3.lua
-minetn-4.lua  minetn-5.lua  minetn-6.lua  minetn-7.lua  nhlib.lua
-opthelp       oracle.lua    oracles.txt   orcus.lua     quest.lua
-rumors.fal    rumors.tru    sanctum.lua   soko1-1.lua   soko1-2.lua
-soko2-1.lua   soko2-2.lua   soko3-1.lua   soko3-2.lua   soko4-1.lua
-soko4-2.lua   symbols       tower1.lua    tower2.lua    tower3.lua
-tribute       valley.lua    water.lua     wizard1.lua   wizard2.lua
-wizard3.lua   wizhelp
+minend-3.lua  minetn-1.lua  minetn-2.lua  minetn-3.lua  minetn-4.lua
+minetn-5.lua  minetn-6.lua  minetn-7.lua  nhlib.lua     opthelp
+oracle.lua    oracles.txt   orcus.lua     quest.lua     rumors.fal
+rumors.tru    sanctum.lua   soko1-1.lua   soko1-2.lua   soko2-1.lua
+soko2-2.lua   soko3-1.lua   soko3-2.lua   soko4-1.lua   soko4-2.lua
+symbols       tower1.lua    tower2.lua    tower3.lua    tribute
+valley.lua    water.lua     wizard1.lua   wizard2.lua   wizard3.lua
+wizhelp
 
 doc:
 (files for all versions)
