@@ -1,4 +1,4 @@
-/* NetHack 3.6	sf_base.c $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.7	sf_base.c $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* Copyright (c) Michael Allison, 2019. */
 /* NetHack may be freely redistributed.  See license for details. */
 

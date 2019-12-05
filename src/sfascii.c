@@ -1,6 +1,12 @@
-/* NetHack 3.6	sfascii.c $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.7	sfascii.c $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* Copyright (c) Michael Allison, 2019. */
 /* NetHack may be freely redistributed.  See license for details. */
+
+/*
+ * this is a proof-of-concept alternative output format. It doesn't
+ * offer value over the sflendian approach and is mostly used to test
+ * and confirm that alternative saveformat operates correctly.
+ */
 
 #include "hack.h"
 #include "integer.h"
@@ -17,7 +23,7 @@ void FDECL(report_problem_ascii, (NHFILE *, const char *, const char *, const ch
 #endif
 
 struct sf_procs ascii_sfo_procs = {
-    ".ascii",
+    ".tx",
     {
         ascii_sfo_aligntyp,
         ascii_sfo_any,
@@ -44,7 +50,7 @@ struct sf_procs ascii_sfo_procs = {
 
 struct sf_procs ascii_sfi_procs =
 {
-    ".ascii",
+    ".tx",
     {
         ascii_sfi_aligntyp,
         ascii_sfi_any,
