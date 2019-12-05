@@ -20,7 +20,8 @@ spoilers:
  *     off due to being polymorphed
  *  Fixed 'object lost' panic when attempting to crawl of of the water during
  *     emergency disrobing/dropping
- *  Running now stops when moving over engravings so you can tell where they are
+ *  Running now stops when moving over engravings so you can tell where they
+ *  are
  *  Fixed detection of unseen/secret doors which failed to find monsters hiding
  *     under objects and failed to find monsters hiding at trap locations
  *  Ensured fatal status conditions made it to disclosure and/or dumplog
@@ -193,6 +194,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1575306309 2019/12/02 17:05:09 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.62 $
+# $NHDT-Date: 1575587888 2019/12/05 23:18:08 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
