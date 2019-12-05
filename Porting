@@ -200,34 +200,37 @@ line options to produce several output files that are required for:
 
      4.2. Other utilities
 
-Compile and link other utilities such as uudecode, tile-generation utilities,
-and so forth. Those produce output files for use during the game and need to
-be included in the packaging of the game.
+	Compile and link other utilities such as uudecode, tile-generation
+utilities, and so forth. Those produce output files for use during the game and
+need to be included in the packaging of the game.
 
      4.3. Lua
-          
-Compile and link into a library, or obtain a prebuilt Lua library for your platform;
-place the Lua source into lib/lua-5.3.5 (or other folder representing an appropriate
-Lua version); place the Lua library into lib.
+  
+	Compile and link into a library, or obtain a prebuilt Lua library for
+your platform. Place the Lua source into lib/lua-5.3.5 (or other folder
+representing an appropriate Lua version); place the compiled Lua library into
+lib.
 
      4.4  Compile NetHack sources
 
-Compile the source code of the game, including a suitable regular-expression
-interface from several options available in sys/share. Pick one that is
-supported by your OS or that you have obtained a 3rd party library for.
+	Compile the source code of the game, including a suitable
+regular-expression choice from several options available in sys/share. Pick one
+that is supported by your OS or that you have obtained a 3rd party library for.
 
      4.5  Compile optional window port components into a library
 
-If your platform requires 3rd party sources in order to support the window
-port options that you have chosen, such as curses sources for the curses
+	If your platform requires 3rd party sources in order to support the
+window port options that you have chosen, such as curses sources for the curses
 window port, you may store the sources for that library in a subfolder under
 lib.
 
-     4.5. Link the game
+     4.6. Link the game
 
-Link the game to the Lua library, any window port support libraries.
+	Link the game to the Lua library, and to any window port support
+libraries.
 
-     4.6  Package the game
+     4.7  Package the game
+
 
 
      5.0	Design Updates
@@ -236,27 +239,27 @@ The following design updates were introduced in NetHack 3.7.
 
      5.1  Quest text files
 
-The quest text files that were formerly converted from their source text by
-makedefs during the build process, have been replaced by Lua versions and
-are inserted into the game package for processing by the embedded Lua
+	The quest text files that were formerly converted from their source
+text by makedefs during the build process, have been replaced by Lua versions
+and are inserted into the game package for processing by the embedded Lua
 interpreter during game execution.
 
      5.2  Level Compiler  
 
-There is no longer a build-time level compiler. Instead, the level descriptions
-have been converted to Lua and are inserted into the game package for
-processing by the embeded Lua interpreter during game execution.
+	There is no longer a build-time level compiler. Instead, the level
+descriptions have been converted to Lua and are inserted into the game package
+for processing by the embeded Lua interpreter during game execution.
 
      5.3  Dungeon Compiler
 
-There is no longer a build-time dungeon compiler. Instead, the dungeon
+	There is no longer a build-time dungeon compiler. Instead, the dungeon
 description has been converted to Lua and is inserted into the game package for
-processing by the embeded Lua interpreter during game execution. 
+processing by the embeded Lua interpreter during game execution.
 
 
      5.4  Run-time Options
 
-Some of the build and option information that was formerly produced at
+	Some of the build and option information that was formerly produced at
 build-time by makedefs, and contained information about the game platform and
 options selected during the build of the game can now be produced at run-time
 by code within the game itself. That was done to facilitate cross-compiling of
