@@ -231,19 +231,19 @@ WINQTOBJ = qt_win.o qt_clust.o qttableview.o tile.o
 #
 # Files for a Qt 4 or 5 port
 #
-WINQT4SRC = ../win/Qt4/qt4bind.cpp ../win/Qt4/qt4click.cpp \
-	../win/Qt4/qt4clust.cpp ../win/Qt4/qt4delay.cpp \
-	../win/Qt4/qt4glyph.cpp ../win/Qt4/qt4icon.cpp ../win/Qt4/qt4inv.cpp \
-	../win/Qt4/qt4key.cpp ../win/Qt4/qt4line.cpp ../win/Qt4/qt4main.cpp \
-	../win/Qt4/qt4map.cpp ../win/Qt4/qt4menu.cpp ../win/Qt4/qt4msg.cpp \
-	../win/Qt4/qt4plsel.cpp ../win/Qt4/qt4rip.cpp ../win/Qt4/qt4set.cpp \
-	../win/Qt4/qt4stat.cpp ../win/Qt4/qt4str.cpp ../win/Qt4/qt4streq.cpp \
-	../win/Qt4/qt4svsel.cpp ../win/Qt4/qt4win.cpp ../win/Qt4/qt4xcmd.cpp \
-	../win/Qt4/qt4yndlg.cpp
-WINQT4OBJ = qt4bind.o qt4click.o qt4clust.o qt4delay.o qt4glyph.o qt4icon.o \
-	qt4inv.o qt4key.o qt4line.o qt4main.o qt4map.o qt4menu.o qt4msg.o \
-	qt4plsel.o qt4rip.o qt4set.o qt4stat.o qt4str.o qt4streq.o qt4svsel.o \
-	qt4win.o qt4xcmd.o qt4yndlg.o tile.o
+WINQTSRC = ../win/Qt/qt_bind.cpp ../win/Qt/qt_click.cpp \
+	../win/Qt/qt_clust.cpp ../win/Qt/qt_delay.cpp \
+	../win/Qt/qt_glyph.cpp ../win/Qt/qt_icon.cpp ../win/Qt/qt_inv.cpp \
+	../win/Qt/qt_key.cpp ../win/Qt/qt_line.cpp ../win/Qt/qt_main.cpp \
+	../win/Qt/qt_map.cpp ../win/Qt/qt_menu.cpp ../win/Qt/qt_msg.cpp \
+	../win/Qt/qt_plsel.cpp ../win/Qt/qt_rip.cpp ../win/Qt/qt_set.cpp \
+	../win/Qt/qt_stat.cpp ../win/Qt/qt_str.cpp ../win/Qt/qt_streq.cpp \
+	../win/Qt/qt_svsel.cpp ../win/Qt/qt_win.cpp ../win/Qt/qt_xcmd.cpp \
+	../win/Qt/qt_yndlg.cpp
+WINQTOBJ = qt_bind.o qt_click.o qt_clust.o qt_delay.o qt_glyph.o qt_icon.o \
+	qt_inv.o qt_key.o qt_line.o qt_main.o qt_map.o qt_menu.o qt_msg.o \
+	qt_plsel.o qt_rip.o qt_set.o qt_stat.o qt_str.o qt_streq.o qt_svsel.o \
+	qt_win.o qt_xcmd.o qt_yndlg.o tile.o
 #
 # Files for a Gnome port
 #
@@ -302,12 +302,12 @@ WINBEOBJ =
 #
 #
 # libraries for Qt 3
-WINQTLIB = -L$(QTDIR)/lib -lqt
+WINQT3LIB = -L$(QTDIR)/lib -lqt
 #
 # libraries for Qt 4
 WINQT4LIB = `pkg-config QtGui --libs`
 #
-# libraries for Qt 5 (use with WINQT4SRC and WINQT4OBJ)
+# libraries for Qt 5 (use with WINQTSRC and WINQTOBJ)
 WINQT5LIB = `pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs`
 #
 # libraries for KDE (with Qt)
@@ -474,7 +474,7 @@ GENCSRC = vis_tab.c	sfdata.c #tile.c
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
-WINCXXSRC = $(WINQTSRC) $(WINQT4SRC) $(WINBESRC)
+WINCXXSRC = $(WINQTSRC) $(WINBESRC)
 
 # Files for window system chaining. Requires SYSCF; include via HINTSRC/HINTOBJ
 CHAINSRC = ../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
@@ -613,26 +613,26 @@ qttableview.moc: ../include/qttableview.h
 	$(QTDIR)/bin/moc -o qttableview.moc ../include/qttableview.h
 
 # Qt 4 windowport meta-object-compiler output
-qt4kde0.moc : ../win/Qt4/qt4kde0.h
-	$(QTDIR)/bin/$(MOC) -o qt4kde0.moc ../win/Qt4/qt4kde0.h
-qt4main.moc : ../win/Qt4/qt4main.h
-	$(QTDIR)/bin/$(MOC) -o qt4main.moc ../win/Qt4/qt4main.h
-qt4map.moc : ../win/Qt4/qt4map.h
-	$(QTDIR)/bin/$(MOC) -o qt4map.moc ../win/Qt4/qt4map.h
-qt4menu.moc : ../win/Qt4/qt4menu.h
-	$(QTDIR)/bin/$(MOC) -o qt4menu.moc ../win/Qt4/qt4menu.h
-qt4msg.moc : ../win/Qt4/qt4msg.h
-	$(QTDIR)/bin/$(MOC) -o qt4msg.moc ../win/Qt4/qt4msg.h
-qt4plsel.moc : ../win/Qt4/qt4plsel.h
-	$(QTDIR)/bin/$(MOC) -o qt4plsel.moc ../win/Qt4/qt4plsel.h
-qt4set.moc : ../win/Qt4/qt4set.h
-	$(QTDIR)/bin/$(MOC) -o qt4set.moc ../win/Qt4/qt4set.h
-qt4stat.moc : ../win/Qt4/qt4stat.h
-	$(QTDIR)/bin/$(MOC) -o qt4stat.moc ../win/Qt4/qt4stat.h
-qt4xcmd.moc : ../win/Qt4/qt4xcmd.h
-	$(QTDIR)/bin/$(MOC) -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
-qt4yndlg.moc : ../win/Qt4/qt4yndlg.h
-	$(QTDIR)/bin/$(MOC) -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
+qt_kde0.moc : ../win/Qt/qt_kde0.h
+	$(QTDIR)/bin/$(MOC) -o qt_kde0.moc ../win/Qt/qt_kde0.h
+qt_main.moc : ../win/Qt/qt_main.h
+	$(QTDIR)/bin/$(MOC) -o qt_main.moc ../win/Qt/qt_main.h
+qt_map.moc : ../win/Qt/qt_map.h
+	$(QTDIR)/bin/$(MOC) -o qt_map.moc ../win/Qt/qt_map.h
+qt_menu.moc : ../win/Qt/qt_menu.h
+	$(QTDIR)/bin/$(MOC) -o qt_menu.moc ../win/Qt/qt_menu.h
+qt_msg.moc : ../win/Qt/qt_msg.h
+	$(QTDIR)/bin/$(MOC) -o qt_msg.moc ../win/Qt/qt_msg.h
+qt_plsel.moc : ../win/Qt/qt_plsel.h
+	$(QTDIR)/bin/$(MOC) -o qt_plsel.moc ../win/Qt/qt_plsel.h
+qt_set.moc : ../win/Qt/qt_set.h
+	$(QTDIR)/bin/$(MOC) -o qt_set.moc ../win/Qt/qt_set.h
+qt_stat.moc : ../win/Qt/qt_stat.h
+	$(QTDIR)/bin/$(MOC) -o qt_stat.moc ../win/Qt/qt_stat.h
+qt_xcmd.moc : ../win/Qt/qt_xcmd.h
+	$(QTDIR)/bin/$(MOC) -o qt_xcmd.moc ../win/Qt/qt_xcmd.h
+qt_yndlg.moc : ../win/Qt/qt_yndlg.h
+	$(QTDIR)/bin/$(MOC) -o qt_yndlg.moc ../win/Qt/qt_yndlg.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \
@@ -923,83 +923,83 @@ qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_clust.cpp
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qttableview.cpp
-qt4bind.o: ../win/Qt4/qt4bind.cpp $(HACK_H) ../win/Qt4/qt4bind.h \
-		../win/Qt4/qt4click.h ../win/Qt4/qt4delay.h \
-		../win/Qt4/qt4xcmd.h ../win/Qt4/qt4key.h ../win/Qt4/qt4map.h \
-		../win/Qt4/qt4menu.h ../win/Qt4/qt4msg.h ../win/Qt4/qt4plsel.h \
-		../win/Qt4/qt4svsel.h ../win/Qt4/qt4set.h ../win/Qt4/qt4stat.h \
-		../win/Qt4/qt4streq.h ../win/Qt4/qt4yndlg.h \
-		../win/Qt4/qt4str.h ../include/dlb.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4bind.cpp
-qt4click.o: ../win/Qt4/qt4click.cpp $(HACK_H) ../win/Qt4/qt4click.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4click.cpp
-qt4clust.o: ../win/Qt4/qt4clust.cpp ../win/Qt4/qt4clust.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4clust.cpp
-qt4delay.o: ../win/Qt4/qt4delay.cpp $(HACK_H) ../win/Qt4/qt4delay.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4delay.cpp
-qt4glyph.o: ../win/Qt4/qt4glyph.cpp $(HACK_H) ../include/tile2x11.h \
-		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4glyph.cpp
-qt4icon.o: ../win/Qt4/qt4icon.cpp $(HACK_H) ../win/Qt4/qt4icon.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4icon.cpp
-qt4inv.o: ../win/Qt4/qt4inv.cpp $(HACK_H) ../win/Qt4/qt4inv.h \
-		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4inv.cpp
-qt4key.o: ../win/Qt4/qt4key.cpp $(HACK_H) ../win/Qt4/qt4key.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4key.cpp
-qt4line.o: ../win/Qt4/qt4line.cpp $(HACK_H) ../win/Qt4/qt4line.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4line.cpp
-qt4main.o: ../win/Qt4/qt4main.cpp $(HACK_H) ../include/patchlevel.h \
-		../win/Qt4/qt4main.h qt4main.moc ../win/Qt4/qt4bind.h \
-		../win/Qt4/qt4glyph.h ../win/Qt4/qt4inv.h ../win/Qt4/qt4key.h \
-		../win/Qt4/qt4map.h ../win/Qt4/qt4msg.h ../win/Qt4/qt4set.h \
-		../win/Qt4/qt4stat.h ../win/Qt4/qt4str.h qt4kde0.moc
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4main.cpp
-qt4map.o: ../win/Qt4/qt4map.cpp $(HACK_H) ../win/Qt4/qt4map.h qt4map.moc \
-		../win/Qt4/qt4click.h ../win/Qt4/qt4glyph.h \
-		../include/qt_xpms.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4map.cpp
-qt4menu.o: ../win/Qt4/qt4menu.cpp $(HACK_H) ../win/Qt4/qt4menu.h qt4menu.moc \
-		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h \
-		../win/Qt4/qt4streq.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4menu.cpp
-qt4msg.o: ../win/Qt4/qt4msg.cpp $(HACK_H) ../win/Qt4/qt4msg.h qt4msg.moc \
-		../win/Qt4/qt4map.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4msg.cpp
-qt4plsel.o: ../win/Qt4/qt4plsel.cpp $(HACK_H) ../win/Qt4/qt4plsel.h \
-		qt4plsel.moc ../win/Qt4/qt4bind.h ../win/Qt4/qt4glyph.h \
-		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4plsel.cpp
-qt4rip.o: ../win/Qt4/qt4rip.cpp $(HACK_H) ../win/Qt4/qt4rip.h \
-		../win/Qt4/qt4bind.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4rip.cpp
-qt4set.o: ../win/Qt4/qt4set.cpp $(HACK_H) ../win/Qt4/qt4set.h qt4set.moc \
-		../win/Qt4/qt4glyph.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4set.cpp
-qt4stat.o: ../win/Qt4/qt4stat.cpp $(HACK_H) ../win/Qt4/qt4stat.h qt4stat.moc \
-		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h ../include/qt_xpms.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4stat.cpp
-qt4str.o: ../win/Qt4/qt4str.cpp ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4str.cpp
-qt4streq.o: ../win/Qt4/qt4streq.cpp $(HACK_H) ../win/Qt4/qt4streq.h \
-		../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4streq.cpp
-qt4svsel.o: ../win/Qt4/qt4svsel.cpp $(HACK_H) ../win/Qt4/qt4svsel.h \
-		../win/Qt4/qt4bind.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4svsel.cpp
-qt4win.o: ../win/Qt4/qt4win.cpp $(HACK_H) ../win/Qt4/qt4win.h \
-		../win/Qt4/qt4bind.h ../win/Qt4/qt4click.h \
-		../win/Qt4/qt4glyph.h ../win/Qt4/qt4inv.h ../win/Qt4/qt4key.h \
-		../win/Qt4/qt4icon.h ../win/Qt4/qt4map.h ../win/Qt4/qt4menu.h \
-		../win/Qt4/qt4msg.h ../win/Qt4/qt4set.h ../win/Qt4/qt4clust.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4win.cpp
-qt4xcmd.o: ../win/Qt4/qt4xcmd.cpp $(HACK_H) ../include/func_tab.h \
-		../win/Qt4/qt4xcmd.h qt4xcmd.moc ../win/Qt4/qt4bind.h \
-		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4xcmd.cpp
-qt4yndlg.o: ../win/Qt4/qt4yndlg.cpp $(HACK_H) ../win/Qt4/qt4yndlg.h \
-		qt4yndlg.moc ../win/Qt4/qt4str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt4/qt4yndlg.cpp
+qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_bind.h \
+		../win/Qt/qt_click.h ../win/Qt/qt_delay.h \
+		../win/Qt/qt_xcmd.h ../win/Qt/qt_key.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_menu.h ../win/Qt/qt_msg.h ../win/Qt/qt_plsel.h \
+		../win/Qt/qt_svsel.h ../win/Qt/qt_set.h ../win/Qt/qt_stat.h \
+		../win/Qt/qt_streq.h ../win/Qt/qt_yndlg.h \
+		../win/Qt/qt_str.h ../include/dlb.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_bind.cpp
+qt_click.o: ../win/Qt/qt_click.cpp $(HACK_H) ../win/Qt/qt_click.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_click.cpp
+qt_clust.o: ../win/Qt/qt_clust.cpp ../win/Qt/qt_clust.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_clust.cpp
+qt_delay.o: ../win/Qt/qt_delay.cpp $(HACK_H) ../win/Qt/qt_delay.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_delay.cpp
+qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) ../include/tile2x11.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_glyph.cpp
+qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../win/Qt/qt_icon.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_icon.cpp
+qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../win/Qt/qt_inv.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_inv.cpp
+qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../win/Qt/qt_key.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_key.cpp
+qt_line.o: ../win/Qt/qt_line.cpp $(HACK_H) ../win/Qt/qt_line.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_line.cpp
+qt_main.o: ../win/Qt/qt_main.cpp $(HACK_H) ../include/patchlevel.h \
+		../win/Qt/qt_main.h qt_main.moc ../win/Qt/qt_bind.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h ../win/Qt/qt_key.h \
+		../win/Qt/qt_map.h ../win/Qt/qt_msg.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_stat.h ../win/Qt/qt_str.h qt_kde0.moc
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_main.cpp
+qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_map.h qt_map.moc \
+		../win/Qt/qt_click.h ../win/Qt/qt_glyph.h \
+		../include/qt_xpms.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_map.cpp
+qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../win/Qt/qt_menu.h qt_menu.moc \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_streq.h ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_menu.cpp
+qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_msg.h qt_msg.moc \
+		../win/Qt/qt_map.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_msg.cpp
+qt_plsel.o: ../win/Qt/qt_plsel.cpp $(HACK_H) ../win/Qt/qt_plsel.h \
+		qt_plsel.moc ../win/Qt/qt_bind.h ../win/Qt/qt_glyph.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_plsel.cpp
+qt_rip.o: ../win/Qt/qt_rip.cpp $(HACK_H) ../win/Qt/qt_rip.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_rip.cpp
+qt_set.o: ../win/Qt/qt_set.cpp $(HACK_H) ../win/Qt/qt_set.h qt_set.moc \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_set.cpp
+qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../win/Qt/qt_stat.h qt_stat.moc \
+		../win/Qt/qt_set.h ../win/Qt/qt_str.h ../include/qt_xpms.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_stat.cpp
+qt_str.o: ../win/Qt/qt_str.cpp ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_str.cpp
+qt_streq.o: ../win/Qt/qt_streq.cpp $(HACK_H) ../win/Qt/qt_streq.h \
+		../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_streq.cpp
+qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../win/Qt/qt_svsel.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_svsel.cpp
+qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_win.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_click.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h ../win/Qt/qt_key.h \
+		../win/Qt/qt_icon.h ../win/Qt/qt_map.h ../win/Qt/qt_menu.h \
+		../win/Qt/qt_msg.h ../win/Qt/qt_set.h ../win/Qt/qt_clust.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
+qt_xcmd.o: ../win/Qt/qt_xcmd.cpp $(HACK_H) ../include/func_tab.h \
+		../win/Qt/qt_xcmd.h qt_xcmd.moc ../win/Qt/qt_bind.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_xcmd.cpp
+qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_yndlg.h \
+		qt_yndlg.moc ../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
 wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
 wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)

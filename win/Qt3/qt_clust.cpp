@@ -1,9 +1,10 @@
-/*	SCCS Id: @(#)qt_clust.cpp	3.4	1999/11/19	*/
+/* NetHack 3.6	qt_clust.cpp	$NHDT-Date: 1524684507 2018/04/25 19:28:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) Warwick Allison, 1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 #include "qt_clust.h"
 
-static void include(QRect& r, const QRect& rect)
+static
+void include(QRect& r, const QRect& rect)
 {
 	if (rect.left()<r.left()) {
 			r.setLeft(rect.left());
@@ -74,7 +75,7 @@ void Clusterizer::add(const QRect& rect)
 					- cluster[cursor].width()*cluster[cursor].height();
 
 			if (cost < lowestcost) {
-				bool bad=false;
+				bool bad=FALSE;
 				for (int c=0; c<count && !bad; c++) {
 					bad=cluster[c].intersects(larger) && c!=cursor;
 				}
@@ -107,7 +108,7 @@ void Clusterizer::add(const QRect& rect)
 		int cost=larger.width()*larger.height()
 				- cluster[cursor].width()*cluster[cursor].height();
 		if (cost < lowestcost) {
-			bool bad=false;
+			bool bad=FALSE;
 			for (int c=0; c<count && !bad; c++) {
 				bad=cluster[c].intersects(larger) && c!=cursor;
 			}
@@ -133,7 +134,7 @@ void Clusterizer::add(const QRect& rect)
 					- cluster[merge1].width()*cluster[merge1].height()
 					- cluster[merge2].width()*cluster[merge2].height();
 				if (cost < lowestcost) {
-					bool bad=false;
+					bool bad=FALSE;
 					for (int c=0; c<count && !bad; c++) {
 						bad=cluster[c].intersects(larger) && c!=cursor;
 					}
