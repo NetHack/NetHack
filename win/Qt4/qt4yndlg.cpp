@@ -81,7 +81,7 @@ char NetHackQtYnDialog::Exec()
 	}
 	if ( question.indexOf("what direction") >= 0 ) {
 	    // We replace this regardless, since sometimes you get choices.
-	    const char* d = Cmd.dirchars;
+	    const char* d = g.Cmd.dirchars;
 	    enable=ch;
 	    ch="";
 	    ch.append(d[1]);

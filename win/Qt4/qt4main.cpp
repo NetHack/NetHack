@@ -683,7 +683,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     QToolButton* tb;
     char actchar[32];
     tb = new SmallToolButton( QPixmap(again_xpm),"Again","Action", sm, SLOT(map()), toolbar );
-    Sprintf(actchar, "%c", Cmd.spkeys[NHKF_DOAGAIN]);
+    Sprintf(actchar, "%c", g.Cmd.spkeys[NHKF_DOAGAIN]);
     sm->setMapping(tb, actchar );
     toolbar->addWidget(tb);
     tb = new SmallToolButton( QPixmap(get_xpm),"Get","Action", sm, SLOT(map()), toolbar );
@@ -977,7 +977,7 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 	event->key() >= Qt::Key_Left && event->key() <= Qt::Key_Down )
 	return;
 
-    const char* d = Cmd.dirchars;
+    const char* d = g.Cmd.dirchars;
     switch (event->key()) {
      case Qt::Key_Up:
 	if ( dirkey == d[0] )
