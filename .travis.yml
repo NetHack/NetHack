@@ -31,7 +31,7 @@ matrix:
             - qtbase5-dev
             - qtmultimedia5-dev
             - qtbase5-dev-tools
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && QT_SELECT=5 && make fetch-lua && make MOC=moc install"
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make QT_SELECT=5 MOC=moc install"
     - os: linux
       env: DESCR=linux-bionic-gcc-x11 HINTS=linux-x11
       dist: bionic
