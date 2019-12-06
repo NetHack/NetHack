@@ -71,6 +71,7 @@ HOBJ = host_o
 DAT  = ../dat
 DOC  = ../doc
 INCL = ../include
+LIB  = ../lib
 MSYS = ../sys/msdos
 SRC  = ../src
 SSHR = ../sys/share
