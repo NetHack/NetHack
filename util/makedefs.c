@@ -1201,16 +1201,20 @@ char *outbuf;
 const char *build_date;
 {
     char subbuf[64], versbuf[64];
-    char betabuf[64];
+    char statusbuf[64];
 
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 #if (NH_DEVEL_STATUS == NH_STATUS_BETA)
-    Strcpy(betabuf, " Beta");
+    Strcpy(statusbuf, " Beta");
 #else
-    Strcpy(betabuf, " Work-in-progress");
+#if (NH_DEVEL_STATUS == NH_STATUS_WIP)
+    Strcpy(statusbuf, " Work-in-progress");
+#else
+    Strcpy(statusbuf, " post-release");
+#endif
 #endif
 #else
-    betabuf[0] = '\0';
+    statusbuf[0] = '\0';
 #endif
 
     subbuf[0] = '\0';
@@ -1220,7 +1224,7 @@ const char *build_date;
 #endif
 
     Sprintf(outbuf, "%s NetHack%s Version %s%s - last %s %s.", PORT_ID,
-            subbuf, version_string(versbuf, "."), betabuf,
+            subbuf, version_string(versbuf, "."), statusbuf,
             date_via_env ? "revision" : "build", build_date);
     return outbuf;
 }

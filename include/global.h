@@ -11,14 +11,15 @@
 /*
  * Development status possibilities.
  */
-#define NH_STATUS_RELEASED 0         /* Released */
-#define NH_STATUS_WIP      1         /* Work in progress */
-#define NH_STATUS_BETA     2         /* BETA testing */
+#define NH_STATUS_RELEASED    0         /* Released */
+#define NH_STATUS_WIP         1         /* Work in progress */
+#define NH_STATUS_BETA        2         /* BETA testing */
+#define NH_STATUS_POSTRELEASE 3         /* patch commit point only */
 
 /*
  * Development status of this NetHack version.
  */
-#define NH_DEVEL_STATUS NH_STATUS_RELEASED
+#define NH_DEVEL_STATUS NH_STATUS_POSTRELEASE
 
 #ifndef DEBUG  /* allow tool chains to define without causing warnings */
 #define DEBUG
