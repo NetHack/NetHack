@@ -1,4 +1,4 @@
-/* NetHack 3.6	sys.c	$NHDT-Date: 1547118632 2019/01/10 11:10:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	sys.c	$NHDT-Date: 1575665952 2019/12/06 20:59:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -107,12 +107,11 @@ sysopt_release()
     if (sysopt.genericusers)
         free((genericptr_t) sysopt.genericusers),
         sysopt.genericusers = (char *) 0;
-#ifdef PANICTRACE
     if (sysopt.gdbpath)
         free((genericptr_t) sysopt.gdbpath), sysopt.gdbpath = (char *) 0;
     if (sysopt.greppath)
         free((genericptr_t) sysopt.greppath), sysopt.greppath = (char *) 0;
-#endif
+
     /* this one's last because it might be used in panic feedback, although
        none of the preceding ones are likely to trigger a controlled panic */
     if (sysopt.fmtd_wizard_list)
