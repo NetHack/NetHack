@@ -1290,8 +1290,7 @@ extern NEARDATA char *hilites[CLR_MAX];
 #endif
 
 int
-has_color(color)
-int color;
+has_color(int color)
 {
     return (iflags.use_color && windowprocs.name
             && (windowprocs.wincap & WC_COLOR) && windowprocs.has_color[color]
