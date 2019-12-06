@@ -101,8 +101,8 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     should answer most of your questions.
 
 
-    At the time of this release, NetHack 3.6 has been tested to run/compile
-    on:
+    At the time of the most recent official release, NetHack 3.6, it had
+    been tested to run/compile on:
 
         Intel Pentium or better (or clone) running Linux, BSDI, or 
                 Windows (7 through 10)
@@ -111,11 +111,12 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 	OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
 
     Instructions have been provided by way of community contribution on:
-        msdos protected mode using djgpp
+        msdos protected mode using djgpp including a Linux-host djgpp 
+        cross-compile
 
     Previous versions of NetHack were tested and known to run on the 
     following systems, but it is unknown if they can still build and 
-    execute NetHack 3.6:
+    execute NetHack 3.6 or NetHack 3.7:
 
         Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
         Atari ST/TT/Falcon running TOS (or MultiTOS) with GCC
