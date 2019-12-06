@@ -2833,8 +2833,7 @@ int xtra_prob /* to force 0% random generation items to also be considered */)
 }
 
 int
-shiny_obj(oclass)
-char oclass;
+shiny_obj(char oclass)
 {
     return (int) rnd_otyp_by_namedesc("shiny", oclass, 0);
 }

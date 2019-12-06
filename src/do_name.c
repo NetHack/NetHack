@@ -1925,9 +1925,7 @@ struct monst *mon, *other_mon;
 /* for debugging messages, where data might be suspect and we aren't
    taking what the hero does or doesn't know into consideration */
 char *
-minimal_monnam(mon, ckloc)
-struct monst *mon;
-boolean ckloc;
+minimal_monnam(struct monst *mon, boolean ckloc)
 {
     struct permonst *ptr;
     char *outbuf = nextmbuf();

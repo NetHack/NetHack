@@ -212,10 +212,7 @@ mksobj_at(int otyp, int x, int y, boolean init, boolean artif)
 }
 
 struct obj *
-mksobj_migr_to_species(otyp, mflags2, init, artif)
-int otyp;
-unsigned mflags2;
-boolean init, artif;
+mksobj_migr_to_species(int otyp, unsigned mflags2, boolean init, boolean artif)
 {
     struct obj *otmp;
 
@@ -2392,10 +2389,7 @@ insane_object(struct obj *obj, const char *fmt, const char *mesg, struct monst *
  * take an obj pointer to work.
  */
 struct obj *
-init_dummyobj(obj, otyp, oquan)
-struct obj *obj;
-short otyp;
-long oquan;
+init_dummyobj(struct obj *obj, short otyp, long oquan)
 {
      if (obj) {
          *obj = zeroobj;

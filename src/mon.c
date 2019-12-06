@@ -2574,9 +2574,7 @@ m_into_limbo(struct monst *mtmp)
 }
 
 STATIC_OVL void
-migrate_mon(mtmp, target_lev, xyloc)
-struct monst *mtmp;
-xchar target_lev, xyloc;
+migrate_mon(struct monst *mtmp, xchar target_lev, xchar xyloc)
 {
     unstuck(mtmp);
     mdrop_special_objs(mtmp);

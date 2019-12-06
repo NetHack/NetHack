@@ -142,6 +142,7 @@ E void cl_eos(void);
  * a color or whatever.  wintty.c should concern itself with WHERE to put
  * stuff in a window.
  */
+E int term_attr_fixup(int);
 E void term_start_attr(int attr);
 E void term_end_attr(int attr);
 E void term_start_raw_bold(void);

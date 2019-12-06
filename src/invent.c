@@ -477,11 +477,10 @@ sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
  *      instead of simple 'struct obj *' entries.
  */
 Loot *
-sortloot(olist, mode, by_nexthere, filterfunc)
-struct obj **olist; /* previous version might have changed *olist, we don't */
-unsigned mode; /* flags for sortloot_cmp() */
-boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
-boolean (*filterfunc)(OBJ_P);
+sortloot(struct obj **olist, /* previous version might have changed *olist, we don't */
+ unsigned mode,       /* flags for sortloot_cmp() */
+ boolean by_nexthere, /* T: traverse via obj->nexthere, F: via obj->nobj */
+ boolean (*filterfunc)(OBJ_P))
 {
     Loot *sliarray;
     struct obj *o;

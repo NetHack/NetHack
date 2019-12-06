@@ -849,8 +849,7 @@ unsigned tim, typ;
 }
 
 void
-reset_utrap(msg)
-boolean msg;
+reset_utrap(boolean msg)
 {
     boolean was_Lev = (Levitation != 0), was_Fly = (Flying != 0);
 

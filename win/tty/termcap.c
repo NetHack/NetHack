@@ -1200,8 +1200,7 @@ e_atr2str(int n)
 /* suppress nonfunctional highlights so render_status() might be able to
    optimize more; keep this in sync with s_atr2str() */
 int
-term_attr_fixup(msk)
-int msk;
+term_attr_fixup(int msk)
 {
     /* underline is converted to bold if its start sequence isn't available */
     if ((msk & HL_ULINE) && (!nh_US || !*nh_US)) {

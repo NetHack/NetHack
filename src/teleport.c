@@ -638,8 +638,7 @@ dotelecmd()
 }
 
 int
-dotele(break_the_rules)
-boolean break_the_rules; /* True: wizard mode ^T */
+dotele(boolean break_the_rules) /* True: wizard mode ^T */
 {
     struct trap *trap;
     const char *cantdoit;

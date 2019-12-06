@@ -1620,10 +1620,7 @@ mkclass(char class, int spc)
 
 /* mkclass() with alignment restrictions; used by ndemon() */
 struct permonst *
-mkclass_aligned(class, spc, atyp)
-char class;
-int spc;
-aligntyp atyp;
+mkclass_aligned(char class, int spc, aligntyp atyp)
 {
     register int first, last, num = 0;
     int k, nums[SPECIAL_PM + 1]; /* +1: insurance for final return value */

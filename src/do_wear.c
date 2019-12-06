@@ -46,8 +46,7 @@ STATIC_DCL void already_wearing2(const char *, const char *);
 
 /* plural "fingers" or optionally "gloves" */
 const char *
-fingers_or_gloves(check_gloves)
-boolean check_gloves;
+fingers_or_gloves(boolean check_gloves)
 {
     return ((check_gloves && uarmg)
             ? gloves_simple_name(uarmg) /* "gloves" or "gauntlets" */

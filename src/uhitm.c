@@ -1348,10 +1348,7 @@ shade_aware(struct obj *obj)
 /* used for hero vs monster and monster vs monster; also handles
    monster vs hero but that won't happen because hero can't be a shade */
 boolean
-shade_miss(magr, mdef, obj, thrown, verbose)
-struct monst *magr, *mdef;
-struct obj *obj;
-boolean thrown, verbose;
+shade_miss(struct monst *magr, struct monst *mdef, struct obj *obj, boolean thrown, boolean verbose)
 {
     const char *what, *whose, *target;
     boolean youagr = (magr == &youmonst), youdef = (mdef == &youmonst);

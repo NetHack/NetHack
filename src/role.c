@@ -786,8 +786,7 @@ validrole(int rolenum)
 }
 
 int
-randrole(for_display)
-boolean for_display;
+randrole(boolean for_display)
 {
     int res = SIZE(roles) - 1;
 

@@ -1789,9 +1789,7 @@ invert_all(winid window,
 
 /* support menucolor in addition to caller-supplied attribute */
 STATIC_OVL void
-toggle_menu_attr(on, color, attr)
-boolean on;
-int color, attr;
+toggle_menu_attr(boolean on, int color, int attr)
 {
     if (on) {
         term_start_attr(attr);

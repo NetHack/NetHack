@@ -186,10 +186,7 @@ mzapwand(struct monst *mtmp, struct obj *otmp, boolean self)
 
 /* similar to mzapwand() but for magical horns (only instrument mons play) */
 STATIC_OVL void
-mplayhorn(mtmp, otmp, self)
-struct monst *mtmp;
-struct obj *otmp;
-boolean self;
+mplayhorn(struct monst *mtmp, struct obj *otmp, boolean self)
 {
     if (!canseemon(mtmp)) {
         int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
