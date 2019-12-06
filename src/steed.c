@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1545441042 2018/12/22 01:10:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1575245090 2019/12/02 00:04:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -241,7 +241,7 @@ mount_steed(struct monst *mtmp, /* The animal */
     }
     if (mtmp->data == &mons[PM_LONG_WORM]
         && (u.ux + u.dx != mtmp->mx || u.uy + u.dy != mtmp->my)) {
-        /* 3.6.2:  test_move(below) is used to check for trying to mount
+        /* As of 3.6.2:  test_move(below) is used to check for trying to mount
            diagonally into or out of a doorway or through a tight squeeze;
            attempting to mount a tail segment when hero was not adjacent
            to worm's head could trigger an impossible() in worm_cross()
@@ -519,7 +519,7 @@ dismount_steed(int reason) /* Player was thrown off etc. */
         if (otmp && otmp->cursed) {
             You("can't.  The saddle %s cursed.",
                 otmp->bknown ? "is" : "seems to be");
-            otmp->bknown = TRUE;
+            otmp->bknown = 1; /* ok to skip set_bknown() here */
             return;
         }
         if (!have_spot) {
@@ -732,23 +732,39 @@ stucksteed(boolean checkfeeding)
 void
 place_monster(struct monst *mon, int x, int y)
 {
+    struct monst *othermon;
+    const char *monnm, *othnm;
+    char buf[QBUFSZ];
+
+    buf[0] = '\0';
     /* normal map bounds are <1..COLNO-1,0..ROWNO-1> but sometimes
        vault guards (either living or dead) are parked at <0,0> */
     if (!isok(x, y) && (x != 0 || y != 0 || !mon->isgd)) {
-        impossible("trying to place monster at <%d,%d>", x, y);
+        describe_level(buf);
+        impossible("trying to place %s at <%d,%d> mstate:%lx on %s",
+                   minimal_monnam(mon, TRUE), x, y, mon->mstate, buf);
         x = y = 0;
     }
     if (mon == u.usteed
         /* special case is for convoluted vault guard handling */
         || (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
-        impossible("placing %s onto map?",
-                   (mon == u.usteed) ? "steed" : "defunct monster");
+        describe_level(buf);
+        impossible("placing %s onto map, mstate:%lx, on %s?",
+                   (mon == u.usteed) ? "steed" : "defunct monster",
+                   mon->mstate, buf);
         return;
     }
-    if (level.monsters[x][y])
-        impossible("placing monster over another at <%d,%d>?", x, y);
+    if ((othermon = level.monsters[x][y]) != 0) {
+        describe_level(buf);
+        monnm = minimal_monnam(mon, FALSE);
+        othnm = (mon != othermon) ? minimal_monnam(othermon, TRUE) : "itself";
+        impossible("placing %s over %s at <%d,%d>, mstates:%lx %lx on %s?",
+                   monnm, othnm, x, y, othermon->mstate, mon->mstate, buf);
+    }
     mon->mx = x; mon->my = y;
     level.monsters[x][y] = mon;
+    mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO | MON_BUBBLEMOVE
+                     | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
 }
 
 /*steed.c*/

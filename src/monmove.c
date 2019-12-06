@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1557094802 2019/05/05 22:20:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1575245074 2019/12/02 00:04:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1370,7 +1370,7 @@ m_move(register struct monst *mtmp, register int after)
                         add_damage(mtmp->mx, mtmp->my, 0L);
                 }
             } else if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
-                /* 3.6.2: was using may_dig() but it doesn't handle bars */
+                /* As of 3.6.2: was using may_dig() but it doesn't handle bars */
                 if (!(levl[mtmp->mx][mtmp->my].wall_info & W_NONDIGGABLE)
                     && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR))) {
                     if (canseemon(mtmp))
@@ -1574,7 +1574,8 @@ set_apparxy(register struct monst *mtmp)
  * location however.
  */
 boolean
-undesirable_disp(struct monst *mtmp, xchar x, xchar y)
+undesirable_disp(struct monst *mtmp, /* barging creature */
+                 xchar x, xchar y)   /* spot 'mtmp' is considering moving to */
 {
     boolean is_pet = (mtmp && mtmp->mtame && !mtmp->isminion);
     struct trap *trap = t_at(x, y);
@@ -1592,6 +1593,18 @@ undesirable_disp(struct monst *mtmp, xchar x, xchar y)
                && (mtmp->mtrapseen & (1 << (trap->ttyp - 1))) != 0) {
         return TRUE;
     }
+
+    /* oversimplification:  creatures that bargethrough can't swap places
+       when target monster is in rock or closed door or water (in particular,
+       avoid moving to spots where mondied() won't leave a corpse; doesn't
+       matter whether barger is capable of moving to such a target spot if
+       it were unoccupied) */
+    if (!accessible(x, y)
+        /* mondied() allows is_pool() as an exception to !accessible(),
+           but we'll only do that if 'mtmp' is already at a water location
+           so that we don't swap a water critter onto land */
+        && !(is_pool(x, y) && is_pool(mtmp->mx, mtmp->my)))
+        return TRUE;
 
     return FALSE;
 }

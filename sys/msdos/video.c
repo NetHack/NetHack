@@ -226,6 +226,7 @@ cmov(register int col, register int row)
     }
 }
 
+#if 0
 int
 has_color(int color)
 {
@@ -236,6 +237,7 @@ has_color(int color)
     return 0;
 #endif
 }
+#endif
 
 void
 home()
@@ -566,7 +568,8 @@ xputs(const char *s)
     }
 }
 
-void xputc(char ch) /* write out character (and attribute) */
+/* same signature as 'putchar()' with potential failure result ignored */
+int xputc(int ch) /* write out character (and attribute) */
 {
     int i;
     char attribute;
@@ -585,14 +588,16 @@ void xputc(char ch) /* write out character (and attribute) */
         vesa_xputc(ch, attribute);
 #endif /*SCREEN_VESA*/
     }
+    return 0;
 }
 
+/* write out a glyph picture at current location */
 void xputg(int glyphnum,
            int ch,
-           unsigned special) /* write out a glyph picture at current location */
+           unsigned special)
 {
     if (!iflags.grmode || !iflags.tile_view) {
-        xputc((char) ch);
+        (void) xputc((char) ch);
 #ifdef SCREEN_VGA
     } else if (iflags.grmode && iflags.usevga) {
         vga_xputg(glyphnum, ch, special);

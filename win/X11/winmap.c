@@ -103,7 +103,7 @@ X11_print_glyph(winid window, xchar x, xchar y, int glyph, int bkglyph UNUSED)
 #endif
 
         /* map glyph to character and color */
-        (void) mapglyph(glyph, &och, &color, &special, x, y);
+        (void) mapglyph(glyph, &och, &color, &special, x, y, 0);
         ch = (uchar) och;
 
         if (special != map_info->tile_map.glyphs[y][x].special) {

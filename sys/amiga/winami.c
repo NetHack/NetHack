@@ -28,7 +28,9 @@ long amii_scrnmode;
  * the intuition interface for the amiga...
  */
 struct window_procs amii_procs = {
-    "amii", WC_COLOR | WC_HILITE_PET | WC_INVERSE, 0L, amii_init_nhwindows,
+    "amii", WC_COLOR | WC_HILITE_PET | WC_INVERSE,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    0L, amii_init_nhwindows,
     amii_player_selection, amii_askname, amii_get_nh_event,
     amii_exit_nhwindows, amii_suspend_nhwindows, amii_resume_nhwindows,
     amii_create_nhwindow, amii_clear_nhwindow, amii_display_nhwindow,
@@ -60,7 +62,9 @@ struct window_procs amii_procs = {
  * a shared library to allow the executable to be smaller.
  */
 struct window_procs amiv_procs = {
-    "amitile", WC_COLOR | WC_HILITE_PET | WC_INVERSE, 0L, amii_init_nhwindows,
+    "amitile", WC_COLOR | WC_HILITE_PET | WC_INVERSE,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    0L, amii_init_nhwindows,
     amii_player_selection, amii_askname, amii_get_nh_event,
     amii_exit_nhwindows, amii_suspend_nhwindows, amii_resume_nhwindows,
     amii_create_nhwindow, amii_clear_nhwindow, amii_display_nhwindow,

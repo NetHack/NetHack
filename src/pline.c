@@ -332,7 +332,7 @@ void You_hear(const char *line, ...)
     else if (Unaware)
         YouPrefix(tmp, "You dream that you hear ", line);
     else
-        YouPrefix(tmp, "You hear ", line);
+        YouPrefix(tmp, "You hear ", line);  /* Deaf-aware */
     vpline(strcat(tmp, line), the_args);
     va_end(the_args);
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/osascript
-# NetHack 3.6.2  NetHackTerm.applescript $NHDT-Date: 1524684597 2018/04/25 19:29:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $
+# NetHack 3.6.3  NetHackTerm.applescript $NHDT-Date: 1575245179 2019/12/02 00:06:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.10 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2011
 # NetHack may be freely redistributed.  See license for details.
 

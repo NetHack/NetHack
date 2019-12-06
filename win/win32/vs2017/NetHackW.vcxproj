@@ -8,6 +8,18 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="NetHackProperties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="NetHackProperties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="NetHackProperties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="NetHackProperties.props" />
+  </ImportGroup>
   <Import Project="common.props" />
   <Import Project="dirs.props" />
   <Import Project="files.props" />
@@ -169,10 +181,10 @@
     <ClCompile Include="$(WinWin32Dir)mhstatus.c" />
     <ClCompile Include="$(WinWin32Dir)mhtext.c" />
     <ClCompile Include="$(WinWin32Dir)mswproc.c" />
-    <ClCompile Include="$(WinWin32Dir)winhack.c" />
+    <ClCompile Include="$(WinWin32Dir)NetHackW.c" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="$(WinWin32Dir)winhack.rc" />
+    <ResourceCompile Include="$(WinWin32Dir)NetHackW.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(WinWin32Dir)mhaskyn.h" />
@@ -189,6 +201,18 @@
     <ClInclude Include="$(WinWin32Dir)mhstatus.h" />
     <ClInclude Include="$(WinWin32Dir)mhtext.h" />
     <ClInclude Include="$(WinWin32Dir)winMS.h" />
+    <ClInclude Include="..\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\mnsel.bmp" />
+    <Image Include="..\mnselcnt.bmp" />
+    <Image Include="..\mnunsel.bmp" />
+    <Image Include="..\NETHACK.ICO" />
+    <Image Include="..\petmark.bmp" />
+    <Image Include="..\pilemark.bmp" />
+    <Image Include="..\rip.bmp" />
+    <Image Include="..\splash.bmp" />
+    <Image Include="..\tiles.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="AfterBuild">

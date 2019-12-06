@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.h	$NHDT-Date: 1550524559 2019/02/18 21:15:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	monst.h	$NHDT-Date: 1561053561 2019/06/20 17:59:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -50,6 +50,17 @@ enum m_ap_types {
     M_AP_MONSTER   = 3  /* a monster; mostly used for cloned Wizard */
 };
 
+#define MON_FLOOR        0x00
+#define MON_OFFMAP       0x01
+#define MON_DETACH       0x02
+#define MON_MIGRATING    0x04
+#define MON_LIMBO        0x08
+#define MON_BUBBLEMOVE   0x10
+#define MON_ENDGAME_FREE 0x20
+#define MON_ENDGAME_MIGR 0x40
+#define MON_OBLITERATE   0x80
+#define MSTATE_MASK      0xFF
+
 #define M_AP_TYPMASK  0x7
 #define M_AP_F_DKNOWN 0x8
 #define U_AP_TYPE (youmonst.m_ap_type & M_AP_TYPMASK)
@@ -86,11 +97,13 @@ struct monst {
     Bitfield(perminvis, 1);   /* intrinsic minvis value */
     Bitfield(mcan, 1);        /* has been cancelled */
     Bitfield(mburied, 1);     /* has been buried */
+#define mtemplit mburied      /* since buried isn't implemented, use bit for
+                               * monsters shown by transient light source;
+                               * only valid during bhit() execution        */
     Bitfield(mundetected, 1); /* not seen in present hiding place;
                                * implies one of M1_CONCEAL or M1_HIDE,
                                * but not mimic (that is, snake, spider,
-                               * trapper, piercer, eel)
-                               */
+                               * trapper, piercer, eel) */
     Bitfield(mcansee, 1);   /* cansee 1, temp.blinded 0, blind 0 */
 
     Bitfield(mspeed, 2);    /* current speed */
@@ -149,8 +162,8 @@ struct monst {
     long mtrapseen;        /* bitmap of traps we've been trapped in */
     long mlstmv;           /* for catching up with lost time */
     long mspare1;
+#define mstate mspare1      /* only for debug exam right now, not code flow */
     struct obj *minvent;   /* mon's inventory */
-
     struct obj *mw;        /* mon's weapon */
     long misc_worn_check;  /* mon's wornmask */
     xchar weapon_check;    /* flag for whether to try switching weapons */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	winprocs.h	$NHDT-Date: 1553204011 2019/03/21 21:33:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	winprocs.h	$NHDT-Date: 1567213890 2019/08/31 01:11:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,6 +14,7 @@ struct window_procs {
                            * '+' are reserved for processors. */
     unsigned long wincap; /* window port capability options supported */
     unsigned long wincap2; /* additional window port capability options */
+    boolean has_color[CLR_MAX];
     void (*win_init_nhwindows)(int *, char **);
     void (*win_player_selection)(void);
     void (*win_askname)(void);
@@ -111,7 +112,7 @@ extern
 #define end_menu (*windowprocs.win_end_menu)
 #define select_menu (*windowprocs.win_select_menu)
 #define message_menu (*windowprocs.win_message_menu)
-#define update_inventory (*windowprocs.win_update_inventory)
+
 #define mark_synch (*windowprocs.win_mark_synch)
 #define wait_synch (*windowprocs.win_wait_synch)
 #ifdef CLIPPING
@@ -447,6 +448,7 @@ extern void FDECL(safe_status_enablefield,
 extern void FDECL(safe_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 extern boolean NDECL(safe_can_suspend);
 extern void FDECL(stdio_raw_print, (const char *));
+extern void FDECL(stdio_nonl_raw_print, (const char *));
 extern void FDECL(stdio_raw_print_bold, (const char *));
 extern void NDECL(stdio_wait_synch);
 extern int NDECL(stdio_nhgetch);

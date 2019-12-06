@@ -1688,7 +1688,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 
 		painter.setPen( green );
 		/* map glyph to character and color */
-    		(void)mapglyph(g, &och, &color, &special, i, j);
+    		(void)mapglyph(g, &och, &color, &special, i, j, 0);
 		ch = (uchar)och;
 #ifdef TEXTCOLOR
 		painter.setPen( nhcolor_to_pen(color) );
@@ -5229,6 +5229,7 @@ struct window_procs Qt_procs = {
 	WC_FONT_MAP|WC_TILE_FILE|WC_TILE_WIDTH|WC_TILE_HEIGHT|
 	WC_PLAYER_SELECTION|WC_SPLASH_SCREEN,
     0L,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     NetHackQtBind::qt_init_nhwindows,
     NetHackQtBind::qt_player_selection,
     NetHackQtBind::qt_askname,

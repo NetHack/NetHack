@@ -1,24 +1,50 @@
 language: c
-
-script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && QT_SELECT=5 make MOC=moc install"
-
 matrix:
   include:
-    - env: HINTS=linux
+    - os: linux
+      env: DESCR=linux-xenial-gcc HINTS=linux
       compiler: gcc
-    - env: HINTS=linux
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: linux
+      env: DESCR=linux-xenial-clang HINTS=linux
       compiler: clang
-    - env: HINTS=linux-x11
-      compiler: gcc
-    - env: HINTS=linux-qt5
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: linux
+      env: DESCR=linux-xenial-gcc-x11 HINTS=linux-x11
       compiler: gcc
       addons:
         apt:
           packages:
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: linux
+      env: DESCR=linux-xenial-gcc-qt5 HINTS=linux-qt5
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
             - qtbase5-dev
             - qtmultimedia5-dev
             - qtbase5-dev-tools
-    - env: HINTS=linux-minimal
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && QT_SELECT=5 make MOC=moc install"
+    - os: linux
+      env: DESCR=linux-bionic-gcc-x11 HINTS=linux-x11
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: linux
+      env: DESCR=linux-xenial-gcc-minimal HINTS=linux-minimal
       compiler: gcc
       script: |
               cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
@@ -43,10 +69,50 @@ matrix:
               sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
               make install
               cat dat/options
-
+    - os: windows
+      env: DESCR=windows-visualstudio
+      language: shell
+      script:
+        - ./win/win32/vs2017/travisci.sh
+    - os: windows
+#     install: choco install mingw
+      env: DESCR=windows-mingw
+      script:
+        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
+        - export ADD_CURSES=Y
+        - export PDCURSES_TOP=../../pdcurses
+        - cd src
+        - cp ../sys/winnt/Makefile.gcc ./Makefile
+        - mingw32-make install
+  exclude:
+#    - os: osx
+#      osx_image: xcode10.3
+#      env: DESCR=osx-xcode10.3-x11 HINTS=macosx10.14 WANT_WIN_CURSES=1 WANT_WIN_X11=1 USE_XPM=1
+#      compiler: clang
+#      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+    - os: osx
+      osx_image: xcode10.2
+      env: HINTS=macosx10.14
+      compiler: clang
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
+#
 sudo: false
-
 notifications:
   email:
     recipients:
       - devteam@nethack.org
+#
+deploy:
+  provider: releases
+  api_key:
+    secure: "U0Dt2CXrcG8Yi4taUCT/6AnM+0IJtdCv6IVG/2rGooUY3pZjNWE9XDM6X9ZeAmbI79aN6FPTppjUf3KbB/upYeJt+8mrjnxEk/ZTO1xXDDW8iL/DiqnczoFsMGmPsTM+Fkeak8bu0SifI7Qkx9i1N+zOyl2VdlaxGjchPfl/OJw2jcQs7rOGRfr23/rapZKTcFq+BFlxMiIHa0dXbCJ9vagdlyAeclOCtPjw1VoH/Cb/+0/Xlx2MFPncw4/1P+bO/fPantHyehh3/WCDVCnI4M7ftONpsTVRrQ+Hml89teUH9/1xXUOpbCeVghWr1rumLcQzMqLKNj2lP/gm9co2/DKpxiUPUzBfO/9Jvl1CNoEwPYQBRNb38kggDvAT4vKX38Oi5sZvumFEO4L0y7o4cW6SA4/CYIykfxOdkrryt8ltfWwopdy3I/DothYw31vJ9GsZOCAShFRAy3hJxYUbHhT+7SDUBadVSEkb4UqxQ+7zntAVT+Lp4DXLAfvsWxZGrQoP/IrWAgNOLRKILubpzh+YpadMH3Ygha2JRAeJAEZ3DnXf3vOOAucWnk4mNXDbW35GTDTAJDWMvddZCfsrUI/uHxgaRjFs9fLX1X5tqhGnsr27sKLWyX+zrIPVV0TPl3AzYPAf6Bc8Okeu+JEGQERvvgSasCuYcmhgYznBVJI="
+  file_glob: true
+  file: 
+    - "$TRAVIS_TAG.x86.zip"
+  skip_cleanup: true
+  on:
+    tags: true
+  prerelease: true
+  name: "Pre-release build of NetHack 3.6.3"
+  body: "This is an auto generated pre-release build of NetHack 3.6.3."
+

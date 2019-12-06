@@ -1,24 +1,52 @@
-                NetHack 3.6.2 -- General information
+          NetHack 3.6.3 -- General information December 5, 2019
 
 NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.2 contains a collection of about 320 bug fixes to NetHack 3.6.1
-and more than 20 enhancements. The file doc/fixes36.2 in the source
-distribution has a full list of them. The text in there was written for the
-development team's own use and is provided  "as is", so please do not ask us
-to further explain the entries in that file. Some entries might be considered
-"spoilers", particularly in the "new features" section.
+NetHack 3.6.3 is the official release of NetHack that follows NetHack 3.6.2.
+It contains a collection of over 190 bug fixes to NetHack 3.6.2 and over 22
+game enhancements and community contributions. The file doc/fixes36.3 in the
+source distribution has a full list of them. The text in there was written for
+the development team's own use and is provided  "as is", so please do not ask
+us to further explain the entries in that file. Some entries might be 
+considered "spoilers", particularly in the "new features" section.
 
 Below you will find some other general notes that were not considered
 spoilers:
-* Performance optimizations with tty including the ability to do per field 
-  updating
-* sys/winnt/nttty performance improvements mainly through the introduction
-  of a back buffer approach
-* a couple of windows crash bug fixes
-* adoption of the curses window port that was in use in the community
+
+ *  Fixed stale 'thrownobj' pointer for returning thrown aklys while engulfed
+ *  Fixed uarmh null pointer dereference if a helm of opposite alignment came
+ *     off due to being polymorphed
+ *  Fixed 'object lost' panic when attempting to crawl of of the water during
+ *     emergency disrobing/dropping
+ *  Running now stops when moving over engravings so you can tell where they
+ *     are
+ *  Fixed detection of unseen/secret doors which failed to find monsters hiding
+ *     under objects and failed to find monsters hiding at trap locations
+ *  Ensured fatal status conditions made it to disclosure and/or dumplog
+ *  Fixed "Bad fruit #N" warnings when saving bones with 'perm_invent' On
+ *  Fixed it so yellow dragons don't have green breath
+ *  Added several grammar corrections
+ *  Improved recognition of deafness for several situations including the
+ *     playing of musical instruments and bribing negotiations with demon lords
+ *  Fixed ignoring of god's wrath when hero injured himself during altar kick 
+ *  Fixed several cases where persistent inventory window was not updated
+ *  Fixed temple priests or shopkeepers moving over other monsters
+ *  Fixed a crash-causing bug when putting on levitation boots over a sink
+ *  Ensured that thrown or kicked objects will end up in bones
+ *  Made water go all the way to the edges of level on the Plane of Water
+ *  Made clouds disrupt line of sight along the edges of the Plane of Air
+ *  Improved and expanded usage of status highlighting percentage rules
+ *  Added more than 15 improvements and fixes to the curses window port
+ *  Added and documented significant changes to default directory choices for
+ *    the Windows platform
+ *  Improved the layout and display of the player selection dialog used on the
+ *     Windows graphical implementation
+ *  Improved performance of some tty versions by reducing the number of 
+ *     function calls made from mapglyph
+ *  Allowed the msdos implementation to build with curses and PDCurses
+ *  Over 100 other fixes and improvements
 
                         - - - - - - - - - - -
 
@@ -125,8 +153,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
 If you have problems building the game, or you find bugs in it, we recommend 
 filing a bug report from our "Contact Us" web page at:
-    https://www.nethack.org/common/contact.html or
-    http://www.nethack.org/common/contact.html
+    https://www.nethack.org/common/contact.html
 Please include the version information from #version or the command line
 option --version in the appropriate field.
 
@@ -167,6 +194,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1557077369 2019/05/05 17:29:29 $ $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.55 $
+# $NHDT-Date: 1575587888 2019/12/05 23:18:08 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.

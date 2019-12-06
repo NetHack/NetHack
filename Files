@@ -50,9 +50,9 @@ fixes30.pl08   fixes30.pl09   fixes30.pl10   fixes31.1      fixes31.2
 fixes31.3      fixes32.0      fixes32.1      fixes32.2      fixes32.3
 fixes33.0      fixes33.1      fixes34.0      fixes34.1      fixes34.2
 fixes34.3      fixes35.0      fixes36.0      fixes36.1      fixes36.2
-lev_comp.6     lev_comp.txt   makedefs.6     makedefs.txt   mn.7
-mnh.7          nethack.6      nethack.txt    recover.6      recover.txt
-tmac.n         tmac.nh        window.doc
+fixes36.3      lev_comp.6     lev_comp.txt   makedefs.6     makedefs.txt
+mn.7           mnh.7          nethack.6      nethack.txt    recover.6
+recover.txt    tmac.n         tmac.nh        window.doc
 
 include:
 (files for GEM versions)
@@ -113,7 +113,7 @@ vault.c     version.c   vision.c    weapon.c    were.c      wield.c
 windows.c   wizard.c    worm.c      worn.c      write.c     zap.c
 
 sys/amiga:
-(files for Amiga versions - untested for 3.6.2)
+(files for Amiga versions - untested for 3.6.3)
 Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
 amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
 amii.hlp      amimenu.c     amirip.c      amisnd.c      amistack.c
@@ -124,12 +124,12 @@ winfuncs.c    winkey.c      winmenu.c     winproto.h    winreq.c
 winstr.c      xpm2iff.c
 
 sys/atari:
-(files for Atari version - untested for 3.6.2)
+(files for Atari version - untested for 3.6.3)
 Install.tos   atarifnt.uue  nethack.mnu   setup.g       tos.c
 unx2atar.sed
 
 sys/be:
-(files for BeOS version - untested for 3.6.2)
+(files for BeOS version - untested for 3.6.3)
 README    bemain.c
 
 sys/mac:
@@ -142,18 +142,20 @@ macwin.c      mgetline.c    mmodal.c      mrecover.c    mrecover.hqx
 mttymain.c
 
 sys/msdos:
-(files for MSDOS version - untested for 3.6.2)
-Install.dos   Makefile.BC   Makefile.GCC  Makefile.MSC  SCHEMA35.MSC
-moveinit.pat  msdos.c       msdoshlp.txt  ovlinit.c     pckeys.c
-pctiles.c     pctiles.h     pcvideo.h     portio.h      schema1.BC
-schema2.BC    schema3.MSC   setup.bat     sound.c       tile2bin.c
-vesa.h        video.c       vidtxt.c      vidvesa.c     vidvga.c
+(files for MSDOS version - tested for 3.6.3 via cross-compile only)
+Install.dos      Makefile.BC      Makefile.GCC     Makefile.MSC
+Makefile1.cross  Makefile2.cross  SCHEMA35.MSC     moveinit.pat
+msdos.c          msdoshlp.txt     ovlinit.c        pckeys.c
+pctiles.c        pctiles.h        pcvideo.h        portio.h
+schema1.BC       schema2.BC       schema3.MSC      setup.bat
+sound.c          tile2bin.c       vesa.h           video.c
+vidtxt.c         vidvesa.c        vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
 
 sys/os2:
-(files for OS/2 version - untested for 3.6.2)
+(files for OS/2 version - untested for 3.6.3)
 Install.os2   Makefile.os2  nhpmico.uu    os2.c
 
 sys/share:
@@ -163,10 +165,10 @@ random.c
 (Berkeley uudecode file, which may be used in build process of any version)
 uudecode.c
 
-(file for MSDOS, OS/2, Amiga, and Atari versions - untested for 3.6.2)
+(file for MSDOS, OS/2, Amiga, and Atari versions - untested for 3.6.3)
 pcmain.c
 
-(file for MSDOS, OS/2, and Atari versions - untested for 3.6.2)
+(file for MSDOS, OS/2, and Atari versions - untested for 3.6.3)
 NetHack.cnf  pctty.c
 
 (file for MSDOS, OS/2, and VMS versions)
@@ -178,10 +180,10 @@ nhlan.c
 (file for VMS version)
 tclib.c
 
-(files for MSDOS and OS/2 versions - untested for 3.6.2)
+(files for MSDOS and OS/2 versions - untested for 3.6.3)
 Makefile.lib  termcap.uu
 
-(files for MSDOS, OS/2 and Atari versions - untested for 3.6.2)
+(files for MSDOS, OS/2 and Atari versions - tested on MSDOS for 3.6.3 via cross-compile only)
 pcsys.c   pcunix.c
 
 (files for UNIX and Be versions)
@@ -236,10 +238,12 @@ NetHack.xcscheme   makedefs.xcscheme  recover.xcscheme
 
 sys/unix/hints:
 (files for configuring UNIX NetHack versions)
-linux           linux-chroot    linux-minimal   linux-qt4
-linux-qt5       linux-x11       macosx          macosx.sh
-macosx10.5      macosx10.7      macosx10.8      macosx10.10
-macosx10.10-qt  macosx10.14     unix
+linux               linux-chroot        linux-minimal
+linux-qt4           linux-qt5           linux-x11
+macosx              macosx.sh           macosx10.5
+macosx10.7          macosx10.8          macosx10.10
+macosx10.10-qt      macosx10.14         solaris
+solaris-playground  unix
 
 sys/vms:
 (files for VMS version)
@@ -249,7 +253,7 @@ spec_lev.com  sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c
 vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
 
 sys/wince:
-(files for Windows CE and PocketPC - untested for 3.6.2)
+(files for Windows CE and PocketPC - untested for 3.6.3)
 Install.ce    bootstrp.mak  celib.c       cesetup.bat   cesound.c
 defaults.nh   keypad.uu     menubar.uu    mhaskyn.c     mhaskyn.h
 mhcmd.c       mhcmd.h       mhcolor.c     mhcolor.h     mhdlg.c
@@ -262,7 +266,7 @@ resource.h    winMS.h       winhack.c     winhack.rc    winhcksp.rc
 winmain.c
 
 sys/wince/ceinc:
-(header files for Windows CE and PocketPC - untested for 3.6.2)
+(header files for Windows CE and PocketPC - untested for 3.6.3)
 assert.h  errno.h   fcntl.h
 
 sys/wince/ceinc/sys:
@@ -271,12 +275,14 @@ stat.h
 
 sys/winnt:
 (files for Windows 7/8.x/10 version)
-Install.nt      Makefile.gcc    Makefile.msc    console.rc
-defaults.nh     nethack.def     nh340key.c      nhdefkey.c
-nhico.uu        nhraykey.c      nhsetup.bat     ntsound.c
-nttty.c         porthelp        stub-pdcscrn.c  stubs.c
-sysconf         win10.c         win10.h         win32api.h
-windmain.c      winnt.c         winos.h
+.nethackrc.template  Install.nt           Makefile.gcc
+Makefile.msc         console.rc           nethack.def
+nh340key.c           nhdefkey.c           nhico.uu
+nhraykey.c           nhsetup.bat          ntsound.c
+nttty.c              porthelp             stub-pdcscrn.c
+stubs.c              sysconf.template     win10.c
+win10.h              win32api.h           windmain.c
+winnt.c              winos.h
 
 util:
 (files for all versions)
@@ -326,12 +332,12 @@ cursinit.h  cursinvt.c  cursinvt.h  cursmain.c  cursmesg.c  cursmesg.h
 cursmisc.c  cursmisc.h  cursstat.c  cursstat.h  curswins.c  curswins.h
 
 win/gem:
-(files for GEM versions - untested for 3.6.2)
+(files for GEM versions - untested for 3.6.3)
 Install.gem  bitmfile.c   gem_rsc.uu   gem_rso.uu   gr_rect.c    gr_rect.h
 load_img.c   tile2img.c   title.uu     wingem.c     wingem1.c    xpm2img.c
 
 win/gnome:
-(files for GNOME versions - untested for 3.6.2)
+(files for GNOME versions - untested for 3.6.3)
 README      gn_xpms.h   gnaskstr.c  gnaskstr.h  gnbind.c    gnbind.h
 gnglyph.c   gnglyph.h   gnmain.c    gnmain.h    gnmap.c     gnmap.h
 gnmenu.c    gnmenu.h    gnmesg.c    gnmesg.h    gnomeprv.h  gnopts.c
@@ -357,38 +363,102 @@ getline.c  termcap.c  topl.c     wintty.c
 
 win/win32:
 (files for Windows versions - tested up to Windows 10)
-NetHackW.exe.manifest  dgnstuff-mingw32.mak   dgnstuff.mak
-levstuff-mingw32.mak   levstuff.mak           mhaskyn.c
-mhaskyn.h              mhdlg.c                mhdlg.h
-mhfont.c               mhfont.h               mhinput.c
-mhinput.h              mhmain.c               mhmain.h
-mhmap.c                mhmap.h                mhmenu.c
-mhmenu.h               mhmsg.h                mhmsgwnd.c
-mhmsgwnd.h             mhrip.c                mhrip.h
-mhsplash.c             mhsplash.h             mhstatus.c
-mhstatus.h             mhtext.c               mhtext.h
-mnsel.uu               mnselcnt.uu            mnunsel.uu
-mswproc.c              nethack.rc             nhresource.h
-petmark.uu             pilemark.uu            record.uu
-resource.h             rip.uu                 splash.uu
-tiles-mingw32.mak      tiles.mak              winMS.h
-winhack.c              winhack.rc
+NetHackW.c             NetHackW.exe.manifest  NetHackW.rc
+dgnstuff-mingw32.mak   dgnstuff.mak           levstuff-mingw32.mak
+levstuff.mak           mhaskyn.c              mhaskyn.h
+mhdlg.c                mhdlg.h                mhfont.c
+mhfont.h               mhinput.c              mhinput.h
+mhmain.c               mhmain.h               mhmap.c
+mhmap.h                mhmenu.c               mhmenu.h
+mhmsg.h                mhmsgwnd.c             mhmsgwnd.h
+mhrip.c                mhrip.h                mhsplash.c
+mhsplash.h             mhstatus.c             mhstatus.h
+mhtext.c               mhtext.h               mnsel.uu
+mnselcnt.uu            mnunsel.uu             mswproc.c
+nethack.rc             nhresource.h           petmark.uu
+pilemark.uu            record.uu              resource.h
+rip.uu                 splash.uu              tiles-mingw32.mak
+tiles.mak              winMS.h
 
 win/win32/vs2017:
 (files for Visual Studio 2017 Community Edition builds)
-NetHack.sln         NetHack.vcxproj     NetHackW.vcxproj
-PDCurses.vcxproj    afterdgncomp.proj   afterdlb.proj
-afterlevcomp.proj   aftermakedefs.proj  afternethack.proj
-afterrecover.proj   aftertile2bmp.proj  aftertilemap.proj
-afteruudecode.proj  build.bat           common.props
-config.props        console.props       default.props
-default_dll.props   default_lib.props   dgncomp.vcxproj
-dirs.props          dlb.vcxproj         dll.props
-files.props         levcomp.vcxproj     makedefs.vcxproj
-nh340key.def        nh340key.vcxproj    nhdefkey.def
-nhdefkey.vcxproj    nhraykey.def        nhraykey.vcxproj
-recover.vcxproj     tile2bmp.vcxproj    tilemap.vcxproj
-tiles.vcxproj       uudecode.vcxproj
+NetHack.sln                   NetHack.vcxproj
+NetHackPackage.appxmanifest   NetHackPackage.wapproj
+NetHackProperties.props       NetHackW.vcxproj
+PDCurses.vcxproj              Package.StoreAssociation.xml
+ScreenShot.PNG                afterdgncomp.proj
+afterdlb.proj                 afterlevcomp.proj
+aftermakedefs.proj            afternethack.proj
+afterrecover.proj             aftertile2bmp.proj
+aftertilemap.proj             afteruudecode.proj
+build.bat                     common.props
+config.props                  console.props
+default.props                 default_dll.props
+default_lib.props             dgncomp.vcxproj
+dirs.props                    dlb.vcxproj
+dll.props                     files.props
+levcomp.vcxproj               makedefs.vcxproj
+nh340key.def                  nh340key.vcxproj
+nhdefkey.def                  nhdefkey.vcxproj
+nhraykey.def                  nhraykey.vcxproj
+recover.vcxproj               tile2bmp.vcxproj
+tilemap.vcxproj               tiles.vcxproj
+travisci.sh                   uudecode.vcxproj
+
+win/win32/vs2017/Images:
+(files for Visual Studio 2017 Community Edition builds)
+BadgeLogo.scale-100.png
+BadgeLogo.scale-125.png
+BadgeLogo.scale-150.png
+BadgeLogo.scale-200.png
+BadgeLogo.scale-400.png
+LargeTile.scale-100.png
+LargeTile.scale-125.png
+LargeTile.scale-150.png
+LargeTile.scale-200.png
+LargeTile.scale-400.png
+LockScreenLogo.scale-200.png
+SmallTile.scale-100.png
+SmallTile.scale-125.png
+SmallTile.scale-150.png
+SmallTile.scale-200.png
+SmallTile.scale-400.png
+SplashScreen.scale-100.png
+SplashScreen.scale-125.png
+SplashScreen.scale-150.png
+SplashScreen.scale-200.png
+SplashScreen.scale-400.png
+Square150x150Logo.scale-100.png
+Square150x150Logo.scale-125.png
+Square150x150Logo.scale-150.png
+Square150x150Logo.scale-200.png
+Square150x150Logo.scale-400.png
+Square44x44Logo.altform-unplated_targetsize-16.png
+Square44x44Logo.altform-unplated_targetsize-256.png
+Square44x44Logo.altform-unplated_targetsize-32.png
+Square44x44Logo.altform-unplated_targetsize-48.png
+Square44x44Logo.scale-100.png
+Square44x44Logo.scale-125.png
+Square44x44Logo.scale-150.png
+Square44x44Logo.scale-200.png
+Square44x44Logo.scale-400.png
+Square44x44Logo.targetsize-16.png
+Square44x44Logo.targetsize-24.png
+Square44x44Logo.targetsize-24_altform-unplated.png
+Square44x44Logo.targetsize-256.png
+Square44x44Logo.targetsize-32.png
+Square44x44Logo.targetsize-48.png
+StoreLogo.backup.png
+StoreLogo.scale-100.png
+StoreLogo.scale-125.png
+StoreLogo.scale-150.png
+StoreLogo.scale-200.png
+StoreLogo.scale-400.png
+Wide310x150Logo.scale-100.png
+Wide310x150Logo.scale-125.png
+Wide310x150Logo.scale-150.png
+Wide310x150Logo.scale-200.png
+Wide310x150Logo.scale-400.png
 
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.

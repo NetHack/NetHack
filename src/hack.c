@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1551137618 2019/02/25 23:33:38 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.208 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1568509227 2019/09/15 01:00:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -147,17 +147,35 @@ moverock()
             if (mtmp && !noncorporeal(mtmp->data)
                 && (!mtmp->mtrapped
                     || !(ttmp && is_pit(ttmp->ttyp)))) {
+                boolean deliver_part1 = FALSE;
+
                 if (Blind)
                     feel_location(sx, sy);
                 if (canspotmon(mtmp)) {
                     pline("There's %s on the other side.", a_monnam(mtmp));
+                    deliver_part1 = TRUE;
                 } else {
                     You_hear("a monster behind %s.", the(xname(otmp)));
+                    if (!Deaf)
+                        deliver_part1 = TRUE;
                     map_invisible(rx, ry);
                 }
-                if (flags.verbose)
-                    pline("Perhaps that's why %s cannot move it.",
-                          u.usteed ? y_monnam(u.usteed) : "you");
+                if (flags.verbose) {
+                    char you_or_steed[BUFSZ];
+
+                    Strcpy(you_or_steed,
+                           u.usteed ? y_monnam(u.usteed) : "you");
+                    pline("%s%s cannot move %s.",
+                          deliver_part1
+                              ? "Perhaps that's why "
+                              : "",
+                          deliver_part1
+                              ? you_or_steed
+                              : upstart(you_or_steed),
+                          deliver_part1
+                              ? "it"
+                              : the(xname(otmp)));
+                }
                 goto cannot_push;
             }
 
@@ -1138,6 +1156,7 @@ is_valid_travelpt(int x,int y)
     int ty = u.ty;
     boolean ret;
     int g = glyph_at(x,y);
+
     if (x == u.ux && y == u.uy)
         return TRUE;
     if (isok(x,y) && glyph_is_cmap(g) && S_stone == glyph_to_cmap(g)
@@ -1321,7 +1340,7 @@ domove()
         domove_attempting = 0L;
 }
 
-void
+STATIC_OVL void
 domove_core()
 {
     register struct monst *mtmp;
@@ -1333,7 +1352,8 @@ domove_core()
     xchar chainx = 0, chainy = 0,
           ballx = 0, bally = 0;         /* ball&chain new positions */
     int bc_control = 0;                 /* control for ball&chain */
-    boolean cause_delay = FALSE;        /* dragging ball will skip a move */
+    boolean cause_delay = FALSE,        /* dragging ball will skip a move */
+            u_with_boulder = (sobj_at(BOULDER, u.ux, u.uy) != 0);
 
     if (context.travel) {
         if (!findtravelpath(FALSE))
@@ -1436,6 +1456,21 @@ domove_core()
             }
         }
         if (!isok(x, y)) {
+            if (iflags.mention_walls) {
+                int dx = u.dx, dy = u.dy;
+
+                if (dx && dy) { /* diagonal */
+                    /* only as far as possible diagonally if in very
+                       corner; otherwise just report whichever of the
+                       cardinal directions has reached its limit */
+                    if (isok(x, u.uy))
+                        dx = 0;
+                    else if (isok(u.ux, y))
+                        dy = 0;
+                }
+                You("have already gone as far %s as possible.",
+                    directionname(xytod(dx, dy)));
+            }
             nomul(0);
             return;
         }
@@ -1762,6 +1797,15 @@ domove_core()
                 u.usteed->mx = u.ux; u.usteed->my = u.uy;
             }
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
+        } else if (u_with_boulder
+                    && !(verysmall(mtmp->data)
+                         && (!mtmp->minvent || (curr_mon_load(mtmp) <= 600)))) {
+            /* can't swap places when pet won't fit there with the boulder */
+            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+            You("stop.  %s won't fit into the same spot that you're at.",
+                 upstart(y_monnam(mtmp)));
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
@@ -1896,7 +1940,7 @@ domove_core()
     }
 }
 
-void
+STATIC_OVL void
 maybe_smudge_engr(x1,y1,x2,y2)
 int x1, y1, x2, y2;
 {
@@ -2564,8 +2608,10 @@ pickup_checks()
     }
     if (!can_reach_floor(TRUE)) {
         struct trap *traphere = t_at(u.ux, u.uy);
-        if (traphere && uteetering_at_seen_pit(traphere))
-            You("cannot reach the bottom of the pit.");
+        if (traphere
+            && (uteetering_at_seen_pit(traphere) || uescaped_shaft(traphere)))
+            You("cannot reach the bottom of the %s.",
+                is_pit(traphere->ttyp) ? "pit" : "abyss");
         else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
             rider_cant_reach();
         else if (Blind && !can_reach_floor(TRUE))
@@ -2588,9 +2634,9 @@ dopickup(VOID_ARGS)
               ? multi + 1 : 0;
     multi = 0; /* always reset */
 
-    if ((ret = pickup_checks() >= 0))
+    if ((ret = pickup_checks()) >= 0) {
         return ret;
-    else if (ret == -2) {
+    } else if (ret == -2) {
         tmpcount = -count;
         return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
     } /* else ret == -1 */
@@ -2683,6 +2729,7 @@ lookaround()
                 if (x == u.ux + u.dx && y == u.uy + u.dy) {
                     if (iflags.mention_walls) {
                         int tt = what_trap(trap->ttyp, rn2_on_display_rng);
+
                         You("stop in front of %s.",
                             an(defsyms[trap_to_defsym(tt)].explanation));
                     }
@@ -2843,8 +2890,16 @@ unmul(const char *msg_override)
         nomovemsg = msg_override;
     else if (!nomovemsg)
         nomovemsg = You_can_move_again;
-    if (*nomovemsg)
+    if (*nomovemsg) {
         pline("%s", nomovemsg);
+        /* follow "you survived that attempt on your life" with a message
+           about current form if it's not the default; primarily for
+           life-saving while turning into green slime but is also a reminder
+           if life-saved while poly'd and Unchanging (explore or wizard mode
+           declining to die since can't be both Unchanging and Lifesaved) */
+        if (Upolyd && !strncmpi(nomovemsg, "You survived that ", 18))
+            You("are %s.", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
+    }
     nomovemsg = 0;
     u.usleep = 0;
     multi_reason = NULL;

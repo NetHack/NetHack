@@ -1,4 +1,4 @@
-/* NetHack 3.6	sit.c	$NHDT-Date: 1544442714 2018/12/10 11:51:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	sit.c	$NHDT-Date: 1559670609 2019/06/04 17:50:09 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -67,7 +67,7 @@ dosit()
 
     if (OBJ_AT(u.ux, u.uy)
         /* ensure we're not standing on the precipice */
-        && !uteetering_at_seen_pit(trap)) {
+        && !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
         register struct obj *obj;
 
         obj = level.objects[u.ux][u.uy];
@@ -392,7 +392,7 @@ rndcurse()
         if (!Blind) {
             pline("%s %s.", Yobjnam2(otmp, "glow"),
                   hcolor(otmp->cursed ? NH_BLACK : (const char *) "brown"));
-            otmp->bknown = TRUE;
+            otmp->bknown = 1; /* ok to bypass set_bknown() here */
         }
     }
 }

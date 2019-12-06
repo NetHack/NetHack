@@ -1,4 +1,4 @@
-/* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6  artilist.h      $NHDT-Date: 1564351548 2019/07/28 22:05:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -57,8 +57,16 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
       DRLI(5, 2), DRLI(0, 0), NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM, 8000L,
       NO_COLOR),
     /*
-     *      Mjollnir will return to the hand of the wielder when thrown
-     *      if the wielder is a Valkyrie wearing Gauntlets of Power.
+     *      Mjollnir can be thrown when wielded if hero has 25 Strength
+     *      (usually via gauntlets of power but possible with rings of
+     *      gain strength).  If the thrower is a Valkyrie, Mjollnir will
+     *      usually (99%) return and then usually (separate 99%) be caught
+     *      and automatically be re-wielded.  When returning Mjollnir is
+     *      not caught, there is a 50:50 chance of hitting hero for damage
+     *      and its lightning shock might destroy some wands and/or rings.
+     *
+     *      Monsters don't throw Mjollnir regardless of strength (not even
+     *      fake-player valkyries).
      */
     A("Mjollnir", WAR_HAMMER, /* Mjo:llnir */
       (SPFX_RESTR | SPFX_ATTK), 0, 0, ELEC(5, 24), NO_DFNS, NO_CARY, 0,

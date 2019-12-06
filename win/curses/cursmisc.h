@@ -9,7 +9,8 @@
 /* Global declarations */
 
 int curses_read_char(void);
-void curses_toggle_color_attr(WINDOW * win, int color, int attr, int onoff);
+void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff);
+void curses_menu_color_attr(WINDOW *win, int color, int attr, int onoff);
 void curses_bail(const char *mesg);
 winid curses_get_wid(int type);
 char *curses_copy_of(const char *s);
@@ -30,5 +31,6 @@ int curses_read_attrs(const char *attrs);
 char *curses_fmt_attrs(char *);
 int curses_convert_keys(int key);
 int curses_get_mouse(int *mousex, int *mousey, int *mod);
+void curses_mouse_support(int);
 
 #endif /* CURSMISC_H */

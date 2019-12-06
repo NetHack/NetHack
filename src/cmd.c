@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1557088405 2019/05/05 20:33:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.333 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1575245052 2019/12/02 00:04:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.350 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -22,6 +22,9 @@
 #ifndef C
 #define C(c) (0x1f & (c))
 #endif
+
+#define unctrl(c) ((c) <= C('z') ? (0x60 | (c)) : (c))
+#define unmeta(c) (0x7f & (c))
 
 #ifdef ALTMETA
 STATIC_VAR boolean alt_esc = FALSE;
@@ -152,7 +155,6 @@ STATIC_PTR int wiz_level_change(void);
 STATIC_PTR int wiz_show_seenv(void);
 STATIC_PTR int wiz_show_vision(void);
 STATIC_PTR int wiz_smell(void);
-STATIC_PTR int wiz_intrinsic(void);
 STATIC_PTR int wiz_show_wmodes(void);
 STATIC_DCL void wiz_map_levltyp(void);
 STATIC_DCL void wiz_levltyp_legend(void);
@@ -577,11 +579,11 @@ extcmd_via_menu()
                 if ((len = (int) strlen(efp->ef_desc)) > biggest)
                     biggest = len;
                 if (++i > MAX_EXT_CMD) {
-#if defined(BETA)
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
                     impossible(
       "Exceeded %d extended commands in doextcmd() menu; 'extmenu' disabled.",
                                MAX_EXT_CMD);
-#endif /* BETA */
+#endif /* NH_DEVEL_STATUS != NH_STATUS_RELEASED */
                     iflags.extmenu = 0;
                     return -1;
                 }
@@ -655,7 +657,7 @@ extcmd_via_menu()
         if (n == 1) {
             if (matchlevel > (QBUFSZ - 2)) {
                 free((genericptr_t) pick_list);
-#if defined(BETA)
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
                 impossible("Too many chars (%d) entered in extcmd_via_menu()",
                            matchlevel);
 #endif
@@ -853,6 +855,7 @@ wiz_makemap(VOID_ARGS)
         u_on_rndspot((u.uhave.amulet ? 1 : 0) /* 'going up' flag */
                      | (was_in_W_tower ? 2 : 0));
         losedogs();
+        kill_genocided_monsters();
         /* u_on_rndspot() might pick a spot that has a monster, or losedogs()
            might pick the hero's spot (only if there isn't already a monster
            there), so we might have to move hero or the co-located monster */
@@ -994,7 +997,8 @@ wiz_panic(VOID_ARGS)
         u.uen = u.uenmax = 1000;
         return 0;
     }
-    if (yn("Do you want to call panic() and end your game?") == 'y')
+    if (paranoid_query(ParanoidQuit,
+                       "Do you want to call panic() and end your game?"))
         panic("Crash test.");
     return 0;
 }
@@ -1475,15 +1479,21 @@ wiz_intrinsic(VOID_ARGS)
                                          = &mons[context.warntype.speciesidx];
                 }
                 goto def_feedback;
+            case GLIB:
+                /* slippery fingers applies to gloves if worn at the time
+                   so persistent inventory might need updating */
+                make_glib((int) newtimeout);
+                goto def_feedback;
             case LEVITATION:
             case FLYING:
                 float_vs_flight();
                 /*FALLTHRU*/
             default:
-            def_feedback:
+ def_feedback:
                 pline("Timeout for %s %s %d.", propertynames[i].prop_name,
                       oldtimeout ? "increased by" : "set to", amt);
-                incr_itimeout(&u.uprops[p].intrinsic, amt);
+                if (p != GLIB)
+                    incr_itimeout(&u.uprops[p].intrinsic, amt);
                 break;
             }
             context.botl = 1; /* probably not necessary... */
@@ -1917,7 +1927,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
         enlght_out(buf);
     }
 
-    /* 3.6.2: dungeon level, so that ^X really has all status info as
+    /* As of 3.6.2: dungeon level, so that ^X really has all status info as
        claimed by the comment below; this reveals more information than
        the basic status display, but that's one of the purposes of ^X;
        similar information is revealed by #overview; the "You died in
@@ -1961,20 +1971,73 @@ background_enlightenment(int unused_mode UNUSED, int final)
         /* same phrasing for current and final: "entered" is unconditional */
         enlght_line(You_, "entered ", buf, "");
     }
+
+    /* for gameover, these have been obtained in really_done() so that they
+       won't vary if user leaves a disclosure prompt or --More-- unanswered
+       long enough for the dynamic value to change between then and now */
+    if (final ? iflags.at_midnight : midnight()) {
+        enl_msg("It ", "is ", "was ", "the midnight hour", "");
+    } else if (final ? iflags.at_night : night()) {
+        enl_msg("It ", "is ", "was ", "nighttime", "");
+    }
+    /* other environmental factors */
+    if (flags.moonphase == FULL_MOON || flags.moonphase == NEW_MOON) {
+        /* [This had "tonight" but has been changed to "in effect".
+           There is a similar issue to Friday the 13th--it's the value
+           at the start of the current session but that session might
+           have dragged on for an arbitrary amount of time.  We want to
+           report the values that currently affect play--or affected
+           play when game ended--rather than actual outside situation.] */
+        Sprintf(buf, "a %s moon in effect%s",
+                (flags.moonphase == FULL_MOON) ? "full"
+                : (flags.moonphase == NEW_MOON) ? "new"
+                  /* showing these would probably just lead to confusion
+                     since they have no effect on game play... */
+                  : (flags.moonphase < FULL_MOON) ? "first quarter"
+                    : "last quarter",
+                /* we don't have access to 'how' here--aside from survived
+                   vs died--so settle for general platitude */
+                final ? " when your adventure ended" : "");
+        enl_msg("There ", "is ", "was ", buf, "");
+    }
+    if (flags.friday13) {
+        /* let player know that friday13 penalty is/was in effect;
+           we don't say "it is/was Friday the 13th" because that was at
+           the start of the session and it might be past midnight (or
+           days later if the game has been paused without save/restore),
+           so phrase this similar to the start up message */
+        Sprintf(buf, " Bad things %s on Friday the 13th.",
+                !final ? "can happen"
+                : (final == ENL_GAMEOVERALIVE) ? "could have happened"
+                  /* there's no may to tell whether -1 Luck made a
+                     difference but hero has died... */
+                  : "happened");
+        enlght_out(buf);
+    }
+
     if (!Upolyd) {
-        /* flags.showexp does not matter */
+        int ulvl = (int) u.ulevel;
+        /* [flags.showexp currently does not matter; should it?] */
+
         /* experience level is already shown above */
         Sprintf(buf, "%-1ld experience point%s", u.uexp, plur(u.uexp));
-        if (wizard) {
-            if (u.ulevel < 30) {
-                int ulvl = (int) u.ulevel;
-                long nxtlvl = newuexp(ulvl);
-                /* long oldlvl = (ulvl > 1) ? newuexp(ulvl - 1) : 0; */
+        /* TODO?
+         *  Remove wizard-mode restriction since patient players can
+         *  determine the numbers needed without resorting to spoilers
+         *  (even before this started being disclosed for 'final';
+         *  just enable 'showexp' and look at normal status lines
+         *  after drinking gain level potions or eating wraith corpses
+         *  or being level-drained by vampires).
+         */
+        if (ulvl < 30 && (final || wizard)) {
+            long nxtlvl = newuexp(ulvl), delta = nxtlvl - u.uexp;
 
-                Sprintf(eos(buf), ", %ld %s%sneeded to attain level %d",
-                        (nxtlvl - u.uexp), (u.uexp > 0) ? "more " : "",
-                        !final ? "" : "were ", (ulvl + 1));
-            }
+            Sprintf(eos(buf), ", %ld %s%sneeded %s level %d",
+                    delta, (u.uexp > 0) ? "more " : "",
+                    /* present tense=="needed", past tense=="were needed" */
+                    !final ? "" : (delta == 1L) ? "was " : "were ",
+                    /* "for": grammatically iffy but less likely to wrap */
+                    (ulvl < 18) ? "to attain" : "for", (ulvl + 1));
         }
         you_have(buf, "");
     }
@@ -2063,8 +2126,7 @@ basics_enlightenment(int mode UNUSED, int final)
                 *ocl ? "'" : "", *ocl ? ocl : "all types", *ocl ? "'" : "");
         if (flags.pickup_thrown && *ocl) /* *ocl: don't show if 'all types' */
             Strcat(buf, " plus thrown");
-        if (iflags.autopickup_exceptions[AP_GRAB]
-            || iflags.autopickup_exceptions[AP_LEAVE])
+        if (apelist)
             Strcat(buf, ", with exceptions");
     } else
         Strcpy(buf, "off");
@@ -2252,26 +2314,50 @@ status_enlightenment(int mode, int final)
         youhiding(TRUE, final);
 
     /* internal troubles, mostly in the order that prayer ranks them */
-    if (Stoned)
-        you_are("turning to stone", "");
-    if (Slimed)
-        you_are("turning into slime", "");
+    if (Stoned) {
+        if (final && (Stoned & I_SPECIAL))
+            enlght_out(" You turned into stone.");
+        else
+            you_are("turning to stone", "");
+    }
+    if (Slimed) {
+        if (final && (Slimed & I_SPECIAL))
+            enlght_out(" You turned into slime.");
+        else
+            you_are("turning into slime", "");
+    }
     if (Strangled) {
         if (u.uburied) {
             you_are("buried", "");
         } else {
-            Strcpy(buf, "being strangled");
-            if (wizard)
-                Sprintf(eos(buf), " (%ld)", (Strangled & TIMEOUT));
-            you_are(buf, from_what(STRANGLED));
+            if (final && (Strangled & I_SPECIAL)) {
+                enlght_out(" You died from strangulation.");
+            } else {
+                Strcpy(buf, "being strangled");
+                if (wizard)
+                    Sprintf(eos(buf), " (%ld)", (Strangled & TIMEOUT));
+                you_are(buf, from_what(STRANGLED));
+            }
         }
     }
     if (Sick) {
-        /* prayer lumps these together; botl puts Ill before FoodPois */
-        if (u.usick_type & SICK_NONVOMITABLE)
-            you_are("terminally sick from illness", "");
-        if (u.usick_type & SICK_VOMITABLE)
-            you_are("terminally sick from food poisoning", "");
+        /* the two types of sickness are lumped together; hero can be
+           afflicted by both but there is only one timeout; botl status
+           puts TermIll before FoodPois and death due to timeout reports
+           terminal illness if both are in effect, so do the same here */
+        if (final && (Sick & I_SPECIAL)) {
+            Sprintf(buf, " %sdied from %s.", You_, /* has trailing space */
+                    (u.usick_type & SICK_NONVOMITABLE)
+                    ? "terminal illness" : "food poisoning");
+            enlght_out(buf);
+        } else {
+            /* unlike death due to sickness, report the two cases separately
+               because it is possible to cure one without curing the other */
+            if (u.usick_type & SICK_NONVOMITABLE)
+                you_are("terminally sick from illness", "");
+            if (u.usick_type & SICK_VOMITABLE)
+                you_are("terminally sick from food poisoning", "");
+        }
     }
     if (Vomiting)
         you_are("nauseated", "");
@@ -2367,7 +2453,9 @@ status_enlightenment(int mode, int final)
         }
     }
     if (Glib) {
-        Sprintf(buf, "slippery %s", makeplural(body_part(FINGER)));
+        Sprintf(buf, "slippery %s", fingers_or_gloves(TRUE));
+        if (wizard)
+            Sprintf(eos(buf), " (%ld)", (Glib & TIMEOUT));
         you_have(buf, "");
     }
     if (Fumbling) {
@@ -2495,7 +2583,7 @@ status_enlightenment(int mode, int final)
 }
 
 /* attributes: intrinsics and the like, other non-obvious capabilities */
-void
+STATIC_OVL void
 attributes_enlightenment(int unused_mode UNUSED, int final)
 {
     static NEARDATA const char if_surroundings_permitted[] =
@@ -3431,13 +3519,70 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', (char *) 0, (char *) 0, donull, 0, (char *) 0 } /* sentinel */
 };
 
+/* for key2extcmddesc() to support dowhatdoes() */
+struct movcmd {
+    uchar k1, k2, k3, k4; /* 'normal', 'qwertz', 'numpad', 'phone' */
+    const char *txt, *alt; /* compass direction, screen direction */
+};
+static const struct movcmd movtab[] = {
+    { 'h', 'h', '4', '4', "west",      "left" },
+    { 'j', 'j', '2', '8', "south",     "down" },
+    { 'k', 'k', '8', '2', "north",     "up" },
+    { 'l', 'l', '6', '6', "east",      "right" },
+    { 'b', 'b', '1', '7', "southwest", "lower left" },
+    { 'n', 'n', '3', '9', "southeast", "lower right" },
+    { 'u', 'u', '9', '3', "northeast", "upper right" },
+    { 'y', 'z', '7', '1', "northwest", "upper left" },
+    {   0,   0,   0,   0,  (char *) 0, (char *) 0 }
+};
+
 int extcmdlist_length = SIZE(extcmdlist) - 1;
 
 const char *
 key2extcmddesc(uchar key)
 {
-    if (Cmd.commands[key] && Cmd.commands[key]->ef_txt)
-        return Cmd.commands[key]->ef_desc;
+    static char key2cmdbuf[48];
+    const struct movcmd *mov;
+    int k, c;
+    uchar M_5 = (uchar) M('5'), M_0 = (uchar) M('0');
+
+    /* need to check for movement commands before checking the extended
+       commands table because it contains entries for number_pad commands
+       that match !number_pad movement (like 'j' for "jump") */
+    key2cmdbuf[0] = '\0';
+    if (movecmd(k = key))
+        Strcpy(key2cmdbuf, "move"); /* "move or attack"? */
+    else if (movecmd(k = unctrl(key)))
+        Strcpy(key2cmdbuf, "rush");
+    else if (movecmd(k = (Cmd.num_pad ? unmeta(key) : lowc(key))))
+        Strcpy(key2cmdbuf, "run");
+    if (*key2cmdbuf) {
+        for (mov = &movtab[0]; mov->k1; ++mov) {
+            c = !Cmd.num_pad ? (!Cmd.swap_yz ? mov->k1 : mov->k2)
+                             : (!Cmd.phone_layout ? mov->k3 : mov->k4);
+            if (c == k) {
+                Sprintf(eos(key2cmdbuf), " %s (screen %s)",
+                        mov->txt, mov->alt);
+                return key2cmdbuf;
+            }
+        }
+    } else if (digit(key) || (Cmd.num_pad && digit(unmeta(key)))) {
+        key2cmdbuf[0] = '\0';
+        if (!Cmd.num_pad)
+            Strcpy(key2cmdbuf, "start of, or continuation of, a count");
+        else if (key == '5' || key == M_5)
+            Sprintf(key2cmdbuf, "%s prefix",
+                    (!!Cmd.pcHack_compat ^ (key == M_5)) ? "run" : "rush");
+        else if (key == '0' || (Cmd.pcHack_compat && key == M_0))
+            Strcpy(key2cmdbuf, "synonym for 'i'");
+        if (*key2cmdbuf)
+            return key2cmdbuf;
+    }
+    if (Cmd.commands[key]) {
+        if (Cmd.commands[key]->ef_txt)
+            return Cmd.commands[key]->ef_desc;
+
+    }
     return (char *) 0;
 }
 
@@ -4072,9 +4217,6 @@ wiz_migrate_mons()
 }
 #endif
 
-#define unctrl(c) ((c) <= C('z') ? (0x60 | (c)) : (c))
-#define unmeta(c) (0x7f & (c))
-
 struct {
     int nhkf;
     char key;
@@ -4400,21 +4542,51 @@ accept_menu_prefix(int (*cmd_func)(void))
 char
 randomkey()
 {
-    static int i = 0;
+    static unsigned i = 0;
     char c;
 
-    switch (rn2(12)) {
-    default: c = '\033'; break;
-    case 0: c = '\n'; break;
+    switch (rn2(16)) {
+    default:
+        c = '\033';
+        break;
+    case 0:
+        c = '\n';
+        break;
     case 1:
     case 2:
     case 3:
-    case 4: c = (char)(' ' + rn2((int)('~' - ' '))); break;
-    case 5: c = '\t'; break;
-    case 6: c = (char)('a' + rn2((int)('z' - 'a'))); break;
-    case 7: c = (char)('A' + rn2((int)('Z' - 'A'))); break;
-    case 8: c = extcmdlist[(i++) % SIZE(extcmdlist)].key; break;
-    case 9: c = '#'; break;
+    case 4:
+        c = (char) rn1('~' - ' ' + 1, ' ');
+        break;
+    case 5:
+        c = (char) (rn2(2) ? '\t' : ' ');
+        break;
+    case 6:
+        c = (char) rn1('z' - 'a' + 1, 'a');
+        break;
+    case 7:
+        c = (char) rn1('Z' - 'A' + 1, 'A');
+        break;
+    case 8:
+        c = extcmdlist[i++ % SIZE(extcmdlist)].key;
+        break;
+    case 9:
+        c = '#';
+        break;
+    case 10:
+    case 11:
+    case 12:
+        c = Cmd.dirchars[rn2(8)];
+        if (!rn2(7))
+            c = !Cmd.num_pad ? (!rn2(3) ? C(c) : (c + 'A' - 'a')) : M(c);
+        break;
+    case 13:
+        c = (char) rn1('9' - '0' + 1, '0');
+        break;
+    case 14:
+        /* any char, but avoid '\0' because it's used for mouse click */
+        c = (char) rnd(iflags.wc_eight_bit_input ? 255 : 127);
+        break;
     }
 
     return c;
@@ -4795,7 +4967,7 @@ getdir(const char *s)
     char dirsym;
     int is_mov;
 
-retry:
+ retry:
     if (in_doagain || *readchar_queue)
         dirsym = readchar();
     else
@@ -5608,7 +5780,7 @@ end_of_input()
 #ifdef NOSAVEONHANGUP
 #ifdef INSURANCE
     if (flags.ins_chkpt && program_state.something_worth_saving)
-        program_statue.preserve_locks = 1; /* keep files for recovery */
+        program_state.preserve_locks = 1; /* keep files for recovery */
 #endif
     program_state.something_worth_saving = 0; /* don't save */
 #endif
@@ -5777,19 +5949,27 @@ paranoid_query(boolean be_paranoid, const char *prompt)
        to give the go-ahead for this query; default is "no" unless the
        ParanoidConfirm flag is set in which case there's no default */
     if (be_paranoid) {
-        char qbuf[QBUFSZ], ans[BUFSZ] = DUMMY;
-        const char *promptprefix = "", *responsetype = ParanoidConfirm
-                                                           ? "(yes|no)"
-                                                           : "(yes) [no]";
-        int trylimit = 6; /* 1 normal, 5 more with "Yes or No:" prefix */
+        char pbuf[BUFSZ], qbuf[QBUFSZ], ans[BUFSZ];
+        const char *promptprefix = "",
+                *responsetype = ParanoidConfirm ? "(yes|no)" : "(yes) [no]";
+        int k, trylimit = 6; /* 1 normal, 5 more with "Yes or No:" prefix */
 
+        copynchars(pbuf, prompt, BUFSZ - 1);
         /* in addition to being paranoid about this particular
            query, we might be even more paranoid about all paranoia
            responses (ie, ParanoidConfirm is set) in which case we
            require "no" to reject in addition to "yes" to confirm
            (except we won't loop if response is ESC; it means no) */
         do {
-            Sprintf(qbuf, "%s%s %s", promptprefix, prompt, responsetype);
+            /* make sure we won't overflow a QBUFSZ sized buffer */
+            k = (int) (strlen(promptprefix) + 1 + strlen(responsetype));
+            if ((int) strlen(pbuf) + k > QBUFSZ - 1) {
+                /* chop off some at the end */
+                Strcpy(pbuf + (QBUFSZ - 1) - k - 4, "...?"); /* -4: "...?" */
+            }
+
+            Sprintf(qbuf, "%s%s %s", promptprefix, pbuf, responsetype);
+            *ans = '\0';
             getlin(qbuf, ans);
             (void) mungspaces(ans);
             confirmed_ok = !strcmpi(ans, "yes");

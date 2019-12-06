@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1549333449 2019/02/05 02:24:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1560608320 2019/06/15 14:18:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -150,10 +150,16 @@ const char *str;
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
     if (!(cw->flags & WIN_STOP)) {
+        if (ttyDisplay->cury && ttyDisplay->toplin == 2)
+            tty_clear_nhwindow(WIN_MESSAGE);
+
         cw->curx = cw->cury = 0;
         home();
         cl_end();
         addtopl(str);
+
+        if (ttyDisplay->cury && ttyDisplay->toplin != 3)
+            ttyDisplay->toplin = 2;
     }
 }
 

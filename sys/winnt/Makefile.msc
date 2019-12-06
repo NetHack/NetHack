@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1554784482 2019/04/09 04:34:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.153 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1572748386 2019/11/03 02:33:06 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.167 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2019
 #
 #==============================================================================
@@ -73,7 +73,7 @@ DEBUGINFO = Y
 #    of your PDCurses C files.
 #
 #ADD_CURSES=Y
-#PDCURSES_TOP=..\..\pdcurses
+#PDCURSES_TOP=..\lib\pdcurses
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -91,9 +91,13 @@ DEBUGINFO = Y
 
 #
 #==============================================================================
+#
+#  The version of the game this Makefile was designed for
+NETHACK_VERSION="3.6.3"
 
-#  Set the gamedir according to your preference.  
-#  If not present prior to compilation it gets created.
+# A brief version for use in macros
+NHV=$(NETHACK_VERSION:.=)
+NHV=$(NHV:"=)
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -261,7 +265,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 GUIOBJ	= $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
-	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
+	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)NetHackW.o
 
 GUIHDR	= $(MSWIN)\mhaskyn.h $(MSWIN)\mhdlg.h $(MSWIN)\mhfont.h \
 	$(MSWIN)\mhinput.h $(MSWIN)\mhmain.h $(MSWIN)\mhmap.h $(MSWIN)\mhmenu.h \
@@ -361,6 +365,7 @@ DATABASE = $(DAT)\data.base
 #==========================================
 
 cc=cl
+cpp=cpp
 link=link
 rc=Rc
 
@@ -368,7 +373,7 @@ rc=Rc
 # Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
 # is too old or untested.
 #
-#NMAKE version 1414264330 is distributed with VS 15.7.5
+#NMAKE version 1421277022 is distributed with latest VS 2019
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
@@ -379,7 +384,7 @@ MAKEVERSION=$(MAKEVERSION: =)
 #!MESSAGE $(_NMAKE_VER)
 #!MESSAGE $(MAKEVERSION)
 
-VSNEWEST=2017
+VSNEWEST=2019
 !IF ($(MAKEVERSION) < 1000000000)
 VSVER=0000		#untested ancient version
 !ELSEIF ($(MAKEVERSION) > 1000000000) && ($(MAKEVERSION) < 1100000000)
@@ -390,9 +395,11 @@ VSVER=2012
 VSVER=2013
 !ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
 VSVER=2015
-!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1414264331)
+!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270312)
+VSVER=2017
+!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1421277023)
 VSVER=$(VSNEWEST)
-!ELSEIF ($(MAKEVERSION) > 1414264330)
+!ELSEIF ($(MAKEVERSION) > 1421277022)
 VSVER=2999              #untested future version
 !ENDIF
 
@@ -519,7 +526,8 @@ guilflags = $(lflags) -subsystem:windows,$(EXEVER)
 dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
 
 # basic subsystem specific libraries, less the C Run-Time
-baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib gdi32.lib
+baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib gdi32.lib \
+		ole32.lib Shell32.lib
 winlibs     = $(baselibs) user32.lib comdlg32.lib winspool.lib
 
 # for Windows applications that use the C Run-Time libraries
@@ -547,7 +555,7 @@ lflagsBuild = $(lflags) $(conlibs) $(MACHINE)
 LIBS= user32.lib winmm.lib $(ZLIB) $(CURSESLIB)
 
 ! IF ("$(USE_DLB)"=="Y")
-DLB = nhdat
+DLB = nhdat$(NHV)
 ! ELSE
 DLB =
 ! ENDIF
@@ -576,7 +584,7 @@ DLB =
 	@$(cc) $(cflagsBuild)  -Fo$@  $<
 
 {$(SSYS)}.cpp{$(OBJ)}.o:
-	@$(CC) $(cflagsBuild) /EHsc -Fo$@  $<
+	@$(cc) $(cflagsBuild) /EHsc -Fo$@  $<
 
 #==========================================
 # Rules for files in sys\winnt
@@ -628,7 +636,7 @@ DLB =
 #==========================================
 
 {$(WCURSES)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+	@$(cc) -DPDC_NCMOUSE $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
 
 #{$(WCURSES)}.txt{$(DAT)}.txt:
 #	@copy $< $@
@@ -671,7 +679,7 @@ install: $(O)envchk.tag $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAM
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
 ! IF ("$(USE_DLB)"=="Y")
-	copy nhdat                $(GAMEDIR)
+	copy nhdat$(NHV)          $(GAMEDIR)
 	copy $(DAT)\license       $(GAMEDIR)
 	copy $(DAT)\opthelp       $(GAMEDIR)
 ! ELSE
@@ -680,13 +688,13 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	copy $(DAT)\*.lev         $(GAMEDIR)
 	if exist $(GAMEDIR)\makefile del $(GAMEDIR)\makefile
 ! ENDIF
-	if not exist $(GAMEDIR)\sysconf copy $(MSWSYS)\sysconf $(GAMEDIR)
-	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
+	if exist $(MSWSYS)\sysconf.template copy $(MSWSYS)\sysconf.template $(GAMEDIR)
+	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)\symbols.template
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
 	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
 	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
-	-if not exist $(GAMEDIR)\defaults.nh copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
+	if exist $(MSWSYS)\.nethackrc.template copy $(MSWSYS)\.nethackrc.template $(GAMEDIR)
 	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
 	echo install done > $@
 
@@ -742,11 +750,11 @@ $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
 tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
-$(O)winhack.res: $(TILEBMP16) $(MSWIN)\winhack.rc $(MSWIN)\mnsel.bmp \
+$(O)NetHackW.res: $(TILEBMP16) $(MSWIN)\NetHackW.rc $(MSWIN)\mnsel.bmp \
 	$(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
 	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico $(MSWIN)\rip.bmp \
 	$(MSWIN)\splash.bmp
-	@$(rc) -r -fo$@ -i$(MSWIN) -dNDEBUG $(MSWIN)\winhack.rc
+	@$(rc) -r -fo$@ -i$(MSWIN) -dNDEBUG $(MSWIN)\NetHackW.rc
 
 $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 	@$(rc) -r -fo$@ -i$(MSWSYS) -dNDEBUG $(MSWSYS)\console.rc
@@ -820,7 +828,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
 $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winhack.res $(O)gamedir.tag $(KEYDLLS)
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)NetHackW.res $(O)gamedir.tag $(KEYDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
@@ -829,9 +837,8 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 		$(GUIOBJ)
 		$(O)tile.o
 		$(O)ttystub.o
-		$(O)winhack.res
+		$(O)NetHackW.res
 <<
-	@if exist $(O)install.tag del $(O)install.tag
 
 $(O)gamedir.tag:
 	@if not exist $(GAMEDIR)\*.* echo creating directory $(GAMEDIR:\=/)
@@ -918,7 +925,7 @@ $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objcla
 		 $(U)makedefs.c
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	@$(cc) $(cflagsBuild) -Fo$@ $(U)makedefs.c
+	@$(cc) -DENUM_PM $(cflagsBuild) -Fo$@ $(U)makedefs.c
 
 #
 #  date.h should be remade every time any of the source or include
@@ -1098,7 +1105,7 @@ $(O)envchk.tag: $(O)obj.tag
 #==========================================
 
 #==========================================
-# DLB utility and nhdat file creation
+# DLB utility and nhdatNNN file creation
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
@@ -1119,7 +1126,7 @@ $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
 
-nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
+nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon $(DAT)\porthelp \
 	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
@@ -1279,7 +1286,7 @@ spotless: clean
 	if exist $(GAMEDIR)\nhraykey.dll del $(GAMEDIR)\nhraykey.dll
 	if exist $(GAMEDIR)\NetHack.exe  del $(GAMEDIR)\NetHack.exe
 	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
-	if exist $(GAMEDIR)\nhdat        del $(GAMEDIR)\nhdat
+	if exist $(GAMEDIR)\nhdat$(NHV)  del $(GAMEDIR)\nhdat$(NHV)
 ! ENDIF
 	if exist $(INCL)\date.h          del $(INCL)\date.h
 	if exist $(INCL)\onames.h        del $(INCL)\onames.h
@@ -1332,7 +1339,7 @@ spotless: clean
 	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
 	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
 	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
-	if exist nhdat.			 del nhdat.
+	if exist nhdat$(NHV).	         del nhdat$(NHV).
 	if exist $(O)obj.tag             del $(O)obj.tag
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
 	if exist $(O)nh*key.lib          del $(O)nh*key.lib
@@ -1462,8 +1469,8 @@ $(O)guistub.o: $(HACK_H) $(MSWSYS)\stubs.c
 # WIN32 dependencies
 #
 
-$(O)winhack.o: $(HACK_H) $(MSWIN)\winhack.c
-	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\winhack.c
+$(O)NetHackW.o: $(HACK_H) $(MSWIN)\NetHackW.c
+	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\NetHackW.c
 
 #if you aren't linking in the full tty then
 #include the following stub for proper linkage.
@@ -1738,6 +1745,7 @@ $(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
+$(O)windmain.o: $(MSWSYS)\windmain.c $(HACK_H)
 #$(O)windows.o: windows.c $(HACK_H) $(INCL)\wingem.h $(INCL)\winGnome.h
 $(O)wizard.o: wizard.c $(HACK_H) $(INCL)\qtext.h
 $(O)worm.o: worm.c $(HACK_H) $(INCL)\lev.h

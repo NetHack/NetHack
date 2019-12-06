@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1547255911 2019/01/12 01:18:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1573943499 2019/11/16 22:31:39 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -266,7 +266,9 @@ struct symparse {
 /* misc symbol definitions */
 #define SYM_BOULDER 0
 #define SYM_INVISIBLE 1
-#define MAXOTHER 2
+#define SYM_PET_OVERRIDE 2
+#define SYM_HERO_OVERRIDE 3
+#define MAXOTHER 4
 
 /* linked list of symsets and their characteristics */
 struct symsetentry {
@@ -278,7 +280,8 @@ struct symsetentry {
     Bitfield(nocolor, 1);     /* don't use color if set               */
     Bitfield(primary, 1);     /* restricted for use as primary set    */
     Bitfield(rogue, 1);       /* restricted for use as rogue lev set  */
-                              /* 5 free bits */
+    Bitfield(explicitly, 1);  /* explicit symset set                  */
+                              /* 4 free bits */
 };
 
 /*
@@ -298,13 +301,17 @@ struct symsetentry {
 #define H_IBM     1
 #define H_DEC     2
 #define H_CURS    3
+#define H_MAC     4 /* obsolete; needed so that the listing of available
+                     * symsets by 'O' can skip it for !MAC_GRAPHICS_ENV */
 
 extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];
 extern int currentgraphics; /* from drawing.c */
 extern nhsym showsyms[];
-extern nhsym l_syms[];
-extern nhsym r_syms[];
+extern nhsym primary_syms[];
+extern nhsym rogue_syms[];
+extern nhsym ov_primary_syms[];
+extern nhsym ov_rogue_syms[];
 
 extern struct symsetentry symset[NUM_GRAPHICS]; /* from drawing.c */
 #define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))
@@ -624,12 +631,16 @@ extern dlevel_t level; /* structure describing the current level */
 /*
  * Macros for encapsulation of level.monsters references.
  */
+#if 0
 #define MON_AT(x, y)                            \
     (level.monsters[x][y] != (struct monst *) 0 \
      && !(level.monsters[x][y])->mburied)
 #define MON_BURIED_AT(x, y)                     \
     (level.monsters[x][y] != (struct monst *) 0 \
      && (level.monsters[x][y])->mburied)
+#else   /* without 'mburied' */
+#define MON_AT(x, y) (level.monsters[x][y] != (struct monst *) 0)
+#endif
 #ifdef EXTRA_SANITY_CHECKS
 #define place_worm_seg(m, x, y) \
     do {                                                        \

@@ -3,7 +3,7 @@
 
 	For example, ^S and ^Q are often used for XON/XOFF flow-control,
 	meaning that ^S suspends output and subsequent ^Q resumes suspended
-	output.  When that it the case, neither of those characters will
+	output.  When that is the case, neither of those characters will
 	reach NetHack when it is waiting for a command keystroke.  So they
 	aren't used as commands, but 'whatdoes' might not be able to tell
 	you that if they don't get passed through to NetHack.

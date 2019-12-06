@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1556835736 2019/05/02 22:22:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1574882660 2019/11/27 19:24:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.108 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -123,6 +123,7 @@
  */
 #include "hack.h"
 
+STATIC_DCL void show_mon_or_warn(int, int, int);
 STATIC_DCL void display_monster(xchar, xchar, struct monst *, int, xchar);
 STATIC_DCL int swallow_to_glyph(int, int);
 STATIC_DCL void display_warning(struct monst *);
@@ -349,6 +350,25 @@ map_location(int x, int y, int show)
     _map_location(x, y, show);
 }
 
+/* display something on monster layer; may need to fixup object layer */
+STATIC_OVL void
+show_mon_or_warn(x, y, monglyph)
+int x, y, monglyph;
+{
+    struct obj *o;
+
+    /* "remembered, unseen monster" is tracked by object layer so if we're
+       putting something on monster layer at same spot, stop remembering
+       that; if an object is in view there, start remembering it instead */
+    if (glyph_is_invisible(levl[x][y].glyph)) {
+        unmap_object(x, y);
+        if (cansee(x, y) && (o = vobj_at(x, y)) != 0)
+            map_object(o, FALSE);
+    }
+
+    show_glyph(x, y, monglyph);
+}
+
 #define DETECTED 2
 #define PHYSICALLY_SEEN 1
 #define is_worm_tail(mon) ((mon) && ((x != (mon)->mx) || (y != (mon)->my)))
@@ -464,7 +484,7 @@ display_monster(register xchar x, register xchar y, /* display position */
             else
                 num = mon_to_glyph(mon, rn2_on_display_rng);
         }
-        show_glyph(x, y, num);
+        show_mon_or_warn(x, y, num);
     }
 }
 
@@ -493,14 +513,7 @@ display_warning(register struct monst *mon)
         impossible("display_warning did not match warning type?");
         return;
     }
-    /* warning glyph is drawn on the monster layer; unseen
-       monster glyph is drawn on the object/trap/floor layer;
-       if we see a 'warning' move onto 'remembered, unseen' we
-       need to explicitly remove that in order for it to not
-       reappear when the warned-of monster moves off that spot */
-    if (glyph_is_invisible(levl[x][y].glyph))
-        unmap_object(x, y);
-    show_glyph(x, y, glyph);
+    show_mon_or_warn(x, y, glyph);
 }
 
 int
@@ -745,12 +758,19 @@ newsym(register int x, register int y)
          */
         lev->waslit = (lev->lit != 0); /* remember lit condition */
 
-        /* normal region shown only on accessible positions, but poison clouds
-         * also shown above lava, pools and moats.
+        mon = m_at(x, y);
+        worm_tail = is_worm_tail(mon);
+
+        /*
+         * Normal region shown only on accessible positions, but
+         * poison clouds also shown above lava, pools and moats.
+         * However, sensed monsters take precedence over all regions.
          */
-        if (reg && (ACCESSIBLE(lev->typ)
-                    || (reg->glyph == cmap_to_glyph(S_poisoncloud)
-                        && is_pool_or_lava(x, y)))) {
+        if (reg
+            && (ACCESSIBLE(lev->typ)
+                || (reg->glyph == cmap_to_glyph(S_poisoncloud)
+                    && is_pool_or_lava(x, y)))
+            && (!mon || worm_tail || !sensemon(mon))) {
             show_region(reg, x, y);
             return;
         }
@@ -765,8 +785,6 @@ newsym(register int x, register int y)
             if (see_self)
                 display_self();
         } else {
-            mon = m_at(x, y);
-            worm_tail = is_worm_tail(mon);
             see_it = mon && (mon_visible(mon)
                              || (!worm_tail && (tp_sensemon(mon)
                                                 || MATCH_WARN_OF_MON(mon))));
@@ -879,7 +897,7 @@ shieldeff(xchar x, xchar y)
     }
 }
 
-int
+STATIC_OVL int
 tether_glyph(int x, int y)
 {
     int tdx, tdy;
@@ -1045,6 +1063,33 @@ tmp_at(int x, int y)
         flush_screen(0);                 /* make sure it shows up */
         break;
     } /* end case */
+}
+
+/*
+ * flash_glyph_at(x, y, glyph, repeatcount)
+ *
+ * Briefly flash between the passed glyph and the glyph that's
+ * meant to be at the location.
+ */
+void
+flash_glyph_at(x, y, tg, rpt)
+int x, y;
+int tg, rpt;
+{
+    int i, glyph[2];
+
+    rpt *= 2; /* two loop iterations per 'count' */
+    glyph[0] = tg;
+    glyph[1] = (level.flags.hero_memory) ? levl[x][y].glyph
+                                         : back_to_glyph(x, y);
+    /* even iteration count (guaranteed) ends with glyph[1] showing;
+       caller might want to override that, but no newsym() calls here
+       in case caller has tinkered with location visibility */
+    for (i = 0; i < rpt; i++) {
+        show_glyph(x, y, glyph[i % 2]);
+        flush_screen(1);
+        delay_output();
+    }
 }
 
 /*
@@ -1318,15 +1363,15 @@ docrt()
 
     if (u.uswallow) {
         swallowed(1);
-        return;
+        goto post_map;
     }
     if (Underwater && !Is_waterlevel(&u.uz)) {
         under_water(1);
-        return;
+        goto post_map;
     }
     if (u.uburied) {
         under_ground(1);
-        return;
+        goto post_map;
     }
 
     /* shut down vision */
@@ -1352,6 +1397,8 @@ docrt()
 
     /* overlay with monsters */
     see_monsters();
+
+ post_map:
 
     /* perm_invent */
     update_inventory();

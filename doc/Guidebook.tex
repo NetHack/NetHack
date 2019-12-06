@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{May 7, 2019}
+\date{December 5, 2019}
 
 \maketitle
 
@@ -796,7 +796,14 @@ Eat food.\\
 Normally checks for edible item(s) on the floor, then if none are found
 or none are chosen, checks for edible item(s) in inventory.
 Precede `{\tt e}' with the `{\tt m}' prefix to bypass attempting to eat
-anything off the floor.
+anything off the floor.\\
+%.lp ""
+If you attempt to eat while already satiated, you might choke to death.
+If you risk it, you will be asked whether
+to ``continue eating?'' {\it if you survive the first bite\/}.
+You can set the
+{\it paranoid\verb+_+confirmation:eating\/}
+option to require a response of ``{\tt yes}'' instead of just `{\tt y}'.
 %.lp
 % Make sure Elbereth is not hyphenated below, the exact spelling matters.
 % (Only specified here to parallel Guidebook.mn; use of \tt font implicity
@@ -1130,7 +1137,7 @@ slot to another so that it has a letter which is more meaningful for you
 or that it will appear in a particular location when inventory listings
 are displayed.
 You can move to a currently empty slot, or if the destination is
-occupied--and won't merge--the item there will swap slots with the one
+occupied---and won't merge---the item there will swap slots with the one
 being moved.
 ``{\tt \#adjust}'' can also be used to split a stack of objects; when
 choosing the item to adjust, enter a count prior to its letter.\\
@@ -1216,7 +1223,13 @@ Advance or check weapon and spell skills. Autocompletes.
 Default key is `{\tt M-e}'.
 %.lp
 \item[\tb{\#exploremode}]
-Enter the explore mode.
+Enter the explore mode.\\
+%.lp ""
+Requires confirmation; default response is `{\tt n}' (no).
+To really switch to explore mode, respond with `{\tt y}'.
+You can set the
+{\it paranoid\verb+_+confirmation:quit\/}
+option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#fire}]
 Fire ammunition from quiver. Default key is `{\tt f}'.
@@ -1324,7 +1337,13 @@ Default keys are `{\tt \^{}O}', and `{\tt M-O}'.
 Test the panic routine.
 Terminates the current game.
 Autocompletes.
-Debug mode only.
+Debug mode only.\\
+%.lp ""
+Asks for confirmation; default is `{\tt n}' (no); continue playing.
+To really panic, respond with `{\tt y}'.
+You can set the
+{\it paranoid\verb+_+confirmation:quit\/}
+option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#pay}]
 Pay your shopping bill. Default key is `{\tt p}'.
@@ -1361,12 +1380,14 @@ Quaff (drink) something. Default key is `{\tt q}'.
 %.lp
 \item[\tb{\#quit}]
 Quit the program without saving your game. Autocompletes.
-Default key is `{\tt M-q}'.
+Default key is `{\tt M-q}'.\\
 %.lp ""
 Since using this command by accident would throw away the current game,
-you are asked to confirm your intent before quitting.  By default a
-response of `{\tt y}' acknowledges that intent.  You can set the
-{\it paranoid\verb+_+confirmation\/}
+you are asked to confirm your intent before quitting.
+Default response is `{\tt n}' (no); continue playing.
+To really quit, respond with `{\tt y}'.
+You can set the
+{\it paranoid\verb+_+confirmation:quit\/}
 option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#quiver}]
@@ -2030,9 +2051,9 @@ will result in it disappearing from your map, similarly if it is the
 one who moved rather than you.
 
 %.pg
-However, if you encounter a monster which you can't see or sense--
-perhaps it is invisible and has just tapped you on the noggin--
-a special ``remembered, unseen monster'' marker will be displayed at
+However, if you encounter a monster which you can't see or
+sense---perhaps it is invisible and has just tapped you on the
+noggin---a special ``remembered, unseen monster'' marker will be displayed at
 the location where you think it is.
 That will persist until you have
 proven that there is no monster there, even if the unseen monster
@@ -2312,7 +2333,7 @@ But first you need to have a weapon in each hand.
 (Note that your two weapons are not fully equal; the one in the
 hand you normally wield with is considered primary and the other
 one is considered secondary.  The most noticeable difference is
-after you stop--or before you begin, for that matter--wielding
+after you stop---or before you begin, for that matter---wielding
 two weapons at once.  The primary is your wielded weapon and the
 secondary is just an item in your inventory that's been designated
 as alternate weapon.)
@@ -2544,7 +2565,7 @@ The commands to use rings are `{\tt P}' (put on) and `{\tt R}' (remove).
 %.pg
 Spellbooks are tomes of mighty magic.  When studied with the `{\tt r}' (read)
 command, they transfer to the reader the knowledge of a spell (and
-therefore eventually become unreadable) --- unless the attempt backfires.
+therefore eventually become unreadable)---unless the attempt backfires.
 Reading a cursed spellbook or one with mystic runes beyond
 your ken can be harmful to your health!
 
@@ -2687,9 +2708,9 @@ you are carrying (shopkeepers aside).
 Normally, if you have seen an object at a particular map location and
 move to another location where you can't directly see that object any
 more, if will continue to be displayed on your map.
-That remains the case even if it is not actually there any more--
-perhaps a monster has picked it up or it has rotted away--
-until you can see or feel that location again.
+That remains the case even if it is not actually there any
+more---perhaps a monster has picked it up or it has rotted
+away---until you can see or feel that location again.
 One notable exception is that if the object gets covered by the
 ``remembered, unseen monster'' marker.
 When that marker is later removed
@@ -2852,19 +2873,32 @@ for system administrators.
 \subsection*{Using a configuration file}
 
 %.pg
-The default name of the configuration file varies on different
-operating systems. On MS-DOS and Windows, it is \mbox{``defaults.nh''} in
-the same folder as \mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}.
+The default name and location of the configuration file varies on different
+operating systems.\\
+
+%.lp ""
 On Unix, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home
 directory. The file may not exist, but it is a normal ASCII text file and
-can be created with any text editor.
+can be created with any text editor.\\
 
-%.pg
+%.lp ""
+On Windows, it is \mbox{``.nethackrc''} in the folder
+\mbox{{``\%USERPROFILE\%\textbackslash NetHack\textbackslash 3.6''}}. The
+file may not exist, but it is a normal ASCII text file and can be created
+with any text editor.
+After runing {\it NetHack\/} for the first time, you should find a default
+template for ths configuration file named \mbox{``.nethackrc.template''} in
+\mbox{{``\%USERPROFILE\%\textbackslash NetHack\textbackslash 3.6''}}.
+If you had not created the configuration file, {\it NetHack\/} will create
+the configuration file for you using the default template file.
+
+%.lp ""
+On MS-DOS it is \mbox{``defaults.nh''} in the same folder as
+\mbox{{\it nethack.exe\/}}.\\
+
+%.lp ""
 Any line in the configuration file starting with `{\tt \#}' is treated as a comment.
-Empty lines are ignored.
-
-%.pg
-Any line beginning with `{\tt [}' and ending in `{\tt ]}' is considered a section
+Empty lines are ignored. Any line beginning with `{\tt [}' and ending in `{\tt ]}' is considered a section
 marker. The text between the square brackets is the section name.
 Lines after a section marker belong to that section, and are
 ignored unless a CHOOSE -statement was used to select that section.
@@ -2872,9 +2906,13 @@ Section names are case insensitive.
 
 %.pg
 You can use different configuration statements in the file, some
-of which can be used multiple times. In general, the statements are
+of which can be used multiple times.
+In general, the statements are
 written in capital letters, followed by an equals sign, followed by
-settings particular to that statement. Here is a list of allowed statements:
+settings particular to that statement.
+
+%.pg
+Here is a list of allowed statements:
 
 %.lp
 \blist{}
@@ -2889,7 +2927,7 @@ You can specify multiple OPTIONS statements, and multiple options
 separated by commas in a single OPTIONS statement.
 (Comma separated options are processed from right to left.)
 
-%.pg
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
@@ -2923,6 +2961,9 @@ HACKDIR, must be writable.
 \item[\bb{TROUBLEDIR}]
 The location that a record of game aborts and self-diagnosed game problems
 is kept. Defaults to HACKDIR, must be writable.
+%
+% config file entries beyond this point are shown alphabetically
+%
 %.lp
 \item[\bb{AUTOCOMPLETE}]
 Enable or disable an extended command autocompletion.
@@ -2932,11 +2973,11 @@ autocompletion, list the extended command. Prefix the
 command with ``{{\tt !}}'' to disable the autocompletion
 for that command.
 
-%.pg
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
-    AUTOCOMPLETE=zap,!annotate
+   AUTOCOMPLETE=zap,!annotate
 \end{verbatim}
 %.ed
 
@@ -2951,7 +2992,7 @@ extended commands. You can specify multiple bindings. Format is key
 followed by the command, separated by a colon.
 See the ``Changing Key Bindings`` section for more information.
 
-%.pg
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
@@ -2964,7 +3005,7 @@ Example:
 Chooses at random one of the comma-separated parameters as an active
 section name. Lines in other sections are ignored.
 
-%.pg
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
@@ -2978,22 +3019,38 @@ Example:
 %.ed
 
 %.lp
-\item[\bb{MSGTYPE}]
-Change the way messages are shown in the top status line.
-See the ``Configuring Message Types`` section.
-%.lp
 \item[\bb{MENUCOLOR}]
 Highlight menu lines with different colors.
 See the ``Configuring Menu Colors`` section.
 %.lp
+\item[\bb{MSGTYPE}]
+Change the way messages are shown in the top status line.
+See the ``Configuring Message Types`` section.
+%.lp
+\item[\bb{ROGUESYMBOLS}]
+Custom symbols for for the rogue level's symbol set.
+See {\it SYMBOLS} below.
+%.lp
+\item[\bb{SOUND}]
+Define a sound mapping.
+See the ``Configuring User Sounds'' section.
+%.lp
+\item[\bb{SOUNDDIR}]
+Define the directory that contains the sound files.
+See the ``Configuring User Sounds'' section.
+%.lp
 \item[\bb{SYMBOLS}]
-Override one or more symbols in the symbols files.
+Override one or more symbols in the symbol set used for all dungeon
+levels except for the special rogue level.
 See the ``Modifying {\it NetHack\/} Symbols'' section.
 %.pg
+
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
-    SYMBOLS=S_boulder:0
+   # replace small punctuation (tick marks) with digits
+   SYMBOLS=S_boulder:0,S_golem:7
 \end{verbatim}
 %.ed
 
@@ -3003,24 +3060,19 @@ Debug mode only:  extra items to add to initial inventory.
 Value is the name of a text file containing a list of item names,
 one per line, up to a maximum of 128 lines.
 Each line is processed by the function that handles wishing.
-%.pg
+
+%.lp ""
 Example:
 %.sd
 \begin{verbatim}
-    WIZKIT=~/wizkit.txt
+   WIZKIT=~/wizkit.txt
 \end{verbatim}
 %.ed
-%.lp
-\item[\bb{SOUNDDIR}]
-Define the directory that contains the sound files.
-See the ``Configuring User Sounds'' section.
-%.lp
-\item[\bb{SOUND}]
-Define a sound mapping. See the ``Configuring User Sounds'' section.
 \elist
 
+%.lp ""
 %.pg
-Here is a short example of config file contents:
+Here is an example of configuration file contents:
 %.sd
 \begin{verbatim}
     # Set your character's role, race, gender, and alignment.
@@ -3028,10 +3080,13 @@ Here is a short example of config file contents:
 
     # Turn on autopickup, set automatically picked up object types
     OPTIONS=autopickup,pickup_types:$"=/!?+
-    # Show colored text if possible
-    OPTIONS=color
-    # Show lit corridors differently
-    OPTIONS=lit_corridor
+
+    # Map customization
+    OPTIONS=color           # Display things in color if possible
+    OPTIONS=lit_corridor    # Show lit corridors differently
+    OPTIONS=hilite_pet,hilite_pile
+    # Replace small punctuation (tick marks) with digits
+    SYMBOLS=S_boulder:0,S_golem:7
 
     # No startup splash screen. Windows GUI only.
     OPTIONS=!splash_screen
@@ -3473,7 +3528,7 @@ Valid settings are:
 %.sd
 %.si
 {\tt 0} --- disabled\\
-{\tt 1} --- enabled and make OS adjustment to support mouse use in the game\\
+{\tt 1} --- enabled and make OS adjustment to support mouse use\\
 {\tt 2} --- enabled like {\tt 1}, but does not make any OS adjustments\\
 %.ei
 %.ed
@@ -3592,6 +3647,9 @@ a peaceful monster;
 \item[{\tt wand-break}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm breaking
 a wand;
+\item[{\tt eating}]
+require ``{\tt yes}'' rather than `{\tt y}' to confirm whether to
+continue eating;
 \item[{\tt Were-change}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm changing form
 due to lycanthropy
@@ -3952,7 +4010,7 @@ windowtype that you have chosen.
 Character strings that are too long may be truncated.
 Not all window ports will adjust for all settings listed
 here.  You can safely add any of these options to your
-config file, and if the window port is capable of adjusting
+configuration file, and if the window port is capable of adjusting
 to suit your preferences, it will attempt to do so. If it
 can't it will silently ignore it.  You can find out if an
 option is supported by the window port that you are currently
@@ -4064,7 +4122,7 @@ Number of lines for traditional below-the-map status display.
 Acceptable values are 2 and 3 (default is 2).
 Curses and tty interfaces only.
 %.lp
-\item[\ib{term\verb+_+cols}\ \ {\it and}]"
+\item[\ib{term\verb+_+cols} {\normalfont and}]
 %.lp
 \item[\ib{term\verb+_+rows}]
 Curses interface only.
@@ -4209,7 +4267,8 @@ returns to {\it NetHack\/} to help compensate for international keyboard
 issues.
 OPTIONS=subkeyvalue:171/92
 will return 92 to {\it NetHack\/}, if 171 was originally going to be returned.
-You can use multiple subkeyvalue statements in the config file if needed.
+You can use multiple subkeyvalue statements in the configuration file
+if needed.
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{video}]
@@ -4279,12 +4338,15 @@ character in the pattern, specifically:
 %.ei
 %.ed
 
-A ``never pickup'' rule takes precedence over an ``always pickup'' rule if
-both match.
+The {\it autopickup\verb+_+exception\/} rules are processed in the order
+in which they appear in your configuration file, thus allowing a
+later rule to override an earlier rule.
 
 %.lp ""
-Exceptions can be set with the `{\tt O}' command, but ones set that way will
-not be preserved across saves and restores.
+Exceptions can be set with the `{\tt O}' command, but because they are not
+included in your configuration file, they won't be in effect if you save
+and then restore your game.
+{\it autopickup\verb+_+exception\/} rules are not saved with the game.
 \elist
 
 %.lp "Here are some examples:"
@@ -4332,8 +4394,9 @@ the ``{\tt <esc>}'', ``{\tt <enter>}'', and ``{\tt <space>}'' keys.
 
 %.lp "Menu accelerator keys"
 \item[\tb{Menu accelerator keys}]
-The menu control or accelerator keys can also be rebound via OPTIONS-lines
-in the config file. You cannot bind object symbols into menu accelerators.
+The menu control or accelerator keys can also be rebound via OPTIONS lines
+in the configuration file.
+You cannot bind object symbols into menu accelerators.
 
 %.lp "Special command keys"
 \item[\tb{Special command keys}]
@@ -4341,157 +4404,157 @@ Below are the special commands you can rebind. Some of them can be bound to
 same keys with no problems, others are in the same ``context'', and if bound
 to same keys, only one of those commands will be available. Special command
 can only be bound to a single key.
+\elist
 
 %.pg
-\blist{}
+\blist{\itemindent 10mm \labelwidth 15mm \rightmargin 15mm}
 %.lp
-\item{\bb{count}}
+\item[{\bb{count}}]
 Prefix key to start a count, to repeat a command this many times.
-With {\it number\verb+_+pad\/} only. Default is `{\tt n}'.
+With {\it number\verb+_+pad\/} only. Default is~`{\tt n}'.
 %.lp
-\item{\bb{doinv}}
-Show inventory. With {\it number\verb+_+pad\/} only. Default is `{\tt 0}'.
+\item[{\bb{doinv}}]
+Show inventory. With {\it number\verb+_+pad\/} only. Default is~`{\tt 0}'.
 %.lp
-\item{\bb{fight}}
-Prefix key to force fight a direction. Default is `{\tt F}'.
+\item[{\bb{fight}}]
+Prefix key to force fight a direction. Default is~`{\tt F}'.
 %.lp
-\item{\bb{fight.numpad}}
+\item[{\bb{fight.numpad}}]
 Prefix key to force fight a direction. With {\it number\verb+_+pad\/} only.
-Default is `{\tt -}'.
+Default is~`{\tt -}'.
 %.lp
-\item{\bb{getdir.help}}
-When asked for a direction, the key to show the help. Default is `{\tt ?}'.
+\item[{\bb{getdir.help}}]
+When asked for a direction, the key to show the help. Default is~`{\tt ?}'.
 %.lp
-\item{\bb{getdir.self}}
-When asked for a direction, the key to target yourself. Default is `{\tt .}'.
+\item[{\bb{getdir.self}}]
+When asked for a direction, the key to target yourself. Default is~`{\tt .}'.
 %.lp
-\item{\bb{getdir.self2}}
-When asked for a direction, the key to target yourself. Default is `{\tt s}'.
+\item[{\bb{getdir.self2}}]
+When asked for a direction, the key to target yourself. Default is~`{\tt s}'.
 %.lp
-\item{\bb{getpos.autodescribe}}
+\item[{\bb{getpos.autodescribe}}]
 When asked for a location, the key to toggle {\it autodescribe\/}.
-Default is `{\tt \#}'.
+Default is~`{\tt \#}'.
 %.lp
-\item{\bb{getpos.all.next}}
+\item[{\bb{getpos.all.next}}]
 When asked for a location, the key to go to next closest interesting thing.
-Default is `{\tt a}'.
+Default is~`{\tt a}'.
 %.lp
-\item{\bb{getpos.all.prev}}
+\item[{\bb{getpos.all.prev}}]
 When asked for a location, the key to go to previous closest interesting thing.
-Default is `{\tt A}'.
+Default is~`{\tt A}'.
 %.lp
-\item{\bb{getpos.door.next}}
+\item[{\bb{getpos.door.next}}]
 When asked for a location, the key to go to next closest door or doorway.
-Default is `{\tt d}'.
+Default is~`{\tt d}'.
 %.lp
-\item{\bb{getpos.door.prev}}
+\item[{\bb{getpos.door.prev}}]
 When asked for a location, the key to go to previous closest door or doorway.
-Default is `{\tt D}'.
+Default is~`{\tt D}'.
 %.lp
-\item{\bb{getpos.help}}
-When asked for a location, the key to show help. Default is `{\tt ?}'.
+\item[{\bb{getpos.help}}]
+When asked for a location, the key to show help. Default is~`{\tt ?}'.
 %.lp
-\item{\bb{getpos.mon.next}}
+\item[{\bb{getpos.mon.next}}]
 When asked for a location, the key to go to next closest monster.
-Default is `{\tt m}'.
+Default is~`{\tt m}'.
 %.lp
-\item{\bb{getpos.mon.prev}}
+\item[{\bb{getpos.mon.prev}}]
 When asked for a location, the key to go to previous closest monster.
-Default is `{\tt M}'.
+Default is~`{\tt M}'.
 %.lp
-\item{\bb{getpos.obj.next}}
+\item[{\bb{getpos.obj.next}}]
 When asked for a location, the key to go to next closest object.
-Default is `{\tt o}'.
+Default is~`{\tt o}'.
 %.lp
-\item{\bb{getpos.obj.prev}}
+\item[{\bb{getpos.obj.prev}}]
 When asked for a location, the key to go to previous closest object.
-Default is `{\tt O}'.
+Default is~`{\tt O}'.
 %.lp
-\item{\bb{getpos.menu}}
+\item[{\bb{getpos.menu}}]
 When asked for a location, and using one of the next or previous keys to
-cycle through targets, toggle showing a menu instead. Default is `{\tt !}'.
+cycle through targets, toggle showing a menu instead. Default is~`{\tt !}'.
 %.lp
-\item{\bb{getpos.moveskip}}
+\item[{\bb{getpos.moveskip}}]
 When asked for a location, and using the shifted movement keys or
 meta-digit keys to fast-move around, move by skipping the same glyphs
 instead of by 8 units.
-Default is `{\tt *}'.
+Default is~`{\tt *}'.
 %.lp
-\item{\bb{getpos.filter}}
+\item[{\bb{getpos.filter}}]
 When asked for a location, change the filtering mode when using one of
 the next or previous keys to cycle through targets. Toggles between no
-filtering, in view only, and in the same area only. Default is `{\tt "}'.
+filtering, in view only, and in the same area only. Default is~`{\tt "}'.
 %.lp
-\item{\bb{getpos.pick}}
+\item[{\bb{getpos.pick}}]
 When asked for a location, the key to choose the location, and possibly
-ask for more info. Default is `{\tt .}'.
+ask for more info. Default is~`{\tt .}'.
 %.lp
-\item{\bb{getpos.pick.once}}
+\item[{\bb{getpos.pick.once}}]
 When asked for a location, the key to choose the location, and skip
-asking for more info. Default is `{\tt ,}'.
+asking for more info. Default is~`{\tt ,}'.
 %.lp
-\item{\bb{getpos.pick.quick}}
+\item[{\bb{getpos.pick.quick}}]
 When asked for a location, the key to choose the location, skip asking
-for more info, and exit the location asking loop. Default is `{\tt ;}'.
+for more info, and exit the location asking loop. Default is~`{\tt ;}'.
 %.lp
-\item{\bb{getpos.pick.verbose}}
+\item[{\bb{getpos.pick.verbose}}]
 When asked for a location, the key to choose the location, and show more
-info without asking. Default is `{\tt :}'.
+info without asking. Default is~`{\tt :}'.
 %.lp
-\item{\bb{getpos.self}}
+\item[{\bb{getpos.self}}]
 When asked for a location, the key to go to your location.
-Default is `{\tt @}'.
+Default is~`{\tt @}'.
 %.lp
-\item{\bb{getpos.unexplored.next}}
+\item[{\bb{getpos.unexplored.next}}]
 When asked for a location, the key to go to next closest unexplored location.
-Default is `{\tt x}'.
+Default is~`{\tt x}'.
 %.lp
-\item{\bb{getpos.unexplored.prev}}
+\item[{\bb{getpos.unexplored.prev}}]
 When asked for a location, the key to go to previous closest unexplored
-location. Default is `{\tt X}'.
+location. Default is~`{\tt X}'.
 %.lp
-\item{\bb{getpos.valid}}
+\item[{\bb{getpos.valid}}]
 When asked for a location, the key to go to show valid target locations.
-Default is `{\tt \$}'.
+Default is~`{\tt \$}'.
 %.lp
-\item{\bb{getpos.valid.next}}
+\item[{\bb{getpos.valid.next}}]
 When asked for a location, the key to go to next closest valid location.
-Default is `{\tt z}'.
+Default is~`{\tt z}'.
 %.lp
-\item{\bb{getpos.valid.prev}}
+\item[{\bb{getpos.valid.prev}}]
 When asked for a location, the key to go to previous closest valid location.
-Default is `{\tt Z}'.
+Default is~`{\tt Z}'.
 %.lp
-\item{\bb{nopickup}}
-Prefix key to move without picking up items. Default is `{\tt m}'.
+\item[{\bb{nopickup}}]
+Prefix key to move without picking up items. Default is~`{\tt m}'.
 %.lp
-\item{\bb{redraw}}
-Key to redraw the screen. Default is `{\tt \^{}R}'.
+\item[{\bb{redraw}}]
+Key to redraw the screen. Default is~`{\tt \^{}R}'.
 %.lp
-\item{\bb{redraw.numpad}}
+\item[{\bb{redraw.numpad}}]
 Key to redraw the screen. With {\it number\verb+_+pad\/} only.
-Default is `{\tt \^{}L}'.
+Default is~`{\tt \^{}L}'.
 %.lp
-\item{\bb{repeat}}
-Key to repeat previous command. Default is `{\tt \^{}A}'.
+\item[{\bb{repeat}}]
+Key to repeat previous command. Default is~`{\tt \^{}A}'.
 %.lp
-\item{\bb{reqmenu}}
-Prefix key to request menu from some commands. Default is `{\tt m}'.
+\item[{\bb{reqmenu}}]
+Prefix key to request menu from some commands. Default is~`{\tt m}'.
 %.lp
-\item{\bb{run}}
-Prefix key to run towards a direction. Default is `{\tt G}'.
+\item[{\bb{run}}]
+Prefix key to run towards a direction. Default is~`{\tt G}'.
 %.lp
-\item{\bb{run.nopickup}}
+\item[{\bb{run.nopickup}}]
 Prefix key to run towards a direction without picking up items on the way.
-Default is `{\tt M}'.
+Default is~`{\tt M}'.
 %.lp
-\item{\bb{run.numpad}}
+\item[{\bb{run.numpad}}]
 Prefix key to run towards a direction. With {\it number\verb+_+pad\/} only.
-Default is `{\tt 5}'.
+Default is~`{\tt 5}'.
 %.lp
-\item{\bb{rush}}
-Prefix key to rush towards a direction. Default is `{\tt g}'.
-\elist
+\item[{\bb{rush}}]
+Prefix key to rush towards a direction. Default is~`{\tt g}'.
 \elist
 
 
@@ -4503,7 +4566,7 @@ You can change the way the messages are shown in the message area, when
 the message matches a user-defined pattern.
 
 %.pg
-In general, the config file entries to configure the message types
+In general, the configuration file entries to describe the message types
 look like this:
 \begin{verbatim}
     MSGTYPE=type "pattern"
@@ -4541,7 +4604,7 @@ the user is prompted with more-prompt, and a message matching
 ``You displaced  \verb+<+something\verb+>+'' is not shown at all.
 
 %.lp
-The order of the defined MSGTYPE-lines is important; the last matching
+The order of the defined MSGTYPE lines is important; the last matching
 rule is used. Put the general case first, exceptions below them.
 
 %.pg
@@ -4552,11 +4615,12 @@ rule is used. Put the general case first, exceptions below them.
 
 %.pg
 Some platforms allow you to define colors used in menu lines when the
-line matches a user-defined pattern. At this time the tty, win32tty and
-win32gui support this.
+line matches a user-defined pattern.
+At this time the tty, curses, win32tty and
+win32gui interfaces support this.
 
 %.pg
-In general, the config file entries to configure the menu color mappings
+In general, the configuration file entries to describe the menu color mappings
 look like this:
 \begin{verbatim}
     MENUCOLOR="pattern"=color&attribute
@@ -4608,8 +4672,8 @@ specifies that any menu line with ``~blessed~'' contained
 in it will be shown in green color, lines with ``~cursed~'' will be
 shown in red, and lines with ``~cursed~'' followed by ``(being worn)''
 on the same line will be shown in red color and underlined.
-You can have multiple MENUCOLOR entries in your config file,
-and the last MENUCOLOR-line in your config file that matches
+You can have multiple MENUCOLOR entries in your configuration file,
+and the last MENUCOLOR line that matches
 a menu line will be used for the line.
 
 %.pg
@@ -4630,7 +4694,7 @@ At this time the Qt port and the win32tty and win32gui ports support the
 use of user sounds.
 
 %.pg
-The following config file entries are relevant to mapping user sounds
+The following configuration file entries are relevant to mapping user sounds
 to messages:
 
 \blist{}
@@ -4696,6 +4760,8 @@ combination with any of the other attributes.
 
 To specify both a color and an attribute, use `\&' to combine them.
 To specify multiple attributes, use `+' to combine those.
+
+%.lp ""
 For example: {\tt magenta\&inverse+dim}.
 
 Note that the display may substitute or ignore particular attributes
@@ -4748,23 +4814,19 @@ percentage or absolute number threshold, or text to match against.
 
 \blist{}
 %.lp "*"
-\item{\bb{}}
-``{\tt always}'' will set the default attributes for that field.
+\item[{\tt always}] will set the default attributes for that field.
 %.lp "*"
-\item{\bb{}}
-``{\tt up}'' and ``{\tt down}'' set the field attributes for when the field
-value changes upwards or downwards. This attribute times out after
-{\tt statushilites} turns.
+\item[{\tt up}{\normalfont, }{\tt down}] set the field attributes
+for when the field value changes upwards or downwards. This attribute
+times out after {\tt statushilites} turns.
 %.lp "*"
-\item{\bb{}}
-``{\tt changed}'' sets the field attribute for when the field value
+\item[{\tt changed}] sets the field attribute for when the field value
 changes. This attribute times out after {\tt statushilites} turns.
 (If a field has both a ``changed'' rule and an ``up'' or ``down''
 rule which matches a change in the field's value,
 the ``up'' or ``down'' one takes precedence.)
 %.lp "*"
-\item{\bb{}}
-percentage sets the field attribute when the field value
+\item[{\tt percentage}] sets the field attribute when the field value
 matches the percentage.
 It is specified as a number between 0 and 100, followed by `{\tt \%}'
 (percent sign).
@@ -4773,10 +4835,26 @@ it also matches when value is below or above the percentage.
 Use prefix `{\tt <}' or `{\tt >}' to match when strictly below or above.
 (The numeric limit is relaxed slightly for those: {\tt >-1\%}
 and {\tt <101\%} are allowed.)
-Only valid for ``{\it hitpoints\/}'' and ``{\it power\/}'' fields.
+Only four fields support percentage rules.
+Percentages for ``{\it hitpoints\/}'' and ``{\it power\/}'' are
+straightforward; they're based on the corresponding maximum field.
+Percentage highlight rules are also allowed for ``{\it experience level\/}''
+and ``{\it experience points\/}'' (valid when the
+{\it showexp\/}
+option is enabled).
+For those, the percentage is based on the progress from the start of
+the current experience level to the start of the next level.
+So if level 2 starts at 20 points and level 3 starts at 40 points,
+having 30 points is 50\% and 35 points is 75\%.
+100\% is unattainable for experience because you'll gain a level and
+the calculations will be reset for that new level, but a rule for
+{\tt =100\%} is allowed and matches the special case of being
+exactly 1 experience point short of the next level.
+% (If you manage to reach level 30, there is no next level and the
+% percentage will remain at 0\% no matter have many additional experience
+% points you earn.)
 %.lp "*"
-\item{\bb{}}
-absolute value sets the attribute when the field value
+\item[{\tt absolute}] value sets the attribute when the field value
 matches that number.
 The number must be 0 or higher, except for ``{\it armor-class\/} which
 allows negative values, and may optionally be preceded by `{\tt =}'.
@@ -4785,8 +4863,7 @@ it also matches when value is below or above.
 If the prefix is `{\tt <}' or `{\tt >}', only match when strictly
 above or below.
 %.lp "*"
-\item{\bb{}}
-text match sets the attribute when the field value matches the text.
+\item[{\tt text}] match sets the attribute when the field value matches the text.
 Text matches can only be used for ``{\it alignment\/}'',
 ``{\it carrying-capacity\/}'', ``{\it hunger\/}'', ``{\it dungeon-level\/}'',
 and ``{\it title\/}''.
@@ -4796,7 +4873,7 @@ is tested; the character's name is ignored.
 \elist
 
 The in-game options menu can help you determine the correct syntax for a
-config file.
+configuration file.
 
 The whole feature can be disable by setting option {\it statushilites} to 0.
 
@@ -4837,11 +4914,14 @@ Set the name of the symbol set that you want to load for display
 on the rogue level.
 \elist
 
-You can also override one or more symbols using the {\it SYMBOLS\/} config
-file option. Symbols are specified as {\it name:value\/} pairs. Note that
-{\it NetHack\/} escape-processes the {\it value\/} string in conventional C
-fashion.  This means that `\verb+\+' is a prefix to take the following
-character literally.  Thus `\verb+\+' needs to be represented as `\verb+\\+'.
+You can also override one or more symbols using the {\it SYMBOLS\/} and
+{\it ROGUESYMBOLS\/} configuration file options.
+Symbols are specified as {\it name:value\/} pairs.
+Note that {\it NetHack\/} escape-processes
+the {\it value\/} string in conventional C fashion.
+This means that `\verb+\+' is a prefix to take the following character
+literally.
+Thus `\verb+\+' needs to be represented as `\verb+\\+'.
 The special prefix
 `\verb+\m+' switches on the meta bit in the symbol value, and the
 `{\tt \^{}}' prefix causes the following character to be treated as a control
@@ -4979,7 +5059,8 @@ Default                      & Symbol Name                & Description\\
 \verb+@+ & S\verb+_+ss3                     &	(magic shield 3 of 4)\\
 \verb@*@ & S\verb+_+ss4                     &	(magic shield 4 of 4)\\
 \verb@^@ & S\verb+_+statue\verb+_+trap            &	(statue trap)\\
-\verb@ @ & S\verb+_+stone                   &	(dark part of a room)\\
+\verb@ @ & S\verb+_+stone                   &	(solid rock or unexplored terrain\\
+         &                                  &   \,or dark part of a room)\\
 \verb@]@ & S\verb+_+strange\verb+_+obj      &	(strange object)\\
 \verb@-@ & S\verb+_+sw\verb+_+bc                  &	(swallow bottom center)\\
 \verb@\@ & S\verb+_+sw\verb+_+bl                  &	(swallow bottom left)\\
@@ -4994,7 +5075,7 @@ Default                      & Symbol Name                & Description\\
 \verb@\@ & S\verb+_+throne                  &	(opulent throne)\\
 \verb@-@ & S\verb+_+tlcorn                  &	(top left corner)\\
 \verb@|@ & S\verb+_+tlwall                  &	(wall)\\
-\verb@(@ & S\verb+_+tool                    &	(useful item (pick-axe\, key\, lamp...))\\
+\verb@(@ & S\verb+_+tool                    &	(useful item (pick-axe, key, lamp...))\\
 \verb@^@ & S\verb+_+trap\verb+_+door              &	(trap door)\\
 \verb@t@ & S\verb+_+trapper                 &	(trapper or lurker above)\\
 \verb@-@ & S\verb+_+trcorn                  &	(top right corner)\\
@@ -5023,24 +5104,32 @@ Default                      & Symbol Name                & Description\\
 \verb@w@ & S\verb+_+worm                    &	(worm)\\
 \verb@~@ & S\verb+_+worm\verb+_+tail              &	(long worm tail)\\
 \verb@W@ & S\verb+_+wraith                  &	(wraith)\\
-\verb@x@ & S\verb+_+xan                     &	(xan or other mythical/fantastic insect)\\
+\verb@x@ & S\verb+_+xan                     &	(xan or other extraordinary insect)\\
 \verb@X@ & S\verb+_+xorn                    &	(xorn)\\
 \verb@Y@ & S\verb+_+yeti                    &	(apelike creature)\\
 \verb@Z@ & S\verb+_+zombie                  &	(zombie)\\
-\verb@z@ & S\verb+_+zruty                   &	(zruty)
+\verb@z@ & S\verb+_+zruty                   &	(zruty)\\
+\verb@ @ & S\verb+_+pet\verb+_+override     &	(any pet if ACCESSIBILITY=1 is set)\\
+\verb@ @ & S\verb+_+hero\verb+_+override    &	(hero if ACCESSIBILITY=1 is set)
 \end{longtable}%
 }
 
-%.pg
-There is one additional class of object, described as ``strange object'',
-which will occasionally be the shape taken on by mimics and shown as
-`{\tt \verb+]+}'
-for maps displayed as text characters.
-Although the displayed character is the same as the default value for
-`S\verb+_+mimic\verb+_+def', it is a different symbol and there is no
-corresponding
-`S\verb+_+strange\verb+_+object' symbol nor any way to assign an
-alternate value for it.
+\hyphenation{sysconf}	%no syllable breaks => don't hyphenate file name
+%.lp
+Notes:
+
+%.lp "*"
+Several symbols in this table appear to be blank.
+They are the space character, except for S\verb+_+pet\verb+_+override
+and S\verb+_+hero\verb+_+override which don't have any default value
+and can only be used if enabled in the ``sysconf'' file.
+
+%.lp "*"
+S\verb+_+rock is misleadingly named; rocks and stones use S\verb+_+gem.
+Statues and boulders are the rock being referred to, but since
+version 3.6.0, statues are displayed as the monster they depict.
+So S\verb+_+rock is only used for boulders and not used at all if
+overridden by the more specific S\verb+_+boulder.
 
 %.pg
 %.hn 2
@@ -5083,8 +5172,15 @@ is a symset called {\it NHAccess\/}.  Selecting that symset in your
 configuration file will cause the game to run in a manner accessible
 to the blind. After you have gained some experience with the game
 and with editing files, you may want to alter settings via {\it SYMBOLS=\/}
+and {\it ROGUESYMBOLS=\/}
 in your configuration file to better suit your preferences.
-The most crucial settings to make the game accessible are:
+See the previous section for the special symbols S\verb+_+pet\verb+_+override
+to force a consistent symbol for all pets and S\verb+_+hero\verb+_+override
+to force a unique symbol for the player character if {\it accessibility\/}
+is enabled in the {\it sysconf\/} file.
+
+%.pg
+The most crucial settings to make the game more accessible are:
 %.pg
 \blist{}
 %.lp
@@ -5208,7 +5304,7 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 %.sd
 %.si
 {\tt \%\%}  --- literal `{\tt \%}'\\
-{\tt \%v}  --- version (eg. ``{\tt 3.6.2-0}'')\\
+{\tt \%v}  --- version (eg. ``{\tt 3.6.3-0}'')\\
 {\tt \%u}  --- game UID\\
 {\tt \%t}  --- game start time, UNIX timestamp format\\
 {\tt \%T}  --- current time, UNIX timestamp format\\
@@ -5400,7 +5496,7 @@ with help from {\it Ross Brown}, {\it Mike Engber}, {\it David Hairston},
 {\it Michael Hamel}, {\it Jonathan Handler}, {\it Johnny Lee},
 {\it Tim Lennan}, {\it Rob Menke}, and {\it Andy Swanson},
 developed {\it NetHack\/} 3.1 for the Macintosh, porting it for MPW.
-Building on their development, {\it Barton House} added a Think C port.
+Building on their development, {\it Bart House} added a Think C port.
 
 %.pg
 \medskip
@@ -5613,7 +5709,7 @@ maintained the port of {\it NetHack\/} 3.6 for Mac OSX.
 
 %.pg
 \medskip
-{\it Michael Allison}, {\it David Cohrs}, {\it Barton House},
+{\it Michael Allison}, {\it David Cohrs}, {\it Bart House},
 {\it Pasi Kallinen}, {\it Alex Kompel}, {\it Dion Nicolaas},
 {\it Derek S. Ray} and  {\it Yitzhak Sapir}
 maintained the port of  {\it NetHack\/} 3.6 for Microsoft Windows.
@@ -5644,15 +5740,25 @@ time of release of 3.6.1 consisted of
 
 %.pg
 \medskip
-In early May 2019, another 320 bug fixes along with some enhancements and 
+In early May 2019, another 320 bug fixes along with some enhancements and
 the adopted curses window port, were released as 3.6.2.
+
+%.pg
+\medskip
+{\it Bart House}, who had contributed to the game as a porting team participant
+for decades, joined the {\it NetHack Development Team} in late May 2019.
+
+%.pg
+\medskip
+NetHack 3.6.3 was released on December 5, 2019 containing over 190 bug
+fixes to NetHack 3.6.2.
 
 %.pg
 \medskip
 \nd The official {\it NetHack\/} web site is maintained by {\it Ken Lorber} at
 {\catcode`\#=11
-\special{html:<a href="http://www.nethack.org/">}}
-http:{\tt /}{\tt /}www.nethack.org{\tt /}.
+\special{html:<a href="https://www.nethack.org/">}}
+https:{\tt /}{\tt /}www.nethack.org{\tt /}.
 {\catcode`\#=11
 \special{html:</a>}}
 
@@ -5665,7 +5771,7 @@ again to {\it M. Drew Streib} and {\it Pasi Kallinen} for providing a
 public NetHack server at nethack.alt.org. Thanks to {\it Keith Simpson}
 and {\it Andy Thomson} for hardfought.org. Thanks to all those
 unnamed dungeoneers who invest their time and effort into annual
-{\it NetHack\/} tournaments such as {\it Junethack}, 
+{\it NetHack\/} tournaments such as {\it Junethack},
 {\it The November NetHack Tournament} and in days past,
 {\it devnull.net\/} (gone for now, but not forgotten).
 \clearpage
@@ -5674,54 +5780,55 @@ unnamed dungeoneers who invest their time and effort into annual
 \section*{Dungeoneers}
 %.pg
 \nd From time to time, some depraved individual out there in netland sends a
-particularly intriguing modification to help out with the game.  The 
+particularly intriguing modification to help out with the game.  The
 {\it NetHack Development Team} sometimes makes note of the names of the worst
 of these miscreants in this, the list of Dungeoneers:
 %.sd
 \begin{center}
 \begin{tabular}{llll}
 %TABLE_START
-Adam Aronow & Janet Walz & Nathan Eady\\
-Alex Kompel & Janne Salmij\"{a}rvi & Norm Meluch\\
-Alex Smith & Jean-Christophe Collet & Olaf Seibert\\
-Andreas Dorn & Jeff Bailey & Pasi Kallinen\\
-Andy Church & Jochen Erwied & Pat Rankin\\
-Andy Swanson & John Kallen & Patric Mueller\\
+Adam Aronow & J. Ali Harlow & Mikko Juola\\
+Alex Kompel & Janet Walz & Nathan Eady\\
+Alex Smith & Janne Salmij\"{a}rvi & Norm Meluch\\
+Andreas Dorn & Jean-Christophe Collet & Olaf Seibert\\
+Andy Church & Jeff Bailey & Pasi Kallinen\\
+Andy Swanson & Jochen Erwied & Pat Rankin\\
+Andy Thomson & John Kallen & Patric Mueller\\
 Ari Huttunen & John Rupley & Paul Winner\\
-Barton House & John S. Bien & Pierre Martineau\\
+Bart House & John S. Bien & Pierre Martineau\\
 Benson I. Margulies & Johnny Lee & Ralf Brown\\
 Bill Dyer & Jon W\{tte & Ray Chason\\
 Boudewijn Waijers & Jonathan Handler & Richard Addison\\
 Bruce Cox & Joshua Delahunty & Richard Beigel\\
 Bruce Holloway & Karl Garrison & Richard P. Hughey\\
 Bruce Mewborne & Keizo Yamamoto & Rob Menke\\
-Carl Schelin & Ken Arnold & Robin Bandy\\
-Chris Russo & Ken Arromdee & Robin Johnson\\
-David Cohrs & Ken Lorber & Roderick Schertler\\
-David Damerell & Ken Washikita & Roland McGrath\\
-David Gentzel & Kevin Darcy & Ron Van Iwaarden\\
-David Hairston & Kevin Hugo & Ronnen Miller\\
-Dean Luick & Kevin Sitze & Ross Brown\\
-Del Lamb & Kevin Smolkowski & Sascha Wostmann\\
-Derek S. Ray & Kevin Sweet & Scott Bigham\\
-Deron Meranda & Lars Huttar & Scott R. Turner\\
-Dion Nicolaas & Leon Arnott & Sean Hunt\\
-Dylan O'Donnell & M. Drew Streib & Stephen Spackman\\
-Eric Backus & Malcolm Ryan & Stefan Thielscher\\
-Eric Hendrickson & Mark Gooderum & Stephen White\\
-Eric R. Smith & Mark Modrall & Steve Creps\\
-Eric S. Raymond & Marvin Bressler & Steve Linhart\\
-Erik Andersen & Matthew Day & Steve VanDevender\\
-Frederick Roeber & Merlyn LeRoy & Teemu Suikki\\
-Gil Neiger & Michael Allison & Tim Lennan\\
-Greg Laskin & Michael Feir & Timo Hakulinen\\
-Greg Olson & Michael Hamel & Tom Almy\\
-Gregg Wonderly & Michael Sokolov & Tom West\\
-Hao-yang Wang & Mike Engber & Warren Cheung\\
-Helge Hafting & Mike Gallop & Warwick Allison\\
-Irina Rempt-Drijfhout & Mike Passaretti & Yitzhak Sapir\\
-Izchak Miller & Mike Stephenson\\
-J. Ali Harlow & Mikko Juola
+Carl Schelin & Keith Simpson & Robin Bandy\\
+Chris Russo & Ken Arnold & Robin Johnson\\
+David Cohrs & Ken Arromdee & Roderick Schertler\\
+David Damerell & Ken Lorber & Roland McGrath\\
+David Gentzel & Ken Washikita & Ron Van Iwaarden\\
+David Hairston & Kevin Darcy & Ronnen Miller\\
+Dean Luick & Kevin Hugo & Ross Brown\\
+Del Lamb & Kevin Sitze & Sascha Wostmann\\
+Derek S. Ray & Kevin Smolkowski & Scott Bigham\\
+Deron Meranda & Kevin Sweet & Scott R. Turner\\
+Dion Nicolaas & Lars Huttar & Sean Hunt\\
+Dylan O'Donnell & Leon Arnott & Stephen Spackman\\
+Eric Backus & M. Drew Streib & Stefan Thielscher\\
+Eric Hendrickson & Malcolm Ryan & Stephen White\\
+Eric R. Smith & Mark Gooderum & Steve Creps\\
+Eric S. Raymond & Mark Modrall & Steve Linhart\\
+Erik Andersen & Marvin Bressler & Steve VanDevender\\
+Fredrik Ljungdahl & Matthew Day & Teemu Suikki\\
+Frederick Roeber & Merlyn LeRoy & Tim Lennan\\
+Gil Neiger & Michael Allison & Timo Hakulinen\\
+Greg Laskin & Michael Feir & Tom Almy\\
+Greg Olson & Michael Hamel & Tom West\\
+Gregg Wonderly & Michael Sokolov & Warren Cheung\\
+Hao-yang Wang & Mike Engber & Warwick Allison\\
+Helge Hafting & Mike Gallop & Yitzhak Sapir\\
+Irina Rempt-Drijfhout & Mike Passaretti\\
+Izchak Miller & Mike Stephenson
 %TABLE_END  Do not delete this line.
 \end{tabular}
 \end{center}
@@ -5742,7 +5849,3 @@ J. Ali Harlow & Mikko Juola
 %\end{flushleft}
 
 \end{document}
-
-
-
-

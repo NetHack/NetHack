@@ -619,6 +619,13 @@ scatter(int sx, int sy,     /* location of objects to scatter */
                    obj->ox, obj->oy, sx, sy);
 
     while ((otmp = (individual_object ? obj : level.objects[sx][sy])) != 0) {
+        if (otmp == uball || otmp == uchain) {
+            boolean waschain = (otmp == uchain);
+            pline_The("chain shatters!");
+            unpunish();
+            if (waschain)
+                continue;
+        }
         if (otmp->quan > 1L) {
             qtmp = otmp->quan - 1L;
             if (qtmp > LARGEST_INT)
@@ -762,6 +769,9 @@ scatter(int sx, int sy,     /* location of objects to scatter */
         newsym(x, y);
     }
     newsym(sx, sy);
+    if (sx == u.ux && sy == u.uy && u.uundetected
+        && hides_under(youmonst.data))
+        (void) hideunder(&youmonst);
     return total;
 }
 

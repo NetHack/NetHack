@@ -27,7 +27,7 @@ int tgetnum(const char *);
 char *tgetstr(const char *, char **);
 char *tgoto(const char *, int, int);
 char *tparam(const char *, char *, int, int, int, int, int);
-void tputs(const char *, int, int (*)());
+void tputs(const char *, int, int (*)(int));
 
 /* local support data */
 static char *tc_entry;
@@ -484,9 +484,9 @@ tparam(const char *ctl, /* parameter control string */
 
 /* send a string to the terminal, possibly padded with trailing NULs */
 void
-tputs(const char *string,   /* characters to output */
-      int range,            /* number of lines affected, used for `*' delays */
-      int (*output_func)()) /* actual output routine; return value ignored */
+tputs(const char *string,      /* characters to output */
+      int range,               /* number of lines affected, used for `*' delays */
+      int (*output_func)(int)) /* actual output routine; return value ignored */
 {
     register int c, num = 0;
     register const char *p = string;

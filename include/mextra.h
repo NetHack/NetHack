@@ -1,4 +1,4 @@
-/* NetHack 3.6	mextra.h	$NHDT-Date: 1547428759 2019/01/14 01:19:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	mextra.h	$NHDT-Date: 1574722861 2019/11/25 23:01:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -179,7 +179,9 @@ struct mextra {
     struct eshk *eshk;
     struct emin *emin;
     struct edog *edog;
-    int mcorpsenm; /* obj->corpsenm for mimic posing as statue or corpse */
+    int mcorpsenm; /* obj->corpsenm for mimic posing as statue or corpse,
+                    * obj->spe (fruit index) for one posing as a slime mold,
+                    * or an alignment mask for one posing as an altar */
 };
 
 #define MNAME(mon) ((mon)->mextra->mname)

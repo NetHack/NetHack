@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1544437284 2018/12/10 10:21:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1575245054 2019/12/02 00:04:14 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -362,7 +362,7 @@ gold_detect(register struct obj *sobj)
     You("notice some gold between your %s.", makeplural(body_part(FOOT)));
     return 0;
 
-outgoldmap:
+ outgoldmap:
     cls();
 
     (void) unconstrain_map();
@@ -580,13 +580,13 @@ object_detect(struct obj *detector, /* object doing the detecting */
     }
 
     /* Special boulder symbol check - does the class symbol happen
-     * to match iflags.bouldersym which is a user-defined?
+     * to match showsyms[SYM_BOULDER + SYM_OFF_X] which is user-defined.
      * If so, that means we aren't sure what they really wanted to
      * detect. Rather than trump anything, show both possibilities.
      * We can exclude checking the buried obj chain for boulders below.
      */
     sym = class ? def_oc_syms[class].sym : 0;
-    if (sym && iflags.bouldersym && sym == iflags.bouldersym)
+    if (sym && showsyms[SYM_BOULDER + SYM_OFF_X] && sym == showsyms[SYM_BOULDER + SYM_OFF_X])
         boulder = ROCK_CLASS;
 
     if (Hallucination || (Confusion && class == SCROLL_CLASS))
@@ -971,7 +971,7 @@ trap_detect(struct obj *sobj)
     Your("%s itch.", makeplural(body_part(TOE)));
     return 0;
 
-outtrapmap:
+ outtrapmap:
     cls();
 
     (void) unconstrain_map();
@@ -1182,7 +1182,8 @@ use_crystal_ball(struct obj **optr)
             ret = object_detect((struct obj *) 0, class);
         else if ((class = def_char_to_monclass(ch)) != MAXMCLASSES)
             ret = monster_detect((struct obj *) 0, class);
-        else if (iflags.bouldersym && (ch == iflags.bouldersym))
+        else if (showsyms[SYM_BOULDER + SYM_OFF_X]
+                 && (ch == showsyms[SYM_BOULDER + SYM_OFF_X]))
             ret = object_detect((struct obj *) 0, ROCK_CLASS);
         else
             switch (ch) {
@@ -1307,7 +1308,7 @@ do_vicinity_map(struct obj *sobj) /* scroll--actually fake spellbook--object */
      * Unlike when casting the spell, it is much too intrustive when
      * in the midst of walking around or combatting monsters.
      *
-     * For 3.6.2, show terrain, then object, then monster like regular
+     * As of 3.6.2, show terrain, then object, then monster like regular
      * map updating, except in this case the map locations get marked
      * as seen from every direction rather than just from direction of
      * hero.  Skilled spell marks revealed objects as 'seen up close'
@@ -1387,8 +1388,13 @@ do_vicinity_map(struct obj *sobj) /* scroll--actually fake spellbook--object */
                 continue;
             newglyph = glyph_at(zx, zy);
             if (glyph_is_monster(newglyph)
-                && glyph_to_mon(newglyph) != PM_LONG_WORM_TAIL)
-                map_invisible(zx, zy);
+                && glyph_to_mon(newglyph) != PM_LONG_WORM_TAIL) {
+                /* map_invisible() was unconditional here but that made
+                   remembered objects be forgotten for the case where a
+                   monster is immediately redrawn by see_monsters() */
+                if ((mtmp = m_at(zx, zy)) == 0 || !canspotmon(mtmp))
+                    map_invisible(zx, zy);
+            }
         }
     see_monsters();
 
@@ -1414,11 +1420,20 @@ cvt_sdoor_to_door(struct rm *lev)
     lev->doormask = newmask;
 }
 
+/* find something at one location; it should find all somethings there
+   since it is used for magical detection rather than physical searching */
 STATIC_PTR void
 findone(int zx, int zy, genericptr_t num)
 {
     register struct trap *ttmp;
     register struct monst *mtmp;
+
+    /*
+     * This used to use if/else-if/else-if/else/end-if but that only
+     * found the first hidden thing at the location.  Two hidden things
+     * at the same spot is uncommon, but it's possible for an undetected
+     * monster to be hiding at the location of an unseen trap.
+     */
 
     if (levl[zx][zy].typ == SDOOR) {
         cvt_sdoor_to_door(&levl[zx][zy]); /* .typ = DOOR */
@@ -1431,19 +1446,25 @@ findone(int zx, int zy, genericptr_t num)
         magic_map_background(zx, zy, 0);
         newsym(zx, zy);
         (*(int *) num)++;
-    } else if ((ttmp = t_at(zx, zy)) != 0) {
-        if (!ttmp->tseen && ttmp->ttyp != STATUE_TRAP) {
-            ttmp->tseen = 1;
-            newsym(zx, zy);
-            (*(int *) num)++;
-        }
-    } else if ((mtmp = m_at(zx, zy)) != 0) {
+    }
+
+    if ((ttmp = t_at(zx, zy)) != 0 && !ttmp->tseen
+        /* [shouldn't successful 'find' reveal and activate statue traps?] */
+        && ttmp->ttyp != STATUE_TRAP) {
+        ttmp->tseen = 1;
+        newsym(zx, zy);
+        (*(int *) num)++;
+    }
+
+    if ((mtmp = m_at(zx, zy)) != 0
+        /* brings hidden monster out of hiding even if already sensed */
+        && (!canspotmon(mtmp) || mtmp->mundetected || M_AP_TYPE(mtmp))) {
         if (M_AP_TYPE(mtmp)) {
             seemimic(mtmp);
             (*(int *) num)++;
-        }
-        if (mtmp->mundetected
-            && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
+        } else if (mtmp->mundetected && (is_hider(mtmp->data)
+                                         || hides_under(mtmp->data)
+                                         || mtmp->data->mlet == S_EEL)) {
             mtmp->mundetected = 0;
             newsym(zx, zy);
             (*(int *) num)++;
@@ -1567,8 +1588,7 @@ find_trap(struct trap *trap)
 
     /* The "Hallucination ||" is to preserve 3.6.1 behaviour, but this
        behaviour might need a rework in the hallucination case
-       (e.g. to not prompt if any trap glyph appears on the
-       square). */
+       (e.g. to not prompt if any trap glyph appears on the square). */
     if (Hallucination ||
         levl[trap->tx][trap->ty].glyph !=
         trap_to_glyph(trap, rn2_on_display_rng)) {
@@ -1599,18 +1619,22 @@ mfind0(struct monst *mtmp, boolean via_warning)
     if (M_AP_TYPE(mtmp)) {
         seemimic(mtmp);
         found_something = TRUE;
-    } else if (!canspotmon(mtmp)) {
-        if (mtmp->mundetected
-            && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
+    } else {
+        /* this used to only be executed if a !canspotmon() test passed
+           but that failed to bring sensed monsters out of hiding */
+        found_something = !canspotmon(mtmp);
+        if (mtmp->mundetected && (is_hider(mtmp->data)
+                                  || hides_under(mtmp->data)
+                                  || mtmp->data->mlet == S_EEL)) {
             if (via_warning) {
                 Your("warning senses cause you to take a second %s.",
                      Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
             mtmp->mundetected = 0;
+            found_something = TRUE;
         }
         newsym(x, y);
-        found_something = TRUE;
     }
 
     if (found_something) {
@@ -1877,7 +1901,7 @@ dump_map()
 
             glyph = reveal_terrain_getglyph(x, y, FALSE, u.uswallow,
                                             default_glyph, subset);
-            (void) mapglyph(glyph, &ch, &color, &special, x, y);
+            (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
             buf[x - 1] = ch;
             if (ch != ' ') {
                 blankrow = FALSE;

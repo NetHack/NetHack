@@ -13,7 +13,6 @@
  *
  */
 
-
 #ifdef WIN32
 #define NEED_VARARGS /* Uses ... */
 #include "win32api.h"
@@ -419,8 +418,17 @@ nttty_exit()
 int
 process_keystroke(INPUT_RECORD *ir, boolean *valid, boolean numberpad, int portdebug)
 {
-    int ch = keyboard_handler.pProcessKeystroke(
+    int ch;
+
+#ifdef QWERTZ_SUPPORT
+    if (Cmd.swap_yz)
+        numberpad |= 0x10;
+#endif
+    ch = keyboard_handler.pProcessKeystroke(
                     console.hConIn, ir, valid, numberpad, portdebug);
+#ifdef QWERTZ_SUPPORT
+    numberpad &= ~0x10;
+#endif
     /* check for override */
     if (ch && ch < MAX_OVERRIDES && key_overrides[ch])
         ch = key_overrides[ch];
@@ -439,13 +447,20 @@ tgetch()
     int mod;
     coord cc;
     DWORD count;
+    boolean numpad = iflags.num_pad;
+
     really_move_cursor();
     if (iflags.debug_fuzzer)
         return randomkey();
+#ifdef QWERTZ_SUPPORT
+    if (Cmd.swap_yz)
+        numpad |= 0x10;
+#endif
+
     return (program_state.done_hup)
                ? '\033'
                : keyboard_handler.pCheckInput(
-                   console.hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
+                   console.hConIn, &ir, &count, numpad, 0, &mod, &cc);
 }
 
 int
@@ -454,13 +469,22 @@ ntposkey(int *x, int *y, int *mod)
     int ch;
     coord cc;
     DWORD count;
+    boolean numpad = iflags.num_pad;
+
     really_move_cursor();
     if (iflags.debug_fuzzer)
         return randomkey();
+#ifdef QWERTZ_SUPPORT
+    if (Cmd.swap_yz)
+        numpad |= 0x10;
+#endif
     ch = (program_state.done_hup)
              ? '\033'
              : keyboard_handler.pCheckInput(
-                   console.hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
+                   console.hConIn, &ir, &count, numpad, 1, mod, &cc);
+#ifdef QWERTZ_SUPPORT
+    numpad &= ~0x10;
+#endif
     if (!ch) {
         *x = cc.x;
         *y = cc.y;
@@ -518,18 +542,20 @@ nocmov(int x, int y)
     set_console_cursor(x, y);
 }
 
-void
-xputc(char ch)
+/* same signature as 'putchar()' with potential failure result ignored */
+int
+xputc(int ch)
 {
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-    xputc_core(ch);
+    xputc_core((char) ch);
+    return 0;
 }
 
 void
 xputs(const char *s)
 {
     int k;
-    int slen = strlen(s);
+    int slen = (int) strlen(s);
 
     if (ttyDisplay)
         set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
@@ -638,13 +664,37 @@ cl_end()
 void
 raw_clear_screen()
 {
-    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
+    if (WINDOWPORT("tty")) {
+        cell_t * back = console.back_buffer;
+        cell_t * front = console.front_buffer;
+        COORD pos;
+        DWORD unused;
+
+        for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
+            for (pos.X = 0; pos.X < console.width; pos.X++) {
+                 WriteConsoleOutputAttribute(console.hConOut, &back->attribute,
+                                             1, pos, &unused);
+                 front->attribute = back->attribute;
+                 if (console.has_unicode) {
+                     WriteConsoleOutputCharacterW(console.hConOut,
+                             &back->character, 1, pos, &unused);
+                 } else {
+                     char ch = (char)back->character;
+                     WriteConsoleOutputCharacterA(console.hConOut, &ch, 1, pos,
+                                                         &unused);
+                 }
+                 *front = *back;
+                 back++;
+                 front++;
+            }
+        }
+    }
 }
 
 void
 clear_screen()
 {
-    raw_clear_screen();
+    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);    
     home();
 }
 
@@ -697,7 +747,6 @@ tty_delay_output()
     }
 }
 
-#ifdef TEXTCOLOR
 /*
  * CLR_BLACK		0
  * CLR_RED		1
@@ -770,10 +819,10 @@ init_ttycolor()
 #endif
     init_ttycolor_completed = TRUE;
 }
-#endif /* TEXTCOLOR */
 
+#if 0
 int
-has_color(int color)
+has_color(int color)        /* this function is commented out */
 {
 #ifdef TEXTCOLOR
     if ((color >= 0) && (color < CLR_MAX))
@@ -785,6 +834,7 @@ has_color(int color)
     else
         return 0;
 }
+#endif
 
 int
 term_attr_fixup(int attrmask)
@@ -1575,8 +1625,8 @@ check_font_widths()
     boolean used[256];
     memset(used, 0, sizeof(used));
     for (int i = 0; i < SYM_MAX; i++) {
-        used[l_syms[i]] = TRUE;
-        used[r_syms[i]] = TRUE;
+        used[primary_syms[i]] = TRUE;
+        used[rogue_syms[i]] = TRUE;
     }
 
     int wcUsedCount = 0;
@@ -1877,12 +1927,17 @@ void nethack_enter_nttty()
     HKL keyboard_layout = GetKeyboardLayout(0);
     DWORD primary_language = (UINT_PTR) keyboard_layout & 0x3f;
 
-    if (primary_language == LANG_ENGLISH) {
-        if (!load_keyboard_handler("nhdefkey"))
-            error("Unable to load nhdefkey.dll");
-    } else {
-        if (!load_keyboard_handler("nhraykey"))
-            error("Unable to load nhraykey.dll");
+    /* This was overriding the handler that had already
+       been loaded during options parsing. Needs to
+       check first */
+    if (!iflags.altkeyhandler[0]) {
+        if (primary_language == LANG_ENGLISH) {
+            if (!load_keyboard_handler("nhdefkey"))
+                error("Unable to load nhdefkey.dll");
+        } else {
+            if (!load_keyboard_handler("nhraykey"))
+                error("Unable to load nhraykey.dll");
+        }
     }
 }
 #endif /* TTY_GRAPHICS */

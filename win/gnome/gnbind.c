@@ -24,7 +24,9 @@ extern NEARDATA winid WIN_STATUS;
 
 /* Interface definition, for windows.c */
 struct window_procs Gnome_procs = {
-    "Gnome", WC_COLOR | WC_HILITE_PET | WC_INVERSE, 0L, gnome_init_nhwindows,
+    "Gnome", WC_COLOR | WC_HILITE_PET | WC_INVERSE, 0L,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    gnome_init_nhwindows,
     gnome_player_selection, gnome_askname, gnome_get_nh_event,
     gnome_exit_nhwindows, gnome_suspend_nhwindows, gnome_resume_nhwindows,
     gnome_create_nhwindow, gnome_clear_nhwindow, gnome_display_nhwindow,

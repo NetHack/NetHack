@@ -1,4 +1,4 @@
-/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1557254337 2019/05/07 18:38:57 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1557510467 2019/05/10 17:47:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.127 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,7 +9,7 @@
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL 2
+#define PATCHLEVEL 3
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -36,9 +36,45 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
+/*  Patch 3, December 5, 2019
+ *
+ *  Fixed stale 'thrownobj' pointer for returning thrown aklys while engulfed
+ *  Fixed uarmh null pointer dereference if a helm of opposite alignment came
+ *     off due to being polymorphed
+ *  Fixed 'object lost' panic when attempting to crawl of of the water during
+ *     emergency disrobing/dropping
+ *  Running now stops when moving over engravings so you can tell where they are
+ *  Fixed detection of unseen/secret doors which failed to find monsters hiding
+ *     under objects and failed to find monsters hiding at trap locations
+ *  Ensured fatal status conditions made it to disclosure and/or dumplog
+ *  Fixed "Bad fruit #N" warnings when saving bones with 'perm_invent' On
+ *  Fixed it so yellow dragons don't have green breath
+ *  Added several grammar corrections
+ *  Improved recognition of deafness for several situations including the
+ *     playing of musical instruments and bribing negotiations with demon lords
+ *  Fixed ignoring of god's wrath when hero injured himself during altar kick 
+ *  Fixed several cases where persistent inventory window was not updated
+ *  Fixed temple priests or shopkeepers moving over other monsters
+ *  Fixed a crash-causing bug when putting on levitation boots over a sink
+ *  Ensured that thrown or kicked objects will end up in bones
+ *  Made water go all the way to the edges of level on the Plane of Water
+ *  Made clouds disrupt line of sight along the edges of the Plane of Air
+ *  Improved and expanded usage of status highlighting percentage rules
+ *  Added more than 15 improvements and fixes to the curses window port
+ *  Added and documented significant changes to default directory choices for
+ *    the Windows platform
+ *  Improved the layout and display of the player selection dialog used on the
+ *     Windows graphical implementation
+ *  Improved performance of some tty versions by reducing the number of 
+ *     function calls made from mapglyph
+ *  Allowed the msdos implementation to build with curses and PDCurses
+ *  Included over 100 other fixes and improvements as outlined in doc/fixes36.3
+ */
+
 /*  Patch 2, May 7, 2019
  *  
- *  Over 320 bug fixes including a couple of crash bug fixes
+ *  Over 320 bug fixes including a couple of crash bug fixes as outlined in
+ *      doc/fixes36.2
  *  More than 15 enhancements or improvements
  *  Ensuring that unix Makefiles do not rely on features unique to gnu make
  *  Improvements to hilite_status parsing in an effort to ensure that expected
@@ -50,13 +86,15 @@
  */
 
 /*  Patch 1, April 27, 2018
- *  Over four hundred and seventy bug fixes and improvements.
+ *
+ *  Over four hundred and seventy bug fixes and improvements as outlined in
+ *      doc/fixes36.1
  */
 
 /*
  *  NetHack 3.6.0, December 7, 2015
  *
- *  Hundreds of bug fixes.
+ *  Hundreds of bug fixes as outlined in doc/fixes36.0.
  *  Some code reorganization.
  *  Some new features.
  *  Variations of some community patches rolled in.

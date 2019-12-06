@@ -24,7 +24,7 @@ WIZARDS=*
 # Only available if NetHack was compiled with DUMPLOG
 # Allows following placeholders:
 #   %% literal '%'
-#   %v version (eg. "3.6.2-0")
+#   %v version (eg. "3.6.3-0")
 #   %u game UID
 #   %t game start time, UNIX timestamp format
 #   %T current time, UNIX timestamp format
@@ -52,6 +52,11 @@ WIZARDS=*
 # Uncomment the next line to disable the SEDUCE option.
 #SEDUCE=0
 
+# Uncomment the next line to enable some accessibility features such
+# as S_hero_override and S_pet_override symbols for screen readers
+# in the user config file.
+#ACCESSIBILITY=1
+
 # Record (high score) file options.
 # CAUTION: changing these after people have started playing games can
 #  lead to lost high scores!
@@ -72,30 +77,27 @@ WIZARDS=*
 # IMPORTANT: If you change any of these locations, the directories they
 # point at must exist.  NetHack will not create them for you.
 #
-# HACKDIR is the default location for everything.
-# Note: On Windows HACKDIR defaults to the location 
-#       of the NetHack.exe or NetHackw.exe file so
-#       setting HACKDIR below to override that is 
-#       not usually necessary or recommended.
-#HACKDIR=c:\games\nethack
-#
 # The location that users can adjust their config file startup options
-#CONFIGDIR=c:\games\nethack
-#
-# The location that level files in progress are stored (default=HACKDIR, writeable)
-#LEVELDIR=c:\nethack\levels
-#
-# The location where saved games are kept (default=HACKDIR, writeable)
-#SAVEDIR=c:\nethack\save
-#
-# The location that bones files are kept (default=HACKDIR, writeable)
-#BONESDIR=c:\nethack\save
-#
-# The location that file synchronization locks are stored (default=HACKDIR, writeable)
-#LOCKDIR=c:\nethack\levels
+#CONFIGDIR=%USERPROFILE%\NetHack
 #
 # The location that a record of game aborts and self-diagnosed game problems
 # is kept (default=HACKDIR, writeable)
-#TROUBLEDIR=c:\nethack\trouble
-
-
+#TROUBLEDIR=%USERPROFILE%\NetHack\3.6
+#
+# The location that documentation and helps files are placed
+#HACKDIR=%USERPROFILE%\NetHack\3.6
+#
+# The location that level files in progress are stored (writeable)
+LEVELDIR=%USERPROFILE%\AppData\Local\NetHack\3.6
+#
+# The location where saved games are kept (writeable)
+#SAVEDIR=%USERPROFILE%\AppData\Local\NetHack\3.6
+#
+# The location that bones files are kept (writeable)
+#BONESDIR=c:\ProgramData\NetHack\3.6
+#
+# The location that score files are kept (writeable)
+#SCOREDIR=c:\ProgramData\NetHack\3.6
+#
+# The location that file synchronization locks are stored (writeable)
+#LOCKDIR=c:\ProgramData\NetHack\3.6

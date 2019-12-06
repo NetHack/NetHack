@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.305 $ $NHDT-Date: 1557251604 2019/05/07 17:53:24 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.334 $ $NHDT-Date: 1575245028 2019/12/02 00:03:48 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "May 7, 2019
+.ds f2 "December 5, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -511,8 +511,8 @@ information, then let you pick another location;
 you to choose another location to examine; \(oq:\(cq will show additional
 info, if any, without asking for confirmation.
 When picking a location,
-pressing the ESC key will terminate this command, or pressing \(oq?\(cq
-will give a brief reminder about how it works.
+pressing the ESC key will terminate this command, or pressing \(oq?\(cq will
+give a brief reminder about how it works.
 .lp ""
 If the
 .op autodescribe
@@ -693,6 +693,14 @@ Normally checks for edible item(s) on the floor, then if none are found
 or none are chosen, checks for edible item(s) in inventory.
 Precede \(oqe\(cq with the \(oqm\(cq prefix to bypass attempting to eat
 anything off the floor.
+.lp ""
+If you attempt to eat while already satiated, you might choke to death.
+If you risk it, you will be asked whether
+to \(lqcontinue eating?\(rq \fIif you survive the first bite\fP.
+You can set the
+.op paranoid_confirmation:eating
+option to require a response of \f(CRyes\fP instead of just \f(CRy\fP.
+.
 .\" Make sure Elbereth is not hyphenated below, the exact spelling matters
 .hw Elbereth
 .lp E
@@ -1104,6 +1112,12 @@ Autocompletes.
 Default key is \(oqM-e\(cq.
 .lp #exploremode
 Enter the explore mode.
+.lp ""
+Requires confirmation; default response is \f(CRn\fP (no).
+To really switch to explore mode, respond with \f(CRy\fP.
+You can set the
+.op paranoid_confirmation:quit
+option to require a response of \f(CRyes\fP instead.
 .lp "#fire    "
 Fire ammunition from quiver.
 Default key is \(oqf\(cq.
@@ -1211,6 +1225,12 @@ Test the panic routine.
 Terminates the current game.
 Autocompletes.
 Debug mode only.
+.lp ""
+Asks for confirmation; default is \f(CRn\fP (no); continue playing.
+To really panic, respond with \f(CRy\fP.
+You can set the
+.op paranoid_confirmation:quit
+option to require a response of \f(CRyes\fP instead.
 .lp "#pay     "
 Pay your shopping bill.
 Default key is \(oqp\(cq.
@@ -1251,10 +1271,11 @@ Default key is \(oqM-q\(cq.
 .lp ""
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.
-By default a response of \(oqy\(cq acknowledges that intent.
+Default response is \f(CRn\fP (no); continue playing.
+To really quit, respond with \f(CRy\fP.
 You can set the
-.op paranoid_confirmation
-option to require a response of \(lqyes\(rq instead.
+.op paranoid_confirmation:quit
+option to require a response of \f(CRyes\fP instead.
 .lp "#quiver  "
 Select ammunition for quiver.
 Default key is \(oqQ\(cq.
@@ -2604,14 +2625,25 @@ Using a configuration file
 .hw .nethackrc defaults.nh nethack.exe nethackW.exe
 The default name of the configuration file varies on different
 operating systems.
-On MS-DOS and Windows, it is \(lqdefaults.nh\(rq
-in the same folder as nethack.exe or nethackW.exe.
+.pg
 On
 .UX ,
 Linux,
 and Mac OS X it is \(lq.nethackrc\(rq in the user's home directory.
 The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
+.pg
+On Windows, it is \(lq.nethackrc\(rq in the folder
+\(lq\\%USERPROFILE%\\NetHack\\3.6\(rq.  The file may not exist,
+but it is a normal ASCII text file can can be created with any
+text editor.
+After running NetHack for the first time, you should find a default
+template for the configuration file named \(lq.nethackrc.template\(rq
+in \(lq\\%USERPROFILE%\\NetHack\\3.6\(rq.
+If you had not created the configuration file, NetHack will create
+the configuration file for you using the default template file.
+.pg
+On MS-DOS, it is \(lqdefaults.nh\(rq in the same folder as nethack.exe.
 .pg
 Any line in the configuration file starting with \(oq#\(cq is treated
 as a comment.
@@ -2629,6 +2661,7 @@ of which can be used multiple times.
 In general, the statements are
 written in capital letters, followed by an equals sign, followed by
 settings particular to that statement.
+.pg
 Here is a list of allowed statements:
 .lp OPTIONS
 There are two types of options, boolean and compound options.
@@ -2640,7 +2673,7 @@ Some options are persistent, and apply only to new games.
 You can specify multiple OPTIONS statements, and multiple options
 separated by commas in a single OPTIONS statement.
 (Comma separated options are processed from right to left.)
-.pg
+.lp ""
 Example:
 .sd
 .ft CR
@@ -2669,6 +2702,9 @@ HACKDIR, must be writable.
 .lp TROUBLEDIR
 The location that a record of game aborts and self-diagnosed game problems
 is kept. Defaults to HACKDIR, must be writable.
+.\"
+.\" config file entries beyond this point are shown alphabetically
+.\"
 .lp AUTOCOMPLETE
 Enable or disable an extended command autocompletion.
 Autocompletion has no effect for the X11 windowport.
@@ -2676,7 +2712,7 @@ You can specify multiple autocompletions.
 To enable autocompletion, list the extended command.
 Prefix the command with \(lq!\(rq to disable the autocompletion
 for that command.
-.pg
+.lp ""
 Example:
 .sd
 \f(CRAUTOCOMPLETE=zap,!annotate\fP
@@ -2692,7 +2728,7 @@ extended commands.
 You can specify multiple bindings.
 Format is key followed by the command, separated by a colon.
 See the \(lqChanging Key Bindings\(rq section for more information.
-.pg
+.lp ""
 Example:
 .sd
 \f(CRBIND=\(haX:getpos.autodescribe\fP
@@ -2700,7 +2736,7 @@ Example:
 .lp CHOOSE
 Chooses at random one of the comma-separated parameters as an active
 section name. Lines in other sections are ignored.
-.pg
+.lp ""
 Example:
 .sd
 .ft CR \" constant-width Roman
@@ -2712,55 +2748,73 @@ OPTIONS=role:arc,race:dwa,align:law,gender:fem
 OPTIONS=role:wiz,race:elf,align:cha,gender:mal
 .ft \" revert to previous font
 .ed
-.lp MSGTYPE
-Change the way messages are shown in the top status line.
-See the \(lqConfiguring Message Types\(rq section.
 .lp MENUCOLOR
 Highlight menu lines with different colors.
 See the \(lqConfiguring Menu Colors\(rq section.
+.lp MSGTYPE
+Change the way messages are shown in the top status line.
+See the \(lqConfiguring Message Types\(rq section.
+.lp ROGUESYMBOLS
+Custom symbols for for the rogue level's symbol set.
+See \fISYMBOLS\fP below.
+.lp SOUND
+Define a sound mapping.
+See the \(lqConfiguring User Sounds\(rq section.
+.lp SOUNDDIR
+Define the directory that contains the sound files.
+See the \(lqConfiguring User Sounds\(rq section.
 .lp SYMBOLS
-Override one or more symbols in the symbols files.
+Override one or more symbols in the symbol set used for all dungeon
+levels except for the special rogue level.
 See the \(lqModifying NetHack Symbols\(rq section.
-.pg
+.lp ""
 Example:
 .sd
-\f(CRSYMBOLS=S_boulder:0\fP
+\f(CR# replace small punctuation (tick marks) with digits\fP
+\f(CRSYMBOLS=S_boulder:0,S_golem:7\fP
 .ed
 .lp WIZKIT
 Debug mode only:  extra items to add to initial inventory.
 Value is the name of a text file containing a list of item names,
 one per line, up to a maximum of 128 lines.
 Each line is processed by the function that handles wishing.
-.pg
+.lp ""
 Example:
 .sd
 \f(CRWIZKIT=\(ti/wizkit.txt\fP \" \(ti == '~'
 .ed
-.lp SOUNDDIR
-Define the directory that contains the sound files.
-See the \(lqConfiguring User Sounds\(rq section.
-.lp SOUND
-Define a sound mapping.
-See the \(lqConfiguring User Sounds\(rq section.
+.
 .pg
-Here is a short example of config file contents:
-.sd
+\ \" dummy paragraph to force some separation [.BR isn't working as intended]
+.pg
+.SD n \" suppress indentation
+Here is an example of configuration file contents:
+.ED
+.\" [conditional indentation; see description of NETHACKOPTIONS below]
+.ds sD i \" assume proportional, indentation acceptable and preferred
+.\" Check for fixed-width font; 'f' will be same width as 'F'.
+.if (\w'f'p)=(\w'F'p) .ds sD n \" if same width, suppress indentation
+.SD \*(sD \" string variable sD will expand to either 'i' or 'n'
 .ft CR \" set font to constant-width Roman
 # Set your character's role, race, gender, and alignment.
 OPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful
 #
 # Turn on autopickup, set automatically picked up object types
 OPTIONS=autopickup,pickup_types:$"=/!?+
-# Show colored text if possible
-OPTIONS=color
-# Show lit corridors differently
-OPTIONS=lit_corridor
+#
+# Map customization
+OPTIONS=color           # Display things in color if possible
+OPTIONS=lit_corridor    # Show lit corridors differently
+OPTIONS=hilite_pet,hilite_pile
+# Replace small punctuation (tick marks) with digits
+SYMBOLS=S_boulder:0,S_golem:7
 #
 # No startup splash screen. Windows GUI only.
 OPTIONS=!splash_screen
 .ft \" revert to previous font
-.ed
-.BR 2
+.ED
+.pg
+\ \" another dummy paragraph [.BR 2]
 .hn 2
 Using the NETHACKOPTIONS environment variable
 .pg
@@ -3161,7 +3215,7 @@ Valid settings are:
 .sd
 .si
 .CC 0 "disabled"
-.CC 1 "enabled and make OS adjustments to support mouse use in the game"
+.CC 1 "enabled and make OS adjustments to support mouse use"
 .CC 2 "like 1 but does not make any OS adjustments"
 .ei
 .ed
@@ -3261,6 +3315,8 @@ bones data when dying in debug mode;
 require \(lqyes\(rq rather than \(oqy\(cq to confirm attacking a peaceful monster;
 .PL wand-break
 require \(lqyes\(rq rather than \(oqy\(cq to confirm breaking a wand;
+.PL eating
+require \(lqyes\(rq rather than \(oqy\(cq to confirm whether to continue eating;
 .PL Were-change
 require \(lqyes\(rq rather than \(oqy\(cq to confirm changing form due to lycanthropy
 when hero has polymorph control;
@@ -3578,7 +3634,7 @@ used to customize and change the characteristics of the
 windowtype that you have chosen.
 Character strings that are too long may be truncated.
 Not all window ports will adjust for all settings listed
-here.  You can safely add any of these options to your config
+here.  You can safely add any of these options to your configuration
 file, and if the window port is capable of adjusting to
 suit your preferences, it will attempt to do so. If it
 can't it will silently ignore it.  You can find out if an
@@ -3777,7 +3833,8 @@ May be used to alter the value of keystrokes that the operating system
 returns to NetHack to help compensate for international keyboard issues.
 OPTIONS=subkeyvalue:171/92
 will return 92 to NetHack, if 171 was originally going to be returned.
-You can use multiple subkeyvalue statements in the config file if needed.
+You can use multiple subkeyvalue statements in the configuration file
+if needed.
 Cannot be set with the \(oqO\(cq command.
 .lp video
 Set the video mode used (PC NetHack only).
@@ -3839,11 +3896,16 @@ character in the pattern, specifically:
 .CC > "never pickup an object that matches rest of pattern."
 .ei
 .ed
-A \(lqnever pickup\(rq rule takes precedence over an \(lqalways pickup\(rq
-rule if both match.
+The
+.op autopickup_exception
+rules are processed in the order in which they appear in your configuration
+file, thus allowing a later rule to override an earlier rule.
 .lp ""
-Exceptions can be set with the \(oqO\(cq command, but ones set that way will
-not be preserved across saves and restores.
+Exceptions can be set with the \(oqO\(cq command, but because they are not
+included in your configuration file, they won't be in effect if you save
+and then restore your game.
+.op autopickup_exception
+rules and not saved with the game.
 .\" end of ``.lp autopickup_exception'' entry; continue enclosing page...
 .\" use .lp "text" to make an unindented paragraph ("text" should be short)
 .lp "Here are some examples:"
@@ -3884,8 +3946,8 @@ You can bind multiple keys to the same extended command.
 Unbind a key by using \(lqnothing\(rq as the extended command to bind to.
 You can also bind the \(lq<esc>\(rq, \(lq<enter>\(rq, and \(lq<space>\(rq keys.
 .lp "Menu accelerator keys"
-The menu control or accelerator keys can also be rebound via OPTIONS-lines
-in the config file.
+The menu control or accelerator keys can also be rebound via OPTIONS lines
+in the configuration file.
 You cannot bind object symbols into menu accelerators.
 .lp "Special command keys"
 Below are the special commands you can rebind.
@@ -4044,7 +4106,7 @@ Configuring Message Types
 You can change the way the messages are shown in the message area, when
 the message matches a user-defined pattern.
 .pg
-In general, the config file entries to configure the message types
+In general, the configuration file entries to describe the message types
 look like this:
 .si
 MSGTYPE=type "pattern"
@@ -4084,16 +4146,17 @@ the user is prompted with more-prompt, and a message matching
 .\" historical trivia:  "You displaced Fido." was the sort of message you
 .\" got when swapping places with your pet, but that was changed long ago...
 .lp ""
-The order of the defined MSGTYPE-lines is important; the last matching
+The order of the defined MSGTYPE lines is important; the last matching
 rule is used. Put the general case first, exceptions below them.
 .hn 2
 Configuring Menu Colors
 .pg
 Some platforms allow you to define colors used in menu lines when the
-line matches a user-defined pattern. At this time the tty, win32tty and
-win32gui support this.
+line matches a user-defined pattern.
+At this time the tty, curses, win32tty and
+win32gui interfaces support this.
 .pg
-In general, the config file entries to configure the menu color mappings
+In general, the configuration file entries to describe the menu color mappings
 look like this:
 .si
 .lp MENUCOLOR="pattern"=color&attribute
@@ -4136,8 +4199,8 @@ in it will be shown in green color, lines with \(lq\ cursed\ \(rq will be
 shown in red, and lines with \(lq\ cursed\ \(rq followed
 by \(lq(being worn)\(rq
 on the same line will be shown in red color and underlined.
-You can have multiple MENUCOLOR entries in your config file,
-and the last MENUCOLOR-line in your config file that matches
+You can have multiple MENUCOLOR entries in your configuration file,
+and the last MENUCOLOR line that matches
 a menu line will be used for the line.
 .pg
 Note that if you intend to have one or more color specifications match
@@ -4153,7 +4216,7 @@ that matches a user-defined pattern is delivered to the message window.
 At this time the Qt port and the win32tty and win32gui ports support the
 use of user sounds.
 .pg
-The following config file entries are relevant to mapping user sounds
+The following configuration file entries are relevant to mapping user sounds
 to messages:
 .lp SOUNDDIR
 The directory that houses the sound files to be played.
@@ -4261,7 +4324,7 @@ text to match against.
 .lp "*"
 \(lqalways\(rq will set the default attributes for that field.
 .lp "*"
-\(lqup\(rq and \(lqdown\(rq set the field attributes for when the field
+\(lqup\(rq, \(lqdown\(rq set the field attributes for when the field
 value changes upwards or downwards.
 This attribute times out after
 .op statushilites
@@ -4284,7 +4347,24 @@ it also matches when value is below or above the percentage.
 Use prefix \(oq<\(cq or \(oq>\(cq to match when strictly below or above.
 (The numeric limit is relaxed slightly for those: \f(CR>-1%\fP
 and \f(CR<101%\fP are allowed.)
-Only valid for \(lqhitpoints\(rq and \(lqpower\(rq fields.
+Only four fields support percentage rules.
+Percentages for \(lqhitpoints\(rq and \(lqpower\(rq are
+straightforward; they're based on the corresponding maximum field.
+Percentage highlight rules are also allowed for \(lqexperience level\(rq
+and \(lqexperience points\(rq (valid when the
+.op showexp
+option is enabled).
+For those, the percentage is based on the progress from the start of
+the current experience level to the start of the next level.
+So if level 2 starts at 20 points and level 3 starts at 40 points,
+having 30 points is 50% and 35 points is 75%.
+100% is unattainable for experience because you'll gain a level and
+the calculations will be reset for that new level, but a rule for
+\f(CR=100%\fP is allowed and matches the special case of being
+exactly 1 experience point short of the next level.
+.\" (If you manage to reach level 30, there is no next level and the
+.\" percentage will remain at 0% no matter have many additional experience
+.\" points you earn.)
 .lp "*"
 absolute value sets the attribute when the field value matches
 that number.
@@ -4305,7 +4385,7 @@ is tested; the character's name is ignored.
 .ei
 .pg
 The in-game options menu can help you determine the correct syntax for a
-config file.
+configuration file.
 .pg
 The whole feature can be disabled by setting option
 .op statushilites
@@ -4340,8 +4420,9 @@ Set the name of the symbol set that you want to load.
 Set the name of the symbol set that you want to load for display
 on the rogue level.
 .pg
-You can also override one or more symbols using the SYMBOLS config
-file option. Symbols are specified as name:value pairs.
+You can also override one or more symbols using the SYMBOLS and
+ROGUESYMBOLS configuration file options.
+Symbols are specified as name:value pairs.
 Note that
 NetHack escape-processes the value string in conventional C fashion.
 This means that \\ is a prefix to take the following character literally.
@@ -4350,16 +4431,23 @@ The special prefix form \\m switches on the meta bit in the symbol value,
 and the \(ha prefix causes the following character to be treated as a
 control character.
 .pg
+.\" Table is centered.
+.\" First line (title) is left justified and spans second and third columns;
+.\" it used to be centered but tended to look as if too far to the right.
+.\" Remaining lines are left justified in each of three columns.  First
+.\" line (second overall) contains column labels; the first column has a
+.\" dummy label of two spaces.  (That used to be "Default" but it made all
+.\" the lines wider because of the label's width and caused several lines
+.\" to be too wide when generating plain text output.  Two spaces leaves
+.\" some room between the symbol character and name.)  Entries in first
+.\" column now use constant-width Roman font to approximate TeX tt font.
 .TS S
 center;
-c s s
-c1 l1 l.
+l s s
+l1fCR l1 l.
 .\"TABLE_START
-.\" because description is wide, centered title seems off, so pad it a bit
-.\" note that each backslash precedes one space of padding (including the
-.\" last one; in other words, there's a trailing space here)
-NetHack Symbols\ \ \ \ \ \ \ 
-Default	Symbol Name	Description
+NetHack Symbols
+\ \ 	Symbol Name	Description
 \_	\_	\_
 \ 	S_air	(air)
 \&_	S_altar	(altar)
@@ -4486,7 +4574,8 @@ s	S_spider	(arachnid or centipede)
 @	S_ss3	(magic shield 3 of 4)
 *	S_ss4	(magic shield 4 of 4)
 \(ha	S_statue_trap	(statue trap)
-\ 	S_stone	(dark part of a room)
+\ 	S_stone	(solid rock or unexplored terrain
+\ 	\ 	\ or dark part of a room)
 ]	S_strange_obj	(strange object)
 \-	S_sw_bc	(swallow bottom center)
 \\	S_sw_bl	(swallow bottom left)
@@ -4530,21 +4619,30 @@ v	S_vortex	(vortex)
 w	S_worm	(worm)
 \(ti	S_worm_tail	(long worm tail)
 W	S_wraith	(wraith)
-x	S_xan	(xan or other mythical/fantastic insect)
+x	S_xan	(xan or other extraordinary insect)
 X	S_xorn	(xorn)
 Y	S_yeti	(apelike creature)
 Z	S_zombie	(zombie)
 z	S_zruty	(zruty)
+\ 	S_pet_override	(any pet if ACCESSIBILITY=1 is set)
+\ 	S_hero_override	(hero if ACCESSIBILITY=1 is set)
 .\"TABLE_END  Do not delete this line.
 .TE
+.\" don't hyphenate file name across lines
+.hw sysconf
 .pg
-There is one additional class of object, described as \(lqstrange object\(rq,
-which will occasionally be the shape taken on by mimics and shown
-as \(oq]\(cq for maps displayed as text characters.
-Although the displayed character is the same as the default value for
-\(lqS_mimic_def\(rq, it is a different symbol and there is no corresponding
-\(lqS_strange_object\(rq symbol nor any way to assign an alternate value
-for it.
+.lp "Notes:"
+.lp "*"
+Several symbols in this table appear to be blank.
+They are the space character, except for S_pet_override
+and S_hero_override which don't have any default value
+and can only be used if enabled in the \(lqsysconf\(rq file.
+.lp "*"
+S_rock is misleadingly named; rocks and stones use S_gem.
+Statues and boulders are the rock being referred to, but since
+version 3.6.0, statues are displayed as the monster they depict.
+So S_rock is only used for boulders and not used at all if
+overridden by the more specific S_boulder.
 .pg
 .hn 2
 Configuring NetHack for Play by the Blind
@@ -4585,8 +4683,14 @@ configuration file will cause the game to run in a manner accessible
 to the blind.
 After you have gained some experience with the game
 and with editing files, you may want to alter settings via \fBSYMBOLS=\fP
+and \fBROGUESYMBOLS=\fP
 in your configuration file to better suit your preferences.
-The most crucial settings to make the game accessible are:
+See the previous section for the special symbols S_pet_override
+to force a consistent symbol for all pets and
+S_hero_override to force a unique symbol for the player character
+if \fBaccessibility\fP is enabled in the sysconf file.
+.pg
+The most crucial settings to make the game more accessible are:
 .pg
 .lp symset:NHAccess
 Load a symbol set appropriate for use by blind players.
@@ -4620,7 +4724,7 @@ of moving 8 units at a time.
 .lp nostatus_updates
 Prevent updates to the status lines at the bottom of the screen, if
 your screen-reader reads those lines. The same information can be
-seen via the #attributes command.
+seen via the \(lq#attributes\(rq command.
 .hn 2
 Global Configuration for System Administrators
 .pg
@@ -4692,7 +4796,7 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 .PL %%
 literal \(oq\f(CR%\fP\(cq
 .PL %v
-version (eg. \(lq\f(CR3.6.2\-0\fP\(rq)
+version (eg. \(lq\f(CR3.6.3\-0\fP\(rq)
 .PL %u
 game UID
 .PL %t
@@ -4855,7 +4959,7 @@ and \fBPaul Winner\fP, ported NetHack 3.1 to the PC.
 \fBMike Engber\fP, \fBDavid Hairston\fP, \fBMichael Hamel\fP,
 \fBJonathan Handler\fP, \fBJohnny Lee\fP, \fBTim Lennan\fP, \fBRob Menke\fP,
 and \fBAndy Swanson\fP, developed NetHack 3.1 for the Macintosh,
-porting it for MPW.  Building on their development, \fBBarton House\fP
+porting it for MPW.  Building on their development, \fBBart House\fP
 added a Think C port.
 .pg
 \fBTimo Hakulinen\fP ported NetHack 3.1 to OS/2.  \fBEric Smith\fP
@@ -5014,7 +5118,7 @@ flavors and maintained the X11 interface.
 \fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP
 maintained the port of NetHack 3.6 for Mac OSX.
 .pg
-\fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBBarton House\fP,
+\fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBBart House\fP,
 \fBPasi Kallinen\fP, \fBAlex Kompel\fP, \fBDion Nicolaas\fP,
 \fBDerek S. Ray\fP and \fBYitzhak Sapir\fP maintained the port of
 NetHack 3.6 for Microsoft Windows.
@@ -5036,12 +5140,18 @@ The NetHack Development Team at the time of release of 3.6.1 consisted of
 \fBPat Rankin\fP, \fBDerek S. Ray\fP, \fBAlex Smith\fP,
 \fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
 .pg
-In early May 2019, another 320 bug fixes along with some enhancements and 
+In early May 2019, another 320 bug fixes along with some enhancements and
 the adopted curses window port, were released as 3.6.2.
+.pg
+\fBBart House\fP, who had contributed to the game as a porting team
+participant for decades, joined the NetHack Development Team in late May 2019.
+.pg
+NetHack 3.6.3 was released on December 5, 2019 containing over 190 bug
+fixes to NetHack 3.6.2.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP
 at
-.UR http://www.nethack.org/ .
+.UR https://www.nethack.org/ .
 .pg
 .hn 2
 SPECIAL THANKS
@@ -5051,7 +5161,7 @@ again to \fBM. Drew Streib\fP and \fBPasi Kallinen\fP for providing a
 public NetHack server at nethack.alt.org. Thanks to \fBKeith Simpson\fP
 and \fBAndy Thomson\fP for hardfought.org. Thanks to all those
 unnamed dungeoneers who invest their time and effort into annual
-NetHack tournaments such as Junethack, The November NetHack Tournament 
+NetHack tournaments such as Junethack, The November NetHack Tournament
 and in days past, devnull.net (gone for now, but not forgotten).
 .pg
 .ce
@@ -5065,49 +5175,50 @@ miscreants in this, the list of Dungeoneers:
 .
 .TS S
 center;
-c c c.
+c2 c2 c.
 .\"TABLE_START
-Adam Aronow	Janet Walz	Nathan Eady
-Alex Kompel	Janne Salmijarvi	Norm Meluch
-Alex Smith	Jean-Christophe Collet	Olaf Seibert
-Andreas Dorn	Jeff Bailey	Pasi Kallinen
-Andy Church	Jochen Erwied	Pat Rankin
-Andy Swanson	John Kallen	Patric Mueller
+Adam Aronow	J. Ali Harlow	Mikko Juola
+Alex Kompel	Janet Walz	Nathan Eady
+Alex Smith	Janne Salmijarvi	Norm Meluch
+Andreas Dorn	Jean-Christophe Collet	Olaf Seibert
+Andy Church	Jeff Bailey	Pasi Kallinen
+Andy Swanson	Jochen Erwied	Pat Rankin
+Andy Thomson	John Kallen	Patric Mueller
 Ari Huttunen	John Rupley	Paul Winner
-Barton House	John S. Bien	Pierre Martineau
+Bart House	John S. Bien	Pierre Martineau
 Benson I. Margulies	Johnny Lee	Ralf Brown
 Bill Dyer	Jon W{tte	Ray Chason
 Boudewijn Waijers	Jonathan Handler	Richard Addison
 Bruce Cox	Joshua Delahunty	Richard Beigel
 Bruce Holloway	Karl Garrison	Richard P. Hughey
 Bruce Mewborne	Keizo Yamamoto	Rob Menke
-Carl Schelin	Ken Arnold	Robin Bandy
-Chris Russo	Ken Arromdee	Robin Johnson
-David Cohrs	Ken Lorber	Roderick Schertler
-David Damerell	Ken Washikita	Roland McGrath
-David Gentzel	Kevin Darcy	Ron Van Iwaarden
-David Hairston	Kevin Hugo	Ronnen Miller
-Dean Luick	Kevin Sitze	Ross Brown
-Del Lamb	Kevin Smolkowski	Sascha Wostmann
-Derek S. Ray	Kevin Sweet	Scott Bigham
-Deron Meranda	Lars Huttar	Scott R. Turner
-Dion Nicolaas	Leon Arnott	Sean Hunt
-Dylan O'Donnell	M. Drew Streib	Stephen Spackman
-Eric Backus	Malcolm Ryan	Stefan Thielscher
-Eric Hendrickson	Mark Gooderum	Stephen White
-Eric R. Smith	Mark Modrall	Steve Creps
-Eric S. Raymond	Marvin Bressler	Steve Linhart
-Erik Andersen	Matthew Day	Steve VanDevender
-Frederick Roeber	Merlyn LeRoy	Teemu Suikki
-Gil Neiger	Michael Allison	Tim Lennan
-Greg Laskin	Michael Feir	Timo Hakulinen
-Greg Olson	Michael Hamel	Tom Almy
-Gregg Wonderly	Michael Sokolov	Tom West
-Hao-yang Wang	Mike Engber	Warren Cheung
-Helge Hafting	Mike Gallop	Warwick Allison
-Irina Rempt-Drijfhout	Mike Passaretti	Yitzhak Sapir
+Carl Schelin	Keith Simpson	Robin Bandy
+Chris Russo	Ken Arnold	Robin Johnson
+David Cohrs	Ken Arromdee	Roderick Schertler
+David Damerell	Ken Lorber	Roland McGrath
+David Gentzel	Ken Washikita	Ron Van Iwaarden
+David Hairston	Kevin Darcy	Ronnen Miller
+Dean Luick	Kevin Hugo	Ross Brown
+Del Lamb	Kevin Sitze	Sascha Wostmann
+Derek S. Ray	Kevin Smolkowski	Scott Bigham
+Deron Meranda	Kevin Sweet	Scott R. Turner
+Dion Nicolaas	Lars Huttar	Sean Hunt
+Dylan O'Donnell	Leon Arnott	Stephen Spackman
+Eric Backus	M. Drew Streib	Stefan Thielscher
+Eric Hendrickson	Malcolm Ryan	Stephen White
+Eric R. Smith	Mark Gooderum	Steve Creps
+Eric S. Raymond	Mark Modrall	Steve Linhart
+Erik Andersen	Marvin Bressler	Steve VanDevender
+Fredrik Ljungdahl	Matthew Day	Teemu Suikki
+Frederick Roeber	Merlyn LeRoy	Tim Lennan
+Gil Neiger	Michael Allison	Timo Hakulinen
+Greg Laskin	Michael Feir	Tom Almy
+Greg Olson	Michael Hamel	Tom West
+Gregg Wonderly	Michael Sokolov	Warren Cheung
+Hao-yang Wang	Mike Engber	Warwick Allison
+Helge Hafting	Mike Gallop	Yitzhak Sapir
+Irina Rempt-Drijfhout	Mike Passaretti
 Izchak Miller	Mike Stephenson
-J. Ali Harlow	Mikko Juola
 .\"TABLE_END  Do not delete this line.
 .TE
 .pg
@@ -5117,3 +5228,4 @@ J. Ali Harlow	Mikko Juola
 .\"Amiga is a trademark of Commodore-Amiga, Inc
 .sm "Brand and product names are trademarks or registered trademarks \
 of their respective holders."
+.\"EOF

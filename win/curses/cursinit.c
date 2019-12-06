@@ -260,6 +260,9 @@ curses_create_main_windows()
 
         if (curses_get_nhwin(STATUS_WIN)) {
             curses_del_nhwin(STATUS_WIN);
+            /* 'count window' overlays last line of mesg win;
+               asking it to display a Null string removes it */
+            curses_count_window((char *) 0);
             curses_del_nhwin(MESSAGE_WIN);
             curses_del_nhwin(MAP_WIN);
             curses_del_nhwin(INV_WIN);
@@ -459,7 +462,7 @@ curses_choose_character()
         tmpchoice[count] = toupper(tmpchoice[count]);
     }
 
-    sprintf(choice, "%s%s", choice, tmpchoice);
+    strcat(choice, tmpchoice);
 
     /* prevent an unnecessary prompt */
     rigid_role_checks();
@@ -779,17 +782,14 @@ curses_init_options()
     set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS, SET_IN_GAME);
 
     /* Remove a few options that are irrelevant to this windowport */
-    /*set_option_mod_status("DECgraphics", SET_IN_FILE); */
     set_option_mod_status("eight_bit_tty", SET_IN_FILE);
 
-    /* Make sure that DECgraphics is not set to true via the config
-       file, as this will cause display issues.  We can't disable it in
-       options.c in case the game is compiled with both tty and curses. */
-    if (!symset[PRIMARY].name
-        || !strcmpi(symset[PRIMARY].name, "DECgraphics")) {
+    /* If we don't have a symset defined, load the curses symset by default */
+    if (!symset[PRIMARY].explicitly)
         load_symset("curses", PRIMARY);
+    if (!symset[ROGUESET].explicitly)
         load_symset("default", ROGUESET);
-    }
+
 #ifdef PDCURSES
     /* PDCurses for SDL, win32 and OS/2 has the ability to set the
        terminal size programatically.  If the user does not specify a
@@ -816,6 +816,9 @@ curses_init_options()
 */
 #endif /* PDCURSES */
 
+    /* FIXME: this overrides explicit OPTIONS=!use_inverse */
+    iflags.wc_inverse = TRUE; /* aka iflags.use_inverse; default is False */
+
     /* fix up pet highlighting */
     if (iflags.wc2_petattr == -1) /* shouldn't happen */
         iflags.wc2_petattr = A_NORMAL;
@@ -835,8 +838,10 @@ curses_init_options()
 
 #ifdef NCURSES_MOUSE_VERSION
     if (iflags.wc_mouse_support) {
-        mousemask(BUTTON1_CLICKED, NULL);
+        curses_mouse_support(iflags.wc_mouse_support);
     }
+#else
+    iflags.wc_mouse_support = 0;
 #endif
 }
 

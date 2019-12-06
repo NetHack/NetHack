@@ -5,26 +5,53 @@
 
 #include "curses.h"
 #include "hack.h"
+#ifdef SHORT_FILENAMES
+#include "patchlev.h"
+#else
 #include "patchlevel.h"
+#endif
 #include "color.h"
 #include "wincurs.h"
 
+/* define this if not linking with <foo>tty.o|.obj for some reason */
+#ifdef CURSES_DEFINE_ERASE_CHAR
+char erase_char, kill_char;
+#else
+/* defined in sys/<foo>/<foo>tty.o|.obj which gets linked into
+   tty-only, tty+curses, and curses-only binaries */
+extern char erase_char, kill_char;
+#endif
+
 extern long curs_mesg_suppress_turn; /* from cursmesg.c */
+
+/* stubs for curses_procs{} */
+#ifdef POSITIONBAR
+static void dummy_update_position_bar(char *);
+#endif
+#ifdef CHANGE_COLOR
+static void dummy_change_color(int, long, int);
+static char *dummy_get_color_string(VOID_ARGS);
+#endif
 
 /* Public functions for curses NetHack interface */
 
 /* Interface definition, for windows.c */
 struct window_procs curses_procs = {
     "curses",
-    (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_HILITE_PET
+    (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_INVERSE
+     | WC_HILITE_PET
+#ifdef NCURSES_MOUSE_VERSION /* (this macro name works for PDCURSES too) */
+     | WC_MOUSE_SUPPORT
+#endif
      | WC_PERM_INVENT | WC_POPUP_DIALOG | WC_SPLASH_SCREEN),
     (WC2_DARKGRAY | WC2_HITPOINTBAR
 #if defined(STATUS_HILITES)
      | WC2_HILITE_STATUS
 #endif
-     | WC2_HITPOINTBAR | WC2_FLUSH_STATUS | WC2_TERM_SIZE
+     | WC2_FLUSH_STATUS | WC2_TERM_SIZE
      | WC2_STATUSLINES | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR
      | WC2_SUPPRESS_HIST),
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     curses_init_nhwindows,
     curses_player_selection,
     curses_askname,
@@ -52,7 +79,7 @@ struct window_procs curses_procs = {
     curses_cliparound,
 #endif
 #ifdef POSITIONBAR
-    donull,
+    dummy_update_position_bar,
 #endif
     curses_print_glyph,
     curses_raw_print,
@@ -66,9 +93,13 @@ struct window_procs curses_procs = {
     curses_get_ext_cmd,
     curses_number_pad,
     curses_delay_output,
-#ifdef CHANGE_COLOR             /* only a Mac option currently */
-    donull,
-    donull,
+#ifdef CHANGE_COLOR
+    dummy_change_color,
+#ifdef MAC /* old OS 9, not OSX */
+    (void (*)(int)) 0,
+    (short (*)(winid, char *)) 0,
+#endif
+    dummy_get_color_string,
 #endif
     curses_start_screen,
     curses_end_screen,
@@ -143,6 +174,8 @@ curses_init_nhwindows(int *argcp UNUSED,
 #endif
     noecho();
     raw();
+    nonl(); /* don't force ^M into newline (^J); input accepts them both
+             * but as a command, accidental <enter> won't run South */
     meta(stdscr, TRUE);
     orig_cursor = curs_set(0);
     keypad(stdscr, TRUE);
@@ -181,6 +214,10 @@ curses_init_nhwindows(int *argcp UNUSED,
     if ((term_rows < 15) || (term_cols < 40)) {
         panic("Terminal too small.  Must be minumum 40 width and 15 height");
     }
+    /* during line input, deletes the most recently typed character */
+    erase_char = erasechar(); /* <delete>/<rubout> or possibly <backspace> */
+    /* during line input, deletes all typed characters */
+    kill_char = killchar(); /* ^U (back in prehistoric times, '@') */
 
     curses_create_main_windows();
     curses_init_mesg_history();
@@ -202,6 +239,7 @@ curses_player_selection()
 void
 curses_askname()
 {
+    plname[0] = '\0';
     curses_line_input_dialog("Who are you?", plname, PL_NSIZ);
 }
 
@@ -301,6 +339,11 @@ curses_clear_nhwindow(winid wid)
 {
     if (wid != NHW_MESSAGE) {
         curses_clear_nhwin(wid);
+    } else {
+        /* scroll the message window one line if it's full */
+        curses_count_window("");
+        /* remove 'countwin', leaving last message line blank */
+        curses_count_window((char *) 0);
     }
 }
 
@@ -585,6 +628,7 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
 void
 curses_wait_synch()
 {
+    /* [do we need 'if (counting) curses_count_window((char *)0);' here?] */
 }
 
 /*
@@ -622,16 +666,16 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
     int attr = -1;
 
     /* map glyph to character and color */
-    mapglyph(glyph, &ch, &color, &special, x, y);
+    mapglyph(glyph, &ch, &color, &special, x, y, 0);
     if ((special & MG_PET) && iflags.hilite_pet) {
         attr = iflags.wc2_petattr;
     }
     if ((special & MG_DETECT) && iflags.use_inverse) {
         attr = A_REVERSE;
     }
-    if (!symset[PRIMARY].name || !strcmpi(symset[PRIMARY].name, "curses")) {
+    if (SYMHANDLING(H_DEC))
         ch = curses_convert_glyph(ch, glyph);
-    }
+
     if (wid == NHW_MAP) {
 /* hilite stairs not in 3.6, yet
         if ((special & MG_STAIRS) && iflags.hilite_hidden_stairs) {
@@ -643,6 +687,11 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
                 color = 16 + (color * 2) + 1;
             else
                 attr = A_REVERSE;
+        }
+        /* water and lava look the same except for color; when color is off,
+           render lava in inverse video so that they look different */
+        if ((special & MG_BW_LAVA) && iflags.use_inverse) {
+            attr = A_REVERSE; /* mapglyph() only sets this if color is off */
         }
     }
 
@@ -884,6 +933,8 @@ curses_preference_update(const char *pref)
         redo_status = TRUE;
     else if (!strcmp(pref, "align_message"))
         redo_main = TRUE;
+    else if (!strcmp(pref, "mouse_support"))
+        curses_mouse_support(iflags.wc_mouse_support);
 
     if (redo_main || redo_status)
         curs_reset_windows(redo_main, redo_status);
@@ -907,5 +958,29 @@ curs_reset_windows(boolean redo_main, boolean redo_status)
         doredraw();
     }
 }
+
+/* stubs for curses_procs{} */
+
+#ifdef POSITIONBAR
+static void
+dummy_update_position_bar(char *arg UNUSED)
+{
+    return;
+}
+#endif
+
+#ifdef CHANGE_COLOR
+static void
+dummy_change_color(int a1 UNUSED, long a2 UNUSED, int a3 UNUSED)
+{
+    return;
+}
+
+static char *
+dummy_get_color_string(VOID_ARGS)
+{
+    return (char *) 0;
+}
+#endif
 
 /*cursmain.c*/

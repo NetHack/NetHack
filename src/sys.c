@@ -63,7 +63,7 @@ sys_early_init()
     /* panic options */
     sysopt.gdbpath = dupstr(GDBPATH);
     sysopt.greppath = dupstr(GREPPATH);
-#ifdef BETA
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     sysopt.panictrace_gdb = 1;
 #ifdef PANICTRACE_LIBC
     sysopt.panictrace_libc = 2;
@@ -80,6 +80,7 @@ sys_early_init()
     sysopt.check_plname = 0;
     sysopt.seduce = 1; /* if it's compiled in, default to on */
     sysopt_seduce_set(sysopt.seduce);
+    sysopt.accessibility = 0;
     return;
 }
 

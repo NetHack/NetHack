@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1548978604 2019/01/31 23:50:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.189 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1575245055 2019/12/02 00:04:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.196 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -161,7 +161,7 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
                        since trapped target is a sitting duck */
                     int damage, dieroll = 1;
 
-                    /* 3.6.2: this was calling hmon() unconditionally
+                    /* As of 3.6.2: this was calling hmon() unconditionally
                        so always credited/blamed the hero but the boulder
                        might have been thrown by a giant or launched by
                        a rolling boulder trap triggered by a monster or
@@ -240,12 +240,13 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
         }
         return water_damage(obj, NULL, FALSE) == ER_DESTROYED;
     } else if (u.ux == x && u.uy == y && (t = t_at(x, y)) != 0
-               && uteetering_at_seen_pit(t)) {
+               && (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
         if (Blind && !Deaf)
             You_hear("%s tumble downwards.", the(xname(obj)));
         else
-            pline("%s %s into %s pit.", The(xname(obj)),
-                  otense(obj, "tumble"), the_your[t->madeby_u]);
+            pline("%s %s into %s %s.", The(xname(obj)),
+                  otense(obj, "tumble"), the_your[t->madeby_u],
+                  is_pit(t->ttyp) ? "pit" : "hole");
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
         while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
@@ -279,11 +280,11 @@ doaltarobj(register struct obj *obj)
               an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj),
               otense(obj, "hit"));
         if (!Hallucination)
-            obj->bknown = 1;
+            obj->bknown = 1; /* ok to bypass set_bknown() */
     } else {
         pline("%s %s on the altar.", Doname2(obj), otense(obj, "land"));
         if (obj->oclass != COIN_CLASS)
-            obj->bknown = 1;
+            obj->bknown = 1; /* ok to bypass set_bknown() */
     }
 }
 
@@ -301,6 +302,7 @@ polymorph_sink()
 {
     uchar sym = S_sink;
     boolean sinklooted;
+    int algn;
 
     if (levl[u.ux][u.uy].typ != SINK)
         return;
@@ -327,7 +329,11 @@ polymorph_sink()
     case 2:
         sym = S_altar;
         levl[u.ux][u.uy].typ = ALTAR;
-        levl[u.ux][u.uy].altarmask = Align2amask(rn2((int) A_LAWFUL + 2) - 1);
+        /* 3.6.3: this used to pass 'rn2(A_LAWFUL + 2) - 1' to
+           Align2mask() but it evaluates its argument more than once */
+        algn = rn2(3) - 1; /* -1 (A_Cha) or 0 (A_Neu) or +1 (A_Law) */
+        levl[u.ux][u.uy].altarmask = ((Inhell && rn2(3)) ? AM_NONE
+                                      : Align2amask(algn));
         break;
     case 3:
         sym = S_room;
@@ -564,7 +570,7 @@ canletgo(struct obj *obj, const char *word)
                   obj->corpsenm ? " any of" : "", plur(obj->quan));
         }
         obj->corpsenm = 0; /* reset */
-        obj->bknown = 1;
+        set_bknown(obj, 1);
         return FALSE;
     }
     if (obj->otyp == LEASH && obj->leashmon != 0) {
@@ -978,7 +984,7 @@ dodown()
     }
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
-        if (trap && uteetering_at_seen_pit(trap)) {
+        if (trap && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
             dotrap(trap, TOOKPLUNGE);
             return 1;
         } else if (!trap || !is_hole(trap->ttyp)
@@ -1344,6 +1350,16 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
     }
     savelev(fd, ledger_no(&u.uz),
             cant_go_back ? FREE_SAVE : (WRITE_SAVE | FREE_SAVE));
+    /* air bubbles and clouds are saved in game-state rather than with the
+       level they're used on; in normal play, you can't leave and return
+       to any endgame level--bubbles aren't needed once you move to the
+       next level so used to be discarded when the next special level was
+       loaded; but in wizard mode you can leave and return, and since they
+       aren't saved with the level and restored upon return (new ones are
+       created instead), we need to discard them to avoid a memory leak;
+       so bubbles are now discarded as we leave the level they're used on */
+    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
+        save_waterlevel(-1, FREE_SAVE);
     bclose(fd);
     if (cant_go_back) {
         /* discard unreachable levels; keep #0 */
@@ -1403,10 +1419,16 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
         reseed_random(rn2_on_display_rng);
         minit(); /* ZEROCOMP */
         getlev(fd, hackpid, new_ledger, FALSE);
+        /* when in wizard mode, it is possible to leave from and return to
+           any level in the endgame; above, we discarded bubble/cloud info
+           when leaving Plane of Water or Air so recreate some now */
+        if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
+            restore_waterlevel(-1);
         (void) nhclose(fd);
         oinit(); /* reassign level dependent obj probabilities */
     }
     reglyph_darkroom();
+    u.uinwater = 0;
     /* do this prior to level-change pline messages */
     vision_reset();         /* clear old level's line-of-sight */
     vision_full_recalc = 0; /* don't let that reenable vision yet */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1556649298 2019/04/30 18:34:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1575245065 2019/12/02 00:04:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1185,9 +1185,8 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
         /* This case is too obvious to ignore, but Nethack is not in
          * general very good at considering height--most short monsters
          * still _can_ attack you when you're flying or mounted.
-         * [FIXME: why can't a flying attacker overcome this?]
          */
-        if (u.usteed || Levitation || Flying) {
+        if ((u.usteed || Levitation || Flying) && !is_flyer(mtmp->data)) {
             pline("%s tries to reach your %s %s!", Monst_name, sidestr, leg);
             dmg = 0;
         } else if (mtmp->mcan) {
@@ -1382,7 +1381,7 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
                      (Teleport_control && !Stunned && !unconscious()) ? ""
                      : "very ");
             tele();
-            /* 3.6.2:  make sure damage isn't fatal; previously, it
+            /* As of 3.6.2:  make sure damage isn't fatal; previously, it
                was possible to be teleported and then drop dead at
                the destination when QM's 1d4 damage gets applied below;
                even though that wasn't "wrong", it seemed strange,
@@ -1771,8 +1770,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
         if (!engulf_target(mtmp, &youmonst))
             return 0;
-        if ((t && is_pit(t->ttyp))
-            && sobj_at(BOULDER, u.ux, u.uy))
+        if ((t && is_pit(t->ttyp)) && sobj_at(BOULDER, u.ux, u.uy))
             return 0;
 
         if (Punished)
@@ -1855,6 +1853,14 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
     if (mtmp != u.ustuck)
         return 0;
+    if (Punished) {
+        /* ball&chain are in limbo while swallowed; update their internal
+           location to be at swallower's spot */
+        if (uchain->where == OBJ_FREE)
+            uchain->ox = mtmp->mx, uchain->oy = mtmp->my;
+        if (uball->where == OBJ_FREE)
+            uball->ox = mtmp->mx, uball->oy = mtmp->my;
+    }
     if (u.uswldtim > 0)
         u.uswldtim -= 1;
 
@@ -1990,7 +1996,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
               is_animal(mtmp->data) ? "regurgitates" : "expels");
         expels(mtmp, mtmp->data, FALSE);
     } else if (!u.uswldtim || youmonst.data->msize >= MZ_HUGE) {
-        /* 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
+        /* As of 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
            expels now so the !u.uswldtim case is no longer possible;
            however, polymorphing into a huge form while already
            swallowed is still possible */
@@ -2377,9 +2383,13 @@ could_seduce(struct monst *magr, struct monst *mdef, struct attack *mattk /* non
     if (agrinvis && !defperc && adtyp == AD_SEDU)
         return 0;
 
+    /* nymphs have two attacks, one for steal-item damage and the other
+       for seduction, both pass the could_seduce() test;
+       incubi/succubi have three attacks, their claw attacks for damage
+       don't pass the test */
     if ((pagr->mlet != S_NYMPH
          && pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
-        || (adtyp != AD_SEDU && adtyp != AD_SSEX))
+        || (adtyp != AD_SEDU && adtyp != AD_SSEX && adtyp != AD_SITM))
         return 0;
 
     return (genagr == 1 - gendef) ? 1 : (pagr->mlet == S_NYMPH) ? 2 : 0;

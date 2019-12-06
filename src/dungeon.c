@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1554341477 2019/04/04 01:31:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1559476918 2019/06/02 12:01:58 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -179,6 +179,8 @@ save_dungeon(int fd, boolean perform_write, boolean free_data)
             next_ms = curr_ms->next;
             if (curr_ms->custom)
                 free((genericptr_t) curr_ms->custom);
+            if (curr_ms->final_resting_place)
+                savecemetery(fd, FREE_SAVE, &curr_ms->final_resting_place);
             free((genericptr_t) curr_ms);
         }
         mapseenchn = 0;
@@ -1145,6 +1147,13 @@ prev_level(boolean at_stairs)
 void
 u_on_newpos(int x, int y)
 {
+    if (!isok(x, y)) { /* validate location */
+        void (*func)(const char *, ...) PRINTF_F(1, 2);
+
+        func = (x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1) ? panic
+               : impossible;
+        (*func)("u_on_newpos: trying to place hero off map <%d,%d>", x, y);
+    }
     u.ux = x;
     u.uy = y;
 #ifdef CLIPPING
@@ -2064,7 +2073,8 @@ int ledger_num;
     struct cemetery *bp, *bpnext;
 
     for (mptr = mapseenchn; mptr; mprev = mptr, mptr = mptr->next)
-        if (dungeons[mptr->lev.dnum].ledger_start + mptr->lev.dlevel == ledger_num)
+        if (dungeons[mptr->lev.dnum].ledger_start + mptr->lev.dlevel
+            == ledger_num)
             break;
 
     if (!mptr)
@@ -2552,8 +2562,7 @@ recalc_mapseen()
 }
 
 /*ARGUSED*/
-/* valley and sanctum levels get automatic annotation once temple is entered
- */
+/* valley and sanctum levels get automatic annotation once temple is entered */
 void
 mapseen_temple(struct monst *priest UNUSED) /* currently unused; might be useful someday */
 {

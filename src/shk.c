@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1555201699 2019/04/14 00:28:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.159 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1571436007 2019/10/18 22:00:07 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.171 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -55,9 +55,10 @@ STATIC_DCL long stolen_container(struct obj *, struct monst *,
 STATIC_DCL long getprice(struct obj *, boolean);
 STATIC_DCL void shk_names_obj(struct monst *, struct obj *,
                               const char *, long, const char *);
-STATIC_DCL struct obj *bp_to_obj(struct bill_x *);
 STATIC_DCL boolean inherits(struct monst *, int, int, boolean);
 STATIC_DCL void set_repo_loc(struct monst *);
+STATIC_DCL struct obj *bp_to_obj(struct bill_x *);
+STATIC_DCL long get_pricing_units(struct obj *);
 STATIC_DCL boolean angry_shk_exists(void);
 STATIC_DCL void rile_shk(struct monst *);
 STATIC_DCL void rouse_shk(struct monst *, boolean);
@@ -906,7 +907,12 @@ obfree(register struct obj *obj, register struct obj *merge)
         bpm = onbill(merge, shkp, FALSE);
         if (!bpm) {
             /* this used to be a rename */
-            impossible("obfree: not on bill??");
+            /* !merge already returned */
+            impossible("obfree: not on bill, %s = (%d,%d,%ld,%d) (%d,%d,%ld,%d)??",
+                        "otyp,where,quan,unpaid",
+                        obj->otyp, obj->where, obj->quan, obj->unpaid ? 1 : 0,
+                        merge->otyp, merge->where, merge->quan,
+                            merge->unpaid ? 1 : 0);
             return;
         } else {
             /* this was a merger */
@@ -1947,12 +1953,32 @@ get_cost_of_shop_item(register struct obj *obj,
            items on freespot are implicitly 'no charge' */
         *nochrg = (top->where == OBJ_FLOOR && (obj->no_charge || freespot));
 
-        if (carried(top) ? (int) obj->unpaid : !*nochrg)
-            cost = obj->quan * get_cost(obj, shkp);
+        if (carried(top) ? (int) obj->unpaid : !*nochrg) {
+            long per_unit_cost = get_cost(obj, shkp);
+
+            cost = get_pricing_units(obj) * per_unit_cost;
+        }
         if (Has_contents(obj) && !freespot)
             cost += contained_cost(obj, shkp, 0L, FALSE, TRUE);
     }
     return cost;
+}
+
+STATIC_OVL long
+get_pricing_units(obj)
+struct obj *obj;
+{
+    long units = obj->quan;
+
+    if (obj->globby) {
+        /* globs must be sold by weight not by volume */
+        long unit_weight = (long) objects[obj->otyp].oc_weight,
+             wt = (obj->owt > 0) ? (long) obj->owt : (long) weight(obj);
+
+        if (unit_weight)
+            units = (wt + unit_weight - 1L) / unit_weight;
+    }
+    return units;
 }
 
 /* decide whether to apply a surcharge (or hypothetically, a discount) to obj
@@ -2117,7 +2143,7 @@ contained_cost(struct obj *obj, struct monst *shkp, long price, boolean usell, b
                items on freespot are implicitly 'no charge' */
             if (on_floor ? (!otmp->no_charge && !freespot)
                          : (otmp->unpaid || !unpaid_only))
-                price += get_cost(otmp, shkp) * otmp->quan;
+                price += get_cost(otmp, shkp) * get_pricing_units(otmp);
         }
 
         if (Has_contents(otmp))
@@ -2220,7 +2246,9 @@ special_stock(struct obj *obj, struct monst *shkp, boolean quietly)
 STATIC_OVL long
 set_cost(register struct obj *obj, register struct monst *shkp)
 {
-    long tmp = getprice(obj, TRUE) * obj->quan, multiplier = 1L, divisor = 1L;
+    long tmp, unit_price = getprice(obj, TRUE), multiplier = 1L, divisor = 1L;
+
+    tmp = get_pricing_units(obj) * unit_price;
 
     if (uarmh && uarmh->otyp == DUNCE_CAP)
         divisor *= 3L;
@@ -2392,6 +2420,9 @@ add_one_tobill(struct obj *obj, boolean dummy, struct monst *shkp)
     } else
         bp->useup = 0;
     bp->price = get_cost(obj, shkp);
+    if (obj->globby)
+        /* for globs, the amt charged for quan 1 depends on owt */
+        bp->price *= get_pricing_units(obj);
     eshkp->billct++;
     obj->unpaid = 1;
 }
@@ -2525,9 +2556,11 @@ addtobill(struct obj *obj, boolean ininv, boolean dummy, boolean silent)
     ltmp = cltmp = gltmp = 0L;
     container = Has_contents(obj);
 
-    if (!obj->no_charge)
+    if (!obj->no_charge) {
         ltmp = get_cost(obj, shkp);
-
+        if (obj->globby)
+            ltmp *= get_pricing_units(obj);
+    }
     if (obj->no_charge && !container) {
         obj->no_charge = 0;
         return;
@@ -2601,7 +2634,7 @@ addtobill(struct obj *obj, boolean ininv, boolean dummy, boolean silent)
     }
 }
 
-void
+STATIC_OVL void
 append_honorific(char *buf)
 {
     /* (chooses among [0]..[3] normally; [1]..[4] after the
@@ -2745,7 +2778,7 @@ stolen_container(struct obj *obj, struct monst *shkp, long price, boolean ininv)
         if (billamt)
             price += billamt;
         else if (ininv ? otmp->unpaid : !otmp->no_charge)
-            price += otmp->quan * get_cost(otmp, shkp);
+            price += get_pricing_units(otmp) * get_cost(otmp, shkp);
 
         if (Has_contents(otmp))
             price = stolen_container(otmp, shkp, price, ininv);
@@ -2767,8 +2800,8 @@ stolen_value(struct obj *obj, xchar x, xchar y, boolean peaceful, boolean silent
     /* gather information for message(s) prior to manipulating bill */
     was_unpaid = obj->unpaid ? TRUE : FALSE;
     if (Has_contents(obj)) {
-        c_count = count_contents(obj, TRUE, FALSE, TRUE);
-        u_count = count_contents(obj, TRUE, FALSE, FALSE);
+        c_count = count_contents(obj, TRUE, FALSE, TRUE, FALSE);
+        u_count = count_contents(obj, TRUE, FALSE, FALSE, FALSE);
     }
 
     if (!billable(&shkp, obj, roomno, FALSE)) {
@@ -2789,7 +2822,7 @@ stolen_value(struct obj *obj, xchar x, xchar y, boolean peaceful, boolean silent
         if (billamt)
             value += billamt;
         else if (!obj->no_charge)
-            value += obj->quan * get_cost(obj, shkp);
+            value += get_pricing_units(obj) * get_cost(obj, shkp);
 
         if (Has_contents(obj)) {
             boolean ininv =
@@ -2852,8 +2885,9 @@ stolen_value(struct obj *obj, xchar x, xchar y, boolean peaceful, boolean silent
             if (canseemon(shkp)) {
                 Norep("%s booms: \"%s, you are a thief!\"",
                       Shknam(shkp), plname);
-            } else
-                Norep("You hear a scream, \"Thief!\"");
+            } else if (!Deaf) {
+                Norep("You hear a scream, \"Thief!\"");  /* Deaf-aware */
+            }
         }
         hot_pursuit(shkp);
         (void) angry_guards(FALSE);
@@ -3069,9 +3103,9 @@ sellobj(register struct obj *obj, xchar x, xchar y)
 
             if (container) {
                 /* number of items owned by shk */
-                shksc = count_contents(obj, TRUE, TRUE, FALSE);
+                shksc = count_contents(obj, TRUE, TRUE, FALSE, TRUE);
                 /* number of items owned by you (total - shksc) */
-                yourc = count_contents(obj, TRUE, TRUE, TRUE) - shksc;
+                yourc = count_contents(obj, TRUE, TRUE, TRUE, TRUE) - shksc;
                 only_partially_your_contents = shksc && yourc;
             }
             /*
@@ -3087,14 +3121,27 @@ sellobj(register struct obj *obj, xchar x, xchar y)
                (The case where it has contents already entirely owned
                by the shk is treated the same was if it were empty
                since the hero isn't selling any of those contents.)
-               Your container:
+               Your container and shk is willing to buy it:
                 "... your <empty bag>.  Sell it?"
                 "... your <bag> and its contents.  Sell them?"
                 "... your <bag> and item inside.  Sell them?"
                 "... your <bag> and items inside.  Sell them?"
+               Your container but shk only cares about the contents:
+                "... your item in your <bag>.  Sell it?"
+                "... your items in your <bag>.  Sell them?"
                Shk's container:
                 "... your item in the <bag>.  Sell it?"
                 "... your items in the <bag>.  Sell them?"
+              FIXME:
+               "your items" should sometimes be "some of your items"
+               (when container has some stuff the shk is willing to buy
+               and other stuff he or she doesn't care about); likewise,
+               "your item" should sometimes be "one of your items".
+               That would make the prompting even more verbose so
+               living without it might be a good thing.
+              FIXME too:
+               when container's contents are unknown, plural "items"
+               should be used to not give away information.
              */
             Sprintf(qbuf, "%s offers%s %ld gold piece%s for %s%s ",
                     Shknam(shkp), short_funds ? " only" : "", offer,
@@ -3103,7 +3150,7 @@ sellobj(register struct obj *obj, xchar x, xchar y)
                         ? ((yourc == 1L) ? "your item in " : "your items in ")
                         : "",
                     obj->unpaid ? "the" : "your");
-            one = obj->unpaid ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
+            one = !ltmp ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
             Sprintf(qsfx, "%s.  Sell %s?",
                     (cltmp && ltmp)
                         ? (only_partially_your_contents
@@ -4142,6 +4189,8 @@ price_quote(register struct obj *first_obj)
         contentsonly = !cost;
         if (Has_contents(otmp))
             cost += contained_cost(otmp, shkp, 0L, FALSE, FALSE);
+        if (otmp->globby)
+            cost *= get_pricing_units(otmp);  /* always quan 1, vary by wt */
         if (!cost) {
             Strcpy(price, "no charge");
             contentsonly = FALSE;
@@ -4613,5 +4662,161 @@ sasc_bug(struct obj *op, unsigned x)
     op->unpaid = x;
 }
 #endif
+
+/*
+ * The caller is about to make obj_absorbed go away.
+ *
+ * There's no way for you (or a shopkeeper) to prevent globs
+ * from merging with each other on the floor due to the
+ * inherent nature of globs so it irretrievably becomes part
+ * of the floor glob mass. When one glob is absorbed by another
+ * glob, the two become indistinguishable and the remaining
+ * glob object grows in mass, the product of both.
+ *
+ * billing admin, player compensation, shopkeeper compensation
+ * all need to be considered.
+ *
+ * Any original billed item is lost to the absorption so the
+ * original billed amount for the object being absorbed must
+ * get added to the cost owing for the absorber, and the
+ * separate cost for the object being absorbed goes away.
+ *
+ * There are four scenarios to deal with:
+ *     1. shop_owned glob merging into shop_owned glob
+ *     2. player_owned glob merging into shop_owned glob
+ *     3. shop_owned glob merging into player_owned glob
+ *     4. player_owned glob merging into player_owned glob
+ */
+void
+globby_bill_fixup(obj_absorber, obj_absorbed)
+struct obj *obj_absorber, *obj_absorbed;
+{
+    int x = 0, y = 0;
+    struct bill_x *bp, *bp_absorber = (struct bill_x *) 0;
+    struct monst *shkp = 0;
+    struct eshk *eshkp;
+    long amount, per_unit_cost = set_cost(obj_absorbed, shkp);
+    boolean floor_absorber = (obj_absorber->where == OBJ_FLOOR);
+
+    if (!obj_absorber->globby)
+        impossible("globby_bill_fixup called for non-globby object");
+
+    if (floor_absorber) {
+        x = obj_absorber->ox, y = obj_absorber->oy;
+    }
+    if (obj_absorber->unpaid) {
+        /* look for a shopkeeper who owns this object */
+        for (shkp = next_shkp(fmon, TRUE); shkp;
+             shkp = next_shkp(shkp->nmon, TRUE))
+            if (onbill(obj_absorber, shkp, TRUE))
+                break;
+    } else if (obj_absorbed->unpaid) {
+        if (obj_absorbed->where == OBJ_FREE
+             && floor_absorber && costly_spot(x, y)) {
+            shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
+        }
+    }
+    /* sanity check, in case obj is on bill but not marked 'unpaid' */
+    if (!shkp)
+        shkp = shop_keeper(*u.ushops);
+    if (!shkp)
+        return;
+    bp_absorber = onbill(obj_absorber, shkp, FALSE);
+    bp = onbill(obj_absorbed, shkp, FALSE);
+    eshkp = ESHK(shkp);
+
+    /**************************************************************
+     * Scenario 1. Shop-owned glob absorbing into shop-owned glob
+     **************************************************************/
+    if (bp && (!obj_absorber->no_charge
+               || billable(&shkp, obj_absorber, eshkp->shoproom, FALSE))) {
+        /* the glob being absorbed has a billing record */
+        amount = bp->price;
+        eshkp->billct--;
+#ifdef DUMB
+        {
+            /* DRS/NS 2.2.6 messes up -- Peter Kendell */
+            int indx = eshkp->billct;
+
+            *bp = eshkp->bill_p[indx];
+        }
+#else
+        *bp = eshkp->bill_p[eshkp->billct];
+#endif
+        clear_unpaid_obj(shkp, obj_absorbed);
+
+        if (bp_absorber) {
+            /* the absorber has a billing record */
+            bp_absorber->price += amount;           
+        } else {
+            /* the absorber has no billing record */
+            ;
+        }
+        return;
+    }
+    /**************************************************************
+     * Scenario 2. Player-owned glob absorbing into shop-owned glob 
+     **************************************************************/
+    if (!bp_absorber && !bp && !obj_absorber->no_charge) {
+        /* there are no billing records */
+        amount = get_pricing_units(obj_absorbed) * per_unit_cost;
+        if (saleable(shkp, obj_absorbed)) {
+            if (eshkp->debit >= amount) {
+                if (eshkp->loan) { /* you carry shop's gold */
+                   if (eshkp->loan >= amount)
+                        eshkp->loan -= amount;
+                   else
+                        eshkp->loan = 0L;
+                }
+                eshkp->debit -= amount;
+                pline_The("donated %s %spays off your debt.",
+                          obj_typename(obj_absorbed->otyp),
+                          eshkp->debit ? "partially " : "");
+            } else {
+                long delta = amount - eshkp->debit;
+
+                eshkp->credit += delta;
+                if (eshkp->debit) {
+                    eshkp->debit = 0L;
+                    eshkp->loan = 0L;
+                    Your("debt is paid off.");
+                }
+                if (eshkp->credit == delta)
+                    pline_The("%s established %ld %s credit.",
+                              obj_typename(obj_absorbed->otyp),
+                              delta, currency(delta));
+                else
+                    pline_The("%s added %ld %s %s %ld %s.",
+                              obj_typename(obj_absorbed->otyp),
+                              delta, currency(delta),
+                              "to your credit; total is now",
+                              eshkp->credit, currency(eshkp->credit));
+            }
+        }
+        return;
+    } else if (bp_absorber) {
+        /* absorber has a billing record */
+        bp_absorber->price += per_unit_cost * get_pricing_units(obj_absorbed);
+        return;
+    }
+    /**************************************************************
+     * Scenario 3. shop_owned glob merging into player_owned glob
+     **************************************************************/
+    if (bp && (obj_absorber->no_charge
+               || (floor_absorber && !costly_spot(x, y)))) {
+        amount = bp->price;
+        bill_dummy_object(obj_absorbed);
+        verbalize("You owe me %ld %s for my %s that you %s with your%s",
+                  amount, currency(amount), obj_typename(obj_absorbed->otyp),
+                  ANGRY(shkp) ? "had the audacity to mix" : "just mixed",
+                  ANGRY(shkp) ? " stinking batch!" : "s.");
+        return;
+    }
+    /**************************************************************
+     * Scenario 4. player_owned glob merging into player_owned glob
+     **************************************************************/
+
+    return;
+}
 
 /*shk.c*/

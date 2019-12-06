@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1545259936 2018/12/19 22:52:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.313 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1569189770 2019/09/22 22:02:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.317 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1806,7 +1806,6 @@ launch_obj(short otyp, register int x1, register int y1, register int x2, regist
 
         bhitpos.x += dx;
         bhitpos.y += dy;
-        t = t_at(bhitpos.x, bhitpos.y);
 
         if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
             if (otyp == BOULDER && throws_rocks(mtmp->data)) {
@@ -1841,7 +1840,7 @@ launch_obj(short otyp, register int x1, register int y1, register int x2, regist
                     break;
                 }
             }
-            if (t && otyp == BOULDER) {
+            if ((t = t_at(bhitpos.x, bhitpos.y)) != 0 && otyp == BOULDER) {
                 switch (t->ttyp) {
                 case LANDMINE:
                     if (rn2(10) > 2) {
@@ -2124,6 +2123,7 @@ mintrap(register struct monst *mtmp)
             inescapable = force_mintrap || ((tt == HOLE || tt == PIT)
                                             && Sokoban && !trap->madeby_u);
         const char *fallverb;
+        xchar tx = trap->tx, ty = trap->ty;
 
         /* true when called from dotrap, inescapable is not an option */
         if (mtmp == u.usteed)
@@ -2593,7 +2593,8 @@ mintrap(register struct monst *mtmp)
                       a_your[trap->madeby_u]);
             }
             if (!in_sight && !Deaf)
-                pline("Kaablamm!  You hear an explosion in the distance!");
+                pline("Kaablamm!  %s an explosion in the distance!",
+                      "You hear");  /* Deaf-aware */
             blow_up_landmine(trap);
             /* explosion might have destroyed a drawbridge; don't
                dish out more damage if monster is already dead */
@@ -2606,7 +2607,7 @@ mintrap(register struct monst *mtmp)
                     trapkilled = TRUE;
             }
             /* a boulder may fill the new pit, crushing monster */
-            fill_pit(trap->tx, trap->ty);
+            fill_pit(tx, ty); /* thitm may have already destroyed the trap */
             if (DEADMONSTER(mtmp))
                 trapkilled = TRUE;
             if (unconscious()) {
@@ -4258,8 +4259,8 @@ help_monster_out(struct monst *mtmp, struct trap *ttmp)
 
     You("pull %s out of the pit.", mon_nam(mtmp));
     mtmp->mtrapped = 0;
-    fill_pit(mtmp->mx, mtmp->my);
     reward_untrap(ttmp, mtmp);
+    fill_pit(mtmp->mx, mtmp->my);
     return 1;
 }
 
@@ -4522,7 +4523,7 @@ openholdingtrap(struct monst *mon,
     t = t_at(ishero ? u.ux : mon->mx, ishero ? u.uy : mon->my);
 
     if (ishero && u.utrap) { /* all u.utraptype values are holding traps */
-        which = "";
+        which = the_your[(!t || !t->tseen || !t->madeby_u) ? 0 : 1];
         switch (u.utraptype) {
         case TT_LAVA:
             trapdescr = "molten lava";
@@ -4533,6 +4534,7 @@ openholdingtrap(struct monst *mon,
             break;
         case TT_BURIEDBALL:
             trapdescr = "your anchor";
+            which = "";
             break;
         case TT_BEARTRAP:
         case TT_PIT:
@@ -4567,8 +4569,9 @@ openholdingtrap(struct monst *mon,
             Sprintf(buf, "%s is", noit_Monnam(u.usteed));
         else
             Strcpy(buf, "You are");
-        pline("%s released from %s%s.", buf, which, trapdescr);
         reset_utrap(TRUE);
+        vision_full_recalc = 1; /* vision limits can change (pit escape) */
+        pline("%s released from %s%s.", buf, which, trapdescr);
     } else {
         if (!mon->mtrapped)
             return FALSE;
@@ -5000,11 +5003,21 @@ join_adjacent_pits(struct trap *trap)
 boolean
 uteetering_at_seen_pit(struct trap *trap)
 {
-    if (trap && trap->tseen && (!u.utrap || u.utraptype != TT_PIT)
-        && is_pit(trap->ttyp))
-        return TRUE;
-    else
-        return FALSE;
+    return (trap && is_pit(trap->ttyp) && trap->tseen
+            && trap->tx == u.ux && trap->ty == u.uy
+            && !(u.utrap && u.utraptype == TT_PIT));
+}
+
+/*
+ * Returns TRUE if you didn't fall through a hole or didn't
+ * release a trap door
+ */
+boolean
+uescaped_shaft(trap)
+struct trap *trap;
+{
+    return (trap && is_hole(trap->ttyp) && trap->tseen
+            && trap->tx == u.ux && trap->ty == u.uy);
 }
 
 /* Destroy a trap that emanates from the floor. */

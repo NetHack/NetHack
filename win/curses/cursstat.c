@@ -210,8 +210,8 @@ static void
 draw_status()
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
-    int orient = curses_get_window_orientation(STATUS_WIN);
-    boolean horiz = (orient != ALIGN_RIGHT && orient != ALIGN_LEFT);
+    orient statorient = (orient) curses_get_window_orientation(STATUS_WIN);
+    boolean horiz = (statorient != ALIGN_RIGHT && statorient != ALIGN_LEFT);
     boolean border = curses_window_has_border(STATUS_WIN);
 
     /* Figure out if we have proper window dimensions for horizontal
@@ -229,6 +229,7 @@ draw_status()
             curs_reset_windows(TRUE, TRUE);
             win = curses_get_nhwin(STATUS_WIN);
         }
+        nhUse(ax);  /* getmaxyx macro isn't sufficient */
     }
 
     werase(win);
@@ -514,6 +515,7 @@ boolean border;
                        conditions would go if they were on this line */
                     condstart += (cap_and_hunger == 2) ? spacing[BL_CAP]
                                  : (cap_and_hunger == 0) ? 1 : 0;
+                    nhUse(conddummy);   /* getyx needed 3 args */
                 }
                 if (!(cap_and_hunger & 1))
                     continue;
@@ -534,6 +536,7 @@ boolean border;
                          t = (width - (border ? 0 : 1)) - (ex - 1);
                          ebuf[max(t, 2)] = '\0'; /* might still wrap... */
                      }
+                     nhUse(ey); /* getyx needed 3 args */
                 }
                 break;
             case BL_SCORE:
@@ -908,7 +911,7 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
 {
 #ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
-    int coloridx;
+    int coloridx = 0;
 #endif
 #endif /* STATUS_HILITES */
     int k, bar_pos;
@@ -1720,18 +1723,14 @@ void
 curses_update_stats(void)
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
+    orient statorient = (orient) curses_get_window_orientation(STATUS_WIN);
+    boolean horiz = (statorient != ALIGN_RIGHT && statorient != ALIGN_LEFT);
+    boolean border = curses_window_has_border(STATUS_WIN);
 
     /* Clear the window */
     werase(win);
 
-    int orient = curses_get_window_orientation(STATUS_WIN);
-
-    boolean horiz = FALSE;
-    if ((orient != ALIGN_RIGHT) && (orient != ALIGN_LEFT))
-        horiz = TRUE;
-    boolean border = curses_window_has_border(STATUS_WIN);
-
-    /* Figure out if we have proper window dimensions for horizontal statusbar. */
+    /* Figure out if we have proper window dimensions for horizontal status */
     if (horiz) {
         /* correct y */
         int cy = 3;
@@ -1750,7 +1749,8 @@ curses_update_stats(void)
             curses_last_messages();
             doredraw();
 
-            /* Reset XP highlight (since classic_status and new show different numbers) */
+            /* Reset XP highlight (since classic_status and new show
+               different numbers) */
             prevexp.highlight_turns = 0;
             curses_update_stats();
             return;
@@ -1776,7 +1776,7 @@ curses_update_stats(void)
         hpmax = u.mhmax;
     }
 
-    if (orient != ALIGN_RIGHT && orient != ALIGN_LEFT)
+    if (horiz)
         draw_horizontal(x, y, hp, hpmax);
     else
         draw_vertical(x, y, hp, hpmax);
@@ -1789,7 +1789,8 @@ curses_update_stats(void)
     if (first) {
         first = FALSE;
 
-        /* Zero highlight timers. This will call curses_update_status again if needed */
+        /* Zero highlight timers. This will call curses_update_status again
+           if needed */
         curses_decrement_highlights(TRUE);
     }
 }

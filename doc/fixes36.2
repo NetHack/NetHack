@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.315 $ $NHDT-Date: 1557091781 2019/05/05 21:29:41 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.318 $ $NHDT-Date: 1557447310 2019/05/10 00:15:10 $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,
@@ -40,7 +40,7 @@ internals for 'sortloot' option have been changed to not reorder the actual
 	full-pack identify won't result in possibly skipping some items
 give vault guards a cursed tin whistle since there is a shrill whistling
 	sound if hero teleports out of vault while being confronted by guard
-polymorphing worn amulet triggers panic if it turns into amulet of change
+polymorphing worn amulet triggered panic if it turned into an amulet of change
 wishing for small mimic corpse or large mimic corpse failed with 'nothing
 	matching that exists'; wishing for large {dog,cat,kobold} corpse
 	yielded normal size one (size prefix was being stripped off for globs)
@@ -69,7 +69,7 @@ shopkeeper's position in front of shop door didn't correctly handle bottom
 	(latent bug; no such shops are present in 3.6.x)
 attempting to update permanent inventory window during restore had problems
 	with unpaid items (needed shop bill before shop and its shopkeeper
-	were restored) and named fruit
+	were restored) and also with named fruit
 remembered corpse which isn't there anymore would be described by farlook as
 	the corpse of a random monster type
 when eating a tin of spinach, don't "feel like Popeye" if sustain-abilities
@@ -155,7 +155,7 @@ a wand of polymorph lost its magical ability for the turn just because the
 	player using it to engrave happened to be blind, which didn't make
 	much sense
 floating eye is classified as a flyer but flying is blocked while levitating,
-	so don't set intrinsic flying if hero is polymorphed into one
+	so don't set intrinsic flying when hero is polymorphed into one
 change default value for the 'autodescribe' option to 'on'
 Elbereth hypocrisy penalty doesn't apply if attacking a monster which isn't
 	frightened by Elbereth; normal scuffing of engravings still applies
@@ -225,7 +225,7 @@ magic trap's deafening roar effect wasn't waking nearby monsters
 scattering of objects might leave source location with wrong thing displayed
 for configurations with 'long int' larger than 'int', lev_comp wrote some
 	garbage into the *.lev files, but nethack seemed unaffected by that
-	(at least on little-endian hardare) and loaded the levels successfully
+	(at least on little-endian hardware) and loaded the levels successfully
 stinking cloud placed near water could kill underwater creatures
 applying--rather than wielding--a cursed polearm or weapon-tool didn't report
 	that it had become welded to hero's hand(s)
@@ -333,8 +333,8 @@ setting SEDUCE=0 made all succubus and incubus attacks be described as
 	smiling engagingly or seductively rather than hitting or missing
 entering Ft.Ludios with a lit candle lit up the entire entry room except for
 	one corner spot; that corner is beyond candle radius but other spots
-	even further away were being shown; force the walls to unlit in order
-	to prevent those wall spots from showing so soon
+	even further away were being shown; in knox.des, force the walls to
+	be unlit in order to prevent those wall spots from showing so soon
 a couple of short wall segments in the "Gnome King's Wine Cellar" variant of
 	Mines' End were diggable; one stone spot which should have been, wasn't
 boulder dropped or launched by a monster onto a monster trapped in a pit and
@@ -345,8 +345,8 @@ the simulation of dual weapon combat when polymorphed into a form with more
 	even when current shape couldn't handle silver, or if it was cursed;
 	cursed is allowed but weapon will be dropped, just like in two-weapon
 demons gated in other demons without any message
-if vampire revives from from dead bat/cloud/wolf shape held by hero poly'd
-	into grabber, release it from hero's grasp
+if a vampire revives from from dead bat/cloud/wolf shape while held by hero
+	poly'd into a grabber, release it from hero's grasp
 various non-weapon attacks while polymorphed didn't inflict blessed or silver
 	weapon damage when worn items contacted vulnerable target monsters
 hero poly'd into rope golem form could choke headless or non-breathing monsts
@@ -378,8 +378,6 @@ when using 'f' to fire/throw--and possibly some ^A's to repeat--then running
 	in quiver), using ^A would put whichever inventory item was assigned
 	the same letter as the prior direction into quiver slot (unless item
 	was already worn or wielded) and then ask for a direction to fire it
-early rolling boulder trap lacking any boulder might still have the corpse
-	of a dead adventurer
 persistent inventory window would show "(being worn)" for armor that was in
 	the midst of being put on or taken off; it is 'partly worn' in such
 	circumstances so "being worn" could be misleading
@@ -396,8 +394,8 @@ status lines' dungeon location field in the elemental planes now shows Earth
 	or Air or Fire or Water instead of generic End Game
 avoid spurious status refresh when hero gains experience while 'showexp' and
 	'showscore' options are off
-using Cleaver to attack a worm tail segment but kill adjacent head first would
-	result in an impossible warning from cutworm
+using Cleaver to attack a worm tail segment but killing adjacent head first
+	would result in an impossible warning from cutworm
 Valkyrie quest was supposed to have a 50:50 chance that northern drawbridge
 	would be raised, but both were always lowered; chances now are: both
 	lowered: 3/8, S down+N up: 3/8, N down+S up: 1/8, both raised: 1/8
@@ -409,8 +407,8 @@ once a status highlight for a temporary rule ('up', 'down', 'changed') timed
 if a migrating long worm couldn't be placed, or some other monster was given
 	an existing long worm's place and it couldn't be put somewhere else,
 	a "trying to place monster at <0,0>" warning would occur
-if hero throws a pick-axe into a shop and shopkeeper catches it, shk will say
-	"get out of my way, scum" even if there's no monster at pick-axe spot
+if hero throws a pick-axe into a shop and shopkeeper catches it, shk would say
+	"get out of my way, scum" even if there was no monster at pick-axe spot
 a quantum mechanic hit that teleported the target could also kill it at the
 	destination; make sure that the small amount of physical damage isn't
 	fatal unless the teleport is negated by cancellation (magic or armor)
@@ -501,6 +499,8 @@ when u.uhp==-1 became a flag to suppress status updating, if game ended when
 	hero died with exactly -1 HP, status would be blank during disclosure
 mimic mimicking a shop item didn't show any shop price for whatis and glance
 the SEDUCE=0 fix broke #chat to succubi/incubi
+early rolling boulder trap lacking any boulder might still have the corpse
+	of a dead adventurer
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -565,8 +565,6 @@ curses: if player pressed ESC at More>> prompt to suppress remaining messages
 curses: don't let MSGTYPE=hide block prompts from being shown
 curses: the --More-- prompt (">>") wasn't always placed in a visible location,
 	especially when window borders were displayed
-vms: add compile of isaac64.c to Makefile.src and vmsbuild.com
-vms+curses: add compile support but it is known to fail to build
 
 
 Platform- and/or Interface-Specific Fixes or Features
@@ -610,6 +608,8 @@ unix: in nethack.sh, use 'test -f' instead of 'test -e' when checking for
 	fonts.dir while running under X11
 vms: data file processing and playground setup were missing post-3.4.3 files
 	engrave, epitaph, and bogusmon made from corresponding *.txt
+vms: add compile of isaac64.c to Makefile.src and vmsbuild.com
+vms+curses: add compile support but it is known to fail to build
 windows: Added ntassert() mechanism for Windows based port use
 windows: heed OPTIONS=symset:default in config file if it is present
 windows: add curses window port which can co-exist with tty in exe and be

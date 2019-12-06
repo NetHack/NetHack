@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1557094801 2019/05/05 22:20:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.170 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1575245059 2019/12/02 00:04:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -49,6 +49,7 @@ static void done_hangup(int);
 STATIC_DCL void disclose(int, boolean);
 STATIC_DCL void get_valuables(struct obj *);
 STATIC_DCL void sort_valuables(struct valuable_data *, int);
+STATIC_DCL void done_object_cleanup(void);
 STATIC_DCL void artifact_score(struct obj *, boolean, winid);
 STATIC_DCL void really_done(int) NORETURN;
 STATIC_DCL void savelife(int);
@@ -255,8 +256,8 @@ NH_panictrace_gdb()
 #ifdef PANICTRACE_GDB
     /* A (more) generic method to get a stack trace - invoke
      * gdb on ourself. */
-    char *gdbpath = GDBVAR;
-    char *greppath = GREPVAR;
+    const char *gdbpath = GDBVAR;
+    const char *greppath = GREPVAR;
     char buf[BUFSZ];
     FILE *gdb;
 
@@ -265,8 +266,8 @@ NH_panictrace_gdb()
     if (greppath == NULL || greppath[0] == 0)
         return FALSE;
 
-    sprintf(buf, "%s -n -q %s %d 2>&1 | %s '^#'", gdbpath, ARGV0, getpid(),
-            greppath);
+    sprintf(buf, "%s -n -q %s %d 2>&1 | %s '^#'",
+            gdbpath, ARGV0, getpid(), greppath);
     gdb = popen(buf, "w");
     if (gdb) {
         raw_print("Generating more information you may report:\n");
@@ -953,7 +954,7 @@ sort_valuables(struct valuable_data list[],
 #if 0
 /*
  * odds_and_ends() was used for 3.6.0 and 3.6.1.
- * Schroedinger's Cat is handled differently starting with 3.6.2.
+ * Schroedinger's Cat is handled differently as of 3.6.2.
  */
 STATIC_DCL boolean odds_and_ends(struct obj *, int);
 
@@ -978,6 +979,62 @@ odds_and_ends(struct obj *list, int what)
     return FALSE;
 }
 #endif
+
+/* deal with some objects which may be in an abnormal state at end of game */
+STATIC_OVL void
+done_object_cleanup()
+{
+    int ox, oy;
+
+    /* might have been killed while using a disposable item, so make sure
+       it's gone prior to inventory disclosure and creation of bones */
+    inven_inuse(TRUE);
+    /*
+     * Hero can die when throwing an object (by hitting an adjacent
+     * gas spore, for instance, or being hit by mis-returning Mjollnir),
+     * or while in transit (from falling down stairs).  If that happens,
+     * some object(s) might be in limbo rather than on the map or in
+     * any inventory.  Saving bones with an active light source in limbo
+     * would trigger an 'object not local' panic.
+     *
+     * We used to use dealloc_obj() on thrownobj and kickedobj but
+     * that keeps them out of bones and could leave uball in a confused
+     * state (gone but still attached).  Place them on the map but
+     * bypass flooreffects().  That could lead to minor anomalies in
+     * bones, like undamaged paper at water or lava locations or piles
+     * not being knocked down holes, but it seems better to get this
+     * game over with than risk being tangled up in more and more details.
+     */
+    ox = u.ux + u.dx, oy = u.uy + u.dy;
+    if (!isok(ox, oy) || !accessible(ox, oy))
+        ox = u.ux, oy = u.uy;
+    /* put thrown or kicked object on map (for bones); location might
+       be incorrect (perhaps killed by divine lightning when throwing at
+       a temple priest?) but this should be better than just vanishing
+       (fragile stuff should be taken care of before getting here) */
+    if (thrownobj && thrownobj->where == OBJ_FREE) {
+        place_object(thrownobj, ox, oy);
+        stackobj(thrownobj), thrownobj = 0;
+    }
+    if (kickedobj && kickedobj->where == OBJ_FREE) {
+        place_object(kickedobj, ox, oy);
+        stackobj(kickedobj), kickedobj = 0;
+    }
+    /* if Punished hero dies during level change or dies or quits while
+       swallowed, uball and uchain will be in limbo; put them on floor
+       so bones will have them and object list cleanup finds them */
+    if (uchain && uchain->where == OBJ_FREE) {
+        /* placebc(); */
+        lift_covet_and_placebc(override_restriction);
+    }
+    /* persistent inventory window now obsolete since disclosure uses
+       a normal popup one; avoids "Bad fruit #n" when saving bones */
+    if (iflags.perm_invent) {
+        iflags.perm_invent = FALSE;
+        update_inventory(); /* make interface notice the change */
+    }
+    return;
+}
 
 /* called twice; first to calculate total, then to list relevant items */
 STATIC_OVL void
@@ -1108,6 +1165,7 @@ done(int how)
     if (!survive && (wizard || discover) && how <= GENOCIDED
         && !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
+        iflags.last_msg = PLNMSG_OK_DONT_DIE;
         savelife(how);
         survive = TRUE;
     }
@@ -1147,21 +1205,21 @@ really_done(int how)
     /* render vision subsystem inoperative */
     iflags.vision_inited = 0;
 
-    /* might have been killed while using a disposable item, so make sure
-       it's gone prior to inventory disclosure and creation of bones data */
-    inven_inuse(TRUE);
-    /* maybe not on object lists; if an active light source, would cause
-       big trouble (`obj_is_local' panic) for savebones() -> savelev() */
-    if (thrownobj && thrownobj->where == OBJ_FREE)
-        dealloc_obj(thrownobj);
-    if (kickedobj && kickedobj->where == OBJ_FREE)
-        dealloc_obj(kickedobj);
+    /* maybe use up active invent item(s), place thrown/kicked missile,
+       deal with ball and chain possibly being temporarily off the map */
+    if (!program_state.panicking)
+        done_object_cleanup();
+    /* in case we're panicking; normally cleared by done_object_cleanup() */
+    iflags.perm_invent = FALSE;
 
     /* remember time of death here instead of having bones, rip, and
        topten figure it out separately and possibly getting different
        time or even day if player is slow responding to --More-- */
     urealtime.finish_time = endtime = getnow();
     urealtime.realtime += (long) (endtime - urealtime.start_timing);
+    /* collect these for end of game disclosure (not used during play) */
+    iflags.at_night = night();
+    iflags.at_midnight = midnight();
 
     dump_open_log(endtime);
     /* Sometimes you die on the first move.  Life's not fair.
@@ -1282,10 +1340,8 @@ really_done(int how)
         int mnum = u.umonnum;
 
         if (!Upolyd) {
-            /* Base corpse on race when not poly'd since original
-             * u.umonnum is based on role, and all role monsters
-             * are human.
-             */
+            /* Base corpse on race when not poly'd since original u.umonnum
+               is based on role, and all role monsters are human. */
             mnum = (flags.female && urace.femalenum != NON_PM)
                        ? urace.femalenum
                        : urace.malenum;
@@ -1557,9 +1613,12 @@ container_contents(struct obj *list, boolean identified,
 
     for (box = list; box; box = box->nobj) {
         if (Is_container(box) || box->otyp == STATUE) {
-            box->cknown = 1; /* we're looking at the contents now */
-            if (identified)
-                box->lknown = 1;
+            if (!box->cknown || (identified && !box->lknown)) {
+                box->cknown = 1; /* we're looking at the contents now */
+                if (identified)
+                    box->lknown = 1;
+                update_inventory();
+            }
             if (box->otyp == BAG_OF_TRICKS) {
                 continue; /* wrong type of container */
             } else if (box->cobj) {

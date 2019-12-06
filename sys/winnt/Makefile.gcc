@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1546174698 2018/12/30 12:58:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.71 $
+# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1572748375 2019/11/03 02:32:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.80 $
 # Copyright (c) 2010 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -90,8 +90,8 @@ TARGET_CPU=x86
 #    of your PDCurses C files which must already be resident on 
 #    your machine.
 #
-#ADD_CURSES=Y
-#PDCURSES_TOP=../../pdcurses
+# ADD_CURSES=Y
+# PDCURSES_TOP=../../pdcurses
 
 #4b Qt
 #
@@ -138,6 +138,13 @@ SKIP_NETHACKW=Y
 
 #==============================================================================
 
+#  The version of the game this Makefile was designed for
+NETHACK_VERSION="3.6.3"
+
+# A brief version for use in macros
+NHV1=$(subst .,,$(NETHACK_VERSION))
+NHV=$(subst ",,$(NHV1))
+
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
 #
@@ -181,7 +188,7 @@ RANDOM  = $(OBJ)/random.o
 #RANDOM =
 BCRYPT=-lbcrypt
 
-WINPFLAG   = -DTILES -DMSWIN_GRAPHICS -DWIN32CON -D_WIN32_IE=0x0400 -D_WIN32_WINNT=0x0501
+WINPFLAG   = -DTILES -DMSWIN_GRAPHICS -DWIN32CON -D_WIN32_IE=0x0400 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
 ifeq "$(WANT_WIN_QT4)" "Y"
     WINPFLAG += -DQT_GRAPHICS -DPIXMAPDIR='"."'
 endif
@@ -336,7 +343,7 @@ ifneq "$(SKIP_NETHACKW)" "Y"
 GUIOBJ  = $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
-	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
+	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)NetHackW.o
 
 endif
 
@@ -397,12 +404,11 @@ PDCSRC                  = $(PDCURSES_TOP)/pdcurses
 PDCWINCON               = $(PDCURSES_TOP)/wincon
 PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o             \
 	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
-	$(O)deprec.o $(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o     \
+	$(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o                  \
 	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o   \
 	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o     \
 	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
-	$(O)slk.o $(O)termattr.o $(O)terminfo.o $(O)touch.o $(O)util.o $(O)window.o    \
-	$(O)debug.o
+	$(O)slk.o $(O)termattr.o $(O)touch.o $(O)util.o $(O)window.o $(O)debug.o
 
 PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o \
 	  $(O)pdcsetsc.o $(O)pdcutil.o
@@ -475,10 +481,18 @@ endif
 #==========================================
 #==========================================
 
+ifndef TRAVIS_COMPILER
 cc     = i686-w64-mingw32-gcc.exe
 cxx    = g++
 rc     = windres
 link   = i686-w64-mingw32-gcc.exe
+else
+cc     = gcc
+cxx    = g++
+rc     = windres
+link   = gcc
+endif
+
 ifeq "$(WANT_WIN_QT4)" "Y"
     link = g++
 endif
@@ -496,9 +510,9 @@ endif
 CFLAGSBASE  = -c $(cflags) $(WINPINC) $(cdebug) $(CURSESDEF)
 #LFLAGSBASEC = $(linkdebug)
 #LFLAGSBASEG = $(linkdebug) -mwindows
-
-conlibs = -lgdi32 -lwinmm $(BCRYPT)
-guilibs = -lcomctl32 -lwinmm
+baselibs = -lwinmm -lshell32 -lole32 -luuid
+conlibs = -lgdi32 $(baselibs) $(BCRYPT)
+guilibs = -lcomctl32 $(baselibs)
 ifeq "$(WANT_WIN_QT4)" "Y"
     # Might be either Qt 4 or Qt 5
     ifeq "$(HAVE_QT5)" "Y"
@@ -547,7 +561,7 @@ lflags  = $(LFLAGSBASEC) $(linkdebuf)
 CXXFLAGS = $(CFLAGS)
 
 ifeq  "$(USE_DLB)" "Y"
-DLB = nhdat
+DLB = nhdat$(NHV)
 else
 DLB =
 endif
@@ -620,11 +634,11 @@ $(OBJ)/%.o : $(MSWIN)/%.c
 	$(cc) $(CFLAGS)  -o$@  $<
 
 #==========================================
-# Rules for files in win\curses
+# Rules for files in win/curses
 #==========================================
 
 $(OBJ)/%.o : $(WCURSES)/%.c
-	$(cc) $(PDCINCL) $(CFLAGS)  -o$@  $<
+	$(cc) -DPDC_NCMOUSE $(PDCINCL) $(CFLAGS) -o$@  $<
 
 #==========================================
 # Rules for files in PDCurses
@@ -728,16 +742,20 @@ default : install
 
 all :   install
 
-install: initialchk $(GAMEDIR)/NetHack.exe $(U)uudecode.exe $(O)winres.o \
-	$(NETHACKW_EXE) install.tag $(EXTRA_FILES)
+install: initialchk $(O)utility.tag $(GAMEDIR)/NetHack.exe $(NETHACKW_EXE) \
+	$(O)install.tag $(EXTRA_FILES)
 	@echo NetHack is up to date.
 	@echo Done.
 
-
-install.tag:  $(DAT)/data    $(DAT)/rumors    $(DAT)/dungeon \
-	       $(DAT)/oracles $(DAT)/quest.dat sp_lev.tag $(DLB)
+$(O)install.tag:  $(DAT)/data    $(DAT)/rumors    $(DAT)/dungeon \
+	       $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag $(DLB)
+ifdef TRAVIS_COMPILER
+	ls -l $(SRC)
+	ls -l $(DAT)
+	ls -l $(UTIL)
+endif
 ifeq  "$(USE_DLB)" "Y"
-	$(subst /,\,copy nhdat                $(GAMEDIR))
+	$(subst /,\,copy nhdat$(NHV)          $(GAMEDIR))
 	$(subst /,\,copy $(DAT)/license       $(GAMEDIR))
 	$(subst /,\,copy $(DAT)/opthelp       $(GAMEDIR))
 else
@@ -746,11 +764,11 @@ else
 	$(subst /,\,copy $(DAT)/*.lev         $(GAMEDIR))
 	$(subst /,\,if exist $(GAMEDIR)/makefile del $(GAMEDIR)/makefile)
 endif
-	$(subst /,\,if not exist $(GAMEDIR)/sysconf copy $(MSWSYS)/sysconf $(GAMEDIR))
-	$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR))
+	$(subst /,\,if exist $(MSWSYS)/sysconf.template copy $(MSWSYS)/sysconf.template $(GAMEDIR))
+	$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR)/symbols.template)
 	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
 	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
-	$(subst /,\,if not exist $(GAMEDIR)/defaults.nh copy $(MSWSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
+	$(subst /,\,if exist $(MSWSYS)/.nethackrc.template copy $(MSWSYS)/.nethackrc.template $(GAMEDIR))
 	$(subst /,\,-if not exist $(GAMEDIR)/record. echo.>$(GAMEDIR)/record.)
 #
 #
@@ -762,7 +780,7 @@ recover: $(U)recover.exe
 	$(subst /,\,if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR))
 	$(subst /,\,if exist $(DOC)/recover.txt copy $(DOC)/recover.txt $(GAMEDIR)/recover.txt)
 
-sp_lev.tag: utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
+$(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des   \
 	 $(DAT)/medusa.des  $(DAT)/oracle.des   $(DAT)/tower.des  \
 	 $(DAT)/yendor.des  $(DAT)/arch.des     $(DAT)/barb.des   \
@@ -796,9 +814,9 @@ sp_lev.tag: utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(subst /,\,$(U)levcomp $(DAT)/wizard.des)
 	$(subst /,\,copy *.lev $(DAT))
 	$(subst /,\,del *.lev)
-	$(subst /,\,echo sp_levs done > sp_lev.tag)
+	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
 
-utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
+$(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
 	 $(SRC)/vis_tab.c $(U)levcomp.exe $(INCL)/vis_tab.h \
 	 $(U)dgncomp.exe $(TILEUTIL16)
 	$(subst /,\,@echo utilities made >$@)
@@ -807,11 +825,11 @@ utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
 tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
-$(O)winres.o: $(TILEBMP16) $(MSWIN)/winhack.rc $(MSWIN)/mnsel.bmp \
+$(O)winres.o: $(TILEBMP16) $(MSWIN)/NetHackW.rc $(MSWIN)/mnsel.bmp \
 	 $(MSWIN)/mnselcnt.bmp $(MSWIN)/mnunsel.bmp \
 	 $(MSWIN)/petmark.bmp $(MSWIN)/pilemark.bmp $(MSWIN)/NetHack.ico $(MSWIN)/rip.bmp \
 	 $(MSWIN)/splash.bmp
-	$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/winhack.rc
+	$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/NetHackW.rc
 
 $(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
 	$(rc) -o$@ --include-dir $(MSWSYS) -i $(MSWSYS)/console.rc
@@ -830,7 +848,7 @@ $(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistu
 	@echo Linking $@...
 	$(link) $(lflags) -o$@ $(ALLOBJ) $(TTYOBJ) $(O)nttty.o $(O)tile.o \
 		$(O)guistub.o $(O)conres.o $(PDCLIB) $(conlibs) -static -lstdc++
-	$(subst /,\,@if exist install.tag del install.tag)
+	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 # NetHackW
 # full tty linkage libs:
@@ -846,7 +864,7 @@ $(GAMEDIR)/NetHackW.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)ttystub.o \
 	@echo Linking $@...
 	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o \
 		$(O)winres.o $(PDCLIB) $(guilibs) -static -lstdc++
-	$(subst /,\,@if exist install.tag del install.tag)
+	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 endif
 
 $(O)nhdefkey.o:
@@ -926,16 +944,16 @@ $(INCL)/vis_tab.h: $(U)makedefs.exe
 $(SRC)/vis_tab.c: $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -z)
 
-$(DAT)/data: utility.tag    $(DATABASE)
+$(DAT)/data: $(O)utility.tag    $(DATABASE)
 	$(subst /,\,$(U)makedefs -d)
 
-$(DAT)/rumors: utility.tag    $(DAT)/rumors.tru   $(DAT)/rumors.fal
+$(DAT)/rumors: $(O)utility.tag    $(DAT)/rumors.tru   $(DAT)/rumors.fal
 	$(subst /,\,$(U)makedefs -r)
 
-$(DAT)/quest.dat: utility.tag  $(DAT)/quest.txt
+$(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
 	$(subst /,\,$(U)makedefs -q)
 
-$(DAT)/oracles: utility.tag    $(DAT)/oracles.txt
+$(DAT)/oracles: $(O)utility.tag    $(DAT)/oracles.txt
 	$(subst /,\,$(U)makedefs -h)
 
 $(DAT)/engrave: $(DAT)/engrave.txt $(U)makedefs.exe
@@ -947,7 +965,7 @@ $(DAT)/epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
 $(DAT)/bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
-$(DAT)/dungeon: utility.tag  $(DAT)/dungeon.def
+$(DAT)/dungeon: $(O)utility.tag  $(DAT)/dungeon.def
 	$(subst /,\,$(U)makedefs -e)
 	$(subst /,\,$(U)dgncomp $(DAT)/dungeon.pdf)
 
@@ -1099,10 +1117,11 @@ $(O)dlb_main.o: $(UTIL)/dlb_main.c $(INCL)/config.h $(INCL)/dlb.h
 $(DAT)/porthelp: $(MSWSYS)/porthelp
 	$(subst /,\,@copy $(MSWSYS)/porthelp $@ >nul)
 
-nhdat:  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
+nhdat$(NHV):  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	 $(DAT)/quest.dat $(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp $(DAT)/keyhelp \
 	 $(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp $(DAT)/dungeon \
-	 $(DAT)/porthelp $(DAT)/license $(DAT)/engrave $(DAT)/epitaph $(DAT)/bogusmon $(DAT)/tribute sp_lev.tag
+	 $(DAT)/porthelp $(DAT)/license $(DAT)/engrave \
+	 $(DAT)/epitaph $(DAT)/bogusmon $(DAT)/tribute $(O)sp_lev.tag
 	$(subst /,\,echo data >$(DAT)/dlb.lst)
 	$(subst /,\,echo oracles >>$(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/options echo options >>$(DAT)/dlb.lst)
@@ -1235,13 +1254,13 @@ ifneq "$(W_GAMEDIR)" ""
 	if exist $(W_GAMEDIR)\nhraykey.dll del $(W_GAMEDIR)\nhraykey.dll
 	if exist $(W_GAMEDIR)\NetHack.exe  del $(W_GAMEDIR)\NetHack.exe
 	if exist $(W_GAMEDIR)\NetHack.pdb  del $(W_GAMEDIR)\NetHack.pdb
-	if exist $(W_GAMEDIR)\nhdat        del $(W_GAMEDIR)\nhdat
+	if exist $(W_GAMEDIR)\nhdat$(NHV)  del $(W_GAMEDIR)\nhdat$(NHV)
 endif
 ifneq "$(W_SRC)" ""
 	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
 	if exist $(W_SRC)\tile.c           del $(W_SRC)\tile.c
 	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
-	if exist nhdat.			   del nhdat.
+	if exist $(W_SRC)\nhdat$(NHV).	   del $(W_SRC)\nhdat$(NHV).
 endif
 ifneq "$(W_DAT)" ""
 	if exist $(W_DAT)\data             del $(W_DAT)\data
@@ -1334,8 +1353,8 @@ endif
 
 clean:
 	if exist initialchk del initialchk
-	if exist install.tag del install.tag
-	if exist utility.tag del utility.tag
+	if exist $(O)install.tag del $(O)install.tag
+	if exist $(O)utility.tag del $(O)utility.tag
 ifneq "$(W_UTIL)" ""
 	if exist $(W_UTIL)\makedefs.exe    del $(W_UTIL)\makedefs.exe
 	if exist $(W_UTIL)\levcomp.exe     del $(W_UTIL)\levcomp.exe
@@ -1392,8 +1411,8 @@ endif
 	$(subst /,\,if exist $(TILEBMP32) del $(TILEBMP32))
 
 #clean:
-#	-test -f install.tag && del install.tag
-#	-test -f utility.tag && del utility.tag
+#	-test -f $(O)install.tag && del $(O)install.tag
+#	-test -f $(O)utility.tag && del $(O)utility.tag
 #	-test -f $(U)makedefs.exe && del $(U)makedefs.exe
 #	-test -f $(U)levcomp.exe && del $(U)levcomp.exe
 #	-test -f $(U)dgncomp.exe && del $(U)dgncomp.exe
@@ -1734,6 +1753,7 @@ $(O)vision.o: vision.c $(HACK_H) $(INCL)/vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
+$(O)windmain.o: $(MSWSYS)/windmain.c $(HACK_H)
 $(O)windows.o: windows.c $(HACK_H) $(INCL)/wingem.h $(INCL)/winGnome.h
 $(O)wizard.o: wizard.c $(HACK_H) $(INCL)/qtext.h
 $(O)worm.o: worm.c $(HACK_H) $(INCL)/lev.h

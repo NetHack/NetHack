@@ -38,12 +38,6 @@ extern WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows  */
 #endif  /* !__APPLE__ && !PDCURSES */
 #define CURSES_DARK_GRAY    17
 #define MAP_SCROLLBARS
-#ifdef PDCURSES
-# define getmouse nc_getmouse
-# ifndef NCURSES_MOUSE_VERSION
-#  define NCURSES_MOUSE_VERSION
-# endif
-#endif
 
 #if !defined(A_LEFTLINE) && defined(A_LEFT)
 #define A_LEFTLINE A_LEFT
@@ -149,6 +143,7 @@ extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
 extern int curses_read_char(void);
 extern void curses_toggle_color_attr(WINDOW *win, int color, int attr,
                                      int onoff);
+extern void curses_menu_color_attr(WINDOW *, int, int, int);
 extern void curses_bail(const char *mesg);
 extern winid curses_get_wid(int type);
 extern char *curses_copy_of(const char *s);
@@ -169,6 +164,7 @@ extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 extern int curses_convert_keys(int key);
 extern int curses_get_mouse(int *mousex, int *mousey, int *mod);
+extern void curses_mouse_support(int);
 
 /* cursdial.c */
 

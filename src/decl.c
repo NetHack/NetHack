@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1547025164 2019/01/09 09:12:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1573869062 2019/11/16 01:51:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -168,6 +168,7 @@ NEARDATA struct obj
 #ifdef TEXTCOLOR
 /*
  *  This must be the same order as used for buzz() in zap.c.
+ *  (They're only used in mapglyph.c so probably shouldn't be here.)
  */
 const int zapcolors[NUM_ZAP] = {
     HI_ZAP,     /* 0 - missile */
@@ -176,8 +177,10 @@ const int zapcolors[NUM_ZAP] = {
     HI_ZAP,     /* 3 - sleep */
     CLR_BLACK,  /* 4 - death */
     CLR_WHITE,  /* 5 - lightning */
-    CLR_YELLOW, /* 6 - poison gas */
-    CLR_GREEN,  /* 7 - acid */
+    /* 3.6.3: poison gas zap used to be yellow and acid zap was green,
+       which conflicted with the corresponding dragon colors */
+    CLR_GREEN,  /* 6 - poison gas */
+    CLR_YELLOW, /* 7 - acid */
 };
 #endif /* text color */
 
@@ -213,6 +216,8 @@ char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */
 NEARDATA struct monst *mydogs = (struct monst *) 0;
 /* monsters that are moving to another dungeon level */
 NEARDATA struct monst *migrating_mons = (struct monst *) 0;
+NEARDATA struct autopickup_exception *apelist =
+                            (struct autopickup_exception *)0;
 
 NEARDATA struct mvitals mvitals[NUMMONS];
 NEARDATA long domove_attempting = 0L;
@@ -253,7 +258,8 @@ struct c_common_strings c_common_strings = { "Nothing happens.",
                                              "You can move again.",
                                              "Never mind.",
                                              "vision quickly clears.",
-                                             { "the", "your" } };
+                                             { "the", "your" },
+                                             { "mon", "you" } };
 
 /* NOTE: the order of these words exactly corresponds to the
    order of oc_material values #define'd in objclass.h. */
@@ -280,9 +286,15 @@ char *fqn_prefix[PREFIX_COUNT] = { (char *) 0, (char *) 0, (char *) 0,
                                    (char *) 0, (char *) 0, (char *) 0,
                                    (char *) 0, (char *) 0, (char *) 0,
                                    (char *) 0 };
-                                   
+#ifdef WIN32
+boolean fqn_prefix_locked[PREFIX_COUNT] = { FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE };
+#endif
+
 #ifdef PREFIXES_IN_USE
-char *fqn_prefix_names[PREFIX_COUNT] = {
+const char *fqn_prefix_names[PREFIX_COUNT] = {
     "hackdir",  "leveldir", "savedir",    "bonesdir",  "datadir",
     "scoredir", "lockdir",  "sysconfdir", "configdir", "troubledir"
 };

@@ -409,7 +409,7 @@ vms_handler(genericptr_t sigargs,  /*+ prototype in <signal.h> is screwed */
         || (condition >= SS$_ASTFLT && condition <= SS$_TBIT)
         || (condition >= SS$_ARTRES && condition <= SS$_INHCHME)) {
         program_state.done_hup = TRUE; /* pretend hangup has been attempted */
-#ifndef BETA
+#if (NH_DEVEL_STATUS == NH_STATUS_RELEASED)
         if (wizard)
 #endif
             abort(); /* enter the debugger */

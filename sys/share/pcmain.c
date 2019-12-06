@@ -14,12 +14,10 @@
 
 #include <ctype.h>
 
-#if !defined(AMIGA) && !defined(GNUDOS)
+#if !defined(AMIGA) && !defined(__DJGPP__)
 #include <sys\stat.h>
 #else
-#ifdef GNUDOS
 #include <sys/stat.h>
-#endif
 #endif
 
 #ifdef __DJGPP__

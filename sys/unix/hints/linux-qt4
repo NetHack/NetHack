@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  linux-qt4 $NHDT-Date: 1432512814 2015/05/25 00:13:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $
+# NetHack 3.6  linux-qt4 $NHDT-Date: 1566346592 2019/08/21 00:16:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.27 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -18,7 +18,7 @@ VARDIR = $(HACKDIR)
 
 
 POSTINSTALL= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
-POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; ( cd $(INSTDIR); mkfontdir -x .lev );
 
 CFLAGS=-g -O -I../include -DNOTPARMDECL
 CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"

@@ -172,12 +172,12 @@ BEGIN
     CONTROL         "Chaotic",IDC_PLSEL_ALIGN_CHAOTIC,"Button",BS_AUTORADIOBUTTON,168,72,38,10
     CONTROL         "Male",IDC_PLSEL_GENDER_MALE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,168,108,30,10
     CONTROL         "Female",IDC_PLSEL_GENDER_FEMALE,"Button",BS_AUTORADIOBUTTON,168,120,38,10
-    GROUPBOX        "Alignment",IDC_STATIC,162,36,48,54
-    GROUPBOX        "Gender",IDC_STATIC,162,96,48,42
-    GROUPBOX        "Role",IDC_STATIC,6,36,72,150
-    GROUPBOX        "Race",IDC_STATIC,84,36,72,72
+    GROUPBOX        "Alignment",IDC_PLSEL_ALIGNMENT_GROUP,162,36,48,54
+    GROUPBOX        "Gender",IDC_PLSEL_GENDER_GROUP,162,96,48,42
+    GROUPBOX        "Role",IDC_PLSEL_ROLE_GROUP,6,36,72,150
+    GROUPBOX        "Race",IDC_PLSEL_RACE_GROUP,84,36,72,72
     PUSHBUTTON      "Random",IDC_PLSEL_RANDOM,90,192,54,14,WS_GROUP
-    GROUPBOX        "Name",IDC_STATIC,6,0,120,30
+    GROUPBOX        "Name",IDC_PLSEL_NAME_GROUP,6,0,120,30
     CONTROL         "",IDC_PLSEL_ROLE_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | LVS_NOSCROLL | LVS_NOCOLUMNHEADER | WS_BORDER | WS_GROUP | WS_TABSTOP,12,48,60,130
     CONTROL         "",IDC_PLSEL_RACE_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | LVS_NOSCROLL | LVS_NOCOLUMNHEADER | WS_BORDER | WS_GROUP | WS_TABSTOP,90,48,60,51
 END
@@ -320,8 +320,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,6,1,0
- PRODUCTVERSION 3,6,1,0
+ FILEVERSION 3,6,3,0
+ PRODUCTVERSION 3,6,3,0
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -337,13 +337,13 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "NetHack for Windows - Graphical Interface"
-            VALUE "FileVersion", "3.6.1"
+            VALUE "FileVersion", "3.6.3"
             VALUE "InternalName", "NetHackW"
-            VALUE "LegalCopyright", "Copyright (C) 1985 - 2018.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
+            VALUE "LegalCopyright", "Copyright (C) 1985 - 2019.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
             VALUE "OriginalFilename", "NetHackW.exe"
             VALUE "PrivateBuild", "140606"
             VALUE "ProductName", "NetHack"
-            VALUE "ProductVersion", "3.6.1"
+            VALUE "ProductVersion", "3.6.3"
         END
     END
     BLOCK "VarFileInfo"
