@@ -461,8 +461,7 @@ phaze_dialogue()
    during end of game rundown (and potential dumplog);
    timeout has already counted down to 0 by the time we get here */
 STATIC_OVL void
-done_timeout(how, which)
-int how, which;
+done_timeout(int how, int which)
 {
     long *intrinsic_p = &u.uprops[which].intrinsic;
 

@@ -1179,8 +1179,7 @@ badspot(register xchar x, register xchar y)
 /* when arriving on a level, if hero and a monster are trying to share same
    spot, move one; extracted from goto_level(); also used by wiz_makemap() */
 void
-u_collide_m(mtmp)
-struct monst *mtmp;
+u_collide_m(struct monst *mtmp)
 {
     coord cc;
 
@@ -1940,8 +1939,7 @@ set_wounded_legs(register long side, register int timex)
 }
 
 void
-heal_legs(how)
-int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
+heal_legs(int how) /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 {
     if (Wounded_legs) {
         if (ATEMP(A_DEX) < 0) {

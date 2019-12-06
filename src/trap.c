@@ -5012,8 +5012,7 @@ uteetering_at_seen_pit(struct trap *trap)
  * release a trap door
  */
 boolean
-uescaped_shaft(trap)
-struct trap *trap;
+uescaped_shaft(struct trap *trap)
 {
     return (trap && is_hole(trap->ttyp) && trap->tseen
             && trap->tx == u.ux && trap->ty == u.uy);

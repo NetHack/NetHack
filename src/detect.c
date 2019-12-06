@@ -1793,10 +1793,7 @@ sokoban_detect()
 }
 
 STATIC_DCL int
-reveal_terrain_getglyph(x, y, full, swallowed, default_glyph, which_subset)
-int x, y, full;
-unsigned swallowed;
-int default_glyph, which_subset;
+reveal_terrain_getglyph(int x, int y, int full, unsigned swallowed, int default_glyph, int which_subset)
 {
     int glyph, levl_glyph;
     uchar seenv;

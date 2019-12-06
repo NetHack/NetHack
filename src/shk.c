@@ -1965,8 +1965,7 @@ get_cost_of_shop_item(register struct obj *obj,
 }
 
 STATIC_OVL long
-get_pricing_units(obj)
-struct obj *obj;
+get_pricing_units(struct obj *obj)
 {
     long units = obj->quan;
 
@@ -4688,8 +4687,7 @@ sasc_bug(struct obj *op, unsigned x)
  *     4. player_owned glob merging into player_owned glob
  */
 void
-globby_bill_fixup(obj_absorber, obj_absorbed)
-struct obj *obj_absorber, *obj_absorbed;
+globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
 {
     int x = 0, y = 0;
     struct bill_x *bp, *bp_absorber = (struct bill_x *) 0;

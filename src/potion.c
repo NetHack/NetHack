@@ -418,8 +418,7 @@ make_deaf(long xtime, boolean talk)
 
 /* set or clear "slippery fingers" */
 void
-make_glib(xtime)
-int xtime;
+make_glib(int xtime)
 {
     set_itimeout(&Glib, xtime);
     /* may change "(being worn)" to "(being worn; slippery)" or vice versa */

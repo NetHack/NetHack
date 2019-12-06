@@ -173,8 +173,7 @@ unplacebc_core()
 }
 
 STATIC_OVL boolean
-check_restriction(restriction)
-int restriction;
+check_restriction(int restriction)
 {
     boolean ret = FALSE;
 
@@ -230,8 +229,7 @@ unplacebc_and_covet_placebc()
 }
 
 void
-lift_covet_and_placebc(pin)
-int pin;
+lift_covet_and_placebc(int pin)
 {
     if (!check_restriction(pin)) {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
@@ -254,9 +252,7 @@ int pin;
 #else  /* BREADCRUMBS */
 
 void
-Placebc(funcnm, linenum)
-const char *funcnm;
-int linenum;
+Placebc(const char *funcnm, int linenum)
 {
     if (!check_restriction(0)) {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
@@ -284,9 +280,7 @@ int linenum;
 }
 
 void
-Unplacebc(funcnm, linenum)
-const char *funcnm;
-int linenum;
+Unplacebc(const char *funcnm, int linenum)
 {
 
     if (bcrestriction) {
@@ -305,9 +299,7 @@ int linenum;
 }
 
 int
-Unplacebc_and_covet_placebc(funcnm, linenum)
-const char *funcnm;
-int linenum;
+Unplacebc_and_covet_placebc(const char *funcnm, int linenum)
 {
     int restriction = 0;
 
@@ -328,10 +320,7 @@ int linenum;
 }
 
 void
-Lift_covet_and_placebc(pin, funcnm, linenum)
-int pin;
-char *funcnm;
-int linenum;
+Lift_covet_and_placebc(int pin, char *funcnm, int linenum)
 {
     if (!check_restriction(pin)) {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)

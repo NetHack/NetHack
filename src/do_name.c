@@ -1898,8 +1898,7 @@ distant_monnam(struct monst *mon,
 /* returns mon_nam(mon) relative to other_mon; normal name unless they're
    the same, in which case the reference is to {him|her|it} self */
 char *
-mon_nam_too(mon, other_mon)
-struct monst *mon, *other_mon;
+mon_nam_too(struct monst *mon, struct monst *other_mon)
 {
     char *outbuf;
 

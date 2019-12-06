@@ -2041,8 +2041,7 @@ retouch_equipment(int dropflag)/* 0==don't drop, 1==drop all, 2==drop weapon */
 static int mkot_trap_warn_count = 0;
 
 STATIC_OVL int
-count_surround_traps(x, y)
-int x, y;
+count_surround_traps(int x, int y)
 {
     struct rm *levp;
     struct obj *otmp;
@@ -2109,9 +2108,8 @@ mkot_trap_warn()
 /* Master Key is magic key if its bless/curse state meets our criteria:
    not cursed for rogues or blessed for non-rogues */
 boolean
-is_magic_key(mon, obj)
-struct monst *mon; /* if null, non-rogue is assumed */
-struct obj *obj;
+is_magic_key(struct monst *mon, /* if null, non-rogue is assumed */
+             struct obj *obj)
 {
     if (((obj && obj->oartifact == ART_MASTER_KEY_OF_THIEVERY)
          && ((mon == &youmonst) ? Role_if(PM_ROGUE)
@@ -2123,8 +2121,7 @@ struct obj *obj;
 
 /* figure out whether 'mon' (usually youmonst) is carrying the magic key */
 struct obj *
-has_magic_key(mon)
-struct monst *mon; /* if null, hero assumed */
+has_magic_key(struct monst *mon) /* if null, hero assumed */
 {
     struct obj *o;
     short key = artilist[ART_MASTER_KEY_OF_THIEVERY].otyp;

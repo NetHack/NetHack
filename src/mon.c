@@ -2583,8 +2583,7 @@ migrate_mon(struct monst *mtmp, xchar target_lev, xchar xyloc)
 }
 
 STATIC_OVL boolean
-ok_to_obliterate(mtmp)
-struct monst *mtmp;
+ok_to_obliterate(struct monst *mtmp)
 {
     /*
      * Add checks for monsters that should not be obliterated
@@ -2598,8 +2597,7 @@ struct monst *mtmp;
 }
 
 void
-elemental_clog(mon)
-struct monst *mon;
+elemental_clog(struct monst *mon)
 {
     int m_lev = 0;
     static long msgmv = 0L;
@@ -2703,8 +2701,7 @@ mnexto(struct monst *mtmp)
 }
 
 STATIC_OVL void
-deal_with_overcrowding(mtmp)
-struct monst *mtmp;
+deal_with_overcrowding(struct monst *mtmp)
 {
     if (In_endgame(&u.uz)) {
         debugpline1("overcrowding: elemental_clog on %s", m_monnam(mtmp));

@@ -398,8 +398,7 @@ init_ov_primary_symbols()
 }
 
 nhsym
-get_othersym(idx, which_set)
-int idx, which_set;
+get_othersym(int idx, int which_set)
 {
     nhsym sym = (nhsym) 0;
     int oidx = idx + SYM_OFF_X;

@@ -196,8 +196,7 @@ simple_typename(int otyp)
 
 /* typename for debugging feedback where data involved might be suspect */
 char *
-safe_typename(otyp)
-int otyp;
+safe_typename(int otyp)
 {
     unsigned save_nameknown;
     char *res = 0;
@@ -4137,8 +4136,7 @@ helm_simple_name(struct obj *helmet)
 
 /* gloves vs gauntlets; depends upon discovery state */
 const char *
-gloves_simple_name(gloves)
-struct obj *gloves;
+gloves_simple_name(struct obj *gloves)
 {
     static const char gauntlets[] = "gauntlets";
 
@@ -4249,10 +4247,7 @@ safe_qbuf(char *qbuf, /* output buffer */
 }
 
 STATIC_OVL char *
-globwt(otmp, buf, weightformatted_p)
-struct obj *otmp;
-char *buf;
-boolean *weightformatted_p;
+globwt(struct obj *otmp, char *buf, boolean *weightformatted_p)
 {
     *buf = '\0';
     if (otmp->globby) {

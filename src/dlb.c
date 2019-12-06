@@ -267,8 +267,7 @@ lib_dlb_cleanup(VOID_ARGS)
 
 #ifdef VERSION_IN_DLB_FILENAME
 char *
-build_dlb_filename(lf)
-const char *lf;
+build_dlb_filename(const char *lf)
 {
     Sprintf(dlbfilename, "%s%d%d%d",
             lf ? lf : DLBBASENAME, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);

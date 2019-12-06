@@ -1349,9 +1349,8 @@ bcsign(register struct obj *otmp)
 
 /* set the object's bless/curse-state known flag */
 void
-set_bknown(obj, onoff)
-struct obj *obj;
-unsigned onoff; /* 1 or 0 */
+set_bknown(struct obj *obj, 
+           unsigned onoff) /* 1 or 0 */
 {
     if (obj->bknown != onoff) {
         obj->bknown = onoff;
@@ -2458,9 +2457,7 @@ check_contained(struct obj *container, const char *mesg)
 
 /* called when 'obj->globby' is set so we don't recheck it here */
 STATIC_OVL void
-check_glob(obj, mesg)
-struct obj *obj;
-const char *mesg;
+check_glob(struct obj *obj, const char *mesg)
 {
 #define LOWEST_GLOB GLOB_OF_GRAY_OOZE
 #define HIGHEST_GLOB GLOB_OF_BLACK_PUDDING

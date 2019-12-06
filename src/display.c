@@ -352,8 +352,7 @@ map_location(int x, int y, int show)
 
 /* display something on monster layer; may need to fixup object layer */
 STATIC_OVL void
-show_mon_or_warn(x, y, monglyph)
-int x, y, monglyph;
+show_mon_or_warn(int x, int y, int monglyph)
 {
     struct obj *o;
 
@@ -1072,9 +1071,7 @@ tmp_at(int x, int y)
  * meant to be at the location.
  */
 void
-flash_glyph_at(x, y, tg, rpt)
-int x, y;
-int tg, rpt;
+flash_glyph_at(int x, int y, int tg, int rpt)
 {
     int i, glyph[2];
 

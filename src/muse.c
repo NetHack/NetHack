@@ -25,16 +25,16 @@ STATIC_DCL void mquaffmsg(struct monst *, struct obj *);
 STATIC_DCL boolean m_use_healing(struct monst *);
 STATIC_PTR int mbhitm(struct monst *, struct obj *);
 STATIC_DCL void mbhit(struct monst *, int,
-                              int (*)(MONST_P, OBJ_P),
-                              int (*)(OBJ_P, OBJ_P), struct obj *);
+                      int (*)(MONST_P, OBJ_P),
+                      int (*)(OBJ_P, OBJ_P), struct obj *);
 STATIC_DCL void you_aggravate(struct monst *);
 STATIC_DCL void mon_consume_unstone(struct monst *, struct obj *,
-                                            boolean, boolean);
+                                    boolean, boolean);
 STATIC_DCL boolean cures_stoning(struct monst *, struct obj *,
-                                         boolean);
+                                 boolean);
 STATIC_DCL boolean mcould_eat_tin(struct monst *);
 STATIC_DCL boolean muse_unslime(struct monst *, struct obj *,
-                                        struct trap *, boolean);
+                                struct trap *, boolean);
 STATIC_DCL int cures_sliming(struct monst *, struct obj *);
 STATIC_DCL boolean green_mon(struct monst *);
 

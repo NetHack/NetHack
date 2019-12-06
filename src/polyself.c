@@ -857,8 +857,7 @@ polymon(int mntmp)
 
 /* dropx() jacket for break_armor() */
 STATIC_OVL void
-dropp(obj)
-struct obj *obj;
+dropp(struct obj *obj)
 {
     struct obj *otmp;
 
