@@ -320,7 +320,7 @@ VVOBJ  = $(O)version.o
 MDLIB  = $(O)mdlib.o
 
 ifeq "$(ADD_LUA)" "Y"
-LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 LUA_QTEXT_FILE = "quest.lua"
 endif
 

@@ -327,7 +327,7 @@ VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
 VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
 VOBJ28 = $(O)sfstruct.o
 
-LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 LUA_QTEXT_FILE = "quest.lua"
 
 !IFDEF CROSSCOMPILE_HOST
@@ -1882,6 +1882,7 @@ $(O)muse.o: muse.c $(HACK_H)
 $(O)music.o: music.c $(HACK_H) #interp.c
 $(O)nhlua.o: nhlua.c $(HACK_H)
 $(O)nhlsel.o: nhlsel.c $(HACK_H)
+$(O)nhlobj.o: nhlobj.c $(HACK_H)
 $(O)o_init.o: o_init.c $(HACK_H) $(INCL)\lev.h
 $(O)objnam.o: objnam.c $(HACK_H)
 $(O)options.o: options.c $(CONFIG_H) $(INCL)\objclass.h $(INCL)\flag.h \

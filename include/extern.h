@@ -1671,6 +1671,11 @@ E struct selectionvar *FDECL(l_selection_check, (lua_State *, int));
 E int FDECL(l_selection_register, (lua_State *));
 #endif
 
+/* ### nhlobj.c ### */
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+E int FDECL(l_obj_register, (lua_State *));
+#endif
+
 /* ### nhlua.c ### */
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
@@ -1681,6 +1686,9 @@ E void FDECL(nhl_error, (lua_State *, const char *)) NORETURN;
 E void FDECL(lcheck_param_table, (lua_State *));
 E schar FDECL(get_table_mapchr, (lua_State *, const char *));
 E schar FDECL(get_table_mapchr_opt, (lua_State *, const char *, SCHAR_P));
+E void FDECL(nhl_add_table_entry_int, (lua_State *, const char *, int));
+E void FDECL(nhl_add_table_entry_char, (lua_State *, const char *, CHAR_P));
+E void FDECL(nhl_add_table_entry_str, (lua_State *, const char *, const char *));
 E schar FDECL(splev_chr2typ, (CHAR_P));
 E schar FDECL(check_mapchr, (const char *));
 E int FDECL(get_table_int, (lua_State *, const char *));

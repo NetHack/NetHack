@@ -327,7 +327,7 @@ VOBJ28 = $(O)sfstruct.o
 #VOBJ31 = $(O)win10.o
 
 ifeq "$(ADD_LUA)" "Y"
-LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 LUA_QTEXT_FILE = "quest.lua"
 endif
 
@@ -1593,6 +1593,7 @@ $(O)muse.o: muse.c $(HACK_H)
 $(O)music.o: music.c $(HACK_H) #interp.c
 $(O)nhlua.o: nhlua.c $(HACK_H)
 $(O)nhlsel.o: nhlsel.c $(HACK_H)
+$(O)nhlobj.o: nhlobj.c $(HACK_H)
 $(O)o_init.o: o_init.c $(HACK_H) $(INCL)/lev.h
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)/obj.h $(INCL)/objclass.h \
 		$(INCL)/prop.h $(INCL)/skills.h $(INCL)/color.h
