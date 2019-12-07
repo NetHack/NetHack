@@ -527,7 +527,12 @@ DATABASE = $(DAT)\data.base
 # ctags options
 #
 #CTAGSCMD=ctags-orig.exe
+!IF "$(TRAVIS_BUILD_DIR)" != ""	
+CTAGSCMD=..\lib\ctags\ctags.exe
+!ELSE
 CTAGSCMD=..\..\..\ctags\ctags.exe
+!ENDIF
+
 CTAGSOPT =--language-force=c --sort=no -D"Bitfield(x,n)=unsigned x : n" --excmd=pattern
 #
 # ctags wants unix-style pathnames
