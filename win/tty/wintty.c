@@ -361,7 +361,7 @@ new_status_window()
         if (wins[WIN_STATUS]->maxrow > iflags.wc2_statuslines)
             tty_clear_nhwindow(WIN_STATUS);
 
-        tty_destroy_nhwindow(WIN_STATUS), WIN_STATUS = WIN_ERR;
+        tty_destroy_nhwindow(WIN_STATUS); WIN_STATUS = WIN_ERR;
     }
     /* frees some status tracking data */
     genl_status_finish();
@@ -606,8 +606,9 @@ tty_player_selection()
                             choice = selected[1].item.a_int;
                     } else
                         choice = (n == 0) ? ROLE_RANDOM : ROLE_NONE;
-                    if (selected)
-                        free((genericptr_t) selected), selected = 0;
+                    if (selected) {
+                        free((genericptr_t) selected); selected = 0;
+                    }
                     destroy_nhwindow(win);
 
                     if (choice == ROLE_NONE) {
@@ -695,8 +696,9 @@ tty_player_selection()
                                 choice = selected[1].item.a_int;
                         } else
                             choice = (n == 0) ? ROLE_RANDOM : ROLE_NONE;
-                        if (selected)
-                            free((genericptr_t) selected), selected = 0;
+                        if (selected) {
+                            free((genericptr_t) selected); selected = 0;
+                        }
                         destroy_nhwindow(win);
 
                         if (choice == ROLE_NONE) {
@@ -788,8 +790,9 @@ tty_player_selection()
                                 choice = selected[1].item.a_int;
                         } else
                             choice = (n == 0) ? ROLE_RANDOM : ROLE_NONE;
-                        if (selected)
-                            free((genericptr_t) selected), selected = 0;
+                        if (selected) {
+                            free((genericptr_t) selected); selected = 0;
+                        }
                         destroy_nhwindow(win);
 
                         if (choice == ROLE_NONE) {
@@ -877,8 +880,9 @@ tty_player_selection()
                                 choice = selected[1].item.a_int;
                         } else
                             choice = (n == 0) ? ROLE_RANDOM : ROLE_NONE;
-                        if (selected)
-                            free((genericptr_t) selected), selected = 0;
+                        if (selected) {
+                            free((genericptr_t) selected); selected = 0;
+                        }
                         destroy_nhwindow(win);
 
                         if (choice == ROLE_NONE) {
@@ -973,8 +977,9 @@ tty_player_selection()
         n = select_menu(win, PICK_ONE, &selected);
         /* [pick-one menus with a preselected entry behave oddly...] */
         choice = (n > 0) ? selected[n - 1].item.a_int : (n == 0) ? 1 : -1;
-        if (selected)
-            free((genericptr_t) selected), selected = 0;
+        if (selected) {
+            free((genericptr_t) selected); selected = 0;
+        }
         destroy_nhwindow(win);
 
         switch (choice) {
@@ -992,11 +997,11 @@ tty_player_selection()
             iflags.renameinprogress = TRUE;
             /* plnamesuffix() can change any or all of ROLE, RACE,
                GEND, ALGN; we'll override that and honor only the name */
-            saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND,
+            saveROLE = ROLE; saveRACE = RACE; saveGEND = GEND;
                 saveALGN = ALGN;
             *plname = '\0';
             plnamesuffix(); /* calls askname() when plname[] is empty */
-            ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND,
+            ROLE = saveROLE; RACE = saveRACE; GEND = saveGEND;
                 ALGN = saveALGN;
             break; /* getconfirmation is still True */
         }
@@ -1070,8 +1075,9 @@ reset_role_filtering()
 
         ROLE = RACE = GEND = ALGN = ROLE_NONE;
     }
-    if (selected)
-        free((genericptr_t) selected), selected = 0;
+    if (selected) {
+        free((genericptr_t) selected); selected = 0;
+    }
     destroy_nhwindow(win);
     return (n > 0) ? TRUE : FALSE;
 }
@@ -1253,7 +1259,7 @@ tty_askname()
             tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury - 1);
             tty_putstr(BASE_WINDOW, 0, "Enter a name for your character...");
             /* erase previous prompt (in case of ESC after partial response) */
-            tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury), cl_end();
+            tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury); cl_end();
         }
         tty_putstr(BASE_WINDOW, 0, who_are_you);
         tty_curs(BASE_WINDOW, (int) (sizeof who_are_you),
@@ -3768,7 +3774,7 @@ tty_status_init()
         tty_status[BEFORE][i] = tty_status[NOW][i];
     }
     tty_condition_bits = 0L;
-    hpbar_percent = 0, hpbar_color = NO_COLOR;
+    hpbar_percent = 0; hpbar_color = NO_COLOR;
 #endif /* STATUS_HILITES */
 
     /* let genl_status_init do most of the initialization */
