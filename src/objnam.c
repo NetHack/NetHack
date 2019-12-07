@@ -3042,11 +3042,11 @@ struct obj *no_wish;
             trapped = 2; /* not trapped */
         /* locked, unlocked, broken: box/chest lock states */
         } else if (!strncmpi(bp, "locked ", l = 7)) {
-            locked = 1, unlocked = broken = 0;
+            locked = 1; unlocked = broken = 0;
         } else if (!strncmpi(bp, "unlocked ", l = 9)) {
-            unlocked = 1, locked = broken = 0;
+            unlocked = 1; locked = broken = 0;
         } else if (!strncmpi(bp, "broken ", l = 7)) {
-            broken = 1, locked = unlocked = 0;
+            broken = 1; locked = unlocked = 0;
         } else if (!strncmpi(bp, "greased ", l = 8)) {
             isgreased = 1;
         } else if (!strncmpi(bp, "very ", l = 5)) {
@@ -3243,7 +3243,7 @@ struct obj *no_wish;
         mntmp = NON_PM; /* not useful for "glob of <foo>" object lookup */
         cnt = 0; /* globs don't stack */
         oclass = FOOD_CLASS;
-        actualn = bp, dn = 0;
+        actualn = bp; dn = 0;
         goto srch;
     } else {
         /*
@@ -3832,7 +3832,7 @@ struct obj *no_wish;
      * Create the object, then fine-tune it.
      */
     otmp = typ ? mksobj(typ, TRUE, FALSE) : mkobj(oclass, FALSE);
-    typ = otmp->otyp, oclass = otmp->oclass; /* what we actually got */
+    typ = otmp->otyp; oclass = otmp->oclass; /* what we actually got */
 
     if (islit && (typ == OIL_LAMP || typ == MAGIC_LAMP || typ == BRASS_LANTERN
                   || Is_candle(otmp) || typ == POT_OIL)) {
@@ -4038,11 +4038,11 @@ struct obj *no_wish;
     /* set locked/unlocked/broken */
     if (Is_box(otmp)) {
         if (locked) {
-            otmp->olocked = 1, otmp->obroken = 0;
+            otmp->olocked = 1; otmp->obroken = 0;
         } else if (unlocked) {
-            otmp->olocked = 0, otmp->obroken = 0;
+            otmp->olocked = 0; otmp->obroken = 0;
         } else if (broken) {
-            otmp->olocked = 0, otmp->obroken = 1;
+            otmp->olocked = 0; otmp->obroken = 1;
         }
     }
 

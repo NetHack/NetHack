@@ -66,8 +66,9 @@ boolean pushing;
             if (ltyp == DRAWBRIDGE_UP) {
                 levl[rx][ry].drawbridgemask &= ~DB_UNDER; /* clear lava */
                 levl[rx][ry].drawbridgemask |= DB_FLOOR;
-            } else
-                levl[rx][ry].typ = ROOM, levl[rx][ry].flags = 0;
+            } else {
+                levl[rx][ry].typ = ROOM; levl[rx][ry].flags = 0;
+            }
 
             if (ttmp)
                 (void) delfloortrap(ttmp);
@@ -1748,10 +1749,12 @@ deferred_goto()
             pline1(dfr_post_msg);
     }
     u.utotype = 0; /* our caller keys off of this */
-    if (dfr_pre_msg)
-        free((genericptr_t) dfr_pre_msg), dfr_pre_msg = 0;
-    if (dfr_post_msg)
-        free((genericptr_t) dfr_post_msg), dfr_post_msg = 0;
+    if (dfr_pre_msg) {
+        free((genericptr_t) dfr_pre_msg); dfr_pre_msg = 0;
+    }
+    if (dfr_post_msg) {
+        free((genericptr_t) dfr_post_msg); dfr_post_msg = 0;
+    }
 }
 
 /*

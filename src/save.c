@@ -116,12 +116,15 @@ dosave0()
        a few of things before saving so that they won't be restored in
        an improper state; these will be no-ops for normal save sequence */
     u.uinvulnerable = 0;
-    if (iflags.save_uswallow)
-        u.uswallow = 1, iflags.save_uswallow = 0;
-    if (iflags.save_uinwater)
-        u.uinwater = 1, iflags.save_uinwater = 0;
-    if (iflags.save_uburied)
-        u.uburied = 1, iflags.save_uburied = 0;
+    if (iflags.save_uswallow) {
+        u.uswallow = 1; iflags.save_uswallow = 0;
+    }
+    if (iflags.save_uinwater) {
+        u.uinwater = 1; iflags.save_uinwater = 0;
+    }
+    if (iflags.save_uburied) {
+        u.uburied = 1; iflags.save_uburied = 0;
+    }
 
     if (!program_state.something_worth_saving || !SAVEF[0])
         return 0;
@@ -1361,19 +1364,25 @@ freedynamicdata()
     free_dungeons();
 
     /* some pointers in iflags */
-    if (iflags.wc_font_map)
-        free((genericptr_t) iflags.wc_font_map), iflags.wc_font_map = 0;
-    if (iflags.wc_font_message)
-        free((genericptr_t) iflags.wc_font_message),
+    if (iflags.wc_font_map) {
+        free((genericptr_t) iflags.wc_font_map); iflags.wc_font_map = 0;
+    }
+    if (iflags.wc_font_message) {
+        free((genericptr_t) iflags.wc_font_message);
         iflags.wc_font_message = 0;
-    if (iflags.wc_font_text)
-        free((genericptr_t) iflags.wc_font_text), iflags.wc_font_text = 0;
-    if (iflags.wc_font_menu)
-        free((genericptr_t) iflags.wc_font_menu), iflags.wc_font_menu = 0;
-    if (iflags.wc_font_status)
-        free((genericptr_t) iflags.wc_font_status), iflags.wc_font_status = 0;
-    if (iflags.wc_tile_file)
-        free((genericptr_t) iflags.wc_tile_file), iflags.wc_tile_file = 0;
+    }
+    if (iflags.wc_font_text) {
+        free((genericptr_t) iflags.wc_font_text); iflags.wc_font_text = 0;
+    }
+    if (iflags.wc_font_menu) {
+        free((genericptr_t) iflags.wc_font_menu); iflags.wc_font_menu = 0;
+    }
+    if (iflags.wc_font_status) {
+        free((genericptr_t) iflags.wc_font_status); iflags.wc_font_status = 0;
+    }
+    if (iflags.wc_tile_file) {
+        free((genericptr_t) iflags.wc_tile_file); iflags.wc_tile_file = 0;
+    }
     free_autopickup_exceptions();
 
     /* miscellaneous */

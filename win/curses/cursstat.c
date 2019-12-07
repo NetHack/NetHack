@@ -59,7 +59,7 @@ curses_status_init()
         *status_vals_long[i] = '\0';
     }
     curses_condition_bits = 0L;
-    hpbar_percent = 0, hpbar_color = NO_COLOR;
+    hpbar_percent = 0; hpbar_color = NO_COLOR;
     vert_status_dirty = 1;
 
     /* let genl_status_init do most of the initialization */
@@ -73,8 +73,9 @@ curses_status_finish()
     int i;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
-        if (status_vals_long[i])
-            free(status_vals_long[i]), status_vals_long[i] = (char *) 0;
+        if (status_vals_long[i]) {
+            free(status_vals_long[i]); status_vals_long[i] = (char *) 0;
+        }
     }
 
     genl_status_finish();
@@ -308,8 +309,9 @@ boolean border;
 
     /* note: getmaxyx() is a macro which assigns values to height and width */
     getmaxyx(win, height, width);
-    if (border)
-        height -= 2, width -= 2;
+    if (border) {
+        height -= 2; width -= 2;
+    }
 
     /*
      * Potential revisions:
@@ -603,9 +605,10 @@ boolean border;
                     /* encumbrance is truncated if too wide, but other fields
                        aren't; if window is narrower than normal, last field
                        written might have wrapped to the next line */
-                    if (y > j + (border ? 1 : 0))
-                        x = width - (border ? -1 : 0), /* (width-=2 above) */
+                    if (y > j + (border ? 1 : 0)) {
+                        x = width - (border ? -1 : 0); /* (width-=2 above) */
                         y = j + (border ? 1 : 0);
+                    }
                     /* cbuf[] was populated above; clen is its length */
                     if (number_of_lines == 3) {
                         /*
@@ -803,8 +806,9 @@ boolean border;
 #endif
     }
 
-    if (border)
-        x++, y++;
+    if (border) {
+        x++; y++;
+    }
     for (i = 0; (fld = fieldorder[i]) != BL_FLUSH; ++i) {
         if (!status_activefields[fld])
             continue;
@@ -1030,8 +1034,9 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                 cndlen = 1 + (int) strlen(condnam); /* count leading space */
                 if (!do_vert) {
                     getyx(win, cy, cx);
-                    if (cy > cy0) /* wrap to next line shouldn't happen */
-                        cx = width, cy = cy0;
+                    if (cy > cy0) { /* wrap to next line shouldn't happen */
+                        cx = width; cy = cy0;
+                    }
                     if (cx + cndlen > width - (border ? 2 : 1)) {
                         /* not enough room for current condition */
                         if (cx + 1 > width - (border ? 2 : 1))

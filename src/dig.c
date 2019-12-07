@@ -397,12 +397,12 @@ dig(VOID_ARGS)
             }
             if (IS_TREE(lev->typ)) {
                 digtxt = "You cut down the tree.";
-                lev->typ = ROOM, lev->flags = 0;
+                lev->typ = ROOM; lev->flags = 0;
                 if (!rn2(5))
                     (void) rnd_treefruit_at(dpx, dpy);
             } else {
                 digtxt = "You succeed in cutting away some rock.";
-                lev->typ = CORR, lev->flags = 0;
+                lev->typ = CORR; lev->flags = 0;
             }
         } else if (IS_WALL(lev->typ)) {
             if (shopedge) {
@@ -410,11 +410,11 @@ dig(VOID_ARGS)
                 dmgtxt = "damage";
             }
             if (level.flags.is_maze_lev) {
-                lev->typ = ROOM, lev->flags = 0;
+                lev->typ = ROOM; lev->flags = 0;
             } else if (level.flags.is_cavernous_lev && !in_town(dpx, dpy)) {
-                lev->typ = CORR, lev->flags = 0;
+                lev->typ = CORR; lev->flags = 0;
             } else {
-                lev->typ = DOOR, lev->doormask = D_NODOOR;
+                lev->typ = DOOR; lev->doormask = D_NODOOR;
             }
             digtxt = "You make an opening in the wall.";
         } else if (lev->typ == SDOOR) {
@@ -949,7 +949,7 @@ coord *cc;
         pline_The("grave seems unused.  Strange....");
         break;
     }
-    levl[dig_x][dig_y].typ = ROOM, levl[dig_x][dig_y].flags = 0;
+    levl[dig_x][dig_y].typ = ROOM; levl[dig_x][dig_y].flags = 0;
     del_engr_at(dig_x, dig_y);
     newsym(dig_x, dig_y);
     return;
@@ -1286,7 +1286,7 @@ register struct monst *mtmp;
         newsym(mtmp->mx, mtmp->my);
         return FALSE;
     } else if (here->typ == SCORR) {
-        here->typ = CORR, here->flags = 0;
+        here->typ = CORR; here->flags = 0;
         unblock_point(mtmp->mx, mtmp->my);
         newsym(mtmp->mx, mtmp->my);
         draft_message(FALSE); /* "You feel a draft." */
@@ -1311,19 +1311,19 @@ register struct monst *mtmp;
         if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
             add_damage(mtmp->mx, mtmp->my, 0L);
         if (level.flags.is_maze_lev) {
-            here->typ = ROOM, here->flags = 0;
+            here->typ = ROOM; here->flags = 0;
         } else if (level.flags.is_cavernous_lev
                    && !in_town(mtmp->mx, mtmp->my)) {
-            here->typ = CORR, here->flags = 0;
+            here->typ = CORR; here->flags = 0;
         } else {
-            here->typ = DOOR, here->doormask = D_NODOOR;
+            here->typ = DOOR; here->doormask = D_NODOOR;
         }
     } else if (IS_TREE(here->typ)) {
-        here->typ = ROOM, here->flags = 0;
+        here->typ = ROOM; here->flags = 0;
         if (pile && pile < 5)
             (void) rnd_treefruit_at(mtmp->mx, mtmp->my);
     } else {
-        here->typ = CORR, here->flags = 0;
+        here->typ = CORR; here->flags = 0;
         if (pile && pile < 5)
             (void) mksobj_at((pile == 1) ? BOULDER : ROCK, mtmp->mx, mtmp->my,
                              TRUE, FALSE);
@@ -1524,21 +1524,21 @@ zap_dig()
                         add_damage(zx, zy, SHOP_WALL_COST);
                         shopwall = TRUE;
                     }
-                    room->typ = ROOM, room->flags = 0;
+                    room->typ = ROOM; room->flags = 0;
                     unblock_point(zx, zy); /* vision */
                 } else if (!Blind)
                     pline_The("wall glows then fades.");
                 break;
             } else if (IS_TREE(room->typ)) { /* check trees before stone */
                 if (!(room->wall_info & W_NONDIGGABLE)) {
-                    room->typ = ROOM, room->flags = 0;
+                    room->typ = ROOM; room->flags = 0;
                     unblock_point(zx, zy); /* vision */
                 } else if (!Blind)
                     pline_The("tree shudders but is unharmed.");
                 break;
             } else if (room->typ == STONE || room->typ == SCORR) {
                 if (!(room->wall_info & W_NONDIGGABLE)) {
-                    room->typ = CORR, room->flags = 0;
+                    room->typ = CORR; room->flags = 0;
                     unblock_point(zx, zy); /* vision */
                 } else if (!Blind)
                     pline_The("rock glows then fades.");
@@ -1554,16 +1554,16 @@ zap_dig()
                 }
                 watch_dig((struct monst *) 0, zx, zy, TRUE);
                 if (level.flags.is_cavernous_lev && !in_town(zx, zy)) {
-                    room->typ = CORR, room->flags = 0;
+                    room->typ = CORR; room->flags = 0;
                 } else {
-                    room->typ = DOOR, room->doormask = D_NODOOR;
+                    room->typ = DOOR; room->doormask = D_NODOOR;
                 }
                 digdepth -= 2;
             } else if (IS_TREE(room->typ)) {
-                room->typ = ROOM, room->flags = 0;
+                room->typ = ROOM; room->flags = 0;
                 digdepth -= 2;
             } else { /* IS_ROCK but not IS_WALL or SDOOR */
-                room->typ = CORR, room->flags = 0;
+                room->typ = CORR; room->flags = 0;
                 digdepth--;
             }
             unblock_point(zx, zy); /* vision */
@@ -1611,7 +1611,7 @@ char *msg;
         return FALSE;
     *msg = '\0';
     room = &levl[cc->x][cc->y];
-    ltyp = room->typ, room->flags = 0;
+    ltyp = room->typ; room->flags = 0;
 
     if (is_pool(cc->x, cc->y) || is_lava(cc->x, cc->y)) {
         /* this is handled by the caller after we return FALSE */
@@ -1696,7 +1696,7 @@ schar filltyp;
         int idx;
 
         t = *trap;
-        levl[t.tx][t.ty].typ = filltyp, levl[t.tx][t.ty].flags = 0;
+        levl[t.tx][t.ty].typ = filltyp; levl[t.tx][t.ty].flags = 0;
         liquid_flow(t.tx, t.ty, filltyp, trap,
                     (t.tx == u.ux && t.ty == u.uy)
                         ? "Suddenly %s flows in from the adjacent pit!"
@@ -1973,7 +1973,7 @@ long timeout UNUSED;
     while (Has_contents(obj)) {
         /* We don't need to place contained object on the floor
            first, but we do need to update its map coordinates. */
-        obj->cobj->ox = obj->ox, obj->cobj->oy = obj->oy;
+        obj->cobj->ox = obj->ox; obj->cobj->oy = obj->oy;
         /* Everything which can be held in a container can also be
            buried, so bury_an_obj's use of obj_extract_self insures
            that Has_contents(obj) will eventually become false. */

@@ -983,10 +983,12 @@ status_finish()
 
     /* free memory that we alloc'd now */
     for (i = 0; i < MAXBLSTATS; ++i) {
-        if (blstats[0][i].val)
-            free((genericptr_t) blstats[0][i].val), blstats[0][i].val = 0;
-        if (blstats[1][i].val)
-            free((genericptr_t) blstats[1][i].val), blstats[1][i].val = 0;
+        if (blstats[0][i].val) {
+            free((genericptr_t) blstats[0][i].val); blstats[0][i].val = 0;
+        }
+        if (blstats[1][i].val) {
+            free((genericptr_t) blstats[1][i].val); blstats[1][i].val = 0;
+        }
 #ifdef STATUS_HILITES
         /* pointer to an entry in thresholds list; Null it out since
            that list is about to go away */
@@ -1239,7 +1241,7 @@ struct istat_s *bl, *maxbl;
         return 0;
     }
 
-    ival = 0, lval = 0L, uval = 0U, ulval = 0UL;
+    ival = 0; lval = 0L; uval = 0U; ulval = 0UL;
     anytype = bl->anytype;
     if (maxbl->a.a_void) {
         switch (anytype) {
@@ -3409,8 +3411,9 @@ choose_value:
                 hilite.rel = TXT_VALUE;
                 Strcpy(hilite.textmatch, rolelist[rv]);
             }
-            for (i = 0; i < j; i++)
-                free((genericptr_t) rolelist[i]), rolelist[i] = 0;
+            for (i = 0; i < j; i++) {
+                free((genericptr_t) rolelist[i]); rolelist[i] = 0;
+            }
             if (rv < 0)
                 goto choose_behavior;
         } else {
@@ -3752,7 +3755,7 @@ shlmenu_redo:
             status_hilites_viewall();
         else
             (void) status_hilite_menu_fld(i);
-        free((genericptr_t) picks), picks = (menu_item *) 0;
+        free((genericptr_t) picks); picks = (menu_item *) 0;
         redo = TRUE;
     }
 

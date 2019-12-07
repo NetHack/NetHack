@@ -370,7 +370,7 @@ register struct monst *mtmp;
 
     switch (strat) {
     case STRAT_HEAL: /* hide and recover */
-        mx = mtmp->mx, my = mtmp->my;
+        mx = mtmp->mx; my = mtmp->my;
         /* if wounded, hole up on or near the stairs (to block them) */
         choose_stairs(&sx, &sy);
         mtmp->mavenge = 1; /* covetous monsters attack while fleeing */
@@ -386,7 +386,7 @@ register struct monst *mtmp;
                 rloc_to(mtmp, mx, my);
                 return 0;
             }
-            mx = mtmp->mx, my = mtmp->my; /* update cached location */
+            mx = mtmp->mx; my = mtmp->my; /* update cached location */
         }
         /* if you're not around, cast healing spells */
         if (distu(mx, my) > (BOLT_LIM * BOLT_LIM))
@@ -439,7 +439,7 @@ register struct monst *mtmp;
                 return 0;
             }
         } else { /* a monster has it - 'port beside it. */
-            mx = mtmp->mx, my = mtmp->my;
+            mx = mtmp->mx; my = mtmp->my;
             if (!mnearto(mtmp, tx, ty, FALSE))
                 rloc_to(mtmp, mx, my); /* no room? stay put */
             return 0;
@@ -654,8 +654,9 @@ resurrect()
                 elapsed /= 50L;
                 if (mtmp->msleeping && rn2((int) elapsed + 1))
                     mtmp->msleeping = 0;
-                if (mtmp->mfrozen == 1) /* would unfreeze on next move */
-                    mtmp->mfrozen = 0, mtmp->mcanmove = 1;
+                if (mtmp->mfrozen == 1) { /* would unfreeze on next move */
+                    mtmp->mfrozen = 0; mtmp->mcanmove = 1;
+                }
                 if (mtmp->mcanmove && !mtmp->msleeping) {
                     *mmtmp = mtmp->nmon;
                     mon_arrive(mtmp, TRUE);

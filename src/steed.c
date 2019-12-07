@@ -562,7 +562,7 @@ int reason; /* Player was thrown off etc. */
      * but we don't know where that was and even if we did, it might
      * be hostile terrain.
      */
-    steedcc.x = u.ux, steedcc.y = u.uy;
+    steedcc.x = u.ux; steedcc.y = u.uy;
     if (m_at(u.ux, u.uy)) {
         /* hero's spot has a monster in it; hero must have been plucked
            from saddle as engulfer moved into his spot--other dismounts
@@ -771,7 +771,7 @@ int x, y;
         impossible("placing %s over %s at <%d,%d>, mstates:%lx %lx on %s?",
                    monnm, othnm, x, y, othermon->mstate, mon->mstate, buf);
     }
-    mon->mx = x, mon->my = y;
+    mon->mx = x; mon->my = y;
     level.monsters[x][y] = mon;
     mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO | MON_BUBBLEMOVE
                      | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);

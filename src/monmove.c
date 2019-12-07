@@ -1262,7 +1262,7 @@ register int after;
         if (mmoved == 1) {
             /* normal monster move will already have <nix,niy>,
                but pet dog_move() with 'goto postmov' won't */
-            nix = mtmp->mx, niy = mtmp->my;
+            nix = mtmp->mx; niy = mtmp->my;
             /* sequencing issue:  when monster movement decides that a
                monster can move to a door location, it moves the monster
                there before dealing with the door rather than after;
@@ -1281,7 +1281,7 @@ register int after;
                 if (sawmon) {
                     remove_monster(nix, niy);
                     place_monster(mtmp, omx, omy);
-                    newsym(nix, niy), newsym(omx, omy);
+                    newsym(nix, niy); newsym(omx, omy);
                 }
                 if (vamp_shift(mtmp, &mons[PM_FOG_CLOUD], sawmon)) {
                     ptr = mtmp->data; /* update cached value */
@@ -1289,7 +1289,7 @@ register int after;
                 if (sawmon) {
                     remove_monster(omx, omy);
                     place_monster(mtmp, nix, niy);
-                    newsym(omx, omy), newsym(nix, niy);
+                    newsym(omx, omy); newsym(nix, niy);
                 }
             }
 

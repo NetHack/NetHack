@@ -718,8 +718,9 @@ int alter_type;
     } else {
         /* this get_obj_location shouldn't fail, but if it does,
            use hero's location */
-        if (!get_obj_location(obj, &ox, &oy, CONTAINED_TOO))
-            ox = u.ux, oy = u.uy;
+        if (!get_obj_location(obj, &ox, &oy, CONTAINED_TOO)) {
+            ox = u.ux; oy = u.uy;
+        }
         if (!costly_spot(ox, oy))
             return;
         objroom = *in_rooms(ox, oy, SHOPBASE);
@@ -728,10 +729,11 @@ int alter_type;
             return;
     }
 
-    if (obj->quan == 1L)
-        those = "that", them = "it";
-    else
-        those = "those", them = "them";
+    if (obj->quan == 1L) {
+        those = "that"; them = "it";
+    } else {
+        those = "those"; them = "them";
+    }
 
     /* when shopkeeper describes the object as being uncursed or unblessed
        hero will know that it is now uncursed; will also make the feedback
@@ -1942,8 +1944,9 @@ struct monst *mtmp;
         obj_extract_self(otmp);
         if (otmp->owornmask) {
             if (keeping_mon) {
-                if (otmp == mwep)
-                    mwepgone(mtmp), mwep = 0;
+                if (otmp == mwep) {
+                    mwepgone(mtmp); mwep = 0;
+                }
                 mtmp->misc_worn_check &= ~otmp->owornmask;
                 update_mon_intrinsics(mtmp, otmp, FALSE, TRUE);
             }
@@ -2604,8 +2607,9 @@ struct obj *obj;
         embedded = TRUE;
         if ((owornmask & (W_ARM | I_SPECIAL)) == (W_ARM | I_SPECIAL))
             owornmask &= ~I_SPECIAL;
-        else
-            n = 0,  owornmask = ~0; /* force insane_object("bogus") below */
+        else {
+            n = 0;  owornmask = ~0; /* force insane_object("bogus") below */
+        }
     }
     if (n == 2 && carried(obj)
         && obj == uball && (owornmask & W_BALL) != 0L
@@ -2911,12 +2915,14 @@ struct obj **obj1, **obj2;
             if (!(otmp2->where == OBJ_FLOOR && otmp1->where == OBJ_FREE)
                 && (otmp1->owt > otmp2->owt
                     || (otmp1->owt == otmp2->owt && rn2(2)))) {
-                if (otmp2->where == OBJ_FLOOR)
-                    ox = otmp2->ox, oy = otmp2->oy;
+                if (otmp2->where == OBJ_FLOOR) {
+                    ox = otmp2->ox; oy = otmp2->oy;
+                }
                 result = obj_absorb(obj1, obj2);
             } else {
-                if (otmp1->where == OBJ_FLOOR)
-                    ox = otmp1->ox, oy = otmp1->oy;
+                if (otmp1->where == OBJ_FLOOR) {
+                    ox = otmp1->ox; oy = otmp1->oy;
+                }
                 result = obj_absorb(obj2, obj1);
             }
             /* callers really ought to take care of this; glob melding is

@@ -329,7 +329,7 @@ invault()
         /* first find the goal for the guard */
         if (!find_guard_dest((struct monst *)0, &rx, &ry))
             return;
-        gx = rx, gy = ry;
+        gx = rx; gy = ry;
 
         /* next find a good place for a door in the wall */
         x = u.ux;
@@ -673,7 +673,7 @@ int goldx, goldy; /* <gold->ox, gold->oy> */
         gdelta = distu(guardx, guardy);
         if (gdelta > 2 && see_it) { /* skip if player won't see it */
             bestdelta = gdelta;
-            bestcc.x = (xchar) guardx, bestcc.y = (xchar) guardy;
+            bestcc.x = (xchar) guardx; bestcc.y = (xchar) guardy;
             tryct = 9;
             do {
                 /* pick an available spot nearest the hero and also try
@@ -1032,7 +1032,7 @@ register struct monst *grd;
         /* At the end of the process, the guard is killed */
         /* in restfakecorr().                             */
  cleanup:
-        x = grd->mx, y = grd->my;
+        x = grd->mx; y = grd->my;
         see_guard = canspotmon(grd);
         parkguard(grd); /* move to <0,0> */
         wallify_vault(grd);

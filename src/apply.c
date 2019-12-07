@@ -82,7 +82,7 @@ struct obj *obj;
     } else if ((mtmp = bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT,
                             (int FDECL((*), (MONST_P, OBJ_P))) 0,
                             (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj)) != 0) {
-        obj->ox = u.ux, obj->oy = u.uy;
+        obj->ox = u.ux; obj->oy = u.uy;
         (void) flash_hits_mon(mtmp, obj);
     }
     return 1;
@@ -325,7 +325,7 @@ register struct obj *obj;
     context.stethoscope_move = moves;
     context.stethoscope_movement = youmonst.movement;
 
-    bhitpos.x = u.ux, bhitpos.y = u.uy; /* tentative, reset below */
+    bhitpos.x = u.ux; bhitpos.y = u.uy; /* tentative, reset below */
     notonhead = u.uswallow;
     if (u.usteed && u.dz > 0) {
         if (interference) {
@@ -374,7 +374,7 @@ register struct obj *obj;
                                    SUPPRESS_IT | SUPPRESS_INVISIBLE, FALSE);
 
         /* bhitpos needed by mstatusline() iff mtmp is a long worm */
-        bhitpos.x = rx, bhitpos.y = ry;
+        bhitpos.x = rx; bhitpos.y = ry;
         notonhead = (mtmp->mx != rx || mtmp->my != ry);
 
         if (mtmp->mundetected) {
@@ -438,7 +438,7 @@ register struct obj *obj;
         return res;
     case SCORR:
         You_hear(hollow_str, "passage");
-        lev->typ = CORR, lev->flags = 0;
+        lev->typ = CORR; lev->flags = 0;
         unblock_point(rx, ry);
         feel_newsym(rx, ry);
         return res;
@@ -509,7 +509,7 @@ struct obj *obj;
                    actually moves because line-of-sight may change */
                 if (M_AP_TYPE(mtmp))
                     seemimic(mtmp);
-                omx = mtmp->mx, omy = mtmp->my;
+                omx = mtmp->mx; omy = mtmp->my;
                 mnexto(mtmp);
                 if (mtmp->mx != omx || mtmp->my != omy) {
                     mtmp->mundetected = 0; /* reveal non-mimic hider */
@@ -1613,8 +1613,8 @@ boolean showmsg;
                 You_cant("jump diagonally out of a doorway.");
             return FALSE;
         }
-        uc.x = u.ux, uc.y = u.uy;
-        tc.x = x, tc.y = y; /* target */
+        uc.x = u.ux; uc.y = u.uy;
+        tc.x = x; tc.y = y; /* target */
         if (!walk_path(&uc, &tc, check_jump, (genericptr_t) &traj)) {
             if (showmsg)
                 There("is an obstacle preventing that jump.");
@@ -2541,7 +2541,7 @@ struct obj *otmp;
         return;
     }
     trapinfo.tobj = otmp;
-    trapinfo.tx = u.ux, trapinfo.ty = u.uy;
+    trapinfo.tx = u.ux; trapinfo.ty = u.uy;
     tmp = ACURR(A_DEX);
     trapinfo.time_needed =
         (tmp > 17) ? 2 : (tmp > 12) ? 3 : (tmp > 7) ? 4 : 5;
@@ -2920,8 +2920,8 @@ int min_range, max_range;
     impaired = (Confusion || Stunned || Hallucination);
     mpos.x = mpos.y = 0; /* no candidate location yet */
     rt = isqrt(max_range);
-    lo_x = max(u.ux - rt, 1), hi_x = min(u.ux + rt, COLNO - 1);
-    lo_y = max(u.uy - rt, 0), hi_y = min(u.uy + rt, ROWNO - 1);
+    lo_x = max(u.ux - rt, 1); hi_x = min(u.ux + rt, COLNO - 1);
+    lo_y = max(u.uy - rt, 0); hi_y = min(u.uy + rt, ROWNO - 1);
     for (x = lo_x; x <= hi_x; ++x) {
         for (y = lo_y; y <= hi_y; ++y) {
             if (distu(x, y) < min_range || distu(x, y) > max_range
@@ -2939,7 +2939,7 @@ int min_range, max_range;
                 || (glyph_is_statue(glyph) && impaired)) {
                 if (mpos.x)
                     return FALSE; /* more than one candidate location */
-                mpos.x = x, mpos.y = y;
+                mpos.x = x; mpos.y = y;
             }
         }
     }
@@ -3429,7 +3429,7 @@ struct obj *obj;
                  */
                 typ = fillholetyp(x, y, FALSE);
                 if (typ != ROOM) {
-                    levl[x][y].typ = typ, levl[x][y].flags = 0;
+                    levl[x][y].typ = typ; levl[x][y].flags = 0;
                     liquid_flow(x, y, typ, t_at(x, y),
                                 fillmsg
                                   ? (char *) 0

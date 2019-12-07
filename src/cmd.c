@@ -5381,7 +5381,7 @@ int x, y;
         int dm = levl[x][y].doormask;
 
         if ((dm & (D_CLOSED | D_LOCKED))) {
-            add_herecmd_menuitem(win, doopen, "Open the door"), ++K;
+            add_herecmd_menuitem(win, doopen, "Open the door"); ++K;
             /* unfortunately there's no lknown flag for doors to
                remember the locked/unlocked state */
             key_or_pick = (carrying(SKELETON_KEY) || carrying(LOCK_PICK));
@@ -5389,26 +5389,28 @@ int x, y;
             if (key_or_pick || card) {
                 Sprintf(buf, "%sunlock the door",
                         key_or_pick ? "lock or " : "");
-                add_herecmd_menuitem(win, doapply, upstart(buf)), ++K;
+                add_herecmd_menuitem(win, doapply, upstart(buf)); ++K;
             }
             /* unfortunately there's no tknown flag for doors (or chests)
                to remember whether a trap had been found */
             add_herecmd_menuitem(win, dountrap,
-                                 "Search the door for a trap"), ++K;
+                                 "Search the door for a trap"); ++K;
             /* [what about #force?] */
-            add_herecmd_menuitem(win, dokick, "Kick the door"), ++K;
+            add_herecmd_menuitem(win, dokick, "Kick the door"); ++K;
         } else if ((dm & D_ISOPEN)) {
-            add_herecmd_menuitem(win, doclose, "Close the door"), ++K;
+            add_herecmd_menuitem(win, doclose, "Close the door"); ++K;
         }
     }
 
-    if (typ <= SCORR)
-        add_herecmd_menuitem(win, dosearch, "Search for secret doors"), ++K;
+    if (typ <= SCORR) {
+        add_herecmd_menuitem(win, dosearch, "Search for secret doors"); ++K;
+    }
 
     if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen) {
-        add_herecmd_menuitem(win, doidtrap, "Examine trap"), ++K;
-        if (ttmp->ttyp != VIBRATING_SQUARE)
-            add_herecmd_menuitem(win, dountrap, "Attempt to disarm trap"), ++K;
+        add_herecmd_menuitem(win, doidtrap, "Examine trap"); ++K;
+        if (ttmp->ttyp != VIBRATING_SQUARE) {
+            add_herecmd_menuitem(win, dountrap, "Attempt to disarm trap"); ++K;
+        }
     }
 
     mtmp = m_at(x, y);
@@ -5420,10 +5422,10 @@ int x, y;
 
         if (!u.usteed) {
             Sprintf(buf, "Ride %s", mnam);
-            add_herecmd_menuitem(win, doride, buf), ++K;
+            add_herecmd_menuitem(win, doride, buf); ++K;
         }
         Sprintf(buf, "Remove saddle from %s", mnam);
-        add_herecmd_menuitem(win, doloot, buf), ++K;
+        add_herecmd_menuitem(win, doloot, buf); ++K;
     }
     if (mtmp && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)
         && carrying(SADDLE)) {
@@ -5587,7 +5589,7 @@ int x, y, mod;
 
     if (flags.travelcmd) {
         if (abs(x) <= 1 && abs(y) <= 1) {
-            x = sgn(x), y = sgn(y);
+            x = sgn(x); y = sgn(y);
         } else {
             u.tx = u.ux + x;
             u.ty = u.uy + y;
@@ -5666,16 +5668,17 @@ int x, y, mod;
         }
     } else {
         /* convert without using floating point, allowing sloppy clicking */
-        if (x > 2 * abs(y))
-            x = 1, y = 0;
-        else if (y > 2 * abs(x))
-            x = 0, y = 1;
-        else if (x < -2 * abs(y))
-            x = -1, y = 0;
-        else if (y < -2 * abs(x))
-            x = 0, y = -1;
-        else
-            x = sgn(x), y = sgn(y);
+        if (x > 2 * abs(y)) {
+            x = 1; y = 0;
+        } else if (y > 2 * abs(x)) {
+            x = 0; y = 1;
+        } else if (x < -2 * abs(y)) {
+            x = -1; y = 0;
+        } else if (y < -2 * abs(x)) {
+            x = 0; y = -1;
+        } else {
+            x = sgn(x); y = sgn(y);
+        }
 
         if (x == 0 && y == 0) {
             /* map click on player to "rest" command */

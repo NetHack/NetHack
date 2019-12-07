@@ -586,7 +586,7 @@ unsigned int *stuckid, *steedid;
     iflags.deferred_X = (newgameflags.explore && !discover);
     if (newgameflags.debug) {
         /* authorized by startup code; wizard mode exists and is allowed */
-        wizard = TRUE, discover = iflags.deferred_X = FALSE;
+        wizard = TRUE; discover = iflags.deferred_X = FALSE;
     } else if (wizard) {
         /* specified by save file; check authorization now */
         set_playmode();
@@ -1148,7 +1148,7 @@ boolean ghostly;
     rest_regions(fd, ghostly);
     if (ghostly) {
         /* Now get rid of all the temp fruits... */
-        freefruitchn(oldfruit), oldfruit = 0;
+        freefruitchn(oldfruit); oldfruit = 0;
 
         if (lev > ledger_no(&medusa_level)
             && lev < ledger_no(&stronghold_level) && xdnstair == 0) {

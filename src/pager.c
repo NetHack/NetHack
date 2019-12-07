@@ -207,7 +207,7 @@ struct obj **obj_p;
             otmp->leashmon = 0;
         /* extra fields needed for shop price with doname() formatting */
         otmp->where = OBJ_FLOOR;
-        otmp->ox = x, otmp->oy = y;
+        otmp->ox = x; otmp->oy = y;
         otmp->no_charge = (otmp->otyp == STRANGE_OBJECT && costly_spot(x, y));
     }
     /* if located at adjacent spot, mark it as having been seen up close
@@ -246,7 +246,7 @@ int x, y, glyph;
                      : obj_descr[STRANGE_OBJECT].oc_name);
         if (fakeobj) {
             otmp->where = OBJ_FREE; /* object_from_map set it to OBJ_FLOOR */
-            dealloc_obj(otmp), otmp = 0;
+            dealloc_obj(otmp); otmp = 0;
         }
     } else
         Strcpy(buf, something); /* sanity precaution */
@@ -790,7 +790,7 @@ char *supplemental_name;
                         putstr(datawin, 0, buf + 1);
                     }
                     display_nhwindow(datawin, FALSE);
-                    destroy_nhwindow(datawin), datawin = WIN_ERR;
+                    destroy_nhwindow(datawin); datawin = WIN_ERR;
                 }
             } else if (user_typed_name && pass == 0 && !pass1found_in_file)
                 pline("I don't have any information on those things.");
@@ -1521,7 +1521,7 @@ boolean without_asking;
                     putstr(datawin, 0, txt);
                 }
                 display_nhwindow(datawin, FALSE);
-                destroy_nhwindow(datawin), datawin = WIN_ERR;
+                destroy_nhwindow(datawin); datawin = WIN_ERR;
             }
         }
     }

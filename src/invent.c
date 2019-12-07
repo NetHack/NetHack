@@ -79,7 +79,7 @@ struct obj *obj;
      */
     if (!Blind)
         obj->dknown = 1; /* xname(obj) does this; we want it sooner */
-    seen = obj->dknown ? TRUE : FALSE,
+    seen = obj->dknown ? TRUE : FALSE;
     /* class order */
     classorder = flags.sortpack ? flags.inv_order : def_srt_order;
     p = index(classorder, oclass);
@@ -227,7 +227,7 @@ struct obj *obj;
      * remember 'obj's current settings.
      */
     saveo.odiluted = obj->odiluted;
-    saveo.blessed = obj->blessed, saveo.cursed = obj->cursed;
+    saveo.blessed = obj->blessed; saveo.cursed = obj->cursed;
     saveo.spe = obj->spe;
     saveo.owt = obj->owt;
     save_oname = has_oname(obj) ? ONAME(obj) : 0;
@@ -236,8 +236,9 @@ struct obj *obj;
        sortloot() will deal with them using other criteria than name */
     if (obj->oclass == POTION_CLASS) {
         obj->odiluted = 0;
-        if (obj->otyp == POT_WATER)
-            obj->blessed = 0, obj->cursed = 0;
+        if (obj->otyp == POT_WATER) {
+            obj->blessed = 0; obj->cursed = 0;
+        }
     }
     /* make "wet towel" and "moist towel" format as "towel" so that all
        three group together */
@@ -268,8 +269,9 @@ struct obj *obj;
     /* restore the object */
     if (obj->oclass == POTION_CLASS) {
         obj->odiluted = saveo.odiluted;
-        if (obj->otyp == POT_WATER)
-            obj->blessed = saveo.blessed, obj->cursed = saveo.cursed;
+        if (obj->otyp == POT_WATER) {
+            obj->blessed = saveo.blessed; obj->cursed = saveo.cursed;
+        }
     }
     if (obj->otyp == TOWEL) {
         obj->spe = saveo.spe;
@@ -507,14 +509,14 @@ boolean FDECL((*filterfunc), (OBJ_P));
             && (!augment_filter || o->otyp != CORPSE
                 || !touch_petrifies(&mons[o->corpsenm])))
             continue;
-        sliarray[i].obj = o, sliarray[i].indx = (int) i;
+        sliarray[i].obj = o; sliarray[i].indx = (int) i;
         sliarray[i].str = (char *) 0;
         sliarray[i].orderclass = sliarray[i].subclass = sliarray[i].disco = 0;
         ++i;
     }
     n = i;
     /* add a terminator so that we don't have to pass 'n' back to caller */
-    sliarray[n].obj = (struct obj *) 0, sliarray[n].indx = -1;
+    sliarray[n].obj = (struct obj *) 0; sliarray[n].indx = -1;
     sliarray[n].str = (char *) 0;
     sliarray[n].orderclass = sliarray[n].subclass = sliarray[n].disco = 0;
 
@@ -525,9 +527,11 @@ boolean FDECL((*filterfunc), (OBJ_P));
         qsort((genericptr_t) sliarray, n, sizeof *sliarray, sortloot_cmp);
         sortlootmode = 0; /* reset static mode flags */
         /* if sortloot_cmp formatted any objects, discard their strings now */
-        for (i = 0; i < n; ++i)
-            if (sliarray[i].str)
-                free((genericptr_t) sliarray[i].str), sliarray[i].str = 0;
+        for (i = 0; i < n; ++i) {
+            if (sliarray[i].str) {
+                free((genericptr_t) sliarray[i].str); sliarray[i].str = 0;
+            }
+        }
     }
     return sliarray;
 }
@@ -537,8 +541,9 @@ void
 unsortloot(loot_array_p)
 Loot **loot_array_p;
 {
-    if (*loot_array_p)
-        free((genericptr_t) *loot_array_p), *loot_array_p = (Loot *) 0;
+    if (*loot_array_p) {
+        free((genericptr_t) *loot_array_p); *loot_array_p = (Loot *) 0;
+    }
 }
 
 #if 0 /* 3.6.0 'revamp' */
@@ -725,8 +730,9 @@ struct obj **potmp, **pobj;
         if (!otmp->globby)
             otmp->quan += obj->quan;
         /* temporary special case for gold objects!!!! */
-        if (otmp->oclass == COIN_CLASS)
-            otmp->owt = weight(otmp), otmp->bknown = 0;
+        if (otmp->oclass == COIN_CLASS) {
+            otmp->owt = weight(otmp); otmp->bknown = 0;
+        }
         /* and puddings!!!1!!one! */
         else if (!Is_pudding(otmp))
             otmp->owt += obj->owt;
@@ -1444,10 +1450,12 @@ register const char *let, *word;
     long dummymask;
     Loot *sortedinvent, *srtinv;
 
-    if (*let == ALLOW_COUNT)
-        let++, allowcnt = 1;
-    if (*let == COIN_CLASS)
-        let++, usegold = TRUE;
+    if (*let == ALLOW_COUNT) {
+        let++; allowcnt = 1;
+    }
+    if (*let == COIN_CLASS) {
+        let++; usegold = TRUE;
+    }
 
     /* Equivalent of an "ugly check" for gold */
     if (usegold && !strcmp(word, "eat")
@@ -1455,10 +1463,12 @@ register const char *let, *word;
             || youmonst.data == &mons[PM_RUST_MONSTER]))
         usegold = FALSE;
 
-    if (*let == ALL_CLASSES)
-        let++, allowall = TRUE;
-    if (*let == ALLOW_NONE)
-        let++, allownone = TRUE;
+    if (*let == ALL_CLASSES) {
+        let++; allowall = TRUE;
+    }
+    if (*let == ALLOW_NONE) {
+        let++; allownone = TRUE;
+    }
     /* "ugly check" for reading fortune cookies, part 1.
      * The normal 'ugly check' keeps the object on the inventory list.
      * We don't want to do that for shirts/cookies, so the check for
@@ -1473,8 +1483,9 @@ register const char *let, *word;
         && throws_rocks(youmonst.data))
         useboulder = TRUE;
 
-    if (allownone)
-        *bp++ = HANDS_SYM, *bp++ = ' '; /* '-' */
+    if (allownone) {
+        *bp++ = HANDS_SYM; *bp++ = ' '; /* '-' */
+    }
     ap = altlets;
 
     if (!flags.invlet_constant)
@@ -3324,8 +3335,9 @@ char *buf;
             break; /* "closed door" */
         }
         /* override door description for open drawbridge */
-        if (is_drawbridge_wall(x, y) >= 0)
-            dfeature = "open drawbridge portcullis", cmap = -1;
+        if (is_drawbridge_wall(x, y) >= 0) {
+            dfeature = "open drawbridge portcullis"; cmap = -1;
+        }
     } else if (IS_FOUNTAIN(ltyp))
         cmap = S_fountain; /* "fountain" */
     else if (IS_THRONE(ltyp))
@@ -3968,8 +3980,9 @@ boolean unpaid, showsym;
 void
 free_invbuf()
 {
-    if (invbuf)
-        free((genericptr_t) invbuf), invbuf = (char *) 0;
+    if (invbuf) {
+        free((genericptr_t) invbuf); invbuf = (char *) 0;
+    }
     invbufsiz = 0;
 }
 
@@ -4227,8 +4240,9 @@ doorganize() /* inventory organizer by Del Lamb */
                         ONAME(obj) = objname;
                 } else {
                     /* will merge; discard 'from' name */
-                    if (objname)
-                        free((genericptr_t) objname), objname = 0;
+                    if (objname) {
+                        free((genericptr_t) objname); objname = 0;
+                    }
                 }
 
                 if (merged(&otmp, &obj)) {

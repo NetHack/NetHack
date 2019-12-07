@@ -564,7 +564,7 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
         /* ++i, wrap 8 to i=0 /or/ --i, wrap -1 to i=7 */
         i = (i + (clockwise ? 1 : 7)) % 8;
 
-        tx = x + xdir[i], ty = y + ydir[i]; /* current target location */
+        tx = x + xdir[i]; ty = y + ydir[i]; /* current target location */
         if (!isok(tx, ty))
             continue;
         mtmp = m_at(tx, ty);
@@ -578,7 +578,7 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
                                &attknum, &armorpenalty);
         dieroll = rnd(20);
         mhit = (tmp > dieroll);
-        bhitpos.x = tx, bhitpos.y = ty; /* normally set up by attack() */
+        bhitpos.x = tx; bhitpos.y = ty; /* normally set up by attack() */
         (void) known_hitum(mtmp, uwep, &mhit, tmp, armorpenalty,
                            uattk, dieroll);
         (void) passive(mtmp, uwep, mhit, !DEADMONSTER(mtmp), AT_WEAP, !uwep);
@@ -1571,8 +1571,9 @@ struct attack *mattk;
         obj_extract_self(gold);
 
     while ((otmp = mdef->minvent) != 0) {
-        if (gold) /* put 'mdef's gold back after remembering mdef->minvent */
-            mpickobj(mdef, gold), gold = 0;
+        if (gold) { /* put 'mdef's gold back after remembering mdef->minvent */
+            mpickobj(mdef, gold); gold = 0;
+        }
         if (!Upolyd)
             break; /* no longer have ability to steal */
         /* take the object away from the monster */

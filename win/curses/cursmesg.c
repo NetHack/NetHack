@@ -143,7 +143,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     if (mx == border_space && message_length > width - 2) {
         /* split needed */
         tmpstr = curses_break_str(message, (width - 2), 1);
-        mvwprintw(win, my, mx, "%s", tmpstr), mx += (int) strlen(tmpstr);
+        mvwprintw(win, my, mx, "%s", tmpstr); mx += (int) strlen(tmpstr);
         /* one space to separate first part of message from rest [is this
            actually useful?] */
         if (mx < width - 2)
@@ -155,7 +155,7 @@ curses_message_win_puts(const char *message, boolean recursed)
         curses_message_win_puts(tmpstr, TRUE);
         free(tmpstr);
     } else {
-        mvwprintw(win, my, mx, "%s", message), mx += message_length;
+        mvwprintw(win, my, mx, "%s", message); mx += message_length;
         if (bold)
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
     }
@@ -188,9 +188,9 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     if (mx - brdroffset > width - 3) { /* -3: room for ">>_" */
-        if (my - brdroffset < height - 1)
-            ++my, mx = brdroffset;
-        else
+        if (my - brdroffset < height - 1) {
+            ++my; mx = brdroffset;
+        } else
             mx = width - 3 + brdroffset;
     }
     /* if ">>" (--More--) is being rendered at the same spot as before,
@@ -199,18 +199,18 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
     if (mx == prev_x && my == prev_y) {
         blink = 1 - blink;
     } else {
-        prev_x = mx, prev_y = my;
+        prev_x = mx; prev_y = my;
         blink = 0;
     }
     moreattr = !iflags.wc2_guicolor ? (int) A_REVERSE : NONE;
     curses_toggle_color_attr(win, MORECOLOR, moreattr, ON);
     if (blink) {
         wattron(win, A_BLINK);
-        mvwprintw(win, my, mx, ">"), mx += 1;
+        mvwprintw(win, my, mx, ">"); mx += 1;
         wattroff(win, A_BLINK);
-        waddstr(win, ">"), mx += 1;
+        waddstr(win, ">"); mx += 1;
     } else {
-        mvwprintw(win, my, mx, ">>"), mx += 2;
+        mvwprintw(win, my, mx, ">>"); mx += 2;
     }
     curses_toggle_color_attr(win, MORECOLOR, moreattr, OFF);
     wrefresh(win);
@@ -232,7 +232,7 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
     if (height == 1) {
         curses_clear_unhighlight_message_window();
     } else {
-        mx -= 2, mvwprintw(win, my, mx, "  "); /* back up and blank out ">>" */
+        mx -= 2; mvwprintw(win, my, mx, "  "); /* back up and blank out ">>" */
         if (!noscroll) {
             scroll_window(MESSAGE_WIN);
         }
@@ -405,8 +405,9 @@ curses_count_window(const char *count_text)
     int messageh, messagew, border;
 
     if (!count_text) {
-        if (countwin)
-            delwin(countwin), countwin = NULL;
+        if (countwin) {
+            delwin(countwin); countwin = NULL;
+        }
         counting = FALSE;
         return;
     }
@@ -895,8 +896,8 @@ boolean restoring_msghist;
         /* hide any messages we've gathered since starting current session
            so that the ^P data will start out empty as we add ones being
            restored from save file; we'll put these back after that's done */
-        stash_count = num_messages, num_messages = 0;
-        stash_head = first_mesg, first_mesg = (nhprev_mesg *) 0;
+        stash_count = num_messages; num_messages = 0;
+        stash_head = first_mesg; first_mesg = (nhprev_mesg *) 0;
         last_mesg = (nhprev_mesg *) 0; /* no need to remember the tail */
         initd = TRUE;
 #ifdef DUMPLOG

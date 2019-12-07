@@ -200,7 +200,7 @@ unsigned entflags;
     if (good_ptr == good) {
         /* 3.6.3: earlier versions didn't have the option to try <xx,yy>,
            and left 'cc' uninitialized when returning False */
-        cc->x = xx, cc->y = yy;
+        cc->x = xx; cc->y = yy;
         /* if every spot other than <xx,yy> has failed, try <xx,yy> itself */
         if (allow_xx_yy && goodpos(xx, yy, &fakemon, entflags)) {
             return TRUE; /* 'cc' is set */
@@ -564,7 +564,7 @@ dotelecmd()
         return dotele(FALSE);
 
     added = hidden = NOOP_SPELL;
-    save_HTele = HTeleportation, save_ETele = ETeleportation;
+    save_HTele = HTeleportation; save_ETele = ETeleportation;
     if (!iflags.menu_requested) {
         ignore_restrictions = TRUE;
     } else {
@@ -1232,12 +1232,13 @@ boolean suppress_impossible;
     }
 
     if (mtmp->iswiz && mtmp->mx) { /* Wizard, not just arriving */
-        if (!In_W_tower(u.ux, u.uy, &u.uz))
-            x = xupstair, y = yupstair;
-        else if (!xdnladder) /* bottom level of tower */
-            x = xupladder, y = yupladder;
-        else
-            x = xdnladder, y = ydnladder;
+        if (!In_W_tower(u.ux, u.uy, &u.uz)) {
+            x = xupstair; y = yupstair;
+        } else if (!xdnladder) { /* bottom level of tower */
+            x = xupladder; y = yupladder;
+        } else {
+            x = xdnladder; y = ydnladder;
+        }
         /* if the wiz teleports away to heal, try the up staircase,
            to block the player's escaping before he's healed
            (deliberately use `goodpos' rather than `rloc_pos_ok' here) */

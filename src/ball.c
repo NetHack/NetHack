@@ -1094,15 +1094,16 @@ bc_sanity_check()
 
         /* non-free chain should be under or next to the hero;
            non-free ball should be on or next to the chain or else carried */
-        cx = uchain->ox, cy = uchain->oy;
-        cdx = cx - u.ux, cdy = cy - u.uy;
-        cdx = abs(cdx), cdy = abs(cdy);
-        if (uball->where == OBJ_INVENT) /* carried(uball) */
-            bx = u.ux, by = u.uy; /* get_obj_location() */
-        else
-            bx = uball->ox, by = uball->oy;
-        bdx = bx - cx, bdy = by - cy;
-        bdx = abs(bdx), bdy = abs(bdy);
+        cx = uchain->ox; cy = uchain->oy;
+        cdx = cx - u.ux; cdy = cy - u.uy;
+        cdx = abs(cdx); cdy = abs(cdy);
+        if (uball->where == OBJ_INVENT) { /* carried(uball) */
+            bx = u.ux; by = u.uy; /* get_obj_location() */
+        } else {
+            bx = uball->ox; by = uball->oy;
+        }
+        bdx = bx - cx; bdy = by - cy;
+        bdx = abs(bdx); bdy = abs(bdy);
         if (cdx > 1 || cdy > 1 || bdx > 1 || bdy > 1)
             impossible(
                      "b&c distance: you@<%d,%d>, chain@<%d,%d>, ball@<%d,%d>",

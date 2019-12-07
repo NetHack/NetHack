@@ -558,8 +558,9 @@ int curse_bless;
             if (is_on)
                 Ring_off(obj);
             obj->spe += s; /* update the ring while it's off */
-            if (is_on)
-                setworn(obj, mask), Ring_on(obj);
+            if (is_on) {
+                setworn(obj, mask); Ring_on(obj);
+            }
             /* oartifact: if a touch-sensitive artifact ring is
                ever created the above will need to be revised  */
             /* update shop bill to reflect new higher price */
@@ -2555,7 +2556,7 @@ struct _create_particular_data *d;
             /* otherwise try again */
             continue;
         }
-        mx = mtmp->mx, my = mtmp->my;
+        mx = mtmp->mx; my = mtmp->my;
         /* 'is_FOO()' ought to be called 'always_FOO()' */
         if (d->fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data))
             mtmp->female = d->fem; /* ignored for is_neuter() */

@@ -3118,8 +3118,9 @@ boolean FDECL((*proc), (char *));
 
                 if (!config_error_nextline(inbuf)) {
                     rv = FALSE;
-                    if (buf)
-                        free(buf), buf = (char *) 0;
+                    if (buf) {
+                        free(buf); buf = (char *) 0;
+                    }
                     break;
                 }
 

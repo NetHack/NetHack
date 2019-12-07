@@ -109,7 +109,7 @@ moverock()
     register struct trap *ttmp;
     register struct monst *mtmp;
 
-    sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
+    sx = u.ux + u.dx; sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
         /* make sure that this boulder is visible as the top object */
         if (otmp != level.objects[sx][sy])
@@ -1281,7 +1281,7 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
         if (anchored) {
             coord cc;
 
-            cc.x = u.ux, cc.y = u.uy;
+            cc.x = u.ux; cc.y = u.uy;
             /* can move normally within radius 1 of buried ball */
             if (buried_ball(&cc) && dist2(x, y, cc.x, cc.y) <= 2) {
                 /* ugly hack: we need to issue some message here
@@ -1795,43 +1795,47 @@ domove_core()
         /* seemimic/newsym should be done before moving hero, otherwise
            the display code will draw the hero here before we possibly
            cancel the swap below (we can ignore steed mx,my here) */
-        u.ux = u.ux0, u.uy = u.uy0;
+        u.ux = u.ux0; u.uy = u.uy0;
         mtmp->mundetected = 0;
         if (M_AP_TYPE(mtmp))
             seemimic(mtmp);
         else if (!mtmp->mtame)
             newsym(mtmp->mx, mtmp->my);
-        u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
+        u.ux = mtmp->mx; u.uy = mtmp->my; /* resume swapping positions */
 
         if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
             && is_pit(trap->ttyp)
             && sobj_at(BOULDER, trap->tx, trap->ty)) {
             /* can't swap places with pet pinned in a pit by a boulder */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+            u.ux = u.ux0; u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed) {
+                u.usteed->mx = u.ux; u.usteed->my = u.uy;
+            }
         } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
             /* can't swap places when pet can't move to your spot */
-            u.ux = u.ux0, u.uy = u.uy0;
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+            u.ux = u.ux0; u.uy = u.uy0;
+            if (u.usteed) {
+                u.usteed->mx = u.ux; u.usteed->my = u.uy;
+            }
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
         } else if (u_with_boulder
                     && !(verysmall(mtmp->data)
                          && (!mtmp->minvent || (curr_mon_load(mtmp) <= 600)))) {
             /* can't swap places when pet won't fit there with the boulder */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+            u.ux = u.ux0; u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed) {
+                u.usteed->mx = u.ux; u.usteed->my = u.uy;
+            }
             You("stop.  %s won't fit into the same spot that you're at.",
                  upstart(y_monnam(mtmp)));
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
             /* can't swap places when pet won't fit thru the opening */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+            u.ux = u.ux0; u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed) {
+                u.usteed->mx = u.ux; u.usteed->my = u.uy;
+            }
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
         } else {
             char pnambuf[BUFSZ];
@@ -2164,7 +2168,7 @@ boolean pick;
 
     ++inspoteffects;
     spotterrain = levl[u.ux][u.uy].typ;
-    spotloc.x = u.ux, spotloc.y = u.uy;
+    spotloc.x = u.ux; spotloc.y = u.uy;
 
     /* moving onto different terrain might cause Lev or Fly to toggle */
     if (spotterrain != levl[u.ux0][u.uy0].typ || !on_level(&u.uz, &u.uz0))

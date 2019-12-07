@@ -3103,9 +3103,9 @@ boolean tinitial, tfrom_file;
             wizard = discover = FALSE;
         } else if (!strncmpi(op, "explore", 6)
                    || !strncmpi(op, "discovery", 6)) {
-            wizard = FALSE, discover = TRUE;
+            wizard = FALSE; discover = TRUE;
         } else if (!strncmpi(op, "debug", 5) || !strncmpi(op, "wizard", 6)) {
-            wizard = TRUE, discover = FALSE;
+            wizard = TRUE; discover = FALSE;
         } else {
             config_error_add("Invalid value for \"%s\":%s", fullname, op);
             return FALSE;
@@ -4667,7 +4667,7 @@ doset() /* changing options via menu by Per Liboriussen */
                     preference_update(compopt[opt_indx].name);
             }
         }
-        free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
+        free((genericptr_t) pick_list); pick_list = (menu_item *) 0;
     }
 
     destroy_nhwindow(tmpwin);
@@ -5217,7 +5217,7 @@ boolean setinitial, setfromfile;
                 for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx)
                     free_one_msgtype(pick_list[pick_idx].item.a_int - 1
                                            - pick_idx);
-                free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
+                free((genericptr_t) pick_list); pick_list = (menu_item *) 0;
             }
             destroy_nhwindow(tmpwin);
             if (pick_cnt >= 0)
@@ -5306,7 +5306,7 @@ boolean setinitial, setfromfile;
                 for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx)
                     free_one_menu_coloring(pick_list[pick_idx].item.a_int - 1
                                            - pick_idx);
-                free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
+                free((genericptr_t) pick_list); pick_list = (menu_item *) 0;
             }
             destroy_nhwindow(tmpwin);
             if (pick_cnt >= 0)
@@ -5374,7 +5374,7 @@ boolean setinitial, setfromfile;
                     remove_autopickup_exception(
                                          (struct autopickup_exception *)
                                              pick_list[pick_idx].item.a_void);
-                free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
+                free((genericptr_t) pick_list); pick_list = (menu_item *) 0;
             }
             destroy_nhwindow(tmpwin);
             if (pick_cnt >= 0)
@@ -5512,10 +5512,12 @@ boolean setinitial, setfromfile;
         /* clean up */
         while ((sl = symset_list) != 0) {
             symset_list = sl->next;
-            if (sl->name)
-                free((genericptr_t) sl->name), sl->name = (char *) 0;
-            if (sl->desc)
-                free((genericptr_t) sl->desc), sl->desc = (char *) 0;
+            if (sl->name) {
+                free((genericptr_t) sl->name); sl->name = (char *) 0;
+            }
+            if (sl->desc) {
+                free((genericptr_t) sl->desc); sl->desc = (char *) 0;
+            }
             free((genericptr_t) sl);
         }
 
@@ -6287,7 +6289,7 @@ const char *str;
         Strcat(buf, ", ");
     } else {
         putstr(datawin, 0, str);
-        free((genericptr_t) buf), buf = 0;
+        free((genericptr_t) buf); buf = 0;
     }
     return;
 }

@@ -388,14 +388,15 @@ struct obj *pick;
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
                 it = 0;
-                if (otmp->obroken)
+                if (otmp->obroken) {
                     verb = "fix";
-                else if (!otmp->olocked)
-                    verb = "lock", it = 1;
-                else if (picktyp != LOCK_PICK)
-                    verb = "unlock", it = 1;
-                else
+                } else if (!otmp->olocked) {
+                    verb = "lock"; it = 1;
+                } else if (picktyp != LOCK_PICK) {
+                    verb = "unlock"; it = 1;
+                } else {
                     verb = "pick";
+                }
 
                 /* "There is <a box> here; <verb> <it|its lock>?" */
                 Sprintf(qsfx, " here; %s %s?", verb, it ? "it" : "its lock");
@@ -968,7 +969,7 @@ int x, y;
                 return FALSE;
             }
             block_point(x, y);
-            door->typ = SDOOR, door->doormask = D_NODOOR;
+            door->typ = SDOOR; door->doormask = D_NODOOR;
             if (vis)
                 pline_The("doorway vanishes!");
             newsym(x, y);

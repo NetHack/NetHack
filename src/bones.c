@@ -482,7 +482,7 @@ struct obj *corpse;
     resetobjs(level.buriedobjlist, FALSE);
 
     /* Hero is no longer on the map. */
-    u.ux0 = u.ux, u.uy0 = u.uy;
+    u.ux0 = u.ux; u.uy0 = u.uy;
     u.ux = u.uy = 0;
 
     /* Clear all memory from the level. */
@@ -508,7 +508,7 @@ struct obj *corpse;
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
     Strcpy(newbones->when, yyyymmddhhmmss(when));
     /* final resting place, used to decide when bones are discovered */
-    newbones->frpx = u.ux0, newbones->frpy = u.uy0;
+    newbones->frpx = u.ux0; newbones->frpy = u.uy0;
     newbones->bonesknown = FALSE;
     /* if current character died on a bones level, the cemetery list
        will have multiple entries, most recent (this dead hero) first */
