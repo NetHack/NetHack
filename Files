@@ -50,9 +50,9 @@ fixes30.pl08   fixes30.pl09   fixes30.pl10   fixes31.1      fixes31.2
 fixes31.3      fixes32.0      fixes32.1      fixes32.2      fixes32.3
 fixes33.0      fixes33.1      fixes34.0      fixes34.1      fixes34.2
 fixes34.3      fixes35.0      fixes36.0      fixes36.1      fixes36.2
-fixes36.3      lev_comp.6     lev_comp.txt   makedefs.6     makedefs.txt
-mn.7           mnh.7          nethack.6      nethack.txt    recover.6
-recover.txt    tmac.n         tmac.nh        window.doc
+fixes36.3      fixes36.4      lev_comp.6     lev_comp.txt   makedefs.6
+makedefs.txt   mn.7           mnh.7          nethack.6      nethack.txt
+recover.6      recover.txt    tmac.n         tmac.nh        window.doc
 
 include:
 (files for GEM versions)
