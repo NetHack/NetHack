@@ -603,10 +603,10 @@ objects.o:
 	@rm -f $(MAKEDEFS)
 
 # Qt 3 windowport meta-object-compiler output
-qt_kde0.moc: ../include/qt_kde0.h
+qt3kde0.moc: ../include/qt_kde0.h
 	$(QTDIR)/bin/moc -o qt_kde0.moc ../include/qt_kde0.h
 
-qt_win.moc: ../include/qt_win.h
+qt3win.moc: ../include/qt_win.h
 	$(QTDIR)/bin/moc -o qt_win.moc ../include/qt_win.h
 
 qttableview.moc: ../include/qttableview.h
@@ -914,12 +914,20 @@ gr_rect.o: ../win/gem/gr_rect.c ../include/gr_rect.h
 tile.o: tile.c $(HACK_H)
 cppregex.o: ../sys/share/cppregex.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ ../sys/share/cppregex.cpp
-qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
+qt3win.o: ../win/Qt3/qt_win.cpp $(HACK_H) ../include/func_tab.h \
 		../include/dlb.h ../include/patchlevel.h ../include/tile2x11.h \
 		../include/qt_win.h ../include/qt_clust.h ../include/qt_kde0.h \
-		../include/qt_xpms.h qt_win.moc qt_kde0.moc qttableview.moc
+		../include/qt_xpms.h qt3win.moc qt3kde0.moc qttableview.moc
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt_win.cpp
+qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_win.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_click.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h ../win/Qt/qt_key.h \
+		../win/Qt/qt_icon.h ../win/Qt/qt_map.h ../win/Qt/qt_menu.h \
+		../win/Qt/qt_msg.h ../win/Qt/qt_set.h ../win/Qt/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
-qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
+qt3clust.o: ../win/Qt3/qt_clust.cpp ../include/qt_clust.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt_clust.cpp
+qt_clust.o: ../win/Qt/qt_clust.cpp ../win/Qt/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_clust.cpp
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qttableview.cpp
@@ -933,8 +941,6 @@ qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_bind.h \
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_bind.cpp
 qt_click.o: ../win/Qt/qt_click.cpp $(HACK_H) ../win/Qt/qt_click.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_click.cpp
-qt_clust.o: ../win/Qt/qt_clust.cpp ../win/Qt/qt_clust.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_clust.cpp
 qt_delay.o: ../win/Qt/qt_delay.cpp $(HACK_H) ../win/Qt/qt_delay.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_delay.cpp
 qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) ../include/tile2x11.h \
@@ -987,12 +993,6 @@ qt_streq.o: ../win/Qt/qt_streq.cpp $(HACK_H) ../win/Qt/qt_streq.h \
 qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../win/Qt/qt_svsel.h \
 		../win/Qt/qt_bind.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_svsel.cpp
-qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_win.h \
-		../win/Qt/qt_bind.h ../win/Qt/qt_click.h \
-		../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h ../win/Qt/qt_key.h \
-		../win/Qt/qt_icon.h ../win/Qt/qt_map.h ../win/Qt/qt_menu.h \
-		../win/Qt/qt_msg.h ../win/Qt/qt_set.h ../win/Qt/qt_clust.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
 qt_xcmd.o: ../win/Qt/qt_xcmd.cpp $(HACK_H) ../include/func_tab.h \
 		../win/Qt/qt_xcmd.h qt_xcmd.moc ../win/Qt/qt_bind.h \
 		../win/Qt/qt_set.h ../win/Qt/qt_str.h
