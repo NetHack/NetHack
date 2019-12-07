@@ -69,6 +69,11 @@ matrix:
               sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
               make fetch-lua && make install
               cat dat/options
+    - os: windows
+      env: DESCR=windows-visualstudio
+      language: shell
+      script:
+        - ./win/win32/vs2017/travisci.sh
     - os: linux
       env: DESCR=msdos-cross-on-linux HINTS=linux LUA_VERSION=5.3.5
       compiler: gcc
@@ -79,11 +84,6 @@ matrix:
         - cd lib/lua-$LUA_VERSION/src && make a && cd ../../.. 
         - sh sys/msdos/msdos-cross-compile.sh
   exclude:
-    - os: windows
-      env: DESCR=windows-visualstudio
-      language: shell
-      script:
-        - ./win/win32/vs2017/travisci.sh
     - os: windows
 #     install: choco install mingw
       env: DESCR=windows-mingw

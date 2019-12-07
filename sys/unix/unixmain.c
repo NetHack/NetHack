@@ -498,12 +498,13 @@ boolean wr;
 #ifdef VAR_PLAYGROUND
         int len = strlen(VAR_PLAYGROUND);
 
-        fqn_prefix[SCOREPREFIX] = (char *) alloc(len + 2);
-        Strcpy(fqn_prefix[SCOREPREFIX], VAR_PLAYGROUND);
-        if (fqn_prefix[SCOREPREFIX][len - 1] != '/') {
-            fqn_prefix[SCOREPREFIX][len] = '/';
-            fqn_prefix[SCOREPREFIX][len + 1] = '\0';
+        g.fqn_prefix[SCOREPREFIX] = (char *) alloc(len + 2);
+        Strcpy(g.fqn_prefix[SCOREPREFIX], VAR_PLAYGROUND);
+        if (g.fqn_prefix[SCOREPREFIX][len - 1] != '/') {
+            g.fqn_prefix[SCOREPREFIX][len] = '/';
+            g.fqn_prefix[SCOREPREFIX][len + 1] = '\0';
         }
+
 #endif
     }
 
@@ -523,11 +524,11 @@ boolean wr;
      */
     if (wr) {
 #ifdef VAR_PLAYGROUND
-        fqn_prefix[LEVELPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[SAVEPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[BONESPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[LOCKPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[TROUBLEPREFIX] = fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[LEVELPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[SAVEPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[BONESPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[LOCKPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[TROUBLEPREFIX] = g.fqn_prefix[SCOREPREFIX];
 #endif
         check_recordfile(dir);
     }
