@@ -604,10 +604,10 @@ objects.o:
 
 # Qt 3 windowport meta-object-compiler output
 qt3kde0.moc: ../include/qt_kde0.h
-	$(QTDIR)/bin/moc -o qt_kde0.moc ../include/qt_kde0.h
+	$(QTDIR)/bin/moc -o qt3kde0.moc ../include/qt_kde0.h
 
 qt3win.moc: ../include/qt_win.h
-	$(QTDIR)/bin/moc -o qt_win.moc ../include/qt_win.h
+	$(QTDIR)/bin/moc -o qt3win.moc ../include/qt_win.h
 
 qttableview.moc: ../include/qttableview.h
 	$(QTDIR)/bin/moc -o qttableview.moc ../include/qttableview.h
