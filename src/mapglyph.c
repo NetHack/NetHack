@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1573943501 2019/11/16 22:31:41 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1575755075 2019/12/07 21:44:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -138,8 +138,52 @@ unsigned mgflags;
            if they use the same symbol and color is disabled */
         } else if (!iflags.use_color && offset == S_lava
                    && (g.showsyms[idx] == g.showsyms[S_pool + SYM_OFF_P]
-                       || g.showsyms[idx] == g.showsyms[S_water + SYM_OFF_P])) {
+                       || g.showsyms[idx]
+                          == g.showsyms[S_water + SYM_OFF_P])) {
             special |= MG_BW_LAVA;
+        } else if (offset == S_altar && iflags.use_color) {
+            if ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz))
+                && (levl[x][y].altarmask & AM_SHRINE)) {
+                /* high altar */
+                color = CLR_BRIGHT_MAGENTA;
+            } else {
+                switch (levl[x][y].altarmask & AM_MASK) {
+#if 0   /*
+         * On OSX with XTERM=xterm-color256 these render as
+         *  white -> tty: gray, curses: ok
+         *  gray  -> both tty and curses: black
+         *  black -> both tty and curses: blue
+         *  red   -> both tty and curses: ok.
+         * Since the colors have specific associations (mainly with
+         * the unicorns matched with each alignment), we shouldn't use
+         * scrambled colors and we don't have sufficient information
+         * to handle platform-specific variations.
+         */
+                case AM_LAWFUL:  /* 4 */
+                    color = CLR_WHITE;
+                    break;
+                case AM_NEUTRAL: /* 2 */
+                    color = CLR_GRAY;
+                    break;
+                case AM_CHAOTIC: /* 1 */
+                    color = CLR_BLACK;
+                    break;
+#else /* !0: TEMP? */
+                case AM_LAWFUL:  /* 4 */
+                case AM_NEUTRAL: /* 2 */
+                case AM_CHAOTIC: /* 1 */
+                    cmap_color(S_altar); /* gray */
+                    break;
+#endif /* 0 */
+                case AM_NONE:    /* 0 */
+                    color = CLR_RED;
+                    break;
+                default: /* 3, 5..7 -- shouldn't happen but 3 was possible
+                          * prior to 3.6.3 (due to faulty sink polymorph) */
+                    color = NO_COLOR;
+                    break;
+                }
+            }
         } else {
             cmap_color(offset);
         }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1573346192 2019/11/10 00:36:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1575755077 2019/12/07 21:44:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1384,6 +1384,7 @@ dosacrifice()
                 /* curse the lawful/neutral altar */
                 pline_The("altar is stained with %s blood.", g.urace.adj);
                 levl[u.ux][u.uy].altarmask = AM_CHAOTIC;
+                newsym(u.ux, u.uy); /* in case Invisible to self */
                 angry_priest();
             } else {
                 struct monst *dmon;
@@ -1640,15 +1641,16 @@ dosacrifice()
                     a_gname());
                 if (rn2(8 + u.ulevel) > 5) {
                     struct monst *pri;
+                    boolean shrine;
+
                     You_feel("the power of %s increase.", u_gname());
                     exercise(A_WIS, TRUE);
                     change_luck(1);
-                    /* Yes, this is supposed to be &=, not |= */
-                    levl[u.ux][u.uy].altarmask &= AM_SHRINE;
-                    /* the following accommodates stupid compilers */
-                    levl[u.ux][u.uy].altarmask =
-                        levl[u.ux][u.uy].altarmask
-                        | (Align2amask(u.ualign.type));
+                    shrine = on_shrine();
+                    levl[u.ux][u.uy].altarmask = Align2amask(u.ualign.type);
+                    if (shrine)
+                        levl[u.ux][u.uy].altarmask |= AM_SHRINE;
+                    newsym(u.ux, u.uy); /* in case Invisible to self */
                     if (!Blind)
                         pline_The("altar glows %s.",
                                   hcolor((u.ualign.type == A_LAWFUL)

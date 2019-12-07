@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ $NHDT-Date: 1575542023 2019/12/05 10:33:43 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.19 $ $NHDT-Date: 1575755075 2019/12/07 21:44:35 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -40,6 +40,7 @@ split off some of the functionality that was in makedefs (compiled-in options
 	and accessed on the target platform
 replace quest.txt and associated conversion to quest.dat via makedefs with
 	lua quest texts loaded at runtime
+some altars are displayed in different colors (for tty and curses at least)
 
 
 Platform- and/or Interface-Specific New Features
