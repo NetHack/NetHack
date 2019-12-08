@@ -944,7 +944,7 @@ void
 set_savefile_name(regularize_it)
 boolean regularize_it;
 {
-    int idx = 0, regoffset = 0, overflow = 0,  
+    int idx = historical, regoffset = 0, overflow = 0,  
         indicator_spot = 0; /* 0=no indicator, 1=before ext, 2=after ext */
     const char *postappend = (const char *) 0,
                *sfindicator = (const char *) 0;
@@ -958,7 +958,6 @@ boolean regularize_it;
            place it into the save file.
         */
         idx = historical;
-        sfindicator = sfoprocs[idx].ext;
     }
 #ifdef VMS
     Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
