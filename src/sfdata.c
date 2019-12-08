@@ -215,6 +215,7 @@ int cnt;
     sfo_int(nhfp, &d_context_info->current_fruit, parent, "current_fruit", 1);/* (int) */
     sfo_int(nhfp, &d_context_info->warnlevel, parent, "warnlevel", 1);/* (int) */
     sfo_int(nhfp, &d_context_info->rndencode, parent, "rndencode", 1);/* (int) */
+    sfo_int(nhfp, &d_context_info->mysteryforce, parent, "mysteryforce", 1);/* (int) */
     sfo_long(nhfp, &d_context_info->next_attrib_check, parent, "next_attrib_check", 1);/* (long) */
     sfo_long(nhfp, &d_context_info->stethoscope_move, parent, "stethoscope_move", 1);/* (long) */
     sfo_short(nhfp, &d_context_info->stethoscope_movement, parent, "stethoscope_movement", 1);/* (short) */
@@ -2585,6 +2586,7 @@ int cnt;
     sfi_int(nhfp, &d_context_info->current_fruit, parent, "current_fruit", 1);
     sfi_int(nhfp, &d_context_info->warnlevel, parent, "warnlevel", 1);
     sfi_int(nhfp, &d_context_info->rndencode, parent, "rndencode", 1);
+    sfi_int(nhfp, &d_context_info->mysteryforce, parent, "mysteryforce", 1);
     sfi_long(nhfp, &d_context_info->next_attrib_check, parent, "next_attrib_check", 1);
     sfi_long(nhfp, &d_context_info->stethoscope_move, parent, "stethoscope_move", 1);
     sfi_short(nhfp, &d_context_info->stethoscope_movement, parent, "stethoscope_movement", 1);
@@ -5305,6 +5307,7 @@ const char *critical_members[] = {
 	"struct context_info:current_fruit:int",
 	"struct context_info:warnlevel:int",
 	"struct context_info:rndencode:int",
+	"struct context_info:mysteryforce:int",
 	"struct context_info:next_attrib_check:long",
 	"struct context_info:stethoscope_move:long",
 	"struct context_info:stethoscope_movement:short",
