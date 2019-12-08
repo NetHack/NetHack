@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1575245076 2019/12/02 00:04:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.255 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1575768412 2019/12/08 01:26:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.273 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4239,6 +4239,65 @@ struct obj *gloves;
             return gauntlets;
     }
     return "gloves";
+}
+
+/* boots vs shoes; depends upon discovery state */
+const char *
+boots_simple_name(boots)
+struct obj *boots;
+{
+    static const char shoes[] = "shoes";
+
+    if (boots && boots->dknown) {
+        int otyp = boots->otyp;
+        struct objclass *ocl = &objects[otyp];
+        const char *actualn = OBJ_NAME(*ocl),
+                   *descrpn = OBJ_DESCR(*ocl);
+
+        if (strstri(descrpn, shoes)
+            || (objects[otyp].oc_name_known && strstri(actualn, shoes)))
+            return shoes;
+    }
+    return "boots";
+}
+
+/* simplified shield for messages */
+const char *
+shield_simple_name(shield)
+struct obj *shield;
+{
+    if (shield) {
+        /* xname() describes unknown (unseen) reflection as smooth */
+        if (shield->otyp == SHIELD_OF_REFLECTION)
+            return shield->dknown ? "silver shield" : "smooth shield";
+        /*
+         * We might distinguish between wooden vs metallic or
+         * light vs heavy to give small benefit to spell casters.
+         * Fighter types probably care more about the former for
+         * vulnerability to fire or rust.
+         *
+         * We could do that both ways: light wooden shield, light
+         * metallic shield (there aren't any), heavy wooden shield,
+         * and heavy metallic shield but that's getting away from
+         * "simple name" which is intended to be shorter as well
+         * as less detailed than xname().
+         */
+#if 0
+        /* spellcasting uses a division like this */
+        return (weight(shield) > (int) objects[SMALL_SHIELD].oc_weight)
+               ? "heavy shield"
+               : "light shield";
+#endif
+    }
+    return "shield";
+}
+
+/* for completness */
+const char *
+shirt_simple_name(shirt)
+struct obj *shirt UNUSED;
+{
+    return "shirt";
 }
 
 const char *

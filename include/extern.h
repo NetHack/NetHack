@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1574648937 2019/11/25 02:28:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.760 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1575768406 2019/12/08 01:26:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.766 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1796,6 +1796,9 @@ E const char *FDECL(suit_simple_name, (struct obj *));
 E const char *FDECL(cloak_simple_name, (struct obj *));
 E const char *FDECL(helm_simple_name, (struct obj *));
 E const char *FDECL(gloves_simple_name, (struct obj *));
+E const char *FDECL(boots_simple_name, (struct obj *));
+E const char *FDECL(shield_simple_name, (struct obj *));
+E const char *FDECL(shirt_simple_name, (struct obj *));
 E const char *FDECL(mimic_obj_name, (struct monst *));
 E char *FDECL(safe_qbuf, (char *, const char *, const char *, struct obj *,
                           char *(*)(OBJ_P), char *(*)(OBJ_P), const char *));
