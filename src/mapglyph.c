@@ -9,8 +9,10 @@
 #include "color.h"
 #define HI_DOMESTIC CLR_WHITE /* monst.c */
 
+#if 0
 #if !defined(TTY_GRAPHICS)
 #define has_color(n) TRUE
+#endif
 #endif
 
 #ifdef TEXTCOLOR
@@ -57,6 +59,10 @@ static const int explcolors[] = {
 #define is_objpile(x,y) (!Hallucination && g.level.objects[(x)][(y)] \
                          && g.level.objects[(x)][(y)]->nexthere)
 
+#define GMAP_SET                 0x00000001
+#define GMAP_ROGUELEVEL          0x00000002
+#define GMAP_ALTARCOLOR          0x00000004
+
 /*ARGSUSED*/
 int
 mapglyph(glyph, ochar, ocolor, ospecial, x, y, mgflags)
@@ -74,6 +80,21 @@ unsigned mgflags;
             is_you = (x == u.ux && y == u.uy),
             has_rogue_color = (has_rogue_ibm_graphics
                                && g.symset[g.currentgraphics].nocolor == 0);
+
+    if (!g.glyphmap_perlevel_flags) {
+        /*
+         *    GMAP_SET                0x00000001
+         *    GMAP_ROGUELEVEL         0x00000002
+         *    GMAP_ALTARCOLOR         0x00000004
+         */
+        g.glyphmap_perlevel_flags |= GMAP_SET;
+
+        if (Is_rogue_level(&u.uz)) {
+            g.glyphmap_perlevel_flags |= GMAP_ROGUELEVEL;
+        } else if ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) {
+            g.glyphmap_perlevel_flags |= GMAP_ALTARCOLOR;
+        }
+    }
 
     /*
      *  Map the glyph back to a character and color.
@@ -142,7 +163,7 @@ unsigned mgflags;
                           == g.showsyms[S_water + SYM_OFF_P])) {
             special |= MG_BW_LAVA;
         } else if (offset == S_altar && iflags.use_color) {
-            if ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz))
+            if ((g.glyphmap_perlevel_flags & GMAP_ALTARCOLOR)
                 && (levl[x][y].altarmask & AM_SHRINE)) {
                 /* high altar */
                 color = CLR_BRIGHT_MAGENTA;
@@ -273,14 +294,16 @@ unsigned mgflags;
 
         if ((special & MG_PET) != 0) {
             ovidx = SYM_PET_OVERRIDE + SYM_OFF_X;
-            if (Is_rogue_level(&u.uz) ? g.ov_rogue_syms[ovidx]
-                                      : g.ov_primary_syms[ovidx])
+            if ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL)
+                    ? g.ov_rogue_syms[ovidx]
+                    : g.ov_primary_syms[ovidx])
                 idx = ovidx;
         }
         if (is_you) {
             ovidx = SYM_HERO_OVERRIDE + SYM_OFF_X;
-            if (Is_rogue_level(&u.uz) ? g.ov_rogue_syms[ovidx]
-                                      : g.ov_primary_syms[ovidx])
+            if ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL)
+                    ? g.ov_rogue_syms[ovidx]
+                    : g.ov_primary_syms[ovidx])
                 idx = ovidx;
         }
     }
@@ -288,7 +311,8 @@ unsigned mgflags;
     ch = g.showsyms[idx];
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
-    if (!has_color(color) || (Is_rogue_level(&u.uz) && !has_rogue_color))
+    if (!has_color(color) ||
+            ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL) && !has_rogue_color))
 #endif
         color = NO_COLOR;
     *ochar = (int) ch;
