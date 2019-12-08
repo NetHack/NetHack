@@ -1,4 +1,4 @@
-/* NetHack 3.6	context.h	$NHDT-Date: 1455907260 2016/02/19 18:41:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.6	context.h	$NHDT-Date: 1575775592 2019/12/08 03:26:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -115,6 +115,7 @@ struct context_info {
     int current_fruit; /* fruit->fid corresponding to g.pl_fruit[] */
     int warnlevel;
     int rndencode;          /* randomized escape sequence introducer */
+    int mysteryforce;
     long next_attrib_check; /* next attribute check */
     long stethoscope_move;
     short stethoscope_movement;
