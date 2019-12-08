@@ -2655,6 +2655,7 @@ lua_State *L;
     tmpobj.recharged = 0;
     tmpobj.greased = 0;
     tmpobj.broken = 0;
+    tmpobj.containment = 0;
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         const char *paramstr = luaL_checkstring(L, 1);
