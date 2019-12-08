@@ -307,25 +307,24 @@ dlb_main.c  makedefs.c  mdgrep.h    mdgrep.pl   panic.c     readtags.c
 recover.c
 
 win/Qt:
+(files for the Qt 4 or 5 widget library - X11, Windows, Mac OS X)
+qt_bind.cpp   qt_bind.h     qt_click.cpp  qt_click.h    qt_clust.cpp
+qt_clust.h    qt_delay.cpp  qt_delay.h    qt_glyph.cpp  qt_glyph.h
+qt_icon.cpp   qt_icon.h     qt_inv.cpp    qt_inv.h      qt_kde0.h
+qt_key.cpp    qt_key.h      qt_line.cpp   qt_line.h     qt_main.cpp
+qt_main.h     qt_map.cpp    qt_map.h      qt_menu.cpp   qt_menu.h
+qt_msg.cpp    qt_msg.h      qt_plsel.cpp  qt_plsel.h    qt_rip.cpp
+qt_rip.h      qt_set.cpp    qt_set.h      qt_stat.cpp   qt_stat.h
+qt_str.cpp    qt_str.h      qt_streq.cpp  qt_streq.h    qt_svsel.cpp
+qt_svsel.h    qt_win.cpp    qt_win.h      qt_xcmd.cpp   qt_xcmd.h
+qt_yndlg.cpp  qt_yndlg.h
+
+win/Qt3:
 (files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
 Info.plist           Install.Qt           knethack.lnk
-knh-mini.xpm         knh.xpm              nhicns.uu
-nhsplash.xpm         qpe-nethack.control  qt_clust.cpp
-qt_win.cpp           qttableview.cpp      tileedit.cpp
-tileedit.h
-
-win/Qt4:
-(files for the Qt 4 widget library - X11, Windows, Mac OS X)
-qt4bind.cpp   qt4bind.h     qt4click.cpp  qt4click.h    qt4clust.cpp
-qt4clust.h    qt4delay.cpp  qt4delay.h    qt4glyph.cpp  qt4glyph.h
-qt4icon.cpp   qt4icon.h     qt4inv.cpp    qt4inv.h      qt4kde0.h
-qt4key.cpp    qt4key.h      qt4line.cpp   qt4line.h     qt4main.cpp
-qt4main.h     qt4map.cpp    qt4map.h      qt4menu.cpp   qt4menu.h
-qt4msg.cpp    qt4msg.h      qt4plsel.cpp  qt4plsel.h    qt4rip.cpp
-qt4rip.h      qt4set.cpp    qt4set.h      qt4stat.cpp   qt4stat.h
-qt4str.cpp    qt4str.h      qt4streq.cpp  qt4streq.h    qt4svsel.cpp
-qt4svsel.h    qt4win.cpp    qt4win.h      qt4xcmd.cpp   qt4xcmd.h
-qt4yndlg.cpp  qt4yndlg.h
+knh-mini.xpm         knh.xpm              qpe-nethack.control
+qt_clust.cpp         qt_win.cpp           qttableview.cpp
+tileedit.cpp         tileedit.h
 
 win/X11:
 (files for X versions)
@@ -366,10 +365,10 @@ NetHackTerm.applescript       recover.pl
 
 win/share:
 (files for versions using optional tiles)
-bmptiles.c     gifread.c      giftiles.c     monsters.txt   objects.txt
-other.txt      ppmwrite.c     renumtiles.pl  safeproc.c     thintile.c
-tile.doc       tile.h         tile2bmp.c     tilemap.c      tileset.c
-tiletext.c
+bmptiles.c     gifread.c      giftiles.c     monsters.txt   nhicns.uu
+nhsplash.xpm   objects.txt    other.txt      ppmwrite.c     renumtiles.pl
+safeproc.c     thintile.c     tile.doc       tile.h         tile2bmp.c
+tilemap.c      tileset.c      tiletext.c
 
 win/tty:
 (files for tty versions)
