@@ -5,7 +5,6 @@
 
 #include "hack.h"
 #include "lev.h"
-#include "sfproto.h"
 
 
 #ifdef MFLOPPY
@@ -555,10 +554,6 @@ struct obj *corpse;
             bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
             bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nnn */
         }
-        if (nhfp->fieldlevel) {
-            sfo_char(nhfp, &c, "bones", "bones_count", 1);
-            sfo_char(nhfp, bonesid, "bones", "bonesid", (int) c);
-        }
         savefruitchn(nhfp);
         if (nhfp->structlevel)
             bflush(nhfp->fd);
@@ -580,11 +575,6 @@ struct obj *corpse;
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
         bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c);	/* DD.nnn */
-        savefruitchn(nhfp);
-    }
-    if (nhfp->fieldlevel) {
-        sfo_char(nhfp, &c, "bones", "bones_count", 1);
-        sfo_char(nhfp, bonesid, "bones", "bonesid", (int) c); 	/* DD.nnn */
         savefruitchn(nhfp);
     }
     update_mlstmv(); /* update monsters for eventual restoration */
@@ -640,11 +630,6 @@ getbones()
             mread(nhfp->fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
             mread(nhfp->fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
         }
-        if (nhfp->fieldlevel) {
-            sfi_char(nhfp, &c, "bones", "bones_count", 1); /* length incl. '\0' */
-            for (i = 0; i < (int) c; ++i)
-                sfi_char(nhfp, &oldbonesid[i], "bones", "bonesid", 1);
-	}
         if (strcmp(bonesid, oldbonesid) != 0
             /* from 3.3.0 through 3.6.0, bones in the quest branch stored
                a bogus bonesid in the file; 3.6.1 fixed that, but for

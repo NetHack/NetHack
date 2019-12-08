@@ -7,8 +7,6 @@
 #include "dgn_file.h"
 #include "dlb.h"
 #include "lev.h"
-#include "sfproto.h"
-
 
 #define DUNGEON_FILE "dungeon.lua"
 
@@ -149,26 +147,14 @@ boolean perform_write, free_data;
             bwrite(nhfp->fd, (genericptr_t) &g.dungeon_topology, sizeof g.dungeon_topology);
             bwrite(nhfp->fd, (genericptr_t) g.tune, sizeof tune);
         }
-        if (nhfp->fieldlevel) {
-            sfo_int(nhfp, &g.n_dgns, "dungeon", "dungeon_count", 1);
-            for (i = 0; i < g.n_dgns; ++i)
-                sfo_dungeon(nhfp, &g.dungeons[i], "dungeon", "dungeon", 1);
-            sfo_dgn_topology(nhfp, &g.dungeon_topology, "dungeon", "g.dungeon_topology", 1);
-            for (i = 0; i < (int) sizeof tune; ++i)
-                sfo_char(nhfp, &g.tune[i], "dungeon", "tune", 1);
-        }
         for (count = 0, curr = g.branches; curr; curr = curr->next)
             count++;
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &count, sizeof(count));
-        if (nhfp->fieldlevel)
-            sfo_int(nhfp, &count, "dungeon", "branch_count", 1);
 
         for (curr = g.branches; curr; curr = curr->next) {
           if (nhfp->structlevel)
               bwrite(nhfp->fd, (genericptr_t) curr, sizeof(branch));
-          if (nhfp->fieldlevel)
-              sfo_branch(nhfp, curr, "dungeon", "branch", 1);
         }
         count = maxledgerno();
         if (nhfp->structlevel) { 
@@ -177,20 +163,12 @@ boolean perform_write, free_data;
                    (unsigned) count * sizeof(struct linfo));
             bwrite(nhfp->fd, (genericptr_t) &g.inv_pos, sizeof g.inv_pos);
         }
-        if (nhfp->fieldlevel) {
-            sfo_int(nhfp, &count, "dungeon", "level_info_count", 1);
-            for (i = 0; i < count; ++i)
-                sfo_linfo(nhfp, &g.level_info[i], "dungeon", "g.level_info", 1);
-            sfo_nhcoord(nhfp, &g.inv_pos, "dungeon", "g.inv_pos", 1);
-        }
         for (count = 0, curr_ms = g.mapseenchn; curr_ms;
              curr_ms = curr_ms->next)
             count++;
 
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &count, sizeof(count));
-        if (nhfp->fieldlevel)
-            sfo_int(nhfp, &count, "dungeon", "mapseen_count", 1);
 
         for (curr_ms = g.mapseenchn; curr_ms; curr_ms = curr_ms->next) {
             save_mapseen(nhfp, curr_ms);
@@ -230,27 +208,15 @@ NHFILE *nhfp;
         mread(nhfp->fd, (genericptr_t) &g.dungeon_topology, sizeof g.dungeon_topology);
         mread(nhfp->fd, (genericptr_t) g.tune, sizeof tune);
     }
-    if (nhfp->fieldlevel) {
-        sfi_int(nhfp, &g.n_dgns, "dungeon", "dungeon_count", 1);
-        for (i = 0; i < g.n_dgns; ++i)
-            sfi_dungeon(nhfp, &g.dungeons[i], "dungeon", "dungeon", 1);
-        sfi_dgn_topology(nhfp, &g.dungeon_topology, "dungeon", "g.dungeon_topology", 1);
-        for (i = 0; i < (int) sizeof tune; ++i)
-            sfi_char(nhfp, &g.tune[i], "dungeon", "tune", 1);
-    }
     last = g.branches = (branch *) 0;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &count, "dungeon", "branch_count", 1);
 
     for (i = 0; i < count; i++) {
         curr = (branch *) alloc(sizeof(branch));
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) curr, sizeof(branch));
-        if (nhfp->fieldlevel)
-            sfi_branch(nhfp, curr, "dungeon", "branch", 1);
         curr->next = (branch *) 0;
         if (last)
             last->next = curr;
@@ -261,8 +227,6 @@ NHFILE *nhfp;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &count, "dungeon", "level_info_count", 1);
 
     if (count >= MAXLINFO)
         panic("level information count larger (%d) than allocated size",
@@ -270,17 +234,10 @@ NHFILE *nhfp;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) g.level_info,
               (unsigned) count * sizeof(struct linfo));
-    if (nhfp->fieldlevel)
-        for (i = 0; i < count; ++i)
-            sfi_linfo(nhfp, &g.level_info[i], "dungeon", "g.level_info", 1);
 
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) &g.inv_pos, sizeof g.inv_pos);
         mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
-    }
-    if (nhfp->fieldlevel) {
-        sfi_nhcoord(nhfp, &g.inv_pos, "dungeon", "inv_pos", 1);
-        sfi_int(nhfp, &count, "dungeon", "mapseen_count", 1);
     }
 
     last_ms = (mapseen *) 0;
@@ -2446,8 +2403,6 @@ mapseen *mptr;
             break;
     if (nhfp->structlevel)
         bwrite(nhfp->fd, (genericptr_t) &brindx, sizeof brindx);
-    if (nhfp->fieldlevel)
-        sfo_int(nhfp, &brindx, "mapseen", "branch_index", 1);
 
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &mptr->lev, sizeof mptr->lev);
@@ -2455,28 +2410,14 @@ mapseen *mptr;
         bwrite(nhfp->fd, (genericptr_t) &mptr->flags, sizeof mptr->flags);
         bwrite(nhfp->fd, (genericptr_t) &mptr->custom_lth, sizeof mptr->custom_lth);
     }
-    if (nhfp->fieldlevel) {
-        sfo_d_level(nhfp, &mptr->lev, "mapseen", "d_level", 1);
-        sfo_mapseen_feat(nhfp, &mptr->feat, "mapseen", "feat", 1);
-        sfo_mapseen_flags(nhfp, &mptr->flags, "mapseen", "flags", 1);
-        sfo_unsigned(nhfp, &mptr->custom_lth, "mapseen", "custom_lth", 1);
-    }
 
     if (mptr->custom_lth) {
         if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) mptr->custom, mptr->custom_lth);
         }
-        if (nhfp->fieldlevel) {
-            for (i = 0; i < (int) mptr->custom_lth; ++i)
-                sfo_char(nhfp, &mptr->custom[i], "mapseen", "custom", 1);
-        }
     }
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &mptr->msrooms, sizeof mptr->msrooms);
-    }
-    if (nhfp->fieldlevel) {
-        for (i = 0; i < ((MAXNROFROOMS + 1) * 2); ++i)
-            sfo_mapseen_rooms(nhfp, &mptr->msrooms[i], "mapseen", "msrooms", 1);
     }
     savecemetery(nhfp, &mptr->final_resting_place);
 }
@@ -2493,8 +2434,6 @@ NHFILE *nhfp;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &branchnum, sizeof branchnum);
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &branchnum, "mapseen", "branch_index", 1);
     for (brindx = 0, curr = g.branches; curr; curr = curr->next, ++brindx)
         if (brindx == branchnum)
             break;
@@ -2506,12 +2445,6 @@ NHFILE *nhfp;
         mread(nhfp->fd, (genericptr_t) &load->flags, sizeof load->flags);
         mread(nhfp->fd, (genericptr_t) &load->custom_lth, sizeof load->custom_lth);
     }
-    if (nhfp->fieldlevel) {
-        sfi_d_level(nhfp, &load->lev, "mapseen", "d_level", 1);
-        sfi_mapseen_feat(nhfp, &load->feat, "mapseen", "feat", 1);
-        sfi_mapseen_flags(nhfp, &load->flags, "mapseen", "flags", 1);
-        sfi_unsigned(nhfp, &load->custom_lth, "mapseen", "custom_lth", 1);
-    }
 
     if (load->custom_lth) {
         /* length doesn't include terminator (which isn't saved & restored) */
@@ -2519,19 +2452,11 @@ NHFILE *nhfp;
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) load->custom, load->custom_lth);
         }
-        if (nhfp->fieldlevel) {
-            for (i = 0; i < (int) load->custom_lth; ++i)
-                sfi_char(nhfp, &load->custom[i], "mapseen", "custom", 1);
-        }
         load->custom[load->custom_lth] = '\0';
     } else
         load->custom = 0;
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) &load->msrooms, sizeof load->msrooms);
-    }
-    if (nhfp->fieldlevel) {
-        for (i = 0; i < ((MAXNROFROOMS + 1) * 2); ++i)
-            sfi_mapseen_rooms(nhfp, &load->msrooms[i], "mapseen", "msrooms", 1);
     }
     restcemetery(nhfp, &load->final_resting_place);
     return load;

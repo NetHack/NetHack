@@ -15,7 +15,6 @@
 #include <limits.h>
 #endif
 #include "dlb.h"
-#include "sfproto.h"
 
 
 /* add b to long a, convert wraparound to max value */
@@ -2153,8 +2152,6 @@ NHFILE *nhfp;
         for (kptr = &g.killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
             if (nhfp->structlevel)
 	        bwrite(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
-            if (nhfp->fieldlevel)
-	        sfo_kinfo(nhfp, kptr, "killers", "kinfo", 1);
         }
     }
     if (release_data(nhfp)) {
@@ -2175,8 +2172,6 @@ NHFILE *nhfp;
     for (kptr = &g.killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
         if (nhfp->structlevel)
 	    mread(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
-        if (nhfp->fieldlevel)
-            sfi_kinfo(nhfp, kptr, "killers", "kinfo", 1);
         if (kptr->next) {
             kptr->next = (struct kinfo *) alloc(sizeof (struct kinfo));
         }

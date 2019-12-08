@@ -169,10 +169,6 @@
     <ClCompile Include="$(SrcDir)rumors.c" />
     <ClCompile Include="$(SrcDir)save.c" />
     <ClCompile Include="$(SrcDir)sfstruct.c" />
-    <ClCompile Include="$(SrcDir)sfbase.c" />
-    <ClCompile Include="$(SrcDir)sflendian.c" />
-    <ClCompile Include="$(SrcDir)sfascii.c" />
-    <ClCompile Include="$(SrcDir)sfdata.c" />
     <ClCompile Include="$(SrcDir)shk.c" />
     <ClCompile Include="$(SrcDir)shknam.c" />
     <ClCompile Include="$(SrcDir)sit.c" />

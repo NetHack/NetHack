@@ -5,8 +5,6 @@
 
 #include "hack.h"
 #include "lev.h"
-#include "sfproto.h"
-
 
 #define newseg() (struct wseg *) alloc(sizeof (struct wseg))
 #define dealloc_seg(wseg) free((genericptr_t) (wseg))
@@ -493,8 +491,6 @@ NHFILE *nhfp;
             /* Save number of segments */
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &count, sizeof(int));
-            if (nhfp->fieldlevel)
-                sfo_int(nhfp, &count, "worm", "segment_count", 1);
             /* Save segment locations of the monster. */
             if (count) {
                 for (curr = wtails[i]; curr; curr = curr->nseg) {
@@ -502,19 +498,11 @@ NHFILE *nhfp;
                         bwrite(nhfp->fd, (genericptr_t) &(curr->wx), sizeof(xchar));
                         bwrite(nhfp->fd, (genericptr_t) &(curr->wy), sizeof(xchar));
                     }
-                    if (nhfp->fieldlevel) {
-                        sfo_xchar(nhfp, &(curr->wx), "worm", "wx", 1);
-                        sfo_xchar(nhfp, &(curr->wy), "worm", "wy", 1);
-                    }
                 }
             }
         }
         if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) wgrowtime, sizeof(wgrowtime));
-        }
-        if (nhfp->fieldlevel) {
-            for (i = 0; i < MAX_NUM_WORMS; ++i)
-                sfo_long(nhfp, &wgrowtime[i], "worm", "wgrowtime", 1);
         }
     }
 
@@ -550,8 +538,6 @@ NHFILE *nhfp;
     for (i = 1; i < MAX_NUM_WORMS; i++) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &count, sizeof(int));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &count, "worm", "segment_count", 1);
 
         /* Get the segments. */
         for (curr = (struct wseg *) 0, j = 0; j < count; j++) {
@@ -560,10 +546,6 @@ NHFILE *nhfp;
             if (nhfp->structlevel) {
                 mread(nhfp->fd, (genericptr_t) &(temp->wx), sizeof(xchar));
                 mread(nhfp->fd, (genericptr_t) &(temp->wy), sizeof(xchar));
-            }
-            if (nhfp->fieldlevel) {
-                sfi_xchar(nhfp, &(temp->wx), "worm", "wx", 1);
-                sfi_xchar(nhfp, &(temp->wy), "worm", "wy", 1);
             }
             if (curr)
                 curr->nseg = temp;
@@ -575,10 +557,6 @@ NHFILE *nhfp;
     }
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) wgrowtime, sizeof(wgrowtime));
-    }
-    if (nhfp->fieldlevel) {
-        for (i = 0; i < MAX_NUM_WORMS; ++i)
-            sfi_long(nhfp, &wgrowtime[i], "worm", "wgrowtime", 1);
     }
 }
 

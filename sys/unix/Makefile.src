@@ -452,7 +452,6 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
 	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
-	   sfbase.c sfdata.c sfascii.c sflendian.c \
 	   shk.c shknam.c sit.c sounds.c \
 	   sp_lev.c spell.c steal.c steed.c sys.c teleport.c timeout.c \
 	   topten.c track.c trap.c u_init.c \
@@ -469,7 +468,7 @@ SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 SYSCXXSRC = ../sys/share/cppregex.cpp
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = vis_tab.c	sfdata.c #tile.c
+GENCSRC = vis_tab.c	#tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
@@ -520,7 +519,6 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o sfstruct.o \
-	sfbase.o sfdata.o sfascii.o sflendian.o \
 	shk.o shknam.o sit.o sounds.o sp_lev.o spell.o sys.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
 	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
@@ -666,26 +664,7 @@ tile.c: ../win/share/tilemap.c $(HACK_H)
 ../win/gnome/gn_rip.h: ../win/X11/rip.xpm
 	cp ../win/X11/rip.xpm ../win/gnome/gn_rip.h
 
-# readtags dependencies
-#
-#
 sfstruct.o: sfstruct.c $(HACK_H)
-sfbase.o: sfbase.c $(HACK_H) ../include/sfproto.h ../include/sfprocs.h
-sfascii.o: sfascii.c $(HACK_H) ../include/sfprocs.h
-sflendian.o: sflendian.c $(HACK_H) ../include/sfprocs.h
-sfdata.o: sfdata.c $(HACK_H) ../include/sfprocs.h
-
-#../util/readtags:
-#	@( cd ../util ; $(MAKE) readtags )
-#
-#../util/nethack.tags:
-#	@( cd ../util ; $(MAKE) nethack.tags )
-#
-#sfdata.c: ../util/readtags ../util/nethack.tags
-#	@( cd ../util ; ./readtags )
-#
-#../include/sfproto.h: ../util/readtags ../util/nethack.tags
-#	@( cd ../util ; ./readtags )
 
 #	date.h should be remade any time any of the source or include code
 #	is modified.  Unfortunately, this would make the contents of this
@@ -777,7 +756,7 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c -o $@ ../sys/atari/tos.c
 pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h \
-		../include/sfproto.h ../include/integer.h
+		../include/integer.h
 	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcmain.c
 pcsys.o: ../sys/share/pcsys.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcsys.c
@@ -1001,16 +980,14 @@ wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
 wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
 	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_trace.c
 vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
-sfdata.o: sfdata.c $(HACK_H) ../include/artifact.h ../include/func_tab.h \
-		../include/lev.h ../include/integer.h ../include/sfproto.h
 allmain.o: allmain.c $(HACK_H)
 alloc.o: alloc.c $(CONFIG_H)
 apply.o: apply.c $(HACK_H)
 artifact.o: artifact.c $(HACK_H) ../include/artifact.h ../include/artilist.h \
-		../include/sfproto.h ../include/integer.h
+		../include/integer.h
 attrib.o: attrib.c $(HACK_H)
 ball.o: ball.c $(HACK_H)
-bones.o: bones.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
+bones.o: bones.c $(HACK_H) ../include/lev.h \
 		../include/integer.h
 botl.o: botl.c $(HACK_H)
 cmd.o: cmd.c $(HACK_H) ../include/lev.h ../include/func_tab.h
@@ -1029,24 +1006,24 @@ dokick.o: dokick.c $(HACK_H)
 dothrow.o: dothrow.c $(HACK_H)
 drawing.o: drawing.c $(HACK_H) ../include/tcap.h
 dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h \
-		../include/lev.h ../include/sfproto.h ../include/integer.h
+		../include/lev.h ../include/integer.h
 eat.o: eat.c $(HACK_H)
-end.o: end.c $(HACK_H) ../include/lev.h ../include/dlb.h ../include/sfproto.h \
+end.o: end.c $(HACK_H) ../include/lev.h ../include/dlb.h \
 		../include/integer.h
-engrave.o: engrave.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
+engrave.o: engrave.c $(HACK_H) ../include/lev.h \
 		../include/integer.h
 exper.o: exper.c $(HACK_H)
 explode.o: explode.c $(HACK_H)
 extralev.o: extralev.c $(HACK_H)
-files.o: files.c $(HACK_H) ../include/dlb.h ../include/sfproto.h \
-		../include/integer.h ../include/sfprocs.h ../include/lev.h \
+files.o: files.c $(HACK_H) ../include/dlb.h \
+		../include/integer.h ../include/lev.h \
 		#zlib.h
 fountain.o: fountain.c $(HACK_H)
 hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
 invent.o: invent.c $(HACK_H)
 isaac64.o: isaac64.c $(CONFIG_H) ../include/isaac64.h
-light.o: light.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
+light.o: light.c $(HACK_H) ../include/lev.h \
 		../include/integer.h
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) ../include/mail.h
@@ -1067,9 +1044,9 @@ minion.o: minion.c $(HACK_H)
 mklev.o: mklev.c $(HACK_H)
 mkmap.o: mkmap.c $(HACK_H) ../include/sp_lev.h
 mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h ../include/lev.h \
-		../include/sfproto.h ../include/integer.h
+		../include/integer.h
 mkobj.o: mkobj.c $(HACK_H)
-mkroom.o: mkroom.c $(HACK_H) ../include/sfproto.h ../include/integer.h
+mkroom.o: mkroom.c $(HACK_H) ../include/integer.h
 mon.o: mon.c $(HACK_H) ../include/mfndpos.h
 mondata.o: mondata.c $(HACK_H)
 monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h ../include/artifact.h
@@ -1082,13 +1059,13 @@ muse.o: muse.c $(HACK_H)
 music.o: music.c $(HACK_H)
 nhlua.o: nhlua.c $(HACK_H) ../include/dlb.h
 nhlsel.o: nhlsel.c $(HACK_H) ../include/sp_lev.h
-o_init.o: o_init.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
+o_init.o: o_init.c $(HACK_H) ../include/lev.h \
 		../include/integer.h
 objects.o: objects.c $(CONFIG_H) ../include/obj.h ../include/objclass.h \
 		../include/prop.h ../include/skills.h ../include/color.h
 objnam.o: objnam.c $(HACK_H)
 options.o: options.c $(CONFIG_H) ../include/objclass.h ../include/flag.h \
-		$(HACK_H) ../include/tcap.h ../include/sfprocs.h \
+		$(HACK_H) ../include/tcap.h \
 		../include/integer.h
 pager.o: pager.c $(HACK_H) ../include/dlb.h
 pickup.o: pickup.c $(HACK_H)
@@ -1101,23 +1078,18 @@ quest.o: quest.c $(HACK_H)
 questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h
 read.o: read.c $(HACK_H)
 rect.o: rect.c $(HACK_H)
-region.o: region.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
+region.o: region.c $(HACK_H) ../include/lev.h \
 		../include/integer.h
 restore.o: restore.c $(HACK_H) ../include/lev.h ../include/tcap.h \
-		../include/sfproto.h ../include/integer.h
+		../include/integer.h
 rip.o: rip.c $(HACK_H)
 rnd.o: rnd.c $(HACK_H) ../include/isaac64.h
 role.o: role.c $(HACK_H)
 rumors.o: rumors.c $(HACK_H) ../include/lev.h ../include/dlb.h \
-		../include/sfproto.h ../include/integer.h
-save.o: save.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
+		../include/integer.h
+save.o: save.c $(HACK_H) ../include/lev.h \
 		../include/integer.h
 sfstruct.o: sfstruct.c $(HACK_H)
-sfbase.o: sfbase.c $(HACK_H) ../include/integer.h ../include/sfprocs.h
-sfdata.o: sfdata.c $(HACK_H) ../include/artifact.h ../include/func_tab.h \
-		../include/lev.h ../include/integer.h ../include/sfproto.h
-sfascii.o: sfascii.c $(HACK_H) ../include/integer.h ../include/sfprocs.h
-sflendian.o: sflendian.c $(HACK_H) ../include/integer.h ../include/sfprocs.h
 shk.o: shk.c $(HACK_H)
 shknam.o: shknam.c $(HACK_H)
 sit.o: sit.c $(HACK_H) ../include/artifact.h
@@ -1128,7 +1100,7 @@ steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
 sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
-timeout.o: timeout.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
+timeout.o: timeout.c $(HACK_H) ../include/lev.h \
 		../include/integer.h
 topten.o: topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h
 track.o: track.c $(HACK_H)
@@ -1137,7 +1109,7 @@ u_init.o: u_init.c $(HACK_H)
 uhitm.o: uhitm.c $(HACK_H)
 vault.o: vault.c $(HACK_H)
 version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h \
-		../include/lev.h ../include/sfproto.h ../include/integer.h \
+		../include/lev.h ../include/integer.h \
 		../include/patchlevel.h
 vision.o: vision.c $(HACK_H) ../include/vis_tab.h
 weapon.o: weapon.c $(HACK_H)
@@ -1145,7 +1117,7 @@ were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
 windows.o: windows.c $(HACK_H) ../include/wingem.h ../include/winGnome.h
 wizard.o: wizard.c $(HACK_H)
-worm.o: worm.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
+worm.o: worm.c $(HACK_H) ../include/lev.h \
 		../include/integer.h
 worn.o: worn.c $(HACK_H)
 write.o: write.c $(HACK_H)

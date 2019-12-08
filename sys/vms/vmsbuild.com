@@ -320,7 +320,7 @@ $ gosub compile_list
 $!
 $! Files added in 3.7
 $!
-$ c_list = "sfbase,sfdata,sfstruct,sflendian,sfascii,nhlua,nhlsel"
+$ c_list = "sfstruct,nhlua,nhlsel"
 $ gosub compile_list
 $!
 $! 3.7 runtime LUA level parser/loader

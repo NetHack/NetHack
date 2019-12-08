@@ -18,7 +18,6 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 #include "tcap.h"
 #include <ctype.h>
 #endif
-#include "sfprocs.h"
 
 #define BACKWARD_COMPAT
 
@@ -698,8 +697,6 @@ initoptions_init()
         if (boolopt[i].addr)
             *(boolopt[i].addr) = boolopt[i].initvalue;
     }
-    /* initialize the function pointers for fieldlevel saves */
-    sf_init();
 
 #ifdef SYSFLAGS
     Strcpy(sysflags.sysflagsid, "sysflags");

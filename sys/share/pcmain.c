@@ -7,7 +7,6 @@
 
 #include "hack.h"
 #include "dlb.h"
-#include "sfproto.h"
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -450,8 +449,6 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         g.hackpid = 1;
         if (nhfp->structlevel)
             write(nhfp->fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &g.hackpid, "locking", "g.hackpid", 1);
         close_nhfile(nhfp);
     }
 #ifdef MFLOPPY

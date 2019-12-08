@@ -7,7 +7,6 @@
 #include "dlb.h"
 #include "date.h"
 #include "lev.h"
-#include "sfproto.h"
 
 /*
  * All the references to the contents of patchlevel.h have been moved
@@ -399,26 +398,17 @@ unsigned long utdflags;
         if (rlen == 0)
             return FALSE;
     }
-    if (nhfp->fieldlevel) {
-        sfi_char(nhfp, &indicator, "indicate", "format", 1);
-        sfi_int(nhfp, &filecmc, "validate", "critical_members_count", 1);
-        cmc = critical_members_count();
-    }
     if (cmc != filecmc)
         return FALSE;
 
-    if (nhfp->fieldlevel && (nhfp->fnidx > historical)) {
-            sfi_version_info(nhfp, &vers_info, "version", "version_info", 1);
-    } else {
-        rlen = read(nhfp->fd, (genericptr_t) &vers_info, sizeof vers_info);
-        minit();                /* ZEROCOMP */
-        if (rlen == 0) {
-            if (verbose) {
-                pline("File \"%s\" is empty?", name);
-                wait_synch();
-            }
-            return FALSE;
+    rlen = read(nhfp->fd, (genericptr_t) &vers_info, sizeof vers_info);
+    minit();                /* ZEROCOMP */
+    if (rlen == 0) {
+        if (verbose) {
+            pline("File \"%s\" is empty?", name);
+            wait_synch();
         }
+        return FALSE;
     }
 
     if (!check_version(&vers_info, name, verbose, utdflags)) {
@@ -437,17 +427,6 @@ NHFILE *nhfp;
     int cmc = 0;
 
     if (nhfp->mode & WRITING) {
-        if (nhfp->fieldlevel) {
-            indicate = (nhfp->fnidx == ascii) ? 'a' : 'l';
-            sfo_char(nhfp, &indicate, "indicate", "format", 1);
-            cmc = critical_members_count();
-            {
-#if 0
-                pline("critical-members=%d.", cmc);
-#endif
-            }
-            sfo_int(nhfp, &cmc, "validate", "critical_members_count", 1);
-        }
         if (nhfp->structlevel) {
             indicate = 'h';     /* historical */
             bwrite(nhfp->fd, (genericptr_t) &indicate, sizeof indicate);
@@ -484,11 +463,6 @@ NHFILE *nhfp;
         bwrite(nhfp->fd,(genericptr_t) &version_data,
                (unsigned) (sizeof version_data));
         bufon(nhfp->fd);
-    }
-    if (nhfp->fieldlevel) {
-        store_formatindicator(nhfp);
-        sfo_version_info(nhfp, (struct version_info *) &version_data,
-                         "version", "version_info", 1);
     }
     return;
 }
