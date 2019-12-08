@@ -759,8 +759,6 @@ d_level *lev;
         Sprintf(eos(dptr), ".%d", lev->dlevel);
 #ifdef SYSCF
     idx = sysopt.bonesformat[0];
-    if (idx > historical && idx <= ascii)
-        Strcat(dptr, sfoprocs[idx].ext);
 #endif
 #ifdef VMS
     Strcat(dptr, ";1");
@@ -951,11 +949,6 @@ boolean regularize_it;
     const char *postappend = (const char *) 0,
                *sfindicator = (const char *) 0;
 
-#ifdef SYSCF
-    idx = sysopt.saveformat[0];
-    if (idx > historical && idx <= ascii)
-        sfindicator = sfoprocs[idx].ext;
-#endif
     if (g.program_state.in_self_recover) {
         /* self_recover needs to be done as historical
            structlevel content until that process is
@@ -1036,15 +1029,7 @@ boolean regularize_it;
         if (strlen(g.SAVEF) + strlen(SAVE_EXTENSION) < (SAVESIZE - 1)) {
             Strcat(g.SAVEF, SAVE_EXTENSION);
 #ifdef MSDOS
-#ifdef SYSCF
- 	if (idx >= historical && idx <= ascii) {
-	    /* we did leave room for the extra char in SAVE_EXTENSION */
-	    g.SAVEF[strlen(g.SAVEF)-1] =
-	    	(idx == lendian) ? 'l' :
-	    	(idx == ascii)   ? 'a' : '\0';
-	}
-        sfindicator = (g.program_state.in_self_recover) ? "" : sfoprocs[idx].ext;
-#endif
+        sfindicator = "";
 #endif
         } else
             overflow = 3;
