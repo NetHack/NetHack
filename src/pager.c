@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1574722864 2019/11/25 23:01:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1575830188 2019/12/08 18:36:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -483,11 +483,8 @@ char *buf, *monbuf;
 
         switch (glyph_to_cmap(glyph)) {
         case S_altar:
-            amsk = ((mtmp = m_at(x, y)) != 0 && has_mcorpsenm(mtmp)
-                    && M_AP_TYPE(mtmp) == M_AP_FURNITURE
-                    && mtmp->mappearance == S_altar) ? MCORPSENM(mtmp)
-                   : levl[x][y].altarmask;
-            algn = Amask2align(amsk & ~AM_SHRINE);
+            amsk = altarmask_at(x, y);
+            algn = Amask2align(amsk & AM_MASK);
             Sprintf(buf, "%s %saltar",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */

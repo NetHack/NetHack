@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1575755077 2019/12/07 21:44:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1575830189 2019/12/08 18:36:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2075,6 +2075,24 @@ doturn()
     g.multi_reason = "trying to turn the monsters";
     g.nomovemsg = You_can_move_again;
     return 1;
+}
+
+int
+altarmask_at(x, y)
+int x, y;
+{
+    int res = 0;
+
+    if (isok(x, y)) {
+        struct monst *mon = m_at(x, y);
+
+        if (mon && M_AP_TYPE(mon) == M_AP_FURNITURE
+            && mon->mappearance == S_altar)
+            res = has_mcorpsenm(mon) ? MCORPSENM(mon) : 0;
+        else if (IS_ALTAR(levl[x][y].typ))
+            res = levl[x][y].altarmask;
+    }
+    return res;
 }
 
 const char *
