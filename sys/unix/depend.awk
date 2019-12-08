@@ -41,13 +41,21 @@ FNR == 1	{ output_dep()			#finish previous file
 		  #[3.4.0: gnomehack headers currently aren't in include]
 		  #[3.6.2: Qt4 headers aren't in include either]
 		  #[3.6.2: curses headers likewise]
+		  #[3.7.0: Qt headers have moved]
 		  if (incl ~ /\.h$/) {
                     if (incl ~ "curses\.h")
                       incl = ""	 # skip "curses.h"; it should be <curses.h>
+
+		    else if (incl ~ /^..\/lib\/lua-.*\/src\/l/)
+		      incl = "" # skip lua headers
 		    else if (incl ~ /^curs/)	# curses special case
 		      incl = "../win/curses/" incl
-		    else if (incl ~ /^qt4/)	# Qt v4 special case
-		      incl = "../win/Qt4/" incl
+		    else if (incl ~ /^qtext.h/)	# qtext.h special case
+		      incl = "../include/" incl
+		    else if (incl ~ /^qt_xpms.h/)	# qt_xpms.h special case
+		      incl = "../include/" incl
+		    else if (incl ~ /^qt/)	# Qt v4 special case
+		      incl = "../win/Qt/" incl
 		    else if (incl ~ /^gn/)	# gnomehack special case
 		      incl = "../win/gnome/" incl
 		    else
