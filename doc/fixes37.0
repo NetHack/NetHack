@@ -15,6 +15,7 @@ message "your knapsack can't accomodate any more items" when picking stuff up
 	pending; vary the message rather than add more convoluted pickup code
 function calls made from mapglyph based on dungeon level are now called once
 	per level
+allow teleporting onto the vibrating square
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
