@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1575767152 2019/12/08 01:05:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1575917700 2019/12/09 18:55:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -224,10 +224,11 @@ WINX11SRC = ../win/X11/Window.c ../win/X11/dialogs.c ../win/X11/winX.c \
 WINX11OBJ = Window.o dialogs.o winX.o winmap.o winmenu.o winmesg.o \
 	winmisc.o winstat.o wintext.o winval.o tile.o
 #
-# Files for a Qt port
+# Files for a Qt 3 port (renamed since nethack 3.6.x)
 #
-WINQTSRC = ../win/Qt/qt_win.cpp ../win/Qt/qt_clust.cpp ../win/Qt/qttableview.cpp
-WINQTOBJ = qt_win.o qt_clust.o qttableview.o tile.o
+WINQT3SRC = ../win/Qt3/qt3_win.cpp ../win/Qt3/qt3_clust.cpp \
+	../win/Qt3/qt3tableview.cpp
+WINQT3OBJ = qt3_win.o qt3_clust.o qt3tableview.o tile.o
 #
 # Files for a Qt 4 or 5 port
 #
@@ -473,7 +474,7 @@ GENCSRC = vis_tab.c	#tile.c
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
-WINCXXSRC = $(WINQTSRC) $(WINBESRC)
+WINCXXSRC = $(WINQTSRC) $(WINQT3SRC) $(WINBESRC)
 
 # Files for window system chaining. Requires SYSCF; include via HINTSRC/HINTOBJ
 CHAINSRC = ../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
@@ -601,14 +602,12 @@ objects.o:
 	@rm -f $(MAKEDEFS)
 
 # Qt 3 windowport meta-object-compiler output
-qt3kde0.moc: ../include/qt_kde0.h
-	$(QTDIR)/bin/moc -o qt3kde0.moc ../include/qt_kde0.h
-
-qt3win.moc: ../include/qt_win.h
-	$(QTDIR)/bin/moc -o qt3win.moc ../include/qt_win.h
-
-qttableview.moc: ../include/qttableview.h
-	$(QTDIR)/bin/moc -o qttableview.moc ../include/qttableview.h
+qt3_kde0.moc: ../win/Qt3/qt3_kde0.h
+	$(QTDIR)/bin/moc -o qt3kde0.moc ../win/Qt3/qt3_kde0.h
+qt3_win.moc: ../win/Qt3/qt3_win.h
+	$(QTDIR)/bin/moc -o qt3win.moc ../win/Qt3/qt3_win.h
+qt3tableview.moc: ../win/Qt3/qt3tableview.h
+	$(QTDIR)/bin/moc -o qt3tableview.moc ../win/Qt/qt3tableview.h
 
 # Qt 4 windowport meta-object-compiler output
 qt_kde0.moc : ../win/Qt/qt_kde0.h
@@ -709,7 +708,7 @@ spotless: clean
 depend: ../sys/unix/depend.awk \
 		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
 		$(CHAINSRC) $(GENCSRC) $(HACKCSRC)
-	$(AWK) -f ../sys/unix/depend.awk ../include/*.h \
+	$(AWK) -f ../sys/unix/depend.awk ../include/*.h ../win/*/*.h \
 		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
 		$(CHAINSRC) $(GENCSRC) $(HACKCSRC) >makedep
 	@echo '/^# DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT/+2,$$d' >eddep
@@ -841,44 +840,82 @@ tile.o: tile.c $(HACK_H)
 gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
 		../win/gnome/gnmain.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnaskstr.c
-gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnmain.h \
-		../win/gnome/gnmenu.h ../win/gnome/gnaskstr.h \
-		../win/gnome/gnyesno.h
+gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnomeprv.h \
+		$(HACK_H) ../include/dlb.h ../include/patchlevel.h \
+		../include/winGnome.h ../win/gnome/gnmain.h \
+		../win/gnome/gnmap.h ../win/gnome/gnmenu.h \
+		../win/gnome/gnplayer.h ../win/gnome/gnsignal.h \
+		../win/gnome/gnglyph.h ../win/gnome/gnstatus.h \
+		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
+		../win/gnome/gnyesno.h ../win/gnome/gnworn.h \
+		../win/gnome/gnaskstr.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnbind.c
-gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h ../include/tile2x11.h
+gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h $(CONFIG_H) \
+		../include/tile2x11.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnglyph.c
 gnmain.o: ../win/gnome/gnmain.c ../win/gnome/gnmain.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnbind.h ../win/gnome/gnopts.h $(HACK_H) \
-		../include/date.h
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnglyph.h ../win/gnome/gnbind.h \
+		../win/gnome/gnmap.h ../win/gnome/gnmenu.h \
+		../win/gnome/gnplayer.h ../win/gnome/gnstatus.h \
+		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
+		../win/gnome/gnyesno.h ../win/gnome/gnworn.h \
+		../win/gnome/gnopts.h ../include/date.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmain.c
-gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnsignal.h $(HACK_H)
+gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h $(CONFIG_H) \
+		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmap.c
-gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h ../win/gnome/gnmain.h \
-		../win/gnome/gnbind.h ../include/func_tab.h
+gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h $(CONFIG_H) \
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnmain.h ../win/gnome/gnbind.h \
+		../win/gnome/gnmap.h ../win/gnome/gnplayer.h \
+		../win/gnome/gnsignal.h ../win/gnome/gnglyph.h \
+		../win/gnome/gnstatus.h ../win/gnome/gntext.h \
+		../win/gnome/gnmesg.h ../win/gnome/gnyesno.h \
+		../win/gnome/gnworn.h ../include/func_tab.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmenu.c
-gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h ../win/gnome/gnsignal.h
+gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h $(CONFIG_H) \
+		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h $(HACK_H) \
+		../include/dlb.h ../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnglyph.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmesg.c
 gnopts.o: ../win/gnome/gnopts.c ../win/gnome/gnopts.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
+		$(CONFIG_H) ../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnopts.c
 gnplayer.o: ../win/gnome/gnplayer.c ../win/gnome/gnplayer.h \
 		../win/gnome/gnmain.h $(HACK_H)
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnplayer.c
 gnsignal.o: ../win/gnome/gnsignal.c ../win/gnome/gnsignal.h \
-		../win/gnome/gnmain.h
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnglyph.h ../win/gnome/gnmain.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnsignal.c
-gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h \
-		../win/gnome/gnsignal.h ../win/gnome/gn_xpms.h \
-		../win/gnome/gnomeprv.h
+gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h $(CONFIG_H) \
+		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h $(HACK_H) \
+		../include/dlb.h ../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnglyph.h ../win/gnome/gn_xpms.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnstatus.c
-gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h ../win/gnome/gnmain.h \
-		../win/gnome/gn_rip.h
+gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h $(CONFIG_H) \
+		../win/gnome/gnmain.h ../win/gnome/gn_rip.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gntext.c
-gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
+gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h \
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnmain.h ../win/gnome/gnmap.h \
+		../win/gnome/gnmenu.h ../win/gnome/gnplayer.h \
+		../win/gnome/gnsignal.h ../win/gnome/gnglyph.h \
+		../win/gnome/gnstatus.h ../win/gnome/gntext.h \
+		../win/gnome/gnmesg.h ../win/gnome/gnyesno.h \
+		../win/gnome/gnworn.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnyesno.c
-gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h
+gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h $(CONFIG_H) \
+		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnworn.c
 wingem.o: ../win/gem/wingem.c $(HACK_H) ../include/func_tab.h ../include/dlb.h \
 		../include/patchlevel.h ../include/wingem.h
@@ -894,11 +931,14 @@ tile.o: tile.c $(HACK_H)
 cppregex.o: ../sys/share/cppregex.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ ../sys/share/cppregex.cpp
 qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_bind.h \
-		../win/Qt/qt_click.h ../win/Qt/qt_delay.h ../win/Qt/qt_xcmd.h \
-		../win/Qt/qt_key.h ../win/Qt/qt_map.h ../win/Qt/qt_menu.h \
-		../win/Qt/qt_msg.h ../win/Qt/qt_plsel.h ../win/Qt/qt_svsel.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_stat.h ../win/Qt/qt_streq.h \
-		../win/Qt/qt_yndlg.h ../win/Qt/qt_str.h ../include/dlb.h
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_click.h \
+		../win/Qt/qt_delay.h ../win/Qt/qt_xcmd.h ../win/Qt/qt_key.h \
+		../win/Qt/qt_map.h ../win/Qt/qt_win.h ../win/Qt/qt_clust.h \
+		../win/Qt/qt_menu.h ../win/Qt/qt_rip.h ../win/Qt/qt_msg.h \
+		../win/Qt/qt_plsel.h ../win/Qt/qt_svsel.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_stat.h ../win/Qt/qt_icon.h ../win/Qt/qt_streq.h \
+		../win/Qt/qt_line.h ../win/Qt/qt_yndlg.h ../win/Qt/qt_str.h \
+		../include/dlb.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_bind.cpp
 qt_click.o: ../win/Qt/qt_click.cpp $(HACK_H) ../win/Qt/qt_click.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_click.cpp
@@ -919,56 +959,76 @@ qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../win/Qt/qt_key.h
 qt_line.o: ../win/Qt/qt_line.cpp $(HACK_H) ../win/Qt/qt_line.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_line.cpp
 qt_main.o: ../win/Qt/qt_main.cpp $(HACK_H) ../include/patchlevel.h \
-		../win/Qt/qt_main.h qt_main.moc ../win/Qt/qt_bind.h \
-		../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h ../win/Qt/qt_key.h \
-		../win/Qt/qt_map.h ../win/Qt/qt_msg.h ../win/Qt/qt_set.h \
-		../win/Qt/qt_stat.h ../win/Qt/qt_str.h qt_kde0.moc
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h qt_main.moc \
+		../win/Qt/qt_bind.h ../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h \
+		../win/Qt/qt_key.h ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_clust.h ../win/Qt/qt_msg.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_stat.h ../win/Qt/qt_icon.h ../win/Qt/qt_str.h \
+		qt_kde0.moc
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_main.cpp
-qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_map.h qt_map.moc \
-		../win/Qt/qt_click.h ../win/Qt/qt_glyph.h ../include/qt_xpms.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_map.cpp
-qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../win/Qt/qt_menu.h qt_menu.moc \
-		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_streq.h \
+qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_clust.h qt_map.moc ../win/Qt/qt_click.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_xpms.h ../win/Qt/qt_set.h \
 		../win/Qt/qt_str.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_map.cpp
+qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../win/Qt/qt_menu.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_rip.h qt_menu.moc \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_streq.h \
+		../win/Qt/qt_line.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_menu.cpp
-qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_msg.h qt_msg.moc \
-		../win/Qt/qt_map.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
+qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_msg.h ../win/Qt/qt_win.h \
+		qt_msg.moc ../win/Qt/qt_map.h ../win/Qt/qt_clust.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_msg.cpp
 qt_plsel.o: ../win/Qt/qt_plsel.cpp $(HACK_H) ../win/Qt/qt_plsel.h qt_plsel.moc \
-		../win/Qt/qt_bind.h ../win/Qt/qt_glyph.h ../win/Qt/qt_set.h \
-		../win/Qt/qt_str.h
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_plsel.cpp
 qt_rip.o: ../win/Qt/qt_rip.cpp $(HACK_H) ../win/Qt/qt_rip.h \
-		../win/Qt/qt_bind.h ../win/Qt/qt_str.h
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_rip.cpp
 qt_set.o: ../win/Qt/qt_set.cpp $(HACK_H) ../win/Qt/qt_set.h qt_set.moc \
 		../win/Qt/qt_glyph.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_set.cpp
-qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../win/Qt/qt_stat.h qt_stat.moc \
-		../win/Qt/qt_set.h ../win/Qt/qt_str.h ../include/qt_xpms.h
+qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../win/Qt/qt_stat.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_icon.h qt_stat.moc \
+		../win/Qt/qt_set.h ../win/Qt/qt_str.h ../win/Qt/qt_xpms.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_stat.cpp
 qt_str.o: ../win/Qt/qt_str.cpp ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_str.cpp
 qt_streq.o: ../win/Qt/qt_streq.cpp $(HACK_H) ../win/Qt/qt_streq.h \
-		../win/Qt/qt_str.h
+		../win/Qt/qt_line.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_streq.cpp
 qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../win/Qt/qt_svsel.h \
-		../win/Qt/qt_bind.h ../win/Qt/qt_str.h
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_svsel.cpp
 qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_win.h \
-		../win/Qt/qt_bind.h ../win/Qt/qt_click.h ../win/Qt/qt_glyph.h \
-		../win/Qt/qt_inv.h ../win/Qt/qt_key.h ../win/Qt/qt_icon.h \
-		../win/Qt/qt_map.h ../win/Qt/qt_menu.h ../win/Qt/qt_msg.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_clust.h
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_click.h ../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h \
+		../win/Qt/qt_key.h ../win/Qt/qt_icon.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_clust.h ../win/Qt/qt_menu.h ../win/Qt/qt_rip.h \
+		../win/Qt/qt_msg.h ../win/Qt/qt_set.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
 qt_xcmd.o: ../win/Qt/qt_xcmd.cpp $(HACK_H) ../include/func_tab.h \
 		../win/Qt/qt_xcmd.h qt_xcmd.moc ../win/Qt/qt_bind.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_str.h
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_xcmd.cpp
 qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_yndlg.h qt_yndlg.moc \
 		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
+qt3_win.o: ../win/Qt3/qt3_win.cpp $(HACK_H) ../include/func_tab.h \
+		../include/dlb.h ../include/patchlevel.h ../include/tile2x11.h \
+		../win/Qt3/qt3_win.h ../win/Qt3/qt3_clust.h \
+		../win/Qt3/qt3_kde0.h ../win/Qt3/qt3_xpms.h qt3_win.moc \
+		qt3_kde0.moc qt3tableview.moc
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt3_win.cpp
+qt3_clust.o: ../win/Qt3/qt3_clust.cpp ../win/Qt3/qt3_clust.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt3_clust.cpp
+qt3tableview.o: ../win/Qt3/qt3tableview.cpp ../win/Qt3/qt3tableview.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt3tableview.cpp
 wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
 wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)

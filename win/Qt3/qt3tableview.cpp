@@ -1,5 +1,5 @@
 /**********************************************************************
-** $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.4 $ $NHDT-Date: 1524684508 2018/04/25 19:28:28 $
+** $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1575917720 2019/12/09 18:55:20 $
 ** $Id: qttableview.cpp,v 1.2 2002/03/09 03:13:15 jwalz Exp $
 **
 ** Implementation of QtTableView class
@@ -13,7 +13,7 @@
 **
 **********************************************************************/
 
-#include "qttableview.h"
+#include "qt3tableview.h"
 #if QT_VERSION >= 300
 #ifndef QT_NO_QTTABLEVIEW
 #include <qscrollbar.h>

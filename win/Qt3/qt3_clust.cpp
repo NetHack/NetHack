@@ -1,7 +1,7 @@
-/* NetHack 3.6	qt_clust.cpp	$NHDT-Date: 1524684507 2018/04/25 19:28:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.6	qt_clust.cpp	$NHDT-Date: 1575917719 2019/12/09 18:55:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Warwick Allison, 1999. */
 /* NetHack may be freely redistributed.  See license for details. */
-#include "qt_clust.h"
+#include "qt3_clust.h"
 
 static
 void include(QRect& r, const QRect& rect)

@@ -1,4 +1,4 @@
-// NetHack 3.6	qt_win.cpp	$NHDT-Date: 1524684508 2018/04/25 19:28:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.77 $
+// NetHack 3.6	qt_win.cpp	$NHDT-Date: 1575917720 2019/12/09 18:55:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 
@@ -74,7 +74,7 @@ extern "C" {
 
 }
 
-#include "qt_win.h"
+#include "qt3_win.h"
 #include <qregexp.h>
 #include <qpainter.h>
 #include <qdir.h>
@@ -98,8 +98,8 @@ extern "C" {
 
 #include <ctype.h>
 
-#include "qt_clust.h"
-#include "qt_xpms.h"
+#include "qt3_clust.h"
+#include "qt3_xpms.h"
 
 #include <dirent.h>
 #ifdef Q_WS_MACX
@@ -5303,10 +5303,10 @@ extern "C" void play_usersound(const char* filename, int volume)
 #endif
 }
 
-#include "qt_win.moc"
+#include "qt3_win.moc"
 #ifndef KDE
-#include "qt_kde0.moc"
+#include "qt3_kde0.moc"
 #endif
 #if QT_VERSION >= 300
-#include "qttableview.moc"
+#include "qt3tableview.moc"
 #endif

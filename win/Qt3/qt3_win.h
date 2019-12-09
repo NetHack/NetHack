@@ -1,4 +1,4 @@
-// NetHack 3.6	qt_win.h	$NHDT-Date: 1447755972 2015/11/17 10:26:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $
+// NetHack 3.6	qt_win.h	$NHDT-Date: 1575917700 2019/12/09 18:55:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 //
@@ -52,7 +52,7 @@
 #include <ktopwidget.h>
 #endif
 
-#include "qt_clust.h"
+#include "qt3_clust.h"
 
 class QVBox;
 class QMenuBar;
@@ -737,7 +737,7 @@ class NetHackQtInvUsageWindow : public QWidget
 // note the actual class of the windows.
 //
 #ifndef KDE
-#include "qt_kde0.h"
+#include "qt3_kde0.h"
 #endif
 
 class NetHackQtMainWindow : public KTopLevelWidget
