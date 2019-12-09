@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.6  Makefile.top    $NHDT-Date: 1574825215 2019/11/27 03:26:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $
+# NetHack 3.6  Makefile.top    $NHDT-Date: 1575932543 2019/12/09 23:02:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -94,6 +94,14 @@ DATNODLB = $(VARDATND) license symbols
 DATDLB = $(DATHELP) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
+# first target is also the default target for 'make' without any arguments
+all:	$(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
+	true; $(MOREALL)
+	@echo "Done."
+
+$(GAME): lua_support
+	( cd src ; $(MAKE) $(GAME) )
+
 lua_support: lib/lua/liblua.a include/nhlua.h
 	@true
 lib/lua-$(LUA_VERSION)/src/liblua.a: lib/lua-$(LUA_VERSION)/src/lua.h
@@ -109,13 +117,6 @@ include/nhlua.h: lib/lua/liblua.a
 	@echo '#include "../lib/lua-$(LUA_VERSION)/src/lualib.h"' >> $@
 	@echo '#include "../lib/lua-$(LUA_VERSION)/src/lauxlib.h"' >> $@
 	@echo '/*nhlua.h*/' >> $@
-
-$(GAME): lua_support
-	( cd src ; $(MAKE) )
-
-all:	$(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
-	true; $(MOREALL)
-	@echo "Done."
 
 # Note: many of the dependencies below are here to allow parallel make
 # to generate valid output
