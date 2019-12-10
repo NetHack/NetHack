@@ -36,8 +36,14 @@ CXX=g++ -std=gnu++11
 WINSRC = $(WINQTSRC)
 WINOBJ = $(WINQTOBJ)
 WINLIB = $(WINQT5LIB)
-#MOC = moc
-MOC = moc-qt5
+MOC = $(shell which moc-qt5)
+ifeq (,$(MOC))
+  ifeq (, $(shell which moc))
+    $(error "moc not found in $(PATH)")
+  else
+    MOC = moc
+  endif
+endif
 
 VARDATND = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
 
