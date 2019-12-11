@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1574116097 2019/11/18 22:28:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.272 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1576096997 2019/12/11 20:43:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1048,8 +1048,8 @@ boolean regularize_it;
     }
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if (overflow)
-        impossible("set_savefile_name() couldn't complete without overlow %d",
-                    overflow);
+        impossible("set_savefile_name() couldn't complete without overflow %d",
+                   overflow);
 #endif
 }
 
