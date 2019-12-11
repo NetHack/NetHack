@@ -93,7 +93,7 @@ const struct propname {
     { UNCHANGING, "unchanging" },
     { REFLECTING, "reflecting" },
     { FREE_ACTION, "free action" },
-    { FIXED_ABIL, "fixed abilites" },
+    { FIXED_ABIL, "fixed abilities" },
     { LIFESAVED, "life will be saved" },
     {  0, 0 },
 };
@@ -1398,7 +1398,7 @@ long timeout;
         break; /* case [otyp ==] candelabrum|tallow_candle|wax_candle */
 
     default:
-        impossible("burn_object: unexpeced obj %s", xname(obj));
+        impossible("burn_object: unexpected obj %s", xname(obj));
         break;
     }
     if (need_newsym)

@@ -1057,7 +1057,7 @@ reset_role_filtering()
 
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             "Uncceptable alignments", MENU_UNSELECTED);
+             "Unacceptable alignments", MENU_UNSELECTED);
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     end_menu(win, "Pick all that apply");

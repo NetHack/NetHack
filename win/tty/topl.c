@@ -302,7 +302,7 @@ char c;
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
     if (cw == (struct WinDesc *) 0)
-        panic("Putsym window MESSAGE nonexistant");
+        panic("Putsym window MESSAGE nonexistent");
 
     switch (c) {
     case '\b':

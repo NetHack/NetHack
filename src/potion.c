@@ -2260,7 +2260,7 @@ dodip()
                           more_than_one ? " that you dipped into" : "",
                           newbuf);
             else
-                pline("Somehing happens.");
+                pline("Something happens.");
 
             if (old_dknown
                 && !objects[old_otyp].oc_name_known

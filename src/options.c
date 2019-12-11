@@ -395,7 +395,7 @@ static struct Comp_Opt {
     },
     { "statuslines",
 #ifdef CURSES_GRAPHICS
-      "2 or 3 lines for horizonal (bottom or top) status display",
+      "2 or 3 lines for horizontal (bottom or top) status display",
       20, SET_IN_GAME
 #else
       "2 or 3 lines for status display",
