@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlobj.c	$NHDT-Date: 1574646948 2019/11/25 01:55:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
+/* NetHack 3.7	nhlobj.c	$NHDT-Date: 1576097301 2019/12/11 20:48:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /*      Copyright (c) 2019 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -108,7 +108,8 @@ lua_State *L;
     return 0;
 }
 
-/* Create a lua table representation of the object, unpacking all the object fields.
+/* Create a lua table representation of the object, unpacking all the
+   object fields.
    local o = obj.new("rock");
    local otbl = o:totable(); */
 static int
@@ -117,7 +118,6 @@ lua_State *L;
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
     struct obj *obj = lo->obj;
-    char buf[BUFSZ];
 
     lua_newtable(L);
 
@@ -135,11 +135,13 @@ lua_State *L;
     if (OBJ_NAME(objects[obj->otyp]))
         nhl_add_table_entry_str(L, "otyp_name", OBJ_NAME(objects[obj->otyp]));
     if (OBJ_DESCR(objects[obj->otyp]))
-        nhl_add_table_entry_str(L, "otyp_descr", OBJ_DESCR(objects[obj->otyp]));
+        nhl_add_table_entry_str(L, "otyp_descr",
+                                OBJ_DESCR(objects[obj->otyp]));
     nhl_add_table_entry_int(L, "owt", obj->owt);
     nhl_add_table_entry_int(L, "quan", obj->quan);
     nhl_add_table_entry_int(L, "spe", obj->spe);
-    nhl_add_table_entry_char(L, "oclass", def_oc_syms[obj->oclass].sym);
+    nhl_add_table_entry_char(L, "oclass",
+                             def_oc_syms[(uchar) obj->oclass].sym);
     nhl_add_table_entry_char(L, "invlet", obj->invlet);
     /* TODO: nhl_add_table_entry_char(L, "oartifact", obj->oartifact);*/
     nhl_add_table_entry_int(L, "where", obj->where);
@@ -178,7 +180,9 @@ lua_State *L;
     nhl_add_table_entry_int(L, "cknown", obj->cknown);
     nhl_add_table_entry_int(L, "lknown", obj->lknown);
     nhl_add_table_entry_int(L, "corpsenm", obj->corpsenm);
-    if (obj->corpsenm != NON_PM && (obj->otyp == TIN || obj->otyp == CORPSE || obj->otyp == EGG || obj->otyp == FIGURINE || obj->otyp == STATUE))
+    if (obj->corpsenm != NON_PM
+        && (obj->otyp == TIN || obj->otyp == CORPSE || obj->otyp == EGG
+            || obj->otyp == FIGURINE || obj->otyp == STATUE))
         nhl_add_table_entry_str(L, "corpsenm_name", mons[obj->corpsenm].mname);
     /* TODO: leashmon, fromsink, novelidx, record_achieve_special */
     nhl_add_table_entry_int(L, "usecount", obj->usecount);
