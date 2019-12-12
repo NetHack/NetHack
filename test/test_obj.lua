@@ -39,3 +39,28 @@ local o4tbl = o4:totable();
 if (o4tbl.otyp_name ~= "rock") then
    error("no rock under the large box");
 end
+
+
+local oc = obj.class(o4tbl.otyp);
+if (oc.name ~= "rock") then
+   error("object class is not rock, part 1");
+end
+if (oc.class ~= "*") then
+   error("object class is not *, part 1");
+end
+
+local oc2 = obj.class(o);
+if (oc2.name ~= "rock") then
+   error("object class is not rock, part 2");
+end
+if (oc2.class ~= "*") then
+   error("object class is not *, part 2");
+end
+
+local oc3 = obj.class(obj.new("rock"));
+if (oc3.name ~= "rock") then
+   error("object class is not rock, part 3");
+end
+if (oc3.class ~= "*") then
+   error("object class is not *, part 3");
+end

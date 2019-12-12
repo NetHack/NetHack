@@ -42,15 +42,23 @@ local wishtest_objects = {
    ["land mine"] = { otyp_name = "land mine", oclass = "(" },
    ["blessed historic statue of woodland-elf named Foo"] = { otyp_name = "statue", blessed = 1, historic = 1, corpsenm_name = "Woodland-elf", oname = "Foo" },
    ["blessed figurine of a ki-rin"] = { otyp_name = "figurine", blessed = 1, corpsenm_name = "ki-rin" },
-   -- ["partly eaten orange"] = { otyp_descr = "orange", oclass = "%", oeaten = ... },
+   ["partly eaten orange"] = { otyp_name = "orange", oclass = "%", oeaten = function ()
+                                  local oc = obj.class(obj.new("orange"));
+                                  return (oc.nutrition // 2);
+                             end },
 };
-
 
 for str, tbl in pairs(wishtest_objects) do
    local o = obj.new(str):totable();
    for field, value in pairs(tbl) do
-      if (o[field] ~= value) then
-         error("wished " .. str .. ", but " .. field .. " is " .. o[field] .. ", not " .. value);
+      local val;
+      if (type(value) == "function") then
+         val = value();
+      else
+         val = value;
+      end
+      if (o[field] ~= val) then
+         error("wished " .. str .. ", but " .. field .. " is " .. o[field] .. ", not " .. val);
       end
    end
 end

@@ -108,6 +108,78 @@ lua_State *L;
     return 0;
 }
 
+/* Get a table of object class data. */
+/* local odata = obj.class(otbl.otyp); */
+/* local odata = obj.class(obj.new("rock")); */
+static int
+l_obj_objects_to_table(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+    int otyp = -1;
+    struct objclass *o;
+
+    if (argc != 1) {
+        nhl_error(L, "l_obj_objects_to_table: Wrong args");
+        return 0;
+    }
+
+    if (lua_type(L, 1) == LUA_TNUMBER) {
+        otyp = luaL_checkinteger(L, 1);
+    } else if (lua_type(L, 1) == LUA_TUSERDATA) {
+        struct _lua_obj *lo = l_obj_check(L, 1);
+        if (lo && lo->obj)
+            otyp = lo->obj->otyp;
+    }
+    lua_pop(L, 1);
+
+    if (otyp == -1) {
+        nhl_error(L, "l_obj_objects_to_table: Wrong args");
+        return 0;
+    }
+
+    o = &objects[otyp];
+
+    lua_newtable(L);
+
+    if (OBJ_NAME(objects[otyp]))
+        nhl_add_table_entry_str(L, "name", OBJ_NAME(objects[otyp]));
+    if (OBJ_DESCR(objects[otyp]))
+        nhl_add_table_entry_str(L, "descr",
+                                OBJ_DESCR(objects[otyp]));
+    if (o->oc_uname)
+        nhl_add_table_entry_str(L, "uname", o->oc_uname);
+
+    nhl_add_table_entry_int(L, "name_known", o->oc_name_known);
+    nhl_add_table_entry_int(L, "merge", o->oc_merge);
+    nhl_add_table_entry_int(L, "uses_known", o->oc_uses_known);
+    nhl_add_table_entry_int(L, "pre_discovered", o->oc_pre_discovered);
+    nhl_add_table_entry_int(L, "magic", o->oc_magic);
+    nhl_add_table_entry_int(L, "charged", o->oc_charged);
+    nhl_add_table_entry_int(L, "unique", o->oc_unique);
+    nhl_add_table_entry_int(L, "nowish", o->oc_nowish);
+    nhl_add_table_entry_int(L, "big", o->oc_big);
+    /* TODO: oc_bimanual, oc_bulky */
+    nhl_add_table_entry_int(L, "tough", o->oc_tough);
+    nhl_add_table_entry_int(L, "dir", o->oc_dir); /* TODO: convert to text */
+    nhl_add_table_entry_int(L, "material", o->oc_material); /* TODO: convert to text */
+    /* TODO: oc_subtyp, oc_skill, oc_armcat */
+    nhl_add_table_entry_int(L, "oprop", o->oc_oprop);
+    nhl_add_table_entry_char(L, "class",
+                             def_oc_syms[(uchar) o->oc_class].sym);
+    nhl_add_table_entry_int(L, "delay", o->oc_delay);
+    nhl_add_table_entry_int(L, "color", o->oc_color); /* TODO: text? */
+    nhl_add_table_entry_int(L, "prob", o->oc_prob);
+    nhl_add_table_entry_int(L, "weight", o->oc_weight);
+    nhl_add_table_entry_int(L, "cost", o->oc_cost);
+    nhl_add_table_entry_int(L, "damage_small", o->oc_wsdam);
+    nhl_add_table_entry_int(L, "damage_large", o->oc_wldam);
+    /* TODO: oc_oc1, oc_oc2, oc_hitbon, a_ac, a_can, oc_level */
+    nhl_add_table_entry_int(L, "nutrition", o->oc_nutrition);
+
+    return 1;
+}
+
 /* Create a lua table representation of the object, unpacking all the
    object fields.
    local o = obj.new("rock");
@@ -322,6 +394,7 @@ static const struct luaL_Reg l_obj_methods[] = {
     { "at", l_obj_at },
     { "next", l_obj_nextobj },
     { "totable", l_obj_to_table },
+    { "class", l_obj_objects_to_table },
     { "placeobj", l_obj_placeobj },
     { "container", l_obj_container },
     { "contents", l_obj_getcontents },
