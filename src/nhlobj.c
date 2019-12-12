@@ -140,6 +140,13 @@ lua_State *L;
     nhl_add_table_entry_int(L, "owt", obj->owt);
     nhl_add_table_entry_int(L, "quan", obj->quan);
     nhl_add_table_entry_int(L, "spe", obj->spe);
+
+    if (obj->otyp == STATUE) {
+        nhl_add_table_entry_int(L, "historic", (obj->spe & STATUE_HISTORIC));
+        nhl_add_table_entry_int(L, "statue_male", (obj->spe & STATUE_MALE));
+        nhl_add_table_entry_int(L, "statue_female", (obj->spe & STATUE_FEMALE));
+    }
+
     nhl_add_table_entry_char(L, "oclass",
                              def_oc_syms[(uchar) obj->oclass].sym);
     nhl_add_table_entry_char(L, "invlet", obj->invlet);
