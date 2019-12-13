@@ -115,6 +115,19 @@ int value;
 }
 
 void
+nhl_add_table_entry_char(L, name, value)
+lua_State *L;
+const char *name;
+char value;
+{
+    char buf[2];
+    Sprintf(buf, "%c", value);
+    lua_pushstring(L, name);
+    lua_pushstring(L, buf);
+    lua_rawset(L, -3);
+}
+
+void
 nhl_add_table_entry_str(L, name, value)
 lua_State *L;
 const char *name;
@@ -873,6 +886,8 @@ nhl_init()
 
     l_selection_register(L);
     l_register_des(L);
+
+    l_obj_register(L);
 
     if (!nhl_loadlua(L, "nhlib.lua")) {
         lua_close(L);

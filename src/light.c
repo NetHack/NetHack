@@ -4,8 +4,6 @@
 
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
-#include "sfproto.h"
-
 
 /*
  * Mobile light sources.
@@ -326,9 +324,6 @@ int range;
         if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
         }
-        if (nhfp->fieldlevel) {
-            sfo_int(nhfp, &count, "lightsources", "lightsource_count", 1);
-        }
         actual = maybe_write_ls(nhfp, range, TRUE);
         if (actual != count)
             panic("counted %d light sources, wrote %d! [range=%d]", count,
@@ -379,15 +374,11 @@ NHFILE *nhfp;
     /* restore elements */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof count);
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &count, "lightsources", "lightsource_count", 1);
 
     while (count-- > 0) {
         ls = (light_source *) alloc(sizeof(light_source));
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) ls, sizeof(light_source));
-        if (nhfp->fieldlevel)
-            sfi_ls_t(nhfp, ls, "lightsources", "lightsource", 1);
         ls->next = g.light_base;
         g.light_base = ls;
     }
@@ -529,8 +520,6 @@ light_source *ls;
         if (ls->flags & LSF_NEEDS_FIXUP) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) ls, sizeof(light_source));
-            if (nhfp->fieldlevel)
-                sfo_ls_t(nhfp, ls, "lightsources", "lightsource", 1);
         } else {
             /* replace object pointer with id for write, then put back */
             arg_save = ls->id;
@@ -552,8 +541,6 @@ light_source *ls;
             ls->flags |= LSF_NEEDS_FIXUP;
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) ls, sizeof(light_source));
-            if (nhfp->fieldlevel)
-                sfo_ls_t(nhfp, ls, "lightsources", "lightsource", 1);
             ls->id = arg_save;
             ls->flags &= ~LSF_NEEDS_FIXUP;
         }

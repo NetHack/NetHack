@@ -310,8 +310,7 @@ VOBJ20 = $(O)vis_tab.o  $(O)weapon.o  $(O)were.o     $(O)wield.o    $(O)windows.
 VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
 VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
 VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)       $(O)isaac64.o  $(VIDEO_OBJ)
-VOBJ24 = $(O)sfbase.o   $(O)sfdata.o
-VOBJ25 = $(O)sfstruct.o $(O)sfascii.o $(O)sflendian.o 
+VOBJ24 = $(O)sfstruct.o
 
 SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
@@ -321,7 +320,7 @@ VVOBJ  = $(O)version.o
 MDLIB  = $(O)mdlib.o
 
 ifeq "$(ADD_LUA)" "Y"
-LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
+LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 LUA_QTEXT_FILE = "quest.lua"
 endif
 

@@ -695,6 +695,9 @@ const struct instance_globals g_init = {
     DUMMY,   /* lua_ver[LUA_VER_BUFSIZ] */
     DUMMY,   /* lua_copyright[LUA_COPYRIGHT_BUFSIZ] */
 
+    /* per-level glyph mapping flags */
+    0L,     /* glyphmap_perlevel_flags */
+
     IVMAGIC  /* used to validate that structure layout has been preserved */
 };
 

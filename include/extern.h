@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1574648937 2019/11/25 02:28:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.760 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1575830178 2019/12/08 18:36:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.767 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1671,6 +1671,11 @@ E struct selectionvar *FDECL(l_selection_check, (lua_State *, int));
 E int FDECL(l_selection_register, (lua_State *));
 #endif
 
+/* ### nhlobj.c ### */
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+E int FDECL(l_obj_register, (lua_State *));
+#endif
+
 /* ### nhlua.c ### */
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
@@ -1681,6 +1686,9 @@ E void FDECL(nhl_error, (lua_State *, const char *)) NORETURN;
 E void FDECL(lcheck_param_table, (lua_State *));
 E schar FDECL(get_table_mapchr, (lua_State *, const char *));
 E schar FDECL(get_table_mapchr_opt, (lua_State *, const char *, SCHAR_P));
+E void FDECL(nhl_add_table_entry_int, (lua_State *, const char *, int));
+E void FDECL(nhl_add_table_entry_char, (lua_State *, const char *, CHAR_P));
+E void FDECL(nhl_add_table_entry_str, (lua_State *, const char *, const char *));
 E schar FDECL(splev_chr2typ, (CHAR_P));
 E schar FDECL(check_mapchr, (const char *));
 E int FDECL(get_table_int, (lua_State *, const char *));
@@ -1796,6 +1804,9 @@ E const char *FDECL(suit_simple_name, (struct obj *));
 E const char *FDECL(cloak_simple_name, (struct obj *));
 E const char *FDECL(helm_simple_name, (struct obj *));
 E const char *FDECL(gloves_simple_name, (struct obj *));
+E const char *FDECL(boots_simple_name, (struct obj *));
+E const char *FDECL(shield_simple_name, (struct obj *));
+E const char *FDECL(shirt_simple_name, (struct obj *));
 E const char *FDECL(mimic_obj_name, (struct monst *));
 E char *FDECL(safe_qbuf, (char *, const char *, const char *, struct obj *,
                           char *(*)(OBJ_P), char *(*)(OBJ_P), const char *));
@@ -2042,6 +2053,7 @@ E boolean FDECL(can_pray, (BOOLEAN_P));
 E int NDECL(dopray);
 E const char *NDECL(u_gname);
 E int NDECL(doturn);
+E int FDECL(altarmask_at, (int, int));
 E const char *NDECL(a_gname);
 E const char *FDECL(a_gname_at, (XCHAR_P x, XCHAR_P y));
 E const char *FDECL(align_gname, (ALIGNTYP_P));

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ $NHDT-Date: 1575542023 2019/12/05 10:33:43 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.19 $ $NHDT-Date: 1575755075 2019/12/07 21:44:35 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -13,6 +13,9 @@ improvements to pronoun usage when hallucinating
 message "your knapsack can't accomodate any more items" when picking stuff up
 	or removing such from container was inaccurate if there was some gold
 	pending; vary the message rather than add more convoluted pickup code
+function calls made from mapglyph based on dungeon level are now called once
+	per level
+allow teleporting onto the vibrating square
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
@@ -39,7 +42,8 @@ split off some of the functionality that was in makedefs (compiled-in options
 	build date/time, etc) so that it can be built by a cross-compiler
 	and accessed on the target platform
 replace quest.txt and associated conversion to quest.dat via makedefs with
- 	lua quest texts loaded at runtime
+	lua quest texts loaded at runtime
+some altars are displayed in different colors (for tty and curses at least)
 
 
 Platform- and/or Interface-Specific New Features
@@ -55,4 +59,7 @@ Code Cleanup and Reorganization
 move majority of global variables into instance_globals struct g
 move zeroobj, zeromonst, zeroany into const_globals struct cg
 remove STATIC_DCL, STATIC_OVL, STATIC_VAR, STATIC_PTR
+old Qt moved from win/Qt to win/Qt3
+more current Qt for Qt version 4 and 5 moved from win/Qt4 to win/Qt; qt4
+	moniker changed to qt_
 

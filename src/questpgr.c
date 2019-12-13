@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1574634383 2019/11/24 22:26:23 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1575830005 2019/12/08 18:33:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -489,7 +489,9 @@ const char *msgid;
         nelems = (int) lua_tointeger(L, -1);
         lua_pop(L, 1);
         if (nelems < 2) {
-            impossible("com_pager: questtext[%s][%s] in %s in not an array of strings", section, msgid, QTEXT_FILE);
+            impossible(
+              "com_pager: questtext[%s][%s] in %s in not an array of strings",
+                       section, msgid, QTEXT_FILE);
             lua_close(L);
             return FALSE;
         }
@@ -511,12 +513,13 @@ const char *msgid;
 
     if (synopsis) {
         char in_line[BUFSZ], out_line[BUFSZ];
+
         Strcpy(in_line, synopsis);
         convert_line(in_line, out_line);
         putmsghistory(out_line, FALSE);
+        free(synopsis);
     }
 
-    free(synopsis);
     free(text);
     lua_close(L);
     return TRUE;

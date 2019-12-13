@@ -16,8 +16,6 @@
  */
 
 #include "hack.h"
-#include "sfproto.h"
-
 
 static boolean FDECL(isbig, (struct mkroom *));
 static struct mkroom *FDECL(pick_room, (BOOLEAN_P));
@@ -811,8 +809,6 @@ struct mkroom *r;
      */
     if (nhfp->structlevel)
         bwrite(nhfp->fd, (genericptr_t) r, sizeof (struct mkroom));
-    if (nhfp->fieldlevel)
-        sfo_mkroom(nhfp, r, "room", "mkroom", 1);
     for (i = 0; i < r->nsubrooms; i++) {
         save_room(nhfp, r->sbrooms[i]);
     }
@@ -830,8 +826,6 @@ NHFILE *nhfp;
     /* First, write the number of rooms */
     if (nhfp->structlevel)
         bwrite(nhfp->fd, (genericptr_t) &g.nroom, sizeof(g.nroom));
-    if (nhfp->fieldlevel)
-        sfo_int(nhfp, &g.nroom, "room", "g.nroom", 1);
     for (i = 0; i < g.nroom; i++)
         save_room(nhfp, &g.rooms[i]);
 }
@@ -845,8 +839,6 @@ struct mkroom *r;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) r, sizeof(struct mkroom));
-    if (nhfp->fieldlevel)
-        sfi_mkroom(nhfp, r, "room", "mkroom", 1);
 
     for (i = 0; i < r->nsubrooms; i++) {
         r->sbrooms[i] = &g.subrooms[g.nsubroom];
@@ -867,8 +859,6 @@ NHFILE *nhfp;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.nroom, sizeof(g.nroom));
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &g.nroom, "room", "g.nroom", 1);
 
     g.nsubroom = 0;
     for (i = 0; i < g.nroom; i++) {

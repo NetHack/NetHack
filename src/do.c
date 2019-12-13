@@ -1279,15 +1279,22 @@ boolean at_stairs, falling, portal;
      *   -1   11.46  12.50  12.5
      *   -2    5.21   4.17   0.0
      *   -3    2.08   0.0    0.0
+     *
+     * 3.7.0: the chance for the "mysterious force" to kick in goes down
+     * as it kicks in, starting at 25% per climb attempt and dropping off
+     * gradually but substantially.  The drop off is greater when hero is
+     * sent down farther so benefits lawfuls more than chaotics this time.
      */
     if (Inhell && up && u.uhave.amulet && !newdungeon && !portal
         && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
-        if (!rn2(4)) {
+        if (!rn2(4 + g.context.mysteryforce)) {
             int odds = 3 + (int) u.ualign.type,   /* 2..4 */
-                diff = odds <= 1 ? 0 : rn2(odds); /* paranoia */
+                diff = (odds <= 1) ? 0 : rn2(odds); /* paranoia */
 
             if (diff != 0) {
                 assign_rnd_level(newlevel, &u.uz, diff);
+                /* assign_rnd_level() may have used a value less than diff */
+                diff = u.uz.dlevel - newlevel->dlevel; /* actual descent */
                 /* if inside the tower, stay inside */
                 if (was_in_W_tower && !On_W_tower_level(newlevel))
                     diff = 0;
@@ -1295,15 +1302,20 @@ boolean at_stairs, falling, portal;
             if (diff == 0)
                 assign_level(newlevel, &u.uz);
 
-            new_ledger = ledger_no(newlevel);
-
             pline("A mysterious force momentarily surrounds you...");
+            /* each time it kicks in, the chance of doing so again may drop;
+               that drops faster, on average, when being sent down farther so
+               while the impact is reduced for everybody compared to earlier
+               versions, it is reduced least for chaotics, most for lawfuls */
+            g.context.mysteryforce += rn2(diff + 2); /* L:0-4, N:0-3, C:0-2 */
+
             if (on_level(newlevel, &u.uz)) {
                 (void) safe_teleds(FALSE);
                 (void) next_to_u();
                 return;
-            } else
-                at_stairs = g.at_ladder = FALSE;
+            }
+            new_ledger = ledger_no(newlevel);
+            at_stairs = g.at_ladder = FALSE;
         }
     }
 
@@ -1578,6 +1590,7 @@ boolean at_stairs, falling, portal;
 
     /* Reset the screen. */
     vision_reset(); /* reset the blockages */
+    g.glyphmap_perlevel_flags = 0L; /* force per-level mapglyph() changes */
     docrt();        /* does a full vision recalc */
     flush_screen(-1);
 

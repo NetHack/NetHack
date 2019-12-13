@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1575245052 2019/12/02 00:04:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.350 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1576201761 2019/12/13 01:49:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.383 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -946,6 +946,8 @@ wiz_load_lua(VOID_ARGS)
 {
     if (wizard) {
         char buf[BUFSZ];
+
+        buf[0] = '\0';
         getlin("Load which lua file?", buf);
         if (buf[0] == '\033' || buf[0] == '\0')
             return 0;
@@ -965,6 +967,7 @@ wiz_load_splua(VOID_ARGS)
         char buf[BUFSZ];
         int ridx;
 
+        buf[0] = '\0';
         getlin("Load which des lua file?", buf);
         if (buf[0] == '\033' || buf[0] == '\0')
             return 0;

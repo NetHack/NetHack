@@ -129,11 +129,6 @@ LEXYYC = lex.yy.c
 # YTABH = y_tab.h
 # LEXYYC = lexyy.c
 
-# This is the universal ctags utility which produces the tags in the
-# format that util/readtags requires. 
-# https://github.com/universal-ctags/ctags.git
-CTAGSCMD = universal-ctags
-
 # if you change this to 1, feedback while building will omit -Dthis -Wthat
 # -Isomewhere so that each file being compiled is listed on one short line;
 # it requires support for '$<' in rules with more than one prerequisite
@@ -189,7 +184,6 @@ MAKESRC = makedefs.c ../src/mdlib.c
 RECOVSRC = recover.c
 DLBSRC = dlb_main.c
 UTILSRCS = $(MAKESRC) panic.c $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
-READTAGSSRC = readtags.c
 
 # files that define all monsters and objects
 CMONOBJ = ../src/monst.c ../src/objects.c
@@ -209,9 +203,6 @@ RECOVOBJS = recover.o
 
 # object files for the data librarian
 DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
-
-# object files for readtags
-READTAGSOBJS = readtags.o
 
 # flags for creating distribution versions of sys/share/*_lex.c, using
 # a more portable flex skeleton, which is not included in the distribution.
@@ -368,67 +359,6 @@ tileedit: tileedit.cpp $(TEXT_IO)
 	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
 	$(CC) -o tileedit -I../include -I$(QTDIR)/include -L$(QTDIR)/lib \
 		tileedit.cpp $(TEXT_IO) -lqt
-
-#	dependencies for readtags
-#
-CTAGDEP = ../include/align.h  ../include/artifact.h ../include/artilist.h \
-	  ../include/attrib.h ../include/context.h  ../include/coord.h    \
-	  ../include/decl.h   ../include/dungeon.h  ../include/engrave.h  \
-	  ../include/flag.h   ../include/func_tab.h ../include/global.h   \
-	  ../include/hack.h   ../include/lev.h      ../include/mextra.h   \
-	  ../include/mkroom.h ../include/monst.h    ../include/monsym.h   \
-	  ../include/obj.h    ../include/objclass.h ../include/prop.h     \
-	  ../include/quest.h  ../include/rect.h     ../include/region.h   \
-	  ../include/rm.h     ../include/skills.h   ../include/spell.h    \
-	  ../include/sys.h    ../include/timeout.h  ../include/trap.h     \
-	  ../include/you.h    ../include/onames.h   ../include/wintype.h
-#	../include/permonst.h
-CTAGSOPT = --language-force=c --sort=no -D"Bitfield(x,n)=unsigned x : n" --excmd=pattern
-
-readtags: $(READTAGSOBJS)
-	$(CC) $(LFLAGS) -o readtags $(READTAGSOBJS) $(LIBS)
-
-readtags.o: readtags.c $(HACK_H)
-	$(CC) $(CFLAGS) -c readtags.c
-
-nethack.tags: $(CTAGDEP)
-#
-# tested with universal ctags from https://github.com/universal-ctags/ctags.git
-#
-	$(CTAGSCMD) $(CTAGSOPT) -f nethack.tags ../include/align.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/artifact.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/artilist.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/attrib.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/context.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/coord.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/decl.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/dungeon.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/engrave.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/flag.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/func_tab.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/global.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/hack.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/lev.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/mextra.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/mkroom.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/monst.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/monsym.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/obj.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/objclass.h
-#	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/permonst.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/prop.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/quest.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/rect.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/region.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/rm.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/skills.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/spell.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/sys.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/timeout.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/trap.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/you.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/onames.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/wintype.h
 
 # using dependencies like
 #	../src/foo::

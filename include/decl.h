@@ -1260,6 +1260,9 @@ struct instance_globals {
     char lua_ver[LUA_VER_BUFSIZ];
     char lua_copyright[LUA_COPYRIGHT_BUFSIZ];
 
+    /* per-level glyph mapping flags */
+    long glyphmap_perlevel_flags;
+
     unsigned long magic; /* validate that structure layout is preserved */
 };
 

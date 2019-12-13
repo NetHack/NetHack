@@ -6,8 +6,6 @@
 #include "hack.h"
 #include "sp_lev.h"
 #include "lev.h" /* save & restore info */
-#include "sfproto.h"
-
 
 static int FDECL(iswall, (int, int));
 static int FDECL(iswall_or_stone, (int, int));
@@ -1579,18 +1577,9 @@ NHFILE *nhfp;
             bwrite(nhfp->fd, (genericptr_t) &g.xmax, sizeof(int));
             bwrite(nhfp->fd, (genericptr_t) &g.ymax, sizeof(int));
         }
-        if (nhfp->fieldlevel) {
-            sfo_int(nhfp, &n, "waterlevel", "bubble_count", 1);
-            sfo_int(nhfp, &g.xmin, "waterlevel", "g.xmin", 1);
-            sfo_int(nhfp, &g.ymin, "waterlevel", "g.ymin", 1);
-            sfo_int(nhfp, &g.xmax, "waterlevel", "g.xmax", 1);
-            sfo_int(nhfp, &g.ymax, "waterlevel", "g.ymax", 1);
-        }
         for (b = g.bbubbles; b; b = b->next) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) b, sizeof(struct bubble));
-            if (nhfp->fieldlevel)
-                sfo_bubble(nhfp, b, "waterlevel", "bubble", 1);
         }
     }
     if (release_data(nhfp))
@@ -1623,20 +1612,11 @@ NHFILE *nhfp;
         mread(nhfp->fd,(genericptr_t)&g.xmax,sizeof(int));
         mread(nhfp->fd,(genericptr_t)&g.ymax,sizeof(int));
     }
-    if (nhfp->fieldlevel) {
-        sfi_int(nhfp, &n, "waterlevel", "bubble_count", 1);
-        sfi_int(nhfp, &g.xmin, "waterlevel", "g.xmin", 1);
-        sfi_int(nhfp, &g.ymin, "waterlevel", "g.ymin", 1);
-        sfi_int(nhfp, &g.xmax, "waterlevel", "g.xmax", 1);
-        sfi_int(nhfp, &g.ymax, "waterlevel", "g.ymax", 1);
-    }
     for (i = 0; i < n; i++) {
         btmp = b;
         b = (struct bubble *) alloc(sizeof(struct bubble));
         if (nhfp->structlevel)
             mread(nhfp->fd,(genericptr_t) b, sizeof(struct bubble));
-        if (nhfp->fieldlevel)
-            sfi_bubble(nhfp, b, "waterlevel", "bubble", 1);
       if (g.bbubbles) {
           btmp->next = b;
           b->prev = btmp;

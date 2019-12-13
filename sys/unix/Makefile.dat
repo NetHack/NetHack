@@ -65,11 +65,11 @@ rip.xpm: ../win/X11/rip.xpm
 mapbg.xpm: ../win/gnome/mapbg.xpm
 	cp ../win/gnome/mapbg.xpm mapbg.xpm
 
-nhsplash.xpm: ../win/Qt/nhsplash.xpm
-	cp ../win/Qt/nhsplash.xpm nhsplash.xpm
+nhsplash.xpm: ../win/share/nhsplash.xpm
+	cp ../win/share/nhsplash.xpm nhsplash.xpm
 
-nethack.icns: ../win/Qt/nhicns.uu
-	$(UUDECODE) ../win/Qt/nhicns.uu
+nethack.icns: ../win/share/nhicns.uu
+	$(UUDECODE) ../win/share/nhicns.uu
 
 Info.plist: ../win/Qt/Info.pli
 	cp ../win/Qt/Info.pli Info.plist

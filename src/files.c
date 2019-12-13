@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1574116097 2019/11/18 22:28:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.272 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1576096997 2019/12/11 20:43:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,8 +8,6 @@
 #include "hack.h"
 #include "dlb.h"
 #include <ctype.h>
-#include "sfproto.h"
-#include "sfprocs.h"
 #include "lev.h"
 
 #ifdef TTY_GRAPHICS
@@ -451,18 +449,6 @@ NHFILE *nhfp;
     if (nhfp) {
         if (nhfp->structlevel && nhfp->fd != -1)
             (void) nhclose(nhfp->fd), nhfp->fd = -1;
-        if (nhfp->fieldlevel) {
-            if (nhfp->fpdef) {
-                (void) fclose(nhfp->fpdef);
-                nhfp->fpdef = (FILE *) 0;
-            }
-        }
-        if (nhfp->fplog)
-            (void) fprintf(nhfp->fplog, "# closing\n");
-        if (nhfp->fplog)
-            (void) fclose(nhfp->fplog);
-        if (nhfp->fpdebug)
-            (void) fclose(nhfp->fpdebug);
         zero_nhfile(nhfp);
         free_nhfile(nhfp);
     }
@@ -479,13 +465,6 @@ NHFILE *nhfp;
         (void) lseek(nhfp->fd, (off_t) 0, 0);
 #endif
     }
-    if (nhfp->fieldlevel) {
-        if (nhfp->fpdef) {
-            rewind(nhfp->fpdef);
-            nhfp->count = 0L;
-            nhfp->eof = FALSE;
-        }
-    }
 }
 
 static
@@ -497,25 +476,10 @@ NHFILE *nhfp;
        the pointer to the nethack file descriptor */
     if (nhfp) {
          /* check for no open file at all,
-          * not a structlevel legacy file,
-          * nor a fieldlevel file.
+          * not a structlevel legacy file
           */
-         if (((nhfp->fd == -1) && !nhfp->fpdef)
-                || (nhfp->structlevel && nhfp->fd < 0)
-                || (nhfp->fieldlevel && !nhfp->fpdef)) {
+         if (nhfp->structlevel && nhfp->fd < 0) {
             /* not viable, start the cleanup */
-            if (nhfp->fieldlevel) {
-                if (nhfp->fpdef) {
-                    (void) fclose(nhfp->fpdef);
-                    nhfp->fpdef = (FILE *) 0;
-                }
-                if (nhfp->fplog) {
-                    (void) fprintf(nhfp->fplog, "# closing, not viable\n");
-                    (void) fclose(nhfp->fplog);
-                }
-                if (nhfp->fpdebug)
-                    (void) fclose(nhfp->fpdebug);
-            }
             zero_nhfile(nhfp);
             free_nhfile(nhfp);
             nhfp = (NHFILE *) 0;
@@ -795,8 +759,6 @@ d_level *lev;
         Sprintf(eos(dptr), ".%d", lev->dlevel);
 #ifdef SYSCF
     idx = sysopt.bonesformat[0];
-    if (idx > historical && idx <= ascii)
-        Strcat(dptr, sfoprocs[idx].ext);
 #endif
 #ifdef VMS
     Strcat(dptr, ";1");
@@ -847,26 +809,6 @@ char errbuf[];
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_BONESFILE;
         nhfp->mode = WRITING;
-#ifdef SYSCF
-        if (sysopt.bonesformat[0] > historical &&
-            sysopt.bonesformat[0] <= ascii) {
-            nhfp->structlevel = FALSE;
-            nhfp->fieldlevel = TRUE;
-            nhfp->addinfo = TRUE;
-            nhfp->style.deflt = TRUE;
-            nhfp->style.binary = (sysopt.bonesformat[0] != ascii);
-            nhfp->fnidx = sysopt.bonesformat[0];
-            nhfp->fd = -1;
-            nhfp->fpdef = fopen(file, nhfp->style.binary ? WRBMODE : WRTMODE);
-            if (nhfp->fpdef) {
-#ifdef SAVEFILE_DEBUGGING
-                nhfp->fpdebug = fopen("create_bonesfile-debug.log", "a");
-#endif
-            } else {
-                failed = errno;
-            }
-        }
-#endif      /* SYSCF */
         if (nhfp->structlevel) {
 #if defined(MICRO) || defined(WIN32)
             /* Use O_TRUNC to force the file to be shortened if it already
@@ -962,26 +904,6 @@ char **bonesid;
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_BONESFILE;
         nhfp->mode = READING;
-#ifdef SYSCF
-        if (sysopt.bonesformat[0] > historical &&
-            sysopt.bonesformat[0] <= ascii) {
-            nhfp->structlevel = FALSE;
-            nhfp->fieldlevel = TRUE;
-            nhfp->addinfo = TRUE;
-            nhfp->style.deflt = TRUE;
-            nhfp->style.binary = (sysopt.bonesformat[0] != ascii);
-            nhfp->fnidx = sysopt.bonesformat[0];
-            nhfp->fd = -1;
-            nhfp->fpdef = fopen(fq_bones, nhfp->style.binary ? RDBMODE : RDTMODE);
-            if (nhfp->fpdef) {
-#ifdef SAVEFILE_DEBUGGING
-                nhfp->fpdebug = fopen("open_bonesfile-debug.log", "a");
-#endif
-            } else {
-                failed = errno;
-            }
-        }
-#endif  /* SYSCF */
         if (nhfp->structlevel) {
 #ifdef MAC
             nhfp->fd = macopen(fq_bones, O_RDONLY | O_BINARY, BONE_TYPE);
@@ -1022,16 +944,11 @@ void
 set_savefile_name(regularize_it)
 boolean regularize_it;
 {
-    int idx = 0, regoffset = 0, overflow = 0,  
+    int idx = historical, regoffset = 0, overflow = 0,  
         indicator_spot = 0; /* 0=no indicator, 1=before ext, 2=after ext */
     const char *postappend = (const char *) 0,
                *sfindicator = (const char *) 0;
 
-#ifdef SYSCF
-    idx = sysopt.saveformat[0];
-    if (idx > historical && idx <= ascii)
-        sfindicator = sfoprocs[idx].ext;
-#endif
     if (g.program_state.in_self_recover) {
         /* self_recover needs to be done as historical
            structlevel content until that process is
@@ -1041,7 +958,6 @@ boolean regularize_it;
            place it into the save file.
         */
         idx = historical;
-        sfindicator = sfoprocs[idx].ext;
     }
 #ifdef VMS
     Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
@@ -1112,15 +1028,7 @@ boolean regularize_it;
         if (strlen(g.SAVEF) + strlen(SAVE_EXTENSION) < (SAVESIZE - 1)) {
             Strcat(g.SAVEF, SAVE_EXTENSION);
 #ifdef MSDOS
-#ifdef SYSCF
- 	if (idx >= historical && idx <= ascii) {
-	    /* we did leave room for the extra char in SAVE_EXTENSION */
-	    g.SAVEF[strlen(g.SAVEF)-1] =
-	    	(idx == lendian) ? 'l' :
-	    	(idx == ascii)   ? 'a' : '\0';
-	}
-        sfindicator = (g.program_state.in_self_recover) ? "" : sfoprocs[idx].ext;
-#endif
+        sfindicator = "";
 #endif
         } else
             overflow = 3;
@@ -1140,8 +1048,8 @@ boolean regularize_it;
     }
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if (overflow)
-        impossible("set_savefile_name() couldn't complete without overlow %d",
-                    overflow);
+        impossible("set_savefile_name() couldn't complete without overflow %d",
+                   overflow);
 #endif
 }
 
@@ -1152,8 +1060,6 @@ NHFILE *nhfp;
 {
     if (nhfp->structlevel)
         (void) write(nhfp->fd, (genericptr_t) g.SAVEF, sizeof(g.SAVEF));
-    if (nhfp->fieldlevel)
-        sfo_str(nhfp, g.SAVEF, "savefile_name", "g.savef", sizeof(g.SAVEF)); 
 }
 #endif
 
@@ -1212,23 +1118,6 @@ create_savefile()
             nhfp->fd = -1;
             nhfp->fpdef = (FILE *) 0;
         }
-        if (!do_historical) {
-            nhfp->structlevel = FALSE;
-            nhfp->fieldlevel = TRUE;
-            nhfp->addinfo = TRUE;
-            nhfp->style.deflt = TRUE;
-            nhfp->style.binary = (sysopt.saveformat[0] != ascii);
-            nhfp->fnidx = sysopt.saveformat[0];
-            nhfp->fd = -1;
-            nhfp->fpdef = fopen(fq_save, nhfp->style.binary ? WRBMODE : WRTMODE);
-            if (nhfp->fpdef) {
-#ifdef SAVEFILE_DEBUGGING
-                nhfp->fpdebug = fopen("create_savefile-debug.log", "a");
-#endif
-            } else {
-                failed = errno;
-            }
-        }
         if (nhfp->structlevel) {
 #if defined(MICRO) || defined(WIN32)
             nhfp->fd = open(fq_save, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
@@ -1274,11 +1163,6 @@ open_savefile()
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = READING;
-#ifdef SYSCF
-        if (sysopt.saveformat[0] > historical &&
-            sysopt.saveformat[0] <= ascii)
-            do_historical = FALSE;
-#endif /* SYSCF */
         if (g.program_state.in_self_recover) {
             do_historical = TRUE;       /* force it */
             nhfp->structlevel = TRUE;
@@ -1289,23 +1173,6 @@ open_savefile()
             nhfp->fnidx = historical;
             nhfp->fd = -1;
             nhfp->fpdef = (FILE *) 0;
-        }
-        if (!do_historical) {
-            nhfp->structlevel = FALSE;
-            nhfp->fieldlevel = TRUE;
-            nhfp->addinfo = TRUE;
-            nhfp->style.deflt = TRUE;
-            nhfp->style.binary = (sysopt.saveformat[0] < ascii);
-            nhfp->fnidx = sysopt.saveformat[0];
-            nhfp->fd = -1;
-            nhfp->fpdef = fopen(fq_save, nhfp->style.binary ? RDBMODE : RDTMODE);
-            if (nhfp->fpdef) {
-#ifdef SAVEFILE_DEBUGGING
-                nhfp->fpdebug = fopen("open_savefile-debug.log", "a");
-#endif
-            } else {
-                failed = errno;
-            }
         }
         if (nhfp->structlevel) {
 #ifdef MAC
@@ -1345,10 +1212,6 @@ restore_saved_game()
 
     nh_uncompress(fq_save);
     if ((nhfp = open_savefile()) != 0) {
-        if (nhfp && nhfp->fieldlevel && nhfp->fplog)
-            (void) fprintf(nhfp->fplog, "# just opened\n");
-        if (nhfp->fieldlevel && nhfp->addinfo)
-            sfi_addinfo(nhfp, "NetHack", "start", "savefile", 0);
         if (validate(nhfp, fq_save) != 0) {
             close_nhfile(nhfp);
             nhfp = (NHFILE *)0;
@@ -4051,15 +3914,6 @@ recover_savefile()
      */
 
     /*
-     * Things are different now. We could be in a situation
-     * where the default save file format is not structlevel.
-     * self-recover is currently written to use copy_bytes()
-     * to move content from the level files into the savefile.
-     * Until the code is updated to use something other than
-     * copy_bytes, what we need to do is force the recovery
-     * save to be structlevel, finish creating it, then read
-     * it back in. The save after that can be fieldlevel again.
-     *
      * Set a flag for the savefile routines to know the
      * circumstances and act accordingly:
      *    g.program_state.in_self_recover
@@ -4088,28 +3942,10 @@ recover_savefile()
      */
     /*store_formatindicator(snhfp); */
     store_version(snhfp);
-#if 0
-    if (snhfp->structlevel) {
-        if (write(snhfp->fd, (genericptr_t) &version_data, sizeof version_data)
-            != sizeof version_data)
-            savewrite_failure = "version_info";
-    }
-    if (snhfp->fieldlevel) {
-        sfo_version_info(snhfp, (struct version_info *) &version_data,
-                         "version", "version_info", 1);
-        savewrite_failure = (const char *) 0;
-    }
-    if (savewrite_failure)
-        goto cleanup;
-#endif
 
     if (snhfp->structlevel) {
         if (write(snhfp->fd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi)
             savewrite_failure = "savefileinfo";
-    }
-    if (snhfp->fieldlevel) {
-        sfo_savefile_info(snhfp, &sfsaveinfo, "savefileinfo", "savefile_info", 1);
-        savewrite_failure = (const char *) 0;
     }
     if (savewrite_failure)
         goto cleanup;
@@ -4119,10 +3955,6 @@ recover_savefile()
             != sizeof pltmpsiz)
             savewrite_failure = "player name size";
     }
-    if (snhfp->fieldlevel) {
-        sfo_int(snhfp, &pltmpsiz, "plname", "plname_size", 1);
-        savewrite_failure = (const char *) 0;
-    }
     if (savewrite_failure)
         goto cleanup;
 
@@ -4130,18 +3962,9 @@ recover_savefile()
         if (write(snhfp->fd, (genericptr_t) &tmpplbuf, pltmpsiz) != pltmpsiz)
             savewrite_failure = "player name";
     }
-    if (snhfp->fieldlevel) {
-        sfo_str(snhfp, tmpplbuf, "plname", "tmpplbuf", pltmpsiz);
-        savewrite_failure = (const char *) 0;
-    }
     if (savewrite_failure)
         goto cleanup;
 
-    /*
-     * copy_bytes isn't good enough anymore.
-     * We could be reading from a structlevel file but
-     * writing into a fieldlevel save file. Yikes!
-     */
     if (!copy_bytes(lnhfp->fd, snhfp->fd)) {
         close_nhfile(gnhfp);
         close_nhfile(snhfp);

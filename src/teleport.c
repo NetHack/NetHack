@@ -260,8 +260,13 @@ teleok(x, y, trapok)
 register int x, y;
 boolean trapok;
 {
-    if (!trapok && t_at(x, y))
-        return FALSE;
+    if (!trapok) {
+        /* allow teleportation onto vibrating square, it's not a real trap */
+        struct trap *trap = t_at(x, y);
+        if (trap && trap->ttyp != VIBRATING_SQUARE) {
+            return FALSE;
+        }
+    }
     if (!goodpos(x, y, &g.youmonst, 0))
         return FALSE;
     if (!tele_jump_ok(u.ux, u.uy, x, y))

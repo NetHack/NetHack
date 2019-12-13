@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1575214670 2019/12/01 15:37:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1575768410 2019/12/08 01:26:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1464,11 +1464,11 @@ struct obj *obj;
         return 0;
     }
 
-    reset_remarm(); /* clear g.context.takeoff.mask and g.context.takeoff.what */
+    reset_remarm(); /* clear context.takeoff.mask and context.takeoff.what */
     (void) select_off(obj);
     if (!g.context.takeoff.mask)
         return 0;
-    /* none of armoroff()/Ring_/Amulet/Blindf_off() use g.context.takeoff.mask */
+    /* none of armoroff()/Ring_/Amulet/Blindf_off() use context.takeoff.mask */
     reset_remarm();
 
     if (obj->owornmask & W_ARMOR) {
@@ -1584,70 +1584,76 @@ struct obj *otmp;
     if (delay) {
         nomul(delay);
         g.multi_reason = "disrobing";
-        if (is_helmet(otmp)) {
-            what = helm_simple_name(otmp);
-            g.afternmv = Helmet_off;
-        } else if (is_gloves(otmp)) {
-            what = gloves_simple_name(otmp);
-            g.afternmv = Gloves_off;
-        } else if (is_boots(otmp)) {
-            what = c_boots;
-            g.afternmv = Boots_off;
-        } else if (is_suit(otmp)) {
+        switch (objects[otmp->otyp].oc_armcat) {
+        case ARM_SUIT:
             what = suit_simple_name(otmp);
             g.afternmv = Armor_off;
-        } else if (is_cloak(otmp)) {
+            break;
+        case ARM_SHIELD:
+            what = shield_simple_name(otmp);
+            g.afternmv = Shield_off;
+            break;
+        case ARM_HELM:
+            what = helm_simple_name(otmp);
+            g.afternmv = Helmet_off;
+            break;
+        case ARM_GLOVES:
+            what = gloves_simple_name(otmp);
+            g.afternmv = Gloves_off;
+            break;
+        case ARM_BOOTS:
+            what = boots_simple_name(otmp);
+            g.afternmv = Boots_off;
+            break;
+        case ARM_CLOAK:
             what = cloak_simple_name(otmp);
             g.afternmv = Cloak_off;
-        } else if (is_shield(otmp)) {
-            what = c_shield;
-            g.afternmv = Shield_off;
-        } else if (is_shirt(otmp)) {
-            what = c_shirt;
+            break;
+        case ARM_SHIRT:
+            what = shirt_simple_name(otmp);
             g.afternmv = Shirt_off;
-        } else {
+            break;
+        default:
             impossible("Taking off unknown armor (%d: %d), delay %d",
                        otmp->otyp, objects[otmp->otyp].oc_armcat, delay);
+            break;
         }
         if (what) {
+            /* sizeof offdelaybuf == 60; increase it if this becomes longer */
             Sprintf(offdelaybuf, "You finish taking off your %s.", what);
             g.nomovemsg = offdelaybuf;
         }
     } else {
-        /* Be warned!  We want off_msg after removing the item to
-         * avoid "You were wearing ____ (being worn)."  However, an
-         * item which grants fire resistance might cause some trouble
-         * if removed in Hell and lifesaving puts it back on; in this
-         * case the message will be printed at the wrong time (after
-         * the messages saying you died and were lifesaved).  Luckily,
-         * no cloak, shield, or fast-removable armor grants fire
-         * resistance, so we can safely do the off_msg afterwards.
-         * Rings do grant fire resistance, but for rings we want the
-         * off_msg before removal anyway so there's no problem.  Take
-         * care in adding armors granting fire resistance; this code
-         * might need modification.
-         * 3.2 (actually 3.1 even): that comment is obsolete since
-         * fire resistance is not required for Gehennom so setworn()
-         * doesn't force the resistance granting item to be re-worn
-         * after being lifesaved anymore.
-         */
-        if (is_cloak(otmp))
-            (void) Cloak_off();
-        else if (is_shield(otmp))
-            (void) Shield_off();
-        else if (is_helmet(otmp))
-            (void) Helmet_off();
-        else if (is_gloves(otmp))
-            (void) Gloves_off();
-        else if (is_boots(otmp))
-            (void) Boots_off();
-        else if (is_shirt(otmp))
-            (void) Shirt_off();
-        else if (is_suit(otmp))
+        /* no delay so no '(*afternmv)()' or 'nomovemsg' */
+        switch (objects[otmp->otyp].oc_armcat) {
+        case ARM_SUIT:
             (void) Armor_off();
-        else
+            break;
+        case ARM_SHIELD:
+            (void) Shield_off();
+            break;
+        case ARM_HELM:
+            (void) Helmet_off();
+            break;
+        case ARM_GLOVES:
+            (void) Gloves_off();
+            break;
+        case ARM_BOOTS:
+            (void) Boots_off();
+            break;
+        case ARM_CLOAK:
+            (void) Cloak_off();
+            break;
+        case ARM_SHIRT:
+            (void) Shirt_off();
+            break;
+        default:
             impossible("Taking off unknown armor (%d: %d), no delay",
                        otmp->otyp, objects[otmp->otyp].oc_armcat);
+            break;
+        }
+        /* We want off_msg() after removing the item to
+           avoid "You were wearing ____ (being worn)." */
         off_msg(otmp);
     }
     g.context.takeoff.mask = g.context.takeoff.what = 0L;

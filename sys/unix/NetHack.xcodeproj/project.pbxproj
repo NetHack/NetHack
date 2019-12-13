@@ -142,10 +142,6 @@
 		31B8A46021A26AE70055BD01 /* dlb_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A45F21A26AE70055BD01 /* dlb_main.c */; };
 		31B8A46121A26AF60055BD01 /* panic.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42721A267E60055BD01 /* panic.c */; };
 		31B8A46221A26B020055BD01 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
-		544768A323994965004B9739 /* sfascii.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A223994965004B9739 /* sfascii.c */; };
-		544768A5239949A8004B9739 /* sfbase.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A4239949A8004B9739 /* sfbase.c */; };
-		544768A9239949FA004B9739 /* sfdata.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A6239949FA004B9739 /* sfdata.c */; };
-		544768AA239949FA004B9739 /* sflendian.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A7239949FA004B9739 /* sflendian.c */; };
 		544768AB239949FA004B9739 /* sfstruct.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A8239949FA004B9739 /* sfstruct.c */; };
 		544768AE23994A17004B9739 /* nhlsel.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AC23994A17004B9739 /* nhlsel.c */; };
 		544768AF23994A17004B9739 /* nhlua.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AD23994A17004B9739 /* nhlua.c */; };
@@ -486,18 +482,12 @@
 		31B8A45F21A26AE70055BD01 /* dlb_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlb_main.c; path = ../../util/dlb_main.c; sourceTree = "<group>"; };
 		31B8A46421A278AC0055BD01 /* dgn_comp.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = dgn_comp.y; path = ../../util/dgn_comp.y; sourceTree = "<group>"; };
 		31B8A46821A288770055BD01 /* dgn_comp.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = dgn_comp.l; path = ../../util/dgn_comp.l; sourceTree = "<group>"; };
-		544768A223994965004B9739 /* sfascii.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfascii.c; path = ../../src/sfascii.c; sourceTree = "<group>"; };
-		544768A4239949A8004B9739 /* sfbase.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfbase.c; path = ../../src/sfbase.c; sourceTree = "<group>"; };
-		544768A6239949FA004B9739 /* sfdata.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfdata.c; path = ../../src/sfdata.c; sourceTree = "<group>"; };
-		544768A7239949FA004B9739 /* sflendian.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sflendian.c; path = ../../src/sflendian.c; sourceTree = "<group>"; };
 		544768A8239949FA004B9739 /* sfstruct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfstruct.c; path = ../../src/sfstruct.c; sourceTree = "<group>"; };
 		544768AC23994A17004B9739 /* nhlsel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlsel.c; path = ../../src/nhlsel.c; sourceTree = "<group>"; };
 		544768AD23994A17004B9739 /* nhlua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlua.c; path = ../../src/nhlua.c; sourceTree = "<group>"; };
 		544768B023994A2C004B9739 /* mdlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mdlib.c; path = ../../src/mdlib.c; sourceTree = "<group>"; };
 		544768B423995447004B9739 /* isaac64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = isaac64.h; path = ../../include/isaac64.h; sourceTree = "<group>"; };
 		544768B523995488004B9739 /* nhlua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nhlua.h; path = ../../include/nhlua.h; sourceTree = "<group>"; };
-		544768B623995488004B9739 /* sfprocs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sfprocs.h; path = ../../include/sfprocs.h; sourceTree = "<group>"; };
-		544768B723995488004B9739 /* sfproto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sfproto.h; path = ../../include/sfproto.h; sourceTree = "<group>"; };
 		544768B923995BB7004B9739 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../lib/lua/liblua.a; sourceTree = "<group>"; };
 		54FCE8282223261F00F393C8 /* isaac64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = isaac64.c; path = ../../src/isaac64.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -567,11 +557,7 @@
 				544768B023994A2C004B9739 /* mdlib.c */,
 				544768AC23994A17004B9739 /* nhlsel.c */,
 				544768AD23994A17004B9739 /* nhlua.c */,
-				544768A6239949FA004B9739 /* sfdata.c */,
-				544768A7239949FA004B9739 /* sflendian.c */,
 				544768A8239949FA004B9739 /* sfstruct.c */,
-				544768A4239949A8004B9739 /* sfbase.c */,
-				544768A223994965004B9739 /* sfascii.c */,
 				31B8A35521A238030055BD01 /* allmain.c */,
 				31B8A36521A238040055BD01 /* alloc.c */,
 				31B8A35E21A238040055BD01 /* apply.c */,
@@ -710,8 +696,6 @@
 			isa = PBXGroup;
 			children = (
 				544768B523995488004B9739 /* nhlua.h */,
-				544768B623995488004B9739 /* sfprocs.h */,
-				544768B723995488004B9739 /* sfproto.h */,
 				544768B423995447004B9739 /* isaac64.h */,
 				3186A3B721A4B0FD0052BF02 /* align.h */,
 				3186A38021A4B0FB0052BF02 /* amiconf.h */,
@@ -1460,7 +1444,6 @@
 			files = (
 				31B8A3BC21A238060055BD01 /* eat.c in Sources */,
 				31B8A3A921A238060055BD01 /* music.c in Sources */,
-				544768A9239949FA004B9739 /* sfdata.c in Sources */,
 				544768B123994A2C004B9739 /* mdlib.c in Sources */,
 				31B8A3D221A238060055BD01 /* engrave.c in Sources */,
 				31B8A3A021A238060055BD01 /* exper.c in Sources */,
@@ -1479,7 +1462,6 @@
 				31B8A41921A244940055BD01 /* objects.c in Sources */,
 				31B8A3AA21A238060055BD01 /* wizard.c in Sources */,
 				31B8A3D021A238060055BD01 /* explode.c in Sources */,
-				544768A5239949A8004B9739 /* sfbase.c in Sources */,
 				31B8A3DE21A238060055BD01 /* sys.c in Sources */,
 				31B8A38021A238060055BD01 /* sit.c in Sources */,
 				31B8A3AF21A238060055BD01 /* lock.c in Sources */,
@@ -1580,7 +1562,6 @@
 				31B8A38E21A238060055BD01 /* quest.c in Sources */,
 				31B8A3D621A238060055BD01 /* region.c in Sources */,
 				31B8A3D421A238060055BD01 /* worm.c in Sources */,
-				544768AA239949FA004B9739 /* sflendian.c in Sources */,
 				31B8A3C921A238060055BD01 /* sounds.c in Sources */,
 				31B8A37C21A238060055BD01 /* pager.c in Sources */,
 				31B8A39F21A238060055BD01 /* fountain.c in Sources */,
@@ -1589,7 +1570,6 @@
 				31B8A3D321A238060055BD01 /* cmd.c in Sources */,
 				31B8A3AB21A238060055BD01 /* mplayer.c in Sources */,
 				31B8A3CC21A238060055BD01 /* pickup.c in Sources */,
-				544768A323994965004B9739 /* sfascii.c in Sources */,
 				31B8A39721A238060055BD01 /* invent.c in Sources */,
 				31B8A40021A23E6E0055BD01 /* getline.c in Sources */,
 				31B8A3B521A238060055BD01 /* rect.c in Sources */,
