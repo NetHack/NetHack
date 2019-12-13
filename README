@@ -1,52 +1,26 @@
-          NetHack 3.6.3 -- General information December 5, 2019
+          NetHack 3.6.4 -- General information December 5, 2019
 
 NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.3 is the official release of NetHack that follows NetHack 3.6.2.
-It contains a collection of over 190 bug fixes to NetHack 3.6.2 and over 22
-game enhancements and community contributions. The file doc/fixes36.3 in the
-source distribution has a full list of them. The text in there was written for
-the development team's own use and is provided  "as is", so please do not ask
-us to further explain the entries in that file. Some entries might be 
-considered "spoilers", particularly in the "new features" section.
+NetHack 3.6.4 is the official release of NetHack that follows NetHack 3.6.3
+and contains all bug fixes since then, including one security-releated fix.
+The file doc/fixes36.4 in the source distribution has a full list of them. The
+text in there was written for the development team's own use and is provided
+"as is", so please do not ask us to further explain the entries in that file.
+Some entries might be considered "spoilers", particularly in the "new features"
+section.
 
 Below you will find some other general notes that were not considered
 spoilers:
 
- *  Fixed stale 'thrownobj' pointer for returning thrown aklys while engulfed
- *  Fixed uarmh null pointer dereference if a helm of opposite alignment came
- *     off due to being polymorphed
- *  Fixed 'object lost' panic when attempting to crawl of of the water during
- *     emergency disrobing/dropping
- *  Running now stops when moving over engravings so you can tell where they
- *     are
- *  Fixed detection of unseen/secret doors which failed to find monsters hiding
- *     under objects and failed to find monsters hiding at trap locations
- *  Ensured fatal status conditions made it to disclosure and/or dumplog
- *  Fixed "Bad fruit #N" warnings when saving bones with 'perm_invent' On
- *  Fixed it so yellow dragons don't have green breath
- *  Added several grammar corrections
- *  Improved recognition of deafness for several situations including the
- *     playing of musical instruments and bribing negotiations with demon lords
- *  Fixed ignoring of god's wrath when hero injured himself during altar kick 
- *  Fixed several cases where persistent inventory window was not updated
- *  Fixed temple priests or shopkeepers moving over other monsters
- *  Fixed a crash-causing bug when putting on levitation boots over a sink
- *  Ensured that thrown or kicked objects will end up in bones
- *  Made water go all the way to the edges of level on the Plane of Water
- *  Made clouds disrupt line of sight along the edges of the Plane of Air
- *  Improved and expanded usage of status highlighting percentage rules
- *  Added more than 15 improvements and fixes to the curses window port
- *  Added and documented significant changes to default directory choices for
- *    the Windows platform
- *  Improved the layout and display of the player selection dialog used on the
- *     Windows graphical implementation
- *  Improved performance of some tty versions by reducing the number of 
- *     function calls made from mapglyph
- *  Allowed the msdos implementation to build with curses and PDCurses
- *  Over 100 other fixes and improvements
+ *  GDBPATH and GREPPATH from sysconf or -D... on compilation command line were
+ *      being processed even if PANICTRACE was disabled but only being freed
+ *      at end of game when that was enabled
+ *  fix the article used in the message when your steed encounters a polymorph trap
+ *  dozen-ish assorted spelling/typo fixes in messages and source comments
+ *  fix potential buffer overflow when parsing run-time configuration file
 
                         - - - - - - - - - - -
 
@@ -57,13 +31,13 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     call it.
 
 2.  Having unpacked, you should have a file called 'Files' in your Top
-    directory.  
+    directory.
 
     This file contains the list of all the files you now SHOULD
     have in each directory.  Please check the files in each directory
     against this list to make sure that you have a complete set.
 
-    This file also contains a list of what files are created during 
+    This file also contains a list of what files are created during
     the build process.
 
     The names of the directories listed should not be changed unless you
@@ -88,7 +62,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     At the time of this release, NetHack 3.6 has been tested to run/compile
     on:
 
-        Intel Pentium or better (or clone) running Linux, BSDI, or 
+        Intel Pentium or better (or clone) running Linux, BSDI, or
                 Windows (7 through 10)
         Intel 80386 or greater (or clone) boxes running Linux, or BSDI
 	Mac OS X 10.11 (follow the instructions in sys/unix, not sys/mac)
@@ -97,8 +71,8 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     Instructions have been provided by way of community contribution on:
         msdos protected mode using djgpp
 
-    Previous versions of NetHack were tested and known to run on the 
-    following systems, but it is unknown if they can still build and 
+    Previous versions of NetHack were tested and known to run on the
+    following systems, but it is unknown if they can still build and
     execute NetHack 3.6:
 
         Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
@@ -151,7 +125,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
                         - - - - - - - - - - -
 
-If you have problems building the game, or you find bugs in it, we recommend 
+If you have problems building the game, or you find bugs in it, we recommend
 filing a bug report from our "Contact Us" web page at:
     https://www.nethack.org/common/contact.html
 Please include the version information from #version or the command line
@@ -165,12 +139,12 @@ available can be obtained via git here:
 
 When sending correspondence, please observe the following:
 o Please be sure to include your machine type, OS, and patchlevel.
-o Please avoid sending us binary files (e.g. save files or bones files). 
+o Please avoid sending us binary files (e.g. save files or bones files).
   If you have found a bug and think that your save file would aid in solving
-  the problem, send us a description in words of the problem, your machine 
-  type, your operating system, and the version of NetHack.  Tell us that you 
+  the problem, send us a description in words of the problem, your machine
+  type, your operating system, and the version of NetHack.  Tell us that you
   have a save file, but do not actually send it.
-  You may then be contacted by a member of the development team with the 
+  You may then be contacted by a member of the development team with the
   address of a specific person to send the save file to.
 o Though we make an effort to reply to each bug report, it may take some
   time before you receive feedback.  This is especially true during the
@@ -179,16 +153,16 @@ o We don't give hints for playing the game.
 o Don't bother to ask when the next version will be out or you can expect
   to receive a stock answer.
 
-If you want to submit a patch for the NetHack source code via email directly, 
+If you want to submit a patch for the NetHack source code via email directly,
 you can direct it to this address:
     nethack-bugs (at) nethack.org
 
-If a feature is not accepted you are free, of course, to post the patches 
+If a feature is not accepted you are free, of course, to post the patches
 to the net yourself and let the marketplace decide their worth.
 
 All of this amounts to the following:  If you decide to apply a free-lanced
 patch to your 3.6 code, you are welcome to do so, of course, but we won't
-be able to provide support or receive bug reports for it.  
+be able to provide support or receive bug reports for it.
 
 In our own patches, we will assume that your code is synchronized with ours.
 
