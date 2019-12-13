@@ -211,8 +211,11 @@ curses_init_nhwindows(int *argcp UNUSED,
     getmaxyx(base_term, term_rows, term_cols);
     counting = FALSE;
     curses_init_options();
-    if ((term_rows < 15) || (term_cols < 40)) {
-        panic("Terminal too small.  Must be minumum 40 width and 15 height");
+    if (term_rows < 15 || term_cols < 40) {
+        panic("Terminal is too small; must have at least %s%s%s.",
+              (term_rows < 15) ? "15 rows" : "",
+              (term_rows < 15 && term_cols < 40) ? " and " : "",
+              (term_cols < 40) ? "40 columns" : "");
     }
     /* during line input, deletes the most recently typed character */
     erase_char = erasechar(); /* <delete>/<rubout> or possibly <backspace> */

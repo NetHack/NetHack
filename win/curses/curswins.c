@@ -504,7 +504,7 @@ curses_puts(winid wid, int attr, const char *text)
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         if (!curses_menu_exists(wid)) {
             impossible(
-                     "curses_puts: Attempted write to nonexistant window %d!",
+                     "curses_puts: Attempted write to nonexistent window %d!",
                        wid);
             return;
         }
