@@ -82,9 +82,6 @@ bitmfile.h  gem_rsc.h   load_img.h  wingem.h
 (file for GNOME versions)
 winGnome.h
 
-(files for Qt versions)
-qt_clust.h     qt_kde0.h      qt_win.h       qt_xpms.h      qttableview.h
-
 (files for X versions)
 tile2x11.h  winX.h      xwindow.h   xwindowp.h
 
@@ -98,12 +95,12 @@ isaac64.h     lev.h         lint.h        mail.h        mextra.h
 mfndpos.h     micro.h       mkroom.h      monattk.h     mondata.h
 monflag.h     monst.h       monsym.h      ntconf.h      obj.h
 objclass.h    os2conf.h     patchlevel.h  pcconf.h      permonst.h
-prop.h        qtext.h       quest.h       rect.h        region.h
-rm.h          sfprocs.h     sfproto.h     skills.h      sp_lev.h
-spell.h       sys.h         system.h      tcap.h        tileset.h
-timeout.h     tosconf.h     tradstdc.h    trampoli.h    trap.h
-unixconf.h    vision.h      vmsconf.h     wceconf.h     winami.h
-wincurs.h     winprocs.h    wintype.h     you.h         youprop.h
+prop.h        quest.h       rect.h        region.h      rm.h
+skills.h      sp_lev.h      spell.h       sys.h         system.h
+tcap.h        tileset.h     timeout.h     tosconf.h     tradstdc.h
+trampoli.h    trap.h        unixconf.h    vision.h      vmsconf.h
+wceconf.h     winami.h      wincurs.h     winprocs.h    wintype.h
+you.h         youprop.h
 
 (file for tty versions)
 wintty.h
@@ -114,26 +111,25 @@ mactty.h      macwin.h      mttypriv.h
 
 src:
 (files for all versions)
-allmain.c    alloc.c      apply.c      artifact.c   attrib.c     ball.c
-bones.c      botl.c       cmd.c        dbridge.c    decl.c       detect.c
-dig.c        display.c    dlb.c        do.c         do_name.c    do_wear.c
-dog.c        dogmove.c    dokick.c     dothrow.c    drawing.c    dungeon.c
-eat.c        end.c        engrave.c    exper.c      explode.c    extralev.c
-files.c      fountain.c   hack.c       hacklib.c    invent.c     isaac64.c
-light.c      lock.c       mail.c       makemon.c    mapglyph.c   mcastu.c
-mdlib.c      mhitm.c      mhitu.c      minion.c     mklev.c      mkmap.c
-mkmaze.c     mkobj.c      mkroom.c     mon.c        mondata.c    monmove.c
-monst.c      mplayer.c    mthrowu.c    muse.c       music.c      nhlsel.c
-nhlua.c      o_init.c     objects.c    objnam.c     options.c    pager.c
-pickup.c     pline.c      polyself.c   potion.c     pray.c       priest.c
-quest.c      questpgr.c   read.c       rect.c       region.c     restore.c
-rip.c        rnd.c        role.c       rumors.c     save.c       sfascii.c
-sfbase.c     sfdata.c     sflendian.c  sfstruct.c   shk.c        shknam.c
-sit.c        sounds.c     sp_lev.c     spell.c      steal.c      steed.c
-sys.c        teleport.c   timeout.c    topten.c     track.c      trap.c
-u_init.c     uhitm.c      vault.c      version.c    vision.c     weapon.c
-were.c       wield.c      windows.c    wizard.c     worm.c       worn.c
-write.c      zap.c
+allmain.c   alloc.c     apply.c     artifact.c  attrib.c    ball.c
+bones.c     botl.c      cmd.c       dbridge.c   decl.c      detect.c
+dig.c       display.c   dlb.c       do.c        do_name.c   do_wear.c
+dog.c       dogmove.c   dokick.c    dothrow.c   drawing.c   dungeon.c
+eat.c       end.c       engrave.c   exper.c     explode.c   extralev.c
+files.c     fountain.c  hack.c      hacklib.c   invent.c    isaac64.c
+light.c     lock.c      mail.c      makemon.c   mapglyph.c  mcastu.c
+mdlib.c     mhitm.c     mhitu.c     minion.c    mklev.c     mkmap.c
+mkmaze.c    mkobj.c     mkroom.c    mon.c       mondata.c   monmove.c
+monst.c     mplayer.c   mthrowu.c   muse.c      music.c     nhlobj.c
+nhlsel.c    nhlua.c     o_init.c    objects.c   objnam.c    options.c
+pager.c     pickup.c    pline.c     polyself.c  potion.c    pray.c
+priest.c    quest.c     questpgr.c  read.c      rect.c      region.c
+restore.c   rip.c       rnd.c       role.c      rumors.c    save.c
+sfstruct.c  shk.c       shknam.c    sit.c       sounds.c    sp_lev.c
+spell.c     steal.c     steed.c     sys.c       teleport.c  timeout.c
+topten.c    track.c     trap.c      u_init.c    uhitm.c     vault.c
+version.c   vision.c    weapon.c    were.c      wield.c     windows.c
+wizard.c    worm.c      worn.c      write.c     zap.c
 
 sys/amiga:
 (files for Amiga versions - untested for 3.6.3)
@@ -299,12 +295,12 @@ winnt.c              winos.h
 
 test:
 (files in top directory)
-test_des.lua  test_lev.lua  test_sel.lua  test_src.lua
+test_des.lua  test_lev.lua  test_obj.lua  test_sel.lua  test_src.lua
+testwish.lua
 
 util:
 (files for all versions)
-dlb_main.c  makedefs.c  mdgrep.h    mdgrep.pl   panic.c     readtags.c
-recover.c
+dlb_main.c  makedefs.c  mdgrep.h    mdgrep.pl   panic.c     recover.c
 
 win/Qt:
 (files for the Qt 4 or 5 widget library - X11, Windows, Mac OS X)
@@ -317,14 +313,16 @@ qt_msg.cpp    qt_msg.h      qt_plsel.cpp  qt_plsel.h    qt_rip.cpp
 qt_rip.h      qt_set.cpp    qt_set.h      qt_stat.cpp   qt_stat.h
 qt_str.cpp    qt_str.h      qt_streq.cpp  qt_streq.h    qt_svsel.cpp
 qt_svsel.h    qt_win.cpp    qt_win.h      qt_xcmd.cpp   qt_xcmd.h
-qt_yndlg.cpp  qt_yndlg.h
+qt_xpms.h     qt_yndlg.cpp  qt_yndlg.h
 
 win/Qt3:
 (files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
 Info.plist           Install.Qt           knethack.lnk
 knh-mini.xpm         knh.xpm              qpe-nethack.control
-qt_clust.cpp         qt_win.cpp           qttableview.cpp
-tileedit.cpp         tileedit.h
+qt3_clust.cpp        qt3_clust.h          qt3_kde0.h
+qt3_win.cpp          qt3_win.h            qt3_xpms.h
+qt3tableview.cpp     qt3tableview.h       tileedit.cpp
+tileedit.h
 
 win/X11:
 (files for X versions)
