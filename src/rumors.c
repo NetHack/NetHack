@@ -386,8 +386,6 @@ void
 save_oracles(nhfp)
 NHFILE *nhfp;
 {
-    int i;
-
     if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
@@ -409,7 +407,6 @@ void
 restore_oracles(nhfp)
 NHFILE *nhfp;
 {
-    int i;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
 

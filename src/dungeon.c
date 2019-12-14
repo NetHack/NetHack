@@ -135,7 +135,7 @@ save_dungeon(nhfp, perform_write, free_data)
 NHFILE *nhfp;
 boolean perform_write, free_data;
 {
-    int i, count;
+    int count;
     branch *curr, *next;
     mapseen *curr_ms, *next_ms;
 
@@ -2396,7 +2396,7 @@ NHFILE *nhfp;
 mapseen *mptr;
 {
     branch *curr;
-    int i, brindx;
+    int brindx;
 
     for (brindx = 0, curr = g.branches; curr; curr = curr->next, ++brindx)
         if (curr == mptr->br)
@@ -2426,7 +2426,7 @@ static mapseen *
 load_mapseen(nhfp)
 NHFILE *nhfp;
 {
-    int i, branchnum = 0, brindx;
+    int branchnum = 0, brindx;
     mapseen *load;
     branch *curr;
 

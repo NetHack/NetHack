@@ -587,7 +587,7 @@ struct obj *corpse;
 int
 getbones()
 {
-    int ok, i;
+    int ok;
     NHFILE *nhfp = (NHFILE *) 0;
     char c = 0, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 

@@ -147,6 +147,7 @@
 		544768AF23994A17004B9739 /* nhlua.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AD23994A17004B9739 /* nhlua.c */; };
 		544768B123994A2C004B9739 /* mdlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768B023994A2C004B9739 /* mdlib.c */; };
 		544768BA23995BB7004B9739 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 544768B923995BB7004B9739 /* liblua.a */; };
+		544768BC23A53C9F004B9739 /* nhlobj.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768BB23A53C9F004B9739 /* nhlobj.c */; };
 		54FCE8292223261F00F393C8 /* isaac64.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FCE8282223261F00F393C8 /* isaac64.c */; };
 /* End PBXBuildFile section */
 
@@ -489,6 +490,7 @@
 		544768B423995447004B9739 /* isaac64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = isaac64.h; path = ../../include/isaac64.h; sourceTree = "<group>"; };
 		544768B523995488004B9739 /* nhlua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nhlua.h; path = ../../include/nhlua.h; sourceTree = "<group>"; };
 		544768B923995BB7004B9739 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../lib/lua/liblua.a; sourceTree = "<group>"; };
+		544768BB23A53C9F004B9739 /* nhlobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlobj.c; path = ../../src/nhlobj.c; sourceTree = "<group>"; };
 		54FCE8282223261F00F393C8 /* isaac64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = isaac64.c; path = ../../src/isaac64.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -530,6 +532,7 @@
 			isa = PBXGroup;
 			children = (
 				2A953FB221A3F404007906E5 /* XCode.xcconfig */,
+				544768BB23A53C9F004B9739 /* nhlobj.c */,
 				31B8A3F821A23E490055BD01 /* win */,
 				31B8A3E921A23CC40055BD01 /* sys */,
 				3189579621A2046700FB2ABE /* include */,
@@ -1484,6 +1487,7 @@
 				31B8A3C821A238060055BD01 /* options.c in Sources */,
 				31B8A3CD21A238060055BD01 /* write.c in Sources */,
 				31B8A40F21A23EEC0055BD01 /* cursmesg.c in Sources */,
+				544768BC23A53C9F004B9739 /* nhlobj.c in Sources */,
 				31B8A3DF21A238060055BD01 /* end.c in Sources */,
 				31B8A38921A238060055BD01 /* mklev.c in Sources */,
 				31B8A3D721A238060055BD01 /* muse.c in Sources */,

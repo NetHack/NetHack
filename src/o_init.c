@@ -289,7 +289,7 @@ void
 savenames(nhfp)
 NHFILE *nhfp;
 {
-    int i, j;
+    int i;
     unsigned int len;
 
     if (perform_bwrite(nhfp)) {
@@ -323,7 +323,7 @@ void
 restnames(nhfp)
 NHFILE *nhfp;
 {
-    int i, j;
+    int i;
     unsigned int len = 0;
 
     if (nhfp->structlevel) {
