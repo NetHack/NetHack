@@ -1,12 +1,12 @@
-/* NetHack 3.6	mplayer.c	$NHDT-Date: 1545964576 2018/12/28 02:36:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	mplayer.c	$NHDT-Date: 1550524564 2019/02/18 21:16:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.26 $ */
 /*      Copyright (c) Izchak Miller, 1992.                        */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-STATIC_DCL const char *NDECL(dev_name);
-STATIC_DCL void FDECL(get_mplname, (struct monst *, char *));
-STATIC_DCL void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
+static const char *NDECL(dev_name);
+static void FDECL(get_mplname, (struct monst *, char *));
+static void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
 
 /* These are the names of those who
  * contributed to the development of NetHack 3.2/3.3/3.4/3.6.
@@ -40,7 +40,7 @@ static const char *developers[] = {
 };
 
 /* return a randomly chosen developer name */
-STATIC_OVL const char *
+static const char *
 dev_name()
 {
     register int i, m = 0, n = SIZE(developers);
@@ -67,7 +67,7 @@ dev_name()
     return (developers[i]);
 }
 
-STATIC_OVL void
+static void
 get_mplname(mtmp, nam)
 register struct monst *mtmp;
 char *nam;
@@ -92,7 +92,7 @@ char *nam;
                         (boolean) mtmp->female));
 }
 
-STATIC_OVL void
+static void
 mk_mplayer_armor(mon, typ)
 struct monst *mon;
 short typ;
@@ -335,13 +335,13 @@ boolean special;
     int pm, x, y;
     struct monst fakemon;
 
-    fakemon = zeromonst;
+    fakemon = cg.zeromonst;
     while (num) {
         int tryct = 0;
 
         /* roll for character class */
         pm = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
-        set_mon_data(&fakemon, &mons[pm], -1);
+        set_mon_data(&fakemon, &mons[pm]);
 
         /* roll for an available location */
         do {
@@ -377,8 +377,8 @@ register struct monst *mtmp;
     if (mtmp->mpeaceful)
         return; /* will drop to humanoid talk */
 
-    pline("Talk? -- %s", (mtmp->data == &mons[urole.malenum]
-                          || mtmp->data == &mons[urole.femalenum])
+    pline("Talk? -- %s", (mtmp->data == &mons[g.urole.malenum]
+                          || mtmp->data == &mons[g.urole.femalenum])
                              ? same_class_msg[rn2(3)]
                              : other_class_msg[rn2(3)]);
 }

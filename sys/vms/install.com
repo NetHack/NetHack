@@ -1,9 +1,9 @@
 $ ! vms/install.com -- set up nethack 'playground'
-$! $NHDT-Date: 1542388600 2018/11/16 17:16:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.11 $
+$! $NHDT-Date: 1573172443 2019/11/08 00:20:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $
 $! Copyright (c) 2016 by Robert Patrick Rankin
 $! NetHack may be freely redistributed.  See license for details.
 $ !
-$ ! $NHDT-Date: 1542388600 2018/11/16 17:16:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.11 $
+$ ! $NHDT-Date: 1573172452 2019/11/08 00:20:52 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $
 $ !
 $ ! Use vmsbuild.com to create nethack.exe, makedefs, and lev_comp *first*.
 $ !
@@ -35,21 +35,31 @@ $	sysconf_file = "[.sys.vms]sysconf"
 $	guidebook  = "[.doc]Guidebook.txt"
 $	invoc_proc = "[.sys.vms]nethack.com"
 $	trmcp_file = "[.sys.share]termcap"
-$	spec_files = "AIR.LEV,ASMODEUS.LEV,ASTRAL.LEV,BAALZ.LEV,BIGRM-%.LEV," -
-		   + "CASTLE.LEV,EARTH.LEV,FAKEWIZ%.LEV,FIRE.LEV," -
-		   + "JUIBLEX.LEV,KNOX.LEV,MEDUSA-%.LEV,MINEFILL.LEV," -
-		   + "MINETN-%.LEV,MINEND-%.LEV,ORACLE.LEV,ORCUS.LEV," -
-		   + "SANCTUM.LEV,SOKO%-%.LEV,TOWER%.LEV,VALLEY.LEV," -
-		   + "WATER.LEV,WIZARD%.LEV"
-$	spec_input = "bigroom.des castle.des endgame.des " -
-		   + "gehennom.des knox.des medusa.des mines.des " -
-		   + "oracle.des sokoban.des tower.des yendor.des"
-$	qstl_files = "%%%-GOAL.LEV,%%%-FIL%.LEV,%%%-LOCA.LEV,%%%-STRT.LEV"
-$	qstl_input = "Arch.des Barb.des Caveman.des Healer.des " -
-		   + "Knight.des Monk.des Priest.des Ranger.des Rogue.des " -
-		   + "Samurai.des Tourist.des Wizard.des Valkyrie.des"
-$	dngn_files = "DUNGEON."
-$	dngn_input = "dungeon.pdf"
+$	spec_files = "air.lua,asmodeus.lua,astral.lua,baalz.lua,"	-
+		+ "bigrm-*.lua,castle.lua,earth.lua,fakewiz%.lua,"	-
+		+ "fire.lua,juiblex.lua,knox.lua,medusa-%.lua,"		-
+		+ "minefill.lua,minetn-%.lua,minend-%.lua,nhlib.lua,"	-
+		+ "oracle.lua,orcus.lua,sanctum.lua,soko%-%.lua,"	-
+		+ "tower%.lua,valley.lua,water.lua,wizard%.lua"
+$	qstl_files = "%%%-goal.lua,%%%-fil%.lua,%%%-loca.lua,%%%-strt.lua"
+$	dngn_files = "dungeon.lua"
+$!
+$!	spec_files = "AIR.LEV,ASMODEUS.LEV,ASTRAL.LEV,BAALZ.LEV,BIGRM-%.LEV," -
+$!		   + "CASTLE.LEV,EARTH.LEV,FAKEWIZ%.LEV,FIRE.LEV," -
+$!		   + "JUIBLEX.LEV,KNOX.LEV,MEDUSA-%.LEV,MINEFILL.LEV," -
+$!		   + "MINETN-%.LEV,MINEND-%.LEV,ORACLE.LEV,ORCUS.LEV," -
+$!		   + "SANCTUM.LEV,SOKO%-%.LEV,TOWER%.LEV,VALLEY.LEV," -
+$!		   + "WATER.LEV,WIZARD%.LEV"
+$!	spec_input = "bigroom.des castle.des endgame.des " -
+$!		   + "gehennom.des knox.des medusa.des mines.des " -
+$!		   + "oracle.des sokoban.des tower.des yendor.des"
+$!	qstl_files = "%%%-GOAL.LEV,%%%-FIL%.LEV,%%%-LOCA.LEV,%%%-STRT.LEV"
+$!	qstl_input = "Arch.des Barb.des Caveman.des Healer.des " -
+$!		   + "Knight.des Monk.des Priest.des Ranger.des Rogue.des " -
+$!		   + "Samurai.des Tourist.des Wizard.des Valkyrie.des"
+$!	dngn_files = "DUNGEON."
+$!	dngn_input = "dungeon.pdf"
+$!
 $	dlb_files  = help_files + "," + data_files + "," -
 		   + spec_files + "," + qstl_files + "," + dngn_files
 $	data_libry = "nh-data.dlb"
@@ -91,15 +101,15 @@ $ makedefs -h	!oracles.txt -> oracles
 $	milestone "(dungeon preprocess)"
 $ makedefs -s
 $	milestone "(engrave, epitaph, bogusmon)"
-$ makedefs -e	!dungeon.def -> dungeon.pdf
-$	milestone "(quest text)"
+$! makedefs -e	!dungeon.def -> dungeon.pdf
+$!	milestone "(quest text)"
 $ makedefs -q	!quest.txt -> quest.dat
 $	milestone "(special levels)"
-$ lev_comp 'spec_input' !special levels
-$	milestone "(quest levels)"
-$ lev_comp 'qstl_input' !quest levels
-$	milestone "(dungeon compile)"
-$ dgn_comp 'dngn_input' !dungeon database
+$! lev_comp 'spec_input' !special levels
+$!	milestone "(quest levels)"
+$! lev_comp 'qstl_input' !quest levels
+$!	milestone "(dungeon compile)"
+$! dgn_comp 'dngn_input' !dungeon database
 $	set default [-]		!move up
 $ if p3.nes."" .and. f$edit(p3,"UPCASE").nes."DATA_PLUS_DLB" then  exit
 $

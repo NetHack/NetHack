@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1526429201 2018/05/16 00:06:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1575830186 2019/12/08 18:36:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,8 +9,10 @@
 #include "color.h"
 #define HI_DOMESTIC CLR_WHITE /* monst.c */
 
+#if 0
 #if !defined(TTY_GRAPHICS)
 #define has_color(n) TRUE
+#endif
 #endif
 
 #ifdef TEXTCOLOR
@@ -48,30 +50,51 @@ static const int explcolors[] = {
 
 #if defined(USE_TILES) && defined(MSDOS)
 #define HAS_ROGUE_IBM_GRAPHICS \
-    (currentgraphics == ROGUESET && SYMHANDLING(H_IBM) && !iflags.grmode)
+    (g.currentgraphics == ROGUESET && SYMHANDLING(H_IBM) && !iflags.grmode)
 #else
 #define HAS_ROGUE_IBM_GRAPHICS \
-    (currentgraphics == ROGUESET && SYMHANDLING(H_IBM))
+    (g.currentgraphics == ROGUESET && SYMHANDLING(H_IBM))
 #endif
 
-#define is_objpile(x,y) (!Hallucination && level.objects[(x)][(y)] \
-                         && level.objects[(x)][(y)]->nexthere)
+#define is_objpile(x,y) (!Hallucination && g.level.objects[(x)][(y)] \
+                         && g.level.objects[(x)][(y)]->nexthere)
+
+#define GMAP_SET                 0x00000001
+#define GMAP_ROGUELEVEL          0x00000002
+#define GMAP_ALTARCOLOR          0x00000004
 
 /*ARGSUSED*/
 int
-mapglyph(glyph, ochar, ocolor, ospecial, x, y)
+mapglyph(glyph, ochar, ocolor, ospecial, x, y, mgflags)
 int glyph, *ocolor, x, y;
 int *ochar;
 unsigned *ospecial;
+unsigned mgflags;
 {
     register int offset, idx;
     int color = NO_COLOR;
     nhsym ch;
     unsigned special = 0;
     /* condense multiple tests in macro version down to single */
-    boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS;
-    boolean has_rogue_color = (has_rogue_ibm_graphics
-                               && symset[currentgraphics].nocolor == 0);
+    boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS,
+            is_you = (x == u.ux && y == u.uy),
+            has_rogue_color = (has_rogue_ibm_graphics
+                               && g.symset[g.currentgraphics].nocolor == 0);
+
+    if (!g.glyphmap_perlevel_flags) {
+        /*
+         *    GMAP_SET                0x00000001
+         *    GMAP_ROGUELEVEL         0x00000002
+         *    GMAP_ALTARCOLOR         0x00000004
+         */
+        g.glyphmap_perlevel_flags |= GMAP_SET;
+
+        if (Is_rogue_level(&u.uz)) {
+            g.glyphmap_perlevel_flags |= GMAP_ROGUELEVEL;
+        } else if ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) {
+            g.glyphmap_perlevel_flags |= GMAP_ALTARCOLOR;
+        }
+    }
 
     /*
      *  Map the glyph back to a character and color.
@@ -129,15 +152,61 @@ unsigned *ospecial;
         /* provide a visible difference if normal and lit corridor
            use the same symbol */
         } else if (iflags.use_color && offset == S_litcorr
-                   && showsyms[idx] == showsyms[S_corr + SYM_OFF_P]) {
+                   && g.showsyms[idx] == g.showsyms[S_corr + SYM_OFF_P]) {
             color = CLR_WHITE;
 #endif
         /* try to provide a visible difference between water and lava
            if they use the same symbol and color is disabled */
         } else if (!iflags.use_color && offset == S_lava
-                   && (showsyms[idx] == showsyms[S_pool + SYM_OFF_P]
-                       || showsyms[idx] == showsyms[S_water + SYM_OFF_P])) {
+                   && (g.showsyms[idx] == g.showsyms[S_pool + SYM_OFF_P]
+                       || g.showsyms[idx]
+                          == g.showsyms[S_water + SYM_OFF_P])) {
             special |= MG_BW_LAVA;
+        } else if (offset == S_altar && iflags.use_color) {
+            int amsk = altarmask_at(x, y); /* might be a mimic */
+
+            if ((g.glyphmap_perlevel_flags & GMAP_ALTARCOLOR)
+                && (amsk & AM_SHRINE) != 0) {
+                /* high altar */
+                color = CLR_BRIGHT_MAGENTA;
+            } else {
+                switch (amsk & AM_MASK) {
+#if 0   /*
+         * On OSX with TERM=xterm-color256 these render as
+         *  white -> tty: gray, curses: ok
+         *  gray  -> both tty and curses: black
+         *  black -> both tty and curses: blue
+         *  red   -> both tty and curses: ok.
+         * Since the colors have specific associations (with the
+         * unicorns matched with each alignment), we shouldn't use
+         * scrambled colors and we don't have sufficient information
+         * to handle platform-specific color variations.
+         */
+                case AM_LAWFUL:  /* 4 */
+                    color = CLR_WHITE;
+                    break;
+                case AM_NEUTRAL: /* 2 */
+                    color = CLR_GRAY;
+                    break;
+                case AM_CHAOTIC: /* 1 */
+                    color = CLR_BLACK;
+                    break;
+#else /* !0: TEMP? */
+                case AM_LAWFUL:  /* 4 */
+                case AM_NEUTRAL: /* 2 */
+                case AM_CHAOTIC: /* 1 */
+                    cmap_color(S_altar); /* gray */
+                    break;
+#endif /* 0 */
+                case AM_NONE:    /* 0 */
+                    color = CLR_RED;
+                    break;
+                default: /* 3, 5..7 -- shouldn't happen but 3 was possible
+                          * prior to 3.6.3 (due to faulty sink polymorph) */
+                    color = NO_COLOR;
+                    break;
+                }
+            }
         } else {
             cmap_color(offset);
         }
@@ -206,7 +275,7 @@ unsigned *ospecial;
     } else { /* a monster */
         idx = mons[glyph].mlet + SYM_OFF_M;
         if (has_rogue_color && iflags.use_color) {
-            if (x == u.ux && y == u.uy)
+            if (is_you)
                 /* actually player should be yellow-on-gray if in corridor */
                 color = CLR_YELLOW;
             else
@@ -215,27 +284,42 @@ unsigned *ospecial;
             mon_color(glyph);
 #ifdef TEXTCOLOR
             /* special case the hero for `showrace' option */
-            if (iflags.use_color && x == u.ux && y == u.uy
-                && flags.showrace && !Upolyd)
+            if (iflags.use_color && is_you && flags.showrace && !Upolyd)
                 color = HI_DOMESTIC;
 #endif
         }
     }
 
-    ch = showsyms[idx];
+    /* These were requested by a blind player to enhance screen reader use */
+    if (sysopt.accessibility == 1 && !(mgflags & MG_FLAG_NOOVERRIDE)) {
+        int ovidx;
+
+        if ((special & MG_PET) != 0) {
+            ovidx = SYM_PET_OVERRIDE + SYM_OFF_X;
+            if ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL)
+                    ? g.ov_rogue_syms[ovidx]
+                    : g.ov_primary_syms[ovidx])
+                idx = ovidx;
+        }
+        if (is_you) {
+            ovidx = SYM_HERO_OVERRIDE + SYM_OFF_X;
+            if ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL)
+                    ? g.ov_rogue_syms[ovidx]
+                    : g.ov_primary_syms[ovidx])
+                idx = ovidx;
+        }
+    }
+
+    ch = g.showsyms[idx];
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
-    if (!has_color(color) || (Is_rogue_level(&u.uz) && !has_rogue_color))
-        color = NO_COLOR;
+    if (!has_color(color) ||
+            ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL) && !has_rogue_color))
 #endif
-
+        color = NO_COLOR;
     *ochar = (int) ch;
     *ospecial = special;
-#ifdef TEXTCOLOR
     *ocolor = color;
-#else
-    nhUse(ocolor);
-#endif
     return idx;
 }
 
@@ -245,11 +329,11 @@ int glyph;
 {
     static char encbuf[20]; /* 10+1 would suffice */
 
-    Sprintf(encbuf, "\\G%04X%04X", context.rndencode, glyph);
+    Sprintf(encbuf, "\\G%04X%04X", g.context.rndencode, glyph);
     return encbuf;
 }
 
-const char *
+char *
 decode_mixed(buf, str)
 char *buf;
 const char *str;
@@ -257,8 +341,8 @@ const char *str;
     static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
     char *put = buf;
 
-    if (!put || !str)
-        return "";
+    if (!str)
+        return strcpy(buf, "");
 
     while (*str) {
         if (*str == '\\') {
@@ -275,15 +359,15 @@ const char *str;
                         rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
                     else
                         break;
-                if (rndchk == context.rndencode) {
+                if (rndchk == g.context.rndencode) {
                     gv = dcount = 0;
                     for (; *str && ++dcount <= 4; ++str)
                         if ((dp = index(hex, *str)) != 0)
                             gv = (gv * 16) + ((int) (dp - hex) / 2);
                         else
                             break;
-                    so = mapglyph(gv, &ch, &oc, &os, 0, 0);
-                    *put++ = showsyms[so];
+                    so = mapglyph(gv, &ch, &oc, &os, 0, 0, 0);
+                    *put++ = g.showsyms[so];
                     /* 'str' is ready for the next loop iteration and '*str'
                        should not be copied at the end of this iteration */
                     continue;
@@ -300,7 +384,7 @@ const char *str;
                         rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
                     else
                         break;
-                if (rndchk == context.rndencode) {
+                if (rndchk == g.context.rndencode) {
                     dcount = 0;
                     for (; *str && ++dcount <= 2; ++str)
                         if ((dp = index(hex, *str)) != 0)
@@ -308,10 +392,19 @@ const char *str;
                         else
                             break;
                 }
-                *put++ = showsyms[so];
+                *put++ = g.showsyms[so];
                 break;
 #endif
             case '\\':
+                break;
+            case '\0':
+                /* String ended with '\\'.  This can happen when someone
+                   names an object with a name ending with '\\', drops the
+                   named object on the floor nearby and does a look at all
+                   nearby objects. */
+                /* brh - should we perhaps not allow things to have names
+                   that contain '\\' */
+                str = save_str;
                 break;
             }
         }

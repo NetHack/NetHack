@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1545441042 2018/12/22 01:10:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.7	steed.c	$NHDT-Date: 1575245090 2019/12/02 00:04:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,8 +9,8 @@ static NEARDATA const char steeds[] = { S_QUADRUPED, S_UNICORN, S_ANGEL,
                                         S_CENTAUR,   S_DRAGON,  S_JABBERWOCK,
                                         '\0' };
 
-STATIC_DCL boolean FDECL(landing_spot, (coord *, int, int));
-STATIC_DCL void FDECL(maybewakesteed, (struct monst *));
+static boolean FDECL(landing_spot, (coord *, int, int));
+static void FDECL(maybewakesteed, (struct monst *));
 
 /* caller has decided that hero can't reach something while mounted */
 void
@@ -70,7 +70,7 @@ struct obj *otmp;
         char kbuf[BUFSZ];
 
         You("touch %s.", mon_nam(mtmp));
-        if (!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
+        if (!(poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM))) {
             Sprintf(kbuf, "attempting to saddle %s", an(mtmp->data->mname));
             instapetrify(kbuf);
         }
@@ -162,8 +162,8 @@ boolean
 can_ride(mtmp)
 struct monst *mtmp;
 {
-    return (mtmp->mtame && humanoid(youmonst.data)
-            && !verysmall(youmonst.data) && !bigmonst(youmonst.data)
+    return (mtmp->mtame && humanoid(g.youmonst.data)
+            && !verysmall(g.youmonst.data) && !bigmonst(g.youmonst.data)
             && (!Underwater || is_swimmer(mtmp->data)));
 }
 
@@ -226,8 +226,8 @@ boolean force;      /* Quietly force this animal */
             return (FALSE);
     }
 
-    if (Upolyd && (!humanoid(youmonst.data) || verysmall(youmonst.data)
-                   || bigmonst(youmonst.data) || slithy(youmonst.data))) {
+    if (Upolyd && (!humanoid(g.youmonst.data) || verysmall(g.youmonst.data)
+                   || bigmonst(g.youmonst.data) || slithy(g.youmonst.data))) {
         You("won't fit on a saddle.");
         return (FALSE);
     }
@@ -238,14 +238,14 @@ boolean force;      /* Quietly force this animal */
 
     /* Can the player reach and see the monster? */
     if (!mtmp || (!force && ((Blind && !Blind_telepat) || mtmp->mundetected
-                             || mtmp->m_ap_type == M_AP_FURNITURE
-                             || mtmp->m_ap_type == M_AP_OBJECT))) {
+                             || M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                             || M_AP_TYPE(mtmp) == M_AP_OBJECT))) {
         pline("I see nobody there.");
         return (FALSE);
     }
     if (mtmp->data == &mons[PM_LONG_WORM]
         && (u.ux + u.dx != mtmp->mx || u.uy + u.dy != mtmp->my)) {
-        /* 3.6.2:  test_move(below) is used to check for trying to mount
+        /* As of 3.6.2:  test_move(below) is used to check for trying to mount
            diagonally into or out of a doorway or through a tight squeeze;
            attempting to mount a tail segment when hero was not adjacent
            to worm's head could trigger an impossible() in worm_cross()
@@ -350,11 +350,11 @@ boolean force;      /* Quietly force this animal */
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep))
-        unweapon = FALSE;
+        g.unweapon = FALSE;
     u.usteed = mtmp;
     remove_monster(mtmp->mx, mtmp->my);
     teleds(mtmp->mx, mtmp->my, TRUE);
-    context.botl = TRUE;
+    g.context.botl = TRUE;
     return TRUE;
 }
 
@@ -377,7 +377,7 @@ exercise_steed()
 void
 kick_steed()
 {
-    char He[4];
+    char He[BUFSZ]; /* monverbself() appends to the "He"/"She"/"It" value */
     if (!u.usteed)
         return;
 
@@ -400,7 +400,9 @@ kick_steed()
             if (u.usteed->msleeping || !u.usteed->mcanmove)
                 pline("%s stirs.", He);
             else
-                pline("%s rouses %sself!", He, mhim(u.usteed));
+                /* if hallucinating, might yield "He rouses herself" or
+                   "She rouses himself" */
+                pline("%s!", monverbself(u.usteed, He, "rouse", (char *) 0));
         } else
             pline("%s does not respond.", He);
         return;
@@ -430,7 +432,7 @@ kick_steed()
  * room's walls, which is not what we want.
  * Adapted from mail daemon code.
  */
-STATIC_OVL boolean
+static boolean
 landing_spot(spot, reason, forceit)
 coord *spot; /* landing position (we fill it in) */
 int reason;
@@ -455,7 +457,7 @@ int forceit;
                         || (distance == min_distance && rn2(2))) {
                         if (i > 0 || (((t = t_at(x, y)) == 0 || !t->tseen)
                                       && (!sobj_at(BOULDER, x, y)
-                                          || throws_rocks(youmonst.data)))) {
+                                          || throws_rocks(g.youmonst.data)))) {
                             spot->x = x;
                             spot->y = y;
                             min_distance = distance;
@@ -468,7 +470,7 @@ int forceit;
 
     /* If we didn't find a good spot and forceit is on, try enexto(). */
     if (forceit && min_distance < 0
-        && !enexto(spot, u.ux, u.uy, youmonst.data))
+        && !enexto(spot, u.ux, u.uy, g.youmonst.data))
         return FALSE;
 
     return found;
@@ -525,7 +527,7 @@ int reason; /* Player was thrown off etc. */
         if (otmp && otmp->cursed) {
             You("can't.  The saddle %s cursed.",
                 otmp->bknown ? "is" : "seems to be");
-            otmp->bknown = TRUE;
+            otmp->bknown = 1; /* ok to skip set_bknown() here */
             return;
         }
         if (!have_spot) {
@@ -642,9 +644,9 @@ int reason; /* Player was thrown off etc. */
                 /* Keep steed here, move the player to cc;
                  * teleds() clears u.utrap
                  */
-                in_steed_dismounting = TRUE;
+                g.in_steed_dismounting = TRUE;
                 teleds(cc.x, cc.y, TRUE);
-                in_steed_dismounting = FALSE;
+                g.in_steed_dismounting = FALSE;
 
                 /* Put your steed in your trap */
                 if (save_utrap)
@@ -673,23 +675,23 @@ int reason; /* Player was thrown off etc. */
 
     /* usually return the hero to the surface */
     if (reason != DISMOUNT_ENGULFED && reason != DISMOUNT_BONES) {
-        in_steed_dismounting = TRUE;
+        g.in_steed_dismounting = TRUE;
         (void) float_down(0L, W_SADDLE);
-        in_steed_dismounting = FALSE;
-        context.botl = TRUE;
+        g.in_steed_dismounting = FALSE;
+        g.context.botl = TRUE;
         (void) encumber_msg();
-        vision_full_recalc = 1;
+        g.vision_full_recalc = 1;
     } else
-        context.botl = TRUE;
+        g.context.botl = TRUE;
     /* polearms behave differently when not mounted */
     if (uwep && is_pole(uwep))
-        unweapon = TRUE;
+        g.unweapon = TRUE;
     return;
 }
 
 /* when attempting to saddle or mount a sleeping steed, try to wake it up
    (for the saddling case, it won't be u.usteed yet) */
-STATIC_OVL void
+static void
 maybewakesteed(steed)
 struct monst *steed;
 {
@@ -742,23 +744,39 @@ place_monster(mon, x, y)
 struct monst *mon;
 int x, y;
 {
+    struct monst *othermon;
+    const char *monnm, *othnm;
+    char buf[QBUFSZ];
+
+    buf[0] = '\0';
     /* normal map bounds are <1..COLNO-1,0..ROWNO-1> but sometimes
        vault guards (either living or dead) are parked at <0,0> */
     if (!isok(x, y) && (x != 0 || y != 0 || !mon->isgd)) {
-        impossible("trying to place monster at <%d,%d>", x, y);
+        describe_level(buf);
+        impossible("trying to place %s at <%d,%d> mstate:%lx on %s",
+                   minimal_monnam(mon, TRUE), x, y, mon->mstate, buf);
         x = y = 0;
     }
     if (mon == u.usteed
         /* special case is for convoluted vault guard handling */
         || (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
-        impossible("placing %s onto map?",
-                   (mon == u.usteed) ? "steed" : "defunct monster");
+        describe_level(buf);
+        impossible("placing %s onto map, mstate:%lx, on %s?",
+                   (mon == u.usteed) ? "steed" : "defunct monster",
+                   mon->mstate, buf);
         return;
     }
-    if (level.monsters[x][y])
-        impossible("placing monster over another at <%d,%d>?", x, y);
+    if ((othermon = g.level.monsters[x][y]) != 0) {
+        describe_level(buf);
+        monnm = minimal_monnam(mon, FALSE);
+        othnm = (mon != othermon) ? minimal_monnam(othermon, TRUE) : "itself";
+        impossible("placing %s over %s at <%d,%d>, mstates:%lx %lx on %s?",
+                   monnm, othnm, x, y, othermon->mstate, mon->mstate, buf);
+    }
     mon->mx = x, mon->my = y;
-    level.monsters[x][y] = mon;
+    g.level.monsters[x][y] = mon;
+    mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO | MON_BUBBLEMOVE
+                     | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
 }
 
 /*steed.c*/

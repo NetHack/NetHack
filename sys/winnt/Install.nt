@@ -1,11 +1,11 @@
-         Copyright (c) NetHack Development Team 1990-2018
+         Copyright (c) NetHack Development Team 1990-2019
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
                   Instructions for compiling and installing
                        NetHack 3.6 on a Windows system
-         (Windows 7/8.x/10 or later only. XP may work but is untested)
+                       (Windows 7/8.x/10 or later only)
          ==============================================================
-          Last revision: $NHDT-Date: 1542545993 2018/11/18 12:59:53 $
+          Last revision: $NHDT-Date: 1575245156 2019/12/02 00:05:56 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -16,12 +16,13 @@ contributed the port.
 
 Alex Kompel, Dion Nicolaas, Yitzhak Sapir, Derek S. Ray, Michael Allison,
 Pasi Kallinen, Bart House, and Janet Walz contributed to the maintainance
-of the tty and graphical windows versions of NetHack 3.6.2.
+of the tty and graphical windows versions of NetHack 3.6.3.
 
 You can build a TTY version of NetHack and a Windows Graphical 
 version.  You can use one of the following build environments:
 
-  o A copy of Microsoft Visual Studio 2017 Community Edition
+  o A copy of Microsoft Visual Studio 2017 Community Edition or
+    a copy of Microsoft Visual Studio 2019 Community Edition
 
     OR
 
@@ -65,6 +66,14 @@ of NetHack you wish to run.
 The Visual Studio 2017 NetHack solution file can be found here:
     win\win32\vs2017\NetHack.sln
 
+You can use that same win\win32\vs2017\NetHack.sln with Visual Studio 2019,
+but you may have to retarget the projects:
+    Windows SDK Version: 10.0.17763.0  [ There have been some reports of 
+                                         difficulties if you instead choose 
+                                         "10.0 (latest installed version)" ]
+    Platform Toolset: Upgrade to v142
+    
+
 Before executing the steps to build listed in the next paragraph,
 decide if you want to include optional curses window-port. See
 the note just below entitled "Optional curses window-port support."
@@ -84,11 +93,10 @@ using.  Change to the directory win\win32\vs2017 and run "build.bat".
 
  * Optional curses window-port support *
 
-Starting with 3.6.2, the community patch for a window-port that uses
-curses was incorporated into the NetHack source code tree. That window-port,
-which evolved from work originally done by Karl Garrison, has been used in
-several NetHack variants and on nethack.alt.org and on 
-www.hardfought.org/nethack/.
+Since 3.6.2, the community patch for a window-port that uses curses has been
+incorporated into the NetHack source code tree. That window-port, which 
+evolved from work originally done by Karl Garrison, has been used in several
+NetHack variants and on nethack.alt.org and on www.hardfought.org/nethack/.
 
 If you want to include the curses window-port support in your Visual Studio
 build, you will have to first obtain the PDCurses sources from
@@ -143,7 +151,7 @@ a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
 is set up for a 32-bit x86 version, but that's only because it will 
 run on the most number of existing Windows environments.
 
-NetHack's save files and bones files in the 3.6.2 release have not yet
+NetHack's save files and bones files in the 3.6.3 release have not yet
 evolved enough to allow them to interchange between the 32-bit version 
 and the 64-bit version (or between different platforms). Hopefully
 that will change in an upcoming release.
@@ -195,8 +203,8 @@ Setting Up
     source tree.
         cd src
 
-2.  Starting with 3.6.2, the community patch for an optional curses 
-    window-port was incorporated into the NetHack source code tree. That 
+2.  Since 3.6.2, the community patch for an optional curses window-port
+    has been incorporated into the NetHack source code tree. That 
     window-port, which evolved from work originally done by Karl Garrison,
     has been used in several NetHack variants and on nethack.alt.org and 
     on www.hardfought.org/nethack/. The optional curses window-port is 

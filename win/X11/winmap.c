@@ -107,7 +107,7 @@ int bkglyph UNUSED;
 #endif
 
         /* map glyph to character and color */
-        (void) mapglyph(glyph, &och, &color, &special, x, y);
+        (void) mapglyph(glyph, &och, &color, &special, x, y, 0);
         ch = (uchar) och;
 
         if (special != map_info->tile_map.glyphs[y][x].special) {
@@ -1701,7 +1701,7 @@ int exit_condition;
                 inptr = (inptr + 1) % INBUF_SIZE;
                 /* pkey(retval); */
                 keep_going = FALSE;
-            } else if (program_state.done_hup) {
+            } else if (g.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;
@@ -1720,7 +1720,7 @@ int exit_condition;
                     /* pkey(retval); */
                 }
                 keep_going = FALSE;
-            } else if (program_state.done_hup) {
+            } else if (g.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;

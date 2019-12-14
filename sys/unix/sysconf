@@ -1,4 +1,4 @@
-# NetHack 3.6 sysconf $NHDT-Date: 1524689450 2018/04/25 20:50:50 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $
+# NetHack 3.6 sysconf $NHDT-Date: 1575245127 2019/12/02 00:05:27 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.32 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -61,6 +61,11 @@ MAXPLAYERS=10
 # incubi to use nymphs' charm behavior rather than their own seduce behavior.
 #SEDUCE=0
 
+# Uncomment the next line to enable some accessibility features such
+# as S_hero_override and S_pet_override symbols for screen readers
+# in the user config file.
+#ACCESSIBILITY=1
+
 # Uncomment to disable savefile UID checking.
 #CHECK_SAVE_UID=0
 
@@ -90,7 +95,7 @@ MAXPLAYERS=10
 # Only available if NetHack was compiled with DUMPLOG
 # Allows following placeholders:
 #   %% literal '%'
-#   %v version (eg. "3.6.2-0")
+#   %v version (eg. "3.6.3-0")
 #   %u game UID
 #   %t game start time, UNIX timestamp format
 #   %T current time, UNIX timestamp format
@@ -110,7 +115,8 @@ MAXPLAYERS=10
 
 # Try to get more info in case of a program bug or crash.  Only used
 # if the program is built with the PANICTRACE compile-time option enabled.
-# By default PANICTRACE is enabled if BETA is defined, otherwise disabled.
+# By default PANICTRACE is enabled if (NH_DEVEL_STATUS != NH_STATUS_RELEASED),
+# otherwise disabled.
 # Using GDB can get more information and works on more systems but requires
 # 'gdb' be available; using LIBC only works if NetHack is linked with a
 # libc that supports the backtrace(3) API.  Both require certain compilation

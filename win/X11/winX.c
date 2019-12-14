@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1546081304 2018/12/29 11:01:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1552441031 2019/03/13 01:37:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -107,6 +107,7 @@ struct window_procs X11_procs = {
     WC2_FLUSH_STATUS | WC2_RESET_STATUS | WC2_HILITE_STATUS |
 #endif
     0L,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     X11_init_nhwindows,
     X11_player_selection, X11_askname, X11_get_nh_event, X11_exit_nhwindows,
     X11_suspend_nhwindows, X11_resume_nhwindows, X11_create_nhwindow,
@@ -946,8 +947,8 @@ const char *str;
 
     switch (wp->type) {
     case NHW_MESSAGE:
-        (void) strncpy(toplines, str, TBUFSZ); /* for Norep(). */
-        toplines[TBUFSZ - 1] = 0;
+        (void) strncpy(g.toplines, str, TBUFSZ); /* for Norep(). */
+        g.toplines[TBUFSZ - 1] = 0;
         append_message(wp, str);
         break;
 #ifndef STATUS_HILITES
@@ -1355,9 +1356,20 @@ int how;
 time_t when;
 {
     struct xwindow *wp;
+    FILE *rip_fp = 0;
 
     check_winid(window);
     wp = &window_list[window];
+
+    /* make sure the graphical tombstone is available; it's not easy to
+       revert to the ASCII-art text tombstone once we're past this point */
+    if (appResources.tombstone && *appResources.tombstone)
+        rip_fp = fopen(appResources.tombstone, "r"); /* "rip.xpm" */
+    if (!rip_fp) {
+        genl_outrip(window, how, when);
+        return;
+    }
+    (void) fclose(rip_fp);
 
     if (wp->type == NHW_TEXT) {
         wp->text_information->is_rip = TRUE;
@@ -1713,7 +1725,7 @@ Cardinal *num_params;
     nhUse(num_params);
 
     nh_XtPopdown(w);
-    (void) strcpy(plname, "Mumbles"); /* give them a name... ;-) */
+    (void) strcpy(g.plname, "Mumbles"); /* give them a name... ;-) */
     exit_x_event = TRUE;
 }
 
@@ -1741,11 +1753,11 @@ XtPointer call_data;
     }
 
     /* Truncate name if necessary */
-    if (len >= sizeof plname - 1)
-        len = sizeof plname - 1;
+    if (len >= sizeof g.plname - 1)
+        len = sizeof g.plname - 1;
 
-    (void) strncpy(plname, s, len);
-    plname[len] = '\0';
+    (void) strncpy(g.plname, s, len);
+    g.plname[len] = '\0';
     XtFree(s);
 
     nh_XtPopdown(XtParent(dialog));
@@ -1778,7 +1790,7 @@ X11_askname()
                           (XtCallbackProc) 0);
 
     SetDialogPrompt(dialog, nhStr("What is your name?")); /* set prompt */
-    SetDialogResponse(dialog, plname, PL_NSIZ); /* set default answer */
+    SetDialogResponse(dialog, g.plname, PL_NSIZ); /* set default answer */
 
     XtRealizeWidget(popup);
     positionpopup(popup, TRUE); /* center,bottom */
@@ -1950,7 +1962,7 @@ boolean complain;
     wp = &window_list[newwin];
     X11_start_menu(newwin);
 
-    any = zeroany;
+    any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
         X11_add_menu(newwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      line, MENU_UNSELECTED);
@@ -2572,12 +2584,12 @@ init_standard_windows()
 }
 
 void
-nh_XtPopup(w, g, childwid)
+nh_XtPopup(w, grb, childwid)
 Widget w;        /* widget */
-int g;           /* type of grab */
+int grb;         /* type of grab */
 Widget childwid; /* child to receive focus (can be None) */
 {
-    XtPopup(w, (XtGrabKind) g);
+    XtPopup(w, (XtGrabKind) grb);
     XSetWMProtocols(XtDisplay(w), XtWindow(w), &wm_delete_window, 1);
     if (appResources.autofocus)
         XtSetKeyboardFocus(toplevel, childwid);

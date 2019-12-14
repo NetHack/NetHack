@@ -2,3 +2,11 @@
 *.db-shm
 *.db-wal
 paniclog
+_pkginfo.txt
+AppPackages
+BundleArtifacts
+report.xml
+*.cer
+*.appxbundle
+NetHackPackage_StoreKey.pfx
+NetHackPackage_TemporaryKey.pfx

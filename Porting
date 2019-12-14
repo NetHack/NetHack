@@ -1,4 +1,4 @@
-  NetHack Porting Guidelines		v 3.6			1999-11-29
+  NetHack Porting Guidelines		v 3.7			2019-12-05
 
 
      1.0	Introduction
@@ -6,13 +6,17 @@
 	This document goes through the steps required to port NetHack to a
 new machine.  The basic steps in porting the program are:
 
-	1.  Get the code onto your machine.  The parts of the current
+	1.  Get the code onto your build machine.  The parts of the current
 	    directory setup you definitely need include src (NetHack code
 	    shared by all systems), include (include files), util (code
 	    for utility programs), and dat (various data files).  The
 	    documentation in doc is strongly recommended.  You already
 	    have the files in the top directory since you're reading this
 	    one. :-)
+
+	    If you will be cross-compiling for your target platform on 
+            a different platform, you may want to read Cross-compiling
+            in the Top folder as well.
 
 	    A full list of the distribution files and their associated
 	    OSes may be found in the top-level file "Files".
@@ -53,7 +57,8 @@ new machine.  The basic steps in porting the program are:
 	    possibly send us some mail.  We might be able to help.
 
 	6.  Mail all of your fixes to us in a contextual form so that we can
-	    easily integrate them into the code.
+	    easily integrate them into the code, or fork the NetHack
+            repository on GitHub and issue a pull-request for your changes.
 
 	One general rule of thumb exists.  Always add code.  Don't delete
 somebody else's code for yours -- it won't work on their machine if you do.
@@ -120,13 +125,6 @@ files for the game.
 You may have to create an OS-specific module to handle things you want to
 use, like a mouse or a ram-disk.
 
-	The utility compilers "dgn_comp" and "lev_comp" may be a better
-place to start.  They also require "makedefs" but are independent of
-"nethack".  They are usually the last programs made, but since they are
-much smaller they may be more tractable when first arguing with the include
-files.  These programs create binary data files that "nethack" uses to
-guide its dungeon creation.
-
      3.1	Makefiles
 
 	This distribution provides makefiles for several kinds of systems.
@@ -167,10 +165,106 @@ for raw I/O, etc.
 to.  This file contains some OS dependencies concerning time and filename
 creation.
 
-
 	An object of the NetHack development project is to get the game
 working on as many different types of hardware and under as many different
 operating systems as is practical.  Any assistance will be appreciated.
+
+Cross-compiling may allow porting of NetHack to a machine where there may
+be challenges building on the platform directly, and may help maintain a
+working version of NetHack on that platform. See the file Cross-compiling
+for more information.
+
+     4.0	Build Process
+
+NetHack requires the following steps to be carried out:
+
+     4.1. makedefs
+
+Compile and link util/makedefs. Run makedefs repeatedly with different command
+line options to produce several output files that are required for:
+          (a) additional build steps to follow, including some header
+              files: pm.h, onames.h, date.h.
+          (b) creation of files, containing information required by,
+              or about the game during its execution, that are stored in a 
+              portable, platform-independent way, that need to be inserted
+              into the final game package.
+
+          util/makedefs -v
+          util/makedefs -o
+          util/makedefs -p
+          util/makedefs -z
+          util/makedefs -d
+          util/makedefs -r
+          util/makedefs -h
+          util/makedefs -s
+
+     4.2. Other utilities
+
+	Compile and link other utilities such as uudecode, tile-generation
+utilities, and so forth. Those produce output files for use during the game and
+need to be included in the packaging of the game.
+
+     4.3. Lua
+  
+	Compile and link into a library, or obtain a prebuilt Lua library for
+your platform. Place the Lua source into lib/lua-5.3.5 (or other folder
+representing an appropriate Lua version); place the compiled Lua library into
+lib.
+
+     4.4  Compile NetHack sources
+
+	Compile the source code of the game, including a suitable
+regular-expression choice from several options available in sys/share. Pick one
+that is supported by your OS or that you have obtained a 3rd party library for.
+
+     4.5  Compile optional window port components into a library
+
+	If your platform requires 3rd party sources in order to support the
+window port options that you have chosen, such as curses sources for the curses
+window port, you may store the sources for that library in a subfolder under
+lib.
+
+     4.6. Link the game
+
+	Link the game to the Lua library, and to any window port support
+libraries.
+
+     4.7  Package the game
+
+
+
+     5.0	Design Updates
+
+The following design updates were introduced in NetHack 3.7.
+
+     5.1  Quest text files
+
+	The quest text files that were formerly converted from their source
+text by makedefs during the build process, have been replaced by Lua versions
+and are inserted into the game package for processing by the embedded Lua
+interpreter during game execution.
+
+     5.2  Level Compiler  
+
+	There is no longer a build-time level compiler. Instead, the level
+descriptions have been converted to Lua and are inserted into the game package
+for processing by the embeded Lua interpreter during game execution.
+
+     5.3  Dungeon Compiler
+
+	There is no longer a build-time dungeon compiler. Instead, the dungeon
+description has been converted to Lua and is inserted into the game package for
+processing by the embeded Lua interpreter during game execution.
+
+
+     5.4  Run-time Options
+
+	Some of the build and option information that was formerly produced at
+build-time by makedefs, and contained information about the game platform and
+options selected during the build of the game can now be produced at run-time
+by code within the game itself. That was done to facilitate cross-compiling of
+NetHack on one platform for game execution on another.
+
 
 # NetHack 3.6  Porting       $NHDT-Date: 1524689603 2018/04/25 20:53:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.5 $
 # Copyright (c) 2005 by Michael Allison

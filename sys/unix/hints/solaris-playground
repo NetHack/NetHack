@@ -1,0 +1,48 @@
+#
+# NetHack 3.6 unix $NHDT-Date: 1554411633 2019/04/04 21:00:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.0 $
+# Copyright (c) Kevin Smolkowski "Snivik", Elgin Oregon 2019.
+# NetHack may be freely redistributed.  See license for details. 
+#
+#-PRE
+# This hints file provides a shared playground build for Solaris, specifically
+# for Solaris 10 and 11, but should work just fine on older versions
+
+# Nethack will install suid games, and will expect to read a users .nethackrc file from
+# their home directory which may be a problem on secure systems with read restricted home
+# directories,  not that you would problably run NetHack on such a system anyway.  :)
+
+# Build using using included gcc and gmake, optional flex and bison come from csw for solaris 10 
+# and included on Solaris 11
+
+
+PREFIX=/usr
+HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+INSTDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)
+SHELLDIR=$(PREFIX)/games
+
+POSTINSTALL= cp sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf;$(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+
+CC=gcc
+CFLAGS=-O -I../include
+LINK=$(CC)
+
+WINSRC = $(WINTTYSRC)
+WINOBJ = $(WINTTYOBJ)
+WINLIB = $(WINTTYLIB)
+
+WINTTYLIB=-ltermlib
+
+CHOWN=chown
+CHGRP=chgrp
+
+GAMEUID  = games
+GAMEGRP  = bin
+
+GAMEPERM = 04755
+VARFILEPERM = 0644
+VARDIRPERM = 0755
+
+# Optional Tools to build level compiler
+#LEX=flex
+#YACC=bison -y

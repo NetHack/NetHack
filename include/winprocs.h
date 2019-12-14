@@ -1,4 +1,4 @@
-/* NetHack 3.6	winprocs.h	$NHDT-Date: 1502141230 2017/08/07 21:27:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	winprocs.h	$NHDT-Date: 1567213890 2019/08/31 01:11:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,6 +14,7 @@ struct window_procs {
                            * '+' are reserved for processors. */
     unsigned long wincap; /* window port capability options supported */
     unsigned long wincap2; /* additional window port capability options */
+    boolean has_color[CLR_MAX];
     void FDECL((*win_init_nhwindows), (int *, char **));
     void NDECL((*win_player_selection));
     void NDECL((*win_askname));
@@ -112,7 +113,7 @@ extern
 #define end_menu (*windowprocs.win_end_menu)
 #define select_menu (*windowprocs.win_select_menu)
 #define message_menu (*windowprocs.win_message_menu)
-#define update_inventory (*windowprocs.win_update_inventory)
+
 #define mark_synch (*windowprocs.win_mark_synch)
 #define wait_synch (*windowprocs.win_wait_synch)
 #ifdef CLIPPING
@@ -213,14 +214,21 @@ extern
 #define WC2_DARKGRAY      0x0020L /* 06 use bold black for black glyphs */
 #define WC2_HITPOINTBAR   0x0040L /* 07 show bar representing hit points */
 #define WC2_FLUSH_STATUS  0x0080L /* 08 call status_update(BL_FLUSH)
-                                        after updating status window fields */
-#define WC2_RESET_STATUS  0x0100L /* 09 call status_update(BL_RESET) to indicate
-                                        draw everything */
+                                   *    after updating status window fields */
+#define WC2_RESET_STATUS  0x0100L /* 09 call status_update(BL_RESET) to
+                                   *    indicate 'draw everything'      */
 #define WC2_TERM_SIZE     0x0200L /* 10 support setting terminal size   */
-#define WC2_WINDOWBORDERS 0x0400L /* 11 display borders on nh windows   */
-#define WC2_PETATTR       0x0800L /* 12 attributes for hilite_pet       */
-#define WC2_GUICOLOR      0x1000L /* 13 display colours outside map win */
-                                  /* 19 free bits */
+#define WC2_STATUSLINES   0x0400L /* 16 switch between 2 or 3 lines of status */
+#define WC2_WINDOWBORDERS 0x0800L /* 11 display borders on nh windows   */
+#define WC2_PETATTR       0x1000L /* 12 attributes for hilite_pet       */
+#define WC2_GUICOLOR      0x2000L /* 13 display colours outside map win */
+/* pline() can overload the display attributes argument passed to putstr()
+   with one or more flags and at most one of bold/blink/inverse/&c */
+#define WC2_URGENT_MESG   0x4000L /* 14 putstr(WIN_MESSAGE) supports urgency
+                                   *    via non-display attribute flag  */
+#define WC2_SUPPRESS_HIST 0x8000L /* 15 putstr(WIN_MESSAGE) supports history
+                                   *    suppression via non-disp attr   */
+                                  /* 16 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2
@@ -443,6 +451,7 @@ extern void FDECL(safe_status_enablefield,
 extern void FDECL(safe_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 extern boolean NDECL(safe_can_suspend);
 extern void FDECL(stdio_raw_print, (const char *));
+extern void FDECL(stdio_nonl_raw_print, (const char *));
 extern void FDECL(stdio_raw_print_bold, (const char *));
 extern void NDECL(stdio_wait_synch);
 extern int NDECL(stdio_nhgetch);

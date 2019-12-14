@@ -1,4 +1,4 @@
-/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1545270756 2018/12/20 01:52:36 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1555361295 2019/04/15 20:48:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -278,12 +278,16 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 
 /*
- * According to ANSI, prototypes for old-style declarations must widen the
- * arguments to int.  However, the MSDOS compilers accept shorter arguments
- * (char, short, etc.) in prototypes and do typechecking with them.  Therefore
- * this mess to allow the better typechecking while also allowing some
- * prototypes for the ANSI compilers so people quit trying to fix the
- * prototypes to match the standard and thus lose the typechecking.
+ * According to ANSI C, prototypes for old-style function definitions like
+ *   int func(arg) short arg; { ... }
+ * must specify widened arguments (char and short to int, float to double),
+ *   int func(int);
+ * same as how narrow arguments get passed when there is no prototype info.
+ * However, various compilers accept shorter arguments (char, short, etc.)
+ * in prototypes and do typechecking with them.  Therefore this mess to
+ * allow the better typechecking while also allowing some prototypes for
+ * the ANSI compilers so people quit trying to fix the prototypes to match
+ * the standard and thus lose the typechecking.
  */
 #if defined(MSDOS) && !defined(__GO32__)
 #define UNWIDENED_PROTOTYPES
@@ -316,6 +320,22 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #endif
 
+/* this applies to both VMS and Digital Unix/HP Tru64 */
+#ifdef WIDENED_PROTOTYPES
+/* ANSI C uses "value preserving rules", where 'unsigned char' and
+   'unsigned short' promote to 'int' if signed int is big enough to hold
+   all possible values, rather than traditional "sign preserving rules"
+   where 'unsigned char' and 'unsigned short' promote to 'unsigned int'.
+   However, the ANSI C rules aren't binding on non-ANSI compilers.
+   When DEC C (aka Compaq C, then HP C) is in non-standard 'common' mode
+   it supports prototypes that expect widened types, but it uses the old
+   sign preserving rules for how to widen narrow unsigned types.  (In its
+   default 'relaxed' mode, __STDC__ is 1 and uchar widens to 'int'.) */
+#if defined(__DECC) && (!defined(__STDC__) || !__STDC__)
+#define UCHAR_P unsigned int
+#endif
+#endif
+
 /* These are used for arguments within FDECL/VDECL prototype declarations.
  */
 #ifdef UNWIDENED_PROTOTYPES
@@ -332,7 +352,9 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #ifdef WIDENED_PROTOTYPES
 #define CHAR_P int
 #define SCHAR_P int
+#ifndef UCHAR_P
 #define UCHAR_P int
+#endif
 #define XCHAR_P int
 #define SHORT_P int
 #define BOOLEAN_P int

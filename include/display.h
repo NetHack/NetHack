@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.h	$NHDT-Date: 1546212620 2018/12/30 23:30:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.29 $ */
+/* NetHack 3.6	display.h	$NHDT-Date: 1559994621 2019/06/08 11:50:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.32 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,7 +19,7 @@
  * Returns the head of the list of objects that the player can see
  * at location (x,y).
  */
-#define vobj_at(x, y) (level.objects[x][y])
+#define vobj_at(x, y) (g.level.objects[x][y])
 
 /*
  * sensemon()
@@ -48,7 +48,7 @@
 
 #define mon_warning(mon)                                                 \
     (Warning && !(mon)->mpeaceful && (distu((mon)->mx, (mon)->my) < 100) \
-     && (((int) ((mon)->m_lev / 4)) >= context.warnlevel))
+     && (((int) ((mon)->m_lev / 4)) >= g.context.warnlevel))
 
 /*
  * mon_visible()
@@ -58,11 +58,18 @@
  * vobj_at() returns a pointer to an object that the hero can see there.
  * Infravision is not taken into account.
  */
+#if 0
 #define mon_visible(mon) \
     (/* The hero can see the monster IF the monster                     */ \
      (!mon->minvis || See_invisible)  /*     1. is not invisible        */ \
      && !mon->mundetected             /* AND 2. not an undetected hider */ \
      && !(mon->mburied || u.uburied)) /* AND 3. neither you nor it is buried */
+#else   /* without 'mburied' and 'uburied' */
+#define mon_visible(mon) \
+    (/* The hero can see the monster IF the monster                     */ \
+     (!mon->minvis || See_invisible)  /*     1. is not invisible        */ \
+     && !mon->mundetected)            /* AND 2. not an undetected hider */
+#endif
 
 /*
  * see_with_infrared()
@@ -145,18 +152,31 @@
  *
  * Respectively return a random monster or object.
  */
-#define random_monster() rn2(NUMMONS)
-#define random_object() rn1(NUM_OBJECTS - 1, 1)
+#define random_monster(rng) rng(NUMMONS)
+#define random_object(rng) (rng(NUM_OBJECTS - 1) + 1)
 
 /*
  * what_obj()
  * what_mon()
  *
  * If hallucinating, choose a random object/monster, otherwise, use the one
- * given.
+ * given. Use the given rng to handle hallucination.
  */
-#define what_obj(obj) (Hallucination ? random_object() : obj)
-#define what_mon(mon) (Hallucination ? random_monster() : mon)
+#define what_obj(obj, rng) (Hallucination ? random_object(rng) : obj)
+#define what_mon(mon, rng) (Hallucination ? random_monster(rng) : mon)
+#define what_trap(trp, rng) (Hallucination ? random_trap(rng) : trp)
+
+/*
+ * newsym_rn2
+ *
+ * An appropriate random number generator for use with newsym(), when
+ * randomness is needed there. This is currently hardcoded as
+ * rn2_on_display_rng, but is futureproofed for cases where we might
+ * want to prevent display-random objects entering the character's
+ * memory (this isn't important at present but may be if we need
+ * reproducible gameplay for some reason).
+ */
+#define newsym_rn2 rn2_on_display_rng
 
 /*
  * covers_objects()
@@ -192,20 +212,21 @@
  * Display the hero.  It is assumed that all checks necessary to determine
  * _if_ the hero can be seen have already been done.
  */
-#define maybe_display_usteed(otherwise_self)                             \
-    ((u.usteed && mon_visible(u.usteed)) ? ridden_mon_to_glyph(u.usteed) \
-                                         : (otherwise_self))
+#define maybe_display_usteed(otherwise_self)                            \
+    ((u.usteed && mon_visible(u.usteed))                                \
+     ? ridden_mon_to_glyph(u.usteed, rn2_on_display_rng)                \
+     : (otherwise_self))
 
 #define display_self() \
     show_glyph(u.ux, u.uy,                                                  \
-           maybe_display_usteed((youmonst.m_ap_type == M_AP_NOTHING)        \
+           maybe_display_usteed((U_AP_TYPE == M_AP_NOTHING)                 \
                                 ? hero_glyph                                \
-                                : (youmonst.m_ap_type == M_AP_FURNITURE)    \
-                                  ? cmap_to_glyph(youmonst.mappearance)     \
-                                  : (youmonst.m_ap_type == M_AP_OBJECT)     \
-                                    ? objnum_to_glyph(youmonst.mappearance) \
-                                    /* else M_AP_MONSTER */                 \
-                                    : monnum_to_glyph(youmonst.mappearance)))
+                                : (U_AP_TYPE == M_AP_FURNITURE)             \
+                                  ? cmap_to_glyph(g.youmonst.mappearance)     \
+                                  : (U_AP_TYPE == M_AP_OBJECT)              \
+                                    ? objnum_to_glyph(g.youmonst.mappearance) \
+                                    /* else U_AP_TYPE == M_AP_MONSTER */    \
+                                    : monnum_to_glyph(g.youmonst.mappearance)))
 
 /*
  * A glyph is an abstraction that represents a _unique_ monster, object,
@@ -278,27 +299,27 @@
 #define GLYPH_INVISIBLE   GLYPH_INVIS_OFF
 
 #define warning_to_glyph(mwarnlev) ((mwarnlev) + GLYPH_WARNING_OFF)
-#define mon_to_glyph(mon) \
-    ((int) what_mon(monsndx((mon)->data)) + GLYPH_MON_OFF)
-#define detected_mon_to_glyph(mon) \
-    ((int) what_mon(monsndx((mon)->data)) + GLYPH_DETECT_OFF)
-#define ridden_mon_to_glyph(mon) \
-    ((int) what_mon(monsndx((mon)->data)) + GLYPH_RIDDEN_OFF)
-#define pet_to_glyph(mon) \
-    ((int) what_mon(monsndx((mon)->data)) + GLYPH_PET_OFF)
+#define mon_to_glyph(mon, rng)                                      \
+    ((int) what_mon(monsndx((mon)->data), rng) + GLYPH_MON_OFF)
+#define detected_mon_to_glyph(mon, rng)                             \
+    ((int) what_mon(monsndx((mon)->data), rng) + GLYPH_DETECT_OFF)
+#define ridden_mon_to_glyph(mon, rng)                               \
+    ((int) what_mon(monsndx((mon)->data), rng) + GLYPH_RIDDEN_OFF)
+#define pet_to_glyph(mon, rng)                                      \
+    ((int) what_mon(monsndx((mon)->data), rng) + GLYPH_PET_OFF)
 
 /* This has the unfortunate side effect of needing a global variable    */
 /* to store a result. 'otg_temp' is defined and declared in decl.{ch}.  */
-#define random_obj_to_glyph()                \
-    ((otg_temp = random_object()) == CORPSE  \
-         ? random_monster() + GLYPH_BODY_OFF \
-         : otg_temp + GLYPH_OBJ_OFF)
+#define random_obj_to_glyph(rng)                \
+    ((g.otg_temp = random_object(rng)) == CORPSE  \
+         ? random_monster(rng) + GLYPH_BODY_OFF \
+         : g.otg_temp + GLYPH_OBJ_OFF)
 
-#define obj_to_glyph(obj) \
+#define obj_to_glyph(obj, rng)                                          \
     (((obj)->otyp == STATUE)                                            \
-         ? statue_to_glyph(obj)                                         \
+         ? statue_to_glyph(obj, rng)                                    \
          : Hallucination                                                \
-               ? random_obj_to_glyph()                                  \
+               ? random_obj_to_glyph(rng)                               \
                : ((obj)->otyp == CORPSE)                                \
                      ? (int) (obj)->corpsenm + GLYPH_BODY_OFF           \
                      : (int) (obj)->otyp + GLYPH_OBJ_OFF)
@@ -306,8 +327,8 @@
 /* MRKR: Statues now have glyphs corresponding to the monster they    */
 /*       represent and look like monsters when you are hallucinating. */
 
-#define statue_to_glyph(obj)                          \
-    (Hallucination ? random_monster() + GLYPH_MON_OFF \
+#define statue_to_glyph(obj, rng)                              \
+    (Hallucination ? random_monster(rng) + GLYPH_MON_OFF       \
                    : (int) (obj)->corpsenm + GLYPH_STATUE_OFF)
 
 #define cmap_to_glyph(cmap_idx) ((int) (cmap_idx) + GLYPH_CMAP_OFF)
@@ -330,9 +351,9 @@
 #define hero_glyph                                                    \
     monnum_to_glyph((Upolyd || !flags.showrace)                       \
                         ? u.umonnum                                   \
-                        : (flags.female && urace.femalenum != NON_PM) \
-                              ? urace.femalenum                       \
-                              : urace.malenum)
+                        : (flags.female && g.urace.femalenum != NON_PM) \
+                              ? g.urace.femalenum                       \
+                              : g.urace.malenum)
 
 /*
  * Change the given glyph into it's given type.  Note:

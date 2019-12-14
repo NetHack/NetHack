@@ -20,6 +20,7 @@ void curses_add_wid(winid wid);
 void curses_refresh_nhwin(winid wid);
 void curses_del_nhwin(winid wid);
 void curses_del_wid(winid wid);
+void curs_destroy_all_wins(void);
 void curses_putch(winid wid, int x, int y, int ch, int color, int attrs);
 void curses_get_window_xy(winid wid, int *x, int *y);
 boolean curses_window_has_border(winid wid);

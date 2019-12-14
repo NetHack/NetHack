@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1545705819 2018/12/25 02:43:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1575245194 2019/12/02 00:06:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.227 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,7 +56,7 @@ extern short glyph2tile[];
  */
 #define HUPSKIP() \
     do {                                        \
-        if (program_state.done_hup) {           \
+        if (g.program_state.done_hup) {           \
             morc = '\033';                      \
             return;                             \
         }                                       \
@@ -64,15 +64,13 @@ extern short glyph2tile[];
     /* morc=ESC - in case we bypass xwaitforspace() which sets that */
 #define HUPSKIP_RESULT(RES) \
     do {                                        \
-        if (program_state.done_hup)             \
+        if (g.program_state.done_hup)             \
             return (RES);                       \
     } while (0)
 #else /* !HANGUP_HANDLING */
 #define HUPSKIP() /*empty*/
 #define HUPSKIP_RESULT(RES) /*empty*/
 #endif /* ?HANGUP_HANDLING */
-
-extern char mapped_menu_cmds[]; /* from options.c */
 
 /* this is only needed until tty_status_* routines are written */
 extern NEARDATA winid WIN_STATUS;
@@ -96,7 +94,12 @@ struct window_procs tty_procs = {
      | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
      | WC2_RESET_STATUS
 #endif
-     | WC2_DARKGRAY),
+     | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_STATUSLINES),
+#ifdef TEXTCOLOR
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+#else
+    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+#endif
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
     tty_exit_nhwindows, tty_suspend_nhwindows, tty_resume_nhwindows,
     tty_create_nhwindow, tty_clear_nhwindow, tty_display_nhwindow,
@@ -123,11 +126,7 @@ struct window_procs tty_procs = {
 
     /* other defs that really should go away (they're tty specific) */
     tty_start_screen, tty_end_screen, genl_outrip,
-#if defined(WIN32)
-    nttty_preference_update,
-#else
-    genl_preference_update,
-#endif
+    tty_preference_update,
     tty_getmsghistory, tty_putmsghistory,
     tty_status_init,
     genl_status_finish, tty_status_enablefield,
@@ -139,7 +138,6 @@ struct window_procs tty_procs = {
     genl_can_suspend_yes,
 };
 
-static int maxwin = 0; /* number of windows in use */
 winid BASE_WINDOW;
 struct WinDesc *wins[MAXWIN];
 struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
@@ -177,44 +175,46 @@ boolean HE_resets_AS; /* see termcap.c */
 static const char to_continue[] = "to continue";
 #define getret() getreturn(to_continue)
 #else
-STATIC_DCL void NDECL(getret);
+static void NDECL(getret);
 #endif
-STATIC_DCL void FDECL(erase_menu_or_text,
-                      (winid, struct WinDesc *, BOOLEAN_P));
-STATIC_DCL void FDECL(free_window_info, (struct WinDesc *, BOOLEAN_P));
-STATIC_DCL void FDECL(dmore, (struct WinDesc *, const char *));
-STATIC_DCL void FDECL(set_item_state, (winid, int, tty_menu_item *));
-STATIC_DCL void FDECL(set_all_on_page, (winid, tty_menu_item *,
+static void FDECL(bail, (const char *)); /* __attribute__((noreturn)) */
+static void NDECL(new_status_window);
+static void FDECL(erase_menu_or_text, (winid, struct WinDesc *,
+                                           BOOLEAN_P));
+static void FDECL(free_window_info, (struct WinDesc *, BOOLEAN_P));
+static void FDECL(dmore, (struct WinDesc *, const char *));
+static void FDECL(set_item_state, (winid, int, tty_menu_item *));
+static void FDECL(set_all_on_page, (winid, tty_menu_item *,
                                         tty_menu_item *));
-STATIC_DCL void FDECL(unset_all_on_page, (winid, tty_menu_item *,
+static void FDECL(unset_all_on_page, (winid, tty_menu_item *,
                                           tty_menu_item *));
-STATIC_DCL void FDECL(invert_all_on_page, (winid, tty_menu_item *,
+static void FDECL(invert_all_on_page, (winid, tty_menu_item *,
                                            tty_menu_item *, CHAR_P));
-STATIC_DCL void FDECL(invert_all, (winid, tty_menu_item *,
+static void FDECL(invert_all, (winid, tty_menu_item *,
                                    tty_menu_item *, CHAR_P));
-STATIC_DCL void FDECL(toggle_menu_attr, (BOOLEAN_P, int, int));
-STATIC_DCL void FDECL(process_menu_window, (winid, struct WinDesc *));
-STATIC_DCL void FDECL(process_text_window, (winid, struct WinDesc *));
-STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
-STATIC_DCL const char *FDECL(compress_str, (const char *));
-STATIC_DCL void FDECL(tty_putsym, (winid, int, int, CHAR_P));
-STATIC_DCL void FDECL(bail, (const char *)); /* __attribute__((noreturn)) */
-STATIC_DCL void FDECL(setup_rolemenu, (winid, BOOLEAN_P, int, int, int));
-STATIC_DCL void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
-STATIC_DCL void FDECL(setup_gendmenu, (winid, BOOLEAN_P, int, int, int));
-STATIC_DCL void FDECL(setup_algnmenu, (winid, BOOLEAN_P, int, int, int));
-STATIC_DCL boolean NDECL(reset_role_filtering);
+static void FDECL(toggle_menu_attr, (BOOLEAN_P, int, int));
+static void FDECL(process_menu_window, (winid, struct WinDesc *));
+static void FDECL(process_text_window, (winid, struct WinDesc *));
+static tty_menu_item *FDECL(reverse, (tty_menu_item *));
+static const char *FDECL(compress_str, (const char *));
+static void FDECL(tty_putsym, (winid, int, int, CHAR_P));
+static void FDECL(setup_rolemenu, (winid, BOOLEAN_P, int, int, int));
+static void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
+static void FDECL(setup_gendmenu, (winid, BOOLEAN_P, int, int, int));
+static void FDECL(setup_algnmenu, (winid, BOOLEAN_P, int, int, int));
+static boolean NDECL(reset_role_filtering);
 #ifdef STATUS_HILITES
-STATIC_DCL boolean FDECL(check_fields, (BOOLEAN_P, int *, int *));
-STATIC_DCL void NDECL(render_status);
-STATIC_DCL void FDECL(tty_putstatusfield, (struct tty_status_fields *,
-                                           const char *, int, int));
-STATIC_DCL boolean NDECL(check_windowdata);
-STATIC_DCL int NDECL(condition_size);
-STATIC_DCL int FDECL(make_things_fit, (BOOLEAN_P));
-STATIC_DCL void FDECL(shrink_enc, (int));
-STATIC_DCL void FDECL(shrink_dlvl, (int));
-STATIC_DCL void NDECL(do_setlast);
+static boolean FDECL(check_fields, (BOOLEAN_P, int *));
+static void NDECL(render_status);
+static void FDECL(tty_putstatusfield, (const char *, int, int));
+static boolean NDECL(check_windowdata);
+static void NDECL(set_condition_length);
+static int FDECL(make_things_fit, (BOOLEAN_P));
+static void FDECL(shrink_enc, (int));
+static void FDECL(shrink_dlvl, (int));
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+static void NDECL(status_sanity_check);
+#endif /* NH_DEVEL_STATUS */
 #endif
 
 /*
@@ -261,7 +261,7 @@ int i, c, d;
 
 
 /* clean up and quit */
-STATIC_OVL void
+static void
 bail(mesg)
 const char *mesg;
 {
@@ -272,7 +272,7 @@ const char *mesg;
 }
 
 #if defined(SIGWINCH) && defined(CLIPPING)
-STATIC_DCL void FDECL(winch_handler, (int));
+static void FDECL(winch_handler, (int));
 
     /*
      * This really ought to just set a flag like the hangup handler does,
@@ -284,7 +284,7 @@ STATIC_DCL void FDECL(winch_handler, (int));
      * 'winch_seen' has been "notyet" for a long time....
      */
 /*ARGUSED*/
-STATIC_OVL void
+static void
 winch_handler(sig_unused) /* signal handler is called with at least 1 arg */
 int sig_unused UNUSED;
 {
@@ -322,19 +322,8 @@ int sig_unused UNUSED;
             cw = wins[WIN_MESSAGE];
             cw->curx = cw->cury = 0;
 
-            tty_destroy_nhwindow(WIN_STATUS);
-            WIN_STATUS = tty_create_nhwindow(NHW_STATUS);
-
+            new_status_window();
             if (u.ux) {
-#ifdef CLIPPING
-                if (CO < COLNO || LI < ROWNO + 3) {
-                    setclipped();
-                    tty_cliparound(u.ux, u.uy);
-                } else {
-                    clipping = FALSE;
-                    clipx = clipy = 0;
-                }
-#endif
                 i = ttyDisplay->toplin;
                 ttyDisplay->toplin = 0;
                 docrt();
@@ -342,7 +331,7 @@ int sig_unused UNUSED;
                 ttyDisplay->toplin = i;
                 flush_screen(1);
                 if (i) {
-                    addtopl(toplines);
+                    addtopl(g.toplines);
                 } else
                     for (i = WIN_INVEN; i < MAXWIN; i++)
                         if (wins[i] && wins[i]->active) {
@@ -359,6 +348,41 @@ int sig_unused UNUSED;
 }
 #endif
 
+/* destroy and recreate status window; extracted from winch_handler()
+   and augmented for use by tty_preference_update() */
+static void
+new_status_window()
+{
+    if (WIN_STATUS != WIN_ERR) {
+        /* if it's shrinking, clear it before destroying so that
+           dropped portion won't show anything that's now becoming stale */
+        if (wins[WIN_STATUS]->maxrow > iflags.wc2_statuslines)
+            tty_clear_nhwindow(WIN_STATUS);
+
+        tty_destroy_nhwindow(WIN_STATUS), WIN_STATUS = WIN_ERR;
+    }
+    /* frees some status tracking data */
+    genl_status_finish();
+    /* creates status window and allocates tracking data */
+    tty_status_init();
+    tty_clear_nhwindow(WIN_STATUS); /* does some init, sets context.botlx */
+#ifdef STATUS_HILITES
+    status_initialize(REASSESS_ONLY);
+#endif
+
+#ifdef CLIPPING
+    if (u.ux) {
+        if (LI < 1 + ROWNO + iflags.wc2_statuslines) {
+            setclipped();
+            tty_cliparound(u.ux, u.uy);
+        } else {
+            clipping = FALSE;
+            clipx = clipy = 0;
+        }
+    }
+#endif
+}
+
 /*ARGSUSED*/
 void
 tty_init_nhwindows(argcp, argv)
@@ -367,14 +391,17 @@ char **argv UNUSED;
 {
     int wid, hgt, i;
 
-/*
- *  Remember tty modes, to be restored on exit.
- *
- *  gettty() must be called before tty_startup()
- *    due to ordering of LI/CO settings
- *  tty_startup() must be called before initoptions()
- *    due to ordering of graphics settings
- */
+    /* options aren't processed yet so wc2_statuslines might be 0;
+       make sure that it has a reasonable value during tty setup */
+    iflags.wc2_statuslines = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    /*
+     *  Remember tty modes, to be restored on exit.
+     *
+     *  gettty() must be called before tty_startup()
+     *    due to ordering of LI/CO settings
+     *  tty_startup() must be called before initoptions()
+     *    due to ordering of graphics settings
+     */
 #if defined(UNIX) || defined(VMS)
     setbuf(stdout, obuf);
 #endif
@@ -414,6 +441,31 @@ char **argv UNUSED;
         tty_putstr(BASE_WINDOW, 0, copyright_banner_line(i));
     tty_putstr(BASE_WINDOW, 0, "");
     tty_display_nhwindow(BASE_WINDOW, FALSE);
+
+    /* 'statuslines' defaults to SET_IN_FILE, allowed but invisible;
+       make it dynamically settable if feasible, otherwise visible */
+    if (tty_procs.wincap2 & WC2_STATUSLINES)
+        set_wc2_option_mod_status(WC2_STATUSLINES,
+#ifndef CLIPPING
+                                  (LI < 1 + ROWNO + 2) ? DISP_IN_GAME :
+#endif
+                                   SET_IN_GAME);
+}
+
+void
+tty_preference_update(pref)
+const char *pref;
+{
+    if (!strcmp(pref, "statuslines") && iflags.window_inited) {
+        new_status_window();
+    }
+
+#if defined(WIN32)
+    nttty_preference_update(pref);
+#else
+    genl_preference_update(pref);
+#endif
+    return;
 }
 
 /* try to reduce clutter in the code below... */
@@ -512,7 +564,7 @@ tty_player_selection()
                     k = pick_role(RACE, GEND, ALGN, PICK_RANDOM);
                     if (k < 0) {
                         tty_putstr(BASE_WINDOW, 0, "Incompatible role!");
-                        k = randrole();
+                        k = randrole(FALSE);
                     }
                 } else {
                     /* Prompt for a role */
@@ -524,7 +576,7 @@ tty_player_selection()
                     setup_rolemenu(win, TRUE, RACE, GEND, ALGN);
                     /* add miscellaneous menu entries */
                     role_menu_extra(ROLE_RANDOM, win, TRUE);
-                    any = zeroany; /* separator, not a choice */
+                    any = cg.zeroany; /* separator, not a choice */
                     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                              MENU_UNSELECTED);
                     role_menu_extra(RS_RACE, win, FALSE);
@@ -574,7 +626,7 @@ tty_player_selection()
                     } else if (choice == ROLE_RANDOM) {
                         k = pick_role(RACE, GEND, ALGN, PICK_RANDOM);
                         if (k < 0)
-                            k = randrole();
+                            k = randrole(FALSE);
                     } else {
                         k = choice - 1;
                     }
@@ -618,7 +670,7 @@ tty_player_selection()
                         role_selection_prolog(RS_RACE, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
-                        any = zeroany; /* zero out all bits */
+                        any = cg.zeroany; /* zero out all bits */
                         /* populate the menu with role choices */
                         setup_racemenu(win, TRUE, ROLE, GEND, ALGN);
                         /* add miscellaneous menu entries */
@@ -711,7 +763,7 @@ tty_player_selection()
                         role_selection_prolog(RS_GENDER, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
-                        any = zeroany; /* zero out all bits */
+                        any = cg.zeroany; /* zero out all bits */
                         /* populate the menu with gender choices */
                         setup_gendmenu(win, TRUE, ROLE, RACE, ALGN);
                         /* add miscellaneous menu entries */
@@ -802,7 +854,7 @@ tty_player_selection()
                         role_selection_prolog(RS_ALGNMNT, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
-                        any = zeroany; /* zero out all bits */
+                        any = cg.zeroany; /* zero out all bits */
                         setup_algnmenu(win, TRUE, ROLE, RACE, GEND);
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
@@ -882,7 +934,7 @@ tty_player_selection()
         role_selection_prolog(ROLE_NONE, BASE_WINDOW);
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-        any = zeroany; /* zero out all bits */
+        any = cg.zeroany; /* zero out all bits */
         any.a_int = 0;
         if (!roles[ROLE].name.f
             && (roles[ROLE].allow & ROLE_GENDMASK)
@@ -890,7 +942,7 @@ tty_player_selection()
             Sprintf(plbuf, " %s", genders[GEND].adj);
         else
             *plbuf = '\0'; /* omit redundant gender */
-        Sprintf(pbuf, "%s, %s%s %s %s", plname, aligns[ALGN].adj, plbuf,
+        Sprintf(pbuf, "%s, %s%s %s %s", g.plname, aligns[ALGN].adj, plbuf,
                 races[RACE].adj,
                 (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
                                                   : roles[ROLE].name.m);
@@ -940,8 +992,8 @@ tty_player_selection()
                GEND, ALGN; we'll override that and honor only the name */
             saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND,
                 saveALGN = ALGN;
-            *plname = '\0';
-            plnamesuffix(); /* calls askname() when plname[] is empty */
+            *g.plname = '\0';
+            plnamesuffix(); /* calls askname() when g.plname[] is empty */
             ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND,
                 ALGN = saveALGN;
             break; /* getconfirmation is still True */
@@ -974,7 +1026,7 @@ tty_player_selection()
     return;
 }
 
-STATIC_OVL boolean
+static boolean
 reset_role_filtering()
 {
     winid win;
@@ -984,7 +1036,7 @@ reset_role_filtering()
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
-    any = zeroany;
+    any = cg.zeroany;
 
     /* no extra blank line preceding this entry; end_menu supplies one */
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -1003,7 +1055,7 @@ reset_role_filtering()
 
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             "Uncceptable alignments", MENU_UNSELECTED);
+             "Unacceptable alignments", MENU_UNSELECTED);
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     end_menu(win, "Pick all that apply");
@@ -1028,7 +1080,7 @@ reset_role_filtering()
 #undef ALGN
 
 /* add entries a-Archeologist, b-Barbarian, &c to menu being built in 'win' */
-STATIC_OVL void
+static void
 setup_rolemenu(win, filtering, race, gend, algn)
 winid win;
 boolean filtering; /* True => exclude filtered roles; False => filter reset */
@@ -1039,7 +1091,7 @@ int race, gend, algn; /* all ROLE_NONE for !filtering case */
     boolean role_ok;
     char thisch, lastch = '\0', rolenamebuf[50];
 
-    any = zeroany; /* zero out all bits */
+    any = cg.zeroany; /* zero out all bits */
     for (i = 0; roles[i].name.m; i++) {
         role_ok = ok_role(i, race, gend, algn);
         if (filtering && !role_ok)
@@ -1071,7 +1123,7 @@ int race, gend, algn; /* all ROLE_NONE for !filtering case */
     }
 }
 
-STATIC_OVL void
+static void
 setup_racemenu(win, filtering, role, gend, algn)
 winid win;
 boolean filtering;
@@ -1082,7 +1134,7 @@ int role, gend, algn;
     int i;
     char this_ch;
 
-    any = zeroany;
+    any = cg.zeroany;
     for (i = 0; races[i].noun; i++) {
         race_ok = ok_race(role, i, gend, algn);
         if (filtering && !race_ok)
@@ -1104,7 +1156,7 @@ int role, gend, algn;
     }
 }
 
-STATIC_DCL void
+static void
 setup_gendmenu(win, filtering, role, race, algn)
 winid win;
 boolean filtering;
@@ -1115,7 +1167,7 @@ int role, race, algn;
     int i;
     char this_ch;
 
-    any = zeroany;
+    any = cg.zeroany;
     for (i = 0; i < ROLE_GENDERS; i++) {
         gend_ok = ok_gend(role, race, i, algn);
         if (filtering && !gend_ok)
@@ -1135,7 +1187,7 @@ int role, race, algn;
     }
 }
 
-STATIC_DCL void
+static void
 setup_algnmenu(win, filtering, role, race, gend)
 winid win;
 boolean filtering;
@@ -1146,7 +1198,7 @@ int role, race, gend;
     int i;
     char this_ch;
 
-    any = zeroany;
+    any = cg.zeroany;
     for (i = 0; i < ROLE_ALIGNS; i++) {
         algn_ok = ok_align(role, race, gend, i);
         if (filtering && !algn_ok)
@@ -1167,7 +1219,7 @@ int role, race, gend;
 }
 
 /*
- * plname is filled either by an option (-u Player  or  -uPlayer) or
+ * g.plname is filled either by an option (-u Player  or  -uPlayer) or
  * explicitly (by being the wizard) or by askname.
  * It may still contain a suffix denoting the role, etc.
  * Always called after init_nhwindows() and before display_gamewindows().
@@ -1187,7 +1239,7 @@ tty_askname()
         case 0:
             break; /* no game chosen; start new game */
         case 1:
-            return; /* plname[] has been set */
+            return; /* g.plname[] has been set */
         }
 #endif /* SELECTSAVED */
 
@@ -1250,7 +1302,7 @@ tty_askname()
                     && !(c >= '0' && c <= '9' && ct > 0))
                     c = '_';
 #endif
-            if (ct < (int) (sizeof plname) - 1) {
+            if (ct < (int) (sizeof g.plname) - 1) {
 #if defined(MICRO)
 #if defined(MSDOS)
                 if (iflags.grmode) {
@@ -1261,13 +1313,13 @@ tty_askname()
 #else
                 (void) putchar(c);
 #endif
-                plname[ct++] = c;
+                g.plname[ct++] = c;
 #ifdef WIN32CON
                 ttyDisplay->curx++;
 #endif
             }
         }
-        plname[ct] = 0;
+        g.plname[ct] = 0;
     } while (ct == 0);
 
     /* move to next line to simulate echo of user's <return> */
@@ -1285,7 +1337,7 @@ tty_get_nh_event()
 }
 
 #if !defined(MICRO) && !defined(WIN32CON)
-STATIC_OVL void
+static void
 getret()
 {
     HUPSKIP();
@@ -1367,13 +1419,21 @@ tty_create_nhwindow(type)
 int type;
 {
     struct WinDesc *newwin;
-    int i;
+    int i, rowoffset;
     int newid;
 
-    if (maxwin == MAXWIN)
+    for (newid = 0; newid < MAXWIN; ++newid)
+        if (wins[newid] == 0)
+            break;
+    if (newid == MAXWIN) {
+        panic("No window slots!");
+        /*NOTREACHED*/
         return WIN_ERR;
+    }
 
-    newwin = (struct WinDesc *) alloc(sizeof(struct WinDesc));
+    newwin = (struct WinDesc *) alloc(sizeof (struct WinDesc));
+    wins[newid] = newwin;
+
     newwin->type = type;
     newwin->flags = 0;
     newwin->active = FALSE;
@@ -1402,15 +1462,22 @@ int type;
         newwin->maxcol = newwin->cols = 0;
         break;
     case NHW_STATUS:
-        /* status window, 2 lines long, full width, bottom of screen */
+        /* status window, 2 or 3 lines long, full width, bottom of screen */
+        if (iflags.wc2_statuslines < 2
+#ifndef CLIPPING
+            || (LI < 1 + ROWNO + 3)
+#endif
+            || iflags.wc2_statuslines > 3)
+            iflags.wc2_statuslines = 2;
         newwin->offx = 0;
+        rowoffset = ttyDisplay->rows - iflags.wc2_statuslines;
 #if defined(USE_TILES) && defined(MSDOS)
         if (iflags.grmode) {
-            newwin->offy = ttyDisplay->rows - 2;
+            newwin->offy = rowoffset;
         } else
 #endif
-            newwin->offy = min((int) ttyDisplay->rows - 2, ROWNO + 1);
-        newwin->rows = newwin->maxrow = 2;
+            newwin->offy = min(rowoffset, ROWNO + 1);
+        newwin->rows = newwin->maxrow = iflags.wc2_statuslines;
         newwin->cols = newwin->maxcol = ttyDisplay->cols;
         break;
     case NHW_MAP:
@@ -1424,9 +1491,8 @@ int type;
         break;
     case NHW_MENU:
     case NHW_TEXT:
-        /* inventory/menu window, variable length, full width, top of screen
-         */
-        /* help window, the same, different semantics for display, etc */
+        /* inventory/menu window, variable length, full width, top of screen;
+           help window, the same, different semantics for display, etc */
         newwin->offx = newwin->offy = 0;
         newwin->rows = 0;
         newwin->cols = ttyDisplay->cols;
@@ -1434,33 +1500,20 @@ int type;
         break;
     default:
         panic("Tried to create window type %d\n", (int) type);
-        return WIN_ERR;
-    }
-
-    for (newid = 0; newid < MAXWIN; newid++) {
-        if (wins[newid] == 0) {
-            wins[newid] = newwin;
-            break;
-        }
-    }
-    if (newid == MAXWIN) {
-        panic("No window slots!");
+        /*NOTREACHED*/
         return WIN_ERR;
     }
 
     if (newwin->maxrow) {
-        newwin->data =
-            (char **) alloc(sizeof(char *) * (unsigned) newwin->maxrow);
-        newwin->datlen =
-            (short *) alloc(sizeof(short) * (unsigned) newwin->maxrow);
-        if (newwin->maxcol) {
-            /* WIN_STATUS */
-            for (i = 0; i < newwin->maxrow; i++) {
+        newwin->data = (char **) alloc(
+                               (unsigned) (newwin->maxrow * sizeof (char *)));
+        newwin->datlen = (short *) alloc(
+                                (unsigned) (newwin->maxrow * sizeof (short)));
+        for (i = 0; i < newwin->maxrow; i++) {
+            if (newwin->maxcol) { /* WIN_STATUS */
                 newwin->data[i] = (char *) alloc((unsigned) newwin->maxcol);
                 newwin->datlen[i] = (short) newwin->maxcol;
-            }
-        } else {
-            for (i = 0; i < newwin->maxrow; i++) {
+            } else {
                 newwin->data[i] = (char *) 0;
                 newwin->datlen[i] = 0;
             }
@@ -1475,7 +1528,7 @@ int type;
     return newid;
 }
 
-STATIC_OVL void
+static void
 erase_menu_or_text(window, cw, clear)
 winid window;
 struct WinDesc *cw;
@@ -1495,7 +1548,7 @@ boolean clear;
     }
 }
 
-STATIC_OVL void
+static void
 free_window_info(cw, free_data)
 struct WinDesc *cw;
 boolean free_data;
@@ -1526,7 +1579,7 @@ boolean free_data;
         tty_menu_item *temp;
 
         while ((temp = cw->mlist) != 0) {
-            cw->mlist = cw->mlist->next;
+            cw->mlist = temp->next;
             if (temp->str)
                 free((genericptr_t) temp->str);
             free((genericptr_t) temp);
@@ -1547,6 +1600,7 @@ void
 tty_clear_nhwindow(window)
 winid window;
 {
+    int i, j, m, n;
     register struct WinDesc *cw = 0;
 
     HUPSKIP();
@@ -1567,17 +1621,27 @@ winid window;
         }
         break;
     case NHW_STATUS:
-        tty_curs(window, 1, 0);
-        cl_end();
-        tty_curs(window, 1, 1);
-        cl_end();
+        m = cw->maxrow;
+        n = cw->cols;
+        for (i = 0; i < m; ++i) {
+            tty_curs(window, 1, i);
+            cl_end();
+
+            for (j = 0; j < n - 1; ++j)
+                cw->data[i][j] = ' ';
+            cw->data[i][n - 1] = '\0';
+            /*finalx[i][NOW] = finalx[i][BEFORE] = 0;*/
+        }
+        g.context.botlx = 1;
         break;
     case NHW_MAP:
         /* cheap -- clear the whole thing and tell nethack to redraw botl */
-        context.botlx = 1;
+        g.context.botlx = 1;
         /*FALLTHRU*/
     case NHW_BASE:
         clear_screen();
+        /*for (i = 0; i < cw->maxrow; ++i)           */
+        /*    finalx[i][NOW] = finalx[i][BEFORE] = 0;*/
         break;
     case NHW_MENU:
     case NHW_TEXT:
@@ -1628,7 +1692,7 @@ long count;
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 dmore(cw, s)
 register struct WinDesc *cw;
 const char *s; /* valid responses */
@@ -1649,7 +1713,7 @@ const char *s; /* valid responses */
     xwaitforspace(s);
 }
 
-STATIC_OVL void
+static void
 set_item_state(window, lineno, item)
 winid window;
 int lineno;
@@ -1665,7 +1729,7 @@ tty_menu_item *item;
     term_end_attr(item->attr);
 }
 
-STATIC_OVL void
+static void
 set_all_on_page(window, page_start, page_end)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1680,7 +1744,7 @@ tty_menu_item *page_start, *page_end;
         }
 }
 
-STATIC_OVL void
+static void
 unset_all_on_page(window, page_start, page_end)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1696,7 +1760,7 @@ tty_menu_item *page_start, *page_end;
         }
 }
 
-STATIC_OVL void
+static void
 invert_all_on_page(window, page_start, page_end, acc)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1719,7 +1783,7 @@ char acc; /* group accelerator, 0 => all */
 /*
  * Invert all entries that match the give group accelerator (or all if zero).
  */
-STATIC_OVL void
+static void
 invert_all(window, page_start, page_end, acc)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1750,7 +1814,7 @@ char acc; /* group accelerator, 0 => all */
 }
 
 /* support menucolor in addition to caller-supplied attribute */
-STATIC_OVL void
+static void
 toggle_menu_attr(on, color, attr)
 boolean on;
 int color, attr;
@@ -1774,7 +1838,7 @@ int color, attr;
 #endif
 }
 
-STATIC_OVL void
+static void
 process_menu_window(window, cw)
 winid window;
 struct WinDesc *cw;
@@ -1935,7 +1999,7 @@ struct WinDesc *cw;
             Strcat(resp, " ");                  /* next page or end */
             Strcat(resp, "0123456789\033\n\r"); /* counts, quit */
             Strcat(resp, gacc);                 /* group accelerators */
-            Strcat(resp, mapped_menu_cmds);
+            Strcat(resp, g.mapped_menu_cmds);
 
             if (cw->npages > 1)
                 Sprintf(cw->morestr, "(%d of %d)", curr_page + 1,
@@ -2145,12 +2209,13 @@ struct WinDesc *cw;
     free((genericptr_t) morestr);
 }
 
-STATIC_OVL void
+static void
 process_text_window(window, cw)
 winid window;
 struct WinDesc *cw;
 {
     int i, n, attr;
+    boolean linestart;
     register char *cp;
 
     for (n = 0, i = 0; i < cw->maxrow; i++) {
@@ -2184,15 +2249,25 @@ struct WinDesc *cw;
                 ++ttyDisplay->curx;
             }
             term_start_attr(attr);
-            for (cp = &cw->data[i][1];
+            for (cp = &cw->data[i][1], linestart = TRUE;
 #ifndef WIN32CON
                  *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-                 cp++)
+                 cp++
 #else
                  *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
-                 cp++, ttyDisplay->curx++)
+                 cp++, ttyDisplay->curx++
 #endif
-                (void) putchar(*cp);
+                 ) {
+                /* message recall for msg_window:full/combination/reverse
+                   might have output from '/' in it (see redotoplin()) */
+                if (linestart && (*cp & 0x80) != 0) {
+                    g_putch(*cp);
+                    end_glyphout();
+                    linestart = FALSE;
+                } else {
+                    (void) putchar(*cp);
+                }
+            }
             term_end_attr(attr);
         }
     }
@@ -2324,7 +2399,7 @@ winid window;
     case NHW_MESSAGE:
         if (ttyDisplay->toplin)
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
-    /*FALLTHRU*/
+        /*FALLTHRU*/
     case NHW_STATUS:
     case NHW_BASE:
     case NHW_MAP:
@@ -2372,7 +2447,7 @@ winid window;
 
     free_window_info(cw, TRUE);
     free((genericptr_t) cw);
-    wins[window] = 0;
+    wins[window] = 0; /* available for re-use */
 }
 
 void
@@ -2476,7 +2551,7 @@ register int x, y; /* not xchar: perhaps xchar is unsigned and
     ttyDisplay->cury = y;
 }
 
-STATIC_OVL void
+static void
 tty_putsym(window, x, y, ch)
 winid window;
 int x, y;
@@ -2509,7 +2584,7 @@ char ch;
     }
 }
 
-STATIC_OVL const char *
+static const char *
 compress_str(str)
 const char *str;
 {
@@ -2574,18 +2649,34 @@ const char *str;
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
     switch (cw->type) {
-    case NHW_MESSAGE:
+    case NHW_MESSAGE: {
+        int suppress_history = (attr & ATR_NOHISTORY);
+
+        /* in case we ever support display attributes for topline
+           messages, clear flag mask leaving only display attr */
+        /*attr &= ~(ATR_URGENT | ATR_NOHISTORY);*/
+
         /* really do this later */
 #if defined(USER_SOUNDS) && defined(WIN32CON)
         play_sound_for_message(str);
 #endif
-        update_topl(str);
+        if (!suppress_history) {
+            /* normal output; add to current top line if room, else flush
+               whatever is there to history and then write this */
+            update_topl(str);
+        } else {
+            /* put anything already on top line into history */
+            remember_topl();
+            /* write to top line without remembering what we're writing */
+            show_topl(str);
+        }
         break;
+    }
 #ifndef STATUS_HILITES
     case NHW_STATUS:
         ob = &cw->data[cw->cury][j = cw->curx];
-        if (context.botlx)
-            *ob = 0;
+        if (g.context.botlx)
+            *ob = '\0';
         if (!cw->cury && (int) strlen(str) >= CO) {
             /* the characters before "St:" are unnecessary */
             nb = index(str, ':');
@@ -2595,7 +2686,7 @@ const char *str;
         nb = str;
         for (i = cw->curx + 1, n0 = cw->cols; i < n0; i++, nb++) {
             if (!*nb) {
-                if (*ob || context.botlx) {
+                if (*ob || g.context.botlx) {
                     /* last char printed may be in middle of line */
                     tty_curs(WIN_STATUS, i, cw->cury);
                     cl_end();
@@ -2610,7 +2701,7 @@ const char *str;
 
         (void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
         cw->data[cw->cury][cw->cols - 1] = '\0'; /* null terminate */
-        cw->cury = (cw->cury + 1) % 2;
+        cw->cury = (cw->cury + 1) % cw->maxrow;
         cw->curx = 0;
         break;
 #endif /* STATUS_HILITES */
@@ -2727,9 +2818,9 @@ boolean complain;
                 if (complain)
                     raw_printf("Cannot open %s as stdin.", fname);
             } else {
-                (void) execlp(catmore, "page", (char *) 0);
+                (void) execlp(g.catmore, "page", (char *) 0);
                 if (complain)
-                    raw_printf("Cannot exec %s.", catmore);
+                    raw_printf("Cannot exec %s.", g.catmore);
             }
             if (complain)
                 sleep(10); /* want to wait_synch() but stdin is gone */
@@ -2835,7 +2926,7 @@ boolean preselected;        /* item is marked as selected */
 
     cw->nitems++;
     if (identifier->a_void) {
-        int len = strlen(str);
+        int len = (int) strlen(str);
 
         if (len >= BUFSZ) {
             /* We *think* everything's coming in off at most BUFSZ bufs... */
@@ -2849,7 +2940,7 @@ boolean preselected;        /* item is marked as selected */
     } else
         newstr = str;
 
-    item = (tty_menu_item *) alloc(sizeof(tty_menu_item));
+    item = (tty_menu_item *) alloc(sizeof *item);
     item->identifier = *identifier;
     item->count = -1L;
     item->selected = preselected;
@@ -2863,7 +2954,7 @@ boolean preselected;        /* item is marked as selected */
 }
 
 /* Invert the given list, can handle NULL as an input. */
-STATIC_OVL tty_menu_item *
+static tty_menu_item *
 reverse(curr)
 tty_menu_item *curr;
 {
@@ -2906,24 +2997,33 @@ const char *prompt; /* prompt to for menu */
     if (prompt) {
         anything any;
 
-        any = zeroany; /* not selectable */
+        any = cg.zeroany; /* not selectable */
         tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                      MENU_UNSELECTED);
         tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt,
                      MENU_UNSELECTED);
     }
 
-    /* XXX another magic number? 52 */
+    /* 52: 'a'..'z' and 'A'..'Z'; avoids selector duplication within a page */
     lmax = min(52, (int) ttyDisplay->rows - 1);    /* # lines per page */
     cw->npages = (cw->nitems + (lmax - 1)) / lmax; /* # of pages */
+    /*
+     * TODO?
+     *  For really tall page, allow 53 if '$' or '#' is present and
+     *  54 if both are.  [Only for single page menu, otherwise pages
+     *  without those could try to use too many letters.]
+     *  Probably not worth bothering with; anyone with a display big
+     *  for this to matter will likely switch from tty to curses for
+     *  multi-line message window and/or persistent inventory window.
+     */
 
     /* make sure page list is large enough */
-    if (cw->plist_size < cw->npages + 1 /*need 1 slot beyond last*/) {
+    if (cw->plist_size < cw->npages + 1) { /* +1: need one slot beyond last */
         if (cw->plist)
             free((genericptr_t) cw->plist);
         cw->plist_size = cw->npages + 1;
         cw->plist = (tty_menu_item **) alloc(cw->plist_size
-                                             * sizeof(tty_menu_item *));
+                                             * sizeof (tty_menu_item *));
     }
 
     cw->cols = 0;  /* cols is set when the win is initialized... (why?) */
@@ -3090,7 +3190,7 @@ tty_wait_synch()
         if (ttyDisplay->inmore) {
             addtopl("--More--");
             (void) fflush(stdout);
-        } else if (ttyDisplay->inread > program_state.gameover) {
+        } else if (ttyDisplay->inread > g.program_state.gameover) {
             /* this can only happen if we were reading and got interrupted */
             ttyDisplay->toplin = 3;
             /* do this twice; 1st time gets the Quit? message again */
@@ -3150,7 +3250,7 @@ register int xmin, ymax;
     end_glyphout();
     if (ymax >= (int) wins[WIN_STATUS]->offy) {
         /* we have wrecked the bottom line */
-        context.botlx = 1;
+        g.context.botlx = 1;
         bot();
     }
 }
@@ -3182,7 +3282,12 @@ int in_ch;
 
     HUPSKIP();
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
-    if (SYMHANDLING(H_IBM) || iflags.eight_bit_tty) {
+    if (SYMHANDLING(H_IBM)
+        /* for DECgraphics, lower-case letters with high bit set mean
+           switch character set and render with high bit clear;
+           user might want 8-bits for other characters */
+        || (iflags.eight_bit_tty && (!SYMHANDLING(H_DEC)
+                                     || (in_ch & 0x7f) < 0x60))) {
         /* IBM-compatible displays don't need other stuff */
         (void) putchar(ch);
     } else if (ch & 0x80) {
@@ -3215,14 +3320,13 @@ setclipped()
     clipping = TRUE;
     clipx = clipy = 0;
     clipxmax = CO;
-    clipymax = LI - 3;
+    clipymax = LI - 1 - iflags.wc2_statuslines;
 }
 
 void
 tty_cliparound(x, y)
 int x, y;
 {
-    extern boolean restoring;
     int oldx = clipx, oldy = clipy;
 
     HUPSKIP();
@@ -3237,14 +3341,13 @@ int x, y;
     }
     if (y < clipy + 2) {
         clipy = max(0, y - (clipymax - clipy) / 2);
-        clipymax = clipy + (LI - 3);
+        clipymax = clipy + (LI - 1 - iflags.wc2_statuslines);
     } else if (y > clipymax - 2) {
         clipymax = min(ROWNO, clipymax + (clipymax - clipy) / 2);
-        clipy = clipymax - (LI - 3);
+        clipy = clipymax - (LI - 1 - iflags.wc2_statuslines);
     }
     if (clipx != oldx || clipy != oldy) {
-        if (on_level(&u.uz0, &u.uz) && !restoring)
-            (void) doredraw();
+        redraw_map(); /* ask the core to resend the map window's data */
     }
 }
 #endif /* CLIPPING */
@@ -3278,7 +3381,7 @@ int bkglyph UNUSED;
     }
 #endif
     /* map glyph to character and color */
-    (void) mapglyph(glyph, &ch, &color, &special, x, y);
+    (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
 
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
@@ -3512,7 +3615,7 @@ char *posbar;
  *      and tries a few different ways to squish a representation
  *      of the status window values onto the 80 column tty display.
  *          ->check_fields()
- *          ->condition_size()  - get the width of all conditions
+ *          ->set_condition_length()  - update the width of conditions
  *          ->shrink_enc()      - shrink encumbrance message word
  *          ->shrink_dlvl()     - reduce the width of Dlvl:42
  *
@@ -3528,9 +3631,11 @@ char *posbar;
  *
  *  render_status
  *
- *      Goes through each of the two status row's fields and
+ *      Goes through each of the status row's fields and
  *      calls tty_putstatusfield() to place them on the display.
  *          ->tty_putstatusfield()
+ *      At the end of the for-loop, the NOW values get copied
+ *      to BEFORE values.
  *
  *  tty_putstatusfield()
  *
@@ -3550,25 +3655,14 @@ extern char *status_vals[MAXBLSTATS];
 extern boolean status_activefields[MAXBLSTATS];
 extern winid WIN_STATUS;
 
-const char *fieldnames[] = {
-    "title",  "strength", "dexterity", "constitution", "intelligence",
-    "wisdom",  "charisma", "alignment", "score", "carrying-capacity",
-    "gold", "power",  "power-max", "experience-level", "armor-class",
-    "HD",  "time",  "hunger",  "hitpoints",  "hitpoints-max",
-    "dungeon-level",  "experience",  "condition",
-};
-
 #ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
-STATIC_DCL int FDECL(condcolor, (long, unsigned long *));
+static int FDECL(condcolor, (long, unsigned long *));
 #endif
-STATIC_DCL int FDECL(condattr, (long, unsigned long *));
+static int FDECL(condattr, (long, unsigned long *));
 static unsigned long *tty_colormasks;
 static long tty_condition_bits;
-int cond_disp_width[2];                    /* 2: current and previous */
-static struct tty_status_fields
-                tty_status[2][MAXBLSTATS]; /* 2: first index is for current
-                                                 and previous */
+static struct tty_status_fields tty_status[2][MAXBLSTATS]; /* 2: NOW,BEFORE */
 static int hpbar_percent, hpbar_color;
 static struct condition_t {
     long mask;
@@ -3594,23 +3688,37 @@ static const char *encvals[3][6] = {
     { "", "Burden",   "Stress",   "Strain",   "Overtax",   "Overload"   },
     { "", "Brd",      "Strs",     "Strn",     "Ovtx",      "Ovld"       }
 };
+#define blPAD BL_FLUSH
 #define MAX_PER_ROW 15
-static enum statusfields fieldorder[2][MAX_PER_ROW] = { /* 2: 2 status lines */
+/* 2 or 3 status lines */
+static const enum statusfields
+    twolineorder[3][MAX_PER_ROW] = {
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-      BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
-      BL_FLUSH },
+      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD },
     { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
       BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-      BL_CAP, BL_CONDITION, BL_FLUSH }
+      BL_CAP, BL_CONDITION, BL_FLUSH },
+    /* third row of array isn't used for twolineorder */
+    { BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
+},
+    /* Align moved from 1 to 2, Leveldesc+Time+Condition moved from 2 to 3 */
+    threelineorder[3][MAX_PER_ROW] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
+      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
+    { BL_ALIGN, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+      BL_AC, BL_XP, BL_EXP, BL_HD, BL_HUNGER,
+      BL_CAP, BL_FLUSH, blPAD, blPAD },
+    { BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_FLUSH, blPAD, blPAD,
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
 };
+static const enum statusfields (*fieldorder)[MAX_PER_ROW];
 
-static int last_on_row[2];  /* [rows] */
-static int finalx[2][2];    /* [rows][NOW or BEFORE] */
-static boolean setlast = FALSE;
+static int finalx[3][2];    /* [rows][NOW or BEFORE] */
 static boolean windowdata_init = FALSE;
-static int cond_shrinklvl = 0, cond_width_at_shrink = 0;
+static int cond_shrinklvl = 0;
 static int enclev = 0, enc_shrinklvl = 0;
-/* static int dl_shrinklvl = 0; */
+static int dlvl_shrinklvl = 0;
 static boolean truncation_expected = FALSE;
 #define FORCE_RESET TRUE
 #define NO_RESET FALSE
@@ -3641,18 +3749,20 @@ void
 tty_status_init()
 {
 #ifdef STATUS_HILITES
-    int i;
+    int i, num_rows;
+
+    num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    fieldorder = (num_rows != 3) ? twolineorder : threelineorder;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
         tty_status[NOW][i].idx = BL_FLUSH;
         tty_status[NOW][i].color = NO_COLOR; /* no color */
         tty_status[NOW][i].attr = ATR_NONE;
-        tty_status[NOW][i].x = 0;
-        tty_status[NOW][i].y = 0;
+        tty_status[NOW][i].x = tty_status[NOW][i].y = 0;
         tty_status[NOW][i].valid  = FALSE;
         tty_status[NOW][i].dirty  = FALSE;
         tty_status[NOW][i].redraw = FALSE;
-        tty_status[NOW][i].last_on_row = FALSE;
+        tty_status[NOW][i].sanitycheck = FALSE;
         tty_status[BEFORE][i] = tty_status[NOW][i];
     }
     tty_condition_bits = 0L;
@@ -3671,10 +3781,6 @@ const char *fmt;
 boolean enable;
 {
     genl_status_enablefield(fieldidx, nm, fmt, enable);
-#ifdef STATUS_HILITES
-    /* force re-evaluation of last field on the row */
-    setlast = FALSE;
-#endif
 }
 
 #ifdef STATUS_HILITES
@@ -3742,10 +3848,11 @@ int fldidx, chg UNUSED, percent, color;
 genericptr_t ptr;
 unsigned long *colormasks;
 {
-    int i;
+    int attrmask;
     long *condptr = (long *) ptr;
     char *text = (char *) ptr;
-    char *fval, *lastchar, *p;
+    char goldbuf[40], *lastchar, *p;
+    const char *fmt;
     boolean reset_state = NO_RESET;
 
     if ((fldidx < BL_RESET) || (fldidx >= MAXBLSTATS))
@@ -3754,20 +3861,17 @@ unsigned long *colormasks;
     if ((fldidx >= 0 && fldidx < MAXBLSTATS) && !status_activefields[fldidx])
         return;
 
-    if (!setlast)
-        do_setlast();
-
-#ifndef TEXTCOLOR
-    color = (color & ~0x00FF) | NO_COLOR;
-#endif
-
     switch (fldidx) {
     case BL_RESET:
         reset_state = FORCE_RESET;
-        /* FALLTHRU */
+        /*FALLTHRU*/
     case BL_FLUSH:
-        if (make_things_fit(reset_state) || truncation_expected)
+        if (make_things_fit(reset_state) || truncation_expected) {
             render_status();
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+            status_sanity_check();
+#endif
+        }
         return;
     case BL_CONDITION:
         tty_status[NOW][fldidx].idx = fldidx;
@@ -3775,18 +3879,35 @@ unsigned long *colormasks;
         tty_colormasks = colormasks;
         tty_status[NOW][fldidx].valid = TRUE;
         tty_status[NOW][fldidx].dirty = TRUE;
+        tty_status[NOW][fldidx].sanitycheck = TRUE;
         truncation_expected = FALSE;
         break;
+    case BL_GOLD:
+        text = decode_mixed(goldbuf, text);
+        /*FALLTHRU*/
     default:
+        attrmask = (color >> 8) & 0x00FF;
+#ifndef TEXTCOLOR
+        color = NO_COLOR;
+#endif
+        fmt = status_fieldfmt[fldidx];
+        if (!fmt)
+            fmt = "%s";
+        /* should be checking for first enabled field here rather than
+           just first field, but 'fieldorder' doesn't start any rows
+           with fields which can be disabled so [any_row][0] suffices */
+        if (*fmt == ' ' && (fldidx == fieldorder[0][0]
+                            || fldidx == fieldorder[1][0]
+                            || fldidx == fieldorder[2][0]))
+            ++fmt; /* skip leading space for first field on line */
+        Sprintf(status_vals[fldidx], fmt, text);
         tty_status[NOW][fldidx].idx = fldidx;
-        Sprintf(status_vals[fldidx],
-                status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] : "%s",
-                text);
         tty_status[NOW][fldidx].color = (color & 0x00FF);
-        tty_status[NOW][fldidx].attr = ((color >> 8) & 0x00FF);
+        tty_status[NOW][fldidx].attr = term_attr_fixup(attrmask);
         tty_status[NOW][fldidx].lth = strlen(status_vals[fldidx]);
         tty_status[NOW][fldidx].valid = TRUE;
         tty_status[NOW][fldidx].dirty = TRUE;
+        tty_status[NOW][fldidx].sanitycheck = TRUE;
         break;
     }
 
@@ -3806,114 +3927,97 @@ unsigned long *colormasks;
             /* Special additional processing for hitpointbar */
             hpbar_percent = percent;
             hpbar_color = (color & 0x00FF);
-        }
-        if (iflags.wc2_hitpointbar
-            && (tty_procs.wincap2 & WC2_FLUSH_STATUS) != 0L) {
             tty_status[NOW][BL_TITLE].color = hpbar_color;
             tty_status[NOW][BL_TITLE].dirty = TRUE;
         }
         break;
     case BL_LEVELDESC:
+        dlvl_shrinklvl = 0; /* caller is passing full length string */
+        /*FALLTHRU*/
     case BL_HUNGER:
         /* The core sends trailing blanks for some fields.
            Let's suppress the trailing blanks */
         if (tty_status[NOW][fldidx].lth > 0) {
-            lastchar = eos(status_vals[fldidx]);
-            lastchar--;
-            while (lastchar >= status_vals[fldidx] && *lastchar == ' ') {
-                *lastchar-- = '\0';
+            p = status_vals[fldidx];
+            for (lastchar = eos(p); lastchar > p && *--lastchar == ' '; ) {
+                *lastchar = '\0';
                 tty_status[NOW][fldidx].lth--;
             }
         }
         break;
     case BL_TITLE:
+        /* when hitpointbar is enabled, rendering will enforce a length
+           of 30 on title, padding with spaces or truncating if necessary */
         if (iflags.wc2_hitpointbar)
-            tty_status[NOW][fldidx].lth += 2; /* '[' and ']' */
+            tty_status[NOW][fldidx].lth = 30 + 2; /* '[' and ']' */
         break;
     case BL_GOLD:
-        /* \GXXXXNNNN counts as 1 */
+        /* \GXXXXNNNN counts as 1 [moot since we use decode_mixed() above] */
         if ((p = index(status_vals[fldidx], '\\')) != 0 && p[1] == 'G')
             tty_status[NOW][fldidx].lth -= (10 - 1);
         break;
     case BL_CAP:
-        fval = status_vals[fldidx];
-        if (fval) {
-            if (*fval == ' ')
-                fval++;
-            for (i = 0; i < SIZE(encvals); ++i) {
-                if (!strcmp(encvals[enc_shrinklvl][i], fval)) {
-                    enclev = i;
-                    break;              /* for */
-                }
-            }
-        }
+        enc_shrinklvl = 0; /* caller is passing full length string */
+        enclev = stat_cap_indx();
         break;
     }
-    /* 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
+    /* As of 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
     return;
 }
 
-void
-do_setlast()
-{
-    int i, row, fld;
-
-    setlast = TRUE;
-    for (row = 0; row < 2; ++row)
-        for (i = MAX_PER_ROW - 1; i > 0; --i) {
-           fld = fieldorder[row][i];
-
-           if (fld == BL_FLUSH || !status_activefields[fld])
-                continue;
-
-           last_on_row[row] = fld;
-           break;
-        }
-}
-
-STATIC_OVL int
+static int
 make_things_fit(force_update)
 boolean force_update;
 {
-    int trycnt, fitting = 0, condsz = 0, requirement = 0;
-    int rowsz[2], otheroptions = 0;
-    boolean check = FALSE;
+    int trycnt, fitting = 0, requirement;
+    int rowsz[3], num_rows, condrow, otheroptions = 0;
 
-    condsz = condition_size();
+    num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    condrow = num_rows - 1; /* always last row, 1 for 0..1 or 2 for 0..2 */
+    cond_shrinklvl = 0;
+    if (enc_shrinklvl > 0 && num_rows == 2)
+        shrink_enc(0);
+    if (dlvl_shrinklvl > 0)
+        shrink_dlvl(0);
+    set_condition_length();
     for (trycnt = 0; trycnt < 6 && !fitting; ++trycnt) {
-        check = check_fields(force_update, &rowsz[0], &rowsz[1]);
-        if (!check)
-            return 0;
+        /* FIXME: this remeasures each line every time even though it
+           is only attempting to shrink one of them and the other one
+           (or two) remains the same */
+        if (!check_fields(force_update, rowsz)) {
+            fitting = 0;
+            break;
+        }
 
-        requirement = rowsz[1];
-        if (requirement < wins[WIN_STATUS]->cols - 1) {
+        requirement = rowsz[condrow] - 1;
+        if (requirement <= wins[WIN_STATUS]->cols - 1) {
             fitting = requirement;
             break;  /* we're good */
         }
         if (trycnt < 2) {
             if (cond_shrinklvl < trycnt + 1) {
                 cond_shrinklvl = trycnt + 1;
-                condsz = condition_size();
-                cond_width_at_shrink = cond_disp_width[NOW];
+                set_condition_length();
             }
             continue;
         }
         if (cond_shrinklvl >= 2) {
             /* We've exhausted the condition identifiers shrinkage,
-             * so let's try something other things...
+             * so let's try shrinking other things...
              */
-            if (otheroptions == 0 || otheroptions == 1) {
-                /* try shrinking the encumbrance word */
-                shrink_enc(otheroptions + 1);
-                otheroptions++;
+            if (otheroptions < 2) {
+                /* try shrinking the encumbrance word, but
+                   only when it's on the same line as conditions */
+                if (num_rows == 2)
+                    shrink_enc(otheroptions + 1);
             } else if (otheroptions == 2) {
                 shrink_dlvl(1);
-                otheroptions++;
             } else {
                 /* Last resort - turn on trunction */
                 truncation_expected = TRUE;
-                otheroptions++;
+                break;
             }
+            ++otheroptions;
         }
     }
     return fitting;
@@ -3925,179 +4029,229 @@ boolean force_update;
  * must be updated because they need to change.
  * This is now done at an individual field case-by-case level.
  */
-boolean
-check_fields(forcefields, topsz, bottomsz)
+static boolean
+check_fields(forcefields, sz)
 boolean forcefields;
-int *topsz, *bottomsz;
+int sz[3];
 {
-    int c, i, row, col, trackx, idx;
-    boolean valid = TRUE, matchprev = FALSE, update_right, disregard = FALSE;
+    int c, i, row, col, num_rows, idx;
+    boolean valid = TRUE, matchprev, update_right;
 
     if (!windowdata_init && !check_windowdata())
         return FALSE;
 
-    for (row = 0; row < 2; ++row) {
+    num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+
+    for (row = 0; row < num_rows; ++row) {
+        sz[row] = 0;
         col = 1;
-        trackx = 1;
         update_right = FALSE;
-        idx = -1;
-        for (i = 0; fieldorder[row][i] != BL_FLUSH; ++i) {
-            idx = fieldorder[row][i];
+        for (i = 0; (idx = fieldorder[row][i]) != BL_FLUSH; ++i) {
             if (!status_activefields[idx])
                 continue;
             if (!tty_status[NOW][idx].valid)
                 valid = FALSE;
-
+            /* might be called more than once for shrink tests, so need
+               to reset these (redraw and x at any rate) each time */
+            tty_status[NOW][idx].redraw = FALSE;
             tty_status[NOW][idx].y = row;
             tty_status[NOW][idx].x = col;
 
-            /* On a change to the field length, everything
-               further to the right must be updated as well */
-            if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth)
+            /* On a change to the field location, everything further
+               to the right must be updated as well.  (Not necessarily
+               everything; it's possible for complementary changes across
+               multiple fields to put stuff further right back in sync.) */
+            if (tty_status[NOW][idx].x + tty_status[NOW][idx].lth
+                != tty_status[BEFORE][idx].x + tty_status[BEFORE][idx].lth)
                 update_right = TRUE;
+            else if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth
+                     || tty_status[NOW][idx].x != tty_status[BEFORE][idx].x)
+                tty_status[NOW][idx].redraw = TRUE;
+            else /* in case update_right is set, we're back in sync now */
+                update_right = FALSE;
 
-            if (idx == last_on_row[row])
-                tty_status[NOW][idx].last_on_row = TRUE;
-
-            if (!update_right && !forcefields) {
+            matchprev = FALSE; /* assume failure */
+            if (valid && !update_right && !forcefields
+                && !tty_status[NOW][idx].redraw) {
                 /*
-                 * Check values against those already on the dislay.
+                 * Check values against those already on the display.
                  *  - Is the additional processing time for this worth it?
                  */
-                if (do_field_opt) {
-                    matchprev = FALSE;
-                    disregard = (tty_status[NOW][idx].lth == 0);
-                    if (do_field_opt && !disregard
-                            && tty_status[NOW][idx].dirty) {
+                if (do_field_opt
+                    /* color/attr checks aren't right for 'condition'
+                       and neither is examining status_vals[BL_CONDITION]
+                       so skip same-contents optimization for conditions */
+                    && idx != BL_CONDITION
+                    && (tty_status[NOW][idx].color
+                        == tty_status[BEFORE][idx].color)
+                    && (tty_status[NOW][idx].attr
+                        == tty_status[BEFORE][idx].attr)) {
+                    matchprev = TRUE; /* assume success */
+                    if (tty_status[NOW][idx].dirty) {
                         /* compare values */
-                        const char *ob, *nb;     /* old byte, new byte */
+                        const char *ob, *nb; /* old byte, new byte */
+                        struct WinDesc *cw = wins[WIN_STATUS];
 
                         c = col - 1;
-                        ob = &wins[WIN_STATUS]->data[row][c];
+                        ob = &cw->data[row][c];
                         nb = status_vals[idx];
-                        while (*nb && c < wins[WIN_STATUS]->cols) {
+                        while (*nb && c < cw->cols) {
                             if (*nb != *ob)
                                 break;
                             nb++;
                             ob++;
                             c++;
                         }
-                        if (!*nb && c > col - 1)
-                            matchprev = TRUE;
+                        /* if we're not at the end of new string, no match;
+                           we don't need to worry about whether there might
+                           be leftover old string; that could only happen
+                           if they have different lengths, in which case
+                           'update_right' will be set and we won't get here */
+                        if (*nb)
+                            matchprev = FALSE;
+#if 0
+                        if (*nb || (*ob && *ob != ' '
+                                    && (*ob != '/' || idx != BL_XP)
+                                    && (*ob != '(' || (idx != BL_HP
+                                                       && idx != BL_ENE))))
+                            matchprev = FALSE;
+#endif
                     }
-                } else {
-                    matchprev = FALSE;
                 }
             }
 
-            /*
-             * With STATUS_HILITES, it is possible that the color
-             * needs to change even if the text is the same, so
-             * we flag that here by setting .redraw.
-             * Then, render_status() will see that flag setting
-             * and ensure that the tty cell content is updated.
-             * After the field has been updated, render_status()
-             * will also clear .redraw and .dirty.
-             */
             if (forcefields || update_right
-                || (!matchprev && tty_status[NOW][idx].dirty && !disregard)
-                || tty_status[NOW][idx].color != tty_status[BEFORE][idx].color
-                || tty_status[NOW][idx].attr  != tty_status[BEFORE][idx].attr)
+                || (tty_status[NOW][idx].dirty && !matchprev))
                 tty_status[NOW][idx].redraw = TRUE;
+
             col += tty_status[NOW][idx].lth;
         }
-        if (idx != -1) {
-            if (row && bottomsz)
-                *bottomsz = col + tty_status[NOW][idx].lth;
-            else if (topsz)
-                *topsz = col + tty_status[NOW][idx].lth;
-        }
+        sz[row] = col;
     }
     return valid;
 }
 
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+static void
+status_sanity_check(VOID_ARGS)
+{
+    int i;
+    static boolean in_sanity_check = FALSE;
+    static const char *const idxtext[] = {
+        "BL_TITLE", "BL_STR", "BL_DX", "BL_CO", "BL_IN", "BL_WI", /* 0.. 5   */
+        "BL_CH","BL_ALIGN", "BL_SCORE", "BL_CAP", "BL_GOLD",     /* 6.. 10  */
+        "BL_ENE", "BL_ENEMAX", "BL_XP", "BL_AC", "BL_HD",       /* 11.. 15 */
+        "BL_TIME", "BL_HUNGER", "BL_HP", "BL_HPMAX",           /* 16.. 19 */
+        "BL_LEVELDESC", "BL_EXP", "BL_CONDITION"              /* 20.. 22 */
+    };
+   
+    if (in_sanity_check)
+        return;
+    in_sanity_check = TRUE;
+    /*
+     * Make sure that every field made it down to the
+     * bottom of the render_status() for-loop.
+     */
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        if (tty_status[NOW][i].sanitycheck) {
+            char panicmsg[BUFSZ];
+
+            Sprintf(panicmsg, "failed on tty_status[NOW][%s].", idxtext[i]);
+            paniclog("status_sanity_check", panicmsg);
+            tty_status[NOW][i].sanitycheck = FALSE;
+            /*
+             * Attention developers: If you encounter the above
+             * message in paniclog, it almost certainly means that
+             * a recent code change has caused a failure to reach
+             * the bottom of render_status(), at least for the BL_
+             * field identified in the impossible() message.
+             *
+             * That could be because of the addition of a continue
+             * statement within the render_status() for-loop, or a
+             * premature return from render_status() before it finished
+             * its housekeeping chores.
+             */
+        }
+    }
+    in_sanity_check = FALSE;
+}
+#endif /* NHDEVEL_STATUS */
+
 /*
  * This is what places a field on the tty display.
- * If val isn't null, it will be used rather than
- * fld (it takes precedence).
  */
-STATIC_OVL void
-tty_putstatusfield(fld, val, x, y)
-struct tty_status_fields *fld;
-const char *val;
+static void
+tty_putstatusfield(text, x, y)
+const char *text;
 int x, y;
 {
-    int i, n, ncols, lth = 0;
+    int i, n, ncols, nrows, lth = 0;
     struct WinDesc *cw = 0;
-    const char *text = (char *)0;
 
-    if ((cw = wins[NHW_STATUS]) == (struct WinDesc *) 0)
-        panic("Invalid WinDesc\n");
+    if (WIN_STATUS == WIN_ERR
+        || (cw = wins[WIN_STATUS]) == (struct WinDesc *) 0)
+        panic("tty_putstatusfield: Invalid WinDesc\n");
 
     ncols = cw->cols;
-    if (val) {
-        text = val;
-        lth = strlen(text);
-    } else if (fld) {
-        text = status_vals[fld->idx];
-        lth = fld->lth;
-    }
-    if (!text)
-        return;
+    nrows = cw->maxrow;
+    lth = (int) strlen(text);
 
     print_vt_code2(AVTC_SELECT_WINDOW, NHW_STATUS);
 
-    if (x < ncols && y < 2) {
-        tty_curs(NHW_STATUS, x, y);
+    if (x < ncols && y < nrows) {
+        if (x != cw->curx || y != cw->cury)
+            tty_curs(NHW_STATUS, x, y);
         for (i = 0; i < lth; ++i) {
             n = i + x;
             if (n < ncols && *text) {
                 (void) putchar(*text);
                 ttyDisplay->curx++;
                 cw->curx++;
-              cw->data[y][n-1] = *text;
+                cw->data[y][n - 1] = *text;
                 text++;
             }
         }
-    } else {
-        /* Now we're truncating */
-        if (truncation_expected)
-            ; /* but we knew in advance */
     }
-}
-
-STATIC_OVL int
-condition_size()
-{
-    long mask = 0L;
-    int c, x;
-
-    x = 0;
-    for (c = 0; c < SIZE(conditions); ++c) {
-        mask = conditions[c].mask;
-        if ((tty_condition_bits & mask) == mask) {
-            x++;    /* for spacer */
-            x += (int) strlen(conditions[c].text[cond_shrinklvl]);
+#if 0
+    else {
+        if (truncation_expected) {
+        /* Now we're truncating */
+            ; /* but we knew in advance */
         }
     }
-    tty_status[NOW][BL_CONDITION].lth = x;
-    cond_disp_width[NOW] = x;
-    return x;
+#endif
 }
 
-STATIC_OVL void
+/* caller must set cond_shrinklvl (0..2) before calling us */
+static void
+set_condition_length()
+{
+    long mask;
+    int c, lth = 0;
+
+    if (tty_condition_bits) {
+        for (c = 0; c < SIZE(conditions); ++c) {
+            mask = conditions[c].mask;
+            if ((tty_condition_bits & mask) == mask)
+                lth += 1 + (int) strlen(conditions[c].text[cond_shrinklvl]);
+        }
+    }
+    tty_status[NOW][BL_CONDITION].lth = lth;
+}
+
+static void
 shrink_enc(lvl)
 int lvl;
 {
     /* shrink or restore the encumbrance word */
-    if (lvl == 0 || lvl <= 2) {
+    if (lvl <= 2) {
         enc_shrinklvl = lvl;
-        Strcpy(status_vals[BL_CAP], encvals[lvl][enclev]);
+        Sprintf(status_vals[BL_CAP], " %s", encvals[lvl][enclev]);
     }
     tty_status[NOW][BL_CAP].lth = strlen(status_vals[BL_CAP]);
 }
 
-STATIC_OVL void
+static void
 shrink_dlvl(lvl)
 int lvl;
 {
@@ -4106,6 +4260,7 @@ int lvl;
     char *levval = index(status_vals[BL_LEVELDESC], ':');
 
     if (levval) {
+        dlvl_shrinklvl = lvl;
         Strcpy(buf, (lvl == 0) ? "Dlvl" : "Dl");
         Strcat(buf, levval);
         Strcpy(status_vals[BL_LEVELDESC], buf);
@@ -4117,21 +4272,14 @@ int lvl;
  * Ensure the underlying status window data start out
  * blank and null-terminated.
  */
-STATIC_OVL boolean
+static boolean
 check_windowdata(VOID_ARGS)
 {
     if (WIN_STATUS == WIN_ERR || wins[WIN_STATUS] == (struct WinDesc *) 0) {
         paniclog("check_windowdata", " null status window.");
         return FALSE;
     } else if (!windowdata_init) {
-        int i, n = wins[WIN_STATUS]->cols;
-
-        for (i = 0; i < wins[WIN_STATUS]->cols; ++i) {
-            wins[WIN_STATUS]->data[0][i] = ' ';
-            wins[WIN_STATUS]->data[1][i] = ' ';
-        }
-        wins[WIN_STATUS]->data[0][n - 1] = '\0';    /* null terminate */
-        wins[WIN_STATUS]->data[1][n - 1] = '\0';    /* null terminate */
+        tty_clear_nhwindow(WIN_STATUS); /* also sets cw->data[] to spaces */
         windowdata_init = TRUE;
     }
     return TRUE;
@@ -4142,7 +4290,7 @@ check_windowdata(VOID_ARGS)
  * Return what color this condition should
  * be displayed in based on user settings.
  */
-STATIC_OVL int
+static int
 condcolor(bm, bmarray)
 long bm;
 unsigned long *bmarray;
@@ -4161,10 +4309,10 @@ unsigned long *bmarray;
    the condition where this gets used always has the same value */
 #define condcolor(bm,bmarray) NO_COLOR
 #define term_start_color(color) /*empty*/
-#define term_end_color(color) /*empty*/
+#define term_end_color() /*empty*/
 #endif /* TEXTCOLOR */
 
-STATIC_OVL int
+static int
 condattr(bm, bmarray)
 long bm;
 unsigned long *bmarray;
@@ -4199,44 +4347,44 @@ unsigned long *bmarray;
 }
 
 #define Begin_Attr(m) \
-    do {                                                                \
-        if (m) {                                                        \
-            if ((m) & HL_BOLD)                                          \
-                term_start_attr(ATR_BOLD);                              \
-            if ((m) & HL_INVERSE)                                       \
-                term_start_attr(ATR_INVERSE);                           \
-            if ((m) & HL_ULINE)                                         \
-                term_start_attr(ATR_ULINE);                             \
-            if ((m) & HL_BLINK)                                         \
-                term_start_attr(ATR_BLINK);                             \
-            if ((m) & HL_DIM)                                           \
-                term_start_attr(ATR_DIM);                               \
-        }                                                               \
+    do {                                        \
+        if (m) {                                \
+            if ((m) & HL_BOLD)                  \
+                term_start_attr(ATR_BOLD);      \
+            if ((m) & HL_INVERSE)               \
+                term_start_attr(ATR_INVERSE);   \
+            if ((m) & HL_ULINE)                 \
+                term_start_attr(ATR_ULINE);     \
+            if ((m) & HL_BLINK)                 \
+                term_start_attr(ATR_BLINK);     \
+            if ((m) & HL_DIM)                   \
+                term_start_attr(ATR_DIM);       \
+        }                                       \
     } while (0)
 
 #define End_Attr(m) \
-    do {                                                                \
-        if (m) {                                                        \
-            if ((m) & HL_DIM)                                           \
-                term_end_attr(ATR_DIM);                                 \
-            if ((m) & HL_BLINK)                                         \
-                term_end_attr(ATR_BLINK);                               \
-            if ((m) & HL_ULINE)                                         \
-                term_end_attr(ATR_ULINE);                               \
-            if ((m) & HL_INVERSE)                                       \
-                term_end_attr(ATR_INVERSE);                             \
-            if ((m) & HL_BOLD)                                          \
-                term_end_attr(ATR_BOLD);                                \
-        }                                                               \
+    do {                                        \
+        if (m) {                                \
+            if ((m) & HL_DIM)                   \
+                term_end_attr(ATR_DIM);         \
+            if ((m) & HL_BLINK)                 \
+                term_end_attr(ATR_BLINK);       \
+            if ((m) & HL_ULINE)                 \
+                term_end_attr(ATR_ULINE);       \
+            if ((m) & HL_INVERSE)               \
+                term_end_attr(ATR_INVERSE);     \
+            if ((m) & HL_BOLD)                  \
+                term_end_attr(ATR_BOLD);        \
+        }                                       \
     } while (0)
 
-STATIC_OVL void
+static void
 render_status(VOID_ARGS)
 {
-    long mask = 0L;
-    int i, c, row, attrmask = 0;
+    long mask, bits;
+    int i, x, y, idx, c, row, tlth, num_rows, coloridx = 0, attrmask = 0;
+    char *text;
     struct WinDesc *cw = 0;
-    struct tty_status_fields *nullfield = (struct tty_status_fields *) 0;
 
     if (WIN_STATUS == WIN_ERR
         || (cw = wins[WIN_STATUS]) == (struct WinDesc *) 0) {
@@ -4244,22 +4392,19 @@ render_status(VOID_ARGS)
         return;
     }
 
-    for (row = 0; row < 2; ++row) {
+    num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    for (row = 0; row < num_rows; ++row) {
         HUPSKIP();
-        curs(WIN_STATUS, 1, row);
-        for (i = 0; fieldorder[row][i] != BL_FLUSH; ++i) {
-            int idx = fieldorder[row][i];
-
+        y = row;
+        tty_curs(WIN_STATUS, 1, y);
+        for (i = 0; (idx = fieldorder[row][i]) != BL_FLUSH; ++i) {
             if (!status_activefields[idx])
                 continue;
+            x = tty_status[NOW][idx].x;
+            text = status_vals[idx]; /* always "" for BL_CONDITION */
+            tlth = (int) tty_status[NOW][idx].lth; /* valid for BL_CONDITION */
 
-            if ((tty_status[NOW][idx].lth || idx == BL_CONDITION)
-                 && (tty_status[NOW][idx].redraw || !do_field_opt)) {
-                int coloridx = tty_status[NOW][idx].color;
-                int attridx = tty_status[NOW][idx].attr;
-                int x = tty_status[NOW][idx].x;
-                int y = row;
-                char *text = status_vals[idx];
+            if (tty_status[NOW][idx].redraw || !do_field_opt) {
                 boolean hitpointbar = (idx == BL_TITLE
                                        && iflags.wc2_hitpointbar);
 
@@ -4269,68 +4414,79 @@ render_status(VOID_ARGS)
                      * | Condition Codes |
                      * +-----------------+
                      */
-                    for (c = 0; c < SIZE(conditions); ++c) {
+                    bits = tty_condition_bits;
+                    /* if no bits are set, we can fall through condition
+                       rendering code to finalx[] handling (and subsequent
+                       rest-of-line erasure if line is shorter than before) */
+                    if (num_rows == 3 && bits != 0L) {
+                        int k;
+                        char *dat = &cw->data[y][0];
+
+                        /* line up with hunger (or where it would have
+                           been when currently omitted); if there isn't
+                           enough room for that, right justify; or place
+                           as-is if not even enough room for /that/; we
+                           expect hunger to be on preceding row, in which
+                           case its current data has been moved to [BEFORE] */
+                        if (tty_status[BEFORE][BL_HUNGER].y < row
+                            && x < tty_status[BEFORE][BL_HUNGER].x
+                            && (tty_status[BEFORE][BL_HUNGER].x + tlth
+                                < cw->cols - 1))
+                            k = tty_status[BEFORE][BL_HUNGER].x;
+                        else if (x + tlth < cw->cols - 1)
+                            k = cw->cols - tlth;
+                        else
+                            k = x;
+                        while (x < k) {
+                            if (dat[x - 1] != ' ')
+                                tty_putstatusfield(" ", x, y);
+                            ++x;
+                        }
+                        tty_status[NOW][BL_CONDITION].x = x;
+                        tty_curs(WIN_STATUS, x, y);
+                    }
+                    for (c = 0; c < SIZE(conditions) && bits != 0L; ++c) {
                         mask = conditions[c].mask;
-                        if ((tty_condition_bits & mask) == mask) {
+                        if (bits & mask) {
                             const char *condtext;
 
-                            tty_putstatusfield(nullfield, " ", x++, y);
+                            tty_putstatusfield(" ", x++, y);
                             if (iflags.hilite_delta) {
                                 attrmask = condattr(mask, tty_colormasks);
                                 Begin_Attr(attrmask);
                                 coloridx = condcolor(mask, tty_colormasks);
-                                if (coloridx != NO_COLOR
-                                    && coloridx != CLR_MAX)
+                                if (coloridx != NO_COLOR)
                                     term_start_color(coloridx);
                             }
-                            if (x >= cw->cols && !truncation_expected)
-                                impossible(
-                                   "Unexpected condition placement overflow");
                             condtext = conditions[c].text[cond_shrinklvl];
-                            tty_putstatusfield(nullfield, condtext, x, y);
+                            if (x >= cw->cols && !truncation_expected) {
+                                impossible(
+                         "Unexpected condition placement overflow for \"%s\"",
+                                           condtext);
+                                condtext = "";
+                                bits = 0L; /* skip any remaining conditions */
+                            }
+                            tty_putstatusfield(condtext, x, y);
                             x += (int) strlen(condtext);
                             if (iflags.hilite_delta) {
-                                if (coloridx != NO_COLOR
-                                    && coloridx != CLR_MAX)
+                                if (coloridx != NO_COLOR)
                                     term_end_color();
                                 End_Attr(attrmask);
                             }
+                            bits &= ~mask;
                         }
                     }
-                    if (x >= cw->cols) {
+                    /* 'x' is 1-based and 'cols' and 'data' are 0-based,
+                       so x==cols means we just stored in data[N-2] and
+                       are now positioned at data[N-1], the terminator;
+                       that's ok as long as we don't write there */
+                    if (x > cw->cols) {
                         static unsigned once_only = 0;
 
                         if (!truncation_expected && !once_only++)
-                            paniclog(
-                                "render_status()", " unexpected truncation.");
-                        x = cw->cols - 1;
-                    }
-                    tty_curs(WIN_STATUS, x, y);
-                    cl_end();
-                } else if (idx == BL_GOLD) {
-                    char buf[BUFSZ];
-                    /*
-                     * +-----------+
-                     * |   Gold    |
-                     * +-----------+
-                     */
-                    if (iflags.hilite_delta) {
-                        if (*text == ' ') {
-                            tty_putstatusfield(nullfield, " ", x++, y);
-                            text++;
-                        }
-                        /* multiple attributes can be in effect concurrently */
-                        Begin_Attr(attridx);
-                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
-                            term_start_color(coloridx);
-                    }
-                    /* decode_mixed() due to GOLD glyph */
-                    tty_putstatusfield(nullfield,
-                                       decode_mixed(buf, text), x, y);
-                    if (iflags.hilite_delta) {
-                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
-                            term_end_color();
-                        End_Attr(attridx);
+                            paniclog("render_status()",
+                                     " unexpected truncation.");
+                        x = cw->cols;
                     }
                 } else if (hitpointbar) {
                     /*
@@ -4339,54 +4495,50 @@ render_status(VOID_ARGS)
                      * +-------------------------+
                      */
                     /* hitpointbar using hp percent calculation */
-                    int bar_pos, bar_len;
-                    char *bar2 = (char *)0;
-                    char bar[MAXCO], savedch = 0;
-                    boolean twoparts = FALSE;
+                    int bar_len, bar_pos = 0;
+                    char bar[MAXCO], *bar2 = (char *) 0, savedch = '\0';
+                    boolean twoparts = (hpbar_percent < 100);
 
-                    bar_len = strlen(text);
-                    if (bar_len < MAXCO-1) {
+                    /* force exactly 30 characters, padded with spaces
+                       if shorter or truncated if longer */
+                    if (strlen(text) != 30) {
+                        Sprintf(bar, "%-30.30s", text);
+                        Strcpy(status_vals[BL_TITLE], bar);
+                    } else
                         Strcpy(bar, text);
+                    bar_len = (int) strlen(bar); /* always 30 */
+                    tlth = bar_len + 2;
+                    /* when at full HP, the whole title will be highlighted;
+                       when injured or dead, there will be a second portion
+                       which is not highlighted */
+                    if (twoparts) {
+                        /* figure out where to separate the two parts */
                         bar_pos = (bar_len * hpbar_percent) / 100;
                         if (bar_pos < 1 && hpbar_percent > 0)
                             bar_pos = 1;
                         if (bar_pos >= bar_len && hpbar_percent < 100)
                             bar_pos = bar_len - 1;
-                        if (bar_pos > 0 && bar_pos < bar_len) {
-                            twoparts = TRUE;
-                            bar2 = &bar[bar_pos];
-                            savedch = *bar2;
-                            *bar2 = '\0';
-                        }
+                        bar2 = &bar[bar_pos];
+                        savedch = *bar2;
+                        *bar2 = '\0';
                     }
-                    if (iflags.hilite_delta) {
-                        char *s = bar;
-                        tty_putstatusfield(nullfield, "[", x++, y);
-                        if (hpbar_percent > 0) {
-                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                                term_start_color(hpbar_color);
-                            term_start_attr(ATR_INVERSE);
-                        }
-                        if (hpbar_percent == 0)
-                            s = text;
-                        tty_putstatusfield(nullfield, s, x, y);
-                        x += (int) strlen(s);
-                        if (hpbar_percent > 0) {
-                            term_end_attr(ATR_INVERSE);
-                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                                term_end_color();
-                        }
-                        if (twoparts && hpbar_percent > 0) {
-                            *bar2 = savedch;
-                            tty_putstatusfield(nullfield, bar2, x, y);
-                            x += (int) strlen(bar2);
-                            tty_curs(WIN_STATUS, x, y);
-                        }
-                        tty_putstatusfield(nullfield, "]", x++, y);
-                    } else {
-                        tty_putstatusfield(&tty_status[NOW][idx],
-                                           (char *) 0, x, y);
+                    tty_putstatusfield("[", x++, y);
+                    if (*bar) { /* always True, unless twoparts+dead (0 HP) */
+                        term_start_attr(ATR_INVERSE);
+                        if (iflags.hilite_delta && hpbar_color != NO_COLOR)
+                            term_start_color(hpbar_color);
+                        tty_putstatusfield(bar, x, y);
+                        x += (int) strlen(bar);
+                        if (iflags.hilite_delta && hpbar_color != NO_COLOR)
+                            term_end_color();
+                        term_end_attr(ATR_INVERSE);
                     }
+                    if (twoparts) { /* no highlighting for second part */
+                        *bar2 = savedch;
+                        tty_putstatusfield(bar2, x, y);
+                        x += (int) strlen(bar2);
+                    }
+                    tty_putstatusfield("]", x++, y);
                 } else {
                     /*
                      * +-----------------------------+
@@ -4395,55 +4547,54 @@ render_status(VOID_ARGS)
                      * +-----------------------------+
                      */
                     if (iflags.hilite_delta) {
-                        if (*text == ' ') {
-                            tty_putstatusfield(nullfield, " ", x++, y);
+                        while (*text == ' ') {
+                            tty_putstatusfield(" ", x++, y);
                             text++;
                         }
-                        /* multiple attributes can be in effect concurrently */
-                        Begin_Attr(attridx);
-                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
+                        if (*text == '/' && idx == BL_EXP) {
+                            tty_putstatusfield("/", x++, y);
+                            text++;
+                        }
+                        attrmask = tty_status[NOW][idx].attr;
+                        Begin_Attr(attrmask);
+                        coloridx = tty_status[NOW][idx].color;
+                        if (coloridx != NO_COLOR)
                             term_start_color(coloridx);
                     }
-                    tty_putstatusfield(&tty_status[NOW][idx], text, x, y);
+                    tty_putstatusfield(text, x, y);
+                    x += (int) strlen(text);
                     if (iflags.hilite_delta) {
-                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
+                        if (coloridx != NO_COLOR)
                             term_end_color();
-                        End_Attr(attridx);
+                        End_Attr(attrmask);
                     }
                 }
-                if (tty_status[NOW][idx].last_on_row) {
-                    int padright = 0;
-
-                    x = tty_status[NOW][idx].x + tty_status[NOW][idx].lth;
-                    finalx[row][NOW] = x - 1;
-                    if (finalx[row][NOW] < finalx[row][BEFORE])
-                        padright = finalx[row][BEFORE] - finalx[row][NOW];
-                    while (padright-- > 0)
-                        tty_putstatusfield(nullfield, " ", x++, y);
-                }
+            } else {
+                /* not rendered => same text as before */
+                x += tlth;
             }
-            /* reset .redraw, .dirty, .padright now that they're rendered */
+            finalx[row][NOW] = x - 1;
+            /* reset .redraw and .dirty now that field has been rendered */
             tty_status[NOW][idx].dirty  = FALSE;
             tty_status[NOW][idx].redraw = FALSE;
-            tty_status[NOW][idx].last_on_row = FALSE;
-
+            tty_status[NOW][idx].sanitycheck = FALSE;
             /*
              * For comparison of current and previous:
              * - Copy the entire tty_status struct.
              */
-             tty_status[BEFORE][idx] = tty_status[NOW][idx];
+            tty_status[BEFORE][idx] = tty_status[NOW][idx];
+        }
+        x = finalx[row][NOW];
+        if ((x < finalx[row][BEFORE] || !finalx[row][BEFORE])
+            && x + 1 < cw->cols) {
+            tty_curs(WIN_STATUS, x + 1, y);
+            cl_end();
         }
         /*
          * For comparison of current and previous:
          * - Copy the last written column number on the row.
          */
         finalx[row][BEFORE] = finalx[row][NOW];
-    }
-    if (cond_disp_width[NOW] < cond_width_at_shrink) {
-        cond_shrinklvl = 0;      /* reset */
-        cond_width_at_shrink = condition_size();
-        shrink_enc(0);
-        shrink_dlvl(0);
     }
     return;
 }

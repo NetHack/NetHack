@@ -50,6 +50,7 @@ struct window_procs mswin_procs = {
         | WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE | WC_VARY_MSGCOUNT
         | WC_WINDOWCOLORS | WC_PLAYER_SELECTION,
     WC2_FULLSCREEN | WC2_SOFTKEYBOARD | WC2_WRAPTEXT, mswin_init_nhwindows,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     mswin_player_selection, mswin_askname, mswin_get_nh_event,
     mswin_exit_nhwindows, mswin_suspend_nhwindows, mswin_resume_nhwindows,
     mswin_create_nhwindow, mswin_clear_nhwindow, mswin_display_nhwindow,
@@ -225,7 +226,7 @@ mswin_player_selection(void)
                                            flags.initalign, PICK_RANDOM);
                 if (flags.initrole < 0) {
                     raw_print("Incompatible role!");
-                    flags.initrole = randrole();
+                    flags.initrole = randrole(FALSE);
                 }
             }
 
@@ -358,7 +359,7 @@ prompt_for_player_selection(void)
                                        flags.initalign, PICK_RANDOM);
             if (flags.initrole < 0) {
                 /* tty_putstr(BASE_WINDOW, 0, "Incompatible role!"); */
-                flags.initrole = randrole();
+                flags.initrole = randrole(FALSE);
             }
         } else {
             /* tty_clear_nhwindow(BASE_WINDOW); */
@@ -396,7 +397,7 @@ prompt_for_player_selection(void)
             any.a_int = pick_role(flags.initrace, flags.initgend,
                                   flags.initalign, PICK_RANDOM) + 1;
             if (any.a_int == 0) /* must be non-zero */
-                any.a_int = randrole() + 1;
+                any.a_int = randrole(FALSE) + 1;
             add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
                      MENU_UNSELECTED);
             any.a_int = i + 1; /* must be non-zero */
@@ -645,7 +646,7 @@ mswin_askname(void)
 {
     logDebug("mswin_askname()\n");
 
-    if (mswin_getlin_window("who are you?", plname, PL_NSIZ) == IDCANCEL) {
+    if (mswin_getlin_window("who are you?", g.plname, PL_NSIZ) == IDCANCEL) {
         bail("bye-bye");
         /* not reached */
     }

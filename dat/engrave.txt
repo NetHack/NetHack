@@ -12,6 +12,7 @@ ad aerarium
 Owlbreath
 Galadriel
 Kilroy was here
+Frodo lives
 
 # Journey to the Center of the Earth
 A.S. ->
@@ -86,3 +87,6 @@ Warning, Exploding runes!
 
 # "Whispers Underground" Ben Aaronovitch
 If you can read these words then you are not only a nerd but probably dead.
+
+# Portal
+The cake is a lie

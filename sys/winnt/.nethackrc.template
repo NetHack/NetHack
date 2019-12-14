@@ -1,0 +1,235 @@
+# NetHack 3.6  defaults.nh       $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
+# Copyright (c) 2006 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
+
+# Sample config file for win32 NetHack
+# A '#' at the beginning of a line means the rest of the line is a comment.
+#
+# Some options MUST be set in this file, other options can be toggled while
+# playing.  For a list of options available see the <opthelp.> file.
+#
+# To change the configuration, comment out the unwanted lines, and
+# uncomment the configuration you want.
+#
+# $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
+
+# *** OPTIONS ***
+#
+# Use the IBM character set rather than just plain ascii characters
+# for tty window-port.
+OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
+
+# Here is a suggested symbol set from Michael Feir, 
+# for use by blind NetHack players
+#OPTIONS=symset:NHAccess,roguesymset:NHAccess
+
+# Optional curses port interface
+#OPTIONS=windowtype:curses
+#
+# Keyboard handling
+# Different keyboard handlers can be loaded.
+# Default is nhdefkey.dll but you can override that.
+# Ray Chason's keyboard handler
+# OPTIONS=altkeyhandler:nhraykey.dll
+#
+# NetHack 3.4.0 keyboard handling
+# OPTIONS=altkeyhandler:nh340key.dll
+
+# *** Personal Preferences ***
+# Some options to set personal preferences.  Uncomment and change these to
+# suit your personal preference.  If several people are to use the same
+# configuration, options like these should not be set.
+#
+#OPTIONS=name:Janet,role:Valkyrie,race:Human,gender:female,align:lawful
+#OPTIONS=dogname:Fido,catname:Morris,fruit:guava
+#OPTIONS=horsename:Silver
+
+# Disable autopickup
+OPTIONS=!autopickup
+
+# When autopickup is on, automatically pick up these types of objects
+#OPTIONS=pickup_types:$"=/!?+
+
+#OPTIONS=packorder:")[%?+/=!(*0_`
+#OPTIONS=scores:10 top/2 around/own
+#OPTIONS=nolegacy,noverbose
+#OPTIONS=menustyle:traditional
+#OPTIONS=perm_invent
+
+
+# Highlight menu lines with different colors. You need to define the colors
+# with MENUCOLOR lines.
+#  Toggle menucolor use on or off
+OPTIONS=menucolors
+# Define color used for a certain menu line. Format is
+#    MENUCOLOR="regular expression"=color
+# or
+#    MENUCOLOR="regular expression"=color&attribute
+#  Show all blessed items in green
+MENUCOLOR=" blessed " = green
+#  Show all holy water in green
+MENUCOLOR=" holy " = green
+#  Show all cursed items in red
+MENUCOLOR=" cursed " = red
+#  Show all unholy water in red
+MENUCOLOR=" unholy " = red
+#  Show all cursed worn items in orange and underlined
+MENUCOLOR=" cursed .* (being worn)" = orange&underline
+
+
+
+# General options.  You might also set "silent" so as not to attract
+# the boss's attention.
+#
+# number_pad option can have an optional value of 0 (off), 1 (on), 
+# or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
+OPTIONS=time,noshowexp,number_pad:2,lit_corridor,mouse_support:1
+
+# Make commands that ask for an inventory item pop up a menu
+OPTIONS=force_invmenu
+
+#
+# If you want to get rid of "use #quit to quit..." use:
+OPTIONS=suppress_alert:3.3.1
+#
+# Note: the rest_on_space in the next line may not be
+#       appropriate for a beginning NetHack player, since
+#       it could result in use of a turn unintentionally.
+#       If you're new to NetHack, leave it commented it out.
+#OPTIONS=rest_on_space
+#
+# Set some options to control graphical window-port (these will
+# be safely and silently ignored by the tty port)
+#
+# Map window settings
+# possible map_mode options include: tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|
+#                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
+#                                    ascii10x18|fit_to_screen|ascii_fit_to_screen|
+#                                    tiles_fit_to_screen
+OPTIONS=map_mode:tiles,scroll_margin:10
+
+# Message window settings
+OPTIONS=font_message:Arial,font_size_message:14,align_message:top
+
+# Menu settings
+OPTIONS=font_menu:Arial,font_size_menu:14
+
+# Text settings
+OPTIONS=font_text:Courier New,font_size_text:14
+
+# Status window settings
+OPTIONS=font_status:Courier New,font_size_status:14
+
+# Other
+OPTIONS=hilite_pet,!toptenwin
+#OPTIONS=!splash_screen,player_selection:prompts
+
+# Status/message window colors
+# Possible color options include:
+# six digit hexadecimal RGB color value ("#8F8F8F"), black, red, green, brown,
+# blue, magenta, cyan, gray (or grey), orange, brightgreen, yellow, brightblue,
+# brightmagenta, brightcyan, white, trueblack, purple, silver, maroon, fuchsia,
+# lime, olive, navy, teal, aqua, activeborder, activecaption, appworkspace,
+# background, btnface, btnshadow, btntext, captiontext, graytext, highlight,
+# highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
+# window, windowframe, windowtext.
+#OPTIONS=windowcolors:status windowtext/window message windowtext/window
+
+# "Nethack mode" colors
+OPTIONS=windowcolors:status white/#000000 message white/#000000 text white/#000000 menu white/#000000 menutext white/#000000
+OPTIONS=vary_msgcount:4
+
+# *** LOCATIONS ***
+# IMPORTANT: If you change any of these locations, the directories they
+# point at must exist.  NetHack will not create them for you.
+#
+# The location that documentation and helps files are placed
+#HACKDIR=c:\User\USERNAME\NetHack\3.6
+#
+# The location that level files in progress are stored (writeable)
+#LEVELDIR=c:\User\USERNAME\AppData\Local\NetHack\3.6
+#
+# The location where saved games are kept (writeable)
+#SAVEDIR=c:\User\USERNAME\AppData\Local\NetHack\3.6
+#
+# The location that bones files are kept (writeable)
+#BONESDIR=c:\ProgramData\NetHack\3.6
+#
+# The location that score files are kept (writeable)
+#SCOREDIR=c:\ProgramData\NetHack\3.6
+#
+# The location that file synchronization locks are stored (writeable)
+#LOCKDIR=c:\ProgramData\NetHack\3.6
+#
+
+# Finnish keyboards might need these modifications uncommented. 
+# For  \, @, $, [, |
+#OPTIONS=subkeyvalue:171/92
+#OPTIONS=subkeyvalue:178/64
+#OPTIONS=subkeyvalue:180/36
+#OPTIONS=subkeyvalue:184/91
+#OPTIONS=subkeyvalue:188/124
+
+#
+# Some versions of Windows allow you to adjust the win32 console port 
+# colors using R-G-B settings.
+#
+#OPTIONS=palette:black-0-0-0
+#OPTIONS=palette:red-210-0-0
+#OPTIONS=palette:green-80-200-0
+#OPTIONS=palette:brown-180-100-0
+#OPTIONS=palette:blue-0-0-200
+#OPTIONS=palette:magenta-128-0-128
+#OPTIONS=palette:cyan-50-180-180
+#OPTIONS=palette:gray-192-192-192
+#OPTIONS=palette:dark gray-100-100-100
+#OPTIONS=palette:orange-255-128-0
+#OPTIONS=palette:bright green-0-255-0
+#OPTIONS=palette:yellow-255-255-0
+#OPTIONS=palette:bright blue-100-100-240
+#OPTIONS=palette:bright magenta-255-0-255
+#OPTIONS=palette:bright cyan-0-255-255
+#OPTIONS=palette:white-255-255-255
+
+
+
+# Status hilites
+OPTIONS=statushilites
+# HP
+OPTIONS=hitpointbar
+OPTIONS=hilite_status:hitpoints/100%/gray&normal
+OPTIONS=hilite_status:hitpoints/<100%/green&normal
+OPTIONS=hilite_status:hitpoints/<66%/yellow&normal
+OPTIONS=hilite_status:hitpoints/<50%/orange&normal
+OPTIONS=hilite_status:hitpoints/<33%/red&bold
+OPTIONS=hilite_status:hitpoints/<15%/red&inverse
+
+## Pw
+OPTIONS=hilite_status:power/100%/gray&normal
+OPTIONS=hilite_status:power/<100%/green&normal
+OPTIONS=hilite_status:power/<66%/yellow&normal
+OPTIONS=hilite_status:power/<50%/orange&normal
+OPTIONS=hilite_status:power/<33%/red&bold
+
+## Carry
+OPTIONS=hilite_status:cap/burdened/yellow/stressed/orange/strained/red&bold/overtaxed/red&inverse/overloaded/red&inverse&blink
+
+## Hunger
+OPTIONS=hilite_status:hunger/satiated/yellow/hungry/orange/weak/red&bold/fainting/red&inverse/fainted/red&inverse&blink
+
+## Mental
+OPTIONS=hilite_status:condition/hallu/yellow
+OPTIONS=hilite_status:condition/conf/orange
+OPTIONS=hilite_status:condition/stun/red&bold
+
+## Health
+OPTIONS=hilite_status:condition/termill/red&inverse
+OPTIONS=hilite_status:condition/foodpois/red&inverse
+OPTIONS=hilite_status:condition/slime/red&inverse
+
+# gold
+OPTIONS=hilite_status:gold/up/yellow/down/brown
+
+# St, Dx, Co, In, Wi, Ch
+OPTIONS=hilite_status:characteristics/up/green/down/red
+

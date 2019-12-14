@@ -1,4 +1,4 @@
-/* NetHack 3.6	skills.h	$NHDT-Date: 1432512778 2015/05/25 00:12:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.6	skills.h	$NHDT-Date: 1547255911 2019/01/12 01:18:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,50 +21,50 @@ enum p_skills {
  * Update weapon.c if you amend any skills.
  * Also used for oc_subtyp.
  */
-    P_DAGGER,
-    P_KNIFE,
-    P_AXE,
-    P_PICK_AXE,
-    P_SHORT_SWORD,
-    P_BROAD_SWORD,
-    P_LONG_SWORD,
-    P_TWO_HANDED_SWORD,
-    P_SCIMITAR,
-    P_SABER,
-    P_CLUB, /* Heavy-shafted bludgeon */
-    P_MACE,
-    P_MORNING_STAR, /* Spiked bludgeon */
-    P_FLAIL,        /* Two pieces hinged or chained together */
-    P_HAMMER,       /* Heavy head on the end */
-    P_QUARTERSTAFF, /* Long-shafted bludgeon */
-    P_POLEARMS,
-    P_SPEAR, /* includes javelin */
-    P_TRIDENT,
-    P_LANCE,
-    P_BOW,
-    P_SLING,
-    P_CROSSBOW,
-    P_DART,
-    P_SHURIKEN,
-    P_BOOMERANG,
-    P_WHIP,
-    P_UNICORN_HORN, /* last weapon */
+    P_DAGGER             =  1,
+    P_KNIFE              =  2,
+    P_AXE                =  3,
+    P_PICK_AXE           =  4,
+    P_SHORT_SWORD        =  5,
+    P_BROAD_SWORD        =  6,
+    P_LONG_SWORD         =  7,
+    P_TWO_HANDED_SWORD   =  8,
+    P_SCIMITAR           =  9,
+    P_SABER              = 10,
+    P_CLUB               = 11, /* Heavy-shafted bludgeon */
+    P_MACE               = 12,
+    P_MORNING_STAR       = 13, /* Spiked bludgeon */
+    P_FLAIL              = 14, /* Two pieces hinged or chained together */
+    P_HAMMER             = 15, /* Heavy head on the end */
+    P_QUARTERSTAFF       = 16, /* Long-shafted bludgeon */
+    P_POLEARMS           = 17, /* attack two or three steps away */
+    P_SPEAR              = 18, /* includes javelin */
+    P_TRIDENT            = 19,
+    P_LANCE              = 20,
+    P_BOW                = 21, /* launchers */
+    P_SLING              = 22,
+    P_CROSSBOW           = 23,
+    P_DART               = 24, /* hand-thrown missiles */
+    P_SHURIKEN           = 25,
+    P_BOOMERANG          = 26,
+    P_WHIP               = 27, /* flexible, one-handed */
+    P_UNICORN_HORN       = 28, /* last weapon, two-handed */
 
     /* Spell Skills added by Larry Stewart-Zerba */
-    P_ATTACK_SPELL,
-    P_HEALING_SPELL,
-    P_DIVINATION_SPELL,
-    P_ENCHANTMENT_SPELL,
-    P_CLERIC_SPELL,
-    P_ESCAPE_SPELL,
-    P_MATTER_SPELL,
+    P_ATTACK_SPELL       = 29,
+    P_HEALING_SPELL      = 30,
+    P_DIVINATION_SPELL   = 31,
+    P_ENCHANTMENT_SPELL  = 32,
+    P_CLERIC_SPELL       = 33,
+    P_ESCAPE_SPELL       = 34,
+    P_MATTER_SPELL       = 35,
 
     /* Other types of combat */
-    P_BARE_HANDED_COMBAT, /* actually weaponless; gloves are ok */
-    P_TWO_WEAPON_COMBAT,
-    P_RIDING,             /* How well you control your steed */
+    P_BARE_HANDED_COMBAT = 36, /* actually weaponless; gloves are ok */
+    P_TWO_WEAPON_COMBAT  = 37, /* pair of weapons, one in each hand */
+    P_RIDING             = 38, /* How well you control your steed */
 
-    P_NUM_SKILLS
+    P_NUM_SKILLS         = 39
 };
 
 #define P_MARTIAL_ARTS P_BARE_HANDED_COMBAT /* Role distinguishes */
@@ -89,13 +89,19 @@ enum p_skills {
  * a value of 0 needed.
  */
 enum skill_levels {
-    P_ISRESTRICTED = 0,
-    P_UNSKILLED,
-    P_BASIC,
-    P_SKILLED,
-    P_EXPERT,
-    P_MASTER,       /* Unarmed combat/martial arts only */
-    P_GRAND_MASTER  /* Unarmed combat/martial arts only */
+    P_ISRESTRICTED = 0, /* unskilled and can't be advanced */
+    P_UNSKILLED    = 1, /* unskilled so far but can be advanced */
+    /* Skill levels Basic/Advanced/Expert had long been used by
+       Heroes of Might and Magic (tm) and its sequels... */
+    P_BASIC        = 2,
+    P_SKILLED      = 3,
+    P_EXPERT       = 4,
+    /* when the skill system was adopted into nethack, levels beyond expert
+       were unnamed and just used numbers.  Devteam coined them Master and
+       Grand Master.  Sometime after that, Heroes of Might and Magic IV (tm)
+       was released and had two more levels which use these same names. */
+    P_MASTER       = 5, /* Unarmed combat/martial arts only */
+    P_GRAND_MASTER = 6  /* ditto */
 };
 
 #define practice_needed_to_advance(level) ((level) * (level) *20)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1494034337 2017/05/06 01:32:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1575245050 2019/12/02 00:04:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -103,11 +103,11 @@ static const struct innate {
 
   hum_abil[] = { { 0, 0, 0, 0 } };
 
-STATIC_DCL void NDECL(exerper);
-STATIC_DCL void FDECL(postadjabil, (long *));
-STATIC_DCL const struct innate *FDECL(role_abil, (int));
-STATIC_DCL const struct innate *FDECL(check_innate_abil, (long *, long));
-STATIC_DCL int FDECL(innately, (long *));
+static void NDECL(exerper);
+static void FDECL(postadjabil, (long *));
+static const struct innate *FDECL(role_abil, (int));
+static const struct innate *FDECL(check_innate_abil, (long *, long));
+static int FDECL(innately, (long *));
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -115,7 +115,7 @@ adjattrib(ndx, incr, msgflg)
 int ndx, incr;
 int msgflg; /* positive => no message, zero => message, and */
 {           /* negative => conditional (msg if change made) */
-    int old_acurr, old_abase;
+    int old_acurr, old_abase, old_amax, decr;
     boolean abonflg;
     const char *attrstr;
 
@@ -130,23 +130,38 @@ int msgflg; /* positive => no message, zero => message, and */
 
     old_acurr = ACURR(ndx);
     old_abase = ABASE(ndx);
+    old_amax = AMAX(ndx);
+    ABASE(ndx) += incr; /* when incr is negative, this reduces ABASE() */
     if (incr > 0) {
-        ABASE(ndx) += incr;
         if (ABASE(ndx) > AMAX(ndx)) {
-            incr = ABASE(ndx) - AMAX(ndx);
-            AMAX(ndx) += incr;
+            AMAX(ndx) = ABASE(ndx);
             if (AMAX(ndx) > ATTRMAX(ndx))
-                AMAX(ndx) = ATTRMAX(ndx);
-            ABASE(ndx) = AMAX(ndx);
+                ABASE(ndx) = AMAX(ndx) = ATTRMAX(ndx);
         }
         attrstr = plusattr[ndx];
         abonflg = (ABON(ndx) < 0);
-    } else {
-        ABASE(ndx) += incr;
+    } else { /* incr is negative */
         if (ABASE(ndx) < ATTRMIN(ndx)) {
-            incr = ABASE(ndx) - ATTRMIN(ndx);
+            /*
+             * If base value has dropped so low that it is trying to be
+             * taken below the minimum, reduce max value (peak reached)
+             * instead.  That means that restore ability and repeated
+             * applications of unicorn horn will not be able to recover
+             * all the lost value.  As of 3.6.2, we only take away
+             * some (average half, possibly zero) of the excess from max
+             * instead of all of it, but without intervening recovery, it
+             * can still eventually drop to the minimum allowed.  After
+             * that, it can't be recovered, only improved with new gains.
+             *
+             * This used to assign a new negative value to incr and then
+             * add it, but that could affect messages below, possibly
+             * making a large decrease be described as a small one.
+             *
+             * decr = rn2(-(ABASE - ATTRMIN) + 1);
+             */
+            decr = rn2(ATTRMIN(ndx) - ABASE(ndx) + 1);
             ABASE(ndx) = ATTRMIN(ndx);
-            AMAX(ndx) += incr;
+            AMAX(ndx) -= decr;
             if (AMAX(ndx) < ATTRMIN(ndx))
                 AMAX(ndx) = ATTRMIN(ndx);
         }
@@ -155,20 +170,23 @@ int msgflg; /* positive => no message, zero => message, and */
     }
     if (ACURR(ndx) == old_acurr) {
         if (msgflg == 0 && flags.verbose) {
-            if (ABASE(ndx) == old_abase)
+            if (ABASE(ndx) == old_abase && AMAX(ndx) == old_amax) {
                 pline("You're %s as %s as you can get.",
                       abonflg ? "currently" : "already", attrstr);
-            else /* current stayed the same but base value changed */
+            } else {
+                /* current stayed the same but base value changed, or
+                   base is at minimum and reduction caused max to drop */
                 Your("innate %s has %s.", attrname[ndx],
                      (incr > 0) ? "improved" : "declined");
+            }
         }
         return FALSE;
     }
 
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
-    context.botl = 1;
-    if (moves > 1 && (ndx == A_STR || ndx == A_CON))
+    g.context.botl = TRUE;
+    if (g.program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         (void) encumber_msg();
     return TRUE;
 }
@@ -294,7 +312,7 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
     if (i == 0 && typ != A_CHA) {
         /* instant kill */
         u.uhp = -1;
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         pline_The("poison was deadly...");
     } else if (i > 5) {
         /* HP damage; more likely--but less severe--with missiles */
@@ -310,8 +328,8 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
     }
 
     if (u.uhp < 1) {
-        killer.format = kprefix;
-        Strcpy(killer.name, pkiller);
+        g.killer.format = kprefix;
+        Strcpy(g.killer.name, pkiller);
         /* "Poisoned by a poisoned ___" is redundant */
         done(strstri(pkiller, "poison") ? DIED : POISONING);
     }
@@ -336,7 +354,7 @@ boolean parameter; /* So I can't think up of a good name.  So sue me. --KAA */
     register struct obj *otmp;
     register long bonchance = 0;
 
-    for (otmp = invent; otmp; otmp = otmp->nobj)
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if (confers_luck(otmp)) {
             if (otmp->cursed)
                 bonchance -= otmp->quan;
@@ -379,13 +397,13 @@ restore_attrib()
         if (ATEMP(i) != equilibrium && ATIME(i) != 0) {
             if (!(--(ATIME(i)))) { /* countdown for change */
                 ATEMP(i) += (ATEMP(i) > 0) ? -1 : 1;
-                context.botl = 1;
+                g.context.botl = TRUE;
                 if (ATEMP(i)) /* reset timer */
                     ATIME(i) = 100 / ACURR(A_CON);
             }
         }
     }
-    if (context.botl)
+    if (g.context.botl)
         (void) encumber_msg();
 }
 
@@ -421,14 +439,14 @@ boolean inc_or_dec;
                                                                       : "Con",
                     (inc_or_dec) ? "inc" : "dec", AEXE(i));
     }
-    if (moves > 0 && (i == A_STR || i == A_CON))
+    if (g.moves > 0 && (i == A_STR || i == A_CON))
         (void) encumber_msg();
 }
 
-STATIC_OVL void
+static void
 exerper()
 {
-    if (!(moves % 10)) {
+    if (!(g.moves % 10)) {
         /* Hunger Checks */
 
         int hs = (u.uhunger > 1000) ? SATIATED : (u.uhunger > 150)
@@ -478,7 +496,7 @@ exerper()
     }
 
     /* status checks */
-    if (!(moves % 5)) {
+    if (!(g.moves % 5)) {
         debugpline0("exerper: Status checks");
         if ((HClairvoyant & (INTRINSIC | TIMEOUT)) && !BClairvoyant)
             exercise(A_WIS, TRUE);
@@ -513,11 +531,11 @@ exerchk()
     /*  Check out the periodic accumulations */
     exerper();
 
-    if (moves >= context.next_attrib_check) {
-        debugpline1("exerchk: ready to test. multi = %d.", multi);
+    if (g.moves >= g.context.next_attrib_check) {
+        debugpline1("exerchk: ready to test. multi = %d.", g.multi);
     }
     /*  Are we ready for a test? */
-    if (moves >= context.next_attrib_check && !multi) {
+    if (g.moves >= g.context.next_attrib_check && !g.multi) {
         debugpline0("exerchk: testing.");
         /*
          *      Law of diminishing returns (Part II):
@@ -582,13 +600,13 @@ exerchk()
                     (mod_val > 0) ? "must have been" : "haven't been",
                     exertext[i][(mod_val > 0) ? 0 : 1]);
             }
-        nextattrib:
+ nextattrib:
             /* this used to be ``AEXE(i) /= 2'' but that would produce
                platform-dependent rounding/truncation for negative vals */
             AEXE(i) = (abs(ax) / 2) * mod_val;
         }
-        context.next_attrib_check += rn1(200, 800);
-        debugpline1("exerchk: next check at %ld.", context.next_attrib_check);
+        g.context.next_attrib_check += rn1(200, 800);
+        debugpline1("exerchk: next check at %ld.", g.context.next_attrib_check);
     }
 }
 
@@ -599,15 +617,15 @@ register int np;
     register int i, x, tryct;
 
     for (i = 0; i < A_MAX; i++) {
-        ABASE(i) = AMAX(i) = urole.attrbase[i];
+        ABASE(i) = AMAX(i) = g.urole.attrbase[i];
         ATEMP(i) = ATIME(i) = 0;
-        np -= urole.attrbase[i];
+        np -= g.urole.attrbase[i];
     }
 
     tryct = 0;
     while (np > 0 && tryct < 100) {
         x = rn2(100);
-        for (i = 0; (i < A_MAX) && ((x -= urole.attrdist[i]) > 0); i++)
+        for (i = 0; (i < A_MAX) && ((x -= g.urole.attrdist[i]) > 0); i++)
             ;
         if (i >= A_MAX)
             continue; /* impossible */
@@ -626,7 +644,7 @@ register int np;
     while (np < 0 && tryct < 100) { /* for redistribution */
 
         x = rn2(100);
-        for (i = 0; (i < A_MAX) && ((x -= urole.attrdist[i]) > 0); i++)
+        for (i = 0; (i < A_MAX) && ((x -= g.urole.attrdist[i]) > 0); i++)
             ;
         if (i >= A_MAX)
             continue; /* impossible */
@@ -665,7 +683,7 @@ redist_attr()
     (void) encumber_msg();
 }
 
-STATIC_OVL
+static
 void
 postadjabil(ability)
 long *ability;
@@ -676,7 +694,7 @@ long *ability;
         see_monsters();
 }
 
-STATIC_OVL const struct innate *
+static const struct innate *
 role_abil(r)
 int r;
 {
@@ -706,7 +724,7 @@ int r;
     return roleabils[i].abil;
 }
 
-STATIC_OVL const struct innate *
+static const struct innate *
 check_innate_abil(ability, frommask)
 long *ability;
 long frommask;
@@ -754,7 +772,7 @@ long frommask;
 #define FROM_LYCN 6
 
 /* check whether particular ability has been obtained via innate attribute */
-STATIC_OVL int
+static int
 innately(ability)
 long *ability;
 {
@@ -789,7 +807,7 @@ int propidx;
            ignore innateness if equipment is going to claim responsibility */
         && !u.uprops[propidx].extrinsic)
         return FROM_ROLE;
-    if (propidx == BLINDED && !haseyes(youmonst.data))
+    if (propidx == BLINDED && !haseyes(g.youmonst.data))
         return FROM_FORM;
     return FROM_NONE;
 }
@@ -966,30 +984,30 @@ newhp()
 
     if (u.ulevel == 0) {
         /* Initialize hit points */
-        hp = urole.hpadv.infix + urace.hpadv.infix;
-        if (urole.hpadv.inrnd > 0)
-            hp += rnd(urole.hpadv.inrnd);
-        if (urace.hpadv.inrnd > 0)
-            hp += rnd(urace.hpadv.inrnd);
-        if (moves <= 1L) { /* initial hero; skip for polyself to new man */
+        hp = g.urole.hpadv.infix + g.urace.hpadv.infix;
+        if (g.urole.hpadv.inrnd > 0)
+            hp += rnd(g.urole.hpadv.inrnd);
+        if (g.urace.hpadv.inrnd > 0)
+            hp += rnd(g.urace.hpadv.inrnd);
+        if (g.moves <= 1L) { /* initial hero; skip for polyself to new man */
             /* Initialize alignment stuff */
             u.ualign.type = aligns[flags.initalign].value;
-            u.ualign.record = urole.initrecord;
+            u.ualign.record = g.urole.initrecord;
         }
         /* no Con adjustment for initial hit points */
     } else {
-        if (u.ulevel < urole.xlev) {
-            hp = urole.hpadv.lofix + urace.hpadv.lofix;
-            if (urole.hpadv.lornd > 0)
-                hp += rnd(urole.hpadv.lornd);
-            if (urace.hpadv.lornd > 0)
-                hp += rnd(urace.hpadv.lornd);
+        if (u.ulevel < g.urole.xlev) {
+            hp = g.urole.hpadv.lofix + g.urace.hpadv.lofix;
+            if (g.urole.hpadv.lornd > 0)
+                hp += rnd(g.urole.hpadv.lornd);
+            if (g.urace.hpadv.lornd > 0)
+                hp += rnd(g.urace.hpadv.lornd);
         } else {
-            hp = urole.hpadv.hifix + urace.hpadv.hifix;
-            if (urole.hpadv.hirnd > 0)
-                hp += rnd(urole.hpadv.hirnd);
-            if (urace.hpadv.hirnd > 0)
-                hp += rnd(urace.hpadv.hirnd);
+            hp = g.urole.hpadv.hifix + g.urace.hpadv.hifix;
+            if (g.urole.hpadv.hirnd > 0)
+                hp += rnd(g.urole.hpadv.hirnd);
+            if (g.urace.hpadv.hirnd > 0)
+                hp += rnd(g.urace.hpadv.hirnd);
         }
         if (ACURR(A_CON) <= 3)
             conplus = -2;
@@ -1031,7 +1049,7 @@ int x;
 #endif
     } else if (x == A_CHA) {
         if (tmp < 18
-            && (youmonst.data->mlet == S_NYMPH || u.umonnum == PM_SUCCUBUS
+            && (g.youmonst.data->mlet == S_NYMPH || u.umonnum == PM_SUCCUBUS
                 || u.umonnum == PM_INCUBUS))
             return (schar) 18;
     } else if (x == A_CON) {
@@ -1123,8 +1141,10 @@ int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
 {
     aligntyp oldalign = u.ualign.type;
 
-    u.ublessed = 0;   /* lose divine protection */
-    context.botl = 1; /* status line needs updating */
+    u.ublessed = 0; /* lose divine protection */
+    /* You/Your/pline message with call flush_screen(), triggering bot(),
+       so the actual data change needs to come before the message */
+    g.context.botl = TRUE; /* status line needs updating */
     if (reason == 0) {
         /* conversion via altar */
         u.ualignbase[A_CURRENT] = (aligntyp) newalign;
@@ -1143,7 +1163,6 @@ int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
                                     ? "much of a muchness"
                                     : "back in sync with your body");
     }
-
     if (u.ualign.type != oldalign) {
         u.ualign.record = 0; /* slate is wiped clean */
         retouch_equipment(0);

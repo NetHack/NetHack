@@ -1,4 +1,4 @@
-# NetHack 3.6  bogusmon.txt       $NHDT-Date: 1524689579 2018/04/25 20:52:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.7 $
+# NetHack 3.6  bogusmon.txt       $NHDT-Date: 1574387024 2019/11/22 01:43:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.8 $
 # Copyright (c) 2016 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -80,6 +80,15 @@ tofurkey
 shrinking violet
 shallow one
 spherical cow
+electric giraffe
+steam dragon
+omnibus
+slinky
+maxotaur
+octahedron
+dungeon core
+quale
+holloway
 
 # Quendor (Zork, &c.)
 grue
@@ -189,6 +198,9 @@ Dalek
 microscopic space fleet
 Ravenous Bugblatter Beast of Traal
 
+# The Tough Guide to Fantasyland
+leathery-winged avian
+
 # TMNT
 teenage mutant ninja turtle
 
@@ -239,6 +251,7 @@ corpulent porpoise
 quokka
 potoo
 lemming
+dhole
 
 # european cryptids
 wolpertinger
@@ -275,6 +288,7 @@ netsplit
 wiki
 peer
 COBOL
+wire shark
 
 # bugs
 bohrbug
@@ -326,6 +340,7 @@ bold face
 boustrophedon
 ligature
 rebus
+dinkus
 
 # Their actual character
 apostrophe golem
@@ -335,6 +350,10 @@ voluptuous ampersand
 +Bob the angry flower
 +Strong Bad
 +Magical Trevor
+
+# Girl Genius
+smakken
+mimmoth
 
 # KoL
 one-winged dewinged stab-bat
@@ -424,6 +443,9 @@ womble
 # Fraggle Rock
 fraggle
 
+# Harry Harrison
+stainless steel rat
+
 # Spoonerism
 mock role
 
@@ -475,6 +497,7 @@ geriatric snake
 gnat ant
 giant bath
 grant beetle
+greater snake
 grind bug
 giant mango
 glossy golem

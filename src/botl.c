@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1545705812 2018/12/25 02:43:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1573178085 2019/11/08 01:54:45 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -13,11 +13,9 @@ extern const char *hu_stat[]; /* defined in eat.c */
 const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
                                  "Strained", "Overtaxed", "Overloaded" };
 
-STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
-STATIC_DCL const char *NDECL(rank);
-#ifdef STATUS_HILITES
-STATIC_DCL void NDECL(bot_via_windowport);
-#endif
+static const char *NDECL(rank);
+static void NDECL(bot_via_windowport);
+static void NDECL(stat_update_time);
 
 static char *
 get_strength_str()
@@ -41,7 +39,7 @@ get_strength_str()
 void
 check_gold_symbol()
 {
-    nhsym goldch = showsyms[COIN_CLASS + SYM_OFF_O];
+    nhsym goldch = g.showsyms[COIN_CLASS + SYM_OFF_O];
 
     iflags.invis_goldsym = (goldch <= (nhsym) ' ');
 }
@@ -53,7 +51,7 @@ do_statusline1()
     register char *nb;
     register int i, j;
 
-    Strcpy(newbot1, plname);
+    Strcpy(newbot1, g.plname);
     if ('a' <= newbot1[0] && newbot1[0] <= 'z')
         newbot1[0] += 'A' - 'a';
     newbot1[10] = 0;
@@ -75,7 +73,7 @@ do_statusline1()
         Strcpy(nb = eos(nb), rank());
 
     Sprintf(nb = eos(nb), "  ");
-    i = mrank_sz + 15;
+    i = g.mrank_sz + 15;
     j = (int) ((nb + 2) - newbot1); /* strlen(newbot1) but less computation */
     if ((i - j) > 0)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
@@ -119,7 +117,7 @@ do_statusline2()
 
     /* dungeon location plus gold */
     (void) describe_level(dloc); /* includes at least one trailing space */
-    if ((money = money_cnt(invent)) < 0L)
+    if ((money = money_cnt(g.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
     Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
             (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
@@ -143,14 +141,14 @@ do_statusline2()
     if (Upolyd)
         Sprintf(expr, "HD:%d", mons[u.umonnum].mlevel);
     else if (flags.showexp)
-        Sprintf(expr, "Xp:%u/%-1ld", u.ulevel, u.uexp);
+        Sprintf(expr, "Xp:%d/%-1ld", u.ulevel, u.uexp);
     else
-        Sprintf(expr, "Exp:%u", u.ulevel);
+        Sprintf(expr, "Exp:%d", u.ulevel);
     xln = strlen(expr);
 
     /* time/move counter */
     if (flags.time)
-        Sprintf(tmmv, "T:%ld", moves);
+        Sprintf(tmmv, "T:%ld", g.moves);
     else
         tmmv[0] = '\0';
     tln = strlen(tmmv);
@@ -234,17 +232,31 @@ void
 bot()
 {
     /* dosave() flags completion by setting u.uhp to -1 */
-    if ((u.uhp != -1) && youmonst.data && iflags.status_updates) {
-#ifdef STATUS_HILITES
-        bot_via_windowport();
-#else
-        curs(WIN_STATUS, 1, 0);
-        putstr(WIN_STATUS, 0, do_statusline1());
-        curs(WIN_STATUS, 1, 1);
-        putmixed(WIN_STATUS, 0, do_statusline2());
-#endif
+    if ((u.uhp != -1) && g.youmonst.data && iflags.status_updates) {
+        if (VIA_WINDOWPORT()) {
+            bot_via_windowport();
+        } else {
+            curs(WIN_STATUS, 1, 0);
+            putstr(WIN_STATUS, 0, do_statusline1());
+            curs(WIN_STATUS, 1, 1);
+            putmixed(WIN_STATUS, 0, do_statusline2());
+        }
     }
-    context.botl = context.botlx = 0;
+    g.context.botl = g.context.botlx = iflags.time_botl = FALSE;
+}
+
+void
+timebot()
+{
+    if (flags.time && iflags.status_updates) {
+        if (VIA_WINDOWPORT()) {
+            stat_update_time();
+        } else {
+            /* old status display updates everything */
+            bot();
+        }
+    }
+    iflags.time_botl = FALSE;
 }
 
 /* convert experience level (1..30) to rank index (0..8) */
@@ -279,7 +291,7 @@ boolean female;
         if (monnum == role->malenum || monnum == role->femalenum)
             break;
     if (!role->name.m)
-        role = &urole;
+        role = &g.urole;
 
     /* Find the rank */
     for (i = xlev_to_rank((int) lev); i >= 0; i--) {
@@ -297,7 +309,7 @@ boolean female;
     return "Player";
 }
 
-STATIC_OVL const char *
+static const char *
 rank()
 {
     return rank_of(u.ulevel, Role_switch, flags.female);
@@ -341,12 +353,12 @@ max_rank_sz()
 {
     register int i, r, maxr = 0;
     for (i = 0; i < 9; i++) {
-        if (urole.rank[i].m && (r = strlen(urole.rank[i].m)) > maxr)
+        if (g.urole.rank[i].m && (r = strlen(g.urole.rank[i].m)) > maxr)
             maxr = r;
-        if (urole.rank[i].f && (r = strlen(urole.rank[i].f)) > maxr)
+        if (g.urole.rank[i].f && (r = strlen(g.urole.rank[i].f)) > maxr)
             maxr = r;
     }
-    mrank_sz = maxr;
+    g.mrank_sz = maxr;
     return;
 }
 
@@ -357,7 +369,7 @@ botl_score()
     long deepest = deepest_lev_reached(FALSE);
     long utotal;
 
-    utotal = money_cnt(invent) + hidden_gold();
+    utotal = money_cnt(g.invent) + hidden_gold();
     if ((utotal -= u.umoney0) < 0L)
         utotal = 0L;
     utotal += u.urexp + (50 * (deepest - 1))
@@ -376,13 +388,16 @@ char *buf;
     int ret = 1;
 
     /* TODO:    Add in dungeon name */
-    if (Is_knox(&u.uz))
-        Sprintf(buf, "%s ", dungeons[u.uz.dnum].dname);
-    else if (In_quest(&u.uz))
+    if (Is_knox(&u.uz)) {
+        Sprintf(buf, "%s ", g.dungeons[u.uz.dnum].dname);
+    } else if (In_quest(&u.uz)) {
         Sprintf(buf, "Home %d ", dunlev(&u.uz));
-    else if (In_endgame(&u.uz))
-        Sprintf(buf, Is_astralevel(&u.uz) ? "Astral Plane " : "End Game ");
-    else {
+    } else if (In_endgame(&u.uz)) {
+        /* [3.6.2: this used to be "Astral Plane" or generic "End Game"] */
+        (void) endgamelevelname(buf, depth(&u.uz));
+        (void) strsubst(buf, "Plane of ", ""); /* just keep <element> */
+        Strcat(buf, " ");
+    } else {
         /* ports with more room may expand this one */
         Sprintf(buf, "Dlvl:%-2d ", depth(&u.uz));
         ret = 0;
@@ -397,89 +412,75 @@ char *buf;
 /* structure that tracks the status details in the core */
 
 #ifdef STATUS_HILITES
-struct hilite_s {
-    enum statusfields fld;
-    boolean set;
-    unsigned anytype;
-    anything value;
-    int behavior;
-    char textmatch[QBUFSZ];
-    enum relationships rel;
-    int coloridx;
-    struct hilite_s *next;
-};
-
-struct condmap {
-    const char *id;
-    unsigned long bitmask;
-};
 #endif /* STATUS_HILITES */
 
-struct istat_s {
-    const char *fldname;
-    const char *fldfmt;
-    long time;  /* moves when this field hilite times out */
-    boolean chg; /* need to recalc time? */
-    unsigned anytype;
-    anything a;
-    char *val;
-    int valwidth;
-    enum statusfields idxmax;
-    enum statusfields fld;
-#ifdef STATUS_HILITES
-    struct hilite_s *thresholds;
-#endif
-};
-
-
-STATIC_DCL void NDECL(init_blstats);
-STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
-STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
-STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
-STATIC_DCL boolean FDECL(evaluate_and_notify_windowport_field,
-                         (int, boolean *, int, int));
-STATIC_DCL void FDECL(evaluate_and_notify_windowport, (boolean *, int, int));
+static boolean FDECL(eval_notify_windowport_field, (int, boolean *, int));
+static void FDECL(evaluate_and_notify_windowport, (boolean *, int));
+static void NDECL(init_blstats);
+static int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
+static char *FDECL(anything_to_s, (char *, anything *, int));
+static int FDECL(percentage, (struct istat_s *, struct istat_s *));
+static int NDECL(exp_percentage);
 
 #ifdef STATUS_HILITES
-STATIC_DCL boolean FDECL(hilite_reset_needed, (struct istat_s *, long));
-STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
-STATIC_DCL boolean FDECL(is_ltgt_percentnumber, (const char *));
-STATIC_DCL boolean FDECL(has_ltgt_percentnumber, (const char *));
-STATIC_DCL boolean FDECL(parse_status_hl2, (char (*)[QBUFSZ],BOOLEAN_P));
-STATIC_DCL boolean FDECL(parse_condition, (char (*)[QBUFSZ], int));
-STATIC_DCL boolean FDECL(noneoftheabove, (const char *));
-STATIC_DCL void FDECL(merge_bestcolor, (int *, int));
-STATIC_DCL void FDECL(get_hilite_color, (int, int, genericptr_t, int,
-                                         int, int *));
-STATIC_DCL unsigned long FDECL(match_str2conditionbitmask, (const char *));
-STATIC_DCL unsigned long FDECL(str2conditionbitmask, (char *));
-STATIC_DCL void FDECL(split_clridx, (int, int *, int *));
-STATIC_DCL char *FDECL(hlattr2attrname, (int, char *, int));
-STATIC_DCL void FDECL(status_hilite_linestr_add, (int, struct hilite_s *,
+static void FDECL(s_to_anything, (anything *, char *, int));
+static enum statusfields FDECL(fldname_to_bl_indx, (const char *));
+static boolean FDECL(hilite_reset_needed, (struct istat_s *, long));
+static boolean FDECL(noneoftheabove, (const char *));
+static struct hilite_s *FDECL(get_hilite, (int, int, genericptr_t,
+                                               int, int, int *));
+static void FDECL(split_clridx, (int, int *, int *));
+static boolean FDECL(is_ltgt_percentnumber, (const char *));
+static boolean FDECL(has_ltgt_percentnumber, (const char *));
+static int FDECL(splitsubfields, (char *, char ***, int));
+static boolean FDECL(is_fld_arrayvalues, (const char *,
+                                              const char *const *,
+                                              int, int, int *));
+static int FDECL(query_arrayvalue, (const char *, const char *const *,
+                                        int, int));
+static void FDECL(status_hilite_add_threshold, (int, struct hilite_s *));
+static boolean FDECL(parse_status_hl2, (char (*)[QBUFSZ], BOOLEAN_P));
+static char *FDECL(conditionbitmask2str, (unsigned long));
+static unsigned long FDECL(match_str2conditionbitmask, (const char *));
+static unsigned long FDECL(str2conditionbitmask, (char *));
+static boolean FDECL(parse_condition, (char (*)[QBUFSZ], int));
+static char *FDECL(hlattr2attrname, (int, char *, int));
+static void FDECL(status_hilite_linestr_add, (int, struct hilite_s *,
                                                 unsigned long, const char *));
-STATIC_DCL void NDECL(status_hilite_linestr_done);
-STATIC_DCL int FDECL(status_hilite_linestr_countfield, (int));
-STATIC_DCL void NDECL(status_hilite_linestr_gather_conditions);
-STATIC_DCL void NDECL(status_hilite_linestr_gather);
-STATIC_DCL char *FDECL(status_hilite2str, (struct hilite_s *));
-STATIC_DCL int NDECL(status_hilite_menu_choose_field);
-STATIC_DCL int FDECL(status_hilite_menu_choose_behavior, (int));
-STATIC_DCL int FDECL(status_hilite_menu_choose_updownboth, (int, const char *,
+static void NDECL(status_hilite_linestr_done);
+static int FDECL(status_hilite_linestr_countfield, (int));
+static void NDECL(status_hilite_linestr_gather_conditions);
+static void NDECL(status_hilite_linestr_gather);
+static char *FDECL(status_hilite2str, (struct hilite_s *));
+static int NDECL(status_hilite_menu_choose_field);
+static int FDECL(status_hilite_menu_choose_behavior, (int));
+static int FDECL(status_hilite_menu_choose_updownboth, (int, const char *,
                                                        BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL boolean FDECL(status_hilite_menu_add, (int));
-#define has_hilite(i) (blstats[0][(i)].thresholds)
+static boolean FDECL(status_hilite_menu_add, (int));
+#define has_hilite(i) (g.blstats[0][(i)].thresholds)
+/* TH_UPDOWN encompasses specific 'up' and 'down' also general 'changed' */
+#define Is_Temp_Hilite(rule) ((rule) && (rule)->behavior == BL_TH_UPDOWN)
+
+/* pointers to current hilite rule and list of this field's defined rules */
+#define INIT_THRESH  , (struct hilite_s *) 0, (struct hilite_s *) 0
+#else /* !STATUS_HILITES */
+#define INIT_THRESH /*empty*/
 #endif
 
-#define INIT_BLSTAT(name, fmtstr, anytyp, wid, fld)                     \
-    { name, fmtstr, 0L, FALSE, anytyp,  { (genericptr_t) 0 }, (char *) 0, \
-      wid,  -1, fld }
-#define INIT_BLSTATP(name, fmtstr, anytyp, wid, maxfld, fld)            \
-    { name, fmtstr, 0L, FALSE, anytyp,  { (genericptr_t) 0 }, (char *) 0, \
-      wid,  maxfld, fld }
+#define INIT_BLSTAT(name, fmtstr, anytyp, wid, fld) \
+    { name, fmtstr, 0L, FALSE, FALSE, 0, anytyp,                        \
+      { (genericptr_t) 0 }, (char *) 0,                                 \
+      wid,  -1, fld INIT_THRESH }
+#define INIT_BLSTATP(name, fmtstr, anytyp, wid, maxfld, fld) \
+    { name, fmtstr, 0L, FALSE, TRUE, 0, anytyp,                         \
+      { (genericptr_t) 0 }, (char *) 0,                                 \
+      wid,  maxfld, fld INIT_THRESH }
 
-/* If entries are added to this, botl.h will require updating too */
-STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
-    INIT_BLSTAT("title", "%s", ANY_STR, 80, BL_TITLE),
+/* If entries are added to this, botl.h will require updating too.
+   'max' value of BL_EXP gets special handling since the percentage
+   involved isn't a direct 100*current/maximum calculation. */
+static struct istat_s initblstats[MAXBLSTATS] = {
+    INIT_BLSTAT("title", "%s", ANY_STR, MAXVALWIDTH, BL_TITLE),
     INIT_BLSTAT("strength", " St:%s", ANY_INT, 10, BL_STR),
     INIT_BLSTAT("dexterity", " Dx:%s", ANY_INT,  10, BL_DX),
     INIT_BLSTAT("constitution", " Co:%s", ANY_INT, 10, BL_CO),
@@ -492,7 +493,7 @@ STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("gold", " %s", ANY_LONG, 30, BL_GOLD),
     INIT_BLSTATP("power", " Pw:%s", ANY_INT, 10, BL_ENEMAX, BL_ENE),
     INIT_BLSTAT("power-max", "(%s)", ANY_INT, 10, BL_ENEMAX),
-    INIT_BLSTAT("experience-level", " Xp:%s", ANY_INT, 10, BL_XP),
+    INIT_BLSTATP("experience-level", " Xp:%s", ANY_INT, 10, BL_EXP, BL_XP),
     INIT_BLSTAT("armor-class", " AC:%s", ANY_INT, 10, BL_AC),
     INIT_BLSTAT("HD", " HD:%s", ANY_INT, 10, BL_HD),
     INIT_BLSTAT("time", " T:%s", ANY_LONG, 20, BL_TIME),
@@ -500,20 +501,17 @@ STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("hunger", " %s", ANY_INT, 40, BL_HUNGER),
     INIT_BLSTATP("hitpoints", " HP:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
     INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
-    INIT_BLSTAT("dungeon-level", "%s", ANY_STR, 80, BL_LEVELDESC),
-    INIT_BLSTAT("experience", "/%s", ANY_LONG, 20, BL_EXP),
+    INIT_BLSTAT("dungeon-level", "%s", ANY_STR, MAXVALWIDTH, BL_LEVELDESC),
+    INIT_BLSTATP("experience", "/%s", ANY_LONG, 20, BL_EXP, BL_EXP),
     INIT_BLSTAT("condition", "%s", ANY_MASK32, 0, BL_CONDITION)
 };
 
 #undef INIT_BLSTATP
 #undef INIT_BLSTAT
+#undef INIT_THRESH
 
-struct istat_s blstats[2][MAXBLSTATS];
-static boolean blinit = FALSE, update_all = FALSE;
-static boolean valset[MAXBLSTATS];
-unsigned long blcolormasks[CLR_MAX];
-static long bl_hilite_moves = 0L;
-
+#ifdef STATUS_HILITES
+#endif
 /* we don't put this next declaration in #ifdef STATUS_HILITES.
  * In the absence of STATUS_HILITES, each array
  * element will be 0 however, and quite meaningless,
@@ -521,24 +519,25 @@ static long bl_hilite_moves = 0L;
  * the final argument of status_update, with or
  * without STATUS_HILITES.
  */
-unsigned long cond_hilites[BL_ATTCLR_MAX];
 
-void
+static void
 bot_via_windowport()
 {
     char buf[BUFSZ];
+    const char *titl;
     register char *nb;
-    static int i, idx = 0, idx_p, cap;
+    int i, idx, cap;
     long money;
 
-    if (!blinit)
+    if (!g.blinit)
         panic("bot before init.");
 
-    idx_p = idx;
-    idx = 1 - idx; /* 0 -> 1, 1 -> 0 */
+    /* toggle from previous iteration */
+    idx = 1 - g.now_or_before_idx; /* 0 -> 1, 1 -> 0 */
+    g.now_or_before_idx = idx;
 
     /* clear the "value set" indicators */
-    (void) memset((genericptr_t) valset, 0, MAXBLSTATS * sizeof (boolean));
+    (void) memset((genericptr_t) g.valset, 0, MAXBLSTATS * sizeof (boolean));
 
     /*
      * Note: min(x,9999) - we enforce the same maximum on hp, maxhp,
@@ -549,40 +548,48 @@ bot_via_windowport()
     /*
      *  Player name and title.
      */
-    Strcpy(nb = buf, plname);
+    Strcpy(nb = buf, g.plname);
     nb[0] = highc(nb[0]);
-    nb[10] = '\0';
-    Sprintf(nb = eos(nb), " the ");
-    if (Upolyd) {
-        for (i = 0, nb = strcpy(eos(nb), mons[u.umonnum].mname); nb[i]; i++)
+    titl = !Upolyd ? rank() : mons[u.umonnum].mname;
+    i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
+    /* if "Name the Rank/monster" is too long, we truncate the name
+       but always keep at least 10 characters of it; when hitpintbar is
+       enabled, anything beyond 30 (long monster name) will be truncated */
+    if (i > 30) {
+        i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
+        nb[max(i, 10)] = '\0';
+    }
+    Strcpy(nb = eos(nb), " the ");
+    Strcpy(nb = eos(nb), titl);
+    if (Upolyd) { /* when poly'd, capitalize monster name */
+        for (i = 0; nb[i]; i++)
             if (i == 0 || nb[i - 1] == ' ')
                 nb[i] = highc(nb[i]);
-    } else
-        Strcpy(nb = eos(nb), rank());
-    Sprintf(blstats[idx][BL_TITLE].val, "%-29s", buf);
-    valset[BL_TITLE] = TRUE; /* indicate val already set */
+    }
+    Sprintf(g.blstats[idx][BL_TITLE].val, "%-30s", buf);
+    g.valset[BL_TITLE] = TRUE; /* indicate val already set */
 
     /* Strength */
-    blstats[idx][BL_STR].a.a_int = ACURR(A_STR);
-    Strcpy(blstats[idx][BL_STR].val, get_strength_str());
-    valset[BL_STR] = TRUE; /* indicate val already set */
+    g.blstats[idx][BL_STR].a.a_int = ACURR(A_STR);
+    Strcpy(g.blstats[idx][BL_STR].val, get_strength_str());
+    g.valset[BL_STR] = TRUE; /* indicate val already set */
 
     /*  Dexterity, constitution, intelligence, wisdom, charisma. */
-    blstats[idx][BL_DX].a.a_int = ACURR(A_DEX);
-    blstats[idx][BL_CO].a.a_int = ACURR(A_CON);
-    blstats[idx][BL_IN].a.a_int = ACURR(A_INT);
-    blstats[idx][BL_WI].a.a_int = ACURR(A_WIS);
-    blstats[idx][BL_CH].a.a_int = ACURR(A_CHA);
+    g.blstats[idx][BL_DX].a.a_int = ACURR(A_DEX);
+    g.blstats[idx][BL_CO].a.a_int = ACURR(A_CON);
+    g.blstats[idx][BL_IN].a.a_int = ACURR(A_INT);
+    g.blstats[idx][BL_WI].a.a_int = ACURR(A_WIS);
+    g.blstats[idx][BL_CH].a.a_int = ACURR(A_CHA);
 
     /* Alignment */
-    Strcpy(blstats[idx][BL_ALIGN].val, (u.ualign.type == A_CHAOTIC)
+    Strcpy(g.blstats[idx][BL_ALIGN].val, (u.ualign.type == A_CHAOTIC)
                                           ? "Chaotic"
                                           : (u.ualign.type == A_NEUTRAL)
                                                ? "Neutral"
                                                : "Lawful");
 
     /* Score */
-    blstats[idx][BL_SCORE].a.a_long =
+    g.blstats[idx][BL_SCORE].a.a_long =
 #ifdef SCORE_ON_BOTL
         flags.showscore ? botl_score() :
 #endif
@@ -592,18 +599,18 @@ bot_via_windowport()
     i = Upolyd ? u.mh : u.uhp;
     if (i < 0)
         i = 0;
-    blstats[idx][BL_HP].a.a_int = min(i, 9999);
+    g.blstats[idx][BL_HP].a.a_int = min(i, 9999);
     i = Upolyd ? u.mhmax : u.uhpmax;
-    blstats[idx][BL_HPMAX].a.a_int = min(i, 9999);
+    g.blstats[idx][BL_HPMAX].a.a_int = min(i, 9999);
 
     /*  Dungeon level. */
-    (void) describe_level(blstats[idx][BL_LEVELDESC].val);
-    valset[BL_LEVELDESC] = TRUE; /* indicate val already set */
+    (void) describe_level(g.blstats[idx][BL_LEVELDESC].val);
+    g.valset[BL_LEVELDESC] = TRUE; /* indicate val already set */
 
     /* Gold */
-    if ((money = money_cnt(invent)) < 0L)
+    if ((money = money_cnt(g.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
-    blstats[idx][BL_GOLD].a.a_long = min(money, 999999L);
+    g.blstats[idx][BL_GOLD].a.a_long = min(money, 999999L);
     /*
      * The tty port needs to display the current symbol for gold
      * as a field header, so to accommodate that we pass gold with
@@ -619,84 +626,102 @@ bot_via_windowport()
      * The currency prefix is encoded as ten character \GXXXXNNNN
      * sequence.
      */
-    Sprintf(blstats[idx][BL_GOLD].val, "%s:%ld",
+    Sprintf(g.blstats[idx][BL_GOLD].val, "%s:%ld",
             (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
               : encglyph(objnum_to_glyph(GOLD_PIECE)),
-            blstats[idx][BL_GOLD].a.a_long);
-    valset[BL_GOLD] = TRUE; /* indicate val already set */
+            g.blstats[idx][BL_GOLD].a.a_long);
+    g.valset[BL_GOLD] = TRUE; /* indicate val already set */
 
     /* Power (magical energy) */
-    blstats[idx][BL_ENE].a.a_int = min(u.uen, 9999);
-    blstats[idx][BL_ENEMAX].a.a_int = min(u.uenmax, 9999);
+    g.blstats[idx][BL_ENE].a.a_int = min(u.uen, 9999);
+    g.blstats[idx][BL_ENEMAX].a.a_int = min(u.uenmax, 9999);
 
     /* Armor class */
-    blstats[idx][BL_AC].a.a_int = u.uac;
+    g.blstats[idx][BL_AC].a.a_int = u.uac;
 
     /* Monster level (if Upolyd) */
-    blstats[idx][BL_HD].a.a_int = Upolyd ? (int) mons[u.umonnum].mlevel : 0;
+    g.blstats[idx][BL_HD].a.a_int = Upolyd ? (int) mons[u.umonnum].mlevel : 0;
 
     /* Experience */
-    blstats[idx][BL_XP].a.a_int = u.ulevel;
-    blstats[idx][BL_EXP].a.a_long = u.uexp;
+    g.blstats[idx][BL_XP].a.a_int = u.ulevel;
+    g.blstats[idx][BL_EXP].a.a_long = u.uexp;
 
     /* Time (moves) */
-    blstats[idx][BL_TIME].a.a_long = moves;
+    g.blstats[idx][BL_TIME].a.a_long = g.moves;
 
     /* Hunger */
     /* note: u.uhs is unsigned, and 3.6.1's STATUS_HILITE defined
        BL_HUNGER to be ANY_UINT, but that was the only non-int/non-long
        numeric field so it's far simpler to treat it as plain int and
        not need ANY_UINT handling at all */
-    blstats[idx][BL_HUNGER].a.a_int = (int) u.uhs;
-    Strcpy(blstats[idx][BL_HUNGER].val,
+    g.blstats[idx][BL_HUNGER].a.a_int = (int) u.uhs;
+    Strcpy(g.blstats[idx][BL_HUNGER].val,
            (u.uhs != NOT_HUNGRY) ? hu_stat[u.uhs] : "");
-    valset[BL_HUNGER] = TRUE;
+    g.valset[BL_HUNGER] = TRUE;
 
     /* Carrying capacity */
     cap = near_capacity();
-    blstats[idx][BL_CAP].a.a_int = cap;
-    Strcpy(blstats[idx][BL_CAP].val,
+    g.blstats[idx][BL_CAP].a.a_int = cap;
+    Strcpy(g.blstats[idx][BL_CAP].val,
            (cap > UNENCUMBERED) ? enc_stat[cap] : "");
-    valset[BL_CAP] = TRUE;
+    g.valset[BL_CAP] = TRUE;
 
     /* Conditions */
-    blstats[idx][BL_CONDITION].a.a_ulong = 0L;
+    g.blstats[idx][BL_CONDITION].a.a_ulong = 0L;
     if (Stoned)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STONE;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STONE;
     if (Slimed)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_SLIME;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_SLIME;
     if (Strangled)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STRNGL;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STRNGL;
     if (Sick && (u.usick_type & SICK_VOMITABLE) != 0)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FOODPOIS;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FOODPOIS;
     if (Sick && (u.usick_type & SICK_NONVOMITABLE) != 0)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_TERMILL;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_TERMILL;
     /*
      * basic formatting puts hunger status and encumbrance here
      */
     if (Blind)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_BLIND;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_BLIND;
     if (Deaf)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_DEAF;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_DEAF;
     if (Stunned)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STUN;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STUN;
     if (Confusion)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_CONF;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_CONF;
     if (Hallucination)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_HALLU;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_HALLU;
     /* levitation and flying are mututally exclusive */
     if (Levitation)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_LEV;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_LEV;
     if (Flying)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FLY;
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FLY;
     if (u.usteed)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_RIDE;
-    evaluate_and_notify_windowport(valset, idx, idx_p);
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_RIDE;
+    evaluate_and_notify_windowport(g.valset, idx);
 }
 
-STATIC_OVL boolean
-evaluate_and_notify_windowport_field(fld, valsetlist, idx, idx_p)
-int fld, idx, idx_p;
+/* update just the status lines' 'time' field */
+static void
+stat_update_time()
+{
+    int idx = g.now_or_before_idx; /* no 0/1 toggle */
+    int fld = BL_TIME;
+
+    /* Time (moves) */
+    g.blstats[idx][fld].a.a_long = g.moves;
+    g.valset[fld] = FALSE;
+
+    eval_notify_windowport_field(fld, g.valset, idx);
+    if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
+        status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
+                      NO_COLOR, (unsigned long *) 0);
+    return;
+}
+
+static boolean
+eval_notify_windowport_field(fld, valsetlist, idx)
+int fld, idx;
 boolean *valsetlist;
 {
     static int oldrndencode = 0;
@@ -704,66 +729,96 @@ boolean *valsetlist;
     int pc, chg, color = NO_COLOR;
     unsigned anytype;
     boolean updated = FALSE, reset;
-    struct istat_s *curr = NULL, *prev = NULL;
-    enum statusfields idxmax;
+    struct istat_s *curr, *prev;
+    enum statusfields fldmax;
 
     /*
      *  Now pass the changed values to window port.
      */
-    anytype = blstats[idx][fld].anytype;
-    curr = &blstats[idx][fld];
-    prev = &blstats[idx_p][fld];
+    anytype = g.blstats[idx][fld].anytype;
+    curr = &g.blstats[idx][fld];
+    prev = &g.blstats[1 - idx][fld];
     color = NO_COLOR;
 
-    chg = update_all ? 0 : compare_blstats(prev, curr);
+    chg = g.update_all ? 0 : compare_blstats(prev, curr);
+    /*
+     * TODO:
+     *  Dynamically update 'percent_matters' as rules are added or
+     *  removed to track whether any of them are precentage rules.
+     *  Then there'll be no need to assume that non-Null 'thresholds'
+     *  means that percentages need to be kept up to date.
+     *  [Affects exp_percent_changing() too.]
+     */
+    if (((chg || g.update_all || fld == BL_XP)
+         && curr->percent_matters && curr->thresholds)
+        /* when 'hitpointbar' is On, percent matters even if HP
+           hasn't changed and has no percentage rules (in case HPmax
+           has changed when HP hasn't, where we ordinarily wouldn't
+           update HP so would miss an update of the hitpoint bar) */
+        || (fld == BL_HP && iflags.wc2_hitpointbar)) {
+        fldmax = curr->idxmax;
+        pc = (fldmax == BL_EXP) ? exp_percentage()
+             : (fldmax >= 0) ? percentage(curr, &g.blstats[idx][fldmax])
+               : 0; /* bullet proofing; can't get here */
+        if (pc != prev->percent_value)
+            chg = 1;
+        curr->percent_value = pc;
+    } else {
+        pc = 0;
+    }
 
     /* Temporary? hack: moveloop()'s prolog for a new game sets
-     * context.rndencode after the status window has been init'd,
+     * g.context.rndencode after the status window has been init'd,
      * so $:0 has already been encoded and cached by the window
      * port.  Without this hack, gold's \G sequence won't be
-     * recognized and ends up being displayed as-is for 'update_all'.
+     * recognized and ends up being displayed as-is for 'g.update_all'.
      *
-     * Also, even if context.rndencode hasn't changed and the
+     * Also, even if g.context.rndencode hasn't changed and the
      * gold amount itself hasn't changed, the glyph portion of the
      * encoding may have changed if a new symset was put into effect.
      *
      *  \GXXXXNNNN:25
-     *  XXXX = the context.rndencode portion
+     *  XXXX = the g.context.rndencode portion
      *  NNNN = the glyph portion
      *  25   = the gold amount
      *
      * Setting 'chg = 2' is enough to render the field properly, but
-     * not to honor an initial highlight, so force 'update_all = TRUE'.
+     * not to honor an initial highlight, so force 'g.update_all = TRUE'.
      */
     if (fld == BL_GOLD
-        && (context.rndencode != oldrndencode
-            || showsyms[COIN_CLASS + SYM_OFF_O] != oldgoldsym)) {
-        update_all = TRUE; /* chg = 2; */
-        oldrndencode = context.rndencode;
-        oldgoldsym = showsyms[COIN_CLASS + SYM_OFF_O];
+        && (g.context.rndencode != oldrndencode
+            || g.showsyms[COIN_CLASS + SYM_OFF_O] != oldgoldsym)) {
+        g.update_all = TRUE; /* chg = 2; */
+        oldrndencode = g.context.rndencode;
+        oldgoldsym = g.showsyms[COIN_CLASS + SYM_OFF_O];
     }
 
     reset = FALSE;
 #ifdef STATUS_HILITES
-    if (!update_all && !chg) {
-        reset = hilite_reset_needed(prev, bl_hilite_moves);
+    if (!g.update_all && !chg && curr->time) {
+        reset = hilite_reset_needed(prev, g.bl_hilite_moves);
         if (reset)
             curr->time = prev->time = 0L;
     }
 #endif
 
-    if (update_all || chg || reset) {
-        idxmax = curr->idxmax;
-        pc = (idxmax >= 0) ? percentage(curr, &blstats[idx][idxmax]) : 0;
-
+   if (g.update_all || chg || reset) {
         if (!valsetlist[fld])
             (void) anything_to_s(curr->val, &curr->a, anytype);
 
         if (anytype != ANY_MASK32) {
 #ifdef STATUS_HILITES
-            if ((chg || *curr->val)) {
-                get_hilite_color(idx, fld, (genericptr_t)&curr->a,
-                                 chg, pc, &color);
+            if (chg || *curr->val) {
+                /* if Xp percentage changed, we set 'chg' to 1 above;
+                   reset that if the Xp value hasn't actually changed
+                   or possibly went down rather than up (level loss) */
+                if (chg == 1 && fld == BL_XP)
+                    chg = compare_blstats(prev, curr);
+
+                curr->hilite_rule = get_hilite(idx, fld,
+                                               (genericptr_t) &curr->a,
+                                               chg, pc, &color);
+                prev->hilite_rule = curr->hilite_rule;
                 if (chg == 2) {
                     color = NO_COLOR;
                     chg = 0;
@@ -771,11 +826,11 @@ boolean *valsetlist;
             }
 #endif /* STATUS_HILITES */
             status_update(fld, (genericptr_t) curr->val,
-                          chg, pc, color, &cond_hilites[0]);
+                          chg, pc, color, (unsigned long *) 0);
         } else {
-            /* Color for conditions is done through cond_hilites[] */
-            status_update(fld, (genericptr_t) &curr->a.a_ulong, chg, pc,
-                          color, &cond_hilites[0]);
+            /* Color for conditions is done through g.cond_hilites[] */
+            status_update(fld, (genericptr_t) &curr->a.a_ulong,
+                          chg, pc, color, g.cond_hilites);
         }
         curr->chg = prev->chg = TRUE;
         updated = TRUE;
@@ -784,8 +839,8 @@ boolean *valsetlist;
 }
 
 static void
-evaluate_and_notify_windowport(valsetlist, idx, idx_p)
-int idx, idx_p;
+evaluate_and_notify_windowport(valsetlist, idx)
+int idx;
 boolean *valsetlist;
 {
     int i, updated = 0, notpresent = 0;
@@ -802,7 +857,7 @@ boolean *valsetlist;
             notpresent++;
             continue;
         }
-        if (evaluate_and_notify_windowport_field(i, valsetlist, idx, idx_p))
+        if (eval_notify_windowport_field(i, valsetlist, idx))
             updated++;
     }
     /*
@@ -814,9 +869,9 @@ boolean *valsetlist;
      *     fields that have changed since the previous update.
      *
      * In both of those situations, we need to force updates to
-     * all of the fields when context.botlx is set. The tty port in
+     * all of the fields when g.context.botlx is set. The tty port in
      * particular has a problem if that isn't done, since the core sets
-     * context.botlx when a menu or text display obliterates the status
+     * g.context.botlx when a menu or text display obliterates the status
      * line.
      *
      * For those situations, to trigger the full update of every field
@@ -828,85 +883,52 @@ boolean *valsetlist;
      * the display, call status_update() with BL_FLUSH.
      *
      */
-    if (context.botlx && (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
+    if (g.context.botlx && (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
         status_update(BL_RESET, (genericptr_t) 0, 0, 0,
-                      NO_COLOR, &cond_hilites[0]);
-    else if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
+                      NO_COLOR, (unsigned long *) 0);
+    else if ((updated || g.context.botlx)
+             && (windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
-                      NO_COLOR, &cond_hilites[0]);
+                      NO_COLOR, (unsigned long *) 0);
 
-    context.botl = context.botlx = 0;
-    update_all = FALSE;
-}
-
-void
-status_eval_next_unhilite()
-{
-    int i;
-    struct istat_s *curr = NULL;
-    long next_unhilite, this_unhilite;
-
-    bl_hilite_moves = moves;
-    /* figure out when the next unhilight needs to be performed */
-    next_unhilite = 0L;
-    for (i = 0; i < MAXBLSTATS; ++i) {
-        curr = &blstats[0][i]; /* blstats[0][*].time == blstats[1][*].time */
-
-        if (curr->chg) {
-            struct istat_s *prev = &blstats[1][i];
-
-#ifdef STATUS_HILITES
-            curr->time = prev->time = (bl_hilite_moves + iflags.hilite_delta);
-#endif
-            curr->chg = prev->chg = FALSE;
-        }
-
-        this_unhilite = curr->time;
-        if (this_unhilite > 0L
-            && (next_unhilite == 0L || this_unhilite < next_unhilite)
-#ifdef STATUS_HILITES
-            && hilite_reset_needed(curr, this_unhilite + 1L)
-#endif
-            )
-            next_unhilite = this_unhilite;
-    }
-    if (next_unhilite > 0L && next_unhilite < bl_hilite_moves)
-        context.botl = TRUE;
+    g.context.botl = g.context.botlx = iflags.time_botl = FALSE;
+    g.update_all = FALSE;
 }
 
 void
 status_initialize(reassessment)
-boolean
-    reassessment; /* TRUE = just reassess fields w/o other initialization*/
+boolean reassessment; /* TRUE: just recheck fields w/o other initialization */
 {
+    enum statusfields fld;
+    boolean fldenabl;
     int i;
-    const char *fieldfmt = (const char *) 0;
-    const char *fieldname = (const char *) 0;
+    const char *fieldfmt, *fieldname;
 
     if (!reassessment) {
-        if (blinit)
+        if (g.blinit)
             impossible("2nd status_initialize with full init.");
         init_blstats();
         (*windowprocs.win_status_init)();
-        blinit = TRUE;
+        g.blinit = TRUE;
+    } else if (!g.blinit) {
+        panic("status 'reassess' before init");
     }
     for (i = 0; i < MAXBLSTATS; ++i) {
-        enum statusfields fld = initblstats[i].fld;
-        boolean fldenabled = (fld == BL_SCORE) ? flags.showscore
-            : (fld == BL_XP) ? (boolean) !Upolyd
-            : (fld == BL_HD) ? (boolean) Upolyd
-            : (fld == BL_TIME) ? flags.time
-            : (fld == BL_EXP) ? (boolean) (flags.showexp && !Upolyd)
-            : TRUE;
+        fld = initblstats[i].fld;
+        fldenabl = (fld == BL_SCORE) ? flags.showscore
+                   : (fld == BL_TIME) ? flags.time
+                     : (fld == BL_EXP) ? (boolean) (flags.showexp && !Upolyd)
+                       : (fld == BL_XP) ? (boolean) !Upolyd
+                         : (fld == BL_HD) ? (boolean) Upolyd
+                           : TRUE;
 
         fieldname = initblstats[i].fldname;
-        if (fld == BL_TITLE && iflags.wc2_hitpointbar)
-            fieldfmt = "%-30s";
-        else
-            fieldfmt = initblstats[i].fldfmt;
-        status_enablefield(fld, fieldname, fieldfmt, fldenabled);
+        fieldfmt = (fld == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30.30s"
+                   : initblstats[i].fldfmt;
+        status_enablefield(fld, fieldname, fieldfmt, fldenabl);
     }
-    update_all = TRUE;
+    g.update_all = TRUE;
+    g.context.botlx = TRUE;
 }
 
 void
@@ -920,27 +942,28 @@ status_finish()
 
     /* free memory that we alloc'd now */
     for (i = 0; i < MAXBLSTATS; ++i) {
-        if (blstats[0][i].val)
-            free((genericptr_t) blstats[0][i].val), blstats[0][i].val = 0;
-        if (blstats[1][i].val)
-            free((genericptr_t) blstats[1][i].val), blstats[1][i].val = 0;
+        if (g.blstats[0][i].val)
+            free((genericptr_t) g.blstats[0][i].val), g.blstats[0][i].val = 0;
+        if (g.blstats[1][i].val)
+            free((genericptr_t) g.blstats[1][i].val), g.blstats[1][i].val = 0;
 #ifdef STATUS_HILITES
-        if (blstats[0][i].thresholds) {
-            struct hilite_s *temp = blstats[0][i].thresholds,
-                            *next = (struct hilite_s *)0;
-            while (temp) {
+        /* pointer to an entry in thresholds list; Null it out since
+           that list is about to go away */
+        g.blstats[0][i].hilite_rule = g.blstats[1][i].hilite_rule = 0;
+        if (g.blstats[0][i].thresholds) {
+            struct hilite_s *temp, *next;
+
+            for (temp = g.blstats[0][i].thresholds; temp; temp = next) {
                 next = temp->next;
-                free(temp);
-                blstats[0][i].thresholds = (struct hilite_s *)0;
-                blstats[1][i].thresholds = blstats[0][i].thresholds;
-                temp = next;
+                free((genericptr_t) temp);
             }
+            g.blstats[0][i].thresholds = g.blstats[1][i].thresholds = 0;
         }
 #endif /* STATUS_HILITES */
     }
 }
 
-STATIC_OVL void
+static void
 init_blstats()
 {
     static boolean initalready = FALSE;
@@ -950,26 +973,25 @@ init_blstats()
         impossible("init_blstats called more than once.");
         return;
     }
-
-    initalready = TRUE;
-    for (i = BEFORE; i <= NOW; ++i) {
+    for (i = 0; i <= 1; ++i) {
         for (j = 0; j < MAXBLSTATS; ++j) {
 #ifdef STATUS_HILITES
-            struct hilite_s *keep_hilite_chain = blstats[i][j].thresholds;
+            struct hilite_s *keep_hilite_chain = g.blstats[i][j].thresholds;
 #endif
 
-            blstats[i][j] = initblstats[j];
-            blstats[i][j].a = zeroany;
-            if (blstats[i][j].valwidth) {
-                blstats[i][j].val = (char *) alloc(blstats[i][j].valwidth);
-                blstats[i][j].val[0] = '\0';
+            g.blstats[i][j] = initblstats[j];
+            g.blstats[i][j].a = cg.zeroany;
+            if (g.blstats[i][j].valwidth) {
+                g.blstats[i][j].val = (char *) alloc(g.blstats[i][j].valwidth);
+                g.blstats[i][j].val[0] = '\0';
             } else
-                blstats[i][j].val = (char *) 0;
+                g.blstats[i][j].val = (char *) 0;
 #ifdef STATUS_HILITES
-            blstats[i][j].thresholds = keep_hilite_chain;
+            g.blstats[i][j].thresholds = keep_hilite_chain;
 #endif
         }
     }
+    initalready = TRUE;
 }
 
 /*
@@ -990,7 +1012,7 @@ init_blstats()
  *     - for strings,  0 = stayed the same, 1 = changed
  *
  */
-STATIC_OVL int
+static int
 compare_blstats(bl1, bl2)
 struct istat_s *bl1, *bl2;
 {
@@ -1063,7 +1085,7 @@ struct istat_s *bl1, *bl2;
     return result;
 }
 
-STATIC_OVL char *
+static char *
 anything_to_s(buf, a, anytype)
 char *buf;
 anything *a;
@@ -1110,7 +1132,7 @@ int anytype;
 }
 
 #ifdef STATUS_HILITES
-STATIC_OVL void
+static void
 s_to_anything(a, buf, anytype)
 anything *a;
 char *buf;
@@ -1159,7 +1181,7 @@ int anytype;
 }
 #endif /* STATUS_HILITES */
 
-STATIC_OVL int
+static int
 percentage(bl, maxbl)
 struct istat_s *bl, *maxbl;
 {
@@ -1224,14 +1246,121 @@ struct istat_s *bl, *maxbl;
     return result;
 }
 
+/* percentage for both xp (level) and exp (points) is the percentage for
+   (curr_exp - this_level_start) in (next_level_start - this_level_start) */
+static int
+exp_percentage()
+{
+    int res = 0;
+
+    if (u.ulevel < 30) {
+        long exp_val, nxt_exp_val, curlvlstart;
+
+        curlvlstart = newuexp(u.ulevel - 1);
+        exp_val = u.uexp - curlvlstart;
+        nxt_exp_val = newuexp(u.ulevel) - curlvlstart;
+        if (exp_val == nxt_exp_val - 1L) {
+            /*
+             * Full 100% is unattainable since hero gains a level
+             * and the threshold for next level increases, but treat
+             * (next_level_start - 1 point) as a special case.  It's a
+             * key value after being level drained so is something that
+             * some players would like to be able to highlight distinctly.
+             */
+            res = 100;
+        } else {
+            struct istat_s curval, maxval;
+
+            curval.anytype = maxval.anytype = ANY_LONG;
+            curval.a = maxval.a = cg.zeroany;
+            curval.a.a_long = exp_val;
+            maxval.a.a_long = nxt_exp_val;
+            /* maximum delta between levels is 10000000; calculation of
+               100 * (10000000 - N) / 10000000 fits within 32-bit long */
+            res = percentage(&curval, &maxval);
+        }
+    }
+    return res;
+}
+
+/* experience points have changed but experience level hasn't; decide whether
+   botl update is needed for a different percentage highlight rule for Xp */
+boolean
+exp_percent_changing()
+{
+    int pc, color_dummy;
+    anything a;
+    struct hilite_s *rule;
+    struct istat_s *curr;
+
+    /* if status update is already requested, skip this processing */
+    if (!g.context.botl) {
+        /*
+         * Status update is warranted iff percent integer changes and the new
+         * percentage results in a different highlighting rule being selected.
+         */
+        curr = &g.blstats[g.now_or_before_idx][BL_XP];
+        /* TODO: [see eval_notify_windowport_field() about percent_matters
+           and the check against 'thresholds'] */
+        if (curr->percent_matters && curr->thresholds
+            && (pc = exp_percentage()) != curr->percent_value) {
+            a = cg.zeroany;
+            a.a_int = (int) u.ulevel;
+            rule = get_hilite(g.now_or_before_idx, BL_XP,
+                              (genericptr_t) &a, 0, pc, &color_dummy);
+            if (rule != curr->hilite_rule)
+                return TRUE; /* caller should set 'g.context.botl' to True */
+        }
+    }
+    return FALSE;
+}
+
+/* callback so that interface can get capacity index rather than trying
+   to reconstruct that from the encumbrance string or asking the general
+   core what the value is */
+int
+stat_cap_indx()
+{
+    int cap;
+
+#ifdef STATUS_HILITES
+    cap = g.blstats[g.now_or_before_idx][BL_CAP].a.a_int;
+#else
+    cap = near_capacity();
+#endif
+    return cap;
+}
+
+/* callback so that interface can get hunger index rather than trying to
+   reconstruct that from the hunger string or dipping into core internals */
+int
+stat_hunger_indx()
+{
+    int uhs;
+
+#ifdef STATUS_HILITES
+    uhs = g.blstats[g.now_or_before_idx][BL_HUNGER].a.a_int;
+#else
+    uhs = (int) u.uhs;
+#endif
+    return uhs;
+}
+
+/* used by X11 for "tty status" even when STATUS_HILITES is disabled */
+const char *
+bl_idx_to_fldname(idx)
+int idx;
+{
+    if (idx >= 0 && idx < MAXBLSTATS)
+        return initblstats[idx].fldname;
+    return (const char *) 0;
+}
 
 #ifdef STATUS_HILITES
 
 /****************************************************************************/
 /* Core status hiliting support */
 /****************************************************************************/
-
-struct hilite_s status_hilites[MAXBLSTATS];
 
 static struct fieldid_t {
     const char *fieldname;
@@ -1266,17 +1395,8 @@ static const char threshold_value[] = "hilite_status threshold ",
                   is_out_of_range[] = " is out of range";
 
 
-const char *
-bl_idx_to_fldname(idx)
-int idx;
-{
-    if (idx >= 0 && idx < MAXBLSTATS)
-        return initblstats[idx].fldname;
-    return (const char *) 0;
-}
-
 /* field name to bottom line index */
-STATIC_OVL enum statusfields
+static enum statusfields
 fldname_to_bl_indx(name)
 const char *name;
 {
@@ -1315,34 +1435,69 @@ const char *name;
     return (nmatches == 1) ? fld : BL_FLUSH;
 }
 
-STATIC_OVL boolean
+static boolean
 hilite_reset_needed(bl_p, augmented_time)
 struct istat_s *bl_p;
-long augmented_time;
+long augmented_time; /* no longer augmented; it once encoded fractional
+                      * amounts for multiple moves within same turn     */
 {
-    struct hilite_s *tl = bl_p->thresholds;
-
     /*
      * This 'multi' handling may need some tuning...
      */
-    if (multi)
+    if (g.multi)
+        return FALSE;
+
+    if (!Is_Temp_Hilite(bl_p->hilite_rule))
         return FALSE;
 
     if (bl_p->time == 0 || bl_p->time >= augmented_time)
         return FALSE;
 
-    while (tl) {
-        /* only this style times out (includes general 'changed'
-           as well as specific 'up' and 'down') */
-        if (tl->behavior == BL_TH_UPDOWN)
-            return TRUE;
-        tl = tl->next;
-    }
-
-    return FALSE;
+    return TRUE;
 }
 
-/* called by options handling when 'statushilites' boolean is toggled */
+/* called from moveloop(); sets context.botl if temp hilites have timed out */
+void
+status_eval_next_unhilite()
+{
+    int i;
+    struct istat_s *curr;
+    long next_unhilite, this_unhilite;
+
+    g.bl_hilite_moves = g.moves; /* simpllfied; used to try to encode fractional
+                              * amounts for multiple moves within same turn */
+    /* figure out whether an unhilight needs to be performed now */
+    next_unhilite = 0L;
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        curr = &g.blstats[0][i]; /* g.blstats[0][*].time == g.blstats[1][*].time */
+
+        if (curr->chg) {
+            struct istat_s *prev = &g.blstats[1][i];
+
+            if (Is_Temp_Hilite(curr->hilite_rule))
+                curr->time = prev->time = (g.bl_hilite_moves
+                                           + iflags.hilite_delta);
+            else
+                curr->time = prev->time = 0L;
+
+            curr->chg = prev->chg = FALSE;
+            g.context.botl = TRUE;
+        }
+        if (g.context.botl)
+            continue; /* just process other g.blstats[][].time and .chg */
+
+        this_unhilite = curr->time;
+        if (this_unhilite > 0L
+            && (next_unhilite == 0L || this_unhilite < next_unhilite)
+            && hilite_reset_needed(curr, this_unhilite + 1L)) {
+            next_unhilite = this_unhilite;
+            if (next_unhilite < g.bl_hilite_moves)
+                g.context.botl = TRUE;
+        }
+    }
+}
+
+/* called by options handling when 'statushilites' value is changed */
 void
 reset_status_hilites()
 {
@@ -1350,15 +1505,15 @@ reset_status_hilites()
         int i;
 
         for (i = 0; i < MAXBLSTATS; ++i)
-            blstats[0][i].time = blstats[1][i].time = 0L;
-        update_all = TRUE;
+            g.blstats[0][i].time = g.blstats[1][i].time = 0L;
+        g.update_all = TRUE;
     }
-    context.botlx = TRUE;
+    g.context.botlx = TRUE;
 }
 
 /* test whether the text from a title rule matches the string for
    title-while-polymorphed in the 'textmatch' menu */
-STATIC_OVL boolean
+static boolean
 noneoftheabove(hl_text)
 const char *hl_text;
 {
@@ -1370,33 +1525,13 @@ const char *hl_text;
     return FALSE;
 }
 
-STATIC_OVL void
-merge_bestcolor(bestcolor, newcolor)
-int *bestcolor;
-int newcolor;
-{
-    int natr = HL_UNDEF, nclr = NO_COLOR;
-
-    split_clridx(newcolor, &nclr, &natr);
-
-    if (nclr != NO_COLOR)
-        *bestcolor = (*bestcolor & 0xff00) | nclr;
-
-    if (natr != HL_UNDEF) {
-        if (natr == HL_NONE)
-            *bestcolor = *bestcolor & 0x00ff; /* reset all attributes */
-        else
-            *bestcolor |= (natr << 8); /* merge attributes */
-    }
-}
-
 /*
- * get_hilite_color
+ * get_hilite
  *
- * Figures out, based on the value and the direction it is moving,
- * the color that the field should be displayed in.
+ * Returns, based on the value and the direction it is moving,
+ * the highlight rule that applies to the specified field.
  *
- * Provide get_hilite_color() with the following to work with:
+ * Provide get_hilite() with the following to work with:
  *     actual value vp
  *          useful for BL_TH_VAL_ABSOLUTE
  *     indicator of down, up, or the same (-1, 1, 0) chg
@@ -1405,28 +1540,22 @@ int newcolor;
  *          useful for BL_TH_VAL_PERCENTAGE
  *
  * Get back:
- *     color     based on user thresholds set in config file.
- *               The rightmost 8 bits contain a color index.
- *               The 8 bits to the left of that contain
- *               the attribute bits.
- *                   color = 0x00FF
- *                   attrib= 0xFF00
+ *     pointer to rule that applies; Null if no rule does.
  */
-STATIC_OVL void
-get_hilite_color(idx, fldidx, vp, chg, pc, colorptr)
+static struct hilite_s *
+get_hilite(idx, fldidx, vp, chg, pc, colorptr)
 int idx, fldidx, chg, pc;
 genericptr_t vp;
 int *colorptr;
 {
-    int bestcolor = NO_COLOR;
-    struct hilite_s *hl;
+    struct hilite_s *hl, *rule = 0;
     anything *value = (anything *) vp;
     char *txtstr;
 
-    if (!colorptr || fldidx < 0 || fldidx >= MAXBLSTATS)
-        return;
+    if (fldidx < 0 || fldidx >= MAXBLSTATS)
+        return (struct hilite_s *) 0;
 
-    if (blstats[idx][fldidx].thresholds) {
+    if (has_hilite(fldidx)) {
         int dt;
         /* there are hilites set here */
         int max_pc = -1, min_pc = 101;
@@ -1440,7 +1569,7 @@ int *colorptr;
                 perc_or_abs = FALSE;
 
         /* min_/max_ are used to track best fit */
-        for (hl = blstats[idx][fldidx].thresholds; hl; hl = hl->next) {
+        for (hl = g.blstats[0][fldidx].thresholds; hl; hl = hl->next) {
             dt = initblstats[fldidx].anytype; /* only needed for 'absolute' */
             /* if we've already matched a temporary highlight, it takes
                precedence over all persistent ones; we still process
@@ -1455,7 +1584,7 @@ int *colorptr;
             switch (hl->behavior) {
             case BL_TH_VAL_PERCENTAGE: /* percent values are always ANY_INT */
                 if (hl->rel == EQ_VALUE && pc == hl->value.a_int) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    rule = hl;
                     min_pc = max_pc = hl->value.a_int;
                     exactmatch = perc_or_abs = TRUE;
                 } else if (exactmatch) {
@@ -1463,25 +1592,25 @@ int *colorptr;
                 } else if (hl->rel == LT_VALUE
                            && (pc < hl->value.a_int)
                            && (hl->value.a_int <= min_pc)) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    rule = hl;
                     min_pc = hl->value.a_int;
                     perc_or_abs = TRUE;
                 } else if (hl->rel == LE_VALUE
                            && (pc <= hl->value.a_int)
                            && (hl->value.a_int <= min_pc)) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    rule = hl;
                     min_pc = hl->value.a_int;
                     perc_or_abs = TRUE;
                 } else if (hl->rel == GT_VALUE
                            && (pc > hl->value.a_int)
                            && (hl->value.a_int >= max_pc)) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    rule = hl;
                     max_pc = hl->value.a_int;
                     perc_or_abs = TRUE;
                 } else if (hl->rel == GE_VALUE
                            && (pc >= hl->value.a_int)
                            && (hl->value.a_int >= max_pc)) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    rule = hl;
                     max_pc = hl->value.a_int;
                     perc_or_abs = TRUE;
                 }
@@ -1490,13 +1619,13 @@ int *colorptr;
                 /* specific 'up' or 'down' takes precedence over general
                    'changed' regardless of their order in the rule set */
                 if (chg < 0 && hl->rel == LT_VALUE) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    rule = hl;
                     updown = TRUE;
                 } else if (chg > 0 && hl->rel == GT_VALUE) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    rule = hl;
                     updown = TRUE;
                 } else if (chg != 0 && hl->rel == EQ_VALUE && !updown) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    rule = hl;
                     changed = TRUE;
                 }
                 break;
@@ -1509,7 +1638,7 @@ int *colorptr;
                 if (dt == ANY_INT) {
                     if (hl->rel == EQ_VALUE
                         && hl->value.a_int == value->a_int) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         min_ival = max_ival = hl->value.a_int;
                         exactmatch = perc_or_abs = TRUE;
                     } else if (exactmatch) {
@@ -1517,32 +1646,32 @@ int *colorptr;
                     } else if (hl->rel == LT_VALUE
                                && (value->a_int < hl->value.a_int)
                                && (hl->value.a_int <= min_ival)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         min_ival = hl->value.a_int;
                         perc_or_abs = TRUE;
                     } else if (hl->rel == LE_VALUE
                                && (value->a_int <= hl->value.a_int)
                                && (hl->value.a_int <= min_ival)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         min_ival = hl->value.a_int;
                         perc_or_abs = TRUE;
                     } else if (hl->rel == GT_VALUE
                                && (value->a_int > hl->value.a_int)
                                && (hl->value.a_int >= max_ival)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         max_ival = hl->value.a_int;
                         perc_or_abs = TRUE;
                     } else if (hl->rel == GE_VALUE
                                && (value->a_int >= hl->value.a_int)
                                && (hl->value.a_int >= max_ival)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         max_ival = hl->value.a_int;
                         perc_or_abs = TRUE;
                     }
                 } else { /* ANY_LONG */
                     if (hl->rel == EQ_VALUE
                         && hl->value.a_long == value->a_long) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         min_lval = max_lval = hl->value.a_long;
                         exactmatch = perc_or_abs = TRUE;
                     } else if (exactmatch) {
@@ -1550,49 +1679,49 @@ int *colorptr;
                     } else if (hl->rel == LT_VALUE
                                && (value->a_long < hl->value.a_long)
                                && (hl->value.a_long <= min_lval)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         min_lval = hl->value.a_long;
                         perc_or_abs = TRUE;
                     } else if (hl->rel == LE_VALUE
                                && (value->a_long <= hl->value.a_long)
                                && (hl->value.a_long <= min_lval)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         min_lval = hl->value.a_long;
                         perc_or_abs = TRUE;
                     } else if (hl->rel == GT_VALUE
                                && (value->a_long > hl->value.a_long)
                                && (hl->value.a_long >= max_lval)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         max_lval = hl->value.a_long;
                         perc_or_abs = TRUE;
                     } else if (hl->rel == GE_VALUE
                                && (value->a_long >= hl->value.a_long)
                                && (hl->value.a_long >= max_lval)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         max_lval = hl->value.a_long;
                         perc_or_abs = TRUE;
                     }
                 }
                 break;
             case BL_TH_TEXTMATCH: /* ANY_STR */
-                txtstr = blstats[idx][fldidx].val;
+                txtstr = g.blstats[idx][fldidx].val;
                 if (fldidx == BL_TITLE)
                     /* "<name> the <rank-title>", skip past "<name> the " */
-                    txtstr += (strlen(plname) + sizeof " the " - sizeof "");
+                    txtstr += (strlen(g.plname) + sizeof " the " - sizeof "");
                 if (hl->rel == TXT_VALUE && hl->textmatch[0]) {
                     if (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                         exactmatch = TRUE;
                     } else if (exactmatch) {
                         ; /* already found best fit, skip "noneoftheabove" */
                     } else if (fldidx == BL_TITLE
                                && Upolyd && noneoftheabove(hl->textmatch)) {
-                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        rule = hl;
                     }
                 }
                 break;
             case BL_TH_ALWAYS_HILITE:
-                merge_bestcolor(&bestcolor, hl->coloridx);
+                rule = hl;
                 break;
             case BL_TH_NONE:
                 break;
@@ -1601,11 +1730,11 @@ int *colorptr;
             }
         }
     }
-    *colorptr = bestcolor;
-    return;
+    *colorptr = rule ? rule->coloridx : NO_COLOR;
+    return rule;
 }
 
-STATIC_OVL void
+static void
 split_clridx(idx, coloridx, attrib)
 int idx;
 int *coloridx, *attrib;
@@ -1681,7 +1810,7 @@ boolean from_configfile;
 }
 
 /* is str in the format of "[<>]?=?[-+]?[0-9]+%?" regex */
-STATIC_OVL boolean
+static boolean
 is_ltgt_percentnumber(str)
 const char *str;
 {
@@ -1703,7 +1832,7 @@ const char *str;
 }
 
 /* does str only contain "<>=-+0-9%" chars */
-STATIC_OVL boolean
+static boolean
 has_ltgt_percentnumber(str)
 const char *str;
 {
@@ -1721,7 +1850,7 @@ const char *str;
  * returns number of strings, or -1 if more than maxsf or MAX_SUBFIELDS
  */
 #define MAX_SUBFIELDS 16
-STATIC_OVL int
+static int
 splitsubfields(str, sfarr, maxsf)
 char *str;
 char ***sfarr;
@@ -1765,7 +1894,7 @@ int maxsf;
 }
 #undef MAX_SUBFIELDS
 
-boolean
+static boolean
 is_fld_arrayvalues(str, arr, arrmin, arrmax, retidx)
 const char *str;
 const char *const *arr;
@@ -1782,7 +1911,7 @@ int *retidx;
     return FALSE;
 }
 
-int
+static int
 query_arrayvalue(querystr, arr, arrmin, arrmax)
 const char *querystr;
 const char *const *arr;
@@ -1798,7 +1927,7 @@ int arrmin, arrmax;
     start_menu(tmpwin);
 
     for (i = arrmin; i < arrmax; i++) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = i + adj;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  arr[i], MENU_UNSELECTED);
@@ -1816,7 +1945,7 @@ int arrmin, arrmax;
     return ret;
 }
 
-void
+static void
 status_hilite_add_threshold(fld, hilite)
 int fld;
 struct hilite_s *hilite;
@@ -1832,16 +1961,16 @@ struct hilite_s *hilite;
 
     new_hilite->set = TRUE;
     new_hilite->fld = fld;
-    new_hilite->next = blstats[0][fld].thresholds;
-    blstats[0][fld].thresholds = new_hilite;
+    new_hilite->next = g.blstats[0][fld].thresholds;
+    g.blstats[0][fld].thresholds = new_hilite;
     /* sort_hilites(fld) */
 
     /* current and prev must both point at the same hilites */
-    blstats[1][fld].thresholds = blstats[0][fld].thresholds;
+    g.blstats[1][fld].thresholds = g.blstats[0][fld].thresholds;
 }
 
 
-STATIC_OVL boolean
+static boolean
 parse_status_hl2(s, from_configfile)
 char (*s)[QBUFSZ];
 boolean from_configfile;
@@ -2112,9 +2241,9 @@ boolean from_configfile;
 
         hilite.anytype = dt;
 
-        if (hilite.behavior == BL_TH_TEXTMATCH && txt
-            && strlen(txt) < QBUFSZ - 1) {
-            Strcpy(hilite.textmatch, txt);
+        if (hilite.behavior == BL_TH_TEXTMATCH && txt) {
+            (void) strncpy(hilite.textmatch, txt, sizeof hilite.textmatch);
+            hilite.textmatch[sizeof hilite.textmatch - 1] = '\0';
             (void) trimspaces(hilite.textmatch);
         }
 
@@ -2126,6 +2255,7 @@ boolean from_configfile;
 
     return TRUE;
 }
+#endif /* STATUS_HILITES */
 
 const struct condmap valid_conditions[] = {
     { "stone",    BL_MASK_STONE },
@@ -2142,6 +2272,8 @@ const struct condmap valid_conditions[] = {
     { "fly",      BL_MASK_FLY },
     { "ride",     BL_MASK_RIDE },
 };
+
+#ifdef STATUS_HILITES
 
 const struct condmap condition_aliases[] = {
     { "strangled",      BL_MASK_STRNGL },
@@ -2170,7 +2302,7 @@ query_conditions()
     start_menu(tmpwin);
 
     for (i = 0; i < SIZE(valid_conditions); i++) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_ulong = valid_conditions[i].bitmask;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  valid_conditions[i].id, MENU_UNSELECTED);
@@ -2188,7 +2320,7 @@ query_conditions()
     return ret;
 }
 
-STATIC_OVL char *
+static char *
 conditionbitmask2str(ul)
 unsigned long ul;
 {
@@ -2219,7 +2351,7 @@ unsigned long ul;
     return buf;
 }
 
-STATIC_OVL unsigned long
+static unsigned long
 match_str2conditionbitmask(str)
 const char *str;
 {
@@ -2258,7 +2390,7 @@ const char *str;
     return mask;
 }
 
-STATIC_OVL unsigned long
+static unsigned long
 str2conditionbitmask(str)
 char *str;
 {
@@ -2283,7 +2415,7 @@ char *str;
     return conditions_bitmask;
 }
 
-STATIC_OVL boolean
+static boolean
 parse_condition(s, sidx)
 char (*s)[QBUFSZ];
 int sidx;
@@ -2299,6 +2431,15 @@ int sidx;
 
     /*3.6.1:
       OPTION=hilite_status: condition/stone+slime+foodPois/red&inverse */
+
+    /*
+     * TODO?
+     *  It would be simpler to treat each condition (also hunger state
+     *  and encumbrance level) as if it were a separate field.  That
+     *  way they could have either or both 'changed' temporary rule and
+     *  'always' persistent rule and wouldn't need convoluted access to
+     *  the intended color and attributes.
+     */
 
     sidx++;
     while(s[sidx]) {
@@ -2321,7 +2462,7 @@ int sidx;
         /*
          * We have the conditions_bitmask with bits set for
          * each ailment we want in a particular color and/or
-         * attribute, but we need to assign it to an arry of
+         * attribute, but we need to assign it to an array of
          * bitmasks indexed by the color chosen
          *        (0 to (CLR_MAX - 1))
          * and/or attributes chosen
@@ -2362,22 +2503,23 @@ int sidx;
 
         for (i = 0; i < sf; ++i) {
             int a = match_str2attr(subfields[i], FALSE);
+
             if (a == ATR_DIM)
-                cond_hilites[HL_ATTCLR_DIM] |= conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_DIM] |= conditions_bitmask;
             else if (a == ATR_BLINK)
-                cond_hilites[HL_ATTCLR_BLINK] |= conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_BLINK] |= conditions_bitmask;
             else if (a == ATR_ULINE)
-                cond_hilites[HL_ATTCLR_ULINE] |= conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_ULINE] |= conditions_bitmask;
             else if (a == ATR_INVERSE)
-                cond_hilites[HL_ATTCLR_INVERSE] |= conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_INVERSE] |= conditions_bitmask;
             else if (a == ATR_BOLD)
-                cond_hilites[HL_ATTCLR_BOLD] |= conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_BOLD] |= conditions_bitmask;
             else if (a == ATR_NONE) {
-                cond_hilites[HL_ATTCLR_DIM] &= ~conditions_bitmask;
-                cond_hilites[HL_ATTCLR_BLINK] &= ~conditions_bitmask;
-                cond_hilites[HL_ATTCLR_ULINE] &= ~conditions_bitmask;
-                cond_hilites[HL_ATTCLR_INVERSE] &= ~conditions_bitmask;
-                cond_hilites[HL_ATTCLR_BOLD] &= ~conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_DIM] &= ~conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_BLINK] &= ~conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_ULINE] &= ~conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_INVERSE] &= ~conditions_bitmask;
+                g.cond_hilites[HL_ATTCLR_BOLD] &= ~conditions_bitmask;
             } else {
                 int k = match_str2clr(subfields[i]);
 
@@ -2389,7 +2531,7 @@ int sidx;
         /* set the bits in the appropriate member of the
            condition array according to color chosen as index */
 
-        cond_hilites[coloridx] |= conditions_bitmask;
+        g.cond_hilites[coloridx] |= conditions_bitmask;
         success = TRUE;
         sidx++;
     }
@@ -2402,21 +2544,19 @@ clear_status_hilites()
     int i;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
-        if (blstats[0][i].thresholds) {
-            struct hilite_s *temp = blstats[0][i].thresholds,
-                            *next = (struct hilite_s *)0;
-            while (temp) {
-                next = temp->next;
-                free(temp);
-                blstats[0][i].thresholds = (struct hilite_s *)0;
-                blstats[1][i].thresholds = blstats[0][i].thresholds;
-                temp = next;
-            }
+        struct hilite_s *temp, *next;
+
+        for (temp = g.blstats[0][i].thresholds; temp; temp = next) {
+            next = temp->next;
+            free(temp);
         }
+        g.blstats[0][i].thresholds = g.blstats[1][i].thresholds = 0;
+        /* pointer into thresholds list, now stale */
+        g.blstats[0][i].hilite_rule = g.blstats[1][i].hilite_rule = 0;
     }
 }
 
-STATIC_OVL char *
+static char *
 hlattr2attrname(attrib, buf, bufsz)
 int attrib, bufsz;
 char *buf;
@@ -2463,7 +2603,7 @@ struct _status_hilite_line_str {
 static struct _status_hilite_line_str *status_hilite_str = 0;
 static int status_hilite_str_id = 0;
 
-STATIC_OVL void
+static void
 status_hilite_linestr_add(fld, hl, mask, str)
 int fld;
 struct hilite_s *hl;
@@ -2494,7 +2634,7 @@ const char *str;
     }
 }
 
-STATIC_OVL void
+static void
 status_hilite_linestr_done()
 {
     struct _status_hilite_line_str *nxt, *tmp = status_hilite_str;
@@ -2508,7 +2648,7 @@ status_hilite_linestr_done()
     status_hilite_str_id = 0;
 }
 
-STATIC_OVL int
+static int
 status_hilite_linestr_countfield(fld)
 int fld;
 {
@@ -2535,7 +2675,7 @@ count_status_hilites(VOID_ARGS)
     return count;
 }
 
-STATIC_OVL void
+static void
 status_hilite_linestr_gather_conditions()
 {
     int i;
@@ -2553,19 +2693,19 @@ status_hilite_linestr_gather_conditions()
         int j;
 
         for (j = 0; j < CLR_MAX; j++)
-            if (cond_hilites[j] & valid_conditions[i].bitmask) {
+            if (g.cond_hilites[j] & valid_conditions[i].bitmask) {
                 clr = j;
                 break;
             }
-        if (cond_hilites[HL_ATTCLR_DIM] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_DIM] & valid_conditions[i].bitmask)
             atr |= HL_DIM;
-        if (cond_hilites[HL_ATTCLR_BOLD] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_BOLD] & valid_conditions[i].bitmask)
             atr |= HL_BOLD;
-        if (cond_hilites[HL_ATTCLR_BLINK] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_BLINK] & valid_conditions[i].bitmask)
             atr |= HL_BLINK;
-        if (cond_hilites[HL_ATTCLR_ULINE] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_ULINE] & valid_conditions[i].bitmask)
             atr |= HL_ULINE;
-        if (cond_hilites[HL_ATTCLR_INVERSE] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_INVERSE] & valid_conditions[i].bitmask)
             atr |= HL_INVERSE;
         if (atr != HL_NONE)
             atr &= ~HL_NONE;
@@ -2615,7 +2755,7 @@ status_hilite_linestr_gather_conditions()
         }
 }
 
-STATIC_OVL void
+static void
 status_hilite_linestr_gather()
 {
     int i;
@@ -2624,7 +2764,7 @@ status_hilite_linestr_gather()
     status_hilite_linestr_done();
 
     for (i = 0; i < MAXBLSTATS; i++) {
-        hl = blstats[0][i].thresholds;
+        hl = g.blstats[0][i].thresholds;
         while (hl) {
             status_hilite_linestr_add(i, hl, 0UL, status_hilite2str(hl));
             hl = hl->next;
@@ -2635,7 +2775,7 @@ status_hilite_linestr_gather()
 }
 
 
-char *
+static char *
 status_hilite2str(hl)
 struct hilite_s *hl;
 {
@@ -2714,7 +2854,7 @@ struct hilite_s *hl;
     return buf;
 }
 
-STATIC_OVL int
+static int
 status_hilite_menu_choose_field()
 {
     winid tmpwin;
@@ -2728,10 +2868,10 @@ status_hilite_menu_choose_field()
     for (i = 0; i < MAXBLSTATS; i++) {
 #ifndef SCORE_ON_BOTL
         if (initblstats[i].fld == BL_SCORE
-            && !blstats[0][BL_SCORE].thresholds)
+            && !g.blstats[0][BL_SCORE].thresholds)
             continue;
 #endif
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = (i + 1);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  initblstats[i].fldname, MENU_UNSELECTED);
@@ -2748,7 +2888,7 @@ status_hilite_menu_choose_field()
     return fld;
 }
 
-STATIC_OVL int
+static int
 status_hilite_menu_choose_behavior(fld)
 int fld;
 {
@@ -2769,7 +2909,7 @@ int fld;
     start_menu(tmpwin);
 
     if (fld != BL_CONDITION) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_ALWAYS_HILITE;
         Sprintf(buf, "Always highlight %s", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 'a', 0, ATR_NONE,
@@ -2778,7 +2918,7 @@ int fld;
     }
 
     if (fld == BL_CONDITION) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_CONDITION;
         add_menu(tmpwin, NO_GLYPH, &any, 'b', 0, ATR_NONE,
                  "Bitmask of conditions", MENU_UNSELECTED);
@@ -2786,7 +2926,7 @@ int fld;
     }
 
     if (fld != BL_CONDITION) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_UPDOWN;
         Sprintf(buf, "%s value changes", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE,
@@ -2796,7 +2936,7 @@ int fld;
 
     if (fld != BL_CAP && fld != BL_HUNGER
         && (at == ANY_INT || at == ANY_LONG)) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_ABSOLUTE;
         add_menu(tmpwin, NO_GLYPH, &any, 'n', 0, ATR_NONE,
                  "Number threshold", MENU_UNSELECTED);
@@ -2804,7 +2944,7 @@ int fld;
     }
 
     if (initblstats[fld].idxmax >= 0) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_PERCENTAGE;
         add_menu(tmpwin, NO_GLYPH, &any, 'p', 0, ATR_NONE,
                  "Percentage threshold", MENU_UNSELECTED);
@@ -2813,7 +2953,7 @@ int fld;
 
     if (initblstats[fld].anytype == ANY_STR
         || fld == BL_CAP || fld == BL_HUNGER) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_TEXTMATCH;
         Sprintf(buf, "%s text match", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 't', 0, ATR_NONE,
@@ -2840,7 +2980,7 @@ int fld;
     return beh;
 }
 
-STATIC_OVL int
+static int
 status_hilite_menu_choose_updownboth(fld, str, ltok, gtok)
 int fld;
 const char *str;
@@ -2861,7 +3001,7 @@ boolean ltok, gtok;
                     (fld == BL_AC) ? "Better (lower)" : "Less", str);
         else
             Sprintf(buf, "Value goes down");
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = 10 + LT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
@@ -2869,7 +3009,7 @@ boolean ltok, gtok;
         if (str) {
             Sprintf(buf, "%s or %s",
                     str, (fld == BL_AC) ? "better (lower)" : "less");
-            any = zeroany;
+            any = cg.zeroany;
             any.a_int = 10 + LE_VALUE;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      buf, MENU_UNSELECTED);
@@ -2880,7 +3020,7 @@ boolean ltok, gtok;
         Sprintf(buf, "Exactly %s", str);
     else
         Sprintf(buf, "Value changes");
-    any = zeroany;
+    any = cg.zeroany;
     any.a_int = 10 + EQ_VALUE;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
              buf, MENU_UNSELECTED);
@@ -2889,7 +3029,7 @@ boolean ltok, gtok;
         if (str) {
             Sprintf(buf, "%s or %s",
                     str, (fld == BL_AC) ? "worse (higher)" : "more");
-            any = zeroany;
+            any = cg.zeroany;
             any.a_int = 10 + GE_VALUE;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      buf, MENU_UNSELECTED);
@@ -2900,7 +3040,7 @@ boolean ltok, gtok;
                     (fld == BL_AC) ? "Worse (higher)" : "More", str);
         else
             Sprintf(buf, "Value goes up");
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = 10 + GT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
              buf, MENU_UNSELECTED);
@@ -2918,7 +3058,7 @@ boolean ltok, gtok;
     return ret;
 }
 
-STATIC_OVL boolean
+static boolean
 status_hilite_menu_add(origfld)
 int origfld;
 {
@@ -3032,7 +3172,7 @@ choose_value:
                      : (lt_gt_eq == EQ_VALUE) ? "="
                        : ""; /* didn't specify lt_gt_eq with number */
 
-        aval = zeroany;
+        aval = cg.zeroany;
         dt = percent ? ANY_INT : initblstats[fld].anytype;
         (void) s_to_anything(&aval, numstart, dt);
 
@@ -3069,8 +3209,8 @@ choose_value:
                   op, aval.a_int, is_out_of_range);
             goto choose_value;
         } else if (dt == ANY_LONG
-                   && (aval.a_long < (lt_gt_eq == GT_VALUE) ? -1L
-                                     : (lt_gt_eq == LT_VALUE) ? 1L : 0L)) {
+                   && (aval.a_long < ((lt_gt_eq == GT_VALUE) ? -1L
+                                      : (lt_gt_eq == LT_VALUE) ? 1L : 0L))) {
             pline("%s'%s%ld'%s", threshold_value,
                   op, aval.a_long, is_out_of_range);
             goto choose_value;
@@ -3192,13 +3332,13 @@ choose_value:
             Strcpy(hilite.textmatch, hutxt[rv]);
         } else if (fld == BL_TITLE) {
             const char *rolelist[3 * 9 + 1];
-            char mbuf[QBUFSZ], fbuf[QBUFSZ], obuf[QBUFSZ];
+            char mbuf[MAXVALWIDTH], fbuf[MAXVALWIDTH], obuf[MAXVALWIDTH];
             int i, j, rv;
 
             for (i = j = 0; i < 9; i++) {
-                Sprintf(mbuf, "\"%s\"", urole.rank[i].m);
-                if (urole.rank[i].f) {
-                    Sprintf(fbuf, "\"%s\"", urole.rank[i].f);
+                Sprintf(mbuf, "\"%s\"", g.urole.rank[i].m);
+                if (g.urole.rank[i].f) {
+                    Sprintf(fbuf, "\"%s\"", g.urole.rank[i].f);
                     Sprintf(obuf, "%s or %s",
                             flags.female ? fbuf : mbuf,
                             flags.female ? mbuf : fbuf);
@@ -3239,7 +3379,7 @@ choose_value:
                 goto choose_behavior;
 
             hilite.rel = TXT_VALUE;
-            if (strlen(inbuf) < QBUFSZ - 1)
+            if (strlen(inbuf) < sizeof hilite.textmatch)
                 Strcpy(hilite.textmatch, inbuf);
             else
                 return FALSE;
@@ -3273,23 +3413,23 @@ choose_color:
         char *tmpattr;
 
         if (atr & HL_DIM)
-            cond_hilites[HL_ATTCLR_DIM] |= cond;
-        else if (atr & HL_BLINK)
-            cond_hilites[HL_ATTCLR_BLINK] |= cond;
-        else if (atr & HL_ULINE)
-            cond_hilites[HL_ATTCLR_ULINE] |= cond;
-        else if (atr & HL_INVERSE)
-            cond_hilites[HL_ATTCLR_INVERSE] |= cond;
-        else if (atr & HL_BOLD)
-            cond_hilites[HL_ATTCLR_BOLD] |= cond;
-        else if (atr == HL_NONE) {
-            cond_hilites[HL_ATTCLR_DIM] &= ~cond;
-            cond_hilites[HL_ATTCLR_BLINK] &= ~cond;
-            cond_hilites[HL_ATTCLR_ULINE] &= ~cond;
-            cond_hilites[HL_ATTCLR_INVERSE] &= ~cond;
-            cond_hilites[HL_ATTCLR_BOLD] &= ~cond;
+            g.cond_hilites[HL_ATTCLR_DIM] |= cond;
+        if (atr & HL_BLINK)
+            g.cond_hilites[HL_ATTCLR_BLINK] |= cond;
+        if (atr & HL_ULINE)
+            g.cond_hilites[HL_ATTCLR_ULINE] |= cond;
+        if (atr & HL_INVERSE)
+            g.cond_hilites[HL_ATTCLR_INVERSE] |= cond;
+        if (atr & HL_BOLD)
+            g.cond_hilites[HL_ATTCLR_BOLD] |= cond;
+        if (atr == HL_NONE) {
+            g.cond_hilites[HL_ATTCLR_DIM] &= ~cond;
+            g.cond_hilites[HL_ATTCLR_BLINK] &= ~cond;
+            g.cond_hilites[HL_ATTCLR_ULINE] &= ~cond;
+            g.cond_hilites[HL_ATTCLR_INVERSE] &= ~cond;
+            g.cond_hilites[HL_ATTCLR_BOLD] &= ~cond;
         }
-        cond_hilites[clr] |= cond;
+        g.cond_hilites[clr] |= cond;
         (void) strNsubst(strcpy(clrbuf, clr2colorname(clr)), " ", "-", 0);
         tmpattr = hlattr2attrname(atr, attrbuf, BUFSZ);
         if (tmpattr)
@@ -3340,34 +3480,34 @@ int id;
         int i;
 
         for (i = 0; i < CLR_MAX; i++)
-            cond_hilites[i] &= ~hlstr->mask;
-        cond_hilites[HL_ATTCLR_DIM] &= ~hlstr->mask;
-        cond_hilites[HL_ATTCLR_BOLD] &= ~hlstr->mask;
-        cond_hilites[HL_ATTCLR_BLINK] &= ~hlstr->mask;
-        cond_hilites[HL_ATTCLR_ULINE] &= ~hlstr->mask;
-        cond_hilites[HL_ATTCLR_INVERSE] &= ~hlstr->mask;
+            g.cond_hilites[i] &= ~hlstr->mask;
+        g.cond_hilites[HL_ATTCLR_DIM] &= ~hlstr->mask;
+        g.cond_hilites[HL_ATTCLR_BOLD] &= ~hlstr->mask;
+        g.cond_hilites[HL_ATTCLR_BLINK] &= ~hlstr->mask;
+        g.cond_hilites[HL_ATTCLR_ULINE] &= ~hlstr->mask;
+        g.cond_hilites[HL_ATTCLR_INVERSE] &= ~hlstr->mask;
         return TRUE;
     } else {
         int fld = hlstr->fld;
-        struct hilite_s *hl = blstats[0][fld].thresholds;
-        struct hilite_s *hlprev = (struct hilite_s *) 0;
+        struct hilite_s *hl, *hlprev = (struct hilite_s *) 0;
 
-        if (hl) {
-            while (hl) {
-                if (hlstr->hl == hl) {
-                    if (hlprev) {
-                        hlprev->next = hl->next;
-                    } else {
-                        blstats[0][fld].thresholds = hl->next;
-                        blstats[1][fld].thresholds =
-                            blstats[0][fld].thresholds;
-                    }
-                    free((genericptr_t) hl);
-                    return TRUE;
+        for (hl = g.blstats[0][fld].thresholds; hl; hl = hl->next) {
+            if (hlstr->hl == hl) {
+                if (hlprev) {
+                    hlprev->next = hl->next;
+                } else {
+                    g.blstats[0][fld].thresholds = hl->next;
+                    g.blstats[1][fld].thresholds = g.blstats[0][fld].thresholds;
                 }
-                hlprev = hl;
-                hl = hl->next;
+                if (g.blstats[0][fld].hilite_rule == hl) {
+                    g.blstats[0][fld].hilite_rule
+                        = g.blstats[1][fld].hilite_rule = (struct hilite_s *) 0;
+                    g.blstats[0][fld].time = g.blstats[1][fld].time = 0L;
+                }
+                free((genericptr_t) hl);
+                return TRUE;
             }
+            hlprev = hl;
         }
     }
     return FALSE;
@@ -3402,7 +3542,7 @@ int fld;
         hlstr = status_hilite_str;
         while (hlstr) {
             if (hlstr->fld == fld) {
-                any = zeroany;
+                any = cg.zeroany;
                 any.a_int = hlstr->id;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                          hlstr->str, MENU_UNSELECTED);
@@ -3410,17 +3550,17 @@ int fld;
             hlstr = hlstr->next;
         }
     } else {
-        any = zeroany;
+        any = cg.zeroany;
         Sprintf(buf, "No current hilites for %s", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
     }
 
     /* separator line */
-    any = zeroany;
+    any = cg.zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
 
     if (count) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = -1;
         add_menu(tmpwin, NO_GLYPH, &any, 'X', 0, ATR_NONE,
                  "Remove selected hilites", MENU_UNSELECTED);
@@ -3436,7 +3576,7 @@ int fld;
     } else
 #endif
     {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = -2;
         add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
                  "Add a new hilite", MENU_UNSELECTED);
@@ -3532,12 +3672,12 @@ shlmenu_redo:
     status_hilite_linestr_gather();
     countall = status_hilite_linestr_countfield(BL_FLUSH);
     if (countall) {
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = -1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "View all hilites in config format", MENU_UNSELECTED);
 
-        any = zeroany;
+        any = cg.zeroany;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     }
 
@@ -3553,7 +3693,7 @@ shlmenu_redo:
         if (initblstats[i].fld == BL_SCORE && !count)
             continue;
 #endif
-        any = zeroany;
+        any = cg.zeroany;
         any.a_int = i + 1;
         Sprintf(buf, "%-18s", initblstats[i].fldname);
         if (count)

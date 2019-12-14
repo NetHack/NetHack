@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1545597424 2018/12/23 20:37:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1568508711 2019/09/15 00:51:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,8 +10,12 @@
 # include <fcntl.h>
 # include <errno.h>
 #endif /* SIMPLE_MAIL */
+#endif /* MAIL */
+#ifdef MAIL_STRUCTURES
 #include "mail.h"
+#endif
 
+#ifdef MAIL
 /*
  * Notify user when new mail has arrived.  Idea by Merlyn Leroy.
  *
@@ -36,12 +40,10 @@
  *                       random intervals.
  */
 
-STATIC_DCL boolean FDECL(md_start, (coord *));
-STATIC_DCL boolean FDECL(md_stop, (coord *, coord *));
-STATIC_DCL boolean FDECL(md_rush, (struct monst *, int, int));
-STATIC_DCL void FDECL(newmail, (struct mail_info *));
-
-extern char *viz_rmin, *viz_rmax; /* line-of-sight limits (vision.c) */
+static boolean FDECL(md_start, (coord *));
+static boolean FDECL(md_stop, (coord *, coord *));
+static boolean FDECL(md_rush, (struct monst *, int, int));
+static void FDECL(newmail, (struct mail_info *));
 
 #if !defined(UNIX) && !defined(VMS)
 int mustgetmail = -1;
@@ -140,7 +142,7 @@ getmailstatus()
  * Pick coordinates for a starting position for the mail daemon.  Called
  * from newmail() and newphone().
  */
-STATIC_OVL boolean
+static boolean
 md_start(startp)
 coord *startp;
 {
@@ -164,14 +166,14 @@ coord *startp;
      * Arrive at an up or down stairwell if it is in line of sight from the
      * hero.
      */
-    if (couldsee(upstair.sx, upstair.sy)) {
-        startp->x = upstair.sx;
-        startp->y = upstair.sy;
+    if (couldsee(g.upstair.sx, g.upstair.sy)) {
+        startp->x = g.upstair.sx;
+        startp->y = g.upstair.sy;
         return TRUE;
     }
-    if (couldsee(dnstair.sx, dnstair.sy)) {
-        startp->x = dnstair.sx;
-        startp->y = dnstair.sy;
+    if (couldsee(g.dnstair.sx, g.dnstair.sy)) {
+        startp->x = g.dnstair.sx;
+        startp->y = g.dnstair.sy;
         return TRUE;
     }
 
@@ -181,23 +183,23 @@ coord *startp;
      * position that could be seen.  What we really ought to be doing is
      * finding a path from a stairwell...
      *
-     * The arrays viz_rmin[] and viz_rmax[] are set even when blind.  These
+     * The arrays g.viz_rmin[] and g.viz_rmax[] are set even when blind.  These
      * are the LOS limits for each row.
      */
     lax = 0; /* be picky */
     max_distance = -1;
  retry:
     for (row = 0; row < ROWNO; row++) {
-        if (viz_rmin[row] < viz_rmax[row]) {
+        if (g.viz_rmin[row] < g.viz_rmax[row]) {
             /* There are valid positions on this row. */
-            dd = distu(viz_rmin[row], row);
+            dd = distu(g.viz_rmin[row], row);
             if (dd > max_distance) {
                 if (lax) {
                     max_distance = dd;
                     startp->y = row;
-                    startp->x = viz_rmin[row];
+                    startp->x = g.viz_rmin[row];
 
-                } else if (enexto(&testcc, (xchar) viz_rmin[row], row,
+                } else if (enexto(&testcc, (xchar) g.viz_rmin[row], row,
                                   (struct permonst *) 0)
                            && !cansee(testcc.x, testcc.y)
                            && couldsee(testcc.x, testcc.y)) {
@@ -205,14 +207,14 @@ coord *startp;
                     *startp = testcc;
                 }
             }
-            dd = distu(viz_rmax[row], row);
+            dd = distu(g.viz_rmax[row], row);
             if (dd > max_distance) {
                 if (lax) {
                     max_distance = dd;
                     startp->y = row;
-                    startp->x = viz_rmax[row];
+                    startp->x = g.viz_rmax[row];
 
-                } else if (enexto(&testcc, (xchar) viz_rmax[row], row,
+                } else if (enexto(&testcc, (xchar) g.viz_rmax[row], row,
                                   (struct permonst *) 0)
                            && !cansee(testcc.x, testcc.y)
                            && couldsee(testcc.x, testcc.y)) {
@@ -240,7 +242,7 @@ coord *startp;
  * enexto().  Use enexto() as a last resort because enexto() chooses
  * its point randomly, which is not what we want.
  */
-STATIC_OVL boolean
+static boolean
 md_stop(stopp, startp)
 coord *stopp;  /* stopping position (we fill it in) */
 coord *startp; /* starting position (read only) */
@@ -281,7 +283,7 @@ static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
  * FALSE if the md gets stuck in a position where there is a monster.  Return
  * TRUE otherwise.
  */
-STATIC_OVL boolean
+static boolean
 md_rush(md, tx, ty)
 struct monst *md;
 register int tx, ty; /* destination of mail daemon */
@@ -384,7 +386,7 @@ register int tx, ty; /* destination of mail daemon */
 
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 newmail(info)
 struct mail_info *info;
 {
@@ -403,7 +405,7 @@ struct mail_info *info;
         goto go_back;
 
     message_seen = TRUE;
-    verbalize("%s, %s!  %s.", Hello(md), plname, info->display_txt);
+    verbalize("%s, %s!  %s.", Hello(md), g.plname, info->display_txt);
 
     if (info->message_typ) {
         struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);
@@ -442,7 +444,7 @@ ckmailstatus()
         return;
     if (mustgetmail < 0) {
 #if defined(AMIGA) || defined(MSDOS) || defined(TOS)
-        mustgetmail = (moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
+        mustgetmail = (g.moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
 #endif
         return;
     }
@@ -460,28 +462,65 @@ void
 readmail(otmp)
 struct obj *otmp UNUSED;
 {
-    static char *junk[] = {
-        NULL, /* placeholder for "Report bugs to <devteam@nethack.org>.", */
-        "Please disregard previous letter.", "Welcome to NetHack.",
+    static const char *junk[] = {
+        "Report bugs to <%s>.", /*** must be first entry ***/
+        "Please disregard previous letter.",
+        "Welcome to NetHack.",
 #ifdef AMIGA
-        "Only Amiga makes it possible.", "CATS have all the answers.",
+        "Only Amiga makes it possible.",
+        "CATS have all the answers.",
 #endif
         "This mail complies with the Yendorian Anti-Spam Act (YASA)",
         "Please find enclosed a small token to represent your Owlbear",
         "**FR33 P0T10N 0F FULL H34L1NG**",
         "Please return to sender (Asmodeus)",
+        /* when enclosed by "It reads:  \"...\"", this is too long
+           for an ordinary 80-column display so wraps to a second line
+           (suboptimal but works correctly);
+           dollar sign and fractional zorkmids are inappropriate within
+           nethack but are suitable for typical dysfunctional spam mail */
      "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!",
-        "Invitation: Visit the NetHack web site at http://www.nethack.org!"
+        /* DEVTEAM_URL will be substituted for "%s"; terminating punctuation
+           (formerly "!") has deliberately been omitted so that it can't be
+           mistaken for part of the URL (unfortunately that is still followed
+           by a closing quote--in the pline below, not the data here) */
+        "Invitation: Visit the NetHack web site at %s"
     };
 
     /* XXX replace with more general substitution code and add local
-     * contact message.  Also use DEVTEAM_URL */
-    if (junk[0] == NULL) {
-#define BUGS_FORMAT "Report bugs to <%s>."
-        /* +2 from '%s' suffices as substitute for usual +1 for terminator */
-        junk[0] = (char *) alloc(strlen(BUGS_FORMAT) + strlen(DEVTEAM_EMAIL));
-        Sprintf(junk[0], BUGS_FORMAT, DEVTEAM_EMAIL);
-#undef BUGS_FORMAT
+     * contact message.
+     *
+     * FIXME:  this allocated memory is never freed.  However, if the
+     * game is restarted, the junk[] update will be a no-op for second
+     * and subsequent runs and this updated text will still be appropriate.
+     */
+    if (index(junk[0], '%')) {
+        char *tmp;
+        int i;
+
+        for (i = 0; i < SIZE(junk); ++i) {
+            if (index(junk[i], '%')) {
+                if (i == 0) {
+                    /* +2 from '%s' in junk[0] suffices as substitute
+                       for usual +1 for terminator */
+                    tmp = (char *) alloc(strlen(junk[0])
+                                         + strlen(DEVTEAM_EMAIL));
+                    Sprintf(tmp, junk[0], DEVTEAM_EMAIL);
+                    junk[0] = tmp;
+                } else if (strstri(junk[i], "web site")) {
+                    /* as with junk[0], room for terminator is present */
+                    tmp = (char *) alloc(strlen(junk[i])
+                                         + strlen(DEVTEAM_URL));
+                    Sprintf(tmp, junk[i], DEVTEAM_URL);
+                    junk[i] = tmp;
+                } else {
+                    /* could check for "%%" but unless that becomes needed,
+                       handling it is more complicated than necessary */
+                    impossible("fake mail #%d has undefined substitution", i);
+                    junk[i] = "Bad fake mail...";
+                }
+            }
+        }
     }
     if (Blind) {
         pline("Unfortunately you cannot see what it says.");
@@ -500,12 +539,12 @@ ckmailstatus()
 
     if (!mailbox || u.uswallow || !flags.biff
 #ifdef MAILCKFREQ
-        || moves < laststattime + MAILCKFREQ
+        || g.moves < laststattime + MAILCKFREQ
 #endif
         )
         return;
 
-    laststattime = moves;
+    laststattime = g.moves;
     if (stat(mailbox, &nmstat)) {
 #ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
@@ -625,8 +664,8 @@ ck_server_admin_msg()
     static struct stat ost,nst;
     static long lastchk = 0;
 
-    if (moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
-    lastchk = moves;
+    if (g.moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
+    lastchk = g.moves;
 
     if (!stat(SERVER_ADMIN_MSG, &nst)) {
         if (nst.st_mtime > ost.st_mtime)

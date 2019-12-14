@@ -1,4 +1,4 @@
-/* NetHack 3.6	mextra.h	$NHDT-Date: 1451836000 2016/01/03 15:46:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.6	mextra.h	$NHDT-Date: 1574722861 2019/11/25 23:01:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -116,8 +116,8 @@ struct eshk {
     long credit;          /* amount credited to customer */
     long debit;           /* amount of debt for using unpaid items */
     long loan;            /* shop-gold picked (part of debit) */
-    int shoptype;         /* the value of rooms[shoproom].rtype */
-    schar shoproom;       /* index in rooms; set by inshop() */
+    int shoptype;         /* the value of g.rooms[shoproom].rtype */
+    schar shoproom;       /* index in g.rooms; set by inshop() */
     schar unused;         /* to force alignment for stupid compilers */
     boolean following;    /* following customer since he owes us sth */
     boolean surcharge;    /* angry shk inflates prices */
@@ -144,16 +144,16 @@ struct emin {
 /***
  **     formerly edog.h -- pet extension
  */
-/*      various types of pet food, the lower, the better liked */
+/*      various types of pet food, the lower the value, the better liked */
 enum dogfood_types {
     DOGFOOD = 0,
-    CADAVER,
-    ACCFOOD,
-    MANFOOD,
-    APPORT,
-    POISON,
-    UNDEF,
-    TABU
+    CADAVER = 1,
+    ACCFOOD = 2,
+    MANFOOD = 3,
+    APPORT  = 4,
+    POISON  = 5,
+    UNDEF   = 6,
+    TABU    = 7
 };
 
 struct edog {
@@ -179,7 +179,9 @@ struct mextra {
     struct eshk *eshk;
     struct emin *emin;
     struct edog *edog;
-    int mcorpsenm; /* obj->corpsenm for mimic posing as statue or corpse */
+    int mcorpsenm; /* obj->corpsenm for mimic posing as statue or corpse,
+                    * obj->spe (fruit index) for one posing as a slime mold,
+                    * or an alignment mask for one posing as an altar */
 };
 
 #define MNAME(mon) ((mon)->mextra->mname)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1518922474 2018/02/18 02:54:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1574636502 2019/11/24 23:01:42 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -22,8 +22,10 @@
         char *          trimspaces      (char *)
         char *          strip_newline   (char *)
         char *          stripchars      (char *, const char *, const char *)
+        char *          stripdigits     (char *)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
+        int             str_lines_maxlen (const char *)
         char *          strkitten       (char *,char)
         void            copynchars      (char *,const char *,int)
         char            chrcasecpy      (int,int)
@@ -51,6 +53,8 @@
         boolean         fuzzymatch      (const char *, const char *,
                                          const char *, boolean)
         void            setrandom       (void)
+        void            init_random     (fn)
+        void            reseed_random   (fn)
         time_t          getnow          (void)
         int             getyear         (void)
         char *          yymmdd          (time_t)
@@ -67,6 +71,7 @@
         void            strbuf_reserve  (strbuf *, int)
         void            strbuf_empty    (strbuf *)
         void            strbuf_nl_to_crlf (strbuf_t *)
+        char *          nonconst        (const char *, char *)
 =*/
 #ifdef LINT
 #define Static /* pacify lint */
@@ -168,13 +173,14 @@ char *bp;
     return bp;
 }
 
-/* remove leading and trailing whitespace, in place */
-char*
+/* skip leading whitespace; remove trailing whitespace, in place */
+char *
 trimspaces(txt)
-char* txt;
+char *txt;
 {
-    char* end;
+    char *end;
 
+    /* leading whitespace will remain in the buffer */
     while (*txt == ' ' || *txt == '\t')
         txt++;
     end = eos(txt);
@@ -219,6 +225,31 @@ const char *str, *chkstr;
     if ((int) strlen(str) >= clen)
         return (boolean) (!strncmp(eos((char *) str) - clen, chkstr, clen));
     return FALSE;
+}
+
+/* return the max line length from buffer comprising of newline-separated strings */
+int
+str_lines_maxlen(str)
+const char *str;
+{
+    const char *s1, *s2;
+    int len, max_len = 0;
+
+    s1 = str;
+    while (s1 && *s1) {
+        s2 = index(s1, '\n');
+        if (s2) {
+            len = (int) (s2 - s1);
+            s1 = s2 + 1;
+        } else {
+            len = (int) strlen(s1);
+            s1 = (char *) 0;
+        }
+        if (len > max_len)
+            max_len = len;
+    }
+
+    return max_len;
 }
 
 /* append a character to a string (in place): strcat(s, {c,'\0'}); */
@@ -463,6 +494,21 @@ const char *stuff_to_strip, *orig;
     } else
         impossible("no output buf in stripchars");
     return bp;
+}
+
+/* remove digits from string */
+char *
+stripdigits(s)
+char *s;
+{
+    char *s1, *s2;
+
+    for (s1 = s2 = s; *s1; s1++)
+        if (*s1 < '0' || *s1 > '9')
+            *s2++ = *s1;
+    *s2 = '\0';
+
+    return s;
 }
 
 /* substitute a word or phrase in a string (in place) */
@@ -846,46 +892,76 @@ boolean caseblind;
     && !defined(_DCC) && !defined(__GNUC__)
 extern struct tm *FDECL(localtime, (time_t *));
 #endif
-STATIC_DCL struct tm *NDECL(getlt);
+static struct tm *NDECL(getlt);
 
-void
-setrandom()
+/* Sets the seed for the random number generator */
+#ifdef USE_ISAAC64
+
+static void
+set_random(seed, fn)
+unsigned long seed;
+int FDECL((*fn), (int));
 {
-    unsigned long seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+    init_isaac64(seed, fn);
+}
 
-#if defined(UNIX) || defined(VMS)
-    {
-        unsigned long pid = (unsigned long) getpid();
+#else /* USE_ISAAC64 */
 
-        /* Quick dirty band-aid to prevent PRNG prediction */
-        if (pid) {
-            if (!(pid & 3L))
-                pid -= 1L;
-            seed *= pid;
-        }
-    }
-#endif
-
+/*ARGSUSED*/
+static void
+set_random(seed, fn)
+unsigned long seed;
+int FDECL((*fn), (int)) UNUSED;
+{
     /* the types are different enough here that sweeping the different
      * routine names into one via #defines is even more confusing
      */
-#ifdef RANDOM /* srandom() from sys/share/random.c */
+# ifdef RANDOM /* srandom() from sys/share/random.c */
     srandom((unsigned int) seed);
-#else
-#if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) \
+# else
+#  if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) \
     || defined(CYGWIN32) /* system srandom() */
-#if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
+#   if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
     (void)
-#endif
+#   endif
         srandom((int) seed);
-#else
-#ifdef UNIX /* system srand48() */
+#  else
+#   ifdef UNIX /* system srand48() */
     srand48((long) seed);
-#else       /* poor quality system routine */
+#   else       /* poor quality system routine */
     srand((int) seed);
-#endif
-#endif
-#endif
+#   endif
+#  endif
+# endif
+}
+
+#endif /* USE_ISAAC64 */
+
+/* An appropriate version of this must always be provided in
+   port-specific code somewhere. It returns a number suitable
+   as seed for the random number generator */
+extern unsigned long NDECL(sys_random_seed);
+
+/*
+ * Initializes the random number generator.
+ * Only call once.
+ */
+void
+init_random(fn)
+int FDECL((*fn), (int));
+{
+    set_random(sys_random_seed(), fn);
+}
+
+/* Reshuffles the random number generator. */
+void
+reseed_random(fn)
+int FDECL((*fn), (int));
+{
+   /* only reseed if we are certain that the seed generation is unguessable
+    * by the players. */
+    if (has_strong_rngseed)
+        init_random(fn);
 }
 
 time_t
@@ -897,7 +973,7 @@ getnow()
     return datetime;
 }
 
-STATIC_OVL struct tm *
+static struct tm *
 getlt()
 {
     time_t date = getnow();
@@ -1008,33 +1084,33 @@ char *buf;
     int k;
     time_t timeresult = (time_t) 0;
     struct tm t, *lt;
-    char *g, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
+    char *d, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
 
     if (buf && strlen(buf) == 14) {
-        g = buf;
+        d = buf;
         p = y; /* year */
         for (k = 0; k < 4; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = mo; /* month */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = md; /* day */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = h; /* hour */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = mi; /* minutes */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = s; /* seconds */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         lt = getlt();
         if (lt) {
@@ -1184,6 +1260,21 @@ strbuf_t *strbuf;
                 }
         }
     }
+}
+
+char *
+nonconst(str, buf)
+const char *str;
+char *buf;
+{
+    char *retval = emptystr;
+
+    if (str && buf)
+        if ((int) strlen(str) < BUFSZ - 1) {
+	    Strcpy(buf, str);
+            retval = buf;
+        }
+    return retval;
 }
 
 /*hacklib.c*/

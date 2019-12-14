@@ -1,23 +1,63 @@
-                NetHack 3.6.2 -- General information
+         NetHack 3.7.0 work-in-progress -- General information
 
-NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
+NetHack 3.7 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
-NetHack 3.4 as there was no NetHack 3.5 release.
+NetHack 3.6.
 
-NetHack 3.6.2 contains a collection of more than 220 bug fixes to NetHack 3.6.1.
-The file doc/fixes36.2 in the source distribution has a full list of them. The
-text in there was written for the development team's own use and is provided 
-"as is", so please do not ask us to further explain the entries in that file. 
-Some entries might be considered "spoilers", particularly in the "new features" 
-section.
+NetHack 3.7.0 work-in-progress is not a release of NetHack. As a .0 version,
+and still very early in its development cycle, there has already been changes
+made, and there will continue to be many more prior to an eventual release.
 
-Below you will find some other general notes that were not considered
-spoilers:
-* Performance optimizations with tty including the ability to do per field 
-  updating
-* sys/winnt/nttty performance improvements mainly through the introduction
-  of a back buffer approach
-* a couple of windows crash bug fixes
+In short -- there are likely to be bugs. Don't treat NetHack-3.7 branch as
+released code, and if stability is paramount, then the most recent 
+NetHack 3.6.3 release is safest for you.
+
+We're making the .0 work-in-progress available so that you can observe, test
+out, and contribute to its development. Constructive suggestions, GitHub pull
+requests, and bug reports are all welcome and encouraged.
+
+The file doc/fixes37.0 in the source distribution has a full list of bug-fixes
+included so far, as well as brief mentions of some of the other code changes.
+The text in there was written for the development team's own use and is
+provided  "as is", so please do not ask us to further explain the entries in
+that file. Some entries might be considered "spoilers", particularly in the 
+"new features" section.
+
+Along with the game improvements and bug fixes, NetHack 3.7 strives to make
+some general architectural improvements to the game or to its building 
+process. Among them:
+
+ *  Remove barriers to building NetHack on one platform and operating system,
+    for later execution on another (possibly quite different) platform and/or
+    operating system. That capability is generally known as "cross-compiling."
+    See the file "Cross-compiling" in the top-level folder for more information
+    on that.
+
+ *  Replace the build-time "yacc and lex"-based level compiler, the "yacc and 
+    lex"-based dungeon compiler, and the quest text file processing done
+    by NetHack's "makedefs" utility, with Lua text alternatives that are 
+    loaded and processed by the game during play.
+
+ *  Write game savefiles and bonesfiles in a more portable and consistent way
+    to open up the possibility of utilizing them between different platforms,
+    such as between your desktop computer and your hand-held device.
+
+ *  Add support to make the game restartable without exit (a.k.a. "play again"
+    support). Toward that end, many previously scattered and separate variables
+    have been gathered into a central 'g' structure in decl.h/decl.c. That
+    will benefit the porting effort to some platforms that are under
+    consideration.
+
+Here are some other general notes on the changes in NetHack 3.7 that were not
+considered spoilers:
+ -  automatic annotation "gateway to Moloch's Sanctum" for vibrating square
+        level once that square's location becomes known (found or magic
+        mapped); goes away once sanctum temple is found (entered or high altar
+        mapped)
+ -  savefile: add support to deconstruct internal data structures down into
+        their individual fields and save those fields instead of the entire
+        struct
+ -  savefile: use little-endian format for fields where that makes a difference
 
                         - - - - - - - - - - -
 
@@ -45,7 +85,11 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     "license" in the 'dat' subdirectory.  It is expected that you comply
     with the terms of that license, and we are very serious about it.
 
-4.  If everything is in order, you can now turn to trying to get the program
+4.  If you are attempting to build NetHack on one platform/processor, to
+    produce a game on a different platform/processor it may behoove you to
+    read the file "Cross-compiling" in your Top directory.
+
+5.  If everything is in order, you can now turn to trying to get the program
     to compile and run on your particular system.  It is worth mentioning
     that the default configuration is SysV/Sun/Solaris2.x (simply because
     the code was housed on such a system).
@@ -56,8 +100,9 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     for particular windowing environments.  Reading them, and the man pages,
     should answer most of your questions.
 
-    At the time of this release, NetHack 3.6 has been tested to run/compile
-    on:
+
+    At the time of the most recent official release, NetHack 3.6, it had
+    been tested to run/compile on:
 
         Intel Pentium or better (or clone) running Linux, BSDI, or 
                 Windows (7 through 10)
@@ -66,11 +111,12 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 	OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
 
     Instructions have been provided by way of community contribution on:
-        msdos protected mode using djgpp
+        msdos protected mode using djgpp including a Linux-host djgpp 
+        cross-compile
 
     Previous versions of NetHack were tested and known to run on the 
     following systems, but it is unknown if they can still build and 
-    execute NetHack 3.6:
+    execute NetHack 3.6 or NetHack 3.7:
 
         Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
         Atari ST/TT/Falcon running TOS (or MultiTOS) with GCC
@@ -124,8 +170,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
 If you have problems building the game, or you find bugs in it, we recommend 
 filing a bug report from our "Contact Us" web page at:
-    https://www.nethack.org/common/contact.html or
-    http://www.nethack.org/common/contact.html
+    https://www.nethack.org/common/contact.html
 Please include the version information from #version or the command line
 option --version in the appropriate field.
 
@@ -166,6 +211,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1546383333 2019/01/01 22:55:33 $ $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.48 $
+# $NHDT-Date: 1572309271 2019/10/29 00:34:31 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.57 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.

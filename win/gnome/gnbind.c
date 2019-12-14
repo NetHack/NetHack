@@ -24,7 +24,9 @@ extern NEARDATA winid WIN_STATUS;
 
 /* Interface definition, for windows.c */
 struct window_procs Gnome_procs = {
-    "Gnome", WC_COLOR | WC_HILITE_PET | WC_INVERSE, 0L, gnome_init_nhwindows,
+    "Gnome", WC_COLOR | WC_HILITE_PET | WC_INVERSE, 0L,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    gnome_init_nhwindows,
     gnome_player_selection, gnome_askname, gnome_get_nh_event,
     gnome_exit_nhwindows, gnome_suspend_nhwindows, gnome_resume_nhwindows,
     gnome_create_nhwindow, gnome_clear_nhwindow, gnome_display_nhwindow,
@@ -159,7 +161,7 @@ gnome_player_selection()
         sel = pick_role(flags.initrace, flags.initgend, flags.initalign,
                         PICK_RANDOM);
         if (sel < 0)
-            sel = randrole();
+            sel = randrole(FALSE);
     }
 
     flags.initrole = sel;
@@ -355,7 +357,7 @@ gnome_askname()
 
     /* Ask for a name and stuff the response into plname, a nethack global */
     ret = ghack_ask_string_dialog("What is your name?", "gandalf",
-                                  "GnomeHack", plname);
+                                  "GnomeHack", g.plname);
 
     /* Quit if they want to quit... */
     if (ret == -1) {
@@ -907,7 +909,7 @@ gnome_nhgetch()
     g_askingQuestion = 1;
     /* Process events until a key press event arrives. */
     while (g_numKeys == 0) {
-        if (program_state.done_hup)
+        if (g.program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }
@@ -945,7 +947,7 @@ gnome_nh_poskey(int *x, int *y, int *mod)
     g_askingQuestion = 0;
     /* Process events until a key or map-click arrives. */
     while (g_numKeys == 0 && g_numClicks == 0) {
-        if (program_state.done_hup)
+        if (g.program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }
@@ -1169,7 +1171,7 @@ gnome_outrip(winid wid, int how, time_t when)
     long year;
 
     /* Put name on stone */
-    Sprintf(buf, "%s\n", plname);
+    Sprintf(buf, "%s\n", g.plname);
     Strcat(ripString, buf);
 
     /* Put $ on stone */

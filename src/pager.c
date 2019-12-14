@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1546144745 2018/12/30 04:39:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.146 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1575830188 2019/12/08 18:36:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,42 +9,42 @@
 #include "hack.h"
 #include "dlb.h"
 
-STATIC_DCL boolean FDECL(is_swallow_sym, (int));
-STATIC_DCL int FDECL(append_str, (char *, const char *));
-STATIC_DCL void FDECL(look_at_object, (char *, int, int, int));
-STATIC_DCL void FDECL(look_at_monster, (char *, char *,
+static boolean FDECL(is_swallow_sym, (int));
+static int FDECL(append_str, (char *, const char *));
+static void FDECL(look_at_object, (char *, int, int, int));
+static void FDECL(look_at_monster, (char *, char *,
                                         struct monst *, int, int));
-STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
-STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
+static struct permonst *FDECL(lookat, (int, int, char *, char *));
+static void FDECL(checkfile, (char *, struct permonst *,
                                   BOOLEAN_P, BOOLEAN_P, char *));
-STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
-STATIC_DCL void FDECL(do_supplemental_info, (char *, struct permonst *,
+static void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
+static void FDECL(do_supplemental_info, (char *, struct permonst *,
                                              BOOLEAN_P));
-STATIC_DCL void NDECL(whatdoes_help);
-STATIC_DCL void NDECL(docontact);
-STATIC_DCL void NDECL(dispfile_help);
-STATIC_DCL void NDECL(dispfile_shelp);
-STATIC_DCL void NDECL(dispfile_optionfile);
-STATIC_DCL void NDECL(dispfile_license);
-STATIC_DCL void NDECL(dispfile_debughelp);
-STATIC_DCL void NDECL(hmenu_doextversion);
-STATIC_DCL void NDECL(hmenu_dohistory);
-STATIC_DCL void NDECL(hmenu_dowhatis);
-STATIC_DCL void NDECL(hmenu_dowhatdoes);
-STATIC_DCL void NDECL(hmenu_doextlist);
+static void NDECL(whatdoes_help);
+static void NDECL(docontact);
+static void NDECL(dispfile_help);
+static void NDECL(dispfile_shelp);
+static void NDECL(dispfile_optionfile);
+static void NDECL(dispfile_license);
+static void NDECL(dispfile_debughelp);
+static void NDECL(hmenu_doextversion);
+static void NDECL(hmenu_dohistory);
+static void NDECL(hmenu_dowhatis);
+static void NDECL(hmenu_dowhatdoes);
+static void NDECL(hmenu_doextlist);
 #ifdef PORT_HELP
 extern void NDECL(port_help);
 #endif
 
 /* Returns "true" for characters that could represent a monster's stomach. */
-STATIC_OVL boolean
+static boolean
 is_swallow_sym(c)
 int c;
 {
     int i;
 
     for (i = S_sw_tl; i <= S_sw_br; i++)
-        if ((int) showsyms[i] == c)
+        if ((int) g.showsyms[i] == c)
             return TRUE;
     return FALSE;
 }
@@ -54,7 +54,7 @@ int c;
  * a substring of buf.  Return 1 if the string was appended, 0 otherwise.
  * It is expected that buf is of size BUFSZ.
  */
-STATIC_OVL int
+static int
 append_str(buf, new_str)
 char *buf;
 const char *new_str;
@@ -82,15 +82,15 @@ char *outbuf;
     /* include race with role unless polymorphed */
     race[0] = '\0';
     if (!Upolyd)
-        Sprintf(race, "%s ", urace.adj);
+        Sprintf(race, "%s ", g.urace.adj);
     Sprintf(outbuf, "%s%s%s called %s",
             /* being blinded may hide invisibility from self */
             (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
-            mons[u.umonnum].mname, plname);
+            mons[u.umonnum].mname, g.plname);
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
-    if (u.uundetected || (Upolyd && youmonst.m_ap_type))
-        mhidden_description(&youmonst, FALSE, eos(outbuf));
+    if (u.uundetected || (Upolyd && U_AP_TYPE))
+        mhidden_description(&g.youmonst, FALSE, eos(outbuf));
     return outbuf;
 }
 
@@ -103,32 +103,34 @@ boolean altmon; /* for probing: if mimicking a monster, say so */
 char *outbuf;
 {
     struct obj *otmp;
-    boolean fakeobj, isyou = (mon == &youmonst);
+    boolean fakeobj, isyou = (mon == &g.youmonst);
     int x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my,
-        glyph = (level.flags.hero_memory && !isyou) ? levl[x][y].glyph
+        glyph = (g.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
                                                     : glyph_at(x, y);
 
     *outbuf = '\0';
-    if (mon->m_ap_type == M_AP_FURNITURE
-        || mon->m_ap_type == M_AP_OBJECT) {
+    if (M_AP_TYPE(mon) == M_AP_FURNITURE
+        || M_AP_TYPE(mon) == M_AP_OBJECT) {
         Strcpy(outbuf, ", mimicking ");
-        if (mon->m_ap_type == M_AP_FURNITURE) {
+        if (M_AP_TYPE(mon) == M_AP_FURNITURE) {
             Strcat(outbuf, an(defsyms[mon->mappearance].explanation));
-        } else if (mon->m_ap_type == M_AP_OBJECT
+        } else if (M_AP_TYPE(mon) == M_AP_OBJECT
                    /* remembered glyph, not glyph_at() which is 'mon' */
                    && glyph_is_object(glyph)) {
-        objfrommap:
+ objfrommap:
             otmp = (struct obj *) 0;
             fakeobj = object_from_map(glyph, x, y, &otmp);
             Strcat(outbuf, (otmp && otmp->otyp != STRANGE_OBJECT)
                               ? ansimpleoname(otmp)
                               : an(obj_descr[STRANGE_OBJECT].oc_name));
-            if (fakeobj)
+            if (fakeobj) {
+                otmp->where = OBJ_FREE; /* object_from_map set to OBJ_FLOOR */
                 dealloc_obj(otmp);
+            }
         } else {
             Strcat(outbuf, something);
         }
-    } else if (mon->m_ap_type == M_AP_MONSTER) {
+    } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
         if (altmon)
             Sprintf(outbuf, ", masquerading as %s",
                     an(mons[mon->mappearance].mname));
@@ -158,7 +160,7 @@ object_from_map(glyph, x, y, obj_p)
 int glyph, x, y;
 struct obj **obj_p;
 {
-    boolean fakeobj = FALSE;
+    boolean fakeobj = FALSE, mimic_obj = FALSE;
     struct monst *mtmp;
     struct obj *otmp;
     int glyphotyp = glyph_to_obj(glyph);
@@ -166,15 +168,16 @@ struct obj **obj_p;
     *obj_p = (struct obj *) 0;
     /* TODO: check inside containers in case glyph came from detection */
     if ((otmp = sobj_at(glyphotyp, x, y)) == 0)
-        for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj)
+        for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj)
             if (otmp->ox == x && otmp->oy == y && otmp->otyp == glyphotyp)
                 break;
 
     /* there might be a mimic here posing as an object */
     mtmp = m_at(x, y);
-    if (mtmp && is_obj_mappear(mtmp, (unsigned) glyphotyp))
+    if (mtmp && is_obj_mappear(mtmp, (unsigned) glyphotyp)) {
         otmp = 0;
-    else
+        mimic_obj = TRUE;
+    } else
         mtmp = 0;
 
     if (!otmp || otmp->otyp != glyphotyp) {
@@ -186,15 +189,26 @@ struct obj **obj_p;
         if (otmp->oclass == COIN_CLASS)
             otmp->quan = 2L; /* to force pluralization */
         else if (otmp->otyp == SLIME_MOLD)
-            otmp->spe = context.current_fruit; /* give it a type */
-        else if (otmp->otyp == LEASH)
-            otmp->leashmon = 0;
-        if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
-            otmp->corpsenm = MCORPSENM(mtmp);
-        else if (otmp->otyp == CORPSE && glyph_is_body(glyph))
+            otmp->spe = g.context.current_fruit; /* give it a type */
+        if (mtmp && has_mcorpsenm(mtmp)) { /* mimic as corpse/statue */
+            if (otmp->otyp == SLIME_MOLD)
+                /* override g.context.current_fruit to avoid
+                     look, use 'O' to make new named fruit, look again
+                   giving different results when current_fruit changes */
+                otmp->spe = MCORPSENM(mtmp);
+            else
+                otmp->corpsenm = MCORPSENM(mtmp);
+        } else if (otmp->otyp == CORPSE && glyph_is_body(glyph)) {
             otmp->corpsenm = glyph - GLYPH_BODY_OFF;
-        else if (otmp->otyp == STATUE && glyph_is_statue(glyph))
+        } else if (otmp->otyp == STATUE && glyph_is_statue(glyph)) {
             otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
+        }
+        if (otmp->otyp == LEASH)
+            otmp->leashmon = 0;
+        /* extra fields needed for shop price with doname() formatting */
+        otmp->where = OBJ_FLOOR;
+        otmp->ox = x, otmp->oy = y;
+        otmp->no_charge = (otmp->otyp == STRANGE_OBJECT && costly_spot(x, y));
     }
     /* if located at adjacent spot, mark it as having been seen up close
        (corpse type will be known even if dknown is 0, so we don't need a
@@ -208,12 +222,16 @@ struct obj **obj_p;
         /* terrain mode views what's already known, doesn't learn new stuff */
         && !iflags.terrainmode) /* so don't set dknown when in terrain mode */
         otmp->dknown = 1; /* if a pile, clearly see the top item only */
-
+    if (fakeobj && mtmp && mimic_obj &&
+        (otmp->dknown || (M_AP_FLAG(mtmp) & M_AP_F_DKNOWN))) {
+            mtmp->m_ap_type |= M_AP_F_DKNOWN;
+            otmp->dknown = 1;
+    }
     *obj_p = otmp;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
 
-STATIC_OVL void
+static void
 look_at_object(buf, x, y, glyph)
 char *buf; /* output buffer */
 int x, y, glyph;
@@ -226,8 +244,10 @@ int x, y, glyph;
                      ? distant_name(otmp, otmp->dknown ? doname_with_price
                                                        : doname_vague_quan)
                      : obj_descr[STRANGE_OBJECT].oc_name);
-        if (fakeobj)
+        if (fakeobj) {
+            otmp->where = OBJ_FREE; /* object_from_map set it to OBJ_FLOOR */
             dealloc_obj(otmp), otmp = 0;
+        }
     } else
         Strcpy(buf, something); /* sanity precaution */
 
@@ -246,7 +266,7 @@ int x, y, glyph;
     return;
 }
 
-STATIC_OVL void
+static void
 look_at_monster(buf, monbuf, mtmp, x, y)
 char *buf, *monbuf; /* buf: output, monbuf: optional output */
 struct monst *mtmp;
@@ -273,7 +293,7 @@ int x, y;
             Strcat(buf, is_animal(mtmp->data)
                           ? ", swallowing you" : ", engulfing you");
         else
-            Strcat(buf, (Upolyd && sticks(youmonst.data))
+            Strcat(buf, (Upolyd && sticks(g.youmonst.data))
                           ? ", being held" : ", holding you");
     }
     if (mtmp->mleashed)
@@ -286,11 +306,12 @@ int x, y;
         /* newsym lets you know of the trap, so mention it here */
         if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB)
             Sprintf(eos(buf), ", trapped in %s", an(trapname(tt, FALSE)));
+            t->tseen = 1;
     }
 
     /* we know the hero sees a monster at this location, but if it's shown
        due to persistant monster detection he might remember something else */
-    if (mtmp->mundetected || mtmp->m_ap_type)
+    if (mtmp->mundetected || M_AP_TYPE(mtmp))
         mhidden_description(mtmp, FALSE, eos(buf));
 
     if (monbuf) {
@@ -340,8 +361,8 @@ int x, y;
                 if (Hallucination) {
                     Strcat(monbuf, "paranoid delusion");
                 } else {
-                    unsigned long mW = (context.warntype.obj
-                                        | context.warntype.polyd),
+                    unsigned long mW = (g.context.warntype.obj
+                                        | g.context.warntype.polyd),
                                   m2 = mtmp->data->mflags2;
                     const char *whom = ((mW & M2_HUMAN & m2) ? "human"
                                         : (mW & M2_ELF & m2) ? "elf"
@@ -368,7 +389,7 @@ int x, y;
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
  */
-STATIC_OVL struct permonst *
+static struct permonst *
 lookat(x, y, buf, monbuf)
 int x, y;
 char *buf, *monbuf;
@@ -380,7 +401,8 @@ char *buf, *monbuf;
     buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
     if (u.ux == x && u.uy == y && canspotself()
-        && !(iflags.save_uswallow && glyph == mon_to_glyph(u.ustuck))
+        && !(iflags.save_uswallow &&
+             glyph == mon_to_glyph(u.ustuck, rn2_on_display_rng))
         && (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
         /* fill in buf[] */
         (void) self_lookat(buf);
@@ -422,8 +444,8 @@ char *buf, *monbuf;
         Sprintf(buf, "interior of %s", a_monnam(u.ustuck));
         pm = u.ustuck->data;
     } else if (glyph_is_monster(glyph)) {
-        bhitpos.x = x;
-        bhitpos.y = y;
+        g.bhitpos.x = x;
+        g.bhitpos.y = y;
         if ((mtmp = m_at(x, y)) != 0) {
             look_at_monster(buf, monbuf, mtmp, x, y);
             pm = mtmp->data;
@@ -453,17 +475,21 @@ char *buf, *monbuf;
         Strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
-    } else
+    } else {
+        int amsk;
+        aligntyp algn;
+
         switch (glyph_to_cmap(glyph)) {
         case S_altar:
+            amsk = altarmask_at(x, y);
+            algn = Amask2align(amsk & AM_MASK);
             Sprintf(buf, "%s %saltar",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */
                     (Is_astralevel(&u.uz) && distu(x, y) > 2)
                         ? "aligned"
-                        : align_str(
-                              Amask2align(levl[x][y].altarmask & ~AM_SHRINE)),
-                    ((levl[x][y].altarmask & AM_SHRINE)
+                        : align_str(algn),
+                    ((amsk & AM_SHRINE) != 0
                      && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))
                         ? "high "
                         : "");
@@ -498,7 +524,7 @@ char *buf, *monbuf;
             Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
             break;
         }
-
+    }
     return (pm && !Hallucination) ? pm : (struct permonst *) 0;
 }
 
@@ -512,7 +538,7 @@ char *buf, *monbuf;
  *       lcase() for data.base lookup so that we can have a clean key.
  *       Therefore, we create a copy of inp _just_ for data.base lookup.
  */
-STATIC_OVL void
+static void
 checkfile(inp, pm, user_typed_name, without_asking, supplemental_name)
 char *inp;
 struct permonst *pm;
@@ -789,11 +815,12 @@ struct permonst **for_supplement;
                       unreconnoitered[] = "unreconnoitered";
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
-    int i, alt_i, glyph = NO_GLYPH,
+    int i, alt_i, j, glyph = NO_GLYPH,
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
             submerged = (Underwater && !Is_waterlevel(&u.uz));
     const char *x_str;
+    nhsym tmpsym;
 
     if (looked) {
         int oc;
@@ -801,7 +828,7 @@ struct permonst **for_supplement;
 
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
-        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
+        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y, 0);
 
         Sprintf(prefix, "%s        ", encglyph(glyph));
     } else
@@ -857,11 +884,11 @@ struct permonst **for_supplement;
         if (x_str == unreconnoitered)
             goto didlook;
     }
-
+ check_monsters:
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 1; i < MAXMCLASSES; i++) {
-            if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
+            if (sym == (looked ? g.showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
                 && def_monsyms[i].explain && *def_monsyms[i].explain) {
                 need_to_look = TRUE;
                 if (!found) {
@@ -877,7 +904,7 @@ struct permonst **for_supplement;
         /* handle '@' as a special case if it refers to you and you're
            playing a character which isn't normally displayed by that
            symbol; firstmatch is assumed to already be set for '@' */
-        if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M]
+        if ((looked ? (sym == g.showsyms[S_HUMAN + SYM_OFF_M]
                        && cc.x == u.ux && cc.y == u.uy)
                     : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
             && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
@@ -887,7 +914,7 @@ struct permonst **for_supplement;
     /* Now check for objects */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
         for (i = 1; i < MAXOCLASSES; i++) {
-            if (sym == (looked ? showsyms[i + SYM_OFF_O]
+            if (sym == (looked ? g.showsyms[i + SYM_OFF_O]
                                : def_oc_syms[i].sym)
                 || (looked && i == ROCK_CLASS && glyph_is_statue(glyph))) {
                 need_to_look = TRUE;
@@ -923,7 +950,7 @@ struct permonst **for_supplement;
     }
 
     /* Now check for graphics symbols */
-    alt_i = (sym == (looked ? showsyms[0] : defsyms[0].sym)) ? 0 : (2 + 1);
+    alt_i = (sym == (looked ? g.showsyms[0] : defsyms[0].sym)) ? 0 : (2 + 1);
     for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
         /* when sym is the default background character, we process
            i == 0 three times: unexplored, stone, dark part of a room */
@@ -939,7 +966,7 @@ struct permonst **for_supplement;
                 x_str = "land"; /* replace "dark part of a room" */
             /* alt_i is now 3 or more and no longer of interest */
         }
-        if (sym == (looked ? showsyms[i] : defsyms[i].sym) && *x_str) {
+        if (sym == (looked ? g.showsyms[i] : defsyms[i].sym) && *x_str) {
             /* avoid "an unexplored", "an stone", "an air", "a water",
                "a floor of a room", "a dark part of a room";
                article==2 => "the", 1 => "an", 0 => (none) */
@@ -982,7 +1009,7 @@ struct permonst **for_supplement;
     /* Now check for warning symbols */
     for (i = 1; i < WARNCOUNT; i++) {
         x_str = def_warnsyms[i].explanation;
-        if (sym == (looked ? warnsyms[i] : def_warnsyms[i].sym)) {
+        if (sym == (looked ? g.warnsyms[i] : def_warnsyms[i].sym)) {
             if (!found) {
                 Sprintf(out_str, "%s%s", prefix, def_warnsyms[i].explanation);
                 *firstmatch = def_warnsyms[i].explanation;
@@ -1010,8 +1037,44 @@ struct permonst **for_supplement;
         }
     }
 
+    /* Finally, handle some optional overriding symbols */
+    for (j = SYM_OFF_X; j < SYM_MAX; ++j) {
+        if (j == (SYM_INVISIBLE + SYM_OFF_X))
+            continue;       /* already handled above */
+        tmpsym = Is_rogue_level(&u.uz) ? g.ov_rogue_syms[j]
+                                       : g.ov_primary_syms[j];
+        if (tmpsym && sym == tmpsym) {
+            switch (j) {
+            case SYM_BOULDER + SYM_OFF_X:
+                if (!found) {
+                    *firstmatch = "boulder";
+                    Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
+                    found++;
+                } else {
+                    found += append_str(out_str, "boulder");
+                }
+                break;
+            case SYM_PET_OVERRIDE + SYM_OFF_X:
+                if (looked) {
+                    int oc = 0;
+                    unsigned os = 0;
+
+                    /* convert to symbol without override in effect */
+                    (void) mapglyph(glyph, &sym, &oc, &os,
+                                    cc.x, cc.y, MG_FLAG_NOOVERRIDE);
+                    goto check_monsters;
+                }
+                break;
+            case SYM_HERO_OVERRIDE + SYM_OFF_X:
+                sym = g.showsyms[S_HUMAN + SYM_OFF_M];
+                goto check_monsters;
+            }
+        }
+    }
+#if 0
     /* handle optional boulder symbol as a special case */
-    if (iflags.bouldersym && sym == iflags.bouldersym) {
+    if (o_syms[SYM_BOULDER + SYM_OFF_X]
+        && sym == o_syms[SYM_BOULDER + SYM_OFF_X]) {
         if (!found) {
             *firstmatch = "boulder";
             Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
@@ -1020,6 +1083,7 @@ struct permonst **for_supplement;
             found += append_str(out_str, "boulder");
         }
     }
+#endif
 
     /*
      * If we are looking at the screen, follow multiple possibilities or
@@ -1027,7 +1091,10 @@ struct permonst **for_supplement;
      */
 
     if (found > 4)
-        Sprintf(out_str, "%s", "That can be many things");
+        /* 3.6.3: this used to be "That can be many things" (without prefix)
+           which turned it into a sentence that lacked its terminating period;
+           we could add one below but reinstating the prefix here is better */
+        Sprintf(out_str, "%scan be many things", prefix);
 
  didlook:
     if (looked) {
@@ -1090,7 +1157,7 @@ coord *click_cc;
             winid win;
             anything any;
 
-            any = zeroany;
+            any = cg.zeroany;
             win = create_nhwindow(NHW_MENU);
             start_menu(win);
             any.a_char = '/';
@@ -1108,7 +1175,7 @@ coord *click_cc;
                      flags.lootabc ? 0 : any.a_char, 'n', ATR_NONE,
                      "something else (by symbol or name)", MENU_UNSELECTED);
             if (!u.uswallow && !Hallucination) {
-                any = zeroany;
+                any = cg.zeroany;
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                          "", MENU_UNSELECTED);
                 /* these options work sensibly for the swallowed case,
@@ -1161,7 +1228,7 @@ coord *click_cc;
             if (!invlet || invlet == '\033')
                 return 0;
             *out_str = '\0';
-            for (invobj = invent; invobj; invobj = invobj->nobj)
+            for (invobj = g.invent; invobj; invobj = invobj->nobj)
                 if (invobj->invlet == invlet) {
                     strcpy(out_str, singular(invobj, xname));
                     break;
@@ -1240,6 +1307,21 @@ coord *click_cc;
         if (found) {
             /* use putmixed() because there may be an encoded glyph present */
             putmixed(WIN_MESSAGE, 0, out_str);
+#ifdef DUMPLOG
+            {
+                char dmpbuf[BUFSZ];
+
+                /* putmixed() bypasses pline() so doesn't write to DUMPLOG;
+                   tty puts it into ^P recall, so it ought to be there;
+                   DUMPLOG is plain text, so override graphics character;
+                   at present, force space, but we ought to use defsyms[]
+                   value for the glyph the graphics character came from */
+                (void) decode_mixed(dmpbuf, out_str);
+                if (dmpbuf[0] < ' ' || dmpbuf[0] >= 127) /* ASCII isprint() */
+                    dmpbuf[0] = ' ';
+                dumplogmsg(dmpbuf);
+            }
+#endif
 
             /* check the data file for information about this thing */
             if (found == 1 && ans != LOOK_QUICK && ans != LOOK_ONCE
@@ -1264,7 +1346,7 @@ coord *click_cc;
     return 0;
 }
 
-STATIC_OVL void
+static void
 look_all(nearby, do_mons)
 boolean nearby; /* True => within BOLTLIM, False => entire map */
 boolean do_mons; /* True => monsters, False => objects */
@@ -1286,8 +1368,8 @@ boolean do_mons; /* True => monsters, False => objects */
                 if (glyph_is_monster(glyph)) {
                     struct monst *mtmp;
 
-                    bhitpos.x = x; /* [is this actually necessary?] */
-                    bhitpos.y = y;
+                    g.bhitpos.x = x; /* [is this actually necessary?] */
+                    g.bhitpos.y = y;
                     if (x == u.ux && y == u.uy && canspotself()) {
                         (void) self_lookat(lookbuf);
                         ++count;
@@ -1374,7 +1456,7 @@ static const char *suptext2[] = {
     (char *) 0,
 };
 
-void
+static void
 do_supplemental_info(name, pm, without_asking)
 char *name;
 struct permonst *pm;
@@ -1420,7 +1502,7 @@ boolean without_asking;
                 } else {
                     textp = suptext2;
                     gang = "";
-		}
+                }
                 datawin = create_nhwindow(NHW_MENU);
                 for (i = 0; textp[i]; i++) {
                     char buf[BUFSZ];
@@ -1477,7 +1559,7 @@ doidtrap()
         }
     }
 
-    for (trap = ftrap; trap; trap = trap->ntrap)
+    for (trap = g.ftrap; trap; trap = trap->ntrap)
         if (trap->tx == x && trap->ty == y) {
             if (!trap->tseen)
                 break;
@@ -1534,12 +1616,12 @@ doidtrap()
     rest_on_space, #if SHELL, #if SUSPEND) are booleans.
 */
 
-STATIC_DCL void
+static void
 whatdoes_help()
 {
     dlb *fp;
     char *p, buf[BUFSZ];
-    winid tmpwin = create_nhwindow(NHW_TEXT);
+    winid tmpwin;
 
     fp = dlb_fopen(KEYHELP, "r");
     if (!fp) {
@@ -1547,6 +1629,7 @@ whatdoes_help()
         display_nhwindow(WIN_MESSAGE, TRUE);
         return;
     }
+    tmpwin = create_nhwindow(NHW_TEXT);
     while (dlb_fgets(buf, (int) sizeof buf, fp)) {
         if (*buf == '#')
             continue;
@@ -1568,10 +1651,10 @@ struct wd_stack_frame {
     Bitfield(else_seen, 1);
 };
 
-STATIC_DCL boolean FDECL(whatdoes_cond, (char *, struct wd_stack_frame *,
+static boolean FDECL(whatdoes_cond, (char *, struct wd_stack_frame *,
                                          int *, int));
 
-STATIC_OVL boolean
+static boolean
 whatdoes_cond(buf, stack, depth, lnum)
 char *buf;
 struct wd_stack_frame *stack;
@@ -1819,7 +1902,7 @@ dowhatdoes()
     return 0;
 }
 
-STATIC_OVL void
+static void
 docontact(VOID_ARGS)
 {
     winid cwin = create_nhwindow(NHW_TEXT);
@@ -1849,61 +1932,61 @@ docontact(VOID_ARGS)
     destroy_nhwindow(cwin);
 }
 
-void
+static void
 dispfile_help(VOID_ARGS)
 {
     display_file(HELP, TRUE);
 }
 
-void
+static void
 dispfile_shelp(VOID_ARGS)
 {
     display_file(SHELP, TRUE);
 }
 
-void
+static void
 dispfile_optionfile(VOID_ARGS)
 {
     display_file(OPTIONFILE, TRUE);
 }
 
-void
+static void
 dispfile_license(VOID_ARGS)
 {
     display_file(LICENSE, TRUE);
 }
 
-void
+static void
 dispfile_debughelp(VOID_ARGS)
 {
     display_file(DEBUGHELP, TRUE);
 }
 
-void
+static void
 hmenu_doextversion(VOID_ARGS)
 {
     (void) doextversion();
 }
 
-void
+static void
 hmenu_dohistory(VOID_ARGS)
 {
     (void) dohistory();
 }
 
-void
+static void
 hmenu_dowhatis(VOID_ARGS)
 {
     (void) dowhatis();
 }
 
-void
+static void
 hmenu_dowhatdoes(VOID_ARGS)
 {
     (void) dowhatdoes();
 }
 
-void
+static void
 hmenu_doextlist(VOID_ARGS)
 {
     (void) doextlist();
@@ -1919,7 +2002,7 @@ domenucontrols(VOID_ARGS)
 }
 
 /* data for dohelp() */
-static struct {
+static const struct {
     void NDECL((*f));
     const char *text;
 } help_menu_items[] = {
@@ -1954,7 +2037,7 @@ dohelp()
     anything any;
     int sel;
 
-    any = zeroany; /* zero all bits */
+    any = cg.zeroany; /* zero all bits */
     start_menu(tmpwin);
 
     for (i = 0; help_menu_items[i].text; i++) {

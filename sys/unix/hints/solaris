@@ -1,0 +1,44 @@
+#
+# NetHack 3.6 unix $NHDT-Date: 1554411633 2019/04/04 21:00:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.0 $
+# Copyright (c) Kevin Smolkowski "Snivik", Elgin Oregon 2019.
+# NetHack may be freely redistributed.  See license for details. 
+#
+#-PRE
+# solaris hints file
+# This hints file provides a single-user x11 build for Solaris, specifically
+# for Solaris 10 and 11, but should work just fine on older versions
+
+# Build using using included gcc and gmake, optional flex and bison come from csw for solaris 10 and included 
+# with Solaris 11
+
+# Build NetHack off your home directory
+HACKDIR=$(HOME)/nethackdir
+INSTDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)
+SHELLDIR=$(HOME)
+
+POSTINSTALL= cp sys/unix/sysconf $(INSTDIR)/sysconf;
+
+CC=gcc
+CFLAGS=-O -I../include
+LINK=$(CC)
+
+WINSRC = $(WINTTYSRC)
+WINOBJ = $(WINTTYOBJ)
+WINLIB = $(WINTTYLIB)
+
+WINTTYLIB=-ltermlib
+
+CHOWN=true
+CHGRP=true
+
+GAMEUID  = games
+GAMEGRP  = bin
+
+GAMEPERM = 04755
+VARFILEPERM = 0644
+VARDIRPERM = 0755
+
+# Optional Tools to build level compiler
+#LEX=flex
+#YACC=bison -y

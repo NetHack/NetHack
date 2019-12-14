@@ -1,4 +1,4 @@
-/* NetHack 3.6  wintype.h       $NHDT-Date: 1461028538 2016/04/19 01:15:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6  wintype.h       $NHDT-Date: 1549327486 2019/02/05 00:44:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -74,12 +74,16 @@ typedef struct mi {
 #define NHW_TEXT 5
 
 /* attribute types for putstr; the same as the ANSI value, for convenience */
-#define ATR_NONE 0
-#define ATR_BOLD 1
-#define ATR_DIM 2
-#define ATR_ULINE 4
-#define ATR_BLINK 5
-#define ATR_INVERSE 7
+#define ATR_NONE       0
+#define ATR_BOLD       1
+#define ATR_DIM        2
+#define ATR_ULINE      4
+#define ATR_BLINK      5
+#define ATR_INVERSE    7
+/* not a display attribute but passed to putstr() as an attribute;
+   can be masked with one regular display attribute */
+#define ATR_URGENT    16
+#define ATR_NOHISTORY 32
 
 /* nh_poskey() modifier types */
 #define CLICK_1 1

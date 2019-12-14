@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixmain.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.6	unixmain.c	$NHDT-Date: 1570408210 2019/10/07 00:30:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -50,15 +50,15 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    register int fd;
 #ifdef CHDIR
     register char *dir;
 #endif
+    NHFILE *nhfp;
     boolean exact_username;
     boolean resuming = FALSE; /* assume new game */
     boolean plsel_once = FALSE;
 
-    sys_early_init();
+    early_init();
 
 #if defined(__APPLE__)
     {
@@ -92,8 +92,8 @@ char *argv[];
     }
 #endif
 
-    hname = argv[0];
-    hackpid = getpid();
+    g.hname = argv[0];
+    g.hackpid = getpid();
     (void) umask(0777 & ~FCMASK);
 
     choose_windows(DEFAULT_WINDOW_SYS);
@@ -114,11 +114,20 @@ char *argv[];
         if (argcheck(argc, argv, ARG_VERSION) == 2)
             exit(EXIT_SUCCESS);
 
+        if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
+#ifdef CHDIR
+            chdirx((char *) 0, 0);
+#endif
+            iflags.initoptions_noterminate = TRUE;
+            initoptions();
+            iflags.initoptions_noterminate = FALSE;
+            reveal_paths();
+            exit(EXIT_SUCCESS);
+        }
         if (argcheck(argc, argv, ARG_DEBUG) == 1) {
             argc--;
             argv++;
-	}
-
+        }
         if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
@@ -152,7 +161,7 @@ char *argv[];
             initoptions();
 #endif
 #ifdef PANICTRACE
-            ARGV0 = hname; /* save for possible stack trace */
+            ARGV0 = g.hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
             panictrace_setsignals(TRUE);
 #endif
@@ -180,7 +189,7 @@ char *argv[];
 #endif
     initoptions();
 #ifdef PANICTRACE
-    ARGV0 = hname; /* save for possible stack trace */
+    ARGV0 = g.hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
     panictrace_setsignals(TRUE);
 #endif
@@ -191,7 +200,7 @@ char *argv[];
      * It seems you really want to play.
      */
     u.uhp = 1; /* prevent RIP on early quits */
-    program_state.preserve_locks = 1;
+    g.program_state.preserve_locks = 1;
 #ifndef NO_SIGNAL
     sethanguphandler((SIG_RET_TYPE) hangup);
 #endif
@@ -209,9 +218,9 @@ char *argv[];
 #endif
 
 #ifdef DEF_PAGER
-    if (!(catmore = nh_getenv("HACKPAGER"))
-        && !(catmore = nh_getenv("PAGER")))
-        catmore = DEF_PAGER;
+    if (!(g.catmore = nh_getenv("HACKPAGER"))
+        && !(g.catmore = nh_getenv("PAGER")))
+        g.catmore = DEF_PAGER;
 #endif
 #ifdef MAIL
     getmailstatus();
@@ -229,11 +238,11 @@ char *argv[];
          * dash matches role, race, gender, or alignment.
          */
         /* guard against user names with hyphens in them */
-        int len = (int) strlen(plname);
+        int len = (int) strlen(g.plname);
         /* append the current role, if any, so that last dash is ours */
-        if (++len < (int) sizeof plname)
-            (void) strncat(strcat(plname, "-"), pl_character,
-                           sizeof plname - len - 1);
+        if (++len < (int) sizeof g.plname)
+            (void) strncat(strcat(g.plname, "-"), g.pl_character,
+                           sizeof g.plname - len - 1);
     }
     /* strip role,race,&c suffix; calls askname() if plname[] is empty
        or holds a generic user name like "player" or "games" */
@@ -241,7 +250,7 @@ char *argv[];
 
     if (wizard) {
         /* use character name rather than lock letter for file names */
-        locknum = 0;
+        g.locknum = 0;
     } else {
         /* suppress interrupts while processing lock file */
         (void) signal(SIGQUIT, SIG_IGN);
@@ -262,26 +271,26 @@ char *argv[];
      * First, try to find and restore a save file for specified character.
      * We'll return here if new game player_selection() renames the hero.
      */
-attempt_restore:
+ attempt_restore:
 
     /*
      * getlock() complains and quits if there is already a game
-     * in progress for current character name (when locknum == 0)
-     * or if there are too many active games (when locknum > 0).
+     * in progress for current character name (when g.locknum == 0)
+     * or if there are too many active games (when g.locknum > 0).
      * When proceeding, it creates an empty <lockname>.0 file to
      * designate the current game.
      * getlock() constructs <lockname> based on the character
-     * name (for !locknum) or on first available of alock, block,
+     * name (for !g.locknum) or on first available of alock, block,
      * clock, &c not currently in use in the playground directory
-     * (for locknum > 0).
+     * (for g.locknum > 0).
      */
-    if (*plname) {
+    if (*g.plname) {
         getlock();
-        program_state.preserve_locks = 0; /* after getlock() */
+        g.program_state.preserve_locks = 0; /* after getlock() */
     }
 
-    if (*plname && (fd = restore_saved_game()) >= 0) {
-        const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
+    if (*g.plname && (nhfp = restore_saved_game()) != 0) {
+        const char *fq_save = fqname(g.SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
 #ifndef NO_SIGNAL
@@ -295,7 +304,7 @@ attempt_restore:
 #endif
         pline("Restoring save file...");
         mark_synch(); /* flush output */
-        if (dorecover(fd)) {
+        if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             wd_message();
             if (discover || wizard) {
@@ -311,7 +320,7 @@ attempt_restore:
     }
 
     if (!resuming) {
-        boolean neednewlock = (!*plname);
+        boolean neednewlock = (!*g.plname);
         /* new game:  start by choosing role, race, etc;
            player might change the hero's name while doing that,
            in which case we try to restore under the new name
@@ -320,14 +329,14 @@ attempt_restore:
             if (!plsel_once)
                 player_selection();
             plsel_once = TRUE;
-            if (neednewlock && *plname)
+            if (neednewlock && *g.plname)
                 goto attempt_restore;
             if (iflags.renameinprogress) {
                 /* player has renamed the hero while selecting role;
                    if locking alphabetically, the existing lock file
                    can still be used; otherwise, discard current one
                    and create another for the new character name */
-                if (!locknum) {
+                if (!g.locknum) {
                     delete_levelfile(0); /* remove empty lock file */
                     getlock();
                 }
@@ -388,11 +397,11 @@ char *argv[];
 #endif
         case 'u':
             if (argv[0][2]) {
-                (void) strncpy(plname, argv[0] + 2, sizeof plname - 1);
+                (void) strncpy(g.plname, argv[0] + 2, sizeof g.plname - 1);
             } else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof plname - 1);
+                (void) strncpy(g.plname, argv[0], sizeof g.plname - 1);
             } else {
                 raw_print("Player name expected after -u");
             }
@@ -452,17 +461,17 @@ char *argv[];
 #else
     /* XXX This is deprecated in favor of SYSCF with MAXPLAYERS */
     if (argc > 1)
-        locknum = atoi(argv[1]);
+        g.locknum = atoi(argv[1]);
 #endif
 #ifdef MAX_NR_OF_PLAYERS
     /* limit to compile-time limit */
-    if (!locknum || locknum > MAX_NR_OF_PLAYERS)
-        locknum = MAX_NR_OF_PLAYERS;
+    if (!g.locknum || g.locknum > MAX_NR_OF_PLAYERS)
+        g.locknum = MAX_NR_OF_PLAYERS;
 #endif
 #ifdef SYSCF
     /* let syscf override compile-time limit */
-    if (!locknum || (sysopt.maxplayers && locknum > sysopt.maxplayers))
-        locknum = sysopt.maxplayers;
+    if (!g.locknum || (sysopt.maxplayers && g.locknum > sysopt.maxplayers))
+        g.locknum = sysopt.maxplayers;
 #endif
 }
 
@@ -489,12 +498,13 @@ boolean wr;
 #ifdef VAR_PLAYGROUND
         int len = strlen(VAR_PLAYGROUND);
 
-        fqn_prefix[SCOREPREFIX] = (char *) alloc(len + 2);
-        Strcpy(fqn_prefix[SCOREPREFIX], VAR_PLAYGROUND);
-        if (fqn_prefix[SCOREPREFIX][len - 1] != '/') {
-            fqn_prefix[SCOREPREFIX][len] = '/';
-            fqn_prefix[SCOREPREFIX][len + 1] = '\0';
+        g.fqn_prefix[SCOREPREFIX] = (char *) alloc(len + 2);
+        Strcpy(g.fqn_prefix[SCOREPREFIX], VAR_PLAYGROUND);
+        if (g.fqn_prefix[SCOREPREFIX][len - 1] != '/') {
+            g.fqn_prefix[SCOREPREFIX][len] = '/';
+            g.fqn_prefix[SCOREPREFIX][len + 1] = '\0';
         }
+
 #endif
     }
 
@@ -514,11 +524,11 @@ boolean wr;
      */
     if (wr) {
 #ifdef VAR_PLAYGROUND
-        fqn_prefix[LEVELPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[SAVEPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[BONESPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[LOCKPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[TROUBLEPREFIX] = fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[LEVELPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[SAVEPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[BONESPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[LOCKPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[TROUBLEPREFIX] = g.fqn_prefix[SCOREPREFIX];
 #endif
         check_recordfile(dir);
     }
@@ -531,8 +541,8 @@ whoami()
 {
     /*
      * Who am i? Algorithm: 1. Use name as specified in NETHACKOPTIONS
-     *			2. Use $USER or $LOGNAME	(if 1. fails)
-     *			3. Use getlogin()		(if 2. fails)
+     *                      2. Use $USER or $LOGNAME    (if 1. fails)
+     *                      3. Use getlogin()           (if 2. fails)
      * The resulting name is overridden by command line options.
      * If everything fails, or if the resulting name is some generic
      * account like "games", "play", "player", "hack" then eventually
@@ -540,7 +550,7 @@ whoami()
      * Note that we trust the user here; it is possible to play under
      * somebody else's name.
      */
-    if (!*plname) {
+    if (!*g.plname) {
         register const char *s;
 
         s = nh_getenv("USER");
@@ -550,8 +560,8 @@ whoami()
             s = getlogin();
 
         if (s && *s) {
-            (void) strncpy(plname, s, sizeof plname - 1);
-            if (index(plname, '-'))
+            (void) strncpy(g.plname, s, sizeof g.plname - 1);
+            if (index(g.plname, '-'))
                 return TRUE;
         }
     }
@@ -651,20 +661,20 @@ boolean
 check_user_string(optstr)
 char *optstr;
 {
-    struct passwd *pw = get_unix_pw();
+    struct passwd *pw;
     int pwlen;
     char *eop, *w;
-    char *pwname;
+    char *pwname = 0;
 
     if (optstr[0] == '*')
         return TRUE; /* allow any user */
-    if (!pw)
-        return FALSE;
     if (sysopt.check_plname)
-        pwname = plname;
-    else
+        pwname = g.plname;
+    else if ((pw = get_unix_pw()) != 0)
         pwname = pw->pw_name;
-    pwlen = strlen(pwname);
+    if (!pwname || !*pwname)
+        return FALSE;
+    pwlen = (int) strlen(pwname);
     eop = eos(optstr);
     w = optstr;
     while (w + pwlen <= eop) {
@@ -722,7 +732,6 @@ get_login_name()
     struct passwd *pw = get_unix_pw();
 
     buf[0] = '\0';
-
     if (pw)
         (void)strcpy(buf, pw->pw_name);
 
@@ -739,30 +748,64 @@ char *buf;
     /* This should be replaced when there is a Cocoa port. */
     const char *errfmt;
     size_t len;
-    FILE *PB = popen("/usr/bin/pbcopy","w");
-    if(!PB){
-	errfmt = "Unable to start pbcopy (%d)\n";
-	goto error;
+    FILE *PB = popen("/usr/bin/pbcopy", "w");
+
+    if (!PB) {
+        errfmt = "Unable to start pbcopy (%d)\n";
+        goto error;
     }
 
     len = strlen(buf);
     /* Remove the trailing \n, carefully. */
-    if(buf[len-1] == '\n') len--;
+    if (buf[len - 1] == '\n')
+        len--;
 
     /* XXX Sorry, I'm too lazy to write a loop for output this short. */
-    if(len!=fwrite(buf,1,len,PB)){
-	errfmt = "Error sending data to pbcopy (%d)\n";
-	goto error;
+    if (len != fwrite(buf, 1, len, PB)) {
+        errfmt = "Error sending data to pbcopy (%d)\n";
+        goto error;
     }
 
-    if(pclose(PB)!=-1){
-	return;
+    if (pclose(PB) != -1) {
+        return;
     }
     errfmt = "Error finishing pbcopy (%d)\n";
 
-error:
-    raw_printf(errfmt,strerror(errno));
+ error:
+    raw_printf(errfmt, strerror(errno));
 }
+#endif /* __APPLE__ */
+
+unsigned long
+sys_random_seed()
+{
+    unsigned long seed = 0L;
+    unsigned long pid = (unsigned long) getpid();
+    boolean no_seed = TRUE;
+#ifdef DEV_RANDOM
+    FILE *fptr;
+
+    fptr = fopen(DEV_RANDOM, "r");
+    if (fptr) {
+        fread(&seed, sizeof (long), 1, fptr);
+        has_strong_rngseed = TRUE;  /* decl.c */
+        no_seed = FALSE;
+        (void) fclose(fptr);
+    } else {
+        /* leaves clue, doesn't exit */
+        paniclog("sys_random_seed", "falling back to weak seed");
+    }
 #endif
+    if (no_seed) {
+        seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+        /* Quick dirty band-aid to prevent PRNG prediction */
+        if (pid) {
+            if (!(pid & 3L))
+                pid -= 1L;
+            seed *= pid;
+        }
+    }
+    return seed;
+}
 
 /*unixmain.c*/

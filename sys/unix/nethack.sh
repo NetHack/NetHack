@@ -1,5 +1,5 @@
 #!/bin/sh
-# NetHack 3.6  nethack.sh	$NHDT-Date: 1524689450 2018/04/25 20:50:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.19 $
+# NetHack 3.6  nethack.sh	$NHDT-Date: 1552425075 2019/03/12 21:11:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -17,7 +17,7 @@ esac
 export XUSERFILESEARCHPATH
 
 # Get font dir added, but only once (and only if there's an xset to be found).
-test -n "$DISPLAY" -a -e $HACKDIR/fonts.dir && xset p >/dev/null 2>&1 && (
+test -n "$DISPLAY" -a -f $HACKDIR/fonts.dir && xset p >/dev/null 2>&1 && (
 	xset fp- $HACKDIR >/dev/null 2>&1;
 	xset fp+ $HACKDIR
 )

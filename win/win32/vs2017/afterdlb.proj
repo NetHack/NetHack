@@ -3,7 +3,7 @@
   <Import Project="files.props"/>
   <Target Name="Build"
 	Inputs="$(ToolsDir)dlb.exe;@(DlbList);$(SysWinntDir)porthelp"
-	Outputs="$(BinDir)nhdat">
+	Outputs="$(BinDir)nhdat$(VERSION_MAJOR)$(VERSION_MINOR)$(PATCHLEVEL)">
 
  	<Copy SourceFiles="$(SysWinntDir)porthelp" DestinationFolder="$(DatDir)"/>
 	<WriteLinesToFile File="$(DatDir)dlb.lst" Lines="@(DlbList->'%(filename)%(extension)')" Overwrite="true"/>
@@ -12,6 +12,6 @@
 
 	</Target>
   <Target Name="Clean">
-	<Delete Files="$(BinDir)nhdat"/>
+	<Delete Files="$(BinDir)nhdat$(VERSION_MAJOR)$(VERSION_MINOR)$(PATCHLEVEL)"/>
   </Target>
 </Project>

@@ -710,7 +710,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     mgch = ' ';
                 } else {
                     (void) mapglyph(data->map[col][row], &mgch, &color,
-                                    &special, col, row);
+                                    &special, col, row, 0);
                 }
                 msg_data->buffer[index] = mgch;
                 index++;
@@ -824,7 +824,7 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
 #ifdef USE_PILEMARK
     /* rely on NetHack core helper routine */
     (void) mapglyph(data->map[i][j], &mgch, &color, &special,
-                    i, j);
+                    i, j, 0);
     if ((glyph != NO_GLYPH) && (special & MG_PET)
 #else
     if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
@@ -899,7 +899,7 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
     #else
         /* rely on NetHack core helper routine */
         (void) mapglyph(data->map[i][j], &mgch, &color,
-                        &special, i, j);
+                        &special, i, j, 0);
         ch = (char) mgch;
         if (((special & MG_PET) && iflags.hilite_pet)
             || ((special & (MG_DETECT | MG_BW_LAVA))
@@ -925,12 +925,12 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
         if (data->bUnicodeFont) {
             wch = winos_ascii_to_wide(ch);
             if (wch == 0x2591 || wch == 0x2592) {
-                int level = 80;
-                HBRUSH brush = CreateSolidBrush(RGB(level, level, level));
+                int intensity = 80;
+                HBRUSH brush = CreateSolidBrush(RGB(intensity, intensity, intensity));
                 FillRect(data->backBufferDC, rect, brush);
                 DeleteObject(brush);
-                level = (wch == 0x2591 ? 100 : 200);
-                brush = CreateSolidBrush(RGB(level, level, level));
+                intensity = (wch == 0x2591 ? 100 : 200);
+                brush = CreateSolidBrush(RGB(intensity, intensity, intensity));
                 RECT smallRect = { rect->left + 1, rect->top + 1,
                                     rect->right - 1, rect->bottom - 1 };
                 FillRect(data->backBufferDC, &smallRect, brush);

@@ -1,6 +1,12 @@
+# Guidebook without a suffix is usually a copy of Guidebook.txt.  The
+# latter is managed by git because it is part of the source distribution.
+# We don't want both copies.
 Guidebook
+# various intermediate files or generated output, not to be tracked.
 Guidebook.aux
+Guidebook.dvi
 Guidebook.log
 Guidebook.pdf
-Guidebook.synctex.gz
+Guidebook.ps
+*.synctex.*
 

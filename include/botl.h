@@ -1,4 +1,4 @@
-/* NetHack 3.6  botl.h  $NHDT-Date: 1526907469 2018/05/21 12:57:49 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6  botl.h  $NHDT-Date: 1562187996 2019/07/03 21:06:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,6 +27,11 @@ Astral Plane \GXXXXNNNN:123456 HP:1234(1234) Pw:1234(1234) AC:-127
 #define MAXCO (COLNO + 40)
 #endif
 
+struct condmap {
+    const char *id;
+    unsigned long bitmask;
+};
+
 enum statusfields {
     BL_CHARACTERISTICS = -3, /* alias for BL_STR..BL_CH */
     BL_RESET = -2,           /* Force everything to redisplay */
@@ -36,7 +41,7 @@ enum statusfields {
     BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, /* 7..12 */
     BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, /* 13..18 */
     BL_HPMAX, BL_LEVELDESC, BL_EXP, BL_CONDITION, /* 19..22 */
-    MAXBLSTATS
+    MAXBLSTATS /* [23] */
 };
 
 enum relationships { NO_LTEQGT = -1,
@@ -64,6 +69,59 @@ enum relationships { NO_LTEQGT = -1,
 #define BL_MASK_RIDE            0x00001000L
 #define BL_MASK_BITS            13 /* number of mask bits that can be set */
 /* clang-format on */
+
+/*
+ * Possible additional conditions:
+ *  major:
+ *      grab   - grabbed by eel so about to be drowned ("wrapd"? damage type
+ *               is AD_WRAP but message is "<mon> swings itself around you")
+ *      digst  - swallowed and being digested
+ *      lava   - trapped sinking into lava
+ *  in_between: (potentially severe but don't necessarily lead to death;
+ *               explains to player why he isn't getting to take any turns)
+ *      unconc - unconscious
+ *      parlyz - (multi < 0 && (!strncmp(multi_reason, "paralyzed", 9)
+ *                              || !strncmp(multi_reason, "frozen", 6)))
+ *      asleep - (multi < 0 && !strncmp(multi_reason, "sleeping", 8))
+ *      busy   - other multi < 0
+ *  minor:
+ *      held   - grabbed by non-eel or by eel but not susceptible to drowning
+ *      englf  - engulfed or swallowed but not being digested (usually
+ *               obvious but the blank symbol set makes that uncertain)
+ *      vomit  - vomiting (causes confusion and stun late in countdown)
+ *      trap   - trapped in pit, bear trap, web, or floor (solidified lava)
+ *      teth   - tethered to buried iron ball
+ *      chain  - punished
+ *      slip   - slippery fingers
+ *      ice    - standing on ice (movement becomes uncertain)
+ *     [underwater - movement uncertain, vision truncated, equipment at risk]
+ *  other:
+ *     [hold      - poly'd into grabber and holding adjacent monster]
+ *      Stormbringer - wielded weapon poses risks
+ *      Cleaver   - wielded weapon risks unintended consequences
+ *      barehand  - not wielding any weapon nor wearing gloves
+ *      no-weapon - not wielding any weapon
+ *      bow/xbow/sling - wielding a missile launcher of specified type
+ *      pole      - wielding a polearm
+ *      pick      - wielding a pickaxe
+ *      junk      - wielding non-weapon, non-weptool
+ *      naked     - no armor
+ *      no-gloves - self-explanatory
+ *      no-cloak  - ditto
+ *     [no-{other armor slots?} - probably much too verbose]
+ *  conduct?
+ *      [maybe if third status line is added]
+ *
+ *  Can't add all of these and probably don't want to.  But maybe we
+ *  can add some of them and it's not as many as first appears:
+ *  lava/trap/teth are mutually exclusive;
+ *  digst/grab/englf/held/hold are also mutually exclusive;
+ *  Stormbringer/Cleaver/barehand/no-weapon/bow&c/pole/pick/junk too;
+ *  naked/no-{any armor slot} likewise.
+ */
+
+#define VIA_WINDOWPORT() \
+    ((windowprocs.wincap2 & (WC2_HILITE_STATUS | WC2_FLUSH_STATUS)) != 0)
 
 #define REASSESS_ONLY TRUE
 
@@ -96,7 +154,42 @@ enum hlattribs { HL_UNDEF   = 0x00,
                  HL_ULINE   = 0x08,
                  HL_BLINK   = 0x10,
                  HL_DIM     = 0x20 };
-/* #endif STATUS_HILITES */
+
+#define MAXVALWIDTH 80 /* actually less, but was using 80 to allocate title
+                       * and leveldesc then using QBUFSZ everywhere else   */
+#ifdef STATUS_HILITES
+struct hilite_s {
+    enum statusfields fld;
+    boolean set;
+    unsigned anytype;
+    anything value;
+    int behavior;
+    char textmatch[MAXVALWIDTH];
+    enum relationships rel;
+    int coloridx;
+    struct hilite_s *next;
+};
+#endif
+
+struct istat_s {
+    const char *fldname;
+    const char *fldfmt;
+    long time;  /* moves when this field hilite times out */
+    boolean chg; /* need to recalc time? */
+    boolean percent_matters;
+    short percent_value;
+    unsigned anytype;
+    anything a;
+    char *val;
+    int valwidth;
+    enum statusfields idxmax;
+    enum statusfields fld;
+#ifdef STATUS_HILITES
+    struct hilite_s *hilite_rule; /* the entry, if any, in 'thresholds'
+                                   * list that currently applies        */
+    struct hilite_s *thresholds;
+#endif
+};
 
 extern const char *status_fieldnames[]; /* in botl.c */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1526933747 2018/05/21 20:15:47 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1575245096 2019/12/02 00:04:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -58,20 +58,20 @@ extern void FDECL(trace_procs_init, (int));
 extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
 #endif
 
-STATIC_DCL void FDECL(def_raw_print, (const char *s));
-STATIC_DCL void NDECL(def_wait_synch);
+static void FDECL(def_raw_print, (const char *s));
+static void NDECL(def_wait_synch);
 
 #ifdef DUMPLOG
-STATIC_DCL winid FDECL(dump_create_nhwindow, (int));
-STATIC_DCL void FDECL(dump_clear_nhwindow, (winid));
-STATIC_DCL void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
-STATIC_DCL void FDECL(dump_destroy_nhwindow, (winid));
-STATIC_DCL void FDECL(dump_start_menu, (winid));
-STATIC_DCL void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P,
+static winid FDECL(dump_create_nhwindow, (int));
+static void FDECL(dump_clear_nhwindow, (winid));
+static void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
+static void FDECL(dump_destroy_nhwindow, (winid));
+static void FDECL(dump_start_menu, (winid));
+static void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P,
                                       CHAR_P, int, const char *, BOOLEAN_P));
-STATIC_DCL void FDECL(dump_end_menu, (winid, const char *));
-STATIC_DCL int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
-STATIC_DCL void FDECL(dump_putstr, (winid, int, const char *));
+static void FDECL(dump_end_menu, (winid, const char *));
+static int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
+static void FDECL(dump_putstr, (winid, int, const char *));
 #endif /* DUMPLOG */
 
 #ifdef HANGUPHANDLING
@@ -185,8 +185,6 @@ wl_addtail(struct winlink *wl)
 }
 #endif /* WINCHAIN */
 
-static struct win_choices *last_winchoice = 0;
-
 boolean
 genl_can_suspend_no(VOID_ARGS)
 {
@@ -199,7 +197,7 @@ genl_can_suspend_yes(VOID_ARGS)
     return TRUE;
 }
 
-STATIC_OVL
+static
 void
 def_raw_print(s)
 const char *s;
@@ -207,7 +205,7 @@ const char *s;
     puts(s);
 }
 
-STATIC_OVL
+static
 void
 def_wait_synch(VOID_ARGS)
 {
@@ -253,11 +251,11 @@ const char *s;
         if (!strcmpi(s, winchoices[i].procs->name)) {
             windowprocs = *winchoices[i].procs;
 
-            if (last_winchoice && last_winchoice->ini_routine)
-                (*last_winchoice->ini_routine)(WININIT_UNDO);
+            if (g.last_winchoice && g.last_winchoice->ini_routine)
+                (*g.last_winchoice->ini_routine)(WININIT_UNDO);
             if (winchoices[i].ini_routine)
                 (*winchoices[i].ini_routine)(WININIT);
-            last_winchoice = &winchoices[i];
+            g.last_winchoice = &winchoices[i];
             return;
         }
     }
@@ -374,7 +372,7 @@ commit_windowchain()
                                               p->nextlink->linkdata);
         } else {
             (void) (*p->wincp->chain_routine)(WINCHAIN_INIT, n, p->linkdata,
-                                              last_winchoice->procs, 0);
+                                              g.last_winchoice->procs, 0);
         }
     }
 
@@ -525,7 +523,9 @@ static void FDECL(hup_void_fdecl_winid, (winid));
 static void FDECL(hup_void_fdecl_constchar_p, (const char *));
 
 static struct window_procs hup_procs = {
-    "hup", 0L, 0L, hup_init_nhwindows,
+    "hup", 0L, 0L,
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    hup_init_nhwindows,
     hup_void_ndecl,                                    /* player_selection */
     hup_void_ndecl,                                    /* askname */
     hup_void_ndecl,                                    /* get_nh_event */
@@ -1085,18 +1085,19 @@ unsigned long *colormasks UNUSED;
     putmixed(WIN_STATUS, 0, newbot2); /* putmixed() due to GOLD glyph */
 }
 
-STATIC_VAR struct window_procs dumplog_windowprocs_backup;
-STATIC_VAR FILE *dumplog_file;
+static struct window_procs dumplog_windowprocs_backup;
+static FILE *dumplog_file;
 
 #ifdef DUMPLOG
-STATIC_VAR time_t dumplog_now;
+static time_t dumplog_now;
 
-STATIC_DCL char *FDECL(dump_fmtstr, (const char *, char *));
-
-STATIC_OVL char *
-dump_fmtstr(fmt, buf)
+char *
+dump_fmtstr(fmt, buf, fullsubs)
 const char *fmt;
 char *buf;
+boolean fullsubs; /* True -> full substitution for file name, False ->
+                   * partial substitution for '--showpaths' feedback
+                   * where there's no game in progress when executed */
 {
     const char *fp = fmt;
     char *bp = buf;
@@ -1119,7 +1120,7 @@ char *buf;
      * may or may not interfere with that usage.]
      */
 
-    while (fp && *fp && len < BUFSZ-1) {
+    while (fp && *fp && len < BUFSZ - 1) {
         if (*fp == '%') {
             fp++;
             switch (*fp) {
@@ -1130,38 +1131,68 @@ char *buf;
                 Sprintf(tmpbuf, "%%");
                 break;
             case 't': /* game start, timestamp */
-                Sprintf(tmpbuf, "%lu", (unsigned long) ubirthday);
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%lu", (unsigned long) ubirthday);
+                else
+                    Strcpy(tmpbuf, "{game start cookie}");
                 break;
             case 'T': /* current time, timestamp */
-                Sprintf(tmpbuf, "%lu", (unsigned long) now);
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%lu", (unsigned long) now);
+                else
+                    Strcpy(tmpbuf, "{current time cookie}");
                 break;
             case 'd': /* game start, YYYYMMDDhhmmss */
-                Sprintf(tmpbuf, "%08ld%06ld",
-                        yyyymmdd(ubirthday), hhmmss(ubirthday));
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%08ld%06ld",
+                            yyyymmdd(ubirthday), hhmmss(ubirthday));
+                else
+                    Strcpy(tmpbuf, "{game start date+time}");
                 break;
             case 'D': /* current time, YYYYMMDDhhmmss */
-                Sprintf(tmpbuf, "%08ld%06ld", yyyymmdd(now), hhmmss(now));
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%08ld%06ld", yyyymmdd(now), hhmmss(now));
+                else
+                    Strcpy(tmpbuf, "{current date+time}");
                 break;
-            case 'v': /* version, eg. "3.6.2-0" */
+            case 'v': /* version, eg. "3.6.3-0" */
                 Sprintf(tmpbuf, "%s", version_string(verbuf));
                 break;
             case 'u': /* UID */
                 Sprintf(tmpbuf, "%ld", uid);
                 break;
             case 'n': /* player name */
-                Sprintf(tmpbuf, "%s", *plname ? plname : "unknown");
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%s", *g.plname ? g.plname : "unknown");
+                else
+                    Strcpy(tmpbuf, "{hero name}");
                 break;
             case 'N': /* first character of player name */
-                Sprintf(tmpbuf, "%c", *plname ? *plname : 'u');
+                if (fullsubs)
+                    Sprintf(tmpbuf, "%c", *g.plname ? *g.plname : 'u');
+                else
+                    Strcpy(tmpbuf, "{hero initial}");
                 break;
             }
+            if (fullsubs) {
+                /* replace potentially troublesome characters (including
+                   <space> even though it might be an acceptable file name
+                   character); user shouldn't be able to get ' ' or '/'
+                   or '\\' into plname[] but play things safe */
+                (void) strNsubst(tmpbuf, " ", "_", 0);
+                (void) strNsubst(tmpbuf, "/", "_", 0);
+                (void) strNsubst(tmpbuf, "\\", "_", 0);
+                /* note: replacements are only done on field substitutions,
+                   not on the template (from sysconf or DUMPLOG_FILE) */
+            }
 
-            slen = strlen(tmpbuf);
-            if (len + slen < BUFSZ-1) {
+            slen = (int) strlen(tmpbuf);
+            if (len + slen < BUFSZ - 1) {
                 len += slen;
                 Sprintf(bp, "%s", tmpbuf);
                 bp += slen;
-                if (*fp) fp++;
+                if (*fp)
+                    fp++;
             } else
                 break;
         } else {
@@ -1189,9 +1220,9 @@ time_t now;
 #ifdef SYSCF
     if (!sysopt.dumplogfile)
         return;
-    fname = dump_fmtstr(sysopt.dumplogfile, buf);
+    fname = dump_fmtstr(sysopt.dumplogfile, buf, TRUE);
 #else
-    fname = dump_fmtstr(DUMPLOG_FILE, buf);
+    fname = dump_fmtstr(DUMPLOG_FILE, buf, TRUE);
 #endif
     dumplog_file = fopen(fname, "w");
     dumplog_windowprocs_backup = windowprocs;
@@ -1224,7 +1255,7 @@ int no_forward;
 }
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 dump_putstr(win, attr, str)
 winid win UNUSED;
 int attr UNUSED;
@@ -1234,7 +1265,7 @@ const char *str;
         fprintf(dumplog_file, "%s\n", str);
 }
 
-STATIC_OVL winid
+static winid
 dump_create_nhwindow(dummy)
 int dummy;
 {
@@ -1242,7 +1273,7 @@ int dummy;
 }
 
 /*ARGUSED*/
-STATIC_OVL void
+static void
 dump_clear_nhwindow(win)
 winid win UNUSED;
 {
@@ -1250,7 +1281,7 @@ winid win UNUSED;
 }
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 dump_display_nhwindow(win, p)
 winid win UNUSED;
 boolean p UNUSED;
@@ -1259,7 +1290,7 @@ boolean p UNUSED;
 }
 
 /*ARGUSED*/
-STATIC_OVL void
+static void
 dump_destroy_nhwindow(win)
 winid win UNUSED;
 {
@@ -1267,7 +1298,7 @@ winid win UNUSED;
 }
 
 /*ARGUSED*/
-STATIC_OVL void
+static void
 dump_start_menu(win)
 winid win UNUSED;
 {
@@ -1275,7 +1306,7 @@ winid win UNUSED;
 }
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 dump_add_menu(win, glyph, identifier, ch, gch, attr, str, preselected)
 winid win UNUSED;
 int glyph;
@@ -1295,7 +1326,7 @@ boolean preselected UNUSED;
 }
 
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 dump_end_menu(win, str)
 winid win UNUSED;
 const char *str;
@@ -1308,7 +1339,7 @@ const char *str;
     }
 }
 
-STATIC_OVL int
+static int
 dump_select_menu(win, how, item)
 winid win UNUSED;
 int how UNUSED;
@@ -1340,6 +1371,30 @@ boolean onoff_flag;
     } else {
         iflags.in_dumplog = FALSE;
     }
+}
+
+#ifdef TTY_GRAPHICS
+#ifdef TEXTCOLOR
+#ifdef TOS
+extern const char *hilites[CLR_MAX];
+#else
+extern NEARDATA char *hilites[CLR_MAX];
+#endif
+#endif
+#endif
+
+int
+has_color(color)
+int color;
+{
+    return (iflags.use_color && windowprocs.name
+            && (windowprocs.wincap & WC_COLOR) && windowprocs.has_color[color]
+#ifdef TTY_GRAPHICS
+#if defined(TEXTCOLOR) && defined(TERMLIB) && !defined(NO_TERMS)
+             && (hilites[color] != 0)
+#endif
+#endif
+    );
 }
 
 /*windows.c*/

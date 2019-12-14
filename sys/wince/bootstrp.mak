@@ -291,7 +291,7 @@ $(U)makedefs.exe:	$(MAKEOBJS)
 	$(link) $(LFLAGSU) -out:$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
-		 $(INCL)\monsym.h    $(INCL)\qtext.h	$(INCL)\patchlevel.h \
+		 $(INCL)\monsym.h    $(INCL)\patchlevel.h \
 		 $(U)makedefs.c
 	if not exist $(OBJ)\*.* echo creating directory $(OBJ)
 	if not exist $(OBJ)\*.* mkdir $(OBJ)
@@ -834,8 +834,8 @@ $(O)polyself.o: $(SRC)\polyself.c $(HACK_H)
 $(O)potion.o: $(SRC)\potion.c $(HACK_H)
 $(O)pray.o: $(SRC)\pray.c $(HACK_H)
 $(O)priest.o: $(SRC)\priest.c $(HACK_H) $(INCL)\mfndpos.h
-$(O)quest.o: $(SRC)\quest.c $(HACK_H) $(INCL)\qtext.h
-$(O)questpgr.o: $(SRC)\questpgr.c $(HACK_H) $(INCL)\dlb.h $(INCL)\qtext.h
+$(O)quest.o: $(SRC)\quest.c $(HACK_H)
+$(O)questpgr.o: $(SRC)\questpgr.c $(HACK_H) $(INCL)\dlb.h
 $(O)read.o: $(SRC)\read.c $(HACK_H)
 $(O)rect.o: $(SRC)\rect.c $(HACK_H)
 $(O)region.o: $(SRC)\region.c $(HACK_H) $(INCL)\lev.h
@@ -867,7 +867,7 @@ $(O)weapon.o: $(SRC)\weapon.c $(HACK_H)
 $(O)were.o: $(SRC)\were.c $(HACK_H)
 $(O)wield.o: $(SRC)\wield.c $(HACK_H)
 $(O)windows.o: $(SRC)\windows.c $(HACK_H) $(INCL)\wingem.h $(INCL)\winGnome.h
-$(O)wizard.o: $(SRC)\wizard.c $(HACK_H) $(INCL)\qtext.h
+$(O)wizard.o: $(SRC)\wizard.c $(HACK_H)
 $(O)worm.o: $(SRC)\worm.c $(HACK_H) $(INCL)\lev.h
 $(O)worn.o: $(SRC)\worn.c $(HACK_H)
 $(O)write.o: $(SRC)\write.c $(HACK_H)

@@ -1,0 +1,39 @@
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.3 $ $NHDT-Date: 1576282492 2019/12/14 00:14:52 $
+
+This fixes36.4 file is here to capture information about updates in the 3.6.x
+lineage following the release of 3.6.3 in December 2019.  Hypothetical version
+3.6.4 may not be released, in which case these fixes will appear in 3.7.0.
+
+General Fixes and Modified Features
+-----------------------------------
+GDBPATH and GREPPATH from sysconf or -D... on compilation command line were
+	being processed even if PANICTRACE was disabled but only being freed
+	at end of game when that was enabled
+fix the article used in the message when your steed encounters a polymorph trap
+alloc teleporting onto the vibrating square
+message "your knapsack can't accomodate any more items" when picking stuff up
+	or removing such from container was inaccurate if there was some gold
+	pending; vary the message rather than add more convoluted pickup code
+dozen-ish assorted spelling/typo fixes in messages and source comments
+
+
+Fixes to Post-3.6.3 Problems that Were Exposed Via git Repository
+------------------------------------------------------------------
+
+
+Platform- and/or Interface-Specific Fixes or Features
+-----------------------------------------------------
+
+
+General New Features
+--------------------
+
+
+NetHack Community Patches (or Variation) Included
+-------------------------------------------------
+
+
+Code Cleanup and Reorganization
+-------------------------------
+
+

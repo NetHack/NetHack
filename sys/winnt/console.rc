@@ -1,4 +1,4 @@
-/* NetHack 3.6	console.rc	$NHDT-Date: 1432512793 2015/05/25 00:13:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	console.rc	$NHDT-Date: 1575245149 2019/12/02 00:05:49 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Yitzhak Sapir, 2002. 					*/
 /* NetHack may be freely redistributed.  See license for details. 	*/
 
@@ -12,8 +12,8 @@
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,6,2,0
- PRODUCTVERSION 3,6,2,0
+ FILEVERSION 3,6,3,0
+ PRODUCTVERSION 3,6,3,0
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -29,13 +29,13 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "NetHack for Windows - TTY Interface\0"
-            VALUE "FileVersion", "3.6.2\0"
+            VALUE "FileVersion", "3.6.3\0"
             VALUE "InternalName", "NetHack\0"
-            VALUE "LegalCopyright", "Copyright (C) 1985 - 2018.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details.\0"
+            VALUE "LegalCopyright", "Copyright (C) 1985 - 2019.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details.\0"
             VALUE "OriginalFilename", "NetHack.exe\0"
             VALUE "PrivateBuild", "050102\0"
             VALUE "ProductName", "NetHack\0"
-            VALUE "ProductVersion", "3.6.2\0"
+            VALUE "ProductVersion", "3.6.3\0"
         END
     END
     BLOCK "VarFileInfo"

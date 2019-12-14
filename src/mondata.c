@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1546465283 2019/01/02 21:41:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1574648940 2019/11/25 02:29:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,30 +10,30 @@
 
 /* set up an individual monster's base type (initial creation, shapechange) */
 void
-set_mon_data(mon, ptr, flag)
+set_mon_data(mon, ptr)
 struct monst *mon;
 struct permonst *ptr;
-int flag;
 {
     int new_speed, old_speed = mon->data ? mon->data->mmove : 0;
 
     mon->data = ptr;
     mon->mnum = (short) monsndx(ptr);
-    if (flag == -1)
-        return; /* "don't care" */
 
-    if (flag == 1)
-        mon->mintrinsics |= (ptr->mresists & 0x00FF);
-    else
-        mon->mintrinsics = (ptr->mresists & 0x00FF);
-
-    if (mon->movement) { /* same adjustment as poly'd hero undergoes */
+    if (mon->movement) { /* used to adjust poly'd hero as well as monsters */
         new_speed = ptr->mmove;
         /* prorate unused movement if new form is slower so that
            it doesn't get extra moves leftover from previous form;
            if new form is faster, leave unused movement as is */
-        if (new_speed < old_speed)
-            mon->movement = new_speed * mon->movement / old_speed;
+        if (new_speed < old_speed) {
+            /*
+             * Some static analysis warns that this might divide by 0
+               mon->movement = new_speed * mon->movement / old_speed;
+             * so add a redundant test to suppress that.
+             */
+            mon->movement *= new_speed;
+            if (old_speed > 0) /* old > new and new >= 0, so always True */
+                mon->movement /= old_speed;
+        }
     }
     return;
 }
@@ -88,7 +88,7 @@ struct permonst *ptr;
 {
     /* non-stone golems turn into stone golems unless latter is genocided */
     return (boolean) (is_golem(ptr) && ptr != &mons[PM_STONE_GOLEM]
-                      && !(mvitals[PM_STONE_GOLEM].mvflags & G_GENOD));
+                      && !(g.mvitals[PM_STONE_GOLEM].mvflags & G_GENOD));
     /* allow G_EXTINCT */
 }
 
@@ -102,10 +102,10 @@ struct monst *mon;
 
     if (is_undead(ptr) || is_demon(ptr) || is_were(ptr)
         /* is_were() doesn't handle hero in human form */
-        || (mon == &youmonst && u.ulycn >= LOW_PM)
+        || (mon == &g.youmonst && u.ulycn >= LOW_PM)
         || ptr == &mons[PM_DEATH] || is_vampshifter(mon))
         return TRUE;
-    wep = (mon == &youmonst) ? uwep : MON_WEP(mon);
+    wep = (mon == &g.youmonst) ? uwep : MON_WEP(mon);
     return (boolean) (wep && wep->oartifact && defends(AD_DRLI, wep));
 }
 
@@ -115,7 +115,7 @@ resists_magm(mon)
 struct monst *mon;
 {
     struct permonst *ptr = mon->data;
-    boolean is_you = (mon == &youmonst);
+    boolean is_you = (mon == &g.youmonst);
     long slotmask;
     struct obj *o;
 
@@ -128,7 +128,7 @@ struct monst *mon;
     if (o && o->oartifact && defends(AD_MAGM, o))
         return TRUE;
     /* check for magic resistance granted by worn or carried items */
-    o = is_you ? invent : mon->minvent;
+    o = is_you ? g.invent : mon->minvent;
     slotmask = W_ARMOR | W_ACCESSORY;
     if (!is_you /* assumes monsters don't wield non-weapons */
         || (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
@@ -149,7 +149,7 @@ resists_blnd(mon)
 struct monst *mon;
 {
     struct permonst *ptr = mon->data;
-    boolean is_you = (mon == &youmonst);
+    boolean is_you = (mon == &g.youmonst);
     long slotmask;
     struct obj *o;
 
@@ -166,7 +166,7 @@ struct monst *mon;
     o = is_you ? uwep : MON_WEP(mon);
     if (o && o->oartifact && defends(AD_BLND, o))
         return TRUE;
-    o = is_you ? invent : mon->minvent;
+    o = is_you ? g.invent : mon->minvent;
     slotmask = W_ARMOR | W_ACCESSORY;
     if (!is_you /* assumes monsters don't wield non-weapons */
         || (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
@@ -190,7 +190,7 @@ struct monst *mdef;
 uchar aatyp;
 struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
 {
-    boolean is_you = (mdef == &youmonst);
+    boolean is_you = (mdef == &g.youmonst);
     boolean check_visor = FALSE;
     struct obj *o;
     const char *s;
@@ -226,7 +226,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
             return TRUE; /* no defense */
         } else
             return FALSE; /* other objects cannot cause blindness yet */
-        if ((magr == &youmonst) && u.uswallow)
+        if ((magr == &g.youmonst) && u.uswallow)
             return FALSE; /* can't affect eyes while inside monster */
         break;
 
@@ -241,7 +241,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
         /* e.g. raven: all ublindf, including LENSES, protect */
         if (is_you && ublindf)
             return FALSE;
-        if ((magr == &youmonst) && u.uswallow)
+        if ((magr == &g.youmonst) && u.uswallow)
             return FALSE; /* can't affect eyes while inside monster */
         check_visor = TRUE;
         break;
@@ -259,7 +259,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
 
     /* check if wearing a visor (only checked if visor might help) */
     if (check_visor) {
-        o = (mdef == &youmonst) ? invent : mdef->minvent;
+        o = (mdef == &g.youmonst) ? g.invent : mdef->minvent;
         for (; o; o = o->nobj)
             if ((o->owornmask & W_ARMH)
                 && (s = OBJ_DESCR(objects[o->otyp])) != (char *) 0
@@ -340,7 +340,7 @@ struct monst *mtmp;
         && (breathless(mtmp->data) || verysmall(mtmp->data)
             || !has_head(mtmp->data) || mtmp->data->mlet == S_EEL))
         return FALSE;
-    if ((mtmp == &youmonst) && Strangled)
+    if ((mtmp == &g.youmonst) && Strangled)
         return FALSE;
     return TRUE;
 }
@@ -350,7 +350,7 @@ boolean
 can_chant(mtmp)
 struct monst *mtmp;
 {
-    if ((mtmp == &youmonst && Strangled)
+    if ((mtmp == &g.youmonst && Strangled)
         || is_silent(mtmp->data) || !has_head(mtmp->data)
         || mtmp->data->msound == MS_BUZZ || mtmp->data->msound == MS_BURBLE)
         return FALSE;
@@ -374,10 +374,10 @@ struct monst *mon;
        are non-breathing creatures which have higher brain function. */
     if (!has_head(mon->data))
         return FALSE;
-    if (mon == &youmonst) {
+    if (mon == &g.youmonst) {
         /* hero can't be mindless but poly'ing into mindless form can
            confer strangulation protection */
-        nobrainer = mindless(youmonst.data);
+        nobrainer = mindless(g.youmonst.data);
         nonbreathing = Breathless;
     } else {
         nobrainer = mindless(mon->data);
@@ -910,13 +910,20 @@ register struct monst *mtmp;
     return mtmp->female;
 }
 
-/* Like gender(), but lower animals and such are still "it".
-   This is the one we want to use when printing messages. */
+/* Like gender(), but unseen humanoids are "it" rather than "he" or "she"
+   and lower animals and such are "it" even when seen; hallucination might
+   yield "they".  This is the one we want to use when printing messages. */
 int
-pronoun_gender(mtmp, override_vis)
+pronoun_gender(mtmp, pg_flags)
 register struct monst *mtmp;
-boolean override_vis; /* if True then 'no it' unless neuter */
+unsigned pg_flags; /* flags&1: 'no it' unless neuter,
+                    * flags&2: random if hallucinating */
 {
+    boolean override_vis = (pg_flags & PRONOUN_NO_IT) ? TRUE : FALSE,
+            hallu_rand = (pg_flags & PRONOUN_HALLU) ? TRUE : FALSE;
+
+    if (hallu_rand && Hallucination)
+        return rn2(4); /* 0..3 */
     if (!override_vis && !canspotmon(mtmp))
         return 2;
     if (is_neuter(mtmp->data))
@@ -1081,8 +1088,8 @@ const struct permonst *
 raceptr(mtmp)
 struct monst *mtmp;
 {
-    if (mtmp == &youmonst && !Upolyd)
-        return &mons[urace.malenum];
+    if (mtmp == &g.youmonst && !Upolyd)
+        return &mons[g.urace.malenum];
     else
         return mtmp->data;
 }

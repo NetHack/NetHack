@@ -1,6 +1,6 @@
 # depend.awk -- awk script used to construct makefile dependencies
 # for nethack's source files (`make depend' support for Makefile.src).
-# $NHDT-Date: 1546220373 2018/12/31 01:39:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.8 $
+# $NHDT-Date: 1575916941 2019/12/09 18:42:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $
 #
 # usage:
 #   cd src ; nawk -f depend.awk ../include/*.h list-of-.c/.cpp-files
@@ -41,14 +41,25 @@ FNR == 1	{ output_dep()			#finish previous file
 		  #[3.4.0: gnomehack headers currently aren't in include]
 		  #[3.6.2: Qt4 headers aren't in include either]
 		  #[3.6.2: curses headers likewise]
+		  #[3.7.0: Qt headers have moved]
 		  if (incl ~ /\.h$/) {
-                    if (incl ~ "curses\.h")
-                      incl = ""	 # skip "curses.h"; it should be <curses.h>
+		    if (incl ~ "curses\.h")
+		      incl = ""	# skip "curses.h"; it should be <curses.h>
+		    else if (incl ~ /^..\/lib\/lua-.*\/src\/l/)
+		      incl = ""	# skip lua headers
 		    else if (incl ~ /^curs/)	# curses special case
 		      incl = "../win/curses/" incl
-		    else if (incl ~ /^qt4/)	# Qt v4 special case
-		      incl = "../win/Qt4/" incl
-		    else if (incl ~ /^gn/)	# gnomehack special case
+		    else if (incl ~ /^qt/) {	# Qt special cases
+		      # qtext.h is a core header that accidentally matches...
+		      if (incl ~ /^qtext.h/)	# ...the Qt exception
+		        incl = "../include/" incl
+		      # Qt v3 headers are in ../win/Qt3
+		      # Qt v4/v5 headers are in ../win/Qt
+		      else if (FILENAME ~ /^\.\.\/win\/Qt3\/.*/)
+		        incl = "../win/Qt3/" incl
+		      else			# Qt v4
+		        incl = "../win/Qt/" incl
+		    } else if (incl ~ /^gn/)	# gnomehack special case
 		      incl = "../win/gnome/" incl
 		    else
 		      incl = "../include/" incl
@@ -100,7 +111,7 @@ function output_specials(			i, sp, alt_sp)
 # write a target and its dependency list in pretty-printed format;
 # if target's primary source file has a path prefix, also write build command
 #
-function format_dep(target, source,		n, i, list)
+function format_dep(target, source,		col, n, i, list)
 {
   split("", done)			#``for (x in done) delete done[x]''
   printf("%s:", target);  col = length(target) + 1

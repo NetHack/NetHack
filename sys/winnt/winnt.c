@@ -11,6 +11,7 @@
  *
  */
 
+#include "win10.h"
 #include "winos.h"
 
 #define NEED_VARARGS
@@ -54,6 +55,7 @@ static HWND GetConsoleHwnd(void);
 extern void NDECL(backsp);
 #endif
 int NDECL(windows_console_custom_nhgetch);
+extern void NDECL(safe_routines);
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
@@ -187,15 +189,26 @@ get_username(lan_username_size)
 int *lan_username_size;
 {
     static TCHAR username_buffer[BUFSZ];
-    unsigned int status;
     DWORD i = BUFSZ - 1;
+    BOOL allowUserName = TRUE;
 
-    /* i gets updated with actual size */
-    status = GetUserName(username_buffer, &i);
-    if (status)
-        username_buffer[i] = '\0';
-    else
-        Strcpy(username_buffer, "NetHack");
+    Strcpy(username_buffer, "NetHack");
+
+#ifndef WIN32CON
+    /* Our privacy policy for the windows store version of nethack makes
+     * a promise about not collecting any personally identifiable information.
+     * Do not allow getting user name if we being run from windows store
+     * version of nethack.  In 3.7, we should remove use of username.
+     */
+    allowUserName = !win10_is_desktop_bridge_application();
+#endif
+
+    if (allowUserName) {
+        /* i gets updated with actual size */
+        if (GetUserName(username_buffer, &i))
+            username_buffer[i] = '\0';
+    }
+
     if (lan_username_size)
         *lan_username_size = strlen(username_buffer);
     return username_buffer;
@@ -211,6 +224,9 @@ GetModuleFileName(hInst, szFullPath, sizeof(szFullPath));
 return &szFullPath[0];
 }
 #endif
+
+extern void NDECL(mswin_raw_print_flush);
+extern void FDECL(mswin_raw_print, (const char *));
 
 /* fatal error */
 /*VARARGS1*/
@@ -233,6 +249,8 @@ VA_DECL(const char *, s)
         Strcat(buf, "\n");
         raw_printf(buf);
     }
+    if (windowprocs.win_raw_print == mswin_raw_print)
+        mswin_raw_print_flush();
     VA_END();
     exit(EXIT_FAILURE);
 }
@@ -246,35 +264,18 @@ Delay(int ms)
 void
 win32_abort()
 {
-    boolean is_tty = FALSE;
+    int c;
 
-#ifdef TTY_GRAPHICS
-    is_tty = WINDOWPORT("tty");
-#endif
+    if (WINDOWPORT("mswin") || WINDOWPORT("tty")) {
+        if (iflags.window_inited)
+            exit_nhwindows((char *) 0);
+        iflags.window_inited = FALSE;
+    }
+    if (!WINDOWPORT("mswin") && !WINDOWPORT("safe-startup"))
+        safe_routines();
     if (wizard) {
-        int c, ci, ct;
-
-        if (!iflags.window_inited)
-            c = 'n';
-        ct = 0;
-        msmsg("Execute debug breakpoint wizard?");
-        while ((ci = nhgetch()) != '\n') {
-            if (ct > 0) {
-                if (is_tty)
-                    backsp(); /* \b is visible on NT console */
-                (void) putchar(' ');
-                if (is_tty)
-                    backsp();
-                ct = 0;
-                c = 'n';
-            }
-            if (ci == 'y' || ci == 'n' || ci == 'Y' || ci == 'N') {
-                ct = 1;
-                c = ci;
-                msmsg("%c", c);
-            }
-        }
-        if (c == 'y')
+        raw_print("Execute debug breakpoint wizard?");
+        if ((c = nhgetch()) == 'y' || c == 'Y')
             DebugBreak();
     }
     abort();
@@ -516,8 +517,10 @@ int code;
            a little cleaner than the stdio one */
         windowprocs.win_nhgetch = windows_console_custom_nhgetch;
     }
-    if (getreturn_enabled)
+    if (getreturn_enabled) {
+        raw_print("\n");
         wait_synch();
+    }
     exit(code);
 }
 
@@ -535,13 +538,16 @@ void
 getreturn(str)
 const char *str;
 {
+    static boolean in_getreturn = FALSE;
     char buf[BUFSZ];
 
-    if (!getreturn_enabled)
+    if (in_getreturn || !getreturn_enabled)
         return;
+    in_getreturn = TRUE;
     Sprintf(buf,"Hit <Enter> %s.", str);
     raw_print(buf);
     wait_synch();
+    in_getreturn = FALSE;
     return;
 }
 
@@ -680,6 +686,54 @@ char *name;
     }
     return;
 }
+
+#include <bcrypt.h>     /* Windows Crypto Next Gen (CNG) */
+
+#ifndef STATUS_SUCCESS
+#define STATUS_SUCCESS 0
+#endif
+#ifndef STATUS_NOT_FOUND
+#define STATUS_NOT_FOUND 0xC0000225
+#endif
+#ifndef STATUS_UNSUCCESSFUL
+#define STATUS_UNSUCCESSFUL 0xC0000001
+#endif
+
+unsigned long
+sys_random_seed(VOID_ARGS)
+{
+    unsigned long ourseed = 0UL;
+    BCRYPT_ALG_HANDLE hRa = (BCRYPT_ALG_HANDLE) 0;
+    NTSTATUS status = STATUS_UNSUCCESSFUL;
+    boolean Plan_B = TRUE;
+
+    status = BCryptOpenAlgorithmProvider(&hRa, BCRYPT_RNG_ALGORITHM,
+                                         (LPCWSTR) 0, 0);
+    if (hRa && status == STATUS_SUCCESS) {
+        status = BCryptGenRandom(hRa, (PUCHAR) &ourseed,
+                                 (ULONG) sizeof ourseed, 0);
+        if (status == STATUS_SUCCESS) {
+            BCryptCloseAlgorithmProvider(hRa,0);
+            has_strong_rngseed = TRUE;
+            Plan_B = FALSE;
+        }
+    }
+
+    if (Plan_B) {
+        time_t datetime = 0;
+        const char *emsg;
+
+        if (status == STATUS_NOT_FOUND)
+            emsg = "BCRYPT_RNG_ALGORITHM not avail, falling back";
+        else
+            emsg = "Other failure than algorithm not avail";
+        paniclog("sys_random_seed", emsg); /* leaves clue, doesn't exit */
+        (void) time(&datetime);
+        ourseed = (unsigned long) datetime;
+    }
+    return ourseed;
+}
+
 #endif /* WIN32 */
 
 /*winnt.c*/

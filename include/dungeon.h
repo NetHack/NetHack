@@ -98,31 +98,36 @@ typedef struct branch {
  *
  * Depth corresponds to the number of floors below the surface.
  */
-#define Is_astralevel(x) (on_level(x, &astral_level))
-#define Is_earthlevel(x) (on_level(x, &earth_level))
-#define Is_waterlevel(x) (on_level(x, &water_level))
-#define Is_firelevel(x) (on_level(x, &fire_level))
-#define Is_airlevel(x) (on_level(x, &air_level))
-#define Is_medusa_level(x) (on_level(x, &medusa_level))
-#define Is_oracle_level(x) (on_level(x, &oracle_level))
-#define Is_valley(x) (on_level(x, &valley_level))
-#define Is_juiblex_level(x) (on_level(x, &juiblex_level))
-#define Is_asmo_level(x) (on_level(x, &asmodeus_level))
-#define Is_baal_level(x) (on_level(x, &baalzebub_level))
-#define Is_wiz1_level(x) (on_level(x, &wiz1_level))
-#define Is_wiz2_level(x) (on_level(x, &wiz2_level))
-#define Is_wiz3_level(x) (on_level(x, &wiz3_level))
-#define Is_sanctum(x) (on_level(x, &sanctum_level))
-#define Is_portal_level(x) (on_level(x, &portal_level))
-#define Is_rogue_level(x) (on_level(x, &rogue_level))
-#define Is_stronghold(x) (on_level(x, &stronghold_level))
-#define Is_bigroom(x) (on_level(x, &bigroom_level))
-#define Is_qstart(x) (on_level(x, &qstart_level))
-#define Is_qlocate(x) (on_level(x, &qlocate_level))
-#define Is_nemesis(x) (on_level(x, &nemesis_level))
-#define Is_knox(x) (on_level(x, &knox_level))
-#define Is_mineend_level(x) (on_level(x, &mineend_level))
-#define Is_sokoend_level(x) (on_level(x, &sokoend_level))
+
+/* These both can't be zero, or dungeon_topology isn't init'd / restored */
+#define Lassigned(y) ((y)->dlevel || (y)->dnum)
+#define Lcheck(x,z) (Lassigned(z) && on_level(x, z))
+
+#define Is_astralevel(x)    (Lcheck(x, &astral_level))
+#define Is_earthlevel(x)    (Lcheck(x, &earth_level))
+#define Is_waterlevel(x)    (Lcheck(x, &water_level))
+#define Is_firelevel(x)     (Lcheck(x, &fire_level))
+#define Is_airlevel(x)      (Lcheck(x, &air_level))
+#define Is_medusa_level(x)  (Lcheck(x, &medusa_level))
+#define Is_oracle_level(x)  (Lcheck(x, &oracle_level))
+#define Is_valley(x)        (Lcheck(x, &valley_level))
+#define Is_juiblex_level(x) (Lcheck(x, &juiblex_level))
+#define Is_asmo_level(x)    (Lcheck(x, &asmodeus_level))
+#define Is_baal_level(x)    (Lcheck(x, &baalzebub_level))
+#define Is_wiz1_level(x)    (Lcheck(x, &wiz1_level))
+#define Is_wiz2_level(x)    (Lcheck(x, &wiz2_level))
+#define Is_wiz3_level(x)    (Lcheck(x, &wiz3_level))
+#define Is_sanctum(x)       (Lcheck(x, &sanctum_level))
+#define Is_portal_level(x)  (Lcheck(x, &portal_level))
+#define Is_rogue_level(x)   (Lcheck(x, &rogue_level))
+#define Is_stronghold(x)    (Lcheck(x, &stronghold_level))
+#define Is_bigroom(x)       (Lcheck(x, &bigroom_level))
+#define Is_qstart(x)        (Lcheck(x, &qstart_level))
+#define Is_qlocate(x)       (Lcheck(x, &qlocate_level))
+#define Is_nemesis(x)       (Lcheck(x, &nemesis_level))
+#define Is_knox(x)          (Lcheck(x, &knox_level))
+#define Is_mineend_level(x) (Lcheck(x, &mineend_level))
+#define Is_sokoend_level(x) (Lcheck(x, &sokoend_level))
 
 #define In_sokoban(x) ((x)->dnum == sokoban_dnum)
 #define Inhell In_hell(&u.uz) /* now gehennom */
@@ -237,6 +242,13 @@ typedef struct mapseen {
            questing is for quest home (level 1) */
         Bitfield(quest_summons, 1); /* heard summons from leader */
         Bitfield(questing, 1); /* quest leader has unlocked quest stairs */
+        /* "gateway to sanctum" */
+        Bitfield(vibrating_square, 1); /* found vibrating square 'trap';
+                                        * flag cleared once the msanctum
+                                        * annotation has been added (on
+                                        * the next dungeon level; temple
+                                        * entered or high altar mapped) */
+        Bitfield(spare1, 1); /* not used */
     } flags;
     /* custom naming */
     char *custom;
@@ -244,7 +256,7 @@ typedef struct mapseen {
     struct mapseen_rooms {
         Bitfield(seen, 1);
         Bitfield(untended, 1);         /* flag for shop without shk */
-    } msrooms[(MAXNROFROOMS + 1) * 2]; /* same size as rooms[] */
+    } msrooms[(MAXNROFROOMS + 1) * 2]; /* same size as g.rooms[] */
     /* dead heroes; might not have graves or ghosts */
     struct cemetery *final_resting_place; /* same as level.bonesinfo */
 } mapseen;

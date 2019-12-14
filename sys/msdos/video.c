@@ -1,4 +1,4 @@
-/* NetHack 3.6	video.c	$NHDT-Date: 1457207042 2016/03/05 19:44:02 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.6	video.c	$NHDT-Date: 1554215931 2019/04/02 14:38:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $ */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 2001	    */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*								    */
@@ -122,7 +122,7 @@ void FDECL(get_cursor, (int *, int *));
 void FDECL(adjust_cursor_flags, (struct WinDesc *));
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
-STATIC_DCL void NDECL(init_ttycolor);
+static void NDECL(init_ttycolor);
 
 int savevmode;               /* store the original video mode in here */
 int curcol, currow;          /* graphics mode current cursor locations */
@@ -227,6 +227,7 @@ register int col, row;
     }
 }
 
+#if 0
 int
 has_color(int color)
 {
@@ -237,6 +238,7 @@ has_color(int color)
     return 0;
 #endif
 }
+#endif
 
 void
 home()
@@ -283,6 +285,12 @@ void
 standoutend()
 {
     g_attribute = iflags.grmode ? attrib_gr_normal : attrib_text_normal;
+}
+
+int
+term_attr_fixup(int attrmask)
+{
+    return attrmask;
 }
 
 void
@@ -565,8 +573,10 @@ const char *s;
     }
 }
 
-void xputc(ch) /* write out character (and attribute) */
-char ch;
+/* same signature as 'putchar()' with potential failure result ignored */
+int
+xputc(ch) /* write out character (and attribute) */
+int ch;
 {
     int i;
     char attribute;
@@ -585,16 +595,17 @@ char ch;
         vesa_xputc(ch, attribute);
 #endif /*SCREEN_VESA*/
     }
+    return 0;
 }
 
-void xputg(glyphnum, ch,
-           special) /* write out a glyph picture at current location */
+/* write out a glyph picture at current location */
+void xputg(glyphnum, ch, special)
 int glyphnum;
 int ch;
 unsigned special;
 {
     if (!iflags.grmode || !iflags.tile_view) {
-        xputc((char) ch);
+        (void) xputc((char) ch);
 #ifdef SCREEN_VGA
     } else if (iflags.grmode && iflags.usevga) {
         vga_xputg(glyphnum, ch, special);
@@ -713,7 +724,7 @@ char *schoice[3] = { "dark", "normal", "light" };
 char *shade[3];
 #endif /* VIDEOSHADES */
 
-STATIC_OVL void
+static void
 init_ttycolor()
 {
 #ifdef VIDEOSHADES
