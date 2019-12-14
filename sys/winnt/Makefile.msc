@@ -1793,7 +1793,7 @@ $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
 #	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\wintext.c
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
 #	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winval.c
-$(O)tile.o: tile.c $(HACK_H)
+$(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnmain.h
 #	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnaskstr.c
@@ -1884,7 +1884,7 @@ $(O)load_img.o: ..\win\gem\load_img.c $(INCL)\load_img.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\gem\load_img.c
 $(O)gr_rect.o: ..\win\gem\gr_rect.c $(INCL)\gr_rect.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\gem\gr_rect.c
-$(O)tile.o: tile.c $(HACK_H)
+$(O)tile.o: $(SRC)\tile.c $(HACK_H)
 #cppregex.o: ..\sys\share\cppregex.cpp
 #	$(CXX) $(CXXFLAGS) -Fo$@  ..\sys\share\cppregex.cpp
 $(O)qt_bind.o: ..\win\Qt\qt_bind.cpp $(HACK_H) ..\win\Qt\qt_bind.h \
