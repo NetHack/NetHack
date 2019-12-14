@@ -6,7 +6,6 @@
 #include "hack.h"
 #include "dgn_file.h"
 #include "dlb.h"
-#include "lev.h"
 
 #define DUNGEON_FILE "dungeon.lua"
 

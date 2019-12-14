@@ -4,8 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
-
 
 #ifdef MFLOPPY
 extern long bytes_counted;

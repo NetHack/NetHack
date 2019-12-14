@@ -4,7 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h" /* for checking save modes */
 
 static void NDECL(stoned_dialogue);
 static void NDECL(vomiting_dialogue);

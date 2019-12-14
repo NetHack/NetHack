@@ -4,7 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 
 static NEARDATA struct engr *head_engr;
 static const char *NDECL(blengr);

@@ -6,7 +6,6 @@
 #include "hack.h"
 #include "dlb.h"
 #include "date.h"
-#include "lev.h"
 
 /*
  * All the references to the contents of patchlevel.h have been moved

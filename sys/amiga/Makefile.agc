@@ -938,7 +938,7 @@ $(O)attrib.o:  $(NHS)attrib.c $(HDEP) $(I)artifact.h
 
 $(O)ball.o: $(NHS)ball.c $(HDEP)
 
-$(O)bones.o:  $(NHS)bones.c $(HDEP) $(I)lev.h
+$(O)bones.o:  $(NHS)bones.c $(HDEP)
 
 $(O)botl.o:	$(NHS)botl.c $(HDEP)
 
@@ -956,7 +956,7 @@ $(O)display.o:  $(NHS)display.c $(HDEP)
 
 $(O)dlb.o: $(NHS)dlb.c $(HDEP) $(I)dlb.h
 
-$(O)do.o:  $(NHS)do.c $(HDEP) $(I)lev.h
+$(O)do.o:  $(NHS)do.c $(HDEP)
 
 $(O)do_name.o:  $(NHS)do_name.c $(HDEP)
 
@@ -977,9 +977,9 @@ $(O)dungeon.o:  $(NHS)dungeon.c $(HDEP) $(I)dgn_file.h $(I)dlb.h
 
 $(O)eat.o:  $(NHS)eat.c $(HDEP)
 
-$(O)end.o:  $(NHS)end.c $(HDEP) $(I)lev.h $(I)dlb.h
+$(O)end.o:  $(NHS)end.c $(HDEP) $(I)dlb.h
 
-$(O)engrave.o:  $(NHS)engrave.c $(HDEP) $(I)lev.h
+$(O)engrave.o:  $(NHS)engrave.c $(HDEP)
 
 $(O)exper.o:  $(NHS)exper.c $(HDEP)
 
@@ -997,7 +997,7 @@ $(O)hacklib.o:  $(NHS)hacklib.c $(HDEP)
 
 $(O)invent.o:  $(NHS)invent.c $(HDEP) $(I)artifact.h
 
-$(O)light.o:  $(NHS)light.c $(HDEP) $(I)lev.h
+$(O)light.o:  $(NHS)light.c $(HDEP)
 
 $(O)lock.o:  $(NHS)lock.c $(HDEP)
 
@@ -1020,7 +1020,7 @@ $(O)mklev.o:  $(NHS)mklev.c $(HDEP)
 
 $(O)mkmap.o:  $(NHS)mkmap.c $(HDEP) $(I)sp_lev.h
 
-$(O)mkmaze.o:  $(NHS)mkmaze.c $(HDEP) $(I)sp_lev.h $(I)lev.h
+$(O)mkmaze.o:  $(NHS)mkmaze.c $(HDEP) $(I)sp_lev.h
 
 $(O)mkobj.o:  $(NHS)mkobj.c $(HDEP) $(I)artifact.h $(I)prop.h
 
@@ -1046,7 +1046,7 @@ $(O)muse.o:	$(NHS)muse.c $(HDEP)
 
 $(O)music.o:  $(NHS)music.c $(HDEP) #interp.c
 
-$(O)o_init.o:  $(NHS)o_init.c $(HDEP) $(I)lev.h
+$(O)o_init.o:  $(NHS)o_init.c $(HDEP)
 
 $(O)objects.o:  $(NHS)objects.c $(I)config.h $(I)obj.h $(I)objclass.h \
 		$(I)prop.h $(I)skills.h $(I)color.h
@@ -1081,7 +1081,7 @@ $(O)rect.o:	$(NHS)rect.c $(HDEP)
 
 $(O)region.o:	$(NHS)region.c $(HDEP)
 
-$(O)restore.o:  $(NHS)restore.c $(HDEP) $(I)lev.h $(I)tcap.h $(I)quest.h
+$(O)restore.o:  $(NHS)restore.c $(HDEP) $(I)tcap.h $(I)quest.h
 
 $(O)rnd.o:  $(NHS)rnd.c $(HDEP)
 
@@ -1089,7 +1089,7 @@ $(O)role.o:	$(NHS)role.c $(HDEP)
 
 $(O)rumors.o:  $(NHS)rumors.c $(HDEP) $(I)dlb.h
 
-$(O)save.o:  $(NHS)save.c $(HDEP) $(I)lev.h $(I)quest.h
+$(O)save.o:  $(NHS)save.c $(HDEP) $(I)quest.h
 
 $(O)shk.o:  $(NHS)shk.c $(HDEP)
 	$(CC) $(CFLAGS) $(CFLAGS2) $(OBJSPEC)$@ $(NHS)shk.c
@@ -1112,7 +1112,7 @@ $(O)sys.o:	$(NHS)sys.c $(HDEP)
 
 $(O)teleport.o:	$(NHS)teleport.c $(HDEP)
 
-$(O)timeout.o:  $(NHS)timeout.c $(HDEP) $(I)lev.h
+$(O)timeout.o:  $(NHS)timeout.c $(HDEP)
 
 $(O)topten.o:  $(NHS)topten.c $(HDEP) $(I)dlb.h
 
@@ -1142,7 +1142,7 @@ $(O)windows.o:  $(NHS)windows.c $(HDEP) $(I)wintty.h
 
 $(O)wizard.o:  $(NHS)wizard.c $(HDEP)
 
-$(O)worm.o:  $(NHS)worm.c $(HDEP) $(I)lev.h
+$(O)worm.o:  $(NHS)worm.c $(HDEP)
 
 $(O)worn.o:  $(NHS)worn.c $(HDEP)
 

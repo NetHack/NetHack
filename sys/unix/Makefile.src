@@ -495,7 +495,7 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h def_os2.h \
 	display.h dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h \
-	global.h hack.h lev.h lint.h macconf.h mextra.h mfndpos.h micro.h \
+	global.h hack.h lint.h macconf.h mextra.h mfndpos.h micro.h \
 	mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h \
@@ -1044,16 +1044,16 @@ apply.o: apply.c $(HACK_H)
 artifact.o: artifact.c $(HACK_H) ../include/artifact.h ../include/artilist.h
 attrib.o: attrib.c $(HACK_H)
 ball.o: ball.c $(HACK_H)
-bones.o: bones.c $(HACK_H) ../include/lev.h
+bones.o: bones.c $(HACK_H)
 botl.o: botl.c $(HACK_H)
-cmd.o: cmd.c $(HACK_H) ../include/lev.h ../include/func_tab.h
+cmd.o: cmd.c $(HACK_H) ../include/func_tab.h
 dbridge.o: dbridge.c $(HACK_H)
 decl.o: decl.c $(HACK_H)
 detect.o: detect.c $(HACK_H) ../include/artifact.h
 dig.o: dig.c $(HACK_H)
 display.o: display.c $(HACK_H)
 dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h ../include/patchlevel.h
-do.o: do.c $(HACK_H) ../include/lev.h
+do.o: do.c $(HACK_H)
 do_name.o: do_name.c $(HACK_H)
 do_wear.o: do_wear.c $(HACK_H)
 dog.o: dog.c $(HACK_H)
@@ -1061,21 +1061,20 @@ dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h
 dokick.o: dokick.c $(HACK_H)
 dothrow.o: dothrow.c $(HACK_H)
 drawing.o: drawing.c $(HACK_H) ../include/tcap.h
-dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h \
-		../include/lev.h
+dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
 eat.o: eat.c $(HACK_H)
-end.o: end.c $(HACK_H) ../include/lev.h ../include/dlb.h
-engrave.o: engrave.c $(HACK_H) ../include/lev.h
+end.o: end.c $(HACK_H) ../include/dlb.h
+engrave.o: engrave.c $(HACK_H)
 exper.o: exper.c $(HACK_H)
 explode.o: explode.c $(HACK_H)
 extralev.o: extralev.c $(HACK_H)
-files.o: files.c $(HACK_H) ../include/dlb.h ../include/lev.h #zlib.h
+files.o: files.c $(HACK_H) ../include/dlb.h #zlib.h
 fountain.o: fountain.c $(HACK_H)
 hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
 invent.o: invent.c $(HACK_H)
 isaac64.o: isaac64.c $(CONFIG_H) ../include/isaac64.h
-light.o: light.c $(HACK_H) ../include/lev.h
+light.o: light.c $(HACK_H)
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) ../include/mail.h
 makemon.o: makemon.c $(HACK_H)
@@ -1094,7 +1093,7 @@ mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 minion.o: minion.c $(HACK_H)
 mklev.o: mklev.c $(HACK_H)
 mkmap.o: mkmap.c $(HACK_H) ../include/sp_lev.h
-mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h ../include/lev.h
+mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h
 mkobj.o: mkobj.c $(HACK_H)
 mkroom.o: mkroom.c $(HACK_H)
 mon.o: mon.c $(HACK_H) ../include/mfndpos.h
@@ -1109,7 +1108,7 @@ muse.o: muse.c $(HACK_H)
 music.o: music.c $(HACK_H)
 nhlua.o: nhlua.c $(HACK_H) ../include/dlb.h
 nhlsel.o: nhlsel.c $(HACK_H) ../include/sp_lev.h
-o_init.o: o_init.c $(HACK_H) ../include/lev.h
+o_init.o: o_init.c $(HACK_H)
 objects.o: objects.c $(CONFIG_H) ../include/obj.h ../include/objclass.h \
 		../include/prop.h ../include/skills.h ../include/color.h
 objnam.o: objnam.c $(HACK_H)
@@ -1126,13 +1125,13 @@ quest.o: quest.c $(HACK_H)
 questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h
 read.o: read.c $(HACK_H)
 rect.o: rect.c $(HACK_H)
-region.o: region.c $(HACK_H) ../include/lev.h
-restore.o: restore.c $(HACK_H) ../include/lev.h ../include/tcap.h
+region.o: region.c $(HACK_H)
+restore.o: restore.c $(HACK_H) ../include/tcap.h
 rip.o: rip.c $(HACK_H)
 rnd.o: rnd.c $(HACK_H) ../include/isaac64.h
 role.o: role.c $(HACK_H)
-rumors.o: rumors.c $(HACK_H) ../include/lev.h ../include/dlb.h
-save.o: save.c $(HACK_H) ../include/lev.h
+rumors.o: rumors.c $(HACK_H) ../include/dlb.h
+save.o: save.c $(HACK_H)
 sfstruct.o: sfstruct.c $(HACK_H)
 shk.o: shk.c $(HACK_H)
 shknam.o: shknam.c $(HACK_H)
@@ -1144,7 +1143,7 @@ steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
 sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
-timeout.o: timeout.c $(HACK_H) ../include/lev.h
+timeout.o: timeout.c $(HACK_H)
 topten.o: topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h
 track.o: track.c $(HACK_H)
 trap.o: trap.c $(HACK_H)
@@ -1152,14 +1151,14 @@ u_init.o: u_init.c $(HACK_H)
 uhitm.o: uhitm.c $(HACK_H)
 vault.o: vault.c $(HACK_H)
 version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h \
-		../include/lev.h ../include/patchlevel.h
+		../include/patchlevel.h
 vision.o: vision.c $(HACK_H) ../include/vis_tab.h
 weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
 windows.o: windows.c $(HACK_H) ../include/wingem.h ../include/winGnome.h
 wizard.o: wizard.c $(HACK_H)
-worm.o: worm.c $(HACK_H) ../include/lev.h
+worm.o: worm.c $(HACK_H)
 worn.o: worn.c $(HACK_H)
 write.o: write.c $(HACK_H)
 zap.o: zap.c $(HACK_H)

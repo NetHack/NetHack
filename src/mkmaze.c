@@ -5,7 +5,6 @@
 
 #include "hack.h"
 #include "sp_lev.h"
-#include "lev.h" /* save & restore info */
 
 static int FDECL(iswall, (int, int));
 static int FDECL(iswall_or_stone, (int, int));

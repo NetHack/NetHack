@@ -8,7 +8,6 @@
 #include "hack.h"
 #include "dlb.h"
 #include <ctype.h>
-#include "lev.h"
 
 #ifdef TTY_GRAPHICS
 #include "wintty.h" /* more() */

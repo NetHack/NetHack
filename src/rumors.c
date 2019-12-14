@@ -4,7 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 #include "dlb.h"
 
 /*      [note: this comment is fairly old, but still accurate for 3.1]

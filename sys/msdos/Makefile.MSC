@@ -1114,7 +1114,7 @@ apply.o: apply.c $(HACK_H)
 artifact.o: artifact.c $(HACK_H) $(INCL)\artifact.h $(INCL)\artilist.h
 attrib.o: attrib.c $(HACK_H) $(INCL)\artifact.h
 ball.o: ball.c $(HACK_H)
-bones.o: bones.c $(HACK_H) $(INCL)\lev.h
+bones.o: bones.c $(HACK_H)
 botl.o: botl.c $(HACK_H)
 cmd.o: cmd.c $(HACK_H) $(INCL)\func_tab.h
 dbridge.o: dbridge.c $(HACK_H)
@@ -1123,7 +1123,7 @@ detect.o: detect.c $(HACK_H) $(INCL)\artifact.h
 dig.o: dig.c $(HACK_H)
 display.o: display.c $(HACK_H)
 dlb.o: dlb.c $(CONFIG_H) $(INCL)\dlb.h
-do.o: do.c $(HACK_H) $(INCL)\lev.h
+do.o: do.c $(HACK_H)
 do_name.o: do_name.c $(HACK_H)
 do_wear.o: do_wear.c $(HACK_H)
 dog.o: dog.c $(HACK_H)
@@ -1133,8 +1133,8 @@ dothrow.o: dothrow.c $(HACK_H)
 drawing.o: drawing.c $(HACK_H) $(INCL)\tcap.h
 dungeon.o: dungeon.c $(HACK_H) $(INCL)\dgn_file.h $(INCL)\dlb.h
 eat.o: eat.c $(HACK_H)
-end.o: end.c $(HACK_H) $(INCL)\lev.h $(INCL)\dlb.h
-engrave.o: engrave.c $(HACK_H) $(INCL)\lev.h
+end.o: end.c $(HACK_H) $(INCL)\dlb.h
+engrave.o: engrave.c $(HACK_H)
 exper.o: exper.c $(HACK_H)
 explode.o: explode.c $(HACK_H)
 extralev.o: extralev.c $(HACK_H)
@@ -1143,7 +1143,7 @@ fountain.o: fountain.c $(HACK_H)
 hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
 invent.o: invent.c $(HACK_H) $(INCL)\artifact.h
-light.o: light.c $(HACK_H) $(INCL)\lev.h
+light.o: light.c $(HACK_H)
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) $(INCL)\mail.h
 makemon.o: makemon.c $(HACK_H)
@@ -1154,7 +1154,7 @@ mhitu.o: mhitu.c $(HACK_H) $(INCL)\artifact.h
 minion.o: minion.c $(HACK_H)
 mklev.o: mklev.c $(HACK_H)
 mkmap.o: mkmap.c $(HACK_H) $(INCL)\sp_lev.h
-mkmaze.o: mkmaze.c $(HACK_H) $(INCL)\sp_lev.h $(INCL)\lev.h
+mkmaze.o: mkmaze.c $(HACK_H) $(INCL)\sp_lev.h
 mkobj.o: mkobj.c $(HACK_H) $(INCL)\artifact.h
 mkroom.o: mkroom.c $(HACK_H)
 mon.o: mon.c $(HACK_H) $(INCL)\mfndpos.h
@@ -1167,7 +1167,7 @@ mplayer.o: mplayer.c $(HACK_H)
 mthrowu.o: mthrowu.c $(HACK_H)
 muse.o: muse.c $(HACK_H)
 music.o: music.c $(HACK_H) #interp.c
-o_init.o: o_init.c $(HACK_H) $(INCL)\lev.h
+o_init.o: o_init.c $(HACK_H)
 objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
 objnam.o: objnam.c $(HACK_H)
@@ -1186,12 +1186,12 @@ questpgr.o: questpgr.c $(HACK_H) $(INCL)\dlb.h
 read.o: read.c $(HACK_H)
 rect.o: rect.c $(HACK_H)
 region.o: region.c $(HACK_H)
-restore.o: restore.c $(HACK_H) $(INCL)\lev.h $(INCL)\tcap.h
+restore.o: restore.c $(HACK_H) $(INCL)\tcap.h
 rip.o: rip.c $(HACK_H)
 rnd.o: rnd.c $(HACK_H)
 role.o: role.c $(HACK_H)
-rumors.o: rumors.c $(HACK_H) $(INCL)\lev.h $(INCL)\dlb.h
-save.o: save.c $(HACK_H) $(INCL)\lev.h
+rumors.o: rumors.c $(HACK_H) $(INCL)\dlb.h
+save.o: save.c $(HACK_H)
 shk.o: shk.c $(HACK_H)
 shknam.o: shknam.c $(HACK_H)
 sit.o: sit.c $(HACK_H) $(INCL)\artifact.h
@@ -1202,7 +1202,7 @@ steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
 sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
-timeout.o: timeout.c $(HACK_H) $(INCL)\lev.h
+timeout.o: timeout.c $(HACK_H)
 topten.o: topten.c $(HACK_H) $(INCL)\dlb.h $(INCL)\patchlev.h
 track.o: track.c $(HACK_H)
 trap.o: trap.c $(HACK_H)
@@ -1216,7 +1216,7 @@ were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
 windows.o: windows.c $(HACK_H) $(INCL)\wingem.h
 wizard.o: wizard.c $(HACK_H)
-worm.o: worm.c $(HACK_H) $(INCL)\lev.h
+worm.o: worm.c $(HACK_H)
 worn.o: worn.c $(HACK_H)
 write.o: write.c $(HACK_H)
 zap.o: zap.c $(HACK_H)

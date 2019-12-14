@@ -175,7 +175,7 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(RANDSRC) $(GENCSRC)
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	   config.h config1.h context.h coord.h decl.h def_os2.h display.h \
 	   dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h global.h \
-	   hack.h lev.h macconf.h mextra.h mfndpos.h micro.h mkroom.h \
+	   hack.h macconf.h mextra.h mfndpos.h micro.h mkroom.h \
 	   monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	   os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
 	   region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
@@ -491,16 +491,16 @@ apply.obj :	apply.c $(HACK_H)
 artifact.obj :	artifact.c $(HACK_H) $(INC)artifact.h $(INC)artilist.h
 attrib.obj :	attrib.c $(HACK_H)
 ball.obj :	ball.c $(HACK_H)
-bones.obj :	bones.c $(HACK_H) $(INC)lev.h
+bones.obj :	bones.c $(HACK_H)
 botl.obj :	botl.c $(HACK_H)
-cmd.obj :	cmd.c $(HACK_H) $(INC)lev.h $(INC)func_tab.h
+cmd.obj :	cmd.c $(HACK_H) $(INC)func_tab.h
 dbridge.obj :	dbridge.c $(HACK_H)
 decl.obj :	decl.c $(HACK_H)
 detect.obj :	detect.c $(HACK_H) $(INC)artifact.h
 dig.obj :	dig.c $(HACK_H)
 display.obj :	display.c $(HACK_H)
 dlb.obj :	dlb.c $(CONFIG_H) $(INC)dlb.h
-do.obj :	do.c $(HACK_H) $(INC)lev.h
+do.obj :	do.c $(HACK_H)
 do_name.obj :	do_name.c $(HACK_H)
 do_wear.obj :	do_wear.c $(HACK_H)
 dog.obj :	dog.c $(HACK_H)
@@ -508,10 +508,10 @@ dogmove.obj :	dogmove.c $(HACK_H) $(INC)mfndpos.h
 dokick.obj :	dokick.c $(HACK_H)
 dothrow.obj :	dothrow.c $(HACK_H)
 drawing.obj :	drawing.c $(HACK_H) $(INC)tcap.h
-dungeon.obj :	dungeon.c $(HACK_H) $(INC)dgn_file.h $(INC)dlb.h $(INC)lev.h
+dungeon.obj :	dungeon.c $(HACK_H) $(INC)dgn_file.h $(INC)dlb.h
 eat.obj :	eat.c $(HACK_H)
-end.obj :	end.c $(HACK_H) $(INC)lev.h $(INC)dlb.h
-engrave.obj :	engrave.c $(HACK_H) $(INC)lev.h
+end.obj :	end.c $(HACK_H) $(INC)dlb.h
+engrave.obj :	engrave.c $(HACK_H)
 exper.obj :	exper.c $(HACK_H)
 explode.obj :	explode.c $(HACK_H)
 extralev.obj :	extralev.c $(HACK_H)
@@ -520,7 +520,7 @@ fountain.obj :	fountain.c $(HACK_H)
 hack.obj :	hack.c $(HACK_H)
 hacklib.obj :	hacklib.c $(HACK_H)
 invent.obj :	invent.c $(HACK_H)
-light.obj :	light.c $(HACK_H) $(INC)lev.h
+light.obj :	light.c $(HACK_H)
 lock.obj :	lock.c $(HACK_H)
 mail.obj :	mail.c $(HACK_H) $(INC)mail.h
 makemon.obj :	makemon.c $(HACK_H)
@@ -531,7 +531,7 @@ mhitu.obj :	mhitu.c $(HACK_H) $(INC)artifact.h
 minion.obj :	minion.c $(HACK_H)
 mklev.obj :	mklev.c $(HACK_H)
 mkmap.obj :	mkmap.c $(HACK_H) $(INC)sp_lev.h
-mkmaze.obj :	mkmaze.c $(HACK_H) $(INC)sp_lev.h $(INC)lev.h
+mkmaze.obj :	mkmaze.c $(HACK_H) $(INC)sp_lev.h
 mkobj.obj :	mkobj.c $(HACK_H)
 mkroom.obj :	mkroom.c $(HACK_H)
 mon.obj :	mon.c $(HACK_H) $(INC)mfndpos.h
@@ -544,7 +544,7 @@ mplayer.obj :	mplayer.c $(HACK_H)
 mthrowu.obj :	mthrowu.c $(HACK_H)
 muse.obj :	muse.c $(HACK_H)
 music.obj :	music.c $(HACK_H) #interp.c
-o_init.obj :	o_init.c $(HACK_H) $(INC)lev.h
+o_init.obj :	o_init.c $(HACK_H)
 objects.obj :	objects.c $(CONFIG_H) $(INC)obj.h $(INC)objclass.h \
 		$(INC)prop.h $(INC)skills.h $(INC)color.h
 objnam.obj :	objnam.c $(HACK_H)
@@ -561,13 +561,13 @@ quest.obj :	quest.c $(HACK_H)
 questpgr.obj :	questpgr.c $(HACK_H) $(INC)dlb.h
 read.obj :	read.c $(HACK_H)
 rect.obj :	rect.c $(HACK_H)
-region.obj :	region.c $(HACK_H) $(INC)lev.h
-restore.obj :	restore.c $(HACK_H) $(INC)lev.h $(INC)tcap.h
+region.obj :	region.c $(HACK_H)
+restore.obj :	restore.c $(HACK_H) $(INC)tcap.h
 rip.obj :	rip.c $(HACK_H)
 rnd.obj :	rnd.c $(HACK_H)
 role.obj :	role.c $(HACK_H)
-rumors.obj :	rumors.c $(HACK_H) $(INC)lev.h $(INC)dlb.h
-save.obj :	save.c $(HACK_H) $(INC)lev.h
+rumors.obj :	rumors.c $(HACK_H) $(INC)dlb.h
+save.obj :	save.c $(HACK_H)
 shk.obj :	shk.c $(HACK_H)
 shknam.obj :	shknam.c $(HACK_H)
 sit.obj :	sit.c $(HACK_H) $(INC)artifact.h
@@ -578,7 +578,7 @@ steal.obj :	steal.c $(HACK_H)
 steed.obj :	steed.c $(HACK_H)
 sys.obj :	sys.c $(HACK_H)
 teleport.obj :	teleport.c $(HACK_H)
-timeout.obj :	timeout.c $(HACK_H) $(INC)lev.h
+timeout.obj :	timeout.c $(HACK_H)
 topten.obj :	topten.c $(HACK_H) $(INC)dlb.h $(INC)patchlevel.h
 track.obj :	track.c $(HACK_H)
 trap.obj :	trap.c $(HACK_H)
@@ -592,7 +592,7 @@ were.obj :	were.c $(HACK_H)
 wield.obj :	wield.c $(HACK_H)
 windows.obj :	windows.c $(HACK_H) $(INC)wingem.h $(INC)winGnome.h
 wizard.obj :	wizard.c $(HACK_H)
-worm.obj :	worm.c $(HACK_H) $(INC)lev.h
+worm.obj :	worm.c $(HACK_H)
 worn.obj :	worn.c $(HACK_H)
 write.obj :	write.c $(HACK_H)
 zap.obj :	zap.c $(HACK_H)

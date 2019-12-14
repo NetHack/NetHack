@@ -6,7 +6,6 @@
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
 #include "hack.h"
-#include "lev.h"
 
 static void FDECL(trycall, (struct obj *));
 static void NDECL(polymorph_sink);

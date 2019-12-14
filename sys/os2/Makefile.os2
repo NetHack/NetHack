@@ -1519,7 +1519,7 @@ $(OBJ)\attrib.o   : $(SRC)\$(CB) $(HACK_H) $(INCL)\artifact.h
 	$(SRCCC)
 $(OBJ)\ball.o     : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
-$(OBJ)\bones.o    : $(SRC)\$(CB) $(HACK_H) $(INCL)\lev.h
+$(OBJ)\bones.o    : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\botl.o     : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
@@ -1537,7 +1537,7 @@ $(OBJ)\display.o  : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\dlb.o      : $(SRC)\$(CB) $(CONFIG_H) $(INCL)\dlb.h
 	$(SRCCC)
-$(OBJ)\do.o       : $(SRC)\$(CB) $(HACK_H) $(INCL)\lev.h
+$(OBJ)\do.o       : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\do_name.o  : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
@@ -1557,9 +1557,9 @@ $(OBJ)\dungeon.o  : $(SRC)\$(CB) $(HACK_H) $(INCL)\dgn_file.h
 	$(SRCCC)
 $(OBJ)\eat.o      : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
-$(OBJ)\end.o      : $(SRC)\$(CB) $(HACK_H) $(INCL)\lev.h
+$(OBJ)\end.o      : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
-$(OBJ)\engrave.o  : $(SRC)\$(CB) $(HACK_H) $(INCL)\lev.h
+$(OBJ)\engrave.o  : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\exper.o    : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
@@ -1653,7 +1653,7 @@ $(OBJ)\region.o     : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\rect.o     : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
-$(OBJ)\restore.o  : $(SRC)\$(CB) $(HACK_H) $(INCL)\lev.h $(INCL)\tcap.h $(INCL)\quest.h
+$(OBJ)\restore.o  : $(SRC)\$(CB) $(HACK_H) $(INCL)\tcap.h $(INCL)\quest.h
 	$(SRCCC)
 $(OBJ)\rip.o      : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
@@ -1663,7 +1663,7 @@ $(OBJ)\role.o     : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\rumors.o   : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
-$(OBJ)\save.o     : $(SRC)\$(CB) $(HACK_H) $(INCL)\lev.h $(INCL)\quest.h
+$(OBJ)\save.o     : $(SRC)\$(CB) $(HACK_H) $(INCL)\quest.h
 	$(SRCCC)
 $(OBJ)\shk.o      : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
@@ -1713,7 +1713,7 @@ $(OBJ)\windows.o  : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\wizard.o   : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
-$(OBJ)\worm.o     : $(SRC)\$(CB) $(HACK_H) $(INCL)\lev.h
+$(OBJ)\worm.o     : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\worn.o     : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)

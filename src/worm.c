@@ -4,7 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 
 #define newseg() (struct wseg *) alloc(sizeof (struct wseg))
 #define dealloc_seg(wseg) free((genericptr_t) (wseg))

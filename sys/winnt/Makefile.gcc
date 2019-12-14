@@ -491,7 +491,6 @@ HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/align.h $(INCL)/context.h \
 	       $(INCL)/rect.h $(INCL)/region.h $(INCL)/winprocs.h \
 	       $(INCL)/wintty.h $(INCL)/sys.h $(INCL)/trampoli.h
 
-LEV_H       = $(INCL)/lev.h
 DGN_FILE_H  = $(INCL)/dgn_file.h
 SP_LEV_H    = $(INCL)/sp_lev.h
 TILE_H      = ../win/share/tile.h
@@ -1538,7 +1537,7 @@ $(O)apply.o: apply.c $(HACK_H)
 $(O)artifact.o: artifact.c $(HACK_H) $(INCL)/artifact.h $(INCL)/artilist.h
 $(O)attrib.o: attrib.c $(HACK_H)
 $(O)ball.o: ball.c $(HACK_H)
-$(O)bones.o: bones.c $(HACK_H) $(INCL)/lev.h
+$(O)bones.o: bones.c $(HACK_H)
 $(O)botl.o: botl.c $(HACK_H)
 $(O)cmd.o: cmd.c $(HACK_H) $(INCL)/func_tab.h
 $(O)dbridge.o: dbridge.c $(HACK_H)
@@ -1547,7 +1546,7 @@ $(O)detect.o: detect.c $(HACK_H) $(INCL)/artifact.h
 $(O)dig.o: dig.c $(HACK_H)
 $(O)display.o: display.c $(HACK_H)
 $(O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h
-$(O)do.o: do.c $(HACK_H) $(INCL)/lev.h
+$(O)do.o: do.c $(HACK_H)
 $(O)do_name.o: do_name.c $(HACK_H)
 $(O)do_wear.o: do_wear.c $(HACK_H)
 $(O)dog.o: dog.c $(HACK_H)
@@ -1557,8 +1556,8 @@ $(O)dothrow.o: dothrow.c $(HACK_H)
 $(O)drawing.o: drawing.c $(HACK_H) $(INCL)/tcap.h
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
-$(O)end.o: end.c $(HACK_H) $(INCL)/lev.h $(INCL)/dlb.h
-$(O)engrave.o: engrave.c $(HACK_H) $(INCL)/lev.h
+$(O)end.o: end.c $(HACK_H) $(INCL)/dlb.h
+$(O)engrave.o: engrave.c $(HACK_H)
 $(O)exper.o: exper.c $(HACK_H)
 $(O)explode.o: explode.c $(HACK_H)
 $(O)extralev.o: extralev.c $(HACK_H)
@@ -1567,7 +1566,7 @@ $(O)fountain.o: fountain.c $(HACK_H)
 $(O)hack.o: hack.c $(HACK_H)
 $(O)hacklib.o: hacklib.c $(HACK_H)
 $(O)invent.o: invent.c $(HACK_H)
-$(O)light.o: light.c $(HACK_H) $(INCL)/lev.h
+$(O)light.o: light.c $(HACK_H)
 $(O)lock.o: lock.c $(HACK_H)
 $(O)mail.o: mail.c $(HACK_H) $(INCL)/mail.h
 $(O)makemon.o: makemon.c $(HACK_H)
@@ -1578,7 +1577,7 @@ $(O)mhitu.o: mhitu.c $(HACK_H) $(INCL)/artifact.h
 $(O)minion.o: minion.c $(HACK_H)
 $(O)mklev.o: mklev.c $(HACK_H)
 $(O)mkmap.o: mkmap.c $(HACK_H) $(INCL)/sp_lev.h
-$(O)mkmaze.o: mkmaze.c $(HACK_H) $(INCL)/sp_lev.h $(INCL)/lev.h
+$(O)mkmaze.o: mkmaze.c $(HACK_H) $(INCL)/sp_lev.h
 $(O)mkobj.o: mkobj.c $(HACK_H)
 $(O)mkroom.o: mkroom.c $(HACK_H)
 $(O)mon.o: mon.c $(HACK_H) $(INCL)/mfndpos.h
@@ -1594,7 +1593,7 @@ $(O)music.o: music.c $(HACK_H) #interp.c
 $(O)nhlua.o: nhlua.c $(HACK_H)
 $(O)nhlsel.o: nhlsel.c $(HACK_H)
 $(O)nhlobj.o: nhlobj.c $(HACK_H)
-$(O)o_init.o: o_init.c $(HACK_H) $(INCL)/lev.h
+$(O)o_init.o: o_init.c $(HACK_H)
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)/obj.h $(INCL)/objclass.h \
 		$(INCL)/prop.h $(INCL)/skills.h $(INCL)/color.h
 $(O)objnam.o: objnam.c $(HACK_H)
@@ -1611,13 +1610,13 @@ $(O)quest.o: quest.c $(HACK_H)
 $(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)/dlb.h
 $(O)read.o: read.c $(HACK_H)
 $(O)rect.o: rect.c $(HACK_H)
-$(O)region.o: region.c $(HACK_H) $(INCL)/lev.h
-$(O)restore.o: restore.c $(HACK_H) $(INCL)/lev.h $(INCL)/tcap.h
+$(O)region.o: region.c $(HACK_H)
+$(O)restore.o: restore.c $(HACK_H) $(INCL)/tcap.h
 $(O)rip.o: rip.c $(HACK_H)
 $(O)rnd.o: rnd.c $(HACK_H)
 $(O)role.o: role.c $(HACK_H)
-$(O)rumors.o: rumors.c $(HACK_H) $(INCL)/lev.h $(INCL)/dlb.h
-$(O)save.o: save.c $(HACK_H) $(INCL)/lev.h
+$(O)rumors.o: rumors.c $(HACK_H) $(INCL)/dlb.h
+$(O)save.o: save.c $(HACK_H)
 $(O)shk.o: shk.c $(HACK_H)
 $(O)shknam.o: shknam.c $(HACK_H)
 $(O)sit.o: sit.c $(HACK_H) $(INCL)/artifact.h
@@ -1628,7 +1627,7 @@ $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
 $(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
-$(O)timeout.o: timeout.c $(HACK_H) $(INCL)/lev.h
+$(O)timeout.o: timeout.c $(HACK_H)
 $(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h $(INCL)/patchlevel.h
 $(O)track.o: track.c $(HACK_H)
 $(O)trap.o: trap.c $(HACK_H)
@@ -1643,7 +1642,7 @@ $(O)wield.o: wield.c $(HACK_H)
 $(O)windmain.o: $(MSWSYS)/windmain.c $(HACK_H)
 $(O)windows.o: windows.c $(HACK_H) $(INCL)/wingem.h $(INCL)/winGnome.h
 $(O)wizard.o: wizard.c $(HACK_H)
-$(O)worm.o: worm.c $(HACK_H) $(INCL)/lev.h
+$(O)worm.o: worm.c $(HACK_H)
 $(O)worn.o: worn.c $(HACK_H)
 $(O)write.o: write.c $(HACK_H)
 $(O)zap.o: zap.c $(HACK_H)
