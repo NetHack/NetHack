@@ -583,7 +583,7 @@ $(U)makedefs.exe:  $(MAKEOBJS)
 <<
 
 makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)\objclass.h \
-		$(INCL)\monsym.h   $(INCL)\qtext.h $(UTIL)\makedefs.c
+		$(INCL)\monsym.h   $(UTIL)\makedefs.c
 
 #  The following include files depend on makedefs to be created.
 #
@@ -1181,8 +1181,8 @@ polyself.o: polyself.c $(HACK_H)
 potion.o: potion.c $(HACK_H)
 pray.o: pray.c $(HACK_H)
 priest.o: priest.c $(HACK_H) $(INCL)\mfndpos.h
-quest.o: quest.c $(HACK_H) $(INCL)\qtext.h
-questpgr.o: questpgr.c $(HACK_H) $(INCL)\dlb.h $(INCL)\qtext.h
+quest.o: quest.c $(HACK_H)
+questpgr.o: questpgr.c $(HACK_H) $(INCL)\dlb.h
 read.o: read.c $(HACK_H)
 rect.o: rect.c $(HACK_H)
 region.o: region.c $(HACK_H)
@@ -1215,7 +1215,7 @@ weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
 windows.o: windows.c $(HACK_H) $(INCL)\wingem.h
-wizard.o: wizard.c $(HACK_H) $(INCL)\qtext.h
+wizard.o: wizard.c $(HACK_H)
 worm.o: worm.c $(HACK_H) $(INCL)\lev.h
 worn.o: worn.c $(HACK_H)
 write.o: write.c $(HACK_H)

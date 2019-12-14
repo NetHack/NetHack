@@ -950,7 +950,7 @@ $(TEMP)\makedefs.rsp : $(MAKEOBJS) $(TEMP)\$(MKDFDEF)
 	$(ECHO) $(MKDFMD) $(LFLAGS);>> $@
 
 $(OBJ)\makedefs.o : $(UTIL)\$(CB) $(CONFIG_H) $(INCL)\permonst.h $(INCL)\objclass.h \
-		    $(INCL)\monsym.h $(INCL)\artilist.h $(INCL)\qtext.h
+		    $(INCL)\monsym.h $(INCL)\artilist.h
 	$(UTILCC)
 
 #
@@ -1643,9 +1643,9 @@ $(OBJ)\pray.o     : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\priest.o   : $(SRC)\$(CB) $(HACK_H) $(INCL)\mfndpos.h
 	$(SRCCC)
-$(OBJ)\quest.o    : $(SRC)\$(CB) $(HACK_H) $(INCL)\quest.h $(INCL)\qtext.h
+$(OBJ)\quest.o    : $(SRC)\$(CB) $(HACK_H) $(INCL)\quest.h
 	$(SRCCC)
-$(OBJ)\questpgr.o : $(SRC)\$(CB) $(HACK_H) $(INCL)\qtext.h
+$(OBJ)\questpgr.o : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\read.o     : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
@@ -1711,7 +1711,7 @@ $(OBJ)\wield.o    : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\windows.o  : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
-$(OBJ)\wizard.o   : $(SRC)\$(CB) $(HACK_H) $(INCL)\qtext.h
+$(OBJ)\wizard.o   : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\worm.o     : $(SRC)\$(CB) $(HACK_H) $(INCL)\lev.h
 	$(SRCCC)

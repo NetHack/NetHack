@@ -888,7 +888,6 @@ OBJ_H       = $(INCL)\obj.h
 OBJCLASS_H  = $(INCL)\objclass.h
 OBJECTS_H   = $(INCL)\objects.h
 PROP_H      = $(INCL)\prop.h
-QTEXT_H     = $(INCL)\qtext.h
 QUEST_H     = $(INCL)\quest.h
 SP_LEV_H    = $(INCL)\sp_lev.h
 TERMCAP_H   = $(INCL)\tcap.h
@@ -1025,7 +1024,7 @@ $(U)makedefs.exe:	$(MAKEOBJS)
 	@$(LINK) $(LFLAGSU) $(MAKEOBJS), $@,, $(CLIB) $(BCMDL);
 
 $(O)makedefs.o: $(CONFIG_H)	    $(PERMONST_H)      $(OBJCLASS_H) \
-		 $(MONSYM_H)    $(QTEXT_H)	$(PATCHLEVEL_H) \
+		 $(MONSYM_H)    $(PATCHLEVEL_H) \
 		 $(U)makedefs.c
 	@echo $(BCOPTS1) > $(VROOMMCFG)
 	@echo $(BCOPTS2) >> $(VROOMMCFG)
@@ -1854,8 +1853,8 @@ $(O)pager.o:	 $(SRC)\pager.c    $(HACK_H) $(DLB_H)
 	$(CC) $(CFLAGNO) $(COBJNAM)$@ $(SRC)\pager.c
 $(O)pickup.o:    $(PCHO) $(SRC)\pickup.c   $(HACK_H)
 $(O)pray.o:      $(PCHO) $(SRC)\pray.c     $(HACK_H)
-$(O)quest.o:     $(PCHO) $(SRC)\quest.c    $(HACK_H) $(QUEST_H) $(QTEXT_H)
-$(O)questpgr.o:  $(PCHO) $(SRC)\questpgr.c $(HACK_H) $(QTEXT_H) $(DLB_H)
+$(O)quest.o:     $(PCHO) $(SRC)\quest.c    $(HACK_H) $(QUEST_H)
+$(O)questpgr.o:  $(PCHO) $(SRC)\questpgr.c $(HACK_H) $(DLB_H)
 $(O)rect.o:      $(PCHO) $(SRC)\rect.c     $(HACK_H)
 $(O)region.o:    $(PCHO) $(SRC)\region.c   $(HACK_H)
 $(O)restore.o:   $(PCHO) $(SRC)\restore.c  $(HACK_H) $(LEV_H) $(TERMCAP_H) \
@@ -1938,7 +1937,7 @@ $(O)trap.0:     $(PCH0) $(SRC)\trap.c     $(HACK_H)
 $(O)vault.0:    $(PCH0) $(SRC)\vault.c    $(HACK_H)
 $(O)weapon.0:   $(PCH0) $(SRC)\weapon.c   $(HACK_H)
 $(O)were.0:     $(PCH0) $(SRC)\were.c     $(HACK_H)
-$(O)wizard.0:   $(PCH0) $(SRC)\wizard.c   $(HACK_H) $(QTEXT_H)
+$(O)wizard.0:   $(PCH0) $(SRC)\wizard.c   $(HACK_H)
 $(O)zap.0:      $(PCH0) $(SRC)\zap.c      $(HACK_H)
 
 #
@@ -2067,7 +2066,7 @@ $(O)trap.B:     $(PCHB) $(SRC)\trap.c     $(HACK_H)
 $(O)vault.B:    $(PCHB) $(SRC)\vault.c    $(HACK_H)
 $(O)weapon.B:   $(PCHB) $(SRC)\weapon.c   $(HACK_H)
 $(O)were.B:     $(PCHB) $(SRC)\were.c     $(HACK_H)
-$(O)wizard.B:   $(PCHB) $(SRC)\wizard.c   $(HACK_H) $(QTEXT_H)
+$(O)wizard.B:   $(PCHB) $(SRC)\wizard.c   $(HACK_H)
 $(O)zap.B:      $(PCHB) $(SRC)\zap.c      $(HACK_H)
 
 # end of file

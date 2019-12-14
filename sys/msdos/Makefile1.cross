@@ -192,19 +192,34 @@ YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h   \
 DISPLAY_H  = $(MONDATA_H)	$(INCL)/vision.h    $(INCL)/display.h
 PCCONF_H   = $(INCL)/micro.h	$(INCL)/system.h    $(INCL)/pcconf.h \
 	    $(MSYS)/pcvideo.h
-CONFIG_H   = $(GLOBAL_H)	$(INCL)/tradstdc.h  $(INCL)/config1.h \
-	    $(INCL)/config.h
 DECL_H	   = $(YOU_H)		$(INCL)/spell.h	    $(INCL)/color.h   \
 	     $(INCL)/obj.h	$(INCL)/onames.h    $(INCL)/pm.h      \
 	      $(INCL)/decl.h
 GLOBAL_H   = $(PCCONF_H)	$(INCL)/coord.h	   $(INCL)/global.h
-HACK_H	   = $(CONFIG_H)	$(INCL)/context.h  $(DUNGEON_H)	       \
-	     $(DECL_H)	      	$(DISPLAY_H)	   $(INCL)/monsym.h    \
-	     $(INCL)/mkroom.h	$(INCL)/objclass.h $(INCL)/trap.h      \
-	     $(INCL)/flag.h     $(RM_H)		   $(INCL)/vision.h    \
-	     $(INCL)/wintype.h  $(INCL)/engrave.h  $(INCL)/rect.h      \
-	     $(INCL)/trampoli.h $(INCL)/hack.h     $(REGION_H)	       \
-	     $(INCL)/sys.h
+
+CONFIG_H = $(INCL)/config.h $(INCL)/config1.h $(INCL)/tradstdc.h \
+		$(INCL)/global.h $(INCL)/coord.h $(INCL)/vmsconf.h \
+		$(INCL)/system.h $(INCL)/nhlua.h $(INCL)/unixconf.h \
+		$(INCL)/os2conf.h $(INCL)/micro.h $(INCL)/pcconf.h \
+		$(INCL)/tosconf.h $(INCL)/amiconf.h $(INCL)/macconf.h \
+		$(INCL)/beconf.h $(INCL)/wceconf.h $(INCL)/ntconf.h
+
+HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/lint.h $(INCL)/align.h \
+		$(INCL)/dungeon.h $(INCL)/monsym.h $(INCL)/mkroom.h \
+		$(INCL)/objclass.h $(INCL)/youprop.h $(INCL)/prop.h \
+		$(INCL)/permonst.h $(INCL)/monattk.h \
+		$(INCL)/monflag.h $(INCL)/mondata.h $(INCL)/pm.h \
+		$(INCL)/wintype.h $(INCL)/context.h $(INCL)/rm.h \
+		$(INCL)/botl.h $(INCL)/rect.h \
+		$(INCL)/region.h $(INCL)/decl.h $(INCL)/quest.h \
+		$(INCL)/spell.h $(INCL)/color.h $(INCL)/obj.h \
+		$(INCL)/you.h $(INCL)/attrib.h $(INCL)/monst.h \
+		$(INCL)/mextra.h $(INCL)/skills.h $(INCL)/onames.h \
+		$(INCL)/timeout.h $(INCL)/trap.h $(INCL)/flag.h \
+		$(INCL)/vision.h $(INCL)/display.h $(INCL)/engrave.h \
+		$(INCL)/winprocs.h $(INCL)/sys.h $(INCL)/wintty.h \
+		$(INCL)/trampoli.h
+
 DLB_H      = $(INCL)/dlb.h
 
 ifeq ($(SUPPRESS_GRAPHICS),Y)
@@ -396,9 +411,13 @@ hobj.tag:
 $(U)makedefs:  $(MAKEDEFSOBJS)
 	$(HOST_LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS)
 
-$(HOST_O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
-		$(INCL)/monsym.h   $(INCL)/qtext.h $(U)makedefs.c
-	$(HOST_CC) $(cflags) -o$@ $(U)makedefs.c
+$(O)makedefs$(HOST).o:
+
+$(HOST_O)makedefs.o: $(U)makedefs.c $(SRC)/mdlib.c $(CONFIG_H) $(INCL)/permonst.h \
+		$(INCL)/objclass.h $(INCL)/monsym.h \
+		$(INCL)/artilist.h $(INCL)/dungeon.h $(INCL)/obj.h \
+		$(INCL)/monst.h $(INCL)/you.h $(INCL)/flag.h \
+		$(INCL)/dlb.h $(INCL)/patchlevel.h
 
 #=============================================
 #  Header file moves required for tile support

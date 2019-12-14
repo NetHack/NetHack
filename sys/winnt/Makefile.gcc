@@ -899,7 +899,7 @@ $(U)makedefs.exe: $(MAKEOBJS)
 	$(link) $(LFLAGSU) -o$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H) $(INCL)/monattk.h $(INCL)/monflag.h \
-	 $(INCL)/objclass.h $(INCL)/monsym.h $(INCL)/qtext.h \
+	 $(INCL)/objclass.h $(INCL)/monsym.h \
 	 $(INCL)/patchlevel.h $(U)makedefs.c
 	$(cc) $(CFLAGSU) -o$@ $(U)makedefs.c
 
@@ -1607,8 +1607,8 @@ $(O)polyself.o: polyself.c $(HACK_H)
 $(O)potion.o: potion.c $(HACK_H)
 $(O)pray.o: pray.c $(HACK_H)
 $(O)priest.o: priest.c $(HACK_H) $(INCL)/mfndpos.h
-$(O)quest.o: quest.c $(HACK_H) $(INCL)/qtext.h
-$(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)/dlb.h $(INCL)/qtext.h
+$(O)quest.o: quest.c $(HACK_H)
+$(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)/dlb.h
 $(O)read.o: read.c $(HACK_H)
 $(O)rect.o: rect.c $(HACK_H)
 $(O)region.o: region.c $(HACK_H) $(INCL)/lev.h
@@ -1642,7 +1642,7 @@ $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
 $(O)windmain.o: $(MSWSYS)/windmain.c $(HACK_H)
 $(O)windows.o: windows.c $(HACK_H) $(INCL)/wingem.h $(INCL)/winGnome.h
-$(O)wizard.o: wizard.c $(HACK_H) $(INCL)/qtext.h
+$(O)wizard.o: wizard.c $(HACK_H)
 $(O)worm.o: worm.c $(HACK_H) $(INCL)/lev.h
 $(O)worn.o: worn.c $(HACK_H)
 $(O)write.o: write.c $(HACK_H)

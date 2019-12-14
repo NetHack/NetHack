@@ -202,7 +202,6 @@ typedef struct {
 #include "context.h"
 #include "rm.h"
 #include "botl.h"
-#include "qtext.h"
 
 /* Symbol offsets */
 #define SYM_OFF_P (0)

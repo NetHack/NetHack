@@ -267,7 +267,6 @@
 		3186A38F21A4B0FC0052BF02 /* monflag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monflag.h; path = ../../include/monflag.h; sourceTree = "<group>"; };
 		3186A39021A4B0FC0052BF02 /* lev_comp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lev_comp.h; path = ../../include/lev_comp.h; sourceTree = "<group>"; };
 		3186A39121A4B0FC0052BF02 /* micro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = micro.h; path = ../../include/micro.h; sourceTree = "<group>"; };
-		3186A39221A4B0FC0052BF02 /* qtext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qtext.h; path = ../../include/qtext.h; sourceTree = "<group>"; };
 		3186A39321A4B0FC0052BF02 /* xwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xwindow.h; path = ../../include/xwindow.h; sourceTree = "<group>"; };
 		3186A39421A4B0FC0052BF02 /* tileset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tileset.h; path = ../../include/tileset.h; sourceTree = "<group>"; };
 		3186A39521A4B0FC0052BF02 /* obj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = obj.h; path = ../../include/obj.h; sourceTree = "<group>"; };
@@ -765,7 +764,6 @@
 				3186A37821A4B0FA0052BF02 /* qt_kde0.h */,
 				3186A3B421A4B0FD0052BF02 /* qt_win.h */,
 				3186A3BD21A4B0FD0052BF02 /* qt_xpms.h */,
-				3186A39221A4B0FC0052BF02 /* qtext.h */,
 				3186A3C421A4B0FE0052BF02 /* qttableview.h */,
 				3186A39E21A4B0FD0052BF02 /* quest.h */,
 				3186A37C21A4B0FA0052BF02 /* rect.h */,

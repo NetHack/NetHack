@@ -7,8 +7,6 @@
 
 /*  quest-specific pager routines. */
 
-#include "qtext.h"
-
 #define QTEXT_FILE "quest.lua"
 
 #ifdef TTY_GRAPHICS

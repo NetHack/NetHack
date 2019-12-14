@@ -262,7 +262,6 @@
     <ClInclude Include="$(IncDir)permonst.h" />
     <ClInclude Include="$(IncDir)pm.h" />
     <ClInclude Include="$(IncDir)prop.h" />
-    <ClInclude Include="$(IncDir)qtext.h" />
     <ClInclude Include="$(IncDir)quest.h" />
     <ClInclude Include="$(IncDir)rect.h" />
     <ClInclude Include="$(IncDir)region.h" />

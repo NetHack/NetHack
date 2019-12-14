@@ -422,7 +422,7 @@ $(SBIN)makedefs: $(MAKEOBJS)
 	$(LINK) $(LNSPEC) $(SBIN)makedefs $(LIN) $(MAKEOBJS) $(LLIB)
 
 $(OO)makedefs.o:  $(UTIL)makedefs.c $(I)config.h $(I)permonst.h $(I)monsym.h \
-		$(I)objclass.h  $(I)patchlevel.h $(I)qtext.h $(I)artilist.h
+		$(I)objclass.h  $(I)patchlevel.h $(I)artilist.h
 	$(CC) $(DEFSPEC)MAKEDEFS_C $(CFLAGS) $(OBJSPEC)$@ $(UTIL)makedefs.c
 
 $(SBIN)lev_comp:  $(SPLEVOBJS)
@@ -1071,9 +1071,9 @@ $(O)pray.o:  $(NHS)pray.c $(HDEP)
 
 $(O)priest.o:  $(NHS)priest.c $(HDEP) $(I)mfndpos.h
 
-$(O)quest.o:	$(NHS)quest.c $(HDEP) $(I)quest.h $(I)qtext.h
+$(O)quest.o:	$(NHS)quest.c $(HDEP) $(I)quest.h
 
-$(O)questpgr.o: $(NHS)questpgr.c $(HDEP) $(I)qtext.h $(I)dlb.h
+$(O)questpgr.o: $(NHS)questpgr.c $(HDEP) $(I)dlb.h
 
 $(O)read.o:  $(NHS)read.c $(HDEP)
 
@@ -1140,7 +1140,7 @@ $(O)wield.o:  $(NHS)wield.c $(HDEP)
 
 $(O)windows.o:  $(NHS)windows.c $(HDEP) $(I)wintty.h
 
-$(O)wizard.o:  $(NHS)wizard.c $(HDEP) $(I)qtext.h
+$(O)wizard.o:  $(NHS)wizard.c $(HDEP)
 
 $(O)worm.o:  $(NHS)worm.c $(HDEP) $(I)lev.h
 

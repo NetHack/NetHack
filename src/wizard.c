@@ -9,7 +9,6 @@
 /*             - generalized for 3.1 (mike@bullns.on01.bull.ca) */
 
 #include "hack.h"
-#include "qtext.h"
 
 static short FDECL(which_arti, (int));
 static boolean FDECL(mon_has_arti, (struct monst *, SHORT_P));

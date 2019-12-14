@@ -640,7 +640,7 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \
-		../include/dlb.h ../include/patchlevel.h ../include/qtext.h
+		../include/dlb.h ../include/patchlevel.h
 	@( cd ../util ; $(MAKE) makedefs )
 
 #	Source files created by 'makedefs' at build time.
@@ -742,7 +742,7 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/permonst.h ../include/monattk.h \
 		../include/monflag.h ../include/mondata.h ../include/pm.h \
 		../include/wintype.h ../include/context.h ../include/rm.h \
-		../include/botl.h ../include/qtext.h ../include/rect.h \
+		../include/botl.h ../include/rect.h \
 		../include/region.h ../include/decl.h ../include/quest.h \
 		../include/spell.h ../include/color.h ../include/obj.h \
 		../include/you.h ../include/attrib.h ../include/monst.h \
