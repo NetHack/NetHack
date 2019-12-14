@@ -699,7 +699,7 @@ $(SBIN)lev_comp:  $(SPLEVOBJS)
 $(SBIN)dgn_comp:  $(DGNCOMPOBJS)
 	$(LINK) $(LNSPEC) $(SBIN)dgn_comp $(LIN) $(DGNCOMPOBJS) $(FBFIL) $(FLLIB)
 
-$(OO)lev_yacc.o:  $(UTIL)lev_yacc.c $(HDEP) $(I)pm.h $(I)onames.h
+$(OO)lev_yacc.o:  $(UTIL)lev_yacc.c $(HDEP) $(I)sp_lev.h $(I)pm.h $(I)onames.h
 #	setdate $(UTIL)lev_yacc.c
 	$(CC) $(DEFSPEC)LEV_LEX_C $(DEFSPEC)PREFIX="NH:slib/" $(CFLAGS) \
 		$(DEFSPEC)alloca=malloc $(OBJSPEC)$@ $(UTIL)lev_yacc.c
