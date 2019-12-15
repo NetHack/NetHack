@@ -9,6 +9,7 @@ makedefs
 dgn_comp
 lev_comp
 dlb
+dlb_main
 recover
 tilemap
 tileedit
