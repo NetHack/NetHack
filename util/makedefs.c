@@ -1059,6 +1059,10 @@ rumors_failure:
     exit(EXIT_FAILURE);
 }
 
+#if (NH_DEVEL_STATUS == NH_STATUS_WIP)
+#else
+    Strcat(subbuf, " post-release");
+#endif
 void
 do_date()
 {
@@ -1361,6 +1365,10 @@ windowing_sanity()
 #endif /*DEFAULT_WINDOW_SYS*/
 }
 
+#if (NH_DEVEL_STATUS == NH_STATUS_WIP)
+#else
+            " [post-release]"
+#endif
 /* routine to decide whether to discard something from data.base */
 static boolean
 d_filter(line)
