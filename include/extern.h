@@ -823,6 +823,9 @@ E void NDECL(reveal_paths);
 E boolean FDECL(read_tribute, (const char *, const char *, int,
                                char *, int, unsigned));
 E boolean FDECL(Death_quote, (char *, int));
+#ifdef EXTRAINFO_FN
+E void NDECL(mk_dgl_extrainfo);
+#endif
 
 /* ### fountain.c ### */
 

@@ -19,6 +19,10 @@ static void FDECL(regen_hp, (int));
 static void FDECL(interrupt_multi, (const char *));
 static void FDECL(debug_fields, (const char *));
 
+#ifdef EXTRAINFO_FN
+static long prev_dgl_extrainfo = 0;
+#endif
+
 void
 early_init()
 {
@@ -192,6 +196,13 @@ boolean resuming;
 
                     if (u.ublesscnt)
                         u.ublesscnt--;
+
+#ifdef EXTRAINFO_FN
+                    if ((prev_dgl_extrainfo == 0) || (prev_dgl_extrainfo < (g.moves + 250))) {
+                        prev_dgl_extrainfo = g.moves;
+                        mk_dgl_extrainfo();
+                    }
+#endif
 
                     /* One possible result of prayer is healing.  Whether or
                      * not you get healed depends on your current hit points.

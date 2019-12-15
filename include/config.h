@@ -573,6 +573,7 @@ typedef unsigned char uchar;
    dgamelaunch-based server play */
 #define DGAMELAUNCH
 #ifdef DGAMELAUNCH
+#define EXTRAINFO_FN    "/dgldir/extrainfo-nh370/%n.extrainfo"
 #define MAILCKFREQ 5  /* SIMPLE_MAIL is in unixconf.h */
 #endif
 
