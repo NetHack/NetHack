@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.334 $ $NHDT-Date: 1575245028 2019/12/02 00:03:48 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.337 $ $NHDT-Date: 1576431522 2019/12/15 17:38:42 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -45,6 +45,8 @@ A Guide to the Mazes of Menace
 .au
 Original version - Eric S. Raymond
 (Edited and expanded for 3.6 by Mike Stephenson and others)
+.sp 1
+\*(f2
 .hn 1
 Introduction
 .pg
