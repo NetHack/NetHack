@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1570566381 2019/10/08 20:26:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1576282488 2019/12/14 00:14:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.237 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1424,7 +1424,14 @@ boolean telekinesis;
                /* [exception for gold coins will have to change
                    if silver/copper ones ever get implemented] */
                && inv_cnt(FALSE) >= 52 && !merge_choice(invent, obj)) {
-        Your("knapsack cannot accommodate any more items.");
+        /* if there is some gold here (and we haven't already skipped it),
+           we aren't limited by the 52 item limit for it, but caller and
+           "grandcaller" aren't prepared to skip stuff and then pickup
+           just gold, so the best we can do here is vary the message */
+        Your("knapsack cannot accommodate any more items%s.",
+             /* floor follows by nexthere, otherwise container so by nobj */
+             nxtobj(obj, GOLD_PIECE, (boolean) (obj->where == OBJ_FLOOR))
+                 ? " (except gold)" : "");
         result = -1; /* nothing lifted */
     } else {
         result = 1;
