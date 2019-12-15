@@ -15,6 +15,8 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.6 by Mike Stephenson and others)
 
+                                  December 5, 2019
+
 
 
           1.  Introduction
@@ -56,8 +58,6 @@
           last  night  fortifying  yourself at the local inn, becoming more
           and more depressed as you watch the odds of  your  success  being
           posted on the inn's walls getting lower and lower.
-
-
 
 
           NetHack Guidebook                                               1
