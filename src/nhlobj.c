@@ -5,6 +5,26 @@
 #include "hack.h"
 #include "sp_lev.h"
 
+static int FDECL(l_obj_add_to_container, (lua_State *));
+static int FDECL(l_obj_addcontent, (lua_State *));
+static int FDECL(l_obj_at, (lua_State *));
+static int FDECL(l_obj_class, (lua_State *));
+static int FDECL(l_obj_container, (lua_State *));
+static int FDECL(l_obj_contents, (lua_State *));
+static int FDECL(l_obj_gc, (lua_State *));
+static int FDECL(l_obj_getcontents, (lua_State *));
+static int FDECL(l_obj_isnull, (lua_State *));
+static int FDECL(l_obj_new_readobjnam, (lua_State *));
+static int FDECL(l_obj_next, (lua_State *));
+static int FDECL(l_obj_nextobj, (lua_State *));
+static int FDECL(l_obj_obj_add_to_container, (lua_State *));
+static int FDECL(l_obj_obj_getcontents, (lua_State *));
+static int FDECL(l_obj_obj_objects_to_table, (lua_State *));
+static int FDECL(l_obj_objects_to_table, (lua_State *));
+static int FDECL(l_obj_placeobj, (lua_State *));
+static int FDECL(l_obj_to_table, (lua_State *));
+static int FDECL(l_obj_totable, (lua_State *));
+
 struct _lua_obj {
     int state; /* UNUSED */
     struct obj *obj;
@@ -125,7 +145,7 @@ lua_State *L;
     }
 
     if (lua_type(L, 1) == LUA_TNUMBER) {
-        otyp = luaL_checkinteger(L, 1);
+        otyp = (int) luaL_checkinteger(L, 1);
     } else if (lua_type(L, 1) == LUA_TUSERDATA) {
         struct _lua_obj *lo = l_obj_check(L, 1);
         if (lo && lo->obj)
@@ -308,8 +328,9 @@ lua_State *L;
 
     if (argc == 2) {
         int x, y;
-        x = luaL_checkinteger(L, 1);
-        y = luaL_checkinteger(L, 2);
+
+        x = (int) luaL_checkinteger(L, 1);
+        y = (int) luaL_checkinteger(L, 2);
         lua_pop(L, 2);
         (void) l_obj_push(L, g.level.objects[x][y]);
         return 1;
@@ -333,8 +354,9 @@ lua_State *L;
 
     if (lo && lo->obj) {
         int x, y;
-        x = luaL_checkinteger(L, 2);
-        y = luaL_checkinteger(L, 3);
+
+        x = (int) luaL_checkinteger(L, 2);
+        y = (int) luaL_checkinteger(L, 3);
         lua_pop(L, 3);
 
         place_object(lo->obj, x, y);

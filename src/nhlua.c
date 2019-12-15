@@ -16,6 +16,8 @@
 /* lua_CFunction prototypes */
 static int FDECL(nhl_test, (lua_State *));
 static int FDECL(nhl_getmap, (lua_State *));
+static int FDECL(nhl_gettrap, (lua_State *));
+static int FDECL(nhl_deltrap, (lua_State *));
 #if 0
 static int FDECL(nhl_setmap, (lua_State *));
 #endif
