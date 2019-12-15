@@ -1847,7 +1847,11 @@ do_options()
 #if (NH_DEVEL_STATUS == NH_STATUS_BETA)
             " [beta]"
 #else
+#if (NH_DEVEL_STATUS == NH_STATUS_WIP)
             " [work-in-progress]"
+#else
+            " [post-release]"
+#endif
 #endif
 #else
             ""
