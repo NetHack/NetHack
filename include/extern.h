@@ -202,6 +202,7 @@ E int NDECL(doconduct);
 E int NDECL(domonability);
 E char FDECL(cmd_from_func, (int NDECL((*))));
 E boolean FDECL(redraw_cmd, (CHAR_P));
+E const char *FDECL(levltyp_to_name, (int));
 #ifdef USE_TRAMPOLI
 E int NDECL(doextcmd);
 E int NDECL(domonability);
@@ -2462,6 +2463,7 @@ E struct selectionvar *FDECL(selection_filter_mapchar, (struct selectionvar *, X
 E void FDECL(set_floodfillchk_match_under, (XCHAR_P));
 E void FDECL(selection_do_ellipse, (struct selectionvar *, int, int, int, int, int));
 E void NDECL(update_croom);
+E const char *FDECL(get_trapname_bytype, (int));
 E void FDECL(l_register_des, (lua_State *));
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 

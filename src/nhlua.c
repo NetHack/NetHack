@@ -222,6 +222,75 @@ schar typ;
     return 'x';
 }
 
+/* local t = gettrap(x,y); */
+static int
+nhl_gettrap(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 2) {
+        int x = (int) lua_tointeger(L, 1);
+        int y = (int) lua_tointeger(L, 2);
+
+        if (x >= 0 && x < COLNO && y >= 0 && y < ROWNO) {
+            struct trap *ttmp = t_at(x,y);
+
+            if (ttmp) {
+                lua_newtable(L);
+
+                nhl_add_table_entry_int(L, "tx", ttmp->tx);
+                nhl_add_table_entry_int(L, "ty", ttmp->ty);
+                nhl_add_table_entry_int(L, "ttyp", ttmp->ttyp);
+                nhl_add_table_entry_str(L, "ttyp_name", get_trapname_bytype(ttmp->ttyp));
+                nhl_add_table_entry_int(L, "tseen", ttmp->tseen);
+                nhl_add_table_entry_int(L, "madeby_u", ttmp->madeby_u);
+                switch (ttmp->ttyp) {
+                case SQKY_BOARD:
+                    nhl_add_table_entry_int(L, "tnote", ttmp->tnote);
+                    break;
+                case ROLLING_BOULDER_TRAP:
+                    nhl_add_table_entry_int(L, "launchx", ttmp->launch.x);
+                    nhl_add_table_entry_int(L, "launchy", ttmp->launch.y);
+                    nhl_add_table_entry_int(L, "launch2x", ttmp->launch2.x);
+                    nhl_add_table_entry_int(L, "launch2y", ttmp->launch2.y);
+                    break;
+                case PIT:
+                case SPIKED_PIT:
+                    nhl_add_table_entry_int(L, "conjoined", ttmp->conjoined);
+                    break;
+                }
+                return 1;
+            } else
+                nhl_error(L, "No trap at location");
+        } else
+            nhl_error(L, "Coordinates out of range");
+    } else
+        nhl_error(L, "Wrong args");
+    return 0;
+}
+
+/* deltrap(x,y); */
+static int
+nhl_deltrap(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 2) {
+        int x = (int) lua_tointeger(L, 1);
+        int y = (int) lua_tointeger(L, 2);
+
+        if (x >= 0 && x < COLNO && y >= 0 && y < ROWNO) {
+            struct trap *ttmp = t_at(x,y);
+
+            if (ttmp)
+                deltrap(ttmp);
+        }
+    }
+    return 0;
+}
+
 /* local loc = getmap(x,y) */
 static int
 nhl_getmap(L)
@@ -240,6 +309,7 @@ lua_State *L;
             /* FIXME: some should be boolean values */
             nhl_add_table_entry_int(L, "glyph", levl[x][y].glyph);
             nhl_add_table_entry_int(L, "typ", levl[x][y].typ);
+            nhl_add_table_entry_str(L, "typ_name", levltyp_to_name(levl[x][y].typ));
             Sprintf(buf, "%c", splev_typ2chr(levl[x][y].typ));
             nhl_add_table_entry_str(L, "mapchr", buf);
             nhl_add_table_entry_int(L, "seenv", levl[x][y].seenv);
@@ -249,6 +319,8 @@ lua_State *L;
             nhl_add_table_entry_int(L, "roomno", levl[x][y].roomno);
             nhl_add_table_entry_bool(L, "edge", levl[x][y].edge);
             nhl_add_table_entry_bool(L, "candig", levl[x][y].candig);
+
+            nhl_add_table_entry_int(L, "has_trap", t_at(x,y) ? 1 : 0);
 
             /* TODO: FIXME: levl[x][y].flags */
 
@@ -670,6 +742,9 @@ static const struct luaL_Reg nhl_functions[] = {
 #if 0
     {"setmap", nhl_setmap},
 #endif
+    {"gettrap", nhl_gettrap},
+    {"deltrap", nhl_deltrap},
+
     {"pline", nhl_pline},
     {"verbalize", nhl_verbalize},
     {"menu", nhl_menu},

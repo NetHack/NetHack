@@ -14,6 +14,20 @@ function is_map_at(x,y, mapch, lit)
    end
 end
 
+function check_loc_name(x, y, name)
+   local loc = nh.getmap(x,y);
+   if (loc.typ_name ~= name) then
+      error("No " .. name .. " at " .. x .. "," .. y .. " (" .. loc.typ_name .. ")");
+   end
+end
+
+function check_trap_at(x,y, name)
+   local t = nh.gettrap(x + 1, y); -- + 1 == g.xstart
+   if (t.ttyp_name ~= name) then
+      error("Trap at " .. x .. "," .. y .. " is " .. t.ttyp_name .. ", not " .. name);
+   end
+end
+
 function test_level_init()
    des.reset_level();
    des.level_init();
@@ -171,6 +185,15 @@ LTL]])
 FFF
 F.F
 FFF]] })
+   for x = 60, 62 do
+      for y = 5, 7 do
+         local nam = "iron bars";
+         if (x == 61 and y == 6) then
+             nam = "room";
+         end
+         check_loc_name(x, y, nam);
+      end
+   end
    des.map({ halign = "left", valign = "bottom", map = [[
 III
 .I.
@@ -179,8 +202,11 @@ end
 
 function test_feature()
    des.feature("fountain", 40, 08);
+   check_loc_name(40 + 1, 08, "fountain");
    des.feature("sink", {41, 08});
+   check_loc_name(41 + 1, 08, "sink");
    des.feature({ type = "pool", x = 42, y = 08 });
+   check_loc_name(42 + 1, 08, "pool");
 end
 
 function test_gold()
@@ -189,9 +215,17 @@ end
 
 function test_trap()
    des.trap("pit", 41, 06);
+   check_trap_at(41, 06, "pit");
+
    des.trap("level teleport", {42, 06});
-   des.trap({ type = "hole", x = 43, y = 06 });
-   des.trap({ type = "hole", coord = {44, 06} });
+   check_trap_at(42, 06, "level teleport");
+
+   des.trap({ type = "falling rock", x = 43, y = 06 });
+   check_trap_at(43, 06, "falling rock");
+
+   des.trap({ type = "dart", coord = {44, 06} });
+   check_trap_at(44, 06, "dart");
+
    des.trap();
    des.trap("rust");
 end

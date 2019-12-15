@@ -3351,6 +3351,19 @@ int defval;
     return defval;
 }
 
+const char *
+get_trapname_bytype(ttyp)
+int ttyp;
+{
+    int i;
+
+    for (i = 0; trap_types[i].name; i++)
+        if (ttyp == trap_types[i].type)
+            return trap_types[i].name;
+
+    return NULL;
+}
+
 int
 get_traptype_byname(trapname)
 const char *trapname;
