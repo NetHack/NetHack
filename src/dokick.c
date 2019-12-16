@@ -1042,7 +1042,7 @@ dokick()
                 return 1;
             } else if (!rn2(4)) {
                 if (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz)) {
-                    fall_through(FALSE);
+                    fall_through(FALSE, 0);
                     return 1;
                 } else
                     goto ouch;

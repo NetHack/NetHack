@@ -12,6 +12,7 @@ fix internal self-recover to work with recent fields added to checkpoint file
 improvements to pronoun usage when hallucinating
 function calls made from mapglyph based on dungeon level are now called once
 	per level
+flying hero could not use a hole deliberately with '>'
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository

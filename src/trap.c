@@ -440,13 +440,15 @@ int x, y, typ;
 }
 
 void
-fall_through(td)
+fall_through(td, ftflags)
 boolean td; /* td == TRUE : trap door or hole */
+unsigned ftflags;
 {
     d_level dtmp;
     char msgbuf[BUFSZ];
     const char *dont_fall = 0;
     int newlevel, bottom;
+    struct trap *t = (struct trap *) 0;
 
     /* we'll fall even while levitating in Sokoban; otherwise, if we
        won't fall and won't be told that we aren't falling, give up now */
@@ -469,10 +471,9 @@ boolean td; /* td == TRUE : trap door or hole */
     } while (!rn2(4) && newlevel < bottom);
 
     if (td) {
-        struct trap *t = t_at(u.ux, u.uy);
-
+        t = t_at(u.ux, u.uy);
         feeltrap(t);
-        if (!Sokoban) {
+        if (!Sokoban && !(ftflags & TOOKPLUNGE)) {
             if (t->ttyp == TRAPDOOR)
                 pline("A trap door opens up under you!");
             else
@@ -484,7 +485,8 @@ boolean td; /* td == TRUE : trap door or hole */
     if (Sokoban && Can_fall_thru(&u.uz))
         ; /* KMH -- You can't escape the Sokoban level traps */
     else if (Levitation || u.ustuck
-             || (!Can_fall_thru(&u.uz) && !levl[u.ux][u.uy].candig) || Flying
+             || (!Can_fall_thru(&u.uz) && !levl[u.ux][u.uy].candig)
+             || (Flying && !(ftflags & TOOKPLUNGE))
              || is_clinger(g.youmonst.data)
              || (Inhell && !u.uevent.invoked && newlevel == bottom)) {
         dont_fall = "don't fall in.";
@@ -503,6 +505,9 @@ boolean td; /* td == TRUE : trap door or hole */
         }
         return;
     }
+    if (Flying && (ftflags & TOOKPLUNGE) && td && t)
+        You("swoop down %s!", (t->ttyp == TRAPDOOR)
+            ? "through the trap door" : "into the gaping hole");
 
     if (*u.ushops)
         shopdig(1);
@@ -1283,7 +1288,7 @@ unsigned trflags;
                        defsyms[trap_to_defsym(ttype)].explanation);
             break; /* don't activate it after all */
         }
-        fall_through(TRUE);
+        fall_through(TRUE, (trflags & TOOKPLUNGE));
         break;
 
     case TELEP_TRAP:
