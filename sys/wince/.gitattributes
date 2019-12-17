@@ -1,4 +1,4 @@
 *.ce NHSUBST
 *.mak NHSUBST
 *.bat NHSUBST
-* NH_filestag=(file%s_for_Windows_CE_and_PocketPC_-_untested_for_3.6.3)
+* NH_filestag=(file%s_for_Windows_CE_and_PocketPC_-_untested_for_3.6.4)

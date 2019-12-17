@@ -1,4 +1,4 @@
-               Instructions for Building and Installing NetHack 3.6.3
+               Instructions for Building and Installing NetHack 3.6.4
                      on a VMS (aka OpenVMS) system
                =========================================
 
@@ -146,8 +146,8 @@ Notes:
 0.  Version 3.5.x was never publicly released.
 
 1.  Save files and bones files from 3.4.x and earlier versions
-    will not work with 3.6.3, but save files and bones file from 3.6.0,
-    through 3.6.2 should work. The scoreboard file (RECORD) from 3.6.x
+    will not work with 3.6.4, but save files and bones file from 3.6.0,
+    through 3.6.4 should work. The scoreboard file (RECORD) from 3.6.x
     or 3.4.x or 3.3.x will work.
 
 2.  To specify user-preference options in your environment, define the

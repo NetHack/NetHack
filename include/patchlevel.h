@@ -9,7 +9,7 @@
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL 3
+#define PATCHLEVEL 4
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -35,6 +35,15 @@
 
 /****************************************************************************/
 /* Version 3.6.x */
+
+/*  Patch 4, December 17, 2019
+ *  GDBPATH and GREPPATH from sysconf or -D... on compilation command line were
+ *      being processed even if PANICTRACE was disabled but only being freed
+ *      at end of game when that was enabled
+ *  fix the article used in the message when your steed encounters a polymorph trap
+ *  dozen-ish assorted spelling/typo fixes in messages and source comments
+ *  fix potential buffer overflow when parsing run-time configuration file
+ */
 
 /*  Patch 3, December 5, 2019
  *

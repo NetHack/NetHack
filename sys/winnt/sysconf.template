@@ -24,7 +24,7 @@ WIZARDS=*
 # Only available if NetHack was compiled with DUMPLOG
 # Allows following placeholders:
 #   %% literal '%'
-#   %v version (eg. "3.6.3-0")
+#   %v version (eg. "3.6.4-0")
 #   %u game UID
 #   %t game start time, UNIX timestamp format
 #   %T current time, UNIX timestamp format
@@ -77,6 +77,9 @@ WIZARDS=*
 # IMPORTANT: If you change any of these locations, the directories they
 # point at must exist.  NetHack will not create them for you.
 #
+# Before adjusting, you can verify the default locations for files with:
+#       nethack --showpaths
+#
 # The location that users can adjust their config file startup options
 #CONFIGDIR=%USERPROFILE%\NetHack
 #
@@ -88,7 +91,7 @@ WIZARDS=*
 #HACKDIR=%USERPROFILE%\NetHack\3.6
 #
 # The location that level files in progress are stored (writeable)
-LEVELDIR=%USERPROFILE%\AppData\Local\NetHack\3.6
+#LEVELDIR=%USERPROFILE%\AppData\Local\NetHack\3.6
 #
 # The location where saved games are kept (writeable)
 #SAVEDIR=%USERPROFILE%\AppData\Local\NetHack\3.6

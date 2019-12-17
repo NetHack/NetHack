@@ -16,7 +16,7 @@ contributed the port.
 
 Alex Kompel, Dion Nicolaas, Yitzhak Sapir, Derek S. Ray, Michael Allison,
 Pasi Kallinen, Bart House, and Janet Walz contributed to the maintainance
-of the tty and graphical windows versions of NetHack 3.6.3.
+of the tty and graphical windows versions of NetHack 3.6.4.
 
 You can build a TTY version of NetHack and a Windows Graphical 
 version.  You can use one of the following build environments:
@@ -151,7 +151,7 @@ a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
 is set up for a 32-bit x86 version, but that's only because it will 
 run on the most number of existing Windows environments.
 
-NetHack's save files and bones files in the 3.6.3 release have not yet
+NetHack's save files and bones files in the 3.6.4 release have not yet
 evolved enough to allow them to interchange between the 32-bit version 
 and the 64-bit version (or between different platforms). Hopefully
 that will change in an upcoming release.
