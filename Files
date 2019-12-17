@@ -113,7 +113,7 @@ vault.c     version.c   vision.c    weapon.c    were.c      wield.c
 windows.c   wizard.c    worm.c      worn.c      write.c     zap.c
 
 sys/amiga:
-(files for Amiga versions - untested for 3.6.3)
+(files for Amiga versions - untested for 3.6.4)
 Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
 amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
 amii.hlp      amimenu.c     amirip.c      amisnd.c      amistack.c
@@ -124,12 +124,12 @@ winfuncs.c    winkey.c      winmenu.c     winproto.h    winreq.c
 winstr.c      xpm2iff.c
 
 sys/atari:
-(files for Atari version - untested for 3.6.3)
+(files for Atari version - untested for 3.6.4)
 Install.tos   atarifnt.uue  nethack.mnu   setup.g       tos.c
 unx2atar.sed
 
 sys/be:
-(files for BeOS version - untested for 3.6.3)
+(files for BeOS version - untested for 3.6.4)
 README    bemain.c
 
 sys/mac:
@@ -142,7 +142,7 @@ macwin.c      mgetline.c    mmodal.c      mrecover.c    mrecover.hqx
 mttymain.c
 
 sys/msdos:
-(files for MSDOS version - tested for 3.6.3 via cross-compile only)
+(files for MSDOS version - tested for 3.6.4 via partial cross-compile only)
 Install.dos      Makefile.BC      Makefile.GCC     Makefile.MSC
 Makefile1.cross  Makefile2.cross  SCHEMA35.MSC     moveinit.pat
 msdos.c          msdoshlp.txt     ovlinit.c        pckeys.c
@@ -155,7 +155,7 @@ vidtxt.c         vidvesa.c        vidvga.c
 nhico.uu  nhpif.uu
 
 sys/os2:
-(files for OS/2 version - untested for 3.6.3)
+(files for OS/2 version - untested for 3.6.4)
 Install.os2   Makefile.os2  nhpmico.uu    os2.c
 
 sys/share:
@@ -165,10 +165,10 @@ random.c
 (Berkeley uudecode file, which may be used in build process of any version)
 uudecode.c
 
-(file for MSDOS, OS/2, Amiga, and Atari versions - untested for 3.6.3)
+(file for MSDOS, OS/2, Amiga, and Atari versions - untested for 3.6.4)
 pcmain.c
 
-(file for MSDOS, OS/2, and Atari versions - untested for 3.6.3)
+(file for MSDOS, OS/2, and Atari versions - untested for 3.6.4)
 NetHack.cnf  pctty.c
 
 (file for MSDOS, OS/2, and VMS versions)
@@ -180,10 +180,10 @@ nhlan.c
 (file for VMS version)
 tclib.c
 
-(files for MSDOS and OS/2 versions - untested for 3.6.3)
+(files for MSDOS and OS/2 versions - untested for 3.6.4)
 Makefile.lib  termcap.uu
 
-(files for MSDOS, OS/2 and Atari versions - tested on MSDOS for 3.6.3 via cross-compile only)
+(files for MSDOS, OS/2 and Atari versions - tested on MSDOS for 3.6.4 via partial cross-compile only)
 pcsys.c   pcunix.c
 
 (files for UNIX and Be versions)
@@ -253,7 +253,7 @@ spec_lev.com  sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c
 vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
 
 sys/wince:
-(files for Windows CE and PocketPC - untested for 3.6.3)
+(files for Windows CE and PocketPC - untested for 3.6.4)
 Install.ce    bootstrp.mak  celib.c       cesetup.bat   cesound.c
 defaults.nh   keypad.uu     menubar.uu    mhaskyn.c     mhaskyn.h
 mhcmd.c       mhcmd.h       mhcolor.c     mhcolor.h     mhdlg.c
@@ -266,7 +266,7 @@ resource.h    winMS.h       winhack.c     winhack.rc    winhcksp.rc
 winmain.c
 
 sys/wince/ceinc:
-(header files for Windows CE and PocketPC - untested for 3.6.3)
+(header files for Windows CE and PocketPC - untested for 3.6.4)
 assert.h  errno.h   fcntl.h
 
 sys/wince/ceinc/sys:
@@ -332,12 +332,12 @@ cursinit.h  cursinvt.c  cursinvt.h  cursmain.c  cursmesg.c  cursmesg.h
 cursmisc.c  cursmisc.h  cursstat.c  cursstat.h  curswins.c  curswins.h
 
 win/gem:
-(files for GEM versions - untested for 3.6.3)
+(files for GEM versions - untested for 3.6.4)
 Install.gem  bitmfile.c   gem_rsc.uu   gem_rso.uu   gr_rect.c    gr_rect.h
 load_img.c   tile2img.c   title.uu     wingem.c     wingem1.c    xpm2img.c
 
 win/gnome:
-(files for GNOME versions - untested for 3.6.3)
+(files for GNOME versions - untested for 3.6.4)
 README      gn_xpms.h   gnaskstr.c  gnaskstr.h  gnbind.c    gnbind.h
 gnglyph.c   gnglyph.h   gnmain.c    gnmain.h    gnmap.c     gnmap.h
 gnmenu.c    gnmenu.h    gnmesg.c    gnmesg.h    gnomeprv.h  gnopts.c
