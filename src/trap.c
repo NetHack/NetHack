@@ -486,8 +486,8 @@ unsigned ftflags;
         ; /* KMH -- You can't escape the Sokoban level traps */
     else if (Levitation || u.ustuck
              || (!Can_fall_thru(&u.uz) && !levl[u.ux][u.uy].candig)
-             || (Flying && !(ftflags & TOOKPLUNGE))
-             || is_clinger(g.youmonst.data)
+             || ((Flying || is_clinger(g.youmonst.data))
+                    && !(ftflags & TOOKPLUNGE))
              || (Inhell && !u.uevent.invoked && newlevel == bottom)) {
         dont_fall = "don't fall in.";
     } else if (g.youmonst.data->msize >= MZ_HUGE) {
@@ -505,9 +505,13 @@ unsigned ftflags;
         }
         return;
     }
-    if (Flying && (ftflags & TOOKPLUNGE) && td && t)
-        You("swoop down %s!", (t->ttyp == TRAPDOOR)
-            ? "through the trap door" : "into the gaping hole");
+    if ((Flying || is_clinger(g.youmonst.data))
+        && (ftflags & TOOKPLUNGE) && td && t)
+        You("%s down %s!",
+            Flying ? "swoop" : "deliberately drop",
+            (t->ttyp == TRAPDOOR)
+                ? "through the trap door"
+                : "into the gaping hole");
 
     if (*u.ushops)
         shopdig(1);
