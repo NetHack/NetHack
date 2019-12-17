@@ -7,6 +7,7 @@ NetHack 3.6.
 NetHack 3.7.0 work-in-progress is not a release of NetHack. As a .0 version,
 and still very early in its development cycle, there has already been changes
 made, and there will continue to be many more prior to an eventual release.
+section.
 
 In short -- there are likely to be bugs. Don't treat NetHack-3.7 branch as
 released code, and if stability is paramount, then the most recent 
@@ -68,13 +69,13 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     call it.
 
 2.  Having unpacked, you should have a file called 'Files' in your Top
-    directory.  
+    directory.
 
     This file contains the list of all the files you now SHOULD
     have in each directory.  Please check the files in each directory
     against this list to make sure that you have a complete set.
 
-    This file also contains a list of what files are created during 
+    This file also contains a list of what files are created during
     the build process.
 
     The names of the directories listed should not be changed unless you
@@ -104,7 +105,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     At the time of the most recent official release, NetHack 3.6, it had
     been tested to run/compile on:
 
-        Intel Pentium or better (or clone) running Linux, BSDI, or 
+        Intel Pentium or better (or clone) running Linux, BSDI, or
                 Windows (7 through 10)
         Intel 80386 or greater (or clone) boxes running Linux, or BSDI
 	Mac OS X 10.11 (follow the instructions in sys/unix, not sys/mac)
@@ -114,8 +115,8 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         msdos protected mode using djgpp including a Linux-host djgpp 
         cross-compile
 
-    Previous versions of NetHack were tested and known to run on the 
-    following systems, but it is unknown if they can still build and 
+    Previous versions of NetHack were tested and known to run on the
+    following systems, but it is unknown if they can still build and
     execute NetHack 3.6 or NetHack 3.7:
 
         Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
@@ -168,7 +169,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
                         - - - - - - - - - - -
 
-If you have problems building the game, or you find bugs in it, we recommend 
+If you have problems building the game, or you find bugs in it, we recommend
 filing a bug report from our "Contact Us" web page at:
     https://www.nethack.org/common/contact.html
 Please include the version information from #version or the command line
@@ -182,12 +183,12 @@ available can be obtained via git here:
 
 When sending correspondence, please observe the following:
 o Please be sure to include your machine type, OS, and patchlevel.
-o Please avoid sending us binary files (e.g. save files or bones files). 
+o Please avoid sending us binary files (e.g. save files or bones files).
   If you have found a bug and think that your save file would aid in solving
-  the problem, send us a description in words of the problem, your machine 
-  type, your operating system, and the version of NetHack.  Tell us that you 
+  the problem, send us a description in words of the problem, your machine
+  type, your operating system, and the version of NetHack.  Tell us that you
   have a save file, but do not actually send it.
-  You may then be contacted by a member of the development team with the 
+  You may then be contacted by a member of the development team with the
   address of a specific person to send the save file to.
 o Though we make an effort to reply to each bug report, it may take some
   time before you receive feedback.  This is especially true during the
@@ -196,16 +197,16 @@ o We don't give hints for playing the game.
 o Don't bother to ask when the next version will be out or you can expect
   to receive a stock answer.
 
-If you want to submit a patch for the NetHack source code via email directly, 
+If you want to submit a patch for the NetHack source code via email directly,
 you can direct it to this address:
     nethack-bugs (at) nethack.org
 
-If a feature is not accepted you are free, of course, to post the patches 
+If a feature is not accepted you are free, of course, to post the patches
 to the net yourself and let the marketplace decide their worth.
 
 All of this amounts to the following:  If you decide to apply a free-lanced
 patch to your 3.6 code, you are welcome to do so, of course, but we won't
-be able to provide support or receive bug reports for it.  
+be able to provide support or receive bug reports for it.
 
 In our own patches, we will assume that your code is synchronized with ours.
 

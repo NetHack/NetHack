@@ -44,6 +44,15 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
+/*  Patch 4, December 17, 2019
+ *  GDBPATH and GREPPATH from sysconf or -D... on compilation command line were
+ *      being processed even if PANICTRACE was disabled but only being freed
+ *      at end of game when that was enabled
+ *  fix the article used in the message when your steed encounters a polymorph trap
+ *  dozen-ish assorted spelling/typo fixes in messages and source comments
+ *  fix potential buffer overflow when parsing run-time configuration file
+ */
+
 /*  Patch 3, December 5, 2019
  *
  *  Fixed stale 'thrownobj' pointer for returning thrown aklys while engulfed
