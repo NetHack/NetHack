@@ -197,8 +197,8 @@ test_portable_config(
          */
 
          *portable_device_top_path = '\0';
-         (void) strncpy(tmppath, executable_path, sizeof tmppath - 1);
-         tmppath[sizeof tmppath - 1] = '\0';
+         (void) strncpy(tmppath, executable_path, sizeof tmppath - (1 + sizeof "sysconf"));
+         tmppath[sizeof tmppath - (1 + sizeof "sysconf")] = '\0';
          (void) strcat(tmppath, "sysconf");
          /* split the path up */
 #ifdef UNICODE
