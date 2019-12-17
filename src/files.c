@@ -2463,6 +2463,12 @@ char *origbuf;
             free((genericptr_t) sysopt.dumplogfile);
         sysopt.dumplogfile = dupstr(bufp);
 #endif
+#ifdef WIN32
+    } else if (src == SET_IN_SYS && match_varname(buf, "portable_device_top", 8)) {
+        if (sysopt.portable_device_top)
+            free((genericptr_t) sysopt.portable_device_top);
+        sysopt.portable_device_top = dupstr(bufp);
+#endif
     } else if (src == SET_IN_SYS && match_varname(buf, "GENERICUSERS", 12)) {
         if (sysopt.genericusers)
             free((genericptr_t) sysopt.genericusers);
@@ -4140,6 +4146,16 @@ reveal_paths(VOID_ARGS)
     } else
 #endif /* ?DUMPLOG */
         raw_printf("No end-of-game disclosure file (%s).", nodumpreason);
+
+#ifdef WIN32
+    if (sysopt.portable_device_top) {
+        const char *pd = get_portable_device();
+
+        raw_printf("Writable folder for portable device config (sysconf %s):",
+                    "portable_device_top");
+        raw_printf("    \"%s\"", pd);
+    }
+#endif
 
     /* personal configuration file */
 
