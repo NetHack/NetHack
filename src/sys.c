@@ -36,7 +36,7 @@ sys_early_init()
     sysopt.dumplogfile = (char *) 0;
 #endif
 #ifdef WIN32
-    char *portable_device_top = (char *) 0;
+    sysopt.portable_device_top = (char *) 0;
 #endif
     sysopt.env_dbgfl = 0; /* haven't checked getenv("DEBUGFILES") yet */
     sysopt.shellers = (char *) 0;
