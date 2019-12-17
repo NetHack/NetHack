@@ -508,9 +508,13 @@ unsigned ftflags;
         }
         return;
     }
-    if (Flying && (ftflags & TOOKPLUNGE) && td && t)
-        You("swoop down %s!", (t->ttyp == TRAPDOOR)
-            ? "through the trap door" : "into the gaping hole");
+    if ((Flying || is_clinger(youmonst.data))
+        && (ftflags & TOOKPLUNGE) && td && t)
+        You("%s down %s!",
+            Flying ? "swoop" : "deliberately drop",
+            (t->ttyp == TRAPDOOR)
+                ? "through the trap door"
+                : "into the gaping hole");
 
     if (*u.ushops)
         shopdig(1);
