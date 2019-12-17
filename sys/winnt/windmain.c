@@ -311,8 +311,10 @@ set_default_prefix_locations(const char *programPath)
 
     if (test_portable_config(executable_path, portable_device_top_path,
                                         sizeof portable_device_top_path)) {
+#if 0
         if (illegal_dir(portable_device_top_path, executable_path))
             windows_startup_state = 2;
+#endif
         fqn_prefix[SYSCONFPREFIX] = executable_path;
         fqn_prefix[CONFIGPREFIX]  = portable_device_top_path;
         fqn_prefix[HACKPREFIX]    = portable_device_top_path;
