@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.4 $ $NHDT-Date: 1576287569 2019/12/14 01:39:29 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.11 $ $NHDT-Date: 1576635242 2019/12/18 02:14:02 $
 
 fixes36.4 contains a terse summary of changes made to 3.6.3 in order to
 produce 3.6.4.
@@ -16,6 +16,9 @@ message "your knapsack can't accomodate any more items" when picking stuff up
 	pending; vary the message rather than add more convoluted pickup code
 dozen-ish assorted spelling/typo fixes in messages and source comments
 fix potential buffer overflow when parsing run-time configuration file
+wizard mode wishing for terrain would leave it unmapped if done while blind
+wizard mode terrain wish could leave hero in water (severe vision limits) or
+	in lava (trapped, sinking) which wasn't there any more
 
 
 Platform- and/or Interface-Specific Fixes or Features

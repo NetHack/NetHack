@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1576274483 2019/12/13 22:01:23 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.325 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1576635243 2019/12/18 02:14:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.328 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3746,6 +3746,7 @@ drown()
     boolean inpool_ok = FALSE, crawl_ok;
     int i, x, y;
 
+    feel_newsym(u.ux, u.uy); /* in case Blind, map the water here */
     /* happily wading in the same contiguous pool */
     if (u.uinwater && is_pool(u.ux - u.dx, u.uy - u.dy)
         && (Swimming || Amphibious)) {
@@ -5262,6 +5263,7 @@ lava_effects()
     int dmg = d(6, 6); /* only applicable for water walking */
     boolean usurvive, boil_away;
 
+    feel_newsym(u.ux, u.uy); /* in case Blind, map the lava here */
     burn_away_slime();
     if (likes_lava(youmonst.data))
         return FALSE;
