@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1576635242 2019/12/18 02:14:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.256 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1576638500 2019/12/18 03:08:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.257 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3733,7 +3733,7 @@ struct obj *no_wish;
             del_engr_at(x, y);
             pline("A pool of molten lava.");
             if (!(Levitation || Flying))
-                (void) lava_effects();
+                pooleffects(FALSE);
             madeterrain = TRUE;
         } else if (!BSTRCMPI(bp, p - 5, "altar")) {
             aligntyp al;
@@ -3770,12 +3770,15 @@ struct obj *no_wish;
         }
 
         if (madeterrain) {
-            feel_newsym(x, y);
-            if (u.uinwater && !is_pool(x, y)) {
+            feel_newsym(x, y); /* map the spot where the wish occurred */
+            /* hero started at <x,y> but might not be there anymore (create
+               lava, decline to die, and get teleported away to safety) */
+            if (u.uinwater && !is_pool(u.ux, u.uy)) {
                 u.uinwater = 0; /* leave the water */
                 docrt();
                 vision_full_recalc = 1;
-            } else if (u.utrap && u.utraptype == TT_LAVA && !is_lava(x, y)) {
+            } else if (u.utrap && u.utraptype == TT_LAVA
+                       && !is_lava(u.ux, u.uy)) {
                 reset_utrap(FALSE);
             }
             /* cast 'const' away; caller won't modify this */

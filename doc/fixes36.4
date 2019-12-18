@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.11 $ $NHDT-Date: 1576635242 2019/12/18 02:14:02 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $ $NHDT-Date: 1576638499 2019/12/18 03:08:19 $
 
 fixes36.4 contains a terse summary of changes made to 3.6.3 in order to
 produce 3.6.4.
@@ -19,6 +19,9 @@ fix potential buffer overflow when parsing run-time configuration file
 wizard mode wishing for terrain would leave it unmapped if done while blind
 wizard mode terrain wish could leave hero in water (severe vision limits) or
 	in lava (trapped, sinking) which wasn't there any more
+flying hero can go down (via '>') holes or trap doors instead of escaping trap
+polymorphed hero hiding on the ceiling can now use '>' to unhide instead of
+	being told "you can't go down here"
 
 
 Platform- and/or Interface-Specific Fixes or Features
