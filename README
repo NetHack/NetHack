@@ -5,9 +5,10 @@ which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
 NetHack 3.6.4 is the official release of NetHack that follows NetHack 3.6.3
-and contains all bug fixes since then, including one security-related
-fix for a vulnerability potentially impacting 3.6.0, 3.6.1, 3.6.2, and 3.6.3.
-The file doc/fixes36.4 in the source distribution has a full list of them. The
+and contains all bug fixes since 3.6.3, including one security-related fix for
+a vulnerability that affects NetHack versions 3.6.0, 3.6.1, 3.6.2, and 3.6.3.
+
+The file doc/fixes36.4 in the source distribution has a full list of fixes. The
 text in there was written for the development team's own use and is provided
 "as is", so please do not ask us to further explain the entries in that file.
 Some entries might be considered "spoilers", particularly in the "new features"
