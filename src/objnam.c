@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1575245076 2019/12/02 00:04:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.255 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1576638500 2019/12/18 03:08:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.257 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3663,14 +3663,17 @@ struct obj *no_wish;
             goto typfnd;
         }
     }
-/* Let wizards wish for traps and furniture.
- * Must come after objects check so wizards can still wish for
- * trap objects like beartraps.
- * Disallow such topology tweaks for WIZKIT startup wishes.
- */
+
+    /*
+     * Let wizards wish for traps and furniture.
+     * Must come after objects check so wizards can still wish for
+     * trap objects like beartraps.
+     * Disallow such topology tweaks for WIZKIT startup wishes.
+     */
  wiztrap:
     if (wizard && !program_state.wizkit_wishing) {
         struct rm *lev;
+        boolean madeterrain = FALSE;
         int trap, x = u.ux, y = u.uy;
 
         for (trap = NO_TRAP + 1; trap < TRAPNUM; trap++) {
@@ -3693,7 +3696,8 @@ struct obj *no_wish;
             return (struct obj *) &zeroobj;
         }
 
-        /* furniture and terrain */
+        /* furniture and terrain (use at your own risk; can clobber stairs
+           or place furniture on existing traps which shouldn't be allowed) */
         lev = &levl[x][y];
         p = eos(bp);
         if (!BSTRCMPI(bp, p - 8, "fountain")) {
@@ -3702,43 +3706,36 @@ struct obj *no_wish;
             if (!strncmpi(bp, "magic ", 6))
                 lev->blessedftn = 1;
             pline("A %sfountain.", lev->blessedftn ? "magic " : "");
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-        if (!BSTRCMPI(bp, p - 6, "throne")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 6, "throne")) {
             lev->typ = THRONE;
             pline("A throne.");
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-        if (!BSTRCMPI(bp, p - 4, "sink")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 4, "sink")) {
             lev->typ = SINK;
             level.flags.nsinks++;
             pline("A sink.");
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
+            madeterrain = TRUE;
+
         /* ("water" matches "potion of water" rather than terrain) */
-        if (!BSTRCMPI(bp, p - 4, "pool") || !BSTRCMPI(bp, p - 4, "moat")) {
+        } else if (!BSTRCMPI(bp, p - 4, "pool")
+                   || !BSTRCMPI(bp, p - 4, "moat")) {
             lev->typ = !BSTRCMPI(bp, p - 4, "pool") ? POOL : MOAT;
             del_engr_at(x, y);
             pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
             /* Must manually make kelp! */
             water_damage_chain(level.objects[x][y], TRUE);
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-        if (!BSTRCMPI(bp, p - 4, "lava")) { /* also matches "molten lava" */
+            madeterrain = TRUE;
+
+        /* also matches "molten lava" */
+        } else if (!BSTRCMPI(bp, p - 4, "lava")) {
             lev->typ = LAVAPOOL;
             del_engr_at(x, y);
             pline("A pool of molten lava.");
             if (!(Levitation || Flying))
-                (void) lava_effects();
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-
-        if (!BSTRCMPI(bp, p - 5, "altar")) {
+                pooleffects(FALSE);
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 5, "altar")) {
             aligntyp al;
 
             lev->typ = ALTAR;
@@ -3751,37 +3748,43 @@ struct obj *no_wish;
             else if (!strncmpi(bp, "unaligned ", 10))
                 al = A_NONE;
             else /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
-                al = (!rn2(6)) ? A_NONE : rn2((int) A_LAWFUL + 2) - 1;
+                al = !rn2(6) ? A_NONE : (rn2((int) A_LAWFUL + 2) - 1);
             lev->altarmask = Align2amask(al);
             pline("%s altar.", An(align_str(al)));
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-
-        if (!BSTRCMPI(bp, p - 5, "grave")
-            || !BSTRCMPI(bp, p - 9, "headstone")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 5, "grave")
+                   || !BSTRCMPI(bp, p - 9, "headstone")) {
             make_grave(x, y, (char *) 0);
             pline("%s.", IS_GRAVE(lev->typ) ? "A grave"
                                             : "Can't place a grave here");
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-
-        if (!BSTRCMPI(bp, p - 4, "tree")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 4, "tree")) {
             lev->typ = TREE;
             pline("A tree.");
-            newsym(x, y);
             block_point(x, y);
-            return (struct obj *) &zeroobj;
-        }
-
-        if (!BSTRCMPI(bp, p - 4, "bars")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 4, "bars")) {
             lev->typ = IRONBARS;
             pline("Iron bars.");
-            newsym(x, y);
+            madeterrain = TRUE;
+        }
+
+        if (madeterrain) {
+            feel_newsym(x, y); /* map the spot where the wish occurred */
+            /* hero started at <x,y> but might not be there anymore (create
+               lava, decline to die, and get teleported away to safety) */
+            if (u.uinwater && !is_pool(u.ux, u.uy)) {
+                u.uinwater = 0; /* leave the water */
+                docrt();
+                vision_full_recalc = 1;
+            } else if (u.utrap && u.utraptype == TT_LAVA
+                       && !is_lava(u.ux, u.uy)) {
+                reset_utrap(FALSE);
+            }
+            /* cast 'const' away; caller won't modify this */
             return (struct obj *) &zeroobj;
         }
-    }
+    } /* end of wizard mode traps and terrain */
 
     if (!oclass && !typ) {
         if (!strncmpi(bp, "polearm", 7)) {
