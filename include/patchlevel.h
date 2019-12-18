@@ -36,13 +36,30 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
-/*  Patch 4, December 17, 2019
+/*  Patch 4, December 18, 2019
+ *
+ *  fix potential buffer overflow when parsing run-time configuration file
  *  GDBPATH and GREPPATH from sysconf or -D... on compilation command line were
  *      being processed even if PANICTRACE was disabled but only being freed
  *      at end of game when that was enabled
- *  fix the article used in the message when your steed encounters a polymorph trap
+ *  fix the article used in the message when your steed encounters a polymorph
+ *      trap
+ *  allow teleporting onto the vibrating square
+ *  message "your knapsack can't accomodate any more items" when picking stuff
+ *      up or removing such from container was inaccurate if there was some
+ *      gold pending; vary the message rather than add more convoluted pickup
+ *      code
  *  dozen-ish assorted spelling/typo fixes in messages and source comments
- *  fix potential buffer overflow when parsing run-time configuration file
+ *  wizard mode wishing for terrain would leave it unmapped if done while blind
+ *  wizard mode terrain wish could leave hero in water (severe vision limits)
+ *      or in lava (trapped, sinking) which wasn't there any more
+ *  flying hero can go down (via '>') holes or trap doors instead of escaping
+ *      trap
+ *  polymorphed hero hiding on the ceiling can now use '>' to unhide instead of
+ *      being told "you can't go down here"
+ *  fix compilation on platforms that split the ncurses and tinfo libraries
+ *  Windows: allow all game files to be on a portable device via the sysconf
+ *      option 'portable_device_paths'
  */
 
 /*  Patch 3, December 5, 2019
@@ -61,7 +78,7 @@
  *  Added several grammar corrections
  *  Improved recognition of deafness for several situations including the
  *     playing of musical instruments and bribing negotiations with demon lords
- *  Fixed ignoring of god's wrath when hero injured himself during altar kick 
+ *  Fixed ignoring of god's wrath when hero injured himself during altar kick
  *  Fixed several cases where persistent inventory window was not updated
  *  Fixed temple priests or shopkeepers moving over other monsters
  *  Fixed a crash-causing bug when putting on levitation boots over a sink
@@ -74,14 +91,14 @@
  *    the Windows platform
  *  Improved the layout and display of the player selection dialog used on the
  *     Windows graphical implementation
- *  Improved performance of some tty versions by reducing the number of 
+ *  Improved performance of some tty versions by reducing the number of
  *     function calls made from mapglyph
  *  Allowed the msdos implementation to build with curses and PDCurses
  *  Included over 100 other fixes and improvements as outlined in doc/fixes36.3
  */
 
 /*  Patch 2, May 7, 2019
- *  
+ *
  *  Over 320 bug fixes including a couple of crash bug fixes as outlined in
  *      doc/fixes36.2
  *  More than 15 enhancements or improvements
