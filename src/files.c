@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1576096997 2019/12/11 20:43:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1576626110 2019/12/17 23:41:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.276 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2596,12 +2596,6 @@ char *origbuf;
             free((genericptr_t) sysopt.dumplogfile);
         sysopt.dumplogfile = dupstr(bufp);
 #endif
-#ifdef WIN32
-    } else if (src == SET_IN_SYS && match_varname(buf, "portable_device_top", 8)) {
-        if (sysopt.portable_device_top)
-            free((genericptr_t) sysopt.portable_device_top);
-        sysopt.portable_device_top = dupstr(bufp);
-#endif
     } else if (src == SET_IN_SYS && match_varname(buf, "GENERICUSERS", 12)) {
         if (sysopt.genericusers)
             free((genericptr_t) sysopt.genericusers);
@@ -2741,6 +2735,16 @@ char *origbuf;
             return FALSE;
         }
         sysopt.accessibility = n;
+#ifdef WIN32
+    } else if (src == SET_IN_SYS
+                && match_varname(buf, "portable_device_paths", 8)) {
+        n = atoi(bufp);
+        if (n < 0 || n > 1) {
+            config_error_add("Illegal value in portable_device_paths (not 0,1).");
+            return FALSE;
+        }
+        sysopt.portable_device_paths = n;
+#endif
 #endif /* SYSCF */
 
     } else if (match_varname(buf, "BOULDER", 3)) {
@@ -3296,7 +3300,8 @@ boolean FDECL((*proc), (char *));
                         free(buf);
                     }
                     buf = strcat(tmpbuf, ep);
-                    buf[sizeof inbuf - 1] = '\0';
+                    if (strlen(buf) >= sizeof inbuf)
+                        buf[sizeof inbuf - 1] = '\0';
                 }
 
                 if (morelines || (ignoreline && !oldline))
@@ -4338,11 +4343,10 @@ reveal_paths(VOID_ARGS)
         raw_printf("No end-of-game disclosure file (%s).", nodumpreason);
 
 #ifdef WIN32
-    if (sysopt.portable_device_top) {
+    if (sysopt.portable_device_paths) {
         const char *pd = get_portable_device();
 
-        raw_printf("Writable folder for portable device config (sysconf %s):",
-                    "portable_device_top");
+        raw_printf("portable_device_paths (set in sysconf):");
         raw_printf("    \"%s\"", pd);
     }
 #endif

@@ -35,9 +35,6 @@ sys_early_init()
 #ifdef DUMPLOG
     sysopt.dumplogfile = (char *) 0;
 #endif
-#ifdef WIN32
-    sysopt.portable_device_top = (char *) 0;
-#endif
     sysopt.env_dbgfl = 0; /* haven't checked getenv("DEBUGFILES") yet */
     sysopt.shellers = (char *) 0;
     sysopt.explorers = (char *) 0;
@@ -86,6 +83,9 @@ sys_early_init()
     /* default to little-endian in 3.7 */
     sysopt.saveformat[0] = sysopt.bonesformat[0] = lendian;
     sysopt.accessibility = 0;
+#ifdef WIN32
+    sysopt.portable_device_paths = 0;
+#endif
     return;
 }
 
@@ -108,12 +108,6 @@ sysopt_release()
 #ifdef DUMPLOG
     if (sysopt.dumplogfile)
         free((genericptr_t)sysopt.dumplogfile), sysopt.dumplogfile=(char *)0;
-#endif
-#ifdef WIN32
-    if (sysopt.portable_device_top) {
-        free((genericptr_t) sysopt.portable_device_top);
-        sysopt.portable_device_top = (char *) 0;
-    }
 #endif
     if (sysopt.genericusers)
         free((genericptr_t) sysopt.genericusers),

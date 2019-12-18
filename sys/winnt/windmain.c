@@ -167,25 +167,16 @@ folder_file_exists(const char * folder, const char * file_name)
 boolean
 test_portable_config(
     const char *executable_path,
-    char *portable_device_top_path,
-    size_t portable_device_top_path_size)
+    char *portable_device_path,
+    size_t portable_device_path_size)
 {
+    int lth = 0;
+    const char *sysconf = "sysconf";
+    char tmppath[MAX_PATH];
     boolean retval = FALSE,
             save_initoptions_noterminate = iflags.initoptions_noterminate;
-    char tmppath[MAX_PATH], *toppath, *sysconftop;
-#ifdef UNICODE
-    TCHAR wdrive[_MAX_DRIVE];
-    TCHAR wthisdir[_MAX_DIR];
-    TCHAR wfname[_MAX_FNAME];
-    TCHAR wext[_MAX_EXT];
-#endif
-    char drive[_MAX_DRIVE];
-    char thisdir[_MAX_DIR];
-    char fname[_MAX_FNAME];
-    char ext[_MAX_EXT];
-    errno_t err;
 
-    if (portable_device_top_path && folder_file_exists(executable_path, "sysconf")) {
+    if (portable_device_path && folder_file_exists(executable_path, "sysconf")) {
         /*
            There is a sysconf file (not just sysconf.template) present in
            the exe path, which is not the way NetHack is initially distributed,
@@ -195,101 +186,38 @@ test_portable_config(
            delve into that...
          */
 
-         *portable_device_top_path = '\0';
-         (void) strncpy(tmppath, executable_path, sizeof tmppath - (1 + sizeof "sysconf"));
-         tmppath[sizeof tmppath - (1 + sizeof "sysconf")] = '\0';
-         (void) strcat(tmppath, "sysconf");
-         /* split the path up */
-#ifdef UNICODE
-        {
-            int sz, wchars_num = MultiByteToWideChar( CP_ACP, 0, tmppath, -1, NULL, 0);
-            wchar_t *wstr;
-
-            if (wchars_num) {
-                wstr = (wchar_t *) alloc(wchars_num * sizeof(wchar_t));
-                MultiByteToWideChar( CP_ACP, 0, tmppath, -1, wstr, wchars_num);
-                err = _wsplitpath_s(wstr, wdrive, _MAX_DRIVE, wthisdir, _MAX_DIR,
-                                       wfname, _MAX_FNAME, wext, _MAX_EXT);
-                free(wstr);
-            }
-            sz = WideCharToMultiByte(CP_ACP, 0, wdrive, -1, drive,
-                                        0, NULL, NULL);
-            if (sz <= sizeof drive)
-                WideCharToMultiByte(CP_ACP, 0, wdrive, -1, drive,
-                                        sz, NULL, NULL);
-
-        }
-#else
-        err = _splitpath_s(tmppath, drive, _MAX_DRIVE, thisdir, _MAX_DIR,
-                                       fname, _MAX_FNAME, ext, _MAX_EXT);
-#endif
-        if (err != 0)
-            goto done_test;
-
-        toppath = (char *) alloc(portable_device_top_path_size);
-        *toppath = '\0';
-        /* -2 because we need to append the path separator */
-        (void) strncpy(toppath, drive, portable_device_top_path_size - 2);
-        toppath[portable_device_top_path_size - 2] = '\0';
-        (void) strcat(toppath, "\\");
+        *portable_device_path = '\0';
+        lth = sizeof tmppath - strlen(sysconf); 
+        (void) strncpy(tmppath, executable_path, lth - 1);
+        tmppath[lth - 1] = '\0';
+        (void) strcat(tmppath, sysconf);
 
         iflags.initoptions_noterminate = 1;
         /* assure_syscf_file(); */
         config_error_init(TRUE, tmppath, FALSE);
         /* ... and _must_ parse correctly. */
         if (read_config_file(tmppath, SET_IN_SYS)
-            && sysopt.portable_device_top
-            && (strlen(sysopt.portable_device_top) + strlen(toppath)
-                                         < portable_device_top_path_size - 3)) {
-            sysconftop = sysopt.portable_device_top;
-            if (sysconftop[1] == ':')
-                sysconftop += 2;      /* skip the device if specified */
-            if (*sysconftop == '\\')
-                sysconftop += 1;      /* skip the root folder if specified */
-            (void) strcat(toppath, sysconftop);
-            append_slash(toppath);
+            && sysopt.portable_device_paths)
             retval = TRUE;
-        } else {
-            if (config_error_done())
-                retval = FALSE;
-        }
+        (void) config_error_done();
         iflags.initoptions_noterminate = save_initoptions_noterminate;
-        sysopt_release();
-        if (retval)
-            Strcpy(portable_device_top_path, toppath);
-        free(toppath);
+        sysopt_release();   /* the real sysconf processing comes later */
     }
- done_test:
-
+    if (retval) {
+        lth = strlen(executable_path);
+        if (lth <= (int) portable_device_path_size - 1)
+            Strcpy(portable_device_path, executable_path);
+        else
+            retval = FALSE;
+    }
     return retval;
 }
 
-static char portable_device_top_path[MAX_PATH];
+static char portable_device_path[MAX_PATH];
 
 const char *get_portable_device()
 {
-    return (const char *) portable_device_top_path;
-}
-
-boolean illegal_dir(const char *d1, const char *d2)
-{
-    int i;
-    char tmpbuf[MAX_PATH];
-
-    if (!strcmpi(d1, d2)) {
-        (void) strncpy(tmpbuf, &portable_device_top_path[3],
-                           sizeof tmpbuf - 1);
-        tmpbuf[sizeof tmpbuf - 1] = '\0';
-        i = (int) strlen(tmpbuf) - 1;
-        if (tmpbuf[i] == '\\')
-            tmpbuf[i] = '\0';
-        raw_printf("Illegal \"portable_device_top = %s\" in your sysconf file",
-                        tmpbuf);
-        raw_printf("because the exe is running from that folder.");
-        raw_printf("Point 'portable_device_top' to a different folder.");
-        return TRUE;
-    }
-    return FALSE;
+    return (const char *) portable_device_path;
 }
 
 void
@@ -308,19 +236,17 @@ set_default_prefix_locations(const char *programPath)
     strcpy(executable_path, get_executable_path());
     append_slash(executable_path);
 
-    if (test_portable_config(executable_path, portable_device_top_path,
-                                        sizeof portable_device_top_path)) {
-        if (illegal_dir(portable_device_top_path, executable_path))
-            windows_startup_state = 2;
+    if (test_portable_config(executable_path,
+                          portable_device_path, sizeof portable_device_path)) {
         g.fqn_prefix[SYSCONFPREFIX] = executable_path;
-        g.fqn_prefix[CONFIGPREFIX]  = portable_device_top_path;
-        g.fqn_prefix[HACKPREFIX]    = portable_device_top_path;
-        g.fqn_prefix[SAVEPREFIX]    = portable_device_top_path;
-        g.fqn_prefix[LEVELPREFIX]   = portable_device_top_path;
-        g.fqn_prefix[BONESPREFIX]   = portable_device_top_path;
-        g.fqn_prefix[SCOREPREFIX]   = portable_device_top_path;
-        g.fqn_prefix[LOCKPREFIX]    = portable_device_top_path;
-        g.fqn_prefix[TROUBLEPREFIX] = portable_device_top_path;
+        g.fqn_prefix[CONFIGPREFIX]  = portable_device_path;
+        g.fqn_prefix[HACKPREFIX]    = portable_device_path;
+        g.fqn_prefix[SAVEPREFIX]    = portable_device_path;
+        g.fqn_prefix[LEVELPREFIX]   = portable_device_path;
+        g.fqn_prefix[BONESPREFIX]   = portable_device_path;
+        g.fqn_prefix[SCOREPREFIX]   = portable_device_path;
+        g.fqn_prefix[LOCKPREFIX]    = portable_device_path;
+        g.fqn_prefix[TROUBLEPREFIX] = portable_device_path;
         g.fqn_prefix[DATAPREFIX]    = executable_path;
     } else {
         build_known_folder_path(&FOLDERID_Profile, profile_path,

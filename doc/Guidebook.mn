@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 17, 2019
+.ds f2 "December 18, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4800,6 +4800,13 @@ to identify unique people for the score file.
 MAX_STATUENAME_RANK\ =\ Maximum number of score file entries to use for
 random statue names (default is 10).
 .lp
+ACCESSIBILITY\ =\ 0 or 1 to disable or enable, respectively, the ability for players 
+to set S_pet_override and S_hero_override symbols in their configuration file.
+.lp
+PORTABLE_DEVICE_PATHS\ =\ 0 or 1 Windows OS only, the game will look
+for all of its external files, and write to all of its output files in one place
+rather than at the standard locations.
+.lp
 DUMPLOGFILE\ =\ A filename where the end-of-game dumplog is saved.
 Not defining this will prevent dumplog from being created. Only available
 if your game is compiled with DUMPLOG. Allows the following placeholders:
@@ -5162,7 +5169,7 @@ participant for decades, joined the NetHack Development Team in late May 2019.
 NetHack 3.6.3 was released on December 5, 2019 containing over 190 bug
 fixes to NetHack 3.6.2.
 .pg
-NetHack 3.6.4 was released on December 17, 2019 containing a security fix
+NetHack 3.6.4 was released on December 18, 2019 containing a security fix
 and a few bug fixes.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP
