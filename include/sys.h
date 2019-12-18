@@ -18,9 +18,6 @@ struct sysopt {
 #ifdef DUMPLOG
     char *dumplogfile; /* where the dump file is saved */
 #endif
-#ifdef WIN32
-    char *portable_device_top;  /* nethack configuration for a portable drive */
-#endif
     int env_dbgfl;    /*  1: debugfiles comes from getenv("DEBUGFILES")
                        *     so sysconf's DEBUGFILES shouldn't override it;
                        *  0: getenv() hasn't been attempted yet;
@@ -47,6 +44,9 @@ struct sysopt {
 
     /* enable accessibility options */
     int accessibility;
+#ifdef WIN32
+    int portable_device_paths;  /* nethack configuration for a portable device */
+#endif
 };
 
 extern struct sysopt sysopt;

@@ -4789,6 +4789,13 @@ to identify unique people for the score file.
 MAX_STATUENAME_RANK\ =\ Maximum number of score file entries to use for
 random statue names (default is 10).
 .lp
+ACCESSIBILITY\ =\ 0 or 1 to disable or enable, respectively, the ability for players 
+to set S_pet_override and S_hero_override symbols in their configuration file.
+.lp
+PORTABLE_DEVICE_PATHS\ =\ 0 or 1 Windows OS only, the game will look
+for all of its external files, and write to all of its output files in one place
+rather than at the standard locations.
+.lp
 DUMPLOGFILE\ =\ A filename where the end-of-game dumplog is saved.
 Not defining this will prevent dumplog from being created. Only available
 if your game is compiled with DUMPLOG. Allows the following placeholders:
