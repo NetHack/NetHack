@@ -113,6 +113,6 @@ deploy:
   on:
     tags: true
   prerelease: true
-  name: "Pre-release build of NetHack 3.6.3"
-  body: "This is an auto generated pre-release build of NetHack 3.6.3."
+  name: "Release build of NetHack 3.6.4"
+  body: "This is an auto generated Release build of NetHack 3.6.4."
 
