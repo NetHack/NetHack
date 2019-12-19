@@ -334,7 +334,7 @@
 #define explosion_to_glyph(expltype, idx) \
     ((((expltype) * MAXEXPCHARS) + ((idx) - S_explode1)) + GLYPH_EXPLODE_OFF)
 
-#define trap_to_glyph(trap, rng)                                \
+#define trap_to_glyph(trap)                                \
     cmap_to_glyph(trap_to_defsym((trap)->ttyp))
 
 /* Not affected by hallucination.  Gives a generic body for CORPSE */
