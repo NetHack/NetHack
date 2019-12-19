@@ -50,6 +50,7 @@ struct window_procs mswin_procs = {
         | WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE | WC_VARY_MSGCOUNT
         | WC_WINDOWCOLORS | WC_PLAYER_SELECTION,
     WC2_FULLSCREEN | WC2_SOFTKEYBOARD | WC2_WRAPTEXT, mswin_init_nhwindows,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     mswin_player_selection, mswin_askname, mswin_get_nh_event,
     mswin_exit_nhwindows, mswin_suspend_nhwindows, mswin_resume_nhwindows,
     mswin_create_nhwindow, mswin_clear_nhwindow, mswin_display_nhwindow,

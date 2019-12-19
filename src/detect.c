@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1562630266 2019/07/08 23:57:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1575245054 2019/12/02 00:04:14 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -598,13 +598,13 @@ int class;            /* an object class, 0 for all */
     }
 
     /* Special boulder symbol check - does the class symbol happen
-     * to match iflags.bouldersym which is a user-defined?
+     * to match showsyms[SYM_BOULDER + SYM_OFF_X] which is user-defined.
      * If so, that means we aren't sure what they really wanted to
      * detect. Rather than trump anything, show both possibilities.
      * We can exclude checking the buried obj chain for boulders below.
      */
     sym = class ? def_oc_syms[class].sym : 0;
-    if (sym && iflags.bouldersym && sym == iflags.bouldersym)
+    if (sym && g.showsyms[SYM_BOULDER + SYM_OFF_X] && sym == g.showsyms[SYM_BOULDER + SYM_OFF_X])
         boulder = ROCK_CLASS;
 
     if (Hallucination || (Confusion && class == SCROLL_CLASS))
@@ -1206,7 +1206,8 @@ struct obj **optr;
             ret = object_detect((struct obj *) 0, class);
         else if ((class = def_char_to_monclass(ch)) != MAXMCLASSES)
             ret = monster_detect((struct obj *) 0, class);
-        else if (iflags.bouldersym && (ch == iflags.bouldersym))
+        else if (g.showsyms[SYM_BOULDER + SYM_OFF_X]
+                 && (ch == g.showsyms[SYM_BOULDER + SYM_OFF_X]))
             ret = object_detect((struct obj *) 0, ROCK_CLASS);
         else
             switch (ch) {
@@ -1333,7 +1334,7 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
      * Unlike when casting the spell, it is much too intrustive when
      * in the midst of walking around or combatting monsters.
      *
-     * For 3.6.2, show terrain, then object, then monster like regular
+     * As of 3.6.2, show terrain, then object, then monster like regular
      * map updating, except in this case the map locations get marked
      * as seen from every direction rather than just from direction of
      * hero.  Skilled spell marks revealed objects as 'seen up close'
@@ -1413,8 +1414,13 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
                 continue;
             newglyph = glyph_at(zx, zy);
             if (glyph_is_monster(newglyph)
-                && glyph_to_mon(newglyph) != PM_LONG_WORM_TAIL)
-                map_invisible(zx, zy);
+                && glyph_to_mon(newglyph) != PM_LONG_WORM_TAIL) {
+                /* map_invisible() was unconditional here but that made
+                   remembered objects be forgotten for the case where a
+                   monster is immediately redrawn by see_monsters() */
+                if ((mtmp = m_at(zx, zy)) == 0 || !canspotmon(mtmp))
+                    map_invisible(zx, zy);
+            }
         }
     see_monsters();
 
@@ -1931,7 +1937,7 @@ dump_map()
 
             glyph = reveal_terrain_getglyph(x, y, FALSE, u.uswallow,
                                             default_glyph, subset);
-            (void) mapglyph(glyph, &ch, &color, &special, x, y);
+            (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
             buf[x - 1] = ch;
             if (ch != ' ') {
                 blankrow = FALSE;

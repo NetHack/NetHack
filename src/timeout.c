@@ -1,12 +1,9 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1565574996 2019/08/12 01:56:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1573290422 2019/11/09 09:07:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h" /* for checking save modes */
-#include "sfproto.h"
-
 
 static void NDECL(stoned_dialogue);
 static void NDECL(vomiting_dialogue);
@@ -95,7 +92,7 @@ const struct propname {
     { UNCHANGING, "unchanging" },
     { REFLECTING, "reflecting" },
     { FREE_ACTION, "free action" },
-    { FIXED_ABIL, "fixed abilites" },
+    { FIXED_ABIL, "fixed abilities" },
     { LIFESAVED, "life will be saved" },
     {  0, 0 },
 };
@@ -726,6 +723,9 @@ nh_timeout()
                 break;
             case DETECT_MONSTERS:
                 see_monsters();
+                break;
+            case GLIB:
+                make_glib(0); /* might update persistent inventory */
                 break;
             }
         }
@@ -1397,7 +1397,7 @@ long timeout;
         break; /* case [otyp ==] candelabrum|tallow_candle|wax_candle */
 
     default:
-        impossible("burn_object: unexpeced obj %s", xname(obj));
+        impossible("burn_object: unexpected obj %s", xname(obj));
         break;
     }
     if (need_newsym)
@@ -2162,16 +2162,12 @@ timer_element *timer;
         /* assume no pointers in arg */
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) timer, sizeof(timer_element));
-        if (nhfp->fieldlevel)
-            sfo_fe(nhfp, timer, "timers", "timer", 1);
         break;
 
     case TIMER_OBJECT:
         if (timer->needs_fixup) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
-            if (nhfp->fieldlevel)
-                sfo_fe(nhfp, timer, "timers", "timer", 1);
         } else {
             /* replace object pointer with id */
             arg_save.a_obj = timer->arg.a_obj;
@@ -2180,8 +2176,6 @@ timer_element *timer;
             timer->needs_fixup = 1;
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
-            if (nhfp->fieldlevel)
-                sfo_fe(nhfp, timer, "timers", "timer", 1);
             timer->arg.a_obj = arg_save.a_obj;
             timer->needs_fixup = 0;
         }
@@ -2191,8 +2185,6 @@ timer_element *timer;
         if (timer->needs_fixup) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
-            if (nhfp->fieldlevel)
-                sfo_fe(nhfp, timer, "timers", "timer", 1);
         } else {
             /* replace monster pointer with id */
             arg_save.a_monst = timer->arg.a_monst;
@@ -2201,8 +2193,6 @@ timer_element *timer;
             timer->needs_fixup = 1;
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
-            if (nhfp->fieldlevel)
-                sfo_fe(nhfp, timer, "timers", "timer", 1);
             timer->arg.a_monst = arg_save.a_monst;
             timer->needs_fixup = 0;
         }
@@ -2340,14 +2330,10 @@ int range;
         if (range == RANGE_GLOBAL) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &g.timer_id, sizeof(g.timer_id));
-            if (nhfp->fieldlevel)
-                sfo_ulong(nhfp, &g.timer_id, "timers", "g.timer_id", 1);
         }
         count = maybe_write_timer(nhfp, range, FALSE);
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
-        if (nhfp->fieldlevel)
-            sfo_int(nhfp, &count, "timers", "timer_count", 1);
         (void) maybe_write_timer(nhfp, range, TRUE);
     }
 
@@ -2380,28 +2366,22 @@ int range;
 boolean ghostly; /* restoring from a ghost level */
 long adjust;     /* how much to adjust timeout */
 {
-    int count;
+    int count = 0;
     timer_element *curr;
 
     if (range == RANGE_GLOBAL) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &g.timer_id, sizeof g.timer_id);
-        if (nhfp->fieldlevel)
-            sfi_ulong(nhfp, &g.timer_id, "timers", "g.timer_id", 1);
     }
 
     /* restore elements */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof count);
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &count, "timers", "timer_count", 1);
        
     while (count-- > 0) {
         curr = (timer_element *) alloc(sizeof(timer_element));
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) curr, sizeof(timer_element));
-        if (nhfp->fieldlevel)
-            sfi_fe(nhfp, curr, "timers", "timer", 1);
         if (ghostly)
             curr->timeout += adjust;
         insert_timer(curr);

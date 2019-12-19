@@ -78,6 +78,10 @@ enum dismount_types {
     DISMOUNT_BYCHOICE = 6
 };
 
+/* mgflags for mapglyph() */
+#define MG_FLAG_NORMAL     0x00
+#define MG_FLAG_NOOVERRIDE 0x01
+
 /* Special returns from mapglyph() */
 #define MG_CORPSE  0x01
 #define MG_INVIS   0x02
@@ -198,7 +202,6 @@ typedef struct {
 #include "context.h"
 #include "rm.h"
 #include "botl.h"
-#include "qtext.h"
 
 /* Symbol offsets */
 #define SYM_OFF_P (0)

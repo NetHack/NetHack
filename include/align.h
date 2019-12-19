@@ -33,6 +33,7 @@ typedef struct align { /* alignment & record */
 
 #define AM_SPLEV_CO 3
 #define AM_SPLEV_NONCO 7
+#define AM_SPLEV_RANDOM 8
 
 #define Amask2align(x)                                          \
     ((aligntyp)((!(x)) ? A_NONE : ((x) == AM_LAWFUL) ? A_LAWFUL \

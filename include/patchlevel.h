@@ -1,4 +1,4 @@
-/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1557510467 2019/05/10 17:47:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1575775596 2019/12/08 03:26:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,7 +14,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 0
+#define EDITLEVEL 3
 
 #define COPYRIGHT_BANNER_A "NetHack, Copyright 1985-2019"
 #define COPYRIGHT_BANNER_B \
@@ -34,15 +34,81 @@
 #define VERSION_COMPATIBILITY 0x03070000L
 
 /****************************************************************************/
+/* Version 3.7.x */
+
+/*
+ *  NetHack 3.7.0, <insert date here>
+ *
+ */
+
+/****************************************************************************/
 /* Version 3.6.x */
 
-/*  Patch 3, <insert date here>
- *  
+/*  Patch 4, December 18, 2019
+ *
+ *  fix potential buffer overflow when parsing run-time configuration file
+ *  GDBPATH and GREPPATH from sysconf or -D... on compilation command line were
+ *      being processed even if PANICTRACE was disabled but only being freed
+ *      at end of game when that was enabled
+ *  fix the article used in the message when your steed encounters a polymorph
+ *      trap
+ *  allow teleporting onto the vibrating square
+ *  message "your knapsack can't accomodate any more items" when picking stuff
+ *      up or removing such from container was inaccurate if there was some
+ *      gold pending; vary the message rather than add more convoluted pickup
+ *      code
+ *  dozen-ish assorted spelling/typo fixes in messages and source comments
+ *  wizard mode wishing for terrain would leave it unmapped if done while blind
+ *  wizard mode terrain wish could leave hero in water (severe vision limits)
+ *      or in lava (trapped, sinking) which wasn't there any more
+ *  flying hero can go down (via '>') holes or trap doors instead of escaping
+ *      trap
+ *  polymorphed hero hiding on the ceiling can now use '>' to unhide instead of
+ *      being told "you can't go down here"
+ *  fix compilation on platforms that split the ncurses and tinfo libraries
+ *  Windows: allow all game files to be on a portable device via the sysconf
+ *      option 'portable_device_paths'
+ */
+
+/*  Patch 3, December 5, 2019
+ *
+ *  Fixed stale 'thrownobj' pointer for returning thrown aklys while engulfed
+ *  Fixed uarmh null pointer dereference if a helm of opposite alignment came
+ *     off due to being polymorphed
+ *  Fixed 'object lost' panic when attempting to crawl of of the water during
+ *     emergency disrobing/dropping
+ *  Running now stops when moving over engravings so you can tell where they are
+ *  Fixed detection of unseen/secret doors which failed to find monsters hiding
+ *     under objects and failed to find monsters hiding at trap locations
+ *  Ensured fatal status conditions made it to disclosure and/or dumplog
+ *  Fixed "Bad fruit #N" warnings when saving bones with 'perm_invent' On
+ *  Fixed it so yellow dragons don't have green breath
+ *  Added several grammar corrections
+ *  Improved recognition of deafness for several situations including the
+ *     playing of musical instruments and bribing negotiations with demon lords
+ *  Fixed ignoring of god's wrath when hero injured himself during altar kick
+ *  Fixed several cases where persistent inventory window was not updated
+ *  Fixed temple priests or shopkeepers moving over other monsters
+ *  Fixed a crash-causing bug when putting on levitation boots over a sink
+ *  Ensured that thrown or kicked objects will end up in bones
+ *  Made water go all the way to the edges of level on the Plane of Water
+ *  Made clouds disrupt line of sight along the edges of the Plane of Air
+ *  Improved and expanded usage of status highlighting percentage rules
+ *  Added more than 15 improvements and fixes to the curses window port
+ *  Added and documented significant changes to default directory choices for
+ *    the Windows platform
+ *  Improved the layout and display of the player selection dialog used on the
+ *     Windows graphical implementation
+ *  Improved performance of some tty versions by reducing the number of
+ *     function calls made from mapglyph
+ *  Allowed the msdos implementation to build with curses and PDCurses
+ *  Included over 100 other fixes and improvements as outlined in doc/fixes36.3
  */
 
 /*  Patch 2, May 7, 2019
- *  
- *  Over 320 bug fixes including a couple of crash bug fixes
+ *
+ *  Over 320 bug fixes including a couple of crash bug fixes as outlined in
+ *      doc/fixes36.2
  *  More than 15 enhancements or improvements
  *  Ensuring that unix Makefiles do not rely on features unique to gnu make
  *  Improvements to hilite_status parsing in an effort to ensure that expected
@@ -54,13 +120,15 @@
  */
 
 /*  Patch 1, April 27, 2018
- *  Over four hundred and seventy bug fixes and improvements.
+ *
+ *  Over four hundred and seventy bug fixes and improvements as outlined in
+ *      doc/fixes36.1
  */
 
 /*
  *  NetHack 3.6.0, December 7, 2015
  *
- *  Hundreds of bug fixes.
+ *  Hundreds of bug fixes as outlined in doc/fixes36.0.
  *  Some code reorganization.
  *  Some new features.
  *  Variations of some community patches rolled in.

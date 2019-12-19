@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1558400902 2019/05/21 01:08:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.209 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1575245194 2019/12/02 00:06:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.227 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -95,6 +95,11 @@ struct window_procs tty_procs = {
      | WC2_RESET_STATUS
 #endif
      | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_STATUSLINES),
+#ifdef TEXTCOLOR
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+#else
+    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+#endif
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
     tty_exit_nhwindows, tty_suspend_nhwindows, tty_resume_nhwindows,
     tty_create_nhwindow, tty_clear_nhwindow, tty_display_nhwindow,
@@ -133,7 +138,6 @@ struct window_procs tty_procs = {
     genl_can_suspend_yes,
 };
 
-static int maxwin = 0; /* number of windows in use */
 winid BASE_WINDOW;
 struct WinDesc *wins[MAXWIN];
 struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
@@ -204,7 +208,7 @@ static boolean FDECL(check_fields, (BOOLEAN_P, int *));
 static void NDECL(render_status);
 static void FDECL(tty_putstatusfield, (const char *, int, int));
 static boolean NDECL(check_windowdata);
-static int NDECL(condition_size);
+static void NDECL(set_condition_length);
 static int FDECL(make_things_fit, (BOOLEAN_P));
 static void FDECL(shrink_enc, (int));
 static void FDECL(shrink_dlvl, (int));
@@ -1051,7 +1055,7 @@ reset_role_filtering()
 
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             "Uncceptable alignments", MENU_UNSELECTED);
+             "Unacceptable alignments", MENU_UNSELECTED);
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     end_menu(win, "Pick all that apply");
@@ -1418,10 +1422,18 @@ int type;
     int i, rowoffset;
     int newid;
 
-    if (maxwin == MAXWIN)
+    for (newid = 0; newid < MAXWIN; ++newid)
+        if (wins[newid] == 0)
+            break;
+    if (newid == MAXWIN) {
+        panic("No window slots!");
+        /*NOTREACHED*/
         return WIN_ERR;
+    }
 
-    newwin = (struct WinDesc *) alloc(sizeof(struct WinDesc));
+    newwin = (struct WinDesc *) alloc(sizeof (struct WinDesc));
+    wins[newid] = newwin;
+
     newwin->type = type;
     newwin->flags = 0;
     newwin->active = FALSE;
@@ -1488,17 +1500,7 @@ int type;
         break;
     default:
         panic("Tried to create window type %d\n", (int) type);
-        return WIN_ERR;
-    }
-
-    for (newid = 0; newid < MAXWIN; newid++) {
-        if (wins[newid] == 0) {
-            wins[newid] = newwin;
-            break;
-        }
-    }
-    if (newid == MAXWIN) {
-        panic("No window slots!");
+        /*NOTREACHED*/
         return WIN_ERR;
     }
 
@@ -2445,7 +2447,7 @@ winid window;
 
     free_window_info(cw, TRUE);
     free((genericptr_t) cw);
-    wins[window] = 0;
+    wins[window] = 0; /* available for re-use */
 }
 
 void
@@ -3379,7 +3381,7 @@ int bkglyph UNUSED;
     }
 #endif
     /* map glyph to character and color */
-    (void) mapglyph(glyph, &ch, &color, &special, x, y);
+    (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
 
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
@@ -3613,7 +3615,7 @@ char *posbar;
  *      and tries a few different ways to squish a representation
  *      of the status window values onto the 80 column tty display.
  *          ->check_fields()
- *          ->condition_size()  - get the width of all conditions
+ *          ->set_condition_length()  - update the width of conditions
  *          ->shrink_enc()      - shrink encumbrance message word
  *          ->shrink_dlvl()     - reduce the width of Dlvl:42
  *
@@ -3959,7 +3961,7 @@ unsigned long *colormasks;
         enclev = stat_cap_indx();
         break;
     }
-    /* 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
+    /* As of 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
     return;
 }
 
@@ -3967,7 +3969,7 @@ static int
 make_things_fit(force_update)
 boolean force_update;
 {
-    int trycnt, fitting = 0, condsz, requirement;
+    int trycnt, fitting = 0, requirement;
     int rowsz[3], num_rows, condrow, otheroptions = 0;
 
     num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
@@ -3977,7 +3979,7 @@ boolean force_update;
         shrink_enc(0);
     if (dlvl_shrinklvl > 0)
         shrink_dlvl(0);
-    condsz = condition_size();
+    set_condition_length();
     for (trycnt = 0; trycnt < 6 && !fitting; ++trycnt) {
         /* FIXME: this remeasures each line every time even though it
            is only attempting to shrink one of them and the other one
@@ -3995,7 +3997,7 @@ boolean force_update;
         if (trycnt < 2) {
             if (cond_shrinklvl < trycnt + 1) {
                 cond_shrinklvl = trycnt + 1;
-                condsz = condition_size();
+                set_condition_length();
             }
             continue;
         }
@@ -4209,21 +4211,24 @@ int x, y;
                 text++;
             }
         }
-    } else {
-        /* Now we're truncating */
-        if (truncation_expected)
-            ; /* but we knew in advance */
     }
+#if 0
+    else {
+        if (truncation_expected) {
+        /* Now we're truncating */
+            ; /* but we knew in advance */
+        }
+    }
+#endif
 }
 
 /* caller must set cond_shrinklvl (0..2) before calling us */
-static int
-condition_size()
+static void
+set_condition_length()
 {
     long mask;
-    int c, lth;
+    int c, lth = 0;
 
-    lth = 0;
     if (tty_condition_bits) {
         for (c = 0; c < SIZE(conditions); ++c) {
             mask = conditions[c].mask;
@@ -4232,7 +4237,6 @@ condition_size()
         }
     }
     tty_status[NOW][BL_CONDITION].lth = lth;
-    return lth;
 }
 
 static void
@@ -4305,7 +4309,7 @@ unsigned long *bmarray;
    the condition where this gets used always has the same value */
 #define condcolor(bm,bmarray) NO_COLOR
 #define term_start_color(color) /*empty*/
-#define term_end_color(color) /*empty*/
+#define term_end_color() /*empty*/
 #endif /* TEXTCOLOR */
 
 static int

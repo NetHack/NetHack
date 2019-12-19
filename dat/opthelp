@@ -99,7 +99,7 @@ altmeta        For unix and VMS, treat two character sequence
                "ESC c" as M-c (Meta+c, 8th bit set) when nethack  [FALSE]
                obtains a command from player's keyboard.
 
-Boolean option if USE_TILES was set at compile time (MSDOS protected mode only):
+Boolean option if USE_TILES was set at compile time (MSDOS protected mode):
 preload_tiles  control whether tiles get pre-loaded into RAM at   [TRUE]
                the start of the game.  Doing so enhances performance
                of the tile graphics, but uses more memory.
@@ -157,9 +157,13 @@ paranoid_confirmation  space separated list    [paranoid_confirmation:pray]
               die     -- yes vs y to confirm dying (for explore or debug mode)
               bones   -- yes vs y to confirm saving bones data in debug mode
               attack  -- yes vs y to confirm attacking a peaceful monster
+              wand-break  -- yes vs y to confirm breaking a wand
+              eating  -- yes vs y to confirm whether to continue eating
+              Were-change -- yes vs y to confirm changing form due to
+                      lycanthropy when hero has polymorph control;
               pray    -- y to confirm an attempt to pray; on by default
               Remove  -- always pick from inventory for 'R' and 'T' even when
-              wearing just one applicable item to remove or take off
+                      wearing just one applicable item to remove or take off
 pickup_burden when you pick up an item that exceeds this encumbrance    [S]
               level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
               or overLoaded), you will be asked if you want to continue.

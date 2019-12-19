@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1547086250 2019/01/10 02:10:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1574648943 2019/11/25 02:29:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -701,7 +701,9 @@ const struct Race races[] = {
 const struct Gender genders[] = {
     { "male", "he", "him", "his", "Mal", ROLE_MALE },
     { "female", "she", "her", "her", "Fem", ROLE_FEMALE },
-    { "neuter", "it", "it", "its", "Ntr", ROLE_NEUTER }
+    { "neuter", "it", "it", "its", "Ntr", ROLE_NEUTER },
+    /* used by pronoun_gender() when hallucinating */
+    { "group", "they", "them", "their", "Grp", 0 },
 };
 
 /* Table of all alignments */
@@ -2084,7 +2086,7 @@ struct monst *mtmp;
         return "Aloha"; /* Hawaiian */
     case PM_VALKYRIE:
         return
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
                (mtmp && mtmp->data == &mons[PM_MAIL_DAEMON]) ? "Hallo" :
 #endif
                "Velkommen"; /* Norse */

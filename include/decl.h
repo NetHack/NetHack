@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1559601011 2019/06/03 22:30:11 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1573869061 2019/11/16 01:51:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,7 +10,7 @@
 #if !defined(MICRO) && !defined(VMS) && !defined(WIN32)
 #define LOCKNAMESIZE (PL_NSIZ + 14) /* long enough for uid+name+.99 */
 #define LOCKNAMEINIT "1lock"
-#define BONESINIT "bonesnn.xxx"
+#define BONESINIT "bonesnn.xxx.le"
 #define BONESSIZE sizeof(BONESINIT)
 #else
 #if defined(MICRO)
@@ -22,13 +22,13 @@
 #if defined(VMS)
 #define LOCKNAMESIZE (PL_NSIZ + 17) /* long enough for _uid+name+.99;1 */
 #define LOCKNAMEINIT "1lock"
-#define BONESINIT "bonesnn.xxx;1"
+#define BONESINIT "bonesnn.xxx_le;1"
 #define BONESSIZE sizeof(BONESINIT)
 #endif
 #if defined(WIN32)
 #define LOCKNAMESIZE (PL_NSIZ + 25) /* long enough for username+-+name+.99 */
 #define LOCKNAMEINIT ""
-#define BONESINIT "bonesnn.xxx"
+#define BONESINIT "bonesnn.xxx.le"
 #define BONESSIZE sizeof(BONESINIT)
 #endif
 #endif
@@ -170,6 +170,7 @@ struct sinfo {
     int exiting;                /* an exit handler is executing */
     int in_moveloop;
     int in_impossible;
+    int in_self_recover;
 #ifdef PANICLOG
     int in_paniclog;
 #endif
@@ -339,6 +340,9 @@ E const struct c_common_strings c_common_strings;
 /* material strings */
 E const char *materialnm[];
 
+/* empty string that is non-const for parameter use */
+E char emptystr[];
+
 /* Monster name articles */
 #define ARTICLE_NONE 0
 #define ARTICLE_THE 1
@@ -409,6 +413,9 @@ E const char *const monexplain[], invisexplain[], *const oclass_names[];
 #define PREFIXES_IN_USE
 #endif
 
+#ifdef WIN32
+E boolean fqn_prefix_locked[PREFIX_COUNT];
+#endif
 #ifdef PREFIXES_IN_USE
 E const char *fqn_prefix_names[PREFIX_COUNT];
 #endif
@@ -421,12 +428,9 @@ E struct restore_info restoreinfo;
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
-struct opvar {
-    xchar spovartyp; /* one of SPOVAR_foo */
-    union {
-        char *str;
-        long l;
-    } vardata;
+struct selectionvar {
+    int wid, hei;
+    char *map;
 };
 
 struct autopickup_exception {
@@ -461,7 +465,7 @@ struct breadcrumbs {
 E const char *ARGV0;
 #endif
 
-enum earlyarg {ARG_DEBUG, ARG_VERSION
+enum earlyarg {ARG_DEBUG, ARG_VERSION, ARG_SHOWPATHS
 #ifdef WIN32
     ,ARG_WINDOWS
 #endif
@@ -696,6 +700,9 @@ struct role_filter {
 #define WIZKIT_MAX 128
 #define CVT_BUF_SIZE 64
 
+#define LUA_VER_BUFSIZ 20
+#define LUA_COPYRIGHT_BUFSIZ 120
+
 struct instance_globals {
 
     /* apply.c */
@@ -871,7 +878,7 @@ struct instance_globals {
     d_level save_dlevel;
 
     /* do_name.c */
-    struct opvar *gloc_filter_map;
+    struct selectionvar *gloc_filter_map;
     int gloc_filter_floodfill_match_glyph;
     int via_naming;
 
@@ -903,8 +910,10 @@ struct instance_globals {
     struct symsetentry symset[NUM_GRAPHICS];
     int currentgraphics;
     nhsym showsyms[SYM_MAX]; /* symbols to be displayed */
-    nhsym l_syms[SYM_MAX];   /* loaded symbols          */
-    nhsym r_syms[SYM_MAX];   /* rogue symbols           */
+    nhsym primary_syms[SYM_MAX];   /* loaded primary symbols          */
+    nhsym rogue_syms[SYM_MAX];   /* loaded rogue symbols           */
+    nhsym ov_primary_syms[SYM_MAX];   /* loaded primary symbols          */
+    nhsym ov_rogue_syms[SYM_MAX];   /* loaded rogue symbols           */
     nhsym warnsyms[WARNCOUNT]; /* the current warning display symbols */
 
     /* dungeon.c */
@@ -1113,12 +1122,6 @@ struct instance_globals {
 
     /* questpgr.c */
     char cvt_buf[CVT_BUF_SIZE];
-    struct qtlists qt_list;
-#ifdef DLB
-    struct dlb_handle *msg_file;
-#else
-    FILE *msg_file;
-#endif
     /* used by ldrname() and neminame(), then copied into cvt_buf */
     char nambuf[CVT_BUF_SIZE];
 
@@ -1183,6 +1186,7 @@ struct instance_globals {
     int num_lregions;
     /* positions touched by level elements explicitly defined in the des-file */
     char SpLev_Map[COLNO][ROWNO];
+    struct sp_coder *coder;
     xchar xstart, ystart;
     char xsize, ysize;
     boolean splev_init_present;
@@ -1192,7 +1196,6 @@ struct instance_globals {
     struct obj *container_obj[MAX_CONTAINMENT];
     int container_idx;
     struct monst *invent_carrying_monster;
-    aligntyp ralign[3];
 
     /* spells.c */
     int spl_sortmode;   /* index into spl_sortchoices[] */
@@ -1252,6 +1255,13 @@ struct instance_globals {
     /* zap.c */
     int  poly_zapped;
     boolean obj_zapped;
+
+    /* new stuff */
+    char lua_ver[LUA_VER_BUFSIZ];
+    char lua_copyright[LUA_COPYRIGHT_BUFSIZ];
+
+    /* per-level glyph mapping flags */
+    long glyphmap_perlevel_flags;
 
     unsigned long magic; /* validate that structure layout is preserved */
 };

@@ -28,8 +28,10 @@ schar bg_typ;
     register int i, j;
 
     for (i = 1; i < COLNO; i++)
-        for (j = 0; j < ROWNO; j++)
+        for (j = 0; j < ROWNO; j++) {
             levl[i][j].typ = bg_typ;
+            levl[i][j].lit = FALSE;
+        }
 }
 
 static void

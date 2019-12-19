@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixtty.c	$NHDT-Date: 1548372343 2019/01/24 23:25:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	unixtty.c	$NHDT-Date: 1570652308 2019/10/09 20:18:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -243,6 +243,7 @@ const char *s;
     iflags.cbreak = (CBRKON(inittyb.cbrkflgs & CBRKMASK)) ? ON : OFF;
     curttyb.inputflags |= STRIPHI;
     setioctls();
+    settty_needed = FALSE;
 }
 
 void
@@ -471,6 +472,9 @@ VA_DECL(const char *, s)
 {
     VA_START(s);
     VA_INIT(s, const char *);
+
+    if (iflags.window_inited)
+        exit_nhwindows((char *) 0); /* for tty, will call settty() */
     if (settty_needed)
         settty((char *) 0);
     Vprintf(s, VA_ARGS);

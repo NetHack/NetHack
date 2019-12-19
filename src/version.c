@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1552353060 2019/03/12 01:11:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1575161965 2019/12/01 00:59:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,8 +6,6 @@
 #include "hack.h"
 #include "dlb.h"
 #include "date.h"
-#include "lev.h"
-#include "sfproto.h"
 
 /*
  * All the references to the contents of patchlevel.h have been moved
@@ -19,11 +17,48 @@
 #include "patchlevel.h"
 #endif
 
+#if defined(CROSSCOMPILE)
+struct cross_target_s cross_target = {
+    /* https://groups.google.com/forum/#!original/
+       comp.sources.games/91SfKYg_xzI/dGnR3JnspFkJ */
+    "Tue, 28-Jul-87 13:18:57 EDT",
+    "Version 1.0, built Jul 28 13:18:57 1987.",
+    "0000000000000000000000000000000000000000",
+    "master",
+    "1.0.0-0",
+    "NetHack Version 1.0.0-0 - last build Tue Jul 28 13:18:57 1987.",
+    0x01010000UL,
+    0x00000000UL,
+    0x00000000UL,
+    0x00000000UL,
+    0x00000000UL,
+    0x00000000UL,
+    554476737UL,
+};
+#endif /* CROSSCOMPILE */
+
 #if defined(NETHACK_GIT_SHA)
-const char *NetHack_git_sha = NETHACK_GIT_SHA;
+const char *NetHack_git_sha
+#if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
+                = NETHACK_GIT_SHA
+#else
+#ifdef NETHACK_HOST_GIT_SHA
+                = NETHACK_HOST_GIT_SHA
 #endif
+#endif
+;
+#endif
+
 #if defined(NETHACK_GIT_BRANCH)
-const char *NetHack_git_branch = NETHACK_GIT_BRANCH;
+const char *NetHack_git_branch
+#if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
+                = NETHACK_GIT_BRANCH
+#else
+#ifdef NETHACK_HOST_GIT_BRANCH
+                = NETHACK_HOST_GIT_BRANCH
+#endif
+#endif
+;
 #endif
 
 static void FDECL(insert_rtoption, (char *));
@@ -98,9 +133,38 @@ doversion()
 int
 doextversion()
 {
-    dlb *f;
+    int rtcontext = 0;
+    const char *rtbuf;
+    dlb *f = (dlb *) 0;
     char buf[BUFSZ], *p = 0;
     winid win = create_nhwindow(NHW_TEXT);
+    boolean use_dlb = TRUE,
+            done_rt = FALSE,
+            done_dlb = FALSE,
+            prolog;
+#if 0   /* moved to util/mdlib.c and rendered via do_runtime_info() */
+    const char *lua_info[] = {
+ "About Lua: Copyright (c) 1994-2017 Lua.org, PUC-Rio.",
+ /*        1         2         3         4         5         6         7
+  1234567890123456789012345678901234567890123456789012345678901234567890123456789
+  */
+ "    \"Permission is hereby granted, free of charge, to any person obtaining",
+ "     a copy of this software and associated documentation files (the ",
+ "     \"Software\"), to deal in the Software without restriction including",
+ "     without limitation the rights to use, copy, modify, merge, publish,",
+ "     distribute, sublicense, and/or sell copies of the Software, and to ",
+ "     permit persons to whom the Software is furnished to do so, subject to",
+ "     the following conditions:",
+ "     The above copyright notice and this permission notice shall be",
+ "     included in all copies or substantial portions of the Software.\"",
+        (const char *) 0
+  };
+#endif /*0*/
+#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
+    use_dlb = FALSE;
+#else
+    done_rt = TRUE;
+#endif
 
     /* instead of using ``display_file(OPTIONS_USED,TRUE)'' we handle
        the file manually so we can include dynamic version info */
@@ -119,58 +183,76 @@ doextversion()
         putstr(win, 0, p);
     }
 
-    f = dlb_fopen(OPTIONS_USED, "r");
-    if (!f) {
-        putstr(win, 0, "");
-        Sprintf(buf, "[Configuration '%s' not available?]", OPTIONS_USED);
-        putstr(win, 0, buf);
-    } else {
-        /*
-         * already inserted above:
-         * + outdented program name and version plus build date and time
-         * dat/options; display contents with lines prefixed by '-' deleted:
-         * - blank-line
-         * -     indented program name and version
-         *   blank-line
-         *   outdented feature header
-         * - blank-line
-         *       indented feature list
-         *       spread over multiple lines
-         *   blank-line
-         *   outdented windowing header
-         * - blank-line
-         *       indented windowing choices with
-         *       optional second line for default
-         * - blank-line
-         * - EOF
-         */
-        boolean prolog = TRUE; /* to skip indented program name */
-
-        while (dlb_fgets(buf, BUFSZ, f)) {
-            (void) strip_newline(buf);
-            if (index(buf, '\t') != 0)
-                (void) tabexpand(buf);
-
-            if (*buf && *buf != ' ') {
-                /* found outdented header; insert a separator since we'll
-                   have skipped corresponding blank line inside the file */
-                putstr(win, 0, "");
-                prolog = FALSE;
-            }
-            /* skip blank lines and prolog (progame name plus version) */
-            if (prolog || !*buf)
-                continue;
-
-            if (index(buf, ':'))
-                insert_rtoption(buf);
-
-            if (*buf)
-                putstr(win, 0, buf);
+    if (use_dlb) {
+        f = dlb_fopen(OPTIONS_USED, "r");
+        if (!f) {
+            putstr(win, 0, "");
+            Sprintf(buf, "[Configuration '%s' not available?]", OPTIONS_USED);
+            putstr(win, 0, buf);
+            done_dlb = TRUE;
         }
-        (void) dlb_fclose(f);
-        display_nhwindow(win, FALSE);
-        destroy_nhwindow(win);
     }
+    /*
+     * already inserted above:
+     * + outdented program name and version plus build date and time
+     * dat/options; display contents with lines prefixed by '-' deleted:
+     * - blank-line
+     * -     indented program name and version
+     *   blank-line
+     *   outdented feature header
+     * - blank-line
+     *       indented feature list
+     *       spread over multiple lines
+     *   blank-line
+     *   outdented windowing header
+     * - blank-line
+     *       indented windowing choices with
+     *       optional second line for default
+     * - blank-line
+     * - EOF
+     */
+
+    prolog = TRUE; /* to skip indented program name */
+    for (;;) {
+        if (use_dlb && !done_dlb) {
+            if (!dlb_fgets(buf, BUFSZ, f)) {
+                done_dlb = TRUE;
+                continue;
+            }
+        } else if (!done_rt) {
+            if (!(rtbuf = do_runtime_info(&rtcontext))) {
+                done_rt = TRUE;
+                continue;
+            }
+            (void) strncpy(buf, rtbuf, BUFSZ - 1);
+            buf[BUFSZ - 1] = '\0';
+        } else {
+            break;
+        }
+        (void) strip_newline(buf);
+        if (index(buf, '\t') != 0)
+            (void) tabexpand(buf);
+
+        if (*buf && *buf != ' ') {
+            /* found outdented header; insert a separator since we'll
+               have skipped corresponding blank line inside the file */
+            putstr(win, 0, "");
+            prolog = FALSE;
+        }
+        /* skip blank lines and prolog (progame name plus version) */
+        if (prolog || !*buf)
+            continue;
+
+        if (index(buf, ':'))
+            insert_rtoption(buf);
+
+        if (*buf)
+            putstr(win, 0, buf);
+    }
+    if (use_dlb)
+        (void) dlb_fclose(f);
+    display_nhwindow(win, FALSE);
+    destroy_nhwindow(win);
     return 0;
 }
 
@@ -219,6 +301,8 @@ static struct rt_opt {
     const char *token, *value;
 } rt_opts[] = {
     { ":PATMATCH:", regex_id },
+    { ":LUAVERSION:", (const char *) g.lua_ver },
+    { ":LUACOPYRIGHT:", (const char *) g.lua_copyright },
 };
 
 /*
@@ -233,9 +317,13 @@ char *buf;
 {
     int i;
 
+    if (!g.lua_ver[0])
+        get_lua_version();
+
     for (i = 0; i < SIZE(rt_opts); ++i) {
-        if (strstri(buf, rt_opts[i].token))
+        if (strstri(buf, rt_opts[i].token) && *rt_opts[i].value) {
             (void) strsubst(buf, rt_opts[i].token, rt_opts[i].value);
+	}
         /* we don't break out of the loop after a match; there might be
            other matches on the same line */
     }
@@ -309,26 +397,17 @@ unsigned long utdflags;
         if (rlen == 0)
             return FALSE;
     }
-    if (nhfp->fieldlevel) {
-        sfi_char(nhfp, &indicator, "indicate", "format", 1);
-        sfi_int(nhfp, &filecmc, "validate", "critical_members_count", 1);
-        cmc = critical_members_count();
-    }
     if (cmc != filecmc)
         return FALSE;
 
-    if (nhfp->fieldlevel && (nhfp->fnidx > historical)) {
-            sfi_version_info(nhfp, &vers_info, "version", "version_info", 1);
-    } else {
-        rlen = read(nhfp->fd, (genericptr_t) &vers_info, sizeof vers_info);
-        minit();                /* ZEROCOMP */
-        if (rlen == 0) {
-            if (verbose) {
-                pline("File \"%s\" is empty?", name);
-                wait_synch();
-            }
-            return FALSE;
+    rlen = read(nhfp->fd, (genericptr_t) &vers_info, sizeof vers_info);
+    minit();                /* ZEROCOMP */
+    if (rlen == 0) {
+        if (verbose) {
+            pline("File \"%s\" is empty?", name);
+            wait_synch();
         }
+        return FALSE;
     }
 
     if (!check_version(&vers_info, name, verbose, utdflags)) {
@@ -347,17 +426,6 @@ NHFILE *nhfp;
     int cmc = 0;
 
     if (nhfp->mode & WRITING) {
-        if (nhfp->fieldlevel) {
-            indicate = (nhfp->fnidx == ascii) ? 'a' : 'l';
-            sfo_char(nhfp, &indicate, "indicate", "format", 1);
-            cmc = critical_members_count();
-            {
-#if 0
-                pline("critical-members=%d.", cmc);
-#endif
-            }
-            sfo_int(nhfp, &cmc, "validate", "critical_members_count", 1);
-        }
         if (nhfp->structlevel) {
             indicate = 'h';     /* historical */
             bwrite(nhfp->fd, (genericptr_t) &indicate, sizeof indicate);
@@ -370,11 +438,23 @@ void
 store_version(nhfp)
 NHFILE *nhfp;
 {
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_HOST)
     static const struct version_info version_data = {
         VERSION_NUMBER, VERSION_FEATURES,
         VERSION_SANITY1, VERSION_SANITY2, VERSION_SANITY3
+#else
+    struct version_info version_data = {
+        0UL,0UL,0UL,0UL,0Ul
+#endif
     };
 
+#if defined(CROSSCOMPILE) && !defined(CROSSCOMPILE_HOST)
+    version_data.incarnation = VERSION_NUMBER;    /* actual version number */
+    version_data.feature_set = VERSION_FEATURES;  /* bitmask of config settings */
+    version_data.entity_count  = VERSION_SANITY1; /* # of monsters and objects */
+    version_data.struct_sizes1 = VERSION_SANITY2; /* size of key structs */
+    version_data.struct_sizes2 = VERSION_SANITY3; /* size of more key structs */
+#endif
     if (nhfp->structlevel) {
         bufoff(nhfp->fd);
         /* bwrite() before bufon() uses plain write() */
@@ -382,11 +462,6 @@ NHFILE *nhfp;
         bwrite(nhfp->fd,(genericptr_t) &version_data,
                (unsigned) (sizeof version_data));
         bufon(nhfp->fd);
-    }
-    if (nhfp->fieldlevel) {
-        store_formatindicator(nhfp);
-        sfo_version_info(nhfp, (struct version_info *) &version_data,
-                         "version", "version_info", 1);
     }
     return;
 }

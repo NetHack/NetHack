@@ -38,6 +38,20 @@ GAMEDIR =../binary
 ADD_CURSES=Y
 PDCURSES_TOP=../../pdcurses
 
+#---------------------------------------------------------------
+# Location of LUA
+#
+# Original source needs to be obtained from: 
+#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#
+#    This build assumes that the LUA sources are located
+#    at the specified location. If they are actually elsewhere
+#    you'll need to specify the correct spot below in order to
+#    successfully build NetHack-3.7.
+#
+ADD_LUA=Y
+LUATOP=../lib/lua535
+
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -206,18 +220,11 @@ VGAOBJ      = $(O)vidvga.o $(O)vidvesa.o
 
 MAKESRC	    = makedefs.c
 
+ifneq "$(ADD_LUA)" "Y"
 SPLEVSRC    = lev_yacc.c  lev_$(LEX).c	 lev_main.c  panic.c
-
-DGNCOMPSRC  = dgn_yacc.c  dgn_$(LEX).c	 dgn_main.c
+endif
 
 MAKEDEFSOBJS    = $(O)makedefs.o  $(O)monst.o	 $(O)objects.o
-
-SPLEVOBJS   = $(O)lev_yacc.o  $(O)lev_$(LEX).o	$(O)lev_main.o  $(O)alloc.o	\
-		$(O)monst.o	    $(O)objects.o	    $(O)panic.o  \
-		$(O)drawing.o	$(O)decl.o	$(O)stubvid.o
-
-DGNCOMPOBJS = $(O)dgn_yacc.o  $(O)dgn_$(LEX).o	$(O)dgn_main.o  $(O)alloc.o	 \
-		$(O)panic.o
 
 RECOVOBJS   = $(O)recover.o
 
@@ -301,11 +308,17 @@ VOBJ20 = $(O)vis_tab.o  $(O)weapon.o  $(O)were.o     $(O)wield.o    $(O)windows.
 VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
 VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
 VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)       $(O)isaac64.o
+VOBJ24 = $(O)sfstruct.o
 
 SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
 
 VVOBJ  = $(O)version.o
+
+ifeq "$(ADD_LUA)" "Y"
+LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
+LUA_QTEXT_FILE = "quest.lua"
+endif
 
 ifeq "$(ADD_CURSES)" "Y"
 CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
@@ -318,10 +331,41 @@ VOBJ  = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
 	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
-	$(VOBJ21) $(VOBJ22) $(VOBJ23) \
-	$(CURSESOBJ)
+	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
+	$(CURSESOBJ) $(LUAOBJ)
 
 ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
+
+ifeq "$(ADD_LUA)" "Y"
+#===============-=================================================
+# LUA library
+# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#=================================================================
+
+LUASRC   = $(LUATOP)/src
+LUALIB   = $(O)lua535s.a
+LUADLL   = $(O)lua535.a
+LUAINCL  = -I$(LUASRC)
+#LUAFLAGS = unix added -lm here?
+LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
+
+LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
+		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
+		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
+		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
+		loslib.c lparser.c lstate.c lstring.c lstrlib.c  \
+		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
+		lvm.c lzio.c
+
+LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
+		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
+		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
+		$(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
+		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o \
+		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
+		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
+endif
 
 ifeq "$(ADD_CURSES)" "Y"
 #==========================================
@@ -334,11 +378,12 @@ PDCSRC                  = $(PDCURSES_TOP)/pdcurses
 PDCDOS               = $(PDCURSES_TOP)/dos
 PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o             \
 	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
-	$(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o                  \
+	$(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o     \
 	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o   \
 	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o     \
 	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
-	$(O)slk.o $(O)termattr.o $(O)touch.o $(O)util.o $(O)window.o $(O)debug.o
+	$(O)slk.o $(O)termattr.o $(O)touch.o $(O)util.o $(O)window.o    \
+	$(O)debug.o
 
 PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o \
 	$(O)pdcscrn.o $(O)pdcsetsc.o $(O)pdcutil.o
@@ -420,7 +465,7 @@ CURSESDEF=
 CURSESLIB=
 endif
 
-INCLDIR=-I../include -I../sys/msdos
+INCLDIR=-I../include -I../sys/msdos $(LUAINCL)
 
 # Debugging
 #cflags = -pg -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
@@ -511,6 +556,15 @@ $(OBJ)/%.o : $(PDCSRC)/%.c
 $(OBJ)/%.o : $(PDCDOS)/%.c
 	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
 
+ifeq "$(ADD_LUA)" "Y"
+#==========================================
+# Rules for LUA files
+#==========================================
+
+$(OBJ)/%.o : $(LUASRC)/%.c
+	$(CC) $(cflags)  -o$@  $<
+endif
+
 #==========================================
 #  Primary Targets.
 #==========================================
@@ -526,11 +580,13 @@ default: $(GAMEFILE)
 
 util: $(O)utility.tag
 
+ifneq "$(ADD_LUA)" "Y"
 LEVCOMPEXE = $(U)lev_comp.exe
-
+else
+LEVCOMPEXE =
+endif
 $(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h \
-	$(INCL)/pm.h	  monstr.c   vis_tab.c	$(LEVCOMPEXE) \
-	$(U)dgn_comp.exe $(TILEUTIL)
+	$(INCL)/pm.h	  monstr.c   vis_tab.c $(TILEUTIL)
 	$(subst /,\,echo utilities made > $@)
 
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
@@ -547,7 +603,11 @@ ifeq ($(USE_DLB),Y)
 else
 	@$(subst /,\,copy $(DAT)/*. $(GAMEDIR))
 	@$(subst /,\,copy $(DAT)/*.dat $(GAMEDIR))
+ifeq "$(ADD_LUA)" "Y"
+	@$(subst /,\,copy $(DAT)/*.lua $(GAMEDIR))
+else
 	@$(subst /,\,copy $(DAT)/*.lev $(GAMEDIR))
+endif
 	@$(subst /,\,copy $(MSYS)/msdoshlp.txt $(GAMEDIR))
 	@$(subst /,\,if exist $(GAMEDIR)/makefile. del $(GAMEDIR)/makefile.)
 endif
@@ -572,7 +632,7 @@ endif
 #  The main target.
 #==========================================
 
-$(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(PDCLIB) \
+$(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(PDCLIB) $(LUATARGETS) \
 	$(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
 	 @if exist temp.a del temp.a
 	 @ar ru temp.a $(VOBJ01)
@@ -604,11 +664,14 @@ $(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(PDCLIB) \
 	 @ar ru temp.a $(TILOBJ)
 	 @ar ru temp.a $(TILOBJ2)
 	 @ar ru temp.a $(VVOBJ)
+ifeq "$(ADD_LUA)" "Y"
+	 @ar ru temp.a $(LUAOBJ)
+endif
 ifeq "$(ADD_CURSES)" "Y"
 	 @ar ru temp.a $(CURSESOBJ)
 endif
 	$(LINK) $(LFLAGS) -o$(GAME).exe temp.a \
-	$(PDCLIB) $(LIBRARIES) $(ZLIB)
+	$(PDCLIB) $(LUALIB) $(LIBRARIES) $(ZLIB)
 	@$(subst /,\,stubedit $(GAME).exe minstack=2048K)
 	@$(subst /,\,copy $(GAME).exe $(GAMEFILE))
 	@$(subst /,\,del $(GAME).exe)
@@ -643,6 +706,9 @@ $(O)$(GAME).lnk: $(ALLOBJ)
 	 echo $(TILOBJ) >> $(subst /,\,$@)
 	 echo $(TILOBJ2) >> $(subst /,\,$@)
 	 echo $(VVOBJ)  >> $(subst /,\,$@)
+ifeq "$(ADD_LUA)" "Y"
+	 echo $(LUAOBJ) >> $(subst /,\,$@)
+endif
 ifeq "$(ADD_CURSES)" "Y"
 	 echo $(CURSESOBJ) >> $(subst /,\,$@)
 endif
@@ -683,8 +749,9 @@ $(U)makedefs.exe:  $(MAKEDEFSOBJS)
 	$(LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS)
 
 $(O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
-		$(INCL)/monsym.h   $(INCL)/qtext.h $(U)makedefs.c
+		$(INCL)/monsym.h   $(U)makedefs.c
 
+ifneq "$(ADD_LUA)" "Y"
 #==========================================
 #  Level Compiler Dependencies
 #==========================================
@@ -757,58 +824,6 @@ else
 	@$(subst /,\,copy $(SSHR)/lev_lex.c $@)
 	@$(subst /,\,echo.>>$@)
 endif
-
-#==========================================
-#  Dungeon Dependencies
-#==========================================
-
-$(U)dgn_comp.exe:  $(DGNCOMPOBJS)
-	$(LINK) $(LFLAGS) -o$@ $(DGNCOMPOBJS)
-
-ifeq  "$(DO_YACC)" "YACC_ACT"
-$(U)dgn_yacc.c $(INCL)/dgn_comp.h : $(U)dgn_comp.y
-	@$(subst /,\,chdir $(UTIL))
-	@$(subst /,\,$(YACC) -d dgn_comp.y)
-	@$(subst /,\,copy $(YTABC) dgn_yacc.c)
-	@$(subst /,\,copy $(YTABH) $(INCL)/dgn_comp.h)
-	@$(subst /,\,@del $(YTABC))
-	@$(subst /,\,@del $(YTABH))
-	@$(subst /,\,chdir $(SRC))
-else
-$(U)dgn_yacc.c: $(SSHR)/dgn_yacc.c
-	@echo ---
-	@echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
-	@echo dgn_comp.h from $(SSHR) into $(U) and use that.
-	@$(subst /,\,copy $(SSHR)/dgn_yacc.c $(U)dgn_yacc.c)
-	@$(subst /,\,echo.>>$(U)dgn_yacc.c)
-
-$(INCL)/dgn_comp.h: $(SSHR)/dgn_comp.h
-	@echo ---
-	@echo For now, we will copy the prebuilt dgn_comp.h
-	@echo from $(SSHR) into $(INCL) and use that.
-	@$(subst /,\,copy $(SSHR)/dgn_comp.h $(INCL)/dgn_comp.h)
-	@$(subst /,\,echo.>>$(INCL)/dgn_comp.h)
-
-endif
-
-ifeq  "$(DO_LEX)" "LEX_ACT"
-
-$(U)dgn_$(LEX).c: $(U)dgn_comp.l $(INCL)/dgn_comp.h
-	@$(subst /,\,chdir $(UTIL))
-	@$(subst /,\,$(LEX) $(FLEXSKEL) dgn_comp.l)
-	@$(subst /,\,if exist $@ del $@)
-	@$(subst /,\,copy $(LEXYYC) $@)
-	@$(subst /,\,del $(LEXYYC))
-	@$(subst /,\,chdir $(SRC))
-else
-
-$(U)dgn_$(LEX).c: $(SSHR)/dgn_lex.c $(INCL)/dgn_comp.h
-	@echo ---
-	@echo For now, we will copy the prebuilt dgn_lex.c
-	@echo from $(SSHR) into $(U) and use it.
-	@$(subst /,\,copy $(SSHR)/dgn_lex.c $@)
-	@$(subst /,\,echo.>>$@)
-
 endif
 
 #==========================================
@@ -944,7 +959,11 @@ endif
 #==========================================
 
 $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
-	ar rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
+	ar rcS $@ $(PDCLIBOBJS1)
+	ar rcS $@ $(PDCLIBOBJS2)
+	ar rcS $@ $(PDCLIBOBJS3)
+	ar rcS $@ $(PDCLIBOBJS4)
+	ar rcs $@ $(PDCOBJS)
 
 #==========================================
 #  Other Util Dependencies.
@@ -985,8 +1004,10 @@ $(DAT)/data: $(O)utility.tag	$(DATABASE)
 $(DAT)/rumors:	     $(O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
 	@$(subst /,\,$(U)makedefs.exe -r)
 
+ifndef LUA_QTEXT_FILE
 $(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
 	@$(subst /,\,$(U)makedefs.exe -q)
+endif
 
 $(DAT)/oracles:	     $(O)utility.tag    $(DAT)/oracles.txt
 	@$(subst /,\,$(U)makedefs.exe -h)
@@ -1000,48 +1021,8 @@ $(DAT)/engrave:	     $(O)utility.tag    $(DAT)/engrave.txt
 $(DAT)/epitaph:	     $(O)utility.tag    $(DAT)/epitaph.txt
 	@$(subst /,\,$(U)makedefs.exe -s)
 
-$(O)sp_lev.tag: $(O)utility.tag \
-	$(DAT)/bigroom.des  $(DAT)/castle.des \
-	$(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des \
-	$(DAT)/medusa.des  $(DAT)/oracle.des   $(DAT)/tower.des \
-	$(DAT)/yendor.des  $(DAT)/arch.des     $(DAT)/barb.des \
-	$(DAT)/caveman.des   $(DAT)/healer.des   $(DAT)/knight.des \
-	$(DAT)/monk.des      $(DAT)/priest.des   $(DAT)/ranger.des \
-	$(DAT)/rogue.des     $(DAT)/samurai.des  $(DAT)/tourist.des \
-	$(DAT)/valkyrie.des  $(DAT)/wizard.des
-	@$(subst /,\,cd $(DAT))
-	@$(subst /,\,$(U)lev_comp bigroom.des)
-	@$(subst /,\,$(U)lev_comp castle.des)
-	@$(subst /,\,$(U)lev_comp endgame.des)
-	@$(subst /,\,$(U)lev_comp gehennom.des)
-	@$(subst /,\,$(U)lev_comp knox.des)
-	@$(subst /,\,$(U)lev_comp mines.des)
-	@$(subst /,\,$(U)lev_comp medusa.des)
-	@$(subst /,\,$(U)lev_comp oracle.des)
-	@$(subst /,\,$(U)lev_comp sokoban.des)
-	@$(subst /,\,$(U)lev_comp tower.des)
-	@$(subst /,\,$(U)lev_comp yendor.des)
-	@$(subst /,\,$(U)lev_comp arch.des)
-	@$(subst /,\,$(U)lev_comp barb.des)
-	@$(subst /,\,$(U)lev_comp caveman.des)
-	@$(subst /,\,$(U)lev_comp healer.des)
-	@$(subst /,\,$(U)lev_comp knight.des)
-	@$(subst /,\,$(U)lev_comp monk.des)
-	@$(subst /,\,$(U)lev_comp priest.des)
-	@$(subst /,\,$(U)lev_comp ranger.des)
-	@$(subst /,\,$(U)lev_comp rogue.des)
-	@$(subst /,\,$(U)lev_comp samurai.des)
-	@$(subst /,\,$(U)lev_comp tourist.des)
-	@$(subst /,\,$(U)lev_comp valkyrie.des)
-	@$(subst /,\,$(U)lev_comp wizard.des)
-	@$(subst /,\,cd $(SRC))
+$(O)sp_lev.tag: $(O)utility.tag
 	@$(subst /,\,echo sp_levs done > $@)
-
-$(DAT)/dungeon:	  $(O)utility.tag  $(DAT)/dungeon.def
-	@$(subst /,\,$(U)makedefs.exe -e)
-	@$(subst /,\,cd $(DAT))
-	@$(subst /,\,$(U)dgn_comp.exe dungeon.pdf)
-	@$(subst /,\,cd $(SRC))
 
 #==========================================
 # DLB stuff
@@ -1049,16 +1030,23 @@ $(DAT)/dungeon:	  $(O)utility.tag  $(DAT)/dungeon.def
 
 #note that dir below assumes bin/dir.exe from djgpp distribution
 #
-$(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors $(DAT)/dungeon \
-	    $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag \
-	    $(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
+$(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
+		$(DAT)/oracles \
+ifndef LUA_QTEXT_FILE
+		$(DAT)/quest.dat \
+endif
+		$(O)sp_lev.tag \
+		$(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
 	@$(subst /,\,echo dat done >$(O)dat.tag)
 	@$(subst /,\,cd $(DAT))
 	@$(subst /,\,copy $(MSYS)/msdoshlp.txt .)
-	@$(LS) data dungeon oracles options quest.dat rumors help hh >dlb.lst
+	@$(LS) data oracles options rumors help hh >dlb.lst
+ifndef LUA_QTEXT_FILE
+	@$(LS) quest.dat >>dlb.lst
+endif
 	@$(LS) cmdhelp history opthelp wizhelp license msdoshlp.txt >>dlb.lst
 	@$(LS) bogusmon engrave epitaph tribute >>dlb.lst
-	$(LS) $(subst /,\,*.lev) >>dlb.lst
+	$(LS) $(subst /,\,*.lua) >>dlb.lst
 	@$(subst /,\,$(U)dlb_main cvIf dlb.lst nhdat)
 	@$(subst /,\,cd $(SRC))
 
@@ -1085,10 +1073,7 @@ clean:
 
 spotless: clean
 
-	$(subst /,\,if exist $(U)dgn_flex.c del $(U)dgn_flex.c)
-	$(subst /,\,if exist $(U)dgn_lex.c del $(U)dgn_lex.c)
 	$(subst /,\,if exist $(U)makedefs.exe del $(U)makedefs.exe)
-	$(subst /,\,if exist $(U)dgn_comp.exe del $(U)dgn_comp.exe)
 	$(subst /,\,if exist $(U)recover.exe del $(U)recover.exe)
 	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
 	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
@@ -1100,24 +1085,105 @@ spotless: clean
 	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
 	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
 	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
-	$(subst /,\,if exist $(INCL)/dgn_comp.h del $(INCL)/dgn_comp.h)
-	$(subst /,\,if exist $(INCL)/lev_comp.h del $(INCL)/lev_comp.h)
 	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
 	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
 	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
 	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
 	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
 	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
-	$(subst /,\,if exist $(DAT)/dungeon.pdf del $(DAT)/dungeon.pdf)
-	$(subst /,\,if exist $(DAT)/dungeon del $(DAT)/dungeon)
 	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
+ifndef LUA_QTEXT_FILE
 	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
+endif
 	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
 	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
 	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
 	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
-	$(subst /,\,if exist $(DAT)/*.lev del $(DAT)/*.lev)
+	$(subst /,\,if exist $(TILE_BMP) del $(TILE_BMP))
+	$(subst /,\,if exist $(WSHR)/monthin.txt del $(WSHR)/monthin.txt)
+	$(subst /,\,if exist $(WSHR)/objthin.txt del $(WSHR)/objthin.txt)
+	$(subst /,\,if exist $(WSHR)/oththin.txt del $(WSHR)/oththin.txt)
+
+#==========================================
+# Create directory for holding object files
+#==========================================
+
+$(O)obj.tag:
+	-$(subst /,\,@if not exist $(OBJ)/*.* mkdir $(OBJ))
+	@$(subst /,\,@echo directory created > $@)
+
+#===========================================
+# Work around some djgpp long file name woes
+#===========================================
+
+$(PATCHLEV_H):
+	@$(subst /,\,if not exist $@ copy $(INCL)/patchlevel.h $(INCL)/patchlev.h)
+
+#=============================================================
+# LUA
+#=============================================================
+
+lua.exe: $(O)lua.o $(LUALIB) 
+	$(link) $(LFLAGS) -o$@ $(O)lua.o $(LUALIB)
+
+luac.exe: $(O)luac.o $(O)lua535s.a
+	$(link) $(LFLAGSU) -o$@ $(O)luac.o $(LUALIB)
+
+$(O)lua535.a: $(LUAOBJFILES)
+	$(cc) -shared -Wl,--export-all-symbols \
+		-Wl,--add-stdcall-alias -o $@ $<
+
+$(O)lua535s.a: $(LUAOBJFILES)
+	ar rcs $@ $(LUAOBJFILES)
+
+$(O)lua.o: $(LUASRC)/lua.c
+$(O)luac.o: $(LUASRC)/luac.c
+
+#==========================================
+#  Housekeeping.
+#==========================================
+
+clean:
+	$(subst /,\,if exist $(O)*.o del $(O)*.o)
+	$(subst /,\,if exist $(O)dat.tag del $(O)dat.tag)
+	$(subst /,\,if exist $(O)install.tag del $(O)install.tag)
+	$(subst /,\,if exist $(O)$(GAME).lnk del $(O)$(GAME).lnk)
+	$(subst /,\,if exist $(O)obj.tag del $(O)obj.tag)
+	$(subst /,\,if exist $(O)sp_lev.tag del $(O)sp_lev.tag)
+	$(subst /,\,if exist $(O)thintile.tag del $(O)thintile.tag)
+	$(subst /,\,if exist $(O)utility.tag del $(O)utility.tag)
+	$(subst /,\,if exist temp.a del temp.a)
+
+spotless: clean
+
+	$(subst /,\,if exist $(U)makedefs.exe del $(U)makedefs.exe)
+	$(subst /,\,if exist $(U)recover.exe del $(U)recover.exe)
+	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
+	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
+	$(subst /,\,if exist $(U)tile2bin.exe del $(U)tile2bin.exe)
+	$(subst /,\,if exist $(U)til2bin2.exe del $(U)til2bin2.exe)
+	$(subst /,\,if exist $(U)thintile.exe del $(U)thintile.exe)
+	$(subst /,\,if exist $(U)dlb_main.exe del $(U)dlb_main.exe)
+	$(subst /,\,if exist $(INCL)/vis_tab.h del $(INCL)/vis_tab.h)
+	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
+	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
+	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
+	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
+	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
+	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
+	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
+	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
+	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
+	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
+ifndef LUA_QTEXT_FILE
+	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
+endif
+	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
+	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
+	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
+	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
+	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
 	$(subst /,\,if exist $(TILE_BMP) del $(TILE_BMP))
 	$(subst /,\,if exist $(WSHR)/monthin.txt del $(WSHR)/monthin.txt)
 	$(subst /,\,if exist $(WSHR)/objthin.txt del $(WSHR)/objthin.txt)
@@ -1332,7 +1398,7 @@ $(O)apply.o: apply.c $(HACK_H)
 $(O)artifact.o: artifact.c $(HACK_H) $(INCL)/artifact.h $(INCL)/artilist.h
 $(O)attrib.o: attrib.c $(HACK_H)
 $(O)ball.o: ball.c $(HACK_H)
-$(O)bones.o: bones.c $(HACK_H) $(INCL)/lev.h
+$(O)bones.o: bones.c $(HACK_H)
 $(O)botl.o: botl.c $(HACK_H)
 $(O)cmd.o: cmd.c $(HACK_H) $(INCL)/func_tab.h
 $(O)dbridge.o: dbridge.c $(HACK_H)
@@ -1342,7 +1408,7 @@ $(O)dig.o: dig.c $(HACK_H)
 $(O)display.o: display.c $(HACK_H)
 $(O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h
 	$(CC) $(cflags) -I../sys/msdos -o$@ dlb.c
-$(O)do.o: do.c $(HACK_H) $(INCL)/lev.h
+$(O)do.o: do.c $(HACK_H)
 $(O)do_name.o: do_name.c $(HACK_H)
 $(O)do_wear.o: do_wear.c $(HACK_H)
 $(O)dog.o: dog.c $(HACK_H)
@@ -1352,8 +1418,8 @@ $(O)dothrow.o: dothrow.c $(HACK_H)
 $(O)drawing.o: drawing.c $(HACK_H) $(INCL)/tcap.h
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
-$(O)end.o: end.c $(HACK_H) $(INCL)/lev.h $(INCL)/dlb.h
-$(O)engrave.o: engrave.c $(HACK_H) $(INCL)/lev.h
+$(O)end.o: end.c $(HACK_H) $(INCL)/dlb.h
+$(O)engrave.o: engrave.c $(HACK_H)
 $(O)exper.o: exper.c $(HACK_H)
 $(O)explode.o: explode.c $(HACK_H)
 $(O)extralev.o: extralev.c $(HACK_H)
@@ -1362,7 +1428,7 @@ $(O)fountain.o: fountain.c $(HACK_H)
 $(O)hack.o: hack.c $(HACK_H)
 $(O)hacklib.o: hacklib.c $(HACK_H)
 $(O)invent.o: invent.c $(HACK_H)
-$(O)light.o: light.c $(HACK_H) $(INCL)/lev.h
+$(O)light.o: light.c $(HACK_H)
 $(O)lock.o: lock.c $(HACK_H)
 $(O)mail.o: mail.c $(HACK_H) $(INCL)/mail.h
 $(O)makemon.o: makemon.c $(HACK_H)
@@ -1373,7 +1439,7 @@ $(O)mhitu.o: mhitu.c $(HACK_H) $(INCL)/artifact.h
 $(O)minion.o: minion.c $(HACK_H)
 $(O)mklev.o: mklev.c $(HACK_H)
 $(O)mkmap.o: mkmap.c $(HACK_H) $(INCL)/sp_lev.h
-$(O)mkmaze.o: mkmaze.c $(HACK_H) $(INCL)/sp_lev.h $(INCL)/lev.h
+$(O)mkmaze.o: mkmaze.c $(HACK_H) $(INCL)/sp_lev.h
 $(O)mkobj.o: mkobj.c $(HACK_H)
 $(O)mkroom.o: mkroom.c $(HACK_H)
 $(O)mon.o: mon.c $(HACK_H) $(INCL)/mfndpos.h
@@ -1386,7 +1452,10 @@ $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H)
 $(O)music.o: music.c $(HACK_H) #interp.c
-$(O)o_init.o: o_init.c $(HACK_H) $(INCL)/lev.h
+$(O)nhlua.o: nhlua.c $(HACK_H)
+$(O)nhlsel.o: nhlsel.c $(HACK_H)
+$(O)nhlobj.o: nhlobj.c $(HACK_H)
+$(O)o_init.o: o_init.c $(HACK_H)
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)/obj.h $(INCL)/objclass.h \
 		$(INCL)/prop.h $(INCL)/skills.h $(INCL)/color.h
 $(O)objnam.o: objnam.c $(HACK_H)
@@ -1399,17 +1468,17 @@ $(O)polyself.o: polyself.c $(HACK_H)
 $(O)potion.o: potion.c $(HACK_H)
 $(O)pray.o: pray.c $(HACK_H)
 $(O)priest.o: priest.c $(HACK_H) $(INCL)/mfndpos.h
-$(O)quest.o: quest.c $(HACK_H) $(INCL)/qtext.h
-$(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)/dlb.h $(INCL)/qtext.h
+$(O)quest.o: quest.c $(HACK_H)
+$(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)/dlb.h
 $(O)read.o: read.c $(HACK_H)
 $(O)rect.o: rect.c $(HACK_H)
-$(O)region.o: region.c $(HACK_H) $(INCL)/lev.h
-$(O)restore.o: restore.c $(HACK_H) $(INCL)/lev.h $(INCL)/tcap.h
+$(O)region.o: region.c $(HACK_H)
+$(O)restore.o: restore.c $(HACK_H) $(INCL)/tcap.h
 $(O)rip.o: rip.c $(HACK_H)
 $(O)rnd.o: rnd.c $(HACK_H)
 $(O)role.o: role.c $(HACK_H)
-$(O)rumors.o: rumors.c $(HACK_H) $(INCL)/lev.h $(INCL)/dlb.h
-$(O)save.o: save.c $(HACK_H) $(INCL)/lev.h
+$(O)rumors.o: rumors.c $(HACK_H) $(INCL)/dlb.h
+$(O)save.o: save.c $(HACK_H)
 $(O)shk.o: shk.c $(HACK_H)
 $(O)shknam.o: shknam.c $(HACK_H)
 $(O)sit.o: sit.c $(HACK_H) $(INCL)/artifact.h
@@ -1420,7 +1489,7 @@ $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
 $(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
-$(O)timeout.o: timeout.c $(HACK_H) $(INCL)/lev.h
+$(O)timeout.o: timeout.c $(HACK_H)
 $(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h $(PATCHLEV_H)
 $(O)track.o: track.c $(HACK_H)
 $(O)trap.o: trap.c $(HACK_H)
@@ -1433,8 +1502,8 @@ $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
 $(O)windows.o: windows.c $(HACK_H) $(INCL)/wingem.h $(INCL)/winGnome.h
-$(O)wizard.o: wizard.c $(HACK_H) $(INCL)/qtext.h
-$(O)worm.o: worm.c $(HACK_H) $(INCL)/lev.h
+$(O)wizard.o: wizard.c $(HACK_H)
+$(O)worm.o: worm.c $(HACK_H)
 $(O)worn.o: worn.c $(HACK_H)
 $(O)write.o: write.c $(HACK_H)
 $(O)zap.o: zap.c $(HACK_H)

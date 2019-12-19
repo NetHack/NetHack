@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ $NHDT-Date: 1557663358 2019/05/12 12:15:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ $NHDT-Date: 1576288434 2019/12/14 01:53:54 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -7,6 +7,11 @@ hero polymorphed into a vampire can use #monster to shape-shift rather than
 	just do a one-shot polymorph into bat/cloud/wolf and shifted vampire
 	hero can use #monster again to take on another form (randomly chosen
 	among the shiftable shapes and true vampire form)
+adjust bones filename buffer sizes to accommodate suffix
+fix internal self-recover to work with recent fields added to checkpoint file
+improvements to pronoun usage when hallucinating
+function calls made from mapglyph based on dungeon level are now called once
+	per level
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
@@ -24,6 +29,17 @@ if a killer bee encounters a lump of royal jelly and there is no queen bee on
 automatic annotation "gateway to Moloch's Sanctum" for vibrating square level
 	once that square's location becomes known (found or magic mapped);
 	goes away once sanctum temple is found (entered or high altar mapped)
+savefile: add support to deconstruct internal data structures down into their
+	individual fields and save those fields instead of the entire struct
+savefile: use little-endian format for fields where that makes a difference
+replace build-time level compiler and dungeon compiler with run-time loading of
+	the dungeon and level descriptions and interpreting them via LUA
+split off some of the functionality that was in makedefs (compiled-in options
+	build date/time, etc) so that it can be built by a cross-compiler
+	and accessed on the target platform
+replace quest.txt and associated conversion to quest.dat via makedefs with
+	lua quest texts loaded at runtime
+some altars are displayed in different colors (for tty and curses at least)
 
 
 Platform- and/or Interface-Specific New Features
@@ -40,4 +56,7 @@ Code Cleanup and Reorganization
 move majority of global variables into instance_globals struct g
 move zeroobj, zeromonst, zeroany into const_globals struct cg
 remove STATIC_DCL, STATIC_OVL, STATIC_VAR, STATIC_PTR
+old Qt moved from win/Qt to win/Qt3
+more current Qt for Qt version 4 and 5 moved from win/Qt4 to win/Qt; qt4
+	moniker changed to qt_
 

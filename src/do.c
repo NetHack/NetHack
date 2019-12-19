@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1559670603 2019/06/04 17:50:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1576638499 2019/12/18 03:08:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.198 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,7 +6,6 @@
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
 #include "hack.h"
-#include "lev.h"
 
 static void FDECL(trycall, (struct obj *));
 static void NDECL(polymorph_sink);
@@ -165,7 +164,7 @@ const char *verb;
                        since trapped target is a sitting duck */
                     int damage, dieroll = 1;
 
-                    /* 3.6.2: this was calling hmon() unconditionally
+                    /* As of 3.6.2: this was calling hmon() unconditionally
                        so always credited/blamed the hero but the boulder
                        might have been thrown by a giant or launched by
                        a rolling boulder trap triggered by a monster or
@@ -244,12 +243,13 @@ const char *verb;
         }
         return water_damage(obj, NULL, FALSE) == ER_DESTROYED;
     } else if (u.ux == x && u.uy == y && (t = t_at(x, y)) != 0
-               && uteetering_at_seen_pit(t)) {
+               && (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
         if (Blind && !Deaf)
             You_hear("%s tumble downwards.", the(xname(obj)));
         else
-            pline("%s %s into %s pit.", The(xname(obj)),
-                  otense(obj, "tumble"), the_your[t->madeby_u]);
+            pline("%s %s into %s %s.", The(xname(obj)),
+                  otense(obj, "tumble"), the_your[t->madeby_u],
+                  is_pit(t->ttyp) ? "pit" : "hole");
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
         while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
@@ -307,6 +307,7 @@ polymorph_sink()
 {
     uchar sym = S_sink;
     boolean sinklooted;
+    int algn;
 
     if (levl[u.ux][u.uy].typ != SINK)
         return;
@@ -333,7 +334,11 @@ polymorph_sink()
     case 2:
         sym = S_altar;
         levl[u.ux][u.uy].typ = ALTAR;
-        levl[u.ux][u.uy].altarmask = Align2amask(rn2((int) A_LAWFUL + 2) - 1);
+        /* 3.6.3: this used to pass 'rn2(A_LAWFUL + 2) - 1' to
+           Align2amask() but that evaluates its argument more than once */
+        algn = rn2(3) - 1; /* -1 (A_Cha) or 0 (A_Neu) or +1 (A_Law) */
+        levl[u.ux][u.uy].altarmask = ((Inhell && rn2(3)) ? AM_NONE
+                                      : Align2amask(algn));
         break;
     case 3:
         sym = S_room;
@@ -989,9 +994,27 @@ dodown()
                                                     : surface(u.ux, u.uy));
         return 0; /* didn't move */
     }
+
+    if (Upolyd && ceiling_hider(&mons[u.umonnum]) && u.uundetected) {
+        u.uundetected = 0;
+        if (Flying) { /* lurker above */
+            You("fly out of hiding.");
+        } else { /* piercer */
+            You("drop to the %s.", surface(u.ux, u.uy));
+            if (is_pool_or_lava(u.ux, u.uy)) {
+                pooleffects(FALSE);
+            } else {
+                (void) pickup(1);
+                if ((trap = t_at(u.ux, u.uy)) != 0)
+                    dotrap(trap, TOOKPLUNGE);
+            }
+        }
+        return 1; /* came out of hiding; might need '>' again to go down */
+    }
+
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
-        if (trap && uteetering_at_seen_pit(trap)) {
+        if (trap && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
             dotrap(trap, TOOKPLUNGE);
             return 1;
         } else if (!trap || !is_hole(trap->ttyp)
@@ -1273,15 +1296,22 @@ boolean at_stairs, falling, portal;
      *   -1   11.46  12.50  12.5
      *   -2    5.21   4.17   0.0
      *   -3    2.08   0.0    0.0
+     *
+     * 3.7.0: the chance for the "mysterious force" to kick in goes down
+     * as it kicks in, starting at 25% per climb attempt and dropping off
+     * gradually but substantially.  The drop off is greater when hero is
+     * sent down farther so benefits lawfuls more than chaotics this time.
      */
     if (Inhell && up && u.uhave.amulet && !newdungeon && !portal
         && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
-        if (!rn2(4)) {
+        if (!rn2(4 + g.context.mysteryforce)) {
             int odds = 3 + (int) u.ualign.type,   /* 2..4 */
-                diff = odds <= 1 ? 0 : rn2(odds); /* paranoia */
+                diff = (odds <= 1) ? 0 : rn2(odds); /* paranoia */
 
             if (diff != 0) {
                 assign_rnd_level(newlevel, &u.uz, diff);
+                /* assign_rnd_level() may have used a value less than diff */
+                diff = u.uz.dlevel - newlevel->dlevel; /* actual descent */
                 /* if inside the tower, stay inside */
                 if (was_in_W_tower && !On_W_tower_level(newlevel))
                     diff = 0;
@@ -1289,15 +1319,20 @@ boolean at_stairs, falling, portal;
             if (diff == 0)
                 assign_level(newlevel, &u.uz);
 
-            new_ledger = ledger_no(newlevel);
-
             pline("A mysterious force momentarily surrounds you...");
+            /* each time it kicks in, the chance of doing so again may drop;
+               that drops faster, on average, when being sent down farther so
+               while the impact is reduced for everybody compared to earlier
+               versions, it is reduced least for chaotics, most for lawfuls */
+            g.context.mysteryforce += rn2(diff + 2); /* L:0-4, N:0-3, C:0-2 */
+
             if (on_level(newlevel, &u.uz)) {
                 (void) safe_teleds(FALSE);
                 (void) next_to_u();
                 return;
-            } else
-                at_stairs = g.at_ladder = FALSE;
+            }
+            new_ledger = ledger_no(newlevel);
+            at_stairs = g.at_ladder = FALSE;
         }
     }
 
@@ -1572,6 +1607,7 @@ boolean at_stairs, falling, portal;
 
     /* Reset the screen. */
     vision_reset(); /* reset the blockages */
+    g.glyphmap_perlevel_flags = 0L; /* force per-level mapglyph() changes */
     docrt();        /* does a full vision recalc */
     flush_screen(-1);
 
@@ -1663,9 +1699,9 @@ boolean at_stairs, falling, portal;
                  || g.quest_status.leader_is_dead)) {
             if (!u.uevent.qcalled) {
                 u.uevent.qcalled = 1;
-                com_pager(2); /* main "leader needs help" message */
+                com_pager("quest_portal"); /* main "leader needs help" message */
             } else {          /* reminder message */
-                com_pager(Role_if(PM_ROGUE) ? 4 : 3);
+                com_pager(Role_if(PM_ROGUE) ? "quest_portal_demand" : "quest_portal_again");
             }
         }
     }

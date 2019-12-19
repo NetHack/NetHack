@@ -1,14 +1,10 @@
-/* NetHack 3.6	restore.c	$NHDT-Date: 1561485720 2019/06/25 18:02:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1575245087 2019/12/02 00:04:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 #include "tcap.h" /* for TERMLIB and ASCIIGRAPH */
-#include "sfproto.h"
-
-
 
 #if defined(MICRO)
 extern int dotcnt; /* shared with save */
@@ -122,21 +118,17 @@ static void
 restlevchn(nhfp)
 NHFILE *nhfp;
 {
-    int cnt;
+    int cnt = 0;
     s_level *tmplev, *x;
 
     g.sp_levchn = (s_level *) 0;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &cnt, sizeof(int));
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &cnt, "levchn", "lev_count", 1);
 
     for (; cnt > 0; cnt--) {
         tmplev = (s_level *) alloc(sizeof(s_level));
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) tmplev, sizeof(s_level));
-        if (nhfp->fieldlevel)
-            sfi_s_level(nhfp, tmplev, "levchn", "s_level", 1);
 
         if (!g.sp_levchn)
             g.sp_levchn = tmplev;
@@ -154,14 +146,12 @@ restdamage(nhfp, ghostly)
 NHFILE *nhfp;
 boolean ghostly;
 {
-    unsigned int dmgcount;
+    unsigned int dmgcount = 0;
     int counter;
     struct damage *tmp_dam;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &dmgcount, sizeof(dmgcount));
-    if (nhfp->fieldlevel)
-        sfi_unsigned(nhfp, &dmgcount, "damage", "damage_count", 1);
     counter = (int) dmgcount;
 
     if (!counter)
@@ -172,8 +162,6 @@ boolean ghostly;
 
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) tmp_dam, sizeof(*tmp_dam));
-        if (nhfp->fieldlevel)
-            sfi_damage(nhfp, tmp_dam, "damage", "damage", 1);
 
         if (ghostly)
             tmp_dam->when += (g.monstermoves - g.omoves);
@@ -208,12 +196,10 @@ restobj(nhfp, otmp)
 NHFILE *nhfp;
 struct obj *otmp;
 {
-    int buflen;
+    int buflen = 0;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) otmp, sizeof(struct obj));
-    if (nhfp->fieldlevel)
-        sfi_obj(nhfp, otmp, "obj", "obj", 1);
 
     /* next object pointers are invalid; otmp->cobj needs to be left
        as is--being non-null is key to restoring container contents */
@@ -225,22 +211,16 @@ struct obj *otmp;
         /* oname - object's name */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "obj", "oname_length", 1);
 
         if (buflen > 0) { /* includes terminating '\0' */
             new_oname(otmp, buflen);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) ONAME(otmp), buflen);
-            if (nhfp->fieldlevel)
-                sfi_str(nhfp, ONAME(otmp), "obj", "oname", buflen);
         }
 
         /* omonst - corpse or statue might retain full monster details */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "obj", "omonst_length", 1);
         if (buflen > 0) {
             newomonst(otmp);
             /* this is actually a monst struct, so we
@@ -251,42 +231,30 @@ struct obj *otmp;
         /* omid - monster id number, connecting corpse to ghost */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "obj", "omid_length", 1);
 
         if (buflen > 0) {
             newomid(otmp);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) OMID(otmp), buflen);
-            if (nhfp->fieldlevel)
-                sfi_unsigned(nhfp, OMID(otmp), "obj", "omid", 1);
         }
 
         /* olong - temporary gold */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "obj",  "olong_length", 1);
         if (buflen > 0) {
             newolong(otmp);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) OLONG(otmp), buflen);
-            if (nhfp->fieldlevel)
-                sfi_long(nhfp, OLONG(otmp), "obj", "olong", 1);
         }
 
         /* omailcmd - feedback mechanism for scroll of mail */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "obj", "omailcmd_length", 1);
         if (buflen > 0) {
             char *omailcmd = (char *) alloc(buflen);
 
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) omailcmd, buflen);
-            if (nhfp->fieldlevel)
-                sfi_str(nhfp, omailcmd, "obj", "omailcmd", buflen);
             new_omailcmd(otmp, omailcmd);
             free((genericptr_t) omailcmd);
         }
@@ -300,13 +268,11 @@ boolean ghostly, frozen;
 {
     register struct obj *otmp, *otmp2 = 0;
     register struct obj *first = (struct obj *) 0;
-    int buflen;
+    int buflen = 0;
 
     while (1) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "obj",  "obj_length", 1);
 
         if (buflen == -1)
             break;
@@ -346,7 +312,7 @@ boolean ghostly, frozen;
             /*
              * TODO:  Remove this after 3.6.x save compatibility is dropped.
              *
-             * For 3.6.2, SchroedingersBox() always has a cat corpse in it.
+             * As of 3.6.2, SchroedingersBox() always has a cat corpse in it.
              * For 3.6.[01], it was empty and its weight was falsified
              * to have the value it would have had if there was one inside.
              * Put a non-rotting cat corpse in this box to convert to 3.6.2.
@@ -389,12 +355,10 @@ restmon(nhfp, mtmp)
 NHFILE *nhfp;
 struct monst *mtmp;
 {
-    int buflen;
+    int buflen = 0;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) mtmp, sizeof(struct monst));
-    if (nhfp->fieldlevel)
-        sfi_monst(nhfp, mtmp, "mon", "monst_length", 1);
 
     /* next monster pointer is invalid */
     mtmp->nmon = (struct monst *) 0;
@@ -405,82 +369,56 @@ struct monst *mtmp;
         /* mname - monster's name */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "mon", "mname_length", 1);
         if (buflen > 0) { /* includes terminating '\0' */
             new_mname(mtmp, buflen);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) MNAME(mtmp), buflen);
-            if (nhfp->fieldlevel)
-                sfi_str(nhfp, MNAME(mtmp), "mon", "mname", buflen);
         }
         /* egd - vault guard */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "mon", "egd_length", 1);
 
         if (buflen > 0) {
             newegd(mtmp);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) EGD(mtmp), sizeof(struct egd));
-            if (nhfp->fieldlevel)
-                sfi_egd(nhfp, EGD(mtmp), "mon", "egd", 1);
         }
         /* epri - temple priest */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "mon", "epri_length", 1);
         if (buflen > 0) {
             newepri(mtmp);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) EPRI(mtmp), sizeof(struct epri));
-            if (nhfp->fieldlevel)
-                sfi_epri(nhfp, EPRI(mtmp), "mon", "epri", 1);
         }
         /* eshk - shopkeeper */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "mon", "eshk_length", 1);
         if (buflen > 0) {
             neweshk(mtmp);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) ESHK(mtmp), sizeof(struct eshk));
-            if (nhfp->fieldlevel)
-                sfi_eshk(nhfp, ESHK(mtmp), "mon", "eshk", 1);
         }
         /* emin - minion */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "mon", "emin_length", 1);
         if (buflen > 0) {
             newemin(mtmp);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) EMIN(mtmp), sizeof(struct emin));
-            if (nhfp->fieldlevel)
-                sfi_emin(nhfp, EMIN(mtmp), "mon", "emin", 1);
         }
         /* edog - pet */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "mon", "edog_length", 1);
         if (buflen > 0) {
             newedog(mtmp);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) EDOG(mtmp), sizeof(struct edog));
-            if (nhfp->fieldlevel)
-                sfi_edog(nhfp, EDOG(mtmp), "mon", "edog", 1);
         }
         /* mcorpsenm - obj->corpsenm for mimic posing as corpse or
            statue (inline int rather than pointer to something) */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &MCORPSENM(mtmp), "mon", "mcorpsenm", 1);
     } /* mextra */
 }
 
@@ -491,13 +429,11 @@ boolean ghostly;
 {
     register struct monst *mtmp, *mtmp2 = 0;
     register struct monst *first = (struct monst *) 0;
-    int offset, buflen;
+    int offset, buflen = 0;
 
     while (1) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &buflen, "mon", "monst_length", 1);
         if (buflen == -1)
             break;
 
@@ -565,21 +501,18 @@ static struct fruit *
 loadfruitchn(nhfp)
 NHFILE *nhfp;
 {
-    register struct fruit *flist, *fnext = (struct fruit *) 0;
-    boolean keepgoing;
+    register struct fruit *flist, *fnext;
 
     flist = 0;
-    keepgoing = TRUE;
-    while (fnext = newfruit(), keepgoing) {
+    for (;;) {
+        fnext = newfruit();
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t)fnext, sizeof *fnext);
-        if (nhfp->fieldlevel)
-            sfi_fruit(nhfp, fnext, "fruit", "fruit", 1);
         if (fnext->fid != 0) {
             fnext->nextf = flist;
             flist = fnext;
         } else
-            keepgoing = FALSE;
+            break;
     }
     dealloc_fruit(fnext);
     return flist;
@@ -634,16 +567,11 @@ unsigned int *stuckid, *steedid;
     struct obj *otmp;
     struct obj *bc_obj;
     char timebuf[15];
-    unsigned long uid;
+    unsigned long uid = 0;
     boolean defer_perm_invent;
-
-    if (nhfp->fieldlevel && nhfp->addinfo)
-        sfi_addinfo(nhfp, "gamestate", "start", "", 0);
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &uid, sizeof uid);
-    if (nhfp->fieldlevel)
-        sfi_ulong(nhfp, &uid, "gamestate", "uid", 1);
       
     if (SYSOPT_CHECK_SAVE_UID
         && uid != (unsigned long) getuid()) { /* strange ... */
@@ -657,8 +585,6 @@ unsigned int *stuckid, *steedid;
     newgamecontext = g.context; /* copy statically init'd context */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.context, sizeof (struct context_info));
-    if (nhfp->fieldlevel)
-        sfi_context_info(nhfp, &g.context, "gamestate", "g.context", 1);
     g.context.warntype.species = (g.context.warntype.speciesidx >= LOW_PM)
                                   ? &mons[g.context.warntype.speciesidx]
                                   : (struct permonst *) 0;
@@ -672,8 +598,6 @@ unsigned int *stuckid, *steedid;
     newgameflags = flags;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &flags, sizeof (struct flag));
-    if (nhfp->fieldlevel)
-        sfi_flag(nhfp, &flags, "gamestate", "flags", 1);
 
     /* avoid keeping permanent inventory window up to date during restore
        (setworn() calls update_inventory); attempting to include the cost
@@ -700,9 +624,6 @@ unsigned int *stuckid, *steedid;
     newgamesysflags = sysflags;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
-    if (nhfp->fieldlevel)
-        sfi_sysflag(nhfp, &sysflags, "gamestate", "sysflags", 1);
-    mread(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
 #endif
 
     role_init(); /* Reset the initial role, race, gender, and alignment */
@@ -711,25 +632,17 @@ unsigned int *stuckid, *steedid;
 #endif
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &u, sizeof(struct you));
-    if (nhfp->fieldlevel)
-        sfi_you(nhfp, &u, "gamestate", "you", 1);
     g.youmonst.cham = u.mcham;
         
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) timebuf, 14);
-    if (nhfp->fieldlevel)
-        sfi_str(nhfp, timebuf, "gamestate", "ubirthday", 14);
     timebuf[14] = '\0';
     ubirthday = time_from_yyyymmddhhmmss(timebuf);
     if (nhfp->structlevel)
         mread(nhfp->fd, &urealtime.realtime, sizeof urealtime.realtime);
-    if (nhfp->fieldlevel)
-        sfi_long(nhfp, &urealtime.realtime, "gamestate", "realtime", 1);
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) timebuf, 14);
-    if (nhfp->fieldlevel)
-        sfi_str(nhfp, timebuf, "gamestate", "start_timing", 14);
     timebuf[14] = '\0';
     urealtime.start_timing = time_from_yyyymmddhhmmss(timebuf);
 
@@ -768,8 +681,6 @@ unsigned int *stuckid, *steedid;
     restore_timers(nhfp, RANGE_GLOBAL, FALSE, 0L);
     restore_light_sources(nhfp);
 
-    if (nhfp->fieldlevel && nhfp->addinfo)
-        sfi_addinfo(nhfp, "objchain", "start", "invent", 0);
     g.invent = restobjchn(nhfp, FALSE, FALSE);
 
     /* restore dangling (not on floor or in inventory) ball and/or chain */
@@ -787,12 +698,6 @@ unsigned int *stuckid, *steedid;
 
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) g.mvitals, sizeof g.mvitals);
-    }
-    if (nhfp->fieldlevel) {
-        int i;
-
-        for (i = 0; i < NUMMONS; ++i)
-            sfi_mvitals(nhfp, &g.mvitals[i], "gamestate", "g.mvitals", 1);
     }
 
     /*
@@ -825,40 +730,19 @@ unsigned int *stuckid, *steedid;
         mread(nhfp->fd, (genericptr_t) &g.quest_status, sizeof (struct q_score));
         mread(nhfp->fd, (genericptr_t) g.spl_book, (MAXSPELL + 1) * sizeof (struct spell));
     }
-    if (nhfp->fieldlevel) {
-        int i;
-        struct spell *sptmp;
-
-        sfi_long(nhfp, &g.moves, "gamestate", "g.moves", 1);
-        sfi_long(nhfp, &g.monstermoves, "gamestate", "g.monstermoves", 1);
-        sfi_q_score(nhfp, &g.quest_status, "gamestate", "g.quest_status", 1);
-        sptmp = g.spl_book;
-        for (i = 0; i < (MAXSPELL + 1); ++i)
-            sfi_spell(nhfp, sptmp++, "gamestate", "g.spl_book", 1);
-    }        
     restore_artifacts(nhfp);
     restore_oracles(nhfp);
     if (u.ustuck) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) stuckid, sizeof *stuckid);
-        if (nhfp->fieldlevel)
-            sfi_unsigned(nhfp, stuckid, "gamestate", "ustuck_id", 1);
     }
     if (u.usteed) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) steedid, sizeof *steedid);
-        if (nhfp->fieldlevel)
-            sfi_unsigned(nhfp, steedid, "gamestate", "usteed_id", 1);
     }
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) g.pl_character, sizeof g.pl_character);
         mread(nhfp->fd, (genericptr_t) g.pl_fruit, sizeof g.pl_fruit);
-    }
-    if (nhfp->fieldlevel) {
-        sfi_char(nhfp, g.pl_character, "gamestate", "g.pl_character",
-                 sizeof g.pl_character);
-        sfi_char(nhfp, g.pl_fruit, "gamestate", "g.pl_fruit",
-                 sizeof g.pl_fruit);
     }
     freefruitchn(g.ffruit); /* clean up fruit(s) made by initoptions() */
     g.ffruit = loadfruitchn(nhfp);
@@ -972,7 +856,7 @@ dorecover(nhfp)
 NHFILE *nhfp;
 {
     unsigned int stuckid = 0, steedid = 0; /* not a register */
-    xchar ltmp;
+    xchar ltmp = 0;
     int rtmp;
     struct obj *otmp;
 
@@ -1040,11 +924,6 @@ NHFILE *nhfp;
             if (restoreinfo.mread_flags == -1)
                 break;
         }
-        if (nhfp->fieldlevel) {
-            sfi_xchar(nhfp, &ltmp, "gamestate", "level_number", 1);
-            if (nhfp->eof)
-                break;
-	}
         getlev(nhfp, 0, ltmp, FALSE);
 #ifdef MICRO
         curs(WIN_MAP, 1 + dotcnt++, dotrow);
@@ -1062,9 +941,6 @@ NHFILE *nhfp;
             return rtmp; /* dorecover called recursively */
     }
     restoreinfo.mread_flags = 0;
-    if (nhfp->fieldlevel && nhfp->addinfo)
-        sfi_addinfo(nhfp, "NetHack", "end", "savefile", 0);
-
     rewind_nhfile(nhfp);        /* return to beginning of file */
     (void) validate(nhfp, (char *) 0);
     get_plname_from_file(nhfp, g.plname);
@@ -1104,7 +980,6 @@ NHFILE *nhfp;
      */
     inven_inuse(FALSE);
 
-    load_qtlist(); /* re-load the quest text info */
     /* Set up the vision internals, after levl[] data is loaded
        but before docrt(). */
     reglyph_darkroom();
@@ -1128,20 +1003,16 @@ NHFILE *nhfp;
 struct cemetery **cemeteryaddr;
 {
     struct cemetery *bonesinfo, **bonesaddr;
-    int cflag;
+    int cflag = 0;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &cflag, sizeof cflag);
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &cflag, "cemetery", "cemetery_flag", 1);
     if (cflag == 0) {
         bonesaddr = cemeteryaddr;
         do {
             bonesinfo = (struct cemetery *) alloc(sizeof *bonesinfo);
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) bonesinfo, sizeof *bonesinfo);
-            if (nhfp->fieldlevel)
-                sfi_cemetery(nhfp, bonesinfo, "bones", "bonesinfo", 1);
             *bonesaddr = bonesinfo;
             bonesaddr = &(*bonesaddr)->next;
         } while (*bonesaddr);
@@ -1177,10 +1048,6 @@ boolean rlecomp;
                         mread(nhfp->fd, (genericptr_t) &len, sizeof(uchar));
                         mread(nhfp->fd, (genericptr_t) &r, sizeof(struct rm));
                     }
-                    if (nhfp->fieldlevel) {
-                        sfi_uchar(nhfp, &len, "room", "levl", 1);
-                        sfi_rm(nhfp, &r, "room", "rm", 1);
-                    }
                 }
             }
             j = 0;
@@ -1193,13 +1060,6 @@ boolean rlecomp;
 #endif /* ?RLECOMP */
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) levl, sizeof levl);
-    }
-    if (nhfp->fieldlevel) {
-        int c, r;
-
-        for (c = 0; c < COLNO; ++c)
-            for (r = 0; r < ROWNO; ++r)    
-                sfi_rm(nhfp, &levl[c][r], "room", "levl", 1);
     }
 }
 
@@ -1225,10 +1085,9 @@ boolean ghostly;
     register struct monst *mtmp;
     long elapsed;
     branch *br;
-    int hpid;
-    xchar dlvl;
+    int hpid = 0;
+    xchar dlvl = 0;
     int x, y;
-    boolean keepgoing;
 #ifdef TOS
     short tlev;
 #endif
@@ -1249,21 +1108,15 @@ boolean ghostly;
     /* First some sanity checks */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &hpid, sizeof(hpid));
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &hpid, "gamestate", "g.hackpid", 1);
 
 /* CHECK:  This may prevent restoration */
 #ifdef TOS
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &tlev, sizeof(tlev));
-    if (nhfp->fieldlevel)
-        sfi_short(nhfp, &tlev, "gamestate", "tlev", 1);
     dlvl = tlev & 0x00ff;
 #else
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &dlvl, sizeof(dlvl));
-    if (nhfp->fieldlevel)
-        sfi_xchar(nhfp, &dlvl, "gamestate", "dlvl", 1);
 #endif
     if ((pid && pid != hpid) || (lev && dlvl != lev)) {
         char trickbuf[BUFSZ];
@@ -1284,15 +1137,6 @@ boolean ghostly;
         mread(nhfp->fd, (genericptr_t) g.lastseentyp, sizeof(g.lastseentyp));
         mread(nhfp->fd, (genericptr_t) &g.omoves, sizeof(g.omoves));
     }
-    if (nhfp->fieldlevel) {
-        int c, r;
-
-        for (c = 0; c < COLNO; ++c)
-            for (r = 0; r < ROWNO; ++r)
-                sfi_schar(nhfp, &g.lastseentyp[c][r], "lev", "g.lastseentyp", 1);
-
-        sfi_long(nhfp, &g.omoves, "lev", "timestmp", 1);
-    }
     elapsed = g.monstermoves - g.omoves;
 
     if (nhfp->structlevel) {
@@ -1306,20 +1150,6 @@ boolean ghostly;
         mread(nhfp->fd, (genericptr_t)&g.level.flags, sizeof(g.level.flags));
         mread(nhfp->fd, (genericptr_t)g.doors, sizeof(g.doors));
     }
-    if (nhfp->fieldlevel) {
-        int i;
-
-        sfi_stairway(nhfp, &g.upstair, "lev", "g.upstair", 1);
-        sfi_stairway(nhfp, &g.dnstair, "lev", "g.dnstair", 1);
-        sfi_stairway(nhfp, &g.upladder, "lev", "g.upladder", 1);
-        sfi_stairway(nhfp, &g.dnladder, "lev", "g.dnladder", 1);
-        sfi_stairway(nhfp, &g.sstairs, "lev", "g.sstairs", 1);
-        sfi_dest_area(nhfp, &g.updest, "lev", "g.updest", 1);
-        sfi_dest_area(nhfp, &g.dndest, "lev", "g.dndest", 1);
-        sfi_levelflags(nhfp, &g.level.flags, "lev", "g.level.flags", 1);
-        for (i = 0; i < DOORMAX; ++i)
-            sfi_nhcoord(nhfp, &g.doors[i], "lev", "g.doors", 1);
-    }
     rest_rooms(nhfp); /* No joke :-) */
     if (g.nroom)
         g.doorindex = g.rooms[g.nroom - 1].fdoor + g.rooms[g.nroom - 1].doorct;
@@ -1332,20 +1162,20 @@ boolean ghostly;
 
     /* rest_worm(fd); */    /* restore worm information */
     rest_worm(nhfp);    /* restore worm information */
+
     g.ftrap = 0;
-    keepgoing = TRUE;
-    while (trap = newtrap(), keepgoing) {
+    for (;;) {
+        trap = newtrap();
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t)trap, sizeof(struct trap));
-        if (nhfp->fieldlevel)
-            sfi_trap(nhfp, trap, "trap", "trap", 1);
         if (trap->tx != 0) {
             trap->ntrap = g.ftrap;
             g.ftrap = trap;
         } else
-            keepgoing = FALSE;
+            break;
     }
     dealloc_trap(trap);
+
     fobj = restobjchn(nhfp, ghostly, FALSE);
     find_lev_obj();
     /* restobjchn()'s `frozen' argument probably ought to be a callback
@@ -1461,10 +1291,6 @@ char *plbuf;
         (void) read(nhfp->fd, (genericptr_t) &pltmpsiz, sizeof(pltmpsiz));
         (void) read(nhfp->fd, (genericptr_t) plbuf, pltmpsiz);
     }
-    if (nhfp->fieldlevel) {
-            sfi_int(nhfp, &pltmpsiz, "plname", "plname_size", 1);
-            sfi_str(nhfp, plbuf, "plname", "g.plname", pltmpsiz);
-    }
     return;
 }
 
@@ -1472,22 +1298,18 @@ static void
 restore_msghistory(nhfp)
 NHFILE *nhfp;
 {
-    int msgsize, msgcount = 0;
+    int msgsize = 0, msgcount = 0;
     char msg[BUFSZ];
 
     while (1) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &msgsize, sizeof(msgsize));
-        if (nhfp->fieldlevel)
-            sfi_int(nhfp, &msgsize, "msghistory", "msghistory_length", 1);
         if (msgsize == -1)
             break;
         if (msgsize > (BUFSZ - 1))
             panic("restore_msghistory: msg too big (%d)", msgsize);
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) msg, msgsize);
-        if (nhfp->fieldlevel)
-            sfi_str(nhfp, msg, "msghistory", "msg", msgsize);
         msg[msgsize] = '\0';
         putmsghistory(msg, TRUE);
         ++msgcount;
@@ -1671,21 +1493,14 @@ const char *name;
 
     if (nhfp->structlevel)
         utdflags |= UTD_CHECKSIZES;
-    if (nhfp->fieldlevel)
-        utdflags |= UTD_CHECKFIELDCOUNTS |
-                    UTD_SKIP_SANITY1 | UTD_SKIP_SAVEFILEINFO;
     if (!(reslt = uptodate(nhfp, name, utdflags))) return 1;
 
     if ((nhfp->mode & WRITING) == 0) {
 	if (nhfp->structlevel)
             rlen = read(nhfp->fd, (genericptr_t) &sfi, sizeof sfi);
-        if (nhfp->fieldlevel)
-	    sfi_savefile_info(nhfp, &sfi, "savefileinfo", "savefile_info", 1);
     } else {
         if (nhfp->structlevel)
             rlen = read(nhfp->fd, (genericptr_t) &sfi, sizeof sfi);
-        if (nhfp->fieldlevel)
-            sfi_savefile_info(nhfp, &sfi, "savefileinfo", "savefile_info", 1);
         minit();		/* ZEROCOMP */
         if (rlen == 0) {
 	    if (verbose) {

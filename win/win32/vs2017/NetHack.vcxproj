@@ -45,7 +45,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);$(LuaDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;SAFEPROCS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -53,6 +53,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="$(LuaDir)lapi.c" />
+    <ClCompile Include="$(LuaDir)lauxlib.c" />
+    <ClCompile Include="$(LuaDir)lbaselib.c" />
+    <ClCompile Include="$(LuaDir)lbitlib.c" />
+    <ClCompile Include="$(LuaDir)lcode.c" />
+    <ClCompile Include="$(LuaDir)lcorolib.c" />
+    <ClCompile Include="$(LuaDir)lctype.c" />
+    <ClCompile Include="$(LuaDir)ldblib.c" />
+    <ClCompile Include="$(LuaDir)ldebug.c" />
+    <ClCompile Include="$(LuaDir)ldo.c" />
+    <ClCompile Include="$(LuaDir)ldump.c" />
+    <ClCompile Include="$(LuaDir)lfunc.c" />
+    <ClCompile Include="$(LuaDir)lgc.c" />
+    <ClCompile Include="$(LuaDir)linit.c" />
+    <ClCompile Include="$(LuaDir)liolib.c" />
+    <ClCompile Include="$(LuaDir)llex.c" />
+    <ClCompile Include="$(LuaDir)lmathlib.c" />
+    <ClCompile Include="$(LuaDir)lmem.c" />
+    <ClCompile Include="$(LuaDir)loadlib.c" />
+    <ClCompile Include="$(LuaDir)lobject.c" />
+    <ClCompile Include="$(LuaDir)lopcodes.c" />
+    <ClCompile Include="$(LuaDir)loslib.c" />
+    <ClCompile Include="$(LuaDir)lparser.c" />
+    <ClCompile Include="$(LuaDir)lstate.c" />
+    <ClCompile Include="$(LuaDir)lstring.c" />
+    <ClCompile Include="$(LuaDir)lstrlib.c" />
+    <ClCompile Include="$(LuaDir)ltable.c" />
+    <ClCompile Include="$(LuaDir)ltablib.c" />
+    <ClCompile Include="$(LuaDir)ltm.c" />
+    <ClCompile Include="$(LuaDir)lundump.c" />
+    <ClCompile Include="$(LuaDir)lutf8lib.c" />
+    <ClCompile Include="$(LuaDir)lvm.c" />
+    <ClCompile Include="$(LuaDir)lzio.c" />
     <ClCompile Include="$(SrcDir)allmain.c" />
     <ClCompile Include="$(SrcDir)alloc.c" />
     <ClCompile Include="$(SrcDir)apply.c" />
@@ -111,6 +144,8 @@
     <ClCompile Include="$(SrcDir)mthrowu.c" />
     <ClCompile Include="$(SrcDir)muse.c" />
     <ClCompile Include="$(SrcDir)music.c" />
+    <ClCompile Include="$(SrcDir)nhlua.c" />
+    <ClCompile Include="$(SrcDir)nhlsel.c" />
     <ClCompile Include="$(SrcDir)objects.c" />
     <ClCompile Include="$(SrcDir)objnam.c" />
     <ClCompile Include="$(SrcDir)options.c" />
@@ -134,10 +169,6 @@
     <ClCompile Include="$(SrcDir)rumors.c" />
     <ClCompile Include="$(SrcDir)save.c" />
     <ClCompile Include="$(SrcDir)sfstruct.c" />
-    <ClCompile Include="$(SrcDir)sfbase.c" />
-    <ClCompile Include="$(SrcDir)sflendian.c" />
-    <ClCompile Include="$(SrcDir)sfascii.c" />
-    <ClCompile Include="$(SrcDir)sfdata.c" />
     <ClCompile Include="$(SrcDir)shk.c" />
     <ClCompile Include="$(SrcDir)shknam.c" />
     <ClCompile Include="$(SrcDir)sit.c" />
@@ -213,7 +244,6 @@
     <ClInclude Include="$(IncDir)global.h" />
     <ClInclude Include="$(IncDir)hack.h" />
     <ClInclude Include="$(IncDir)isaac64.h" />
-    <ClInclude Include="$(IncDir)lev.h" />
     <ClInclude Include="$(IncDir)mextra.h" />
     <ClInclude Include="$(IncDir)mfndpos.h" />
     <ClInclude Include="$(IncDir)mkroom.h" />
@@ -222,6 +252,7 @@
     <ClInclude Include="$(IncDir)monflag.h" />
     <ClInclude Include="$(IncDir)monst.h" />
     <ClInclude Include="$(IncDir)monsym.h" />
+    <ClInclude Include="$(IncDir)nhlua.h" />
     <ClInclude Include="$(IncDir)ntconf.h" />
     <ClInclude Include="$(IncDir)obj.h" />
     <ClInclude Include="$(IncDir)objclass.h" />
@@ -230,7 +261,6 @@
     <ClInclude Include="$(IncDir)permonst.h" />
     <ClInclude Include="$(IncDir)pm.h" />
     <ClInclude Include="$(IncDir)prop.h" />
-    <ClInclude Include="$(IncDir)qtext.h" />
     <ClInclude Include="$(IncDir)quest.h" />
     <ClInclude Include="$(IncDir)rect.h" />
     <ClInclude Include="$(IncDir)region.h" />

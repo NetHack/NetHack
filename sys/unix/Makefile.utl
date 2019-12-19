@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl    $NHDT-Date: 1539968067 2018/10/19 16:54:27 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.38 $
+# NetHack 3.6  Makefile.utl    $NHDT-Date: 1574646950 2019/11/25 01:55:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -97,6 +97,9 @@ NHSROOT=..
 #CFLAGS = -O -I../include
 #LFLAGS =
 
+CFLAGS += -I../lib/lua-$(LUA_VERSION)/src
+LFLAGS += -lm
+
 # we specify C preprocessor flags via CFLAGS; files built with default rules
 # might include $(CPPFLAGS) which could get a value from user's environment;
 # we avoid that by forcing it empty rather than by overriding default rules
@@ -125,11 +128,6 @@ LEXYYC = lex.yy.c
 # YTABC = y_tab.c
 # YTABH = y_tab.h
 # LEXYYC = lexyy.c
-
-# This is the universal ctags utility which produces the tags in the
-# format that util/readtags requires. 
-# https://github.com/universal-ctags/ctags.git
-CTAGSCMD = universal-ctags
 
 # if you change this to 1, feedback while building will omit -Dthis -Wthat
 # -Isomewhere so that each file being compiled is listed on one short line;
@@ -182,13 +180,10 @@ CONFIG_H = ../src/config.h-t
 HACK_H	 = ../src/hack.h-t
 
 # utility .c files
-MAKESRC = makedefs.c
-SPLEVSRC = lev_yacc.c lev_lex.c lev_main.c
-DGNCOMPSRC = dgn_yacc.c dgn_lex.c dgn_main.c
+MAKESRC = makedefs.c ../src/mdlib.c
 RECOVSRC = recover.c
 DLBSRC = dlb_main.c
-UTILSRCS = $(MAKESRC) panic.c $(SPLEVSRC) $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
-READTAGSSRC = readtags.c
+UTILSRCS = $(MAKESRC) panic.c $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
 
 # files that define all monsters and objects
 CMONOBJ = ../src/monst.c ../src/objects.c
@@ -203,20 +198,11 @@ OALLOC = $(OBJDIR)/alloc.o panic.o
 # object files for makedefs
 MAKEOBJS = makedefs.o $(OMONOBJ)
 
-# object files for special levels compiler
-SPLEVOBJS = lev_yacc.o lev_lex.o lev_main.o $(OALLOC) $(ONAMING)
-
-# object files for dungeon compiler
-DGNCOMPOBJS = dgn_yacc.o dgn_lex.o dgn_main.o $(OALLOC)
-
 # object files for recovery utility
 RECOVOBJS = recover.o
 
 # object files for the data librarian
 DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
-
-# object files for readtags
-READTAGSOBJS = readtags.o
 
 # flags for creating distribution versions of sys/share/*_lex.c, using
 # a more portable flex skeleton, which is not included in the distribution.
@@ -236,11 +222,11 @@ YACCDIST =
 makedefs:	$(MAKEOBJS) mdgrep.h
 	$(CC) $(LFLAGS) -o makedefs $(MAKEOBJS)
 
-makedefs.o: makedefs.c $(CONFIG_H) ../include/permonst.h \
+makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \
-		../include/dlb.h ../include/patchlevel.h ../include/qtext.h
+		../include/dlb.h ../include/patchlevel.h
 
 # Don't require perl to build; that is why mdgrep.h is spelled wrong below.
 mdgreph: mdgrep.pl
@@ -267,81 +253,6 @@ lintdefs:
 # support code used by several of the utility programs (but not makedefs)
 panic.o:     panic.c $(CONFIG_H)
 
-
-#	dependencies for lev_comp
-#
-lev_comp:  $(SPLEVOBJS)
-	$(CC) $(LFLAGS) -o lev_comp $(SPLEVOBJS) $(LIBS)
-
-lev_yacc.o:  lev_yacc.c $(HACK_H) ../include/sp_lev.h
-lev_main.o:  lev_main.c $(HACK_H) ../include/sp_lev.h ../include/tcap.h \
-		../include/date.h
-
-# see lev_comp.l for WEIRD_LEX discussion
-# egrep will return failure if it doesn't find anything, but we know there
-# is one "_cplusplus" inside a comment
-lev_lex.o:   lev_lex.c $(HACK_H) ../include/lev_comp.h ../include/sp_lev.h
-	$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus lev_lex.c` lev_lex.c
-
-# '$(YACC) -d' generates both $(YTABC) and $(YTABH) in one run
-../include/lev_comp.h: lev_yacc.c
-
-lev_yacc.c: lev_comp.y
-	$(YACC) $(YACCDIST) -d lev_comp.y
-	sed -e 's#"$(YTABC)"#"$@"#' -e 's#$(YTABC):#$@:#' $(YTABC) > $@ \
-		&& rm $(YTABC)
-	sed -e 's#"$(YTABH)"#"lev_comp.h"#' $(YTABH) > ../include/lev_comp.h \
-		&& rm $(YTABH)
-
-lev_lex.c: lev_comp.l
-	$(LEX) $(FLEXDIST) lev_comp.l
-	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' \
-	    -e 's#static void yyunput#void yyunput#' $(LEXYYC) > $@ \
-		&& rm $(LEXYYC)
-#	note: flex code construction using m4 macros results in some trailing
-#	spaces; <space><space><star> is basic RE substitute for <space><plus>
-#	and we don't bother stripping trailing tabs because that gets messy;
-#	make expands <dollar><dollar> into <dollar> which is RE end-of-line.
-#	flex also creates yyunput() as a static routine, but lev_comp doesn't
-#	use it so compiler complaints can ensue; recent flex versions honor
-#	NO_YY_UNPUT to suppress it, but older ones don't; making it global to
-#	avoid an "unused function" warning is simpler than trying to remove
-#	the whole thing (although full 'lint' may still complain).
-
-# with all of extern.h's functions to complain about, we drown in
-# 'defined but not used' without -u
-lintlev:
-	@lint -axhu -I../include -DLINT $(SPLEVSRC) $(CALLOC) $(CNAMING) | sed '/_flsbuf/d'
-
-
-#	dependencies for dgn_comp
-#
-dgn_comp:  $(DGNCOMPOBJS)
-	$(CC) $(LFLAGS) -o dgn_comp $(DGNCOMPOBJS) $(LIBS)
-
-dgn_yacc.o:  dgn_yacc.c $(CONFIG_H) ../include/dgn_file.h ../include/date.h
-dgn_main.o:  dgn_main.c $(CONFIG_H) ../include/dlb.h
-
-# see dgn_comp.l for WEIRD_LEX discussion
-dgn_lex.o:   dgn_lex.c $(CONFIG_H) ../include/dgn_comp.h ../include/dgn_file.h
-	$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus dgn_lex.c` dgn_lex.c
-
-# '$(YACC) -d' generates both $(YTABC) and $(YTABH) in one run
-../include/dgn_comp.h: dgn_yacc.c
-
-dgn_yacc.c: dgn_comp.y
-	$(YACC) $(YACCDIST) -d dgn_comp.y
-	sed -e 's#"$(YTABC)"#"$@"#' -e 's#$(YTABC):#$@:#' $(YTABC) > $@ \
-		&& rm $(YTABC)
-	sed -e 's#"$(YTABH)"#"dgn_comp.h"#' $(YTABH) > ../include/dgn_comp.h \
-		&& rm $(YTABH)
-
-dgn_lex.c: dgn_comp.l
-	$(LEX) $(FLEXDIST) dgn_comp.l
-	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' \
-	    -e 's#static void yyunput#void yyunput#' $(LEXYYC) > $@ \
-		&& rm $(LEXYYC)
-#	note: <space><space><star> is basic RE substitute for <space><plus>
 
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
@@ -449,73 +360,6 @@ tileedit: tileedit.cpp $(TEXT_IO)
 	$(CC) -o tileedit -I../include -I$(QTDIR)/include -L$(QTDIR)/lib \
 		tileedit.cpp $(TEXT_IO) -lqt
 
-#	dependencies for readtags
-#
-CTAGDEP = ../include/align.h    ../include/artifact.h ../src/artifact.c     \
-	 ../include/artilist.h ../include/attrib.h   ../src/bones.c        \
-	 ../include/context.h  ../include/coord.h    ../include/decl.h     \
-	 ../src/decl.c         ../include/dungeon.h  ../include/engrave.h  \
-	 ../src/engrave.c      ../include/flag.h     ../include/func_tab.h \
-	 ../include/global.h   ../include/hack.h     ../include/lev.h      \
-	 ../include/mextra.h   ../include/mkroom.h   ../include/monst.h    \
-	 ../include/monsym.h   ../include/obj.h      ../include/objclass.h \
-	 ../include/prop.h     ../include/quest.h    ../include/rect.h     \
-	 ../include/region.h   ../include/rm.h       ../include/skills.h   \
-	 ../include/spell.h    ../include/sys.h      ../include/timeout.h  \
-	 ../include/trap.h     ../include/you.h      ../include/onames.h   \
-	 ../include/wintype.h
-#	 ../include/permonst.h
-CTAGSOPT = --language-force=c --sort=no -D"Bitfield(x,n)=unsigned x : n" --excmd=pattern
-
-readtags: $(READTAGSOBJS)
-	$(CC) $(LFLAGS) -o readtags $(READTAGSOBJS) $(LIBS)
-
-readtags.o: readtags.c $(HACK_H)
-	$(CC) $(CFLAGS) -c readtags.c
-
-nethack.tags: $(CTAGDEP)
-#
-# tested with universal ctags from https://github.com/universal-ctags/ctags.git
-#
-	$(CTAGSCMD) $(CTAGSOPT) -f nethack.tags ../include/align.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/artifact.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../src/artifact.c
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/artilist.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/attrib.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../src/bones.c
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/context.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/coord.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/decl.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../src/decl.c
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/dungeon.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/engrave.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../src/engrave.c
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/flag.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/func_tab.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/global.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/hack.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/lev.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/mextra.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/mkroom.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/monst.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/monsym.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/obj.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/objclass.h
-#	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/permonst.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/prop.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/quest.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/rect.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/region.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/rm.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/skills.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/spell.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/sys.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/timeout.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/trap.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/you.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/onames.h
-	$(CTAGSCMD) $(CTAGSOPT) -a -f nethack.tags ../include/wintype.h
-
 # using dependencies like
 #	../src/foo::
 #		@( cd ../src ; $(MAKE) foo )
@@ -548,24 +392,7 @@ $(HACK_H): $(CONFIG_H)
 $(CONFIG_H): ../include/config.h
 	@( cd ../src ; $(MAKE) $(CONFIG_H) )
 
-# 'make dist' => put generated lex and yacc sources into place for distribution
 SYSSHARE=../sys/share/
-$(SYSSHARE)lev_lex.c: lev_lex.c
-	cp lev_lex.c $@
-$(SYSSHARE)lev_yacc.c: lev_yacc.c
-	cp lev_yacc.c $@
-$(SYSSHARE)lev_comp.h: ../include/lev_comp.h
-	cp ../include/lev_comp.h $@
-$(SYSSHARE)dgn_lex.c: dgn_lex.c
-	cp dgn_lex.c $@
-$(SYSSHARE)dgn_yacc.c: dgn_yacc.c
-	cp dgn_yacc.c $@
-$(SYSSHARE)dgn_comp.h: ../include/dgn_comp.h
-	cp ../include/dgn_comp.h $@
-
-dist:	$(SYSSHARE)lev_lex.c $(SYSSHARE)lev_yacc.c $(SYSSHARE)lev_comp.h \
-	$(SYSSHARE)dgn_lex.c $(SYSSHARE)dgn_yacc.c $(SYSSHARE)dgn_comp.h
-	@echo 'pre-generated lex and yacc sources are in place in sys/share'
 
 tags: $(UTILSRCS)
 	@ctags -tw $(UTILSRCS)
@@ -574,9 +401,7 @@ clean:
 	-rm -f *.o
 
 spotless: clean
-	-rm -f lev_lex.c lev_yacc.c dgn_lex.c dgn_yacc.c
-	-rm -f ../include/lev_comp.h ../include/dgn_comp.h
 	-rm -f ../include/tile.h tiletxt.c
-	-rm -f makedefs lev_comp dgn_comp recover dlb
+	-rm -f makedefs recover dlb
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
 		tilemap tileedit tile2bmp

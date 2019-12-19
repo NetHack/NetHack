@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1564771880 2019/08/02 18:51:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1576288434 2019/12/14 01:53:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -260,8 +260,13 @@ teleok(x, y, trapok)
 register int x, y;
 boolean trapok;
 {
-    if (!trapok && t_at(x, y))
-        return FALSE;
+    if (!trapok) {
+        /* allow teleportation onto vibrating square, it's not a real trap */
+        struct trap *trap = t_at(x, y);
+
+        if (trap && trap->ttyp != VIBRATING_SQUARE)
+            return FALSE;
+    }
     if (!goodpos(x, y, &g.youmonst, 0))
         return FALSE;
     if (!tele_jump_ok(u.ux, u.uy, x, y))
@@ -302,9 +307,9 @@ boolean allow_drag;
      * rock in the way), in which case it teleports the ball on its own.
      */
     if (ball_active) {
-        if (!carried(uball) && distmin(nux, nuy, uball->ox, uball->oy) <= 2)
+        if (!carried(uball) && distmin(nux, nuy, uball->ox, uball->oy) <= 2) {
             ball_still_in_range = TRUE; /* don't have to move the ball */
-        else {
+        } else {
             /* have to move the ball */
             if (!allow_drag || distmin(u.ux, u.uy, nux, nuy) > 1) {
                 /* we should not have dist > 1 and allow_drag at the same
@@ -341,8 +346,13 @@ boolean allow_drag;
             boolean cause_delay;
 
             if (drag_ball(nux, nuy, &bc_control, &ballx, &bally, &chainx,
-                          &chainy, &cause_delay, allow_drag))
+                          &chainy, &cause_delay, allow_drag)) {
                 move_bc(0, bc_control, ballx, bally, chainx, chainy);
+            } else {
+                /* dragging fails if hero is encumbered beyond 'burdened' */
+                allow_drag = FALSE; /* teleport b&c to hero's new spot */
+                unplacebc(); /* to match placebc() below */
+            }
         }
     }
     /* must set u.ux, u.uy after drag_ball(), which may need to know
@@ -682,7 +692,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(g.youmonst.data))) {
             /* Try to use teleport away spell.
-               3.6.2: this used to require that you know the spellbook
+               Prior to 3.6.2 this used to require that you know the spellbook
                (probably just intended as an optimization to skip the
                lookup loop) but it is possible to know and cast a spell
                after forgetting its book due to amnesia. */

@@ -1978,7 +1978,7 @@ if(u.uz.dlevel != x){
     } else /* AMII, or Rogue level in either version */
     {
         /* map glyph to character and color */
-        (void) mapglyph(glyph, &och, &color, &special, x, y);
+        (void) mapglyph(glyph, &och, &color, &special, x, y, 0);
         ch = (uchar) och;
         if (WINVERS_AMIV) { /* implies Rogue level here */
             amii_curs(win, x, y);

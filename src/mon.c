@@ -2038,7 +2038,7 @@ register struct monst *mtmp;
     /* if it's a (possibly polymorphed) quest leader, mark him as dead */
     if (mtmp->m_id == g.quest_status.leader_m_id)
         g.quest_status.leader_is_dead = TRUE;
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     /* if the mail daemon dies, no more mail delivery.  -3. */
     if (tmp == PM_MAIL_DAEMON)
         g.mvitals[tmp].mvflags |= G_GENOD;
@@ -2412,7 +2412,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     if (nocorpse || LEVEL_SPECIFIC_NOCORPSE(mdat))
         goto cleanup;
 
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     if (mdat == &mons[PM_MAIL_DAEMON]) {
         stackobj(mksobj_at(SCR_MAIL, x, y, FALSE, FALSE));
     }
@@ -3770,6 +3770,9 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 
     /* take on the new form... */
     set_mon_data(mtmp, mdat);
+
+    if (mtmp->mleashed && !leashable(mtmp))
+        m_unleash(mtmp, TRUE);
 
     if (emits_light(olddata) != emits_light(mtmp->data)) {
         /* used to give light, now doesn't, or vice versa,

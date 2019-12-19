@@ -3,13 +3,12 @@
   <Import Project="files.props"/>
   <!-- TODO not copying record -->
   <Target Name="Build"
-	Inputs="$(SysWinntDir)defaults.nh;$(DocDir)Guidebook.txt;$(DatDir)license;$(SysWinntDir)sysconf;$(DocDir)nethack.txt;$(DatDir)symbols;$(WinWin32Dir)record;$(DatDir)opthelp"
-	Outputs="$(BinDir)defaults.nh;$(BinDir)Guidebook.txt;$(BinDir)license;$(BinDir)sysconf;$(BinDir)symbols;$(BinDir)record;$(BinDir)opthelp">
-
-	<Copy SourceFiles="$(SysWinntDir)defaults.nh;$(DocDir)Guidebook.txt;$(DatDir)license;$(SysWinntDir)sysconf;$(DocDir)nethack.txt;$(DatDir)symbols;$(WinWin32Dir)record;$(DatDir)opthelp" DestinationFolder="$(BinDir)"/>
-
-	</Target>
+	Inputs="$(SysWinntDir).nethackrc.template;$(DocDir)Guidebook.txt;$(DatDir)license;$(SysWinntDir)sysconf.template;$(DocDir)nethack.txt;$(DatDir)symbols;$(WinWin32Dir)record;$(DatDir)opthelp"
+	Outputs="$(BinDir).nethackrc.template;$(BinDir)Guidebook.txt;$(BinDir)license;$(BinDir)sysconf.template;$(BinDir)symbols.template;$(BinDir)record;$(BinDir)opthelp">
+    <Copy SourceFiles="$(SysWinntDir).nethackrc.template;$(DocDir)Guidebook.txt;$(DatDir)license;$(SysWinntDir)sysconf.template;$(DocDir)nethack.txt;$(DatDir)symbols;$(WinWin32Dir)record;$(DatDir)opthelp"
+	      DestinationFiles="$(BinDir).nethackrc.template;$(BinDir)Guidebook.txt;$(BinDir)license;$(BinDir)sysconf.template;$(BinDir)nethack.txt;$(BinDir)symbols.template;$(BinDir)record;$(BinDir)opthelp" />
+  </Target>
   <Target Name="Clean">
-	<Delete Files="$(BinDir)defaults.nh;$(BinDir)Guidebook.txt;$(BinDir)license;$(BinDir)sysconf;$(BinDir)nethack.txt;$(BinDir)symbols;$(BinDir)record;$(BinDir)opthelp"/>
+	<Delete Files="$(BinDir).nethackrc.template;$(BinDir)Guidebook.txt;$(BinDir)license;$(BinDir)sysconf.template;$(BinDir)nethack.txt;$(BinDir)symbols.template;$(BinDir)record;$(BinDir)opthelp"/>
   </Target>
 </Project>

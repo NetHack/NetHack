@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1567213892 2019/08/31 01:11:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.262 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1575245062 2019/12/02 00:04:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.267 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -139,8 +139,10 @@ struct obj *obj;
             case DRUM_OF_EARTHQUAKE:
             case HORN_OF_PLENTY: /* not a musical instrument */
                 k = 3; /* instrument or unknown horn of plenty */
+                break;
             default:
                 k = 4; /* 'other' tool */
+                break;
             }
         break;
     case FOOD_CLASS:
@@ -464,8 +466,8 @@ const genericptr vptr2;
  *      (fragile) or by avoiding sortloot() during inventory display
  *      (more robust).
  *
- *      3.6.2 reverts to the temporary array of ordered obj pointers
- *      but has sortloot() do the counting and allocation.  Callers
+ *      As of 3.6.2: revert to the temporary array of ordered obj pointers
+ *      but have sortloot() do the counting and allocation.  Callers
  *      need to use array traversal instead of linked list traversal
  *      and need to free the temporary array when done.  And the
  *      array contains 'struct sortloot_item' (aka 'Loot') entries
@@ -1712,7 +1714,7 @@ register const char *let, *word;
             if (iflags.force_invmenu)
                 Sprintf(menuquery, "What do you want to %s?", word);
             if (!strcmp(word, "grease"))
-                Sprintf(qbuf, "your %s", makeplural(body_part(FINGER)));
+                Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
             else if (!strcmp(word, "write with"))
                 Sprintf(qbuf, "your %s", body_part(FINGERTIP));
             else if (!strcmp(word, "wield"))
@@ -1882,7 +1884,7 @@ boolean
 is_worn(otmp)
 struct obj *otmp;
 {
-    return (otmp->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE | W_WEAPON))
+    return (otmp->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE | W_WEAPONS))
             ? TRUE
             : FALSE;
 }
@@ -2893,7 +2895,7 @@ boolean FDECL((*filterfunc), (OBJ_P));
 
         /* coins are either uncursed or unknown based upon option setting */
         if (list->oclass == COIN_CLASS) {
-            if (type == (iflags.goldX ? BUC_UNKNOWN : BUC_UNCURSED))
+            if (type == (flags.goldX ? BUC_UNKNOWN : BUC_UNCURSED))
                 ++count;
             continue;
         }
@@ -2929,7 +2931,7 @@ int *bcp, *ucp, *ccp, *xcp, *ocp;
             list->bknown = (list->oclass != COIN_CLASS);
         /* coins are either uncursed or unknown based upon option setting */
         if (list->oclass == COIN_CLASS) {
-            if (iflags.goldX)
+            if (flags.goldX)
                 ++(*xcp);
             else
                 ++(*ucp);
@@ -2949,30 +2951,32 @@ int *bcp, *ucp, *ccp, *xcp, *ocp;
 
 /* count everything inside a container, or just shop-owned items inside */
 long
-count_contents(container, nested, quantity, everything)
+count_contents(container, nested, quantity, everything, newdrop)
 struct obj *container;
 boolean nested, /* include contents of any nested containers */
     quantity,   /* count all vs count separate stacks */
-    everything; /* all objects vs only unpaid objects */
+    everything, /* all objects vs only unpaid objects */
+    newdrop;    /* on floor, but hero-owned items haven't been marked
+                 * no_charge yet and shop-owned items are still marked
+                 * unpaid -- used when asking the player whether to sell */
 {
     struct obj *otmp, *topc;
     boolean shoppy = FALSE;
     long count = 0L;
 
-    if (!everything) {
+    if (!everything && !newdrop) {
+        xchar x, y;
+
         for (topc = container; topc->where == OBJ_CONTAINED;
              topc = topc->ocontainer)
             continue;
-        if (topc->where == OBJ_FLOOR) {
-            xchar x, y;
-
-            (void) get_obj_location(topc, &x, &y, CONTAINED_TOO);
+        if (topc->where == OBJ_FLOOR && get_obj_location(topc, &x, &y, 0))
             shoppy = costly_spot(x, y);
-        }
     }
     for (otmp = container->cobj; otmp; otmp = otmp->nobj) {
         if (nested && Has_contents(otmp))
-            count += count_contents(otmp, nested, quantity, everything);
+            count += count_contents(otmp, nested, quantity, everything,
+                                    newdrop);
         if (everything || otmp->unpaid || (shoppy && !otmp->no_charge))
             count += quantity ? otmp->quan : 1L;
     }
@@ -3091,7 +3095,7 @@ struct obj *obj;
         /* if filtering by bless/curse state, gold is classified as
            either unknown or uncursed based on user option setting */
         if (g.this_type && index("BUCX", g.this_type))
-            res = (g.this_type == (iflags.goldX ? 'X' : 'U'));
+            res = (g.this_type == (flags.goldX ? 'X' : 'U'));
     } else {
         switch (g.this_type) {
         case 'B':

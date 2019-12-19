@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1562632673 2019/07/09 00:37:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1575830188 2019/12/08 18:36:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -190,12 +190,19 @@ struct obj **obj_p;
             otmp->quan = 2L; /* to force pluralization */
         else if (otmp->otyp == SLIME_MOLD)
             otmp->spe = g.context.current_fruit; /* give it a type */
-        if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
-            otmp->corpsenm = MCORPSENM(mtmp);
-        else if (otmp->otyp == CORPSE && glyph_is_body(glyph))
+        if (mtmp && has_mcorpsenm(mtmp)) { /* mimic as corpse/statue */
+            if (otmp->otyp == SLIME_MOLD)
+                /* override g.context.current_fruit to avoid
+                     look, use 'O' to make new named fruit, look again
+                   giving different results when current_fruit changes */
+                otmp->spe = MCORPSENM(mtmp);
+            else
+                otmp->corpsenm = MCORPSENM(mtmp);
+        } else if (otmp->otyp == CORPSE && glyph_is_body(glyph)) {
             otmp->corpsenm = glyph - GLYPH_BODY_OFF;
-        else if (otmp->otyp == STATUE && glyph_is_statue(glyph))
+        } else if (otmp->otyp == STATUE && glyph_is_statue(glyph)) {
             otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
+        }
         if (otmp->otyp == LEASH)
             otmp->leashmon = 0;
         /* extra fields needed for shop price with doname() formatting */
@@ -470,17 +477,21 @@ char *buf, *monbuf;
         Strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
-    } else
+    } else {
+        int amsk;
+        aligntyp algn;
+
         switch (glyph_to_cmap(glyph)) {
         case S_altar:
+            amsk = altarmask_at(x, y);
+            algn = Amask2align(amsk & AM_MASK);
             Sprintf(buf, "%s %saltar",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */
                     (Is_astralevel(&u.uz) && distu(x, y) > 2)
                         ? "aligned"
-                        : align_str(
-                              Amask2align(levl[x][y].altarmask & ~AM_SHRINE)),
-                    ((levl[x][y].altarmask & AM_SHRINE)
+                        : align_str(algn),
+                    ((amsk & AM_SHRINE) != 0
                      && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))
                         ? "high "
                         : "");
@@ -515,7 +526,7 @@ char *buf, *monbuf;
             Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
             break;
         }
-
+    }
     return (pm && !Hallucination) ? pm : (struct permonst *) 0;
 }
 
@@ -806,11 +817,12 @@ struct permonst **for_supplement;
                       unreconnoitered[] = "unreconnoitered";
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
-    int i, alt_i, glyph = NO_GLYPH,
+    int i, alt_i, j, glyph = NO_GLYPH,
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
             submerged = (Underwater && !Is_waterlevel(&u.uz));
     const char *x_str;
+    nhsym tmpsym;
 
     if (looked) {
         int oc;
@@ -818,7 +830,7 @@ struct permonst **for_supplement;
 
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
-        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
+        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y, 0);
 
         Sprintf(prefix, "%s        ", encglyph(glyph));
     } else
@@ -874,7 +886,7 @@ struct permonst **for_supplement;
         if (x_str == unreconnoitered)
             goto didlook;
     }
-
+ check_monsters:
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 1; i < MAXMCLASSES; i++) {
@@ -1027,8 +1039,44 @@ struct permonst **for_supplement;
         }
     }
 
+    /* Finally, handle some optional overriding symbols */
+    for (j = SYM_OFF_X; j < SYM_MAX; ++j) {
+        if (j == (SYM_INVISIBLE + SYM_OFF_X))
+            continue;       /* already handled above */
+        tmpsym = Is_rogue_level(&u.uz) ? g.ov_rogue_syms[j]
+                                       : g.ov_primary_syms[j];
+        if (tmpsym && sym == tmpsym) {
+            switch (j) {
+            case SYM_BOULDER + SYM_OFF_X:
+                if (!found) {
+                    *firstmatch = "boulder";
+                    Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
+                    found++;
+                } else {
+                    found += append_str(out_str, "boulder");
+                }
+                break;
+            case SYM_PET_OVERRIDE + SYM_OFF_X:
+                if (looked) {
+                    int oc = 0;
+                    unsigned os = 0;
+
+                    /* convert to symbol without override in effect */
+                    (void) mapglyph(glyph, &sym, &oc, &os,
+                                    cc.x, cc.y, MG_FLAG_NOOVERRIDE);
+                    goto check_monsters;
+                }
+                break;
+            case SYM_HERO_OVERRIDE + SYM_OFF_X:
+                sym = g.showsyms[S_HUMAN + SYM_OFF_M];
+                goto check_monsters;
+            }
+        }
+    }
+#if 0
     /* handle optional boulder symbol as a special case */
-    if (iflags.bouldersym && sym == iflags.bouldersym) {
+    if (o_syms[SYM_BOULDER + SYM_OFF_X]
+        && sym == o_syms[SYM_BOULDER + SYM_OFF_X]) {
         if (!found) {
             *firstmatch = "boulder";
             Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
@@ -1037,6 +1085,7 @@ struct permonst **for_supplement;
             found += append_str(out_str, "boulder");
         }
     }
+#endif
 
     /*
      * If we are looking at the screen, follow multiple possibilities or
@@ -1575,7 +1624,7 @@ whatdoes_help()
 {
     dlb *fp;
     char *p, buf[BUFSZ];
-    winid tmpwin = create_nhwindow(NHW_TEXT);
+    winid tmpwin;
 
     fp = dlb_fopen(KEYHELP, "r");
     if (!fp) {
@@ -1583,6 +1632,7 @@ whatdoes_help()
         display_nhwindow(WIN_MESSAGE, TRUE);
         return;
     }
+    tmpwin = create_nhwindow(NHW_TEXT);
     while (dlb_fgets(buf, (int) sizeof buf, fp)) {
         if (*buf == '#')
             continue;

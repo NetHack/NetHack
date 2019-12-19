@@ -7,7 +7,6 @@
 /*  quest dungeon branch routines. */
 
 #include "quest.h"
-#include "qtext.h"
 
 #define Not_firsttime (on_level(&u.uz0, &u.uz))
 #define Qstat(x) (g.quest_status.x)
@@ -27,13 +26,13 @@ static void
 on_start()
 {
     if (!Qstat(first_start)) {
-        qt_pager(QT_FIRSTTIME);
+        qt_pager("firsttime");
         Qstat(first_start) = TRUE;
     } else if ((u.uz0.dnum != u.uz.dnum) || (u.uz0.dlevel < u.uz.dlevel)) {
         if (Qstat(not_ready) <= 2)
-            qt_pager(QT_NEXTTIME);
+            qt_pager("nexttime");
         else
-            qt_pager(QT_OTHERTIME);
+            qt_pager("othertime");
     }
 }
 
@@ -48,14 +47,14 @@ on_locate()
         return;
     } else if (!Qstat(first_locate)) {
         if (from_above)
-            qt_pager(QT_FIRSTLOCATE);
+            qt_pager("locate_first");
         /* if we've arrived from below this will be a lie, but there won't
            be any point in delivering the message upon a return visit from
            above later since the level has now been seen */
         Qstat(first_locate) = TRUE;
     } else {
         if (from_above)
-            qt_pager(QT_NEXTLOCATE);
+            qt_pager("locate_next");
     }
 }
 
@@ -65,7 +64,7 @@ on_goal()
     if (Qstat(killed_nemesis)) {
         return;
     } else if (!Qstat(made_goal)) {
-        qt_pager(QT_FIRSTGOAL);
+        qt_pager("goal_first");
         Qstat(made_goal) = 1;
     } else {
         /*
@@ -81,7 +80,7 @@ on_goal()
                                    | (1 << OBJ_BURIED));
         struct obj *qarti = find_quest_artifact(whichobjchains);
 
-        qt_pager(qarti ? QT_NEXTGOAL : QT_ALTGOAL);
+        qt_pager(qarti ? "goal_next" : "goal_alt");
         if (Qstat(made_goal) < 7)
             Qstat(made_goal)++;
     }
@@ -109,7 +108,7 @@ nemdead()
 {
     if (!Qstat(killed_nemesis)) {
         Qstat(killed_nemesis) = TRUE;
-        qt_pager(QT_KILLEDNEM);
+        qt_pager("killed_nemesis");
     }
 }
 
@@ -123,7 +122,7 @@ struct obj *obj;
         obj->dknown = 1;
         /* only give this message once */
         Qstat(touched_artifact) = TRUE;
-        qt_pager(QT_GOTIT);
+        qt_pager("gotit");
         exercise(A_WIS, TRUE);
     }
 }
@@ -221,16 +220,16 @@ struct obj *obj; /* quest artifact; possibly null if carrying Amulet */
     struct obj *otmp;
 
     if (u.uhave.amulet) { /* unlikely but not impossible */
-        qt_pager(QT_HASAMULET);
+        qt_pager("hasamulet");
         /* leader IDs the real amulet but ignores any fakes */
         if ((otmp = carrying(AMULET_OF_YENDOR)) != 0)
             fully_identify_obj(otmp);
     } else {
-        qt_pager(!Qstat(got_thanks) ? QT_OFFEREDIT : QT_OFFEREDIT2);
+        qt_pager(!Qstat(got_thanks) ? "offeredit" : "offeredit2");
         /* should have obtained bell during quest;
            if not, suggest returning for it now */
         if ((otmp = carrying(BELL_OF_OPENING)) == 0)
-            com_pager(5);
+            com_pager("quest_complete_no_bell");
     }
     Qstat(got_thanks) = TRUE;
 
@@ -260,7 +259,7 @@ chat_with_leader()
 
         /* Rule 2: You've gone back before going for the amulet. */
         else
-            qt_pager(QT_POSTHANKS);
+            qt_pager("posthanks");
 
     /* Rule 3: You've got the artifact and are back to return it. */
     } else if (u.uhave.questart) {
@@ -274,16 +273,16 @@ chat_with_leader()
 
     /* Rule 4: You haven't got the artifact yet. */
     } else if (Qstat(got_quest)) {
-        qt_pager(rn1(10, QT_ENCOURAGE));
+        qt_pager("encourage");
 
     /* Rule 5: You aren't yet acceptable - or are you? */
     } else {
         if (!Qstat(met_leader)) {
-            qt_pager(QT_FIRSTLEADER);
+            qt_pager("leader_first");
             Qstat(met_leader) = TRUE;
             Qstat(not_ready) = 0;
         } else
-            qt_pager(QT_NEXTLEADER);
+            qt_pager("leader_next");
 
         /* the quest leader might have passed through the portal into
            the regular dungeon; none of the remaining make sense there */
@@ -291,16 +290,16 @@ chat_with_leader()
             return;
 
         if (not_capable()) {
-            qt_pager(QT_BADLEVEL);
+            qt_pager("badlevel");
             exercise(A_WIS, TRUE);
             expulsion(FALSE);
         } else if (is_pure(TRUE) < 0) {
-            com_pager(QT_BANISHED);
+            com_pager("banished");
             expulsion(TRUE);
         } else if (is_pure(TRUE) == 0) {
-            qt_pager(QT_BADALIGN);
+            qt_pager("badalign");
             if (Qstat(not_ready) == MAX_QUEST_TRIES) {
-                qt_pager(QT_LASTLEADER);
+                qt_pager("leader_last");
                 expulsion(TRUE);
             } else {
                 Qstat(not_ready)++;
@@ -308,7 +307,7 @@ chat_with_leader()
                 expulsion(FALSE);
             }
         } else { /* You are worthy! */
-            qt_pager(QT_ASSIGNQUEST);
+            qt_pager("assignquest");
             exercise(A_WIS, TRUE);
             Qstat(got_quest) = TRUE;
         }
@@ -330,7 +329,7 @@ struct monst *mtmp;
         return;
 
     if (Qstat(pissed_off)) {
-        qt_pager(QT_LASTLEADER);
+        qt_pager("leader_last");
         expulsion(TRUE);
     } else
         chat_with_leader();
@@ -340,7 +339,7 @@ static void
 chat_with_nemesis()
 {
     /*  The nemesis will do most of the talking, but... */
-    qt_pager(rn1(10, QT_DISCOURAGE));
+    qt_pager("discourage");
     if (!Qstat(met_nemesis))
         Qstat(met_nemesis++);
 }
@@ -350,21 +349,21 @@ nemesis_speaks()
 {
     if (!Qstat(in_battle)) {
         if (u.uhave.questart)
-            qt_pager(QT_NEMWANTSIT);
+            qt_pager("nemesis_wantsit");
         else if (Qstat(made_goal) == 1 || !Qstat(met_nemesis))
-            qt_pager(QT_FIRSTNEMESIS);
+            qt_pager("nemesis_first");
         else if (Qstat(made_goal) < 4)
-            qt_pager(QT_NEXTNEMESIS);
+            qt_pager("nemesis_next");
         else if (Qstat(made_goal) < 7)
-            qt_pager(QT_OTHERNEMESIS);
+            qt_pager("nemesis_other");
         else if (!rn2(5))
-            qt_pager(rn1(10, QT_DISCOURAGE));
+            qt_pager("discourage");
         if (Qstat(made_goal) < 7)
             Qstat(made_goal)++;
         Qstat(met_nemesis) = TRUE;
     } else /* he will spit out random maledictions */
         if (!rn2(5))
-        qt_pager(rn1(10, QT_DISCOURAGE));
+        qt_pager("discourage");
 }
 
 static void
@@ -372,9 +371,9 @@ chat_with_guardian()
 {
     /*  These guys/gals really don't have much to say... */
     if (u.uhave.questart && Qstat(killed_nemesis))
-        qt_pager(rn1(5, QT_GUARDTALK2));
+        qt_pager("guardtalk_after");
     else
-        qt_pager(rn1(5, QT_GUARDTALK));
+        qt_pager("guardtalk_before");
 }
 
 static void

@@ -4,7 +4,11 @@
 
 #include "winMS.h"
 #include <commdlg.h>
+#if !defined(CROSSCOMPILE)
 #include "date.h"
+#else
+#include "config.h"
+#endif
 #include "patchlevel.h"
 #include "resource.h"
 #include "mhmsg.h"
@@ -1063,11 +1067,11 @@ About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         SetDlgItemText(hDlg, IDC_ABOUT_VERSION,
                        NH_A2W(buf, wbuf, sizeof(wbuf)));
 
+        Sprintf(buf, "%s\n%s\n%s\n%s",
+                COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B,
+                COPYRIGHT_BANNER_C, COPYRIGHT_BANNER_D);
         SetDlgItemText(hDlg, IDC_ABOUT_COPYRIGHT,
-                       NH_A2W(COPYRIGHT_BANNER_A "\n" COPYRIGHT_BANNER_B
-                                                 "\n" COPYRIGHT_BANNER_C
-                                                 "\n" COPYRIGHT_BANNER_D,
-                              wbuf, BUFSZ));
+                       NH_A2W(buf, wbuf, sizeof(wbuf)));
 
         /* center dialog in the main window */
         GetWindowRect(GetNHApp()->hMainWnd, &main_rt);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixmain.c	$NHDT-Date: 1562187898 2019/07/03 21:04:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	unixmain.c	$NHDT-Date: 1570408210 2019/10/07 00:30:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -114,11 +114,20 @@ char *argv[];
         if (argcheck(argc, argv, ARG_VERSION) == 2)
             exit(EXIT_SUCCESS);
 
+        if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
+#ifdef CHDIR
+            chdirx((char *) 0, 0);
+#endif
+            iflags.initoptions_noterminate = TRUE;
+            initoptions();
+            iflags.initoptions_noterminate = FALSE;
+            reveal_paths();
+            exit(EXIT_SUCCESS);
+        }
         if (argcheck(argc, argv, ARG_DEBUG) == 1) {
             argc--;
             argv++;
-	}
-
+        }
         if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
@@ -262,7 +271,7 @@ char *argv[];
      * First, try to find and restore a save file for specified character.
      * We'll return here if new game player_selection() renames the hero.
      */
-attempt_restore:
+ attempt_restore:
 
     /*
      * getlock() complains and quits if there is already a game
@@ -489,12 +498,13 @@ boolean wr;
 #ifdef VAR_PLAYGROUND
         int len = strlen(VAR_PLAYGROUND);
 
-        fqn_prefix[SCOREPREFIX] = (char *) alloc(len + 2);
-        Strcpy(fqn_prefix[SCOREPREFIX], VAR_PLAYGROUND);
-        if (fqn_prefix[SCOREPREFIX][len - 1] != '/') {
-            fqn_prefix[SCOREPREFIX][len] = '/';
-            fqn_prefix[SCOREPREFIX][len + 1] = '\0';
+        g.fqn_prefix[SCOREPREFIX] = (char *) alloc(len + 2);
+        Strcpy(g.fqn_prefix[SCOREPREFIX], VAR_PLAYGROUND);
+        if (g.fqn_prefix[SCOREPREFIX][len - 1] != '/') {
+            g.fqn_prefix[SCOREPREFIX][len] = '/';
+            g.fqn_prefix[SCOREPREFIX][len + 1] = '\0';
         }
+
 #endif
     }
 
@@ -514,11 +524,11 @@ boolean wr;
      */
     if (wr) {
 #ifdef VAR_PLAYGROUND
-        fqn_prefix[LEVELPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[SAVEPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[BONESPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[LOCKPREFIX] = fqn_prefix[SCOREPREFIX];
-        fqn_prefix[TROUBLEPREFIX] = fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[LEVELPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[SAVEPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[BONESPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[LOCKPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        g.fqn_prefix[TROUBLEPREFIX] = g.fqn_prefix[SCOREPREFIX];
 #endif
         check_recordfile(dir);
     }
@@ -531,8 +541,8 @@ whoami()
 {
     /*
      * Who am i? Algorithm: 1. Use name as specified in NETHACKOPTIONS
-     *			2. Use $USER or $LOGNAME	(if 1. fails)
-     *			3. Use getlogin()		(if 2. fails)
+     *                      2. Use $USER or $LOGNAME    (if 1. fails)
+     *                      3. Use getlogin()           (if 2. fails)
      * The resulting name is overridden by command line options.
      * If everything fails, or if the resulting name is some generic
      * account like "games", "play", "player", "hack" then eventually
@@ -651,20 +661,20 @@ boolean
 check_user_string(optstr)
 char *optstr;
 {
-    struct passwd *pw = get_unix_pw();
+    struct passwd *pw;
     int pwlen;
     char *eop, *w;
-    char *pwname;
+    char *pwname = 0;
 
     if (optstr[0] == '*')
         return TRUE; /* allow any user */
-    if (!pw)
-        return FALSE;
     if (sysopt.check_plname)
         pwname = g.plname;
-    else
+    else if ((pw = get_unix_pw()) != 0)
         pwname = pw->pw_name;
-    pwlen = strlen(pwname);
+    if (!pwname || !*pwname)
+        return FALSE;
+    pwlen = (int) strlen(pwname);
     eop = eos(optstr);
     w = optstr;
     while (w + pwlen <= eop) {
@@ -722,7 +732,6 @@ get_login_name()
     struct passwd *pw = get_unix_pw();
 
     buf[0] = '\0';
-
     if (pw)
         (void)strcpy(buf, pw->pw_name);
 
@@ -739,31 +748,33 @@ char *buf;
     /* This should be replaced when there is a Cocoa port. */
     const char *errfmt;
     size_t len;
-    FILE *PB = popen("/usr/bin/pbcopy","w");
-    if(!PB){
-	errfmt = "Unable to start pbcopy (%d)\n";
-	goto error;
+    FILE *PB = popen("/usr/bin/pbcopy", "w");
+
+    if (!PB) {
+        errfmt = "Unable to start pbcopy (%d)\n";
+        goto error;
     }
 
     len = strlen(buf);
     /* Remove the trailing \n, carefully. */
-    if(buf[len-1] == '\n') len--;
+    if (buf[len - 1] == '\n')
+        len--;
 
     /* XXX Sorry, I'm too lazy to write a loop for output this short. */
-    if(len!=fwrite(buf,1,len,PB)){
-	errfmt = "Error sending data to pbcopy (%d)\n";
-	goto error;
+    if (len != fwrite(buf, 1, len, PB)) {
+        errfmt = "Error sending data to pbcopy (%d)\n";
+        goto error;
     }
 
-    if(pclose(PB)!=-1){
-	return;
+    if (pclose(PB) != -1) {
+        return;
     }
     errfmt = "Error finishing pbcopy (%d)\n";
 
-error:
-    raw_printf(errfmt,strerror(errno));
+ error:
+    raw_printf(errfmt, strerror(errno));
 }
-#endif
+#endif /* __APPLE__ */
 
 unsigned long
 sys_random_seed()

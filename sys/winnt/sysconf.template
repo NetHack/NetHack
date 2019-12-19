@@ -1,0 +1,106 @@
+#
+# NetHack 3.7 sysconf $NHDT-Date: 1524689357 2018/04/25 20:49:17 $ $NHDT-Branch: NetHack-3.7.0 $:$NHDT-Revision: 1.22 $
+# Copyright (c) 2015 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
+#
+# Sample sysconf file.
+# The sysconf file is only used if NetHack is compiled with SYSCF defined.
+# This file uses the same syntax as nethack.cf.
+
+# Which users can use WIZARD (debugging) mode (the -D flag).
+# A value of * allows anyone to enter debugging mode.
+WIZARDS=*
+
+# Users allowed to use the ! (shell escape) command or to suspend the game.
+# Uses the same syntax as the WIZARDS option above.
+#SHELLERS=
+
+# Show debugging information originating from these source files.
+# Use '*' for all, or list source files separated by spaces.
+# Only available if game has been compiled with DEBUG.
+#DEBUGFILES=*
+
+# Save end of game dump log to this file.
+# Only available if NetHack was compiled with DUMPLOG
+# Allows following placeholders:
+#   %% literal '%'
+#   %v version (eg. "3.7.0-0")
+#   %u game UID
+#   %t game start time, UNIX timestamp format
+#   %T current time, UNIX timestamp format
+#   %d game start time, YYYYMMDDhhmmss format
+#   %D current time, YYYYMMDDhhmmss format
+#   %n player name
+#   %N first character of player name
+#DUMPLOGFILE=nethack-%n-%d.log
+
+# Number of bones file pools.
+# The pool you belong to is determined at game start. You will
+# load and save bones only from that pool. Generally useful
+# for public servers only.
+# Changing this might make existing bones inaccessible.
+# Disabled by setting to 0, or commenting out.
+#BONES_POOLS=10
+
+# Limit the number of simultaneous games (see also nethack.sh).
+#MAXPLAYERS=10
+
+# If not null, added to string "To get local support, " in the support
+# information help.
+#SUPPORT=call Izchak at extension 42.
+
+# Uncomment the next line to disable the SEDUCE option.
+#SEDUCE=0
+
+# Uncomment the next line to enable some accessibility features such
+# as S_hero_override and S_pet_override symbols for screen readers
+# in the user config file.
+#ACCESSIBILITY=1
+
+# Record (high score) file options.
+# CAUTION: changing these after people have started playing games can
+#  lead to lost high scores!
+# Maximum entries for one person.
+#PERSMAX=10
+# Maximum entries in the record file.
+#ENTRYMAX=100
+# Minimum points to get an entry.
+#POINTSMIN=1
+# Determine identity of "person" in the score file with name (0) or
+# numeric (1) user id.
+#PERS_IS_UID=1
+
+# Maximum number of score file entries to use for random statue names
+#MAX_STATUENAME_RANK=10
+
+# *** LOCATIONS ***
+# IMPORTANT: If you change any of these locations, the directories they
+# point at must exist.  NetHack will not create them for you.
+#
+# Before adjusting, you can verify the default locations for files with:
+#       nethack --showpaths
+#
+# The location that users can adjust their config file startup options
+#CONFIGDIR=%USERPROFILE%\NetHack
+#
+# The location that a record of game aborts and self-diagnosed game problems
+# is kept (default=HACKDIR, writeable)
+#TROUBLEDIR=%USERPROFILE%\NetHack\3.7
+#
+# The location that documentation and helps files are placed
+#HACKDIR=%USERPROFILE%\NetHack\3.7
+#
+# The location that level files in progress are stored (writeable)
+#LEVELDIR=%USERPROFILE%\AppData\Local\NetHack\3.7
+#
+# The location where saved games are kept (writeable)
+#SAVEDIR=%USERPROFILE%\AppData\Local\NetHack\3.7
+#
+# The location that bones files are kept (writeable)
+#BONESDIR=c:\ProgramData\NetHack\3.7
+#
+# The location that score files are kept (writeable)
+#SCOREDIR=c:\ProgramData\NetHack\3.7
+#
+# The location that file synchronization locks are stored (writeable)
+#LOCKDIR=c:\ProgramData\NetHack\3.7

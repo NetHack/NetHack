@@ -23,10 +23,15 @@ If you are using the traditional configuration system, see Install.unx.
 	cd $Top/sys/unix
 	sh setup.sh hints/NAME_OF_HINTS_FILE
 	cd ../..
+	make fetch-Lua
 	make all
 
    If the build fails, remove all the generated files before retrying the
    build with: cd $Top; make spotless
+
+   The 'make fetch-Lua' step really only needs to be done one time unless 
+   your sources get refreshed, or the lib folder and its contents get
+   removed.
 
 4. Install:
    Depending on your configuration, this step may or may not need to be done

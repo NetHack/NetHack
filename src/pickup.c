@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1562203851 2019/07/04 01:30:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.229 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1576282488 2019/12/14 00:14:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.237 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -392,7 +392,7 @@ struct obj *obj;
                  : g.shop_filter /* coins are never unpaid, but check anyway */
                     ? (obj->unpaid ? TRUE : FALSE)
                     : g.bucx_filter
-                       ? (index(g.valid_menu_classes, iflags.goldX ? 'X' : 'U')
+                       ? (index(g.valid_menu_classes, flags.goldX ? 'X' : 'U')
                           ? TRUE : FALSE)
                        : TRUE; /* catchall: no filters specified, so accept */
 
@@ -509,7 +509,7 @@ int what; /* should be a long */
         if (!can_reach_floor(TRUE)) {
             if ((g.multi && !g.context.run) || (autopickup && !flags.pickup)
                 || ((ttmp = t_at(u.ux, u.uy)) != 0
-                    && uteetering_at_seen_pit(ttmp)))
+                    && (uteetering_at_seen_pit(ttmp) || uescaped_shaft(ttmp))))
                 read_engr_at(u.ux, u.uy);
             return 0;
         }
@@ -1051,11 +1051,13 @@ int how;               /* type of query */
         if (curr) {
             *pick_list = (menu_item *) alloc(sizeof(menu_item));
             (*pick_list)->item.a_int = curr->oclass;
-            return 1;
+            n = 1;
         } else {
             debugpline0("query_category: no single object match");
+            n = 0;
         }
-        return 0;
+        /* early return is ok; there's no temp window yet */
+        return n;
     }
 
     win = create_nhwindow(NHW_MENU);
@@ -1108,7 +1110,8 @@ int how;               /* type of query */
         pack++;
         if (invlet >= 'u') {
             impossible("query_category: too many categories");
-            return 0;
+            n = 0;
+            goto query_done;
         }
     } while (*pack);
 
@@ -1168,6 +1171,7 @@ int how;               /* type of query */
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
+ query_done:
     destroy_nhwindow(win);
     if (n < 0)
         n = 0; /* caller's don't expect -1 */
@@ -1190,7 +1194,8 @@ int qflags;
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
             if (curr->oclass == *pack) {
                 if ((qflags & WORN_TYPES)
-                    && !(curr->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON)))
+                    && !(curr->owornmask & (W_ARMOR | W_ACCESSORY
+                                            | W_WEAPONS)))
                     continue;
                 if (!counted_category) {
                     ccount++;
@@ -1407,7 +1412,14 @@ boolean telekinesis;
                /* [exception for gold coins will have to change
                    if silver/copper ones ever get implemented] */
                && inv_cnt(FALSE) >= 52 && !merge_choice(g.invent, obj)) {
-        Your("knapsack cannot accommodate any more items.");
+        /* if there is some gold here (and we haven't already skipped it),
+           we aren't limited by the 52 item limit for it, but caller and
+           "grandcaller" aren't prepared to skip stuff and then pickup
+           just gold, so the best we can do here is vary the message */
+        Your("knapsack cannot accommodate any more items%s.",
+             /* floor follows by nexthere, otherwise container so by nobj */
+             nxtobj(obj, GOLD_PIECE, (boolean) (obj->where == OBJ_FLOOR))
+                 ? " (except gold)" : "");
         result = -1; /* nothing lifted */
     } else {
         result = 1;

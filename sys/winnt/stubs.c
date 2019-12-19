@@ -82,11 +82,11 @@ int mode;
     return;
 }
 
-void
+int
 xputc(ch)
-char ch;
+int ch;
 {
-    return;
+    return 0;
 }
 
 void
@@ -112,12 +112,6 @@ void
 backsp()
 {
     return;
-}
-
-int
-has_color(int color)
-{
-    return 1;
 }
 
 #ifndef NO_MOUSE_ALLOWED

@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1561233801 2019/06/22 20:03:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.203 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1574900825 2019/11/28 00:27:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1372,9 +1372,9 @@ const char *mesg;
 
         if (tintxts[r].greasy) {
             /* Assume !Glib, because you can't open tins when Glib. */
-            incr_itimeout(&Glib, rnd(15));
+            make_glib(rn1(11, 5)); /* 5..15 */
             pline("Eating %s food made your %s very slippery.",
-                  tintxts[r].txt, makeplural(body_part(FINGER)));
+                  tintxts[r].txt, fingers_or_gloves(TRUE));
         }
 
     } else { /* spinach... */
@@ -1499,8 +1499,7 @@ struct obj *otmp;
  no_opener:
         pline("It is not so easy to open this tin.");
         if (Glib) {
-            pline_The("tin slips from your %s.",
-                      makeplural(body_part(FINGER)));
+            pline_The("tin slips from your %s.", fingers_or_gloves(FALSE));
             if (otmp->quan > 1L) {
                 otmp = splitobj(otmp, 1L);
             }
@@ -2102,7 +2101,7 @@ eatspecial()
         return;
     }
     if (objects[otmp->otyp].oc_material == PAPER) {
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
         if (otmp->otyp == SCR_MAIL)
             /* no nutrition */
             pline("This junk mail is less than satisfying.");
@@ -2548,7 +2547,7 @@ doeat()
         /* oc_nutrition is usually weight anyway */
         else
             basenutrit = objects[otmp->otyp].oc_nutrition;
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
         if (otmp->otyp == SCR_MAIL) {
             basenutrit = 0;
             nodelicious = TRUE;
@@ -2870,23 +2869,20 @@ int num;
         /* Have lesshungry() report when you're nearly full so all eating
          * warns when you're about to choke.
          */
-        if (u.uhunger >= 1500) {
-            if (!g.context.victual.eating
-                || (g.context.victual.eating && !g.context.victual.fullwarn)) {
-                pline("You're having a hard time getting all of it down.");
-                g.nomovemsg = "You're finally finished.";
-                if (!g.context.victual.eating) {
-                    g.multi = -2;
-                } else {
-                    g.context.victual.fullwarn = TRUE;
-                    if (g.context.victual.canchoke
-                        && g.context.victual.reqtime > 1) {
-                        /* a one-gulp food will not survive a stop */
-                        if (yn_function("Continue eating?", ynchars, 'n')
-                            != 'y') {
-                            reset_eat();
-                            g.nomovemsg = (char *) 0;
-                        }
+        if (u.uhunger >= 1500
+            && (!g.context.victual.eating
+                || (g.context.victual.eating && !g.context.victual.fullwarn))) {
+            pline("You're having a hard time getting all of it down.");
+            g.nomovemsg = "You're finally finished.";
+            if (!g.context.victual.eating) {
+                g.multi = -2;
+            } else {
+                g.context.victual.fullwarn = TRUE;
+                if (g.context.victual.canchoke && g.context.victual.reqtime > 1) {
+                    /* a one-gulp food will not survive a stop */
+                    if (!paranoid_query(ParanoidEating, "Continue eating?")) {
+                        reset_eat();
+                        g.nomovemsg = (char *) 0;
                     }
                 }
             }
