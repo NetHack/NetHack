@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1559601008 2019/06/03 22:30:08 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.123 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1575245033 2019/12/02 00:03:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -554,7 +554,7 @@ typedef unsigned char uchar;
 #define DUMPLOG_FILE        "/tmp/nethack.%n.%d.log"
 /* DUMPLOG_FILE allows following placeholders:
    %% literal '%'
-   %v version (eg. "3.6.2-0")
+   %v version (eg. "3.6.3-0")
    %u game UID
    %t game start time, UNIX timestamp format
    %T current time, UNIX timestamp format

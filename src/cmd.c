@@ -1,10 +1,9 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1565574994 2019/08/12 01:56:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.343 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1576201761 2019/12/13 01:49:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.383 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 #include "func_tab.h"
 
 /* Macros for meta and ctrl modifiers:
@@ -148,6 +147,7 @@ static int NDECL(wiz_where);
 static int NDECL(wiz_detect);
 static int NDECL(wiz_panic);
 static int NDECL(wiz_polyself);
+static int NDECL(wiz_load_lua);
 static int NDECL(wiz_level_tele);
 static int NDECL(wiz_level_change);
 static int NDECL(wiz_show_seenv);
@@ -785,16 +785,14 @@ wiz_identify(VOID_ARGS)
     return 0;
 }
 
-/* #wizmakemap - discard current dungeon level and replace with a new one */
-static int
-wiz_makemap(VOID_ARGS)
+void
+makemap_prepost(pre, wiztower)
+boolean pre, wiztower;
 {
     NHFILE tmpnhfp;
+    struct monst *mtmp;
 
-    if (wizard) {
-        struct monst *mtmp;
-        boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
-
+    if (pre) {
         rm_mapseen(ledger_no(&u.uz));
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (mtmp->isgd) { /* vault is going away; get rid of guard */
@@ -840,19 +838,16 @@ wiz_makemap(VOID_ARGS)
         zero_nhfile(&tmpnhfp);  /* also sets fd to -1 as desired */
         tmpnhfp.mode = FREEING;
         savelev(&tmpnhfp, ledger_no(&u.uz));
-        /* create a new level; various things like bestowing a guardian
-           angel on Astral or setting off alarm on Ft.Ludios are handled
-           by goto_level(do.c) so won't occur for replacement levels */
-        mklev();
-
+    } else {
         vision_reset();
         g.vision_full_recalc = 1;
         cls();
         /* was using safe_teleds() but that doesn't honor arrival region
            on levels which have such; we don't force stairs, just area */
         u_on_rndspot((u.uhave.amulet ? 1 : 0) /* 'going up' flag */
-                     | (was_in_W_tower ? 2 : 0));
+                     | (wiztower ? 2 : 0));
         losedogs();
+        kill_genocided_monsters();
         /* u_on_rndspot() might pick a spot that has a monster, or losedogs()
            might pick the hero's spot (only if there isn't already a monster
            there), so we might have to move hero or the co-located monster */
@@ -870,6 +865,21 @@ wiz_makemap(VOID_ARGS)
 #ifdef INSURANCE
         save_currentstate();
 #endif
+    }
+}
+
+/* #wizmakemap - discard current dungeon level and replace with a new one */
+static int
+wiz_makemap(VOID_ARGS)
+{
+    if (wizard) {
+        boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
+        makemap_prepost(TRUE, was_in_W_tower);
+        /* create a new level; various things like bestowing a guardian
+           angel on Astral or setting off alarm on Ft.Ludios are handled
+           by goto_level(do.c) so won't occur for replacement levels */
+        mklev();
+        makemap_prepost(FALSE, was_in_W_tower);
     } else {
         pline(unavailcmd, "#wizmakemap");
     }
@@ -927,6 +937,73 @@ wiz_detect(VOID_ARGS)
         (void) findit();
     else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_detect)));
+    return 0;
+}
+
+static int
+wiz_load_lua(VOID_ARGS)
+{
+    if (wizard) {
+        char buf[BUFSZ];
+
+        buf[0] = '\0';
+        getlin("Load which lua file?", buf);
+        if (buf[0] == '\033' || buf[0] == '\0')
+            return 0;
+        if (!strchr(buf, '.'))
+            strcat(buf, ".lua");
+        (void) load_lua(buf);
+    } else
+        pline("Unavailable command 'wiz_load_lua'.");
+    return 0;
+}
+
+static int
+wiz_load_splua(VOID_ARGS)
+{
+    if (wizard) {
+        boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
+        char buf[BUFSZ];
+        int ridx;
+
+        buf[0] = '\0';
+        getlin("Load which des lua file?", buf);
+        if (buf[0] == '\033' || buf[0] == '\0')
+            return 0;
+        if (!strchr(buf, '.'))
+            strcat(buf, ".lua");
+        makemap_prepost(TRUE, was_in_W_tower);
+
+        /* TODO: need to split some of this out of mklev(), makelevel(), makemaz() */
+        g.in_mklev = TRUE;
+        oinit(); /* assign level dependent obj probabilities */
+        clear_level_structures();
+
+        (void) load_special(buf);
+
+        bound_digging();
+        mineralize(-1, -1, -1, -1, FALSE);
+        g.in_mklev = FALSE;
+        if (g.level.flags.has_morgue)
+            g.level.flags.graveyard = 1;
+        if (!g.level.flags.is_maze_lev) {
+            struct mkroom *croom;
+            for (croom = &g.rooms[0]; croom != &g.rooms[g.nroom]; croom++)
+#ifdef SPECIALIZATION
+                topologize(croom, FALSE);
+#else
+            topologize(croom);
+#endif
+        }
+        set_wall_state();
+        /* for many room types, g.rooms[].rtype is zeroed once the room has been
+           entered; g.rooms[].orig_rtype always retains original rtype value */
+        for (ridx = 0; ridx < SIZE(g.rooms); ridx++)
+            g.rooms[ridx].orig_rtype = g.rooms[ridx].rtype;
+
+        makemap_prepost(FALSE, was_in_W_tower);
+    } else
+        pline("Unavailable command 'wiz_load_splua'.");
     return 0;
 }
 
@@ -1273,7 +1350,7 @@ wiz_map_levltyp(VOID_ARGS)
 
 /* temporary? hack, since level type codes aren't the same as screen
    symbols and only the latter have easily accessible descriptions */
-static const char *levltyp[] = {
+const char *levltyp[] = {
     "stone", "vertical wall", "horizontal wall", "top-left corner wall",
     "top-right corner wall", "bottom-left corner wall",
     "bottom-right corner wall", "cross wall", "tee-up wall", "tee-down wall",
@@ -1288,6 +1365,15 @@ static const char *levltyp[] = {
     /* padding in case the number of entries above is odd */
     ""
 };
+
+const char *
+levltyp_to_name(typ)
+int typ;
+{
+    if (typ >= 0 && typ < MAX_TYPE)
+        return levltyp[typ];
+    return NULL;
+}
 
 /* explanation of base-36 output from wiz_map_levltyp() */
 static void
@@ -1476,15 +1562,21 @@ wiz_intrinsic(VOID_ARGS)
                                          = &mons[g.context.warntype.speciesidx];
                 }
                 goto def_feedback;
+            case GLIB:
+                /* slippery fingers applies to gloves if worn at the time
+                   so persistent inventory might need updating */
+                make_glib((int) newtimeout);
+                goto def_feedback;
             case LEVITATION:
             case FLYING:
                 float_vs_flight();
                 /*FALLTHRU*/
             default:
-            def_feedback:
+ def_feedback:
                 pline("Timeout for %s %s %d.", propertynames[i].prop_name,
                       oldtimeout ? "increased by" : "set to", amt);
-                incr_itimeout(&u.uprops[p].intrinsic, amt);
+                if (p != GLIB)
+                    incr_itimeout(&u.uprops[p].intrinsic, amt);
                 break;
             }
             g.context.botl = 1; /* probably not necessary... */
@@ -1933,7 +2025,7 @@ int final;
         enlght_out(buf);
     }
 
-    /* 3.6.2: dungeon level, so that ^X really has all status info as
+    /* As of 3.6.2: dungeon level, so that ^X really has all status info as
        claimed by the comment below; this reveals more information than
        the basic status display, but that's one of the purposes of ^X;
        similar information is revealed by #overview; the "You died in
@@ -2466,7 +2558,9 @@ int final;
         }
     }
     if (Glib) {
-        Sprintf(buf, "slippery %s", makeplural(body_part(FINGER)));
+        Sprintf(buf, "slippery %s", fingers_or_gloves(TRUE));
+        if (wizard)
+            Sprintf(eos(buf), " (%ld)", (Glib & TIMEOUT));
         you_have(buf, "");
     }
     if (Fumbling) {
@@ -3520,6 +3614,10 @@ struct ext_func_tab extcmdlist[] = {
             wiz_intrinsic, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { C('v'), "wizlevelport", "teleport to another level",
             wiz_level_tele, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+    { '\0', "wizloaddes", "load and execute a des-file lua script",
+            wiz_load_splua, IFBURIED | WIZMODECMD },
+    { '\0', "wizloadlua", "load and execute a lua script",
+            wiz_load_lua, IFBURIED | WIZMODECMD },
     { '\0', "wizmakemap", "recreate the current level",
             wiz_makemap, IFBURIED | WIZMODECMD },
     { C('f'), "wizmap", "map the level",
@@ -5043,7 +5141,7 @@ const char *s;
     char dirsym;
     int is_mov;
 
-retry:
+ retry:
     if (g.in_doagain || *readchar_queue)
         dirsym = readchar();
     else
@@ -6038,19 +6136,27 @@ const char *prompt;
        to give the go-ahead for this query; default is "no" unless the
        ParanoidConfirm flag is set in which case there's no default */
     if (be_paranoid) {
-        char qbuf[QBUFSZ], ans[BUFSZ] = DUMMY;
-        const char *promptprefix = "", *responsetype = ParanoidConfirm
-                                                           ? "(yes|no)"
-                                                           : "(yes) [no]";
-        int trylimit = 6; /* 1 normal, 5 more with "Yes or No:" prefix */
+        char pbuf[BUFSZ], qbuf[QBUFSZ], ans[BUFSZ];
+        const char *promptprefix = "",
+                *responsetype = ParanoidConfirm ? "(yes|no)" : "(yes) [no]";
+        int k, trylimit = 6; /* 1 normal, 5 more with "Yes or No:" prefix */
 
+        copynchars(pbuf, prompt, BUFSZ - 1);
         /* in addition to being paranoid about this particular
            query, we might be even more paranoid about all paranoia
            responses (ie, ParanoidConfirm is set) in which case we
            require "no" to reject in addition to "yes" to confirm
            (except we won't loop if response is ESC; it means no) */
         do {
-            Sprintf(qbuf, "%s%s %s", promptprefix, prompt, responsetype);
+            /* make sure we won't overflow a QBUFSZ sized buffer */
+            k = (int) (strlen(promptprefix) + 1 + strlen(responsetype));
+            if ((int) strlen(pbuf) + k > QBUFSZ - 1) {
+                /* chop off some at the end */
+                Strcpy(pbuf + (QBUFSZ - 1) - k - 4, "...?"); /* -4: "...?" */
+            }
+
+            Sprintf(qbuf, "%s%s %s", promptprefix, pbuf, responsetype);
+            *ans = '\0';
             getlin(qbuf, ans);
             (void) mungspaces(ans);
             confirmed_ok = !strcmpi(ans, "yes");

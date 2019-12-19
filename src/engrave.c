@@ -1,12 +1,9 @@
-/* NetHack 3.6	engrave.c	$NHDT-Date: 1456304550 2016/02/24 09:02:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	engrave.c	$NHDT-Date: 1570318925 2019/10/05 23:42:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
-#include "sfproto.h"
-
 
 static NEARDATA struct engr *head_engr;
 static const char *NDECL(blengr);
@@ -156,7 +153,8 @@ boolean check_pit;
     if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
         return FALSE;
     if (check_pit && !Flying
-        && (t = t_at(u.ux, u.uy)) != 0 && uteetering_at_seen_pit(t))
+        && (t = t_at(u.ux, u.uy)) != 0
+        && (uteetering_at_seen_pit(t) || uescaped_shaft(t)))
         return FALSE;
 
     return (boolean) ((!Levitation || Is_airlevel(&u.uz)
@@ -289,7 +287,8 @@ int cnt;
 
 void
 wipe_engr_at(x, y, cnt, magical)
-xchar x, y, cnt, magical;
+xchar x, y, cnt;
+boolean magical;
 {
     register struct engr *ep = engr_at(x, y);
 
@@ -316,7 +315,6 @@ int x, y;
 {
     register struct engr *ep = engr_at(x, y);
     int sensed = 0;
-    char buf[BUFSZ];
 
     /* Sensing an engraving does not require sight,
      * nor does it necessarily imply comprehension (literacy).
@@ -365,17 +363,22 @@ int x, y;
             impossible("%s is written in a very strange way.", Something);
             sensed = 1;
         }
+
         if (sensed) {
-            char *et;
-            unsigned maxelen = BUFSZ - sizeof("You feel the words: \"\". ");
-            if (strlen(ep->engr_txt) > maxelen) {
-                (void) strncpy(buf, ep->engr_txt, (int) maxelen);
+            char *et, buf[BUFSZ];
+            int maxelen = (int) (sizeof buf
+                                 /* sizeof "literal" counts terminating \0 */
+                                 - sizeof "You feel the words: \"\".");
+
+            if ((int) strlen(ep->engr_txt) > maxelen) {
+                (void) strncpy(buf, ep->engr_txt, maxelen);
                 buf[maxelen] = '\0';
                 et = buf;
-            } else
+            } else {
                 et = ep->engr_txt;
+            }
             You("%s: \"%s\".", (Blind) ? "feel the words" : "read", et);
-            if (g.context.run > 1)
+            if (g.context.run > 0)
                 nomul(0);
         }
     }
@@ -752,7 +755,7 @@ doengrave()
                 }
                 Strcpy(post_engr_text,
                        (Blind && !Deaf)
-                          ? "You hear drilling!"
+                          ? "You hear drilling!"    /* Deaf-aware */
                           : Blind
                              ? "You feel tremors."
                              : IS_GRAVE(levl[u.ux][u.uy].typ)
@@ -789,7 +792,7 @@ doengrave()
                     doblind = TRUE;
                 } else
                     Strcpy(post_engr_text, !Deaf
-                                ? "You hear crackling!"
+                                ? "You hear crackling!"     /* Deaf-aware */
                                 : "Your hair stands up!");
                 break;
 
@@ -1188,11 +1191,6 @@ NHFILE *nhfp;
                 bwrite(nhfp->fd, (genericptr_t)&(ep->engr_lth), sizeof(ep->engr_lth));
                 bwrite(nhfp->fd, (genericptr_t)ep, sizeof(struct engr) + ep->engr_lth);
             }
-            if (nhfp->fieldlevel) {
-                sfo_unsigned(nhfp, &(ep->engr_lth), "engravings", "engr_lth", 1);
-                sfo_engr(nhfp, ep, "engravings", "engr", 1);
-                sfo_str(nhfp, ep->engr_txt, "engravings", "engr_txt", ep->engr_lth);
-            }
         }
         if (release_data(nhfp))
             dealloc_engr(ep);
@@ -1200,8 +1198,6 @@ NHFILE *nhfp;
     if (perform_bwrite(nhfp)) {
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t)&no_more_engr, sizeof no_more_engr);
-        if (nhfp->fieldlevel)
-           sfo_unsigned(nhfp, &no_more_engr, "engravings", "engr_lth", 1);
     }
     if (release_data(nhfp))
         head_engr = 0;
@@ -1212,25 +1208,18 @@ rest_engravings(nhfp)
 NHFILE *nhfp;
 {
     struct engr *ep;
-    unsigned lth;
+    unsigned lth = 0;
 
     head_engr = 0;
     while (1) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &lth, sizeof(unsigned));
-        if (nhfp->fieldlevel)
-            sfi_unsigned(nhfp, &lth, "engravings", "engr_lth", 1);
 
         if (lth == 0)
             return;
         ep = newengr(lth);
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) ep, sizeof(struct engr) + lth);
-        }
-        if (nhfp->fieldlevel) {
-            sfi_engr(nhfp, ep, "engravings", "engr", 1);
-            ep->engr_txt = (char *) (ep + 1);
-            sfi_str(nhfp, ep->engr_txt, "engravings", "engr_txt", lth);
         }
         ep->nxt_engr = head_engr;
         head_engr = ep;

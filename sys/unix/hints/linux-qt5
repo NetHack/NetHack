@@ -33,8 +33,8 @@ CFLAGS+=`pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags` -fPIC
 LINK=g++
 CXX=g++ -std=gnu++11
 
-WINSRC = $(WINQT4SRC)
-WINOBJ = $(WINQT4OBJ)
+WINSRC = $(WINQTSRC)
+WINOBJ = $(WINQTOBJ)
 WINLIB = $(WINQT5LIB)
 #MOC = moc
 MOC = moc-qt5

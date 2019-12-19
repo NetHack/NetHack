@@ -20,7 +20,8 @@ VARDIR = $(HACKDIR)
 
 POSTINSTALL=cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 
-CFLAGS=-g -O -I../include -DNOTPARMDECL -DDLB
+CFLAGS=-g -O -I../include -DNOTPARMDECL
+CFLAGS+=-DDLB
 CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 CFLAGS+=-DTIMED_DELAY
@@ -33,7 +34,6 @@ CFLAGS+=-DCURSES_GRAPHICS
 #CFLAGS+=-DSCORE_ON_BOTL
 #CFLAGS+=-DMSGHANDLER
 #CFLAGS+=-DTTY_TILES_ESCCODES
-#CFLAGS+=-DDLB
 
 LINK=$(CC)
 # Only needed for GLIBC stack trace:
@@ -47,7 +47,7 @@ WINLIB = $(WINTTYLIB) $(WINCURSESLIB)
 #WINSRC += tile.c
 #WINOBJ += tile.o
 
-WINTTYLIB=-lcurses
+WINTTYLIB=-lncurses -ltinfo
 
 CHOWN=true
 CHGRP=true

@@ -14,6 +14,7 @@ struct window_procs {
                            * '+' are reserved for processors. */
     unsigned long wincap; /* window port capability options supported */
     unsigned long wincap2; /* additional window port capability options */
+    boolean has_color[CLR_MAX];
     void FDECL((*win_init_nhwindows), (int *, char **));
     void NDECL((*win_player_selection));
     void NDECL((*win_askname));
@@ -450,6 +451,7 @@ extern void FDECL(safe_status_enablefield,
 extern void FDECL(safe_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 extern boolean NDECL(safe_can_suspend);
 extern void FDECL(stdio_raw_print, (const char *));
+extern void FDECL(stdio_nonl_raw_print, (const char *));
 extern void FDECL(stdio_raw_print_bold, (const char *));
 extern void NDECL(stdio_wait_synch);
 extern int NDECL(stdio_nhgetch);

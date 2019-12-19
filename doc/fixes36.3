@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.116 $ $NHDT-Date: 1569276988 2019/09/23 22:16:28 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.197 $ $NHDT-Date: 1575173931 2019/12/01 04:18:51 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,
@@ -115,7 +115,11 @@ for multi-shot shooting by monsters, a typo checked hero's weapon for
 when a boulder was teleported, if it landed in a pit or trap door or hole its
 	former location wasn't updated to show that it wasn't there anymore
 	(noticed in Sokoban but not limited to there)
-Terry Pratchett tribute, fix typo in passage #4 for Mort ("the" -> "they")
+Terry Pratchett tribute, fix typo in passage #4 for Mort ("the" -> "they");
+	also passage #7 for Soul Music ("genious" -> "genius");
+	and passage #11 for The Light Fantastic ("to" -> "do");
+	passage #3 for Eric ("short" -> "sort");
+	passage #10 for Witches Abroad ("was" -> "what")
 fix typo in end_of_input() present since 3.6.0 that would prevent compilation
 	for NOSAVEONHANGUP+INSURANCE configuration
 when a status condition becomes fatal, keep it listed as an active condition
@@ -152,11 +156,91 @@ zapping self with wand of opening or spell of knock to escape from a pit trap
 wielded aklys that returned to hero when thrown while inside an engulfer left
 	a stale 'thrownobj' pointer that triggered "add_to_minv: obj not free"
 	panic if same weapon killed any engulfer via melee from inside
-uarmh null pointer dereference if a helm of opposite alignment came off due 
+uarmh null pointer dereference if a helm of opposite alignment came off due
 	to being polymorphed
-verb tense was inappropriate in some messages when a mon/pet had a name 
+verb tense was inappropriate in some messages when a mon/pet had a name
 	ending in 's'
 orctown booty items should have been initialized in mksobj()
+query_category() and whatdoes_help() had early returns which could each leave
+	a temporary window around, which in turn might eventually lead to a
+	panic due to lack of window slots [probably moot for unmodified 3.6.x;
+	the query one couldn't happen unless there is a coding error for
+	object classes somewhere and the help one couldn't happen unless the
+	installed data files left 'keyhelp' missing]
+ball and chain could end up too far from punished hero (triggering b&c warning
+	for wizard mode with sanity checking active) when crawling out of
+	water failed because dropping stuff left hero overly encumbered and
+	hero was life saved--or player declined to die--if the hero got
+	teleported one step further from ball and chain's current location
+avoid 'object lost' panic when polymorph causes loss of levitation boots or
+	water walking boots which dumps hero into water where emergency
+	disrobing/dropping in order to crawl out chooses to drop those boots
+'sortloot's attempt to group musical instruments separately from other tools
+	didn't work as intended due to missing 'break' in sortloot_classify()
+<shift><letter> running told player about engravings as they were being moved
+	over but buffered output didn't show it until hero stopped, so it
+	wasn't possible to tell where they were, unlike all other forms of
+	multiple movement; so stop running if/when an engraving is reached
+fix exploding land mine moving ball or chain and causing a sanity error
+fix firing attached iron ball when swallowed causing a sanity error
+fix vault guard impossible when he could not relocate in certain situation
+fix temple priests or shopkeepers moving over other monsters
+fix hero still hiding under a statue shattered by a land mine
+fix helping a monster out of a pit addressing a deleted trap
+fix launched rolling boulder code accessing deleted trap
+fix monster stepping on a land mine code accessing deleted trap
+revise 'O' to show symbol sets in the same order they appear in the symbols
+	file and order the sets in dat/symbols to yield a sensible symset menu
+yellow dragons had green breath
+partly eaten food in a bones level shop would show a non-zero sale price
+	while on the floor but not be placed on shop bill if picked up;
+	sale price should have been "no charge"
+when non-empty container is dropped in shop and hero is asked whether to sell,
+	counting the subset of contents owned by hero vs those owned by shk
+	could obtain wrong answer because the container had been placed on
+	the floor but the 'unpaid' and 'no_charge' flags of its contents
+	hadn't been updated yet, they were still set for when it was carried
+in a shop which doesn't care about tools:  You drop a <box> containing 1 item.
+	<Shk> offers you <gold> for your items in your <box>.  Sell them?
+	[plural 'items' and 'them' were including the box along with the one
+	item in it even though shk was only offering to buy its contents]
+grammar correction for "That walking shoes is really a small mimic" when
+	applying a stethoscope
+mimic immitating a slime mold would change fruit type when player assigned new
+	named fruit
+parsing for the argument to 'scores' option was sloppy; "3a/o" (slash) and
+	"3a 1o" (space and digit one, not lowercase L) both worked but "3a o"
+	(just space) was supposed to but didn't
+wizmakemap could leave genocided monsters on map
+when entering Astral level, initial rendering of guardian angel didn't show
+	it as tame; noticeable if the level was entered with 'hilite_pet' On
+fix a leashed pet polymorphed into a long worm staying leashed
+prevent leashing unsolid monsters and monsters with no extremities
+playing musical instruments gave feedback which ignored deafness
+some other deafness-related message corrections
+when dipping into holy/unholy water while blind (where the glow message is
+	suppressed), clear dipped item's bknown flag unless water potion's
+	bless/curse state is known
+playing music while hallucinating:  message misspelled "butterflies"
+putting on gloves while having slippery fingers transfered slipperiness to
+	those gloves; taking off slippery gloves directly was disallowed but
+	losing them in other ways transfered slipperiness to bare fingers
+when a monster reads a scroll of fire to cure sliming, don't access that
+	scroll's memory after it has been used up (bcsign)
+monster vs monster attacks didn't handle shades or silver weapon feedback
+successful alchemy would show new potion's description (color) even when blind
+dipping some types of objects into oil would yield "<object> gleams with an
+	oily sheen" even when blind
+dipping into an undiscovered potion would offer chance to give a name to the
+	potion even when its description wasn't known (picked up while blind)
+dipping lichen corpse into acid when not blind and acid was undicovered would
+	not offer a chance to give a name to the potion after lichen feedback
+pluralization improvement for words ending in a k-sound like "biotech"
+check for whether a monster was entering a region (gas cloud) erroneously
+	depended upon whether or not the hero was inside the same region
+all Is_*_level tests during early startup would test as true until
+	dungeon_topology was initialized in a new game or restored from 
+	a save file
 
 
 Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
@@ -164,7 +248,7 @@ Fixes to Post-3.6.2 Problems that Were Exposed Via git Repository
 elemental_clog() loop needed to guard against obliteration of the monster
 	that was trying to be placed
 using ^G to create "hidden mimic" shouldn't have marked it as undetected since
-	mimics 'hide' be appearing to be something else; honor "hidden" for
+	mimics 'hide' by appearing to be something else; honor "hidden" for
 	'hides_under' creatures if/when created at location with object(s),
 	also for eels and other fish if/when created at water location
 for wizard mode 'wizweight' option, glob weight wasn't shown unless glob had
@@ -177,6 +261,17 @@ monster throwing from stack of missiles (darts, daggers, spears) would cause
 	crash if it wasn't wielding a weapon (bug in multi-shot shooting fix)
 surviving death while polymorphed would yield "You are a <foo>" without
 	terminating period
+'mksobj failure' commit resulted in wrong corpse types for dying monsters
+a recent intended sanity check fix inadvertently bypassed placing a thrown
+	chained ball back onto the floor
+in symset:curses, symbol S_tree was accidentally set to horizontal line where
+	plus-or-minus sign was meant; also, change S_bars to not-equals sign
+percentage highlighting for Xp broke up/down/changed highlighting for it;
+	it was flagged as having gone up every time the percentage changed
+deaf change to zap_over_floor needed to be restricted to player actions only
+monster vs shade attack inflicted damage despite "passes harmlessly through"
+fix for feedback from musical instruments played while deaf ignored whistles
+special map display symbol S_player_override renamed to S_hero_override
 curses: sometimes the message window would show a blank line after a prompt
 curses: the change to show map in columns 1..79 instead of 2..80 made the
 	highlight for '@' show up in the wrong place if clipped map had been
@@ -191,6 +286,50 @@ tty: revert the attempt to fix "message line anomaly: if autodecribe feedback
 	prompts that spanned more than one line, a more significant issue
 
 
+Fixes post-beta1
+------------------------------------------------------------------
+fix several tribute typos
+pluralization correction for unlikely epoch and loch
+ensure that --showpaths displays the personal configuration file last
+don't strip leading slash from hallucinatory monster name "/b/tard"
+quaffing unknown potion of see invisible resulted in asking what to call the
+	potion while updated monster display was buffered so not yet shown,
+	hence potentially noticeable effect was concealed from player
+when Riders use their bargethrough capability, don't let them swap places with
+	something located at a spot where corpses can't be created (their
+	door opening ability was letting them exchange places with something
+	co-located with a closed door without opening it; if killed there,
+	there'd be no corpse so no auto-revive)
+putting on levitation boots while on sink would crash when attempting to set
+	the enchantment known flag on Null 'uarmf' pointer
+look-at of mimics mimicking altars got an arbitary alignment from misuse of
+	underlying terrain
+polymorph_sink creating an altar passed a call to rn2() as an argument to a
+	macro which evaluates its parameter more than once
+if a monster (presumably sensed but not seen) was displayed at a location
+	showing "remembered, unseen monster", remove that since hero now knows
+	something else is there (3.6.1 had similar fix for warned-of monsters)
+clairvoyance showed all monsters in range, then after player viewed the map,
+	replaced them with "remembered, unseen monster" glyph and finally
+	did a normal monster refresh; the 'I' glyph step clobbers remembered
+	object at same spot, so skip it for locations where monster refresh
+	is going to immediately redisplay a monster
+take holes that you avoided into consideration when you're on the brink
+update window port spec to include a color-availability table that the window
+	port can set; merge all has_color() implementations into one central
+	function in src/windows.c which uses a few data checks only and
+	elminates multiple string function calls for each map cell update
+	that were being done in some cases previously
+taking off a fedora or dented pot (no-delay helmets) left the helmet stuck
+	and took off hero's suit
+unix: fix double DLB definition in linux hints file
+windows: fix --showpaths output for the data file which relies on being
+	constructed programmatically to incorporate the version suffix
+windows+tty: add code to make keypad support for swap_yz behave (currently
+	commented out in include/ntconf.h)
+windows: fix self-recover user prompting (tty, curses, mswin)
+
+
 Platform- and/or Interface-Specific Fixes or Features
 -----------------------------------------------------
 EDIT_GETLIN: wizard mode 'monpolycontrol' was using the getlin() answer buffer
@@ -201,6 +340,9 @@ EDIT_GETLIN: when naming an object or a monster use the existing name, if
 EDIT_GETLIN: using 'O' to set message types or menu colors was overloading the
 	answer buffer with other stuff, resulting in bogus default response
 	during repeat prompting
+EDIT_GETLIN: for paranoid confirmation, if answer was neither "yes" nor "no",
+	don't supply the rejected answer as the default when retrying
+USE_FCNTL: nethack wasn't closing lock file 'perm'
 curses: very tall menus tried to use selector characters a-z, A-Z, and 0-9,
 	but 0-9 should be reserved for counts and if the display was tall
 	enough for more than 62 entries, arbitrary ASCII punctuation got used
@@ -215,10 +357,10 @@ curses: support EDIT_GETLIN (but like with tty, it's disabled by default) to
 	(however, it's skipped if the 'popup_dialog' option is On)
 curses: when display windows get reconfigured (after setting align_status,
 	align_message, statuslines, windowborders or due to external resize),
-	the message window was being refreshed with the oldest available N
-	messages rather than most recent N.  [Still room for improvement;
-	when feasible it combines short lines, resulting in N messages on
-	fewer than N lines and leaving some of the available lines blank.]
+	the message window was being refreshed with most recent message and
+	the oldest available N-1 messages rather than next to most recent N-1.
+	[Still room for improvement when short lines are combined or long
+	ones are wrapped, where it still shows a subset of N original lines.]
 curses: plug memory leak when getting a line of input is cancelled by ESC
 curses: after requesting a line of input from player, next line of message
 	window could end up being skipped
@@ -229,10 +371,10 @@ curses: don't convert ^M (or <return> or <enter> key) into ^J; both ^J and ^M
 	cause the hero to try to move
 curses: draw map in screen columns 1..79 like tty, rather than in 2..80
 curses: make text windows wider so that help feedback is more readable
-curses: using ':' for search string matching to toggle menu items in a multple
-	page menu would highlight arbitrary items on the currently visible
-	page in sync with the lines that matching items had on other pages
-curses: when map window was clipped, the 'scrollbars' shown to indicate which
+curses: using ':' for toggling menu items which match a search string, in a
+	multi-page menu it would highlight arbitrary items on the currently
+	visible page in sync with lines that matched items have on other pages
+curses: when map window was clipped, position bars shown to indicate which
 	part of the map was in view didn't work as intended, always drawing
 	"*--------------" for horizontal (and comparable '*' with multiple '|'
 	underneath for vertical) when it meant to show "---******------" if
@@ -246,7 +388,14 @@ curses: disable the attempt to support Ctrl+Left_click as an alternate way
 	the mouse data passed to nethack didn't match the curses (ncurses on
 	OSX 10.11) documentation and things didn't work as intended
 curses: menu coloring required that both 'menucolors' and 'guicolor' be On;
-	for menus, override guicolor with more-specific menucolors
+	for menus, ignore 'guicolor' and honor more-specific 'menucolors'
+curses: support symset:curses and symset:DECgraphics for map display
+curses: enable the 'use_inverse' boolean option (via wincap WC_INVERSE flag)
+	for extended monster detection and black&white lava; forced to True
+	to override default of False (for tty's benefit)
+curses: force 'O' command's menus for 'symset' and 'roguesymset' options to
+	be wider so that fewer entries with set descriptions will wrap
+curses: stop restricting menu width to half the display width
 curses+'perm_invent': entries were wrapping without any control; usually not
 	noticeable because next entry overwrote, but visible for final entry
 	when whole inventory fit within the available height; looked ok with
@@ -270,6 +419,13 @@ curses+EDIT_GETLIN: the preceding fix handled an answer which spanned more
 	than one line but didn't remove the answer properly if the prompt
 	portion of prompt+answer spanned more than one line
 msdos:  code fixes to allow a build with curses and PDCurses
+msdos:  added Makefile1.cross (host portion) and Makefile2.cross (target 
+	platform portion) to assist in moving this port toward a cross-compiled
+	build hosted on linux/OSX/Windows with recent C dialect support; that
+	will also pave the way for CI automation and testing of the msdos port
+	build in future should the port remain on the radar; currently only
+	useful for testing the msdos port compile as it cannot yet build a
+	complete game
 tty: re-do one optimization used when status conditions have all been removed
 	and remove another that tried to check whether condition text to be
 	displayed next was the same as the existing value; sometimes new
@@ -279,7 +435,15 @@ tty: take two, if/when autodecribe feedback wraps past top line, clear
 	['exposed by git' section has an entry for reversal of 'take one']
 tty: video attributes (bold, inverse, &c) for status highlighting sometimes
 	were scrambled
+unix: sysconf CHECK_PLNAME=1 wouldn't work if attempt to obtain unix username
+	failed even though it didn't need that to check player character name
+unix+curses: startup error only reset terminal for tty; one noticeable
+	example was answering 'n' to "Destroy old game?"
+vms: update install.com to include overlooked file bigrm-10.lev in nh-data.dlb
 Windows: some startup error messages were not being delivered successfully
+WindowsGUI: player selection dialog box layout was not being adjusted for DPI
+Windows: significant changes to default directory choices; see documentation
+	for details
 
 
 General New Features
@@ -303,23 +467,37 @@ status highlighting using percentage rules now supported for experience level
 	the start of the current Xp level to the start of the next Xp level;
 	100% isn't possible so used as special case for next_Xp_lvl - 1 Exp_pt
 wizard-mode: display effect to show where an unseen wished-for monster landed
+for 'O's symset and roguesymset menus, mark current symbol set as preselected
 curses: enable latent mouse support
 curses: give menus and text windows a minimum size of 5x25 since tiny ones can
 	sometimes be overlooked when shown over old messages rather than map
 curses+'perm_invent': since persistent inventory is narrow, strip off "a",
 	"an", or "the" prefix on inventory entries shown there so that a tiny
 	bit more of the interesting portion is visible
+curses+'curses': change the curses map display to use new symbol set 'curses'
+	instead of hard-coded values; it attempts to show IBMgraphics-style
+	map using DECgraphics characters; DECgraphics can also be used as-is
+fulfill a request from a blind player to have a unique overriding SYMBOL for
+	pets and for the player
+ROGUESYMBOLS can be overridden in config files like SYMBOLS can
+in symset:DECgraphics, set S_altar to 'pi' (was default '_'), S_bars to
+	not-equals sign (was 'pi')
 
 
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 add a couple of engraving suggestions in pull request #79
 chasonr's faster method to write characters to msdos VGA in pull request #220
+chasonr's msdos Makefile.gcc pdcurses build changes in pull request #243
 autopickup exception priority change in pull request #226
+FIQ's curses (PDCurses) number pad changes in pull request #247
 
 
 Code Cleanup and Reorganization
 -------------------------------
 began to add some function caller BREADCRUMBS to aid debugging
+flag existing occurrences of "You hear" as "Deaf-aware" to aid in
+	future maintenance
+
 
 

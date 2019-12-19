@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1568922511 2019/09/19 19:48:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.277 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1574648938 2019/11/25 02:28:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -99,8 +99,8 @@ struct obj *obj;
 
         switch (rn2(3)) {
         case 2:
-            old = Glib;
-            incr_itimeout(&Glib, rn1(10, 3));
+            old = (Glib & TIMEOUT);
+            make_glib((int) old + rn1(10, 3)); /* + 3..12 */
             Your("%s %s!", makeplural(body_part(HAND)),
                  (old ? "are filthier than ever" : "get slimy"));
             if (is_wet_towel(obj))
@@ -139,8 +139,9 @@ struct obj *obj;
     }
 
     if (Glib) {
-        Glib = 0;
-        You("wipe off your %s.", makeplural(body_part(HAND)));
+        make_glib(0);
+        You("wipe off your %s.",
+            !uarmg ? makeplural(body_part(HAND)) : gloves_simple_name(uarmg));
         if (is_wet_towel(obj))
             dry_a_towel(obj, -1, drying_feedback);
         return 1;
@@ -211,7 +212,7 @@ int rx, ry, *resp;
             if (mtmp) {
                 mptr = mtmp->data = &mons[mtmp->mnum];
                 /* TRUE: override visibility check--it's not on the map */
-                gndr = pronoun_gender(mtmp, TRUE);
+                gndr = pronoun_gender(mtmp, PRONOUN_NO_IT);
             } else {
                 mptr = &mons[corpse->corpsenm];
                 if (is_female(mptr))
@@ -377,10 +378,27 @@ register struct obj *obj;
             newsym(mtmp->mx, mtmp->my);
         } else if (mtmp->mappearance) {
             const char *what = "thing";
+            boolean use_plural = FALSE;
+            struct obj dummyobj, *odummy;
 
             switch (M_AP_TYPE(mtmp)) {
             case M_AP_OBJECT:
-                what = simple_typename(mtmp->mappearance);
+                /* FIXME?
+                 *  we should probably be using object_from_map() here
+                 */
+                odummy = init_dummyobj(&dummyobj, mtmp->mappearance, 1L);
+                /* simple_typename() yields "fruit" for any named fruit;
+                   we want the same thing '//' or ';' shows: "slime mold"
+                   or "grape" or "slice of pizza" */
+                if (odummy->otyp == SLIME_MOLD
+                    && has_mcorpsenm(mtmp) && MCORPSENM(mtmp) != NON_PM) {
+                    odummy->spe = MCORPSENM(mtmp);
+                    what = simpleonames(odummy);
+                } else {
+                    what = simple_typename(odummy->otyp);
+                }
+                use_plural = (is_boots(odummy) || is_gloves(odummy)
+                              || odummy->otyp == LENSES);
                 break;
             case M_AP_MONSTER: /* ignore Hallucination here */
                 what = mons[mtmp->mappearance].mname;
@@ -390,7 +408,9 @@ register struct obj *obj;
                 break;
             }
             seemimic(mtmp);
-            pline("That %s is really %s.", what, mnm);
+            pline("%s %s %s really %s.",
+                  use_plural ? "Those" : "That", what,
+                  use_plural ? "are" : "is", mnm);
         } else if (flags.verbose && !canspotmon(mtmp)) {
             There("is %s there.", mnm);
         }
@@ -423,7 +443,8 @@ register struct obj *obj;
     return res;
 }
 
-static const char whistle_str[] = "produce a %s whistling sound.";
+static const char whistle_str[] = "produce a %s whistling sound.",
+                  alt_whistle_str[] = "produce a %s, sharp vibration.";
 
 static void
 use_whistle(obj)
@@ -435,8 +456,7 @@ struct obj *obj;
         You("blow bubbles through %s.", yname(obj));
     } else {
         if (Deaf)
-            You_feel("rushing air tickle your %s.",
-                        body_part(NOSE));
+            You_feel("rushing air tickle your %s.", body_part(NOSE));
         else
             You(whistle_str, obj->cursed ? "shrill" : "high");
         wake_nearby();
@@ -454,16 +474,17 @@ struct obj *obj;
     if (!can_blow(&g.youmonst)) {
         You("are incapable of using the whistle.");
     } else if (obj->cursed && !rn2(2)) {
-        You("produce a %shigh-pitched humming noise.",
-            Underwater ? "very " : "");
+        You("produce a %shigh-%s.", Underwater ? "very " : "",
+            Deaf ? "frequency vibration" : "pitched humming noise");
         wake_nearby();
     } else {
         int pet_cnt = 0, omx, omy;
 
         /* it's magic!  it works underwater too (at a higher pitch) */
-        You(whistle_str,
-            Hallucination ? "normal" : Underwater ? "strange, high-pitched"
-                                                  : "strange");
+        You(Deaf ? alt_whistle_str : whistle_str,
+            Hallucination ? "normal"
+            : (Underwater && !Deaf) ? "strange, high-pitched"
+              : "strange");
         for (mtmp = fmon; mtmp; mtmp = nextmon) {
             nextmon = mtmp->nmon; /* trap might kill mon */
             if (DEADMONSTER(mtmp))
@@ -566,15 +587,13 @@ unleash_all()
 
 #define MAXLEASHED 2
 
-/* TODO:
- *  This ought to exclude various other things, such as lights and gas
- *  spore, is_whirly() critters, ethereal creatures, possibly others.
- */
-static boolean
+boolean
 leashable(mtmp)
 struct monst *mtmp;
 {
-    return (boolean) (mtmp->mnum != PM_LONG_WORM);
+    return (boolean) (mtmp->mnum != PM_LONG_WORM
+                       && !unsolid(mtmp->data)
+                       && (!nolimbs(mtmp->data) || has_head(mtmp->data)));
 }
 
 /* ARGSUSED */
@@ -646,6 +665,11 @@ struct obj *obj;
         if (mtmp->mleashed) {
             pline("This %s is already leashed.",
                   spotmon ? l_monnam(mtmp) : "creature");
+        } else if (unsolid(mtmp->data)) {
+            pline("The leash would just fall off.");
+        } else if (nolimbs(mtmp->data) && !has_head(mtmp->data)) {
+            pline("%s has no extremities the leash would fit.",
+                  Monnam(mtmp));
         } else if (!leashable(mtmp)) {
             pline("The leash won't fit onto %s%s.", spotmon ? "your " : "",
                   l_monnam(mtmp));
@@ -910,8 +934,9 @@ struct obj *obj;
         /* infravision doesn't produce an image in the mirror */
     } else if ((how_seen & SEENMON) == MONSEEN_INFRAVIS) {
         if (vis) /* (redundant) */
-            pline("%s is too far away to see %sself in the dark.",
-                  Monnam(mtmp), mhim(mtmp));
+            pline("%s in the dark.",
+                  monverbself(mtmp, Monnam(mtmp), "are",
+                              "too far away to see"));
         /* some monsters do special things */
     } else if (mlet == S_VAMPIRE || mlet == S_GHOST || is_vampshifter(mtmp)) {
         if (vis)
@@ -941,7 +966,8 @@ struct obj *obj;
         if (vis) {
             char buf[BUFSZ]; /* "She" or "He" */
 
-            pline("%s admires %sself in your %s.", Monnam(mtmp), mhim(mtmp),
+            pline("%s in your %s.", /* "<mon> admires self in your mirror " */
+                  monverbself(mtmp, Monnam(mtmp), "admire", (char *) 0),
                   mirror);
             pline("%s takes it!", upstart(strcpy(buf, mhe(mtmp))));
         } else
@@ -2254,17 +2280,19 @@ struct obj *obj;
 
     if (Glib) {
         pline("%s from your %s.", Tobjnam(obj, "slip"),
-              makeplural(body_part(FINGER)));
+              fingers_or_gloves(FALSE));
         dropx(obj);
         return;
     }
 
     if (obj->spe > 0) {
+        int oldglib;
+
         if ((obj->cursed || Fumbling) && !rn2(2)) {
             consume_obj_charge(obj, TRUE);
 
             pline("%s from your %s.", Tobjnam(obj, "slip"),
-                  makeplural(body_part(FINGER)));
+                  fingers_or_gloves(FALSE));
             dropx(obj);
             return;
         }
@@ -2275,17 +2303,18 @@ struct obj *obj;
             return;
         consume_obj_charge(obj, TRUE);
 
+        oldglib = (int) (Glib & TIMEOUT);
         if (otmp != &cg.zeroobj) {
             You("cover %s with a thick layer of grease.", yname(otmp));
             otmp->greased = 1;
             if (obj->cursed && !nohands(g.youmonst.data)) {
-                incr_itimeout(&Glib, rnd(15));
+                make_glib(oldglib + rn1(6, 10)); /* + 10..15 */
                 pline("Some of the grease gets all over your %s.",
-                      makeplural(body_part(HAND)));
+                      fingers_or_gloves(TRUE));
             }
         } else {
-            incr_itimeout(&Glib, rnd(15));
-            You("coat your %s with grease.", makeplural(body_part(FINGER)));
+            make_glib(oldglib + rn1(11, 5)); /* + 5..15 */
+            You("coat your %s with grease.", fingers_or_gloves(TRUE));
         }
     } else {
         if (obj->known)

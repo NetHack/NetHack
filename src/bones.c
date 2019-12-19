@@ -1,12 +1,9 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1557092711 2019/05/05 21:45:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1571363147 2019/10/18 01:45:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
-#include "sfproto.h"
-
 
 #ifdef MFLOPPY
 extern long bytes_counted;
@@ -85,6 +82,24 @@ boolean restore;
             } else if (has_oname(otmp)) {
                 sanitize_name(ONAME(otmp));
             }
+            /* 3.6.3: set no_charge for partly eaten food in shop;
+               all other items become goods for sale if in a shop */
+            if (otmp->oclass == FOOD_CLASS && otmp->oeaten) {
+                struct obj *top;
+                char *p;
+                xchar ox, oy;
+
+                for (top = otmp; top->where == OBJ_CONTAINED;
+                     top = top->ocontainer)
+                    continue;
+                otmp->no_charge = (top->where == OBJ_FLOOR
+                                   && get_obj_location(top, &ox, &oy, 0)
+                                   /* can't use costly_spot() since its
+                                      result depends upon hero's location */
+                                   && inside_shop(ox, oy)
+                                   && *(p = in_rooms(ox, oy, SHOPBASE))
+                                   && tended_shop(&g.rooms[*p - ROOMOFFSET]));
+            }
         } else { /* saving */
             /* do not zero out o_ids for ghost levels anymore */
 
@@ -117,7 +132,7 @@ boolean restore;
 
             if (otmp->otyp == SLIME_MOLD) {
                 goodfruit(otmp->spe);
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
             } else if (otmp->otyp == SCR_MAIL) {
                 /* 0: delivered in-game via external event;
                    1: from bones or wishing; 2: written with marker */
@@ -537,10 +552,6 @@ struct obj *corpse;
             bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
             bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nnn */
         }
-        if (nhfp->fieldlevel) {
-            sfo_char(nhfp, &c, "bones", "bones_count", 1);
-            sfo_char(nhfp, bonesid, "bones", "bonesid", (int) c);
-        }
         savefruitchn(nhfp);
         if (nhfp->structlevel)
             bflush(nhfp->fd);
@@ -564,11 +575,6 @@ struct obj *corpse;
         bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c);	/* DD.nnn */
         savefruitchn(nhfp);
     }
-    if (nhfp->fieldlevel) {
-        sfo_char(nhfp, &c, "bones", "bones_count", 1);
-        sfo_char(nhfp, bonesid, "bones", "bonesid", (int) c); 	/* DD.nnn */
-        savefruitchn(nhfp);
-    }
     update_mlstmv(); /* update monsters for eventual restoration */
     savelev(nhfp, ledger_no(&u.uz));
     close_nhfile(nhfp);
@@ -579,9 +585,9 @@ struct obj *corpse;
 int
 getbones()
 {
-    int ok, i;
+    int ok;
     NHFILE *nhfp = (NHFILE *) 0;
-    char c, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
+    char c = 0, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
     if (discover) /* save bones files for real games */
         return 0;
@@ -607,7 +613,7 @@ getbones()
 
     if (validate(nhfp, g.bones) != 0) {
         if (!wizard)
-            pline("Discarding unuseable bones; no need to panic...");
+            pline("Discarding unusable bones; no need to panic...");
         ok = FALSE;
     } else {
         ok = TRUE;
@@ -622,11 +628,6 @@ getbones()
             mread(nhfp->fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
             mread(nhfp->fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
         }
-        if (nhfp->fieldlevel) {
-            sfi_char(nhfp, &c, "bones", "bones_count", 1); /* length incl. '\0' */
-            for (i = 0; i < (int) c; ++i)
-                sfi_char(nhfp, &oldbonesid[i], "bones", "bonesid", 1);
-	}
         if (strcmp(bonesid, oldbonesid) != 0
             /* from 3.3.0 through 3.6.0, bones in the quest branch stored
                a bogus bonesid in the file; 3.6.1 fixed that, but for

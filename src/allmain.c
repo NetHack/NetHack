@@ -25,6 +25,9 @@ early_init()
     decl_globals_init();
     objects_globals_init();
     monst_globals_init();
+#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
+    runtime_info_init();
+#endif
     sys_early_init();
 }
 
@@ -619,7 +622,6 @@ newgame()
     if (iflags.news)
         display_file(NEWS, FALSE);
 #endif
-    load_qtlist();          /* load up the quest text info */
     /* quest_init();  --  Now part of role_init() */
 
     mklev();
@@ -636,7 +638,7 @@ newgame()
 
     if (flags.legacy) {
         flush_screen(1);
-        com_pager(1);
+        com_pager("legacy");
     }
 
     urealtime.realtime = 0L;
@@ -772,6 +774,7 @@ const char *msg;
 static const struct early_opt earlyopts[] = {
     {ARG_DEBUG, "debug", 5, TRUE},
     {ARG_VERSION, "version", 4, TRUE},
+    {ARG_SHOWPATHS, "showpaths", 9, FALSE},
 #ifdef WIN32
     {ARG_WINDOWS, "windows", 4, TRUE},
 #endif
@@ -848,6 +851,9 @@ enum earlyarg e_arg;
                 }
             }
             early_version_info(insert_into_pastebuf);
+            return 2;
+        }
+        case ARG_SHOWPATHS: {
             return 2;
         }
 #ifdef WIN32

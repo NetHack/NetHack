@@ -1,11 +1,8 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1543455828 2018/11/29 01:43:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1573957877 2019/11/17 02:31:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
-#include "sfproto.h"
-
 
 /*
  * This should really go into the level structure, but
@@ -338,6 +335,11 @@ NhRegion *reg;
     if (i == g.n_regions)
         return;
 
+    /* remove region before potential newsym() calls, but don't free it yet */
+    if (--g.n_regions != i)
+        g.regions[i] = g.regions[g.n_regions];
+    g.regions[g.n_regions] = (NhRegion *) 0;
+
     /* Update screen if necessary */
     reg->ttl = -2L; /* for visible_region_at */
     if (reg->visible)
@@ -347,9 +349,6 @@ NhRegion *reg;
                     newsym(x, y);
 
     free_region(reg);
-    g.regions[i] = g.regions[g.n_regions - 1];
-    g.regions[g.n_regions - 1] = (NhRegion *) 0;
-    g.n_regions--;
 }
 
 /*
@@ -426,26 +425,27 @@ boolean
 in_out_region(x, y)
 xchar x, y;
 {
-    int i, f_indx;
+    int i, f_indx = 0;
 
-    /* First check if we can do the move */
+    /* First check if hero can do the move */
     for (i = 0; i < g.n_regions; i++) {
-        if (inside_region(g.regions[i], x, y) && !hero_inside(g.regions[i])
-            && !g.regions[i]->attach_2_u) {
-            if ((f_indx = g.regions[i]->can_enter_f) != NO_CALLBACK)
-                if (!(*callbacks[f_indx])(g.regions[i], (genericptr_t) 0))
-                    return FALSE;
-        } else if (hero_inside(g.regions[i]) && !inside_region(g.regions[i], x, y)
-                   && !g.regions[i]->attach_2_u) {
-            if ((f_indx = g.regions[i]->can_leave_f) != NO_CALLBACK)
-                if (!(*callbacks[f_indx])(g.regions[i], (genericptr_t) 0))
-                    return FALSE;
+        if (g.regions[i]->attach_2_u)
+            continue;
+        if (inside_region(g.regions[i], x, y)
+            ? (!hero_inside(g.regions[i])
+               && (f_indx = g.regions[i]->can_enter_f) != NO_CALLBACK)
+            : (hero_inside(g.regions[i])
+               && (f_indx = g.regions[i]->can_leave_f) != NO_CALLBACK)) {
+            if (!(*callbacks[f_indx])(g.regions[i], (genericptr_t) 0))
+                return FALSE;
         }
     }
 
-    /* Callbacks for the regions we do leave */
-    for (i = 0; i < g.n_regions; i++)
-        if (hero_inside(g.regions[i]) && !g.regions[i]->attach_2_u
+    /* Callbacks for the regions hero does leave */
+    for (i = 0; i < g.n_regions; i++) {
+        if (g.regions[i]->attach_2_u)
+            continue;
+        if (hero_inside(g.regions[i])
             && !inside_region(g.regions[i], x, y)) {
             clear_hero_inside(g.regions[i]);
             if (g.regions[i]->leave_msg != (const char *) 0)
@@ -453,10 +453,13 @@ xchar x, y;
             if ((f_indx = g.regions[i]->leave_f) != NO_CALLBACK)
                 (void) (*callbacks[f_indx])(g.regions[i], (genericptr_t) 0);
         }
+    }
 
-    /* Callbacks for the regions we do enter */
-    for (i = 0; i < g.n_regions; i++)
-        if (!hero_inside(g.regions[i]) && !g.regions[i]->attach_2_u
+    /* Callbacks for the regions hero does enter */
+    for (i = 0; i < g.n_regions; i++) {
+        if (g.regions[i]->attach_2_u)
+            continue;
+        if (!hero_inside(g.regions[i])
             && inside_region(g.regions[i], x, y)) {
             set_hero_inside(g.regions[i]);
             if (g.regions[i]->enter_msg != (const char *) 0)
@@ -464,53 +467,59 @@ xchar x, y;
             if ((f_indx = g.regions[i]->enter_f) != NO_CALLBACK)
                 (void) (*callbacks[f_indx])(g.regions[i], (genericptr_t) 0);
         }
+    }
+
     return TRUE;
 }
 
 /*
- * check whether a monster enters/leaves one or more region.
-*/
+ * check whether a monster enters/leaves one or more regions.
+ */
 boolean
 m_in_out_region(mon, x, y)
 struct monst *mon;
 xchar x, y;
 {
-    int i, f_indx;
+    int i, f_indx = 0;
 
-    /* First check if we can do the move */
+    /* First check if mon can do the move */
     for (i = 0; i < g.n_regions; i++) {
-        if (inside_region(g.regions[i], x, y) && !mon_in_region(g.regions[i], mon)
-            && g.regions[i]->attach_2_m != mon->m_id) {
-            if ((f_indx = g.regions[i]->can_enter_f) != NO_CALLBACK)
-                if (!(*callbacks[f_indx])(g.regions[i], mon))
-                    return FALSE;
-        } else if (mon_in_region(g.regions[i], mon)
-                   && !inside_region(g.regions[i], x, y)
-                   && g.regions[i]->attach_2_m != mon->m_id) {
-            if ((f_indx = g.regions[i]->can_leave_f) != NO_CALLBACK)
-                if (!(*callbacks[f_indx])(g.regions[i], mon))
-                    return FALSE;
+        if (g.regions[i]->attach_2_m == mon->m_id)
+            continue;
+        if (inside_region(g.regions[i], x, y)
+            ? (!mon_in_region(g.regions[i], mon)
+               && (f_indx = g.regions[i]->can_enter_f) != NO_CALLBACK)
+            : (mon_in_region(g.regions[i], mon)
+               && (f_indx = g.regions[i]->can_leave_f) != NO_CALLBACK)) {
+            if (!(*callbacks[f_indx])(g.regions[i], mon))
+                return FALSE;
         }
     }
 
-    /* Callbacks for the regions we do leave */
-    for (i = 0; i < g.n_regions; i++)
+    /* Callbacks for the regions mon does leave */
+    for (i = 0; i < g.n_regions; i++) {
+        if (g.regions[i]->attach_2_m == mon->m_id)
+            continue;
         if (mon_in_region(g.regions[i], mon)
-            && g.regions[i]->attach_2_m != mon->m_id
             && !inside_region(g.regions[i], x, y)) {
             remove_mon_from_reg(g.regions[i], mon);
             if ((f_indx = g.regions[i]->leave_f) != NO_CALLBACK)
                 (void) (*callbacks[f_indx])(g.regions[i], mon);
         }
+    }
 
-    /* Callbacks for the regions we do enter */
-    for (i = 0; i < g.n_regions; i++)
-        if (!hero_inside(g.regions[i]) && !g.regions[i]->attach_2_u
+    /* Callbacks for the regions mon does enter */
+    for (i = 0; i < g.n_regions; i++) {
+        if (g.regions[i]->attach_2_m == mon->m_id)
+            continue;
+        if (!mon_in_region(g.regions[i], mon)
             && inside_region(g.regions[i], x, y)) {
             add_mon_to_reg(g.regions[i], mon);
             if ((f_indx = g.regions[i]->enter_f) != NO_CALLBACK)
                 (void) (*callbacks[f_indx])(g.regions[i], mon);
         }
+    }
+
     return TRUE;
 }
 
@@ -596,10 +605,12 @@ xchar x, y;
 {
     register int i;
 
-    for (i = 0; i < g.n_regions; i++)
-        if (inside_region(g.regions[i], x, y) && g.regions[i]->visible
-            && g.regions[i]->ttl != -2L)
+    for (i = 0; i < g.n_regions; i++) {
+        if (!g.regions[i]->visible || g.regions[i]->ttl == -2L)
+            continue;
+        if (inside_region(g.regions[i], x, y))
             return g.regions[i];
+    }
     return (NhRegion *) 0;
 }
 
@@ -627,63 +638,39 @@ NHFILE *nhfp;
         bwrite(nhfp->fd, (genericptr_t) &g.moves, sizeof (g.moves));	/* timestamp */
         bwrite(nhfp->fd, (genericptr_t) &g.n_regions, sizeof (g.n_regions));
     }
-    if (nhfp->fieldlevel) {
-        sfo_long(nhfp, &g.moves, "regions", "tmstamp", 1);
-        sfo_int(nhfp, &g.n_regions, "regions", "region_count", 1);
-    }
     for (i = 0; i < g.n_regions; i++) {
         if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->bounding_box, sizeof (NhRect));
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->nrects, sizeof (short));
         }
-        if (nhfp->fieldlevel) {
-            sfo_nhrect(nhfp, &g.regions[i]->bounding_box, "g.regions", "bounding_box", 1);
-            sfo_short(nhfp, &g.regions[i]->nrects, "g.regions", "nrects", 1);
-        }
         for (j = 0; j < g.regions[i]->nrects; j++) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->rects[j], sizeof (NhRect));
-            if (nhfp->fieldlevel)
-                sfo_nhrect(nhfp, &g.regions[i]->rects[j], "g.regions", "rect", 1);
         }
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_u, sizeof (boolean));
-        if (nhfp->fieldlevel)
-            sfo_boolean(nhfp, &g.regions[i]->attach_2_u, "g.regions", "attach_2_u", 1);
         n = 0;
 
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_m, sizeof (unsigned));
-        if (nhfp->fieldlevel)
-            sfo_unsigned(nhfp, &g.regions[i]->attach_2_m, "g.regions", "attach_2_m", 1);
 
         n = g.regions[i]->enter_msg != (const char *)0 ?
                                         strlen(g.regions[i]->enter_msg) : 0;
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &n, sizeof n);
-        if (nhfp->fieldlevel)
-            sfo_unsigned(nhfp, &n, "g.regions", "enter_msg_length", 1);
 
         if (n > 0) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) g.regions[i]->enter_msg, n);
-            if (nhfp->fieldlevel)
-                sfo_char(nhfp, g.regions[i]->enter_msg, "g.regions", "enter_msg", 1);
         }
         n = g.regions[i]->leave_msg != (const char *)0 ?
                                         strlen(g.regions[i]->leave_msg) : 0;
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &n, sizeof n);
-        if (nhfp->fieldlevel)
-            sfo_unsigned(nhfp, &n, "g.regions", "leave_msg_length", 1);
 
         if (n > 0) {
             if (nhfp->structlevel) {
                 bwrite(nhfp->fd, (genericptr_t) g.regions[i]->leave_msg, n);
-            }
-            if (nhfp->fieldlevel) {
-                for (j = 0; j < (int) n; ++j)
-                    sfo_char(nhfp, &g.regions[i]->leave_msg[j], "g.regions", "leave_msg", 1);
             }
         }
         if (nhfp->structlevel) {
@@ -697,33 +684,15 @@ NHFILE *nhfp;
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->player_flags, sizeof (unsigned int));
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->n_monst, sizeof (short));
         }
-        if (nhfp->fieldlevel) {
-            sfo_long(nhfp, &g.regions[i]->ttl, "g.regions", "ttl", 1);
-            sfo_short(nhfp, &g.regions[i]->expire_f, "g.regions", "expire_f", 1);
-            sfo_short(nhfp, &g.regions[i]->can_enter_f, "g.regions", "can_enter_f", 1);
-            sfo_short(nhfp, &g.regions[i]->enter_f, "g.regions", "enter_f", 1);
-            sfo_short(nhfp, &g.regions[i]->can_leave_f, "g.regions", "can_leave_f", 1);
-            sfo_short(nhfp, &g.regions[i]->leave_f, "g.regions", "leave_f", 1);
-            sfo_short(nhfp, &g.regions[i]->inside_f, "g.regions", "inside_f", 1);
-            sfo_unsigned(nhfp, &g.regions[i]->player_flags, "g.regions", "player_flags", 1);
-            sfo_short(nhfp, &g.regions[i]->n_monst, "g.regions", "monster_count", 1);
-        }
         for (j = 0; j < g.regions[i]->n_monst; j++) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->monsters[j],
                         sizeof (unsigned));
-            if (nhfp->fieldlevel)
-                sfo_unsigned(nhfp, &g.regions[i]->monsters[j], "g.regions", "monster", 1);
         }
         if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->visible, sizeof (boolean));
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->glyph, sizeof (int));
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->arg, sizeof (anything));
-        }
-        if (nhfp->fieldlevel) {
-            sfo_boolean(nhfp, &g.regions[i]->visible, "g.regions", "visible", 1);
-            sfo_int(nhfp, &g.regions[i]->glyph, "g.regions", "glyph", 1);
-            sfo_any(nhfp, &g.regions[i]->arg, "g.regions", "arg", 1);
         }
     }
   
@@ -738,15 +707,13 @@ NHFILE *nhfp;
 boolean ghostly; /* If a bones file restore */
 {
     int i, j;
-    unsigned n;
-    long tmstamp;
+    unsigned n = 0;
+    long tmstamp = 0L;
     char *msg_buf;
 
     clear_regions();		/* Just for security */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &tmstamp, sizeof (tmstamp));
-    if (nhfp->fieldlevel)
-        sfi_long(nhfp, &tmstamp, "regions", "tmstamp", 1);
     if (ghostly)
         tmstamp = 0;
     else
@@ -754,8 +721,6 @@ boolean ghostly; /* If a bones file restore */
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.n_regions, sizeof (g.n_regions));
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &g.n_regions, "regions", "region_count", 1);
 
     g.max_regions = g.n_regions;
     if (g.n_regions > 0)
@@ -766,40 +731,24 @@ boolean ghostly; /* If a bones file restore */
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->bounding_box, sizeof (NhRect));
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->nrects, sizeof (short));
         }
-        if (nhfp->fieldlevel) {
-            sfi_nhrect(nhfp, &g.regions[i]->bounding_box, "g.regions", "bounding box", 1);
-            sfi_short(nhfp, &g.regions[i]->nrects, "g.regions", "nrects", 1);
-        }
         if (g.regions[i]->nrects > 0)
             g.regions[i]->rects = (NhRect *)
                                  alloc(sizeof (NhRect) * g.regions[i]->nrects);
         for (j = 0; j < g.regions[i]->nrects; j++) {
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) &g.regions[i]->rects[j], sizeof (NhRect));
-            if (nhfp->fieldlevel)
-                sfi_nhrect(nhfp, &g.regions[i]->rects[j], "g.regions", "rect", 1);
         }
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_u, sizeof (boolean));
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_m, sizeof (unsigned));
         }
-        if (nhfp->fieldlevel) {
-            sfi_boolean(nhfp, &g.regions[i]->attach_2_u, "g.regions", "attach_2_u", 1);
-            sfi_unsigned(nhfp, &g.regions[i]->attach_2_m, "g.regions", "attach_2_m", 1);
-        }
 
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &n, sizeof n);
-        if (nhfp->fieldlevel)
-            sfi_unsigned(nhfp, &n, "g.regions", "enter_msg_length", 1);
         if (n > 0) {
             msg_buf = (char *) alloc(n + 1);
             if (nhfp->structlevel) {
                 mread(nhfp->fd, (genericptr_t) msg_buf, n);
-            }
-            if (nhfp->fieldlevel) {
-                for (j = 0; (unsigned) j < n; ++j)
-                    sfi_char(nhfp, &msg_buf[j], "g.regions", "enter_msg", 1);
             }
             msg_buf[n] = '\0';
             g.regions[i]->enter_msg = (const char *) msg_buf;
@@ -808,16 +757,10 @@ boolean ghostly; /* If a bones file restore */
 
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &n, sizeof n);
-        if (nhfp->fieldlevel)
-            sfi_unsigned(nhfp, &n, "g.regions", "leave_msg_length", 1);
-        if (n > 0) {
+         if (n > 0) {
             msg_buf = (char *) alloc(n + 1);
             if (nhfp->structlevel) {
                 mread(nhfp->fd, (genericptr_t) msg_buf, n);
-            }
-            if (nhfp->fieldlevel) {
-                for (j = 0; (unsigned) j < n; ++j)
-                    sfi_char(nhfp, &msg_buf[j], "g.regions", "leave_msg", 1);
             }
             msg_buf[n] = '\0';
 	    g.regions[i]->leave_msg = (const char *) msg_buf;
@@ -826,8 +769,6 @@ boolean ghostly; /* If a bones file restore */
 
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->ttl, sizeof (long));
-        if (nhfp->fieldlevel)
-            sfi_long(nhfp, &g.regions[i]->ttl, "g.regions", "ttl", 1);
         /* check for expired region */
         if (g.regions[i]->ttl >= 0L)
             g.regions[i]->ttl =
@@ -848,23 +789,12 @@ boolean ghostly; /* If a bones file restore */
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->player_flags,
                     sizeof (unsigned int));
         }
-        if (nhfp->fieldlevel) {
-            sfi_short(nhfp, &g.regions[i]->expire_f, "g.regions", "expire_f", 1);
-            sfi_short(nhfp, &g.regions[i]->can_enter_f, "g.regions", "can_enter_f", 1);
-            sfi_short(nhfp, &g.regions[i]->enter_f, "g.regions", "enter_f", 1);
-            sfi_short(nhfp, &g.regions[i]->can_leave_f, "g.regions", "can_leave_f", 1);
-            sfi_short(nhfp, &g.regions[i]->leave_f, "g.regions", "leave_f", 1);
-            sfi_short(nhfp, &g.regions[i]->inside_f, "g.regions", "inside_f", 1);
-            sfi_unsigned(nhfp, &g.regions[i]->player_flags, "g.regions", "player_flags", 1);
-        }
         if (ghostly) {	/* settings pertained to old player */
             clear_hero_inside(g.regions[i]);
             clear_heros_fault(g.regions[i]);
         }
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->n_monst, sizeof (short));
-        if (nhfp->fieldlevel)
-            sfi_short(nhfp, &g.regions[i]->n_monst, "g.regions", "monster_count", 1);
         if (g.regions[i]->n_monst > 0)
             g.regions[i]->monsters =
                         (unsigned *) alloc(sizeof (unsigned) * g.regions[i]->n_monst);
@@ -875,18 +805,11 @@ boolean ghostly; /* If a bones file restore */
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) &g.regions[i]->monsters[j],
                         sizeof (unsigned));
-            if (nhfp->fieldlevel)
-                sfi_unsigned(nhfp, &g.regions[i]->monsters[j], "g.regions", "monster", 1);
         }
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->visible, sizeof (boolean));
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->glyph, sizeof (int));
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->arg, sizeof (anything));
-        }
-        if (nhfp->fieldlevel) {
-            sfi_boolean(nhfp, &g.regions[i]->visible, "g.regions", "visible", 1);
-            sfi_int(nhfp, &g.regions[i]->glyph, "g.regions", "glyph", 1);
-            sfi_any(nhfp, &g.regions[i]->arg, "g.regions", "arg", 1);
         }
     }
     /* remove expired regions, do not trigger the expire_f callback (yet!);

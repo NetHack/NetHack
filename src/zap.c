@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1561927499 2019/06/30 20:44:59 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.312 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1573688696 2019/11/13 23:44:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.316 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1231,7 +1231,7 @@ int mat, minwt;
             continue;
         if (obj_resists(otmp, 0, 0))
             continue; /* preserve unique objects */
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
         if (otmp->otyp == SCR_MAIL)
             continue;
 #endif
@@ -1358,7 +1358,7 @@ struct obj *obj;
 {
     long i;
 
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     if (obj->otyp == SCR_MAIL)
         return;
 #endif
@@ -1456,7 +1456,7 @@ int id;
     /* preserve inventory letter if in inventory */
     if (obj_location == OBJ_INVENT)
         otmp->invlet = obj->invlet;
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     /* You can't send yourself 100 mail messages and then
      * polymorph them into useful scrolls
      */
@@ -3341,13 +3341,20 @@ struct obj **pobj; /* object tossed/used, set to NULL
                 if (range > 3) /* another bounce? */
                     skiprange(range, &skiprange_start, &skiprange_end);
             } else if (mtmp && M_IN_WATER(mtmp->data)) {
-                if ((!Blind && canseemon(mtmp)) || sensemon(mtmp))
+                if (!Blind && canspotmon(mtmp))
                     pline("%s %s over %s.", Yname2(obj), otense(obj, "pass"),
                           mon_nam(mtmp));
+                mtmp = (struct monst *) 0;
             }
         }
 
-        if (mtmp && !(in_skip && M_IN_WATER(mtmp->data))) {
+        /* if mtmp is a shade and missile passes harmlessly through it,
+           give message and skip it in order to keep going */
+        if (mtmp && (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
+            && shade_miss(&g.youmonst, mtmp, obj, TRUE, TRUE))
+            mtmp = (struct monst *) 0;
+
+        if (mtmp) {
             g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
             if (weapon == FLASHED_LIGHT) {
                 /* FLASHED_LIGHT hitting invisible monster should
@@ -4433,7 +4440,11 @@ short exploding_wand_typ;
         if (is_ice(x, y)) {
             melt_ice(x, y, (char *) 0);
         } else if (is_pool(x, y)) {
-            const char *msgtxt = "You hear hissing gas.";
+            const char *msgtxt = (!Deaf)
+                                     ? "You hear hissing gas." /* Deaf-aware */
+                                     : (type >= 0)
+                                         ? "That seemed remarkably uneventful."
+                                         : (const char *) 0;
 
             if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP */
                 if (see_it)
@@ -4447,7 +4458,8 @@ short exploding_wand_typ;
                 if (see_it)
                     msgtxt = "The water evaporates.";
             }
-            Norep("%s", msgtxt);
+            if (msgtxt)
+                Norep("%s", msgtxt);
             if (lev->typ == ROOM)
                 newsym(x, y);
         } else if (IS_FOUNTAIN(lev->typ)) {

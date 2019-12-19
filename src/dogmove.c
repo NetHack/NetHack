@@ -432,7 +432,7 @@ int udist;
     } else {
         if ((obj = g.level.objects[omx][omy]) != 0
             && !index(nofetch, obj->oclass)
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
             && obj->otyp != SCR_MAIL
 #endif
             ) {

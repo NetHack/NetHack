@@ -4,10 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 #include "dlb.h"
-#include "sfproto.h"
-
 
 /*      [note: this comment is fairly old, but still accurate for 3.1]
  * Rumors have been entirely rewritten to speed up the access.  This is
@@ -388,20 +385,12 @@ void
 save_oracles(nhfp)
 NHFILE *nhfp;
 {
-    int i;
-
     if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
-            if (nhfp->fieldlevel)
-                sfo_unsigned(nhfp, &g.oracle_cnt, "oracles", "g.oracle_cnt", 1);
             if (g.oracle_cnt) {
                 if (nhfp->structlevel) {
                     bwrite(nhfp->fd, (genericptr_t)g.oracle_loc, g.oracle_cnt * sizeof (long));
-                }
-                if (nhfp->fieldlevel) {
-                    for (i = 0; (unsigned) i < g.oracle_cnt; ++i)
-                        sfo_ulong(nhfp, &g.oracle_loc[i], "oracles", "oracle loc", 1);
                 }
             }
     }
@@ -417,20 +406,13 @@ void
 restore_oracles(nhfp)
 NHFILE *nhfp;
 {
-    int i;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
-    if (nhfp->fieldlevel)
-        sfi_unsigned(nhfp, &g.oracle_cnt, "oracles", "g.oracle_cnt", 1);
 
     if (g.oracle_cnt) {
         g.oracle_loc = (unsigned long *) alloc(g.oracle_cnt * sizeof(long));
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) g.oracle_loc, g.oracle_cnt * sizeof (long));
-        }
-        if (nhfp->fieldlevel) {
-            for (i = 0; (unsigned) i < g.oracle_cnt; ++i)
-                sfi_ulong(nhfp, &g.oracle_loc[i], "oracles", "g.oracle_loc", 1);
         }
         g.oracle_flg = 1; /* no need to call init_oracles() */
     }

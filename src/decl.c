@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1547025164 2019/01/09 09:12:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1573869062 2019/11/16 01:51:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -40,6 +40,7 @@ NEARDATA struct obj *uwep, *uarm, *uswapwep,
 #ifdef TEXTCOLOR
 /*
  *  This must be the same order as used for buzz() in zap.c.
+ *  (They're only used in mapglyph.c so probably shouldn't be here.)
  */
 const int zapcolors[NUM_ZAP] = {
     HI_ZAP,     /* 0 - missile */
@@ -48,8 +49,10 @@ const int zapcolors[NUM_ZAP] = {
     HI_ZAP,     /* 3 - sleep */
     CLR_BLACK,  /* 4 - death */
     CLR_WHITE,  /* 5 - lightning */
-    CLR_YELLOW, /* 6 - poison gas */
-    CLR_GREEN,  /* 7 - acid */
+    /* 3.6.3: poison gas zap used to be yellow and acid zap was green,
+       which conflicted with the corresponding dragon colors */
+    CLR_GREEN,  /* 6 - poison gas */
+    CLR_YELLOW, /* 7 - acid */
 };
 #endif /* text color */
 
@@ -105,9 +108,17 @@ const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
                              "platinum",   "mithril", "plastic",    "glass",
                              "gemstone",   "stone" };
 
+char emptystr[] = {0};       /* non-const */
+
 /* Global windowing data, defined here for multi-window-system support */
 NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN;
-                                   
+#ifdef WIN32
+boolean fqn_prefix_locked[PREFIX_COUNT] = { FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE };
+#endif
+
 #ifdef PREFIXES_IN_USE
 const char *fqn_prefix_names[PREFIX_COUNT] = {
     "hackdir",  "leveldir", "savedir",    "bonesdir",  "datadir",
@@ -388,8 +399,10 @@ const struct instance_globals g_init = {
     DUMMY, /* symset */
     0, /* currentgraphics */
     DUMMY, /* showsyms */
-    DUMMY, /* l_syms */
-    DUMMY, /* r_syms */
+    DUMMY, /* primary_syms */
+    DUMMY, /* rogue_syms */
+    DUMMY, /* ov_primary_syms */
+    DUMMY, /* ov_rogue_syms */
     DUMMY, /* warnsyms */
 
     /* dungeon.c */
@@ -563,8 +576,6 @@ const struct instance_globals g_init = {
 
     /* questpgr.c */
     UNDEFINED_VALUES, /* cvt_buf */
-    UNDEFINED_VALUES, /* qt_list */
-    UNDEFINED_PTR, /* msg_file */
     UNDEFINED_VALUES, /* nambuf */
 
     /* read.c */
@@ -619,7 +630,8 @@ const struct instance_globals g_init = {
     NULL, /* lev_message */
     NULL, /* lregions */
     0, /* num_lregions */
-    UNDEFINED_VALUES, /* SplLev_Map */
+    UNDEFINED_VALUES, /* SpLev_Map */
+    NULL, /* coder */
     UNDEFINED_VALUE, /* xstart */
     UNDEFINED_VALUE, /* ystart */
     UNDEFINED_VALUE, /* xsize */
@@ -631,7 +643,6 @@ const struct instance_globals g_init = {
     { UNDEFINED_PTR }, /* container_obj */
     0, /* container_idx */
     NULL, /* invent_carrying_monster */
-    { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL }, /* ralign */
 
     /* spells.c */
     0, /* spl_sortmode */
@@ -679,6 +690,13 @@ const struct instance_globals g_init = {
     /* zap.c */
     UNDEFINED_VALUE, /* poly_zap */
     UNDEFINED_VALUE,  /* obj_zapped */
+
+    /* new */
+    DUMMY,   /* lua_ver[LUA_VER_BUFSIZ] */
+    DUMMY,   /* lua_copyright[LUA_COPYRIGHT_BUFSIZ] */
+
+    /* per-level glyph mapping flags */
+    0L,     /* glyphmap_perlevel_flags */
 
     IVMAGIC  /* used to validate that structure layout has been preserved */
 };

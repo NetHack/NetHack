@@ -10,8 +10,12 @@
 # include <fcntl.h>
 # include <errno.h>
 #endif /* SIMPLE_MAIL */
+#endif /* MAIL */
+#ifdef MAIL_STRUCTURES
 #include "mail.h"
+#endif
 
+#ifdef MAIL
 /*
  * Notify user when new mail has arrived.  Idea by Merlyn Leroy.
  *

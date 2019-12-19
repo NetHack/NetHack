@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1568509227 2019/09/15 01:00:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.216 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1576638500 2019/12/18 03:08:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -151,17 +151,35 @@ moverock()
             if (mtmp && !noncorporeal(mtmp->data)
                 && (!mtmp->mtrapped
                     || !(ttmp && is_pit(ttmp->ttyp)))) {
+                boolean deliver_part1 = FALSE;
+
                 if (Blind)
                     feel_location(sx, sy);
                 if (canspotmon(mtmp)) {
                     pline("There's %s on the other side.", a_monnam(mtmp));
+                    deliver_part1 = TRUE;
                 } else {
                     You_hear("a monster behind %s.", the(xname(otmp)));
+                    if (!Deaf)
+                        deliver_part1 = TRUE;
                     map_invisible(rx, ry);
                 }
-                if (flags.verbose)
-                    pline("Perhaps that's why %s cannot move it.",
-                          u.usteed ? y_monnam(u.usteed) : "you");
+                if (flags.verbose) {
+                    char you_or_steed[BUFSZ];
+
+                    Strcpy(you_or_steed,
+                           u.usteed ? y_monnam(u.usteed) : "you");
+                    pline("%s%s cannot move %s.",
+                          deliver_part1
+                              ? "Perhaps that's why "
+                              : "",
+                          deliver_part1
+                              ? you_or_steed
+                              : upstart(you_or_steed),
+                          deliver_part1
+                              ? "it"
+                              : the(xname(otmp)));
+                }
                 goto cannot_push;
             }
 
@@ -2103,6 +2121,10 @@ boolean newspot;             /* true if called by spoteffects */
         }
         /* not mounted */
 
+        /* if hiding on ceiling then don't automatically enter pool */
+        if (Upolyd && ceiling_hider(&mons[u.umonnum]) && u.uundetected)
+            return FALSE;
+
         /* drown(),lava_effects() return true if hero changes
            location while surviving the problem */
         if (is_lava(u.ux, u.uy)) {
@@ -2614,8 +2636,10 @@ pickup_checks()
     }
     if (!can_reach_floor(TRUE)) {
         struct trap *traphere = t_at(u.ux, u.uy);
-        if (traphere && uteetering_at_seen_pit(traphere))
-            You("cannot reach the bottom of the pit.");
+        if (traphere
+            && (uteetering_at_seen_pit(traphere) || uescaped_shaft(traphere)))
+            You("cannot reach the bottom of the %s.",
+                is_pit(traphere->ttyp) ? "pit" : "abyss");
         else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
             rider_cant_reach();
         else if (Blind && !can_reach_floor(TRUE))
@@ -2816,7 +2840,7 @@ int x, y;
     if (!IS_DOOR(lev_p->typ))
         return FALSE;
     /* all rogue level doors are doorless but disallow diagonal access, so
-       we treat them as if their non-existant doors were actually present */
+       we treat them as if their non-existent doors were actually present */
     if (Is_rogue_level(&u.uz))
         return FALSE;
     return !(lev_p->doormask & ~(D_NODOOR | D_BROKEN));

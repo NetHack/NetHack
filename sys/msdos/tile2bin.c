@@ -17,7 +17,7 @@
 #include "tile.h"
 #include "pctiles.h"
 
-#include <dos.h>
+/* #include <dos.h> */
 #ifndef MONITOR_HEAP
 #include <stdlib.h>
 #endif

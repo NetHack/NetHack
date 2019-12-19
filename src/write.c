@@ -1,4 +1,4 @@
-/* NetHack 3.6	write.c	$NHDT-Date: 1450261366 2015/12/16 10:22:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	write.c	$NHDT-Date: 1573346194 2019/11/10 00:36:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.20 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -18,7 +18,7 @@ register struct obj *otmp;
         return (10 * objects[otmp->otyp].oc_level);
 
     switch (otmp->otyp) {
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     case SCR_MAIL:
         return 2;
 #endif
@@ -109,7 +109,7 @@ register struct obj *pen;
         return 0;
     } else if (Glib) {
         pline("%s from your %s.", Tobjnam(pen, "slip"),
-              makeplural(body_part(FINGER)));
+              fingers_or_gloves(FALSE));
         dropx(pen);
         return 1;
     }
@@ -333,7 +333,7 @@ found:
     }
     new_obj->blessed = (curseval > 0);
     new_obj->cursed = (curseval < 0);
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     if (new_obj->otyp == SCR_MAIL)
         /* 0: delivered in-game via external event (or randomly for fake mail);
            1: from bones or wishing; 2: written with marker */

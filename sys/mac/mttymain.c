@@ -269,6 +269,33 @@ _mt_init_stuff(void)
     clear_tty(_mt_window);
 
     InitMenuRes();
+
+    {
+        /* update the window proc has_color table */
+        int i, setting = 0;
+        Rect r;
+//	Point p = {0, 0};
+        GDHandle gh = (GDHandle) 0;
+
+        if (_mt_in_color) {
+            GetWindowBounds(_mt_window, kWindowContentRgn, &r);
+//          SetPortWindowPort(_mt_window);
+//          LocalToGlobal (&p);
+//          OffsetRect (&r, p.h, p.v);
+            gh = GetMaxDevice(&r);
+            /* > 4 bpp */
+            setting = ((*((*gh)->gdPMap))->pixelSize > 4) ? 1 : 0;
+    	}
+
+        for (i = 0; i < CLR_MAX ; ++i) {
+            tty_procs.has_color[i] =
+                (i == CLR_BLACK || i == NO_COLOR || i == CLR_WHITE)
+                    ? 1
+                    : (_mt_in_color && gh)
+                        ? setting
+                        : 0;
+        }
+    }
 }
 
 int
@@ -302,6 +329,8 @@ getreturn(char *str)
     (void) tgetch();
 }
 
+#if 0       /* this function is commented out */
+/* the tty has_color[] table is filled in during init above */
 int
 has_color(int color)
 {
@@ -327,6 +356,7 @@ has_color(int color)
 
     return (*((*gh)->gdPMap))->pixelSize > 4; /* > 4 bpp */
 }
+#endif
 
 void
 tty_delay_output(void)

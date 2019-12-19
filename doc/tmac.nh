@@ -117,10 +117,10 @@
 .\" .BR - hard line break with vertical padding inserted
 .\"    $1 - repeat count for amount of padding (optional; default is 1)
 .de BR
-.nr bR (\\$1-0)
-.if \\n(bR<1 .nr bR 1
-.nr bR \\n(bR*\\n(pd
-.sn \\n(bRu
+.ie \\.$==0 .nr bR 1v
+.el .nr bR (\\$1-0)v
+\0
+.sp \\n(bR
 .br
 ..
 .\" .UR url

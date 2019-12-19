@@ -159,8 +159,9 @@ struct monst {
 
     long mtrapseen;        /* bitmap of traps we've been trapped in */
     long mlstmv;           /* for catching up with lost time */
+    long mstate;           /* debugging info on monsters stored here */
+    long migflags;         /* migrating flags */
     long mspare1;
-#define mstate mspare1      /* only for debug exam right now, not code flow */
     struct obj *minvent;   /* mon's inventory */
     struct obj *mw;        /* mon's weapon */
     long misc_worn_check;  /* mon's wornmask */

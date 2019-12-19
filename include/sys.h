@@ -45,6 +45,12 @@ struct sysopt {
     /* save and bones format */
     int saveformat[2];    /* primary and onetime conversion */
     int bonesformat[2];   /* primary and onetime conversion */
+
+    /* enable accessibility options */
+    int accessibility;
+#ifdef WIN32
+    int portable_device_paths;  /* nethack configuration for a portable device */
+#endif
 };
 
 extern struct sysopt sysopt;

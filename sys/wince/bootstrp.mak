@@ -202,7 +202,6 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h \
 		$(INCL)\rect.h $(INCL)\region.h $(INCL)\winprocs.h \
 		$(INCL)\wintty.h $(INCL)\trampoli.h
 
-LEV_H       = $(INCL)\lev.h
 DGN_FILE_H  = $(INCL)\dgn_file.h
 LEV_COMP_H  = $(INCL)\lev_comp.h
 SP_LEV_H    = $(INCL)\sp_lev.h
@@ -291,7 +290,7 @@ $(U)makedefs.exe:	$(MAKEOBJS)
 	$(link) $(LFLAGSU) -out:$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
-		 $(INCL)\monsym.h    $(INCL)\qtext.h	$(INCL)\patchlevel.h \
+		 $(INCL)\monsym.h    $(INCL)\patchlevel.h \
 		 $(U)makedefs.c
 	if not exist $(OBJ)\*.* echo creating directory $(OBJ)
 	if not exist $(OBJ)\*.* mkdir $(OBJ)
@@ -768,7 +767,7 @@ $(O)apply.o: $(SRC)\apply.c $(HACK_H)
 $(O)artifact.o: $(SRC)\artifact.c $(HACK_H) $(INCL)\artifact.h $(INCL)\artilist.h
 $(O)attrib.o: $(SRC)\attrib.c $(HACK_H) $(INCL)\artifact.h
 $(O)ball.o: $(SRC)\ball.c $(HACK_H)
-$(O)bones.o: $(SRC)\bones.c $(HACK_H) $(INCL)\lev.h
+$(O)bones.o: $(SRC)\bones.c $(HACK_H)
 $(O)botl.o: $(SRC)\botl.c $(HACK_H)
 $(O)cmd.o: $(SRC)\cmd.c $(HACK_H) $(INCL)\func_tab.h
 $(O)dbridge.o: $(SRC)\dbridge.c $(HACK_H)
@@ -777,7 +776,7 @@ $(O)detect.o: $(SRC)\detect.c $(HACK_H) $(INCL)\artifact.h
 $(O)dig.o: $(SRC)\dig.c $(HACK_H)
 $(O)display.o: $(SRC)\display.c $(HACK_H)
 $(O)dlb.o: $(SRC)\dlb.c $(CONFIG_H) $(INCL)\dlb.h
-$(O)do.o: $(SRC)\do.c $(HACK_H) $(INCL)\lev.h
+$(O)do.o: $(SRC)\do.c $(HACK_H)
 $(O)do_name.o: $(SRC)\do_name.c $(HACK_H)
 $(O)do_wear.o: $(SRC)\do_wear.c $(HACK_H)
 $(O)dog.o: $(SRC)\dog.c $(HACK_H)
@@ -787,8 +786,8 @@ $(O)dothrow.o: $(SRC)\dothrow.c $(HACK_H)
 $(O)drawing.o: $(SRC)\drawing.c $(HACK_H) $(INCL)\tcap.h
 $(O)dungeon.o: $(SRC)\dungeon.c $(HACK_H) $(INCL)\dgn_file.h $(INCL)\dlb.h
 $(O)eat.o: $(SRC)\eat.c $(HACK_H)
-$(O)end.o: $(SRC)\end.c $(HACK_H) $(INCL)\lev.h $(INCL)\dlb.h
-$(O)engrave.o: $(SRC)\engrave.c $(HACK_H) $(INCL)\lev.h
+$(O)end.o: $(SRC)\end.c $(HACK_H) $(INCL)\dlb.h
+$(O)engrave.o: $(SRC)\engrave.c $(HACK_H)
 $(O)exper.o: $(SRC)\exper.c $(HACK_H)
 $(O)explode.o: $(SRC)\explode.c $(HACK_H)
 $(O)extralev.o: $(SRC)\extralev.c $(HACK_H)
@@ -797,7 +796,7 @@ $(O)fountain.o: $(SRC)\fountain.c $(HACK_H)
 $(O)hack.o: $(SRC)\hack.c $(HACK_H)
 $(O)hacklib.o: $(SRC)\hacklib.c $(HACK_H)
 $(O)invent.o: $(SRC)\invent.c $(HACK_H) $(INCL)\artifact.h
-$(O)light.o: $(SRC)\light.c $(HACK_H) $(INCL)\lev.h
+$(O)light.o: $(SRC)\light.c $(HACK_H)
 $(O)lock.o: $(SRC)\lock.c $(HACK_H)
 $(O)mail.o: $(SRC)\mail.c $(HACK_H) $(INCL)\mail.h
 $(O)makemon.o: $(SRC)\makemon.c $(HACK_H)
@@ -808,7 +807,7 @@ $(O)mhitu.o: $(SRC)\mhitu.c $(HACK_H) $(INCL)\artifact.h
 $(O)minion.o: $(SRC)\minion.c $(HACK_H)
 $(O)mklev.o: $(SRC)\mklev.c $(HACK_H)
 $(O)mkmap.o: $(SRC)\mkmap.c $(HACK_H) $(INCL)\sp_lev.h
-$(O)mkmaze.o: $(SRC)\mkmaze.c $(HACK_H) $(INCL)\sp_lev.h $(INCL)\lev.h
+$(O)mkmaze.o: $(SRC)\mkmaze.c $(HACK_H) $(INCL)\sp_lev.h
 $(O)mkobj.o: $(SRC)\mkobj.c $(HACK_H) $(INCL)\artifact.h
 $(O)mkroom.o: $(SRC)\mkroom.c $(HACK_H)
 $(O)mon.o: $(SRC)\mon.c $(HACK_H) $(INCL)\mfndpos.h
@@ -821,7 +820,7 @@ $(O)mplayer.o: $(SRC)\mplayer.c $(HACK_H)
 $(O)mthrowu.o: $(SRC)\mthrowu.c $(HACK_H)
 $(O)muse.o: $(SRC)\muse.c $(HACK_H)
 $(O)music.o: $(SRC)\music.c $(HACK_H) #interp.c
-$(O)o_init.o: $(SRC)\o_init.c $(HACK_H) $(INCL)\lev.h
+$(O)o_init.o: $(SRC)\o_init.c $(HACK_H)
 $(O)objects.o: $(SRC)\objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
 $(O)objnam.o: $(SRC)\objnam.c $(HACK_H)
@@ -834,17 +833,17 @@ $(O)polyself.o: $(SRC)\polyself.c $(HACK_H)
 $(O)potion.o: $(SRC)\potion.c $(HACK_H)
 $(O)pray.o: $(SRC)\pray.c $(HACK_H)
 $(O)priest.o: $(SRC)\priest.c $(HACK_H) $(INCL)\mfndpos.h
-$(O)quest.o: $(SRC)\quest.c $(HACK_H) $(INCL)\qtext.h
-$(O)questpgr.o: $(SRC)\questpgr.c $(HACK_H) $(INCL)\dlb.h $(INCL)\qtext.h
+$(O)quest.o: $(SRC)\quest.c $(HACK_H)
+$(O)questpgr.o: $(SRC)\questpgr.c $(HACK_H) $(INCL)\dlb.h
 $(O)read.o: $(SRC)\read.c $(HACK_H)
 $(O)rect.o: $(SRC)\rect.c $(HACK_H)
-$(O)region.o: $(SRC)\region.c $(HACK_H) $(INCL)\lev.h
-$(O)restore.o: $(SRC)\restore.c $(HACK_H) $(INCL)\lev.h $(INCL)\tcap.h
+$(O)region.o: $(SRC)\region.c $(HACK_H)
+$(O)restore.o: $(SRC)\restore.c $(HACK_H) $(INCL)\tcap.h
 $(O)rip.o: $(SRC)\rip.c $(HACK_H)
 $(O)rnd.o: $(SRC)\rnd.c $(HACK_H)
 $(O)role.o: $(SRC)\role.c $(HACK_H)
-$(O)rumors.o: $(SRC)\rumors.c $(HACK_H) $(INCL)\lev.h $(INCL)\dlb.h
-$(O)save.o: $(SRC)\save.c $(HACK_H) $(INCL)\lev.h
+$(O)rumors.o: $(SRC)\rumors.c $(HACK_H) $(INCL)\dlb.h
+$(O)save.o: $(SRC)\save.c $(HACK_H)
 $(O)shk.o: $(SRC)\shk.c $(HACK_H)
 $(O)shknam.o: $(SRC)\shknam.c $(HACK_H)
 $(O)sit.o: $(SRC)\sit.c $(HACK_H) $(INCL)\artifact.h
@@ -854,7 +853,7 @@ $(O)spell.o: $(SRC)\spell.c $(HACK_H)
 $(O)steal.o: $(SRC)\steal.c $(HACK_H)
 $(O)steed.o: $(SRC)\steed.c $(HACK_H)
 $(O)teleport.o: $(SRC)\teleport.c $(HACK_H)
-$(O)timeout.o: $(SRC)\timeout.c $(HACK_H) $(INCL)\lev.h
+$(O)timeout.o: $(SRC)\timeout.c $(HACK_H)
 $(O)topten.o: $(SRC)\topten.c $(HACK_H) $(INCL)\dlb.h $(INCL)\patchlevel.h
 $(O)track.o: $(SRC)\track.c $(HACK_H)
 $(O)trap.o: $(SRC)\trap.c $(HACK_H)
@@ -867,8 +866,8 @@ $(O)weapon.o: $(SRC)\weapon.c $(HACK_H)
 $(O)were.o: $(SRC)\were.c $(HACK_H)
 $(O)wield.o: $(SRC)\wield.c $(HACK_H)
 $(O)windows.o: $(SRC)\windows.c $(HACK_H) $(INCL)\wingem.h $(INCL)\winGnome.h
-$(O)wizard.o: $(SRC)\wizard.c $(HACK_H) $(INCL)\qtext.h
-$(O)worm.o: $(SRC)\worm.c $(HACK_H) $(INCL)\lev.h
+$(O)wizard.o: $(SRC)\wizard.c $(HACK_H)
+$(O)worm.o: $(SRC)\worm.c $(HACK_H)
 $(O)worn.o: $(SRC)\worn.c $(HACK_H)
 $(O)write.o: $(SRC)\write.c $(HACK_H)
 $(O)zap.o: $(SRC)\zap.c $(HACK_H)

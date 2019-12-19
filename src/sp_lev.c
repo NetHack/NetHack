@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1567805254 2019/09/06 21:27:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1574646949 2019/11/25 01:55:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,8 +9,9 @@
  * It contains also the special level loader.
  */
 
+#define IN_SP_LEV_C
+ 
 #include "hack.h"
-#include "dlb.h"
 #include "sp_lev.h"
 
 #ifdef _MSC_VER
@@ -22,34 +23,12 @@ typedef void FDECL((*select_iter_func), (int, int, genericptr));
 
 extern void FDECL(mkmap, (lev_init *));
 
+static void NDECL(create_des_coder); 
 static void NDECL(solidify_map);
-static void FDECL(splev_stack_init, (struct splevstack *));
-static void FDECL(splev_stack_done, (struct splevstack *));
-static void FDECL(splev_stack_push, (struct splevstack *,
-                                         struct opvar *));
-static struct opvar *FDECL(splev_stack_pop, (struct splevstack *));
-static struct splevstack *FDECL(splev_stack_reverse,
-                                    (struct splevstack *));
-static struct opvar *FDECL(opvar_new_str, (char *));
-static struct opvar *FDECL(opvar_new_int, (long));
-static struct opvar *FDECL(opvar_new_coord, (int, int));
-#if 0
-static struct opvar * FDECL(opvar_new_region, (int,int, int,int));
-#endif /*0*/
-static struct opvar *FDECL(opvar_clone, (struct opvar *));
-static struct opvar *FDECL(opvar_var_conversion, (struct sp_coder *,
-                                                      struct opvar *));
-static struct splev_var *FDECL(opvar_var_defined, (struct sp_coder *,
-                                                       char *));
-static struct opvar *FDECL(splev_stack_getdat, (struct sp_coder *,
-                                                    XCHAR_P));
-static struct opvar *FDECL(splev_stack_getdat_any, (struct sp_coder *));
-static void FDECL(variable_list_del, (struct splev_var *));
 static void FDECL(lvlfill_maze_grid, (int, int, int, int, SCHAR_P));
 static void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
 static void FDECL(set_wall_property, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                                           int));
-static void NDECL(shuffle_alignments);
 static void NDECL(count_features);
 static void NDECL(remove_boundary_syms);
 static void FDECL(set_door_orientation, (int, int));
@@ -61,8 +40,6 @@ static int NDECL(rndtrap);
 static void FDECL(get_location, (schar *, schar *, int, struct mkroom *));
 static boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
 static unpacked_coord FDECL(get_unpacked_coord, (long, int));
-static void FDECL(get_location_coord, (schar *, schar *, int,
-                                           struct mkroom *, long));
 static void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
 static void FDECL(get_free_room_loc, (schar *, schar *,
                                           struct mkroom *, packed_coord));
@@ -86,86 +63,69 @@ static void FDECL(light_region, (region *));
 static void FDECL(wallify_map, (int, int, int, int));
 static void FDECL(maze1xy, (coord *, int));
 static void NDECL(fill_empty_maze);
-static boolean FDECL(sp_level_loader, (dlb *, sp_lev *));
-static boolean FDECL(sp_level_free, (sp_lev *));
 static void FDECL(splev_initlev, (lev_init *));
-static struct sp_frame *FDECL(frame_new, (long));
-static void FDECL(frame_del, (struct sp_frame *));
-static void FDECL(spo_frame_push, (struct sp_coder *));
-static void FDECL(spo_frame_pop, (struct sp_coder *));
+#if 0
+/* macosx complains that these are unused */
 static long FDECL(sp_code_jmpaddr, (long, long));
-static void FDECL(spo_call, (struct sp_coder *));
-static void FDECL(spo_return, (struct sp_coder *));
-static void FDECL(spo_end_moninvent, (struct sp_coder *));
-static void FDECL(spo_pop_container, (struct sp_coder *));
-static void FDECL(spo_message, (struct sp_coder *));
-static void FDECL(spo_monster, (struct sp_coder *));
-static void FDECL(spo_object, (struct sp_coder *));
-static void FDECL(spo_level_flags, (struct sp_coder *));
-static void FDECL(spo_initlevel, (struct sp_coder *));
-static void FDECL(spo_engraving, (struct sp_coder *));
-static void FDECL(spo_mineralize, (struct sp_coder *));
 static void FDECL(spo_room, (struct sp_coder *));
-static void FDECL(spo_endroom, (struct sp_coder *));
-static void FDECL(spo_stair, (struct sp_coder *));
-static void FDECL(spo_ladder, (struct sp_coder *));
-static void FDECL(spo_grave, (struct sp_coder *));
-static void FDECL(spo_altar, (struct sp_coder *));
 static void FDECL(spo_trap, (struct sp_coder *));
 static void FDECL(spo_gold, (struct sp_coder *));
 static void FDECL(spo_corridor, (struct sp_coder *));
-static void FDECL(selection_setpoint, (int, int, struct opvar *, XCHAR_P));
-static struct opvar *FDECL(selection_not, (struct opvar *));
-static struct opvar *FDECL(selection_logical_oper, (struct opvar *,
-                                                     struct opvar *, CHAR_P));
-static struct opvar *FDECL(selection_filter_mapchar, (struct opvar *,
-                                                          struct opvar *));
-static void FDECL(selection_filter_percent, (struct opvar *, int));
-static int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *,
-                                          BOOLEAN_P));
-static void FDECL(selection_do_grow, (struct opvar *, int));
-static int FDECL(floodfillchk_match_under, (int, int));
-static int FDECL(floodfillchk_match_accessible, (int, int));
-static boolean FDECL(sel_flood_havepoint, (int, int,
-                                               xchar *, xchar *, int));
-static void FDECL(selection_do_ellipse, (struct opvar *, int, int,
-                                             int, int, int));
-static long FDECL(line_dist_coord, (long, long, long, long, long, long));
-static void FDECL(selection_do_gradient, (struct opvar *, long, long, long,
-                                              long, long, long, long, long));
-static void FDECL(selection_do_line, (SCHAR_P, SCHAR_P, SCHAR_P, SCHAR_P,
-                                          struct opvar *));
-static void FDECL(selection_do_randline, (SCHAR_P, SCHAR_P, SCHAR_P,
-                                              SCHAR_P, SCHAR_P, SCHAR_P,
-                                              struct opvar *));
-static void FDECL(selection_iterate, (struct opvar *, select_iter_func,
-                                          genericptr_t));
-static void FDECL(sel_set_ter, (int, int, genericptr_t));
-static void FDECL(sel_set_feature, (int, int, genericptr_t));
-static void FDECL(sel_set_door, (int, int, genericptr_t));
-static void FDECL(spo_door, (struct sp_coder *));
 static void FDECL(spo_feature, (struct sp_coder *));
 static void FDECL(spo_terrain, (struct sp_coder *));
 static void FDECL(spo_replace_terrain, (struct sp_coder *));
-static boolean FDECL(generate_way_out_method, (int, int, struct opvar *));
-static void NDECL(ensure_way_out);
 static void FDECL(spo_levregion, (struct sp_coder *));
 static void FDECL(spo_region, (struct sp_coder *));
 static void FDECL(spo_drawbridge, (struct sp_coder *));
 static void FDECL(spo_mazewalk, (struct sp_coder *));
 static void FDECL(spo_wall_property, (struct sp_coder *));
 static void FDECL(spo_room_door, (struct sp_coder *));
-static void FDECL(sel_set_wallify, (int, int, genericptr_t));
 static void FDECL(spo_wallify, (struct sp_coder *));
-static void FDECL(spo_map, (struct sp_coder *));
-static void FDECL(spo_jmp, (struct sp_coder *, sp_lev *));
-static void FDECL(spo_conditional_jump, (struct sp_coder *, sp_lev *));
-static void FDECL(spo_var_init, (struct sp_coder *));
-#if 0
-static long FDECL(opvar_array_length, (struct sp_coder *));
-#endif /*0*/
-static void FDECL(spo_shuffle_array, (struct sp_coder *));
-static boolean FDECL(sp_level_coder, (sp_lev *));
+static void FDECL(sel_set_wallify, (int, int, genericptr_t));
+#endif
+static void NDECL(spo_end_moninvent);
+static void NDECL(spo_pop_container);
+static void FDECL(spo_endroom, (struct sp_coder *));
+static void FDECL(sel_set_ter, (int, int, genericptr_t));
+static void FDECL(sel_set_door, (int, int, genericptr_t));
+static void FDECL(sel_set_feature, (int, int, genericptr_t));
+static int FDECL(get_coord, (lua_State *, int, int *, int *));
+static int FDECL(get_table_region, (lua_State *, const char *, int *, int *, int *, int *, BOOLEAN_P));
+
+/* lua_CFunction prototypes */
+int FDECL(lspo_altar, (lua_State *));
+int FDECL(lspo_branch, (lua_State *));
+int FDECL(lspo_corridor, (lua_State *));
+int FDECL(lspo_door, (lua_State *));
+int FDECL(lspo_drawbridge, (lua_State *));
+int FDECL(lspo_engraving, (lua_State *));
+int FDECL(lspo_feature, (lua_State *));
+int FDECL(lspo_gold, (lua_State *));
+int FDECL(lspo_grave, (lua_State *));
+int FDECL(lspo_ladder, (lua_State *));
+int FDECL(lspo_level_flags, (lua_State *));
+int FDECL(lspo_level_init, (lua_State *));
+int FDECL(lspo_levregion, (lua_State *));
+int FDECL(lspo_map, (lua_State *));
+int FDECL(lspo_mazewalk, (lua_State *));
+int FDECL(lspo_message, (lua_State *));
+int FDECL(lspo_mineralize, (lua_State *));
+int FDECL(lspo_monster, (lua_State *));
+int FDECL(lspo_non_diggable, (lua_State *));
+int FDECL(lspo_non_passwall, (lua_State *));
+int FDECL(lspo_object, (lua_State *));
+int FDECL(lspo_portal, (lua_State *));
+int FDECL(lspo_random_corridors, (lua_State *));
+int FDECL(lspo_region, (lua_State *));
+int FDECL(lspo_replace_terrain, (lua_State *));
+int FDECL(lspo_reset_level, (lua_State *));
+int FDECL(lspo_room, (lua_State *));
+int FDECL(lspo_stair, (lua_State *));
+int FDECL(lspo_teleport_region, (lua_State *));
+int FDECL(lspo_terrain, (lua_State *));
+int FDECL(lspo_trap, (lua_State *));
+int FDECL(lspo_wall_property, (lua_State *));
+int FDECL(lspo_wallify, (lua_State *));
 
 #define LEFT 1
 #define H_LEFT 2
@@ -181,17 +141,13 @@ static boolean FDECL(sp_level_coder, (sp_lev *));
 #define XLIM 4
 #define YLIM 3
 
-#define Fread (void) dlb_fread
-#define Fgetc (schar) dlb_fgetc
 #define New(type) (type *) alloc(sizeof(type))
 #define NewTab(type, size) (type **) alloc(sizeof(type *) * (unsigned) size)
 #define Free(ptr) if (ptr) free((genericptr_t) (ptr))
 
 extern struct engr *head_engr;
 
-#define SPLEV_STACK_RESERVE 128
-
-void
+static void
 solidify_map()
 {
     xchar x, y;
@@ -202,382 +158,7 @@ solidify_map()
                 levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
 }
 
-void
-splev_stack_init(st)
-struct splevstack *st;
-{
-    if (st) {
-        st->depth = 0;
-        st->depth_alloc = SPLEV_STACK_RESERVE;
-        st->stackdata =
-           (struct opvar **) alloc(st->depth_alloc * sizeof (struct opvar *));
-    }
-}
-
-void
-splev_stack_done(st)
-struct splevstack *st;
-{
-    if (st) {
-        int i;
-
-        if (st->stackdata && st->depth) {
-            for (i = 0; i < st->depth; i++) {
-                switch (st->stackdata[i]->spovartyp) {
-                default:
-                case SPOVAR_NULL:
-                case SPOVAR_COORD:
-                case SPOVAR_REGION:
-                case SPOVAR_MAPCHAR:
-                case SPOVAR_MONST:
-                case SPOVAR_OBJ:
-                case SPOVAR_INT:
-                    break;
-                case SPOVAR_VARIABLE:
-                case SPOVAR_STRING:
-                case SPOVAR_SEL:
-                    Free(st->stackdata[i]->vardata.str);
-                    st->stackdata[i]->vardata.str = NULL;
-                    break;
-                }
-                Free(st->stackdata[i]);
-                st->stackdata[i] = NULL;
-            }
-        }
-        Free(st->stackdata);
-        st->stackdata = NULL;
-        st->depth = st->depth_alloc = 0;
-        Free(st);
-    }
-}
-
-void
-splev_stack_push(st, v)
-struct splevstack *st;
-struct opvar *v;
-{
-    if (!st || !v)
-        return;
-    if (!st->stackdata)
-        panic("splev_stack_push: no stackdata allocated?");
-
-    if (st->depth >= st->depth_alloc) {
-        struct opvar **tmp = (struct opvar **) alloc(
-           (st->depth_alloc + SPLEV_STACK_RESERVE) * sizeof (struct opvar *));
-
-        (void) memcpy(tmp, st->stackdata,
-                      st->depth_alloc * sizeof(struct opvar *));
-        Free(st->stackdata);
-        st->stackdata = tmp;
-        st->depth_alloc += SPLEV_STACK_RESERVE;
-    }
-
-    st->stackdata[st->depth] = v;
-    st->depth++;
-}
-
-struct opvar *
-splev_stack_pop(st)
-struct splevstack *st;
-{
-    struct opvar *ret = NULL;
-
-    if (!st)
-        return ret;
-    if (!st->stackdata)
-        panic("splev_stack_pop: no stackdata allocated?");
-
-    if (st->depth) {
-        st->depth--;
-        ret = st->stackdata[st->depth];
-        st->stackdata[st->depth] = NULL;
-        return ret;
-    } else
-        impossible("splev_stack_pop: empty stack?");
-    return ret;
-}
-
-struct splevstack *
-splev_stack_reverse(st)
-struct splevstack *st;
-{
-    long i;
-    struct opvar *tmp;
-
-    if (!st)
-        return NULL;
-    if (!st->stackdata)
-        panic("splev_stack_reverse: no stackdata allocated?");
-    for (i = 0; i < (st->depth / 2); i++) {
-        tmp = st->stackdata[i];
-        st->stackdata[i] = st->stackdata[st->depth - i - 1];
-        st->stackdata[st->depth - i - 1] = tmp;
-    }
-    return st;
-}
-
-#define OV_typ(o) (o->spovartyp)
-#define OV_i(o) (o->vardata.l)
-#define OV_s(o) (o->vardata.str)
-
-#define OV_pop_i(x) (x = splev_stack_getdat(coder, SPOVAR_INT))
-#define OV_pop_c(x) (x = splev_stack_getdat(coder, SPOVAR_COORD))
-#define OV_pop_r(x) (x = splev_stack_getdat(coder, SPOVAR_REGION))
-#define OV_pop_s(x) (x = splev_stack_getdat(coder, SPOVAR_STRING))
-#define OV_pop(x) (x = splev_stack_getdat_any(coder))
-#define OV_pop_typ(x, typ) (x = splev_stack_getdat(coder, typ))
-
-struct opvar *
-opvar_new_str(s)
-char *s;
-{
-    struct opvar *tmpov = (struct opvar *) alloc(sizeof (struct opvar));
-
-    tmpov->spovartyp = SPOVAR_STRING;
-    if (s) {
-        int len = strlen(s);
-        tmpov->vardata.str = (char *) alloc(len + 1);
-        (void) memcpy((genericptr_t) tmpov->vardata.str, (genericptr_t) s,
-                      len);
-        tmpov->vardata.str[len] = '\0';
-    } else
-        tmpov->vardata.str = NULL;
-    return tmpov;
-}
-
-struct opvar *
-opvar_new_int(i)
-long i;
-{
-    struct opvar *tmpov = (struct opvar *) alloc(sizeof (struct opvar));
-
-    tmpov->spovartyp = SPOVAR_INT;
-    tmpov->vardata.l = i;
-    return tmpov;
-}
-
-struct opvar *
-opvar_new_coord(x, y)
-int x, y;
-{
-    struct opvar *tmpov = (struct opvar *) alloc(sizeof (struct opvar));
-
-    tmpov->spovartyp = SPOVAR_COORD;
-    tmpov->vardata.l = SP_COORD_PACK(x, y);
-    return tmpov;
-}
-
-#if 0
-struct opvar *
-opvar_new_region(x1,y1,x2,y2)
-     int x1,y1,x2,y2;
-{
-    struct opvar *tmpov = (struct opvar *) alloc(sizeof (struct opvar));
-
-    tmpov->spovartyp = SPOVAR_REGION;
-    tmpov->vardata.l = SP_REGION_PACK(x1,y1,x2,y2);
-    return tmpov;
-}
-#endif /*0*/
-
-void
-opvar_free_x(ov)
-struct opvar *ov;
-{
-    if (!ov)
-        return;
-    switch (ov->spovartyp) {
-    case SPOVAR_COORD:
-    case SPOVAR_REGION:
-    case SPOVAR_MAPCHAR:
-    case SPOVAR_MONST:
-    case SPOVAR_OBJ:
-    case SPOVAR_INT:
-        break;
-    case SPOVAR_VARIABLE:
-    case SPOVAR_STRING:
-    case SPOVAR_SEL:
-        Free(ov->vardata.str);
-        break;
-    default:
-        impossible("Unknown opvar value type (%i)!", ov->spovartyp);
-    }
-    Free(ov);
-}
-
-/*
- * Name of current function for use in messages:
- * __func__     -- C99 standard;
- * __FUNCTION__ -- gcc extension, starting before C99 and continuing after;
- *                 picked up by other compilers (or vice versa?);
- * __FUNC__     -- supported by Borland;
- * nhFunc       -- slightly intrusive but fully portable nethack construct
- *                 for any version of any compiler.
- */
-#define opvar_free(ov)                                    \
-    do {                                                  \
-        if (ov) {                                         \
-            opvar_free_x(ov);                             \
-            ov = NULL;                                    \
-        } else                                            \
-            impossible("opvar_free(), %s", nhFunc);       \
-    } while (0)
-
-struct opvar *
-opvar_clone(ov)
-struct opvar *ov;
-{
-    struct opvar *tmpov;
-
-    if (!ov)
-        panic("no opvar to clone");
-    tmpov = (struct opvar *) alloc(sizeof(struct opvar));
-    tmpov->spovartyp = ov->spovartyp;
-    switch (ov->spovartyp) {
-    case SPOVAR_COORD:
-    case SPOVAR_REGION:
-    case SPOVAR_MAPCHAR:
-    case SPOVAR_MONST:
-    case SPOVAR_OBJ:
-    case SPOVAR_INT:
-        tmpov->vardata.l = ov->vardata.l;
-        break;
-    case SPOVAR_VARIABLE:
-    case SPOVAR_STRING:
-    case SPOVAR_SEL:
-        tmpov->vardata.str = dupstr(ov->vardata.str);
-        break;
-    default:
-        impossible("Unknown push value type (%i)!", ov->spovartyp);
-    }
-    return tmpov;
-}
-
-struct opvar *
-opvar_var_conversion(coder, ov)
-struct sp_coder *coder;
-struct opvar *ov;
-{
-    static const char nhFunc[] = "opvar_var_conversion";
-    struct splev_var *tmp;
-    struct opvar *tmpov;
-    struct opvar *array_idx = NULL;
-
-    if (!coder || !ov)
-        return NULL;
-    if (ov->spovartyp != SPOVAR_VARIABLE)
-        return ov;
-    tmp = coder->frame->variables;
-    while (tmp) {
-        if (!strcmp(tmp->name, OV_s(ov))) {
-            if ((tmp->svtyp & SPOVAR_ARRAY)) {
-                array_idx = opvar_var_conversion(coder,
-                                               splev_stack_pop(coder->stack));
-                if (!array_idx || OV_typ(array_idx) != SPOVAR_INT)
-                    panic("array idx not an int");
-                if (tmp->array_len < 1)
-                    panic("array len < 1");
-                OV_i(array_idx) = (OV_i(array_idx) % tmp->array_len);
-                tmpov = opvar_clone(tmp->data.arrayvalues[OV_i(array_idx)]);
-                opvar_free(array_idx);
-                return tmpov;
-            } else {
-                tmpov = opvar_clone(tmp->data.value);
-                return tmpov;
-            }
-        }
-        tmp = tmp->next;
-    }
-    return NULL;
-}
-
-struct splev_var *
-opvar_var_defined(coder, name)
-struct sp_coder *coder;
-char *name;
-{
-    struct splev_var *tmp;
-
-    if (!coder)
-        return NULL;
-    tmp = coder->frame->variables;
-    while (tmp) {
-        if (!strcmp(tmp->name, name))
-            return tmp;
-        tmp = tmp->next;
-    }
-    return NULL;
-}
-
-struct opvar *
-splev_stack_getdat(coder, typ)
-struct sp_coder *coder;
-xchar typ;
-{
-    static const char nhFunc[] = "splev_stack_getdat";
-    if (coder && coder->stack) {
-        struct opvar *tmp = splev_stack_pop(coder->stack);
-        struct opvar *ret = NULL;
-
-        if (!tmp)
-            panic("no value type %i in stack.", typ);
-        if (tmp->spovartyp == SPOVAR_VARIABLE) {
-            ret = opvar_var_conversion(coder, tmp);
-            opvar_free(tmp);
-            tmp = ret;
-        }
-        if (tmp->spovartyp == typ)
-            return tmp;
-        else opvar_free(tmp);
-    }
-    return NULL;
-}
-
-struct opvar *
-splev_stack_getdat_any(coder)
-struct sp_coder *coder;
-{
-    static const char nhFunc[] = "splev_stack_getdat_any";
-    if (coder && coder->stack) {
-        struct opvar *tmp = splev_stack_pop(coder->stack);
-        if (tmp && tmp->spovartyp == SPOVAR_VARIABLE) {
-            struct opvar *ret = opvar_var_conversion(coder, tmp);
-            opvar_free(tmp);
-            return ret;
-        }
-        return tmp;
-    }
-    return NULL;
-}
-
-void
-variable_list_del(varlist)
-struct splev_var *varlist;
-{
-    static const char nhFunc[] = "variable_list_del";
-    struct splev_var *tmp = varlist;
-
-    if (!tmp)
-        return;
-    while (tmp) {
-        Free(tmp->name);
-        if ((tmp->svtyp & SPOVAR_ARRAY)) {
-            long idx = tmp->array_len;
-
-            while (idx-- > 0) {
-                opvar_free(tmp->data.arrayvalues[idx]);
-            };
-            Free(tmp->data.arrayvalues);
-        } else {
-            opvar_free(tmp->data.value);
-        }
-        tmp = varlist->next;
-        Free(varlist);
-        varlist = tmp;
-    }
-}
-
-void
+static void
 lvlfill_maze_grid(x1, y1, x2, y2, filling)
 int x1, y1, x2, y2;
 schar filling;
@@ -594,7 +175,7 @@ schar filling;
         }
 }
 
-void
+static void
 lvlfill_solid(filling, lit)
 schar filling;
 schar lit;
@@ -604,7 +185,26 @@ schar lit;
     for (x = 2; x <= g.x_maze_max; x++)
         for (y = 0; y <= g.y_maze_max; y++) {
             SET_TYPLIT(x, y, filling, lit);
+            /* TODO: consolidate this w lspo_map ? */
+            levl[x][y].flags = 0;
+            levl[x][y].horizontal = 0;
+            levl[x][y].roomno = 0;
+            levl[x][y].edge = 0;
         }
+}
+
+void
+sel_set_wall_property(x, y, arg)
+int x, y;
+genericptr_t arg;
+{
+    int prop = *(int *)arg;
+
+    if (IS_STWALL(levl[x][y].typ) || IS_TREE(levl[x][y].typ)
+        /* 3.6.2: made iron bars eligible to be flagged nondiggable
+           (checked by chewing(hack.c) and zap_over_floor(zap.c)) */
+        || levl[x][y].typ == IRONBARS)
+        levl[x][y].wall_info |= prop;
 }
 
 /*
@@ -616,7 +216,6 @@ xchar x1, y1, x2, y2;
 int prop;
 {
     register xchar x, y;
-    struct rm *lev;
 
     x1 = max(x1, 1);
     x2 = min(x2, COLNO - 1);
@@ -624,31 +223,8 @@ int prop;
     y2 = min(y2, ROWNO - 1);
     for (y = y1; y <= y2; y++)
         for (x = x1; x <= x2; x++) {
-            lev = &levl[x][y];
-            if (IS_STWALL(lev->typ) || IS_TREE(lev->typ)
-                /* 3.6.2: made iron bars eligible to be flagged nondiggable
-                   (checked by chewing(hack.c) and zap_over_floor(zap.c)) */
-                || lev->typ == IRONBARS)
-                lev->wall_info |= prop;
+            sel_set_wall_property(x, y, (genericptr_t)&prop);
         }
-}
-
-static void
-shuffle_alignments()
-{
-    int i;
-    aligntyp atmp;
-
-    /* shuffle 3 alignments */
-    i = rn2(3);
-    atmp = g.ralign[2];
-    g.ralign[2] = g.ralign[i];
-    g.ralign[i] = atmp;
-    if (rn2(2)) {
-        atmp = g.ralign[1];
-        g.ralign[1] = g.ralign[0];
-        g.ralign[0] = atmp;
-    }
 }
 
 /*
@@ -670,7 +246,7 @@ count_features()
         }
 }
 
-void
+static void
 remove_boundary_syms()
 {
     /*
@@ -775,7 +351,7 @@ link_doors_rooms()
             }
 }
 
-void
+static void
 fill_rooms()
 {
     int tmpi, m;
@@ -945,7 +521,7 @@ register int humidity;
     return FALSE;
 }
 
-unpacked_coord
+static unpacked_coord
 get_unpacked_coord(loc, defhumidity)
 long loc;
 int defhumidity;
@@ -967,7 +543,7 @@ int defhumidity;
     return c;
 }
 
-static void
+void
 get_location_coord(x, y, humidity, croom, crd)
 schar *x, *y;
 int humidity;
@@ -1375,7 +951,7 @@ struct mkroom *broom;
             y = broom->ly - 1;
             x = broom->lx
                 + ((dpos == -1) ? rn2(1 + (broom->hx - broom->lx)) : dpos);
-            if (IS_ROCK(levl[x][y - 1].typ))
+            if (!isok(x,y - 1))
                 goto redoloop;
             goto outdirloop;
         case 1:
@@ -1384,7 +960,7 @@ struct mkroom *broom;
             y = broom->hy + 1;
             x = broom->lx
                 + ((dpos == -1) ? rn2(1 + (broom->hx - broom->lx)) : dpos);
-            if (IS_ROCK(levl[x][y + 1].typ))
+            if (!isok(x,y + 1))
                 goto redoloop;
             goto outdirloop;
         case 2:
@@ -1393,7 +969,7 @@ struct mkroom *broom;
             x = broom->lx - 1;
             y = broom->ly
                 + ((dpos == -1) ? rn2(1 + (broom->hy - broom->ly)) : dpos);
-            if (IS_ROCK(levl[x - 1][y].typ))
+            if (!isok(x - 1,y))
                 goto redoloop;
             goto outdirloop;
         case 3:
@@ -1402,7 +978,7 @@ struct mkroom *broom;
             x = broom->hx + 1;
             y = broom->ly
                 + ((dpos == -1) ? rn2(1 + (broom->hy - broom->ly)) : dpos);
-            if (IS_ROCK(levl[x + 1][y].typ))
+            if (!isok(x + 1,y))
                 goto redoloop;
             goto outdirloop;
         default:
@@ -1581,9 +1157,9 @@ struct mkroom *croom;
                ? Align2amask(u.ualignbase[A_ORIGINAL])
                : (m->align == AM_SPLEV_NONCO)
                   ? Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]))
-                  : (m->align <= -(MAX_REGISTERS + 1))
+                  : (m->align == AM_SPLEV_RANDOM)
                      ? induced_align(80)
-                     : (m->align < 0 ? g.ralign[-m->align - 1] : m->align);
+                     : m->align;
 
     if (!class)
         pm = (struct permonst *) 0;
@@ -1619,7 +1195,7 @@ struct mkroom *croom;
     if (MON_AT(x, y) && enexto(&cc, x, y, pm))
         x = cc.x, y = cc.y;
 
-    if (m->align != -(MAX_REGISTERS + 2))
+    if (m->align != AM_SPLEV_RANDOM)
         mtmp = mk_roamer(pm, Amask2align(amask), x, y, m->peaceful);
     else if (PM_ARCHEOLOGIST <= m->id && m->id <= PM_WIZARD)
         mtmp = mk_mplayer(pm, x, y, FALSE);
@@ -1906,10 +1482,6 @@ struct mkroom *croom;
         otmp->otrapped = o->trapped;
     if (o->greased)
         otmp->greased = 1;
-#ifdef INVISIBLE_OBJECTS
-    if (o->invis)
-        otmp->oinvis = 1;
-#endif
 
     if (o->quan > 0 && objects[otmp->otyp].oc_merge) {
         otmp->quan = o->quan;
@@ -1917,7 +1489,7 @@ struct mkroom *croom;
     }
 
     /* contents (of a container or monster's inventory) */
-    if (o->containment & SP_OBJ_CONTENT) {
+    if (o->containment & SP_OBJ_CONTENT || g.invent_carrying_monster) {
         if (!g.container_idx) {
             if (!g.invent_carrying_monster) {
                 /*impossible("create_object: no container");*/
@@ -2086,9 +1658,9 @@ struct mkroom *croom;
                ? Align2amask(u.ualignbase[A_ORIGINAL])
                : (a->align == AM_SPLEV_NONCO)
                   ? Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]))
-                  : (a->align == -(MAX_REGISTERS + 1))
+                  : (a->align == AM_SPLEV_RANDOM)
                      ? induced_align(80)
-                     : (a->align < 0 ? g.ralign[-a->align - 1] : a->align);
+                     : a->align;
 
     levl[x][y].typ = ALTAR;
     levl[x][y].altarmask = amask;
@@ -2106,7 +1678,7 @@ struct mkroom *croom;
     }
 }
 
-void
+static void
 replace_terrain(terr, croom)
 replaceterrain *terr;
 struct mkroom *croom;
@@ -2145,13 +1717,13 @@ int cnt;
     int xx, yy;
 
     switch (wall) {
-    case W_NORTH:
+    case W_SOUTH:
         dy = 0;
         dx = 1;
         xx = croom->lx;
         yy = croom->hy + 1;
         break;
-    case W_SOUTH:
+    case W_NORTH:
         dy = 0;
         dx = 1;
         xx = croom->lx;
@@ -2364,7 +1936,6 @@ corridor *c;
     if (!search_door(&g.rooms[c->src.room], &org.x, &org.y, c->src.wall,
                      c->src.door))
         return;
-
     if (c->dest.room != -1) {
         if (!search_door(&g.rooms[c->dest.room], &dest.x, &dest.y, c->dest.wall,
                          c->dest.door))
@@ -2469,7 +2040,7 @@ boolean prefilled;
     }
 }
 
-struct mkroom *
+static struct mkroom *
 build_room(r, mkr)
 room *r;
 struct mkroom *mkr;
@@ -2646,105 +2217,7 @@ fill_empty_maze()
     }
 }
 
-/*
- * special level loader
- */
-static boolean
-sp_level_loader(fd, lvl)
-dlb *fd;
-sp_lev *lvl;
-{
-    long n_opcode = 0;
-    struct opvar *opdat;
-    int opcode;
-
-    Fread((genericptr_t) & (lvl->n_opcodes), 1, sizeof(lvl->n_opcodes), fd);
-    lvl->opcodes = (_opcode *) alloc(sizeof(_opcode) * (lvl->n_opcodes));
-
-    while (n_opcode < lvl->n_opcodes) {
-        Fread((genericptr_t) &lvl->opcodes[n_opcode].opcode, 1,
-              sizeof(lvl->opcodes[n_opcode].opcode), fd);
-        opcode = lvl->opcodes[n_opcode].opcode;
-
-        opdat = NULL;
-
-        if (opcode < SPO_NULL || opcode >= MAX_SP_OPCODES)
-            panic("sp_level_loader: impossible opcode %i.", opcode);
-
-        if (opcode == SPO_PUSH) {
-            int nsize;
-            struct opvar *ov = (struct opvar *) alloc(sizeof(struct opvar));
-
-            opdat = ov;
-            ov->spovartyp = SPO_NULL;
-            ov->vardata.l = 0;
-            Fread((genericptr_t) & (ov->spovartyp), 1, sizeof(ov->spovartyp),
-                  fd);
-
-            switch (ov->spovartyp) {
-            case SPOVAR_NULL:
-                break;
-            case SPOVAR_COORD:
-            case SPOVAR_REGION:
-            case SPOVAR_MAPCHAR:
-            case SPOVAR_MONST:
-            case SPOVAR_OBJ:
-            case SPOVAR_INT:
-                Fread((genericptr_t) & (ov->vardata.l), 1,
-                      sizeof(ov->vardata.l), fd);
-                break;
-            case SPOVAR_VARIABLE:
-            case SPOVAR_STRING:
-            case SPOVAR_SEL: {
-                char *opd;
-
-                Fread((genericptr_t) &nsize, 1, sizeof(nsize), fd);
-                opd = (char *) alloc(nsize + 1);
-
-                if (nsize)
-                    Fread(opd, 1, nsize, fd);
-                opd[nsize] = 0;
-                ov->vardata.str = opd;
-                break;
-            }
-            default:
-                panic("sp_level_loader: unknown opvar type %i",
-                      ov->spovartyp);
-            }
-        }
-
-        lvl->opcodes[n_opcode].opdat = opdat;
-        n_opcode++;
-    } /*while*/
-
-    return TRUE;
-}
-
-/* Frees the memory allocated for special level creation structs */
-static boolean
-sp_level_free(lvl)
-sp_lev *lvl;
-{
-    static const char nhFunc[] = "sp_level_free";
-    long n_opcode = 0;
-
-    while (n_opcode < lvl->n_opcodes) {
-        int opcode = lvl->opcodes[n_opcode].opcode;
-        struct opvar *opdat = lvl->opcodes[n_opcode].opdat;
-
-        if (opcode < SPO_NULL || opcode >= MAX_SP_OPCODES)
-            panic("sp_level_free: unknown opcode %i", opcode);
-
-        if (opdat)
-            opvar_free(opdat);
-        n_opcode++;
-    }
-    Free(lvl->opcodes);
-    lvl->opcodes = NULL;
-    return TRUE;
-}
-
-void
+static void
 splev_initlev(linit)
 lev_init *linit;
 {
@@ -2760,7 +2233,7 @@ lev_init *linit;
         lvlfill_solid(linit->filling, linit->lit);
         break;
     case LVLINIT_MAZEGRID:
-        lvlfill_maze_grid(2, 0, g.x_maze_max, g.y_maze_max, linit->filling);
+        lvlfill_maze_grid(2, 0, g.x_maze_max, g.y_maze_max, linit->bg);
         break;
     case LVLINIT_ROGUE:
         makeroguerooms();
@@ -2776,132 +2249,19 @@ lev_init *linit;
     }
 }
 
-struct sp_frame *
-frame_new(execptr)
-long execptr;
-{
-    struct sp_frame *frame =
-        (struct sp_frame *) alloc(sizeof(struct sp_frame));
-
-    frame->next = NULL;
-    frame->variables = NULL;
-    frame->n_opcode = execptr;
-    frame->stack = (struct splevstack *) alloc(sizeof(struct splevstack));
-    splev_stack_init(frame->stack);
-    return frame;
-}
-
-void
-frame_del(frame)
-struct sp_frame *frame;
-{
-    if (!frame)
-        return;
-    if (frame->stack) {
-        splev_stack_done(frame->stack);
-        frame->stack = NULL;
-    }
-    if (frame->variables) {
-        variable_list_del(frame->variables);
-        frame->variables = NULL;
-    }
-    Free(frame);
-}
-
-void
-spo_frame_push(coder)
-struct sp_coder *coder;
-{
-    struct sp_frame *tmpframe = frame_new(coder->frame->n_opcode);
-
-    tmpframe->next = coder->frame;
-    coder->frame = tmpframe;
-}
-
-void
-spo_frame_pop(coder)
-struct sp_coder *coder;
-{
-    if (coder->frame && coder->frame->next) {
-        struct sp_frame *tmpframe = coder->frame->next;
-
-        frame_del(coder->frame);
-        coder->frame = tmpframe;
-        coder->stack = coder->frame->stack;
-    }
-}
-
-long
+#if 0
+static long
 sp_code_jmpaddr(curpos, jmpaddr)
 long curpos, jmpaddr;
 {
     return (curpos + jmpaddr);
 }
+#endif
 
-void
-spo_call(coder)
-struct sp_coder *coder;
-{
-    static const char nhFunc[] = "spo_call";
-    struct opvar *addr;
-    struct opvar *params;
-    struct sp_frame *tmpframe;
-
-    if (!OV_pop_i(addr) || !OV_pop_i(params))
-        return;
-    if (OV_i(params) < 0)
-        return;
-
-    tmpframe = frame_new(sp_code_jmpaddr(coder->frame->n_opcode,
-                                         OV_i(addr) - 1));
-
-    while (OV_i(params)-- > 0) {
-        splev_stack_push(tmpframe->stack, splev_stack_getdat_any(coder));
-    }
-    splev_stack_reverse(tmpframe->stack);
-
-    /* push a frame */
-    tmpframe->next = coder->frame;
-    coder->frame = tmpframe;
-
-    opvar_free(addr);
-    opvar_free(params);
-}
-
-void
-spo_return(coder)
-struct sp_coder *coder;
-{
-    static const char nhFunc[] = "spo_return";
-    struct opvar *params;
-
-    if (!coder->frame || !coder->frame->next)
-        panic("return: no frame.");
-    if (!OV_pop_i(params))
-        return;
-    if (OV_i(params) < 0)
-        return;
-
-    while (OV_i(params)-- > 0) {
-        splev_stack_push(coder->frame->next->stack,
-                         splev_stack_pop(coder->stack));
-    }
-
-    /* pop the frame */
-    if (coder->frame->next) {
-        struct sp_frame *tmpframe = coder->frame->next;
-        frame_del(coder->frame);
-        coder->frame = tmpframe;
-        coder->stack = coder->frame->stack;
-    }
-
-    opvar_free(params);
-}
 
 /*ARGUSED*/
-void
-spo_end_moninvent(coder)
-struct sp_coder *coder UNUSED;
+static void
+spo_end_moninvent()
 {
     if (g.invent_carrying_monster)
         m_dowear(g.invent_carrying_monster, TRUE);
@@ -2909,9 +2269,8 @@ struct sp_coder *coder UNUSED;
 }
 
 /*ARGUSED*/
-void
-spo_pop_container(coder)
-struct sp_coder *coder UNUSED;
+static void
+spo_pop_container()
 {
     if (g.container_idx > 0) {
         g.container_idx--;
@@ -2919,20 +2278,25 @@ struct sp_coder *coder UNUSED;
     }
 }
 
-void
-spo_message(coder)
-struct sp_coder *coder;
+/* message("What a strange feeling!"); */
+int
+lspo_message(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_message";
-    struct opvar *op;
-    char *msg, *levmsg;
+    char *levmsg;
     int old_n, n;
+    const char *msg;
 
-    if (!OV_pop_s(op))
-        return;
-    msg = OV_s(op);
-    if (!msg)
-        return;
+    int argc = lua_gettop(L);
+
+    if (argc < 1) {
+        nhl_error(L, "Wrong parameters");
+        return 0;
+    }
+
+    create_des_coder();
+
+    msg = luaL_checkstring(L, 1);
 
     old_n = g.lev_message ? (strlen(g.lev_message) + 1) : 0;
     n = strlen(msg);
@@ -2947,25 +2311,90 @@ struct sp_coder *coder;
     levmsg[old_n + n] = '\0';
     Free(g.lev_message);
     g.lev_message = levmsg;
-    opvar_free(op);
+
+    return 0;  /* number of results */
 }
 
-void
-spo_monster(coder)
-struct sp_coder *coder;
+int
+get_table_align(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_monster";
-    int nparams = 0;
-    struct opvar *varparam;
-    struct opvar *id, *mcoord, *has_inv;
+    const char *const gtaligns[] = { "noalign", "law", "neutral", "chaos", "coaligned", "noncoaligned", "random", NULL };
+    const int aligns2i[] = { AM_NONE, AM_LAWFUL, AM_NEUTRAL, AM_CHAOTIC, AM_SPLEV_CO, AM_SPLEV_NONCO, AM_SPLEV_RANDOM, 0 };
+
+    int a = aligns2i[get_table_option(L, "align", "random", gtaligns)];
+
+    return a;
+}
+
+int
+get_table_monclass(L)
+lua_State *L;
+{
+    char *s = get_table_str_opt(L, "class", NULL);
+    int ret = -1;
+
+    if (s && strlen(s) == 1)
+        ret = (int) *s;
+    Free(s);
+
+    return ret;
+}
+
+int
+find_montype(L, s)
+lua_State *L;
+const char *s;
+{
+    int i;
+
+    for (i = LOW_PM; i < NUMMONS; i++)
+        if (!strcmpi(mons[i].mname, s))
+            return i;
+    nhUse(L);
+    return NON_PM;
+}
+
+int
+get_table_montype(L)
+lua_State *L;
+{
+    char *s = get_table_str_opt(L, "id", NULL);
+    int ret = NON_PM;
+
+    if (s) {
+        ret = find_montype(L, s);
+        Free(s);
+        if (ret == NON_PM)
+            nhl_error(L, "Unknown monster id");
+    }
+    return ret;
+}
+
+/* monster(); */
+/* monster("wood nymph"); */
+/* monster("D"); */
+/* monster("giant eel",11,06); */
+/* monster("hill giant", {08,06}); */
+/* monster({ id = "giant mimic", appear_as = "obj:boulder" }); */
+/* monster({ class = "H", peaceful = 0 }); */
+int
+lspo_monster(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
     monster tmpmons;
+    int mx = -1, my = -1;
+    char *mappear = NULL;
+
+    create_des_coder();
 
     tmpmons.peaceful = -1;
     tmpmons.asleep = -1;
-    tmpmons.name.str = (char *) 0;
+    tmpmons.name.str = NULL;
     tmpmons.appear = 0;
     tmpmons.appear_as.str = (char *) 0;
-    tmpmons.align = -MAX_REGISTERS - 2;
+    tmpmons.align = AM_SPLEV_RANDOM;
     tmpmons.female = 0;
     tmpmons.invis = 0;
     tmpmons.cancelled = 0;
@@ -2979,134 +2408,242 @@ struct sp_coder *coder;
     tmpmons.seentraps = 0;
     tmpmons.has_invent = 0;
 
-    if (!OV_pop_i(has_inv))
-        return;
+    if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
+        const char *paramstr = luaL_checkstring(L, 1);
 
-    if (!OV_pop_i(varparam))
-        return;
-
-    while ((nparams++ < (SP_M_V_END + 1)) && (OV_typ(varparam) == SPOVAR_INT)
-           && (OV_i(varparam) >= 0) && (OV_i(varparam) < SP_M_V_END)) {
-        struct opvar *parm = NULL;
-
-        OV_pop(parm);
-        switch (OV_i(varparam)) {
-        case SP_M_V_NAME:
-            if ((OV_typ(parm) == SPOVAR_STRING) && !tmpmons.name.str)
-                tmpmons.name.str = dupstr(OV_s(parm));
-            break;
-        case SP_M_V_APPEAR:
-            if ((OV_typ(parm) == SPOVAR_INT) && !tmpmons.appear_as.str) {
-                tmpmons.appear = OV_i(parm);
-                opvar_free(parm);
-                OV_pop(parm);
-                tmpmons.appear_as.str = dupstr(OV_s(parm));
-            }
-            break;
-        case SP_M_V_ASLEEP:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.asleep = OV_i(parm);
-            break;
-        case SP_M_V_ALIGN:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.align = OV_i(parm);
-            break;
-        case SP_M_V_PEACEFUL:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.peaceful = OV_i(parm);
-            break;
-        case SP_M_V_FEMALE:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.female = OV_i(parm);
-            break;
-        case SP_M_V_INVIS:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.invis = OV_i(parm);
-            break;
-        case SP_M_V_CANCELLED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.cancelled = OV_i(parm);
-            break;
-        case SP_M_V_REVIVED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.revived = OV_i(parm);
-            break;
-        case SP_M_V_AVENGE:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.avenge = OV_i(parm);
-            break;
-        case SP_M_V_FLEEING:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.fleeing = OV_i(parm);
-            break;
-        case SP_M_V_BLINDED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.blinded = OV_i(parm);
-            break;
-        case SP_M_V_PARALYZED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.paralyzed = OV_i(parm);
-            break;
-        case SP_M_V_STUNNED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.stunned = OV_i(parm);
-            break;
-        case SP_M_V_CONFUSED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.confused = OV_i(parm);
-            break;
-        case SP_M_V_SEENTRAPS:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpmons.seentraps = OV_i(parm);
-            break;
-        case SP_M_V_END:
-            nparams = SP_M_V_END + 1;
-            break;
-        default:
-            impossible("MONSTER with unknown variable param type!");
-            break;
+        if (strlen(paramstr) == 1) {
+            tmpmons.class = *paramstr;
+            tmpmons.id = NON_PM;
+        } else {
+            tmpmons.class = -1;
+            tmpmons.id = find_montype(L, paramstr);
         }
-        opvar_free(parm);
-        if (OV_i(varparam) != SP_M_V_END) {
-            opvar_free(varparam);
-            OV_pop(varparam);
+    } else if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
+               && lua_type(L, 2) == LUA_TTABLE) {
+        const char *paramstr = luaL_checkstring(L, 1);
+
+        get_coord(L, 2, &mx, &my);
+
+        if (strlen(paramstr) == 1) {
+            tmpmons.class = *paramstr;
+            tmpmons.id = NON_PM;
+        } else {
+            tmpmons.class = -1;
+            tmpmons.id = find_montype(L, paramstr);
+        }
+
+    } else if (argc == 3) {
+        const char *paramstr = luaL_checkstring(L, 1);
+
+        mx = luaL_checkinteger(L, 2);
+        my = luaL_checkinteger(L, 3);
+
+        if (strlen(paramstr) == 1) {
+            tmpmons.class = *paramstr;
+            tmpmons.id = NON_PM;
+        } else {
+            tmpmons.class = -1;
+            tmpmons.id = find_montype(L, paramstr);
+        }
+    } else {
+        lcheck_param_table(L);
+
+        tmpmons.peaceful = get_table_int_opt(L, "peaceful", -1); /* TODO: alias hostile=!peaceful */
+        tmpmons.asleep = get_table_int_opt(L, "asleep", -1);
+        tmpmons.name.str = get_table_str_opt(L, "name", NULL);
+        tmpmons.appear = 0;
+        tmpmons.appear_as.str = (char *) 0;
+        tmpmons.align = get_table_align(L);
+        tmpmons.female = get_table_int_opt(L, "female", 0);
+        tmpmons.invis = get_table_int_opt(L, "invisible", 0);
+        tmpmons.cancelled = get_table_int_opt(L, "cancelled", 0);
+        tmpmons.revived = get_table_int_opt(L, "revived", 0);
+        tmpmons.avenge = get_table_int_opt(L, "avenge", 0);
+        tmpmons.fleeing = get_table_int_opt(L, "fleeing", 0);
+        tmpmons.blinded = get_table_int_opt(L, "blinded", 0);
+        tmpmons.paralyzed = get_table_int_opt(L, "paralyzed", 0);
+        tmpmons.stunned = get_table_int_opt(L, "stunned", 0);
+        tmpmons.confused = get_table_int_opt(L, "confused", 0);
+        tmpmons.seentraps = 0; /* TODO: list of trap names to bitfield */
+        tmpmons.has_invent = 0;
+
+        mappear = get_table_str_opt(L, "appear_as", NULL);
+        if (mappear) {
+            if (!strncmp("obj:", mappear, 4)) {
+                tmpmons.appear = M_AP_OBJECT;
+            } else if (!strncmp("mon:", mappear, 4)) {
+                tmpmons.appear = M_AP_MONSTER;
+            } else if (!strncmp("ter:", mappear, 4)) {
+                tmpmons.appear = M_AP_FURNITURE;
+            } else {
+                nhl_error(L, "Unknown appear_as type");
+            }
+            tmpmons.appear_as.str = dupstr(&mappear[4]);
+            Free(mappear);
+        }
+
+        mx = get_table_int_opt(L, "x", -1);
+        my = get_table_int_opt(L, "y", -1);
+
+        if (mx == -1 && my == -1) {
+            lua_getfield(L, 1, "coord");
+            get_coord(L, -1, &mx, &my);
+            lua_pop(L, 1);
+        }
+
+        tmpmons.id = get_table_montype(L);
+        tmpmons.class = get_table_monclass(L);
+
+        lua_getfield(L, 1, "inventory");
+        if (!lua_isnil(L, -1)) {
+            tmpmons.has_invent = 1;
         }
     }
 
-    if (!OV_pop_c(mcoord))
-        panic("no monster coord?");
+    if (mx == -1 && my == -1)
+        tmpmons.coord = SP_COORD_PACK_RANDOM(0);
+    else
+        tmpmons.coord = SP_COORD_PACK(mx, my);
 
-    if (!OV_pop_typ(id, SPOVAR_MONST))
-        panic("no mon type");
+    if (tmpmons.id != NON_PM && tmpmons.class == -1)
+        tmpmons.class = def_monsyms[(int) mons[tmpmons.id].mlet].sym;
 
-    tmpmons.id = SP_MONST_PM(OV_i(id));
-    tmpmons.class = SP_MONST_CLASS(OV_i(id));
-    tmpmons.coord = OV_i(mcoord);
-    tmpmons.has_invent = OV_i(has_inv);
+    create_monster(&tmpmons, g.coder->croom);
 
-    create_monster(&tmpmons, coder->croom);
+    if (tmpmons.has_invent && lua_type(L, -1) == LUA_TFUNCTION) {
+        lua_remove(L, -2);
+        lua_call(L, 0, 0);
+        spo_end_moninvent();
+    } else
+        lua_pop(L, 1);
 
     Free(tmpmons.name.str);
     Free(tmpmons.appear_as.str);
-    opvar_free(id);
-    opvar_free(mcoord);
-    opvar_free(has_inv);
-    opvar_free(varparam);
+
+    return 0;
 }
 
-void
-spo_object(coder)
-struct sp_coder *coder;
+/* the hash key 'name' is an integer or "random",
+   or if not existent, also return rndval.
+ */
+int
+get_table_int_or_random(L, name, rndval)
+lua_State *L;
+const char *name;
+int rndval;
 {
-    static const char nhFunc[] = "spo_object";
+    int ret;
+    char buf[BUFSZ];
+
+    lua_getfield(L, 1, name);
+    if (lua_type(L, -1) == LUA_TNIL) {
+        lua_pop(L, 1);
+        return rndval;
+    }
+    if (!lua_isnumber(L, -1)) {
+        const char *tmp = lua_tostring(L, -1);
+
+        if (tmp && !strcmpi("random", tmp)) {
+            lua_pop(L, 1);
+            return rndval;
+        }
+        Sprintf(buf, "Expected integer or \"random\" for \"%s\", got %s", name, tmp);
+        nhl_error(L, buf);
+        lua_pop(L, 1);
+        return 0;
+    }
+    ret = luaL_optinteger(L, -1, rndval);
+    lua_pop(L, 1);
+    return ret;
+}
+
+int
+get_table_buc(L)
+lua_State *L;
+{
+    const char *const bucs[] = { "random", "blessed", "uncursed", "cursed", NULL };
+    const int bucs2i[] = { 0, 1, 2, 3, 0 };
+
+    int curse_state = bucs2i[get_table_option(L, "buc", "random", bucs)];
+    return curse_state;
+}
+
+int
+get_table_objclass(L)
+lua_State *L;
+{
+    char *s = get_table_str_opt(L, "class", NULL);
+    int ret = -1;
+
+    if (s && strlen(s) == 1)
+        ret = (int) *s;
+    Free(s);
+    return ret;
+}
+
+int
+find_objtype(L, s)
+lua_State *L;
+const char *s;
+{
+    if (s) {
+        int i;
+        const char *objname;
+
+        /* find by object name */
+        for (i = 0; i < NUM_OBJECTS; i++) {
+            objname = obj_descr[i].oc_name;
+            if (objname && !strcmpi(s, objname))
+                return i;
+        }
+
+        /* find by object description */
+        for (i = 0; i < NUM_OBJECTS; i++) {
+            objname = obj_descr[i].oc_descr;
+            if (objname && !strcmpi(s, objname))
+                return i;
+        }
+
+        nhl_error(L, "Unknown object id");
+    }
+    return STRANGE_OBJECT;
+}
+
+int
+get_table_objtype(L)
+lua_State *L;
+{
+    char *s = get_table_str_opt(L, "id", NULL);
+    int ret = find_objtype(L, s);
+
+    Free(s);
+    return ret;
+}
+
+/* object(); */
+/* object("sack"); */
+/* object("scimitar", 6,7); */
+/* object("scimitar", {6,7}); */
+/* object({ class = "%" }); */
+/* object({ id = "boulder", x = 03, y = 12}); */
+/* object({ id = "boulder", coord = {03,12} }); */
+int
+lspo_object(L)
+lua_State *L;
+{
+#if 0
     int nparams = 0;
+#endif
     long quancnt;
-    struct opvar *varparam;
-    struct opvar *id, *containment;
     object tmpobj;
+    int ox = -1, oy = -1;
+    int argc = lua_gettop(L);
+    int maybe_contents = 0;
+
+    create_des_coder();
 
     tmpobj.spe = -127;
-    tmpobj.curse_state = -1;
+    tmpobj.curse_state = 0;
     tmpobj.corpsenm = NON_PM;
     tmpobj.name.str = (char *) 0;
     tmpobj.quan = -1;
@@ -3116,329 +2653,429 @@ struct sp_coder *coder;
     tmpobj.locked = 0;
     tmpobj.trapped = -1;
     tmpobj.recharged = 0;
-    tmpobj.invis = 0;
     tmpobj.greased = 0;
     tmpobj.broken = 0;
-    tmpobj.coord = SP_COORD_PACK_RANDOM(0);
+    tmpobj.containment = 0;
 
-    if (!OV_pop_i(containment))
-        return;
+    if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
+        const char *paramstr = luaL_checkstring(L, 1);
 
-    if (!OV_pop_i(varparam))
-        return;
-
-    while ((nparams++ < (SP_O_V_END + 1)) && (OV_typ(varparam) == SPOVAR_INT)
-           && (OV_i(varparam) >= 0) && (OV_i(varparam) < SP_O_V_END)) {
-        struct opvar *parm;
-
-        OV_pop(parm);
-        switch (OV_i(varparam)) {
-        case SP_O_V_NAME:
-            if ((OV_typ(parm) == SPOVAR_STRING) && !tmpobj.name.str)
-                tmpobj.name.str = dupstr(OV_s(parm));
-            break;
-        case SP_O_V_CORPSENM:
-            if (OV_typ(parm) == SPOVAR_MONST) {
-                char monclass = SP_MONST_CLASS(OV_i(parm));
-                int monid = SP_MONST_PM(OV_i(parm));
-
-                if (monid >= LOW_PM && monid < NUMMONS) {
-                    tmpobj.corpsenm = monid;
-                    break; /* we're done! */
-                } else {
-                    struct permonst *pm = (struct permonst *) 0;
-
-                    if (def_char_to_monclass(monclass) != MAXMCLASSES) {
-                        pm = mkclass(def_char_to_monclass(monclass), G_NOGEN);
-                    } else {
-                        pm = rndmonst();
-                    }
-                    if (pm)
-                        tmpobj.corpsenm = monsndx(pm);
-                }
-            }
-            break;
-        case SP_O_V_CURSE:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.curse_state = OV_i(parm);
-            break;
-        case SP_O_V_SPE:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.spe = OV_i(parm);
-            break;
-        case SP_O_V_QUAN:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.quan = OV_i(parm);
-            break;
-        case SP_O_V_BURIED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.buried = OV_i(parm);
-            break;
-        case SP_O_V_LIT:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.lit = OV_i(parm);
-            break;
-        case SP_O_V_ERODED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.eroded = OV_i(parm);
-            break;
-        case SP_O_V_LOCKED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.locked = OV_i(parm);
-            break;
-        case SP_O_V_TRAPPED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.trapped = OV_i(parm);
-            break;
-        case SP_O_V_RECHARGED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.recharged = OV_i(parm);
-            break;
-        case SP_O_V_INVIS:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.invis = OV_i(parm);
-            break;
-        case SP_O_V_GREASED:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.greased = OV_i(parm);
-            break;
-        case SP_O_V_BROKEN:
-            if (OV_typ(parm) == SPOVAR_INT)
-                tmpobj.broken = OV_i(parm);
-            break;
-        case SP_O_V_COORD:
-            if (OV_typ(parm) != SPOVAR_COORD)
-                panic("no coord for obj?");
-            tmpobj.coord = OV_i(parm);
-            break;
-        case SP_O_V_END:
-            nparams = SP_O_V_END + 1;
-            break;
-        default:
-            impossible("OBJECT with unknown variable param type!");
-            break;
+        if (strlen(paramstr) == 1) {
+            tmpobj.class = *paramstr;
+            tmpobj.id = STRANGE_OBJECT;
+        } else {
+            tmpobj.class = -1;
+            tmpobj.id = find_objtype(L, paramstr);
         }
-        opvar_free(parm);
-        if (OV_i(varparam) != SP_O_V_END) {
-            opvar_free(varparam);
-            OV_pop(varparam);
+    } else if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
+               && lua_type(L, 2) == LUA_TTABLE) {
+        const char *paramstr = luaL_checkstring(L, 1);
+
+        get_coord(L, 2, &ox, &oy);
+
+        if (strlen(paramstr) == 1) {
+            tmpobj.class = *paramstr;
+            tmpobj.id = STRANGE_OBJECT;
+        } else {
+            tmpobj.class = -1;
+            tmpobj.id = find_objtype(L, paramstr);
+        }
+    } else if (argc == 3) {
+        const char *paramstr = luaL_checkstring(L, 1);
+
+        ox = luaL_checkinteger(L, 2);
+        oy = luaL_checkinteger(L, 3);
+
+        if (strlen(paramstr) == 1) {
+            tmpobj.class = *paramstr;
+            tmpobj.id = STRANGE_OBJECT;
+        } else {
+            tmpobj.class = -1;
+            tmpobj.id = find_objtype(L, paramstr);
+        }
+    } else {
+        lcheck_param_table(L);
+
+        tmpobj.spe = get_table_int_or_random(L, "spe", -127);
+        tmpobj.curse_state = get_table_buc(L);
+        tmpobj.corpsenm = NON_PM;
+        tmpobj.name.str = get_table_str_opt(L, "name", (char *) 0);
+        tmpobj.quan = get_table_int_or_random(L, "quantity", -1);
+        tmpobj.buried = get_table_boolean_opt(L, "buried", 0);
+        tmpobj.lit = get_table_boolean_opt(L, "lit", 0);
+        tmpobj.eroded = get_table_int_opt(L, "eroded", 0);
+        tmpobj.locked = get_table_boolean_opt(L, "locked", 0);
+        tmpobj.trapped = get_table_int_opt(L, "trapped", -1);
+        tmpobj.recharged = get_table_int_opt(L, "recharged", 0);
+        tmpobj.greased = get_table_boolean_opt(L, "greased", 0);
+        tmpobj.broken = get_table_boolean_opt(L, "broken", 0);
+
+        ox = get_table_int_opt(L, "x", -1);
+        oy = get_table_int_opt(L, "y", -1);
+
+        if (ox == -1 && oy == -1) {
+            lua_getfield(L, 1, "coord");
+            get_coord(L, -1, &ox, &oy);
+            lua_pop(L, 1);
+        }
+
+        tmpobj.id = get_table_objtype(L);
+        tmpobj.class = get_table_objclass(L);
+        maybe_contents = 1;
+    }
+
+    if (ox == -1 && oy == -1)
+        tmpobj.coord = SP_COORD_PACK_RANDOM(0);
+    else
+        tmpobj.coord = SP_COORD_PACK(ox, oy);
+
+    if (tmpobj.class == -1 && tmpobj.id > STRANGE_OBJECT)
+        tmpobj.class = objects[tmpobj.id].oc_class;
+    else if (tmpobj.class > -1 && tmpobj.id == STRANGE_OBJECT)
+        tmpobj.id = -1;
+
+    if (tmpobj.id == STATUE || tmpobj.id == EGG || tmpobj.id == CORPSE || tmpobj.id == TIN) {
+        int lflags = 0;
+        char *montype = get_table_str_opt(L, "montype", NULL);
+
+        if (montype) {
+            struct permonst *pm = NULL;
+            if (strlen(montype) == 1 && def_char_to_monclass(*montype) != MAXMCLASSES) {
+                pm = mkclass(def_char_to_monclass(*montype), G_NOGEN);
+            } else {
+                int i;
+                for (i = LOW_PM; i < NUMMONS; i++)
+                    if (!strcmpi(mons[i].mname, montype)) {
+                        pm = &mons[i];
+                        break;
+                    }
+            }
+            if (pm)
+                tmpobj.corpsenm = monsndx(pm);
+            else
+                nhl_error(L, "Unknown montype");
+            free(montype);
+        }
+        if (tmpobj.id == STATUE) {
+            lflags |= (get_table_boolean_opt(L, "historic", 0) ? STATUE_HISTORIC : 0x00);
+            lflags |= (get_table_boolean_opt(L, "male", 0) ? STATUE_MALE : 0x00);
+            lflags |= (get_table_boolean_opt(L, "female", 0) ? STATUE_FEMALE : 0x00);
+            tmpobj.spe = lflags;
+        } else if (tmpobj.id == EGG) {
+            tmpobj.spe = get_table_boolean_opt(L, "laid_by_you", 0) ? 1 : 0;
         }
     }
 
-    if (!OV_pop_typ(id, SPOVAR_OBJ))
-        panic("no obj type");
-
-    tmpobj.id = SP_OBJ_TYP(OV_i(id));
-    tmpobj.class = SP_OBJ_CLASS(OV_i(id));
-    tmpobj.containment = OV_i(containment);
-
     quancnt = (tmpobj.id > STRANGE_OBJECT) ? tmpobj.quan : 0;
 
+    if (g.container_idx)
+        tmpobj.containment |= SP_OBJ_CONTENT;
+
+    if (maybe_contents) {
+        lua_getfield(L, 1, "contents");
+        if (!lua_isnil(L, -1))
+            tmpobj.containment |= SP_OBJ_CONTAINER;
+    }
+
     do {
-        create_object(&tmpobj, coder->croom);
+        create_object(&tmpobj, g.coder->croom);
         quancnt--;
     } while ((quancnt > 0) && ((tmpobj.id > STRANGE_OBJECT)
                                && !objects[tmpobj.id].oc_merge));
 
+    if (lua_type(L, -1) == LUA_TFUNCTION) {
+        lua_remove(L, -2);
+        lua_call(L, 0, 0);
+    } else
+        lua_pop(L, 1);
+
+    if ((tmpobj.containment & SP_OBJ_CONTAINER) != 0)
+        spo_pop_container();
+
     Free(tmpobj.name.str);
-    opvar_free(varparam);
-    opvar_free(id);
-    opvar_free(containment);
+
+    return 0;
 }
 
-void
-spo_level_flags(coder)
-struct sp_coder *coder;
+/* level_flags("noteleport", "mazelevel", ... ); */
+int
+lspo_level_flags(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_level_flags";
-    struct opvar *flagdata;
-    long lflags;
+    int argc = lua_gettop(L);
+    int i;
 
-    if (!OV_pop_i(flagdata))
-        return;
-    lflags = OV_i(flagdata);
+    create_des_coder();
 
-    if (lflags & NOTELEPORT)
-        g.level.flags.noteleport = 1;
-    if (lflags & HARDFLOOR)
-        g.level.flags.hardfloor = 1;
-    if (lflags & NOMMAP)
-        g.level.flags.nommap = 1;
-    if (lflags & SHORTSIGHTED)
-        g.level.flags.shortsighted = 1;
-    if (lflags & ARBOREAL)
-        g.level.flags.arboreal = 1;
-    if (lflags & MAZELEVEL)
-        g.level.flags.is_maze_lev = 1;
-    if (lflags & PREMAPPED)
-        coder->premapped = TRUE;
-    if (lflags & SHROUD)
-        g.level.flags.hero_memory = 0;
-    if (lflags & GRAVEYARD)
-        g.level.flags.graveyard = 1;
-    if (lflags & ICEDPOOLS)
-        g.icedpools = TRUE;
-    if (lflags & SOLIDIFY)
-        coder->solidify = TRUE;
-    if (lflags & CORRMAZE)
-        g.level.flags.corrmaze = TRUE;
-    if (lflags & CHECK_INACCESSIBLES)
-        coder->check_inaccessibles = TRUE;
+    if (argc < 1)
+        nhl_error(L, "expected string params");
 
-    opvar_free(flagdata);
+    for (i = 1; i <= argc; i++) {
+        const char *s = luaL_checkstring(L, i);
+
+        if (!strcmpi(s, "noteleport"))
+            g.level.flags.noteleport = 1;
+        else if (!strcmpi(s, "hardfloor"))
+            g.level.flags.hardfloor = 1;
+        else if (!strcmpi(s, "nommap"))
+            g.level.flags.nommap = 1;
+        else if (!strcmpi(s, "shortsighted"))
+            g.level.flags.shortsighted = 1;
+        else if (!strcmpi(s, "arboreal"))
+            g.level.flags.arboreal = 1;
+        else if (!strcmpi(s, "mazelevel"))
+            g.level.flags.is_maze_lev = 1;
+        else if (!strcmpi(s, "shroud"))
+            g.level.flags.hero_memory = 1;
+        else if (!strcmpi(s, "graveyard"))
+            g.level.flags.graveyard = 1;
+        else if (!strcmpi(s, "icedpools"))
+            g.icedpools = 1;
+        else if (!strcmpi(s, "corrmaze"))
+            g.level.flags.corrmaze = 1;
+        else if (!strcmpi(s, "premapped"))
+            g.coder->premapped = 1;
+        else if (!strcmpi(s, "solidify"))
+            g.coder->solidify = 1;
+        else if (!strcmpi(s, "inaccessibles"))
+            g.coder->check_inaccessibles = 1;
+        else {
+            char buf[BUFSZ];
+            Sprintf(buf, "Unknown level flag %s", s);
+            nhl_error(L, buf);
+        }
+    }
+
+    return 0;
 }
 
-void
-spo_initlevel(coder)
-struct sp_coder *coder;
+/* level_init({ style = "solidfill", fg = " " }); */
+/* level_init({ style = "mines", fg = ".", bg = "}", smoothed=1, joined=1, lit=0 }) */
+int
+lspo_level_init(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_initlevel";
     lev_init init_lev;
-    struct opvar *init_style, *fg, *bg, *smoothed, *joined, *lit, *walled,
-        *filling;
+    const char *const initstyles[] = { "solidfill", "mazegrid", "rogue", "mines", NULL };
+    const int initstyles2i[] = { LVLINIT_SOLIDFILL, LVLINIT_MAZEGRID, LVLINIT_ROGUE, LVLINIT_MINES };
 
-    if (!OV_pop_i(fg) || !OV_pop_i(bg) || !OV_pop_i(smoothed)
-        || !OV_pop_i(joined) || !OV_pop_i(lit) || !OV_pop_i(walled)
-        || !OV_pop_i(filling) || !OV_pop_i(init_style))
-        return;
+    create_des_coder();
+
+    lcheck_param_table(L);
 
     g.splev_init_present = TRUE;
 
-    init_lev.init_style = OV_i(init_style);
-    init_lev.fg = OV_i(fg);
-    init_lev.bg = OV_i(bg);
-    init_lev.smoothed = OV_i(smoothed);
-    init_lev.joined = OV_i(joined);
-    init_lev.lit = OV_i(lit);
-    init_lev.walled = OV_i(walled);
-    init_lev.filling = OV_i(filling);
+    init_lev.init_style = initstyles2i[get_table_option(L, "style", "solidfill", initstyles)];
+    init_lev.fg = get_table_mapchr_opt(L, "fg", ROOM);
+    init_lev.bg = get_table_mapchr_opt(L, "bg", STONE);
+    init_lev.smoothed = get_table_boolean_opt(L, "smoothed", 0);
+    init_lev.joined = get_table_boolean_opt(L, "joined", 0);
+    init_lev.lit = get_table_int_or_random(L, "lit", -1); /* TODO: allow lit=BOOL */
+    init_lev.walled = get_table_boolean_opt(L, "walled", 0);
+    init_lev.filling = get_table_mapchr_opt(L, "filling", init_lev.fg);
 
-    coder->lvl_is_joined = OV_i(joined);
+    g.coder->lvl_is_joined = init_lev.joined;
 
     splev_initlev(&init_lev);
 
-    opvar_free(init_style);
-    opvar_free(fg);
-    opvar_free(bg);
-    opvar_free(smoothed);
-    opvar_free(joined);
-    opvar_free(lit);
-    opvar_free(walled);
-    opvar_free(filling);
+    return 0;
 }
 
-void
-spo_engraving(coder)
-struct sp_coder *coder;
+/* engraving({ x = 1, y = 1, type="burn", text="Foo" }); */
+/* engraving({x,y}, "engrave", "Foo"); */
+int
+lspo_engraving(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_engraving";
-    struct opvar *etyp, *txt, *ecoord;
-    xchar x, y;
+    int etyp = DUST;
+    char *txt = (char *) 0;
+    long ecoord;
+    const char *const engrtypes[] = { "dust", "engrave", "burn", "mark", "blood", NULL };
+    const int engrtypes2i[] = { DUST, ENGRAVE, BURN, MARK, ENGR_BLOOD, 0 };
+    xchar x = -1, y = -1;
+    int argc = lua_gettop(L);
 
-    if (!OV_pop_i(etyp) || !OV_pop_s(txt) || !OV_pop_c(ecoord))
-        return;
+    create_des_coder();
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(ecoord));
-    make_engr_at(x, y, OV_s(txt), 0L, OV_i(etyp));
+    if (argc == 1) {
+        lcheck_param_table(L);
 
-    opvar_free(etyp);
-    opvar_free(txt);
-    opvar_free(ecoord);
+        etyp = engrtypes2i[get_table_option(L, "type", "engrave", engrtypes)];
+        x = get_table_int_opt(L, "x", -1);
+        y = get_table_int_opt(L, "y", -1);
+        txt = get_table_str(L, "text");
+    } else if (argc == 3) {
+        int ex, ey;
+        get_coord(L, 1, &ex, &ey);
+        x = ex;
+        y = ey;
+        etyp = engrtypes2i[luaL_checkoption(L, 2, "engrave", engrtypes)];
+        txt = dupstr(luaL_checkstring(L, 3));
+    } else {
+        nhl_error(L, "Wrong parameters");
+    }
+
+    if (x == -1 && y == -1)
+        ecoord = SP_COORD_PACK_RANDOM(0);
+    else
+        ecoord = SP_COORD_PACK(x, y);
+
+    get_location_coord(&x, &y, DRY, g.coder->croom, ecoord);
+    make_engr_at(x, y, txt, 0L, etyp);
+    Free(txt);
+    return 0;
 }
 
-void
-spo_mineralize(coder)
-struct sp_coder *coder;
+int
+lspo_mineralize(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_mineralize";
-    struct opvar *kelp_pool, *kelp_moat, *gold_prob, *gem_prob;
+    int gem_prob, gold_prob, kelp_moat, kelp_pool;
 
-    if (!OV_pop_i(gem_prob) || !OV_pop_i(gold_prob) || !OV_pop_i(kelp_moat)
-        || !OV_pop_i(kelp_pool))
-        return;
+    create_des_coder();
 
-    mineralize(OV_i(kelp_pool), OV_i(kelp_moat), OV_i(gold_prob),
-               OV_i(gem_prob), TRUE);
+    lcheck_param_table(L);
+    gem_prob = get_table_int_opt(L, "gem_prob", 0);
+    gold_prob = get_table_int_opt(L, "gold_prob", 0);
+    kelp_moat = get_table_int_opt(L, "kelp_moat", 0);
+    kelp_pool = get_table_int_opt(L, "kelp_pool", 0);
 
-    opvar_free(gem_prob);
-    opvar_free(gold_prob);
-    opvar_free(kelp_moat);
-    opvar_free(kelp_pool);
+    mineralize(kelp_pool, kelp_moat, gold_prob, gem_prob, TRUE);
+
+    return 0;
 }
 
-void
-spo_room(coder)
-struct sp_coder *coder;
-{
-    static const char nhFunc[] = "spo_room";
+const struct {
+    const char *name;
+    int type;
+} room_types[] = {
+    /* for historical reasons, room types are not contiguous numbers */
+    /* (type 1 is skipped) */
+    { "ordinary", OROOM },
+    { "throne", COURT },
+    { "swamp", SWAMP },
+    { "vault", VAULT },
+    { "beehive", BEEHIVE },
+    { "morgue", MORGUE },
+    { "barracks", BARRACKS },
+    { "zoo", ZOO },
+    { "delphi", DELPHI },
+    { "temple", TEMPLE },
+    { "anthole", ANTHOLE },
+    { "cocknest", COCKNEST },
+    { "leprehall", LEPREHALL },
+    { "shop", SHOPBASE },
+    { "armor shop", ARMORSHOP },
+    { "scroll shop", SCROLLSHOP },
+    { "potion shop", POTIONSHOP },
+    { "weapon shop", WEAPONSHOP },
+    { "food shop", FOODSHOP },
+    { "ring shop", RINGSHOP },
+    { "wand shop", WANDSHOP },
+    { "tool shop", TOOLSHOP },
+    { "book shop", BOOKSHOP },
+    { "health food shop", FODDERSHOP },
+    { "candle shop", CANDLESHOP },
+    { 0, 0 }
+};
 
-    if (coder->n_subroom > MAX_NESTED_ROOMS) {
+int
+get_table_roomtype_opt(L, name, defval)
+lua_State *L;
+const char *name;
+int defval;
+{
+    char *roomstr = get_table_str_opt(L, name, emptystr);
+    if (roomstr && *roomstr) {
+        int i;
+        for (i = 0; room_types[i].name; i++)
+            if (!strcmpi(roomstr, room_types[i].name)) {
+                Free(roomstr);
+                return room_types[i].type;
+            }
+    }
+    Free(roomstr);
+    return defval;
+}
+
+/* room({ type="ordinary", lit=1, x=3,y=3, xalign="center",yalign="center", w=11,h=9 }); */
+int
+lspo_room(L)
+lua_State *L;
+{
+    create_des_coder();
+
+    lcheck_param_table(L);
+
+    if (g.coder->n_subroom > MAX_NESTED_ROOMS) {
         panic("Too deeply nested rooms?!");
     } else {
-        struct opvar *rflags, *h, *w, *yalign, *xalign, *y, *x, *rlit,
-            *chance, *rtype;
+        const char *const left_or_right[] = { "left", "half-left", "center", "half-right", "right", "none", "random", NULL };
+        const int l_or_r2i[] = { LEFT, H_LEFT, CENTER, H_RIGHT, RIGHT, -1, -1, -1 };
+        const char *const top_or_bot[] = { "top", "center", "bottom", "none", "random", NULL };
+        const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1, -1 };
         room tmproom;
         struct mkroom *tmpcr;
 
-        if (!OV_pop_i(h) || !OV_pop_i(w) || !OV_pop_i(y) || !OV_pop_i(x)
-            || !OV_pop_i(yalign) || !OV_pop_i(xalign) || !OV_pop_i(rflags)
-            || !OV_pop_i(rlit) || !OV_pop_i(chance) || !OV_pop_i(rtype))
-            return;
+        tmproom.x = get_table_int_opt(L, "x", -1);
+        tmproom.y = get_table_int_opt(L, "y", -1);
+        if ((tmproom.x == -1 || tmproom.y == -1) && tmproom.x != tmproom.y)
+            nhl_error(L, "Room must have both x and y");
 
-        tmproom.x = OV_i(x);
-        tmproom.y = OV_i(y);
-        tmproom.w = OV_i(w);
-        tmproom.h = OV_i(h);
-        tmproom.xalign = OV_i(xalign);
-        tmproom.yalign = OV_i(yalign);
-        tmproom.rtype = OV_i(rtype);
-        tmproom.chance = OV_i(chance);
-        tmproom.rlit = OV_i(rlit);
-        tmproom.filled = (OV_i(rflags) & (1 << 0));
-        /*tmproom.irregular = (OV_i(rflags) & (1 << 1));*/
-        tmproom.joined = !(OV_i(rflags) & (1 << 2));
+        tmproom.w = get_table_int_opt(L, "w", -1);
+        tmproom.h = get_table_int_opt(L, "h", -1);
 
-        opvar_free(x);
-        opvar_free(y);
-        opvar_free(w);
-        opvar_free(h);
-        opvar_free(xalign);
-        opvar_free(yalign);
-        opvar_free(rtype);
-        opvar_free(chance);
-        opvar_free(rlit);
-        opvar_free(rflags);
+        if ((tmproom.w == -1 || tmproom.h == -1) && tmproom.w != tmproom.h)
+            nhl_error(L, "Room must have both w and h");
 
-        if (!coder->failed_room[coder->n_subroom - 1]) {
-            tmpcr = build_room(&tmproom, coder->croom);
+        tmproom.xalign = l_or_r2i[get_table_option(L, "xalign", "random", left_or_right)];
+        tmproom.yalign = t_or_b2i[get_table_option(L, "yalign", "random", top_or_bot)];
+        tmproom.rtype = get_table_roomtype_opt(L, "type", OROOM);
+        tmproom.chance = get_table_int_opt(L, "chance", 100);
+        tmproom.rlit = get_table_int_opt(L, "lit", -1);
+        tmproom.filled = get_table_int_opt(L, "filled", 1);
+        tmproom.joined = get_table_int_opt(L, "joined", 1);
+
+        if (!g.coder->failed_room[g.coder->n_subroom - 1]) {
+            tmpcr = build_room(&tmproom, g.coder->croom);
             if (tmpcr) {
-                coder->tmproomlist[coder->n_subroom] = tmpcr;
-                coder->failed_room[coder->n_subroom] = FALSE;
-                coder->n_subroom++;
-                return;
+                g.coder->tmproomlist[g.coder->n_subroom] = tmpcr;
+                g.coder->failed_room[g.coder->n_subroom] = FALSE;
+                g.coder->n_subroom++;
+                update_croom();
+                lua_getfield(L, 1, "contents");
+                if (lua_type(L, -1) == LUA_TFUNCTION) {
+                    lua_remove(L, -2);
+                    lua_call(L, 0, 0);
+                } else
+                    lua_pop(L, 1);
+                spo_endroom(g.coder);
+                return 0;
             }
         } /* failed to create parent room, so fail this too */
     }
-    coder->tmproomlist[coder->n_subroom] = (struct mkroom *) 0;
-    coder->failed_room[coder->n_subroom] = TRUE;
-    coder->n_subroom++;
+    g.coder->tmproomlist[g.coder->n_subroom] = (struct mkroom *) 0;
+    g.coder->failed_room[g.coder->n_subroom] = TRUE;
+    g.coder->n_subroom++;
+    update_croom();
+    spo_endroom(g.coder);
+
+    return 0;
 }
 
-void
+static void
 spo_endroom(coder)
-struct sp_coder *coder;
+struct sp_coder *coder UNUSED;
 {
-    if (coder->n_subroom > 1) {
-        coder->n_subroom--;
-        coder->tmproomlist[coder->n_subroom] = NULL;
-        coder->failed_room[coder->n_subroom] = TRUE;
+    if (g.coder->n_subroom > 1) {
+        g.coder->n_subroom--;
+        g.coder->tmproomlist[g.coder->n_subroom] = NULL;
+        g.coder->failed_room[g.coder->n_subroom] = TRUE;
     } else {
         /* no subroom, get out of top-level room */
         /* Need to ensure xstart/ystart/xsize/ysize have something sensible,
            in case there's some stuff to be created outside the outermost
-           room,
-           and there's no MAP.
-        */
+           room, and there's no MAP. */
         if (g.xsize <= 1 && g.ysize <= 1) {
             g.xstart = 1;
             g.ystart = 0;
@@ -3446,46 +3083,129 @@ struct sp_coder *coder;
             g.ysize = ROWNO;
         }
     }
+    update_croom();
 }
 
-void
-spo_stair(coder)
-struct sp_coder *coder;
+/* stair("up"); */
+/* stair({ dir = "down" }); */
+/* stair({ dir = "down", x = 4, y = 7 }); */
+/* stair({ dir = "down", coord = {x,y} }); */
+/* stair("down", 4, 7); */
+/* TODO: stair(selection, "down"); */
+/* TODO: stair("up", {x,y}); */
+int
+lspo_stair(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_stair";
-    xchar x, y;
-    struct opvar *up, *scoord;
+    int argc = lua_gettop(L);
+    xchar x = -1, y = -1;
     struct trap *badtrap;
 
-    if (!OV_pop_i(up) || !OV_pop_c(scoord))
-        return;
+    const char *const stairdirs[] = { "down", "up", NULL };
+    const int stairdirs2i[] = { 0, 1 };
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(scoord));
+    long scoord;
+    int ax = -1, ay = -1;
+    int up;
+    int ltype = lua_type(L, 1);
+
+    create_des_coder();
+
+    if (argc == 1 && ltype == LUA_TSTRING) {
+        up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
+    } else if (argc == 3 && ltype == LUA_TSTRING) {
+        up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
+        ax = luaL_checkinteger(L, 2);
+        ay = luaL_checkinteger(L, 3);
+    } else {
+        lcheck_param_table(L);
+
+        ax = get_table_int_opt(L, "x", -1);
+        ay = get_table_int_opt(L, "y", -1);
+
+        if (ax == -1 && ay == -1) {
+            lua_getfield(L, 1, "coord");
+            get_coord(L, -1, &ax, &ay);
+            lua_pop(L, 1);
+        }
+
+        up = stairdirs2i[get_table_option(L, "dir", "down", stairdirs)];
+    }
+
+    x = ax;
+    y = ay;
+
+    if (x == -1 && y == -1)
+        scoord = SP_COORD_PACK_RANDOM(0);
+    else
+        scoord = SP_COORD_PACK(x, y);
+
+    get_location_coord(&x, &y, DRY, g.coder->croom, scoord);
     if ((badtrap = t_at(x, y)) != 0)
         deltrap(badtrap);
-    mkstairs(x, y, (char) OV_i(up), coder->croom);
+    mkstairs(x, y, (char) up, g.coder->croom);
     g.SpLev_Map[x][y] = 1;
 
-    opvar_free(scoord);
-    opvar_free(up);
+    return 0;
 }
 
-void
-spo_ladder(coder)
-struct sp_coder *coder;
+/* ladder("down"); */
+/* ladder("up", 6,10); */
+/* ladder({ x=11, y=05, dir="down" }); */
+int
+lspo_ladder(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_ladder";
-    xchar x, y;
-    struct opvar *up, *lcoord;
+    int argc = lua_gettop(L);
+    xchar x = -1, y = -1;
+    struct trap *badtrap;
 
-    if (!OV_pop_i(up) || !OV_pop_c(lcoord))
-        return;
+    const char *const stairdirs[] = { "down", "up", NULL };
+    const int stairdirs2i[] = { 0, 1 };
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(lcoord));
+    long scoord;
+    int ax = -1, ay = -1;
+    int up;
+    int ltype = lua_type(L, 1);
 
+    create_des_coder();
+
+    if (argc == 1 && ltype == LUA_TSTRING) {
+        up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
+    } else if (argc == 3 && ltype == LUA_TSTRING) {
+        up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
+        ax = luaL_checkinteger(L, 2);
+        ay = luaL_checkinteger(L, 3);
+    } else {
+        lcheck_param_table(L);
+
+        ax = get_table_int_opt(L, "x", -1);
+        ay = get_table_int_opt(L, "y", -1);
+
+        if (ax == -1 && ay == -1) {
+            lua_getfield(L, 1, "coord");
+            get_coord(L, -1, &ax, &ay);
+            lua_pop(L, 1);
+        }
+
+        up = stairdirs2i[get_table_option(L, "dir", "down", stairdirs)];
+    }
+
+    x = ax;
+    y = ay;
+
+    if (x == -1 && y == -1)
+        scoord = SP_COORD_PACK_RANDOM(0);
+    else
+        scoord = SP_COORD_PACK(ax, ay);
+
+    get_location_coord(&x, &y, DRY, g.coder->croom, scoord);
+
+    if ((badtrap = t_at(x, y)) != 0)
+        deltrap(badtrap);
     levl[x][y].typ = LADDER;
     g.SpLev_Map[x][y] = 1;
-    if (OV_i(up)) {
+    if (up) {
         xupladder = x;
         yupladder = y;
         levl[x][y].ladder = LA_UP;
@@ -3494,212 +3214,398 @@ struct sp_coder *coder;
         ydnladder = y;
         levl[x][y].ladder = LA_DOWN;
     }
-    opvar_free(lcoord);
-    opvar_free(up);
+
+    return 0;
 }
 
-void
-spo_grave(coder)
-struct sp_coder *coder;
+int
+lspo_grave(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_grave";
-    struct opvar *gcoord, *typ, *txt;
     schar x, y;
+    long scoord;
+    int ax,ay;
+    char *txt;
 
-    if (!OV_pop_i(typ) || !OV_pop_s(txt) || !OV_pop_c(gcoord))
-        return;
+    create_des_coder();
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(gcoord));
+    lcheck_param_table(L);
+
+    x = ax = get_table_int_opt(L, "x", -1);
+    y = ay = get_table_int_opt(L, "y", -1);
+    txt = get_table_str_opt(L, "text", NULL);
+
+    if (x == -1 && y == -1)
+        scoord = SP_COORD_PACK_RANDOM(0);
+    else
+        scoord = SP_COORD_PACK(ax, ay);
+
+    get_location_coord(&x, &y, DRY, g.coder->croom, scoord);
 
     if (isok(x, y) && !t_at(x, y)) {
         levl[x][y].typ = GRAVE;
-        switch (OV_i(typ)) {
-        case 2:
-            make_grave(x, y, OV_s(txt));
-            break;
-        case 1:
+        if (txt)
+            make_grave(x, y, txt);
+        else
             make_grave(x, y, NULL);
-            break;
-        default:
-            del_engr_at(x, y);
-            break;
+    }
+
+    Free(txt);
+
+    return 0;
+}
+
+/* altar({ x=NN, y=NN, align=ALIGNMENT, type=SHRINE }); */
+/* des.altar({ coord = {5, 10}, align="noalign", type="altar" }); */
+int
+lspo_altar(L)
+lua_State *L;
+{
+    const char *const shrines[] = { "altar", "shrine", "sanctum", NULL };
+    const int shrines2i[] = { 0, 1, 2, 0 };
+
+    altar tmpaltar;
+
+    int x, y;
+    long acoord;
+    int shrine;
+    int align;
+
+    create_des_coder();
+
+    lcheck_param_table(L);
+
+    x = get_table_int_opt(L, "x", -1);
+    y = get_table_int_opt(L, "y", -1);
+
+    if (x == -1 && y == -1) {
+        lua_getfield(L, 1, "coord");
+        get_coord(L, -1, &x, &y);
+        lua_pop(L, 1);
+    }
+
+    align = get_table_align(L);
+    shrine = shrines2i[get_table_option(L, "type", "altar", shrines)];
+
+    if (x == -1 && y == -1)
+        acoord = SP_COORD_PACK_RANDOM(0);
+    else
+        acoord = SP_COORD_PACK(x, y);
+
+    tmpaltar.coord = acoord;
+    tmpaltar.align = align;
+    tmpaltar.shrine = shrine;
+
+    create_altar(&tmpaltar, g.coder->croom);
+
+    return 0;
+}
+
+const struct {
+    const char *name;
+    int type;
+} trap_types[] = { { "arrow", ARROW_TRAP },
+                   { "dart", DART_TRAP },
+                   { "falling rock", ROCKTRAP },
+                   { "board", SQKY_BOARD },
+                   { "bear", BEAR_TRAP },
+                   { "land mine", LANDMINE },
+                   { "rolling boulder", ROLLING_BOULDER_TRAP },
+                   { "sleep gas", SLP_GAS_TRAP },
+                   { "rust", RUST_TRAP },
+                   { "fire", FIRE_TRAP },
+                   { "pit", PIT },
+                   { "spiked pit", SPIKED_PIT },
+                   { "hole", HOLE },
+                   { "trap door", TRAPDOOR },
+                   { "teleport", TELEP_TRAP },
+                   { "level teleport", LEVEL_TELEP },
+                   { "magic portal", MAGIC_PORTAL },
+                   { "web", WEB },
+                   { "statue", STATUE_TRAP },
+                   { "magic", MAGIC_TRAP },
+                   { "anti magic", ANTI_MAGIC },
+                   { "polymorph", POLY_TRAP },
+                   { "vibrating square", VIBRATING_SQUARE },
+                   { "random", -1 },
+                   { 0, NO_TRAP } };
+
+int
+get_table_traptype_opt(L, name, defval)
+lua_State *L;
+const char *name;
+int defval;
+{
+    char *trapstr = get_table_str_opt(L, name, emptystr);
+
+    if (trapstr && *trapstr) {
+        int i;
+
+        for (i = 0; trap_types[i].name; i++)
+            if (!strcmpi(trapstr, trap_types[i].name)) {
+                Free(trapstr);
+                return trap_types[i].type;
+            }
+    }
+    Free(trapstr);
+    return defval;
+}
+
+const char *
+get_trapname_bytype(ttyp)
+int ttyp;
+{
+    int i;
+
+    for (i = 0; trap_types[i].name; i++)
+        if (ttyp == trap_types[i].type)
+            return trap_types[i].name;
+
+    return NULL;
+}
+
+int
+get_traptype_byname(trapname)
+const char *trapname;
+{
+    int i;
+
+    for (i = 0; trap_types[i].name; i++)
+        if (!strcmpi(trapname, trap_types[i].name))
+            return trap_types[i].type;
+
+    return NO_TRAP;
+}
+
+/* trap({ type = "hole", x = 1, y = 1 }); */
+/* trap("hole", 3, 4); */
+/* trap("level teleport", {5, 8}); */
+/* trap("rust") */
+/* trap(); */
+int
+lspo_trap(L)
+lua_State *L;
+{
+    spltrap tmptrap;
+    int x, y;
+    int argc = lua_gettop(L);
+
+    create_des_coder();
+
+    if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
+        const char *trapstr = luaL_checkstring(L, 1);
+
+        tmptrap.type = get_traptype_byname(trapstr);
+        x = y = -1;
+    } else if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
+               && lua_type(L, 2) == LUA_TTABLE) {
+        const char *trapstr = luaL_checkstring(L, 1);
+
+        tmptrap.type = get_traptype_byname(trapstr);
+        get_coord(L, 2, &x, &y);
+    } else if (argc == 3) {
+        const char *trapstr = luaL_checkstring(L, 1);
+
+        tmptrap.type = get_traptype_byname(trapstr);
+        x = luaL_checkinteger(L, 2);
+        y = luaL_checkinteger(L, 3);
+    } else {
+        lcheck_param_table(L);
+
+        x = get_table_int_opt(L, "x", -1);
+        y = get_table_int_opt(L, "y", -1);
+        tmptrap.type = get_table_traptype_opt(L, "type", -1);
+
+        if (x == -1 && y == -1) {
+            lua_getfield(L, 1, "coord");
+            get_coord(L, -1, &x, &y);
+            lua_pop(L, 1);
         }
     }
 
-    opvar_free(gcoord);
-    opvar_free(typ);
-    opvar_free(txt);
+    if (tmptrap.type == NO_TRAP)
+        nhl_error(L, "Unknown trap type");
+
+    if (x == -1 && y == -1)
+        tmptrap.coord = SP_COORD_PACK_RANDOM(0);
+    else
+        tmptrap.coord = SP_COORD_PACK(x, y);
+
+    create_trap(&tmptrap, g.coder->croom);
+
+    return 0;
 }
 
-void
-spo_altar(coder)
-struct sp_coder *coder;
+/* gold({ amount = 500, x = 2, y = 5 });*/
+int
+lspo_gold(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_altar";
-    struct opvar *al, *shrine, *acoord;
-    altar tmpaltar;
-
-    if (!OV_pop_i(al) || !OV_pop_i(shrine) || !OV_pop_c(acoord))
-        return;
-
-    tmpaltar.coord = OV_i(acoord);
-    tmpaltar.align = OV_i(al);
-    tmpaltar.shrine = OV_i(shrine);
-
-    create_altar(&tmpaltar, coder->croom);
-
-    opvar_free(acoord);
-    opvar_free(shrine);
-    opvar_free(al);
-}
-
-void
-spo_trap(coder)
-struct sp_coder *coder;
-{
-    static const char nhFunc[] = "spo_trap";
-    struct opvar *type;
-    struct opvar *tcoord;
-    spltrap tmptrap;
-
-    if (!OV_pop_i(type) || !OV_pop_c(tcoord))
-        return;
-
-    tmptrap.coord = OV_i(tcoord);
-    tmptrap.type = OV_i(type);
-
-    create_trap(&tmptrap, coder->croom);
-    opvar_free(tcoord);
-    opvar_free(type);
-}
-
-void
-spo_gold(coder)
-struct sp_coder *coder;
-{
-    static const char nhFunc[] = "spo_gold";
-    struct opvar *gcoord, *amt;
     schar x, y;
     long amount;
+    long gcoord;
+    int gx, gy;
 
-    if (!OV_pop_c(gcoord) || !OV_pop_i(amt))
-        return;
-    amount = OV_i(amt);
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(gcoord));
-    if (amount == -1)
+    create_des_coder();
+
+    lcheck_param_table(L);
+
+    x = gx = get_table_int_opt(L, "x", -1);
+    y = gy = get_table_int_opt(L, "y", -1);
+
+    if (x == -1 && y == -1)
+        gcoord = SP_COORD_PACK_RANDOM(0);
+    else
+        gcoord = SP_COORD_PACK(gx, gy);
+    amount = get_table_int_opt(L, "amount", -1);
+    get_location_coord(&x, &y, DRY, g.coder->croom, gcoord);
+    if (amount < 0)
         amount = rnd(200);
     mkgold(amount, x, y);
-    opvar_free(gcoord);
-    opvar_free(amt);
+
+    return 0;
 }
 
-void
-spo_corridor(coder)
-struct sp_coder *coder;
+/* corridor({ srcroom=1, srcdoor=2, srcwall="north", destroom=2, destdoor=1, destwall="west" });*/
+int
+lspo_corridor(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_corridor";
-    struct opvar *deswall, *desdoor, *desroom, *srcwall, *srcdoor, *srcroom;
+    const char *const walldirs[] = { "all", "random", "north", "west", "east", "south", NULL };
+    const int walldirs2i[] = { W_ANY, -1, W_NORTH, W_WEST, W_EAST, W_SOUTH, 0 };
     corridor tc;
 
-    if (!OV_pop_i(deswall) || !OV_pop_i(desdoor) || !OV_pop_i(desroom)
-        || !OV_pop_i(srcwall) || !OV_pop_i(srcdoor) || !OV_pop_i(srcroom))
-        return;
+    create_des_coder();
 
-    tc.src.room = OV_i(srcroom);
-    tc.src.door = OV_i(srcdoor);
-    tc.src.wall = OV_i(srcwall);
-    tc.dest.room = OV_i(desroom);
-    tc.dest.door = OV_i(desdoor);
-    tc.dest.wall = OV_i(deswall);
+    lcheck_param_table(L);
+
+    tc.src.room = get_table_int(L, "srcroom");
+    tc.src.door = get_table_int(L, "srcdoor");
+    tc.src.wall = walldirs2i[get_table_option(L, "srcwall", "all", walldirs)];
+    tc.dest.room = get_table_int(L, "destroom");
+    tc.dest.door = get_table_int(L, "destdoor");
+    tc.dest.wall = walldirs2i[get_table_option(L, "destwall", "all", walldirs)];
 
     create_corridor(&tc);
 
-    opvar_free(deswall);
-    opvar_free(desdoor);
-    opvar_free(desroom);
-    opvar_free(srcwall);
-    opvar_free(srcdoor);
-    opvar_free(srcroom);
+    return 0;
 }
 
-struct opvar *
-selection_opvar(nbuf)
-char *nbuf;
+/* random_corridors(); */
+int
+lspo_random_corridors(L)
+lua_State *L UNUSED;
 {
-    struct opvar *ov;
-    char buf[(COLNO * ROWNO) + 1];
+    corridor tc;
 
-    if (!nbuf) {
-        (void) memset(buf, 1, sizeof(buf));
-        buf[(COLNO * ROWNO)] = '\0';
-        ov = opvar_new_str(buf);
-    } else {
-        ov = opvar_new_str(nbuf);
-    }
-    ov->spovartyp = SPOVAR_SEL;
-    return ov;
+    create_des_coder();
+
+    tc.src.room = -1;
+    tc.src.door = -1;
+    tc.src.wall = -1;
+    tc.dest.room = -1;
+    tc.dest.door = -1;
+    tc.dest.wall = -1;
+
+    create_corridor(&tc);
+
+    return 0;
 }
 
-xchar
-selection_getpoint(x, y, ov)
-int x, y;
-struct opvar *ov;
+/* selection */
+struct selectionvar *
+selection_new()
 {
-    if (!ov || ov->spovartyp != SPOVAR_SEL)
-        return 0;
-    if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO)
-        return 0;
+    struct selectionvar *tmps = (struct selectionvar *) alloc(sizeof (struct selectionvar));
 
-    return (ov->vardata.str[COLNO * y + x] - 1);
+    tmps->wid = COLNO;
+    tmps->hei = ROWNO;
+    tmps->map = (char *)alloc((COLNO * ROWNO) + 1);
+    (void) memset(tmps->map, 1, (COLNO * ROWNO));
+    tmps->map[(COLNO * ROWNO)] = '\0';
+
+    return tmps;
 }
 
 void
-selection_setpoint(x, y, ov, c)
+selection_free(sel)
+struct selectionvar *sel;
+{
+    if (!sel)
+        return;
+    Free(sel->map);
+    sel->map = NULL;
+    sel->wid = sel->hei = 0;
+}
+
+struct selectionvar *
+selection_clone(sel)
+struct selectionvar *sel;
+{
+    struct selectionvar *tmps = (struct selectionvar *) alloc(sizeof (struct selectionvar));
+
+    tmps->wid = sel->wid;
+    tmps->hei = sel->hei;
+    tmps->map = dupstr(sel->map);
+
+    return tmps;
+}
+
+xchar
+selection_getpoint(x, y, sel)
 int x, y;
-struct opvar *ov;
+struct selectionvar *sel;
+{
+    if (!sel || !sel->map)
+        return 0;
+    if (x < 0 || y < 0 || x >= sel->wid || y >= sel->hei)
+        return 0;
+
+    return (sel->map[sel->wid * y + x] - 1);
+}
+
+void
+selection_setpoint(x, y, sel, c)
+int x, y;
+struct selectionvar *sel;
 xchar c;
 {
-    if (!ov || ov->spovartyp != SPOVAR_SEL)
+    if (!sel || !sel->map)
         return;
-    if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO)
+    if (x < 0 || y < 0 || x >= sel->wid || y >= sel->hei)
         return;
 
-    ov->vardata.str[COLNO * y + x] = (char) (c + 1);
+    sel->map[sel->wid * y + x] = (char) (c + 1);
 }
 
-struct opvar *
+struct selectionvar *
 selection_not(s)
-struct opvar *s;
+struct selectionvar *s;
 {
-    struct opvar *ov;
     int x, y;
 
-    ov = selection_opvar((char *) 0);
-    if (!ov)
-        return NULL;
 
-    for (x = 0; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
-            if (!selection_getpoint(x, y, s))
-                selection_setpoint(x, y, ov, 1);
+    for (x = 0; x < s->wid; x++)
+        for (y = 0; y < s->hei; y++)
+            selection_setpoint(x, y, s, selection_getpoint(x, y, s) ? 0 : 1);
 
-    return ov;
+    return s;
 }
 
-struct opvar *
+struct selectionvar *
 selection_logical_oper(s1, s2, oper)
-struct opvar *s1, *s2;
+struct selectionvar *s1, *s2;
 char oper;
 {
-    struct opvar *ov;
+    struct selectionvar *ov;
     int x, y;
 
-    ov = selection_opvar((char *) 0);
+    ov = selection_new();
     if (!ov)
         return NULL;
 
-    for (x = 0; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++) {
+    for (x = 0; x < ov->wid; x++)
+        for (y = 0; y < ov->hei; y++) {
             switch (oper) {
             default:
             case '|':
@@ -3718,23 +3624,21 @@ char oper;
     return ov;
 }
 
-struct opvar *
-selection_filter_mapchar(ov, mc)
-struct opvar *ov;
-struct opvar *mc;
+struct selectionvar *
+selection_filter_mapchar(ov, typ, lit)
+struct selectionvar *ov;
+xchar typ;
+int lit;
 {
     int x, y;
-    schar mapc;
-    xchar lit;
-    struct opvar *ret = selection_opvar((char *) 0);
+    struct selectionvar *ret = selection_new();
 
-    if (!ov || !mc || !ret)
+    if (!ov || !ret)
         return NULL;
-    mapc = SP_MAPCHAR_TYP(OV_i(mc));
-    lit = SP_MAPCHAR_LIT(OV_i(mc));
-    for (x = 0; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
-            if (selection_getpoint(x, y, ov) && (levl[x][y].typ == mapc)) {
+
+    for (x = 0; x < ret->wid; x++)
+        for (y = 0; y < ret->hei; y++)
+            if (selection_getpoint(x, y, ov) && (levl[x][y].typ == typ)) {
                 switch (lit) {
                 default:
                 case -2:
@@ -3755,22 +3659,22 @@ struct opvar *mc;
 
 void
 selection_filter_percent(ov, percent)
-struct opvar *ov;
+struct selectionvar *ov;
 int percent;
 {
     int x, y;
 
     if (!ov)
         return;
-    for (x = 0; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
+    for (x = 0; x < ov->wid; x++)
+        for (y = 0; y < ov->hei; y++)
             if (selection_getpoint(x, y, ov) && (rn2(100) >= percent))
                 selection_setpoint(x, y, ov, 0);
 }
 
-static int
+int
 selection_rndcoord(ov, x, y, removeit)
-struct opvar *ov;
+struct selectionvar *ov;
 schar *x, *y;
 boolean removeit;
 {
@@ -3778,20 +3682,21 @@ boolean removeit;
     int c;
     int dx, dy;
 
-    for (dx = 0; dx < COLNO; dx++)
-        for (dy = 0; dy < ROWNO; dy++)
-            if (isok(dx, dy) && selection_getpoint(dx, dy, ov))
+    for (dx = 0; dx < ov->wid; dx++)
+        for (dy = 0; dy < ov->hei; dy++)
+            if (selection_getpoint(dx, dy, ov))
                 idx++;
 
     if (idx) {
         c = rn2(idx);
-        for (dx = 0; dx < COLNO; dx++)
-            for (dy = 0; dy < ROWNO; dy++)
-                if (isok(dx, dy) && selection_getpoint(dx, dy, ov)) {
+        for (dx = 0; dx < ov->wid; dx++)
+            for (dy = 0; dy < ov->hei; dy++)
+                if (selection_getpoint(dx, dy, ov)) {
                     if (!c) {
                         *x = dx;
                         *y = dy;
-                        if (removeit) selection_setpoint(dx, dy, ov, 0);
+                        if (removeit)
+                            selection_setpoint(dx, dy, ov, 0);
                         return 1;
                     }
                     c--;
@@ -3803,21 +3708,17 @@ boolean removeit;
 
 void
 selection_do_grow(ov, dir)
-struct opvar *ov;
+struct selectionvar *ov;
 int dir;
 {
     int x, y;
-    char tmp[COLNO][ROWNO];
+    struct selectionvar *tmp = selection_new();
 
-    if (ov->spovartyp != SPOVAR_SEL)
-        return;
-    if (!ov)
+    if (!ov || !tmp)
         return;
 
-    (void) memset(tmp, 0, sizeof tmp);
-
-    for (x = 1; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++) {
+    for (x = 1; x < ov->wid; x++)
+        for (y = 0; y < ov->hei; y++) {
             /* note:  dir is a mask of multiple directions, but the only
                way to specify diagonals is by including the two adjacent
                orthogonal directions, which effectively specifies three-
@@ -3834,14 +3735,17 @@ int dir;
                 || ((dir & W_SOUTH) && selection_getpoint(x, y - 1, ov))
                 ||  (((dir & (W_SOUTH | W_WEST)) == (W_SOUTH | W_WEST))
                      && selection_getpoint(x + 1, y - 1, ov))) {
-                tmp[x][y] = 1;
+                selection_setpoint(x, y, tmp, 1);
             }
         }
 
-    for (x = 1; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
-            if (tmp[x][y])
+    for (x = 1; x < ov->wid; x++)
+        for (y = 0; y < ov->hei; y++)
+            if (selection_getpoint(x, y, tmp))
                 selection_setpoint(x, y, ov, 1);
+
+    selection_free(tmp);
+    free(tmp);
 }
 
 static int FDECL((*selection_flood_check_func), (int, int));
@@ -3859,6 +3763,14 @@ floodfillchk_match_under(x,y)
 int x,y;
 {
     return (floodfillchk_match_under_typ == levl[x][y].typ);
+}
+
+void
+set_floodfillchk_match_under(typ)
+xchar typ;
+{
+    floodfillchk_match_under_typ = typ;
+    set_selection_floodfillchk(floodfillchk_match_under);
 }
 
 static int
@@ -3889,12 +3801,11 @@ int n;
 
 void
 selection_floodfill(ov, x, y, diagonals)
-struct opvar *ov;
+struct selectionvar *ov;
 int x, y;
 boolean diagonals;
 {
-    static const char nhFunc[] = "selection_floodfill";
-    struct opvar *tmp = selection_opvar((char *) 0);
+    struct selectionvar *tmp = selection_new();
 #define SEL_FLOOD_STACK (COLNO * ROWNO)
 #define SEL_FLOOD(nx, ny) \
     do {                                      \
@@ -3919,7 +3830,7 @@ boolean diagonals;
     xchar dy[SEL_FLOOD_STACK];
 
     if (selection_flood_check_func == (int FDECL((*), (int, int))) 0) {
-        opvar_free(tmp);
+        selection_free(tmp);
         return;
     }
     SEL_FLOOD(x, y);
@@ -3945,13 +3856,14 @@ boolean diagonals;
 #undef SEL_FLOOD
 #undef SEL_FLOOD_STACK
 #undef SEL_FLOOD_CHKDIR
-    opvar_free(tmp);
+    selection_free(tmp);
+    free(tmp);
 }
 
 /* McIlroy's Ellipse Algorithm */
 void
 selection_do_ellipse(ov, xc, yc, a, b, filled)
-struct opvar *ov;
+struct selectionvar *ov;
 int xc, yc, a, b, filled;
 { /* e(x,y) = b^2*x^2 + a^2*y^2 - a^2*b^2 */
     int x = 0, y = b;
@@ -4063,7 +3975,7 @@ long x1, y1, x2, y2, x3, y3;
 
 void
 selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd, limit)
-struct opvar *ov;
+struct selectionvar *ov;
 long x, y, x2, y2, gtyp, mind, maxd, limit;
 {
     long dx, dy, dofs;
@@ -4115,7 +4027,7 @@ long x, y, x2, y2, gtyp, mind, maxd, limit;
 void
 selection_do_line(x1, y1, x2, y2, ov)
 schar x1, y1, x2, y2;
-struct opvar *ov;
+struct selectionvar *ov;
 {
     int d0, dx, dy, ai, bi, xi, yi;
 
@@ -4169,7 +4081,7 @@ struct opvar *ov;
 void
 selection_do_randline(x1, y1, x2, y2, rough, rec, ov)
 schar x1, y1, x2, y2, rough, rec;
-struct opvar *ov;
+struct selectionvar *ov;
 {
     int mx, my;
     int dx, dy;
@@ -4210,20 +4122,49 @@ struct opvar *ov;
 
 void
 selection_iterate(ov, func, arg)
-struct opvar *ov;
+struct selectionvar *ov;
 select_iter_func func;
 genericptr_t arg;
 {
     int x, y;
 
+    if (!ov)
+        return;
+
     /* yes, this is very naive, but it's not _that_ expensive. */
-    for (x = 0; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
+    for (x = 0; x < ov->wid; x++)
+        for (y = 0; y < ov->hei; y++)
             if (selection_getpoint(x, y, ov))
                 (*func)(x, y, arg);
 }
 
+
 void
+stackDump(L)
+lua_State *L;
+{
+    int i;
+    int top = lua_gettop(L);
+    for (i = 1; i <= top; i++) {  /* repeat for each level */
+        int t = lua_type(L, i);
+        switch (t) {
+        case LUA_TSTRING:  /* strings */
+            pline("%i:\"%s\"", i, lua_tostring(L, i));
+            break;
+        case LUA_TBOOLEAN:  /* booleans */
+            pline("%i:%s", i, lua_toboolean(L, i) ? "true" : "false");
+            break;
+        case LUA_TNUMBER:  /* numbers */
+            pline("%i:%g", i, lua_tonumber(L, i));
+            break;
+        default:  /* other values */
+            pline("%i:%s", i, lua_typename(L, t));
+            break;
+        }
+    }
+}
+
+static void
 sel_set_ter(x, y, arg)
 int x, y;
 genericptr_t arg;
@@ -4241,7 +4182,7 @@ genericptr_t arg;
     }
 }
 
-void
+static void
 sel_set_feature(x, y, arg)
 int x, y;
 genericptr_t arg;
@@ -4251,7 +4192,7 @@ genericptr_t arg;
     levl[x][y].typ = (*(int *) arg);
 }
 
-void
+static void
 sel_set_door(dx, dy, arg)
 int dx, dy;
 genericptr_t arg;
@@ -4271,121 +4212,237 @@ genericptr_t arg;
     g.SpLev_Map[x][y] = 1;
 }
 
-void
-spo_door(coder)
-struct sp_coder *coder;
+/* door({ x = 1, y = 1, state = "nodoor" }); */
+/* door({ wall = "north", pos = 3, state="secret" }); */
+/* door("nodoor", 1, 2); */
+int
+lspo_door(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_door";
-    struct opvar *msk, *sel;
+    int msk;
+    schar x,y;
     xchar typ;
+    const char *const doorstates[] = { "random", "open", "closed", "locked", "nodoor", "broken", "secret", NULL };
+    const int doorstates2i[] = { -1, D_ISOPEN, D_CLOSED, D_LOCKED, D_NODOOR, D_BROKEN, D_SECRET };
+    int argc = lua_gettop(L);
 
-    if (!OV_pop_i(msk) || !OV_pop_typ(sel, SPOVAR_SEL))
-        return;
+    create_des_coder();
 
-    typ = OV_i(msk) == -1 ? rnddoor() : (xchar) OV_i(msk);
+    if (argc == 3) {
+        msk = doorstates2i[luaL_checkoption(L, 1, "random", doorstates)];
+        x = luaL_checkinteger(L, 2);
+        y = luaL_checkinteger(L, 3);
 
-    selection_iterate(sel, sel_set_door, (genericptr_t) &typ);
+    } else {
+        lcheck_param_table(L);
 
-    opvar_free(sel);
-    opvar_free(msk);
+        x = get_table_int_opt(L, "x", -1);
+        y = get_table_int_opt(L, "y", -1);
+        msk = doorstates2i[get_table_option(L, "state", "random", doorstates)];
+    }
+
+    typ = (msk == -1) ? rnddoor() : (xchar) msk;
+
+    if (x == -1 && y == -1) {
+        const char *const walldirs[] = { "all", "random", "north", "west", "east", "south", NULL };
+        const int walldirs2i[] = { W_ANY, W_ANY, W_NORTH, W_WEST, W_EAST, W_SOUTH, 0 };
+        room_door tmpd;
+
+        tmpd.secret = (typ == D_SECRET) ? 1 : 0;
+        tmpd.mask = msk;
+        tmpd.pos = get_table_int_opt(L, "pos", -1);
+        tmpd.wall = walldirs2i[get_table_option(L, "wall", "all", walldirs)];
+
+        create_door(&tmpd, g.coder->croom);
+        link_doors_rooms();
+    } else {
+        /*selection_iterate(sel, sel_set_door, (genericptr_t) &typ);*/
+        get_location_coord(&x, &y, ANY_LOC, g.coder->croom, SP_COORD_PACK(x,y));
+        if (!isok(x,y))
+            nhl_error(L, "door coord not ok");
+        sel_set_door(x, y, (genericptr_t) &typ);
+    }
+
+    return 0;
 }
 
-void
-spo_feature(coder)
-struct sp_coder *coder;
+/* feature("fountain", x, y); */
+/* feature("fountain", {x,y}); */
+/* feature({ type="fountain", x=NN, y=NN }); */
+int
+lspo_feature(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_feature";
-    struct opvar *sel;
+    const char *const features[] = { "fountain", "sink", "pool", NULL };
+    const int features2i[] = { FOUNTAIN, SINK, POOL, STONE };
+    schar x,y;
     int typ;
+    int argc = lua_gettop(L);
 
-    if (!OV_pop_typ(sel, SPOVAR_SEL))
-        return;
+    create_des_coder();
 
-    switch (coder->opcode) {
+    if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
+        && lua_type(L, 2) == LUA_TTABLE) {
+        int fx, fy;
+        typ = features2i[luaL_checkoption(L, 1, NULL, features)];
+        get_coord(L, 2, &fx, &fy);
+        x = fx;
+        y = fy;
+    } else if (argc == 3) {
+        typ = features2i[luaL_checkoption(L, 1, NULL, features)];
+        x = luaL_checkinteger(L, 2);
+        y = luaL_checkinteger(L, 3);
+    } else {
+        lcheck_param_table(L);
+
+        x = get_table_int(L, "x");
+        y = get_table_int(L, "y");
+        typ = features2i[get_table_option(L, "type", NULL, features)];
+    }
+
+    get_location_coord(&x, &y, ANY_LOC, g.coder->croom, SP_COORD_PACK(x,y));
+
+    switch (typ) {
     default:
-        impossible("spo_feature called with wrong opcode %i.", coder->opcode);
         break;
-    case SPO_FOUNTAIN:
+    case FOUNTAIN:
         typ = FOUNTAIN;
         break;
-    case SPO_SINK:
+    case SINK:
         typ = SINK;
         break;
-    case SPO_POOL:
+    case POOL:
         typ = POOL;
         break;
     }
-    selection_iterate(sel, sel_set_feature, (genericptr_t) &typ);
-    opvar_free(sel);
+    if (typ == STONE)
+        impossible("feature has unknown type param.");
+    else
+        sel_set_feature(x, y, (genericptr_t) &typ);
+
+    return 0;
 }
 
-void
-spo_terrain(coder)
-struct sp_coder *coder;
+/* terrain({ x=NN, y=NN, typ=MAPCHAR, lit=BOOL }); */
+/* terrain({ selection=SELECTION, typ=MAPCHAR, lit=BOOL }); */
+/* terrain( SELECTION, MAPCHAR [, BOOL ] ); */
+/* terrain({x,y}, MAPCHAR); */
+/* terrain(x,y, MAPCHAR); */
+int
+lspo_terrain(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_terrain";
     terrain tmpterrain;
-    struct opvar *ter, *sel;
+    xchar x, y;
+    struct selectionvar *sel = NULL;
+    int argc = lua_gettop(L);
 
-    if (!OV_pop_typ(ter, SPOVAR_MAPCHAR) || !OV_pop_typ(sel, SPOVAR_SEL))
-        return;
+    create_des_coder();
+    tmpterrain.tlit = 0;
+    tmpterrain.ter = INVALID_TYPE;
 
-    tmpterrain.ter = SP_MAPCHAR_TYP(OV_i(ter));
-    tmpterrain.tlit = SP_MAPCHAR_LIT(OV_i(ter));
-    selection_iterate(sel, sel_set_ter, (genericptr_t) &tmpterrain);
+    if (argc == 1) {
+        lcheck_param_table(L);
 
-    opvar_free(ter);
-    opvar_free(sel);
+        x = get_table_int_opt(L, "x", -1);
+        y = get_table_int_opt(L, "y", -1);
+        if (x == -1 && y == -1) {
+            lua_getfield(L, 1, "selection");
+            sel = l_selection_check(L, -1);
+            lua_pop(L, 1);
+        }
+        tmpterrain.ter = get_table_mapchr(L, "typ");
+        tmpterrain.tlit = get_table_int_opt(L, "lit", 0);
+    } else if (argc == 2 && lua_type(L, 1) == LUA_TTABLE
+               && lua_type(L, 2) == LUA_TSTRING) {
+        int tx, ty;
+        tmpterrain.ter = check_mapchr(luaL_checkstring(L, 2));
+        lua_pop(L, 1);
+        get_coord(L, 1, &tx, &ty);
+        x = tx;
+        y = ty;
+    } else if (argc == 2) {
+        sel = l_selection_check(L, 1);
+        tmpterrain.ter = check_mapchr(luaL_checkstring(L, 2));
+    } else if (argc == 3) {
+        x = luaL_checkinteger(L, 1);
+        y = luaL_checkinteger(L, 2);
+        tmpterrain.ter = check_mapchr(luaL_checkstring(L, 3));
+    } else {
+        nhl_error(L, "wrong parameters");
+    }
+
+    if (tmpterrain.ter == INVALID_TYPE)
+        nhl_error(L, "Erroneous map char");
+
+    if (sel) {
+        selection_iterate(sel, sel_set_ter, (genericptr_t) &tmpterrain);
+    } else {
+        get_location_coord(&x, &y, ANY_LOC, g.coder->croom, SP_COORD_PACK(x,y));
+        sel_set_ter(x,y, (genericptr_t) &tmpterrain);
+    }
+
+    return 0;
 }
 
-void
-spo_replace_terrain(coder)
-struct sp_coder *coder;
+/* TODO: better parameters, allow selection instead of x1,y1,x2,y2 nonsense.
+   TODO: or remove, if terrain + selection can do this better?
+*/
+/* replace_terrain({ x1=NN,y1=NN, x2=NN,y2=NN, fromterrain=MAPCHAR, toterrain=MAPCHAR, lit=N, chance=NN }); */
+/* replace_terrain({ region={x1,y1, x2,y2}, fromterrain=MAPCHAR, toterrain=MAPCHAR, lit=N, chance=NN }); */
+int
+lspo_replace_terrain(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_replace_terrain";
     replaceterrain rt;
-    struct opvar *reg, *from_ter, *to_ter, *chance;
+    xchar totyp, fromtyp;
 
-    if (!OV_pop_i(chance) || !OV_pop_typ(to_ter, SPOVAR_MAPCHAR)
-        || !OV_pop_typ(from_ter, SPOVAR_MAPCHAR) || !OV_pop_r(reg))
-        return;
+    create_des_coder();
 
-    rt.chance = OV_i(chance);
-    rt.tolit = SP_MAPCHAR_LIT(OV_i(to_ter));
-    rt.toter = SP_MAPCHAR_TYP(OV_i(to_ter));
-    rt.fromter = SP_MAPCHAR_TYP(OV_i(from_ter));
-    /* TODO: use SP_MAPCHAR_LIT(OV_i(from_ter)) too */
-    rt.x1 = SP_REGION_X1(OV_i(reg));
-    rt.y1 = SP_REGION_Y1(OV_i(reg));
-    rt.x2 = SP_REGION_X2(OV_i(reg));
-    rt.y2 = SP_REGION_Y2(OV_i(reg));
+    lcheck_param_table(L);
 
-    replace_terrain(&rt, coder->croom);
+    totyp = get_table_mapchr(L, "toterrain");
 
-    opvar_free(reg);
-    opvar_free(from_ter);
-    opvar_free(to_ter);
-    opvar_free(chance);
+    fromtyp = get_table_mapchr(L, "fromterrain");
+
+    rt.chance = get_table_int_opt(L, "chance", 100);
+    rt.tolit = get_table_int_opt(L, "lit", 1);
+    rt.toter = totyp;
+    rt.fromter = fromtyp;
+    rt.x1 = get_table_int_opt(L, "x1", -1);
+    rt.y1 = get_table_int_opt(L, "y1", -1);
+    rt.x2 = get_table_int_opt(L, "x2", -1);
+    rt.y2 = get_table_int_opt(L, "y2", -1);
+
+    if (rt.x1 == -1 && rt.y1 == -1 && rt.x2 == -1 && rt.y2 == -1) {
+        int rx1, ry1, rx2, ry2;
+        get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
+        rt.x1 = rx1; rt.y1 = ry1;
+        rt.x2 = rx2; rt.y2 = ry2;
+    }
+
+    replace_terrain(&rt, g.coder->croom);
+
+    return 0;
 }
 
 static boolean
 generate_way_out_method(nx,ny, ov)
 int nx,ny;
-struct opvar *ov;
+struct selectionvar *ov;
 {
-    static const char nhFunc[] = "generate_way_out_method";
     const int escapeitems[] = { PICK_AXE,
                                 DWARVISH_MATTOCK,
                                 WAN_DIGGING,
                                 WAN_TELEPORTATION,
                                 SCR_TELEPORTATION,
                                 RIN_TELEPORTATION };
-    struct opvar *ov2 = selection_opvar((char *) 0), *ov3;
+    struct selectionvar *ov2 = selection_new(), *ov3;
     schar x, y;
     boolean res = TRUE;
 
     selection_floodfill(ov2, nx, ny, TRUE);
-    ov3 = opvar_clone(ov2);
+    ov3 = selection_clone(ov2);
 
     /* try to make a secret door */
     while (selection_rndcoord(ov3, &x, &y, TRUE)) {
@@ -4421,8 +4478,8 @@ struct opvar *ov;
 
     /* try to make a hole or a trapdoor */
     if (Can_fall_thru(&u.uz)) {
-        opvar_free(ov3);
-        ov3 = opvar_clone(ov2);
+        selection_free(ov3);
+        ov3 = selection_clone(ov2);
         while (selection_rndcoord(ov3, &x, &y, TRUE)) {
             if (maketrap(x,y, rn2(2) ? HOLE : TRAPDOOR))
                 goto gotitdone;
@@ -4437,16 +4494,17 @@ struct opvar *ov;
 
     res = FALSE;
  gotitdone:
-    opvar_free(ov2);
-    opvar_free(ov3);
+    selection_free(ov2);
+    free(ov2);
+    selection_free(ov3);
+    free(ov3);
     return res;
 }
 
 static void
 ensure_way_out()
 {
-    static const char nhFunc[] = "ensure_way_out";
-    struct opvar *ov = selection_opvar((char *) 0);
+    struct selectionvar *ov = selection_new();
     struct trap *ttmp = g.ftrap;
     int x,y;
     boolean ret = TRUE;
@@ -4483,55 +4541,108 @@ ensure_way_out()
                 }
     outhere: ;
     } while (!ret);
-    opvar_free(ov);
+    selection_free(ov);
+    free(ov);
+}
+
+int
+get_table_intarray_entry(L, tableidx, entrynum)
+lua_State *L;
+int tableidx, entrynum;
+{
+    int ret = 0;
+    if (tableidx < 0)
+        tableidx--;
+
+    lua_pushinteger(L, entrynum);
+    lua_gettable(L, tableidx);
+    if (lua_isnumber(L, -1)) {
+        ret = lua_tointeger(L, -1);
+    } else {
+        char buf[BUFSZ];
+        Sprintf(buf, "Array entry #%i is %s, expected number",
+                1, luaL_typename(L, -1));
+        nhl_error(L, buf);
+    }
+    lua_pop(L, 1);
+    return ret;
+}
+
+static int
+get_table_region(L, name, x1,y1, x2,y2, optional)
+lua_State *L;
+const char *name;
+int *x1, *y1, *x2, *y2;
+boolean optional;
+{
+    int arrlen;
+
+    lua_getfield(L, 1, name);
+    if (optional && lua_type(L, -1) == LUA_TNIL) {
+        lua_pop(L, 1);
+        return 1;
+    }
+
+    luaL_checktype(L, -1, LUA_TTABLE);
+
+    lua_len(L, -1);
+    arrlen = lua_tointeger(L, -1);
+    lua_pop(L, 1);
+    if (arrlen != 4) {
+        nhl_error(L, "Not a region");
+        lua_pop(L, 1);
+        return 0;
+    }
+
+    *x1 = get_table_intarray_entry(L, -1, 1);
+    *y1 = get_table_intarray_entry(L, -1, 2);
+    *x2 = get_table_intarray_entry(L, -1, 3);
+    *y2 = get_table_intarray_entry(L, -1, 4);
+
+    lua_pop(L, 1);
+    return 1;
+}
+
+static int
+get_coord(L, index, x, y)
+lua_State *L;
+int index;
+int *x, *y;
+{
+    if (lua_type(L, index) == LUA_TTABLE) {
+        int arrlen;
+
+        lua_len(L, index);
+        arrlen = lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        if (arrlen != 2) {
+            nhl_error(L, "Not a coordinate");
+            return 0;
+        }
+
+        *x = get_table_intarray_entry(L, index, 1);
+        *y = get_table_intarray_entry(L, index, 2);
+
+        return 1;
+    }
+    return 0;
 }
 
 void
-spo_levregion(coder)
-struct sp_coder *coder;
+levregion_add(lregion)
+lev_region *lregion;
 {
-    static const char nhFunc[] = "spo_levregion";
-    struct opvar *rname, *padding, *rtype, *del_islev, *dy2, *dx2, *dy1, *dx1,
-        *in_islev, *iy2, *ix2, *iy1, *ix1;
-
-    lev_region *tmplregion;
-
-    if (!OV_pop_s(rname) || !OV_pop_i(padding) || !OV_pop_i(rtype)
-        || !OV_pop_i(del_islev) || !OV_pop_i(dy2) || !OV_pop_i(dx2)
-        || !OV_pop_i(dy1) || !OV_pop_i(dx1) || !OV_pop_i(in_islev)
-        || !OV_pop_i(iy2) || !OV_pop_i(ix2) || !OV_pop_i(iy1)
-        || !OV_pop_i(ix1))
-        return;
-
-    tmplregion = (lev_region *) alloc(sizeof(lev_region));
-
-    tmplregion->inarea.x1 = OV_i(ix1);
-    tmplregion->inarea.y1 = OV_i(iy1);
-    tmplregion->inarea.x2 = OV_i(ix2);
-    tmplregion->inarea.y2 = OV_i(iy2);
-
-    tmplregion->delarea.x1 = OV_i(dx1);
-    tmplregion->delarea.y1 = OV_i(dy1);
-    tmplregion->delarea.x2 = OV_i(dx2);
-    tmplregion->delarea.y2 = OV_i(dy2);
-
-    tmplregion->in_islev = OV_i(in_islev);
-    tmplregion->del_islev = OV_i(del_islev);
-    tmplregion->rtype = OV_i(rtype);
-    tmplregion->padding = OV_i(padding);
-    tmplregion->rname.str = dupstr(OV_s(rname));
-
-    if (!tmplregion->in_islev) {
-        get_location(&tmplregion->inarea.x1, &tmplregion->inarea.y1, ANY_LOC,
+    if (!lregion->in_islev) {
+        get_location(&lregion->inarea.x1, &lregion->inarea.y1, ANY_LOC,
                      (struct mkroom *) 0);
-        get_location(&tmplregion->inarea.x2, &tmplregion->inarea.y2, ANY_LOC,
+        get_location(&lregion->inarea.x2, &lregion->inarea.y2, ANY_LOC,
                      (struct mkroom *) 0);
     }
 
-    if (!tmplregion->del_islev) {
-        get_location(&tmplregion->delarea.x1, &tmplregion->delarea.y1,
+    if (!lregion->del_islev) {
+        get_location(&lregion->delarea.x1, &lregion->delarea.y1,
                      ANY_LOC, (struct mkroom *) 0);
-        get_location(&tmplregion->delarea.x2, &tmplregion->delarea.y2,
+        get_location(&lregion->delarea.x2, &lregion->delarea.y2,
                      ANY_LOC, (struct mkroom *) 0);
     }
     if (g.num_lregions) {
@@ -4548,59 +4659,176 @@ struct sp_coder *coder;
         g.num_lregions = 1;
         g.lregions = (lev_region *) alloc(sizeof(lev_region));
     }
-    (void) memcpy(&g.lregions[g.num_lregions - 1], tmplregion,
+    (void) memcpy(&g.lregions[g.num_lregions - 1], lregion,
                   sizeof(lev_region));
-    free(tmplregion);
-
-    opvar_free(dx1);
-    opvar_free(dy1);
-    opvar_free(dx2);
-    opvar_free(dy2);
-
-    opvar_free(ix1);
-    opvar_free(iy1);
-    opvar_free(ix2);
-    opvar_free(iy2);
-
-    opvar_free(del_islev);
-    opvar_free(in_islev);
-    opvar_free(rname);
-    opvar_free(rtype);
-    opvar_free(padding);
 }
 
-void
-spo_region(coder)
-struct sp_coder *coder;
+/* teleport_region({ region = { x1,y1, x2,y2} }); */
+/* teleport_region({ region = { x1,y1, x2,y2}, [ region_islev = 1, ] exclude = { x1,y1, x2,y2}, [ exclude_islen = 1, ] [ dir = "up" ] }); */
+/* TODO: maybe allow using selection, with a new selection method "getextents()"? */
+int
+lspo_teleport_region(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_region";
-    struct opvar *rtype, *rlit, *rflags, *area;
+    const char *const teledirs[] = { "both", "down", "up", NULL };
+    const int teledirs2i[] = { LR_TELE, LR_DOWNTELE, LR_UPTELE, -1 };
+    lev_region tmplregion;
+    int x1,y1,x2,y2;
+
+    create_des_coder();
+
+    lcheck_param_table(L);
+
+    get_table_region(L, "region", &x1, &y1, &x2, &y2, FALSE);
+    tmplregion.inarea.x1 = x1;
+    tmplregion.inarea.y1 = y1;
+    tmplregion.inarea.x2 = x2;
+    tmplregion.inarea.y2 = y2;
+
+    x1 = y1 = x2 = y2 = 0;
+    get_table_region(L, "exclude", &x1, &y1, &x2, &y2, TRUE);
+    tmplregion.delarea.x1 = x1;
+    tmplregion.delarea.y1 = y1;
+    tmplregion.delarea.x2 = x2;
+    tmplregion.delarea.y2 = y2;
+
+    tmplregion.in_islev = get_table_boolean_opt(L, "region_islev", 0);
+    tmplregion.del_islev = get_table_boolean_opt(L, "exclude_islev", 0);
+
+    tmplregion.rtype = teledirs2i[get_table_option(L, "dir", "both", teledirs)];
+    tmplregion.padding = 0;
+    tmplregion.rname.str = NULL;
+
+    levregion_add(&tmplregion);
+
+    return 0;
+}
+
+/* TODO: FIXME
+   from lev_comp SPO_LEVREGION was called as:
+   - STAIR:(x1,y1,x2,y2),(x1,y1,x2,y2),dir
+   - PORTAL:(x1,y1,x2,y2),(x1,y1,x2,y2),string
+   - BRANCH:(x1,y1,x2,y2),(x1,y1,x2,y2),dir
+
+*/
+/* levregion({ region = { x1,y1, x2,y2 }, exclude = { x1,y1, x2,y2 }, type = "portal", name="air" }); */
+/* TODO: allow region to be optional, defaulting to whole level */
+int
+lspo_levregion(L)
+lua_State *L;
+{
+    const char *const regiontypes[] = { "stair-down", "stair-up", "portal", "branch", "teleport", "teleport-up", "teleport-down", NULL };
+    const int regiontypes2i[] = { LR_DOWNSTAIR, LR_UPSTAIR, LR_PORTAL, LR_BRANCH, LR_TELE, LR_UPTELE, LR_DOWNTELE, 0 };
+    lev_region tmplregion;
+    int x1,y1,x2,y2;
+
+    create_des_coder();
+
+    lcheck_param_table(L);
+
+    get_table_region(L, "region", &x1, &y1, &x2, &y2, FALSE);
+
+    tmplregion.inarea.x1 = x1;
+    tmplregion.inarea.y1 = y1;
+    tmplregion.inarea.x2 = x2;
+    tmplregion.inarea.y2 = y2;
+
+    x1 = y1 = x2 = y2 = 0;
+    get_table_region(L, "exclude", &x1, &y1, &x2, &y2, TRUE);
+
+    tmplregion.delarea.x1 = x1;
+    tmplregion.delarea.y1 = y1;
+    tmplregion.delarea.x2 = x2;
+    tmplregion.delarea.y2 = y2;
+
+    tmplregion.in_islev = get_table_boolean_opt(L, "region_islev", 0);
+    tmplregion.del_islev = get_table_boolean_opt(L, "exclude_islev", 0);
+    tmplregion.rtype = regiontypes2i[get_table_option(L, "type", "stair-down", regiontypes)];
+    tmplregion.padding = get_table_int_opt(L, "padding", 0);
+    tmplregion.rname.str = get_table_str_opt(L, "name", NULL);
+
+    levregion_add(&tmplregion);
+
+    return 0;
+}
+
+
+void
+sel_set_lit(x, y, arg)
+int x, y;
+genericptr_t arg;
+{
+     int lit = *(int *)arg;
+
+     levl[x][y].lit = (levl[x][y].typ == LAVAPOOL) ? 1 : lit;
+}
+
+/* region(selection, lit); */
+/* region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL, irregular=BOOL, prefilled=BOOL [ , contents = FUNCTION ] }); */
+/* region({ region={x1,y1, x2,y2}, type="ordinary" }); */
+int
+lspo_region(L)
+lua_State *L;
+{
     xchar dx1, dy1, dx2, dy2;
     register struct mkroom *troom;
-    boolean prefilled, room_not_needed, irregular, joined;
+    boolean prefilled = FALSE, room_not_needed, irregular = FALSE, joined = TRUE;
+    int rtype = OROOM, rlit = 1;
+    int argc = lua_gettop(L);
 
-    if (!OV_pop_i(rflags) || !OV_pop_i(rtype) || !OV_pop_i(rlit)
-        || !OV_pop_r(area))
-        return;
+    create_des_coder();
 
-    prefilled = !(OV_i(rflags) & (1 << 0));
-    irregular = (OV_i(rflags) & (1 << 1));
-    joined = !(OV_i(rflags) & (1 << 2));
+    if (argc <= 1) {
+        lcheck_param_table(L);
 
-    if (OV_i(rtype) > MAXRTYPE) {
-        OV_i(rtype) -= MAXRTYPE + 1;
-        prefilled = TRUE;
-    } else
-        prefilled = FALSE;
+        /* TODO: check the prefilled, what was the default in lev_comp? */
+        /* "unfilled" == 0, "filled" == 1, missing = "filled" */
 
-    if (OV_i(rlit) < 0)
-        OV_i(rlit) =
-            (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+        /* TODO: "unfilled" ==> prefilled=1 */
+        prefilled = get_table_boolean_opt(L, "prefilled", 0);
+        irregular = get_table_boolean_opt(L, "irregular", 0);
+        joined = get_table_boolean_opt(L, "joined", 1);
+        rtype = get_table_roomtype_opt(L, "type", OROOM);
+        rlit = get_table_int_opt(L, "lit", -1);
+        dx1 = get_table_int_opt(L, "x1", -1); /* TODO: area */
+        dy1 = get_table_int_opt(L, "y1", -1);
+        dx2 = get_table_int_opt(L, "x2", -1);
+        dy2 = get_table_int_opt(L, "y2", -1);
 
-    dx1 = SP_REGION_X1(OV_i(area));
-    dy1 = SP_REGION_Y1(OV_i(area));
-    dx2 = SP_REGION_X2(OV_i(area));
-    dy2 = SP_REGION_Y2(OV_i(area));
+        if (dx1 == -1 && dy1 == -1 && dx2 == -1 && dy2 == -1) {
+            int rx1, ry1, rx2, ry2;
+            get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
+            dx1 = rx1; dy1 = ry1;
+            dx2 = rx2; dy2 = ry2;
+        }
+        if (dx1 == -1 && dy1 == -1 && dx2 == -1 && dy2 == -1) {
+            nhl_error(L, "region needs region");
+        }
+
+    } else if (argc == 2) {
+        /* region(selection, "lit"); */
+        const char *const lits[] = { "unlit", "lit", NULL };
+        struct selectionvar *sel = l_selection_check(L, 1);
+
+        rlit = luaL_checkoption(L, 2, "lit", lits);
+
+        /*
+    TODO: adjust region size for wall, but only if lit
+    TODO: lit=random
+        */
+        if (rlit)
+            selection_do_grow(sel, W_ANY);
+        selection_iterate(sel, sel_set_lit, (genericptr_t) &rlit);
+
+        /* TODO: skip the rest of this function? */
+        return 0;
+    } else {
+        nhl_error(L, "Wrong parameters");
+        return 0;
+    }
+
+    if (rlit < 0)
+        rlit = (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
 
     get_location(&dx1, &dy1, ANY_LOC, (struct mkroom *) 0);
     get_location(&dx2, &dy2, ANY_LOC, (struct mkroom *) 0);
@@ -4608,30 +4836,25 @@ struct sp_coder *coder;
     /* for an ordinary room, `prefilled' is a flag to force
        an actual room to be created (such rooms are used to
        control placement of migrating monster arrivals) */
-    room_not_needed = (OV_i(rtype) == OROOM && !irregular && !prefilled);
+    room_not_needed = (rtype == OROOM && !irregular && !prefilled);
     if (room_not_needed || g.nroom >= MAXNROFROOMS) {
         region tmpregion;
         if (!room_not_needed)
             impossible("Too many rooms on new level!");
-        tmpregion.rlit = OV_i(rlit);
+        tmpregion.rlit = rlit;
         tmpregion.x1 = dx1;
         tmpregion.y1 = dy1;
         tmpregion.x2 = dx2;
         tmpregion.y2 = dy2;
         light_region(&tmpregion);
 
-        opvar_free(area);
-        opvar_free(rflags);
-        opvar_free(rlit);
-        opvar_free(rtype);
-
-        return;
+        return 0;
     }
 
     troom = &g.rooms[g.nroom];
 
     /* mark rooms that must be filled, but do it later */
-    if (OV_i(rtype) != OROOM)
+    if (rtype != OROOM)
         troom->needfill = (prefilled ? 2 : 1);
 
     troom->needjoining = joined;
@@ -4640,13 +4863,12 @@ struct sp_coder *coder;
         g.min_rx = g.max_rx = dx1;
         g.min_ry = g.max_ry = dy1;
         g.smeq[g.nroom] = g.nroom;
-        flood_fill_rm(dx1, dy1, g.nroom + ROOMOFFSET, OV_i(rlit), TRUE);
-        add_room(g.min_rx, g.min_ry, g.max_rx, g.max_ry, FALSE, OV_i(rtype),
-                 TRUE);
-        troom->rlit = OV_i(rlit);
+        flood_fill_rm(dx1, dy1, g.nroom + ROOMOFFSET, rlit, TRUE);
+        add_room(g.min_rx, g.min_ry, g.max_rx, g.max_ry, FALSE, rtype, TRUE);
+        troom->rlit = rlit;
         troom->irregular = TRUE;
     } else {
-        add_room(dx1, dy1, dx2, dy2, OV_i(rlit), OV_i(rtype), TRUE);
+        add_room(dx1, dy1, dx2, dy2, rlit, rtype, TRUE);
 #ifdef SPECIALIZATION
         topologize(troom, FALSE); /* set roomno */
 #else
@@ -4655,67 +4877,108 @@ struct sp_coder *coder;
     }
 
     if (!room_not_needed) {
-        if (coder->n_subroom > 1)
+        if (g.coder->n_subroom > 1)
             impossible("region as subroom");
         else {
-            coder->tmproomlist[coder->n_subroom] = troom;
-            coder->failed_room[coder->n_subroom] = FALSE;
-            coder->n_subroom++;
+            g.coder->tmproomlist[g.coder->n_subroom] = troom;
+            g.coder->failed_room[g.coder->n_subroom] = FALSE;
+            g.coder->n_subroom++;
+            update_croom();
+            lua_getfield(L, 1, "contents");
+            if (lua_type(L, -1) == LUA_TFUNCTION) {
+                lua_remove(L, -2);
+                lua_call(L, 0, 0);
+            } else
+                lua_pop(L, 1);
+            spo_endroom(g.coder);
         }
     }
 
-    opvar_free(area);
-    opvar_free(rflags);
-    opvar_free(rlit);
-    opvar_free(rtype);
+    return 0;
 }
 
-void
-spo_drawbridge(coder)
-struct sp_coder *coder;
+/* drawbridge({ dir="east", state="closed", x=05,y=08}); */
+int
+lspo_drawbridge(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_drawbridge";
+    const char *const mwdirs[] = { "north", "south", "west", "east", "random", NULL };
+    const int mwdirs2i[] = { DB_NORTH, DB_SOUTH, DB_WEST, DB_EAST, -1, -2 };
+    const char *const dbopens[] = { "open", "closed", "random", NULL };
+    const int dbopens2i[] = { 1, 0, -1, -2 };
     xchar x, y;
-    int dopen;
-    struct opvar *dir, *db_open, *dcoord;
+    int mx, my, dir;
+    int db_open;
+    long dcoord;
 
-    if (!OV_pop_i(dir) || !OV_pop_i(db_open) || !OV_pop_c(dcoord))
-        return;
+    create_des_coder();
 
-    get_location_coord(&x, &y, DRY | WET | HOT, coder->croom, OV_i(dcoord));
-    if ((dopen = OV_i(db_open)) == -1)
-        dopen = !rn2(2);
-    if (!create_drawbridge(x, y, OV_i(dir), dopen ? TRUE : FALSE))
+    lcheck_param_table(L);
+
+    mx = get_table_int(L, "x");
+    my = get_table_int(L, "y");
+    dir = mwdirs2i[get_table_option(L, "dir", "random", mwdirs)];
+    dcoord = SP_COORD_PACK(mx, my);
+    db_open = dbopens2i[get_table_option(L, "state", "random", dbopens)];
+    x = mx;
+    y = my;
+
+    get_location_coord(&x, &y, DRY | WET | HOT, g.coder->croom, dcoord);
+    if (db_open == -1)
+        db_open = !rn2(2);
+    if (!create_drawbridge(x, y, dir, db_open ? TRUE : FALSE))
         impossible("Cannot create drawbridge.");
     g.SpLev_Map[x][y] = 1;
 
-    opvar_free(dcoord);
-    opvar_free(db_open);
-    opvar_free(dir);
+    return 0;
 }
 
-void
-spo_mazewalk(coder)
-struct sp_coder *coder;
+/* mazewalk({ x = NN, y = NN, typ = ".", dir = "north", stocked = 0 }); */
+/* mazewalk(x,y,dir); */
+int
+lspo_mazewalk(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_mazewalk";
+    const char *const mwdirs[] = { "north", "south", "east", "west", "random", NULL };
+    const int mwdirs2i[] = { W_NORTH, W_SOUTH, W_EAST, W_WEST, -1, -2 };
     xchar x, y;
-    struct opvar *ftyp, *fstocked, *fdir, *mcoord;
-    int dir;
+    int mx, my;
+    xchar ftyp = ROOM;
+    int fstocked = 1, dir = -1;
+    long mcoord;
+    int argc = lua_gettop(L);
 
-    if (!OV_pop_i(ftyp) || !OV_pop_i(fstocked) || !OV_pop_i(fdir)
-        || !OV_pop_c(mcoord))
-        return;
+    create_des_coder();
 
-    dir = OV_i(fdir);
+    if (argc == 3) {
+        mx = luaL_checkinteger(L, 1);
+        my = luaL_checkinteger(L, 2);
+        dir = mwdirs2i[luaL_checkoption(L, 3, "random", mwdirs)];
+    } else {
+        lcheck_param_table(L);
 
-    get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(mcoord));
-    if (!isok(x, y))
-        return;
-
-    if (OV_i(ftyp) < 1) {
-        OV_i(ftyp) = g.level.flags.corrmaze ? CORR : ROOM;
+        mx = get_table_int(L, "x");
+        my = get_table_int(L, "y");
+        ftyp = get_table_mapchr_opt(L, "typ", ROOM);
+        fstocked = get_table_boolean_opt(L, "stocked", 1);
+        dir = mwdirs2i[get_table_option(L, "dir", "random", mwdirs)];
     }
+
+    mcoord = SP_COORD_PACK(mx, my);
+    x = mx;
+    y = my;
+
+    get_location_coord(&x, &y, ANY_LOC, g.coder->croom, mcoord);
+
+    if (!isok(x, y))
+        return 0;
+
+    if (ftyp < 1) {
+        ftyp = g.level.flags.corrmaze ? CORR : ROOM;
+    }
+
+    if (dir == -1)
+        dir = mwdirs2i[rn2(4)];
 
     /* don't use move() - it doesn't use W_NORTH, etc. */
     switch (dir) {
@@ -4732,11 +4995,11 @@ struct sp_coder *coder;
         --x;
         break;
     default:
-        impossible("spo_mazewalk: Bad MAZEWALK direction");
+        impossible("mazewalk: Bad direction");
     }
 
     if (!IS_DOOR(levl[x][y].typ)) {
-        levl[x][y].typ = OV_i(ftyp);
+        levl[x][y].typ = ftyp;
         levl[x][y].flags = 0;
     }
 
@@ -4752,7 +5015,7 @@ struct sp_coder *coder;
             x--;
 
         /* no need for IS_DOOR check; out of map bounds */
-        levl[x][y].typ = OV_i(ftyp);
+        levl[x][y].typ = ftyp;
         levl[x][y].flags = 0;
     }
 
@@ -4763,149 +5026,266 @@ struct sp_coder *coder;
             y--;
     }
 
-    walkfrom(x, y, OV_i(ftyp));
-    if (OV_i(fstocked))
+    walkfrom(x, y, ftyp);
+    if (fstocked)
         fill_empty_maze();
 
-    opvar_free(mcoord);
-    opvar_free(fdir);
-    opvar_free(fstocked);
-    opvar_free(ftyp);
+    return 0;
 }
 
-void
-spo_wall_property(coder)
-struct sp_coder *coder;
+/* wall_property({ x1=0, y1=0, x2=78, y2=20, property="nondiggable" }); */
+/* wall_property({ region = {1,0, 78,20}, property="nonpasswall" }); */
+int
+lspo_wall_property(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_wall_property";
-    struct opvar *r;
-    xchar dx1, dy1, dx2, dy2;
-    int wprop = (coder->opcode == SPO_NON_DIGGABLE)
-                   ? W_NONDIGGABLE
-                   : W_NONPASSWALL;
+    const char *const wprops[] = { "nondiggable", "nonpasswall", NULL };
+    const int wprop2i[] = { W_NONDIGGABLE, W_NONPASSWALL, -1 };
+    schar dx1 = -1, dy1 = -1, dx2 = -1, dy2 = -1;
+    int wprop;
 
-    if (!OV_pop_r(r))
-        return;
+    create_des_coder();
 
-    dx1 = SP_REGION_X1(OV_i(r));
-    dy1 = SP_REGION_Y1(OV_i(r));
-    dx2 = SP_REGION_X2(OV_i(r));
-    dy2 = SP_REGION_Y2(OV_i(r));
+    lcheck_param_table(L);
+
+    dx1 = get_table_int_opt(L, "x1", -1);
+    dy1 = get_table_int_opt(L, "y1", -1);
+    dx2 = get_table_int_opt(L, "x2", -1);
+    dy2 = get_table_int_opt(L, "y2", -1);
+
+    if (dx1 == -1 && dy1 == -1 && dx2 == -1 && dy2 == -1) {
+        int rx1, ry1, rx2, ry2;
+        get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
+        dx1 = rx1; dy1 = ry1;
+        dx2 = rx2; dy2 = ry2;
+    }
+
+    wprop = wprop2i[get_table_option(L, "property", "nondiggable", wprops)];
+
+    if (dx1 == -1)
+        dx1 = g.xstart - 1;
+    if (dy1 == -1)
+        dy1 = g.ystart - 1;
+    if (dx2 == -1)
+        dx2 = g.xstart + g.xsize + 1;
+    if (dy2 == -1)
+        dy2 = g.ystart + g.ysize + 1;
 
     get_location(&dx1, &dy1, ANY_LOC, (struct mkroom *) 0);
     get_location(&dx2, &dy2, ANY_LOC, (struct mkroom *) 0);
 
     set_wall_property(dx1, dy1, dx2, dy2, wprop);
 
-    opvar_free(r);
+    return 0;
 }
 
-void
-spo_room_door(coder)
-struct sp_coder *coder;
+/* non_diggable(selection); */
+/* non_diggable(); */
+int
+lspo_non_diggable(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_room_door";
-    struct opvar *wall, *secret, *mask, *pos;
-    room_door tmpd;
+    int prop = W_NONDIGGABLE;
+    int argc = lua_gettop(L);
+    boolean freesel = FALSE;
+    struct selectionvar *sel = (struct selectionvar *) 0;
 
-    if (!OV_pop_i(wall) || !OV_pop_i(secret) || !OV_pop_i(mask)
-        || !OV_pop_i(pos) || !coder->croom)
-        return;
+    create_des_coder();
 
-    tmpd.secret = OV_i(secret);
-    tmpd.mask = OV_i(mask);
-    tmpd.pos = OV_i(pos);
-    tmpd.wall = OV_i(wall);
+    if (argc == 1)
+        sel = l_selection_check(L, -1);
+    else if (argc == 0) {
+        freesel = TRUE;
+        sel = selection_new();
+        selection_not(sel);
+    }
 
-    create_door(&tmpd, coder->croom);
+    if (sel) {
+        selection_iterate(sel, sel_set_wall_property, (genericptr_t) &prop);
+        if (freesel) {
+            selection_free(sel);
+            free(sel);
+        }
+    }
 
-    opvar_free(wall);
-    opvar_free(secret);
-    opvar_free(mask);
-    opvar_free(pos);
+    return 0;
 }
 
+/* non_passwall(selection); */
+/* non_passwall(); */
+int
+lspo_non_passwall(L)
+lua_State *L;
+{
+    int prop = W_NONPASSWALL;
+    int argc = lua_gettop(L);
+    boolean freesel = FALSE;
+    struct selectionvar *sel = (struct selectionvar *) 0;
+
+    create_des_coder();
+
+    if (argc == 1)
+        sel = l_selection_check(L, -1);
+    else if (argc == 0) {
+        freesel = TRUE;
+        sel = selection_new();
+        selection_not(sel);
+    }
+
+    if (sel) {
+        selection_iterate(sel, sel_set_wall_property, (genericptr_t) &prop);
+        if (freesel) {
+            selection_free(sel);
+            free(sel);
+        }
+    }
+
+    return 0;
+}
+
+#if 0
 /*ARGSUSED*/
-void
+static void
 sel_set_wallify(x, y, arg)
 int x, y;
 genericptr_t arg UNUSED;
 {
     wallify_map(x, y, x, y);
 }
+#endif
 
-void
-spo_wallify(coder)
-struct sp_coder *coder;
+/* TODO: wallify(selection) */
+/* wallify({ x1=NN,y1=NN, x2=NN,y2=NN }); */
+/* wallify(); */
+int
+lspo_wallify(L)
+lua_State *L;
 {
-    static const char nhFunc[] = "spo_wallify";
-    struct opvar *typ, *r;
-    int dx1, dy1, dx2, dy2;
+    int dx1 = -1, dy1 = -1, dx2 = -1, dy2 = -1;
 
-    if (!OV_pop_i(typ))
-        return;
-    switch (OV_i(typ)) {
-    default:
-    case 0:
-        if (!OV_pop_r(r))
-            return;
-        dx1 = (xchar) SP_REGION_X1(OV_i(r));
-        dy1 = (xchar) SP_REGION_Y1(OV_i(r));
-        dx2 = (xchar) SP_REGION_X2(OV_i(r));
-        dy2 = (xchar) SP_REGION_Y2(OV_i(r));
-        wallify_map(dx1 < 0 ? (g.xstart - 1) : dx1,
-                    dy1 < 0 ? (g.ystart - 1) : dy1,
-                    dx2 < 0 ? (g.xstart + g.xsize + 1) : dx2,
-                    dy2 < 0 ? (g.ystart + g.ysize + 1) : dy2);
-        break;
-    case 1:
-        if (!OV_pop_typ(r, SPOVAR_SEL))
-            return;
-        selection_iterate(r, sel_set_wallify, NULL);
-        break;
+    /* TODO: clamp coord values */
+    /* TODO: maybe allow wallify({x1,y1}, {x2,y2}) */
+    /* TODO: is_table_coord(), is_table_area(), get_table_coord(), get_table_area() */
+
+    create_des_coder();
+
+    if (lua_gettop(L) == 1) {
+        dx1 = get_table_int(L, "x1");
+        dy1 = get_table_int(L, "y1");
+        dx2 = get_table_int(L, "x2");
+        dy2 = get_table_int(L, "y2");
     }
-    opvar_free(r);
-    opvar_free(typ);
+
+    wallify_map(dx1 < 0 ? (g.xstart - 1) : dx1,
+                dy1 < 0 ? (g.ystart - 1) : dy1,
+                dx2 < 0 ? (g.xstart + g.xsize + 1) : dx2,
+                dy2 < 0 ? (g.ystart + g.ysize + 1) : dy2);
+
+    return 0;
 }
 
-void
-spo_map(coder)
-struct sp_coder *coder;
+/* reset_level is only needed for testing purposes */
+int
+lspo_reset_level(L)
+lua_State *L UNUSED;
 {
-    static const char nhFunc[] = "spo_map";
+    boolean wtower = In_W_tower(u.ux, u.uy, &u.uz);
+
+    create_des_coder();
+    makemap_prepost(TRUE, wtower);
+    clear_level_structures();
+    return 0;
+}
+
+/* map({ x = 10, y = 10, map = [[...]] }); */
+/* map({ halign = "center", valign = "center", map = [[...]] }); */
+/* map([[...]]) */
+int
+lspo_map(L)
+lua_State *L;
+{
     mazepart tmpmazepart;
-    struct opvar *mpxs, *mpys, *mpmap, *mpa, *mpkeepr, *mpzalign;
-    xchar halign, valign;
     xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
-    unpacked_coord upc;
 
-    if (!OV_pop_i(mpxs) || !OV_pop_i(mpys) || !OV_pop_s(mpmap)
-        || !OV_pop_i(mpkeepr) || !OV_pop_i(mpzalign) || !OV_pop_c(mpa))
-        return;
+    /*
+TODO: allow passing an array of strings as map data
+TODO: handle if map lines aren't same length
+TODO: g.coder->croom needs to be updated
+     */
 
-    tmpmazepart.xsize = OV_i(mpxs);
-    tmpmazepart.ysize = OV_i(mpys);
-    tmpmazepart.zaligntyp = OV_i(mpzalign);
+    const char *const left_or_right[] = { "left", "half-left", "center", "half-right", "right", "none", NULL };
+    const int l_or_r2i[] = { LEFT, H_LEFT, CENTER, H_RIGHT, RIGHT, -1, -1 };
+    const char *const top_or_bot[] = { "top", "center", "bottom", "none", NULL };
+    const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1 };
+    int lr, tb, keepregion = 1, x = -1, y = -1;
+    char *tmps, *mapdata;
+    int mapwid, maphei = 0;
+    int argc = lua_gettop(L);
 
-    upc = get_unpacked_coord(OV_i(mpa), ANY_LOC);
-    tmpmazepart.halign = upc.x;
-    tmpmazepart.valign = upc.y;
+    create_des_coder();
 
+    if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
+        lr = tb = CENTER;
+        mapdata = dupstr(luaL_checkstring(L, 1));
+    } else {
+        lcheck_param_table(L);
+        lr = l_or_r2i[get_table_option(L, "halign", "none", left_or_right)];
+        tb = t_or_b2i[get_table_option(L, "valign", "none", top_or_bot)];
+        keepregion = get_table_boolean_opt(L, "keepregion", 1); /* TODO: maybe rename? */
+        x = get_table_int_opt(L, "x", -1);
+        y = get_table_int_opt(L, "y", -1);
+        mapdata = get_table_str(L, "map");
+    }
+
+    (void) stripdigits(mapdata);
+    mapwid = str_lines_maxlen(mapdata);
+    tmps = mapdata;
+    while (tmps && *tmps) {
+        char *s1 = index(tmps, '\n');
+        if (maphei > MAP_Y_LIM)
+            break;
+        if (s1)
+            s1++;
+        tmps = s1;
+        maphei++;
+    }
+
+    /* keepregion restricts the coordinates of the commands coming after the map
+       into the map region */
+    /* for keepregion */
     tmpxsize = g.xsize;
     tmpysize = g.ysize;
     tmpxstart = g.xstart;
     tmpystart = g.ystart;
 
-    halign = tmpmazepart.halign;
-    valign = tmpmazepart.valign;
-    g.xsize = tmpmazepart.xsize;
-    g.ysize = tmpmazepart.ysize;
-    switch (tmpmazepart.zaligntyp) {
-    default:
-    case 0:
-        break;
-    case 1:
-        switch ((int) halign) {
+
+    g.xsize = tmpmazepart.xsize = mapwid;
+    g.ysize = tmpmazepart.ysize = maphei;
+    tmpmazepart.halign = lr;
+    tmpmazepart.valign = tb;
+
+    if (lr == -1 && tb == -1) {
+        if (isok(x,y)) {
+            /* x,y is given, place map starting at x,y */
+            if (g.coder->croom) {
+                /* in a room? adjust to room relative coords */
+                g.xstart = x + g.coder->croom->lx;
+                g.ystart = y + g.coder->croom->ly;
+                g.xsize = min(tmpmazepart.xsize, (g.coder->croom->hx - g.coder->croom->lx));
+                g.ysize = min(tmpmazepart.ysize, (g.coder->croom->hy - g.coder->croom->ly));
+            } else {
+                g.xsize = tmpmazepart.xsize;
+                g.ysize = tmpmazepart.ysize;
+                g.xstart = x;
+                g.ystart = y;
+            }
+        } else {
+            nhl_error(L, "Map requires either x,y or halign,valign params");
+            return 0;
+        }
+    } else {
+        /* place map starting at halign,valign */
+        switch (lr) {
         case LEFT:
             g.xstart = g.splev_init_present ? 1 : 3;
             break;
@@ -4922,7 +5302,7 @@ struct sp_coder *coder;
             g.xstart = g.x_maze_max - g.xsize - 1;
             break;
         }
-        switch ((int) valign) {
+        switch (tb) {
         case TOP:
             g.ystart = 3;
             break;
@@ -4937,29 +5317,15 @@ struct sp_coder *coder;
             g.xstart++;
         if (!(g.ystart % 2))
             g.ystart++;
-        break;
-    case 2:
-        if (!coder->croom) {
-            g.xstart = 1;
-            g.ystart = 0;
-            g.xsize = COLNO - 1 - tmpmazepart.xsize;
-            g.ysize = ROWNO - tmpmazepart.ysize;
-        }
-        get_location_coord(&halign, &valign, ANY_LOC, coder->croom,
-                           OV_i(mpa));
-        g.xsize = tmpmazepart.xsize;
-        g.ysize = tmpmazepart.ysize;
-        g.xstart = halign;
-        g.ystart = valign;
-        break;
     }
+
     if (g.ystart < 0 || g.ystart + g.ysize > ROWNO) {
         /* try to move the start a bit */
         g.ystart += (g.ystart > 0) ? -2 : 2;
         if (g.ysize == ROWNO)
             g.ystart = 0;
         if (g.ystart < 0 || g.ystart + g.ysize > ROWNO)
-            panic("reading special level with g.ysize too large");
+            g.ystart = 0;
     }
     if (g.xsize <= 1 && g.ysize <= 1) {
         g.xstart = 1;
@@ -4967,13 +5333,18 @@ struct sp_coder *coder;
         g.xsize = COLNO - 1;
         g.ysize = ROWNO;
     } else {
-        xchar x, y, mptyp;
+        char mpchr;
+        xchar mptyp;
 
         /* Load the map */
-        for (y = g.ystart; y < g.ystart + g.ysize; y++)
-            for (x = g.xstart; x < g.xstart + g.xsize; x++) {
-                mptyp = (mpmap->vardata.str[(y - g.ystart) * g.xsize
-                                                  + (x - g.xstart)] - 1);
+        for (y = g.ystart; y < min(ROWNO, g.ystart + g.ysize); y++)
+            for (x = g.xstart; x < min(COLNO, g.xstart + g.xsize); x++) {
+                mpchr = (mapdata[(y - g.ystart) * (mapwid+1) + (x - g.xstart)]);
+                mptyp = splev_chr2typ(mpchr);
+                if (mptyp == INVALID_TYPE) {
+                    /* TODO: warn about illegal map char */
+                    continue;
+                }
                 if (mptyp >= MAX_TYPE)
                     continue;
                 levl[x][y].typ = mptyp;
@@ -5007,291 +5378,47 @@ struct sp_coder *coder;
                 else if (g.splev_init_present && levl[x][y].typ == ICE)
                     levl[x][y].icedpool = g.icedpools ? ICED_POOL : ICED_MOAT;
             }
-        if (coder->lvl_is_joined)
+        if (g.coder->lvl_is_joined)
             remove_rooms(g.xstart, g.ystart, g.xstart + g.xsize, g.ystart + g.ysize);
     }
-    if (!OV_i(mpkeepr)) {
+    if (!keepregion) {
         g.xstart = tmpxstart;
         g.ystart = tmpystart;
         g.xsize = tmpxsize;
         g.ysize = tmpysize;
     }
 
-    opvar_free(mpxs);
-    opvar_free(mpys);
-    opvar_free(mpmap);
-    opvar_free(mpa);
-    opvar_free(mpkeepr);
-    opvar_free(mpzalign);
+    Free(mapdata);
+
+    return 0;
 }
 
 void
-spo_jmp(coder, lvl)
-struct sp_coder *coder;
-sp_lev *lvl;
+update_croom()
 {
-    static const char nhFunc[] = "spo_jmp";
-    struct opvar *tmpa;
-    long a;
-
-    if (!OV_pop_i(tmpa))
-        return;
-    a = sp_code_jmpaddr(coder->frame->n_opcode, (OV_i(tmpa) - 1));
-    if ((a >= 0) && (a < lvl->n_opcodes) && (a != coder->frame->n_opcode))
-        coder->frame->n_opcode = a;
-    opvar_free(tmpa);
-}
-
-void
-spo_conditional_jump(coder, lvl)
-struct sp_coder *coder;
-sp_lev *lvl;
-{
-    static const char nhFunc[] = "spo_conditional_jump";
-    struct opvar *oa, *oc;
-    long a, c;
-    int test = 0;
-
-    if (!OV_pop_i(oa) || !OV_pop_i(oc))
+    if (!g.coder)
         return;
 
-    a = sp_code_jmpaddr(coder->frame->n_opcode, (OV_i(oa) - 1));
-    c = OV_i(oc);
-
-    switch (coder->opcode) {
-    default:
-        impossible("spo_conditional_jump: illegal opcode");
-        break;
-    case SPO_JL:
-        test = (c & SP_CPUFLAG_LT);
-        break;
-    case SPO_JLE:
-        test = (c & (SP_CPUFLAG_LT | SP_CPUFLAG_EQ));
-        break;
-    case SPO_JG:
-        test = (c & SP_CPUFLAG_GT);
-        break;
-    case SPO_JGE:
-        test = (c & (SP_CPUFLAG_GT | SP_CPUFLAG_EQ));
-        break;
-    case SPO_JE:
-        test = (c & SP_CPUFLAG_EQ);
-        break;
-    case SPO_JNE:
-        test = (c & ~SP_CPUFLAG_EQ);
-        break;
-    }
-
-    if ((test) && (a >= 0) && (a < lvl->n_opcodes)
-        && (a != coder->frame->n_opcode))
-        coder->frame->n_opcode = a;
-
-    opvar_free(oa);
-    opvar_free(oc);
+    if (g.coder->n_subroom)
+        g.coder->croom = g.coder->tmproomlist[g.coder->n_subroom - 1];
+    else
+        g.coder->croom = NULL;
 }
 
-void
-spo_var_init(coder)
-struct sp_coder *coder;
+struct sp_coder *
+sp_level_coder_init()
 {
-    static const char nhFunc[] = "spo_var_init";
-    struct opvar *vname;
-    struct opvar *arraylen;
-    struct opvar *vvalue;
-    struct splev_var *tmpvar;
-    struct splev_var *tmp2;
-    long idx;
-
-    OV_pop_s(vname);
-    OV_pop_i(arraylen);
-
-    if (!vname || !arraylen)
-        panic("no values for SPO_VAR_INIT");
-
-    tmpvar = opvar_var_defined(coder, OV_s(vname));
-
-    if (tmpvar) {
-        /* variable redefinition */
-        if (OV_i(arraylen) < 0) {
-            /* copy variable */
-            if (tmpvar->array_len) {
-                idx = tmpvar->array_len;
-                while (idx-- > 0) {
-                    opvar_free(tmpvar->data.arrayvalues[idx]);
-                }
-                Free(tmpvar->data.arrayvalues);
-            } else {
-                opvar_free(tmpvar->data.value);
-            }
-            tmpvar->data.arrayvalues = NULL;
-            goto copy_variable;
-        } else if (OV_i(arraylen)) {
-            /* redefined array */
-            idx = tmpvar->array_len;
-            while (idx-- > 0) {
-                opvar_free(tmpvar->data.arrayvalues[idx]);
-            }
-            Free(tmpvar->data.arrayvalues);
-            tmpvar->data.arrayvalues = NULL;
-            goto create_new_array;
-        } else {
-            /* redefined single value */
-            OV_pop(vvalue);
-            if (tmpvar->svtyp != vvalue->spovartyp)
-                panic("redefining variable as different type");
-            opvar_free(tmpvar->data.value);
-            tmpvar->data.value = vvalue;
-            tmpvar->array_len = 0;
-        }
-    } else {
-        /* new variable definition */
-        tmpvar = (struct splev_var *) alloc(sizeof(struct splev_var));
-        tmpvar->next = coder->frame->variables;
-        tmpvar->name = dupstr(OV_s(vname));
-        coder->frame->variables = tmpvar;
-
-        if (OV_i(arraylen) < 0) {
-        /* copy variable */
-        copy_variable:
-            OV_pop(vvalue);
-            tmp2 = opvar_var_defined(coder, OV_s(vvalue));
-            if (!tmp2)
-                panic("no copyable var");
-            tmpvar->svtyp = tmp2->svtyp;
-            tmpvar->array_len = tmp2->array_len;
-            if (tmpvar->array_len) {
-                idx = tmpvar->array_len;
-                tmpvar->data.arrayvalues =
-                    (struct opvar **) alloc(sizeof(struct opvar *) * idx);
-                while (idx-- > 0) {
-                    tmpvar->data.arrayvalues[idx] =
-                        opvar_clone(tmp2->data.arrayvalues[idx]);
-                }
-            } else {
-                tmpvar->data.value = opvar_clone(tmp2->data.value);
-            }
-            opvar_free(vvalue);
-        } else if (OV_i(arraylen)) {
-        /* new array */
-        create_new_array:
-            idx = OV_i(arraylen);
-            tmpvar->array_len = idx;
-            tmpvar->data.arrayvalues =
-                (struct opvar **) alloc(sizeof(struct opvar *) * idx);
-            while (idx-- > 0) {
-                OV_pop(vvalue);
-                if (!vvalue)
-                    panic("no value for arrayvariable");
-                tmpvar->data.arrayvalues[idx] = vvalue;
-            }
-            tmpvar->svtyp = SPOVAR_ARRAY;
-        } else {
-            /* new single value */
-            OV_pop(vvalue);
-            if (!vvalue)
-                panic("no value for variable");
-            tmpvar->svtyp = OV_typ(vvalue);
-            tmpvar->data.value = vvalue;
-            tmpvar->array_len = 0;
-        }
-    }
-
-    opvar_free(vname);
-    opvar_free(arraylen);
-
-}
-
-#if 0
-static long
-opvar_array_length(coder)
-struct sp_coder *coder;
-{
-    static const char nhFunc[] = "opvar_array_length";
-    struct opvar *vname;
-    struct splev_var *tmp;
-    long len = 0;
-
-    if (!coder)
-        return 0;
-
-    vname = splev_stack_pop(coder->stack);
-    if (!vname)
-        return 0;
-    if (vname->spovartyp != SPOVAR_VARIABLE)
-        goto pass;
-
-    tmp = coder->frame->variables;
-    while (tmp) {
-        if (!strcmp(tmp->name, OV_s(vname))) {
-            if ((tmp->svtyp & SPOVAR_ARRAY)) {
-                len = tmp->array_len;
-                if (len < 1)
-                    len = 0;
-            }
-            goto pass;
-        }
-        tmp = tmp->next;
-    }
-
-pass:
-    opvar_free(vname);
-    return len;
-}
-#endif /*0*/
-
-void
-spo_shuffle_array(coder)
-struct sp_coder *coder;
-{
-    static const char nhFunc[] = "spo_shuffle_array";
-    struct opvar *vname;
-    struct splev_var *tmp;
-    struct opvar *tmp2;
-    long i, j;
-
-    if (!OV_pop_s(vname))
-        return;
-
-    tmp = opvar_var_defined(coder, OV_s(vname));
-    if (!tmp || (tmp->array_len < 1)) {
-        opvar_free(vname);
-        return;
-    }
-    for (i = tmp->array_len - 1; i > 0; i--) {
-        if ((j = rn2(i + 1)) == i)
-            continue;
-        tmp2 = tmp->data.arrayvalues[j];
-        tmp->data.arrayvalues[j] = tmp->data.arrayvalues[i];
-        tmp->data.arrayvalues[i] = tmp2;
-    }
-
-    opvar_free(vname);
-}
-
-/* Special level coder, creates the special level from the sp_lev codes.
- * Does not free the allocated memory.
- */
-static boolean
-sp_level_coder(lvl)
-sp_lev *lvl;
-{
-    static const char nhFunc[] = "sp_level_coder";
-    unsigned long exec_opcodes = 0;
     int tmpi;
-    long room_stack = 0;
-    unsigned long max_execution = SPCODER_MAX_RUNTIME;
     struct sp_coder *coder =
         (struct sp_coder *) alloc(sizeof (struct sp_coder));
 
-    coder->frame = frame_new(0);
-    coder->stack = NULL;
     coder->premapped = FALSE;
     coder->solidify = FALSE;
     coder->check_inaccessibles = FALSE;
     coder->croom = NULL;
     coder->n_subroom = 1;
-    coder->exit_script = FALSE;
     coder->lvl_is_joined = 0;
+    coder->room_stack = 0;
 
     g.splev_init_present = FALSE;
     g.icedpools = FALSE;
@@ -5300,19 +5427,12 @@ sp_lev *lvl;
        once either level is created, these values can be forgotten */
     g.mines_prize_count = g.soko_prize_count = 0;
 
-    if (wizard) {
-        char *met = nh_getenv("SPCODER_MAX_RUNTIME");
-
-        if (met && met[0] == '1')
-            max_execution = (1 << 30) - 1;
-    }
-
     for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi++) {
         coder->tmproomlist[tmpi] = (struct mkroom *) 0;
         coder->failed_room[tmpi] = FALSE;
     }
 
-    shuffle_alignments();
+    update_croom();
 
     for (tmpi = 0; tmpi < MAX_CONTAINMENT; tmpi++)
         g.container_obj[tmpi] = NULL;
@@ -5329,642 +5449,99 @@ sp_lev *lvl;
     g.xsize = COLNO - 1;
     g.ysize = ROWNO;
 
-    while (coder->frame->n_opcode < lvl->n_opcodes && !coder->exit_script) {
-        coder->opcode = lvl->opcodes[coder->frame->n_opcode].opcode;
-        coder->opdat = lvl->opcodes[coder->frame->n_opcode].opdat;
+    return coder;
+}
 
-        coder->stack = coder->frame->stack;
 
-        if (exec_opcodes++ > max_execution) {
-            impossible("Level script is taking too much time, stopping.");
-            coder->exit_script = TRUE;
-        }
+static const struct luaL_Reg nhl_functions[] = {
+    { "message", lspo_message },
+    { "monster", lspo_monster },
+    { "object", lspo_object },
+    { "level_flags", lspo_level_flags },
+    { "level_init", lspo_level_init },
+    { "engraving", lspo_engraving },
+    { "mineralize", lspo_mineralize },
+    { "door", lspo_door },
+    { "stair", lspo_stair },
+    { "ladder", lspo_ladder },
+    { "grave", lspo_grave },
+    { "altar", lspo_altar },
+    { "map", lspo_map },
+    { "feature", lspo_feature },
+    { "terrain", lspo_terrain },
+    { "replace_terrain", lspo_replace_terrain },
+    { "room", lspo_room },
+    { "corridor", lspo_corridor },
+    { "random_corridors", lspo_random_corridors },
+    { "gold", lspo_gold },
+    { "trap", lspo_trap },
+    { "mazewalk", lspo_mazewalk },
+    { "drawbridge", lspo_drawbridge },
+    { "region", lspo_region },
+    { "levregion", lspo_levregion },
+    { "wallify", lspo_wallify },
+    { "wall_property", lspo_wall_property },
+    { "non_diggable", lspo_non_diggable },
+    { "non_passwall", lspo_non_passwall },
+    { "teleport_region", lspo_teleport_region },
+    { "reset_level", lspo_reset_level },
+    /* TODO: { "branch", lspo_branch }, */
+    /* TODO: { "portal", lspo_portal }, */
+    { NULL, NULL }
+};
 
-        if (coder->failed_room[coder->n_subroom - 1]
-            && coder->opcode != SPO_ENDROOM && coder->opcode != SPO_ROOM
-            && coder->opcode != SPO_SUBROOM)
-            goto next_opcode;
+/* TODO:
 
-        coder->croom = coder->tmproomlist[coder->n_subroom - 1];
+ - if des-file used MAZE_ID to start a level, the level needs des.level_flags("mazelevel")
+ - expose g.coder->croom or g.[xy]start and g.xy[size] to lua.
+ - detect a "subroom" automatically.
+ - new function get_mapchar(x,y) to return the mapchar on map
+ - many params should accept their normal type (eg, int or bool), AND "random"
+ - automatically add shuffle(array)
+ - automatically add align = { "law", "neutral", "chaos" } and shuffle it. (remove from lua files)
+ - grab the header comments from des-files and add add them to the lua files
 
-        switch (coder->opcode) {
-        case SPO_NULL:
-            break;
-        case SPO_EXIT:
-            coder->exit_script = TRUE;
-            break;
-        case SPO_FRAME_PUSH:
-            spo_frame_push(coder);
-            break;
-        case SPO_FRAME_POP:
-            spo_frame_pop(coder);
-            break;
-        case SPO_CALL:
-            spo_call(coder);
-            break;
-        case SPO_RETURN:
-            spo_return(coder);
-            break;
-        case SPO_END_MONINVENT:
-            spo_end_moninvent(coder);
-            break;
-        case SPO_POP_CONTAINER:
-            spo_pop_container(coder);
-            break;
-        case SPO_POP: {
-            struct opvar *ov = splev_stack_pop(coder->stack);
+*/
 
-            opvar_free(ov);
-            break;
-        }
-        case SPO_PUSH:
-            splev_stack_push(coder->stack, opvar_clone(coder->opdat));
-            break;
-        case SPO_MESSAGE:
-            spo_message(coder);
-            break;
-        case SPO_MONSTER:
-            spo_monster(coder);
-            break;
-        case SPO_OBJECT:
-            spo_object(coder);
-            break;
-        case SPO_LEVEL_FLAGS:
-            spo_level_flags(coder);
-            break;
-        case SPO_INITLEVEL:
-            spo_initlevel(coder);
-            break;
-        case SPO_ENGRAVING:
-            spo_engraving(coder);
-            break;
-        case SPO_MINERALIZE:
-            spo_mineralize(coder);
-            break;
-        case SPO_SUBROOM:
-        case SPO_ROOM:
-            if (!coder->failed_room[coder->n_subroom - 1]) {
-                spo_room(coder);
-            } else
-                room_stack++;
-            break;
-        case SPO_ENDROOM:
-            if (coder->failed_room[coder->n_subroom - 1]) {
-                if (!room_stack)
-                    spo_endroom(coder);
-                else
-                    room_stack--;
-            } else {
-                spo_endroom(coder);
-            }
-            break;
-        case SPO_DOOR:
-            spo_door(coder);
-            break;
-        case SPO_STAIR:
-            spo_stair(coder);
-            break;
-        case SPO_LADDER:
-            spo_ladder(coder);
-            break;
-        case SPO_GRAVE:
-            spo_grave(coder);
-            break;
-        case SPO_ALTAR:
-            spo_altar(coder);
-            break;
-        case SPO_SINK:
-        case SPO_POOL:
-        case SPO_FOUNTAIN:
-            spo_feature(coder);
-            break;
-        case SPO_TRAP:
-            spo_trap(coder);
-            break;
-        case SPO_GOLD:
-            spo_gold(coder);
-            break;
-        case SPO_CORRIDOR:
-            spo_corridor(coder);
-            break;
-        case SPO_TERRAIN:
-            spo_terrain(coder);
-            break;
-        case SPO_REPLACETERRAIN:
-            spo_replace_terrain(coder);
-            break;
-        case SPO_LEVREGION:
-            spo_levregion(coder);
-            break;
-        case SPO_REGION:
-            spo_region(coder);
-            break;
-        case SPO_DRAWBRIDGE:
-            spo_drawbridge(coder);
-            break;
-        case SPO_MAZEWALK:
-            spo_mazewalk(coder);
-            break;
-        case SPO_NON_PASSWALL:
-        case SPO_NON_DIGGABLE:
-            spo_wall_property(coder);
-            break;
-        case SPO_ROOM_DOOR:
-            spo_room_door(coder);
-            break;
-        case SPO_WALLIFY:
-            spo_wallify(coder);
-            break;
-        case SPO_COPY: {
-            struct opvar *a = splev_stack_pop(coder->stack);
+void
+l_register_des(L)
+lua_State *L;
+{
+    /* register des -table, and functions for it */
+    lua_newtable(L);
+    luaL_setfuncs(L, nhl_functions, 0);
+    lua_setglobal(L, "des");
+}
 
-            splev_stack_push(coder->stack, opvar_clone(a));
-            splev_stack_push(coder->stack, opvar_clone(a));
-            opvar_free(a);
-            break;
-        }
-        case SPO_DEC: {
-            struct opvar *a;
+static void
+create_des_coder()
+{
+    if (!g.coder)
+        g.coder = sp_level_coder_init();
+}
 
-            if (!OV_pop_i(a))
-                break;
-            OV_i(a)--;
-            splev_stack_push(coder->stack, a);
-            break;
-        }
-        case SPO_INC: {
-            struct opvar *a;
+/*
+ * General loader
+ */
+boolean
+load_special(name)
+const char *name;
+{
+    boolean result = FALSE;
 
-            if (!OV_pop_i(a))
-                break;
-            OV_i(a)++;
-            splev_stack_push(coder->stack, a);
-            break;
-        }
-        case SPO_MATH_SIGN: {
-            struct opvar *a;
+    create_des_coder();
 
-            if (!OV_pop_i(a))
-                break;
-            OV_i(a) = ((OV_i(a) < 0) ? -1 : ((OV_i(a) > 0) ? 1 : 0));
-            splev_stack_push(coder->stack, a);
-            break;
-        }
-        case SPO_MATH_ADD: {
-            struct opvar *a, *b;
-
-            if (!OV_pop(b) || !OV_pop(a))
-                break;
-            if (OV_typ(b) == OV_typ(a)) {
-                if (OV_typ(a) == SPOVAR_INT) {
-                    OV_i(a) = OV_i(a) + OV_i(b);
-                    splev_stack_push(coder->stack, a);
-                    opvar_free(b);
-                } else if (OV_typ(a) == SPOVAR_STRING) {
-                    struct opvar *c;
-                    char *tmpbuf = (char *) alloc(strlen(OV_s(a))
-                                                  + strlen(OV_s(b)) + 1);
-
-                    (void) sprintf(tmpbuf, "%s%s", OV_s(a), OV_s(b));
-                    c = opvar_new_str(tmpbuf);
-                    splev_stack_push(coder->stack, c);
-                    opvar_free(a);
-                    opvar_free(b);
-                    Free(tmpbuf);
-                } else {
-                    splev_stack_push(coder->stack, a);
-                    opvar_free(b);
-                    impossible("adding weird types");
-                }
-            } else {
-                splev_stack_push(coder->stack, a);
-                opvar_free(b);
-                impossible("adding different types");
-            }
-            break;
-        }
-        case SPO_MATH_SUB: {
-            struct opvar *a, *b;
-
-            if (!OV_pop_i(b) || !OV_pop_i(a))
-                break;
-            OV_i(a) = OV_i(a) - OV_i(b);
-            splev_stack_push(coder->stack, a);
-            opvar_free(b);
-            break;
-        }
-        case SPO_MATH_MUL: {
-            struct opvar *a, *b;
-
-            if (!OV_pop_i(b) || !OV_pop_i(a))
-                break;
-            OV_i(a) = OV_i(a) * OV_i(b);
-            splev_stack_push(coder->stack, a);
-            opvar_free(b);
-            break;
-        }
-        case SPO_MATH_DIV: {
-            struct opvar *a, *b;
-
-            if (!OV_pop_i(b) || !OV_pop_i(a))
-                break;
-            if (OV_i(b) >= 1) {
-                OV_i(a) = OV_i(a) / OV_i(b);
-            } else {
-                OV_i(a) = 0;
-            }
-            splev_stack_push(coder->stack, a);
-            opvar_free(b);
-            break;
-        }
-        case SPO_MATH_MOD: {
-            struct opvar *a, *b;
-
-            if (!OV_pop_i(b) || !OV_pop_i(a))
-                break;
-            if (OV_i(b) > 0) {
-                OV_i(a) = OV_i(a) % OV_i(b);
-            } else {
-                OV_i(a) = 0;
-            }
-            splev_stack_push(coder->stack, a);
-            opvar_free(b);
-            break;
-        }
-        case SPO_CMP: {
-            struct opvar *a;
-            struct opvar *b;
-            struct opvar *c;
-            long val = 0;
-
-            OV_pop(b);
-            OV_pop(a);
-            if (!a || !b) {
-                impossible("spo_cmp: no values in stack");
-                break;
-            }
-            if (OV_typ(a) != OV_typ(b)) {
-                impossible("spo_cmp: trying to compare differing datatypes");
-                break;
-            }
-            switch (OV_typ(a)) {
-            case SPOVAR_COORD:
-            case SPOVAR_REGION:
-            case SPOVAR_MAPCHAR:
-            case SPOVAR_MONST:
-            case SPOVAR_OBJ:
-            case SPOVAR_INT:
-                if (OV_i(b) > OV_i(a))
-                    val |= SP_CPUFLAG_LT;
-                if (OV_i(b) < OV_i(a))
-                    val |= SP_CPUFLAG_GT;
-                if (OV_i(b) == OV_i(a))
-                    val |= SP_CPUFLAG_EQ;
-                c = opvar_new_int(val);
-                break;
-            case SPOVAR_STRING:
-                c = opvar_new_int(!strcmp(OV_s(b), OV_s(a))
-                                     ? SP_CPUFLAG_EQ
-                                     : 0);
-                break;
-            default:
-                c = opvar_new_int(0);
-                break;
-            }
-            splev_stack_push(coder->stack, c);
-            opvar_free(a);
-            opvar_free(b);
-            break;
-        }
-        case SPO_JMP:
-            spo_jmp(coder, lvl);
-            break;
-        case SPO_JL:
-        case SPO_JLE:
-        case SPO_JG:
-        case SPO_JGE:
-        case SPO_JE:
-        case SPO_JNE:
-            spo_conditional_jump(coder, lvl);
-            break;
-        case SPO_RN2: {
-            struct opvar *tmpv;
-            struct opvar *t;
-
-            if (!OV_pop_i(tmpv))
-                break;
-            t = opvar_new_int((OV_i(tmpv) > 1) ? rn2(OV_i(tmpv)) : 0);
-            splev_stack_push(coder->stack, t);
-            opvar_free(tmpv);
-            break;
-        }
-        case SPO_DICE: {
-            struct opvar *a, *b, *t;
-
-            if (!OV_pop_i(b) || !OV_pop_i(a))
-                break;
-            if (OV_i(b) < 1)
-                OV_i(b) = 1;
-            if (OV_i(a) < 1)
-                OV_i(a) = 1;
-            t = opvar_new_int(d(OV_i(a), OV_i(b)));
-            splev_stack_push(coder->stack, t);
-            opvar_free(a);
-            opvar_free(b);
-            break;
-        }
-        case SPO_MAP:
-            spo_map(coder);
-            break;
-        case SPO_VAR_INIT:
-            spo_var_init(coder);
-            break;
-        case SPO_SHUFFLE_ARRAY:
-            spo_shuffle_array(coder);
-            break;
-        case SPO_SEL_ADD: /* actually, logical or */
-        {
-            struct opvar *sel1, *sel2, *pt;
-
-            if (!OV_pop_typ(sel1, SPOVAR_SEL))
-                panic("no sel1 for add");
-            if (!OV_pop_typ(sel2, SPOVAR_SEL))
-                panic("no sel2 for add");
-            pt = selection_logical_oper(sel1, sel2, '|');
-            opvar_free(sel1);
-            opvar_free(sel2);
-            splev_stack_push(coder->stack, pt);
-            break;
-        }
-        case SPO_SEL_COMPLEMENT: {
-            struct opvar *sel, *pt;
-
-            if (!OV_pop_typ(sel, SPOVAR_SEL))
-                panic("no sel for not");
-            pt = selection_not(sel);
-            opvar_free(sel);
-            splev_stack_push(coder->stack, pt);
-            break;
-        }
-        case SPO_SEL_FILTER: /* sorta like logical and */
-        {
-            struct opvar *filtertype;
-
-            if (!OV_pop_i(filtertype))
-                panic("no sel filter type");
-            switch (OV_i(filtertype)) {
-            case SPOFILTER_PERCENT: {
-                struct opvar *tmp1, *sel;
-
-                if (!OV_pop_i(tmp1))
-                    panic("no sel filter percent");
-                if (!OV_pop_typ(sel, SPOVAR_SEL))
-                    panic("no sel filter");
-                selection_filter_percent(sel, OV_i(tmp1));
-                splev_stack_push(coder->stack, sel);
-                opvar_free(tmp1);
-                break;
-            }
-            case SPOFILTER_SELECTION: /* logical and */
-            {
-                struct opvar *pt, *sel1, *sel2;
-
-                if (!OV_pop_typ(sel1, SPOVAR_SEL))
-                    panic("no sel filter sel1");
-                if (!OV_pop_typ(sel2, SPOVAR_SEL))
-                    panic("no sel filter sel2");
-                pt = selection_logical_oper(sel1, sel2, '&');
-                splev_stack_push(coder->stack, pt);
-                opvar_free(sel1);
-                opvar_free(sel2);
-                break;
-            }
-            case SPOFILTER_MAPCHAR: {
-                struct opvar *pt, *tmp1, *sel;
-
-                if (!OV_pop_typ(sel, SPOVAR_SEL))
-                    panic("no sel filter");
-                if (!OV_pop_typ(tmp1, SPOVAR_MAPCHAR))
-                    panic("no sel filter mapchar");
-                pt = selection_filter_mapchar(sel, tmp1);
-                splev_stack_push(coder->stack, pt);
-                opvar_free(tmp1);
-                opvar_free(sel);
-                break;
-            }
-            default:
-                panic("unknown sel filter type");
-            }
-            opvar_free(filtertype);
-            break;
-        }
-        case SPO_SEL_POINT: {
-            struct opvar *tmp;
-            struct opvar *pt = selection_opvar((char *) 0);
-            schar x, y;
-
-            if (!OV_pop_c(tmp))
-                panic("no ter sel coord");
-            get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
-            selection_setpoint(x, y, pt, 1);
-            splev_stack_push(coder->stack, pt);
-            opvar_free(tmp);
-            break;
-        }
-        case SPO_SEL_RECT:
-        case SPO_SEL_FILLRECT: {
-            struct opvar *tmp, *pt = selection_opvar((char *) 0);
-            schar x, y, x1, y1, x2, y2;
-
-            if (!OV_pop_r(tmp))
-                panic("no ter sel region");
-            x1 = min(SP_REGION_X1(OV_i(tmp)), SP_REGION_X2(OV_i(tmp)));
-            y1 = min(SP_REGION_Y1(OV_i(tmp)), SP_REGION_Y2(OV_i(tmp)));
-            x2 = max(SP_REGION_X1(OV_i(tmp)), SP_REGION_X2(OV_i(tmp)));
-            y2 = max(SP_REGION_Y1(OV_i(tmp)), SP_REGION_Y2(OV_i(tmp)));
-            get_location(&x1, &y1, ANY_LOC, coder->croom);
-            get_location(&x2, &y2, ANY_LOC, coder->croom);
-            x1 = (x1 < 0) ? 0 : x1;
-            y1 = (y1 < 0) ? 0 : y1;
-            x2 = (x2 >= COLNO) ? COLNO - 1 : x2;
-            y2 = (y2 >= ROWNO) ? ROWNO - 1 : y2;
-            if (coder->opcode == SPO_SEL_RECT) {
-                for (x = x1; x <= x2; x++) {
-                    selection_setpoint(x, y1, pt, 1);
-                    selection_setpoint(x, y2, pt, 1);
-                }
-                for (y = y1; y <= y2; y++) {
-                    selection_setpoint(x1, y, pt, 1);
-                    selection_setpoint(x2, y, pt, 1);
-                }
-            } else {
-                for (x = x1; x <= x2; x++)
-                    for (y = y1; y <= y2; y++)
-                        selection_setpoint(x, y, pt, 1);
-            }
-            splev_stack_push(coder->stack, pt);
-            opvar_free(tmp);
-            break;
-        }
-        case SPO_SEL_LINE: {
-            struct opvar *tmp = NULL, *tmp2 = NULL,
-                *pt = selection_opvar((char *) 0);
-            schar x1, y1, x2, y2;
-
-            if (!OV_pop_c(tmp))
-                panic("no ter sel linecoord1");
-            if (!OV_pop_c(tmp2))
-                panic("no ter sel linecoord2");
-            get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
-            get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(tmp2));
-            x1 = (x1 < 0) ? 0 : x1;
-            y1 = (y1 < 0) ? 0 : y1;
-            x2 = (x2 >= COLNO) ? COLNO - 1 : x2;
-            y2 = (y2 >= ROWNO) ? ROWNO - 1 : y2;
-            selection_do_line(x1, y1, x2, y2, pt);
-            splev_stack_push(coder->stack, pt);
-            opvar_free(tmp);
-            opvar_free(tmp2);
-            break;
-        }
-        case SPO_SEL_RNDLINE: {
-            struct opvar *tmp = NULL, *tmp2 = NULL, *tmp3,
-                *pt = selection_opvar((char *) 0);
-            schar x1, y1, x2, y2;
-
-            if (!OV_pop_i(tmp3))
-                panic("no ter sel randline1");
-            if (!OV_pop_c(tmp))
-                panic("no ter sel randline2");
-            if (!OV_pop_c(tmp2))
-                panic("no ter sel randline3");
-            get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
-            get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(tmp2));
-            x1 = (x1 < 0) ? 0 : x1;
-            y1 = (y1 < 0) ? 0 : y1;
-            x2 = (x2 >= COLNO) ? COLNO - 1 : x2;
-            y2 = (y2 >= ROWNO) ? ROWNO - 1 : y2;
-            selection_do_randline(x1, y1, x2, y2, OV_i(tmp3), 12, pt);
-            splev_stack_push(coder->stack, pt);
-            opvar_free(tmp);
-            opvar_free(tmp2);
-            opvar_free(tmp3);
-            break;
-        }
-        case SPO_SEL_GROW: {
-            struct opvar *dirs, *pt;
-
-            if (!OV_pop_i(dirs))
-                panic("no dirs for grow");
-            if (!OV_pop_typ(pt, SPOVAR_SEL))
-                panic("no selection for grow");
-            selection_do_grow(pt, OV_i(dirs));
-            splev_stack_push(coder->stack, pt);
-            opvar_free(dirs);
-            break;
-        }
-        case SPO_SEL_FLOOD: {
-            struct opvar *tmp;
-            schar x, y;
-
-            if (!OV_pop_c(tmp))
-                panic("no ter sel flood coord");
-            get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
-            if (isok(x, y)) {
-                struct opvar *pt = selection_opvar((char *) 0);
-
-                set_selection_floodfillchk(floodfillchk_match_under);
-                floodfillchk_match_under_typ = levl[x][y].typ;
-                selection_floodfill(pt, x, y, FALSE);
-                splev_stack_push(coder->stack, pt);
-            }
-            opvar_free(tmp);
-            break;
-        }
-        case SPO_SEL_RNDCOORD: {
-            struct opvar *pt;
-            schar x, y;
-
-            if (!OV_pop_typ(pt, SPOVAR_SEL))
-                panic("no selection for rndcoord");
-            if (selection_rndcoord(pt, &x, &y, FALSE)) {
-                x -= g.xstart;
-                y -= g.ystart;
-            }
-            splev_stack_push(coder->stack, opvar_new_coord(x, y));
-            opvar_free(pt);
-            break;
-        }
-        case SPO_SEL_ELLIPSE: {
-            struct opvar *filled, *xaxis, *yaxis, *pt;
-            struct opvar *sel = selection_opvar((char *) 0);
-            schar x, y;
-
-            if (!OV_pop_i(filled))
-                panic("no filled for ellipse");
-            if (!OV_pop_i(yaxis))
-                panic("no yaxis for ellipse");
-            if (!OV_pop_i(xaxis))
-                panic("no xaxis for ellipse");
-            if (!OV_pop_c(pt))
-                panic("no pt for ellipse");
-            get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(pt));
-            selection_do_ellipse(sel, x, y, OV_i(xaxis), OV_i(yaxis),
-                                 OV_i(filled));
-            splev_stack_push(coder->stack, sel);
-            opvar_free(filled);
-            opvar_free(yaxis);
-            opvar_free(xaxis);
-            opvar_free(pt);
-            break;
-        }
-        case SPO_SEL_GRADIENT: {
-            struct opvar *gtyp, *glim, *mind, *maxd, *gcoord, *coord2;
-            struct opvar *sel;
-            schar x, y, x2, y2;
-
-            if (!OV_pop_i(gtyp))
-                panic("no gtyp for grad");
-            if (!OV_pop_i(glim))
-                panic("no glim for grad");
-            if (!OV_pop_c(coord2))
-                panic("no coord2 for grad");
-            if (!OV_pop_c(gcoord))
-                panic("no coord for grad");
-            if (!OV_pop_i(maxd))
-                panic("no maxd for grad");
-            if (!OV_pop_i(mind))
-                panic("no mind for grad");
-            get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(gcoord));
-            get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(coord2));
-
-            sel = selection_opvar((char *) 0);
-            selection_do_gradient(sel, x, y, x2, y2, OV_i(gtyp), OV_i(mind),
-                                  OV_i(maxd), OV_i(glim));
-            splev_stack_push(coder->stack, sel);
-
-            opvar_free(gtyp);
-            opvar_free(glim);
-            opvar_free(gcoord);
-            opvar_free(coord2);
-            opvar_free(maxd);
-            opvar_free(mind);
-            break;
-        }
-        default:
-            panic("sp_level_coder: Unknown opcode %i", coder->opcode);
-        }
-
-    next_opcode:
-        coder->frame->n_opcode++;
-    } /*while*/
+    if (!load_lua(name))
+        goto give_up;
 
     link_doors_rooms();
     fill_rooms();
     remove_boundary_syms();
 
-    if (coder->check_inaccessibles)
+    /* TODO: ensure_way_out() needs rewrite */
+    if (g.coder->check_inaccessibles)
         ensure_way_out();
+
     /* FIXME: Ideally, we want this call to only cover areas of the map
      * which were not inserted directly by the special level file (see
      * the insect legs on Baalzebub's level, for instance). Since that
@@ -5976,59 +5553,21 @@ sp_lev *lvl;
 
     count_features();
 
-    if (coder->solidify)
+    if (g.coder->solidify)
         solidify_map();
 
     /* This must be done before sokoban_detect(),
      * otherwise branch stairs won't be premapped. */
     fixup_special();
 
-    if (coder->premapped)
+    if (g.coder->premapped)
         sokoban_detect();
 
-    if (coder->frame) {
-        struct sp_frame *tmpframe;
-        do {
-            tmpframe = coder->frame->next;
-            frame_del(coder->frame);
-            coder->frame = tmpframe;
-        } while (coder->frame);
-    }
-    Free(coder);
-
-    return TRUE;
-}
-
-/*
- * General loader
- */
-boolean
-load_special(name)
-const char *name;
-{
-    dlb *fd;
-    sp_lev *lvl = NULL;
-    boolean result = FALSE;
-    struct version_info vers_info;
-
-    fd = dlb_fopen(name, RDBMODE);
-    if (!fd)
-        return FALSE;
-    Fread((genericptr_t) &vers_info, sizeof vers_info, 1, fd);
-    if (!check_version(&vers_info, name, TRUE, UTD_CHECKSIZES)) {
-        (void) dlb_fclose(fd);
-        goto give_up;
-    }
-
-    lvl = (sp_lev *) alloc(sizeof (sp_lev));
-    result = sp_level_loader(fd, lvl);
-    (void) dlb_fclose(fd);
-    if (result)
-        result = sp_level_coder(lvl);
-    sp_level_free(lvl);
-    Free(lvl);
-
+    result = TRUE;
 give_up:
+    Free(g.coder);
+    g.coder = NULL;
+
     return result;
 }
 

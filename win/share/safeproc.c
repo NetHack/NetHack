@@ -67,6 +67,7 @@
 
 struct window_procs safe_procs = {
     "safe-startup", 0L, 0L,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     safe_init_nhwindows, safe_player_selection, safe_askname, safe_get_nh_event,
     safe_exit_nhwindows, safe_suspend_nhwindows, safe_resume_nhwindows,
     safe_create_nhwindow, safe_clear_nhwindow, safe_display_nhwindow,
@@ -113,6 +114,8 @@ int optn;
         safe_procs.win_raw_print_bold = stdio_raw_print_bold;
         safe_procs.win_nhgetch = stdio_nhgetch;
         safe_procs.win_wait_synch = stdio_wait_synch;
+        if (optn == 2)
+            safe_procs.win_raw_print = stdio_nonl_raw_print;        
     }
     return &safe_procs;
 }
@@ -538,6 +541,17 @@ const char *str;
 {
     if (str)
         fprintf(stdout, "%s\n", str);
+    return;
+}
+
+/* no newline variation, add to your code:
+    windowprocs.win_raw_print = stdio_nonl_raw_print;  */
+void
+stdio_nonl_raw_print(str)
+const char *str;
+{
+    if (str)
+        fprintf(stdout, "%s", str);
     return;
 }
 

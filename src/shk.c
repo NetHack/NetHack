@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1558124088 2019/05/17 20:14:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1571436007 2019/10/18 22:00:07 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.171 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -54,9 +54,10 @@ static long FDECL(stolen_container, (struct obj *, struct monst *,
 static long FDECL(getprice, (struct obj *, BOOLEAN_P));
 static void FDECL(shk_names_obj, (struct monst *, struct obj *,
                                       const char *, long, const char *));
-static struct obj *FDECL(bp_to_obj, (struct bill_x *));
 static boolean FDECL(inherits, (struct monst *, int, int, BOOLEAN_P));
 static void FDECL(set_repo_loc, (struct monst *));
+static struct obj *FDECL(bp_to_obj, (struct bill_x *));
+static long FDECL(get_pricing_units, (struct obj *));
 static boolean NDECL(angry_shk_exists);
 static void FDECL(rile_shk, (struct monst *));
 static void FDECL(rouse_shk, (struct monst *, BOOLEAN_P));
@@ -74,7 +75,6 @@ static void FDECL(deserted_shop, (char *));
 static boolean FDECL(special_stock, (struct obj *, struct monst *,
                                          BOOLEAN_P));
 static const char *FDECL(cad, (BOOLEAN_P));
-static long FDECL(get_pricing_units, (struct obj *obj));
 
 /*
         invariants: obj->unpaid iff onbill(obj) [unless bp->useup]
@@ -2029,11 +2029,11 @@ struct obj *obj;
 
     if (obj->globby) {
         /* globs must be sold by weight not by volume */
-        int unit_weight = (int) objects[obj->otyp].oc_weight,
-            wt = (obj->owt > 0) ? obj->owt : weight(obj);
+        long unit_weight = (long) objects[obj->otyp].oc_weight,
+             wt = (obj->owt > 0) ? (long) obj->owt : (long) weight(obj);
 
         if (unit_weight)
-            units = wt / unit_weight;
+            units = (wt + unit_weight - 1L) / unit_weight;
     }
     return units;
 }
@@ -2898,8 +2898,8 @@ boolean peaceful, silent;
     /* gather information for message(s) prior to manipulating bill */
     was_unpaid = obj->unpaid ? TRUE : FALSE;
     if (Has_contents(obj)) {
-        c_count = count_contents(obj, TRUE, FALSE, TRUE);
-        u_count = count_contents(obj, TRUE, FALSE, FALSE);
+        c_count = count_contents(obj, TRUE, FALSE, TRUE, FALSE);
+        u_count = count_contents(obj, TRUE, FALSE, FALSE, FALSE);
     }
 
     if (!billable(&shkp, obj, roomno, FALSE)) {
@@ -2983,8 +2983,9 @@ boolean peaceful, silent;
             if (canseemon(shkp)) {
                 Norep("%s booms: \"%s, you are a thief!\"",
                       Shknam(shkp), g.plname);
-            } else
-                Norep("You hear a scream, \"Thief!\"");
+            } else if (!Deaf) {
+                Norep("You hear a scream, \"Thief!\"");  /* Deaf-aware */
+            }
         }
         hot_pursuit(shkp);
         (void) angry_guards(FALSE);
@@ -3196,9 +3197,9 @@ xchar x, y;
 
             if (container) {
                 /* number of items owned by shk */
-                shksc = count_contents(obj, TRUE, TRUE, FALSE);
+                shksc = count_contents(obj, TRUE, TRUE, FALSE, TRUE);
                 /* number of items owned by you (total - shksc) */
-                yourc = count_contents(obj, TRUE, TRUE, TRUE) - shksc;
+                yourc = count_contents(obj, TRUE, TRUE, TRUE, TRUE) - shksc;
                 only_partially_your_contents = shksc && yourc;
             }
             /*
@@ -3214,14 +3215,27 @@ xchar x, y;
                (The case where it has contents already entirely owned
                by the shk is treated the same was if it were empty
                since the hero isn't selling any of those contents.)
-               Your container:
+               Your container and shk is willing to buy it:
                 "... your <empty bag>.  Sell it?"
                 "... your <bag> and its contents.  Sell them?"
                 "... your <bag> and item inside.  Sell them?"
                 "... your <bag> and items inside.  Sell them?"
+               Your container but shk only cares about the contents:
+                "... your item in your <bag>.  Sell it?"
+                "... your items in your <bag>.  Sell them?"
                Shk's container:
                 "... your item in the <bag>.  Sell it?"
                 "... your items in the <bag>.  Sell them?"
+              FIXME:
+               "your items" should sometimes be "some of your items"
+               (when container has some stuff the shk is willing to buy
+               and other stuff he or she doesn't care about); likewise,
+               "your item" should sometimes be "one of your items".
+               That would make the prompting even more verbose so
+               living without it might be a good thing.
+              FIXME too:
+               when container's contents are unknown, plural "items"
+               should be used to not give away information.
              */
             Sprintf(qbuf, "%s offers%s %ld gold piece%s for %s%s ",
                     Shknam(shkp), short_funds ? " only" : "", offer,
@@ -3230,7 +3244,7 @@ xchar x, y;
                         ? ((yourc == 1L) ? "your item in " : "your items in ")
                         : "",
                     obj->unpaid ? "the" : "your");
-            one = obj->unpaid ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
+            one = !ltmp ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
             Sprintf(qsfx, "%s.  Sell %s?",
                     (cltmp && ltmp)
                         ? (only_partially_your_contents
@@ -4369,7 +4383,7 @@ const char *Izchak_speaks[] = {
     "%s says: 'These shopping malls give me a headache.'",
     "%s says: 'Slow down.  Think clearly.'",
     "%s says: 'You need to take things one at a time.'",
-    "%s says: 'I don't like poofy coffee... give me Columbian Supremo.'",
+    "%s says: 'I don't like poofy coffee... give me Colombian Supremo.'",
     "%s says that getting the devteam's agreement on anything is difficult.",
     "%s says that he has noticed those who serve their deity will prosper.",
     "%s says: 'Don't try to steal from me - I have friends in high places!'",
@@ -4853,7 +4867,7 @@ struct obj *obj_absorber, *obj_absorbed;
      * Scenario 1. Shop-owned glob absorbing into shop-owned glob
      **************************************************************/
     if (bp && (!obj_absorber->no_charge
-                || billable(&shkp, obj_absorber, eshkp->shoproom, FALSE))) {
+               || billable(&shkp, obj_absorber, eshkp->shoproom, FALSE))) {
         /* the glob being absorbed has a billing record */
         amount = bp->price;
         eshkp->billct--;
@@ -4926,18 +4940,14 @@ struct obj *obj_absorber, *obj_absorbed;
     /**************************************************************
      * Scenario 3. shop_owned glob merging into player_owned glob
      **************************************************************/
-    if (bp &&
-        (obj_absorber->no_charge
-            || (floor_absorber && !costly_spot(x, y)))) {
+    if (bp && (obj_absorber->no_charge
+               || (floor_absorber && !costly_spot(x, y)))) {
         amount = bp->price;
         bill_dummy_object(obj_absorbed);
-        verbalize(
-                  "You owe me %ld %s for my %s that you %s with your%s",
-                    amount, currency(amount), obj_typename(obj_absorbed->otyp),
-                    ANGRY(shkp) ? "had the audacity to mix" :
-                                  "just mixed",
-                    ANGRY(shkp) ? " stinking batch!" :
-                                  "s.");
+        verbalize("You owe me %ld %s for my %s that you %s with your%s",
+                  amount, currency(amount), obj_typename(obj_absorbed->otyp),
+                  ANGRY(shkp) ? "had the audacity to mix" : "just mixed",
+                  ANGRY(shkp) ? " stinking batch!" : "s.");
         return;
     }
     /**************************************************************

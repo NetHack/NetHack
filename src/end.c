@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1562532734 2019/07/07 20:52:14 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.179 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1575245059 2019/12/02 00:04:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,7 +6,6 @@
 #define NEED_VARARGS /* comment line for pre-compiled headers */
 
 #include "hack.h"
-#include "lev.h"
 #ifndef NO_SIGNAL
 #include <signal.h>
 #endif
@@ -15,7 +14,6 @@
 #include <limits.h>
 #endif
 #include "dlb.h"
-#include "sfproto.h"
 
 
 /* add b to long a, convert wraparound to max value */
@@ -238,8 +236,8 @@ NH_panictrace_gdb()
 #ifdef PANICTRACE_GDB
     /* A (more) generic method to get a stack trace - invoke
      * gdb on ourself. */
-    char *gdbpath = GDBVAR;
-    char *greppath = GREPVAR;
+    const char *gdbpath = GDBVAR;
+    const char *greppath = GREPVAR;
     char buf[BUFSZ];
     FILE *gdb;
 
@@ -248,8 +246,8 @@ NH_panictrace_gdb()
     if (greppath == NULL || greppath[0] == 0)
         return FALSE;
 
-    sprintf(buf, "%s -n -q %s %d 2>&1 | %s '^#'", gdbpath, ARGV0, getpid(),
-            greppath);
+    sprintf(buf, "%s -n -q %s %d 2>&1 | %s '^#'",
+            gdbpath, ARGV0, getpid(), greppath);
     gdb = popen(buf, "w");
     if (gdb) {
         raw_print("Generating more information you may report:\n");
@@ -948,7 +946,7 @@ int size; /* max value is less than 20 */
 #if 0
 /*
  * odds_and_ends() was used for 3.6.0 and 3.6.1.
- * Schroedinger's Cat is handled differently starting with 3.6.2.
+ * Schroedinger's Cat is handled differently as of 3.6.2.
  */
 static boolean FDECL(odds_and_ends, (struct obj *, int));
 
@@ -2153,8 +2151,6 @@ NHFILE *nhfp;
         for (kptr = &g.killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
             if (nhfp->structlevel)
 	        bwrite(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
-            if (nhfp->fieldlevel)
-	        sfo_kinfo(nhfp, kptr, "killers", "kinfo", 1);
         }
     }
     if (release_data(nhfp)) {
@@ -2175,8 +2171,6 @@ NHFILE *nhfp;
     for (kptr = &g.killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
         if (nhfp->structlevel)
 	    mread(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
-        if (nhfp->fieldlevel)
-            sfi_kinfo(nhfp, kptr, "killers", "kinfo", 1);
         if (kptr->next) {
             kptr->next = (struct kinfo *) alloc(sizeof (struct kinfo));
         }

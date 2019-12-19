@@ -47,6 +47,9 @@ nethack \- Exploring The Mazes of Menace
 .B \-ibm
 ]
 [
+.BR \-\-showpaths
+]
+[
 .BR \-\-version [ :paste ]
 ]
 .PP
@@ -223,6 +226,10 @@ the list of top scorers, and a subdirectory
 .I save
 where games are saved.
 .PP
+.B \-\-showpaths
+can be used to cause NetHack to show where it is expecting
+to find various configuration files.
+.PP
 .B \-\-version
 can be used to cause NetHack to show the version information it
 was compiled with, then exit. That will include the
@@ -270,7 +277,7 @@ nethack		The program itself.
 .br
 data, oracles, rumors	Data files used by NetHack.
 .br
-quest.dat, bogusmon	More data files.
+bogusmon 	another data file.
 .br
 engrave, epitaph, tribute	Still more data files.
 .br
@@ -287,9 +294,8 @@ help, hh	Help data files.
 .br
 cmdhelp, opthelp, wizhelp	More help data files.
 .br
-*.lev	Predefined special levels.
-.br
-dungeon	Control file for special levels.
+*.lua	Predefined special levels, dungeon control for
+	special levels, quest texts
 .br
 history	A short history of NetHack.
 .br
@@ -386,7 +392,7 @@ SHOPTYPE and SPLEVTYPE can be used in debugging (wizard) mode.
 DEBUGFILES can be used if the program was built with 'DEBUG' enabled.
 .SH "SEE ALSO"
 .PP
-dgn_comp(6), lev_comp(6), recover(6)
+recover(6)
 .SH BUGS
 .PP
 Probably infinite.

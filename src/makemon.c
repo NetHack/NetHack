@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1561236435 2019/06/22 20:47:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1574722863 2019/11/25 23:01:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -166,7 +166,7 @@ register struct monst *mtmp;
     register struct permonst *ptr = mtmp->data;
     register int mm = monsndx(ptr);
     struct obj *otmp;
-    int bias, spe2, w1, w2;
+    int bias, w1, w2;
 
     if (Is_rogue_level(&u.uz))
         return;
@@ -259,12 +259,10 @@ register struct monst *mtmp;
         } else if (ptr->msound == MS_PRIEST
                    || quest_mon_represents_role(ptr, PM_PRIEST)) {
             otmp = mksobj(MACE, FALSE, FALSE);
-            if (otmp) {
-                otmp->spe = rnd(3);
-                if (!rn2(2))
-                    curse(otmp);
-                (void) mpickobj(mtmp, otmp);
-            }
+            otmp->spe = rnd(3);
+            if (!rn2(2))
+                curse(otmp);
+            (void) mpickobj(mtmp, otmp);
         } else if (mm == PM_NINJA) { /* extra quest villains */
             (void) mongets(mtmp, rn2(4) ? SHURIKEN : DART);
             (void) mongets(mtmp, rn2(4) ? SHORT_SWORD : AXE);
@@ -336,14 +334,13 @@ register struct monst *mtmp;
                              artiname(rn2(2) ? ART_DEMONBANE : ART_SUNSWORD));
             bless(otmp);
             otmp->oerodeproof = TRUE;
-            spe2 = rn2(4);
-            otmp->spe = max(otmp->spe, spe2);
+            otmp->spe = rn2(4);
             (void) mpickobj(mtmp, otmp);
 
             otmp = mksobj(!rn2(4) || is_lord(ptr) ? SHIELD_OF_REFLECTION
                                                   : LARGE_SHIELD,
                           FALSE, FALSE);
-            otmp->cursed = FALSE;
+            /* uncurse(otmp); -- mksobj(,FALSE,) item is always uncursed */
             otmp->oerodeproof = TRUE;
             otmp->spe = 0;
             (void) mpickobj(mtmp, otmp);
@@ -1626,7 +1623,7 @@ int mndx, mvflagsmask, genomask;
         return FALSE;
     if (is_placeholder(ptr))
         return FALSE;
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     /* special levels might ask for random demon type; reject this one */
     if (ptr == &mons[PM_MAIL_DAEMON])
         return FALSE;
@@ -2194,10 +2191,12 @@ register struct monst *mtmp;
     } else if (rt == TEMPLE) {
         ap_type = M_AP_FURNITURE;
         appear = S_altar;
-        /*
-         * We won't bother with beehives, morgues, barracks, throne rooms
-         * since they shouldn't contain too many mimics anyway...
-         */
+
+    /*
+     * We won't bother with beehives, morgues, barracks, throne rooms
+     * since they shouldn't contain too many mimics anyway...
+     */
+
     } else if (rt >= SHOPBASE) {
         s_sym = get_shop_item(rt - SHOPBASE);
         if (s_sym < 0) {
@@ -2245,6 +2244,23 @@ register struct monst *mtmp;
 
         newmcorpsenm(mtmp);
         MCORPSENM(mtmp) = mndx;
+    } else if (ap_type == M_AP_OBJECT && appear == SLIME_MOLD) {
+        newmcorpsenm(mtmp);
+        MCORPSENM(mtmp) = g.context.current_fruit;
+        /* if no objects of this fruit type have been created yet,
+           context.current_fruit is available for re-use when the player
+           assigns a new fruit name; override that--having a mimic as the
+           current_fruit is equivalent to creating an instance of that
+           fruit (no-op if a fruit of this type has actually been made) */
+        flags.made_fruit = TRUE;
+    } else if (ap_type == M_AP_FURNITURE && appear == S_altar) {
+        int algn = rn2(3) - 1; /* -1 (A_Cha) or 0 (A_Neu) or +1 (A_Law) */
+
+        newmcorpsenm(mtmp);
+        MCORPSENM(mtmp) = (Inhell && rn2(3)) ? AM_NONE : Align2amask(algn);
+    } else if (has_mcorpsenm(mtmp)) {
+        /* don't retain stale value from a previously mimicked shape */
+        MCORPSENM(mtmp) = NON_PM;
     }
 
     if (does_block(mx, my, &levl[mx][my]))

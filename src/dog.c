@@ -417,7 +417,7 @@ boolean with_you;
         break;
     }
 
-    if ((mtmp->mspare1 & MIGR_LEFTOVERS) != 0L) {
+    if ((mtmp->migflags & MIGR_LEFTOVERS) != 0L) {
         /* Pick up the rest of the MIGR_TO_SPECIES objects */
         if (g.migrating_objs)
             deliver_obj_to_mon(mtmp, 0, DF_ALL);

@@ -7,3 +7,4 @@ dgn_comp.h
 lev_comp.h
 tile.h
 win32api.h
+nhlua.h

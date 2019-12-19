@@ -5,9 +5,6 @@
 
 #include "hack.h"
 #include "sp_lev.h"
-#include "lev.h" /* save & restore info */
-#include "sfproto.h"
-
 
 static int FDECL(iswall, (int, int));
 static int FDECL(iswall_or_stone, (int, int));
@@ -646,14 +643,14 @@ unsigned long mflags;
         /* once in a blue moon, he won't be at the very bottom */
         if (!rn2(40))
             nlev--;
-        mtmp->mspare1 |= MIGR_LEFTOVERS;
+        mtmp->migflags |= MIGR_LEFTOVERS;
     } else {
         nlev = rn2((max_depth - cur_depth) + 1) + cur_depth;
         if (nlev == cur_depth)
             nlev++;
         if (nlev > max_depth)
             nlev = max_depth;
-        mtmp->mspare1 = (mtmp->mspare1 & ~MIGR_LEFTOVERS);
+        mtmp->migflags = (mtmp->migflags & ~MIGR_LEFTOVERS);
     }
     get_level(&dest, nlev);
     migrate_to_level(mtmp, ledger_no(&dest), MIGR_RANDOM, (coord *) 0);
@@ -671,7 +668,7 @@ struct monst *mtmp;
     goldprob = is_captain ? 600 : 300;
     gemprob = goldprob / 4;
     if (rn2(1000) < goldprob) {
-        if ((otmp = mksobj(GOLD_PIECE, FALSE, FALSE)) != 0) {
+        if ((otmp = mksobj(GOLD_PIECE, TRUE, FALSE)) != 0) {
             otmp->quan = 1L + rnd(goldprob);
             otmp->owt = weight(otmp);
             add_to_minv(mtmp, otmp);
@@ -687,7 +684,7 @@ struct monst *mtmp;
     }
     if (is_captain || !rn2(8)) {
         otyp = shiny_obj(RING_CLASS);
-        if (otyp != STRANGE_OBJECT && (otmp = mksobj(otyp, FALSE, FALSE)) != 0)
+        if (otyp != STRANGE_OBJECT && (otmp = mksobj(otyp, TRUE, FALSE)) != 0)
             add_to_minv(mtmp, otmp);
     }
 }
@@ -1361,7 +1358,7 @@ fumaroles()
         }
     }
     if (snd && !Deaf)
-        Norep("You hear a %swhoosh!", loud ? "loud " : "");
+        Norep("You hear a %swhoosh!", loud ? "loud " : "");  /* Deaf-aware */
 }
 
 /*
@@ -1579,18 +1576,9 @@ NHFILE *nhfp;
             bwrite(nhfp->fd, (genericptr_t) &g.xmax, sizeof(int));
             bwrite(nhfp->fd, (genericptr_t) &g.ymax, sizeof(int));
         }
-        if (nhfp->fieldlevel) {
-            sfo_int(nhfp, &n, "waterlevel", "bubble_count", 1);
-            sfo_int(nhfp, &g.xmin, "waterlevel", "g.xmin", 1);
-            sfo_int(nhfp, &g.ymin, "waterlevel", "g.ymin", 1);
-            sfo_int(nhfp, &g.xmax, "waterlevel", "g.xmax", 1);
-            sfo_int(nhfp, &g.ymax, "waterlevel", "g.ymax", 1);
-        }
         for (b = g.bbubbles; b; b = b->next) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) b, sizeof(struct bubble));
-            if (nhfp->fieldlevel)
-                sfo_bubble(nhfp, b, "waterlevel", "bubble", 1);
         }
     }
     if (release_data(nhfp))
@@ -1602,7 +1590,7 @@ restore_waterlevel(nhfp)
 NHFILE *nhfp;
 {
     struct bubble *b = (struct bubble *) 0, *btmp;
-    int i, n;
+    int i, n = 0;
 
     if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
         return;
@@ -1623,20 +1611,11 @@ NHFILE *nhfp;
         mread(nhfp->fd,(genericptr_t)&g.xmax,sizeof(int));
         mread(nhfp->fd,(genericptr_t)&g.ymax,sizeof(int));
     }
-    if (nhfp->fieldlevel) {
-        sfi_int(nhfp, &n, "waterlevel", "bubble_count", 1);
-        sfi_int(nhfp, &g.xmin, "waterlevel", "g.xmin", 1);
-        sfi_int(nhfp, &g.ymin, "waterlevel", "g.ymin", 1);
-        sfi_int(nhfp, &g.xmax, "waterlevel", "g.xmax", 1);
-        sfi_int(nhfp, &g.ymax, "waterlevel", "g.ymax", 1);
-    }
     for (i = 0; i < n; i++) {
         btmp = b;
         b = (struct bubble *) alloc(sizeof(struct bubble));
         if (nhfp->structlevel)
             mread(nhfp->fd,(genericptr_t) b, sizeof(struct bubble));
-        if (nhfp->fieldlevel)
-            sfi_bubble(nhfp, b, "waterlevel", "bubble", 1);
       if (g.bbubbles) {
           btmp->next = b;
           b->prev = btmp;

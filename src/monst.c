@@ -2589,7 +2589,7 @@ struct permonst _mons2[] = {
         M3_INFRAVISIBLE | M3_INFRAVISION | M3_DISPLACES, 34, HI_LORD),
     /* other demons
      */
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     MON("mail daemon", S_DEMON, LVL(56, 24, 10, 127, 0),
         (G_NOGEN | G_NOCORPSE),
         A(NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),

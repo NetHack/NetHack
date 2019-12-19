@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1560611967 2019/06/15 15:19:27 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1574648939 2019/11/25 02:28:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -306,7 +306,7 @@ gloc_filter_init()
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
         if (!g.gloc_filter_map) {
-            g.gloc_filter_map = selection_opvar((char *) 0);
+            g.gloc_filter_map = selection_new();
         }
         /* special case: if we're in a doorway, try to figure out which
            direction we're moving, and use that side of the doorway */
@@ -326,8 +326,8 @@ void
 gloc_filter_done()
 {
     if (g.gloc_filter_map) {
-        opvar_free_x(g.gloc_filter_map);
-        g.gloc_filter_map = (struct opvar *) 0;
+        selection_free(g.gloc_filter_map);
+        g.gloc_filter_map = (struct selectionvar *) 0;
 
     }
 }
@@ -1468,6 +1468,7 @@ struct obj *obj;
 
     if (!obj->dknown)
         return; /* probably blind */
+    flush_screen(1); /* buffered updates might matter to player's response */
 
     if (obj->oclass == POTION_CLASS && obj->fromsink)
         /* kludge, meaning it's sink water */
@@ -1733,8 +1734,8 @@ boolean called;
         Strcat(buf, "saddled ");
     has_adjectives = (buf[0] != '\0');
 
-    /* Put the actual monster name or type into the buffer now */
-    /* Be sure to remember whether the buffer starts with a name */
+    /* Put the actual monster name or type into the buffer now.
+       Remember whether the buffer starts with a personal name. */
     if (do_hallu) {
         char rnamecode;
         char *rname = rndmonnam(&rnamecode);
@@ -1958,7 +1959,7 @@ struct monst *mon, *other_mon;
         outbuf = mon_nam(mon);
     } else {
         outbuf = nextmbuf();
-        switch (pronoun_gender(mon, FALSE)) {
+        switch (pronoun_gender(mon, PRONOUN_HALLU)) {
         case 0:
             Strcpy(outbuf, "himself");
             break;
@@ -1966,9 +1967,81 @@ struct monst *mon, *other_mon;
             Strcpy(outbuf, "herself");
             break;
         default:
+        case 2:
             Strcpy(outbuf, "itself");
             break;
+        case 3: /* could happen when hallucinating */
+            Strcpy(outbuf, "themselves");
+            break;
         }
+    }
+    return outbuf;
+}
+
+/* construct "<monnamtext> <verb> <othertext> {him|her|it}self" which might
+   be distorted by Hallu; if that's plural, adjust monnamtext and verb */
+char *
+monverbself(mon, monnamtext, verb, othertext)
+struct monst *mon;
+char *monnamtext; /* modifiable 'mbuf' with adequare room at end */
+const char *verb, *othertext;
+{
+    char *verbs, selfbuf[40]; /* sizeof "themselves" suffices */
+
+    /* "himself"/"herself"/"itself", maybe "themselves" if hallucinating */
+    Strcpy(selfbuf, mon_nam_too(mon, mon));
+    /* verb starts plural; this will yield singular except for "themselves" */
+    verbs = vtense(selfbuf, verb);
+    if (!strcmp(verb, verbs)) { /* a match indicates that it stayed plural */
+        monnamtext = makeplural(monnamtext);
+        /* for "it", makeplural() produces "them" but we want "they" */
+        if (!strcmpi(monnamtext, genders[3].he)) {
+            boolean capitaliz = (monnamtext[0] == highc(monnamtext[0]));
+
+            Strcpy(monnamtext, genders[3].him);
+            if (capitaliz)
+                monnamtext[0] = highc(monnamtext[0]);
+        }
+    }
+    Strcat(strcat(monnamtext, " "), verbs);
+    if (othertext && *othertext)
+        Strcat(strcat(monnamtext, " "), othertext);
+    Strcat(strcat(monnamtext, " "), selfbuf);
+    return monnamtext;
+}
+
+/* for debugging messages, where data might be suspect and we aren't
+   taking what the hero does or doesn't know into consideration */
+char *
+minimal_monnam(mon, ckloc)
+struct monst *mon;
+boolean ckloc;
+{
+    struct permonst *ptr;
+    char *outbuf = nextmbuf();
+
+    if (!mon) {
+        Strcpy(outbuf, "[Null monster]");
+    } else if ((ptr = mon->data) == 0) {
+        Strcpy(outbuf, "[Null mon->data]");
+    } else if (ptr < &mons[0]) {
+        Sprintf(outbuf, "[Invalid mon->data %s < %s]",
+                fmt_ptr((genericptr_t) mon->data),
+                fmt_ptr((genericptr_t) &mons[0]));
+    } else if (ptr >= &mons[NUMMONS]) {
+        Sprintf(outbuf, "[Invalid mon->data %s >= %s]",
+                fmt_ptr((genericptr_t) mon->data),
+                fmt_ptr((genericptr_t) &mons[NUMMONS]));
+    } else if (ckloc && ptr == &mons[PM_LONG_WORM]
+               && g.level.monsters[mon->mx][mon->my] != mon) {
+        Sprintf(outbuf, "%s <%d,%d>",
+                mons[PM_LONG_WORM_TAIL].mname, mon->mx, mon->my);
+    } else {
+        Sprintf(outbuf, "%s%s <%d,%d>",
+                mon->mtame ? "tame " : mon->mpeaceful ? "peaceful " : "",
+                mon->data->mname, mon->mx, mon->my);
+        if (mon->cham != NON_PM)
+            Sprintf(eos(outbuf), "{%s}", mons[mon->cham].mname);
     }
     return outbuf;
 }
@@ -1978,11 +2051,12 @@ static char *
 bogusmon(buf, code)
 char *buf, *code;
 {
+    static const char bogon_codes[] = "-_+|="; /* see dat/bonusmon.txt */
     char *mname = buf;
 
     get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng);
     /* strip prefix if present */
-    if (!letter(*mname)) {
+    if (index(bogon_codes, *mname)) {
         if (code)
             *code = *mname;
         ++mname;

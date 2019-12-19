@@ -876,7 +876,7 @@ SCROLL(None, "STRC PRST SKRZ KRK",  1,   0, 100), /* Czech and Slovak
                                                         tongue-twister */
     /* These must come last because they have special fixed descriptions.
      */
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
 SCROLL("mail",          "stamped",  0,   0,   0),
 #endif
 SCROLL("blank paper", "unlabeled",  0,  28,  60),

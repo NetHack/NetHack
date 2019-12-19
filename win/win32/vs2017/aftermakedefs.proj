@@ -11,9 +11,7 @@
 	<Exec Command="$(ToolsDir)makedefs.exe -d" WorkingDirectory="$(DatDir)"/>
 	<Exec Command="$(ToolsDir)makedefs.exe -r" WorkingDirectory="$(DatDir)"/>
 	<Exec Command="$(ToolsDir)makedefs.exe -s" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -q" WorkingDirectory="$(DatDir)"/>
 	<Exec Command="$(ToolsDir)makedefs.exe -h" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -e" WorkingDirectory="$(DatDir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="@(Defs)"/>

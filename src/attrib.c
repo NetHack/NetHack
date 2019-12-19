@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1553363417 2019/03/23 17:50:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1575245050 2019/12/02 00:04:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -147,7 +147,7 @@ int msgflg; /* positive => no message, zero => message, and */
              * taken below the minimum, reduce max value (peak reached)
              * instead.  That means that restore ability and repeated
              * applications of unicorn horn will not be able to recover
-             * all the lost value.  Starting will 3.6.2, we only take away
+             * all the lost value.  As of 3.6.2, we only take away
              * some (average half, possibly zero) of the excess from max
              * instead of all of it, but without intervening recovery, it
              * can still eventually drop to the minimum allowed.  After

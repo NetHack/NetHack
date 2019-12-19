@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1569276988 2019/09/23 22:16:28 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1574982014 2019/11/28 23:00:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -32,6 +32,7 @@ struct flag {
 #define discover flags.explore
     boolean female;
     boolean friday13;        /* it's Friday the 13th */
+    boolean goldX;           /* for BUCX filtering, whether gold is X or U */
     boolean help;            /* look in data file for info about stuff */
     boolean ignintr;         /* ignore interrupts */
     boolean ins_chkpt;       /* checkpoint as appropriate; INSURANCE */
@@ -40,7 +41,6 @@ struct flag {
     boolean lit_corridor;    /* show a dark corr as lit if it is in sight */
     boolean nap;             /* `timed_delay' option for display effects */
     boolean null;            /* OK to send nulls to the terminal */
-    boolean p__obsolete;     /* [3.6.2: perm_invent moved to iflags] */
     boolean pickup;          /* whether you pickup or move and look */
     boolean pickup_thrown;   /* auto-pickup items you threw */
     boolean pushweapon; /* When wielding, push old weapon into second slot */
@@ -49,27 +49,6 @@ struct flag {
     boolean showexp;         /* show experience points */
     boolean showscore;       /* show score */
     boolean silent;          /* whether the bell rings or not */
-    /* The story so far:
-     * 'sortloot' originally took a True/False value but was changed
-     * to use a letter instead.  3.6.0 was released without changing its
-     * type from 'boolean' to 'char'.  A compiler was smart enough to
-     * complain that assigning any of the relevant letters was not 0 or 1
-     * so not appropriate for boolean (by a configuration which used
-     * SKIP_BOOLEAN to bypass nethack's 'boolean' and use a C++-compatible
-     * one).  So the type was changed to 'xchar', which is guaranteed to
-     * match the size of 'boolean' (this guarantee only applies for the
-     * !SKIP_BOOLEAN config, unfortunately).  Since xchar does not match
-     * actual use, the type was later changed to 'char'.  But that would
-     * break 3.6.0 savefile compatibility for configurations which typedef
-     * 'schar' to 'short int' instead of to 'char'.  (Needed by pre-ANSI
-     * systems that use unsigned characters without a way to force them
-     * to be signed.)  So, the type has been changed back to 'xchar' for
-     * 3.6.x.
-     *
-     * TODO:  change to 'char' (and move out of this block of booleans,
-     * and get rid of these comments...) once 3.6.0 savefile compatibility
-     * eventually ends.
-     */
     boolean sortpack;        /* sorted inventory */
     boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */
@@ -91,9 +70,10 @@ struct flag {
 #define PARANOID_REMOVE     0x0040
 #define PARANOID_BREAKWAND  0x0080
 #define PARANOID_WERECHANGE 0x0100
+#define PARANOID_EATING     0x0200
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
-    char    sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
+    char sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
     char inv_order[MAXOCLASSES];
     char pickup_types[MAXOCLASSES];
 #define NUM_DISCLOSURE_OPTIONS 6 /* i,a,v,g,c,o (decl.c) */
@@ -254,6 +234,8 @@ struct instance_flags {
     boolean mon_polycontrol; /* debug: control monster polymorphs */
     boolean in_dumplog;    /* doing the dumplog right now? */
     boolean in_parse;      /* is a command being parsed? */
+     /* suppress terminate during options parsing, for --showpaths */
+    boolean initoptions_noterminate;
 
     /* stuff that is related to options and/or user or platform preferences
      */
@@ -270,9 +252,6 @@ struct instance_flags {
     boolean deferred_X;       /* deferred entry into explore mode */
     boolean echo;             /* 1 to echo characters */
     boolean force_invmenu;    /* always menu when handling inventory */
-    /* FIXME: goldX belongs in flags, but putting it in iflags avoids
-       breaking 3.6.[01] save files */
-    boolean goldX;            /* for BUCX filtering, whether gold is X or U */
     boolean hilite_pile;      /* mark piles of objects with a hilite */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean mention_walls;    /* give feedback when bumping walls */
@@ -293,25 +272,16 @@ struct instance_flags {
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean use_menu_color;   /* use color in menus; only if wc_color */
 #ifdef STATUS_HILITES
-    long hilite_delta;     /* number of moves to leave a temp hilite lit */
+    long hilite_delta;        /* number of moves to leave a temp hilite lit */
     long unhilite_deadline; /* time when oldest temp hilite should be unlit */
 #endif
     boolean zerocomp;         /* write zero-compressed save files */
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */
     uchar num_pad_mode;
-    boolean cursesgraphics;     /* Use portable curses extended characters */
-#if 0   /* XXXgraphics superseded by symbol sets */
-    boolean  DECgraphics;       /* use DEC VT-xxx extended character set */
-    boolean  IBMgraphics;       /* use IBM extended character set */
-#ifdef MAC_GRAPHICS_ENV
-    boolean  MACgraphics;       /* use Macintosh extended character set, as
-                                   as defined in the special font HackFont */
-#endif
-#endif
-    uchar bouldersym; /* symbol for boulder display */
-    char prevmsg_window; /* type of old message window to use */
-    boolean extmenu;     /* extended commands use menu interface */
+    uchar bouldersym;         /* symbol for boulder display */
+    char prevmsg_window;      /* type of old message window to use */
+    boolean extmenu;          /* extended commands use menu interface */
 #ifdef MFLOPPY
     boolean checkspace; /* check disk space before writing files */
                         /* (in iflags to allow restore after moving
@@ -504,6 +474,9 @@ enum runmode_types {
 /* werechange: accepting randomly timed werecreature change to transform
    from human to creature or vice versa while having polymorph control */
 #define ParanoidWerechange ((flags.paranoia_bits & PARANOID_WERECHANGE) != 0)
+/* continue eating: prompt given _after_first_bite_ when eating something
+   while satiated */
+#define ParanoidEating ((flags.paranoia_bits & PARANOID_EATING) != 0)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */
