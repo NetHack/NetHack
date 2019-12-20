@@ -943,7 +943,7 @@ wiz_detect(VOID_ARGS)
 static int
 wiz_load_lua(VOID_ARGS)
 {
-    if (wizard) {
+    if (wizard && !iflags.debug_fuzzer) {
         char buf[BUFSZ];
 
         buf[0] = '\0';
@@ -961,7 +961,7 @@ wiz_load_lua(VOID_ARGS)
 static int
 wiz_load_splua(VOID_ARGS)
 {
-    if (wizard) {
+    if (wizard && !iflags.debug_fuzzer) {
         boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
         char buf[BUFSZ];
         int ridx;
