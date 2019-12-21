@@ -83,12 +83,13 @@ matrix:
 #     install: choco install mingw
       env: DESCR=windows-mingw
       script:
-        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
         - export ADD_CURSES=Y
         - export PDCURSES_TOP=../lib/pdcurses
-        - cd src
+        - make -f sys/unix/Makefile.top fetch-lua
+        - cd lib
+        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git pdcurses
+        - cd ../src
         - cp ../sys/winnt/Makefile.gcc ./Makefile
-        - make -f ../sys/unix/Makefile.top fetch-lua
         - mingw32-make install
     - os: linux
       env: DESCR=msdos-cross-on-linux HINTS=linux LUA_VERSION=5.3.5
