@@ -270,7 +270,7 @@ U  = $(UTIL)/
 # Utility Objects.
 #
 
-MAKEDEFSOBJS       = $(O)makedefs.o $(O)mdlib.o $(O)monst.o $(O)objects.o
+MAKEDEFSOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -302,8 +302,8 @@ VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o
 VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o     
 VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
 VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
-VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o    
-VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)isaac64.o
+VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o
+VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)mdlib.o $(O)isaac64.o
 VOBJ11 = $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o
 VOBJ12 = $(O)mklev.o    $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o
 VOBJ13 = $(O)mkroom.o   $(O)mon.o      $(O)mondata.o  $(O)monmove.o
@@ -897,7 +897,7 @@ $(U)makedefs.exe: $(MAKEDEFSOBJS)
 
 $(O)makedefs.o: $(CONFIG_H) $(INCL)/monattk.h $(INCL)/monflag.h \
 	 $(INCL)/objclass.h $(INCL)/monsym.h \
-	 $(INCL)/patchlevel.h $(U)makedefs.c
+	 $(INCL)/patchlevel.h $(U)makedefs.c $(SRC)\mdlib.c
 	$(cc) $(CFLAGSU) -o$@ $(U)makedefs.c
 
 #
