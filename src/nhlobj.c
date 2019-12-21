@@ -6,24 +6,16 @@
 #include "sp_lev.h"
 
 static int FDECL(l_obj_add_to_container, (lua_State *));
-static int FDECL(l_obj_addcontent, (lua_State *));
-static int FDECL(l_obj_at, (lua_State *));
-static int FDECL(l_obj_class, (lua_State *));
-static int FDECL(l_obj_container, (lua_State *));
-static int FDECL(l_obj_contents, (lua_State *));
 static int FDECL(l_obj_gc, (lua_State *));
 static int FDECL(l_obj_getcontents, (lua_State *));
 static int FDECL(l_obj_isnull, (lua_State *));
 static int FDECL(l_obj_new_readobjnam, (lua_State *));
-static int FDECL(l_obj_next, (lua_State *));
 static int FDECL(l_obj_nextobj, (lua_State *));
-static int FDECL(l_obj_obj_add_to_container, (lua_State *));
-static int FDECL(l_obj_obj_getcontents, (lua_State *));
-static int FDECL(l_obj_obj_objects_to_table, (lua_State *));
 static int FDECL(l_obj_objects_to_table, (lua_State *));
 static int FDECL(l_obj_placeobj, (lua_State *));
 static int FDECL(l_obj_to_table, (lua_State *));
-static int FDECL(l_obj_totable, (lua_State *));
+static int FDECL(l_obj_at, (lua_State *));
+static int FDECL(l_obj_container, (lua_State *));
 
 struct _lua_obj {
     int state; /* UNUSED */
