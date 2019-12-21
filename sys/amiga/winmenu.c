@@ -348,7 +348,7 @@ menu_item **retmip;
         nw->Screen = HackScreen;
 
         if (win == WIN_INVEN) {
-            sprintf(title, "%s the %s's Inventory", plname, pl_character);
+            sprintf(title, "%s the %s's Inventory", g.plname, g.pl_character);
             nw->Title = title;
             if (lastinvent.MaxX != 0) {
                 nw->LeftEdge = lastinvent.MinX;

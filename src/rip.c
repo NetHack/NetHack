@@ -16,7 +16,7 @@
 #endif
 
 #ifdef TEXT_TOMBSTONE
-STATIC_DCL void FDECL(center, (int, char *));
+static void FDECL(center, (int, char *));
 
 #ifndef NH320_DEDICATION
 /* A normal tombstone for end of game display. */
@@ -69,16 +69,14 @@ static const char *rip_txt[] = {
 #define DEATH_LINE 8 /* *char[] line # for death description */
 #define YEAR_LINE 12 /* *char[] line # for year */
 
-static char **rip;
-
-STATIC_OVL void
+static void
 center(line, text)
 int line;
 char *text;
 {
     register char *ip, *op;
     ip = text;
-    op = &rip[line][STONE_LINE_CENT - ((strlen(text) + 1) >> 1)];
+    op = &g.rip[line][STONE_LINE_CENT - ((strlen(text) + 1) >> 1)];
     while (*ip)
         *op++ = *ip++;
 }
@@ -96,18 +94,18 @@ time_t when;
     register int x;
     int line;
 
-    rip = dp = (char **) alloc(sizeof(rip_txt));
+    g.rip = dp = (char **) alloc(sizeof(rip_txt));
     for (x = 0; rip_txt[x]; ++x)
         dp[x] = dupstr(rip_txt[x]);
     dp[x] = (char *) 0;
 
     /* Put name on stone */
-    Sprintf(buf, "%s", plname);
+    Sprintf(buf, "%s", g.plname);
     buf[STONE_LINE_LEN] = 0;
     center(NAME_LINE, buf);
 
     /* Put $ on stone */
-    Sprintf(buf, "%ld Au", done_money);
+    Sprintf(buf, "%ld Au", g.done_money);
     buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
     center(GOLD_LINE, buf);
 
@@ -158,10 +156,10 @@ time_t when;
         putstr(tmpwin, 0, "");
 
     for (x = 0; rip_txt[x]; x++) {
-        free((genericptr_t) rip[x]);
+        free((genericptr_t) g.rip[x]);
     }
-    free((genericptr_t) rip);
-    rip = 0;
+    free((genericptr_t) g.rip);
+    g.rip = 0;
 }
 
 #endif /* TEXT_TOMBSTONE */

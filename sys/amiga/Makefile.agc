@@ -182,7 +182,7 @@ MAKEDEFOBJ = \
 	$(O)monstr.o
 
 AMIGAOBJ = \
-	$(O)amidos.o	$(O)amirip.o 	$(O)amisnd.o	$(O)amistack.o	\
+	$(O)amidos.o	$(O)amirip.o 	$(O)amistack.o	\
 	$(O)amiwind.o	$(O)winami.o	$(O)winchar.o	$(O)winfuncs.o	\
 	$(O)winkey.o	$(O)winmenu.o	$(O)winreq.o	$(O)winstr.o
 
@@ -268,16 +268,6 @@ XDFILES=	$(ADFILES) $(BDFILES) $(CDFILES) $(HDFILES) $(KDFILES) \
 		$(MDFILES) $(PDFILES) $(RDFILES) $(RANFILES) $(SDFILES) $(TDFILES) \
 		$(VDFILES) $(WDFILES)
 
-SOUNDFILES= \
-	$(SBIN)cvtsnd \
-	$(SLIB)sounds \
-	$(SLIB)sounds/Bell $(SLIB)sounds/Bugle \
-	$(SLIB)sounds/Drum_Of_Earthquake \
-	$(SLIB)sounds/Fire_Horn $(SLIB)sounds/Frost_Horn \
-	$(SLIB)sounds/Leather_Drum $(SLIB)sounds/Magic_Flute \
-	$(SLIB)sounds/Magic_Harp $(SLIB)sounds/Tooled_Horn \
-	$(SLIB)sounds/Wooden_Flute $(SLIB)sounds/Wooden_Harp
-
 TILEFILES= \
 	$(SBIN)txt2iff \
 	$(NETHACK)tiles \
@@ -327,7 +317,7 @@ all:  $(COMPACT_HEADERS) $(SBIN)lev_comp $(SBIN)dgn_comp $(SBIN)NetHack \
 	$(SBIN)dlb $(NETHACK)recover #$(NETHACK)HackCli $(SBIN)splitter \
 #	$(NETHACK)HackWB 
 
-install: inst-data inst-dungeon inst-fonts inst-sounds inst-tiles \
+install: inst-data inst-dungeon inst-fonts inst-tiles \
 	 $(NETHACK)recover $(NETHACK)NetHack $(NETHACK)nhdat
 	#$(NETHACK)NetHack.dir inst-icons
 
@@ -376,7 +366,7 @@ clean:
 
 spotless:  clean
 	-delete $(SBIN)NetHack $(SBIN)lev_comp $(SBIN)makedefs $(SBIN)dgn_comp
-	-delete $(SBIN)cvtsnd $(SBIN)dlb $(SBIN)txt2iff $(SBIN)splitter
+	-delete $(SBIN)dlb $(SBIN)txt2iff $(SBIN)splitter
 	-delete $(SBIN)tilemap
 	-delete $(SLIB)data $(SLIB)rumors
 	-delete $(SLIB)\#?.lev
@@ -432,7 +422,7 @@ $(SBIN)makedefs: $(MAKEOBJS)
 	$(LINK) $(LNSPEC) $(SBIN)makedefs $(LIN) $(MAKEOBJS) $(LLIB)
 
 $(OO)makedefs.o:  $(UTIL)makedefs.c $(I)config.h $(I)permonst.h $(I)monsym.h \
-		$(I)objclass.h  $(I)patchlevel.h $(I)qtext.h $(I)artilist.h
+		$(I)objclass.h  $(I)patchlevel.h $(I)artilist.h
 	$(CC) $(DEFSPEC)MAKEDEFS_C $(CFLAGS) $(OBJSPEC)$@ $(UTIL)makedefs.c
 
 $(SBIN)lev_comp:  $(SPLEVOBJS)
@@ -568,8 +558,6 @@ $(O)amirip.o:  $(AMI)amirip.c $(HDEP)
 $(O)aglue.o:  $(AMI)aglue.a
 	$(ASM) $(AFLAGS) $(AOBJSPEC)$(O)aglue.o $(AMI)aglue.a
 
-$(O)amisnd.o:	$(AMI)amisnd.c $(HDEP)
-
 $(O)winchar.o:	$(AMI)winchar.c $(NHS)tile.c $(HDEP)
 
 $(NHS)tile.c:	$(WSHARE)tilemap.c
@@ -697,79 +685,6 @@ $(NETHACK)tiles/monsters.iff: $(WSHARE)monsters.txt $(SBIN)txt2iff
 
 $(NETHACK)tiles/other.iff: $(WSHARE)other.txt $(SBIN)txt2iff
 	$(SBIN)txt2iff $(WSHARE)other.txt $(NETHACK)tiles/other.iff
-
-# Sound installation rules.
-inst-sounds: $(SOUNDFILES)
-	list to T:nhsdat.lst $(SLIB)sounds QUICK NOHEAD
-	echo  >T:make-nhsdat $(SBIN)dlb cCfI $(SLIB)sounds $(NETHACK)nhsdat T:nhsdat.lst
-	echo >>T:make-nhsdat if not exists $(NETHACK)nhsdat
-	echo >>T:make-nhsdat copy $(SLIB)sounds/\#? $(NETHACK)sounds
-	echo >>T:make-nhsdat endif
-	execute T:make-nhsdat
-	-delete T:make-nhsdat
-
-$(SLIB)sounds:
-	-makedir $(SLIB)sounds
-
-$(SBIN)cvtsnd: $(OO)cvtsnd.o
-	$(LINK) $(LNSPEC) $@ $(LIN) $(OO)cvtsnd.o $(FLLIB)
-
-$(OO)cvtsnd.o: $(AMI)cvtsnd.c
-
-$(SLIB)sounds/Bell: $(SHARE)sounds/bell.uu
-	$(UUDEC) $(SHARE)sounds/bell.uu
-	$(SBIN)cvtsnd Bell $(SLIB)sounds/Bell
-	-delete Bell
-
-$(SLIB)sounds/Bugle: $(SHARE)sounds/bugle.uu
-	$(UUDEC) $(SHARE)sounds/bugle.uu
-	$(SBIN)cvtsnd Bugle $(SLIB)sounds/Bugle
-	-delete Bugle
-
-$(SLIB)sounds/Drum_Of_Earthquake: $(SHARE)sounds/erthdrum.uu
-	$(UUDEC) $(SHARE)sounds/erthdrum.uu
-	$(SBIN)cvtsnd Drum_Of_Earthquake $(SLIB)sounds/Drum_Of_Earthquake
-	-delete Drum_Of_Earthquake
-
-$(SLIB)sounds/Fire_Horn: $(SHARE)sounds/firehorn.uu
-	$(UUDEC) $(SHARE)sounds/firehorn.uu
-	$(SBIN)cvtsnd Fire_Horn $(SLIB)sounds/Fire_Horn
-	-delete Fire_Horn
-
-$(SLIB)sounds/Frost_Horn: $(SHARE)sounds/frsthorn.uu
-	$(UUDEC) $(SHARE)sounds/frsthorn.uu
-	$(SBIN)cvtsnd Frost_Horn $(SLIB)sounds/Frost_Horn
-	-delete Frost_Horn
-
-$(SLIB)sounds/Leather_Drum: $(SHARE)sounds/lethdrum.uu
-	$(UUDEC) $(SHARE)sounds/lethdrum.uu
-	$(SBIN)cvtsnd Leather_Drum $(SLIB)sounds/Leather_Drum
-	-delete Leather_Drum
-
-$(SLIB)sounds/Magic_Flute: $(SHARE)sounds/mgcflute.uu
-	$(UUDEC) $(SHARE)sounds/mgcflute.uu
-	$(SBIN)cvtsnd Magic_Flute $(SLIB)sounds/Magic_Flute
-	-delete Magic_Flute
-
-$(SLIB)sounds/Magic_Harp: $(SHARE)sounds/mgcharp.uu
-	$(UUDEC) $(SHARE)sounds/mgcharp.uu
-	$(SBIN)cvtsnd Magic_Harp $(SLIB)sounds/Magic_Harp
-	-delete Magic_Harp
-
-$(SLIB)sounds/Tooled_Horn: $(SHARE)sounds/toolhorn.uu
-	$(UUDEC) $(SHARE)sounds/toolhorn.uu
-	$(SBIN)cvtsnd Tooled_Horn $(SLIB)sounds/Tooled_Horn
-	-delete Tooled_Horn
-
-$(SLIB)sounds/Wooden_Flute: $(SHARE)sounds/wdnflute.uu
-	$(UUDEC) $(SHARE)sounds/wdnflute.uu
-	$(SBIN)cvtsnd Wooden_Flute $(SLIB)sounds/Wooden_Flute
-	-delete Wooden_Flute
-
-$(SLIB)sounds/Wooden_Harp: $(SHARE)sounds/wdnharp.uu
-	$(UUDEC) $(SHARE)sounds/wdnharp.uu
-	$(SBIN)cvtsnd Wooden_Harp $(SLIB)sounds/Wooden_Harp
-	-delete Wooden_Harp
 
 inst-dungeon: $(INSTDUNGEONFILES)
 
@@ -1023,7 +938,7 @@ $(O)attrib.o:  $(NHS)attrib.c $(HDEP) $(I)artifact.h
 
 $(O)ball.o: $(NHS)ball.c $(HDEP)
 
-$(O)bones.o:  $(NHS)bones.c $(HDEP) $(I)lev.h
+$(O)bones.o:  $(NHS)bones.c $(HDEP)
 
 $(O)botl.o:	$(NHS)botl.c $(HDEP)
 
@@ -1041,7 +956,7 @@ $(O)display.o:  $(NHS)display.c $(HDEP)
 
 $(O)dlb.o: $(NHS)dlb.c $(HDEP) $(I)dlb.h
 
-$(O)do.o:  $(NHS)do.c $(HDEP) $(I)lev.h
+$(O)do.o:  $(NHS)do.c $(HDEP)
 
 $(O)do_name.o:  $(NHS)do_name.c $(HDEP)
 
@@ -1062,9 +977,9 @@ $(O)dungeon.o:  $(NHS)dungeon.c $(HDEP) $(I)dgn_file.h $(I)dlb.h
 
 $(O)eat.o:  $(NHS)eat.c $(HDEP)
 
-$(O)end.o:  $(NHS)end.c $(HDEP) $(I)lev.h $(I)dlb.h
+$(O)end.o:  $(NHS)end.c $(HDEP) $(I)dlb.h
 
-$(O)engrave.o:  $(NHS)engrave.c $(HDEP) $(I)lev.h
+$(O)engrave.o:  $(NHS)engrave.c $(HDEP)
 
 $(O)exper.o:  $(NHS)exper.c $(HDEP)
 
@@ -1082,7 +997,7 @@ $(O)hacklib.o:  $(NHS)hacklib.c $(HDEP)
 
 $(O)invent.o:  $(NHS)invent.c $(HDEP) $(I)artifact.h
 
-$(O)light.o:  $(NHS)light.c $(HDEP) $(I)lev.h
+$(O)light.o:  $(NHS)light.c $(HDEP)
 
 $(O)lock.o:  $(NHS)lock.c $(HDEP)
 
@@ -1105,7 +1020,7 @@ $(O)mklev.o:  $(NHS)mklev.c $(HDEP)
 
 $(O)mkmap.o:  $(NHS)mkmap.c $(HDEP) $(I)sp_lev.h
 
-$(O)mkmaze.o:  $(NHS)mkmaze.c $(HDEP) $(I)sp_lev.h $(I)lev.h
+$(O)mkmaze.o:  $(NHS)mkmaze.c $(HDEP) $(I)sp_lev.h
 
 $(O)mkobj.o:  $(NHS)mkobj.c $(HDEP) $(I)artifact.h $(I)prop.h
 
@@ -1131,7 +1046,7 @@ $(O)muse.o:	$(NHS)muse.c $(HDEP)
 
 $(O)music.o:  $(NHS)music.c $(HDEP) #interp.c
 
-$(O)o_init.o:  $(NHS)o_init.c $(HDEP) $(I)lev.h
+$(O)o_init.o:  $(NHS)o_init.c $(HDEP)
 
 $(O)objects.o:  $(NHS)objects.c $(I)config.h $(I)obj.h $(I)objclass.h \
 		$(I)prop.h $(I)skills.h $(I)color.h
@@ -1156,9 +1071,9 @@ $(O)pray.o:  $(NHS)pray.c $(HDEP)
 
 $(O)priest.o:  $(NHS)priest.c $(HDEP) $(I)mfndpos.h
 
-$(O)quest.o:	$(NHS)quest.c $(HDEP) $(I)quest.h $(I)qtext.h
+$(O)quest.o:	$(NHS)quest.c $(HDEP) $(I)quest.h
 
-$(O)questpgr.o: $(NHS)questpgr.c $(HDEP) $(I)qtext.h $(I)dlb.h
+$(O)questpgr.o: $(NHS)questpgr.c $(HDEP) $(I)dlb.h
 
 $(O)read.o:  $(NHS)read.c $(HDEP)
 
@@ -1166,7 +1081,7 @@ $(O)rect.o:	$(NHS)rect.c $(HDEP)
 
 $(O)region.o:	$(NHS)region.c $(HDEP)
 
-$(O)restore.o:  $(NHS)restore.c $(HDEP) $(I)lev.h $(I)tcap.h $(I)quest.h
+$(O)restore.o:  $(NHS)restore.c $(HDEP) $(I)tcap.h $(I)quest.h
 
 $(O)rnd.o:  $(NHS)rnd.c $(HDEP)
 
@@ -1174,7 +1089,7 @@ $(O)role.o:	$(NHS)role.c $(HDEP)
 
 $(O)rumors.o:  $(NHS)rumors.c $(HDEP) $(I)dlb.h
 
-$(O)save.o:  $(NHS)save.c $(HDEP) $(I)lev.h $(I)quest.h
+$(O)save.o:  $(NHS)save.c $(HDEP) $(I)quest.h
 
 $(O)shk.o:  $(NHS)shk.c $(HDEP)
 	$(CC) $(CFLAGS) $(CFLAGS2) $(OBJSPEC)$@ $(NHS)shk.c
@@ -1197,7 +1112,7 @@ $(O)sys.o:	$(NHS)sys.c $(HDEP)
 
 $(O)teleport.o:	$(NHS)teleport.c $(HDEP)
 
-$(O)timeout.o:  $(NHS)timeout.c $(HDEP) $(I)lev.h
+$(O)timeout.o:  $(NHS)timeout.c $(HDEP)
 
 $(O)topten.o:  $(NHS)topten.c $(HDEP) $(I)dlb.h
 
@@ -1225,9 +1140,9 @@ $(O)wield.o:  $(NHS)wield.c $(HDEP)
 
 $(O)windows.o:  $(NHS)windows.c $(HDEP) $(I)wintty.h
 
-$(O)wizard.o:  $(NHS)wizard.c $(HDEP) $(I)qtext.h
+$(O)wizard.o:  $(NHS)wizard.c $(HDEP)
 
-$(O)worm.o:  $(NHS)worm.c $(HDEP) $(I)lev.h
+$(O)worm.o:  $(NHS)worm.c $(HDEP)
 
 $(O)worn.o:  $(NHS)worn.c $(HDEP)
 

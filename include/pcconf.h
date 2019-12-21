@@ -41,10 +41,6 @@
 
 #define SHELL /* via exec of COMMAND.COM */
 
-#ifdef __BORLANDC__
-#define PCMUSIC /* Music option, enable very basic pc speaker music notes */
-#endif
-
 /*
  * Screen control options
  *
@@ -156,9 +152,6 @@
 
 #define TIMED_DELAY /* enable the `timed_delay' run-time option */
 
-#ifdef PCMUSIC
-#define TIMED_DELAY /* need it anyway */
-#endif
 #define NOCWD_ASSUMPTIONS /* Allow paths to be specified for HACKDIR,      \
                              LEVELDIR, SAVEDIR, BONESDIR, DATADIR,         \
                              SCOREDIR, LOCKDIR, CONFIGDIR, and TROUBLEDIR. \
@@ -190,7 +183,6 @@
 #undef lock
 #include <pc.h> /* kbhit() */
 #define PC_LOCKING
-#define HOLD_LOCKFILE_OPEN
 #define SELF_RECOVER /* NetHack itself can recover games */
 #endif
 

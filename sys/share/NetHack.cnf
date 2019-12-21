@@ -28,11 +28,6 @@ OPTIONS=rawio,BIOS,symset:IBMGraphics_2,roguesymset:RogueEpyx
 # this:
 #OPTIONS=video:autodetect
 
-# Some versions of NetHack use the pc speaker to play the notes given when
-# playing music instruments in NetHack.  To use this feature, if available,
-# uncomment the following line:
-#OPTIONS=soundcard:autodetect
-
 # If your machine is NEC PC-9800, use:
 #OPTIONS=rawio,BIOS,video:default
 # If you use an Atari and want tty use:

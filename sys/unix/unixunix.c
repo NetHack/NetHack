@@ -75,18 +75,18 @@ eraseoldlocks()
 {
     register int i;
 
-    program_state.preserve_locks = 0; /* not required but shows intent */
+    g.program_state.preserve_locks = 0; /* not required but shows intent */
     /* cannot use maxledgerno() here, because we need to find a lock name
      * before starting everything (including the dungeon initialization
      * that sets astral_level, needed for maxledgerno()) up
      */
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(lock, i);
-        (void) unlink(fqname(lock, LEVELPREFIX, 0));
+        set_levelfile_name(g.lock, i);
+        (void) unlink(fqname(g.lock, LEVELPREFIX, 0));
     }
-    set_levelfile_name(lock, 0);
-    if (unlink(fqname(lock, LEVELPREFIX, 0)))
+    set_levelfile_name(g.lock, 0);
+    if (unlink(fqname(g.lock, LEVELPREFIX, 0)))
         return 0; /* cannot remove it */
     return 1;     /* success! */
 }
@@ -116,22 +116,22 @@ getlock()
         error("%s", "");
     }
 
-    /* default value of lock[] is "1lock" where '1' gets changed to
+    /* default value of g.lock[] is "1lock" where '1' gets changed to
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
-    if (!locknum)
-        Sprintf(lock, "%u%s", (unsigned) getuid(), plname);
+    if (!g.locknum)
+        Sprintf(g.lock, "%u%s", (unsigned) getuid(), g.plname);
 
-    regularize(lock);
-    set_levelfile_name(lock, 0);
+    regularize(g.lock);
+    set_levelfile_name(g.lock, 0);
 
-    if (locknum) {
-        if (locknum > 25)
-            locknum = 25;
+    if (g.locknum) {
+        if (g.locknum > 25)
+            g.locknum = 25;
 
         do {
-            lock[0] = 'a' + i++;
-            fq_lock = fqname(lock, LEVELPREFIX, 0);
+            g.lock[0] = 'a' + i++;
+            fq_lock = fqname(g.lock, LEVELPREFIX, 0);
 
             if ((fd = open(fq_lock, 0)) == -1) {
                 if (errno == ENOENT)
@@ -145,12 +145,12 @@ getlock()
             if (veryold(fd) && eraseoldlocks())
                 goto gotlock;
             (void) close(fd);
-        } while (i < locknum);
+        } while (i < g.locknum);
 
         unlock_file(HLOCK);
         error("Too many hacks running now.");
     } else {
-        fq_lock = fqname(lock, LEVELPREFIX, 0);
+        fq_lock = fqname(g.lock, LEVELPREFIX, 0);
         if ((fd = open(fq_lock, 0)) == -1) {
             if (errno == ENOENT)
                 goto gotlock; /* no such file */
@@ -203,8 +203,8 @@ gotlock:
     if (fd == -1) {
         error("cannot creat lock file (%s).", fq_lock);
     } else {
-        if (write(fd, (genericptr_t) &hackpid, sizeof hackpid)
-            != sizeof hackpid) {
+        if (write(fd, (genericptr_t) &g.hackpid, sizeof g.hackpid)
+            != sizeof g.hackpid) {
             error("cannot write lock (%s)", fq_lock);
         }
         if (close(fd) == -1) {

@@ -406,7 +406,7 @@ prompt_for_player_selection(void)
             /* Prompt for a role */
             win = create_nhwindow(NHW_MENU);
             start_menu(win);
-            any = zeroany; /* zero out all bits */
+            any = cg.zeroany; /* zero out all bits */
             for (i = 0; roles[i].name.m; i++) {
                 if (ok_role(i, flags.initrace, flags.initgend,
                             flags.initalign)) {
@@ -498,7 +498,7 @@ prompt_for_player_selection(void)
                 /* tty_putstr(BASE_WINDOW, 0, "Choosing Race"); */
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
-                any = zeroany; /* zero out all bits */
+                any = cg.zeroany; /* zero out all bits */
                 for (i = 0; races[i].noun; i++)
                     if (ok_race(flags.initrole, i, flags.initgend,
                                 flags.initalign)) {
@@ -572,7 +572,7 @@ prompt_for_player_selection(void)
                 /* tty_putstr(BASE_WINDOW, 0, "Choosing Gender"); */
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
-                any = zeroany; /* zero out all bits */
+                any = cg.zeroany; /* zero out all bits */
                 for (i = 0; i < ROLE_GENDERS; i++)
                     if (ok_gend(flags.initrole, flags.initrace, i,
                                 flags.initalign)) {
@@ -645,7 +645,7 @@ prompt_for_player_selection(void)
                 /* tty_putstr(BASE_WINDOW, 0, "Choosing Alignment"); */
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
-                any = zeroany; /* zero out all bits */
+                any = cg.zeroany; /* zero out all bits */
                 for (i = 0; i < ROLE_ALIGNS; i++)
                     if (ok_align(flags.initrole, flags.initrace,
                                  flags.initgend, i)) {
@@ -685,7 +685,7 @@ mswin_askname(void)
 {
     logDebug("mswin_askname()\n");
 
-    if (mswin_getlin_window("Who are you?", plname, PL_NSIZ) == IDCANCEL) {
+    if (mswin_getlin_window("Who are you?", g.plname, PL_NSIZ) == IDCANCEL) {
         bail("bye-bye");
         /* not reached */
     }
@@ -1227,7 +1227,7 @@ void
 mswin_update_inventory()
 {
     logDebug("mswin_update_inventory()\n");
-    if (iflags.perm_invent && program_state.something_worth_saving
+    if (iflags.perm_invent && g.program_state.something_worth_saving
         && iflags.window_inited && WIN_INVEN != WIN_ERR)
         display_inventory(NULL, FALSE);
 }
@@ -1897,12 +1897,12 @@ mswin_outrip(winid wid, int how, time_t when)
     }
 
     /* Put name on stone */
-    Sprintf(buf, "%s", plname);
+    Sprintf(buf, "%s", g.plname);
     buf[STONE_LINE_LEN] = 0;
     putstr(wid, 0, buf);
 
     /* Put $ on stone */
-    Sprintf(buf, "%ld Au", done_money);
+    Sprintf(buf, "%ld Au", g.done_money);
     buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
     putstr(wid, 0, buf);
 
@@ -2316,7 +2316,7 @@ logDebug(const char *fmt, ...)
 /* Reading and writing settings from the registry. */
 #define CATEGORYKEY "Software"
 #define COMPANYKEY "NetHack"
-#define PRODUCTKEY "NetHack 3.6.3"
+#define PRODUCTKEY "NetHack 3.6.4"
 #define SETTINGSKEY "Settings"
 #define MAINSHOWSTATEKEY "MainShowState"
 #define MAINMINXKEY "MainMinX"

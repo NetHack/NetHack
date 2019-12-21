@@ -19,7 +19,7 @@
  * Returns the head of the list of objects that the player can see
  * at location (x,y).
  */
-#define vobj_at(x, y) (level.objects[x][y])
+#define vobj_at(x, y) (g.level.objects[x][y])
 
 /*
  * sensemon()
@@ -48,7 +48,7 @@
 
 #define mon_warning(mon)                                                 \
     (Warning && !(mon)->mpeaceful && (distu((mon)->mx, (mon)->my) < 100) \
-     && (((int) ((mon)->m_lev / 4)) >= context.warnlevel))
+     && (((int) ((mon)->m_lev / 4)) >= g.context.warnlevel))
 
 /*
  * mon_visible()
@@ -225,11 +225,11 @@
            maybe_display_usteed((U_AP_TYPE == M_AP_NOTHING)                 \
                                 ? hero_glyph                                \
                                 : (U_AP_TYPE == M_AP_FURNITURE)             \
-                                  ? cmap_to_glyph(youmonst.mappearance)     \
+                                  ? cmap_to_glyph(g.youmonst.mappearance)     \
                                   : (U_AP_TYPE == M_AP_OBJECT)              \
-                                    ? objnum_to_glyph(youmonst.mappearance) \
+                                    ? objnum_to_glyph(g.youmonst.mappearance) \
                                     /* else U_AP_TYPE == M_AP_MONSTER */    \
-                                    : monnum_to_glyph(youmonst.mappearance)))
+                                    : monnum_to_glyph(g.youmonst.mappearance)))
 
 /*
  * A glyph is an abstraction that represents a _unique_ monster, object,
@@ -314,9 +314,9 @@
 /* This has the unfortunate side effect of needing a global variable    */
 /* to store a result. 'otg_temp' is defined and declared in decl.{ch}.  */
 #define random_obj_to_glyph(rng)                \
-    ((otg_temp = random_object(rng)) == CORPSE  \
+    ((g.otg_temp = random_object(rng)) == CORPSE  \
          ? random_monster(rng) + GLYPH_BODY_OFF \
-         : otg_temp + GLYPH_OBJ_OFF)
+         : g.otg_temp + GLYPH_OBJ_OFF)
 
 #define obj_to_glyph(obj, rng)                                          \
     (((obj)->otyp == STATUE)                                            \
@@ -354,9 +354,9 @@
 #define hero_glyph                                                    \
     monnum_to_glyph((Upolyd || !flags.showrace)                       \
                         ? u.umonnum                                   \
-                        : (flags.female && urace.femalenum != NON_PM) \
-                              ? urace.femalenum                       \
-                              : urace.malenum)
+                        : (flags.female && g.urace.femalenum != NON_PM) \
+                              ? g.urace.femalenum                       \
+                              : g.urace.malenum)
 
 /*
  * Change the given glyph into it's given type.  Note:

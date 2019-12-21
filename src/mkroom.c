@@ -17,21 +17,21 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(isbig, (struct mkroom *));
-STATIC_DCL struct mkroom *FDECL(pick_room, (BOOLEAN_P));
-STATIC_DCL void NDECL(mkshop), FDECL(mkzoo, (int)), NDECL(mkswamp);
-STATIC_DCL void NDECL(mktemple);
-STATIC_DCL coord *FDECL(shrine_pos, (int));
-STATIC_DCL struct permonst *NDECL(morguemon);
-STATIC_DCL struct permonst *NDECL(squadmon);
-STATIC_DCL void FDECL(save_room, (int, struct mkroom *));
-STATIC_DCL void FDECL(rest_room, (int, struct mkroom *));
+static boolean FDECL(isbig, (struct mkroom *));
+static struct mkroom *FDECL(pick_room, (BOOLEAN_P));
+static void NDECL(mkshop), FDECL(mkzoo, (int)), NDECL(mkswamp);
+static void NDECL(mktemple);
+static coord *FDECL(shrine_pos, (int));
+static struct permonst *NDECL(morguemon);
+static struct permonst *NDECL(squadmon);
+static void FDECL(save_room, (NHFILE *, struct mkroom *));
+static void FDECL(rest_room, (NHFILE *, struct mkroom *));
 
 #define sq(x) ((x) * (x))
 
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
-STATIC_OVL boolean
+static boolean
 isbig(sroom)
 register struct mkroom *sroom;
 {
@@ -85,7 +85,7 @@ int roomtype;
         }
 }
 
-STATIC_OVL void
+static void
 mkshop()
 {
     register struct mkroom *sroom;
@@ -152,11 +152,11 @@ mkshop()
 #ifndef MAC
 gottype:
 #endif
-    for (sroom = &rooms[0];; sroom++) {
+    for (sroom = &g.rooms[0];; sroom++) {
         if (sroom->hx < 0)
             return;
-        if (sroom - rooms >= nroom) {
-            pline("rooms not closed by -1?");
+        if (sroom - g.rooms >= g.nroom) {
+            pline("g.rooms not closed by -1?");
             return;
         }
         if (sroom->rtype != OROOM)
@@ -203,16 +203,16 @@ gottype:
 }
 
 /* pick an unused room, preferably with only one door */
-STATIC_OVL struct mkroom *
+static struct mkroom *
 pick_room(strict)
 register boolean strict;
 {
     register struct mkroom *sroom;
-    register int i = nroom;
+    register int i = g.nroom;
 
-    for (sroom = &rooms[rn2(nroom)]; i--; sroom++) {
-        if (sroom == &rooms[nroom])
-            sroom = &rooms[0];
+    for (sroom = &g.rooms[rn2(g.nroom)]; i--; sroom++) {
+        if (sroom == &g.rooms[g.nroom])
+            sroom = &g.rooms[0];
         if (sroom->hx < 0)
             return (struct mkroom *) 0;
         if (sroom->rtype != OROOM)
@@ -228,7 +228,7 @@ register boolean strict;
     return (struct mkroom *) 0;
 }
 
-STATIC_OVL void
+static void
 mkzoo(type)
 int type;
 {
@@ -267,13 +267,13 @@ struct mkroom *sroom;
     struct monst *mon;
     register int sx, sy, i;
     int sh, tx = 0, ty = 0, goldlim = 0, type = sroom->rtype;
-    int rmno = (int) ((sroom - rooms) + ROOMOFFSET);
+    int rmno = (int) ((sroom - g.rooms) + ROOMOFFSET);
     coord mm;
 
     sh = sroom->fdoor;
     switch (type) {
     case COURT:
-        if (level.flags.is_maze_lev) {
+        if (g.level.flags.is_maze_lev) {
             for (tx = sroom->lx; tx <= sroom->hx; tx++)
                 for (ty = sroom->ly; ty <= sroom->hy; ty++)
                     if (IS_THRONE(levl[tx][ty].typ))
@@ -311,15 +311,15 @@ struct mkroom *sroom;
             if (sroom->irregular) {
                 if ((int) levl[sx][sy].roomno != rmno || levl[sx][sy].edge
                     || (sroom->doorct
-                        && distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1))
+                        && distmin(sx, sy, g.doors[sh].x, g.doors[sh].y) <= 1))
                     continue;
             } else if (!SPACE_POS(levl[sx][sy].typ)
                        || (sroom->doorct
-                           && ((sx == sroom->lx && doors[sh].x == sx - 1)
-                               || (sx == sroom->hx && doors[sh].x == sx + 1)
-                               || (sy == sroom->ly && doors[sh].y == sy - 1)
+                           && ((sx == sroom->lx && g.doors[sh].x == sx - 1)
+                               || (sx == sroom->hx && g.doors[sh].x == sx + 1)
+                               || (sy == sroom->ly && g.doors[sh].y == sy - 1)
                                || (sy == sroom->hy
-                                   && doors[sh].y == sy + 1))))
+                                   && g.doors[sh].y == sy + 1))))
                 continue;
             /* don't place monster on explicitly placed throne */
             if (type == COURT && IS_THRONE(levl[sx][sy].typ))
@@ -353,7 +353,7 @@ struct mkroom *sroom;
             case ZOO:
             case LEPREHALL:
                 if (sroom->doorct) {
-                    int distval = dist2(sx, sy, doors[sh].x, doors[sh].y);
+                    int distval = dist2(sx, sy, g.doors[sh].x, g.doors[sh].y);
                     i = sq(distval);
                 } else
                     i = goldlim;
@@ -412,23 +412,23 @@ struct mkroom *sroom;
         add_to_container(chest, gold);
         chest->owt = weight(chest);
         chest->spe = 2; /* so it can be found later */
-        level.flags.has_court = 1;
+        g.level.flags.has_court = 1;
         break;
     }
     case BARRACKS:
-        level.flags.has_barracks = 1;
+        g.level.flags.has_barracks = 1;
         break;
     case ZOO:
-        level.flags.has_zoo = 1;
+        g.level.flags.has_zoo = 1;
         break;
     case MORGUE:
-        level.flags.has_morgue = 1;
+        g.level.flags.has_morgue = 1;
         break;
     case SWAMP:
-        level.flags.has_swamp = 1;
+        g.level.flags.has_swamp = 1;
         break;
     case BEEHIVE:
-        level.flags.has_beehive = 1;
+        g.level.flags.has_beehive = 1;
         break;
     }
 }
@@ -453,10 +453,10 @@ int mm_flags;
                 || !revive(otmp, FALSE)))
             (void) makemon(mdat, cc.x, cc.y, mm_flags);
     }
-    level.flags.graveyard = TRUE; /* reduced chance for undead corpse */
+    g.level.flags.graveyard = TRUE; /* reduced chance for undead corpse */
 }
 
-STATIC_OVL struct permonst *
+static struct permonst *
 morguemon()
 {
     register int i = rn2(100), hd = rn2(level_difficulty());
@@ -502,20 +502,20 @@ antholemon()
             break;
         }
         /* try again if chosen type has been genocided or used up */
-    } while (++trycnt < 3 && (mvitals[mtyp].mvflags & G_GONE));
+    } while (++trycnt < 3 && (g.mvitals[mtyp].mvflags & G_GONE));
 
-    return ((mvitals[mtyp].mvflags & G_GONE) ? (struct permonst *) 0
+    return ((g.mvitals[mtyp].mvflags & G_GONE) ? (struct permonst *) 0
                                              : &mons[mtyp]);
 }
 
-STATIC_OVL void
+static void
 mkswamp() /* Michiel Huisjes & Fred de Wilde */
 {
     register struct mkroom *sroom;
     register int sx, sy, i, eelct = 0;
 
     for (i = 0; i < 5; i++) { /* turn up to 5 rooms swampy */
-        sroom = &rooms[rn2(nroom)];
+        sroom = &g.rooms[rn2(g.nroom)];
         if (sroom->hx < 0 || sroom->rtype != OROOM || has_upstairs(sroom)
             || has_dnstairs(sroom))
             continue;
@@ -542,17 +542,17 @@ mkswamp() /* Michiel Huisjes & Fred de Wilde */
                         (void) makemon(mkclass(S_FUNGUS, 0), sx, sy,
                                        NO_MM_FLAGS);
                 }
-        level.flags.has_swamp = 1;
+        g.level.flags.has_swamp = 1;
     }
 }
 
-STATIC_OVL coord *
+static coord *
 shrine_pos(roomno)
 int roomno;
 {
     static coord buf;
     int delta;
-    struct mkroom *troom = &rooms[roomno - ROOMOFFSET];
+    struct mkroom *troom = &g.rooms[roomno - ROOMOFFSET];
 
     /* if width and height are odd, placement will be the exact center;
        if either or both are even, center point is a hypothetical spot
@@ -568,7 +568,7 @@ int roomno;
     return &buf;
 }
 
-STATIC_OVL void
+static void
 mktemple()
 {
     register struct mkroom *sroom;
@@ -584,13 +584,13 @@ mktemple()
      * In temples, shrines are blessed altars
      * located in the center of the room
      */
-    shrine_spot = shrine_pos((int) ((sroom - rooms) + ROOMOFFSET));
+    shrine_spot = shrine_pos((int) ((sroom - g.rooms) + ROOMOFFSET));
     lev = &levl[shrine_spot->x][shrine_spot->y];
     lev->typ = ALTAR;
     lev->altarmask = induced_align(80);
     priestini(&u.uz, sroom, shrine_spot->x, shrine_spot->y, FALSE);
     lev->altarmask |= AM_SHRINE;
-    level.flags.has_temple = 1;
+    g.level.flags.has_temple = 1;
 }
 
 boolean
@@ -615,10 +615,10 @@ boolean
 has_dnstairs(sroom)
 register struct mkroom *sroom;
 {
-    if (sroom == dnstairs_room)
+    if (sroom == g.dnstairs_room)
         return TRUE;
-    if (sstairs.sx && !sstairs.up)
-        return (boolean) (sroom == sstairs_room);
+    if (g.sstairs.sx && !g.sstairs.up)
+        return (boolean) (sroom == g.sstairs_room);
     return FALSE;
 }
 
@@ -626,10 +626,10 @@ boolean
 has_upstairs(sroom)
 register struct mkroom *sroom;
 {
-    if (sroom == upstairs_room)
+    if (sroom == g.upstairs_room)
         return TRUE;
-    if (sstairs.sx && sstairs.up)
-        return (boolean) (sroom == sstairs_room);
+    if (g.sstairs.sx && g.sstairs.up)
+        return (boolean) (sroom == g.sstairs_room);
     return FALSE;
 }
 
@@ -665,7 +665,7 @@ coord *c;
     int i;
 
     if (croom->irregular) {
-        i = (int) ((croom - rooms) + ROOMOFFSET);
+        i = (int) ((croom - g.rooms) + ROOMOFFSET);
 
         while (try_cnt++ < 100) {
             c->x = somex(croom);
@@ -719,12 +719,12 @@ schar type;
 {
     register struct mkroom *croom;
 
-    for (croom = &rooms[0]; croom->hx >= 0; croom++)
+    for (croom = &g.rooms[0]; croom->hx >= 0; croom++)
         if ((type == ANY_TYPE && croom->rtype != OROOM)
             || (type == ANY_SHOP && croom->rtype >= SHOPBASE)
             || croom->rtype == type)
             return croom;
-    for (croom = &subrooms[0]; croom->hx >= 0; croom++)
+    for (croom = &g.subrooms[0]; croom->hx >= 0; croom++)
         if ((type == ANY_TYPE && croom->rtype != OROOM)
             || (type == ANY_SHOP && croom->rtype >= SHOPBASE)
             || croom->rtype == type)
@@ -759,7 +759,7 @@ courtmon()
 
 #define NSTYPES (PM_CAPTAIN - PM_SOLDIER + 1)
 
-static struct {
+static const struct {
     unsigned pm;
     unsigned prob;
 } squadprob[NSTYPES] = { { PM_SOLDIER, 80 },
@@ -768,7 +768,7 @@ static struct {
                          { PM_CAPTAIN, 1 } };
 
 /* return soldier types. */
-STATIC_OVL struct permonst *
+static struct permonst *
 squadmon()
 {
     int sel_prob, i, cpro, mndx;
@@ -785,7 +785,7 @@ squadmon()
     }
     mndx = squadprob[rn2(NSTYPES)].pm;
 gotone:
-    if (!(mvitals[mndx].mvflags & G_GONE))
+    if (!(g.mvitals[mndx].mvflags & G_GONE))
         return &mons[mndx];
     else
         return (struct permonst *) 0;
@@ -795,9 +795,9 @@ gotone:
  * save_room : A recursive function that saves a room and its subrooms
  * (if any).
  */
-STATIC_OVL void
-save_room(fd, r)
-int fd;
+static void
+save_room(nhfp, r)
+NHFILE *nhfp;
 struct mkroom *r;
 {
     short i;
@@ -805,40 +805,45 @@ struct mkroom *r;
     /*
      * Well, I really should write only useful information instead
      * of writing the whole structure. That is I should not write
-     * the subrooms pointers, but who cares ?
+     * the g.subrooms pointers, but who cares ?
      */
-    bwrite(fd, (genericptr_t) r, sizeof (struct mkroom));
-    for (i = 0; i < r->nsubrooms; i++)
-        save_room(fd, r->sbrooms[i]);
+    if (nhfp->structlevel)
+        bwrite(nhfp->fd, (genericptr_t) r, sizeof (struct mkroom));
+    for (i = 0; i < r->nsubrooms; i++) {
+        save_room(nhfp, r->sbrooms[i]);
+    }
 }
 
 /*
  * save_rooms : Save all the rooms on disk!
  */
 void
-save_rooms(fd)
-int fd;
+save_rooms(nhfp)
+NHFILE *nhfp;
 {
     short i;
 
     /* First, write the number of rooms */
-    bwrite(fd, (genericptr_t) &nroom, sizeof(nroom));
-    for (i = 0; i < nroom; i++)
-        save_room(fd, &rooms[i]);
+    if (nhfp->structlevel)
+        bwrite(nhfp->fd, (genericptr_t) &g.nroom, sizeof(g.nroom));
+    for (i = 0; i < g.nroom; i++)
+        save_room(nhfp, &g.rooms[i]);
 }
 
-STATIC_OVL void
-rest_room(fd, r)
-int fd;
+static void
+rest_room(nhfp, r)
+NHFILE *nhfp;
 struct mkroom *r;
 {
     short i;
 
-    mread(fd, (genericptr_t) r, sizeof(struct mkroom));
+    if (nhfp->structlevel)
+        mread(nhfp->fd, (genericptr_t) r, sizeof(struct mkroom));
+
     for (i = 0; i < r->nsubrooms; i++) {
-        r->sbrooms[i] = &subrooms[nsubroom];
-        rest_room(fd, &subrooms[nsubroom]);
-        subrooms[nsubroom++].resident = (struct monst *) 0;
+        r->sbrooms[i] = &g.subrooms[g.nsubroom];
+        rest_room(nhfp, &g.subrooms[g.nsubroom]);
+        g.subrooms[g.nsubroom++].resident = (struct monst *) 0;
     }
 }
 
@@ -847,19 +852,21 @@ struct mkroom *r;
  * the disk.
  */
 void
-rest_rooms(fd)
-int fd;
+rest_rooms(nhfp)
+NHFILE *nhfp;
 {
     short i;
 
-    mread(fd, (genericptr_t) &nroom, sizeof(nroom));
-    nsubroom = 0;
-    for (i = 0; i < nroom; i++) {
-        rest_room(fd, &rooms[i]);
-        rooms[i].resident = (struct monst *) 0;
+    if (nhfp->structlevel)
+        mread(nhfp->fd, (genericptr_t) &g.nroom, sizeof(g.nroom));
+
+    g.nsubroom = 0;
+    for (i = 0; i < g.nroom; i++) {
+        rest_room(nhfp, &g.rooms[i]);
+        g.rooms[i].resident = (struct monst *) 0;
     }
-    rooms[nroom].hx = -1; /* restore ending flags */
-    subrooms[nsubroom].hx = -1;
+    g.rooms[g.nroom].hx = -1; /* restore ending flags */
+    g.subrooms[g.nsubroom].hx = -1;
 }
 
 /* convert a display symbol for terrain into topology type;

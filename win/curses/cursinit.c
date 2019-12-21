@@ -785,9 +785,9 @@ curses_init_options()
     set_option_mod_status("eight_bit_tty", SET_IN_FILE);
 
     /* If we don't have a symset defined, load the curses symset by default */
-    if (!symset[PRIMARY].explicitly)
+    if (!g.symset[PRIMARY].explicitly)
         load_symset("curses", PRIMARY);
-    if (!symset[ROGUESET].explicitly)
+    if (!g.symset[ROGUESET].explicitly)
         load_symset("default", ROGUESET);
 
 #ifdef PDCURSES
@@ -879,7 +879,7 @@ curses_display_splash_window()
     refresh();
 }
 
-/* Resore colors and cursor state before exiting */
+/* Restore colors and cursor state before exiting */
 void
 curses_cleanup()
 {

@@ -5,7 +5,7 @@
 #include "hack.h"
 
 /* Note: Arrays are column first, while the screen is row first */
-static int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
+static const int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
                                { S_explode2, S_explode5, S_explode8 },
                                { S_explode3, S_explode6, S_explode9 } };
 
@@ -92,7 +92,7 @@ int expltype;
        so might get hit by double damage */
     grabbed = grabbing = FALSE;
     if (u.ustuck && !u.uswallow) {
-        if (Upolyd && sticks(youmonst.data))
+        if (Upolyd && sticks(g.youmonst.data))
             grabbing = TRUE;
         else
             grabbed = TRUE;
@@ -114,9 +114,9 @@ int expltype;
      */
 
     if (olet == MON_EXPLODE) {
-        /* when explode() is called recursively, killer.name might change so
+        /* when explode() is called recursively, g.killer.name might change so
            we need to retain a copy of the current value for this explosion */
-        str = strcpy(killr_buf, killer.name);
+        str = strcpy(killr_buf, g.killer.name);
         do_hallu = (Hallucination
                     && (strstri(str, "'s explosion")
                         || strstri(str, "s' explosion")));
@@ -184,8 +184,8 @@ int expltype;
                     break;
                 case AD_DISN:
                     explmask[i][j] = (olet == WAND_CLASS)
-                                         ? !!(nonliving(youmonst.data)
-                                              || is_demon(youmonst.data))
+                                         ? !!(nonliving(g.youmonst.data)
+                                              || is_demon(g.youmonst.data))
                                          : !!Disint_resistance;
                     break;
                 case AD_ELEC:
@@ -449,7 +449,7 @@ int expltype;
                                   && completelyburns(mtmp->data))
                                  ? XKILL_NOCORPSE : 0);
 
-                    if (!context.mon_moving) {
+                    if (!g.context.mon_moving) {
                         xkilled(mtmp, XKILL_GIVEMSG | xkflg);
                     } else if (mdef && mtmp == mdef) {
                         /* 'mdef' killed self trying to cure being turned
@@ -471,7 +471,7 @@ int expltype;
                             adtyp = AD_RBRE; /* no corpse */
                         monkilled(mtmp, "", (int) adtyp);
                     }
-                } else if (!context.mon_moving) {
+                } else if (!g.context.mon_moving) {
                     /* all affected monsters, even if mdef is set */
                     setmangry(mtmp, TRUE);
                 }
@@ -501,7 +501,7 @@ int expltype;
         } else if (adtyp == AD_PHYS || physical_dmg)
             damu = Maybe_Half_Phys(damu);
         if (adtyp == AD_FIRE)
-            (void) burnarmor(&youmonst);
+            (void) burnarmor(&g.youmonst);
         destroy_item(SCROLL_CLASS, (int) adtyp);
         destroy_item(SPBOOK_CLASS, (int) adtyp);
         destroy_item(POTION_CLASS, (int) adtyp);
@@ -521,7 +521,7 @@ int expltype;
                 u.mh -= damu;
             else
                 u.uhp -= damu;
-            context.botl = 1;
+            g.context.botl = 1;
         }
 
         if (u.uhp <= 0 || (Upolyd && u.mh <= 0)) {
@@ -530,20 +530,20 @@ int expltype;
             } else {
                 if (olet == MON_EXPLODE) {
                     if (generic) /* explosion was unseen; str=="explosion", */
-                        ;        /* killer.name=="gas spore's explosion"    */
-                    else if (str != killer.name && str != hallu_buf)
-                        Strcpy(killer.name, str);
-                    killer.format = KILLED_BY_AN;
+                        ;        /* g.killer.name=="gas spore's explosion"    */
+                    else if (str != g.killer.name && str != hallu_buf)
+                        Strcpy(g.killer.name, str);
+                    g.killer.format = KILLED_BY_AN;
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
-                    killer.format = NO_KILLER_PREFIX;
-                    Sprintf(killer.name, "caught %sself in %s own %s", uhim(),
+                    g.killer.format = NO_KILLER_PREFIX;
+                    Sprintf(g.killer.name, "caught %sself in %s own %s", uhim(),
                             uhis(), str);
                 } else {
-                    killer.format = (!strcmpi(str, "tower of flame")
+                    g.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))
                                         ? KILLED_BY_AN
                                         : KILLED_BY;
-                    Strcpy(killer.name, str);
+                    Strcpy(g.killer.name, str);
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
@@ -620,7 +620,7 @@ struct obj *obj; /* only scatter this obj        */
         impossible("scattered object <%d,%d> not at scatter site <%d,%d>",
                    obj->ox, obj->oy, sx, sy);
 
-    while ((otmp = (individual_object ? obj : level.objects[sx][sy])) != 0) {
+    while ((otmp = (individual_object ? obj : g.level.objects[sx][sy])) != 0) {
         if (otmp == uball || otmp == uchain) {
             boolean waschain = (otmp == uchain);
             pline_The("chain shatters!");
@@ -706,19 +706,19 @@ struct obj *obj; /* only scatter this obj        */
     while (farthest-- > 0) {
         for (stmp = schain; stmp; stmp = stmp->next) {
             if ((stmp->range-- > 0) && (!stmp->stopped)) {
-                bhitpos.x = stmp->ox + stmp->dx;
-                bhitpos.y = stmp->oy + stmp->dy;
-                typ = levl[bhitpos.x][bhitpos.y].typ;
-                if (!isok(bhitpos.x, bhitpos.y)) {
-                    bhitpos.x -= stmp->dx;
-                    bhitpos.y -= stmp->dy;
+                g.bhitpos.x = stmp->ox + stmp->dx;
+                g.bhitpos.y = stmp->oy + stmp->dy;
+                typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
+                if (!isok(g.bhitpos.x, g.bhitpos.y)) {
+                    g.bhitpos.x -= stmp->dx;
+                    g.bhitpos.y -= stmp->dy;
                     stmp->stopped = TRUE;
                 } else if (!ZAP_POS(typ)
-                           || closed_door(bhitpos.x, bhitpos.y)) {
-                    bhitpos.x -= stmp->dx;
-                    bhitpos.y -= stmp->dy;
+                           || closed_door(g.bhitpos.x, g.bhitpos.y)) {
+                    g.bhitpos.x -= stmp->dx;
+                    g.bhitpos.y -= stmp->dy;
                     stmp->stopped = TRUE;
-                } else if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
+                } else if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
                     if (scflags & MAY_HITMON) {
                         stmp->range--;
                         if (ohitmon(mtmp, stmp->obj, 1, FALSE)) {
@@ -726,16 +726,16 @@ struct obj *obj; /* only scatter this obj        */
                             stmp->stopped = TRUE;
                         }
                     }
-                } else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
+                } else if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) {
                     if (scflags & MAY_HITYOU) {
                         int hitvalu, hitu;
 
-                        if (multi)
+                        if (g.multi)
                             nomul(0);
                         hitvalu = 8 + stmp->obj->spe;
-                        if (bigmonst(youmonst.data))
+                        if (bigmonst(g.youmonst.data))
                             hitvalu++;
-                        hitu = thitu(hitvalu, dmgval(stmp->obj, &youmonst),
+                        hitu = thitu(hitvalu, dmgval(stmp->obj, &g.youmonst),
                                      &stmp->obj, (char *) 0);
                         if (!stmp->obj)
                             stmp->stopped = TRUE;
@@ -746,12 +746,12 @@ struct obj *obj; /* only scatter this obj        */
                     }
                 } else {
                     if (scflags & VIS_EFFECTS) {
-                        /* tmp_at(bhitpos.x, bhitpos.y); */
+                        /* tmp_at(g.bhitpos.x, g.bhitpos.y); */
                         /* delay_output(); */
                     }
                 }
-                stmp->ox = bhitpos.x;
-                stmp->oy = bhitpos.y;
+                stmp->ox = g.bhitpos.x;
+                stmp->oy = g.bhitpos.y;
             }
         }
     }
@@ -772,8 +772,8 @@ struct obj *obj; /* only scatter this obj        */
     }
     newsym(sx, sy);
     if (sx == u.ux && sy == u.uy && u.uundetected
-        && hides_under(youmonst.data))
-        (void) hideunder(&youmonst);
+        && hides_under(g.youmonst.data))
+        (void) hideunder(&g.youmonst);
     return total;
 }
 

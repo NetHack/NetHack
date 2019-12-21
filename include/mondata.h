@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.h	$NHDT-Date: 1550524558 2019/02/18 21:15:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	mondata.h	$NHDT-Date: 1576626512 2019/12/17 23:48:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,6 +31,7 @@
     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)
 #define is_flyer(ptr) (((ptr)->mflags1 & M1_FLY) != 0L)
 #define is_floater(ptr) ((ptr)->mlet == S_EYE || (ptr)->mlet == S_LIGHT)
+/* clinger: piercers, mimics, wumpus -- generally don't fall down holes */
 #define is_clinger(ptr) (((ptr)->mflags1 & M1_CLING) != 0L)
 #define is_swimmer(ptr) (((ptr)->mflags1 & M1_SWIM) != 0L)
 #define breathless(ptr) (((ptr)->mflags1 & M1_BREATHLESS) != 0L)
@@ -41,14 +42,24 @@
 #define noncorporeal(ptr) ((ptr)->mlet == S_GHOST)
 #define tunnels(ptr) (((ptr)->mflags1 & M1_TUNNEL) != 0L)
 #define needspick(ptr) (((ptr)->mflags1 & M1_NEEDPICK) != 0L)
+/* hides_under() requires an object at the location in order to hide */
 #define hides_under(ptr) (((ptr)->mflags1 & M1_CONCEAL) != 0L)
+/* is_hider() is True for mimics but when hiding they appear as something
+   else rather than become mon->mundetected, so use is_hider() with care */
 #define is_hider(ptr) (((ptr)->mflags1 & M1_HIDE) != 0L)
+/* piercers cling to the ceiling; lurkers above are hiders but they fly
+   so aren't classified as clingers; unfortunately mimics are classified
+   as both hiders and clingers but have nothing to do with ceilings;
+   wumpuses (not wumpi :-) cling but aren't hiders */
+#define ceiling_hider(ptr) \
+    (is_hider(ptr) && ((is_clinger(ptr) && (ptr)->mlet != S_MIMIC) \
+                       || is_flyer(ptr))) /* lurker above */
 #define haseyes(ptr) (((ptr)->mflags1 & M1_NOEYES) == 0L)
-#define eyecount(ptr)                                         \
-    (!haseyes(ptr) ? 0 : ((ptr) == &mons[PM_CYCLOPS]          \
-                          || (ptr) == &mons[PM_FLOATING_EYE]) \
-                             ? 1                              \
-                             : 2)
+/* used to decide whether plural applies so no need for 'more than 2' */
+#define eyecount(ptr) \
+    (!haseyes(ptr) ? 0                                                     \
+     : ((ptr) == &mons[PM_CYCLOPS] || (ptr) == &mons[PM_FLOATING_EYE]) ? 1 \
+       : 2)
 #define nohands(ptr) (((ptr)->mflags1 & M1_NOHANDS) != 0L)
 #define nolimbs(ptr) (((ptr)->mflags1 & M1_NOLIMBS) == M1_NOLIMBS)
 #define notake(ptr) (((ptr)->mflags1 & M1_NOTAKE) != 0L)
@@ -95,7 +106,7 @@
 #define is_gnome(ptr) (((ptr)->mflags2 & M2_GNOME) != 0L)
 #define is_orc(ptr) (((ptr)->mflags2 & M2_ORC) != 0L)
 #define is_human(ptr) (((ptr)->mflags2 & M2_HUMAN) != 0L)
-#define your_race(ptr) (((ptr)->mflags2 & urace.selfmask) != 0L)
+#define your_race(ptr) (((ptr)->mflags2 & g.urace.selfmask) != 0L)
 #define is_bat(ptr)                                         \
     ((ptr) == &mons[PM_BAT] || (ptr) == &mons[PM_GIANT_BAT] \
      || (ptr) == &mons[PM_VAMPIRE_BAT])
@@ -111,8 +122,8 @@
 #define is_wanderer(ptr) (((ptr)->mflags2 & M2_WANDER) != 0L)
 #define always_hostile(ptr) (((ptr)->mflags2 & M2_HOSTILE) != 0L)
 #define always_peaceful(ptr) (((ptr)->mflags2 & M2_PEACEFUL) != 0L)
-#define race_hostile(ptr) (((ptr)->mflags2 & urace.hatemask) != 0L)
-#define race_peaceful(ptr) (((ptr)->mflags2 & urace.lovemask) != 0L)
+#define race_hostile(ptr) (((ptr)->mflags2 & g.urace.hatemask) != 0L)
+#define race_peaceful(ptr) (((ptr)->mflags2 & g.urace.lovemask) != 0L)
 #define extra_nasty(ptr) (((ptr)->mflags2 & M2_NASTY) != 0L)
 #define strongmonst(ptr) (((ptr)->mflags2 & M2_STRONG) != 0L)
 #define can_breathe(ptr) attacktype(ptr, AT_BREA)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	system.h	$NHDT-Date: 1550268586 2019/02/15 22:09:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	system.h	$NHDT-Date: 1574825213 2019/11/27 03:26:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,8 +6,8 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#if !defined(WIN32)
 #if !defined(__cplusplus) && !defined(__GO32__)
-
 #define E extern
 
 /* some old <sys/types.h> may not define off_t and size_t; if your system is
@@ -339,7 +339,7 @@ E int FDECL(memcmp, (const void *, const void *, size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
 E void *FDECL(memset, (void *, int, size_t));
 #else
-#if defined(AZTEC_50) || defined(NHSTDC) || defined(WIN32)
+#if defined(AZTEC_50) || defined(NHSTDC))
 E int FDECL(memcmp, (const void *, const void *, size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
 E void *FDECL(memset, (void *, int, size_t));
@@ -453,7 +453,7 @@ E char *FDECL(rindex, (const char *, int));
  * If your system defines sprintf, et al, in stdio.h, add to the initial
  * #if.
  */
-#if defined(ULTRIX) || defined(__DECC) || defined(__SASC_60) || defined(WIN32)
+#if defined(ULTRIX) || defined(__DECC) || defined(__SASC_60)
 #define SPRINTF_PROTO
 #endif
 #if (defined(SUNOS4) && defined(__STDC__)) || defined(_AIX32)
@@ -527,7 +527,7 @@ E char *FDECL(tgetstr, (const char *, char **));
 E char *FDECL(tgoto, (const char *, int, int));
 #endif
 
-#if defined(ALLOC_C) || defined(MAKEDEFS_C)
+#if defined(ALLOC_C) || defined(MAKEDEFS_C) || defined(MDLIB_C)
 E genericptr_t FDECL(malloc, (size_t));
 E genericptr_t FDECL(realloc, (genericptr_t, size_t));
 #endif
@@ -567,5 +567,10 @@ E int FDECL(atoi, (const char *));
 #undef E
 
 #endif /*  !__cplusplus && !__GO32__ */
+#endif /* WIN32 */
+
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+#include "nhlua.h"
+#endif
 
 #endif /* SYSTEM_H */

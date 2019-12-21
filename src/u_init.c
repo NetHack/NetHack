@@ -13,10 +13,10 @@ struct trobj {
     Bitfield(trbless, 2);
 };
 
-STATIC_DCL void FDECL(ini_inv, (struct trobj *));
-STATIC_DCL void FDECL(knows_object, (int));
-STATIC_DCL void FDECL(knows_class, (CHAR_P));
-STATIC_DCL boolean FDECL(restricted_spell_discipline, (int));
+static void FDECL(ini_inv, (struct trobj *));
+static void FDECL(knows_object, (int));
+static void FDECL(knows_class, (CHAR_P));
+static boolean FDECL(restricted_spell_discipline, (int));
 
 #define UNDEF_TYP 0
 #define UNDEF_SPE '\177'
@@ -557,7 +557,7 @@ static const struct def_skill Skill_W[] = {
     { P_NONE, 0 }
 };
 
-STATIC_OVL void
+static void
 knows_object(obj)
 register int obj;
 {
@@ -568,7 +568,7 @@ register int obj;
 /* Know ordinary (non-magical) objects of a certain class,
  * like all gems except the loadstone and luckstone.
  */
-STATIC_OVL void
+static void
 knows_class(sym)
 register char sym;
 {
@@ -625,9 +625,9 @@ u_init()
     u.umortality = 0;
     u.ugrave_arise = NON_PM;
 
-    u.umonnum = u.umonster = (flags.female && urole.femalenum != NON_PM)
-                                 ? urole.femalenum
-                                 : urole.malenum;
+    u.umonnum = u.umonster = (flags.female && g.urole.femalenum != NON_PM)
+                                 ? g.urole.femalenum
+                                 : g.urole.malenum;
     u.ulycn = NON_PM;
     set_uasmon();
 
@@ -640,7 +640,7 @@ u_init()
 
     init_uhunger();
     for (i = 0; i <= MAXSPELL; i++)
-        spl_book[i].sp_id = NO_SPELL;
+        g.spl_book[i].sp_id = NO_SPELL;
     u.ublesscnt = 300; /* no prayers just yet */
     u.ualignbase[A_CURRENT] = u.ualignbase[A_ORIGINAL] = u.ualign.type =
         aligns[flags.initalign].value;
@@ -907,7 +907,7 @@ u_init()
 }
 
 /* skills aren't initialized, so we use the role-specific skill lists */
-STATIC_OVL boolean
+static boolean
 restricted_spell_discipline(otyp)
 int otyp;
 {
@@ -967,22 +967,18 @@ int otyp;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 ini_inv(trop)
 register struct trobj *trop;
 {
     struct obj *obj;
     int otyp, i;
 
-    while (trop->trclass) {
+	while (trop->trclass) {
         otyp = (int) trop->trotyp;
         if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
         } else { /* UNDEF_TYP */
-            static NEARDATA short nocreate = STRANGE_OBJECT;
-            static NEARDATA short nocreate2 = STRANGE_OBJECT;
-            static NEARDATA short nocreate3 = STRANGE_OBJECT;
-            static NEARDATA short nocreate4 = STRANGE_OBJECT;
             /*
              * For random objects, do not create certain overly powerful
              * items: wand of wishing, ring of levitation, or the
@@ -995,9 +991,9 @@ register struct trobj *trop;
              */
             obj = mkobj(trop->trclass, FALSE);
             otyp = obj->otyp;
-            while (otyp == WAN_WISHING || otyp == nocreate
-                   || otyp == nocreate2 || otyp == nocreate3
-                   || otyp == nocreate4 || otyp == RIN_LEVITATION
+            while (otyp == WAN_WISHING || otyp == g.nocreate
+                   || otyp == g.nocreate2 || otyp == g.nocreate3
+                   || otyp == g.nocreate4 || otyp == RIN_LEVITATION
                    /* 'useless' items */
                    || otyp == POT_HALLUCINATION
                    || otyp == POT_ACID
@@ -1039,25 +1035,25 @@ register struct trobj *trop;
             case WAN_POLYMORPH:
             case RIN_POLYMORPH:
             case POT_POLYMORPH:
-                nocreate = RIN_POLYMORPH_CONTROL;
+                g.nocreate = RIN_POLYMORPH_CONTROL;
                 break;
             case RIN_POLYMORPH_CONTROL:
-                nocreate = RIN_POLYMORPH;
-                nocreate2 = SPE_POLYMORPH;
-                nocreate3 = POT_POLYMORPH;
+                g.nocreate = RIN_POLYMORPH;
+                g.nocreate2 = SPE_POLYMORPH;
+                g.nocreate3 = POT_POLYMORPH;
             }
             /* Don't have 2 of the same ring or spellbook */
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
-                nocreate4 = otyp;
+                g.nocreate4 = otyp;
         }
 
-        if (urace.malenum != PM_HUMAN) {
+        if (g.urace.malenum != PM_HUMAN) {
             /* substitute race-specific items; this used to be in
                the 'if (otyp != UNDEF_TYP) { }' block above, but then
                substitutions didn't occur for randomly generated items
                (particularly food) which have racial substitutes */
             for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
-                if (inv_subs[i].race_pm == urace.malenum
+                if (inv_subs[i].race_pm == g.urace.malenum
                     && otyp == inv_subs[i].item_otyp) {
                     debugpline3("ini_inv: substituting %s for %s%s",
                                 OBJ_NAME(objects[inv_subs[i].subs_otyp]),

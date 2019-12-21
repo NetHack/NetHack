@@ -186,7 +186,7 @@ time_t when;
     SetDrMd(rp, JAM1);
 
     /* Put name on stone */
-    Sprintf(buf, "%s", plname);
+    Sprintf(buf, "%s", g.plname);
     buf[STONE_LINE_LEN] = 0;
     tomb_text(buf);
 

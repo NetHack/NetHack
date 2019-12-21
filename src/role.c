@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1547086250 2019/01/10 02:10:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1574648943 2019/11/25 02:29:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -24,7 +24,7 @@
  *
  * God names use a leading underscore to flag goddesses.
  */
-const struct Role roles[] = {
+const struct Role roles[NUM_ROLES+1] = {
     { { "Archeologist", 0 },
       { { "Digger", 0 },
         { "Field Worker", 0 },
@@ -585,34 +585,6 @@ const struct Role roles[] = {
     { { 0, 0 } }
 };
 
-/* The player's role, created at runtime from initial
- * choices.  This may be munged in role_init().
- */
-struct Role urole = {
-    { "Undefined", 0 },
-    { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
-      { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
-    "L", "N", "C",
-    "Xxx", "home", "locate",
-    NON_PM, NON_PM, NON_PM, NON_PM, NON_PM, NON_PM, NON_PM, NON_PM,
-    0, 0, 0, 0,
-    /* Str Int Wis Dex Con Cha */
-    { 7, 7, 7, 7, 7, 7 },
-    { 20, 15, 15, 20, 20, 10 },
-    /* Init   Lower  Higher */
-    { 10, 0, 0, 8, 1, 0 }, /* Hit points */
-    { 2, 0, 0, 2, 0, 3 },
-    14, /* Energy */
-     0,
-    10,
-     0,
-     0,
-     4,
-    A_INT,
-     0,
-    -3
-};
-
 /* Table of all races */
 const struct Race races[] = {
     {
@@ -725,36 +697,13 @@ const struct Race races[] = {
     { 0, 0, 0, 0 }
 };
 
-/* The player's race, created at runtime from initial
- * choices.  This may be munged in role_init().
- */
-struct Race urace = {
-    "something",
-    "undefined",
-    "something",
-    "Xxx",
-    { 0, 0 },
-    NON_PM,
-    NON_PM,
-    NON_PM,
-    NON_PM,
-    0,
-    0,
-    0,
-    0,
-    /*    Str     Int Wis Dex Con Cha */
-    { 3, 3, 3, 3, 3, 3 },
-    { STR18(100), 18, 18, 18, 18, 18 },
-    /* Init   Lower  Higher */
-    { 2, 0, 0, 2, 1, 0 }, /* Hit points */
-    { 1, 0, 2, 0, 2, 0 }  /* Energy */
-};
-
 /* Table of all genders */
 const struct Gender genders[] = {
     { "male", "he", "him", "his", "Mal", ROLE_MALE },
     { "female", "she", "her", "her", "Fem", ROLE_FEMALE },
-    { "neuter", "it", "it", "its", "Ntr", ROLE_NEUTER }
+    { "neuter", "it", "it", "its", "Ntr", ROLE_NEUTER },
+    /* used by pronoun_gender() when hallucinating */
+    { "group", "they", "them", "their", "Grp", 0 },
 };
 
 /* Table of all alignments */
@@ -765,16 +714,10 @@ const struct Align aligns[] = {
     { "evil", "unaligned", "Una", 0, A_NONE }
 };
 
-/* Filters */
-static struct {
-    boolean roles[SIZE(roles)];
-    short mask;
-} rfilter;
-
-STATIC_DCL int NDECL(randrole_filtered);
-STATIC_DCL char *FDECL(promptsep, (char *, int));
-STATIC_DCL int FDECL(role_gendercount, (int));
-STATIC_DCL int FDECL(race_alignmentcount, (int));
+static int NDECL(randrole_filtered);
+static char *FDECL(promptsep, (char *, int));
+static int FDECL(role_gendercount, (int));
+static int FDECL(race_alignmentcount, (int));
 
 /* used by str2XXX() */
 static char NEARDATA randomstr[] = "random";
@@ -799,7 +742,7 @@ boolean for_display;
     return res;
 }
 
-STATIC_OVL int
+static int
 randrole_filtered()
 {
     int i, n = 0, set[SIZE(roles)];
@@ -1054,7 +997,7 @@ int rolenum, racenum, gendnum, alignnum;
     short allow;
 
     if (rolenum >= 0 && rolenum < SIZE(roles) - 1) {
-        if (rfilter.roles[rolenum])
+        if (g.rfilter.roles[rolenum])
             return FALSE;
         allow = roles[rolenum].allow;
         if (racenum >= 0 && racenum < SIZE(races) - 1
@@ -1070,7 +1013,7 @@ int rolenum, racenum, gendnum, alignnum;
     } else {
         /* random; check whether any selection is possible */
         for (i = 0; i < SIZE(roles) - 1; i++) {
-            if (rfilter.roles[i])
+            if (g.rfilter.roles[i])
                 continue;
             allow = roles[i].allow;
             if (racenum >= 0 && racenum < SIZE(races) - 1
@@ -1122,7 +1065,7 @@ int rolenum, racenum, gendnum, alignnum;
     short allow;
 
     if (racenum >= 0 && racenum < SIZE(races) - 1) {
-        if (rfilter.mask & races[racenum].selfmask)
+        if (g.rfilter.mask & races[racenum].selfmask)
             return FALSE;
         allow = races[racenum].allow;
         if (rolenum >= 0 && rolenum < SIZE(roles) - 1
@@ -1138,7 +1081,7 @@ int rolenum, racenum, gendnum, alignnum;
     } else {
         /* random; check whether any selection is possible */
         for (i = 0; i < SIZE(races) - 1; i++) {
-            if (rfilter.mask & races[i].selfmask)
+            if (g.rfilter.mask & races[i].selfmask)
                 continue;
             allow = races[i].allow;
             if (rolenum >= 0 && rolenum < SIZE(roles) - 1
@@ -1195,7 +1138,7 @@ int alignnum UNUSED;
     short allow;
 
     if (gendnum >= 0 && gendnum < ROLE_GENDERS) {
-        if (rfilter.mask & genders[gendnum].allow)
+        if (g.rfilter.mask & genders[gendnum].allow)
             return FALSE;
         allow = genders[gendnum].allow;
         if (rolenum >= 0 && rolenum < SIZE(roles) - 1
@@ -1208,7 +1151,7 @@ int alignnum UNUSED;
     } else {
         /* random; check whether any selection is possible */
         for (i = 0; i < ROLE_GENDERS; i++) {
-            if (rfilter.mask & genders[i].allow)
+            if (g.rfilter.mask & genders[i].allow)
                 continue;
             allow = genders[i].allow;
             if (rolenum >= 0 && rolenum < SIZE(roles) - 1
@@ -1264,7 +1207,7 @@ int alignnum;
     short allow;
 
     if (alignnum >= 0 && alignnum < ROLE_ALIGNS) {
-        if (rfilter.mask & aligns[alignnum].allow)
+        if (g.rfilter.mask & aligns[alignnum].allow)
             return FALSE;
         allow = aligns[alignnum].allow;
         if (rolenum >= 0 && rolenum < SIZE(roles) - 1
@@ -1277,7 +1220,7 @@ int alignnum;
     } else {
         /* random; check whether any selection is possible */
         for (i = 0; i < ROLE_ALIGNS; i++) {
-            if (rfilter.mask & aligns[i].allow)
+            if (g.rfilter.mask & aligns[i].allow)
                 return FALSE;
             allow = aligns[i].allow;
             if (rolenum >= 0 && rolenum < SIZE(roles) - 1
@@ -1378,13 +1321,13 @@ const char *bufp;
     boolean reslt = TRUE;
 
     if ((i = str2role(bufp)) != ROLE_NONE && i != ROLE_RANDOM)
-        rfilter.roles[i] = TRUE;
+        g.rfilter.roles[i] = TRUE;
     else if ((i = str2race(bufp)) != ROLE_NONE && i != ROLE_RANDOM)
-        rfilter.mask |= races[i].selfmask;
+        g.rfilter.mask |= races[i].selfmask;
     else if ((i = str2gend(bufp)) != ROLE_NONE && i != ROLE_RANDOM)
-        rfilter.mask |= genders[i].allow;
+        g.rfilter.mask |= genders[i].allow;
     else if ((i = str2align(bufp)) != ROLE_NONE && i != ROLE_RANDOM)
-        rfilter.mask |= aligns[i].allow;
+        g.rfilter.mask |= aligns[i].allow;
     else
         reslt = FALSE;
     return reslt;
@@ -1395,10 +1338,10 @@ gotrolefilter()
 {
     int i;
 
-    if (rfilter.mask)
+    if (g.rfilter.mask)
         return TRUE;
     for (i = 0; i < SIZE(roles); ++i)
-        if (rfilter.roles[i])
+        if (g.rfilter.roles[i])
             return TRUE;
     return FALSE;
 }
@@ -1409,36 +1352,28 @@ clearrolefilter()
     int i;
 
     for (i = 0; i < SIZE(roles); ++i)
-        rfilter.roles[i] = FALSE;
-    rfilter.mask = 0;
+        g.rfilter.roles[i] = FALSE;
+    g.rfilter.mask = 0;
 }
 
-#define BP_ALIGN 0
-#define BP_GEND 1
-#define BP_RACE 2
-#define BP_ROLE 3
-#define NUM_BP 4
-
-STATIC_VAR char pa[NUM_BP], post_attribs;
-
-STATIC_OVL char *
+static char *
 promptsep(buf, num_post_attribs)
 char *buf;
 int num_post_attribs;
 {
     const char *conjuct = "and ";
 
-    if (num_post_attribs > 1 && post_attribs < num_post_attribs
-        && post_attribs > 1)
+    if (num_post_attribs > 1 && g.role_post_attribs < num_post_attribs
+        && g.role_post_attribs > 1)
         Strcat(buf, ",");
     Strcat(buf, " ");
-    --post_attribs;
-    if (!post_attribs && num_post_attribs > 1)
+    --g.role_post_attribs;
+    if (!g.role_post_attribs && num_post_attribs > 1)
         Strcat(buf, conjuct);
     return buf;
 }
 
-STATIC_OVL int
+static int
 role_gendercount(rolenum)
 int rolenum;
 {
@@ -1455,7 +1390,7 @@ int rolenum;
     return gendcount;
 }
 
-STATIC_OVL int
+static int
 race_alignmentcount(racenum)
 int racenum;
 {
@@ -1487,9 +1422,9 @@ int buflen, rolenum, racenum, gendnum, alignnum;
         return err_ret;
 
     /* initialize these static variables each time this is called */
-    post_attribs = 0;
+    g.role_post_attribs = 0;
     for (k = 0; k < NUM_BP; ++k)
-        pa[k] = 0;
+        g.role_pa[k] = 0;
     buf[0] = '\0';
     *suppliedbuf = '\0';
 
@@ -1522,8 +1457,8 @@ int buflen, rolenum, racenum, gendnum, alignnum;
               && ok_race(rolenum, racenum, gendnum, alignnum))
              && (aligncount > 1))
             || (racenum == ROLE_NONE || racenum == ROLE_RANDOM)) {
-            pa[BP_ALIGN] = 1;
-            post_attribs++;
+            g.role_pa[BP_ALIGN] = 1;
+            g.role_post_attribs++;
         }
     }
     /* <your lawful> */
@@ -1555,8 +1490,8 @@ int buflen, rolenum, racenum, gendnum, alignnum;
                 don't include it in the later list */
         if ((validrole(rolenum) && (gendercount > 1))
             || !validrole(rolenum)) {
-            pa[BP_GEND] = 1;
-            post_attribs++;
+            g.role_pa[BP_GEND] = 1;
+            g.role_post_attribs++;
         }
     }
     /* <your lawful female> */
@@ -1575,12 +1510,12 @@ int buflen, rolenum, racenum, gendnum, alignnum;
             Strcat(buf, races[racenum].noun);
             donefirst = TRUE;
         } else {
-            pa[BP_RACE] = 1;
-            post_attribs++;
+            g.role_pa[BP_RACE] = 1;
+            g.role_post_attribs++;
         }
     } else {
-        pa[BP_RACE] = 1;
-        post_attribs++;
+        g.role_pa[BP_RACE] = 1;
+        g.role_post_attribs++;
     }
     /* <your lawful female gnomish> || <your lawful female gnome> */
 
@@ -1602,8 +1537,8 @@ int buflen, rolenum, racenum, gendnum, alignnum;
         }
         donefirst = TRUE;
     } else if (rolenum == ROLE_NONE) {
-        pa[BP_ROLE] = 1;
-        post_attribs++;
+        g.role_pa[BP_ROLE] = 1;
+        g.role_post_attribs++;
     }
 
     if ((racenum == ROLE_NONE || racenum == ROLE_RANDOM)
@@ -1663,34 +1598,34 @@ int buflen, rolenum, racenum, gendnum, alignnum;
      *
      * Now append the post attributes to it
      */
-    num_post_attribs = post_attribs;
+    num_post_attribs = g.role_post_attribs;
     if (!num_post_attribs) {
         /* some constraints might have been mutually exclusive, in which case
            some prompting that would have been omitted is needed after all */
-        if (flags.initrole == ROLE_NONE && !pa[BP_ROLE])
-            pa[BP_ROLE] = ++post_attribs;
-        if (flags.initrace == ROLE_NONE && !pa[BP_RACE])
-            pa[BP_RACE] = ++post_attribs;
-        if (flags.initalign == ROLE_NONE && !pa[BP_ALIGN])
-            pa[BP_ALIGN] = ++post_attribs;
-        if (flags.initgend == ROLE_NONE && !pa[BP_GEND])
-            pa[BP_GEND] = ++post_attribs;
-        num_post_attribs = post_attribs;
+        if (flags.initrole == ROLE_NONE && !g.role_pa[BP_ROLE])
+            g.role_pa[BP_ROLE] = ++g.role_post_attribs;
+        if (flags.initrace == ROLE_NONE && !g.role_pa[BP_RACE])
+            g.role_pa[BP_RACE] = ++g.role_post_attribs;
+        if (flags.initalign == ROLE_NONE && !g.role_pa[BP_ALIGN])
+            g.role_pa[BP_ALIGN] = ++g.role_post_attribs;
+        if (flags.initgend == ROLE_NONE && !g.role_pa[BP_GEND])
+            g.role_pa[BP_GEND] = ++g.role_post_attribs;
+        num_post_attribs = g.role_post_attribs;
     }
     if (num_post_attribs) {
-        if (pa[BP_RACE]) {
+        if (g.role_pa[BP_RACE]) {
             (void) promptsep(eos(buf), num_post_attribs);
             Strcat(buf, "race");
         }
-        if (pa[BP_ROLE]) {
+        if (g.role_pa[BP_ROLE]) {
             (void) promptsep(eos(buf), num_post_attribs);
             Strcat(buf, "role");
         }
-        if (pa[BP_GEND]) {
+        if (g.role_pa[BP_GEND]) {
             (void) promptsep(eos(buf), num_post_attribs);
             Strcat(buf, "gender");
         }
-        if (pa[BP_ALIGN]) {
+        if (g.role_pa[BP_ALIGN]) {
             (void) promptsep(eos(buf), num_post_attribs);
             Strcat(buf, "alignment");
         }
@@ -1714,22 +1649,22 @@ plnamesuffix()
     /* some generic user names will be ignored in favor of prompting */
     if (sysopt.genericusers) {
         if (*sysopt.genericusers == '*') {
-            *plname = '\0';
+            *g.plname = '\0';
         } else {
-            i = (int) strlen(plname);
-            if ((sptr = strstri(sysopt.genericusers, plname)) != 0
+            i = (int) strlen(g.plname);
+            if ((sptr = strstri(sysopt.genericusers, g.plname)) != 0
                 && (sptr == sysopt.genericusers || sptr[-1] == ' ')
                 && (sptr[i] == ' ' || sptr[i] == '\0'))
-                *plname = '\0'; /* call askname() */
+                *g.plname = '\0'; /* call askname() */
         }
     }
 
     do {
-        if (!*plname)
-            askname(); /* fill plname[] if necessary, or set defer_plname */
+        if (!*g.plname)
+            askname(); /* fill g.plname[] if necessary, or set defer_plname */
 
         /* Look for tokens delimited by '-' */
-        if ((eptr = index(plname, '-')) != (char *) 0)
+        if ((eptr = index(g.plname, '-')) != (char *) 0)
             *eptr++ = '\0';
         while (eptr) {
             /* Isolate the next token */
@@ -1747,10 +1682,10 @@ plnamesuffix()
             else if ((i = str2align(sptr)) != ROLE_NONE)
                 flags.initalign = i;
         }
-    } while (!*plname && !iflags.defer_plname);
+    } while (!*g.plname && !iflags.defer_plname);
 
-    /* commas in the plname confuse the record file, convert to spaces */
-    for (sptr = plname; *sptr; sptr++) {
+    /* commas in the g.plname confuse the record file, convert to spaces */
+    for (sptr = g.plname; *sptr; sptr++) {
         if (*sptr == ',')
             *sptr = ' ';
     }
@@ -1767,11 +1702,11 @@ winid where;
                                not_yet[] = " not yet specified",
                                rand_choice[] = " random";
     char buf[BUFSZ];
-    int r, c, g, a, allowmask;
+    int r, c, gend, a, allowmask;
 
     r = flags.initrole;
     c = flags.initrace;
-    g = flags.initgend;
+    gend = flags.initgend;
     a = flags.initalign;
     if (r >= 0) {
         allowmask = roles[r].allow;
@@ -1780,9 +1715,9 @@ winid where;
         else if (c >= 0 && !(allowmask & ROLE_RACEMASK & races[c].allow))
             c = ROLE_RANDOM;
         if ((allowmask & ROLE_GENDMASK) == ROLE_MALE)
-            g = 0; /* role forces male (hypothetical) */
+            gend = 0; /* role forces male (hypothetical) */
         else if ((allowmask & ROLE_GENDMASK) == ROLE_FEMALE)
-            g = 1; /* role forces female (valkyrie) */
+            gend = 1; /* role forces female (valkyrie) */
         if ((allowmask & ROLE_ALIGNMASK) == AM_LAWFUL)
             a = 0; /* aligns[lawful] */
         else if ((allowmask & ROLE_ALIGNMASK) == AM_NEUTRAL)
@@ -1804,7 +1739,7 @@ winid where;
        to narrow something done to a single choice] */
 
     Sprintf(buf, "%12s ", "name:");
-    Strcat(buf, (which == RS_NAME) ? choosing : !*plname ? not_yet : plname);
+    Strcat(buf, (which == RS_NAME) ? choosing : !*g.plname ? not_yet : g.plname);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "role:");
     Strcat(buf, (which == RS_ROLE) ? choosing : (r == ROLE_NONE)
@@ -1814,10 +1749,10 @@ winid where;
                                                           : roles[r].name.m);
     if (r >= 0 && roles[r].name.f) {
         /* distinct female name [caveman/cavewoman, priest/priestess] */
-        if (g == 1)
+        if (gend == 1)
             /* female specified; replace male role name with female one */
             Sprintf(index(buf, ':'), ": %s", roles[r].name.f);
-        else if (g < 0)
+        else if (gend < 0)
             /* gender unspecified; append slash and female role name */
             Sprintf(eos(buf), "/%s", roles[r].name.f);
     }
@@ -1830,11 +1765,11 @@ winid where;
                                                           : races[c].noun);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "gender:");
-    Strcat(buf, (which == RS_GENDER) ? choosing : (g == ROLE_NONE)
+    Strcat(buf, (which == RS_GENDER) ? choosing : (gend == ROLE_NONE)
                                                       ? not_yet
-                                                      : (g == ROLE_RANDOM)
+                                                      : (gend == ROLE_RANDOM)
                                                             ? rand_choice
-                                                            : genders[g].adj);
+                                                            : genders[gend].adj);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "alignment:");
     Strcat(buf, (which == RS_ALGNMNT) ? choosing : (a == ROLE_NONE)
@@ -1862,7 +1797,7 @@ boolean preselect;
     anything any;
     char buf[BUFSZ];
     const char *what = 0, *constrainer = 0, *forcedvalue = 0;
-    int f = 0, r, c, g, a, i, allowmask;
+    int f = 0, r, c, gend, a, i, allowmask;
 
     r = flags.initrole;
     c = flags.initrace;
@@ -1874,7 +1809,7 @@ boolean preselect;
         what = "role";
         f = r;
         for (i = 0; i < SIZE(roles); ++i)
-            if (i != f && !rfilter.roles[i])
+            if (i != f && !g.rfilter.roles[i])
                 break;
         if (i == SIZE(roles)) {
             constrainer = "filter";
@@ -1893,7 +1828,7 @@ boolean preselect;
                 constrainer = "role";
                 forcedvalue = races[c].noun;
             } else if (f >= 0
-                       && (allowmask & ~rfilter.mask) == races[f].selfmask) {
+                       && (allowmask & ~g.rfilter.mask) == races[f].selfmask) {
                 /* if there is only one race choice available due to user
                    options disallowing others, race menu entry is disabled */
                 constrainer = "filter";
@@ -1904,18 +1839,18 @@ boolean preselect;
     case RS_GENDER:
         what = "gender";
         f = flags.initgend;
-        g = ROLE_NONE;
+        gend = ROLE_NONE;
         if (r >= 0) {
             allowmask = roles[r].allow & ROLE_GENDMASK;
             if (allowmask == ROLE_MALE)
-                g = 0; /* genders[male] */
+                gend = 0; /* genders[male] */
             else if (allowmask == ROLE_FEMALE)
-                g = 1; /* genders[female] */
-            if (g >= 0) {
+                gend = 1; /* genders[female] */
+            if (gend >= 0) {
                 constrainer = "role";
-                forcedvalue = genders[g].adj;
+                forcedvalue = genders[gend].adj;
             } else if (f >= 0
-                       && (allowmask & ~rfilter.mask) == genders[f].allow) {
+                       && (allowmask & ~g.rfilter.mask) == genders[f].allow) {
                 /* if there is only one gender choice available due to user
                    options disallowing other, gender menu entry is disabled */
                 constrainer = "filter";
@@ -1950,7 +1885,7 @@ boolean preselect;
                 constrainer = "race";
         }
         if (f >= 0 && !constrainer
-            && (ROLE_ALIGNMASK & ~rfilter.mask) == aligns[f].allow) {
+            && (ROLE_ALIGNMASK & ~g.rfilter.mask) == aligns[f].allow) {
             /* if there is only one alignment choice available due to user
                options disallowing others, algn menu entry is disabled */
             constrainer = "filter";
@@ -1961,7 +1896,7 @@ boolean preselect;
         break;
     }
 
-    any = zeroany; /* zero out all bits */
+    any = cg.zeroany; /* zero out all bits */
     if (constrainer) {
         any.a_int = 0;
         /* use four spaces of padding to fake a grayed out menu choice */
@@ -2021,15 +1956,15 @@ role_init()
     /* Check for a valid role.  Try flags.initrole first. */
     if (!validrole(flags.initrole)) {
         /* Try the player letter second */
-        if ((flags.initrole = str2role(pl_character)) < 0)
+        if ((flags.initrole = str2role(g.pl_character)) < 0)
             /* None specified; pick a random role */
             flags.initrole = randrole_filtered();
     }
 
     /* We now have a valid role index.  Copy the role name back. */
     /* This should become OBSOLETE */
-    Strcpy(pl_character, roles[flags.initrole].name.m);
-    pl_character[PL_CSIZ - 1] = '\0';
+    Strcpy(g.pl_character, roles[flags.initrole].name.m);
+    g.pl_character[PL_CSIZ - 1] = '\0';
 
     /* Check for a valid race */
     if (!validrace(flags.initrole, flags.initrace))
@@ -2051,35 +1986,35 @@ role_init()
         flags.initalign = randalign(flags.initrole, flags.initrace);
     alignmnt = aligns[flags.initalign].value;
 
-    /* Initialize urole and urace */
-    urole = roles[flags.initrole];
-    urace = races[flags.initrace];
+    /* Initialize g.urole and g.urace */
+    g.urole = roles[flags.initrole];
+    g.urace = races[flags.initrace];
 
     /* Fix up the quest leader */
-    if (urole.ldrnum != NON_PM) {
-        pm = &mons[urole.ldrnum];
+    if (g.urole.ldrnum != NON_PM) {
+        pm = &mons[g.urole.ldrnum];
         pm->msound = MS_LEADER;
         pm->mflags2 |= (M2_PEACEFUL);
         pm->mflags3 |= M3_CLOSE;
         pm->maligntyp = alignmnt * 3;
         /* if gender is random, we choose it now instead of waiting
            until the leader monster is created */
-        quest_status.ldrgend =
+        g.quest_status.ldrgend =
             is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm)
                                                         ? 0
                                                         : (rn2(100) < 50);
     }
 
     /* Fix up the quest guardians */
-    if (urole.guardnum != NON_PM) {
-        pm = &mons[urole.guardnum];
+    if (g.urole.guardnum != NON_PM) {
+        pm = &mons[g.urole.guardnum];
         pm->mflags2 |= (M2_PEACEFUL);
         pm->maligntyp = alignmnt * 3;
     }
 
     /* Fix up the quest nemesis */
-    if (urole.neminum != NON_PM) {
-        pm = &mons[urole.neminum];
+    if (g.urole.neminum != NON_PM) {
+        pm = &mons[g.urole.neminum];
         pm->msound = MS_NEMESIS;
         pm->mflags2 &= ~(M2_PEACEFUL);
         pm->mflags2 |= (M2_NASTY | M2_STALK | M2_HOSTILE);
@@ -2087,7 +2022,7 @@ role_init()
         pm->mflags3 |= M3_WANTSARTI | M3_WAITFORU;
         /* if gender is random, we choose it now instead of waiting
            until the nemesis monster is created */
-        quest_status.nemgend = is_neuter(pm) ? 2 : is_female(pm) ? 1
+        g.quest_status.nemgend = is_neuter(pm) ? 2 : is_female(pm) ? 1
                                    : is_male(pm) ? 0 : (rn2(100) < 50);
     }
 
@@ -2097,13 +2032,13 @@ role_init()
         while (!roles[flags.pantheon].lgod) /* unless they're missing */
             flags.pantheon = randrole(FALSE);
     }
-    if (!urole.lgod) {
-        urole.lgod = roles[flags.pantheon].lgod;
-        urole.ngod = roles[flags.pantheon].ngod;
-        urole.cgod = roles[flags.pantheon].cgod;
+    if (!g.urole.lgod) {
+        g.urole.lgod = roles[flags.pantheon].lgod;
+        g.urole.ngod = roles[flags.pantheon].ngod;
+        g.urole.cgod = roles[flags.pantheon].cgod;
     }
     /* 0 or 1; no gods are neuter, nor is gender randomized */
-    quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
+    g.quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
 
 #if 0
 /*
@@ -2114,7 +2049,7 @@ role_init()
  * needed--via instrinsic 'Infravision' which set_uasmon() manages.
  */
     /* Fix up infravision */
-    if (mons[urace.malenum].mflags3 & M3_INFRAVISION) {
+    if (mons[g.urace.malenum].mflags3 & M3_INFRAVISION) {
         /* although an infravision intrinsic is possible, infravision
          * is purely a property of the physical race.  This means that we
          * must put the infravision flag in the player's current race
@@ -2124,9 +2059,9 @@ role_init()
          * but since infravision has no effect for NPCs anyway we can
          * ignore this.
          */
-        mons[urole.malenum].mflags3 |= M3_INFRAVISION;
-        if (urole.femalenum != NON_PM)
-            mons[urole.femalenum].mflags3 |= M3_INFRAVISION;
+        mons[g.urole.malenum].mflags3 |= M3_INFRAVISION;
+        if (g.urole.femalenum != NON_PM)
+            mons[g.urole.femalenum].mflags3 |= M3_INFRAVISION;
     }
 #endif /*0*/
 
@@ -2151,7 +2086,7 @@ struct monst *mtmp;
         return "Aloha"; /* Hawaiian */
     case PM_VALKYRIE:
         return
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
                (mtmp && mtmp->data == &mons[PM_MAIL_DAEMON]) ? "Hallo" :
 #endif
                "Velkommen"; /* Norse */

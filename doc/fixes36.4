@@ -1,8 +1,8 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.4 $ $NHDT-Date: 1576287569 2019/12/14 01:39:29 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $ $NHDT-Date: 1576638499 2019/12/18 03:08:19 $
 
-This fixes36.4 file is here to capture information about updates in the 3.6.x
-lineage following the release of 3.6.3 in December 2019.  Hypothetical version
-3.6.4 may not be released, in which case these fixes will appear in 3.7.0.
+fixes36.4 contains a terse summary of changes made to 3.6.3 in order to
+produce 3.6.4.
+ 
 
 General Fixes and Modified Features
 -----------------------------------
@@ -15,25 +15,24 @@ message "your knapsack can't accomodate any more items" when picking stuff up
 	or removing such from container was inaccurate if there was some gold
 	pending; vary the message rather than add more convoluted pickup code
 dozen-ish assorted spelling/typo fixes in messages and source comments
-
-
-Fixes to Post-3.6.3 Problems that Were Exposed Via git Repository
-------------------------------------------------------------------
+fix potential buffer overflow when parsing run-time configuration file
+wizard mode wishing for terrain would leave it unmapped if done while blind
+wizard mode terrain wish could leave hero in water (severe vision limits) or
+	in lava (trapped, sinking) which wasn't there any more
+flying hero can go down (via '>') holes or trap doors instead of escaping trap
+polymorphed hero hiding on the ceiling can now use '>' to unhide instead of
+	being told "you can't go down here"
 
 
 Platform- and/or Interface-Specific Fixes or Features
 -----------------------------------------------------
+fix compilation on platforms that split the ncurses and tinfo libraries
+Windows: allow all game files to be on a portable device via the sysconf
+	option 'portable_device_paths'
 
 
 General New Features
 --------------------
-
-
-NetHack Community Patches (or Variation) Included
--------------------------------------------------
-
-
-Code Cleanup and Reorganization
--------------------------------
+none
 
 

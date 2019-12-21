@@ -4,7 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 
 #define newseg() (struct wseg *) alloc(sizeof (struct wseg))
 #define dealloc_seg(wseg) free((genericptr_t) (wseg))
@@ -15,10 +14,10 @@ struct wseg {
     xchar wx, wy; /* the segment's position */
 };
 
-STATIC_DCL void FDECL(toss_wsegs, (struct wseg *, BOOLEAN_P));
-STATIC_DCL void FDECL(shrink_worm, (int));
-STATIC_DCL void FDECL(random_dir, (XCHAR_P, XCHAR_P, xchar *, xchar *));
-STATIC_DCL struct wseg *FDECL(create_worm_tail, (int));
+static void FDECL(toss_wsegs, (struct wseg *, BOOLEAN_P));
+static void FDECL(shrink_worm, (int));
+static void FDECL(random_dir, (XCHAR_P, XCHAR_P, xchar *, xchar *));
+static struct wseg *FDECL(create_worm_tail, (int));
 
 /*  Description of long worm implementation.
  *
@@ -137,7 +136,7 @@ int wseg_count;
  *  Get rid of all worm segments on and following the given pointer curr.
  *  The display may or may not need to be updated as we free the segments.
  */
-STATIC_OVL
+static
 void
 toss_wsegs(curr, display_update)
 register struct wseg *curr;
@@ -170,7 +169,7 @@ register boolean display_update;
  *
  *  Remove the tail segment of the worm (the starting segment of the list).
  */
-STATIC_OVL
+static
 void
 shrink_worm(wnum)
 int wnum; /* worm number */
@@ -219,9 +218,9 @@ struct monst *worm;
     seg->nseg = new_seg;    /* attach it to the end of the list */
     wheads[wnum] = new_seg; /* move the end pointer */
 
-    if (wgrowtime[wnum] <= moves) {
+    if (wgrowtime[wnum] <= g.moves) {
         if (!wgrowtime[wnum])
-            wgrowtime[wnum] = moves + rnd(5);
+            wgrowtime[wnum] = g.moves + rnd(5);
         else
             wgrowtime[wnum] += rn1(15, 3);
         worm->mhp += 3;
@@ -382,7 +381,7 @@ boolean cuttier; /* hit is by wielded blade or axe or by thrown axe */
     /* Sometimes the tail end dies. */
     if (!new_worm) {
         place_worm_seg(worm, x, y); /* place the "head" segment back */
-        if (context.mon_moving) {
+        if (g.context.mon_moving) {
             if (canspotmon(worm))
                 pline("Part of %s tail has been cut off.",
                       s_suffix(mon_nam(worm)));
@@ -416,7 +415,7 @@ boolean cuttier; /* hit is by wielded blade or axe or by thrown axe */
     /* Place the new monster at all the segment locations. */
     place_wsegs(new_worm, worm);
 
-    if (context.mon_moving)
+    if (g.context.mon_moving)
         pline("%s is cut in half.", Monnam(worm));
     else
         You("cut %s in half.", mon_nam(worm));
@@ -477,31 +476,36 @@ boolean use_detection_glyph;
  *  of segments, including the dummy.  Called from save.c.
  */
 void
-save_worm(fd, mode)
-int fd, mode;
+save_worm(nhfp)
+NHFILE *nhfp;
 {
     int i;
     int count;
     struct wseg *curr, *temp;
 
-    if (perform_bwrite(mode)) {
+    if (perform_bwrite(nhfp)) {
         for (i = 1; i < MAX_NUM_WORMS; i++) {
             for (count = 0, curr = wtails[i]; curr; curr = curr->nseg)
                 count++;
             /* Save number of segments */
-            bwrite(fd, (genericptr_t) &count, sizeof(int));
+            if (nhfp->structlevel)
+                bwrite(nhfp->fd, (genericptr_t) &count, sizeof(int));
             /* Save segment locations of the monster. */
             if (count) {
                 for (curr = wtails[i]; curr; curr = curr->nseg) {
-                    bwrite(fd, (genericptr_t) & (curr->wx), sizeof(xchar));
-                    bwrite(fd, (genericptr_t) & (curr->wy), sizeof(xchar));
+                    if (nhfp->structlevel) {
+                        bwrite(nhfp->fd, (genericptr_t) &(curr->wx), sizeof(xchar));
+                        bwrite(nhfp->fd, (genericptr_t) &(curr->wy), sizeof(xchar));
+                    }
                 }
             }
         }
-        bwrite(fd, (genericptr_t) wgrowtime, sizeof(wgrowtime));
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) wgrowtime, sizeof(wgrowtime));
+        }
     }
 
-    if (release_data(mode)) {
+    if (release_data(nhfp)) {
         /* Free the segments only.  savemonchn() will take care of the
          * monsters. */
         for (i = 1; i < MAX_NUM_WORMS; i++) {
@@ -524,23 +528,24 @@ int fd, mode;
  *  Restore the worm information from the save file.  Called from restore.c
  */
 void
-rest_worm(fd)
-int fd;
+rest_worm(nhfp)
+NHFILE *nhfp;
 {
-    int i, j, count;
+    int i, j, count = 0;
     struct wseg *curr, *temp;
 
     for (i = 1; i < MAX_NUM_WORMS; i++) {
-        mread(fd, (genericptr_t) &count, sizeof(int));
-        if (!count)
-            continue; /* none */
+        if (nhfp->structlevel)
+            mread(nhfp->fd, (genericptr_t) &count, sizeof(int));
 
         /* Get the segments. */
         for (curr = (struct wseg *) 0, j = 0; j < count; j++) {
             temp = newseg();
             temp->nseg = (struct wseg *) 0;
-            mread(fd, (genericptr_t) & (temp->wx), sizeof(xchar));
-            mread(fd, (genericptr_t) & (temp->wy), sizeof(xchar));
+            if (nhfp->structlevel) {
+                mread(nhfp->fd, (genericptr_t) &(temp->wx), sizeof(xchar));
+                mread(nhfp->fd, (genericptr_t) &(temp->wy), sizeof(xchar));
+            }
             if (curr)
                 curr->nseg = temp;
             else
@@ -549,7 +554,9 @@ int fd;
         }
         wheads[i] = curr;
     }
-    mread(fd, (genericptr_t) wgrowtime, sizeof(wgrowtime));
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) wgrowtime, sizeof(wgrowtime));
+    }
 }
 
 /*
@@ -599,7 +606,7 @@ struct monst *worm;
         if (curr->wx) {
             if (!isok(curr->wx, curr->wy))
                 panic("worm seg not isok");
-            if (level.monsters[curr->wx][curr->wy] != worm)
+            if (g.level.monsters[curr->wx][curr->wy] != worm)
                 panic("worm not at seg location");
         }
         curr = curr->nseg;
@@ -696,7 +703,7 @@ xchar x, y;
  * This function, and the loop it serves, could be eliminated by coding
  * enexto() with a search radius.
  */
-STATIC_OVL
+static
 void
 random_dir(x, y, nx, ny)
 xchar x, y;
@@ -749,7 +756,7 @@ struct monst *mtmp;
 /*  create_worm_tail()
  *  will create a worm tail chain of (num_segs + 1) and return pointer to it.
  */
-STATIC_OVL
+static
 struct wseg *
 create_worm_tail(num_segs)
 int num_segs;

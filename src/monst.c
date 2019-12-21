@@ -27,7 +27,6 @@
 #define C(color)
 #endif
 
-void NDECL(monst_init);
 /*
  *      Entry Format:   (from permonst.h)
  *
@@ -101,7 +100,7 @@ void NDECL(monst_init);
  */
 
 #ifndef SPLITMON_2
-NEARDATA struct permonst mons[] = {
+NEARDATA struct permonst mons_init[] = {
     /*
      * ants
      */
@@ -2590,7 +2589,7 @@ struct permonst _mons2[] = {
         M3_INFRAVISIBLE | M3_INFRAVISION | M3_DISPLACES, 34, HI_LORD),
     /* other demons
      */
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     MON("mail daemon", S_DEMON, LVL(56, 24, 10, 127, 0),
         (G_NOGEN | G_NOCORPSE),
         A(NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -3228,15 +3227,18 @@ struct permonst _mons2[] = {
 #endif /* !SPLITMON_1 */
 
 #ifndef SPLITMON_1
-/* dummy routine used to force linkage */
+
+struct permonst mons[SIZE(mons_init)];
+
 void
-monst_init()
+monst_globals_init()
 {
+    memcpy(mons, mons_init, sizeof(mons));
     return;
 }
 
-const struct attack sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
-const struct attack sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
+const struct attack c_sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
+const struct attack c_sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
 #endif
 
 /*monst.c*/

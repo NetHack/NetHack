@@ -3,8 +3,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <VERSION_MAJOR>3</VERSION_MAJOR>
-    <VERSION_MINOR>6</VERSION_MINOR>
-    <PATCHLEVEL>3</PATCHLEVEL>
+    <VERSION_MINOR>7</VERSION_MINOR>
+    <PATCHLEVEL>0</PATCHLEVEL>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />

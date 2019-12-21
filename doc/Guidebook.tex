@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{December 5, 2019}
+\date{December 18, 2019}
 
 \maketitle
 
@@ -4256,10 +4256,6 @@ without it) (default off, {\it OS/2, PC\/ {\rm and} ST NetHack\/} only).
 Note:  DEC Rainbows hang if this is turned on.
 Cannot be set with the `{\tt O}' command.
 %.lp
-\item[\ib{soundcard}]
-(default off, {\it PC NetHack \/} only).
-Cannot be set with the `{\tt O}' command.
-%.lp
 \item[\ib{subkeyvalue}]
 ({\it Win32 tty NetHack \/} only).
 May be used to alter the value of keystrokes that the operating system
@@ -5261,6 +5257,22 @@ The syntax is the same as WIZARDS.
 \item[\ib{MAXPLAYERS}]
 Limit the maximum number of games that can be running at the same time.
 %.lp
+\item[\ib{SAVEFORMAT}]
+A list of up to two save file formats separated by space. 
+The first format in the list will written as well as read. The second format 
+will be read only if no save file in the first format exists.
+Valid choices are ``{\tt historical}'' for binary writing of entire structs, 
+``{\tt lendian}'' for binary writing of each field in little-endian order,
+``{\tt ascii}'' for writing the save file content in ascii text.
+%.lp
+\item[\ib{BONESFORMAT}]
+A list of up to two bones file formats separated by space. 
+The first format in the list will written as well as read. The second
+format will be read only if no bones files in the first format exist.
+Valid choices are ``{\tt historical}'' for binary writing of entire structs, 
+``{\tt lendian}'' for binary writing of each field in little-endian order,
+``{\tt ascii}'' for writing the bones file content in ascii text.
+%.lp
 \item[\ib{SUPPORT}]
 A string explainign how to get local support (no default value).
 %.lp
@@ -5296,6 +5308,16 @@ Minimum number of points to get an entry in the score file.
 \item[\ib{PERS\verb+_+IS\verb+_+UID}]
 0 or 1 to use user names or numeric userids, respectively, to identify
 unique people for the score file
+%.lp
+\item[\ib{ACCESSIBILITY}]
+0 or 1 to disable or enable, respectively, the ability for players
+to set S\verb+_+pet\verb+_+override and S\verb+_+hero\verb+_+override 
+symbols in their configuration file.
+%.lp
+\item[\ib{PORTABLE\verb+_+DEVICE\verb+_+PATHS}]
+0 or 1 Windows OS only, the game will look for all of its external
+files, and write to all of its output files in one place 
+rather than at the standard locations.
 %.lp
 \item[\ib{DUMPLOGFILE}]
 A filename where the end-of-game dumplog is saved.
@@ -5752,6 +5774,11 @@ for decades, joined the {\it NetHack Development Team} in late May 2019.
 \medskip
 NetHack 3.6.3 was released on December 5, 2019 containing over 190 bug
 fixes to NetHack 3.6.2.
+
+%.pg
+\medskip
+NetHack 3.6.4 was released on December 18, 2019 containing a security fix and
+a few bug fixes.
 
 %.pg
 \medskip

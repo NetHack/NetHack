@@ -193,6 +193,10 @@ it were a patch. Does not delete the stash from the list.
 list: Lists all of your stashed code blobs.
 
 
+=======================================
+External Links
+=======================================
+http://pcottle.github.io/learnGitBranching
 
 =======================================
 Typical workflows for common activities

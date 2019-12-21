@@ -1,11 +1,11 @@
-               Instructions for Building and Installing NetHack 3.6.3
+               Instructions for Building and Installing NetHack 3.7.0
                      on a VMS (aka OpenVMS) system
                =========================================
 
 0.  Please read this entire file before trying to build or install
     NetHack, then read it again!
 
-1.  NetHack 3.6 was built and tested on OpenVMS on both the Integrity
+1.  NetHack 3.7 was built and tested on OpenVMS on both the Integrity
     and Alpha platform using the HP C V7.3 for OpenVMS compiler.  While
     not tested, older versions of DEC C will most likely work as compatibility
     with older systems is a goal of the VMS porting team.   Unfortunatly,
@@ -16,39 +16,40 @@
     structure.  You should set up a directory--referred to as "top" below
     and in some of the assorted files, but which may be a subdirectory--
     that has these subdirectories
-        [.dat]          -- data files
-        [.doc]          -- documentation files
-        [.include]      -- C header files
-        [.src]          -- primary source files
-        [.sys]          -- parent for [.sys.*]
-        [.sys   .share] -- files shared by several ports, including VMS
-        [.sys   .vms]   -- VMS-specific source and support files
-        [.util]         -- sources for essential utility programs
-        [.win]          -- parent for [.win.*]
-        [.win   .tty]   -- "window" routines for ordinary terminals
+        [.dat]           -- data files
+        [.doc]           -- documentation files
+        [.include]       -- C header files
+        [.lib   .lua535] -- Lua distribution from https://www.lua.org/
+        [.src]           -- primary source files
+        [.sys]           -- parent for [.sys.*]
+        [.sys   .share]  -- files shared by several ports, including VMS
+        [.sys   .vms]    -- VMS-specific source and support files
+        [.util]          -- sources for essential utility programs
+        [.win]           -- parent for [.win.*]
+        [.win   .tty]    -- "window" routines for ordinary terminals
                            (including terminal windows on workstations)
     The following subdirectories may be present, but are not useful for
     building NetHack on VMS and are not required:
-        [.sys   .amiga] -- AmigaDOS
-        [.sys   .atari] -- Atari TOS
-        [.sys   .be]    -- BeBox BeOS
-        [.sys   .mac]   -- Macintosh
-        [.sys   .msdos] -- MSDOS for IBM PCs and compatibles
-        [.sys   .os2]   -- OS/2
+        [.sys   .amiga]  -- AmigaDOS
+        [.sys   .atari]  -- Atari TOS
+        [.sys   .be]     -- BeBox BeOS
+        [.sys   .mac]    -- Macintosh
+        [.sys   .msdos]  -- MSDOS for IBM PCs and compatibles
+        [.sys   .os2]    -- OS/2
         [.sys   .share   .sounds] -- AIFF format audio files
-        [.sys   .unix]  -- guess :-)
+        [.sys   .unix]   -- guess :-)
         [.sys   .unit    .hints] -- configuration data for setup.sh
-        [.sys   .wince] -- Windows CE
+        [.sys   .wince]  -- Windows CE
         [.sys   .wince   .ceinc] -- more WinCE
         [.sys   .wince   .ceinc   .sys] -- ditto
-        [.sys   .winnt] -- Windows NT
-        [.win   .gem]   -- window routines for Atari/GEM
-        [.win   .gnome] -- window routines for Unix/GNOME
-        [.win   .Qt]    -- window routines for Qt
-        [.win   .share] -- "tile" graphic support
-        [.win   .win32] -- Windows NT and Windows CE
-        [.win   .X11]   -- window routines for X-Windows; requires X11R4
-                           or later and MIT's Athena Widget set
+        [.sys   .winnt]  -- Windows NT
+        [.win   .gem]    -- window routines for Atari/GEM
+        [.win   .gnome]  -- window routines for Unix/GNOME
+        [.win   .Qt]     -- window routines for Qt
+        [.win   .share]  -- "tile" graphic support
+        [.win   .win32]  -- Windows NT and Windows CE
+        [.win   .X11]    -- window routines for X-Windows; requires X11R4
+                            or later and MIT's Athena Widget set
     You must arrange things in this structure or the supplied procedures
     and instructions in this file will not work properly.  Several DCL
     command files are present in the [.sys.vms] subdirectory and will not
@@ -145,10 +146,9 @@ Notes:
 
 0.  Version 3.5.x was never publicly released.
 
-1.  Save files and bones files from 3.4.x and earlier versions
-    will not work with 3.6.3, but save files and bones file from 3.6.0,
-    through 3.6.2 should work. The scoreboard file (RECORD) from 3.6.x
-    or 3.4.x or 3.3.x will work.
+1.  Save files and bones files from 3.6.x and earlier versions will not
+    work with 3.7.0. The scoreboard file (RECORD) from 3.6.x or 3.4.x or
+    3.3.x will work.
 
 2.  To specify user-preference options in your environment, define the
     logical name NETHACKOPTIONS to have the value of a quoted string
@@ -507,6 +507,6 @@ Notes:
 minimally updated 9-NOV-2015...
 and again 5-MAY-2019...
 
-# NetHack 3.6  Install.vms       $NHDT-Date: 1575245132 2019/12/02 00:05:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $
+# NetHack 3.7  Install.vms       $NHDT-Date: 1575245132 2019/12/02 00:05:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $
 # Copyright (c) 2003 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.

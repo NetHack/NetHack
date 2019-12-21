@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1575245076 2019/12/02 00:04:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.255 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1576638500 2019/12/18 03:08:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.257 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,22 +10,21 @@
 #define SCHAR_LIM 127
 #define NUMOBUF 12
 
-STATIC_DCL char *FDECL(strprepend, (char *, const char *));
-STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
-STATIC_DCL short FDECL(rnd_otyp_by_namedesc, (const char *, CHAR_P, int));
-STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
-STATIC_DCL char *NDECL(nextobuf);
-STATIC_DCL void FDECL(releaseobuf, (char *));
-STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
-STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
-STATIC_DCL char *FDECL(doname_base, (struct obj *obj, unsigned));
-STATIC_DCL char *FDECL(just_an, (char *str, const char *));
-STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
+static char *FDECL(strprepend, (char *, const char *));
+static short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
+static short FDECL(rnd_otyp_by_namedesc, (const char *, CHAR_P, int));
+static boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
+static char *NDECL(nextobuf);
+static void FDECL(releaseobuf, (char *));
+static char *FDECL(minimal_xname, (struct obj *));
+static void FDECL(add_erosion_words, (struct obj *, char *));
+static char *FDECL(doname_base, (struct obj *obj, unsigned));
+static boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
                                            const char *const *));
-STATIC_DCL char *FDECL(singplur_compound, (char *));
-STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
-STATIC_DCL boolean FDECL(badman, (const char *, BOOLEAN_P));
-STATIC_DCL char *FDECL(globwt, (struct obj *, char *, boolean *));
+static char *FDECL(singplur_compound, (char *));
+static char *FDECL(xname_flags, (struct obj *, unsigned));
+static boolean FDECL(badman, (const char *, BOOLEAN_P));
+static char *FDECL(globwt, (struct obj *, char *, boolean *));
 
 struct Jitem {
     int item;
@@ -45,7 +44,7 @@ struct Jitem {
              && typ != SAPPHIRE && typ != BLACK_OPAL && typ != EMERALD \
              && typ != OPAL)))
 
-STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
+static struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { BROADSWORD, "ninja-to" },
                                              { FLAIL, "nunchaku" },
                                              { GLAIVE, "naginata" },
@@ -59,9 +58,9 @@ STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { POT_BOOZE, "sake" },
                                              { 0, "" } };
 
-STATIC_DCL const char *FDECL(Japanese_item_name, (int i));
+static const char *FDECL(Japanese_item_name, (int i));
 
-STATIC_OVL char *
+static char *
 strprepend(s, pref)
 register char *s;
 register const char *pref;
@@ -81,7 +80,7 @@ register const char *pref;
 static char NEARDATA obufs[NUMOBUF][BUFSZ];
 static int obufidx = 0;
 
-STATIC_OVL char *
+static char *
 nextobuf()
 {
     obufidx = (obufidx + 1) % NUMOBUF;
@@ -89,7 +88,7 @@ nextobuf()
 }
 
 /* put the most recently allocated buffer back if possible */
-STATIC_OVL void
+static void
 releaseobuf(bufp)
 char *bufp;
 {
@@ -227,17 +226,12 @@ struct obj *obj;
 {
     if (!obj->oartifact || !has_oname(obj))
         return FALSE;
-    if (!program_state.gameover && !iflags.override_ID) {
+    if (!g.program_state.gameover && !iflags.override_ID) {
         if (not_fully_identified(obj))
             return FALSE;
     }
     return TRUE;
 }
-
-/* used by distant_name() to pass extra information to xname_flags();
-   it would be much cleaner if this were a parameter, but that would
-   require all of the xname() and doname() calls to be modified */
-static int distantname = 0;
 
 /* Give the name of an object seen at a distance.  Unlike xname/doname,
  * we don't want to set dknown if it's not set already.
@@ -257,9 +251,9 @@ char *FDECL((*func), (OBJ_P));
      * object is within X-ray radius and only treat it as distant when
      * beyond that radius.  Logic is iffy but result might be interesting.
      */
-    ++distantname;
+    ++g.distantname;
     str = (*func)(obj);
-    --distantname;
+    --g.distantname;
     return str;
 }
 
@@ -270,12 +264,12 @@ fruitname(juice)
 boolean juice; /* whether or not to append " juice" to the name */
 {
     char *buf = nextobuf();
-    const char *fruit_nam = strstri(pl_fruit, " of ");
+    const char *fruit_nam = strstri(g.pl_fruit, " of ");
 
     if (fruit_nam)
         fruit_nam += 4; /* skip past " of " */
     else
-        fruit_nam = pl_fruit; /* use it as is */
+        fruit_nam = g.pl_fruit; /* use it as is */
 
     Sprintf(buf, "%s%s", makesingular(fruit_nam), juice ? " juice" : "");
     return buf;
@@ -288,7 +282,7 @@ int indx;
 {
     struct fruit *f;
 
-    for (f = ffruit; f; f = f->nextf)
+    for (f = g.ffruit; f; f = f->nextf)
         if (f->fid == indx)
             break;
     return f;
@@ -311,7 +305,7 @@ int *highest_fid; /* optional output; only valid if 'fname' isn't found */
     if (highest_fid)
         *highest_fid = 0;
     /* first try for an exact match */
-    for (f = ffruit; f; f = f->nextf)
+    for (f = g.ffruit; f; f = f->nextf)
         if (!strcmp(f->fname, fname))
             return f;
         else if (highest_fid && f->fid > *highest_fid)
@@ -322,7 +316,7 @@ int *highest_fid; /* optional output; only valid if 'fname' isn't found */
        matches, not the first */
     if (!exact) {
         tentativef = 0;
-        for (f = ffruit; f; f = f->nextf) {
+        for (f = g.ffruit; f; f = f->nextf) {
             k = strlen(f->fname);
             if (!strncmp(f->fname, fname, k)
                 && (!fname[k] || fname[k] == ' ')
@@ -335,7 +329,7 @@ int *highest_fid; /* optional output; only valid if 'fname' isn't found */
        for exact match, that's trivial, but for prefix, it's hard */
     if (!f) {
         altfname = makesingular(fname);
-        for (f = ffruit; f; f = f->nextf) {
+        for (f = g.ffruit; f; f = f->nextf) {
             if (!strcmp(f->fname, altfname))
                 break;
         }
@@ -346,7 +340,7 @@ int *highest_fid; /* optional output; only valid if 'fname' isn't found */
         unsigned fname_k = strlen(fname); /* length of assumed plural fname */
 
         tentativef = 0;
-        for (f = ffruit; f; f = f->nextf) {
+        for (f = g.ffruit; f; f = f->nextf) {
             k = strlen(f->fname);
             /* reload fnamebuf[] each iteration in case it gets modified;
                there's no need to recalculate fname_k */
@@ -384,7 +378,7 @@ boolean forward;
 
     for (i = 0; i < k; ++i)
         allfr[i] = (struct fruit *) 0;
-    for (f = ffruit; f; f = f->nextf) {
+    for (f = g.ffruit; f; f = f->nextf) {
         /* without sanity checking, this would reduce to 'allfr[f->fid]=f' */
         j = f->fid;
         if (j < 1 || j >= k) {
@@ -396,7 +390,7 @@ boolean forward;
         }
         allfr[j] = f;
     }
-    ffruit = 0; /* reset linked list; we're rebuilding it from scratch */
+    g.ffruit = 0; /* reset linked list; we're rebuilding it from scratch */
     /* slot [0] will always be empty; must start 'i' at 1 to avoid
        [k - i] being out of bounds during first iteration */
     for (i = 1; i < k; ++i) {
@@ -404,8 +398,8 @@ boolean forward;
            for backward ordering, go from low to high */
         j = forward ? (k - i) : i;
         if (allfr[j]) {
-            allfr[j]->nextf = ffruit;
-            ffruit = allfr[j];
+            allfr[j]->nextf = g.ffruit;
+            g.ffruit = allfr[j];
         }
     }
 }
@@ -417,7 +411,7 @@ struct obj *obj;
     return xname_flags(obj, CXN_NORMAL);
 }
 
-STATIC_OVL char *
+static char *
 xname_flags(obj, cxn_flags)
 register struct obj *obj;
 unsigned cxn_flags; /* bitmask of CXN_xxx values */
@@ -449,7 +443,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
      */
     if (!nn && ocl->oc_uses_known && ocl->oc_unique)
         obj->known = 0;
-    if (!Blind && !distantname)
+    if (!Blind && !g.distantname)
         obj->dknown = 1;
     if (Role_if(PM_PRIEST))
         obj->bknown = 1; /* actively avoid set_bknown();
@@ -723,7 +717,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     if (pluralize)
         Strcpy(buf, makeplural(buf));
 
-    if (obj->otyp == T_SHIRT && program_state.gameover) {
+    if (obj->otyp == T_SHIRT && g.program_state.gameover) {
         char tmpbuf[BUFSZ];
 
         Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
@@ -746,7 +740,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
      brown potion               -- if oc_name_known not set
      potion of object detection -- if discovered
  */
-STATIC_OVL char *
+static char *
 minimal_xname(obj)
 struct obj *obj;
 {
@@ -765,7 +759,7 @@ struct obj *obj;
 
     /* caveat: this makes a lot of assumptions about which fields
        are required in order for xname() to yield a sensible result */
-    bareobj = zeroobj;
+    bareobj = cg.zeroobj;
     bareobj.otyp = otyp;
     bareobj.oclass = obj->oclass;
     bareobj.dknown = obj->dknown;
@@ -798,10 +792,10 @@ struct obj *obj;
     char tmpbuf[BUFSZ];
     char *onm = xname(obj);
 
-    if (m_shot.n > 1 && m_shot.o == obj->otyp) {
+    if (g.m_shot.n > 1 && g.m_shot.o == obj->otyp) {
         /* "the Nth arrow"; value will eventually be passed to an() or
            The(), both of which correctly handle this "the " prefix */
-        Sprintf(tmpbuf, "the %d%s ", m_shot.i, ordin(m_shot.i));
+        Sprintf(tmpbuf, "the %d%s ", g.m_shot.i, ordin(g.m_shot.i));
         onm = strprepend(onm, tmpbuf);
     }
     return onm;
@@ -847,7 +841,7 @@ struct permonst *ptr;
     return uniq;
 }
 
-STATIC_OVL void
+static void
 add_erosion_words(obj, prefix)
 struct obj *obj;
 char *prefix;
@@ -925,7 +919,7 @@ struct obj *obj;
 #define DONAME_WITH_PRICE 1
 #define DONAME_VAGUE_QUAN 2
 
-STATIC_OVL char *
+static char *
 doname_base(obj, doname_flags)
 struct obj *obj;
 unsigned doname_flags;
@@ -1019,7 +1013,7 @@ unsigned doname_flags;
                  || ((!known || !objects[obj->otyp].oc_charged
                       || obj->oclass == ARMOR_CLASS
                       || obj->oclass == RING_CLASS)
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
                      && obj->otyp != SCR_MAIL
 #endif
                      && obj->otyp != FAKE_AMULET_OF_YENDOR
@@ -1165,7 +1159,7 @@ unsigned doname_flags;
                 Strcat(prefix, "stale ");
 #endif
             if (omndx >= LOW_PM
-                && (known || (mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
+                && (known || (g.mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
                 Strcat(prefix, mons[omndx].mname);
                 Strcat(prefix, " ");
                 if (obj->spe)
@@ -1183,7 +1177,7 @@ unsigned doname_flags;
         break;
     }
 
-    if ((obj->owornmask & W_WEP) && !mrg_to_wielded) {
+    if ((obj->owornmask & W_WEP) && !g.mrg_to_wielded) {
         if (obj->quan != 1L) {
             Strcat(bp, " (wielded)");
         } else {
@@ -1196,10 +1190,10 @@ unsigned doname_flags;
             Sprintf(eos(bp), " (%sweapon in %s)",
                     (obj->otyp == AKLYS) ? "tethered " : "", hand_s);
 
-            if (warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
+            if (g.warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
                 if (!Blind) /* we know bp[] ends with ')'; overwrite that */
                     Sprintf(eos(bp) - 1, ", %s %s)",
-                            glow_verb(warn_obj_cnt, TRUE),
+                            glow_verb(g.warn_obj_cnt, TRUE),
                             glow_color(obj->oartifact));
             }
         }
@@ -1244,7 +1238,7 @@ unsigned doname_flags;
        bill might not be available yet while restore is in progress
        (objects won't normally be formatted during that time, but if
        'perm_invent' is enabled then they might be) */
-    if (iflags.suppress_price || restoring) {
+    if (iflags.suppress_price || g.restoring) {
         ; /* don't attempt to obtain any stop pricing, even if 'with_price' */
     } else if (is_unpaid(obj)) { /* in inventory or in container in invent */
         long quotedprice = unpaid_cost(obj, TRUE);
@@ -1332,7 +1326,7 @@ struct obj *otmp;
         return FALSE; /* always fully ID'd */
     /* check fundamental ID hallmarks first */
     if (!otmp->known || !otmp->dknown
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
         || (!otmp->bknown && otmp->otyp != SCR_MAIL)
 #else
         || !otmp->bknown
@@ -1646,7 +1640,7 @@ char *FDECL((*func), (OBJ_P));
 }
 
 /* pick "", "a ", or "an " as article for 'str'; used by an() and doname() */
-STATIC_OVL char *
+char *
 just_an(outbuf, str)
 char *outbuf;
 const char *str;
@@ -2138,7 +2132,7 @@ struct sing_plur {
 /* word pairs that don't fit into formula-based transformations;
    also some suffices which have very few--often one--matches or
    which aren't systematically reversible (knives, staves) */
-static struct sing_plur one_off[] = {
+static const struct sing_plur one_off[] = {
     { "child",
       "children" },      /* (for wise guys who give their food funny names) */
     { "cubus", "cubi" }, /* in-/suc-cubus */
@@ -2181,7 +2175,7 @@ static const char *const as_is[] = {
 };
 
 /* singularize/pluralize decisions common to both makesingular & makeplural */
-STATIC_OVL boolean
+static boolean
 singplur_lookup(basestr, endstring, to_plural, alt_as_is)
 char *basestr, *endstring;    /* base string, pointer to eos(string) */
 boolean to_plural;            /* true => makeplural, false => makesingular */
@@ -2256,7 +2250,7 @@ const char *const *alt_as_is; /* another set like as_is[] */
 }
 
 /* searches for common compounds, ex. lump of royal jelly */
-STATIC_OVL char *
+static char *
 singplur_compound(str)
 char *str;
 {
@@ -2316,7 +2310,7 @@ const char *oldstr;
     register char *spot;
     char lo_c, *str = nextobuf();
     const char *excess = (char *) 0;
-    int len;
+    int len, i;
 
     if (oldstr)
         while (*oldstr == ' ')
@@ -2326,6 +2320,26 @@ const char *oldstr;
         Strcpy(str, "s");
         return str;
     }
+    /* makeplural() is sometimes used on monsters rather than objects
+       and sometimes pronouns are used for monsters, so check those;
+       unfortunately, "her" (which matches genders[1].him and [1].his)
+       and "it" (which matches genders[2].he and [2].him) are ambiguous;
+       we'll live with that; caller can fix things up if necessary */
+    *str = '\0';
+    for (i = 0; i <= 2; ++i) {
+        if (!strcmpi(genders[i].he, oldstr))
+            Strcpy(str, genders[3].he); /* "they" */
+        else if (!strcmpi(genders[i].him, oldstr))
+            Strcpy(str, genders[3].him); /* "them" */
+        else if (!strcmpi(genders[i].his, oldstr))
+            Strcpy(str, genders[3].his); /* "their" */
+        if (*str) {
+            if (oldstr[0] == highc(oldstr[0]))
+                str[0] = highc(str[0]);
+            return str;
+        }
+    }
+
     Strcpy(str, oldstr);
 
     /*
@@ -2504,6 +2518,20 @@ const char *oldstr;
         str[0] = '\0';
         return str;
     }
+    /* makeplural() of pronouns isn't reversible but at least we can
+       force a singular value */
+    *str = '\0';
+    if (!strcmpi(genders[3].he, oldstr)) /* "they" */
+        Strcpy(str, genders[2].he); /* "it" */
+    else if (!strcmpi(genders[3].him, oldstr)) /* "them" */
+        Strcpy(str, genders[2].him); /* also "it" */
+    else if (!strcmpi(genders[3].his, oldstr)) /* "their" */
+        Strcpy(str, genders[2].his); /* "its" */
+    if (*str) {
+        if (oldstr[0] == highc(oldstr[0]))
+            str[0] = highc(str[0]);
+        return str;
+    }
 
     bp = strcpy(str, oldstr);
 
@@ -2603,7 +2631,7 @@ const char *oldstr;
     return bp;
 }
 
-STATIC_OVL boolean
+static boolean
 badman(basestr, to_plural)
 const char *basestr;
 boolean to_plural;            /* true => makeplural, false => makesingular */
@@ -2652,7 +2680,7 @@ boolean to_plural;            /* true => makeplural, false => makesingular */
 }
 
 /* compare user string against object name string using fuzzy matching */
-STATIC_OVL boolean
+static boolean
 wishymatch(u_str, o_str, retry_inverted)
 const char *u_str;      /* from user, so might be variant spelling */
 const char *o_str;      /* from objects[], so is in canonical form */
@@ -2751,7 +2779,7 @@ struct o_range {
 };
 
 /* wishable subranges of objects */
-STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
+static NEARDATA const struct o_range o_ranges[] = {
     { "bag", TOOL_CLASS, SACK, BAG_OF_TRICKS },
     { "lamp", TOOL_CLASS, OIL_LAMP, MAGIC_LAMP },
     { "candle", TOOL_CLASS, TALLOW_CANDLE, WAX_CANDLE },
@@ -2824,14 +2852,14 @@ static const struct alt_spellings {
     { (const char *) 0, 0 },
 };
 
-STATIC_OVL short
+static short
 rnd_otyp_by_wpnskill(skill)
 schar skill;
 {
     int i, n = 0;
     short otyp = STRANGE_OBJECT;
 
-    for (i = bases[WEAPON_CLASS];
+    for (i = g.bases[WEAPON_CLASS];
          i < NUM_OBJECTS && objects[i].oc_class == WEAPON_CLASS; i++)
         if (objects[i].oc_skill == skill) {
             n++;
@@ -2839,7 +2867,7 @@ schar skill;
         }
     if (n > 0) {
         n = rn2(n);
-        for (i = bases[WEAPON_CLASS];
+        for (i = g.bases[WEAPON_CLASS];
              i < NUM_OBJECTS && objects[i].oc_class == WEAPON_CLASS; i++)
             if (objects[i].oc_skill == skill)
                 if (--n < 0)
@@ -2848,7 +2876,7 @@ schar skill;
     return otyp;
 }
 
-STATIC_OVL short
+static short
 rnd_otyp_by_namedesc(name, oclass, xtra_prob)
 const char *name;
 char oclass;
@@ -2869,10 +2897,10 @@ int xtra_prob; /* to force 0% random generation items to also be considered */
      * probabilities are not very useful because they don't take
      * the class generation probability into account.  [If 10%
      * of spellbooks were blank and 1% of scrolls were blank,
-     * "blank" would have 10/11 chance to yield a book even though
+     * "blank" would have 10/11 chance to yield a blook even though
      * scrolls are supposed to be much more common than books.]
      */
-    for (i = oclass ? bases[(int) oclass] : STRANGE_OBJECT + 1;
+    for (i = oclass ? g.bases[(int) oclass] : STRANGE_OBJECT + 1;
          i < NUM_OBJECTS && (!oclass || objects[i].oc_class == oclass);
          ++i) {
         /* don't match extra descriptions (w/o real name) */
@@ -2909,7 +2937,7 @@ char oclass;
  * Return something wished for.  Specifying a null pointer for
  * the user request string results in a random object.  Otherwise,
  * if asking explicitly for "nothing" (or "nil") return no_wish;
- * if not an object return &zeroobj; if an error (no matching object),
+ * if not an object return &cg.zeroobj; if an error (no matching object),
  * return null.
  */
 struct obj *
@@ -2928,7 +2956,7 @@ struct obj *no_wish;
     int tmp, tinv, tvariety;
     int wetness, gsize = 0;
     struct fruit *f;
-    int ftype = context.current_fruit;
+    int ftype = g.context.current_fruit;
     char fruitbuf[BUFSZ], globbuf[BUFSZ];
     /* Fruits may not mess up the ability to wish for real objects (since
      * you can leave a fruit in a bones file and it will be added to
@@ -3378,7 +3406,7 @@ struct obj *no_wish;
         otmp = mksobj(GOLD_PIECE, FALSE, FALSE);
         otmp->quan = (long) cnt;
         otmp->owt = weight(otmp);
-        context.botl = 1;
+        g.context.botl = 1;
         return otmp;
     }
 
@@ -3404,7 +3432,6 @@ struct obj *no_wish;
         for (i = 0; i < (int) (sizeof wrpsym); i++) {
             register int j = strlen(wrp[i]);
 
-            /* check for "<class> [ of ] something" */
             if (!strncmpi(bp, wrp[i], j)) {
                 oclass = wrpsym[i];
                 if (oclass != AMULET_CLASS) {
@@ -3416,27 +3443,12 @@ struct obj *no_wish;
                     actualn = bp;
                 goto srch;
             }
-            /* check for "something <class>" */
             if (!BSTRCMPI(bp, p - j, wrp[i])) {
                 oclass = wrpsym[i];
-                /* for "foo amulet", leave the class name so that
-                   wishymatch() can do "of inversion" to try matching
-                   "amulet of foo"; other classes don't include their
-                   class name in their full object names (where
-                   "potion of healing" is just "healing", for instance) */
-                if (oclass != AMULET_CLASS) {
-                    p -= j;
-                    *p = '\0';
-                    if (p > bp && p[-1] == ' ')
-                        p[-1] = '\0';
-                } else {
-                    /* amulet without "of"; convoluted wording but better a
-                       special case that's handled than one that's missing */
-                    if (!strncmpi(bp, "versus poison ", 14)) {
-                        typ = AMULET_VERSUS_POISON;
-                        goto typfnd;
-                    }
-                }
+                p -= j;
+                *p = 0;
+                if (p > bp && p[-1] == ' ')
+                    p[-1] = 0;
                 actualn = dn = bp;
                 goto srch;
             }
@@ -3499,21 +3511,21 @@ struct obj *no_wish;
     } else if (!strcmpi(bp, "looking glass")) {
         ; /* avoid false hit on "* glass" */
     } else if (!BSTRCMPI(bp, p - 6, " glass") || !strcmpi(bp, "glass")) {
-        register char *g = bp;
+        register char *s = bp;
 
         /* treat "broken glass" as a non-existent item; since "broken" is
            also a chest/box prefix it might have been stripped off above */
-        if (broken || strstri(g, "broken"))
+        if (broken || strstri(s, "broken"))
             return (struct obj *) 0;
-        if (!strncmpi(g, "worthless ", 10))
-            g += 10;
-        if (!strncmpi(g, "piece of ", 9))
-            g += 9;
-        if (!strncmpi(g, "colored ", 8))
-            g += 8;
-        else if (!strncmpi(g, "coloured ", 9))
-            g += 9;
-        if (!strcmpi(g, "glass")) { /* choose random color */
+        if (!strncmpi(s, "worthless ", 10))
+            s += 10;
+        if (!strncmpi(s, "piece of ", 9))
+            s += 9;
+        if (!strncmpi(s, "colored ", 8))
+            s += 8;
+        else if (!strncmpi(s, "coloured ", 9))
+            s += 9;
+        if (!strcmpi(s, "glass")) { /* choose random color */
             /* 9 different kinds */
             typ = LAST_GEM + rnd(9);
             if (objects[typ].oc_class == GEM_CLASS)
@@ -3524,7 +3536,7 @@ struct obj *no_wish;
             char tbuf[BUFSZ];
 
             Strcpy(tbuf, "worthless piece of ");
-            Strcat(tbuf, g); /* assume it starts with the color */
+            Strcat(tbuf, s); /* assume it starts with the color */
             Strcpy(bp, tbuf);
         }
     }
@@ -3535,7 +3547,7 @@ struct obj *no_wish;
  srch:
     /* check real names of gems first */
     if (!oclass && actualn) {
-        for (i = bases[GEM_CLASS]; i <= LAST_GEM; i++) {
+        for (i = g.bases[GEM_CLASS]; i <= LAST_GEM; i++) {
             register const char *zn;
 
             if ((zn = OBJ_NAME(objects[i])) != 0 && !strcmpi(actualn, zn)) {
@@ -3622,7 +3634,7 @@ struct obj *no_wish;
             fp += l;
         }
 
-        for (f = ffruit; f; f = f->nextf) {
+        for (f = g.ffruit; f; f = f->nextf) {
             /* match type: 0=none, 1=exact, 2=singular, 3=plural */
             int ftyp = 0;
 
@@ -3663,14 +3675,17 @@ struct obj *no_wish;
             goto typfnd;
         }
     }
-/* Let wizards wish for traps and furniture.
- * Must come after objects check so wizards can still wish for
- * trap objects like beartraps.
- * Disallow such topology tweaks for WIZKIT startup wishes.
- */
+
+    /*
+     * Let wizards wish for traps and furniture.
+     * Must come after objects check so wizards can still wish for
+     * trap objects like beartraps.
+     * Disallow such topology tweaks for WIZKIT startup wishes.
+     */
  wiztrap:
-    if (wizard && !program_state.wizkit_wishing) {
+    if (wizard && !g.program_state.wizkit_wishing) {
         struct rm *lev;
+        boolean madeterrain = FALSE;
         int trap, x = u.ux, y = u.uy;
 
         for (trap = NO_TRAP + 1; trap < TRAPNUM; trap++) {
@@ -3690,55 +3705,49 @@ struct obj *no_wish;
                       (trap != MAGIC_PORTAL) ? "" : " to nowhere");
             } else
                 pline("Creation of %s failed.", an(tname));
-            return (struct obj *) &zeroobj;
+            return (struct obj *) &cg.zeroobj;
         }
 
-        /* furniture and terrain */
+        /* furniture and terrain (use at your own risk; can clobber stairs
+           or place furniture on existing traps which shouldn't be allowed) */
         lev = &levl[x][y];
         p = eos(bp);
         if (!BSTRCMPI(bp, p - 8, "fountain")) {
             lev->typ = FOUNTAIN;
-            level.flags.nfountains++;
+            g.level.flags.nfountains++;
             if (!strncmpi(bp, "magic ", 6))
                 lev->blessedftn = 1;
             pline("A %sfountain.", lev->blessedftn ? "magic " : "");
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-        if (!BSTRCMPI(bp, p - 6, "throne")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 6, "throne")) {
             lev->typ = THRONE;
             pline("A throne.");
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-        if (!BSTRCMPI(bp, p - 4, "sink")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 4, "sink")) {
             lev->typ = SINK;
-            level.flags.nsinks++;
+            g.level.flags.nsinks++;
             pline("A sink.");
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
+            madeterrain = TRUE;
+
         /* ("water" matches "potion of water" rather than terrain) */
-        if (!BSTRCMPI(bp, p - 4, "pool") || !BSTRCMPI(bp, p - 4, "moat")) {
+        } else if (!BSTRCMPI(bp, p - 4, "pool")
+                   || !BSTRCMPI(bp, p - 4, "moat")) {
             lev->typ = !BSTRCMPI(bp, p - 4, "pool") ? POOL : MOAT;
             del_engr_at(x, y);
             pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
             /* Must manually make kelp! */
-            water_damage_chain(level.objects[x][y], TRUE);
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-        if (!BSTRCMPI(bp, p - 4, "lava")) { /* also matches "molten lava" */
+            water_damage_chain(g.level.objects[x][y], TRUE);
+            madeterrain = TRUE;
+
+        /* also matches "molten lava" */
+        } else if (!BSTRCMPI(bp, p - 4, "lava")) {
             lev->typ = LAVAPOOL;
             del_engr_at(x, y);
             pline("A pool of molten lava.");
             if (!(Levitation || Flying))
-                (void) lava_effects();
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-
-        if (!BSTRCMPI(bp, p - 5, "altar")) {
+                pooleffects(FALSE);
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 5, "altar")) {
             aligntyp al;
 
             lev->typ = ALTAR;
@@ -3751,37 +3760,43 @@ struct obj *no_wish;
             else if (!strncmpi(bp, "unaligned ", 10))
                 al = A_NONE;
             else /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
-                al = (!rn2(6)) ? A_NONE : rn2((int) A_LAWFUL + 2) - 1;
+                al = !rn2(6) ? A_NONE : (rn2((int) A_LAWFUL + 2) - 1);
             lev->altarmask = Align2amask(al);
             pline("%s altar.", An(align_str(al)));
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-
-        if (!BSTRCMPI(bp, p - 5, "grave")
-            || !BSTRCMPI(bp, p - 9, "headstone")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 5, "grave")
+                   || !BSTRCMPI(bp, p - 9, "headstone")) {
             make_grave(x, y, (char *) 0);
             pline("%s.", IS_GRAVE(lev->typ) ? "A grave"
                                             : "Can't place a grave here");
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
-        }
-
-        if (!BSTRCMPI(bp, p - 4, "tree")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 4, "tree")) {
             lev->typ = TREE;
             pline("A tree.");
-            newsym(x, y);
             block_point(x, y);
-            return (struct obj *) &zeroobj;
-        }
-
-        if (!BSTRCMPI(bp, p - 4, "bars")) {
+            madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 4, "bars")) {
             lev->typ = IRONBARS;
             pline("Iron bars.");
-            newsym(x, y);
-            return (struct obj *) &zeroobj;
+            madeterrain = TRUE;
         }
-    }
+
+        if (madeterrain) {
+            feel_newsym(x, y); /* map the spot where the wish occurred */
+            /* hero started at <x,y> but might not be there anymore (create
+               lava, decline to die, and get teleported away to safety) */
+            if (u.uinwater && !is_pool(u.ux, u.uy)) {
+                u.uinwater = 0; /* leave the water */
+                docrt();
+                g.vision_full_recalc = 1;
+            } else if (u.utrap && u.utraptype == TT_LAVA
+                       && !is_lava(u.ux, u.uy)) {
+                reset_utrap(FALSE);
+            }
+            /* cast 'const' away; caller won't modify this */
+            return (struct obj *) &cg.zeroobj;
+        }
+    } /* end of wizard mode traps and terrain */
 
     if (!oclass && !typ) {
         if (!strncmpi(bp, "polearm", 7)) {
@@ -3903,7 +3918,7 @@ struct obj *no_wish;
     case STATUE:
         /* otmp->cobj already done in mksobj() */
         break;
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     case SCR_MAIL:
         /* 0: delivered in-game via external event (or randomly for fake mail);
            1: from bones or wishing; 2: written with marker */
@@ -3931,14 +3946,14 @@ struct obj *no_wish;
             if (dead_species(mntmp, FALSE)) {
                 otmp->corpsenm = NON_PM; /* it's empty */
             } else if ((!(mons[mntmp].geno & G_UNIQ) || wizard)
-                       && !(mvitals[mntmp].mvflags & G_NOCORPSE)
+                       && !(g.mvitals[mntmp].mvflags & G_NOCORPSE)
                        && mons[mntmp].cnutrit != 0) {
                 otmp->corpsenm = mntmp;
             }
             break;
         case CORPSE:
             if ((!(mons[mntmp].geno & G_UNIQ) || wizard)
-                && !(mvitals[mntmp].mvflags & G_NOCORPSE)) {
+                && !(g.mvitals[mntmp].mvflags & G_NOCORPSE)) {
                 if (mons[mntmp].msound == MS_GUARDIAN)
                     mntmp = genus(mntmp, 1);
                 set_corpsenm(otmp, mntmp);
@@ -3951,7 +3966,7 @@ struct obj *no_wish;
             break;
         case FIGURINE:
             if (!(mons[mntmp].geno & G_UNIQ) && !is_human(&mons[mntmp])
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
                 && mntmp != PM_MAIL_DAEMON
 #endif
                 )
@@ -4088,7 +4103,7 @@ struct obj *no_wish;
          || (otmp->oartifact && rn2(nartifact_exist()) > 1)) && !wizard) {
         artifact_exists(otmp, safe_oname(otmp), FALSE);
         obfree(otmp, (struct obj *) 0);
-        otmp = (struct obj *) &zeroobj;
+        otmp = (struct obj *) &cg.zeroobj;
         pline("For a moment, you feel %s in your %s, but it disappears!",
               something, makeplural(body_part(HAND)));
         return otmp;
@@ -4132,7 +4147,7 @@ int first, last;
     return 0;
 }
 
-STATIC_OVL const char *
+static const char *
 Japanese_item_name(i)
 int i;
 {
@@ -4229,6 +4244,65 @@ struct obj *gloves;
     return "gloves";
 }
 
+/* boots vs shoes; depends upon discovery state */
+const char *
+boots_simple_name(boots)
+struct obj *boots;
+{
+    static const char shoes[] = "shoes";
+
+    if (boots && boots->dknown) {
+        int otyp = boots->otyp;
+        struct objclass *ocl = &objects[otyp];
+        const char *actualn = OBJ_NAME(*ocl),
+                   *descrpn = OBJ_DESCR(*ocl);
+
+        if (strstri(descrpn, shoes)
+            || (objects[otyp].oc_name_known && strstri(actualn, shoes)))
+            return shoes;
+    }
+    return "boots";
+}
+
+/* simplified shield for messages */
+const char *
+shield_simple_name(shield)
+struct obj *shield;
+{
+    if (shield) {
+        /* xname() describes unknown (unseen) reflection as smooth */
+        if (shield->otyp == SHIELD_OF_REFLECTION)
+            return shield->dknown ? "silver shield" : "smooth shield";
+        /*
+         * We might distinguish between wooden vs metallic or
+         * light vs heavy to give small benefit to spell casters.
+         * Fighter types probably care more about the former for
+         * vulnerability to fire or rust.
+         *
+         * We could do that both ways: light wooden shield, light
+         * metallic shield (there aren't any), heavy wooden shield,
+         * and heavy metallic shield but that's getting away from
+         * "simple name" which is intended to be shorter as well
+         * as less detailed than xname().
+         */
+#if 0
+        /* spellcasting uses a division like this */
+        return (weight(shield) > (int) objects[SMALL_SHIELD].oc_weight)
+               ? "heavy shield"
+               : "light shield";
+#endif
+    }
+    return "shield";
+}
+
+/* for completness */
+const char *
+shirt_simple_name(shirt)
+struct obj *shirt UNUSED;
+{
+    return "shirt";
+}
+
 const char *
 mimic_obj_name(mtmp)
 struct monst *mtmp;
@@ -4322,7 +4396,7 @@ const char *lastR;
     return qbuf;
 }
 
-STATIC_OVL char *
+static char *
 globwt(otmp, buf, weightformatted_p)
 struct obj *otmp;
 char *buf;

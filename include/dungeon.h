@@ -242,6 +242,13 @@ typedef struct mapseen {
            questing is for quest home (level 1) */
         Bitfield(quest_summons, 1); /* heard summons from leader */
         Bitfield(questing, 1); /* quest leader has unlocked quest stairs */
+        /* "gateway to sanctum" */
+        Bitfield(vibrating_square, 1); /* found vibrating square 'trap';
+                                        * flag cleared once the msanctum
+                                        * annotation has been added (on
+                                        * the next dungeon level; temple
+                                        * entered or high altar mapped) */
+        Bitfield(spare1, 1); /* not used */
     } flags;
     /* custom naming */
     char *custom;
@@ -249,7 +256,7 @@ typedef struct mapseen {
     struct mapseen_rooms {
         Bitfield(seen, 1);
         Bitfield(untended, 1);         /* flag for shop without shk */
-    } msrooms[(MAXNROFROOMS + 1) * 2]; /* same size as rooms[] */
+    } msrooms[(MAXNROFROOMS + 1) * 2]; /* same size as g.rooms[] */
     /* dead heroes; might not have graves or ghosts */
     struct cemetery *final_resting_place; /* same as level.bonesinfo */
 } mapseen;

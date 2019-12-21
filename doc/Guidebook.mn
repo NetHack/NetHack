@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.334 $ $NHDT-Date: 1575245028 2019/12/02 00:03:48 $
+.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.337 $ $NHDT-Date: 1576431522 2019/12/15 17:38:42 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -21,10 +21,10 @@
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
-.ds vr "NetHack 3.6
+.ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 5, 2019
+.ds f2 "December 18, 2019
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -45,6 +45,8 @@ A Guide to the Mazes of Menace
 .au
 Original version - Eric S. Raymond
 (Edited and expanded for 3.6 by Mike Stephenson and others)
+.sp 1
+\*(f2
 .hn 1
 Introduction
 .pg
@@ -3824,9 +3826,6 @@ bulletproof input (MS-DOS sometimes treats \(oq\(haP\(cq as a printer toggle
 without it) (default off, OS/2, PC, and ST NetHack only).
 Note:  DEC Rainbows hang if this is turned on.
 Cannot be set with the \(oqO\(cq command.
-.lp soundcard
-(default on, PC NetHack only).
-Cannot be set with the \(oqO\(cq command.
 .lp subkeyvalue
 (Win32 tty NetHack only).
 May be used to alter the value of keystrokes that the operating system
@@ -4757,6 +4756,20 @@ The syntax is the same as WIZARDS.
 MAXPLAYERS\ =\ Limit the maximum number of games that can be running
 at the same time.
 .lp
+SAVEFORMAT\ =\ A list of up to two save file formats separated by space. 
+The first format in the list will written as well as read. The second format 
+will be read only if no save file in the first format exists.
+Valid choices are \(lqhistorical\(rq for binary writing of entire structs, 
+\(lqlendian\(rq for binary writing of each field in little-endian order,
+\(lqascii\(rq for writing the save file content in ascii text.
+.lp
+BONESFORMAT\ =\ A list of up to two bones file formats separated by space. 
+The first format in the list will written as well as read. The second format 
+will be read only if no bones files in the first format exist.
+Valid choices are \(lqhistorical\(rq for binary writing of entire structs, 
+\(lqlendian\(rq for binary writing of each field in little-endian order,
+\(lqascii\(rq for writing the bones file content in ascii text.
+.lp
 SUPPORT\ =\ A string explaining how to get local support (no default value).
 .lp
 RECOVER\ =\ A string explaining how to recover a game on this system
@@ -4786,6 +4799,13 @@ to identify unique people for the score file.
 .lp
 MAX_STATUENAME_RANK\ =\ Maximum number of score file entries to use for
 random statue names (default is 10).
+.lp
+ACCESSIBILITY\ =\ 0 or 1 to disable or enable, respectively, the ability for players 
+to set S_pet_override and S_hero_override symbols in their configuration file.
+.lp
+PORTABLE_DEVICE_PATHS\ =\ 0 or 1 Windows OS only, the game will look
+for all of its external files, and write to all of its output files in one place
+rather than at the standard locations.
 .lp
 DUMPLOGFILE\ =\ A filename where the end-of-game dumplog is saved.
 Not defining this will prevent dumplog from being created. Only available
@@ -5148,6 +5168,9 @@ participant for decades, joined the NetHack Development Team in late May 2019.
 .pg
 NetHack 3.6.3 was released on December 5, 2019 containing over 190 bug
 fixes to NetHack 3.6.2.
+.pg
+NetHack 3.6.4 was released on December 18, 2019 containing a security fix
+and a few bug fixes.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP
 at

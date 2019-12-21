@@ -9,15 +9,14 @@
 /*             - generalized for 3.1 (mike@bullns.on01.bull.ca) */
 
 #include "hack.h"
-#include "qtext.h"
 
-STATIC_DCL short FDECL(which_arti, (int));
-STATIC_DCL boolean FDECL(mon_has_arti, (struct monst *, SHORT_P));
-STATIC_DCL struct monst *FDECL(other_mon_has_arti, (struct monst *, SHORT_P));
-STATIC_DCL struct obj *FDECL(on_ground, (SHORT_P));
-STATIC_DCL boolean FDECL(you_have, (int));
-STATIC_DCL unsigned long FDECL(target_on, (int, struct monst *));
-STATIC_DCL unsigned long FDECL(strategy, (struct monst *));
+static short FDECL(which_arti, (int));
+static boolean FDECL(mon_has_arti, (struct monst *, SHORT_P));
+static struct monst *FDECL(other_mon_has_arti, (struct monst *, SHORT_P));
+static struct obj *FDECL(on_ground, (SHORT_P));
+static boolean FDECL(you_have, (int));
+static unsigned long FDECL(target_on, (int, struct monst *));
+static unsigned long FDECL(strategy, (struct monst *));
 
 /* adding more neutral creatures will tend to reduce the number of monsters
    summoned by nasty(); adding more lawful creatures will reduce the number
@@ -68,7 +67,7 @@ amulet()
     if ((((amu = uamul) != 0 && amu->otyp == AMULET_OF_YENDOR)
          || ((amu = uwep) != 0 && amu->otyp == AMULET_OF_YENDOR))
         && !rn2(15)) {
-        for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
+        for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
             if (ttmp->ttyp == MAGIC_PORTAL) {
                 int du = distu(ttmp->tx, ttmp->ty);
                 if (du <= 9)
@@ -83,7 +82,7 @@ amulet()
         }
     }
 
-    if (!context.no_of_wizards)
+    if (!g.context.no_of_wizards)
         return;
     /* find Wizard, and wake him if necessary */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -140,7 +139,7 @@ register struct monst *mtmp;
 
 #define M_Wants(mask) (mtmp->data->mflags3 & (mask))
 
-STATIC_OVL short
+static short
 which_arti(mask)
 register int mask;
 {
@@ -164,7 +163,7 @@ register int mask;
  *      since bell, book, candle, and amulet are all objects, not really
  *      artifacts right now.  [MRS]
  */
-STATIC_OVL boolean
+static boolean
 mon_has_arti(mtmp, otyp)
 register struct monst *mtmp;
 register short otyp;
@@ -181,7 +180,7 @@ register short otyp;
     return 0;
 }
 
-STATIC_OVL struct monst *
+static struct monst *
 other_mon_has_arti(mtmp, otyp)
 register struct monst *mtmp;
 register short otyp;
@@ -197,7 +196,7 @@ register short otyp;
     return (struct monst *) 0;
 }
 
-STATIC_OVL struct obj *
+static struct obj *
 on_ground(otyp)
 register short otyp;
 {
@@ -212,7 +211,7 @@ register short otyp;
     return (struct obj *) 0;
 }
 
-STATIC_OVL boolean
+static boolean
 you_have(mask)
 register int mask;
 {
@@ -233,7 +232,7 @@ register int mask;
     return 0;
 }
 
-STATIC_OVL unsigned long
+static unsigned long
 target_on(mask, mtmp)
 register int mask;
 register struct monst *mtmp;
@@ -261,7 +260,7 @@ register struct monst *mtmp;
     return (unsigned long) STRAT_NONE;
 }
 
-STATIC_OVL unsigned long
+static unsigned long
 strategy(mtmp)
 register struct monst *mtmp;
 {
@@ -296,7 +295,7 @@ register struct monst *mtmp;
         break;
     }
 
-    if (context.made_amulet)
+    if (g.context.made_amulet)
         if ((strat = target_on(M3_WANTSAMUL, mtmp)) != STRAT_NONE)
             return strat;
 
@@ -347,9 +346,9 @@ xchar *sy;
         }
     }
 
-    if (!x && sstairs.sx) {
-        x = sstairs.sx;
-        y = sstairs.sy;
+    if (!x && g.sstairs.sx) {
+        x = g.sstairs.sx;
+        y = g.sstairs.sy;
     }
 
     if (x && y) {
@@ -632,7 +631,7 @@ resurrect()
     long elapsed;
     const char *verb;
 
-    if (!context.no_of_wizards) {
+    if (!g.context.no_of_wizards) {
         /* make a new Wizard */
         verb = "kill";
         mtmp = makemon(&mons[PM_WIZARD_OF_YENDOR], u.ux, u.uy, MM_NOWAIT);
@@ -642,12 +641,12 @@ resurrect()
     } else {
         /* look for a migrating Wizard */
         verb = "elude";
-        mmtmp = &migrating_mons;
+        mmtmp = &g.migrating_mons;
         while ((mtmp = *mmtmp) != 0) {
             if (mtmp->iswiz
                 /* if he has the Amulet, he won't bring it to you */
                 && !mon_has_amulet(mtmp)
-                && (elapsed = monstermoves - mtmp->mlstmv) > 0L) {
+                && (elapsed = g.monstermoves - mtmp->mlstmv) > 0L) {
                 mon_catchup_elapsed_time(mtmp, elapsed);
                 if (elapsed >= LARGEST_INT)
                     elapsed = LARGEST_INT - 1;
@@ -710,7 +709,7 @@ intervene()
 void
 wizdead()
 {
-    context.no_of_wizards--;
+    g.context.no_of_wizards--;
     if (!u.uevent.udemigod) {
         u.uevent.udemigod = TRUE;
         u.udg_cnt = rn1(250, 50);
@@ -762,13 +761,14 @@ register struct monst *mtmp;
                       random_insult[rn2(SIZE(random_insult))]);
     } else if (is_lminion(mtmp)
                && !(mtmp->isminion && EMIN(mtmp)->renegade)) {
-        com_pager(rn2(QTN_ANGELIC - 1 + (Hallucination ? 1 : 0))
-                  + QT_ANGELIC);
+        com_pager("angel_cuss"); /* TODO: the Hallucination msg */
+        /*com_pager(rn2(QTN_ANGELIC - 1 + (Hallucination ? 1 : 0))
+          + QT_ANGELIC);*/
     } else {
         if (!rn2(is_minion(mtmp->data) ? 100 : 5))
             pline("%s casts aspersions on your ancestry.", Monnam(mtmp));
         else
-            com_pager(rn2(QTN_DEMONIC) + QT_DEMONIC);
+            com_pager("demon_cuss");
     }
 }
 

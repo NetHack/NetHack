@@ -220,7 +220,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
        re-activate them now that input is being requested */
     curses_got_input();
 
-    if (invent || (moves > 1)) {
+    if (g.invent || (g.moves > 1)) {
         curses_get_window_size(MAP_WIN, &map_height, &map_width);
     } else {
         map_height = term_rows;
@@ -579,7 +579,7 @@ curs_new_menu_item(winid wid, const char *str)
     new_item = (nhmenu_item *) alloc((unsigned) sizeof (nhmenu_item));
     new_item->wid = wid;
     new_item->glyph = NO_GLYPH;
-    new_item->identifier = zeroany;
+    new_item->identifier = cg.zeroany;
     new_item->accelerator = '\0';
     new_item->group_accel = '\0';
     new_item->attr = 0;
@@ -759,7 +759,7 @@ curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
     menu_determine_pages(current_menu);
 
     /* Display pre and post-game menus centered */
-    if ((moves <= 1 && !invent) || program_state.gameover) {
+    if ((g.moves <= 1 && !g.invent) || g.program_state.gameover) {
         win = curses_create_window(current_menu->width,
                                    current_menu->height, CENTER);
     } else { /* Display during-game menus on the right out of the way */
@@ -1003,7 +1003,7 @@ menu_win_size(nhmenu *menu)
     int maxheaderwidth = menu->prompt ? (int) strlen(menu->prompt) : 0;
     nhmenu_item *menu_item_ptr;
 
-    if (program_state.gameover) {
+    if (g.program_state.gameover) {
         /* for final inventory disclosure, use full width */
         maxwidth = term_cols - 2; /* +2: borders assumed */
     } else {

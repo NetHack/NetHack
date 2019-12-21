@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1552639487 2019/03/15 08:44:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1574636502 2019/11/24 23:01:42 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -22,8 +22,10 @@
         char *          trimspaces      (char *)
         char *          strip_newline   (char *)
         char *          stripchars      (char *, const char *, const char *)
+        char *          stripdigits     (char *)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
+        int             str_lines_maxlen (const char *)
         char *          strkitten       (char *,char)
         void            copynchars      (char *,const char *,int)
         char            chrcasecpy      (int,int)
@@ -69,6 +71,7 @@
         void            strbuf_reserve  (strbuf *, int)
         void            strbuf_empty    (strbuf *)
         void            strbuf_nl_to_crlf (strbuf_t *)
+        char *          nonconst        (const char *, char *)
 =*/
 #ifdef LINT
 #define Static /* pacify lint */
@@ -222,6 +225,31 @@ const char *str, *chkstr;
     if ((int) strlen(str) >= clen)
         return (boolean) (!strncmp(eos((char *) str) - clen, chkstr, clen));
     return FALSE;
+}
+
+/* return the max line length from buffer comprising of newline-separated strings */
+int
+str_lines_maxlen(str)
+const char *str;
+{
+    const char *s1, *s2;
+    int len, max_len = 0;
+
+    s1 = str;
+    while (s1 && *s1) {
+        s2 = index(s1, '\n');
+        if (s2) {
+            len = (int) (s2 - s1);
+            s1 = s2 + 1;
+        } else {
+            len = (int) strlen(s1);
+            s1 = (char *) 0;
+        }
+        if (len > max_len)
+            max_len = len;
+    }
+
+    return max_len;
 }
 
 /* append a character to a string (in place): strcat(s, {c,'\0'}); */
@@ -466,6 +494,21 @@ const char *stuff_to_strip, *orig;
     } else
         impossible("no output buf in stripchars");
     return bp;
+}
+
+/* remove digits from string */
+char *
+stripdigits(s)
+char *s;
+{
+    char *s1, *s2;
+
+    for (s1 = s2 = s; *s1; s1++)
+        if (*s1 < '0' || *s1 > '9')
+            *s2++ = *s1;
+    *s2 = '\0';
+
+    return s;
 }
 
 /* substitute a word or phrase in a string (in place) */
@@ -849,7 +892,7 @@ boolean caseblind;
     && !defined(_DCC) && !defined(__GNUC__)
 extern struct tm *FDECL(localtime, (time_t *));
 #endif
-STATIC_DCL struct tm *NDECL(getlt);
+static struct tm *NDECL(getlt);
 
 /* Sets the seed for the random number generator */
 #ifdef USE_ISAAC64
@@ -930,7 +973,7 @@ getnow()
     return datetime;
 }
 
-STATIC_OVL struct tm *
+static struct tm *
 getlt()
 {
     time_t date = getnow();
@@ -1041,33 +1084,33 @@ char *buf;
     int k;
     time_t timeresult = (time_t) 0;
     struct tm t, *lt;
-    char *g, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
+    char *d, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
 
     if (buf && strlen(buf) == 14) {
-        g = buf;
+        d = buf;
         p = y; /* year */
         for (k = 0; k < 4; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = mo; /* month */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = md; /* day */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = h; /* hour */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = mi; /* minutes */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = s; /* seconds */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         lt = getlt();
         if (lt) {
@@ -1217,6 +1260,21 @@ strbuf_t *strbuf;
                 }
         }
     }
+}
+
+char *
+nonconst(str, buf)
+const char *str;
+char *buf;
+{
+    char *retval = emptystr;
+
+    if (str && buf)
+        if ((int) strlen(str) < BUFSZ - 1) {
+	    Strcpy(buf, str);
+            retval = buf;
+        }
+    return retval;
 }
 
 /*hacklib.c*/

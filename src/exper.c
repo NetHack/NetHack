@@ -8,7 +8,7 @@
 #include <limits.h>
 #endif
 
-STATIC_DCL int FDECL(enermod, (int));
+static int FDECL(enermod, (int));
 
 long
 newuexp(lev)
@@ -23,7 +23,7 @@ int lev;
     return (10000000L * ((long) (lev - 19)));
 }
 
-STATIC_OVL int
+static int
 enermod(en)
 int en;
 {
@@ -49,19 +49,19 @@ newpw()
     int en = 0, enrnd, enfix;
 
     if (u.ulevel == 0) {
-        en = urole.enadv.infix + urace.enadv.infix;
-        if (urole.enadv.inrnd > 0)
-            en += rnd(urole.enadv.inrnd);
-        if (urace.enadv.inrnd > 0)
-            en += rnd(urace.enadv.inrnd);
+        en = g.urole.enadv.infix + g.urace.enadv.infix;
+        if (g.urole.enadv.inrnd > 0)
+            en += rnd(g.urole.enadv.inrnd);
+        if (g.urace.enadv.inrnd > 0)
+            en += rnd(g.urace.enadv.inrnd);
     } else {
         enrnd = (int) ACURR(A_WIS) / 2;
-        if (u.ulevel < urole.xlev) {
-            enrnd += urole.enadv.lornd + urace.enadv.lornd;
-            enfix = urole.enadv.lofix + urace.enadv.lofix;
+        if (u.ulevel < g.urole.xlev) {
+            enrnd += g.urole.enadv.lornd + g.urace.enadv.lornd;
+            enfix = g.urole.enadv.lofix + g.urace.enadv.lofix;
         } else {
-            enrnd += urole.enadv.hirnd + urace.enadv.hirnd;
-            enfix = urole.enadv.hifix + urace.enadv.hifix;
+            enrnd += g.urole.enadv.hirnd + g.urace.enadv.hirnd;
+            enfix = g.urole.enadv.hifix + g.urace.enadv.hifix;
         }
         en = enermod(rn1(enrnd, enfix));
     }
@@ -128,7 +128,7 @@ register int nk;
     if (mtmp->m_lev > 8)
         tmp += 50;
 
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     /* Mail daemons put up no fight. */
     if (mtmp->data == &mons[PM_MAIL_DAEMON])
         tmp = 1;
@@ -178,19 +178,19 @@ register int exper, rexp;
     if (newexp != oldexp) {
         u.uexp = newexp;
         if (flags.showexp)
-            context.botl = TRUE;
+            g.context.botl = TRUE;
         /* even when experience points aren't being shown, experience level
            might be highlighted with a percentage highlight rule and that
            percentage depends upon experience points */
-        if (!context.botl && exp_percent_changing())
-            context.botl = TRUE;
+        if (!g.context.botl && exp_percent_changing())
+            g.context.botl = TRUE;
     }
     /* newrexp will always differ from oldrexp unless they're LONG_MAX */
     if (newrexp != oldrexp) {
         u.urexp = newrexp;
 #ifdef SCORE_ON_BOTL
         if (flags.showscore)
-            context.botl = TRUE;
+            g.context.botl = TRUE;
 #endif
     }
     if (u.urexp >= (Role_if(PM_WIZARD) ? 1000 : 2000))
@@ -208,7 +208,7 @@ const char *drainer; /* cause of death, if drain should be fatal */
        wizard mode request to reduce level; never fatal though */
     if (drainer && !strcmp(drainer, "#levelchange"))
         drainer = 0;
-    else if (resists_drli(&youmonst))
+    else if (resists_drli(&g.youmonst))
         return;
 
     if (u.ulevel > 1) {
@@ -218,9 +218,9 @@ const char *drainer; /* cause of death, if drain should be fatal */
         reset_rndmonst(NON_PM); /* new monster selection */
     } else {
         if (drainer) {
-            killer.format = KILLED_BY;
-            if (killer.name != drainer)
-                Strcpy(killer.name, drainer);
+            g.killer.format = KILLED_BY;
+            if (g.killer.name != drainer)
+                Strcpy(g.killer.name, drainer);
             done(DIED);
         }
         /* no drainer or lifesaved */
@@ -250,14 +250,14 @@ const char *drainer; /* cause of death, if drain should be fatal */
         u.uexp = newuexp(u.ulevel) - 1;
 
     if (Upolyd) {
-        num = monhp_per_lvl(&youmonst);
+        num = monhp_per_lvl(&g.youmonst);
         u.mhmax -= num;
         u.mh -= num;
         if (u.mh <= 0)
             rehumanize();
     }
 
-    context.botl = TRUE;
+    g.context.botl = TRUE;
 }
 
 /*
@@ -285,7 +285,7 @@ boolean incr; /* true iff via incremental experience growth */
     /* increase hit points (when polymorphed, do monster form first
        in order to retain normal human/whatever increase for later) */
     if (Upolyd) {
-        hpinc = monhp_per_lvl(&youmonst);
+        hpinc = monhp_per_lvl(&g.youmonst);
         u.mhmax += hpinc;
         u.mh += hpinc;
     }
@@ -317,7 +317,7 @@ boolean incr; /* true iff via incremental experience growth */
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
         reset_rndmonst(NON_PM);          /* new monster selection */
     }
-    context.botl = TRUE;
+    g.context.botl = TRUE;
 }
 
 /* compute a random amount of experience points suitable for the hero's

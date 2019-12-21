@@ -261,13 +261,6 @@ Notes:
     Also, it is recommended that you use FLEX instead of the standard
     lex bundled with Solaris 2.x (even if that last one should work ;-).
 
-14. If your machine is a 286, 386, or 486 running an appropriate OS, you
-    may wish to use the console speaker driver included in
-    sys/unix/snd86unx.shr.  This will allow audible music to be played
-    on your console speaker in certain appropriate game situations.  The only
-    modification to the main-line code needed to enable use of the driver
-    is defining UNIX386MUSIC or VPIX_MUSIC in unixconf.h.
-
 15. If you are trying to cross-compile for another system, there is some
     support in the src and util Makefiles, but there are still other
     complications.  It may well be best to make another copy of util,

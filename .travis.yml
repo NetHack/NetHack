@@ -102,10 +102,10 @@ matrix:
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make install"
 #
 sudo: false
-notifications:
-  email:
-    recipients:
-      - devteam@nethack.org
+notifications: false
+#  email:
+#    recipients:
+#      - devteam@nethack.org
 #
 deploy:
   provider: releases

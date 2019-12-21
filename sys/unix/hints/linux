@@ -47,7 +47,6 @@ WINLIB = $(WINTTYLIB) $(WINCURSESLIB)
 #WINSRC += tile.c
 #WINOBJ += tile.o
 
-#WINTTYLIB=$(shell pkg-config ncurses --libs)
 WINTTYLIB=-lncurses -ltinfo
 
 CHOWN=true

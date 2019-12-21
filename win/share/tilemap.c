@@ -54,7 +54,7 @@ struct conditionals {
 #ifndef CHARON /* not supported yet */
     { MON_GLYPH, PM_CROESUS, "Charon" },
 #endif
-#ifndef MAIL
+#ifndef MAIL_STRUCTURES
     { MON_GLYPH, PM_FAMINE, "mail daemon" },
 #endif
     /* commented out in monst.c at present */
@@ -69,7 +69,7 @@ struct conditionals {
 /* allow slime mold to look like slice of pizza, since we
  * don't know what a slime mold should look like when renamed anyway
  */
-#ifndef MAIL
+#ifndef MAIL_STRUCTURES
     { OBJ_GLYPH, SCR_STINKING_CLOUD + EXTRA_SCROLL_DESCR_COUNT,
       "stamped / mail" },
 #endif
@@ -109,11 +109,6 @@ int set, entry;
     int i, j, condnum, tilenum;
     static char buf[BUFSZ];
 
-    /* Note:  these initializers don't do anything except guarantee that
-            we're linked properly.
-    */
-    monst_init();
-    objects_init();
     (void) def_char_to_objclass(']');
 
     condnum = tilenum = 0;

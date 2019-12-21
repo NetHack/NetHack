@@ -10,8 +10,12 @@
 # include <fcntl.h>
 # include <errno.h>
 #endif /* SIMPLE_MAIL */
+#endif /* MAIL */
+#ifdef MAIL_STRUCTURES
 #include "mail.h"
+#endif
 
+#ifdef MAIL
 /*
  * Notify user when new mail has arrived.  Idea by Merlyn Leroy.
  *
@@ -36,12 +40,10 @@
  *                       random intervals.
  */
 
-STATIC_DCL boolean FDECL(md_start, (coord *));
-STATIC_DCL boolean FDECL(md_stop, (coord *, coord *));
-STATIC_DCL boolean FDECL(md_rush, (struct monst *, int, int));
-STATIC_DCL void FDECL(newmail, (struct mail_info *));
-
-extern char *viz_rmin, *viz_rmax; /* line-of-sight limits (vision.c) */
+static boolean FDECL(md_start, (coord *));
+static boolean FDECL(md_stop, (coord *, coord *));
+static boolean FDECL(md_rush, (struct monst *, int, int));
+static void FDECL(newmail, (struct mail_info *));
 
 #if !defined(UNIX) && !defined(VMS)
 int mustgetmail = -1;
@@ -140,7 +142,7 @@ getmailstatus()
  * Pick coordinates for a starting position for the mail daemon.  Called
  * from newmail() and newphone().
  */
-STATIC_OVL boolean
+static boolean
 md_start(startp)
 coord *startp;
 {
@@ -164,14 +166,14 @@ coord *startp;
      * Arrive at an up or down stairwell if it is in line of sight from the
      * hero.
      */
-    if (couldsee(upstair.sx, upstair.sy)) {
-        startp->x = upstair.sx;
-        startp->y = upstair.sy;
+    if (couldsee(g.upstair.sx, g.upstair.sy)) {
+        startp->x = g.upstair.sx;
+        startp->y = g.upstair.sy;
         return TRUE;
     }
-    if (couldsee(dnstair.sx, dnstair.sy)) {
-        startp->x = dnstair.sx;
-        startp->y = dnstair.sy;
+    if (couldsee(g.dnstair.sx, g.dnstair.sy)) {
+        startp->x = g.dnstair.sx;
+        startp->y = g.dnstair.sy;
         return TRUE;
     }
 
@@ -181,23 +183,23 @@ coord *startp;
      * position that could be seen.  What we really ought to be doing is
      * finding a path from a stairwell...
      *
-     * The arrays viz_rmin[] and viz_rmax[] are set even when blind.  These
+     * The arrays g.viz_rmin[] and g.viz_rmax[] are set even when blind.  These
      * are the LOS limits for each row.
      */
     lax = 0; /* be picky */
     max_distance = -1;
  retry:
     for (row = 0; row < ROWNO; row++) {
-        if (viz_rmin[row] < viz_rmax[row]) {
+        if (g.viz_rmin[row] < g.viz_rmax[row]) {
             /* There are valid positions on this row. */
-            dd = distu(viz_rmin[row], row);
+            dd = distu(g.viz_rmin[row], row);
             if (dd > max_distance) {
                 if (lax) {
                     max_distance = dd;
                     startp->y = row;
-                    startp->x = viz_rmin[row];
+                    startp->x = g.viz_rmin[row];
 
-                } else if (enexto(&testcc, (xchar) viz_rmin[row], row,
+                } else if (enexto(&testcc, (xchar) g.viz_rmin[row], row,
                                   (struct permonst *) 0)
                            && !cansee(testcc.x, testcc.y)
                            && couldsee(testcc.x, testcc.y)) {
@@ -205,14 +207,14 @@ coord *startp;
                     *startp = testcc;
                 }
             }
-            dd = distu(viz_rmax[row], row);
+            dd = distu(g.viz_rmax[row], row);
             if (dd > max_distance) {
                 if (lax) {
                     max_distance = dd;
                     startp->y = row;
-                    startp->x = viz_rmax[row];
+                    startp->x = g.viz_rmax[row];
 
-                } else if (enexto(&testcc, (xchar) viz_rmax[row], row,
+                } else if (enexto(&testcc, (xchar) g.viz_rmax[row], row,
                                   (struct permonst *) 0)
                            && !cansee(testcc.x, testcc.y)
                            && couldsee(testcc.x, testcc.y)) {
@@ -240,7 +242,7 @@ coord *startp;
  * enexto().  Use enexto() as a last resort because enexto() chooses
  * its point randomly, which is not what we want.
  */
-STATIC_OVL boolean
+static boolean
 md_stop(stopp, startp)
 coord *stopp;  /* stopping position (we fill it in) */
 coord *startp; /* starting position (read only) */
@@ -281,7 +283,7 @@ static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
  * FALSE if the md gets stuck in a position where there is a monster.  Return
  * TRUE otherwise.
  */
-STATIC_OVL boolean
+static boolean
 md_rush(md, tx, ty)
 struct monst *md;
 register int tx, ty; /* destination of mail daemon */
@@ -384,7 +386,7 @@ register int tx, ty; /* destination of mail daemon */
 
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
-STATIC_OVL void
+static void
 newmail(info)
 struct mail_info *info;
 {
@@ -403,7 +405,7 @@ struct mail_info *info;
         goto go_back;
 
     message_seen = TRUE;
-    verbalize("%s, %s!  %s.", Hello(md), plname, info->display_txt);
+    verbalize("%s, %s!  %s.", Hello(md), g.plname, info->display_txt);
 
     if (info->message_typ) {
         struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);
@@ -442,7 +444,7 @@ ckmailstatus()
         return;
     if (mustgetmail < 0) {
 #if defined(AMIGA) || defined(MSDOS) || defined(TOS)
-        mustgetmail = (moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
+        mustgetmail = (g.moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
 #endif
         return;
     }
@@ -537,12 +539,12 @@ ckmailstatus()
 
     if (!mailbox || u.uswallow || !flags.biff
 #ifdef MAILCKFREQ
-        || moves < laststattime + MAILCKFREQ
+        || g.moves < laststattime + MAILCKFREQ
 #endif
         )
         return;
 
-    laststattime = moves;
+    laststattime = g.moves;
     if (stat(mailbox, &nmstat)) {
 #ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
@@ -662,8 +664,8 @@ ck_server_admin_msg()
     static struct stat ost,nst;
     static long lastchk = 0;
 
-    if (moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
-    lastchk = moves;
+    if (g.moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
+    lastchk = g.moves;
 
     if (!stat(SERVER_ADMIN_MSG, &nst)) {
         if (nst.st_mtime > ost.st_mtime)
