@@ -270,9 +270,7 @@ U  = $(UTIL)/
 # Utility Objects.
 #
 
-MAKESRC        = $(U)makedefs.c
-
-MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
+MAKEDEFSOBJS       = $(O)makedefs.o $(O)mdlib.o $(O)monst.o $(O)objects.o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -894,8 +892,8 @@ objdir.tag:
 # Makedefs Stuff
 #==========================================
 
-$(U)makedefs.exe: $(MAKEOBJS)
-	$(link) $(LFLAGSU) -o$@ $(MAKEOBJS)
+$(U)makedefs.exe: $(MAKEDEFSOBJS)
+	$(link) $(LFLAGSU) -o$@ $(MAKEDEFSOBJS)
 
 $(O)makedefs.o: $(CONFIG_H) $(INCL)/monattk.h $(INCL)/monflag.h \
 	 $(INCL)/objclass.h $(INCL)/monsym.h \
