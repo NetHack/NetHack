@@ -6,6 +6,9 @@ matrix:
       env: DESCR=windows-mingw
       script:
         - sh sys/winnt/travis-gcc.sh
+        - export ADD_CURSES=Y
+        - export PDCURSES_TOP=../lib/pdcurses
+        - export LUA_VERSION=5.3.5
         - cd src
         - cp ../sys/winnt/Makefile.gcc ./Makefile
         - mingw32-make install
