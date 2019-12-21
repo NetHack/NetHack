@@ -10,11 +10,10 @@ matrix:
         - export LUA_VERSION=5.3.5
 	- mkdir -p lib
         - cd lib
-        - curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz
-	- tar zxf lua-$(LUA_VERSION).tar.gz && rm -f lua-$(LUA_VERSION).tar.gz
+        - curl -R -O http://www.lua.org/ftp/lua-$LUA_VERSION.tar.gz
+	- tar zxf lua-$LUA_VERSION.tar.gz
         - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git pdcurses
-        - cd ../
-        - cd src
+        - cd ../src
         - cp sys/winnt/Makefile.gcc ./Makefile
         - mingw32-make install
     - os: linux
