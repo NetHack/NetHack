@@ -128,6 +128,7 @@
     <ClCompile Include="$(SrcDir)makemon.c" />
     <ClCompile Include="$(SrcDir)mapglyph.c" />
     <ClCompile Include="$(SrcDir)mcastu.c" />
+    <ClCompile Include="$(SrcDir)mdlib.c" />
     <ClCompile Include="$(SrcDir)mhitm.c" />
     <ClCompile Include="$(SrcDir)mhitu.c" />
     <ClCompile Include="$(SrcDir)minion.c" />
@@ -144,8 +145,9 @@
     <ClCompile Include="$(SrcDir)mthrowu.c" />
     <ClCompile Include="$(SrcDir)muse.c" />
     <ClCompile Include="$(SrcDir)music.c" />
-    <ClCompile Include="$(SrcDir)nhlua.c" />
+    <ClCompile Include="$(SrcDir)nhlobj.c" />
     <ClCompile Include="$(SrcDir)nhlsel.c" />
+    <ClCompile Include="$(SrcDir)nhlua.c" />
     <ClCompile Include="$(SrcDir)objects.c" />
     <ClCompile Include="$(SrcDir)objnam.c" />
     <ClCompile Include="$(SrcDir)options.c" />
