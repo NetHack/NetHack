@@ -9,7 +9,7 @@ matrix:
       env: DESCR=linux-bionic-gcc HINTS=linux
       dist: bionic
       compiler: gcc
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make feetch-lua && make install"
+      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
     - os: linux
       env: DESCR=linux-xenial-clang HINTS=linux
       compiler: clang
