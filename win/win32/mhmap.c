@@ -305,8 +305,13 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 
     }
 
+    /* TODO: Should we round instead of clamping? */
     data->xFrontTile = (int) ((double) data->xBackTile * data->frontScale);
     data->yFrontTile = (int) ((double) data->yBackTile * data->frontScale);
+
+    /* ensure tile is at least one pixel in size */
+    if (data->xFrontTile < 1) data->xFrontTile = 1;
+    if (data->yFrontTile < 1) data->yFrontTile = 1;
 
     /* calcuate ASCII cursor height */
     data->yBlinkCursor = (int) ((double) CURSOR_HEIGHT * data->backScale);
