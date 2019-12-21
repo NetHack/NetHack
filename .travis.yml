@@ -5,15 +5,9 @@ matrix:
 #     install: choco install mingw
       env: DESCR=windows-mingw
       script:
-        - export ADD_CURSES=Y
-        - export PDCURSES_TOP=../lib/pdcurses
-#	 - mkdir lib
-#        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git lib/pdcurses
-#        - curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
-#	 - tar -zxf lua-5.3.5.tar.gz
-#        - cd ../
+        - sh sys/winnt/travis-gcc.sh
         - cd src
-        - cp sys/winnt/Makefile.gcc ./Makefile
+        - cp ../sys/winnt/Makefile.gcc ./Makefile
         - mingw32-make install
 #
 sudo: false
