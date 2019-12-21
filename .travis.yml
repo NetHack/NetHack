@@ -5,18 +5,15 @@ matrix:
 #     install: choco install mingw
       env: DESCR=windows-mingw
       script:
-	- md lib
-        - cd lib
-        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git pdcurses
-        - ls -a
-        - curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
-	- tar -zxf lua-5.3.5.tar.gz
-        - cd ../
-        - cd src
-        - cp sys/winnt/Makefile.gcc ./Makefile
         - export ADD_CURSES=Y
         - export PDCURSES_TOP=../lib/pdcurses
-        - export LUA_VERSION=5.3.5
+	- mkdir lib
+        - git clone --depth 1 https://github.com/wmcbrine/PDCurses.git lib/pdcurses
+#        - curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#	- tar -zxf lua-5.3.5.tar.gz
+#       - cd ../
+        - cd src
+        - cp sys/winnt/Makefile.gcc ./Makefile
         - mingw32-make install
   exclude:
     - os: linux
