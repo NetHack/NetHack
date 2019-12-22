@@ -34,6 +34,7 @@ typedef struct mswin_menu_item {
     int attr;
     char str[NHMENU_STR_SIZE];
     BOOLEAN_P presel;
+    unsigned int itemflags;
     int count;
     BOOL has_focus;
 } NHMenuItem, *PNHMenuItem;
@@ -627,6 +628,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	/* prevent & being interpreted as a mnemonic start */
         strNsubst(data->menu.items[new_item].str, "&", "&&", 0);
         data->menu.items[new_item].presel = msg_data->presel;
+        data->menu.items[new_item].itemflags = msg_data->itemflags;
 
         /* calculate tabstop size */
         hDC = GetDC(hWnd);

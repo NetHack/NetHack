@@ -71,7 +71,7 @@ E void FDECL(Gem_putstr, (winid, int, const char *));
 E void FDECL(Gem_display_file, (const char *, BOOLEAN_P));
 E void FDECL(Gem_start_menu, (winid));
 E void FDECL(Gem_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
-                            const char *, BOOLEAN_P));
+                            const char *, unsigned int));
 E void FDECL(Gem_end_menu, (winid, const char *));
 E int FDECL(Gem_select_menu, (winid, int, MENU_ITEM_P **));
 E char FDECL(Gem_message_menu, (CHAR_P, int, const char *));

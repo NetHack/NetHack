@@ -13,13 +13,14 @@
 /* menu structure */
 typedef struct tty_mi {
     struct tty_mi *next;
-    anything identifier; /* user identifier */
-    long count;          /* user count */
-    char *str;           /* description string (including accelerator) */
-    int attr;            /* string attribute */
-    boolean selected;    /* TRUE if selected by user */
-    char selector;       /* keyboard accelerator */
-    char gselector;      /* group accelerator */
+    anything identifier;    /* user identifier */
+    long count;             /* user count */
+    char *str;              /* description string (including accelerator) */
+    int attr;               /* string attribute */
+    boolean selected;       /* TRUE if selected by user */
+    unsigned int itemflags; /* */
+    char selector;          /* keyboard accelerator */
+    char gselector;         /* group accelerator */
 } tty_menu_item;
 
 /* descriptor for tty-based windows */
@@ -191,7 +192,7 @@ E void FDECL(tty_putstr, (winid, int, const char *));
 E void FDECL(tty_display_file, (const char *, BOOLEAN_P));
 E void FDECL(tty_start_menu, (winid));
 E void FDECL(tty_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
-                            const char *, BOOLEAN_P));
+                            const char *, unsigned int));
 E void FDECL(tty_end_menu, (winid, const char *));
 E int FDECL(tty_select_menu, (winid, int, MENU_ITEM_P **));
 E char FDECL(tty_message_menu, (CHAR_P, int, const char *));

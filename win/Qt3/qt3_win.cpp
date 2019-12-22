@@ -4817,8 +4817,9 @@ void NetHackQtBind::qt_start_menu(winid wid)
 
 void NetHackQtBind::qt_add_menu(winid wid, int glyph,
     const ANY_P * identifier, CHAR_P ch, CHAR_P gch, int attr,
-    const char *str, BOOLEAN_P presel)
+    const char *str, unsigned int itemflags)
 {
+    boolean presel = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
     NetHackQtWindow* window=id_to_window[wid];
     window->AddMenu(glyph, identifier, ch, gch, attr, str, presel);
 }

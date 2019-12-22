@@ -482,7 +482,8 @@ lua_State *L;
         if (*key)
             any.a_char = key[0];
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, str,
-                 (*defval && *key && defval[0] == key[0]) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (*defval && *key && defval[0] == key[0])
+                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
 
         lua_pop(L, 1); /* removes 'value'; keeps 'key' for next iteration */
     }

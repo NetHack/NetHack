@@ -41,7 +41,7 @@ void amii_getret(void);
 /* winmenu.c */
 void amii_start_menu(winid window);
 void FDECL(amii_add_menu, (winid, int, const anything *, CHAR_P, CHAR_P, int,
-                           const char *, BOOLEAN_P));
+                           const char *, unsigned int));
 void FDECL(amii_end_menu, (winid, const char *));
 int FDECL(amii_select_menu, (winid, int, menu_item **));
 int DoMenuScroll(int win, int blocking, int how, menu_item **);

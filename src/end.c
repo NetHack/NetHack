@@ -1815,7 +1815,8 @@ set_vanq_order()
             continue;
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, vanqorders[i],
-                 (i == g.vanq_sortmode) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (i == g.vanq_sortmode)
+                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Sort order for vanquished monster counts");
 

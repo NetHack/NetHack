@@ -310,7 +310,7 @@ start_menu(window)
 		   be used for menus.
 add_menu(windid window, int glyph, const anything identifier,
 				char accelerator, char groupacc,
-				int attr, char *str, boolean preselected)
+				int attr, char *str, unsigned itemflags)
 		-- Add a text line str to the given menu window.  If identifier
 		   is 0, then the line cannot be selected (e.g. a title).
 		   Otherwise, identifier is the value returned if the line is
@@ -337,8 +337,8 @@ add_menu(windid window, int glyph, const anything identifier,
 		   the menu command (or their user defined aliases), it loses.
 		   The menu commands and aliases take care not to interfere
 		   with the default object class symbols.
-		-- If you want this choice to be preselected when the
-		   menu is displayed, set preselected to TRUE.
+		-- itemflags on this item (such as MENU_ITEMFLAGS_UNSELECTED,
+                   MENU_ITEMFLAGS_PRESELECTED, etc.).
 
 end_menu(window, prompt)
 		-- Stop adding entries to the menu and flushes the window

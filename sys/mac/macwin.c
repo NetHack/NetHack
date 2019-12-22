@@ -1937,7 +1937,7 @@ mac_start_menu(winid win)
 
 void
 mac_add_menu(winid win, int glyph, const anything *any, CHAR_P menuChar,
-             CHAR_P groupAcc, int attr, const char *inStr, int preselected)
+             CHAR_P groupAcc, int attr, const char *inStr, unsigned int itemflags)
 {
 #if defined(__SC__) || defined(__MRC__)
 #pragma unused(glyph)
@@ -1946,6 +1946,7 @@ mac_add_menu(winid win, int glyph, const anything *any, CHAR_P menuChar,
     const char *str;
     char locStr[4 + BUFSZ];
     MacMHMenuItem *item;
+    int preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
 
     if (!inStr)
         return;
