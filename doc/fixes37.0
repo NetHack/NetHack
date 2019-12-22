@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ $NHDT-Date: 1577050214 2019/12/22 21:30:14 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ $NHDT-Date: 1577050470 2019/12/22 21:34:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -42,6 +42,9 @@ split off some of the functionality that was in makedefs (compiled-in options
 replace quest.txt and associated conversion to quest.dat via makedefs with
 	lua quest texts loaded at runtime
 some altars are displayed in different colors (for tty and curses at least)
+add 'quick_farsight' option to provide some control over random clairvoyance
+	where pausing to be able to browse temporarily visible aspects of the
+	revealed map can seem intrusive; doesn't affect clairvoyance spell
 
 
 Platform- and/or Interface-Specific New Features

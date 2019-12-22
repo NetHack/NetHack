@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1575245078 2019/12/02 00:04:38 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.391 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1577050473 2019/12/22 21:34:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.422 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -184,6 +184,7 @@ static const struct Bool_Opt {
     { "popup_dialog", &iflags.wc_popup_dialog, FALSE, SET_IN_GAME },   /*WC*/
     { "preload_tiles", &iflags.wc_preload_tiles, TRUE, DISP_IN_GAME }, /*WC*/
     { "pushweapon", &flags.pushweapon, FALSE, SET_IN_GAME },
+    { "quick_farsight", &flags.quick_farsight, FALSE, SET_IN_GAME },
 #if defined(MICRO) && !defined(AMIGA)
     { "rawio", &iflags.rawio, FALSE, DISP_IN_GAME },
 #else
