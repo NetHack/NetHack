@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1559670611 2019/06/04 17:50:11 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1577055058 2019/12/22 22:50:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -245,7 +245,7 @@ register struct obj *obj;
 /*** Commands to change particular slot(s) ***/
 
 static NEARDATA const char wield_objs[] = {
-    ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, TOOL_CLASS, 0
+    ALLOW_COUNT, ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, TOOL_CLASS, 0
 };
 static NEARDATA const char ready_objs[] = {
     ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0
@@ -258,7 +258,9 @@ static NEARDATA const char bullets[] = { /* (note: different from dothrow.c) */
 int
 dowield()
 {
-    register struct obj *wep, *oldwep;
+    char qbuf[QBUFSZ];
+    struct obj *wep, *oldwep;
+    boolean finish_splitting = FALSE;
     int result;
 
     /* May we attempt this? */
@@ -269,10 +271,22 @@ dowield()
     }
 
     /* Prompt for a new weapon */
-    if (!(wep = getobj(wield_objs, "wield")))
+    clear_splitobjs();
+    if (!(wep = getobj(wield_objs, "wield"))) {
         /* Cancelled */
         return 0;
-    else if (wep == uwep) {
+    } else if (wep->o_id == g.context.objsplit.child_oid) {
+        /* if wep is the result of supplying a count to getobj()
+           we don't want to split something already wielded; for
+           any other item, we need to give it its own inventory slot */
+        if (uwep && uwep->o_id == g.context.objsplit.parent_oid) {
+            unsplitobj(wep);
+            goto already_wielded;
+        }
+        finish_splitting = TRUE;
+        goto wielding;
+    } else if (wep == uwep) {
+ already_wielded:
         You("are already wielding that!");
         if (is_weptool(wep) || is_wet_towel(wep))
             g.unweapon = FALSE; /* [see setuwep()] */
@@ -285,15 +299,55 @@ dowield()
     }
 
     /* Handle no object, or object in other slot */
-    if (wep == &cg.zeroobj)
+    if (wep == &cg.zeroobj) {
         wep = (struct obj *) 0;
-    else if (wep == uswapwep)
+    } else if (wep == uswapwep) {
         return doswapweapon();
-    else if (wep == uquiver)
+    } else if (wep == uquiver) {
+        /* offer to split stack if multiple are quivered */
+        if (uquiver->quan > 1L && inv_cnt(FALSE) < 52 && splittable(uquiver)) {
+            Sprintf(qbuf, "You have %ld %s readied.  Wield one?",
+                    uquiver->quan, simpleonames(uquiver));
+            switch (ynq(qbuf)) {
+            case 'q':
+                return 0;
+            case 'y':
+                /* leave N-1 quivered, split off 1 to wield */
+                wep = splitobj(uquiver, 1L);
+                finish_splitting = TRUE;
+                goto wielding;
+            default:
+                break;
+            }
+            Strcpy(qbuf, "Wield all of them instead?");
+        } else {
+            boolean use_plural = (is_plural(uquiver) || pair_of(uquiver));
+
+            Sprintf(qbuf, "You have %s readied.  Wield %s instead?",
+                    !use_plural ? "that" : "those",
+                    !use_plural ? "it" : "them");
+        }
+        /* require confirmation to wield the quivered weapon */
+        if (ynq(qbuf) != 'y') {
+            (void) Shk_Your(qbuf, uquiver); /* replace qbuf[] contents */
+            pline("%s%s %s readied.", qbuf,
+                  simpleonames(uquiver), otense(uquiver, "remain"));
+            return 0;
+        }
+        /* wielding whole readied stack, so no longer quivered */
         setuqwep((struct obj *) 0);
-    else if (wep->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
+    } else if (wep->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
         You("cannot wield that!");
         return 0;
+    }
+
+ wielding:
+    if (finish_splitting) {
+        /* wep was split off from something; give it its own invlet */
+        freeinv(wep);
+        wep->nomerge = 1;
+        addinv(wep);
+        wep->nomerge = 0;
     }
 
     /* Set your new primary weapon */
@@ -363,7 +417,7 @@ dowieldquiver()
     /* will_weld(), touch_petrifies(), etc. */
     g.multi = 0;
     /* forget last splitobj() before calling getobj() with ALLOW_COUNT */
-    g.context.objsplit.child_oid = g.context.objsplit.parent_oid = 0;
+    clear_splitobjs();
 
     /* Prompt for a new quiver: "What do you want to ready?"
        (Include gems/stones as likely candidates if either primary
@@ -398,7 +452,7 @@ dowieldquiver()
         }
         finish_splitting = TRUE;
     } else if (newquiver == uquiver) {
-    already_quivered:
+ already_quivered:
         pline("That ammunition is already readied!");
         return 0;
     } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {

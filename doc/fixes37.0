@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ $NHDT-Date: 1577050470 2019/12/22 21:34:30 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.29 $ $NHDT-Date: 1577055058 2019/12/22 22:50:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -15,6 +15,8 @@ function calls made from mapglyph based on dungeon level are now called once
 fix accessing mons[-1] when trying to gate in a non-valid demon
 fast hero could have random clairvoyance happen more than once on same turn
 urealtime.realtime was being incorrectly calculated
+using 'Q' on wielded weapon would offer to split stack; make using 'w' on a
+	quivered stack behave similarly
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
