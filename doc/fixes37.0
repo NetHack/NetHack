@@ -13,6 +13,7 @@ improvements to pronoun usage when hallucinating
 function calls made from mapglyph based on dungeon level are now called once
 	per level
 fix accessing mons[-1] when trying to gate in a non-valid demon
+urealtime.realtime was being incorrectly calculated
 
 
 Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
