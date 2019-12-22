@@ -43,6 +43,8 @@ perm_invent    keep inventory in a permanent window               [FALSE]
 pickup_thrown  override pickup_types for thrown objects           [TRUE]
 pushweapon     when wielding a new weapon, put your previously    [FALSE]
                wielded weapon into the secondary weapon slot
+quick_farsight usually skip the chance to browse the map when     [FALSE]
+               randomly triggered clairvoyance takes place
 rawio          allow the use of raw I/O                           [FALSE]
 rest_on_space  count the space bar as a rest character            [FALSE]
 safe_pet       prevent you from (knowingly) attacking your pet(s) [TRUE]

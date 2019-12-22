@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.337 $ $NHDT-Date: 1576431522 2019/12/15 17:38:42 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.345 $ $NHDT-Date: 1577050469 2019/12/22 21:34:29 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -3422,6 +3422,14 @@ something pushes the old item into your alternate weapon slot (default off).
 Likewise for the \(oqa\(cq (apply) command if it causes the applied item to
 become wielded.
 Persistent.
+.lp quick_farsight
+When set, usually prevents the \(lqyou sense your surroundings\(rq message
+where play pauses to allow you to browse the map whenever clairvoyance
+randomly activates.
+Some situations, such as being underwater or engulfed, ignore this option.
+It does not affect the clairvoyance spell where pausing to examine revealed
+objects or monsters is less intrusive.
+Default is off.  Persistent.
 .lp "race    "
 Selects your race (for example, \(lqrace:human\(rq).
 Default is random.
