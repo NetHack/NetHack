@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl    $NHDT-Date: 1574646950 2019/11/25 01:55:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $
+# NetHack 3.6  Makefile.utl    $NHDT-Date: 1576976264 2019/12/22 00:57:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -84,7 +84,6 @@ NHSROOT=..
 # LFLAGS = -b i486-linuxaout -L/usr/X11R6/lib
 
 # flags for BeOS using the command line
-# remember to uncomment flex and bison below
 #   BeOS on a Mac/BeBox:
 #CC = mwcc
 #CFLAGS = -I../include
@@ -97,7 +96,7 @@ NHSROOT=..
 #CFLAGS = -O -I../include
 #LFLAGS =
 
-CFLAGS += -I../lib/lua-$(LUA_VERSION)/src
+# -lm required by lua
 LFLAGS += -lm
 
 # we specify C preprocessor flags via CFLAGS; files built with default rules
@@ -111,23 +110,6 @@ LIBS =
 #OBJDIR = .
 # otherwise, you can save a little bit of disk space with this:
 OBJDIR = ../src
-
-# yacc/lex programs to use to generate *_comp.h, *_lex.c, and *_yacc.c.
-# if, instead of yacc/lex you have bison/flex, comment/uncomment the following.
-YACC     = yacc
-LEX      = lex
-# YACC     = bison -y
-# YACC     = byacc
-# LEX      = flex
-
-# these are the names of the output files from YACC/LEX. Under MS-DOS
-# and similar systems, they may differ
-YTABC = y.tab.c
-YTABH = y.tab.h
-LEXYYC = lex.yy.c
-# YTABC = y_tab.c
-# YTABH = y_tab.h
-# LEXYYC = lexyy.c
 
 # if you change this to 1, feedback while building will omit -Dthis -Wthat
 # -Isomewhere so that each file being compiled is listed on one short line;
@@ -203,18 +185,6 @@ RECOVOBJS = recover.o
 
 # object files for the data librarian
 DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
-
-# flags for creating distribution versions of sys/share/*_lex.c, using
-# a more portable flex skeleton, which is not included in the distribution.
-# hopefully keeping this out of the section to be edited will keep too
-# many people from being confused by it...
-# FLEXDIST = -L -S../sys/share/flexhack.skl
-FLEXDIST =
-#
-# flags for creating distribution versions of sys/share/*_yacc.c, without
-# line numbers so patches from version to version are practical
-# YACCDIST = -l
-YACCDIST =
 
 
 #	dependencies for makedefs
