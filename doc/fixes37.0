@@ -1,8 +1,7 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.29 $ $NHDT-Date: 1577055058 2019/12/22 22:50:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.30 $ $NHDT-Date: 1577063925 2019/12/23 01:18:45 $
 
 General Fixes and Modified Features
 -----------------------------------
-fix compile when DLB isn't defined
 hero polymorphed into a vampire can use #monster to shape-shift rather than
 	just do a one-shot polymorph into bat/cloud/wolf and shifted vampire
 	hero can use #monster again to take on another form (randomly chosen
@@ -14,13 +13,16 @@ function calls made from mapglyph based on dungeon level are now called once
 	per level
 fix accessing mons[-1] when trying to gate in a non-valid demon
 fast hero could have random clairvoyance happen more than once on same turn
-urealtime.realtime was being incorrectly calculated
 using 'Q' on wielded weapon would offer to split stack; make using 'w' on a
 	quivered stack behave similarly
 
 
-Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
+Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
+fix compile when DLB isn't defined
+urealtime.realtime was being incorrectly calculated
+revised "mysterious force" when climbing out of gehennom could generate
+	warnings about "rn2(0) attempted" or "rn2(-n) attempted"
 
 
 Platform- and/or Interface-Specific Fixes
