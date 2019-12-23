@@ -723,6 +723,7 @@ gnome_add_menu(winid wid, int glyph, const ANY_P *identifier,
     item.attr = attr;
     item.str = str;
     item.presel = presel;
+    item.itemflags = itemflags;
 
     if (wid != -1 && gnome_windowlist[wid].win != NULL) {
         gtk_signal_emit(GTK_OBJECT(gnome_windowlist[wid].win),

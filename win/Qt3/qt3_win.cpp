@@ -1447,7 +1447,7 @@ void NetHackQtWindow::CursorTo(int x,int y) { puts("unexpected CursorTo"); }
 void NetHackQtWindow::PutStr(int attr, const char* text) { puts("unexpected PutStr"); }
 void NetHackQtWindow::StartMenu() { puts("unexpected StartMenu"); }
 void NetHackQtWindow::AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-    const char* str, bool presel) { puts("unexpected AddMenu"); }
+    const char* str, unsigned itemflags) { puts("unexpected AddMenu"); }
 void NetHackQtWindow::EndMenu(const char* prompt) { puts("unexpected EndMenu"); }
 int NetHackQtWindow::SelectMenu(int how, MENU_ITEM_P **menu_list) { puts("unexpected SelectMenu"); return 0; }
 void NetHackQtWindow::ClipAround(int x,int y) { puts("unexpected ClipAround"); }
@@ -2788,8 +2788,9 @@ NetHackQtMenuWindow::MenuItem::~MenuItem()
 #define STR_MARGIN 4
 
 void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P* identifier,
-	char ch, char gch, int attr, const char* str, bool presel)
+	char ch, char gch, int attr, const char* str, unsigned itemflags)
 {
+    bool presel = (itemflags & MENU_ITEMFLAGS_SELECTED) != 0;
     if (!ch && identifier->a_void!=0) {
 	// Supply a keyboard accelerator.  Limited supply.
 	static char accel[]="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -2807,6 +2808,7 @@ void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P* identifier,
     item[itemcount].attr=attr;
     item[itemcount].str=strdup(str);
     item[itemcount].selected=presel;
+    item[itemcount].itemflags=itemflags;
     item[itemcount].count=-1;
     ++itemcount;
 

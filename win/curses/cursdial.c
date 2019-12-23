@@ -586,6 +586,7 @@ curs_new_menu_item(winid wid, const char *str)
     new_item->str = new_str;
     new_item->presel = FALSE;
     new_item->selected = FALSE;
+    new_item->itemflags = MENU_ITEMFLAGS_NONE;
     new_item->page_num = 0;
     new_item->line_num = 0;
     new_item->num_lines = 0;
@@ -598,10 +599,11 @@ curs_new_menu_item(winid wid, const char *str)
 void
 curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
                        CHAR_P accelerator, CHAR_P group_accel, int attr,
-                       const char *str, BOOLEAN_P presel)
+                       const char *str, unsigned itemflags)
 {
     nhmenu_item *new_item, *current_items, *menu_item_ptr;
     nhmenu *current_menu = get_menu(wid);
+    boolean presel = (itemflags & MENU_ITEMFLAGS_SELECTED) != 0;
 
     if (current_menu == NULL) {
         impossible(
@@ -620,7 +622,7 @@ curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
     new_item->group_accel = group_accel;
     new_item->attr = attr;
     new_item->presel = presel;
-
+    new_item->itemflags = itemflags;
     current_items = current_menu->entries;
     menu_item_ptr = current_items;
 
@@ -1549,7 +1551,9 @@ menu_operation(WINDOW * win, nhmenu *menu, menu_op
         }
 
         if (menu_item_ptr->identifier.a_void != NULL) {
-            menu_select_deselect(win, menu_item_ptr, operation, current_page);
+            if (operation != INVERT
+                || (menu_item_ptr->itemflags & MENU_ITEMFLAGS_SKIPINVERT) == 0)
+                menu_select_deselect(win, menu_item_ptr, operation, current_page);
         }
 
         menu_item_ptr = menu_item_ptr->next_item;

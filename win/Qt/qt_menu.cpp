@@ -160,8 +160,9 @@ NetHackQtMenuWindow::MenuItem::~MenuItem()
 }
 
 void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P* identifier,
-	char ch, char gch, int attr, const QString& str, bool presel)
+	char ch, char gch, int attr, const QString& str, unsigned itemflags)
 {
+    bool presel = (itemflags & MENU_ITEMFLAGS_SELECTED) != 0;
     if (!ch && identifier->a_void!=0) {
 	// Supply a keyboard accelerator.  Limited supply.
 	static char accel[]="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -180,6 +181,7 @@ void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P* identifier,
     itemlist[itemcount].attr=attr;
     itemlist[itemcount].str=str;
     itemlist[itemcount].selected=presel;
+    itemlist[itemcount].itemflags=itemflags;
     itemlist[itemcount].count=-1;
     itemlist[itemcount].color = -1;
     // Display the boulder symbol correctly

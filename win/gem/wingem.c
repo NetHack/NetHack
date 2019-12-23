@@ -788,6 +788,7 @@ unsigned int itemflags;     /* itemflags such as marked as selected */
     G_item->Gmi_selected = preselected ? 1 : 0;
     G_item->Gmi_accelerator = ch;
     G_item->Gmi_groupacc = gch;
+    G_item->Gmi_itemflags = itemflags;
     G_item->Gmi_attr = attr;
     G_item->Gmi_str = copy_of(newstr);
     mar_add_menu(window, G_item);

@@ -522,7 +522,7 @@ add_menu(winid wid, int glyph, const anything identifier,
 void
 curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
                 CHAR_P accelerator, CHAR_P group_accel, int attr,
-                const char *str, unsigned int itemflags)
+                const char *str, unsigned itemflags)
 {
     int curses_attr;
     boolean presel = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
@@ -537,7 +537,7 @@ curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
     }
 
     curses_add_nhmenu_item(wid, glyph, identifier, accelerator, group_accel,
-                           curses_attr, str, presel);
+                           curses_attr, str, itemflags);
 }
 
 /*

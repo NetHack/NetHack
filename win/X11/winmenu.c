@@ -542,10 +542,12 @@ struct xwindow *wp;
 
     reset_menu_count(wp->menu_information);
     for (count = 0, curr = wp->menu_information->curr_menu.base; curr;
-         curr = curr->next, count++)
+         curr = curr->next, count++) {
+        if ((curr->itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0)
+            continue;
         if (curr->identifier.a_void != 0)
             invert_line(wp, curr, count, -1L);
-
+    }
 }
 
 static void
@@ -655,6 +657,7 @@ unsigned itemflags;
     item->next = (x11_menu_item *) 0;
     item->identifier = *identifier;
     item->attr = attr;
+    item->itemflags = itemflags;
     item->selected = item->preselected = preselected;
     item->pick_count = -1L;
     item->window = window;

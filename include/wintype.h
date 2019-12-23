@@ -107,8 +107,9 @@ typedef struct mi {
 #define MENU_INVERT_PAGE        '~'
 #define MENU_SEARCH             ':'
 
-#define MENU_ITEMFLAGS_NONE     0x0000000
-#define MENU_ITEMFLAGS_SELECTED 0x0000001
+#define MENU_ITEMFLAGS_NONE       0x0000000U
+#define MENU_ITEMFLAGS_SELECTED   0x0000001U
+#define MENU_ITEMFLAGS_SKIPINVERT 0x0000002U
 
 /* clang-format on */
 

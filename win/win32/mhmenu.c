@@ -1306,7 +1306,8 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
         if (data->how == PICK_ANY) {
             reset_menu_count(hwndList, data);
             for (i = 0; i < data->menu.size; i++) {
-                SelectMenuItem(hwndList, data, i,
+                if (!(data->menu.items[i].itemflags & MENU_ITEMFLAGS_SKIPINVERT))
+                    SelectMenuItem(hwndList, data, i,
                                NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
                                                                        : -1);
             }
@@ -1353,7 +1354,8 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             from = max(0, topIndex);
             to = min(data->menu.size, from + pageSize);
             for (i = from; i < to; i++) {
-                SelectMenuItem(hwndList, data, i,
+                if (!(data->menu.items[i].itemflags & MENU_ITEMFLAGS_SKIPINVERT))
+                    SelectMenuItem(hwndList, data, i,
                                NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
                                                                        : -1);
             }

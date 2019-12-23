@@ -1773,7 +1773,10 @@ char acc; /* group accelerator, 0 => all */
     tty_menu_item *curr;
     int n;
 
-    for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next)
+    for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next) {
+        if ((curr->itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0)
+            continue;
+
         if (curr->identifier.a_void && (acc == 0 || curr->gselector == acc)) {
             if (curr->selected) {
                 curr->selected = FALSE;
@@ -1782,6 +1785,7 @@ char acc; /* group accelerator, 0 => all */
                 curr->selected = TRUE;
             set_item_state(window, n, curr);
         }
+    }
 }
 
 /*
@@ -1801,6 +1805,9 @@ char acc; /* group accelerator, 0 => all */
 
     /* invert the rest */
     for (on_curr_page = FALSE, curr = cw->mlist; curr; curr = curr->next) {
+        if ((curr->itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0)
+            continue;
+
         if (curr == page_start)
             on_curr_page = TRUE;
         else if (curr == page_end)

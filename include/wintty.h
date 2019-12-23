@@ -13,14 +13,14 @@
 /* menu structure */
 typedef struct tty_mi {
     struct tty_mi *next;
-    anything identifier;    /* user identifier */
-    long count;             /* user count */
-    char *str;              /* description string (including accelerator) */
-    int attr;               /* string attribute */
-    boolean selected;       /* TRUE if selected by user */
-    unsigned int itemflags; /* */
-    char selector;          /* keyboard accelerator */
-    char gselector;         /* group accelerator */
+    anything identifier; /* user identifier */
+    long count;          /* user count */
+    char *str;           /* description string (including accelerator) */
+    int attr;            /* string attribute */
+    boolean selected;    /* TRUE if selected by user */
+    unsigned itemflags;  /* item flags */
+    char selector;       /* keyboard accelerator */
+    char gselector;      /* group accelerator */
 } tty_menu_item;
 
 /* descriptor for tty-based windows */

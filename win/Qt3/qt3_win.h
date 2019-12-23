@@ -258,7 +258,7 @@ class NetHackQtWindow
     virtual void PutStr(int attr, const char *text);
     virtual void StartMenu();
     virtual void AddMenu(int glyph, const ANY_P *identifier, char ch,
-                         char gch, int attr, const char *str, bool presel);
+                         char gch, int attr, const char *str, unsigned itemflags);
     virtual void EndMenu(const char *prompt);
     virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);
     virtual void ClipAround(int x, int y);
@@ -550,7 +550,7 @@ class NetHackQtMenuWindow : public QTableView, public NetHackQtWindow
 
     virtual void StartMenu();
     virtual void AddMenu(int glyph, const ANY_P *identifier, char ch,
-                         char gch, int attr, const char *str, bool presel);
+                         char gch, int attr, const char *str, unsigned itemflags);
     virtual void EndMenu(const char *prompt);
     virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);
 
@@ -699,7 +699,7 @@ class NetHackQtMenuOrTextWindow : public NetHackQtWindow
     // Menu
     virtual void StartMenu();
     virtual void AddMenu(int glyph, const ANY_P *identifier, char ch,
-                         char gch, int attr, const char *str, bool presel);
+                         char gch, int attr, const char *str, unsigned itemflags);
     virtual void EndMenu(const char *prompt);
     virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);
 };
@@ -854,7 +854,7 @@ class NetHackQtBind : NetHackQtBindBase
     static void qt_start_menu(winid wid);
     static void qt_add_menu(winid wid, int glyph, const ANY_P *identifier,
                             CHAR_P ch, CHAR_P gch, int attr, const char *str,
-                            unsigned int itemflags);
+                            unsigned itemflags);
     static void qt_end_menu(winid wid, const char *prompt);
     static int qt_select_menu(winid wid, int how, MENU_ITEM_P **menu_list);
     static void qt_update_inventory();
