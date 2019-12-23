@@ -1805,9 +1805,6 @@ char acc; /* group accelerator, 0 => all */
 
     /* invert the rest */
     for (on_curr_page = FALSE, curr = cw->mlist; curr; curr = curr->next) {
-        if ((curr->itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0)
-            continue;
-
         if (curr == page_start)
             on_curr_page = TRUE;
         else if (curr == page_end)
@@ -1815,11 +1812,13 @@ char acc; /* group accelerator, 0 => all */
 
         if (!on_curr_page && curr->identifier.a_void
             && (acc == 0 || curr->gselector == acc)) {
-            if (curr->selected) {
-                curr->selected = FALSE;
-                curr->count = -1;
-            } else
-                curr->selected = TRUE;
+            if ((curr->itemflags & MENU_ITEMFLAGS_SKIPINVERT) == 0) {
+                if (curr->selected) {
+                    curr->selected = FALSE;
+                    curr->count = -1;
+                } else
+                    curr->selected = TRUE;
+	    }
         }
     }
 }
