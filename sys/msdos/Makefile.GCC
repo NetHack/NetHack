@@ -295,7 +295,7 @@ VOBJ07 = $(O)getline.o  $(O)hack.o    $(O)hacklib.o  $(O)invent.o   $(O)lock.o
 VOBJ08 = $(O)mail.o     $(O)main.o    $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o $(O)mhitm.o
 VOBJ09 = $(O)mhitu.o    $(O)minion.o  $(O)mkmap.o    $(O)mklev.o    $(O)mkmaze.o
 VOBJ10 = $(O)mkobj.o    $(O)mkroom.o  $(O)mon.o      $(O)mondata.o  $(O)monmove.o
-VOBJ11 = $(O)monst.o    $(O)monstr.o  $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
+VOBJ11 = $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
 VOBJ12 = $(O)music.o    $(O)o_init.o  $(O)objects.o  $(O)objnam.o   $(O)options.o
 VOBJ13 = $(O)pickup.o   $(O)pline.o   $(O)polyself.o $(O)potion.o   $(O)quest.o
 VOBJ14 = $(O)questpgr.o $(O)pager.o   $(O)pray.o     $(O)priest.o   $(O)read.o
@@ -357,14 +357,15 @@ LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
 		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
 		lvm.c lzio.c
 
-LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+LUAOBJFILES1 =  $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
 		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
-		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
-		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
+		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o
+LUAOBJFILES2 =	$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
 		$(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
-		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o \
-		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
+		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o
+LUAOBJFILES3 =	$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
+LUAOBJFILES = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3)
 endif
 
 ifeq "$(ADD_CURSES)" "Y"
@@ -376,14 +377,17 @@ PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)/curspriv.h
 PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
 PDCSRC                  = $(PDCURSES_TOP)/pdcurses
 PDCDOS               = $(PDCURSES_TOP)/dos
-PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o             \
+PDCLIBOBJS1 = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o            \
 	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
-	$(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o     \
-	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o   \
-	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o     \
-	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
-	$(O)slk.o $(O)termattr.o $(O)touch.o $(O)util.o $(O)window.o    \
-	$(O)debug.o
+	$(O)getch.o
+PDCLIBOBJS2 = $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o $(O)initscr.o \
+	$(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o        \
+	$(O)keyname.o $(O)mouse.o
+PDCLIBOBJS3 = $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o $(O)panel.o \
+	$(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
+	$(O)slk.o $(O)termattr.o
+PDCLIBOBJS4 = $(O)touch.o $(O)util.o $(O)window.o $(O)debug.o
+PDCLIBOBJS = $(PDCLIBOBJS1) $(PDCLIBOBJS2) $(PDCLIBOBJS3) $(PDCLIBOBJS4)
 
 PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o \
 	$(O)pdcscrn.o $(O)pdcsetsc.o $(O)pdcutil.o
@@ -586,7 +590,7 @@ else
 LEVCOMPEXE =
 endif
 $(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h \
-	$(INCL)/pm.h	  monstr.c   vis_tab.c $(TILEUTIL)
+	$(INCL)/pm.h	  vis_tab.c $(TILEUTIL)
 	$(subst /,\,echo utilities made > $@)
 
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
@@ -620,6 +624,7 @@ endif
 	-@$(subst /,\,touch $(GAMEDIR)/record)
 	@$(subst /,\,copy $(DOC)/guideb*.txt  $(GAMEDIR))
 	@$(subst /,\,copy ../sys/winnt/sysconf  $(GAMEDIR))
+	@$(subst /,\,if not exist $(GAMEDIR)/sysconf touch $(GAMEDIR)/sysconf)
 	@$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR))
 ifdef CWSDPMI
 	@$(subst /,\,if exist $(CWSDPMI) copy $(CWSDPMI) $(GAMEDIR))
@@ -633,85 +638,49 @@ endif
 #==========================================
 
 $(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(PDCLIB) $(LUATARGETS) \
-	$(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
+	$(O)utility.tag $(ALLOBJ)
 	 @if exist temp.a del temp.a
-	 @ar ru temp.a $(VOBJ01)
-	 @ar ru temp.a $(VOBJ02)
-	 @ar ru temp.a $(VOBJ03)
-	 @ar ru temp.a $(VOBJ04)
-	 @ar ru temp.a $(VOBJ05)
-	 @ar ru temp.a $(VOBJ06)
-	 @ar ru temp.a $(VOBJ07)
-	 @ar ru temp.a $(VOBJ08)
-	 @ar ru temp.a $(VOBJ09)
-	 @ar ru temp.a $(VOBJ10)
-	 @ar ru temp.a $(VOBJ11)
-	 @ar ru temp.a $(VOBJ12)
-	 @ar ru temp.a $(VOBJ13)
-	 @ar ru temp.a $(VOBJ14)
-	 @ar ru temp.a $(VOBJ15)
-	 @ar ru temp.a $(VOBJ16)
-	 @ar ru temp.a $(VOBJ17)
-	 @ar ru temp.a $(VOBJ18)
-	 @ar ru temp.a $(VOBJ19)
-	 @ar ru temp.a $(VOBJ20)
-	 @ar ru temp.a $(VOBJ21)
-	 @ar ru temp.a $(VOBJ22)
-	 @ar ru temp.a $(VOBJ23)
-	 @ar ru temp.a $(VOBJ24)
-	 @ar ru temp.a $(VOBJ25)
-	 @ar ru temp.a $(SOBJ)
-	 @ar ru temp.a $(TILOBJ)
-	 @ar ru temp.a $(TILOBJ2)
-	 @ar ru temp.a $(VVOBJ)
+	 @ar ruS temp.a $(VOBJ01)
+	 @ar ruS temp.a $(VOBJ02)
+	 @ar ruS temp.a $(VOBJ03)
+	 @ar ruS temp.a $(VOBJ04)
+	 @ar ruS temp.a $(VOBJ05)
+	 @ar ruS temp.a $(VOBJ06)
+	 @ar ruS temp.a $(VOBJ07)
+	 @ar ruS temp.a $(VOBJ08)
+	 @ar ruS temp.a $(VOBJ09)
+	 @ar ruS temp.a $(VOBJ10)
+	 @ar ruS temp.a $(VOBJ11)
+	 @ar ruS temp.a $(VOBJ12)
+	 @ar ruS temp.a $(VOBJ13)
+	 @ar ruS temp.a $(VOBJ14)
+	 @ar ruS temp.a $(VOBJ15)
+	 @ar ruS temp.a $(VOBJ16)
+	 @ar ruS temp.a $(VOBJ17)
+	 @ar ruS temp.a $(VOBJ18)
+	 @ar ruS temp.a $(VOBJ19)
+	 @ar ruS temp.a $(VOBJ20)
+	 @ar ruS temp.a $(VOBJ21)
+	 @ar ruS temp.a $(VOBJ22)
+	 @ar ruS temp.a $(VOBJ23)
+	 @ar ruS temp.a $(VOBJ24)
+	 @ar ruS temp.a $(VOBJ25)
+	 @ar ruS temp.a $(SOBJ)
+	 @ar ruS temp.a $(TILOBJ)
+	 @ar ruS temp.a $(TILOBJ2)
+	 @ar ruS temp.a $(VVOBJ)
 ifeq "$(ADD_LUA)" "Y"
-	 @ar ru temp.a $(LUAOBJ)
+	 @ar ruS temp.a $(LUAOBJ)
 endif
 ifeq "$(ADD_CURSES)" "Y"
-	 @ar ru temp.a $(CURSESOBJ)
+	 @ar ruS temp.a $(CURSESOBJ)
 endif
+	@ranlib temp.a
 	$(LINK) $(LFLAGS) -o$(GAME).exe temp.a \
 	$(PDCLIB) $(LUALIB) $(LIBRARIES) $(ZLIB)
 	@$(subst /,\,stubedit $(GAME).exe minstack=2048K)
 	@$(subst /,\,copy $(GAME).exe $(GAMEFILE))
 	@$(subst /,\,del $(GAME).exe)
-
-$(O)$(GAME).lnk: $(ALLOBJ)
-	 echo $(VOBJ01) > $(subst /,\,$@)
-	 echo $(VOBJ02) >> $(subst /,\,$@)
-	 echo $(VOBJ03) >> $(subst /,\,$@)
-	 echo $(VOBJ04) >> $(subst /,\,$@)
-	 echo $(VOBJ05) >> $(subst /,\,$@)
-	 echo $(VOBJ06) >> $(subst /,\,$@)
-	 echo $(VOBJ07) >> $(subst /,\,$@)
-	 echo $(VOBJ08) >> $(subst /,\,$@)
-	 echo $(VOBJ09) >> $(subst /,\,$@)
-	 echo $(VOBJ10) >> $(subst /,\,$@)
-	 echo $(VOBJ11) >> $(subst /,\,$@)
-	 echo $(VOBJ12) >> $(subst /,\,$@)
-	 echo $(VOBJ13) >> $(subst /,\,$@)
-	 echo $(VOBJ14) >> $(subst /,\,$@)
-	 echo $(VOBJ15) >> $(subst /,\,$@)
-	 echo $(VOBJ16) >> $(subst /,\,$@)
-	 echo $(VOBJ17) >> $(subst /,\,$@)
-	 echo $(VOBJ18) >> $(subst /,\,$@)
-	 echo $(VOBJ19) >> $(subst /,\,$@)
-	 echo $(VOBJ20) >> $(subst /,\,$@)
-	 echo $(VOBJ21) >> $(subst /,\,$@)
-	 echo $(VOBJ22) >> $(subst /,\,$@)
-	 echo $(VOBJ23) >> $(subst /,\,$@)
-	 echo $(VOBJ24) >> $(subst /,\,$@)
-	 echo $(VOBJ25) >> $(subst /,\,$@)
-	 echo $(SOBJ)   >> $(subst /,\,$@)
-	 echo $(TILOBJ) >> $(subst /,\,$@)
-	 echo $(TILOBJ2) >> $(subst /,\,$@)
-	 echo $(VVOBJ)  >> $(subst /,\,$@)
-ifeq "$(ADD_LUA)" "Y"
-	 echo $(LUAOBJ) >> $(subst /,\,$@)
-endif
-ifeq "$(ADD_CURSES)" "Y"
-	 echo $(CURSESOBJ) >> $(subst /,\,$@)
-endif
 
 #==========================================
 #=========== SECONDARY TARGETS ============
@@ -731,9 +700,6 @@ $(INCL)/onames.h: $(U)makedefs.exe
 
 $(INCL)/pm.h: $(U)makedefs.exe
 	-$(subst /,\,$(U)makedefs -p)
-
-monstr.c: $(U)makedefs.exe
-	-$(subst /,\,$(U)makedefs -m)
 
 $(INCL)/vis_tab.h: $(U)makedefs.exe
 	-$(subst /,\,$(U)makedefs -z)
@@ -1030,11 +996,14 @@ $(O)sp_lev.tag: $(O)utility.tag
 
 #note that dir below assumes bin/dir.exe from djgpp distribution
 #
+ifndef LUA_QTEXT_FILE
+QUEST_DAT = $(DAT)/quest.dat
+else
+QUEST_DAT =
+endif
 $(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
 		$(DAT)/oracles \
-ifndef LUA_QTEXT_FILE
-		$(DAT)/quest.dat \
-endif
+		$(QUEST_DAT) \
 		$(O)sp_lev.tag \
 		$(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
 	@$(subst /,\,echo dat done >$(O)dat.tag)
@@ -1135,7 +1104,9 @@ $(O)lua535.a: $(LUAOBJFILES)
 		-Wl,--add-stdcall-alias -o $@ $<
 
 $(O)lua535s.a: $(LUAOBJFILES)
-	ar rcs $@ $(LUAOBJFILES)
+	ar rcS $@ $(LUAOBJFILES1)
+	ar rcS $@ $(LUAOBJFILES2)
+	ar rcs $@ $(LUAOBJFILES3)
 
 $(O)lua.o: $(LUASRC)/lua.c
 $(O)luac.o: $(LUASRC)/luac.c
@@ -1169,7 +1140,6 @@ spotless: clean
 	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
 	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
 	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
-	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
 	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
 	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
 	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
