@@ -66,6 +66,7 @@ typedef struct nhmi {
     const char *str;            /* Text of menu item */
     BOOLEAN_P presel;           /* Whether menu item should be preselected */
     boolean selected;           /* Whether item is currently selected */
+    unsigned itemflags;
     int page_num;               /* Display page number for entry */
     int line_num;               /* Line number on page where entry begins */
     int num_lines;              /* Number of lines entry uses on page */
