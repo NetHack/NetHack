@@ -337,8 +337,7 @@ add_menu(windid window, int glyph, const anything identifier,
 		   the menu command (or their user defined aliases), it loses.
 		   The menu commands and aliases take care not to interfere
 		   with the default object class symbols.
-		-- itemflags on this item (such as MENU_ITEMFLAGS_UNSELECTED,
-                   MENU_ITEMFLAGS_PRESELECTED, etc.).
+		-- itemflags on this item (such as MENU_ITEMFLAGS_SELECTED etc.).
 
 end_menu(window, prompt)
 		-- Stop adding entries to the menu and flushes the window
