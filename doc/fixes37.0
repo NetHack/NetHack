@@ -15,6 +15,8 @@ fix accessing mons[-1] when trying to gate in a non-valid demon
 fast hero could have random clairvoyance happen more than once on same turn
 using 'Q' on wielded weapon would offer to split stack; make using 'w' on a
 	quivered stack behave similarly
+leave some menu items out of "invert all" via '@' when their inclusion would
+	degrade the usefulness of that interface feature
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -68,4 +70,5 @@ remove STATIC_DCL, STATIC_OVL, STATIC_VAR, STATIC_PTR
 old Qt moved from win/Qt to win/Qt3 and files renamed to use qt3_ prefix
 more current Qt for Qt version 4 and 5 moved from win/Qt4 to win/Qt; qt4
 	moniker changed to qt_
-
+window-port-interface: add_menu() modified to take a more general itemflags
+	parameter to support uses beyond just 'preselected'
