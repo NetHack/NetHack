@@ -133,6 +133,7 @@ typedef struct x11_mi {
     int attr;            /* Attribute for the line. */
     boolean selected;    /* Been selected? */
     boolean preselected; /*   in advance?  */
+    unsigned itemflags;  /* MENU_ITEMFLAGS_foo */
     char selector;       /* Char used to select this entry. */
     char gselector;      /* Group selector. */
     Widget w;
