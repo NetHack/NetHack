@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmenu.c	$NHDT-Date: 1542245161 2018/11/15 01:26:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	winmenu.c	$NHDT-Date: 1577063136 2019/12/23 01:05:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -628,7 +628,7 @@ winid window;
 
 /*ARGSUSED*/
 void
-X11_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+X11_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
 winid window;
 int glyph; /* unused (for now) */
 const anything *identifier;
@@ -636,10 +636,11 @@ char ch;
 char gch; /* group accelerator (0 = no group) */
 int attr;
 const char *str;
-boolean preselected;
+unsigned itemflags;
 {
     x11_menu_item *item;
     struct menu_info_t *menu_info;
+    boolean preselected = (itemflags & MENU_ITEMFLAGS_SELECTED) != 0;
 
     nhUse(glyph);
 
