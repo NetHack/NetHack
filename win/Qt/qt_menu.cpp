@@ -534,6 +534,9 @@ void NetHackQtMenuWindow::Invert()
         return;
 
     for (int i=0; i<itemcount; i++) {
+        if ((itemlist[i].itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0)
+            continue;
+
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
 
@@ -813,10 +816,10 @@ void NetHackQtMenuOrTextWindow::StartMenu()
     actual->StartMenu();
 }
 void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-	const QString& str, bool presel)
+	const QString& str, unsigned itemflags)
 {
     if (!actual) impossible("AddMenu called before we know if Menu or Text");
-    actual->AddMenu(glyph,identifier,ch,gch,attr,str,presel);
+    actual->AddMenu(glyph,identifier,ch,gch,attr,str,itemflags);
 }
 void NetHackQtMenuOrTextWindow::EndMenu(const QString& prompt)
 {
