@@ -1818,7 +1818,7 @@ char acc; /* group accelerator, 0 => all */
                     curr->count = -1;
                 } else
                     curr->selected = TRUE;
-	    }
+            }
         }
     }
 }

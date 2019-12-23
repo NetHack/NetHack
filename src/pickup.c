@@ -1014,6 +1014,7 @@ int how;               /* type of query */
     boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
             do_buc_unknown = FALSE;
     int num_buc_types = 0;
+    unsigned itemflags = MENU_ITEMFLAGS_NONE;
 
     *pick_list = (menu_item *) 0;
     if (!olist)
@@ -1068,10 +1069,11 @@ int how;               /* type of query */
         invlet = 'A';
         any = cg.zeroany;
         any.a_int = 'A';
+        itemflags = MENU_ITEMFLAGS_SKIPINVERT;
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  (qflags & WORN_TYPES) ? "Auto-select every item being worn"
                                        : "Auto-select every item",
-                 MENU_ITEMFLAGS_NONE);
+                 itemflags);
 
         any = cg.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
@@ -1081,9 +1083,10 @@ int how;               /* type of query */
         invlet = 'a';
         any = cg.zeroany;
         any.a_int = ALL_TYPES_SELECTED;
+        itemflags = MENU_ITEMFLAGS_SKIPINVERT;
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  (qflags & WORN_TYPES) ? "All worn types" : "All types",
-                 MENU_ITEMFLAGS_NONE);
+                 itemflags);
         invlet = 'b';
     } else
         invlet = 'a';
@@ -1141,33 +1144,34 @@ int how;               /* type of query */
     /* items with b/u/c/unknown if there are any;
        this cluster of menu entries is in alphabetical order,
        reversing the usual sequence of 'U' and 'C' in BUCX */
+    itemflags = MENU_ITEMFLAGS_SKIPINVERT;
     if (do_blessed) {
         invlet = 'B';
         any = cg.zeroany;
         any.a_int = 'B';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-                 "Items known to be Blessed", MENU_ITEMFLAGS_NONE);
+                 "Items known to be Blessed", itemflags);
     }
     if (do_cursed) {
         invlet = 'C';
         any = cg.zeroany;
         any.a_int = 'C';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-                 "Items known to be Cursed", MENU_ITEMFLAGS_NONE);
+                 "Items known to be Cursed", itemflags);
     }
     if (do_uncursed) {
         invlet = 'U';
         any = cg.zeroany;
         any.a_int = 'U';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-                 "Items known to be Uncursed", MENU_ITEMFLAGS_NONE);
+                 "Items known to be Uncursed", itemflags);
     }
     if (do_buc_unknown) {
         invlet = 'X';
         any = cg.zeroany;
         any.a_int = 'X';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-                 "Items of unknown Bless/Curse status", MENU_ITEMFLAGS_NONE);
+                 "Items of unknown Bless/Curse status", itemflags);
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
