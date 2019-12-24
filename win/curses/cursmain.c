@@ -525,7 +525,6 @@ curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
                 const char *str, unsigned itemflags)
 {
     int curses_attr;
-    boolean presel = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
 
     attr &= ~(ATR_URGENT | ATR_NOHISTORY);
     curses_attr = curses_convert_attr(attr);
