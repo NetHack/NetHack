@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1577055058 2019/12/22 22:50:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1577186790 2019/12/24 11:26:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -275,16 +275,6 @@ dowield()
     if (!(wep = getobj(wield_objs, "wield"))) {
         /* Cancelled */
         return 0;
-    } else if (wep->o_id == g.context.objsplit.child_oid) {
-        /* if wep is the result of supplying a count to getobj()
-           we don't want to split something already wielded; for
-           any other item, we need to give it its own inventory slot */
-        if (uwep && uwep->o_id == g.context.objsplit.parent_oid) {
-            unsplitobj(wep);
-            goto already_wielded;
-        }
-        finish_splitting = TRUE;
-        goto wielding;
     } else if (wep == uwep) {
  already_wielded:
         You("are already wielding that!");
@@ -295,7 +285,20 @@ dowield()
         weldmsg(uwep);
         /* previously interrupted armor removal mustn't be resumed */
         reset_remarm();
+        /* if player chose a partial stack but can't wield it, undo split */
+        if (wep->o_id && wep->o_id == g.context.objsplit.child_oid)
+            unsplitobj(wep);
         return 0;
+    } else if (wep->o_id && wep->o_id == g.context.objsplit.child_oid) {
+        /* if wep is the result of supplying a count to getobj()
+           we don't want to split something already wielded; for
+           any other item, we need to give it its own inventory slot */
+        if (uwep && uwep->o_id == g.context.objsplit.parent_oid) {
+            unsplitobj(wep);
+            goto already_wielded;
+        }
+        finish_splitting = TRUE;
+        goto wielding;
     }
 
     /* Handle no object, or object in other slot */

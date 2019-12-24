@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ $NHDT-Date: 1577184069 2019/12/24 10:41:09 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.34 $ $NHDT-Date: 1577186790 2019/12/24 11:26:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -28,6 +28,8 @@ fix compile when DLB isn't defined
 urealtime.realtime was being incorrectly calculated
 revised "mysterious force" when climbing out of gehennom could generate
 	warnings about "rn2(0) attempted" or "rn2(-n) attempted"
+after 'w' on split stack patch, wielding '-' would cause an object_lost panic
+same patch allowed partial stack from getobj to replace cursed wielded weapon
 
 
 Platform- and/or Interface-Specific Fixes
