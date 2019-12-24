@@ -1784,8 +1784,9 @@ char acc;
     for (curr = invent_list; start-- && curr; curr = curr->Gmi_next)
         ;
     for (; page-- && curr; curr = curr->Gmi_next) {
-        if ((curr->Gmi_itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0)
+        if (!menuitem_invert_test(0, curr->Gmi_itemflags, curr->Gmi_selected)
             continue;
+
         if (curr->Gmi_identifier && (acc == 0 || curr->Gmi_groupacc == acc)) {
             if (curr->Gmi_selected) {
                 curr->Gmi_selected = FALSE;

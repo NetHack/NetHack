@@ -534,7 +534,8 @@ void NetHackQtMenuWindow::Invert()
         return;
 
     for (int i=0; i<itemcount; i++) {
-        if ((itemlist[i].itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0)
+        if (!menuitem_invert_test(0, itemlist[i].itemflags,
+                                  itemlist[i].selected))
             continue;
 
 	QTableWidgetItem *count = table->item(i, 0);

@@ -311,6 +311,7 @@ static struct Comp_Opt {
     { "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
       PL_PSIZ, DISP_IN_GAME },
     { "map_mode", "map display mode under Windows", 20, DISP_IN_GAME }, /*WC*/
+    { "menuinvertmode", "behaviour of menu iverts", 5, SET_IN_GAME },
     { "menustyle", "user interface for object selection", MENUTYPELEN,
       SET_IN_GAME },
     { "menu_deselect_all", "deselect all items in a menu", 4, SET_IN_FILE },
@@ -2360,6 +2361,24 @@ boolean tinitial, tfrom_file;
         } else
             return FALSE;
         return retval;
+    }
+
+    /* menuinvertmode=0 or 1 or 2 (2 is experimental) */
+    fullname = "menuinvertmode";
+    if (match_optname(opts, fullname, 5, TRUE)) {
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return FALSE;
+        } else {
+            int mode = atoi(op);
+
+            if (mode < 0 || mode > 2) {
+                config_error_add("Illegal %s parameter '%s'", fullname, op);
+                return FALSE;
+            }
+            iflags.menuinvertmode = mode;
+	}
+	return retval;
     }
 
     fullname = "msghistory";
@@ -5614,7 +5633,9 @@ char *buf;
                                   : (i == MAP_MODE_ASCII_FIT_TO_SCREEN)
                                     ? "fit_to_screen"
                                     : defopt);
-    } else if (!strcmp(optname, "menustyle"))
+    } else if (!strcmp(optname, "menuinvertmode"))
+        Sprintf(buf, "%d", iflags.menuinvertmode);
+    else if (!strcmp(optname, "menustyle"))
         Sprintf(buf, "%s", menutype[(int) flags.menu_style]);
     else if (!strcmp(optname, "menu_deselect_all"))
         Sprintf(buf, "%s", to_be_done);

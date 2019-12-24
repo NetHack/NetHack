@@ -543,7 +543,7 @@ struct xwindow *wp;
     reset_menu_count(wp->menu_information);
     for (count = 0, curr = wp->menu_information->curr_menu.base; curr;
          curr = curr->next, count++) {
-        if ((curr->itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0)
+        if (!menuitem_invert_test(0, curr->itemflags, curr->selected))
             continue;
         if (curr->identifier.a_void != 0)
             invert_line(wp, curr, count, -1L);

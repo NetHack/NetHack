@@ -1553,7 +1553,8 @@ menu_operation(WINDOW * win, nhmenu *menu, menu_op
 
         if (menu_item_ptr->identifier.a_void != NULL) {
             if (operation != INVERT
-                || (menu_item_ptr->itemflags & MENU_ITEMFLAGS_SKIPINVERT) == 0)
+                || menuitem_invert_test(0, menu_item_ptr->itemflags,
+                                        menu_item_ptr->selected))
                 menu_select_deselect(win, menu_item_ptr, operation, current_page);
         }
 

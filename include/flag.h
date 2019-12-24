@@ -243,6 +243,8 @@ struct instance_flags {
      */
     unsigned msg_history; /* hint: # of top lines to save */
     int getpos_coords;    /* show coordinates when getting cursor position */
+    int menuinvertmode;  /* 0 = invert toggles every item;
+                            1 = invert skips 'all items' item */
     int menu_headings;    /* ATR for menu headings */
     int *opt_booldup;     /* for duplication of boolean opts in config file */
     int *opt_compdup;     /* for duplication of compound opts in conf file */
