@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.34 $ $NHDT-Date: 1577186790 2019/12/24 11:26:30 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ $NHDT-Date: 1577190687 2019/12/24 12:31:27 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -20,6 +20,9 @@ weight for giant spider was too low for creature of size 'large';
 leave some menu items out of "invert all" via '@' when their inclusion would
 	degrade the usefulness of that interface feature
 change crysknife from mineral to bone and worm tooth from unspecified to bone
+worn meat ring shouldn't cause increased hunger; neither should fake Amulet
+worn +0 ring of protection should cause increased hunger if it is the only
+	source of extrinsic Protection
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
