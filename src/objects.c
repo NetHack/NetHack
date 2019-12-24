@@ -1,4 +1,4 @@
-/* NetHack 3.6	objects.c	$NHDT-Date: 1535422421 2018/08/28 02:13:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	objects.c	$NHDT-Date: 1577184069 2019/12/24 10:41:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -173,10 +173,11 @@ WEAPON("stiletto", None,
 /* 3.6: worm teeth and crysknives now stack;
    when a stack of teeth is enchanted at once, they fuse into one crysknife;
    when a stack of crysknives drops, the whole stack reverts to teeth */
+/* 3.7: change crysknife from MINERAL to BONE and worm tooth from 0 to BONE */
 WEAPON("worm tooth", None,
-       1, 1, 0,  0,  20,   2,  2,  2, 0, 0,   P_KNIFE, 0, CLR_WHITE),
+       1, 1, 0,  0,  20,   2,  2,  2, 0, 0,   P_KNIFE, BONE, CLR_WHITE),
 WEAPON("crysknife", None,
-       1, 1, 0,  0,  20, 100, 10, 10, 3, P,   P_KNIFE, MINERAL, CLR_WHITE),
+       1, 1, 0,  0,  20, 100, 10, 10, 3, P,   P_KNIFE, BONE, CLR_WHITE),
 
 /* axes */
 WEAPON("axe", None,

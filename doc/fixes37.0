@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ $NHDT-Date: 1577147706 2019/12/24 00:35:06 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ $NHDT-Date: 1577184069 2019/12/24 10:41:09 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -19,6 +19,7 @@ weight for giant spider was too low for creature of size 'large';
 	weight for giant beetle was much too low for 'large'
 leave some menu items out of "invert all" via '@' when their inclusion would
 	degrade the usefulness of that interface feature
+change crysknife from mineral to bone and worm tooth from unspecified to bone
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
