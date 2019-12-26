@@ -201,6 +201,7 @@ struct obj *otmp;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) otmp, sizeof(struct obj));
 
+    otmp->lua_ref_cnt = 0;
     /* next object pointers are invalid; otmp->cobj needs to be left
        as is--being non-null is key to restoring container contents */
     otmp->nobj = otmp->nexthere = (struct obj *) 0;

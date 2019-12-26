@@ -1675,6 +1675,7 @@ E int FDECL(l_selection_register, (lua_State *));
 
 /* ### nhlobj.c ### */
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+E void FDECL(nhl_push_obj, (lua_State *, struct obj *));
 E int FDECL(l_obj_register, (lua_State *));
 #endif
 

@@ -839,6 +839,11 @@ lua_State *L;
             return nhl_push_anything(L, ustruct[i].type, ustruct[i].ptr);
         }
 
+    if (!strcmp(tkey, "inventory")) {
+        nhl_push_obj(L, g.invent);
+        return 1;
+    }
+
     nhl_error(L, "Unknown u table index");
     return 0;
 }

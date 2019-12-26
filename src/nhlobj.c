@@ -43,8 +43,10 @@ lua_State *L;
     struct _lua_obj *lo = l_obj_check(L, 1);
 
     if (lo && lo->obj) {
-        /* free-floating objects are deallocated */
-        if (lo->obj->where == OBJ_FREE) {
+        if (lo->obj->lua_ref_cnt > 0)
+            lo->obj->lua_ref_cnt--;
+        /* free-floating objects with no other refs are deallocated. */
+        if (lo->obj->where == OBJ_FREE && !lo->obj->lua_ref_cnt) {
             if (Has_contents(lo->obj)) {
                 struct obj *otmp;
                 while ((otmp = lo->obj->cobj) != 0) {
@@ -71,8 +73,18 @@ struct obj *otmp;
 
     lo->state = 0;
     lo->obj = otmp;
+    if (otmp)
+        otmp->lua_ref_cnt++;
 
     return lo;
+}
+
+void
+nhl_push_obj(L, otmp)
+lua_State *L;
+struct obj *otmp;
+{
+    (void) l_obj_push(L, otmp);
 }
 
 /* local o = obj.new("large chest");

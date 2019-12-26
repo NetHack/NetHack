@@ -444,6 +444,7 @@ long num;
     obj->owt = weight(obj);
     otmp->quan = num;
     otmp->owt = weight(otmp); /* -= obj->owt ? */
+    otmp->lua_ref_cnt = 0;
 
     g.context.objsplit.parent_oid = obj->o_id;
     g.context.objsplit.child_oid = otmp->o_id;
@@ -797,6 +798,7 @@ boolean artif;
     otmp->lknown = 0;
     otmp->cknown = 0;
     otmp->corpsenm = NON_PM;
+    otmp->lua_ref_cnt = 0;
 
     if (init) {
         switch (let) {
@@ -2178,8 +2180,10 @@ struct obj *obj;
      * list must track all objects that can have a light source
      * attached to it (and also requires lamplit to be set).
      */
-    if (obj_sheds_light(obj))
+    if (obj_sheds_light(obj)) {
         del_light_source(LS_OBJECT, obj_to_any(obj));
+        obj->lamplit = 0;
+    }
 
     if (obj == g.thrownobj)
         g.thrownobj = 0;
@@ -2188,6 +2192,8 @@ struct obj *obj;
 
     if (obj->oextra)
         dealloc_oextra(obj);
+    if (obj->lua_ref_cnt)
+        return; /* obj is referenced from a lua script, let lua gc free it */
     free((genericptr_t) obj);
 }
 
