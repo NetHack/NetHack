@@ -411,9 +411,7 @@ hobj.tag:
 $(U)makedefs:  $(MAKEDEFSOBJS)
 	$(HOST_LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS)
 
-$(O)makedefs$(HOST).o:
-
-$(HOST_O)makedefs.o: $(U)makedefs.c $(SRC)/mdlib.c $(CONFIG_H) $(INCL)/permonst.h \
+$(HOST_O)makedefs$(HOST_O).o: $(U)makedefs.c $(SRC)/mdlib.c $(CONFIG_H) $(INCL)/permonst.h \
 		$(INCL)/objclass.h $(INCL)/monsym.h \
 		$(INCL)/artilist.h $(INCL)/dungeon.h $(INCL)/obj.h \
 		$(INCL)/monst.h $(INCL)/you.h $(INCL)/flag.h \
