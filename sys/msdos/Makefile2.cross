@@ -605,12 +605,6 @@ install: $(GAMEFILE) $(O)install.tag
 
 default: $(GAMEFILE)
 
-util: $(O)utility.tag
-
-$(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h $(INCL)/onames.h \
-	$(INCL)/pm.h vis_tab.c $(TILEUTIL)
-	echo utilities made > $@
-
 tileutil: $(U)gif2txt $(U)txt2ppm
 	@echo Optional tile development utilities are up to date.
 
@@ -647,7 +641,7 @@ endif
 #==========================================
 
 $(GAMEFILE): $(O)obj.tag $(PDCLIB) $(LUALIB) \
-	$(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
+	$(ALLOBJ) $(O)$(GAME).lnk
 	if [ -f temp.a ]; then rm temp.a; fi;
 	@$(TARGET_AR) r temp.a $(VOBJ01)
 	@$(TARGET_AR) r temp.a $(VOBJ02)
