@@ -182,7 +182,7 @@ winid window;
 }
 
 void
-chainin_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+chainin_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
 winid window;               /* window to use, must be of type NHW_MENU */
 int glyph;                  /* glyph to display with item (unused) */
 const anything *identifier; /* what to return if selected */
@@ -190,10 +190,11 @@ char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
 int attr;                   /* attribute for string (like tty_putstr()) */
 const char *str;            /* menu string */
-boolean preselected;        /* item is marked as selected */
+unsigned int itemflags;     /* flags such as item is marked as selected
+                               MENU_ITEMFLAGS_SELECTED */
 {
     (*cibase->nprocs->win_add_menu)(cibase->ndata, window, glyph, identifier,
-                                    ch, gch, attr, str, preselected);
+                                    ch, gch, attr, str, itemflags);
 }
 
 void

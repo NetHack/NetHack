@@ -125,7 +125,7 @@ void NetHackQtWindow::CursorTo(int x,int y) { puts("unexpected CursorTo"); }
 void NetHackQtWindow::PutStr(int attr, const QString& text) { puts("unexpected PutStr"); }
 void NetHackQtWindow::StartMenu() { puts("unexpected StartMenu"); }
 void NetHackQtWindow::AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-    const QString& str, bool presel) { puts("unexpected AddMenu"); }
+    const QString& str, unsigned itemflags) { puts("unexpected AddMenu"); }
 void NetHackQtWindow::EndMenu(const QString& prompt) { puts("unexpected EndMenu"); }
 int NetHackQtWindow::SelectMenu(int how, MENU_ITEM_P **menu_list) { puts("unexpected SelectMenu"); return 0; }
 void NetHackQtWindow::ClipAround(int x,int y) { puts("unexpected ClipAround"); }

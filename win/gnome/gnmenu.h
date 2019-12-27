@@ -18,6 +18,7 @@ struct _GHackMenuItem {
     CHAR_P accelerator;
     CHAR_P group_accel;
     int attr;
+    unsigned itemflags;
     const char *str;
     BOOLEAN_P presel;
 };

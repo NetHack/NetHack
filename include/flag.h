@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1574982014 2019/11/28 23:00:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1577050470 2019/12/22 21:34:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,20 +16,19 @@
  */
 
 struct flag {
-    boolean acoustics;  /* allow dungeon sound messages */
-    boolean autodig;    /* MRKR: Automatically dig */
-    boolean autoquiver; /* Automatically fill quiver */
-    boolean autoopen;   /* open doors by walking into them */
+    boolean acoustics;       /* allow dungeon sound messages */
+    boolean autodig;         /* MRKR: Automatically dig */
+    boolean autoquiver;      /* Automatically fill quiver */
+    boolean autoopen;        /* open doors by walking into them */
     boolean autounlock; /* automatically apply unlocking tools */
-    boolean beginner;
-    boolean biff;      /* enable checking for mail */
-    boolean bones;     /* allow saving/loading bones */
-    boolean confirm;   /* confirm before hitting tame monsters */
-    boolean dark_room; /* show shadows in lit rooms */
-    boolean debug;     /* in debugging mode */
+    boolean biff;            /* enable checking for mail */
+    boolean bones;           /* allow saving/loading bones */
+    boolean confirm;         /* confirm before hitting tame monsters */
+    boolean dark_room;       /* show shadows in lit rooms */
+    boolean debug;           /* in debugging mode (aka wizard mode) */
 #define wizard flags.debug
-    boolean end_own; /* list all own scores */
-    boolean explore; /* in exploration mode */
+    boolean end_own;         /* list all own scores */
+    boolean explore;         /* in exploration mode (aka discover mode) */
 #define discover flags.explore
     boolean female;
     boolean friday13;        /* it's Friday the 13th */
@@ -45,6 +44,8 @@ struct flag {
     boolean pickup;          /* whether you pickup or move and look */
     boolean pickup_thrown;   /* auto-pickup items you threw */
     boolean pushweapon; /* When wielding, push old weapon into second slot */
+    boolean quick_farsight;  /* True disables map browsing during random
+                              * clairvoyance */
     boolean rest_on_space;   /* space means rest */
     boolean safe_dog;        /* give complete protection to the dog */
     boolean showexp;         /* show experience points */
@@ -242,6 +243,8 @@ struct instance_flags {
      */
     unsigned msg_history; /* hint: # of top lines to save */
     int getpos_coords;    /* show coordinates when getting cursor position */
+    int menuinvertmode;  /* 0 = invert toggles every item;
+                            1 = invert skips 'all items' item */
     int menu_headings;    /* ATR for menu headings */
     int *opt_booldup;     /* for duplication of boolean opts in config file */
     int *opt_compdup;     /* for duplication of compound opts in conf file */

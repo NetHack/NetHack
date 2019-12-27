@@ -119,6 +119,7 @@ struct obj {
     unsigned oeaten;        /* nutrition left in food, if partly eaten */
     long age;               /* creation date */
     long owornmask;
+    unsigned lua_ref_cnt;  /* # of lua script references for this object */
     struct oextra *oextra; /* pointer to oextra struct */
 };
 

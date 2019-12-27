@@ -1783,7 +1783,10 @@ char acc;
 
     for (curr = invent_list; start-- && curr; curr = curr->Gmi_next)
         ;
-    for (; page-- && curr; curr = curr->Gmi_next)
+    for (; page-- && curr; curr = curr->Gmi_next) {
+        if (!menuitem_invert_test(0, curr->Gmi_itemflags, curr->Gmi_selected)
+            continue;
+
         if (curr->Gmi_identifier && (acc == 0 || curr->Gmi_groupacc == acc)) {
             if (curr->Gmi_selected) {
                 curr->Gmi_selected = FALSE;
@@ -1791,6 +1794,7 @@ char acc;
             } else
                 curr->Gmi_selected = TRUE;
         }
+    }
 }
 
 /************************* Inv_Handler and Inv_Init

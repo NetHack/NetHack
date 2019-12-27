@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1555552624 2019/04/18 01:57:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1577050218 2019/12/22 21:30:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -66,6 +66,10 @@ boolean resuming;
         g.context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
         (void) pickup(1);      /* autopickup at initial location */
+        /* only matters if someday a character is able to start with
+           clairvoyance (wizard with cornuthaum perhaps?); without this,
+           first "random" occurrence would always kick in on turn 1 */
+        g.context.seer_turn = (long) rnd(30);
     }
     g.context.botlx = TRUE; /* for STATUS_HILITES */
     update_inventory(); /* for perm_invent */
@@ -336,9 +340,21 @@ boolean resuming;
 #endif
             if (g.context.bypasses)
                 clear_bypasses();
-            if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
-                && !BClairvoyant && !(g.moves % 15) && !rn2(2))
-                do_vicinity_map((struct obj *) 0);
+            if (g.moves >= g.context.seer_turn) {
+                if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
+                    && !BClairvoyant)
+                    do_vicinity_map((struct obj *) 0);
+                /* we maintain this counter even when clairvoyance isn't
+                   taking place; on average, go again 30 turns from now */
+                g.context.seer_turn = g.moves + (long) rn1(31, 15); /*15..45*/
+                /* [it used to be that on every 15th turn, there was a 50%
+                   chance of farsight, so it could happen as often as every
+                   15 turns or theoretically never happen at all; but when
+                   a fast hero got multiple moves on that 15th turn, it
+                   could actually happen more than once on the same turn!] */
+            }
+            /* [fast hero who gets multiple moves per turn ends up sinking
+               multiple times per turn; is that what we really want?] */
             if (u.utrap && u.utraptype == TT_LAVA)
                 sink_into_lava();
             /* when/if hero escapes from lava, he can't just stay there */

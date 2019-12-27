@@ -163,13 +163,13 @@ sys/msdos:
 Install.dos             Makefile.BC             Makefile.GCC
 Makefile.MSC            Makefile1.cross         Makefile2.cross
 SCHEMA35.MSC            moveinit.pat            msdos-cross-compile.sh
-msdos.c                 msdoshlp.txt            ovlinit.c
-pckeys.c                pctiles.c               pctiles.h
-pcvideo.h               portio.h                schema1.BC
-schema2.BC              schema3.MSC             setup.bat
-sysconf                 tile2bin.c              vesa.h
-video.c                 vidtxt.c                vidvesa.c
-vidvga.c
+msdos.c                 msdoshlp.txt            nhlua.h
+ovlinit.c               pckeys.c                pctiles.c
+pctiles.h               pcvideo.h               portio.h
+schema1.BC              schema2.BC              schema3.MSC
+setup.bat               sysconf                 tile2bin.c
+vesa.h                  video.c                 vidtxt.c
+vidvesa.c               vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
@@ -289,9 +289,9 @@ Makefile.msc         console.rc           nethack.def
 nh340key.c           nhdefkey.c           nhico.uu
 nhraykey.c           nhsetup.bat          ntsound.c
 nttty.c              porthelp             stub-pdcscrn.c
-stubs.c              sysconf.template     win10.c
-win10.h              win32api.h           windmain.c
-winnt.c              winos.h
+stubs.c              sysconf.template     travis-gcc.sh
+win10.c              win10.h              win32api.h
+windmain.c           winnt.c              winos.h
 
 test:
 (files in top directory)

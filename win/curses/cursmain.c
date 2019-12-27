@@ -491,7 +491,7 @@ curses_start_menu(winid wid)
 /*
 add_menu(winid wid, int glyph, const anything identifier,
                                 char accelerator, char groupacc,
-                                int attr, char *str, boolean preselected)
+                                int attr, char *str, unsigned int itemflags)
                 -- Add a text line str to the given menu window.  If identifier
                    is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
@@ -517,12 +517,12 @@ add_menu(winid wid, int glyph, const anything identifier,
                    The menu commands and aliases take care not to interfere
                    with the default object class symbols.
                 -- If you want this choice to be preselected when the
-                   menu is displayed, set preselected to TRUE.
+                   menu is displayed, set bit MENU_ITEMFLAGS_SELECTED.
 */
 void
 curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
                 CHAR_P accelerator, CHAR_P group_accel, int attr,
-                const char *str, BOOLEAN_P presel)
+                const char *str, unsigned itemflags)
 {
     int curses_attr;
 
@@ -536,7 +536,7 @@ curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
     }
 
     curses_add_nhmenu_item(wid, glyph, identifier, accelerator, group_accel,
-                           curses_attr, str, presel);
+                           curses_attr, str, itemflags);
 }
 
 /*

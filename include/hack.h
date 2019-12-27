@@ -490,9 +490,6 @@ enum bodypart_types {
 #define MENU_FULL 2
 #define MENU_PARTIAL 3
 
-#define MENU_SELECTED TRUE
-#define MENU_UNSELECTED FALSE
-
 /*
  * Option flags
  * Each higher number includes the characteristics of the numbers

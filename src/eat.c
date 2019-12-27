@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1574900825 2019/11/28 00:27:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1577190688 2019/12/24 12:31:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2810,19 +2810,47 @@ gethungry()
         /* Conflict uses up food too */
         if (HConflict || (EConflict & (~W_ARTI)))
             u.uhunger--;
-        /* +0 charged rings don't do anything, so don't affect hunger.
-           Slow digestion cancels move hunger but still causes ring hunger. */
+        /*
+         * +0 charged rings don't do anything, so don't affect hunger.
+         * Slow digestion cancels movement and melee hunger but still
+         * causes ring hunger.
+         * Possessing the real Amulet imposes a separate hunger penalty
+         * from wearing an amulet (so gets a double penalty when worn).
+         *
+         * 3.7.0:  Worn meat rings don't affect hunger.
+         * Same with worn cheap plastic imitation of the Amulet.
+         * +0 ring of protection might do something (enhanced "magical
+         * cancellation") if hero doesn't have protection from some
+         * other source (cloak or second ring).
+         */
         switch ((int) (g.moves % 20)) { /* note: use even cases only */
         case 4:
-            if (uleft && (uleft->spe || !objects[uleft->otyp].oc_charged))
+            if (uleft && uleft->otyp != MEAT_RING
+                /* more hungry if +/- is nonzero or +/- doesn't apply or
+                   +0 ring of protection is only source of protection;
+                   need to check whether both rings are +0 protection or
+                   they'd both slip by the "is there another source?" test,
+                   but don't do that for both rings or they will both be
+                   treated as supplying "MC" when only one matters */
+                && (uleft->spe
+                    || !objects[uleft->otyp].oc_charged
+                    || (uleft->otyp == RIN_PROTECTION
+                        && ((EProtection & ~W_RINGL) == 0L
+                            || ((EProtection & ~W_RINGL) == W_RINGR
+                                && uright && uright->otyp == RIN_PROTECTION
+                                && !uright->spe)))))
                 u.uhunger--;
             break;
         case 8:
-            if (uamul)
+            if (uamul && uamul->otyp != FAKE_AMULET_OF_YENDOR)
                 u.uhunger--;
             break;
         case 12:
-            if (uright && (uright->spe || !objects[uright->otyp].oc_charged))
+            if (uright && uright->otyp != MEAT_RING
+                && (uright->spe
+                    || !objects[uright->otyp].oc_charged
+                    || (uright->otyp == RIN_PROTECTION
+                        && (EProtection & ~W_RINGR) == 0L)))
                 u.uhunger--;
             break;
         case 16:

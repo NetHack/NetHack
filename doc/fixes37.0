@@ -1,8 +1,7 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ $NHDT-Date: 1576288434 2019/12/14 01:53:54 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ $NHDT-Date: 1577190687 2019/12/24 12:31:27 $
 
 General Fixes and Modified Features
 -----------------------------------
-fix compile when DLB isn't defined
 hero polymorphed into a vampire can use #monster to shape-shift rather than
 	just do a one-shot polymorph into bat/cloud/wolf and shifted vampire
 	hero can use #monster again to take on another form (randomly chosen
@@ -12,10 +11,28 @@ fix internal self-recover to work with recent fields added to checkpoint file
 improvements to pronoun usage when hallucinating
 function calls made from mapglyph based on dungeon level are now called once
 	per level
+fix accessing mons[-1] when trying to gate in a non-valid demon
+fast hero could have random clairvoyance happen more than once on same turn
+using 'Q' on wielded weapon would offer to split stack; make using 'w' on a
+	quivered stack behave similarly
+weight for giant spider was too low for creature of size 'large';
+	weight for giant beetle was much too low for 'large'
+leave some menu items out of "invert all" via '@' when their inclusion would
+	degrade the usefulness of that interface feature
+change crysknife from mineral to bone and worm tooth from unspecified to bone
+worn meat ring shouldn't cause increased hunger; neither should fake Amulet
+worn +0 ring of protection should cause increased hunger if it is the only
+	source of extrinsic Protection
 
 
-Fixes to Pre-3.7.0 Problems that Were Exposed Via git Repository
+Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
+fix compile when DLB isn't defined
+urealtime.realtime was being incorrectly calculated
+revised "mysterious force" when climbing out of gehennom could generate
+	warnings about "rn2(0) attempted" or "rn2(-n) attempted"
+after 'w' on split stack patch, wielding '-' would cause an object_lost panic
+same patch allowed partial stack from getobj to replace cursed wielded weapon
 
 
 Platform- and/or Interface-Specific Fixes
@@ -40,6 +57,9 @@ split off some of the functionality that was in makedefs (compiled-in options
 replace quest.txt and associated conversion to quest.dat via makedefs with
 	lua quest texts loaded at runtime
 some altars are displayed in different colors (for tty and curses at least)
+add 'quick_farsight' option to provide some control over random clairvoyance
+	where pausing to be able to browse temporarily visible aspects of the
+	revealed map can seem intrusive; doesn't affect clairvoyance spell
 
 
 Platform- and/or Interface-Specific New Features
@@ -57,7 +77,8 @@ Code Cleanup and Reorganization
 move majority of global variables into instance_globals struct g
 move zeroobj, zeromonst, zeroany into const_globals struct cg
 remove STATIC_DCL, STATIC_OVL, STATIC_VAR, STATIC_PTR
-old Qt moved from win/Qt to win/Qt3
+old Qt moved from win/Qt to win/Qt3 and files renamed to use qt3_ prefix
 more current Qt for Qt version 4 and 5 moved from win/Qt4 to win/Qt; qt4
 	moniker changed to qt_
-
+window-port-interface: add_menu() modified to take a more general itemflags
+	parameter to support uses beyond just 'preselected'
