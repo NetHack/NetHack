@@ -607,8 +607,8 @@ dotelecmd()
             any.a_int = (int) tports[i].menulet;
             add_menu(win, NO_GLYPH, &any, (char) any.a_int, 0, ATR_NONE,
                      tports[i].menudesc,
-                     (tports[i].menulet == 'w') ? MENU_SELECTED
-                                                : MENU_UNSELECTED);
+                     (tports[i].menulet == 'w') ? MENU_ITEMFLAGS_SELECTED
+                                                : MENU_ITEMFLAGS_NONE);
         }
         end_menu(win, "Which way do you want to teleport?");
         i = select_menu(win, PICK_ONE, &picks);

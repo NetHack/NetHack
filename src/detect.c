@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1575245054 2019/12/02 00:04:14 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1577050472 2019/12/22 21:34:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1314,7 +1314,8 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
             /* fake spellbook 'sobj' implies hero has cast the spell;
                when book is blessed, casting is skilled or expert level;
                if already clairvoyant, non-skilled spell acts like skilled */
-            extended = (sobj && (sobj->blessed || Clairvoyant));
+            extended = (sobj && (sobj->blessed || Clairvoyant)),
+            random_farsight = !sobj;
     int newglyph, oldglyph,
         lo_y = ((u.uy - 5 < 0) ? 0 : u.uy - 5),
         hi_y = ((u.uy + 6 >= ROWNO) ? ROWNO - 1 : u.uy + 6),
@@ -1391,7 +1392,18 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
             }
         }
 
-    if (!g.level.flags.hero_memory || unconstrained || mdetected || odetected) {
+    /* when this instance of clairvoyance is random (see allmain()) and
+       the only reason to browse the map is that previously undetected
+       monster(s) or object(s) have been revealed, player can prevent
+       the you-sense-your-surroundings message and browse operation from
+       happening by setting 'quick_farsight' option; for clairvoyance
+       spell, that option is ignored because the message and the pause
+       for map browsing isn't as intrusive in that circumstance */
+    if (random_farsight && flags.quick_farsight)
+        mdetected = odetected = FALSE;
+
+    if (!g.level.flags.hero_memory || unconstrained
+        || mdetected || odetected) {
         flush_screen(1);                 /* flush temp screen */
         /* the getpos() prompt from browse_map() is only shown when
            flags.verbose is set, but make this unconditional so that

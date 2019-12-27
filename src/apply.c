@@ -3178,14 +3178,14 @@ struct obj *obj;
         any.a_int++;
         Sprintf(buf, "an object on the %s", surface(cc.x, cc.y));
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
         any.a_int++;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "a monster",
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
         any.a_int++;
         Sprintf(buf, "the %s", surface(cc.x, cc.y));
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
         end_menu(tmpwin, "Aim for what?");
         tohit = rn2(4);
         if (select_menu(tmpwin, PICK_ONE, &selected) > 0

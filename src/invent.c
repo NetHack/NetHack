@@ -2654,11 +2654,11 @@ long *out_cnt;
             Sprintf(eos(prompt),
                     " -- unidentified or partially identified item%s",
                     plur(unid_cnt));
-        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt, MENU_UNSELECTED);
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt, MENU_ITEMFLAGS_NONE);
         if (!unid_cnt) {
             add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "(all items are permanently identified already)",
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
             gotsomething = TRUE;
         } else {
             any.a_obj = &wizid_fakeobj;
@@ -2673,17 +2673,17 @@ long *out_cnt;
                 Sprintf(eos(prompt), " (%s for all)",
                         visctrl(iflags.override_ID));
             add_menu(win, NO_GLYPH, &any, '_', iflags.override_ID, ATR_NONE,
-                     prompt, MENU_UNSELECTED);
+                     prompt, MENU_ITEMFLAGS_NONE);
             gotsomething = TRUE;
         }
    } else if (xtra_choice) {
         /* wizard override ID and xtra_choice are mutually exclusive */
         if (flags.sortpack)
             add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-                     "Miscellaneous", MENU_UNSELECTED);
+                     "Miscellaneous", MENU_ITEMFLAGS_NONE);
         any.a_char = HANDS_SYM; /* '-' */
         add_menu(win, NO_GLYPH, &any, HANDS_SYM, 0, ATR_NONE,
-                 xtra_choice, MENU_UNSELECTED);
+                 xtra_choice, MENU_ITEMFLAGS_NONE);
         gotsomething = TRUE;
     }
  nextclass:
@@ -2700,7 +2700,7 @@ long *out_cnt;
                 add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                          let_to_name(*invlet, FALSE,
                                      (want_reply && iflags.menu_head_objsym)),
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 classcount++;
             }
             if (wizid)
@@ -2709,7 +2709,7 @@ long *out_cnt;
                 any.a_char = ilet;
             add_menu(win, obj_to_glyph(otmp, rn2_on_display_rng), &any, ilet,
                      wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
-                     ATR_NONE, doname(otmp), MENU_UNSELECTED);
+                     ATR_NONE, doname(otmp), MENU_ITEMFLAGS_NONE);
             gotsomething = TRUE;
         }
     }
@@ -2724,10 +2724,10 @@ long *out_cnt;
     if (iflags.force_invmenu && lets && want_reply) {
         any = cg.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-                 "Special", MENU_UNSELECTED);
+                 "Special", MENU_ITEMFLAGS_NONE);
         any.a_char = '*';
         add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
-                 "(list everything)", MENU_UNSELECTED);
+                 "(list everything)", MENU_ITEMFLAGS_NONE);
         gotsomething = TRUE;
     }
     unsortloot(&sortedinvent);
@@ -2738,7 +2738,7 @@ long *out_cnt;
     if (iflags.perm_invent && !lets && !gotsomething) {
         any = cg.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, 0,
-                 not_carrying_anything, MENU_UNSELECTED);
+                 not_carrying_anything, MENU_ITEMFLAGS_NONE);
         want_reply = FALSE;
     }
     end_menu(win, query && *query ? query : (char *) 0);
@@ -2824,13 +2824,13 @@ char avoidlet;
                         add_menu(win, NO_GLYPH, &any, 0, 0,
                                  iflags.menu_headings,
                                  let_to_name(*invlet, FALSE, FALSE),
-                                 MENU_UNSELECTED);
+                                 MENU_ITEMFLAGS_NONE);
                         classcount++;
                     }
                     any.a_char = ilet;
                     add_menu(win, obj_to_glyph(otmp, rn2_on_display_rng),
                              &any, ilet, 0, ATR_NONE,
-                             doname(otmp), MENU_UNSELECTED);
+                             doname(otmp), MENU_ITEMFLAGS_NONE);
                 }
             }
             if (flags.sortpack && *++invlet)
@@ -4275,9 +4275,9 @@ const char *hdr, *txt;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, hdr,
-             MENU_UNSELECTED);
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, txt, MENU_UNSELECTED);
+             MENU_ITEMFLAGS_NONE);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, txt, MENU_ITEMFLAGS_NONE);
     end_menu(win, (char *) 0);
     if (select_menu(win, PICK_NONE, &selected) > 0)
         free((genericptr_t) selected);

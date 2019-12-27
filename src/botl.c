@@ -1930,7 +1930,7 @@ int arrmin, arrmax;
         any = cg.zeroany;
         any.a_int = i + adj;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 arr[i], MENU_UNSELECTED);
+                 arr[i], MENU_ITEMFLAGS_NONE);
     }
 
     end_menu(tmpwin, querystr);
@@ -2305,7 +2305,7 @@ query_conditions()
         any = cg.zeroany;
         any.a_ulong = valid_conditions[i].bitmask;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 valid_conditions[i].id, MENU_UNSELECTED);
+                 valid_conditions[i].id, MENU_ITEMFLAGS_NONE);
     }
 
     end_menu(tmpwin, "Choose status conditions");
@@ -2874,7 +2874,7 @@ status_hilite_menu_choose_field()
         any = cg.zeroany;
         any.a_int = (i + 1);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 initblstats[i].fldname, MENU_UNSELECTED);
+                 initblstats[i].fldname, MENU_ITEMFLAGS_NONE);
     }
 
     end_menu(tmpwin, "Select a hilite field:");
@@ -2913,7 +2913,7 @@ int fld;
         any.a_int = onlybeh = BL_TH_ALWAYS_HILITE;
         Sprintf(buf, "Always highlight %s", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 'a', 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2921,7 +2921,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_CONDITION;
         add_menu(tmpwin, NO_GLYPH, &any, 'b', 0, ATR_NONE,
-                 "Bitmask of conditions", MENU_UNSELECTED);
+                 "Bitmask of conditions", MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2930,7 +2930,7 @@ int fld;
         any.a_int = onlybeh = BL_TH_UPDOWN;
         Sprintf(buf, "%s value changes", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2939,7 +2939,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_ABSOLUTE;
         add_menu(tmpwin, NO_GLYPH, &any, 'n', 0, ATR_NONE,
-                 "Number threshold", MENU_UNSELECTED);
+                 "Number threshold", MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2947,7 +2947,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_PERCENTAGE;
         add_menu(tmpwin, NO_GLYPH, &any, 'p', 0, ATR_NONE,
-                 "Percentage threshold", MENU_UNSELECTED);
+                 "Percentage threshold", MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2957,7 +2957,7 @@ int fld;
         any.a_int = onlybeh = BL_TH_TEXTMATCH;
         Sprintf(buf, "%s text match", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 't', 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -3004,7 +3004,7 @@ boolean ltok, gtok;
         any = cg.zeroany;
         any.a_int = 10 + LT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
 
         if (str) {
             Sprintf(buf, "%s or %s",
@@ -3012,7 +3012,7 @@ boolean ltok, gtok;
             any = cg.zeroany;
             any.a_int = 10 + LE_VALUE;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     buf, MENU_UNSELECTED);
+                     buf, MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -3023,7 +3023,7 @@ boolean ltok, gtok;
     any = cg.zeroany;
     any.a_int = 10 + EQ_VALUE;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             buf, MENU_UNSELECTED);
+             buf, MENU_ITEMFLAGS_NONE);
 
     if (gtok) {
         if (str) {
@@ -3032,7 +3032,7 @@ boolean ltok, gtok;
             any = cg.zeroany;
             any.a_int = 10 + GE_VALUE;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     buf, MENU_UNSELECTED);
+                     buf, MENU_ITEMFLAGS_NONE);
         }
 
         if (str)
@@ -3043,7 +3043,7 @@ boolean ltok, gtok;
         any = cg.zeroany;
         any.a_int = 10 + GT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             buf, MENU_UNSELECTED);
+             buf, MENU_ITEMFLAGS_NONE);
     }
     Sprintf(buf, "Select field %s value:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
@@ -3545,25 +3545,28 @@ int fld;
                 any = cg.zeroany;
                 any.a_int = hlstr->id;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                         hlstr->str, MENU_UNSELECTED);
+                         hlstr->str, MENU_ITEMFLAGS_NONE);
             }
             hlstr = hlstr->next;
         }
     } else {
         any = cg.zeroany;
         Sprintf(buf, "No current hilites for %s", initblstats[fld].fldname);
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+                 MENU_ITEMFLAGS_NONE);
     }
 
     /* separator line */
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
+             MENU_ITEMFLAGS_NONE);
 
     if (count) {
         any = cg.zeroany;
         any.a_int = -1;
         add_menu(tmpwin, NO_GLYPH, &any, 'X', 0, ATR_NONE,
-                 "Remove selected hilites", MENU_UNSELECTED);
+                 "Remove selected hilites",
+                 MENU_ITEMFLAGS_NONE);
     }
 
 #ifndef SCORE_ON_BOTL
@@ -3579,7 +3582,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = -2;
         add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
-                 "Add a new hilite", MENU_UNSELECTED);
+                 "Add a new hilite", MENU_ITEMFLAGS_NONE);
     }
 
     Sprintf(buf, "Current %s hilites:", initblstats[fld].fldname);
@@ -3675,10 +3678,12 @@ shlmenu_redo:
         any = cg.zeroany;
         any.a_int = -1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 "View all hilites in config format", MENU_UNSELECTED);
+                 "View all hilites in config format",
+                 MENU_ITEMFLAGS_NONE);
 
         any = cg.zeroany;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
+                 MENU_ITEMFLAGS_NONE);
     }
 
     for (i = 0; i < MAXBLSTATS; i++) {
@@ -3699,7 +3704,7 @@ shlmenu_redo:
         if (count)
             Sprintf(eos(buf), " (%d defined)", count);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
     }
 
     end_menu(tmpwin, "Status hilites:");

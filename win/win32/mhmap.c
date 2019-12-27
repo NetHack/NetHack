@@ -308,6 +308,10 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
     data->xFrontTile = (int) ((double) data->xBackTile * data->frontScale);
     data->yFrontTile = (int) ((double) data->yBackTile * data->frontScale);
 
+    /* ensure front tile is non-zero in size */
+    data->xFrontTile = max(data->xFrontTile, 1);
+    data->yFrontTile = max(data->yFrontTile, 1);
+
     /* calcuate ASCII cursor height */
     data->yBlinkCursor = (int) ((double) CURSOR_HEIGHT * data->backScale);
     data->yNoBlinkCursor = data->yBackTile;

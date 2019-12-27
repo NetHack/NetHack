@@ -744,19 +744,19 @@ curses_character_dialog(const char **choices, const char *prompt)
 
         identifier.a_int = (count + 1); /* Must be non-zero */
         curses_add_menu(wid, NO_GLYPH, &identifier, curletter, 0,
-                        A_NORMAL, choices[count], FALSE);
+                        A_NORMAL, choices[count], MENU_ITEMFLAGS_NONE);
         used_letters[count] = curletter;
     }
 
     /* Random Selection */
     identifier.a_int = ROLE_RANDOM;
     curses_add_menu(wid, NO_GLYPH, &identifier, '*', 0, A_NORMAL, "Random",
-                    FALSE);
+                    MENU_ITEMFLAGS_NONE);
 
     /* Quit prompt */
     identifier.a_int = ROLE_NONE;
     curses_add_menu(wid, NO_GLYPH, &identifier, 'q', 0, A_NORMAL, "Quit",
-                    FALSE);
+                    MENU_ITEMFLAGS_NONE);
     curses_end_menu(wid, prompt);
     ret = curses_select_menu(wid, PICK_ONE, &selected);
     if (ret == 1) {

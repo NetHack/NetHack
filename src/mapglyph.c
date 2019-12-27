@@ -438,4 +438,26 @@ const char *str;
     putstr(window, attr, decode_mixed(buf, str));
 }
 
+/*
+ * Window port helper function for menu invert routines to move the decision
+ * logic into one place instead of 7 different window-port routines.
+ */
+boolean
+menuitem_invert_test(mode, itemflags, is_selected)
+int mode;
+unsigned itemflags;     /* The itemflags for the item               */
+boolean is_selected;    /* The current selection status of the item */
+{
+    boolean skipinvert = (itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0;
+    
+    if ((iflags.menuinvertmode == 1 || iflags.menuinvertmode == 2)
+        && !mode && skipinvert && !is_selected)
+        return FALSE;
+    else if (iflags.menuinvertmode == 2
+        && !mode && skipinvert && is_selected)
+        return TRUE;
+    else
+        return TRUE;
+}
+
 /*mapglyph.c*/

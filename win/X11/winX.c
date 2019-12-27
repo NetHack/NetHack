@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1552441031 2019/03/13 01:37:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1577063125 2019/12/23 01:05:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1965,7 +1965,7 @@ boolean complain;
     any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
         X11_add_menu(newwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     line, MENU_UNSELECTED);
+                     line, MENU_ITEMFLAGS_NONE);
     }
     (void) dlb_fclose(fp);
 

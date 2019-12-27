@@ -1167,19 +1167,19 @@ coord *click_cc;
                versions: "Specify unknown object by cursor?" */
             add_menu(win, NO_GLYPH, &any,
                      flags.lootabc ? 0 : any.a_char, 'y', ATR_NONE,
-                     "something on the map", MENU_UNSELECTED);
+                     "something on the map", MENU_ITEMFLAGS_NONE);
             any.a_char = 'i';
             add_menu(win, NO_GLYPH, &any,
                      flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                     "something you're carrying", MENU_UNSELECTED);
+                     "something you're carrying", MENU_ITEMFLAGS_NONE);
             any.a_char = '?';
             add_menu(win, NO_GLYPH, &any,
                      flags.lootabc ? 0 : any.a_char, 'n', ATR_NONE,
-                     "something else (by symbol or name)", MENU_UNSELECTED);
+                     "something else (by symbol or name)", MENU_ITEMFLAGS_NONE);
             if (!u.uswallow && !Hallucination) {
                 any = cg.zeroany;
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                         "", MENU_UNSELECTED);
+                         "", MENU_ITEMFLAGS_NONE);
                 /* these options work sensibly for the swallowed case,
                    but there's no reason for the player to use them then;
                    objects work fine when hallucinating, but screen
@@ -1188,19 +1188,19 @@ coord *click_cc;
                 any.a_char = 'm';
                 add_menu(win, NO_GLYPH, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "nearby monsters", MENU_UNSELECTED);
+                         "nearby monsters", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'M';
                 add_menu(win, NO_GLYPH, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "all monsters shown on map", MENU_UNSELECTED);
+                         "all monsters shown on map", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'o';
                 add_menu(win, NO_GLYPH, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "nearby objects", MENU_UNSELECTED);
+                         "nearby objects", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'O';
                 add_menu(win, NO_GLYPH, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "all objects shown on map", MENU_UNSELECTED);
+                         "all objects shown on map", MENU_ITEMFLAGS_NONE);
             }
             end_menu(win, "What do you want to look at:");
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
@@ -2053,7 +2053,7 @@ dohelp()
         }
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 helpbuf, MENU_UNSELECTED);
+                 helpbuf, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select one item:");
     n = select_menu(tmpwin, PICK_ONE, &selected);

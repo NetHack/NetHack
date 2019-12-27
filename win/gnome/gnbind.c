@@ -681,10 +681,9 @@ gnome_start_menu(winid wid)
 /*
 add_menu(windid window, int glyph, const anything identifier,
                                 char accelerator, char groupacc,
-                                int attr, char *str, boolean preselected)
+                                int attr, char *str, unsigned int itemflags)
                 -- Add a text line str to the given menu window.  If
-identifier
-                   is 0, then the line cannot be selected (e.g. a title).
+                   identifier is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
                    selected.  Accelerator is a keyboard key that can be used
                    to select the line.  If the accelerator of a selectable
@@ -708,13 +707,14 @@ identifier
                    The menu commands and aliases take care not to interfere
                    with the default object class symbols.
                 -- If you want this choice to be preselected when the
-                   menu is displayed, set preselected to TRUE.
+                   menu is displayed, set bit MENU_ITEMFLAGS_SELECTED.
 */
 void
 gnome_add_menu(winid wid, int glyph, const ANY_P *identifier,
                CHAR_P accelerator, CHAR_P group_accel, int attr,
-               const char *str, BOOLEAN_P presel)
+               const char *str, unsigned int itemflags)
 {
+    boolean presel = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
     GHackMenuItem item;
     item.glyph = glyph;
     item.identifier = identifier;
@@ -723,6 +723,7 @@ gnome_add_menu(winid wid, int glyph, const ANY_P *identifier,
     item.attr = attr;
     item.str = str;
     item.presel = presel;
+    item.itemflags = itemflags;
 
     if (wid != -1 && gnome_windowlist[wid].win != NULL) {
         gtk_signal_emit(GTK_OBJECT(gnome_windowlist[wid].win),

@@ -1,4 +1,4 @@
-/* NetHack 3.6	context.h	$NHDT-Date: 1575775592 2019/12/08 03:26:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	context.h	$NHDT-Date: 1577050216 2019/12/22 21:30:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -111,14 +111,15 @@ struct context_info {
     unsigned run;           /* 0: h (etc), 1: H (etc), 2: fh (etc) */
                             /* 3: FH, 4: ff+, 5: ff-, 6: FF+, 7: FF- */
                             /* 8: travel */
-    unsigned startingpet_mid;
-    int current_fruit; /* fruit->fid corresponding to g.pl_fruit[] */
-    int warnlevel;
+    unsigned startingpet_mid; /* monster id number for initial pet */
+    int current_fruit;      /* fruit->fid corresponding to g.pl_fruit[] */
+    int mysteryforce;       /* adjusts how often "mysterious force" kicks in */
     int rndencode;          /* randomized escape sequence introducer */
-    int mysteryforce;
+    int warnlevel;          /* threshold (digit) to warn about unseen mons */
     long next_attrib_check; /* next attribute check */
-    long stethoscope_move;
-    short stethoscope_movement;
+    long seer_turn;         /* when random clairvoyance will next kick in */
+    long stethoscope_move;  /* when a stethoscope was last used */
+    short stethoscope_movement; /* to track multiple moves on same turn */
     boolean travel;  /* find way automatically to u.tx,u.ty */
     boolean travel1; /* first travel step */
     boolean forcefight;

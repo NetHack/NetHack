@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1576638499 2019/12/18 03:08:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.198 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1577063925 2019/12/23 01:18:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1311,7 +1311,7 @@ boolean at_stairs, falling, portal;
             if (diff != 0) {
                 assign_rnd_level(newlevel, &u.uz, diff);
                 /* assign_rnd_level() may have used a value less than diff */
-                diff = u.uz.dlevel - newlevel->dlevel; /* actual descent */
+                diff = newlevel->dlevel - u.uz.dlevel; /* actual descent */
                 /* if inside the tower, stay inside */
                 if (was_in_W_tower && !On_W_tower_level(newlevel))
                     diff = 0;

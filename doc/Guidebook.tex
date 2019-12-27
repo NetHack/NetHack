@@ -3760,7 +3760,16 @@ Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
 Likewise for the `a' (apply) command if it causes the applied item to
 become wielded.  Persistent.
-%.Ip
+%.lp
+\item[\ib(quick\verb+_+farsight}
+When set, usually prevents the ``you sense your surroundings'' message
+where play pauses to allow you to browse the map whenever clairvoyance
+randomly activates.
+Some situations, such as being underwater or engulfed, ignore this option.
+It does not affect the clairvoyance spell where pausing to examine revealed
+objects or monsters is less intrusive.
+Default is off.  Persistent.
+%.lp
 \item[\ib{race}]
 Selects your race (for example, ``{\tt race:human}'').  Default is random.
 If you prefix the value with `{\tt !}' or ``{\tt no}'', you will

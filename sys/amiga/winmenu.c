@@ -56,7 +56,7 @@ register winid window;
 
 /* Add a string to a menu */
 void
-amii_add_menu(window, glyph, id, ch, gch, attr, str, preselected)
+amii_add_menu(window, glyph, id, ch, gch, attr, str, itemflags)
 register winid window;
 register int glyph;
 register const anything *id;
@@ -64,9 +64,10 @@ register char ch;
 register char gch;
 register int attr;
 register const char *str;
-register BOOLEAN_P preselected;
+register unsigned int itemflags;
 {
     register struct amii_WinDesc *cw;
+    boolean preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
     amii_menu_item *mip;
     char buf[4 + BUFSZ];
 
@@ -143,7 +144,7 @@ register const char *morestr;
 #endif
         any.a_void = 0;
         amii_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, morestr,
-                      MENU_UNSELECTED);
+                      MENU_ITEMFLAGS_NONE);
 #ifdef PROMPTFIRST /* Do some shuffling. Last first, push others one forward \
                       */
         mip->next = NULL;
