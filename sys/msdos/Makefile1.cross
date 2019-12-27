@@ -285,6 +285,9 @@ $(HOST_O)%.o : $(MSYS)/%.c
 $(HOST_O)%.o : $(SRC)/%.c
 	$(HOST_CC) $(cflags) -o$@ $<
 
+$(HOST_O)%.o : $(UTIL)/%.c
+	$(HOST_CC) $(cflags) -o$@ $<
+
 $(HOST_O)%.o : %.c
 	$(HOST_CC) $(cflags) -o$@ $<
 
@@ -410,8 +413,6 @@ hobj.tag:
 
 $(U)makedefs:  $(MAKEDEFSOBJS)
 	$(HOST_LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS)
-
-$(O)makedefs$(HOST).o:
 
 $(HOST_O)makedefs.o: $(U)makedefs.c $(SRC)/mdlib.c $(CONFIG_H) $(INCL)/permonst.h \
 		$(INCL)/objclass.h $(INCL)/monsym.h \
