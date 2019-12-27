@@ -20,7 +20,8 @@ struct flag {
     boolean autodig;         /* MRKR: Automatically dig */
     boolean autoquiver;      /* Automatically fill quiver */
     boolean autoopen;        /* open doors by walking into them */
-    boolean autounlock; /* automatically apply unlocking tools */
+    boolean autounlock;      /* automatically apply unlocking tools */
+    boolean beginner;        /* True early in each game; affects feedback */
     boolean biff;            /* enable checking for mail */
     boolean bones;           /* allow saving/loading bones */
     boolean confirm;         /* confirm before hitting tame monsters */
