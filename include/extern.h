@@ -1117,7 +1117,7 @@ E boolean FDECL(picking_at, (int, int));
 E void FDECL(breakchestlock, (struct obj *, BOOLEAN_P));
 E void NDECL(reset_pick);
 E void FDECL(maybe_reset_pick, (struct obj *));
-E int FDECL(pick_lock, (struct obj *, xchar, xchar, struct obj *));
+E int FDECL(pick_lock, (struct obj *, XCHAR_P, XCHAR_P, struct obj *));
 E int NDECL(doforce);
 E boolean FDECL(boxlock, (struct obj *, struct obj *));
 E boolean FDECL(doorlock, (struct obj *, int, int));
