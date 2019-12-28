@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559422240 2019/06/01 20:50:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1577568891 2019/12/28 21:34:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -767,7 +767,7 @@ stolen_booty(VOID_ARGS)
         if (is_orc(mtmp->data) && !has_mname(mtmp) && rn2(10)) {
             /*
              * We'll consider the orc captain from the level
-             * .des file to be the captain of a rival orc horde
+             * description to be the captain of a rival orc horde
              * who is there to see what has transpired, and to
              * contemplate future action.
              *
