@@ -295,6 +295,8 @@ dowield()
            any other item, we need to give it its own inventory slot */
         if (uwep && uwep->o_id == g.context.objsplit.parent_oid) {
             unsplitobj(wep);
+            /* wep was merged back to uwep, already_wielded uses wep */
+            wep = uwep;
             goto already_wielded;
         }
         finish_splitting = TRUE;
