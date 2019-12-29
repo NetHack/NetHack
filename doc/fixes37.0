@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ $NHDT-Date: 1577190687 2019/12/24 12:31:27 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ $NHDT-Date: 1577662238 2019/12/29 23:30:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -24,6 +24,8 @@ worn meat ring shouldn't cause increased hunger; neither should fake Amulet
 worn +0 ring of protection should cause increased hunger if it is the only
 	source of extrinsic Protection
 fix accessing mons[-1] when monster figures out if a tin cures stoning
+monster wielding Stormbringer or healer's Staff against another monster would
+	heal the hero instead of the wielding monster when draining life
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1553363416 2019/03/23 17:50:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1577662239 2019/12/29 23:30:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1322,7 +1322,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                     *dmgptr = 0;
                     return TRUE;
                 }
-                if (noncorporeal(g.youmonst.data) || amorphous(g.youmonst.data)) {
+                if (noncorporeal(g.youmonst.data)
+                    || amorphous(g.youmonst.data)) {
                     pline("%s slices through your %s.", wepdesc,
                           body_part(NECK));
                     return TRUE;
@@ -1351,6 +1352,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                           mon_nam(mdef));
             }
             if (mdef->m_lev == 0) {
+                /* losing a level when at 0 is fatal */
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
             } else {
                 int drain = monhp_per_lvl(mdef);
@@ -1359,8 +1361,16 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 mdef->mhpmax -= drain;
                 mdef->m_lev--;
                 drain /= 2;
-                if (drain)
-                    healup(drain, 0, FALSE, FALSE);
+                if (drain) {
+                    /* attacker heals in proportion to amount drained */
+                    if (youattack) {
+                        healup(drain, 0, FALSE, FALSE);
+                    } else {
+                        magr->mhp += drain;
+                        if (magr->mhp > magr->mhpmax)
+                            magr->mhp = magr->mhpmax;
+                    }
+                }
             }
             return vis;
         } else { /* youdefend */
