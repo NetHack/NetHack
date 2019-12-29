@@ -23,6 +23,7 @@ change crysknife from mineral to bone and worm tooth from unspecified to bone
 worn meat ring shouldn't cause increased hunger; neither should fake Amulet
 worn +0 ring of protection should cause increased hunger if it is the only
 	source of extrinsic Protection
+fix accessing mons[-1] when monster figures out if a tin cures stoning
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
