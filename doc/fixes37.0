@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ $NHDT-Date: 1577190687 2019/12/24 12:31:27 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ $NHDT-Date: 1577674533 2019/12/30 02:55:33 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -23,6 +23,9 @@ change crysknife from mineral to bone and worm tooth from unspecified to bone
 worn meat ring shouldn't cause increased hunger; neither should fake Amulet
 worn +0 ring of protection should cause increased hunger if it is the only
 	source of extrinsic Protection
+fix accessing mons[-1] when monster figures out if a tin cures stoning
+monster wielding Stormbringer or healer's Staff against another monster would
+	heal the hero instead of the wielding monster when draining life
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -33,6 +36,8 @@ revised "mysterious force" when climbing out of gehennom could generate
 	warnings about "rn2(0) attempted" or "rn2(-n) attempted"
 after 'w' on split stack patch, wielding '-' would cause an object_lost panic
 same patch allowed partial stack from getobj to replace cursed wielded weapon
+if the orc-town version of mine town has been loaded, creation of orc zombies
+	or orc mummies would name them as part of the town raiding orc clan
 
 
 Platform- and/or Interface-Specific Fixes
@@ -68,6 +73,8 @@ Platform- and/or Interface-Specific New Features
 
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
+hallucinatory trap names from github pull request #174
+autounlock feature originally from unnethack in github pull request #228
 
 
 Code Cleanup and Reorganization

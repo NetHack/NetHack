@@ -2313,6 +2313,8 @@ boolean tinok;
     if (obj->otyp != CORPSE && (obj->otyp != TIN || !tinok))
         return FALSE;
     /* corpse, or tin that mon can open */
+    if (obj->corpsenm == NON_PM) /* empty/special tin */
+        return FALSE;
     return (boolean) (obj->corpsenm == PM_LIZARD
                       || (acidic(&mons[obj->corpsenm])
                           && (obj->corpsenm != PM_GREEN_SLIME

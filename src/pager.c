@@ -305,8 +305,7 @@ int x, y;
 
         /* newsym lets you know of the trap, so mention it here */
         if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB) {
-            Sprintf(eos(buf), ", trapped in %s",
-                    an(defsyms[trap_to_defsym(tt)].explanation));
+            Sprintf(eos(buf), ", trapped in %s", an(trapname(tt, FALSE)));
             t->tseen = 1;
         }
     }
@@ -458,7 +457,7 @@ char *buf, *monbuf;
     } else if (glyph_is_object(glyph)) {
         look_at_object(buf, x, y, glyph); /* fill in buf[] */
     } else if (glyph_is_trap(glyph)) {
-        int tnum = what_trap(glyph_to_trap(glyph), rn2_on_display_rng);
+        int tnum = glyph_to_trap(glyph);
 
         /* Trap detection displays a bear trap at locations having
          * a trapped door or trapped container or both.
@@ -470,7 +469,7 @@ char *buf, *monbuf;
         else if (trapped_door_at(tnum, x, y))
             Strcpy(buf, "trapped door"); /* not "trap door"... */
         else
-            Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
+            Strcpy(buf, trapname(tnum, FALSE));
     } else if (glyph_is_warning(glyph)) {
         int warnindx = glyph_to_warning(glyph);
 
@@ -1570,9 +1569,8 @@ doidtrap()
                 if (u.dz < 0 ? is_hole(tt) : tt == ROCKTRAP)
                     break;
             }
-            tt = what_trap(tt, rn2_on_display_rng);
             pline("That is %s%s%s.",
-                  an(defsyms[trap_to_defsym(tt)].explanation),
+                  an(trapname(tt, FALSE)),
                   !trap->madeby_u
                      ? ""
                      : (tt == WEB)
