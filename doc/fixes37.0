@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ $NHDT-Date: 1577662238 2019/12/29 23:30:38 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ $NHDT-Date: 1577674533 2019/12/30 02:55:33 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -36,6 +36,8 @@ revised "mysterious force" when climbing out of gehennom could generate
 	warnings about "rn2(0) attempted" or "rn2(-n) attempted"
 after 'w' on split stack patch, wielding '-' would cause an object_lost panic
 same patch allowed partial stack from getobj to replace cursed wielded weapon
+if the orc-town version of mine town has been loaded, creation of orc zombies
+	or orc mummies would name them as part of the town raiding orc clan
 
 
 Platform- and/or Interface-Specific Fixes

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1577568891 2019/12/28 21:34:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1577674536 2019/12/30 02:55:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -699,7 +699,7 @@ const char *gang;
     if (otmp && gang) {
         new_oname(otmp, strlen(gang) + 1); /* removes old name if present */
         Strcpy(ONAME(otmp), gang);
-        if (otyp >= TRIPE_RATION && otyp <= TIN) {
+        if (objects[otyp].oc_class == FOOD_CLASS) {
             if (otyp == SLIME_MOLD)
                 otmp->spe = fruitadd((char *) orcfruit[rn2(SIZE(orcfruit))],
                                      (struct fruit *) 0);
@@ -742,12 +742,16 @@ stolen_booty(VOID_ARGS)
     cnt = rnd(10);
     for (i = 0; i < cnt; ++i) {
         /* Food items - but no lembas! (or some other weird things) */
-        otyp = rn2((TIN - TRIPE_RATION) + 1) + TRIPE_RATION;
-        if (otyp != LEMBAS_WAFER && otyp != GLOB_OF_GRAY_OOZE
-            && otyp != GLOB_OF_BROWN_PUDDING && otyp != GLOB_OF_GREEN_SLIME
-            && otyp != GLOB_OF_BLACK_PUDDING && otyp != MEAT_STICK
-            && otyp != MEATBALL && otyp != MEAT_STICK && otyp != MEAT_RING
-            && otyp != HUGE_CHUNK_OF_MEAT && otyp != CORPSE)
+        otyp = rn1(TIN - TRIPE_RATION + 1, TRIPE_RATION);
+        if (otyp != LEMBAS_WAFER
+            /* exclude meat <anything>, globs of <anything>, kelp
+               which all have random generation probability of 0
+               (K-/C-rations do too, but we want to include those) */
+            && (objects[otyp].oc_prob != 0
+                || otyp == C_RATION || otyp == K_RATION)
+            /* exclude food items which utilize obj->corpsenm because
+               that field is going to be overloaded for delivery purposes */
+            && otyp != CORPSE && otyp != EGG && otyp != TIN)
             migr_booty_item(otyp, gang);
     }
     migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);

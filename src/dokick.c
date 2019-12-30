@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1575245057 2019/12/02 00:04:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1577674533 2019/12/30 02:55:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1706,6 +1706,9 @@ unsigned long deliverflags;
     else
         maxobj = 1;
 
+#define DELIVER_PM (M2_UNDEAD | M2_WERE | M2_HUMAN | M2_ELF | M2_DWARF \
+                    | M2_GNOME | M2_ORC | M2_DEMON | M2_GIANT)
+
     cnt = 0;
     for (otmp = g.migrating_objs; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
@@ -1713,7 +1716,7 @@ unsigned long deliverflags;
         if ((where & MIGR_TO_SPECIES) == 0)
             continue;
 
-        if ((mtmp->data->mflags2 & otmp->corpsenm) != 0) {
+        if ((mtmp->data->mflags2 & DELIVER_PM) == otmp->corpsenm) {
             obj_extract_self(otmp);
             otmp->owornmask = 0L;
             otmp->ox = otmp->oy = 0;
@@ -1730,7 +1733,7 @@ unsigned long deliverflags;
                 }
                 free_oname(otmp);
             }
-            otmp->corpsenm = 0;
+            otmp->corpsenm = NON_PM;
             (void) add_to_minv(mtmp, otmp);
             cnt++;
             if (maxobj && cnt >= maxobj)
