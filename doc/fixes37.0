@@ -26,6 +26,7 @@ worn +0 ring of protection should cause increased hunger if it is the only
 fix accessing mons[-1] when monster figures out if a tin cures stoning
 monster wielding Stormbringer or healer's Staff against another monster would
 	heal the hero instead of the wielding monster when draining life
+change twoweapon feedback from "not a weapon" to "not a suitable weapon"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
