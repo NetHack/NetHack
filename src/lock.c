@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1548978605 2019/01/31 23:50:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1577759837 2019/12/31 02:37:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -724,10 +724,10 @@ int x, y;
             break;
         }
         pline("This door%s.", mesg);
-        if (locked && flags.autounlock &&
-            ((unlocktool = carrying(SKELETON_KEY)) ||
-             (unlocktool = carrying(LOCK_PICK)) ||
-             (unlocktool = carrying(CREDIT_CARD)))) {
+        if (locked && flags.autounlock
+            && ((unlocktool = carrying(SKELETON_KEY)) != 0
+                || (unlocktool = carrying(LOCK_PICK)) != 0
+                || (unlocktool = carrying(CREDIT_CARD)) != 0)) {
             pick_lock(unlocktool, cc.x, cc.y, (struct obj *) 0);
         }
         return res;
@@ -976,6 +976,7 @@ int x, y;
     case SPE_WIZARD_LOCK:
         if (Is_rogue_level(&u.uz)) {
             boolean vis = cansee(x, y);
+
             /* Can't have real locking in Rogue, so just hide doorway */
             if (vis)
                 pline("%s springs up in the older, more primitive doorway.",

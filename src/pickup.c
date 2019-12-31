@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1576282488 2019/12/14 00:14:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.237 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1577759853 2019/12/31 02:37:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1719,6 +1719,7 @@ int cindex, ccount; /* index of this container (1..N), number of them (N) */
         return 0;
     if (cobj->olocked) {
         struct obj *unlocktool;
+
         if (ccount < 2)
             pline("%s locked.",
                   cobj->lknown ? "It is" : "Hmmm, it turns out to be");
@@ -1728,10 +1729,10 @@ int cindex, ccount; /* index of this container (1..N), number of them (N) */
             pline("Hmmm, %s turns out to be locked.", the(xname(cobj)));
         cobj->lknown = 1;
 
-        if (flags.autounlock &&
-            ((unlocktool = carrying(SKELETON_KEY)) ||
-             (unlocktool = carrying(LOCK_PICK)) ||
-             (unlocktool = carrying(CREDIT_CARD)))) {
+        if (flags.autounlock
+            && ((unlocktool = carrying(SKELETON_KEY)) != 0
+                || (unlocktool = carrying(LOCK_PICK)) != 0
+                || (unlocktool = carrying(CREDIT_CARD)) != 0)) {
             /* pass ox and oy to avoid direction prompt */
             pick_lock(unlocktool, cobj->ox, cobj->oy, cobj);
         }
