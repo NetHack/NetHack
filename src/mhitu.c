@@ -2688,7 +2688,7 @@ struct monst *mon;
         pline("%s demands that you pay %s, but you refuse...",
               noit_Monnam(mon), noit_mhim(mon));
     } else if (u.umonnum == PM_LEPRECHAUN) {
-        pline("%s tries to take your money, but fails...", noit_Monnam(mon));
+        pline("%s tries to take your gold, but fails...", noit_Monnam(mon));
     } else {
         long cost;
         long umoney = money_cnt(g.invent);
