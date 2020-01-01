@@ -804,8 +804,8 @@ register struct monst *grd;
             if (egrd->warncnt == 3 && !Deaf)
                 verbalize("I repeat, %sfollow me!",
                           u_carry_gold
-                              ? (!umoney ? "drop that hidden money and "
-                                         : "drop that money and ")
+                              ? (!umoney ? "drop that hidden gold and "
+                                         : "drop that gold and ")
                               : "");
             if (egrd->warncnt == 7) {
                 m = grd->mx;

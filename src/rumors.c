@@ -455,7 +455,7 @@ boolean delphi;
         if (delphi)
             putstr(tmpwin, 0,
                    special
-                     ? "The Oracle scornfully takes all your money and says:"
+                     ? "The Oracle scornfully takes all your gold and says:"
                      : "The Oracle meditates for a moment and then intones:");
         else
             putstr(tmpwin, 0, "The message reads:");
@@ -495,7 +495,7 @@ struct monst *oracl;
         pline("%s is in no mood for consultations.", Monnam(oracl));
         return 0;
     } else if (!umoney) {
-        You("have no money.");
+        You("have no gold.");
         return 0;
     }
 
@@ -507,7 +507,7 @@ struct monst *oracl;
         return 0;
     case 'y':
         if (umoney < (long) minor_cost) {
-            You("don't even have enough money for that!");
+            You("don't even have enough gold for that!");
             return 0;
         }
         u_pay = minor_cost;

@@ -559,7 +559,6 @@ register struct monst *mtmp;
 
 /*
  *   Makes up money for monster's inventory.
- *   This will change with silver & copper coins
  */
 void
 mkmonmoney(mtmp, amount)

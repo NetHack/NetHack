@@ -108,7 +108,7 @@ long amount;
         return 0L;
     }
     if (!ygold || ygold->quan < amount) {
-        impossible("Paying without %s money?", ygold ? "enough" : "");
+        impossible("Paying without %s gold?", ygold ? "enough" : "");
         return 0L;
     }
 
@@ -139,7 +139,7 @@ long amount;
         return;
     }
     if (!mongold || mongold->quan < amount) {
-        impossible("%s paying without %s money?", a_monnam(mon),
+        impossible("%s paying without %s gold?", a_monnam(mon),
                    mongold ? "enough" : "");
         return;
     }
@@ -149,7 +149,7 @@ long amount;
     obj_extract_self(mongold);
 
     if (!merge_choice(g.invent, mongold) && inv_cnt(FALSE) >= 52) {
-        You("have no room for the money!");
+        You("have no room for the gold!");
         dropy(mongold);
     } else {
         addinv(mongold);
@@ -793,7 +793,7 @@ shopper_financial_report()
             if ((amt = shop_debt(eshkp)) != 0)
                 You("owe %s %ld %s.", shkname(shkp), amt, currency(amt));
             else if (shkp == this_shkp)
-                You("don't owe any money here.");
+                You("don't owe any gold here.");
         }
 }
 
@@ -1208,7 +1208,7 @@ xchar oy UNUSED;
 }
 
 static const char
-        no_money[] = "Moreover, you%s have no money.",
+        no_money[] = "Moreover, you%s have no gold.",
         not_enough_money[] = "Besides, you don't have enough to interest %s.";
 
 /* delivers the cheapest item on the list */
@@ -1352,7 +1352,7 @@ dopay()
         if (!ltmp)
             You("do not owe %s anything.", shkname(shkp));
         else if (!umoney) {
-            You("%shave no money.", stashed_gold ? "seem to " : "");
+            You("%shave no gold.", stashed_gold ? "seem to " : "");
             if (stashed_gold)
                 pline("But you have some gold stashed away.");
         } else {
@@ -1384,7 +1384,7 @@ dopay()
             if (!umoney)
                 pline(no_money, stashed_gold ? " seem to" : "");
         } else if (ltmp) {
-            pline("%s is after blood, not money!", shkname(shkp));
+            pline("%s is after blood, not gold!", shkname(shkp));
             if (umoney < ltmp / 2L || (umoney < ltmp && stashed_gold)) {
                 if (!umoney)
                     pline(no_money, stashed_gold ? " seem to" : "");
@@ -1402,7 +1402,7 @@ dopay()
         } else {
             /* shopkeeper is angry, but has not been robbed --
              * door broken, attacked, etc. */
-            pline("%s is after your hide, not your money!", Shknam(shkp));
+            pline("%s is after your hide, not your gold!", Shknam(shkp));
             if (umoney < 1000L) {
                 if (!umoney)
                     pline(no_money, stashed_gold ? " seem to" : "");
@@ -1484,12 +1484,12 @@ dopay()
 
         umoney = money_cnt(g.invent);
         if (!umoney && !eshkp->credit) {
-            You("%shave no money or credit%s.",
+            You("%shave no gold or credit%s.",
                 stashed_gold ? "seem to " : "", paid ? " left" : "");
             return 0;
         }
         if ((umoney + eshkp->credit) < cheapest_item(shkp)) {
-            You("don't have enough money to buy%s the item%s you picked.",
+            You("don't have enough gold to buy%s the item%s you picked.",
                 eshkp->billct > 1 ? " any of" : "", plur(eshkp->billct));
             if (stashed_gold)
                 pline("Maybe you have some gold stashed away?");
@@ -1594,7 +1594,7 @@ boolean itemize;
         return PAY_BUY;
     }
     if (itemize && umoney + ESHK(shkp)->credit == 0L) {
-        You("%shave no money or credit left.",
+        You("%shave no gold or credit left.",
             stashed_gold ? "seem to " : "");
         return PAY_BROKE;
     }
@@ -4885,7 +4885,7 @@ struct obj *obj_absorber, *obj_absorbed;
 
         if (bp_absorber) {
             /* the absorber has a billing record */
-            bp_absorber->price += amount;           
+            bp_absorber->price += amount;
         } else {
             /* the absorber has no billing record */
             ;
@@ -4893,7 +4893,7 @@ struct obj *obj_absorber, *obj_absorbed;
         return;
     }
     /**************************************************************
-     * Scenario 2. Player-owned glob absorbing into shop-owned glob 
+     * Scenario 2. Player-owned glob absorbing into shop-owned glob
      **************************************************************/
     if (!bp_absorber && !bp && !obj_absorber->no_charge) {
         /* there are no billing records */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1576638501 2019/12/18 03:08:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.329 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1577759854 2019/12/31 02:37:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,13 +8,13 @@
 extern const char *const destroy_strings[][3]; /* from zap.c */
 
 static boolean FDECL(keep_saddle_with_steedcorpse, (unsigned, struct obj *,
-                                                        struct obj *));
+                                                    struct obj *));
 static struct obj *FDECL(t_missile, (int, struct trap *));
 static char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 static int FDECL(steedintrap, (struct trap *, struct obj *));
 static void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
 static int FDECL(mkroll_launch, (struct trap *, XCHAR_P, XCHAR_P,
-                                     SHORT_P, long));
+                                 SHORT_P, long));
 static boolean FDECL(isclearpath, (coord *, int, SCHAR_P, SCHAR_P));
 static void FDECL(dofiretrap, (struct obj *));
 static void NDECL(domagictrap);
@@ -30,13 +30,13 @@ static int FDECL(disarm_shooting_trap, (struct trap *, int));
 static void FDECL(clear_conjoined_pits, (struct trap *));
 static boolean FDECL(adj_nonconjoined_pit, (struct trap *));
 static int FDECL(try_lift, (struct monst *, struct trap *, int,
-                                BOOLEAN_P));
+                            BOOLEAN_P));
 static int FDECL(help_monster_out, (struct monst *, struct trap *));
 #if 0
 static void FDECL(join_adjacent_pits, (struct trap *));
 #endif
 static boolean FDECL(thitm, (int, struct monst *, struct obj *, int,
-                                 BOOLEAN_P));
+                             BOOLEAN_P));
 static void NDECL(maybe_finish_sokoban);
 
 static const char *const a_your[2] = { "a", "your" };
@@ -44,8 +44,8 @@ static const char *const A_Your[2] = { "A", "Your" };
 static const char tower_of_flame[] = "tower of flame";
 static const char *const A_gush_of_water_hits = "A gush of water hits";
 static const char *const blindgas[6] = { "humid",   "odorless",
-                                             "pungent", "chilling",
-                                             "acrid",   "biting" };
+                                         "pungent", "chilling",
+                                         "acrid",   "biting" };
 
 /* called when you're hit by fire (dofiretrap,buzz,zapyourself,explode);
    returns TRUE if hit on torso */
@@ -154,7 +154,9 @@ int ef_flags;
     if (!otmp)
         return ER_NOTHING;
 
-    victim = carried(otmp) ? &g.youmonst : mcarried(otmp) ? otmp->ocarry : NULL;
+    victim = carried(otmp) ? &g.youmonst
+             : mcarried(otmp) ? otmp->ocarry
+               : (struct monst *) 0;
     uvictim = (victim == &g.youmonst);
     vismon = victim && (victim != &g.youmonst) && canseemon(victim);
     /* Is g.bhitpos correct here? Ugh. */
@@ -225,9 +227,9 @@ int ef_flags;
 
         return ER_NOTHING;
     } else if (erosion < MAX_ERODE) {
-        const char *adverb = (erosion + 1 == MAX_ERODE)
-                                 ? " completely"
-                                 : erosion ? " further" : "";
+        const char *adverb = (erosion + 1 == MAX_ERODE) ? " completely"
+                             : erosion ? " further"
+                               : "";
 
         if (uvictim || vismon || visobj)
             pline("%s %s %s%s!",
@@ -418,9 +420,9 @@ int x, y, typ;
         else if (lev->typ == STONE || lev->typ == SCORR)
             lev->typ = CORR;
         else if (IS_WALL(lev->typ) || lev->typ == SDOOR)
-            lev->typ = g.level.flags.is_maze_lev
-                           ? ROOM
-                           : g.level.flags.is_cavernous_lev ? CORR : DOOR;
+            lev->typ = g.level.flags.is_maze_lev ? ROOM
+                       : g.level.flags.is_cavernous_lev ? CORR
+                         : DOOR;
 
         unearth_objs(x, y);
         break;
@@ -482,9 +484,9 @@ unsigned ftflags;
     } else
         pline_The("%s opens up under you!", surface(u.ux, u.uy));
 
-    if (Sokoban && Can_fall_thru(&u.uz))
+    if (Sokoban && Can_fall_thru(&u.uz)) {
         ; /* KMH -- You can't escape the Sokoban level traps */
-    else if (Levitation || u.ustuck
+    } else if (Levitation || u.ustuck
              || (!Can_fall_thru(&u.uz) && !levl[u.ux][u.uy].candig)
              || ((Flying || is_clinger(g.youmonst.data)
                   || (ceiling_hider(g.youmonst.data) && u.uundetected))
@@ -520,6 +522,7 @@ unsigned ftflags;
         find_hell(&dtmp);
     } else {
         int dist = newlevel - dunlev(&u.uz);
+
         dtmp.dnum = u.uz.dnum;
         dtmp.dlevel = newlevel;
         if (dist > 1)
@@ -651,13 +654,10 @@ int *fail_reason;
         set_malign(mon);
     }
 
-    comes_to_life = !canspotmon(mon)
-                        ? "disappears"
-                        : golem_xform
-                              ? "turns into flesh"
-                              : (nonliving(mon->data) || is_vampshifter(mon))
-                                    ? "moves"
-                                    : "comes to life";
+    comes_to_life = !canspotmon(mon) ? "disappears"
+                    : golem_xform ? "turns into flesh"
+                      : (nonliving(mon->data) || is_vampshifter(mon)) ? "moves"
+                        : "comes to life";
     if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
         /* "the|your|Manlobbi's statue [of a wombat]" */
         shkp = shop_keeper(*in_rooms(mon->mx, mon->my, SHOPBASE));
@@ -1131,7 +1131,7 @@ unsigned trflags;
                 break;
             if (u.twoweap || (uwep && bimanual(uwep)))
                 (void) water_damage(u.twoweap ? uswapwep : uwep, 0, TRUE);
-        glovecheck:
+ glovecheck:
             (void) water_damage(uarmg, "gauntlets", TRUE);
             /* Not "metal gauntlets" since it gets called
              * even if it's leather for the message
@@ -1783,7 +1783,7 @@ int style;
     }
     newsym(x1, y1);
     /* in case you're using a pick-axe to chop the boulder that's being
-       launched (perhaps a monster triggered it), destroy g.context so that
+       launched (perhaps a monster triggered it), destroy context so that
        next dig attempt never thinks you're resuming previous effort */
     if ((otyp == BOULDER || otyp == STATUE)
         && singleobj->ox == g.context.digging.pos.x
@@ -1808,11 +1808,11 @@ int style;
         /* use otrapped as a flag to ohitmon */
         singleobj->otrapped = 1;
         style &= ~LAUNCH_KNOWN;
-    /* fall through */
-    roll:
+    /*FALLTHRU*/
+ roll:
     case ROLL:
         delaycnt = 2;
-    /* fall through */
+    /*FALLTHRU*/
     default:
         if (!delaycnt)
             delaycnt = 1;
@@ -1834,6 +1834,7 @@ int style;
     /* Set the object in motion */
     while (dist-- > 0 && !used_up) {
         struct trap *t;
+
         tmp_at(g.bhitpos.x, g.bhitpos.y);
         tmp = delaycnt;
 
@@ -1882,11 +1883,10 @@ int style;
                 switch (t->ttyp) {
                 case LANDMINE:
                     if (rn2(10) > 2) {
-                        pline(
-                            "KAABLAMM!!!%s",
-                            cansee(g.bhitpos.x, g.bhitpos.y)
-                                ? " The rolling boulder triggers a land mine."
-                                : "");
+                        pline("KAABLAMM!!!%s",
+                              cansee(g.bhitpos.x, g.bhitpos.y)
+                               ? "  The rolling boulder triggers a land mine."
+                               : "");
                         deltrap(t);
                         del_engr_at(g.bhitpos.x, g.bhitpos.y);
                         place_object(singleobj, g.bhitpos.x, g.bhitpos.y);
@@ -1981,9 +1981,7 @@ int style;
         if (dist > 0 && isok(g.bhitpos.x + dx, g.bhitpos.y + dy)
             && levl[g.bhitpos.x + dx][g.bhitpos.y + dy].typ == IRONBARS) {
             x2 = g.bhitpos.x, y2 = g.bhitpos.y; /* object stops here */
-            if (hits_bars(&singleobj,
-                          x2, y2, x2+dx, y2+dy,
-                          !rn2(20), 0)) {
+            if (hits_bars(&singleobj, x2, y2, x2 + dx, y2 + dy, !rn2(20), 0)) {
                 if (!singleobj) {
                     used_up = TRUE;
                     launch_drop_spot((struct obj *) 0, 0, 0);
@@ -2168,8 +2166,9 @@ register struct monst *mtmp;
     } else {
         register int tt = trap->ttyp;
         boolean in_sight, tear_web, see_it,
-            inescapable = g.force_mintrap || ((tt == HOLE || tt == PIT)
-                                            && Sokoban && !trap->madeby_u);
+                inescapable = (g.force_mintrap
+                               || ((tt == HOLE || tt == PIT)
+                                   && Sokoban && !trap->madeby_u));
         const char *fallverb;
         xchar tx = trap->tx, ty = trap->ty;
 
@@ -2233,9 +2232,8 @@ register struct monst *mtmp;
         case ROCKTRAP:
             if (trap->once && trap->tseen && !rn2(15)) {
                 if (in_sight && see_it)
-                    pline(
-                        "A trap door above %s opens, but nothing falls out!",
-                        mon_nam(mtmp));
+                    pline("A trap door above %s opens, but nothing falls out!",
+                          mon_nam(mtmp));
                 deltrap(trap);
                 newsym(mtmp->mx, mtmp->my);
                 break;
@@ -2327,7 +2325,7 @@ register struct monst *mtmp;
                 target = MON_WEP(mtmp);
                 if (target && bimanual(target))
                     (void) water_damage(target, 0, TRUE);
-            glovecheck:
+ glovecheck:
                 target = which_armor(mtmp, W_ARMG);
                 (void) water_damage(target, "gauntlets", TRUE);
                 break;
@@ -2368,7 +2366,7 @@ register struct monst *mtmp;
             break;
         } /* RUST_TRAP */
         case FIRE_TRAP:
-        mfiretrap:
+ mfiretrap:
             if (in_sight)
                 pline("A %s erupts from the %s under %s!", tower_of_flame,
                       surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
@@ -2819,7 +2817,8 @@ boolean byplayer;
         }
         minstapetrify(mon, byplayer);
         /* if life-saved, might not be able to continue wielding */
-        if (!DEADMONSTER(mon) && !which_armor(mon, W_ARMG) && !resists_ston(mon))
+        if (!DEADMONSTER(mon)
+            && !which_armor(mon, W_ARMG) && !resists_ston(mon))
             mwepgone(mon);
     }
 }
@@ -2901,8 +2900,8 @@ int x, y;
     struct obj *otmp;
     struct trap *t;
 
-    if ((t = t_at(x, y)) && is_pit(t->ttyp)
-        && (otmp = sobj_at(BOULDER, x, y))) {
+    if ((t = t_at(x, y)) != 0 && is_pit(t->ttyp)
+        && (otmp = sobj_at(BOULDER, x, y)) != 0) {
         obj_extract_self(otmp);
         (void) flooreffects(otmp, x, y, "settle");
     }
@@ -3215,7 +3214,7 @@ domagictrap()
         /* roar: wake monsters in vicinity, after placing trap-created ones */
         wake_nearto(u.ux, u.uy, 7 * 7);
         /* [flash: should probably also hit nearby gremlins with light] */
-    } else
+    } else {
         switch (fate) {
         case 10:
         case 11:
@@ -3289,6 +3288,7 @@ domagictrap()
         default:
             break;
         }
+    }
 }
 
 /* Set an item on fire.
@@ -3830,7 +3830,7 @@ drown()
                 crawl_ok = TRUE;
                 goto crawl;
             }
-crawl:
+ crawl:
     if (crawl_ok) {
         boolean lost = FALSE;
         /* time to do some strip-tease... */
@@ -5192,9 +5192,9 @@ boolean nocorpse;
 
         if (obj && cansee(mon->mx, mon->my))
             pline("%s is hit by %s!", Monnam(mon), doname(obj));
-        if (d_override)
+        if (d_override) {
             dam = d_override;
-        else if (obj) {
+        } else if (obj) {
             dam = dmgval(obj, mon);
             if (dam < 1)
                 dam = 1;
@@ -5225,11 +5225,11 @@ unconscious()
     if (g.multi >= 0)
         return FALSE;
 
-    return (boolean) (u.usleep
-                      || (g.nomovemsg
-                          && (!strncmp(g.nomovemsg, "You awake", 9)
-                              || !strncmp(g.nomovemsg, "You regain con", 14)
-                              || !strncmp(g.nomovemsg, "You are consci", 14))));
+    return (u.usleep
+            || (g.nomovemsg
+                && (!strncmp(g.nomovemsg, "You awake", 9)
+                    || !strncmp(g.nomovemsg, "You regain con", 14)
+                    || !strncmp(g.nomovemsg, "You are consci", 14))));
 }
 
 static const char lava_killer[] = "molten lava";
@@ -5352,7 +5352,7 @@ lava_effects()
                    KILLED_BY); /* lava damage */
     }
 
-burn_stuff:
+ burn_stuff:
     destroy_item(SCROLL_CLASS, AD_FIRE);
     destroy_item(SPBOOK_CLASS, AD_FIRE);
     destroy_item(POTION_CLASS, AD_FIRE);
@@ -5443,7 +5443,7 @@ maybe_finish_sokoban()
                clear the sokoban_rules flag so that luck penalties for
                things like breaking boulders or jumping will no longer
                be given, and restrictions on diagonal moves are lifted */
-            Sokoban = 0; /* clear level.flags.sokoban_rules */
+            Sokoban = 0; /* clear g.level.flags.sokoban_rules */
             /* TODO: give some feedback about solving the sokoban puzzle
                (perhaps say "congratulations" in Japanese?) */
         }
@@ -5464,7 +5464,7 @@ trapname(ttyp, override)
 int ttyp;
 boolean override;
 {
-    const char * halu_trapnames[] = {
+    static const char *halu_trapnames[] = {
         /* riffs on actual nethack traps */
         "bottomless pit", "polymorphism trap", "devil teleporter",
         "falling boulder trap", "anti-anti-magic field", "weeping gas trap",
@@ -5486,16 +5486,17 @@ boolean override;
         "never-ending elevator", "slime pit", "warp zone", "illusory floor",
         "pile of poo", "honey trap", "tourist trap"
     };
-    int total_names = TRAPNUM + SIZE(halu_trapnames);
-    int nameidx = rn2_on_display_rng(total_names);
+    int total_names, nameidx;
+
     if (override || !Hallucination) {
         return defsyms[trap_to_defsym(ttyp)].explanation;
     }
+    total_names = TRAPNUM + SIZE(halu_trapnames);
+    nameidx = rn2_on_display_rng(total_names);
     if (nameidx < TRAPNUM) {
         /* random but real trap name */
         return defsyms[trap_to_defsym(nameidx)].explanation;
-    }
-    else {
+    } else {
         nameidx -= TRAPNUM;
         return halu_trapnames[nameidx];
     }

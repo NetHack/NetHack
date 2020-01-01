@@ -64,3 +64,21 @@ end
 if (oc3.class ~= "*") then
    error("object class is not *, part 3");
 end
+
+local oc4 = o:class();
+if (oc4.name ~= "rock") then
+   error("object class is not rock, part 4");
+end
+if (oc4.class ~= "*") then
+   error("object class is not *, part 4");
+end
+
+
+-- placing obj into container even when obj is somewhere else already
+local o5 = obj.new("dagger");
+o5:placeobj(u.ux, u.uy);
+box:addcontent(o5);
+
+
+local o6 = obj.new("statue");
+o6:addcontent(obj.new("spellbook"));

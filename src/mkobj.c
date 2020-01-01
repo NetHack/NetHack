@@ -1969,6 +1969,7 @@ struct monst *mtmp;
  *      OBJ_MIGRATING   migrating chain
  *      OBJ_BURIED      level.buriedobjs chain
  *      OBJ_ONBILL      on g.billobjs chain
+ *      OBJ_LUAFREE     obj is dealloc'd from core, but still used by lua
  */
 void
 obj_extract_self(obj)
@@ -1976,6 +1977,7 @@ struct obj *obj;
 {
     switch (obj->where) {
     case OBJ_FREE:
+    case OBJ_LUAFREE:
         break;
     case OBJ_FLOOR:
         remove_object(obj);
@@ -2161,7 +2163,7 @@ void
 dealloc_obj(obj)
 struct obj *obj;
 {
-    if (obj->where != OBJ_FREE)
+    if (obj->where != OBJ_FREE && obj->where != OBJ_LUAFREE)
         panic("dealloc_obj: obj not free");
     if (obj->nobj)
         panic("dealloc_obj with nobj");
@@ -2192,8 +2194,11 @@ struct obj *obj;
 
     if (obj->oextra)
         dealloc_oextra(obj);
-    if (obj->lua_ref_cnt)
-        return; /* obj is referenced from a lua script, let lua gc free it */
+    if (obj->lua_ref_cnt) {
+        /* obj is referenced from a lua script, let lua gc free it */
+        obj->where = OBJ_LUAFREE;
+        return;
+    }
     free((genericptr_t) obj);
 }
 
@@ -2430,7 +2435,8 @@ const char *mesg;
 static const char *obj_state_names[NOBJ_STATES] = { "free",      "floor",
                                                     "contained", "invent",
                                                     "minvent",   "migrating",
-                                                    "buried",    "onbill" };
+                                                    "buried",    "onbill",
+                                                    "luafree" };
 
 static const char *
 where_name(obj)

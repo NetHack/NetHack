@@ -107,7 +107,7 @@ dosounds()
                 {
                     if (gold_in_vault)
                         You_hear(!hallu
-                                     ? "someone counting money."
+                                     ? "someone counting gold coins."
                                      : "the quarterback calling the play.");
                     else
                         You_hear("someone searching.");

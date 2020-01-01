@@ -26,6 +26,7 @@ worn +0 ring of protection should cause increased hunger if it is the only
 fix accessing mons[-1] when monster figures out if a tin cures stoning
 monster wielding Stormbringer or healer's Staff against another monster would
 	heal the hero instead of the wielding monster when draining life
+change twoweapon feedback from "not a weapon" to "not a suitable weapon"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -65,6 +66,7 @@ some altars are displayed in different colors (for tty and curses at least)
 add 'quick_farsight' option to provide some control over random clairvoyance
 	where pausing to be able to browse temporarily visible aspects of the
 	revealed map can seem intrusive; doesn't affect clairvoyance spell
+replace "money" in in-game texts with "gold"
 
 
 Platform- and/or Interface-Specific New Features

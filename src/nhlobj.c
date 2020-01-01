@@ -22,6 +22,8 @@ struct _lua_obj {
     struct obj *obj;
 };
 
+#define lobj_is_ok(lo) ((lo) && (lo)->obj && (lo)->obj->where != OBJ_LUAFREE)
+
 struct _lua_obj *
 l_obj_check(L, index)
 lua_State *L;
@@ -46,7 +48,8 @@ lua_State *L;
         if (lo->obj->lua_ref_cnt > 0)
             lo->obj->lua_ref_cnt--;
         /* free-floating objects with no other refs are deallocated. */
-        if (lo->obj->where == OBJ_FREE && !lo->obj->lua_ref_cnt) {
+        if (!lo->obj->lua_ref_cnt
+            && (lo->obj->where == OBJ_FREE || lo->obj->where == OBJ_LUAFREE)) {
             if (Has_contents(lo->obj)) {
                 struct obj *otmp;
                 while ((otmp = lo->obj->cobj) != 0) {
@@ -98,13 +101,12 @@ lua_State *L;
 
     if (!obj)
         nhl_error(L, "l_obj_getcontents: no obj");
-    if (!obj->cobj)
-        nhl_error(L, "l_obj_getcontents: no cobj");
 
     (void) l_obj_push(L, obj->cobj);
     return 1;
 }
 
+/* Puts object inside another object. */
 /* local box = obj.new("large chest");
    box.addcontent(obj.new("rock"));
 */
@@ -115,19 +117,21 @@ lua_State *L;
     struct _lua_obj *lobox = l_obj_check(L, 1);
     struct _lua_obj *lo = l_obj_check(L, 2);
     struct obj *otmp;
+    int refs;
 
-    if (!lo->obj || !lobox->obj)
-        nhl_error(L, "l_obj_add_to_container: no obj");
+    if (!lobj_is_ok(lo) || !lobj_is_ok(lobox))
+        return 0;
 
-    if (!Is_container(lobox->obj))
-        nhl_error(L, "l_obj_add_to_container: not a container");
+    refs = lo->obj->lua_ref_cnt;
 
+    obj_extract_self(lo->obj);
     otmp = add_to_container(lobox->obj, lo->obj);
 
-    /* was lo->obj merged? FIXME: causes problems if both lo->obj and
-       the one it merged with are handled by lua. Use lo->state? */
-    if (otmp != lo->obj)
+    /* was lo->obj merged? */
+    if (otmp != lo->obj) {
+        lo->obj->lua_ref_cnt += refs;
         lo->obj = otmp;
+    }
 
     return 0;
 }
@@ -135,6 +139,7 @@ lua_State *L;
 /* Get a table of object class data. */
 /* local odata = obj.class(otbl.otyp); */
 /* local odata = obj.class(obj.new("rock")); */
+/* local odata = o:class(); */
 static int
 l_obj_objects_to_table(L)
 lua_State *L;
@@ -217,7 +222,7 @@ lua_State *L;
 
     lua_newtable(L);
 
-    if (!obj) {
+    if (!obj || obj->where == OBJ_LUAFREE) {
         nhl_add_table_entry_int(L, "NO_OBJ", 1);
         return 1;
     }
@@ -352,20 +357,19 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct _lua_obj *lo = l_obj_check(L, 1);
+    int x, y;
 
     if (argc != 3)
         nhl_error(L, "l_obj_placeobj: Wrong args");
 
-    if (lo && lo->obj) {
-        int x, y;
+    x = (int) luaL_checkinteger(L, 2);
+    y = (int) luaL_checkinteger(L, 3);
+    lua_pop(L, 3);
 
-        x = (int) luaL_checkinteger(L, 2);
-        y = (int) luaL_checkinteger(L, 3);
-        lua_pop(L, 3);
-
+    if (lobj_is_ok(lo)) {
+        obj_extract_self(lo->obj);
         place_object(lo->obj, x, y);
-    } else
-        nhl_error(L, "l_obj_placeobj: Wrong args");
+    }
 
     return 0;
 }
@@ -393,11 +397,10 @@ lua_State *L;
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
 
-    if (lo && lo->obj && lo->obj->where == OBJ_CONTAINED) {
+    if (lo && lo->obj && lo->obj->where == OBJ_CONTAINED)
         (void) l_obj_push(L, lo->obj->ocontainer);
-        return 1;
-    }
-    (void) l_obj_push(L, NULL);
+    else
+        (void) l_obj_push(L, NULL);
     return 1;
 }
 
@@ -409,7 +412,7 @@ lua_State *L;
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
 
-    lua_pushboolean(L, lo && lo->obj);
+    lua_pushboolean(L, lobj_is_ok(lo));
     return 1;
 }
 

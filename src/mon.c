@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1569276991 2019/09/23 22:16:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.297 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1577759850 2019/12/31 02:37:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.319 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2353,13 +2353,12 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
                            "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE));
     }
 
-    if (mtmp->mtrapped && (t = t_at(x, y)) != 0
-        && is_pit(t->ttyp)) {
+    if (mtmp->mtrapped && (t = t_at(x, y)) != 0 && is_pit(t->ttyp)) {
         if (sobj_at(BOULDER, x, y))
             nocorpse = TRUE; /* Prevent corpses/treasure being created
-                                "on top" of boulder that is about to fall in.
-                                This is out of order, but cannot be helped
-                                unless this whole routine is rearranged. */
+                              * "on top" of boulder that is about to fall in.
+                              * This is out of order, but cannot be helped
+                              * unless this whole routine is rearranged. */
         if (m_carrying(mtmp, BOULDER))
             burycorpse = TRUE;
     }
@@ -2381,8 +2380,8 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
         g.thrownobj = 0;
     }
 
-    g.vamp_rise_msg = FALSE; /* might get set in mondead(); only checked below */
-    g.disintegested = nocorpse; /* alternate vamp_rise message needed if true */
+    g.vamp_rise_msg = FALSE; /* might get set in mondead(); checked below */
+    g.disintegested = nocorpse; /* alternate vamp_rise mesg needed if true */
     /* dispose of monster and make cadaver */
     if (g.stoned)
         monstone(mtmp);
