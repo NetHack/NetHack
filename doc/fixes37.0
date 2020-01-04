@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ $NHDT-Date: 1577674533 2019/12/30 02:55:33 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ $NHDT-Date: 1578137629 2020/01/04 11:33:49 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -89,3 +89,7 @@ more current Qt for Qt version 4 and 5 moved from win/Qt4 to win/Qt; qt4
 	moniker changed to qt_
 window-port-interface: add_menu() modified to take a more general itemflags
 	parameter to support uses beyond just 'preselected'
+add some bounds checking to tabexpand (doesn't prevent the apparent compiler
+	optimization bug that put homebrew OSX executable into endless loop)
+
+

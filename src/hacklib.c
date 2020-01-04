@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1574636502 2019/11/24 23:01:42 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1578137629 2020/01/04 11:33:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -416,27 +416,40 @@ const char *s;
     return TRUE;
 }
 
-/* expand tabs into proper number of spaces */
+/* expand tabs into proper number of spaces (in place) */
 char *
 tabexpand(sbuf)
-char *sbuf;
+char *sbuf; /* assumed to be [BUFSZ] but can be smaller provided that expanded
+             * string fits; expansion bigger than BUFSZ-1 will be truncated */
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ + 10];
     register char *bp, *s = sbuf;
     register int idx;
 
     if (!*s)
         return sbuf;
-    /* warning: no bounds checking performed */
-    for (bp = buf, idx = 0; *s; s++)
+    for (bp = buf, idx = 0; *s; s++) {
         if (*s == '\t') {
+            /*
+             * clang-8's optimizer at -O4 has been observed to mis-compile
+             * this code when unrolling the loop.  Symptom is nethack
+             * getting stuck in an apparent infinite loop (or perhaps just
+             * an extremely long one) when examining data.base entries.
+             * clang-9 doesn't exhibit this problem.  [Was the incorrect
+             * optimization fixed or just disabled?]
+             */
             do
                 *bp++ = ' ';
             while (++idx % 8);
         } else {
             *bp++ = *s;
-            idx++;
+            ++idx;
         }
+        if (idx >= BUFSZ) {
+            bp = &buf[BUFSZ - 1];
+            break;
+        }
+    }
     *bp = 0;
     return strcpy(sbuf, buf);
 }
