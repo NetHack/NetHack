@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1575830188 2019/12/08 18:36:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1578137709 2020/01/04 11:35:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -778,12 +778,35 @@ char *supplemental_name;
                     }
                     datawin = create_nhwindow(NHW_MENU);
                     for (i = 0; i < entry_count; i++) {
-                        if (!dlb_fgets(buf, BUFSZ, fp))
+                        /* room for 1-tab or 8-space prefix + BUFSZ-1 + \0 */
+                        char tabbuf[BUFSZ + 8], *tp;
+
+                        if (!dlb_fgets(tabbuf, BUFSZ, fp))
                             goto bad_data_file;
-                        (void) strip_newline(buf);
-                        if (index(buf + 1, '\t') != 0)
-                            (void) tabexpand(buf + 1);
-                        putstr(datawin, 0, buf + 1);
+                        tp = tabbuf;
+                        if (!index(tp, '\n'))
+                            goto bad_data_file;
+                        (void) strip_newline(tp);
+                        /* text in this file is indented with one tab but
+                           someone modifying it might use spaces instead */
+                        if (*tp == '\t') {
+                            ++tp;
+                        } else if (*tp == ' ') {
+                            /* remove up to 8 spaces (we expect 8-column
+                               tab stops but user might have them set at
+                               something else so we don't require it) */
+                            do {
+                                ++tp;
+                            } while (tp < &tabbuf[8] && *tp == ' ');
+                        } else {
+                            goto bad_data_file;
+                        }
+                        /* if a tab after the leading one is found,
+                           convert tabs into spaces; the attributions
+                           at the end of quotes typically have them */
+                        if (index(tp, '\t') != 0)
+                            (void) tabexpand(tp);
+                        putstr(datawin, 0, tp);
                     }
                     display_nhwindow(datawin, FALSE);
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
