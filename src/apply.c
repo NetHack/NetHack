@@ -31,6 +31,7 @@ static int FDECL(use_pole, (struct obj *));
 static int FDECL(use_cream_pie, (struct obj *));
 static int FDECL(use_grapple, (struct obj *));
 static int FDECL(do_break_wand, (struct obj *));
+static int FDECL(flip_through_book, (struct obj *));
 static boolean FDECL(figurine_location_checks, (struct obj *,
                                                     coord *, BOOLEAN_P));
 static void FDECL(add_class, (char *, CHAR_P));
@@ -3520,7 +3521,8 @@ char class_list[];
 {
     register struct obj *otmp;
     int otyp;
-    boolean knowoil, knowtouchstone, addpotions, addstones, addfood;
+    boolean knowoil, knowtouchstone;
+    boolean addpotions, addstones, addfood, addspellbooks;
 
     knowoil = objects[POT_OIL].oc_name_known;
     knowtouchstone = objects[TOUCHSTONE].oc_name_known;
@@ -3539,6 +3541,8 @@ char class_list[];
             addstones = TRUE;
         if (otyp == CREAM_PIE || otyp == EUCALYPTUS_LEAF)
             addfood = TRUE;
+        if (otmp->oclass == SPBOOK_CLASS)
+            addspellbooks = TRUE;
     }
 
     class_list[0] = '\0';
@@ -3551,6 +3555,8 @@ char class_list[];
         add_class(class_list, GEM_CLASS);
     if (addfood)
         add_class(class_list, FOOD_CLASS);
+    if (addspellbooks)
+        add_class(class_list, SPBOOK_CLASS);
 }
 
 /* the 'a' command */
@@ -3575,6 +3581,9 @@ doapply()
 
     if (obj->oclass == WAND_CLASS)
         return do_break_wand(obj);
+
+    if (obj->oclass == SPBOOK_CLASS)
+        return flip_through_book(obj);
 
     switch (obj->otyp) {
     case BLINDFOLD:
@@ -3789,6 +3798,59 @@ boolean is_horn;
         unfixable_trbl++;
 
     return unfixable_trbl;
+}
+
+static int
+flip_through_book(obj)
+struct obj *obj;
+{
+    if (Underwater) {
+        pline("You don't want to get the pages even more soggy, do you?");
+        return 0;
+    }
+
+    You("flip through the pages of the spellbook.");
+
+    if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+        if (Deaf) {
+            You_see("the pages glow faintly %s.", hcolor(NH_RED));
+        } else {
+            You_hear("the pages make an unpleasant %s sound.",
+                    Hallucination ? "chuckling"
+                                  : "rustling");
+        }
+        return 1;
+    } else if (Blind) {
+        pline("The pages feel %s.",
+              Hallucination ? "freshly picked"
+                            : "rough and dry");
+        return 1;
+    } else if (obj->otyp == SPE_BLANK_PAPER) {
+        pline("This spellbook %s.",
+              Hallucination ? "doesn't have much of a plot"
+                            : "has nothing written in it");
+        makeknown(obj->otyp);
+        return 1;
+    }
+
+    if (Hallucination) {
+        You("enjoy the animated initials.");
+    } else {
+        static const char* fadeness[] = {
+            "fresh",
+            "slightly faded",
+            "very faded",
+            "extremely faded",
+            "barely visible"
+        };
+
+        int index = min(obj->spestudied, MAX_SPELL_STUDY);
+        pline("The%s ink in this spellbook is %s.",
+              objects[obj->otyp].oc_magic ? " magical" : "",
+              fadeness[index]);
+    }
+
+    return 1;
 }
 
 /*apply.c*/
