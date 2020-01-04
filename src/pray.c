@@ -47,6 +47,12 @@ static const char *godvoices[] = {
     "booms out", "thunders", "rings out", "booms",
 };
 
+static const char *hgodvoices[] = {
+    "belches", "ring-a-lings out", "squeaks", "squeals", "screeches", "drones",
+    "buzzes", "pipes", "tinkles", "rumbulates", "moos", "brays", "barks",
+    "screams", "howls", "ululates", "quacks", "meows",
+};
+
 #define PIOUS 20
 #define DEVOUT 14
 #define FERVENT 9
@@ -1266,7 +1272,9 @@ const char *words;
         words = "";
 
     pline_The("voice of %s %s: %s%s%s", align_gname(g_align),
-              godvoices[rn2(SIZE(godvoices))], quot, words, quot);
+              Hallucination ? hgodvoices[rn2(SIZE(hgodvoices))]
+                            : godvoices[rn2(SIZE(godvoices))],
+              quot, words, quot);
 }
 
 static void
@@ -1309,7 +1317,11 @@ register struct obj *otmp;
         Your("sacrifice disappears!");
     else
         Your("sacrifice is consumed in a %s!",
-             u.ualign.type == A_LAWFUL ? "flash of light" : "burst of flame");
+             u.ualign.type == A_LAWFUL
+                ? "flash of light"
+                : u.ualign.type == A_NEUTRAL
+                    ? "cloud of smoke"
+                    : "burst of flame");
     if (carried(otmp))
         useup(otmp);
     else
@@ -1523,6 +1535,7 @@ dosacrifice()
                 /* Moloch's high altar */
                 if (u.ualign.record > -99)
                     u.ualign.record = -99;
+                pline("An invisible choir chants in Latin, and you are bathed in darkness...");
                 /*[apparently shrug/snarl can be sensed without being seen]*/
                 pline("%s shrugs and retains dominion over %s,", Moloch,
                       u_gname());

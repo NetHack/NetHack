@@ -355,6 +355,8 @@ boolean allow_drag;
             }
         }
     }
+    You("materialize in %s location!",
+        (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
     /* must set u.ux, u.uy after drag_ball(), which may need to know
        the old position if allow_drag is true... */
     u_on_newpos(nux, nuy); /* set u.<x,y>, usteed-><mx,my>; cliparound() */
@@ -1020,6 +1022,7 @@ level_tele()
        call it something, we can't defer until the end of the turn */
     if (u.utotype && !g.context.mon_moving)
         deferred_goto();
+    You("materialize on a different level!");
 }
 
 void

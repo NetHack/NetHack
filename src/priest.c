@@ -580,8 +580,10 @@ register struct monst *priest;
             long pmoney = money_cnt(priest->minvent);
             if (pmoney > 0L) {
                 /* Note: two bits is actually 25 cents.  Hmm. */
-                pline("%s gives you %s for an ale.", Monnam(priest),
-                      (pmoney == 1L) ? "one bit" : "two bits");
+                pline("%s gives you %s %s%s for an ale.", Monnam(priest),
+                      (pmoney == 1L) ? "one" : "two",
+                      Hallucination ? "bitcoin" : "bit",
+                      (pmoney == 1L) ? "" : "s");
                 money2u(priest, pmoney > 1L ? 2 : 1);
             } else
                 pline("%s preaches the virtues of poverty.", Monnam(priest));

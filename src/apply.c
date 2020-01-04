@@ -1138,6 +1138,7 @@ register struct obj *obj;
     }
     if (obj->spe <= 0) {
         pline("This %s has no %s.", xname(obj), s);
+        pline("To attach candles, apply them instead of the %s.", xname(obj));
         return;
     }
     if (Underwater) {

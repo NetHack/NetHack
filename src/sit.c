@@ -274,7 +274,7 @@ dosit()
                 break;
             }
         } else {
-            if (is_prince(g.youmonst.data))
+            if (is_prince(g.youmonst.data) || u.uevent.uhand_of_elbereth)
                 You_feel("very comfortable here.");
             else
                 You_feel("somehow out of place...");

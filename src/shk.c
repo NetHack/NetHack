@@ -3258,7 +3258,7 @@ xchar x, y;
         } else
             qbuf[0] = '\0'; /* just to pacify lint */
 
-        switch (g.sell_response ? g.sell_response : ynaq(qbuf)) {
+        switch (g.sell_response ? g.sell_response : nyaq(qbuf)) {
         case 'q':
             g.sell_response = 'n';
             /*FALLTHRU*/
