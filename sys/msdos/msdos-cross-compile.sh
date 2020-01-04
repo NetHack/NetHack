@@ -18,7 +18,8 @@ if [ "$(uname)" = "Darwin" ]; then
     DJGPP_FILE="djgpp-osx-gcc550.tar.bz2"
 elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
     #Linux
-    DJGPP_FILE="djgpp-linux64-gcc550.tar.bz2"
+    DJGPP_URL="https://github.com/dimkr/build-djgpp/releases/latest/download/"
+    DJGPP_FILE="djgpp-linux64.tar.bz2"
 elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
     #mingw
     DJGPP_FILE="djgpp-mingw-gcc550-standalone.zip"
