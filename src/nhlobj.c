@@ -136,6 +136,32 @@ lua_State *L;
     return 0;
 }
 
+/* Put object into player's inventory */
+/* u.giveobj(obj.new("rock")); */
+int
+nhl_obj_u_giveobj(L)
+lua_State *L;
+{
+    struct _lua_obj *lo = l_obj_check(L, 1);
+    struct obj *otmp;
+    int refs;
+
+    if (!lobj_is_ok(lo) || lo->obj->where == OBJ_INVENT)
+        return 0;
+
+    refs = lo->obj->lua_ref_cnt;
+
+    obj_extract_self(lo->obj);
+    otmp = addinv(lo->obj);
+
+    if (otmp != lo->obj) {
+        lo->obj->lua_ref_cnt += refs;
+        lo->obj = otmp;
+    }
+
+    return 0;
+}
+
 /* Get a table of object class data. */
 /* local odata = obj.class(otbl.otyp); */
 /* local odata = obj.class(obj.new("rock")); */
@@ -413,7 +439,7 @@ lua_State *L;
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
 
-    lua_pushboolean(L, lobj_is_ok(lo));
+    lua_pushboolean(L, !lobj_is_ok(lo));
     return 1;
 }
 

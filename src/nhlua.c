@@ -830,6 +830,13 @@ lua_State *L;
         { "mh", &(u.mh), ANY_INT },
         { "mhmax", &(u.mhmax), ANY_INT },
         { "mtimedone", &(u.mtimedone), ANY_INT },
+        { "dlevel", &(u.uz.dlevel), ANY_SCHAR }, /* actually xchar */
+        { "dnum", &(u.uz.dnum), ANY_SCHAR }, /* actually xchar */
+        { "uluck", &(u.uluck), ANY_SCHAR },
+        { "uhp", &(u.uhp), ANY_INT },
+        { "uhpmax", &(u.uhpmax), ANY_INT },
+        { "uen", &(u.uen), ANY_INT },
+        { "uenmax", &(u.uenmax), ANY_INT },
     };
     int i;
 
@@ -856,11 +863,35 @@ lua_State *L;
     return 0;
 }
 
+static int
+nhl_u_clear_inventory(L)
+lua_State *L;
+{
+    while (g.invent)
+        useupall(g.invent);
+    return 0;
+}
+
+/* Put object into player's inventory */
+/* u.giveobj(obj.new("rock")); */
+static int
+nhl_u_giveobj(L)
+lua_State *L;
+{
+    return nhl_obj_u_giveobj(L);
+}
+
+static const struct luaL_Reg nhl_u_functions[] = {
+    { "clear_inventory", nhl_u_clear_inventory },
+    { "giveobj", nhl_u_giveobj },
+};
+
 void
 init_u_data(L)
 lua_State *L;
 {
     lua_newtable(L);
+    luaL_setfuncs(L, nhl_u_functions, 0);
     lua_newtable(L);
     lua_pushcfunction(L, nhl_meta_u_index);
     lua_setfield(L, -2, "__index");
