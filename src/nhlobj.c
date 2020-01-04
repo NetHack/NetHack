@@ -369,6 +369,7 @@ lua_State *L;
     if (lobj_is_ok(lo)) {
         obj_extract_self(lo->obj);
         place_object(lo->obj, x, y);
+        newsym(x, y);
     }
 
     return 0;
