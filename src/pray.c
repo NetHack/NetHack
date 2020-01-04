@@ -1309,7 +1309,11 @@ register struct obj *otmp;
         Your("sacrifice disappears!");
     else
         Your("sacrifice is consumed in a %s!",
-             u.ualign.type == A_LAWFUL ? "flash of light" : "burst of flame");
+             u.ualign.type == A_LAWFUL
+                ? "flash of light"
+                : u.ualign.type == A_NEUTRAL
+                    ? "cloud of smoke"
+                    : "burst of flame");
     if (carried(otmp))
         useup(otmp);
     else
@@ -1523,6 +1527,7 @@ dosacrifice()
                 /* Moloch's high altar */
                 if (u.ualign.record > -99)
                     u.ualign.record = -99;
+                pline("An invisible choir chants in Latin, and you are bathed in darkness...");
                 /*[apparently shrug/snarl can be sensed without being seen]*/
                 pline("%s shrugs and retains dominion over %s,", Moloch,
                       u_gname());

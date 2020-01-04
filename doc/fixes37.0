@@ -77,6 +77,25 @@ NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 hallucinatory trap names from github pull request #174
 autounlock feature originally from unnethack in github pull request #228
+applying a candelabrum with no candles gives a tip (github #265)
+candelabrum now reads "(n of 7 candles attached)" (github #265)
+replace "You feel cold" message for freezing unseen door (github #265)
+applying a candelabrum with no candles gives a tip (github #265)
+candelabrum now reads "(n of 7 candles attached)" (github #265)
+show appropriate message on throne when crowned (github #265)
+choir chanting, bathing in darkness for death by Moloch (github #265)
+remove "iron hook" unidentified description (github #265)
+suppress "Unknown command" messages in the dumplog. (github #265)
+give player message informing them they can use #enhance (github #265)
+neutral sacrifices disappear in a cloud of smoke (github #265)
+call potion bottles by nonsensical names if hallucinating (github #265)
+add a default message for chatting to gnomes (github #265)
+better reporting directions for impossible() (github #265)
+underwater fire scroll causes vaporization (github #265)
+default shk sell prompt to N (github #265)
+teach non-mindless monsters about the Castle trapdoors (github #265)
+always print a message when the hero teleports (github #265)
+always print a message when the hero level teleports (github #265)
 
 
 Code Cleanup and Reorganization

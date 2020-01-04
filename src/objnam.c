@@ -1096,11 +1096,7 @@ unsigned doname_flags;
             break;
         }
         if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
-            if (!obj->spe)
-                Strcpy(tmpbuf, "no");
-            else
-                Sprintf(tmpbuf, "%d", obj->spe);
-            Sprintf(eos(bp), " (%s candle%s%s)", tmpbuf, plur(obj->spe),
+            Sprintf(eos(bp), " (%d of 7 candle%s%s)", obj->spe, plur(obj->spe),
                     !obj->lamplit ? " attached" : ", lit");
             break;
         } else if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP

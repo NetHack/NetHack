@@ -1210,11 +1210,20 @@ const char *txt;
 
 const char *bottlenames[] = { "bottle", "phial", "flagon", "carafe",
                               "flask",  "jar",   "vial" };
+const char *hbottlenames[] = {
+    "jug", "pitcher", "barrel", "tin", "bag", "box", "glass", "beaker",
+    "tumbler", "vase", "flowerpot", "pan", "thingy", "mug", "teacup", "teapot",
+    "keg", "bucket", "thermos", "amphora", "wineskin", "parcel", "bowl",
+    "ampoule"
+};
 
 const char *
 bottlename()
 {
-    return bottlenames[rn2(SIZE(bottlenames))];
+    if (Hallucination)
+        return hbottlenames[rn2(SIZE(hbottlenames))];
+    else
+        return bottlenames[rn2(SIZE(bottlenames))];
 }
 
 /* handle item dipped into water potion or steed saddle splashed by same */

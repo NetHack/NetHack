@@ -703,7 +703,7 @@ TOOL("drum of earthquake","drum", 0, 0, 1, 1,  2, 25, 25, LEATHER, HI_LEATHER),
 /* tools useful as weapons */
 WEPTOOL("pick-axe", None,
         1, 0, 0, 20, 100,  50,  6,  3, WHACK,  P_PICK_AXE, IRON, HI_METAL),
-WEPTOOL("grappling hook", "iron hook",
+WEPTOOL("grappling hook", None,
         0, 0, 0,  5,  30,  50,  2,  6, WHACK,  P_FLAIL,    IRON, HI_METAL),
 WEPTOOL("unicorn horn", None,
         1, 1, 1,  0,  20, 100, 12, 12, PIERCE, P_UNICORN_HORN,
