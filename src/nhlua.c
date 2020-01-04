@@ -865,7 +865,7 @@ lua_State *L;
 
 static int
 nhl_u_clear_inventory(L)
-lua_State *L;
+lua_State *L UNUSED;
 {
     while (g.invent)
         useupall(g.invent);
