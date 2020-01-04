@@ -1138,7 +1138,20 @@ register struct obj *obj;
     }
     if (obj->spe <= 0) {
         pline("This %s has no %s.", xname(obj), s);
-        pline("To attach candles, apply them instead of the %s.", xname(obj));
+
+        /* only output tip if candles are in inventory */
+        boolean has_candles = FALSE;
+        struct obj *otmp = g.invent;
+        while (!has_candles && otmp) {
+            has_candles = Is_candle(otmp);
+            otmp = otmp->nobj;
+        }
+
+        if (has_candles) {
+            pline("To attach candles, apply them instead of the %s.",
+                  xname(obj));
+        }
+
         return;
     }
     if (Underwater) {
@@ -2514,7 +2527,7 @@ struct obj *otmp;
         return;
     }
     ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
-    if (otmp == g.trapinfo.tobj && u.ux == g.trapinfo.tx 
+    if (otmp == g.trapinfo.tobj && u.ux == g.trapinfo.tx
                                 && u.uy == g.trapinfo.ty) {
         You("resume setting %s%s.", shk_your(buf, otmp),
             trapname(ttyp, FALSE));

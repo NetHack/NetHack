@@ -77,6 +77,7 @@ NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 hallucinatory trap names from github pull request #174
 autounlock feature originally from unnethack in github pull request #228
+applying a candelabrum with no candles gives a tip (github #265)
 
 
 Code Cleanup and Reorganization
