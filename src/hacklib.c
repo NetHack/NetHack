@@ -431,10 +431,10 @@ char *sbuf; /* assumed to be [BUFSZ] but can be smaller provided that expanded
     for (bp = buf, idx = 0; *s; s++) {
         if (*s == '\t') {
             /*
-             * clang-8's optimizer at -O4 has been observed to mis-compile
-             * this code when unrolling the loop.  Symptom is nethack
-             * getting stuck in an apparent infinite loop (or perhaps just
-             * an extremely long one) when examining data.base entries.
+             * clang-8's optimizer at -Os has been observed to mis-compile
+             * this code.  Symptom is nethack getting stuck in an apparent
+             * infinite loop (or perhaps just an extremely long one) when
+             * examining data.base entries.
              * clang-9 doesn't exhibit this problem.  [Was the incorrect
              * optimization fixed or just disabled?]
              */
