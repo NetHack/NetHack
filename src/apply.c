@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1574648938 2019/11/25 02:28:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1578187332 2020/01/05 01:22:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.310 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1138,21 +1138,16 @@ register struct obj *obj;
         return;
     }
     if (obj->spe <= 0) {
+        struct obj *otmp;
+
         pline("This %s has no %s.", xname(obj), s);
-
         /* only output tip if candles are in inventory */
-        boolean has_candles = FALSE;
-        struct obj *otmp = g.invent;
-        while (!has_candles && otmp) {
-            has_candles = Is_candle(otmp);
-            otmp = otmp->nobj;
-        }
-
-        if (has_candles) {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
+            if (Is_candle(otmp))
+                break;
+        if (otmp)
             pline("To attach candles, apply them instead of the %s.",
                   xname(obj));
-        }
-
         return;
     }
     if (Underwater) {
