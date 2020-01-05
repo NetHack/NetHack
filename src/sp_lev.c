@@ -705,8 +705,7 @@ xchar rtype, rlit;
     /* some other rooms may require lighting */
 
     /* is light state random ? */
-    if (rlit == -1)
-        rlit = (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+    rlit = litstate_rnd(rlit);
 
     /*
      * Here we will try to create a room. If some parameters are
@@ -886,8 +885,7 @@ xchar rtype, rlit;
         y++;
     if (rtype == -1)
         rtype = OROOM;
-    if (rlit == -1)
-        rlit = (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+    rlit = litstate_rnd(rlit);
     add_subroom(proom, proom->lx + x, proom->ly + y, proom->lx + x + w - 1,
                 proom->ly + y + h - 1, rlit, rtype, FALSE);
     return TRUE;
@@ -4827,8 +4825,7 @@ lua_State *L;
         return 0;
     }
 
-    if (rlit < 0)
-        rlit = (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+    rlit = litstate_rnd(rlit);
 
     get_location(&dx1, &dy1, ANY_LOC, (struct mkroom *) 0);
     get_location(&dx2, &dy2, ANY_LOC, (struct mkroom *) 0);

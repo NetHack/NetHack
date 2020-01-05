@@ -1301,6 +1301,7 @@ E void FDECL(mineralize, (int, int, int, int, BOOLEAN_P));
 
 E void FDECL(flood_fill_rm, (int, int, int, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(remove_rooms, (int, int, int, int));
+E boolean FDECL(litstate_rnd, (int));
 /* E void FDECL(mkmap, (lev_init *)); -- need sp_lev.h for lev_init */
 
 /* ### mkmaze.c ### */
