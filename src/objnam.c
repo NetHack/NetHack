@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1578190895 2020/01/05 02:21:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.279 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1578258724 2020/01/05 21:12:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.280 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3695,7 +3695,7 @@ struct obj *no_wish;
  wiztrap:
     if (wizard && !g.program_state.wizkit_wishing) {
         struct rm *lev;
-        boolean madeterrain = FALSE;
+        boolean madeterrain = FALSE, badterrain = FALSE;
         int trap, x = u.ux, y = u.uy;
 
         for (trap = NO_TRAP + 1; trap < TRAPNUM; trap++) {
@@ -3789,6 +3789,45 @@ struct obj *no_wish;
             lev->typ = IRONBARS;
             pline("Iron bars.");
             madeterrain = TRUE;
+        } else if (!BSTRCMPI(bp, p - 11, "secret door")) {
+            if (lev->typ == DOOR
+                || (IS_WALL(lev->typ) && lev->typ != DBWALL)) {
+                lev->typ = SDOOR;
+                lev->wall_info = 0;
+                /* lev->horizontal stays as-is */
+                /* no special handling for rogue level is necessary;
+                   exposing a secret door there yields a doorless doorway */
+#if 0       /*
+             * Can't do this; secret doors want both doormask and
+             * wall_info but those both overload rm.flags which makes
+             * D_CLOSED conflict with WM_MASK.  However, converting
+             * secret door to regular door sets D_CLOSED iff D_LOCKED
+             * isn't specified so the alternate code suffices.
+             */
+                lev->doormask = locked ? D_LOCKED : D_CLOSED;
+#else
+                /* cvt_sdoor_to_door() will change D_NODOOR to D_CLOSED */
+                lev->doormask = locked ? D_LOCKED : D_NODOOR;
+#endif
+                if (trapped)
+                    lev->doormask |= D_TRAPPED;
+                block_point(x, y);
+                pline("Secret door.");
+                madeterrain = TRUE;
+            } else {
+                pline("Secret door requires door or wall location.");
+                badterrain = TRUE;
+            }
+        } else if (!BSTRCMPI(bp, p - 15, "secret corridor")) {
+            if (lev->typ == CORR) {
+                lev->typ = SCORR;
+                block_point(x, y);
+                pline("Secret corridor.");
+                madeterrain = TRUE;
+            } else {
+                pline("Secret corridor requires corridor location.");
+                badterrain = TRUE;
+            }
         }
 
         if (madeterrain) {
@@ -3803,6 +3842,8 @@ struct obj *no_wish;
                        && !is_lava(u.ux, u.uy)) {
                 reset_utrap(FALSE);
             }
+        }
+        if (madeterrain || badterrain) {
             /* cast 'const' away; caller won't modify this */
             return (struct obj *) &cg.zeroobj;
         }

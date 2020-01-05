@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ $NHDT-Date: 1578252630 2020/01/05 19:30:30 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $ $NHDT-Date: 1578258722 2020/01/05 21:12:02 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -74,6 +74,9 @@ add 'quick_farsight' option to provide some control over random clairvoyance
 replace "money" in in-game texts with "gold"
 when hallucinating, see hallucinated currencies instead of bits for an ale
 applying a spellbook hints about read charges left
+wizard mode wishing for level topology can now create hidden doors (ask for
+	"secret door" when at a door or wall location) and hidden corridor
+	spots ("secret corridor" at a corridor location)
 
 
 Platform- and/or Interface-Specific New Features

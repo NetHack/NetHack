@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1573943499 2019/11/16 22:31:39 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1578258722 2020/01/05 21:12:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -310,9 +310,20 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define SYMHANDLING(ht) (g.symset[g.currentgraphics].handling == (ht))
 
 /*
- * The 5 possible states of doors
+ *      Note:  secret doors (SDOOR) want to use both rm.doormask and
+ *      rm.wall_info but those both overload rm.flags.  SDOOR only
+ *      has 2 states (closed or locked).  However, it can't specify
+ *      D_CLOSED due to that conflicting with WM_MASK (below).  When
+ *      a secret door is revealed, the door gets set to D_CLOSED iff
+ *      it isn't set to D_LOCKED (see cvt_sdoor_to_door() in detect.c).
+ *
+ *      D_TRAPPED conflicts with W_NONDIGGABLE but the latter is not
+ *      expected to be used on door locations.
  */
 
+/*
+ * The 5 possible states of doors.
+ */
 #define D_NODOOR 0
 #define D_BROKEN 1
 #define D_ISOPEN 2
