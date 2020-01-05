@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ $NHDT-Date: 1578137629 2020/01/04 11:33:49 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ $NHDT-Date: 1578190894 2020/01/05 02:21:34 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -27,6 +27,7 @@ fix accessing mons[-1] when monster figures out if a tin cures stoning
 monster wielding Stormbringer or healer's Staff against another monster would
 	heal the hero instead of the wielding monster when draining life
 change twoweapon feedback from "not a weapon" to "not a suitable weapon"
+don't allow twoweapon combat if either weapon is a bow, crossbow, or sling
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

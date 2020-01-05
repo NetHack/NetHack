@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1576638500 2019/12/18 03:08:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.257 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1578190895 2020/01/05 02:21:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.279 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1174,7 +1174,18 @@ unsigned doname_flags;
     }
 
     if ((obj->owornmask & W_WEP) && !g.mrg_to_wielded) {
-        if (obj->quan != 1L) {
+        boolean twoweap_primary = (obj == uwep && u.twoweap);
+
+        /* use alternate phrasing for non-weapons and for wielded ammo
+           (arrows, bolts), or missiles (darts, shuriken, boomerangs)
+           except when those are being actively dual-wielded where the
+           regular phrasing will list them as "in right hand" to
+           contrast with secondary weapon's "in left hand" */
+        if ((obj->quan != 1L
+             || ((obj->oclass == WEAPON_CLASS)
+                 ? (is_ammo(obj) || is_missile(obj))
+                 : !is_weptool(obj)))
+            && !twoweap_primary) {
             Strcat(bp, " (wielded)");
         } else {
             const char *hand_s = body_part(HAND);
@@ -1183,10 +1194,13 @@ unsigned doname_flags;
                 hand_s = makeplural(hand_s);
             /* note: Sting's glow message, if added, will insert text
                in front of "(weapon in hand)"'s closing paren */
-            Sprintf(eos(bp), " (%sweapon in %s)",
-                    (obj->otyp == AKLYS) ? "tethered " : "", hand_s);
+            Sprintf(eos(bp), " (%s%s in %s%s)",
+                    twoweap_primary ? "wielded" : "weapon",
+                    (obj->otyp == AKLYS) ? "tethered " : "",
+                    twoweap_primary ? "right " : "", hand_s);
 
-            if (g.warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
+            if (g.warn_obj_cnt && obj == uwep
+                && (EWarn_of_mon & W_WEP) != 0L) {
                 if (!Blind) /* we know bp[] ends with ')'; overwrite that */
                     Sprintf(eos(bp) - 1, ", %s %s)",
                             glow_verb(g.warn_obj_cnt, TRUE),
@@ -1196,9 +1210,11 @@ unsigned doname_flags;
     }
     if (obj->owornmask & W_SWAPWEP) {
         if (u.twoweap)
-            Sprintf(eos(bp), " (wielded in other %s)", body_part(HAND));
+            Sprintf(eos(bp), " (wielded in left %s)", body_part(HAND));
         else
-            Strcat(bp, " (alternate weapon; not wielded)");
+            /* TODO: rephrase this when obj isn't a weapon or weptool */
+            Sprintf(eos(bp), " (alternate weapon%s; not wielded)",
+                    plur(obj->quan));
     }
     if (obj->owornmask & W_QUIVER) {
         switch (obj->oclass) {
