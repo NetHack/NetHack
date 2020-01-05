@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1577050472 2019/12/22 21:34:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1578252630 2020/01/05 19:30:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1447,14 +1447,14 @@ struct rm *lev;
 {
     int newmask = lev->doormask & ~WM_MASK;
 
-    if (Is_rogue_level(&u.uz))
+    if (Is_rogue_level(&u.uz)) {
         /* rogue didn't have doors, only doorways */
         newmask = D_NODOOR;
-    else
+    } else {
         /* newly exposed door is closed */
         if (!(newmask & D_LOCKED))
-        newmask |= D_CLOSED;
-
+            newmask |= D_CLOSED;
+    }
     lev->typ = DOOR;
     lev->doormask = newmask;
 }

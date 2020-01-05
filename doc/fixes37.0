@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $ $NHDT-Date: 1578216006 2020/01/05 09:20:06 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ $NHDT-Date: 1578252630 2020/01/05 19:30:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -31,6 +31,7 @@ don't allow twoweapon combat if either weapon is a bow, crossbow, or sling
 drum of earthquake feedback reported various things (fountains, thrones, &c)
 	falling into a chasm but they remained intact because trap creation
 	had been changed to not clobber such things (so couldn't make pits)
+make earthquake which hits a secret door or a secret corridor reveal it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
