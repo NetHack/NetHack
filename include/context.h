@@ -132,6 +132,7 @@ struct context_info {
     boolean botl;        /* partially redo status line */
     boolean botlx;       /* print an entirely new bottom line */
     boolean door_opened; /* set to true if door was opened during test_move */
+    boolean enhance_tip; /* player is informed about #enhance */
     struct dig_info digging;
     struct victual_info victual;
     struct tin_info tin;
