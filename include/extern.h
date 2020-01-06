@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1575830178 2019/12/08 18:36:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.767 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1578297243 2020/01/06 07:54:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.781 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1117,6 +1117,7 @@ E boolean FDECL(picking_at, (int, int));
 E void FDECL(breakchestlock, (struct obj *, BOOLEAN_P));
 E void NDECL(reset_pick);
 E void FDECL(maybe_reset_pick, (struct obj *));
+E struct obj *FDECL(autokey, (BOOLEAN_P));
 E int FDECL(pick_lock, (struct obj *, XCHAR_P, XCHAR_P, struct obj *));
 E int NDECL(doforce);
 E boolean FDECL(boxlock, (struct obj *, struct obj *));

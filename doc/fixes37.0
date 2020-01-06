@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $ $NHDT-Date: 1578258722 2020/01/05 21:12:02 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.54 $ $NHDT-Date: 1578297243 2020/01/06 07:54:03 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -44,6 +44,12 @@ after 'w' on split stack patch, wielding '-' would cause an object_lost panic
 same patch allowed partial stack from getobj to replace cursed wielded weapon
 if the orc-town version of mine town has been loaded, creation of orc zombies
 	or orc mummies would name them as part of the town raiding orc clan
+autounlock of door or chest took no time; chest case depended on whether
+	anything got looted along with the unlocking
+autounlock with artifact unlocking tool didn't do touch check on that tool
+autounlock picked Rogue's artifact key over lock-pick or credit card (or
+	ordinary key depending upon invent order) even for non-rogues who
+	would be blasted when touching it
 
 
 Platform- and/or Interface-Specific Fixes
