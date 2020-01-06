@@ -1035,6 +1035,7 @@ const char *s;
         mazexy(&mm);
         mkstairs(mm.x, mm.y, 0, (struct mkroom *) 0); /* down */
     } else { /* choose "vibrating square" location */
+        int trycnt = 0;
 #define x_maze_min 2
 #define y_maze_min 2
 /*
@@ -1064,6 +1065,8 @@ const char *s;
             y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
             /* we don't want it to be too near the stairs, nor
                to be on a spot that's already in use (wall|trap) */
+            if (++trycnt > 1000)
+                break;
         } while (x == xupstair || y == yupstair /*(direct line)*/
                  || abs(x - xupstair) == abs(y - yupstair)
                  || distmin(x, y, xupstair, yupstair) <= INVPOS_DISTANCE

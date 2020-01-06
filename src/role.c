@@ -2028,9 +2028,19 @@ role_init()
 
     /* Fix up the god names */
     if (flags.pantheon == -1) {             /* new game */
+        int trycnt = 0;
         flags.pantheon = flags.initrole;    /* use own gods */
-        while (!roles[flags.pantheon].lgod) /* unless they're missing */
+        /* unless they're missing */
+        while (!roles[flags.pantheon].lgod && ++trycnt < 100)
             flags.pantheon = randrole(FALSE);
+        if (!roles[flags.pantheon].lgod) {
+            int i;
+            for (i = 0; i < SIZE(roles) - 1; i++)
+                if (roles[i].lgod) {
+                    flags.pantheon = i;
+                    break;
+                }
+        }
     }
     if (!g.urole.lgod) {
         g.urole.lgod = roles[flags.pantheon].lgod;

@@ -812,6 +812,7 @@ makelevel()
 
     /* for each room: put things inside */
     for (croom = g.rooms; croom->hx > 0; croom++) {
+        int trycnt = 0;
         if (croom->rtype != OROOM)
             continue;
 
@@ -833,7 +834,7 @@ makelevel()
         x = 8 - (level_difficulty() / 6);
         if (x <= 1)
             x = 2;
-        while (!rn2(x))
+        while (!rn2(x) && (++trycnt < 1000))
             mktrap(0, 0, croom, (coord *) 0);
         if (!rn2(3))
             (void) mkgold(0L, somex(croom), somey(croom));
@@ -1121,6 +1122,7 @@ coord *mp;
     if (g.nroom == 0) {
         mazexy(mp); /* already verifies location */
     } else {
+        int cnt = 0;
         /* not perfect - there may be only one stairway */
         if (g.nroom > 2) {
             int tryct = 0;
@@ -1135,9 +1137,9 @@ coord *mp;
         do {
             if (!somexy(croom, mp))
                 impossible("Can't place branch!");
-        } while (occupied(mp->x, mp->y)
+        } while ((occupied(mp->x, mp->y)
                  || (levl[mp->x][mp->y].typ != CORR
-                     && levl[mp->x][mp->y].typ != ROOM));
+                     && levl[mp->x][mp->y].typ != ROOM)) && (++cnt < 1000));
     }
     return croom;
 }
