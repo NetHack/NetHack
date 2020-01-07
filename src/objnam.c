@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1578394756 2020/01/07 10:59:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1578400811 2020/01/07 12:40:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1174,7 +1174,9 @@ unsigned doname_flags;
     }
 
     if ((obj->owornmask & W_WEP) && !g.mrg_to_wielded) {
-        boolean twoweap_primary = (obj == uwep && u.twoweap);
+        boolean twoweap_primary = (obj == uwep && u.twoweap),
+                tethered = (obj->otyp == AKLYS);
+
 
         /* use alternate phrasing for non-weapons and for wielded ammo
            (arrows, bolts), or missiles (darts, shuriken, boomerangs)
@@ -1195,8 +1197,9 @@ unsigned doname_flags;
             /* note: Sting's glow message, if added, will insert text
                in front of "(weapon in hand)"'s closing paren */
             Sprintf(eos(bp), " (%s%s in %s%s)",
-                    twoweap_primary ? "wielded" : "weapon",
-                    (obj->otyp == AKLYS) ? "tethered " : "",
+                    tethered ? "tethered " : "", /* aklys */
+                    /* avoid "tethered wielded in right hand" for twoweapon */
+                    (twoweap_primary && !tethered) ? "wielded" : "weapon",
                     twoweap_primary ? "right " : "", hand_s);
 
             if (g.warn_obj_cnt && obj == uwep

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ $NHDT-Date: 1578394755 2020/01/07 10:59:15 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ $NHDT-Date: 1578400811 2020/01/07 12:40:11 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -53,6 +53,7 @@ autounlock with artifact unlocking tool didn't do touch check on that tool
 autounlock picked Rogue's artifact key over lock-pick or credit card (or
 	ordinary key depending upon invent order) even for non-rogues who
 	would be blasted when touching it
+wielded aklys had its "(tethered weapon...)" description scrambled
 
 
 Platform- and/or Interface-Specific Fixes
