@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.54 $ $NHDT-Date: 1578297243 2020/01/06 07:54:03 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ $NHDT-Date: 1578394755 2020/01/07 10:59:15 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -32,6 +32,9 @@ drum of earthquake feedback reported various things (fountains, thrones, &c)
 	falling into a chasm but they remained intact because trap creation
 	had been changed to not clobber such things (so couldn't make pits)
 make earthquake which hits a secret door or a secret corridor reveal it
+wizard mode wishing for "Amulet of Yendor" has 50:50 chance for true Amulet
+	or a cheap plastic imitation; recognize "real Amulet of Yendor" and
+	"fake Amulet of Yendor" to precisely specify either of them
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

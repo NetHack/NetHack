@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1578258724 2020/01/05 21:12:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.280 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1578394756 2020/01/07 10:59:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2962,7 +2962,7 @@ struct obj *no_wish;
     register struct obj *otmp;
     int cnt, spe, spesgn, typ, very, rechrg;
     int blessed, uncursed, iscursed, ispoisoned, isgreased;
-    int eroded, eroded2, erodeproof, locked, unlocked, broken;
+    int eroded, eroded2, erodeproof, locked, unlocked, broken, real, fake;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
     int tmp, tinv, tvariety;
@@ -2970,7 +2970,7 @@ struct obj *no_wish;
     struct fruit *f;
     int ftype = g.context.current_fruit;
     char fruitbuf[BUFSZ], globbuf[BUFSZ];
-    /* Fruits may not mess up the ability to wish for real objects (since
+    /* Fruits must not mess up the ability to wish for real objects (since
      * you can leave a fruit in a bones file and it will be added to
      * another person's game), so they must be checked for last, after
      * stripping all the possible prefixes and seeing if there's a real
@@ -2992,7 +2992,7 @@ struct obj *no_wish;
     very = rechrg = blessed = uncursed = iscursed = ispoisoned =
         isgreased = eroded = eroded2 = erodeproof = halfeaten =
         islit = unlabeled = ishistoric = isdiluted = trapped =
-        locked = unlocked = broken = 0;
+        locked = unlocked = broken = real = fake = 0;
     tvariety = RANDOM_TIN;
     mntmp = NON_PM;
 #define UNDEFINED 0
@@ -3135,6 +3135,15 @@ struct obj *no_wish;
                 break;
             /* "very large " had "very " peeled off on previous iteration */
             gsize = (very != 1) ? 3 : 4;
+        } else if (!strncmpi(bp, "real ", l = 5)) {
+            /* accept "real Amulet of Yendor" with "blessed" or "cursed"
+               or useless "erodeproof" before or after "real" ... */
+            real = 1; /* don't negate 'fake' here; "real fake amulet" and
+                       * "fake real amulet" will both yield fake amulet
+                       * (so will "real amulet" outside of wizard mode) */
+        } else if (!strncmpi(bp, "fake ", l = 5)) {
+            /* ... and "fake Amulet of Yendor" likewise */
+            fake = 1; /* doesn't matter whether 'real' is negated here */
         } else
             break;
         bp += l;
@@ -3230,6 +3239,33 @@ struct obj *no_wish;
     if ((p = strstri(bp, " of spinach")) != 0) {
         *p = 0;
         contents = SPINACH;
+    }
+    /* this is only useful for wizard mode but we'll accept its parsing
+       in normal play (result is never the real Amulet for that case) */
+    if ((p = strstri(bp, OBJ_DESCR(objects[AMULET_OF_YENDOR]))) != 0
+        && (p == bp || p[-1] == ' ')) {
+        char *s = bp;
+
+        /* "Amulet of Yendor" matches two items; disambiguate via "real"
+           or "fake" prefix (parsed above so that both "blessed real"
+           and "real blessed" work); also accept partial specification of
+           the full name of the fake; unlike the prefix recognition loop
+           above, these have to be in the right order when more than one
+           is present (similar to glass gems below) */
+        if (!strncmpi(s, "cheap ", 6))
+            fake = 1, s += 6;
+        if (!strncmpi(s, "plastic ", 8))
+            fake = 1, s += 8;
+        if (!strncmpi(s, "imitation ", 10))
+            fake = 1, s += 10;
+        nhUse(s); /* suppress potential assigned-but-not-used complaint */
+        /* '(!real && !fake)' is the default, so 50:50 chance for either */
+        if (real && fake)
+            real = 0;
+        else if (!real && !fake && !rn2(2))
+            real = 1;
+        typ = real ? AMULET_OF_YENDOR : FAKE_AMULET_OF_YENDOR;
+        goto typfnd;
     }
 
     /*
