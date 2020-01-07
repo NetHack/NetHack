@@ -884,6 +884,7 @@ lua_State *L;
 static const struct luaL_Reg nhl_u_functions[] = {
     { "clear_inventory", nhl_u_clear_inventory },
     { "giveobj", nhl_u_giveobj },
+    { NULL, NULL }
 };
 
 void
