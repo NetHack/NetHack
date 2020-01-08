@@ -24,7 +24,6 @@ static boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
 static char *FDECL(singplur_compound, (char *));
 static char *FDECL(xname_flags, (struct obj *, unsigned));
 static boolean FDECL(badman, (const char *, BOOLEAN_P));
-static char *FDECL(globwt, (struct obj *, char *, boolean *));
 
 struct Jitem {
     int item;
@@ -926,8 +925,7 @@ unsigned doname_flags;
 {
     boolean ispoisoned = FALSE,
             with_price = (doname_flags & DONAME_WITH_PRICE) != 0,
-            vague_quan = (doname_flags & DONAME_VAGUE_QUAN) != 0,
-            weightshown = FALSE;
+            vague_quan = (doname_flags & DONAME_VAGUE_QUAN) != 0;
     boolean known, dknown, cknown, bknown, lknown;
     int omndx = obj->corpsenm;
     char prefix[PREFIX], globbuf[QBUFSZ];
@@ -1258,22 +1256,19 @@ unsigned doname_flags;
     } else if (is_unpaid(obj)) { /* in inventory or in container in invent */
         long quotedprice = unpaid_cost(obj, TRUE);
 
-        Sprintf(eos(bp), " (%s, %s%ld %s)",
+        Sprintf(eos(bp), " (%s, %ld %s)",
                 obj->unpaid ? "unpaid" : "contents",
-                globwt(obj, globbuf, &weightshown),
                 quotedprice, currency(quotedprice));
     } else if (with_price) { /* on floor or in container on floor */
         int nochrg = 0;
         long price = get_cost_of_shop_item(obj, &nochrg);
 
         if (price > 0L)
-            Sprintf(eos(bp), " (%s, %s%ld %s)",
+            Sprintf(eos(bp), " (%s, %ld %s)",
                     nochrg ? "contents" : "for sale",
-                    globwt(obj, globbuf, &weightshown),
                     price, currency(price));
         else if (nochrg > 0)
-            Sprintf(eos(bp), " (%sno charge)",
-                    globwt(obj, globbuf, &weightshown));
+            Sprintf(eos(bp), " (no charge)");
     }
     if (!strncmp(prefix, "a ", 2)) {
         /* save current prefix, without "a "; might be empty */
@@ -1287,9 +1282,10 @@ unsigned doname_flags;
     /* show weight for items (debug tourist info);
        "aum" is stolen from Crawl's "Arbitrary Unit of Measure" */
     if (wizard && iflags.wizweight) {
-        /* wizard mode user has asked to see object weights;
-           globs with shop pricing attached already include it */
-        if (!weightshown)
+        /* wizard mode user has asked to see object weights */
+        if (with_price && (*(eos(bp)-1) == ')'))
+            Sprintf(eos(bp)-1, ", %u aum)", obj->owt);
+        else
             Sprintf(eos(bp), " (%u aum)", obj->owt);
     }
     bp = strprepend(bp, prefix);
@@ -4484,22 +4480,6 @@ const char *lastR;
     }
     /* assert( strlen(qbuf) < QBUFSZ ); */
     return qbuf;
-}
-
-static char *
-globwt(otmp, buf, weightformatted_p)
-struct obj *otmp;
-char *buf;
-boolean *weightformatted_p;
-{
-    *buf = '\0';
-    if (otmp->globby) {
-        Sprintf(buf, "%u aum, ", otmp->owt);
-        *weightformatted_p = TRUE;
-    } else {
-        *weightformatted_p = FALSE;
-    }
-    return buf;
 }
 
 /*objnam.c*/

@@ -35,6 +35,7 @@ make earthquake which hits a secret door or a secret corridor reveal it
 wizard mode wishing for "Amulet of Yendor" has 50:50 chance for true Amulet
 	or a cheap plastic imitation; recognize "real Amulet of Yendor" and
 	"fake Amulet of Yendor" to precisely specify either of them
+unpaid globs showed weight info unconditionally outside of wizmode
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
