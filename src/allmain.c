@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1577050218 2019/12/22 21:30:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1578448653 2020/01/08 01:57:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -85,7 +85,7 @@ boolean resuming;
     initrack();
 
     u.uz0.dlevel = u.uz.dlevel;
-    g.youmonst.movement = NORMAL_SPEED; /* give the hero some movement points */
+    g.youmonst.movement = NORMAL_SPEED; /* give hero some movement points */
     g.context.move = 0;
 
     g.program_state.in_moveloop = 1;
@@ -178,7 +178,7 @@ boolean resuming;
                         g.youmonst.movement = 0;
                     settrack();
 
-                    g.monstermoves++;
+                    g.monstermoves++; /* [obsolete (for a long time...)] */
                     g.moves++;
 
                     /********************************/
@@ -468,7 +468,8 @@ boolean resuming;
             vision_recalc(0); /* vision! */
         /* when running in non-tport mode, this gets done through domove() */
         if ((!g.context.run || flags.runmode == RUN_TPORT)
-            && (g.multi && (!g.context.travel ? !(g.multi % 7) : !(g.moves % 7L)))) {
+            && (g.multi && (!g.context.travel ? !(g.multi % 7)
+                                              : !(g.moves % 7L)))) {
             if (flags.time && g.context.run)
                 g.context.botl = TRUE;
             /* [should this be flush_screen() instead?] */
