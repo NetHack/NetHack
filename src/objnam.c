@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1578532901 2020/01/09 01:21:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.284 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1578535246 2020/01/09 02:00:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.285 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,19 +11,20 @@
 #define NUMOBUF 12
 
 static char *FDECL(strprepend, (char *, const char *));
-static short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
-static short FDECL(rnd_otyp_by_namedesc, (const char *, CHAR_P, int));
-static boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
 static char *NDECL(nextobuf);
 static void FDECL(releaseobuf, (char *));
+static char *FDECL(xname_flags, (struct obj *, unsigned));
 static char *FDECL(minimal_xname, (struct obj *));
 static void FDECL(add_erosion_words, (struct obj *, char *));
 static char *FDECL(doname_base, (struct obj *obj, unsigned));
 static boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
-                                           const char *const *));
+                                       const char *const *));
 static char *FDECL(singplur_compound, (char *));
-static char *FDECL(xname_flags, (struct obj *, unsigned));
 static boolean FDECL(badman, (const char *, BOOLEAN_P));
+static boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
+static short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
+static short FDECL(rnd_otyp_by_namedesc, (const char *, CHAR_P, int));
+static struct obj *FDECL(wizterrainwish, (char *, char *, int, int));
 
 struct Jitem {
     int item;
@@ -2944,6 +2945,169 @@ char oclass;
     return (int) rnd_otyp_by_namedesc("shiny", oclass, 0);
 }
 
+/* in wizard mode, readobjnam() can accept wishes for traps and terrain */
+static struct obj *
+wizterrainwish(bp, p, locked, trapped)
+char *bp, *p;
+int locked, trapped;
+{
+    struct rm *lev;
+    boolean madeterrain = FALSE, badterrain = FALSE;
+    int trap, x = u.ux, y = u.uy;
+
+    for (trap = NO_TRAP + 1; trap < TRAPNUM; trap++) {
+        struct trap *t;
+        const char *tname;
+
+        tname = trapname(trap, TRUE);
+        if (strncmpi(tname, bp, strlen(tname)))
+            continue;
+        /* found it; avoid stupid mistakes */
+        if (is_hole(trap) && !Can_fall_thru(&u.uz))
+            trap = ROCKTRAP;
+        if ((t = maketrap(x, y, trap)) != 0) {
+            trap = t->ttyp;
+            tname = trapname(trap, TRUE);
+            pline("%s%s.", An(tname),
+                  (trap != MAGIC_PORTAL) ? "" : " to nowhere");
+        } else
+            pline("Creation of %s failed.", an(tname));
+        return (struct obj *) &cg.zeroobj;
+    }
+
+    /* furniture and terrain (use at your own risk; can clobber stairs
+       or place furniture on existing traps which shouldn't be allowed) */
+    lev = &levl[x][y];
+    p = eos(bp);
+    if (!BSTRCMPI(bp, p - 8, "fountain")) {
+        lev->typ = FOUNTAIN;
+        g.level.flags.nfountains++;
+        if (!strncmpi(bp, "magic ", 6))
+            lev->blessedftn = 1;
+        pline("A %sfountain.", lev->blessedftn ? "magic " : "");
+        madeterrain = TRUE;
+    } else if (!BSTRCMPI(bp, p - 6, "throne")) {
+        lev->typ = THRONE;
+        pline("A throne.");
+        madeterrain = TRUE;
+    } else if (!BSTRCMPI(bp, p - 4, "sink")) {
+        lev->typ = SINK;
+        g.level.flags.nsinks++;
+        pline("A sink.");
+        madeterrain = TRUE;
+
+    /* ("water" matches "potion of water" rather than terrain) */
+    } else if (!BSTRCMPI(bp, p - 4, "pool")
+               || !BSTRCMPI(bp, p - 4, "moat")) {
+        lev->typ = !BSTRCMPI(bp, p - 4, "pool") ? POOL : MOAT;
+        del_engr_at(x, y);
+        pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
+        /* Must manually make kelp! */
+        water_damage_chain(g.level.objects[x][y], TRUE);
+        madeterrain = TRUE;
+
+    /* also matches "molten lava" */
+    } else if (!BSTRCMPI(bp, p - 4, "lava")) {
+        lev->typ = LAVAPOOL;
+        del_engr_at(x, y);
+        pline("A pool of molten lava.");
+        if (!(Levitation || Flying))
+            pooleffects(FALSE);
+        madeterrain = TRUE;
+    } else if (!BSTRCMPI(bp, p - 5, "altar")) {
+        aligntyp al;
+
+        lev->typ = ALTAR;
+        if (!strncmpi(bp, "chaotic ", 8))
+            al = A_CHAOTIC;
+        else if (!strncmpi(bp, "neutral ", 8))
+            al = A_NEUTRAL;
+        else if (!strncmpi(bp, "lawful ", 7))
+            al = A_LAWFUL;
+        else if (!strncmpi(bp, "unaligned ", 10))
+            al = A_NONE;
+        else /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
+            al = !rn2(6) ? A_NONE : (rn2((int) A_LAWFUL + 2) - 1);
+        lev->altarmask = Align2amask(al);
+        pline("%s altar.", An(align_str(al)));
+        madeterrain = TRUE;
+    } else if (!BSTRCMPI(bp, p - 5, "grave")
+               || !BSTRCMPI(bp, p - 9, "headstone")) {
+        make_grave(x, y, (char *) 0);
+        pline("%s.", IS_GRAVE(lev->typ) ? "A grave"
+                                        : "Can't place a grave here");
+        madeterrain = TRUE;
+    } else if (!BSTRCMPI(bp, p - 4, "tree")) {
+        lev->typ = TREE;
+        pline("A tree.");
+        block_point(x, y);
+        madeterrain = TRUE;
+    } else if (!BSTRCMPI(bp, p - 4, "bars")) {
+        lev->typ = IRONBARS;
+        pline("Iron bars.");
+        madeterrain = TRUE;
+    } else if (!BSTRCMPI(bp, p - 11, "secret door")) {
+        if (lev->typ == DOOR
+            || (IS_WALL(lev->typ) && lev->typ != DBWALL)) {
+            lev->typ = SDOOR;
+            lev->wall_info = 0;
+            /* lev->horizontal stays as-is */
+            /* no special handling for rogue level is necessary;
+               exposing a secret door there yields a doorless doorway */
+#if 0   /*
+         * Can't do this; secret doors want both doormask and
+         * wall_info but those both overload rm.flags which makes
+         * D_CLOSED conflict with WM_MASK.  However, converting
+         * secret door to regular door sets D_CLOSED iff D_LOCKED
+         * isn't specified so the alternate code suffices.
+         */
+            lev->doormask = locked ? D_LOCKED : D_CLOSED;
+#else
+            /* cvt_sdoor_to_door() will change D_NODOOR to D_CLOSED */
+            lev->doormask = locked ? D_LOCKED : D_NODOOR;
+#endif
+            if (trapped)
+                lev->doormask |= D_TRAPPED;
+            block_point(x, y);
+            pline("Secret door.");
+            madeterrain = TRUE;
+        } else {
+            pline("Secret door requires door or wall location.");
+            badterrain = TRUE;
+        }
+    } else if (!BSTRCMPI(bp, p - 15, "secret corridor")) {
+        if (lev->typ == CORR) {
+            lev->typ = SCORR;
+            block_point(x, y);
+            pline("Secret corridor.");
+            madeterrain = TRUE;
+        } else {
+            pline("Secret corridor requires corridor location.");
+            badterrain = TRUE;
+        }
+    }
+
+    if (madeterrain) {
+        feel_newsym(x, y); /* map the spot where the wish occurred */
+        /* hero started at <x,y> but might not be there anymore (create
+           lava, decline to die, and get teleported away to safety) */
+        if (u.uinwater && !is_pool(u.ux, u.uy)) {
+            u.uinwater = 0; /* leave the water */
+            docrt();
+            g.vision_full_recalc = 1;
+        } else if (u.utrap && u.utraptype == TT_LAVA
+                   && !is_lava(u.ux, u.uy)) {
+            reset_utrap(FALSE);
+        }
+    }
+    if (madeterrain || badterrain) {
+        /* cast 'const' away; caller won't modify this */
+        return (struct obj *) &cg.zeroobj;
+    }
+
+    return (struct obj *) 0;
+}
+
 /*
  * Return something wished for.  Specifying a null pointer for
  * the user request string results in a random object.  Otherwise,
@@ -3732,160 +3896,10 @@ struct obj *no_wish;
      */
  wiztrap:
     if (wizard && !g.program_state.wizkit_wishing) {
-        struct rm *lev;
-        boolean madeterrain = FALSE, badterrain = FALSE;
-        int trap, x = u.ux, y = u.uy;
-
-        for (trap = NO_TRAP + 1; trap < TRAPNUM; trap++) {
-            struct trap *t;
-            const char *tname;
-
-            tname = trapname(trap, TRUE);
-            if (strncmpi(tname, bp, strlen(tname)))
-                continue;
-            /* found it; avoid stupid mistakes */
-            if (is_hole(trap) && !Can_fall_thru(&u.uz))
-                trap = ROCKTRAP;
-            if ((t = maketrap(x, y, trap)) != 0) {
-                trap = t->ttyp;
-                tname = trapname(trap, TRUE);
-                pline("%s%s.", An(tname),
-                      (trap != MAGIC_PORTAL) ? "" : " to nowhere");
-            } else
-                pline("Creation of %s failed.", an(tname));
-            return (struct obj *) &cg.zeroobj;
-        }
-
-        /* furniture and terrain (use at your own risk; can clobber stairs
-           or place furniture on existing traps which shouldn't be allowed) */
-        lev = &levl[x][y];
-        p = eos(bp);
-        if (!BSTRCMPI(bp, p - 8, "fountain")) {
-            lev->typ = FOUNTAIN;
-            g.level.flags.nfountains++;
-            if (!strncmpi(bp, "magic ", 6))
-                lev->blessedftn = 1;
-            pline("A %sfountain.", lev->blessedftn ? "magic " : "");
-            madeterrain = TRUE;
-        } else if (!BSTRCMPI(bp, p - 6, "throne")) {
-            lev->typ = THRONE;
-            pline("A throne.");
-            madeterrain = TRUE;
-        } else if (!BSTRCMPI(bp, p - 4, "sink")) {
-            lev->typ = SINK;
-            g.level.flags.nsinks++;
-            pline("A sink.");
-            madeterrain = TRUE;
-
-        /* ("water" matches "potion of water" rather than terrain) */
-        } else if (!BSTRCMPI(bp, p - 4, "pool")
-                   || !BSTRCMPI(bp, p - 4, "moat")) {
-            lev->typ = !BSTRCMPI(bp, p - 4, "pool") ? POOL : MOAT;
-            del_engr_at(x, y);
-            pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
-            /* Must manually make kelp! */
-            water_damage_chain(g.level.objects[x][y], TRUE);
-            madeterrain = TRUE;
-
-        /* also matches "molten lava" */
-        } else if (!BSTRCMPI(bp, p - 4, "lava")) {
-            lev->typ = LAVAPOOL;
-            del_engr_at(x, y);
-            pline("A pool of molten lava.");
-            if (!(Levitation || Flying))
-                pooleffects(FALSE);
-            madeterrain = TRUE;
-        } else if (!BSTRCMPI(bp, p - 5, "altar")) {
-            aligntyp al;
-
-            lev->typ = ALTAR;
-            if (!strncmpi(bp, "chaotic ", 8))
-                al = A_CHAOTIC;
-            else if (!strncmpi(bp, "neutral ", 8))
-                al = A_NEUTRAL;
-            else if (!strncmpi(bp, "lawful ", 7))
-                al = A_LAWFUL;
-            else if (!strncmpi(bp, "unaligned ", 10))
-                al = A_NONE;
-            else /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
-                al = !rn2(6) ? A_NONE : (rn2((int) A_LAWFUL + 2) - 1);
-            lev->altarmask = Align2amask(al);
-            pline("%s altar.", An(align_str(al)));
-            madeterrain = TRUE;
-        } else if (!BSTRCMPI(bp, p - 5, "grave")
-                   || !BSTRCMPI(bp, p - 9, "headstone")) {
-            make_grave(x, y, (char *) 0);
-            pline("%s.", IS_GRAVE(lev->typ) ? "A grave"
-                                            : "Can't place a grave here");
-            madeterrain = TRUE;
-        } else if (!BSTRCMPI(bp, p - 4, "tree")) {
-            lev->typ = TREE;
-            pline("A tree.");
-            block_point(x, y);
-            madeterrain = TRUE;
-        } else if (!BSTRCMPI(bp, p - 4, "bars")) {
-            lev->typ = IRONBARS;
-            pline("Iron bars.");
-            madeterrain = TRUE;
-        } else if (!BSTRCMPI(bp, p - 11, "secret door")) {
-            if (lev->typ == DOOR
-                || (IS_WALL(lev->typ) && lev->typ != DBWALL)) {
-                lev->typ = SDOOR;
-                lev->wall_info = 0;
-                /* lev->horizontal stays as-is */
-                /* no special handling for rogue level is necessary;
-                   exposing a secret door there yields a doorless doorway */
-#if 0       /*
-             * Can't do this; secret doors want both doormask and
-             * wall_info but those both overload rm.flags which makes
-             * D_CLOSED conflict with WM_MASK.  However, converting
-             * secret door to regular door sets D_CLOSED iff D_LOCKED
-             * isn't specified so the alternate code suffices.
-             */
-                lev->doormask = locked ? D_LOCKED : D_CLOSED;
-#else
-                /* cvt_sdoor_to_door() will change D_NODOOR to D_CLOSED */
-                lev->doormask = locked ? D_LOCKED : D_NODOOR;
-#endif
-                if (trapped)
-                    lev->doormask |= D_TRAPPED;
-                block_point(x, y);
-                pline("Secret door.");
-                madeterrain = TRUE;
-            } else {
-                pline("Secret door requires door or wall location.");
-                badterrain = TRUE;
-            }
-        } else if (!BSTRCMPI(bp, p - 15, "secret corridor")) {
-            if (lev->typ == CORR) {
-                lev->typ = SCORR;
-                block_point(x, y);
-                pline("Secret corridor.");
-                madeterrain = TRUE;
-            } else {
-                pline("Secret corridor requires corridor location.");
-                badterrain = TRUE;
-            }
-        }
-
-        if (madeterrain) {
-            feel_newsym(x, y); /* map the spot where the wish occurred */
-            /* hero started at <x,y> but might not be there anymore (create
-               lava, decline to die, and get teleported away to safety) */
-            if (u.uinwater && !is_pool(u.ux, u.uy)) {
-                u.uinwater = 0; /* leave the water */
-                docrt();
-                g.vision_full_recalc = 1;
-            } else if (u.utrap && u.utraptype == TT_LAVA
-                       && !is_lava(u.ux, u.uy)) {
-                reset_utrap(FALSE);
-            }
-        }
-        if (madeterrain || badterrain) {
-            /* cast 'const' away; caller won't modify this */
-            return (struct obj *) &cg.zeroobj;
-        }
-    } /* end of wizard mode traps and terrain */
+        /* [inline code moved to separate routine to unclutter readobjnam] */
+        if ((otmp = wizterrainwish(bp, p, locked, trapped)) != 0)
+            return otmp;
+    }
 
     if (!oclass && !typ) {
         if (!strncmpi(bp, "polearm", 7)) {
