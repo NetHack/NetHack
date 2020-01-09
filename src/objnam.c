@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1578400811 2020/01/07 12:40:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1578532901 2020/01/09 01:21:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.284 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -928,7 +928,7 @@ unsigned doname_flags;
             vague_quan = (doname_flags & DONAME_VAGUE_QUAN) != 0;
     boolean known, dknown, cknown, bknown, lknown;
     int omndx = obj->corpsenm;
-    char prefix[PREFIX], globbuf[QBUFSZ];
+    char prefix[PREFIX];
     char tmpbuf[PREFIX + 1]; /* for when we have to add something at
                                 the start of prefix instead of the
                                 end (Strcat is used on the end) */
@@ -3142,7 +3142,9 @@ struct obj *no_wish;
                        * (so will "real amulet" outside of wizard mode) */
         } else if (!strncmpi(bp, "fake ", l = 5)) {
             /* ... and "fake Amulet of Yendor" likewise */
-            fake = 1; /* doesn't matter whether 'real' is negated here */
+            fake = 1, real = 0;
+            /* ['real' isn't actually needed (unless we someday add
+               "real gem" for random non-glass, non-stone)] */
         } else
             break;
         bp += l;
@@ -3239,18 +3241,21 @@ struct obj *no_wish;
         *p = 0;
         contents = SPINACH;
     }
-    /* this is only useful for wizard mode but we'll accept its parsing
-       in normal play (result is never the real Amulet for that case) */
+    /* real vs fake is only useful for wizard mode but we'll accept its
+       parsing in normal play (result is never real Amulet for that case) */
     if ((p = strstri(bp, OBJ_DESCR(objects[AMULET_OF_YENDOR]))) != 0
         && (p == bp || p[-1] == ' ')) {
         char *s = bp;
 
-        /* "Amulet of Yendor" matches two items; disambiguate via "real"
-           or "fake" prefix (parsed above so that both "blessed real"
-           and "real blessed" work); also accept partial specification of
-           the full name of the fake; unlike the prefix recognition loop
-           above, these have to be in the right order when more than one
-           is present (similar to glass gems below) */
+        /* "Amulet of Yendor" matches two items, name of real Amulet
+           and description of fake one; player can explicitly specify
+           "real" to disambiguate, but not specifying "fake" achieves
+           the same thing; "real" and "fake" are parsed above with other
+           prefixes so that combinations like "blessed real" and "real
+           blessed" work as expected; also accept partial specification
+           of the full name of the fake; unlike the prefix recognition
+           loop above, these have to be in the right order when more
+           than one is present (similar to worthless glass gems below) */
         if (!strncmpi(s, "cheap ", 6))
             fake = 1, s += 6;
         if (!strncmpi(s, "plastic ", 8))
@@ -3258,11 +3263,9 @@ struct obj *no_wish;
         if (!strncmpi(s, "imitation ", 10))
             fake = 1, s += 10;
         nhUse(s); /* suppress potential assigned-but-not-used complaint */
-        /* '(!real && !fake)' is the default, so 50:50 chance for either */
-        if (real && fake)
-            real = 0;
-        else if (!real && !fake && !rn2(2))
-            real = 1;
+        /* when 'fake' is True, it overrides 'real' if both were given;
+           when it is False, force 'real' whether that was specified or not */
+        real = !fake;
         typ = real ? AMULET_OF_YENDOR : FAKE_AMULET_OF_YENDOR;
         goto typfnd;
     }
