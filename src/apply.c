@@ -3520,7 +3520,7 @@ char class_list[];
 
     knowoil = objects[POT_OIL].oc_name_known;
     knowtouchstone = objects[TOUCHSTONE].oc_name_known;
-    addpotions = addstones = addfood = FALSE;
+    addpotions = addstones = addfood = addspellbooks = FALSE;
     for (otmp = g.invent; otmp; otmp = otmp->nobj) {
         otyp = otmp->otyp;
         if (otyp == POT_OIL
