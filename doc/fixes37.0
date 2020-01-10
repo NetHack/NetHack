@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ $NHDT-Date: 1578659784 2020/01/10 12:36:24 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ $NHDT-Date: 1578690701 2020/01/10 21:11:41 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -32,9 +32,11 @@ drum of earthquake feedback reported various things (fountains, thrones, &c)
 	falling into a chasm but they remained intact because trap creation
 	had been changed to not clobber such things (so couldn't make pits)
 make earthquake which hits a secret door or a secret corridor reveal it
-wizard mode wishing for "Amulet of Yendor" has 50:50 chance for true Amulet
+wizard mode wishing for "Amulet of Yendor" had 50:50 chance for true Amulet
 	or a cheap plastic imitation; recognize "real Amulet of Yendor" and
-	"fake Amulet of Yendor" to precisely specify either of them
+	"fake Amulet of Yendor" to precisely specify either of them but also
+	take away the 50% chance of yielding a fake one when neither real nor
+	fake is specified
 unpaid globs showed weight info unconditionally outside of wizmode
 walking out of tethered-to-buried-object trap condition was supposed to
 	reinstate punishment but wasn't finding the buried iron ball because
@@ -60,6 +62,10 @@ autounlock picked Rogue's artifact key over lock-pick or credit card (or
 	would be blasted when touching it
 wielded aklys had its "(tethered weapon...)" description scrambled
 randomized trap name could pick trap #0 which isn't a trap and yielded "water"
+if running and Blind or Stunned or Fumbling or Dex < 10, encountering a closed
+	door orthogonally would keep reporting "ouch! you bump into a door"
+	repeatedly until eventually interrupted by approaching monster or
+	hunger or ^C
 
 
 Platform- and/or Interface-Specific Fixes
