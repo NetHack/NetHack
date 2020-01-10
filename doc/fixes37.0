@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ $NHDT-Date: 1578400811 2020/01/07 12:40:11 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $ $NHDT-Date: 1578624299 2020/01/10 02:44:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -55,6 +55,7 @@ autounlock picked Rogue's artifact key over lock-pick or credit card (or
 	ordinary key depending upon invent order) even for non-rogues who
 	would be blasted when touching it
 wielded aklys had its "(tethered weapon...)" description scrambled
+randomized trap name could pick trap #0 which isn't a trap and yielded "water"
 
 
 Platform- and/or Interface-Specific Fixes
