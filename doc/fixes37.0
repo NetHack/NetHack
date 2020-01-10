@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $ $NHDT-Date: 1578624299 2020/01/10 02:44:59 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ $NHDT-Date: 1578659784 2020/01/10 12:36:24 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -36,6 +36,10 @@ wizard mode wishing for "Amulet of Yendor" has 50:50 chance for true Amulet
 	or a cheap plastic imitation; recognize "real Amulet of Yendor" and
 	"fake Amulet of Yendor" to precisely specify either of them
 unpaid globs showed weight info unconditionally outside of wizmode
+walking out of tethered-to-buried-object trap condition was supposed to
+	reinstate punishment but wasn't finding the buried iron ball because
+	the trap condition was cleared first to indicate escape; result was
+	attached chain that got dragged around but had no ball attached
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
