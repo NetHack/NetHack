@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1578617964 2020/01/10 00:59:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1578668022 2020/01/10 14:53:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -77,7 +77,7 @@ char *
 self_lookat(outbuf)
 char *outbuf;
 {
-    char race[QBUFSZ];
+    char race[QBUFSZ], trapbuf[QBUFSZ];
 
     /* include race with role unless polymorphed */
     race[0] = '\0';
@@ -94,20 +94,8 @@ char *outbuf;
     if (Punished)
         Sprintf(eos(outbuf), ", chained to %s",
                 uball ? ansimpleoname(uball) : "nothing?");
-    if (u.utrap) {
-        if (u.utraptype == TT_BURIEDBALL) {
-            Strcat(outbuf, ", tethered to something buried");
-        } else if (u.utraptype == TT_INFLOOR || u.utraptype == TT_LAVA) {
-            Sprintf(eos(outbuf), ", stuck in %s", the(surface(u.ux, u.uy)));
-        } else { /* bear trap, [spiked] pit, or web */
-            struct trap *t = t_at(u.ux, u.uy);
-
-            Strcat(outbuf, ", trapped");
-            if (t)
-                Sprintf(eos(outbuf), " in %s",
-                        an(trapname(t->ttyp, FALSE)));
-        }
-    }
+    if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
+        Sprintf(eos(outbuf), ", %s", trap_predicament(trapbuf, FALSE));
     return outbuf;
 }
 
