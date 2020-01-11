@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1578668022 2020/01/10 14:53:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1578761137 2020/01/11 16:45:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -802,7 +802,7 @@ char *supplemental_name;
                             do {
                                 ++tp;
                             } while (tp < &tabbuf[8] && *tp == ' ');
-                        } else {
+                        } else if (*tp) { /* empty lines are ok */
                             goto bad_data_file;
                         }
                         /* if a tab after the leading one is found,
