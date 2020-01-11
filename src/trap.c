@@ -3858,7 +3858,7 @@ drown()
             You("dump some of your gear to lose weight...");
         if (succ) {
             pline("Pheew!  That was close.");
-            teleds(x, y, TRUE);
+            teleds(x, y, TELEDS_ALLOW_DRAG);
             return TRUE;
         }
         /* still too much weight */
@@ -3877,7 +3877,7 @@ drown()
         Strcpy(g.killer.name, pool_of_water);
         done(DROWNING);
         /* oops, we're still alive.  better get out of the water. */
-        if (safe_teleds(TRUE))
+        if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
             break; /* successful life-save */
         /* nowhere safe to land; repeat drowning loop... */
         pline("You're still drowning.");
@@ -5348,7 +5348,7 @@ lava_effects()
             Strcpy(g.killer.name, lava_killer);
             You("%s...", boil_away ? "boil away" : "burn to a crisp");
             done(BURNING);
-            if (safe_teleds(TRUE))
+            if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
                 break; /* successful life-save */
             /* nowhere safe to land; repeat burning loop */
             pline("You're still burning.");
@@ -5408,7 +5408,7 @@ sink_into_lava()
             reset_utrap(TRUE);
             /* levitation or flight have become unblocked, otherwise Tport */
             if (!Levitation && !Flying)
-                (void) safe_teleds(TRUE);
+                (void) safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT);
         } else if (!u.umoved) {
             /* can't fully turn into slime while in lava, but might not
                have it be burned away until you've come awfully close */

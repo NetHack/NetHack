@@ -277,11 +277,13 @@ boolean trapok;
 }
 
 void
-teleds(nux, nuy, allow_drag)
-register int nux, nuy;
-boolean allow_drag;
+teleds(nux, nuy, teleds_flags)
+int nux, nuy;
+int teleds_flags;
 {
     boolean ball_active, ball_still_in_range;
+    boolean allow_drag = teleds_flags & TELEDS_ALLOW_DRAG;
+    boolean is_teleport = teleds_flags & TELEDS_TELEPORT;
     struct monst *vault_guard = vault_occupied(u.urooms) ? findgd() : 0;
 
     if (u.utraptype == TT_BURIEDBALL) {
@@ -356,7 +358,7 @@ boolean allow_drag;
         }
     }
 
-    if (flags.verbose)
+    if (is_teleport && flags.verbose)
         You("materialize in %s location!",
             (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
 
@@ -415,8 +417,8 @@ boolean allow_drag;
 }
 
 boolean
-safe_teleds(allow_drag)
-boolean allow_drag;
+safe_teleds(teleds_flags)
+int teleds_flags;
 {
     register int nux, nuy, tcnt = 0;
 
@@ -426,7 +428,7 @@ boolean allow_drag;
     } while (!teleok(nux, nuy, (boolean) (tcnt > 200)) && ++tcnt <= 400);
 
     if (tcnt <= 400) {
-        teleds(nux, nuy, allow_drag);
+        teleds(nux, nuy, teleds_flags);
         return TRUE;
     } else
         return FALSE;
@@ -439,7 +441,7 @@ vault_tele()
     coord c;
 
     if (croom && somexy(croom, &c) && teleok(c.x, c.y, FALSE)) {
-        teleds(c.x, c.y, FALSE);
+        teleds(c.x, c.y, TELEDS_TELEPORT);
         return;
     }
     tele();
@@ -529,7 +531,7 @@ struct obj *scroll;
                 /* for scroll, discover it regardless of destination */
                 if (scroll)
                     learnscroll(scroll);
-                teleds(cc.x, cc.y, FALSE);
+                teleds(cc.x, cc.y, TELEDS_TELEPORT);
                 return TRUE;
             }
             pline("Sorry...");
@@ -543,7 +545,7 @@ struct obj *scroll;
     }
 
     g.telescroll = scroll;
-    (void) safe_teleds(FALSE);
+    (void) safe_teleds(TELEDS_TELEPORT);
     /* teleds() will leave g.telescroll intact iff random destination
        is far enough away for scroll discovery to be warranted */
     if (g.telescroll)
