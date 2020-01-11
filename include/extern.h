@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1578668018 2020/01/10 14:53:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.782 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1578764033 2020/01/11 17:33:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.783 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -231,7 +231,7 @@ E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
 E int NDECL(extcmd_via_menu);
 E int NDECL(enter_explore_mode);
-E char *FDECL(trap_predicament, (char *, BOOLEAN_P));
+E char *FDECL(trap_predicament, (char *, int, BOOLEAN_P));
 E void FDECL(enlightenment, (int, int));
 E void FDECL(youhiding, (BOOLEAN_P, int));
 E void FDECL(show_conduct, (int));

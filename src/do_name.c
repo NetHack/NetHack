@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1574648939 2019/11/25 02:28:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1578764034 2020/01/11 17:33:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2161,14 +2161,26 @@ static NEARDATA const char *const hliquids[] = {
     "caramel sauce", "ink", "aqueous humour", "milk substitute",
     "fruit juice", "glowing lava", "gastric acid", "mineral water",
     "cough syrup", "quicksilver", "sweet vitriol", "grey goo", "pink slime",
+    /* "new coke (tm)", --better not */
 };
 
+/* if hallucinating, return a random liquid instead of 'liquidpref' */
 const char *
 hliquid(liquidpref)
-const char *liquidpref;
+const char *liquidpref; /* use as-is when not hallucinating (unless empty) */
 {
-    return (Hallucination || !liquidpref) ? hliquids[rn2(SIZE(hliquids))]
-                                          : liquidpref;
+    if (Hallucination || !liquidpref || !*liquidpref) {
+        int indx, count = SIZE(hliquids);
+
+        /* if we have a non-hallucinatory default value, include it
+           among the choices */
+        if (liquidpref && *liquidpref)
+            ++count;
+        indx = rn2_on_display_rng(count);
+        if (indx < SIZE(hliquids))
+            return hliquids[indx];
+    }
+    return liquidpref;
 }
 
 /* Aliases for road-runner nemesis

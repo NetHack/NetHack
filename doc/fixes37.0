@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.61 $ $NHDT-Date: 1578761136 2020/01/11 16:45:36 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ $NHDT-Date: 1578764038 2020/01/11 17:33:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -98,6 +98,8 @@ add 'quick_farsight' option to provide some control over random clairvoyance
 	revealed map can seem intrusive; doesn't affect clairvoyance spell
 replace "money" in in-game texts with "gold"
 when hallucinating, see hallucinated currencies instead of bits for an ale
+when hallucinating, see hallucinated liquids when looking at water or lava
+	on the map
 applying a spellbook hints about read charges left
 wizard mode wishing for level topology can now create hidden doors (ask for
 	"secret door" when at a door or wall location) and hidden corridor

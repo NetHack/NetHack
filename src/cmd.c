@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1578668021 2020/01/10 14:53:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.390 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1578764033 2020/01/11 17:33:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1813,8 +1813,9 @@ walking_on_water()
 
 /* describe u.utraptype; used by status_enlightenment() and self_lookat() */
 char *
-trap_predicament(outbuf, wizxtra)
+trap_predicament(outbuf, final, wizxtra)
 char *outbuf;
+int final;
 boolean wizxtra;
 {
     struct trap *t;
@@ -1826,9 +1827,7 @@ boolean wizxtra;
         Strcpy(outbuf, "tethered to something buried");
         break;
     case TT_LAVA:
-        /* surface() should always yield "lava" here unless hallucinatory
-           surfaces get added someday [please don't...] */
-        Sprintf(outbuf, "sinking into %s", surface(u.ux, u.uy));
+        Sprintf(outbuf, "sinking into %s", final ? "lava" : hliquid("lava"));
         break;
     case TT_INFLOOR:
         Sprintf(outbuf, "stuck in %s", the(surface(u.ux, u.uy)));
@@ -2547,7 +2546,7 @@ int final;
         char predicament[BUFSZ];
         boolean anchored = (u.utraptype == TT_BURIEDBALL);
 
-        (void) trap_predicament(predicament, wizard);
+        (void) trap_predicament(predicament, final, wizard);
         if (u.usteed) { /* not `Riding' here */
             Sprintf(buf, "%s%s ", anchored ? "you and " : "", steedname);
             *buf = highc(*buf);
