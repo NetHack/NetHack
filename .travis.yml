@@ -1,34 +1,38 @@
 language: c
 matrix:
   include:
-    - os: linux
-      env: DESCR=linux-xenial-gcc HINTS=linux
+    - name: linux-xenial-gcc
+      os: linux
+      env: HINTS=linux
       compiler: gcc
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
-    - os: linux
-      env: DESCR=linux-bionic-gcc HINTS=linux
+    - name: linux-bionic-gcc
+      os: linux
+      env: HINTS=linux
       dist: bionic
       compiler: gcc
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
-    - os: linux
-      env: DESCR=linux-eoan-clang9 HINTS=linux CC=clang-9 CXX=clang++-9
+    - name: linux-eoan-clang9
+      os: linux
+      env: HINTS=linux
       dist: eoan
       compiler: clang
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
           packages:
             - clang-9
+      before_install:
+        - sudo apt-get update
+        - sudo apt-get -y install clang-9
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
-    - os: linux
-      env: DESCR=linux-xenial-clang HINTS=linux
+    - name: linux-xenial-clang
+      os: linux
+      env: HINTS=linux
       compiler: clang
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
-    - os: linux
-      env: DESCR=linux-xenial-gcc-x11 HINTS=linux-x11
+    - name: linux-xenial-gcc-x11
+      os: linux
+      env: HINTS=linux-x11
       compiler: gcc
       addons:
         apt:
@@ -37,8 +41,9 @@ matrix:
             - libxaw7-dev
             - xfonts-utils
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
-    - os: linux
-      env: DESCR=linux-xenial-gcc-qt5 HINTS=linux-qt5
+    - name: linux-xenial-gcc-qt5
+      os: linux
+      env: HINTS=linux-qt5
       compiler: gcc
       addons:
         apt:
@@ -50,8 +55,9 @@ matrix:
             - qtmultimedia5-dev
             - qtbase5-dev-tools
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make QT_SELECT=5 MOC=moc install"
-    - os: linux
-      env: DESCR=linux-bionic-gcc-x11 HINTS=linux-x11
+    - name: linux-bionic-gcc-x11
+      os: linux
+      env: HINTS=linux-x11
       dist: bionic
       compiler: gcc
       addons:
@@ -61,8 +67,9 @@ matrix:
             - libxaw7-dev
             - xfonts-utils
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
-    - os: linux
-      env: DESCR=linux-xenial-gcc-minimal HINTS=linux-minimal
+    - name: linux-xenial-gcc-minimal
+      os: linux
+      env: HINTS=linux-minimal
       compiler: gcc
       script: |
               cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
@@ -87,14 +94,14 @@ matrix:
               sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
               make fetch-lua && make install
               cat dat/options
-    - os: windows
-      env: DESCR=windows-visualstudio
+    - name: windows-visualstudio
+      os: windows
       language: shell
       script:
         - ./win/win32/vs2017/travisci.sh
-    - os: windows
+    - name: windows-mingw
+      os: windows
 #     install: choco install mingw
-      env: DESCR=windows-mingw
       script:
         - sh sys/winnt/travis-gcc.sh
         - export ADD_CURSES=Y
@@ -103,8 +110,9 @@ matrix:
         - cd src
         - cp ../sys/winnt/Makefile.gcc ./Makefile
         - mingw32-make install
+    - name: msdos crosscompile on linux
     - os: linux
-      env: DESCR=msdos-cross-on-linux HINTS=linux LUA_VERSION=5.3.5
+      env: HINTS=linux LUA_VERSION=5.3.5
       compiler: gcc
       script:
 #        - export
