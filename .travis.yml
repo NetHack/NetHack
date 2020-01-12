@@ -11,11 +11,15 @@ matrix:
       compiler: gcc
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
     - os: linux
-      env: DESCR=linux-eoan-clang-9 HINTS=linux CC=clang-9
+      env: DESCR=linux-eoan-clang9 HINTS=linux CC=clang-9 CXX=clang++-9
       dist: eoan
       compiler: clang
       addons:
         apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
           packages:
             - clang-9
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
