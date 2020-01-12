@@ -237,6 +237,8 @@ opt_##a,
 #endif
     NHOPTB(implicit_uncursed, 0, opt_out, set_in_game, On, Yes, No, No,
                 NoAlias, &flags.implicit_uncursed)
+    NHOPTB(invweight, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
+                &iflags.invweight)
 #if 0   /* obsolete - pre-OSX Mac */
     NHOPTB(large_font, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 &iflags.obsolete)
@@ -416,10 +418,10 @@ opt_##a,
                 &flags.showrace)
 #ifdef SCORE_ON_BOTL
     NHOPTB(showscore, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
-                &flags.showscore) 
+                &flags.showscore)
 #else
     NHOPTB(showscore, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
-                (boolean *) 0) 
+                (boolean *) 0)
 #endif
     NHOPTB(silent, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.silent)
@@ -441,7 +443,7 @@ opt_##a,
                 &iflags.status_updates)
     NHOPTO("status condition fields", o_status_cond, BUFSZ, opt_in,
            set_in_game, No, Yes, No, NoAlias, "edit status condition fields")
-#ifdef STATUS_HILITES 
+#ifdef STATUS_HILITES
     NHOPTC(statushilites, 20, opt_in, set_in_game, Yes, Yes, Yes, No, NoAlias,
                 "0=no status highlighting, N=show highlights for N turns")
     NHOPTO("status hilite rules", o_status_hilites, BUFSZ, opt_in, set_in_game,
@@ -556,8 +558,6 @@ opt_##a,
                 NoAlias, "windowing system to use (should be specified first)")
     NHOPTB(wizmgender, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.wizmgender)
-    NHOPTB(wizweight, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
-                &iflags.wizweight)
     NHOPTB(wraptext, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.wc2_wraptext)
 
