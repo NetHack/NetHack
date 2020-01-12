@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ $NHDT-Date: 1578764038 2020/01/11 17:33:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $ $NHDT-Date: 1578834315 2020/01/12 13:05:15 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -42,6 +42,8 @@ walking out of tethered-to-buried-object trap condition was supposed to
 	reinstate punishment but wasn't finding the buried iron ball because
 	the trap condition was cleared first to indicate escape; result was
 	attached chain that got dragged around but had no ball attached
+when poly'd into a giant and moving onto a boulder's spot, message given was
+	confused about whether autopickup would occur so could be misleading
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

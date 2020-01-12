@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1578690701 2020/01/10 21:11:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1578834315 2020/01/12 13:05:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.241 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -340,7 +340,8 @@ moverock()
                                     slot or into the overflow ('#') slot
                                     unless already carrying at least one */
                               && (inv_cnt(FALSE) < 52 || !carrying(BOULDER))),
-                    willpickup = (canpickup && autopick_testobj(otmp, TRUE));
+                    willpickup = (canpickup && flags.pickup
+                                  && autopick_testobj(otmp, TRUE));
 
                 if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
                     You("aren't skilled enough to %s %s from %s.",
@@ -348,14 +349,21 @@ moverock()
                         the(xname(otmp)), y_monnam(u.usteed));
                 } else {
                     /*
-                     * willpickup:  you easily pick it up
-                     * canpickup:   you could easily pick it up
-                     * otherwise:   you easily push it aside
+                     * will pick up:  you easily pick it up
+                     * can but won't: you manuver over it and could pick it up
+                     * can't pick up: you manuver over it (possibly followed
+                     *     by feedback from failed auto-pickup attempt)
                      */
-                    pline("However, you %seasily %s.",
-                          (willpickup || !canpickup) ? "" : "could ",
-                          (willpickup || canpickup) ? "pick it up"
-                                                    : "push it aside");
+                    pline("However, you %s%s.",
+                          willpickup ? "easily pick it up"
+                                     : "manuver over it",
+                          (canpickup && !willpickup)
+                                     ? " and could pick it up"
+                                     : "");
+                    /* similar to dropping everything and squeezing onto
+                       a Sokoban boulder's spot, moving to same breaks the
+                       Sokoban rules because on next step you could go
+                       past it without pushing it to plug a pit or hole */
                     sokoban_guilt();
                     break;
                 }
