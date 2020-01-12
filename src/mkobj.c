@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1571531889 2019/10/20 00:38:09 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1578855620 2020/01/12 19:00:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.173 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1054,6 +1054,7 @@ boolean artif;
             case STATUE:
                 /* possibly overridden by mkcorpstat() */
                 otmp->corpsenm = rndmonnum();
+                /* note: might produce a novel rather than a spellbook */
                 if (!verysmall(&mons[otmp->corpsenm])
                     && rn2(level_difficulty() / 2 + 10) > 10)
                     (void) add_to_container(otmp, mkobj(SPBOOK_CLASS, FALSE));

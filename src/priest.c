@@ -1,4 +1,4 @@
-/* NetHack 3.6	priest.c	$NHDT-Date: 1545131519 2018/12/18 11:11:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.6	priest.c	$NHDT-Date: 1578855626 2020/01/12 19:00:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -258,7 +258,10 @@ boolean sanctum; /* is it the seat of the high priest? */
         }
         /* 2 to 4 spellbooks */
         for (cnt = rn1(3, 2); cnt > 0; --cnt) {
-            (void) mpickobj(priest, mkobj(SPBOOK_CLASS, FALSE));
+            /* avoid novel (used to be mkobj(SPBOOK_CLASS, FALSE) here) */
+            (void) mpickobj(priest, mksobj(rnd_class(g.bases[SPBOOK_CLASS],
+                                                     SPE_BLANK_PAPER),
+                                           TRUE, FALSE));
         }
         /* robe [via makemon()] */
         if (rn2(2) && (otmp = which_armor(priest, W_ARMC)) != 0) {
