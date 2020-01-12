@@ -24,6 +24,7 @@ static boolean FDECL(isspecmon, (struct monst *));
 static boolean FDECL(validspecmon, (struct monst *, int));
 static struct permonst *FDECL(accept_newcham_form, (struct monst *, int));
 static struct obj *FDECL(make_corpse, (struct monst *, unsigned));
+static long FDECL(mm_2way_aggression, (struct monst *, struct monst *));
 static void FDECL(m_detach, (struct monst *, struct permonst *));
 static void FDECL(lifesaved_monster, (struct monst *));
 static void FDECL(migrate_mon, (struct monst *, XCHAR_P, XCHAR_P));
@@ -1545,6 +1546,39 @@ long flag;
     return cnt;
 }
 
+/* Part of mm_aggression that represents two-way aggression. To avoid having to
+ * code each case twice, this function contains those cases that ought to
+ * happen twice, and mm_aggression will call it twice. */
+static long
+mm_2way_aggression(magr, mdef)
+struct monst *magr, *mdef;
+{
+    struct permonst *ma = magr->data;
+    struct permonst *md = mdef->data;
+    /* Since the quest guardians are under siege, it makes sense to have
+       them fight hostiles.  (But we don't want the quest leader to be in
+       danger.)
+       NOTE: But don't let still-peaceful guardians fight hostile guardians if
+       the hero manages to annoy one of them! */
+    if (ma->msound==MS_GUARDIAN && mdef->mpeaceful==FALSE
+        && !(md->msound == MS_GUARDIAN))
+        return ALLOW_M|ALLOW_TM;
+
+    /* elves vs. orcs */
+    if(is_elf(ma) && is_orc(md))
+        return ALLOW_M|ALLOW_TM;
+
+    /* angels vs. demons */
+    if (ma->mlet==S_ANGEL && is_demon(md))
+        return ALLOW_M|ALLOW_TM;
+
+    /* hobbits vs Nazguls */
+    if (ma == &mons[PM_HOBBIT] && md == &mons[PM_NAZGUL])
+        return ALLOW_M|ALLOW_TM;
+
+    return 0;
+}
+
 /* Monster against monster special attacks; for the specified monster
    combinations, this allows one monster to attack another adjacent one
    in the absence of Conflict.  There is no provision for targetting
@@ -1555,15 +1589,46 @@ mm_aggression(magr, mdef)
 struct monst *magr, /* monster that is currently deciding where to move */
              *mdef; /* another monster which is next to it */
 {
+    struct permonst *ma, *md;
+    ma = magr->data;
+    md = mdef->data;
+
+    /* Don't allow pets to fight each other. */
+    if (magr->mtame && mdef->mtame)
+        return 0;
+
     /* supposedly purple worms are attracted to shrieking because they
        like to eat shriekers, so attack the latter when feasible */
-    if (magr->data == &mons[PM_PURPLE_WORM]
-        && mdef->data == &mons[PM_SHRIEKER])
+    if ((ma == &mons[PM_PURPLE_WORM] || ma == &mons[PM_BABY_PURPLE_WORM])
+        && md == &mons[PM_SHRIEKER])
         return ALLOW_M | ALLOW_TM;
-    /* Various other combinations such as dog vs cat, cat vs rat, and
-       elf vs orc have been suggested.  For the time being we don't
-       support those. */
-    return 0L;
+
+    /* Put one-way aggressions below here, and two-way aggressions in
+     * mm_2way_aggression. */
+
+    /* woodchucks vs. The Oracle (she has a passive retaliation) */
+    if (ma == &mons[PM_WOODCHUCK] && md == &mons[PM_ORACLE])
+        return ALLOW_M|ALLOW_TM;
+
+    /* ravens like eyes */
+    if (ma == &mons[PM_RAVEN] && md == &mons[PM_FLOATING_EYE])
+        return ALLOW_M|ALLOW_TM;
+
+    /* insect-eating bugs vs insects */
+    if (ma->mlet == S_SPIDER && (md->mlet == S_ANT || md->mlet == S_XAN))
+        return ALLOW_M|ALLOW_TM;
+
+    /* bats vs flying insects */
+    if (is_bat(ma) && (md->mlet == S_ANT || md->mlet == S_XAN) &&
+        (md->mflags1 & M1_FLY))
+        return ALLOW_M|ALLOW_TM;
+
+    /* cats vs rats */
+    if (ma->mlet == S_FELINE && is_rat(md))
+        return ALLOW_M|ALLOW_TM;
+
+    /* now test all two-way aggressions both ways */
+    return (mm_2way_aggression(magr, mdef) | mm_2way_aggression(mdef, magr));
 }
 
 /* Monster displacing another monster out of the way */
