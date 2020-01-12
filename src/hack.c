@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1578834315 2020/01/12 13:05:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.241 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1578849526 2020/01/12 17:18:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.242 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -350,13 +350,13 @@ moverock()
                 } else {
                     /*
                      * will pick up:  you easily pick it up
-                     * can but won't: you manuver over it and could pick it up
-                     * can't pick up: you manuver over it (possibly followed
+                     * can but won't: you maneuver over it and could pick it up
+                     * can't pick up: you maneuver over it (possibly followed
                      *     by feedback from failed auto-pickup attempt)
                      */
                     pline("However, you %s%s.",
                           willpickup ? "easily pick it up"
-                                     : "manuver over it",
+                                     : "maneuver over it",
                           (canpickup && !willpickup)
                                      ? " and could pick it up"
                                      : "");
