@@ -446,6 +446,15 @@ unsigned roomno;
 #define N_P2_ITER 1 /* tune map generation via this value */
 #define N_P3_ITER 2 /* tune map smoothing via this value */
 
+boolean
+litstate_rnd(litstate)
+int litstate;
+{
+    if (litstate < 0)
+        return (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+    return (boolean) litstate;
+}
+
 void
 mkmap(init_lev)
 lev_init *init_lev;
@@ -455,8 +464,7 @@ lev_init *init_lev;
     xchar lit = init_lev->lit, walled = init_lev->walled;
     int i;
 
-    if (lit < 0)
-        lit = (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? 1 : 0;
+    lit = litstate_rnd(lit);
 
     g.new_locations = (char *) alloc((WIDTH + 1) * HEIGHT);
 

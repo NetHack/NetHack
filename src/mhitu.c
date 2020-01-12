@@ -453,7 +453,7 @@ register struct monst *mtmp;
                 if (m_at(cc.x, cc.y))
                     (void) enexto(&cc, u.ux, u.uy, g.youmonst.data);
             }
-            teleds(cc.x, cc.y, TRUE); /* move hero */
+            teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG); /* move hero */
             set_apparxy(mtmp);
             newsym(u.ux, u.uy);
 

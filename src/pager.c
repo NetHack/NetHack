@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1575830188 2019/12/08 18:36:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1578764034 2020/01/11 17:33:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -77,7 +77,7 @@ char *
 self_lookat(outbuf)
 char *outbuf;
 {
-    char race[QBUFSZ];
+    char race[QBUFSZ], trapbuf[QBUFSZ];
 
     /* include race with role unless polymorphed */
     race[0] = '\0';
@@ -91,6 +91,11 @@ char *outbuf;
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE))
         mhidden_description(&g.youmonst, FALSE, eos(outbuf));
+    if (Punished)
+        Sprintf(eos(outbuf), ", chained to %s",
+                uball ? ansimpleoname(uball) : "nothing?");
+    if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
+        Sprintf(eos(outbuf), ", %s", trap_predicament(trapbuf, 0, FALSE));
     return outbuf;
 }
 
@@ -106,7 +111,7 @@ char *outbuf;
     boolean fakeobj, isyou = (mon == &g.youmonst);
     int x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my,
         glyph = (g.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
-                                                    : glyph_at(x, y);
+                                                      : glyph_at(x, y);
 
     *outbuf = '\0';
     if (M_AP_TYPE(mon) == M_AP_FURNITURE
@@ -144,8 +149,7 @@ char *outbuf;
             Strcat(outbuf, something);
         } else if (is_hider(mon->data)) {
             Sprintf(eos(outbuf), " on the %s",
-                    (is_flyer(mon->data) || mon->data->mlet == S_PIERCER)
-                       ? "ceiling"
+                    ceiling_hider(mon->data) ? "ceiling"
                        : surface(x, y)); /* trapper */
         } else {
             if (mon->data->mlet == S_EEL && is_pool(x, y))
@@ -778,12 +782,35 @@ char *supplemental_name;
                     }
                     datawin = create_nhwindow(NHW_MENU);
                     for (i = 0; i < entry_count; i++) {
-                        if (!dlb_fgets(buf, BUFSZ, fp))
+                        /* room for 1-tab or 8-space prefix + BUFSZ-1 + \0 */
+                        char tabbuf[BUFSZ + 8], *tp;
+
+                        if (!dlb_fgets(tabbuf, BUFSZ, fp))
                             goto bad_data_file;
-                        (void) strip_newline(buf);
-                        if (index(buf + 1, '\t') != 0)
-                            (void) tabexpand(buf + 1);
-                        putstr(datawin, 0, buf + 1);
+                        tp = tabbuf;
+                        if (!index(tp, '\n'))
+                            goto bad_data_file;
+                        (void) strip_newline(tp);
+                        /* text in this file is indented with one tab but
+                           someone modifying it might use spaces instead */
+                        if (*tp == '\t') {
+                            ++tp;
+                        } else if (*tp == ' ') {
+                            /* remove up to 8 spaces (we expect 8-column
+                               tab stops but user might have them set at
+                               something else so we don't require it) */
+                            do {
+                                ++tp;
+                            } while (tp < &tabbuf[8] && *tp == ' ');
+                        } else if (*tp) { /* empty lines are ok */
+                            goto bad_data_file;
+                        }
+                        /* if a tab after the leading one is found,
+                           convert tabs into spaces; the attributions
+                           at the end of quotes typically have them */
+                        if (index(tp, '\t') != 0)
+                            (void) tabexpand(tp);
+                        putstr(datawin, 0, tp);
                     }
                     display_nhwindow(datawin, FALSE);
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
@@ -815,14 +842,16 @@ struct permonst **for_supplement;
     static const char mon_interior[] = "the interior of a monster",
                       unreconnoitered[] = "unreconnoitered";
     static char look_buf[BUFSZ];
-    char prefix[BUFSZ];
+    char prefix[BUFSZ], gobbledygook[33];
     int i, alt_i, j, glyph = NO_GLYPH,
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
-            submerged = (Underwater && !Is_waterlevel(&u.uz));
+            submerged = (Underwater && !Is_waterlevel(&u.uz)),
+            hallucinate = (Hallucination && !g.program_state.gameover);
     const char *x_str;
     nhsym tmpsym;
 
+    gobbledygook[0] = '\0'; /* no hallucinatory liquid (yet) */
     if (looked) {
         int oc;
         unsigned os;
@@ -889,7 +918,8 @@ struct permonst **for_supplement;
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 1; i < MAXMCLASSES; i++) {
-            if (sym == (looked ? g.showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
+            if (sym == (looked ? g.showsyms[i + SYM_OFF_M]
+                               : def_monsyms[i].sym)
                 && def_monsyms[i].explain && *def_monsyms[i].explain) {
                 need_to_look = TRUE;
                 if (!found) {
@@ -968,14 +998,26 @@ struct permonst **for_supplement;
             /* alt_i is now 3 or more and no longer of interest */
         }
         if (sym == (looked ? g.showsyms[i] : defsyms[i].sym) && *x_str) {
+            /* POOL, MOAT, and WATER are "water", LAVAPOOL is "molten lava" */
+            boolean water_or_lava = (!strcmp(x_str, "water")
+                                     || !strcmp(x_str, "molten lava"));
             /* avoid "an unexplored", "an stone", "an air", "a water",
-               "a floor of a room", "a dark part of a room";
+               "a molten lava", "a floor of a room", "a dark part of a room";
                article==2 => "the", 1 => "an", 0 => (none) */
             int article = strstri(x_str, " of a room") ? 2
                           : !(alt_i <= 2
                               || strcmp(x_str, "air") == 0
                               || strcmp(x_str, "land") == 0
-                              || strcmp(x_str, "water") == 0);
+                              || water_or_lava);
+
+            /* substitute for "water" and "molten lava" when hallucinating */
+            if (water_or_lava && hallucinate) {
+                if (*gobbledygook)
+                    continue; /* just 1 or player could tell h2o from lava */
+                x_str = strncpy(gobbledygook, hliquid(x_str),
+                                (int) sizeof gobbledygook - 1);
+                gobbledygook[sizeof gobbledygook - 1] = '\0';
+            }
 
             if (!found) {
                 if (is_cmap_trap(i)) {
@@ -1108,6 +1150,11 @@ struct permonst **for_supplement;
             pm = lookat(cc.x, cc.y, look_buf, monbuf);
             if (pm && for_supplement)
                 *for_supplement = pm;
+            /* lookat() doesn't hallucinate liquids; substitute ours */
+            if (*gobbledygook && (!strcmp(look_buf, "water")
+                                  || !strcmp(look_buf, "molten lava")))
+                Strcpy(look_buf, gobbledygook);
+
             *firstmatch = look_buf;
             if (*(*firstmatch)) {
                 Sprintf(temp_buf, " (%s)", *firstmatch);
@@ -1122,6 +1169,8 @@ struct permonst **for_supplement;
             }
         }
     }
+    if (*firstmatch == gobbledygook) /* fixup for 'found==1' */
+        *firstmatch = strcpy(look_buf, gobbledygook);
 
     return found;
 }

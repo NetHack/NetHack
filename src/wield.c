@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1577186790 2019/12/24 11:26:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1578190903 2020/01/05 02:21:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -659,32 +659,41 @@ can_twoweapon()
 {
     struct obj *otmp;
 
-#define NOT_WEAPON(obj) (!is_weptool(obj) && obj->oclass != WEAPON_CLASS)
+    /* to dual-wield, must be a weapon-tool or a weapon other than a bow */
+#define TWOWEAPOK(obj) \
+    (((obj)->oclass == WEAPON_CLASS) ? !is_launcher(obj) : is_weptool(obj))
+
     if (!could_twoweap(g.youmonst.data)) {
         if (Upolyd)
             You_cant("use two weapons in your current form.");
         else
             pline("%s aren't able to use two weapons at once.",
-                  makeplural((flags.female && g.urole.name.f) ? g.urole.name.f
-                                                            : g.urole.name.m));
-    } else if (!uwep || !uswapwep)
-        Your("%s%s%s empty.", uwep ? "left " : uswapwep ? "right " : "",
-             body_part(HAND), (!uwep && !uswapwep) ? "s are" : " is");
-    else if (NOT_WEAPON(uwep) || NOT_WEAPON(uswapwep)) {
-        otmp = NOT_WEAPON(uwep) ? uwep : uswapwep;
-        pline("%s %s.", Yname2(otmp),
-              is_plural(otmp) ? "aren't suitable weapons"
-                              : "isn't a suitable weapon");
+                  makeplural((flags.female && g.urole.name.f)
+                             ? g.urole.name.f : g.urole.name.m));
+    } else if (!uwep || !uswapwep) {
+        const char *hand_s = body_part(HAND);
+
+        if (!uwep && !uswapwep)
+            hand_s = makeplural(hand_s);
+        /* "your hands are empty" or "your {left|right} hand is empty" */
+        Your("%s%s %s empty.", uwep ? "left " : uswapwep ? "right " : "",
+             hand_s, vtense(hand_s, "are"));
+    } else if (!TWOWEAPOK(uwep) || !TWOWEAPOK(uswapwep)) {
+        otmp = !TWOWEAPOK(uwep) ? uwep : uswapwep;
+        pline("%s %s suitable %s weapon%s.", Yname2(otmp),
+              is_plural(otmp) ? "aren't" : "isn't a",
+              (otmp == uwep) ? "primary" : "secondary",
+              plur(otmp->quan));
     } else if (bimanual(uwep) || bimanual(uswapwep)) {
         otmp = bimanual(uwep) ? uwep : uswapwep;
         pline("%s isn't one-handed.", Yname2(otmp));
-    } else if (uarms)
+    } else if (uarms) {
         You_cant("use two weapons while wearing a shield.");
-    else if (uswapwep->oartifact)
+    } else if (uswapwep->oartifact) {
         pline("%s being held second to another weapon!",
               Yobjnam2(uswapwep, "resist"));
-    else if (uswapwep->otyp == CORPSE && cant_wield_corpse(uswapwep)) {
-        /* [Note: NOT_WEAPON() check prevents ever getting here...] */
+    } else if (uswapwep->otyp == CORPSE && cant_wield_corpse(uswapwep)) {
+        /* [Note: !TWOWEAPOK() check prevents ever getting here...] */
         ; /* must be life-saved to reach here; return FALSE */
     } else if (Glib || uswapwep->cursed) {
         if (!Glib)

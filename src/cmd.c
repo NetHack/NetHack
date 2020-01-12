@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1576201761 2019/12/13 01:49:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.383 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1578764033 2020/01/11 17:33:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1811,6 +1811,41 @@ walking_on_water()
                       && (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)));
 }
 
+/* describe u.utraptype; used by status_enlightenment() and self_lookat() */
+char *
+trap_predicament(outbuf, final, wizxtra)
+char *outbuf;
+int final;
+boolean wizxtra;
+{
+    struct trap *t;
+
+    /* caller has verified u.utrap */
+    *outbuf = '\0';
+    switch (u.utraptype) {
+    case TT_BURIEDBALL:
+        Strcpy(outbuf, "tethered to something buried");
+        break;
+    case TT_LAVA:
+        Sprintf(outbuf, "sinking into %s", final ? "lava" : hliquid("lava"));
+        break;
+    case TT_INFLOOR:
+        Sprintf(outbuf, "stuck in %s", the(surface(u.ux, u.uy)));
+        break;
+    default: /* TT_BEARTRAP, TT_PIT, or TT_WEB */
+        Strcpy(outbuf, "trapped");
+        if ((t = t_at(u.ux, u.uy)) != 0) /* should never be null */
+            Sprintf(eos(outbuf), " in %s", an(trapname(t->ttyp, FALSE)));
+        break;
+    }
+    if (wizxtra) { /* give extra information for wizard mode enlightenment */
+        /* curly braces: u.utrap is an escape attempt counter rather than a
+           turn timer so use different ornamentation than usual parentheses */
+        Sprintf(eos(outbuf), " {%u}", u.utrap);
+    }
+    return outbuf;
+}
+
 /* check whether hero is wearing something that player definitely knows
    confers the target property; item must have been seen and its type
    discovered but it doesn't necessarily have to be fully identified */
@@ -1921,7 +1956,8 @@ int final;
     /* note that if poly'd, we need to use u.mfemale instead of flags.female
        to access hero's saved gender-as-human/elf/&c rather than current one */
     innategend = (Upolyd ? u.mfemale : flags.female) ? 1 : 0;
-    role_titl = (innategend && g.urole.name.f) ? g.urole.name.f : g.urole.name.m;
+    role_titl = (innategend && g.urole.name.f) ? g.urole.name.f
+                                               : g.urole.name.m;
     rank_titl = rank_of(u.ulevel, Role_switch, innategend);
 
     enlght_out(""); /* separator after title */
@@ -2508,19 +2544,9 @@ int final;
     }
     if (u.utrap) {
         char predicament[BUFSZ];
-        struct trap *t;
         boolean anchored = (u.utraptype == TT_BURIEDBALL);
 
-        if (anchored) {
-            Strcpy(predicament, "tethered to something buried");
-        } else if (u.utraptype == TT_INFLOOR || u.utraptype == TT_LAVA) {
-            Sprintf(predicament, "stuck in %s", the(surface(u.ux, u.uy)));
-        } else {
-            Strcpy(predicament, "trapped");
-            if ((t = t_at(u.ux, u.uy)) != 0)
-                Sprintf(eos(predicament), " in %s",
-                        an(trapname(t->ttyp, FALSE)));
-        }
+        (void) trap_predicament(predicament, final, wizard);
         if (u.usteed) { /* not `Riding' here */
             Sprintf(buf, "%s%s ", anchored ? "you and " : "", steedname);
             *buf = highc(*buf);

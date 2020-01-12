@@ -4626,7 +4626,7 @@ short exploding_wand_typ;
         case ZT_COLD:
             new_doormask = D_NODOOR;
             see_txt = "The door freezes and shatters!";
-            sense_txt = "feel cold.";
+            hear_txt = "a deep cracking sound.";
             break;
         case ZT_DEATH:
             /* death spells/wands don't disintegrate */

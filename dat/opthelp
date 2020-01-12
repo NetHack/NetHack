@@ -9,6 +9,8 @@ autoopen       walking into a door attempts to open it            [TRUE]
 autopickup     automatically pick up objects you move over        [TRUE]
 autoquiver     when firing with an empty quiver, select some      [FALSE]
                suitable inventory weapon to fill the quiver
+autounlock     when opening a locked door or looting a locked     [TRUE]
+               container while carrying a key, offer to use it
 BIOS           allow the use of IBM ROM BIOS calls                [FALSE]
 blind          your character is permanently blind                [FALSE]
 bones          allow loading bones files                          [TRUE]

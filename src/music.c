@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1573063606 2019/11/06 18:06:46 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	music.c	$NHDT-Date: 1578252632 2020/01/05 19:30:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -224,16 +224,20 @@ static void
 do_earthquake(force)
 int force;
 {
+    static const char into_a_chasm[] = " into a chasm";
     register int x, y;
     struct monst *mtmp;
     struct obj *otmp;
     struct trap *chasm, *trap_at_u = t_at(u.ux, u.uy);
-    int start_x, start_y, end_x, end_y;
+    int start_x, start_y, end_x, end_y, amsk;
+    aligntyp algn;
     schar filltype;
     unsigned tu_pit = 0;
 
     if (trap_at_u)
         tu_pit = is_pit(trap_at_u->ttyp);
+    if (force > 13) /* sanity precaution; maximum used is actually 10 */
+        force = 13;
     start_x = u.ux - (force * 2);
     start_y = u.uy - (force * 2);
     end_x = u.ux + (force * 2);
@@ -246,180 +250,216 @@ int force;
         for (y = start_y; y <= end_y; y++) {
             if ((mtmp = m_at(x, y)) != 0) {
                 wakeup(mtmp, TRUE); /* peaceful monster will become hostile */
-                if (mtmp->mundetected && is_hider(mtmp->data)) {
+                if (mtmp->mundetected) {
                     mtmp->mundetected = 0;
-                    if (cansee(x, y))
-                        pline("%s is shaken loose from the ceiling!",
-                              Amonnam(mtmp));
-                    else
-                        You_hear("a thumping sound.");
-                    if (x == u.ux && y == u.uy)
-                        You("easily dodge the falling %s.", mon_nam(mtmp));
                     newsym(x, y);
-                }
-            }
-            if (!rn2(14 - force))
-                switch (levl[x][y].typ) {
-                case FOUNTAIN: /* Make the fountain disappear */
-                    if (cansee(x, y))
-                        pline_The("fountain falls into a chasm.");
-                    goto do_pit;
-                case SINK:
-                    if (cansee(x, y))
-                        pline_The("kitchen sink falls into a chasm.");
-                    goto do_pit;
-                case ALTAR:
-                    if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz))
-                        break;
-
-                    if (cansee(x, y))
-                        pline_The("altar falls into a chasm.");
-                    goto do_pit;
-                case GRAVE:
-                    if (cansee(x, y))
-                        pline_The("headstone topples into a chasm.");
-                    goto do_pit;
-                case THRONE:
-                    if (cansee(x, y))
-                        pline_The("throne falls into a chasm.");
-                    /*FALLTHRU*/
-                case ROOM:
-                case CORR: /* Try to make a pit */
- do_pit:
-                    chasm = maketrap(x, y, PIT);
-                    if (!chasm)
-                        break; /* no pit if portal at that location */
-                    chasm->tseen = 1;
-
-                    /* TODO:
-                     * This ought to be split into a separate routine to
-                     * reduce indentation and the consequent line-wraps.
-                     */
-
-                    levl[x][y].doormask = 0;
-                    /*
-                     * Let liquid flow into the newly created chasm.
-                     * Adjust corresponding code in apply.c for
-                     * exploding wand of digging if you alter this sequence.
-                     */
-                    filltype = fillholetyp(x, y, FALSE);
-                    if (filltype != ROOM) {
-                        levl[x][y].typ = filltype; /* flags set via doormask */
-                        liquid_flow(x, y, filltype, chasm, (char *) 0);
-                    }
-
-                    mtmp = m_at(x, y);
-
-                    if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
+                    if (ceiling_hider(mtmp->data)) {
                         if (cansee(x, y))
-                            pline("KADOOM!  The boulder falls into a chasm%s!",
-                                  (x == u.ux && y == u.uy) ? " below you"
-                                                           : "");
-                        if (mtmp)
-                            mtmp->mtrapped = 0;
-                        obj_extract_self(otmp);
-                        (void) flooreffects(otmp, x, y, "");
-                        break;
+                            pline("%s is shaken loose from the ceiling!",
+                                  Amonnam(mtmp));
+                        else if (!is_flyer(mtmp->data))
+                            You_hear("a thump.");
                     }
+                }
+                if (M_AP_TYPE(mtmp) != M_AP_NOTHING
+                    && M_AP_TYPE(mtmp) != M_AP_MONSTER)
+                    seemimic(mtmp);
+            }
+            if (rn2(14 - force))
+                continue;
 
-                    /* We have to check whether monsters or player
-                       falls in a chasm... */
-                    if (mtmp) {
-                        if (!is_flyer(mtmp->data)
-                            && !is_clinger(mtmp->data)) {
-                            boolean m_already_trapped = mtmp->mtrapped;
+       /*
+        * Possible extensions:
+        *  When a door is trapped, explode it instead of silently
+        *   turning it into an empty doorway.
+        *  Trigger divine wrath when an altar is dumped into a chasm.
+        *  Sometimes replace sink with fountain or fountain with pool
+        *   instead of always producing a pit.
+        *  Sometimes release monster and/or treasure from a grave or
+        *   a throne instead of just dumping them into the chasm.
+        *  Chance to destroy wall segments?  Trees too?
+        *  Honor non-diggable for locked doors, walls, and trees.
+        *   Treat non-passwall as if it was non-diggable?
+        *  Conjoin some of the umpteen pits when they're adjacent?
+        *
+        *  Replace 'goto do_pit;' with 'do_pit = TRUE; break;' and
+        *   move the pit code to after the switch.
+        */
 
-                            mtmp->mtrapped = 1;
-                            if (!m_already_trapped) { /* suppress messages */
-                                if (cansee(x, y))
-                                    pline("%s falls into a chasm!",
-                                          Monnam(mtmp));
-                                else if (humanoid(mtmp->data))
-                                    You_hear("a scream!");
-                            }
-                            /* Falling is okay for falling down
-                                within a pit from jostling too */
-                            mselftouch(mtmp, "Falling, ", TRUE);
-                            if (!DEADMONSTER(mtmp)) {
-                                mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
-                                if (DEADMONSTER(mtmp)) {
-                                    if (!cansee(x, y)) {
-                                        pline("It is destroyed!");
-                                    } else {
-                                        You("destroy %s!",
-                                            mtmp->mtame
-                                              ? x_monnam(mtmp, ARTICLE_THE,
-                                                         "poor",
-                                                         has_mname(mtmp)
-                                                           ? SUPPRESS_SADDLE
-                                                           : 0,
-                                                         FALSE)
-                                              : mon_nam(mtmp));
-                                    }
-                                    xkilled(mtmp, XKILL_NOMSG);
+            switch (levl[x][y].typ) {
+            case FOUNTAIN: /* make the fountain disappear */
+                if (cansee(x, y))
+                    pline_The("fountain falls%s.", into_a_chasm);
+                goto do_pit;
+            case SINK:
+                if (cansee(x, y))
+                    pline_The("kitchen sink falls%s.", into_a_chasm);
+                goto do_pit;
+            case ALTAR:
+                /* always preserve the high altars */
+                if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz))
+                    break;
+                /* no need to check for high altar here; we've just
+                   excluded those */
+                amsk = altarmask_at(x, y);
+                algn = Amask2align(amsk & AM_MASK);
+                if (cansee(x, y))
+                    pline_The("%s altar falls%s.",
+                              align_str(algn), into_a_chasm);
+                goto do_pit;
+            case GRAVE:
+                if (cansee(x, y))
+                    pline_The("headstone topples%s.", into_a_chasm);
+                goto do_pit;
+            case THRONE:
+                if (cansee(x, y))
+                    pline_The("throne falls%s.", into_a_chasm);
+                goto do_pit;
+            case SCORR:
+                levl[x][y].typ = CORR;
+                unblock_point(x, y);
+                if (cansee(x, y))
+                    pline("A secret corridor is revealed.");
+                /*FALLTHRU*/
+            case CORR:
+            case ROOM: /* Try to make a pit. */
+ do_pit:
+                /* maketrap() won't replace furniture with a trap,
+                   so remove the furniture first */
+                if (levl[x][y].typ != CORR) {
+                    if (levl[x][y].typ != DOOR) {
+                        levl[x][y].typ = ROOM;
+                        /* clear blessed fountain, disturbed grave */
+                        levl[x][y].horizontal = 0;
+                    }
+                    /* clear doormask, altarmask, looted throne */
+                    levl[x][y].flags = 0; /* same as 'doormask = D_NODOOR' */
+                }
+                chasm = maketrap(x, y, PIT);
+                if (!chasm)
+                    break; /* no pit if portal at that location */
+                chasm->tseen = 1;
+
+                /* Let liquid flow into the newly created chasm.
+                   Adjust corresponding code in apply.c for exploding
+                   wand of digging if you alter this sequence. */
+                filltype = fillholetyp(x, y, FALSE);
+                if (filltype != ROOM) {
+                    levl[x][y].typ = filltype; /* flags set via doormask */
+                    liquid_flow(x, y, filltype, chasm, (char *) 0);
+                }
+
+                mtmp = m_at(x, y); /* (redundant?) */
+                if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
+                    if (cansee(x, y))
+                        pline("KADOOM!  The boulder falls into a chasm%s!",
+                              (x == u.ux && y == u.uy) ? " below you" : "");
+                    if (mtmp)
+                        mtmp->mtrapped = 0;
+                    obj_extract_self(otmp);
+                    (void) flooreffects(otmp, x, y, "");
+                    break; /* from switch, not loop */
+                }
+
+                /* We have to check whether monsters or player
+                   falls in a chasm... */
+                if (mtmp) {
+                    if (!is_flyer(mtmp->data) && !is_clinger(mtmp->data)) {
+                        boolean m_already_trapped = mtmp->mtrapped;
+
+                        mtmp->mtrapped = 1;
+                        if (!m_already_trapped) { /* suppress messages */
+                            if (cansee(x, y))
+                                pline("%s falls into a chasm!", Monnam(mtmp));
+                            else if (humanoid(mtmp->data))
+                                You_hear("a scream!");
+                        }
+                        /* Falling is okay for falling down
+                           within a pit from jostling too */
+                        mselftouch(mtmp, "Falling, ", TRUE);
+                        if (!DEADMONSTER(mtmp)) {
+                            mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
+                            if (DEADMONSTER(mtmp)) {
+                                if (!cansee(x, y)) {
+                                    pline("It is destroyed!");
+                                } else {
+                                    You("destroy %s!",
+                                        mtmp->mtame
+                                         ? x_monnam(mtmp, ARTICLE_THE, "poor",
+                                                    has_mname(mtmp)
+                                                     ? SUPPRESS_SADDLE : 0,
+                                                    FALSE)
+                                         : mon_nam(mtmp));
                                 }
+                                xkilled(mtmp, XKILL_NOMSG);
                             }
                         }
-                    } else if (x == u.ux && y == u.uy) {
-                        if (u.utrap && u.utraptype == TT_BURIEDBALL) {
-                            /* Note:  the chain should break if a pit gets
-                               created at the buried ball's location, which
-                               is not necessarily here.  But if we don't do
-                               things this way, entering the new pit below
-                               will override current trap anyway, but too
-                               late to get Lev and Fly handling. */
-                            Your("chain breaks!");
-                            reset_utrap(TRUE);
+                    }
+                } else if (x == u.ux && y == u.uy) {
+                    if (u.utrap && u.utraptype == TT_BURIEDBALL) {
+                        /* Note:  the chain should break if a pit gets
+                           created at the buried ball's location, which
+                           is not necessarily here.  But if we don't do
+                           things this way, entering the new pit below
+                           will override current trap anyway, but too
+                           late to get Lev and Fly handling. */
+                        Your("chain breaks!");
+                        reset_utrap(TRUE);
+                    }
+                    if (Levitation || Flying || is_clinger(g.youmonst.data)) {
+                        if (!tu_pit) { /* no pit here previously */
+                            pline("A chasm opens up under you!");
+                            You("don't fall in!");
                         }
-                        if (Levitation || Flying
-                            || is_clinger(g.youmonst.data)) {
-                            if (!tu_pit) { /* no pit here previously */
-                                pline("A chasm opens up under you!");
-                                You("don't fall in!");
-                            }
-                        } else if (!tu_pit || !u.utrap
-                                   || (u.utrap && u.utraptype != TT_PIT)) {
-                            /* no pit here previously, or you were
-                               not in it even if there was */
-                            You("fall into a chasm!");
-                            set_utrap(rn1(6, 2), TT_PIT);
-                            losehp(Maybe_Half_Phys(rnd(6)),
-                                   "fell into a chasm", NO_KILLER_PREFIX);
-                            selftouch("Falling, you");
-                        } else if (u.utrap && u.utraptype == TT_PIT) {
-                            boolean keepfooting =
+                    } else if (!tu_pit || !u.utrap || u.utraptype != TT_PIT) {
+                        /* no pit here previously, or you were
+                           not in it even if there was */
+                        You("fall into a chasm!");
+                        set_utrap(rn1(6, 2), TT_PIT);
+                        losehp(Maybe_Half_Phys(rnd(6)),
+                               "fell into a chasm", NO_KILLER_PREFIX);
+                        selftouch("Falling, you");
+                    } else if (u.utrap && u.utraptype == TT_PIT) {
+                        boolean keepfooting =
                                 ((Fumbling && !rn2(5))
                                  || (!rnl(Role_if(PM_ARCHEOLOGIST) ? 3 : 9))
                                  || ((ACURR(A_DEX) > 7) && rn2(5)));
 
-                            You("are jostled around violently!");
-                            set_utrap(rn1(6, 2), TT_PIT);
-                            losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
-                                   "hurt in a chasm", NO_KILLER_PREFIX);
-                            if (keepfooting)
-                                exercise(A_DEX, TRUE);
-                            else
-                                selftouch(
-                                    (Upolyd && (slithy(g.youmonst.data)
-                                                || nolimbs(g.youmonst.data)))
-                                        ? "Shaken, you"
-                                        : "Falling down, you");
-                        }
-                    } else
-                        newsym(x, y);
-                    break;
-                case DOOR: /* Make the door collapse */
-                    if (levl[x][y].doormask == D_NODOOR)
-                        goto do_pit;
-                    if (cansee(x, y))
-                        pline_The("door collapses.");
-                    if (*in_rooms(x, y, SHOPBASE))
-                        add_damage(x, y, 0L);
-                    levl[x][y].doormask = D_NODOOR;
-                    unblock_point(x, y);
+                        You("are jostled around violently!");
+                        set_utrap(rn1(6, 2), TT_PIT);
+                        losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
+                               "hurt in a chasm", NO_KILLER_PREFIX);
+                        if (keepfooting)
+                            exercise(A_DEX, TRUE);
+                        else
+                            selftouch((Upolyd && (slithy(g.youmonst.data)
+                                                  || nolimbs(g.youmonst.data)))
+                                      ? "Shaken, you"
+                                      : "Falling down, you");
+                    }
+                } else {
                     newsym(x, y);
-                    break;
                 }
+                break;
+            case SDOOR:
+                cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
+                if (cansee(x, y))
+                    pline("A secret door is revealed.");
+                /*FALLTHRU*/
+            case DOOR: /* make the door collapse */
+                /* if already doorless, treat like room or corridor */
+                if (levl[x][y].doormask == D_NODOOR)
+                    goto do_pit;
+                /* wasn't doorless, now it will be */
+                levl[x][y].doormask = D_NODOOR;
+                unblock_point(x, y);
+                newsym(x, y); /* before pline */
+                if (cansee(x, y))
+                    pline_The("door collapses.");
+                if (*in_rooms(x, y, SHOPBASE))
+                    add_damage(x, y, 0L);
+                break;
+            }
         }
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1547421446 2019/01/13 23:17:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1578659784 2020/01/10 12:36:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1741,7 +1741,10 @@ coord *cc;
      *  only lets hero get one step away from the buried ball?]
      */
 
-    if (u.utrap && u.utraptype == TT_BURIEDBALL)
+    /* u.utrap might have already been cleared, in which case the value
+       of u.utraptype is no longer meaningful; if u.utrap is still set
+       then u.utraptype needs to be for buried ball */
+    if (!u.utrap || u.utraptype == TT_BURIEDBALL) {
         for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
             if (otmp->otyp != HEAVY_IRON_BALL)
                 continue;
@@ -1760,6 +1763,7 @@ coord *cc;
                 bdist = odist;
             }
         }
+    }
     if (ball) {
         /* found, but not at < cc->x, cc->y > */
         cc->x = ball->ox;

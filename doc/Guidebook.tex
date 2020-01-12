@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{December 18, 2019}
+\date{January 7, 2020}
 
 \maketitle
 
@@ -1765,36 +1765,82 @@ dark areas are only displayed if they are within one space of you.
 Walls and corridors remain on the map as you explore them.
 
 %.pg
-Secret corridors are hidden.  You can find them with the `{\tt s}' (search)
-command.
+Secret corridors are hidden and appear to be solid rock.
+You can find them with the `{\tt s}' (search) command when adjacent
+to them.
+Multiple search attempts may be needed.
+When searching is successful, secret corridors become ordinary open
+corridor locations.
+Mapping magic reveals secret corridors, so converts them into ordinary
+corridors and shows them as such.
 
 %.hn 2
 \subsection*{Doorways}
 
 %.pg
-Doorways connect rooms and corridors.  Some doorways have no doors;
-you can walk right through.  Others have doors in them, which may be
-open, closed, or locked.  To open a closed door, use the `{\tt o}' (open)
+Doorways connect rooms and corridors.
+Some doorways have no doors; you can walk right through.
+Others have doors in them, which may be open, closed, or locked.
+To open a closed door, use the `{\tt o}' (open)
 command; to close it again, use the `{\tt c}' (close) command.
-
-%.pg
-You can get through a locked door by using a tool to pick the lock
-with the `{\tt a}' (apply) command, or by kicking it open with the
-`{\tt \^{}D}' (kick) command.
+By default the
+{\it autoopen}
+option is enabled, so simply attempting to walk onto a closed door's
+location will attempt to open it without needing `{\tt o}'.
+Opening via
+{\it autoopen}
+will not work if you are {\it confused\/} or {\it stunned\/} or suffer from
+the {\it fumbling\/} attribute.
 
 %.pg
 Open doors cannot be entered diagonally; you must approach them
-straight on, horizontally or vertically.  Doorways without doors are
-not restricted in this fashion.
+straight on, horizontally or vertically.
+Doorways without doors are
+not restricted in this fashion except on one particular level
+%.\" the rogue level
+(described by ``{\tt \#overview}'' as ``a primitive area'').
 
 %.pg
-Doors can be useful for shutting out monsters.  Most monsters cannot
-open doors, although a few don't need to (for example, ghosts can walk through
-doors).
+Unlocking magic exists but usually won't be available early on.
+You can get through a locked door without magic by first using an
+unlocking tool with the `{\tt a}' (apply) command, and then opening it.
+By default the
+{\it autounlock}
+option is also enabled, so if you attempt to open (via `{\tt o}' or
+{\it autoopen})
+a locked door while carrying an unlocking tool, you'll be asked whether
+to use it on the door's lock.
+Alternatively, you can break a closed door (whether locked or not) down
+by kicking it via the ``{\tt \^{}D}'' (kick) command.
+Kicking down a door destroys it and makes a lot of noise which might
+wake sleeping monsters.
 
 %.pg
-Secret doors are hidden.  You can find them with the `{\tt s}' (search)
-command.  Once found they are in all ways equivalent to normal doors.
+Some closed doors are booby-trapped and will explode if an attempt is made
+to open (when unlocked) or unlock (when locked) or kick down.
+Like kicking, an explosion destroys the door and makes a lot of noise.
+The ``{\tt \#untrap}'' command can be used to search a door for traps but
+might take multiple attempts to find one.
+When one is found, you'll be asked whether to try to disarm it.
+If you accede, success will eliminate the trap but
+failure will set off the trap's explosion.
+(If you decline, you effectively forget that a trap was found there.)
+
+%.pg
+Closed doors can be useful for shutting out monsters.
+Most monsters cannot open closed doors, although a few don't need to
+(for example, ghosts can walk through doors and fog clouds can flow
+under them).
+Some monsters who can open doors can also use unlocking tools.
+And some (giants) can smash doors.
+
+%.pg
+Secret doors are hidden and appear to be ordinary wall (from inside a
+room) or solid rock (from outside).
+You can find them with the `{\tt s}' (search) command but it might
+take multiple tries.
+Once found they are in all ways equivalent to normal doors.
+Mapping magic does not reveal secret doors.
 
 %.hn 2
 \subsection*{Traps (`{\tt \^{}}')}
@@ -3187,7 +3233,8 @@ Automatically dig if you are wielding a digging tool and moving into a place
 that can be dug (default false).  Persistent.
 %.lp
 \item[\ib{autoopen}]
-Walking into a door attempts to open it (default true).  Persistent.
+Walking into a closed door attempts to open it (default true).
+Persistent.
 %.lp
 \item[\ib{autopickup}]
 Automatically pick up things onto which you move (default on).  Persistent.
@@ -3205,6 +3252,12 @@ or quiver sack or make ready
 with the `Q' command instead.
 If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  Persistent.
+%.lp
+\item[\ib{autounlock}]
+Walking into a locked door or looting a locked container while carrying
+an unlocking tool (such as a key) will ask whether to use that tool to
+unlock the door or container (default true).
+Persistent.
 %.lp
 \item[\ib{blind}]
 Start the character permanently blind (default false).  Persistent.

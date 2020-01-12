@@ -143,7 +143,7 @@ struct cross_target_s {
     unsigned long build_time;
 };
 extern struct cross_target_s cross_target;
-#if defined(CROSSCOMPILE_TARGET) && !defined(MAKEDEFS_C) 
+#if defined(CROSSCOMPILE_TARGET) && !defined(MAKEDEFS_C)
 #define BUILD_DATE cross_target.build_date        /* "Wed Apr 1 00:00:01 2020" */
 #define COPYRIGHT_BANNER_C cross_target.copyright_banner_c
 #define NETHACK_GIT_SHA cross_target.git_sha

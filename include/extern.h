@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1575830178 2019/12/08 18:36:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.767 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1578764033 2020/01/11 17:33:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.783 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -144,7 +144,7 @@ E void FDECL(Lift_covet_and_placebc, (int, const char *, int));
 #define unplacebc_and_covet_placebc() \
             Unplacebc_and_covet_placebc(__FUNCTION__, __LINE__)
 #define lift_covet_and_placebc(x) \
-            Lift_covet_and_placebc(x, __FUNCTION__, __LINE__) 
+            Lift_covet_and_placebc(x, __FUNCTION__, __LINE__)
 #endif
 E void FDECL(set_bc, (int));
 E void FDECL(move_bc, (int, int, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
@@ -231,6 +231,7 @@ E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
 E int NDECL(extcmd_via_menu);
 E int NDECL(enter_explore_mode);
+E char *FDECL(trap_predicament, (char *, int, BOOLEAN_P));
 E void FDECL(enlightenment, (int, int));
 E void FDECL(youhiding, (BOOLEAN_P, int));
 E void FDECL(show_conduct, (int));
@@ -1117,6 +1118,7 @@ E boolean FDECL(picking_at, (int, int));
 E void FDECL(breakchestlock, (struct obj *, BOOLEAN_P));
 E void NDECL(reset_pick);
 E void FDECL(maybe_reset_pick, (struct obj *));
+E struct obj *FDECL(autokey, (BOOLEAN_P));
 E int FDECL(pick_lock, (struct obj *, XCHAR_P, XCHAR_P, struct obj *));
 E int NDECL(doforce);
 E boolean FDECL(boxlock, (struct obj *, struct obj *));
@@ -1301,6 +1303,7 @@ E void FDECL(mineralize, (int, int, int, int, BOOLEAN_P));
 
 E void FDECL(flood_fill_rm, (int, int, int, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(remove_rooms, (int, int, int, int));
+E boolean FDECL(litstate_rnd, (int));
 /* E void FDECL(mkmap, (lev_init *)); -- need sp_lev.h for lev_init */
 
 /* ### mkmaze.c ### */
@@ -1676,6 +1679,7 @@ E int FDECL(l_selection_register, (lua_State *));
 /* ### nhlobj.c ### */
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 E void FDECL(nhl_push_obj, (lua_State *, struct obj *));
+E int FDECL(nhl_obj_u_giveobj, (lua_State *));
 E int FDECL(l_obj_register, (lua_State *));
 #endif
 
@@ -2526,8 +2530,8 @@ E boolean FDECL(goodpos, (int, int, struct monst *, unsigned));
 E boolean FDECL(enexto, (coord *, XCHAR_P, XCHAR_P, struct permonst *));
 E boolean FDECL(enexto_core, (coord *, XCHAR_P, XCHAR_P,
                               struct permonst *, unsigned));
-E void FDECL(teleds, (int, int, BOOLEAN_P));
-E boolean FDECL(safe_teleds, (BOOLEAN_P));
+E void FDECL(teleds, (int, int, int));
+E boolean FDECL(safe_teleds, (int));
 E boolean FDECL(teleport_pet, (struct monst *, BOOLEAN_P));
 E void NDECL(tele);
 E boolean FDECL(scrolltele, (struct obj *));

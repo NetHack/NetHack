@@ -979,6 +979,7 @@ register struct trobj *trop;
         if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
         } else { /* UNDEF_TYP */
+            int trycnt = 0;
             /*
              * For random objects, do not create certain overly powerful
              * items: wand of wishing, ring of levitation, or the
@@ -1019,6 +1020,8 @@ register struct trobj *trop;
                 dealloc_obj(obj);
                 obj = mkobj(trop->trclass, FALSE);
                 otyp = obj->otyp;
+                if (++trycnt > 1000)
+                    break;
             }
 
             /* Don't start with +0 or negative rings */

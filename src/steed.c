@@ -353,7 +353,7 @@ boolean force;      /* Quietly force this animal */
         g.unweapon = FALSE;
     u.usteed = mtmp;
     remove_monster(mtmp->mx, mtmp->my);
-    teleds(mtmp->mx, mtmp->my, TRUE);
+    teleds(mtmp->mx, mtmp->my, TELEDS_ALLOW_DRAG);
     g.context.botl = TRUE;
     return TRUE;
 }
@@ -645,7 +645,7 @@ int reason; /* Player was thrown off etc. */
                  * teleds() clears u.utrap
                  */
                 g.in_steed_dismounting = TRUE;
-                teleds(cc.x, cc.y, TRUE);
+                teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG);
                 g.in_steed_dismounting = FALSE;
 
                 /* Put your steed in your trap */

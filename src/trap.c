@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1577759854 2019/12/31 02:37:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1578624299 2020/01/10 02:44:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -953,6 +953,14 @@ unsigned trflags;
         if (has_mname(u.usteed) && !Hallucination)
             steed_article = ARTICLE_NONE;
     }
+
+    /*
+     * Note:
+     *  Most references to trap types here don't use trapname() for
+     *  hallucination.  This could be considered to be a bug but doing
+     *  that would hide the actual trap situation from the player which
+     *  would be somewhat harsh for what's usually a minor impairment.
+     */
 
     switch (ttype) {
     case ARROW_TRAP:
@@ -2831,7 +2839,7 @@ float_up()
     if (u.utrap) {
         if (u.utraptype == TT_PIT) {
             reset_utrap(FALSE);
-            You("float up, out of the pit!");
+            You("float up, out of the %s!", trapname(PIT, FALSE));
             g.vision_full_recalc = 1; /* vision limits change */
             fill_pit(u.ux, u.uy);
         } else if (u.utraptype == TT_LAVA /* molten lava */
@@ -2852,7 +2860,8 @@ float_up()
                 body_part(LEG),
                 IS_ROOM(levl[cc.x][cc.y].typ) ? "floor" : "ground");
         } else if (u.utraptype == WEB) {
-            You("float up slightly, but you are still stuck in the web.");
+            You("float up slightly, but you are still stuck in the %s.",
+                trapname(WEB, FALSE));
         } else { /* bear trap */
             You("float up slightly, but your %s is still stuck.",
                 body_part(LEG));
@@ -3068,12 +3077,15 @@ long hmask, emask; /* might cancel timeout */
 void
 climb_pit()
 {
+    const char *pitname;
+
     if (!u.utrap || u.utraptype != TT_PIT)
         return;
 
+    pitname = trapname(PIT, FALSE);
     if (Passes_walls) {
         /* marked as trapped so they can pick things up */
-        You("ascend from the pit.");
+        You("ascend from the %s.", pitname);
         reset_utrap(FALSE);
         fill_pit(u.ux, u.uy);
         g.vision_full_recalc = 1; /* vision limits change */
@@ -3085,19 +3097,24 @@ climb_pit()
     } else if ((Flying || is_clinger(g.youmonst.data)) && !Sokoban) {
         /* eg fell in pit, then poly'd to a flying monster;
            or used '>' to deliberately enter it */
-        You("%s from the pit.", Flying ? "fly" : "climb");
+        You("%s from the %s.", Flying ? "fly" : "climb", pitname);
         reset_utrap(FALSE);
         fill_pit(u.ux, u.uy);
         g.vision_full_recalc = 1; /* vision limits change */
     } else if (!(--u.utrap)) {
         reset_utrap(FALSE);
-        You("%s to the edge of the pit.",
+        You("%s to the edge of the %s.",
             (Sokoban && Levitation)
                 ? "struggle against the air currents and float"
-                : u.usteed ? "ride" : "crawl");
+                : u.usteed ? "ride" : "crawl",
+            pitname);
         fill_pit(u.ux, u.uy);
         g.vision_full_recalc = 1; /* vision limits change */
     } else if (u.dz || flags.verbose) {
+        /* these should use 'pitname' rather than "pit" for hallucination
+           but that would nullify Norep (this message can be repeated
+           many times without further user intervention by using a run
+           attempt to keep retrying to escape from the pit) */
         if (u.usteed)
             Norep("%s is still in a pit.", upstart(y_monnam(u.usteed)));
         else
@@ -3841,7 +3858,7 @@ drown()
             You("dump some of your gear to lose weight...");
         if (succ) {
             pline("Pheew!  That was close.");
-            teleds(x, y, TRUE);
+            teleds(x, y, TELEDS_ALLOW_DRAG);
             return TRUE;
         }
         /* still too much weight */
@@ -3860,7 +3877,7 @@ drown()
         Strcpy(g.killer.name, pool_of_water);
         done(DROWNING);
         /* oops, we're still alive.  better get out of the water. */
-        if (safe_teleds(TRUE))
+        if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
             break; /* successful life-save */
         /* nowhere safe to land; repeat drowning loop... */
         pline("You're still drowning.");
@@ -5331,7 +5348,7 @@ lava_effects()
             Strcpy(g.killer.name, lava_killer);
             You("%s...", boil_away ? "boil away" : "burn to a crisp");
             done(BURNING);
-            if (safe_teleds(TRUE))
+            if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
                 break; /* successful life-save */
             /* nowhere safe to land; repeat burning loop */
             pline("You're still burning.");
@@ -5391,7 +5408,7 @@ sink_into_lava()
             reset_utrap(TRUE);
             /* levitation or flight have become unblocked, otherwise Tport */
             if (!Levitation && !Flying)
-                (void) safe_teleds(TRUE);
+                (void) safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT);
         } else if (!u.umoved) {
             /* can't fully turn into slime while in lava, but might not
                have it be burned away until you've come awfully close */
@@ -5455,9 +5472,6 @@ maybe_finish_sokoban()
  * If the second argument is true, return the correct trap name even when
  * hallucinating (for things like wizard mode wishing for traps and impossible
  * calls).
- * Originally I had intended for messages like "You begin setting the bear trap"
- * to override as well, but the context in those bits of code indicated that it
- * was meant to take a random name if the hero was hallucinating.
  */
 const char *
 trapname(ttyp, override)
@@ -5469,6 +5483,7 @@ boolean override;
         "bottomless pit", "polymorphism trap", "devil teleporter",
         "falling boulder trap", "anti-anti-magic field", "weeping gas trap",
         "queasy board", "electrified web", "owlbear trap", "sand mine",
+        "vacillating triangle",
         /* some traps found in nethack variants */
         "death trap", "disintegration trap", "ice trap", "monochrome trap",
         /* plausible real-life traps */
@@ -5476,7 +5491,7 @@ boolean override;
         "field of caltrops", "buzzsaw trap", "spiked floor", "revolving wall",
         "uneven floor", "finger trap", "jack-in-a-box", "yellow snow",
         "booby trap", "rat trap", "poisoned nail", "snare", "whirlpool",
-        "trip wire",
+        "trip wire", "roach motel (tm)",
         /* sci-fi */
         "negative space", "tensor field", "singularity", "imperial fleet",
         "black hole", "thermal detonator", "event horizon",
@@ -5484,22 +5499,33 @@ boolean override;
         /* miscellaneous suggestions */
         "sweet-smelling gas vent", "phone booth", "exploding runes",
         "never-ending elevator", "slime pit", "warp zone", "illusory floor",
-        "pile of poo", "honey trap", "tourist trap"
+        "pile of poo", "honey trap", "tourist trap",
     };
-    int total_names, nameidx;
+    static char roletrap[33]; /* [17 + 5 + 1] should suffice */
 
-    if (override || !Hallucination) {
-        return defsyms[trap_to_defsym(ttyp)].explanation;
+    if (Hallucination && !override) {
+        int total_names = TRAPNUM + SIZE(halu_trapnames),
+            nameidx = rn2_on_display_rng(total_names + 1);
+
+        if (nameidx == total_names) {
+            boolean fem = Upolyd ? u.mfemale : flags.female;
+
+            /* inspired by "tourist trap" */
+            copynchars(roletrap,
+                       rn2(3) ? ((fem && g.urole.name.f) ? g.urole.name.f
+                                                         : g.urole.name.m)
+                              : rank_of(u.ulevel, Role_switch, fem),
+                       (int) (sizeof roletrap - sizeof " trap"));
+            Strcat(roletrap, " trap");
+            return lcase(roletrap);
+        } else if (nameidx >= TRAPNUM) {
+            nameidx -= TRAPNUM;
+            return halu_trapnames[nameidx];
+        } /* else use an actual trap type */
+        if (nameidx != NO_TRAP)
+            ttyp = nameidx;
     }
-    total_names = TRAPNUM + SIZE(halu_trapnames);
-    nameidx = rn2_on_display_rng(total_names);
-    if (nameidx < TRAPNUM) {
-        /* random but real trap name */
-        return defsyms[trap_to_defsym(nameidx)].explanation;
-    } else {
-        nameidx -= TRAPNUM;
-        return halu_trapnames[nameidx];
-    }
+    return defsyms[trap_to_defsym(ttyp)].explanation;
 }
 
 /*trap.c*/

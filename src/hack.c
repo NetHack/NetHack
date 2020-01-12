@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1576638500 2019/12/18 03:08:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1578690701 2020/01/10 21:11:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -749,8 +749,8 @@ int mode;
             /* Eat the rock. */
             if (mode == DO_MOVE && still_chewing(x, y))
                 return FALSE;
-        } else if (flags.autodig && !g.context.run && !g.context.nopick && uwep
-                   && is_pick(uwep)) {
+        } else if (flags.autodig && !g.context.run && !g.context.nopick
+                   && uwep && is_pick(uwep)) {
             /* MRKR: Automatic digging when wielding the appropriate tool */
             if (mode == DO_MOVE)
                 (void) use_pick_axe2(uwep);
@@ -784,7 +784,8 @@ int mode;
                 if (mode == DO_MOVE)
                     pline("There is an obstacle there.");
                 return FALSE;
-            } else if (tunnels(g.youmonst.data) && !needspick(g.youmonst.data)) {
+            } else if (tunnels(g.youmonst.data)
+                       && !needspick(g.youmonst.data)) {
                 /* Eat the door. */
                 if (mode == DO_MOVE && still_chewing(x, y))
                     return FALSE;
@@ -793,10 +794,10 @@ int mode;
                     if (amorphous(g.youmonst.data))
                         You(
    "try to ooze under the door, but can't squeeze your possessions through.");
-                    if (flags.autoopen && !g.context.run && !Confusion
-                        && !Stunned && !Fumbling) {
-                        g.context.door_opened = g.context.move =
-                            doopen_indir(x, y);
+                    if (flags.autoopen && !g.context.run
+                        && !Confusion && !Stunned && !Fumbling) {
+                        g.context.door_opened
+                            = g.context.move = doopen_indir(x, y);
                     } else if (x == ux || y == uy) {
                         if (Blind || Stunned || ACURR(A_DEX) < 10
                             || Fumbling) {
@@ -807,6 +808,16 @@ int mode;
                                 pline("Ouch!  You bump into a door.");
                                 exercise(A_DEX, FALSE);
                             }
+                            /* use current move; needed for the "ouch" case
+                               but done for steed case too for consistency;
+                               we haven't opened a door but we're going to
+                               return False and without having 'door_opened'
+                               set, 'move' would get reset by caller */
+                            g.context.door_opened
+                                = g.context.move = TRUE;
+                            /* since we've just lied about successfully
+                               moving, we need to manually stop running */
+                            nomul(0);
                         } else
                             pline("That door is closed.");
                     }
@@ -1036,7 +1047,7 @@ int mode;
                         continue;
                     if ((!Passes_walls && !can_ooze(&g.youmonst)
                          && closed_door(x, y)) || sobj_at(BOULDER, x, y)
-                        || test_move(x, y, nx-x, ny-y, TEST_TRAP)) {
+                        || test_move(x, y, nx - x, ny - y, TEST_TRAP)) {
                         /* closed doors and boulders usually
                          * cause a delay, so prefer another path */
                         if (travel[x][y] > radius - 3) {
@@ -2800,8 +2811,8 @@ lookaround()
             pline_The("corridor widens here.");
         goto stop;
     }
-    if ((g.context.run == 1 || g.context.run == 3 || g.context.run == 8) && !noturn
-        && !m0 && i0 && (corrct == 1 || (corrct == 2 && i0 == 1))) {
+    if ((g.context.run == 1 || g.context.run == 3 || g.context.run == 8)
+        && !noturn && !m0 && i0 && (corrct == 1 || (corrct == 2 && i0 == 1))) {
         /* make sure that we do not turn too far */
         if (i0 == 2) {
             if (u.dx == y0 - u.uy && u.dy == u.ux - x0)

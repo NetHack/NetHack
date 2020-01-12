@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1577759853 2019/12/31 02:37:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1578297247 2020/01/06 07:54:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.258 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1729,12 +1729,9 @@ int cindex, ccount; /* index of this container (1..N), number of them (N) */
             pline("Hmmm, %s turns out to be locked.", the(xname(cobj)));
         cobj->lknown = 1;
 
-        if (flags.autounlock
-            && ((unlocktool = carrying(SKELETON_KEY)) != 0
-                || (unlocktool = carrying(LOCK_PICK)) != 0
-                || (unlocktool = carrying(CREDIT_CARD)) != 0)) {
+        if (flags.autounlock && (unlocktool = autokey(TRUE)) != 0) {
             /* pass ox and oy to avoid direction prompt */
-            pick_lock(unlocktool, cobj->ox, cobj->oy, cobj);
+            return (pick_lock(unlocktool, cobj->ox, cobj->oy, cobj) != 0);
         }
         return 0;
     }

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ $NHDT-Date: 1577674533 2019/12/30 02:55:33 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ $NHDT-Date: 1578764038 2020/01/11 17:33:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -27,6 +27,21 @@ fix accessing mons[-1] when monster figures out if a tin cures stoning
 monster wielding Stormbringer or healer's Staff against another monster would
 	heal the hero instead of the wielding monster when draining life
 change twoweapon feedback from "not a weapon" to "not a suitable weapon"
+don't allow twoweapon combat if either weapon is a bow, crossbow, or sling
+drum of earthquake feedback reported various things (fountains, thrones, &c)
+	falling into a chasm but they remained intact because trap creation
+	had been changed to not clobber such things (so couldn't make pits)
+make earthquake which hits a secret door or a secret corridor reveal it
+wizard mode wishing for "Amulet of Yendor" had 50:50 chance for true Amulet
+	or a cheap plastic imitation; recognize "real Amulet of Yendor" and
+	"fake Amulet of Yendor" to precisely specify either of them but also
+	take away the 50% chance of yielding a fake one when neither real nor
+	fake is specified
+unpaid globs showed weight info unconditionally outside of wizmode
+walking out of tethered-to-buried-object trap condition was supposed to
+	reinstate punishment but wasn't finding the buried iron ball because
+	the trap condition was cleared first to indicate escape; result was
+	attached chain that got dragged around but had no ball attached
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -39,6 +54,21 @@ after 'w' on split stack patch, wielding '-' would cause an object_lost panic
 same patch allowed partial stack from getobj to replace cursed wielded weapon
 if the orc-town version of mine town has been loaded, creation of orc zombies
 	or orc mummies would name them as part of the town raiding orc clan
+autounlock of door or chest took no time; chest case depended on whether
+	anything got looted along with the unlocking
+autounlock with artifact unlocking tool didn't do touch check on that tool
+autounlock picked Rogue's artifact key over lock-pick or credit card (or
+	ordinary key depending upon invent order) even for non-rogues who
+	would be blasted when touching it
+wielded aklys had its "(tethered weapon...)" description scrambled
+randomized trap name could pick trap #0 which isn't a trap and yielded "water"
+if running and Blind or Stunned or Fumbling or Dex < 10, encountering a closed
+	door orthogonally would keep reporting "ouch! you bump into a door"
+	repeatedly until eventually interrupted by approaching monster or
+	hunger or ^C
+data.base lookup of an entry with any blank lines would falsely claim that
+	"'data' file in wrong fromat or corrupted" after some extra checks
+	were added while investigating tab handling anomalies
 
 
 Platform- and/or Interface-Specific Fixes
@@ -67,6 +97,13 @@ add 'quick_farsight' option to provide some control over random clairvoyance
 	where pausing to be able to browse temporarily visible aspects of the
 	revealed map can seem intrusive; doesn't affect clairvoyance spell
 replace "money" in in-game texts with "gold"
+when hallucinating, see hallucinated currencies instead of bits for an ale
+when hallucinating, see hallucinated liquids when looking at water or lava
+	on the map
+applying a spellbook hints about read charges left
+wizard mode wishing for level topology can now create hidden doors (ask for
+	"secret door" when at a door or wall location) and hidden corridor
+	spots ("secret corridor" at a corridor location)
 
 
 Platform- and/or Interface-Specific New Features
@@ -77,6 +114,26 @@ NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 hallucinatory trap names from github pull request #174
 autounlock feature originally from unnethack in github pull request #228
+applying a candelabrum with no candles gives a tip (github #265)
+candelabrum now reads "(n of 7 candles attached)" (github #265)
+replace "You feel cold" message for freezing unseen door (github #265)
+applying a candelabrum with no candles gives a tip (github #265)
+candelabrum now reads "(n of 7 candles attached)" (github #265)
+show appropriate message on throne when crowned (github #265)
+choir chanting, bathing in darkness for death by Moloch (github #265)
+remove "iron hook" unidentified description (github #265)
+suppress "Unknown command" messages in the dumplog. (github #265)
+give player message informing them they can use #enhance (github #265)
+neutral sacrifices disappear in a cloud of smoke (github #265)
+call potion bottles by nonsensical names if hallucinating (github #265)
+add a default message for chatting to gnomes (github #265)
+better reporting directions for impossible() (github #265)
+underwater fire scroll causes vaporization (github #265)
+default shk sell prompt to N (github #265)
+teach non-mindless monsters about the Castle trapdoors (github #265)
+always print a message when the hero teleports (github #265)
+always print a message when the hero level teleports (github #265)
+remove Sokoban luck penalties for actions you can't cheat with (github #260)
 
 
 Code Cleanup and Reorganization
@@ -89,3 +146,7 @@ more current Qt for Qt version 4 and 5 moved from win/Qt4 to win/Qt; qt4
 	moniker changed to qt_
 window-port-interface: add_menu() modified to take a more general itemflags
 	parameter to support uses beyond just 'preselected'
+add some bounds checking to tabexpand (doesn't prevent the apparent compiler
+	optimization bug that put homebrew OSX executable into endless loop)
+
+
