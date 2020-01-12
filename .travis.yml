@@ -11,9 +11,13 @@ matrix:
       compiler: gcc
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
     - os: linux
-      env: DESCR=linux-eoan-clang HINTS=linux
+      env: DESCR=linux-eoan-clang-9 HINTS=linux CC=clang-9
       dist: eoan
       compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-9
       script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
     - os: linux
       env: DESCR=linux-xenial-clang HINTS=linux
