@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ $NHDT-Date: 1578855619 2020/01/12 19:00:19 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $ $NHDT-Date: 1578896120 2020/01/13 06:15:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -109,7 +109,7 @@ wizard mode wishing for level topology can now create hidden doors (ask for
 tiny chance for randomly created spellbooks to be Discworld novels instead
 	of having only one in the first book or scroll shop created (won't
 	occur in hero's initial inventory or NPC priest inventory or be
-	bestowed as a prayer boon; might occur inside statues)
+	bestowed as a prayer boon or be found in statues)
 
 
 Platform- and/or Interface-Specific New Features
