@@ -7,6 +7,8 @@ focus will shift to the next major release.
 
 General Fixes and Modified Features
 -----------------------------------
+have string_for_opt() return empty_optstr on failure
+ensure existing callers of string_for_opt() check the return value before using it
 
 
 Fixes to Post-3.6.4 Problems that Were Exposed Via git Repository
@@ -15,6 +17,7 @@ Fixes to Post-3.6.4 Problems that Were Exposed Via git Repository
 
 Platform- and/or Interface-Specific Fixes or Features
 -----------------------------------------------------
+Windows OPTIONS=map_mode:fit_to_screen could cause a game start failure
 
 
 General New Features
