@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1575245194 2019/12/02 00:06:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.227 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1578947635 2020/01/13 20:33:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -582,8 +582,7 @@ tty_player_selection()
                     role_menu_extra(RS_RACE, win, FALSE);
                     role_menu_extra(RS_GENDER, win, FALSE);
                     role_menu_extra(RS_ALGNMNT, win, FALSE);
-                    if (gotrolefilter())
-                        role_menu_extra(RS_filter, win, FALSE);
+                    role_menu_extra(RS_filter, win, FALSE);
                     role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                     Strcpy(pbuf, "Pick a role or profession");
                     end_menu(win, pbuf);
@@ -681,8 +680,7 @@ tty_player_selection()
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_GENDER, win, FALSE);
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
-                        if (gotrolefilter())
-                            role_menu_extra(RS_filter, win, FALSE);
+                        role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                         Strcpy(pbuf, "Pick a race or species");
                         end_menu(win, pbuf);
@@ -774,8 +772,7 @@ tty_player_selection()
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_RACE, win, FALSE);
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
-                        if (gotrolefilter())
-                            role_menu_extra(RS_filter, win, FALSE);
+                        role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                         Strcpy(pbuf, "Pick a gender or sex");
                         end_menu(win, pbuf);
@@ -863,8 +860,7 @@ tty_player_selection()
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_RACE, win, FALSE);
                         role_menu_extra(RS_GENDER, win, FALSE);
-                        if (gotrolefilter())
-                            role_menu_extra(RS_filter, win, FALSE);
+                        role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                         Strcpy(pbuf, "Pick an alignment or creed");
                         end_menu(win, pbuf);
@@ -1032,6 +1028,7 @@ reset_role_filtering()
     winid win;
     anything any;
     int i, n;
+    char filterprompt[QBUFSZ];
     menu_item *selected = 0;
 
     win = create_nhwindow(NHW_MENU);
@@ -1058,10 +1055,12 @@ reset_role_filtering()
              "Unacceptable alignments", MENU_ITEMFLAGS_NONE);
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    end_menu(win, "Pick all that apply");
+    Sprintf(filterprompt, "Pick all that apply%s",
+            gotrolefilter() ? " and/or unpick any that no longer apply" : "");
+    end_menu(win, filterprompt);
     n = select_menu(win, PICK_ANY, &selected);
 
-    if (n > 0) {
+    if (n >= 0) { /* n==0: clear current filters and don't set new ones */
         clearrolefilter();
         for (i = 0; i < n; i++)
             setrolefilter(selected[i].item.a_string);
@@ -1093,7 +1092,11 @@ int race, gend, algn; /* all ROLE_NONE for !filtering case */
 
     any = cg.zeroany; /* zero out all bits */
     for (i = 0; roles[i].name.m; i++) {
-        role_ok = ok_role(i, race, gend, algn);
+        /* role can be constrained by any of race, gender, or alignment */
+        role_ok = (ok_role(i, race, gend, algn)
+                   && ok_race(i, race, gend, algn)
+                   && ok_gend(i, race, gend, algn)
+                   && ok_align(i, race, gend, algn));
         if (filtering && !role_ok)
             continue;
         if (filtering)
@@ -1137,7 +1140,10 @@ int role, gend, algn;
 
     any = cg.zeroany;
     for (i = 0; races[i].noun; i++) {
-        race_ok = ok_race(role, i, gend, algn);
+        /* no ok_gend(); race isn't constrained by gender */
+        race_ok = (ok_race(role, i, gend, algn)
+                   && ok_role(role, i, gend, algn)
+                   && ok_align(role, i, gend, algn));
         if (filtering && !race_ok)
             continue;
         if (filtering)
@@ -1171,7 +1177,10 @@ int role, race, algn;
 
     any = cg.zeroany;
     for (i = 0; i < ROLE_GENDERS; i++) {
-        gend_ok = ok_gend(role, race, i, algn);
+        /* no ok_align(); gender isn't constrained by alignment */
+        gend_ok = (ok_gend(role, race, i, algn)
+                   && ok_role(role, race, i, algn)
+                   && ok_race(role, race, i, algn));
         if (filtering && !gend_ok)
             continue;
         if (filtering)
@@ -1203,7 +1212,10 @@ int role, race, gend;
 
     any = cg.zeroany;
     for (i = 0; i < ROLE_ALIGNS; i++) {
-        algn_ok = ok_align(role, race, gend, i);
+        /* no ok_gend(); alignment isn't constrained by gender */
+        algn_ok = (ok_align(role, race, gend, i)
+                   && ok_role(role, race, gend, i)
+                   && ok_race(role, race, gend, i));
         if (filtering && !algn_ok)
             continue;
         if (filtering)

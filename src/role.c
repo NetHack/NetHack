@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1574648943 2019/11/25 02:29:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1578947634 2020/01/13 20:33:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1047,8 +1047,8 @@ int racenum, gendnum, alignnum, pickhow;
                        gendnum, alignnum)
             && ok_gend(i, racenum,
                        (gendnum >= 0) ? gendnum : ROLE_RANDOM, alignnum)
-            && ok_race(i, racenum,
-                       gendnum, (alignnum >= 0) ? alignnum : ROLE_RANDOM))
+            && ok_align(i, racenum,
+                        gendnum, (alignnum >= 0) ? alignnum : ROLE_RANDOM))
             set[roles_ok++] = i;
     }
     if (roles_ok == 0 || (roles_ok > 1 && pickhow == PICK_RIGID))
@@ -1221,7 +1221,7 @@ int alignnum;
         /* random; check whether any selection is possible */
         for (i = 0; i < ROLE_ALIGNS; i++) {
             if (g.rfilter.mask & aligns[i].allow)
-                return FALSE;
+                continue;
             allow = aligns[i].allow;
             if (rolenum >= 0 && rolenum < SIZE(roles) - 1
                 && !(allow & roles[rolenum].allow & ROLE_ALIGNMASK))
@@ -1909,9 +1909,13 @@ boolean preselect;
         add_menu(where, NO_GLYPH, &any, RS_menu_let[which], 0, ATR_NONE, buf,
                  MENU_ITEMFLAGS_NONE);
     } else if (which == RS_filter) {
+        char setfiltering[40];
+
         any.a_int = RS_menu_arg(RS_filter);
+        Sprintf(setfiltering, "%s role/race/&c filtering",
+                gotrolefilter() ? "Reset" : "Set");
         add_menu(where, NO_GLYPH, &any, '~', 0, ATR_NONE,
-                 "Reset role/race/&c filtering", MENU_ITEMFLAGS_NONE);
+                 setfiltering, MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_RANDOM) {
         any.a_int = ROLE_RANDOM;
         add_menu(where, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",

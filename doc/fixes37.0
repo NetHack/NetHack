@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $ $NHDT-Date: 1578896120 2020/01/13 06:15:20 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.66 $ $NHDT-Date: 1578947634 2020/01/13 20:33:54 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -44,6 +44,7 @@ walking out of tethered-to-buried-object trap condition was supposed to
 	attached chain that got dragged around but had no ball attached
 when poly'd into a giant and moving onto a boulder's spot, message given was
 	confused about whether autopickup would occur so could be misleading
+random role selection wasn't honoring unwanted alignment(s) properly
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -75,6 +76,8 @@ data.base lookup of an entry with any blank lines would falsely claim that
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+tty: role and race selection menus weren't filtering out potential choices
+	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
 
 
 General New Features
