@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1575245078 2019/12/02 00:04:38 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.391 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1578971391 2020/01/14 03:09:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.394 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -42,7 +42,7 @@ enum window_option_types {
 
 #define PILE_LIMIT_DFLT 5
 
-static char empty_optstr[] = {0};
+static char empty_optstr[] = { '\0' };
 
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
@@ -2514,7 +2514,8 @@ boolean tinitial, tfrom_file;
             config_error_add("Unknown %s parameter '%s'", fullname, opts);
             return FALSE;
         }
-        if (opttype > 0 && (op = string_for_opt(opts, FALSE)) != empty_optstr) {
+        if (opttype > 0
+            && (op = string_for_opt(opts, FALSE)) != empty_optstr) {
             wc_set_font_name(opttype, op);
 #ifdef MAC
             set_font_name(opttype, op);
@@ -2614,7 +2615,6 @@ boolean tinitial, tfrom_file;
 
     if (match_optname(opts, "fruit", 2, TRUE)) {
         struct fruit *forig = 0;
-        char empty_str = '\0';
 
         if (duplicate)
             complain_about_duplicate(opts, 1);
@@ -2629,7 +2629,7 @@ boolean tinitial, tfrom_file;
         }
         if (op == empty_optstr)
             return FALSE;
-        /* stripped leading and trailing spaces, condensed internal ones in 3.6.2 */
+        /* strip leading/trailing spaces, condense internal ones (3.6.2) */
         mungspaces(op);
         if (!initial) {
             struct fruit *f;
@@ -3088,7 +3088,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr))
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr))
             flags.pile_limit = negated ? 0 : atoi(op);
         else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3187,7 +3188,8 @@ boolean tinitial, tfrom_file;
         }
         /* "disclose" without a value means "all with prompting"
            and negated means "none without prompting" */
-        if (op == empty_optstr || !strcmpi(op, "all") || !strcmpi(op, "none")) {
+        if (op == empty_optstr
+            || !strcmpi(op, "all") || !strcmpi(op, "none")) {
             if (op != empty_optstr && !strcmpi(op, "none"))
                 negated = TRUE;
             for (num = 0; num < NUM_DISCLOSURE_OPTIONS; num++)
@@ -3473,7 +3475,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_scroll_amount = negated ? 1 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3489,7 +3492,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_scroll_margin = negated ? 5 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3524,7 +3528,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_tile_width = negated ? 0 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3553,7 +3558,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_tile_height = negated ? 0 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3569,7 +3575,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_vary_msgcount = negated ? 0 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3670,7 +3677,7 @@ boolean tinitial, tfrom_file;
                 bad_negation(fullname, FALSE);
                 retval = FALSE;
 
-            /* this just checks atol() sanity, not logical window size sanity */
+            /* just checks atol() sanity, not logical window size sanity */
             } else if (ltmp <= 0L || ltmp >= (long) LARGEST_INT) {
                 config_error_add("Invalid %s: %ld", fullname, ltmp);
                 retval = FALSE;
