@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1577050473 2019/12/22 21:34:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.422 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1578996303 2020/01/14 10:05:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.396 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -42,7 +42,7 @@ enum window_option_types {
 
 #define PILE_LIMIT_DFLT 5
 
-static char empty_optstr[] = {0};
+static char empty_optstr[] = { '\0' };
 
 /*
  *  NOTE:  If you add (or delete) an option, please update the short
@@ -929,8 +929,8 @@ int maxlen;
  */
 static void
 escapes(cp, tp)
-const char *cp;
-char *tp;
+const char *cp; /* might be 'tp', updating in place */
+char *tp; /* result is never longer than 'cp' */
 {
     static NEARDATA const char oct[] = "01234567", dec[] = "0123456789",
                                hex[] = "00112233445566778899aAbBcCdDeEfF";
@@ -1808,15 +1808,16 @@ int c, a;
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
 boolean
 add_menu_coloring(tmpstr)
-char *tmpstr;
+char *tmpstr; /* never Null but could be empty */
 {
     int c = NO_COLOR, a = ATR_NONE;
     char *tmps, *cs, *amp;
     char str[BUFSZ];
 
-    Sprintf(str, "%s", tmpstr);
+    (void) strncpy(str, tmpstr, sizeof str - 1);
+    str[sizeof str - 1] = '\0';
 
-    if (!tmpstr || (cs = index(str, '=')) == 0) {
+    if ((cs = index(str, '=')) == 0) {
         config_error_add("Malformed MENUCOLOR");
         return FALSE;
     }
@@ -2507,7 +2508,8 @@ boolean tinitial, tfrom_file;
             config_error_add("Unknown %s parameter '%s'", fullname, opts);
             return FALSE;
         }
-        if (opttype > 0 && (op = string_for_opt(opts, FALSE)) != empty_optstr) {
+        if (opttype > 0
+            && (op = string_for_opt(opts, FALSE)) != empty_optstr) {
             wc_set_font_name(opttype, op);
 #ifdef MAC
             set_font_name(opttype, op);
@@ -2607,7 +2609,6 @@ boolean tinitial, tfrom_file;
 
     if (match_optname(opts, "fruit", 2, TRUE)) {
         struct fruit *forig = 0;
-        char empty_str = '\0';
 
         if (duplicate)
             complain_about_duplicate(opts, 1);
@@ -2622,7 +2623,7 @@ boolean tinitial, tfrom_file;
         }
         if (op == empty_optstr)
             return FALSE;
-        /* stripped leading and trailing spaces, condensed internal ones in 3.6.2 */
+        /* strip leading/trailing spaces, condense internal ones (3.6.2) */
         mungspaces(op);
         if (!g.opt_initial) {
             struct fruit *f;
@@ -3081,7 +3082,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr))
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr))
             flags.pile_limit = negated ? 0 : atoi(op);
         else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3180,7 +3182,8 @@ boolean tinitial, tfrom_file;
         }
         /* "disclose" without a value means "all with prompting"
            and negated means "none without prompting" */
-        if (op == empty_optstr || !strcmpi(op, "all") || !strcmpi(op, "none")) {
+        if (op == empty_optstr
+            || !strcmpi(op, "all") || !strcmpi(op, "none")) {
             if (op != empty_optstr && !strcmpi(op, "none"))
                 negated = TRUE;
             for (num = 0; num < NUM_DISCLOSURE_OPTIONS; num++)
@@ -3453,7 +3456,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_scroll_amount = negated ? 1 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3469,7 +3473,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_scroll_margin = negated ? 5 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3504,7 +3509,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_tile_width = negated ? 0 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3533,7 +3539,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_tile_height = negated ? 0 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3549,7 +3556,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
-        if ((negated && op == empty_optstr) || (!negated && op != empty_optstr)) {
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr)) {
             iflags.wc_vary_msgcount = negated ? 0 : atoi(op);
         } else if (negated) {
             bad_negation(fullname, TRUE);
@@ -3650,7 +3658,7 @@ boolean tinitial, tfrom_file;
                 bad_negation(fullname, FALSE);
                 retval = FALSE;
 
-            /* this just checks atol() sanity, not logical window size sanity */
+            /* just checks atol() sanity, not logical window size sanity */
             } else if (ltmp <= 0L || ltmp >= (long) LARGEST_INT) {
                 config_error_add("Invalid %s: %ld", fullname, ltmp);
                 retval = FALSE;
@@ -6132,9 +6140,9 @@ char *buf;
 
 int
 sym_val(strval)
-const char *strval;
+const char *strval; /* up to 4*BUFSZ-1 long; only first few chars matter */
 {
-    char buf[QBUFSZ];
+    char buf[QBUFSZ], tmp[QBUFSZ]; /* to hold trucated copy of 'strval' */
 
     buf[0] = '\0';
     if (!strval[0] || !strval[1]) { /* empty, or single character */
@@ -6155,7 +6163,7 @@ const char *strval;
         /* not simple quote or basic backslash;
            strip closing quote and let escapes() deal with it */
         } else {
-            char *p, tmp[QBUFSZ];
+            char *p;
 
             (void) strncpy(tmp, strval + 1, sizeof tmp - 1);
             tmp[sizeof tmp - 1] = '\0';
@@ -6164,8 +6172,11 @@ const char *strval;
                 escapes(tmp, buf);
             } /* else buf[0] stays '\0' */
         }
-    } else /* not lone char nor single quote */
-        escapes(strval, buf);
+    } else { /* not lone char nor single quote */
+        (void) strncpy(tmp, strval + 1, sizeof tmp - 1);
+        tmp[sizeof tmp - 1] = '\0';
+        escapes(tmp, buf);
+    }
 
     return (int) *buf;
 }
