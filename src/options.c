@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1578972408 2020/01/14 03:26:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.395 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1578996303 2020/01/14 10:05:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.396 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -952,8 +952,8 @@ int maxlen;
  */
 STATIC_OVL void
 escapes(cp, tp)
-const char *cp;
-char *tp;
+const char *cp; /* might be 'tp', updating in place */
+char *tp; /* result is never longer than 'cp' */
 {
     static NEARDATA const char oct[] = "01234567", dec[] = "0123456789",
                                hex[] = "00112233445566778899aAbBcCdDeEfF";
@@ -6177,9 +6177,9 @@ char *buf;
 
 int
 sym_val(strval)
-const char *strval;
+const char *strval; /* up to 4*BUFSZ-1 long; only first few chars matter */
 {
-    char buf[QBUFSZ];
+    char buf[QBUFSZ], tmp[QBUFSZ]; /* to hold trucated copy of 'strval' */
 
     buf[0] = '\0';
     if (!strval[0] || !strval[1]) { /* empty, or single character */
@@ -6200,7 +6200,7 @@ const char *strval;
         /* not simple quote or basic backslash;
            strip closing quote and let escapes() deal with it */
         } else {
-            char *p, tmp[QBUFSZ];
+            char *p;
 
             (void) strncpy(tmp, strval + 1, sizeof tmp - 1);
             tmp[sizeof tmp - 1] = '\0';
@@ -6209,8 +6209,11 @@ const char *strval;
                 escapes(tmp, buf);
             } /* else buf[0] stays '\0' */
         }
-    } else /* not lone char nor single quote */
-        escapes(strval, buf);
+    } else { /* not lone char nor single quote */
+        (void) strncpy(tmp, strval + 1, sizeof tmp - 1);
+        tmp[sizeof tmp - 1] = '\0';
+        escapes(tmp, buf);
+    }
 
     return (int) *buf;
 }
