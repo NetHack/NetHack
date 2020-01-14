@@ -6202,6 +6202,7 @@ const char *strval; /* up to 4*BUFSZ-1 long; only first few chars matter */
         } else {
             char *p;
 
+            /* +1: skip opening single quote */
             (void) strncpy(tmp, strval + 1, sizeof tmp - 1);
             tmp[sizeof tmp - 1] = '\0';
             if ((p = rindex(tmp, '\'')) != 0) {
@@ -6210,7 +6211,7 @@ const char *strval; /* up to 4*BUFSZ-1 long; only first few chars matter */
             } /* else buf[0] stays '\0' */
         }
     } else { /* not lone char nor single quote */
-        (void) strncpy(tmp, strval + 1, sizeof tmp - 1);
+        (void) strncpy(tmp, strval, sizeof tmp - 1);
         tmp[sizeof tmp - 1] = '\0';
         escapes(tmp, buf);
     }
