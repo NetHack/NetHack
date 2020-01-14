@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1578971391 2020/01/14 03:09:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.394 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1578972408 2020/01/14 03:26:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.395 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1833,15 +1833,16 @@ int c, a;
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
 boolean
 add_menu_coloring(tmpstr)
-char *tmpstr;
+char *tmpstr; /* never Null but could be empty */
 {
     int c = NO_COLOR, a = ATR_NONE;
     char *tmps, *cs, *amp;
     char str[BUFSZ];
 
-    Sprintf(str, "%s", tmpstr);
+    (void) strncpy(str, tmpstr, sizeof str - 1);
+    str[sizeof str - 1] = '\0';
 
-    if (!tmpstr || (cs = index(str, '=')) == 0) {
+    if ((cs = index(str, '=')) == 0) {
         config_error_add("Malformed MENUCOLOR");
         return FALSE;
     }
