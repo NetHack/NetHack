@@ -6,6 +6,10 @@
 #define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers */
 #include "hack.h"
 
+#define BIGBUFSZ (5 * BUFSZ) /* big enough to format a 4*BUFSZ string (from
+                              * config file parsing) with modest decoration;
+                              * result will then be truncated to BUFSZ-1 */
+
 static unsigned pline_flags = 0;
 static char prevmsg[BUFSZ];
 
@@ -118,7 +122,7 @@ VA_DECL(const char *, line)
 #endif /* USE_STDARG | USE_VARARG */
 {       /* start of vpline() or of nested block in USE_OLDARG's pline() */
     static int in_pline = 0;
-    char pbuf[3 * BUFSZ];
+    char pbuf[BIGBUFSZ]; /* will get chopped down to BUFSZ-1 if longer */
     int ln;
     int msgtyp;
     boolean no_repeat;
@@ -443,15 +447,14 @@ void raw_printf
 VA_DECL(const char *, line)
 #endif
 {
-    char pbuf[3 * BUFSZ];
-    int ln;
+    char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
     /* Do NOT use VA_START and VA_END in here... see above */
 
     if (index(line, '%')) {
         Vsprintf(pbuf, line, VA_ARGS);
         line = pbuf;
     }
-    if ((ln = (int) strlen(line)) > BUFSZ - 1) {
+    if ((int) strlen(line) > BUFSZ - 1) {
         if (line != pbuf)
             line = strncpy(pbuf, line, BUFSZ - 1);
         /* unlike pline, we don't futz around to keep last few chars */
@@ -470,7 +473,7 @@ VA_DECL(const char *, line)
 void impossible
 VA_DECL(const char *, s)
 {
-    char pbuf[2 * BUFSZ];
+    char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
     VA_START(s);
     VA_INIT(s, const char *);
@@ -571,7 +574,7 @@ config_error_add
 VA_DECL(const char *, str)
 #endif /* ?(USE_STDARG || USE_VARARG) */
 {       /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
-    char buf[2 * BUFSZ];
+    char buf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
     Vsprintf(buf, str, VA_ARGS);
     buf[BUFSZ - 1] = '\0';
