@@ -1,4 +1,4 @@
-NETHACK(6)                                                          NETHACK(6)
+NETHACK(6)                       Games Manual                       NETHACK(6)
 
 
 
@@ -7,112 +7,123 @@ NAME
 
 SYNOPSIS
        nethack [ -d directory ] [ -n ] [ -p profession ] [ -r race ] [ -[DX] ]
-       [ -u playername ] [ -dec ] [ -ibm ] [ --version[:paste] ]
+       [ -u playername ] [ -dec ] [ -ibm ] [ --showpaths ] [ --version[:paste]
+       ]
 
        nethack [ -d directory ] -s [ -v ] [ -p profession ] [ -r race ] [
        playernames ]
 
 DESCRIPTION
-       NetHack  is a display oriented Dungeons & Dragons(tm) - like game.  The
+       NetHack is a display oriented Dungeons & Dragons(tm) - like game.   The
        standard tty display and command structure resemble rogue.
 
        Other, more graphical display options exist for most platforms.
 
-       To get started you really only need to know two commands.  The  command
-       ?   will  give  you  a list of the available commands (as well as other
-       information) and the command / will identify the things you see on  the
+       To  get started you really only need to know two commands.  The command
+       ?  will give you a list of the available commands  (as  well  as  other
+       information)  and the command / will identify the things you see on the
        screen.
 
-       To  win  the  game (as opposed to merely playing to beat other people's
-       high scores) you must locate the Amulet of Yendor  which  is  somewhere
+       To win the game (as opposed to merely playing to  beat  other  people's
+       high  scores)  you  must locate the Amulet of Yendor which is somewhere
        below the 20th level of the dungeon and get it out.  Few people achieve
        this; most never do.  Those who have go down in history as heroes among
-       heroes  -  and then they find ways of making the game even harder.  See
-       the Guidebook section on Conduct if this game has gotten too  easy  for
+       heroes - and then they find ways of making the game even  harder.   See
+       the  Guidebook  section on Conduct if this game has gotten too easy for
        you.
 
-       When  the  game ends, whether by your dying, quitting, or escaping from
-       the caves, NetHack will give you (a fragment of) the list of top  scor-
-       ers.   The  scoring  is  based  on many aspects of your behavior, but a
+       When the game ends, whether by your dying, quitting, or  escaping  from
+       the  caves, NetHack will give you (a fragment of) the list of top scor-
+       ers.  The scoring is based on many aspects  of  your  behavior,  but  a
        rough estimate is obtained by taking the amount of gold you've found in
-       the  cave  plus four times your (real) experience.  Precious stones may
-       be worth a lot of gold when brought  to  the  exit.   There  is  a  10%
+       the cave plus four times your (real) experience.  Precious  stones  may
+       be  worth  a  lot  of  gold  when  brought to the exit.  There is a 10%
        penalty for getting yourself killed.
 
-       The  environment variable NETHACKOPTIONS can be used to initialize many
-       run-time options.  The  ?  command  provides  a  description  of  these
+       The environment variable NETHACKOPTIONS can be used to initialize  many
+       run-time  options.   The  ?  command  provides  a  description of these
        options and syntax.  (The -dec and -ibm command line options are equiv-
-       alent to the decgraphics and  ibmgraphics  run-time  options  described
-       there,  and  are  provided purely for convenience on systems supporting
+       alent  to  the  decgraphics  and ibmgraphics run-time options described
+       there, and are provided purely for convenience  on  systems  supporting
        multiple types of terminals.)
 
-       Because the option list can be very long (particularly when  specifying
-       graphics  characters),  options may also be included in a configuration
-       file.  The  default  is  located  in  your  home  directory  and  named
-       .nethackrc  on Unix systems.  On other systems, the default may be dif-
-       ferent,  usually  NetHack.cnf.   On  DOS  or  Windows,  the   name   is
-       defaults.nh,  while  on  the Macintosh or BeOS, it is NetHack Defaults.
-       The configuration file's location may be specified by setting  NETHACK-
-       OPTIONS  to a string consisting of an @ character followed by the file-
+       Because  the option list can be very long (particularly when specifying
+       graphics characters), options may also be included in  a  configuration
+       file.   The  default  is  located  in  your  home  directory  and named
+       .nethackrc on Unix systems.  On other systems, the default may be  dif-
+       ferent,   usually   NetHack.cnf.   On  DOS  or  Windows,  the  name  is
+       defaults.nh, while on the Macintosh or BeOS, it  is  NetHack  Defaults.
+       The  configuration file's location may be specified by setting NETHACK-
+       OPTIONS to a string consisting of an @ character followed by the  file-
        name.
 
-       The -u playername option supplies the answer to the question  "Who  are
-       you?".   It  overrides any name from the options or configuration file,
-       USER, LOGNAME, or getlogin(), which will otherwise be tried  in  order.
-       If  none  of these provides a useful name, the player will be asked for
+       The  -u  playername option supplies the answer to the question "Who are
+       you?".  It overrides any name from the options or  configuration  file,
+       USER,  LOGNAME,  or getlogin(), which will otherwise be tried in order.
+       If none of these provides a useful name, the player will be  asked  for
        one.  Player names (in conjunction with uids) are used to identify save
        files, so you can have several saved games under different names.  Con-
-       versely, you must use the appropriate player name to  restore  a  saved
+       versely,  you  must  use the appropriate player name to restore a saved
        game.
 
        A playername suffix can be used to specify the profession, race, align-
        ment and/or gender of the character.  The full syntax of the playername
-       that  includes  a suffix is "name-ppp-rrr-aaa-ggg".  "ppp" are at least
-       the first three letters of the profession (this can also  be  specified
-       using  a  separate -p profession option).  "rrr" are at least the first
+       that includes a suffix is "name-ppp-rrr-aaa-ggg".  "ppp" are  at  least
+       the  first  three letters of the profession (this can also be specified
+       using a separate -p profession option).  "rrr" are at least  the  first
        three letters of the character's race (this can also be specified using
-       a  separate -r race option).  "aaa" are at last the first three letters
-       of the character's alignment, and "ggg" are at least  the  first  three
-       letters  of the character's gender.  Any of the parts of the suffix may
+       a separate -r race option).  "aaa" are at least the first three letters
+       of  the  character's  alignment, and "ggg" are at least the first three
+       letters of the character's gender.  Any of the parts of the suffix  may
        be left out.
 
-       -p profession can be used to determine the character  profession,  also
-       known  as the role.  You can specify either the male or female name for
-       the character role, or the first three characters of  the  role  as  an
+       -p  profession  can be used to determine the character profession, also
+       known as the role.  You can specify either the male or female name  for
+       the  character  role,  or  the first three characters of the role as an
        abbreviation.  -p @ has been retained to explicitly request that a ran-
-       dom role be chosen.  It may need to be quoted with a backslash (\@)  if
-       @  is  the  "kill" character (see "stty") for the terminal, in order to
+       dom  role be chosen.  It may need to be quoted with a backslash (\@) if
+       @ is the "kill" character (see "stty") for the terminal,  in  order  to
        prevent the current input line from being cleared.
 
        Likewise, -r race can be used to explicitly request that a race be cho-
        sen.
 
-       Leaving  out  any  of  these  characteristics  will result in you being
+       Leaving out any of these  characteristics  will  result  in  you  being
        prompted during the game startup for the information.
 
-
-       The -s option alone will print out the list of your scores on the  cur-
-       rent  version.   An  immediately  following  -v reports on all versions
+       The  -s option alone will print out the list of your scores on the cur-
+       rent version.  An immediately following  -v  reports  on  all  versions
        present in the score file.  The -s may also be followed by arguments -p
-       and  -r to print the scores of particular roles and races only.  It may
+       and -r to print the scores of particular roles and races only.  It  may
        also be followed by one or more player names to print the scores of the
-       players  mentioned, by 'all' to print out all scores, or by a number to
+       players mentioned, by 'all' to print out all scores, or by a number  to
        print that many top scores.
 
        The -n option suppresses printing of any news from the game administra-
        tor.
 
-       The  -D  or -X option will start the game in a special non-scoring dis-
-       covery mode.  -D will, if the player is the game  administrator,  start
+       The -D or -X option will start the game in a special  non-scoring  dis-
+       covery  mode.   -D will, if the player is the game administrator, start
        in debugging (wizard) mode instead.
 
        The -d option, which must be the first argument if it appears, supplies
-       a directory which is to serve as  the  playground.   It  overrides  the
-       value  from NETHACKDIR, HACKDIR, or the directory specified by the game
-       administrator during compilation  (usually  /usr/games/lib/nethackdir).
-       This  option  is  usually  only  useful to the game administrator.  The
+       a  directory  which  is  to  serve as the playground.  It overrides the
+       value from NETHACKDIR, HACKDIR, or the directory specified by the  game
+       administrator  during  compilation (usually /usr/games/lib/nethackdir).
+       This option is usually only useful  to  the  game  administrator.   The
        playground must contain several auxiliary files such as help files, the
        list of top scorers, and a subdirectory save where games are saved.
+
+       --showpaths can be used to cause NetHack to show where it is  expecting
+       to find various configuration files.
+
+       --version  can be used to cause NetHack to show the version information
+       it was compiled with, then exit. That will include the git commit  hash
+       if  the  information was available when the game was compiled.  On some
+       platforms, such as windows and macosx, a variation --version:paste  can
+       be  used  to  cause NetHack to show the version information, then exit,
+       while also leaving a copy of the version information in the paste  buf-
+       fer or clipboard for potential insertion into things like bug reports.
 
 AUTHORS
        Jay  Fenlason  (+  Kenny  Woodland, Mike Thome and Jon Payne) wrote the
@@ -212,10 +223,13 @@ SEE ALSO
 BUGS
        Probably infinite.
 
-
+COPYRIGHT
+       This file is Copyright (C) Robert Patrick Rankin and was last  modified
+       2019/09/15  (version  NetHack-3.6:1.16).   NetHack may be freely redis-
+       tributed.  See license for details.
 
        Dungeons & Dragons is a Trademark of Wizards of the Coast, Inc.
 
 
 
-                                7 December 2015                     NETHACK(6)
+NETHACK                         2 February 2018                     NETHACK(6)
