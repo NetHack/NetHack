@@ -310,7 +310,7 @@ NEARDATA struct permonst mons_init[] = {
           NO_ATTK),
         SIZ(10, 10, MS_SILENT, MZ_SMALL), 0, 0,
         M1_FLY | M1_AMPHIBIOUS | M1_NOLIMBS | M1_NOHEAD | M1_NOTAKE,
-        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, 3, CLR_BLUE),
+        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, 3, CLR_CYAN),
     MON("freezing sphere", S_EYE, LVL(6, 13, 4, 0, 0),
         (G_NOCORPSE | G_NOHELL | G_GENO | 2),
         A(ATTK(AT_EXPL, AD_COLD, 4, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
