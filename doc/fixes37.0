@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.66 $ $NHDT-Date: 1578947634 2020/01/13 20:33:54 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.68 $ $NHDT-Date: 1579257808 2020/01/17 10:43:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -45,6 +45,7 @@ walking out of tethered-to-buried-object trap condition was supposed to
 when poly'd into a giant and moving onto a boulder's spot, message given was
 	confused about whether autopickup would occur so could be misleading
 random role selection wasn't honoring unwanted alignment(s) properly
+if at the edge of the map window, trying to move farther fails but used a turn
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

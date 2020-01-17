@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1578916008 2020/01/13 11:46:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.243 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1579257808 2020/01/17 10:43:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1511,6 +1511,7 @@ domove_core()
                     directionname(xytod(dx, dy)));
             }
             nomul(0);
+            g.context.move = 0;
             return;
         }
         if (((trap = t_at(x, y)) && trap->tseen)
