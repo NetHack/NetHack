@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1577050470 2019/12/22 21:34:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1579261284 2020/01/17 11:41:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.172 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,10 +36,12 @@ struct flag {
     boolean goldX;           /* for BUCX filtering, whether gold is X or U */
     boolean help;            /* look in data file for info about stuff */
     boolean ignintr;         /* ignore interrupts */
+    boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean ins_chkpt;       /* checkpoint as appropriate; INSURANCE */
     boolean invlet_constant; /* let objects keep their inventory symbol */
     boolean legacy;          /* print game entry "story" */
     boolean lit_corridor;    /* show a dark corr as lit if it is in sight */
+    boolean mention_walls;   /* give feedback when bumping walls */
     boolean nap;             /* `timed_delay' option for display effects */
     boolean null;            /* OK to send nulls to the terminal */
     boolean pickup;          /* whether you pickup or move and look */
@@ -258,8 +260,6 @@ struct instance_flags {
     boolean echo;             /* 1 to echo characters */
     boolean force_invmenu;    /* always menu when handling inventory */
     boolean hilite_pile;      /* mark piles of objects with a hilite */
-    boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
-    boolean mention_walls;    /* give feedback when bumping walls */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */
     boolean menu_overlay;     /* Draw menus over the map */
     boolean menu_requested;   /* Flag for overloaded use of 'm' prefix

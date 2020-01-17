@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.346 $ $NHDT-Date: 1578448653 2020/01/08 01:57:33 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.347 $ $NHDT-Date: 1579262524 2020/01/17 12:02:04 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -3160,7 +3160,11 @@ Cannot be set with the \(oqO\(cq command.
 .lp ignintr
 Ignore interrupt signals, including breaks (default off).  Persistent.
 .lp implicit_uncursed
-Omit "uncursed" from inventory lists, if possible (default on).
+Omit \(lquncursed\(rq from object descriptions when it can be deduced from
+other aspects of the description (default on).
+Persistent.
+.lp ""
+If you use menu coloring, you may want to turn this off.
 .lp legacy
 Display an introductory message when starting the game (default on).
 Persistent.
@@ -3180,6 +3184,7 @@ An obsolete synonym for \(lqgender:male\(rq.
 Cannot be set with the \(oqO\(cq command.
 .lp mention_walls
 Give feedback when walking against a wall (default off).
+Persistent.
 .lp menucolors
 Enable coloring menu lines (default off).
 See \(lqConfiguring Menu Colors\(rq on how to configure the colors.

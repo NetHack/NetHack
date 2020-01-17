@@ -3436,6 +3436,7 @@ Visually distinguish pets from similar animals (default off).
 The behavior of this option depends on the type of windowing you use.
 In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a heart symbol near pets.
+
 %.lp ""
 With the curses interface, the {\it petattr\/}
 option controls how to highlight pets and setting it will turn the
@@ -3460,7 +3461,12 @@ Only available for TTY and Windows GUI, and only when statushilites is on.
 Ignore interrupt signals, including breaks (default off).  Persistent.
 %.lp
 \item[\ib{implicit\verb+_+uncursed}]
-Omit ``uncursed'' from inventory lists, if possible (default on).
+Omit ``uncursed'' from object descriptions when it can be deduced from
+other aspects of the description (default on).
+Persistent.
+
+%.lp ""
+If you use menu coloring, you may want to turn this off.
 %.lp
 \item[\ib{legacy}]
 Display an introductory message when starting the game (default on).
@@ -3484,7 +3490,7 @@ An obsolete synonym for ``{\tt gender:male}''.  Cannot be set with the
 `{\tt O}' command.
 %.lp
 \item[\ib{mention\verb+_+walls}]
-Give feedback when walking against a wall (default off).
+Give feedback when walking against a wall (default off).  Persistent.
 %.lp
 \item[\ib{menucolors}]
 Enable coloring menu lines (default off).

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.68 $ $NHDT-Date: 1579257808 2020/01/17 10:43:28 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ $NHDT-Date: 1579261284 2020/01/17 11:41:24 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -114,6 +114,8 @@ tiny chance for randomly created spellbooks to be Discworld novels instead
 	of having only one in the first book or scroll shop created (won't
 	occur in hero's initial inventory or NPC priest inventory or be
 	bestowed as a prayer boon or be found in statues)
+'goldX', 'implicit_uncursed', and 'mention_walls' options changed to be
+	persistent across save/restore
 
 
 Platform- and/or Interface-Specific New Features

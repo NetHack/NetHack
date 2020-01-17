@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1579257808 2020/01/17 10:43:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1579261288 2020/01/17 11:41:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.245 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -750,7 +750,7 @@ int mode;
                 return FALSE;
             }
             if (!(Passes_walls || passes_bars(g.youmonst.data))) {
-                if (mode == DO_MOVE && iflags.mention_walls)
+                if (mode == DO_MOVE && flags.mention_walls)
                     You("cannot pass through the bars.");
                 return FALSE;
             }
@@ -772,7 +772,7 @@ int mode;
                 else if (Passes_walls && !may_passwall(x, y)
                          && In_sokoban(&u.uz))
                     pline_The("Sokoban walls resist your ability.");
-                else if (iflags.mention_walls)
+                else if (flags.mention_walls)
                     pline("It's %s.",
                           (IS_WALL(tmpr->typ) || tmpr->typ == SDOOR) ? "a wall"
                           : IS_TREE(tmpr->typ) ? "a tree"
@@ -842,7 +842,7 @@ int mode;
                 if (mode == DO_MOVE) {
                     if (Blind)
                         feel_location(x, y);
-                    if (Underwater || iflags.mention_walls)
+                    if (Underwater || flags.mention_walls)
                         You_cant("move diagonally into an intact doorway.");
                 }
                 return FALSE;
@@ -896,7 +896,7 @@ int mode;
     if (dx && dy && !Passes_walls && IS_DOOR(ust->typ)
         && (!doorless_door(ux, uy) || block_entry(x, y))) {
         /* Can't move at a diagonal out of a doorway with door. */
-        if (mode == DO_MOVE && iflags.mention_walls)
+        if (mode == DO_MOVE && flags.mention_walls)
             You_cant("move diagonally out of an intact doorway.");
         return FALSE;
     }
@@ -904,7 +904,7 @@ int mode;
     if (sobj_at(BOULDER, x, y) && (Sokoban || !Passes_walls)) {
         if (!(Blind || Hallucination) && (g.context.run >= 2)
             && mode != TEST_TRAV) {
-            if (mode == DO_MOVE && iflags.mention_walls)
+            if (mode == DO_MOVE && flags.mention_walls)
                 pline("A boulder blocks your path.");
             return FALSE;
         }
@@ -1495,7 +1495,7 @@ domove_core()
             }
         }
         if (!isok(x, y)) {
-            if (iflags.mention_walls) {
+            if (flags.mention_walls) {
                 int dx = u.dx, dy = u.dy;
 
                 if (dx && dy) { /* diagonal */
@@ -1518,7 +1518,7 @@ domove_core()
             || (Blind && !Levitation && !Flying && !is_clinger(g.youmonst.data)
                 && is_pool_or_lava(x, y) && levl[x][y].seenv)) {
             if (g.context.run >= 2) {
-                if (iflags.mention_walls) {
+                if (flags.mention_walls) {
                     if (trap && trap->tseen) {
                         You("stop in front of %s.",
                             an(trapname(trap->ttyp, FALSE)));
@@ -2729,7 +2729,7 @@ lookaround()
                 if ((g.context.run != 1 && !mtmp->mtame)
                     || (x == u.ux + u.dx && y == u.uy + u.dy
                         && !g.context.travel)) {
-                    if (iflags.mention_walls)
+                    if (flags.mention_walls)
                         pline("%s blocks your path.", upstart(a_monnam(mtmp)));
                     goto stop;
                 }
@@ -2747,7 +2747,7 @@ lookaround()
                 if (x != u.ux && y != u.uy)
                     continue;
                 if (g.context.run != 1) {
-                    if (iflags.mention_walls)
+                    if (flags.mention_walls)
                         You("stop in front of the door.");
                     goto stop;
                 }
@@ -2776,11 +2776,9 @@ lookaround()
                 if (g.context.run == 1)
                     goto bcorr; /* if you must */
                 if (x == u.ux + u.dx && y == u.uy + u.dy) {
-                    if (iflags.mention_walls) {
-
+                    if (flags.mention_walls)
                         You("stop in front of %s.",
                             an(trapname(trap->ttyp, FALSE)));
-                    }
                     goto stop;
                 }
                 continue;
@@ -2794,7 +2792,7 @@ lookaround()
                      * to test boots by trying to SHIFT-direction
                      * into a pool and seeing if the game allowed it
                      */
-                    if (iflags.mention_walls)
+                    if (flags.mention_walls)
                         You("stop at the edge of the %s.",
                             hliquid(is_pool(x,y) ? "water" : "lava"));
                     goto stop;
@@ -2817,7 +2815,7 @@ lookaround()
         } /* end for loops */
 
     if (corrct > 1 && g.context.run == 2) {
-        if (iflags.mention_walls)
+        if (flags.mention_walls)
             pline_The("corridor widens here.");
         goto stop;
     }
