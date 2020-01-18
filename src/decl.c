@@ -460,10 +460,6 @@ const struct instance_globals g_init = {
     /* lock.c */
     UNDEFINED_VALUES,
 
-    /* makemon.c */
-    { -1, /* choice_count */
-     { 0 } }, /* mchoices */
-
     /* mhitm.c */
     UNDEFINED_VALUE, /* vis */
     UNDEFINED_VALUE, /* far_noise */

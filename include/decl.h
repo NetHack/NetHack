@@ -979,12 +979,6 @@ struct instance_globals {
     /* lock.c */
     struct xlock_s xlock;
 
-    /* makemon.c */
-    struct {
-        int choice_count;
-        char mchoices[SPECIAL_PM]; /* value range is 0..127 */
-    } rndmonst_state;
-
     /* mhitm.c */
     boolean vis;
     boolean far_noise;

@@ -1454,7 +1454,6 @@ boolean at_stairs, falling, portal;
             || dunlev(&u.uz) < dunlev_reached(&u.uz))
             dunlev_reached(&u.uz) = dunlev(&u.uz);
     }
-    reset_rndmonst(NON_PM); /* u.uz change affects monster generation */
 
     /* set default level change destination areas */
     /* the special level code may override these */

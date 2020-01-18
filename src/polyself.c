@@ -299,7 +299,6 @@ newman()
         change_sex();
 
     adjabil(oldlvl, (int) u.ulevel);
-    reset_rndmonst(NON_PM); /* new monster generation criteria */
 
     /* random experience points for the new experience level */
     u.uexp = rndexp(FALSE);
