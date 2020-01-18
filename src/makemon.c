@@ -1565,7 +1565,7 @@ rndmonst()
         totalweight += weight;
         if (rn2(totalweight) < weight)
             selected_mndx = mndx;
-        /* Possible modification:  if there aren't "enough" candidate monsters,
+        /* Possible modification:  if totalweight is "too low",
          * expand minmlev..maxmlev range and try again. */
     }
 
