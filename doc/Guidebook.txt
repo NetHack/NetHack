@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.6 by Mike Stephenson and others)
 
-                                   January 7, 2020
+                                  January 14, 2020
 
 
 
@@ -6123,13 +6123,16 @@
                NetHack 3.6.4 was released on December 18, 2019 containing a
           security fix and a few bug fixes.
 
+               NetHack 3.6.5 was released in January, 2020 containing  some
+          security fixes and a small number of bug fixes.
+
                The official NetHack web site is maintained by Ken Lorber at
           https://www.nethack.org/.
 
           12.1.  SPECIAL THANKS
 
                On behalf of the NetHack community, thank you very much once
-          again to M. Drew Streib and Pasi Kallinen for providing a  public
+          again  to M. Drew Streib and Pasi Kallinen for providing a public
 
 
           NetHack 3.7                                       January 7, 2020
@@ -6142,18 +6145,18 @@
 
 
 
-          NetHack  server  at  nethack.alt.org. Thanks to Keith Simpson and
+          NetHack server at nethack.alt.org. Thanks to  Keith  Simpson  and
           Andy Thomson for hardfought.org. Thanks to all those unnamed dun-
-          geoneers  who  invest  their  time and effort into annual NetHack
-          tournaments such as Junethack, The  November  NetHack  Tournament
+          geoneers who invest their time and  effort  into  annual  NetHack
+          tournaments  such  as  Junethack, The November NetHack Tournament
           and in days past, devnull.net (gone for now, but not forgotten).
 
                                  - - - - - - - - - -
 
-               From  time  to  time,  some depraved individual out there in
-          netland sends a particularly intriguing modification to help  out
+               From time to time, some depraved  individual  out  there  in
+          netland  sends a particularly intriguing modification to help out
           with the game.  The NetHack Development Team sometimes makes note
-          of the names of the worst of these miscreants in this,  the  list
+          of  the  names of the worst of these miscreants in this, the list
           of Dungeoneers:
                Adam Aronow           J. Ali Harlow          Mikko Juola
                Alex Kompel             Janet Walz           Nathan Eady
@@ -6211,7 +6214,7 @@
           Irina Rempt-Drijfhout     Mike Passaretti
               Izchak Miller         Mike Stephenson
 
-               Brand  and product names are trademarks or registered trade-
+               Brand and product names are trademarks or registered  trade-
           marks of their respective holders.
 
 
@@ -6224,7 +6227,7 @@
 
 
 
-
+          NetHack 3.6                                      January 14, 2020
 
 
 
@@ -6265,6 +6268,5 @@
 
 
           NetHack 3.7                                       January 7, 2020
-
 
 
