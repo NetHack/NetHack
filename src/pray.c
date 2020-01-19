@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1578895347 2020/01/13 06:02:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1579401997 2020/01/19 02:46:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -484,7 +484,7 @@ int trouble;
             what = rightglow;
         else if (otmp == uleft)
             what = leftglow;
-    decurse:
+ decurse:
         if (!otmp) {
             impossible("fix_worst_trouble: nothing to uncurse.");
             return;
@@ -1496,7 +1496,7 @@ dosacrifice()
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
         if (!highaltar) {
-        too_soon:
+ too_soon:
             if (altaralign == A_NONE && Inhell)
                 /* hero has left Moloch's Sanctum so is in the process
                    of getting away with the Amulet (outside of Gehennom,
@@ -1526,7 +1526,8 @@ dosacrifice()
                 /* Moloch's high altar */
                 if (u.ualign.record > -99)
                     u.ualign.record = -99;
-                pline("An invisible choir chants in Latin, and you are bathed in darkness...");
+                pline(
+              "An invisible choir chants, and you are bathed in darkness...");
                 /*[apparently shrug/snarl can be sensed without being seen]*/
                 pline("%s shrugs and retains dominion over %s,", Moloch,
                       u_gname());
@@ -1593,7 +1594,7 @@ dosacrifice()
     }
 
     if (altaralign != u.ualign.type && highaltar) {
-    desecrate_high_altar:
+ desecrate_high_altar:
         /*
          * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
          * gets the god who owns it truly pissed off.
@@ -1830,7 +1831,8 @@ boolean praying; /* false means no messages should be given */
     }
 
     if (is_undead(g.youmonst.data) && !Inhell
-        && (g.p_aligntyp == A_LAWFUL || (g.p_aligntyp == A_NEUTRAL && !rn2(10))))
+        && (g.p_aligntyp == A_LAWFUL
+            || (g.p_aligntyp == A_NEUTRAL && !rn2(10))))
         g.p_type = -1;
     /* Note:  when !praying, the random factor for neutrals makes the
        return value a non-deterministic approximation for enlightenment.
