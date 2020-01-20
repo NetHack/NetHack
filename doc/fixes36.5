@@ -15,6 +15,7 @@ fix potential buffer overflow in sym_val()
 fix potential buffer overflow in pline(), raw_printf(), and config_error_add()
 	via bad config file values or command line arguments
 fix potential buffer overflow in choose_windows()
+use vsnprintf instead of vsprintf in pline.c where possible
 
 
 Fixes to Post-3.6.4 Problems that Were Exposed Via git Repository
