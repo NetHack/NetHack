@@ -5,18 +5,27 @@ matrix:
       os: linux
       env: HINTS=linux
       compiler: gcc
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua && test -f lib/lua-5.3.5/src/lua.h || exit 0
+        - make install
     - name: linux-bionic-gcc
       os: linux
       env: HINTS=linux
       dist: bionic
       compiler: gcc
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua && test -f lib/lua-5.3.5/src/lua.h || exit 0
+        - make install
     - name: linux-xenial-clang
       os: linux
       env: HINTS=linux
       compiler: clang
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua && test -f lib/lua-5.3.5/src/lua.h || exit 0
+        - make install
     - name: linux-xenial-gcc-x11
       os: linux
       env: HINTS=linux-x11
@@ -27,7 +36,10 @@ matrix:
             - libx11-dev
             - libxaw7-dev
             - xfonts-utils
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua && test -f lib/lua-5.3.5/src/lua.h || exit 0
+        - make install
     - name: linux-xenial-gcc-qt5
       os: linux
       env: HINTS=linux-qt5
@@ -41,7 +53,10 @@ matrix:
             - qtbase5-dev
             - qtmultimedia5-dev
             - qtbase5-dev-tools
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make QT_SELECT=5 MOC=moc install"
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua && test -f lib/lua-5.3.5/src/lua.h || exit 0
+        - make QT_SELECT=5 MOC=moc install
     - name: linux-bionic-gcc-x11
       os: linux
       env: HINTS=linux-x11
@@ -53,7 +68,10 @@ matrix:
             - libx11-dev
             - libxaw7-dev
             - xfonts-utils
-      script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && make fetch-lua && make install"
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua && test -f lib/lua-5.3.5/src/lua.h || exit 0
+        - make install
     - name: linux-xenial-gcc-minimal
       os: linux
       env: HINTS=linux-minimal
@@ -79,7 +97,8 @@ matrix:
               sed -i '/^#define SHELL/d'          include/unixconf.h
               sed -i '/^#define SUSPEND/d'        include/unixconf.h
               sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
-              make fetch-lua && make install
+              make fetch-lua && test -f lib/lua-5.3.5/src/lua.h || exit 0
+              make install
               cat dat/options
     - name: windows-visualstudio
       os: windows
@@ -105,6 +124,7 @@ matrix:
 #        - export
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua
+        - make fetch-lua && test -f lib/lua-5.3.5/src/lua.h || exit 0
         - cd lib/lua-$LUA_VERSION/src && make a && cd ../../.. 
         - sh sys/msdos/msdos-cross-compile.sh
   exclude:
