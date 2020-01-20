@@ -8,7 +8,7 @@ matrix:
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua
-        - test -d "lib/lua-$LUA_VERSION/src" || {echo "Unable to obtain and unpack Lua" && exit 0}
+        - test -d "lib/lua-$LUA_VERSION/src" || { echo "Unable to obtain and unpack Lua" && exit 0 }
         - make install
   exclude:
     - name: linux-bionic-gcc
@@ -19,7 +19,7 @@ matrix:
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua
-        - test -d "lib/lua-$LUA_VERSION/src" || {echo "Unable to obtain and unpack Lua" && exit 0}
+        - test -d "lib/lua-$LUA_VERSION/src" || { echo "Unable to obtain and unpack Lua" && exit 0 }
         - make install
     - name: linux-xenial-clang
       os: linux
