@@ -74,6 +74,9 @@ fi
 
 cd ../
 
+# Don't fail the build if lua fetch failed because we cannot do anything about it
+if [ ! -d "lib/lua-$LUA_VERSION/src" ] || exit 0
+
 #echo after dos extender
 
 cd src
