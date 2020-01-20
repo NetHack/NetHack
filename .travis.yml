@@ -8,8 +8,8 @@ matrix:
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua
-        - test -d "lib/lua-5.3.5/src" && make install
         - test -d "lib/lua-5.3.5/srcfail" || echo "Unable to obtain and unpack Lua" && exit 0
+        - test -d "lib/lua-5.3.5/src" && make install
   exclude:
     - name: linux-bionic-gcc
       os: linux
