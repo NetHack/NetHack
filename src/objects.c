@@ -1,4 +1,4 @@
-/* NetHack 3.6	objects.c	$NHDT-Date: 1577184069 2019/12/24 10:41:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	objects.c	$NHDT-Date: 1578855624 2020/01/12 19:00:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -918,7 +918,7 @@ SPELL("fireball",        "ragged",
 SPELL("cone of cold",    "dog eared",
       P_ATTACK_SPELL,      10,  7, 4, 1, RAY, HI_PAPER),
 SPELL("sleep",           "mottled",
-      P_ENCHANTMENT_SPELL, 50,  1, 1, 1, RAY, HI_PAPER),
+      P_ENCHANTMENT_SPELL, 49,  1, 1, 1, RAY, HI_PAPER),
 SPELL("finger of death", "stained",
       P_ATTACK_SPELL,       5, 10, 7, 1, RAY, HI_PAPER),
 SPELL("light",           "cloth",
@@ -1003,7 +1003,7 @@ SPELL("blank paper", "plain", P_NONE, 18, 0, 0, 0, 0, HI_PAPER),
 /* tribute book for 3.6 */
 OBJECT(OBJ("novel", "paperback"),
        BITS(0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, PAPER),
-       0, SPBOOK_CLASS, 0, 0, 0, 20, 0, 0, 0, 1, 20, CLR_BRIGHT_BLUE),
+       0, SPBOOK_CLASS, 1, 0, 0, 20, 0, 0, 0, 1, 20, CLR_BRIGHT_BLUE),
 /* a special, one of a kind, spellbook */
 OBJECT(OBJ("Book of the Dead", "papyrus"),
        BITS(0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, P_NONE, PAPER),

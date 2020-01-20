@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1578535246 2020/01/09 02:00:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.285 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1579261291 2020/01/17 11:41:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.288 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -998,7 +998,7 @@ unsigned doname_flags;
             Strcat(prefix, "cursed ");
         else if (obj->blessed)
             Strcat(prefix, "blessed ");
-        else if (!iflags.implicit_uncursed
+        else if (!flags.implicit_uncursed
             /* For most items with charges or +/-, if you know how many
              * charges are left or what the +/- is, then you must have
              * totally identified the item, so "uncursed" is unnecessary,
@@ -2179,7 +2179,7 @@ static const char *const as_is[] = {
     "tuna",    "yaki",      "-hai",      "krill",     "manes",
     "moose",   "ninja",     "sheep",     "ronin",     "roshi",
     "shito",   "tengu",     "ki-rin",    "Nazgul",    "gunyoki",
-    "piranha", "samurai",   "shuriken", 0,
+    "piranha", "samurai",   "shuriken",  "haggis", 0,
     /* Note:  "fish" and "piranha" are collective plurals, suitable
        for "wiped out all <foo>".  For "3 <foo>", they should be
        "fishes" and "piranhas" instead.  We settle for collective
@@ -4237,17 +4237,18 @@ int first, last;
 {
     int i, x, sum = 0;
 
-    if (first == last)
-        return first;
-    for (i = first; i <= last; i++)
-        sum += objects[i].oc_prob;
-    if (!sum) /* all zero */
-        return first + rn2(last - first + 1);
-    x = rnd(sum);
-    for (i = first; i <= last; i++)
-        if (objects[i].oc_prob && (x -= objects[i].oc_prob) <= 0)
-            return i;
-    return 0;
+    if (last > first) {
+        for (i = first; i <= last; i++)
+            sum += objects[i].oc_prob;
+        if (!sum) /* all zero, so equal probability */
+            return rn1(last - first + 1, first);
+
+        x = rnd(sum);
+        for (i = first; i <= last; i++)
+            if ((x -= objects[i].oc_prob) <= 0)
+                return i;
+    }
+    return (first == last) ? first : STRANGE_OBJECT;
 }
 
 static const char *

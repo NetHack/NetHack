@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ $NHDT-Date: 1578764038 2020/01/11 17:33:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ $NHDT-Date: 1579261284 2020/01/17 11:41:24 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -42,6 +42,10 @@ walking out of tethered-to-buried-object trap condition was supposed to
 	reinstate punishment but wasn't finding the buried iron ball because
 	the trap condition was cleared first to indicate escape; result was
 	attached chain that got dragged around but had no ball attached
+when poly'd into a giant and moving onto a boulder's spot, message given was
+	confused about whether autopickup would occur so could be misleading
+random role selection wasn't honoring unwanted alignment(s) properly
+if at the edge of the map window, trying to move farther fails but used a turn
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -73,6 +77,8 @@ data.base lookup of an entry with any blank lines would falsely claim that
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+tty: role and race selection menus weren't filtering out potential choices
+	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
 
 
 General New Features
@@ -104,6 +110,12 @@ applying a spellbook hints about read charges left
 wizard mode wishing for level topology can now create hidden doors (ask for
 	"secret door" when at a door or wall location) and hidden corridor
 	spots ("secret corridor" at a corridor location)
+tiny chance for randomly created spellbooks to be Discworld novels instead
+	of having only one in the first book or scroll shop created (won't
+	occur in hero's initial inventory or NPC priest inventory or be
+	bestowed as a prayer boon or be found in statues)
+'goldX', 'implicit_uncursed', and 'mention_walls' options changed to be
+	persistent across save/restore
 
 
 Platform- and/or Interface-Specific New Features
@@ -114,8 +126,6 @@ NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 hallucinatory trap names from github pull request #174
 autounlock feature originally from unnethack in github pull request #228
-applying a candelabrum with no candles gives a tip (github #265)
-candelabrum now reads "(n of 7 candles attached)" (github #265)
 replace "You feel cold" message for freezing unseen door (github #265)
 applying a candelabrum with no candles gives a tip (github #265)
 candelabrum now reads "(n of 7 candles attached)" (github #265)

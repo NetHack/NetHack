@@ -1,0 +1,59 @@
+MNH(7)                 Miscellaneous Information Manual                 MNH(7)
+
+
+
+NAME
+       mnh - additional text formatting macros for the NetHack Guidebook
+
+SYNOPSIS
+       make Guidebook
+
+DESCRIPTION
+       This  package  of  nroff(1)  and  troff(1)  macro  definitions  extends
+       tmac.n(7) for the NetHack Guidebook.  This document should be  read  as
+       an addendum to the documentation for tmac.n.
+
+       All -mnh macros, diversions, string registers, and number registers are
+       defined below.
+
+FILES
+       doc/tmac.nh
+
+SEE ALSO
+       mn(7)
+
+AUTHOR
+       Pat Rankin
+
+REQUESTS
+       In the Note column, b means the request causes a break, and i means the
+       macro,  number  register, string register, or diversion is internal and
+       should not be used for anything.  In the What It Is column,  div  means
+       diversion,  mac  means  macro, num means number register, and str means
+       string register.  In the Initial Value column, a hyphen means  no  ini-
+       tial value is used, anything else is the initial value, and if two val-
+       ues are given, the first is for nroff and the second for troff.
+
+Macro     What    Initial   Note   Explanation
+Name      It Is   Value
+.BR       mac     -         -    hard line break with vertical padding inserted
+bR        num     -         i
+.CC x y   mac     -         -    aligned one char key x with short definition y
+CW        num     -         i
+CX        num     -         i
+CY        num     -         i
+CZ        num     -         i
+CZ        num     -         i
+.ED       mac     -         -    ends .SD
+.PE       mac     -         b    labelled paragraph end
+.PL x     mac     -         b    labelled paragraph label is x
+.PS x     mac     -         b    labelled paragraph start for label the width of x
+PX        num     -         i
+PY        num     -         i
+.SD x     mac     -         -    .sd with options c-center i-indent n-no indent
+SF        num     -         i
+.UX       mac     -         -    .ux with updated trademark owner
+
+
+
+                                    NETHACK                             MNH(7)
