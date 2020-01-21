@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1573290419 2019/11/09 09:06:59 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1579649789 2020/01/21 23:36:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.148 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -934,7 +934,7 @@ break_armor()
             useup(uarmu);
         }
     } else if (sliparm(g.youmonst.data)) {
-        if (((otmp = uarm) != 0) && (racial_exception(&g.youmonst, otmp) < 1)) {
+        if ((otmp = uarm) != 0 && racial_exception(&g.youmonst, otmp) < 1) {
             if (donning(otmp))
                 cancel_don();
             Your("armor falls around you!");
@@ -1016,6 +1016,21 @@ break_armor()
             dropp(otmp);
         }
     }
+    /* not armor, but eyewear shouldn't stay worn without a head to wear
+       it/them on (should also come off if head is too tiny or too huge,
+       but putting accessories on doesn't reject those cases [yet?]);
+       amulet stays worn */
+    if ((otmp = ublindf) != 0 && !has_head(g.youmonst.data)) {
+        int l;
+        const char *eyewear = simpleonames(otmp); /* blindfold|towel|lenses */
+
+        if (!strncmp(eyewear, "pair of ", l = 8)) /* lenses */
+            eyewear += l;
+        Your("%s %s off!", eyewear, vtense(eyewear, "fall"));
+        (void) Blindf_off((struct obj *) 0); /* Null: skip usual off mesg */
+        dropp(otmp);
+    }
+    /* rings stay worn even when no hands */
 }
 
 static void

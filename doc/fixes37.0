@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ $NHDT-Date: 1579261284 2020/01/17 11:41:24 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ $NHDT-Date: 1579649788 2020/01/21 23:36:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -46,6 +46,7 @@ when poly'd into a giant and moving onto a boulder's spot, message given was
 	confused about whether autopickup would occur so could be misleading
 random role selection wasn't honoring unwanted alignment(s) properly
 if at the edge of the map window, trying to move farther fails but used a turn
+hero can no longer wear blindfold/towel/lenses when poly'd into headless form
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
