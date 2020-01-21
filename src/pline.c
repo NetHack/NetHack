@@ -145,8 +145,8 @@ VA_DECL(const char *, line)
         vlen = vsnprintf(pbuf, sizeof pbuf, line, VA_ARGS);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
         if (vlen >= (int) sizeof pbuf)
-            panic("pline", "truncation of buffer at %zu of %d bytes",
-                  sizeof pbuf, vlen);
+            panic("%s: truncation of buffer at %zu of %d bytes",
+                  "pline", sizeof pbuf, vlen);
 #endif
 #else
         Vsprintf(pbuf, line, VA_ARGS);
@@ -459,20 +459,12 @@ void raw_printf
 VA_DECL(const char *, line)
 #endif
 {
-#if !defined(NO_VSNPRINTF)
-    int vlen = 0;
-#endif
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
     /* Do NOT use VA_START and VA_END in here... see above */
 
     if (index(line, '%')) {
 #if !defined(NO_VSNPRINTF)
-        vlen = vsnprintf(pbuf, sizeof pbuf, line, VA_ARGS);
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
-        if (vlen >= (int) sizeof pbuf)
-            panic("raw_printf", "truncation of buffer at %zu of %d bytes",
-                  sizeof pbuf, vlen);
-#endif
+        (void) vsnprintf(pbuf, sizeof pbuf, line, VA_ARGS);
 #else
         Vsprintf(pbuf, line, VA_ARGS);
 #endif
@@ -497,9 +489,6 @@ VA_DECL(const char *, line)
 void impossible
 VA_DECL(const char *, s)
 {
-#if !defined(NO_VSNPRINTF)
-    int vlen = 0;
-#endif
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
     VA_START(s);
@@ -509,12 +498,7 @@ VA_DECL(const char *, s)
 
     program_state.in_impossible = 1;
 #if !defined(NO_VSNPRINTF)
-    vlen = vsnprintf(pbuf, sizeof pbuf, s, VA_ARGS);
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
-    if (vlen >= (int) sizeof pbuf)
-        panic("impossible", "truncation of buffer at %zu of %d bytes",
-              sizeof pbuf, vlen);
-#endif
+    (void) vsnprintf(pbuf, sizeof pbuf, s, VA_ARGS);
 #else
     Vsprintf(pbuf, s, VA_ARGS);
 #endif
@@ -619,8 +603,8 @@ VA_DECL(const char *, str)
     vlen = vsnprintf(buf, sizeof buf, str, VA_ARGS);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
     if (vlen >= (int) sizeof buf)
-        panic("config_error_add", "truncation of buffer at %zu of %d bytes",
-              sizeof buf, vlen);
+        panic("%s: truncation of buffer at %zu of %d bytes",
+              "config_error_add", sizeof buf, vlen);
 #endif
 #else
     Vsprintf(buf, str, VA_ARGS);
