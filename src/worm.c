@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1561340880 2019/06/24 01:48:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.6	worm.c	$NHDT-Date: 1579616437 2020/01/21 14:20:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -218,6 +218,13 @@ struct monst *worm;
     seg->nseg = new_seg;    /* attach it to the end of the list */
     wheads[wnum] = new_seg; /* move the end pointer */
 
+    /*
+     * [maybe] FIXME?
+     *  scheduling wgrowtime[] seems to be based on normal movement
+     *  speed (12) but long worms move at 1/4 of that (3), so they'll
+     *  reach the scheduled 'moves' more quickly (in terms of their
+     *  actual movement) and grow faster than was probably intended.
+     */
     if (wgrowtime[wnum] <= g.moves) {
         if (!wgrowtime[wnum])
             wgrowtime[wnum] = g.moves + rnd(5);
