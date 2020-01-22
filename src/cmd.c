@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1578764033 2020/01/11 17:33:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1579655026 2020/01/22 01:03:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.392 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2984,6 +2984,8 @@ int final;
         enlght_halfdmg(HALF_PHDAM, final);
     if (Half_spell_damage)
         enlght_halfdmg(HALF_SPDAM, final);
+    if (Half_gas_damage)
+        enl_msg(You_, "take", "took", " reduced poison gas damage", "");
     /* polymorph and other shape change */
     if (Protection_from_shape_changers)
         you_are("protected from shape changers",

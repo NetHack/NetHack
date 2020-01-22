@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ $NHDT-Date: 1579649788 2020/01/21 23:36:28 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ $NHDT-Date: 1579655025 2020/01/22 01:03:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -117,6 +117,7 @@ tiny chance for randomly created spellbooks to be Discworld novels instead
 	bestowed as a prayer boon or be found in statues)
 'goldX', 'implicit_uncursed', and 'mention_walls' options changed to be
 	persistent across save/restore
+wearing a wet towel confers "half damage from poison gas" attribute
 
 
 Platform- and/or Interface-Specific New Features
