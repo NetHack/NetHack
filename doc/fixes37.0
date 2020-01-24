@@ -47,6 +47,8 @@ when poly'd into a giant and moving onto a boulder's spot, message given was
 random role selection wasn't honoring unwanted alignment(s) properly
 if at the edge of the map window, trying to move farther fails but used a turn
 hero can no longer wear blindfold/towel/lenses when poly'd into headless form
+revamp achievement tracking for exploring Mine's End and Sokoban (by acquiring
+	luckstone and bag of holding or amulet of reflection, respectively)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

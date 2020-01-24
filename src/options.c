@@ -737,9 +737,9 @@ initoptions_init()
 
     /* for "special achievement" tracking (see obj.h,
        create_object(sp_lev.c), addinv_core1(invent.c) */
-    iflags.mines_prize_type = LUCKSTONE;
-    iflags.soko_prize_type1 = BAG_OF_HOLDING;
-    iflags.soko_prize_type2 = AMULET_OF_REFLECTION;
+    g.context.achieveo.mines_prize_type = LUCKSTONE;
+    g.context.achieveo.soko_prize_typ1 = BAG_OF_HOLDING;
+    g.context.achieveo.soko_prize_typ2 = AMULET_OF_REFLECTION;
 
     /* assert( sizeof flags.inv_order == sizeof def_inv_order ); */
     (void) memcpy((genericptr_t) flags.inv_order,

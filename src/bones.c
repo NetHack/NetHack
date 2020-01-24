@@ -165,14 +165,10 @@ boolean restore;
                     if (mnum == PM_DOPPELGANGER && otmp->otyp == CORPSE)
                         set_corpsenm(otmp, mnum);
                 }
-            } else if ((otmp->otyp == iflags.mines_prize_type
-                        && !Is_mineend_level(&u.uz))
-                       || ((otmp->otyp == iflags.soko_prize_type1
-                            || otmp->otyp == iflags.soko_prize_type2)
-                           && !Is_sokoend_level(&u.uz))) {
-                /* "special prize" in this game becomes ordinary object
-                   if loaded into another game */
-                otmp->record_achieve_special = NON_PM;
+            } else if (is_mines_prize(otmp) || is_soko_prize(otmp)) {
+                /* achievement tracking; in case prize was moved off its
+                   original level (which is always a no-bones level) */
+                otmp->nomerge = 0;
             } else if (otmp->otyp == AMULET_OF_YENDOR) {
                 /* no longer the real Amulet */
                 otmp->otyp = FAKE_AMULET_OF_YENDOR;

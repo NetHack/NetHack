@@ -806,6 +806,24 @@ boolean pre, wiztower;
                 continue;
             if (mtmp->isshk)
                 setpaid(mtmp);
+            /* achievement tracking */
+            {
+                static const char Unachieve[] = "%s achievement revoked.";
+
+                if (Is_mineend_level(&u.uz)) {
+                    if (u.uachieve.mines_luckstone) {
+                        pline(Unachieve, "Mine's end");
+                        u.uachieve.mines_luckstone = 0;
+                    }
+                    g.context.achieveo.mines_prize_oid = 0;
+                } else if (Is_sokoend_level(&u.uz)) {
+                    if (u.uachieve.finish_sokoban) {
+                        pline(Unachieve, "Sokoban end");
+                        u.uachieve.finish_sokoban = 0;
+                    }
+                    g.context.achieveo.soko_prize_oid = 0;
+                }
+            }
             /* TODO?
              *  Reduce 'born' tally for each monster about to be discarded
              *  by savelev(), otherwise replacing heavily populated levels
@@ -877,6 +895,7 @@ wiz_makemap(VOID_ARGS)
 {
     if (wizard) {
         boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
+
         makemap_prepost(TRUE, was_in_W_tower);
         /* create a new level; various things like bestowing a guardian
            angel on Astral or setting off alarm on Ft.Ludios are handled
