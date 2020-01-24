@@ -860,7 +860,13 @@ const char *status_fieldnm[MAXBLSTATS];
 const char *status_fieldfmt[MAXBLSTATS];
 char *status_vals[MAXBLSTATS];
 boolean status_activefields[MAXBLSTATS];
+#if __linux__
+# if __GNUC__ < 10
 NEARDATA winid WIN_STATUS;
+# endif
+#else
+NEARDATA winid WIN_STATUS;
+#endif
 
 void
 genl_status_init()
