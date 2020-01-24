@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ $NHDT-Date: 1579655025 2020/01/22 01:03:45 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ $NHDT-Date: 1579899144 2020/01/24 20:52:24 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -74,6 +74,7 @@ if running and Blind or Stunned or Fumbling or Dex < 10, encountering a closed
 data.base lookup of an entry with any blank lines would falsely claim that
 	"'data' file in wrong fromat or corrupted" after some extra checks
 	were added while investigating tab handling anomalies
+using nhl_error() to report a Lua processing problem would clobber the stack
 
 
 Platform- and/or Interface-Specific Fixes

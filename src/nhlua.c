@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1575246766 2019/12/02 00:32:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1579899144 2020/01/24 20:52:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.28 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,8 +44,16 @@ const char *msg;
 
     lua_getstack(L, 1, &ar);
     lua_getinfo(L, "lS", &ar);
-    Sprintf(buf, "%s (line %i%s)", msg, ar.currentline, ar.source);
+    Sprintf(buf, "%s (line %d ", msg, ar.currentline);
+    Sprintf(eos(buf), "%.*s)",
+            /* (max length of ar.short_src is actually LUA_IDSIZE
+               so this is overkill for it, but crucial for ar.source) */
+            (int) (sizeof buf - (strlen(buf) + sizeof ")")),
+            ar.short_src); /* (used to be 'ar.source' here) */
     lua_pushstring(L, buf);
+#if 0 /* defined(PANICTRACE) && !defined(NO_SIGNALS) */
+    panictrace_setsignals(FALSE);
+#endif
     (void) lua_error(L);
     /*NOTREACHED*/
 }
