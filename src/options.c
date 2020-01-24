@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1578996303 2020/01/14 10:05:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.396 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1579261293 2020/01/17 11:41:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.428 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -148,7 +148,7 @@ static const struct Bool_Opt {
 #else
     { "ignintr", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
-    { "implicit_uncursed", &iflags.implicit_uncursed, TRUE, SET_IN_GAME },
+    { "implicit_uncursed", &flags.implicit_uncursed, TRUE, SET_IN_GAME },
     { "large_font", &iflags.obsolete, FALSE, SET_IN_FILE }, /* OBSOLETE */
     { "legacy", &flags.legacy, TRUE, DISP_IN_GAME },
     { "lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME },
@@ -158,7 +158,7 @@ static const struct Bool_Opt {
 #else
     { "mail", (boolean *) 0, TRUE, SET_IN_FILE },
 #endif
-    { "mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME },
+    { "mention_walls", &flags.mention_walls, FALSE, SET_IN_GAME },
     { "menucolors", &iflags.use_menu_color, FALSE, SET_IN_GAME },
     /* for menu debugging only*/
     { "menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_WIZGAME },
@@ -739,9 +739,9 @@ initoptions_init()
 
     /* for "special achievement" tracking (see obj.h,
        create_object(sp_lev.c), addinv_core1(invent.c) */
-    iflags.mines_prize_type = LUCKSTONE;
-    iflags.soko_prize_type1 = BAG_OF_HOLDING;
-    iflags.soko_prize_type2 = AMULET_OF_REFLECTION;
+    g.context.achieveo.mines_prize_type = LUCKSTONE;
+    g.context.achieveo.soko_prize_typ1 = BAG_OF_HOLDING;
+    g.context.achieveo.soko_prize_typ2 = AMULET_OF_REFLECTION;
 
     /* assert( sizeof flags.inv_order == sizeof def_inv_order ); */
     (void) memcpy((genericptr_t) flags.inv_order,
@@ -4086,7 +4086,7 @@ boolean tinitial, tfrom_file;
                 g.context.botl = TRUE;
             } else if (boolopt[i].addr == &flags.invlet_constant
                        || boolopt[i].addr == &flags.sortpack
-                       || boolopt[i].addr == &iflags.implicit_uncursed) {
+                       || boolopt[i].addr == &flags.implicit_uncursed) {
                 if (!flags.invlet_constant)
                     reassign();
                 update_inventory();

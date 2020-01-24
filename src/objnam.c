@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1578896203 2020/01/13 06:16:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.287 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1579261291 2020/01/17 11:41:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.288 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -998,7 +998,7 @@ unsigned doname_flags;
             Strcat(prefix, "cursed ");
         else if (obj->blessed)
             Strcat(prefix, "blessed ");
-        else if (!iflags.implicit_uncursed
+        else if (!flags.implicit_uncursed
             /* For most items with charges or +/-, if you know how many
              * charges are left or what the +/- is, then you must have
              * totally identified the item, so "uncursed" is unnecessary,

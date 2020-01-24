@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1573688688 2019/11/13 23:44:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1579655027 2020/01/22 01:03:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1977,7 +1977,8 @@ boolean from_invent;
             explode_oil(obj, x, y);
         } else if (distu(x, y) <= 2) {
             if (!breathless(g.youmonst.data) || haseyes(g.youmonst.data)) {
-                if (obj->otyp != POT_WATER) {
+                /* wet towel protects both eyes and breathing */
+                if (obj->otyp != POT_WATER && !Half_gas_damage) {
                     if (!breathless(g.youmonst.data)) {
                         /* [what about "familiar odor" when known?] */
                         You("smell a peculiar odor...");

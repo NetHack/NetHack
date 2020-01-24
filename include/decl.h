@@ -215,7 +215,7 @@ typedef struct {
     boolean fieldlevel;   /* fieldlevel saves saves each field individually */
     boolean addinfo;      /* if set, some additional context info from core */
     boolean eof;          /* place to mark eof reached */
-    boolean bendian;      /* set to true if executing on a big-endian machine */
+    boolean bendian;      /* set to true if executing on big-endian machine */
     FILE *fpdef;          /* file pointer for fieldlevel default style */
     FILE *fpdefmap;       /* file pointer mapfile for def format */
     FILE *fplog;          /* file pointer logfile */
@@ -1184,15 +1184,13 @@ struct instance_globals {
     char *lev_message;
     lev_region *lregions;
     int num_lregions;
-    /* positions touched by level elements explicitly defined in the des-file */
+    /* positions touched by level elements explicitly defined in des-file */
     char SpLev_Map[COLNO][ROWNO];
     struct sp_coder *coder;
     xchar xstart, ystart;
     char xsize, ysize;
     boolean splev_init_present;
     boolean icedpools;
-    int mines_prize_count;
-    int soko_prize_count; /* achievements */
     struct obj *container_obj[MAX_CONTAINMENT];
     int container_idx;
     struct monst *invent_carrying_monster;

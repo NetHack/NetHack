@@ -105,6 +105,11 @@ struct novel_tracking { /* for choosing random passage when reading novel */
        passage from the Death Quotes section of dat/tribute */
 };
 
+struct achievement_tracking {
+    unsigned mines_prize_oid, soko_prize_oid; /* obj->o_id */
+    short mines_prize_type, soko_prize_typ1, soko_prize_typ2; /* obj->otyp */
+};
+
 struct context_info {
     unsigned ident;         /* social security number for each monster */
     unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
@@ -143,6 +148,7 @@ struct context_info {
     struct obj_split objsplit; /* track most recently split object stack */
     struct tribute_info tribute;
     struct novel_tracking novel;
+    struct achievement_tracking achieveo;
 };
 
 #endif /* CONTEXT_H */

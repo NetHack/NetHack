@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1573290419 2019/11/09 09:06:59 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1579660157 2020/01/22 02:29:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.149 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -462,14 +462,19 @@ int psflags;
                     pline("I've never heard of such monsters.");
                 else
                     You_cant("polymorph into any of those.");
+            } else if (wizard && Upolyd && mntmp == u.umonster) {
+                /* in wizard mode, picking own role while poly'd reverts to
+                   normal without newman()'s chance of level or sex change */
+                rehumanize();
+                goto made_change;
             } else if (iswere && (were_beastie(mntmp) == u.ulycn
                                   || mntmp == counter_were(u.ulycn)
                                   || (Upolyd && mntmp == PM_HUMAN))) {
                 goto do_shift;
-                /* Note:  humans are illegal as monsters, but an
-                 * illegal monster forces newman(), which is what we
-                 * want if they specified a human.... */
             } else if (!polyok(&mons[mntmp])
+                       /* Note:  humans are illegal as monsters, but an
+                          illegal monster forces newman(), which is what
+                          we want if they specified a human.... */
                        && !(mntmp == PM_HUMAN || your_race(&mons[mntmp])
                             || mntmp == g.urole.malenum
                             || mntmp == g.urole.femalenum)) {
@@ -934,7 +939,7 @@ break_armor()
             useup(uarmu);
         }
     } else if (sliparm(g.youmonst.data)) {
-        if (((otmp = uarm) != 0) && (racial_exception(&g.youmonst, otmp) < 1)) {
+        if ((otmp = uarm) != 0 && racial_exception(&g.youmonst, otmp) < 1) {
             if (donning(otmp))
                 cancel_don();
             Your("armor falls around you!");
@@ -1016,6 +1021,21 @@ break_armor()
             dropp(otmp);
         }
     }
+    /* not armor, but eyewear shouldn't stay worn without a head to wear
+       it/them on (should also come off if head is too tiny or too huge,
+       but putting accessories on doesn't reject those cases [yet?]);
+       amulet stays worn */
+    if ((otmp = ublindf) != 0 && !has_head(g.youmonst.data)) {
+        int l;
+        const char *eyewear = simpleonames(otmp); /* blindfold|towel|lenses */
+
+        if (!strncmp(eyewear, "pair of ", l = 8)) /* lenses */
+            eyewear += l;
+        Your("%s %s off!", eyewear, vtense(eyewear, "fall"));
+        (void) Blindf_off((struct obj *) 0); /* Null: skip usual off mesg */
+        dropp(otmp);
+    }
+    /* rings stay worn even when no hands */
 }
 
 static void

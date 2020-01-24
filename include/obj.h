@@ -346,19 +346,9 @@ struct obj {
          && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD)))
 #define pair_of(o) ((o)->otyp == LENSES || is_gloves(o) || is_boots(o))
 
-/* 'PRIZE' values override obj->corpsenm so prizes mustn't be object types
-   which use that field for monster type (or other overloaded purpose) */
-#define MINES_PRIZE 1
-#define SOKO_PRIZE1 2
-#define SOKO_PRIZE2 3
-#define is_mines_prize(o) \
-    ((o)->otyp == iflags.mines_prize_type                \
-     && (o)->record_achieve_special == MINES_PRIZE)
-#define is_soko_prize(o) \
-    (((o)->otyp == iflags.soko_prize_type1               \
-      && (o)->record_achieve_special == SOKO_PRIZE1)     \
-     || ((o)->otyp == iflags.soko_prize_type2            \
-         && (o)->record_achieve_special == SOKO_PRIZE2))
+/* achievement tracking; 3.6.x did this differently */
+#define is_mines_prize(o) ((o)->o_id == g.context.achieveo.mines_prize_oid)
+#define is_soko_prize(o) ((o)->o_id == g.context.achieveo.soko_prize_oid)
 
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO 0x1

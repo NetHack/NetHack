@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1578764033 2020/01/11 17:33:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1579655026 2020/01/22 01:03:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.392 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -806,6 +806,24 @@ boolean pre, wiztower;
                 continue;
             if (mtmp->isshk)
                 setpaid(mtmp);
+            /* achievement tracking */
+            {
+                static const char Unachieve[] = "%s achievement revoked.";
+
+                if (Is_mineend_level(&u.uz)) {
+                    if (u.uachieve.mines_luckstone) {
+                        pline(Unachieve, "Mine's end");
+                        u.uachieve.mines_luckstone = 0;
+                    }
+                    g.context.achieveo.mines_prize_oid = 0;
+                } else if (Is_sokoend_level(&u.uz)) {
+                    if (u.uachieve.finish_sokoban) {
+                        pline(Unachieve, "Sokoban end");
+                        u.uachieve.finish_sokoban = 0;
+                    }
+                    g.context.achieveo.soko_prize_oid = 0;
+                }
+            }
             /* TODO?
              *  Reduce 'born' tally for each monster about to be discarded
              *  by savelev(), otherwise replacing heavily populated levels
@@ -877,6 +895,7 @@ wiz_makemap(VOID_ARGS)
 {
     if (wizard) {
         boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
+
         makemap_prepost(TRUE, was_in_W_tower);
         /* create a new level; various things like bestowing a guardian
            angel on Astral or setting off alarm on Ft.Ludios are handled
@@ -2984,6 +3003,8 @@ int final;
         enlght_halfdmg(HALF_PHDAM, final);
     if (Half_spell_damage)
         enlght_halfdmg(HALF_SPDAM, final);
+    if (Half_gas_damage)
+        enl_msg(You_, "take", "took", " reduced poison gas damage", "");
     /* polymorph and other shape change */
     if (Protection_from_shape_changers)
         you_are("protected from shape changers",

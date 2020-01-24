@@ -1,4 +1,4 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1559998716 2019/06/08 12:58:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1579648295 2020/01/21 23:11:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -95,13 +95,17 @@ struct obj *obj;
     switch (skill) {
     case P_NONE:
         /* not a weapon or weptool: use item class name;
-           override class name "food" for corpses, tins, and eggs,
-           "large rock" for statues and boulders, and "tool" for towels */
+           override class name for things where it sounds strange and
+           for things that aren't unexpected to find being wielded:
+           corpses, tins, eggs, and globs avoid "food",
+           statues and boulders avoid "large rock",
+           and towels and tin openers avoid "tool" */
         descr = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG
                  || obj->otyp == STATUE || obj->otyp == BOULDER
-                 || obj->otyp == TOWEL)
-                    ? OBJ_NAME(objects[obj->otyp])
-                    : def_oc_syms[(int) obj->oclass].name;
+                 || obj->otyp == TOWEL || obj->otyp == TIN_OPENER)
+                ? OBJ_NAME(objects[obj->otyp])
+                : obj->globby ? "glob"
+                  : def_oc_syms[(int) obj->oclass].name;
         break;
     case P_SLING:
         if (is_ammo(obj))

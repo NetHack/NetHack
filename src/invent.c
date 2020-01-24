@@ -835,20 +835,14 @@ struct obj *obj;
     }
 
     /* "special achievements" aren't discoverable during play, they
-       end up being recorded in XLOGFILE at end of game, nowhere else;
-       record_achieve_special overloads corpsenm which is ordinarily
-       initialized to NON_PM (-1) rather than to 0; any special prize
-       must never be a corpse, egg, tin, figurine, or statue because
-       their use of obj->corpsenm for monster type would conflict,
-       nor be a leash (corpsenm overloaded for m_id of leashed
-       monster) or a novel (corpsenm overloaded for novel index) */
+       end up being recorded in XLOGFILE at end of game, nowhere else */
     if (is_mines_prize(obj)) {
         u.uachieve.mines_luckstone = 1;
-        obj->record_achieve_special = NON_PM;
+        g.context.achieveo.mines_prize_oid = 0;
         obj->nomerge = 0;
     } else if (is_soko_prize(obj)) {
         u.uachieve.finish_sokoban = 1;
-        obj->record_achieve_special = NON_PM;
+        g.context.achieveo.soko_prize_oid = 0;
         obj->nomerge = 0;
     }
 }
