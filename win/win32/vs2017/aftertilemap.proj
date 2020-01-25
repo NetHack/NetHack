@@ -4,7 +4,7 @@
   <Target Name="Build"
      Inputs="$(ToolsDir)tilemap.exe"
 	 Outputs="$(SrcDir)tile.c">
-	<Exec Command="$(ToolsDir)tilemap.exe" WorkingDirectory="$(SrcDir)"/>
+	<Exec Command="&quot;$(ToolsDir)tilemap.exe&quot;" WorkingDirectory="$(SrcDir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="$(SrcDir)tile.c"/>
