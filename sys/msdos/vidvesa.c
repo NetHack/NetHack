@@ -925,18 +925,21 @@ unsigned mode;
 
     if (mode == MODETEXT) {
         iflags.grmode = 0;
+        memset(&regs, 0, sizeof(regs));
         regs.x.ax = mode;
         (void) __dpmi_int(VIDEO_BIOS, &regs);
     } else if (mode >= 0x100) {
         iflags.grmode = 1;
+        memset(&regs, 0, sizeof(regs));
         regs.x.ax = 0x4F02;
-        regs.x.bx = mode & 0x81FF;
+        regs.x.bx = mode;
         (void) __dpmi_int(VIDEO_BIOS, &regs);
         /* Record that the window position is unknown */
         vesa_win_pos[0] = 0xFFFFFFFF;
         vesa_win_pos[1] = 0xFFFFFFFF;
     } else {
         iflags.grmode = 0; /* force text mode for error msg */
+        memset(&regs, 0, sizeof(regs));
         regs.x.ax = MODETEXT;
         (void) __dpmi_int(VIDEO_BIOS, &regs);
         g_attribute = attrib_text_normal;
@@ -1057,12 +1060,21 @@ vesa_detect()
     vesa_pixel_size = mode_info.BitsPerPixel;
     vesa_pixel_bytes = (vesa_pixel_size + 7) / 8;
     if (vbe_info.VbeVersion >= 0x0300) {
-        vesa_red_pos = mode_info.RedFieldPosition;
-        vesa_red_size = mode_info.RedMaskSize;
-        vesa_green_pos = mode_info.GreenFieldPosition;
-        vesa_green_size = mode_info.GreenMaskSize;
-        vesa_blue_pos = mode_info.BlueFieldPosition;
-        vesa_blue_size = mode_info.BlueMaskSize;
+        if (mode_info.ModeAttributes & 0x80) {
+            vesa_red_pos = mode_info.LinRedFieldPosition;
+            vesa_red_size = mode_info.LinRedMaskSize;
+            vesa_green_pos = mode_info.LinGreenFieldPosition;
+            vesa_green_size = mode_info.LinGreenMaskSize;
+            vesa_blue_pos = mode_info.LinBlueFieldPosition;
+            vesa_blue_size = mode_info.LinBlueMaskSize;
+        } else {
+            vesa_red_pos = mode_info.RedFieldPosition;
+            vesa_red_size = mode_info.RedMaskSize;
+            vesa_green_pos = mode_info.GreenFieldPosition;
+            vesa_green_size = mode_info.GreenMaskSize;
+            vesa_blue_pos = mode_info.BlueFieldPosition;
+            vesa_blue_size = mode_info.BlueMaskSize;
+        }
     } else {
         switch (vesa_pixel_size) {
         case 15:
