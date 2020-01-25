@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1450451497 2015/12/18 15:11:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1579914041 2020/01/25 01:00:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -430,6 +430,45 @@ encodeachieve()
 {
     long r = 0L;
 
+    /*
+     * Other potential achievements to track (some already recorded
+     * for other purposes such as automatic level annotations or
+     * quest progress):
+     *  entered mines branch,
+     *  chatted with the Oracle,
+     *  read a Discworld novel,
+     *  entered Sokoban's first level,
+     *  entered Bigroom level,
+     *  got quest summons,
+     *  entered quest branch,
+     *  chatted with leader,
+     *  entered second quest level,
+     *  entered last quest level,
+     *  defeated nemesis (not same as acquiring Bell or artifact),
+     *  completed quest (again, not the same as getting the items),
+     *  entered rogue level,
+     *  entered Fort Ludios level/branch,
+     *  entered Medusa level,
+     *  entered castle level,
+     *  opened castle drawbridge,
+     *  obtained castle wand,
+     *  entered valley level,
+     *  [assorted demon lairs?],
+     *  entered Vlad's tower branch,
+     *  defeated Vlad (not same as acquiring Candelabrum),
+     *  entered Wizard's tower area within relevant level,
+     *  defeated Wizard,
+     *  found vibrating square,
+     *  entered sanctum level,
+     *  [defeated Riders],
+     *  located the correct high altar (for initial alignment or current
+     *   one or both?) on the astral level.
+     * Too many to include them all in a 32-bit mask, but that could
+     * handle a lot of them.  Defeated <foo> can be seen via the vanquished
+     * monsters list and many or all of the entered <bar> can be seen via
+     * the dungeon overview but both of those things go away as soon as
+     * the program exits.
+     */
     if (u.uachieve.bell)
         r |= 1L << 0;
     if (u.uachieve.enter_gehennom)
