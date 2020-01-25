@@ -430,7 +430,7 @@ boolean
 in_out_region(x, y)
 xchar x, y;
 {
-    int i, f_indx;
+    int i, f_indx = 0;
 
     /* First check if hero can do the move */
     for (i = 0; i < n_regions; i++) {
@@ -485,7 +485,7 @@ m_in_out_region(mon, x, y)
 struct monst *mon;
 xchar x, y;
 {
-    int i, f_indx;
+    int i, f_indx = 0;
 
     /* First check if mon can do the move */
     for (i = 0; i < n_regions; i++) {
