@@ -4,15 +4,15 @@
   <Target Name="Build"
      Inputs="$(ToolsDir)uudecode.exe;@(UUFiles)"
 	 Outputs="@(IconFiles);@(BmpFiles);@(RecordFiles)">
-	<Exec Command="$(ToolsDir)uudecode.exe $(SysWinntDir)nhico.uu" WorkingDirectory="$(WinWin32Dir)"/>
-	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)mnsel.uu" WorkingDirectory="$(WinWin32Dir)"/>
-	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)mnselcnt.uu" WorkingDirectory="$(WinWin32Dir)"/>
-	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)mnunsel.uu" WorkingDirectory="$(WinWin32Dir)"/>
-	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)petmark.uu" WorkingDirectory="$(WinWin32Dir)"/>
-	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)pilemark.uu" WorkingDirectory="$(WinWin32Dir)"/>
-	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)splash.uu" WorkingDirectory="$(WinWin32Dir)"/>
-	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)rip.uu" WorkingDirectory="$(WinWin32Dir)"/>
-	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)record.uu" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SysWinntDir)nhico.uu&quot;" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(WinWin32Dir)mnsel.uu&quot;" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(WinWin32Dir)mnselcnt.uu&quot;" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(WinWin32Dir)mnunsel.uu&quot;" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(WinWin32Dir)petmark.uu&quot;" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(WinWin32Dir)pilemark.uu&quot;" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(WinWin32Dir)splash.uu&quot;" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(WinWin32Dir)rip.uu&quot;" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(WinWin32Dir)record.uu&quot;" WorkingDirectory="$(WinWin32Dir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="@(IconFiles);@(BmpFiles);@(RecordFiles)"/>

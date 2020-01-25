@@ -4,7 +4,7 @@
   <Target Name="Build"
      Inputs="@(Desfiles->'$(DatDir)%(filename)%(extension)');$(BinDir)levcomp.exe"
 	 Outputs="@(Levfiles->'$(DatDir)%(filename)%(extension)')">
-	<Exec Command="$(ToolsDir)levcomp.exe @(Desfiles, ' ')" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)levcomp.exe&quot; @(Desfiles, ' ')" WorkingDirectory="$(DatDir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="@(Levfiles->'$(DatDir)%(filename)%(extension)')"/>
