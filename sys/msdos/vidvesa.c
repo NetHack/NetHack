@@ -123,6 +123,7 @@ static int vesa_write_win; /* Select the write window */
 static unsigned long vesa_win_func;
 static unsigned long vesa_win_pos[2]; /* Window position */
 static unsigned long vesa_win_addr[2]; /* Window physical address */
+static unsigned long vesa_segment;  /* Selector of linear frame buffer */
 static unsigned long vesa_win_size; /* Window size */
 static unsigned long vesa_win_gran; /* Window granularity */
 static unsigned char vesa_pixel_size;
@@ -222,6 +223,20 @@ error:
     return FALSE;
 }
 
+static unsigned
+vesa_map_frame_buffer(unsigned phys_addr, unsigned size)
+{
+    __dpmi_meminfo info;
+    int rc;
+
+    info.handle = 0;
+    info.address = phys_addr;
+    info.size = size;
+    rc = __dpmi_physical_address_mapping(&info);
+
+    return rc == 0 ? info.address : 0;
+}
+
 /* Set the memory window and return the offset */
 static unsigned long
 vesa_SetWindow(window, offset)
@@ -276,31 +291,66 @@ unsigned x, y;
     unsigned long addr, color;
     unsigned i;
 
-    switch (vesa_pixel_size) {
-    case 8:
-        addr = vesa_SetWindow(vesa_read_win, offset);
-        color = _farpeekb(_dos_ds, addr);
-        break;
+    if (vesa_segment != 0) {
+        /* Linear frame buffer in use */
+        switch (vesa_pixel_size) {
+        case 8:
+            color = _farpeekb(vesa_segment, offset);
+            break;
 
-    case 15:
-    case 16:
-        addr = vesa_SetWindow(vesa_read_win, offset);
-        color = _farpeekw(_dos_ds, addr);
-        break;
+        case 15:
+        case 16:
+            color = _farpeekw(vesa_segment, offset);
+            break;
 
-    case 24:
-        /* Pixel may cross a window boundary */
-        color = 0;
-        for (i = 0; i < 3; ++i) {
-            addr = vesa_SetWindow(vesa_read_win, offset + i);
-            color |= (unsigned long) _farpeekb(_dos_ds, addr) << (i * 8);
+        case 24:
+            /* Don't cross a 4 byte boundary if it can be avoided */
+            if (offset & 1) {
+                color = _farpeekl(vesa_segment, offset - 1) >> 8;
+            } else {
+                color = _farpeekl(vesa_segment, offset) & 0xFFFFFFFF;
+            }
+            break;
+
+        case 32:
+            color = _farpeekl(vesa_segment, offset);
+            break;
+
+        default: /* Shouldn't happen */
+            color = 0;
+            break;
         }
-        break;
+    } else {
+        switch (vesa_pixel_size) {
+        case 8:
+            addr = vesa_SetWindow(vesa_read_win, offset);
+            color = _farpeekb(_dos_ds, addr);
+            break;
 
-    case 32:
-        addr = vesa_SetWindow(vesa_read_win, offset);
-        color = _farpeekl(_dos_ds, addr);
-        break;
+        case 15:
+        case 16:
+            addr = vesa_SetWindow(vesa_read_win, offset);
+            color = _farpeekw(_dos_ds, addr);
+            break;
+
+        case 24:
+            /* Pixel may cross a window boundary */
+            color = 0;
+            for (i = 0; i < 3; ++i) {
+                addr = vesa_SetWindow(vesa_read_win, offset + i);
+                color |= (unsigned long) _farpeekb(_dos_ds, addr) << (i * 8);
+            }
+            break;
+
+        case 32:
+            addr = vesa_SetWindow(vesa_read_win, offset);
+            color = _farpeekl(_dos_ds, addr);
+            break;
+
+        default: /* Shouldn't happen */
+            color = 0;
+            break;
+        }
     }
     return color;
 }
@@ -314,30 +364,62 @@ unsigned long color;
     unsigned long addr;
     unsigned i;
 
-    switch (vesa_pixel_size) {
-    case 8:
-        addr = vesa_SetWindow(vesa_write_win, offset);
-        _farpokeb(_dos_ds, addr, color);
-        break;
+    if (vesa_segment != 0) {
+        /* Linear frame buffer in use */
+        switch (vesa_pixel_size) {
+        case 8:
+            _farpokeb(vesa_segment, offset, color);
+            break;
 
-    case 15:
-    case 16:
-        addr = vesa_SetWindow(vesa_write_win, offset);
-        _farpokew(_dos_ds, addr, color);
-        break;
+        case 15:
+        case 16:
+            _farpokew(vesa_segment, offset, color);
+            break;
 
-    case 24:
-        /* Pixel may cross a window boundary */
-        for (i = 0; i < 3; ++i) {
-            addr = vesa_SetWindow(vesa_read_win, offset + i);
-            _farpokeb(_dos_ds, addr, (unsigned char) (color >> (i * 8)));
+        case 24:
+            if (offset & 1) {
+                _farpokeb(vesa_segment, offset + 0, color & 0xFF);
+                _farpokew(vesa_segment, offset + 1, color >> 8);
+            } else {
+                _farpokew(vesa_segment, offset + 0, color & 0xFFFF);
+                _farpokeb(vesa_segment, offset + 2, color >> 16);
+            }
+            break;
+
+        case 32:
+            _farpokel(vesa_segment, offset, color);
+            break;
+
+        default: /* Shouldn't happen */
+            color = 0;
+            break;
         }
-        break;
+    } else {
+        switch (vesa_pixel_size) {
+        case 8:
+            addr = vesa_SetWindow(vesa_write_win, offset);
+            _farpokeb(_dos_ds, addr, color);
+            break;
 
-    case 32:
-        addr = vesa_SetWindow(vesa_write_win, offset);
-        _farpokel(_dos_ds, addr, color);
-        break;
+        case 15:
+        case 16:
+            addr = vesa_SetWindow(vesa_write_win, offset);
+            _farpokew(_dos_ds, addr, color);
+            break;
+
+        case 24:
+            /* Pixel may cross a window boundary */
+            for (i = 0; i < 3; ++i) {
+                addr = vesa_SetWindow(vesa_write_win, offset + i);
+                _farpokeb(_dos_ds, addr, (unsigned char) (color >> (i * 8)));
+            }
+            break;
+
+        case 32:
+            addr = vesa_SetWindow(vesa_write_win, offset);
+            _farpokel(_dos_ds, addr, color);
+            break;
+        }
     }
 }
 
@@ -1032,6 +1114,25 @@ vesa_detect()
         vesa_write_win = 1;
     } else {
         goto error; /* Shouldn't happen */
+    }
+
+    /* Configure a linear frame buffer if we have it */
+    if ((mode_info.ModeAttributes & 0x80) != 0) {
+        unsigned sel = vesa_segment;
+        unsigned win_size = mode_info.BytesPerScanLine * mode_info.YResolution;
+        unsigned addr = vesa_map_frame_buffer(mode_info.PhysBasePtr, win_size);
+        if (sel == 0) {
+            sel = __dpmi_allocate_ldt_descriptors(1);
+        }
+        if (addr != 0) {
+            vesa_mode |= 0x4000;
+            vesa_segment = sel;
+            __dpmi_set_segment_base_address(sel, addr);
+            __dpmi_set_segment_limit(sel, (win_size - 1) | 0xFFF);
+        } else {
+            __dpmi_free_ldt_descriptor(sel);
+            vesa_segment = 0;
+        }
     }
 
     __dpmi_free_dos_memory(vbe_info_sel);
