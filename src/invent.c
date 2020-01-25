@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1575245062 2019/12/02 00:04:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.267 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1579914042 2020/01/25 01:00:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -834,8 +834,8 @@ struct obj *obj;
         set_artifact_intrinsic(obj, 1, W_ART);
     }
 
-    /* "special achievements" aren't discoverable during play, they
-       end up being recorded in XLOGFILE at end of game, nowhere else */
+    /* "special achievements"; revealed in end of game disclosure and
+       dumplog, originally just recorded in XLOGFILE */
     if (is_mines_prize(obj)) {
         u.uachieve.mines_luckstone = 1;
         g.context.achieveo.mines_prize_oid = 0;
