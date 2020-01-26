@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1579990313 2020/01/25 22:11:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	worm.c	$NHDT-Date: 1580043421 2020/01/26 12:57:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -218,26 +218,65 @@ struct monst *worm;
     seg->nseg = new_seg;    /* attach it to the end of the list */
     wheads[wnum] = new_seg; /* move the end pointer */
 
-    /*
-     * [maybe] FIXME?
-     *  scheduling wgrowtime[] seems to be based on normal movement
-     *  speed (12) but long worms move at 1/4 of that (3), so they'll
-     *  reach the scheduled 'moves' more quickly (in terms of their
-     *  actual movement) and grow faster than was probably intended.
-     */
     if (wgrowtime[wnum] <= g.moves) {
-        if (!wgrowtime[wnum])
+        int whplimit, whpcap, wsegs = count_wsegs(worm);
+
+        /* first set up for the next time to grow */
+        if (!wgrowtime[wnum]) {
+            /* new worm; usually grow a tail segment on its next turn */
             wgrowtime[wnum] = g.moves + rnd(5);
-        else
-            wgrowtime[wnum] += rn1(15, 3);
-        worm->mhp += 3;
-        if (worm->mhp > MHPMAX)
-            worm->mhp = MHPMAX;
-        if (worm->mhp > worm->mhpmax)
-            worm->mhpmax = worm->mhp;
-    } else
-        /* The worm doesn't grow, so the last segment goes away. */
+        } else {
+            int mmove = mcalcmove(worm, FALSE),
+                /* prior to 3.7.0, next-grow increment was 3..17 but since
+                   it got checked every 4th turn when the speed 3 worm got
+                   to move, it was effectively 0..5; also, its usage was
+                   'wgrowtime += incr', so often 'wgrowtime' would be
+                   exceeded by 'moves' on consecutive turns for the worm,
+                   resulting in an excessively rapid growth cycle */
+                incr = rn1(10, 2); /* 2..12; after adjusting for long worn
+                                    * speed of 3, effective value is 8..48 */
+
+            incr = (incr * NORMAL_SPEED) / max(mmove, 1);
+            wgrowtime[wnum] = g.moves + incr;
+        }
+
+        /* increase HP based on number of segments; if it has shrunk, it
+           won't gain new HP until regaining previous peak segment count;
+           when wounded (whether from damage or from shrinking), the HP
+           which might have been 'new' will heal */
+        whplimit = !worm->m_lev ? 4 : (8 * (int) worm->m_lev);
+        /* note: wsegs includes the hidden segment co-located with the head */
+        if (wsegs > 33)
+            whplimit += 2 * (wsegs - 33), wsegs = 33;
+        if (wsegs > 22)
+            whplimit += 4 * (wsegs - 22), wsegs = 22;
+        if (wsegs > 11)
+            whplimit += 6 * (wsegs - 11), wsegs = 11;
+        whplimit += 8 * wsegs;
+        if (whplimit > MHPMAX)
+            whplimit = MHPMAX;
+
+        worm->mhp += d(2, 2); /* 2..4, average 3 */
+        whpcap = max(whplimit, worm->mhpmax);
+        if (worm->mhp < whpcap) {
+            /* can't exceed segment-derived limit unless level increase after
+               peak tail growth has already done so; when that isn't the case,
+               if segment growth exceeds current max HP then increase it */
+            if (worm->mhp > whpcap)
+                worm->mhp = whpcap;
+            if (worm->mhp > worm->mhpmax)
+                worm->mhpmax = worm->mhp;
+        } else {
+            if (worm->mhp > worm->mhpmax)
+                worm->mhp = worm->mhpmax;
+        }
+    } else {
+        /* The worm doesn't grow, so the last segment goes away.
+           (Done after inserting an extra segment at the head, so it
+           isn't getting smaller here, just changing location without
+           having to move any of the intermediate segments.) */
         shrink_worm(wnum);
+    }
 }
 
 /*
@@ -253,10 +292,11 @@ struct monst *worm;
 {
     shrink_worm((int) worm->wormno); /* shrink */
 
-    if (worm->mhp > 3)
-        worm->mhp -= 3; /* mhpmax not changed ! */
-    else
-        worm->mhp = 1;
+    if (worm->mhp > count_wsegs(worm)) {
+        worm->mhp -= d(2, 2); /* 2..4, average 3; note: mhpmax not changed! */
+        if (worm->mhp < 1)
+            worm->mhp = 1;
+    }
 }
 
 /*
