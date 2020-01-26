@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1579261291 2020/01/17 11:41:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.288 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1580070220 2020/01/26 20:23:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.291 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2952,8 +2952,8 @@ char *bp, *p;
 int locked, trapped;
 {
     struct rm *lev;
-    boolean madeterrain = FALSE, badterrain = FALSE;
-    int trap, x = u.ux, y = u.uy;
+    boolean madeterrain = FALSE, badterrain = FALSE, didblock;
+    int trap, oldtyp, x = u.ux, y = u.uy;
 
     for (trap = NO_TRAP + 1; trap < TRAPNUM; trap++) {
         struct trap *t;
@@ -2978,21 +2978,25 @@ int locked, trapped;
     /* furniture and terrain (use at your own risk; can clobber stairs
        or place furniture on existing traps which shouldn't be allowed) */
     lev = &levl[x][y];
+    oldtyp = lev->typ;
+    didblock = does_block(x, y, lev);
     p = eos(bp);
     if (!BSTRCMPI(bp, p - 8, "fountain")) {
         lev->typ = FOUNTAIN;
         g.level.flags.nfountains++;
-        if (!strncmpi(bp, "magic ", 6))
-            lev->blessedftn = 1;
+        lev->looted = 0; /* overlays 'flags' */
+        lev->blessedftn = !strncmpi(bp, "magic ", 6);
         pline("A %sfountain.", lev->blessedftn ? "magic " : "");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 6, "throne")) {
         lev->typ = THRONE;
+        lev->looted = 0; /* overlays 'flags' */
         pline("A throne.");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 4, "sink")) {
         lev->typ = SINK;
         g.level.flags.nsinks++;
+        lev->looted = 0; /* overlays 'flags' */
         pline("A sink.");
         madeterrain = TRUE;
 
@@ -3000,6 +3004,7 @@ int locked, trapped;
     } else if (!BSTRCMPI(bp, p - 4, "pool")
                || !BSTRCMPI(bp, p - 4, "moat")) {
         lev->typ = !BSTRCMPI(bp, p - 4, "pool") ? POOL : MOAT;
+        lev->flags = 0;
         del_engr_at(x, y);
         pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
         /* Must manually make kelp! */
@@ -3009,6 +3014,7 @@ int locked, trapped;
     /* also matches "molten lava" */
     } else if (!BSTRCMPI(bp, p - 4, "lava")) {
         lev->typ = LAVAPOOL;
+        lev->flags = 0;
         del_engr_at(x, y);
         pline("A pool of molten lava.");
         if (!(Levitation || Flying))
@@ -3028,34 +3034,51 @@ int locked, trapped;
             al = A_NONE;
         else /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
             al = !rn2(6) ? A_NONE : (rn2((int) A_LAWFUL + 2) - 1);
-        lev->altarmask = Align2amask(al);
+        lev->altarmask = Align2amask(al); /* overlays 'flags' */
         pline("%s altar.", An(align_str(al)));
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 5, "grave")
                || !BSTRCMPI(bp, p - 9, "headstone")) {
         make_grave(x, y, (char *) 0);
-        pline("%s.", IS_GRAVE(lev->typ) ? "A grave"
-                                        : "Can't place a grave here");
-        madeterrain = TRUE;
+        if (IS_GRAVE(lev->typ)) {
+            lev->looted = 0; /* overlays 'flags' */
+            lev->disturbed = !strncmpi(bp, "disturbed ", 10);
+            pline("A %sgrave.", lev->disturbed ? "disturbed " : "");
+            madeterrain = TRUE;
+        } else {
+            pline("Can't place a grave here");
+            badterrain = TRUE;
+        }
     } else if (!BSTRCMPI(bp, p - 4, "tree")) {
         lev->typ = TREE;
+        lev->looted = 0; /* overlays 'flags' */
         pline("A tree.");
-        block_point(x, y);
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 4, "bars")) {
         lev->typ = IRONBARS;
+        lev->flags = 0;
+        /* [FIXME: if this isn't a wall or door location where 'horizontal'
+            is already set up, that should be calculated for this spot.
+            Unforutnately, it can be tricky; placing one in open space
+            and then another adjacent might need to recalculate first one.] */
         pline("Iron bars.");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 5, "cloud")) {
         lev->typ = CLOUD;
-        block_point(x, y);
+        lev->flags = 0;
         pline("A cloud.");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 11, "secret door")) {
-        if (lev->typ == DOOR
-            || (IS_WALL(lev->typ) && lev->typ != DBWALL)) {
+        /* require door or wall so that the 'horizontal' flag will
+           already have the correct value (it will matter once the
+           secret door is discovered and becomes a regular door);
+           player might choose to put SDOOR on top of existing SDOOR
+           to control its trapped state; iron bars are surrogate walls */
+        if (lev->typ == DOOR || lev->typ == SDOOR
+            || (IS_WALL(lev->typ) && lev->typ != DBWALL)
+            || lev->typ == IRONBARS) {
             lev->typ = SDOOR;
-            lev->wall_info = 0;
+            lev->wall_info = 0; /* overlays 'flags' */
             /* lev->horizontal stays as-is */
             /* no special handling for rogue level is necessary;
                exposing a secret door there yields a doorless doorway */
@@ -3073,7 +3096,6 @@ int locked, trapped;
 #endif
             if (trapped)
                 lev->doormask |= D_TRAPPED;
-            block_point(x, y);
             pline("Secret door.");
             madeterrain = TRUE;
         } else {
@@ -3083,7 +3105,7 @@ int locked, trapped;
     } else if (!BSTRCMPI(bp, p - 15, "secret corridor")) {
         if (lev->typ == CORR) {
             lev->typ = SCORR;
-            block_point(x, y);
+            /* neither CORR nor SCORR uses 'flags' or 'horizontal' */
             pline("Secret corridor.");
             madeterrain = TRUE;
         } else {
@@ -3099,11 +3121,41 @@ int locked, trapped;
         if (u.uinwater && !is_pool(u.ux, u.uy)) {
             u.uinwater = 0; /* leave the water */
             docrt();
-            g.vision_full_recalc = 1;
-        } else if (u.utrap && u.utraptype == TT_LAVA
-                   && !is_lava(u.ux, u.uy)) {
-            reset_utrap(FALSE);
+            /* [block/unblock_point was handled by docrt -> vision_recalc] */
+        } else {
+            if (u.utrap && u.utraptype == TT_LAVA && !is_lava(u.ux, u.uy))
+                reset_utrap(FALSE);
+
+            if (does_block(x, y, lev)) {
+                if (!didblock)
+                    block_point(x, y);
+            } else {
+                if (didblock)
+                    unblock_point(x, y);
+            }
         }
+        /* fixups for replaced terrain that aren't handled above;
+           for fountain placed on fountain or sink placed on sink, the
+           increment above gets canceled out by the decrement here;
+           otherwise if fountain or sink was replaced, there's one less */
+        if (IS_FOUNTAIN(oldtyp))
+            g.level.flags.nfountains--;
+        else if (IS_SINK(oldtyp))
+            g.level.flags.nsinks--;
+        /* horizontal is overlaid by fountain->blessedftn, grave->disturbed */
+        if (IS_FOUNTAIN(oldtyp) || IS_GRAVE(oldtyp)
+            || IS_WALL(oldtyp) || oldtyp == IRONBARS
+            || IS_DOOR(oldtyp) || oldtyp == SDOOR) {
+            /* when new terrain is a fountain, 'blessedftn' was explicitly
+               set above; likewise for grave and 'disturbed'; when it's a
+               secret door, the old type was a wall or a door and we retain
+               the 'horizontal' value from those */
+            if (!IS_FOUNTAIN(lev->typ) && !IS_GRAVE(lev->typ)
+                && lev->typ != SDOOR)
+                lev->horizontal = 0; /* also clears blessedftn, disturbed */
+        }
+        /* note: lev->lit and lev->nondiggable retain their values even
+           though those might not make sense with the new terrain */
     }
     if (madeterrain || badterrain) {
         /* cast 'const' away; caller won't modify this */

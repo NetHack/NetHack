@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1578258722 2020/01/05 21:12:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1580070206 2020/01/26 20:23:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -528,16 +528,19 @@ struct rm {
 #define SV7   0x80
 #define SVALL 0xFF
 
-#define doormask flags
-#define altarmask flags
-#define wall_info flags
-#define ladder flags
-#define drawbridgemask flags
-#define looted flags
-#define icedpool flags
-
+/* if these get changed or expanded, make sure wizard-mode wishing becomes
+   aware of the new usage */
+#define doormask   flags /* door, sdoor (note conflict with wall_info) */
+#define altarmask  flags /* alignment and maybe temple */
+#define wall_info  flags /* wall, sdoor (note conflict with doormask) */
+#define ladder     flags /* up or down */
+#define drawbridgemask flags /* what's underneath when the span is open */
+#define looted     flags /* used for throne, tree, fountain, sink, door */
+#define icedpool   flags /* used for ice (in case it melts) */
+/* horizonal applies to walls, doors (including sdoor); also to iron bars
+   even though they don't have separate symbols for horizontal and vertical */
 #define blessedftn horizontal /* a fountain that grants attribs */
-#define disturbed horizontal  /* a grave that has been disturbed */
+#define disturbed  horizontal /* a grave that has been disturbed */
 
 struct damage {
     struct damage *next;
