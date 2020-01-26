@@ -60,8 +60,8 @@ IDI_ICON1               ICON                    "nethack.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,6,3,0
- PRODUCTVERSION 3,6,3,0
+ FILEVERSION 3,6,4,0
+ PRODUCTVERSION 3,6,4,0
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -77,12 +77,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "NetHack for Windows - TTY Interface"
-            VALUE "FileVersion", "3.6.3"
+            VALUE "FileVersion", "3.6.4"
             VALUE "InternalName", "NetHack"
             VALUE "LegalCopyright", "Copyright (C) 1985 - 2019.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
             VALUE "OriginalFilename", "NetHack.exe"
             VALUE "ProductName", "NetHack"
-            VALUE "ProductVersion", "3.6.3"
+            VALUE "ProductVersion", "3.6.4"
         END
     END
     BLOCK "VarFileInfo"

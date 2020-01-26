@@ -2989,8 +2989,9 @@ boolean peaceful, silent;
             if (canseemon(shkp)) {
                 Norep("%s booms: \"%s, you are a thief!\"",
                       Shknam(shkp), plname);
-            } else
-                Norep("You hear a scream, \"Thief!\"");
+            } else if (!Deaf) {
+                Norep("You hear a scream, \"Thief!\"");  /* Deaf-aware */
+            }
         }
         hot_pursuit(shkp);
         (void) angry_guards(FALSE);
@@ -4395,7 +4396,7 @@ const char *Izchak_speaks[] = {
     "%s says: 'These shopping malls give me a headache.'",
     "%s says: 'Slow down.  Think clearly.'",
     "%s says: 'You need to take things one at a time.'",
-    "%s says: 'I don't like poofy coffee... give me Columbian Supremo.'",
+    "%s says: 'I don't like poofy coffee... give me Colombian Supremo.'",
     "%s says that getting the devteam's agreement on anything is difficult.",
     "%s says that he has noticed those who serve their deity will prosper.",
     "%s says: 'Don't try to steal from me - I have friends in high places!'",

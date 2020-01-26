@@ -43,7 +43,9 @@ struct window_procs Gem_procs = {
         | WC_FONT_TEXT | WC_FONT_MAP | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS
         | WC_FONTSIZ_MENU | WC_FONTSIZ_TEXT | WC_FONTSIZ_MAP | WC_TILE_WIDTH
         | WC_TILE_HEIGHT | WC_TILE_FILE | WC_VARY_MSGCOUNT | WC_ASCII_MAP,
-    0L, Gem_init_nhwindows, Gem_player_selection, Gem_askname,
+    0L,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    Gem_init_nhwindows, Gem_player_selection, Gem_askname,
     Gem_get_nh_event, Gem_exit_nhwindows, Gem_suspend_nhwindows,
     Gem_resume_nhwindows, Gem_create_nhwindow, Gem_clear_nhwindow,
     Gem_display_nhwindow, Gem_destroy_nhwindow, Gem_curs, Gem_putstr,
@@ -930,7 +932,7 @@ int glyph;
     unsigned special;
 
     /* map glyph to character and color */
-    (void) mapglyph(glyph, &ch, &color, &special, x, y);
+    (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
 
 #ifdef TEXTCOLOR
     /* Turn off color if rogue level. */

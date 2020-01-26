@@ -1,4 +1,4 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1543455828 2018/11/29 01:43:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1573957877 2019/11/17 02:31:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -340,6 +340,11 @@ NhRegion *reg;
     if (i == n_regions)
         return;
 
+    /* remove region before potential newsym() calls, but don't free it yet */
+    if (--n_regions != i)
+        regions[i] = regions[n_regions];
+    regions[n_regions] = (NhRegion *) 0;
+
     /* Update screen if necessary */
     reg->ttl = -2L; /* for visible_region_at */
     if (reg->visible)
@@ -349,9 +354,6 @@ NhRegion *reg;
                     newsym(x, y);
 
     free_region(reg);
-    regions[i] = regions[n_regions - 1];
-    regions[n_regions - 1] = (NhRegion *) 0;
-    n_regions--;
 }
 
 /*
@@ -430,24 +432,25 @@ xchar x, y;
 {
     int i, f_indx;
 
-    /* First check if we can do the move */
+    /* First check if hero can do the move */
     for (i = 0; i < n_regions; i++) {
-        if (inside_region(regions[i], x, y) && !hero_inside(regions[i])
-            && !regions[i]->attach_2_u) {
-            if ((f_indx = regions[i]->can_enter_f) != NO_CALLBACK)
-                if (!(*callbacks[f_indx])(regions[i], (genericptr_t) 0))
-                    return FALSE;
-        } else if (hero_inside(regions[i]) && !inside_region(regions[i], x, y)
-                   && !regions[i]->attach_2_u) {
-            if ((f_indx = regions[i]->can_leave_f) != NO_CALLBACK)
-                if (!(*callbacks[f_indx])(regions[i], (genericptr_t) 0))
-                    return FALSE;
+        if (regions[i]->attach_2_u)
+            continue;
+        if (inside_region(regions[i], x, y)
+            ? (!hero_inside(regions[i])
+               && (f_indx = regions[i]->can_enter_f) != NO_CALLBACK)
+            : (hero_inside(regions[i])
+               && (f_indx = regions[i]->can_leave_f) != NO_CALLBACK)) {
+            if (!(*callbacks[f_indx])(regions[i], (genericptr_t) 0))
+                return FALSE;
         }
     }
 
-    /* Callbacks for the regions we do leave */
-    for (i = 0; i < n_regions; i++)
-        if (hero_inside(regions[i]) && !regions[i]->attach_2_u
+    /* Callbacks for the regions hero does leave */
+    for (i = 0; i < n_regions; i++) {
+        if (regions[i]->attach_2_u)
+            continue;
+        if (hero_inside(regions[i])
             && !inside_region(regions[i], x, y)) {
             clear_hero_inside(regions[i]);
             if (regions[i]->leave_msg != (const char *) 0)
@@ -455,10 +458,13 @@ xchar x, y;
             if ((f_indx = regions[i]->leave_f) != NO_CALLBACK)
                 (void) (*callbacks[f_indx])(regions[i], (genericptr_t) 0);
         }
+    }
 
-    /* Callbacks for the regions we do enter */
-    for (i = 0; i < n_regions; i++)
-        if (!hero_inside(regions[i]) && !regions[i]->attach_2_u
+    /* Callbacks for the regions hero does enter */
+    for (i = 0; i < n_regions; i++) {
+        if (regions[i]->attach_2_u)
+            continue;
+        if (!hero_inside(regions[i])
             && inside_region(regions[i], x, y)) {
             set_hero_inside(regions[i]);
             if (regions[i]->enter_msg != (const char *) 0)
@@ -466,12 +472,14 @@ xchar x, y;
             if ((f_indx = regions[i]->enter_f) != NO_CALLBACK)
                 (void) (*callbacks[f_indx])(regions[i], (genericptr_t) 0);
         }
+    }
+
     return TRUE;
 }
 
 /*
- * check whether a monster enters/leaves one or more region.
-*/
+ * check whether a monster enters/leaves one or more regions.
+ */
 boolean
 m_in_out_region(mon, x, y)
 struct monst *mon;
@@ -479,40 +487,44 @@ xchar x, y;
 {
     int i, f_indx;
 
-    /* First check if we can do the move */
+    /* First check if mon can do the move */
     for (i = 0; i < n_regions; i++) {
-        if (inside_region(regions[i], x, y) && !mon_in_region(regions[i], mon)
-            && regions[i]->attach_2_m != mon->m_id) {
-            if ((f_indx = regions[i]->can_enter_f) != NO_CALLBACK)
-                if (!(*callbacks[f_indx])(regions[i], mon))
-                    return FALSE;
-        } else if (mon_in_region(regions[i], mon)
-                   && !inside_region(regions[i], x, y)
-                   && regions[i]->attach_2_m != mon->m_id) {
-            if ((f_indx = regions[i]->can_leave_f) != NO_CALLBACK)
-                if (!(*callbacks[f_indx])(regions[i], mon))
-                    return FALSE;
+        if (regions[i]->attach_2_m == mon->m_id)
+            continue;
+        if (inside_region(regions[i], x, y)
+            ? (!mon_in_region(regions[i], mon)
+               && (f_indx = regions[i]->can_enter_f) != NO_CALLBACK)
+            : (mon_in_region(regions[i], mon)
+               && (f_indx = regions[i]->can_leave_f) != NO_CALLBACK)) {
+            if (!(*callbacks[f_indx])(regions[i], mon))
+                return FALSE;
         }
     }
 
-    /* Callbacks for the regions we do leave */
-    for (i = 0; i < n_regions; i++)
+    /* Callbacks for the regions mon does leave */
+    for (i = 0; i < n_regions; i++) {
+        if (regions[i]->attach_2_m == mon->m_id)
+            continue;
         if (mon_in_region(regions[i], mon)
-            && regions[i]->attach_2_m != mon->m_id
             && !inside_region(regions[i], x, y)) {
             remove_mon_from_reg(regions[i], mon);
             if ((f_indx = regions[i]->leave_f) != NO_CALLBACK)
                 (void) (*callbacks[f_indx])(regions[i], mon);
         }
+    }
 
-    /* Callbacks for the regions we do enter */
-    for (i = 0; i < n_regions; i++)
-        if (!hero_inside(regions[i]) && !regions[i]->attach_2_u
+    /* Callbacks for the regions mon does enter */
+    for (i = 0; i < n_regions; i++) {
+        if (regions[i]->attach_2_m == mon->m_id)
+            continue;
+        if (!mon_in_region(regions[i], mon)
             && inside_region(regions[i], x, y)) {
             add_mon_to_reg(regions[i], mon);
             if ((f_indx = regions[i]->enter_f) != NO_CALLBACK)
                 (void) (*callbacks[f_indx])(regions[i], mon);
         }
+    }
+
     return TRUE;
 }
 
@@ -598,10 +610,12 @@ xchar x, y;
 {
     register int i;
 
-    for (i = 0; i < n_regions; i++)
-        if (inside_region(regions[i], x, y) && regions[i]->visible
-            && regions[i]->ttl != -2L)
+    for (i = 0; i < n_regions; i++) {
+        if (!regions[i]->visible || regions[i]->ttl == -2L)
+            continue;
+        if (inside_region(regions[i], x, y))
             return regions[i];
+    }
     return (NhRegion *) 0;
 }
 

@@ -34,7 +34,9 @@
 
 /*#define CHANGE_COLOR*/ /* allow palette changes */
 #define SELECTSAVED /* Provide menu of saved games to choose from at start */
- 
+
+/* #define QWERTZ_SUPPORT */ /* when swap_yz is True, numpad 7 is 'z' not 'y' */
+
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.
@@ -80,6 +82,12 @@
                      * objects being thrown when the hangup occurs.    \
                      */
 
+#define CONFIG_FILE ".nethackrc"
+#define CONFIG_TEMPLATE ".nethackrc.template"
+#define SYSCF_TEMPLATE "sysconf.template"
+#define SYMBOLS_TEMPLATE "symbols.template"
+#define GUIDEBOOK_FILE "Guidebook.txt"
+
 /* Stuff to help the user with some common, yet significant errors */
 #define INTERJECT_PANIC 0
 #define INTERJECTION_TYPES (INTERJECT_PANIC + 1)
@@ -100,7 +108,7 @@ extern void FDECL(interject, (int));
 #ifdef strcasecmp
 #undef strcasecmp
 #endif
-extern void NDECL(getlock);
+/* extern int NDECL(getlock); */
 #endif
  
 #ifdef _MSC_VER
@@ -285,4 +293,5 @@ extern void FDECL(nhassert_failed, (const char * exp, const char * file,
 #define nethack_enter(argc, argv) nethack_enter_winnt()
 extern void FDECL(nethack_exit, (int)) NORETURN;
 extern boolean FDECL(file_exists, (const char *));
+extern boolean FDECL(file_newer, (const char *, const char *));
 #endif /* NTCONF_H */

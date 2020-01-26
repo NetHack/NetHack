@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1562800504 2019/07/10 23:15:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1575245065 2019/12/02 00:04:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1402,7 +1402,7 @@ register struct attack *mattk;
                      (Teleport_control && !Stunned && !unconscious()) ? ""
                      : "very ");
             tele();
-            /* 3.6.2:  make sure damage isn't fatal; previously, it
+            /* As of 3.6.2:  make sure damage isn't fatal; previously, it
                was possible to be teleported and then drop dead at
                the destination when QM's 1d4 damage gets applied below;
                even though that wasn't "wrong", it seemed strange,
@@ -1793,8 +1793,7 @@ struct attack *mattk;
 
         if (!engulf_target(mtmp, &youmonst))
             return 0;
-        if ((t && is_pit(t->ttyp))
-            && sobj_at(BOULDER, u.ux, u.uy))
+        if ((t && is_pit(t->ttyp)) && sobj_at(BOULDER, u.ux, u.uy))
             return 0;
 
         if (Punished)
@@ -1877,6 +1876,14 @@ struct attack *mattk;
 
     if (mtmp != u.ustuck)
         return 0;
+    if (Punished) {
+        /* ball&chain are in limbo while swallowed; update their internal
+           location to be at swallower's spot */
+        if (uchain->where == OBJ_FREE)
+            uchain->ox = mtmp->mx, uchain->oy = mtmp->my;
+        if (uball->where == OBJ_FREE)
+            uball->ox = mtmp->mx, uball->oy = mtmp->my;
+    }
     if (u.uswldtim > 0)
         u.uswldtim -= 1;
 
@@ -2012,7 +2019,7 @@ struct attack *mattk;
               is_animal(mtmp->data) ? "regurgitates" : "expels");
         expels(mtmp, mtmp->data, FALSE);
     } else if (!u.uswldtim || youmonst.data->msize >= MZ_HUGE) {
-        /* 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
+        /* As of 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
            expels now so the !u.uswldtim case is no longer possible;
            however, polymorphing into a huge form while already
            swallowed is still possible */

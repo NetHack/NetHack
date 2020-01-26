@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1570227405 2019/10/04 22:16:45 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1576281515 2019/12/13 23:58:35 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -263,8 +263,13 @@ teleok(x, y, trapok)
 register int x, y;
 boolean trapok;
 {
-    if (!trapok && t_at(x, y))
-        return FALSE;
+    if (!trapok) {
+        /* allow teleportation onto vibrating square, it's not a real trap */
+        struct trap *trap = t_at(x, y);
+
+        if (trap && trap->ttyp != VIBRATING_SQUARE)
+            return FALSE;
+    }
     if (!goodpos(x, y, &youmonst, 0))
         return FALSE;
     if (!tele_jump_ok(u.ux, u.uy, x, y))
@@ -690,7 +695,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(youmonst.data))) {
             /* Try to use teleport away spell.
-               3.6.2: this used to require that you know the spellbook
+               Prior to 3.6.2 this used to require that you know the spellbook
                (probably just intended as an optimization to skip the
                lookup loop) but it is possible to know and cast a spell
                after forgetting its book due to amnesia. */

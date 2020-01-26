@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1571347977 2019/10/17 21:32:57 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.379 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1575245078 2019/12/02 00:04:38 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.391 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -107,9 +107,9 @@ static struct Bool_Opt {
     { "clicklook", &iflags.clicklook, FALSE, SET_IN_GAME },
     { "cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME },
 #if defined(MICRO) || defined(WIN32) || defined(CURSES_GRAPHICS)
-    { "color", &iflags.wc_color, TRUE, SET_IN_GAME }, /*WC*/
+    { "color", &iflags.wc_color, TRUE, SET_IN_GAME }, /* on/off: use WC or not */
 #else /* systems that support multiple terminals, many monochrome */
-    { "color", &iflags.wc_color, FALSE, SET_IN_GAME }, /*WC*/
+    { "color", &iflags.wc_color, FALSE, SET_IN_GAME },
 #endif
     { "confirm", &flags.confirm, TRUE, SET_IN_GAME },
     { "dark_room", &flags.dark_room, TRUE, SET_IN_GAME },
@@ -178,7 +178,7 @@ static struct Bool_Opt {
 #else
     { "page_wait", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
-    /* 3.6.2: move perm_invent from flags to iflags and out of save file */
+    /* moved perm_invent from flags to iflags and out of save file in 3.6.2 */
     { "perm_invent", &iflags.perm_invent, FALSE, SET_IN_GAME },
     { "pickup_thrown", &flags.pickup_thrown, TRUE, SET_IN_GAME },
     { "popup_dialog", &iflags.wc_popup_dialog, FALSE, SET_IN_GAME },   /*WC*/
@@ -395,7 +395,7 @@ static struct Comp_Opt {
     },
     { "statuslines",
 #ifdef CURSES_GRAPHICS
-      "2 or 3 lines for horizonal (bottom or top) status display",
+      "2 or 3 lines for horizontal (bottom or top) status display",
       20, SET_IN_GAME
 #else
       "2 or 3 lines for status display",
@@ -673,7 +673,7 @@ initoptions()
 
     /* ... and _must_ parse correctly. */
     if (!read_config_file(SYSCF_FILE, SET_IN_SYS)) {
-        if (config_error_done())
+        if (config_error_done() && !iflags.initoptions_noterminate)
             nh_terminate(EXIT_FAILURE);
     }
     config_error_done();
@@ -751,11 +751,12 @@ initoptions_init()
     flags.initrole = flags.initrace = flags.initgend = flags.initalign
         = ROLE_NONE;
 
+    init_ov_primary_symbols();
+    init_ov_rogue_symbols();
     /* Set the default monster and object class symbols. */
     init_symbols();
     for (i = 0; i < WARNCOUNT; i++)
         warnsyms[i] = def_warnsyms[i].sym;
-    iflags.bouldersym = 0;
 
     /* for "special achievement" tracking (see obj.h,
        create_object(sp_lev.c), addinv_core1(invent.c) */
@@ -773,7 +774,7 @@ initoptions_init()
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
         flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
     switch_symbols(FALSE); /* set default characters */
-    init_r_symbols();
+    init_rogue_symbols();
 #if defined(UNIX) && defined(TTY_GRAPHICS)
     /*
      * Set defaults for some options depending on what we can
@@ -784,9 +785,9 @@ initoptions_init()
      */
     /* this detects the IBM-compatible console on most 386 boxes */
     if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
-        if (!symset[PRIMARY].name)
+        if (!symset[PRIMARY].explicitly)
             load_symset("IBMGraphics", PRIMARY);
-        if (!symset[ROGUESET].name)
+        if (!symset[ROGUESET].explicitly)
             load_symset("RogueIBM", ROGUESET);
         switch_symbols(TRUE);
 #ifdef TEXTCOLOR
@@ -801,7 +802,7 @@ initoptions_init()
         /* [could also check "xterm" which emulates vtXXX by default] */
         && !strncmpi(opts, "vt", 2)
         && AS && AE && index(AS, '\016') && index(AE, '\017')) {
-        if (!symset[PRIMARY].name)
+        if (!symset[PRIMARY].explicitly)
             load_symset("DECGraphics", PRIMARY);
         switch_symbols(TRUE);
     }
@@ -810,15 +811,13 @@ initoptions_init()
 
 #if defined(MSDOS) || defined(WIN32)
     /* Use IBM defaults. Can be overridden via config file */
-    if (!symset[PRIMARY].name) {
+    if (!symset[PRIMARY].explicitly)
         load_symset("IBMGraphics_2", PRIMARY);
-    }
-    if (!symset[ROGUESET].name) {
+    if (!symset[ROGUESET].explicitly)
         load_symset("RogueEpyx", ROGUESET);
-    }
 #endif
 #ifdef MAC_GRAPHICS_ENV
-    if (!symset[PRIMARY].name)
+    if (!symset[PRIMARY].explicitly)
         load_symset("MACGraphics", PRIMARY);
     switch_symbols(TRUE);
 #endif /* MAC_GRAPHICS_ENV */
@@ -839,6 +838,7 @@ initoptions_init()
 void
 initoptions_finish()
 {
+    nhsym sym = 0;
 #ifndef MAC
     char *opts = getenv("NETHACKOPTIONS");
 
@@ -882,8 +882,10 @@ initoptions_finish()
      */
     obj_descr[SLIME_MOLD].oc_name = "fruit";
 
-    if (iflags.bouldersym)
-        update_bouldersym();
+    sym = get_othersym(SYM_BOULDER,
+                Is_rogue_level(&u.uz) ? ROGUESET : PRIMARY);
+    if (sym)
+        showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
     reglyph_darkroom();
 
 #ifdef STATUS_HILITES
@@ -1311,12 +1313,13 @@ STATIC_VAR const struct paranoia_opts {
        and "d"ie vs "d"eath, synonyms for each other so doesn't matter;
        (also "p"ray vs "P"aranoia, "pray" takes precedence since "Paranoia"
        is just a synonym for "Confirm"); "b"ones vs "br"eak-wand, the
-       latter requires at least two letters; "wand"-break vs "Were"-change,
+       latter requires at least two letters; "e"at vs "ex"plore,
+       "cont"inue eating vs "C"onfirm; "wand"-break vs "Were"-change,
        both require at least two letters during config processing and use
        case-senstivity for 'O's interactive menu */
     { PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
       "for \"yes\" confirmations, require \"no\" to reject" },
-    { PARANOID_QUIT, "quit", 1, "explore", 1,
+    { PARANOID_QUIT, "quit", 1, "explore", 2,
       "yes vs y to quit or to enter explore mode" },
     { PARANOID_DIE, "die", 1, "death", 2,
       "yes vs y to die (explore mode or debug mode)" },
@@ -1326,6 +1329,8 @@ STATIC_VAR const struct paranoia_opts {
       "yes vs y to attack a peaceful monster" },
     { PARANOID_BREAKWAND, "wand-break", 2, "break-wand", 2,
       "yes vs y to break a wand via (a)pply" },
+    { PARANOID_EATING, "eat", 1, "continue", 4,
+      "yes vs y to continue eating after first bite when satiated" },
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
       "yes vs y to change form when lycanthropy is controllable" },
     { PARANOID_PRAY, "pray", 1, 0, 0,
@@ -2615,7 +2620,7 @@ boolean tinitial, tfrom_file;
         }
         if (!op)
             return FALSE;
-        /* 3.6.2: strip leading and trailing spaces, condense internal ones */
+        /* stripped leading and trailing spaces, condensed internal ones in 3.6.2 */
         mungspaces(op);
         if (!initial) {
             struct fruit *f;
@@ -2756,12 +2761,16 @@ boolean tinitial, tfrom_file;
             /*
              * Override the default boulder symbol.
              */
-            iflags.bouldersym = (uchar) opts[0];
-            /* for 'initial', update_bouldersym() is done in
+            ov_primary_syms[SYM_BOULDER + SYM_OFF_X] = (nhsym) opts[0];
+            ov_rogue_syms[SYM_BOULDER + SYM_OFF_X] = (nhsym) opts[0];
+            /* for 'initial', update of BOULDER symbol is done in
                initoptions_finish(), after all symset options
                have been processed */
             if (!initial) {
-                update_bouldersym();
+                nhsym sym = get_othersym(SYM_BOULDER,
+                                Is_rogue_level(&u.uz) ? ROGUESET : PRIMARY);
+                if (sym)
+                    showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
                 need_redraw = TRUE;
             }
         }
@@ -3264,8 +3273,12 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
-            while (letter(*++op) || *op == ' ')
-                continue;
+            /* "3a" is sufficient but accept "3around" (or "3abracadabra") */
+            while (letter(*op))
+                op++;
+            /* t, a, and o can be separated by space(s) or slash or both */
+            while (*op == ' ')
+                op++;
             if (*op == '/')
                 op++;
         }
@@ -3386,7 +3399,8 @@ boolean tinitial, tfrom_file;
     /* WINCAP
      *
      *  map_mode:[tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|ascii7x12
-     *            |ascii8x12|ascii16x12|ascii12x16|ascii10x18|fit_to_screen]
+     *            |ascii8x12|ascii16x12|ascii12x16|ascii10x18|fit_to_screen
+     *            |ascii_fit_to_screen|tiles_fit_to_screen]
      */
     fullname = "map_mode";
     if (match_optname(opts, fullname, sizeof "map_mode" - 1, TRUE)) {
@@ -3394,7 +3408,7 @@ boolean tinitial, tfrom_file;
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, negated);
         if (op && !negated) {
-            if (!strncmpi(op, "tiles", sizeof "tiles" - 1))
+            if (!strcmpi(op, "tiles"))
                 iflags.wc_map_mode = MAP_MODE_TILES;
             else if (!strncmpi(op, "ascii4x6", sizeof "ascii4x6" - 1))
                 iflags.wc_map_mode = MAP_MODE_ASCII4x6;
@@ -3417,6 +3431,12 @@ boolean tinitial, tfrom_file;
             else if (!strncmpi(op, "fit_to_screen",
                                sizeof "fit_to_screen" - 1))
                 iflags.wc_map_mode = MAP_MODE_ASCII_FIT_TO_SCREEN;
+            else if (!strncmpi(op, "ascii_fit_to_screen",
+                               sizeof "ascii_fit_to_screen" - 1))
+                iflags.wc_map_mode = MAP_MODE_ASCII_FIT_TO_SCREEN;
+            else if (!strncmpi(op, "tiles_fit_to_screen",
+                               sizeof "tiles_fit_to_screen" - 1))
+                iflags.wc_map_mode = MAP_MODE_TILES_FIT_TO_SCREEN;
             else {
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
@@ -4118,7 +4138,7 @@ boolean tinitial, tfrom_file;
     }
 
     /* Is it a symbol? */
-    if (strstr(opts, "S_") == opts && parsesymbols(opts)) {
+    if (strstr(opts, "S_") == opts && parsesymbols(opts, PRIMARY)) {
         switch_symbols(TRUE);
         check_gold_symbol();
         return retval;
@@ -5368,7 +5388,7 @@ boolean setinitial, setfromfile;
                 nothing_to_do = FALSE;
         char *symset_name, fmtstr[20];
         struct symsetentry *sl;
-        int res, which_set, setcount = 0, chosen = -2;
+        int res, which_set, setcount = 0, chosen = -2, defindx = 0;
 
         which_set = rogueflag ? ROGUESET : PRIMARY;
         symset_list = (struct symsetentry *) 0;
@@ -5413,47 +5433,13 @@ boolean setinitial, setfromfile;
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
             any = zeroany;
-#ifdef CURSES_GRAPHICS /* this ought to be handled within curses... */
-            /*
-             * Symbol sets are formatted in two columns, "name description",
-             * on selectable lines.  curses bases menu width on the length
-             * of non-selectable lines (main header, separators if present,
-             * with trailing spaces ignored) and defaults to half the map.
-             * Without something like this separator (shown after the menu
-             * title and a blank line which follows that) to force a wider
-             * menu, entries with long descriptions wrap.  That would be
-             * ok if wrapping operated on the same two columns, but the
-             * menu doesn't know anything about those and the description
-             * is wrapping into the next line's name column, making long
-             * descriptions--and menus containing them--hard to read.
-             */
-            if (WINDOWPORT("curses")) {
-                char tmp1[BUFSZ], tmp2[BUFSZ], bigbuf[BUFSZ + 1 + BUFSZ];
-
-                /* 4: room for space+letter+paren+space, fake selector;
-                   2: added to 'biggest' when constructing 'fmtstr';
-                   1: space between symset name+2 and symset description */
-                if (4 + biggest + 2 + 1 > (int) sizeof tmp1 - 1)
-                    biggest = (int) sizeof tmp1 - 1 - (4 + 2 + 1);
-                (void) memset((genericptr_t) tmp1, '-', biggest);
-                tmp1[biggest] = '\0';
-                if (big_desc > (int) sizeof tmp2 - 1)
-                    big_desc = (int) sizeof tmp2 - 1;
-                (void) memset((genericptr_t) tmp2, '-', big_desc);
-                tmp2[big_desc] = '\0';
-                Sprintf(bigbuf, "%4s", "");
-                Sprintf(eos(bigbuf), fmtstr, tmp1, tmp2);
-                bigbuf[BUFSZ - 1] = '\0';
-                any.a_int = 0;
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                         bigbuf, MENU_UNSELECTED);
-            }
-#else
-            nhUse(big_desc);
-#endif
-            any.a_int = 1;
+            any.a_int = 1; /* -1 + 2 [see 'if (sl->name) {' below]*/
+            if (!symset_name)
+                defindx = any.a_int;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     "Default Symbols", MENU_UNSELECTED);
+                     "Default Symbols",
+                     (any.a_int == defindx) ? MENU_SELECTED
+                                            : MENU_UNSELECTED);
 
             for (sl = symset_list; sl; sl = sl->next) {
                 /* check restrictions */
@@ -5463,20 +5449,34 @@ boolean setinitial, setfromfile;
                 if (sl->handling == H_MAC)
                     continue;
 #endif
-
                 if (sl->name) {
+                    /* +2: sl->idx runs from 0 to N-1 for N symsets;
+                       +1 because Defaults are implicitly in slot [0];
+                       +1 again so that valid data is never 0 */
                     any.a_int = sl->idx + 2;
+                    if (symset_name && !strcmpi(sl->name, symset_name))
+                        defindx = any.a_int;
                     Sprintf(buf, fmtstr, sl->name, sl->desc ? sl->desc : "");
-                    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                             buf, MENU_UNSELECTED);
+                    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+                             (any.a_int == defindx) ? MENU_SELECTED
+                                                    : MENU_UNSELECTED);
                 }
             }
             Sprintf(buf, "Select %ssymbol set:",
                     rogueflag ? "rogue level " : "");
             end_menu(tmpwin, buf);
-            if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
-                chosen = symset_pick->item.a_int - 2;
+            n = select_menu(tmpwin, PICK_ONE, &symset_pick);
+            if (n > 0) {
+                chosen = symset_pick[0].item.a_int;
+                /* if picking non-preselected entry yields 2, make sure
+                   that we're going with the non-preselected one */
+                if (n == 2 && chosen == defindx)
+                    chosen = symset_pick[1].item.a_int;
+                chosen -= 2; /* convert menu index to symset index;
+                              * "Default symbols" have index -1 */
                 free((genericptr_t) symset_pick);
+            } else if (n == 0 && defindx > 0) {
+                chosen = defindx - 2;
             }
             destroy_nhwindow(tmpwin);
 
@@ -5524,9 +5524,9 @@ boolean setinitial, setfromfile;
 
         /* Set default symbols and clear the handling value */
         if (rogueflag)
-            init_r_symbols();
+            init_rogue_symbols();
         else
-            init_l_symbols();
+            init_primary_symbols();
 
         if (symset[which_set].name) {
             /* non-default symbols */
@@ -5593,8 +5593,8 @@ char *buf;
 #ifdef BACKWARD_COMPAT
     else if (!strcmp(optname, "boulder"))
         Sprintf(buf, "%c",
-                iflags.bouldersym
-                    ? iflags.bouldersym
+                ov_primary_syms[SYM_BOULDER + SYM_OFF_X]
+                    ? ov_primary_syms[SYM_BOULDER + SYM_OFF_X]
                     : showsyms[(int) objects[BOULDER].oc_class + SYM_OFF_O]);
 #endif
     else if (!strcmp(optname, "catname"))
@@ -6079,8 +6079,9 @@ free_symsets()
 
 /* Parse the value of a SYMBOLS line from a config file */
 boolean
-parsesymbols(opts)
+parsesymbols(opts, which_set)
 register char *opts;
+int which_set;
 {
     int val;
     char *op, *symname, *strval;
@@ -6088,7 +6089,7 @@ register char *opts;
 
     if ((op = index(opts, ',')) != 0) {
         *op++ = 0;
-        if (!parsesymbols(op))
+        if (!parsesymbols(op, which_set))
             return FALSE;
     }
 
@@ -6111,7 +6112,10 @@ register char *opts;
 
     if (symp->range && symp->range != SYM_CONTROL) {
         val = sym_val(strval);
-        update_l_symset(symp, val);
+        if (which_set == ROGUESET)
+            update_ov_rogue_symset(symp, val);
+        else
+            update_ov_primary_symset(symp, val);
     }
     return TRUE;
 }

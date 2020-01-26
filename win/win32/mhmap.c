@@ -305,8 +305,13 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 
     }
 
+    /* TODO: Should we round instead of clamping? */
     data->xFrontTile = (int) ((double) data->xBackTile * data->frontScale);
     data->yFrontTile = (int) ((double) data->yBackTile * data->frontScale);
+
+    /* ensure tile is at least one pixel in size */
+    if (data->xFrontTile < 1) data->xFrontTile = 1;
+    if (data->yFrontTile < 1) data->yFrontTile = 1;
 
     /* calcuate ASCII cursor height */
     data->yBlinkCursor = (int) ((double) CURSOR_HEIGHT * data->backScale);
@@ -710,7 +715,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     mgch = ' ';
                 } else {
                     (void) mapglyph(data->map[col][row], &mgch, &color,
-                                    &special, col, row);
+                                    &special, col, row, 0);
                 }
                 msg_data->buffer[index] = mgch;
                 index++;
@@ -824,7 +829,7 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
 #ifdef USE_PILEMARK
     /* rely on NetHack core helper routine */
     (void) mapglyph(data->map[i][j], &mgch, &color, &special,
-                    i, j);
+                    i, j, 0);
     if ((glyph != NO_GLYPH) && (special & MG_PET)
 #else
     if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
@@ -899,7 +904,7 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
     #else
         /* rely on NetHack core helper routine */
         (void) mapglyph(data->map[i][j], &mgch, &color,
-                        &special, i, j);
+                        &special, i, j, 0);
         ch = (char) mgch;
         if (((special & MG_PET) && iflags.hilite_pet)
             || ((special & (MG_DETECT | MG_BW_LAVA))

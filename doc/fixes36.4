@@ -1,0 +1,42 @@
+$NHDT-Branch: Nethack-3.6 $:$NHDT-Revision: 1.14 $ $NHDT-Date: 1576976556 2019/12/22 01:02:36 $
+
+fixes36.4 contains a terse summary of changes made to 3.6.3 in order to
+produce 3.6.4 as well as any post-release fixes in binaries.
+ 
+
+General Fixes and Modified Features
+-----------------------------------
+GDBPATH and GREPPATH from sysconf or -D... on compilation command line were
+	being processed even if PANICTRACE was disabled but only being freed
+	at end of game when that was enabled
+fix the article used in the message when your steed encounters a polymorph trap
+allow teleporting onto the vibrating square
+message "your knapsack can't accomodate any more items" when picking stuff up
+	or removing such from container was inaccurate if there was some gold
+	pending; vary the message rather than add more convoluted pickup code
+dozen-ish assorted spelling/typo fixes in messages and source comments
+fix potential buffer overflow when parsing run-time configuration file
+wizard mode wishing for terrain would leave it unmapped if done while blind
+wizard mode terrain wish could leave hero in water (severe vision limits) or
+	in lava (trapped, sinking) which wasn't there any more
+flying hero can go down (via '>') holes or trap doors instead of escaping trap
+polymorphed hero hiding on the ceiling can now use '>' to unhide instead of
+	being told "you can't go down here"
+
+
+Platform- and/or Interface-Specific Fixes or Features
+-----------------------------------------------------
+fix compilation on platforms that split the ncurses and tinfo libraries
+Windows: allow all game files to be on a portable device via the sysconf
+	option 'portable_device_paths'
+
+
+General New Features
+--------------------
+none
+
+
+Platform- and/or Interface-Specific Post-Release Fixes 
+-------------------------------------------------------
+Windows OPTIONS=map_mode:fit_to_screen could cause a game start failure
+

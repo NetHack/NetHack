@@ -21,6 +21,9 @@
  *	Note: 3.6.x was not verified with Symantec C.
  */
 
+#define CONFIG_FILE "defaults.nh"
+#define GUIDEBOOK_FILE "Guidebook.txt"
+ 
 /*
  *  The following options are somewhat configurable depending on
  *  your compiler.

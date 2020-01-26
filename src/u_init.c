@@ -1,4 +1,4 @@
-/* NetHack 3.6	u_init.c	$NHDT-Date: 1539510426 2018/10/14 09:47:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	u_init.c	$NHDT-Date: 1575245094 2019/12/02 00:04:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1114,7 +1114,7 @@ register struct trobj *trop;
         if (obj->oclass == ARMOR_CLASS) {
             if (is_shield(obj) && !uarms && !(uwep && bimanual(uwep))) {
                 setworn(obj, W_ARMS);
-                /* 3.6.2: this used to unset uswapwep if it was set, but
+                /* Prior to 3.6.2 this used to unset uswapwep if it was set, but
                    wearing a shield doesn't prevent having an alternate
                    weapon ready to swap with the primary; just make sure we
                    aren't two-weaponing (academic; no one starts that way) */

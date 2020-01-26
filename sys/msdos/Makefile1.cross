@@ -1,0 +1,709 @@
+# NetHack 3.6	Makefile1.cross
+#       Cross-compile msdos version of NetHack using a 
+#       linux-hosted djgpp cross-compiler.
+#
+#       Makefile1.cross (this file) is for the host-side obj files and 
+#       utilities that will run on the host platform only.
+#
+#       Makefile2.cross is the the target platform obj files
+#       and utilities.
+#
+#   Makefile2 utilizes the djgpp cross-compiler from Andrew Wu:
+#       https://github.com/andrewwutw/build-djgpp
+#
+#   Currently, in NetHack 3.6, the cross-compile for msdos cannot be
+#   used to build the entire game to a playable point but it is useful
+#   for testing the msdos port build of the evolving NetHack code.0
+#
+# The GNU Make has a problem if you include a drive spec below.
+GAMEDIR =../binary
+
+#
+#==============================================================================
+# This marks the end of the BUILD DECISIONS section.
+#==============================================================================
+#
+# Directories, gcc likes unix style directory specs
+#
+
+OBJ  = o
+HOBJ = host_o
+DAT  = ../dat
+DOC  = ../doc
+INCL = ../include
+MSYS = ../sys/msdos
+SRC  = ../src
+SSHR = ../sys/share
+UTIL = ../util
+WIN  = ../win/tty
+WCURSES = ../win/curses
+WSHR = ../win/share
+
+#
+#  Executables.
+#
+HOST_CC = gcc
+HOST_LINK = gcc
+MAKEBIN  = make
+
+#
+# Special libraries and how to link them in.
+#
+LIBS = -lpc
+LIBRARIES = $(LIBS)
+
+#
+#  Yacc/Lex off
+#
+YACC_LEX = N
+
+#
+# Uncomment the line below if you want to store all the level files,
+# help files, etc. in a single library file.
+#
+USE_DLB = Y
+
+#===============================================
+#======= End of Modification Section ===========
+#===============================================
+################################################
+#                                              #
+# Nothing below here should have to be changed.#
+#                                              #
+################################################
+
+# Changing this conditional block is not recommended
+ifeq "$(USE_DLB)" "Y"
+DLBFLG = -DDLB
+else
+DLBFLG =
+endif
+
+TERMLIB =
+
+#==========================================
+#================ MACROS ==================
+#==========================================
+# This section creates shorthand macros for many objects
+# referenced later on in the Makefile.
+#
+# Have windows path styles available for use in commands
+#
+W_OBJ     =$(subst /,\, $(OBJ))
+W_INCL    =$(subst /,\, $(INCL))
+W_DAT     =$(subst /,\, $(DAT))
+W_DOC     =$(subst /,\, $(DOC))
+W_UTIL    =$(subst /,\, $(UTIL))
+W_SRC     =$(subst /,\, $(SRC))
+W_SSYS    =$(subst /,\, $(SSYS))
+W_MSWSYS  =$(subst /,\, $(MSWSYS))
+W_TTY     =$(subst /,\, $(TTY))
+W_MSWIN   =$(subst /,\, $(MSWIN))
+ifeq "$(ADD_CURSES)" "Y"
+W_WCURSES =$(subst /,\, $(WCURSES))
+endif
+W_WSHR    =$(subst /,\, $(WSHR))
+W_GAMEDIR =$(subst /,\, $(GAMEDIR))
+
+#
+# Shorten up the location for some files
+#
+
+O  = $(OBJ)/
+HOST_O = $(HOBJ)/
+U  = $(UTIL)/
+
+#==========================================
+#  Utility Objects.
+#==========================================
+
+MAKESRC	    = makedefs.c
+
+MAKEDEFSOBJS    = $(HOST_O)makedefs.o  $(HOST_O)monst.o	 $(HOST_O)objects.o
+
+#SPLEVSRC    = lev_yacc.c  lev_$(LEX).c	 lev_main.c  panic.c
+#DGNCOMPSRC  = dgn_yacc.c  dgn_$(LEX).c	 dgn_main.c
+#SPLEVOBJS   = $(HOST_O)lev_yacc.o $(HOST_O)lev_$(LEX).o $(HOST_O)lev_main.o $(HOST_O)alloc.o \
+#		$(HOST_O)monst.o $(HOST_O)objects.o $(HOST_O)panic.o                     \
+#		$(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)stubvid.o
+#DGNCOMPOBJS = $(HOST_O)dgn_yacc.o  $(HOST_O)dgn_$(LEX).o $(HOST_O)dgn_main.o  $(HOST_O)alloc.o  \
+#		$(HOST_O)panic.o
+
+#==========================================
+#  Tile related object files.
+#==========================================
+
+TILOBJ      = $(HOST_O)tile.o $(VGAOBJ)
+
+TILOBJ2     = $(HOST_O)tileset.o $(HOST_O)bmptiles.o $(HOST_O)giftiles.o
+
+TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
+		$(HOST_O)objects.o
+
+TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
+		$(HOST_O)objects.o
+
+TILE_BMP    = $(DAT)/nhtiles.bmp
+
+TILEUTIL    = $(TILOBJ) $(U)tile2bin $(U)til2bin2 $(TILE_BMP)
+
+TILEFILES   = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
+
+TILEFILES2  = $(WSHR)/monthin.txt $(WSHR)/objthin.txt $(WSHR)/oththin.txt
+
+GIFREADERS  = $(HOST_O)gifread.o $(HOST_O)alloc.o $(HOST_O)panic.o
+
+GIFREAD2    = $(HOST_O)gifread2.o $(HOST_O)alloc.o $(HOST_O)panic.o
+
+PPMWRITERS  = $(HOST_O)ppmwrite.o $(HOST_O)alloc.o $(HOST_O)panic.o
+
+PPMWRIT2    = $(HOST_O)ppmwrit2.o $(HOST_O)alloc.o $(HOST_O)panic.o
+
+#==========================================
+#   Object files.
+#==========================================
+
+DLBOBJ = $(HOST_O)dlb.o
+
+ALLOBJ = $(MAKEDEFSOBJS) $(TILOBJ) $(TILOBJ2) $(TEXTIO) $(TEXTIO2)
+
+#==========================================
+# Header file macros
+#==========================================
+
+PATCHLEV_H = $(INCL)/patchlev.h
+DGN_FILE_H = $(INCL)/align.h	$(INCL)/dgn_file.h
+DUNGEON_H  = $(INCL)/align.h	$(INCL)/dungeon.h
+MONDATA_H  = $(INCL)/align.h	$(INCL)/mondata.h
+MONST_H	   = $(INCL)/align.h	$(INCL)/monst.h $(INCL)/mextra.h
+PERMONST_H = $(INCL)/monattk.h	$(INCL)/monflag.h   $(INCL)/align.h   \
+	    $(INCL)/permonst.h
+REGION_H   = $(INCL)/region.h
+RM_H	   = $(INCL)/align.h	$(INCL)/rm.h
+SKILLS_H   = $(INCL)/skills.h
+SP_LEV_H   = $(INCL)/align.h	$(INCL)/sp_lev.h
+YOUPROP_H  = $(PERMONST_H)	$(MONDATA_H)	    $(INCL)/prop.h    \
+	    $(INCL)/pm.h       $(INCL)/youprop.h
+YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h   \
+	     $(INCL)/attrib.h	$(INCL)/you.h
+DISPLAY_H  = $(MONDATA_H)	$(INCL)/vision.h    $(INCL)/display.h
+PCCONF_H   = $(INCL)/micro.h	$(INCL)/system.h    $(INCL)/pcconf.h \
+	    $(MSYS)/pcvideo.h
+CONFIG_H   = $(GLOBAL_H)	$(INCL)/tradstdc.h  $(INCL)/config1.h \
+	    $(INCL)/config.h
+DECL_H	   = $(YOU_H)		$(INCL)/spell.h	    $(INCL)/color.h   \
+	     $(INCL)/obj.h	$(INCL)/onames.h    $(INCL)/pm.h      \
+	      $(INCL)/decl.h
+GLOBAL_H   = $(PCCONF_H)	$(INCL)/coord.h	   $(INCL)/global.h
+HACK_H	   = $(CONFIG_H)	$(INCL)/context.h  $(DUNGEON_H)	       \
+	     $(DECL_H)	      	$(DISPLAY_H)	   $(INCL)/monsym.h    \
+	     $(INCL)/mkroom.h	$(INCL)/objclass.h $(INCL)/trap.h      \
+	     $(INCL)/flag.h     $(RM_H)		   $(INCL)/vision.h    \
+	     $(INCL)/wintype.h  $(INCL)/engrave.h  $(INCL)/rect.h      \
+	     $(INCL)/trampoli.h $(INCL)/hack.h     $(REGION_H)	       \
+	     $(INCL)/sys.h
+DLB_H      = $(INCL)/dlb.h
+
+ifeq ($(SUPPRESS_GRAPHICS),Y)
+TILE_H     =
+else
+TILE_H	   = $(WSHR)/tile.h $(INCL)/tileset.h
+endif
+
+ifeq ($(USE_DLB),Y)
+DLB = dlb
+DLBOBJS = $(HOST_O)dlb_main.o $(HOST_O)dlb.o $(HOST_O)alloc.o $(HOST_O)panic.o
+else
+DLB =
+DLBOBJS =
+endif
+
+#==========================================
+# More compiler setup macros
+#==========================================
+#
+CURSESDEF=
+CURSESLIB=
+INCLDIR=-I../include -I../sys/msdos
+# Debugging
+#cflags = -pg -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
+#LFLAGS = -pg
+# 
+cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
+LFLAGS =
+#
+# Debugging
+#cflags = -g -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES
+#LFLAGS = -g
+#
+#    Normal
+cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES
+LFLAGS =
+
+#==========================================
+#================ RULES ==================
+#==========================================
+
+.SUFFIXES: .o .til .uu .c .y .l
+
+#==========================================
+# Rules for host files in src
+#==========================================
+
+$(HOST_O)%.o : $(SRC)/%.c
+	$(HOST_CC) $(cflags) -o$@ $<
+
+#==========================================
+# Rules for host files in sys/msdos
+#==========================================
+
+$(HOST_O)%.o : $(MSYS)/%.c
+	$(HOST_CC) $(cflags) -I../sys/msdos -o$@ $<
+
+#==========================================
+# Rules for host files in util
+#==========================================
+
+$(HOST_O)%.o : $(SRC)/%.c
+	$(HOST_CC) $(cflags) -o$@ $<
+
+$(HOST_O)%.o : %.c
+	$(HOST_CC) $(cflags) -o$@ $<
+
+#==========================================
+# Rules for host files in win/share
+#==========================================
+
+$(HOST_O)%.o : $(WSHR)/%.c
+	$(HOST_CC) $(cflags) -I../win/share -o$@ $<
+
+#==========================================
+#  Primary Targets.
+#==========================================
+
+#  The default target.
+
+all :   prereq
+
+prereq: $(HOST_O)prereq.tag
+	@echo Done.
+
+default: prereq
+
+util: $(HOST_O)utility.tag
+
+$(HOST_O)utility.tag: $(INCL)/date.h $(INCL)/trap.h $(INCL)/onames.h \
+	$(INCL)/pm.h vis_tab.c $(TILEUTIL)
+	echo host utilities made > $@
+
+tileutil: $(U)gif2txt $(U)txt2ppm
+	@echo Optional tile development utilities are up to date.
+
+$(HOST_O)prereq.tag: hobj.tag $(U)makedefs $(HOST_O)utility.tag  \
+		$(HOST_O)thintile.tag $(DAT)/nhdat
+	echo prereq done >$@
+
+#==========================================
+#  Other host targets.
+#==========================================
+
+#note that dir below assumes bin/dir from djgpp distribution
+#
+$(DAT)/nhdat:	$(U)dlb_main $(DAT)/data $(DAT)/rumors \
+	    $(DAT)/oracles $(DAT)/quest.dat \
+	    $(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
+	cd $(DAT); \
+	pwd; \
+	cp $(MSYS)/msdoshlp.txt .; \
+	ls -1 data oracles options quest.dat rumors help hh  >dlb.lst; \
+	ls -1 cmdhelp history opthelp wizhelp license       >>dlb.lst; \
+	ls -1 bogusmon engrave epitaph tribute msdoshlp.txt >>dlb.lst; \
+	$(U)dlb_main cvIf dlb.lst nhdat
+	cd $(SRC)
+
+$(U)dlb_main: $(DLBOBJS)
+	$(HOST_LINK) $(LFLAGS) -o$@ $(DLBOBJS)
+
+$(HOST_O)dlb_main.o: $(U)dlb_main.c $(INCL)/config.h $(DLB_H)
+	$(HOST_CC) $(cflags) -o$@ $(U)dlb_main.c
+
+
+$(INCL)/date.h : $(U)makedefs
+	-$(U)makedefs -v
+
+$(INCL)/onames.h: $(U)makedefs
+	-$(U)makedefs -o
+
+$(INCL)/pm.h: $(U)makedefs
+	-$(U)makedefs -p
+
+#monstr.c: $(U)makedefs
+#	-$(U)makedefs -m
+
+$(INCL)/vis_tab.h: $(U)makedefs
+	-$(U)makedefs -z
+
+vis_tab.c: $(U)makedefs
+	-$(U)makedefs -z
+
+# make data.base an 8.3 filename to prevent an make warning
+DATABASE = $(DAT)/data.bas
+
+$(DAT)/data: $(HOST_O)utility.tag	$(DATABASE)
+	$(U)makedefs -d
+
+$(DAT)/rumors:	     $(HOST_O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
+	$(U)makedefs -r
+
+$(DAT)/quest.dat: $(HOST_O)utility.tag  $(DAT)/quest.txt
+	$(U)makedefs -q
+
+$(DAT)/oracles:	     $(HOST_O)utility.tag    $(DAT)/oracles.txt
+	$(U)makedefs -h
+
+$(DAT)/bogusmon:     $(HOST_O)utility.tag    $(DAT)/bogusmon.txt
+	$(U)makedefs -s
+
+$(DAT)/engrave:	     $(HOST_O)utility.tag    $(DAT)/engrave.txt
+	$(U)makedefs -s
+
+$(DAT)/epitaph:	     $(HOST_O)utility.tag    $(DAT)/epitaph.txt
+	$(U)makedefs -s
+
+#===============================================
+# Create directory for holding host object files
+#===============================================
+
+hobj.tag:
+	mkdir -p ./$(HOBJ)
+	echo directory ready ./$(HOBJ)
+
+#==========================================
+#  Makedefs Stuff
+#==========================================
+
+$(U)makedefs:  $(MAKEDEFSOBJS)
+	$(HOST_LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS)
+
+$(HOST_O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
+		$(INCL)/monsym.h   $(INCL)/qtext.h $(U)makedefs.c
+	$(HOST_CC) $(cflags) -o$@ $(U)makedefs.c
+
+#==========================================
+#  Level Compiler Dependencies
+#==========================================
+
+#$(U)lev_comp:  $(SPLEVOBJS)
+#	-rm -f temp.a
+#	ar r temp.a $(SPLEVOBJS)
+#	$(HOST_LINK) $(LFLAGS) -o$@ temp.a
+#
+#$(HOST_O)lev_yacc.o:  $(HACK_H)	 $(SP_LEV_H) $(INCL)/lev_comp.h $(U)lev_yacc.c
+#	$(HOST_CC) $(cflags) -o$@ $(U)lev_yacc.c
+#
+#$(HOST_O)lev_$(LEX).o:  $(HACK_H)   $(SP_LEV_H)	  $(INCL)/lev_comp.h \
+#	$(U)lev_$(LEX).c
+#	$(HOST_CC) $(cflags) -o$@ $(U)lev_$(LEX).c
+#
+#$(HOST_O)lev_main.o:  $(HACK_H) $(INCL)/sp_lev.h $(INCL)/date.h $(U)lev_main.c
+#
+#$(U)lev_yacc.c: $(SSHR)/lev_yacc.c
+#	@echo ---
+#	@echo For now, we will copy the prebuilt
+#	@echo lev_comp.c from $(SSHR) into $(U) and use that.
+#	@cp $(SSHR)/lev_yacc.c $(U)lev_yacc.c
+#	@echo.>>$(U)lev_yacc.c
+#
+#$(INCL)/lev_comp.h : $(SSHR)/lev_comp.h
+#	@echo For now, we will copy the prebuilt lev_comp.h
+#	@echo from $(SSHR) into $(INCL) and use that.
+#	@cp $(SSHR)/lev_comp.h $@
+#$(U)lev_lex.c: $(SSHR)/lev_lex.c
+#	@echo.>>$(INCL)/lev_comp.h
+#	@echo For now, we will copy the prebuilt lev_lex.c
+#	@echo from $(SSHR) into $(U) and use it.
+#	@cp $(SSHR)/lev_lex.c $@
+#	@echo.>>$@
+
+#==========================================
+#  Dungeon Dependencies
+#==========================================
+
+#$(U)dgn_comp:  $(DGNCOMPOBJS)
+#	$(HOST_LINK) $(LFLAGS) -o$@ $(DGNCOMPOBJS)
+#
+#$(U)dgn_yacc.c: $(SSHR)/dgn_yacc.c
+#	@echo ---
+#	@echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
+#	@echo dgn_comp.h from $(SSHR) into $(U) and use that.
+#	@cp $(SSHR)/dgn_yacc.c $(U)dgn_yacc.c
+#	@echo.>>$(U)dgn_yacc.c
+#
+#$(INCL)/dgn_comp.h: $(SSHR)/dgn_comp.h
+#	@echo ---
+#	@echo For now, we will copy the prebuilt dgn_comp.h
+#	@echo from $(SSHR) into $(INCL) and use that.
+#	@cp $(SSHR)/dgn_comp.h $@
+#	@echo.>>$(INCL)/dgn_comp.h
+#
+#$(U)dgn_$(LEX).c: $(SSHR)/dgn_lex.c $(INCL)/dgn_comp.h
+#	@echo ---
+#	@echo For now, we will copy the prebuilt dgn_lex.c
+#	@echo from $(SSHR) into $(U) and use it.
+#	@cp $(SSHR)/dgn_lex.c $@
+#	@echo.>>$@
+
+#==========================================
+#  Header file moves required for tile support
+#==========================================
+
+ifeq ($(SUPPRESS_GRAPHICS),Y)
+
+else
+#
+#  Tile Mapping
+#
+
+$(SRC)/tile.c: $(U)tilemap
+	@$(U)tilemap
+	@echo A new $@ has been created
+
+$(U)tilemap: $(HOST_O)tilemap.o
+	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tilemap.o
+
+$(HOST_O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H) $(TILE_H)
+	$(HOST_CC) $(cflags) -I$(WSHR) -I$(MSYS) -o$@ $(WSHR)/tilemap.c
+
+
+#==========================================
+#   Tile Utilities
+#  Required for tile support
+#==========================================
+
+$(DAT)/nhtiles.bmp: $(TILEFILES) $(U)tile2bmp
+	@echo Creating binary tile files which may take some time
+	@cd $(DAT)
+	@$(U)tile2bmp $@
+	@cd $(SRC)
+
+$(U)tile2bmp: $(HOST_O)tile2bmp.o $(TEXTIO)
+	-rm -f temp.a
+	ar r temp.a $(TEXTIO)
+	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tile2bmp.o temp.a
+
+$(U)tile2bin: $(HOST_O)tile2bin.o $(TEXTIO)
+	-rm -f temp.a
+	ar r temp.a $(TEXTIO)
+	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tile2bin.o temp.a
+
+$(U)til2bin2: $(HOST_O)til2bin2.o $(TEXTIO2)
+	-rm -f temp.a
+	ar r temp.a $(TEXTIO2)
+	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)til2bin2.o temp.a
+
+$(U)thintile: $(HOST_O)thintile.o
+	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)thintile.o
+
+#$(HOST_O)thintile.o:  $(HACK_H) $(WSHR)/tile.h $(WSHR)/thintile.c
+#	-rm -f temp.a
+#	ar r temp.a $(TEXTIO)
+#	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tile2bmp.o temp.a
+
+$(HOST_O)thintile.o:  $(HACK_H) $(WSHR)/tile.h $(WSHR)/thintile.c
+	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILE -DOVERVIEW_FILE -o$@ $(WSHR)/thintile.c
+
+$(HOST_O)thintile.tag: $(U)thintile $(TILEFILES)
+	$(U)thintile
+	echo thintiles created >$@
+
+$(HOST_O)tile2bmp.o:  $(HACK_H) $(TILE_H) $(WSHR)/tile2bmp.c
+	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -o$@ $(WSHR)/tile2bmp.c
+
+$(HOST_O)tile2bin.o:  $(HACK_H) $(TILE_H) $(MSYS)/pctiles.h $(MSYS)/pcvideo.h $(MSYS)/tile2bin.c
+	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -o$@ $(MSYS)/tile2bin.c
+
+$(HOST_O)til2bin2.o:  $(HACK_H) $(TILE_H) $(MSYS)/pctiles.h $(MSYS)/pcvideo.h $(MSYS)/tile2bin.c
+	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILE_X=8 -DOVERVIEW_FILE -o$@ $(MSYS)/tile2bin.c
+
+$(HOST_O)tiletext.o:  $(CONFIG_H) $(TILE_H) $(WSHR)/tiletext.c
+	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -o$@ $(WSHR)/tiletext.c
+
+$(HOST_O)tiletex2.o:  $(CONFIG_H) $(TILE_H) $(WSHR)/tiletext.c
+	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILE_X=8 -o$@ $(WSHR)/tiletext.c
+
+$(HOST_O)tiletxt.o: $(CONFIG_H) $(TILE_H) $(WSHR)/tilemap.c
+	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILETEXT -o$@ $(WSHR)/tilemap.c
+  
+$(HOST_O)tiletxt2.o: $(CONFIG_H) $(TILE_H) $(WSHR)/tilemap.c
+	$(HOST_CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILETEXT -DTILE_X=8 -o$@ $(WSHR)/tilemap.c
+#
+# Optional GIF Utilities (for development)
+#
+
+$(U)gif2txt: $(GIFREADERS) $(TEXTIO)
+	$(HOST_LINK) $(LFLAGS) -o$@ $(GIFREADERS) $(TEXTIO)
+
+$(U)gif2txt2: $(GIFREAD2) $(TEXTIO2)
+	$(HOST_LINK) $(LFLAGS) -o$@ $(GIFREAD2) $(TEXTIO2)
+
+$(U)txt2ppm: $(PPMWRITERS) $(TEXTIO)
+	$(HOST_LINK) $(LFLAGS) -o$@ $(PPMWRITERS) $(TEXTIO)
+
+$(U)txt2ppm2: $(PPMWRIT2) $(TEXTIO2)
+	$(HOST_LINK) $(LFLAGS) -o$@ $(PPMWRIT2) $(TEXTIO2)
+
+$(HOST_O)gifread.o: $(CONFIG_H) $(WSHR)/tile.h $(WSHR)/gifread.c
+
+$(HOST_O)gifread2.o: $(CONFIG_H) $(WSHR)/tile.h $(WSHR)/gifread.c
+	$(HOST_CC) $(cflags) -DTILE_X=8 -o$@ $(WSHR)/gifread.c
+
+ppmwrite.c: $(WSHR)/ppmwrite.c
+	cp $(WSHR)/ppmwrite.c .
+
+$(HOST_O)ppmwrite.o: $(CONFIG_H)	$(WSHR)/tile.h
+
+$(HOST_O)ppmwrit2.o:  $(CONFIG_H) $(WSHR)/tile.h ppmwrite.c
+	$(HOST_CC) $(cflags) -DTILE_X=8 -o$@ ppmwrite.c
+
+#
+#  Optional tile viewer (development sources only)
+#
+
+$(U)viewtib: $(HOST_O)viewtib.o
+	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)viewtib.o $(LIBRARIES)
+
+$(HOST_O)viewtib.o: $(MSYS)/viewtib.c
+
+endif
+
+#==========================================
+#  Other host Util Dependencies.
+#==========================================
+
+$(HOST_O)monst.o: $(CONFIG_H) $(PERMONST_H) $(INCL)/monsym.h   \
+	$(INCL)/color.h	 monst.c
+	$(HOST_CC) $(cflags) -o$@ monst.c
+
+$(HOST_O)objects.o: $(CONFIG_H)	      $(INCL)/obj.h	 $(INCL)/objclass.h \
+	$(INCL)/prop.h	    $(INCL)/color.h    objects.c
+	$(HOST_CC) $(cflags) -o$@ objects.c
+
+$(HOST_O)panic.o: $(CONFIG_H) $(U)panic.c
+	$(HOST_CC) $(cflags) -o$@ $(U)panic.c
+
+#$(HOST_O)sp_lev.tag: $(HOST_O)utility.tag \
+#	$(DAT)/bigroom.des  $(DAT)/castle.des \
+#	$(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des \
+#	$(DAT)/medusa.des  $(DAT)/oracle.des   $(DAT)/tower.des \
+#	$(DAT)/yendor.des  $(DAT)/arch.des     $(DAT)/barb.des \
+#	$(DAT)/caveman.des   $(DAT)/healer.des   $(DAT)/knight.des \
+#	$(DAT)/monk.des      $(DAT)/priest.des   $(DAT)/ranger.des \
+#	$(DAT)/rogue.des     $(DAT)/samurai.des  $(DAT)/tourist.des \
+#	$(DAT)/valkyrie.des  $(DAT)/wizard.des
+#	cd $(DAT)
+#	$(U)lev_comp bigroom.des
+#	$(U)lev_comp castle.des
+#	$(U)lev_comp endgame.des
+#	$(U)lev_comp gehennom.des
+#	$(U)lev_comp knox.des
+#	$(U)lev_comp mines.des
+#	$(U)lev_comp medusa.des
+#	$(U)lev_comp oracle.des
+#	$(U)lev_comp sokoban.des
+#	$(U)lev_comp tower.des
+#	$(U)lev_comp yendor.des
+#	$(U)lev_comp arch.des
+#	$(U)lev_comp barb.des
+#	$(U)lev_comp caveman.des
+#	$(U)lev_comp healer.des
+#	$(U)lev_comp knight.des
+#	$(U)lev_comp monk.des
+#	$(U)lev_comp priest.des
+#	$(U)lev_comp ranger.des
+#	$(U)lev_comp rogue.des
+#	$(U)lev_comp samurai.des
+#	$(U)lev_comp tourist.des
+#	$(U)lev_comp valkyrie.des
+#	$(U)lev_comp wizard.des
+#	cd $(SRC)
+#	echo sp_levs done > $@
+
+#$(DAT)/dungeon:	  $(HOST_O)utility.tag  $(DAT)/dungeon.def
+#	$(U)makedefs -e
+#	cd $(DAT)
+#	$(U)dgn_comp dungeon.pdf
+#	cd $(SRC)
+
+#==========================================
+#  Housekeeping for host side.
+#==========================================
+
+clean:
+	rm ./host_o/*.o
+	if [ -f $(HOST_O)prereq.tag ];     then rm $(HOST_O)prereq.tag; fi;
+	if [ -f hobj.tag ];                then rm hobj.tag; fi;
+	if [ -f $(HOST_O)utility.tag ];    then rm $(HOST_O)utility.tag; fi;
+	if [ -f temp.a ];                  then rm temp.a; fi;
+
+spotless: clean
+
+	if [ -f $(INCL)/pm.h ];        then rm $(INCL)/pm.h; fi;
+#	if [ -f $(U)dgn_flex.c ];      then rm $(U)dgn_flex.c; fi;
+#	if [ -f $(U)dgn_lex.c ];       then rm $(U)dgn_lex.c; fi;
+#	if [ -f $(U)makedefs ];        then rm $(U)makedefs; fi;
+#	if [ -f $(U)dgn_comp ];        then rm $(U)dgn_comp; fi;
+#	if [ -f $(U)recover.exe ];     then rm $(U)recover.exe; fi;
+#	if [ -f $(U)tilemap ];         then rm $(U)tilemap; fi;
+#	if [ -f $(U)tile2bmp ];        then rm $(U)tile2bmp; fi;
+#	if [ -f $(U)tile2bin ];        then rm $(U)tile2bin; fi;
+#	if [ -f $(U)til2bin2 ];        then rm $(U)til2bin2; fi;
+#	if [ -f $(U)thintile ];        then rm $(U)thintile; fi;
+#	if [ -f $(U)dlb_main ];        then rm $(U)dlb_main; fi;
+#	if [ -f $(INCL)/vis_tab.h ];   then rm $(INCL)/vis_tab.h; fi;
+#	if [ -f $(INCL)/onames.h ];    then rm $(INCL)/onames.h; fi;
+#	if [ -f $(INCL)/pm.h ];        then rm $(INCL)/pm.h; fi;
+#	if [ -f $(INCL)/date.h ];      then rm $(INCL)/date.h; fi;
+#	if [ -f $(INCL)/dgn_comp.h ];  then rm $(INCL)/dgn_comp.h; fi;
+#	if [ -f $(INCL)/lev_comp.h ];  then rm $(INCL)/lev_comp.h; fi;
+#	if [ -f $(SRC)/vis_tab.c ];    then rm $(SRC)/vis_tab.c; fi;
+#	if [ -f $(SRC)/tile.c ];       then rm $(SRC)/tile.c; fi;
+#	if [ -f $(DAT)/options ];      then rm $(DAT)/options; fi;
+#	if [ -f $(DAT)/data ];         then rm $(DAT)/data; fi;
+#	if [ -f $(DAT)/rumors ];       then rm $(DAT)/rumors; fi;
+#	if [ -f $(DAT)/dungeon.pdf ];  then rm $(DAT)/dungeon.pdf; fi;
+#	if [ -f $(DAT)/dungeon ];      then rm $(DAT)/dungeon; fi;
+#	if [ -f $(DAT)/oracles ];      then rm $(DAT)/oracles; fi;
+#	if [ -f $(DAT)/quest.dat ];    then rm $(DAT)/quest.dat; fi;
+#	if [ -f $(DAT)/bogusmon ];     then rm $(DAT)/bogusmon; fi;
+#	if [ -f $(DAT)/engrave ];      then rm $(DAT)/engrave; fi;
+#	if [ -f $(DAT)/epitaph ];      then rm $(DAT)/epitaph; fi;
+#	if [ -f $(DAT)/dlb.lst ];      then rm $(DAT)/dlb.lst; fi;
+#	if [ -f $(DAT)/nhdat ];        then rm $(DAT)/nhdat; fi;
+#	if [ -f $(DAT)/*.lev ];        then rm $(DAT)/*.lev; fi;
+#	if [ -f $(TILE_BMP) ];         then rm $(TILE_BMP); fi;
+#	if [ -f $(WSHR)/monthin.txt ]; then rm $(WSHR)/monthin.txt; fi;
+#	if [ -f $(WSHR)/objthin.txt ]; then rm $(WSHR)/objthin.txt; fi;
+#	if [ -f $(WSHR)/oththin.txt ]; then rm $(WSHR)/oththin.txt; fi;
+
+#==========================================
+# Game Dependencies
+#==========================================
+
+# src dependencies
+
+$(HOST_O)tile.o: tile.c $(HACK_H)
+$(HOST_O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
+$(HOST_O)alloc.o: alloc.c $(CONFIG_H)
+$(HOST_O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h
+	$(HOST_CC) $(cflags) -I../sys/msdos -o$@ dlb.c
+$(HOST_O)monst.o: monst.c $(CONFIG_H) $(INCL)/permonst.h $(INCL)/align.h \
+		$(INCL)/monattk.h $(INCL)/monflag.h $(INCL)/monsym.h \
+		$(INCL)/color.h
+$(HOST_O)objects.o: objects.c $(CONFIG_H) $(INCL)/obj.h $(INCL)/objclass.h \
+		$(INCL)/prop.h $(INCL)/skills.h $(INCL)/color.h
+$(HOST_O)tileset.o: $(WSHR)/tileset.c $(HACK_H)
+$(HOST_O)bmptiles.o: $(WSHR)/bmptiles.c $(INCL)/config.h $(INCL)/tileset.h $(INCL)/integer.h
+$(HOST_O)giftiles.o: $(WSHR)/giftiles.c $(INCL)/config.h $(INCL)/tileset.h $(INCL)/integer.h
+
+# end of file
+

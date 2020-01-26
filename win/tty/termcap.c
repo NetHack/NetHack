@@ -1282,41 +1282,6 @@ int color;
         xputs(hilites[color]);
 }
 
-/* not to be confused with has_colors() in unixtty.c */
-int
-has_color(color)
-int color;
-{
-#ifdef X11_GRAPHICS
-    /* XXX has_color() should be added to windowprocs */
-    if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "X11"))
-        return 1;
-#endif
-#ifdef GEM_GRAPHICS
-    /* XXX has_color() should be added to windowprocs */
-    if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "Gem"))
-        return 1;
-#endif
-#ifdef QT_GRAPHICS
-    /* XXX has_color() should be added to windowprocs */
-    if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "Qt"))
-        return 1;
-#endif
-#ifdef CURSES_GRAPHICS
-    /* XXX has_color() should be added to windowprocs */
-    /* iflags.wc_color is set to false and the option disabled if the
-     terminal cannot display color */
-    if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "curses"))
-        return iflags.wc_color;
-#endif
-#ifdef AMII_GRAPHICS
-    /* hilites[] not used */
-    return iflags.use_color ? 1 : 0;
-#else
-    return hilites[color] != (char *) 0;
-#endif
-}
-
 #endif /* TEXTCOLOR */
 
 #endif /* TTY_GRAPHICS && !NO_TERMS */

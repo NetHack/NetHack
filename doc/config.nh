@@ -347,7 +347,8 @@
 # How the map window is shown?  Windows GUI only.
 # possible map_mode options include: tiles, ascii4x6,
 # ascii6x8, ascii8x8, ascii16x8, ascii7x12, ascii8x12, ascii16x12,
-# ascii12x16, ascii10x18, fit_to_screen
+# ascii12x16, ascii10x18, fit_to_screen, ascii_fit_to_screen,
+# tiles_fit_to_screen
 #OPTIONS=map_mode:tiles
 
 # Define alternative file for the files, and the tile size

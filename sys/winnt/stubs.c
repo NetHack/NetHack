@@ -114,12 +114,6 @@ backsp()
     return;
 }
 
-int
-has_color(int color)
-{
-    return 1;
-}
-
 #ifndef NO_MOUSE_ALLOWED
 void
 toggle_mouse_support()

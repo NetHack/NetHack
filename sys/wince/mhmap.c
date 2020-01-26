@@ -632,7 +632,7 @@ onPaint(HWND hWnd)
 #else
                         /* rely on NetHack core helper routine */
                         (void) mapglyph(data->map[i][j], &mgch, &color,
-                                        &special, i, j);
+                                        &special, i, j, 0);
                         ch = (char) mgch;
                         if (((special & MG_PET) && iflags.hilite_pet)
                             || ((special & MG_DETECT)

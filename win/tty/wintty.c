@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1558400902 2019/05/21 01:08:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.209 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1575245194 2019/12/02 00:06:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.227 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -97,6 +97,11 @@ struct window_procs tty_procs = {
      | WC2_RESET_STATUS
 #endif
      | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_STATUSLINES),
+#ifdef TEXTCOLOR
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+#else
+    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+#endif
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
     tty_exit_nhwindows, tty_suspend_nhwindows, tty_resume_nhwindows,
     tty_create_nhwindow, tty_clear_nhwindow, tty_display_nhwindow,
@@ -135,7 +140,6 @@ struct window_procs tty_procs = {
     genl_can_suspend_yes,
 };
 
-static int maxwin = 0; /* number of windows in use */
 winid BASE_WINDOW;
 struct WinDesc *wins[MAXWIN];
 struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
@@ -1053,7 +1057,7 @@ reset_role_filtering()
 
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             "Uncceptable alignments", MENU_UNSELECTED);
+             "Unacceptable alignments", MENU_UNSELECTED);
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     end_menu(win, "Pick all that apply");
@@ -1420,10 +1424,18 @@ int type;
     int i, rowoffset;
     int newid;
 
-    if (maxwin == MAXWIN)
+    for (newid = 0; newid < MAXWIN; ++newid)
+        if (wins[newid] == 0)
+            break;
+    if (newid == MAXWIN) {
+        panic("No window slots!");
+        /*NOTREACHED*/
         return WIN_ERR;
+    }
 
-    newwin = (struct WinDesc *) alloc(sizeof(struct WinDesc));
+    newwin = (struct WinDesc *) alloc(sizeof (struct WinDesc));
+    wins[newid] = newwin;
+
     newwin->type = type;
     newwin->flags = 0;
     newwin->active = FALSE;
@@ -1490,17 +1502,7 @@ int type;
         break;
     default:
         panic("Tried to create window type %d\n", (int) type);
-        return WIN_ERR;
-    }
-
-    for (newid = 0; newid < MAXWIN; newid++) {
-        if (wins[newid] == 0) {
-            wins[newid] = newwin;
-            break;
-        }
-    }
-    if (newid == MAXWIN) {
-        panic("No window slots!");
+        /*NOTREACHED*/
         return WIN_ERR;
     }
 
@@ -2447,7 +2449,7 @@ winid window;
 
     free_window_info(cw, TRUE);
     free((genericptr_t) cw);
-    wins[window] = 0;
+    wins[window] = 0; /* available for re-use */
 }
 
 void
@@ -3381,7 +3383,7 @@ int bkglyph UNUSED;
     }
 #endif
     /* map glyph to character and color */
-    (void) mapglyph(glyph, &ch, &color, &special, x, y);
+    (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
 
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
@@ -3961,7 +3963,7 @@ unsigned long *colormasks;
         enclev = stat_cap_indx();
         break;
     }
-    /* 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
+    /* As of 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
     return;
 }
 
@@ -4309,7 +4311,7 @@ unsigned long *bmarray;
    the condition where this gets used always has the same value */
 #define condcolor(bm,bmarray) NO_COLOR
 #define term_start_color(color) /*empty*/
-#define term_end_color(color) /*empty*/
+#define term_end_color() /*empty*/
 #endif /* TEXTCOLOR */
 
 STATIC_OVL int

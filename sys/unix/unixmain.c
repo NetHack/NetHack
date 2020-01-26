@@ -114,11 +114,20 @@ char *argv[];
         if (argcheck(argc, argv, ARG_VERSION) == 2)
             exit(EXIT_SUCCESS);
 
+        if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
+#ifdef CHDIR
+            chdirx((char *) 0, 0);
+#endif
+            iflags.initoptions_noterminate = TRUE;
+            initoptions();
+            iflags.initoptions_noterminate = FALSE;
+            reveal_paths();
+            exit(EXIT_SUCCESS);
+        }
         if (argcheck(argc, argv, ARG_DEBUG) == 1) {
             argc--;
             argv++;
         }
-
         if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else

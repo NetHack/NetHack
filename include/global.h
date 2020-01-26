@@ -11,14 +11,15 @@
 /*
  * Development status possibilities.
  */
-#define NH_STATUS_RELEASED 0         /* Released */
-#define NH_STATUS_WIP      1         /* Work in progress */
-#define NH_STATUS_BETA     2         /* BETA testing */
+#define NH_STATUS_RELEASED    0         /* Released */
+#define NH_STATUS_WIP         1         /* Work in progress */
+#define NH_STATUS_BETA        2         /* BETA testing */
+#define NH_STATUS_POSTRELEASE 3         /* patch commit point only */
 
 /*
  * Development status of this NetHack version.
  */
-#define NH_DEVEL_STATUS NH_STATUS_WIP
+#define NH_DEVEL_STATUS NH_STATUS_POSTRELEASE
 
 #ifndef DEBUG  /* allow tool chains to define without causing warnings */
 #define DEBUG
@@ -70,9 +71,10 @@
  * since otherwise comparisons with signed quantities are done incorrectly
  */
 typedef schar xchar;
-#if defined(__GNUC__) && defined(WIN32) && defined(__cplusplus)
+
+#ifdef __MINGW32__
 /* Resolve conflict with Qt 5 and MinGW-w32 */
-typedef uchar boolean; /* 0 or 1 */
+typedef unsigned char boolean; /* 0 or 1 */
 #else
 #ifndef SKIP_BOOLEAN
 typedef xchar boolean; /* 0 or 1 */

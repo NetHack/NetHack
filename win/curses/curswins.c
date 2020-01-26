@@ -87,7 +87,7 @@ curses_create_window(int width, int height, orient orientation)
     switch (orientation) {
     default:
         impossible("curses_create_window: Bad orientation");
-        /* fall through to centre */
+        /*FALLTHRU*/
     case CENTER:
         startx = (term_cols / 2) - (width / 2);
         starty = (term_rows / 2) - (height / 2);
@@ -504,7 +504,7 @@ curses_puts(winid wid, int attr, const char *text)
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         if (!curses_menu_exists(wid)) {
             impossible(
-                     "curses_puts: Attempted write to nonexistant window %d!",
+                     "curses_puts: Attempted write to nonexistent window %d!",
                        wid);
             return;
         }

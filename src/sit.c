@@ -67,7 +67,7 @@ dosit()
 
     if (OBJ_AT(u.ux, u.uy)
         /* ensure we're not standing on the precipice */
-        && !uteetering_at_seen_pit(trap)) {
+        && !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
         register struct obj *obj;
 
         obj = level.objects[u.ux][u.uy];
