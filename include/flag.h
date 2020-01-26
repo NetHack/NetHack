@@ -367,6 +367,10 @@ struct instance_flags {
     int wc_map_mode;        /* specify map viewing options, mostly
                              * for backward compatibility */
     int wc_player_selection;    /* method of choosing character */
+#if defined(MSDOS)
+    unsigned wc_video_width;    /* X resolution of screen */
+    unsigned wc_video_height;   /* Y resolution of screen */
+#endif
     boolean wc_splash_screen;   /* display an opening splash screen or not */
     boolean wc_popup_dialog;    /* put queries in pop up dialogs instead of
                                  * in the message window */
