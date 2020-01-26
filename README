@@ -29,6 +29,7 @@ spoilers:
  *  use vsnprintf instead of vsprintf in pline.c where possible
  *  Windows: incldues a fix from a 3.6.4 post-release update where 
  *      OPTIONS=map_mode:fit_to_screen could cause a game start failure
+ *  Windows: users with C-locale unmappable names could get game start failure
 
                         - - - - - - - - - - -
 

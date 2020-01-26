@@ -36,7 +36,7 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
-/*  Patch 5, January ??, 2020
+/*  Patch 5, January 27, 2020
  *
  *  fix accessing mons[-1] when trying to gate in a non-valid demon
  *  fix accessing mons[-1] when monster figures out if a tin cures stoning
@@ -49,6 +49,7 @@
  *  use vsnprintf instead of vsprintf in pline.c where possible
  *  Windows: incldues a fix from a 3.6.4 post-release update where 
  *      OPTIONS=map_mode:fit_to_screen could cause a game start failure
+ *  Windows: users with C-locale unmappable names could get game start failure
  */
 
 /*  Patch 4, December 18, 2019
