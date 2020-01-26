@@ -3048,6 +3048,7 @@ int locked, trapped;
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 5, "cloud")) {
         lev->typ = CLOUD;
+        block_point(x, y);
         pline("A cloud.");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 11, "secret door")) {
