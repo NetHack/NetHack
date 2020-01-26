@@ -3046,6 +3046,10 @@ int locked, trapped;
         lev->typ = IRONBARS;
         pline("Iron bars.");
         madeterrain = TRUE;
+    } else if (!BSTRCMPI(bp, p - 5, "cloud")) {
+        lev->typ = CLOUD;
+        pline("A cloud.");
+        madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 11, "secret door")) {
         if (lev->typ == DOOR
             || (IS_WALL(lev->typ) && lev->typ != DBWALL)) {
