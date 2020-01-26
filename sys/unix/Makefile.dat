@@ -123,8 +123,11 @@ spec_levs:
 quest_levs:
 	touch quest_levs
 
-spotless:
-	-rm -f spec_levs quest_levs *.lev $(VARDAT)
+# gitinfo.txt is optionally made by src/Makefile when creating date.h
+clean:
+	-rm -f gitinfo.txt
+
+spotless: clean
 	-rm -f nhdat x11tiles beostiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm
 	-rm -f rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad
 	-rm -f nhsplash.xpm nhtiles.bmp
