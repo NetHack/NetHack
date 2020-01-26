@@ -502,18 +502,20 @@ boolean clearfirst;
 #endif /* USE_TILES && CLIPPING */
 
 void
-vga_userpan(left)
-boolean left;
+vga_userpan(pan)
+enum vga_pan_direction pan;
 {
     int x;
 
     /*	pline("Into userpan"); */
     if (iflags.over_view || iflags.traditional_view)
         return;
-    if (left)
+    if (pan == pan_left)
         x = min(COLNO - 1, clipxmax + 10);
-    else
+    else if (pan == pan_right)
         x = max(0, clipx - 10);
+    else
+        return;
     vga_cliparound(x, 10); /* y value is irrelevant on VGA clipping */
     positionbar();
     vga_DrawCursor();

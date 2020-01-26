@@ -17,18 +17,23 @@
 #include "wintty.h"
 #include "tileset.h"
 
-#define BACKGROUND_VESA_COLOR 1
 #define FIRST_TEXT_COLOR 240
+
+extern int total_tiles_used; /* tile.c */
+
+struct VesaCharacter {
+    int colour;
+    int chr;
+};
 
 static unsigned long FDECL(vesa_SetWindow, (int window, unsigned long offset));
 static unsigned long FDECL(vesa_ReadPixel32, (unsigned x, unsigned y));
 static void FDECL(vesa_WritePixel32, (unsigned x, unsigned y,
         unsigned long color));
 static void FDECL(vesa_WritePixel, (unsigned x, unsigned y, unsigned color));
-static unsigned long FDECL(vesa_MakeColor, (unsigned r, unsigned g, unsigned b));
-static void FDECL(vesa_GetRGB, (
-        unsigned long color,
-        unsigned char *rp, unsigned char *gp, unsigned char *bp));
+static void FDECL(vesa_WritePixelRow, (unsigned long offset,
+        unsigned char const *p_row, unsigned p_row_size));
+static unsigned long FDECL(vesa_MakeColor, (struct Pixel));
 static void FDECL(vesa_FillRect, (
         unsigned left, unsigned top,
         unsigned width, unsigned height,
@@ -36,26 +41,33 @@ static void FDECL(vesa_FillRect, (
 
 static void NDECL(vesa_redrawmap);
 static void FDECL(vesa_cliparound, (int, int));
+#if 0
 static void FDECL(decal_packed, (const struct TileImage *tile, unsigned special));
+#endif
 static void FDECL(vesa_SwitchMode, (unsigned mode));
+static void NDECL(vesa_SetViewPort);
 static boolean FDECL(vesa_SetPalette, (const struct Pixel *));
 static boolean FDECL(vesa_SetHardPalette, (const struct Pixel *));
 static boolean FDECL(vesa_SetSoftPalette, (const struct Pixel *));
-static void FDECL(vesa_DisplayCell, (const struct TileImage *tile, int, int));
-static void FDECL(vesa_DisplayCellInMemory, (const struct TileImage *tile,
-        int, char buf[TILE_Y][640*2]));
+static void FDECL(vesa_DisplayCell, (int, int, int));
 static unsigned FDECL(vesa_FindMode, (unsigned long mode_addr, unsigned bits));
-static void FDECL(vesa_WriteChar, (int, int, int, int, BOOLEAN_P));
-static void FDECL(vesa_WriteCharInMemory, (int, int, char buf[TILE_Y][640*2],
-        int));
+static void FDECL(vesa_WriteChar, (int, int, int, int));
+static void FDECL(vesa_WriteCharXY, (int, int, int, int));
+static void FDECL(vesa_WriteCharTransparent, (int, int, int, int));
+static void FDECL(vesa_WriteTextRow, (int pixx, int pixy,
+        struct VesaCharacter const *t_row, unsigned t_row_width));
+static boolean FDECL(vesa_GetCharPixel, (int, unsigned, unsigned));
+static unsigned char FDECL(vesa_GetCharPixelRow, (int, unsigned, unsigned));
 static void FDECL(vesa_WriteStr, (const char *, int, int, int, int));
-static char __far *NDECL(vesa_FontPtrs);
+static unsigned char __far *NDECL(vesa_FontPtrs);
+static void FDECL(vesa_process_tile, (struct TileImage *tile));
 
 #ifdef POSITIONBAR
 static void NDECL(positionbar);
 #endif
 
 extern int clipx, clipxmax; /* current clipping column from wintty.c */
+extern int clipy, clipymax; /* current clipping row from wintty.c */
 extern int curcol, currow;  /* current column and row        */
 extern int g_attribute;
 extern int attrib_text_normal;  /* text mode normal attribute */
@@ -90,7 +102,8 @@ static struct map_struct {
     }
 #define TOP_MAP_ROW 1
 
-static int viewport_size = 40;
+static int viewport_cols = 40;
+static int viewport_rows = ROWNO;
 
 static const struct Pixel defpalette[] = {    /* Colors for text and the position bar */
 	{ 0x18, 0x18, 0x18, 0xff }, /* CLR_BLACK */
@@ -129,12 +142,25 @@ static unsigned long vesa_win_gran; /* Window granularity */
 static unsigned char vesa_pixel_size;
 static unsigned char vesa_pixel_bytes;
 static unsigned char vesa_red_pos;
-static unsigned char vesa_red_size;
+static unsigned char vesa_red_shift;
 static unsigned char vesa_green_pos;
-static unsigned char vesa_green_size;
+static unsigned char vesa_green_shift;
 static unsigned char vesa_blue_pos;
-static unsigned char vesa_blue_size;
+static unsigned char vesa_blue_shift;
 static unsigned long vesa_palette[256];
+static unsigned vesa_char_width = 8, vesa_char_height = 16;
+static unsigned vesa_oview_width, vesa_oview_height;
+static unsigned char **vesa_tiles;
+static unsigned char **vesa_oview_tiles;
+
+#ifdef SIMULATE_CURSOR
+static unsigned long *undercursor;
+#endif
+
+/* Used to cache character writes for speed */
+static struct VesaCharacter chr_cache[100];
+static unsigned chr_cache_size;
+static unsigned chr_cache_pixx, chr_cache_pixy, chr_cache_lastx;
 
 struct OldModeInfo {
     unsigned mode;
@@ -435,54 +461,93 @@ unsigned color;
     }
 }
 
-static unsigned long
-vesa_MakeColor(r, g, b)
-unsigned r, g, b;
+static void
+vesa_WritePixelRow(offset, p_row, p_row_size)
+unsigned long offset;
+unsigned char const *p_row;
+unsigned p_row_size;
 {
-    r = (r & 0xFF) >> (8 - vesa_red_size);
-    g = (g & 0xFF) >> (8 - vesa_green_size);
-    b = (b & 0xFF) >> (8 - vesa_blue_size);
-    return ((unsigned long) r << vesa_red_pos)
-         | ((unsigned long) g << vesa_green_pos)
-         | ((unsigned long) b << vesa_blue_pos);
+    if (vesa_segment != 0) {
+        /* Linear frame buffer in use */
+        movedata(_go32_my_ds(), (unsigned)p_row, vesa_segment, offset, p_row_size);
+    } else {
+        /* Windowed frame buffer in use */
+        unsigned long addr = vesa_SetWindow(vesa_write_win, offset);
+        unsigned i = 0;
+        while (offset + p_row_size > vesa_win_pos[vesa_write_win] + vesa_win_size) {
+            /* The row passes the end of the current window. Write what we can,
+             * and advance the window */
+            unsigned w = (vesa_win_pos[vesa_write_win] + vesa_win_size)
+                       - (offset + i);
+            dosmemput(p_row + i, w, addr);
+            i += w;
+            addr = vesa_SetWindow(vesa_write_win, offset + i);
+        }
+        dosmemput(p_row + i, p_row_size - i, addr);
+    }
 }
 
-static void
-vesa_GetRGB(color, rp, gp, bp)
-unsigned long color;
-unsigned char *rp, *gp, *bp;
+static unsigned long
+vesa_MakeColor(p)
+struct Pixel p;
 {
-    unsigned r, g, b;
-
-    r = color >> vesa_red_pos;
-    g = color >> vesa_green_pos;
-    b = color >> vesa_blue_pos;
-    r <<= 8 - vesa_red_size;
-    g <<= 8 - vesa_green_size;
-    b <<= 8 - vesa_blue_size;
-    *rp = (unsigned char) r;
-    *gp = (unsigned char) g;
-    *bp = (unsigned char) b;
+    unsigned long r = p.r >> vesa_red_shift;
+    unsigned long g = p.g >> vesa_green_shift;
+    unsigned long b = p.b >> vesa_blue_shift;
+    return (r << vesa_red_pos)
+         | (g << vesa_green_pos)
+         | (b << vesa_blue_pos);
 }
 
 static void
 vesa_FillRect(left, top, width, height, color)
 unsigned left, top, width, height, color;
 {
+    unsigned p_row_size = width * vesa_pixel_bytes;
+    unsigned char *p_row = (unsigned char *) alloc(p_row_size);
+    unsigned long c32 = vesa_palette[color & 0xFF];
+    unsigned long offset = top * (unsigned long)vesa_scan_line + left * vesa_pixel_bytes;
     unsigned x, y;
 
-    for (y = 0; y < height; ++y) {
+    switch (vesa_pixel_bytes) {
+    case 1:
+        memset(p_row, color, p_row_size);
+        break;
+
+    case 2:
         for (x = 0; x < width; ++x) {
-            vesa_WritePixel(left + x, top + y, color);
+            ((uint16_t *)p_row)[x] = c32;
         }
+        break;
+
+    case 3:
+        for (x = 0; x < width; ++x) {
+            p_row[3*x + 0] =  c32        & 0xFF;
+            p_row[3*x + 1] = (c32 >>  8) & 0xFF;
+            p_row[3*x + 2] =  c32 >> 16        ;
+        }
+        break;
+
+    case 4:
+        for (x = 0; x < width; ++x) {
+            ((uint32_t *)p_row)[x] = c32;
+        }
+        break;
     }
+
+    for (y = 0; y < height; ++y) {
+        vesa_WritePixelRow(offset, p_row, p_row_size);
+        offset += vesa_scan_line;
+    }
+
+    free(p_row);
 }
 
 void
 vesa_get_scr_size()
 {
-    CO = 80;
-    LI = 29;
+    CO = vesa_x_res / vesa_char_width;
+    LI = vesa_y_res / vesa_char_height - 1;
 }
 
 void
@@ -513,11 +578,12 @@ void
 vesa_cl_end(col, row)
 int col, row;
 {
-    unsigned left = vesa_x_center + col * 8;
-    unsigned top  = vesa_y_center + row * 16;
-    unsigned width = (CO - 1 - col) * 8;
-    unsigned height = 16;
+    unsigned left = vesa_x_center + col * vesa_char_width;
+    unsigned top  = vesa_y_center + row * vesa_char_height;
+    unsigned width = (CO - 1 - col) * vesa_char_width;
+    unsigned height = vesa_char_height;
 
+    vesa_flush_text();
     vesa_FillRect(left, top, width, height, BACKGROUND_VESA_COLOR);
 }
 
@@ -526,14 +592,12 @@ void
 vesa_cl_eos(cy)
 int cy;
 {
-    int count;
-
     cl_end();
     if (cy < LI - 1) {
-        unsigned left = vesa_x_center;
-        unsigned top  = vesa_y_center + cy * 16;
-        unsigned width = 640;
-        unsigned height = (LI - 1 - cy) * 16;
+        unsigned left = 0;
+        unsigned top  = vesa_y_center + cy * vesa_char_height;
+        unsigned width = vesa_x_res;
+        unsigned height = (LI - 1 - cy) * vesa_char_height;
 
         vesa_FillRect(left, top, width, height, BACKGROUND_VESA_COLOR);
     }
@@ -611,7 +675,10 @@ int attr;
         ++row;
         break;
     default:
-        vesa_WriteChar((unsigned char) ch, col, row, attr, FALSE);
+        vesa_WriteChar((unsigned char) ch, col, row, attr);
+        if (ch == '.') {
+            vesa_flush_text();
+        }
         if (col < (CO - 1))
             ++col;
         break;
@@ -632,7 +699,6 @@ unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
     int col, row;
     int attr;
     int ry;
-    const struct TileImage *packcell;
 
     row = currow;
     col = curcol;
@@ -646,13 +712,15 @@ unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
     attr = (g_attribute == 0) ? attrib_gr_normal : g_attribute;
     map[ry][col].attr = attr;
     if (iflags.traditional_view) {
-        vesa_WriteChar((unsigned char) ch, col, row, attr, FALSE);
+        vesa_WriteChar((unsigned char) ch, col, row, attr);
     } else {
-        if ((col >= clipx) && (col <= clipxmax)) {
-            packcell = get_tile(glyph2tile[glyphnum]);
+        if ((col >= clipx) && (col <= clipxmax)
+        &&  (ry >= clipy) && (ry <= clipymax)) {
+#if 0
             if (!iflags.over_view && map[ry][col].special)
                 decal_packed(packcell, special);
-            vesa_DisplayCell(packcell, col - clipx, row);
+#endif
+            vesa_DisplayCell(glyph2tile[glyphnum], col - clipx, ry - clipy);
         }
     }
     if (col < (CO - 1))
@@ -686,19 +754,36 @@ static void
 vesa_cliparound(x, y)
 int x, y;
 {
-    int oldx = clipx;
+    int oldx = clipx, oldy = clipy;
 
     if (!iflags.tile_view || iflags.over_view || iflags.traditional_view)
         return;
 
-    if (x < clipx + 5) {
-        clipx = max(0, x - (viewport_size / 2));
-        clipxmax = clipx + (viewport_size - 1);
-    } else if (x > clipxmax - 5) {
-        clipxmax = min(COLNO - 1, x + (viewport_size / 2));
-        clipx = clipxmax - (viewport_size - 1);
+    if (viewport_cols < COLNO) {
+        if (x < clipx + 5) {
+            clipx = max(0, x - (viewport_cols / 2));
+            clipxmax = clipx + (viewport_cols - 1);
+        } else if (x > clipxmax - 5) {
+            clipxmax = min(COLNO - 1, x + (viewport_cols / 2));
+            clipx = clipxmax - (viewport_cols - 1);
+        }
+    } else {
+        clipx = 0;
+        clipxmax = COLNO - 1;
     }
-    if (clipx != oldx) {
+    if (viewport_rows < ROWNO) {
+        if (y < clipy + 5) {
+            clipy = max(0, y - (viewport_rows / 2));
+            clipymax = clipy + (viewport_rows - 1);
+        } else if (y > clipymax - 5) {
+            clipymax = min(ROWNO, y + (viewport_rows / 2));
+            clipy = clipymax - (viewport_rows - 1);
+        }
+    } else {
+        clipy = 0;
+        clipymax = ROWNO - 1;
+    }
+    if (clipx != oldx || clipy != oldy) {
         if (on_level(&u.uz0, &u.uz) && !g.restoring)
             /* (void) doredraw(); */
             vesa_redrawmap();
@@ -708,70 +793,139 @@ int x, y;
 static void
 vesa_redrawmap()
 {
-    int x, y, t;
-    const struct TileImage *packcell;
+    unsigned y_top = TOP_MAP_ROW * vesa_char_height;
+    unsigned y_bottom = vesa_y_res - 5 * vesa_char_height;
+    unsigned x, y, cx, cy, px, py;
+    unsigned long color;
+    unsigned long offset = y_top * (unsigned long) vesa_scan_line;
+    unsigned char *p_row = NULL;
+    unsigned p_row_width;
 
-    /* y here is in screen rows*/
-    /* Build each row in local memory, then write, to minimize use of the
-       window switch function */
-    for (y = 0; y < ROWNO; ++y) {
-        char buf[TILE_Y][640*2];
+    /*
+     * The map is drawn in pixel-row order (pixel row 0, then row 1, etc.),
+     * rather than cell by cell, to minimize calls to vesa_SetWindow.
+     */
+    if (iflags.traditional_view) {
+        /* Text mode */
+        y = y_top;
+        for (cy = clipy; cy <= clipymax && cy < ROWNO; ++cy) {
+            struct VesaCharacter t_row[COLNO];
+            for (cx = clipx; cx <= clipxmax && cx < COLNO; ++cx) {
+                t_row[cx].chr = map[cy][cx].ch;
+                t_row[cx].colour = map[cy][cx].attr;
+            }
+            vesa_WriteTextRow(0, y, t_row + clipx, cx - clipx);
+            x = (cx - clipx) * vesa_char_width;
+            if (x < vesa_x_res) {
+                vesa_FillRect(x, y, vesa_x_res - x, vesa_char_height, BACKGROUND_VESA_COLOR);
+            }
+            y += vesa_char_height;
+        }
+    } else if (iflags.over_view) {
+        /* Overview mode */
+        const unsigned char *tile;
 
-        for (x = clipx; x <= clipxmax; ++x) {
-            if (iflags.traditional_view) {
-                vesa_WriteCharInMemory((unsigned char) map[y][x].ch, x,
-                              buf, map[y][x].attr);
-            } else {
-                t = map[y][x].glyph;
-                packcell = get_tile(glyph2tile[t]);
-                if (!iflags.over_view && map[y][x].special)
-                    decal_packed(packcell, map[y][x].special);
-                vesa_DisplayCellInMemory(packcell, x - clipx, buf);
+        p_row_width = vesa_oview_width * vesa_pixel_bytes;
+        y = y_top;
+        for (cy = 0; cy < ROWNO; ++cy) {
+            for (py = 0; py < vesa_oview_height; ++py) {
+                for (cx = 0; cx < COLNO; ++cx) {
+                    tile = vesa_oview_tiles[glyph2tile[map[cy][cx].glyph]];
+                    vesa_WritePixelRow(offset + p_row_width * cx, tile + p_row_width * py, p_row_width);
+                }
+                x = COLNO * vesa_oview_width;
+                if (x < vesa_x_res) {
+                    vesa_FillRect(x, y, vesa_x_res - x, 1, BACKGROUND_VESA_COLOR);
+                }
+                offset += vesa_scan_line;
+                ++y;
             }
         }
-        if (iflags.over_view && vesa_pixel_size != 8) {
-            for (t = 0; t < TILE_Y; ++t) {
-                for (x = 0; x < 640; ++x) {
-                    unsigned long c1 = vesa_palette[buf[t][x * 2 + 0]];
-                    unsigned long c2 = vesa_palette[buf[t][x * 2 + 1]];
-                    unsigned char r1, r2, g1, g2, b1, b2;
+    } else {
+        /* Normal tiled mode */
+        const unsigned char *tile;
 
-                    vesa_GetRGB(c1, &r1, &g1, &b1);
-                    vesa_GetRGB(c2, &r2, &g2, &b2);
-                    r1 = (r1 + r2) / 2;
-                    g1 = (g1 + g2) / 2;
-                    b1 = (b1 + b2) / 2;
-                    vesa_WritePixel32(x, (y + TOP_MAP_ROW) * TILE_Y + t,
-                            vesa_MakeColor(r1, g1, b1));
+        p_row_width = iflags.wc_tile_width * vesa_pixel_bytes;
+        y = y_top;
+        for (cy = clipy; cy <= clipymax && cy < ROWNO; ++cy) {
+            for (py = 0; py < iflags.wc_tile_height; ++py) {
+                for (cx = clipx; cx <= clipxmax && cx < COLNO; ++cx) {
+                    tile = vesa_tiles[glyph2tile[map[cy][cx].glyph]];
+                    vesa_WritePixelRow(offset + p_row_width * (cx - clipx), tile + p_row_width * py, p_row_width);
                 }
-            }
-        } else {
-            for (t = 0; t < TILE_Y; ++t) {
-                for (x = 0; x < 640; ++x) {
-                    vesa_WritePixel(x, (y + TOP_MAP_ROW) * TILE_Y + t, buf[t][x]);
+                x = (cx - clipx) * iflags.wc_tile_width;
+                if (x < vesa_x_res) {
+                    vesa_FillRect(x, y, vesa_x_res - x, 1, BACKGROUND_VESA_COLOR);
                 }
+                offset += vesa_scan_line;
+                ++y;
             }
         }
     }
+    /* Loops leave y as the start of any remaining unfilled space */
+    if (y < y_bottom) {
+        vesa_FillRect(0, y, vesa_x_res, y_bottom - y, BACKGROUND_VESA_COLOR);
+    }
+
+    free(p_row);
 }
 #endif /* USE_TILES && CLIPPING */
 
 void
-vesa_userpan(left)
-boolean left;
+vesa_userpan(pan)
+enum vga_pan_direction pan;
 {
-    int x;
-
     /*	pline("Into userpan"); */
     if (iflags.over_view || iflags.traditional_view)
         return;
-    if (left)
-        x = min(COLNO - 1, clipxmax + 10);
-    else
-        x = max(0, clipx - 10);
-    vesa_cliparound(x, 10); /* y value is irrelevant on VGA clipping */
-    positionbar();
-    vesa_DrawCursor();
+
+    switch (pan) {
+    case pan_left:
+        if (viewport_cols < COLNO) {
+            clipxmax = clipx - 1;
+            clipx = clipxmax - (viewport_cols - 1);
+            if (clipx < 0) {
+                clipx = 0;
+                clipxmax = viewport_cols - 1;
+            }
+        }
+        break;
+
+    case pan_right:
+        if (viewport_cols < COLNO) {
+            clipx = clipxmax + 1;
+            clipxmax = clipx + (viewport_cols - 1);
+            if (clipxmax > COLNO - 1) {
+                clipxmax = COLNO - 1;
+                clipx = clipxmax - (viewport_cols - 1);
+            }
+        }
+        break;
+
+    case pan_up:
+        if (viewport_rows < ROWNO) {
+            clipymax = clipy - 1;
+            clipy = clipymax - (viewport_rows - 1);
+            if (clipy < 0) {
+                clipy = 0;
+                clipymax = viewport_rows - 1;
+            }
+        }
+        break;
+
+    case pan_down:
+        if (viewport_rows < ROWNO) {
+            clipy = clipymax + 1;
+            clipymax = clipy + (viewport_rows - 1);
+            if (clipymax > ROWNO - 1) {
+                clipymax = ROWNO - 1;
+                clipy = clipymax - (viewport_rows - 1);
+            }
+        }
+        break;
+    }
+
+    vesa_refresh();
 }
 
 void
@@ -782,13 +936,29 @@ boolean on;
     if (on) {
         iflags.over_view = TRUE;
         clipx = 0;
-        clipxmax = CO - 1;
+        clipxmax = COLNO - 1;
+        clipy = 0;
+        clipymax = ROWNO - 1;
     } else {
         iflags.over_view = FALSE;
-        clipx = max(0, (curcol - viewport_size / 2));
-        if (clipx > ((CO - 1) - viewport_size))
-            clipx = (CO - 1) - viewport_size;
-        clipxmax = clipx + (viewport_size - 1);
+        if (viewport_cols < COLNO) {
+            clipx = max(0, (curcol - viewport_cols / 2));
+            if (clipx > ((COLNO - 1) - viewport_cols))
+                clipx = (COLNO - 1) - viewport_cols;
+            clipxmax = clipx + (viewport_cols - 1);
+        } else {
+            clipx = 0;
+            clipxmax = COLNO - 1;
+        }
+        if (viewport_rows < ROWNO) {
+            clipy = max(0, (currow - viewport_rows / 2));
+            if (clipy > ((ROWNO - 1) - viewport_rows))
+                clipy = (ROWNO - 1) - viewport_rows;
+            clipymax = clipy + (viewport_rows - 1);
+        } else {
+            clipy = 0;
+            clipymax = ROWNO - 1;
+        }
     }
 }
 
@@ -801,14 +971,30 @@ boolean on;
         /*		switch_symbols(FALSE); */
         iflags.traditional_view = TRUE;
         clipx = 0;
-        clipxmax = CO - 1;
+        clipxmax = COLNO - 1;
+        clipy = 0;
+        clipymax = ROWNO - 1;
     } else {
         iflags.traditional_view = FALSE;
         if (!iflags.over_view) {
-            clipx = max(0, (curcol - viewport_size / 2));
-            if (clipx > ((CO - 1) - viewport_size))
-                clipx = (CO - 1) - viewport_size;
-            clipxmax = clipx + (viewport_size - 1);
+            if (viewport_cols < COLNO) {
+                clipx = max(0, (curcol - viewport_cols / 2));
+                if (clipx > ((COLNO - 1) - viewport_cols))
+                    clipx = (COLNO - 1) - viewport_cols;
+                clipxmax = clipx + (viewport_cols - 1);
+            } else {
+                clipx = 0;
+                clipxmax = COLNO - 1;
+            }
+            if (viewport_rows < ROWNO) {
+                clipy = max(0, (currow - viewport_rows / 2));
+                if (clipy > ((ROWNO - 1) - viewport_rows))
+                    clipy = (ROWNO - 1) - viewport_rows;
+                clipymax = clipy + (viewport_rows - 1);
+            } else {
+                clipy = 0;
+                clipymax = ROWNO - 1;
+            }
         }
     }
 }
@@ -821,6 +1007,7 @@ vesa_refresh()
     vesa_DrawCursor();
 }
 
+#if 0
 static void
 decal_packed(gp, special)
 const struct TileImage *gp;
@@ -835,6 +1022,7 @@ unsigned special;
     } else if (special & MG_RIDDEN) {
     }
 }
+#endif
 
 /*
  * Open tile files,
@@ -846,10 +1034,17 @@ unsigned special;
 void
 vesa_Init(void)
 {
+    static boolean inited = FALSE;
     const struct Pixel *paletteptr;
-#ifdef USE_TILES
+    unsigned i;
+    unsigned num_pixels, num_oview_pixels;
     const char *tile_file;
     int tilefailure = 0;
+
+    if (inited) return;
+    inited = TRUE;
+
+#ifdef USE_TILES
     /*
      * Attempt to open the required tile files. If we can't
      * don't perform the video mode switch, use TTY code instead.
@@ -859,9 +1054,9 @@ vesa_Init(void)
     if (tile_file == NULL || *tile_file == '\0') {
         tile_file = "nhtiles.bmp";
     }
-    if (!read_tiles(tile_file, FALSE))
+    if (!read_tiles(tile_file, vesa_pixel_size > 8))
         tilefailure |= 1;
-    if (get_palette() == NULL)
+    if (vesa_pixel_size == 8 && get_palette() == NULL)
         tilefailure |= 4;
 
     if (tilefailure) {
@@ -892,7 +1087,9 @@ vesa_Init(void)
         /*	clear_screen()	*/ /* not vesa_clear_screen() */
         return;
     }
+
     vesa_SwitchMode(vesa_mode);
+    vesa_SetViewPort();
     windowprocs.win_cliparound = vesa_cliparound;
 #ifdef USE_TILES
     paletteptr = get_palette();
@@ -906,7 +1103,90 @@ vesa_Init(void)
     font = vesa_FontPtrs();
     clear_screen();
     clipx = 0;
-    clipxmax = clipx + (viewport_size - 1);
+    clipxmax = clipx + (viewport_cols - 1);
+    clipy = 0;
+    clipymax = clipy + (viewport_rows - 1);
+
+    /* Set the size of the tiles for the overview mode */
+    vesa_oview_width = vesa_x_res / COLNO;
+    if (vesa_oview_width > iflags.wc_tile_width) {
+        vesa_oview_width = iflags.wc_tile_width;
+    }
+    vesa_oview_height = (vesa_y_res - (TOP_MAP_ROW + 4) * vesa_char_height)
+                      / ROWNO;
+    if (vesa_oview_height > iflags.wc_tile_height) {
+        vesa_oview_height = iflags.wc_tile_height;
+    }
+
+    /* Process tiles for the current video mode */
+    vesa_tiles = (unsigned char **) alloc(total_tiles_used * sizeof(void *));
+    vesa_oview_tiles = (unsigned char **) alloc(total_tiles_used * sizeof(void *));
+    num_pixels = iflags.wc_tile_width * iflags.wc_tile_height;
+    num_oview_pixels = vesa_oview_width * vesa_oview_height;
+    set_tile_type(vesa_pixel_size > 8);
+    for (i = 0; i < total_tiles_used; ++i) {
+        const struct TileImage *tile = get_tile(i);
+        struct TileImage *ov_tile = stretch_tile(tile, vesa_oview_width, vesa_oview_height);
+        unsigned j;
+        unsigned char *t_img = (unsigned char *) alloc(num_pixels * vesa_pixel_bytes);
+        unsigned char *ot_img = (unsigned char *) alloc(num_oview_pixels * vesa_pixel_bytes);
+        vesa_tiles[i] = t_img;
+        vesa_oview_tiles[i] = ot_img;
+        switch (vesa_pixel_bytes) {
+        case 1:
+            memcpy(t_img, tile->indexes, num_pixels);
+            memcpy(ot_img, ov_tile->indexes, num_oview_pixels);
+            break;
+
+        case 2:
+            for (j = 0; j < num_pixels; ++j) {
+                ((uint16_t *)t_img)[j] = vesa_MakeColor(tile->pixels[j]);
+            }
+            for (j = 0; j < num_oview_pixels; ++j) {
+                ((uint16_t *)ot_img)[j] = vesa_MakeColor(ov_tile->pixels[j]);
+            }
+            break;
+
+        case 3:
+            for (j = 0; j < num_pixels; ++j) {
+                unsigned long color = vesa_MakeColor(tile->pixels[j]);
+                t_img[3*j + 0] =  color        & 0xFF;
+                t_img[3*j + 1] = (color >>  8) & 0xFF;
+                t_img[3*j + 2] = (color >> 16) & 0xFF;
+            }
+            for (j = 0; j < num_oview_pixels; ++j) {
+                unsigned long color = vesa_MakeColor(ov_tile->pixels[j]);
+                ot_img[3*j + 0] =  color        & 0xFF;
+                ot_img[3*j + 1] = (color >>  8) & 0xFF;
+                ot_img[3*j + 2] = (color >> 16) & 0xFF;
+            }
+            break;
+
+        case 4:
+            for (j = 0; j < num_pixels; ++j) {
+                ((uint32_t *)t_img)[j] = vesa_MakeColor(tile->pixels[j]);
+            }
+            for (j = 0; j < num_oview_pixels; ++j) {
+                ((uint32_t *)ot_img)[j] = vesa_MakeColor(ov_tile->pixels[j]);
+            }
+            break;
+        }
+        free_tile(ov_tile);
+    }
+    free_tiles();
+}
+
+/* Set the size of the map viewport */
+static void
+vesa_SetViewPort()
+{
+    unsigned y_reserved = (TOP_MAP_ROW + 5) * vesa_char_height;
+    unsigned y_map = vesa_y_res - y_reserved;
+
+    viewport_cols = vesa_x_res / iflags.wc_tile_width;
+    viewport_rows = y_map / iflags.wc_tile_height;
+    if (viewport_cols > COLNO) viewport_cols = COLNO;
+    if (viewport_rows > ROWNO) viewport_rows = ROWNO;
 }
 
 /*
@@ -928,6 +1208,10 @@ unsigned mode;
         memset(&regs, 0, sizeof(regs));
         regs.x.ax = mode;
         (void) __dpmi_int(VIDEO_BIOS, &regs);
+#ifdef SIMULATE_CURSOR
+        free(undercursor);
+        undercursor = NULL;
+#endif
     } else if (mode >= 0x100) {
         iflags.grmode = 1;
         memset(&regs, 0, sizeof(regs));
@@ -955,7 +1239,14 @@ unsigned mode;
 void
 vesa_Finish(void)
 {
-    free_tiles();
+    int i;
+
+    for (i = 0; i < total_tiles_used; ++i) {
+        free(vesa_tiles[i]);
+        free(vesa_oview_tiles[i]);
+    }
+    free(vesa_tiles);
+    free(vesa_oview_tiles);
     vesa_SwitchMode(MODETEXT);
     windowprocs.win_cliparound = tty_cliparound;
     g_attribute = attrib_text_normal;
@@ -973,18 +1264,18 @@ vesa_Finish(void)
  * address of the appropriate character definition table for
  * the current graphics mode into interrupt vector 0x43 (0000:010C).
  */
-static char __far *
+static unsigned char __far *
 vesa_FontPtrs(void)
 {
     USHORT __far *tmp;
-    char __far *retval;
+    unsigned char __far *retval;
     USHORT fseg, foff;
     tmp = (USHORT __far *) MK_PTR(((USHORT) FONT_PTR_SEGMENT),
                                   ((USHORT) FONT_PTR_OFFSET));
     foff = READ_ABSOLUTE_WORD(tmp);
     ++tmp;
     fseg = READ_ABSOLUTE_WORD(tmp);
-    retval = (char __far *) MK_PTR(fseg, foff);
+    retval = (unsigned char __far *) MK_PTR(fseg, foff);
     return retval;
 }
 
@@ -1002,6 +1293,7 @@ vesa_detect()
     __dpmi_regs regs;
     unsigned long mode_addr;
     struct ModeInfoBlock mode_info;
+    const char *mode_str;
 
     vbe_info_seg = __dpmi_allocate_dos_memory(
             (sizeof(vbe_info) + 15) / 16,
@@ -1032,8 +1324,26 @@ vesa_detect()
     mode_addr = (vbe_info.VideoModePtr >> 16) * 16L
               + (vbe_info.VideoModePtr & 0xFFFF);
 
+    /* Allow the user to select a specific mode */
+    mode_str = getenv("NH_DISPLAY_MODE");
+    if (mode_str != NULL) {
+        char *end;
+        unsigned long num = strtoul(mode_str, &end, 16);
+        if (*end == '\0') {
+            /* Can we select this mode? */
+            if (vesa_GetModeInfo(num, &mode_info)
+            &&  mode_info.XResolution >= 640
+            &&  mode_info.YResolution >= 480
+            &&  mode_info.BitsPerPixel >= 8) {
+                vesa_mode = num & 0x47FF;
+            }
+        }
+        if (vesa_mode == 0xFFFF)
+            mode_str = NULL;
+    }
+
     /* Scan the mode list for an acceptable mode */
-    if (get_palette() != NULL)
+    if (get_palette() != NULL && vesa_mode == 0xFFFF)
         vesa_mode = vesa_FindMode(mode_addr,  8);
     if (vesa_mode == 0xFFFF)
         vesa_mode = vesa_FindMode(mode_addr, 32);
@@ -1052,8 +1362,8 @@ vesa_detect()
     vesa_GetModeInfo(vesa_mode, &mode_info);
     vesa_x_res = mode_info.XResolution;
     vesa_y_res = mode_info.YResolution;
-    vesa_x_center = (vesa_x_res - 640) / 2;
-    vesa_y_center = (vesa_y_res - 480) / 2;
+    vesa_x_center = 0;
+    vesa_y_center = 0;
     vesa_scan_line = mode_info.BytesPerScanLine;
     vesa_win_size = mode_info.WinSize * 1024L;
     vesa_win_gran = mode_info.WinGranularity * 1024L;
@@ -1062,47 +1372,47 @@ vesa_detect()
     if (vbe_info.VbeVersion >= 0x0300) {
         if (mode_info.ModeAttributes & 0x80) {
             vesa_red_pos = mode_info.LinRedFieldPosition;
-            vesa_red_size = mode_info.LinRedMaskSize;
+            vesa_red_shift = 8 - mode_info.LinRedMaskSize;
             vesa_green_pos = mode_info.LinGreenFieldPosition;
-            vesa_green_size = mode_info.LinGreenMaskSize;
+            vesa_green_shift = 8 - mode_info.LinGreenMaskSize;
             vesa_blue_pos = mode_info.LinBlueFieldPosition;
-            vesa_blue_size = mode_info.LinBlueMaskSize;
+            vesa_blue_shift = 8 - mode_info.LinBlueMaskSize;
         } else {
             vesa_red_pos = mode_info.RedFieldPosition;
-            vesa_red_size = mode_info.RedMaskSize;
+            vesa_red_shift = 8 - mode_info.RedMaskSize;
             vesa_green_pos = mode_info.GreenFieldPosition;
-            vesa_green_size = mode_info.GreenMaskSize;
+            vesa_green_shift = 8 - mode_info.GreenMaskSize;
             vesa_blue_pos = mode_info.BlueFieldPosition;
-            vesa_blue_size = mode_info.BlueMaskSize;
+            vesa_blue_shift = 8 - mode_info.BlueMaskSize;
         }
     } else {
         switch (vesa_pixel_size) {
         case 15:
             vesa_blue_pos = 0;
-            vesa_blue_size = 5;
+            vesa_blue_shift = 3;
             vesa_green_pos = 5;
-            vesa_green_size = 5;
+            vesa_green_shift = 3;
             vesa_red_pos = 10;
-            vesa_red_size = 5;
+            vesa_red_shift = 3;
             break;
 
         case 16:
             vesa_blue_pos = 0;
-            vesa_blue_size = 5;
+            vesa_blue_shift = 3;
             vesa_green_pos = 5;
-            vesa_green_size = 6;
+            vesa_green_shift = 2;
             vesa_red_pos = 11;
-            vesa_red_size = 5;
+            vesa_red_shift = 3;
             break;
 
         case 24:
         case 32:
             vesa_blue_pos = 0;
-            vesa_blue_size = 8;
+            vesa_blue_shift = 0;
             vesa_green_pos = 8;
-            vesa_green_size = 8;
+            vesa_green_shift = 0;
             vesa_red_pos = 16;
-            vesa_red_size = 8;
+            vesa_red_shift = 0;
             break;
         }
     }
@@ -1129,7 +1439,8 @@ vesa_detect()
     }
 
     /* Configure a linear frame buffer if we have it */
-    if ((mode_info.ModeAttributes & 0x80) != 0) {
+    if ((mode_info.ModeAttributes & 0x80) != 0
+        && (mode_str == NULL || (vesa_mode & 0x4000) != 0)) {
         unsigned sel = vesa_segment;
         unsigned win_size = mode_info.BytesPerScanLine * mode_info.YResolution;
         unsigned addr = vesa_map_frame_buffer(mode_info.PhysBasePtr, win_size);
@@ -1164,6 +1475,13 @@ unsigned bits;
     struct ModeInfoBlock mode_info0, mode_info;
     unsigned model = (bits == 8) ? 4 : 6;
 
+    if (iflags.wc_video_width < 640) {
+        iflags.wc_video_width = 640;
+    }
+    if (iflags.wc_video_height < 480) {
+        iflags.wc_video_height = 480;
+    }
+
     memset(&mode_info, 0, sizeof(mode_info));
     selected_mode = 0xFFFF;
     while (1) {
@@ -1175,8 +1493,8 @@ unsigned bits;
         if (!vesa_GetModeInfo(mode, &mode_info0)) continue;
 
         /* Check that the mode is acceptable */
-        if (mode_info0.XResolution < 640) continue;
-        if (mode_info0.YResolution < 480) continue;
+        if (mode_info0.XResolution < iflags.wc_video_width) continue;
+        if (mode_info0.YResolution < iflags.wc_video_height) continue;
         if (mode_info0.NumberOfPlanes != 1) continue;
         if (mode_info0.BitsPerPixel != bits) continue;
         if (mode_info0.NumberOfBanks != 1) continue;
@@ -1202,66 +1520,182 @@ unsigned bits;
  *
  */
 static void
-vesa_WriteChar(chr, col, row, colour, transparent)
+vesa_WriteChar(chr, col, row, colour)
 int chr, col, row, colour;
-boolean transparent;
 {
-    int i, j;
     int pixx, pixy;
 
-    unsigned char __far *fp = font;
-    unsigned char fnt;
+    /* min() protects from callers */
+    pixx = min(col, (CO - 1)) * vesa_char_width;
+    pixy = min(row, (LI - 1)) * vesa_char_height;
 
-    pixx = min(col, (CO - 1)) * 8;  /* min() protects from callers */
-    pixy = min(row, (LI - 1)) * 16; /* assumes 8 x 16 char set */
     pixx += vesa_x_center;
     pixy += vesa_y_center;
 
-    for (i = 0; i < MAX_ROWS_PER_CELL; ++i) {
-        fnt = READ_ABSOLUTE((fp + chr * 16 + i));
-        for (j = 0; j < 8; ++j) {
-            if (fnt & (0x80 >> j)) {
-                vesa_WritePixel(pixx + j, pixy + i, colour + FIRST_TEXT_COLOR);
-            } else if (!transparent) {
-                vesa_WritePixel(pixx + j, pixy + i, BACKGROUND_VESA_COLOR);
+    vesa_WriteCharXY(chr, pixx, pixy, colour);
+}
+
+/*
+ * As vesa_WriteChar, but specify coordinates by pixel and allow
+ * transparency
+ */
+static void
+vesa_WriteCharXY(chr, pixx, pixy, colour)
+int chr, pixx, pixy, colour;
+{
+    /* Flush if cache is full or if not contiguous to the last character */
+    if (chr_cache_size >= SIZE(chr_cache)) {
+        vesa_flush_text();
+    }
+    if (chr_cache_size != 0 && chr_cache_lastx + vesa_char_width != pixx) {
+        vesa_flush_text();
+    }
+    if (chr_cache_size != 0 && chr_cache_pixy != pixy) {
+        vesa_flush_text();
+    }
+    /* Add to cache and write later */
+    if (chr_cache_size == 0) {
+        chr_cache_pixx = pixx;
+        chr_cache_pixy = pixy;
+    }
+    chr_cache_lastx = pixx;
+    chr_cache[chr_cache_size].chr = chr;
+    chr_cache[chr_cache_size].colour = colour;
+    ++chr_cache_size;
+}
+
+/*
+ * Draw a character with a transparent background
+ * Don't bother cacheing; only the position bar and the cursor use this
+ */
+static void
+vesa_WriteCharTransparent(chr, pixx, pixy, colour)
+int chr, pixx, pixy, colour;
+{
+    int px, py;
+
+    for (py = 0; py < vesa_char_height; ++py) {
+        for (px = 0; px < vesa_char_width; ++px) {
+            if (vesa_GetCharPixel(chr, px, py)) {
+                vesa_WritePixel(pixx + px, pixy + py, colour + FIRST_TEXT_COLOR);
             }
         }
     }
 }
 
-/*
- * Like vesa_WriteChar, but draw the character in local memory rather than in
- * the VGA frame buffer.
- *
- * vesa_redrawmap uses this to gather a row of cells in local memory and then
- * draw them in strict row-major order, minimizing the use of the VESA
- * windowing function.
- *
- */
-static void
-vesa_WriteCharInMemory(chr, col, buf, colour)
-int chr, col;
-char buf[TILE_Y][640*2];
-int colour;
+void
+vesa_flush_text()
 {
-    int i, j;
-    int pixx;
+    if (chr_cache_size == 0) return;
 
-    unsigned char __far *fp = font;
-    unsigned char fnt;
+    vesa_WriteTextRow(chr_cache_pixx, chr_cache_pixy, chr_cache, chr_cache_size);
+    chr_cache_size = 0;
+}
 
-    pixx = min(col, (CO - 1)) * 8;  /* min() protects from callers */
+static void
+vesa_WriteTextRow(pixx, pixy, t_row, t_row_width)
+int pixx, pixy;
+struct VesaCharacter const *t_row;
+unsigned t_row_width;
+{
+    int x, px, py;
+    unsigned i;
+    unsigned p_row_width = t_row_width * vesa_char_width * vesa_pixel_bytes;
+    unsigned char *p_row = (unsigned char *) alloc(p_row_width);
+    unsigned long offset = pixy * (unsigned long)vesa_scan_line + pixx * vesa_pixel_bytes;
+    unsigned char fg[4], bg[4];
 
-    for (i = 0; i < MAX_ROWS_PER_CELL; ++i) {
-        fnt = READ_ABSOLUTE((fp + chr * 16 + i));
-        for (j = 0; j < 8; ++j) {
-            if (fnt & (0x80 >> j)) {
-                buf[i][pixx + j] = colour + FIRST_TEXT_COLOR;
+    /* Preprocess the background color */
+    if (vesa_pixel_bytes == 1) {
+        bg[0] = BACKGROUND_VESA_COLOR;
+    } else {
+        unsigned long pix = vesa_palette[BACKGROUND_VESA_COLOR];
+        bg[0] =  pix        & 0xFF;
+        bg[1] = (pix >>  8) & 0xFF;
+        bg[2] = (pix >> 16) & 0xFF;
+        bg[3] = (pix >> 24) & 0xFF;
+    }
+
+    /* First loop: draw one raster line of all row entries */
+    for (py = 0; py < vesa_char_height; ++py) {
+        /* Second loop: draw one raster line of one character */
+        x = 0;
+        for (i = 0; i < t_row_width; ++i) {
+            int chr = t_row[i].chr;
+            int colour = t_row[i].colour + FIRST_TEXT_COLOR;
+            /* Preprocess the foreground color */
+            if (vesa_pixel_bytes == 1) {
+                fg[0] = colour;
             } else {
-                buf[i][pixx + j] = BACKGROUND_VESA_COLOR;
+                unsigned long pix = vesa_palette[colour];
+                fg[0] =  pix        & 0xFF;
+                fg[1] = (pix >>  8) & 0xFF;
+                fg[2] = (pix >> 16) & 0xFF;
+                fg[3] = (pix >> 24) & 0xFF;
+            }
+            /* Third loop: draw eight pixels */
+            for (px = 0; px < vesa_char_width; px += 8) {
+                /* Fourth loop: draw one pixel */
+                int px2;
+                unsigned char fnt = vesa_GetCharPixelRow(chr, px, py);
+                int l = vesa_char_width - px;
+                if (l > 8) {
+                    l = 8;
+                }
+                for (px2 = 0; px2 < l; ++px2) {
+                    if (fnt & 0x80) {
+                        memcpy(p_row + x, fg, vesa_pixel_bytes);
+                    } else {
+                        memcpy(p_row + x, bg, vesa_pixel_bytes);
+                    }
+                    x += vesa_pixel_bytes;
+                    fnt <<= 1;
+                }
             }
         }
+        vesa_WritePixelRow(offset, p_row, p_row_width);
+        offset += vesa_scan_line;
     }
+    free(p_row);
+}
+
+static boolean
+vesa_GetCharPixel(ch, x, y)
+int ch;
+unsigned x, y;
+{
+    unsigned x2;
+    unsigned char fnt;
+
+    x2 = x % 8;
+
+    fnt = vesa_GetCharPixelRow(ch, x, y);
+    return (fnt & (0x80 >> x2)) != 0;
+}
+
+static unsigned char
+vesa_GetCharPixelRow(ch, x, y)
+int ch;
+unsigned x, y;
+{
+    unsigned fnt_width;
+    unsigned x1;
+    unsigned char fnt;
+    size_t offset;
+
+    if (x >= vesa_char_width) return FALSE;
+    if (y >= vesa_char_height) return FALSE;
+
+    fnt_width = (vesa_char_width + 7) / 8;
+    x1 = x / 8;
+
+    const unsigned char __far *fp;
+
+    if (ch < 0 || 255 < ch) return FALSE;
+    offset = (ch * vesa_char_height + y) * fnt_width + x1;
+    fp = font;
+    fnt = READ_ABSOLUTE((fp + offset));
+    return fnt;
 }
 
 /*
@@ -1269,93 +1703,45 @@ int colour;
  * at the desired location (col,row).
  *
  * Note: (col,row) in this case refer to the coordinate location in
- * NetHack character grid terms, (ie. the 40 x 25 character grid),
+ * NetHack character grid terms, relative to the map viewport,
  * not the x,y pixel location.
  *
  */
 static void
-vesa_DisplayCell(tile, col, row)
-const struct TileImage *tile;
+vesa_DisplayCell(tilenum, col, row)
+int tilenum;
 int col, row;
 {
-    int i, j, pixx, pixy;
+    unsigned char const *tile;
+    unsigned t_width, t_height;
+    unsigned char const *tptr;
+    int px, py, pixx, pixy;
+    unsigned long offset;
+    unsigned p_row_width;
 
-    pixx = col * TILE_X;
-    pixy = row * TILE_Y;
     if (iflags.over_view) {
-        pixx /= 2;
-        pixx += vesa_x_center;
-        pixy += vesa_y_center;
-        if (vesa_pixel_size != 8) {
-            for (i = 0; i < TILE_Y; ++i) {
-                for (j = 0; j < TILE_X; j += 2) {
-                    unsigned index = i * tile->width + j;
-                    unsigned long c1 = vesa_palette[tile->indexes[index + 0]];
-                    unsigned long c2 = vesa_palette[tile->indexes[index + 1]];
-                    unsigned char r1, r2, g1, g2, b1, b2;
-
-                    vesa_GetRGB(c1, &r1, &g1, &b1);
-                    vesa_GetRGB(c2, &r2, &g2, &b2);
-                    r1 = (r1 + r2) / 2;
-                    g1 = (g1 + g2) / 2;
-                    b1 = (b1 + b2) / 2;
-                    vesa_WritePixel32(pixx + j / 2, pixy + i,
-                            vesa_MakeColor(r1, g1, b1));
-                }
-            }
-        } else {
-            for (i = 0; i < TILE_Y; ++i) {
-                for (j = 0; j < TILE_X; j += 2) {
-                    unsigned index = i * tile->width + j;
-                    vesa_WritePixel(pixx + j / 2, pixy + i, tile->indexes[index]);
-                }
-            }
-        }
+        tile = vesa_oview_tiles[tilenum];
+        t_width = vesa_oview_width;
+        t_height = vesa_oview_height;
     } else {
-        pixx += vesa_x_center;
-        pixy += vesa_y_center;
-        for (i = 0; i < TILE_Y; ++i) {
-            for (j = 0; j < TILE_X; ++j) {
-                unsigned index = i * tile->width + j;
-                vesa_WritePixel(pixx + j, pixy + i, tile->indexes[index]);
-            }
-        }
+        tile = vesa_tiles[tilenum];
+        t_width = iflags.wc_tile_width;
+        t_height = iflags.wc_tile_height;
     }
-}
 
-/*
- * Like vesa_DisplayCell, but draw the tile in local memory rather than in
- * the VGA frame buffer.
- *
- * vesa_redrawmap uses this to gather a row of cells in local memory and then
- * draw them in strict row-major order, minimizing the use of the VESA
- * windowing function.
- *
- */
-static void
-vesa_DisplayCellInMemory(tile, col, buf)
-const struct TileImage *tile;
-int col;
-char buf[TILE_Y][640*2];
-{
-    int i, j, pixx;
+    p_row_width = t_width * vesa_pixel_bytes;
 
-    pixx = col * TILE_X;
-    if (iflags.over_view && vesa_pixel_size == 8) {
-        pixx /= 2;
-        for (i = 0; i < TILE_Y; ++i) {
-            for (j = 0; j < TILE_X; j += 2) {
-                unsigned index = i * tile->width + j;
-                buf[i][pixx + j / 2] = tile->indexes[index];
-            }
-        }
-    } else {
-        for (i = 0; i < TILE_Y; ++i) {
-            for (j = 0; j < TILE_X; ++j) {
-                unsigned index = i * tile->width + j;
-                buf[i][pixx + j] = tile->indexes[index];
-            }
-        }
+    pixx = col * t_width;
+    pixy = row * t_height + TOP_MAP_ROW * vesa_char_height;
+    pixx += vesa_x_center;
+    pixy += vesa_y_center;
+    offset = pixy * (unsigned long)vesa_scan_line + pixx * vesa_pixel_bytes;
+    tptr = tile;
+
+    for (py = 0; py < t_height; ++py) {
+        vesa_WritePixelRow(offset, tptr, p_row_width);
+        offset += vesa_scan_line;
+        tptr += p_row_width;
     }
 }
 
@@ -1379,7 +1765,7 @@ int len, col, row, colour;
     i = 0;
     us = (const unsigned char *) s;
     while ((*us != 0) && (i < len) && (col < (CO - 1))) {
-        vesa_WriteChar(*us, col, row, colour, FALSE);
+        vesa_WriteChar(*us, col, row, colour);
         ++us;
         ++i;
         ++col;
@@ -1389,8 +1775,8 @@ int len, col, row, colour;
 /*
  * Initialize the VGA palette with the desired colours. This
  * must be a series of 720 bytes for use with a card in 256
- * colour mode at 640 x 480. The first 240 palette entries are
- * used by the tile set; the last 16 are reserved for text.
+ * colour mode. The first 240 palette entries are used by the
+ * tile set; the last 16 are reserved for text.
  *
  */
 static boolean
@@ -1398,9 +1784,9 @@ vesa_SetPalette(palette)
 const struct Pixel *palette;
 {
     if (vesa_pixel_size == 8) {
-        vesa_SetHardPalette(palette);
+        return vesa_SetHardPalette(palette);
     } else {
-        vesa_SetSoftPalette(palette);
+        return vesa_SetSoftPalette(palette);
     }
 }
 
@@ -1498,33 +1884,29 @@ const struct Pixel *palette;
 {
     const struct Pixel *p;
     unsigned i;
-    unsigned char r, g, b;
 
     /* Set the tile set and text colors */
 #ifdef USE_TILES
-    p = palette;
-    for (i = 0; i < FIRST_TEXT_COLOR; ++i) {
-        r = p->r;
-        g = p->g;
-        b = p->b;
-        vesa_palette[i] = vesa_MakeColor(r, g, b);
-        ++p;
+    if (palette != NULL) {
+        p = palette;
+        for (i = 0; i < FIRST_TEXT_COLOR; ++i) {
+            vesa_palette[i] = vesa_MakeColor(*p);
+            ++p;
+        }
     }
 #endif
     p = defpalette;
     for (i = FIRST_TEXT_COLOR; i < 256; ++i) {
-        r = p->r;
-        g = p->g;
-        b = p->b;
-        vesa_palette[i] = vesa_MakeColor(r, g, b);
+        vesa_palette[i] = vesa_MakeColor(*p);
         ++p;
     }
+    return TRUE;
 }
 
 #ifdef POSITIONBAR
 
 #define PBAR_ROW (LI - 4)
-#define PBAR_COLOR_ON 16    /* slate grey background colour of tiles */
+#define PBAR_COLOR_ON 6     /* slate grey background colour of tiles */
 #define PBAR_COLOR_OFF 0    /* bluish grey, used in old style only */
 #define PBAR_COLOR_STAIRS CLR_BROWN /* brown */
 #define PBAR_COLOR_HERO CLR_WHITE  /* creamy white */
@@ -1535,7 +1917,7 @@ void
 vesa_update_positionbar(posbar)
 char *posbar;
 {
-    char *p = pbar;
+    unsigned char *p = pbar;
     if (posbar)
         while (*posbar)
             *p++ = *posbar++;
@@ -1545,13 +1927,13 @@ char *posbar;
 static void
 positionbar()
 {
-    char *posbar = pbar;
+    unsigned char *posbar = pbar;
     int feature, ucol;
-    int k, x, y, colour, row;
 
     int startk, stopk;
     boolean nowhere = FALSE;
-    int pixy = (PBAR_ROW * MAX_ROWS_PER_CELL);
+    int pixx, col;
+    int pixy = (PBAR_ROW * vesa_char_height);
     int tmp;
 
     if (!iflags.grmode || !iflags.tile_view)
@@ -1564,53 +1946,45 @@ positionbar()
 #endif
         return;
     }
+    startk = clipx * vesa_x_res / COLNO;
+    stopk = (clipxmax + 1) * vesa_x_res / COLNO;
 #ifdef OLD_STYLE
-    for (y = pixy; y < (pixy + MAX_ROWS_PER_CELL); ++y) {
-        for (x = 0; x < 640; ++x) {
-            k = x / 8;
-            if ((k < clipx) || (k > clipxmax)) {
-                colour = PBAR_COLOR_OFF;
-            } else
-                colour = PBAR_COLOR_ON;
-            vesa_WritePixel(x + vesa_x_center, y + vesa_y_center, colour);
-        }
-    }
+    vesa_FillRect(0, pixy, startk, vesa_char_height,
+                  PBAR_COLOR_OFF + FIRST_TEXT_COLOR);
+    vesa_FillRect(startk, pixy, stopk - startk, vesa_char_height,
+                  PBAR_COLOR_ON + FIRST_TEXT_COLOR);
+    vesa_FillRect(stopk, pixy, vesa_x_res - stopk, vesa_char_height,
+                  PBAR_COLOR_OFF + FIRST_TEXT_COLOR);
 #else
-    for (y = pixy, row = 0; y < (pixy + MAX_ROWS_PER_CELL); ++y, ++row) {
-        if ((!row) || (row == (ROWS_PER_CELL - 1))) {
-            startk = 0;
-            stopk = SCREENBYTES;
-        } else {
-            startk = clipx;
-            stopk = clipxmax;
-        }
-        for (x = 0; x < 640; ++x) {
-            k = x / 8;
-            if ((k < startk) || (k > stopk))
-                colour = BACKGROUND_VGA_COLOR;
-            else
-                colour = PBAR_COLOR_ON;
-            vesa_WritePixel(x + vesa_x_center, y + vesa_y_center, colour);
-        }
-    }
+    vesa_FillRect(0, pixy, vesa_x_res, 1, PBAR_COLOR_ON + FIRST_TEXT_COLOR);
+    vesa_FillRect(0, pixy + 1, startk, vesa_char_height - 2,
+                  BACKGROUND_VESA_COLOR);
+    vesa_FillRect(startk, pixy + 1, stopk - startk, vesa_char_height - 2,
+                  PBAR_COLOR_ON + FIRST_TEXT_COLOR);
+    vesa_FillRect(stopk, pixy + 1, vesa_x_res - stopk, vesa_char_height - 2,
+                  BACKGROUND_VESA_COLOR);
+    vesa_FillRect(0, pixy + vesa_char_height - 1, vesa_x_res, 1,
+                  PBAR_COLOR_ON + FIRST_TEXT_COLOR);
 #endif
     ucol = 0;
     if (posbar) {
         while (*posbar != 0) {
             feature = *posbar++;
+            col = *posbar++;
+            pixx = col * vesa_x_res / COLNO;
             switch (feature) {
             case '>':
-                vesa_WriteChar(feature, (int) *posbar++, PBAR_ROW, PBAR_COLOR_STAIRS, TRUE);
+                vesa_WriteCharTransparent(feature, pixx, pixy, PBAR_COLOR_STAIRS);
                 break;
             case '<':
-                vesa_WriteChar(feature, (int) *posbar++, PBAR_ROW, PBAR_COLOR_STAIRS, TRUE);
+                vesa_WriteCharTransparent(feature, pixx, pixy, PBAR_COLOR_STAIRS);
                 break;
             case '@':
-                ucol = (int) *posbar++;
-                vesa_WriteChar(feature, ucol, PBAR_ROW, PBAR_COLOR_HERO, TRUE);
+                ucol = col;
+                vesa_WriteCharTransparent(feature, pixx, pixy, PBAR_COLOR_HERO);
                 break;
             default: /* unanticipated symbols */
-                vesa_WriteChar(feature, (int) *posbar++, PBAR_ROW, PBAR_COLOR_STAIRS, TRUE);
+                vesa_WriteCharTransparent(feature, pixx, pixy, PBAR_COLOR_STAIRS);
                 break;
             }
         }
@@ -1619,51 +1993,73 @@ positionbar()
     if (inmap) {
         tmp = curcol + 1;
         if ((tmp != ucol) && (curcol >= 0))
-            vesa_WriteChar('_', tmp, PBAR_ROW, PBAR_COLOR_HERO, TRUE);
+            vesa_WriteCharTransparent('_', tmp * vesa_x_res / COLNO, pixy,
+                                      PBAR_COLOR_HERO);
     }
 #endif
+    vesa_flush_text();
 }
 
 #endif /*POSITIONBAR*/
 
 #ifdef SIMULATE_CURSOR
 
-static unsigned long undercursor[TILE_Y][TILE_X];
-
 void
 vesa_DrawCursor()
 {
-    unsigned x, y, left, top, right, bottom, width;
+    static boolean last_inmap = FALSE;
+    unsigned x, y, left, top, right, bottom, width, height;
     boolean isrogue = Is_rogue_level(&u.uz);
     boolean halfwidth =
         (isrogue || iflags.over_view || iflags.traditional_view || !inmap);
     int curtyp;
 
+    if (inmap && !last_inmap) {
+        vesa_redrawmap();
+    }
+    last_inmap = inmap;
+
     if (!cursor_type && inmap)
         return; /* CURSOR_INVIS - nothing to do */
+    if (undercursor == NULL) {
+        /* size for the greater of one tile or one character */
+        unsigned size1 = vesa_char_width * vesa_char_height;
+        unsigned size2 = iflags.wc_tile_width * iflags.wc_tile_height;
+        undercursor = (unsigned long *) alloc(
+                sizeof(undercursor[0]) * max(size1, size2));
+    }
 
     x = min(curcol, (CO - 1)); /* protection from callers */
     y = min(currow, (LI - 1)); /* protection from callers */
-    if (!halfwidth && ((x < clipx) || (x > clipxmax)))
+    if (!halfwidth
+    &&  ((x < clipx) || (x > clipxmax) || (y < clipy) || (y > clipymax)))
         return;
-    if (inmap)
+    if (inmap) {
         x -= clipx;
-    left = x * TILE_X; /* convert to pixels */
-    top  = y * TILE_Y;
-    if (halfwidth) {
-        left /= 2;
-        width = TILE_X / 2;
-    } else {
-        width = TILE_X;
+        y -= clipy;
     }
-    left += vesa_x_center;
-    top  += vesa_y_center;
+    /* convert to pixels */
+    if (!inmap || iflags.traditional_view) {
+        width = vesa_char_width;
+        height = vesa_char_height;
+    } else if (iflags.over_view) {
+        width = vesa_oview_width;
+        height = vesa_oview_height;
+    } else {
+        width = iflags.wc_tile_width;
+        height = iflags.wc_tile_height;
+    }
+    left = x * width  + vesa_x_center;
+    top  = y * height + vesa_y_center;
+    if (y >= TOP_MAP_ROW) {
+        top -= (height - vesa_char_height) * TOP_MAP_ROW;
+    }
     right = left + width - 1;
-    bottom = top + TILE_Y - 1;
+    bottom = top + height - 1;
 
-    for (y = 0; y < ROWS_PER_CELL; ++y) {
+    for (y = 0; y < height; ++y) {
         for (x = 0; x < width; ++x) {
-            undercursor[y][x] = vesa_ReadPixel32(left + x, top + y);
+            undercursor[y * width + x] = vesa_ReadPixel32(left + x, top + y);
         }
     }
 
@@ -1725,35 +2121,45 @@ vesa_DrawCursor()
 void
 vesa_HideCursor()
 {
-    unsigned x, y, left, top, width;
+    unsigned x, y, left, top, width, height;
     boolean isrogue = Is_rogue_level(&u.uz);
     boolean halfwidth =
         (isrogue || iflags.over_view || iflags.traditional_view || !inmap);
-    int curtyp;
 
     if (!cursor_type && inmap)
         return; /* CURSOR_INVIS - nothing to do */
+    if (undercursor == NULL)
+        return;
 
     x = min(curcol, (CO - 1)); /* protection from callers */
     y = min(currow, (LI - 1)); /* protection from callers */
-    if (!halfwidth && ((x < clipx) || (x > clipxmax)))
+    if (!halfwidth
+    &&  ((x < clipx) || (x > clipxmax) || (y < clipy) || (y > clipymax)))
         return;
-    if (inmap)
+    if (inmap) {
         x -= clipx;
-    left = x * TILE_X; /* convert to pixels */
-    top  = y * TILE_Y;
-    if (halfwidth) {
-        left /= 2;
-        width = TILE_X / 2;
-    } else {
-        width = TILE_X;
+        y -= clipy;
     }
-    left += vesa_x_center;
-    top  += vesa_y_center;
+    /* convert to pixels */
+    if (!inmap || iflags.traditional_view) {
+        width = vesa_char_width;
+        height = vesa_char_height;
+    } else if (iflags.over_view) {
+        width = vesa_oview_width;
+        height = vesa_oview_height;
+    } else {
+        width = iflags.wc_tile_width;
+        height = iflags.wc_tile_height;
+    }
+    left = x * width  + vesa_x_center;
+    top  = y * height + vesa_y_center;
+    if (y >= TOP_MAP_ROW) {
+        top -= (height - vesa_char_height) * TOP_MAP_ROW;
+    }
 
-    for (y = 0; y < ROWS_PER_CELL; ++y) {
+    for (y = 0; y < height; ++y) {
         for (x = 0; x < width; ++x) {
-            vesa_WritePixel32(left + x, top + y, undercursor[y][x]);
+            vesa_WritePixel32(left + x, top + y, undercursor[y * width + x]);
         }
     }
 }
