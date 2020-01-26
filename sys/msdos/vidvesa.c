@@ -58,6 +58,8 @@ static void FDECL(vesa_WriteTextRow, (int pixx, int pixy,
         struct VesaCharacter const *t_row, unsigned t_row_width));
 static boolean FDECL(vesa_GetCharPixel, (int, unsigned, unsigned));
 static unsigned char FDECL(vesa_GetCharPixelRow, (int, unsigned, unsigned));
+static unsigned long FDECL(vesa_DoublePixels, (unsigned long));
+static unsigned long FDECL(vesa_TriplePixels, (unsigned long));
 static void FDECL(vesa_WriteStr, (const char *, int, int, int, int));
 static unsigned char __far *NDECL(vesa_FontPtrs);
 static void FDECL(vesa_process_tile, (struct TileImage *tile));
@@ -1118,6 +1120,23 @@ vesa_Init(void)
         vesa_oview_height = iflags.wc_tile_height;
     }
 
+    /* Use the map font size to set the font size */
+    /* Supported sizes are 8x16, 16x32, 24x48 and 32x64 */
+    vesa_char_height = iflags.wc_fontsiz_map;
+    if (vesa_char_height <= 0 || vesa_char_height > vesa_y_res / 30) {
+        vesa_char_height = vesa_y_res / 30;
+    }
+    if (vesa_char_height < 32) {
+        vesa_char_height = 16;
+    } else if (vesa_char_height < 48) {
+        vesa_char_height = 32;
+    } else if (vesa_char_height < 64) {
+        vesa_char_height = 48;
+    } else {
+        vesa_char_height = 64;
+    }
+    vesa_char_width = vesa_char_height / 2;
+
     /* Process tiles for the current video mode */
     vesa_tiles = (unsigned char **) alloc(total_tiles_used * sizeof(void *));
     vesa_oview_tiles = (unsigned char **) alloc(total_tiles_used * sizeof(void *));
@@ -1678,24 +1697,81 @@ vesa_GetCharPixelRow(ch, x, y)
 int ch;
 unsigned x, y;
 {
-    unsigned fnt_width;
     unsigned x1;
     unsigned char fnt;
     size_t offset;
 
-    if (x >= vesa_char_width) return FALSE;
-    if (y >= vesa_char_height) return FALSE;
+    if (x >= vesa_char_width) return 0;
+    if (y >= vesa_char_height) return 0;
 
-    fnt_width = (vesa_char_width + 7) / 8;
     x1 = x / 8;
 
     const unsigned char __far *fp;
 
     if (ch < 0 || 255 < ch) return FALSE;
-    offset = (ch * vesa_char_height + y) * fnt_width + x1;
+    offset = ch * 16 + (y * 16 / vesa_char_height);
     fp = font;
     fnt = READ_ABSOLUTE((fp + offset));
+
+    if (vesa_char_width != 8) {
+        unsigned long fnt2 = fnt;
+        unsigned width = vesa_char_width;
+        if (width % 3 == 0) {
+            fnt2 = vesa_TriplePixels(fnt2);
+            width /= 3;
+        }
+        while (width > 8) {
+            fnt2 = vesa_DoublePixels(fnt2);
+            width /= 2;
+        }
+        fnt2 <<= 32 - vesa_char_width;
+        fnt = (unsigned char)(fnt2 >> (24 - 8 * x1));
+    }
+
     return fnt;
+}
+
+/* Scale font pixels horizontally */
+static unsigned long
+vesa_DoublePixels(fnt)
+unsigned long fnt;
+{
+    static const unsigned char double_bits[] = {
+        0x00, 0x03, 0x0C, 0x0F,
+        0x30, 0x33, 0x3C, 0x3F,
+        0xC0, 0xC3, 0xCC, 0xCF,
+        0xF0, 0xF3, 0xFC, 0xFF
+    };
+    unsigned i;
+    unsigned long fnt2;
+
+    fnt2 = 0;
+    for (i = 0; i < 16; i += 4) {
+        unsigned long b4 = (fnt >> i) & 0xF;
+        fnt2 |= (unsigned long)double_bits[b4] << (i * 2);
+    }
+    return fnt2;
+}
+
+static unsigned long
+vesa_TriplePixels(fnt)
+unsigned long fnt;
+{
+    static const unsigned short triple_bits[] = {
+        00000, 00007, 00070, 00077,
+        00700, 00707, 00770, 00777,
+        07000, 07007, 07070, 07077,
+        07700, 07707, 07770, 07777
+    };
+    unsigned i;
+    unsigned long fnt2;
+
+    fnt2 = 0;
+    for (i = 0; i < 11; i += 4) {
+        unsigned long b4 = (fnt >> i) & 0xF;
+        fnt2 |= (unsigned long)triple_bits[b4] << (i * 3);
+    }
+    return fnt2;
 }
 
 /*
