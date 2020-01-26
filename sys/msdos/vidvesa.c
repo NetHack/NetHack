@@ -108,7 +108,7 @@ static int viewport_cols = 40;
 static int viewport_rows = ROWNO;
 
 static const struct Pixel defpalette[] = {    /* Colors for text and the position bar */
-	{ 0x18, 0x18, 0x18, 0xff }, /* CLR_BLACK */
+	{ 0x00, 0x00, 0x00, 0xff }, /* CLR_BLACK */
 	{ 0xaa, 0x00, 0x00, 0xff }, /* CLR_RED */
 	{ 0x00, 0xaa, 0x00, 0xff }, /* CLR_GREEN */
 	{ 0x99, 0x40, 0x00, 0xff }, /* CLR_BROWN */
