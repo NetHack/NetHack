@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1577759850 2019/12/31 02:37:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.319 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1580044343 2020/01/26 13:12:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.320 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -633,9 +633,11 @@ register struct monst *mtmp;
     return 0;
 }
 
+/* calculate 'mon's movement for current turn; called from moveloop() */
 int
-mcalcmove(mon)
+mcalcmove(mon, m_moving)
 struct monst *mon;
+boolean m_moving; /* True: adjust for moving; False: just adjust for speed */
 {
     int mmove = mon->data->mmove;
     int mmove_adj;
@@ -656,17 +658,18 @@ struct monst *mon;
         mmove = ((rn2(2) ? 4 : 5) * mmove) / 3;
     }
 
-    /* Randomly round the monster's speed to a multiple of NORMAL_SPEED.
-       This makes it impossible for the player to predict when they'll get
-       a free turn (thus preventing exploits like "melee kiting"), while
-       retaining guarantees about shopkeepers not being outsped by a
-       normal-speed player, normal-speed players being unable to open up
-       a gap when fleeing a normal-speed monster, etc. */
-    mmove_adj = mmove % NORMAL_SPEED;
-    mmove -= mmove_adj;
-    if (rn2(NORMAL_SPEED) < mmove_adj)
-        mmove += NORMAL_SPEED;
-
+    if (m_moving) {
+        /* Randomly round the monster's speed to a multiple of NORMAL_SPEED.
+           This makes it impossible for the player to predict when they'll
+           get a free turn (thus preventing exploits like "melee kiting"),
+           while retaining guarantees about shopkeepers not being outsped
+           by a normal-speed player, normal-speed players being unable
+           to open up a gap when fleeing a normal-speed monster, etc. */
+        mmove_adj = mmove % NORMAL_SPEED;
+        mmove -= mmove_adj;
+        if (rn2(NORMAL_SPEED) < mmove_adj)
+            mmove += NORMAL_SPEED;
+    }
     return mmove;
 }
 
