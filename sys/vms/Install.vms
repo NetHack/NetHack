@@ -264,7 +264,7 @@ Notes:
     termcap file, otherwise a message about "Unknown terminal type" will
     be printed and NetHack will exit.
 
-7.  Both vmsbuild.com and Makefile.src have provisions to build nethack's
+7.  Both vmsbuild.com and Makefile.src have provisions to build NetHack's
     'curses' interface, but the source code for it won't compile using
     the implementation of curses which is supplied with VMS.
 
