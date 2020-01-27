@@ -27,6 +27,10 @@ OPTIONS=rawio,BIOS,symset:IBMGraphics_2,roguesymset:RogueEpyx
 # To use VGA graphical tiles on an MS-DOS PC with VGA or better,uncomment 
 # this:
 #OPTIONS=video:autodetect
+# And to explicitly set the resolution:
+#OPTIONS=video_width:1024
+#OPTIONS=video_height:768
+
 
 # If your machine is NEC PC-9800, use:
 #OPTIONS=rawio,BIOS,video:default
