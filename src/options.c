@@ -3377,9 +3377,11 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         }
-        op = string_for_opt(opts, negated);
-        iflags.wc_video_width = strtol(op, NULL, 10);
-        return FALSE;
+        if ((op = string_for_opt(opts, negated)) != empty_optstr)
+            iflags.wc_video_width = strtol(op, NULL, 10);
+        else
+            return FALSE;
+        return retval;
     }
     fullname = "video_height";
     if (match_optname(opts, fullname, 7, TRUE)) {
@@ -3389,9 +3391,11 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         }
-        op = string_for_opt(opts, negated);
-        iflags.wc_video_height = strtol(op, NULL, 10);
-        return FALSE;
+        if ((op = string_for_opt(opts, negated)) != empty_optstr)
+            iflags.wc_video_height = strtol(op, NULL, 10);
+	else
+            return FALSE;
+        return retval;
     }
 #ifdef NO_TERMS
     /* video:string -- must be after longer tests */
