@@ -72,9 +72,6 @@ extern short glyph2tile[];
 #define HUPSKIP_RESULT(RES) /*empty*/
 #endif /* ?HANGUP_HANDLING */
 
-/* this is only needed until tty_status_* routines are written */
-extern NEARDATA winid WIN_STATUS;
-
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
     "tty",
