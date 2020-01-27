@@ -32,6 +32,8 @@ static int FDECL(nhl_ing_suffix, (lua_State *));
 static int FDECL(nhl_an, (lua_State *));
 static int FDECL(nhl_meta_u_index, (lua_State *));
 static int FDECL(nhl_meta_u_newindex, (lua_State *));
+static int FDECL(nhl_u_clear_inventory, (lua_State *));
+static int FDECL(nhl_u_giveobj, (lua_State *));
 static int FDECL(traceback_handler, (lua_State *));
 
 void
