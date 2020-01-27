@@ -860,7 +860,6 @@ const char *status_fieldnm[MAXBLSTATS];
 const char *status_fieldfmt[MAXBLSTATS];
 char *status_vals[MAXBLSTATS];
 boolean status_activefields[MAXBLSTATS];
-NEARDATA winid WIN_STATUS;
 
 void
 genl_status_init()
