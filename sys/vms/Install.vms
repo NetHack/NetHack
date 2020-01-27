@@ -91,7 +91,7 @@
     freeware CD, you will need to pass "/Define=_DECC_V4_SOURCE" as the
     third argument to vmsbuild.com in step #5.  The version of yacc
     or bison in that distribution places '#include <stdlib.h>' in the
-    generated code, before nethack's '#include "config.h"', leading to
+    generated code, before NetHack's '#include "config.h"', leading to
     conflicts that prevent compilation from completing.
 
 5.  To build NETHACK.EXE and its auxiliary programs, execute the
@@ -439,7 +439,7 @@ Notes:
     Any character name you specify will be ignored in favor of "wizard".
 
     [More out of date information.  Rather than compile-time Local_WIZARD,
-    users(s) allowed to entre wizard mode are now controlled by the entry
+    users(s) allowed to run in wizard mode are now controlled by the entry
     WIZARDS in the file SYSCONF.]
 
 15. At program startup time, NetHack uses the empty file PERM to prevent
