@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ $NHDT-Date: 1579914040 2020/01/25 01:00:40 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ $NHDT-Date: 1580043420 2020/01/26 12:57:00 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -47,6 +47,7 @@ if at the edge of the map window, trying to move farther fails but used a turn
 hero can no longer wear blindfold/towel/lenses when poly'd into headless form
 revamp achievement tracking for exploring Mine's End and Sokoban (by acquiring
 	luckstone and bag of holding or amulet of reflection, respectively)
+throttle long worm growth rate and HP accumulation
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -110,8 +111,8 @@ when hallucinating, see hallucinated liquids when looking at water or lava
 	on the map
 applying a spellbook hints about read charges left
 wizard mode wishing for level topology can now create hidden doors (ask for
-	"secret door" when at a door or wall location) and hidden corridor
-	spots ("secret corridor" at a corridor location)
+	"secret door" when at a door or wall location), hidden corridor
+	spots ("secret corridor" at a corridor location), and clouds
 tiny chance for randomly created spellbooks to be Discworld novels instead
 	of having only one in the first book or scroll shop created (won't
 	occur in hero's initial inventory or NPC priest inventory or be

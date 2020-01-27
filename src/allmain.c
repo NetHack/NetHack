@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1578448653 2020/01/08 01:57:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1580044340 2020/01/26 13:12:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -125,7 +125,7 @@ boolean resuming;
                        to skip dead monsters here because they will have
                        been purged at end of their previous round of moving */
                     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-                        mtmp->movement += mcalcmove(mtmp);
+                        mtmp->movement += mcalcmove(mtmp, TRUE);
 
                     /* occasionally add another monster; since this takes
                        place after movement has been allotted, the new
@@ -139,7 +139,7 @@ boolean resuming;
                     /* calculate how much time passed. */
                     if (u.usteed && u.umoved) {
                         /* your speed doesn't augment steed's speed */
-                        moveamt = mcalcmove(u.usteed);
+                        moveamt = mcalcmove(u.usteed, TRUE);
                     } else {
                         moveamt = g.youmonst.data->mmove;
 

@@ -3907,6 +3907,10 @@ Values are \(lqautodetect\(rq, \(lqdefault\(rq, or \(lqvga\(rq.
 Setting \(lqvga\(rq (or \(lqautodetect\(rq with vga hardware present)
 will cause the game to display tiles.
 Cannot be set with the \(oqO\(cq command.
+.lp video_height
+Set the VGA mode resolution height (MS-DOS only, with video:vga)
+.lp video_width
+Set the VGA mode resolution width (MS-DOS only, with video:vga)
 .lp videocolors
 Set the color palette for PC systems using NO_TERMS
 (default 4-2-6-1-5-3-15-12-10-14-9-13-11, (PC NetHack only).

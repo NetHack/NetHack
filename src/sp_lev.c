@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1574646949 2019/11/25 01:55:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580036285 2020/01/26 10:58:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.148 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1571,10 +1571,13 @@ struct mkroom *croom;
 
         /*
          * If this is a specific item of the right type and it is being
-         * created on the right level, flag it as the designated item
+         * created on the right level, record its obj->o_id to be able
+         * to recognize it as the designated item
          * used to detect a special achievement (to whit, reaching and
          * exploring the target level, although the exploration part
          * might be short-circuited if a monster brings object to hero).
+         * Achievement is accomplished and the recorded o_id is cleared
+         * if/when it gets added into hero's inventory.
          *
          * Random items of the appropriate type won't trigger a false
          * match--they'll fail the (id != -1) test above--but the level

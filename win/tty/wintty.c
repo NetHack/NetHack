@@ -72,9 +72,6 @@ extern short glyph2tile[];
 #define HUPSKIP_RESULT(RES) /*empty*/
 #endif /* ?HANGUP_HANDLING */
 
-/* this is only needed until tty_status_* routines are written */
-extern NEARDATA winid WIN_STATUS;
-
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
     "tty",
@@ -155,11 +152,12 @@ char defmorestr[] = "--More--";
 #if defined(USE_TILES) && defined(MSDOS)
 boolean clipping = FALSE; /* clipping on? */
 int clipx = 0, clipxmax = 0;
+int clipy = 0, clipymax = 0;
 #else
 static boolean clipping = FALSE; /* clipping on? */
 static int clipx = 0, clipxmax = 0;
-#endif
 static int clipy = 0, clipymax = 0;
+#endif
 #endif /* CLIPPING */
 
 #if defined(USE_TILES) && defined(MSDOS)
