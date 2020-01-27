@@ -1344,7 +1344,7 @@ vesa_detect()
               + (vbe_info.VideoModePtr & 0xFFFF);
 
     /* Allow the user to select a specific mode */
-    mode_str = getenv("NH_DISPLAY_MODE");
+    mode_str = nh_getenv("NH_DISPLAY_MODE");
     if (mode_str != NULL) {
         char *end;
         unsigned long num = strtoul(mode_str, &end, 16);
