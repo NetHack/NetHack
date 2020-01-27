@@ -95,9 +95,6 @@ static XtSignalId X11_sig_id;
 #endif
 #endif
 
-/* this is only needed until X11_status_* routines are written */
-extern NEARDATA winid WIN_STATUS;
-
 /* Interface definition, for windows.c */
 struct window_procs X11_procs = {
     "X11",
