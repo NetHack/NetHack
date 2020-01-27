@@ -11,7 +11,6 @@ fix internal self-recover to work with recent fields added to checkpoint file
 improvements to pronoun usage when hallucinating
 function calls made from mapglyph based on dungeon level are now called once
 	per level
-fix accessing mons[-1] when trying to gate in a non-valid demon
 fast hero could have random clairvoyance happen more than once on same turn
 using 'Q' on wielded weapon would offer to split stack; make using 'w' on a
 	quivered stack behave similarly
@@ -23,7 +22,6 @@ change crysknife from mineral to bone and worm tooth from unspecified to bone
 worn meat ring shouldn't cause increased hunger; neither should fake Amulet
 worn +0 ring of protection should cause increased hunger if it is the only
 	source of extrinsic Protection
-fix accessing mons[-1] when monster figures out if a tin cures stoning
 monster wielding Stormbringer or healer's Staff against another monster would
 	heal the hero instead of the wielding monster when draining life
 change twoweapon feedback from "not a weapon" to "not a suitable weapon"

@@ -44,6 +44,22 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
+/*  Patch 5, January 27, 2020
+ *
+ *  fix accessing mons[-1] when trying to gate in a non-valid demon
+ *  fix accessing mons[-1] when monster figures out if a tin cures stoning
+ *  have string_for_opt() return empty_optstr on failure
+ *  ensure existing callers of string_for_opt() check return value before using it
+ *  fix potential buffer overflow in add_menu_coloring()0
+ *  fix potential buffer overflow in sym_val()
+ *  fix potential buffer overflow in pline(), raw_printf(), and config_error_add()
+ *  fix potential buffer overflow in choose_windows()
+ *  use vsnprintf instead of vsprintf in pline.c where possible
+ *  Windows: incldues a fix from a 3.6.4 post-release update where 
+ *      OPTIONS=map_mode:fit_to_screen could cause a game start failure
+ *  Windows: users with C-locale unmappable names could get game start failure
+ */
+
 /*  Patch 4, December 18, 2019
  *
  *  fix potential buffer overflow when parsing run-time configuration file
