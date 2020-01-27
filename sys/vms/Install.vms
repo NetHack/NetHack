@@ -157,12 +157,7 @@ Notes:
     versions of VMS.  (Note:  in the distributed sources, this has already
     been uncommented.)
 
-3.  vmsbuild.com includes commands to try to build the 'curses' interface
-    but they won't work.  That interface requires 'ncurses' or 'PDcurses',
-    not the older 'curses' (neither the VMS-specific variation nor the
-    BSD-derived one) included with the C run-time library.
-
-4.  To specify user-preference options in your environment, define the
+3.  To specify user-preference options in your environment, define the
     logical name NETHACKOPTIONS to have the value of a quoted string
     containing a comma separated list of option values.  The option names
     are case-insensitive.
@@ -195,7 +190,7 @@ Notes:
     placed in the playground directory by install.com.  Also, an example
     configuration file can be found in [.win.X11]nethack.rc.)
 
-5.  [As mentioned above, the set of Makefiles is out of date so disregard
+4.  [As mentioned above, the set of Makefiles is out of date so disregard
     this note....]
     Instead of using vmsbuild.com to compile and link everything, you can
     use the set of Makefiles found in the vms subdirectory, provided you
@@ -236,7 +231,7 @@ Notes:
     [Note:  Makefile.* have been updated occasionally but not exercised
     for a long time, so might not be in working order.]
 
-6.  termcap is an ASCII data file containing descriptions of terminal
+5.  termcap is an ASCII data file containing descriptions of terminal
     capabilities and the escape sequences that software must use to take
     advantage of them.  If you do not already have a termcap file in use
     on your system there is a small one in file [.SYS.SHARE]TERMCAP.  It
@@ -264,11 +259,13 @@ Notes:
     termcap file, otherwise a message about "Unknown terminal type" will
     be printed and NetHack will exit.
 
-7.  Both vmsbuild.com and Makefile.src have provisions to build NetHack's
+6.  Both vmsbuild.com and Makefile.src have provisions to build NetHack's
     'curses' interface, but the source code for it won't compile using
-    the implementation of curses which is supplied with VMS.
+    the implementation of curses which is supplied with VMS (either the
+    VMS-specific variant or the BSD-derived one).  It requires 'ncurses'
+    or 'PDcurses'.
 
-8.  NetHack contains code which attempts to make it secure in case it's
+7.  NetHack contains code which attempts to make it secure in case it's
     installed with privileges (to allow the playground to be protected
     against world write access).  This has only undergone limited testing,
     so install NetHack with privileges at your own risk.  If you discover
@@ -321,7 +318,7 @@ Notes:
     built NetHack, you can relink with tracebacks disabled by doing
        $ @[.SYS.VMS]VMSBUILD "LINK" "" "" "/noTrace/noDebug"
 
-9.  If you can't or won't install nethack.exe with privileges and if you
+8.  If you can't or won't install nethack.exe with privileges and if you
     don't have access to a privileged account yourself, then if you intend
     to allow other users to access your copy of NetHack you should probably
     place an ACL on the playground directory and its save subdirectory.
@@ -354,7 +351,7 @@ Notes:
     you to run recover.exe on behalf of other users, because you won't be
     able to create files owned by them unless you have elevated privileges.
 
-10. Many NetHack commands can be aborted by sending it the <escape>
+9.  Many NetHack commands can be aborted by sending it the <escape>
     character when it wants input.  This is displayed as ESC inside the
     game.  Digital VK201 keyboards (used by VT2xx and VT3xx and older
     VAXstations) and VK401 keyboards (used by VT4xx, newer VAXstations,
@@ -394,7 +391,7 @@ Notes:
     be sure to remember to eventually reattach to the NetHack subprocess;
     otherwise the game in progress won't get saved when you logout.
 
-11. NetHack optionally maintains a logfile which receives one line appended
+10. NetHack optionally maintains a logfile which receives one line appended
     to it whenever a game ends.  This can be disabled entirely by adding
     an "#undef LOGFILE" directive to vmsconf.h prior to building the
     program, or it can be disabled later by removing the file(s) LOGFILE.;*
@@ -405,7 +402,7 @@ Notes:
     more elaborate log file named XLOGFILE containing more information is
     handled similarly.
 
-12. Some attempt at support for VMS versions earlier than V4.6 has been
+11. Some attempt at support for VMS versions earlier than V4.6 has been
     included, but no such obsolete system was available for testing it.
     vmsbuild.com detects the need for the extra support routines and
     arranges automatically for them to be compiled.  The reason that
@@ -416,7 +413,7 @@ Notes:
     [That was written many years ago and the chance of it still working
     is very small.]
 
-13. vmsbuild.com collects almost all of the object files (xxx.OBJ) into
+12. vmsbuild.com collects almost all of the object files (xxx.OBJ) into
     an object library (NETHACK.OLB) as it compiles the source files.
     This should prevent the quota-exceeded problems from the linker
     that some sites have reported for prior versions.  Note that if you
@@ -428,7 +425,7 @@ Notes:
     If you forget to replace the library entry, your newly compiled code
     will not be included in the new executable image.
 
-14. To access "wizard mode"--intended for debugging purposes, not to
+13. To access "wizard mode"--intended for debugging purposes, not to
     spoil the game with unlimited wishes--you must be running from the
     username compiled into the game via Local_WIZARD in vmsconf.h, and
     you must specify "-D" on the command line when invoking NetHack.
@@ -442,7 +439,7 @@ Notes:
     users(s) allowed to run in wizard mode are now controlled by the entry
     WIZARDS in the file SYSCONF.]
 
-15. At program startup time, NetHack uses the empty file PERM to prevent
+14. At program startup time, NetHack uses the empty file PERM to prevent
     two different processes from using the same character name (under the
     same UIC ownership) at the same time.  It does this by temporarily
     giving that file a second directory entry named PERM.LOCK, then
@@ -484,7 +481,7 @@ Notes:
     is accomplished using temporary entry RECORD.LOCK and LOGFILE using
     entry LOGFILE.LOCK.
 
-16. Unless you have both Motif and the Athena Widget set from MIT, you
+15. Unless you have both Motif and the Athena Widget set from MIT, you
     will not be able to use the X11 interface on VMS.  Even if you do
     have both those things, such a configuration has not been tested and
     there are no provisions for it in vmsbuild.com.  Makefile.src does
@@ -510,7 +507,7 @@ Notes:
     window manager in order for any changes to take effect; it's easiest
     to just make the session manager quit and then log in again.
 
-17. If necessary, send problem reports via e-mail to
+16. If necessary, send problem reports via e-mail to
        <devteam@nethack.org>
     Always include version information for NetHack, the operating system,
     and the C compiler used.
