@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1577063925 2019/12/23 01:18:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1580254093 2020/01/28 23:28:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.221 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1615,6 +1615,13 @@ boolean at_stairs, falling, portal;
      *  Move all plines beyond the screen reset.
      */
 
+    /* deferred arrival message for level teleport looks odd if given
+       after the various messages below so give it before them */
+    if (g.dfr_post_msg && !strncmpi(g.dfr_post_msg, "You materialize", 15)) {
+        pline("%s", g.dfr_post_msg);
+        free((genericptr_t) g.dfr_post_msg), g.dfr_post_msg = 0;
+    }
+
     /* special levels can have a custom arrival message */
     deliver_splev_message();
 
@@ -1699,9 +1706,11 @@ boolean at_stairs, falling, portal;
                  || g.quest_status.leader_is_dead)) {
             if (!u.uevent.qcalled) {
                 u.uevent.qcalled = 1;
-                com_pager("quest_portal"); /* main "leader needs help" message */
-            } else {          /* reminder message */
-                com_pager(Role_if(PM_ROGUE) ? "quest_portal_demand" : "quest_portal_again");
+                /* main "leader needs help" message */
+                com_pager("quest_portal");
+            } else { /* reminder message */
+                com_pager(Role_if(PM_ROGUE) ? "quest_portal_demand"
+                                            : "quest_portal_again");
             }
         }
     }

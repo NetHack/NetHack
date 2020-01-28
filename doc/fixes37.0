@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ $NHDT-Date: 1580252492 2020/01/28 23:01:32 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.80 $ $NHDT-Date: 1580254093 2020/01/28 23:28:13 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -76,6 +76,8 @@ data.base lookup of an entry with any blank lines would falsely claim that
 	"'data' file in wrong fromat or corrupted" after some extra checks
 	were added while investigating tab handling anomalies
 using nhl_error() to report a Lua processing problem would clobber the stack
+level teleporation's "You materialize on a different level!" could be given
+	out of sequence with other arrival messages
 
 
 Platform- and/or Interface-Specific Fixes
