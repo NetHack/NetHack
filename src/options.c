@@ -2387,8 +2387,8 @@ boolean tinitial, tfrom_file;
                 return FALSE;
             }
             iflags.menuinvertmode = mode;
-	}
-	return retval;
+        }
+        return retval;
     }
 
     fullname = "msghistory";
@@ -3393,7 +3393,7 @@ boolean tinitial, tfrom_file;
         }
         if ((op = string_for_opt(opts, negated)) != empty_optstr)
             iflags.wc_video_height = strtol(op, NULL, 10);
-	else
+        else
             return FALSE;
         return retval;
     }
