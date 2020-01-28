@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ $NHDT-Date: 1580043420 2020/01/26 12:57:00 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ $NHDT-Date: 1580244571 2020/01/28 20:49:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -95,12 +95,12 @@ savefile: add support to deconstruct internal data structures down into their
 	individual fields and save those fields instead of the entire struct
 savefile: use little-endian format for fields where that makes a difference
 replace build-time level compiler and dungeon compiler with run-time loading of
-	the dungeon and level descriptions and interpreting them via LUA
+	the dungeon and level descriptions and interpreting them via Lua
 split off some of the functionality that was in makedefs (compiled-in options
 	build date/time, etc) so that it can be built by a cross-compiler
 	and accessed on the target platform
 replace quest.txt and associated conversion to quest.dat via makedefs with
-	lua quest texts loaded at runtime
+	Lua quest texts loaded at runtime
 some altars are displayed in different colors (for tty and curses at least)
 add 'quick_farsight' option to provide some control over random clairvoyance
 	where pausing to be able to browse temporarily visible aspects of the
@@ -122,6 +122,7 @@ tiny chance for randomly created spellbooks to be Discworld novels instead
 wearing a wet towel confers "half damage from poison gas" attribute
 for end of game disclosure and dumplog, show 'achievements' (previously only
 	available as an encoded value in xlogfile) along with 'conduct'
+more grades of self-appearance than beautiful or handsome vs ugly
 
 
 Platform- and/or Interface-Specific New Features
