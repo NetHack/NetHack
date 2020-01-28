@@ -55,7 +55,6 @@ struct flag {
     boolean showscore;       /* show score */
     boolean silent;          /* whether the bell rings or not */
     boolean sortpack;        /* sorted inventory */
-    boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */
     boolean time;            /* display elapsed 'time' */
     boolean tombstone;       /* print tombstone */
@@ -79,6 +78,7 @@ struct flag {
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
+    unsigned sparkle;  /* show "resisting" special FX (Scott Bigham & VIVIT) */
     char inv_order[MAXOCLASSES];
     char pickup_types[MAXOCLASSES];
 #define NUM_DISCLOSURE_OPTIONS 6 /* i,a,v,g,c,o (decl.c) */

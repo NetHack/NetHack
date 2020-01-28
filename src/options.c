@@ -216,7 +216,6 @@ static const struct Bool_Opt {
     { "silent", &flags.silent, TRUE, SET_IN_GAME },
     { "softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE }, /*WC2*/
     { "sortpack", &flags.sortpack, TRUE, SET_IN_GAME },
-    { "sparkle", &flags.sparkle, TRUE, SET_IN_GAME },
     { "splash_screen", &iflags.wc_splash_screen, TRUE, DISP_IN_GAME }, /*WC*/
     { "standout", &flags.standout, FALSE, SET_IN_GAME },
     { "status_updates", &iflags.status_updates, TRUE, DISP_IN_GAME },
@@ -387,6 +386,7 @@ static struct Comp_Opt {
       DISP_IN_GAME }, /*WC*/
     { "sortloot", "sort object selection lists by description", 4,
       SET_IN_GAME },
+    { "sparkle", "length of resistance sparkle animation", 20, SET_IN_GAME },
     { "statushilites",
 #ifdef STATUS_HILITES
       "0=no status highlighting, N=show highlights for N turns",
@@ -3316,6 +3316,26 @@ boolean tinitial, tfrom_file;
         return retval;
     }
 
+    fullname = "sparkle";
+    if (match_optname(opts, fullname, 4, TRUE)) {
+        if (duplicate)
+            complain_about_duplicate(opts, 1);
+        op = string_for_opt(opts, negated);
+        if ((negated && op == empty_optstr)
+            || (!negated && op != empty_optstr))
+            flags.sparkle = negated ? 0 : atoi(op);
+        else if (negated) {
+            bad_negation(fullname, TRUE);
+            return FALSE;
+        } else /* op == empty_optstr */
+            /* loop thrice over shield_static array */
+            flags.sparkle = 3 * SHIELD_COUNT;
+        /* sanity check */
+        if (flags.sparkle < 0)
+            flags.sparkle = 3 * SHIELD_COUNT;
+        return retval;
+    }
+
     fullname = "suppress_alert";
     if (match_optname(opts, fullname, 4, TRUE)) {
         if (duplicate)
@@ -5854,6 +5874,8 @@ char *buf;
                 Strcpy(buf, sortltype[i]);
                 break;
             }
+    } else if (!strcmp(optname, "sparkle")) {
+        Sprintf(buf, "%d", flags.sparkle);
     } else if (!strcmp(optname, "player_selection")) {
         Sprintf(buf, "%s", iflags.wc_player_selection ? "prompts" : "dialog");
 #ifdef STATUS_HILITES

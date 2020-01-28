@@ -57,8 +57,6 @@ const int zapcolors[NUM_ZAP] = {
 #endif /* text color */
 
 const int shield_static[SHIELD_COUNT] = {
-    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4, /* 7 per row */
-    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
 };
 
