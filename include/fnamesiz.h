@@ -1,9 +1,9 @@
-/* NetHack 3.7	filesize.h	$NHDT-Date: 1575245033 2019/12/02 00:03:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.7	fnamesiz.h	$NHDT-Date: 1580310580 2020/01/29 15:09:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $ */
 /*-Copyright (c) Michael Allison, 2020. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef FILESIZE_H 
-#define FILESIZE_H
+#ifndef FNAMESIZ_H 
+#define FNAMESIZ_H
 
 /*
  *  Declarations for some file sizes, some of which need to be shared
@@ -76,4 +76,4 @@
 #define SAVESIZE FILENAME
 #endif
 
-#endif /* FILESIZE_H */
+#endif /* FNAMESIZ_H */
