@@ -881,7 +881,7 @@ struct instance_globals {
     boolean chosen_symset_start;
     boolean chosen_symset_end;
     int symset_which_set;
-    /* SAVESIZE, BONESSIZE, LOCKNAMESIZE are defined in "filesize.h" */
+    /* SAVESIZE, BONESSIZE, LOCKNAMESIZE are defined in "fnamesiz.h" */
     char SAVEF[SAVESIZE]; /* holds relative path of save file from playground */
 #ifdef MICRO
     char SAVEP[SAVESIZE]; /* holds path of directory for save file */

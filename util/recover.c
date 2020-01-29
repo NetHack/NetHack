@@ -46,7 +46,7 @@ char *FDECL(exepath, (char *));
 extern unsigned _stklen = STKSIZ;
 #endif
 
-/* SAVESIZE is defined in "filesize.h" */
+/* SAVESIZE is defined in "fnamesiz.h" */
 char savename[SAVESIZE]; /* holds relative path of save file from playground */
 
 int

@@ -424,7 +424,7 @@ YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h   \
 DISPLAY_H  = $(MONDATA_H)	$(INCL)/vision.h    $(INCL)/display.h
 PCCONF_H   = $(INCL)/micro.h	$(INCL)/system.h    $(INCL)/pcconf.h \
 	    $(MSYS)/pcvideo.h
-CONFIG_H   = $(GLOBAL_H)	$(INCL)/filesize.h  $(INCL)/tradstdc.h \
+CONFIG_H   = $(GLOBAL_H)	$(INCL)/fnamesiz.h  $(INCL)/tradstdc.h \
 	     $(INCL)/config1.h $(INCL)/config.h
 DECL_H	   = $(YOU_H)		$(INCL)/spell.h	    $(INCL)/color.h   \
 	     $(INCL)/obj.h	$(INCL)/onames.h    $(INCL)/pm.h      \

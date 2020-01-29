@@ -579,6 +579,6 @@ typedef unsigned char uchar;
 #endif
 
 #include "global.h" /* Define everything else according to choices above */
-#include "filesize.h" /* Define file sizes shared between nethack and recover */
+#include "fnamesiz.h" /* Define file sizes shared between nethack and recover */
 
 #endif /* CONFIG_H */

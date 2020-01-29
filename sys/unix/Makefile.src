@@ -729,7 +729,7 @@ depend: ../sys/unix/depend.awk \
 
 # config.h timestamp
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
-		../include/global.h ../include/filesize.h ../include/coord.h \
+		../include/global.h ../include/fnamesiz.h ../include/coord.h \
 		../include/vmsconf.h ../include/system.h ../include/nhlua.h \
 		../include/unixconf.h ../include/os2conf.h ../include/micro.h \
 		../include/pcconf.h ../include/tosconf.h ../include/amiconf.h \
