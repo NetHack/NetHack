@@ -6,7 +6,7 @@
 #define FNAMESIZ_H
 
 /*
- *  Declarations for some file sizes, some of which need to be shared
+ *  Declarations for some file name sizes, some of which need to be shared
  *  between NetHack and recover. By placing them in here, there is less
  *  chance of deviation between the two.
  */
