@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ $NHDT-Date: 1580043420 2020/01/26 12:57:00 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.80 $ $NHDT-Date: 1580254093 2020/01/28 23:28:13 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -76,6 +76,8 @@ data.base lookup of an entry with any blank lines would falsely claim that
 	"'data' file in wrong fromat or corrupted" after some extra checks
 	were added while investigating tab handling anomalies
 using nhl_error() to report a Lua processing problem would clobber the stack
+level teleporation's "You materialize on a different level!" could be given
+	out of sequence with other arrival messages
 
 
 Platform- and/or Interface-Specific Fixes
@@ -95,12 +97,12 @@ savefile: add support to deconstruct internal data structures down into their
 	individual fields and save those fields instead of the entire struct
 savefile: use little-endian format for fields where that makes a difference
 replace build-time level compiler and dungeon compiler with run-time loading of
-	the dungeon and level descriptions and interpreting them via LUA
+	the dungeon and level descriptions and interpreting them via Lua
 split off some of the functionality that was in makedefs (compiled-in options
 	build date/time, etc) so that it can be built by a cross-compiler
 	and accessed on the target platform
 replace quest.txt and associated conversion to quest.dat via makedefs with
-	lua quest texts loaded at runtime
+	Lua quest texts loaded at runtime
 some altars are displayed in different colors (for tty and curses at least)
 add 'quick_farsight' option to provide some control over random clairvoyance
 	where pausing to be able to browse temporarily visible aspects of the
@@ -122,6 +124,9 @@ tiny chance for randomly created spellbooks to be Discworld novels instead
 wearing a wet towel confers "half damage from poison gas" attribute
 for end of game disclosure and dumplog, show 'achievements' (previously only
 	available as an encoded value in xlogfile) along with 'conduct'
+more grades of self-appearance than beautiful or handsome vs ugly
+when 'color' if Off and 'use_inverse' is On, draw ice on the map in inverse
+	video if it uses the same character as room floor or as dark floor
 
 
 Platform- and/or Interface-Specific New Features

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1575830186 2019/12/08 18:36:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1580252137 2020/01/28 22:55:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -162,6 +162,12 @@ unsigned mgflags;
                        || g.showsyms[idx]
                           == g.showsyms[S_water + SYM_OFF_P])) {
             special |= MG_BW_LAVA;
+        /* similar for floor [what about empty doorway?] and ice */
+        } else if (!iflags.use_color && offset == S_ice
+                   && (g.showsyms[idx] == g.showsyms[S_room + SYM_OFF_P]
+                       || g.showsyms[idx]
+                          == g.showsyms[S_darkroom + SYM_OFF_P])) {
+            special |= MG_BW_ICE;
         } else if (offset == S_altar && iflags.use_color) {
             int amsk = altarmask_at(x, y); /* might be a mimic */
 
