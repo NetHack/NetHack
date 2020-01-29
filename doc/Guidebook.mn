@@ -1784,6 +1784,81 @@ any other customers.
 If a shop is \(lqclosed for inventory,\(rq it will not open of its own accord.
 .lp * 2
 Shops do not get restocked with new items, regardless of inventory depletion.
+.hn 2
+Movement feedback
+.pg
+Moving around the map usually provides no feedback--other than drawing the
+hero at the new location--unless you step on an object or pile of objects,
+or on a trap, or attempt to move onto a spot where a monster is located.
+There are several options which can be used to augment the normal feedback.
+.pg
+The
+.op pile_limit
+option controls how many objects can be in a pile--sharing the same map
+location--for the game to state \(lqthere are objects here\(rq
+instead of listing them.
+The default is \f(CR5\fP.
+Setting it to \f(CR1\fP would always give that message instead of listing
+any objects.
+Setting it to \f(CR0\fP is a special case which will always list all
+objects no matter how big a pile is.
+Note that the number refers to the count of separate stacks of objects
+present rather than the sum of the quantities of those stacks (so
+\f(CR7 arrows\fP or \f(CR25 gold pieces\fP will each count as 1 rather
+than as 7 and 25, respectively, and total to 2 when both are at the
+same location).
+.pg
+The \(lqnopickup\(rq command prefix (default \(oq\f(CRm\fP\(cq) before
+a movement direction can be used to step on objects without attempting
+auto-pickup and without giving feedback about them.
+.pg
+The
+.op mention_walls
+option controls whether you get feedback if you try to walk into a wall
+or solid stone or off the edge of the map.
+Normally nothing happens (unless the hero is blind and no wall is shown,
+then the wall that is being bumped into will be drawn on the map).
+This option also gives feedback when the various rush or run variations
+of movement stop for some non-obvious reason.
+.pg
+The
+.op mention_decor
+option controls whether you get feedback when walking on \(lqfurniture.\(rq
+Normally stepping onto stairs or a fountain or an altar or various other
+things doesn't elicit anything unless it is covered by one or more objects
+so is obscured on the map.
+Doorless doorways and open doors aren't considered worthy of mention;
+closed doors (if you can move onto their spots) and broken doors are.
+Assuming that you're able to do so, moving onto water or lava or ice
+will give feedback if not yet on that type of terrain but not repeat it
+(unless there has been some intervening message) when moving from water
+to another water spot, or lava to lava, or ice to ice.
+Moving off of any of those back onto \(lqnormal\(rq terrain will give one
+message too, unless there is feedback about one or more objects, in which
+case the back on land circumstance is implied.
+.pg
+The
+.op confirm
+and
+.op safe_pet
+options control what happens when you try to move onto a peaceful monster's
+spot or a tame one's spot.
+.\" getting away from "Movement feedback" here; oh well...
+.pg
+The \(lqnopickup\(rq command prefix (default \(oq\f(CRm\fP\(cq) is
+also the move-without-attacking prefix and can be used to try to step
+onto a visible monster's spot without the move being considered an attack
+(see the \fIFighting\fP subsection of \fIMonsters\fP below).
+The \(lqfight\(rq command prefix (default \(oq\f(CRF\fP\(cq;
+also \(oq\f(CR\-\fP\(cq if
+.op number_pad
+is on) can be used to force an attack, when guessing where an unseen
+monster is or when deliberately attacking a peaceful or tame creature.
+.pg
+The
+.op run_mode
+option controls how frequently the map gets redrawn when moving more
+than one step in a single command (so when rushing, running, or traveling).
 .
 .hn 1
 Monsters
@@ -1809,8 +1884,10 @@ shopkeeper or the Oracle of Delphi can produce useful results.
 Fighting
 .pg
 If you see a monster and you wish to fight it, just attempt to walk
-into it.  Many monsters you find will mind their own business unless
-you attack them.  Some of them are very dangerous when angered.
+into it.
+Many monsters you find will mind their own business unless
+you attack them.
+Some of them are very dangerous when angered.
 Remember:  discretion is the better part of valor.
 .pg
 In most circumstances, if you attempt to attack a peaceful monster by
@@ -3182,6 +3259,11 @@ Enable mail delivery during the game (default on).  Persistent.
 .lp "male    "
 An obsolete synonym for \(lqgender:male\(rq.
 Cannot be set with the \(oqO\(cq command.
+.lp mention_decor
+Give feedback when walking on various dungeon features such as stairs,
+fountains, or altars which are ordinarily only described when covered
+by one or more objects (default off).
+Persistent.
 .lp mention_walls
 Give feedback when walking against a wall (default off).
 Persistent.

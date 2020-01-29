@@ -1966,6 +1966,90 @@ If a shop is ``closed for inventory,'' it will not open of its own accord.
 Shops do not get restocked with new items, regardless of inventory depletion.
 \end{itemize}
 
+%.hn 2
+\subsubsection*{Movement feedback}
+
+%.pg
+Moving around the map usually provides no feedback--other than drawing the
+hero at the new location--unless you step on an object or pile of objects,
+or on a trap, or attempt to move onto a spot where a monster is located.
+There are several options which can be used to augment the normal feedback.
+
+%.pg
+The
+{\it pile\verb+_+limit\/}
+option controls how many objects can be in a pile--sharing the same map
+location--for the game to state ``there are objects here''
+instead of listing them.
+The default is {\tt 5}.
+Setting it to {\tt 1} would always give that message instead of listing
+any objects.
+Setting it to {\tt 0} is a special case which will always list all
+objects no matter how big a pile is.
+Note that the number refers to the count of separate stacks of objects
+present rather than the sum of the quantities of those stacks (so
+{\tt 7 arrows} or {\tt 25 gold pieces} will each count as 1 rather
+than as 7 and 25, respectively, and total to 2 when both are at the
+same location).
+
+%.pg
+The \{\tt nopickup} command prefix (default `\{\tt m}') before
+a movement direction can be used to step on objects without attempting
+auto-pickup and without giving feedback about them.
+
+%.pg
+The
+{\it mention\verb+_+walls\/}
+option controls whether you get feedback if you try to walk into a wall
+or solid stone or off the edge of the map.
+Normally nothing happens (unless the hero is blind and no wall is shown,
+then the wall that is being bumped into will be drawn on the map).
+This option also gives feedback when the various rush or run variations
+of movement stop for some non-obvious reason.
+
+%.pg
+The
+{\it mention\verb+_+decor\/}
+option controls whether you get feedback when walking on ``furniture.''
+Normally stepping onto stairs or a fountain or an altar or various other
+things doesn't elicit anything unless it is covered by one or more objects
+so is obscured on the map.
+Doorless doorways and open doors aren't considered worthy of mention;
+closed doors (if you can move onto their spots) and broken doors are.
+Assuming that you're able to do so, moving onto water or lava or ice
+will give feedback if not yet on that type of terrain but not repeat it
+(unless there has been some intervening message) when moving from water
+to another water spot, or lava to lava, or ice to ice.
+Moving off of any of those back onto ``normal'' terrain will give one
+message too, unless there is feedback about one or more objects, in which
+case the back on land circumstance is implied.
+
+%.pg
+The
+{\it confirm\/}
+and
+{\it safe\verb+_+pet\/}
+options control what happens when you try to move onto a peaceful monster's
+spot or a tame one's spot.
+
+%.\" getting away from "Movement feedback" here; oh well...
+%.pg
+The {\tt nopickup} command prefix (default `{\tt m}' is
+also the move-without-attacking prefix and can be used to try to step
+onto a visible monster's spot without the move being considered an attack
+(see the {\it Fighting\/} subsection of {\it Monsters\/} below).
+The `{\tt fight}' command prefix (default `{\tt F}';
+also `{\tt -}' if
+{\it number\verb+_+pad\/}
+is on) can be used to force an attack, when guessing where an unseen
+monster is or when deliberately attacking a peaceful or tame creature.
+
+%.pg
+The
+{\it run\verb+_+mode}
+option controls how frequently the map gets redrawn when moving more
+than one step in a single command (so when rushing, running, or traveling).
+
 %.hn 1
 \section{Monsters}
 
@@ -3488,6 +3572,11 @@ Enable mail delivery during the game (default on).  Persistent.
 \item[\ib{male}]
 An obsolete synonym for ``{\tt gender:male}''.  Cannot be set with the
 `{\tt O}' command.
+%.lp
+\item[\ib{mention\verb+_+decor}]
+Give feedback when walking on various dungeon features such as stairs,
+fountains, or altars which are ordinarily only described when covered
+by one or more objects (default off).  Persistent.
 %.lp
 \item[\ib{mention\verb+_+walls}]
 Give feedback when walking against a wall (default off).  Persistent.

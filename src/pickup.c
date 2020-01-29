@@ -16,6 +16,7 @@ static boolean FDECL(query_classes, (char *, boolean *, boolean *,
                                          const char *, struct obj *,
                                          BOOLEAN_P, int *));
 static boolean FDECL(fatal_corpse_mistake, (struct obj *, BOOLEAN_P));
+static void NDECL(describe_decor);
 static void FDECL(check_here, (BOOLEAN_P));
 static boolean FDECL(n_or_more, (struct obj *));
 static boolean FDECL(all_but_uchain, (struct obj *));
@@ -285,6 +286,60 @@ boolean remotely;
     return TRUE;
 }
 
+/* handle 'mention_decor' (when walking onto a dungeon feature such as
+   stairs or altar, describe it even if it isn't covered up by an object) */
+static void
+describe_decor()
+{
+    char outbuf[BUFSZ], fbuf[QBUFSZ];
+    boolean doorhere, waterhere, do_norep;
+    const char *dfeature = dfeature_at(u.ux, u.uy, fbuf);
+    int ltyp = levl[u.ux][u.uy].typ;
+
+    if (ltyp == DRAWBRIDGE_UP) /* surface for spot in front of closed db */
+        ltyp = db_under_typ(levl[u.ux][u.uy].drawbridgemask);
+
+    /* we don't mention "ordinary" doors but do mention broken ones */
+    doorhere = dfeature && (!strcmp(dfeature, "open door")
+                            || !strcmp(dfeature, "doorway"));
+    waterhere = dfeature && !strcmp(dfeature, "pool of water");
+    if (doorhere || (waterhere && Underwater))
+        dfeature = 0;
+
+    if (dfeature) {
+        if (waterhere)
+            dfeature = strcpy(fbuf, waterbody_name(u.ux, u.uy));
+        if (strcmp(dfeature, "swamp"))
+            dfeature = an(dfeature);
+
+        if (flags.verbose) {
+            Sprintf(outbuf, "There is %s here.", dfeature);
+        } else {
+            if (dfeature != fbuf)
+                Strcpy(fbuf, dfeature);
+            Sprintf(outbuf, "%s.", upstart(fbuf));
+        }
+        do_norep = (ltyp == iflags.prev_decor
+                    && (waterhere
+                        || !strcmp(dfeature, "molten lava")
+                        || !strcmp(dfeature, "ice")));
+        if (!do_norep)
+            pline("%s", outbuf);
+        else
+            Norep("%s", outbuf);
+    } else {
+        if ((IS_POOL(iflags.prev_decor)
+             || iflags.prev_decor == LAVAPOOL
+             || iflags.prev_decor == ICE)) {
+            pline("%s %s %s.",
+                  flags.verbose ? "You are back" : "Back",
+                  (Levitation || Flying) ? "over" : "on",
+                  surface(u.ux, u.uy));
+        }
+    }
+    iflags.prev_decor = ltyp;
+}
+
 /* look at the objects at our location, unless there are too many of them */
 static void
 check_here(picked_some)
@@ -305,7 +360,11 @@ boolean picked_some;
             nomul(0);
         flush_screen(1);
         (void) look_here(ct, picked_some);
+
+        iflags.prev_decor = STONE;
     } else {
+        if (flags.mention_decor)
+            describe_decor();
         read_engr_at(u.ux, u.uy);
     }
 }
@@ -319,7 +378,6 @@ struct obj *obj;
         return FALSE;
     return (boolean) (obj->quan >= g.val_for_n_or_more);
 }
-
 
 /* check valid_menu_classes[] for an entry; also used by askchain() */
 boolean
@@ -487,8 +545,10 @@ int what; /* should be a long */
        and read_engr_at in addition to bypassing autopickup itself
        [probably ought to check whether hero is using a cockatrice
        corpse for a pillow here... (also at initial faint/sleep)] */
-    if (autopickup && g.multi < 0 && unconscious())
+    if (autopickup && g.multi < 0 && unconscious()) {
+        iflags.prev_decor = STONE;
         return 0;
+    }
 
     if (what < 0) /* pick N of something */
         count = -what;
@@ -496,20 +556,23 @@ int what; /* should be a long */
         count = 0;
 
     if (!u.uswallow) {
-        struct trap *ttmp;
+        struct trap *t;
 
         /* no auto-pick if no-pick move, nothing there, or in a pool */
         if (autopickup && (g.context.nopick || !OBJ_AT(u.ux, u.uy)
                            || (is_pool(u.ux, u.uy) && !Underwater)
                            || is_lava(u.ux, u.uy))) {
+            if (flags.mention_decor)
+                describe_decor();
             read_engr_at(u.ux, u.uy);
             return 0;
         }
         /* no pickup if levitating & not on air or water level */
         if (!can_reach_floor(TRUE)) {
+            describe_decor(); /* even when !flags.mention_decor */
             if ((g.multi && !g.context.run) || (autopickup && !flags.pickup)
-                || ((ttmp = t_at(u.ux, u.uy)) != 0
-                    && (uteetering_at_seen_pit(ttmp) || uescaped_shaft(ttmp))))
+                || ((t = t_at(u.ux, u.uy)) != 0
+                    && (uteetering_at_seen_pit(t) || uescaped_shaft(t))))
                 read_engr_at(u.ux, u.uy);
             return 0;
         }
@@ -517,15 +580,13 @@ int what; /* should be a long */
          * action, or possibly paralyzed, sleeping, etc.... and they just
          * teleported onto the object.  They shouldn't pick it up.
          */
-        if ((g.multi && !g.context.run) || (autopickup && !flags.pickup)) {
+        if ((g.multi && !g.context.run)
+            || (autopickup && !flags.pickup)
+            || notake(g.youmonst.data)) {
             check_here(FALSE);
-            return 0;
-        }
-        if (notake(g.youmonst.data)) {
-            if (!autopickup)
+            if (notake(g.youmonst.data) && OBJ_AT(u.ux, u.uy)
+                && (autopickup || flags.pickup))
                 You("are physically incapable of picking anything up.");
-            else
-                check_here(FALSE);
             return 0;
         }
 
@@ -534,6 +595,8 @@ int what; /* should be a long */
             && !g.context.nopick)
             nomul(0);
     }
+    /* for describe_decor()'s Norep handling */
+    iflags.prev_decor = STONE;
 
     add_valid_menu_class(0); /* reset */
     if (!u.uswallow) {
