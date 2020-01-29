@@ -64,6 +64,11 @@ tgetch()
 {
     char ch;
 
+#ifdef SCREEN_VESA
+    if (iflags.usevesa) {
+        vesa_flush_text();
+    }
+#endif /*SCREEN_VESA*/
 /* BIOSgetch can use the numeric key pad on IBM compatibles. */
 #ifdef SIMULATE_CURSOR
     if (iflags.grmode && cursor_flag)

@@ -4,7 +4,7 @@
   <Target Name="Build"
      Inputs="$(ToolsDir)tile2bmp.exe;$(WinShareDir)monsters.txt;$(WinShareDir)objects.txt"
 	 Outputs="$(WinWin32Dir)tiles.bmp">
-	<Exec Command="$(ToolsDir)tile2bmp.exe tiles.bmp" WorkingDirectory="$(SrcDir)"/>
+	<Exec Command="&quot;$(ToolsDir)tile2bmp.exe&quot; tiles.bmp" WorkingDirectory="$(SrcDir)"/>
 	<Move SourceFiles="$(SrcDir)tiles.bmp" DestinationFolder="$(WinWin32Dir)"/>
   </Target>
   <Target Name="Clean">

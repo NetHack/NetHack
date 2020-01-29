@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1578187332 2020/01/05 01:22:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.310 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1580244571 2020/01/28 20:49:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.314 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -815,14 +815,25 @@ register xchar x, y;
     }
 }
 
+/* charisma is supposed to include qualities like leadership and personal
+   magnetism rather than just appearance, but it has devolved to this... */
 const char *
 beautiful()
 {
-    return ((ACURR(A_CHA) > 14)
-               ? ((poly_gender() == 1)
-                     ? "beautiful"
-                     : "handsome")
-               : "ugly");
+    const char *res;
+    int cha = ACURR(A_CHA);
+
+    /* don't bother complaining about the sexism; nethack is not real life */
+    res = ((cha >= 25) ? "sublime" /* 25 is the maximum possible */
+           : (cha >= 19) ? "splendorous" /* note: not "splendiferous" */
+             : (cha >= 16) ? ((poly_gender() == 1) ? "beautiful" : "handsome")
+               : (cha >= 14) ? ((poly_gender() == 1) ? "winsome" : "amiable")
+                 : (cha >= 11) ? "cute"
+                   : (cha >= 9) ? "plain"
+                     : (cha >= 6) ? "homely"
+                       : (cha >= 4) ? "ugly"
+                         : "hideous"); /* 3 is the minimum possible */
+    return res;
 }
 
 static const char look_str[] = "look %s.";

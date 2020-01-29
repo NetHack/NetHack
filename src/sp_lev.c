@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1574646949 2019/11/25 01:55:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580036285 2020/01/26 10:58:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.148 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1569,32 +1569,37 @@ struct mkroom *croom;
     if (o->id != -1) {
         static const char prize_warning[] = "multiple prizes on %s level";
 
-        /* if this is a specific item of the right type and it is being
-           created on the right level, flag it as the designated item
-           used to detect a special achievement (to whit, reaching and
-           exploring the target level, although the exploration part
-           might be short-circuited if a monster brings object to hero) */
-        if (Is_mineend_level(&u.uz)) {
-            if (otmp->otyp == iflags.mines_prize_type) {
-                if (!g.mines_prize_count++) {
-                    /* Note: the first luckstone on lev will become the prize
-                             even if its not the explicit one, but random */
-                    otmp->record_achieve_special = MINES_PRIZE;
-                    /* prevent stacking; cleared when achievement is recorded */
-                    otmp->nomerge = 1;
-                }
+        /*
+         * If this is a specific item of the right type and it is being
+         * created on the right level, record its obj->o_id to be able
+         * to recognize it as the designated item
+         * used to detect a special achievement (to whit, reaching and
+         * exploring the target level, although the exploration part
+         * might be short-circuited if a monster brings object to hero).
+         * Achievement is accomplished and the recorded o_id is cleared
+         * if/when it gets added into hero's inventory.
+         *
+         * Random items of the appropriate type won't trigger a false
+         * match--they'll fail the (id != -1) test above--but the level
+         * definition should not include a second instance of any prize.
+         */
+        if (Is_mineend_level(&u.uz)
+            && otmp->otyp == g.context.achieveo.mines_prize_type) {
+            if (!g.context.achieveo.mines_prize_oid) {
+                g.context.achieveo.mines_prize_oid = otmp->o_id;
+                /* prevent stacking; cleared when achievement is recorded */
+                otmp->nomerge = 1;
+            } else {
+                impossible(prize_warning, "mines end");
             }
-        } else if (Is_sokoend_level(&u.uz)) {
-            if (otmp->otyp == iflags.soko_prize_type1) {
-                otmp->record_achieve_special = SOKO_PRIZE1;
+        } else if (Is_sokoend_level(&u.uz)
+                   && (otmp->otyp == g.context.achieveo.soko_prize_typ1
+                       || otmp->otyp == g.context.achieveo.soko_prize_typ2)) {
+            if (!g.context.achieveo.soko_prize_oid) {
+                g.context.achieveo.soko_prize_oid = otmp->o_id;
                 otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
-                if (++g.soko_prize_count > 1)
-                    impossible(prize_warning, "sokoban end");
-            } else if (otmp->otyp == iflags.soko_prize_type2) {
-                otmp->record_achieve_special = SOKO_PRIZE2;
-                otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
-                if (++g.soko_prize_count > 1)
-                    impossible(prize_warning, "sokoban end");
+            } else {
+                impossible(prize_warning, "sokoban end");
             }
         }
     }
@@ -2590,14 +2595,26 @@ const char *s;
 
         /* find by object name */
         for (i = 0; i < NUM_OBJECTS; i++) {
-            objname = obj_descr[i].oc_name;
+            objname = OBJ_NAME(objects[i]);
             if (objname && !strcmpi(s, objname))
                 return i;
         }
 
+        /*
+         * FIXME:
+         *  If the file specifies "orange potion", the actual object
+         *  description is just "orange" and won't match.  [There's a
+         *  reason that wish handling is insanely complicated.]  And
+         *  even if that gets fixed, if the file specifies "gray stone"
+         *  it will start matching but would always pick the first one.
+         *
+         *  "orange potion" is an unlikely thing to have in a special
+         *  level description but "gray stone" is not....
+         */
+
         /* find by object description */
         for (i = 0; i < NUM_OBJECTS; i++) {
-            objname = obj_descr[i].oc_descr;
+            objname = OBJ_DESCR(objects[i]);
             if (objname && !strcmpi(s, objname))
                 return i;
         }
@@ -5419,10 +5436,6 @@ sp_level_coder_init()
 
     g.splev_init_present = FALSE;
     g.icedpools = FALSE;
-    /* achievement tracking; static init would suffice except we need to
-       reset if #wizmakemap is used to recreate mines' end or sokoban end;
-       once either level is created, these values can be forgotten */
-    g.mines_prize_count = g.soko_prize_count = 0;
 
     for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi++) {
         coder->tmproomlist[tmpi] = (struct mkroom *) 0;

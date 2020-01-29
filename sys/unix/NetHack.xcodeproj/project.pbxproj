@@ -151,6 +151,14 @@
 		54FCE8292223261F00F393C8 /* isaac64.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FCE8282223261F00F393C8 /* isaac64.c */; };
 /* End PBXBuildFile section */
 
+			inputFiles = (
+			);
+			inputFiles = (
+			);
+			inputFiles = (
+			);
+			inputFiles = (
+			);
 /* Begin PBXContainerItemProxy section */
 		316B91CA21A3BD7C00EC3E81 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -976,7 +984,7 @@
 		3189576921A1FCC100FB2ABE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1120;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Bart House";
 				TargetAttributes = {
 					3189577021A1FCC100FB2ABE = {
@@ -1837,6 +1845,10 @@
 			};
 			name = Release;
 		};
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "-";
 		31B8A44F21A26A4B0055BD01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {

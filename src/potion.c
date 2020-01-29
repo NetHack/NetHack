@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1573848199 2019/11/15 20:03:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1579655028 2020/01/22 01:03:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1627,13 +1627,19 @@ register struct obj *obj;
        remains in inventory where our caller expects it to be */
     obj->in_use = 1;
 
-    switch (obj->otyp) {
+    /* wearing a wet towel protects both eyes and breathing, even when
+       the breath effect might be beneficial; we still pass down to the
+       naming opportunity in case potion was thrown at hero by a monster */
+    switch (Half_gas_damage ? TOWEL : obj->otyp) {
+    case TOWEL:
+        pline("Some vapor passes harmlessly around you.");
+        break;
     case POT_RESTORE_ABILITY:
     case POT_GAIN_ABILITY:
         if (obj->cursed) {
-            if (!breathless(g.youmonst.data))
+            if (!breathless(g.youmonst.data)) {
                 pline("Ulch!  That potion smells terrible!");
-            else if (haseyes(g.youmonst.data)) {
+            } else if (haseyes(g.youmonst.data)) {
                 const char *eyes = body_part(EYE);
 
                 if (eyecount(g.youmonst.data) != 1)

@@ -107,15 +107,6 @@ struct TileSetImage *image;
     if (!read_info_header(fp, &header2)) goto error;
     if (!check_info_header(&header2)) goto error;
 
-#if 0 /* TODO */
-    if (header2.Compression == BI_PNG) {
-        /* Image data is an embedded PNG bit stream */
-        boolean ok = do_read_png_tiles(fp, image));
-        fclose(fp);
-        return ok;
-    }
-#endif
-
     /* header2.Height < 0 means the Y coordinate is reversed; the origin is
      * top left rather than bottom left */
     image->width = header2.Width;
@@ -300,7 +291,7 @@ struct TileSetImage *image;
                 break;
             case 32:
                 for (x = 0; x < image->width; ++x) {
-                    uint32 color = read_u32(row_bytes + x * 2);
+                    uint32 color = read_u32(row_bytes + x * 4);
                     row[x] = build_pixel(&header2, color);
                 }
                 break;
@@ -609,7 +600,7 @@ uint32 color;
     if (mask == 0) return 0;
     bits = 0xFFFF; /* 0xFF, 0xF, 0x3, 0x1 */
     shift = 16;    /*    8,   4,   2,   1 */
-    while (bits != 0) {
+    while (shift != 0) {
         if ((mask & bits) == 0) {
             mask >>= shift;
             color >>= shift;

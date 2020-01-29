@@ -638,8 +638,6 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* ysize */
     FALSE, /* splev_init_present */
     FALSE, /* icedpools */
-    0, /* mines_prize_count */
-    0, /* soki_prize_count */
     { UNDEFINED_PTR }, /* container_obj */
     0, /* container_idx */
     NULL, /* invent_carrying_monster */

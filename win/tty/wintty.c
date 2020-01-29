@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1578947635 2020/01/13 20:33:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1580252140 2020/01/28 22:55:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -71,9 +71,6 @@ extern short glyph2tile[];
 #define HUPSKIP() /*empty*/
 #define HUPSKIP_RESULT(RES) /*empty*/
 #endif /* ?HANGUP_HANDLING */
-
-/* this is only needed until tty_status_* routines are written */
-extern NEARDATA winid WIN_STATUS;
 
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
@@ -155,11 +152,12 @@ char defmorestr[] = "--More--";
 #if defined(USE_TILES) && defined(MSDOS)
 boolean clipping = FALSE; /* clipping on? */
 int clipx = 0, clipxmax = 0;
+int clipy = 0, clipymax = 0;
 #else
 static boolean clipping = FALSE; /* clipping on? */
 static int clipx = 0, clipxmax = 0;
-#endif
 static int clipy = 0, clipymax = 0;
+#endif
 #endif /* CLIPPING */
 
 #if defined(USE_TILES) && defined(MSDOS)
@@ -3393,7 +3391,7 @@ int glyph;
 int bkglyph UNUSED;
 {
     int ch;
-    boolean reverse_on = FALSE;
+    boolean inverse_on = FALSE;
     int color;
     unsigned special;
 
@@ -3431,13 +3429,16 @@ int bkglyph UNUSED;
     }
 #endif /* TEXTCOLOR */
 
-    /* must be after color check; term_end_color may turn off inverse too */
-    if (((special & MG_PET) && iflags.hilite_pet)
-        || ((special & MG_OBJPILE) && iflags.hilite_pile)
-        || ((special & MG_DETECT) && iflags.use_inverse)
-        || ((special & MG_BW_LAVA) && iflags.use_inverse)) {
+    /* must be after color check; term_end_color may turn off inverse too;
+       BW_LAVA and BW_ICE won't ever be set when color is on;
+       (tried bold for ice but it didn't look very good; inverse is easier
+       to see although the Valkyrie quest ends up being hard on the eyes) */
+    if (((special & MG_PET) != 0 && iflags.hilite_pet)
+        || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
+        || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE)) != 0
+            && iflags.use_inverse)) {
         term_start_attr(ATR_INVERSE);
-        reverse_on = TRUE;
+        inverse_on = TRUE;
     }
 
 #if defined(USE_TILES) && defined(MSDOS)
@@ -3447,10 +3448,12 @@ int bkglyph UNUSED;
 #endif
         g_putch(ch); /* print the character */
 
-    if (reverse_on) {
+    if (inverse_on) {
         term_end_attr(ATR_INVERSE);
 #ifdef TEXTCOLOR
-        /* turn off color as well, ATR_INVERSE may have done this already */
+        /* turn off color as well, turning off ATR_INVERSE may have done
+           this already and if so, we won't know the current state unless
+           we do it explicitly */
         if (ttyDisplay->color != NO_COLOR) {
             term_end_color();
             ttyDisplay->color = NO_COLOR;

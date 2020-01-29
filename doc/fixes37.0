@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ $NHDT-Date: 1579261284 2020/01/17 11:41:24 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.80 $ $NHDT-Date: 1580254093 2020/01/28 23:28:13 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -11,7 +11,6 @@ fix internal self-recover to work with recent fields added to checkpoint file
 improvements to pronoun usage when hallucinating
 function calls made from mapglyph based on dungeon level are now called once
 	per level
-fix accessing mons[-1] when trying to gate in a non-valid demon
 fast hero could have random clairvoyance happen more than once on same turn
 using 'Q' on wielded weapon would offer to split stack; make using 'w' on a
 	quivered stack behave similarly
@@ -23,7 +22,6 @@ change crysknife from mineral to bone and worm tooth from unspecified to bone
 worn meat ring shouldn't cause increased hunger; neither should fake Amulet
 worn +0 ring of protection should cause increased hunger if it is the only
 	source of extrinsic Protection
-fix accessing mons[-1] when monster figures out if a tin cures stoning
 monster wielding Stormbringer or healer's Staff against another monster would
 	heal the hero instead of the wielding monster when draining life
 change twoweapon feedback from "not a weapon" to "not a suitable weapon"
@@ -46,6 +44,10 @@ when poly'd into a giant and moving onto a boulder's spot, message given was
 	confused about whether autopickup would occur so could be misleading
 random role selection wasn't honoring unwanted alignment(s) properly
 if at the edge of the map window, trying to move farther fails but used a turn
+hero can no longer wear blindfold/towel/lenses when poly'd into headless form
+revamp achievement tracking for exploring Mine's End and Sokoban (by acquiring
+	luckstone and bag of holding or amulet of reflection, respectively)
+throttle long worm growth rate and HP accumulation
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -73,6 +75,9 @@ if running and Blind or Stunned or Fumbling or Dex < 10, encountering a closed
 data.base lookup of an entry with any blank lines would falsely claim that
 	"'data' file in wrong fromat or corrupted" after some extra checks
 	were added while investigating tab handling anomalies
+using nhl_error() to report a Lua processing problem would clobber the stack
+level teleporation's "You materialize on a different level!" could be given
+	out of sequence with other arrival messages
 
 
 Platform- and/or Interface-Specific Fixes
@@ -92,12 +97,12 @@ savefile: add support to deconstruct internal data structures down into their
 	individual fields and save those fields instead of the entire struct
 savefile: use little-endian format for fields where that makes a difference
 replace build-time level compiler and dungeon compiler with run-time loading of
-	the dungeon and level descriptions and interpreting them via LUA
+	the dungeon and level descriptions and interpreting them via Lua
 split off some of the functionality that was in makedefs (compiled-in options
 	build date/time, etc) so that it can be built by a cross-compiler
 	and accessed on the target platform
 replace quest.txt and associated conversion to quest.dat via makedefs with
-	lua quest texts loaded at runtime
+	Lua quest texts loaded at runtime
 some altars are displayed in different colors (for tty and curses at least)
 add 'quick_farsight' option to provide some control over random clairvoyance
 	where pausing to be able to browse temporarily visible aspects of the
@@ -108,14 +113,20 @@ when hallucinating, see hallucinated liquids when looking at water or lava
 	on the map
 applying a spellbook hints about read charges left
 wizard mode wishing for level topology can now create hidden doors (ask for
-	"secret door" when at a door or wall location) and hidden corridor
-	spots ("secret corridor" at a corridor location)
+	"secret door" when at a door or wall location), hidden corridor
+	spots ("secret corridor" at a corridor location), and clouds
 tiny chance for randomly created spellbooks to be Discworld novels instead
 	of having only one in the first book or scroll shop created (won't
 	occur in hero's initial inventory or NPC priest inventory or be
 	bestowed as a prayer boon or be found in statues)
 'goldX', 'implicit_uncursed', and 'mention_walls' options changed to be
 	persistent across save/restore
+wearing a wet towel confers "half damage from poison gas" attribute
+for end of game disclosure and dumplog, show 'achievements' (previously only
+	available as an encoded value in xlogfile) along with 'conduct'
+more grades of self-appearance than beautiful or handsome vs ugly
+when 'color' if Off and 'use_inverse' is On, draw ice on the map in inverse
+	video if it uses the same character as room floor or as dark floor
 
 
 Platform- and/or Interface-Specific New Features

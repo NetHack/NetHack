@@ -1,8 +1,8 @@
-         Copyright (c) NetHack Development Team 1990-2019
+         Copyright (c) NetHack Development Team 1990-2020
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
                   Instructions for compiling and installing
-                       NetHack 3.6 on a Windows system
+                       NetHack 3.7 on a Windows system
                        (Windows 7/8.x/10 or later only)
          ==============================================================
           Last revision: $NHDT-Date: 1575245156 2019/12/02 00:05:56 $
@@ -16,7 +16,7 @@ contributed the port.
 
 Alex Kompel, Dion Nicolaas, Yitzhak Sapir, Derek S. Ray, Michael Allison,
 Pasi Kallinen, Bart House, and Janet Walz contributed to the maintainance
-of the tty and graphical windows versions of NetHack 3.6.4.
+of the tty and graphical windows versions of NetHack 3.7.0.
 
 You can build a TTY version of NetHack and a Windows Graphical 
 version.  You can use one of the following build environments:
@@ -26,7 +26,7 @@ version.  You can use one of the following build environments:
 
     OR
 
-  o (Untested for 3.6) A copy of MinGW. MinGW is a collection of header 
+  o (Untested for 3.7) A copy of MinGW. MinGW is a collection of header 
     files and import libraries with which native Windows32 programs 
     can be built; the MinGW distribution contains the GNU Compiler 
     Collection. You can download MinGW at
@@ -39,17 +39,17 @@ version.  You can use one of the following build environments:
 \---------------------------------------------/
 
                                                                  
-                 (NetHack-top) ----------------------(optional-pdcurses-top)
-                       |                                        |
-  ----------------------------------------------          --------------
-  |     |     |        |      |     |          |          |            |
- util  dat   doc    include  src   sys        win      pdcurses      wincon 
-                                    |          |
-                                 ------    -------- 
-                                 |    |    |      |
-                             share  winnt tty   win32
+               (NetHack-top)
+                     |
+  +-----+-----+------+------+-----+----------+---------~---------+
+  |     |     |      |      |     |          |                   |
+ util  dat   doc  include  src   sys        win                 lib (external)
+                                    |          |                 |
+                                 +----+    +------+        +-----------+
+                                 |    |    |      |        |           |
+                             share  winnt tty   win32  Lua-5.3.5    pdcurses
                                                   |
-                                                vs2017
+                                               vs2017
 
  
 /--------------------------------------------------------\
@@ -151,7 +151,7 @@ a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
 is set up for a 32-bit x86 version, but that's only because it will 
 run on the most number of existing Windows environments.
 
-NetHack's save files and bones files in the 3.6.4 release have not yet
+NetHack's save files and bones files in the 3.7.0 release have not yet
 evolved enough to allow them to interchange between the 32-bit version 
 and the 64-bit version (or between different platforms). Hopefully
 that will change in an upcoming release.
@@ -164,7 +164,7 @@ I. Dispelling the Myths:
 
     We have provided a Makefile for each of the following compilers:
 
-        o Microsoft Visual Studio 2015 or 2017 C++ Compiler
+        o Microsoft Visual Studio 2017 or 2019 C++ Compiler
           The Community Editions are fine and available at no cost
         o MinGW 2.0 (with GCC 3.2)
 

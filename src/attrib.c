@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1575245050 2019/12/02 00:04:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1579655026 2020/01/22 01:03:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -277,11 +277,12 @@ int typ, fatal;        /* if fatal is 0, limit damage to adjattrib */
 boolean thrown_weapon; /* thrown weapons are less deadly */
 {
     int i, loss, kprefix = KILLED_BY_AN;
+    boolean blast = !strcmp(reason, "blast");
 
     /* inform player about being poisoned unless that's already been done;
        "blast" has given a "blast of poison gas" message; "poison arrow",
        "poison dart", etc have implicitly given poison messages too... */
-    if (strcmp(reason, "blast") && !strstri(reason, "poison")) {
+    if (!blast && !strstri(reason, "poison")) {
         boolean plural = (reason[strlen(reason) - 1] == 's') ? 1 : 0;
 
         /* avoid "The" Orcus's sting was poisoned... */
@@ -290,7 +291,7 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
               plural ? "were" : "was");
     }
     if (Poison_resistance) {
-        if (!strcmp(reason, "blast"))
+        if (blast)
             shieldeff(u.ux, u.uy);
         pline_The("poison doesn't seem to affect you.");
         return;
@@ -315,8 +316,12 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
         g.context.botl = TRUE;
         pline_The("poison was deadly...");
     } else if (i > 5) {
+        boolean cloud = !strcmp(reason, "gas cloud");
+
         /* HP damage; more likely--but less severe--with missiles */
         loss = thrown_weapon ? rnd(6) : rn1(10, 6);
+        if ((blast || cloud) && Half_gas_damage) /* worn towel */
+            loss = (loss + 1) / 2;
         losehp(loss, pkiller, kprefix); /* poison damage */
     } else {
         /* attribute loss; if typ is A_STR, reduction in current and

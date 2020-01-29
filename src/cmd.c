@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1578764033 2020/01/11 17:33:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1579914040 2020/01/25 01:00:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.394 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -194,6 +194,7 @@ static void FDECL(characteristics_enlightenment, (int, int));
 static void FDECL(one_characteristic, (int, int, int));
 static void FDECL(status_enlightenment, (int, int));
 static void FDECL(attributes_enlightenment, (int, int));
+static void FDECL(show_achievements, (int));
 
 static void FDECL(add_herecmd_menuitem, (winid, int NDECL((*)),
                                              const char *));
@@ -806,6 +807,24 @@ boolean pre, wiztower;
                 continue;
             if (mtmp->isshk)
                 setpaid(mtmp);
+            /* achievement tracking */
+            {
+                static const char Unachieve[] = "%s achievement revoked.";
+
+                if (Is_mineend_level(&u.uz)) {
+                    if (u.uachieve.mines_luckstone) {
+                        pline(Unachieve, "Mine's end");
+                        u.uachieve.mines_luckstone = 0;
+                    }
+                    g.context.achieveo.mines_prize_oid = 0;
+                } else if (Is_sokoend_level(&u.uz)) {
+                    if (u.uachieve.finish_sokoban) {
+                        pline(Unachieve, "Sokoban end");
+                        u.uachieve.finish_sokoban = 0;
+                    }
+                    g.context.achieveo.soko_prize_oid = 0;
+                }
+            }
             /* TODO?
              *  Reduce 'born' tally for each monster about to be discarded
              *  by savelev(), otherwise replacing heavily populated levels
@@ -877,6 +896,7 @@ wiz_makemap(VOID_ARGS)
 {
     if (wizard) {
         boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
+
         makemap_prepost(TRUE, was_in_W_tower);
         /* create a new level; various things like bestowing a guardian
            angel on Astral or setting off alarm on Ft.Ludios are handled
@@ -2984,6 +3004,8 @@ int final;
         enlght_halfdmg(HALF_PHDAM, final);
     if (Half_spell_damage)
         enlght_halfdmg(HALF_SPDAM, final);
+    if (Half_gas_damage)
+        enl_msg(You_, "take", "took", " reduced poison gas damage", "");
     /* polymorph and other shape change */
     if (Protection_from_shape_changers)
         you_are("protected from shape changers",
@@ -3163,135 +3185,6 @@ int final;
             enl_msg(You_, "have been killed ", p, buf, "");
     }
 }
-
-#if 0  /* no longer used */
-static boolean NDECL(minimal_enlightenment);
-
-/*
- * Courtesy function for non-debug, non-explorer mode players
- * to help refresh them about who/what they are.
- * Returns FALSE if menu cancelled (dismissed with ESC), TRUE otherwise.
- */
-static boolean
-minimal_enlightenment()
-{
-    winid tmpwin;
-    menu_item *selected;
-    anything any;
-    int genidx, n;
-    char buf[BUFSZ], buf2[BUFSZ];
-    static const char untabbed_fmtstr[] = "%-15s: %-12s";
-    static const char untabbed_deity_fmtstr[] = "%-17s%s";
-    static const char tabbed_fmtstr[] = "%s:\t%-12s";
-    static const char tabbed_deity_fmtstr[] = "%s\t%s";
-    static const char *fmtstr;
-    static const char *deity_fmtstr;
-
-    fmtstr = iflags.menu_tab_sep ? tabbed_fmtstr : untabbed_fmtstr;
-    deity_fmtstr = iflags.menu_tab_sep ? tabbed_deity_fmtstr
-                                       : untabbed_deity_fmtstr;
-    any = cg.zeroany;
-    buf[0] = buf2[0] = '\0';
-    tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-             "Starting", MENU_ITEMFLAGS_NONE);
-
-    /* Starting name, race, role, gender */
-    Sprintf(buf, fmtstr, "name", g.plname);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-    Sprintf(buf, fmtstr, "race", g.urace.noun);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-    Sprintf(buf, fmtstr, "role",
-            (flags.initgend && g.urole.name.f) ? g.urole.name.f : g.urole.name.m);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-    Sprintf(buf, fmtstr, "gender", genders[flags.initgend].adj);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-
-    /* Starting alignment */
-    Sprintf(buf, fmtstr, "alignment", align_str(u.ualignbase[A_ORIGINAL]));
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-
-    /* Current name, race, role, gender */
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-             MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-             "Current", MENU_ITEMFLAGS_NONE);
-    Sprintf(buf, fmtstr, "race", Upolyd ? g.youmonst.data->mname : g.urace.noun);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-    if (Upolyd) {
-        Sprintf(buf, fmtstr, "role (base)",
-                (u.mfemale && g.urole.name.f) ? g.urole.name.f
-                                            : g.urole.name.m);
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                 MENU_ITEMFLAGS_NONE);
-    } else {
-        Sprintf(buf, fmtstr, "role",
-                (flags.female && g.urole.name.f) ? g.urole.name.f
-                                               : g.urole.name.m);
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                 MENU_ITEMFLAGS_NONE);
-    }
-    /* don't want poly_gender() here; it forces `2' for non-humanoids */
-    genidx = is_neuter(g.youmonst.data) ? 2 : flags.female;
-    Sprintf(buf, fmtstr, "gender", genders[genidx].adj);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-    if (Upolyd && (int) u.mfemale != genidx) {
-        Sprintf(buf, fmtstr, "gender (base)", genders[u.mfemale].adj);
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                 MENU_ITEMFLAGS_NONE);
-    }
-
-    /* Current alignment */
-    Sprintf(buf, fmtstr, "alignment", align_str(u.ualign.type));
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-
-    /* Deity list */
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-             MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-             "Deities", MENU_ITEMFLAGS_NONE);
-    Sprintf(buf2, deity_fmtstr, align_gname(A_CHAOTIC),
-            (u.ualignbase[A_ORIGINAL] == u.ualign.type
-             && u.ualign.type == A_CHAOTIC)               ? " (s,c)"
-                : (u.ualignbase[A_ORIGINAL] == A_CHAOTIC) ? " (s)"
-                : (u.ualign.type   == A_CHAOTIC)          ? " (c)" : "");
-    Sprintf(buf, fmtstr, "Chaotic", buf2);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-
-    Sprintf(buf2, deity_fmtstr, align_gname(A_NEUTRAL),
-            (u.ualignbase[A_ORIGINAL] == u.ualign.type
-             && u.ualign.type == A_NEUTRAL)               ? " (s,c)"
-                : (u.ualignbase[A_ORIGINAL] == A_NEUTRAL) ? " (s)"
-                : (u.ualign.type   == A_NEUTRAL)          ? " (c)" : "");
-    Sprintf(buf, fmtstr, "Neutral", buf2);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-
-    Sprintf(buf2, deity_fmtstr, align_gname(A_LAWFUL),
-            (u.ualignbase[A_ORIGINAL] == u.ualign.type
-             && u.ualign.type == A_LAWFUL)                ? " (s,c)"
-                : (u.ualignbase[A_ORIGINAL] == A_LAWFUL)  ? " (s)"
-                : (u.ualign.type   == A_LAWFUL)           ? " (c)" : "");
-    Sprintf(buf, fmtstr, "Lawful", buf2);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-             MENU_ITEMFLAGS_NONE);
-
-    end_menu(tmpwin, "Base Attributes");
-    n = select_menu(tmpwin, PICK_NONE, &selected);
-    destroy_nhwindow(tmpwin);
-    return (boolean) (n != -1);
-}
-#endif /*0*/
 
 /* ^X command */
 static int
@@ -3478,10 +3371,87 @@ int final;
                     " for any artifacts", "");
     }
 
+    show_achievements(final);
+
     /* Pop up the window and wait for a key */
     display_nhwindow(g.en_win, TRUE);
     destroy_nhwindow(g.en_win);
     g.en_win = WIN_ERR;
+}
+
+static void
+show_achievements(final)
+int final;
+{
+    winid awin = WIN_ERR;
+    int acnt = 0;
+
+    /* unfortunately we can't show the achievements (at least not all of
+       them) while the game is in progress because it would give away the
+       ID of luckstone (at Mine's End) and of real Amulet of Yendor */
+    if (!final && !wizard)
+        return;
+
+    if (g.en_win != WIN_ERR) {
+        awin = g.en_win;
+        putstr(awin, 0, "");
+    } else {
+        awin = create_nhwindow(NHW_MENU);
+    }
+    putstr(awin, 0, "Achievements:");
+    /* arranged in approximate order of difficulty */
+    if (u.uachieve.mines_luckstone)
+        enl_msg(You_, "have ", "",
+                "completed the Gnomish Mines", ""), ++acnt;
+    if (u.uachieve.finish_sokoban)
+        enl_msg(You_, "have ", "",
+                "completed Sokoban", ""), ++acnt;
+    if (u.uachieve.killed_medusa)
+        enl_msg(You_, "have ", "",
+                "defeated Medusa", ""), ++acnt;
+    if (u.uachieve.bell)
+        enl_msg(You_, "have ", "",
+                "handled the Bell of Opening", ""), ++acnt;
+    if (u.uachieve.enter_gehennom)
+        enl_msg(You_, "have ", "",
+                "passed the Valley of the Dead", ""), ++acnt;
+    if (u.uachieve.menorah)
+        enl_msg(You_, "have ", "",
+                "handled the Candelabrum of Invocation", ""), ++acnt;
+    if (u.uachieve.book)
+        enl_msg(You_, "have ", "",
+                "handled the Book of the Dead", ""), ++acnt;
+    if (u.uevent.invoked)
+        enl_msg(You_, "have ", "",
+                "gained access to Moloch's Sanctum", ""), ++acnt;
+    if (u.uachieve.amulet)
+        enl_msg(You_, "have ", "",
+                "obtained the Amulet of Yendor", ""), ++acnt;
+    if (In_endgame(&u.uz))
+        enl_msg(You_, "have ", "",
+                "reached the Elemental Planes", ""), ++acnt;
+    if (Is_astralevel(&u.uz))
+        enl_msg(You_, "have ", "",
+                "reached the Astral Plane", ""), ++acnt;
+    if (u.uachieve.ascended)
+        enlght_out(" You ascended!"), ++acnt;
+    if (u.uroleplay.blind || u.uroleplay.nudist) {
+        if (acnt)
+            putstr(awin, 0, "");
+        if (u.uroleplay.blind)
+            enl_msg(You_, "are exploring", "explored",
+                    " without being able to see", ""), ++acnt;
+        if (u.uroleplay.nudist)
+            enl_msg(You_, "have gone", "went",
+                    " without any armor", ""), ++acnt;
+    }
+    if (!acnt)
+        enlght_out(" []");
+
+    if (awin != g.en_win) {
+        display_nhwindow(awin, TRUE);
+        destroy_nhwindow(awin);
+    }
 }
 
 /* ordered by command name */
