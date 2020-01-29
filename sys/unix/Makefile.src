@@ -494,9 +494,9 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 #
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h def_os2.h \
-	display.h dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h \
-	global.h hack.h lint.h macconf.h mextra.h mfndpos.h micro.h \
-	mkroom.h \
+	display.h dlb.h dungeon.h engrave.h extern.h flag.h fnamesiz.h \
+	func_tab.h global.h hack.h lint.h macconf.h mextra.h mfndpos.h \
+	micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h \
 	rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h \
@@ -729,12 +729,12 @@ depend: ../sys/unix/depend.awk \
 
 # config.h timestamp
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
-		../include/global.h ../include/fnamesiz.h ../include/coord.h \
-		../include/vmsconf.h ../include/system.h ../include/nhlua.h \
-		../include/unixconf.h ../include/os2conf.h ../include/micro.h \
-		../include/pcconf.h ../include/tosconf.h ../include/amiconf.h \
-		../include/macconf.h ../include/beconf.h ../include/wceconf.h \
-		../include/ntconf.h
+		../include/global.h ../include/coord.h ../include/vmsconf.h \
+		../include/system.h ../include/nhlua.h ../include/unixconf.h \
+		../include/os2conf.h ../include/micro.h ../include/pcconf.h \
+		../include/tosconf.h ../include/amiconf.h ../include/macconf.h \
+		../include/beconf.h ../include/wceconf.h ../include/ntconf.h \
+		../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
@@ -743,13 +743,13 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/permonst.h ../include/monattk.h \
 		../include/monflag.h ../include/mondata.h ../include/pm.h \
 		../include/wintype.h ../include/context.h ../include/rm.h \
-		../include/botl.h ../include/rect.h \
-		../include/region.h ../include/decl.h ../include/quest.h \
-		../include/spell.h ../include/color.h ../include/obj.h \
-		../include/you.h ../include/attrib.h ../include/monst.h \
-		../include/mextra.h ../include/skills.h ../include/onames.h \
-		../include/timeout.h ../include/trap.h ../include/flag.h \
-		../include/vision.h ../include/display.h ../include/engrave.h \
+		../include/botl.h ../include/rect.h ../include/region.h \
+		../include/decl.h ../include/quest.h ../include/spell.h \
+		../include/color.h ../include/obj.h ../include/you.h \
+		../include/attrib.h ../include/monst.h ../include/mextra.h \
+		../include/skills.h ../include/onames.h ../include/timeout.h \
+		../include/trap.h ../include/flag.h ../include/vision.h \
+		../include/display.h ../include/engrave.h \
 		../include/winprocs.h ../include/sys.h ../include/wintty.h \
 		../include/trampoli.h
 	touch $(HACK_H)
@@ -1109,6 +1109,7 @@ muse.o: muse.c $(HACK_H)
 music.o: music.c $(HACK_H)
 nhlua.o: nhlua.c $(HACK_H) ../include/dlb.h
 nhlsel.o: nhlsel.c $(HACK_H) ../include/sp_lev.h
+nhlobj.o: nhlobj.c $(HACK_H) ../include/sp_lev.h
 o_init.o: o_init.c $(HACK_H)
 objects.o: objects.c $(CONFIG_H) ../include/obj.h ../include/objclass.h \
 		../include/prop.h ../include/skills.h ../include/color.h
