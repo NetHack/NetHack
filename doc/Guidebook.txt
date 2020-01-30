@@ -2059,32 +2059,32 @@
           25,  respectively, and total to 2 when both are at the same loca-
           tion).
 
-               The "nopickup" command prefix (default `m') before  a  move-
-          ment  direction can be used to step on objects without attempting
+               The "nopickup" command prefix (default `m') can be used  be-
+          fore  a  movement direction to step on objects without attempting
           auto-pickup and without giving feedback about them.
 
                The mention_walls option controls whether you  get  feedback
           if  you try to walk into a wall or solid stone or off the edge of
           the map.  Normally nothing happens (unless the hero is blind  and
           no wall is shown, then the wall that is being bumped into will be
-          drawn on the map).  This option also gives feedback when the var-
-          ious rush or run variations of movement stop for some non-obvious
-          reason.
+          drawn on the map).  This option also gives feedback when  rushing
+          or running stops for some non-obvious reason.
 
-               The mention_decor option controls whether you  get  feedback
-          when  walking on "furniture."  Normally stepping onto stairs or a
-          fountain or an altar or various other things doesn't elicit  any-
-          thing  unless it is covered by one or more objects so is obscured
-          on the map.  Doorless doorways and open doors  aren't  considered
-          worthy  of  mention;  closed  doors  (if  you can move onto their
-          spots) and broken doors are.  Assuming that you're able to do so,
-          moving onto water or lava or ice will give feedback if not yet on
-          that type of terrain but not repeat it  (unless  there  has  been
-          some intervening message) when moving from water to another water
-          spot, or lava to lava, or ice to ice.  Moving off of any of those
-          back  onto  "normal"  terrain  will  give one message too, unless
-          there is feedback about one or more objects, in  which  case  the
-          back on land circumstance is implied.
+               The  mention_decor  option controls whether you get feedback
+          when walking on "furniture."  Normally stepping onto stairs or  a
+          fountain  or an altar or various other things doesn't elicit any-
+          thing unless it is covered by one or more objects so is  obscured
+          on  the  map.   Setting  this  option  to true will describe such
+          things even when they aren't  obscured.   Doorless  doorways  and
+          open  doors aren't considered worthy of mention; closed doors (if
+          you can move onto their spots) and broken  doors  are.   Assuming
+          that  you're able to do so, moving onto water or lava or ice will
+          give feedback if not yet on that type of terrain but  not  repeat
+          it  (unless  there has been some intervening message) when moving
+          from water to another water spot, or lava to lava, or ice to ice.
+          Moving  off  of any of those back onto "normal" terrain will give
+          one message too, unless there is feedback about one or  more  ob-
+          jects, in which case the back on land circumstance is implied.
 
                The  confirm  and safe_pet options control what happens when
           you try to move onto a peaceful monster's spot or  a  tame  one's
@@ -3721,8 +3721,8 @@
             `O' command.
 
           mention_decor
-            Give  feedback when walking on various dungeon features such as
-            stairs, fountains, or altars  which  are  ordinarily  only  de-
+            Give  feedback  when walking onto various dungeon features such
+            as stairs, fountains, or altars which are ordinarily  only  de-
             scribed  when  covered  by  one  or more objects (default off).
             Persistent.
 
