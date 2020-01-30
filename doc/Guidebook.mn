@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.347 $ $NHDT-Date: 1579262524 2020/01/17 12:02:04 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.355 $ $NHDT-Date: 1580346228 2020/01/30 01:03:48 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -1808,8 +1808,8 @@ present rather than the sum of the quantities of those stacks (so
 than as 7 and 25, respectively, and total to 2 when both are at the
 same location).
 .pg
-The \(lqnopickup\(rq command prefix (default \(oq\f(CRm\fP\(cq) before
-a movement direction can be used to step on objects without attempting
+The \(lqnopickup\(rq command prefix (default \(oq\f(CRm\fP\(cq) can be
+used before a movement direction to step on objects without attempting
 auto-pickup and without giving feedback about them.
 .pg
 The
@@ -1818,8 +1818,8 @@ option controls whether you get feedback if you try to walk into a wall
 or solid stone or off the edge of the map.
 Normally nothing happens (unless the hero is blind and no wall is shown,
 then the wall that is being bumped into will be drawn on the map).
-This option also gives feedback when the various rush or run variations
-of movement stop for some non-obvious reason.
+This option also gives feedback when rushing or running stops for
+some non-obvious reason.
 .pg
 The
 .op mention_decor
@@ -1827,6 +1827,8 @@ option controls whether you get feedback when walking on \(lqfurniture.\(rq
 Normally stepping onto stairs or a fountain or an altar or various other
 things doesn't elicit anything unless it is covered by one or more objects
 so is obscured on the map.
+Setting this option to true will describe such things even when they
+aren't obscured.
 Doorless doorways and open doors aren't considered worthy of mention;
 closed doors (if you can move onto their spots) and broken doors are.
 Assuming that you're able to do so, moving onto water or lava or ice
@@ -3260,7 +3262,7 @@ Enable mail delivery during the game (default on).  Persistent.
 An obsolete synonym for \(lqgender:male\(rq.
 Cannot be set with the \(oqO\(cq command.
 .lp mention_decor
-Give feedback when walking on various dungeon features such as stairs,
+Give feedback when walking onto various dungeon features such as stairs,
 fountains, or altars which are ordinarily only described when covered
 by one or more objects (default off).
 Persistent.
