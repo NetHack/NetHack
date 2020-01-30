@@ -232,7 +232,7 @@ the entrance.
 Strange forbidding shapes seem to be moving in the distance.]],
       },
       goal_alt = {
-         text = "The have returned to %ns lair.",
+         text = "You have returned to %ns lair.",
       },
       goal_first = {
          synopsis = "[This strange feeling must be the presence of %o.]",

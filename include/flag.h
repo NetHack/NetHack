@@ -41,6 +41,7 @@ struct flag {
     boolean invlet_constant; /* let objects keep their inventory symbol */
     boolean legacy;          /* print game entry "story" */
     boolean lit_corridor;    /* show a dark corr as lit if it is in sight */
+    boolean mention_decor;   /* give feedback for unobscured furniture */
     boolean mention_walls;   /* give feedback when bumping walls */
     boolean nap;             /* `timed_delay' option for display effects */
     boolean null;            /* OK to send nulls to the terminal */
@@ -283,6 +284,7 @@ struct instance_flags {
     boolean zerocomp;         /* write zero-compressed save files */
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */
+    schar prev_decor;         /* 'mention_decor' just mentioned this */
     uchar num_pad_mode;
     uchar bouldersym;         /* symbol for boulder display */
     char prevmsg_window;      /* type of old message window to use */

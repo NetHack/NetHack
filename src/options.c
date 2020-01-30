@@ -158,6 +158,7 @@ static const struct Bool_Opt {
 #else
     { "mail", (boolean *) 0, TRUE, SET_IN_FILE },
 #endif
+    { "mention_decor", &flags.mention_decor, FALSE, SET_IN_GAME },
     { "mention_walls", &flags.mention_walls, FALSE, SET_IN_GAME },
     { "menucolors", &iflags.use_menu_color, FALSE, SET_IN_GAME },
     /* for menu debugging only*/
@@ -4168,6 +4169,8 @@ boolean tinitial, tfrom_file;
                        || boolopt[i].addr == &iflags.wc2_guicolor) {
                 update_inventory();
 #endif /* TEXTCOLOR */
+            } else if (boolopt[i].addr == &flags.mention_decor) {
+                iflags.prev_decor = STONE;
             }
             return retval;
         }
