@@ -328,7 +328,6 @@ VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
 VOBJ28 = $(O)sfstruct.o
 
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
-LUA_QTEXT_FILE = "quest.lua"
 
 !IFDEF CROSSCOMPILE_HOST
 DLBOBJ_HOST = $(O)dlb$(HOST).o
@@ -901,7 +900,7 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 #    objs: $(GAMEOBJ) $(TTYOBJ) $(O)tile.o $(O)guistub.o
 
 
-$(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
+$(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
 			$(ALLOBJ) $(TTYOBJ) $(O)console.res $(KEYDLLS) \
 			$(LUATARGETS) $(PDCLIB)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
@@ -1005,9 +1004,6 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	$(DAT)\oracles \
-! IFNDEF LUA_QTEXT_FILE
-		$(DAT)\quest.dat \
-! ENDIF
 		$(O)sp_lev.tag $(DLB)
 ! IF ("$(USE_DLB)"=="Y")
 	copy nhdat$(NHV)          $(GAMEDIR)
@@ -1235,12 +1231,7 @@ $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
 
-nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
-!IFNDEF LUA_QTEXT_FILE
-	$(DAT)\quest.dat \
-!ELSE
-        $(DAT)\quest.lua \
-!ENDIF
+nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) $(DAT)\quest.lua \
 	$(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\porthelp \
 	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
@@ -1251,9 +1242,6 @@ nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	if exist ttyoptions echo ttyoptions >>dlb.lst
 	if exist guioptions echo guioptions >>dlb.lst
 	if exist porthelp echo porthelp >>dlb.lst
-!IFNDEF LUA_QTEXT_FILE
-	echo quest.dat >>dlb.lst
-!ENDIF
 	echo rumors >>dlb.lst
 	echo help >>dlb.lst
 	echo hh >>dlb.lst
@@ -1656,9 +1644,6 @@ spotless: clean
 !ENDIF
 	if exist $(DAT)\oracles		 del $(DAT)\oracles
 	if exist $(DAT)\rumors		 del $(DAT)\rumors
-!IFNDEF LUA_QTEXT_FILE
-	if exist $(DAT)\quest.dat	 del $(DAT)\quest.dat
-!ENDIF
 	if exist $(DAT)\options		 del $(DAT)\options
 	if exist $(DAT)\ttyoptions	 del $(DAT)\ttyoptions
 	if exist $(DAT)\guioptions	 del $(DAT)\guioptions
