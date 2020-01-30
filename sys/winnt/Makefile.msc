@@ -1,5 +1,5 @@
 # NetHack 3.7 Makefile.msc
-#       Copyright (c) NetHack PC Development Team 1993-2019
+#       Copyright (c) NetHack PC Development Team 1993-2020
 #
 #==============================================================================
 # Build Tools Environment
@@ -365,14 +365,17 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(VOBJ30) \
          $(REGEX)  $(CURSESOBJ) $(MDLIB)
 
+WINDHDR = $(MSWSYS)\win10.h $(MSWSYS)\winos.h $(MSWSYS)\win32api.h
+
 GUIOBJ	= $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)NetHackW.o
 
-GUIHDR	= $(MSWIN)\mhaskyn.h $(MSWIN)\mhdlg.h $(MSWIN)\mhfont.h \
+ALL_GUIHDR = $(MSWIN)\mhaskyn.h $(MSWIN)\mhdlg.h $(MSWIN)\mhfont.h \
 	$(MSWIN)\mhinput.h $(MSWIN)\mhmain.h $(MSWIN)\mhmap.h $(MSWIN)\mhmenu.h \
-	$(MSWIN)\mhmsg.h $(MSWIN)\mhmsgwnd.h $(MSWIN)\mhrip.h $(MSWIN)\mhstatus.h \
+	$(MSWIN)\mhmsg.h $(MSWIN)\mhmsgwnd.h $(MSWIN)\mhrip.h \
+	$(MSWIN)\mhsplash.h $(MSWIN)\mhstatus.h \
 	$(MSWIN)\mhtext.h $(MSWIN)\resource.h $(MSWIN)\winMS.h
 
 COMCTRL = comctl32.lib
@@ -793,7 +796,7 @@ DLB =
 #==========================================
 
 {$(TTY)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@  $<
+	@$(cc) $(cflagsBuild) -I$(MSWSYS) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@  $<
 
 
 #==========================================
@@ -801,7 +804,7 @@ DLB =
 #==========================================
 
 {$(MSWIN)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@  $<
+	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@  $<
 
 #==========================================
 # Rules for files in win\curses
@@ -818,13 +821,13 @@ DLB =
 #==========================================
 
 {$(PDCURSES_TOP)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	@$(cc) /wd4244 $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCSRC)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	@$(cc) /wd4244 $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCWINCON)}.c{$(OBJ)}.o:
-	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	@$(cc) /wd4244 $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 # Rules for LUA files
@@ -899,8 +902,8 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 
 
 $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)console.res $(KEYDLLS) \
-			$(LUATARGETS)
+			$(ALLOBJ) $(TTYOBJ) $(O)console.res $(KEYDLLS) \
+			$(LUATARGETS) $(PDCLIB)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
         @echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
@@ -924,7 +927,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
 $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)NetHackW.res \
+			$(ALLOBJ) $(GUIOBJ) $(O)NetHackW.res \
 			$(O)gamedir.tag $(KEYDLLS) \
 			$(LUATARGETS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
@@ -1204,7 +1207,7 @@ $(O)envchk.tag: $(O)obj.tag
 # DLB utility and nhdatNNN file creation
 #==========================================
 
-$(U)dlb_main.exe: $(DLBOBJ_HOST) $(O)dlb$(HOST).o
+$(U)dlb.exe: $(DLBOBJ_HOST) $(O)dlb$(HOST).o
 	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)dlb_main$(HOST).o
@@ -1232,7 +1235,7 @@ $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
 
-nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
+nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 !IFNDEF LUA_QTEXT_FILE
 	$(DAT)\quest.dat \
 !ELSE
@@ -1265,7 +1268,7 @@ nhdat$(NHV):	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	echo bogusmon >>dlb.lst
 	echo tribute >>dlb.lst
 	for %%N in (*.lua) do echo %%N >>dlb.lst
-	$(U)dlb_main cIf dlb.lst $(SRC)\nhdat
+	$(U)dlb cIf dlb.lst $(SRC)\nhdat
 	cd $(SRC)
 
 #==========================================
@@ -1408,6 +1411,82 @@ $(O)luac.o: $(LUASRC)\luac.c
 $(O)lapi.o: $(LUASRC)\lapi.c
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -wd4244 -Fo$@ $(LUASRC)\lapi.c
 
+#===================================================================
+# sys/winnt dependencies
+#===================================================================
+
+$(O)nttty.o:   $(MSWSYS)\nttty.c $(WINDHDR) $(HACK_H) $(TILE_H)
+$(O)win10.o:  $(MSWSYS)\winnt.c $(WINDHDR) $(HACK_H)
+$(O)winnt.o:  $(MSWSYS)\winnt.c $(WINDHDR) $(HACK_H)
+$(O)ntsound.o: $(MSWSYS)\ntsound.c $(WINDHDR) $(HACK_H)
+$(O)windmain.o: $(MSWSYS)\windmain.c $(WINDHDR) $(HACK_H)
+
+#if you aren't linking in the full gui then
+#include the following stub for proper linkage.
+
+$(O)guistub.o: $(WINDHDR) $(HACK_H) $(MSWSYS)\stubs.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -DGUISTUB -Fo$@ $(MSWSYS)\stubs.c
+
+#===================================================================
+# win/win32 dependencies
+#===================================================================
+
+$(O)mhaskyn.o: $(MSWIN)\mhaskyn.c $(MSWIN)\$(@B).h $(WINDHDR) $(HACK_H)
+$(O)mhdlg.o: $(MSWIN)\mhdlg.c $(MSWIN)\$(@B).h $(MSWIN)\resource.h $(WINDHDR) $(HACK_H)
+$(O)mhfont.o: $(MSWIN)\mhfont.c $(MSWIN)\$(@B).h $(WINDHDR) $(HACK_H)
+$(O)mhinput.o: $(MSWIN)\mhinput.c $(MSWIN)\$(@B).h $(MSWIN)\winMS.h $(WINDHDR) $(HACK_H)
+$(O)mhmain.o: $(MSWIN)\mhmain.c $(ALL_GUIHDR) $(WINDHDR) $(HACK_H)
+$(O)mhmap.o: $(MSWIN)\mhmap.c $(MSWIN)\$(@B).h $(MSWIN)\mhfont.h $(MSWIN)\mhinput.h \
+		$(MSWIN)\mhmsg.h $(MSWIN)\resource.h $(WINDHDR) $(HACK_H)
+$(O)mhmenu.o: $(MSWIN)\mhmenu.c $(MSWIN)\$(@B).h $(MSWIN)\mhmain.h $(MSWIN)\mhmsg.h \
+		$(MSWIN)\mhfont.h $(MSWIN)\mhdlg.h $(MSWIN)\resource.h $(WINDHDR) $(HACK_H)
+$(O)mhmsgwnd.o: $(MSWIN)\mhmsgwnd.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\mhfont.h \
+		$(MSWIN)\winMS.h $(WINDHDR) $(HACK_H)
+$(O)mhrip.o: $(MSWIN)\mhrip.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\mhfont.h \
+		$(MSWIN)\resource.h $(WINDHDR) $(HACK_H)
+$(O)mhsplash.o: $(MSWIN)\mhsplash.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\mhfont.h \
+		$(MSWIN)\resource.h $(WINDHDR) $(HACK_H) $(INCL)\patchlevel.h
+$(O)mhstatus.o: $(MSWIN)\mhstatus.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\mhfont.h \
+		$(WINDHDR) $(HACK_H)
+$(O)mhtext.o: $(MSWIN)\mhtext.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\mhfont.h \
+		$(WINDHDR) $(HACK_H)
+$(O)mswproc.o: $(MSWIN)\mswproc.c $(ALL_GUIHDR) $(MSWIN)\resource.h $(WINDHDR) $(HACK_H)
+$(O)NetHackW.o: $(MSWIN)\NetHackW.c $(ALL_GUIHDR) $(MSWIN)\resource.h $(WINDHDR) $(HACK_H)
+
+#if you aren't linking in the full tty then
+#include the following stub for proper linkage.
+
+$(O)ttystub.o: $(WINDHDR) $(HACK_H) $(MSWSYS)\stubs.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -DTTYSTUB -Fo$@ $(MSWSYS)\stubs.c
+
+#===================================================================
+# sys/share dependencies
+#===================================================================
+
+(O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
+	@$(CC) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ ..\sys\share\cppregex.cpp
+
+#===================================================================
+# curses window port dependencies
+#===================================================================
+
+$(O)cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
+$(O)cursinit.o: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
+$(O)cursinvt.o: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
+$(O)cursmain.o: $(WCURSES)\cursmain.c $(INCL)\wincurs.h
+$(O)cursmesg.o: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
+$(O)cursmisc.o: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
+$(O)cursstat.o: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
+$(O)curswins.o: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
+
+#===================================================================
+# save dependencies
+#===================================================================
+
+$(O)sfstruct.o: $(HACK_H) $(SRC)\sfstruct.c
+#	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfstruct.c
+
+ 
 #===============================================================================
 # CROSSCOMPILE
 #===============================================================================
@@ -1431,191 +1510,12 @@ $(O)mdlib.o: $(SRC)\mdlib.c
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(SRC)\mdlib.c
 #	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EP -Fo$@ $(SRC)\mdlib.c >mdlib.c.preprocessed
 
-#===============================================================================
-# Housekeeping
-#===============================================================================
-
-spotless: clean
-! IF ("$(OBJ)"!="")
-	if exist $(OBJ)\* rmdir $(OBJ) /s /Q
-	if exist $(GAMEDIR)\nhdefkey.dll del $(GAMEDIR)\nhdefkey.dll
-	if exist $(GAMEDIR)\nh340key.dll del $(GAMEDIR)\nh340key.dll
-	if exist $(GAMEDIR)\nhraykey.dll del $(GAMEDIR)\nhraykey.dll
-	if exist $(GAMEDIR)\NetHack.exe  del $(GAMEDIR)\NetHack.exe
-	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
-	if exist $(GAMEDIR)\nhdat$(NHV)  del $(GAMEDIR)\nhdat$(NHV)
-! ENDIF
-	if exist $(INCL)\date.h          del $(INCL)\date.h
-	if exist $(INCL)\onames.h        del $(INCL)\onames.h
-	if exist $(INCL)\pm.h            del $(INCL)\pm.h
-	if exist $(INCL)\vis_tab.h       del $(INCL)\vis_tab.h
-	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
-	if exist $(SRC)\tile.c           del $(SRC)\tile.c
-	if exist $(U)*.lnk               del $(U)*.lnk
-	if exist $(U)*.map               del $(U)*.map
-	if exist $(DAT)\data             del $(DAT)\data
-	if exist $(DAT)\rumors           del $(DAT)\rumors
-	if exist $(DAT)\engrave          del $(DAT)\engrave
-	if exist $(DAT)\epitaph          del $(DAT)\epitaph
-	if exist $(DAT)\bogusmon         del $(DAT)\bogusmon
-	if exist $(DAT)\dlb.lst		 del $(DAT)\dlb.lst
-	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
-	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
-	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
-	if exist nhdat$(NHV).	         del nhdat$(NHV).
-	if exist $(O)obj.tag             del $(O)obj.tag
-	if exist $(O)gamedir.tag         del $(O)gamedir.tag
-	if exist $(O)nh*key.lib          del $(O)nh*key.lib
-	if exist $(O)nh*key.exp          del $(O)nh*key.exp
-        if exist $(MSWIN)\mnsel.bmp      del $(MSWIN)\mnsel.bmp
-        if exist $(MSWIN)\mnselcnt.bmp   del $(MSWIN)\mnselcnt.bmp
-        if exist $(MSWIN)\mnunsel.bmp    del $(MSWIN)\mnunsel.bmp
-        if exist $(MSWIN)\petmark.bmp    del $(MSWIN)\petmark.bmp
-        if exist $(MSWIN)\pilemark.bmp   del $(MSWIN)\pilemark.bmp
-        if exist $(MSWIN)\rip.bmp        del $(MSWIN)\rip.bmp
-        if exist $(MSWIN)\splash.bmp     del $(MSWIN)\splash.bmp
-        if exist $(MSWIN)\nethack.ico    del $(MSWIN)\nethack.ico
-        if exist $(MSWSYS)\nethack.ico   del $(MSWSYS)\nethack.ico
-	if exist $(U)recover.exe         del $(U)recover.exe
-	if exist $(U)tile2bmp.exe        del $(U)tile2bmp.exe
-	if exist $(U)tilemap.exe         del $(U)tilemap.exe
-	if exist $(U)uudecode.exe        del $(U)uudecode.exe
-	if exist $(U)dlb_main.exe        del $(U)dlb_main.exe
-!IF "$(ADD_CURSES)" == "Y"	
-	if exist $(O)pdcurses.lib        del $(O)pdcurses.lib
-!ENDIF
-	if exist $(DAT)\oracles		 del $(DAT)\oracles
-	if exist $(DAT)\rumors		 del $(DAT)\rumors
-!IFNDEF LUA_QTEXT_FILE
-	if exist $(DAT)\quest.dat	 del $(DAT)\quest.dat
-!ENDIF
-	if exist $(DAT)\options		 del $(DAT)\options
-	if exist $(DAT)\ttyoptions	 del $(DAT)\ttyoptions
-	if exist $(DAT)\guioptions	 del $(DAT)\guioptions
-	if exist $(DAT)\data		 del $(DAT)\data
-
-clean:
-	if exist $(O)*.o del $(O)*.o
-	if exist $(INCL)\nhlua.h   del $(INCL)\nhlua.h
-	if exist $(O)utility.tag   del $(O)utility.tag
-	if exist $(U)makedefs.exe  del $(U)makedefs.exe
-	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
-	if exist $(SRC)\*.map      del $(SRC)\*.map
-	if exist $(O)install.tag   del $(O)install.tag
-	if exist $(O)console.res  del $(O)console.res
-	if exist $(O)dlb_main.MAP del $(O)dlb_main.MAP
-	if exist $(O)dlb_main.PDB del $(O)dlb_main.PDB
-	if exist $(O)gamedir.tag  del $(O)gamedir.tag
-	if exist $(O)makedefs.MAP del $(O)makedefs.MAP
-	if exist $(O)makedefs.PDB del $(O)makedefs.PDB
-	if exist $(O)NetHack.MAP  del $(O)NetHack.MAP
-	if exist $(O)nh340key.def del $(O)nh340key.def
-	if exist $(O)nh340key.exp del $(O)nh340key.exp
-	if exist $(O)nh340key.lib del $(O)nh340key.lib
-	if exist $(O)nh340key.map del $(O)nh340key.map
-	if exist $(O)nh340key.PDB del $(O)nh340key.PDB
-	if exist $(O)nhdefkey.def del $(O)nhdefkey.def
-	if exist $(O)nhdefkey.exp del $(O)nhdefkey.exp
-	if exist $(O)nhdefkey.lib del $(O)nhdefkey.lib
-	if exist $(O)nhdefkey.map del $(O)nhdefkey.map
-	if exist $(O)nhdefkey.PDB del $(O)nhdefkey.PDB
-	if exist $(O)nhraykey.def del $(O)nhraykey.def
-	if exist $(O)nhraykey.exp del $(O)nhraykey.exp
-	if exist $(O)nhraykey.lib del $(O)nhraykey.lib
-	if exist $(O)nhraykey.map del $(O)nhraykey.map
-	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
-	if exist $(O)envchk.tag   del $(O)envchk.tag
-	if exist $(O)obj.tag      del $(O)obj.tag
-	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
-	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
-	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
-	if exist $(TILEBMP16)        del $(TILEBMP16)
-	if exist $(TILEBMP32)        del $(TILEBMP32)
-
-#===================================================================
-# OTHER DEPENDENCIES
-#===================================================================
-
-#
-# dat dependencies
-#
-
-$(DAT)\data: $(O)utility.tag    $(DATABASE)
-	$(U)makedefs -d
-
-$(DAT)\rumors: $(O)utility.tag    $(DAT)\rumors.tru   $(DAT)\rumors.fal
-	$(U)makedefs -r
-
-!IFNDEF LUA_QTEXT_FILE
-$(DAT)\quest.dat: $(O)utility.tag  $(DAT)\quest.txt
-	$(U)makedefs -q
-!ENDIF
-
-$(DAT)\oracles: $(O)utility.tag    $(DAT)\oracles.txt
-	$(U)makedefs -h
-
-$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
-	$(U)makedefs -s
-
-$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
-	$(U)makedefs -s
-
-$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
-	$(U)makedefs -s
-
-!IFDEF OBSOLETE_DGN_COMPILER
-$(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
-	$(U)makedefs -e
-	cd $(DAT)
-	$(U)dgncomp dungeon.pdf
-	cd $(SRC)
-!ENDIF
-
-#
-# NT dependencies
-#
-
-$(O)nttty.o:   $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h $(MSWSYS)\nttty.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -I$(WSHR) -Fo$@  $(MSWSYS)\nttty.c
-$(O)winnt.o: $(HACK_H) $(MSWSYS)\win32api.h $(MSWSYS)\winnt.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWSYS)\win10.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@  $(MSWSYS)\winnt.c
-$(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(MSWSYS)\ntsound.c
-$(O)windmain.o: $(MSWSYS)\windmain.c $(HACK_H)
-
-#if you aren't linking in the full gui then
-#include the following stub for proper linkage.
-
-$(O)guistub.o: $(HACK_H) $(MSWSYS)\stubs.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -DGUISTUB -Fo$@ $(MSWSYS)\stubs.c
-
-#
-# WIN32 dependencies
-#
-
-$(O)NetHackW.o: $(HACK_H) $(MSWIN)\NetHackW.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\NetHackW.c
-
-#if you aren't linking in the full tty then
-#include the following stub for proper linkage.
-
-$(O)ttystub.o: $(HACK_H) $(MSWSYS)\stubs.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -DTTYSTUB -Fo$@ $(MSWSYS)\stubs.c
-
-#
 #============================================
-# save dependencies
+# util dual-role CROSSCOMPILE dependencies
 #============================================
-
-$(O)sfstruct.o: $(HACK_H) $(SRC)\sfstruct.c
-#	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\sfstruct.c
-
-# 
-# util dependencies
-# These have dual-roles and need to be build for host and targt platforms.
 #
-
+# These have dual-roles and need to be build for host and target platforms.
+#
 !IFDEF CROSSCOMPILE_HOST
 $(O)panic$(HOST).o:  $(U)panic.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(U)panic.c
@@ -1675,24 +1575,136 @@ $(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h \
 		$(INCL)\patchlevel.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ version.c
 
-# 
-# sys/share dependencies
+#===================================================================
+# DAT dependencies
+#===================================================================
+
+#
+# dat dependencies
 #
 
-(O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
-	@$(CC) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ ..\sys\share\cppregex.cpp
+$(DAT)\data: $(O)utility.tag    $(DATABASE)
+	$(U)makedefs -d
 
-# 
-# curses window port dependencies
-#
-$(O)cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
-$(O)cursinit.o: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
-$(O)cursinvt.o: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
-$(O)cursmain.o: $(WCURSES)\cursmain.c $(INCL)\wincurs.h
-$(O)cursmesg.o: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
-$(O)cursmisc.o: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
-$(O)cursstat.o: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
-$(O)curswins.o: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
+$(DAT)\rumors: $(O)utility.tag    $(DAT)\rumors.tru   $(DAT)\rumors.fal
+	$(U)makedefs -r
+
+$(DAT)\oracles: $(O)utility.tag    $(DAT)\oracles.txt
+	$(U)makedefs -h
+
+$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+#===============================================================================
+# Housekeeping
+#===============================================================================
+
+spotless: clean
+! IF ("$(OBJ)"!="")
+	if exist $(OBJ)\* rmdir $(OBJ) /s /Q
+	if exist $(GAMEDIR)\nhdefkey.dll del $(GAMEDIR)\nhdefkey.dll
+	if exist $(GAMEDIR)\nh340key.dll del $(GAMEDIR)\nh340key.dll
+	if exist $(GAMEDIR)\nhraykey.dll del $(GAMEDIR)\nhraykey.dll
+	if exist $(GAMEDIR)\NetHack.exe  del $(GAMEDIR)\NetHack.exe
+	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
+	if exist $(GAMEDIR)\nhdat$(NHV)  del $(GAMEDIR)\nhdat$(NHV)
+! ENDIF
+	if exist $(INCL)\date.h          del $(INCL)\date.h
+	if exist $(INCL)\onames.h        del $(INCL)\onames.h
+	if exist $(INCL)\pm.h            del $(INCL)\pm.h
+	if exist $(INCL)\vis_tab.h       del $(INCL)\vis_tab.h
+	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
+	if exist $(SRC)\tile.c           del $(SRC)\tile.c
+	if exist $(U)*.lnk               del $(U)*.lnk
+	if exist $(U)*.map               del $(U)*.map
+	if exist $(DAT)\data             del $(DAT)\data
+	if exist $(DAT)\rumors           del $(DAT)\rumors
+	if exist $(DAT)\engrave          del $(DAT)\engrave
+	if exist $(DAT)\epitaph          del $(DAT)\epitaph
+	if exist $(DAT)\bogusmon         del $(DAT)\bogusmon
+	if exist $(DAT)\dlb.lst		 del $(DAT)\dlb.lst
+	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
+	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
+	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
+	if exist nhdat$(NHV).	         del nhdat$(NHV).
+	if exist $(O)obj.tag             del $(O)obj.tag
+	if exist $(O)gamedir.tag         del $(O)gamedir.tag
+	if exist $(O)nh*key.lib          del $(O)nh*key.lib
+	if exist $(O)nh*key.exp          del $(O)nh*key.exp
+        if exist $(MSWIN)\mnsel.bmp      del $(MSWIN)\mnsel.bmp
+        if exist $(MSWIN)\mnselcnt.bmp   del $(MSWIN)\mnselcnt.bmp
+        if exist $(MSWIN)\mnunsel.bmp    del $(MSWIN)\mnunsel.bmp
+        if exist $(MSWIN)\petmark.bmp    del $(MSWIN)\petmark.bmp
+        if exist $(MSWIN)\pilemark.bmp   del $(MSWIN)\pilemark.bmp
+        if exist $(MSWIN)\rip.bmp        del $(MSWIN)\rip.bmp
+        if exist $(MSWIN)\splash.bmp     del $(MSWIN)\splash.bmp
+        if exist $(MSWIN)\nethack.ico    del $(MSWIN)\nethack.ico
+        if exist $(MSWSYS)\nethack.ico   del $(MSWSYS)\nethack.ico
+	if exist $(U)recover.exe         del $(U)recover.exe
+	if exist $(U)tile2bmp.exe        del $(U)tile2bmp.exe
+	if exist $(U)tilemap.exe         del $(U)tilemap.exe
+	if exist $(U)uudecode.exe        del $(U)uudecode.exe
+	if exist $(U)dlb.exe             del $(U)dlb.exe
+!IF "$(ADD_CURSES)" == "Y"	
+	if exist $(O)pdcurses.lib        del $(O)pdcurses.lib
+!ENDIF
+	if exist $(DAT)\oracles		 del $(DAT)\oracles
+	if exist $(DAT)\rumors		 del $(DAT)\rumors
+!IFNDEF LUA_QTEXT_FILE
+	if exist $(DAT)\quest.dat	 del $(DAT)\quest.dat
+!ENDIF
+	if exist $(DAT)\options		 del $(DAT)\options
+	if exist $(DAT)\ttyoptions	 del $(DAT)\ttyoptions
+	if exist $(DAT)\guioptions	 del $(DAT)\guioptions
+	if exist $(DAT)\data		 del $(DAT)\data
+
+clean:
+	if exist $(O)*.o del $(O)*.o
+	if exist $(INCL)\nhlua.h   del $(INCL)\nhlua.h
+	if exist $(O)utility.tag   del $(O)utility.tag
+	if exist $(U)makedefs.exe  del $(U)makedefs.exe
+	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
+	if exist $(SRC)\*.map      del $(SRC)\*.map
+	if exist $(O)install.tag   del $(O)install.tag
+	if exist $(O)console.res  del $(O)console.res
+	if exist $(O)dlb.MAP      del $(O)dlb.MAP
+	if exist $(O)dlb.PDB      del $(O)dlb.PDB
+	if exist $(O)gamedir.tag  del $(O)gamedir.tag
+	if exist $(O)makedefs.MAP del $(O)makedefs.MAP
+	if exist $(O)makedefs.PDB del $(O)makedefs.PDB
+	if exist $(O)NetHack.MAP  del $(O)NetHack.MAP
+	if exist $(O)nh340key.def del $(O)nh340key.def
+	if exist $(O)nh340key.exp del $(O)nh340key.exp
+	if exist $(O)nh340key.lib del $(O)nh340key.lib
+	if exist $(O)nh340key.map del $(O)nh340key.map
+	if exist $(O)nh340key.PDB del $(O)nh340key.PDB
+	if exist $(O)nhdefkey.def del $(O)nhdefkey.def
+	if exist $(O)nhdefkey.exp del $(O)nhdefkey.exp
+	if exist $(O)nhdefkey.lib del $(O)nhdefkey.lib
+	if exist $(O)nhdefkey.map del $(O)nhdefkey.map
+	if exist $(O)nhdefkey.PDB del $(O)nhdefkey.PDB
+	if exist $(O)nhraykey.def del $(O)nhraykey.def
+	if exist $(O)nhraykey.exp del $(O)nhraykey.exp
+	if exist $(O)nhraykey.lib del $(O)nhraykey.lib
+	if exist $(O)nhraykey.map del $(O)nhraykey.map
+	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
+	if exist $(O)envchk.tag   del $(O)envchk.tag
+	if exist $(O)obj.tag      del $(O)obj.tag
+	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
+	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
+	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
+	if exist $(TILEBMP16)        del $(TILEBMP16)
+	if exist $(TILEBMP32)        del $(TILEBMP32)
+
+#===================================================================
+# OTHER DEPENDENCIES
+#===================================================================
 #
 # The rest are stolen from sys/unix/Makefile.src, 
 # with the following changes:
@@ -2062,8 +2074,9 @@ $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H)
 $(O)music.o: music.c $(HACK_H)
-$(O)nhlua.o: nhlua.c $(HACK_H) $(INCL)\dlb.h
+$(O)nhlobj.o: nhlobj.c $(HACK_H) $(INCL)\sp_lev.h
 $(O)nhlsel.o: nhlsel.c $(HACK_H) $(INCL)\sp_lev.h
+$(O)nhlua.o: nhlua.c $(HACK_H) $(INCL)\dlb.h
 $(O)o_init.o: o_init.c $(HACK_H)
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
