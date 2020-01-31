@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.81 $ $NHDT-Date: 1580322890 2020/01/29 18:34:50 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $ $NHDT-Date: 1580476196 2020/01/31 13:09:56 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -48,7 +48,8 @@ hero can no longer wear blindfold/towel/lenses when poly'd into headless form
 revamp achievement tracking for exploring Mine's End and Sokoban (by acquiring
 	luckstone and bag of holding or amulet of reflection, respectively)
 throttle long worm growth rate and HP accumulation
-poly'd hero was able to zap wands without any hands
+poly'd hero was able to zap wands, apply tools, and #rub objects wands without
+	having any hands
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

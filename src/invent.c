@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1579914042 2020/01/25 01:00:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1580476196 2020/01/31 13:09:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.288 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1531,7 +1531,9 @@ register const char *let, *word;
              || (!strcmp(word, "rub")
                  && ((otmp->oclass == TOOL_CLASS && otyp != OIL_LAMP
                       && otyp != MAGIC_LAMP && otyp != BRASS_LANTERN)
-                     || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
+                     || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))
+                     || (otmp->oclass == FOOD_CLASS
+                         && otmp->otyp != LUMP_OF_ROYAL_JELLY)))
              || (!strcmp(word, "use or apply")
                  /* Picks, axes, pole-weapons, bullwhips */
                  && ((otmp->oclass == WEAPON_CLASS
@@ -1546,6 +1548,7 @@ register const char *let, *word;
                          && otyp != CREAM_PIE && otyp != EUCALYPTUS_LEAF
                          && otyp != LUMP_OF_ROYAL_JELLY)
                      || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
+             || (!strcmp(word, "rub the royal jelly on") && otmp->otyp != EGG)
              || (!strcmp(word, "invoke")
                  && !otmp->oartifact
                  && !objects[otyp].oc_unique
