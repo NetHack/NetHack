@@ -29,6 +29,7 @@ static int FDECL(use_whip, (struct obj *));
 static void FDECL(display_polearm_positions, (int));
 static int FDECL(use_pole, (struct obj *));
 static int FDECL(use_cream_pie, (struct obj *));
+static int FDECL(use_royal_jelly, (struct obj *));
 static int FDECL(use_grapple, (struct obj *));
 static int FDECL(do_break_wand, (struct obj *));
 static int FDECL(flip_through_book, (struct obj *));
@@ -3131,6 +3132,49 @@ struct obj *obj;
 }
 
 static int
+use_royal_jelly(obj)
+struct obj *obj;
+{
+    static const char allowall[2] = { ALL_CLASSES, 0 };
+    struct obj *eobj = getobj(allowall, "rub the royal jelly on");
+
+    if (!eobj)
+        return 0;
+
+    if (obj->quan > 1L)
+        obj = splitobj(obj, 1L);
+
+    You("smear royal jelly all over %s.", yname(eobj));
+
+    if (eobj->otyp != EGG) {
+        useup(obj);
+        return 0;
+    }
+
+    if (eobj->corpsenm == PM_KILLER_BEE)
+        eobj->corpsenm = PM_QUEEN_BEE;
+
+    if (obj->cursed) {
+        useup(obj);
+        kill_egg(eobj);
+        return 0;
+    }
+
+    if (eobj->corpsenm != NON_PM) {
+        if (!eobj->timed)
+            attach_egg_hatch_timeout(eobj, 0L);
+
+        /* blessed royal jelly will make the hatched creature think
+           you're the parent - but has no effect if you laid the egg */
+        if (obj->blessed && !eobj->spe)
+            eobj->spe = 2;
+    }
+
+    useup(obj);
+    return 0;
+}
+
+static int
 use_grapple(obj)
 struct obj *obj;
 {
@@ -3544,7 +3588,8 @@ char class_list[];
                 && (!otmp->dknown
                     || (!knowtouchstone && !objects[otyp].oc_name_known))))
             addstones = TRUE;
-        if (otyp == CREAM_PIE || otyp == EUCALYPTUS_LEAF)
+        if (otyp == CREAM_PIE || otyp == EUCALYPTUS_LEAF
+            || otyp == LUMP_OF_ROYAL_JELLY)
             addfood = TRUE;
         if (otmp->oclass == SPBOOK_CLASS)
             addspellbooks = TRUE;
@@ -3608,6 +3653,9 @@ doapply()
         break;
     case CREAM_PIE:
         res = use_cream_pie(obj);
+        break;
+    case LUMP_OF_ROYAL_JELLY:
+        res = use_royal_jelly(obj);
         break;
     case BULLWHIP:
         res = use_whip(obj);

@@ -130,6 +130,7 @@ when 'color' if Off and 'use_inverse' is On, draw ice on the map in inverse
 	video if it uses the same character as room floor or as dark floor
 new 'mention_decor' option; when On, describe dungeon features being stepped
 	on or floated/flown over even when they're not covered by objects
+applying royal jelly on an egg kills, revives, or changes the egg
 
 
 Platform- and/or Interface-Specific New Features
