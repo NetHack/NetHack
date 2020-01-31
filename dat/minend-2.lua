@@ -78,8 +78,9 @@ des.non_diggable(selection.area(53,07,55,07))
 des.non_diggable(selection.area(53,14,61,14))
 -- The Gnome King's wine cellar.
 -- the Trespassers sign is a long-running joke
-des.engraving({12,03},"engrave","You are now entering the Gnome King's wine cellar.")
-des.engraving({12,04},"engrave","Trespassers will be persecuted!")
+des.engraving({12,03}, "engrave",
+	      "You are now entering the Gnome King's wine cellar.")
+des.engraving({12,04}, "engrave", "Trespassers will be persecuted!")
 des.object("booze", 10, 07)
 des.object("booze", 10, 07)
 des.object("!", 10, 07)
@@ -107,7 +108,8 @@ des.object("ruby", 70, 05)
 des.object("amethyst", 70, 05)
 des.object("*", 70, 05)
 des.object("amethyst", 70, 05)
-des.object("luckstone", 70, 05)
+des.object({ id="luckstone", x=70, y=05,
+	     buc="not-cursed", achievement=1 });
 -- Scattered gems...
 des.object("*")
 des.object("*")

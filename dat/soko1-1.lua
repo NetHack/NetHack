@@ -94,13 +94,16 @@ des.door("closed", 17, 11);
 des.door("closed", 17, 13);
 des.door("closed", 17, 15);
 
-des.region({ region={18,10, 22,16}, lit = 1, type = "zoo", prefilled = 0, irregular = 1 });
+des.region({ region={18,10, 22,16}, lit = 1, type = "zoo",
+	     prefilled = 0, irregular = 1 });
 
 px, py = selection.rndcoord(place);
-if math.random(0, 99) < 50 then
-   des.object("bag of holding", px, py);
+if math.random(0, 99) < 75 then
+   des.object({ id="bag of holding", x=px, y=py,
+		buc="not-cursed", achievement=1 });
 else
-   des.object("amulet of reflection", px, py);
+   des.object({ id="amulet of reflection", x=px, y=py,
+		buc="not-cursed", achievement=1 });
 end
 des.engraving({ x = px, y = py, type = "burn", text = "Elbereth" });
 des.object({ id = "scare monster", x = px, y = py, buc = "cursed" });

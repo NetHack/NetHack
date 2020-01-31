@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580431541 2020/01/31 00:45:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580434524 2020/01/31 01:35:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.150 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1581,25 +1581,10 @@ struct mkroom *croom;
         }
     }
 
-    if (o->id != -1) {
+    if (o->achievement) {
         static const char prize_warning[] = "multiple prizes on %s level";
 
-        /*
-         * If this is a specific item of the right type and it is being
-         * created on the right level, record its obj->o_id to be able
-         * to recognize it as the designated item
-         * used to detect a special achievement (to whit, reaching and
-         * exploring the target level, although the exploration part
-         * might be short-circuited if a monster brings object to hero).
-         * Achievement is accomplished and the recorded o_id is cleared
-         * if/when it gets added into hero's inventory.
-         *
-         * Random items of the appropriate type won't trigger a false
-         * match--they'll fail the (id != -1) test above--but the level
-         * definition should not include a second instance of any prize.
-         */
-        if (Is_mineend_level(&u.uz)
-            && otmp->otyp == g.context.achieveo.mines_prize_type) {
+        if (Is_mineend_level(&u.uz)) {
             if (!g.context.achieveo.mines_prize_oid) {
                 g.context.achieveo.mines_prize_oid = otmp->o_id;
                 /* prevent stacking; cleared when achievement is recorded */
@@ -1607,15 +1592,19 @@ struct mkroom *croom;
             } else {
                 impossible(prize_warning, "mines end");
             }
-        } else if (Is_sokoend_level(&u.uz)
-                   && (otmp->otyp == g.context.achieveo.soko_prize_typ1
-                       || otmp->otyp == g.context.achieveo.soko_prize_typ2)) {
+        } else if (Is_sokoend_level(&u.uz)) {
             if (!g.context.achieveo.soko_prize_oid) {
                 g.context.achieveo.soko_prize_oid = otmp->o_id;
                 otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
             } else {
                 impossible(prize_warning, "sokoban end");
             }
+        } else {
+            char lbuf[QBUFSZ];
+
+            (void) describe_level(lbuf); /* always has a trailing space */
+            impossible("create_object: unknown achievement (%s\"%s\")",
+                       lbuf, simpleonames(otmp));
         }
     }
 
@@ -2745,6 +2734,7 @@ lua_State *L;
         tmpobj.recharged = get_table_int_opt(L, "recharged", 0);
         tmpobj.greased = get_table_boolean_opt(L, "greased", 0);
         tmpobj.broken = get_table_boolean_opt(L, "broken", 0);
+        tmpobj.achievement = get_table_boolean_opt(L, "achievement", 0);
 
         ox = get_table_int_opt(L, "x", -1);
         oy = get_table_int_opt(L, "y", -1);

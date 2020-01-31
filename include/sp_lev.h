@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1544930819 2018/12/16 03:26:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1580434523 2020/01/31 01:35:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -142,7 +142,8 @@ typedef struct {
     int quan;
     short buried;
     short lit;
-    short eroded, locked, trapped, recharged, invis, greased, broken;
+    short eroded, locked, trapped, recharged, invis, greased, broken,
+          achievement;
 } object;
 
 typedef struct {
