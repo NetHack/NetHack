@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1580427882 2020/01/30 23:44:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1580506559 2020/01/31 21:35:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -959,42 +959,40 @@ lua_State *L;
     return 1;
 }
 
-/* read lua code/data from a dlb module or an external file, insert the file
-   name as new first record so that we aren't at the mercy of whoever edits
-   it to maintain that, and since we're forced to muck with messy details,
-   replace full-line comments with empty lines so that Lua won't need to */
+/* read lua code/data from a dlb module or an external file
+   into a string buffer and feed that to lua */
 boolean
 nhl_loadlua(L, fname)
 lua_State *L;
 const char *fname;
 {
 #define LOADCHUNKSIZE (1L << 13) /* 8K */
-    boolean ret = TRUE, is_comment;
+    boolean ret = TRUE;
     dlb *fh;
-    char *buf = (char *) 0, *bufin, *bufout, *p, *nl;
-    long buflen, ct, cnt, fnamesiz;
-    int llret, first = 0, spanlines = 0;
+    char *buf = (char *) 0, *bufin, *bufout, *p, *nl, *altfname;
+    long buflen, ct, cnt;
+    int llret;
 
+    altfname = (char *) alloc(strlen(fname) + 3); /* 3: '('...')\0' */
+    /* don't know whether 'fname' is inside a dlb container;
+       if we did, we could choose between "nhdat(<fname>)" and "<fname>"
+       but since we don't, compromise */
+    Sprintf(altfname, "(%s)", fname);
     fh = dlb_fopen(fname, "r");
     if (!fh) {
-        impossible("nhl_loadlua: Error loading %s", fname);
+        impossible("nhl_loadlua: Error loading %s", altfname);
         ret = FALSE;
         goto give_up;
     }
 
-    fnamesiz = strlen(fname) + 7L; /* 7: "--{" + "}--\n" (no '\0') */
     dlb_fseek(fh, 0L, SEEK_END);
     buflen = dlb_ftell(fh);
     dlb_fseek(fh, 0L, SEEK_SET);
 
     /* extra +1: room to add final '\n' if missing */
-    buf = bufout = (char *) alloc(fnamesiz + buflen + 1 + 1);
-    /* insert file name as first record so nhl_error() can report it;
-       leading dashes make it be a comment, trailing ones are for
-       symmetry; delimit file name with braces instead of spaces to
-       avoid an undesireable line split during error feedback */
-    Sprintf(bufout, "--{%s}--\n", fname);
-    bufin = bufout = eos(buf);
+    buf = bufout = (char *) alloc(buflen + 1 + 1);
+    buf[0] = '\0';
+    bufin = bufout = buf;
 
     ct = 0L;
     while (buflen > 0 || ct) {
@@ -1025,41 +1023,14 @@ const char *fname;
             if ((nl = index(bufin, '\n')) != 0) {
                 /* normal case, newline is present */
                 ct = (long) (nl - bufin + 1L); /* +1: keep the newline */
-                for (p = bufin; *p == ' '; ++p)
-                    continue;
-                is_comment = (p[0] == '-' && p[1] == '-' && !spanlines);
-                if (spanlines && index("])}", *p))
-                    --spanlines;
-                if (!first++ && (*p == '\n' || is_comment)) {
-                    /* if first line is blank or a comment, omit it so that
-                       our "--{fname}--\n" line doesn't make the line count
-                       be out of sync; note: when first line is code, line
-                       number reported in error messages will be off by one */
-                    bufin = nl + 1;
-                } else if (is_comment) {
-                    /* discard comment to shorten the string Lua will deal
-                       with but keep the line to maintain Lua line counter */
-#if 0
-                    Strcpy(bufout, "--\n"), bufout += 3;
-#else
-                    Strcpy(bufout, "\n"), bufout += 1;
-#endif
-                    bufin += ct;
-                } else {
-                    /* normal case; some text terminated by newline */
-                    for (p = bufin; p <= nl; ++p)
-                        *bufout++ = *bufin++;
-                    for (p = &bufout[-2]; *p == ' '; --p) /* [-1] is '\n' */
-                        continue;
-                    if (index("[({", *p))
-                        ++spanlines;
-                }
+                for (p = bufin; p <= nl; ++p)
+                    *bufout++ = *bufin++;
                 if (*bufin == '\r')
                     ++bufin, ++ct;
                 /* update for next loop iteration */
                 cnt -= ct;
                 ct = 0;
-            } else {
+            } else if (strlen(bufin) < LOADCHUNKSIZE) {
                 /* no newline => partial record; move unprocessed chars
                    to front of input buffer (bufin portion of buf[]) */
                 ct = cnt = (long) (eos(bufin) - bufin);
@@ -1068,35 +1039,20 @@ const char *fname;
                 *p = '\0';
                 bufin = p; /* next fread() populates buf[] starting here */
                 /* cnt==0 so inner loop will terminate */
+            } else {
+                /* LOADCHUNKSIZE portion of buffer already completely full */
+                impossible("(%s) line too long", altfname);
+                goto give_up;
             }
         }
     }
     *bufout = '\0';
     (void) dlb_fclose(fh);
 
-#ifdef DEBUG
-    if (explicitdebug("loadlua")) {
-        FILE *fp;
-        char oname[QBUFSZ];
-
-        (void) strsubst(strcpy(oname, fname), ".lua", ".txt");
-        if ((fp = fopen(oname, "w")) != 0) {
-            for (buflen = strlen(buf), p = buf;
-                 buflen > 0;
-                 buflen -= cnt, p += cnt) {
-                cnt = min(buflen, LOADCHUNKSIZE);
-                if ((long) fwrite(p, 1, cnt, fp) < cnt)
-                    break;
-            }
-            (void) fclose(fp);
-        }
-    }
-#endif
-
-    llret = luaL_loadstring(L, buf);
+    llret = luaL_loadbuffer(L, buf, strlen(buf), altfname);
     if (llret != LUA_OK) {
-        impossible("luaL_loadstring: Error loading %s (errcode %i)",
-                   fname, llret);
+        impossible("luaL_loadbuffer: Error loading %s (errcode %i)",
+                   altfname, llret);
         ret = FALSE;
         goto give_up;
     } else {
@@ -1110,10 +1066,10 @@ const char *fname;
     }
 
  give_up:
-    if (buf) {
+    if (altfname)
+        free((genericptr_t) altfname);
+    if (buf)
         free((genericptr_t) buf);
-        buflen = 0;
-    }
     return ret;
 }
 
