@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1580252122 2020/01/28 22:55:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1580600495 2020/02/01 23:41:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -168,9 +168,6 @@ typedef struct strbuf {
     char * str;
     char   buf[256];
 } strbuf_t;
-
-/* max. layers of object containment from sp_lev.h */
-#define MAX_CONTAINMENT 10
 
 /* str_or_len from sp_lev.h */
 typedef union str_or_len {

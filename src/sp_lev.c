@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580434524 2020/01/31 01:35:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580600499 2020/02/01 23:41:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.151 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -142,11 +142,31 @@ int FDECL(lspo_wallify, (lua_State *));
 #define XLIM 4
 #define YLIM 3
 
-#define New(type) (type *) alloc(sizeof(type))
-#define NewTab(type, size) (type **) alloc(sizeof(type *) * (unsigned) size)
-#define Free(ptr) if (ptr) free((genericptr_t) (ptr))
+#define New(type) (type *) alloc(sizeof (type))
+#define NewTab(type, size) (type **) alloc(sizeof (type *) * (unsigned) size)
+#define Free(ptr) \
+    do {                                        \
+        if (ptr)                                \
+            free((genericptr_t) (ptr));         \
+    } while (0)
 
 extern struct engr *head_engr;
+
+    /*
+     * No need for 'struct instance_globals g' to contain these.
+     * sp_level_coder_init() always re-initializes them prior to use.
+     */
+boolean splev_init_present,
+        icedpools;
+/* positions touched by level elements explicitly defined in the level */
+static char SpLev_Map[COLNO][ROWNO];
+#define MAX_CONTAINMENT 10
+static int container_idx = 0; /* next slot in container_obj[] to use */
+static struct obj *container_obj[MAX_CONTAINMENT];
+static struct monst *invent_carrying_monster = (struct monst *) 0;
+    /*
+     * end of no 'g.'
+     */
 
 static void
 solidify_map()
@@ -155,7 +175,7 @@ solidify_map()
 
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            if (IS_STWALL(levl[x][y].typ) && !g.SpLev_Map[x][y])
+            if (IS_STWALL(levl[x][y].typ) && !SpLev_Map[x][y])
                 levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
 }
 
@@ -267,7 +287,7 @@ remove_boundary_syms()
     if (has_bounds) {
         for (x = 0; x < g.x_maze_max; x++)
             for (y = 0; y < g.y_maze_max; y++)
-                if ((levl[x][y].typ == CROSSWALL) && g.SpLev_Map[x][y])
+                if ((levl[x][y].typ == CROSSWALL) && SpLev_Map[x][y])
                     levl[x][y].typ = ROOM;
     }
 }
@@ -1388,7 +1408,7 @@ struct mkroom *croom;
 
         if (m->has_invent) {
             discard_minvent(mtmp);
-            g.invent_carrying_monster = mtmp;
+            invent_carrying_monster = mtmp;
         }
     }
 }
@@ -1502,9 +1522,9 @@ struct mkroom *croom;
     }
 
     /* contents (of a container or monster's inventory) */
-    if (o->containment & SP_OBJ_CONTENT || g.invent_carrying_monster) {
-        if (!g.container_idx) {
-            if (!g.invent_carrying_monster) {
+    if (o->containment & SP_OBJ_CONTENT || invent_carrying_monster) {
+        if (!container_idx) {
+            if (!invent_carrying_monster) {
                 /*impossible("create_object: no container");*/
                 /* don't complain, the monster may be gone legally
                    (eg. unique demon already generated)
@@ -1516,10 +1536,10 @@ struct mkroom *croom;
                 ; /* ['otmp' remains on floor] */
             } else {
                 remove_object(otmp);
-                (void) mpickobj(g.invent_carrying_monster, otmp);
+                (void) mpickobj(invent_carrying_monster, otmp);
             }
         } else {
-            struct obj *cobj = g.container_obj[g.container_idx - 1];
+            struct obj *cobj = container_obj[container_idx - 1];
 
             remove_object(otmp);
             if (cobj) {
@@ -1535,9 +1555,9 @@ struct mkroom *croom;
     /* container */
     if (o->containment & SP_OBJ_CONTAINER) {
         delete_contents(otmp);
-        if (g.container_idx < MAX_CONTAINMENT) {
-            g.container_obj[g.container_idx] = otmp;
-            g.container_idx++;
+        if (container_idx < MAX_CONTAINMENT) {
+            container_obj[container_idx] = otmp;
+            container_idx++;
         } else
             impossible("create_object: too deeply nested containers.");
     }
@@ -1618,8 +1638,8 @@ struct mkroom *croom;
         boolean dealloced;
 
         (void) bury_an_obj(otmp, &dealloced);
-        if (dealloced && g.container_idx) {
-            g.container_obj[g.container_idx - 1] = NULL;
+        if (dealloced && container_idx) {
+            container_obj[container_idx - 1] = NULL;
         }
     }
 }
@@ -2162,7 +2182,7 @@ int humidity;
         y = rn1(g.y_maze_max - 3, 3);
         if (--tryct < 0)
             break; /* give up */
-    } while (!(x % 2) || !(y % 2) || g.SpLev_Map[x][y]
+    } while (!(x % 2) || !(y % 2) || SpLev_Map[x][y]
              || !is_ok_location((schar) x, (schar) y, humidity));
 
     m->x = (xchar) x, m->y = (xchar) y;
@@ -2187,7 +2207,7 @@ fill_empty_maze()
 
     for (x = 2; x < g.x_maze_max; x++)
         for (y = 0; y < g.y_maze_max; y++)
-            if (g.SpLev_Map[x][y])
+            if (SpLev_Map[x][y])
                 mapcount--;
 
     if ((mapcount > (int) (mapcountmax / 10))) {
@@ -2252,7 +2272,7 @@ lev_init *linit;
             linit->lit = rn2(2);
         if (linit->filling > -1)
             lvlfill_solid(linit->filling, 0);
-        linit->icedpools = g.icedpools;
+        linit->icedpools = icedpools;
         mkmap(linit);
         break;
     }
@@ -2272,18 +2292,18 @@ long curpos, jmpaddr;
 static void
 spo_end_moninvent()
 {
-    if (g.invent_carrying_monster)
-        m_dowear(g.invent_carrying_monster, TRUE);
-    g.invent_carrying_monster = NULL;
+    if (invent_carrying_monster)
+        m_dowear(invent_carrying_monster, TRUE);
+    invent_carrying_monster = NULL;
 }
 
 /*ARGUSED*/
 static void
 spo_pop_container()
 {
-    if (g.container_idx > 0) {
-        g.container_idx--;
-        g.container_obj[g.container_idx] = NULL;
+    if (container_idx > 0) {
+        container_idx--;
+        container_obj[container_idx] = NULL;
     }
 }
 
@@ -2798,7 +2818,7 @@ lua_State *L;
 
     quancnt = (tmpobj.id > STRANGE_OBJECT) ? tmpobj.quan : 0;
 
-    if (g.container_idx)
+    if (container_idx)
         tmpobj.containment |= SP_OBJ_CONTENT;
 
     if (maybe_contents) {
@@ -2860,7 +2880,7 @@ lua_State *L;
         else if (!strcmpi(s, "graveyard"))
             g.level.flags.graveyard = 1;
         else if (!strcmpi(s, "icedpools"))
-            g.icedpools = 1;
+            icedpools = 1;
         else if (!strcmpi(s, "corrmaze"))
             g.level.flags.corrmaze = 1;
         else if (!strcmpi(s, "premapped"))
@@ -2897,7 +2917,7 @@ lua_State *L;
 
     lcheck_param_table(L);
 
-    g.splev_init_present = TRUE;
+    splev_init_present = TRUE;
 
     init_lev.init_style
         = initstyles2i[get_table_option(L, "style", "solidfill", initstyles)];
@@ -3192,7 +3212,7 @@ lua_State *L;
     if ((badtrap = t_at(x, y)) != 0)
         deltrap(badtrap);
     mkstairs(x, y, (char) up, g.coder->croom);
-    g.SpLev_Map[x][y] = 1;
+    SpLev_Map[x][y] = 1;
 
     return 0;
 }
@@ -3251,7 +3271,7 @@ lua_State *L;
     if ((badtrap = t_at(x, y)) != 0)
         deltrap(badtrap);
     levl[x][y].typ = LADDER;
-    g.SpLev_Map[x][y] = 1;
+    SpLev_Map[x][y] = 1;
     if (up) {
         xupladder = x;
         yupladder = y;
@@ -4264,7 +4284,7 @@ genericptr_t arg;
     }
     set_door_orientation(x, y); /* set/clear levl[x][y].horizontal */
     levl[x][y].doormask = typ;
-    g.SpLev_Map[x][y] = 1;
+    SpLev_Map[x][y] = 1;
 }
 
 /* door({ x = 1, y = 1, state = "nodoor" }); */
@@ -5006,7 +5026,7 @@ lua_State *L;
         db_open = !rn2(2);
     if (!create_drawbridge(x, y, dir, db_open ? TRUE : FALSE))
         impossible("Cannot create drawbridge.");
-    g.SpLev_Map[x][y] = 1;
+    SpLev_Map[x][y] = 1;
 
     return 0;
 }
@@ -5336,8 +5356,8 @@ TODO: g.coder->croom needs to be updated
         maphei++;
     }
 
-    /* keepregion restricts the coordinates of the commands coming after the map
-       into the map region */
+    /* keepregion restricts the coordinates of the commands coming after
+       the map into the map region */
     /* for keepregion */
     tmpxsize = g.xsize;
     tmpysize = g.ysize;
@@ -5375,7 +5395,7 @@ TODO: g.coder->croom needs to be updated
         /* place map starting at halign,valign */
         switch (lr) {
         case LEFT:
-            g.xstart = g.splev_init_present ? 1 : 3;
+            g.xstart = splev_init_present ? 1 : 3;
             break;
         case H_LEFT:
             g.xstart = 2 + ((g.x_maze_max - 2 - g.xsize) / 4);
@@ -5443,7 +5463,7 @@ TODO: g.coder->croom needs to be updated
                 levl[x][y].horizontal = 0;
                 levl[x][y].roomno = 0;
                 levl[x][y].edge = 0;
-                g.SpLev_Map[x][y] = 1;
+                SpLev_Map[x][y] = 1;
                 /*
                  *  Set secret doors to closed (why not trapped too?).  Set
                  *  the horizontal bit.
@@ -5464,8 +5484,8 @@ TODO: g.coder->croom needs to be updated
                     levl[x][y].horizontal = 1;
                 else if (levl[x][y].typ == LAVAPOOL)
                     levl[x][y].lit = 1;
-                else if (g.splev_init_present && levl[x][y].typ == ICE)
-                    levl[x][y].icedpool = g.icedpools ? ICED_POOL : ICED_MOAT;
+                else if (splev_init_present && levl[x][y].typ == ICE)
+                    levl[x][y].icedpool = icedpools ? ICED_POOL : ICED_MOAT;
             }
         if (g.coder->lvl_is_joined)
             remove_rooms(g.xstart, g.ystart,
@@ -5510,8 +5530,8 @@ sp_level_coder_init()
     coder->lvl_is_joined = 0;
     coder->room_stack = 0;
 
-    g.splev_init_present = FALSE;
-    g.icedpools = FALSE;
+    splev_init_present = FALSE;
+    icedpools = FALSE;
 
     for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi++) {
         coder->tmproomlist[tmpi] = (struct mkroom *) 0;
@@ -5521,19 +5541,19 @@ sp_level_coder_init()
     update_croom();
 
     for (tmpi = 0; tmpi < MAX_CONTAINMENT; tmpi++)
-        g.container_obj[tmpi] = NULL;
-    g.container_idx = 0;
+        container_obj[tmpi] = NULL;
+    container_idx = 0;
 
-    g.invent_carrying_monster = NULL;
+    invent_carrying_monster = NULL;
 
-    (void) memset((genericptr_t) &g.SpLev_Map[0][0], 0, sizeof g.SpLev_Map);
+    (void) memset((genericptr_t) SpLev_Map, 0, sizeof SpLev_Map);
 
     g.level.flags.is_maze_lev = 0;
 
-    g.xstart = 1;
+    g.xstart = 1; /* column [0] is off limits */
     g.ystart = 0;
-    g.xsize = COLNO - 1;
-    g.ysize = ROWNO;
+    g.xsize = COLNO - 1; /* 1..COLNO-1 */
+    g.ysize = ROWNO; /* 0..ROWNO-1 */
 
     return coder;
 }
