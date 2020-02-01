@@ -3412,11 +3412,6 @@ boolean tinitial, tfrom_file;
         return retval;
     }
 #endif /* NO_TERMS */
-        } else if ((opts = string_for_env_opt(fullname, opts, FALSE))
-                                              == empty_optstr) {
-            return FALSE;
-        }
-    }
 #endif /* MSDOS */
 
     /* WINCAP
