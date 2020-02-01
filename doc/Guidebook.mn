@@ -3987,14 +3987,19 @@ if needed.
 Cannot be set with the \(oqO\(cq command.
 .lp video
 Set the video mode used (PC NetHack only).
-Values are \(lqautodetect\(rq, \(lqdefault\(rq, or \(lqvga\(rq.
-Setting \(lqvga\(rq (or \(lqautodetect\(rq with vga hardware present)
-will cause the game to display tiles.
+Values are \(lqautodetect\(rq, \(lqdefault\(rq, \(lqvga\(rq, or \(lqvesa\(rq.
+Setting \(lqvesa\(rq will cause the game to display tiles, using the full
+capability of the VGA hardware.
+Setting \(lqvga\(rq will cause the game to display tiles, fixed at 640x480
+in 16 colors, a mode that is compatible with all VGA hardware. Third party
+tilesets will probably not work.
+Setting \(lqautodetect\(rq attempts \(lqvesa\(rq, then \(lqvga\(rq, and
+finally sets \(lqdefault\(rq if neither of those modes works.
 Cannot be set with the \(oqO\(cq command.
 .lp video_height
-Set the VGA mode resolution height (MS-DOS only, with video:vga)
+Set the VGA mode resolution height (MS-DOS only, with video:vesa)
 .lp video_width
-Set the VGA mode resolution width (MS-DOS only, with video:vga)
+Set the VGA mode resolution width (MS-DOS only, with video:vesa)
 .lp videocolors
 Set the color palette for PC systems using NO_TERMS
 (default 4-2-6-1-5-3-15-12-10-14-9-13-11, (PC NetHack only).
