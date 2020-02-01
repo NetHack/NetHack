@@ -439,7 +439,7 @@ $(U)tilemap: $(HOST_O)tilemap.o
 	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tilemap.o
 
 $(HOST_O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H) $(TILE_H)
-	$(HOST_CC) $(cflags) -I$(WSHR) -I$(MSYS) -o$@ $(WSHR)/tilemap.c
+	$(HOST_CC) $(cflags) -I$(WSHR) -I$(MSYS) -DSTATUES_LOOK_LIKE_MONSTERS -o$@ $(WSHR)/tilemap.c
 
 
 #==========================================
