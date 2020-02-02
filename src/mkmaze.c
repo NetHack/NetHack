@@ -565,10 +565,6 @@ fixup_special()
                 set_corpsenm(otmp, rndmonnum());
             }
         }
-    } else if (Is_wiz1_level(&u.uz)) {
-        croom = search_special(MORGUE);
-
-        create_secret_door(croom, W_SOUTH | W_EAST | W_WEST);
     } else if (Is_knox(&u.uz)) {
         /* using an unfilled morgue for rm id */
         croom = search_special(MORGUE);
@@ -587,10 +583,6 @@ fixup_special()
         g.level.flags.graveyard = 1;
     } else if (Is_stronghold(&u.uz)) {
         g.level.flags.graveyard = 1;
-    } else if (Is_sanctum(&u.uz)) {
-        croom = search_special(TEMPLE);
-
-        create_secret_door(croom, W_ANY);
     } else if (on_level(&u.uz, &orcus_level)) {
         struct monst *mtmp, *mtmp2;
 

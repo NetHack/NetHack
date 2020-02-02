@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1580254093 2020/01/28 23:28:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.221 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1580608377 2020/02/02 01:52:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1781,10 +1781,11 @@ void
 deferred_goto()
 {
     if (!on_level(&u.uz, &u.utolev)) {
-        d_level dest;
+        d_level dest, oldlev;
         int typmask = u.utotype; /* save it; goto_level zeroes u.utotype */
 
         assign_level(&dest, &u.utolev);
+        assign_level(&oldlev, &u.uz);
         if (g.dfr_pre_msg)
             pline1(g.dfr_pre_msg);
         goto_level(&dest, !!(typmask & 1), !!(typmask & 2), !!(typmask & 4));
@@ -1796,7 +1797,7 @@ deferred_goto()
                 newsym(u.ux, u.uy);
             }
         }
-        if (g.dfr_post_msg)
+        if (g.dfr_post_msg && !on_level(&u.uz, &oldlev))
             pline1(g.dfr_post_msg);
     }
     u.utotype = 0; /* our caller keys off of this */

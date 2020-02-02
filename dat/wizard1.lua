@@ -28,9 +28,10 @@ des.levregion({ type="stair-up", region={01,00,79,20}, region_islev=1, exclude={
 des.levregion({ type="stair-down", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
 des.levregion({ type="branch", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
 des.teleport_region({ region={01,00,79,20}, region_islev=1, exclude={0,0,27,12} })
--- Make it a morgue for rm id in mkmaze.c
--- for the purpose of random sdoor placement
-des.region({ region={12,01, 20,09}, lit=0, type="morgue", prefilled=1 })
+des.region({ region={12,01, 20,09}, lit=0, type="morgue", prefilled=1, contents=function()
+                local sdwall = { "south", "west", "east" };
+                des.door({ wall = sdwall[math.random(1, #sdwall)], state = "secret" });
+end })
 -- another region to constrain monster arrival
 des.region({ region={01,01, 10,11}, lit=0, type="ordinary", prefilled=0 })
 des.mazewalk(28,05,"east")

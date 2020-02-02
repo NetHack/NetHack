@@ -445,7 +445,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
 	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
-	   files.c fountain.c hack.c hacklib.c invent.c isaac64.c light.c \
+	   files.c fountain.c hack.c hacklib.c \
+	   insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mapglyph.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
@@ -512,7 +513,8 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
 	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
-	extralev.o files.o fountain.o hack.o hacklib.o invent.o isaac64.o \
+	extralev.o files.o fountain.o hack.o hacklib.o \
+	insight.o invent.o isaac64.o \
 	light.o lock.o mail.o makemon.o mapglyph.o mcastu.o mdlib.o mhitm.o \
 	mhitu.o minion.o mklev.o mkmap.o mkmaze.o mkobj.o mkroom.o mon.o \
 	mondata.o monmove.o mplayer.o mthrowu.o muse.o music.o \
@@ -1073,6 +1075,7 @@ files.o: files.c $(HACK_H) ../include/dlb.h #zlib.h
 fountain.o: fountain.c $(HACK_H)
 hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
+insight.o: insight.c $(HACK_H)
 invent.o: invent.c $(HACK_H)
 isaac64.o: isaac64.c $(CONFIG_H) ../include/isaac64.h
 light.o: light.c $(HACK_H)

@@ -1614,6 +1614,7 @@ struct monst *mtmp;
 #define MUSE_WAN_SPEED_MONSTER 7
 #define MUSE_BULLWHIP 8
 #define MUSE_POT_POLYMORPH 9
+#define MUSE_BAG 10
 
 boolean
 find_misc(mtmp)
@@ -1737,6 +1738,13 @@ struct monst *mtmp;
             && mons[monsndx(mdat)].difficulty < 6) {
             g.m.misc = obj;
             g.m.has_misc = MUSE_POT_POLYMORPH;
+        }
+        nomore(MUSE_BAG);
+        if (Is_container(obj) && obj->otyp != BAG_OF_TRICKS && !rn2(5)
+            && !g.m.has_misc && Has_contents(obj)
+            && !obj->olocked && !obj->otrapped) {
+            g.m.misc = obj;
+            g.m.has_misc = MUSE_BAG;
         }
     }
     return (boolean) !!g.m.has_misc;
@@ -1875,6 +1883,29 @@ struct monst *mtmp;
             makeknown(POT_POLYMORPH);
         m_useup(mtmp, otmp);
         return 2;
+    case MUSE_BAG:
+        {
+            struct obj *xobj;
+            long count = 1;
+
+            /* FIXME: handle cursed bag of holding */
+            if (Is_mbag(otmp) && otmp->cursed)
+                return 0;
+            if (!Has_contents(otmp) || otmp->olocked)
+                return 0;
+
+            for (xobj = otmp->cobj; xobj; xobj = xobj->nobj) count++;
+            count = rn2(count);
+            for (xobj = otmp->cobj; xobj && count; xobj = xobj->nobj) count--;
+            if (xobj && can_carry(mtmp, xobj)) {
+                if (vismon)
+                    pline("%s rummages through something.", Monnam(mtmp));
+                obj_extract_self(xobj);
+                (void) mpickobj(mtmp, xobj);
+                return 2;
+            }
+        }
+        return 0;
     case MUSE_POLY_TRAP:
         if (vismon) {
             const char *Mnam = Monnam(mtmp);
@@ -2087,6 +2118,8 @@ struct obj *obj;
             return (boolean) (!obj->cursed && !is_unicorn(mon->data));
         if (typ == FROST_HORN || typ == FIRE_HORN)
             return (obj->spe > 0 && can_blow(mon));
+        if (Is_container(obj) && !(Is_mbag(obj) && obj->cursed))
+            return TRUE;
         break;
     case FOOD_CLASS:
         if (typ == CORPSE)

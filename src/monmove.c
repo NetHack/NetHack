@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1579616424 2020/01/21 14:20:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1580633722 2020/02/02 08:55:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -631,22 +631,23 @@ register struct monst *mtmp;
         /* arbitrary distance restriction to keep monster far away
            from you from having cast dozens of sticks-to-snakes
            or similar spells by the time you reach it */
-        if (dist2(mtmp->mx, mtmp->my, u.ux, u.uy) <= 49
-            && !mtmp->mspec_used) {
+        if (!mtmp->mspec_used
+            && dist2(mtmp->mx, mtmp->my, u.ux, u.uy) <= 49) {
             struct attack *a;
 
             for (a = &mdat->mattk[0]; a < &mdat->mattk[NATTK]; a++) {
                 if (a->aatyp == AT_MAGC
                     && (a->adtyp == AD_SPEL || a->adtyp == AD_CLRC)) {
                     if (castmu(mtmp, a, FALSE, FALSE)) {
-                        tmp = 3;
+                        tmp = 3; /* bypass m_move() */
                         break;
                     }
                 }
             }
         }
 
-        tmp = m_move(mtmp, 0);
+        if (!tmp)
+            tmp = m_move(mtmp, 0);
         if (tmp != 2)
             distfleeck(mtmp, &inrange, &nearby, &scared); /* recalc */
 
@@ -690,14 +691,18 @@ register struct monst *mtmp;
     /*  Now, attack the player if possible - one attack set per monst
      */
 
-    if (!mtmp->mpeaceful || (Conflict && !resist(mtmp, RING_CLASS, 0, 0))) {
-        if (inrange && !noattacks(mdat)
-            && (Upolyd ? u.mh : u.uhp) > 0 && !scared && tmp != 3)
+    if (tmp != 3 && (!mtmp->mpeaceful
+                     || (Conflict && !resist(mtmp, RING_CLASS, 0, 0)))) {
+        if (inrange && !scared && !noattacks(mdat)
+            /* [is this hp check really needed?] */
+            && (Upolyd ? u.mh : u.uhp) > 0) {
             if (mattacku(mtmp))
                 return 1; /* monster died (e.g. exploded) */
-
-        if (mtmp->wormno)
-            wormhitu(mtmp);
+        }
+        if (mtmp->wormno) {
+            if (wormhitu(mtmp))
+                return 1; /* worm died (poly'd hero passive counter-attack) */
+        }
     }
     /* special speeches for quest monsters */
     if (!mtmp->msleeping && mtmp->mcanmove && nearby)
@@ -707,6 +712,7 @@ register struct monst *mtmp;
         && couldsee(mtmp->mx, mtmp->my) && !mtmp->minvis && !rn2(5))
         cuss(mtmp);
 
+    /* note: can't get here when tmp==2 so this always returns 0 */
     return (tmp == 2);
 }
 
