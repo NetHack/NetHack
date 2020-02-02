@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580607226 2020/02/02 01:33:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580610435 2020/02/02 02:27:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -150,14 +150,11 @@ int FDECL(lspo_wallify, (lua_State *));
             free((genericptr_t) (ptr));         \
     } while (0)
 
-extern struct engr *head_engr;
-
     /*
      * No need for 'struct instance_globals g' to contain these.
      * sp_level_coder_init() always re-initializes them prior to use.
      */
-boolean splev_init_present,
-        icedpools;
+static boolean splev_init_present, icedpools;
 /* positions touched by level elements explicitly defined in the level */
 static char SpLev_Map[COLNO][ROWNO];
 #define MAX_CONTAINMENT 10
