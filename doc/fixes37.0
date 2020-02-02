@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ $NHDT-Date: 1580504296 2020/01/31 20:58:16 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ $NHDT-Date: 1580608377 2020/02/02 01:52:57 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -82,6 +82,9 @@ level teleporation's "You materialize on a different level!" could be given
 	out of sequence with other arrival messages
 creating Mine Town variant 1 (Orcish Town) sometimes complained about being
 	unable to place lregion type 1 and failed to have any staircase up
+prevent "you materialize on a different level" after "a mysterious force
+	prevents you from descending" if you try to level teleport past the
+	stairs down from the quest home level before being granted access
 
 
 Platform- and/or Interface-Specific Fixes
