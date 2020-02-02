@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ $NHDT-Date: 1580608377 2020/02/02 01:52:57 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ $NHDT-Date: 1580633720 2020/02/02 08:55:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -50,6 +50,7 @@ revamp achievement tracking for exploring Mine's End and Sokoban (by acquiring
 throttle long worm growth rate and HP accumulation
 poly'd hero was able to zap wands, apply tools, and #rub objects without
 	having any hands
+spellcasting monster got an extra move after casting
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
