@@ -2125,7 +2125,8 @@ roguename()
 
 static NEARDATA const char *const hcolors[] = {
     "ultraviolet", "infrared", "bluish-orange", "reddish-green", "dark white",
-    "light black", "sky blue-pink", "salty", "sweet", "sour", "bitter",
+    "light black", "sky blue-pink",
+    "salty", "sweet", "sour", "bitter", "umami", /* basic tastes */
     "striped", "spiral", "swirly", "plaid", "checkered", "argyle", "paisley",
     "blotchy", "guernsey-spotted", "polka-dotted", "square", "round",
     "triangular", "cabernet", "sangria", "fuchsia", "wisteria", "lemon-lime",
