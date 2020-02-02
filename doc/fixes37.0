@@ -89,6 +89,8 @@ prevent "you materialize on a different level" after "a mysterious force
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+msdos:  Add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
+	can display statue glyphs. 
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
 
