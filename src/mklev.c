@@ -685,8 +685,8 @@ makelevel()
         } else if (g.dungeons[u.uz.dnum].proto[0]) {
             makemaz("");
             return;
-        } else if (In_mines(&u.uz)) {
-            makemaz("minefill");
+        } else if (g.dungeons[u.uz.dnum].fill_lvl[0]) {
+            makemaz(g.dungeons[u.uz.dnum].fill_lvl);
             return;
         } else if (In_quest(&u.uz)) {
             char fillname[9];

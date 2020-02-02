@@ -1,4 +1,4 @@
-/* NetHack 3.6	context.h	$NHDT-Date: 1577050216 2019/12/22 21:30:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.6	context.h	$NHDT-Date: 1580434522 2020/01/31 01:35:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -107,7 +107,7 @@ struct novel_tracking { /* for choosing random passage when reading novel */
 
 struct achievement_tracking {
     unsigned mines_prize_oid, soko_prize_oid; /* obj->o_id */
-    short mines_prize_type, soko_prize_typ1, soko_prize_typ2; /* obj->otyp */
+    /* short mines_prize_type, soko_prize_typ1, soko_prize_typ2; */
 };
 
 struct context_info {

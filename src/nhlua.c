@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1579901146 2020/01/24 21:25:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.29 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1580506559 2020/01/31 21:35:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -254,7 +254,8 @@ lua_State *L;
                 nhl_add_table_entry_int(L, "tx", ttmp->tx);
                 nhl_add_table_entry_int(L, "ty", ttmp->ty);
                 nhl_add_table_entry_int(L, "ttyp", ttmp->ttyp);
-                nhl_add_table_entry_str(L, "ttyp_name", get_trapname_bytype(ttmp->ttyp));
+                nhl_add_table_entry_str(L, "ttyp_name",
+                                        get_trapname_bytype(ttmp->ttyp));
                 nhl_add_table_entry_int(L, "tseen", ttmp->tseen);
                 nhl_add_table_entry_int(L, "madeby_u", ttmp->madeby_u);
                 switch (ttmp->ttyp) {
@@ -321,7 +322,8 @@ lua_State *L;
             /* FIXME: some should be boolean values */
             nhl_add_table_entry_int(L, "glyph", levl[x][y].glyph);
             nhl_add_table_entry_int(L, "typ", levl[x][y].typ);
-            nhl_add_table_entry_str(L, "typ_name", levltyp_to_name(levl[x][y].typ));
+            nhl_add_table_entry_str(L, "typ_name",
+                                    levltyp_to_name(levl[x][y].typ));
             Sprintf(buf, "%c", splev_typ2chr(levl[x][y].typ));
             nhl_add_table_entry_str(L, "mapchr", buf);
             nhl_add_table_entry_int(L, "seenv", levl[x][y].seenv);
@@ -340,27 +342,42 @@ lua_State *L;
             lua_newtable(L);
 
             if (IS_DOOR(levl[x][y].typ)) {
-                nhl_add_table_entry_bool(L, "nodoor", (levl[x][y].flags & D_NODOOR));
-                nhl_add_table_entry_bool(L, "broken", (levl[x][y].flags & D_BROKEN));
-                nhl_add_table_entry_bool(L, "isopen", (levl[x][y].flags & D_ISOPEN));
-                nhl_add_table_entry_bool(L, "closed", (levl[x][y].flags & D_CLOSED));
-                nhl_add_table_entry_bool(L, "locked", (levl[x][y].flags & D_LOCKED));
-                nhl_add_table_entry_bool(L, "trapped", (levl[x][y].flags & D_TRAPPED));
+                nhl_add_table_entry_bool(L, "nodoor",
+                                         (levl[x][y].flags & D_NODOOR));
+                nhl_add_table_entry_bool(L, "broken",
+                                         (levl[x][y].flags & D_BROKEN));
+                nhl_add_table_entry_bool(L, "isopen",
+                                         (levl[x][y].flags & D_ISOPEN));
+                nhl_add_table_entry_bool(L, "closed",
+                                         (levl[x][y].flags & D_CLOSED));
+                nhl_add_table_entry_bool(L, "locked",
+                                         (levl[x][y].flags & D_LOCKED));
+                nhl_add_table_entry_bool(L, "trapped",
+                                         (levl[x][y].flags & D_TRAPPED));
             } else if (IS_ALTAR(levl[x][y].typ)) {
                 /* TODO: bits 0, 1, 2 */
-                nhl_add_table_entry_bool(L, "shrine", (levl[x][y].flags & AM_SHRINE));
+                nhl_add_table_entry_bool(L, "shrine",
+                                         (levl[x][y].flags & AM_SHRINE));
             } else if (IS_THRONE(levl[x][y].typ)) {
-                nhl_add_table_entry_bool(L, "looted", (levl[x][y].flags & T_LOOTED));
+                nhl_add_table_entry_bool(L, "looted",
+                                         (levl[x][y].flags & T_LOOTED));
             } else if (levl[x][y].typ == TREE) {
-                nhl_add_table_entry_bool(L, "looted", (levl[x][y].flags & TREE_LOOTED));
-                nhl_add_table_entry_bool(L, "swarm", (levl[x][y].flags & TREE_SWARM));
+                nhl_add_table_entry_bool(L, "looted",
+                                         (levl[x][y].flags & TREE_LOOTED));
+                nhl_add_table_entry_bool(L, "swarm",
+                                         (levl[x][y].flags & TREE_SWARM));
             } else if (IS_FOUNTAIN(levl[x][y].typ)) {
-                nhl_add_table_entry_bool(L, "looted", (levl[x][y].flags & F_LOOTED));
-                nhl_add_table_entry_bool(L, "warned", (levl[x][y].flags & F_WARNED));
+                nhl_add_table_entry_bool(L, "looted",
+                                         (levl[x][y].flags & F_LOOTED));
+                nhl_add_table_entry_bool(L, "warned",
+                                         (levl[x][y].flags & F_WARNED));
             } else if (IS_SINK(levl[x][y].typ)) {
-                nhl_add_table_entry_bool(L, "pudding", (levl[x][y].flags & S_LPUDDING));
-                nhl_add_table_entry_bool(L, "dishwasher", (levl[x][y].flags & S_LDWASHER));
-                nhl_add_table_entry_bool(L, "ring", (levl[x][y].flags & S_LRING));
+                nhl_add_table_entry_bool(L, "pudding",
+                                         (levl[x][y].flags & S_LPUDDING));
+                nhl_add_table_entry_bool(L, "dishwasher",
+                                         (levl[x][y].flags & S_LDWASHER));
+                nhl_add_table_entry_bool(L, "ring",
+                                         (levl[x][y].flags & S_LRING));
             }
             /* TODO: drawbridges, walls, ladders, room=>ICED_xxx */
 
@@ -441,10 +458,10 @@ static int
 nhl_menu(L)
 lua_State *L;
 {
+    static const char *const pickX[] = {"none", "one", "any"}; /* PICK_x */
     int argc = lua_gettop(L);
     const char *prompt;
     const char *defval = "";
-    const char *const pickX[] = {"none", "one", "any"}; /* PICK_NONE, PICK_ONE, PICK_ANY */
     int pick = PICK_ONE, pick_cnt;
     winid tmpwin;
     anything any;
@@ -506,7 +523,8 @@ lua_State *L;
         char buf[2];
         buf[0] = picks[0].item.a_char;
 
-        if (pick == PICK_ONE && pick_cnt > 1 && *defval && defval[0] == picks[0].item.a_char)
+        if (pick == PICK_ONE && pick_cnt > 1
+            && *defval && defval[0] == picks[0].item.a_char)
             buf[0] = picks[1].item.a_char;
 
         buf[1] = '\0';
@@ -666,15 +684,16 @@ get_table_boolean(L, name)
 lua_State *L;
 const char *name;
 {
+    static const char *const boolstr[] = {
+        "true", "false", "yes", "no", NULL
+    };
+    /* static const int boolstr2i[] = { TRUE, FALSE, TRUE, FALSE, -1 }; */
     int ltyp;
     int ret = -1;
 
     lua_getfield(L, -1, name);
     ltyp = lua_type(L, -1);
     if (ltyp == LUA_TSTRING) {
-        const char *const boolstr[] = { "true", "false", "yes", "no", NULL };
-        /* const int boolstr2i[] = { TRUE, FALSE, TRUE, FALSE, -1 }; */
-
         ret = luaL_checkoption(L, -1, NULL, boolstr);
         /* nhUse(boolstr2i[0]); */
     } else if (ltyp == LUA_TBOOLEAN) {
@@ -805,10 +824,17 @@ int anytype;
 void *src;
 {
     anything any = cg.zeroany;
+
     switch (anytype) {
-    case ANY_INT: any.a_int = *(int *)src; lua_pushinteger(L, any.a_int); break;
-    case ANY_UCHAR: any.a_uchar = *(uchar *)src; lua_pushinteger(L, any.a_uchar); break;
-    case ANY_SCHAR: any.a_schar = *(schar *)src; lua_pushinteger(L, any.a_schar); break;
+    case ANY_INT: any.a_int = *(int *) src;
+        lua_pushinteger(L, any.a_int);
+        break;
+    case ANY_UCHAR: any.a_uchar = *(uchar *) src;
+        lua_pushinteger(L, any.a_uchar);
+        break;
+    case ANY_SCHAR: any.a_schar = *(schar *) src;
+        lua_pushinteger(L, any.a_schar);
+        break;
     }
     return 1;
 }
@@ -817,8 +843,7 @@ static int
 nhl_meta_u_index(L)
 lua_State *L;
 {
-    const char *tkey = luaL_checkstring(L, 2);
-    const struct {
+    static const struct {
         const char *name;
         void *ptr;
         int type;
@@ -848,6 +873,7 @@ lua_State *L;
         { "uen", &(u.uen), ANY_INT },
         { "uenmax", &(u.uenmax), ANY_INT },
     };
+    const char *tkey = luaL_checkstring(L, 2);
     int i;
 
     /* FIXME: doesn't really work, eg. negative values for u.dx */
@@ -933,42 +959,40 @@ lua_State *L;
     return 1;
 }
 
-/* read lua code/data from a dlb module or an external file, insert the
-   file name as new first record so that we aren't at the mercy of whoever
-   edits it to maintain that, and since we're forced to muck with messy
-   details, replace comments with empty lines so that Lua won't need to */
+/* read lua code/data from a dlb module or an external file
+   into a string buffer and feed that to lua */
 boolean
 nhl_loadlua(L, fname)
 lua_State *L;
 const char *fname;
 {
 #define LOADCHUNKSIZE (1L << 13) /* 8K */
-    boolean ret = TRUE, is_comment;
+    boolean ret = TRUE;
     dlb *fh;
-    char *buf = (char *) 0, *bufin, *bufout, *p, *nl;
-    long buflen, ct, cnt, fnamesiz;
-    int llret, first = 0, spanlines = 0;
+    char *buf = (char *) 0, *bufin, *bufout, *p, *nl, *altfname;
+    long buflen, ct, cnt;
+    int llret;
 
+    altfname = (char *) alloc(strlen(fname) + 3); /* 3: '('...')\0' */
+    /* don't know whether 'fname' is inside a dlb container;
+       if we did, we could choose between "nhdat(<fname>)" and "<fname>"
+       but since we don't, compromise */
+    Sprintf(altfname, "(%s)", fname);
     fh = dlb_fopen(fname, "r");
     if (!fh) {
-        impossible("nhl_loadlua: Error loading %s", fname);
+        impossible("nhl_loadlua: Error loading %s", altfname);
         ret = FALSE;
         goto give_up;
     }
 
-    fnamesiz = strlen(fname) + 7L; /* 7: "--{" + "}--\n" (no '\0') */
     dlb_fseek(fh, 0L, SEEK_END);
     buflen = dlb_ftell(fh);
     dlb_fseek(fh, 0L, SEEK_SET);
 
     /* extra +1: room to add final '\n' if missing */
-    buf = bufout = (char *) alloc(fnamesiz + buflen + 1 + 1);
-    /* insert file name as first record so nhl_error() can report it;
-       leading dashes make it be a comment, trailing ones are for
-       symmetry; delimit file name with braces instead of spaces to
-       avoid an undesireable line split during error feedback */
-    Sprintf(bufout, "--{%s}--\n", fname);
-    bufin = bufout = eos(buf);
+    buf = bufout = (char *) alloc(buflen + 1 + 1);
+    buf[0] = '\0';
+    bufin = bufout = buf;
 
     ct = 0L;
     while (buflen > 0 || ct) {
@@ -999,41 +1023,14 @@ const char *fname;
             if ((nl = index(bufin, '\n')) != 0) {
                 /* normal case, newline is present */
                 ct = (long) (nl - bufin + 1L); /* +1: keep the newline */
-                for (p = bufin; *p == ' '; ++p)
-                    continue;
-                is_comment = (p[0] == '-' && p[1] == '-' && !spanlines);
-                if (spanlines && index("])}", *p))
-                    --spanlines;
-                if (!first++ && (*p == '\n' || is_comment)) {
-                    /* if first line is blank or a comment, omit it so that
-                       our "--{fname}--\n" line doesn't make the line count
-                       be out of sync; note: when first line is code, line
-                       number reported in error messages will be off by one */
-                    bufin = nl + 1;
-                } else if (is_comment) {
-                    /* discard comment to shorten the string Lua will deal
-                       with but keep the line to maintain Lua line counter */
-#if 0
-                    Strcpy(bufout, "--\n"), bufout += 3;
-#else
-                    Strcpy(bufout, "\n"), bufout += 1;
-#endif
-                    bufin += ct;
-                } else {
-                    /* normal case; some text terminated by newline */
-                    for (p = bufin; p <= nl; ++p)
-                        *bufout++ = *bufin++;
-                    for (p = &bufout[-2]; *p == ' '; --p) /* [-1] is '\n' */
-                        continue;
-                    if (index("[({", *p))
-                        ++spanlines;
-                }
+                for (p = bufin; p <= nl; ++p)
+                    *bufout++ = *bufin++;
                 if (*bufin == '\r')
                     ++bufin, ++ct;
                 /* update for next loop iteration */
                 cnt -= ct;
                 ct = 0;
-            } else {
+            } else if (strlen(bufin) < LOADCHUNKSIZE) {
                 /* no newline => partial record; move unprocessed chars
                    to front of input buffer (bufin portion of buf[]) */
                 ct = cnt = (long) (eos(bufin) - bufin);
@@ -1042,35 +1039,20 @@ const char *fname;
                 *p = '\0';
                 bufin = p; /* next fread() populates buf[] starting here */
                 /* cnt==0 so inner loop will terminate */
+            } else {
+                /* LOADCHUNKSIZE portion of buffer already completely full */
+                impossible("(%s) line too long", altfname);
+                goto give_up;
             }
         }
     }
     *bufout = '\0';
     (void) dlb_fclose(fh);
 
-#ifdef DEBUG
-    if (explicitdebug("loadlua")) {
-        FILE *fp;
-        char oname[QBUFSZ];
-
-        (void) strsubst(strcpy(oname, fname), ".lua", ".txt");
-        if ((fp = fopen(oname, "w")) != 0) {
-            for (buflen = strlen(buf), p = buf;
-                 buflen > 0;
-                 buflen -= cnt, p += cnt) {
-                cnt = min(buflen, LOADCHUNKSIZE);
-                if ((long) fwrite(p, 1, cnt, fp) < cnt)
-                    break;
-            }
-            (void) fclose(fp);
-        }
-    }
-#endif
-
-    llret = luaL_loadstring(L, buf);
+    llret = luaL_loadbuffer(L, buf, strlen(buf), altfname);
     if (llret != LUA_OK) {
-        impossible("luaL_loadstring: Error loading %s (errcode %i)",
-                   fname, llret);
+        impossible("luaL_loadbuffer: Error loading %s (errcode %i)",
+                   altfname, llret);
         ret = FALSE;
         goto give_up;
     } else {
@@ -1084,10 +1066,10 @@ const char *fname;
     }
 
  give_up:
-    if (buf) {
+    if (altfname)
+        free((genericptr_t) altfname);
+    if (buf)
         free((genericptr_t) buf);
-        buflen = 0;
-    }
     return ret;
 }
 
@@ -1095,8 +1077,8 @@ lua_State *
 nhl_init()
 {
     lua_State *L = luaL_newstate();
-    luaL_openlibs(L);
 
+    luaL_openlibs(L);
     nhl_set_package_path(L, "./?.lua");
 
     /* register nh -table, and functions for it */

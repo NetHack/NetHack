@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.81 $ $NHDT-Date: 1580322890 2020/01/29 18:34:50 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ $NHDT-Date: 1580504296 2020/01/31 20:58:16 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -48,7 +48,8 @@ hero can no longer wear blindfold/towel/lenses when poly'd into headless form
 revamp achievement tracking for exploring Mine's End and Sokoban (by acquiring
 	luckstone and bag of holding or amulet of reflection, respectively)
 throttle long worm growth rate and HP accumulation
-poly'd hero was able to zap wands without any hands
+poly'd hero was able to zap wands, apply tools, and #rub objects without
+	having any hands
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -79,6 +80,8 @@ data.base lookup of an entry with any blank lines would falsely claim that
 using nhl_error() to report a Lua processing problem would clobber the stack
 level teleporation's "You materialize on a different level!" could be given
 	out of sequence with other arrival messages
+creating Mine Town variant 1 (Orcish Town) sometimes complained about being
+	unable to place lregion type 1 and failed to have any staircase up
 
 
 Platform- and/or Interface-Specific Fixes
@@ -130,6 +133,7 @@ when 'color' if Off and 'use_inverse' is On, draw ice on the map in inverse
 	video if it uses the same character as room floor or as dark floor
 new 'mention_decor' option; when On, describe dungeon features being stepped
 	on or floated/flown over even when they're not covered by objects
+applying royal jelly on an egg kills, revives, or changes the egg
 
 
 Platform- and/or Interface-Specific New Features

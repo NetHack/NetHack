@@ -1157,7 +1157,7 @@ unsigned doname_flags;
                 && (known || (g.mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
                 Strcat(prefix, mons[omndx].mname);
                 Strcat(prefix, " ");
-                if (obj->spe)
+                if (obj->spe == 1)
                     Strcat(bp, " (laid by you)");
             }
         }
