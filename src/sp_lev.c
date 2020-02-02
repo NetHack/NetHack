@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580600499 2020/02/01 23:41:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580607226 2020/02/02 01:33:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2372,7 +2372,6 @@ lua_State *L;
     if (s && strlen(s) == 1)
         ret = (int) *s;
     Free(s);
-
     return ret;
 }
 
@@ -2797,11 +2796,11 @@ lua_State *L;
                         break;
                     }
             }
+            free((genericptr_t) montype);
             if (pm)
                 tmpobj.corpsenm = monsndx(pm);
             else
                 nhl_error(L, "Unknown montype");
-            free(montype);
         }
         if (tmpobj.id == STATUE) {
             if (get_table_boolean_opt(L, "historic", 0))
@@ -3045,16 +3044,17 @@ const char *name;
 int defval;
 {
     char *roomstr = get_table_str_opt(L, name, emptystr);
+    int i, res = defval;
+
     if (roomstr && *roomstr) {
-        int i;
         for (i = 0; room_types[i].name; i++)
             if (!strcmpi(roomstr, room_types[i].name)) {
-                Free(roomstr);
-                return room_types[i].type;
+                res = room_types[i].type;
+                break;
             }
     }
     Free(roomstr);
-    return defval;
+    return res;
 }
 
 /* room({ type="ordinary", lit=1, x=3,y=3, xalign="center",yalign="center", w=11,h=9 }); */
@@ -3311,14 +3311,9 @@ lua_State *L;
 
     if (isok(x, y) && !t_at(x, y)) {
         levl[x][y].typ = GRAVE;
-        if (txt)
-            make_grave(x, y, txt);
-        else
-            make_grave(x, y, NULL);
+        make_grave(x, y, txt); /* note: 'txt' might be Null */
     }
-
     Free(txt);
-
     return 0;
 }
 
@@ -3406,18 +3401,17 @@ const char *name;
 int defval;
 {
     char *trapstr = get_table_str_opt(L, name, emptystr);
+    int i, res = defval;
 
     if (trapstr && *trapstr) {
-        int i;
-
         for (i = 0; trap_types[i].name; i++)
             if (!strcmpi(trapstr, trap_types[i].name)) {
-                Free(trapstr);
-                return trap_types[i].type;
+                res = trap_types[i].type;
+                break;
             }
     }
     Free(trapstr);
-    return defval;
+    return res;
 }
 
 const char *
@@ -4732,19 +4726,19 @@ lev_region *lregion;
     if (g.num_lregions) {
         /* realloc the lregion space to add the new one */
         lev_region *newl = (lev_region *) alloc(
-            sizeof(lev_region) * (unsigned) (1 + g.num_lregions));
+            sizeof (lev_region) * (unsigned) (1 + g.num_lregions));
 
         (void) memcpy((genericptr_t) (newl), (genericptr_t) g.lregions,
-                      sizeof(lev_region) * g.num_lregions);
+                      sizeof (lev_region) * g.num_lregions);
         Free(g.lregions);
         g.num_lregions++;
         g.lregions = newl;
     } else {
         g.num_lregions = 1;
-        g.lregions = (lev_region *) alloc(sizeof(lev_region));
+        g.lregions = (lev_region *) alloc(sizeof (lev_region));
     }
     (void) memcpy(&g.lregions[g.num_lregions - 1], lregion,
-                  sizeof(lev_region));
+                  sizeof (lev_region));
 }
 
 /* teleport_region({ region = { x1,y1, x2,y2} }); */
@@ -4840,7 +4834,6 @@ lua_State *L;
     tmplregion.rname.str = get_table_str_opt(L, "name", NULL);
 
     levregion_add(&tmplregion);
-
     return 0;
 }
 
@@ -5348,6 +5341,7 @@ TODO: g.coder->croom needs to be updated
     tmps = mapdata;
     while (tmps && *tmps) {
         char *s1 = index(tmps, '\n');
+
         if (maphei > MAP_Y_LIM)
             break;
         if (s1)
