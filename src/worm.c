@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1580043421 2020/01/26 12:57:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	worm.c	$NHDT-Date: 1580633722 2020/02/02 08:55:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -329,8 +329,10 @@ struct monst *worm;
  *  Check for mon->wormno before calling this function!
  *
  *  If the hero is near any part of the worm, the worm will try to attack.
+ *  Returns 1 if the worm dies (poly'd hero with passive counter-attack)
+ *  or 0 if it doesn't.
  */
-void
+int
 wormhitu(worm)
 struct monst *worm;
 {
@@ -341,11 +343,15 @@ struct monst *worm;
      *  is out of range of the player.  We might try to kludge, and bring
      *  the head within range for a tiny moment, but this needs a bit more
      *  looking at before we decide to do this.
+     *
+     *  Head has already had a chance to attack, so the dummy tail segment
+     *  sharing its location should be skipped.
      */
-    for (seg = wtails[wnum]; seg; seg = seg->nseg)
+    for (seg = wtails[wnum]; seg != wheads[wnum]; seg = seg->nseg)
         if (distu(seg->wx, seg->wy) < 3)
             if (mattacku(worm))
-                return; /* your passive ability killed the worm */
+                return 1; /* your passive ability killed the worm */
+    return 0;
 }
 
 /*  cutworm()

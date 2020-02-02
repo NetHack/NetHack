@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1573869061 2019/11/16 01:51:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1580600478 2020/02/01 23:41:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.221 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1110,27 +1110,19 @@ struct instance_globals {
     /* auto-response flag for/from "sell foo?" 'a' => 'y', 'q' => 'n' */
     char sell_response;
     int sell_how;
-    /* can't just use sell_response='y' for auto_credit because the 'a' response
+    /* can't just use sell_response='y' for auto_credit because 'a' response
        shouldn't carry over from ordinary selling to credit selling */
     boolean auto_credit;
     struct repo repo;
-   long int followmsg; /* last time of follow message */
-
+    long int followmsg; /* last time of follow message */
 
     /* sp_lev.c */
     char *lev_message;
     lev_region *lregions;
     int num_lregions;
-    /* positions touched by level elements explicitly defined in des-file */
-    char SpLev_Map[COLNO][ROWNO];
     struct sp_coder *coder;
     xchar xstart, ystart;
-    char xsize, ysize;
-    boolean splev_init_present;
-    boolean icedpools;
-    struct obj *container_obj[MAX_CONTAINMENT];
-    int container_idx;
-    struct monst *invent_carrying_monster;
+    xchar xsize, ysize;
 
     /* spells.c */
     int spl_sortmode;   /* index into spl_sortchoices[] */

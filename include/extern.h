@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1580044333 2020/01/26 13:12:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.786 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1580633720 2020/02/02 08:55:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.787 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3014,7 +3014,7 @@ E void FDECL(initworm, (struct monst *, int));
 E void FDECL(worm_move, (struct monst *));
 E void FDECL(worm_nomove, (struct monst *));
 E void FDECL(wormgone, (struct monst *));
-E void FDECL(wormhitu, (struct monst *));
+E int FDECL(wormhitu, (struct monst *));
 E void FDECL(cutworm, (struct monst *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void FDECL(see_wsegs, (struct monst *));
 E void FDECL(detect_wsegs, (struct monst *, BOOLEAN_P));

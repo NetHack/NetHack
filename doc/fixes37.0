@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ $NHDT-Date: 1580504296 2020/01/31 20:58:16 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ $NHDT-Date: 1580633720 2020/02/02 08:55:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -50,6 +50,7 @@ revamp achievement tracking for exploring Mine's End and Sokoban (by acquiring
 throttle long worm growth rate and HP accumulation
 poly'd hero was able to zap wands, apply tools, and #rub objects without
 	having any hands
+spellcasting monster got an extra move after casting
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -82,10 +83,15 @@ level teleporation's "You materialize on a different level!" could be given
 	out of sequence with other arrival messages
 creating Mine Town variant 1 (Orcish Town) sometimes complained about being
 	unable to place lregion type 1 and failed to have any staircase up
+prevent "you materialize on a different level" after "a mysterious force
+	prevents you from descending" if you try to level teleport past the
+	stairs down from the quest home level before being granted access
 
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+msdos:  Add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
+	can display statue glyphs. 
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
 
@@ -134,6 +140,7 @@ when 'color' if Off and 'use_inverse' is On, draw ice on the map in inverse
 new 'mention_decor' option; when On, describe dungeon features being stepped
 	on or floated/flown over even when they're not covered by objects
 applying royal jelly on an egg kills, revives, or changes the egg
+intelligent monsters pick up and rummage through containers
 
 
 Platform- and/or Interface-Specific New Features
