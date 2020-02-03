@@ -4,7 +4,7 @@
   <Target Name="Build"
      Inputs="$(ToolsDir)dgncomp.exe;$(DatDir)dungeon.pdf"
 	 Outputs="$(DatDir)dungeon">
-	<Exec Command="$(ToolsDir)dgncomp.exe dungeon.pdf" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)dgncomp.exe&quot; dungeon.pdf" WorkingDirectory="$(DatDir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="$(DatDir)dungeon"/>

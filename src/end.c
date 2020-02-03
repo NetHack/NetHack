@@ -631,7 +631,11 @@ VA_DECL(const char *, str)
     {
         char buf[BUFSZ];
 
+#if !defined(NO_VSNPRINTF)
+        (void) vsnprintf(buf, sizeof buf, str, VA_ARGS);
+#else
         Vsprintf(buf, str, VA_ARGS);
+#endif
         raw_print(buf);
         paniclog("panic", buf);
     }

@@ -165,7 +165,11 @@ dungeon: dungeon.def ../util/makedefs ../util/dgn_comp
 	../util/makedefs -e
 	../util/dgn_comp dungeon.pdf
 
-spotless:
+# gitinfo.txt is optionally made by src/Makefile when creating date.h
+clean:
+	-rm -f gitinfo.txt
+
+spotless: clean
 	-rm -f spec_levs quest_levs *.lev $(VARDAT) dungeon dungeon.pdf
 	-rm -f nhdat x11tiles beostiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm
 	-rm -f rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad
