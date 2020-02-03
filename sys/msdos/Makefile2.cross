@@ -1082,7 +1082,7 @@ $(O)files.o: files.c $(HACK_H) $(INCL)/dlb.h
 $(O)fountain.o: fountain.c $(HACK_H)
 $(O)hack.o: hack.c $(HACK_H)
 $(O)hacklib.o: hacklib.c $(HACK_H)
-$(O)insight.o: invent.c $(HACK_H)
+$(O)insight.o: insight.c $(HACK_H)
 $(O)invent.o: invent.c $(HACK_H)
 $(O)light.o: light.c $(HACK_H)
 $(O)lock.o: lock.c $(HACK_H)
