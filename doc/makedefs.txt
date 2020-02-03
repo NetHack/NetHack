@@ -1,4 +1,4 @@
-MAKEDEFS(6)                                                        MAKEDEFS(6)
+MAKEDEFS(6)                      Games Manual                      MAKEDEFS(6)
 
 
 
@@ -32,7 +32,9 @@ SHORT COMMANDS
 
        -m     Generate monster.c.
 
-       -v     Generate date.h and options file.
+       -v     Generate  date.h and options file. It will read dat/gitinfo.txt,
+              only if it is present, to obtain githash= and gitbranch=
+               info and include related preprocessor #defines in date.h file.
 
        -p     Generate pm.h
 
@@ -40,11 +42,20 @@ SHORT COMMANDS
 
        -r     Generate the rumors file.
 
+       -s     Generate the bogusmon , engrave and epitaphfiles.
+
        -h     Generate the oracles file.
 
        -z     Generate vis_tab.c and vis_tab.h.
 
 LONG COMMANDS
+       --debug
+              Show debugging output.
+
+       --make [command]
+              Execute a short command.  Command  is  given  without  preceding
+              dash.
+
        --input file
               Specify the input file for the command (if needed).  If the file
               is - standard input is read.
@@ -58,7 +69,7 @@ LONG COMMANDS
               newline.  If specified, the delimiter is used between each  part
               of the version string.
 
-       --grep Filter  the input file to the output file.  See the MDGREP FUNC
+       --grep Filter  the input file to the output file.  See the MDGREP FUNC-
               TIONS section below for information on controlling the filtering
               operation.
 
@@ -82,7 +93,7 @@ MDGREP FUNCTIONS
        The  --grep command (and certain other commands) filter their input, on
        a line-by-line basis, according to control lines embedded in the  input
        and  on  information  gleaned  from the NetHack(6) configuration.  This
-       allows certain changes such as embedding  platform-specific  documenta
+       allows certain changes such as embedding  platform-specific  documenta-
        tion into the master documentation files.
 
        Rules:
@@ -90,11 +101,11 @@ MDGREP FUNCTIONS
               -   The default conditional state is printing enabled.
 
               -   Any  line NOT starting with a caret (^) is either suppressed
-                  or passed through unchanged depending on the current  condi
+                  or passed through unchanged depending on the current  condi-
                   tional state.
 
               -   Any  line  starting with a caret is a control line; as in C,
-                  zero or more spaces may be embedded in the line almost  any
+                  zero or more spaces may be embedded in the line almost  any-
                   where  (except  immediately  after  the  caret); however the
                   caret must be in column 1.
 
@@ -105,7 +116,7 @@ MDGREP FUNCTIONS
                   many errors as possible to be detected.
 
               -   Unknown identifiers are treated  as  both  TRUE  and  as  an
-                  error.   Note  that --undef or #undef in the NetHack(6) con
+                  error.   Note  that --undef or #undef in the NetHack(6) con-
                   figuration are different from unknown.
 
        Control lines:
@@ -130,6 +141,11 @@ AUTHOR
 SEE ALSO
        dgn_comp(6)
 
+COPYRIGHT
+       This file is  Copyright  (C)  Kenneth  Lorber  and  was  last  modified
+       2018/04/25  (version NetHack-3.6.0:1.10).  NetHack may be freely redis-
+       tributed.  See license for details.
 
 
-4th Berkeley Distribution         29 Apr 2010                      MAKEDEFS(6)
+
+NETHACK                           25 May 2015                      MAKEDEFS(6)

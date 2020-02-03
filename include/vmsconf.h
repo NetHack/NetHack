@@ -169,6 +169,11 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 #define FCMASK 0660 /* file creation mask */
 
 /*
+ * 
+ */
+#define NO_VSNPRINTF /* Avoid vsnprintf, use less-safe vsprintf instead. */
+
+/*
  * The remainder of the file should not need to be changed.
  */
 

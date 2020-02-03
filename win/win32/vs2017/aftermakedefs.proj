@@ -4,16 +4,16 @@
   <Target Name="Build"
      Inputs="$(ToolsDir)makedefs.exe"
 	 Outputs="@(Defs)">
-	<Exec Command="$(ToolsDir)makedefs.exe -v" WorkingDirectory="$(UtilDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -o" WorkingDirectory="$(UtilDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -p" WorkingDirectory="$(UtilDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -z" WorkingDirectory="$(UtilDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -d" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -r" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -s" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -q" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -h" WorkingDirectory="$(DatDir)"/>
-	<Exec Command="$(ToolsDir)makedefs.exe -e" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -v" WorkingDirectory="$(UtilDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -o" WorkingDirectory="$(UtilDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -p" WorkingDirectory="$(UtilDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -z" WorkingDirectory="$(UtilDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -d" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -r" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -s" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -q" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -h" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)makedefs.exe&quot; -e" WorkingDirectory="$(DatDir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="@(Defs)"/>

@@ -74,9 +74,6 @@ extern short glyph2tile[];
 
 extern char mapped_menu_cmds[]; /* from options.c */
 
-/* this is only needed until tty_status_* routines are written */
-extern NEARDATA winid WIN_STATUS;
-
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
     "tty",

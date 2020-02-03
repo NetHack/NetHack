@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 18, 2019
+.ds f2 "January 27, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -5160,6 +5160,9 @@ fixes to NetHack 3.6.2.
 .pg
 NetHack 3.6.4 was released on December 18, 2019 containing a security fix
 and a few bug fixes.
+.pg
+NetHack 3.6.5 was released on January 27, 2020 containing some security fixes
+and a small number of bug fixes.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP
 at

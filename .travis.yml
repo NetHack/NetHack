@@ -113,5 +113,5 @@ deploy:
   on:
     tags: true
   prerelease: true
-  name: "Pre-Release build of NetHack 3.6"
-  body: "This is an auto generated Pre-Release build of NetHack 3.6"
+  name: "Post-Release build of NetHack 3.6"
+  body: "This is an auto generated Post-Release build of NetHack 3.6"

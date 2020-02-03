@@ -166,6 +166,8 @@
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
 			fileType = sourcecode.yacc;
+			inputFiles = (
+			);
 			isEditable = 1;
 			outputFiles = (
 				"$(NH_INC_DIR)/lev_comp.h",
@@ -177,6 +179,8 @@
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
 			fileType = sourcecode.lex;
+			inputFiles = (
+			);
 			isEditable = 1;
 			outputFiles = (
 				"$(NH_UTIL_DIR)/lev_lex.c",
@@ -188,6 +192,8 @@
 			compilerSpec = com.apple.compilers.proxy.script;
 			filePatterns = dgn_comp.y;
 			fileType = sourcecode.yacc;
+			inputFiles = (
+			);
 			isEditable = 1;
 			outputFiles = (
 				"$(NH_UTIL_DIR)/dgn_yacc.c",
@@ -199,6 +205,8 @@
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
 			fileType = sourcecode.lex;
+			inputFiles = (
+			);
 			isEditable = 1;
 			outputFiles = (
 				"$(NH_UTIL_DIR)/dgn_lex.c",
@@ -1129,7 +1137,7 @@
 		3189576921A1FCC100FB2ABE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Bart House";
 				TargetAttributes = {
 					3189577021A1FCC100FB2ABE = {
@@ -2111,6 +2119,7 @@
 		3189577921A1FCC100FB2ABE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2120,6 +2129,7 @@
 		3189577A21A1FCC100FB2ABE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2129,6 +2139,7 @@
 		3189578421A1FDA400FB2ABE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2137,6 +2148,7 @@
 		3189578521A1FDA400FB2ABE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2145,6 +2157,7 @@
 		31B8A42321A2669A0055BD01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2153,6 +2166,7 @@
 		31B8A42421A2669A0055BD01 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2163,6 +2177,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2174,6 +2189,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2183,6 +2199,7 @@
 		31B8A44F21A26A4B0055BD01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2191,6 +2208,7 @@
 		31B8A45021A26A4B0055BD01 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2199,6 +2217,7 @@
 		31B8A45C21A26A970055BD01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -2207,6 +2226,7 @@
 		31B8A45D21A26A970055BD01 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
