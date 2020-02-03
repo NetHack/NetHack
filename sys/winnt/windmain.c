@@ -29,7 +29,6 @@ char *NDECL(exename);
 boolean NDECL(fakeconsole);
 void NDECL(freefakeconsole);
 E void FDECL(nethack_exit, (int));
-E char chosen_windowtype[WINTYPELEN];   /* flag.h */
 #if defined(MSWIN_GRAPHICS)
 E void NDECL(mswin_destroy_reg);
 #endif
@@ -252,16 +251,16 @@ set_default_prefix_locations(const char *programPath)
 
     if (test_portable_config(executable_path,
                           portable_device_path, sizeof portable_device_path)) {
-        fqn_prefix[SYSCONFPREFIX] = executable_path;
-        fqn_prefix[CONFIGPREFIX]  = portable_device_path;
-        fqn_prefix[HACKPREFIX]    = portable_device_path;
-        fqn_prefix[SAVEPREFIX]    = portable_device_path;
-        fqn_prefix[LEVELPREFIX]   = portable_device_path;
-        fqn_prefix[BONESPREFIX]   = portable_device_path;
-        fqn_prefix[SCOREPREFIX]   = portable_device_path;
-        fqn_prefix[LOCKPREFIX]    = portable_device_path;
-        fqn_prefix[TROUBLEPREFIX] = portable_device_path;
-        fqn_prefix[DATAPREFIX]    = executable_path;
+        g.fqn_prefix[SYSCONFPREFIX] = executable_path;
+        g.fqn_prefix[CONFIGPREFIX]  = portable_device_path;
+        g.fqn_prefix[HACKPREFIX]    = portable_device_path;
+        g.fqn_prefix[SAVEPREFIX]    = portable_device_path;
+        g.fqn_prefix[LEVELPREFIX]   = portable_device_path;
+        g.fqn_prefix[BONESPREFIX]   = portable_device_path;
+        g.fqn_prefix[SCOREPREFIX]   = portable_device_path;
+        g.fqn_prefix[LOCKPREFIX]    = portable_device_path;
+        g.fqn_prefix[TROUBLEPREFIX] = portable_device_path;
+        g.fqn_prefix[DATAPREFIX]    = executable_path;
     } else {
         if(!build_known_folder_path(&FOLDERID_Profile, profile_path,
             sizeof(profile_path), FALSE))
@@ -279,16 +278,16 @@ set_default_prefix_locations(const char *programPath)
             versioned_global_data_path, sizeof(versioned_global_data_path), TRUE))
             strcpy(versioned_global_data_path, executable_path);
 
-        fqn_prefix[SYSCONFPREFIX] = versioned_global_data_path;
-        fqn_prefix[CONFIGPREFIX]  = profile_path;
-        fqn_prefix[HACKPREFIX]    = versioned_profile_path;
-        fqn_prefix[SAVEPREFIX]    = versioned_user_data_path;
-        fqn_prefix[LEVELPREFIX]   = versioned_user_data_path;
-        fqn_prefix[BONESPREFIX]   = versioned_global_data_path;
-        fqn_prefix[SCOREPREFIX]   = versioned_global_data_path;
-        fqn_prefix[LOCKPREFIX]    = versioned_global_data_path;
-        fqn_prefix[TROUBLEPREFIX] = versioned_profile_path;
-        fqn_prefix[DATAPREFIX]    = executable_path;
+        g.fqn_prefix[SYSCONFPREFIX] = versioned_global_data_path;
+        g.fqn_prefix[CONFIGPREFIX]  = profile_path;
+        g.fqn_prefix[HACKPREFIX]    = versioned_profile_path;
+        g.fqn_prefix[SAVEPREFIX]    = versioned_user_data_path;
+        g.fqn_prefix[LEVELPREFIX]   = versioned_user_data_path;
+        g.fqn_prefix[BONESPREFIX]   = versioned_global_data_path;
+        g.fqn_prefix[SCOREPREFIX]   = versioned_global_data_path;
+        g.fqn_prefix[LOCKPREFIX]    = versioned_global_data_path;
+        g.fqn_prefix[TROUBLEPREFIX] = versioned_profile_path;
+        g.fqn_prefix[DATAPREFIX]    = executable_path;
     }
 }
 
@@ -359,18 +358,18 @@ void copy_sysconf_content()
     /* Using the SYSCONFPREFIX path, lock it so that it does not change */
     fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
 
-    update_file(fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
-        fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
+    update_file(g.fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
+        g.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
 
-    update_file(fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
-        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
+    update_file(g.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
+        g.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
 
     /* If the required early game file does not exist, copy it */
-    copy_file(fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
-        fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
+    copy_file(g.fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
+        g.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
 
-    update_file(fqn_prefix[SYSCONFPREFIX], SYMBOLS,
-        fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
+    update_file(g.fqn_prefix[SYSCONFPREFIX], SYMBOLS,
+        g.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
 }
 
 void copy_config_content()
@@ -379,13 +378,13 @@ void copy_config_content()
     fqn_prefix_locked[CONFIGPREFIX] = TRUE;
 
     /* Keep templates up to date */
-    update_file(fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
-        fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
+    update_file(g.fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
+        g.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
 
     /* If the required early game file does not exist, copy it */
     /* NOTE: We never replace .nethackrc or sysconf */
-    copy_file(fqn_prefix[CONFIGPREFIX], CONFIG_FILE,
-        fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE);
+    copy_file(g.fqn_prefix[CONFIGPREFIX], CONFIG_FILE,
+        g.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE);
 }
 
 void
@@ -394,10 +393,10 @@ copy_hack_content()
     nhassert(fqn_prefix_locked[HACKPREFIX]);
 
     /* Keep Guidebook and opthelp up to date */
-    update_file(fqn_prefix[HACKPREFIX], GUIDEBOOK_FILE,
-        fqn_prefix[DATAPREFIX], GUIDEBOOK_FILE, FALSE);
-    update_file(fqn_prefix[HACKPREFIX], OPTIONFILE,
-        fqn_prefix[DATAPREFIX], OPTIONFILE, FALSE);
+    update_file(g.fqn_prefix[HACKPREFIX], GUIDEBOOK_FILE,
+        g.fqn_prefix[DATAPREFIX], GUIDEBOOK_FILE, FALSE);
+    update_file(g.fqn_prefix[HACKPREFIX], OPTIONFILE,
+        g.fqn_prefix[DATAPREFIX], OPTIONFILE, FALSE);
 }
 
 /*
@@ -416,7 +415,7 @@ int argc;
 char *argv[];
 {
     boolean resuming = FALSE; /* assume new game */
-    int fd;
+    NHFILE *nhfp;
     char *windowtype = NULL;
     char *envp = NULL;
     char *sptr = NULL;
@@ -428,7 +427,7 @@ char *argv[];
      * pointers during early startup initialization.
      */
     safe_routines();
-    sys_early_init();
+    early_init();
 #ifdef _MSC_VER
 # ifdef DEBUG
     /* set these appropriately for VS debugging */
@@ -452,7 +451,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 # endif
 #endif
 
-    hname = "NetHack"; /* used for syntax messages */
+    g.hname = "NetHack"; /* used for syntax messages */
 
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
     /* Save current directory and make sure it gets restored when
@@ -465,7 +464,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     set_default_prefix_locations(argv[0]);
 
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-    chdir(fqn_prefix[HACKPREFIX]);
+    chdir(g.fqn_prefix[HACKPREFIX]);
 #endif
 
     if (GUILaunched || IsDebuggerPresent())
@@ -528,8 +527,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         Strcpy(default_window_sys, "curses");
 #endif /* CURSES */
 #endif /* TTY */
-        if (iflags.windowtype_deferred && chosen_windowtype[0])
-            windowtype = chosen_windowtype;
+        if (iflags.windowtype_deferred && g.chosen_windowtype[0])
+            windowtype = g.chosen_windowtype;
     }
     choose_windows(windowtype);
 
@@ -548,34 +547,34 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (WINDOWPORT("tty"))
         toggle_mouse_support();
 
-    /* strip role,race,&c suffix; calls askname() if plname[] is empty
+    /* strip role,race,&c suffix; calls askname() if g.plname[] is empty
        or holds a generic user name like "player" or "games" */
     plnamesuffix();
-    set_playmode(); /* sets plname to "wizard" for wizard mode */
+    set_playmode(); /* sets g.plname to "wizard" for wizard mode */
     /* until the getlock code is resolved, override askname()'s
        setting of renameallowed; when False, player_selection()
        won't resent renaming as an option */
     iflags.renameallowed = FALSE;
     /* Obtain the name of the logged on user and incorporate
      * it into the name. */
-    Sprintf(fnamebuf, "%s", plname);
+    Sprintf(fnamebuf, "%s", g.plname);
     (void) fname_encode(
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.", '%',
         fnamebuf, encodedfnamebuf, BUFSZ);
-    Sprintf(lock, "%s", encodedfnamebuf);
+    Sprintf(g.lock, "%s", encodedfnamebuf);
     /* regularize(lock); */ /* we encode now, rather than substitute */
     if (getlock() == 0)
         nethack_exit(EXIT_SUCCESS);
 
     /* Set up level 0 file to keep the game state.
      */
-    fd = create_levelfile(0, (char *) 0);
-    if (fd < 0) {
+    nhfp = create_levelfile(0, (char *) 0);
+    if (!nhfp) {
         raw_print("Cannot create lock file");
     } else {
-        hackpid = GetCurrentProcessId();
-        write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
-        nhclose(fd);
+        g.hackpid = GetCurrentProcessId();
+        write(nhfp->fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
+        close_nhfile(nhfp);
     }
     /*
      *  Initialize the vision system.  This must be before mklev() on a
@@ -588,7 +587,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
      * We'll return here if new game player_selection() renames the hero.
      */
 attempt_restore:
-    if ((fd = restore_saved_game()) >= 0) {
+    if ((nhfp = restore_saved_game()) != 0) {
 #ifdef NEWS
         if (iflags.news) {
             display_file(NEWS, FALSE);
@@ -597,7 +596,7 @@ attempt_restore:
 #endif
         pline("Restoring save file...");
         mark_synch(); /* flush output */
-        if (dorecover(fd)) {
+        if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             if (discover)
                 You("are in non-scoring discovery mode.");
@@ -605,10 +604,14 @@ attempt_restore:
                 if (yn("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
                 else {
-                    nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
+                    nh_compress(fqname(g.SAVEF, SAVEPREFIX, 0));
                 }
             }
         }
+        if (g.program_state.in_self_recover) {
+            g.program_state.in_self_recover = FALSE;
+            set_savefile_name(TRUE);
+	}
     }
 
     if (!resuming) {
@@ -638,7 +641,7 @@ attempt_restore:
     return 0;
 }
 
-STATIC_OVL void
+static void
 process_options(argc, argv)
 int argc;
 char *argv[];
@@ -683,7 +686,7 @@ char *argv[];
             }
             if (!*dir)
                 error("Flag -d must be followed by a directory name.");
-            Strcpy(hackdir, dir);
+            Strcpy(g.hackdir, dir);
         }
 
         if (argc > 1) {
@@ -740,11 +743,11 @@ char *argv[];
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -784,7 +787,7 @@ char *argv[];
         case 'w': /* windowtype */
             config_error_init(FALSE, "command line", FALSE);
             if (strlen(&argv[0][2]) < (WINTYPELEN - 1))
-                Strcpy(chosen_windowtype, &argv[0][2]);
+                Strcpy(g.chosen_windowtype, &argv[0][2]);
             config_error_done();
             break;
         case '@':
@@ -804,7 +807,7 @@ char *argv[];
     }
 }
 
-STATIC_OVL void
+static void
 nhusage()
 {
     char buf1[BUFSZ], buf2[BUFSZ], *bufptr;
@@ -821,18 +824,18 @@ nhusage()
      */
     (void) Sprintf(buf2, "\nUsage:\n%s [-d dir] -s [-r race] [-p profession] "
                          "[maxrank] [name]...\n       or",
-                   hname);
+                   g.hname);
     ADD_USAGE(buf2);
 
     (void) Sprintf(
         buf2, "\n%s [-d dir] [-u name] [-r race] [-p profession] [-[DX]]",
-        hname);
+        g.hname);
     ADD_USAGE(buf2);
 #ifdef NEWS
     ADD_USAGE(" [-n]");
 #endif
     (void) Sprintf(buf2, "\n       or\n%s [--showpaths]",
-        hname);
+        g.hname);
     ADD_USAGE(buf2);
     if (!iflags.window_inited)
         raw_printf("%s\n", buf1);
@@ -867,7 +870,7 @@ port_help()
 boolean
 authorize_wizard_mode()
 {
-    if (!strcmp(plname, WIZARD_NAME))
+    if (!strcmp(g.plname, WIZARD_NAME))
         return TRUE;
     return FALSE;
 }
@@ -1090,14 +1093,14 @@ eraseoldlocks()
      */
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(lock, i);
-        (void) unlink(fqname(lock, LEVELPREFIX, 0));
+        set_levelfile_name(g.lock, i);
+        (void) unlink(fqname(g.lock, LEVELPREFIX, 0));
     }
-    set_levelfile_name(lock, 0);
+    set_levelfile_name(g.lock, 0);
 #ifdef HOLD_LOCKFILE_OPEN
     really_close();
 #endif
-    if (unlink(fqname(lock, LEVELPREFIX, 0)))
+    if (unlink(fqname(g.lock, LEVELPREFIX, 0)))
         return 0; /* cannot remove it */
     return (1);   /* success! */
 }
@@ -1107,7 +1110,9 @@ getlock()
 {
     register int fd, ern, prompt_result = 0;
     int fcmask = FCMASK;
+#ifndef SELF_RECOVER
     char tbuf[BUFSZ];
+#endif
     const char *fq_lock;
 #define OOPS_BUFSZ 512
     char oops[OOPS_BUFSZ];
@@ -1123,30 +1128,16 @@ getlock()
     }
 
     /* regularize(lock); */ /* already done in pcmain */
-    Sprintf(tbuf, "%s", fqname(lock, LEVELPREFIX, 0));
-    set_levelfile_name(lock, 0);
-    fq_lock = fqname(lock, LEVELPREFIX, 1);
+    /*Sprintf(tbuf, "%s", fqname(g.lock, LEVELPREFIX, 0)); */
+    set_levelfile_name(g.lock, 0);
+    fq_lock = fqname(g.lock, LEVELPREFIX, 1);
     if ((fd = open(fq_lock, 0)) == -1) {
         if (errno == ENOENT)
             goto gotlock; /* no such file */
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-#if defined(HOLD_LOCKFILE_OPEN)
-        if (errno == EACCES) {
-            Strcpy(
-                oops,
-                "\nThere are files from a game in progress under your name.");
-            Strcat(oops, "\nThe files are locked or inaccessible.");
-            Strcat(oops, " Is the other game still running?\n");
-            if (strlen(fq_lock) < ((OOPS_BUFSZ - 16) - strlen(oops)))
-                Sprintf(eos(oops), "Cannot open %s", fq_lock);
-            Strcat(oops, "\n");
-            unlock_file(HLOCK);
-            raw_print(oops);
-        } else
-#endif
-            error("Bad directory or name: %s\n%s\n", fq_lock,
+        error("Bad directory or name: %s\n%s\n", fq_lock,
                   strerror(errno));
         unlock_file(HLOCK);
         Sprintf(oops, "Cannot open %s", fq_lock);
@@ -1220,11 +1211,11 @@ gotlock:
 #endif
         Sprintf(oops, "cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n", fq_lock,
               strerror(ern), " Are you sure that the directory",
-              fqn_prefix[LEVELPREFIX]);
+              g.fqn_prefix[LEVELPREFIX]);
         raw_print(oops);
     } else {
-        if (write(fd, (char *) &hackpid, sizeof(hackpid))
-            != sizeof(hackpid)) {
+        if (write(fd, (char *) &g.hackpid, sizeof(g.hackpid))
+            != sizeof(g.hackpid)) {
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif

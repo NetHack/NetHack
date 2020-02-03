@@ -66,6 +66,7 @@ typedef struct nhmi {
     const char *str;            /* Text of menu item */
     BOOLEAN_P presel;           /* Whether menu item should be preselected */
     boolean selected;           /* Whether item is currently selected */
+    unsigned itemflags;
     int page_num;               /* Display page number for entry */
     int line_num;               /* Line number on page where entry begins */
     int num_lines;              /* Number of lines entry uses on page */
@@ -220,7 +221,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
        re-activate them now that input is being requested */
     curses_got_input();
 
-    if (invent || (moves > 1)) {
+    if (g.invent || (g.moves > 1)) {
         curses_get_window_size(MAP_WIN, &map_height, &map_width);
     } else {
         map_height = term_rows;
@@ -579,13 +580,14 @@ curs_new_menu_item(winid wid, const char *str)
     new_item = (nhmenu_item *) alloc((unsigned) sizeof (nhmenu_item));
     new_item->wid = wid;
     new_item->glyph = NO_GLYPH;
-    new_item->identifier = zeroany;
+    new_item->identifier = cg.zeroany;
     new_item->accelerator = '\0';
     new_item->group_accel = '\0';
     new_item->attr = 0;
     new_item->str = new_str;
     new_item->presel = FALSE;
     new_item->selected = FALSE;
+    new_item->itemflags = MENU_ITEMFLAGS_NONE;
     new_item->page_num = 0;
     new_item->line_num = 0;
     new_item->num_lines = 0;
@@ -598,10 +600,11 @@ curs_new_menu_item(winid wid, const char *str)
 void
 curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
                        CHAR_P accelerator, CHAR_P group_accel, int attr,
-                       const char *str, BOOLEAN_P presel)
+                       const char *str, unsigned itemflags)
 {
     nhmenu_item *new_item, *current_items, *menu_item_ptr;
     nhmenu *current_menu = get_menu(wid);
+    boolean presel = (itemflags & MENU_ITEMFLAGS_SELECTED) != 0;
 
     if (current_menu == NULL) {
         impossible(
@@ -620,7 +623,7 @@ curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
     new_item->group_accel = group_accel;
     new_item->attr = attr;
     new_item->presel = presel;
-
+    new_item->itemflags = itemflags;
     current_items = current_menu->entries;
     menu_item_ptr = current_items;
 
@@ -759,7 +762,7 @@ curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
     menu_determine_pages(current_menu);
 
     /* Display pre and post-game menus centered */
-    if ((moves <= 1 && !invent) || program_state.gameover) {
+    if ((g.moves <= 1 && !g.invent) || g.program_state.gameover) {
         win = curses_create_window(current_menu->width,
                                    current_menu->height, CENTER);
     } else { /* Display during-game menus on the right out of the way */
@@ -1003,7 +1006,7 @@ menu_win_size(nhmenu *menu)
     int maxheaderwidth = menu->prompt ? (int) strlen(menu->prompt) : 0;
     nhmenu_item *menu_item_ptr;
 
-    if (program_state.gameover) {
+    if (g.program_state.gameover) {
         /* for final inventory disclosure, use full width */
         maxwidth = term_cols - 2; /* +2: borders assumed */
     } else {
@@ -1549,7 +1552,10 @@ menu_operation(WINDOW * win, nhmenu *menu, menu_op
         }
 
         if (menu_item_ptr->identifier.a_void != NULL) {
-            menu_select_deselect(win, menu_item_ptr, operation, current_page);
+            if (operation != INVERT
+                || menuitem_invert_test(0, menu_item_ptr->itemflags,
+                                        menu_item_ptr->selected))
+                menu_select_deselect(win, menu_item_ptr, operation, current_page);
         }
 
         menu_item_ptr = menu_item_ptr->next_item;

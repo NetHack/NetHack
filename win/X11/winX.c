@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1552441031 2019/03/13 01:37:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1577063125 2019/12/23 01:05:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -944,8 +944,8 @@ const char *str;
 
     switch (wp->type) {
     case NHW_MESSAGE:
-        (void) strncpy(toplines, str, TBUFSZ); /* for Norep(). */
-        toplines[TBUFSZ - 1] = 0;
+        (void) strncpy(g.toplines, str, TBUFSZ); /* for Norep(). */
+        g.toplines[TBUFSZ - 1] = 0;
         append_message(wp, str);
         break;
 #ifndef STATUS_HILITES
@@ -1722,7 +1722,7 @@ Cardinal *num_params;
     nhUse(num_params);
 
     nh_XtPopdown(w);
-    (void) strcpy(plname, "Mumbles"); /* give them a name... ;-) */
+    (void) strcpy(g.plname, "Mumbles"); /* give them a name... ;-) */
     exit_x_event = TRUE;
 }
 
@@ -1750,11 +1750,11 @@ XtPointer call_data;
     }
 
     /* Truncate name if necessary */
-    if (len >= sizeof plname - 1)
-        len = sizeof plname - 1;
+    if (len >= sizeof g.plname - 1)
+        len = sizeof g.plname - 1;
 
-    (void) strncpy(plname, s, len);
-    plname[len] = '\0';
+    (void) strncpy(g.plname, s, len);
+    g.plname[len] = '\0';
     XtFree(s);
 
     nh_XtPopdown(XtParent(dialog));
@@ -1787,7 +1787,7 @@ X11_askname()
                           (XtCallbackProc) 0);
 
     SetDialogPrompt(dialog, nhStr("What is your name?")); /* set prompt */
-    SetDialogResponse(dialog, plname, PL_NSIZ); /* set default answer */
+    SetDialogResponse(dialog, g.plname, PL_NSIZ); /* set default answer */
 
     XtRealizeWidget(popup);
     positionpopup(popup, TRUE); /* center,bottom */
@@ -1959,10 +1959,10 @@ boolean complain;
     wp = &window_list[newwin];
     X11_start_menu(newwin);
 
-    any = zeroany;
+    any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
         X11_add_menu(newwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     line, MENU_UNSELECTED);
+                     line, MENU_ITEMFLAGS_NONE);
     }
     (void) dlb_fclose(fp);
 
@@ -2581,12 +2581,12 @@ init_standard_windows()
 }
 
 void
-nh_XtPopup(w, g, childwid)
+nh_XtPopup(w, grb, childwid)
 Widget w;        /* widget */
-int g;           /* type of grab */
+int grb;         /* type of grab */
 Widget childwid; /* child to receive focus (can be None) */
 {
-    XtPopup(w, (XtGrabKind) g);
+    XtPopup(w, (XtGrabKind) grb);
     XSetWMProtocols(XtDisplay(w), XtWindow(w), &wm_delete_window, 1);
     if (appResources.autofocus)
         XtSetKeyboardFocus(toplevel, childwid);

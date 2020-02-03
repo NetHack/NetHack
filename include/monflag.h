@@ -186,7 +186,7 @@
 #define G_NOCORPSE 0x0010 /* no corpse left ever */
 #define G_FREQ 0x0007     /* creation frequency mask */
 
-/* for mvitals[].mvflags (variant during game), along with G_NOCORPSE */
+/* for g.mvitals[].mvflags (variant during game), along with G_NOCORPSE */
 #define G_KNOWN 0x0004 /* have been encountered */
 #define G_GONE (G_GENOD | G_EXTINCT)
 #define G_GENOD 0x0002 /* have been genocided */

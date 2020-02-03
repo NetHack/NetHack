@@ -25,7 +25,7 @@ MAIN(int argc, char **argv)
     char *dir;
     boolean resuming = FALSE; /* assume new game */
 
-    sys_early_init();
+    early_init();
 
     dir = nh_getenv("NETHACKDIR");
     if (!dir)
@@ -88,7 +88,7 @@ attempt_restore:
                 if (yn("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
                 else {
-                    nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
+                    nh_compress(fqname(g.SAVEF, SAVEPREFIX, 0));
                 }
             }
         }
@@ -132,14 +132,14 @@ whoami(void)
      */
     char *s;
 
-    if (*plname)
+    if (*g.plname)
         return;
     if (s = nh_getenv("USER")) {
-        (void) strncpy(plname, s, sizeof(plname) - 1);
+        (void) strncpy(g.plname, s, sizeof(g.plname) - 1);
         return;
     }
     if (s = nh_getenv("LOGNAME")) {
-        (void) strncpy(plname, s, sizeof(plname) - 1);
+        (void) strncpy(g.plname, s, sizeof(g.plname) - 1);
         return;
     }
 }
@@ -177,11 +177,11 @@ process_options(int argc, char **argv)
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -236,15 +236,15 @@ getlock(void)
 {
     int fd;
 
-    Sprintf(lock, "%d%s", getuid(), plname);
-    regularize(lock);
-    set_levelfile_name(lock, 0);
-    fd = creat(lock, FCMASK);
+    Sprintf(g.lock, "%d%s", getuid(), g.plname);
+    regularize(g.lock);
+    set_levelfile_name(g.lock, 0);
+    fd = creat(g.lock, FCMASK);
     if (fd == -1) {
         error("cannot creat lock file.");
     } else {
-        if (write(fd, (genericptr_t) &hackpid, sizeof(hackpid))
-            != sizeof(hackpid)) {
+        if (write(fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid))
+            != sizeof(g.hackpid)) {
             error("cannot write lock");
         }
         if (close(fd) == -1) {

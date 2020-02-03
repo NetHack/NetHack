@@ -744,19 +744,19 @@ curses_character_dialog(const char **choices, const char *prompt)
 
         identifier.a_int = (count + 1); /* Must be non-zero */
         curses_add_menu(wid, NO_GLYPH, &identifier, curletter, 0,
-                        A_NORMAL, choices[count], FALSE);
+                        A_NORMAL, choices[count], MENU_ITEMFLAGS_NONE);
         used_letters[count] = curletter;
     }
 
     /* Random Selection */
     identifier.a_int = ROLE_RANDOM;
     curses_add_menu(wid, NO_GLYPH, &identifier, '*', 0, A_NORMAL, "Random",
-                    FALSE);
+                    MENU_ITEMFLAGS_NONE);
 
     /* Quit prompt */
     identifier.a_int = ROLE_NONE;
     curses_add_menu(wid, NO_GLYPH, &identifier, 'q', 0, A_NORMAL, "Quit",
-                    FALSE);
+                    MENU_ITEMFLAGS_NONE);
     curses_end_menu(wid, prompt);
     ret = curses_select_menu(wid, PICK_ONE, &selected);
     if (ret == 1) {
@@ -785,9 +785,9 @@ curses_init_options()
     set_option_mod_status("eight_bit_tty", SET_IN_FILE);
 
     /* If we don't have a symset defined, load the curses symset by default */
-    if (!symset[PRIMARY].explicitly)
+    if (!g.symset[PRIMARY].explicitly)
         load_symset("curses", PRIMARY);
-    if (!symset[ROGUESET].explicitly)
+    if (!g.symset[ROGUESET].explicitly)
         load_symset("default", ROGUESET);
 
 #ifdef PDCURSES
@@ -879,7 +879,7 @@ curses_display_splash_window()
     refresh();
 }
 
-/* Resore colors and cursor state before exiting */
+/* Restore colors and cursor state before exiting */
 void
 curses_cleanup()
 {

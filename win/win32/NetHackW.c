@@ -123,7 +123,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     windowprocs.win_wait_synch = mswin_wait_synch;
 
     win10_init();
-    sys_early_init();
+    early_init();
 
     /* init application structure */
     _nethack_app.hApp = hInstance;
@@ -216,19 +216,19 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     if (argc == 2) {
         TCHAR *savefile = strdup(argv[1]);
-        TCHAR *plname;
+        TCHAR *name;
         for (p = savefile; *p && *p != '-'; p++)
             ;
         if (*p) {
             /* we found a '-' */
-            plname = p + 1;
-            for (p = plname; *p && *p != '.'; p++)
+            name = p + 1;
+            for (p = name; *p && *p != '.'; p++)
                 ;
             if (*p) {
                 if (strcmp(p + 1, "NetHack-saved-game") == 0) {
                     *p = '\0';
                     argv[1] = "-u";
-                    argv[2] = _strdup(plname);
+                    argv[2] = _strdup(name);
                     argc = 3;
                 }
             }

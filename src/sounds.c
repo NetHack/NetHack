@@ -4,20 +4,20 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));
-STATIC_DCL int FDECL(domonnoise, (struct monst *));
-STATIC_DCL int NDECL(dochat);
-STATIC_DCL int FDECL(mon_in_room, (struct monst *, int));
+static boolean FDECL(mon_is_gecko, (struct monst *));
+static int FDECL(domonnoise, (struct monst *));
+static int NDECL(dochat);
+static int FDECL(mon_in_room, (struct monst *, int));
 
 /* this easily could be a macro, but it might overtax dumb compilers */
-STATIC_OVL int
+static int
 mon_in_room(mon, rmtyp)
 struct monst *mon;
 int rmtyp;
 {
     int rno = levl[mon->mx][mon->my].roomno;
     if (rno >= ROOMOFFSET)
-        return rooms[rno - ROOMOFFSET].rtype == rmtyp;
+        return g.rooms[rno - ROOMOFFSET].rtype == rmtyp;
     return FALSE;
 }
 
@@ -36,20 +36,20 @@ dosounds()
 
     hallu = Hallucination ? 1 : 0;
 
-    if (level.flags.nfountains && !rn2(400)) {
+    if (g.level.flags.nfountains && !rn2(400)) {
         static const char *const fountain_msg[4] = {
             "bubbling water.", "water falling on coins.",
             "the splashing of a naiad.", "a soda fountain!",
         };
         You_hear1(fountain_msg[rn2(3) + hallu]);
     }
-    if (level.flags.nsinks && !rn2(300)) {
+    if (g.level.flags.nsinks && !rn2(300)) {
         static const char *const sink_msg[3] = {
             "a slow drip.", "a gurgling noise.", "dishes being washed!",
         };
         You_hear1(sink_msg[rn2(2) + hallu]);
     }
-    if (level.flags.has_court && !rn2(200)) {
+    if (g.level.flags.has_court && !rn2(200)) {
         static const char *const throne_msg[4] = {
             "the tones of courtly conversation.",
             "a sceptre pounded in judgment.",
@@ -72,7 +72,7 @@ dosounds()
             }
         }
     }
-    if (level.flags.has_swamp && !rn2(200)) {
+    if (g.level.flags.has_swamp && !rn2(200)) {
         static const char *const swamp_msg[3] = {
             "hear mosquitoes!", "smell marsh gas!", /* so it's a smell...*/
             "hear Donald Duck!",
@@ -80,10 +80,10 @@ dosounds()
         You1(swamp_msg[rn2(2) + hallu]);
         return;
     }
-    if (level.flags.has_vault && !rn2(200)) {
+    if (g.level.flags.has_vault && !rn2(200)) {
         if (!(sroom = search_special(VAULT))) {
             /* strange ... */
-            level.flags.has_vault = 0;
+            g.level.flags.has_vault = 0;
             return;
         }
         if (gd_sound())
@@ -107,7 +107,7 @@ dosounds()
                 {
                     if (gold_in_vault)
                         You_hear(!hallu
-                                     ? "someone counting money."
+                                     ? "someone counting gold coins."
                                      : "the quarterback calling the play.");
                     else
                         You_hear("someone searching.");
@@ -124,7 +124,7 @@ dosounds()
             }
         return;
     }
-    if (level.flags.has_beehive && !rn2(200)) {
+    if (g.level.flags.has_beehive && !rn2(200)) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
@@ -146,7 +146,7 @@ dosounds()
             }
         }
     }
-    if (level.flags.has_morgue && !rn2(200)) {
+    if (g.level.flags.has_morgue && !rn2(200)) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
@@ -171,7 +171,7 @@ dosounds()
             }
         }
     }
-    if (level.flags.has_barracks && !rn2(200)) {
+    if (g.level.flags.has_barracks && !rn2(200)) {
         static const char *const barracks_msg[4] = {
             "blades being honed.", "loud snoring.", "dice being thrown.",
             "General MacArthur!",
@@ -194,7 +194,7 @@ dosounds()
             }
         }
     }
-    if (level.flags.has_zoo && !rn2(200)) {
+    if (g.level.flags.has_zoo && !rn2(200)) {
         static const char *const zoo_msg[3] = {
             "a sound reminiscent of an elephant stepping on a peanut.",
             "a sound reminiscent of a seal barking.", "Doctor Dolittle!",
@@ -209,10 +209,10 @@ dosounds()
             }
         }
     }
-    if (level.flags.has_shop && !rn2(200)) {
+    if (g.level.flags.has_shop && !rn2(200)) {
         if (!(sroom = search_special(ANY_SHOP))) {
             /* strange... */
-            level.flags.has_shop = 0;
+            g.level.flags.has_shop = 0;
             return;
         }
         if (tended_shop(sroom)
@@ -225,7 +225,7 @@ dosounds()
         }
         return;
     }
-    if (level.flags.has_temple && !rn2(200)
+    if (g.level.flags.has_temple && !rn2(200)
         && !(Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
@@ -365,7 +365,7 @@ register struct monst *mtmp;
         growl_verb = growl_sound(mtmp);
     if (growl_verb) {
         pline("%s %s!", Monnam(mtmp), vtense((char *) 0, growl_verb));
-        if (context.run)
+        if (g.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 18);
     }
@@ -408,7 +408,7 @@ register struct monst *mtmp;
         }
     if (yelp_verb) {
         pline("%s %s!", Monnam(mtmp), vtense((char *) 0, yelp_verb));
-        if (context.run)
+        if (g.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 12);
     }
@@ -442,7 +442,7 @@ register struct monst *mtmp;
         }
     if (whimper_verb) {
         pline("%s %s.", Monnam(mtmp), vtense((char *) 0, whimper_verb));
-        if (context.run)
+        if (g.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 6);
     }
@@ -468,7 +468,7 @@ register struct monst *mtmp;
 }
 
 /* return True if mon is a gecko or seems to look like one (hallucination) */
-STATIC_OVL boolean
+static boolean
 mon_is_gecko(mon)
 struct monst *mon;
 {
@@ -487,7 +487,7 @@ struct monst *mon;
     return (boolean) (glyph_to_mon(glyph) == PM_GECKO);
 }
 
-STATIC_OVL int
+static int
 domonnoise(mtmp)
 register struct monst *mtmp;
 {
@@ -505,14 +505,14 @@ register struct monst *mtmp;
         return 0;
 
     /* leader might be poly'd; if he can still speak, give leader speech */
-    if (mtmp->m_id == quest_status.leader_m_id && msound > MS_ANIMAL)
+    if (mtmp->m_id == g.quest_status.leader_m_id && msound > MS_ANIMAL)
         msound = MS_LEADER;
     /* make sure it's your role's quest guardian; adjust if not */
-    else if (msound == MS_GUARDIAN && ptr != &mons[urole.guardnum])
+    else if (msound == MS_GUARDIAN && ptr != &mons[g.urole.guardnum])
         msound = mons[genus(monsndx(ptr), 1)].msound;
     /* some normally non-speaking types can/will speak if hero is similar */
     else if (msound == MS_ORC         /* note: MS_ORC is same as MS_GRUNT */
-             && ((same_race(ptr, youmonst.data)          /* current form, */
+             && ((same_race(ptr, g.youmonst.data)          /* current form, */
                   || same_race(ptr, &mons[Race_switch])) /* unpoly'd form */
                  || Hallucination))
         msound = MS_HUMANOID;
@@ -558,9 +558,9 @@ register struct monst *mtmp;
             (Upolyd && (u.umonnum == PM_WOLF || u.umonnum == PM_WINTER_WOLF
                         || u.umonnum == PM_WINTER_WOLF_CUB));
         const char *racenoun =
-            (flags.female && urace.individual.f)
-                ? urace.individual.f
-                : (urace.individual.m) ? urace.individual.m : urace.noun;
+            (flags.female && g.urace.individual.f)
+                ? g.urace.individual.f
+                : (g.urace.individual.m) ? g.urace.individual.m : g.urace.noun;
 
         if (mtmp->mtame) {
             if (kindred) {
@@ -600,11 +600,11 @@ register struct monst *mtmp;
             if (kindred)
                 verbl_msg =
                     "This is my hunting ground that you dare to prowl!";
-            else if (youmonst.data == &mons[PM_SILVER_DRAGON]
-                     || youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
+            else if (g.youmonst.data == &mons[PM_SILVER_DRAGON]
+                     || g.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
                 /* Silver dragons are silver in color, not made of silver */
                 Sprintf(verbuf, "%s!  Your silver sheen does not frighten me!",
-                        youmonst.data == &mons[PM_SILVER_DRAGON]
+                        g.youmonst.data == &mons[PM_SILVER_DRAGON]
                             ? "Fool"
                             : "Young Fool");
                 verbl_msg = verbuf;
@@ -639,9 +639,9 @@ register struct monst *mtmp;
         } else if (mtmp->mpeaceful) {
             if (mtmp->mtame
                 && (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
-                    || moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5))
+                    || g.moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5))
                 pline_msg = "whines.";
-            else if (mtmp->mtame && EDOG(mtmp)->hungrytime > moves + 1000)
+            else if (mtmp->mtame && EDOG(mtmp)->hungrytime > g.moves + 1000)
                 pline_msg = "yips.";
             else {
                 if (mtmp->data
@@ -657,9 +657,9 @@ register struct monst *mtmp;
             if (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
                 || mtmp->mtame < 5)
                 pline_msg = "yowls.";
-            else if (moves > EDOG(mtmp)->hungrytime)
+            else if (g.moves > EDOG(mtmp)->hungrytime)
                 pline_msg = "meows.";
-            else if (EDOG(mtmp)->hungrytime > moves + 1000)
+            else if (EDOG(mtmp)->hungrytime > g.moves + 1000)
                 pline_msg = "purrs.";
             else
                 pline_msg = "mews.";
@@ -696,7 +696,7 @@ register struct monst *mtmp;
     case MS_NEIGH:
         if (mtmp->mtame < 5)
             pline_msg = "neighs.";
-        else if (moves > EDOG(mtmp)->hungrytime)
+        else if (g.moves > EDOG(mtmp)->hungrytime)
             pline_msg = "whinnies.";
         else
             pline_msg = "whickers.";
@@ -721,8 +721,8 @@ register struct monst *mtmp;
         pline("%s rattles noisily.", Monnam(mtmp));
         You("freeze for a moment.");
         nomul(-2);
-        multi_reason = "scared by rattling";
-        nomovemsg = 0;
+        g.multi_reason = "scared by rattling";
+        g.nomovemsg = 0;
         break;
     case MS_LAUGH: {
         static const char *const laugh_msg[4] = {
@@ -794,7 +794,7 @@ register struct monst *mtmp;
         } else if (mtmp->mhp < mtmp->mhpmax / 2)
             pline_msg = "asks for a potion of healing.";
         else if (mtmp->mtame && !mtmp->isminion
-                 && moves > EDOG(mtmp)->hungrytime)
+                 && g.moves > EDOG(mtmp)->hungrytime)
             verbl_msg = "I'm hungry.";
         /* Specific monsters' interests */
         else if (is_elf(ptr))
@@ -805,18 +805,25 @@ register struct monst *mtmp;
             pline_msg = "talks about spellcraft.";
         else if (ptr->mlet == S_CENTAUR)
             pline_msg = "discusses hunting.";
-        else if (is_gnome(ptr) && Hallucination && (gnomeplan = rn2(4)) % 2)
-            /* skipped for rn2(4) result of 0 or 2;
-               gag from an early episode of South Park called "Gnomes";
-               initially, Tweek (introduced in that episode) is the only
-               one aware of the tiny gnomes after spotting them sneaking
-               about; they are embarked upon a three-step business plan;
-               a diagram of the plan shows:
-                         Phase 1         Phase 2      Phase 3
-                   Collect underpants       ?          Profit
-               and they never verbalize step 2 so we don't either */
-            verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
-                                         : "Phase three, profit!";
+        else if (is_gnome(ptr)) {
+            if (Hallucination && (gnomeplan = rn2(4)) % 2) {
+                /* skipped for rn2(4) result of 0 or 2;
+                   gag from an early episode of South Park called "Gnomes";
+                   initially, Tweek (introduced in that episode) is the only
+                   one aware of the tiny gnomes after spotting them sneaking
+                   about; they are embarked upon a three-step business plan;
+                   a diagram of the plan shows:
+                               Phase 1         Phase 2      Phase 3
+                         Collect underpants       ?          Profit
+                   and they never verbalize step 2 so we don't either */
+                verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
+                                             : "Phase three, profit!";
+            }
+            else {
+                verbl_msg =
+                  "Many enter the dungeon, and few return to the sunlit lands.";
+            }
+        }
         else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:
@@ -842,7 +849,7 @@ register struct monst *mtmp;
 
         if (SYSOPT_SEDUCE) {
             if (ptr->mlet != S_NYMPH
-                && could_seduce(mtmp, &youmonst, (struct attack *) 0) == 1) {
+                && could_seduce(mtmp, &g.youmonst, (struct attack *) 0) == 1) {
                 (void) doseduce(mtmp);
                 break;
             }
@@ -903,7 +910,7 @@ register struct monst *mtmp;
             verbl_msg = "Relax, this won't hurt a bit.";
         break;
     case MS_GUARD:
-        if (money_cnt(invent))
+        if (money_cnt(g.invent))
             verbl_msg = "Please drop that gold and follow me.";
         else
             verbl_msg = "Please follow me.";
@@ -929,7 +936,7 @@ register struct monst *mtmp;
         boolean ms_Death = (ptr == &mons[PM_DEATH]);
 
         /* 3.6 tribute */
-        if (ms_Death && !context.tribute.Deathnotice
+        if (ms_Death && !g.context.tribute.Deathnotice
             && (book = u_have_novel()) != 0) {
             if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
                 Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
@@ -939,7 +946,7 @@ register struct monst *mtmp;
                     Strcat(verbuf, "  I may have been misquoted there.");
                 verbl_msg = verbuf;
             }
-            context.tribute.Deathnotice = 1;
+            g.context.tribute.Deathnotice = 1;
         } else if (ms_Death && rn2(3) && Death_quote(verbuf, sizeof verbuf)) {
             verbl_msg = verbuf;
         /* end of tribute addition */
@@ -981,15 +988,15 @@ dotalk()
     return result;
 }
 
-STATIC_OVL int
+static int
 dochat()
 {
     struct monst *mtmp;
     int tx, ty;
     struct obj *otmp;
 
-    if (is_silent(youmonst.data)) {
-        pline("As %s, you cannot speak.", an(youmonst.data->mname));
+    if (is_silent(g.youmonst.data)) {
+        pline("As %s, you cannot speak.", an(g.youmonst.data->mname));
         return 0;
     }
     if (Strangled) {

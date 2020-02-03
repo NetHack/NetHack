@@ -354,7 +354,7 @@ gnome_askname()
 
     /* Ask for a name and stuff the response into plname, a nethack global */
     ret = ghack_ask_string_dialog("What is your name?", "gandalf",
-                                  "GnomeHack", plname);
+                                  "GnomeHack", g.plname);
 
     /* Quit if they want to quit... */
     if (ret == -1) {
@@ -678,10 +678,9 @@ gnome_start_menu(winid wid)
 /*
 add_menu(windid window, int glyph, const anything identifier,
                                 char accelerator, char groupacc,
-                                int attr, char *str, boolean preselected)
+                                int attr, char *str, unsigned int itemflags)
                 -- Add a text line str to the given menu window.  If
-identifier
-                   is 0, then the line cannot be selected (e.g. a title).
+                   identifier is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
                    selected.  Accelerator is a keyboard key that can be used
                    to select the line.  If the accelerator of a selectable
@@ -705,13 +704,14 @@ identifier
                    The menu commands and aliases take care not to interfere
                    with the default object class symbols.
                 -- If you want this choice to be preselected when the
-                   menu is displayed, set preselected to TRUE.
+                   menu is displayed, set bit MENU_ITEMFLAGS_SELECTED.
 */
 void
 gnome_add_menu(winid wid, int glyph, const ANY_P *identifier,
                CHAR_P accelerator, CHAR_P group_accel, int attr,
-               const char *str, BOOLEAN_P presel)
+               const char *str, unsigned int itemflags)
 {
+    boolean presel = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
     GHackMenuItem item;
     item.glyph = glyph;
     item.identifier = identifier;
@@ -720,6 +720,7 @@ gnome_add_menu(winid wid, int glyph, const ANY_P *identifier,
     item.attr = attr;
     item.str = str;
     item.presel = presel;
+    item.itemflags = itemflags;
 
     if (wid != -1 && gnome_windowlist[wid].win != NULL) {
         gtk_signal_emit(GTK_OBJECT(gnome_windowlist[wid].win),
@@ -906,7 +907,7 @@ gnome_nhgetch()
     g_askingQuestion = 1;
     /* Process events until a key press event arrives. */
     while (g_numKeys == 0) {
-        if (program_state.done_hup)
+        if (g.program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }
@@ -944,7 +945,7 @@ gnome_nh_poskey(int *x, int *y, int *mod)
     g_askingQuestion = 0;
     /* Process events until a key or map-click arrives. */
     while (g_numKeys == 0 && g_numClicks == 0) {
-        if (program_state.done_hup)
+        if (g.program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }
@@ -1168,7 +1169,7 @@ gnome_outrip(winid wid, int how, time_t when)
     long year;
 
     /* Put name on stone */
-    Sprintf(buf, "%s\n", plname);
+    Sprintf(buf, "%s\n", g.plname);
     Strcat(ripString, buf);
 
     /* Put $ on stone */

@@ -1701,7 +1701,7 @@ int exit_condition;
                 inptr = (inptr + 1) % INBUF_SIZE;
                 /* pkey(retval); */
                 keep_going = FALSE;
-            } else if (program_state.done_hup) {
+            } else if (g.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;
@@ -1720,7 +1720,7 @@ int exit_condition;
                     /* pkey(retval); */
                 }
                 keep_going = FALSE;
-            } else if (program_state.done_hup) {
+            } else if (g.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;

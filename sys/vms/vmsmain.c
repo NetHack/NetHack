@@ -32,7 +32,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    register int fd;
+    NHFILE *nhfp;
 #ifdef CHDIR
     register char *dir;
 #endif
@@ -44,12 +44,12 @@ char *argv[];
     privon();
 #endif
 
-    sys_early_init();
+    early_init();
 
     atexit(byebye);
-    hname = argv[0];
-    hname = vms_basename(hname); /* name used in 'usage' type messages */
-    hackpid = getpid();
+    g.hname = argv[0];
+    g.hname = vms_basename(g.hname); /* name used in 'usage' type messages */
+    g.hackpid = getpid();
     (void) umask(0);
 
     choose_windows(DEFAULT_WINDOW_SYS);
@@ -67,8 +67,25 @@ char *argv[];
         dir = nh_getenv("HACKDIR");
 #endif
     if (argc > 1) {
+        if (argcheck(argc, argv, ARG_VERSION) == 2)
+            exit(EXIT_SUCCESS);
+
+        if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
 #ifdef CHDIR
-        if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
+            chdirx((char *) 0, 0);
+#endif
+            iflags.initoptions_noterminate = TRUE;
+            initoptions();
+            iflags.initoptions_noterminate = FALSE;
+            reveal_paths();
+            exit(EXIT_SUCCESS);
+        }
+        if (argcheck(argc, argv, ARG_DEBUG) == 1) {
+            argc--;
+            argv++;
+        }
+#ifdef CHDIR
+        if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
              */
@@ -141,7 +158,7 @@ char *argv[];
 
     if (wizard) {
         /* use character name rather than lock letter for file names */
-        locknum = 0;
+        g.locknum = 0;
     } else {
         /* suppress interrupts while processing lock file */
         (void) signal(SIGQUIT, SIG_IGN);
@@ -149,14 +166,14 @@ char *argv[];
     }
     /*
      * getlock() complains and quits if there is already a game
-     * in progress for current character name (when locknum == 0)
-     * or if there are too many active games (when locknum > 0).
+     * in progress for current character name (when g.locknum == 0)
+     * or if there are too many active games (when g.locknum > 0).
      * When proceeding, it creates an empty <lockname>.0 file to
      * designate the current game.
      * getlock() constructs <lockname> based on the character
-     * name (for !locknum) or on first available of alock, block,
+     * name (for !g.locknum) or on first available of alock, block,
      * clock, &c not currently in use in the playground directory
-     * (for locknum > 0).
+     * (for g.locknum > 0).
      */
     getlock();
 
@@ -175,8 +192,8 @@ char *argv[];
  * We'll return here if new game player_selection() renames the hero.
  */
 attempt_restore:
-    if ((fd = restore_saved_game()) >= 0) {
-        const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
+    if ((nhfp = restore_saved_game()) != 0) {
+        const char *fq_save = fqname(g.SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
@@ -188,7 +205,7 @@ attempt_restore:
 #endif
         pline("Restoring save file...");
         mark_synch(); /* flush output */
-        if (dorecover(fd)) {
+        if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
             wd_message();
             if (discover || wizard) {
@@ -212,7 +229,7 @@ attempt_restore:
                    if locking alphabetically, the existing lock file
                    can still be used; otherwise, discard current one
                    and create another for the new character name */
-                if (!locknum) {
+                if (!g.locknum) {
                     delete_levelfile(0); /* remove empty lock file */
                     getlock();
                 }
@@ -257,11 +274,11 @@ char *argv[];
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -315,10 +332,10 @@ char *argv[];
     }
 
     if (argc > 1)
-        locknum = atoi(argv[1]);
+        g.locknum = atoi(argv[1]);
 #ifdef MAX_NR_OF_PLAYERS
-    if (!locknum || locknum > MAX_NR_OF_PLAYERS)
-        locknum = MAX_NR_OF_PLAYERS;
+    if (!g.locknum || g.locknum > MAX_NR_OF_PLAYERS)
+        g.locknum = MAX_NR_OF_PLAYERS;
 #endif
 }
 
@@ -368,8 +385,8 @@ whoami()
      */
     register char *s;
 
-    if (!*plname && (s = nh_getenv("USER")))
-        (void) lcase(strncpy(plname, s, sizeof(plname) - 1));
+    if (!*g.plname && (s = nh_getenv("USER")))
+        (void) lcase(strncpy(g.plname, s, sizeof(g.plname) - 1));
 }
 
 static void
@@ -391,7 +408,7 @@ byebye()
 
     /* SIGHUP doesn't seem to do anything on VMS, so we fudge it here... */
     hup = (void FDECL((*), (int) )) signal(SIGHUP, SIG_IGN);
-    if (!program_state.exiting++ && hup != (void FDECL((*), (int) )) SIG_DFL
+    if (!g.program_state.exiting++ && hup != (void FDECL((*), (int) )) SIG_DFL
         && hup != (void FDECL((*), (int) )) SIG_IGN) {
         (*hup)(SIGHUP);
     }
@@ -414,7 +431,7 @@ genericptr_t sigargs, mechargs; /* [0] is argc, [1..argc] are the real args */
     if (condition == SS$_ACCVIO /* access violation */
         || (condition >= SS$_ASTFLT && condition <= SS$_TBIT)
         || (condition >= SS$_ARTRES && condition <= SS$_INHCHME)) {
-        program_state.done_hup = TRUE; /* pretend hangup has been attempted */
+        g.program_state.done_hup = TRUE; /* pretend hangup has been attempted */
 #if (NH_DEVEL_STATUS == NH_STATUS_RELEASED)
         if (wizard)
 #endif

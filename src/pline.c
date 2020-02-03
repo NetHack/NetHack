@@ -10,9 +10,6 @@
                               * config file parsing) with modest decoration;
                               * result will then be truncated to BUFSZ-1 */
 
-static unsigned pline_flags = 0;
-static char prevmsg[BUFSZ];
-
 static void FDECL(putmesg, (const char *));
 static char *FDECL(You_buf, (int));
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
@@ -20,9 +17,6 @@ static void FDECL(execplinehandler, (const char *));
 #endif
 
 #ifdef DUMPLOG
-/* also used in end.c */
-unsigned saved_pline_index = 0; /* slot in saved_plines[] to use next */
-char *saved_plines[DUMPLOG_MSG_COUNT] = { (char *) 0 };
 
 /* keep the most recent DUMPLOG_MSG_COUNT messages */
 void
@@ -36,9 +30,11 @@ const char *line;
      *  The core should take responsibility for that and have
      *  this share it.
      */
-    unsigned indx = saved_pline_index; /* next slot to use */
-    char *oldest = saved_plines[indx]; /* current content of that slot */
+    unsigned indx = g.saved_pline_index; /* next slot to use */
+    char *oldest = g.saved_plines[indx]; /* current content of that slot */
 
+    if (!strncmp(line, "Unknown command", 15))
+        return;
     if (oldest && strlen(oldest) >= strlen(line)) {
         /* this buffer will gradually shrink until the 'else' is needed;
            there's no pressing need to track allocation size instead */
@@ -46,9 +42,9 @@ const char *line;
     } else {
         if (oldest)
             free((genericptr_t) oldest);
-        saved_plines[indx] = dupstr(line);
+        g.saved_plines[indx] = dupstr(line);
     }
-    saved_pline_index = (indx + 1) % DUMPLOG_MSG_COUNT;
+    g.saved_pline_index = (indx + 1) % DUMPLOG_MSG_COUNT;
 }
 
 /* called during save (unlike the interface-specific message history,
@@ -60,9 +56,9 @@ dumplogfreemessages()
     unsigned indx;
 
     for (indx = 0; indx < DUMPLOG_MSG_COUNT; ++indx)
-        if (saved_plines[indx])
-            free((genericptr_t) saved_plines[indx]), saved_plines[indx] = 0;
-    saved_pline_index = 0;
+        if (g.saved_plines[indx])
+            free((genericptr_t) g.saved_plines[indx]), g.saved_plines[indx] = 0;
+    g.saved_pline_index = 0;
 }
 #endif
 
@@ -73,10 +69,10 @@ const char *line;
 {
     int attr = ATR_NONE;
 
-    if ((pline_flags & URGENT_MESSAGE) != 0
+    if ((g.pline_flags & URGENT_MESSAGE) != 0
         && (windowprocs.wincap2 & WC2_URGENT_MESG) != 0)
         attr |= ATR_URGENT;
-    if ((pline_flags & SUPPRESS_HISTORY) != 0
+    if ((g.pline_flags & SUPPRESS_HISTORY) != 0
         && (windowprocs.wincap2 & WC2_SUPPRESS_HIST) != 0)
         attr |= ATR_NOHISTORY;
 
@@ -134,10 +130,10 @@ VA_DECL(const char *, line)
     if (!line || !*line)
         return;
 #ifdef HANGUPHANDLING
-    if (program_state.done_hup)
+    if (g.program_state.done_hup)
         return;
 #endif
-    if (program_state.wizkit_wishing)
+    if (g.program_state.wizkit_wishing)
         return;
 
     if (index(line, '%')) {
@@ -173,7 +169,7 @@ VA_DECL(const char *, line)
      * Unfortunately, that means Norep() isn't honored (general issue) and
      * that short lines aren't combined into one longer one (tty behavior).
      */
-    if ((pline_flags & SUPPRESS_HISTORY) == 0)
+    if ((g.pline_flags & SUPPRESS_HISTORY) == 0)
         dumplogmsg(line);
 #endif
     /* use raw_print() if we're called too early (or perhaps too late
@@ -187,12 +183,12 @@ VA_DECL(const char *, line)
     }
 
     msgtyp = MSGTYP_NORMAL;
-    no_repeat = (pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
-    if ((pline_flags & OVERRIDE_MSGTYPE) == 0) {
+    no_repeat = (g.pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
+    if ((g.pline_flags & OVERRIDE_MSGTYPE) == 0) {
         msgtyp = msgtype_type(line, no_repeat);
-        if ((pline_flags & URGENT_MESSAGE) == 0
+        if ((g.pline_flags & URGENT_MESSAGE) == 0
             && (msgtyp == MSGTYP_NOSHOW
-                || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg))))
+                || (msgtyp == MSGTYP_NOREP && !strcmp(line, g.prevmsg))))
             /* FIXME: we need a way to tell our caller that this message
              * was suppressed so that caller doesn't set iflags.last_msg
              * for something that hasn't been shown, otherwise a subsequent
@@ -203,7 +199,7 @@ VA_DECL(const char *, line)
             goto pline_done;
     }
 
-    if (vision_full_recalc)
+    if (g.vision_full_recalc)
         vision_recalc(0);
     if (u.ux)
         flush_screen(1); /* %% */
@@ -216,7 +212,7 @@ VA_DECL(const char *, line)
 
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
-    (void) strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
+    (void) strncpy(g.prevmsg, line, BUFSZ), g.prevmsg[BUFSZ - 1] = '\0';
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 
@@ -240,9 +236,9 @@ VA_DECL2(unsigned, pflags, const char *, line)
 {
     VA_START(line);
     VA_INIT(line, const char *);
-    pline_flags = pflags;
+    g.pline_flags = pflags;
     vpline(line, VA_ARGS);
-    pline_flags = 0;
+    g.pline_flags = 0;
     VA_END();
     return;
 }
@@ -253,36 +249,32 @@ VA_DECL(const char *, line)
 {
     VA_START(line);
     VA_INIT(line, const char *);
-    pline_flags = PLINE_NOREPEAT;
+    g.pline_flags = PLINE_NOREPEAT;
     vpline(line, VA_ARGS);
-    pline_flags = 0;
+    g.pline_flags = 0;
     VA_END();
     return;
 }
-
-/* work buffer for You(), &c and verbalize() */
-static char *you_buf = 0;
-static int you_buf_siz = 0;
 
 static char *
 You_buf(siz)
 int siz;
 {
-    if (siz > you_buf_siz) {
-        if (you_buf)
-            free((genericptr_t) you_buf);
-        you_buf_siz = siz + 10;
-        you_buf = (char *) alloc((unsigned) you_buf_siz);
+    if (siz > g.you_buf_siz) {
+        if (g.you_buf)
+            free((genericptr_t) g.you_buf);
+        g.you_buf_siz = siz + 10;
+        g.you_buf = (char *) alloc((unsigned) g.you_buf_siz);
     }
-    return you_buf;
+    return g.you_buf;
 }
 
 void
 free_youbuf()
 {
-    if (you_buf)
-        free((genericptr_t) you_buf), you_buf = (char *) 0;
-    you_buf_siz = 0;
+    if (g.you_buf)
+        free((genericptr_t) g.you_buf), g.you_buf = (char *) 0;
+    g.you_buf_siz = 0;
 }
 
 /* `prefix' must be a string literal, not a pointer */
@@ -493,10 +485,10 @@ VA_DECL(const char *, s)
 
     VA_START(s);
     VA_INIT(s, const char *);
-    if (program_state.in_impossible)
+    if (g.program_state.in_impossible)
         panic("impossible called impossible");
 
-    program_state.in_impossible = 1;
+    g.program_state.in_impossible = 1;
 #if !defined(NO_VSNPRINTF)
     (void) vsnprintf(pbuf, sizeof pbuf, s, VA_ARGS);
 #else
@@ -509,11 +501,15 @@ VA_DECL(const char *, s)
     pline("%s", VA_PASS1(pbuf));
     /* reuse pbuf[] */
     Strcpy(pbuf, "Program in disorder!");
-    if (program_state.something_worth_saving)
+    if (g.program_state.something_worth_saving)
         Strcat(pbuf, "  (Saving and reloading may fix this problem.)");
     pline("%s", VA_PASS1(pbuf));
+    pline("Please report these messages to %s.", DEVTEAM_EMAIL);
+    if (sysopt.support) {
+        pline("Alternatively, contact local support: %s", sysopt.support);
+    }
 
-    program_state.in_impossible = 0;
+    g.program_state.in_impossible = 0;
     VA_END();
 }
 

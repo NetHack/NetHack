@@ -440,7 +440,7 @@ ghack_status_window_update_stats()
     long umoney;
 
     /* First, fill in the player name and the dungeon level */
-    strcpy(buf, plname);
+    strcpy(buf, g.plname);
     if ('a' <= buf[0] && buf[0] <= 'z')
         buf[0] += 'A' - 'a';
     strcat(buf, " the ");
@@ -558,7 +558,7 @@ ghack_status_window_update_stats()
     gtk_label_set(GTK_LABEL(chaLabel), buf);
 
     /* Now do the non-pixmaped stats (gold and such) */
-    umoney = money_cnt(invent);
+    umoney = money_cnt(g.invent);
     sprintf(buf, "Au:%ld", umoney);
     if (lastAu < umoney && firstTime == FALSE) {
         /* Ok, this changed so add it to the highlighing list */
@@ -662,7 +662,7 @@ ghack_status_window_update_stats()
     }
 
     if (flags.time) {
-        sprintf(buf, "Time:%ld", moves);
+        sprintf(buf, "Time:%ld", g.moves);
         gtk_label_set(GTK_LABEL(timeLabel), buf);
     } else
         gtk_label_set(GTK_LABEL(timeLabel), "");

@@ -224,7 +224,7 @@ winid window;
 
 void
 chainout_add_menu(vp, window, glyph, identifier, ch, gch, attr, str,
-                  preselected)
+                  itemflags)
 void *vp;
 winid window;               /* window to use, must be of type NHW_MENU */
 int glyph;                  /* glyph to display with item (unused) */
@@ -233,12 +233,12 @@ char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
 int attr;                   /* attribute for string (like tty_putstr()) */
 const char *str;            /* menu string */
-boolean preselected;        /* item is marked as selected */
+unsigned int itemflags;     /* itemflags such as marked as selected */
 {
     struct chainout_data *tdp = vp;
 
     (*tdp->nprocs->win_add_menu)(window, glyph, identifier, ch, gch, attr,
-                                 str, preselected);
+                                 str, itemflags);
 }
 
 void

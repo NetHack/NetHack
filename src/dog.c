@@ -5,7 +5,7 @@
 
 #include "hack.h"
 
-STATIC_DCL int NDECL(pet_type);
+static int NDECL(pet_type);
 
 void
 newedog(mtmp)
@@ -44,7 +44,7 @@ register struct monst *mtmp;
     EDOG(mtmp)->dropdist = 10000;
     EDOG(mtmp)->apport = ACURR(A_CHA);
     EDOG(mtmp)->whistletime = 0;
-    EDOG(mtmp)->hungrytime = 1000 + monstermoves;
+    EDOG(mtmp)->hungrytime = 1000 + g.monstermoves;
     EDOG(mtmp)->ogoal.x = -1; /* force error if used before set */
     EDOG(mtmp)->ogoal.y = -1;
     EDOG(mtmp)->abuse = 0;
@@ -53,14 +53,14 @@ register struct monst *mtmp;
     EDOG(mtmp)->killed_by_u = 0;
 }
 
-STATIC_OVL int
+static int
 pet_type()
 {
-    if (urole.petnum != NON_PM)
-        return  urole.petnum;
-    else if (preferred_pet == 'c')
+    if (g.urole.petnum != NON_PM)
+        return  g.urole.petnum;
+    else if (g.preferred_pet == 'c')
         return  PM_KITTEN;
-    else if (preferred_pet == 'd')
+    else if (g.preferred_pet == 'd')
         return  PM_LITTLE_DOG;
     else
         return  rn2(2) ? PM_KITTEN : PM_LITTLE_DOG;
@@ -84,7 +84,7 @@ boolean quietly;
             /* activating a figurine provides one way to exceed the
                maximum number of the target critter created--unless
                it has a special limit (erinys, Nazgul) */
-            if ((mvitals[mndx].mvflags & G_EXTINCT)
+            if ((g.mvitals[mndx].mvflags & G_EXTINCT)
                 && mbirth_limit(mndx) != MAXMONNO) {
                 if (!quietly)
                     /* have just been given "You <do something with>
@@ -155,18 +155,17 @@ makedog()
     register struct obj *otmp;
     const char *petname;
     int pettype;
-    static int petname_used = 0;
 
-    if (preferred_pet == 'n')
+    if (g.preferred_pet == 'n')
         return ((struct monst *) 0);
 
     pettype = pet_type();
     if (pettype == PM_LITTLE_DOG)
-        petname = dogname;
+        petname = g.dogname;
     else if (pettype == PM_PONY)
-        petname = horsename;
+        petname = g.horsename;
     else
-        petname = catname;
+        petname = g.catname;
 
     /* default pet names */
     if (!*petname && pettype == PM_LITTLE_DOG) {
@@ -186,14 +185,14 @@ makedog()
     if (!mtmp)
         return ((struct monst *) 0); /* pets were genocided */
 
-    context.startingpet_mid = mtmp->m_id;
+    g.context.startingpet_mid = mtmp->m_id;
     /* Horses already wear a saddle */
     if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
         otmp->dknown = otmp->bknown = otmp->rknown = 1;
         put_saddle_on_mon(otmp, mtmp);
     }
 
-    if (!petname_used++ && *petname)
+    if (!g.petname_used++ && *petname)
         mtmp = christen_monst(mtmp, petname);
 
     initedog(mtmp);
@@ -212,7 +211,7 @@ update_mlstmv()
     for (mon = fmon; mon; mon = mon->nmon) {
         if (DEADMONSTER(mon))
             continue;
-        mon->mlstmv = monstermoves;
+        mon->mlstmv = g.monstermoves;
     }
 }
 
@@ -223,8 +222,8 @@ losedogs()
     int dismissKops = 0;
 
     /*
-     * First, scan migrating_mons for shopkeepers who want to dismiss Kops,
-     * and scan mydogs for shopkeepers who want to retain kops.
+     * First, scan g.migrating_mons for shopkeepers who want to dismiss Kops,
+     * and scan g.mydogs for shopkeepers who want to retain kops.
      * Second, dismiss kops if warranted, making more room for arrival.
      * Third, place monsters accompanying the hero.
      * Last, place migrating monsters coming to this level.
@@ -236,7 +235,7 @@ losedogs()
      */
 
     /* check for returning shk(s) */
-    for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
         if (mtmp->mux != u.uz.dnum || mtmp->muy != u.uz.dlevel)
             continue;
         if (mtmp->isshk) {
@@ -252,11 +251,11 @@ losedogs()
             }
         }
     }
-    /* make the same check for mydogs */
-    for (mtmp = mydogs; mtmp && dismissKops >= 0; mtmp = mtmp->nmon) {
+    /* make the same check for g.mydogs */
+    for (mtmp = g.mydogs; mtmp && dismissKops >= 0; mtmp = mtmp->nmon) {
         if (mtmp->isshk) {
             /* hostile shk might accompany hero [ESHK(mtmp)->dismiss_kops
-               can't be set here; it's only used for migrating_mons] */
+               can't be set here; it's only used for g.migrating_mons] */
             if (!mtmp->mpeaceful)
                 dismissKops = -1;
         }
@@ -269,22 +268,22 @@ losedogs()
         make_happy_shoppers(TRUE);
 
     /* place pets and/or any other monsters who accompany hero */
-    while ((mtmp = mydogs) != 0) {
-        mydogs = mtmp->nmon;
+    while ((mtmp = g.mydogs) != 0) {
+        g.mydogs = mtmp->nmon;
         mon_arrive(mtmp, TRUE);
     }
 
     /* time for migrating monsters to arrive;
        monsters who belong on this level but fail to arrive get put
        back onto the list (at head), so traversing it is tricky */
-    for (mtmp = migrating_mons; mtmp; mtmp = mtmp2) {
+    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp->nmon;
         if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel) {
-            /* remove mtmp from migrating_mons list */
-            if (mtmp == migrating_mons) {
-                migrating_mons = mtmp->nmon;
+            /* remove mtmp from g.migrating_mons list */
+            if (mtmp == g.migrating_mons) {
+                g.migrating_mons = mtmp->nmon;
             } else {
-                for (mtmp0 = migrating_mons; mtmp0; mtmp0 = mtmp0->nmon)
+                for (mtmp0 = g.migrating_mons; mtmp0; mtmp0 = mtmp0->nmon)
                     if (mtmp0->nmon == mtmp) {
                         mtmp0->nmon = mtmp->nmon;
                         break;
@@ -355,12 +354,12 @@ boolean with_you;
      * specify its final destination.
      */
 
-    if (mtmp->mlstmv < monstermoves - 1L) {
+    if (mtmp->mlstmv < g.monstermoves - 1L) {
         /* heal monster for time spent in limbo */
-        long nmv = monstermoves - 1L - mtmp->mlstmv;
+        long nmv = g.monstermoves - 1L - mtmp->mlstmv;
 
         mon_catchup_elapsed_time(mtmp, nmv);
-        mtmp->mlstmv = monstermoves - 1L;
+        mtmp->mlstmv = g.monstermoves - 1L;
 
         /* let monster move a bit on new level (see placement code below) */
         wander = (xchar) min(nmv, 8);
@@ -389,7 +388,7 @@ boolean with_you;
         xlocale = xdnladder, ylocale = ydnladder;
         break;
     case MIGR_SSTAIRS:
-        xlocale = sstairs.sx, ylocale = sstairs.sy;
+        xlocale = g.sstairs.sx, ylocale = g.sstairs.sy;
         break;
     case MIGR_PORTAL:
         if (In_endgame(&u.uz)) {
@@ -398,12 +397,12 @@ boolean with_you;
                that we know that the current endgame levels always
                build upwards and never have any exclusion subregion
                inside their TELEPORT_REGION settings. */
-            xlocale = rn1(updest.hx - updest.lx + 1, updest.lx);
-            ylocale = rn1(updest.hy - updest.ly + 1, updest.ly);
+            xlocale = rn1(g.updest.hx - g.updest.lx + 1, g.updest.lx);
+            ylocale = rn1(g.updest.hy - g.updest.ly + 1, g.updest.ly);
             break;
         }
         /* find the arrival portal */
-        for (t = ftrap; t; t = t->ntrap)
+        for (t = g.ftrap; t; t = t->ntrap)
             if (t->ttyp == MAGIC_PORTAL)
                 break;
         if (t) {
@@ -418,9 +417,9 @@ boolean with_you;
         break;
     }
 
-    if ((mtmp->mspare1 & MIGR_LEFTOVERS) != 0L) {
+    if ((mtmp->migflags & MIGR_LEFTOVERS) != 0L) {
         /* Pick up the rest of the MIGR_TO_SPECIES objects */
-        if (migrating_objs)
+        if (g.migrating_objs)
             deliver_obj_to_mon(mtmp, 0, DF_ALL);
     }
 
@@ -433,7 +432,7 @@ boolean with_you;
             coord c;
 
             /* somexy() handles irregular rooms */
-            if (somexy(&rooms[*r - ROOMOFFSET], &c))
+            if (somexy(&g.rooms[*r - ROOMOFFSET], &c))
                 xlocale = c.x, ylocale = c.y;
             else
                 xlocale = ylocale = 0;
@@ -539,8 +538,8 @@ long nmv; /* number of moves */
         && (carnivorous(mtmp->data) || herbivorous(mtmp->data))) {
         struct edog *edog = EDOG(mtmp);
 
-        if ((monstermoves > edog->hungrytime + 500 && mtmp->mhp < 3)
-            || (monstermoves > edog->hungrytime + 750))
+        if ((g.monstermoves > edog->hungrytime + 500 && mtmp->mhp < 3)
+            || (g.monstermoves > edog->hungrytime + 750))
             mtmp->mtame = mtmp->mpeaceful = 0;
     }
 
@@ -653,10 +652,10 @@ boolean pets_only; /* true for ascension or final escape */
                 obj->no_charge = 0;
             }
 
-            relmon(mtmp, &mydogs);   /* move it from map to mydogs */
+            relmon(mtmp, &g.mydogs);   /* move it from map to g.mydogs */
             mtmp->mx = mtmp->my = 0; /* avoid mnexto()/MON_AT() problem */
             mtmp->wormno = num_segs;
-            mtmp->mlstmv = monstermoves;
+            mtmp->mlstmv = g.monstermoves;
         } else if (mtmp->iswiz) {
             /* we want to be able to find him when his next resurrection
                chance comes up, but have him resume his present location
@@ -708,7 +707,7 @@ coord *cc;   /* optional destination coordinates */
         mtmp->mtame--;
         m_unleash(mtmp, TRUE);
     }
-    relmon(mtmp, &migrating_mons); /* move it from map to migrating_mons */
+    relmon(mtmp, &g.migrating_mons); /* move it from map to g.migrating_mons */
 
     new_lev.dnum = ledger_to_dnum((xchar) tolev);
     new_lev.dlevel = ledger_to_dlev((xchar) tolev);
@@ -718,7 +717,7 @@ coord *cc;   /* optional destination coordinates */
     if (In_W_tower(mtmp->mx, mtmp->my, &u.uz))
         xyflags |= 2;
     mtmp->wormno = num_segs;
-    mtmp->mlstmv = monstermoves;
+    mtmp->mlstmv = g.monstermoves;
     mtmp->mtrack[1].x = cc ? cc->x : mtmp->mx;
     mtmp->mtrack[1].y = cc ? cc->y : mtmp->my;
     mtmp->mtrack[0].x = xyloc;
@@ -726,8 +725,8 @@ coord *cc;   /* optional destination coordinates */
     mtmp->mux = new_lev.dnum;
     mtmp->muy = new_lev.dlevel;
     mtmp->mx = mtmp->my = 0; /* this implies migration */
-    if (mtmp == context.polearm.hitmon)
-        context.polearm.hitmon = (struct monst *) 0;
+    if (mtmp == g.context.polearm.hitmon)
+        g.context.polearm.hitmon = (struct monst *) 0;
 }
 
 /* return quality of food; the lower the better */
@@ -754,6 +753,21 @@ register struct obj *obj;
         if ((obj->otyp == CORPSE || obj->otyp == EGG) && touch_petrifies(fptr)
             && !resists_ston(mon))
             return POISON;
+        if (obj->otyp == LUMP_OF_ROYAL_JELLY
+            && mon->data == &mons[PM_KILLER_BEE]) {
+            struct monst *mtmp = 0;
+
+            /* if there's a queen bee on the level, don't eat royal jelly;
+               if there isn't, do eat it and grow into a queen */
+            if ((g.mvitals[PM_QUEEN_BEE].mvflags & G_GENOD) == 0)
+                for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+                    if (DEADMONSTER(mtmp))
+                        continue;
+                    if (mtmp->data == &mons[PM_QUEEN_BEE])
+                        break;
+                }
+            return !mtmp ? DOGFOOD : TABU;
+        }
         if (!carni && !herbi)
             return obj->cursed ? UNDEF : APPORT;
 
@@ -768,7 +782,7 @@ register struct obj *obj;
            when starving; they never eat stone-to-flesh'd meat */
         if (mptr == &mons[PM_GHOUL]) {
             if (obj->otyp == CORPSE)
-                return (peek_at_iced_corpse_age(obj) + 50L <= monstermoves
+                return (peek_at_iced_corpse_age(obj) + 50L <= g.monstermoves
                         && fptr != &mons[PM_LIZARD]
                         && fptr != &mons[PM_LICHEN])
                            ? DOGFOOD
@@ -790,7 +804,7 @@ register struct obj *obj;
         case EGG:
             return carni ? CADAVER : MANFOOD;
         case CORPSE:
-            if ((peek_at_iced_corpse_age(obj) + 50L <= monstermoves
+            if ((peek_at_iced_corpse_age(obj) + 50L <= g.monstermoves
                  && obj->corpsenm != PM_LIZARD && obj->corpsenm != PM_LICHEN
                  && mptr->mlet != S_FUNGUS)
                 || (acidic(fptr) && !resists_acid(mon))
@@ -887,7 +901,7 @@ register struct obj *obj;
     if (mtmp == u.ustuck) {
         if (u.uswallow)
             expels(mtmp, mtmp->data, TRUE);
-        else if (!(Upolyd && sticks(youmonst.data)))
+        else if (!(Upolyd && sticks(g.youmonst.data)))
             unstuck(mtmp);
     }
 
@@ -898,7 +912,7 @@ register struct obj *obj;
         if (mtmp->mcanmove && !mtmp->mconf && !mtmp->meating
             && ((tasty = dogfood(mtmp, obj)) == DOGFOOD
                 || (tasty <= ACCFOOD
-                    && EDOG(mtmp)->hungrytime <= monstermoves))) {
+                    && EDOG(mtmp)->hungrytime <= g.monstermoves))) {
             /* pet will "catch" and eat this thrown food */
             if (canseemon(mtmp)) {
                 boolean big_corpse =
@@ -923,11 +937,11 @@ register struct obj *obj;
         /* monsters with conflicting structures cannot be tamed */
         || mtmp->isshk || mtmp->isgd || mtmp->ispriest || mtmp->isminion
         || is_covetous(mtmp->data) || is_human(mtmp->data)
-        || (is_demon(mtmp->data) && !is_demon(youmonst.data))
+        || (is_demon(mtmp->data) && !is_demon(g.youmonst.data))
         || (obj && dogfood(mtmp, obj) >= MANFOOD))
         return FALSE;
 
-    if (mtmp->m_id == quest_status.leader_m_id)
+    if (mtmp->m_id == g.quest_status.leader_m_id)
         return FALSE;
 
     /* add the pet extension */
@@ -985,7 +999,7 @@ boolean was_dead;
             if (!rn2(edog->abuse + 1))
                 mtmp->mpeaceful = 1;
         if (!quietly && cansee(mtmp->mx, mtmp->my)) {
-            if (haseyes(youmonst.data)) {
+            if (haseyes(g.youmonst.data)) {
                 if (haseyes(mtmp->data))
                     pline("%s %s to look you in the %s.", Monnam(mtmp),
                           mtmp->mpeaceful ? "seems unable" : "refuses",
@@ -1018,8 +1032,8 @@ boolean was_dead;
         edog->killed_by_u = 0;
         edog->abuse = 0;
         edog->ogoal.x = edog->ogoal.y = -1;
-        if (was_dead || edog->hungrytime < monstermoves + 500L)
-            edog->hungrytime = monstermoves + 500L;
+        if (was_dead || edog->hungrytime < g.monstermoves + 500L)
+            edog->hungrytime = g.monstermoves + 500L;
         if (was_dead) {
             edog->droptime = 0L;
             edog->dropdist = 10000;

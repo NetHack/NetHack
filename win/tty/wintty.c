@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1575245194 2019/12/02 00:06:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.227 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1580252140 2020/01/28 22:55:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,7 +56,7 @@ extern short glyph2tile[];
  */
 #define HUPSKIP() \
     do {                                        \
-        if (program_state.done_hup) {           \
+        if (g.program_state.done_hup) {           \
             morc = '\033';                      \
             return;                             \
         }                                       \
@@ -64,15 +64,13 @@ extern short glyph2tile[];
     /* morc=ESC - in case we bypass xwaitforspace() which sets that */
 #define HUPSKIP_RESULT(RES) \
     do {                                        \
-        if (program_state.done_hup)             \
+        if (g.program_state.done_hup)             \
             return (RES);                       \
     } while (0)
 #else /* !HANGUP_HANDLING */
 #define HUPSKIP() /*empty*/
 #define HUPSKIP_RESULT(RES) /*empty*/
 #endif /* ?HANGUP_HANDLING */
-
-extern char mapped_menu_cmds[]; /* from options.c */
 
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
@@ -154,11 +152,12 @@ char defmorestr[] = "--More--";
 #if defined(USE_TILES) && defined(MSDOS)
 boolean clipping = FALSE; /* clipping on? */
 int clipx = 0, clipxmax = 0;
+int clipy = 0, clipymax = 0;
 #else
 static boolean clipping = FALSE; /* clipping on? */
 static int clipx = 0, clipxmax = 0;
-#endif
 static int clipy = 0, clipymax = 0;
+#endif
 #endif /* CLIPPING */
 
 #if defined(USE_TILES) && defined(MSDOS)
@@ -174,45 +173,45 @@ boolean HE_resets_AS; /* see termcap.c */
 static const char to_continue[] = "to continue";
 #define getret() getreturn(to_continue)
 #else
-STATIC_DCL void NDECL(getret);
+static void NDECL(getret);
 #endif
-STATIC_DCL void FDECL(bail, (const char *)); /* __attribute__((noreturn)) */
-STATIC_DCL void NDECL(new_status_window);
-STATIC_DCL void FDECL(erase_menu_or_text, (winid, struct WinDesc *,
+static void FDECL(bail, (const char *)); /* __attribute__((noreturn)) */
+static void NDECL(new_status_window);
+static void FDECL(erase_menu_or_text, (winid, struct WinDesc *,
                                            BOOLEAN_P));
-STATIC_DCL void FDECL(free_window_info, (struct WinDesc *, BOOLEAN_P));
-STATIC_DCL void FDECL(dmore, (struct WinDesc *, const char *));
-STATIC_DCL void FDECL(set_item_state, (winid, int, tty_menu_item *));
-STATIC_DCL void FDECL(set_all_on_page, (winid, tty_menu_item *,
+static void FDECL(free_window_info, (struct WinDesc *, BOOLEAN_P));
+static void FDECL(dmore, (struct WinDesc *, const char *));
+static void FDECL(set_item_state, (winid, int, tty_menu_item *));
+static void FDECL(set_all_on_page, (winid, tty_menu_item *,
                                         tty_menu_item *));
-STATIC_DCL void FDECL(unset_all_on_page, (winid, tty_menu_item *,
+static void FDECL(unset_all_on_page, (winid, tty_menu_item *,
                                           tty_menu_item *));
-STATIC_DCL void FDECL(invert_all_on_page, (winid, tty_menu_item *,
+static void FDECL(invert_all_on_page, (winid, tty_menu_item *,
                                            tty_menu_item *, CHAR_P));
-STATIC_DCL void FDECL(invert_all, (winid, tty_menu_item *,
+static void FDECL(invert_all, (winid, tty_menu_item *,
                                    tty_menu_item *, CHAR_P));
-STATIC_DCL void FDECL(toggle_menu_attr, (BOOLEAN_P, int, int));
-STATIC_DCL void FDECL(process_menu_window, (winid, struct WinDesc *));
-STATIC_DCL void FDECL(process_text_window, (winid, struct WinDesc *));
-STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
-STATIC_DCL const char *FDECL(compress_str, (const char *));
-STATIC_DCL void FDECL(tty_putsym, (winid, int, int, CHAR_P));
-STATIC_DCL void FDECL(setup_rolemenu, (winid, BOOLEAN_P, int, int, int));
-STATIC_DCL void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
-STATIC_DCL void FDECL(setup_gendmenu, (winid, BOOLEAN_P, int, int, int));
-STATIC_DCL void FDECL(setup_algnmenu, (winid, BOOLEAN_P, int, int, int));
-STATIC_DCL boolean NDECL(reset_role_filtering);
+static void FDECL(toggle_menu_attr, (BOOLEAN_P, int, int));
+static void FDECL(process_menu_window, (winid, struct WinDesc *));
+static void FDECL(process_text_window, (winid, struct WinDesc *));
+static tty_menu_item *FDECL(reverse, (tty_menu_item *));
+static const char *FDECL(compress_str, (const char *));
+static void FDECL(tty_putsym, (winid, int, int, CHAR_P));
+static void FDECL(setup_rolemenu, (winid, BOOLEAN_P, int, int, int));
+static void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
+static void FDECL(setup_gendmenu, (winid, BOOLEAN_P, int, int, int));
+static void FDECL(setup_algnmenu, (winid, BOOLEAN_P, int, int, int));
+static boolean NDECL(reset_role_filtering);
 #ifdef STATUS_HILITES
-STATIC_DCL boolean FDECL(check_fields, (BOOLEAN_P, int *));
-STATIC_DCL void NDECL(render_status);
-STATIC_DCL void FDECL(tty_putstatusfield, (const char *, int, int));
-STATIC_DCL boolean NDECL(check_windowdata);
-STATIC_DCL void NDECL(set_condition_length);
-STATIC_DCL int FDECL(make_things_fit, (BOOLEAN_P));
-STATIC_DCL void FDECL(shrink_enc, (int));
-STATIC_DCL void FDECL(shrink_dlvl, (int));
+static boolean FDECL(check_fields, (BOOLEAN_P, int *));
+static void NDECL(render_status);
+static void FDECL(tty_putstatusfield, (const char *, int, int));
+static boolean NDECL(check_windowdata);
+static void NDECL(set_condition_length);
+static int FDECL(make_things_fit, (BOOLEAN_P));
+static void FDECL(shrink_enc, (int));
+static void FDECL(shrink_dlvl, (int));
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-STATIC_DCL void NDECL(status_sanity_check);
+static void NDECL(status_sanity_check);
 #endif /* NH_DEVEL_STATUS */
 #endif
 
@@ -260,7 +259,7 @@ int i, c, d;
 
 
 /* clean up and quit */
-STATIC_OVL void
+static void
 bail(mesg)
 const char *mesg;
 {
@@ -271,7 +270,7 @@ const char *mesg;
 }
 
 #if defined(SIGWINCH) && defined(CLIPPING)
-STATIC_DCL void FDECL(winch_handler, (int));
+static void FDECL(winch_handler, (int));
 
     /*
      * This really ought to just set a flag like the hangup handler does,
@@ -283,7 +282,7 @@ STATIC_DCL void FDECL(winch_handler, (int));
      * 'winch_seen' has been "notyet" for a long time....
      */
 /*ARGUSED*/
-STATIC_OVL void
+static void
 winch_handler(sig_unused) /* signal handler is called with at least 1 arg */
 int sig_unused UNUSED;
 {
@@ -330,7 +329,7 @@ int sig_unused UNUSED;
                 ttyDisplay->toplin = i;
                 flush_screen(1);
                 if (i) {
-                    addtopl(toplines);
+                    addtopl(g.toplines);
                 } else
                     for (i = WIN_INVEN; i < MAXWIN; i++)
                         if (wins[i] && wins[i]->active) {
@@ -349,7 +348,7 @@ int sig_unused UNUSED;
 
 /* destroy and recreate status window; extracted from winch_handler()
    and augmented for use by tty_preference_update() */
-STATIC_OVL void
+static void
 new_status_window()
 {
     if (WIN_STATUS != WIN_ERR) {
@@ -575,14 +574,13 @@ tty_player_selection()
                     setup_rolemenu(win, TRUE, RACE, GEND, ALGN);
                     /* add miscellaneous menu entries */
                     role_menu_extra(ROLE_RANDOM, win, TRUE);
-                    any = zeroany; /* separator, not a choice */
+                    any = cg.zeroany; /* separator, not a choice */
                     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-                             MENU_UNSELECTED);
+                             MENU_ITEMFLAGS_NONE);
                     role_menu_extra(RS_RACE, win, FALSE);
                     role_menu_extra(RS_GENDER, win, FALSE);
                     role_menu_extra(RS_ALGNMNT, win, FALSE);
-                    if (gotrolefilter())
-                        role_menu_extra(RS_filter, win, FALSE);
+                    role_menu_extra(RS_filter, win, FALSE);
                     role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                     Strcpy(pbuf, "Pick a role or profession");
                     end_menu(win, pbuf);
@@ -669,19 +667,18 @@ tty_player_selection()
                         role_selection_prolog(RS_RACE, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
-                        any = zeroany; /* zero out all bits */
+                        any = cg.zeroany; /* zero out all bits */
                         /* populate the menu with role choices */
                         setup_racemenu(win, TRUE, ROLE, GEND, ALGN);
                         /* add miscellaneous menu entries */
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-                                 MENU_UNSELECTED);
+                                 MENU_ITEMFLAGS_NONE);
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_GENDER, win, FALSE);
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
-                        if (gotrolefilter())
-                            role_menu_extra(RS_filter, win, FALSE);
+                        role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                         Strcpy(pbuf, "Pick a race or species");
                         end_menu(win, pbuf);
@@ -762,19 +759,18 @@ tty_player_selection()
                         role_selection_prolog(RS_GENDER, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
-                        any = zeroany; /* zero out all bits */
+                        any = cg.zeroany; /* zero out all bits */
                         /* populate the menu with gender choices */
                         setup_gendmenu(win, TRUE, ROLE, RACE, ALGN);
                         /* add miscellaneous menu entries */
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-                                 MENU_UNSELECTED);
+                                 MENU_ITEMFLAGS_NONE);
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_RACE, win, FALSE);
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
-                        if (gotrolefilter())
-                            role_menu_extra(RS_filter, win, FALSE);
+                        role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                         Strcpy(pbuf, "Pick a gender or sex");
                         end_menu(win, pbuf);
@@ -853,17 +849,16 @@ tty_player_selection()
                         role_selection_prolog(RS_ALGNMNT, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
-                        any = zeroany; /* zero out all bits */
+                        any = cg.zeroany; /* zero out all bits */
                         setup_algnmenu(win, TRUE, ROLE, RACE, GEND);
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-                                 MENU_UNSELECTED);
+                                 MENU_ITEMFLAGS_NONE);
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_RACE, win, FALSE);
                         role_menu_extra(RS_GENDER, win, FALSE);
-                        if (gotrolefilter())
-                            role_menu_extra(RS_filter, win, FALSE);
+                        role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                         Strcpy(pbuf, "Pick an alignment or creed");
                         end_menu(win, pbuf);
@@ -933,7 +928,7 @@ tty_player_selection()
         role_selection_prolog(ROLE_NONE, BASE_WINDOW);
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-        any = zeroany; /* zero out all bits */
+        any = cg.zeroany; /* zero out all bits */
         any.a_int = 0;
         if (!roles[ROLE].name.f
             && (roles[ROLE].allow & ROLE_GENDMASK)
@@ -941,30 +936,30 @@ tty_player_selection()
             Sprintf(plbuf, " %s", genders[GEND].adj);
         else
             *plbuf = '\0'; /* omit redundant gender */
-        Sprintf(pbuf, "%s, %s%s %s %s", plname, aligns[ALGN].adj, plbuf,
+        Sprintf(pbuf, "%s, %s%s %s %s", g.plname, aligns[ALGN].adj, plbuf,
                 races[RACE].adj,
                 (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
                                                   : roles[ROLE].name.m);
         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, pbuf,
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
         /* blank separator */
         any.a_int = 0;
-        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
         /* [ynaq] menu choices */
         any.a_int = 1;
         add_menu(win, NO_GLYPH, &any, 'y', 0, ATR_NONE, "Yes; start game",
-                 MENU_SELECTED);
+                 MENU_ITEMFLAGS_SELECTED);
         any.a_int = 2;
         add_menu(win, NO_GLYPH, &any, 'n', 0, ATR_NONE,
-                 "No; choose role again", MENU_UNSELECTED);
+                 "No; choose role again", MENU_ITEMFLAGS_NONE);
         if (iflags.renameallowed) {
             any.a_int = 3;
             add_menu(win, NO_GLYPH, &any, 'a', 0, ATR_NONE,
-                     "Not yet; choose another name", MENU_UNSELECTED);
+                     "Not yet; choose another name", MENU_ITEMFLAGS_NONE);
         }
         any.a_int = -1;
         add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
         Sprintf(pbuf, "Is this ok? [yn%sq]", iflags.renameallowed ? "a" : "");
         end_menu(win, pbuf);
         n = select_menu(win, PICK_ONE, &selected);
@@ -991,8 +986,8 @@ tty_player_selection()
                GEND, ALGN; we'll override that and honor only the name */
             saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND,
                 saveALGN = ALGN;
-            *plname = '\0';
-            plnamesuffix(); /* calls askname() when plname[] is empty */
+            *g.plname = '\0';
+            plnamesuffix(); /* calls askname() when g.plname[] is empty */
             ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND,
                 ALGN = saveALGN;
             break; /* getconfirmation is still True */
@@ -1025,42 +1020,45 @@ tty_player_selection()
     return;
 }
 
-STATIC_OVL boolean
+static boolean
 reset_role_filtering()
 {
     winid win;
     anything any;
     int i, n;
+    char filterprompt[QBUFSZ];
     menu_item *selected = 0;
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
-    any = zeroany;
+    any = cg.zeroany;
 
     /* no extra blank line preceding this entry; end_menu supplies one */
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             "Unacceptable roles", MENU_UNSELECTED);
+             "Unacceptable roles", MENU_ITEMFLAGS_NONE);
     setup_rolemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             "Unacceptable races", MENU_UNSELECTED);
+             "Unacceptable races", MENU_ITEMFLAGS_NONE);
     setup_racemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             "Unacceptable genders", MENU_UNSELECTED);
+             "Unacceptable genders", MENU_ITEMFLAGS_NONE);
     setup_gendmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             "Unacceptable alignments", MENU_UNSELECTED);
+             "Unacceptable alignments", MENU_ITEMFLAGS_NONE);
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    end_menu(win, "Pick all that apply");
+    Sprintf(filterprompt, "Pick all that apply%s",
+            gotrolefilter() ? " and/or unpick any that no longer apply" : "");
+    end_menu(win, filterprompt);
     n = select_menu(win, PICK_ANY, &selected);
 
-    if (n > 0) {
+    if (n >= 0) { /* n==0: clear current filters and don't set new ones */
         clearrolefilter();
         for (i = 0; i < n; i++)
             setrolefilter(selected[i].item.a_string);
@@ -1079,7 +1077,7 @@ reset_role_filtering()
 #undef ALGN
 
 /* add entries a-Archeologist, b-Barbarian, &c to menu being built in 'win' */
-STATIC_OVL void
+static void
 setup_rolemenu(win, filtering, race, gend, algn)
 winid win;
 boolean filtering; /* True => exclude filtered roles; False => filter reset */
@@ -1090,9 +1088,13 @@ int race, gend, algn; /* all ROLE_NONE for !filtering case */
     boolean role_ok;
     char thisch, lastch = '\0', rolenamebuf[50];
 
-    any = zeroany; /* zero out all bits */
+    any = cg.zeroany; /* zero out all bits */
     for (i = 0; roles[i].name.m; i++) {
-        role_ok = ok_role(i, race, gend, algn);
+        /* role can be constrained by any of race, gender, or alignment */
+        role_ok = (ok_role(i, race, gend, algn)
+                   && ok_race(i, race, gend, algn)
+                   && ok_gend(i, race, gend, algn)
+                   && ok_align(i, race, gend, algn));
         if (filtering && !role_ok)
             continue;
         if (filtering)
@@ -1117,12 +1119,13 @@ int race, gend, algn; /* all ROLE_NONE for !filtering case */
         /* !filtering implies reset_role_filtering() where we want to
            mark this role as preseleted if current filter excludes it */
         add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE, an(rolenamebuf),
-                 (!filtering && !role_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (!filtering && !role_ok)
+                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
         lastch = thisch;
     }
 }
 
-STATIC_OVL void
+static void
 setup_racemenu(win, filtering, role, gend, algn)
 winid win;
 boolean filtering;
@@ -1133,9 +1136,12 @@ int role, gend, algn;
     int i;
     char this_ch;
 
-    any = zeroany;
+    any = cg.zeroany;
     for (i = 0; races[i].noun; i++) {
-        race_ok = ok_race(role, i, gend, algn);
+        /* no ok_gend(); race isn't constrained by gender */
+        race_ok = (ok_race(role, i, gend, algn)
+                   && ok_role(role, i, gend, algn)
+                   && ok_align(role, i, gend, algn));
         if (filtering && !race_ok)
             continue;
         if (filtering)
@@ -1151,11 +1157,12 @@ int role, gend, algn;
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
                  ATR_NONE, races[i].noun,
-                 (!filtering && !race_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (!filtering && !race_ok)
+                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
 }
 
-STATIC_DCL void
+static void
 setup_gendmenu(win, filtering, role, race, algn)
 winid win;
 boolean filtering;
@@ -1166,9 +1173,12 @@ int role, race, algn;
     int i;
     char this_ch;
 
-    any = zeroany;
+    any = cg.zeroany;
     for (i = 0; i < ROLE_GENDERS; i++) {
-        gend_ok = ok_gend(role, race, i, algn);
+        /* no ok_align(); gender isn't constrained by alignment */
+        gend_ok = (ok_gend(role, race, i, algn)
+                   && ok_role(role, race, i, algn)
+                   && ok_race(role, race, i, algn));
         if (filtering && !gend_ok)
             continue;
         if (filtering)
@@ -1182,11 +1192,12 @@ int role, race, algn;
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
                  ATR_NONE, genders[i].adj,
-                 (!filtering && !gend_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (!filtering && !gend_ok)
+                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
 }
 
-STATIC_DCL void
+static void
 setup_algnmenu(win, filtering, role, race, gend)
 winid win;
 boolean filtering;
@@ -1197,9 +1208,12 @@ int role, race, gend;
     int i;
     char this_ch;
 
-    any = zeroany;
+    any = cg.zeroany;
     for (i = 0; i < ROLE_ALIGNS; i++) {
-        algn_ok = ok_align(role, race, gend, i);
+        /* no ok_gend(); alignment isn't constrained by gender */
+        algn_ok = (ok_align(role, race, gend, i)
+                   && ok_role(role, race, gend, i)
+                   && ok_race(role, race, gend, i));
         if (filtering && !algn_ok)
             continue;
         if (filtering)
@@ -1213,12 +1227,13 @@ int role, race, gend;
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
                  ATR_NONE, aligns[i].adj,
-                 (!filtering && !algn_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (!filtering && !algn_ok)
+                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
 }
 
 /*
- * plname is filled either by an option (-u Player  or  -uPlayer) or
+ * g.plname is filled either by an option (-u Player  or  -uPlayer) or
  * explicitly (by being the wizard) or by askname.
  * It may still contain a suffix denoting the role, etc.
  * Always called after init_nhwindows() and before display_gamewindows().
@@ -1238,7 +1253,7 @@ tty_askname()
         case 0:
             break; /* no game chosen; start new game */
         case 1:
-            return; /* plname[] has been set */
+            return; /* g.plname[] has been set */
         }
 #endif /* SELECTSAVED */
 
@@ -1301,7 +1316,7 @@ tty_askname()
                     && !(c >= '0' && c <= '9' && ct > 0))
                     c = '_';
 #endif
-            if (ct < (int) (sizeof plname) - 1) {
+            if (ct < (int) (sizeof g.plname) - 1) {
 #if defined(MICRO)
 #if defined(MSDOS)
                 if (iflags.grmode) {
@@ -1312,13 +1327,13 @@ tty_askname()
 #else
                 (void) putchar(c);
 #endif
-                plname[ct++] = c;
+                g.plname[ct++] = c;
 #ifdef WIN32CON
                 ttyDisplay->curx++;
 #endif
             }
         }
-        plname[ct] = 0;
+        g.plname[ct] = 0;
     } while (ct == 0);
 
     /* move to next line to simulate echo of user's <return> */
@@ -1336,7 +1351,7 @@ tty_get_nh_event()
 }
 
 #if !defined(MICRO) && !defined(WIN32CON)
-STATIC_OVL void
+static void
 getret()
 {
     HUPSKIP();
@@ -1527,7 +1542,7 @@ int type;
     return newid;
 }
 
-STATIC_OVL void
+static void
 erase_menu_or_text(window, cw, clear)
 winid window;
 struct WinDesc *cw;
@@ -1547,7 +1562,7 @@ boolean clear;
     }
 }
 
-STATIC_OVL void
+static void
 free_window_info(cw, free_data)
 struct WinDesc *cw;
 boolean free_data;
@@ -1631,11 +1646,11 @@ winid window;
             cw->data[i][n - 1] = '\0';
             /*finalx[i][NOW] = finalx[i][BEFORE] = 0;*/
         }
-        context.botlx = 1;
+        g.context.botlx = 1;
         break;
     case NHW_MAP:
         /* cheap -- clear the whole thing and tell nethack to redraw botl */
-        context.botlx = 1;
+        g.context.botlx = 1;
         /*FALLTHRU*/
     case NHW_BASE:
         clear_screen();
@@ -1691,7 +1706,7 @@ long count;
     return FALSE;
 }
 
-STATIC_OVL void
+static void
 dmore(cw, s)
 register struct WinDesc *cw;
 const char *s; /* valid responses */
@@ -1712,7 +1727,7 @@ const char *s; /* valid responses */
     xwaitforspace(s);
 }
 
-STATIC_OVL void
+static void
 set_item_state(window, lineno, item)
 winid window;
 int lineno;
@@ -1728,7 +1743,7 @@ tty_menu_item *item;
     term_end_attr(item->attr);
 }
 
-STATIC_OVL void
+static void
 set_all_on_page(window, page_start, page_end)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1743,7 +1758,7 @@ tty_menu_item *page_start, *page_end;
         }
 }
 
-STATIC_OVL void
+static void
 unset_all_on_page(window, page_start, page_end)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1759,7 +1774,7 @@ tty_menu_item *page_start, *page_end;
         }
 }
 
-STATIC_OVL void
+static void
 invert_all_on_page(window, page_start, page_end, acc)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1768,7 +1783,10 @@ char acc; /* group accelerator, 0 => all */
     tty_menu_item *curr;
     int n;
 
-    for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next)
+    for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next) {
+        if (!menuitem_invert_test(0, curr->itemflags, curr->selected))
+            continue;
+
         if (curr->identifier.a_void && (acc == 0 || curr->gselector == acc)) {
             if (curr->selected) {
                 curr->selected = FALSE;
@@ -1777,12 +1795,13 @@ char acc; /* group accelerator, 0 => all */
                 curr->selected = TRUE;
             set_item_state(window, n, curr);
         }
+    }
 }
 
 /*
  * Invert all entries that match the give group accelerator (or all if zero).
  */
-STATIC_OVL void
+static void
 invert_all(window, page_start, page_end, acc)
 winid window;
 tty_menu_item *page_start, *page_end;
@@ -1803,17 +1822,19 @@ char acc; /* group accelerator, 0 => all */
 
         if (!on_curr_page && curr->identifier.a_void
             && (acc == 0 || curr->gselector == acc)) {
-            if (curr->selected) {
-                curr->selected = FALSE;
-                curr->count = -1;
-            } else
+            if (menuitem_invert_test(0, curr->itemflags, curr->selected)) {
+                if (curr->selected) {
+                    curr->selected = FALSE;
+                    curr->count = -1;
+                } else
                 curr->selected = TRUE;
+            }
         }
     }
 }
 
 /* support menucolor in addition to caller-supplied attribute */
-STATIC_OVL void
+static void
 toggle_menu_attr(on, color, attr)
 boolean on;
 int color, attr;
@@ -1837,7 +1858,7 @@ int color, attr;
 #endif
 }
 
-STATIC_OVL void
+static void
 process_menu_window(window, cw)
 winid window;
 struct WinDesc *cw;
@@ -1998,7 +2019,7 @@ struct WinDesc *cw;
             Strcat(resp, " ");                  /* next page or end */
             Strcat(resp, "0123456789\033\n\r"); /* counts, quit */
             Strcat(resp, gacc);                 /* group accelerators */
-            Strcat(resp, mapped_menu_cmds);
+            Strcat(resp, g.mapped_menu_cmds);
 
             if (cw->npages > 1)
                 Sprintf(cw->morestr, "(%d of %d)", curr_page + 1,
@@ -2208,7 +2229,7 @@ struct WinDesc *cw;
     free((genericptr_t) morestr);
 }
 
-STATIC_OVL void
+static void
 process_text_window(window, cw)
 winid window;
 struct WinDesc *cw;
@@ -2550,7 +2571,7 @@ register int x, y; /* not xchar: perhaps xchar is unsigned and
     ttyDisplay->cury = y;
 }
 
-STATIC_OVL void
+static void
 tty_putsym(window, x, y, ch)
 winid window;
 int x, y;
@@ -2583,7 +2604,7 @@ char ch;
     }
 }
 
-STATIC_OVL const char *
+static const char *
 compress_str(str)
 const char *str;
 {
@@ -2674,7 +2695,7 @@ const char *str;
 #ifndef STATUS_HILITES
     case NHW_STATUS:
         ob = &cw->data[cw->cury][j = cw->curx];
-        if (context.botlx)
+        if (g.context.botlx)
             *ob = '\0';
         if (!cw->cury && (int) strlen(str) >= CO) {
             /* the characters before "St:" are unnecessary */
@@ -2685,7 +2706,7 @@ const char *str;
         nb = str;
         for (i = cw->curx + 1, n0 = cw->cols; i < n0; i++, nb++) {
             if (!*nb) {
-                if (*ob || context.botlx) {
+                if (*ob || g.context.botlx) {
                     /* last char printed may be in middle of line */
                     tty_curs(WIN_STATUS, i, cw->cury);
                     cl_end();
@@ -2817,9 +2838,9 @@ boolean complain;
                 if (complain)
                     raw_printf("Cannot open %s as stdin.", fname);
             } else {
-                (void) execlp(catmore, "page", (char *) 0);
+                (void) execlp(g.catmore, "page", (char *) 0);
                 if (complain)
-                    raw_printf("Cannot exec %s.", catmore);
+                    raw_printf("Cannot exec %s.", g.catmore);
             }
             if (complain)
                 sleep(10); /* want to wait_synch() but stdin is gone */
@@ -2899,7 +2920,7 @@ winid window;
  * later.
  */
 void
-tty_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+tty_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
 winid window;               /* window to use, must be of type NHW_MENU */
 int glyph UNUSED;           /* glyph to display with item (not used) */
 const anything *identifier; /* what to return if selected */
@@ -2907,8 +2928,9 @@ char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
 int attr;                   /* attribute for string (like tty_putstr()) */
 const char *str;            /* menu string */
-boolean preselected;        /* item is marked as selected */
+unsigned int itemflags;     /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
+    boolean preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
     register struct WinDesc *cw = 0;
     tty_menu_item *item;
     const char *newstr;
@@ -2943,6 +2965,7 @@ boolean preselected;        /* item is marked as selected */
     item->identifier = *identifier;
     item->count = -1L;
     item->selected = preselected;
+    item->itemflags = itemflags;
     item->selector = ch;
     item->gselector = gch;
     item->attr = attr;
@@ -2953,7 +2976,7 @@ boolean preselected;        /* item is marked as selected */
 }
 
 /* Invert the given list, can handle NULL as an input. */
-STATIC_OVL tty_menu_item *
+static tty_menu_item *
 reverse(curr)
 tty_menu_item *curr;
 {
@@ -2996,11 +3019,11 @@ const char *prompt; /* prompt to for menu */
     if (prompt) {
         anything any;
 
-        any = zeroany; /* not selectable */
+        any = cg.zeroany; /* not selectable */
         tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
         tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt,
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
     }
 
     /* 52: 'a'..'z' and 'A'..'Z'; avoids selector duplication within a page */
@@ -3189,7 +3212,7 @@ tty_wait_synch()
         if (ttyDisplay->inmore) {
             addtopl("--More--");
             (void) fflush(stdout);
-        } else if (ttyDisplay->inread > program_state.gameover) {
+        } else if (ttyDisplay->inread > g.program_state.gameover) {
             /* this can only happen if we were reading and got interrupted */
             ttyDisplay->toplin = 3;
             /* do this twice; 1st time gets the Quit? message again */
@@ -3249,7 +3272,7 @@ register int xmin, ymax;
     end_glyphout();
     if (ymax >= (int) wins[WIN_STATUS]->offy) {
         /* we have wrecked the bottom line */
-        context.botlx = 1;
+        g.context.botlx = 1;
         bot();
     }
 }
@@ -3368,7 +3391,7 @@ int glyph;
 int bkglyph UNUSED;
 {
     int ch;
-    boolean reverse_on = FALSE;
+    boolean inverse_on = FALSE;
     int color;
     unsigned special;
 
@@ -3406,13 +3429,16 @@ int bkglyph UNUSED;
     }
 #endif /* TEXTCOLOR */
 
-    /* must be after color check; term_end_color may turn off inverse too */
-    if (((special & MG_PET) && iflags.hilite_pet)
-        || ((special & MG_OBJPILE) && iflags.hilite_pile)
-        || ((special & MG_DETECT) && iflags.use_inverse)
-        || ((special & MG_BW_LAVA) && iflags.use_inverse)) {
+    /* must be after color check; term_end_color may turn off inverse too;
+       BW_LAVA and BW_ICE won't ever be set when color is on;
+       (tried bold for ice but it didn't look very good; inverse is easier
+       to see although the Valkyrie quest ends up being hard on the eyes) */
+    if (((special & MG_PET) != 0 && iflags.hilite_pet)
+        || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
+        || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE)) != 0
+            && iflags.use_inverse)) {
         term_start_attr(ATR_INVERSE);
-        reverse_on = TRUE;
+        inverse_on = TRUE;
     }
 
 #if defined(USE_TILES) && defined(MSDOS)
@@ -3422,10 +3448,12 @@ int bkglyph UNUSED;
 #endif
         g_putch(ch); /* print the character */
 
-    if (reverse_on) {
+    if (inverse_on) {
         term_end_attr(ATR_INVERSE);
 #ifdef TEXTCOLOR
-        /* turn off color as well, ATR_INVERSE may have done this already */
+        /* turn off color as well, turning off ATR_INVERSE may have done
+           this already and if so, we won't know the current state unless
+           we do it explicitly */
         if (ttyDisplay->color != NO_COLOR) {
             term_end_color();
             ttyDisplay->color = NO_COLOR;
@@ -3656,9 +3684,9 @@ extern winid WIN_STATUS;
 
 #ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
-STATIC_DCL int FDECL(condcolor, (long, unsigned long *));
+static int FDECL(condcolor, (long, unsigned long *));
 #endif
-STATIC_DCL int FDECL(condattr, (long, unsigned long *));
+static int FDECL(condattr, (long, unsigned long *));
 static unsigned long *tty_colormasks;
 static long tty_condition_bits;
 static struct tty_status_fields tty_status[2][MAXBLSTATS]; /* 2: NOW,BEFORE */
@@ -3964,7 +3992,7 @@ unsigned long *colormasks;
     return;
 }
 
-STATIC_OVL int
+static int
 make_things_fit(force_update)
 boolean force_update;
 {
@@ -4028,7 +4056,7 @@ boolean force_update;
  * must be updated because they need to change.
  * This is now done at an individual field case-by-case level.
  */
-STATIC_OVL boolean
+static boolean
 check_fields(forcefields, sz)
 boolean forcefields;
 int sz[3];
@@ -4131,7 +4159,7 @@ int sz[3];
 }
 
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
-STATIC_OVL void
+static void
 status_sanity_check(VOID_ARGS)
 {
     int i;
@@ -4179,7 +4207,7 @@ status_sanity_check(VOID_ARGS)
 /*
  * This is what places a field on the tty display.
  */
-STATIC_OVL void
+static void
 tty_putstatusfield(text, x, y)
 const char *text;
 int x, y;
@@ -4222,7 +4250,7 @@ int x, y;
 }
 
 /* caller must set cond_shrinklvl (0..2) before calling us */
-STATIC_OVL void
+static void
 set_condition_length()
 {
     long mask;
@@ -4238,7 +4266,7 @@ set_condition_length()
     tty_status[NOW][BL_CONDITION].lth = lth;
 }
 
-STATIC_OVL void
+static void
 shrink_enc(lvl)
 int lvl;
 {
@@ -4250,7 +4278,7 @@ int lvl;
     tty_status[NOW][BL_CAP].lth = strlen(status_vals[BL_CAP]);
 }
 
-STATIC_OVL void
+static void
 shrink_dlvl(lvl)
 int lvl;
 {
@@ -4271,7 +4299,7 @@ int lvl;
  * Ensure the underlying status window data start out
  * blank and null-terminated.
  */
-STATIC_OVL boolean
+static boolean
 check_windowdata(VOID_ARGS)
 {
     if (WIN_STATUS == WIN_ERR || wins[WIN_STATUS] == (struct WinDesc *) 0) {
@@ -4289,7 +4317,7 @@ check_windowdata(VOID_ARGS)
  * Return what color this condition should
  * be displayed in based on user settings.
  */
-STATIC_OVL int
+static int
 condcolor(bm, bmarray)
 long bm;
 unsigned long *bmarray;
@@ -4311,7 +4339,7 @@ unsigned long *bmarray;
 #define term_end_color() /*empty*/
 #endif /* TEXTCOLOR */
 
-STATIC_OVL int
+static int
 condattr(bm, bmarray)
 long bm;
 unsigned long *bmarray;
@@ -4377,7 +4405,7 @@ unsigned long *bmarray;
         }                                       \
     } while (0)
 
-STATIC_OVL void
+static void
 render_status(VOID_ARGS)
 {
     long mask, bits;

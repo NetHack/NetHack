@@ -242,7 +242,7 @@ winid window;
  * later.
  */
 void
-safe_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+safe_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
 winid window;               /* window to use, must be of type NHW_MENU */
 int glyph UNUSED;           /* glyph to display with item (not used) */
 const anything *identifier; /* what to return if selected */
@@ -250,7 +250,7 @@ char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
 int attr;                   /* attribute for string (like safe_putstr()) */
 const char *str;            /* menu string */
-boolean preselected;        /* item is marked as selected */
+unsigned int itemflags;     /* itemflags such as marked as selected */
 {
     return;
 }

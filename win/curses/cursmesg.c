@@ -72,7 +72,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     }
 #endif
 
-    if (curs_mesg_suppress_turn == moves) {
+    if (curs_mesg_suppress_turn == g.moves) {
         return; /* user has typed ESC to avoid seeing remaining messages. */
     }
 
@@ -84,19 +84,19 @@ curses_message_win_puts(const char *message, boolean recursed)
         my = border_space;
 
     if (strcmp(message, "#") == 0) {    /* Extended command or Count: */
-        if ((strcmp(toplines, "#") != 0)
+        if ((strcmp(g.toplines, "#") != 0)
             /* Bottom of message window */
             && (my >= (height - 1 + border_space)) && (height != 1)) {
             scroll_window(MESSAGE_WIN);
             mx = width;
             my--;
-            Strcpy(toplines, message);
+            Strcpy(g.toplines, message);
         }
         return;
     }
 
     if (!recursed) {
-        strcpy(toplines, message);
+        strcpy(g.toplines, message);
         mesg_add_line(message);
     }
 
@@ -112,7 +112,7 @@ curses_message_win_puts(const char *message, boolean recursed)
                 /* Pause until key is hit - Esc suppresses any further
                    messages that turn */
                 if (curses_more() == '\033') {
-                    curs_mesg_suppress_turn = moves;
+                    curs_mesg_suppress_turn = g.moves;
                     return;
                 }
                 /* turn_lines reset to 0 by more()->block()->got_input() */
@@ -312,7 +312,7 @@ curses_last_messages()
         if (mesg && mesg->str && *mesg->str)
             curses_message_win_puts(mesg->str, TRUE);
     }
-    curses_message_win_puts(toplines, TRUE);
+    curses_message_win_puts(g.toplines, TRUE);
     --last_messages;
 
     if (border)
@@ -368,19 +368,22 @@ curses_prev_mesg()
 
     wid = curses_get_wid(NHW_MENU);
     curses_create_nhmenu(wid);
-    Id = zeroany;
+    Id = cg.zeroany;
 
     for (count = 0; count < num_messages; ++count) {
         mesg = get_msg_line(do_lifo, count);
         if (turn != mesg->turn && count != 0) {
-            curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, "---", FALSE);
+            curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, "---",
+                            MENU_ITEMFLAGS_NONE);
         }
-        curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, mesg->str, FALSE);
+        curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, mesg->str,
+                         MENU_ITEMFLAGS_NONE);
         turn = mesg->turn;
     }
     if (!count)
         curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL,
-                        "[No past messages available.]", FALSE);
+                        "[No past messages available.]",
+                        MENU_ITEMFLAGS_NONE);
 
     curses_end_menu(wid, "");
     if (!do_lifo)
@@ -643,7 +646,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         case '\n':
             (void) strncpy(answer, p_answer, buffer);
             answer[buffer - 1] = '\0';
-            Strcpy(toplines, tmpbuf);
+            Strcpy(g.toplines, tmpbuf);
             mesg_add_line(tmpbuf);
 #if 1
             /* position at end of current line so next message will be
@@ -780,7 +783,6 @@ mesg_add_line(const char *mline)
             current_mesg->str = dupstr(mline);
         }
     }
-    current_mesg->turn = moves;
 
     if (num_messages == 0) {
         /* very first message; set up head */
@@ -888,7 +890,7 @@ boolean restoring_msghist;
     static int stash_count;
     static nhprev_mesg *stash_head = 0;
 #ifdef DUMPLOG
-    extern unsigned saved_pline_index; /* pline.c */
+    /* extern unsigned g.saved_pline_index; */ /* pline.c */
 #endif
 
     if (restoring_msghist && !initd) {
@@ -900,8 +902,8 @@ boolean restoring_msghist;
         last_mesg = (nhprev_mesg *) 0; /* no need to remember the tail */
         initd = TRUE;
 #ifdef DUMPLOG
-        /* this suffices; there's no need to scrub saved_pline[] pointers */
-        saved_pline_index = 0;
+        /* this suffices; there's no need to scrub g.saved_pline[] pointers */
+        g.saved_pline_index = 0;
 #endif
     }
 

@@ -60,6 +60,9 @@
 #define HI_BEAM_SLEEP       HI_ZAP
 #define HI_BEAM_DEATH       CLR_BLACK
 #define HI_BEAM_LIGHTNING   CLR_WHITE
+
+/* 3.6.3: poison gas zap used to be yellow and acid zap was green,
+   which conflicted with the corresponding dragon colors */
 #define HI_BEAM_POISON      CLR_GREEN
 #define HI_BEAM_ACID        CLR_YELLOW
 

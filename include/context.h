@@ -1,4 +1,4 @@
-/* NetHack 3.6	context.h	$NHDT-Date: 1455907260 2016/02/19 18:41:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.6	context.h	$NHDT-Date: 1580434522 2020/01/31 01:35:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -105,19 +105,26 @@ struct novel_tracking { /* for choosing random passage when reading novel */
        passage from the Death Quotes section of dat/tribute */
 };
 
+struct achievement_tracking {
+    unsigned mines_prize_oid, soko_prize_oid; /* obj->o_id */
+    /* short mines_prize_type, soko_prize_typ1, soko_prize_typ2; */
+};
+
 struct context_info {
     unsigned ident;         /* social security number for each monster */
     unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
     unsigned run;           /* 0: h (etc), 1: H (etc), 2: fh (etc) */
                             /* 3: FH, 4: ff+, 5: ff-, 6: FF+, 7: FF- */
                             /* 8: travel */
-    unsigned startingpet_mid;
-    int current_fruit; /* fruit->fid corresponding to pl_fruit[] */
-    int warnlevel;
+    unsigned startingpet_mid; /* monster id number for initial pet */
+    int current_fruit;      /* fruit->fid corresponding to g.pl_fruit[] */
+    int mysteryforce;       /* adjusts how often "mysterious force" kicks in */
     int rndencode;          /* randomized escape sequence introducer */
+    int warnlevel;          /* threshold (digit) to warn about unseen mons */
     long next_attrib_check; /* next attribute check */
-    long stethoscope_move;
-    short stethoscope_movement;
+    long seer_turn;         /* when random clairvoyance will next kick in */
+    long stethoscope_move;  /* when a stethoscope was last used */
+    short stethoscope_movement; /* to track multiple moves on same turn */
     boolean travel;  /* find way automatically to u.tx,u.ty */
     boolean travel1; /* first travel step */
     boolean forcefight;
@@ -130,6 +137,7 @@ struct context_info {
     boolean botl;        /* partially redo status line */
     boolean botlx;       /* print an entirely new bottom line */
     boolean door_opened; /* set to true if door was opened during test_move */
+    boolean enhance_tip; /* player is informed about #enhance */
     struct dig_info digging;
     struct victual_info victual;
     struct tin_info tin;
@@ -140,8 +148,7 @@ struct context_info {
     struct obj_split objsplit; /* track most recently split object stack */
     struct tribute_info tribute;
     struct novel_tracking novel;
+    struct achievement_tracking achieveo;
 };
-
-extern NEARDATA struct context_info context;
 
 #endif /* CONTEXT_H */

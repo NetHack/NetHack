@@ -123,30 +123,30 @@
  */
 #include "hack.h"
 
-STATIC_DCL void FDECL(show_mon_or_warn, (int, int, int));
-STATIC_DCL void FDECL(display_monster,
+static void FDECL(show_mon_or_warn, (int, int, int));
+static void FDECL(display_monster,
                       (XCHAR_P, XCHAR_P, struct monst *, int, XCHAR_P));
-STATIC_DCL int FDECL(swallow_to_glyph, (int, int));
-STATIC_DCL void FDECL(display_warning, (struct monst *));
+static int FDECL(swallow_to_glyph, (int, int));
+static void FDECL(display_warning, (struct monst *));
 
-STATIC_DCL int FDECL(check_pos, (int, int, int));
-STATIC_DCL int FDECL(get_bk_glyph, (XCHAR_P, XCHAR_P));
-STATIC_DCL int FDECL(tether_glyph, (int, int));
+static int FDECL(check_pos, (int, int, int));
+static int FDECL(get_bk_glyph, (XCHAR_P, XCHAR_P));
+static int FDECL(tether_glyph, (int, int));
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
-STATIC_DCL boolean FDECL(more_than_one, (int, int, int, int, int));
+static boolean FDECL(more_than_one, (int, int, int, int, int));
 #endif
 
-STATIC_DCL int FDECL(set_twall, (int, int, int, int, int, int, int, int));
-STATIC_DCL int FDECL(set_wall, (int, int, int));
-STATIC_DCL int FDECL(set_corn, (int, int, int, int, int, int, int, int));
-STATIC_DCL int FDECL(set_crosswall, (int, int));
-STATIC_DCL void FDECL(set_seenv, (struct rm *, int, int, int, int));
-STATIC_DCL void FDECL(t_warn, (struct rm *));
-STATIC_DCL int FDECL(wall_angle, (struct rm *));
+static int FDECL(set_twall, (int, int, int, int, int, int, int, int));
+static int FDECL(set_wall, (int, int, int));
+static int FDECL(set_corn, (int, int, int, int, int, int, int, int));
+static int FDECL(set_crosswall, (int, int));
+static void FDECL(set_seenv, (struct rm *, int, int, int, int));
+static void FDECL(t_warn, (struct rm *));
+static int FDECL(wall_angle, (struct rm *));
 
-#define remember_topology(x, y) (lastseentyp[x][y] = levl[x][y].typ)
+#define remember_topology(x, y) (g.lastseentyp[x][y] = levl[x][y].typ)
 
 /*
  * magic_map_background()
@@ -175,7 +175,7 @@ int show;
         else if (lev->typ == CORR && glyph == cmap_to_glyph(S_litcorr))
             glyph = cmap_to_glyph(S_corr);
     }
-    if (level.flags.hero_memory)
+    if (g.level.flags.hero_memory)
         lev->glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
@@ -211,7 +211,7 @@ register int show;
 {
     register int glyph = back_to_glyph(x, y);
 
-    if (level.flags.hero_memory)
+    if (g.level.flags.hero_memory)
         levl[x][y].glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
@@ -229,9 +229,9 @@ register struct trap *trap;
 register int show;
 {
     register int x = trap->tx, y = trap->ty;
-    register int glyph = trap_to_glyph(trap, newsym_rn2);
+    register int glyph = trap_to_glyph(trap);
 
-    if (level.flags.hero_memory)
+    if (g.level.flags.hero_memory)
         levl[x][y].glyph = glyph;
     if (show)
         show_glyph(x, y, glyph);
@@ -251,7 +251,7 @@ register int show;
     register int x = obj->ox, y = obj->oy;
     register int glyph = obj_to_glyph(obj, newsym_rn2);
 
-    if (level.flags.hero_memory) {
+    if (g.level.flags.hero_memory) {
         /* MRKR: While hallucinating, statues are seen as random monsters */
         /*       but remembered as random objects.                        */
 
@@ -279,7 +279,7 @@ map_invisible(x, y)
 register xchar x, y;
 {
     if (x != u.ux || y != u.uy) { /* don't display I at hero's location */
-        if (level.flags.hero_memory)
+        if (g.level.flags.hero_memory)
             levl[x][y].glyph = GLYPH_INVISIBLE;
         show_glyph(x, y, GLYPH_INVISIBLE);
     }
@@ -313,7 +313,7 @@ register int x, y;
 {
     register struct trap *trap;
 
-    if (!level.flags.hero_memory)
+    if (!g.level.flags.hero_memory)
         return;
 
     if ((trap = t_at(x, y)) != 0 && trap->tseen && !covers_traps(x, y)) {
@@ -363,7 +363,7 @@ int x, y, show;
 }
 
 /* display something on monster layer; may need to fixup object layer */
-STATIC_OVL void
+static void
 show_mon_or_warn(x, y, monglyph)
 int x, y, monglyph;
 {
@@ -396,7 +396,7 @@ int x, y, monglyph;
  * a worm tail.
  *
  */
-STATIC_OVL void
+static void
 display_monster(x, y, mon, sightflags, worm_tail)
 register xchar x, y;        /* display position */
 register struct monst *mon; /* monster to display */
@@ -440,7 +440,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
             if (!sensed) {
                 show_glyph(x, y, glyph);
                 /* override real topology with mimic's fake one */
-                lastseentyp[x][y] = cmap_to_type(sym);
+                g.lastseentyp[x][y] = cmap_to_type(sym);
             }
             break;
         }
@@ -449,7 +449,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
             /* Make a fake object to send to map_object(). */
             struct obj obj;
 
-            obj = zeroobj;
+            obj = cg.zeroobj;
             obj.ox = x;
             obj.oy = y;
             obj.otyp = mon->mappearance;
@@ -510,7 +510,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
  *
  * Do not call for worm tails.
  */
-STATIC_OVL void
+static void
 display_warning(mon)
 register struct monst *mon;
 {
@@ -611,7 +611,7 @@ xchar x, y;
          *
          *      + Stone, walls, and closed doors.
          *      + Boulders.  [see a boulder before a doorway]
-         *      + Doors.
+         *      + doors.
          *      + Room/water positions
          *      + Everything else (hallways!)
          */
@@ -693,13 +693,13 @@ xchar x, y;
              * the wrong glyph.
              */
             if (uchain->ox == x && uchain->oy == y) {
-                if (level.objects[x][y] == uchain)
+                if (g.level.objects[x][y] == uchain)
                     u.bc_felt |= BC_CHAIN;
                 else
                     u.bc_felt &= ~BC_CHAIN; /* do not feel the chain */
             }
             if (!carried(uball) && uball->ox == x && uball->oy == y) {
-                if (level.objects[x][y] == uball)
+                if (g.level.objects[x][y] == uball)
                     u.bc_felt |= BC_BALL;
                 else
                     u.bc_felt &= ~BC_BALL; /* do not feel the ball */
@@ -738,10 +738,10 @@ register int x, y;
     register int see_it;
     register xchar worm_tail;
 
-    if (in_mklev)
+    if (g.in_mklev)
         return;
 #ifdef HANGUPHANDLING
-    if (program_state.done_hup)
+    if (g.program_state.done_hup)
         return;
 #endif
 
@@ -915,7 +915,7 @@ xchar x, y;
     }
 }
 
-STATIC_OVL int
+static int
 tether_glyph(x, y)
 int x, y;
 {
@@ -1100,7 +1100,7 @@ int tg, rpt;
 
     rpt *= 2; /* two loop iterations per 'count' */
     glyph[0] = tg;
-    glyph[1] = (level.flags.hero_memory) ? levl[x][y].glyph
+    glyph[1] = (g.level.flags.hero_memory) ? levl[x][y].glyph
                                          : back_to_glyph(x, y);
     /* even iteration count (guaranteed) ends with glyph[1] showing;
        caller might want to override that, but no newsym() calls here
@@ -1283,7 +1283,7 @@ see_monsters()
     register struct monst *mon;
     int new_warn_obj_cnt = 0;
 
-    if (defer_see_monsters)
+    if (g.defer_see_monsters)
         return;
 
     for (mon = fmon; mon; mon = mon->nmon) {
@@ -1292,15 +1292,15 @@ see_monsters()
         newsym(mon->mx, mon->my);
         if (mon->wormno)
             see_wsegs(mon);
-        if (Warn_of_mon && (context.warntype.obj & mon->data->mflags2) != 0L)
+        if (Warn_of_mon && (g.context.warntype.obj & mon->data->mflags2) != 0L)
             new_warn_obj_cnt++;
     }
     /*
      * Make Sting glow blue or stop glowing if required.
      */
-    if (new_warn_obj_cnt != warn_obj_cnt) {
+    if (new_warn_obj_cnt != g.warn_obj_cnt) {
         Sting_effects(new_warn_obj_cnt);
-        warn_obj_cnt = new_warn_obj_cnt;
+        g.warn_obj_cnt = new_warn_obj_cnt;
     }
 
     /* when mounted, hero's location gets caught by monster loop */
@@ -1352,7 +1352,7 @@ see_traps()
     struct trap *trap;
     int glyph;
 
-    for (trap = ftrap; trap; trap = trap->ntrap) {
+    for (trap = g.ftrap; trap; trap = trap->ntrap) {
         glyph = glyph_at(trap->tx, trap->ty);
         if (glyph_is_trap(glyph))
             newsym(trap->tx, trap->ty);
@@ -1426,7 +1426,7 @@ docrt()
     /* perm_invent */
     update_inventory();
 
-    context.botlx = 1; /* force a redraw of the bottom line */
+    g.context.botlx = 1; /* force a redraw of the bottom line */
 }
 
 /* for panning beyond a clipped region; resend the current map data to
@@ -1444,7 +1444,7 @@ redraw_map()
      * !u.ux: display isn't ready yet; (restoring || !on_level()): was part
      * of cliparound() but interface shouldn't access this much internals
      */
-    if (!u.ux || restoring || !on_level(&u.uz0, &u.uz))
+    if (!u.ux || g.restoring || !on_level(&u.uz0, &u.uz))
         return;
 
     /*
@@ -1463,15 +1463,6 @@ redraw_map()
 /* ======================================================================== */
 /* Glyph Buffering (3rd screen) =========================================== */
 
-typedef struct {
-    xchar new; /* perhaps move this bit into the rm structure. */
-    int glyph;
-} gbuf_entry;
-
-static gbuf_entry gbuf[ROWNO][COLNO];
-static char gbuf_start[ROWNO];
-static char gbuf_stop[ROWNO];
-
 /* FIXME: This is a dirty hack, because newsym() doesn't distinguish
  * between object piles and single objects, it doesn't mark the location
  * for update. */
@@ -1480,11 +1471,11 @@ newsym_force(x, y)
 register int x, y;
 {
     newsym(x,y);
-    gbuf[y][x].new = 1;
-    if (gbuf_start[y] > x)
-        gbuf_start[y] = x;
-    if (gbuf_stop[y] < x)
-        gbuf_stop[y] = x;
+    g.gbuf[y][x].gnew = 1;
+    if (g.gbuf_start[y] > x)
+        g.gbuf_start[y] = x;
+    if (g.gbuf_stop[y] < x)
+        g.gbuf_stop[y] = x;
 }
 
 /*
@@ -1560,13 +1551,13 @@ int x, y, glyph;
         return;
     }
 
-    if (gbuf[y][x].glyph != glyph || iflags.use_background_glyph) {
-        gbuf[y][x].glyph = glyph;
-        gbuf[y][x].new = 1;
-        if (gbuf_start[y] > x)
-            gbuf_start[y] = x;
-        if (gbuf_stop[y] < x)
-            gbuf_stop[y] = x;
+    if (g.gbuf[y][x].glyph != glyph || iflags.use_background_glyph) {
+        g.gbuf[y][x].glyph = glyph;
+        g.gbuf[y][x].gnew = 1;
+        if (g.gbuf_start[y] > x)
+            g.gbuf_start[y] = x;
+        if (g.gbuf_stop[y] < x)
+            g.gbuf_stop[y] = x;
     }
 }
 
@@ -1579,12 +1570,12 @@ int x, y, glyph;
         int i;                         \
                                        \
         for (i = 0; i < ROWNO; i++) {  \
-            gbuf_start[i] = COLNO - 1; \
-            gbuf_stop[i] = 0;          \
+            g.gbuf_start[i] = COLNO - 1; \
+            g.gbuf_stop[i] = 0;          \
         }                              \
     }
 
-static gbuf_entry nul_gbuf = { 0, cmap_to_glyph(S_stone) };
+static const gbuf_entry nul_gbuf = { 0, cmap_to_glyph(S_stone) };
 /*
  * Turn the 3rd screen into stone.
  */
@@ -1595,7 +1586,7 @@ clear_glyph_buffer()
     register gbuf_entry *gptr;
 
     for (y = 0; y < ROWNO; y++) {
-        gptr = &gbuf[y][0];
+        gptr = &g.gbuf[y][0];
         for (x = COLNO; x; x--) {
             *gptr++ = nul_gbuf;
         }
@@ -1613,8 +1604,8 @@ int start, stop, y;
     register int x;
 
     for (x = start; x <= stop; x++)
-        if (gbuf[y][x].glyph != cmap_to_glyph(S_stone))
-            print_glyph(WIN_MAP, x, y, gbuf[y][x].glyph, get_bk_glyph(x, y));
+        if (g.gbuf[y][x].glyph != cmap_to_glyph(S_stone))
+            print_glyph(WIN_MAP, x, y, g.gbuf[y][x].glyph, get_bk_glyph(x, y));
 }
 
 void
@@ -1626,7 +1617,7 @@ cls()
         return;
     in_cls = TRUE;
     display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
-    context.botlx = 1;                    /* force update of botl window */
+    g.context.botlx = 1;                    /* force update of botl window */
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
     clear_glyph_buffer(); /* this is sort of an extra effort, but OK */
@@ -1655,17 +1646,17 @@ int cursor_on_u;
         return; /* if already flushing then return */
     flushing = 1;
 #ifdef HANGUPHANDLING
-    if (program_state.done_hup)
+    if (g.program_state.done_hup)
         return;
 #endif
 
     for (y = 0; y < ROWNO; y++) {
-        register gbuf_entry *gptr = &gbuf[y][x = gbuf_start[y]];
+        register gbuf_entry *gptr = &g.gbuf[y][x = g.gbuf_start[y]];
 
-        for (; x <= gbuf_stop[y]; gptr++, x++)
-            if (gptr->new) {
+        for (; x <= g.gbuf_stop[y]; gptr++, x++)
+            if (gptr->gnew) {
                 print_glyph(WIN_MAP, x, y, gptr->glyph, get_bk_glyph(x, y));
-                gptr->new = 0;
+                gptr->gnew = 0;
             }
     }
 
@@ -1674,7 +1665,7 @@ int cursor_on_u;
     display_nhwindow(WIN_MAP, FALSE);
     reset_glyph_bbox();
     flushing = 0;
-    if (context.botl || context.botlx)
+    if (g.context.botl || g.context.botlx)
         bot();
     else if (iflags.time_botl)
         timebot();
@@ -1707,7 +1698,7 @@ xchar x, y;
     switch (ptr->typ) {
     case SCORR:
     case STONE:
-        idx = level.flags.arboreal ? S_tree : S_stone;
+        idx = g.level.flags.arboreal ? S_tree : S_stone;
         break;
     case ROOM:
         idx = S_room;
@@ -1829,7 +1820,7 @@ xchar x, y;
  * If you don't want a patchwork monster while hallucinating, decide on
  * a random monster in swallowed() and don't use what_mon() here.
  */
-STATIC_OVL int
+static int
 swallow_to_glyph(mnum, loc)
 int mnum;
 int loc;
@@ -1879,7 +1870,7 @@ xchar x, y;
 {
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO)
         return cmap_to_glyph(S_room); /* XXX */
-    return gbuf[y][x].glyph;
+    return g.gbuf[y][x].glyph;
 }
 
 /*
@@ -1895,7 +1886,7 @@ xchar x, y;
  * than current data from the map.]
  */
 
-STATIC_OVL int
+static int
 get_bk_glyph(x, y)
 xchar x, y;
 {
@@ -1903,11 +1894,11 @@ xchar x, y;
     struct rm *lev = &levl[x][y];
 
     if (iflags.use_background_glyph && lev->seenv != 0
-        && gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
+        && g.gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
         switch (lev->typ) {
         case SCORR:
         case STONE:
-            idx = level.flags.arboreal ? S_tree : S_stone;
+            idx = g.level.flags.arboreal ? S_tree : S_stone;
             break;
         case ROOM:
            idx = S_room;
@@ -1996,7 +1987,7 @@ int x, y, a, b, c, dd;
  *
  * Things that are ambiguous: lava
  */
-STATIC_OVL int
+static int
 check_pos(x, y, which)
 int x, y, which;
 {
@@ -2013,7 +2004,7 @@ int x, y, which;
 /* Return TRUE if more than one is non-zero. */
 /*ARGSUSED*/
 #ifdef WA_VERBOSE
-STATIC_OVL boolean
+static boolean
 more_than_one(x, y, a, b, c)
 int x, y, a, b, c;
 {
@@ -2029,7 +2020,7 @@ int x, y, a, b, c;
 #endif
 
 /* Return the wall mode for a T wall. */
-STATIC_OVL int
+static int
 set_twall(x0, y0, x1, y1, x2, y2, x3, y3)
 int x0, y0; /* used #if WA_VERBOSE */
 int x1, y1, x2, y2, x3, y3;
@@ -2054,7 +2045,7 @@ int x1, y1, x2, y2, x3, y3;
 }
 
 /* Return wall mode for a horizontal or vertical wall. */
-STATIC_OVL int
+static int
 set_wall(x, y, horiz)
 int x, y, horiz;
 {
@@ -2076,7 +2067,7 @@ int x, y, horiz;
 }
 
 /* Return a wall mode for a corner wall. (x4,y4) is the "inner" position. */
-STATIC_OVL int
+static int
 set_corn(x1, y1, x2, y2, x3, y3, x4, y4)
 int x1, y1, x2, y2, x3, y3, x4, y4;
 {
@@ -2105,7 +2096,7 @@ int x1, y1, x2, y2, x3, y3, x4, y4;
 }
 
 /* Return mode for a crosswall. */
-STATIC_OVL int
+static int
 set_crosswall(x, y)
 int x, y;
 {
@@ -2228,7 +2219,7 @@ unsigned char seenv_matrix[3][3] = { { SV2, SV1, SV0 },
 #define sign(z) ((z) < 0 ? -1 : ((z) > 0 ? 1 : 0))
 
 /* Set the seen vector of lev as if seen from (x0,y0) to (x,y). */
-STATIC_OVL void
+static void
 set_seenv(lev, x0, y0, x, y)
 struct rm *lev;
 int x0, y0, x, y; /* from, to */
@@ -2307,7 +2298,7 @@ static const int cross_matrix[4][6] = {
 };
 
 /* Print out a T wall warning and all interesting info. */
-STATIC_OVL void
+static void
 t_warn(lev)
 struct rm *lev;
 {
@@ -2340,7 +2331,7 @@ struct rm *lev;
  * draw diagrams.  See rm.h for more details on the wall modes and
  * seen vector (SV).
  */
-STATIC_OVL int
+static int
 wall_angle(lev)
 struct rm *lev;
 {

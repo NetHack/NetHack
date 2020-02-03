@@ -19,19 +19,19 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(get_wall_for_db, (int *, int *));
-STATIC_DCL struct entity *FDECL(e_at, (int, int));
-STATIC_DCL void FDECL(m_to_e, (struct monst *, int, int, struct entity *));
-STATIC_DCL void FDECL(u_to_e, (struct entity *));
-STATIC_DCL void FDECL(set_entity, (int, int, struct entity *));
-STATIC_DCL const char *FDECL(e_nam, (struct entity *));
-STATIC_DCL const char *FDECL(E_phrase, (struct entity *, const char *));
-STATIC_DCL boolean FDECL(e_survives_at, (struct entity *, int, int));
-STATIC_DCL void FDECL(e_died, (struct entity *, int, int));
-STATIC_DCL boolean FDECL(automiss, (struct entity *));
-STATIC_DCL boolean FDECL(e_missed, (struct entity *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(e_jumps, (struct entity *));
-STATIC_DCL void FDECL(do_entity, (struct entity *));
+static void FDECL(get_wall_for_db, (int *, int *));
+static struct entity *FDECL(e_at, (int, int));
+static void FDECL(m_to_e, (struct monst *, int, int, struct entity *));
+static void FDECL(u_to_e, (struct entity *));
+static void FDECL(set_entity, (int, int, struct entity *));
+static const char *FDECL(e_nam, (struct entity *));
+static const char *FDECL(E_phrase, (struct entity *, const char *));
+static boolean FDECL(e_survives_at, (struct entity *, int, int));
+static void FDECL(e_died, (struct entity *, int, int));
+static boolean FDECL(automiss, (struct entity *));
+static boolean FDECL(e_missed, (struct entity *, BOOLEAN_P));
+static boolean FDECL(e_jumps, (struct entity *));
+static void FDECL(do_entity, (struct entity *));
 
 boolean
 is_pool(x, y)
@@ -205,7 +205,7 @@ int *x, *y;
 /*
  * Find the drawbridge wall associated with a drawbridge.
  */
-STATIC_OVL void
+static void
 get_wall_for_db(x, y)
 int *x, *y;
 {
@@ -282,17 +282,7 @@ boolean flag;
     return  TRUE;
 }
 
-struct entity {
-    struct monst *emon;     /* youmonst for the player */
-    struct permonst *edata; /* must be non-zero for record to be valid */
-    int ex, ey;
-};
-
-#define ENTITIES 2
-
-static NEARDATA struct entity occupants[ENTITIES];
-
-STATIC_OVL
+static
 struct entity *
 e_at(x, y)
 int x, y;
@@ -300,18 +290,18 @@ int x, y;
     int entitycnt;
 
     for (entitycnt = 0; entitycnt < ENTITIES; entitycnt++)
-        if ((occupants[entitycnt].edata) && (occupants[entitycnt].ex == x)
-            && (occupants[entitycnt].ey == y))
+        if ((g.occupants[entitycnt].edata) && (g.occupants[entitycnt].ex == x)
+            && (g.occupants[entitycnt].ey == y))
             break;
     debugpline1("entitycnt = %d", entitycnt);
 #ifdef D_DEBUG
     wait_synch();
 #endif
     return (entitycnt == ENTITIES) ? (struct entity *) 0
-                                   : &(occupants[entitycnt]);
+                                   : &(g.occupants[entitycnt]);
 }
 
-STATIC_OVL void
+static void
 m_to_e(mtmp, x, y, etmp)
 struct monst *mtmp;
 int x, y;
@@ -329,17 +319,17 @@ struct entity *etmp;
         etmp->edata = (struct permonst *) 0;
 }
 
-STATIC_OVL void
+static void
 u_to_e(etmp)
 struct entity *etmp;
 {
-    etmp->emon = &youmonst;
+    etmp->emon = &g.youmonst;
     etmp->ex = u.ux;
     etmp->ey = u.uy;
-    etmp->edata = youmonst.data;
+    etmp->edata = g.youmonst.data;
 }
 
-STATIC_OVL void
+static void
 set_entity(x, y, etmp)
 int x, y;
 struct entity *etmp;
@@ -352,7 +342,7 @@ struct entity *etmp;
         etmp->edata = (struct permonst *) 0;
 }
 
-#define is_u(etmp) (etmp->emon == &youmonst)
+#define is_u(etmp) (etmp->emon == &g.youmonst)
 #define e_canseemon(etmp) \
     (is_u(etmp) ? (boolean) TRUE : canseemon(etmp->emon))
 
@@ -363,7 +353,7 @@ struct entity *etmp;
 
 /* #define e_strg(etmp, func) (is_u(etmp)? (char *)0 : func(etmp->emon)) */
 
-STATIC_OVL const char *
+static const char *
 e_nam(etmp)
 struct entity *etmp;
 {
@@ -374,7 +364,7 @@ struct entity *etmp;
  * Generates capitalized entity name, makes 2nd -> 3rd person conversion on
  * verb, where necessary.
  */
-STATIC_OVL const char *
+static const char *
 E_phrase(etmp, verb)
 struct entity *etmp;
 const char *verb;
@@ -395,7 +385,7 @@ const char *verb;
 /*
  * Simple-minded "can it be here?" routine
  */
-STATIC_OVL boolean
+static boolean
 e_survives_at(etmp, x, y)
 struct entity *etmp;
 int x, y;
@@ -419,25 +409,25 @@ int x, y;
     return TRUE;
 }
 
-STATIC_OVL void
+static void
 e_died(etmp, xkill_flags, how)
 struct entity *etmp;
 int xkill_flags, how;
 {
     if (is_u(etmp)) {
         if (how == DROWNING) {
-            killer.name[0] = 0; /* drown() sets its own killer */
+            g.killer.name[0] = 0; /* drown() sets its own killer */
             (void) drown();
         } else if (how == BURNING) {
-            killer.name[0] = 0; /* lava_effects() sets own killer */
+            g.killer.name[0] = 0; /* lava_effects() sets own killer */
             (void) lava_effects();
         } else {
             coord xy;
 
             /* use more specific killer if specified */
-            if (!killer.name[0]) {
-                killer.format = KILLED_BY_AN;
-                Strcpy(killer.name, "falling drawbridge");
+            if (!g.killer.name[0]) {
+                g.killer.format = KILLED_BY_AN;
+                Strcpy(g.killer.name, "falling drawbridge");
             }
             done(how);
             /* So, you didn't die */
@@ -445,7 +435,7 @@ int xkill_flags, how;
                 if (enexto(&xy, etmp->ex, etmp->ey, etmp->edata)) {
                     pline("A %s force teleports you away...",
                           Hallucination ? "normal" : "strange");
-                    teleds(xy.x, xy.y, FALSE);
+                    teleds(xy.x, xy.y, TELEDS_NO_FLAGS);
                 }
                 /* otherwise on top of the drawbridge is the
                  * only viable spot in the dungeon, so stay there
@@ -457,12 +447,12 @@ int xkill_flags, how;
     } else {
         int entitycnt;
 
-        killer.name[0] = 0;
+        g.killer.name[0] = 0;
 /* fake "digested to death" damage-type suppresses corpse */
 #define mk_message(dest) (((dest & XKILL_NOMSG) != 0) ? (char *) 0 : "")
 #define mk_corpse(dest) (((dest & XKILL_NOCORPSE) != 0) ? AD_DGST : AD_PHYS)
         /* if monsters are moving, one of them caused the destruction */
-        if (context.mon_moving)
+        if (g.context.mon_moving)
             monkilled(etmp->emon,
                       mk_message(xkill_flags), mk_corpse(xkill_flags));
         else /* you caused it */
@@ -471,9 +461,9 @@ int xkill_flags, how;
 
         /* dead long worm handling */
         for (entitycnt = 0; entitycnt < ENTITIES; entitycnt++) {
-            if (etmp != &(occupants[entitycnt])
-                && etmp->emon == occupants[entitycnt].emon)
-                occupants[entitycnt].edata = (struct permonst *) 0;
+            if (etmp != &(g.occupants[entitycnt])
+                && etmp->emon == g.occupants[entitycnt].emon)
+                g.occupants[entitycnt].edata = (struct permonst *) 0;
         }
 #undef mk_message
 #undef mk_corpse
@@ -483,7 +473,7 @@ int xkill_flags, how;
 /*
  * These are never directly affected by a bridge or portcullis.
  */
-STATIC_OVL boolean
+static boolean
 automiss(etmp)
 struct entity *etmp;
 {
@@ -494,7 +484,7 @@ struct entity *etmp;
 /*
  * Does falling drawbridge or portcullis miss etmp?
  */
-STATIC_OVL boolean
+static boolean
 e_missed(etmp, chunks)
 struct entity *etmp;
 boolean chunks;
@@ -531,7 +521,7 @@ boolean chunks;
 /*
  * Can etmp jump from death?
  */
-STATIC_OVL boolean
+static boolean
 e_jumps(etmp)
 struct entity *etmp;
 {
@@ -555,7 +545,7 @@ struct entity *etmp;
     return (tmp >= rnd(10)) ? TRUE : FALSE;
 }
 
-STATIC_OVL void
+static void
 do_entity(etmp)
 struct entity *etmp;
 {
@@ -599,8 +589,8 @@ struct entity *etmp;
     } else {
         if (crm->typ == DRAWBRIDGE_DOWN) {
             if (is_u(etmp)) {
-                killer.format = NO_KILLER_PREFIX;
-                Strcpy(killer.name,
+                g.killer.format = NO_KILLER_PREFIX;
+                Strcpy(g.killer.name,
                        "crushed to death underneath a drawbridge");
             }
             pline("%s crushed underneath the drawbridge.",
@@ -717,8 +707,8 @@ struct entity *etmp;
                       E_phrase(etmp, "disappear"));
         }
         if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
-            killer.format = KILLED_BY_AN;
-            Strcpy(killer.name, "closing drawbridge");
+            g.killer.format = KILLED_BY_AN;
+            Strcpy(g.killer.name, "closing drawbridge");
             e_died(etmp, XKILL_NOMSG, CRUSHING);
             return;
         }
@@ -748,8 +738,8 @@ struct entity *etmp;
                     pline("%s into the %s.", E_phrase(etmp, "fall"),
                           lava ? hliquid("lava") : "moat");
             }
-        killer.format = NO_KILLER_PREFIX;
-        Strcpy(killer.name, "fell from a drawbridge");
+        g.killer.format = NO_KILLER_PREFIX;
+        Strcpy(g.killer.name, "fell from a drawbridge");
         e_died(etmp, /* CRUSHING is arbitrary */
                XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                is_pool(etmp->ex, etmp->ey) ? DROWNING
@@ -760,7 +750,7 @@ struct entity *etmp;
 }
 
 /* clear stale reason for death before returning */
-#define nokiller() (killer.name[0] = '\0', killer.format = 0)
+#define nokiller() (g.killer.name[0] = '\0', g.killer.format = 0)
 
 /*
  * Close the drawbridge located at x,y
@@ -801,11 +791,11 @@ int x, y;
         break;
     }
     lev2->wall_info = W_NONDIGGABLE;
-    set_entity(x, y, &(occupants[0]));
-    set_entity(x2, y2, &(occupants[1]));
-    do_entity(&(occupants[0]));          /* Do set_entity after first */
-    set_entity(x2, y2, &(occupants[1])); /* do_entity for worm tail */
-    do_entity(&(occupants[1]));
+    set_entity(x, y, &(g.occupants[0]));
+    set_entity(x2, y2, &(g.occupants[1]));
+    do_entity(&(g.occupants[0]));          /* Do set_entity after first */
+    set_entity(x2, y2, &(g.occupants[1])); /* do_entity for worm tail */
+    do_entity(&(g.occupants[1]));
     if (OBJ_AT(x, y) && !Deaf)
         You_hear("smashing and crushing.");
     (void) revive_nasty(x, y, (char *) 0);
@@ -850,11 +840,11 @@ int x, y;
     lev2 = &levl[x2][y2];
     lev2->typ = DOOR;
     lev2->doormask = D_NODOOR;
-    set_entity(x, y, &(occupants[0]));
-    set_entity(x2, y2, &(occupants[1]));
-    do_entity(&(occupants[0]));          /* do set_entity after first */
-    set_entity(x2, y2, &(occupants[1])); /* do_entity for worm tails */
-    do_entity(&(occupants[1]));
+    set_entity(x, y, &(g.occupants[0]));
+    set_entity(x2, y2, &(g.occupants[1]));
+    do_entity(&(g.occupants[0]));          /* do set_entity after first */
+    set_entity(x2, y2, &(g.occupants[1])); /* do_entity for worm tails */
+    do_entity(&(g.occupants[1]));
     (void) revive_nasty(x, y, (char *) 0);
     delallobj(x, y);
     if ((t = t_at(x, y)) != 0)
@@ -883,7 +873,7 @@ int x, y;
     struct obj *otmp;
     int x2, y2, i;
     boolean e_inview;
-    struct entity *etmp1 = &(occupants[0]), *etmp2 = &(occupants[1]);
+    struct entity *etmp1 = &(g.occupants[0]), *etmp2 = &(g.occupants[1]);
 
     lev1 = &levl[x][y];
     if (!IS_DRAWBRIDGE(lev1->typ))
@@ -957,8 +947,8 @@ int x, y;
             if (e_inview)
                 pline("%s blown apart by flying debris.",
                       E_phrase(etmp2, "are"));
-            killer.format = KILLED_BY_AN;
-            Strcpy(killer.name, "exploding drawbridge");
+            g.killer.format = KILLED_BY_AN;
+            Strcpy(g.killer.name, "exploding drawbridge");
             e_died(etmp2,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/
@@ -989,8 +979,8 @@ int x, y;
                     debugpline1("%s from shrapnel", E_phrase(etmp1, "die"));
                 }
             }
-            killer.format = KILLED_BY_AN;
-            Strcpy(killer.name, "collapsing drawbridge");
+            g.killer.format = KILLED_BY_AN;
+            Strcpy(g.killer.name, "collapsing drawbridge");
             e_died(etmp1,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/

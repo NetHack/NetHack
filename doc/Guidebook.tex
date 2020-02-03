@@ -1765,36 +1765,82 @@ dark areas are only displayed if they are within one space of you.
 Walls and corridors remain on the map as you explore them.
 
 %.pg
-Secret corridors are hidden.  You can find them with the `{\tt s}' (search)
-command.
+Secret corridors are hidden and appear to be solid rock.
+You can find them with the `{\tt s}' (search) command when adjacent
+to them.
+Multiple search attempts may be needed.
+When searching is successful, secret corridors become ordinary open
+corridor locations.
+Mapping magic reveals secret corridors, so converts them into ordinary
+corridors and shows them as such.
 
 %.hn 2
 \subsection*{Doorways}
 
 %.pg
-Doorways connect rooms and corridors.  Some doorways have no doors;
-you can walk right through.  Others have doors in them, which may be
-open, closed, or locked.  To open a closed door, use the `{\tt o}' (open)
+Doorways connect rooms and corridors.
+Some doorways have no doors; you can walk right through.
+Others have doors in them, which may be open, closed, or locked.
+To open a closed door, use the `{\tt o}' (open)
 command; to close it again, use the `{\tt c}' (close) command.
-
-%.pg
-You can get through a locked door by using a tool to pick the lock
-with the `{\tt a}' (apply) command, or by kicking it open with the
-`{\tt \^{}D}' (kick) command.
+By default the
+{\it autoopen}
+option is enabled, so simply attempting to walk onto a closed door's
+location will attempt to open it without needing `{\tt o}'.
+Opening via
+{\it autoopen}
+will not work if you are {\it confused\/} or {\it stunned\/} or suffer from
+the {\it fumbling\/} attribute.
 
 %.pg
 Open doors cannot be entered diagonally; you must approach them
-straight on, horizontally or vertically.  Doorways without doors are
-not restricted in this fashion.
+straight on, horizontally or vertically.
+Doorways without doors are
+not restricted in this fashion except on one particular level
+%.\" the rogue level
+(described by ``{\tt \#overview}'' as ``a primitive area'').
 
 %.pg
-Doors can be useful for shutting out monsters.  Most monsters cannot
-open doors, although a few don't need to (for example, ghosts can walk through
-doors).
+Unlocking magic exists but usually won't be available early on.
+You can get through a locked door without magic by first using an
+unlocking tool with the `{\tt a}' (apply) command, and then opening it.
+By default the
+{\it autounlock}
+option is also enabled, so if you attempt to open (via `{\tt o}' or
+{\it autoopen})
+a locked door while carrying an unlocking tool, you'll be asked whether
+to use it on the door's lock.
+Alternatively, you can break a closed door (whether locked or not) down
+by kicking it via the ``{\tt \^{}D}'' (kick) command.
+Kicking down a door destroys it and makes a lot of noise which might
+wake sleeping monsters.
 
 %.pg
-Secret doors are hidden.  You can find them with the `{\tt s}' (search)
-command.  Once found they are in all ways equivalent to normal doors.
+Some closed doors are booby-trapped and will explode if an attempt is made
+to open (when unlocked) or unlock (when locked) or kick down.
+Like kicking, an explosion destroys the door and makes a lot of noise.
+The ``{\tt \#untrap}'' command can be used to search a door for traps but
+might take multiple attempts to find one.
+When one is found, you'll be asked whether to try to disarm it.
+If you accede, success will eliminate the trap but
+failure will set off the trap's explosion.
+(If you decline, you effectively forget that a trap was found there.)
+
+%.pg
+Closed doors can be useful for shutting out monsters.
+Most monsters cannot open closed doors, although a few don't need to
+(for example, ghosts can walk through doors and fog clouds can flow
+under them).
+Some monsters who can open doors can also use unlocking tools.
+And some (giants) can smash doors.
+
+%.pg
+Secret doors are hidden and appear to be ordinary wall (from inside a
+room) or solid rock (from outside).
+You can find them with the `{\tt s}' (search) command but it might
+take multiple tries.
+Once found they are in all ways equivalent to normal doors.
+Mapping magic does not reveal secret doors.
 
 %.hn 2
 \subsection*{Traps (`{\tt \^{}}')}
@@ -1919,6 +1965,92 @@ If a shop is ``closed for inventory,'' it will not open of its own accord.
 \item[$\bullet$]
 Shops do not get restocked with new items, regardless of inventory depletion.
 \end{itemize}
+
+%.hn 2
+\subsubsection*{Movement feedback}
+
+%.pg
+Moving around the map usually provides no feedback--other than drawing the
+hero at the new location--unless you step on an object or pile of objects,
+or on a trap, or attempt to move onto a spot where a monster is located.
+There are several options which can be used to augment the normal feedback.
+
+%.pg
+The
+{\it pile\verb+_+limit\/}
+option controls how many objects can be in a pile--sharing the same map
+location--for the game to state ``there are objects here''
+instead of listing them.
+The default is {\tt 5}.
+Setting it to {\tt 1} would always give that message instead of listing
+any objects.
+Setting it to {\tt 0} is a special case which will always list all
+objects no matter how big a pile is.
+Note that the number refers to the count of separate stacks of objects
+present rather than the sum of the quantities of those stacks (so
+{\tt 7 arrows} or {\tt 25 gold pieces} will each count as 1 rather
+than as 7 and 25, respectively, and total to 2 when both are at the
+same location).
+
+%.pg
+The {\tt nopickup} command prefix (default `{\tt m}') can be
+used before a movement direction to step on objects without attempting
+auto-pickup and without giving feedback about them.
+
+%.pg
+The
+{\it mention\verb+_+walls\/}
+option controls whether you get feedback if you try to walk into a wall
+or solid stone or off the edge of the map.
+Normally nothing happens (unless the hero is blind and no wall is shown,
+then the wall that is being bumped into will be drawn on the map).
+This option also gives feedback when rushing or running stops for
+some non-obvious reason.
+
+%.pg
+The
+{\it mention\verb+_+decor\/}
+option controls whether you get feedback when walking on ``furniture.''
+Normally stepping onto stairs or a fountain or an altar or various other
+things doesn't elicit anything unless it is covered by one or more objects
+so is obscured on the map.
+Setting this option to true will describe such things even when they
+aren't obscured.
+Doorless doorways and open doors aren't considered worthy of mention;
+closed doors (if you can move onto their spots) and broken doors are.
+Assuming that you're able to do so, moving onto water or lava or ice
+will give feedback if not yet on that type of terrain but not repeat it
+(unless there has been some intervening message) when moving from water
+to another water spot, or lava to lava, or ice to ice.
+Moving off of any of those back onto ``normal'' terrain will give one
+message too, unless there is feedback about one or more objects, in which
+case the back on land circumstance is implied.
+
+%.pg
+The
+{\it confirm\/}
+and
+{\it safe\verb+_+pet\/}
+options control what happens when you try to move onto a peaceful monster's
+spot or a tame one's spot.
+
+%.\" getting away from "Movement feedback" here; oh well...
+%.pg
+The {\tt nopickup} command prefix (default `{\tt m}' is
+also the move-without-attacking prefix and can be used to try to step
+onto a visible monster's spot without the move being considered an attack
+(see the {\it Fighting\/} subsection of {\it Monsters\/} below).
+The `{\tt fight}' command prefix (default `{\tt F}';
+also `{\tt -}' if
+{\it number\verb+_+pad\/}
+is on) can be used to force an attack, when guessing where an unseen
+monster is or when deliberately attacking a peaceful or tame creature.
+
+%.pg
+The
+{\it run\verb+_+mode}
+option controls how frequently the map gets redrawn when moving more
+than one step in a single command (so when rushing, running, or traveling).
 
 %.hn 1
 \section{Monsters}
@@ -3187,7 +3319,8 @@ Automatically dig if you are wielding a digging tool and moving into a place
 that can be dug (default false).  Persistent.
 %.lp
 \item[\ib{autoopen}]
-Walking into a door attempts to open it (default true).  Persistent.
+Walking into a closed door attempts to open it (default true).
+Persistent.
 %.lp
 \item[\ib{autopickup}]
 Automatically pick up things onto which you move (default on).  Persistent.
@@ -3205,6 +3338,12 @@ or quiver sack or make ready
 with the `Q' command instead.
 If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  Persistent.
+%.lp
+\item[\ib{autounlock}]
+Walking into a locked door or looting a locked container while carrying
+an unlocking tool (such as a key) will ask whether to use that tool to
+unlock the door or container (default true).
+Persistent.
 %.lp
 \item[\ib{blind}]
 Start the character permanently blind (default false).  Persistent.
@@ -3383,6 +3522,7 @@ Visually distinguish pets from similar animals (default off).
 The behavior of this option depends on the type of windowing you use.
 In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a heart symbol near pets.
+
 %.lp ""
 With the curses interface, the {\it petattr\/}
 option controls how to highlight pets and setting it will turn the
@@ -3407,7 +3547,12 @@ Only available for TTY and Windows GUI, and only when statushilites is on.
 Ignore interrupt signals, including breaks (default off).  Persistent.
 %.lp
 \item[\ib{implicit\verb+_+uncursed}]
-Omit ``uncursed'' from inventory lists, if possible (default on).
+Omit ``uncursed'' from object descriptions when it can be deduced from
+other aspects of the description (default on).
+Persistent.
+
+%.lp ""
+If you use menu coloring, you may want to turn this off.
 %.lp
 \item[\ib{legacy}]
 Display an introductory message when starting the game (default on).
@@ -3430,8 +3575,13 @@ Enable mail delivery during the game (default on).  Persistent.
 An obsolete synonym for ``{\tt gender:male}''.  Cannot be set with the
 `{\tt O}' command.
 %.lp
+\item[\ib{mention\verb+_+decor}]
+Give feedback when walking onto various dungeon features such as stairs,
+fountains, or altars which are ordinarily only described when covered
+by one or more objects (default off).  Persistent.
+%.lp
 \item[\ib{mention\verb+_+walls}]
-Give feedback when walking against a wall (default off).
+Give feedback when walking against a wall (default off).  Persistent.
 %.lp
 \item[\ib{menucolors}]
 Enable coloring menu lines (default off).
@@ -3760,7 +3910,16 @@ Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
 Likewise for the `a' (apply) command if it causes the applied item to
 become wielded.  Persistent.
-%.Ip
+%.lp
+\item[\ib(quick\verb+_+farsight)]
+When set, usually prevents the ``you sense your surroundings'' message
+where play pauses to allow you to browse the map whenever clairvoyance
+randomly activates.
+Some situations, such as being underwater or engulfed, ignore this option.
+It does not affect the clairvoyance spell where pausing to examine revealed
+objects or monsters is less intrusive.
+Default is off.  Persistent.
+%.lp
 \item[\ib{race}]
 Selects your race (for example, ``{\tt race:human}'').  Default is random.
 If you prefix the value with `{\tt !}' or ``{\tt no}'', you will
@@ -4256,10 +4415,6 @@ without it) (default off, {\it OS/2, PC\/ {\rm and} ST NetHack\/} only).
 Note:  DEC Rainbows hang if this is turned on.
 Cannot be set with the `{\tt O}' command.
 %.lp
-\item[\ib{soundcard}]
-(default off, {\it PC NetHack \/} only).
-Cannot be set with the `{\tt O}' command.
-%.lp
 \item[\ib{subkeyvalue}]
 ({\it Win32 tty NetHack \/} only).
 May be used to alter the value of keystrokes that the operating system
@@ -4277,6 +4432,12 @@ Values are {\it autodetect\/}, {\it default\/}, or {\it vga\/}.
 Setting {\it vga\/} (or {\it autodetect\/} with vga hardware present) will
 cause the game to display tiles.
 Cannot be set with the `{\tt O}' command.
+%.lp
+\item[\ib{video\verb+_+height}]
+Set the VGA mode resolution height (MS-DOS only, with video:vga)
+%.lp
+\item[\ib{video\verb+_+width}]
+Set the VGA mode resolution width (MS-DOS only, with video:vga)
 %.lp
 \item[\ib{videocolors}]
 \begin{sloppypar}
@@ -5260,6 +5421,22 @@ The syntax is the same as WIZARDS.
 %.lp
 \item[\ib{MAXPLAYERS}]
 Limit the maximum number of games that can be running at the same time.
+%.lp
+\item[\ib{SAVEFORMAT}]
+A list of up to two save file formats separated by space. 
+The first format in the list will written as well as read. The second format 
+will be read only if no save file in the first format exists.
+Valid choices are ``{\tt historical}'' for binary writing of entire structs, 
+``{\tt lendian}'' for binary writing of each field in little-endian order,
+``{\tt ascii}'' for writing the save file content in ascii text.
+%.lp
+\item[\ib{BONESFORMAT}]
+A list of up to two bones file formats separated by space. 
+The first format in the list will written as well as read. The second
+format will be read only if no bones files in the first format exist.
+Valid choices are ``{\tt historical}'' for binary writing of entire structs, 
+``{\tt lendian}'' for binary writing of each field in little-endian order,
+``{\tt ascii}'' for writing the bones file content in ascii text.
 %.lp
 \item[\ib{SUPPORT}]
 A string explainign how to get local support (no default value).

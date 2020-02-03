@@ -26,19 +26,10 @@ SHORT COMMANDS
 
        -d     Generate data.base.
 
-       -e     Generate  dungeon.pdf.   The  input  file  dungeon.def is passed
-              through the same logic as that used by the --grep  command;  see
-              the MDGREP FUNCTIONS section below for details.
-
-       -m     Generate monster.c.
-
        -v     Generate  date.h and options file. It will read dat/gitinfo.txt,
               only if it is present, to obtain githash= and gitbranch=
-               info and include related preprocessor #defines in date.h file.
 
        -p     Generate pm.h
-
-       -q     Generate quest.dat.
 
        -r     Generate the rumors file.
 
@@ -148,4 +139,5 @@ COPYRIGHT
 
 
 
-NETHACK                           25 May 2015                      MAKEDEFS(6)
+
+NETHACK                           1 Jan 2020                       MAKEDEFS(6)

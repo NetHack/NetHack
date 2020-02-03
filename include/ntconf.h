@@ -18,8 +18,6 @@
 #define PC_LOCKING /* Prevent overwrites of aborted or in-progress games */
 /* without first receiving confirmation. */
 
-#define HOLD_LOCKFILE_OPEN /* Keep an exclusive lock on the .0 file */
-
 #define SELF_RECOVER /* Allow the game itself to recover from an aborted \
                         game */
 
@@ -35,7 +33,7 @@
 /*#define CHANGE_COLOR*/ /* allow palette changes */
 #define SELECTSAVED /* Provide menu of saved games to choose from at start */
 
-/* #define QWERTZ_SUPPORT */ /* when swap_yz is True, numpad 7 is 'z' not 'y' */
+#define QWERTZ_SUPPORT  /* when swap_yz is True, numpad 7 is 'z' not 'y' */
 
 /*
  * -----------------------------------------------------------------
@@ -112,6 +110,7 @@ extern void FDECL(interject, (int));
 #endif
  
 #ifdef _MSC_VER
+#define HAS_STDINT
 #if (_MSC_VER > 1000)
 /* Visual C 8 warning elimination */
 #ifndef _CRT_SECURE_NO_DEPRECATE
@@ -225,7 +224,6 @@ extern void FDECL(interject, (int));
 
 /* this was part of the MICRO stuff in the past */
 extern const char *alllevels, *allbones;
-extern char hackdir[];
 #define ABORT C('a')
 #define getuid() 1
 #define getlogin() ((char *) 0)
@@ -294,4 +292,8 @@ extern void FDECL(nhassert_failed, (const char * exp, const char * file,
 extern void FDECL(nethack_exit, (int)) NORETURN;
 extern boolean FDECL(file_exists, (const char *));
 extern boolean FDECL(file_newer, (const char *, const char *));
+#ifndef SYSTEM_H
+#include "system.h"
+#endif
+
 #endif /* NTCONF_H */

@@ -54,8 +54,9 @@ enum any_types {
 
 /* menu return list */
 typedef struct mi {
-    anything item; /* identifier */
-    long count;    /* count */
+    anything item;     /* identifier */
+    long count;        /* count */
+    unsigned itemflags; /* item flags */
 } menu_item;
 #define MENU_ITEM_P struct mi
 
@@ -105,6 +106,11 @@ typedef struct mi {
 #define MENU_UNSELECT_PAGE      '\\'
 #define MENU_INVERT_PAGE        '~'
 #define MENU_SEARCH             ':'
+
+#define MENU_ITEMFLAGS_NONE       0x0000000U
+#define MENU_ITEMFLAGS_SELECTED   0x0000001U
+#define MENU_ITEMFLAGS_SKIPINVERT 0x0000002U
+
 /* clang-format on */
 
 #endif /* WINTYPE_H */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.c	$NHDT-Date: 1547118631 2019/01/10 11:10:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	monst.c	$NHDT-Date: 1577096800 2019/12/23 10:26:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -27,7 +27,6 @@
 #define C(color)
 #endif
 
-void NDECL(monst_init);
 /*
  *      Entry Format:   (from permonst.h)
  *
@@ -101,7 +100,7 @@ void NDECL(monst_init);
  */
 
 #ifndef SPLITMON_2
-NEARDATA struct permonst mons[] = {
+NEARDATA struct permonst mons_init[] = {
     /*
      * ants
      */
@@ -132,7 +131,7 @@ NEARDATA struct permonst mons[] = {
     MON("giant beetle", S_ANT, LVL(5, 6, 4, 0, 0), (G_GENO | 3),
         A(ATTK(AT_BITE, AD_PHYS, 3, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
-        SIZ(10, 10, MS_SILENT, MZ_LARGE), MR_POISON, MR_POISON,
+        SIZ(200, 50, MS_SILENT, MZ_LARGE), MR_POISON, MR_POISON,
         M1_ANIMAL | M1_NOHANDS | M1_POIS | M1_CARNIVORE, M2_HOSTILE, 0,
         6, CLR_BLACK),
     MON("queen bee", S_ANT, LVL(9, 24, -4, 0, 0), (G_GENO | G_NOGEN),
@@ -788,7 +787,7 @@ NEARDATA struct permonst mons[] = {
     MON("giant spider", S_SPIDER, LVL(5, 15, 4, 0, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_DRST, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
-        SIZ(100, 100, MS_SILENT, MZ_LARGE), MR_POISON, MR_POISON,
+        SIZ(200, 100, MS_SILENT, MZ_LARGE), MR_POISON, MR_POISON,
         M1_ANIMAL | M1_NOHANDS | M1_OVIPAROUS | M1_POIS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG, 0, 7, CLR_MAGENTA),
     MON("scorpion", S_SPIDER, LVL(5, 15, 3, 0, 0), (G_GENO | 2),
@@ -2590,7 +2589,7 @@ struct permonst _mons2[] = {
         M3_INFRAVISIBLE | M3_INFRAVISION | M3_DISPLACES, 34, HI_LORD),
     /* other demons
      */
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     MON("mail daemon", S_DEMON, LVL(56, 24, 10, 127, 0),
         (G_NOGEN | G_NOCORPSE),
         A(NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -3228,15 +3227,18 @@ struct permonst _mons2[] = {
 #endif /* !SPLITMON_1 */
 
 #ifndef SPLITMON_1
-/* dummy routine used to force linkage */
+
+struct permonst mons[SIZE(mons_init)];
+
 void
-monst_init()
+monst_globals_init()
 {
+    memcpy(mons, mons_init, sizeof(mons));
     return;
 }
 
-const struct attack sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
-const struct attack sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
+const struct attack c_sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
+const struct attack c_sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
 #endif
 
 /*monst.c*/

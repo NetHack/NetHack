@@ -5,7 +5,7 @@
 void FDECL(amii_raw_print, (const char *));
 void FDECL(amii_raw_print_bold, (const char *));
 void FDECL(amii_start_menu, (winid ));
-void FDECL(amii_add_menu, (winid  , char  , int  , const char *));
+void FDECL(amii_add_menu, (winid  , char  , int  , const char *, unsigned int));
 void FDECL(amii_end_menu, (winid  , char  , const char * , const char *));
 char FDECL(amii_select_menu, (winid ));
 void NDECL(amii_update_inventory );

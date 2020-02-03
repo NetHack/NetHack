@@ -242,8 +242,8 @@ curses_player_selection()
 void
 curses_askname()
 {
-    plname[0] = '\0';
-    curses_line_input_dialog("Who are you?", plname, PL_NSIZ);
+    g.plname[0] = '\0';
+    curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
 }
 
 
@@ -491,7 +491,7 @@ curses_start_menu(winid wid)
 /*
 add_menu(winid wid, int glyph, const anything identifier,
                                 char accelerator, char groupacc,
-                                int attr, char *str, boolean preselected)
+                                int attr, char *str, unsigned int itemflags)
                 -- Add a text line str to the given menu window.  If identifier
                    is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
@@ -517,12 +517,12 @@ add_menu(winid wid, int glyph, const anything identifier,
                    The menu commands and aliases take care not to interfere
                    with the default object class symbols.
                 -- If you want this choice to be preselected when the
-                   menu is displayed, set preselected to TRUE.
+                   menu is displayed, set bit MENU_ITEMFLAGS_SELECTED.
 */
 void
 curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
                 CHAR_P accelerator, CHAR_P group_accel, int attr,
-                const char *str, BOOLEAN_P presel)
+                const char *str, unsigned itemflags)
 {
     int curses_attr;
 
@@ -536,7 +536,7 @@ curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
     }
 
     curses_add_nhmenu_item(wid, glyph, identifier, accelerator, group_accel,
-                           curses_attr, str, presel);
+                           curses_attr, str, itemflags);
 }
 
 /*
@@ -688,12 +688,12 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
         if ((special & MG_OBJPILE) && iflags.hilite_pile) {
             if (iflags.wc_color)
                 color = 16 + (color * 2) + 1;
-            else
+            else /* if (iflags.use_inverse) */
                 attr = A_REVERSE;
         }
         /* water and lava look the same except for color; when color is off,
            render lava in inverse video so that they look different */
-        if ((special & MG_BW_LAVA) && iflags.use_inverse) {
+        if ((special & (MG_BW_LAVA | MG_BW_ICE)) != 0 && iflags.use_inverse) {
             attr = A_REVERSE; /* mapglyph() only sets this if color is off */
         }
     }

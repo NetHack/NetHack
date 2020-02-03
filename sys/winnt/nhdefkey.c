@@ -25,7 +25,6 @@ static char author[] = "The NetHack Development Team";
 
 extern HANDLE hConIn;
 extern INPUT_RECORD ir;
-extern struct sinfo program_state;
 
 char dllname[512];
 char *shortdllname;

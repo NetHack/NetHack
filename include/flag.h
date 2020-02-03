@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1574900824 2019/11/28 00:27:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.160 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1580434522 2020/01/31 01:35:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,75 +16,45 @@
  */
 
 struct flag {
-    boolean acoustics;  /* allow dungeon sound messages */
-    boolean autodig;    /* MRKR: Automatically dig */
-    boolean autoquiver; /* Automatically fill quiver */
-    boolean autoopen;   /* open doors by walking into them */
-    boolean beginner;
-    boolean biff;      /* enable checking for mail */
-    boolean bones;     /* allow saving/loading bones */
-    boolean confirm;   /* confirm before hitting tame monsters */
-    boolean dark_room; /* show shadows in lit rooms */
-    boolean debug;     /* in debugging mode */
+    boolean acoustics;       /* allow dungeon sound messages */
+    boolean autodig;         /* MRKR: Automatically dig */
+    boolean autoquiver;      /* Automatically fill quiver */
+    boolean autoopen;        /* open doors by walking into them */
+    boolean autounlock;      /* automatically apply unlocking tools */
+    boolean beginner;        /* True early in each game; affects feedback */
+    boolean biff;            /* enable checking for mail */
+    boolean bones;           /* allow saving/loading bones */
+    boolean confirm;         /* confirm before hitting tame monsters */
+    boolean dark_room;       /* show shadows in lit rooms */
+    boolean debug;           /* in debugging mode (aka wizard mode) */
 #define wizard flags.debug
-    boolean end_own; /* list all own scores */
-    boolean explore; /* in exploration mode */
+    boolean end_own;         /* list all own scores */
+    boolean explore;         /* in exploration mode (aka discover mode) */
 #define discover flags.explore
     boolean female;
     boolean friday13;        /* it's Friday the 13th */
+    boolean goldX;           /* for BUCX filtering, whether gold is X or U */
     boolean help;            /* look in data file for info about stuff */
     boolean ignintr;         /* ignore interrupts */
+    boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean ins_chkpt;       /* checkpoint as appropriate; INSURANCE */
     boolean invlet_constant; /* let objects keep their inventory symbol */
     boolean legacy;          /* print game entry "story" */
     boolean lit_corridor;    /* show a dark corr as lit if it is in sight */
+    boolean mention_decor;   /* give feedback for unobscured furniture */
+    boolean mention_walls;   /* give feedback when bumping walls */
     boolean nap;             /* `timed_delay' option for display effects */
     boolean null;            /* OK to send nulls to the terminal */
-    boolean p__obsolete;     /* [3.6.2: perm_invent moved to iflags] */
     boolean pickup;          /* whether you pickup or move and look */
     boolean pickup_thrown;   /* auto-pickup items you threw */
     boolean pushweapon; /* When wielding, push old weapon into second slot */
+    boolean quick_farsight;  /* True disables map browsing during random
+                              * clairvoyance */
     boolean rest_on_space;   /* space means rest */
     boolean safe_dog;        /* give complete protection to the dog */
     boolean showexp;         /* show experience points */
     boolean showscore;       /* show score */
     boolean silent;          /* whether the bell rings or not */
-    /* The story so far:
-     * 'sortloot' originally took a True/False value but was changed
-     * to use a letter instead.  3.6.0 was released without changing its
-     * type from 'boolean' to 'char'.  A compiler was smart enough to
-     * complain that assigning any of the relevant letters was not 0 or 1
-     * so not appropriate for boolean (by a configuration which used
-     * SKIP_BOOLEAN to bypass nethack's 'boolean' and use a C++-compatible
-     * one).  So the type was changed to 'xchar', which is guaranteed to
-     * match the size of 'boolean' (this guarantee only applies for the
-     * !SKIP_BOOLEAN config, unfortunately).  Since xchar does not match
-     * actual use, the type was later changed to 'char'.  But that would
-     * break 3.6.0 savefile compatibility for configurations which typedef
-     * 'schar' to 'short int' instead of to 'char'.  (Needed by pre-ANSI
-     * systems that use unsigned characters without a way to force them
-     * to be signed.)  So, the type has been changed back to 'xchar' for
-     * 3.6.x.
-     *
-     * TODO:  change to 'char' (and move out of this block of booleans,
-     * and get rid of these comments...) once 3.6.0 savefile compatibility
-     * eventually ends.
-     */
-#ifndef SKIP_BOOLEAN
-    /* this is the normal configuration; assigning a character constant
-       for a normal letter to an 'xchar' variable should always work even
-       if 'char' is unsigned since character constants are actually 'int'
-       and letters are within the range where signedness shouldn't matter */
-    xchar   sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
-#else
-    /* with SKIP_BOOLEAN, we have no idea what underlying type is being
-       used, other than it isn't 'xchar' (although its size might match
-       that) or a bitfield (because it must be directly addressable);
-       it's probably either 'char' for compactness or 'int' for access,
-       but we don't know which and it might be something else anyway;
-       flip a coin here and guess 'char' for compactness */
-    char    sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
-#endif
     boolean sortpack;        /* sorted inventory */
     boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */
@@ -109,6 +79,7 @@ struct flag {
 #define PARANOID_EATING     0x0200
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
+    char sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
     char inv_order[MAXOCLASSES];
     char pickup_types[MAXOCLASSES];
 #define NUM_DISCLOSURE_OPTIONS 6 /* i,a,v,g,c,o (decl.c) */
@@ -239,7 +210,7 @@ struct instance_flags {
      * a structure of their own elsewhere some day.
      */
     boolean debug_fuzzer;  /* fuzz testing */
-    boolean defer_plname;  /* X11 hack: askname() might not set plname */
+    boolean defer_plname;  /* X11 hack: askname() might not set g.plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
     int at_midnight;       /* only valid during end of game disclosure */
@@ -276,6 +247,8 @@ struct instance_flags {
      */
     unsigned msg_history; /* hint: # of top lines to save */
     int getpos_coords;    /* show coordinates when getting cursor position */
+    int menuinvertmode;  /* 0 = invert toggles every item;
+                            1 = invert skips 'all items' item */
     int menu_headings;    /* ATR for menu headings */
     int *opt_booldup;     /* for duplication of boolean opts in config file */
     int *opt_compdup;     /* for duplication of compound opts in conf file */
@@ -287,12 +260,7 @@ struct instance_flags {
     boolean deferred_X;       /* deferred entry into explore mode */
     boolean echo;             /* 1 to echo characters */
     boolean force_invmenu;    /* always menu when handling inventory */
-    /* FIXME: goldX belongs in flags, but putting it in iflags avoids
-       breaking 3.6.[01] save files */
-    boolean goldX;            /* for BUCX filtering, whether gold is X or U */
     boolean hilite_pile;      /* mark piles of objects with a hilite */
-    boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
-    boolean mention_walls;    /* give feedback when bumping walls */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */
     boolean menu_overlay;     /* Draw menus over the map */
     boolean menu_requested;   /* Flag for overloaded use of 'm' prefix
@@ -310,25 +278,17 @@ struct instance_flags {
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean use_menu_color;   /* use color in menus; only if wc_color */
 #ifdef STATUS_HILITES
-    long hilite_delta;     /* number of moves to leave a temp hilite lit */
+    long hilite_delta;        /* number of moves to leave a temp hilite lit */
     long unhilite_deadline; /* time when oldest temp hilite should be unlit */
 #endif
     boolean zerocomp;         /* write zero-compressed save files */
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */
+    schar prev_decor;         /* 'mention_decor' just mentioned this */
     uchar num_pad_mode;
-    boolean cursesgraphics;     /* Use portable curses extended characters */
-#if 0   /* XXXgraphics superseded by symbol sets */
-    boolean  DECgraphics;       /* use DEC VT-xxx extended character set */
-    boolean  IBMgraphics;       /* use IBM extended character set */
-#ifdef MAC_GRAPHICS_ENV
-    boolean  MACgraphics;       /* use Macintosh extended character set, as
-                                   as defined in the special font HackFont */
-#endif
-#endif
-    uchar bouldersym; /* symbol for boulder display */
-    char prevmsg_window; /* type of old message window to use */
-    boolean extmenu;     /* extended commands use menu interface */
+    uchar bouldersym;         /* symbol for boulder display */
+    char prevmsg_window;      /* type of old message window to use */
+    boolean extmenu;          /* extended commands use menu interface */
 #ifdef MFLOPPY
     boolean checkspace; /* check disk space before writing files */
                         /* (in iflags to allow restore after moving
@@ -409,6 +369,10 @@ struct instance_flags {
     int wc_map_mode;        /* specify map viewing options, mostly
                              * for backward compatibility */
     int wc_player_selection;    /* method of choosing character */
+#if defined(MSDOS)
+    unsigned wc_video_width;    /* X resolution of screen */
+    unsigned wc_video_height;   /* Y resolution of screen */
+#endif
     boolean wc_splash_screen;   /* display an opening splash screen or not */
     boolean wc_popup_dialog;    /* put queries in pop up dialogs instead of
                                  * in the message window */
@@ -436,11 +400,6 @@ struct instance_flags {
     Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
-    /* item types used to acomplish "special achievements"; find the target
-       object and you'll be flagged as having achieved something... */
-    short mines_prize_type;     /* luckstone */
-    short soko_prize_type1;     /* bag of holding or    */
-    short soko_prize_type2;     /* amulet of reflection */
     struct debug_flags debug;
     boolean windowtype_locked;  /* windowtype can't change from configfile */
     boolean windowtype_deferred; /* pick a windowport and store it in
@@ -533,58 +492,6 @@ enum runmode_types {
 struct ext_func_tab; /* from func_tab.h */
 #endif
 
-/* special key functions */
-enum nh_keyfunc {
-    NHKF_ESC = 0,
-    NHKF_DOAGAIN,
-
-    NHKF_REQMENU,
-
-    /* run ... clicklook need to be in a continuous block */
-    NHKF_RUN,
-    NHKF_RUN2,
-    NHKF_RUSH,
-    NHKF_FIGHT,
-    NHKF_FIGHT2,
-    NHKF_NOPICKUP,
-    NHKF_RUN_NOPICKUP,
-    NHKF_DOINV,
-    NHKF_TRAVEL,
-    NHKF_CLICKLOOK,
-
-    NHKF_REDRAW,
-    NHKF_REDRAW2,
-    NHKF_GETDIR_SELF,
-    NHKF_GETDIR_SELF2,
-    NHKF_GETDIR_HELP,
-    NHKF_COUNT,
-    NHKF_GETPOS_SELF,
-    NHKF_GETPOS_PICK,
-    NHKF_GETPOS_PICK_Q,  /* quick */
-    NHKF_GETPOS_PICK_O,  /* once */
-    NHKF_GETPOS_PICK_V,  /* verbose */
-    NHKF_GETPOS_SHOWVALID,
-    NHKF_GETPOS_AUTODESC,
-    NHKF_GETPOS_MON_NEXT,
-    NHKF_GETPOS_MON_PREV,
-    NHKF_GETPOS_OBJ_NEXT,
-    NHKF_GETPOS_OBJ_PREV,
-    NHKF_GETPOS_DOOR_NEXT,
-    NHKF_GETPOS_DOOR_PREV,
-    NHKF_GETPOS_UNEX_NEXT,
-    NHKF_GETPOS_UNEX_PREV,
-    NHKF_GETPOS_INTERESTING_NEXT,
-    NHKF_GETPOS_INTERESTING_PREV,
-    NHKF_GETPOS_VALID_NEXT,
-    NHKF_GETPOS_VALID_PREV,
-    NHKF_GETPOS_HELP,
-    NHKF_GETPOS_MENU,
-    NHKF_GETPOS_LIMITVIEW,
-    NHKF_GETPOS_MOVESKIP,
-
-    NUM_NHKF
-};
-
 enum gloctypes {
     GLOC_MONS = 0,
     GLOC_OBJS,
@@ -595,27 +502,5 @@ enum gloctypes {
 
     NUM_GLOCS
 };
-
-/* commands[] is used to directly access cmdlist[] instead of looping
-   through it to find the entry for a given input character;
-   move_X is the character used for moving one step in direction X;
-   alphadirchars corresponds to old sdir,
-   dirchars corresponds to ``iflags.num_pad ? ndir : sdir'';
-   pcHack_compat and phone_layout only matter when num_pad is on,
-   swap_yz only matters when it's off */
-struct cmd {
-    unsigned serialno;     /* incremented after each update */
-    boolean num_pad;       /* same as iflags.num_pad except during updates */
-    boolean pcHack_compat; /* for numpad:  affects 5, M-5, and M-0 */
-    boolean phone_layout;  /* inverted keypad:  1,2,3 above, 7,8,9 below */
-    boolean swap_yz;       /* QWERTZ keyboards; use z to move NW, y to zap */
-    char move_W, move_NW, move_N, move_NE, move_E, move_SE, move_S, move_SW;
-    const char *dirchars;      /* current movement/direction characters */
-    const char *alphadirchars; /* same as dirchars if !numpad */
-    const struct ext_func_tab *commands[256]; /* indexed by input character */
-    char spkeys[NUM_NHKF];
-};
-
-extern NEARDATA struct cmd Cmd;
 
 #endif /* FLAG_H */

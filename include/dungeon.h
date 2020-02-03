@@ -56,6 +56,7 @@ typedef struct dest_area { /* non-stairway level change identifier */
 typedef struct dungeon {   /* basic dungeon identifier */
     char dname[24];        /* name of the dungeon (eg. "Hell") */
     char proto[15];        /* name of prototype file (eg. "tower") */
+    char fill_lvl[15];     /* name of "fill" level protype file */
     char boneid;           /* character to id dungeon in bones files */
     d_flags flags;         /* dungeon flags */
     xchar entry_lev;       /* entry level */
@@ -242,6 +243,13 @@ typedef struct mapseen {
            questing is for quest home (level 1) */
         Bitfield(quest_summons, 1); /* heard summons from leader */
         Bitfield(questing, 1); /* quest leader has unlocked quest stairs */
+        /* "gateway to sanctum" */
+        Bitfield(vibrating_square, 1); /* found vibrating square 'trap';
+                                        * flag cleared once the msanctum
+                                        * annotation has been added (on
+                                        * the next dungeon level; temple
+                                        * entered or high altar mapped) */
+        Bitfield(spare1, 1); /* not used */
     } flags;
     /* custom naming */
     char *custom;
@@ -249,7 +257,7 @@ typedef struct mapseen {
     struct mapseen_rooms {
         Bitfield(seen, 1);
         Bitfield(untended, 1);         /* flag for shop without shk */
-    } msrooms[(MAXNROFROOMS + 1) * 2]; /* same size as rooms[] */
+    } msrooms[(MAXNROFROOMS + 1) * 2]; /* same size as g.rooms[] */
     /* dead heroes; might not have graves or ghosts */
     struct cemetery *final_resting_place; /* same as level.bonesinfo */
 } mapseen;

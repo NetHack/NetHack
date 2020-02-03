@@ -58,7 +58,7 @@ curses_create_window(int width, int height, orient orientation)
 
     if ((orientation == UP) || (orientation == DOWN) ||
         (orientation == LEFT) || (orientation == RIGHT)) {
-        if (invent || (moves > 1)) {
+        if (g.invent || (g.moves > 1)) {
             map_border = curses_window_has_border(MAP_WIN);
             curses_get_window_xy(MAP_WIN, &mapx, &mapy);
             curses_get_window_size(MAP_WIN, &maph, &mapw);
@@ -93,7 +93,7 @@ curses_create_window(int width, int height, orient orientation)
         starty = (term_rows / 2) - (height / 2);
         break;
     case UP:
-        if (invent || (moves > 1)) {
+        if (g.invent || (g.moves > 1)) {
             startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
         } else {
             startx = 0;
@@ -102,7 +102,7 @@ curses_create_window(int width, int height, orient orientation)
         starty = mapy + mapb_offset;
         break;
     case DOWN:
-        if (invent || (moves > 1)) {
+        if (g.invent || (g.moves > 1)) {
             startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
         } else {
             startx = 0;
@@ -118,7 +118,7 @@ curses_create_window(int width, int height, orient orientation)
         starty = term_rows - height;
         break;
     case RIGHT:
-        if (invent || (moves > 1)) {
+        if (g.invent || (g.moves > 1)) {
             startx = (mapw + mapx + (mapb_offset * 2)) - width;
         } else {
             startx = term_cols - width;
@@ -168,7 +168,7 @@ curses_refresh_nethack_windows()
     map_window = curses_get_nhwin(MAP_WIN);
     inv_window = curses_get_nhwin(INV_WIN);
 
-    if ((moves <= 1) && !invent) {
+    if ((g.moves <= 1) && !g.invent) {
         /* Main windows not yet displayed; refresh base window instead */
         touchwin(stdscr);
         refresh();
@@ -508,8 +508,9 @@ curses_puts(winid wid, int attr, const char *text)
                        wid);
             return;
         }
-        Id = zeroany;
-        curses_add_nhmenu_item(wid, NO_GLYPH, &Id, 0, 0, attr, text, FALSE);
+        Id = cg.zeroany;
+        curses_add_nhmenu_item(wid, NO_GLYPH, &Id, 0, 0, attr, text,
+                                MENU_ITEMFLAGS_NONE);
     } else {
         waddstr(win, text);
         wnoutrefresh(win);
