@@ -645,7 +645,7 @@ getbones()
         } else {
             register struct monst *mtmp;
 
-            getlev(nhfp, 0, 0, TRUE);
+            getlev(nhfp, 0, 0);
 
             /* Note that getlev() now keeps tabs on unique
              * monsters such as demon lords, and tracks the
