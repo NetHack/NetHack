@@ -79,34 +79,24 @@ static struct stat hbuf;
 
 extern char orgdir[];
 
-int
+void
 get_known_folder_path(
     const KNOWNFOLDERID * folder_id,
     char * path
     , size_t path_size)
 {
     PWSTR wide_path;
-    if (FAILED(SHGetKnownFolderPath(folder_id, 0, NULL, &wide_path))) {
+    if (FAILED(SHGetKnownFolderPath(folder_id, 0, NULL, &wide_path)))
         error("Unable to get known folder path");
-        return FALSE;
-    }
 
     size_t converted;
     errno_t err;
 
-    err = wcstombs_s(&converted, path, path_size, wide_path, _TRUNCATE);
+    err = wcstombs_s(&converted, path, path_size, wide_path, path_size - 1);
 
     CoTaskMemFree(wide_path);
 
-    if (err == STRUNCATE || err == EILSEQ) {
-        // silently handle this problem
-        return FALSE;
-    } else if (err != 0) {
-        error("Failed folder (%u) path string conversion, unexpected err = %d", folder_id->Data1, err);
-        return FALSE;
-    }
-
-    return TRUE;
+    if (err != 0) error("Failed folder path string conversion");
 }
 
 void
@@ -118,16 +108,14 @@ create_directory(const char * path)
         error("Unable to create directory '%s'", path);
 }
 
-int
+void
 build_known_folder_path(
     const KNOWNFOLDERID * folder_id,
     char * path,
     size_t path_size,
     boolean versioned)
 {
-    if(!get_known_folder_path(folder_id, path, path_size))
-        return FALSE;
-
+    get_known_folder_path(folder_id, path, path_size);
     strcat(path, "\\NetHack\\");
     create_directory(path);
     if (versioned) {
@@ -135,7 +123,6 @@ build_known_folder_path(
                     VERSION_MAJOR, VERSION_MINOR);
         create_directory(path);
     }
-    return TRUE;
 }
 
 void
@@ -263,22 +250,17 @@ set_default_prefix_locations(const char *programPath)
         fqn_prefix[TROUBLEPREFIX] = portable_device_path;
         fqn_prefix[DATAPREFIX]    = executable_path;
     } else {
-        if(!build_known_folder_path(&FOLDERID_Profile, profile_path,
-            sizeof(profile_path), FALSE))
-            strcpy(profile_path, executable_path);
+        build_known_folder_path(&FOLDERID_Profile, profile_path,
+            sizeof(profile_path), FALSE);
 
-        if(!build_known_folder_path(&FOLDERID_Profile, versioned_profile_path,
-            sizeof(profile_path), TRUE))
-            strcpy(versioned_profile_path, executable_path);
+        build_known_folder_path(&FOLDERID_Profile, versioned_profile_path,
+            sizeof(profile_path), TRUE);
 
-        if(!build_known_folder_path(&FOLDERID_LocalAppData,
-            versioned_user_data_path, sizeof(versioned_user_data_path), TRUE))
-            strcpy(versioned_user_data_path, executable_path);
+        build_known_folder_path(&FOLDERID_LocalAppData,
+            versioned_user_data_path, sizeof(versioned_user_data_path), TRUE);
 
-        if(!build_known_folder_path(&FOLDERID_ProgramData,
-            versioned_global_data_path, sizeof(versioned_global_data_path), TRUE))
-            strcpy(versioned_global_data_path, executable_path);
-
+        build_known_folder_path(&FOLDERID_ProgramData,
+            versioned_global_data_path, sizeof(versioned_global_data_path), TRUE);
         fqn_prefix[SYSCONFPREFIX] = versioned_global_data_path;
         fqn_prefix[CONFIGPREFIX]  = profile_path;
         fqn_prefix[HACKPREFIX]    = versioned_profile_path;

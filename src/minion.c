@@ -78,13 +78,11 @@ struct monst *mon;
     if (is_dprince(ptr) || (ptr == &mons[PM_WIZARD_OF_YENDOR])) {
         dtype = (!rn2(20)) ? dprince(atyp) : (!rn2(4)) ? dlord(atyp)
                                                        : ndemon(atyp);
-        cnt = ((dtype != NON_PM)
-               && !rn2(4) && is_ndemon(&mons[dtype])) ? 2 : 1;
+        cnt = (!rn2(4) && is_ndemon(&mons[dtype])) ? 2 : 1;
     } else if (is_dlord(ptr)) {
         dtype = (!rn2(50)) ? dprince(atyp) : (!rn2(20)) ? dlord(atyp)
                                                         : ndemon(atyp);
-        cnt = ((dtype != NON_PM)
-               && !rn2(4) && is_ndemon(&mons[dtype])) ? 2 : 1;
+        cnt = (!rn2(4) && is_ndemon(&mons[dtype])) ? 2 : 1;
     } else if (is_ndemon(ptr)) {
         dtype = (!rn2(20)) ? dlord(atyp) : (!rn2(6)) ? ndemon(atyp)
                                                      : monsndx(ptr);
@@ -93,8 +91,7 @@ struct monst *mon;
         dtype = (is_lord(ptr) && !rn2(20))
                     ? llord()
                     : (is_lord(ptr) || !rn2(6)) ? lminion() : monsndx(ptr);
-        cnt = ((dtype != NON_PM)
-               && !rn2(4) && !is_lord(&mons[dtype])) ? 2 : 1;
+        cnt = (!rn2(4) && !is_lord(&mons[dtype])) ? 2 : 1;
     } else if (ptr == &mons[PM_ANGEL]) {
         /* non-lawful angels can also summon */
         if (!rn2(6)) {
@@ -110,8 +107,7 @@ struct monst *mon;
         } else {
             dtype = PM_ANGEL;
         }
-        cnt = ((dtype != NON_PM)
-               && !rn2(4) && !is_lord(&mons[dtype])) ? 2 : 1;
+        cnt = (!rn2(4) && !is_lord(&mons[dtype])) ? 2 : 1;
     }
 
     if (dtype == NON_PM)

@@ -243,8 +243,7 @@ void
 choose_windows(s)
 const char *s;
 {
-    int i;
-    char *tmps = 0;
+    register int i;
 
     for (i = 0; winchoices[i].procs; i++) {
         if ('+' == winchoices[i].procs->name[0])
@@ -270,22 +269,9 @@ const char *s;
         windowprocs.win_wait_synch = def_wait_synch;
 
     if (!winchoices[0].procs) {
-        raw_printf("No window types supported?");
+        raw_printf("No window types?");
         nh_terminate(EXIT_FAILURE);
     }
-    /* 50: arbitrary, no real window_type names are anywhere near that long;
-       used to prevent potential raw_printf() overflow if user supplies a
-       very long string (on the order of 1200 chars) on the command line
-       (config file options can't get that big; they're truncated at 1023) */
-#define WINDOW_TYPE_MAXLEN 50
-    if (strlen(s) >= WINDOW_TYPE_MAXLEN) {
-        tmps = (char *) alloc(WINDOW_TYPE_MAXLEN);
-        (void) strncpy(tmps, s, WINDOW_TYPE_MAXLEN - 1);
-        tmps[WINDOW_TYPE_MAXLEN - 1] = '\0';
-        s = tmps;
-    }
-#undef WINDOW_TYPE_MAXLEN
-
     if (!winchoices[1].procs) {
         config_error_add(
                      "Window type %s not recognized.  The only choice is: %s",
@@ -307,8 +293,6 @@ const char *s;
         config_error_add("Window type %s not recognized.  Choices are:  %s",
                          s, buf);
     }
-    if (tmps)
-        free((genericptr_t) tmps) /*, tmps = 0*/ ;
 
     if (windowprocs.win_raw_print == def_raw_print
             || WINDOWPORT("safe-startup"))
@@ -878,6 +862,7 @@ const char *status_fieldnm[MAXBLSTATS];
 const char *status_fieldfmt[MAXBLSTATS];
 char *status_vals[MAXBLSTATS];
 boolean status_activefields[MAXBLSTATS];
+NEARDATA winid WIN_STATUS;
 
 void
 genl_status_init()
@@ -1172,7 +1157,7 @@ boolean fullsubs; /* True -> full substitution for file name, False ->
                 else
                     Strcpy(tmpbuf, "{current date+time}");
                 break;
-            case 'v': /* version, eg. "3.6.5-0" */
+            case 'v': /* version, eg. "3.6.4-0" */
                 Sprintf(tmpbuf, "%s", version_string(verbuf));
                 break;
             case 'u': /* UID */
