@@ -750,7 +750,11 @@ boolean *valsetlist;
      *  [Affects exp_percent_changing() too.]
      */
     if (((chg || g.update_all || fld == BL_XP)
-         && curr->percent_matters && curr->thresholds)
+         && curr->percent_matters
+#ifdef STATUS_HILITES
+         && curr->thresholds
+#endif
+        )
         /* when 'hitpointbar' is On, percent matters even if HP
            hasn't changed and has no percentage rules (in case HPmax
            has changed when HP hasn't, where we ordinarily wouldn't
@@ -1288,9 +1292,12 @@ exp_percentage()
 boolean
 exp_percent_changing()
 {
-    int pc, color_dummy;
+    int pc;
     anything a;
+#ifdef STATUS_HILITES
+    int color_dummy;
     struct hilite_s *rule;
+#endif
     struct istat_s *curr;
 
     /* if status update is already requested, skip this processing */
@@ -1302,14 +1309,19 @@ exp_percent_changing()
         curr = &g.blstats[g.now_or_before_idx][BL_XP];
         /* TODO: [see eval_notify_windowport_field() about percent_matters
            and the check against 'thresholds'] */
-        if (curr->percent_matters && curr->thresholds
+        if (curr->percent_matters
+#ifdef STATUS_HILITES
+            && curr->thresholds
+#endif
             && (pc = exp_percentage()) != curr->percent_value) {
             a = cg.zeroany;
             a.a_int = (int) u.ulevel;
+#ifdef STATUS_HILITES
             rule = get_hilite(g.now_or_before_idx, BL_XP,
                               (genericptr_t) &a, 0, pc, &color_dummy);
             if (rule != curr->hilite_rule)
                 return TRUE; /* caller should set 'g.context.botl' to True */
+#endif
         }
     }
     return FALSE;
