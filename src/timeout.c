@@ -1658,7 +1658,7 @@ do_storms()
  *      are saved with a level.  Object and monster timers are
  *      saved using their respective id's instead of pointers.
  *
- *  void restore_timers(NHFILE *, int range, boolean ghostly, long adjust)
+ *  void restore_timers(NHFILE *, int range, long adjust)
  *      Restore timers of range 'range'.  If from a ghost pile,
  *      adjust the timeout by 'adjust'.  The object and monster
  *      ids are not restored until later.
@@ -2360,14 +2360,14 @@ int range;
  * monster pointers.
  */
 void
-restore_timers(nhfp, range, ghostly, adjust)
+restore_timers(nhfp, range, adjust)
 NHFILE *nhfp;
 int range;
-boolean ghostly; /* restoring from a ghost level */
 long adjust;     /* how much to adjust timeout */
 {
     int count = 0;
     timer_element *curr;
+    boolean ghostly = (nhfp->ftype == NHF_BONESFILE); /* from a ghost level */
 
     if (range == RANGE_GLOBAL) {
         if (nhfp->structlevel)

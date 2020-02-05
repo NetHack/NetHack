@@ -702,14 +702,14 @@ NHFILE *nhfp;
 }
 
 void
-rest_regions(nhfp, ghostly)
+rest_regions(nhfp)
 NHFILE *nhfp;
-boolean ghostly; /* If a bones file restore */
 {
     int i, j;
     unsigned n = 0;
     long tmstamp = 0L;
     char *msg_buf;
+    boolean ghostly = (nhfp->ftype == NHF_BONESFILE);
 
     clear_regions();		/* Just for security */
     if (nhfp->structlevel)

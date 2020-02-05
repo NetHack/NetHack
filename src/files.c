@@ -1101,12 +1101,7 @@ create_savefile()
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = WRITING;
-#ifdef SYSCF
-        if (sysopt.saveformat[0] > historical &&
-            sysopt.saveformat[0] <= ascii)
-            do_historical = FALSE;
-#endif /* SYSCF */
-        if (g.program_state.in_self_recover) {
+        if (g.program_state.in_self_recover || do_historical) {
             do_historical = TRUE;       /* force it */
             nhfp->structlevel = TRUE;
             nhfp->fieldlevel = FALSE;
@@ -1162,7 +1157,7 @@ open_savefile()
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = READING;
-        if (g.program_state.in_self_recover) {
+        if (g.program_state.in_self_recover || do_historical) {
             do_historical = TRUE;       /* force it */
             nhfp->structlevel = TRUE;
             nhfp->fieldlevel = FALSE;

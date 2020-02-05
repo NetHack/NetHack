@@ -245,7 +245,7 @@ dosave0()
             return 0;
         }
         minit(); /* ZEROCOMP */
-        getlev(onhfp, g.hackpid, ltmp, FALSE);
+        getlev(onhfp, g.hackpid, ltmp);
         close_nhfile(onhfp);
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp); /* level number*/

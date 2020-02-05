@@ -1479,7 +1479,7 @@ boolean at_stairs, falling, portal;
         reseed_random(rn2);
         reseed_random(rn2_on_display_rng);
         minit(); /* ZEROCOMP */
-        getlev(nhfp, g.hackpid, new_ledger, FALSE);
+        getlev(nhfp, g.hackpid, new_ledger);
         /* when in wizard mode, it is possible to leave from and return to
            any level in the endgame; above, we discarded bubble/cloud info
            when leaving Plane of Water or Air so recreate some now */

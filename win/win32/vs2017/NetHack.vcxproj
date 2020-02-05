@@ -120,6 +120,7 @@
     <ClCompile Include="$(SrcDir)fountain.c" />
     <ClCompile Include="$(SrcDir)hack.c" />
     <ClCompile Include="$(SrcDir)hacklib.c" />
+    <ClCompile Include="$(SrcDir)insight.c" />
     <ClCompile Include="$(SrcDir)invent.c" />
     <ClCompile Include="$(SrcDir)isaac64.c" />
     <ClCompile Include="$(SrcDir)light.c" />

@@ -286,34 +286,39 @@ RECOVOBJS    = $(O)recover.o
 
 #  Object files for the game itself.
 
+VOBJ01 = $(O)allmain.o $(O)alloc.o    $(O)apply.o    $(O)artifact.o
+VOBJ02 = $(O)attrib.o  $(O)ball.o     $(O)bones.o    $(O)botl.o
+VOBJ03 = $(O)cmd.o     $(O)dbridge.o  $(O)decl.o     $(O)detect.o
+VOBJ04 = $(O)display.o $(O)dlb.o      $(O)dig.o      $(O)do.o
+VOBJ05 = $(O)do_name.o $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o
+VOBJ06 = $(O)dokick.o  $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o
+VOBJ07 = $(O)eat.o     $(O)end.o      $(O)engrave.o  $(O)exper.o
+VOBJ08 = $(O)explode.o $(O)extralev.o $(O)files.o    $(O)fountain.o
+VOBJ09 = $(O)getline.o $(O)hack.o     $(O)hacklib.o  $(O)insight.o
+VOBJ10 = $(O)invent.o  $(O)isaac64.o  $(O)light.o    $(O)lock.o
+VOBJ11 = $(O)mail.o    $(O)main.o     $(O)makemon.o  $(O)mapglyph.o
+VOBJ12 = $(O)mcastu.o  $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o
+VOBJ13 = $(O)mkmap.o   $(O)mklev.o    $(O)mkmaze.o   $(O)mkobj.o
+VOBJ14 = $(O)mkroom.o  $(O)mon.o      $(O)mondata.o  $(O)monmove.o
+VOBJ15 = $(O)monst.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
+VOBJ16 = $(O)music.o   $(O)o_init.o   $(O)objects.o  $(O)objnam.o
+VOBJ17 = $(O)options.o $(O)pickup.o   $(O)pline.o    $(O)polyself.o
+VOBJ18 = $(O)potion.o  $(O)quest.o    $(O)questpgr.o $(O)pager.o
+VOBJ19 = $(O)pray.o    $(O)priest.o   $(O)read.o     $(O)rect.o
+VOBJ20 = $(O)region.o  $(O)restore.o  $(O)rip.o      $(O)rnd.o
+VOBJ21 = $(O)role.o    $(O)rumors.o   $(O)save.o     $(O)sfstruct.o
+VOBJ22 = $(O)shk.o     $(O)shknam.o   $(O)sit.o      $(O)sounds.o
+VOBJ23 = $(O)sp_lev.o  $(O)spell.o    $(O)steal.o    $(O)steed.o
+VOBJ24 = $(O)sys.o     $(O)teleport.o $(O)termcap.o  $(O)timeout.o
+VOBJ25 = $(O)topl.o    $(O)topten.o   $(O)track.o    $(O)trap.o
+VOBJ26 = $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
+VOBJ27 = $(O)vis_tab.o $(O)weapon.o   $(O)were.o     $(O)wield.o
+VOBJ28 = $(O)windows.o $(O)wintty.o   $(O)wizard.o   $(O)worm.o
+VOBJ29 = $(O)worn.o    $(O)write.o    $(O)zap.o
+VOBJ30 = $(REGEX)      $(VIDEO_OBJ)
 
-VOBJ01 = $(O)allmain.o  $(O)alloc.o   $(O)apply.o    $(O)artifact.o $(O)attrib.o
-VOBJ02 = $(O)ball.o     $(O)bones.o   $(O)botl.o     $(O)cmd.o      $(O)dbridge.o
-VOBJ03 = $(O)decl.o     $(O)detect.o  $(O)display.o  $(O)do.o       $(O)do_name.o
-VOBJ04 = $(O)do_wear.o  $(O)dog.o     $(O)dogmove.o  $(O)dokick.o   $(O)dothrow.o
-VOBJ05 = $(O)drawing.o  $(O)dungeon.o $(O)eat.o      $(O)end.o      $(O)engrave.o
-VOBJ06 = $(O)exper.o    $(O)explode.o $(O)extralev.o $(O)files.o    $(O)fountain.o
-VOBJ07 = $(O)getline.o  $(O)hack.o    $(O)hacklib.o  $(O)invent.o   $(O)lock.o
-VOBJ08 = $(O)mail.o     $(O)main.o    $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o $(O)mhitm.o
-VOBJ09 = $(O)mhitu.o    $(O)minion.o  $(O)mkmap.o    $(O)mklev.o    $(O)mkmaze.o
-VOBJ10 = $(O)mkobj.o    $(O)mkroom.o  $(O)mon.o      $(O)mondata.o  $(O)monmove.o
-VOBJ11 = $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
-VOBJ12 = $(O)music.o    $(O)o_init.o  $(O)objects.o  $(O)objnam.o   $(O)options.o
-VOBJ13 = $(O)pickup.o   $(O)pline.o   $(O)polyself.o $(O)potion.o   $(O)quest.o
-VOBJ14 = $(O)questpgr.o $(O)pager.o   $(O)pray.o     $(O)priest.o   $(O)read.o
-VOBJ15 = $(O)rect.o     $(O)restore.o $(O)rip.o      $(O)rnd.o      $(O)role.o
-VOBJ16 = $(O)rumors.o   $(O)save.o    $(O)shk.o      $(O)shknam.o   $(O)sit.o
-VOBJ17 = $(O)sounds.o   $(O)sp_lev.o  $(O)spell.o    $(O)steal.o    $(O)steed.o
-VOBJ18 = $(O)termcap.o  $(O)timeout.o $(O)topl.o     $(O)topten.o   $(O)track.o
-VOBJ19 = $(O)trap.o     $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
-VOBJ20 = $(O)vis_tab.o  $(O)weapon.o  $(O)were.o     $(O)wield.o    $(O)windows.o
-VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
-VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
-VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)       $(O)isaac64.o  $(VIDEO_OBJ)
-VOBJ24 = $(O)sfstruct.o
-
-SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
-	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
+SOBJ   = $(O)msdos.o   $(O)pcsys.o    $(O)tty.o      $(O)unix.o \
+	 $(O)video.o   $(O)vidtxt.o   $(O)pckeys.o
 
 VVOBJ  = $(O)version.o
 
@@ -321,7 +326,6 @@ MDLIB  = $(O)mdlib.o
 
 ifeq "$(ADD_LUA)" "Y"
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
-LUA_QTEXT_FILE = "quest.lua"
 endif
 
 ifeq "$(ADD_CURSES)" "Y"
@@ -336,6 +340,7 @@ VOBJ  = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
 	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
+	$(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(VOBJ30) \
 	$(LUAOBJ) $(CURSESOBJ) $(MDLIB)
 
 ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
@@ -668,6 +673,11 @@ $(GAMEFILE): $(O)obj.tag $(PDCLIB) $(LUALIB) \
 	@$(TARGET_AR) r temp.a $(VOBJ23)
 	@$(TARGET_AR) r temp.a $(VOBJ24)
 	@$(TARGET_AR) r temp.a $(VOBJ25)
+	@$(TARGET_AR) r temp.a $(VOBJ26)
+	@$(TARGET_AR) r temp.a $(VOBJ27)
+	@$(TARGET_AR) r temp.a $(VOBJ28)
+	@$(TARGET_AR) r temp.a $(VOBJ29)
+	@$(TARGET_AR) r temp.a $(VOBJ30)
 	@$(TARGET_AR) r temp.a $(VIDEO_OBJ)
 	@$(TARGET_AR) r temp.a $(SOBJ)
 	@$(TARGET_AR) r temp.a $(TILOBJ)
@@ -842,9 +852,6 @@ spotless: clean
 	if [ -f $(DAT)/data ];         then rm $(DAT)/data; fi;
 	if [ -f $(DAT)/rumors ];       then rm $(DAT)/rumors; fi;
 	if [ -f $(DAT)/oracles ];      then rm $(DAT)/oracles; fi;
-ifndef LUA_QTEXT_FILE
-	if [ -f $(DAT)/quest.dat ];    then rm $(DAT)/quest.dat; fi;
-endif
 	if [ -f $(DAT)/bogusmon ];     then rm $(DAT)/bogusmon; fi;
 	if [ -f $(DAT)/engrave ];      then rm $(DAT)/engrave; fi;
 	if [ -f $(DAT)/epitaph ];      then rm $(DAT)/epitaph; fi;
@@ -1075,6 +1082,7 @@ $(O)files.o: files.c $(HACK_H) $(INCL)/dlb.h
 $(O)fountain.o: fountain.c $(HACK_H)
 $(O)hack.o: hack.c $(HACK_H)
 $(O)hacklib.o: hacklib.c $(HACK_H)
+$(O)insight.o: insight.c $(HACK_H)
 $(O)invent.o: invent.c $(HACK_H)
 $(O)light.o: light.c $(HACK_H)
 $(O)lock.o: lock.c $(HACK_H)
@@ -1100,6 +1108,9 @@ $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H)
 $(O)music.o: music.c $(HACK_H) #interp.c
+$(O)nhlua.o: nhlua.c $(HACK_H)
+$(O)nhlsel.o: nhlsel.c $(HACK_H)
+$(O)nhlobj.o: nhlobj.c $(HACK_H)
 $(O)o_init.o: o_init.c $(HACK_H)
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)/obj.h $(INCL)/objclass.h \
 		$(INCL)/prop.h $(INCL)/skills.h $(INCL)/color.h
@@ -1157,5 +1168,5 @@ $(O)tileset.o: $(WSHR)/tileset.c $(HACK_H)
 $(O)bmptiles.o: $(WSHR)/bmptiles.c $(INCL)/config.h $(INCL)/tileset.h $(INCL)/integer.h
 $(O)giftiles.o: $(WSHR)/giftiles.c $(INCL)/config.h $(INCL)/tileset.h $(INCL)/integer.h
 
-# end of file
+#end of file
 

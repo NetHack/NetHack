@@ -148,17 +148,10 @@
 		544768B123994A2C004B9739 /* mdlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768B023994A2C004B9739 /* mdlib.c */; };
 		544768BA23995BB7004B9739 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 544768B923995BB7004B9739 /* liblua.a */; };
 		544768BC23A53C9F004B9739 /* nhlobj.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768BB23A53C9F004B9739 /* nhlobj.c */; };
+		5462D14823E7B19200969423 /* insight.c in Sources */ = {isa = PBXBuildFile; fileRef = 5462D14723E7B19200969423 /* insight.c */; };
 		54FCE8292223261F00F393C8 /* isaac64.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FCE8282223261F00F393C8 /* isaac64.c */; };
 /* End PBXBuildFile section */
 
-			inputFiles = (
-			);
-			inputFiles = (
-			);
-			inputFiles = (
-			);
-			inputFiles = (
-			);
 /* Begin PBXContainerItemProxy section */
 		316B91CA21A3BD7C00EC3E81 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -497,6 +490,7 @@
 		544768B523995488004B9739 /* nhlua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nhlua.h; path = ../../include/nhlua.h; sourceTree = "<group>"; };
 		544768B923995BB7004B9739 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../lib/lua/liblua.a; sourceTree = "<group>"; };
 		544768BB23A53C9F004B9739 /* nhlobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlobj.c; path = ../../src/nhlobj.c; sourceTree = "<group>"; };
+		5462D14723E7B19200969423 /* insight.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insight.c; path = ../../src/insight.c; sourceTree = "<group>"; };
 		54FCE8282223261F00F393C8 /* isaac64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = isaac64.c; path = ../../src/isaac64.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -601,6 +595,7 @@
 				31B8A33921A238020055BD01 /* fountain.c */,
 				31B8A35821A238040055BD01 /* hack.c */,
 				31B8A36421A238040055BD01 /* hacklib.c */,
+				5462D14723E7B19200969423 /* insight.c */,
 				31B8A33121A238010055BD01 /* invent.c */,
 				54FCE8282223261F00F393C8 /* isaac64.c */,
 				31B8A32B21A238010055BD01 /* light.c */,
@@ -1462,6 +1457,7 @@
 				31B8A38521A238060055BD01 /* rnd.c in Sources */,
 				31B8A38B21A238060055BD01 /* topten.c in Sources */,
 				31B8A38121A238060055BD01 /* mapglyph.c in Sources */,
+				5462D14823E7B19200969423 /* insight.c in Sources */,
 				31B8A41321A23F650055BD01 /* version.c in Sources */,
 				31B8A3BB21A238060055BD01 /* allmain.c in Sources */,
 				31B8A39521A238060055BD01 /* windows.c in Sources */,
@@ -1845,10 +1841,6 @@
 			};
 			name = Release;
 		};
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_IDENTITY = "-";
 		31B8A44F21A26A4B0055BD01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
