@@ -259,7 +259,7 @@ role       Your starting role (e.g., role:Barbarian, role:Valk).   [random]
            as possible.  You can also still denote your role by
            appending it to the "name" option (e.g., name:Vic-V), but
            the "role" option will take precedence.
-sparkle    the length of the sparkly effect for resisted magical   [7]
+sparkle    the length of the sparkly effect for resisted magical   [21]
            attacks (e.g. fire attack on fire-resistant monster)
 windowtype windowing system to be used    [depends on operating system and
            compile-time setup]    if more than one choice is available.
