@@ -113,6 +113,10 @@
 #define is_bird(ptr) ((ptr)->mlet == S_BAT && !is_bat(ptr))
 #define is_giant(ptr) (((ptr)->mflags2 & M2_GIANT) != 0L)
 #define is_golem(ptr) ((ptr)->mlet == S_GOLEM)
+#define is_rat(ptr)                                         \
+    (((ptr) == &mons[PM_SEWER_RAT]) || ((ptr) == &mons[PM_GIANT_RAT]) || \
+     ((ptr) == &mons[PM_RABID_RAT]) || ((ptr) == &mons[PM_WERERAT]) || \
+     ((ptr) == &mons[PM_HUMAN_WERERAT]))
 #define is_domestic(ptr) (((ptr)->mflags2 & M2_DOMESTIC) != 0L)
 #define is_demon(ptr) (((ptr)->mflags2 & M2_DEMON) != 0L)
 #define is_mercenary(ptr) (((ptr)->mflags2 & M2_MERC) != 0L)

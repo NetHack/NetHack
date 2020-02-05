@@ -1015,7 +1015,7 @@ int after; /* this is extra fast monster movement */
                 || ((mtmp->mhp * 4 < mtmp->mhpmax
                      || mtmp2->data->msound == MS_GUARDIAN
                      || mtmp2->data->msound == MS_LEADER) && mtmp2->mpeaceful
-                    && !Conflict)
+                    && !(mm_aggression(mtmp, mtmp2) & ALLOW_M) && !Conflict)
                 || (touch_petrifies(mtmp2->data) && !resists_ston(mtmp)))
                 continue;
 
