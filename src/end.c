@@ -116,7 +116,7 @@ int sig_unused UNUSED;
 {
 #define SIG_MSG "\nSignal received.\n"
     int f2;
-    
+
     f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
     nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
     NH_abort(); /* ... and we're already in the process of quitting? */
@@ -1257,8 +1257,11 @@ int how;
                 have been genocided:  genocide could occur after hero is
                 already infected or hero could eat a glob of one created
                 before genocide; don't try to arise as one if they're gone */
-             && !(g.mvitals[PM_GREEN_SLIME].mvflags & G_GENOD))
+             && !(g.mvitals[PM_GREEN_SLIME].mvflags & G_GENOD)) {
+        if (Hallucination)
+            pline("Next time, watch out for slime!");
         u.ugrave_arise = PM_GREEN_SLIME;
+    }
 
     if (how == QUIT) {
         g.killer.format = NO_KILLER_PREFIX;
@@ -1957,10 +1960,8 @@ boolean ask;
                 Sprintf(buftoo, "%*s%s", pfx, "", buf);
                 putstr(klwin, 0, buftoo);
             }
-            /*
-             * if (Hallucination)
-             *     putstr(klwin, 0, "and a partridge in a pear tree");
-             */
+            if (Hallucination && ntypes > 10)
+                putstr(klwin, 0, "and a partridge in a pear tree");
             if (ntypes > 1) {
                 if (!dumping)
                     putstr(klwin, 0, "");

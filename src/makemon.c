@@ -1869,6 +1869,9 @@ struct monst *mtmp, *victim;
         } else if (canspotmon(mtmp)) {
             char buf[BUFSZ];
 
+            if (Hallucination)
+                pline("What? %s is evolving!", Monnam(mtmp));
+
             /* 3.6.1:
              * Temporary (?) hack to fix growing into opposite gender.
              */

@@ -1554,8 +1554,11 @@ dosacrifice()
             } else { /* super big win */
                 adjalign(10);
                 u.uachieve.ascended = 1;
-                pline(
-               "An invisible choir sings, and you are bathed in radiance...");
+                /* you might be able to see the invisible choir! */
+                pline("%s sings, and you are bathed in radiance...",
+                      Hallucination ? "The fat lady"
+                          : (See_invisible && !Blind ? "A visible choir"
+                                                     : "An invisible choir"));
                 godvoice(altaralign, "Mortal, thou hast done well!");
                 display_nhwindow(WIN_MESSAGE, FALSE);
                 verbalize(

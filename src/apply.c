@@ -476,6 +476,8 @@ struct obj *obj;
     if (!can_blow(&g.youmonst)) {
         You("are incapable of using the whistle.");
     } else if (obj->cursed && !rn2(2)) {
+        if (Hallucination && !Deaf)
+            You("play a kazoo symphony.");
         You("produce a %shigh-%s.", Underwater ? "very " : "",
             Deaf ? "frequency vibration" : "pitched humming noise");
         wake_nearby();
@@ -3401,6 +3403,15 @@ struct obj *obj;
     g.current_wand = obj; /* destroy_item might reset this */
     freeinv(obj);       /* hide it from destroy_item instead... */
     setnotworn(obj);    /* so we need to do this ourselves */
+
+    /* If you know the wand you're breaking is a wand of nothing,
+     * it should say something different.
+     * OK to skip other wand breaking code since even wresting won't have
+     * any effect. */
+    if(obj->otyp == WAN_NOTHING && objects[WAN_NOTHING].oc_name_known) {
+      pline("Predictably, nothing happens.");
+      goto discard_broken_wand;
+    }
 
     if (!zappable(obj)) {
         pline(nothing_else_happens);

@@ -286,6 +286,8 @@ boolean resuming;
                         warnreveal();
                     mkot_trap_warn();
                     dosounds();
+                    if (Hallucination && !rn2(10000))
+                        You("vaguely feel a vague sense of vagueness.");
                     do_storms();
                     gethungry();
                     age_spells();
@@ -706,6 +708,9 @@ boolean new_game; /* false => restoring an old game */
                    : "%s %s, the%s %s %s, welcome back to NetHack!",
           Hello((struct monst *) 0), g.plname, buf, g.urace.adj,
           (currentgend && g.urole.name.f) ? g.urole.name.f : g.urole.name.m);
+
+    if (Hallucination)
+        pline("NetHack is filmed in front of a live studio audience.");
 }
 
 #ifdef POSITIONBAR
