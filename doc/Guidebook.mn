@@ -1084,6 +1084,9 @@ Close a door.
 Default key is \(oqc\(cq.
 .lp "#conduct "
 List voluntary challenges you have maintained.
+.\" [only in wizard mode:]
+.\" Also lists various achievements representing progress toward ultimate
+.\" ascension if any have been attained.
 Autocompletes.
 Default key is \(oqM-C\(cq.
 .lp ""
@@ -2726,6 +2729,71 @@ wish for any items is a challenge, as is a game without wishing for
 an artifact (even if the artifact immediately disappears).
 When the game offers you an opportunity to make a wish for an item,
 you may choose \(lqnothing\(rq if you want to decline.
+.hn 2
+Achievements
+.pg
+End of game disclosure will also display various achievements
+representing progress toward ultimate ascension, if any have been
+attained.
+They aren't directly related to \fIconduct\fP but are grouped with
+it because they fall into the same category of \(lqbragging rights\(rq
+and to limit the number of questions during disclosure.
+.pg
+The first two are also conducts, the rest are listed roughly in order
+of difficulty and not necessarily in the order in which you might
+accomplish them.
+.lp "Blind   "
+Blind from birth.
+.lp "Nudist  "
+Never wore any armor.
+.lp "Mines' End"
+Explored to the bottom of the Gnomish Mines and found a special item there.
+.lp "Sokoban "
+Explored to the top of Sokoban and found a special item there.
+.lp "Medusa  "
+Defeated Medusa.
+.lp "Bell    "
+Acquired the Bell of Opening.
+.lp "Gehennom"
+Entered Gehennom proper (beyond the Valley).
+.lp "Candle  "
+Acquired the Candelabrum of Invocation.
+.lp "Book    "
+Acquired the Book of the Dead.
+.lp Invocation
+Gained access to the bottommost level of Gehennom.
+.lp "Amulet  "
+Acquired the fabled Amulet of Yendor.
+.lp "Endgame "
+Reached the Elemental Planes.
+.lp "Astral  "
+Reached the Astral Plane level.
+.lp "Ascended"
+Delivered the Amulet to its final destination.
+.lp ""
+.lp "Notes:  "
+.pg
+\fIBlind\fP and \fINudist\fP are also conducts, and they can only be
+enabled by setting the correspondingly named option in NETHACKOPTIONS
+or run-time configuration file prior to game start.
+In the case of \fIBlind\fP, the option also enforces the conduct.
+They aren't really significant accomplishments unless/until you make
+substantial progress into the dungeon but they are treated as
+Achievements as long as the conduct is enabled and hasn't been broken.
+.pg
+The \(lqspecial items\(rq hidden in \fIMines\~End\fP and \fISokoban\fP
+are not unique but are considered to be prizes or rewards
+for exploring those levels since doing so is not necessary to complete
+the game.
+Finding other instances of the same objects doesn't record the
+corresponding achievement.
+.pg
+The \fIMedusa\fP achievement is recorded if she dies for any reason,
+even if you are not directly responsible.
+.pg
+The \fIValley of the Dead\fP is part of \fIGehennom\fP but the
+\fIGehennom\fP achievement doesn't get recorded until you make it past
+that level.
 .
 .hn 1
 Options
@@ -3106,7 +3174,7 @@ The possibilities are:
 .CC a "disclose your attributes;"
 .CC v "summarize monsters that have been vanquished;"
 .CC g "list monster species that have been genocided;"
-.CC c "display your conduct;"
+.CC c "display your conduct; also achievements, if any;"
 .CC o "display dungeon overview."
 .ei
 .ed

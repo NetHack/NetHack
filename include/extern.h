@@ -198,7 +198,6 @@ E boolean NDECL(status_hilite_menu);
 E char NDECL(randomkey);
 E void FDECL(random_response, (char *, int));
 E int NDECL(rnd_extcmd_idx);
-E int NDECL(doconduct);
 E int NDECL(domonability);
 E char FDECL(cmd_from_func, (int NDECL((*))));
 E boolean FDECL(redraw_cmd, (CHAR_P));
@@ -231,10 +230,6 @@ E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
 E int NDECL(extcmd_via_menu);
 E int NDECL(enter_explore_mode);
-E char *FDECL(trap_predicament, (char *, int, BOOLEAN_P));
-E void FDECL(enlightenment, (int, int));
-E void FDECL(youhiding, (BOOLEAN_P, int));
-E void FDECL(show_conduct, (int));
 E boolean FDECL(bind_key, (UCHAR_P, const char *));
 E void NDECL(dokeylist);
 E int FDECL(xytod, (SCHAR_P, SCHAR_P));
@@ -724,8 +719,6 @@ E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *, BOOLEAN_P,
                                   BOOLEAN_P, BOOLEAN_P));
 E void FDECL(nh_terminate, (int)) NORETURN;
-E int NDECL(dovanquished);
-E int NDECL(num_genocides);
 E void FDECL(delayed_killer, (int, int, const char *));
 E struct kinfo *FDECL(find_delayed_killer, (int));
 E void FDECL(dealloc_killer, (struct kinfo *));
@@ -985,6 +978,24 @@ E void FDECL(strbuf_reserve, (strbuf_t *, int));
 E void FDECL(strbuf_empty, (strbuf_t *));
 E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
 E char *FDECL(nonconst, (const char *, char *));
+
+/* ### insight.c ### */
+
+E int NDECL(doattributes);
+E void FDECL(enlightenment, (int, int));
+E void FDECL(youhiding, (BOOLEAN_P, int));
+E char *FDECL(trap_predicament, (char *, int, BOOLEAN_P));
+E int NDECL(doconduct);
+E void FDECL(show_conduct, (int));
+E int NDECL(count_uachieve);
+E int NDECL(dovanquished);
+E void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
+E int NDECL(num_genocides);
+E void FDECL(list_genocided, (CHAR_P, BOOLEAN_P));
+E const char *FDECL(align_str, (ALIGNTYP_P));
+E char *FDECL(piousness, (BOOLEAN_P, const char *));
+E void FDECL(mstatusline, (struct monst *));
+E void NDECL(ustatusline);
 
 /* ### invent.c ### */
 
@@ -2095,10 +2106,6 @@ E void NDECL(clearpriests);
 E void FDECL(restpriest, (struct monst *, BOOLEAN_P));
 E void FDECL(newepri, (struct monst *));
 E void FDECL(free_epri, (struct monst *));
-E const char *FDECL(align_str, (ALIGNTYP_P));
-E char *FDECL(piousness, (BOOLEAN_P, const char *));
-E void FDECL(mstatusline, (struct monst *));
-E void NDECL(ustatusline);
 
 /* ### quest.c ### */
 
