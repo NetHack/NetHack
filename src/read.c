@@ -2440,6 +2440,7 @@ struct obj *from_obj;
 }
 
 struct _create_particular_data {
+    int quan;
     int which;
     int fem;
     char monclass;
@@ -2456,6 +2457,7 @@ struct _create_particular_data *d;
     char *bufp = str;
     char *tmpp;
 
+    d->quan = 1 + ((g.multi > 0) ? g.multi : 0);
     d->monclass = MAXMCLASSES;
     d->which = g.urole.malenum; /* an arbitrary index into mons[] */
     d->fem = -1; /* gender not specified */
@@ -2463,6 +2465,14 @@ struct _create_particular_data *d;
     d->maketame = d->makepeaceful = d->makehostile = FALSE;
     d->sleeping = d->saddled = d->invisible = d->hidden = FALSE;
 
+    /* quantity */
+    if (digit(*bufp) && strcmp(bufp, "0")) {
+        d->quan = atoi(bufp);
+        while (digit(*bufp))
+            bufp++;
+        while (*bufp == ' ')
+            bufp++;
+    }
     if ((tmpp = strstri(bufp, "saddled ")) != 0) {
         d->saddled = TRUE;
         (void) memset(tmpp, ' ', sizeof "saddled " - 1);
@@ -2551,7 +2561,7 @@ struct _create_particular_data *d;
         }
         whichpm = &mons[d->which];
     }
-    for (i = 0; i <= g.multi; i++) {
+    for (i = 0; i < d->quan; i++) {
         if (d->monclass != MAXMCLASSES)
             whichpm = mkclass(d->monclass, 0);
         else if (d->randmonst)

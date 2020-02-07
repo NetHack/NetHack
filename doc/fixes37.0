@@ -51,6 +51,7 @@ throttle long worm growth rate and HP accumulation
 poly'd hero was able to zap wands, apply tools, and #rub objects without
 	having any hands
 spellcasting monster got an extra move after casting
+allow defining #wizgenesis quantity in the prompt
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
