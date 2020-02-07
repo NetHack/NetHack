@@ -75,6 +75,8 @@ dosit()
             You("coil up around your %shoard.",
                 (obj->quan + money_cnt(g.invent) < u.ulevel * 1000) ? "meager "
                                                                   : "");
+        } else if (obj->otyp == TOWEL) {
+            pline("It's probably not a good time for a picnic...");
         } else {
             You("sit on %s.", the(xname(obj)));
             if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
