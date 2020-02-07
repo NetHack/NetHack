@@ -686,7 +686,7 @@ boolean new_game; /* false => restoring an old game */
     }
 
     if (Hallucination)
-        pline("NetHack is filmed in front of a live studio audience.");
+        pline("NetHack is filmed in front of an undead studio audience.");
 
     /*
      * The "welcome back" message always describes your innate form
