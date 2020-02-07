@@ -685,6 +685,9 @@ boolean new_game; /* false => restoring an old game */
         return;
     }
 
+    if (Hallucination)
+        pline("NetHack is filmed in front of a live studio audience.");
+
     /*
      * The "welcome back" message always describes your innate form
      * even when polymorphed or wearing a helm of opposite alignment.
