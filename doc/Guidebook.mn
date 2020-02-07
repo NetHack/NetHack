@@ -3771,9 +3771,11 @@ Setting this option makes the score list visible when a windowing version
 of NetHack is started without a parent window, but it no longer leaves
 the score list around after game end on a terminal or emulating window.
 .lp travel
-Allow the travel command (default on).  Turning this option off will
-prevent the game from attempting unintended moves if you make inadvertent
-mouse clicks on the map window.  Persistent.
+Allow the travel command via mouse click (default on).
+Turning this option off will prevent the game from attempting unintended
+moves if you make inadvertent mouse clicks on the map window.
+Does not affect traveling via the \(oq\f(CR_\fP\(cq (\(lq#travel\(rq) command.
+Persistent.
 ." .lp travel_debug
 ." Display intended path during each step of travel (default off).
 ." Debug mode only.

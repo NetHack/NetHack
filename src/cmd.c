@@ -3162,15 +3162,12 @@ register char *cmd;
         }
         return;
     case NHKF_TRAVEL:
-        if (flags.travelcmd) {
-            g.context.travel = 1;
-            g.context.travel1 = 1;
-            g.context.run = 8;
-            g.context.nopick = 1;
-            g.domove_attempting |= DOMOVE_RUSH;
-            break;
-        }
-        /*FALLTHRU*/
+        g.context.travel = 1;
+        g.context.travel1 = 1;
+        g.context.run = 8;
+        g.context.nopick = 1;
+        g.domove_attempting |= DOMOVE_RUSH;
+        break;
     default:
         if (movecmd(*cmd)) { /* ordinary movement */
             g.context.run = 0; /* only matters here if it was 8 */
@@ -4302,14 +4299,16 @@ dotravel(VOID_ARGS)
     static char cmd[2];
     coord cc;
 
-    /* [FIXME?  Supporting the ability to disable traveling via mouse
-       click makes some sense, depending upon overall mouse usage.
-       Disabling '_' on a user by user basis makes no sense at all since
-       even if it is typed by accident, aborting when picking a target
-       destination is trivial.  Travel via mouse predates travel via '_',
-       and this use of OPTION=!travel is probably just a mistake....] */
-    if (!flags.travelcmd)
-        return 0;
+    /*
+     * Travelling used to be a no-op if user toggled 'travel' option
+     * Off.  However, travel was initially implemented as a mouse-only
+     * command and the original purpose of the option was to be able
+     * to prevent clicks on the map from initiating travel.
+     *
+     * Travel via '_' came later.  Since it requires a destination--
+     * which offers the user a chance to cancel if it was accidental--
+     * there's no reason for the option to disable travel-by-keys.
+     */
 
     cmd[1] = 0;
     cc.x = iflags.travelcc.x;

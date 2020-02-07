@@ -142,6 +142,8 @@ new 'mention_decor' option; when On, describe dungeon features being stepped
 	on or floated/flown over even when they're not covered by objects
 applying royal jelly on an egg kills, revives, or changes the egg
 intelligent monsters pick up and rummage through containers
+toggling 'travel' option Off now only inhibits travel by mouse click, not by
+	'_' command where choosing the destination provides a chance to cancel
 
 
 Platform- and/or Interface-Specific New Features
