@@ -1525,6 +1525,32 @@ xchar x, y;
 }
 
 boolean
+On_ladder(x, y)
+xchar x, y;
+{
+    return (boolean) ((x == xdnladder && y == ydnladder)
+                      || (x == xupladder && y == yupladder));
+}
+
+boolean
+On_stairs_up(x, y)
+xchar x, y;
+{
+    return ((x == xupstair && y == yupstair)
+            || (x == g.sstairs.sx && y == g.sstairs.sy && g.sstairs.up)
+            || (x == xupladder && y == yupladder));
+}
+
+boolean
+On_stairs_dn(x, y)
+xchar x, y;
+{
+    return ((x == xdnstair && y == ydnstair)
+            || (x == g.sstairs.sx && y == g.sstairs.sy && !g.sstairs.up)
+            || (x == xdnladder && y == ydnladder));
+}
+
+boolean
 Is_botlevel(lev)
 d_level *lev;
 {
