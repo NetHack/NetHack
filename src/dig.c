@@ -1635,6 +1635,7 @@ char *msg;
     } else if (ltyp == IRONBARS) {
         /* "set of iron bars" */
         Strcpy(msg, "The bars go much deeper than your pit.");
+        return FALSE;
 #if 0
     } else if (is_lava(cc->x, cc->y)) {
     } else if (is_ice(cc->x, cc->y)) {
