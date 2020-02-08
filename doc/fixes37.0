@@ -144,6 +144,11 @@ applying royal jelly on an egg kills, revives, or changes the egg
 intelligent monsters pick up and rummage through containers
 toggling 'travel' option Off now only inhibits travel by mouse click, not by
 	'_' command where choosing the destination provides a chance to cancel
+different glyphs and symbols for stone and unexplored areas
+new glyph GLYPH_NOTHING was added so !dark_room has something to be set to
+	now that stone could be mapped to an entirely different symbol
+added several new status conditions all of which are opt-in except
+	the new cond_grab and cond_lava which are opt-out
 
 
 Platform- and/or Interface-Specific New Features
