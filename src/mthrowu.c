@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1573688695 2019/11/13 23:44:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1581184742 2020/02/08 17:59:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -151,7 +151,6 @@ monmulti(mtmp, otmp, mwep)
 struct monst *mtmp;
 struct obj *otmp, *mwep;
 {
-    int skill = (int) objects[otmp->otyp].oc_skill;
     int multishot = 1;
 
     if (otmp->quan > 1L /* no point checking if there's only 1 */
