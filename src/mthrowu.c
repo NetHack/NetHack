@@ -815,15 +815,19 @@ struct attack  *mattk;
         }
         if (!mtmp->mspec_used && rn2(3)) {
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
+                boolean utarget = (mtarg == &g.youmonst);
                 if (canseemon(mtmp))
                     pline("%s breathes %s!", Monnam(mtmp), breathwep[typ - 1]);
                 dobuzz((int) (-20 - (typ - 1)), (int) mattk->damn,
-                       mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby), FALSE);
+                       mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby), utarget);
                 nomul(0);
                 /* breath runs out sometimes. Also, give monster some
                  * cunning; don't breath if the target fell asleep.
                  */
-                mtmp->mspec_used = 6 + rn2(18);
+                if (!utarget || !rn2(3))
+                    mtmp->mspec_used = 8 + rn2(18);
+                if (utarget && typ == AD_SLEE && !Sleep_resistance)
+                    mtmp->mspec_used += rnd(20);
 
                 /* If this is a pet, it'll get hungry. Minions and
                  * spell beings won't hunger */
@@ -992,39 +996,7 @@ breamu(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
 {
-    /* if new breath types are added, change AD_ACID to max type */
-    int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_ACID) : mattk->adtyp;
-
-    if (lined_up(mtmp)) {
-        if (mtmp->mcan) {
-            if (!Deaf) {
-                if (canseemon(mtmp))
-                    pline("%s coughs.", Monnam(mtmp));
-                else
-                    You_hear("a cough.");
-            }
-            return 0;
-        }
-        if (!mtmp->mspec_used && rn2(3)) {
-            if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
-                if (canseemon(mtmp))
-                    pline("%s breathes %s!", Monnam(mtmp),
-                          breathwep[typ - 1]);
-                buzz((int) (-20 - (typ - 1)), (int) mattk->damn, mtmp->mx,
-                     mtmp->my, sgn(g.tbx), sgn(g.tby));
-                nomul(0);
-                /* breath runs out sometimes. Also, give monster some
-                 * cunning; don't breath if the player fell asleep.
-                 */
-                if (!rn2(3))
-                    mtmp->mspec_used = 10 + rn2(20);
-                if (typ == AD_SLEE && !Sleep_resistance)
-                    mtmp->mspec_used += rnd(20);
-            } else
-                impossible("Breath weapon %d used", typ - 1);
-        }
-    }
-    return 1;
+    return breamm(mtmp, mattk, &g.youmonst);
 }
 
 boolean
@@ -1073,27 +1045,29 @@ static boolean
 m_lined_up(mtarg, mtmp)
 struct monst *mtarg, *mtmp;
 {
-    return (linedup(mtarg->mx, mtarg->my, mtmp->mx, mtmp->my, 0));
-}
-
-
-/* is mtmp in position to use ranged attack? */
-boolean
-lined_up(mtmp)
-register struct monst *mtmp;
-{
-    boolean ignore_boulders;
+    boolean utarget = (mtarg == &g.youmonst);
+    xchar tx = utarget ? mtmp->mux : mtarg->mx;
+    xchar ty = utarget ? mtmp->muy : mtarg->my;
+    boolean ignore_boulders = utarget && (throws_rocks(mtmp->data)
+                                          || m_carrying(mtmp, WAN_STRIKING));
 
     /* hero concealment usually trumps monst awareness of being lined up */
-    if (Upolyd && rn2(25)
+    if (utarget && Upolyd && rn2(25)
         && (u.uundetected || (U_AP_TYPE != M_AP_NOTHING
                               && U_AP_TYPE != M_AP_MONSTER)))
         return FALSE;
 
-    ignore_boulders = (throws_rocks(mtmp->data)
-                       || m_carrying(mtmp, WAN_STRIKING));
-    return linedup(mtmp->mux, mtmp->muy, mtmp->mx, mtmp->my,
-                   ignore_boulders ? 1 : 2);
+    return linedup(tx, ty, mtmp->mx, mtmp->my,
+                   utarget ? (ignore_boulders ? 1 : 2) : 0);
+}
+
+
+/* is mtmp in position to use ranged attack on hero? */
+boolean
+lined_up(mtmp)
+register struct monst *mtmp;
+{
+    return m_lined_up(&g.youmonst, mtmp);
 }
 
 /* check if a monster is carrying a particular item */
