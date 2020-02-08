@@ -275,6 +275,9 @@
  *
  * statue       One for each monster.  Count: NUMMONS
  *
+ * unexplored   One for unexplored areas of the map
+ * nothing      Nothing but background
+ *
  * The following are offsets used to convert to and from a glyph.
  */
 #define NUM_ZAP 8 /* number of zap beam types */
@@ -292,10 +295,14 @@
 #define GLYPH_SWALLOW_OFF ((NUM_ZAP << 2) + GLYPH_ZAP_OFF)
 #define GLYPH_WARNING_OFF ((NUMMONS << 3) + GLYPH_SWALLOW_OFF)
 #define GLYPH_STATUE_OFF  (WARNCOUNT + GLYPH_WARNING_OFF)
-#define MAX_GLYPH         (NUMMONS + GLYPH_STATUE_OFF)
+#define GLYPH_UNEXPLORED_OFF (NUMMONS + GLYPH_STATUE_OFF)
+#define GLYPH_NOTHING_OFF (GLYPH_UNEXPLORED_OFF + 1)
+#define MAX_GLYPH         (GLYPH_NOTHING_OFF + 1)
 
 #define NO_GLYPH          MAX_GLYPH
 #define GLYPH_INVISIBLE   GLYPH_INVIS_OFF
+#define GLYPH_UNEXPLORED  GLYPH_UNEXPLORED_OFF
+#define GLYPH_NOTHING     GLYPH_NOTHING_OFF
 
 #define warning_to_glyph(mwarnlev) ((mwarnlev) + GLYPH_WARNING_OFF)
 #define mon_to_glyph(mon, rng)                                      \
@@ -434,5 +441,7 @@
 #define glyph_is_warning(glyph)   \
     ((glyph) >= GLYPH_WARNING_OFF \
      && (glyph) < (GLYPH_WARNING_OFF + WARNCOUNT))
+#define glyph_is_unexplored(glyph) ((glyph) == GLYPH_UNEXPLORED)
+#define glyph_is_nothing(glyph) ((glyph) == GLYPH_NOTHING)
 
 #endif /* DISPLAY_H */

@@ -587,12 +587,12 @@ reglyph_darkroom()
                 || Is_rogue_level(&u.uz)) {
                 if (lev->glyph == cmap_to_glyph(S_darkroom))
                     lev->glyph = lev->waslit ? cmap_to_glyph(S_room)
-                                             : cmap_to_glyph(S_stone);
+                                             : GLYPH_NOTHING;
             } else {
                 if (lev->glyph == cmap_to_glyph(S_room) && lev->seenv
                     && lev->waslit && !cansee(x, y))
                     lev->glyph = cmap_to_glyph(S_darkroom);
-                else if (lev->glyph == cmap_to_glyph(S_stone)
+                else if (lev->glyph == GLYPH_NOTHING
                          && lev->typ == ROOM && lev->seenv && !cansee(x, y))
                     lev->glyph = cmap_to_glyph(S_darkroom);
             }
@@ -600,7 +600,7 @@ reglyph_darkroom()
     if (flags.dark_room && iflags.use_color)
         g.showsyms[S_darkroom] = g.showsyms[S_room];
     else
-        g.showsyms[S_darkroom] = g.showsyms[S_stone];
+        g.showsyms[S_darkroom] = g.showsyms[SYM_NOTHING + SYM_OFF_X];
 }
 
 /* check whether a user-supplied option string is a proper leading

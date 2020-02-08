@@ -102,7 +102,15 @@ unsigned mgflags;
      *  Warning:  For speed, this makes an assumption on the order of
      *            offsets.  The order is set in display.h.
      */
-    if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) { /* a statue */
+    if ((offset = (glyph - GLYPH_NOTHING_OFF)) >= 0) {
+        idx = SYM_NOTHING + SYM_OFF_X;
+        color = NO_COLOR;
+        special |= MG_NOTHING;
+    } else if ((offset = (glyph - GLYPH_UNEXPLORED_OFF)) >= 0) {
+        idx = SYM_UNEXPLORED + SYM_OFF_X;
+        color = NO_COLOR;
+        special |= MG_UNEXPL;
+    } else if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) { /* a statue */
         idx = mons[offset].mlet + SYM_OFF_M;
         if (has_rogue_color)
             color = CLR_RED;

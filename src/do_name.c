@@ -241,7 +241,7 @@ const void *b;
 #define IS_UNEXPLORED_LOC(x,y) \
     (isok((x), (y))                                     \
      && glyph_is_cmap(levl[(x)][(y)].glyph)             \
-     && glyph_to_cmap(levl[(x)][(y)].glyph) == S_stone  \
+     && levl[(x)][(y)].glyph == GLYPH_UNEXPLORED        \
      && !levl[(x)][(y)].seenv)
 
 #define GLOC_SAME_AREA(x,y)                                     \

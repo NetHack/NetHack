@@ -18,6 +18,7 @@
 #define BOLT_LIM 8        /* from this distance ranged attacks will be made */
 #define MAX_CARR_CAP 1000 /* so that boulders can be heavier */
 #define DUMMY { 0 }       /* array initializer, letting [1..N-1] default */
+#define DEF_NOTHING ' '   /* default symbol for NOTHING and UNEXPLORED  */
 
 /* The UNDEFINED macros are used to initialize variables whose
    initialized value is not relied upon.
@@ -93,6 +94,8 @@ enum dismount_types {
 #define MG_BW_LAVA 0x0080  /* 'black & white lava': highlight lava if it
                               can't be distringuished from water by color */
 #define MG_BW_ICE  0x0100  /* similar for ice vs floor */
+#define MG_NOTHING 0x0200  /* char represents GLYPH_NOTHING */
+#define MG_UNEXPL  0x0400  /* char represents GLYPH_UNEXPLORED */
 
 /* sellobj_state() states */
 #define SELL_NORMAL (0)

@@ -478,6 +478,16 @@ char *buf, *monbuf;
         int warnindx = glyph_to_warning(glyph);
 
         Strcpy(buf, def_warnsyms[warnindx].explanation);
+    } else if (glyph_is_nothing(glyph)) {
+        Strcpy(buf, "dark part of a room");
+    } else if (glyph_is_unexplored(glyph)) {
+        if (Underwater && !Is_waterlevel(&u.uz)) {
+            /* "unknown" == previously mapped but not visible when
+               submerged; better terminology appreciated... */
+            Strcpy(buf, (distu(x, y) <= 2) ? "land" : "unknown");
+        } else {
+            Strcpy(buf, "unexplored area");
+        }
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
     } else {
@@ -843,7 +853,7 @@ struct permonst **for_supplement;
                       unreconnoitered[] = "unreconnoitered";
     static char look_buf[BUFSZ];
     char prefix[BUFSZ], gobbledygook[33];
-    int i, alt_i, j, glyph = NO_GLYPH,
+    int i, j, glyph = NO_GLYPH,
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
             submerged = (Underwater && !Is_waterlevel(&u.uz)),
@@ -979,24 +989,33 @@ struct permonst **for_supplement;
             found += append_str(out_str, an(unseen_explain));
         }
     }
-
-    /* Now check for graphics symbols */
-    alt_i = (sym == (looked ? g.showsyms[0] : defsyms[0].sym)) ? 0 : (2 + 1);
-    for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
-        /* when sym is the default background character, we process
-           i == 0 three times: unexplored, stone, dark part of a room */
-        if (alt_i < 2) {
-            x_str = !alt_i++ ? "unexplored" : submerged ? "unknown" : "stone";
-            i = 0; /* for second iteration, undo loop increment */
-            /* alt_i is now 1 or 2 */
+    if ((glyph && glyph_is_nothing(glyph))
+        || (looked && sym == g.showsyms[SYM_NOTHING + SYM_OFF_X])) {
+        x_str = "the dark part of a room";
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, x_str);
+            *firstmatch = x_str;
+            found++;
         } else {
-            if (alt_i++ == 2)
-                i = 0; /* undo loop increment */
-            x_str = defsyms[i].explanation;
-            if (submerged && !strcmp(x_str, defsyms[0].explanation))
-                x_str = "land"; /* replace "dark part of a room" */
-            /* alt_i is now 3 or more and no longer of interest */
+            found += append_str(out_str, x_str);
         }
+    }
+    if ((glyph && glyph_is_unexplored(glyph))
+        || (looked && sym == g.showsyms[SYM_UNEXPLORED + SYM_OFF_X])) {
+        x_str = "unexplored";
+        if (submerged)
+            x_str = "land"; /* replace "unexplored" */
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, x_str);
+            *firstmatch = x_str;
+            found++;
+        } else {
+            found += append_str(out_str, x_str);
+        }
+    }
+    /* Now check for graphics symbols */
+    for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
+        x_str = defsyms[i].explanation;
         if (sym == (looked ? g.showsyms[i] : defsyms[i].sym) && *x_str) {
             /* POOL, MOAT, and WATER are "water", LAVAPOOL is "molten lava" */
             boolean water_or_lava = (!strcmp(x_str, "water")
@@ -1005,10 +1024,14 @@ struct permonst **for_supplement;
                "a molten lava", "a floor of a room", "a dark part of a room";
                article==2 => "the", 1 => "an", 0 => (none) */
             int article = strstri(x_str, " of a room") ? 2
-                          : !(alt_i <= 2
+                          : !(i == S_stone
                               || strcmp(x_str, "air") == 0
                               || strcmp(x_str, "land") == 0
                               || water_or_lava);
+
+            /* check if dark part of a room was already included above */
+            if (i == S_darkroom && glyph && glyph_is_nothing(glyph))
+                continue;
 
             /* substitute for "water" and "molten lava" when hallucinating */
             if (water_or_lava && hallucinate) {
