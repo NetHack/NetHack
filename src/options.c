@@ -115,6 +115,35 @@ static const struct Bool_Opt {
     { "color", &iflags.wc_color, FALSE, SET_IN_GAME },
 #endif
     { "confirm", &flags.confirm, TRUE, SET_IN_GAME },
+    { "cond_barehanded", &condtests[bl_bareh].choice, FALSE, SET_IN_GAME },
+    { "cond_blind", &condtests[bl_blind].choice, FALSE, SET_IN_GAME },
+    { "cond_busy", &condtests[bl_busy].choice, FALSE, SET_IN_GAME },
+    { "cond_conf", &condtests[bl_conf].choice, FALSE, SET_IN_GAME },
+    { "cond_deaf", &condtests[bl_deaf].choice, FALSE, SET_IN_GAME },
+    { "cond_fly", &condtests[bl_fly].choice, FALSE, SET_IN_GAME },
+    { "cond_foodPois", &condtests[bl_foodpois].choice, FALSE, SET_IN_GAME },
+    { "cond_glowhands", &condtests[bl_glowhands].choice, FALSE, SET_IN_GAME },
+    { "cond_grab", &condtests[bl_grab].choice, FALSE, SET_IN_GAME },
+    { "cond_hallu", &condtests[bl_hallu].choice, FALSE, SET_IN_GAME },
+    { "cond_held", &condtests[bl_held].choice, FALSE, SET_IN_GAME },
+    { "cond_ice" , &condtests[bl_icy].choice, FALSE, SET_IN_GAME },
+    { "cond_iron", &condtests[bl_elf_iron].choice, FALSE, SET_IN_GAME },
+    { "cond_lava", &condtests[bl_inlava].choice, FALSE, SET_IN_GAME },
+    { "cond_lev", &condtests[bl_lev].choice, FALSE, SET_IN_GAME },
+    { "cond_unconscious", &condtests[bl_unconsc].choice, FALSE, SET_IN_GAME },
+    { "cond_paralyze", &condtests[bl_parlyz].choice, FALSE, SET_IN_GAME },
+    { "cond_ride", &condtests[bl_ride].choice, FALSE, SET_IN_GAME },
+    { "cond_sleep" , &condtests[bl_sleeping].choice, FALSE, SET_IN_GAME },
+    { "cond_slime", &condtests[bl_slime].choice, FALSE, SET_IN_GAME },
+    { "cond_slip", &condtests[bl_slippery].choice, FALSE, SET_IN_GAME },
+    { "cond_stone", &condtests[bl_stone].choice, FALSE, SET_IN_GAME },
+    { "cond_strngl", &condtests[bl_strngl].choice, FALSE, SET_IN_GAME },
+    { "cond_stun", &condtests[bl_stun].choice, FALSE, SET_IN_GAME },
+    { "cond_submerged" , &condtests[bl_submerged].choice, FALSE, SET_IN_GAME },
+    { "cond_termIll", &condtests[bl_termill].choice, FALSE, SET_IN_GAME },
+    { "cond_tethered", &condtests[bl_tethered].choice, FALSE, SET_IN_GAME },
+    { "cond_trap", &condtests[bl_trapped].choice, FALSE, SET_IN_GAME },
+    { "cond_woundedl", &condtests[bl_woundedl].choice, FALSE, SET_IN_GAME },
     { "dark_room", &flags.dark_room, TRUE, SET_IN_GAME },
     { "eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_GAME }, /*WC*/
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS) || defined(X11_GRAPHICS)
@@ -703,7 +732,7 @@ initoptions_init()
         if (boolopt[i].addr)
             *(boolopt[i].addr) = boolopt[i].initvalue;
     }
-
+    condopt((boolean *) 0, 0);  /* make the choices match defaults */
 #ifdef SYSFLAGS
     Strcpy(sysflags.sysflagsid, "sysflags");
     sysflags.sysflagsid[9] = (char) sizeof (struct sysflag);
@@ -4088,6 +4117,9 @@ boolean tinitial, tfrom_file;
                    as with ascii_map, what does it mean to turn off tiled
                    map if ascii map isn't supported? */
                 iflags.wc_ascii_map = negated;
+            }
+            if (!strncmpi(opts, "cond_", sizeof "cond_" - 1)) {
+                condopt(boolopt[i].addr, negated);
             }
             /* only do processing below if setting with doset() */
             if (g.opt_initial)

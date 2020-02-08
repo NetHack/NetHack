@@ -972,9 +972,9 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
     waddch(win, ']');
 }
 
-/* valid_conditions[] is used primarily for parsing hilite_status rules, but
+/* conditions[] is used primarily for parsing hilite_status rules, but
    we can use it for condition names and mask bits, avoiding duplication */
-extern const struct condmap valid_conditions[]; /* botl.c */
+extern const struct conditions_t conditions[]; /* botl.c */
 
 static void
 curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
@@ -996,9 +996,9 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
         if (nohilite)
             *nohilite = TRUE; /* assume ok */
         for (i = 0; i < BL_MASK_BITS; ++i) {
-            bitmsk = valid_conditions[i].bitmask;
+            bitmsk = conditions[i].mask;
             if (curses_condition_bits & bitmsk) {
-                Strcpy(condnam, valid_conditions[i].id);
+                Strcpy(condnam, conditions[i].text[0]);
                 Strcat(strcat(condbuf, " "), upstart(condnam));
 #ifdef STATUS_HILITES
                 if (nohilite && *nohilite
@@ -1024,9 +1024,9 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
         cond_bits = curses_condition_bits;
         /* show active conditions directly; for vertical, three per line */
         for (i = 0; i < BL_MASK_BITS; ++i) {
-            bitmsk = valid_conditions[i].bitmask;
+            bitmsk = conditions[i].mask;
             if (cond_bits & bitmsk) {
-                Strcpy(condnam, valid_conditions[i].id);
+                Strcpy(condnam, conditions[i].text[0]);
                 cndlen = 1 + (int) strlen(condnam); /* count leading space */
                 if (!do_vert) {
                     getyx(win, cy, cx);
