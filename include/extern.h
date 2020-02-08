@@ -562,6 +562,7 @@ E void FDECL(impact_drop, (struct obj *, XCHAR_P, XCHAR_P, XCHAR_P));
 
 /* ### dothrow.c ### */
 
+E int FDECL(multishot_class_bonus, (int, struct obj *, struct obj *));
 E int NDECL(dothrow);
 E int NDECL(dofire);
 E void FDECL(endmultishot, (BOOLEAN_P));

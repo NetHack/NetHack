@@ -188,34 +188,8 @@ struct obj *otmp, *mwep;
         multishot = (long) rnd((int) multishot);
 
         /* class bonus */
-        switch (monsndx(mtmp->data)) {
-        case PM_CAVEMAN: /* give bonus for low-tech gear */
-            if (skill == -P_SLING || skill == P_SPEAR)
-                multishot++;
-            break;
-        case PM_MONK: /* allow higher volley count */
-            if (skill == -P_SHURIKEN)
-                multishot++;
-            break;
-        case PM_RANGER:
-            if (skill != P_DAGGER)
-                multishot++;
-            break;
-        case PM_ROGUE:
-            if (skill == P_DAGGER)
-                multishot++;
-            break;
-        case PM_NINJA:
-            if (skill == -P_SHURIKEN || skill == -P_DART)
-                multishot++;
-            /*FALLTHRU*/
-        case PM_SAMURAI:
-            if (otmp->otyp == YA && mwep->otyp == YUMI)
-                multishot++;
-            break;
-        default:
-            break;
-        }
+        multishot += multishot_class_bonus(monsndx(mtmp->data), otmp, mwep);
+
         /* racial bonus */
         if ((is_elf(mtmp->data) && otmp->otyp == ELVEN_ARROW
             && mwep->otyp == ELVEN_BOW)
