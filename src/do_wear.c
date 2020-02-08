@@ -593,6 +593,8 @@ Gloves_off(VOID_ARGS)
        engage if a corpse has been set up as the alternate weapon.] */
     if (u.twoweap && uswapwep && uswapwep->otyp == CORPSE)
         wielding_corpse(uswapwep, on_purpose);
+    if (condtests[bl_bareh].enabled)
+        g.context.botl = 1;
 
     return 0;
 }
