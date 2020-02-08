@@ -3835,17 +3835,13 @@ boolean doit;
         add_herecmd_menuitem(win, dosit,
                              "Sit on the throne");
 
-    if ((u.ux == xupstair && u.uy == yupstair)
-        || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy && g.sstairs.up)
-        || (u.ux == xupladder && u.uy == yupladder)) {
+    if (On_stairs_up(u.ux, u.uy)) {
         Sprintf(buf, "Go up the %s",
                 (u.ux == xupladder && u.uy == yupladder)
                 ? "ladder" : "stairs");
         add_herecmd_menuitem(win, doup, buf);
     }
-    if ((u.ux == xdnstair && u.uy == ydnstair)
-        || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy && !g.sstairs.up)
-        || (u.ux == xdnladder && u.uy == ydnladder)) {
+    if (On_stairs_dn(u.ux, u.uy)) {
         Sprintf(buf, "Go down the %s",
                 (u.ux == xupladder && u.uy == yupladder)
                 ? "ladder" : "stairs");
@@ -3955,16 +3951,10 @@ int x, y, mod;
             } else if (IS_THRONE(levl[u.ux][u.uy].typ)) {
                 cmd[0] = cmd_from_func(dosit);
                 return cmd;
-            } else if ((u.ux == xupstair && u.uy == yupstair)
-                       || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy
-                           && g.sstairs.up)
-                       || (u.ux == xupladder && u.uy == yupladder)) {
+            } else if (On_stairs_up(u.ux, u.uy)) {
                 cmd[0] = cmd_from_func(doup);
                 return cmd;
-            } else if ((u.ux == xdnstair && u.uy == ydnstair)
-                       || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy
-                           && !g.sstairs.up)
-                       || (u.ux == xdnladder && u.uy == ydnladder)) {
+            } else if (On_stairs_dn(u.ux, u.uy)) {
                 cmd[0] = cmd_from_func(dodown);
                 return cmd;
             } else if ((o = vobj_at(u.ux, u.uy)) != 0) {

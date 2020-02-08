@@ -252,6 +252,23 @@ struct monst *mon;
     }
 }
 
+struct monst *
+find_pmmonst(pm)
+int pm;
+{
+    struct monst *mtmp = 0;
+
+    if ((g.mvitals[pm].mvflags & G_GENOD) == 0)
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp))
+                continue;
+            if (mtmp->data == &mons[pm])
+                break;
+        }
+
+    return mtmp;
+}
+
 /* killer bee 'mon' is on a spot containing lump of royal jelly 'obj' and
    will eat it if there is no queen bee on the level; return 1: mon died,
    0: mon ate jelly and lived; -1: mon didn't eat jelly to use its move */
@@ -261,16 +278,8 @@ struct monst *mon;
 struct obj *obj;
 {
     int m_delay;
-    struct monst *mtmp = 0;
+    struct monst *mtmp = find_pmmonst(PM_QUEEN_BEE);
 
-    /* find a queen bee */
-    if ((g.mvitals[PM_QUEEN_BEE].mvflags & G_GENOD) == 0)
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-            if (DEADMONSTER(mtmp))
-                continue;
-            if (mtmp->data == &mons[PM_QUEEN_BEE])
-                break;
-        }
     /* if there's no queen on the level, eat the royal jelly and become one */
     if (!mtmp) {
         m_delay = obj->blessed ? 3 : !obj->cursed ? 5 : 7;
