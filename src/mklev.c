@@ -10,6 +10,7 @@
 /* conversion of result to int is reasonable */
 
 static void FDECL(mkfount, (int, struct mkroom *));
+static boolean FDECL(find_okay_roompos, (struct mkroom *, coord *));
 static void FDECL(mksink, (struct mkroom *));
 static void FDECL(mkaltar, (struct mkroom *));
 static void FDECL(mkgrave, (struct mkroom *));
@@ -1604,19 +1605,30 @@ struct mkroom *croom;
     g.level.flags.nfountains++;
 }
 
+static boolean
+find_okay_roompos(croom, crd)
+struct mkroom *croom;
+coord *crd;
+{
+    int tryct = 0;
+
+    do {
+        if (++tryct > 200)
+            return FALSE;
+        if (!somexy(croom, crd))
+            return FALSE;
+    } while (occupied(crd->x, crd->y) || bydoor(crd->x, crd->y));
+    return TRUE;
+}
+
 static void
 mksink(croom)
 struct mkroom *croom;
 {
     coord m;
-    register int tryct = 0;
 
-    do {
-        if (++tryct > 200)
-            return;
-        if (!somexy(croom, &m))
-            return;
-    } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
+    if (!find_okay_roompos(croom, &m))
+        return;
 
     /* Put a sink at m.x, m.y */
     levl[m.x][m.y].typ = SINK;
@@ -1629,18 +1641,13 @@ mkaltar(croom)
 struct mkroom *croom;
 {
     coord m;
-    register int tryct = 0;
     aligntyp al;
 
     if (croom->rtype != OROOM)
         return;
 
-    do {
-        if (++tryct > 200)
-            return;
-        if (!somexy(croom, &m))
-            return;
-    } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
+    if (!find_okay_roompos(croom, &m))
+        return;
 
     /* Put an altar at m.x, m.y */
     levl[m.x][m.y].typ = ALTAR;
@@ -1662,12 +1669,8 @@ struct mkroom *croom;
     if (croom->rtype != OROOM)
         return;
 
-    do {
-        if (++tryct > 200)
-            return;
-        if (!somexy(croom, &m))
-            return;
-    } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
+    if (!find_okay_roompos(croom, &m))
+        return;
 
     /* Put a grave at <m.x,m.y> */
     make_grave(m.x, m.y, dobell ? "Saved by the bell!" : (char *) 0);
