@@ -23,6 +23,7 @@ static void FDECL(skiprange, (int, int *, int *));
 static int FDECL(zap_hit, (int, int));
 static void FDECL(disintegrate_mon, (struct monst *, int, const char *));
 static void FDECL(backfire, (struct obj *));
+static void FDECL(boxlock_invent, (struct obj *));
 static int FDECL(spell_hit_bonus, (int));
 static void FDECL(destroy_one_item, (struct obj *, int, int));
 static void FDECL(wishcmdassist, (int));
@@ -2264,6 +2265,24 @@ dozap()
     return 1;
 }
 
+/* Lock or unlock all boxes in inventory */
+static void
+boxlock_invent(obj)
+struct obj *obj;
+{
+    struct obj *otmp;
+    boolean boxing = FALSE;
+
+    /* (un)lock carried boxes */
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
+        if (Is_box(otmp)) {
+            (void) boxlock(otmp, obj);
+            boxing = TRUE;
+        }
+    if (boxing)
+        update_inventory(); /* in case any box->lknown has changed */
+}
+
 int
 zapyourself(obj, ordinary)
 struct obj *obj;
@@ -2496,18 +2515,7 @@ boolean ordinary;
         }
         /* invent is hit iff hero doesn't escape from a trap */
         if (!u.utrap || !openholdingtrap(&g.youmonst, &learn_it)) {
-            struct obj *otmp;
-            boolean boxing = FALSE;
-
-            /* unlock carried boxes */
-            for (otmp = g.invent; otmp; otmp = otmp->nobj)
-                if (Is_box(otmp)) {
-                    (void) boxlock(otmp, obj);
-                    boxing = TRUE;
-                }
-            if (boxing)
-                update_inventory(); /* in case any box->lknown has changed */
-
+            boxlock_invent(obj);
             /* trigger previously escaped trapdoor */
             (void) openfallingtrap(&g.youmonst, TRUE, &learn_it);
         }
@@ -2516,17 +2524,7 @@ boolean ordinary;
     case SPE_WIZARD_LOCK:
         /* similar logic to opening; invent is hit iff no trap triggered */
         if (u.utrap || !closeholdingtrap(&g.youmonst, &learn_it)) {
-            struct obj *otmp;
-            boolean boxing = FALSE;
-
-            /* lock carried boxes */
-            for (otmp = g.invent; otmp; otmp = otmp->nobj)
-                if (Is_box(otmp)) {
-                    (void) boxlock(otmp, obj);
-                    boxing = TRUE;
-                }
-            if (boxing)
-                update_inventory(); /* in case any box->lknown has changed */
+            boxlock_invent(obj);
         }
         break;
     case WAN_DIGGING:
