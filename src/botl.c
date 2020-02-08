@@ -421,7 +421,6 @@ static int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
 static char *FDECL(anything_to_s, (char *, anything *, int));
 static int FDECL(percentage, (struct istat_s *, struct istat_s *));
 static int NDECL(exp_percentage);
-static boolean FDECL(test_condition, (enum blconditions, struct permonst *));
 
 #ifdef STATUS_HILITES
 static void FDECL(s_to_anything, (anything *, char *, int));
