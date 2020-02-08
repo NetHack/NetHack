@@ -510,6 +510,31 @@ static struct istat_s initblstats[MAXBLSTATS] = {
 #undef INIT_BLSTAT
 #undef INIT_THRESH
 
+#ifdef STATUS_HILITES
+
+const struct condmap condition_aliases[] = {
+    { "strangled",      BL_MASK_STRNGL },
+    { "all",            BL_MASK_BAREH | BL_MASK_BLIND | BL_MASK_BUSY
+                        | BL_MASK_CONF | BL_MASK_DEAF | BL_MASK_ELF_IRON
+                        | BL_MASK_FLY | BL_MASK_FOODPOIS | BL_MASK_GLOWHANDS
+                        | BL_MASK_GRAB | BL_MASK_HALLU | BL_MASK_HELD
+                        | BL_MASK_ICY | BL_MASK_INLAVA | BL_MASK_LEV
+                        | BL_MASK_PARLYZ | BL_MASK_RIDE | BL_MASK_SLEEPING
+                        | BL_MASK_SLIME | BL_MASK_SLIPPERY | BL_MASK_STONE
+                        | BL_MASK_STRNGL | BL_MASK_STUN | BL_MASK_SUBMERGED
+                        | BL_MASK_TERMILL | BL_MASK_TETHERED | BL_MASK_TRAPPED
+                        | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL },
+    { "major_troubles", BL_MASK_FOODPOIS | BL_MASK_GRAB | BL_MASK_INLAVA
+                        | BL_MASK_SLIME | BL_MASK_STONE | BL_MASK_STRNGL
+                        | BL_MASK_TERMILL },
+    { "minor_troubles", BL_MASK_BLIND | BL_MASK_DEAF | BL_MASK_STUN
+                        | BL_MASK_CONF | BL_MASK_HALLU | BL_MASK_PARLYZ },
+    { "movement",       BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE },
+    { "self_inflicted", BL_MASK_ELF_IRON },
+};
+
+#endif /* STATUS_HILITES */
+
 const struct conditions_t conditions[] = {
     /* priority, mask, identifier, txt1, txt2, txt3 */
     { 3, BL_MASK_BAREH,     bl_bareh,     { "Bare",     "Bar",   "Bh"  } },
@@ -2480,22 +2505,6 @@ boolean from_configfile;
 #endif /* STATUS_HILITES */
 
 #ifdef STATUS_HILITES
-
-const struct condmap condition_aliases[] = {
-    { "strangled",      BL_MASK_STRNGL },
-    { "all",            BL_MASK_STONE | BL_MASK_SLIME | BL_MASK_STRNGL
-                        | BL_MASK_FOODPOIS | BL_MASK_TERMILL
-                        | BL_MASK_BLIND | BL_MASK_DEAF | BL_MASK_STUN
-                        | BL_MASK_CONF | BL_MASK_HALLU
-                        | BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE
-                        | BL_MASK_ELF_IRON },
-    { "major_troubles", BL_MASK_STONE | BL_MASK_SLIME | BL_MASK_STRNGL
-                        | BL_MASK_FOODPOIS | BL_MASK_TERMILL },
-    { "minor_troubles", BL_MASK_BLIND | BL_MASK_DEAF | BL_MASK_STUN
-                        | BL_MASK_CONF | BL_MASK_HALLU },
-    { "movement",       BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE },
-    { "moreconditions",    BL_MASK_ELF_IRON },
-};
 
 unsigned long
 query_conditions()
