@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1574646948 2019/11/25 01:55:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1581280068 2020/02/09 20:27:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -387,13 +387,15 @@ lua_State *L;
         nhl_error(L, "selection.rect: illegal arguments");
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
-    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2,y2));
+    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL,
+                       SP_COORD_PACK(x1, y1));
+    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
+                       SP_COORD_PACK(x2, y2));
 
-    selection_do_line(x1,y1,x2,y1, sel);
-    selection_do_line(x1,y1,x1,y2, sel);
-    selection_do_line(x2,y1,x2,y2, sel);
-    selection_do_line(x1,y2,x2,y2, sel);
+    selection_do_line(x1, y1, x2, y1, sel);
+    selection_do_line(x1, y1, x1, y2, sel);
+    selection_do_line(x2, y1, x2, y2, sel);
+    selection_do_line(x1, y2, x2, y2, sel);
     lua_settop(L, 1);
     return 1;
 }
@@ -406,7 +408,6 @@ static int
 l_selection_fillrect(L)
 lua_State *L;
 {
-    int argc = lua_gettop(L);
     struct selectionvar *sel;
     int y;
     schar x1;
@@ -418,15 +419,17 @@ lua_State *L;
         nhl_error(L, "selection.fillrect: illegal arguments");
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
-    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2,y2));
+    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL,
+                       SP_COORD_PACK(x1, y1));
+    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
+                       SP_COORD_PACK(x2, y2));
 
     if (x1 == x2) {
         for (y = y1; y <= y2; y++)
             selection_setpoint(x1, y, sel, 1);
     } else {
         for (y = y1; y <= y2; y++)
-            selection_do_line(x1,y,x2,y, sel);
+            selection_do_line(x1, y, x2, y, sel);
     }
     lua_settop(L, 1);
     return 1;
