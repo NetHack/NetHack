@@ -31,6 +31,7 @@ static long FDECL(carry_count, (struct obj *, struct obj *, long,
 static int FDECL(lift_object, (struct obj *, struct obj *, long *,
                                    BOOLEAN_P));
 static boolean FDECL(mbag_explodes, (struct obj *, int));
+static boolean NDECL(is_boh_item_gone);
 static long FDECL(boh_loss, (struct obj *container, int));
 static int FDECL(in_container, (struct obj *));
 static int FDECL(out_container, (struct obj *));
@@ -2162,6 +2163,12 @@ int depthin;
     return FALSE;
 }
 
+static boolean
+is_boh_item_gone()
+{
+    return (boolean) (!rn2(13));
+}
+
 static long
 boh_loss(container, held)
 struct obj *container;
@@ -2174,7 +2181,7 @@ int held;
 
         for (curr = container->cobj; curr; curr = otmp) {
             otmp = curr->nobj;
-            if (!rn2(13)) {
+            if (is_boh_item_gone()) {
                 obj_extract_self(curr);
                 loss += mbag_item_gone(held, curr);
             }
@@ -3288,7 +3295,7 @@ struct obj *box; /* or bag */
 
             if (box->otyp == ICE_BOX) {
                 removed_from_icebox(otmp); /* resume rotting for corpse */
-            } else if (cursed_mbag && !rn2(13)) {
+            } else if (cursed_mbag && is_boh_item_gone()) {
                 loss += mbag_item_gone(held, otmp);
                 /* abbreviated drop format is no longer appropriate */
                 terse = FALSE;
