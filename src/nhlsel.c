@@ -13,7 +13,7 @@ static int FDECL(l_selection_setpoint, (lua_State *));
 static int FDECL(l_selection_not, (lua_State *));
 static int FDECL(l_selection_filter_percent, (lua_State *));
 static int FDECL(l_selection_rndcoord, (lua_State *));
-static boolean FDECL(params_sel_2coords, (lua_State *, struct selectionvar *,
+static boolean FDECL(params_sel_2coords, (lua_State *, struct selectionvar **,
                                           schar *, schar *, schar *, schar *));
 static int FDECL(l_selection_line, (lua_State *));
 static int FDECL(l_selection_randline, (lua_State *));
@@ -319,7 +319,7 @@ lua_State *L;
 static boolean
 params_sel_2coords(L, sel, x1,y1, x2,y2)
 lua_State *L;
-struct selectionvar *sel;
+struct selectionvar **sel;
 schar *x1, *y1, *x2, *y2;
 {
     int argc = lua_gettop(L);
@@ -330,14 +330,14 @@ schar *x1, *y1, *x2, *y2;
         *y1 = (schar) luaL_checkinteger(L, 2);
         *x2 = (schar) luaL_checkinteger(L, 3);
         *y2 = (schar) luaL_checkinteger(L, 4);
-        sel = l_selection_check(L, 5);
+        *sel = l_selection_check(L, 5);
         lua_remove(L, 1);
         lua_remove(L, 1);
         lua_remove(L, 1);
         lua_remove(L, 1);
         return TRUE;
     } else if (argc == 5) {
-        sel = l_selection_check(L, 1);
+        *sel = l_selection_check(L, 1);
         *x1 = (schar) luaL_checkinteger(L, 2);
         *y1 = (schar) luaL_checkinteger(L, 3);
         *x2 = (schar) luaL_checkinteger(L, 4);
@@ -360,7 +360,7 @@ lua_State *L;
     schar x2;
     schar y2;
 
-    if (!params_sel_2coords(L, sel, &x1, &y1, &x2, &y2)) {
+    if (!params_sel_2coords(L, &sel, &x1, &y1, &x2, &y2)) {
         nhl_error(L, "selection.line: illegal arguments");
     }
 
@@ -383,7 +383,7 @@ lua_State *L;
     schar x2;
     schar y2;
 
-    if (!params_sel_2coords(L, sel, &x1, &y1, &x2, &y2)) {
+    if (!params_sel_2coords(L, &sel, &x1, &y1, &x2, &y2)) {
         nhl_error(L, "selection.rect: illegal arguments");
     }
 
@@ -414,7 +414,7 @@ lua_State *L;
     schar x2;
     schar y2;
 
-    if (!params_sel_2coords(L, sel, &x1, &y1, &x2, &y2)) {
+    if (!params_sel_2coords(L, &sel, &x1, &y1, &x2, &y2)) {
         nhl_error(L, "selection.fillrect: illegal arguments");
     }
 
