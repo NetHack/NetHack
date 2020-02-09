@@ -92,6 +92,7 @@ prevent "you materialize on a different level" after "a mysterious force
 	stairs down from the quest home level before being granted access
 set g.context.botl for glove and wielding actions that could start or end
 	bare-handedness in support of condtests[bl_bareh]
+reinstate ranked ordering of the status condition fields
 
 
 Platform- and/or Interface-Specific Fixes
@@ -100,6 +101,7 @@ msdos:  Add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs. 
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
+windows: update for new status condition fields
 
 
 General New Features
@@ -196,5 +198,12 @@ window-port-interface: add_menu() modified to take a more general itemflags
 	parameter to support uses beyond just 'preselected'
 add some bounds checking to tabexpand (doesn't prevent the apparent compiler
 	optimization bug that put homebrew OSX executable into endless loop)
-
+unified breamm and breamu
+added some stair helper functions
+unified the code for finding a queen bee
+unified the code for multishot class bonus code
+unified the code for obtaining the inventory letter value for sortloot
+unified the code for (un)locking boxes in inventory
+unified the code for finding room pos for some features
+unified the code for revealing hiding monsters for mvm attacks
 
