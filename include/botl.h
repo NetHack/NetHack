@@ -128,6 +128,7 @@ extern const struct conditions_t conditions[CONDITION_COUNT];
 enum condchoice { opt_in, opt_out};
 struct condtests_t {
     enum blconditions c;
+    const char *useroption;
     enum condchoice opt;
     boolean enabled;
     boolean choice;

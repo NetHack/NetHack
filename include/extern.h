@@ -183,7 +183,9 @@ E boolean NDECL(exp_percent_changing);
 E int NDECL(stat_cap_indx);
 E int NDECL(stat_hunger_indx);
 E const char *FDECL(bl_idx_to_fldname, (int));
-E void FDECL(condopt, (boolean *, BOOLEAN_P));
+E void FDECL(condopt, (int, boolean *, BOOLEAN_P));
+E int FDECL(parse_cond_option, (BOOLEAN_P, char *));
+E void NDECL(cond_menu);
 #ifdef STATUS_HILITES
 E void NDECL(status_eval_next_unhilite);
 E void NDECL(reset_status_hilites);

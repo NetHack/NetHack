@@ -576,36 +576,36 @@ const struct conditions_t conditions[] = {
 };
 
 struct condtests_t condtests[CONDITION_COUNT] = {
-    /* id, opt_in or out, enabled, configchoice, testresult */
-    { bl_bareh,     opt_in,  FALSE, FALSE, FALSE },
-    { bl_blind,     opt_out, TRUE,  FALSE, FALSE },
-    { bl_busy,      opt_in,  FALSE, FALSE, FALSE },
-    { bl_conf,      opt_out, TRUE,  FALSE, FALSE },
-    { bl_deaf,      opt_out, TRUE,  FALSE, FALSE },
-    { bl_elf_iron,  opt_out, TRUE,  FALSE, FALSE },
-    { bl_fly,       opt_out, TRUE,  FALSE, FALSE },
-    { bl_foodpois,  opt_out, TRUE,  FALSE, FALSE },
-    { bl_glowhands, opt_in,  FALSE, FALSE, FALSE },
-    { bl_grab,      opt_out, TRUE,  FALSE, FALSE },
-    { bl_hallu,     opt_out, TRUE,  FALSE, FALSE },
-    { bl_held,      opt_in,  FALSE, FALSE, FALSE },
-    { bl_icy,       opt_in,  FALSE, FALSE, FALSE },
-    { bl_inlava,    opt_out, TRUE,  FALSE, FALSE },
-    { bl_lev,       opt_out, TRUE,  FALSE, FALSE },
-    { bl_parlyz,    opt_in,  FALSE, FALSE, FALSE },
-    { bl_ride,      opt_out, TRUE,  FALSE, FALSE },
-    { bl_sleeping,  opt_in,  FALSE, FALSE, FALSE },
-    { bl_slime,     opt_out, TRUE,  FALSE, FALSE },
-    { bl_slippery,  opt_in,  FALSE, FALSE, FALSE },
-    { bl_stone,     opt_out, TRUE,  FALSE, FALSE },
-    { bl_strngl,    opt_out, TRUE,  FALSE, FALSE },
-    { bl_stun,      opt_out, TRUE,  FALSE, FALSE },
-    { bl_submerged, opt_in,  FALSE, FALSE, FALSE },
-    { bl_termill,   opt_out, TRUE,  FALSE, FALSE },
-    { bl_tethered,  opt_in,  FALSE, FALSE, FALSE },
-    { bl_trapped,   opt_in,  FALSE, FALSE, FALSE },
-    { bl_unconsc,   opt_in,  FALSE, FALSE, FALSE },
-    { bl_woundedl,  opt_in,  FALSE, FALSE, FALSE },
+    /* id, useropt, opt_in or out, enabled, configchoice, testresult */
+    { bl_bareh,     "barehanded",  opt_in,  FALSE, FALSE, FALSE },
+    { bl_blind,     "blind",       opt_out, TRUE,  FALSE, FALSE },
+    { bl_busy,      "busy",        opt_in,  FALSE, FALSE, FALSE },
+    { bl_conf,      "conf",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_deaf,      "deaf",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_elf_iron,  "iron",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_fly,       "fly",         opt_out, TRUE,  FALSE, FALSE },
+    { bl_foodpois,  "foodPois",    opt_out, TRUE,  FALSE, FALSE },
+    { bl_glowhands, "glowhands",   opt_in,  FALSE, FALSE, FALSE },
+    { bl_grab,      "grab",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_hallu,     "hallucinat",  opt_out, TRUE,  FALSE, FALSE },
+    { bl_held,      "held",        opt_in,  FALSE, FALSE, FALSE },
+    { bl_icy,       "ice",         opt_in,  FALSE, FALSE, FALSE },
+    { bl_inlava,    "lava",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_lev,       "levitate",    opt_out, TRUE,  FALSE, FALSE },
+    { bl_parlyz,    "paralyzed",   opt_in,  FALSE, FALSE, FALSE },
+    { bl_ride,      "ride",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_sleeping,  "sleep",       opt_in,  FALSE, FALSE, FALSE },
+    { bl_slime,     "slime",       opt_out, TRUE,  FALSE, FALSE },
+    { bl_slippery,  "slip",        opt_in,  FALSE, FALSE, FALSE },
+    { bl_stone,     "stone",       opt_out, TRUE,  FALSE, FALSE },
+    { bl_strngl,    "strngl",      opt_out, TRUE,  FALSE, FALSE },
+    { bl_stun,      "stun",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_submerged, "submerged",   opt_in,  FALSE, FALSE, FALSE },
+    { bl_termill,   "termIll",     opt_out, TRUE,  FALSE, FALSE },
+    { bl_tethered,  "tethered",    opt_in,  FALSE, FALSE, FALSE },
+    { bl_trapped,   "trap",        opt_in,  FALSE, FALSE, FALSE },
+    { bl_unconsc,   "unconscious", opt_in,  FALSE, FALSE, FALSE },
+    { bl_woundedl,  "woundedlegs", opt_in,  FALSE, FALSE, FALSE },
 };
 /* condition indexing */
 int cond_idx[CONDITION_COUNT] = { 0 };
@@ -922,7 +922,7 @@ bot_via_windowport()
     evaluate_and_notify_windowport(g.valset, idx);
 }
 
- 
+
 /* update just the status lines' 'time' field */
 static void
 stat_update_time()
@@ -943,30 +943,35 @@ stat_update_time()
 
 /* deal with player's choice to change processing of a condition */
 void
-condopt(addr, negated)
+condopt(idx, addr, negated)
+int idx;
 boolean *addr;
 boolean negated;
 {
     int i;
-    boolean is_init = FALSE;
 
-    for (i = 0; i < CONDITION_COUNT; ++i) {
-        if (!addr) {
-             /* special: indicates a request to init so
-                set the choice values to match the defaults */
-            is_init = TRUE;
+    /* sanity check */
+    if ((idx < 0 || idx >= CONDITION_COUNT)
+        || (addr && addr != &condtests[idx].choice))
+        return;
+
+    if (!addr) {
+        /* special: indicates a request to init so
+           set the choice values to match the defaults */
+        for (i = 0; i < CONDITION_COUNT; ++i) {
             cond_idx[i] = i;
             condtests[i].choice = condtests[i].enabled;
-        } else if (addr == &condtests[i].choice) {
-            condtests[i].enabled = negated ? FALSE : TRUE;
         }
-        /* avoid lingering false positives if test is no longer run */
-        if (!condtests[i].enabled)
-            condtests[i].test = FALSE;
-    }
-    if (is_init)
         qsort((genericptr_t) cond_idx, CONDITION_COUNT,
               sizeof cond_idx[0], cond_cmp);
+    } else {
+        /* (addr == &condtests[idx].choice) */
+        condtests[idx].enabled = negated ? FALSE : TRUE;
+        condtests[idx].choice = condtests[idx].enabled;
+        /* avoid lingering false positives if test is no longer run */
+        if (!condtests[idx].enabled)
+            condtests[idx].test = FALSE;
+    }
 }
 
 /* qsort callback routine for sorting the condition index */
@@ -982,6 +987,74 @@ const genericptr vptr2;
         return c1 - c2;
     /* tie-breaker - visible alpha by name */
     return strcmpi(conditions[indx1].text[0], conditions[indx2].text[0]);
+}
+
+int
+parse_cond_option(negated, opts)
+boolean negated;
+char *opts;
+{
+    int i;
+    size_t sl;
+    const char *compareto, *uniqpart, prefix[] = "cond_";
+
+    if (!opts || strlen(opts) <= sizeof prefix - 1)
+        return 2;
+    uniqpart = opts + (sizeof prefix - 1);
+    for (i = 0; i < CONDITION_COUNT; ++i) {
+        compareto = condtests[i].useroption;
+        sl = strlen(compareto);
+        if (match_optname(uniqpart, compareto, (sl >= 4) ? 4 : sl, FALSE)) {
+            condopt(i, &condtests[i].choice, negated);
+            return 0;
+        }
+    }
+    return 1;  /* !0 indicates error */
+}
+
+void
+cond_menu(VOID_ARGS)
+{
+    int i, res, idx = 0;
+    unsigned long ret = 0UL;
+    winid tmpwin;
+    anything any;
+    menu_item *picks = (menu_item *) 0;
+    char mbuf[QBUFSZ];
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+
+    any = cg.zeroany;
+    Sprintf(mbuf, "%-21s (ranking)", "field option");
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, mbuf,
+             MENU_ITEMFLAGS_NONE);
+    for (i = 0; i < SIZE(conditions); i++) {
+        Sprintf(mbuf, "cond_%-14s (%3d)", condtests[i].useroption, cond_idx[i]);
+        any = cg.zeroany;
+        any.a_int = i + 1; /* avoid zero */
+        condtests[i].choice = FALSE;
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 mbuf,
+                 condtests[i].enabled
+                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    }
+
+    end_menu(tmpwin, "Choose status conditions to toggle");
+
+    res = select_menu(tmpwin, PICK_ANY, &picks);
+    destroy_nhwindow(tmpwin);
+    if (res > 0) {
+        for (i = 0; i < res; i++) {
+            idx = picks[i].item.a_int - 1;
+            condtests[idx].choice = TRUE;
+        }
+        free((genericptr_t) picks);
+    }
+    for (i = 0; i < CONDITION_COUNT; ++i) {
+        if (condtests[i].enabled != condtests[i].choice)
+            condtests[i].enabled = condtests[i].choice;
+    }
 }
 
 static boolean

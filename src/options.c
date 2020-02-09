@@ -115,35 +115,6 @@ static const struct Bool_Opt {
     { "color", &iflags.wc_color, FALSE, SET_IN_GAME },
 #endif
     { "confirm", &flags.confirm, TRUE, SET_IN_GAME },
-    { "cond_barehanded", &condtests[bl_bareh].choice, opt_in, SET_IN_GAME },
-    { "cond_blind", &condtests[bl_blind].choice, opt_out, SET_IN_GAME },
-    { "cond_busy", &condtests[bl_busy].choice, opt_in, SET_IN_GAME },
-    { "cond_conf", &condtests[bl_conf].choice, opt_out, SET_IN_GAME },
-    { "cond_deaf", &condtests[bl_deaf].choice, opt_out, SET_IN_GAME },
-    { "cond_fly", &condtests[bl_fly].choice, opt_out, SET_IN_GAME },
-    { "cond_foodPois", &condtests[bl_foodpois].choice, opt_out, SET_IN_GAME },
-    { "cond_glowhands", &condtests[bl_glowhands].choice, opt_in, SET_IN_GAME },
-    { "cond_grab", &condtests[bl_grab].choice, opt_out, SET_IN_GAME },
-    { "cond_hallu", &condtests[bl_hallu].choice, opt_out, SET_IN_GAME },
-    { "cond_held", &condtests[bl_held].choice, opt_in, SET_IN_GAME },
-    { "cond_ice" , &condtests[bl_icy].choice, opt_in, SET_IN_GAME },
-    { "cond_iron", &condtests[bl_elf_iron].choice, opt_out, SET_IN_GAME },
-    { "cond_lava", &condtests[bl_inlava].choice, opt_out, SET_IN_GAME },
-    { "cond_lev", &condtests[bl_lev].choice, opt_out, SET_IN_GAME },
-    { "cond_unconscious", &condtests[bl_unconsc].choice, opt_in, SET_IN_GAME },
-    { "cond_paralyze", &condtests[bl_parlyz].choice, opt_in, SET_IN_GAME },
-    { "cond_ride", &condtests[bl_ride].choice, opt_out, SET_IN_GAME },
-    { "cond_sleep" , &condtests[bl_sleeping].choice, opt_in, SET_IN_GAME },
-    { "cond_slime", &condtests[bl_slime].choice, opt_out, SET_IN_GAME },
-    { "cond_slip", &condtests[bl_slippery].choice, opt_in, SET_IN_GAME },
-    { "cond_stone", &condtests[bl_stone].choice, opt_out, SET_IN_GAME },
-    { "cond_strngl", &condtests[bl_strngl].choice, opt_out, SET_IN_GAME },
-    { "cond_stun", &condtests[bl_stun].choice, opt_out, SET_IN_GAME },
-    { "cond_submerged" , &condtests[bl_submerged].choice, opt_in, SET_IN_GAME },
-    { "cond_termIll", &condtests[bl_termill].choice, opt_out, SET_IN_GAME },
-    { "cond_tethered", &condtests[bl_tethered].choice, opt_in, SET_IN_GAME },
-    { "cond_trap", &condtests[bl_trapped].choice, opt_in, SET_IN_GAME },
-    { "cond_woundedl", &condtests[bl_woundedl].choice, opt_in, SET_IN_GAME },
     { "dark_room", &flags.dark_room, TRUE, SET_IN_GAME },
     { "eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_GAME }, /*WC*/
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS) || defined(X11_GRAPHICS)
@@ -732,7 +703,7 @@ initoptions_init()
         if (boolopt[i].addr)
             *(boolopt[i].addr) = boolopt[i].initvalue;
     }
-    condopt((boolean *) 0, 0);  /* make the choices match defaults */
+    condopt(0, (boolean *) 0, 0);  /* make the choices match defaults */
 #ifdef SYSFLAGS
     Strcpy(sysflags.sysflagsid, "sysflags");
     sysflags.sysflagsid[9] = (char) sizeof (struct sysflag);
@@ -2002,6 +1973,8 @@ char c;
     return FALSE;
 }
 
+#define is_cond_option(x) (!strncmpi((x), "cond_", sizeof "cond_" - 1))
+
 boolean
 parseoptions(opts, tinitial, tfrom_file)
 register char *opts;
@@ -2073,6 +2046,29 @@ boolean tinitial, tfrom_file;
             return FALSE;
         } else
             flags.initgend = flags.female = negated;
+        return retval;
+    }
+
+    /* some prefix-based options */
+
+    if (is_cond_option(opts)) {
+        int reslt;
+
+        if ((reslt = parse_cond_option(negated, opts)) != 0) {
+            switch(reslt) {
+              case 3:
+                 config_error_add("Ambiguous condition option %s", opts);
+                 break;
+              case 1:
+              case 2:
+              default:
+                 config_error_add("Unknown condition option %s (%d)",
+                                 opts, reslt);
+                 break;
+            }
+            return FALSE;
+        }
+        g.opt_need_redraw = TRUE;
         return retval;
     }
 
@@ -4118,10 +4114,7 @@ boolean tinitial, tfrom_file;
                    map if ascii map isn't supported? */
                 iflags.wc_ascii_map = negated;
             }
-            if (!strncmpi(opts, "cond_", sizeof "cond_" - 1)) {
-                condopt(boolopt[i].addr, negated);
-                g.opt_need_redraw = TRUE;
-            }
+
             /* only do processing below if setting with doset() */
             if (g.opt_initial)
                 return retval;
@@ -4473,6 +4466,18 @@ int nset;
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
 }
 
+static int
+count_cond(VOID_ARGS)
+{
+    int i, cnt = 0;
+
+    for (i = 0; i < CONDITION_COUNT; ++i) {
+        if (condtests[i].enabled)
+            cnt++;
+    }
+    return cnt;
+}
+
 int
 count_apes(VOID_ARGS)
 {
@@ -4488,6 +4493,7 @@ count_apes(VOID_ARGS)
 }
 
 enum opt_other_enums {
+    OPT_OTHER_COND = -5,
     OPT_OTHER_MSGTYPE = -4,
     OPT_OTHER_MENUCOLOR = -3,
     OPT_OTHER_STATHILITE = -2,
@@ -4502,6 +4508,8 @@ static struct other_opts {
     int NDECL((*othr_count_func));
 } othropt[] = {
     { "autopickup exceptions", SET_IN_GAME, OPT_OTHER_APEXC, count_apes },
+    { "status condition fields", SET_IN_GAME,
+      OPT_OTHER_COND, count_cond },
     { "menu colors", SET_IN_GAME, OPT_OTHER_MENUCOLOR, count_menucolors },
     { "message types", SET_IN_GAME, OPT_OTHER_MSGTYPE, msgtype_count },
 #ifdef STATUS_HILITES
@@ -4674,6 +4682,9 @@ doset() /* changing options via menu by Per Liboriussen */
 #endif
             } else if (opt_indx == OPT_OTHER_MENUCOLOR) {
                     (void) special_handling("menu_colors", setinitial,
+                                            fromfile);
+            } else if (opt_indx == OPT_OTHER_COND) {
+                    (void) special_handling("condition_options", setinitial,
                                             fromfile);
             } else if (opt_indx == OPT_OTHER_MSGTYPE) {
                     (void) special_handling("msgtype", setinitial, fromfile);
@@ -5595,7 +5606,8 @@ boolean setinitial, setfromfile;
             assign_graphics(PRIMARY);
         preference_update("symset");
         g.opt_need_redraw = TRUE;
-
+    } else if (!strcmp("condition_options", optname)) {
+        cond_menu();    /* in botl.c */
     } else {
         /* didn't match any of the special options */
         return FALSE;
