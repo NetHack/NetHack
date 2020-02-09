@@ -4120,6 +4120,7 @@ boolean tinitial, tfrom_file;
             }
             if (!strncmpi(opts, "cond_", sizeof "cond_" - 1)) {
                 condopt(boolopt[i].addr, negated);
+                g.opt_need_redraw = TRUE;
             }
             /* only do processing below if setting with doset() */
             if (g.opt_initial)
