@@ -1016,7 +1016,6 @@ void
 cond_menu(VOID_ARGS)
 {
     int i, res, idx = 0;
-    unsigned long ret = 0UL;
     winid tmpwin;
     anything any;
     menu_item *picks = (menu_item *) 0;
