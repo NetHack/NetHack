@@ -118,7 +118,7 @@ enum blconditions {
 /* clang-format on */
 
 struct conditions_t {
-    int priority;
+    int ranking;
     long mask;
     enum blconditions c;
     const char *text[3];
@@ -135,6 +135,7 @@ struct condtests_t {
 };
 
 extern struct condtests_t condtests[CONDITION_COUNT];
+extern int cond_idx[CONDITION_COUNT];
 
 #define BEFORE  0
 #define NOW     1

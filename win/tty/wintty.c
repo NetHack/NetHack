@@ -4409,7 +4409,7 @@ static void
 render_status(VOID_ARGS)
 {
     long mask, bits;
-    int i, x, y, idx, c, row, tlth, num_rows, coloridx = 0, attrmask = 0;
+    int i, x, y, idx, c, ci, row, tlth, num_rows, coloridx = 0, attrmask = 0;
     char *text;
     struct WinDesc *cw = 0;
 
@@ -4473,7 +4473,8 @@ render_status(VOID_ARGS)
                         tty_curs(WIN_STATUS, x, y);
                     }
                     for (c = 0; c < SIZE(conditions) && bits != 0L; ++c) {
-                        mask = conditions[c].mask;
+                        ci = cond_idx[c];
+                        mask = conditions[ci].mask;
                         if (bits & mask) {
                             const char *condtext;
 
@@ -4485,7 +4486,7 @@ render_status(VOID_ARGS)
                                 if (coloridx != NO_COLOR)
                                     term_start_color(coloridx);
                             }
-                            condtext = conditions[c].text[cond_shrinklvl];
+                            condtext = conditions[ci].text[cond_shrinklvl];
                             if (x >= cw->cols && !truncation_expected) {
                                 impossible(
                          "Unexpected condition placement overflow for \"%s\"",

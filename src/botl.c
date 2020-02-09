@@ -421,6 +421,7 @@ static int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
 static char *FDECL(anything_to_s, (char *, anything *, int));
 static int FDECL(percentage, (struct istat_s *, struct istat_s *));
 static int NDECL(exp_percentage);
+static int FDECL(CFDECLSPEC cond_cmp, (const genericptr, const genericptr));
 
 #ifdef STATUS_HILITES
 static void FDECL(s_to_anything, (anything *, char *, int));
@@ -542,36 +543,36 @@ const struct condmap condition_aliases[] = {
 #endif /* STATUS_HILITES */
 
 const struct conditions_t conditions[] = {
-    /* priority, mask, identifier, txt1, txt2, txt3 */
-    { 3, BL_MASK_BAREH,     bl_bareh,     { "Bare",     "Bar",   "Bh"  } },
-    { 2, BL_MASK_BLIND,     bl_blind,     { "Blind",    "Blnd",  "Bl"  } },
-    { 3, BL_MASK_BUSY,      bl_busy,      { "Busy",     "Bsy",   "By"  } },
-    { 2, BL_MASK_CONF,      bl_conf,      { "Conf",     "Cnf",   "Cf"  } },
-    { 2, BL_MASK_DEAF,      bl_deaf,      { "Deaf",     "Def",   "Df"  } },
-    { 3, BL_MASK_ELF_IRON,  bl_elf_iron,  { "Iron",     "Irn",   "Fe"  } },
-    { 2, BL_MASK_FLY,       bl_fly,       { "Fly",      "Fly",   "Fl"  } },
-    { 2, BL_MASK_FOODPOIS,  bl_foodpois,  { "FoodPois", "Fpois", "Poi" } },
-    { 3, BL_MASK_GLOWHANDS, bl_glowhands, { "Glow",     "Glo",   "Gl"  } },
-    { 2, BL_MASK_GRAB,      bl_grab,      { "Grab",     "Grb",   "Gr"  } },
-    { 2, BL_MASK_HALLU,     bl_hallu,     { "Hallu",    "Hal",   "Hl"  } },
-    { 3, BL_MASK_HELD,      bl_held,      { "Held",     "Hld",   "Hd"  } },
-    { 3, BL_MASK_ICY,       bl_icy,       { "Icy",      "Icy",   "Ic"  } },
-    { 2, BL_MASK_INLAVA,    bl_inlava,    { "Lava",     "Lav",   "La"  } },
-    { 2, BL_MASK_LEV,       bl_lev,       { "Lev",      "Lev",   "Lv"  } },
-    { 3, BL_MASK_PARLYZ,    bl_parlyz,    { "Parlyz",   "Para",  "Par" } },
-    { 2, BL_MASK_RIDE,      bl_ride,      { "Ride",     "Rid",   "Rd"  } },
-    { 3, BL_MASK_SLEEPING,  bl_sleeping,  { "Zzz",      "Zzz",   "Zz"  } },
-    { 2, BL_MASK_SLIME,     bl_slime,     { "Slime",    "Slim",  "Slm" } },
-    { 3, BL_MASK_SLIPPERY,  bl_slippery,  { "Slip",     "Sli",   "Sl"  } },
-    { 2, BL_MASK_STONE,     bl_stone,     { "Stone",    "Ston",  "Sto" } },
-    { 2, BL_MASK_STRNGL,    bl_strngl,    { "Strngl",   "Stngl", "Str" } },
-    { 2, BL_MASK_STUN,      bl_stun,      { "Stun",     "Stun",  "St"  } },
-    { 3, BL_MASK_SUBMERGED, bl_submerged, { "Sub",      "Sub",   "Sw"  } },
-    { 2, BL_MASK_TERMILL,   bl_termill,   { "TermIll",  "Ill",   "Ill" } },
-    { 3, BL_MASK_TETHERED,  bl_tethered,  { "Teth",     "Tth",   "Te"  } },
-    { 3, BL_MASK_TRAPPED,   bl_trapped,   { "Trap",     "Trp",   "Tr"  } },
-    { 3, BL_MASK_UNCONSC,   bl_unconsc,   { "Out",      "Out",   "KO"  } },
-    { 3, BL_MASK_WOUNDEDL,  bl_woundedl,  { "Legs",     "Leg",   "Lg"  } },
+    /* ranking, mask, identifier, txt1, txt2, txt3 */
+    { 20, BL_MASK_BAREH,     bl_bareh,     { "Bare",     "Bar",   "Bh"  } },
+    { 10, BL_MASK_BLIND,     bl_blind,     { "Blind",    "Blnd",  "Bl"  } },
+    { 20, BL_MASK_BUSY,      bl_busy,      { "Busy",     "Bsy",   "By"  } },
+    { 10, BL_MASK_CONF,      bl_conf,      { "Conf",     "Cnf",   "Cf"  } },
+    { 10, BL_MASK_DEAF,      bl_deaf,      { "Deaf",     "Def",   "Df"  } },
+    { 15, BL_MASK_ELF_IRON,  bl_elf_iron,  { "Iron",     "Irn",   "Fe"  } },
+    { 10, BL_MASK_FLY,       bl_fly,       { "Fly",      "Fly",   "Fl"  } },
+    {  6, BL_MASK_FOODPOIS,  bl_foodpois,  { "FoodPois", "Fpois", "Poi" } },
+    { 20, BL_MASK_GLOWHANDS, bl_glowhands, { "Glow",     "Glo",   "Gl"  } },
+    {  2, BL_MASK_GRAB,      bl_grab,      { "Grab",     "Grb",   "Gr"  } },
+    { 10, BL_MASK_HALLU,     bl_hallu,     { "Hallu",    "Hal",   "Hl"  } },
+    { 20, BL_MASK_HELD,      bl_held,      { "Held",     "Hld",   "Hd"  } },
+    { 20, BL_MASK_ICY,       bl_icy,       { "Icy",      "Icy",   "Ic"  } },
+    {  8, BL_MASK_INLAVA,    bl_inlava,    { "Lava",     "Lav",   "La"  } },
+    { 10, BL_MASK_LEV,       bl_lev,       { "Lev",      "Lev",   "Lv"  } },
+    { 20, BL_MASK_PARLYZ,    bl_parlyz,    { "Parlyz",   "Para",  "Par" } },
+    { 10, BL_MASK_RIDE,      bl_ride,      { "Ride",     "Rid",   "Rd"  } },
+    { 20, BL_MASK_SLEEPING,  bl_sleeping,  { "Zzz",      "Zzz",   "Zz"  } },
+    {  6, BL_MASK_SLIME,     bl_slime,     { "Slime",    "Slim",  "Slm" } },
+    { 20, BL_MASK_SLIPPERY,  bl_slippery,  { "Slip",     "Sli",   "Sl"  } },
+    {  6, BL_MASK_STONE,     bl_stone,     { "Stone",    "Ston",  "Sto" } },
+    {  4, BL_MASK_STRNGL,    bl_strngl,    { "Strngl",   "Stngl", "Str" } },
+    { 10, BL_MASK_STUN,      bl_stun,      { "Stun",     "Stun",  "St"  } },
+    { 15, BL_MASK_SUBMERGED, bl_submerged, { "Sub",      "Sub",   "Sw"  } },
+    {  6, BL_MASK_TERMILL,   bl_termill,   { "TermIll",  "Ill",   "Ill" } },
+    { 20, BL_MASK_TETHERED,  bl_tethered,  { "Teth",     "Tth",   "Te"  } },
+    { 20, BL_MASK_TRAPPED,   bl_trapped,   { "Trap",     "Trp",   "Tr"  } },
+    { 20, BL_MASK_UNCONSC,   bl_unconsc,   { "Out",      "Out",   "KO"  } },
+    { 20, BL_MASK_WOUNDEDL,  bl_woundedl,  { "Legs",     "Leg",   "Lg"  } },
 };
 
 struct condtests_t condtests[CONDITION_COUNT] = {
@@ -606,6 +607,8 @@ struct condtests_t condtests[CONDITION_COUNT] = {
     { bl_unconsc,   opt_in,  FALSE, FALSE, FALSE },
     { bl_woundedl,  opt_in,  FALSE, FALSE, FALSE },
 };
+/* condition indexing */
+int cond_idx[CONDITION_COUNT] = { 0 };
 
 /* cache-related */
 static boolean cache_avail[3] = { FALSE, FALSE, FALSE };
@@ -936,6 +939,49 @@ stat_update_time()
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, (unsigned long *) 0);
     return;
+}
+
+/* deal with player's choice to change processing of a condition */
+void
+condopt(addr, negated)
+boolean *addr;
+boolean negated;
+{
+    int i;
+    boolean is_init = FALSE;
+
+    for (i = 0; i < CONDITION_COUNT; ++i) {
+        if (!addr) {
+             /* special: indicates a request to init so
+                set the choice values to match the defaults */
+            is_init = TRUE;
+            cond_idx[i] = i;
+            condtests[i].choice = condtests[i].enabled;
+        } else if (addr == &condtests[i].choice) {
+            condtests[i].enabled = negated ? FALSE : TRUE;
+        }
+        /* avoid lingering false positives if test is no longer run */
+        if (!condtests[i].enabled)
+            condtests[i].test = FALSE;
+    }
+    if (is_init)
+        qsort((genericptr_t) cond_idx, CONDITION_COUNT,
+              sizeof cond_idx[0], cond_cmp);
+}
+
+/* qsort callback routine for sorting the condition index */
+static int CFDECLSPEC
+cond_cmp(vptr1, vptr2)
+const genericptr vptr1;
+const genericptr vptr2;
+{
+    int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2,
+        c1 = conditions[indx1].ranking, c2 = conditions[indx2].ranking;
+
+    if (c1 != c2)
+        return c1 - c2;
+    /* tie-breaker - visible alpha by name */
+    return strcmpi(conditions[indx1].text[0], conditions[indx2].text[0]);
 }
 
 static boolean
@@ -1585,28 +1631,6 @@ int idx;
     if (idx >= 0 && idx < MAXBLSTATS)
         return initblstats[idx].fldname;
     return (const char *) 0;
-}
-
-/* deal with player's choice to change processing of a condition */
-void
-condopt(addr, negated)
-boolean *addr;
-boolean negated;
-{
-    int i;
-
-    for (i = 0; i < CONDITION_COUNT; ++i) {
-        if (!addr) {
-             /* special: indicates a request to init so
-                set the choice values to match the defaults */
-            condtests[i].choice = condtests[i].enabled;
-        } else if (addr == &condtests[i].choice) {
-            condtests[i].enabled = negated ? FALSE : TRUE;
-        }
-        /* avoid lingering false positives if test is no longer run */
-        if (!condtests[i].enabled)
-            condtests[i].test = FALSE;
-    }
 }
 
 #ifdef STATUS_HILITES

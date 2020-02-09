@@ -975,6 +975,7 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
 /* conditions[] is used primarily for parsing hilite_status rules, but
    we can use it for condition names and mask bits, avoiding duplication */
 extern const struct conditions_t conditions[]; /* botl.c */
+extern int cond_idx[CONDITION_COUNT];
 
 static void
 curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
@@ -983,7 +984,7 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                 boolean *nohilite) /* optional output; indicates whether -*/
 {                                  /*+ condbuf[] could be used as-is      */
     char condnam[20];
-    int i;
+    int i, ci;
     long bitmsk;
 
     if (condbuf) {
@@ -996,9 +997,10 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
         if (nohilite)
             *nohilite = TRUE; /* assume ok */
         for (i = 0; i < BL_MASK_BITS; ++i) {
-            bitmsk = conditions[i].mask;
+            ci = cond_idx[i];
+            bitmsk = conditions[ci].mask;
             if (curses_condition_bits & bitmsk) {
-                Strcpy(condnam, conditions[i].text[0]);
+                Strcpy(condnam, conditions[ci].text[0]);
                 Strcat(strcat(condbuf, " "), upstart(condnam));
 #ifdef STATUS_HILITES
                 if (nohilite && *nohilite
@@ -1024,9 +1026,10 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
         cond_bits = curses_condition_bits;
         /* show active conditions directly; for vertical, three per line */
         for (i = 0; i < BL_MASK_BITS; ++i) {
-            bitmsk = conditions[i].mask;
+            ci = cond_idx[i];
+            bitmsk = conditions[ci].mask;
             if (cond_bits & bitmsk) {
-                Strcpy(condnam, conditions[i].text[0]);
+                Strcpy(condnam, conditions[ci].text[0]);
                 cndlen = 1 + (int) strlen(condnam); /* count leading space */
                 if (!do_vert) {
                     getyx(win, cy, cx);
