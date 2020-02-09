@@ -721,7 +721,7 @@ boolean border;
         time_and_score |= 2;
     cond_count = 0;
     if (curses_condition_bits) {
-        for (i = 0; i < BL_MASK_BITS; ++i)
+        for (i = 0; i < CONDITION_COUNT; ++i)
             if (curses_condition_bits & (1 << i))
                 ++cond_count;
     }
@@ -996,7 +996,7 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
         condbuf[0] = '\0';
         if (nohilite)
             *nohilite = TRUE; /* assume ok */
-        for (i = 0; i < BL_MASK_BITS; ++i) {
+        for (i = 0; i < CONDITION_COUNT; ++i) {
             ci = cond_idx[i];
             bitmsk = conditions[ci].mask;
             if (curses_condition_bits & bitmsk) {
@@ -1025,7 +1025,7 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
 
         cond_bits = curses_condition_bits;
         /* show active conditions directly; for vertical, three per line */
-        for (i = 0; i < BL_MASK_BITS; ++i) {
+        for (i = 0; i < CONDITION_COUNT; ++i) {
             ci = cond_idx[i];
             bitmsk = conditions[ci].mask;
             if (cond_bits & bitmsk) {
