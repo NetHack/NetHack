@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580610435 2020/02/02 02:27:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1581373396 2020/02/10 22:23:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.155 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3597,11 +3597,12 @@ void
 selection_free(sel)
 struct selectionvar *sel;
 {
-    if (!sel)
-        return;
-    Free(sel->map);
-    sel->map = NULL;
-    sel->wid = sel->hei = 0;
+    if (sel) {
+        Free(sel->map);
+        sel->map = NULL;
+        sel->wid = sel->hei = 0;
+        free((genericptr_t) sel);
+    }
 }
 
 struct selectionvar *
@@ -3812,7 +3813,6 @@ int dir;
                 selection_setpoint(x, y, ov, 1);
 
     selection_free(tmp);
-    free(tmp);
 }
 
 static int FDECL((*selection_flood_check_func), (int, int));
@@ -3924,7 +3924,6 @@ boolean diagonals;
 #undef SEL_FLOOD_STACK
 #undef SEL_FLOOD_CHKDIR
     selection_free(tmp);
-    free(tmp);
 }
 
 /* McIlroy's Ellipse Algorithm */
@@ -4571,9 +4570,7 @@ struct selectionvar *ov;
     res = FALSE;
  gotitdone:
     selection_free(ov2);
-    free(ov2);
     selection_free(ov3);
-    free(ov3);
     return res;
 }
 
@@ -4606,19 +4603,19 @@ ensure_way_out()
 
     do {
         ret = TRUE;
-        for (x = 0; x < COLNO; x++)
+        for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++)
                 if (ACCESSIBLE(levl[x][y].typ)
                     && !selection_getpoint(x, y, ov)) {
-                    if (generate_way_out_method(x,y, ov))
-                        selection_floodfill(ov, x,y, TRUE);
+                    if (generate_way_out_method(x, y, ov))
+                        selection_floodfill(ov, x, y, TRUE);
                     ret = FALSE;
                     goto outhere;
                 }
- outhere: ;
+ outhere:
+        ;
     } while (!ret);
     selection_free(ov);
-    free(ov);
 }
 
 int
@@ -5191,10 +5188,8 @@ int prop;
 
     if (sel) {
         selection_iterate(sel, sel_set_wall_property, (genericptr_t) &prop);
-        if (freesel) {
+        if (freesel)
             selection_free(sel);
-            free(sel);
-        }
     }
 }
 
