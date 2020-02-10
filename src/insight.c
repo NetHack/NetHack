@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1581322662 2020/02/10 08:17:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1581362470 2020/02/10 19:21:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1708,7 +1708,6 @@ int final; /* used "behind the curtain" by enl_foo() macros */
 {
     int i, achidx, acnt;
     char title[BUFSZ];
-    boolean ach_amulet = FALSE;
     winid awin = WIN_ERR;
 
     /* unfortunately we can't show the achievements (at least not all of
@@ -1733,15 +1732,17 @@ int final; /* used "behind the curtain" by enl_foo() macros */
     putstr(awin, 0, title);
 
     /* display achievements in the order in which they were recorded;
-       lone exception is to defer the Amulet (by taking it out of list)
-       if we just ascended; it warrants alternate wording when given
-       away during ascension, but the Amulet achievement is always
-       attained before entering endgame and the alternate wording looks
-       strange if shown before "reached endgame" and "reached Astral" */
+       lone exception is to defer the Amulet if we just ascended;
+       it warrants alternate wording when given away during ascension,
+       but the Amulet achievement is always attained before entering
+       endgame and the alternate wording looks strange if shown before
+       "reached endgame" and "reached Astral" */
     if (remove_achievement(ACH_UWIN)) { /* UWIN == Ascended! */
-        ach_amulet = remove_achievement(ACH_AMUL);
-        record_achievement(ACH_UWIN); /* put back; always last when present */
-        acnt = count_achievements();
+        /* for ascension, force it to be last and Amulet next to last
+           by taking them out and then adding them back */
+        if (remove_achievement(ACH_AMUL)) /* should always be True here */
+            record_achievement(ACH_AMUL);
+        record_achievement(ACH_UWIN);
     }
     for (i = 0; i < acnt; ++i) {
         achidx = u.uachieved[i];
@@ -1791,10 +1792,12 @@ int final; /* used "behind the curtain" by enl_foo() macros */
                     "gained access to Moloch's Sanctum", "");
             break;
         case ACH_AMUL:
-            /* note: we won't get here if ACH_UWIN is going to be shown */
+            /* alternate wording for ascended (always past tense) since
+               hero had it until #offer forced it to be relinquished */
             enl_msg(You_,
                     u.uhave.amulet ? "have" : "have obtained",
-                    u.uhave.amulet ? "had" : "had obtained",
+                    u.uevent.ascended ? "delivered"
+                     : u.uhave.amulet ? "had" : "had obtained",
                     " the Amulet of Yendor", "");
             break;
 
@@ -1808,10 +1811,6 @@ int final; /* used "behind the curtain" by enl_foo() macros */
             enl_msg(You_, "have ", "", "reached the Astral Plane", "");
             break;
         case ACH_UWIN:
-            /* if we took Amulet achievement out of the list, show it now;
-               always uses past tense here since game ends upon ascension */
-            if (ach_amulet)
-                enl_msg(You_, "?", "delivered", " the Amulet of Yendor", "");
             /* the ultimate achievement... */
             enlght_out(" You ascended!");
             break;
@@ -1822,14 +1821,6 @@ int final; /* used "behind the curtain" by enl_foo() macros */
             break;
         } /* switch */
     } /* for */
-#ifdef XLOGFILE
-    /* if we removed the Amulet achievement because of ascension, put it
-       back for encoding in the achievements field of xlogfile; it will
-       change position from the original ordering but that doesn't matter
-       to the bitmask which is going to be constructed and logged */
-    if (ach_amulet)
-        record_achievement(ACH_AMUL);
-#endif
 
     if (awin != g.en_win) {
         display_nhwindow(awin, TRUE);
