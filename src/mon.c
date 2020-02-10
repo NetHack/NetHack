@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1580044343 2020/01/26 13:12:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.320 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1581322664 2020/02/10 08:17:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.321 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2065,7 +2065,7 @@ register struct monst *mtmp;
     if (mtmp->data->msound == MS_NEMESIS)
         nemdead();
     if (mtmp->data == &mons[PM_MEDUSA])
-        u.uachieve.killed_medusa = 1;
+        record_achievement(ACH_MEDU);
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         unmap_object(mtmp->mx, mtmp->my);
     m_detach(mtmp, mptr);

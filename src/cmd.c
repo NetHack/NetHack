@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1579914040 2020/01/25 01:00:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.394 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1581322659 2020/02/10 08:17:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.398 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -792,16 +792,12 @@ boolean pre, wiztower;
                 static const char Unachieve[] = "%s achievement revoked.";
 
                 if (Is_mineend_level(&u.uz)) {
-                    if (u.uachieve.mines_luckstone) {
+                    if (remove_achievement(ACH_LUCK))
                         pline(Unachieve, "Mine's end");
-                        u.uachieve.mines_luckstone = 0;
-                    }
                     g.context.achieveo.mines_prize_oid = 0;
                 } else if (Is_sokoend_level(&u.uz)) {
-                    if (u.uachieve.finish_sokoban) {
+                    if (remove_achievement(ACH_SOKO))
                         pline(Unachieve, "Sokoban end");
-                        u.uachieve.finish_sokoban = 0;
-                    }
                     g.context.achieveo.soko_prize_oid = 0;
                 }
             }

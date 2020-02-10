@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1546565814 2019/01/04 01:36:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.88 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1581322667 2020/02/10 08:17:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -259,6 +259,7 @@ struct obj *book2;
             /* successful invocation */
             mkinvokearea();
             u.uevent.invoked = 1;
+            record_achievement(ACH_INVK);
             /* in case you haven't killed the Wizard yet, behave as if
                you just did */
             u.uevent.udemigod = 1; /* wizdead() */

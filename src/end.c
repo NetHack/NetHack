@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1575245059 2019/12/02 00:04:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1581322661 2020/02/10 08:17:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -812,7 +812,7 @@ boolean taken;
 
     if (!done_stopprint) {
         if (should_query_disclose_option('c', &defquery)) {
-            int acnt = count_uachieve();
+            int acnt = count_achievements();
 
             Sprintf(qbuf, "Do you want to see your conduct%s%s?",
                     (acnt > 0) ? " and achievement" : "",
@@ -1222,6 +1222,17 @@ int how;
     iflags.at_night = night();
     iflags.at_midnight = midnight();
 
+    /* final achievement tracking; only show blind and nudist if some
+       tangible progress has been made; always show ascension last */
+    if (u.uachieved[0] || !flags.beginner) {
+        if (u.uroleplay.blind)
+            record_achievement(ACH_BLND); /* blind the whole game */
+        if (u.uroleplay.nudist)
+            record_achievement(ACH_NUDE); /* never wore armor */
+    }
+    if (how == ASCENDED)
+        record_achievement(ACH_UWIN);
+
     dump_open_log(endtime);
     /* Sometimes you die on the first move.  Life's not fair.
      * On those rare occasions you get hosed immediately, go out
@@ -1592,6 +1603,7 @@ int how;
      * score list?" */
     if (have_windows && !iflags.toptenwin)
         exit_nhwindows((char *) 0), have_windows = FALSE;
+    /* update 'logfile' and 'xlogfile', if enabled, and maybe 'record' */
     topten(how, endtime);
     if (have_windows)
         exit_nhwindows((char *) 0);
