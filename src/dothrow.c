@@ -28,6 +28,52 @@ static NEARDATA const char bullets[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES,
 
 /* g.thrownobj (decl.c) tracks an object until it lands */
 
+int
+multishot_class_bonus(pm, ammo, launcher)
+int pm;
+struct obj *ammo;
+struct obj *launcher; /* can be NULL */
+{
+    int multishot = 0;
+    schar skill = objects[ammo->otyp].oc_skill;
+
+    switch (pm) {
+    case PM_CAVEMAN:
+        /* give bonus for low-tech gear */
+        if (skill == -P_SLING || skill == P_SPEAR)
+            multishot++;
+        break;
+    case PM_MONK:
+        /* allow higher volley count despite skill limitation */
+        if (skill == -P_SHURIKEN)
+            multishot++;
+        break;
+    case PM_RANGER:
+        /* arbitrary; encourage use of other missiles beside daggers */
+        if (skill != P_DAGGER)
+            multishot++;
+        break;
+    case PM_ROGUE:
+        /* possibly should add knives... */
+        if (skill == P_DAGGER)
+            multishot++;
+        break;
+    case PM_NINJA:
+        if (skill == -P_SHURIKEN || skill == -P_DART)
+            multishot++;
+        /*FALLTHRU*/
+    case PM_SAMURAI:
+        /* role-specific launcher and its ammo */
+        if (ammo->otyp == YA && launcher && launcher->otyp == YUMI)
+            multishot++;
+        break;
+    default:
+        break; /* No bonus */
+    }
+
+    return multishot;
+}
+
 /* Throw the selected object, asking for direction */
 static int
 throw_obj(obj, shotlimit)
@@ -130,35 +176,8 @@ int shotlimit;
             break;
         }
         /* ...or is using a special weapon for their role... */
-        switch (Role_switch) {
-        case PM_CAVEMAN:
-            /* give bonus for low-tech gear */
-            if (skill == -P_SLING || skill == P_SPEAR)
-                multishot++;
-            break;
-        case PM_MONK:
-            /* allow higher volley count despite skill limitation */
-            if (skill == -P_SHURIKEN)
-                multishot++;
-            break;
-        case PM_RANGER:
-            /* arbitrary; encourage use of other missiles beside daggers */
-            if (skill != P_DAGGER)
-                multishot++;
-            break;
-        case PM_ROGUE:
-            /* possibly should add knives... */
-            if (skill == P_DAGGER)
-                multishot++;
-            break;
-        case PM_SAMURAI:
-            /* role-specific launcher and its ammo */
-            if (obj->otyp == YA && uwep && uwep->otyp == YUMI)
-                multishot++;
-            break;
-        default:
-            break; /* No bonus */
-        }
+        multishot += multishot_class_bonus(Role_switch, obj, uwep);
+
         /* ...or using their race's special bow; no bonus for spears */
         if (!weakmultishot)
             switch (Race_switch) {

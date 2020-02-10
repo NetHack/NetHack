@@ -587,12 +587,12 @@ reglyph_darkroom()
                 || Is_rogue_level(&u.uz)) {
                 if (lev->glyph == cmap_to_glyph(S_darkroom))
                     lev->glyph = lev->waslit ? cmap_to_glyph(S_room)
-                                             : cmap_to_glyph(S_stone);
+                                             : GLYPH_NOTHING;
             } else {
                 if (lev->glyph == cmap_to_glyph(S_room) && lev->seenv
                     && lev->waslit && !cansee(x, y))
                     lev->glyph = cmap_to_glyph(S_darkroom);
-                else if (lev->glyph == cmap_to_glyph(S_stone)
+                else if (lev->glyph == GLYPH_NOTHING
                          && lev->typ == ROOM && lev->seenv && !cansee(x, y))
                     lev->glyph = cmap_to_glyph(S_darkroom);
             }
@@ -600,7 +600,7 @@ reglyph_darkroom()
     if (flags.dark_room && iflags.use_color)
         g.showsyms[S_darkroom] = g.showsyms[S_room];
     else
-        g.showsyms[S_darkroom] = g.showsyms[S_stone];
+        g.showsyms[S_darkroom] = g.showsyms[SYM_NOTHING + SYM_OFF_X];
 }
 
 /* check whether a user-supplied option string is a proper leading
@@ -703,7 +703,7 @@ initoptions_init()
         if (boolopt[i].addr)
             *(boolopt[i].addr) = boolopt[i].initvalue;
     }
-
+    condopt(0, (boolean *) 0, 0);  /* make the choices match defaults */
 #ifdef SYSFLAGS
     Strcpy(sysflags.sysflagsid, "sysflags");
     sysflags.sysflagsid[9] = (char) sizeof (struct sysflag);
@@ -1973,6 +1973,8 @@ char c;
     return FALSE;
 }
 
+#define is_cond_option(x) (!strncmpi((x), "cond_", sizeof "cond_" - 1))
+
 boolean
 parseoptions(opts, tinitial, tfrom_file)
 register char *opts;
@@ -2044,6 +2046,29 @@ boolean tinitial, tfrom_file;
             return FALSE;
         } else
             flags.initgend = flags.female = negated;
+        return retval;
+    }
+
+    /* some prefix-based options */
+
+    if (is_cond_option(opts)) {
+        int reslt;
+
+        if ((reslt = parse_cond_option(negated, opts)) != 0) {
+            switch(reslt) {
+              case 3:
+                 config_error_add("Ambiguous condition option %s", opts);
+                 break;
+              case 1:
+              case 2:
+              default:
+                 config_error_add("Unknown condition option %s (%d)",
+                                 opts, reslt);
+                 break;
+            }
+            return FALSE;
+        }
+        g.opt_need_redraw = TRUE;
         return retval;
     }
 
@@ -4089,6 +4114,7 @@ boolean tinitial, tfrom_file;
                    map if ascii map isn't supported? */
                 iflags.wc_ascii_map = negated;
             }
+
             /* only do processing below if setting with doset() */
             if (g.opt_initial)
                 return retval;
@@ -4440,6 +4466,18 @@ int nset;
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
 }
 
+static int
+count_cond(VOID_ARGS)
+{
+    int i, cnt = 0;
+
+    for (i = 0; i < CONDITION_COUNT; ++i) {
+        if (condtests[i].enabled)
+            cnt++;
+    }
+    return cnt;
+}
+
 int
 count_apes(VOID_ARGS)
 {
@@ -4455,6 +4493,7 @@ count_apes(VOID_ARGS)
 }
 
 enum opt_other_enums {
+    OPT_OTHER_COND = -5,
     OPT_OTHER_MSGTYPE = -4,
     OPT_OTHER_MENUCOLOR = -3,
     OPT_OTHER_STATHILITE = -2,
@@ -4469,6 +4508,8 @@ static struct other_opts {
     int NDECL((*othr_count_func));
 } othropt[] = {
     { "autopickup exceptions", SET_IN_GAME, OPT_OTHER_APEXC, count_apes },
+    { "status condition fields", SET_IN_GAME,
+      OPT_OTHER_COND, count_cond },
     { "menu colors", SET_IN_GAME, OPT_OTHER_MENUCOLOR, count_menucolors },
     { "message types", SET_IN_GAME, OPT_OTHER_MSGTYPE, msgtype_count },
 #ifdef STATUS_HILITES
@@ -4641,6 +4682,9 @@ doset() /* changing options via menu by Per Liboriussen */
 #endif
             } else if (opt_indx == OPT_OTHER_MENUCOLOR) {
                     (void) special_handling("menu_colors", setinitial,
+                                            fromfile);
+            } else if (opt_indx == OPT_OTHER_COND) {
+                    (void) special_handling("condition_options", setinitial,
                                             fromfile);
             } else if (opt_indx == OPT_OTHER_MSGTYPE) {
                     (void) special_handling("msgtype", setinitial, fromfile);
@@ -5562,7 +5606,8 @@ boolean setinitial, setfromfile;
             assign_graphics(PRIMARY);
         preference_update("symset");
         g.opt_need_redraw = TRUE;
-
+    } else if (!strcmp("condition_options", optname)) {
+        cond_menu();    /* in botl.c */
     } else {
         /* didn't match any of the special options */
         return FALSE;

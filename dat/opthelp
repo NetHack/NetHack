@@ -64,8 +64,9 @@ status_updates update the status lines                            [TRUE]
 time           display elapsed game time, in moves                [FALSE]
 tombstone      print tombstone when you die                       [TRUE]
 toptenwin      print topten in a window rather than stdout        [FALSE]
-travel         enable the command to travel to a map location via [TRUE]
-               a shortest-path algorithm, usually invoked by '_'.
+travel         enables travelling via mouse click if supported;   [TRUE]
+               can be toggled off to prevent mouse clicks on the map from
+               attempting to move the hero; does not affect travel via '_'
 use_darkgray   use bold black instead of blue for black glyphs.   [TRUE]
 use_inverse    display detected monsters in highlighted manner    [FALSE]
 verbose        print more commentary during the game              [TRUE]

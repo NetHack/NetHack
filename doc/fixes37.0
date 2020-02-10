@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ $NHDT-Date: 1580633720 2020/02/02 08:55:20 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ $NHDT-Date: 1581210469 2020/02/09 01:07:49 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -51,6 +51,10 @@ throttle long worm growth rate and HP accumulation
 poly'd hero was able to zap wands, apply tools, and #rub objects without
 	having any hands
 spellcasting monster got an extra move after casting
+allow defining #wizgenesis quantity in the prompt
+digging through iron bars from an adjacent pit made a pit on top of the bars
+give feedback if controlled level teleport attempt fails because hero is
+	already on the bottom level and player tries to go even deeper
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -86,6 +90,9 @@ creating Mine Town variant 1 (Orcish Town) sometimes complained about being
 prevent "you materialize on a different level" after "a mysterious force
 	prevents you from descending" if you try to level teleport past the
 	stairs down from the quest home level before being granted access
+set g.context.botl for glove and wielding actions that could start or end
+	bare-handedness in support of condtests[bl_bareh]
+reinstate ranked ordering of the status condition fields
 
 
 Platform- and/or Interface-Specific Fixes
@@ -94,6 +101,7 @@ msdos:  Add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs. 
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
+windows: update for new status condition fields
 
 
 General New Features
@@ -141,6 +149,13 @@ new 'mention_decor' option; when On, describe dungeon features being stepped
 	on or floated/flown over even when they're not covered by objects
 applying royal jelly on an egg kills, revives, or changes the egg
 intelligent monsters pick up and rummage through containers
+toggling 'travel' option Off now only inhibits travel by mouse click, not by
+	'_' command where choosing the destination provides a chance to cancel
+different glyphs and symbols for stone and unexplored areas
+new glyph GLYPH_NOTHING was added so !dark_room has something to be set to
+	now that stone could be mapped to an entirely different symbol
+added several new status conditions all of which are opt-in except
+	the new cond_grab and cond_lava which are opt-out
 
 
 Platform- and/or Interface-Specific New Features
@@ -183,5 +198,12 @@ window-port-interface: add_menu() modified to take a more general itemflags
 	parameter to support uses beyond just 'preselected'
 add some bounds checking to tabexpand (doesn't prevent the apparent compiler
 	optimization bug that put homebrew OSX executable into endless loop)
-
+unified breamm and breamu
+added some stair helper functions
+unified the code for finding a queen bee
+unified the code for multishot class bonus code
+unified the code for obtaining the inventory letter value for sortloot
+unified the code for (un)locking boxes in inventory
+unified the code for finding room pos for some features
+unified the code for revealing hiding monsters for mvm attacks
 

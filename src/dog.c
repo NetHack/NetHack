@@ -755,17 +755,10 @@ register struct obj *obj;
             return POISON;
         if (obj->otyp == LUMP_OF_ROYAL_JELLY
             && mon->data == &mons[PM_KILLER_BEE]) {
-            struct monst *mtmp = 0;
+            struct monst *mtmp = find_pmmonst(PM_QUEEN_BEE);
 
             /* if there's a queen bee on the level, don't eat royal jelly;
                if there isn't, do eat it and grow into a queen */
-            if ((g.mvitals[PM_QUEEN_BEE].mvflags & G_GENOD) == 0)
-                for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                    if (DEADMONSTER(mtmp))
-                        continue;
-                    if (mtmp->data == &mons[PM_QUEEN_BEE])
-                        break;
-                }
             return !mtmp ? DOGFOOD : TABU;
         }
         if (!carni && !herbi)

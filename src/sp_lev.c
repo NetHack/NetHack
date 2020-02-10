@@ -92,6 +92,7 @@ static void FDECL(sel_set_feature, (int, int, genericptr_t));
 static int FDECL(get_coord, (lua_State *, int, int *, int *));
 static int FDECL(get_table_region, (lua_State *, const char *,
                                     int *, int *, int *, int *, BOOLEAN_P));
+static void FDECL(set_wallprop_in_selection, (lua_State *, int));
 
 /* lua_CFunction prototypes */
 int FDECL(lspo_altar, (lua_State *));
@@ -5169,13 +5170,11 @@ lua_State *L;
     return 0;
 }
 
-/* non_diggable(selection); */
-/* non_diggable(); */
-int
-lspo_non_diggable(L)
+static void
+set_wallprop_in_selection(L, prop)
 lua_State *L;
+int prop;
 {
-    int prop = W_NONDIGGABLE;
     int argc = lua_gettop(L);
     boolean freesel = FALSE;
     struct selectionvar *sel = (struct selectionvar *) 0;
@@ -5197,7 +5196,15 @@ lua_State *L;
             free(sel);
         }
     }
+}
 
+/* non_diggable(selection); */
+/* non_diggable(); */
+int
+lspo_non_diggable(L)
+lua_State *L;
+{
+    set_wallprop_in_selection(L, W_NONDIGGABLE);
     return 0;
 }
 
@@ -5207,29 +5214,7 @@ int
 lspo_non_passwall(L)
 lua_State *L;
 {
-    int prop = W_NONPASSWALL;
-    int argc = lua_gettop(L);
-    boolean freesel = FALSE;
-    struct selectionvar *sel = (struct selectionvar *) 0;
-
-    create_des_coder();
-
-    if (argc == 1)
-        sel = l_selection_check(L, -1);
-    else if (argc == 0) {
-        freesel = TRUE;
-        sel = selection_new();
-        selection_not(sel);
-    }
-
-    if (sel) {
-        selection_iterate(sel, sel_set_wall_property, (genericptr_t) &prop);
-        if (freesel) {
-            selection_free(sel);
-            free(sel);
-        }
-    }
-
+    set_wallprop_in_selection(L, W_NONPASSWALL);
     return 0;
 }
 

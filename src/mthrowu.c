@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1573688695 2019/11/13 23:44:55 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1581184742 2020/02/08 17:59:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -151,7 +151,6 @@ monmulti(mtmp, otmp, mwep)
 struct monst *mtmp;
 struct obj *otmp, *mwep;
 {
-    int skill = (int) objects[otmp->otyp].oc_skill;
     int multishot = 1;
 
     if (otmp->quan > 1L /* no point checking if there's only 1 */
@@ -188,34 +187,8 @@ struct obj *otmp, *mwep;
         multishot = (long) rnd((int) multishot);
 
         /* class bonus */
-        switch (monsndx(mtmp->data)) {
-        case PM_CAVEMAN: /* give bonus for low-tech gear */
-            if (skill == -P_SLING || skill == P_SPEAR)
-                multishot++;
-            break;
-        case PM_MONK: /* allow higher volley count */
-            if (skill == -P_SHURIKEN)
-                multishot++;
-            break;
-        case PM_RANGER:
-            if (skill != P_DAGGER)
-                multishot++;
-            break;
-        case PM_ROGUE:
-            if (skill == P_DAGGER)
-                multishot++;
-            break;
-        case PM_NINJA:
-            if (skill == -P_SHURIKEN || skill == -P_DART)
-                multishot++;
-            /*FALLTHRU*/
-        case PM_SAMURAI:
-            if (otmp->otyp == YA && mwep->otyp == YUMI)
-                multishot++;
-            break;
-        default:
-            break;
-        }
+        multishot += multishot_class_bonus(monsndx(mtmp->data), otmp, mwep);
+
         /* racial bonus */
         if ((is_elf(mtmp->data) && otmp->otyp == ELVEN_ARROW
             && mwep->otyp == ELVEN_BOW)
@@ -815,15 +788,19 @@ struct attack  *mattk;
         }
         if (!mtmp->mspec_used && rn2(3)) {
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
+                boolean utarget = (mtarg == &g.youmonst);
                 if (canseemon(mtmp))
                     pline("%s breathes %s!", Monnam(mtmp), breathwep[typ - 1]);
                 dobuzz((int) (-20 - (typ - 1)), (int) mattk->damn,
-                       mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby), FALSE);
+                       mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby), utarget);
                 nomul(0);
                 /* breath runs out sometimes. Also, give monster some
                  * cunning; don't breath if the target fell asleep.
                  */
-                mtmp->mspec_used = 6 + rn2(18);
+                if (!utarget || !rn2(3))
+                    mtmp->mspec_used = 8 + rn2(18);
+                if (utarget && typ == AD_SLEE && !Sleep_resistance)
+                    mtmp->mspec_used += rnd(20);
 
                 /* If this is a pet, it'll get hungry. Minions and
                  * spell beings won't hunger */
@@ -992,39 +969,7 @@ breamu(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
 {
-    /* if new breath types are added, change AD_ACID to max type */
-    int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_ACID) : mattk->adtyp;
-
-    if (lined_up(mtmp)) {
-        if (mtmp->mcan) {
-            if (!Deaf) {
-                if (canseemon(mtmp))
-                    pline("%s coughs.", Monnam(mtmp));
-                else
-                    You_hear("a cough.");
-            }
-            return 0;
-        }
-        if (!mtmp->mspec_used && rn2(3)) {
-            if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
-                if (canseemon(mtmp))
-                    pline("%s breathes %s!", Monnam(mtmp),
-                          breathwep[typ - 1]);
-                buzz((int) (-20 - (typ - 1)), (int) mattk->damn, mtmp->mx,
-                     mtmp->my, sgn(g.tbx), sgn(g.tby));
-                nomul(0);
-                /* breath runs out sometimes. Also, give monster some
-                 * cunning; don't breath if the player fell asleep.
-                 */
-                if (!rn2(3))
-                    mtmp->mspec_used = 10 + rn2(20);
-                if (typ == AD_SLEE && !Sleep_resistance)
-                    mtmp->mspec_used += rnd(20);
-            } else
-                impossible("Breath weapon %d used", typ - 1);
-        }
-    }
-    return 1;
+    return breamm(mtmp, mattk, &g.youmonst);
 }
 
 boolean
@@ -1073,27 +1018,29 @@ static boolean
 m_lined_up(mtarg, mtmp)
 struct monst *mtarg, *mtmp;
 {
-    return (linedup(mtarg->mx, mtarg->my, mtmp->mx, mtmp->my, 0));
-}
-
-
-/* is mtmp in position to use ranged attack? */
-boolean
-lined_up(mtmp)
-register struct monst *mtmp;
-{
-    boolean ignore_boulders;
+    boolean utarget = (mtarg == &g.youmonst);
+    xchar tx = utarget ? mtmp->mux : mtarg->mx;
+    xchar ty = utarget ? mtmp->muy : mtarg->my;
+    boolean ignore_boulders = utarget && (throws_rocks(mtmp->data)
+                                          || m_carrying(mtmp, WAN_STRIKING));
 
     /* hero concealment usually trumps monst awareness of being lined up */
-    if (Upolyd && rn2(25)
+    if (utarget && Upolyd && rn2(25)
         && (u.uundetected || (U_AP_TYPE != M_AP_NOTHING
                               && U_AP_TYPE != M_AP_MONSTER)))
         return FALSE;
 
-    ignore_boulders = (throws_rocks(mtmp->data)
-                       || m_carrying(mtmp, WAN_STRIKING));
-    return linedup(mtmp->mux, mtmp->muy, mtmp->mx, mtmp->my,
-                   ignore_boulders ? 1 : 2);
+    return linedup(tx, ty, mtmp->mx, mtmp->my,
+                   utarget ? (ignore_boulders ? 1 : 2) : 0);
+}
+
+
+/* is mtmp in position to use ranged attack on hero? */
+boolean
+lined_up(mtmp)
+register struct monst *mtmp;
+{
+    return m_lined_up(&g.youmonst, mtmp);
 }
 
 /* check if a monster is carrying a particular item */

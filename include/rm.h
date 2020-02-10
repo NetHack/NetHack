@@ -264,11 +264,13 @@ struct symparse {
 };
 
 /* misc symbol definitions */
-#define SYM_BOULDER 0
-#define SYM_INVISIBLE 1
-#define SYM_PET_OVERRIDE 2
-#define SYM_HERO_OVERRIDE 3
-#define MAXOTHER 4
+#define SYM_NOTHING 0
+#define SYM_UNEXPLORED 1
+#define SYM_BOULDER 2
+#define SYM_INVISIBLE 3
+#define SYM_PET_OVERRIDE 4
+#define SYM_HERO_OVERRIDE 5
+#define MAXOTHER 6
 
 /* linked list of symsets and their characteristics */
 struct symsetentry {

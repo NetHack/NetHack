@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1574646948 2019/11/25 01:55:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1581280068 2020/02/09 20:27:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,8 @@ static int FDECL(l_selection_setpoint, (lua_State *));
 static int FDECL(l_selection_not, (lua_State *));
 static int FDECL(l_selection_filter_percent, (lua_State *));
 static int FDECL(l_selection_rndcoord, (lua_State *));
+static boolean FDECL(params_sel_2coords, (lua_State *, struct selectionvar **,
+                                          schar *, schar *, schar *, schar *));
 static int FDECL(l_selection_line, (lua_State *));
 static int FDECL(l_selection_randline, (lua_State *));
 static int FDECL(l_selection_rect, (lua_State *));
@@ -312,6 +314,39 @@ lua_State *L;
     return 2;
 }
 
+/* function(selection, x1,y1, x2,y2) */
+/* selection:function(x1,y1, x2,y2) */
+static boolean
+params_sel_2coords(L, sel, x1,y1, x2,y2)
+lua_State *L;
+struct selectionvar **sel;
+schar *x1, *y1, *x2, *y2;
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 4) {
+        (void) l_selection_new(L);
+        *x1 = (schar) luaL_checkinteger(L, 1);
+        *y1 = (schar) luaL_checkinteger(L, 2);
+        *x2 = (schar) luaL_checkinteger(L, 3);
+        *y2 = (schar) luaL_checkinteger(L, 4);
+        *sel = l_selection_check(L, 5);
+        lua_remove(L, 1);
+        lua_remove(L, 1);
+        lua_remove(L, 1);
+        lua_remove(L, 1);
+        return TRUE;
+    } else if (argc == 5) {
+        *sel = l_selection_check(L, 1);
+        *x1 = (schar) luaL_checkinteger(L, 2);
+        *y1 = (schar) luaL_checkinteger(L, 3);
+        *x2 = (schar) luaL_checkinteger(L, 4);
+        *y2 = (schar) luaL_checkinteger(L, 5);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /* local s = selection.line(sel, x1,y1, x2,y2); */
 /* local s = selection.line(x1,y1, x2,y2); */
 /* s:line(x1,y1, x2,y2); */
@@ -319,30 +354,14 @@ static int
 l_selection_line(L)
 lua_State *L;
 {
-    int argc = lua_gettop(L);
     struct selectionvar *sel;
     schar x1;
     schar y1;
     schar x2;
     schar y2;
 
-    if (argc == 4) {
-        (void) l_selection_new(L);
-        x1 = (schar) luaL_checkinteger(L, 1);
-        y1 = (schar) luaL_checkinteger(L, 2);
-        x2 = (schar) luaL_checkinteger(L, 3);
-        y2 = (schar) luaL_checkinteger(L, 4);
-        sel = l_selection_check(L, 5);
-        lua_remove(L, 1);
-        lua_remove(L, 1);
-        lua_remove(L, 1);
-        lua_remove(L, 1);
-    } else {
-        sel = l_selection_check(L, 1);
-        x1 = (schar) luaL_checkinteger(L, 2);
-        y1 = (schar) luaL_checkinteger(L, 3);
-        x2 = (schar) luaL_checkinteger(L, 4);
-        y2 = (schar) luaL_checkinteger(L, 5);
+    if (!params_sel_2coords(L, &sel, &x1, &y1, &x2, &y2)) {
+        nhl_error(L, "selection.line: illegal arguments");
     }
 
     get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
@@ -358,39 +377,25 @@ static int
 l_selection_rect(L)
 lua_State *L;
 {
-    int argc = lua_gettop(L);
     struct selectionvar *sel;
     schar x1;
     schar y1;
     schar x2;
     schar y2;
 
-    if (argc == 4) {
-        (void) l_selection_new(L);
-        x1 = (schar) luaL_checkinteger(L, 1);
-        y1 = (schar) luaL_checkinteger(L, 2);
-        x2 = (schar) luaL_checkinteger(L, 3);
-        y2 = (schar) luaL_checkinteger(L, 4);
-        sel = l_selection_check(L, 5);
-        lua_remove(L, 1);
-        lua_remove(L, 1);
-        lua_remove(L, 1);
-        lua_remove(L, 1);
-    } else {
-        sel = l_selection_check(L, 1);
-        x1 = (schar) luaL_checkinteger(L, 2);
-        y1 = (schar) luaL_checkinteger(L, 3);
-        x2 = (schar) luaL_checkinteger(L, 4);
-        y2 = (schar) luaL_checkinteger(L, 5);
+    if (!params_sel_2coords(L, &sel, &x1, &y1, &x2, &y2)) {
+        nhl_error(L, "selection.rect: illegal arguments");
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
-    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2,y2));
+    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL,
+                       SP_COORD_PACK(x1, y1));
+    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
+                       SP_COORD_PACK(x2, y2));
 
-    selection_do_line(x1,y1,x2,y1, sel);
-    selection_do_line(x1,y1,x1,y2, sel);
-    selection_do_line(x2,y1,x2,y2, sel);
-    selection_do_line(x1,y2,x2,y2, sel);
+    selection_do_line(x1, y1, x2, y1, sel);
+    selection_do_line(x1, y1, x1, y2, sel);
+    selection_do_line(x2, y1, x2, y2, sel);
+    selection_do_line(x1, y2, x2, y2, sel);
     lua_settop(L, 1);
     return 1;
 }
@@ -403,7 +408,6 @@ static int
 l_selection_fillrect(L)
 lua_State *L;
 {
-    int argc = lua_gettop(L);
     struct selectionvar *sel;
     int y;
     schar x1;
@@ -411,34 +415,21 @@ lua_State *L;
     schar x2;
     schar y2;
 
-    if (argc == 4) {
-        (void) l_selection_new(L);
-        x1 = (schar) luaL_checkinteger(L, 1);
-        y1 = (schar) luaL_checkinteger(L, 2);
-        x2 = (schar) luaL_checkinteger(L, 3);
-        y2 = (schar) luaL_checkinteger(L, 4);
-        sel = l_selection_check(L, 5);
-        lua_remove(L, 1);
-        lua_remove(L, 1);
-        lua_remove(L, 1);
-        lua_remove(L, 1);
-    } else {
-        sel = l_selection_check(L, 1);
-        x1 = (schar) luaL_checkinteger(L, 2);
-        y1 = (schar) luaL_checkinteger(L, 3);
-        x2 = (schar) luaL_checkinteger(L, 4);
-        y2 = (schar) luaL_checkinteger(L, 5);
+    if (!params_sel_2coords(L, &sel, &x1, &y1, &x2, &y2)) {
+        nhl_error(L, "selection.fillrect: illegal arguments");
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
-    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2,y2));
+    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL,
+                       SP_COORD_PACK(x1, y1));
+    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
+                       SP_COORD_PACK(x2, y2));
 
     if (x1 == x2) {
         for (y = y1; y <= y2; y++)
             selection_setpoint(x1, y, sel, 1);
     } else {
         for (y = y1; y <= y2; y++)
-            selection_do_line(x1,y,x2,y, sel);
+            selection_do_line(x1, y, x2, y, sel);
     }
     lua_settop(L, 1);
     return 1;

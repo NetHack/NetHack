@@ -3691,25 +3691,8 @@ static unsigned long *tty_colormasks;
 static long tty_condition_bits;
 static struct tty_status_fields tty_status[2][MAXBLSTATS]; /* 2: NOW,BEFORE */
 static int hpbar_percent, hpbar_color;
-static struct condition_t {
-    long mask;
-    const char *text[3]; /* 3: potential display vals, progressively shorter */
-} conditions[] = {
-    /* The sequence order of these matters */
-    { BL_MASK_STONE,    { "Stone",    "Ston",  "Sto" } },
-    { BL_MASK_SLIME,    { "Slime",    "Slim",  "Slm" } },
-    { BL_MASK_STRNGL,   { "Strngl",   "Stngl", "Str" } },
-    { BL_MASK_FOODPOIS, { "FoodPois", "Fpois", "Poi" } },
-    { BL_MASK_TERMILL,  { "TermIll" , "Ill",   "Ill" } },
-    { BL_MASK_BLIND,    { "Blind",    "Blnd",  "Bl"  } },
-    { BL_MASK_DEAF,     { "Deaf",     "Def",   "Df"  } },
-    { BL_MASK_STUN,     { "Stun",     "Stun",  "St"  } },
-    { BL_MASK_CONF,     { "Conf",     "Cnf",   "Cf"  } },
-    { BL_MASK_HALLU,    { "Hallu",    "Hal",   "Hl"  } },
-    { BL_MASK_LEV,      { "Lev",      "Lev",   "Lv"  } },
-    { BL_MASK_FLY,      { "Fly",      "Fly",   "Fl"  } },
-    { BL_MASK_RIDE,     { "Ride",     "Rid",   "Rd"  } },
-};
+extern const struct conditions_t conditions[CONDITION_COUNT];
+
 static const char *encvals[3][6] = {
     { "", "Burdened", "Stressed", "Strained", "Overtaxed", "Overloaded" },
     { "", "Burden",   "Stress",   "Strain",   "Overtax",   "Overload"   },
@@ -3833,19 +3816,36 @@ boolean enable;
  *      -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
  *         If fldindex is BL_CONDITION, then ptr is a long value with
  *         any or none of the following bits set (from botl.h):
- *              BL_MASK_STONE           0x00000001L
- *              BL_MASK_SLIME           0x00000002L
- *              BL_MASK_STRNGL          0x00000004L
- *              BL_MASK_FOODPOIS        0x00000008L
- *              BL_MASK_TERMILL         0x00000010L
- *              BL_MASK_BLIND           0x00000020L
- *              BL_MASK_DEAF            0x00000040L
- *              BL_MASK_STUN            0x00000080L
- *              BL_MASK_CONF            0x00000100L
- *              BL_MASK_HALLU           0x00000200L
- *              BL_MASK_LEV             0x00000400L
- *              BL_MASK_FLY             0x00000800L
- *              BL_MASK_RIDE            0x00001000L
+ *               BL_MASK_BAREH        0x00000001L
+ *               BL_MASK_BLIND        0x00000002L
+ *               BL_MASK_BUSY         0x00000004L
+ *               BL_MASK_CONF         0x00000008L
+ *               BL_MASK_DEAF         0x00000010L
+ *               BL_MASK_ELF_IRON     0x00000020L
+ *               BL_MASK_FLY          0x00000040L
+ *               BL_MASK_FOODPOIS     0x00000080L
+ *               BL_MASK_GLOWHANDS    0x00000100L
+ *               BL_MASK_GRAB         0x00000200L
+ *               BL_MASK_HALLU        0x00000400L
+ *               BL_MASK_HELD         0x00000800L
+ *               BL_MASK_ICY          0x00001000L
+ *               BL_MASK_INLAVA       0x00002000L
+ *               BL_MASK_LEV          0x00004000L
+ *               BL_MASK_PARLYZ       0x00008000L
+ *               BL_MASK_RIDE         0x00010000L
+ *               BL_MASK_SLEEPING     0x00020000L
+ *               BL_MASK_SLIME        0x00040000L
+ *               BL_MASK_SLIPPERY     0x00080000L
+ *               BL_MASK_STONE        0x00100000L
+ *               BL_MASK_STRNGL       0x00200000L
+ *               BL_MASK_STUN         0x00400000L
+ *               BL_MASK_SUBMERGED    0x00800000L
+ *               BL_MASK_TERMILL      0x01000000L
+ *               BL_MASK_TETHERED     0x02000000L
+ *               BL_MASK_TRAPPED      0x04000000L
+ *               BL_MASK_UNCONSC      0x08000000L
+ *               BL_MASK_WOUNDEDL     0x10000000L
+ *
  *      -- The value passed for BL_GOLD usually includes an encoded leading
  *         symbol for GOLD "\GXXXXNNNN:nnn". If the window port needs to use
  *         the textual gold amount without the leading "$:" the port will
@@ -4409,7 +4409,7 @@ static void
 render_status(VOID_ARGS)
 {
     long mask, bits;
-    int i, x, y, idx, c, row, tlth, num_rows, coloridx = 0, attrmask = 0;
+    int i, x, y, idx, c, ci, row, tlth, num_rows, coloridx = 0, attrmask = 0;
     char *text;
     struct WinDesc *cw = 0;
 
@@ -4473,7 +4473,8 @@ render_status(VOID_ARGS)
                         tty_curs(WIN_STATUS, x, y);
                     }
                     for (c = 0; c < SIZE(conditions) && bits != 0L; ++c) {
-                        mask = conditions[c].mask;
+                        ci = cond_idx[c];
+                        mask = conditions[ci].mask;
                         if (bits & mask) {
                             const char *condtext;
 
@@ -4485,7 +4486,7 @@ render_status(VOID_ARGS)
                                 if (coloridx != NO_COLOR)
                                     term_start_color(coloridx);
                             }
-                            condtext = conditions[c].text[cond_shrinklvl];
+                            condtext = conditions[ci].text[cond_shrinklvl];
                             if (x >= cw->cols && !truncation_expected) {
                                 impossible(
                          "Unexpected condition placement overflow for \"%s\"",

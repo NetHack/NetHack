@@ -15,6 +15,7 @@
 
 static void FDECL(loot_classify, (Loot *, struct obj *));
 static char *FDECL(loot_xname, (struct obj *));
+static int FDECL(invletter_value, (CHAR_P));
 static int FDECL(CFDECLSPEC sortloot_cmp, (const genericptr,
                                                const genericptr));
 static void NDECL(reorder_invent);
@@ -294,6 +295,17 @@ struct obj *obj;
     return res;
 }
 
+static int
+invletter_value(c)
+char c;
+{
+    return ('a' <= c && c <= 'z') ? (c - 'a' + 2)
+        : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
+        : (c == '$') ? 1
+        : (c == '#') ? 1 + 52 + 1
+        : 1 + 52 + 1 + 1; /* none of the above */
+}
+
 /* qsort comparison routine for sortloot() */
 static int CFDECLSPEC
 sortloot_cmp(vptr1, vptr2)
@@ -305,7 +317,7 @@ const genericptr vptr2;
     struct obj *obj1 = sli1->obj,
                *obj2 = sli2->obj;
     char *nam1, *nam2;
-    int val1, val2, c, namcmp;
+    int val1, val2, namcmp;
 
     /* order by object class unless we're doing by-invlet without sortpack */
     if ((g.sortlootmode & (SORTLOOT_PACK | SORTLOOT_INVLET))
@@ -350,18 +362,8 @@ const genericptr vptr2;
 
     /* order by assigned inventory letter */
     if ((g.sortlootmode & SORTLOOT_INVLET) != 0) {
-        c = obj1->invlet;
-        val1 = ('a' <= c && c <= 'z') ? (c - 'a' + 2)
-               : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
-                 : (c == '$') ? 1
-                   : (c == '#') ? 1 + 52 + 1
-                     : 1 + 52 + 1 + 1; /* none of the above */
-        c = obj2->invlet;
-        val2 = ('a' <= c && c <= 'z') ? (c - 'a' + 2)
-               : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
-                 : (c == '$') ? 1
-                   : (c == '#') ? 1 + 52 + 1
-                     : 1 + 52 + 1 + 1; /* none of the above */
+        val1 = invletter_value(obj1->invlet);
+        val2 = invletter_value(obj2->invlet);
         if (val1 != val2)
             return val1 - val2;
     }

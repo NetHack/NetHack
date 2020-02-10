@@ -169,9 +169,9 @@ int show;
     if (!cansee(x, y) && !lev->waslit) {
         /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
         if (lev->typ == ROOM && glyph == cmap_to_glyph(S_room))
-            glyph = cmap_to_glyph((flags.dark_room && iflags.use_color)
-                                      ? (DARKROOMSYM)
-                                      : S_stone);
+            glyph = (flags.dark_room && iflags.use_color)
+                        ? cmap_to_glyph(DARKROOMSYM)
+                        : GLYPH_NOTHING;
         else if (lev->typ == CORR && glyph == cmap_to_glyph(S_litcorr))
             glyph = cmap_to_glyph(S_corr);
     }
@@ -1137,7 +1137,7 @@ int first;
         for (y = lasty - 1; y <= lasty + 1; y++)
             for (x = lastx - 1; x <= lastx + 1; x++)
                 if (isok(x, y))
-                    show_glyph(x, y, cmap_to_glyph(S_stone));
+                    show_glyph(x, y, GLYPH_UNEXPLORED);
     }
 
     swallower = monsndx(u.ustuck->data);
@@ -1211,7 +1211,7 @@ int mode;
         for (y = lasty - 1; y <= lasty + 1; y++)
             for (x = lastx - 1; x <= lastx + 1; x++)
                 if (isok(x, y))
-                    show_glyph(x, y, cmap_to_glyph(S_stone));
+                    show_glyph(x, y, GLYPH_UNEXPLORED);
     }
 
     /*
@@ -1222,7 +1222,7 @@ int mode;
         for (y = u.uy - 1; y <= u.uy + 1; y++)
             if (isok(x, y) && (is_pool_or_lava(x, y) || is_ice(x, y))) {
                 if (Blind && !(x == u.ux && y == u.uy))
-                    show_glyph(x, y, cmap_to_glyph(S_stone));
+                    show_glyph(x, y, GLYPH_UNEXPLORED);
                 else
                     newsym(x, y);
             }
@@ -1411,8 +1411,7 @@ docrt()
     for (x = 1; x < COLNO; x++) {
         lev = &levl[x][0];
         for (y = 0; y < ROWNO; y++, lev++)
-            if (lev->glyph != cmap_to_glyph(S_stone))
-                show_glyph(x, y, lev->glyph);
+            show_glyph(x, y, lev->glyph);
     }
 
     /* see what is to be seen */
@@ -1565,19 +1564,19 @@ int x, y, glyph;
  * Reset the changed glyph borders so that none of the 3rd screen has
  * changed.
  */
-#define reset_glyph_bbox()             \
-    {                                  \
-        int i;                         \
-                                       \
-        for (i = 0; i < ROWNO; i++) {  \
+#define reset_glyph_bbox()               \
+    {                                    \
+        int i;                           \
+                                         \
+        for (i = 0; i < ROWNO; i++) {    \
             g.gbuf_start[i] = COLNO - 1; \
             g.gbuf_stop[i] = 0;          \
-        }                              \
+        }                                \
     }
 
-static const gbuf_entry nul_gbuf = { 0, cmap_to_glyph(S_stone) };
+static const gbuf_entry nul_gbuf = { 0, GLYPH_UNEXPLORED };
 /*
- * Turn the 3rd screen into stone.
+ * Turn the 3rd screen into UNEXPLORED.
  */
 void
 clear_glyph_buffer()
@@ -1595,7 +1594,7 @@ clear_glyph_buffer()
 }
 
 /*
- * Assumes that the indicated positions are filled with S_stone glyphs.
+ * Assumes that the indicated positions are filled with GLYPH_UNEXPLORED glyphs.
  */
 void
 row_refresh(start, stop, y)
@@ -1604,13 +1603,14 @@ int start, stop, y;
     register int x;
 
     for (x = start; x <= stop; x++)
-        if (g.gbuf[y][x].glyph != cmap_to_glyph(S_stone))
+        if (g.gbuf[y][x].glyph != GLYPH_UNEXPLORED)
             print_glyph(WIN_MAP, x, y, g.gbuf[y][x].glyph, get_bk_glyph(x, y));
 }
 
 void
 cls()
 {
+    int y;
     static boolean in_cls = 0;
 
     if (in_cls)
@@ -1621,6 +1621,10 @@ cls()
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
     clear_glyph_buffer(); /* this is sort of an extra effort, but OK */
+    for (y = 0; y < ROWNO; y++) {
+        g.gbuf_start[y] = 0;
+        g.gbuf_stop[y] = COLNO - 1;
+    }
     in_cls = FALSE;
 }
 
@@ -1890,11 +1894,11 @@ static int
 get_bk_glyph(x, y)
 xchar x, y;
 {
-    int idx, bkglyph = NO_GLYPH;
+    int idx, bkglyph = GLYPH_UNEXPLORED;
     struct rm *lev = &levl[x][y];
 
     if (iflags.use_background_glyph && lev->seenv != 0
-        && g.gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
+        && (g.gbuf[y][x].glyph != GLYPH_UNEXPLORED)) {
         switch (lev->typ) {
         case SCORR:
         case STONE:
