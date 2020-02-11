@@ -616,7 +616,7 @@ static const char *cache_nomovemsg = NULL, *cache_multi_reason = NULL;
 static d_level cache_uz = { 0 };
 static boolean cache_underwater = FALSE;
 
-#define cond_cache_prep()                                   \
+#define cond_cache_prepA()                                  \
 do {                                                        \
     boolean clear_cache = FALSE, refresh_cache = FALSE;     \
                                                             \
@@ -644,6 +644,10 @@ do {                                                        \
         cache_reslt[0] = cache_avail[0] = FALSE;            \
         cache_reslt[1] = cache_avail[1] = FALSE;            \
     }                                                       \
+} while (0)
+
+#define cond_cache_prepB()                                  \
+do {                                                        \
     if (((cache_uz.dnum != u.uz.dnum)                       \
         || (cache_uz.dlevel != u.uz.dlevel))                \
         || (cache_underwater != Underwater))  {             \
@@ -852,51 +856,36 @@ bot_via_windowport()
     test_if_enabled(bl_tethered) = (u.utrap && u.utraptype == TT_BURIEDBALL);
     test_if_enabled(bl_woundedl) = (Wounded_legs);
 
-    cond_cache_prep();
-
-    if (condtests[bl_unconsc].enabled) {
-        if (cache_nomovemsg && !cache_avail[0]) {
-            cache_reslt[0] = unconscious();
-            cache_avail[0] = TRUE;
+    if (g.multi < 0) {
+        cond_cache_prepA();
+        if (condtests[bl_unconsc].enabled
+            && cache_nomovemsg && !cache_avail[0]) {
+                cache_reslt[0] = (!u.usleep && unconscious());
+                cache_avail[0] = TRUE;
         }
-    }
-    if (condtests[bl_parlyz].enabled) {
-        if (cache_multi_reason && !cache_avail[1]) {
-            cache_reslt[1] = (!strncmp(cache_multi_reason, "paralyzed", 9)
-                              || !strncmp(cache_multi_reason, "frozen", 6));
-            cache_avail[1] = TRUE;
+        if (condtests[bl_parlyz].enabled
+            && cache_multi_reason && !cache_avail[1]) {
+                cache_reslt[1] = (!strncmp(cache_multi_reason, "paralyzed", 9)
+                                 || !strncmp(cache_multi_reason, "frozen", 6));
+                cache_avail[1] = TRUE;
         }
-    }
-
-    /* unconsc */
-    if (cache_avail[0] && condtests[bl_unconsc].enabled) {
-        condtests[bl_unconsc].test = cache_reslt[0];
+        if (cache_avail[0] && cache_reslt[0]) {
+            condtests[bl_unconsc].test = cache_reslt[0];
+        } else if (cache_avail[1] && cache_reslt[1]) {
+            condtests[bl_parlyz].test = cache_reslt[1];
+        } else if (condtests[bl_sleeping].enabled && u.usleep) {
+            condtests[bl_sleeping].test = TRUE;
+        } else if (condtests[bl_busy].enabled) {
+            condtests[bl_busy].test = TRUE;
+        }
     } else {
-        condtests[bl_unconsc].test = FALSE;
-    }
-    /* parlyz */
-    if (cache_avail[1] && condtests[bl_parlyz].enabled
-                       && !condtests[bl_unconsc].test) {
-        condtests[bl_parlyz].test = cache_reslt[1];
-    } else {
-        condtests[bl_parlyz].test = FALSE;
-    }
-    /* sleeping */
-    if (!condtests[bl_unconsc].test && !condtests[bl_parlyz].test) {
-        condtests[bl_sleeping].test = u.usleep ? TRUE : FALSE;
-    } else {
-        condtests[bl_sleeping].test = FALSE;
-    }
-    /* busy */
-    if (!condtests[bl_unconsc].test && !condtests[bl_parlyz].test
-                                    && !condtests[bl_sleeping].test) {
-        condtests[bl_busy].test = (g.multi < 0);
-    } else {
-        condtests[bl_busy].test = FALSE;
+        condtests[bl_unconsc].test = condtests[bl_parlyz].test =
+            condtests[bl_sleeping].test = condtests[bl_busy].test = FALSE;
     }
 
     /* submerged */
     if (condtests[bl_submerged].enabled) {
+        cond_cache_prepB();
         if (!cache_avail[2] && cache_underwater == 0
             && (cache_uz.dlevel == 0 && cache_uz.dnum == 0)) {
             cache_uz = u.uz;
@@ -909,6 +898,8 @@ bot_via_windowport()
         } else {
             condtests[bl_submerged].test = FALSE;
         }
+    } else {
+        condtests[bl_submerged].test = FALSE;
     }
 
 #define cond_bitset(c) \
