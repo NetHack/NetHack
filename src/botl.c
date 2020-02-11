@@ -532,12 +532,11 @@ const struct condmap condition_aliases[] = {
                         | BL_MASK_HALLU | BL_MASK_PARLYZ | BL_MASK_SUBMERGED
                         | BL_MASK_STUN },
     { "movement",       BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE },
-    { "opt_in",         BL_MASK_BAREH | BL_MASK_BLIND | BL_MASK_BUSY
-                        | BL_MASK_GLOWHANDS | BL_MASK_HELD | BL_MASK_ICY
-                        | BL_MASK_PARLYZ | BL_MASK_SLEEPING | BL_MASK_SLIPPERY
-                        | BL_MASK_SUBMERGED | BL_MASK_TETHERED
-                        | BL_MASK_TRAPPED | BL_MASK_UNCONSC
-                        | BL_MASK_WOUNDEDL },
+    { "opt_in",         BL_MASK_BAREH | BL_MASK_BUSY | BL_MASK_GLOWHANDS
+                        | BL_MASK_HELD | BL_MASK_ICY | BL_MASK_PARLYZ
+                        | BL_MASK_SLEEPING | BL_MASK_SLIPPERY
+                        | BL_MASK_SUBMERGED | BL_MASK_TETHERED | BL_MASK_TRAPPED
+                        | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL },
 };
 
 #endif /* STATUS_HILITES */
