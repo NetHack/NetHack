@@ -1,7 +1,7 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ $NHDT-Date: 1581503728 2020/02/12 10:35:28 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.365 $ $NHDT-Date: 1581536599 2020/02/12 19:43:19 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
-.\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
+.\" Guidebook.mn currently does *not* fully adhere to these guidelines.
 .\"|||
 .\"| o Never include empty or blank lines in a roff document.  Instead,  use
 .\"|   the empty request (a line consisting of a dot only) or a line comment
@@ -16,7 +16,18 @@
 .\"|||
 .\"
 .
+.\" Usage:
+.\" to produce Guidebook.ps:
+.\"  cat Guidebook.mn |tbl tmac.n - |groff >Guidebook.ps
+.\" to produce Guidebook.txt:
+.\"  cat Guidebook.mn |tbl tmac.n - |groff -c -Tascii |col -bx >Guidebook.txt
+.\" with an optional filtering step between 'cat' and 'tbl':
+.\"  cat... |../util/makedefs --grep --input - --output - |tbl...
+.
 .so tmac.nh	\" extra macros which aren't in tmac.n
+.
+.\" \n(fF=1: fixed-width font (Guidebook.txt), =0: proportional-width font
+.nr fF (\w'f'p)=(\w'F'p) \" compare width of 'f' to that of 'F'
 .
 .ds h0 "NetHack Guidebook
 .ds h1
@@ -2797,9 +2808,7 @@ and to limit the number of questions during disclosure.
 Listed roughly in order of difficulty and not necessarily in the order
 in which you might accomplish them.
 .\" Vary the output between Guidebook.txt and Guidebook.{ps,pdf}
-.\" [conditional indentation and width of key field]
-.\" Check for fixed-width font; 'f' will be same width as 'F'.
-.ie (\w'f'p)=(\w'F'p) \{\
+.ie \n(fF \{
 .\" fixed-width font: suppress indentation; default key width is fine;
 .\" display longest entries (below) across two lines for Guidebook.txt
 .SD n
@@ -2812,7 +2821,7 @@ in which you might accomplish them.
 .\}
 .fi
 .\" Use separate if-else because other achievements will be inserted here.
-.ie (\w'f'p)=(\w'F'p) \{\
+.ie \n(fF \{\
 .PL Sokoban
 Explored to the top of Sokoban
 .br
@@ -3065,8 +3074,8 @@ Here is an example of configuration file contents:
 .ED
 .\" [conditional indentation; see description of NETHACKOPTIONS below]
 .ds sD i \" assume proportional, indentation acceptable and preferred
-.\" Check for fixed-width font; 'f' will be same width as 'F'.
-.if (\w'f'p)=(\w'F'p) .ds sD n \" if same width, suppress indentation
+.\" Check for fixed-width font; fF set up at top of file
+.if \n(fF .ds sD n \" if same width, suppress indentation
 .SD \*(sD \" string variable sD will expand to either 'i' or 'n'
 .ft CR \" set font to constant-width Roman
 # Set your character's role, race, gender, and alignment.
@@ -3116,8 +3125,8 @@ you would enter the command
 .\" can't rely on that.  Assume Guidebook.ps uses a proportional font
 .\" and Guidebook.txt a fixed-width one and test which sort we're using.
 .ds sD i \" assume proportional, indentation acceptable and preferred
-.\" Check for fixed-width font; 'f' will be same width as 'F'.
-.if (\w'f'p)=(\w'F'p) .ds sD n \" if same width, suppress indentation
+.\" Check for fixed-width font; fF set up at top of file
+.if \n(fF .ds sD n \" if same width, suppress indentation
 .SD \*(sD
 \f(CR% setenv NETHACKOPTIONS "color,\\!leg,name:Blue Meanie,fruit:lime"\fP
 .ED
