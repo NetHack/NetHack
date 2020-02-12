@@ -396,7 +396,10 @@ static const char *build_opts[] = {
 #endif
 #endif
 #ifdef DUMPLOG
-    "end-of-game dumplogs",
+    "end-of-game dumplogs (plaintext)",
+#endif
+#ifdef DUMPHTML
+    "end-of-game dumplogs (HTML)",
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
     "exclusive lock on level 0 file",
