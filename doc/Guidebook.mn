@@ -2294,36 +2294,42 @@ protection than others.  Your armor class is a measure of this
 protection.  Armor class (AC) is measured as in AD&D, with 10 being
 the equivalent of no armor, and lower numbers meaning better armor.
 Each suit of armor which exists in AD&D gives the same protection in
-NetHack.  Here is an (incomplete) list of the armor classes provided by
-various suits of armor:
+NetHack.
+.pg
+Here is a list of the armor class values provided by suits of armor:
 .
+.\" Replace the old one suit per line table with a more condensed one.
+.\" AC4 has been split into two lines to accomodate plain text output
+.\" (Guidebook.txt).  It has a tab at the end of the first line (actually,
+.\" that has become a tab followed by an empty comment to avoid being
+.\" invisible) to explicitly force an empty second column and it has a pair
+.\" of non-breakable spaces at start of second line for some indentation.
 .TS S
 center;
 a n.
-dragon scale mail	1
-plate mail	3
-crystal plate mail	3
-bronze plate mail	4
-splint mail	4
-banded mail	4
-dwarvish mithril-coat	4
-elven mithril-coat	5
-chain mail	5
-orcish chain mail	6
-scale mail	6
-dragon scales	7
-studded leather armor	7
-ring mail	7
-orcish ring mail	8
-leather armor	8
-leather jacket	9
-no armor	10
+Dragon scale mail	1
+Plate mail, Crystal plate mail	3
+Bronze plate mail, Splint mail,	\"
+\~\~Banded mail, Dwarvish mithril-coat	4
+Chain mail, Elven mithril-coat	5
+Scale mail, Orcish chain mail	6
+Ring mail, Studded leather armor, Dragon scales	7
+Leather armor, Orcish ring mail	8
+Leather jacket	9
+none	10
 .TE
 .pg
-You can also wear other pieces of armor (for example helmets, boots, shields, cloaks)
-to lower your armor class even further, but you can only wear one item
-of each category (one suit of armor, one cloak, one helmet, one
-shield, and so on) at a time.
+You can also wear other pieces of armor (cloak over suit, shirt under
+suit, helmet, gloves, boots, shield) to lower your armor class even
+further.
+You can wear at most one item of each category (one suit of armor, one
+cloak, one helmet, one shield, and so on) at a time.
+Most of these provide a one or two point improvement to AC but can be
+enchanted.
+Shirts are an exception; they don't provide any protection unless enchanted.
+Some cloaks also don't improve AC when unenchanted but all cloaks offer
+some protection against rust or corrosion to suits worn under them and
+against some monster \fItouch\fP attacks.
 .pg
 If a piece of armor is enchanted, its armor protection will be better
 (or worse) than normal, and its \(lqplus\(rq (or minus) will subtract from
@@ -2339,9 +2345,18 @@ addition to being unremovable.
 Many types of armor are subject to some kind of damage like rust.  Such
 damage can be repaired.  Some types of armor may inhibit spell casting.
 .pg
+The
+.op nudist
+option can be set (prior to game start) to attempt to play the entire
+game without wearing any armor (a self-imposed challange which is
+extremely difficult to accomplish).
+.pg
 The commands to use armor are \(oqW\(cq (wear) and \(oqT\(cq (take off).
-The \(oqA\(cq command can also be used to take off armor as well as other
+The \(oqA\(cq command can be used to take off armor as well as other
 worn items.
+Also, \(oqP\(cq (put on) and \(oqR\(cq (remove) which are normally for
+accessories can be used for armor, but pieces of armor won't be shown
+as likely candidates in a prompt for choosing what to put on or remove.
 .hn 2
 Food (\(oq%\(cq)
 .pg
@@ -2453,13 +2468,22 @@ Rings are very useful items, since they are relatively permanent
 magic, unlike the usually fleeting effects of potions, scrolls, and
 wands.
 .pg
-Putting on a ring activates its magic.  You can wear only two
-rings, one on each ring finger.
+Putting on a ring activates its magic.
+You can wear at most two rings at any time, one on the ring finger of
+each hand.
 .pg
 Most rings also cause you to grow hungry more rapidly, the rate
 varying with the type of ring.
 .pg
+When wearing gloves, rings are worn underneath.
+If the gloves are cursed, rings cannot be put on and any already being
+worn cannot be removed.
+When worn gloves aren't cursed, you don't have to manually take them
+off before putting on or removing a ring and then re-wear them after.
+That's done implicitly to avoid unnecessary tedium.
+.pg
 The commands to use rings are \(oqP\(cq (put on) and \(oqR\(cq (remove).
+\(oqA\(cq, \(oqW\(cq, and \(oqT\(cq can also be used; see \fIAmulets\fP.
 .hn 2
 Spellbooks (\(oq+\(cq)
 .pg
@@ -2521,6 +2545,12 @@ have a limited number of uses, akin to wand charges.  For example, lamps burn
 out after a while.  Other tools are containers, which objects can
 be placed into or taken out of.
 .pg
+Some tools (such as a blindfold) can be \fIworn\fP and can be put on and
+removed like other accessories (rings, amulets); see \fIAmulets\fP.
+Other tools (such as pick-axe) can be wielded as weapons in addition to
+being applied for their usual purpose, and in some cases (again, pick-axe)
+become wielded as a weapon even when applied.
+.pg
 The command to use a tool is \(oqa\(cq (apply).
 .hn 3
 Containers
@@ -2551,6 +2581,11 @@ Only one amulet may be worn at a time, around your neck.
 .pg
 The commands to use amulets are the same as for rings, \(oqP\(cq (put on)
 and \(oqR\(cq (remove).
+\(oqA\(cq can be used to remove various worn items including amulets.
+Also, \(oqW\(cq (wear) and \(oqT\(cq (take off) which are normally for
+armor can be used for amulets and other accessories (rings and eyewear),
+but accessories won't be shown as likely candidates in a prompt for
+choosing what to wear or take off.
 .hn 2
 Gems (\(oq*\(cq)
 .pg
@@ -2568,8 +2603,16 @@ Large rocks (\(oq\`\(cq)
 Statues and boulders are not particularly useful, and are generally
 heavy.  It is rumored that some statues are not what they seem.
 .pg
-Very large humanoids (giants and their ilk) have been known to use boulders
-as weapons.
+Boulders occasionally block your path.
+You can push one forward when nothing blocks \fIits\fP path, or you can
+smash it into a pile of small rocks with breaking magic or a pick-exe.
+Very large humanoids (giants and their ilk) have been known to pick up
+boulders and use them as missile weapons.
+.pg
+Unlike boulders, statues can't be pushed, but don't need to be because
+they don't block movement.
+.\" 'rumor' above is about statue traps; this is a hint about statue contents
+They can be smashed into rocks though.
 .pg
 For some configurations of the program, statues are no longer shown as
 \(oq\f(CR\`\fP\(cq but by the letter representing the monster they depict
@@ -2581,6 +2624,19 @@ Gold adds to your score, and you can buy things in shops with it.
 There are a number
 of monsters in the dungeon that may be influenced by the amount of gold
 you are carrying (shopkeepers aside).
+.pg
+Gold pieces are the only type of object where bless/curse state does not
+apply.
+They're always uncursed but never described as uncursed even if you turn
+off the
+.op implicit_uncursed
+option.
+You can set the
+.op goldX
+option if you prefer to have gold pieces be treated as bless/curse state
+\fIunknown\fP rather than as known to be uncursed.
+Only matters when you're using an object selection prompt that can filter
+by \(lq\f(CRBUCX\fP\(rq state.
 .
 .hn 2
 Persistence of Objects
