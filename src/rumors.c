@@ -525,6 +525,8 @@ struct monst *oracl;
     }
     money2mon(oracl, (long) u_pay);
     g.context.botl = 1;
+    if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
+        record_achievement(ACH_ORCL);
     add_xpts = 0; /* first oracle of each type gives experience points */
     if (u_pay == minor_cost) {
         outrumor(1, BY_ORACLE);

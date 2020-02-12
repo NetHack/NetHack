@@ -465,7 +465,8 @@ register struct obj *spellbook;
         }
     }
 
-    if (g.context.spbook.delay && !confused && spellbook == g.context.spbook.book
+    if (g.context.spbook.delay && !confused
+        && spellbook == g.context.spbook.book
         /* handle the sequence: start reading, get interrupted, have
            g.context.spbook.book become erased somehow, resume reading it */
         && booktype != SPE_BLANK_PAPER) {
@@ -490,6 +491,7 @@ register struct obj *spellbook;
                 check_unpaid(spellbook);
                 makeknown(booktype);
                 if (!u.uevent.read_tribute) {
+                    record_achievement(ACH_NOVL);
                     /* give bonus of 20 xp and 4*20+0 pts */
                     more_experienced(20, 0);
                     newexplevel();

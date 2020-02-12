@@ -2198,7 +2198,7 @@ boolean pick;
     check_special_room(FALSE);
     if (IS_SINK(levl[u.ux][u.uy].typ) && Levitation)
         dosinkfall();
-    if (!g.in_steed_dismounting) { /* if dismounting, we'll check again later */
+    if (!g.in_steed_dismounting) { /* if dismounting, check again later */
         boolean pit;
 
         /* if levitation is due to time out at the end of this
@@ -2462,7 +2462,7 @@ register boolean newlev;
 /* possibly deliver a one-time room entry message */
 void
 check_special_room(newlev)
-register boolean newlev;
+boolean newlev;
 {
     register struct monst *mtmp;
     char *ptr;
@@ -2474,6 +2474,12 @@ register boolean newlev;
 
     if (!*u.uentered && !*u.ushops_entered) /* implied by newlev */
         return; /* no entrance messages necessary */
+
+    if (!g.context.achieveo.minetn_reached
+        && In_mines(&u.uz) && in_town(u.ux, u.uy)) {
+        record_achievement(ACH_TOWN);
+        g.context.achieveo.minetn_reached = TRUE;
+    }
 
     /* Did we just enter a shop? */
     if (*u.ushops_entered)
@@ -2504,6 +2510,7 @@ register boolean newlev;
         case MORGUE:
             if (midnight()) {
                 const char *run = locomotion(g.youmonst.data, "Run");
+
                 pline("%s away!  %s away!", run, run);
             } else
                 You("have an uncanny feeling...");
@@ -2528,6 +2535,7 @@ register boolean newlev;
             break;
         case DELPHI: {
             struct monst *oracle = monstinroom(&mons[PM_ORACLE], roomno);
+
             if (oracle) {
                 if (!oracle->mpeaceful)
                     verbalize("You're in Delphi, %s.", g.plname);
@@ -2586,7 +2594,6 @@ register boolean newlev;
                 }
         }
     }
-
     return;
 }
 

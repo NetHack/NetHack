@@ -1755,14 +1755,38 @@ int final; /* used "behind the curtain" by enl_foo() macros */
         case ACH_NUDE:
             enl_msg(You_, "have gone", "went", " without any armor", "");
             break;
-        case ACH_LUCK:
-            enl_msg(You_, "have ", "", "completed the Gnomish Mines", "");
+        case ACH_MINE:
+            you_have_X("entered the Gnomish Mines");
+            break;
+        case ACH_TOWN:
+            you_have_X("entered Mine Town");
+            break;
+        case ACH_SHOP:
+            you_have_X("entered a shop");
+            break;
+        case ACH_TMPL:
+            you_have_X("entered a temple");
+            break;
+        case ACH_ORCL:
+            you_have_X("consulted the Oracle of Delphi");
+            break;
+        case ACH_NOVL:
+            you_have_X("read from a Discworld novel");
             break;
         case ACH_SOKO:
-            enl_msg(You_, "have ", "", "completed Sokoban", "");
+            you_have_X("entered Sokoban");
+            break;
+        case ACH_SOKO_PRIZE: /* hard to reach guaranteed bag or amulet */
+            you_have_X("completed Sokoban");
+            break;
+        case ACH_MINE_PRIZE: /* hidden guaranteed luckstone */
+            you_have_X("completed the Gnomish Mines");
+            break;
+        case ACH_BGRM:
+            you_have_X("entered the Big Room");
             break;
         case ACH_MEDU:
-            enl_msg(You_, "have ", "", "defeated Medusa", "");
+            you_have_X("defeated Medusa");
             break;
         case ACH_BELL:
             /* alternate phrasing for present vs past and also for
@@ -1788,8 +1812,7 @@ int final; /* used "behind the curtain" by enl_foo() macros */
                     " the Book of the Dead", "");
             break;
         case ACH_INVK:
-            enl_msg(You_, "have ", "",
-                    "gained access to Moloch's Sanctum", "");
+            you_have_X("gained access to Moloch's Sanctum");
             break;
         case ACH_AMUL:
             /* alternate wording for ascended (always past tense) since
@@ -1805,10 +1828,10 @@ int final; /* used "behind the curtain" by enl_foo() macros */
            be redundant and ascending makes both be redundant, but
            we display all that apply */
         case ACH_ENDG:
-            enl_msg(You_, "have ", "", "reached the Elemental Planes", "");
+            you_have_X("reached the Elemental Planes");
             break;
         case ACH_ASTR:
-            enl_msg(You_, "have ", "", "reached the Astral Plane", "");
+            you_have_X("reached the Astral Plane");
             break;
         case ACH_UWIN:
             /* the ultimate achievement... */

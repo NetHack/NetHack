@@ -1624,12 +1624,6 @@ boolean at_stairs, falling, portal;
     /* special levels can have a custom arrival message */
     deliver_splev_message();
 
-    /* give room entrance message, if any */
-    check_special_room(FALSE);
-
-    /* deliver objects traveling with player */
-    obj_delivery(TRUE);
-
     /* Check whether we just entered Gehennom. */
     if (!In_hell(&u.uz0) && Inhell) {
         if (Is_valley(&u.uz)) {
@@ -1701,9 +1695,18 @@ boolean at_stairs, falling, portal;
                 mtmp->msleeping = 0;
             }
         }
+    } else if (In_mines(&u.uz)) {
+        if (newdungeon)
+            record_achievement(ACH_MINE);
+    } else if (In_sokoban(&u.uz)) {
+        if (newdungeon)
+            record_achievement(ACH_SOKO);
     } else {
-        if (new && Is_rogue_level(&u.uz))
+        if (new && Is_rogue_level(&u.uz)) {
             You("enter what seems to be an older, more primitive world.");
+        } else if (new && Is_bigroom(&u.uz)) {
+            record_achievement(ACH_BGRM);
+        }
         /* main dungeon message from your quest leader */
         if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest")
             && !(u.uevent.qcompleted || u.uevent.qexpelled
@@ -1726,6 +1729,11 @@ boolean at_stairs, falling, portal;
 
     if ((annotation = get_annotation(&u.uz)) != 0)
         You("remember this level as %s.", annotation);
+
+    /* give room entrance message, if any */
+    check_special_room(FALSE);
+    /* deliver objects traveling with player */
+    obj_delivery(TRUE);
 
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);

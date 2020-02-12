@@ -792,12 +792,12 @@ boolean pre, wiztower;
                 static const char Unachieve[] = "%s achievement revoked.";
 
                 if (Is_mineend_level(&u.uz)) {
-                    if (remove_achievement(ACH_LUCK))
-                        pline(Unachieve, "Mine's end");
+                    if (remove_achievement(ACH_MINE_PRIZE))
+                        pline(Unachieve, "Mine's-end");
                     g.context.achieveo.mines_prize_oid = 0;
                 } else if (Is_sokoend_level(&u.uz)) {
-                    if (remove_achievement(ACH_SOKO))
-                        pline(Unachieve, "Sokoban end");
+                    if (remove_achievement(ACH_SOKO_PRIZE))
+                        pline(Unachieve, "Sokoban-end");
                     g.context.achieveo.soko_prize_oid = 0;
                 }
             }

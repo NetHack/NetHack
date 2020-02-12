@@ -839,11 +839,11 @@ struct obj *obj;
     /* "special achievements"; revealed in end of game disclosure and
        dumplog, originally just recorded in XLOGFILE */
     if (is_mines_prize(obj)) {
-        record_achievement(ACH_LUCK);
+        record_achievement(ACH_MINE_PRIZE);
         g.context.achieveo.mines_prize_oid = 0; /* done with luckstone o_id */
         obj->nomerge = 0;
     } else if (is_soko_prize(obj)) {
-        record_achievement(ACH_SOKO);
+        record_achievement(ACH_SOKO_PRIZE);
         g.context.achieveo.soko_prize_oid = 0; /* done with bag/amulet o_id */
         obj->nomerge = 0;
     }

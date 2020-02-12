@@ -70,7 +70,7 @@ static void FDECL(writeentry, (FILE *, struct toptenentry *));
 static void FDECL(writexlentry, (FILE *, struct toptenentry *, int));
 static long NDECL(encodexlogflags);
 static long NDECL(encodeconduct);
-static long NDECL(encodeachieve);
+static long FDECL(encodeachieve, (BOOLEAN_P));
 #endif
 static void FDECL(free_ttlist, (struct toptenentry *));
 static int FDECL(classmon, (char *, BOOLEAN_P));
@@ -365,7 +365,8 @@ int how;
         Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
                 g.multi_reason ? g.multi_reason : "helpless");
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
-            encodeconduct(), XLOG_SEP, g.moves, XLOG_SEP, encodeachieve());
+            encodeconduct(), XLOG_SEP, g.moves, XLOG_SEP,
+            encodeachieve(FALSE));
     Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld", XLOG_SEP,
             (long) urealtime.realtime, XLOG_SEP,
             (long) ubirthday, XLOG_SEP, (long) urealtime.finish_time);
@@ -426,54 +427,26 @@ encodeconduct()
 }
 
 static long
-encodeachieve()
+encodeachieve(secondlong)
+boolean secondlong; /* False: handle achievements 1..31, True: 32..62 */
 {
-    int i, ilimit;
+    int i, achidx, offset;
     long r = 0L;
 
     /*
-     * Other potential achievements to track (some already recorded
-     * for other purposes such as automatic level annotations or
-     * quest progress):
-     *  entered mines branch,
-     *  chatted with the Oracle,
-     *  read a Discworld novel,
-     *  entered Sokoban's first level,
-     *  entered Bigroom level,
-     *  got quest summons,
-     *  entered quest branch,
-     *  chatted with leader,
-     *  entered second quest level,
-     *  entered last quest level,
-     *  defeated nemesis (not same as acquiring Bell or artifact),
-     *  completed quest (again, not the same as getting the items),
-     *  entered rogue level,
-     *  entered Fort Ludios level/branch,
-     *  entered Medusa level,
-     *  entered castle level,
-     *  opened castle drawbridge,
-     *  obtained castle wand,
-     *  entered valley level,
-     *  [assorted demon lairs?],
-     *  entered Vlad's tower branch,
-     *  defeated Vlad (not same as acquiring Candelabrum),
-     *  entered Wizard's tower area within relevant level,
-     *  defeated Wizard,
-     *  found vibrating square,
-     *  entered sanctum level,
-     *  [defeated Riders],
-     *  located the correct high altar (for initial alignment or current
-     *   one or both?) on the astral level.
-     * Too many to include them all in a 32-bit mask, but that could
-     * handle a lot of them.  Defeated <foo> can be seen via the vanquished
-     * monsters list and many or all of the entered <bar> can be seen via
-     * the dungeon overview but both of those things go away as soon as
-     * the program exits.
+     * 32: portable limit for 'long'.
+     * Force 32 even on configurations that are using 64 bit longs.
+     *
+     * We use signed long and limit ourselves to 31 bits since tools
+     * that post-process xlogfile might not be able to cope with
+     * 'unsigned long'.
      */
-    ilimit = min(N_ACH, 32 - 1); /* 32: portable limit for 'long' */
-    for (i = 0; i < ilimit && u.uachieved[i]; ++i)
-        r |= 1L << (u.uachieved[i] - 1);
-
+    offset = secondlong ? (32 - 1) : 0;
+    for (i = 0; u.uachieved[i]; ++i) {
+        achidx = u.uachieved[i] - offset;
+        if (achidx > 0 && achidx < 32) /* value 1..31 sets bit 0..30 */
+            r |= 1L << (achidx - 1);
+    }
     return r;
 }
 

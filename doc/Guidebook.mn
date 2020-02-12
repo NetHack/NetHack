@@ -2615,8 +2615,9 @@ Statues and boulders are not particularly useful, and are generally
 heavy.  It is rumored that some statues are not what they seem.
 .pg
 Boulders occasionally block your path.
-You can push one forward when nothing blocks \fIits\fP path, or you can
-smash it into a pile of small rocks with breaking magic or a pick-exe.
+You can push one forward (by attempting to walk onto its spot)
+when nothing blocks \fIits\fP path, or you can
+smash it into a pile of small rocks with breaking magic or a pick-axe.
 Very large humanoids (giants and their ilk) have been known to pick up
 boulders and use them as missile weapons.
 .pg
@@ -2820,9 +2821,24 @@ in which you might accomplish them.
 .PS "Mines'\~End\~"
 .\}
 .fi
-.\" Use separate if-else because other achievements will be inserted here.
-.ie \n(fF \{\
+.PL Shop
+Entered a shop.
+.PL Temple
+Entered a temple.
+.PL Mines
+Entered the Gnomish Mines.
+.PL Town
+Entered Mine Town.
+.PL Oracle
+Consulted the Oracle of Delphi.
+.PL Novel
+Read a passage from a Discworld Novel.
 .PL Sokoban
+Entered Sokoban.
+.PL "Big\~Room"
+Entered the Big Room.
+.ie \n(fF \{\
+.PL "Soko-Prize"
 Explored to the top of Sokoban
 .br
 and found a special item there.
@@ -2832,7 +2848,7 @@ Explored to the bottom of the Gnomish Mines
 and found a special item there.
 .\}
 .el \{\
-.PL Sokoban
+.PL "Soko-Prize"
 Explored to the top of Sokoban and found a special item there.
 .PL "Mines'\~End"
 Explored to the bottom of the Gnomish Mines and found a special item there.
@@ -2865,6 +2881,11 @@ Delivered the Amulet to its final destination.
 .PE
 .ED
 .lp "Notes:  "
+.pg
+There's no guaranteed \fINovel\fP so the achievement to read one might
+not always be attainable (except perhaps by \fIwishing\fP).
+Similarly, the \fIBig Room\fP level is not always present.
+Unlike with the Novel, there's no way to wish for this opportunity.
 .pg
 The \(lqspecial items\(rq hidden in \fIMines'\~End\fP and \fISokoban\fP
 are not unique but are considered to be prizes or rewards
