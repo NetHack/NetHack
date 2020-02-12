@@ -3039,6 +3039,82 @@ an artifact (even if the artifact immediately disappears).  When the
 game offers you an opportunity to make a wish for an item, you may
 choose ``nothing'' if you want to decline.
 
+%.hn 2
+\subsection*{Achievements}
+
+%.pg
+End of game disclosure will also display various achievements
+representing progress toward ultimate ascension, if any have been
+attained.
+They aren't directly related to {\it conduct\/} but are grouped with
+it because they fall into the same category of ``bragging rights''
+and to limit the number of questions during disclosure.
+Listed roughly in order of difficulty and not necessarily in the order
+in which you might accomplish them.
+
+% [length stuff copied from paranoid_confirmation]
+\newlength{\achwidth}
+%.PS "Mines'\~End\~"
+\settowidth{\achwidth}{\tt Mines'~End~}
+\addtolength{\achwidth}{\labelsep}
+\blist{\leftmargin \achwidth \topsep 1mm \itemsep 0mm}
+%.PL Sokoban
+\item[{\tt Sokoban}]
+Explored to the top of Sokoban and found a special item there.
+\item[{\tt Mines'~End}]
+Explored to the bottom of the Gnomish Mines and found a special item there.
+\item[{\tt Medusa}]
+Defeated Medusa.
+\item[{\tt Bell}]
+Acquired the Bell of Opening.
+\item[{\tt Gehennom}]
+Entered Gehennom.
+\item[{\tt Candle}]
+Acquired the Candelabrum of Invocation.
+\item[{\tt Book}]
+Acquired the Book of the Dead.
+\item[{\tt Invocation}]
+Gained access to the bottommost level of Gehennom.
+\item[{\tt Amulet}]
+Acquired the fabled Amulet of Yendor.
+\item[{\tt Endgame}]
+Reached the Elemental Planes.
+\item[{\tt Astral}]
+Reached the Astral Plane level.
+\item[{\tt Blind}]
+Blind from birth.
+\item[{\tt Nudist}]
+Never wore any armor.
+\item[{\tt Ascended}]
+Delivered the Amulet to its final destination.
+\elist
+%.PE
+%.ED
+
+%.lp "Notes:  "
+\noindent
+Notes:
+
+%.pg
+The ``special items'' hidden in {\it Mines'~End\/} and (\it Sokoban\/}
+are not unique but are considered to be prizes or rewards
+for exploring those levels since doing so is not necessary to complete
+the game.
+Finding other instances of the same objects doesn't record the
+corresponding achievement.
+
+%.pg
+The {\it Medusa\/} achievement is recorded if she dies for any reason,
+even if you are not directly responsible, and only if she dies.
+
+%.pg
+{\it Blind\/} and {\it Nudist\/} are also conducts, and they can only be
+enabled by setting the correspondingly named option in NETHACKOPTIONS
+or run-time configuration file prior to game start.
+In the case of {\it Blind\/}, the option also enforces the conduct.
+They aren't really significant accomplishments unless/until you make
+substantial progress into the dungeon.
+
 %.hn 1
 \section{Options}
 

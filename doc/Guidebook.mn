@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ $NHDT-Date: 1581296179 2020/02/10 00:56:19 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ $NHDT-Date: 1581503728 2020/02/12 10:35:28 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -2794,50 +2794,70 @@ attained.
 They aren't directly related to \fIconduct\fP but are grouped with
 it because they fall into the same category of \(lqbragging rights\(rq
 and to limit the number of questions during disclosure.
-.pg
-The first two are also conducts, the rest are listed roughly in order
-of difficulty and not necessarily in the order in which you might
-accomplish them.
-.lp "Blind   "
-Blind from birth.
-.lp "Nudist  "
-Never wore any armor.
-.lp "Mines' End"
-Explored to the bottom of the Gnomish Mines and found a special item there.
-.lp "Sokoban "
+Listed roughly in order of difficulty and not necessarily in the order
+in which you might accomplish them.
+.\" Vary the output between Guidebook.txt and Guidebook.{ps,pdf}
+.\" [conditional indentation and width of key field]
+.\" Check for fixed-width font; 'f' will be same width as 'F'.
+.ie (\w'f'p)=(\w'F'p) \{\
+.\" fixed-width font: suppress indentation; default key width is fine;
+.\" display longest entries (below) across two lines for Guidebook.txt
+.SD n
+.PS "Mines'\~End"
+.\}
+.el \{\
+.\" proportianal font: use indentation and force wider key
+.SD i
+.PS "Mines'\~End\~"
+.\}
+.fi
+.\" Use separate if-else because other achievements will be inserted here.
+.ie (\w'f'p)=(\w'F'p) \{\
+.PL Sokoban
+Explored to the top of Sokoban
+.br
+and found a special item there.
+.PL "Mines'\~End"
+Explored to the bottom of the Gnomish Mines
+.br
+and found a special item there.
+.\}
+.el \{\
+.PL Sokoban
 Explored to the top of Sokoban and found a special item there.
-.lp "Medusa  "
+.PL "Mines'\~End"
+Explored to the bottom of the Gnomish Mines and found a special item there.
+.\}
+.fi
+.PL Medusa
 Defeated Medusa.
-.lp "Bell    "
+.PL Bell
 Acquired the Bell of Opening.
-.lp "Gehennom"
+.PL Gehennom
 Entered Gehennom.
-.lp "Candle  "
+.PL Candle
 Acquired the Candelabrum of Invocation.
-.lp "Book    "
+.PL Book
 Acquired the Book of the Dead.
-.lp Invocation
+.PL Invocation
 Gained access to the bottommost level of Gehennom.
-.lp "Amulet  "
+.PL Amulet
 Acquired the fabled Amulet of Yendor.
-.lp "Endgame "
+.PL Endgame
 Reached the Elemental Planes.
-.lp "Astral  "
+.PL Astral
 Reached the Astral Plane level.
-.lp "Ascended"
+.PL Blind
+Blind from birth.
+.PL Nudist
+Never wore any armor.
+.PL Ascended
 Delivered the Amulet to its final destination.
-.lp ""
+.PE
+.ED
 .lp "Notes:  "
 .pg
-\fIBlind\fP and \fINudist\fP are also conducts, and they can only be
-enabled by setting the correspondingly named option in NETHACKOPTIONS
-or run-time configuration file prior to game start.
-In the case of \fIBlind\fP, the option also enforces the conduct.
-They aren't really significant accomplishments unless/until you make
-substantial progress into the dungeon but they are treated as
-Achievements as long as the conduct is enabled and hasn't been broken.
-.pg
-The \(lqspecial items\(rq hidden in \fIMines\~End\fP and \fISokoban\fP
+The \(lqspecial items\(rq hidden in \fIMines'\~End\fP and \fISokoban\fP
 are not unique but are considered to be prizes or rewards
 for exploring those levels since doing so is not necessary to complete
 the game.
@@ -2846,11 +2866,13 @@ corresponding achievement.
 .pg
 The \fIMedusa\fP achievement is recorded if she dies for any reason,
 even if you are not directly responsible, and only if she dies.
-.\"--Reaching the Valley actually records the "entered Gehennom" achievement.
-.\" .pg
-.\" The \fIValley of the Dead\fP is part of \fIGehennom\fP but the
-.\" \fIGehennom\fP achievement doesn't get recorded until you make it past
-.\" that level.
+.pg
+\fIBlind\fP and \fINudist\fP are also conducts, and they can only be
+enabled by setting the correspondingly named option in NETHACKOPTIONS
+or run-time configuration file prior to game start.
+In the case of \fIBlind\fP, the option also enforces the conduct.
+They aren't really significant accomplishments unless/until you make
+substantial progress into the dungeon.
 .
 .hn 1
 Options
