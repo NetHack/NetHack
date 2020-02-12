@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.355 $ $NHDT-Date: 1580346228 2020/01/30 01:03:48 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ $NHDT-Date: 1581296179 2020/02/10 00:56:19 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "January 27, 2020
+.ds f2 "February 10, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -44,7 +44,7 @@ A Guide to the Mazes of Menace
 (Guidebook for NetHack)
 .au
 Original version - Eric S. Raymond
-(Edited and expanded for 3.6 by Mike Stephenson and others)
+(Edited and expanded for 3.7 by Mike Stephenson and others)
 .sp 1
 \*(f2
 .hn 1
@@ -2755,7 +2755,7 @@ Defeated Medusa.
 .lp "Bell    "
 Acquired the Bell of Opening.
 .lp "Gehennom"
-Entered Gehennom proper (beyond the Valley).
+Entered Gehennom.
 .lp "Candle  "
 Acquired the Candelabrum of Invocation.
 .lp "Book    "
@@ -2789,11 +2789,12 @@ Finding other instances of the same objects doesn't record the
 corresponding achievement.
 .pg
 The \fIMedusa\fP achievement is recorded if she dies for any reason,
-even if you are not directly responsible.
-.pg
-The \fIValley of the Dead\fP is part of \fIGehennom\fP but the
-\fIGehennom\fP achievement doesn't get recorded until you make it past
-that level.
+even if you are not directly responsible, and only if she dies.
+.\"--Reaching the Valley actually records the "entered Gehennom" achievement.
+.\" .pg
+.\" The \fIValley of the Dead\fP is part of \fIGehennom\fP but the
+.\" \fIGehennom\fP achievement doesn't get recorded until you make it past
+.\" that level.
 .
 .hn 1
 Options
@@ -4057,14 +4058,19 @@ if needed.
 Cannot be set with the \(oqO\(cq command.
 .lp video
 Set the video mode used (PC NetHack only).
-Values are \(lqautodetect\(rq, \(lqdefault\(rq, or \(lqvga\(rq.
-Setting \(lqvga\(rq (or \(lqautodetect\(rq with vga hardware present)
-will cause the game to display tiles.
+Values are \(lqautodetect\(rq, \(lqdefault\(rq, \(lqvga\(rq, or \(lqvesa\(rq.
+Setting \(lqvesa\(rq will cause the game to display tiles, using the full
+capability of the VGA hardware.
+Setting \(lqvga\(rq will cause the game to display tiles, fixed at 640x480
+in 16 colors, a mode that is compatible with all VGA hardware. Third party
+tilesets will probably not work.
+Setting \(lqautodetect\(rq attempts \(lqvesa\(rq, then \(lqvga\(rq, and
+finally sets \(lqdefault\(rq if neither of those modes works.
 Cannot be set with the \(oqO\(cq command.
 .lp video_height
-Set the VGA mode resolution height (MS-DOS only, with video:vga)
+Set the VGA mode resolution height (MS-DOS only, with video:vesa)
 .lp video_width
-Set the VGA mode resolution width (MS-DOS only, with video:vga)
+Set the VGA mode resolution width (MS-DOS only, with video:vesa)
 .lp videocolors
 Set the color palette for PC systems using NO_TERMS
 (default 4-2-6-1-5-3-15-12-10-14-9-13-11, (PC NetHack only).

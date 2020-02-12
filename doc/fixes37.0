@@ -184,6 +184,11 @@ teach non-mindless monsters about the Castle trapdoors (github #265)
 always print a message when the hero teleports (github #265)
 always print a message when the hero level teleports (github #265)
 remove Sokoban luck penalties for actions you can't cheat with (github #260)
+sounds for minotaurs (github #298)
+correct the Guidebook descriptions for msdos video_width and video_height to
+	state that they work with video:vesa; the video:vga setting that was 
+	described there forces the 640x480x16 mode where video_width and
+	video_height don't operate (github #294)
 
 
 Code Cleanup and Reorganization

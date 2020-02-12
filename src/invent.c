@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1580476196 2020/01/31 13:09:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.288 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1581322662 2020/02/10 08:17:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.290 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -810,22 +810,22 @@ struct obj *obj;
         if (u.uhave.amulet)
             impossible("already have amulet?");
         u.uhave.amulet = 1;
-        u.uachieve.amulet = 1;
+        record_achievement(ACH_AMUL);
     } else if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
         if (u.uhave.menorah)
             impossible("already have candelabrum?");
         u.uhave.menorah = 1;
-        u.uachieve.menorah = 1;
+        record_achievement(ACH_CNDL);
     } else if (obj->otyp == BELL_OF_OPENING) {
         if (u.uhave.bell)
             impossible("already have silver bell?");
         u.uhave.bell = 1;
-        u.uachieve.bell = 1;
+        record_achievement(ACH_BELL);
     } else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
         if (u.uhave.book)
             impossible("already have the book?");
         u.uhave.book = 1;
-        u.uachieve.book = 1;
+        record_achievement(ACH_BOOK);
     } else if (obj->oartifact) {
         if (is_quest_artifact(obj)) {
             if (u.uhave.questart)
@@ -839,12 +839,12 @@ struct obj *obj;
     /* "special achievements"; revealed in end of game disclosure and
        dumplog, originally just recorded in XLOGFILE */
     if (is_mines_prize(obj)) {
-        u.uachieve.mines_luckstone = 1;
-        g.context.achieveo.mines_prize_oid = 0;
+        record_achievement(ACH_LUCK);
+        g.context.achieveo.mines_prize_oid = 0; /* done with luckstone o_id */
         obj->nomerge = 0;
     } else if (is_soko_prize(obj)) {
-        u.uachieve.finish_sokoban = 1;
-        g.context.achieveo.soko_prize_oid = 0;
+        record_achievement(ACH_SOKO);
+        g.context.achieveo.soko_prize_oid = 0; /* done with bag/amulet o_id */
         obj->nomerge = 0;
     }
 }

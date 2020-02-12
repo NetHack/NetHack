@@ -1,4 +1,4 @@
-/* NetHack 3.6	you.h	$NHDT-Date: 1574648937 2019/11/25 02:28:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	you.h	$NHDT-Date: 1581322658 2020/02/10 08:17:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -54,17 +54,25 @@ struct u_event {
     Bitfield(ascended, 1);          /* has offered the Amulet */
 };
 
-struct u_achieve {
-    Bitfield(amulet, 1);  /* touched Amulet */
-    Bitfield(bell, 1);    /* touched Bell */
-    Bitfield(book, 1);    /* touched Book */
-    Bitfield(menorah, 1); /* touched Candelabrum */
-    Bitfield(enter_gehennom,1); /* entered Gehennom (or Valley) by any means */
-    Bitfield(ascended, 1); /* not quite the same as u.uevent.ascended */
-    Bitfield(mines_luckstone, 1); /* got a luckstone at end of mines */
-    Bitfield(finish_sokoban, 1);  /* obtained the sokoban prize */
-
-    Bitfield(killed_medusa, 1);
+/* numerical order of these matters because they've been encoded in a
+   bitmask in xlogfile; reordering would break decoding that; during play
+   the number doesn't matter--they're recorded in the order achieved */
+enum achivements {
+    ACH_BELL =  1, /* acquired Bell of Opening */
+    ACH_HELL =  2, /* entered Gehennom */
+    ACH_CNDL =  3, /* acquired Candelabrum of Invocation */
+    ACH_BOOK =  4, /* acquired Book of the Dead */
+    ACH_INVK =  5, /* performed invocation to gain access to Sanctum */
+    ACH_AMUL =  6, /* acuired The Amulet */
+    ACH_ENDG =  7, /* entered end game */
+    ACH_ASTR =  8, /* entered Astral Plane */
+    ACH_UWIN =  9, /* ascended */
+    ACH_LUCK = 10, /* acquired Mines' End luckstone */
+    ACH_SOKO = 11, /* acquired Sokoban bag of holding or amu of reflection */
+    ACH_MEDU = 12, /* killed Medusa */
+    ACH_BLND = 13, /* hero was always blond, no, blind */
+    ACH_NUDE = 14, /* hero never wore armor */
+    N_ACH
 };
 
 struct u_realtime {
@@ -346,7 +354,6 @@ struct you {
     /* 1 free bit! */
 
     unsigned udg_cnt;           /* how long you have been demigod */
-    struct u_achieve uachieve;  /* achievements */
     struct u_event uevent;      /* certain events have happened */
     struct u_have uhave;        /* you're carrying special objects */
     struct u_conduct uconduct;  /* KMH, conduct */
@@ -399,7 +406,7 @@ struct you {
     struct skills weapon_skills[P_NUM_SKILLS];
     boolean twoweap;         /* KMH -- Using two-weapon combat */
     short mcham;             /* vampire mndx if shapeshifted to bat/cloud */
-
+    xchar uachieved[N_ACH];  /* list of achievements in the order attained */
 }; /* end of `struct you' */
 
 #define Upolyd (u.umonnum != u.umonster)

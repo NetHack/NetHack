@@ -339,6 +339,9 @@ register struct monst *mtmp;
     case MS_WAIL:
         ret = "wail";
         break;
+    case MS_MOO:
+        ret = "low";
+        break;
     case MS_SILENT:
         ret = "commotion";
         break;
@@ -749,6 +752,12 @@ register struct monst *mtmp;
                 verbl_msg = "??????????";
 #endif
         }
+        break;
+    case MS_MOO:
+        if (!mtmp->mpeaceful)
+            pline_msg = "bellows!";
+        else
+            pline_msg = "moos.";
         break;
     case MS_BOAST: /* giants */
         if (!mtmp->mpeaceful) {

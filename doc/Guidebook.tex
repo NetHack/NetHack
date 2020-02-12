@@ -44,8 +44,8 @@
 
 %.au
 \author{Original version - Eric S. Raymond\\
-(Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{January 27, 2020}
+(Edited and expanded for 3.7 by Mike Stephenson and others)}
+\date{February 10, 2020}
 
 \maketitle
 
@@ -3911,7 +3911,7 @@ something pushes the old item into your alternate weapon slot (default off).
 Likewise for the `a' (apply) command if it causes the applied item to
 become wielded.  Persistent.
 %.lp
-\item[\ib(quick\verb+_+farsight)]
+\item[\ib{quick\verb+_+farsight}]
 When set, usually prevents the ``you sense your surroundings'' message
 where play pauses to allow you to browse the map whenever clairvoyance
 randomly activates.
@@ -4430,16 +4430,21 @@ Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{video}]
 Set the video mode used ({\it PC\/ NetHack\/} only).
-Values are {\it autodetect\/}, {\it default\/}, or {\it vga\/}.
-Setting {\it vga\/} (or {\it autodetect\/} with vga hardware present) will
-cause the game to display tiles.
+Values are {\it autodetect\/}, {\it default\/}, {\it vga\/}, or {\it vesa\/}.
+Setting {\it vesa\/} will cause the game to display tiles, using the full
+capability of the VGA hardware.
+Setting {\it vga\/} will cause the game to display tiles, fixed at 640x480
+in 16 colors, a mode that is compatible with all VGA hardware. Third party
+tilesets will probably not work.
+Setting {\it autodetect\/} attempts {\it vesa\/}, then {\it vga\/}, and
+finally sets {\it default\/} if neither of those modes works.
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{video\verb+_+height}]
-Set the VGA mode resolution height (MS-DOS only, with video:vga)
+Set the VGA mode resolution height (MS-DOS only, with video:vesa)
 %.lp
 \item[\ib{video\verb+_+width}]
-Set the VGA mode resolution width (MS-DOS only, with video:vga)
+Set the VGA mode resolution width (MS-DOS only, with video:vesa)
 %.lp
 \item[\ib{videocolors}]
 \begin{sloppypar}

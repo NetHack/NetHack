@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1580577249 2020/02/01 17:14:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1581362470 2020/02/10 19:21:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1698,50 +1698,15 @@ int final;
     g.en_win = WIN_ERR;
 }
 
-/* uses to decide whether there are any achievements to display */
-int
-count_uachieve()
-{
-    int acnt = 0;
-
-    /* these tests must be kept in sync with show_achievements() */
-    if (u.uroleplay.blind)
-        ++acnt;
-    if (u.uroleplay.nudist)
-        ++acnt;
-    if (u.uachieve.mines_luckstone)
-        ++acnt;
-    if (u.uachieve.finish_sokoban)
-        ++acnt;
-    if (u.uachieve.killed_medusa)
-        ++acnt;
-    if (u.uachieve.bell)
-        ++acnt;
-    if (u.uachieve.enter_gehennom)
-        ++acnt;
-    if (u.uachieve.menorah)
-        ++acnt;
-    if (u.uachieve.book)
-        ++acnt;
-    if (u.uevent.invoked)
-        ++acnt;
-    if (u.uachieve.amulet)
-        ++acnt;
-    if (In_endgame(&u.uz))
-        ++acnt;
-    if (Is_astralevel(&u.uz))
-        ++acnt;
-    if (u.uachieve.ascended)
-        ++acnt;
-
-    return acnt;
-}
+/*
+ *      Achievements (see 'enum achievements' in you.h).
+ */
 
 static void
 show_achievements(final)
-int final;
+int final; /* used "behind the curtain" by enl_foo() macros */
 {
-    int acnt;
+    int i, achidx, acnt;
     char title[BUFSZ];
     winid awin = WIN_ERR;
 
@@ -1754,7 +1719,7 @@ int final;
     /* first, figure whether any achievements have been accomplished
        so that we don't show the header for them if the resulting list
        below it would be empty */
-    if ((acnt = count_uachieve()) == 0)
+    if ((acnt = count_achievements()) == 0)
         return;
 
     if (g.en_win != WIN_ERR) {
@@ -1765,73 +1730,162 @@ int final;
     }
     Sprintf(title, "Achievement%s:", plur(acnt));
     putstr(awin, 0, title);
-    /* after 'blind' and 'nudist', which are the easiest if you die but
-       the hardest if you ascend, they're arranged in approximate order
-       of difficulty */
-    if (u.uroleplay.blind)
-        enl_msg(You_, "are exploring", "explored",
-                " without being able to see", "");
-    if (u.uroleplay.nudist)
-        enl_msg(You_, "have gone", "went", " without any armor", "");
 
-    if (u.uachieve.mines_luckstone)
-        enl_msg(You_, "have ", "", "completed the Gnomish Mines", "");
-    if (u.uachieve.finish_sokoban)
-        enl_msg(You_, "have ", "", "completed Sokoban", "");
-    if (u.uachieve.killed_medusa)
-        enl_msg(You_, "have ", "", "defeated Medusa", "");
-    if (u.uachieve.bell) {
-        /* alternate phrasing for present vs past and also for possessing
-           the item vs once held it */
-        enl_msg(You_,
-                u.uhave.bell ? "have" : "have handled",
-                u.uhave.bell ? "had" : "handled",
-                " the Bell of Opening", "");
+    /* display achievements in the order in which they were recorded;
+       lone exception is to defer the Amulet if we just ascended;
+       it warrants alternate wording when given away during ascension,
+       but the Amulet achievement is always attained before entering
+       endgame and the alternate wording looks strange if shown before
+       "reached endgame" and "reached Astral" */
+    if (remove_achievement(ACH_UWIN)) { /* UWIN == Ascended! */
+        /* for ascension, force it to be last and Amulet next to last
+           by taking them out and then adding them back */
+        if (remove_achievement(ACH_AMUL)) /* should always be True here */
+            record_achievement(ACH_AMUL);
+        record_achievement(ACH_UWIN);
     }
-    /* wording is clumsy but the game is inconsistent about "entering
-       Gehennom"; the Valley is part of Gehennom but the message about
-       entering Gehennom is given when descending from the Valley to the
-       level below and that's also when the flag about entering gets set */
-    if (u.uachieve.enter_gehennom)
-        enl_msg(You_, "have ", "", "passed the Valley of the Dead", "");
-    if (u.uachieve.menorah) {
-        enl_msg(You_,
-                u.uhave.menorah ? "have" : "have handled",
-                u.uhave.menorah ? "had" : "handled",
-                " the Candelabrum of Invocation", "");
-    }
-    if (u.uachieve.book) {
-        enl_msg(You_,
-                u.uhave.book ? "have" : "have handled",
-                u.uhave.book ? "had" : "handled",
-                " the Book of the Dead", "");
-    }
-    if (u.uevent.invoked)
-        enl_msg(You_, "have ", "", "gained access to Moloch's Sanctum", "");
-    if (u.uachieve.amulet) {
-        /* extra alternate wording for past tense because ascension
-           requires giving up the Amulet */
-        enl_msg(You_,
-                u.uhave.amulet ? "have" : "have obtained",
-                u.uachieve.ascended ? "delivered"
-                 : u.uhave.amulet ? "had" : "had obtained",
-                " the Amulet of Yendor", "");
-    }
+    for (i = 0; i < acnt; ++i) {
+        achidx = u.uachieved[i];
 
-    /* reaching Astral makes feedback about reaching the Planes be redundant
-       and asceding makes both be redundant, but we display all that apply */
-    if (In_endgame(&u.uz))
-        enl_msg(You_, "have ", "", "reached the Elemental Planes", "");
-    if (Is_astralevel(&u.uz))
-        enl_msg(You_, "have ", "", "reached the Astral Plane", "");
-    if (u.uachieve.ascended)
-        enlght_out(" You ascended!");
+        switch (achidx) {
+        case ACH_BLND:
+            enl_msg(You_, "are exploring", "explored",
+                    " without being able to see", "");
+            break;
+        case ACH_NUDE:
+            enl_msg(You_, "have gone", "went", " without any armor", "");
+            break;
+        case ACH_LUCK:
+            enl_msg(You_, "have ", "", "completed the Gnomish Mines", "");
+            break;
+        case ACH_SOKO:
+            enl_msg(You_, "have ", "", "completed Sokoban", "");
+            break;
+        case ACH_MEDU:
+            enl_msg(You_, "have ", "", "defeated Medusa", "");
+            break;
+        case ACH_BELL:
+            /* alternate phrasing for present vs past and also for
+               possessing the item vs once held it */
+            enl_msg(You_,
+                    u.uhave.bell ? "have" : "have handled",
+                    u.uhave.bell ? "had" : "handled",
+                    " the Bell of Opening", "");
+            break;
+        case ACH_HELL:
+            enl_msg(You_, "have ", "", "entered Gehennom", "");
+            break;
+        case ACH_CNDL:
+            enl_msg(You_,
+                    u.uhave.menorah ? "have" : "have handled",
+                    u.uhave.menorah ? "had" : "handled",
+                    " the Candelabrum of Invocation", "");
+            break;
+        case ACH_BOOK:
+            enl_msg(You_,
+                    u.uhave.book ? "have" : "have handled",
+                    u.uhave.book ? "had" : "handled",
+                    " the Book of the Dead", "");
+            break;
+        case ACH_INVK:
+            enl_msg(You_, "have ", "",
+                    "gained access to Moloch's Sanctum", "");
+            break;
+        case ACH_AMUL:
+            /* alternate wording for ascended (always past tense) since
+               hero had it until #offer forced it to be relinquished */
+            enl_msg(You_,
+                    u.uhave.amulet ? "have" : "have obtained",
+                    u.uevent.ascended ? "delivered"
+                     : u.uhave.amulet ? "had" : "had obtained",
+                    " the Amulet of Yendor", "");
+            break;
+
+        /* reaching Astral makes feedback about reaching the Planes
+           be redundant and ascending makes both be redundant, but
+           we display all that apply */
+        case ACH_ENDG:
+            enl_msg(You_, "have ", "", "reached the Elemental Planes", "");
+            break;
+        case ACH_ASTR:
+            enl_msg(You_, "have ", "", "reached the Astral Plane", "");
+            break;
+        case ACH_UWIN:
+            /* the ultimate achievement... */
+            enlght_out(" You ascended!");
+            break;
+        default:
+            /* title[] has served its purpose, reuse it as a scratch buffer */
+            Sprintf(title, " [Unexpected achievement #%d.]", achidx);
+            enlght_out(title);
+            break;
+        } /* switch */
+    } /* for */
 
     if (awin != g.en_win) {
         display_nhwindow(awin, TRUE);
         destroy_nhwindow(awin);
     }
 }
+
+/* record an achievement (add at end of list unless already present) */
+void
+record_achievement(achidx)
+xchar achidx;
+{
+    int i;
+
+    /* valid achievements range from 1 to N_ACH-1 */
+    if (achidx < 1 || achidx >= N_ACH) {
+        impossible("Achievement #%d is out of range.", achidx);
+        return;
+    }
+
+    /* the list has an extra slot so there is always at least one 0 at
+       its end (more than one unless all N_ACH-1 possible achievements
+       have been recorded); find first empty slot or achievement #achidx;
+       an attempt to duplicate an achievement can happen if any of Bell,
+       Candelabrum, Book, or Amulet is dropped then picked up again */
+    for (i = 0; u.uachieved[i]; ++i)
+        if (u.uachieved[i] == achidx)
+            return; /* already recorded, don't duplicate it */
+    u.uachieved[i] = achidx;
+    return;
+}
+
+/* discard a recorded achievement; return True if removed, False otherwise */
+boolean
+remove_achievement(achidx)
+xchar achidx;
+{
+    int i;
+
+    for (i = 0; u.uachieved[i]; ++i)
+        if (u.uachieved[i] == achidx)
+            break; /* stop when found */
+    if (!u.uachieved[i]) /* not found */
+        return FALSE;
+    /* list is 0 terminated so any beyond the removed one move up a slot */
+    do {
+        u.uachieved[i] = u.uachieved[i + 1];
+    } while (u.uachieved[++i]);
+    return TRUE;
+}
+
+/* used to decide whether there are any achievements to display */
+int
+count_achievements()
+{
+    int i, acnt = 0;
+
+    for (i = 0; u.uachieved[i]; ++i)
+        ++acnt;
+    return acnt;
+}
+
+/*
+ *      Vanquished monsters.
+ */
 
 static const char *vanqorders[NUM_VANQ_ORDER_MODES] = {
     "traditional: by monster level, by internal monster index",

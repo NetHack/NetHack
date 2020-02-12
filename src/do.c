@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1580608377 2020/02/02 01:52:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1581322660 2020/02/10 08:17:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.224 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1039,8 +1039,7 @@ dodown()
         pline("Unspeakable cruelty and harm lurk down there.");
         if (yn("Are you sure you want to enter?") != 'y')
             return 0;
-        else
-            pline("So be it.");
+        pline("So be it.");
         u.uevent.gehennom_entered = 1; /* don't ask again */
     }
 
@@ -1642,7 +1641,8 @@ boolean at_stairs, falling, portal;
             You_hear("groans and moans everywhere.");
         } else
             pline("It is hot here.  You smell smoke...");
-        u.uachieve.enter_gehennom = 1;
+
+        record_achievement(ACH_HELL); /* reached Gehennom */
     }
     /* in case we've managed to bypass the Valley's stairway down */
     if (Inhell && !Is_valley(&u.uz))
@@ -1677,10 +1677,14 @@ boolean at_stairs, falling, portal;
 
     /* special location arrival messages/events */
     if (In_endgame(&u.uz)) {
-        if (new &&on_level(&u.uz, &astral_level))
+        if (newdungeon)
+            record_achievement(ACH_ENDG); /* reached endgame */
+        if (new && on_level(&u.uz, &astral_level)) {
             final_level(); /* guardian angel,&c */
-        else if (newdungeon && u.uhave.amulet)
+            record_achievement(ACH_ASTR); /* reached Astral level */
+        } else if (newdungeon && u.uhave.amulet) {
             resurrect(); /* force confrontation with Wizard */
+        }
     } else if (In_quest(&u.uz)) {
         onquest(); /* might be reaching locate|goal level */
     } else if (In_V_tower(&u.uz)) {

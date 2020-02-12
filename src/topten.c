@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1579914041 2020/01/25 01:00:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1581322668 2020/02/10 08:17:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -428,6 +428,7 @@ encodeconduct()
 static long
 encodeachieve()
 {
+    int i, ilimit;
     long r = 0L;
 
     /*
@@ -469,34 +470,9 @@ encodeachieve()
      * the dungeon overview but both of those things go away as soon as
      * the program exits.
      */
-    if (u.uachieve.bell)
-        r |= 1L << 0;
-    if (u.uachieve.enter_gehennom)
-        r |= 1L << 1;
-    if (u.uachieve.menorah)
-        r |= 1L << 2;
-    if (u.uachieve.book)
-        r |= 1L << 3;
-    if (u.uevent.invoked)
-        r |= 1L << 4;
-    if (u.uachieve.amulet)
-        r |= 1L << 5;
-    if (In_endgame(&u.uz))
-        r |= 1L << 6;
-    if (Is_astralevel(&u.uz))
-        r |= 1L << 7;
-    if (u.uachieve.ascended)
-        r |= 1L << 8;
-    if (u.uachieve.mines_luckstone)
-        r |= 1L << 9;
-    if (u.uachieve.finish_sokoban)
-        r |= 1L << 10;
-    if (u.uachieve.killed_medusa)
-        r |= 1L << 11;
-    if (u.uroleplay.blind)
-        r |= 1L << 12;
-    if (u.uroleplay.nudist)
-        r |= 1L << 13;
+    ilimit = min(N_ACH, 32 - 1); /* 32: portable limit for 'long' */
+    for (i = 0; i < ilimit && u.uachieved[i]; ++i)
+        r |= 1L << (u.uachieved[i] - 1);
 
     return r;
 }

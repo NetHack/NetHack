@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1579401997 2020/01/19 02:46:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1581322665 2020/02/10 08:17:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1516,7 +1516,6 @@ dosacrifice()
             /* The final Test.  Did you win? */
             if (uamul == otmp)
                 Amulet_off();
-            u.uevent.ascended = 1;
             if (carried(otmp))
                 useup(otmp); /* well, it's gone now */
             else
@@ -1552,8 +1551,8 @@ dosacrifice()
                 pline(cloud_of_smoke, hcolor(NH_ORANGE));
                 done(ESCAPED);
             } else { /* super big win */
+                u.uevent.ascended = 1;
                 adjalign(10);
-                u.uachieve.ascended = 1;
                 pline(
                "An invisible choir sings, and you are bathed in radiance...");
                 godvoice(altaralign, "Mortal, thou hast done well!");
@@ -1564,6 +1563,7 @@ dosacrifice()
                     flags.female ? "dess" : "");
                 done(ASCENDED);
             }
+            /*NOTREACHED*/
         }
     } /* real Amulet */
 

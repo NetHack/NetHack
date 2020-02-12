@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1580633720 2020/02/02 08:55:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.787 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1581322657 2020/02/10 08:17:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.795 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -994,7 +994,9 @@ E void FDECL(youhiding, (BOOLEAN_P, int));
 E char *FDECL(trap_predicament, (char *, int, BOOLEAN_P));
 E int NDECL(doconduct);
 E void FDECL(show_conduct, (int));
-E int NDECL(count_uachieve);
+E void FDECL(record_achievement, (XCHAR_P));
+E boolean FDECL(remove_achievement, (XCHAR_P));
+E int NDECL(count_achievements);
 E int NDECL(dovanquished);
 E void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
 E int NDECL(num_genocides);
