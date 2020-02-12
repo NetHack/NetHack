@@ -1895,9 +1895,13 @@ dump_headers()
     fprintf(dumphtml_file, "<meta name=\"date\" content=\"%s\" />\n", iso8601);
     fprintf(dumphtml_file, "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n");
     fprintf(dumphtml_file, "<link href=\"https://cdn.jsdelivr.net/gh/maxwell-k/dejavu-sans-mono-web-font@2.37/index.css\" title=\"Default\" rel=\"stylesheet\" type=\"text/css\" media=\"all\" />\n");
-    fprintf(dumphtml_file, "<style type=\"text/css\">\n");
-    dump_css();
-    fprintf(dumphtml_file, "</style>\n</head>\n<body>\n");
+    if (sysopt.csspath)
+        fprintf (dumphtml_file, "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">\n", sysopt.csspath);
+    else {
+        fprintf(dumphtml_file, "<style type=\"text/css\">\n");
+        dump_css();
+        fprintf(dumphtml_file, "</style>\n</head>\n<body>\n");
+    }
 
 #endif
 }

@@ -37,6 +37,7 @@ sys_early_init()
 #endif
 #ifdef DUMPHTML
     sysopt.dumphtmlfile = (char *) 0;
+    sysopt.csspath = (char *) 0;
 #endif
     sysopt.env_dbgfl = 0; /* haven't checked getenv("DEBUGFILES") yet */
     sysopt.shellers = (char *) 0;
@@ -115,6 +116,8 @@ sysopt_release()
 #ifdef DUMPHTML
     if (sysopt.dumphtmlfile)
         free((genericptr_t)sysopt.dumphtmlfile), sysopt.dumphtmlfile=(char *)0;
+    if (sysopt.csspath)
+        free((genericptr_t)sysopt.csspath), sysopt.csspath = (char *)0;
 #endif
     if (sysopt.genericusers)
         free((genericptr_t) sysopt.genericusers),

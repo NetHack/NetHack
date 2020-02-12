@@ -20,6 +20,8 @@ struct sysopt {
 #endif
 #ifdef DUMPHTML
     char *dumphtmlfile; /* where the html dump is saved */
+    char *csspath; /* relative path (from finished html dump)
+                      of external CSS eg: "../css/NHdump.css" */
 #endif
 
     int env_dbgfl;    /*  1: debugfiles comes from getenv("DEBUGFILES")

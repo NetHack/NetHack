@@ -5567,6 +5567,17 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 %.ei
 %.ed
 \elist
+%.lp
+\item[\ib{DUMPHTMLFILE}]
+A filename where the end-of-game dumplog is saved in HTML format.
+HTML dump will only be created if this is defined. Only available if your game
+is compiled with DUMPHTML. Placeholders are allowed as for DUMPLOGFILE above.
+%.lp
+\item[\ib{CSSPATH}]
+A file-path relative to the eventual location of the HTML dumplog, containing
+the styles needed to render it.  NHdump.css contains example content for this
+file. If this is not specified (but DUMPHTMLFILE is), the CSS (from NHdump.css)
+will be embedded directly into the HTML dumplog.
 
 %.hn 1
 \section{Scoring}
