@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1580610435 2020/02/02 02:27:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1581562593 2020/02/13 02:56:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.157 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3581,12 +3581,11 @@ lua_State *L UNUSED;
 struct selectionvar *
 selection_new()
 {
-    struct selectionvar *
-        tmps = (struct selectionvar *) alloc(sizeof (struct selectionvar));
+    struct selectionvar *tmps = (struct selectionvar *) alloc(sizeof tmps);
 
     tmps->wid = COLNO;
     tmps->hei = ROWNO;
-    tmps->map = (char *)alloc((COLNO * ROWNO) + 1);
+    tmps->map = (char *) alloc((COLNO * ROWNO) + 1);
     (void) memset(tmps->map, 1, (COLNO * ROWNO));
     tmps->map[(COLNO * ROWNO)] = '\0';
 
@@ -3594,14 +3593,18 @@ selection_new()
 }
 
 void
-selection_free(sel)
+selection_free(sel, freesel)
 struct selectionvar *sel;
+boolean freesel;
 {
-    if (!sel)
-        return;
-    Free(sel->map);
-    sel->map = NULL;
-    sel->wid = sel->hei = 0;
+    if (sel) {
+        Free(sel->map);
+        sel->map = NULL;
+        if (freesel)
+            free((genericptr_t) sel);
+        else
+            sel->wid = sel->hei = 0;
+    }
 }
 
 struct selectionvar *
@@ -3811,8 +3814,7 @@ int dir;
             if (selection_getpoint(x, y, tmp))
                 selection_setpoint(x, y, ov, 1);
 
-    selection_free(tmp);
-    free(tmp);
+    selection_free(tmp, TRUE);
 }
 
 static int FDECL((*selection_flood_check_func), (int, int));
@@ -3897,7 +3899,7 @@ boolean diagonals;
     xchar dy[SEL_FLOOD_STACK];
 
     if (selection_flood_check_func == (int FDECL((*), (int, int))) 0) {
-        selection_free(tmp);
+        selection_free(tmp, TRUE);
         return;
     }
     SEL_FLOOD(x, y);
@@ -3923,8 +3925,7 @@ boolean diagonals;
 #undef SEL_FLOOD
 #undef SEL_FLOOD_STACK
 #undef SEL_FLOOD_CHKDIR
-    selection_free(tmp);
-    free(tmp);
+    selection_free(tmp, TRUE);
 }
 
 /* McIlroy's Ellipse Algorithm */
@@ -4554,7 +4555,7 @@ struct selectionvar *ov;
 
     /* try to make a hole or a trapdoor */
     if (Can_fall_thru(&u.uz)) {
-        selection_free(ov3);
+        selection_free(ov3, TRUE);
         ov3 = selection_clone(ov2);
         while (selection_rndcoord(ov3, &x, &y, TRUE)) {
             if (maketrap(x,y, rn2(2) ? HOLE : TRAPDOOR))
@@ -4570,10 +4571,8 @@ struct selectionvar *ov;
 
     res = FALSE;
  gotitdone:
-    selection_free(ov2);
-    free(ov2);
-    selection_free(ov3);
-    free(ov3);
+    selection_free(ov2, TRUE);
+    selection_free(ov3, TRUE);
     return res;
 }
 
@@ -4606,19 +4605,19 @@ ensure_way_out()
 
     do {
         ret = TRUE;
-        for (x = 0; x < COLNO; x++)
+        for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++)
                 if (ACCESSIBLE(levl[x][y].typ)
                     && !selection_getpoint(x, y, ov)) {
-                    if (generate_way_out_method(x,y, ov))
-                        selection_floodfill(ov, x,y, TRUE);
+                    if (generate_way_out_method(x, y, ov))
+                        selection_floodfill(ov, x, y, TRUE);
                     ret = FALSE;
                     goto outhere;
                 }
- outhere: ;
+ outhere:
+        ;
     } while (!ret);
-    selection_free(ov);
-    free(ov);
+    selection_free(ov, TRUE);
 }
 
 int
@@ -5181,9 +5180,9 @@ int prop;
 
     create_des_coder();
 
-    if (argc == 1)
+    if (argc == 1) {
         sel = l_selection_check(L, -1);
-    else if (argc == 0) {
+    } else if (argc == 0) {
         freesel = TRUE;
         sel = selection_new();
         selection_not(sel);
@@ -5191,10 +5190,8 @@ int prop;
 
     if (sel) {
         selection_iterate(sel, sel_set_wall_property, (genericptr_t) &prop);
-        if (freesel) {
-            selection_free(sel);
-            free(sel);
-        }
+        if (freesel)
+            selection_free(sel, TRUE);
     }
 }
 

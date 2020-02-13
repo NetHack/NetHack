@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1581322657 2020/02/10 08:17:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.795 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1581562570 2020/02/13 02:56:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.796 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2471,7 +2471,7 @@ E void FDECL(fill_room, (struct mkroom *, BOOLEAN_P));
 E boolean FDECL(load_special, (const char *));
 E xchar FDECL(selection_getpoint, (int, int, struct selectionvar *));
 E struct selectionvar *NDECL(selection_new);
-E void FDECL(selection_free, (struct selectionvar *));
+E void FDECL(selection_free, (struct selectionvar *, BOOLEAN_P));
 #if !defined(IN_SP_LEV_C)
 E void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
 #endif

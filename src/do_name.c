@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1578764034 2020/01/11 17:33:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1581562587 2020/02/13 02:56:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.172 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -326,7 +326,7 @@ void
 gloc_filter_done()
 {
     if (g.gloc_filter_map) {
-        selection_free(g.gloc_filter_map);
+        selection_free(g.gloc_filter_map, TRUE);
         g.gloc_filter_map = (struct selectionvar *) 0;
 
     }

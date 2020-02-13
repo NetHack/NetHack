@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1581280068 2020/02/09 20:27:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1581562591 2020/02/13 02:56:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -54,7 +54,7 @@ int index;
     struct selectionvar *sel;
 
     luaL_checktype(L, index, LUA_TUSERDATA);
-    sel = (struct selectionvar *)luaL_checkudata(L, index, "selection");
+    sel = (struct selectionvar *) luaL_checkudata(L, index, "selection");
     if (!sel)
         nhl_error(L, "Selection error");
     return sel;
@@ -65,8 +65,9 @@ l_selection_gc(L)
 lua_State *L;
 {
     struct selectionvar *sel = l_selection_check(L, 1);
+
     if (sel)
-        selection_free(sel);
+        selection_free(sel, FALSE);
     return 0;
 }
 
@@ -89,15 +90,16 @@ l_selection_push(L)
 lua_State *L;
 {
     struct selectionvar *tmp = selection_new();
-    struct selectionvar *sel = (struct selectionvar *)lua_newuserdata(L, sizeof(struct selectionvar));
+    struct selectionvar
+        *sel = (struct selectionvar *) lua_newuserdata(L, sizeof sel);
+
     luaL_getmetatable(L, "selection");
     lua_setmetatable(L, -2);
 
     sel->wid = tmp->wid;
     sel->hei = tmp->hei;
     sel->map = dupstr(tmp->map);
-    selection_free(tmp);
-    free(tmp);
+    selection_free(tmp, TRUE);
 
     return sel;
 }
