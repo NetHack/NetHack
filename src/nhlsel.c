@@ -91,7 +91,7 @@ lua_State *L;
 {
     struct selectionvar *tmp = selection_new();
     struct selectionvar
-        *sel = (struct selectionvar *) lua_newuserdata(L, sizeof sel);
+        *sel = (struct selectionvar *) lua_newuserdata(L, sizeof(struct selectionvar));
 
     luaL_getmetatable(L, "selection");
     lua_setmetatable(L, -2);
