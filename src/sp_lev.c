@@ -3581,7 +3581,7 @@ lua_State *L UNUSED;
 struct selectionvar *
 selection_new()
 {
-    struct selectionvar *tmps = (struct selectionvar *) alloc(sizeof tmps);
+    struct selectionvar *tmps = (struct selectionvar *) alloc(sizeof(struct selectionvar));
 
     tmps->wid = COLNO;
     tmps->hei = ROWNO;
