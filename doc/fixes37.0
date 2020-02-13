@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ $NHDT-Date: 1581210469 2020/02/09 01:07:49 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ $NHDT-Date: 1581637124 2020/02/13 23:38:44 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -55,6 +55,7 @@ allow defining #wizgenesis quantity in the prompt
 digging through iron bars from an adjacent pit made a pit on top of the bars
 give feedback if controlled level teleport attempt fails because hero is
 	already on the bottom level and player tries to go even deeper
+unseen pet that drowned didn't give "you have a sad feeling" message
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
