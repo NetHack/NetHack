@@ -579,7 +579,8 @@ xchar lev;
             for (x = 0; x < COLNO; x++) {
                 g.level.monsters[x][y] = 0;
                 g.level.objects[x][y] = 0;
-                levl[x][y] = cg.zerorm;
+                levl[x][y].seenv = 0;
+                levl[x][y].glyph = GLYPH_UNEXPLORED;
             }
         fmon = 0;
         g.ftrap = 0;

@@ -804,7 +804,9 @@ int howmuch;
         for (zy = 0; zy < ROWNO; zy++)
             if (howmuch & ALL_MAP || rn2(7)) {
                 /* Zonk all memory of this location. */
-                levl[zx][zy] = cg.zerorm;
+                levl[zx][zy].seenv = 0;
+                levl[zx][zy].waslit = 0;
+                levl[zx][zy].glyph = GLYPH_UNEXPLORED;
                 g.lastseentyp[zx][zy] = STONE;
             }
     /* forget overview data for this level */

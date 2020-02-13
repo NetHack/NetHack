@@ -585,6 +585,8 @@ makevtele()
 void
 clear_level_structures()
 {
+    static struct rm zerorm = { GLYPH_UNEXPLORED,
+                                0, 0, 0, 0, 0, 0, 0, 0, 0 };
     register int x, y;
     register struct rm *lev;
 
@@ -595,7 +597,7 @@ clear_level_structures()
     for (x = 0; x < COLNO; x++) {
         lev = &levl[x][0];
         for (y = 0; y < ROWNO; y++) {
-            *lev++ = cg.zerorm;
+            *lev++ = zerorm;
             /*
              * These used to be '#if MICROPORT_BUG',
              * with use of memset(0) for '#if !MICROPORT_BUG' below,

@@ -699,7 +699,6 @@ const struct const_globals cg = {
     DUMMY, /* zeroobj */
     DUMMY, /* zeromonst */
     DUMMY, /* zeroany */
-    { GLYPH_UNEXPLORED, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 #define ZERO(x) memset(&x, 0, sizeof(x))
