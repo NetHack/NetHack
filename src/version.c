@@ -170,10 +170,11 @@ doextversion()
        the file manually so we can include dynamic version info */
 
     (void) getversionstring(buf);
-    /* if extra text (git info) is present, put it on separate line */
+    /* if extra text (git info) is present, put it on separate line
+       but don't wrap on (x86) */
     if (strlen(buf) >= COLNO)
         p = rindex(buf, '(');
-    if (p && p > buf && p[-1] == ' ')
+    if (p && p > buf && p[-1] == ' ' && p[1] != 'x')
         p[-1] = '\0';
     else
         p = 0;
