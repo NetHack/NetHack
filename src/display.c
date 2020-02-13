@@ -901,13 +901,15 @@ void
 shieldeff(x, y)
 xchar x, y;
 {
-    register int i;
+    register int i, offset;
 
     if (!flags.sparkle)
         return;
     if (cansee(x, y)) { /* Don't see anything if can't see the location */
-        for (i = 0; i < SHIELD_COUNT; i++) {
-            show_glyph(x, y, cmap_to_glyph(shield_static[i]));
+        offset = rn2(SHIELD_COUNT); /* Start on random frame of animation */
+        for (i = 0; i < flags.sparkle; i++) {
+            show_glyph(x, y, cmap_to_glyph(shield_static[(i+offset) %
+                        SHIELD_COUNT]));
             flush_screen(1); /* make sure the glyph shows up */
             delay_output();
         }
