@@ -35,6 +35,8 @@
 
 #define QWERTZ_SUPPORT  /* when swap_yz is True, numpad 7 is 'z' not 'y' */
 
+#define OPTIONS_AT_RUNTIME  /* build info done at runtime not text file */
+
 /*
  * -----------------------------------------------------------------
  *  The remaining code shouldn't need modification.

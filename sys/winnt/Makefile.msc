@@ -356,13 +356,14 @@ CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
 SOBJ   = $(O)windmain.o $(O)winnt.o $(O)win10.o \
 	$(O)safeproc.o $(O)nhlan.o $(SOUND) 
 
-OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
-         $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
-         $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
-         $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
-         $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(VOBJ30) \
-         $(REGEX)  $(CURSESOBJ) $(MDLIB)
+OBJS   = $(MDLIB) \
+	$(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
+	$(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
+	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
+	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
+	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
+	$(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(VOBJ30) \
+	$(REGEX)  $(CURSESOBJ)
 
 WINDHDR = $(MSWSYS)\win10.h $(MSWSYS)\winos.h $(MSWSYS)\win32api.h
 
@@ -904,7 +905,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
 			$(ALLOBJ) $(TTYOBJ) $(O)console.res $(KEYDLLS) \
 			$(LUATARGETS) $(PDCLIB)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
-        @echo Linking $(@:\=/)
+	@echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
 		$(LIBS) $(PDCLIB) $(LUALIB) \
 		$(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
@@ -1035,7 +1036,7 @@ $(O)sp_lev.tag:
 
 $(O)utility.tag: $(INCL)\nhlua.h $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
 		$(SRC)\vis_tab.c $(INCL)\vis_tab.h $(TILEUTIL16)
-             @echo utilities made >$@
+	     @echo utilities made >$@
 	     @echo utilities made.
 
 $(INCL)\nhlua.h: 
@@ -1193,7 +1194,7 @@ $(O)envchk.tag: $(O)obj.tag
 #	   @echo Warning, the CL Environment variable is defined:
 #	   @echo CL=$(CL)
 !	ENDIF
-        echo envchk >$@
+	echo envchk >$@
 
 #==========================================
 #=========== SECONDARY TARGETS ============
@@ -1625,15 +1626,15 @@ spotless: clean
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
 	if exist $(O)nh*key.lib          del $(O)nh*key.lib
 	if exist $(O)nh*key.exp          del $(O)nh*key.exp
-        if exist $(MSWIN)\mnsel.bmp      del $(MSWIN)\mnsel.bmp
-        if exist $(MSWIN)\mnselcnt.bmp   del $(MSWIN)\mnselcnt.bmp
-        if exist $(MSWIN)\mnunsel.bmp    del $(MSWIN)\mnunsel.bmp
-        if exist $(MSWIN)\petmark.bmp    del $(MSWIN)\petmark.bmp
-        if exist $(MSWIN)\pilemark.bmp   del $(MSWIN)\pilemark.bmp
-        if exist $(MSWIN)\rip.bmp        del $(MSWIN)\rip.bmp
-        if exist $(MSWIN)\splash.bmp     del $(MSWIN)\splash.bmp
-        if exist $(MSWIN)\nethack.ico    del $(MSWIN)\nethack.ico
-        if exist $(MSWSYS)\nethack.ico   del $(MSWSYS)\nethack.ico
+	if exist $(MSWIN)\mnsel.bmp      del $(MSWIN)\mnsel.bmp
+	if exist $(MSWIN)\mnselcnt.bmp   del $(MSWIN)\mnselcnt.bmp
+	if exist $(MSWIN)\mnunsel.bmp    del $(MSWIN)\mnunsel.bmp
+	if exist $(MSWIN)\petmark.bmp    del $(MSWIN)\petmark.bmp
+	if exist $(MSWIN)\pilemark.bmp   del $(MSWIN)\pilemark.bmp
+	if exist $(MSWIN)\rip.bmp        del $(MSWIN)\rip.bmp
+	if exist $(MSWIN)\splash.bmp     del $(MSWIN)\splash.bmp
+	if exist $(MSWIN)\nethack.ico    del $(MSWIN)\nethack.ico
+	if exist $(MSWSYS)\nethack.ico   del $(MSWSYS)\nethack.ico
 	if exist $(U)recover.exe         del $(U)recover.exe
 	if exist $(U)tile2bmp.exe        del $(U)tile2bmp.exe
 	if exist $(U)tilemap.exe         del $(U)tilemap.exe
