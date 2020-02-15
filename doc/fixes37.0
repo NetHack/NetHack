@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ $NHDT-Date: 1581637124 2020/02/13 23:38:44 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ $NHDT-Date: 1581726277 2020/02/15 00:24:37 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -94,6 +94,7 @@ prevent "you materialize on a different level" after "a mysterious force
 set g.context.botl for glove and wielding actions that could start or end
 	bare-handedness in support of condtests[bl_bareh]
 reinstate ranked ordering of the status condition fields
+grammar for messages about a monster removing items from a container was bad
 
 
 Platform- and/or Interface-Specific Fixes

@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1580685754 2020/02/02 23:22:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1581726278 2020/02/15 00:24:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1847,8 +1847,8 @@ boolean vismon;
                                 * even if [attempted] removal is observed */
         if (!*contnr_nam) {
             /* xname sets dknown, distant_name doesn't */
-            Strcpy(contnr_nam, nearby ? xname(container)
-                                      : distant_name(container, xname));
+            Strcpy(contnr_nam, an(nearby ? xname(container)
+                                         : distant_name(container, xname)));
         }
         /* this was originally just 'can_carry(mon, xobj)' which
            covers objects a monster shouldn't pick up but also
@@ -1865,10 +1865,10 @@ boolean vismon;
                     Norep("%s rummages through %s.", Monnam(mon), contnr_nam);
                 else if (takeout_indx == 0) /* adjacent, first item */
                     pline("%s removes %s from %s.", Monnam(mon),
-                          an(xname(xobj)), contnr_nam);
+                          doname(xobj), contnr_nam);
                 else /* adjacent, additional items */
                     pline("%s removes %s.", upstart(mpronounbuf),
-                          an(xname(xobj)));
+                          doname(xobj));
             }
             /* obj_extract_self(xobj); -- already done above */
             (void) mpickobj(mon, xobj);
