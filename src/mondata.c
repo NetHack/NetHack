@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1574648940 2019/11/25 02:29:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1581803740 2020/02/15 21:55:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -197,6 +197,13 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
 
     /* no eyes protect against all attacks for now */
     if (!haseyes(mdef->data))
+        return FALSE;
+
+    /* /corvus oculum corvi non eruit/
+       a saying expressed in Latin rather than a zoological observation:
+       "a crow will not pluck out the eye of another crow"
+       so prevent ravens from blinding each other */
+    if (magr->data == &mons[PM_RAVEN] && mdef->data == &mons[PM_RAVEN])
         return FALSE;
 
     switch (aatyp) {

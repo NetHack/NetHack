@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ $NHDT-Date: 1581732920 2020/02/15 02:15:20 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.101 $ $NHDT-Date: 1581803740 2020/02/15 21:55:40 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -56,6 +56,7 @@ digging through iron bars from an adjacent pit made a pit on top of the bars
 give feedback if controlled level teleport attempt fails because hero is
 	already on the bottom level and player tries to go even deeper
 unseen pet that drowned didn't give "you have a sad feeling" message
+prevent ravens from blinding other ravens: /corvus oculum corvi non eruit/
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
