@@ -5,4 +5,4 @@ EOF--EOF
 .
 .\" post process with "sed -e '/EOF--EOF/,12345D'" to remove trailing junk
 .\" (also removes Unix trademark footnote; that ought to be kept but the
-/\" generic "all trademarks are held by respective owners" is still present)
+.\" generic "all trademarks are held by respective owners" is still present)
