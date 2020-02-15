@@ -1,5 +1,5 @@
 #      NetHack Documentation Makefile.
-# NetHack 3.6  Makefile.doc    $NHDT-Date: 1540625947 2018/10/27 07:39:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.17 $
+# NetHack 3.6  Makefile.doc    $NHDT-Date: 1581732920 2020/02/15 02:15:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -34,6 +34,8 @@ PSCMD = groff
 # GUIDECMD= $(GUIDE_PREFORMAT) | perl -pe 's/^(.mt)$$/.pl 4720v\n.in 0\n.po 8\n.ll 64m\n$$1/' | nroff -c -Tascii | $(COLCMD)
 #
 GUIDECMD = $(GUIDE_PREFORMAT) | nroff -c -Tascii | $(COLCMD)
+ONEPAGECMD = $(ONEPAGE_PREFORMAT) | nroff -c -Tascii | $(COLCMD) \
+	| sed -e '/EOF--EOF/,12345D'
 
 # Only generate output for the current configuration:
 NHGREP = $(MAKEDEFS) --grep --input - --output -
@@ -43,6 +45,9 @@ NHGREP = $(MAKEDEFS) --grep --input - --output -
 #NHGREP = cat
 
 GUIDE_PREFORMAT = cat Guidebook.mn | $(NHGREP) | tbl tmac.n -
+# for Guidebook.dat, unpaginated version of Guidebook.txt
+ONEPAGE_PREFORMAT = cat Gbk-1pg-pfx.mn Guidebook.mn Gbk-1pg-sfx.mn \
+	| $(NHGREP) | tbl tmac.n -
 
 # the basic guidebook
 Guidebook:	Guidebook.mn tmac.n tmac.nh
@@ -97,6 +102,9 @@ distrib: $(DISTRIB)
 
 Guidebook.txt	: Guidebook.mn tmac.n tmac.nh
 	$(GUIDECMD) > Guidebook.txt
+Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn Guidebook.mn tmac.n tmac.nh
+	$(ONEPAGECMD) > Guidebook.dat
+
 MAN2TXT = $(NHGREP) | nroff -man - | $(COLCMD)
 nethack.txt	: nethack.6
 	cat nethack.6 | $(MAN2TXT) > nethack.txt
@@ -115,7 +123,7 @@ clean:
 	-rm -f Guidebook.aux Guidebook.log
 
 spotless: clean
-	-rm -f Guidebook Guidebook.ps Guidebook.dvi
+	-rm -f Guidebook Guidebook.dat Guidebook.ps Guidebook.dvi
 
 maintainer-clean: spotless
 	-rm -f $(DISTRIB)
