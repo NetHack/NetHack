@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.368 $ $NHDT-Date: 1581722897 2020/02/14 23:28:17 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ $NHDT-Date: 1581772703 2020/02/15 13:18:23 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -2862,15 +2862,14 @@ and to limit the number of questions during disclosure.
 Listed roughly in order of difficulty and not necessarily in the order
 in which you might accomplish them.
 .\" Vary the output between Guidebook.txt and Guidebook.{ps,pdf}
-.ie \n(fF \{
-.\" fixed-width font: suppress indentation; default key width is fine;
+.ie \n(fF \{\
+.\" fixed-width font: default key width is fine;
 .\" display longest entries (below) across two lines for Guidebook.txt
-.SD n
 .PS "Mines'\~End"
 .\}
 .el \{\
-.\" proportianal font: use indentation and force wider key
-.SD i
+.\" proportional font: force a blank line and use a slightly wider key
+.sp
 .PS "Mines'\~End\~"
 .\}
 .fi
@@ -2932,7 +2931,7 @@ Never wore any armor.
 .PL Ascended
 Delivered the Amulet to its final destination.
 .PE
-.ED
+.sp
 .lp "Notes:  "
 .pg
 There's no guaranteed \fINovel\fP so the achievement to read one might
