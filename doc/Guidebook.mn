@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ $NHDT-Date: 1581772703 2020/02/15 13:18:23 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.371 $ $NHDT-Date: 1581800856 2020/02/15 21:07:36 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -2536,7 +2536,7 @@ Putting on a ring activates its magic.
 You can wear at most two rings at any time, one on the ring finger of
 each hand.
 .pg
-Most rings also cause you to grow hungry more rapidly, the rate
+Most worn rings also cause you to grow hungry more rapidly, the rate
 varying with the type of ring.
 .pg
 When wearing gloves, rings are worn underneath.
@@ -2615,6 +2615,15 @@ Other tools (such as pick-axe) can be wielded as weapons in addition to
 being applied for their usual purpose, and in some cases (again, pick-axe)
 become wielded as a weapon even when applied.
 .pg
+.\" Mentioned here because of the old method of attempting "Zen" conduct:
+.\" restart until there's a blindfold in starting inventory and put it on
+.\" first thing.
+The
+.op blind
+option can be set (prior to game start) to attempt to play the entire
+game without being able to see (a self-imposed challenge which is
+very difficult to accomplish).
+.pg
 The command to use a tool is \(oqa\(cq (apply).
 .hn 3
 Containers
@@ -2642,6 +2651,8 @@ rings, amulets have various magical properties, some beneficial,
 some harmful, which are activated by putting them on.
 .pg
 Only one amulet may be worn at a time, around your neck.
+Like wearing rings, wearing an amulet affects your metabolism, causing
+you to grow hungry more rapidly.
 .pg
 The commands to use amulets are the same as for rings, \(oqP\(cq (put on)
 and \(oqR\(cq (remove).
