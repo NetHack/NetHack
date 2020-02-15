@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ $NHDT-Date: 1581726277 2020/02/15 00:24:37 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ $NHDT-Date: 1581732920 2020/02/15 02:15:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -162,6 +162,8 @@ added several new status conditions all of which are opt-in except
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------
+teach unix/Makefile.doc how to make Guidebook.dat, an unpaginated copy of
+	Guidebook.txt
 
 
 NetHack Community Patches (or Variation) Included
