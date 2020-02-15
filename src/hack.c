@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1579261288 2020/01/17 11:41:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.245 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1581810065 2020/02/15 23:41:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.247 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2925,10 +2925,11 @@ monster_nearby()
 
 void
 nomul(nval)
-register int nval;
+int nval;
 {
     if (g.multi < nval)
         return;              /* This is a bug fix by ab@unido */
+    g.context.botl |= (g.multi >= 0);
     u.uinvulnerable = FALSE; /* Kludge to avoid ctrl-C bug -dlc */
     u.usleep = 0;
     g.multi = nval;
@@ -2942,6 +2943,7 @@ void
 unmul(msg_override)
 const char *msg_override;
 {
+    g.context.botl = 1;
     g.multi = 0; /* caller will usually have done this already */
     if (msg_override)
         g.nomovemsg = msg_override;

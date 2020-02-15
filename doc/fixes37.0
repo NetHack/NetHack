@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.101 $ $NHDT-Date: 1581803740 2020/02/15 21:55:40 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ $NHDT-Date: 1581810078 2020/02/15 23:41:18 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -96,6 +96,7 @@ set g.context.botl for glove and wielding actions that could start or end
 	bare-handedness in support of condtests[bl_bareh]
 reinstate ranked ordering of the status condition fields
 grammar for messages about a monster removing items from a container was bad
+some new status conditions didn't always update when they should
 
 
 Platform- and/or Interface-Specific Fixes

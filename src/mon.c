@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1581637127 2020/02/13 23:38:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.322 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1581810072 2020/02/15 23:41:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2319,6 +2319,10 @@ unstuck(mtmp)
 struct monst *mtmp;
 {
     if (u.ustuck == mtmp) {
+        g.context.botl = 1;
+        /* do this first so that docrt()'s botl update is accurate;
+           safe to do as long as u.uswallow is also cleared before docrt() */
+        u.ustuck = (struct monst *) 0;
         if (u.uswallow) {
             u.ux = mtmp->mx;
             u.uy = mtmp->my;
@@ -2333,7 +2337,6 @@ struct monst *mtmp;
             if (attacktype(mtmp->data, AT_ENGL) && !mtmp->mspec_used)
                 mtmp->mspec_used = rnd(2);
         }
-        u.ustuck = 0;
     }
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1575245065 2019/12/02 00:04:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.168 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1581810070 2020/02/15 23:41:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -217,6 +217,7 @@ struct monst *mtmp;
 struct permonst *mdat; /* if mtmp is polymorphed, mdat != mtmp->data */
 boolean message;
 {
+    g.context.botl = 1;
     if (message) {
         if (is_animal(mdat)) {
             You("get regurgitated!");
@@ -1267,8 +1268,10 @@ register struct attack *mattk;
         break;
     case AD_STCK:
         hitmsg(mtmp, mattk);
-        if (uncancelled && !u.ustuck && !sticks(g.youmonst.data))
+        if (uncancelled && !u.ustuck && !sticks(g.youmonst.data)) {
+            g.context.botl = 1;
             u.ustuck = mtmp;
+        }
         break;
     case AD_WRAP:
         if ((!mtmp->mcan || u.ustuck == mtmp) && !sticks(g.youmonst.data)) {
@@ -1276,6 +1279,7 @@ register struct attack *mattk;
                 if (u_slip_free(mtmp, mattk)) {
                     dmg = 0;
                 } else {
+                    g.context.botl = 1;
                     pline("%s swings itself around you!", Monnam(mtmp));
                     u.ustuck = mtmp;
                 }
