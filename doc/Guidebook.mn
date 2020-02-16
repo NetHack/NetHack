@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.371 $ $NHDT-Date: 1581800856 2020/02/15 21:07:36 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.372 $ $NHDT-Date: 1581817474 2020/02/16 01:44:34 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -2364,18 +2364,18 @@ Here is a list of the armor class values provided by suits of armor:
 .\" that, AC7 became the longest and the table looks better by shortening
 .\" it to get the second column (number) closer to the text on most lines.
 .\" Both AC4 and AC7 have trailing tab plus empty comment on their first
-.\" line and leading non-breakable spaces to indent their second line.
+.\" line and leading spaces to indent their second line.
 .TS S
 center;
 a n.
 Dragon scale mail	1
 Plate mail, Crystal plate mail	3
 Bronze plate mail, Splint mail,	\"
-\~\~Banded mail, Dwarvish mithril-coat	4
+\ \ \ Banded mail, Dwarvish mithril-coat	4
 Chain mail, Elven mithril-coat	5
 Scale mail, Orcish chain mail	6
 Ring mail, Studded leather armor,	\"
-\~\~Dragon scales	7
+\ \ \ Dragon scales	7
 Leather armor, Orcish ring mail	8
 Leather jacket	9
 none	10
@@ -2879,8 +2879,9 @@ in which you might accomplish them.
 .PS "Mines'\~End"
 .\}
 .el \{\
-.\" proportional font: force a blank line and use a slightly wider key
+.\" proportional font: force blank line, indent, and use slightly wider key
 .sp
+.in +5n
 .PS "Mines'\~End\~"
 .\}
 .fi
@@ -2942,6 +2943,7 @@ Never wore any armor.
 .PL Ascended
 Delivered the Amulet to its final destination.
 .PE
+.if !\n(fF .in -5n .fi \" undo proportional-width font-specific indentation
 .sp
 .lp "Notes:  "
 .pg
