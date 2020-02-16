@@ -182,7 +182,9 @@ struct monst *mon;
 }
 
 /* True iff monster can be blinded by the given attack;
-   note: may return True when mdef is blind (e.g. new cream-pie attack) */
+   note: may return True when mdef is blind (e.g. new cream-pie attack)
+   magr can be NULL.
+*/
 boolean
 can_blnd(magr, mdef, aatyp, obj)
 struct monst *magr; /* NULL == no specific aggressor */
@@ -203,7 +205,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
        a saying expressed in Latin rather than a zoological observation:
        "a crow will not pluck out the eye of another crow"
        so prevent ravens from blinding each other */
-    if (magr->data == &mons[PM_RAVEN] && mdef->data == &mons[PM_RAVEN])
+    if (magr && magr->data == &mons[PM_RAVEN] && mdef->data == &mons[PM_RAVEN])
         return FALSE;
 
     switch (aatyp) {
