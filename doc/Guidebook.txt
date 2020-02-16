@@ -2617,17 +2617,17 @@
 
                Here  is  a list of the armor class values provided by suits
           of armor:
-                      Dragon scale mail                        1
-                      Plate mail, Crystal plate mail           3
-                      Bronze plate mail, Splint mail,
+                     Dragon scale mail                         1
+                     Plate mail, Crystal plate mail            3
+                     Bronze plate mail, Splint mail,
                         Banded mail, Dwarvish mithril-coat     4
-                      Chain mail, Elven mithril-coat           5
-                      Scale mail, Orcish chain mail            6
-                      Ring mail, Studded leather armor,
+                     Chain mail, Elven mithril-coat            5
+                     Scale mail, Orcish chain mail             6
+                     Ring mail, Studded leather armor,
                         Dragon scales                          7
-                      Leather armor, Orcish ring mail          8
-                      Leather jacket                           9
-                      none                                    10
+                     Leather armor, Orcish ring mail           8
+                     Leather jacket                            9
+                     none                                     10
 
                You can also wear other pieces of armor  (cloak  over  suit,
           shirt  under  suit,  helmet, gloves, boots, shield) to lower your
@@ -2806,8 +2806,8 @@
                Putting on a ring activates its magic.  You can wear at most
           two rings at any time, one on the ring finger of each hand.
 
-               Most rings also cause you to grow hungry more  rapidly,  the
-          rate varying with the type of ring.
+               Most worn rings also cause you to grow hungry more  rapidly,
+          the rate varying with the type of ring.
 
                When  wearing  gloves,  rings  are  worn underneath.  If the
           gloves are cursed, rings cannot be put on and any  already  being
@@ -2908,6 +2908,10 @@
 
 
 
+               The blind option can be set (prior to game start) to attempt
+          to play the entire game without being able to see (a self-imposed
+          challenge which is very difficult to accomplish).
+
                The command to use a tool is `a' (apply).
 
           7.10.1.  Containers
@@ -2932,7 +2936,9 @@
           Like rings, amulets have various magical properties, some benefi-
           cial, some harmful, which are activated by putting them on.
 
-               Only one amulet may be worn at a time, around your neck.
+               Only  one  amulet  may  be worn at a time, around your neck.
+          Like wearing rings, wearing an amulet  affects  your  metabolism,
+          causing you to grow hungry more rapidly.
 
                The  commands  to use amulets are the same as for rings, `P'
           (put on) and `R' (remove).  `A' can be  used  to  remove  various
@@ -2954,14 +2960,8 @@
           tile weapons (if you have a sling).  In  the  most  desperate  of
           cases, you can still throw them by hand.
 
-          7.13.  Large rocks (``')
 
-               Statues  and  boulders  are not particularly useful, and are
-          generally heavy.  It is rumored that some statues  are  not  what
-          they seem.
 
-               Boulders  occasionally  block  your  path.  You can push one
-          forward (by attempting to walk onto its spot) when nothing blocks
 
 
           NetHack 3.7                                     February 15, 2020
@@ -2974,6 +2974,14 @@
 
 
 
+          7.13.  Large rocks (``')
+
+               Statues  and  boulders  are not particularly useful, and are
+          generally heavy.  It is rumored that some statues  are  not  what
+          they seem.
+
+               Boulders  occasionally  block  your  path.  You can push one
+          forward (by attempting to walk onto its spot) when nothing blocks
           its  path,  or  you  can smash it into a pile of small rocks with
           breaking magic or a pick-axe.  Very large humanoids  (giants  and
           their  ilk)  have  been known to pick up boulders and use them as
@@ -3019,15 +3027,7 @@
           er the object and resume remembering it.
 
                The situation is the same for a pile of objects, except that
-          only the top item of the pile is displayed.  The hilite_pile  op-
-          tion  can be enabled in order to show an item differently when it
-          is the top one of a pile.
-
-          8.  Conduct
-
-               As if winning NetHack were  not  difficult  enough,  certain
-          players  seek to challenge themselves by imposing restrictions on
-          the way they play the game.  The game automatically  tracks  some
+          only the top item of the  pile  is  displayed.   The  hilite_pile
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3040,6 +3040,14 @@
 
 
 
+          option  can  be enabled in order to show an item differently when
+          it is the top one of a pile.
+
+          8.  Conduct
+
+               As if winning NetHack were  not  difficult  enough,  certain
+          players  seek to challenge themselves by imposing restrictions on
+          the way they play the game.  The game automatically  tracks  some
           of  these  challenges,  which can be checked at any time with the
           #conduct command or at the end of the game.  When you perform  an
           action  which  breaks  a  challenge, it will no longer be listed.
@@ -3086,14 +3094,6 @@
           brains while polymorphed into a mind flayer, is considered eating
           an animal, although wax is only an animal byproduct.
 
-               Regardless  of  conduct,  there will be some items which are
-          indigestible, and others which are hazardous  to  eat.   Using  a
-          swallow-and-digest attack against a monster is equivalent to eat-
-          ing the monster's corpse.  Please note that the term  "vegan"  is
-          used  here  only  in  the context of diet.  You are still free to
-          choose not to use  or  wear  items  derived  from  animals  (e.g.
-          leather,  dragon hide, bone, horns, coral), but the game will not
-          keep track of this for you.  Also note that "milky"  potions  may
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3106,6 +3106,14 @@
 
 
 
+               Regardless  of  conduct,  there will be some items which are
+          indigestible, and others which are hazardous  to  eat.   Using  a
+          swallow-and-digest attack against a monster is equivalent to eat-
+          ing the monster's corpse.  Please note that the term  "vegan"  is
+          used  here  only  in  the context of diet.  You are still free to
+          choose not to use  or  wear  items  derived  from  animals  (e.g.
+          leather,  dragon hide, bone, horns, coral), but the game will not
+          keep track of this for you.  Also note that "milky"  potions  may
           be a translucent white, but they do not contain milk, so they are
           compatible with a vegan  diet.   Slime  molds  or  player-defined
           "fruits",  although  they  could  be  anything from "cherries" to
@@ -3151,15 +3159,7 @@
           You  can change the form of an item into another item of the same
           type ("polypiling") or the form of your  own  body  into  another
           creature  ("polyself")  by  wand,  spell, or potion of polymorph;
-          avoiding these effects are each considered challenges.   Polymor-
-          phing  monsters,  including  pets, does not break either of these
-          challenges.  Finally, you may sometimes receive  wishes;  a  game
-          without  an attempt to wish for any items is a challenge, as is a
-          game without wishing for an artifact (even if the artifact  imme-
-          diately  disappears).  When the game offers you an opportunity to
-          make a wish for an item, you may choose "nothing" if you want  to
-          decline.
-
+          avoiding  these   effects   are   each   considered   challenges.
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3171,6 +3171,14 @@
           NetHack Guidebook                                              49
 
 
+
+          Polymorphing  monsters,  including pets, does not break either of
+          these challenges.  Finally, you may sometimes receive  wishes;  a
+          game  without an attempt to wish for any items is a challenge, as
+          is a game without wishing for an artifact (even if  the  artifact
+          immediately disappears).  When the game offers you an opportunity
+          to make a wish for an item, you may choose "nothing" if you  want
+          to decline.
 
           8.1.  Achievements
 
@@ -3218,14 +3226,6 @@
           unique  but  are considered to be prizes or rewards for exploring
           those levels since doing so is  not  necessary  to  complete  the
           game.  Finding other instances of the same objects doesn't record
-          the corresponding achievement.
-
-               The Medusa achievement is recorded if she dies for any  rea-
-          son,  even  if  you are not directly responsible, and only if she
-          dies.
-
-               Blind and Nudist are also conducts, and they can only be en-
-          abled   by   setting   the   correspondingly   named   option  in
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3238,10 +3238,18 @@
 
 
 
-          NETHACKOPTIONS or  run-time  configuration  file  prior  to  game
-          start.   In  the case of Blind, the option also enforces the con-
-          duct.  They aren't really significant accomplishments  unless/un-
-          til you make substantial progress into the dungeon.
+          the corresponding achievement.
+
+               The Medusa achievement is recorded if she dies for any  rea-
+          son,  even  if  you are not directly responsible, and only if she
+          dies.
+
+               Blind and Nudist are also conducts, and they can only be en-
+          abled  by  setting the correspondingly named option in NETHACKOP-
+          TIONS or run-time configuration file prior to game start.  In the
+          case of Blind, the option also enforces the conduct.  They aren't
+          really significant accomplishments unless/until you make substan-
+          tial progress into the dungeon.
 
           9.  Options
 
@@ -3283,15 +3291,7 @@
                Any line in the configuration  file  starting  with  `#'  is
           treated as a comment.  Empty lines are ignored.
 
-               Any  line beginning with `[' and ending in `]' is considered
-          a section marker.  The text between the square  brackets  is  the
-          section  name.   Lines after a section marker belong to that sec-
-          tion, and are ignored unless a CHOOSE statement was used  to  se-
-          lect that section.  Section names are case insensitive.
 
-               You  can use different configuration statements in the file,
-          some of which can be used multiple times.  In general, the state-
-          ments are written in capital letters, followed by an equals sign,
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3304,6 +3304,15 @@
 
 
 
+               Any  line beginning with `[' and ending in `]' is considered
+          a section marker.  The text between the square  brackets  is  the
+          section  name.   Lines after a section marker belong to that sec-
+          tion, and are ignored unless a CHOOSE statement was used  to  se-
+          lect that section.  Section names are case insensitive.
+
+               You  can use different configuration statements in the file,
+          some of which can be used multiple times.  In general, the state-
+          ments are written in capital letters, followed by an equals sign,
           followed by settings particular to that statement.
 
                Here is a list of allowed statements:
@@ -3350,15 +3359,6 @@
             The  location  that  a record of game aborts and self-diagnosed
             game problems is kept. Defaults to HACKDIR, must be writable.
 
-          AUTOCOMPLETE
-            Enable or disable an extended command autocompletion.  Autocom-
-            pletion  has no effect for the X11 windowport.  You can specify
-            multiple autocompletions.  To enable autocompletion,  list  the
-            extended  command.   Prefix the command with "!" to disable the
-            autocompletion for that command.
-
-
-
 
           NetHack 3.7                                     February 15, 2020
 
@@ -3369,6 +3369,13 @@
           NetHack Guidebook                                              52
 
 
+
+          AUTOCOMPLETE
+            Enable or disable an extended command autocompletion.  Autocom-
+            pletion  has no effect for the X11 windowport.  You can specify
+            multiple autocompletions.  To enable autocompletion,  list  the
+            extended  command.   Prefix the command with "!" to disable the
+            autocompletion for that command.
 
             Example:
 
@@ -3417,13 +3424,6 @@
             Define a sound mapping.  See the "Configuring User Sounds" sec-
             tion.
 
-          SOUNDDIR
-            Define  the  directory  that contains the sound files.  See the
-            "Configuring User Sounds" section.
-
-          SYMBOLS
-            Override one or more symbols in the symbol  set  used  for  all
-            dungeon  levels  except  for  the special rogue level.  See the
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3436,6 +3436,13 @@
 
 
 
+          SOUNDDIR
+            Define  the  directory  that contains the sound files.  See the
+            "Configuring User Sounds" section.
+
+          SYMBOLS
+            Override one or more symbols in the symbol  set  used  for  all
+            dungeon  levels  except  for  the special rogue level.  See the
             "Modifying NetHack Symbols" section.
 
             Example:
@@ -3483,13 +3490,6 @@
           option to the list, and turn it off by typing a `!' or  "no"  be-
           fore  the  name.  Others take a character string as a value.  You
           can set string options by typing the  option  name,  a  colon  or
-          equals sign, and then the value of the string.  The value is ter-
-          minated by the next comma or the end of string.
-
-               For example, to set up an environment variable so that color
-          is on, legacy is off, character name is set to "Blue Meanie", and
-          named fruit is set to "lime", you would enter the command
-
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3501,6 +3501,13 @@
           NetHack Guidebook                                              54
 
 
+
+          equals sign, and then the value of the string.  The value is ter-
+          minated by the next comma or the end of string.
+
+               For example, to set up an environment variable so that color
+          is on, legacy is off, character name is set to "Blue Meanie", and
+          named fruit is set to "lime", you would enter the command
 
           % setenv NETHACKOPTIONS "color,\!leg,name:Blue Meanie,fruit:lime"
 
@@ -3548,14 +3555,7 @@
             ment from being picked randomly.  Cannot be set  with  the  `O'
             command.  Persistent.
 
-          autodescribe
-            Automatically  describe  the terrain under cursor when asked to
-            get a location on the map (default true).  The whatis_coord op-
-            tion controls whether the description includes map coordinates.
 
-          autodig
-            Automatically dig if you are wielding a digging tool and moving
-            into a place that can be dug (default false).  Persistent.
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3567,6 +3567,15 @@
           NetHack Guidebook                                              55
 
 
+
+          autodescribe
+            Automatically  describe  the terrain under cursor when asked to
+            get a location on the map (default true).  The whatis_coord op-
+            tion controls whether the description includes map coordinates.
+
+          autodig
+            Automatically dig if you are wielding a digging tool and moving
+            into a place that can be dug (default false).  Persistent.
 
           autoopen
             Walking into a closed door attempts to open it (default  true).
@@ -3613,15 +3622,6 @@
             Synonym  for "role" to pick the type of your character (for ex-
             ample "character:Monk").  See role for more details.
 
-          checkpoint
-            Save game state after each level change, for possible  recovery
-            after program crash (default on).  Persistent.
-
-          checkspace
-            Check  free  disk  space  before writing files to disk (default
-            on).  You may have to turn this off if you have more than 2  GB
-            free  space on the partition used for your save and level files
-            (because too much space might overflow the calculation and  end
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3634,6 +3634,15 @@
 
 
 
+          checkpoint
+            Save game state after each level change, for possible  recovery
+            after program crash (default on).  Persistent.
+
+          checkspace
+            Check  free  disk  space  before writing files to disk (default
+            on).  You may have to turn this off if you have more than 2  GB
+            free  space on the partition used for your save and level files
+            (because too much space might overflow the calculation and  end
             up looking like insufficient space).  Only applies when MFLOPPY
             was defined during compilation.
 
@@ -3679,15 +3688,6 @@
             The listing of vanquished monsters can be sorted, so there  are
             two additional choices for `v':
 
-                 ? - prompt you and default to ask on the prompt;
-                 # - disclose it without prompting, ask for sort order.
-
-            Asking refers to picking one of the orderings from a menu.  The
-            `+' disclose without prompting choice, or  being  prompted  and
-            answering `y' rather than `a', will default to showing monsters
-            in the traditional order, from high level to low level.
-
-
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3699,6 +3699,14 @@
           NetHack Guidebook                                              57
 
 
+
+                 ? - prompt you and default to ask on the prompt;
+                 # - disclose it without prompting, ask for sort order.
+
+            Asking refers to picking one of the orderings from a menu.  The
+            `+' disclose without prompting choice, or  being  prompted  and
+            answering `y' rather than `a', will default to showing monsters
+            in the traditional order, from high level to low level.
 
             Omitted categories are implicitly added with `n' prefix.  Spec-
             ified categories with omitted prefix implicitly use `+' prefix.
@@ -3746,14 +3754,6 @@
 
           fruit
             Name  a  fruit  after  something  you enjoy eating (for example
-            "fruit:mango") (default "slime mold").  Basically  a  nostalgic
-            whimsy  that  NetHack  uses  from time to time.  You should set
-            this to something you find more  appetizing  than  slime  mold.
-            Apples,  oranges,  pears,  bananas, and melons already exist in
-            NetHack, so don't use those.
-
-          gender
-            Your starting gender (gender:male or gender:female).   You  may
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3766,6 +3766,14 @@
 
 
 
+            "fruit:mango") (default "slime mold").  Basically  a  nostalgic
+            whimsy  that  NetHack  uses  from time to time.  You should set
+            this to something you find more  appetizing  than  slime  mold.
+            Apples,  oranges,  pears,  bananas, and melons already exist in
+            NetHack, so don't use those.
+
+          gender
+            Your starting gender (gender:male or gender:female).   You  may
             specify  just  the first letter.  Although you can still denote
             your gender using the "male" and "female" options, the "gender"
             option  will  take precedence.  The default is to randomly pick
@@ -3813,14 +3821,6 @@
             inverse video is often used; with tiles, generally  displays  a
             small plus-symbol beside the object on the top of the pile.
 
-          hitpointbar
-            Show  a  hit  point bar graph behind your name and title.  Only
-            available for TTY and Windows GUI, and only when  statushilites
-            is on.
-
-          horsename
-            Name  your  starting  horse  (for example "horsename:Trigger").
-
 
           NetHack 3.7                                     February 15, 2020
 
@@ -3832,6 +3832,13 @@
 
 
 
+          hitpointbar
+            Show  a  hit  point bar graph behind your name and title.  Only
+            available for TTY and Windows GUI, and only when  statushilites
+            is on.
+
+          horsename
+            Name  your  starting  horse  (for example "horsename:Trigger").
             Cannot be set with the `O' command.
 
           ignintr
@@ -3879,13 +3886,6 @@
             Enable coloring menu lines  (default  off).   See  "Configuring
             Menu Colors" on how to configure the colors.
 
-          menustyle
-            Controls the interface used when you need to choose various ob-
-            jects (in response to the Drop  command,  for  instance).   The
-            value  specified  should be the first letter of one of the fol-
-            lowing:  traditional, combination, full,  or  partial.   Tradi-
-            tional  was the only interface available for early versions; it
-            consists of a prompt for object class characters,  followed  by
 
 
           NetHack 3.7                                     February 15, 2020
@@ -3898,6 +3898,13 @@
 
 
 
+          menustyle
+            Controls the interface used when you need to choose various ob-
+            jects (in response to the Drop  command,  for  instance).   The
+            value  specified  should be the first letter of one of the fol-
+            lowing:  traditional, combination, full,  or  partial.   Tradi-
+            tional  was the only interface available for early versions; it
+            consists of a prompt for object class characters,  followed  by
             an  object-by-object prompt for all items matching the selected
             object class(es).  Combination starts with a prompt for  object
             class(es) of interest, but then displays a menu of matching ob-
@@ -3946,13 +3953,6 @@
             Show  object symbols in menu headings in menus where the object
             symbols act as menu accelerators (default off).
 
-          menu_overlay
-            Do not clear the screen before drawing menus, and  align  menus
-            to  the  right edge of the screen. Only for the tty port.  (de-
-            fault on)
-
-
-
 
           NetHack 3.7                                     February 15, 2020
 
@@ -3963,6 +3963,11 @@
           NetHack Guidebook                                              61
 
 
+
+          menu_overlay
+            Do not clear the screen before drawing menus, and  align  menus
+            to  the  right edge of the screen. Only for the tty port.  (de-
+            fault on)
 
           menu_previous_page
             Menu character accelerator to goto the previous menu page.  Im-
@@ -4013,11 +4018,6 @@
 
             For backward compatibility, no  value  needs  to  be  specified
             (which  defaults  to  "full"),  or  it  can  be  negated (which
-            defaults to "single").
-
-          name
-            Set your character's name (defaults to your  user  name).   You
-            can  also set your character's role by appending a dash and one
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4030,6 +4030,11 @@
 
 
 
+            defaults to "single").
+
+          name
+            Set your character's name (defaults to your  user  name).   You
+            can  also set your character's role by appending a dash and one
             or more letters of the role (that is, by suffixing one of -A -B
             -C  -H  -K  -M  -P -Ra -Ro -S -T -V -W).  If -@ is used for the
             role, then a random one will be automatically  chosen.   Cannot
@@ -4079,11 +4084,6 @@
             prompting   is  desired.   The  default  is  paranoid_confirma-
             tion:pray.
 
-            Confirm     - for any prompts which are set  to  require  "yes"
-                          rather  than `y', also require "no" to reject in-
-                          stead of accepting any non-yes response as no
-            quit        - require "yes" rather than `y' to confirm quitting
-                          the  game  or  switching into non-scoring explore
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4096,6 +4096,11 @@
 
 
 
+            Confirm     - for any prompts which are set  to  require  "yes"
+                          rather  than `y', also require "no" to reject in-
+                          stead of accepting any non-yes response as no
+            quit        - require "yes" rather than `y' to confirm quitting
+                          the  game  or  switching into non-scoring explore
                           mode;
             die         - require "yes" rather than `y'  to  confirm  dying
                           (not  useful  in  normal play; applies to explore
@@ -4145,11 +4150,6 @@
                  l - Left line indicator
                  r - Right line indicator
 
-            Some of those choices might not work,  particularly  the  final
-            three,  depending  upon terminal hardware or terminal emulation
-            software.
-
-
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4161,6 +4161,10 @@
           NetHack Guidebook                                              64
 
 
+
+            Some of those choices might not work,  particularly  the  final
+            three,  depending  upon terminal hardware or terminal emulation
+            software.
 
             Currently multiple highlight-style letters can be  combined  by
             simply  stringing them together (for example, "bk"), but in the
@@ -4211,11 +4215,7 @@
             might only be allowed for someone logged in under a  particular
             user  name  (on  multi-user systems) or specifying a particular
             character name (on single-user systems) or it might be disabled
-            entirely.   Requesting  it when not allowed or not possible re-
-            sults in explore mode instead.  Default is normal play.
-
-          pushweapon
-            Using the `w' (wield) command when already  wielding  something
+            entirely.   Requesting  it  when  not  allowed  or not possible
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4228,6 +4228,10 @@
 
 
 
+            results in explore mode instead.  Default is normal play.
+
+          pushweapon
+            Using the `w' (wield) command when already  wielding  something
             pushes  the  old  item into your alternate weapon slot (default
             off).  Likewise for the `a' (apply) command if  it  causes  the
             applied item to become wielded.  Persistent.
@@ -4278,10 +4282,6 @@
 
             teleport - update the map after movement has finished;
             run      - update the map after every seven or so steps;
-            walk     - update the map after each step;
-            crawl    - like walk, but pause briefly after each step.
-
-            This option only affects the game's  screen  display,  not  the
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4294,7 +4294,11 @@
 
 
 
-            actual results of moving.  The default is "run"; versions prior
+            walk     - update the map after each step;
+            crawl    - like walk, but pause briefly after each step.
+
+            This option only affects the game's screen display, not the ac-
+            tual  results  of moving.  The default is "run"; versions prior
             to 3.4.1 used "teleport" only.  Whether or not  the  effect  is
             noticeable will depend upon the window port used or on the type
             of terminal.  Persistent.
@@ -4344,10 +4348,6 @@
             Sort  the  pack contents by type when displaying inventory (de-
             fault on).  Persistent.
 
-          sparkle
-            Display a sparkly effect when a monster (including yourself) is
-            hit  by  an attack to which it is resistant (default on).  Per-
-            sistent.
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4359,6 +4359,11 @@
           NetHack Guidebook                                              67
 
 
+
+          sparkle
+            Display a sparkly effect when a monster (including yourself) is
+            hit  by  an attack to which it is resistant (default on).  Per-
+            sistent.
 
           standout
             Boldface monsters and "--More--" (default off).  Persistent.
@@ -4408,12 +4413,7 @@
           travel
             Allow the travel command via mouse click (default on).  Turning
             this option off will prevent the game from attempting unintend-
-            ed moves if you make inadvertent mouse clicks on the  map  win-
-            dow.   Does  not  affect traveling via the `_' ("#travel") com-
-            mand.  Persistent.
-
-          verbose
-            Provide  more  commentary  during  the   game   (default   on).
+            ed moves if you  make  inadvertent  mouse  clicks  on  the  map
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4426,7 +4426,12 @@
 
 
 
-            Persistent.
+            window.  Does not affect traveling via the `_' ("#travel") com-
+            mand.  Persistent.
+
+          verbose
+            Provide more commentary during the game (default on).   Persis-
+            tent.
 
           whatis_coord
             When  using  the  `/' or `;' commands to look around on the map
@@ -4474,12 +4479,7 @@
 
           windowtype
             When the program has been built to support multiple interfaces,
-            select which one to use, such as "tty" or  "X11"  (default  de-
-            pends on build-time settings; use "#version" to check).  Cannot
-            be set with the `O' command.
-
-            When used, it should be the first option set  since  its  value
-            might  enable  or  disable  the  availability  of various other
+            select which one to  use,  such  as  "tty"  or  "X11"  (default
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4492,10 +4492,15 @@
 
 
 
-            options.  For multiple lines  in  a  configuration  file,  that
-            would  be  the  first  non-comment line.  For a comma-separated
-            list in NETHACKOPTIONS or an OPTIONS line  in  a  configuration
-            file, that would be the rightmost option in the list.
+            depends on build-time settings; use "#version" to check).  Can-
+            not be set with the `O' command.
+
+            When used, it should be the first option set  since  its  value
+            might  enable  or disable the availability of various other op-
+            tions.  For multiple lines in a configuration file, that  would
+            be  the  first non-comment line.  For a comma-separated list in
+            NETHACKOPTIONS or an OPTIONS line in a configuration file, that
+            would be the rightmost option in the list.
 
           wizweight
             Augment object descriptions with their objects' weight (default
@@ -4542,11 +4547,6 @@
             example, specified with the traps option) straight  through  to
             your terminal (default off).
 
-          font_map
-            if NetHack can, it should use a font by the chosen name for the
-            map window.
-
-
 
           NetHack 3.7                                     February 15, 2020
 
@@ -4557,6 +4557,10 @@
           NetHack Guidebook                                              70
 
 
+
+          font_map
+            if NetHack can, it should use a font by the chosen name for the
+            map window.
 
           font_menu
             If NetHack can, it should use a font by  the  chosen  name  for
@@ -4608,10 +4612,6 @@
             If NetHack can, it should display the map in the manner  speci-
             fied.
 
-          player_selection
-            If  NetHack  can, it should pop up dialog boxes, or use prompts
-            for character selection.
-
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4623,6 +4623,10 @@
           NetHack Guidebook                                              71
 
 
+
+          player_selection
+            If  NetHack  can, it should pop up dialog boxes, or use prompts
+            for character selection.
 
           popup_dialog
             If NetHack can, it should pop up dialog boxes for input.
@@ -4674,10 +4678,6 @@
 
           tile_file
             Specify the name of an alternative tile file  to  override  the
-            default.
-
-          tile_height
-            Specify  the  preferred  height  of each tile in a tile capable
 
 
           NetHack 3.7                                     February 15, 2020
@@ -4690,6 +4690,10 @@
 
 
 
+            default.
+
+          tile_height
+            Specify  the  preferred  height  of each tile in a tile capable
             port.
 
           tile_width
@@ -4740,10 +4744,6 @@
           wraptext
             If NetHack can, it should wrap long lines of text if they don't
             fit in the visible area of the window.
-
-
-
-
 
 
           NetHack 3.7                                     February 15, 2020
