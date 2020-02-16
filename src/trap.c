@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1578624299 2020/01/10 02:44:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.349 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1581886868 2020/02/16 21:01:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.351 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2987,7 +2987,7 @@ long hmask, emask; /* might cancel timeout */
             else
                 pline("Startled, %s can no longer hold you!",
                       mon_nam(u.ustuck));
-            u.ustuck = 0;
+            set_ustuck((struct monst *) 0);
         }
         /* kludge alert:
          * drown() and lava_effects() print various messages almost

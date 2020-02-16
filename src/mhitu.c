@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1581810070 2020/02/15 23:41:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1581886862 2020/02/16 21:01:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -534,7 +534,7 @@ register struct monst *mtmp;
             pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
                   g.youmonst.data->mname, g.plname);
         if (sticky)
-            u.ustuck = mtmp;
+            set_ustuck(mtmp);
         g.youmonst.m_ap_type = M_AP_NOTHING;
         g.youmonst.mappearance = 0;
         newsym(u.ux, u.uy);
@@ -973,7 +973,7 @@ register struct attack *mattk;
                 if (u_slip_free(mtmp, mattk)) {
                     dmg = 0;
                 } else {
-                    u.ustuck = mtmp;
+                    set_ustuck(mtmp);
                     pline("%s grabs you!", Monnam(mtmp));
                 }
             } else if (u.ustuck == mtmp) {
@@ -1269,8 +1269,7 @@ register struct attack *mattk;
     case AD_STCK:
         hitmsg(mtmp, mattk);
         if (uncancelled && !u.ustuck && !sticks(g.youmonst.data)) {
-            g.context.botl = 1;
-            u.ustuck = mtmp;
+            set_ustuck(mtmp);
         }
         break;
     case AD_WRAP:
@@ -1279,9 +1278,8 @@ register struct attack *mattk;
                 if (u_slip_free(mtmp, mattk)) {
                     dmg = 0;
                 } else {
-                    g.context.botl = 1;
+                    set_ustuck(mtmp); /* before message, for botl update */
                     pline("%s swings itself around you!", Monnam(mtmp));
-                    u.ustuck = mtmp;
                 }
             } else if (u.ustuck == mtmp) {
                 if (is_pool(mtmp->mx, mtmp->my) && !Swimming && !Amphibious) {
@@ -1296,8 +1294,9 @@ register struct attack *mattk;
                             moat ? "moat" : "pool of water",
                             an(mtmp->data->mname));
                     done(DROWNING);
-                } else if (mattk->aatyp == AT_HUGS)
+                } else if (mattk->aatyp == AT_HUGS) {
                     You("are being crushed.");
+                }
             } else {
                 dmg = 0;
                 if (flags.verbose)
@@ -1801,7 +1800,7 @@ struct attack *mattk;
         remove_monster(omx, omy);
         mtmp->mtrapped = 0; /* no longer on old trap */
         place_monster(mtmp, u.ux, u.uy);
-        u.ustuck = mtmp;
+        set_ustuck(mtmp);
         newsym(mtmp->mx, mtmp->my);
         if (is_animal(mtmp->data) && u.usteed) {
             char buf[BUFSZ];
@@ -1814,8 +1813,9 @@ struct attack *mattk;
             pline("%s lunges forward and plucks you off %s!", Monnam(mtmp),
                   buf);
             dismount_steed(DISMOUNT_ENGULFED);
-        } else
+        } else {
             pline("%s engulfs you!", Monnam(mtmp));
+        }
         stop_occupation();
         reset_occupations(); /* behave as if you had moved */
 
@@ -1843,7 +1843,7 @@ struct attack *mattk;
                fully swallowed yet so that won't work here */
             if (Punished)
                 placebc();
-            u.ustuck = 0;
+            set_ustuck((struct monst *) 0);
             return (!DEADMONSTER(mtmp)) ? 0 : 2;
         }
 
@@ -1869,7 +1869,7 @@ struct attack *mattk;
         }
         /* u.uswldtim always set > 1 */
         u.uswldtim = (unsigned) ((tim_tmp < 2) ? 2 : tim_tmp);
-        swallowed(1);
+        swallowed(1); /* update the map display, shows hero swallowed */
         for (otmp2 = g.invent; otmp2; otmp2 = otmp2->nobj)
             (void) snuff_lit(otmp2);
     }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1573764936 2019/11/14 20:55:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1581886869 2020/02/16 21:01:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.227 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -145,7 +145,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
             /* applied pole-arm attack is too far to get stuck */
             && distu(mtmp->mx, mtmp->my) <= 2) {
             if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK))
-                u.ustuck = mtmp;
+                set_ustuck(mtmp);
         }
         /* #H7329 - if hero is on engraved "Elbereth", this will end up
          * assessing an alignment penalty and removing the engraving
@@ -495,7 +495,7 @@ int dieroll;
                 monflee(mon, !rn2(3) ? rnd(100) : 0, FALSE, TRUE);
 
                 if (u.ustuck == mon && !u.uswallow && !sticks(g.youmonst.data))
-                    u.ustuck = 0;
+                    set_ustuck((struct monst *) 0);
             }
             /* Vorpal Blade hit converted to miss */
             /* could be headless monster or worm tail */
@@ -1933,7 +1933,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
                     tmp = 0;
                 } else {
                     You("swing yourself around %s!", mon_nam(mdef));
-                    u.ustuck = mdef;
+                    set_ustuck(mdef);
                 }
             } else if (u.ustuck == mdef) {
                 /* Monsters don't wear amulets of magical breathing */
@@ -2631,7 +2631,7 @@ register struct monst *mon;
                 if (u.ustuck && u.ustuck != mon)
                     uunstick();
                 You("grab %s!", mon_nam(mon));
-                u.ustuck = mon;
+                set_ustuck(mon);
                 if (silverhit && flags.verbose)
                     silver_sears(&g.youmonst, mon, silverhit);
                 sum[i] = damageum(mon, mattk, specialdmg);
@@ -3042,7 +3042,7 @@ struct monst *mtmp;
     const char *fmt = "Wait!  That's %s!", *generic = "a monster", *what = 0;
 
     if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK))
-        u.ustuck = mtmp;
+        set_ustuck(mtmp);
 
     if (Blind) {
         if (!Blind_telepat)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1581810065 2020/02/15 23:41:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.247 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1581886860 2020/02/16 21:01:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1537,13 +1537,14 @@ domove_core()
         if (u.ustuck && (x != u.ustuck->mx || y != u.ustuck->my)) {
             if (distu(u.ustuck->mx, u.ustuck->my) > 2) {
                 /* perhaps it fled (or was teleported or ... ) */
-                u.ustuck = 0;
+                set_ustuck((struct monst *) 0);
             } else if (sticks(g.youmonst.data)) {
                 /* When polymorphed into a sticking monster,
                  * u.ustuck means it's stuck to you, not you to it.
                  */
-                You("release %s.", mon_nam(u.ustuck));
-                u.ustuck = 0;
+                mtmp = u.ustuck;
+                set_ustuck((struct monst *) 0);
+                You("release %s.", mon_nam(mtmp));
             } else {
                 /* If holder is asleep or paralyzed:
                  *      37.5% chance of getting away,
@@ -1559,8 +1560,9 @@ domove_core()
                 case 1:
                 case 2:
  pull_free:
-                    You("pull free from %s.", mon_nam(u.ustuck));
-                    u.ustuck = 0;
+                    mtmp = u.ustuck;
+                    set_ustuck((struct monst *) 0);
+                    You("pull free from %s.", mon_nam(mtmp));
                     break;
                 case 3:
                     if (!u.ustuck->mcanmove) {

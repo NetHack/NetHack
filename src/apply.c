@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1580476196 2020/01/31 13:09:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.316 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1581886857 2020/02/16 21:00:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.317 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1721,8 +1721,10 @@ int magic; /* 0=Physical, otherwise skill level */
         return 0;
     } else if (u.ustuck) {
         if (u.ustuck->mtame && !Conflict && !u.ustuck->mconf) {
-            You("pull free from %s.", mon_nam(u.ustuck));
-            u.ustuck = 0;
+            struct monst *mtmp = u.ustuck;
+
+            set_ustuck((struct monst *) 0);
+            You("pull free from %s.", mon_nam(mtmp));
             return 1;
         }
         if (magic) {

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1581810044 2020/02/15 23:40:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.226 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1581886859 2020/02/16 21:00:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.227 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1373,12 +1373,11 @@ boolean at_stairs, falling, portal;
         unplacebc();
     reset_utrap(FALSE); /* needed in level_tele */
     fill_pit(u.ux, u.uy);
-    u.ustuck = 0; /* idem */
+    set_ustuck((struct monst *) 0); /* idem */
+    u.uswallow = u.uswldtim = 0;
     u.uinwater = 0;
     u.uundetected = 0; /* not hidden, even if means are available */
     keepdogs(FALSE);
-    if (u.uswallow) /* idem */
-        u.uswldtim = u.uswallow = 0;
     recalc_mapseen(); /* recalculate map overview before we leave the level */
     /*
      *  We no longer see anything on the level.  Make sure that this

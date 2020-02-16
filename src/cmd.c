@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1581322659 2020/02/10 08:17:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.398 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1581886858 2020/02/16 21:00:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.400 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -824,7 +824,7 @@ boolean pre, wiztower;
         reset_utrap(FALSE);
         check_special_room(TRUE); /* room exit */
         u.ustuck = (struct monst *) 0;
-        u.uswallow = 0;
+        u.uswallow = u.uswldtim = 0;
         u.uinwater = 0;
         u.uundetected = 0; /* not hidden, even if means are available */
         dmonsfree(); /* purge dead monsters from 'fmon' */

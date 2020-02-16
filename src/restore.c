@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1575245087 2019/12/02 00:04:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1581886865 2020/02/16 21:01:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -775,7 +775,7 @@ unsigned int stuckid, steedid;
                 break;
         if (!mtmp)
             panic("Cannot find the monster ustuck.");
-        u.ustuck = mtmp;
+        set_ustuck(mtmp);
     }
     if (steedid) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
