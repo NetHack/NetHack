@@ -2174,6 +2174,13 @@ struct obj *obj;
 {
     int typ = obj->otyp;
 
+    /* don't let monsters interact with protected items on the floor */
+    if ((obj->where == OBJ_FLOOR)
+        && (obj->ox == mon->mx) && (obj->oy == mon->my)
+        && onscary(obj->ox, obj->oy, mon)) {
+        return FALSE;
+    }
+
     if (is_animal(mon->data) || mindless(mon->data)
         || mon->data == &mons[PM_GHOST]) /* don't loot bones piles */
         return FALSE;
