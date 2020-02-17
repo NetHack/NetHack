@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "February 15, 2020
+.ds f2 "February 17, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1580,7 +1580,7 @@ with another key, modifies it by setting the \(lqmeta\(rq [8th,
 or \(lqhigh\(rq] bit), you can invoke many extended commands by meta-ing
 the first letter of the command.
 .pg
-In \fINT\fP, \fIOS/2\fP, \fIPC\fP and \fIST\fP \fINetHack\fP,
+In \fIWindows\fP, \fIOS/2\fP, \fIPC\fP and \fIST\fP \fINetHack\fP,
 the \(lqAlt\(rq key can be used in this fashion;
 on the \fIAmiga\fP, set the
 .op altmeta
