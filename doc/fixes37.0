@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ $NHDT-Date: 1581810078 2020/02/15 23:41:18 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ $NHDT-Date: 1582020640 2020/02/18 10:10:40 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -160,6 +160,7 @@ new glyph GLYPH_NOTHING was added so !dark_room has something to be set to
 	now that stone could be mapped to an entirely different symbol
 added several new status conditions all of which are opt-in except
 	the new cond_grab and cond_lava which are opt-out
+tipping your cap might get a response
 
 
 Platform- and/or Interface-Specific New Features

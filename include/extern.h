@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1581886855 2020/02/16 21:00:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.797 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1581985538 2020/02/18 00:25:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.798 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2449,6 +2449,7 @@ E void FDECL(yelp, (struct monst *));
 E void FDECL(whimper, (struct monst *));
 E void FDECL(beg, (struct monst *));
 E int NDECL(dotalk);
+E int NDECL(tiphat);
 #ifdef USER_SOUNDS
 E int FDECL(add_sound_mapping, (const char *));
 E void FDECL(play_sound_for_message, (const char *));
