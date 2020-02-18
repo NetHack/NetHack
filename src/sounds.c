@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1582024315 2020/02/18 11:11:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1582061574 2020/02/18 21:32:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -462,12 +462,20 @@ register struct monst *mtmp;
         return;
 
     /* presumably nearness and soundok checks have already been made */
-    if (!is_silent(mtmp->data) && mtmp->data->msound <= MS_ANIMAL)
+    if (!is_silent(mtmp->data) && mtmp->data->msound <= MS_ANIMAL) {
         (void) domonnoise(mtmp);
-    else if (mtmp->data->msound >= MS_HUMANOID) {
+    } else if (mtmp->data->msound >= MS_HUMANOID) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         verbalize("I'm hungry.");
+    } else {
+        /* this is pretty lame but is better than leaving out the block
+           of speech types between animal and humanoid; this covers
+           MS_SILENT too (if caller lets that get this far) since it's
+           excluded by the first two cases */
+        if (canspotmon(mtmp))
+            pline("%s seems famished.", Monnam(mtmp));
+        /* looking famished will be a good trick for a tame skeleton... */
     }
 }
 
@@ -515,8 +523,8 @@ register struct monst *mtmp;
     else if (msound == MS_GUARDIAN && ptr != &mons[g.urole.guardnum])
         msound = mons[genus(monsndx(ptr), 1)].msound;
     /* some normally non-speaking types can/will speak if hero is similar */
-    else if (msound == MS_ORC         /* note: MS_ORC is same as MS_GRUNT */
-             && ((same_race(ptr, g.youmonst.data)          /* current form, */
+    else if (msound == MS_ORC
+             && ((same_race(ptr, g.youmonst.data)        /* current form, */
                   || same_race(ptr, &mons[Race_switch])) /* unpoly'd form */
                  || Hallucination))
         msound = MS_HUMANOID;
@@ -626,12 +634,13 @@ register struct monst *mtmp;
                     verbl_msg = vampmsg[vampindex];
             }
         }
-    } break;
+        break;
+    }
     case MS_WERE:
         if (flags.moonphase == FULL_MOON && (night() ^ !rn2(13))) {
             pline("%s throws back %s head and lets out a blood curdling %s!",
                   Monnam(mtmp), mhis(mtmp),
-                  ptr == &mons[PM_HUMAN_WERERAT] ? "shriek" : "howl");
+                  (ptr == &mons[PM_HUMAN_WERERAT]) ? "shriek" : "howl");
             wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
         } else
             pline_msg =
@@ -705,6 +714,9 @@ register struct monst *mtmp;
         else
             pline_msg = "whickers.";
         break;
+    case MS_MOO:
+        pline_msg = mtmp->mpeaceful ? "moos." : "bellows!";
+        break;
     case MS_WAIL:
         pline_msg = "wails mournfully.";
         break;
@@ -713,6 +725,10 @@ register struct monst *mtmp;
         break;
     case MS_BURBLE:
         pline_msg = "burbles.";
+        break;
+    case MS_TRUMPET:
+        pline_msg = "trumpets!";
+        wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
         break;
     case MS_SHRIEK:
         pline_msg = "shrieks.";
@@ -733,9 +749,13 @@ register struct monst *mtmp;
             "giggles.", "chuckles.", "snickers.", "laughs.",
         };
         pline_msg = laugh_msg[rn2(4)];
-    } break;
+        break;
+    }
     case MS_MUMBLE:
         pline_msg = "mumbles incomprehensibly.";
+        break;
+    case MS_ORC: /* this used to be an alias for grunt, now it is distinct */
+        pline_msg = "grunts.";
         break;
     case MS_DJINNI:
         if (mtmp->mtame) {
@@ -748,17 +768,9 @@ register struct monst *mtmp;
         } else {
             if (ptr != &mons[PM_PRISONER])
                 verbl_msg = "This will teach you not to disturb me!";
-#if 0
-            else
-                verbl_msg = "??????????";
-#endif
+            else /* vague because prisoner might already be out of cell */
+                verbl_msg = "Get me out of here.";
         }
-        break;
-    case MS_MOO:
-        if (!mtmp->mpeaceful)
-            pline_msg = "bellows!";
-        else
-            pline_msg = "moos.";
         break;
     case MS_BOAST: /* giants */
         if (!mtmp->mpeaceful) {
@@ -831,7 +843,7 @@ register struct monst *mtmp;
             }
             else {
                 verbl_msg =
-                  "Many enter the dungeon, and few return to the sunlit lands.";
+                "Many enter the dungeon, and few return to the sunlit lands.";
             }
         }
         else
@@ -1193,7 +1205,7 @@ tiphat()
         if (vismon || unseen || (statue && Hallucination)
             /* unseen adjacent monster will respond if able */
             || (range == 1 && mtmp && responsive_mon_at(x, y)
-                && mtmp->data->msound != MS_SILENT)
+                && !is_silent(mtmp->data))
             /* we check accessible() after m_at() in case there's a
                visible monster phazing through a wall here */
             || !(accessible(x, y) || levl[x][y].typ == IRONBARS))
@@ -1211,7 +1223,7 @@ tiphat()
         /* if this monster is waiting for something, prod it into action */
         mtmp->mstrategy &= ~STRAT_WAITMASK;
 
-        if (vismon && mtmp->mpeaceful && humanoid(mtmp->data)) {
+        if (vismon && humanoid(mtmp->data) && mtmp->mpeaceful && !Conflict) {
             if ((otmp = which_armor(mtmp, W_ARMH)) == 0) {
                 pline("%s waves.", Monnam(mtmp));
             } else if (otmp->cursed) {
