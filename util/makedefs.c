@@ -1059,10 +1059,6 @@ rumors_failure:
     exit(EXIT_FAILURE);
 }
 
-#if (NH_DEVEL_STATUS == NH_STATUS_WIP)
-#else
-    Strcat(subbuf, " post-release");
-#endif
 void
 do_date()
 {
@@ -1269,7 +1265,7 @@ char *githash, *gitbranch;
             *strval++ = '\0';
             /* strip off the '\n' */
             if ((c = index(strval, '\n')) != 0)
-                *c = '\0'; 
+                *c = '\0';
             if ((c = index(opt, '\n')) != 0)
                 *c = '\0';
             /* strip leading and trailing white space */
@@ -1365,10 +1361,6 @@ windowing_sanity()
 #endif /*DEFAULT_WINDOW_SYS*/
 }
 
-#if (NH_DEVEL_STATUS == NH_STATUS_WIP)
-#else
-            " [post-release]"
-#endif
 /* routine to decide whether to discard something from data.base */
 static boolean
 d_filter(line)
