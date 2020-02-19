@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1581985538 2020/02/18 00:25:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.798 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1582155854 2020/02/19 23:44:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.799 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -418,6 +418,7 @@ E boolean FDECL(revive_corpse, (struct obj *));
 E void FDECL(revive_mon, (ANY_P *, long));
 E int NDECL(donull);
 E int NDECL(dowipe);
+E void FDECL(legs_in_no_shape, (const char *, BOOLEAN_P));
 E void FDECL(set_wounded_legs, (long, int));
 E void FDECL(heal_legs, (int));
 

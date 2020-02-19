@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1581362470 2020/02/10 19:21:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1582155881 2020/02/19 23:44:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -927,7 +927,12 @@ int final;
                 enl_msg(buf, " has", " had", " wounded legs", "");
             }
         } else {
-            Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
+            long wl = (EWounded_legs & BOTH_SIDES);
+            const char *bp = body_part(LEG), *article = "a ";
+
+            if (wl == BOTH_SIDES)
+                bp = makeplural(bp), article = "";
+            Sprintf(buf, "%swounded %s", article, bp);
             you_have(buf, "");
         }
     }

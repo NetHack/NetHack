@@ -1,4 +1,4 @@
-/* NetHack 3.7	steed.c	$NHDT-Date: 1575245090 2019/12/02 00:04:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.7	steed.c	$NHDT-Date: 1582155885 2020/02/19 23:44:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -219,9 +219,13 @@ boolean force;      /* Quietly force this animal */
      * temporary 1 point Dex loss become permanent.]
      */
     if (Wounded_legs) {
-        Your("%s are in no shape for riding.", makeplural(body_part(LEG)));
-        if (force && wizard && yn("Heal your legs?") == 'y')
-            HWounded_legs = EWounded_legs = 0L;
+        char qbuf[QBUFSZ];
+
+        legs_in_no_shape("riding", FALSE);
+        Sprintf(qbuf, "Heal your leg%s?",
+                ((HWounded_legs & BOTH_SIDES) == BOTH_SIDES) ? "s" : "");
+        if (force && wizard && yn(qbuf) == 'y')
+            heal_legs(0);
         else
             return (FALSE);
     }
