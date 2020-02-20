@@ -37,6 +37,8 @@ NEARDATA struct obj *uwep, *uarm, *uswapwep,
     *uarmc, *uarmh, *uarms, *uarmg,*uarmf, *uamul,
     *uright, *uleft, *ublindf, *uchain, *uball;
 
+struct engr *head_engr;
+
 #ifdef TEXTCOLOR
 /*
  *  This must be the same order as used for buzz() in zap.c.

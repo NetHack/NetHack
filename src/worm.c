@@ -921,4 +921,30 @@ int x, y;
     return res;
 }
 
+void
+flip_worm_segs_vertical(worm, miny, maxy)
+struct monst *worm;
+int miny, maxy;
+{
+    struct wseg *curr = wtails[worm->wormno];
+
+    while (curr) {
+	curr->wy = (maxy - curr->wy + miny);
+	curr = curr->nseg;
+    }
+}
+
+void
+flip_worm_segs_horizontal(worm, minx, maxx)
+struct monst *worm;
+int minx, maxx;
+{
+    struct wseg *curr = wtails[worm->wormno];
+
+    while (curr) {
+	curr->wx = (maxx - curr->wx + minx);
+	curr = curr->nseg;
+    }
+}
+
 /*worm.c*/

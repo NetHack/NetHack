@@ -210,6 +210,9 @@ E NEARDATA struct obj *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
 E NEARDATA struct obj *uchain; /* defined only when punished */
 E NEARDATA struct obj *uball;
 
+#include "engrave.h"
+E struct engr *head_engr;
+
 #include "you.h"
 E NEARDATA struct you u;
 E NEARDATA time_t ubirthday;

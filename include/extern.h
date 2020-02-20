@@ -986,6 +986,7 @@ E void FDECL(strbuf_reserve, (strbuf_t *, int));
 E void FDECL(strbuf_empty, (strbuf_t *));
 E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
 E char *FDECL(nonconst, (const char *, char *));
+E int FDECL(swapbits, (int, int, int));
 
 /* ### insight.c ### */
 
@@ -1334,6 +1335,7 @@ E void FDECL(fix_wall_spines, (int, int, int, int));
 E void FDECL(walkfrom, (int, int, SCHAR_P));
 E void FDECL(makemaz, (const char *));
 E void FDECL(mazexy, (coord *));
+E void FDECL(get_level_extends, (int *, int *, int *, int *));
 E void NDECL(bound_digging);
 E void FDECL(mkportal, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
 E boolean FDECL(bad_location, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
@@ -2464,6 +2466,7 @@ E void FDECL(sysopt_seduce_set, (int));
 
 /* ### sp_lev.c ### */
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+E void FDECL(flip_level_rnd, (int));
 E boolean FDECL(check_room, (xchar *, xchar *, xchar *, xchar *, BOOLEAN_P));
 E boolean FDECL(create_room, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                               XCHAR_P, XCHAR_P, XCHAR_P));
@@ -3049,6 +3052,8 @@ E int FDECL(count_wsegs, (struct monst *));
 E boolean FDECL(worm_known, (struct monst *));
 E boolean FDECL(worm_cross, (int, int, int, int));
 E int FDECL(wseg_at, (struct monst *, int, int));
+E void FDECL(flip_worm_segs_vertical, (struct monst *, int, int));
+E void FDECL(flip_worm_segs_horizontal, (struct monst *, int, int));
 
 /* ### worn.c ### */
 

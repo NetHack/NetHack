@@ -86,6 +86,7 @@ struct sp_coder {
     int n_subroom;
     int lvl_is_joined;
     boolean check_inaccessibles;
+    int allow_flips;
 };
 
 /*

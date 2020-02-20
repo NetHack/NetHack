@@ -147,6 +147,7 @@ static int NDECL(wiz_polyself);
 static int NDECL(wiz_load_lua);
 static int NDECL(wiz_level_tele);
 static int NDECL(wiz_level_change);
+static int NDECL(wiz_flip_level);
 static int NDECL(wiz_show_seenv);
 static int NDECL(wiz_show_vision);
 static int NDECL(wiz_smell);
@@ -1018,6 +1019,17 @@ wiz_level_tele(VOID_ARGS)
     return 0;
 }
 
+/* #wizlevelflip - randomly flip the current level.
+   Does not handle vision, player position, monst mtrack, levregions,
+   as flipping is normally done only during level creation.
+ */
+static int
+wiz_level_flip(VOID_ARGS)
+{
+    if (wizard) flip_level_rnd(3);
+    return 0;
+}
+
 /* #levelchange command - adjust hero's experience level */
 static int
 wiz_level_change(VOID_ARGS)
@@ -1867,6 +1879,8 @@ struct ext_func_tab extcmdlist[] = {
             wiz_identify, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '\0', "wizintrinsic", "set an intrinsic",
             wiz_intrinsic, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+    { '\0', "wizlevelflip", "flip the level",
+            wiz_level_flip, IFBURIED | WIZMODECMD },
     { C('v'), "wizlevelport", "teleport to another level",
             wiz_level_tele, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '\0', "wizloaddes", "load and execute a des-file lua script",

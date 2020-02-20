@@ -213,6 +213,320 @@ schar lit;
 }
 
 void
+flip_drawbridge_horizontal(lev)
+struct rm *lev;
+{
+    if (IS_DRAWBRIDGE(lev->typ)) {
+        if ((lev->drawbridgemask & DB_DIR) == DB_WEST) {
+            lev->drawbridgemask &= ~DB_WEST;
+            lev->drawbridgemask |=  DB_EAST;
+        } else if ((lev->drawbridgemask & DB_DIR) == DB_EAST) {
+            lev->drawbridgemask &= ~DB_EAST;
+            lev->drawbridgemask |=  DB_WEST;
+        }
+    }
+}
+
+void
+flip_drawbridge_vertical(lev)
+struct rm *lev;
+{
+    if (IS_DRAWBRIDGE(lev->typ)) {
+        if ((lev->drawbridgemask & DB_DIR) == DB_NORTH) {
+            lev->drawbridgemask &= ~DB_NORTH;
+            lev->drawbridgemask |=  DB_SOUTH;
+        } else if ((lev->drawbridgemask & DB_DIR) == DB_SOUTH) {
+            lev->drawbridgemask &= ~DB_SOUTH;
+            lev->drawbridgemask |=  DB_NORTH;
+        }
+    }
+}
+
+int
+flip_encoded_direction_bits(int flp, int val)
+{
+    /* These depend on xdir[] and ydir[] order */
+    if (flp & 1) {
+        val = swapbits(val, 1, 7);
+        val = swapbits(val, 2, 6);
+        val = swapbits(val, 3, 5);
+    }
+    if (flp & 2) {
+        val = swapbits(val, 1, 3);
+        val = swapbits(val, 0, 4);
+        val = swapbits(val, 7, 5);
+    }
+
+    return val;
+}
+
+#define FlipX(val) ((maxx - (val)) + minx)
+#define FlipY(val) ((maxy - (val)) + miny)
+
+void
+flip_level(int flp)
+{
+    int x, y, i;
+    int minx, miny, maxx, maxy;
+    struct rm trm;
+    struct trap *ttmp;
+    struct obj *otmp;
+    struct monst *mtmp;
+    struct engr *etmp;
+    struct mkroom *sroom;
+
+    get_level_extends(&minx, &miny, &maxx, &maxy);
+    /* get_level_extends() returns -1,-1 to COLNO,ROWNO at max */
+    if (miny < 0) miny = 0;
+    if (minx < 0) minx = 0;
+    if (maxx >= COLNO) maxx = (COLNO - 1);
+    if (maxy >= ROWNO) maxy = (ROWNO - 1);
+
+    /* stairs and ladders */
+    if (flp & 1) {
+	yupstair = FlipY(yupstair);
+	ydnstair = FlipY(ydnstair);
+	yupladder = FlipY(yupladder);
+	ydnladder = FlipY(ydnladder);
+        g.sstairs.sy = FlipY(g.sstairs.sy);
+    }
+    if (flp & 2) {
+	xupstair = FlipX(xupstair);
+	xdnstair = FlipX(xdnstair);
+	xupladder = FlipX(xupladder);
+	xdnladder = FlipX(xdnladder);
+        g.sstairs.sx = FlipX(g.sstairs.sx);
+    }
+
+    /* traps */
+    for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
+	if (flp & 1) {
+	    ttmp->ty = FlipY(ttmp->ty);
+	    if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
+		ttmp->launch.y = FlipY(ttmp->launch.y);
+		ttmp->launch2.y = FlipY(ttmp->launch2.y);
+	    } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
+                ttmp->conjoined = flip_encoded_direction_bits(flp, ttmp->conjoined);
+            }
+	}
+	if (flp & 2) {
+	    ttmp->tx = FlipX(ttmp->tx);
+	    if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
+		ttmp->launch.x = FlipX(ttmp->launch.x);
+		ttmp->launch2.x = FlipX(ttmp->launch2.x);
+	    } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
+                ttmp->conjoined = flip_encoded_direction_bits(flp, ttmp->conjoined);
+	    }
+	}
+    }
+
+    /* objects */
+    for (otmp = fobj; otmp; otmp = otmp->nobj) {
+	if (flp & 1)
+	    otmp->oy = FlipY(otmp->oy);
+	if (flp & 2)
+	    otmp->ox = FlipX(otmp->ox);
+    }
+
+    /* buried objects */
+    for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
+	if (flp & 1)
+	    otmp->oy = FlipY(otmp->oy);
+	if (flp & 2)
+	    otmp->ox = FlipX(otmp->ox);
+    }
+
+    /* monsters */
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	if (flp & 1) {
+	    mtmp->my = FlipY(mtmp->my);
+	    if (mtmp->ispriest)
+		EPRI(mtmp)->shrpos.y = FlipY(EPRI(mtmp)->shrpos.y);
+	    else if (mtmp->isshk) {
+		ESHK(mtmp)->shk.y = FlipY(ESHK(mtmp)->shk.y);
+		ESHK(mtmp)->shd.y = FlipY(ESHK(mtmp)->shd.y);
+	    } else if (mtmp->wormno) {
+		flip_worm_segs_vertical(mtmp, miny, maxy);
+	    }
+	}
+	if (flp & 2) {
+	    mtmp->mx = FlipX(mtmp->mx);
+	    if (mtmp->ispriest)
+		EPRI(mtmp)->shrpos.x = FlipX(EPRI(mtmp)->shrpos.x);
+	    else if (mtmp->isshk) {
+		ESHK(mtmp)->shk.x = FlipX(ESHK(mtmp)->shk.x);
+		ESHK(mtmp)->shd.x = FlipX(ESHK(mtmp)->shd.x);
+	    } else if (mtmp->wormno) {
+		flip_worm_segs_horizontal(mtmp, minx, maxx);
+	    }
+	}
+    }
+
+    /* engravings */
+    for (etmp = head_engr; etmp; etmp = etmp->nxt_engr) {
+	if (flp & 1)
+	    etmp->engr_y = FlipY(etmp->engr_y);
+	if (flp & 2)
+	    etmp->engr_x = FlipX(etmp->engr_x);
+    }
+
+    /* regions */
+    for (i = 0; i < g.num_lregions; i++) {
+	if (flp & 1) {
+	    g.lregions[i].inarea.y1 = FlipY(g.lregions[i].inarea.y1);
+	    g.lregions[i].inarea.y2 = FlipY(g.lregions[i].inarea.y2);
+	    if (g.lregions[i].inarea.y1 > g.lregions[i].inarea.y2) {
+		int tmp = g.lregions[i].inarea.y1;
+		g.lregions[i].inarea.y1 = g.lregions[i].inarea.y2;
+		g.lregions[i].inarea.y2 = tmp;
+	    }
+
+	    g.lregions[i].delarea.y1 = FlipY(g.lregions[i].delarea.y1);
+	    g.lregions[i].delarea.y2 = FlipY(g.lregions[i].delarea.y2);
+	    if (g.lregions[i].delarea.y1 > g.lregions[i].delarea.y2) {
+		int tmp = g.lregions[i].delarea.y1;
+		g.lregions[i].delarea.y1 = g.lregions[i].delarea.y2;
+		g.lregions[i].delarea.y2 = tmp;
+	    }
+	}
+	if (flp & 2) {
+	    g.lregions[i].inarea.x1 = FlipX(g.lregions[i].inarea.x1);
+	    g.lregions[i].inarea.x2 = FlipX(g.lregions[i].inarea.x2);
+	    if (g.lregions[i].inarea.x1 > g.lregions[i].inarea.x2) {
+		int tmp = g.lregions[i].inarea.x1;
+		g.lregions[i].inarea.x1 = g.lregions[i].inarea.x2;
+		g.lregions[i].inarea.x2 = tmp;
+	    }
+
+	    g.lregions[i].delarea.x1 = FlipX(g.lregions[i].delarea.x1);
+	    g.lregions[i].delarea.x2 = FlipX(g.lregions[i].delarea.x2);
+	    if (g.lregions[i].delarea.x1 > g.lregions[i].delarea.x2) {
+		int tmp = g.lregions[i].delarea.x1;
+		g.lregions[i].delarea.x1 = g.lregions[i].delarea.x2;
+		g.lregions[i].delarea.x2 = tmp;
+	    }
+	}
+    }
+
+    /* rooms */
+    for(sroom = &g.rooms[0]; ; sroom++) {
+	if (sroom->hx < 0) break;
+
+	if (flp & 1) {
+	    sroom->ly = FlipY(sroom->ly);
+	    sroom->hy = FlipY(sroom->hy);
+	    if (sroom->ly > sroom->hy) {
+		int tmp = sroom->ly;
+		sroom->ly = sroom->hy;
+		sroom->hy = tmp;
+	    }
+	}
+	if (flp & 2) {
+	    sroom->lx = FlipX(sroom->lx);
+	    sroom->hx = FlipX(sroom->hx);
+	    if (sroom->lx > sroom->hx) {
+		int tmp = sroom->lx;
+		sroom->lx = sroom->hx;
+		sroom->hx = tmp;
+	    }
+	}
+
+	if (sroom->nsubrooms)
+	    for (i = 0; i < sroom->nsubrooms; i++) {
+		struct mkroom *rroom = sroom->sbrooms[i];
+		if (flp & 1) {
+		    rroom->ly = FlipY(rroom->ly);
+		    rroom->hy = FlipY(rroom->hy);
+		    if (rroom->ly > rroom->hy) {
+			int tmp = rroom->ly;
+			rroom->ly = rroom->hy;
+			rroom->hy = tmp;
+		    }
+		}
+		if (flp & 2) {
+		    rroom->lx = FlipX(rroom->lx);
+		    rroom->hx = FlipX(rroom->hx);
+		    if (rroom->lx > rroom->hx) {
+			int tmp = rroom->lx;
+			rroom->lx = rroom->hx;
+			rroom->hx = tmp;
+		    }
+		}
+	    }
+    }
+
+    /* doors */
+    for (i = 0; i < g.doorindex; i++) {
+	if (flp & 1)
+	    g.doors[i].y = FlipY(g.doors[i].y);
+	if (flp & 2)
+	    g.doors[i].x = FlipX(g.doors[i].x);
+    }
+
+    /* the map */
+    if (flp & 1) {
+	for (x = minx; x <= maxx; x++)
+	    for (y = miny; y < (miny + ((maxy-miny+1) / 2)); y++) {
+                int ny = FlipY(y);
+
+		flip_drawbridge_vertical(&levl[x][y]);
+		flip_drawbridge_vertical(&levl[x][ny]);
+
+		trm = levl[x][y];
+		levl[x][y] = levl[x][ny];
+		levl[x][ny] = trm;
+
+		otmp = g.level.objects[x][y];
+		g.level.objects[x][y] = g.level.objects[x][ny];
+		g.level.objects[x][ny] = otmp;
+
+		mtmp = g.level.monsters[x][y];
+		g.level.monsters[x][y] = g.level.monsters[x][ny];
+		g.level.monsters[x][ny] = mtmp;
+	    }
+    }
+    if (flp & 2) {
+	for (x = minx; x < (minx + ((maxx-minx+1) / 2)); x++)
+	    for (y = miny; y <= maxy; y++) {
+                int nx = FlipX(x);
+
+		flip_drawbridge_horizontal(&levl[x][y]);
+		flip_drawbridge_horizontal(&levl[nx][y]);
+
+		trm = levl[x][y];
+		levl[x][y] = levl[nx][y];
+		levl[nx][y] = trm;
+
+		otmp = g.level.objects[x][y];
+		g.level.objects[x][y] = g.level.objects[nx][y];
+		g.level.objects[nx][y] = otmp;
+
+		mtmp = g.level.monsters[x][y];
+		g.level.monsters[x][y] = g.level.monsters[nx][y];
+		g.level.monsters[nx][y] = mtmp;
+	    }
+    }
+
+    fix_wall_spines(1, 0, COLNO-1, ROWNO-1);
+
+    vision_reset();
+}
+
+#undef FlipX
+#undef FlipY
+
+void
+flip_level_rnd(int flp)
+{
+    int c = 0;
+    if ((flp & 1) && rn2(2)) c |= 1;
+    if ((flp & 2) && rn2(2)) c |= 2;
+
+    if (c) flip_level(c);
+}
+
+
+void
 sel_set_wall_property(x, y, arg)
 int x, y;
 genericptr_t arg;
@@ -2886,6 +3200,12 @@ lua_State *L;
             g.coder->solidify = 1;
         else if (!strcmpi(s, "inaccessibles"))
             g.coder->check_inaccessibles = 1;
+        else if (!strcmpi(s, "noflipx"))
+            g.coder->allow_flips &= ~2;
+        else if (!strcmpi(s, "noflipy"))
+            g.coder->allow_flips &= ~1;
+        else if (!strcmpi(s, "noflip"))
+            g.coder->allow_flips = 0;
         else {
             char buf[BUFSZ];
             Sprintf(buf, "Unknown level flag %s", s);
@@ -5498,6 +5818,7 @@ sp_level_coder_init()
     coder->premapped = FALSE;
     coder->solidify = FALSE;
     coder->check_inaccessibles = FALSE;
+    coder->allow_flips = 3; /* allow flipping level horiz/vert */
     coder->croom = NULL;
     coder->n_subroom = 1;
     coder->lvl_is_joined = 0;
@@ -5629,6 +5950,8 @@ const char *name;
      */
     if (!g.level.flags.corrmaze)
         wallification(1, 0, COLNO - 1, ROWNO - 1);
+
+    flip_level_rnd(g.coder->allow_flips);
 
     count_features();
 

@@ -22,7 +22,6 @@ static void FDECL(check_ransacked, (char *));
 static void FDECL(migr_booty_item, (int, const char *));
 static void FDECL(migrate_orc, (struct monst *, unsigned long));
 static void NDECL(stolen_booty);
-static void FDECL(get_level_extends, (int *, int *, int *, int *));
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -1225,7 +1224,7 @@ coord *cc;
     return;
 }
 
-static void
+void
 get_level_extends(left, top, right, bottom)
 int *left, *top, *right, *bottom;
 {
