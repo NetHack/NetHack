@@ -78,6 +78,7 @@ enum blconditions {
     bl_trapped,
     bl_unconsc,
     bl_woundedl,
+    bl_holding,
 
     CONDITION_COUNT
 };
@@ -114,7 +115,8 @@ enum blconditions {
 #define BL_MASK_TRAPPED      0x04000000L
 #define BL_MASK_UNCONSC      0x08000000L
 #define BL_MASK_WOUNDEDL     0x10000000L
-#define BL_MASK_BITS            29 /* number of mask bits that can be set */
+#define BL_MASK_HOLDING      0x20000000L
+#define BL_MASK_BITS            30 /* number of mask bits that can be set */
 /* clang-format on */
 
 struct conditions_t {

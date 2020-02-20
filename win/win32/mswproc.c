@@ -2831,6 +2831,7 @@ static mswin_condition_field _condition_fields[CONDITION_COUNT] = {
     { BL_MASK_TRAPPED,   "Trap" },
     { BL_MASK_UNCONSC,   "Out" },
     { BL_MASK_WOUNDEDL,  "Legs" },
+    { BL_MASK_HOLDING,   "Uhold" },
 };
 
 extern winid WIN_STATUS;

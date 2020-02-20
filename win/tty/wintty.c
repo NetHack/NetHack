@@ -3845,6 +3845,7 @@ boolean enable;
  *               BL_MASK_TRAPPED      0x04000000L
  *               BL_MASK_UNCONSC      0x08000000L
  *               BL_MASK_WOUNDEDL     0x10000000L
+ *               BL_MASK_HOLDING      0x20000000L
  *
  *      -- The value passed for BL_GOLD usually includes an encoded leading
  *         symbol for GOLD "\GXXXXNNNN:nnn". If the window port needs to use

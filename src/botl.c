@@ -422,6 +422,7 @@ static char *FDECL(anything_to_s, (char *, anything *, int));
 static int FDECL(percentage, (struct istat_s *, struct istat_s *));
 static int NDECL(exp_percentage);
 static int FDECL(CFDECLSPEC cond_cmp, (const genericptr, const genericptr));
+static int FDECL(CFDECLSPEC menualpha_cmp, (const genericptr, const genericptr));
 
 #ifdef STATUS_HILITES
 static void FDECL(s_to_anything, (anything *, char *, int));
@@ -523,8 +524,9 @@ const struct condmap condition_aliases[] = {
                         | BL_MASK_PARLYZ | BL_MASK_RIDE | BL_MASK_SLEEPING
                         | BL_MASK_SLIME | BL_MASK_SLIPPERY | BL_MASK_STONE
                         | BL_MASK_STRNGL | BL_MASK_STUN | BL_MASK_SUBMERGED
-                        | BL_MASK_TERMILL | BL_MASK_TETHERED | BL_MASK_TRAPPED
-                        | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL },
+                        | BL_MASK_TERMILL | BL_MASK_TETHERED
+                        | BL_MASK_TRAPPED | BL_MASK_UNCONSC
+                        | BL_MASK_WOUNDEDL | BL_MASK_HOLDING },
     { "major_troubles", BL_MASK_FOODPOIS | BL_MASK_GRAB | BL_MASK_INLAVA
                         | BL_MASK_SLIME | BL_MASK_STONE | BL_MASK_STRNGL
                         | BL_MASK_TERMILL },
@@ -536,7 +538,8 @@ const struct condmap condition_aliases[] = {
                         | BL_MASK_HELD | BL_MASK_ICY | BL_MASK_PARLYZ
                         | BL_MASK_SLEEPING | BL_MASK_SLIPPERY
                         | BL_MASK_SUBMERGED | BL_MASK_TETHERED | BL_MASK_TRAPPED
-                        | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL },
+                        | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL
+                        | BL_MASK_HOLDING },
 };
 
 #endif /* STATUS_HILITES */
@@ -572,6 +575,7 @@ const struct conditions_t conditions[] = {
     { 20, BL_MASK_TRAPPED,   bl_trapped,   { "Trap",     "Trp",   "Tr"  } },
     { 20, BL_MASK_UNCONSC,   bl_unconsc,   { "Out",      "Out",   "KO"  } },
     { 20, BL_MASK_WOUNDEDL,  bl_woundedl,  { "Legs",     "Leg",   "Lg"  } },
+    { 20, BL_MASK_HOLDING,   bl_holding,   { "UHold",    "UHld",  "UHd" } },
 };
 
 struct condtests_t condtests[CONDITION_COUNT] = {
@@ -605,6 +609,7 @@ struct condtests_t condtests[CONDITION_COUNT] = {
     { bl_trapped,   "trap",        opt_in,  FALSE, FALSE, FALSE },
     { bl_unconsc,   "unconscious", opt_in,  FALSE, FALSE, FALSE },
     { bl_woundedl,  "woundedlegs", opt_in,  FALSE, FALSE, FALSE },
+    { bl_holding,   "holding",     opt_in,  FALSE, FALSE, FALSE },
 };
 /* condition indexing */
 int cond_idx[CONDITION_COUNT] = { 0 };
@@ -834,7 +839,8 @@ bot_via_windowport()
     condtests[bl_conf].test      = (Confusion) ? TRUE : FALSE;
     condtests[bl_deaf].test      = (Deaf);
     condtests[bl_fly].test       = (Flying);
-    condtests[bl_foodpois].test  = (Sick && (u.usick_type & SICK_VOMITABLE) != 0);
+    condtests[bl_foodpois].test  = (Sick
+                                    && (u.usick_type & SICK_VOMITABLE) != 0);
     condtests[bl_glowhands].test = (u.umconf);
     condtests[bl_grab].test      = (u.ustuck && u.ustuck->data->mlet == S_EEL);
     condtests[bl_hallu].test     = (Hallucination);
@@ -845,10 +851,17 @@ bot_via_windowport()
     condtests[bl_stone].test     = (Stoned) ? TRUE : FALSE;
     condtests[bl_strngl].test    = (Strangled) ? TRUE : FALSE;
     condtests[bl_stun].test      = (Stunned) ? TRUE : FALSE;
-    condtests[bl_termill].test   = (Sick && (u.usick_type & SICK_NONVOMITABLE) != 0);
+    condtests[bl_termill].test   = (Sick
+                                    && (u.usick_type & SICK_NONVOMITABLE)
+                                        != 0);
     test_if_enabled(bl_elf_iron) = (FALSE);
     test_if_enabled(bl_bareh)    = (!uarmg && !uwep);
-    test_if_enabled(bl_held)     = (u.ustuck && !condtests[bl_grab].test);
+    /* do this next one before bl_held */
+    condtests[bl_holding].test   = (u.ustuck && !u.uswallow
+                                    && Upolyd && sticks(g.youmonst.data));
+    test_if_enabled(bl_held)     = (u.ustuck && !u.uswallow
+                                    && !condtests[bl_holding].test
+                                    && !condtests[bl_grab].test);
     test_if_enabled(bl_icy)      = levl[u.ux][u.uy].typ == ICE;
     test_if_enabled(bl_slippery) = (Glib) ? TRUE : FALSE;
     test_if_enabled(bl_trapped)  = (u.utrap && u.utraptype != TT_BURIEDBALL
@@ -906,7 +919,9 @@ bot_via_windowport()
         g.blstats[idx][BL_CONDITION].a.a_ulong |= conditions[(c)].mask;
 
     for (i = 0; i < CONDITION_COUNT; ++i) {
-        if (condtests[i].enabled && condtests[i].test)
+        if (condtests[i].enabled
+             /* && i != bl_holding  */ /* uncomment to suppress UHold */
+                && condtests[i].test)
             cond_bitset(i);
     }
     evaluate_and_notify_windowport(g.valset, idx);
@@ -976,7 +991,18 @@ const genericptr vptr2;
     if (c1 != c2)
         return c1 - c2;
     /* tie-breaker - visible alpha by name */
-    return strcmpi(conditions[indx1].text[0], conditions[indx2].text[0]);
+    return strcmpi(condtests[indx1].useroption, condtests[indx2].useroption);
+}
+
+/* qsort callback routine for alphabetical sorting of index */
+static int CFDECLSPEC
+menualpha_cmp(vptr1, vptr2)
+const genericptr vptr1;
+const genericptr vptr2;
+{
+    int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2;
+
+    return strcmpi(condtests[indx1].useroption, condtests[indx2].useroption);
 }
 
 int
@@ -1005,41 +1031,70 @@ char *opts;
 void
 cond_menu(VOID_ARGS)
 {
-    int i, res, idx = 0;
+    int i, res, idx = 0, sortorder = 0;
+    int sequence[CONDITION_COUNT];
     winid tmpwin;
     anything any;
     menu_item *picks = (menu_item *) 0;
     char mbuf[QBUFSZ];
+    static const char *menutitle[2] = { "alphabetically", "by ranking"};
+    boolean showmenu = TRUE;
 
-    tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
-
-    any = cg.zeroany;
-    Sprintf(mbuf, "%-21s (ranking)", "field option");
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, mbuf,
-             MENU_ITEMFLAGS_NONE);
-    for (i = 0; i < SIZE(conditions); i++) {
-        Sprintf(mbuf, "cond_%-14s (%3d)", condtests[i].useroption, cond_idx[i]);
-        any = cg.zeroany;
-        any.a_int = i + 1; /* avoid zero */
-        condtests[i].choice = FALSE;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 mbuf,
-                 condtests[i].enabled
-                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    }
-
-    end_menu(tmpwin, "Choose status conditions to toggle");
-
-    res = select_menu(tmpwin, PICK_ANY, &picks);
-    destroy_nhwindow(tmpwin);
-    if (res > 0) {
-        for (i = 0; i < res; i++) {
-            idx = picks[i].item.a_int - 1;
-            condtests[idx].choice = TRUE;
+    do {
+        for (i = 0; i < CONDITION_COUNT; ++i) {
+            sequence[i] = i;
         }
-        free((genericptr_t) picks);
-    }
+        qsort((genericptr_t) sequence, CONDITION_COUNT,
+              sizeof sequence[0],
+              (sortorder) ? cond_cmp : menualpha_cmp);
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin);
+
+        any = cg.zeroany;
+        any.a_int = 1;
+        Sprintf(mbuf, "change sort order from \"%s\" to \"%s\"",
+                menutitle[sortorder], menutitle[1 - sortorder]);
+        add_menu(tmpwin, NO_GLYPH, &any, 'S', 0, ATR_NONE, mbuf,
+                 MENU_ITEMFLAGS_NONE);
+        any = cg.zeroany;
+        Sprintf(mbuf, "sorted %s", menutitle[sortorder]);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, mbuf,
+                 MENU_ITEMFLAGS_NONE);
+        for (i = 0; i < SIZE(condtests); i++) {
+            idx = sequence[i];
+            Sprintf(mbuf, "cond_%-14s", condtests[idx].useroption);
+            any = cg.zeroany;
+            any.a_int = idx + 2; /* avoid zero and the sort change pick */
+            condtests[idx].choice = FALSE;
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     mbuf,
+                     condtests[idx].enabled
+                        ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        }
+
+        end_menu(tmpwin, "Choose status conditions to toggle");
+
+        res = select_menu(tmpwin, PICK_ANY, &picks);
+        destroy_nhwindow(tmpwin);
+        showmenu = FALSE;
+        if (res > 0) {
+            for (i = 0; i < res; i++) {
+                idx = picks[i].item.a_int;
+                if (idx == 1) {
+                   /* sort change requested */
+                   sortorder = 1 - sortorder;
+                   showmenu = TRUE;
+                   break;       /* for loop */
+                } else {
+                    idx -= 2;
+                    condtests[idx].choice = TRUE;
+                }
+            }
+            free((genericptr_t) picks);
+        }
+    } while (showmenu);
+
     for (i = 0; i < CONDITION_COUNT; ++i) {
         if (condtests[i].enabled != condtests[i].choice)
             condtests[i].enabled = condtests[i].choice;
