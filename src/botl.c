@@ -1031,13 +1031,14 @@ char *opts;
 void
 cond_menu(VOID_ARGS)
 {
-    int i, res, idx = 0, sortorder = 0;
+    static int sortorder = 0;
+    static const char *menutitle[2] = { "alphabetically", "by ranking"};
+    int i, res, idx = 0;
     int sequence[CONDITION_COUNT];
     winid tmpwin;
     anything any;
     menu_item *picks = (menu_item *) 0;
     char mbuf[QBUFSZ];
-    static const char *menutitle[2] = { "alphabetically", "by ranking"};
     boolean showmenu = TRUE;
 
     do {
@@ -1095,9 +1096,11 @@ cond_menu(VOID_ARGS)
         }
     } while (showmenu);
 
-    for (i = 0; i < CONDITION_COUNT; ++i) {
-        if (condtests[i].enabled != condtests[i].choice)
-            condtests[i].enabled = condtests[i].choice;
+    if (res > 0) {
+        for (i = 0; i < CONDITION_COUNT; ++i) {
+            if (condtests[i].enabled != condtests[i].choice)
+                condtests[i].enabled = condtests[i].choice;
+        }
     }
 }
 
