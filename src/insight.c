@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1582155881 2020/02/19 23:44:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1582238044 2020/02/20 22:34:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -897,8 +897,19 @@ int final;
         } else
             you_are(predicament, "");
     } /* (u.utrap) */
-    if (u.uswallow) {
-        Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
+    if (u.uswallow) { /* implies u.ustuck is non-Null */
+        Sprintf(buf, "%s by %s",
+                is_animal(u.ustuck->data) ? "swallowed" : "engulfed",
+                a_monnam(u.ustuck));
+        if (dmgtype(u.ustuck->data, AD_DGST)) {
+            /* if final, death via digestion can be deduced by u.uswallow
+               still being True and u.uswldtim having been decremented to 0 */
+            if (final && !u.uswldtim)
+                Strcat(buf, " and got totally digested");
+            else
+                Sprintf(eos(buf), " and %s being digested",
+                        final ? "were" : "are");
+        }
         if (wizard)
             Sprintf(eos(buf), " (%u)", u.uswldtim);
         you_are(buf, "");
