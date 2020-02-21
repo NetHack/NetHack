@@ -767,7 +767,7 @@ amii_get_ext_cmd(void)
 #ifdef EXTMENU
     if (iflags.extmenu) {
         win = amii_create_nhwindow(NHW_MENU);
-        amii_start_menu(win);
+        amii_start_menu(win, MENU_BEHAVE_STANDARD);
         pline("#");
         amii_putstr(WIN_MESSAGE, -1, " ");
 
@@ -830,7 +830,7 @@ amii_get_ext_cmd(void)
             }
 
             win = amii_create_nhwindow(NHW_MENU);
-            amii_start_menu(win);
+            amii_start_menu(win, MENU_BEHAVE_STANDARD);
 
             for (i = 0; extcmdlist[i].ef_txt != NULL; ++i) {
                 id.a_char = extcmdlist[i].ef_txt[0];
@@ -1389,7 +1389,7 @@ amii_player_selection()
         } else {
             /* Prompt for a role */
             win = create_nhwindow(NHW_MENU);
-            start_menu(win);
+            start_menu(win, MENU_BEHAVE_STANDARD);
             any.a_void = 0; /* zero out all bits */
             for (i = 0; roles[i].name.m; i++) {
                 if (ok_role(i, flags.initrace, flags.initgend,
@@ -1480,7 +1480,7 @@ amii_player_selection()
             /* Permit the user to pick, if there is more than one */
             if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; races[i].noun; i++)
                     if (ok_race(flags.initrole, i, flags.initgend,
@@ -1553,7 +1553,7 @@ amii_player_selection()
             /* Permit the user to pick, if there is more than one */
             if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; i < ROLE_GENDERS; i++)
                     if (ok_gend(flags.initrole, flags.initrace, i,
@@ -1624,7 +1624,7 @@ amii_player_selection()
             /* Permit the user to pick, if there is more than one */
             if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; i < ROLE_ALIGNS; i++)
                     if (ok_align(flags.initrole, flags.initrace,

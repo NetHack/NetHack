@@ -152,7 +152,7 @@ void mswin_curs(winid wid, int x, int y);
 void mswin_putstr(winid wid, int attr, const char *text);
 void mswin_putstr_ex(winid wid, int attr, const char *text, int);
 void mswin_display_file(const char *filename, BOOLEAN_P must_exist);
-void mswin_start_menu(winid wid);
+void mswin_start_menu(winid wid, unsigned long mbehavior);
 void mswin_add_menu(winid wid, int glyph, const ANY_P *identifier,
                     CHAR_P accelerator, CHAR_P group_accel, int attr,
                     const char *str, unsigned int itemflags);

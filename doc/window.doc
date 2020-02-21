@@ -303,11 +303,13 @@ display_nhwindow(window, boolean blocking)
 destroy_nhwindow(window)
 		-- Destroy will dismiss the window if the window has not
 		   already been dismissed.
-start_menu(window)
+start_menu(window, unsigned long mbehavior)
 		-- Start using window as a menu.  You must call start_menu()
 		   before add_menu().  After calling start_menu() you may not
 		   putstr() to the window.  Only windows of type NHW_MENU may
 		   be used for menus.
+		-- mbehavior allows flags to be passed to alter the appearance
+                   and/or behavior of the menu.
 add_menu(windid window, int glyph, const anything identifier,
 				char accelerator, char groupacc,
 				int attr, char *str, unsigned itemflags)

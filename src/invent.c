@@ -2642,7 +2642,7 @@ long *out_cnt;
     sortedinvent = sortloot(&g.invent, sortflags, FALSE,
                             (boolean FDECL((*), (OBJ_P))) 0);
 
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     if (wizard && iflags.override_ID) {
         int unid_cnt;
@@ -2810,7 +2810,7 @@ char avoidlet;
 
     if (g.invent) {
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
         while (!invdone) {
             any = cg.zeroany; /* set all bits to zero */
             classcount = 0;
@@ -4272,7 +4272,7 @@ const char *hdr, *txt;
 
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, hdr,
              MENU_ITEMFLAGS_NONE);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);

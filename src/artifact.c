@@ -1527,7 +1527,7 @@ struct obj *obj;
             anything any;
 
             any = cg.zeroany; /* set all bits to zero */
-            start_menu(tmpwin);
+            start_menu(tmpwin, MENU_BEHAVE_STANDARD);
             /* use index+1 (cant use 0) as identifier */
             for (i = num_ok_dungeons = 0; i < g.n_dgns; i++) {
                 if (!g.dungeons[i].dunlev_ureached)

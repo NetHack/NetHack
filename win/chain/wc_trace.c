@@ -356,16 +356,18 @@ boolean complain;
 }
 
 void
-trace_start_menu(vp, window)
+trace_start_menu(vp, window, mbehavior)
 void *vp;
 winid window;
+unsigned long mbehavior;
 {
     struct trace_data *tdp = vp;
 
-    fprintf(wc_tracelogf, "%sstart_menu(%d)\n", INDENT, window);
+    fprintf(wc_tracelogf, "%sstart_menu(%d, %lu)\n", INDENT,
+            window, mbehavior);
 
     PRE;
-    (*tdp->nprocs->win_start_menu)(tdp->ndata, window);
+    (*tdp->nprocs->win_start_menu)(tdp->ndata, window, mbehavior);
     POST;
 }
 
