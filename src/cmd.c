@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1581886858 2020/02/16 21:00:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.400 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1582321487 2020/02/21 21:44:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.403 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -147,7 +147,7 @@ static int NDECL(wiz_polyself);
 static int NDECL(wiz_load_lua);
 static int NDECL(wiz_level_tele);
 static int NDECL(wiz_level_change);
-static int NDECL(wiz_flip_level);
+static int NDECL(wiz_level_flip);
 static int NDECL(wiz_show_seenv);
 static int NDECL(wiz_show_vision);
 static int NDECL(wiz_smell);
