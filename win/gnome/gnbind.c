@@ -663,7 +663,7 @@ gnome_display_file(const char *filename, BOOLEAN_P must_exist)
    be used for menus.
 */
 void
-gnome_start_menu(winid wid)
+gnome_start_menu(winid wid, unsigned long mbehavior)
 {
     if (wid != -1) {
         if (gnome_windowlist[wid].win == NULL

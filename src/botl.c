@@ -1050,7 +1050,7 @@ cond_menu(VOID_ARGS)
               (sortorder) ? cond_cmp : menualpha_cmp);
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
         any = cg.zeroany;
         any.a_int = 1;
@@ -2321,7 +2321,7 @@ int arrmin, arrmax;
     int adj = (arrmin > 0) ? 1 : arrmax;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     for (i = arrmin; i < arrmax; i++) {
         any = cg.zeroany;
@@ -2666,7 +2666,7 @@ query_conditions()
     menu_item *picks = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     for (i = 0; i < SIZE(conditions); i++) {
         any = cg.zeroany;
@@ -3230,7 +3230,7 @@ status_hilite_menu_choose_field()
     menu_item *picks = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     for (i = 0; i < MAXBLSTATS; i++) {
 #ifndef SCORE_ON_BOTL
@@ -3273,7 +3273,7 @@ int fld;
     at = initblstats[fld].anytype;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     if (fld != BL_CONDITION) {
         any = cg.zeroany;
@@ -3360,7 +3360,7 @@ boolean ltok, gtok;
     menu_item *picks = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     if (ltok) {
         if (str)
@@ -3903,7 +3903,7 @@ int fld;
     }
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     if (count) {
         hlstr = status_hilite_str;
@@ -4037,7 +4037,7 @@ shlmenu_redo:
     redo = FALSE;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     status_hilite_linestr_gather();
     countall = status_hilite_linestr_countfield(BL_FLUSH);

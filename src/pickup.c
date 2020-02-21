@@ -935,7 +935,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
                            (qflags & BY_NEXTHERE) ? TRUE : FALSE, allow);
 
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     /*
      * Run through the list and add the objects to the menu.  If
@@ -1126,7 +1126,7 @@ int how;               /* type of query */
     }
 
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     pack = flags.inv_order;
 
     if (qflags & CHOOSE_ALL) {
@@ -1888,7 +1888,7 @@ doloot()
 
             any.a_void = 0;
             win = create_nhwindow(NHW_MENU);
-            start_menu(win);
+            start_menu(win, MENU_BEHAVE_STANDARD);
 
             for (cobj = g.level.objects[cc.x][cc.y]; cobj;
                  cobj = cobj->nexthere)
@@ -2964,7 +2964,7 @@ boolean outokay, inokay, alreadyused, more_containers;
 
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
 
     any.a_int = 1; /* ':' */
     Sprintf(buf, "Look inside %s", thesimpleoname(obj));
@@ -3061,7 +3061,7 @@ dotip()
 
                 any = cg.zeroany;
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
 
                 for (cobj = g.level.objects[cc.x][cc.y], i = 0; cobj;
                      cobj = cobj->nexthere)

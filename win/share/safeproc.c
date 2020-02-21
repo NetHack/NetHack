@@ -226,8 +226,9 @@ boolean complain;
 }
 
 void
-safe_start_menu(window)
+safe_start_menu(window, mbehavior)
 winid window;
+unsigned long mbehavior;
 {
     return;
 }

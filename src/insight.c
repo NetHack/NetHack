@@ -235,7 +235,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     g.en_win = create_nhwindow(NHW_MENU);
     g.en_via_menu = !final;
     if (g.en_via_menu)
-        start_menu(g.en_win);
+        start_menu(g.en_win, MENU_BEHAVE_STANDARD);
 
     Strcpy(tmpbuf, g.plname);
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
@@ -2016,7 +2016,7 @@ set_vanq_order()
     int i, n, choice;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany; /* zero out all bits */
     for (i = 0; i < SIZE(vanqorders); i++) {
         if (i == VANQ_ALPHA_MIX || i == VANQ_MCLS_HTOL) /* skip these */

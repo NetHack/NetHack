@@ -1443,7 +1443,7 @@ const char *prompt;
     menu_item *picks = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(colornames); i++) {
         if (!colornames[i].name)
@@ -1489,7 +1489,7 @@ const char *prompt;
     if (prompt && strstri(prompt, "menu headings"))
         default_attr = iflags.menu_headings;
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(attrnames); i++) {
         if (!attrnames[i].name)
@@ -1588,7 +1588,7 @@ query_msgtype()
     menu_item *picks = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(msgtype_names); i++)
         if (msgtype_names[i].descr) {
@@ -4536,7 +4536,7 @@ doset() /* changing options via menu by Per Liboriussen */
     unsigned longest_name_len;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
 #ifdef notyet /* SYSCF */
     /* XXX I think this is still fragile.  Fixing initial/from_file and/or
@@ -4754,7 +4754,7 @@ int numtotal;
 
     opt_idx = 0;
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(action_titles); i++) {
         char tmpbuf[BUFSZ];
@@ -4800,7 +4800,7 @@ boolean setinitial, setfromfile;
         menu_item *style_pick = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         for (i = 0; i < SIZE(menutype); i++) {
             style_name = menutype[i];
@@ -4820,7 +4820,7 @@ boolean setinitial, setfromfile;
         menu_item *paranoia_picks = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         for (i = 0; paranoia[i].flagmask != 0; ++i) {
             if (paranoia[i].flagmask == PARANOID_BONES && !wizard)
@@ -4852,7 +4852,7 @@ boolean setinitial, setfromfile;
         menu_item *burden_pick = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         for (i = 0; i < SIZE(burdentype); i++) {
             burden_name = burdentype[i];
@@ -4883,7 +4883,7 @@ boolean setinitial, setfromfile;
         menu_item *disclosure_pick = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
             Sprintf(buf, "%-12s[%c%c]", disclosure_names[i],
@@ -4911,7 +4911,7 @@ boolean setinitial, setfromfile;
                 Sprintf(buf, "Disclosure options for %s:",
                         disclosure_names[i]);
                 tmpwin = create_nhwindow(NHW_MENU);
-                start_menu(tmpwin);
+                start_menu(tmpwin, MENU_BEHAVE_STANDARD);
                 any = cg.zeroany;
                 /* 'y','n',and '+' work as alternate selectors; '-' doesn't */
                 any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
@@ -4960,7 +4960,7 @@ boolean setinitial, setfromfile;
         menu_item *mode_pick = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         for (i = 0; i < SIZE(runmodes); i++) {
             mode_name = runmodes[i];
@@ -4980,7 +4980,7 @@ boolean setinitial, setfromfile;
         char gp = iflags.getpos_coords;
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         any.a_char = GPCOORDS_COMPASS;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMPASS, 0, ATR_NONE,
@@ -5044,7 +5044,7 @@ boolean setinitial, setfromfile;
         char gf = iflags.getloc_filter;
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         any.a_char = (GFILTER_NONE + 1);
         add_menu(tmpwin, NO_GLYPH, &any, 'n',
@@ -5079,7 +5079,7 @@ boolean setinitial, setfromfile;
             menu_item *window_pick = (menu_item *) 0;
 
             tmpwin = create_nhwindow(NHW_MENU);
-            start_menu(tmpwin);
+            start_menu(tmpwin, MENU_BEHAVE_STANDARD);
             any = cg.zeroany;
             if (!WINDOWPORT("curses")) {
                 any.a_char = 's';
@@ -5110,7 +5110,7 @@ boolean setinitial, setfromfile;
         menu_item *sortl_pick = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         for (i = 0; i < SIZE(sortltype); i++) {
             sortl_name = sortltype[i];
@@ -5137,7 +5137,7 @@ boolean setinitial, setfromfile;
         boolean msg = (*(optname + 6) == 'm');
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         any.a_int = ALIGN_TOP;
         add_menu(tmpwin, NO_GLYPH, &any, 't', 0, ATR_NONE, "top",
@@ -5172,7 +5172,7 @@ boolean setinitial, setfromfile;
         menu_item *mode_pick = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         for (i = 0; i < SIZE(npchoices); i++) {
             any.a_int = i + 1;
@@ -5249,7 +5249,7 @@ boolean setinitial, setfromfile;
             struct plinemsg_type *tmp = g.plinemsg_types;
 
             tmpwin = create_nhwindow(NHW_MENU);
-            start_menu(tmpwin);
+            start_menu(tmpwin, MENU_BEHAVE_STANDARD);
             any = cg.zeroany;
             mt_idx = 0;
             while (tmp) {
@@ -5329,7 +5329,7 @@ boolean setinitial, setfromfile;
             char clrbuf[QBUFSZ];
 
             tmpwin = create_nhwindow(NHW_MENU);
-            start_menu(tmpwin);
+            start_menu(tmpwin, MENU_BEHAVE_STANDARD);
             any = cg.zeroany;
             mc_idx = 0;
             while (tmp) {
@@ -5403,7 +5403,7 @@ boolean setinitial, setfromfile;
             menu_item *pick_list = (menu_item *) 0;
 
             tmpwin = create_nhwindow(NHW_MENU);
-            start_menu(tmpwin);
+            start_menu(tmpwin, MENU_BEHAVE_STANDARD);
             if (numapes) {
                 ape = g.apelist;
                 any = cg.zeroany;
@@ -5489,7 +5489,7 @@ boolean setinitial, setfromfile;
 
             Sprintf(fmtstr, "%%-%ds %%s", biggest + 2);
             tmpwin = create_nhwindow(NHW_MENU);
-            start_menu(tmpwin);
+            start_menu(tmpwin, MENU_BEHAVE_STANDARD);
             any = cg.zeroany;
             any.a_int = 1; /* -1 + 2 [see 'if (sl->name) {' below]*/
             if (!symset_name)
@@ -6526,7 +6526,7 @@ char *class_select;
     next_accelerator = 'a';
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     while (*class_list) {
         const char *text;
         boolean selected;

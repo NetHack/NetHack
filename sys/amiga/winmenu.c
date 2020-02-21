@@ -9,8 +9,10 @@
 
 /* Start building the text for a menu */
 void
-amii_start_menu(window)
+amii_start_menu(window, mbehavior)
 register winid window;
+unsigned long mbehavior UNUSED;
+
 {
     register int i;
     register struct amii_WinDesc *cw;

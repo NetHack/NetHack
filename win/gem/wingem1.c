@@ -1424,8 +1424,9 @@ mar_more()
 
 /************************* Gem_start_menu *******************************/
 void
-Gem_start_menu(win)
+Gem_start_menu(win, mbehavior)
 winid win;
+unsigned long mbehavior UNUSED;
 {
     win = win;
     if (invent_list) {
@@ -2551,7 +2552,7 @@ winid window;
         use_rip = FALSE;
         break;
     case NHW_MENU:
-        Gem_start_menu(window); /* delete invent_list */
+        Gem_start_menu(window, MENU_BEHAVE_STANDARD); /* delete invent_list */
         test_free(Menu_title);
         break;
     case 0: /* No window available, probably an error message? */

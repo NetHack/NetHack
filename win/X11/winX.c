@@ -1957,7 +1957,7 @@ boolean complain;
 
     newwin = X11_create_nhwindow(NHW_MENU);
     wp = &window_list[newwin];
-    X11_start_menu(newwin);
+    X11_start_menu(newwin, MENU_BEHAVE_STANDARD);
 
     any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {

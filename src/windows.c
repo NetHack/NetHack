@@ -66,7 +66,7 @@ static winid FDECL(dump_create_nhwindow, (int));
 static void FDECL(dump_clear_nhwindow, (winid));
 static void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
 static void FDECL(dump_destroy_nhwindow, (winid));
-static void FDECL(dump_start_menu, (winid));
+static void FDECL(dump_start_menu, (winid, unsigned long));
 static void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P,
                                       CHAR_P, int, const char *, unsigned int));
 static void FDECL(dump_end_menu, (winid, const char *));
@@ -536,6 +536,7 @@ static int NDECL(hup_int_ndecl);
 static void NDECL(hup_void_ndecl);
 static void FDECL(hup_void_fdecl_int, (int));
 static void FDECL(hup_void_fdecl_winid, (winid));
+static void FDECL(hup_void_fdecl_winid_ulong, (winid, unsigned long));
 static void FDECL(hup_void_fdecl_constchar_p, (const char *));
 
 static struct window_procs hup_procs = {
@@ -550,7 +551,7 @@ static struct window_procs hup_procs = {
     hup_create_nhwindow, hup_void_fdecl_winid,         /* clear_nhwindow */
     hup_display_nhwindow, hup_void_fdecl_winid,        /* destroy_nhwindow */
     hup_curs, hup_putstr, hup_putstr,                  /* putmixed */
-    hup_display_file, hup_void_fdecl_winid,            /* start_menu */
+    hup_display_file, hup_void_fdecl_winid_ulong,      /* start_menu */
     hup_add_menu, hup_end_menu, hup_select_menu, genl_message_menu,
     hup_void_ndecl,                                    /* update_inventory */
     hup_void_ndecl,                                    /* mark_synch */
@@ -853,6 +854,15 @@ int arg UNUSED;
 static void
 hup_void_fdecl_winid(window)
 winid window UNUSED;
+{
+    return;
+}
+
+/*ARGUSED*/
+static void
+hup_void_fdecl_winid_ulong(window, mbehavior)
+winid window UNUSED;
+unsigned long mbehavior UNUSED;
 {
     return;
 }
@@ -1314,8 +1324,9 @@ winid win UNUSED;
 
 /*ARGUSED*/
 static void
-dump_start_menu(win)
+dump_start_menu(win, mbehavior)
 winid win UNUSED;
+unsigned long mbehavior;
 {
     return;
 }
