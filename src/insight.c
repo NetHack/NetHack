@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1582238044 2020/02/20 22:34:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1582321544 2020/02/21 21:45:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -914,9 +914,11 @@ int final;
             Sprintf(eos(buf), " (%u)", u.uswldtim);
         you_are(buf, "");
     } else if (u.ustuck) {
-        Sprintf(buf, "%s %s",
-                (Upolyd && sticks(g.youmonst.data)) ? "holding" : "held by",
-                a_monnam(u.ustuck));
+        boolean ustick = (Upolyd && sticks(g.youmonst.data));
+        int dx = u.ustuck->mx - u.ux, dy = u.ustuck->my - u.uy;
+
+        Sprintf(buf, "%s %s (%s)", ustick ? "holding" : "held by",
+                a_monnam(u.ustuck), dxdy_to_dist_descr(dx, dy, TRUE));
         you_are(buf, "");
     }
     if (Riding) {

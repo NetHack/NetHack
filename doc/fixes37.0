@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ $NHDT-Date: 1582020640 2020/02/18 10:10:40 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $ $NHDT-Date: 1582321542 2020/02/21 21:45:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -57,6 +57,7 @@ give feedback if controlled level teleport attempt fails because hero is
 	already on the bottom level and player tries to go even deeper
 unseen pet that drowned didn't give "you have a sad feeling" message
 prevent ravens from blinding other ravens: /corvus oculum corvi non eruit/
+have ^X provide more information when held or swallowed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -201,6 +202,9 @@ correct the Guidebook descriptions for msdos video_width and video_height to
 
 Code Cleanup and Reorganization
 -------------------------------
+new core file insight.c - move enlightenment and conduct from cmd.c to it,
+	also move vanquished, genocided, and extinct monsters from end.c,
+	and move one-line stethoscope/probing feedback from priest.c
 move majority of global variables into instance_globals struct g
 move zeroobj, zeromonst, zeroany into const_globals struct cg
 remove STATIC_DCL, STATIC_OVL, STATIC_VAR, STATIC_PTR

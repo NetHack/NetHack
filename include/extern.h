@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1582155854 2020/02/19 23:44:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.799 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1582321542 2020/02/21 21:45:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.801 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -424,6 +424,7 @@ E void FDECL(heal_legs, (int));
 
 /* ### do_name.c ### */
 
+E char *FDECL(dxdy_to_dist_descr, (int, int, BOOLEAN_P));
 E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
 E boolean FDECL(getpos_menu, (coord *, int));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
