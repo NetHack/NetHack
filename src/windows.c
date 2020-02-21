@@ -1326,7 +1326,7 @@ winid win UNUSED;
 static void
 dump_start_menu(win, mbehavior)
 winid win UNUSED;
-unsigned long mbehavior;
+unsigned long mbehavior UNUSED;
 {
     return;
 }
