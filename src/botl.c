@@ -963,6 +963,7 @@ boolean negated;
     if (!addr) {
         /* special: indicates a request to init so
            set the choice values to match the defaults */
+        g.condmenu_sortorder = 0;
         for (i = 0; i < CONDITION_COUNT; ++i) {
             cond_idx[i] = i;
             condtests[i].choice = condtests[i].enabled;
@@ -1031,7 +1032,6 @@ char *opts;
 void
 cond_menu(VOID_ARGS)
 {
-    static int sortorder = 0;
     static const char *menutitle[2] = { "alphabetically", "by ranking"};
     int i, res, idx = 0;
     int sequence[CONDITION_COUNT];
@@ -1047,7 +1047,7 @@ cond_menu(VOID_ARGS)
         }
         qsort((genericptr_t) sequence, CONDITION_COUNT,
               sizeof sequence[0],
-              (sortorder) ? cond_cmp : menualpha_cmp);
+              (g.condmenu_sortorder) ? cond_cmp : menualpha_cmp);
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -1055,11 +1055,12 @@ cond_menu(VOID_ARGS)
         any = cg.zeroany;
         any.a_int = 1;
         Sprintf(mbuf, "change sort order from \"%s\" to \"%s\"",
-                menutitle[sortorder], menutitle[1 - sortorder]);
+                menutitle[g.condmenu_sortorder],
+                menutitle[1 - g.condmenu_sortorder]);
         add_menu(tmpwin, NO_GLYPH, &any, 'S', 0, ATR_NONE, mbuf,
                  MENU_ITEMFLAGS_NONE);
         any = cg.zeroany;
-        Sprintf(mbuf, "sorted %s", menutitle[sortorder]);
+        Sprintf(mbuf, "sorted %s", menutitle[g.condmenu_sortorder]);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, mbuf,
                  MENU_ITEMFLAGS_NONE);
         for (i = 0; i < SIZE(condtests); i++) {
@@ -1084,7 +1085,7 @@ cond_menu(VOID_ARGS)
                 idx = picks[i].item.a_int;
                 if (idx == 1) {
                    /* sort change requested */
-                   sortorder = 1 - sortorder;
+                   g.condmenu_sortorder = 1 - g.condmenu_sortorder;
                    showmenu = TRUE;
                    break;       /* for loop */
                 } else {

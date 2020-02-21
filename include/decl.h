@@ -667,6 +667,7 @@ struct instance_globals {
 #endif
     unsigned long cond_hilites[BL_ATTCLR_MAX];
     int now_or_before_idx;   /* 0..1 for array[2][] first index */
+    int condmenu_sortorder;
 
     /* cmd.c */
     struct cmd Cmd; /* flag.h */
