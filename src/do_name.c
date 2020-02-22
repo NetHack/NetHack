@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1581562587 2020/02/13 02:56:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.172 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1582364431 2020/02/22 09:40:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2054,15 +2054,16 @@ char *buf, *code;
     static const char bogon_codes[] = "-_+|="; /* see dat/bonusmon.txt */
     char *mname = buf;
 
+    if (code)
+        *code = '\0';
+    /* might fail (return empty buf[]) if the file isn't available */
     get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng);
-    /* strip prefix if present */
-    if (index(bogon_codes, *mname)) {
+    if (!*mname) {
+        Strcpy(buf, "bogon");
+    } else if (index(bogon_codes, *mname)) { /* strip prefix if present */
         if (code)
             *code = *mname;
         ++mname;
-    } else {
-        if (code)
-            *code = '\0';
     }
     return mname;
 }

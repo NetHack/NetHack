@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $ $NHDT-Date: 1582321542 2020/02/21 21:45:42 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $ $NHDT-Date: 1582364458 2020/02/22 09:40:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -58,6 +58,7 @@ give feedback if controlled level teleport attempt fails because hero is
 unseen pet that drowned didn't give "you have a sad feeling" message
 prevent ravens from blinding other ravens: /corvus oculum corvi non eruit/
 have ^X provide more information when held or swallowed
+avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

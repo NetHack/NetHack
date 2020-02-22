@@ -1,4 +1,4 @@
-/* NetHack 3.6	rumors.c	$NHDT-Date: 1545132266 2018/12/18 11:24:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	rumors.c	$NHDT-Date: 1582364450 2020/02/22 09:40:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -279,23 +279,26 @@ int FDECL((*rng), (int));
     dlb *fh;
 
     buf[0] = '\0';
-
     fh = dlb_fopen(fname, "r");
-
     if (fh) {
-        /* TODO: cache sizetxt, starttxt, endtxt. maybe cache file contents?
-         */
-        long sizetxt = 0, starttxt = 0, endtxt = 0, tidbit = 0;
+        /* TODO: cache sizetxt, starttxt, endtxt. maybe cache file contents? */
+        long sizetxt = 0L, starttxt = 0L, endtxt = 0L, tidbit = 0L;
         char *endp, line[BUFSZ], xbuf[BUFSZ];
-        (void) dlb_fgets(line, sizeof line,
-                         fh); /* skip "don't edit" comment */
+
+        /* skip "don't edit" comment */
+        (void) dlb_fgets(line, sizeof line, fh);
 
         (void) dlb_fseek(fh, 0L, SEEK_CUR);
         starttxt = dlb_ftell(fh);
         (void) dlb_fseek(fh, 0L, SEEK_END);
         endtxt = dlb_ftell(fh);
         sizetxt = endtxt - starttxt;
-        tidbit = rng(sizetxt);
+        /* might be zero (only if file is empty); should complain in that
+           case but if could happen over and over, also the suggestion
+           that save and restore might fix the problem wouldn't be useful */
+        if (sizetxt < 1L)
+            return buf;
+        tidbit = (*rng)(sizetxt);
 
         (void) dlb_fseek(fh, starttxt + tidbit, SEEK_SET);
         (void) dlb_fgets(line, sizeof line, fh);
@@ -387,10 +390,12 @@ NHFILE *nhfp;
 {
     if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
+                bwrite(nhfp->fd, (genericptr_t) &g.oracle_cnt,
+                       sizeof g.oracle_cnt);
             if (g.oracle_cnt) {
                 if (nhfp->structlevel) {
-                    bwrite(nhfp->fd, (genericptr_t)g.oracle_loc, g.oracle_cnt * sizeof (long));
+                    bwrite(nhfp->fd, (genericptr_t) g.oracle_loc,
+                           g.oracle_cnt * sizeof (long));
                 }
             }
     }
@@ -412,7 +417,8 @@ NHFILE *nhfp;
     if (g.oracle_cnt) {
         g.oracle_loc = (unsigned long *) alloc(g.oracle_cnt * sizeof(long));
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) g.oracle_loc, g.oracle_cnt * sizeof (long));
+            mread(nhfp->fd, (genericptr_t) g.oracle_loc,
+                  g.oracle_cnt * sizeof (long));
         }
         g.oracle_flg = 1; /* no need to call init_oracles() */
     }
