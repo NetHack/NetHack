@@ -1,8 +1,8 @@
 
-
 -- Test the selection
 
-function test_selection()
+-- test selection parameters
+function test_selection_params()
    local sel = selection.new();
 
    -- test set & get
@@ -79,7 +79,28 @@ function test_selection()
 
    local sel2 = selection.clone(sel);
    local sel3 = sel2:clone();
-end -- selection_tests()
+
+end -- test_selection_params
+
+-- test negation
+function test_sel_negate()
+   local sela = selection.negate();
+   local selb = sela:negate();
+
+   for x = 0,nhc.COLNO - 2 do
+      for y = 0,nhc.ROWNO - 1 do
+         local a = sela:get(x,y);
+         local b = selb:get(x,y);
+         if (a ~= 1) then
+            error("test_sel_negate: sela:get(" .. x .. "," .. y .. ")==" .. a);
+         end
+         if (b ~= 0) then
+            error("test_sel_negate: selb:get(" .. x .. "," .. y .. ")==" .. b);
+         end
+      end
+   end
+end -- test_sel_negate
 
 
-test_selection();
+test_selection_params();
+test_sel_negate();
