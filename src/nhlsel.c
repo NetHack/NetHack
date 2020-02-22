@@ -299,9 +299,14 @@ l_selection_filter_percent(L)
 lua_State *L;
 {
     struct selectionvar *sel = l_selection_check(L, 1);
+    struct selectionvar *ret;
     int p = (int) luaL_checkinteger(L, 2);
-    selection_filter_percent(sel, p);
-    lua_settop(L, 1);
+
+    lua_pop(L, 1);
+    (void) l_selection_clone(L);
+    ret = l_selection_check(L, 1);
+    selection_filter_percent(ret, p);
+
     return 1;
 }
 

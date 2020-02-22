@@ -29,6 +29,16 @@ function sel_has_n_points(sel, pts, msg)
    end
 end
 
+function sel_are_equal(sela, selb, msg)
+   for x = 0,nhc.COLNO - 2 do
+      for y = 0,nhc.ROWNO - 1 do
+         if (sela:get(x,y) ~= selb:get(x,y)) then
+            error("selections differ at (" .. x .. "," .. y .. "),sela=" .. sela:get(x,y) .. ",selb=" .. selb:get(x,y) .. ": " .. msg);
+         end
+      end
+   end
+end
+
 -- test selection parameters
 function test_selection_params()
    local sel = selection.new();
@@ -201,9 +211,25 @@ function test_sel_logical_xor()
    sel_has_n_points(selr, 2, __func__);
 end -- test_sel_logical_xor
 
+function test_sel_filter_percent()
+   local __func__ = "test_sel_filter_percent";
+   local sela = selection.negate();
+   local sela_clone = sela:clone();
+
+   local selb = sela:percentage(100);
+   sel_are_equal(sela, selb, __func__);
+   sel_are_equal(sela, sela_clone, __func__);
+
+   local selc = sela:percentage(0);
+   sel_are_equal(sela, sela_clone, __func__);
+   sel_has_n_points(selc, 0, __func__);
+
+   -- TODO: Need a predictable rn2 to test for percentage(50)
+end -- test_sel_filter_percent
 
 test_selection_params();
 test_sel_negate();
 test_sel_logical_and();
 test_sel_logical_or();
 test_sel_logical_xor();
+test_sel_filter_percent();
