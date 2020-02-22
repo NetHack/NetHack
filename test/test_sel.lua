@@ -278,6 +278,20 @@ function test_sel_fillrect()
    end
 end -- test_sel_fillrect
 
+function test_sel_randline()
+   local __func__ = "test_sel_randline";
+   local sela = selection.new();
+   local sela_clone = sela:clone();
+
+   -- roughness 0 is drawn line a straight line
+   local selb = sela:randline(1,1, 5,5, 0);
+   sel_are_equal(sela, sela_clone, __func__);
+   sel_has_n_points(selb, 5, __func__);
+   for x = 1, 5 do
+      sel_pt_ne(selb, x,x, 1, __func__);
+   end
+end -- test_sel_randline
+
 test_selection_params();
 test_sel_negate();
 test_sel_logical_and();
@@ -287,3 +301,4 @@ test_sel_filter_percent();
 test_sel_line();
 test_sel_rect();
 test_sel_fillrect();
+test_sel_randline();

@@ -486,6 +486,7 @@ lua_State *L;
         x2 = (schar) luaL_checkinteger(L, 4);
         y2 = (schar) luaL_checkinteger(L, 5);
         roughness = (int) luaL_checkinteger(L, 6);
+        lua_pop(L, 5);
     } else if (argc == 5 && lua_type(L, 1) == LUA_TNUMBER) {
         x1 = (schar) luaL_checkinteger(L, 1);
         y1 = (schar) luaL_checkinteger(L, 2);
@@ -502,8 +503,9 @@ lua_State *L;
     get_location_coord(&x2, &y2, ANY_LOC,
                        g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2, y2));
 
+    (void) l_selection_clone(L);
+    sel = l_selection_check(L, 1);
     selection_do_randline(x1, y1, x2, y2, roughness, 12, sel);
-    lua_settop(L, 1);
     return 1;
 }
 

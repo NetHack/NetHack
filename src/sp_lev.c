@@ -4474,14 +4474,8 @@ struct selectionvar *ov;
     int mx, my;
     int dx, dy;
 
-    if (rec < 1) {
+    if (rec < 1 || (x2 == x1 && y2 == y1))
         return;
-    }
-
-    if ((x2 == x1) && (y2 == y1)) {
-        selection_setpoint(x1, y1, ov, 1);
-        return;
-    }
 
     if (rough > max(abs(x2 - x1), abs(y2 - y1)))
         rough = max(abs(x2 - x1), abs(y2 - y1));
@@ -4498,7 +4492,9 @@ struct selectionvar *ov;
         } while ((mx > COLNO - 1 || mx < 0 || my < 0 || my > ROWNO - 1));
     }
 
-    selection_setpoint(mx, my, ov, 1);
+    if (!selection_getpoint(mx, my, ov)) {
+        selection_setpoint(mx, my, ov, 1);
+    }
 
     rough = (rough * 2) / 3;
 
@@ -4506,6 +4502,8 @@ struct selectionvar *ov;
 
     selection_do_randline(x1, y1, mx, my, rough, rec, ov);
     selection_do_randline(mx, my, x2, y2, rough, rec, ov);
+
+    selection_setpoint(x2, y2, ov, 1);
 }
 
 void
