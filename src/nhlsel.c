@@ -515,11 +515,18 @@ static int
 l_selection_grow(L)
 lua_State *L;
 {
+    int argc = lua_gettop(L);
     const char *const growdirs[] = { "all", "random", "north", "west", "east", "south", NULL };
     const int growdirs2i[] = { W_ANY, -1, W_NORTH, W_WEST, W_EAST, W_SOUTH, 0 };
 
     struct selectionvar *sel = l_selection_check(L, 1);
     int dir = growdirs2i[luaL_checkoption(L, 2, "all", growdirs)];
+
+    if (argc == 2)
+        lua_pop(L, 1); /* get rid of growdir */
+
+    (void) l_selection_clone(L);
+    sel = l_selection_check(L, 1);
     selection_do_grow(sel, dir);
     lua_settop(L, 1);
     return 1;
