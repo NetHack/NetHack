@@ -322,6 +322,22 @@ function test_sel_grow()
    sel_pt_ne(seld, 6,4, 1, __func__);
 end -- test_sel_grow
 
+function test_sel_filter_mapchar()
+   local __func__ = "test_sel_filter_mapchar";
+   local sela = selection.negate();
+   local sela_clone = sela:clone();
+
+   des.terrain(sela, ".");
+   des.terrain(5,5, "L");
+   des.terrain(15,10, "L");
+
+   local selb = sela:filter_mapchar("L");
+   sel_are_equal(sela, sela_clone, __func__);
+   sel_has_n_points(selb, 2, __func__);
+   sel_pt_ne(selb, 5,5, 1, __func__);
+   sel_pt_ne(selb, 15,10, 1, __func__);
+end -- test_sel_filter_mapchar
+
 test_selection_params();
 test_sel_negate();
 test_sel_logical_and();
@@ -333,3 +349,4 @@ test_sel_rect();
 test_sel_fillrect();
 test_sel_randline();
 test_sel_grow();
+test_sel_filter_mapchar();

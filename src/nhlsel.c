@@ -538,24 +538,32 @@ static int
 l_selection_filter_mapchar(L)
 lua_State *L;
 {
+    int argc = lua_gettop(L);
     struct selectionvar *sel = l_selection_check(L, 1);
     char *mapchr = dupstr(luaL_checkstring(L, 2));
     xchar typ = check_mapchr(mapchr);
     int lit = (int) luaL_optinteger(L, 3, -2); /* TODO: special lit values */
-    struct selectionvar *tmp = selection_filter_mapchar(sel, typ, lit);
+    struct selectionvar *tmp, *tmp2;
 
     if (typ == INVALID_TYPE)
         nhl_error(L, "Erroneous map char");
 
-    if (sel->map)
-        free(sel->map);
-    sel->map = tmp->map;
-    if (tmp)
-        free(tmp);
+    if (argc > 1)
+        lua_pop(L, argc - 1);
+
+    tmp = l_selection_push(L);
+    tmp2 = selection_filter_mapchar(sel, typ, lit);
+
+    free(tmp->map);
+    tmp->map = tmp2->map;
+    tmp2->map = NULL;
+    selection_free(tmp2, TRUE);
+
+    lua_remove(L, 1);
+
     if (mapchr)
         free(mapchr);
 
-    lua_settop(L, 1);
     return 1;
 }
 
