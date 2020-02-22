@@ -237,14 +237,16 @@ lua_State *L;
     int x,y;
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
+    struct selectionvar *selr = l_selection_push(L);
 
-    for (x = 0; x < sela->wid; x++)
-        for (y = 0; y < sela->hei; y++) {
+    for (x = 0; x < selr->wid; x++)
+        for (y = 0; y < selr->hei; y++) {
             int val = selection_getpoint(x, y, sela) & selection_getpoint(x, y, selb);
-            selection_setpoint(x, y, sela, val);
+            selection_setpoint(x, y, selr, val);
         }
 
-    lua_settop(L, 1);
+    lua_remove(L, 1);
+    lua_remove(L, 1);
     return 1;
 }
 
@@ -256,14 +258,16 @@ lua_State *L;
     int x,y;
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
+    struct selectionvar *selr = l_selection_push(L);
 
-    for (x = 0; x < sela->wid; x++)
-        for (y = 0; y < sela->hei; y++) {
+    for (x = 0; x < selr->wid; x++)
+        for (y = 0; y < selr->hei; y++) {
             int val = selection_getpoint(x, y, sela) | selection_getpoint(x, y, selb);
-            selection_setpoint(x, y, sela, val);
+            selection_setpoint(x, y, selr, val);
         }
 
-    lua_settop(L, 1);
+    lua_remove(L, 1);
+    lua_remove(L, 1);
     return 1;
 }
 
@@ -275,14 +279,16 @@ lua_State *L;
     int x,y;
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
+    struct selectionvar *selr = l_selection_push(L);
 
-    for (x = 0; x < sela->wid; x++)
-        for (y = 0; y < sela->hei; y++) {
+    for (x = 0; x < selr->wid; x++)
+        for (y = 0; y < selr->hei; y++) {
             int val = selection_getpoint(x, y, sela) ^ selection_getpoint(x, y, selb);
-            selection_setpoint(x, y, sela, val);
+            selection_setpoint(x, y, selr, val);
         }
 
-    lua_settop(L, 1);
+    lua_remove(L, 1);
+    lua_remove(L, 1);
     return 1;
 }
 
