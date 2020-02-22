@@ -419,11 +419,13 @@ lua_State *L;
     get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
                        SP_COORD_PACK(x2, y2));
 
+    lua_settop(L, 1);
+    (void) l_selection_clone(L);
+    sel = l_selection_check(L, 1);
     selection_do_line(x1, y1, x2, y1, sel);
     selection_do_line(x1, y1, x1, y2, sel);
     selection_do_line(x2, y1, x2, y2, sel);
     selection_do_line(x1, y2, x2, y2, sel);
-    lua_settop(L, 1);
     return 1;
 }
 
@@ -451,6 +453,9 @@ lua_State *L;
     get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
                        SP_COORD_PACK(x2, y2));
 
+    lua_settop(L, 1);
+    (void) l_selection_clone(L);
+    sel = l_selection_check(L, 1);
     if (x1 == x2) {
         for (y = y1; y <= y2; y++)
             selection_setpoint(x1, y, sel, 1);
@@ -458,7 +463,6 @@ lua_State *L;
         for (y = y1; y <= y2; y++)
             selection_do_line(x1, y, x2, y, sel);
     }
-    lua_settop(L, 1);
     return 1;
 }
 

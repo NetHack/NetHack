@@ -244,6 +244,40 @@ function test_sel_line()
 
 end -- test_sel_line
 
+function test_sel_rect()
+   local __func__ = "test_sel_rect";
+   local sela = selection.new();
+   local sela_clone = sela:clone();
+
+   local selb = sela:rect(1,1, 3,3);
+   sel_are_equal(sela, sela_clone, __func__);
+   sel_has_n_points(selb, 8, __func__);
+
+   for x = 1,3 do
+      for y = 1,3 do
+         local v = 1;
+         if (x == 2 and y == 2) then v = 0; end;
+         sel_pt_ne(selb, x,y, v, __func__);
+      end
+   end
+end -- test_sel_rect
+
+function test_sel_fillrect()
+   local __func__ = "test_sel_fillrect";
+   local sela = selection.new();
+   local sela_clone = sela:clone();
+
+   local selb = sela:fillrect(1,1, 3,3);
+   sel_are_equal(sela, sela_clone, __func__);
+   sel_has_n_points(selb, 9, __func__);
+
+   for x = 1,3 do
+      for y = 1,3 do
+         sel_pt_ne(selb, x,y, 1, __func__);
+      end
+   end
+end -- test_sel_fillrect
+
 test_selection_params();
 test_sel_negate();
 test_sel_logical_and();
@@ -251,3 +285,5 @@ test_sel_logical_or();
 test_sel_logical_xor();
 test_sel_filter_percent();
 test_sel_line();
+test_sel_rect();
+test_sel_fillrect();
