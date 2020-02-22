@@ -70,7 +70,6 @@ function test_selection_params()
    sel:area(1,2, 7,8);
    sel:grow();
    sel:filter_mapchar(' ');
-   sel:floodfill(1,1);
    sel:circle(40, 10, 9);
    sel:circle(40, 10, 9, 1);
    sel:ellipse(40, 10, 20, 8);
@@ -89,7 +88,6 @@ function test_selection_params()
    selection.area(sel, 1,2, 7,8);
    selection.grow(sel);
    selection.filter_mapchar(sel, ' ');
-   selection.floodfill(sel, 1,1);
    selection.circle(sel, 40, 10, 9);
    selection.circle(sel, 40, 10, 9, 1);
    selection.ellipse(sel, 40, 10, 20, 8);
@@ -338,6 +336,25 @@ function test_sel_filter_mapchar()
    sel_pt_ne(selb, 15,10, 1, __func__);
 end -- test_sel_filter_mapchar
 
+function test_sel_flood()
+   local __func__ = "test_sel_flood";
+   local sela = selection.new();
+   local sela_clone = sela:clone();
+
+   des.terrain(selection.negate(), ".");
+   des.terrain(5,5, "L");
+   des.terrain(6,5, "L");
+   des.terrain(7,5, "L");
+   des.terrain(8,6, "L");
+
+   local selb = selection.floodfill(6,5);
+   sel_has_n_points(selb, 3, __func__);
+   sel_pt_ne(selb, 5,5, 1, __func__);
+   sel_pt_ne(selb, 6,5, 1, __func__);
+   sel_pt_ne(selb, 7,5, 1, __func__);
+
+end -- test_sel_flood
+
 test_selection_params();
 test_sel_negate();
 test_sel_logical_and();
@@ -350,3 +367,4 @@ test_sel_fillrect();
 test_sel_randline();
 test_sel_grow();
 test_sel_filter_mapchar();
+test_sel_flood();

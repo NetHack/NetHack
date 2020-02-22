@@ -568,7 +568,6 @@ lua_State *L;
 }
 
 
-/* local s = selection.floodfill(sel, x, y); */
 /* local s = selection.floodfill(x,y); */
 static int
 l_selection_flood(L)
@@ -578,11 +577,7 @@ lua_State *L;
     struct selectionvar *sel = (struct selectionvar *) 0;
     schar x, y;
 
-    if (argc == 3) {
-        sel = l_selection_check(L, 1);
-        x = (schar) luaL_checkinteger(L, 2);
-        y = (schar) luaL_checkinteger(L, 3);
-    } else if (argc == 2) {
+    if (argc == 2) {
         x = (schar) luaL_checkinteger(L, 1);
         y = (schar) luaL_checkinteger(L, 2);
         lua_pop(L, 2);
@@ -600,7 +595,6 @@ lua_State *L;
         set_floodfillchk_match_under(levl[x][y].typ);
         selection_floodfill(sel, x, y, FALSE);
     }
-    lua_settop(L, 1);
     return 1;
 }
 
