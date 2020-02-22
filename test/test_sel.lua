@@ -227,9 +227,27 @@ function test_sel_filter_percent()
    -- TODO: Need a predictable rn2 to test for percentage(50)
 end -- test_sel_filter_percent
 
+function test_sel_line()
+   local __func__ = "test_sel_line";
+   local sela = selection.new();
+   local sela_clone = sela:clone();
+
+   local selb = sela:line(1,1, 5,5);
+   sel_are_equal(sela, sela_clone, __func__);
+   sel_has_n_points(selb, 5, __func__);
+   for x = 1, 5 do
+      sel_pt_ne(selb, x,x, 1, __func__);
+   end
+
+   local selc = selb:line(10,1, 10,5);
+   sel_has_n_points(selc, 10, __func__);
+
+end -- test_sel_line
+
 test_selection_params();
 test_sel_negate();
 test_sel_logical_and();
 test_sel_logical_or();
 test_sel_logical_xor();
 test_sel_filter_percent();
+test_sel_line();

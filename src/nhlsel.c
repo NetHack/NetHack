@@ -334,6 +334,10 @@ lua_State *L;
     return 2;
 }
 
+/* internal function to get a selection and 4 integer values from lua stack.
+   removes the integers from the stack.
+   returns TRUE if params are good.
+*/
 /* function(selection, x1,y1, x2,y2) */
 /* selection:function(x1,y1, x2,y2) */
 static boolean
@@ -362,6 +366,7 @@ schar *x1, *y1, *x2, *y2;
         *y1 = (schar) luaL_checkinteger(L, 3);
         *x2 = (schar) luaL_checkinteger(L, 4);
         *y2 = (schar) luaL_checkinteger(L, 5);
+        lua_pop(L, 4);
         return TRUE;
     }
     return FALSE;
@@ -387,8 +392,10 @@ lua_State *L;
     get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
     get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2,y2));
 
-    selection_do_line(x1,y1,x2,y2, sel);
     lua_settop(L, 1);
+    (void) l_selection_clone(L);
+    sel = l_selection_check(L, 1);
+    selection_do_line(x1,y1,x2,y2, sel);
     return 1;
 }
 
