@@ -27,6 +27,10 @@ static void NDECL(create_des_coder);
 static void NDECL(solidify_map);
 static void FDECL(lvlfill_maze_grid, (int, int, int, int, SCHAR_P));
 static void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
+static void FDECL(flip_drawbridge_horizontal, (struct rm *));
+static void FDECL(flip_drawbridge_vertical, (struct rm *));
+static int FDECL(flip_encoded_direction_bits, (int, int));
+static void FDECL(flip_level, (int, BOOLEAN_P));
 static void FDECL(set_wall_property, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                                           int));
 static void NDECL(count_features);
@@ -212,7 +216,7 @@ schar lit;
         }
 }
 
-void
+static void
 flip_drawbridge_horizontal(lev)
 struct rm *lev;
 {
@@ -227,7 +231,7 @@ struct rm *lev;
     }
 }
 
-void
+static void
 flip_drawbridge_vertical(lev)
 struct rm *lev;
 {
@@ -242,7 +246,7 @@ struct rm *lev;
     }
 }
 
-int
+static int
 flip_encoded_direction_bits(int flp, int val)
 {
     /* These depend on xdir[] and ydir[] order */
@@ -263,8 +267,10 @@ flip_encoded_direction_bits(int flp, int val)
 #define FlipX(val) ((maxx - (val)) + minx)
 #define FlipY(val) ((maxy - (val)) + miny)
 
-void
-flip_level(int flp)
+static void
+flip_level(flp, extras)
+int flp;
+boolean extras;
 {
     int x, y, i;
     int minx, miny, maxx, maxy;
@@ -507,6 +513,11 @@ flip_level(int flp)
 	    }
     }
 
+    if (extras) {
+        if (flp & 1) u.uy = FlipY(u.uy);
+        if (flp & 2) u.ux = FlipX(u.ux);
+    }
+
     fix_wall_spines(1, 0, COLNO-1, ROWNO-1);
 
     vision_reset();
@@ -516,13 +527,15 @@ flip_level(int flp)
 #undef FlipY
 
 void
-flip_level_rnd(int flp)
+flip_level_rnd(flp, extras)
+int flp;
+boolean extras;
 {
     int c = 0;
     if ((flp & 1) && rn2(2)) c |= 1;
     if ((flp & 2) && rn2(2)) c |= 2;
 
-    if (c) flip_level(c);
+    if (c) flip_level(c, extras);
 }
 
 
@@ -5949,7 +5962,7 @@ const char *name;
     if (!g.level.flags.corrmaze)
         wallification(1, 0, COLNO - 1, ROWNO - 1);
 
-    flip_level_rnd(g.coder->allow_flips);
+    flip_level_rnd(g.coder->allow_flips, FALSE);
 
     count_features();
 

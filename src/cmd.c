@@ -1020,13 +1020,13 @@ wiz_level_tele(VOID_ARGS)
 }
 
 /* #wizlevelflip - randomly flip the current level.
-   Does not handle vision, player position, monst mtrack, levregions,
+   Does not handle vision, monst mtrack, levregions,
    as flipping is normally done only during level creation.
  */
 static int
 wiz_level_flip(VOID_ARGS)
 {
-    if (wizard) flip_level_rnd(3);
+    if (wizard) flip_level_rnd(3, TRUE);
     return 0;
 }
 
