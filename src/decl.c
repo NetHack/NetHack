@@ -464,8 +464,6 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES,
 
     /* makemon.c */
-    { -1, /* choice_count */
-     { 0 } }, /* mchoices */
 
     /* mhitm.c */
     UNDEFINED_VALUE, /* vis */

@@ -199,6 +199,7 @@ correct the Guidebook descriptions for msdos video_width and video_height to
 	state that they work with video:vesa; the video:vga setting that was 
 	described there forces the 640x480x16 mode where video_width and
 	video_height don't operate (github #294)
+redo rndmonst() to operate in a single pass (github pull request #286)
 
 
 Code Cleanup and Reorganization

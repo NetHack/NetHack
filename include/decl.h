@@ -886,17 +886,18 @@ struct instance_globals {
     boolean chosen_symset_end;
     int symset_which_set;
     /* SAVESIZE, BONESSIZE, LOCKNAMESIZE are defined in "fnamesiz.h" */
-    char SAVEF[SAVESIZE]; /* holds relative path of save file from playground */
+    char SAVEF[SAVESIZE]; /* relative path of save file from playground */
 #ifdef MICRO
     char SAVEP[SAVESIZE]; /* holds path of directory for save file */
 #endif
     char bones[BONESSIZE];
     char lock[LOCKNAMESIZE];
 
-
     /* hack.c */
     anything tmp_anything;
     int wc; /* current weight_cap(); valid after call to inv_weight() */
+
+    /* insight.c */
 
     /* invent.c */
     int lastinvnr;  /* 0 ... 51 (never saved&restored) */
@@ -905,7 +906,7 @@ struct instance_globals {
     char *invbuf;
     unsigned invbufsiz;
     /* for perm_invent when operating on a partial inventory display, so that
-       the persistent one doesn't get shrunk during filtering for item selection
+       persistent one doesn't get shrunk during filtering for item selection
        then regrown to full inventory, possibly being resized in the process */
     winid cached_pickinv_win;
     /* query objlist callback: return TRUE if obj type matches "this_type" */
@@ -916,15 +917,10 @@ struct instance_globals {
     /* light.c */
     light_source *light_base;
 
-
     /* lock.c */
     struct xlock_s xlock;
 
     /* makemon.c */
-    struct {
-        int choice_count;
-        char mchoices[SPECIAL_PM]; /* value range is 0..127 */
-    } rndmonst_state;
 
     /* mhitm.c */
     boolean vis;
