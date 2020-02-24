@@ -1380,7 +1380,7 @@ coord *click_cc;
         if (found) {
             /* use putmixed() because there may be an encoded glyph present */
             putmixed(WIN_MESSAGE, 0, out_str);
-#ifdef DUMPLOG
+#if defined(DUMPLOG) || defined (DUMPHTML)
             {
                 char dmpbuf[BUFSZ];
 
