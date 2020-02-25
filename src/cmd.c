@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1582592803 2020/02/25 01:06:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.405 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1582594149 2020/02/25 01:29:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.406 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1019,7 +1019,7 @@ wiz_level_tele(VOID_ARGS)
     return 0;
 }
 
-/* #wizlevelflip - flip the current level */
+/* #wizlevelflip - transpose the current level */
 static int
 wiz_level_flip(VOID_ARGS)
 {
@@ -1031,7 +1031,7 @@ wiz_level_flip(VOID_ARGS)
      *   levregions,
      *   monster mtrack,
      *   migrating monsters aimed at returning to specific coordinates
-     *     on the this level
+     *     on this level
      * as flipping is normally done only during level creation.
      */
     if (wizard) {
