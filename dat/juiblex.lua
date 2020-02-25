@@ -3,11 +3,10 @@
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
 --
-des.level_init({ style = "solidfill", fg = " " });
 
-des.level_flags("mazelevel", "noteleport", "shortsighted")
+des.level_flags("mazelevel", "noteleport", "shortsighted", "noflip")
 -- des.level_init(mines,'.','}',true,true,unlit,false)
-des.level_init({ style = "mines", fg = ".", bg = "}", smoothed=1, joined=1, lit=0 });
+des.level_init({ style = "swamp", lit = 0 });
 -- guarantee at least one open spot to ensure successful stair placement
 des.map({ halign = "left", valign = "bottom", map = [[
 xxxxxxxx
@@ -27,24 +26,24 @@ xxxxxxxx
 des.object("boulder")
 -- lair
 des.map([[
-xx}}}}}x}}}}}x}}}}}x}}}}}x}}}}}x}}}}}x}}}}}x}}}}}xx
-x}}}.}}}}}..}}}..}}}}}..}}}..}}}}}..}}}..}}}}}.}}}x
-}}}...}}..}}.}.}}.}}.}}}...}}}.}}}..}}}..}}}}...}}}
-x}}}.}}.}}}.}}.}}.}}...}}.}}.....}}.....}....}.}}}x
-xx}}}..}}}.}}.}}.}}..}}.....}}.}}}.}}.}}}}}}}}}}}xx
-x}}}..}}}}}.}}.}}.}}...}}}}}.....}}.}}}}}}.....}}}x
-}}}..}}...}}..}}.}}}.}}}...}}}.}}}.}.}}}}..P.P..}}}
-}}.}}}}...}}}}}.}...}}}..P..}}}.}.}}}.}}}}.....}}}}
-}.}}}}.}}.}..}.}}}}}}}..P.P..}}}.}}}.}}..}}...}}}}x
-x}}}}.}}}}....}}}}}.}}}..P..}}}.}}}}.}}..}}...}}}.}
-}}}}..}}.}}..}}}}...}}}}...}}}.}}}}}.}}}}.}}}}}}.}}
-}}}...}}...}}}..}}}}}}}}}}}}.....}}}}.}}...}..}.}}}
-x}}}..}}.}}}}....}}..}}}..}}.....}}}}.}}}.}....}}}x
-xx}}}.}}}}..}}..}}..}}..}}..}}.}}}..}.}..}}}..}}}xx
-x}}}.}}}}....}}}}..}}....}}}}}}}...}}}....}}}}.}}}x
-}}}...}}}....}}}..}}}....}}}..}}...}}}....}}}...}}}
-x}}}.}}}}}..}}}..}}}}}..}}}..}}}}}..}}}..}}}}}.}}}x
-xx}}}}}x}}}}}x}}}}}x}}}}}x}}}}}x}}}}}x}}}}}x}}}}}xx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxx
+xxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxx
+xxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxx
+xxxxxxxxxxxxxxxxxxxxxxxx}}}xxxxxxxxxxxxxxx}}}}}xxxx
+xxxxxxxxxxxxxxxxxxxxxxx}}}}}xxxxxxxxxxxxx}.....}xxx
+xxxxxxxxxxxxxxxxxxxxxx}}...}}xxxxxxxxxxx}..P.P..}xx
+xxxxxxxxxxxxxxxxxxxxx}}..P..}}xxxxxxxxxxx}.....}xxx
+xxxxxxxxxxxxxxxxxxxxx}}.P.P.}}xxxxxxxxxxxx}...}xxxx
+xxxxxxxxxxxxxxxxxxxxx}}..P..}}xxxxxxxxxxxx}...}xxxx
+xxxxxxxxxxxxxxxxxxxxxx}}...}}xxxxxxxxxxxxxx}}}xxxxx
+xxxxxxxxxxxxxxxxxxxxxxx}}}}}xxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxx}}}xxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxx
+xxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxx
+xxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ]]);
 -- Random registers
 local monster = { "j","b","P","F" }
@@ -58,8 +57,6 @@ place:set(46,15);
 
 -- Dungeon description
 des.region({ region={00,00,50,17}, lit=0, type="swamp" })
-des.mazewalk(00,09,"west")
-des.mazewalk(50,08,"east")
 des.levregion({ region = {01,00,11,20}, region_islev=1, exclude={0,0,50,17}, type="stair-down" });
 des.levregion({ region = {69,00,79,20}, region_islev=1, exclude={0,0,50,17}, type="stair-up" });
 des.levregion({ region = {01,00,11,20}, region_islev=1, exclude={0,0,50,17}, type="branch" });

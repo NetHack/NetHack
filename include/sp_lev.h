@@ -39,7 +39,8 @@ enum lvlinit_types {
     LVLINIT_SOLIDFILL,
     LVLINIT_MAZEGRID,
     LVLINIT_MINES,
-    LVLINIT_ROGUE
+    LVLINIT_ROGUE,
+    LVLINIT_SWAMP
 };
 
 /* max. nested depth of subrooms */

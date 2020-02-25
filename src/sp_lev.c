@@ -27,6 +27,7 @@ static void NDECL(create_des_coder);
 static void NDECL(solidify_map);
 static void FDECL(lvlfill_maze_grid, (int, int, int, int, SCHAR_P));
 static void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
+static void FDECL(lvlfill_swamp, (SCHAR_P, SCHAR_P, SCHAR_P));
 static void FDECL(flip_drawbridge_horizontal, (struct rm *));
 static void FDECL(flip_drawbridge_vertical, (struct rm *));
 static int FDECL(flip_encoded_direction_bits, (int, int));
@@ -212,6 +213,33 @@ schar lit;
             levl[x][y].horizontal = 0;
             levl[x][y].roomno = 0;
             levl[x][y].edge = 0;
+        }
+}
+
+static void
+lvlfill_swamp(fg, bg, lit)
+schar fg, bg, lit;
+{
+    int x,y;
+
+    lvlfill_solid(bg, lit);
+
+    /* "relaxed blockwise maze" algorithm, Jamis Buck */
+    for (x = 2; x <= g.x_maze_max; x+=2)
+        for (y = 0; y <= g.y_maze_max; y+=2) {
+            int c = 0;
+            SET_TYPLIT(x, y, fg, lit);
+            if (levl[x+1][y].typ == bg) c++;
+            if (levl[x][y+1].typ == bg) c++;
+            if (levl[x+1][y+1].typ == bg) c++;
+            if (c == 3) {
+                switch (rn2(3)) {
+                case 0: SET_TYPLIT((x+1),y, fg, lit); break;
+                case 1: SET_TYPLIT(x, (y+1), fg, lit); break;
+                case 2: SET_TYPLIT((x+1),(y+1), fg, lit); break;
+                default: break;
+                }
+            }
         }
 }
 
@@ -2666,6 +2694,11 @@ lev_init *linit;
         linit->icedpools = icedpools;
         mkmap(linit);
         break;
+    case LVLINIT_SWAMP:
+        if (linit->lit == -1)
+            linit->lit = rn2(2);
+        lvlfill_swamp(linit->fg, linit->bg, linit->lit);
+        break;
     }
 }
 
@@ -3302,10 +3335,11 @@ lspo_level_init(L)
 lua_State *L;
 {
     static const char *const initstyles[] = {
-        "solidfill", "mazegrid", "rogue", "mines", NULL
+        "solidfill", "mazegrid", "rogue", "mines", "swamp", NULL
     };
     static const int initstyles2i[] = {
-        LVLINIT_SOLIDFILL, LVLINIT_MAZEGRID, LVLINIT_ROGUE, LVLINIT_MINES
+        LVLINIT_SOLIDFILL, LVLINIT_MAZEGRID, LVLINIT_ROGUE,
+        LVLINIT_MINES, LVLINIT_SWAMP, 0
     };
     lev_init init_lev;
 
@@ -3318,7 +3352,7 @@ lua_State *L;
     init_lev.init_style
         = initstyles2i[get_table_option(L, "style", "solidfill", initstyles)];
     init_lev.fg = get_table_mapchr_opt(L, "fg", ROOM);
-    init_lev.bg = get_table_mapchr_opt(L, "bg", STONE);
+    init_lev.bg = get_table_mapchr_opt(L, "bg", INVALID_TYPE);
     init_lev.smoothed = get_table_boolean_opt(L, "smoothed", 0);
     init_lev.joined = get_table_boolean_opt(L, "joined", 0);
     init_lev.lit = get_table_int_or_random(L, "lit", -1); /* TODO: allow lit=BOOL */
@@ -3326,6 +3360,9 @@ lua_State *L;
     init_lev.filling = get_table_mapchr_opt(L, "filling", init_lev.fg);
 
     g.coder->lvl_is_joined = init_lev.joined;
+
+    if (init_lev.bg == INVALID_TYPE)
+        init_lev.bg = (init_lev.init_style == LVLINIT_SWAMP) ? MOAT : STONE;
 
     splev_initlev(&init_lev);
 

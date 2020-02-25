@@ -164,6 +164,7 @@ added several new status conditions all of which are opt-in except
 	the new cond_grab and cond_lava which are opt-out
 tipping your cap might get a response
 special levels can be flipped horizontally and/or vertically
+new special level initialization routine, "swamp"
 
 
 Platform- and/or Interface-Specific New Features
