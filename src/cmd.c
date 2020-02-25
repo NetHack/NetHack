@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1582321487 2020/02/21 21:44:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.403 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1582592803 2020/02/25 01:06:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.405 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1019,14 +1019,37 @@ wiz_level_tele(VOID_ARGS)
     return 0;
 }
 
-/* #wizlevelflip - randomly flip the current level.
-   Does not handle vision, monst mtrack, levregions,
-   as flipping is normally done only during level creation.
- */
+/* #wizlevelflip - flip the current level */
 static int
 wiz_level_flip(VOID_ARGS)
 {
-    if (wizard) flip_level_rnd(3, TRUE);
+    static const char choices[] = "0123",
+        prmpt[] = "Flip 0=randomly, 1=vertically, 2=horizonally, 3=both:";
+
+    /*
+     * Does not handle
+     *   levregions,
+     *   monster mtrack,
+     *   migrating monsters aimed at returning to specific coordinates
+     *     on the this level
+     * as flipping is normally done only during level creation.
+     */
+    if (wizard) {
+        char c = yn_function(prmpt, choices, '\0');
+
+        if (c && index(choices, c)) {
+            c -= '0';
+
+            if (!c)
+                flip_level_rnd(3, TRUE);
+            else
+                flip_level((int) c, TRUE);
+
+            docrt();
+        } else {
+            pline("%s", Never_mind);
+        }
+    }
     return 0;
 }
 

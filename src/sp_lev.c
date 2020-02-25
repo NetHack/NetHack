@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1581562593 2020/02/13 02:56:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1582592810 2020/02/25 01:06:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,7 +30,6 @@ static void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
 static void FDECL(flip_drawbridge_horizontal, (struct rm *));
 static void FDECL(flip_drawbridge_vertical, (struct rm *));
 static int FDECL(flip_encoded_direction_bits, (int, int));
-static void FDECL(flip_level, (int, BOOLEAN_P));
 static void FDECL(set_wall_property, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                                           int));
 static void NDECL(count_features);
@@ -246,6 +245,49 @@ struct rm *lev;
     }
 }
 
+/* for #wizlevelflip; not needed when flipping during level creation;
+   update seen vector for whole level and glyph for walls */
+static void
+flip_visuals(flp)
+int flp;
+{
+    struct rm *lev;
+    int x, y, seenv;
+
+    for (y = 0; y < ROWNO; ++y) {
+        for (x = 1; x < COLNO; ++x) {
+            lev = &levl[x][y];
+            seenv = lev->seenv & 0xff;
+            /* locations which haven't been seen can be skipped */
+            if (seenv == 0)
+                continue;
+            /* flip <x,y>'s seen vector; not necessary for locations seen
+               from all directions (the whole level after magic mapping) */
+            if (seenv != SVALL) {
+                /* SV2 SV1 SV0 *
+                 * SV3 -+- SV7 *
+                 * SV4 SV5 SV6 */
+                if (flp & 1) { /* swap top and bottom */
+                    seenv = swapbits(seenv, 2, 4);
+                    seenv = swapbits(seenv, 1, 5);
+                    seenv = swapbits(seenv, 0, 6);
+                }
+                if (flp & 2) { /* swap left and right */
+                    seenv = swapbits(seenv, 2, 0);
+                    seenv = swapbits(seenv, 3, 7);
+                    seenv = swapbits(seenv, 4, 6);
+                }
+                lev->seenv = (uchar) seenv;
+            }
+            /* if <x,y> is displayed as a wall, reset its display glyph so
+               that remembered, out of view T's and corners get flipped */
+            if ((IS_WALL(lev->typ) || lev->typ == SDOOR)
+                && glyph_is_cmap(lev->glyph))
+                lev->glyph = back_to_glyph(x, y);
+        }
+    }
+}
+
 static int
 flip_encoded_direction_bits(int flp, int val)
 {
@@ -267,12 +309,14 @@ flip_encoded_direction_bits(int flp, int val)
 #define FlipX(val) ((maxx - (val)) + minx)
 #define FlipY(val) ((maxy - (val)) + miny)
 
-static void
+/* transpose top with bottom or left with right or both; sometimes called
+   for new special levels, or for any level via the #wizlevelflip command */
+void
 flip_level(flp, extras)
 int flp;
 boolean extras;
 {
-    int x, y, i;
+    int x, y, i, itmp;
     int minx, miny, maxx, maxy;
     struct rm trm;
     struct trap *ttmp;
@@ -283,10 +327,14 @@ boolean extras;
 
     get_level_extends(&minx, &miny, &maxx, &maxy);
     /* get_level_extends() returns -1,-1 to COLNO,ROWNO at max */
-    if (miny < 0) miny = 0;
-    if (minx < 0) minx = 0;
-    if (maxx >= COLNO) maxx = (COLNO - 1);
-    if (maxy >= ROWNO) maxy = (ROWNO - 1);
+    if (miny < 0)
+        miny = 0;
+    if (minx < 0)
+        minx = 0;
+    if (maxx >= COLNO)
+        maxx = (COLNO - 1);
+    if (maxy >= ROWNO)
+        maxy = (ROWNO - 1);
 
     /* stairs and ladders */
     if (flp & 1) {
@@ -312,7 +360,8 @@ boolean extras;
 		ttmp->launch.y = FlipY(ttmp->launch.y);
 		ttmp->launch2.y = FlipY(ttmp->launch2.y);
 	    } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
-                ttmp->conjoined = flip_encoded_direction_bits(flp, ttmp->conjoined);
+                ttmp->conjoined = flip_encoded_direction_bits(flp,
+                                                              ttmp->conjoined);
             }
 	}
 	if (flp & 2) {
@@ -321,7 +370,8 @@ boolean extras;
 		ttmp->launch.x = FlipX(ttmp->launch.x);
 		ttmp->launch2.x = FlipX(ttmp->launch2.x);
 	    } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
-                ttmp->conjoined = flip_encoded_direction_bits(flp, ttmp->conjoined);
+                ttmp->conjoined = flip_encoded_direction_bits(flp,
+                                                              ttmp->conjoined);
 	    }
 	}
     }
@@ -382,34 +432,34 @@ boolean extras;
 	    g.lregions[i].inarea.y1 = FlipY(g.lregions[i].inarea.y1);
 	    g.lregions[i].inarea.y2 = FlipY(g.lregions[i].inarea.y2);
 	    if (g.lregions[i].inarea.y1 > g.lregions[i].inarea.y2) {
-		int tmp = g.lregions[i].inarea.y1;
+		itmp = g.lregions[i].inarea.y1;
 		g.lregions[i].inarea.y1 = g.lregions[i].inarea.y2;
-		g.lregions[i].inarea.y2 = tmp;
+		g.lregions[i].inarea.y2 = itmp;
 	    }
 
 	    g.lregions[i].delarea.y1 = FlipY(g.lregions[i].delarea.y1);
 	    g.lregions[i].delarea.y2 = FlipY(g.lregions[i].delarea.y2);
 	    if (g.lregions[i].delarea.y1 > g.lregions[i].delarea.y2) {
-		int tmp = g.lregions[i].delarea.y1;
+		itmp = g.lregions[i].delarea.y1;
 		g.lregions[i].delarea.y1 = g.lregions[i].delarea.y2;
-		g.lregions[i].delarea.y2 = tmp;
+		g.lregions[i].delarea.y2 = itmp;
 	    }
 	}
 	if (flp & 2) {
 	    g.lregions[i].inarea.x1 = FlipX(g.lregions[i].inarea.x1);
 	    g.lregions[i].inarea.x2 = FlipX(g.lregions[i].inarea.x2);
 	    if (g.lregions[i].inarea.x1 > g.lregions[i].inarea.x2) {
-		int tmp = g.lregions[i].inarea.x1;
+		itmp = g.lregions[i].inarea.x1;
 		g.lregions[i].inarea.x1 = g.lregions[i].inarea.x2;
-		g.lregions[i].inarea.x2 = tmp;
+		g.lregions[i].inarea.x2 = itmp;
 	    }
 
 	    g.lregions[i].delarea.x1 = FlipX(g.lregions[i].delarea.x1);
 	    g.lregions[i].delarea.x2 = FlipX(g.lregions[i].delarea.x2);
 	    if (g.lregions[i].delarea.x1 > g.lregions[i].delarea.x2) {
-		int tmp = g.lregions[i].delarea.x1;
+		itmp = g.lregions[i].delarea.x1;
 		g.lregions[i].delarea.x1 = g.lregions[i].delarea.x2;
-		g.lregions[i].delarea.x2 = tmp;
+		g.lregions[i].delarea.x2 = itmp;
 	    }
 	}
     }
@@ -422,40 +472,41 @@ boolean extras;
 	    sroom->ly = FlipY(sroom->ly);
 	    sroom->hy = FlipY(sroom->hy);
 	    if (sroom->ly > sroom->hy) {
-		int tmp = sroom->ly;
+		itmp = sroom->ly;
 		sroom->ly = sroom->hy;
-		sroom->hy = tmp;
+		sroom->hy = itmp;
 	    }
 	}
 	if (flp & 2) {
 	    sroom->lx = FlipX(sroom->lx);
 	    sroom->hx = FlipX(sroom->hx);
 	    if (sroom->lx > sroom->hx) {
-		int tmp = sroom->lx;
+		itmp = sroom->lx;
 		sroom->lx = sroom->hx;
-		sroom->hx = tmp;
+		sroom->hx = itmp;
 	    }
 	}
 
 	if (sroom->nsubrooms)
 	    for (i = 0; i < sroom->nsubrooms; i++) {
 		struct mkroom *rroom = sroom->sbrooms[i];
+
 		if (flp & 1) {
 		    rroom->ly = FlipY(rroom->ly);
 		    rroom->hy = FlipY(rroom->hy);
 		    if (rroom->ly > rroom->hy) {
-			int tmp = rroom->ly;
+			itmp = rroom->ly;
 			rroom->ly = rroom->hy;
-			rroom->hy = tmp;
+			rroom->hy = itmp;
 		    }
 		}
 		if (flp & 2) {
 		    rroom->lx = FlipX(rroom->lx);
 		    rroom->hx = FlipX(rroom->hx);
 		    if (rroom->lx > rroom->hx) {
-			int tmp = rroom->lx;
+			itmp = rroom->lx;
 			rroom->lx = rroom->hx;
-			rroom->hx = tmp;
+			rroom->hx = itmp;
 		    }
 		}
 	    }
@@ -472,7 +523,7 @@ boolean extras;
     /* the map */
     if (flp & 1) {
 	for (x = minx; x <= maxx; x++)
-	    for (y = miny; y < (miny + ((maxy-miny+1) / 2)); y++) {
+	    for (y = miny; y < (miny + ((maxy - miny + 1) / 2)); y++) {
                 int ny = FlipY(y);
 
 		flip_drawbridge_vertical(&levl[x][y]);
@@ -492,7 +543,7 @@ boolean extras;
 	    }
     }
     if (flp & 2) {
-	for (x = minx; x < (minx + ((maxx-minx+1) / 2)); x++)
+	for (x = minx; x < (minx + ((maxx - minx + 1) / 2)); x++)
 	    for (y = miny; y <= maxy; y++) {
                 int nx = FlipX(x);
 
@@ -514,28 +565,43 @@ boolean extras;
     }
 
     if (extras) {
-        if (flp & 1) u.uy = FlipY(u.uy);
-        if (flp & 2) u.ux = FlipX(u.ux);
+        if (flp & 1)
+            u.uy = FlipY(u.uy), u.uy0 = FlipY(u.uy0);
+        if (flp & 2)
+            u.ux = FlipX(u.ux), u.ux0 = FlipX(u.ux0);
     }
 
-    fix_wall_spines(1, 0, COLNO-1, ROWNO-1);
-
+    fix_wall_spines(1, 0, COLNO - 1, ROWNO - 1);
+    if (extras && flp) {
+        set_wall_state();
+        flip_visuals(flp); /* after wall_spines; flips seenv and wall joins */
+    }
     vision_reset();
 }
 
 #undef FlipX
 #undef FlipY
 
+/* randomly transpose top with bottom or left with right or both;
+   caller controls which transpositions are allowed */
 void
 flip_level_rnd(flp, extras)
 int flp;
 boolean extras;
 {
     int c = 0;
-    if ((flp & 1) && rn2(2)) c |= 1;
-    if ((flp & 2) && rn2(2)) c |= 2;
 
-    if (c) flip_level(c, extras);
+    /* TODO?
+     *  Might change rn2(2) to !rn2(3) or (rn2(5) < 2) in order to bias
+     *  the outcome towards the traditional orientation.
+     */
+    if ((flp & 1) && rn2(2))
+        c |= 1;
+    if ((flp & 2) && rn2(2))
+        c |= 2;
+
+    if (c)
+        flip_level(c, extras);
 }
 
 
