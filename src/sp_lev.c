@@ -3935,11 +3935,15 @@ lua_State *L;
     return 0;
 }
 
+/* gold(500, 3,5); */
+/* gold(500, {5, 6}); */
 /* gold({ amount = 500, x = 2, y = 5 });*/
+/* gold(); */
 int
 lspo_gold(L)
 lua_State *L;
 {
+    int argc = lua_gettop(L);
     schar x, y;
     long amount;
     long gcoord;
@@ -3947,16 +3951,31 @@ lua_State *L;
 
     create_des_coder();
 
-    lcheck_param_table(L);
+    if (argc == 3) {
+        amount = luaL_checkinteger(L, 1);
+        x = gx = luaL_checkinteger(L, 2);
+        y = gy = luaL_checkinteger(L, 2);
+    } else if (argc == 2 && lua_type(L, 2) == LUA_TTABLE) {
+        amount = luaL_checkinteger(L, 1);
+        get_coord(L, 2, &gx, &gy);
+        x = gx;
+        y = gy;
+    } else if (argc == 0 || (argc == 1 && lua_type(L, 1) == LUA_TTABLE)) {
+        lcheck_param_table(L);
 
-    x = gx = get_table_int_opt(L, "x", -1);
-    y = gy = get_table_int_opt(L, "y", -1);
+        amount = get_table_int_opt(L, "amount", -1);
+        x = gx = get_table_int_opt(L, "x", -1);
+        y = gy = get_table_int_opt(L, "y", -1);
+    } else {
+        nhl_error(L, "Wrong parameters");
+        return 0;
+    }
 
     if (x == -1 && y == -1)
         gcoord = SP_COORD_PACK_RANDOM(0);
     else
         gcoord = SP_COORD_PACK(gx, gy);
-    amount = get_table_int_opt(L, "amount", -1);
+
     get_location_coord(&x, &y, DRY, g.coder->croom, gcoord);
     if (amount < 0)
         amount = rnd(200);
