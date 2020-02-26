@@ -499,10 +499,10 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	func_tab.h global.h hack.h lint.h macconf.h mextra.h mfndpos.h \
 	micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
-	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h \
-	rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h \
-	tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
-	wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
+	optlist.h os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
+	region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
+	tosconf.h tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h \
+	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
 
@@ -1118,7 +1118,7 @@ objects.o: objects.c $(CONFIG_H) ../include/obj.h ../include/objclass.h \
 		../include/prop.h ../include/skills.h ../include/color.h
 objnam.o: objnam.c $(HACK_H)
 options.o: options.c $(CONFIG_H) ../include/objclass.h ../include/flag.h \
-		$(HACK_H) ../include/tcap.h
+		$(HACK_H) ../include/tcap.h ../include/optlist.h
 pager.o: pager.c $(HACK_H) ../include/dlb.h
 pickup.o: pickup.c $(HACK_H)
 pline.o: pline.c $(HACK_H)

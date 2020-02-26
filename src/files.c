@@ -2099,7 +2099,7 @@ int src;
     char *envp;
 #endif
 
-    if (src == SET_IN_SYS) {
+    if (src == set_in_sysconf) {
         /* SYSCF_FILE; if we can't open it, caller will bail */
         if (filename && *filename) {
             set_configfile_name(fqname(filename, SYSCONFPREFIX, 0));
@@ -2108,7 +2108,7 @@ int src;
             fp = (FILE *) 0;
         return  fp;
     }
-    /* If src != SET_IN_SYS, "filename" is an environment variable, so it
+    /* If src != set_in_sysconf, "filename" is an environment variable, so it
      * should hang around. If set, it is expected to be a full path name
      * (if relevant)
      */
@@ -2556,7 +2556,7 @@ char *origbuf;
         (void) strncpy(g.catname, bufp, PL_PSIZ - 1);
 
 #ifdef SYSCF
-    } else if (src == SET_IN_SYS && match_varname(buf, "WIZARDS", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "WIZARDS", 7)) {
         if (sysopt.wizards)
             free((genericptr_t) sysopt.wizards);
         sysopt.wizards = dupstr(bufp);
@@ -2568,15 +2568,15 @@ char *origbuf;
                 free((genericptr_t) sysopt.fmtd_wizard_list);
             sysopt.fmtd_wizard_list = build_english_list(sysopt.wizards);
         }
-    } else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "SHELLERS", 8)) {
         if (sysopt.shellers)
             free((genericptr_t) sysopt.shellers);
         sysopt.shellers = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "EXPLORERS", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "EXPLORERS", 7)) {
         if (sysopt.explorers)
             free((genericptr_t) sysopt.explorers);
         sysopt.explorers = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "DEBUGFILES", 5)) {
         /* if showdebug() has already been called (perhaps we've added
            some debugpline() calls to option processing) and has found
            a value for getenv("DEBUGFILES"), don't override that */
@@ -2585,17 +2585,17 @@ char *origbuf;
                 free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
         }
-    } else if (src == SET_IN_SYS && match_varname(buf, "DUMPLOGFILE", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "DUMPLOGFILE", 7)) {
 #ifdef DUMPLOG
         if (sysopt.dumplogfile)
             free((genericptr_t) sysopt.dumplogfile);
         sysopt.dumplogfile = dupstr(bufp);
 #endif
-    } else if (src == SET_IN_SYS && match_varname(buf, "GENERICUSERS", 12)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "GENERICUSERS", 12)) {
         if (sysopt.genericusers)
             free((genericptr_t) sysopt.genericusers);
         sysopt.genericusers = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "BONES_POOLS", 10)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "BONES_POOLS", 10)) {
         /* max value of 10 guarantees (N % bones.pools) will be one digit
            so we don't lose control of the length of bones file names */
         n = atoi(bufp);
@@ -2603,32 +2603,32 @@ char *origbuf;
         /* note: right now bones_pools==0 is the same as bones_pools==1,
            but we could change that and make bones_pools==0 become an
            indicator to suppress bones usage altogether */
-    } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
             free((genericptr_t) sysopt.support);
         sysopt.support = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "RECOVER", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "RECOVER", 7)) {
         if (sysopt.recover)
             free((genericptr_t) sysopt.recover);
         sysopt.recover = dupstr(bufp);
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "CHECK_SAVE_UID", 14)) {
         n = atoi(bufp);
         sysopt.check_save_uid = n;
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "CHECK_PLNAME", 12)) {
         n = atoi(bufp);
         sysopt.check_plname = n;
     } else if (match_varname(buf, "SEDUCE", 6)) {
         n = !!atoi(bufp); /* XXX this could be tighter */
         /* allow anyone to turn it off, but only sysconf to turn it on*/
-        if (src != SET_IN_SYS && n != 0) {
+        if (src != set_in_sysconf && n != 0) {
             config_error_add("Illegal value in SEDUCE");
             return FALSE;
         }
         sysopt.seduce = n;
         sysopt_seduce_set(sysopt.seduce);
-    } else if (src == SET_IN_SYS && match_varname(buf, "MAXPLAYERS", 10)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "MAXPLAYERS", 10)) {
         n = atoi(bufp);
         /* XXX to get more than 25, need to rewrite all lock code */
         if (n < 0 || n > 25) {
@@ -2636,35 +2636,35 @@ char *origbuf;
             return FALSE;
         }
         sysopt.maxplayers = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "PERSMAX", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "PERSMAX", 7)) {
         n = atoi(bufp);
         if (n < 1) {
             config_error_add("Illegal value in PERSMAX (minimum is 1).");
             return FALSE;
         }
         sysopt.persmax = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "PERS_IS_UID", 11)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "PERS_IS_UID", 11)) {
         n = atoi(bufp);
         if (n != 0 && n != 1) {
             config_error_add("Illegal value in PERS_IS_UID (must be 0 or 1).");
             return FALSE;
         }
         sysopt.pers_is_uid = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "ENTRYMAX", 8)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "ENTRYMAX", 8)) {
         n = atoi(bufp);
         if (n < 10) {
             config_error_add("Illegal value in ENTRYMAX (minimum is 10).");
             return FALSE;
         }
         sysopt.entrymax = n;
-    } else if ((src == SET_IN_SYS) && match_varname(buf, "POINTSMIN", 9)) {
+    } else if ((src == set_in_sysconf) && match_varname(buf, "POINTSMIN", 9)) {
         n = atoi(bufp);
         if (n < 1) {
             config_error_add("Illegal value in POINTSMIN (minimum is 1).");
             return FALSE;
         }
         sysopt.pointsmin = n;
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "MAX_STATUENAME_RANK", 10)) {
         n = atoi(bufp);
         if (n < 1) {
@@ -2675,7 +2675,7 @@ char *origbuf;
         sysopt.tt_oname_maxrank = n;
 
     /* SYSCF PANICTRACE options */
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "PANICTRACE_LIBC", 15)) {
         n = atoi(bufp);
 #if defined(PANICTRACE) && defined(PANICTRACE_LIBC)
@@ -2685,7 +2685,7 @@ char *origbuf;
         }
 #endif
         sysopt.panictrace_libc = n;
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "PANICTRACE_GDB", 14)) {
         n = atoi(bufp);
 #if defined(PANICTRACE)
@@ -2695,7 +2695,7 @@ char *origbuf;
         }
 #endif
         sysopt.panictrace_gdb = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "GDBPATH", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "GDBPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
             config_error_add("File specified in GDBPATH does not exist.");
@@ -2705,7 +2705,7 @@ char *origbuf;
         if (sysopt.gdbpath)
             free((genericptr_t) sysopt.gdbpath);
         sysopt.gdbpath = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "GREPPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
             config_error_add("File specified in GREPPATH does not exist.");
@@ -2716,13 +2716,13 @@ char *origbuf;
             free((genericptr_t) sysopt.greppath);
         sysopt.greppath = dupstr(bufp);
     /* SYSCF SAVE and BONES format options */
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "SAVEFORMAT", 10)) {
         parseformat(sysopt.saveformat, bufp);
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "BONESFORMAT", 11)) {
         parseformat(sysopt.bonesformat, bufp);
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "ACCESSIBILITY", 13)) {
         n = atoi(bufp);
         if (n < 0 || n > 1) {
@@ -2731,7 +2731,7 @@ char *origbuf;
         }
         sysopt.accessibility = n;
 #ifdef WIN32
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                 && match_varname(buf, "portable_device_paths", 8)) {
         n = atoi(bufp);
         if (n < 0 || n > 1) {
@@ -2967,6 +2967,7 @@ boolean secure;
 
     tmp->next = config_error_data;
     config_error_data = tmp;
+    g.program_state.config_error_ready = TRUE;
 }
 
 static boolean
@@ -3042,6 +3043,7 @@ config_error_done()
     }
     config_error_data = tmp->next;
     free(tmp);
+    g.program_state.config_error_ready = FALSE;
     return n;
 }
 
