@@ -158,7 +158,7 @@ mswin_init_nhwindows(int *argc, char **argv)
      * non-console applications
      */
     iflags.toptenwin = 1;
-    set_option_mod_status("toptenwin", SET_IN_FILE);
+    set_option_mod_status("toptenwin", set_in_config);
 
     /* initialize map tiles bitmap */
     initMapTiles();
@@ -176,14 +176,14 @@ mswin_init_nhwindows(int *argc, char **argv)
             | WC_MAP_MODE | WC_FONT_MESSAGE | WC_FONT_STATUS | WC_FONT_MENU
             | WC_FONT_TEXT | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS
             | WC_FONTSIZ_MENU | WC_FONTSIZ_TEXT | WC_VARY_MSGCOUNT,
-        SET_IN_GAME);
+        set_in_game);
 
     /* WC2 options */
-    set_wc2_option_mod_status(WC2_FULLSCREEN | WC2_SOFTKEYBOARD, SET_IN_FILE);
+    set_wc2_option_mod_status(WC2_FULLSCREEN | WC2_SOFTKEYBOARD, set_in_config);
     GetNHApp()->bFullScreen = iflags.wc2_fullscreen;
     GetNHApp()->bUseSIP = iflags.wc2_softkeyboard;
 
-    set_wc2_option_mod_status(WC2_WRAPTEXT, SET_IN_GAME);
+    set_wc2_option_mod_status(WC2_WRAPTEXT, set_in_game);
     GetNHApp()->bWrapText = iflags.wc2_wraptext;
 
     /* create the main nethack window */

@@ -2068,8 +2068,10 @@ $(O)o_init.o: o_init.c $(HACK_H)
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
 $(O)objnam.o: objnam.c $(HACK_H)
-$(O)options.o: options.c $(CONFIG_H) $(INCL)\objclass.h $(INCL)\flag.h \
+$(O)options.o: options.c $(INCL)\optlist.h $(CONFIG_H) $(INCL)\objclass.h $(INCL)\flag.h \
 		$(HACK_H) $(INCL)\tcap.h
+	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EP options.c >$(@B).preproc
+	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ options.c
 $(O)pager.o: pager.c $(HACK_H) $(INCL)\dlb.h
 $(O)pickup.o: pickup.c $(HACK_H)
 $(O)pline.o: pline.c $(HACK_H)

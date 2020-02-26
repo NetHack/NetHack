@@ -213,16 +213,16 @@ mswin_init_nhwindows(int *argc, char **argv)
      * non-console applications
      */
     iflags.toptenwin = 1;
-    set_option_mod_status("toptenwin", SET_IN_FILE);
-    //set_option_mod_status("perm_invent", SET_IN_FILE);
-    set_option_mod_status("mouse_support", SET_IN_GAME);
+    set_option_mod_status("toptenwin", set_in_config);
+    //set_option_mod_status("perm_invent", set_in_config);
+    set_option_mod_status("mouse_support", set_in_game);
 
     /* initialize map tiles bitmap */
     initMapTiles();
 
     /* set tile-related options to readonly */
     set_wc_option_mod_status(WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE,
-                             DISP_IN_GAME);
+                             set_gameview);
 
     /* set font-related options to change in the game */
     set_wc_option_mod_status(
@@ -231,7 +231,7 @@ mswin_init_nhwindows(int *argc, char **argv)
             | WC_FONT_STATUS | WC_FONT_MENU | WC_FONT_TEXT
             | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_MENU
             | WC_FONTSIZ_TEXT | WC_VARY_MSGCOUNT,
-        SET_IN_GAME);
+        set_in_game);
 
     mswin_color_from_string(iflags.wc_foregrnd_menu, &menu_fg_brush,
                             &menu_fg_color);

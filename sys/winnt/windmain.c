@@ -209,7 +209,7 @@ test_portable_config(
         /* assure_syscf_file(); */
         config_error_init(TRUE, tmppath, FALSE);
         /* ... and _must_ parse correctly. */
-        if (read_config_file(tmppath, SET_IN_SYS)
+        if (read_config_file(tmppath, set_in_sysconf)
             && sysopt.portable_device_paths)
             retval = TRUE;
         (void) config_error_done();

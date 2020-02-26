@@ -440,14 +440,14 @@ char **argv UNUSED;
     tty_putstr(BASE_WINDOW, 0, "");
     tty_display_nhwindow(BASE_WINDOW, FALSE);
 
-    /* 'statuslines' defaults to SET_IN_FILE, allowed but invisible;
+    /* 'statuslines' defaults to set_in_config, allowed but invisible;
        make it dynamically settable if feasible, otherwise visible */
     if (tty_procs.wincap2 & WC2_STATUSLINES)
         set_wc2_option_mod_status(WC2_STATUSLINES,
 #ifndef CLIPPING
                                   (LI < 1 + ROWNO + 2) ? DISP_IN_GAME :
 #endif
-                                   SET_IN_GAME);
+                                   set_in_game);
 }
 
 void

@@ -86,6 +86,8 @@ typedef xchar boolean; /* 0 or 1 */
 #define FALSE ((boolean) 0)
 #endif
 
+enum optchoice { opt_in, opt_out};
+
 /*
  * type nhsym: loadable symbols go into this type
  */

@@ -778,11 +778,11 @@ curses_character_dialog(const char **choices, const char *prompt)
 void
 curses_init_options()
 {
-    /* change these from DISP_IN_GAME to SET_IN_GAME */
-    set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS, SET_IN_GAME);
+    /* change these from set_gameview to set_in_game */
+    set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS, set_in_game);
 
     /* Remove a few options that are irrelevant to this windowport */
-    set_option_mod_status("eight_bit_tty", SET_IN_FILE);
+    set_option_mod_status("eight_bit_tty", set_in_config);
 
     /* If we don't have a symset defined, load the curses symset by default */
     if (!g.symset[PRIMARY].explicitly)

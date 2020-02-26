@@ -107,6 +107,8 @@ struct sinfo {
     int in_moveloop;
     int in_impossible;
     int in_self_recover;
+    int in_parseoptions;        /* in parseoptions */
+    int config_error_ready;     /* config_error_add is ready, available */
 #ifdef PANICLOG
     int in_paniclog;
 #endif

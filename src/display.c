@@ -1459,6 +1459,38 @@ redraw_map()
     flush_screen(1);
 }
 
+/*
+ * =======================================================
+ */
+void
+reglyph_darkroom()
+{
+    xchar x, y;
+
+    for (x = 0; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+            struct rm *lev = &levl[x][y];
+
+            if (!flags.dark_room || !iflags.use_color
+                || Is_rogue_level(&u.uz)) {
+                if (lev->glyph == cmap_to_glyph(S_darkroom))
+                    lev->glyph = lev->waslit ? cmap_to_glyph(S_room)
+                                             : GLYPH_NOTHING;
+            } else {
+                if (lev->glyph == cmap_to_glyph(S_room) && lev->seenv
+                    && lev->waslit && !cansee(x, y))
+                    lev->glyph = cmap_to_glyph(S_darkroom);
+                else if (lev->glyph == GLYPH_NOTHING
+                         && lev->typ == ROOM && lev->seenv && !cansee(x, y))
+                    lev->glyph = cmap_to_glyph(S_darkroom);
+            }
+        }
+    if (flags.dark_room && iflags.use_color)
+        g.showsyms[S_darkroom] = g.showsyms[S_room];
+    else
+        g.showsyms[S_darkroom] = g.showsyms[SYM_NOTHING + SYM_OFF_X];
+}
+
 /* ======================================================================== */
 /* Glyph Buffering (3rd screen) =========================================== */
 
