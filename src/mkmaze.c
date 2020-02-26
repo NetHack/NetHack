@@ -565,19 +565,6 @@ fixup_special()
                 set_corpsenm(otmp, rndmonnum());
             }
         }
-    } else if (Is_knox(&u.uz)) {
-        /* using an unfilled morgue for rm id */
-        croom = search_special(MORGUE);
-        /* avoid inappropriate morgue-related messages */
-        g.level.flags.graveyard = g.level.flags.has_morgue = 0;
-        croom->rtype = OROOM; /* perhaps it should be set to VAULT? */
-        /* stock the main vault */
-        for (x = croom->lx; x <= croom->hx; x++)
-            for (y = croom->ly; y <= croom->hy; y++) {
-                (void) mkgold((long) rn1(300, 600), x, y);
-                if (!rn2(3) && !is_pool(x, y))
-                    (void) maketrap(x, y, rn2(3) ? LANDMINE : SPIKED_PIT);
-            }
     } else if (Role_if(PM_PRIEST) && In_quest(&u.uz)) {
         /* less chance for undead corpses (lured from lower morgues) */
         g.level.flags.graveyard = 1;

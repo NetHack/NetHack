@@ -25,6 +25,7 @@ static int FDECL(l_selection_filter_mapchar, (lua_State *));
 static int FDECL(l_selection_flood, (lua_State *));
 static int FDECL(l_selection_circle, (lua_State *));
 static int FDECL(l_selection_ellipse, (lua_State *));
+static int FDECL(l_selection_iterate, (lua_State *));
 static int FDECL(l_selection_gc, (lua_State *));
 static int FDECL(l_selection_not, (lua_State *));
 static int FDECL(l_selection_and, (lua_State *));
@@ -39,7 +40,6 @@ static int FDECL(l_selection_not, (lua_State *));
    function body below.
  */
 static int FDECL(l_selection_gradient, (lua_State *));
-static int FDECL(l_selection_iterate, (lua_State *));
 static int FDECL(l_selection_add, (lua_State *));
 static int FDECL(l_selection_sub, (lua_State *));
 static int FDECL(l_selection_ipairs, (lua_State *));
@@ -701,6 +701,33 @@ lua_State *L;
     return 1;
 }
 
+/* sel:iterate(function(x,y) ... end); */
+static int
+l_selection_iterate(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+    struct selectionvar *sel = (struct selectionvar *) 0;
+    int x, y;
+
+    if (argc == 2 && lua_type(L, 2) == LUA_TFUNCTION) {
+        sel = l_selection_check(L, 1);
+        lua_remove(L, 1);
+        for (y = 0; y < sel->hei; y++)
+            for (x = 0; x < sel->wid; x++)
+                if (selection_getpoint(x, y, sel)) {
+                    lua_pushvalue(L, 1);
+                    lua_pushinteger(L, x - g.xstart);
+                    lua_pushinteger(L, y - g.ystart);
+                    lua_call(L, 2, 0);
+                }
+    } else {
+        nhl_error(L, "wrong parameters");
+        /*NOTREACHED*/
+    }
+    return 0;
+}
+
 
 static const struct luaL_Reg l_selection_methods[] = {
     { "new", l_selection_new },
@@ -720,9 +747,9 @@ static const struct luaL_Reg l_selection_methods[] = {
     { "floodfill", l_selection_flood },
     { "circle", l_selection_circle },
     { "ellipse", l_selection_ellipse },
+    { "iterate", l_selection_iterate },
     /* TODO:
        { "gradient", l_selection_gradient },
-       { "iterate", l_selection_iterate },
     */
     { NULL, NULL }
 };
