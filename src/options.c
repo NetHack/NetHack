@@ -1462,10 +1462,19 @@ char *op UNUSED;
 
 int
 optfn_MACgraphics(optidx, req, negated, opts, op)
-int optidx, req;
+#if defined(MAC_GRAPHICS_ENV) && defined(BACKWARD_COMPAT)
+int optidx;
+int req;
 boolean negated;
 char *opts;
 char *op;
+#else
+int optidx UNUSED;
+int req;
+boolean negated UNUSED;
+char *opts UNUSED;
+char *op UNUSED;
+#endif
 {
 #if defined(MAC_GRAPHICS_ENV) && defined(BACKWARD_COMPAT)
     boolean badflag = FALSE;
