@@ -59,6 +59,7 @@ unseen pet that drowned didn't give "you have a sad feeling" message
 prevent ravens from blinding other ravens: /corvus oculum corvi non eruit/
 have ^X provide more information when held or swallowed
 avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
+display wasn't updating immediately after toggling hilite_pet option
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
