@@ -505,8 +505,8 @@ enum optset_restrictions {
     set_in_config  = 1, /* config file option only */
     set_viaprog    = 2, /* may be set via extern program, not seen in game */
     set_gameview   = 3, /* may be set via extern program, displayed in game */
-    set_in_game    = 4, /* may be set set in the game if wizmode */
-    set_wizonly    = 5, /* may be set via extern program or set in the game */
+    set_in_game    = 4, /* may be set via extern program or set in the game */
+    set_wizonly    = 5, /* may be set set in the game if wizmode */
     set_hidden     = 6  /* placeholder for prefixed entries, never show it  */
 };
 #define SET__IS_VALUE_VALID(s) ((s < set_in_sysconf) || (s > set_wizonly))
