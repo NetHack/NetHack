@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1581562591 2020/02/13 02:56:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1582675449 2020/02/26 00:04:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -298,10 +298,11 @@ static int
 l_selection_filter_percent(L)
 lua_State *L;
 {
-    struct selectionvar *sel = l_selection_check(L, 1);
     struct selectionvar *ret;
-    int p = (int) luaL_checkinteger(L, 2);
+    int p;
 
+    (void) l_selection_check(L, 1);
+    p = (int) luaL_checkinteger(L, 2);
     lua_pop(L, 1);
     (void) l_selection_clone(L);
     ret = l_selection_check(L, 1);
