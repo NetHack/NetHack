@@ -97,6 +97,8 @@ static int FDECL(get_coord, (lua_State *, int, int *, int *));
 static int FDECL(get_table_region, (lua_State *, const char *,
                                     int *, int *, int *, int *, BOOLEAN_P));
 static void FDECL(set_wallprop_in_selection, (lua_State *, int));
+static int FDECL(floodfillchk_match_under, (int, int));
+static int FDECL(floodfillchk_match_accessible, (int, int));
 
 /* lua_CFunction prototypes */
 int FDECL(lspo_altar, (lua_State *));
