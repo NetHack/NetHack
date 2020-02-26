@@ -233,4 +233,4 @@ options overhaul: moved the option definitions into include/optlist.h;
 	each option has its own individual function for setting the option,
 	for retrieving the option value, and for processing the option
 	following its selection in the 'O' menu, added doc/options.doc file.
-recglyph_darkroom() relocated from options.c to display.c
+function reglyph_darkroom() relocated from options.c to display.c
