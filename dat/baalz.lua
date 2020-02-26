@@ -7,7 +7,7 @@ des.level_init({ style = "solidfill", fg = " " });
 
 -- TODO FIXME: see baalz_fixup - the legs get removed currently.
 
-des.level_flags("mazelevel", "noteleport", "corrmaze")
+des.level_flags("mazelevel", "corrmaze")
 -- the two pools are fakes used to mark spots which need special wall fixups
 -- the two iron bars are eyes and spots to their left will be made diggable
 des.map({ halign = "right", valign = "center", map = [[
