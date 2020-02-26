@@ -173,7 +173,7 @@ extern void curses_line_input_dialog(const char *prompt,
 extern int curses_character_input_dialog(const char *prompt,
                                          const char *choices, CHAR_P def);
 extern int curses_ext_cmd(void);
-extern void curses_create_nhmenu(winid wid);
+extern void curses_create_nhmenu(winid wid, unsigned long);
 extern void curses_add_nhmenu_item(winid wid, int glyph,
                                    const ANY_P *identifier, CHAR_P accelerator,
                                    CHAR_P group_accel, int attr,

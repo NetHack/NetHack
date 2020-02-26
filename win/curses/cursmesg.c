@@ -367,7 +367,7 @@ curses_prev_mesg()
     boolean do_lifo = (iflags.prevmsg_window != 'f');
 
     wid = curses_get_wid(NHW_MENU);
-    curses_create_nhmenu(wid);
+    curses_create_nhmenu(wid, 0UL);
     Id = cg.zeroany;
 
     for (count = 0; count < num_messages; ++count) {

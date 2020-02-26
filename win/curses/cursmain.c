@@ -485,7 +485,7 @@ curses_start_menu(winid wid, unsigned long mbehavior)
     if (inv_update)
         return;
 
-    curses_create_nhmenu(wid);
+    curses_create_nhmenu(wid, mbehavior);
 }
 
 /*
