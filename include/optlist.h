@@ -262,21 +262,21 @@ pfx_##a,
                 &flags.mention_decor)
     NHOPTB(mention_walls, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.mention_walls)
-    NHOPTC(menu_deselect_all, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_deselect_all, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "deselect all items in a menu")
-    NHOPTC(menu_deselect_page, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_deselect_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "deselect all items on this page of a menu")
-    NHOPTC(menu_first_page, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_first_page, 4, opt_in, set_in_config, No, No, Yes, No, NoAlias,
                 "jump to the first page in a menu")
     NHOPTC(menu_headings, 4, opt_in, set_in_game, No, Yes, No, Yes, NoAlias,
                 "display style for menu headings")
-    NHOPTC(menu_invert_all, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_invert_all, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "invert all items in a menu")
-    NHOPTC(menu_invert_page, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_invert_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "invert all items on this page of a menu")
-    NHOPTC(menu_last_page, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_last_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "jump to the last page in a menu")
-    NHOPTC(menu_next_page, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_next_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "goto the next menu page")
     NHOPTB(menu_objsyms, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.menu_head_objsym)
@@ -287,13 +287,13 @@ pfx_##a,
     NHOPTB(menu_overlay, 0, opt_in, set_in_config, Off, No, No, No, NoAlias,
                 (boolean *) 0)
 #endif
-    NHOPTC(menu_previous_page, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_previous_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "goto the previous menu page")
-    NHOPTC(menu_search, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_search, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "search for a menu item")
-    NHOPTC(menu_select_all, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_select_all, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "select all items in a menu")
-    NHOPTC(menu_select_page, 4, opt_in, set_in_config, No, No, No, No, NoAlias,
+    NHOPTC(menu_select_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "select all items on this page of a menu")
     NHOPTB(menu_tab_sep, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.menu_tab_sep)

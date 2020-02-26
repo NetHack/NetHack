@@ -235,7 +235,7 @@ static void FDECL(complain_about_duplicate, (const char *, int));
 static int FDECL(length_without_val, (const char *, int len));
 static void NDECL(determine_ambiguities);
 static int FDECL(check_misc_menu_command, (char *, char *));
-int FDECL(spcfn_misc_menu_cmd, (int, BOOLEAN_P, BOOLEAN_P, char *, char *));
+int FDECL(spcfn_misc_menu_cmd, (int, int, BOOLEAN_P, char *, char *));
 
 static const char *FDECL(attr2attrname, (int));
 static const char * FDECL(msgtype2name, (int));
@@ -348,6 +348,8 @@ boolean tinitial, tfrom_file;
     if (optlen_wo_val < optlen) {
         has_val = TRUE;
         optlen = optlen_wo_val;
+    } else {
+        has_val = FALSE;
     }
 
     for (i = 0; i < OPTCOUNT; ++i) {
@@ -423,8 +425,8 @@ boolean tinitial, tfrom_file;
         }
 
         /*
-         * Now call the option's associated function via the
-         * function pointer for it in the allopt[] array.
+         * Now call the option's associated function via the function
+         * pointer for it in the allopt[] array, specifying a 'do_set' req.
          */
         if (allopt[matchidx].optfn) {
             op = string_for_opt(opts, TRUE);
@@ -436,14 +438,19 @@ boolean tinitial, tfrom_file;
     if (g.program_state.in_parseoptions > 0)
         g.program_state.in_parseoptions--;
 
+#if 0
+    /* This specialization shouldn't be needed any longer because each of
+       the individual options is part of the allopts[] list, thus already
+       taken care of in the for-loop above */
     if (!got_match) {
         int res = check_misc_menu_command(opts, op);
 
         if (res >= 0)
-            optresult = spcfn_misc_menu_cmd(res, FALSE, negated, opts, op);
+            optresult = spcfn_misc_menu_cmd(res, do_set, negated, opts, op);
         if (optresult == optn_ok)
             got_match = TRUE;
     }
+#endif
 
     if (!got_match) {
         /* Is it a symbol? */
@@ -1453,7 +1460,6 @@ char *op UNUSED;
     return optn_ok;
 }
 
-#ifdef MAC_GRAPHICS_ENV
 int
 optfn_MACgraphics(optidx, req, negated, opts, op)
 int optidx, req;
@@ -1461,12 +1467,33 @@ boolean negated;
 char *opts;
 char *op;
 {
+#if defined(MAC_GRAPHICS_ENV) && defined(BACKWARD_COMPAT)
+    boolean badflag = FALSE;
+
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
         /* "MACgraphics" */
-        iflags.MACgraphics = !negated;
+        if (!negated) {
+            if (g.symset[PRIMARY].name) {
+                badflag = TRUE;
+            } else {
+                g.symset[PRIMARY].name = dupstr(fullname);
+                if (!read_sym_file(PRIMARY)) {
+                    badflag = TRUE;
+                    clear_symsetentry(PRIMARY, TRUE);
+                }
+            }
+            if (badflag) {
+                config_error_add("Failure to load symbol set %s.", fullname);
+                return FALSE;
+            } else {
+                switch_symbols(TRUE);
+                if (!g.opt_initial && Is_rogue_level(&u.uz))
+                    assign_graphics(ROGUESET);
+            }
+        }
         return optn_ok;
     }
     if (req == get_val) {
@@ -1475,9 +1502,20 @@ char *op;
         opts[0] = '\0';
         return optn_ok;
     }
+#else
+    if (req == do_set) {
+        config_error_add("'%s' %s; use 'symset:%s' instead",
+                         allopt[optidx].name,
+#ifdef MAC_GRAPHICS_ENV /* implies BACKWARD_COMPAT is not defined */
+                         "no longer supported",
+#else
+                         "is not supported",
+#endif
+                         allopt[optidx].name);
+    }
+#endif
     return optn_ok;
 }
-#endif
 
 int
 optfn_map_mode(optidx, req, negated, opts, op)
@@ -1575,7 +1613,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1598,7 +1640,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1621,7 +1667,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1681,7 +1731,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1704,7 +1758,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1727,7 +1785,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1750,7 +1812,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1773,7 +1839,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1796,7 +1866,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1819,7 +1893,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -1842,7 +1920,11 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-        return optn_ok;
+        int res = check_misc_menu_command(opts, op);
+
+        if (res < 0)
+            return optn_err;
+        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
         if (!opts)
@@ -4416,17 +4498,12 @@ boolean negated;
 char *opts;
 char *op;
 {
-    int i;
-
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
         if (!allopt[optidx].addr)
             return optn_ok; /* silent retreat */
-
-        if (optidx == opt_status_updates)
-            i = 1;
 
         /* option that must come from config file? */
         if (!g.opt_initial && (allopt[optidx].setwhere == set_in_config))
@@ -4549,6 +4626,7 @@ char *op;
                     iflags.wc2_petattr = curses_read_attrs("I");
             }
 #endif
+            g.opt_need_redraw = TRUE;
             break;
         case opt_hitpointbar:
             if (VIA_WINDOWPORT()) {
@@ -4588,7 +4666,8 @@ char *op;
 }
 
 int spcfn_misc_menu_cmd(midx, req, negated, opts, op)
-int midx, req;
+int midx;
+int req;
 boolean negated;
 char *opts;
 char *op;
