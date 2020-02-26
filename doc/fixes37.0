@@ -227,4 +227,9 @@ unified the code for obtaining the inventory letter value for sortloot
 unified the code for (un)locking boxes in inventory
 unified the code for finding room pos for some features
 unified the code for revealing hiding monsters for mvm attacks
-
+options overhaul: moved the option definitions into include/optlist.h;
+	combined the boolean and compound options into one allopt[] array;
+	each option has its own individual function for setting the option,
+	for retrieving the option value, and for processing the option
+	following its selection in the 'O' menu, added doc/options.doc file.
+recglyph_darkroom() relocated from options.c to display.c
