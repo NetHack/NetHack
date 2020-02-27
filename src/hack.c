@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1581886860 2020/02/16 21:01:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1582799171 2020/02/27 10:26:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1749,8 +1749,10 @@ domove_core()
     if (u.utrap) {
         boolean moved = trapmove(x, y, trap);
 
-        if (!u.utrap)
+        if (!u.utrap) {
+            g.context.botl = TRUE;
             reset_utrap(TRUE); /* might resume levitation or flight */
+        }
         /* might not have escaped, or did escape but remain in same spot */
         if (!moved)
             return;
@@ -1965,7 +1967,7 @@ domove_core()
         /* display every step or every 7th step depending upon mode */
         if (flags.runmode != RUN_LEAP || !(g.moves % 7L)) {
             if (flags.time)
-                g.context.botl = 1;
+                iflags.time_botl = 1;
             curs_on_u();
             delay_output();
             if (flags.runmode == RUN_CRAWL) {

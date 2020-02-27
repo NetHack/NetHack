@@ -82,7 +82,7 @@ gnome_init_nhwindows(int *argc, char **argv)
 #endif
 
     // gnome/gtk is not reentrant
-    set_option_mod_status("ignintr", DISP_IN_GAME);
+    set_option_mod_status("ignintr", set_gameview);
     flags.ignintr = TRUE;
 
     iflags.window_inited = TRUE;

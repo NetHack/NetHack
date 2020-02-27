@@ -165,7 +165,7 @@ mswin_init_nhwindows(int *argc, char **argv)
 
     /* set tile-related options to readonly */
     set_wc_option_mod_status(WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE,
-                             DISP_IN_GAME);
+                             set_gameview);
 
     /* init color table */
     mswin_init_color_table();
