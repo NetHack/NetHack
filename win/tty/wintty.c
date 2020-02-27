@@ -445,7 +445,7 @@ char **argv UNUSED;
     if (tty_procs.wincap2 & WC2_STATUSLINES)
         set_wc2_option_mod_status(WC2_STATUSLINES,
 #ifndef CLIPPING
-                                  (LI < 1 + ROWNO + 2) ? DISP_IN_GAME :
+                                  (LI < 1 + ROWNO + 2) ? set_gameview :
 #endif
                                    set_in_game);
 }
