@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1581886868 2020/02/16 21:01:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.351 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1582799195 2020/02/27 10:26:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.353 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -326,8 +326,9 @@ int x, y, typ;
         if (u.utrap && x == u.ux && y == u.uy
             && ((u.utraptype == TT_BEARTRAP && typ != BEAR_TRAP)
                 || (u.utraptype == TT_WEB && typ != WEB)
-                || (u.utraptype == TT_PIT && !is_pit(typ))))
-            u.utrap = 0;
+                || (u.utraptype == TT_PIT && !is_pit(typ))
+                || (u.utraptype == TT_LAVA && !is_lava(x, y))))
+            reset_utrap(FALSE);
         /* old <tx,ty> remain valid */
     } else if (IS_FURNITURE(lev->typ)
                && (!IS_GRAVE(lev->typ) || (typ != PIT && typ != HOLE))) {
@@ -866,6 +867,12 @@ void
 set_utrap(tim, typ)
 unsigned tim, typ;
 {
+    /* if we get here through reset_utrap(), the caller of that might
+       have already set u.utrap to 0 so this check won't be sufficient
+       in that situation; caller will need to set context.botl itself */
+    if (!u.utrap ^ !tim)
+        g.context.botl = TRUE;
+
     u.utrap = tim;
     /* FIXME:
      * utraptype==0 is bear trap rather than 'none'; we probably ought
