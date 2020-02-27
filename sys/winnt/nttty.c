@@ -339,7 +339,7 @@ int *wid, *hgt;
 {
     *wid = console.width;
     *hgt = console.height;
-    set_option_mod_status("mouse_support", SET_IN_GAME);
+    set_option_mod_status("mouse_support", set_in_game);
 }
 
 void

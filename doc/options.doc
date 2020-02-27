@@ -1,0 +1,86 @@
+The definitition for each OPTIONS= option resides in include/optlish.h as of
+February 2020 in 3.7 WIP.
+
+Boolean and compound options are combined into a single allopt[] array.
+
+To add an option:
+
+    1. Add an entry to include/optlist.h, using the NHOPTB macro for a
+       boolean on/off option, or NHOPTC macro for a compound option. The
+       list of options is kept in alphabetical order.
+       When the list of options is processed during the compile of options.c,
+       the following will be automatically generated and included in 
+       options.c:
+
+            i) an optfn_xxxx function prototype (xxxx is the option name).
+           ii) an opt_xxxx enum value for referencing that option index by
+               name throughout options.c (xxxx is the option name).
+          iii) an initialization of an element in the allopt[] array, at
+               index opt_xxxx from step ii (xxxx is the option name).
+
+    2. Create the optn_xxxx() function in options.c. Failure to do that will
+       result in a link error of "undefined function xxxx." The functions are
+       in options.c in alphabetical sequence by function name.
+
+       The skeletal template for an optn_xxxx() function is:
+
+            int
+            optfn_xxxx(optidx, req, negated, opts, op)
+            int optidx              /* the index of this option opt_xxxx */
+            int req;                /* the request ID from core functions */
+            boolean negated;        /* will be true if opt was negated */
+            char *opts;             /* points to the complete opt string */
+            char *op;               /* points to value portion of opt string */
+            {
+                if (req == do_init) {
+                    return optn_ok;
+                }
+                if (req == do_set) {
+                    /* do option set processing for the option */
+                    /* if successful, return optn_ok;    */
+                    /* if unsuccessful, return optn_err; */
+                }
+                if (req == get_val) {
+                    /* return the current val of option in supplied opts buf */
+                    if (!opts)
+                        return optn_err;
+                    Sprintf(opts, "%s", fakefunction to get xxxx value);
+                    return optn_ok;
+                }
+                if (req == do_handler) {
+
+                    /* this is optional. If the option needs its own
+                       special handling after the doset menu, do it here
+                       or call a function to do it. The naming convention
+                       for such a function in options.c has been 
+                       handler_xxxx(), but the function does not need to
+                       reside in options.c */
+
+                    return optn_ok;
+                }
+                return optn_ok;
+            }
+
+    3. NOTE:  If you add (or delete) an option, please update the short
+       options help (option_help()), the long options help (dat/opthelp)
+       and also the Guidebooks.
+
+Here's some information about the req ID's passed to optn_xxxx() functions.
+Each optfn_xxxx() function can be called with a req id of: do_init, do_set,
+do_handler or get_val.
+
+req do_init is called from options_init, and if initialization or memory
+allocation or other initialization for that particular option is needed,
+it can be done in response to the init req
+
+req do_set is called from parseoptions() for each option it encounters
+and the optfn_xxxx() function is expected to react and set the option
+based on the string values that parseoptions() passes to it.
+
+req get_val is passed a buffer from its caller that the optfn_xxxx() is
+expected to fill with the current value of the opton.
+
+req do_handler is called during doset() operations processing in response
+to player selections, most likely from the 'O' option-setting menu. The
+do_handler req is only called for options that were marked as supporting
+do_handler in the option definition in include/optlist.h

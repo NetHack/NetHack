@@ -211,6 +211,9 @@ end
 
 function test_gold()
    des.gold({ amount = 999, x = 40, y = 07 });
+   des.gold();
+   des.gold(666, 41,07);
+   des.gold(123, {42,07});
 end
 
 function test_trap()

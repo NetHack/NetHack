@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1578297247 2020/01/06 07:54:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.258 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1581985559 2020/02/18 00:25:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.261 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -935,7 +935,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
                            (qflags & BY_NEXTHERE) ? TRUE : FALSE, allow);
 
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     /*
      * Run through the list and add the objects to the menu.  If
@@ -1126,7 +1126,7 @@ int how;               /* type of query */
     }
 
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     pack = flags.inv_order;
 
     if (qflags & CHOOSE_ALL) {
@@ -1888,7 +1888,7 @@ doloot()
 
             any.a_void = 0;
             win = create_nhwindow(NHW_MENU);
-            start_menu(win);
+            start_menu(win, MENU_BEHAVE_STANDARD);
 
             for (cobj = g.level.objects[cc.x][cc.y]; cobj;
                  cobj = cobj->nexthere)
@@ -2964,7 +2964,7 @@ boolean outokay, inokay, alreadyused, more_containers;
 
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
 
     any.a_int = 1; /* ':' */
     Sprintf(buf, "Look inside %s", thesimpleoname(obj));
@@ -3061,7 +3061,7 @@ dotip()
 
                 any = cg.zeroany;
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
 
                 for (cobj = g.level.objects[cc.x][cc.y], i = 0; cobj;
                      cobj = cobj->nexthere)
@@ -3171,6 +3171,8 @@ dotip()
     /* anything not covered yet */
     if (cobj->oclass == POTION_CLASS) /* can't pour potions... */
         pline_The("%s %s securely sealed.", xname(cobj), otense(cobj, "are"));
+    else if (uarmh && cobj == uarmh)
+        return tiphat();
     else if (cobj->otyp == STATUE)
         pline("Nothing interesting happens.");
     else

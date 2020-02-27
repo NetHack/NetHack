@@ -159,7 +159,7 @@ char **argv;
             | WC_FONT_STATUS | WC_FONT_MENU | WC_FONT_TEXT
             | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_MAP | WC_FONTSIZ_STATUS
             | WC_FONTSIZ_MENU | WC_FONTSIZ_TEXT | WC_VARY_MSGCOUNT,
-        SET_IN_GAME);
+        set_in_game);
     if (iflags.wc_align_message == 0)
         iflags.wc_align_message = ALIGN_TOP;
     if (iflags.wc_align_status == 0)
@@ -241,7 +241,7 @@ Gem_player_selection()
         } else {
             /* Prompt for a role */
             win = create_nhwindow(NHW_MENU);
-            start_menu(win);
+            start_menu(win, MENU_BEHAVE_STANDARD);
             any.a_void = 0; /* zero out all bits */
             for (i = 0; roles[i].name.m; i++) {
                 if (ok_role(i, flags.initrace, flags.initgend,
@@ -313,7 +313,7 @@ Gem_player_selection()
             /* Permit the user to pick, if there is more than one */
             if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; races[i].noun; i++)
                     if (ok_race(flags.initrole, i, flags.initgend,
@@ -382,7 +382,7 @@ Gem_player_selection()
             /* Permit the user to pick, if there is more than one */
             if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; i < ROLE_GENDERS; i++)
                     if (ok_gend(flags.initrole, flags.initrace, i,
@@ -451,7 +451,7 @@ Gem_player_selection()
             /* Permit the user to pick, if there is more than one */
             if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; i < ROLE_ALIGNS; i++)
                     if (ok_align(flags.initrole, flags.initrace,
@@ -1002,7 +1002,7 @@ Gem_get_ext_cmd()
     const char *ptr;
 
     wind = Gem_create_nhwindow(NHW_MENU);
-    Gem_start_menu(wind);
+    Gem_start_menu(wind, MENU_BEHAVE_STANDARD);
     for (i = 0; (ptr = extcmdlist[i].ef_txt); i++) {
         any.a_int = i;
         accelerator = *ptr;

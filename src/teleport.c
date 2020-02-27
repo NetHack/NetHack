@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1581210886 2020/02/09 01:14:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1581886867 2020/02/16 21:01:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,6 +10,26 @@ static boolean FDECL(teleok, (int, int, BOOLEAN_P));
 static void NDECL(vault_tele);
 static boolean FDECL(rloc_pos_ok, (int, int, struct monst *));
 static void FDECL(mvault_tele, (struct monst *));
+
+/* teleporting is prevented on this level for this monster? */
+boolean
+noteleport_level(mon)
+struct monst *mon;
+{
+    struct monst *mtmp;
+
+    /* demon court in Gehennom prevent others from teleporting */
+    if (In_hell(&u.uz) && !(is_dlord(mon->data) || is_dprince(mon->data)))
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+            if (is_dlord(mtmp->data) || is_dprince(mtmp->data))
+                return TRUE;
+
+    /* natural no-teleport level */
+    if (g.level.flags.noteleport)
+        return TRUE;
+
+    return FALSE;
+}
 
 /*
  * Is (x,y) a good position of mtmp?  If mtmp is NULL, then is (x,y) good
@@ -323,7 +343,7 @@ int teleds_flags;
         }
     }
     reset_utrap(FALSE);
-    u.ustuck = 0;
+    set_ustuck((struct monst *) 0);
     u.ux0 = u.ux;
     u.uy0 = u.uy;
 
@@ -495,7 +515,7 @@ struct obj *scroll;
     boolean result = FALSE; /* don't learn scroll */
 
     /* Disable teleportation in stronghold && Vlad's Tower */
-    if (g.level.flags.noteleport) {
+    if (noteleport_level(&g.youmonst)) {
         if (!wizard) {
             pline("A mysterious force prevents you from teleporting!");
             return TRUE;
@@ -608,7 +628,7 @@ dotelecmd()
         int i, tmode;
 
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         for (i = 0; i < SIZE(tports); ++i) {
             any.a_int = (int) tports[i].menulet;
@@ -1316,7 +1336,7 @@ boolean
 tele_restrict(mon)
 struct monst *mon;
 {
-    if (g.level.flags.noteleport) {
+    if (noteleport_level(mon)) {
         if (canseemon(mon))
             pline("A mysterious force prevents %s from teleporting!",
                   mon_nam(mon));
@@ -1591,7 +1611,7 @@ boolean give_feedback;
         if (give_feedback)
             pline("%s resists your magic!", Monnam(mtmp));
         return FALSE;
-    } else if (g.level.flags.noteleport && u.uswallow && mtmp == u.ustuck) {
+    } else if (u.uswallow && mtmp == u.ustuck && noteleport_level(mtmp)) {
         if (give_feedback)
             You("are no longer inside %s!", mon_nam(mtmp));
         unstuck(mtmp);

@@ -612,8 +612,9 @@ struct xwindow *wp;
 /* Global functions ======================================================= */
 
 void
-X11_start_menu(window)
+X11_start_menu(window, mbehavior)
 winid window;
+unsigned long mbehavior UNUSED;
 {
     struct xwindow *wp;
     check_winid(window);
@@ -763,7 +764,7 @@ menu_item **menu_list;
         winid newwin = X11_create_nhwindow(NHW_MENU);
         struct xwindow *nwp = &window_list[newwin];
 
-        X11_start_menu(newwin);
+        X11_start_menu(newwin, MENU_BEHAVE_STANDARD);
         move_menu(&menu_info->new_menu, &nwp->menu_information->new_menu);
         for (curr = nwp->menu_information->new_menu.base; curr;
              curr = curr->next)

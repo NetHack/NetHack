@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.c	$NHDT-Date: 1577096800 2019/12/23 10:26:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	monst.c	$NHDT-Date: 1582061573 2020/02/18 21:32:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -688,13 +688,13 @@ NEARDATA struct permonst mons_init[] = {
     MON("rothe", S_QUADRUPED, LVL(2, 9, 7, 0, 0), (G_GENO | G_SGROUP | 4),
         A(ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_BITE, AD_PHYS, 1, 3),
           ATTK(AT_BITE, AD_PHYS, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(400, 100, MS_SILENT, MZ_LARGE), 0, 0,
+        SIZ(400, 100, MS_MOO, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_NOHANDS | M1_OMNIVORE, M2_HOSTILE, M3_INFRAVISIBLE,
         4, CLR_BROWN),
     MON("mumak", S_QUADRUPED, LVL(5, 9, 0, 0, -2), (G_GENO | 1),
         A(ATTK(AT_BUTT, AD_PHYS, 4, 12), ATTK(AT_BITE, AD_PHYS, 2, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(2500, 500, MS_ROAR, MZ_LARGE), 0, 0,
+        SIZ(2500, 500, MS_TRUMPET, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS | M1_HERBIVORE,
         M2_HOSTILE | M2_STRONG, M3_INFRAVISIBLE, 7, CLR_GRAY),
     MON("leocrotta", S_QUADRUPED, LVL(6, 18, 4, 10, 0), (G_GENO | 2),
@@ -724,7 +724,7 @@ NEARDATA struct permonst mons_init[] = {
     MON("mastodon", S_QUADRUPED, LVL(20, 12, 5, 0, 0), (G_GENO | 1),
         A(ATTK(AT_BUTT, AD_PHYS, 4, 8), ATTK(AT_BUTT, AD_PHYS, 4, 8), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(3800, 800, MS_SILENT, MZ_LARGE), 0, 0,
+        SIZ(3800, 800, MS_TRUMPET, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS | M1_HERBIVORE,
         M2_HOSTILE | M2_STRONG, M3_INFRAVISIBLE, 22, CLR_BLACK),
     /*
@@ -1453,7 +1453,13 @@ struct permonst _mons2[] = {
         M1_ANIMAL | M1_HUMANOID | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY, M3_INFRAVISIBLE | M3_INFRAVISION,
         17, CLR_BROWN),
-    /* 'I' is a visual marker for all invisible monsters and must be unused */
+    /*
+     * Invisible
+     * S_invisible=='I' is a visual marker for all invisible monsters
+     * and must be not be used for any specific monster types.  Long
+     * time 'invisible stalker' was changed to 'stalker', an Elemental.
+     */
+
     /*
      * Jabberwock
      */
@@ -1925,7 +1931,8 @@ struct permonst _mons2[] = {
         A(ATTK(AT_CLAW, AD_SITM, 0, 0), ATTK(AT_BITE, AD_PHYS, 1, 3), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(100, 50, MS_GROWL, MZ_SMALL), 0, 0,
-        M1_ANIMAL | M1_HUMANOID | M1_OMNIVORE, 0, M3_INFRAVISIBLE, 4, CLR_GRAY),
+        M1_ANIMAL | M1_HUMANOID | M1_OMNIVORE, 0, M3_INFRAVISIBLE,
+        4, CLR_GRAY),
     MON("ape", S_YETI, LVL(4, 12, 6, 0, 0), (G_GENO | G_SGROUP | 2),
         A(ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_CLAW, AD_PHYS, 1, 3),
           ATTK(AT_BITE, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK),

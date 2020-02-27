@@ -1194,7 +1194,7 @@ enhance_weapon_skill()
         }
 
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
 
         /* start with a legend if any entries will be annotated
            with "*" or "#" below */

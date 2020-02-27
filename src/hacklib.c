@@ -72,6 +72,7 @@
         void            strbuf_empty    (strbuf *)
         void            strbuf_nl_to_crlf (strbuf_t *)
         char *          nonconst        (const char *, char *)
+        int             swapbits        (int, int, int)
 =*/
 #ifdef LINT
 #define Static /* pacify lint */
@@ -1288,6 +1289,16 @@ char *buf;
             retval = buf;
         }
     return retval;
+}
+
+/* swapbits(val, bita, bitb) swaps bit a with bit b in val */
+int
+swapbits(val, bita, bitb)
+int val, bita, bitb;
+{
+    int tmp = ((val >> bita) & 1) ^ ((val >> bitb) & 1);
+
+    return (val ^ ((tmp << bita) | (tmp << bitb)));
 }
 
 /*hacklib.c*/

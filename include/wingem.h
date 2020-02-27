@@ -69,7 +69,7 @@ E void FDECL(Gem_destroy_nhwindow, (winid));
 E void FDECL(Gem_curs, (winid, int, int));
 E void FDECL(Gem_putstr, (winid, int, const char *));
 E void FDECL(Gem_display_file, (const char *, BOOLEAN_P));
-E void FDECL(Gem_start_menu, (winid));
+E void FDECL(Gem_start_menu, (winid, unsigned long));
 E void FDECL(Gem_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
                             const char *, unsigned int));
 E void FDECL(Gem_end_menu, (winid, const char *));

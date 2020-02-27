@@ -32,6 +32,7 @@ struct WinDesc {
     long rows, cols;     /* dimensions */
     long curx, cury;     /* current cursor position */
     long maxrow, maxcol; /* the maximum size used -- for MENU wins */
+    unsigned long mbehavior; /* menu behavior flags (MENU) */
     /* maxcol is also used by WIN_MESSAGE for */
     /* tracking the ^P command */
     short *datlen;         /* allocation size for *data */
@@ -190,7 +191,7 @@ E void FDECL(tty_destroy_nhwindow, (winid));
 E void FDECL(tty_curs, (winid, int, int));
 E void FDECL(tty_putstr, (winid, int, const char *));
 E void FDECL(tty_display_file, (const char *, BOOLEAN_P));
-E void FDECL(tty_start_menu, (winid));
+E void FDECL(tty_start_menu, (winid, unsigned long));
 E void FDECL(tty_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
                             const char *, unsigned int));
 E void FDECL(tty_end_menu, (winid, const char *));

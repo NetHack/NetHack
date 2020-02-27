@@ -215,7 +215,6 @@ const char *drainer; /* cause of death, if drain should be fatal */
         pline("%s level %d.", Goodbye(), u.ulevel--);
         /* remove intrinsic abilities */
         adjabil(u.ulevel + 1, u.ulevel);
-        reset_rndmonst(NON_PM); /* new monster selection */
     } else {
         if (drainer) {
             g.killer.format = KILLED_BY;
@@ -315,7 +314,6 @@ boolean incr; /* true iff via incremental experience growth */
         if (u.ulevelmax < u.ulevel)
             u.ulevelmax = u.ulevel;
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
-        reset_rndmonst(NON_PM);          /* new monster selection */
     }
     g.context.botl = TRUE;
 }

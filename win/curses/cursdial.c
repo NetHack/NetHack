@@ -83,6 +83,7 @@ typedef struct nhm {
     int num_pages;              /* Number of display pages for entry */
     int height;                 /* Window height of menu */
     int width;                  /* Window width of menu */
+    unsigned long mbehavior;    /* menu flags */
     boolean reuse_accels;       /* Non-unique accelerators per page */
     boolean bottom_heavy;       /* display multi-page menu starting at end */
     struct nhm *prev_menu;      /* Pointer to previous entry */
@@ -510,7 +511,7 @@ curses_ext_cmd()
 /* Initialize a menu from given NetHack winid */
 
 void
-curses_create_nhmenu(winid wid)
+curses_create_nhmenu(winid wid, unsigned long mbehavior)
 {
     nhmenu *new_menu = NULL;
     nhmenu *menuptr = nhmenus;
@@ -541,6 +542,7 @@ curses_create_nhmenu(winid wid)
         new_menu->num_pages = 0;
         new_menu->height = 0;
         new_menu->width = 0;
+        new_menu->mbehavior = mbehavior;
         new_menu->reuse_accels = FALSE;
         new_menu->bottom_heavy = FALSE;
         return;
@@ -553,6 +555,7 @@ curses_create_nhmenu(winid wid)
     new_menu->num_pages = 0;
     new_menu->height = 0;
     new_menu->width = 0;
+    new_menu->mbehavior = mbehavior;
     new_menu->reuse_accels = FALSE;
     new_menu->bottom_heavy = FALSE;
     new_menu->next_menu = NULL;

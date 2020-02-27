@@ -1,52 +1,58 @@
-/* NetHack 3.6	monflag.h	$NHDT-Date: 1432512778 2015/05/25 00:12:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	monflag.h	$NHDT-Date: 1582061573 2020/02/18 21:32:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef MONFLAG_H
 #define MONFLAG_H
 
-#define MS_SILENT 0     /* makes no sound */
-#define MS_BARK 1       /* if full moon, may howl */
-#define MS_MEW 2        /* mews or hisses */
-#define MS_ROAR 3       /* roars */
-#define MS_GROWL 4      /* growls */
-#define MS_SQEEK 5      /* squeaks, as a rodent */
-#define MS_SQAWK 6      /* squawks, as a bird */
-#define MS_HISS 7       /* hisses */
-#define MS_BUZZ 8       /* buzzes (killer bee) */
-#define MS_GRUNT 9      /* grunts (or speaks own language) */
-#define MS_NEIGH 10     /* neighs, as an equine */
-#define MS_WAIL 11      /* wails, as a tortured soul */
-#define MS_GURGLE 12    /* gurgles, as liquid or through saliva */
-#define MS_BURBLE 13    /* burbles (jabberwock) */
-#define MS_ANIMAL 13    /* up to here are animal noises */
-#define MS_SHRIEK 15    /* wakes up others */
-#define MS_BONES 16     /* rattles bones (skeleton) */
-#define MS_LAUGH 17     /* grins, smiles, giggles, and laughs */
-#define MS_MUMBLE 18    /* says something or other */
-#define MS_IMITATE 19   /* imitates others (leocrotta) */
-#define MS_ORC MS_GRUNT /* intelligent brutes */
-#define MS_HUMANOID 20  /* generic traveling companion */
-#define MS_ARREST 21    /* "Stop in the name of the law!" (Kops) */
-#define MS_SOLDIER 22   /* army and watchmen expressions */
-#define MS_GUARD 23     /* "Please drop that gold and follow me." */
-#define MS_DJINNI 24    /* "Thank you for freeing me!" */
-#define MS_NURSE 25     /* "Take off your shirt, please." */
-#define MS_SEDUCE 26    /* "Hello, sailor." (Nymphs) */
-#define MS_VAMPIRE 27   /* vampiric seduction, Vlad's exclamations */
-#define MS_BRIBE 28     /* asks for money, or berates you */
-#define MS_CUSS 29      /* berates (demons) or intimidates (Wiz) */
-#define MS_RIDER 30     /* astral level special monsters */
-#define MS_LEADER 31    /* your class leader */
-#define MS_NEMESIS 32   /* your nemesis */
-#define MS_GUARDIAN 33  /* your leader's guards */
-#define MS_SELL 34      /* demand payment, complain about shoplifters */
-#define MS_ORACLE 35    /* do a consultation */
-#define MS_PRIEST 36    /* ask for contribution; do cleansing */
-#define MS_SPELL 37     /* spellcaster not matching any of the above */
-#define MS_WERE 38      /* lycanthrope in human form */
-#define MS_MOO 39       /* minotaurs */
-#define MS_BOAST 40     /* giants */
+enum ms_sounds {
+    MS_SILENT   =  0,   /* makes no sound */
+    MS_BARK     =  1,   /* if full moon, may howl */
+    MS_MEW      =  2,   /* mews or hisses */
+    MS_ROAR     =  3,   /* roars */
+    MS_GROWL    =  4,   /* growls */
+    MS_SQEEK    =  5,   /* squeaks, as a rodent */
+    MS_SQAWK    =  6,   /* squawks, as a bird */
+    MS_HISS     =  7,   /* hisses */
+    MS_BUZZ     =  8,   /* buzzes (killer bee) */
+    MS_GRUNT    =  9,   /* grunts (or speaks own language) */
+    MS_NEIGH    = 10,   /* neighs, as an equine */
+    MS_MOO      = 11,   /* minotaurs, rothes */
+    MS_WAIL     = 12,   /* wails, as a tortured soul */
+    MS_GURGLE   = 13,   /* gurgles, as liquid or through saliva */
+    MS_BURBLE   = 14,   /* burbles (jabberwock) */
+    MS_TRUMPET  = 15,   /* trumpets (elephant) */
+    MS_ANIMAL   = 15,   /* up to here are animal noises */
+                        /* FIXME? the grunt "speaks own language" case
+                           shouldn't be classified as animal */
+    MS_SHRIEK   = 16,   /* wakes up others */
+    MS_BONES    = 17,   /* rattles bones (skeleton) */
+    MS_LAUGH    = 18,   /* grins, smiles, giggles, and laughs */
+    MS_MUMBLE   = 19,   /* says something or other */
+    MS_IMITATE  = 20,   /* imitates others (leocrotta) */
+    MS_WERE     = 21,   /* lycanthrope in human form */
+    MS_ORC      = 22,   /* intelligent brutes */
+                        /* from here onward, can speach can be comprehended */
+    MS_HUMANOID = 23,   /* generic traveling companion */
+    MS_ARREST   = 24,   /* "Stop in the name of the law!" (Kops) */
+    MS_SOLDIER  = 25,   /* army and watchmen expressions */
+    MS_GUARD    = 26,   /* "Please drop that gold and follow me." */
+    MS_DJINNI   = 27,   /* "Thank you for freeing me!" */
+    MS_NURSE    = 28,   /* "Take off your shirt, please." */
+    MS_SEDUCE   = 29,   /* "Hello, sailor." (Nymphs) */
+    MS_VAMPIRE  = 30,   /* vampiric seduction, Vlad's exclamations */
+    MS_BRIBE    = 31,   /* asks for money, or berates you */
+    MS_CUSS     = 32,   /* berates (demons) or intimidates (Wiz) */
+    MS_RIDER    = 33,   /* astral level special monsters */
+    MS_LEADER   = 34,   /* your class leader */
+    MS_NEMESIS  = 35,   /* your nemesis */
+    MS_GUARDIAN = 36,   /* your leader's guards */
+    MS_SELL     = 37,   /* demand payment, complain about shoplifters */
+    MS_ORACLE   = 38,   /* do a consultation */
+    MS_PRIEST   = 39,   /* ask for contribution; do cleansing */
+    MS_SPELL    = 40,   /* spellcaster not matching any of the above */
+    MS_BOAST    = 41    /* giants */
+};
 
 #define MR_FIRE 0x01   /* resists fire */
 #define MR_COLD 0x02   /* resists cold */

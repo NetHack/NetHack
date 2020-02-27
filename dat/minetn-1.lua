@@ -115,8 +115,8 @@ des.object({ id = "magic missile", coord = place[5], buc="uncursed", spe=0 })
 
 -- the Orcish Army
 
-local inside = selection.floodfill(selection.new(), 18,8)
-local near_temple = selection.area(selection.new(), 17,8, 23,14) & inside
+local inside = selection.floodfill(18,8)
+local near_temple = selection.area(17,8, 23,14) & inside
 
 for i=1,5 + math.random(1 - 1,1*10) do
    if math.random(0, 99) < 50 then

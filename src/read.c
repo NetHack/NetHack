@@ -804,7 +804,9 @@ int howmuch;
         for (zy = 0; zy < ROWNO; zy++)
             if (howmuch & ALL_MAP || rn2(7)) {
                 /* Zonk all memory of this location. */
-                levl[zx][zy] = cg.zerorm;
+                levl[zx][zy].seenv = 0;
+                levl[zx][zy].waslit = 0;
+                levl[zx][zy].glyph = GLYPH_UNEXPLORED;
                 g.lastseentyp[zx][zy] = STONE;
             }
     /* forget overview data for this level */
@@ -2105,7 +2107,6 @@ do_class_genocide()
                      * have G_GENOD or !G_GENO.
                      */
                     g.mvitals[i].mvflags |= (G_GENOD | G_NOCORPSE);
-                    reset_rndmonst(i);
                     kill_genocided_monsters();
                     update_inventory(); /* eggs & tins */
                     pline("Wiped out all %s.", nam);
@@ -2322,7 +2323,6 @@ int how;
         } else if (ptr == g.youmonst.data) {
             rehumanize();
         }
-        reset_rndmonst(mndx);
         kill_genocided_monsters();
         update_inventory(); /* in case identified eggs were affected */
     } else {

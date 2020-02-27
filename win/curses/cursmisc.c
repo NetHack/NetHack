@@ -671,7 +671,7 @@ curses_view_file(const char *filename, boolean must_exist)
     }
 
     wid = curses_get_wid(NHW_MENU);
-    curses_create_nhmenu(wid);
+    curses_create_nhmenu(wid, 0UL);
     Id = cg.zeroany;
 
     while (dlb_fgets(buf, BUFSZ, fp) != NULL) {

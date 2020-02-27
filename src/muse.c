@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1580685754 2020/02/02 23:22:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1581726278 2020/02/15 00:24:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -546,7 +546,7 @@ struct monst *mtmp;
              * mean if the monster leaves the level, they'll know
              * about teleport traps.
              */
-            if (!g.level.flags.noteleport
+            if (!noteleport_level(mtmp)
                 || !(mtmp->mtrapseen & (1 << (TELEP_TRAP - 1)))) {
                 g.m.defensive = obj;
                 g.m.has_defense = (mon_has_amulet(mtmp))
@@ -560,7 +560,7 @@ struct monst *mtmp;
             && (!obj->cursed || (!(mtmp->isshk && inhishop(mtmp))
                                  && !mtmp->isgd && !mtmp->ispriest))) {
             /* see WAN_TELEPORTATION case above */
-            if (!g.level.flags.noteleport
+            if (!noteleport_level(mtmp)
                 || !(mtmp->mtrapseen & (1 << (TELEP_TRAP - 1)))) {
                 g.m.defensive = obj;
                 g.m.has_defense = MUSE_SCR_TELEPORTATION;
@@ -673,7 +673,7 @@ struct monst *mtmp;
             if (vismon && how)     /* mentions 'teleport' */
                 makeknown(how);
             /* monster learns that teleportation isn't useful here */
-            if (g.level.flags.noteleport)
+            if (noteleport_level(mtmp))
                 mtmp->mtrapseen |= (1 << (TELEP_TRAP - 1));
             return 2;
         }
@@ -692,7 +692,7 @@ struct monst *mtmp;
         g.m_using = TRUE;
         mbhit(mtmp, rn1(8, 6), mbhitm, bhito, otmp);
         /* monster learns that teleportation isn't useful here */
-        if (g.level.flags.noteleport)
+        if (noteleport_level(mtmp))
             mtmp->mtrapseen |= (1 << (TELEP_TRAP - 1));
         g.m_using = FALSE;
         return 2;
@@ -1016,7 +1016,7 @@ struct monst *mtmp;
     switch (rn2(8 + (difficulty > 3) + (difficulty > 6) + (difficulty > 8))) {
     case 6:
     case 9:
-        if (g.level.flags.noteleport && ++trycnt < 2)
+        if (noteleport_level(mtmp) && ++trycnt < 2)
             goto try_again;
         if (!rn2(3))
             return WAN_TELEPORTATION;
@@ -1847,8 +1847,8 @@ boolean vismon;
                                 * even if [attempted] removal is observed */
         if (!*contnr_nam) {
             /* xname sets dknown, distant_name doesn't */
-            Strcpy(contnr_nam, nearby ? xname(container)
-                                      : distant_name(container, xname));
+            Strcpy(contnr_nam, an(nearby ? xname(container)
+                                         : distant_name(container, xname)));
         }
         /* this was originally just 'can_carry(mon, xobj)' which
            covers objects a monster shouldn't pick up but also
@@ -1865,10 +1865,10 @@ boolean vismon;
                     Norep("%s rummages through %s.", Monnam(mon), contnr_nam);
                 else if (takeout_indx == 0) /* adjacent, first item */
                     pline("%s removes %s from %s.", Monnam(mon),
-                          an(xname(xobj)), contnr_nam);
+                          doname(xobj), contnr_nam);
                 else /* adjacent, additional items */
                     pline("%s removes %s.", upstart(mpronounbuf),
-                          an(xname(xobj)));
+                          doname(xobj));
             }
             /* obj_extract_self(xobj); -- already done above */
             (void) mpickobj(mon, xobj);
@@ -2173,6 +2173,13 @@ struct monst *mon;
 struct obj *obj;
 {
     int typ = obj->otyp;
+
+    /* don't let monsters interact with protected items on the floor */
+    if ((obj->where == OBJ_FLOOR)
+        && (obj->ox == mon->mx) && (obj->oy == mon->my)
+        && onscary(obj->ox, obj->oy, mon)) {
+        return FALSE;
+    }
 
     if (is_animal(mon->data) || mindless(mon->data)
         || mon->data == &mons[PM_GHOST]) /* don't loot bones piles */

@@ -839,11 +839,11 @@ struct obj *obj;
     /* "special achievements"; revealed in end of game disclosure and
        dumplog, originally just recorded in XLOGFILE */
     if (is_mines_prize(obj)) {
-        record_achievement(ACH_LUCK);
+        record_achievement(ACH_MINE_PRIZE);
         g.context.achieveo.mines_prize_oid = 0; /* done with luckstone o_id */
         obj->nomerge = 0;
     } else if (is_soko_prize(obj)) {
-        record_achievement(ACH_SOKO);
+        record_achievement(ACH_SOKO_PRIZE);
         g.context.achieveo.soko_prize_oid = 0; /* done with bag/amulet o_id */
         obj->nomerge = 0;
     }
@@ -2642,7 +2642,7 @@ long *out_cnt;
     sortedinvent = sortloot(&g.invent, sortflags, FALSE,
                             (boolean FDECL((*), (OBJ_P))) 0);
 
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     if (wizard && iflags.override_ID) {
         int unid_cnt;
@@ -2810,7 +2810,7 @@ char avoidlet;
 
     if (g.invent) {
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
         while (!invdone) {
             any = cg.zeroany; /* set all bits to zero */
             classcount = 0;
@@ -4272,7 +4272,7 @@ const char *hdr, *txt;
 
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, hdr,
              MENU_ITEMFLAGS_NONE);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);

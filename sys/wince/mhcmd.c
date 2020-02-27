@@ -1108,7 +1108,7 @@ ActivateCell(HWND hWnd, int cell)
             pSet = nhcmdset_default;
 
         wid = mswin_create_nhwindow(NHW_MENU);
-        mswin_start_menu(wid);
+        mswin_start_menu(wid, MENU_BEHAVE_STANDARD);
         for (i = 0; i < nhcmdset_count(pSet); i++) {
             any.a_void = nhcmdset_get(pSet, i);
             mswin_add_menu(wid, NO_GLYPH, &any, 'a' + i, 0, ATR_NONE,

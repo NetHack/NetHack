@@ -158,7 +158,7 @@ mswin_init_nhwindows(int *argc, char **argv)
      * non-console applications
      */
     iflags.toptenwin = 1;
-    set_option_mod_status("toptenwin", SET_IN_FILE);
+    set_option_mod_status("toptenwin", set_in_config);
 
     /* initialize map tiles bitmap */
     initMapTiles();
@@ -176,14 +176,14 @@ mswin_init_nhwindows(int *argc, char **argv)
             | WC_MAP_MODE | WC_FONT_MESSAGE | WC_FONT_STATUS | WC_FONT_MENU
             | WC_FONT_TEXT | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS
             | WC_FONTSIZ_MENU | WC_FONTSIZ_TEXT | WC_VARY_MSGCOUNT,
-        SET_IN_GAME);
+        set_in_game);
 
     /* WC2 options */
-    set_wc2_option_mod_status(WC2_FULLSCREEN | WC2_SOFTKEYBOARD, SET_IN_FILE);
+    set_wc2_option_mod_status(WC2_FULLSCREEN | WC2_SOFTKEYBOARD, set_in_config);
     GetNHApp()->bFullScreen = iflags.wc2_fullscreen;
     GetNHApp()->bUseSIP = iflags.wc2_softkeyboard;
 
-    set_wc2_option_mod_status(WC2_WRAPTEXT, SET_IN_GAME);
+    set_wc2_option_mod_status(WC2_WRAPTEXT, set_in_game);
     GetNHApp()->bWrapText = iflags.wc2_wraptext;
 
     /* create the main nethack window */
@@ -366,7 +366,7 @@ prompt_for_player_selection(void)
             /* tty_putstr(BASE_WINDOW, 0, "Choosing Character's Role"); */
             /* Prompt for a role */
             win = create_nhwindow(NHW_MENU);
-            start_menu(win);
+            start_menu(win, MENU_BEHAVE_STANDARD);
             any.a_void = 0; /* zero out all bits */
             for (i = 0; roles[i].name.m; i++) {
                 if (ok_role(i, flags.initrace, flags.initgend,
@@ -458,7 +458,7 @@ prompt_for_player_selection(void)
                 /* tty_clear_nhwindow(BASE_WINDOW); */
                 /* tty_putstr(BASE_WINDOW, 0, "Choosing Race"); */
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; races[i].noun; i++)
                     if (ok_race(flags.initrole, i, flags.initgend,
@@ -532,7 +532,7 @@ prompt_for_player_selection(void)
                 /* tty_clear_nhwindow(BASE_WINDOW); */
                 /* tty_putstr(BASE_WINDOW, 0, "Choosing Gender"); */
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; i < ROLE_GENDERS; i++)
                     if (ok_gend(flags.initrole, flags.initrace, i,
@@ -605,7 +605,7 @@ prompt_for_player_selection(void)
                 /* tty_clear_nhwindow(BASE_WINDOW); */
                 /* tty_putstr(BASE_WINDOW, 0, "Choosing Alignment"); */
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; i < ROLE_ALIGNS; i++)
                     if (ok_align(flags.initrole, flags.initrace,
@@ -1005,9 +1005,9 @@ mswin_display_file(const char *filename, BOOLEAN_P must_exist)
    be used for menus.
 */
 void
-mswin_start_menu(winid wid)
+mswin_start_menu(winid wid, unsigned long mbehavior)
 {
-    logDebug("mswin_start_menu(%d)\n", wid);
+    logDebug("mswin_start_menu(%d, %lu)\n", wid, mbehavior);
     if ((wid >= 0) && (wid < MAXWINDOWS)) {
         if (GetNHApp()->windowlist[wid].win == NULL
             && GetNHApp()->windowlist[wid].type == NHW_MENU) {

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1581322660 2020/02/10 08:17:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.224 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1582155879 2020/02/19 23:44:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1050,7 +1050,8 @@ dodown()
 
     if (trap) {
         const char *down_or_thru = trap->ttyp == HOLE ? "down" : "through";
-        const char *actn = Flying ? "fly" : locomotion(g.youmonst.data, "jump");
+        const char *actn = Flying ? "fly"
+                                  : locomotion(g.youmonst.data, "jump");
 
         if (g.youmonst.data->msize >= MZ_HUGE) {
             char qbuf[QBUFSZ];
@@ -1373,12 +1374,11 @@ boolean at_stairs, falling, portal;
         unplacebc();
     reset_utrap(FALSE); /* needed in level_tele */
     fill_pit(u.ux, u.uy);
-    u.ustuck = 0; /* idem */
+    set_ustuck((struct monst *) 0); /* idem */
+    u.uswallow = u.uswldtim = 0;
     u.uinwater = 0;
     u.uundetected = 0; /* not hidden, even if means are available */
     keepdogs(FALSE);
-    if (u.uswallow) /* idem */
-        u.uswldtim = u.uswallow = 0;
     recalc_mapseen(); /* recalculate map overview before we leave the level */
     /*
      *  We no longer see anything on the level.  Make sure that this
@@ -1453,7 +1453,6 @@ boolean at_stairs, falling, portal;
             || dunlev(&u.uz) < dunlev_reached(&u.uz))
             dunlev_reached(&u.uz) = dunlev(&u.uz);
     }
-    reset_rndmonst(NON_PM); /* u.uz change affects monster generation */
 
     /* set default level change destination areas */
     /* the special level code may override these */
@@ -1624,12 +1623,6 @@ boolean at_stairs, falling, portal;
     /* special levels can have a custom arrival message */
     deliver_splev_message();
 
-    /* give room entrance message, if any */
-    check_special_room(FALSE);
-
-    /* deliver objects traveling with player */
-    obj_delivery(TRUE);
-
     /* Check whether we just entered Gehennom. */
     if (!In_hell(&u.uz0) && Inhell) {
         if (Is_valley(&u.uz)) {
@@ -1701,9 +1694,18 @@ boolean at_stairs, falling, portal;
                 mtmp->msleeping = 0;
             }
         }
+    } else if (In_mines(&u.uz)) {
+        if (newdungeon)
+            record_achievement(ACH_MINE);
+    } else if (In_sokoban(&u.uz)) {
+        if (newdungeon)
+            record_achievement(ACH_SOKO);
     } else {
-        if (new && Is_rogue_level(&u.uz))
+        if (new && Is_rogue_level(&u.uz)) {
             You("enter what seems to be an older, more primitive world.");
+        } else if (new && Is_bigroom(&u.uz)) {
+            record_achievement(ACH_BGRM);
+        }
         /* main dungeon message from your quest leader */
         if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest")
             && !(u.uevent.qcompleted || u.uevent.qexpelled
@@ -1726,6 +1728,11 @@ boolean at_stairs, falling, portal;
 
     if ((annotation = get_annotation(&u.uz)) != 0)
         You("remember this level as %s.", annotation);
+
+    /* give room entrance message, if any */
+    check_special_room(FALSE);
+    /* deliver objects traveling with player */
+    obj_delivery(TRUE);
 
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
@@ -2001,10 +2008,30 @@ dowipe()
     return 1;
 }
 
+/* common wounded legs feedback */
+void
+legs_in_no_shape(for_what, by_steed)
+const char *for_what; /* jumping, kicking, riding */
+boolean by_steed;
+{
+    if (by_steed && u.usteed) {
+        pline("%s is in no shape for %s.", Monnam(u.usteed), for_what);
+    } else {
+        long wl = (EWounded_legs & BOTH_SIDES);
+        const char *bp = body_part(LEG);
+
+        if (wl == BOTH_SIDES)
+            bp = makeplural(bp);
+        Your("%s%s %s in no shape for %s.",
+             (wl == LEFT_SIDE) ? "left " : (wl == RIGHT_SIDE) ? "right " : "",
+             bp, (wl == BOTH_SIDES) ? "are" : "is", for_what);
+    }
+}
+
 void
 set_wounded_legs(side, timex)
-register long side;
-register int timex;
+long side;
+int timex;
 {
     /* KMH -- STEED
      * If you are riding, your steed gets the wounded legs instead.
@@ -2012,13 +2039,12 @@ register int timex;
      * Caller is also responsible for adjusting messages.
      */
 
-    if (!Wounded_legs) {
+    g.context.botl = 1;
+    if (!Wounded_legs)
         ATEMP(A_DEX)--;
-        g.context.botl = 1;
-    }
 
-    if (!Wounded_legs || (HWounded_legs & TIMEOUT))
-        HWounded_legs = timex;
+    if (!Wounded_legs || (HWounded_legs & TIMEOUT) < timex)
+        set_itimeout(&HWounded_legs, (long) timex);
     EWounded_legs = side;
     (void) encumber_msg();
 }
@@ -2028,10 +2054,9 @@ heal_legs(how)
 int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 {
     if (Wounded_legs) {
-        if (ATEMP(A_DEX) < 0) {
+        g.context.botl = 1;
+        if (ATEMP(A_DEX) < 0)
             ATEMP(A_DEX)++;
-            g.context.botl = 1;
-        }
 
         /* when mounted, wounded legs applies to the steed;
            during petrification countdown, "your limbs turn to stone"

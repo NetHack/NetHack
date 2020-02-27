@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1577662239 2019/12/29 23:30:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1581886858 2020/02/16 21:00:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1061,7 +1061,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                 g.multi_reason = "being scared stiff";
                 g.nomovemsg = "";
                 if (magr && magr == u.ustuck && sticks(g.youmonst.data)) {
-                    u.ustuck = (struct monst *) 0;
+                    set_ustuck((struct monst *) 0);
                     You("release %s!", mon_nam(magr));
                 }
             }
@@ -1527,7 +1527,7 @@ struct obj *obj;
             anything any;
 
             any = cg.zeroany; /* set all bits to zero */
-            start_menu(tmpwin);
+            start_menu(tmpwin, MENU_BEHAVE_STANDARD);
             /* use index+1 (cant use 0) as identifier */
             for (i = num_ok_dungeons = 0; i < g.n_dgns; i++) {
                 if (!g.dungeons[i].dunlev_ureached)

@@ -175,10 +175,11 @@ boolean complain;
 }
 
 void
-chainin_start_menu(window)
+chainin_start_menu(window, mbehavior)
 winid window;
+unsigned long mbehavior;
 {
-    (*cibase->nprocs->win_start_menu)(cibase->ndata, window);
+    (*cibase->nprocs->win_start_menu)(cibase->ndata, window, mbehavior);
 }
 
 void

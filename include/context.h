@@ -106,8 +106,10 @@ struct novel_tracking { /* for choosing random passage when reading novel */
 };
 
 struct achievement_tracking {
-    unsigned mines_prize_oid, soko_prize_oid; /* obj->o_id */
-    /* short mines_prize_type, soko_prize_typ1, soko_prize_typ2; */
+    unsigned mines_prize_oid,  /* luckstone->o_id */
+             soko_prize_oid,   /* {bag or amulet}->o_id */
+             castle_prize_old; /* wand->o_id; not yet implemented */
+    boolean minetn_reached;    /* avoid redundant checking for town entry */
 };
 
 struct context_info {

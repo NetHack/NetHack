@@ -482,7 +482,9 @@ struct obj *corpse;
     /* Clear all memory from the level. */
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
-            levl[x][y] = cg.zerorm;
+            levl[x][y].seenv = 0;
+            levl[x][y].waslit = 0;
+            levl[x][y].glyph = GLYPH_UNEXPLORED;
             g.lastseentyp[x][y] = 0;
         }
 

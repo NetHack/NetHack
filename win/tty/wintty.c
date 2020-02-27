@@ -440,14 +440,14 @@ char **argv UNUSED;
     tty_putstr(BASE_WINDOW, 0, "");
     tty_display_nhwindow(BASE_WINDOW, FALSE);
 
-    /* 'statuslines' defaults to SET_IN_FILE, allowed but invisible;
+    /* 'statuslines' defaults to set_in_config, allowed but invisible;
        make it dynamically settable if feasible, otherwise visible */
     if (tty_procs.wincap2 & WC2_STATUSLINES)
         set_wc2_option_mod_status(WC2_STATUSLINES,
 #ifndef CLIPPING
                                   (LI < 1 + ROWNO + 2) ? DISP_IN_GAME :
 #endif
-                                   SET_IN_GAME);
+                                   set_in_game);
 }
 
 void
@@ -569,7 +569,7 @@ tty_player_selection()
                     tty_clear_nhwindow(BASE_WINDOW);
                     role_selection_prolog(RS_ROLE, BASE_WINDOW);
                     win = create_nhwindow(NHW_MENU);
-                    start_menu(win);
+                    start_menu(win, MENU_BEHAVE_STANDARD);
                     /* populate the menu with role choices */
                     setup_rolemenu(win, TRUE, RACE, GEND, ALGN);
                     /* add miscellaneous menu entries */
@@ -666,7 +666,7 @@ tty_player_selection()
                         tty_clear_nhwindow(BASE_WINDOW);
                         role_selection_prolog(RS_RACE, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
-                        start_menu(win);
+                        start_menu(win, MENU_BEHAVE_STANDARD);
                         any = cg.zeroany; /* zero out all bits */
                         /* populate the menu with role choices */
                         setup_racemenu(win, TRUE, ROLE, GEND, ALGN);
@@ -758,7 +758,7 @@ tty_player_selection()
                         tty_clear_nhwindow(BASE_WINDOW);
                         role_selection_prolog(RS_GENDER, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
-                        start_menu(win);
+                        start_menu(win, MENU_BEHAVE_STANDARD);
                         any = cg.zeroany; /* zero out all bits */
                         /* populate the menu with gender choices */
                         setup_gendmenu(win, TRUE, ROLE, RACE, ALGN);
@@ -848,7 +848,7 @@ tty_player_selection()
                         tty_clear_nhwindow(BASE_WINDOW);
                         role_selection_prolog(RS_ALGNMNT, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
-                        start_menu(win);
+                        start_menu(win, MENU_BEHAVE_STANDARD);
                         any = cg.zeroany; /* zero out all bits */
                         setup_algnmenu(win, TRUE, ROLE, RACE, GEND);
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
@@ -927,7 +927,7 @@ tty_player_selection()
         tty_clear_nhwindow(BASE_WINDOW);
         role_selection_prolog(ROLE_NONE, BASE_WINDOW);
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
         any = cg.zeroany; /* zero out all bits */
         any.a_int = 0;
         if (!roles[ROLE].name.f
@@ -1030,7 +1030,7 @@ reset_role_filtering()
     menu_item *selected = 0;
 
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
 
     /* no extra blank line preceding this entry; end_menu supplies one */
@@ -1456,6 +1456,7 @@ int type;
     newwin->mlist = (tty_menu_item *) 0;
     newwin->plist = (tty_menu_item **) 0;
     newwin->npages = newwin->plist_size = newwin->nitems = newwin->how = 0;
+    newwin->mbehavior = 0U;
     switch (type) {
     case NHW_BASE:
         /* base window, used for absolute movement on the screen */
@@ -2907,9 +2908,11 @@ boolean complain;
 }
 
 void
-tty_start_menu(window)
+tty_start_menu(window, mbehavior)
 winid window;
+unsigned long mbehavior;
 {
+    wins[window]->mbehavior = mbehavior;
     tty_clear_nhwindow(window);
     return;
 }
@@ -3845,6 +3848,7 @@ boolean enable;
  *               BL_MASK_TRAPPED      0x04000000L
  *               BL_MASK_UNCONSC      0x08000000L
  *               BL_MASK_WOUNDEDL     0x10000000L
+ *               BL_MASK_HOLDING      0x20000000L
  *
  *      -- The value passed for BL_GOLD usually includes an encoded leading
  *         symbol for GOLD "\GXXXXNNNN:nnn". If the window port needs to use

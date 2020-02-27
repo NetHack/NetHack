@@ -1,0 +1,8 @@
+.\" suffux to Guidebook.mn for 'roff version of Guidebook written as one page
+.br
+.\" add a marker that precedes hundreds of blank lines which pad out the page
+EOF--EOF
+.
+.\" post process with "sed -e '/EOF--EOF/,12345D'" to remove trailing junk
+.\" (also removes Unix trademark footnote; that ought to be kept but the
+.\" generic "all trademarks are held by respective owners" is still present)

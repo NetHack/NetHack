@@ -470,7 +470,7 @@ register struct monst *mtmp;
 
     /* some monsters teleport */
     if (mtmp->mflee && !rn2(40) && can_teleport(mdat) && !mtmp->iswiz
-        && !g.level.flags.noteleport) {
+        && !noteleport_level(mtmp)) {
         (void) rloc(mtmp, TRUE);
         return 0;
     }
@@ -1149,7 +1149,7 @@ register int after;
     if (is_minion(ptr) || is_rider(ptr))
         flag |= ALLOW_SANCT;
     /* unicorn may not be able to avoid hero on a noteleport level */
-    if (is_unicorn(ptr) && !g.level.flags.noteleport)
+    if (is_unicorn(ptr) && !noteleport_level(mtmp))
         flag |= NOTONL;
     if (passes_walls(ptr))
         flag |= (ALLOW_WALL | ALLOW_ROCK);
@@ -1185,7 +1185,7 @@ register int after;
         if (!mtmp->mpeaceful && g.level.flags.shortsighted
             && nidist > (couldsee(nix, niy) ? 144 : 36) && appr == 1)
             appr = 0;
-        if (is_unicorn(ptr) && g.level.flags.noteleport) {
+        if (is_unicorn(ptr) && noteleport_level(mtmp)) {
             /* on noteleport levels, perhaps we cannot avoid hero */
             for (i = 0; i < cnt; i++)
                 if (!(info[i] & NOTONL))

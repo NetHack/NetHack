@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1581322664 2020/02/10 08:17:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.321 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1581886863 2020/02/16 21:01:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.324 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -24,6 +24,7 @@ static boolean FDECL(isspecmon, (struct monst *));
 static boolean FDECL(validspecmon, (struct monst *, int));
 static struct permonst *FDECL(accept_newcham_form, (struct monst *, int));
 static struct obj *FDECL(make_corpse, (struct monst *, unsigned));
+static int FDECL(minliquid_core, (struct monst *));
 static void FDECL(m_detach, (struct monst *, struct permonst *));
 static void FDECL(lifesaved_monster, (struct monst *));
 static void FDECL(migrate_mon, (struct monst *, XCHAR_P, XCHAR_P));
@@ -436,8 +437,8 @@ unsigned corpseflags;
         }
         free_mname(mtmp);
         return obj;
-    default_1:
     default:
+ default_1:
         if (g.mvitals[mndx].mvflags & G_NOCORPSE) {
             return (struct obj *) 0;
         } else {
@@ -487,7 +488,22 @@ unsigned corpseflags;
 /* check mtmp and water/lava for compatibility, 0 (survived), 1 (died) */
 int
 minliquid(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
+{
+    int res;
+
+    /* set up flag for mondead() and xkilled() */
+    iflags.sad_feeling = (mtmp->mtame && !canseemon(mtmp));
+    res = minliquid_core(mtmp);
+    /* always clear the flag */
+    iflags.sad_feeling = FALSE;
+    return res;
+}
+
+/* guts of minliquid() */
+static int
+minliquid_core(mtmp)
+struct monst *mtmp;
 {
     boolean inpool, inlava, infountain;
 
@@ -1667,7 +1683,7 @@ struct monst *mtmp, *mtmp2;
     mtmp2->nmon = fmon;
     fmon = mtmp2;
     if (u.ustuck == mtmp)
-        u.ustuck = mtmp2;
+        set_ustuck(mtmp2);
     if (u.usteed == mtmp)
         u.usteed = mtmp2;
     if (mtmp2->isshk)
@@ -1930,7 +1946,12 @@ mondead(mtmp)
 register struct monst *mtmp;
 {
     struct permonst *mptr;
+    boolean be_sad;
     int tmp;
+
+    /* potential pet message; always clear global flag */
+    be_sad = iflags.sad_feeling;
+    iflags.sad_feeling = FALSE;
 
     mtmp->mhp = 0; /* in case caller hasn't done this */
     lifesaved_monster(mtmp);
@@ -2001,6 +2022,9 @@ register struct monst *mtmp;
             return;
         }
     }
+
+    if (be_sad)
+        You("have a sad feeling for a moment, then it passes.");
 
     /* dead vault guard is actually kept at coordinate <0,0> until
        his temporary corridor to/from the vault has been removed;
@@ -2274,15 +2298,13 @@ struct monst *mdef;
 const char *fltxt;
 int how;
 {
-    boolean be_sad = FALSE; /* true if unseen pet is killed */
-
     if ((mdef->wormno ? worm_known(mdef) : cansee(mdef->mx, mdef->my))
         && fltxt)
         pline("%s is %s%s%s!", Monnam(mdef),
               nonliving(mdef->data) ? "destroyed" : "killed",
               *fltxt ? " by the " : "", fltxt);
     else
-        be_sad = (mdef->mtame != 0);
+        iflags.sad_feeling = (mdef->mtame != 0);
 
     /* no corpses if digested or disintegrated */
     g.disintegested = (how == AD_DGST || how == -AD_RBRE);
@@ -2290,9 +2312,14 @@ int how;
         mondead(mdef);
     else
         mondied(mdef);
+}
 
-    if (be_sad && DEADMONSTER(mdef))
-        You("have a sad feeling for a moment, then it passes.");
+void
+set_ustuck(mtmp)
+struct monst *mtmp;
+{
+    g.context.botl = 1;
+    u.ustuck = mtmp;
 }
 
 void
@@ -2300,6 +2327,10 @@ unstuck(mtmp)
 struct monst *mtmp;
 {
     if (u.ustuck == mtmp) {
+        /* do this first so that docrt()'s botl update is accurate;
+           safe to do as long as u.uswallow is also cleared before docrt() */
+        set_ustuck((struct monst *) 0);
+
         if (u.uswallow) {
             u.ux = mtmp->mx;
             u.uy = mtmp->my;
@@ -2314,7 +2345,6 @@ struct monst *mtmp;
             if (attacktype(mtmp->data, AT_ENGL) && !mtmp->mspec_used)
                 mtmp->mspec_used = rnd(2);
         }
-        u.ustuck = 0;
     }
 }
 
@@ -2335,11 +2365,16 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     struct permonst *mdat;
     struct obj *otmp;
     struct trap *t;
+    boolean be_sad;
     boolean wasinside = u.uswallow && (u.ustuck == mtmp),
             burycorpse = FALSE,
             nomsg = (xkill_flags & XKILL_NOMSG) != 0,
             nocorpse = (xkill_flags & XKILL_NOCORPSE) != 0,
             noconduct = (xkill_flags & XKILL_NOCONDUCT) != 0;
+
+    /* potential pet message; always clear global flag */
+    be_sad = iflags.sad_feeling;
+    iflags.sad_feeling = FALSE;
 
     mtmp->mhp = 0; /* caller will usually have already done this */
     if (!noconduct) /* KMH, conduct */
@@ -2402,6 +2437,9 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
             pline("Maybe not...");
         return;
     }
+
+    if (be_sad)
+        You("have a sad feeling for a moment, then it passes.");
 
     mdat = mtmp->data; /* note: mondead can change mtmp->data */
     mndx = monsndx(mdat);

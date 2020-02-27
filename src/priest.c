@@ -402,6 +402,7 @@ int roomno;
 
     if ((priest = findpriest((char) roomno)) != 0) {
         /* tended */
+        record_achievement(ACH_TMPL);
 
         epri_p = EPRI(priest);
         shrined = has_shrine(priest);

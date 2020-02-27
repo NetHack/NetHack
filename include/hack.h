@@ -497,19 +497,19 @@ enum bodypart_types {
 #define TELEDS_TELEPORT   2
 
 /*
- * Option flags
- * Each higher number includes the characteristics of the numbers
- * below it.
+ * option setting restrictions
  */
-/* XXX This should be replaced with a bitmap. */
-#define SET_IN_SYS 0   /* system config file option only */
-#define SET_IN_FILE 1  /* config file option only */
-#define SET_VIA_PROG 2 /* may be set via extern program, not seen in game */
-#define DISP_IN_GAME 3 /* may be set via extern program, displayed in game \
-                          */
-#define SET_IN_GAME 4  /* may be set via extern program or set in the game */
-#define SET_IN_WIZGAME 5  /* may be set set in the game if wizmode */
-#define SET__IS_VALUE_VALID(s) ((s < SET_IN_SYS) || (s > SET_IN_WIZGAME))
+
+enum optset_restrictions {
+    set_in_sysconf = 0, /* system config file option only */
+    set_in_config  = 1, /* config file option only */
+    set_viaprog    = 2, /* may be set via extern program, not seen in game */
+    set_gameview   = 3, /* may be set via extern program, displayed in game */
+    set_in_game    = 4, /* may be set via extern program or set in the game */
+    set_wizonly    = 5, /* may be set set in the game if wizmode */
+    set_hidden     = 6  /* placeholder for prefixed entries, never show it  */
+};
+#define SET__IS_VALUE_VALID(s) ((s < set_in_sysconf) || (s > set_wizonly))
 
 #define FEATURE_NOTICE_VER(major, minor, patch)                    \
     (((unsigned long) major << 24) | ((unsigned long) minor << 16) \

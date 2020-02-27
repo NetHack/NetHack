@@ -5,7 +5,7 @@
 
 #include "hack.h"
 
-static NEARDATA struct engr *head_engr;
+struct engr *head_engr;
 static const char *NDECL(blengr);
 
 char *

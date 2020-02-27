@@ -37,6 +37,8 @@ NEARDATA struct obj *uwep, *uarm, *uswapwep,
     *uarmc, *uarmh, *uarms, *uarmg,*uarmf, *uamul,
     *uright, *uleft, *ublindf, *uchain, *uball;
 
+struct engr *head_engr;
+
 #ifdef TEXTCOLOR
 /*
  *  This must be the same order as used for buzz() in zap.c.
@@ -235,6 +237,7 @@ const struct instance_globals g_init = {
 #endif
     UNDEFINED_VALUES, /* cond_hilites */
     0, /* now_or_before_idx */
+    0, /* condmenu_sortorder */
 
     /* cmd.c */
     UNDEFINED_VALUES, /* Cmd */
@@ -461,8 +464,6 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES,
 
     /* makemon.c */
-    { -1, /* choice_count */
-     { 0 } }, /* mchoices */
 
     /* mhitm.c */
     UNDEFINED_VALUE, /* vis */
@@ -699,7 +700,6 @@ const struct const_globals cg = {
     DUMMY, /* zeroobj */
     DUMMY, /* zeromonst */
     DUMMY, /* zeroany */
-    { GLYPH_UNEXPLORED, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 #define ZERO(x) memset(&x, 0, sizeof(x))

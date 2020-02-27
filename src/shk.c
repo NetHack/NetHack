@@ -564,6 +564,7 @@ char *enterstring;
         u.ushops[0] = '\0';
         return;
     }
+    record_achievement(ACH_SHOP);
 
     eshkp->bill_p = &(eshkp->bill[0]);
 

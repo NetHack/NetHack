@@ -213,13 +213,14 @@ boolean complain;
 }
 
 void
-chainout_start_menu(vp, window)
+chainout_start_menu(vp, window, mbehavior)
 void *vp;
 winid window;
+unsigned long mbehavior;
 {
     struct chainout_data *tdp = vp;
 
-    (*tdp->nprocs->win_start_menu)(window);
+    (*tdp->nprocs->win_start_menu)(window, mbehavior);
 }
 
 void

@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1581322659 2020/02/10 08:17:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.398 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1582594149 2020/02/25 01:29:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.406 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -147,6 +147,7 @@ static int NDECL(wiz_polyself);
 static int NDECL(wiz_load_lua);
 static int NDECL(wiz_level_tele);
 static int NDECL(wiz_level_change);
+static int NDECL(wiz_level_flip);
 static int NDECL(wiz_show_seenv);
 static int NDECL(wiz_show_vision);
 static int NDECL(wiz_smell);
@@ -357,7 +358,7 @@ doextlist(VOID_ARGS)
     while (redisplay) {
         redisplay = FALSE;
         any = cg.zeroany;
-        start_menu(menuwin);
+        start_menu(menuwin, MENU_BEHAVE_STANDARD);
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "Extended Commands List",
                  MENU_ITEMFLAGS_NONE);
@@ -576,7 +577,7 @@ extcmd_via_menu()
 
         /* otherwise... */
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
         Sprintf(fmtstr, "%%-%ds", biggest + 15);
         prompt[0] = '\0';
         wastoolong = FALSE; /* True => had to wrap due to line width
@@ -792,12 +793,12 @@ boolean pre, wiztower;
                 static const char Unachieve[] = "%s achievement revoked.";
 
                 if (Is_mineend_level(&u.uz)) {
-                    if (remove_achievement(ACH_LUCK))
-                        pline(Unachieve, "Mine's end");
+                    if (remove_achievement(ACH_MINE_PRIZE))
+                        pline(Unachieve, "Mine's-end");
                     g.context.achieveo.mines_prize_oid = 0;
                 } else if (Is_sokoend_level(&u.uz)) {
-                    if (remove_achievement(ACH_SOKO))
-                        pline(Unachieve, "Sokoban end");
+                    if (remove_achievement(ACH_SOKO_PRIZE))
+                        pline(Unachieve, "Sokoban-end");
                     g.context.achieveo.soko_prize_oid = 0;
                 }
             }
@@ -824,7 +825,7 @@ boolean pre, wiztower;
         reset_utrap(FALSE);
         check_special_room(TRUE); /* room exit */
         u.ustuck = (struct monst *) 0;
-        u.uswallow = 0;
+        u.uswallow = u.uswldtim = 0;
         u.uinwater = 0;
         u.uundetected = 0; /* not hidden, even if means are available */
         dmonsfree(); /* purge dead monsters from 'fmon' */
@@ -1015,6 +1016,40 @@ wiz_level_tele(VOID_ARGS)
         level_tele();
     else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_level_tele)));
+    return 0;
+}
+
+/* #wizlevelflip - transpose the current level */
+static int
+wiz_level_flip(VOID_ARGS)
+{
+    static const char choices[] = "0123",
+        prmpt[] = "Flip 0=randomly, 1=vertically, 2=horizonally, 3=both:";
+
+    /*
+     * Does not handle
+     *   levregions,
+     *   monster mtrack,
+     *   migrating monsters aimed at returning to specific coordinates
+     *     on this level
+     * as flipping is normally done only during level creation.
+     */
+    if (wizard) {
+        char c = yn_function(prmpt, choices, '\0');
+
+        if (c && index(choices, c)) {
+            c -= '0';
+
+            if (!c)
+                flip_level_rnd(3, TRUE);
+            else
+                flip_level((int) c, TRUE);
+
+            docrt();
+        } else {
+            pline("%s", Never_mind);
+        }
+    }
     return 0;
 }
 
@@ -1476,7 +1511,7 @@ wiz_intrinsic(VOID_ARGS)
 
         any = cg.zeroany;
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
         for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
             p = propertynames[i].prop_num;
             if (p == HALLUC_RES) {
@@ -1620,7 +1655,7 @@ doterrain(VOID_ARGS)
      *  a legend for the levl[][].typ codes dump
      */
     men = create_nhwindow(NHW_MENU);
-    start_menu(men);
+    start_menu(men, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_int = 1;
     add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -1867,6 +1902,8 @@ struct ext_func_tab extcmdlist[] = {
             wiz_identify, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '\0', "wizintrinsic", "set an intrinsic",
             wiz_intrinsic, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+    { '\0', "wizlevelflip", "flip the level",
+            wiz_level_flip, IFBURIED | WIZMODECMD },
     { C('v'), "wizlevelport", "teleport to another level",
             wiz_level_tele, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '\0', "wizloaddes", "load and execute a des-file lua script",
@@ -3716,7 +3753,7 @@ int x, y;
     struct monst *mtmp;
 
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
 
     if (IS_DOOR(typ)) {
         boolean key_or_pick, card;
@@ -3817,7 +3854,7 @@ boolean doit;
     menu_item *picks = (menu_item *) 0;
 
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
 
     if (IS_FOUNTAIN(typ) || IS_SINK(typ)) {
         Sprintf(buf, "Drink from the %s",

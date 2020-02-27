@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1577674533 2019/12/30 02:55:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1582155880 2020/02/19 23:44:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -258,7 +258,7 @@ xchar x, y;
             if (mon->mx != x || mon->my != y) {
                 (void) unmap_invisible(x, y);
                 pline("%s %s, %s evading your %skick.", Monnam(mon),
-                      (!g.level.flags.noteleport && can_teleport(mon->data))
+                      (can_teleport(mon->data) && !noteleport_level(mon))
                           ? "teleports"
                           : is_floater(mon->data)
                                 ? "floats"
@@ -788,15 +788,7 @@ dokick()
             return 0;
         }
     } else if (Wounded_legs) {
-        /* note: jump() has similar code */
-        long wl = (EWounded_legs & BOTH_SIDES);
-        const char *bp = body_part(LEG);
-
-        if (wl == BOTH_SIDES)
-            bp = makeplural(bp);
-        Your("%s%s %s in no shape for kicking.",
-             (wl == LEFT_SIDE) ? "left " : (wl == RIGHT_SIDE) ? "right " : "",
-             bp, (wl == BOTH_SIDES) ? "are" : "is");
+        legs_in_no_shape("kicking", FALSE);
         no_kick = TRUE;
     } else if (near_capacity() > SLT_ENCUMBER) {
         Your("load is too heavy to balance yourself for a kick.");

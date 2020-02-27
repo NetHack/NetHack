@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1559994625 2019/06/08 11:50:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1581886866 2020/02/16 21:01:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -216,7 +216,7 @@ dosave0()
     /* these pointers are no longer valid, and at least u.usteed
      * may mislead place_monster() on other levels
      */
-    u.ustuck = (struct monst *) 0;
+    set_ustuck((struct monst *) 0);
     u.usteed = (struct monst *) 0;
 
     for (ltmp = (xchar) 1; ltmp <= maxledgerno(); ltmp++) {
@@ -579,7 +579,8 @@ xchar lev;
             for (x = 0; x < COLNO; x++) {
                 g.level.monsters[x][y] = 0;
                 g.level.objects[x][y] = 0;
-                levl[x][y] = cg.zerorm;
+                levl[x][y].seenv = 0;
+                levl[x][y].glyph = GLYPH_UNEXPLORED;
             }
         fmon = 0;
         g.ftrap = 0;

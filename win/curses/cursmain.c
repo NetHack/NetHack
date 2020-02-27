@@ -162,15 +162,15 @@ curses_init_nhwindows(int *argcp UNUSED,
         curses_init_nhcolors();
     } else {
         iflags.use_color = FALSE;
-        set_option_mod_status("color", SET_IN_FILE);
+        set_option_mod_status("color", set_in_config);
         iflags.wc2_guicolor = FALSE;
-        set_wc2_option_mod_status(WC2_GUICOLOR, SET_IN_FILE);
+        set_wc2_option_mod_status(WC2_GUICOLOR, set_in_config);
     }
 #else
     iflags.use_color = FALSE;
-    set_option_mod_status("color", SET_IN_FILE);
+    set_option_mod_status("color", set_in_config);
     iflags.wc2_guicolor = FALSE;
-    set_wc2_option_mod_status(WC2_GUICOLOR, SET_IN_FILE);
+    set_wc2_option_mod_status(WC2_GUICOLOR, set_in_config);
 #endif
     noecho();
     raw();
@@ -328,7 +328,7 @@ curses_create_nhwindow(int type)
     winid wid = curses_get_wid(type);
 
     if (curses_is_menu(wid) || curses_is_text(wid)) {
-        curses_start_menu(wid);
+        curses_start_menu(wid, MENU_BEHAVE_STANDARD);
         curses_add_wid(wid);
     }
 
@@ -480,12 +480,12 @@ curses_display_file(const char *filename, BOOLEAN_P must_exist)
    be used for menus.
 */
 void
-curses_start_menu(winid wid)
+curses_start_menu(winid wid, unsigned long mbehavior)
 {
     if (inv_update)
         return;
 
-    curses_create_nhmenu(wid);
+    curses_create_nhmenu(wid, mbehavior);
 }
 
 /*

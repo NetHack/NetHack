@@ -79,7 +79,7 @@ extern void curses_destroy_nhwindow(winid wid);
 extern void curses_curs(winid wid, int x, int y);
 extern void curses_putstr(winid wid, int attr, const char *text);
 extern void curses_display_file(const char *filename, BOOLEAN_P must_exist);
-extern void curses_start_menu(winid wid);
+extern void curses_start_menu(winid wid, unsigned long);
 extern void curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
                             CHAR_P accelerator, CHAR_P group_accel, int attr,
                             const char *str, unsigned int itemflags);
@@ -173,7 +173,7 @@ extern void curses_line_input_dialog(const char *prompt,
 extern int curses_character_input_dialog(const char *prompt,
                                          const char *choices, CHAR_P def);
 extern int curses_ext_cmd(void);
-extern void curses_create_nhmenu(winid wid);
+extern void curses_create_nhmenu(winid wid, unsigned long);
 extern void curses_add_nhmenu_item(winid wid, int glyph,
                                    const ANY_P *identifier, CHAR_P accelerator,
                                    CHAR_P group_accel, int attr,

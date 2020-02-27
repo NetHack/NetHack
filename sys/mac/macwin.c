@@ -1929,7 +1929,7 @@ mac_nh_poskey(int *a, int *b, int *c)
 }
 
 void
-mac_start_menu(winid win)
+mac_start_menu(winid win, unsigned long mbehavior)
 {
     HideWindow(theWindows[win].its_window);
     mac_clear_nhwindow(win);

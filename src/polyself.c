@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1579660157 2020/01/22 02:29:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1581886864 2020/02/16 21:01:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.150 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -299,7 +299,6 @@ newman()
         change_sex();
 
     adjabil(oldlvl, (int) u.ulevel);
-    reset_rndmonst(NON_PM); /* new monster generation criteria */
 
     /* random experience points for the new experience level */
     u.uexp = rndexp(FALSE);
@@ -767,7 +766,7 @@ int mntmp;
        grabber to engulfer or vice versa because engulfing by poly'd hero
        always ends immediately so won't be in effect during a polymorph] */
     if (!sticky && !u.uswallow && u.ustuck && sticks(g.youmonst.data))
-        u.ustuck = 0;
+        set_ustuck((struct monst *) 0);
     else if (sticky && !sticks(g.youmonst.data))
         uunstick();
 
@@ -1622,12 +1621,14 @@ domindblast()
 void
 uunstick()
 {
-    if (!u.ustuck) {
+    struct monst *mtmp = u.ustuck;
+
+    if (!mtmp) {
         impossible("uunstick: no ustuck?");
         return;
     }
-    pline("%s is no longer in your clutches.", Monnam(u.ustuck));
-    u.ustuck = 0;
+    set_ustuck((struct monst *) 0); /* before pline() */
+    pline("%s is no longer in your clutches.", Monnam(mtmp));
 }
 
 void

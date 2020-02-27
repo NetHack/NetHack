@@ -480,7 +480,7 @@ lua_State *L;
     luaL_checktype(L, argc, LUA_TTABLE);
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     lua_pushnil(L); /* first key */
     while (lua_next(L, argc) != 0) {

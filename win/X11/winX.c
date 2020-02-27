@@ -1492,8 +1492,8 @@ char **argv;
         window_list[i].type = NHW_NONE;
 
     /* add another option that can be set */
-    set_wc_option_mod_status(WC_TILED_MAP, SET_IN_GAME);
-    set_option_mod_status("mouse_support", SET_IN_GAME);
+    set_wc_option_mod_status(WC_TILED_MAP, set_in_game);
+    set_option_mod_status("mouse_support", set_in_game);
 
     load_default_resources(); /* create default_resource_data[] */
 
@@ -1957,7 +1957,7 @@ boolean complain;
 
     newwin = X11_create_nhwindow(NHW_MENU);
     wp = &window_list[newwin];
-    X11_start_menu(newwin);
+    X11_start_menu(newwin, MENU_BEHAVE_STANDARD);
 
     any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
