@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1573290422 2019/11/09 09:07:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1582925432 2020/02/28 21:30:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -170,6 +170,7 @@ static void
 vomiting_dialogue()
 {
     const char *txt = 0;
+    char buf[BUFSZ];
     long v = (Vomiting & TIMEOUT);
 
     /* note: nhtimeout() hasn't decremented timed properties for the
@@ -180,6 +181,8 @@ vomiting_dialogue()
         break;
     case 11:
         txt = vomiting_texts[1];
+        if (strstri(txt, " confused") && Confusion)
+            txt = strsubst(strcpy(buf, txt), " confused", " more confused");
         break;
     case 6:
         make_stunned((HStun & TIMEOUT) + (long) d(2, 4), FALSE);
@@ -193,6 +196,8 @@ vomiting_dialogue()
         break;
     case 8:
         txt = vomiting_texts[2];
+        if (strstri(txt, " think") && Stunned)
+            txt = strsubst(strcpy(buf, txt), "can't seem to ", "can't ");
         break;
     case 5:
         txt = vomiting_texts[3];
@@ -591,7 +596,7 @@ nh_timeout()
                 break;
             case FAST:
                 if (!Very_fast)
-                    You_feel("yourself slowing down%s.",
+                    You_feel("yourself slow down%s.",
                              Fast ? " a bit" : "");
                 break;
             case CONFUSION:
