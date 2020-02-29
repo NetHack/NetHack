@@ -34,7 +34,7 @@ des.region({ region={17,06, 18,11}, lit=0, type="beehive" })
 des.region({ region={20,06,26,11},lit=0,type="ordinary",prefilled=1,
              contents = function()
                 local w = "north";
-                if math.random(0,99) < 50 then w = "west" end
+                if percent(50) then w = "west" end
                 des.door({ state="secret", wall=w })
              end
 });

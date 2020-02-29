@@ -33,31 +33,31 @@ des.map([[
 -----                   ------                     -------  ---------------
 ]]);
 
-if math.random(0, 99) < 75 then
-  if math.random(0, 99) < 50 then
+if percent(75) then
+  if percent(50) then
     des.terrain(selection.line(25,8, 25,9), "|")
   else
     des.terrain(selection.line(16,13, 17,13), "-")
   end
 end
-if math.random(0, 99) < 75 then
-  if math.random(0, 99) < 50 then
+if percent(75) then
+  if percent(50) then
     des.terrain(selection.line(36,10, 36,11), "|")
   else
     des.terrain(selection.line(32,15, 33,15), "-")
   end
 end
-if math.random(0, 99) < 50 then
+if percent(50) then
   des.terrain(selection.area(21,4, 22,5), ".")
   des.terrain(selection.line(14,9, 14,10), "|")
 end
-if math.random(0, 99) < 50 then
+if percent(50) then
   des.terrain({46,13}, "|")
   des.terrain(selection.line(43,5, 47,5), "-")
   des.terrain(selection.line(42,6, 46,6), ".")
   des.terrain(selection.line(46,7, 47,7), ".")
 end
-if math.random(0,99) < 50 then
+if percent(50) then
   des.terrain(selection.area(69,11, 71,11), "-")
 end
 

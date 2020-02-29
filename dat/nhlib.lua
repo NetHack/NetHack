@@ -28,5 +28,5 @@ end
 
 -- percent(20) returns true 20% of the time
 function percent(threshold)
-   return math.random(0,99) < threshold
+   return math.random(0, 99) < threshold
 end
