@@ -5788,8 +5788,7 @@ boolean val_allowed;
 }
 
 void
-set_duplicate_opt_detection(on_or_off)
-int on_or_off;
+reset_duplicate_opt_detection(VOID_ARGS)
 {
     int k;
 

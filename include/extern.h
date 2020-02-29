@@ -1869,7 +1869,7 @@ E char FDECL(map_menu_cmd, (CHAR_P));
 E void FDECL(show_menu_controls, (winid, BOOLEAN_P));
 E void FDECL(assign_warnings, (uchar *));
 E char *FDECL(nh_getenv, (const char *));
-E void FDECL(set_duplicate_opt_detection, (int));
+E void NDECL(reset_duplicate_opt_detection);
 E void FDECL(set_wc_option_mod_status, (unsigned long, int));
 E void FDECL(set_wc2_option_mod_status, (unsigned long, int));
 E void FDECL(set_option_mod_status, (const char *, int));

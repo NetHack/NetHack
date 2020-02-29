@@ -3059,7 +3059,7 @@ int src;
         return FALSE;
 
     /* begin detection of duplicate configfile options */
-    set_duplicate_opt_detection(1);
+    reset_duplicate_opt_detection();
     free_config_sections();
     iflags.parse_config_file_src = src;
 
@@ -3068,7 +3068,7 @@ int src;
 
     free_config_sections();
     /* turn off detection of duplicate configfile options */
-    set_duplicate_opt_detection(0);
+    reset_duplicate_opt_detection();
     return rv;
 }
 
