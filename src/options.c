@@ -306,7 +306,7 @@ register char *opts;
 boolean tinitial, tfrom_file;
 {
     char *op;
-    boolean negated, got_match, has_val = FALSE;
+    boolean negated, got_match = FALSE, has_val = FALSE;
     int i, matchidx = -1, optresult = optn_err, optlen, optlen_wo_val;
     boolean retval = TRUE;
 
@@ -5789,7 +5789,7 @@ boolean val_allowed;
 
 void
 set_duplicate_opt_detection(on_or_off)
-int on_or_off;
+int on_or_off UNUSED;
 {
     int k;
 
