@@ -2514,6 +2514,8 @@ E struct selectionvar *FDECL(selection_filter_mapchar, (struct selectionvar *,
 E void FDECL(set_floodfillchk_match_under, (XCHAR_P));
 E void FDECL(selection_do_ellipse, (struct selectionvar *,
                                     int, int, int, int, int));
+E void FDECL(selection_do_gradient, (struct selectionvar *, long, long,
+                                     long, long, long, long, long, long));
 E void NDECL(update_croom);
 E const char *FDECL(get_trapname_bytype, (int));
 E void FDECL(l_register_des, (lua_State *));

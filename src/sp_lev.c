@@ -4683,6 +4683,8 @@ long x, y, x2, y2, gtyp, mind, maxd, limit;
 
     switch (gtyp) {
     default:
+        impossible("Unrecognized gradient type! Defaulting to radial...");
+        /* FALLTHRU */
     case SEL_GRADIENT_RADIAL: {
         for (dx = 0; dx < COLNO; dx++)
             for (dy = 0; dy < ROWNO; dy++) {
