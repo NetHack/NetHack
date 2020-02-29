@@ -88,7 +88,7 @@ des.object({ id = "corpse", montype="watchman" })
 des.object({ id = "corpse", montype="watch captain" })
 
 -- Rubble!
-for i=1,9 + math.random(2 - 1,2*5) do
+for i=1,9 + d(5) do
   if percent(90) then
     des.object("boulder")
   end
@@ -96,13 +96,13 @@ for i=1,9 + math.random(2 - 1,2*5) do
 end
 
 -- Guarantee 7 candles since we won't have Izchak available
-des.object({ id = "wax candle", coord = place[4], quantity = math.random(1,2) })
+des.object({ id = "wax candle", coord = place[4], quantity = d(2) })
 
-des.object({ id = "wax candle", coord = place[1], quantity = math.random(2,4) })
-des.object({ id = "wax candle", coord = place[2], quantity = math.random(1,2) })
-des.object({ id = "tallow candle", coord = place[3], quantity = math.random(1,3) })
-des.object({ id = "tallow candle", coord = place[2], quantity = math.random(1,2) })
-des.object({ id = "tallow candle", coord = place[4], quantity = math.random(1,2) })
+des.object({ id = "wax candle", coord = place[1], quantity = d(2,2) })
+des.object({ id = "wax candle", coord = place[2], quantity = d(2) })
+des.object({ id = "tallow candle", coord = place[3], quantity = d(3) })
+des.object({ id = "tallow candle", coord = place[2], quantity = d(2) })
+des.object({ id = "tallow candle", coord = place[4], quantity = d(2) })
 
 -- go ahead and leave a lamp next to one corpse to be suggestive
 -- and some empty wands...
@@ -118,7 +118,7 @@ des.object({ id = "magic missile", coord = place[5], buc="uncursed", spe=0 })
 local inside = selection.floodfill(18,8)
 local near_temple = selection.area(17,8, 23,14) & inside
 
-for i=1,5 + math.random(1 - 1,1*10) do
+for i=1,5 + d(10) do
    if percent(50) then
       des.monster({ id = "orc-captain", coord = { inside:rndcoord(1) }, peaceful=0 });
    else
@@ -130,12 +130,12 @@ for i=1,5 + math.random(1 - 1,1*10) do
    end
 end
 -- shamans can be hanging out in/near the temple
-for i=1,math.random(2 - 1,2*3) do
+for i=1,d(2,3) do
    des.monster({ id = "orc shaman", coord = { near_temple:rndcoord(0) }, peaceful=0 });
 end
 -- these are not such a big deal
 -- to run into outside the bars
-for i=1,9 + math.random(2 - 1,2*5) do
+for i=1,9 + d(2,5) do
    if percent(90) then
       des.monster({ id = "hill orc", peaceful = 0 })
    else

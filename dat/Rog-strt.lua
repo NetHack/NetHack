@@ -153,10 +153,10 @@ des.monster({ id = "leprechaun", x=74, y=04, peaceful=0 })
 des.monster({ id = "leprechaun", x=25, y=19, peaceful=0 })
 des.monster({ id = "water nymph", x=25, y=18, peaceful=0 })
 -- Wandering the streets.
-for i=1,4 + math.random(1 - 1,1*3)  do
+for i=1,4 + d(3)  do
    des.monster({ id = "water nymph", coord = {streets:rndcoord(1)}, peaceful=0 })
    des.monster({ id = "leprechaun", coord = {streets:rndcoord(1)}, peaceful=0 })
 end
-for i=1,7 + math.random(1 - 1,1*3)  do
+for i=1,7 + d(3)  do
    des.monster({ id = "chameleon", coord = {streets:rndcoord(1)}, peaceful=0 })
 end

@@ -50,12 +50,12 @@ des.object("chest",niches[2])
 des.object("chest",niches[3])
 des.object({ id = "chest", coord=niches[4],
              contents = function()
-                des.object({ id = "wax candle", quantity=math.random(4,8) })
+                des.object({ id = "wax candle", quantity=d(4,2) })
              end
 });
 des.object({ id = "chest", coord=niches[5],
              contents = function()
-                des.object({ id = "tallow candle", quantity=math.random(4,8) })
+                des.object({ id = "tallow candle", quantity=d(4,2) })
              end
 });
 -- We have to protect the tower against outside attacks
