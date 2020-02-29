@@ -641,9 +641,6 @@ const struct instance_globals g_init = {
     0, /* spl_sortmode */
     NULL, /* spl_orderindx */
 
-    /* teleport.c */
-    NULL, /* telescroll */
-
     /* timeout.c */
     UNDEFINED_PTR, /* timer_base */
     1, /* timer_id */

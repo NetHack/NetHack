@@ -408,15 +408,6 @@ int teleds_flags;
        been updated for new location instead of right after u_on_newpos() */
     if (levl[u.ux][u.uy].typ != levl[u.ux0][u.uy0].typ)
         switch_terrain();
-    if (g.telescroll) {
-        /* when teleporting by scroll, we need to handle discovery
-           now before getting feedback about any objects at our
-           destination since we might land on another such scroll */
-        if (distu(u.ux0, u.uy0) >= 16 || !couldsee(u.ux0, u.uy0))
-            learnscroll(g.telescroll);
-        else
-            g.telescroll = 0; /* no discovery by scrolltele()'s caller */
-    }
     /* sequencing issue:  we want guard's alarm, if any, to occur before
        room entry message, if any, so need to check for vault exit prior
        to spoteffects; but spoteffects() sets up new value for u.urooms
@@ -500,14 +491,12 @@ boolean force_it;
 void
 tele()
 {
-    (void) scrolltele((struct obj *) 0);
+    scrolltele((struct obj *) 0);
 }
 
-/* teleport the hero; return true if scroll of teleportation should become
-   discovered; teleds() will usually do the actual discovery, since the
-   outcome sometimes depends upon destination and discovery needs to be
-   performed before arrival, in case we land on another teleport scroll */
-boolean
+/* teleport the hero, possibly by scroll (will accept null for teleporting not
+ * by scroll) */
+void
 scrolltele(scroll)
 struct obj *scroll;
 {
@@ -515,11 +504,12 @@ struct obj *scroll;
     boolean result = FALSE; /* don't learn scroll */
 
     /* Disable teleportation in stronghold && Vlad's Tower */
-    if (noteleport_level(&g.youmonst)) {
-        if (!wizard) {
-            pline("A mysterious force prevents you from teleporting!");
-            return TRUE;
+    if (noteleport_level(&g.youmonst) && !wizard) {
+        pline("A mysterious force prevents you from teleporting!");
+        if (scroll) {
+            learnscroll(scroll); /* this is obviously a teleport scroll */
         }
+        return;
     }
 
     /* don't show trap if "Sorry..." */
@@ -529,7 +519,11 @@ struct obj *scroll;
     if ((u.uhave.amulet || On_W_tower_level(&u.uz)) && !rn2(3)) {
         You_feel("disoriented for a moment.");
         if (!wizard || yn("Override?") != 'y')
-            return FALSE;
+            /* This message doesn't unambiguously indicate that a scroll you
+             * read was just a scroll (it does if you're spoiled, though). Due
+             * to this, we can't just if(scroll) learnscroll(scroll); at the top
+             * of the function. */
+            return;
     }
     if ((Teleport_control && !Stunned) || wizard) {
         if (unconscious()) {
@@ -541,37 +535,37 @@ struct obj *scroll;
             if (u.usteed)
                 Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
             pline("Where do %s want to be teleported?", whobuf);
+            if (scroll) {
+                learnscroll(scroll);
+            }
             cc.x = u.ux;
             cc.y = u.uy;
             if (getpos(&cc, TRUE, "the desired position") < 0)
-                return TRUE; /* abort */
+                return; /* abort */
             /* possible extensions: introduce a small error if
                magic power is low; allow transfer to solid rock */
             if (teleok(cc.x, cc.y, FALSE)) {
                 /* for scroll, discover it regardless of destination */
-                if (scroll)
-                    learnscroll(scroll);
                 teleds(cc.x, cc.y, TELEDS_TELEPORT);
-                return TRUE;
+                return;
             }
             pline("Sorry...");
-            result = TRUE;
         }
     } else if (scroll && scroll->blessed) {
         /* (this used to be handled in seffects()) */
-        if (yn("Do you wish to teleport?") == 'n')
-            return TRUE;
-        result = TRUE;
+        if (yn("Do you wish to teleport?") == 'n') {
+            learnscroll(scroll); /* this is obviously a teleport scroll */
+            return;
+        }
     }
 
-    g.telescroll = scroll;
+    /* you always get a "materialize" message regardless of how far you
+     * teleported; this unambiguously indicates that the scroll is a
+     * teleportation scroll. */
+    if (scroll) {
+        learnscroll(scroll);
+    }
     (void) safe_teleds(TELEDS_TELEPORT);
-    /* teleds() will leave g.telescroll intact iff random destination
-       is far enough away for scroll discovery to be warranted */
-    if (g.telescroll)
-        result = TRUE;
-    g.telescroll = 0; /* reset */
-    return result;
 }
 
 /* ^T command; 'm ^T' == choose among several teleport modes */

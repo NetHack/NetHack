@@ -1464,8 +1464,14 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     case SCR_TELEPORTATION:
         if (confused || scursed) {
             level_tele();
+            /* gives "materialize on different/same level!" message, must be a
+             * teleport scroll */
+            g.known = TRUE;
         } else {
-            g.known = scrolltele(sobj);
+            scrolltele(sobj);
+            /* this will call learnscroll() as appropriate, and has results
+             * which maybe shouldn't result in the scroll becoming known; either
+             * way, no need to set g.known */
         }
         break;
     case SCR_GOLD_DETECTION:

@@ -1130,9 +1130,6 @@ struct instance_globals {
     int spl_sortmode;   /* index into spl_sortchoices[] */
     int *spl_orderindx; /* array of g.spl_book[] indices */
 
-    /* teleport.c */
-    struct obj *telescroll; /* non-null when teleporting via this scroll */
-
     /* timeout.c */
     /* ordered timer list */
     struct fe *timer_base; /* "active" */

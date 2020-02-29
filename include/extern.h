@@ -2564,7 +2564,7 @@ E void FDECL(teleds, (int, int, int));
 E boolean FDECL(safe_teleds, (int));
 E boolean FDECL(teleport_pet, (struct monst *, BOOLEAN_P));
 E void NDECL(tele);
-E boolean FDECL(scrolltele, (struct obj *));
+E void FDECL(scrolltele, (struct obj *));
 E int NDECL(dotelecmd);
 E int FDECL(dotele, (BOOLEAN_P));
 E void NDECL(level_tele);
