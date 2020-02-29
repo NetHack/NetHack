@@ -151,7 +151,7 @@ options: $(GAME)
 
 quest.lua: $(GAME)
 
-spec_levs:
+spec_levs: lua_syntax_check
 	( cd dat ; $(MAKE) spec_levs )
 	( cd dat ; $(MAKE) quest_levs )
 
@@ -260,6 +260,14 @@ fetch-Lua:
 	( mkdir -p lib ; cd lib ; \
 	  curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz ; \
 	  tar zxf lua-$(LUA_VERSION).tar.gz ; rm -f lua-$(LUA_VERSION).tar.gz )
+
+# if lua is installed, luac should be as well. Leverage its ability to quietly
+# compile lua files while producing no output or other side effects in order to
+# check the basic syntax of files.
+# Note: this won't detect things like calling a function with the wrong number
+# or types of arguments.
+lua_syntax_check:
+	luac -p dat/*.lua
 
 update: $(GAME) recover $(VARDAT) spec_levs
 #	(don't yank the old version out from under people who're playing it)
