@@ -1285,6 +1285,23 @@ have_lizard()
     return FALSE;
 }
 
+struct obj *
+u_carried_gloves() {
+    struct obj *otmp, *gloves = (struct obj *) 0;
+
+    if (uarmg) {
+        gloves = uarmg;
+    } else {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
+            if (is_gloves(otmp)) {
+                gloves = otmp;
+                break;
+            }
+    }
+    return gloves;
+}
+
+
 /* 3.6 tribute */
 struct obj *
 u_have_novel()

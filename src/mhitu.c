@@ -22,6 +22,8 @@ static void FDECL(mswings, (struct monst *, struct obj *));
 static void FDECL(wildmiss, (struct monst *, struct attack *));
 static void FDECL(hitmsg, (struct monst *, struct attack *));
 
+#define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
+
 static void
 hitmsg(mtmp, mattk)
 struct monst *mtmp;
@@ -2581,10 +2583,23 @@ struct monst *mon;
         return 1;
 
     if (uarm || uarmc) {
-        if (!Deaf)
-            verbalize("You're such a %s; I wish...",
-                      flags.female ? "sweet lady" : "nice guy");
-        else if (seewho)
+        if (!Deaf) {
+            if (!(ld() && mon->female)) {
+                verbalize("You're such a %s; I wish...",
+                          flags.female ? "sweet lady" : "nice guy");
+            } else {
+                struct obj *yourgloves = u_carried_gloves();
+
+                /* have her call your gloves by their correct
+                   name, possibly revealing them to you */
+                if (yourgloves)
+                    yourgloves->dknown = 1;
+                verbalize("Well, then you owe me %s%s!",
+                          yourgloves ? yname(yourgloves)
+                                     : "twelve pairs of gloves",
+                          yourgloves ? " and eleven more pairs of gloves" : "");
+            }
+	} else if (seewho)
             pline("%s appears to sigh.", Monnam(mon));
         /* else no regret message if can't see or hear seducer */
 

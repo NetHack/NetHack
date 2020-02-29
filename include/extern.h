@@ -1037,6 +1037,7 @@ E struct obj *FDECL(sobj_at, (int, int, int));
 E struct obj *FDECL(nxtobj, (struct obj *, int, BOOLEAN_P));
 E struct obj *FDECL(carrying, (int));
 E boolean NDECL(have_lizard);
+E struct obj *NDECL(u_carried_gloves);
 E struct obj *NDECL(u_have_novel);
 E struct obj *FDECL(o_on, (unsigned int, struct obj *));
 E boolean FDECL(obj_here, (struct obj *, int, int));
