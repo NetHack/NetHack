@@ -251,8 +251,6 @@ struct instance_flags {
     int menuinvertmode;  /* 0 = invert toggles every item;
                             1 = invert skips 'all items' item */
     int menu_headings;    /* ATR for menu headings */
-    int *opt_booldup;     /* for duplication of boolean opts in config file */
-    int *opt_compdup;     /* for duplication of compound opts in conf file */
 #ifdef ALTMETA
     boolean altmeta;      /* Alt-c sends ESC c rather than M-c */
 #endif

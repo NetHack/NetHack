@@ -33,7 +33,7 @@ struct allopt_t {
     const char *alias;
     const char *descr;
     const char *prefixgw;
-    boolean initval, has_handler, unused;
+    boolean initval, has_handler, dupdetected;
 };
 
 #endif /* OPTLIST_H */
@@ -352,7 +352,7 @@ pfx_##a,
                 &iflags.perm_invent)
     NHOPTC(petattr, 88, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                 "attributes for highlighting pets")
-    NHOPTC(pettype, 4, opt_in, set_gameview, Yes, Yes, No, No, NoAlias,
+    NHOPTC(pettype, 4, opt_in, set_gameview, Yes, Yes, No, No, "pet",
                 "your preferred initial pet type")
     NHOPTC(pickup_burden, 20, opt_in, set_in_game, No, Yes, No, Yes, NoAlias,
                 "maximum burden picked up before prompt")
@@ -408,10 +408,10 @@ pfx_##a,
     NHOPTB(showrace, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.showrace)
 #ifdef SCORE_ON_BOTL
-    NHOPTB(showscore, 0, opt_in, set_in_game, Off, No, No, No, NoAlias,
+    NHOPTB(showscore, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.showscore) 
 #else
-    NHOPTB(showscore, 0, opt_in, set_in_config, Off, No, No, No, NoAlias,
+    NHOPTB(showscore, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 (boolean *) 0) 
 #endif
     NHOPTB(silent, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
@@ -516,6 +516,13 @@ pfx_##a,
                 "video width")
     NHOPTC(video_height, 10, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "video height")
+#endif
+#ifdef TTY_TILES_ESCCODES
+    NHOPTB(vt_tiledata, 0, opt_out, set_in_config, On, Yes, No, No, NoAlias,
+                &iflags.vt_tiledata)
+#else
+    NHOPTB(vt_tiledata, 0, opt_out, set_in_config, On, Yes, No, No, NoAlias,
+                (boolean *) 0)
 #endif
     NHOPTC(warnings, 10, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "display characters for warnings")
