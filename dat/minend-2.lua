@@ -31,23 +31,23 @@ des.map([[
 ---------------------------------------------------------------------------
 ]]);
 
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain({55,14},"-")
    des.terrain({56,14},"-")
    des.terrain({61,15},"|")
    des.terrain({52,5}, "S")
    des.door("locked", 52,5)
 end
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain({18,1}, "|")
    des.terrain(selection.area(7,12, 8,13), ".")
 end
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain({49,4}, "|")
    des.terrain({21,5}, ".")
 end
-if math.random(0, 99) < 50 then
-   if math.random(0, 99) < 50 then
+if percent(50) then
+   if percent(50) then
       des.terrain({22,1}, "|")
    else
       des.terrain({50,7}, "-")

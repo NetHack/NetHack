@@ -89,7 +89,7 @@ des.object({ id = "corpse", montype="watch captain" })
 
 -- Rubble!
 for i=1,9 + math.random(2 - 1,2*5) do
-  if math.random(0,99) < 90 then
+  if percent(90) then
     des.object("boulder")
   end
   des.object("rock")
@@ -119,10 +119,10 @@ local inside = selection.floodfill(18,8)
 local near_temple = selection.area(17,8, 23,14) & inside
 
 for i=1,5 + math.random(1 - 1,1*10) do
-   if math.random(0, 99) < 50 then
+   if percent(50) then
       des.monster({ id = "orc-captain", coord = { inside:rndcoord(1) }, peaceful=0 });
    else
-      if math.random(0, 99) < 80 then
+      if percent(80) then
          des.monster({ id = "Uruk-hai", coord = { inside:rndcoord(1) }, peaceful=0 })
       else
          des.monster({ id = "Mordor orc", coord = { inside:rndcoord(1) }, peaceful=0 })
@@ -136,7 +136,7 @@ end
 -- these are not such a big deal
 -- to run into outside the bars
 for i=1,9 + math.random(2 - 1,2*5) do
-   if math.random(0, 99) < 90 then
+   if percent(90) then
       des.monster({ id = "hill orc", peaceful = 0 })
    else
       des.monster({ id = "goblin", peaceful = 0 })
