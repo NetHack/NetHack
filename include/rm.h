@@ -438,7 +438,8 @@ struct rm {
 #define SET_TYPLIT(x, y, ttyp, llit)                              \
     {                                                             \
         if ((x) >= 0 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) { \
-            if ((ttyp) < MAX_TYPE)                                \
+            if ((ttyp) < MAX_TYPE && levl[(x)][(y)].typ != STAIRS \
+                && levl[(x)][(y)].typ != LADDER)                  \
                 levl[(x)][(y)].typ = (ttyp);                      \
             if ((ttyp) == LAVAPOOL)                               \
                 levl[(x)][(y)].lit = 1;                           \
