@@ -12,13 +12,13 @@
 --     (player or nonplayer).
 --   Teleporting boulders.
 --   Digging in the floor.
+--   Jumping.
+--   Being pulled by a thrown iron ball.
+--   Hurtling through the air from Newton's 3rd law.
 -- The following actions are permitted, but with a luck penalty:
 --   Breaking boulders.
 --   Stone-to-fleshing boulders.
 --   Creating new boulders (e.g., with a scroll of earth).
---   Jumping.
---   Being pulled by a thrown iron ball.
---   Hurtling through the air from Newton's 3rd law.
 --   Squeezing past boulders when naked or as a giant.
 -- These actions are not permitted:
 --   Moving diagonally between two boulders and/or walls.
