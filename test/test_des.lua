@@ -285,7 +285,7 @@ function test_door()
    des.door("nodoor", 12,12);
    des.door({ x = 13, y = 12, state = "open" });
    des.door({ coord = {14, 12}, state = "open" });
-   des.room({ type = "graveyard", contents = function()
+   des.room({ type = "ordinary", contents = function()
                  des.door({ wall = "north", pos = 1 });
                  des.door({ wall = "random", state = "locked" });
                          end
@@ -309,13 +309,13 @@ end
 function test_room()
    des.reset_level();
    des.level_init({ style = "solidfill", fg=" " });
-   des.room({ type = " ordinary", lit = 1,
+   des.room({ type = "ordinary", lit = 1,
               x=3, y=3, xalign="center", yalign="center",
               w=11, h=9, contents = function()
                  des.room({ x=4, y=3, w=3,h=3 });
               end
    });
-   des.room({ type=" ordinary", coord={3, 3}, w=3, h=3 });
+   des.room({ type="ordinary", coord={3, 3}, w=3, h=3 });
    des.room();
    des.room({ contents = function()
                  des.object();
