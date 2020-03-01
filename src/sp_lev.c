@@ -3496,6 +3496,8 @@ int defval;
                 res = room_types[i].type;
                 break;
             }
+        if (!room_types[i].name)
+            impossible("Unknown room type '%s'", roomstr);
     }
     Free(roomstr);
     return res;

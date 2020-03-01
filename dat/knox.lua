@@ -65,7 +65,7 @@ function treasure_spot(x,y)
    end
 end
 
-des.region({ region={21,08,35,11}, lit=1, type="orginary" })
+des.region({ region={21,08,35,11}, lit=1, type="ordinary" })
 local treasury = selection.area(21,08,35,11);
 treasury:iterate(treasure_spot);
 
