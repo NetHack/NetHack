@@ -1,4 +1,4 @@
-The definitition for each OPTIONS= option resides in include/optlish.h as of
+The definitition for each OPTIONS= option resides in include/optlist.h as of
 February 2020 in 3.7 WIP.
 
 Boolean and compound options are combined into a single allopt[] array.
@@ -18,8 +18,8 @@ To add an option:
           iii) an initialization of an element in the allopt[] array, at
                index opt_xxxx from step ii (xxxx is the option name).
 
-    2. Create the optn_xxxx() function in options.c. Failure to do that will
-       result in a link error of "undefined function xxxx." The functions are
+    2. Create the optfn_xxxx() function in options.c. Failure to do that will
+       result in a link error of "undefined function optfn_xxxx." The functions are
        in options.c in alphabetical sequence by function name.
 
        The skeletal template for an optn_xxxx() function is:
@@ -44,7 +44,7 @@ To add an option:
                     /* return the current val of option in supplied opts buf */
                     if (!opts)
                         return optn_err;
-                    Sprintf(opts, "%s", fakefunction to get xxxx value);
+                    Sprintf(opts, "%s", fakefunction_to_get_xxxx_value_goes_here);
                     return optn_ok;
                 }
                 if (req == do_handler) {
@@ -65,7 +65,7 @@ To add an option:
        options help (option_help()), the long options help (dat/opthelp)
        and also the Guidebooks.
 
-Here's some information about the req ID's passed to optn_xxxx() functions.
+Here's some information about the req ID's passed to optfn_xxxx() functions.
 Each optfn_xxxx() function can be called with a req id of: do_init, do_set,
 do_handler or get_val.
 
