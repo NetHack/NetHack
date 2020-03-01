@@ -61,6 +61,11 @@ enum lvlinit_types {
 #define SEL_GRADIENT_RADIAL 0
 #define SEL_GRADIENT_SQUARE 1
 
+/* light states for terrain replacements, specifically for SET_TYPLIT
+ * (not used for init_level) */
+#define SET_LIT_RANDOM -1
+#define SET_LIT_NOCHANGE -2
+
 #define SP_COORD_IS_RANDOM 0x01000000L
 /* Humidity flags for get_location() and friends, used with
  * SP_COORD_PACK_RANDOM() */

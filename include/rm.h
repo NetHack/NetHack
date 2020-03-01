@@ -443,8 +443,8 @@ struct rm {
                 levl[(x)][(y)].typ = (ttyp);                      \
             if ((ttyp) == LAVAPOOL)                               \
                 levl[(x)][(y)].lit = 1;                           \
-            else if ((schar)(llit) != -2) {                       \
-                if ((schar)(llit) == -1)                          \
+            else if ((schar)(llit) != SET_LIT_NOCHANGE) {         \
+                if ((schar)(llit) == SET_LIT_RANDOM)              \
                     levl[(x)][(y)].lit = rn2(2);                  \
                 else                                              \
                     levl[(x)][(y)].lit = (llit);                  \

@@ -10,7 +10,7 @@
  */
 
 #define IN_SP_LEV_C
- 
+
 #include "hack.h"
 #include "sp_lev.h"
 
@@ -23,7 +23,7 @@ typedef void FDECL((*select_iter_func), (int, int, genericptr));
 
 extern void FDECL(mkmap, (lev_init *));
 
-static void NDECL(create_des_coder); 
+static void NDECL(create_des_coder);
 static void NDECL(solidify_map);
 static void FDECL(lvlfill_maze_grid, (int, int, int, int, SCHAR_P));
 static void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
@@ -4873,7 +4873,7 @@ lua_State *L;
     int argc = lua_gettop(L);
 
     create_des_coder();
-    tmpterrain.tlit = 0;
+    tmpterrain.tlit = SET_LIT_NOCHANGE;
     tmpterrain.ter = INVALID_TYPE;
 
     if (argc == 1) {
@@ -4888,7 +4888,7 @@ lua_State *L;
             lua_pop(L, 1);
         }
         tmpterrain.ter = get_table_mapchr(L, "typ");
-        tmpterrain.tlit = get_table_int_opt(L, "lit", 0);
+        tmpterrain.tlit = get_table_int_opt(L, "lit", SET_LIT_NOCHANGE);
     } else if (argc == 2 && lua_type(L, 1) == LUA_TTABLE
                && lua_type(L, 2) == LUA_TSTRING) {
         int tx, ty;
@@ -4943,7 +4943,7 @@ lua_State *L;
     fromtyp = get_table_mapchr(L, "fromterrain");
 
     rt.chance = get_table_int_opt(L, "chance", 100);
-    rt.tolit = get_table_int_opt(L, "lit", 1);
+    rt.tolit = get_table_int_opt(L, "lit", SET_LIT_NOCHANGE);
     rt.toter = totyp;
     rt.fromter = fromtyp;
     rt.x1 = get_table_int_opt(L, "x1", -1);
