@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1581322661 2020/02/10 08:17:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1583023462 2020/03/01 00:44:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1093,8 +1093,9 @@ int how;
 #ifdef HANGUPHANDLING
         || g.program_state.done_hup
 #endif
-        ) {
-        /* skip status update if panicking or disconnected */
+        || (how == QUIT && done_stopprint)) {
+        /* skip status update if panicking or disconnected
+           or answer of 'q' to "Really quit?" */
         g.context.botl = g.context.botlx = iflags.time_botl = FALSE;
     } else {
         /* otherwise force full status update */
