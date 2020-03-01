@@ -70,8 +70,8 @@ pfx_##a,
 #endif
 
 /* B:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, boolptr */
-/* C:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, descr  */
-/* P:pfx, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, descr */
+/* C:nm, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc */
+/* P:pfx, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc*/
 
     NHOPTB(acoustics, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                &flags.acoustics)
@@ -518,10 +518,10 @@ pfx_##a,
                 "video height")
 #endif
 #ifdef TTY_TILES_ESCCODES
-    NHOPTB(vt_tiledata, 0, opt_out, set_in_config, On, Yes, No, No, NoAlias,
+    NHOPTB(vt_tiledata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 &iflags.vt_tiledata)
 #else
-    NHOPTB(vt_tiledata, 0, opt_out, set_in_config, On, Yes, No, No, NoAlias,
+    NHOPTB(vt_tiledata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 (boolean *) 0)
 #endif
     NHOPTC(warnings, 10, opt_in, set_in_config, No, Yes, No, No, NoAlias,

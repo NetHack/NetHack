@@ -107,7 +107,7 @@ extern char ttycolors[CLR_MAX]; /* in sys/msdos/video.c */
 #endif
 
 static char empty_optstr[] = { '\0' };
-boolean duplicate;
+boolean duplicate, using_alias;
 
 static const char def_inv_order[MAXOCLASSES] = {
     COIN_CLASS, AMULET_CLASS, WEAPON_CLASS, ARMOR_CLASS, FOOD_CLASS,
@@ -311,6 +311,7 @@ boolean tinitial, tfrom_file;
     boolean retval = TRUE;
 
     duplicate = FALSE;
+    using_alias = FALSE;
     g.opt_initial = tinitial;
     g.opt_from_file = tfrom_file;
     if ((op = index(opts, ',')) != 0) {
@@ -405,6 +406,7 @@ boolean tinitial, tfrom_file;
                                       allopt[i].valok);
             if (got_match) {
                 matchidx = i;
+                using_alias = TRUE;
                 break;
             }
         }
@@ -4518,10 +4520,6 @@ char *op;
         if (!g.opt_initial && (allopt[optidx].setwhere == set_in_config))
             return optn_err;
 
-        /* 0 means boolean opts */
-        if (duplicate_opt_detection(optidx))
-            complain_about_duplicate(optidx);
-
         op = string_for_opt(opts, TRUE);
         if (op != empty_optstr) {
             if (negated) {
@@ -5801,7 +5799,7 @@ duplicate_opt_detection(optidx)
 int optidx;
 {
     if (g.opt_initial && g.opt_from_file)
-        return allopt[optidx].dupdetected;
+        return allopt[optidx].dupdetected++;
     return FALSE;
 }
 
@@ -5809,15 +5807,20 @@ static void
 complain_about_duplicate(optidx)
 int optidx;
 {
+    char buf[BUFSZ];
+
 #ifdef MAC
     /* the Mac has trouble dealing with the output of messages while
      * processing the config file.  That should get fixed one day.
      * For now just return.
      */
 #else /* !MAC */
-    config_error_add("%s option specified multiple times: %s",
+    buf[0] = '\0';
+    if (using_alias)
+        Sprintf(buf, " (via alias: %s)", allopt[optidx].alias);
+    config_error_add("%s option specified multiple times: %s%s",
                      (allopt[optidx].opttyp == CompOpt) ? "compound" : "boolean",
-                     allopt[optidx].name);
+                     allopt[optidx].name, buf);
 #endif /* ?MAC */
     return;
 }
@@ -7076,7 +7079,7 @@ char **opp;
                 return FALSE;
             }
         } else {
-            if (duplicate_opt_detection(optidx))
+            if (duplicate && !allopt[optidx].dupeok)
                 complain_about_duplicate(optidx);
             *opp = op;
             return TRUE;
