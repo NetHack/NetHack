@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $ $NHDT-Date: 1582364458 2020/02/22 09:40:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ $NHDT-Date: 1583073988 2020/03/01 14:46:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -167,6 +167,9 @@ tipping your cap might get a response
 special levels can be flipped horizontally and/or vertically
 new special level initialization routine, "swamp"
 demon lords and princes suppress teleporting in Gehennom
+for !fixinv option where inventory letters normally don't stick, try to put
+	a throw-and-return weapon back into the same inventory slot it gets
+	thrown from; only works if it does return and is successfully caught
 
 
 Platform- and/or Interface-Specific New Features

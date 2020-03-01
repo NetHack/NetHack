@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1581322662 2020/02/10 08:17:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.290 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1583073990 2020/03/01 14:46:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.294 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,6 +19,7 @@ static int FDECL(invletter_value, (CHAR_P));
 static int FDECL(CFDECLSPEC sortloot_cmp, (const genericptr,
                                                const genericptr));
 static void NDECL(reorder_invent);
+static struct obj *FDECL(addinv_core0, (struct obj *, struct obj *));
 static void FDECL(noarmor, (BOOLEAN_P));
 static void FDECL(invdisp_nothing, (const char *, const char *));
 static boolean FDECL(worn_wield_only, (struct obj *));
@@ -873,9 +874,9 @@ struct obj *obj;
  * Add obj to the hero's inventory.  Make sure the object is "free".
  * Adjust hero attributes as necessary.
  */
-struct obj *
-addinv(obj)
-struct obj *obj;
+static struct obj *
+addinv_core0(obj, other_obj)
+struct obj *obj, *other_obj;
 {
     struct obj *otmp, *prev;
     int saved_otyp = (int) obj->otyp; /* for panic */
@@ -892,6 +893,20 @@ struct obj *obj;
     obj->was_thrown = 0;       /* not meaningful for invent */
 
     addinv_core1(obj);
+
+    /* for addinv_before(); if something has been removed and is now being
+       reinserted, try to put it in the same place instead of merging or
+       placing at end; for thrown-and-return weapon with !fixinv setting */
+    if (other_obj) {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj) {
+            if (otmp->nobj == other_obj) {
+                obj->nobj = other_obj;
+                otmp->nobj = obj;
+                obj->where = OBJ_INVENT;
+                goto added;
+            }
+        }
+    }
 
     /* merge with quiver in preference to any other inventory slot
        in case quiver and wielded weapon are both eligible; adding
@@ -937,6 +952,22 @@ struct obj *obj;
     carry_obj_effects(obj); /* carrying affects the obj */
     update_inventory();
     return obj;
+}
+
+/* add obj to the hero's inventory in the default fashion */
+struct obj *
+addinv(obj)
+struct obj *obj;
+{
+    return addinv_core0(obj, (struct obj *) 0);
+}
+
+/* add obj to the hero's inventory by inserting in front of a specific item */
+struct obj *
+addinv_before(obj, other_obj)
+struct obj *obj, *other_obj;
+{
+    return addinv_core0(obj, other_obj);
 }
 
 /*

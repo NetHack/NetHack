@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1582592780 2020/02/25 01:06:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.804 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1583073988 2020/03/01 14:46:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.809 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -575,7 +575,7 @@ E void FDECL(hitfloor, (struct obj *, BOOLEAN_P));
 E void FDECL(hurtle, (int, int, int, BOOLEAN_P));
 E void FDECL(mhurtle, (struct monst *, int, int, int));
 E boolean FDECL(throwing_weapon, (struct obj *));
-E void FDECL(throwit, (struct obj *, long, BOOLEAN_P));
+E void FDECL(throwit, (struct obj *, long, BOOLEAN_P, struct obj *));
 E int FDECL(omon_adj, (struct monst *, struct obj *, BOOLEAN_P));
 E int FDECL(thitmonst, (struct monst *, struct obj *));
 E int FDECL(hero_breaks, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P));
@@ -1024,8 +1024,9 @@ E int FDECL(ckunpaid, (struct obj *));
 E void FDECL(addinv_core1, (struct obj *));
 E void FDECL(addinv_core2, (struct obj *));
 E struct obj *FDECL(addinv, (struct obj *));
-E struct obj *FDECL(hold_another_object,
-                    (struct obj *, const char *, const char *, const char *));
+E struct obj *FDECL(addinv_before, (struct obj *, struct obj *));
+E struct obj *FDECL(hold_another_object, (struct obj *, const char *,
+                                          const char *, const char *));
 E void FDECL(useupall, (struct obj *));
 E void FDECL(useup, (struct obj *));
 E void FDECL(consume_obj_charge, (struct obj *, BOOLEAN_P));
