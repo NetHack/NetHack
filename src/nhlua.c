@@ -1051,8 +1051,8 @@ const char *fname;
 
     llret = luaL_loadbuffer(L, buf, strlen(buf), altfname);
     if (llret != LUA_OK) {
-        impossible("luaL_loadbuffer: Error loading %s (errcode %i)",
-                   altfname, llret);
+        impossible("luaL_loadbuffer: Error loading %s: %s",
+                   altfname, lua_tostring(L, -1));
         ret = FALSE;
         goto give_up;
     } else {
