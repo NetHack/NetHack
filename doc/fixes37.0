@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ $NHDT-Date: 1583073988 2020/03/01 14:46:28 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.115 $ $NHDT-Date: 1583102142 2020/03/01 22:35:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -60,6 +60,7 @@ prevent ravens from blinding other ravens: /corvus oculum corvi non eruit/
 have ^X provide more information when held or swallowed
 avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
 display wasn't updating immediately after toggling hilite_pet option
+randomly choosing role could lead to crash via segfault
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
