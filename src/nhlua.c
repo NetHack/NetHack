@@ -256,8 +256,8 @@ lua_State *L;
                 nhl_add_table_entry_int(L, "ttyp", ttmp->ttyp);
                 nhl_add_table_entry_str(L, "ttyp_name",
                                         get_trapname_bytype(ttmp->ttyp));
-                nhl_add_table_entry_int(L, "tseen", ttmp->tseen);
-                nhl_add_table_entry_int(L, "madeby_u", ttmp->madeby_u);
+                nhl_add_table_entry_bool(L, "tseen", ttmp->tseen);
+                nhl_add_table_entry_bool(L, "madeby_u", ttmp->madeby_u);
                 switch (ttmp->ttyp) {
                 case SQKY_BOARD:
                     nhl_add_table_entry_int(L, "tnote", ttmp->tnote);
@@ -334,7 +334,7 @@ lua_State *L;
             nhl_add_table_entry_bool(L, "edge", levl[x][y].edge);
             nhl_add_table_entry_bool(L, "candig", levl[x][y].candig);
 
-            nhl_add_table_entry_int(L, "has_trap", t_at(x,y) ? 1 : 0);
+            nhl_add_table_entry_bool(L, "has_trap", t_at(x,y) ? 1 : 0);
 
             /* TODO: FIXME: levl[x][y].flags */
 
