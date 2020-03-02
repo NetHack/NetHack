@@ -87,7 +87,7 @@ enum window_option_types {
     TEXT_OPTION
 };
 
-enum {optn_err = 0, optn_ok};
+enum {optn_silenterr = -1, optn_err = 0, optn_ok};
 enum requests {do_nothing, do_init, do_set, do_handler, get_val};
 
 static struct allopt_t allopt[SIZE(allopt_init)];
@@ -463,6 +463,8 @@ boolean tinitial, tfrom_file;
         }
     }
 
+    if (optresult == optn_silenterr)
+        return FALSE;
     if (optresult == optn_ok)
         return retval;
 
@@ -514,7 +516,7 @@ char *op;
                 return optn_err;
             }
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -1321,7 +1323,7 @@ char *op;
             } else
                 flags.female = flags.initgend;
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -3041,7 +3043,7 @@ char *op;
             } else /* Backwards compatibility */
                 g.pl_race = *op;
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -3116,7 +3118,7 @@ char *op;
             } else /* Backwards compatibility */
                 nmcpy(g.pl_character, op, PL_NSIZ);
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
