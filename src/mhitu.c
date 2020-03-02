@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1581886862 2020/02/16 21:01:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1583193505 2020/03/02 23:58:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -507,7 +507,8 @@ register struct monst *mtmp;
                         || u.umonnum == PM_TRAPPER)
                         pline(
                              "Wait, %s!  There's a hidden %s named %s there!",
-                              m_monnam(mtmp), g.youmonst.data->mname, g.plname);
+                              m_monnam(mtmp),
+                              g.youmonst.data->mname, g.plname);
                     else
                         pline(
                           "Wait, %s!  There's a %s named %s hiding under %s!",
@@ -549,7 +550,7 @@ register struct monst *mtmp;
             map_invisible(mtmp->mx, mtmp->my);
         if (!youseeit)
             pline("%s %s!", Something, (likes_gold(mtmp->data)
-                                        && g.youmonst.mappearance == GOLD_PIECE)
+                                      && g.youmonst.mappearance == GOLD_PIECE)
                                            ? "tries to pick you up"
                                            : "disturbs you");
         else /* see note about m_monnam() above */
@@ -662,6 +663,9 @@ register struct monst *mtmp;
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
+        if (i > 0 && foundyou /* previous attack might have moved hero */
+            && (mtmp->mux != u.ux || mtmp->muy != u.uy))
+            continue; /* fill in sum[] with 'miss' but skip other actions */
         mon_currwep = (struct obj *)0;
         mattk = getmattk(mtmp, &g.youmonst, i, sum, &alt_attk);
         if ((u.uswallow && mattk->aatyp != AT_ENGL)
@@ -1005,8 +1009,8 @@ register struct attack *mattk;
                     dmg += rn1(4, 3); /* 3..6 */
                 if (dmg <= 0)
                     dmg = 1;
-                if (!(otmp->oartifact
-                      && artifact_hit(mtmp, &g.youmonst, otmp, &dmg, g.mhitu_dieroll)))
+                if (!(otmp->oartifact && artifact_hit(mtmp, &g.youmonst, otmp,
+                                                      &dmg, g.mhitu_dieroll)))
                     hitmsg(mtmp, mattk);
                 if (!dmg)
                     break;

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.115 $ $NHDT-Date: 1583102142 2020/03/01 22:35:42 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ $NHDT-Date: 1583193505 2020/03/02 23:58:25 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -61,6 +61,8 @@ have ^X provide more information when held or swallowed
 avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
 display wasn't updating immediately after toggling hilite_pet option
 randomly choosing role could lead to crash via segfault
+if eel bite attack caused hero to move (killed + rehumanized + crawled out
+	of water), its grab attack could succeed even if no longer adjacent
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
