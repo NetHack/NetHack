@@ -2468,6 +2468,12 @@ E void FDECL(sysopt_seduce_set, (int));
 
 /* ### sp_lev.c ### */
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+E struct mapfragment *FDECL(mapfrag_fromstr, (char *));
+E void FDECL(mapfrag_free, (struct mapfragment **));
+E schar FDECL(mapfrag_get, (struct mapfragment *, int, int));
+E boolean FDECL(mapfrag_canmatch, (struct mapfragment *));
+E const char * FDECL(mapfrag_error, (struct mapfragment *));
+E boolean FDECL(mapfrag_match, (struct mapfragment *, int, int));
 E void FDECL(flip_level, (int, BOOLEAN_P));
 E void FDECL(flip_level_rnd, (int, BOOLEAN_P));
 E boolean FDECL(check_room, (xchar *, xchar *, xchar *, xchar *, BOOLEAN_P));

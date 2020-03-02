@@ -57,7 +57,6 @@ static int FDECL(pm_to_humidity, (struct permonst *));
 static void FDECL(create_monster, (monster *, struct mkroom *));
 static void FDECL(create_object, (object *, struct mkroom *));
 static void FDECL(create_altar, (altar *, struct mkroom *));
-static void FDECL(replace_terrain, (replaceterrain *, struct mkroom *));
 static boolean FDECL(search_door, (struct mkroom *,
                                        xchar *, xchar *, XCHAR_P, int));
 static void NDECL(fix_stair_rooms);
@@ -172,6 +171,97 @@ static struct monst *invent_carrying_monster = (struct monst *) 0;
     /*
      * end of no 'g.'
      */
+
+struct mapfragment *
+mapfrag_fromstr(str)
+char *str;
+{
+    struct mapfragment *mf = (struct mapfragment *) alloc(sizeof(struct mapfragment));
+
+    char *tmps;
+
+    mf->data = dupstr(str);
+
+    (void) stripdigits(mf->data);
+    mf->wid = str_lines_maxlen(mf->data);
+    mf->hei = 0;
+    tmps = mf->data;
+    while (tmps && *tmps) {
+        char *s1 = index(tmps, '\n');
+
+        if (mf->hei > MAP_Y_LIM) {
+            free(mf->data);
+            free(mf);
+            return NULL;
+        }
+        if (s1)
+            s1++;
+        tmps = s1;
+        mf->hei++;
+    }
+    return mf;
+}
+
+void
+mapfrag_free(mf)
+struct mapfragment **mf;
+{
+    if (mf && *mf) {
+        free((*mf)->data);
+        free(*mf);
+        mf = NULL;
+    }
+}
+
+schar
+mapfrag_get(mf, x,y)
+struct mapfragment *mf;
+int x,y;
+{
+    if (y < 0 || x < 0 || y > mf->hei-1 || x > mf->wid-1)
+        panic("outside mapfrag (%i,%i), wanted (%i,%i)", mf->wid, mf->hei, x,y);
+    return splev_chr2typ(mf->data[y * (mf->wid + 1) + x]);
+}
+
+boolean
+mapfrag_canmatch(mf)
+struct mapfragment *mf;
+{
+    return ((mf->wid % 2) && (mf->hei % 2));
+}
+
+const char *
+mapfrag_error(mf)
+struct mapfragment *mf;
+{
+    if (!mf)
+        return "mapfragment error";
+    else if (!mapfrag_canmatch(mf)) {
+        mapfrag_free(&mf);
+        return "mapfragment needs to have odd height and width";
+    } else if (mapfrag_get(mf, (mf->wid/2), (mf->hei/2)) >= MAX_TYPE) {
+        mapfrag_free(&mf);
+        return "mapfragment center must be valid terrain";
+    }
+    return NULL;
+}
+
+boolean
+mapfrag_match(mf, x,y)
+struct mapfragment *mf;
+int x,y;
+{
+    int rx, ry;
+
+    for (rx = -(mf->wid / 2); rx <= (mf->wid / 2); rx++)
+        for (ry = -(mf->hei / 2); ry <= (mf->hei / 2); ry++) {
+            schar mapc = mapfrag_get(mf, rx + (mf->wid / 2) , ry + (mf->hei / 2));
+            schar levc = isok(x+rx, y+ry) ? levl[x+rx][y+ry].typ : STONE;
+            if ((mapc < MAX_TYPE) && (mapc != levc))
+                return FALSE;
+        }
+    return TRUE;
+}
 
 static void
 solidify_map()
@@ -2125,31 +2215,6 @@ struct mkroom *croom;
         levl[x][y].altarmask |= AM_SHRINE;
         g.level.flags.has_temple = TRUE;
     }
-}
-
-static void
-replace_terrain(terr, croom)
-replaceterrain *terr;
-struct mkroom *croom;
-{
-    schar x, y, x1, y1, x2, y2;
-
-    if (terr->toter >= MAX_TYPE)
-        return;
-
-    x1 = terr->x1;
-    y1 = terr->y1;
-    get_location(&x1, &y1, ANY_LOC, croom);
-
-    x2 = terr->x2;
-    y2 = terr->y2;
-    get_location(&x2, &y2, ANY_LOC, croom);
-
-    for (x = max(x1, 0); x <= min(x2, COLNO - 1); x++)
-        for (y = max(y1, 0); y <= min(y2, ROWNO - 1); y++)
-            if (levl[x][y].typ == terr->fromter && rn2(100) < terr->chance) {
-                SET_TYPLIT(x, y, terr->toter, terr->tolit);
-            }
 }
 
 /*
@@ -4922,17 +4987,22 @@ lua_State *L;
     return 0;
 }
 
-/* TODO: better parameters, allow selection instead of x1,y1,x2,y2 nonsense.
-   TODO: or remove, if terrain + selection can do this better?
-*/
 /* replace_terrain({ x1=NN,y1=NN, x2=NN,y2=NN, fromterrain=MAPCHAR, toterrain=MAPCHAR, lit=N, chance=NN }); */
 /* replace_terrain({ region={x1,y1, x2,y2}, fromterrain=MAPCHAR, toterrain=MAPCHAR, lit=N, chance=NN }); */
+/* replace_terrain({ selection=selection.area(2,5, 40,10), fromterrain=MAPCHAR, toterrain=MAPCHAR }); */
+/* replace_terrain({ selection=SEL, mapfragment=[[...]], toterrain=MAPCHAR }); */
 int
 lspo_replace_terrain(L)
 lua_State *L;
 {
-    replaceterrain rt;
     xchar totyp, fromtyp;
+    struct mapfragment *mf = NULL;
+    struct selectionvar *sel = NULL;
+    boolean freesel = FALSE;
+    int x, y;
+    int x1, y1, x2, y2;
+    int chance;
+    int tolit;
 
     create_des_coder();
 
@@ -4940,25 +5010,75 @@ lua_State *L;
 
     totyp = get_table_mapchr(L, "toterrain");
 
-    fromtyp = get_table_mapchr(L, "fromterrain");
+    if (totyp >= MAX_TYPE)
+        return 0;
 
-    rt.chance = get_table_int_opt(L, "chance", 100);
-    rt.tolit = get_table_int_opt(L, "lit", 1);
-    rt.toter = totyp;
-    rt.fromter = fromtyp;
-    rt.x1 = get_table_int_opt(L, "x1", -1);
-    rt.y1 = get_table_int_opt(L, "y1", -1);
-    rt.x2 = get_table_int_opt(L, "x2", -1);
-    rt.y2 = get_table_int_opt(L, "y2", -1);
+    fromtyp = get_table_mapchr_opt(L, "fromterrain", INVALID_TYPE);
 
-    if (rt.x1 == -1 && rt.y1 == -1 && rt.x2 == -1 && rt.y2 == -1) {
-        int rx1, ry1, rx2, ry2;
-        get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
-        rt.x1 = rx1; rt.y1 = ry1;
-        rt.x2 = rx2; rt.y2 = ry2;
+    if (fromtyp == INVALID_TYPE) {
+        const char *err;
+        char *tmpstr = get_table_str(L, "mapfragment");
+        mf = mapfrag_fromstr(tmpstr);
+        free(tmpstr);
+
+        if ((err = mapfrag_error(mf)) != NULL) {
+            mapfrag_free(&mf);
+            nhl_error(L, err);
+            /*NOTREACHED*/
+        }
     }
 
-    replace_terrain(&rt, g.coder->croom);
+    chance = get_table_int_opt(L, "chance", 100);
+    tolit = get_table_int_opt(L, "lit", -2);
+    x1 = get_table_int_opt(L, "x1", -1);
+    y1 = get_table_int_opt(L, "y1", -1);
+    x2 = get_table_int_opt(L, "x2", -1);
+    y2 = get_table_int_opt(L, "y2", -1);
+
+    if (x1 == -1 && y1 == -1 && x2 == -1 && y2 == -1) {
+        get_table_region(L, "region", &x1, &y1, &x2, &y2, TRUE);
+    }
+
+    if (x1 == -1 && y1 == -1 && x2 == -1 && y2 == -1) {
+        lua_getfield(L, 1, "selection");
+        if (lua_type(L, -1) != LUA_TNIL)
+            sel = l_selection_check(L, -1);
+        lua_pop(L, 1);
+    }
+
+    if (!sel) {
+        sel = selection_new();
+        freesel = TRUE;
+
+        if (x1 == -1 && y1 == -1 && x2 == -1 && y2 == -1) {
+            (void) selection_not(sel);
+        } else {
+            schar rx1, ry1, rx2, ry2;
+            rx1 = x1, ry1 = y1, rx2 = x2, ry2 = x2;
+            get_location(&rx1, &ry1, ANY_LOC, g.coder->croom);
+            get_location(&rx2, &ry2, ANY_LOC, g.coder->croom);
+            for (x = max(rx1, 0); x <= min(rx2, COLNO - 1); x++)
+                for (y = max(ry1, 0); y <= min(ry2, ROWNO - 1); y++)
+                    selection_setpoint(x,y, sel, 1);
+        }
+    }
+
+    for (y = 0; y <= sel->hei; y++)
+        for (x = 0; x < sel->wid; x++)
+            if (selection_getpoint(x,y,sel)) {
+                if (mf) {
+                    if (mapfrag_match(mf, x,y) && (rn2(100)) < chance)
+                        SET_TYPLIT(x, y, totyp, tolit);
+                } else {
+                    if (levl[x][y].typ == fromtyp && rn2(100) < chance)
+                        SET_TYPLIT(x, y, totyp, tolit);
+                }
+            }
+
+    if (freesel)
+        selection_free(sel, TRUE);
+
+    mapfrag_free(&mf);
 
     return 0;
 }
@@ -5736,7 +5856,6 @@ int
 lspo_map(L)
 lua_State *L;
 {
-    mazepart tmpmazepart;
     xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
 
     /*
@@ -5756,36 +5875,31 @@ TODO: g.coder->croom needs to be updated
     };
     static const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1 };
     int lr, tb, keepregion = 1, x = -1, y = -1;
-    char *tmps, *mapdata;
-    int mapwid, maphei = 0;
+    struct mapfragment *mf;
     int argc = lua_gettop(L);
 
     create_des_coder();
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
+        char *tmpstr = dupstr(luaL_checkstring(L, 1));
         lr = tb = CENTER;
-        mapdata = dupstr(luaL_checkstring(L, 1));
+        mf = mapfrag_fromstr(tmpstr);
+        free(tmpstr);
     } else {
+        char *tmpstr;
         lcheck_param_table(L);
         lr = l_or_r2i[get_table_option(L, "halign", "none", left_or_right)];
         tb = t_or_b2i[get_table_option(L, "valign", "none", top_or_bot)];
         keepregion = get_table_boolean_opt(L, "keepregion", 1); /* TODO: maybe rename? */
         get_table_xy_or_coord(L, &x, &y);
-        mapdata = get_table_str(L, "map");
+        tmpstr = get_table_str(L, "map");
+        mf = mapfrag_fromstr(tmpstr);
+        free(tmpstr);
     }
 
-    (void) stripdigits(mapdata);
-    mapwid = str_lines_maxlen(mapdata);
-    tmps = mapdata;
-    while (tmps && *tmps) {
-        char *s1 = index(tmps, '\n');
-
-        if (maphei > MAP_Y_LIM)
-            break;
-        if (s1)
-            s1++;
-        tmps = s1;
-        maphei++;
+    if (!mf) {
+        nhl_error(L, "Map data error");
+        return 0;
     }
 
     /* keepregion restricts the coordinates of the commands coming after
@@ -5797,10 +5911,8 @@ TODO: g.coder->croom needs to be updated
     tmpystart = g.ystart;
 
 
-    g.xsize = tmpmazepart.xsize = mapwid;
-    g.ysize = tmpmazepart.ysize = maphei;
-    tmpmazepart.halign = lr;
-    tmpmazepart.valign = tb;
+    g.xsize = mf->wid;
+    g.ysize = mf->hei;
 
     if (lr == -1 && tb == -1) {
         if (isok(x,y)) {
@@ -5809,17 +5921,18 @@ TODO: g.coder->croom needs to be updated
                 /* in a room? adjust to room relative coords */
                 g.xstart = x + g.coder->croom->lx;
                 g.ystart = y + g.coder->croom->ly;
-                g.xsize = min(tmpmazepart.xsize,
+                g.xsize = min(mf->wid,
                               (g.coder->croom->hx - g.coder->croom->lx));
-                g.ysize = min(tmpmazepart.ysize,
+                g.ysize = min(mf->hei,
                               (g.coder->croom->hy - g.coder->croom->ly));
             } else {
-                g.xsize = tmpmazepart.xsize;
-                g.ysize = tmpmazepart.ysize;
+                g.xsize = mf->wid;
+                g.ysize = mf->hei;
                 g.xstart = x;
                 g.ystart = y;
             }
         } else {
+            mapfrag_free(&mf);
             nhl_error(L, "Map requires either x,y or halign,valign params");
             return 0;
         }
@@ -5873,15 +5986,12 @@ TODO: g.coder->croom needs to be updated
         g.xsize = COLNO - 1;
         g.ysize = ROWNO;
     } else {
-        char mpchr;
         xchar mptyp;
 
         /* Load the map */
         for (y = g.ystart; y < min(ROWNO, g.ystart + g.ysize); y++)
             for (x = g.xstart; x < min(COLNO, g.xstart + g.xsize); x++) {
-                mpchr = mapdata[(y - g.ystart) * (mapwid + 1)
-                                + (x - g.xstart)];
-                mptyp = splev_chr2typ(mpchr);
+                mptyp = mapfrag_get(mf, (x - g.xstart), (y - g.ystart));
                 if (mptyp == INVALID_TYPE) {
                     /* TODO: warn about illegal map char */
                     continue;
@@ -5930,7 +6040,7 @@ TODO: g.coder->croom needs to be updated
         g.ysize = tmpysize;
     }
 
-    Free(mapdata);
+    mapfrag_free(&mf);
 
     return 0;
 }

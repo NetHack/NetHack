@@ -19,9 +19,9 @@ static int FDECL(l_selection_line, (lua_State *));
 static int FDECL(l_selection_randline, (lua_State *));
 static int FDECL(l_selection_rect, (lua_State *));
 static int FDECL(l_selection_fillrect, (lua_State *));
-static int FDECL(l_selection_fillrect, (lua_State *));
 static int FDECL(l_selection_grow, (lua_State *));
 static int FDECL(l_selection_filter_mapchar, (lua_State *));
+static int FDECL(l_selection_match, (lua_State *));
 static int FDECL(l_selection_flood, (lua_State *));
 static int FDECL(l_selection_circle, (lua_State *));
 static int FDECL(l_selection_ellipse, (lua_State *));
@@ -568,6 +568,46 @@ lua_State *L;
     return 1;
 }
 
+/* local s = selection.match([[...]]); */
+static int
+l_selection_match(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+    struct selectionvar *sel = (struct selectionvar *) 0;
+    struct mapfragment *mf;
+    int x, y;
+
+    if (argc == 1) {
+        const char *err;
+        char *mapstr = dupstr(luaL_checkstring(L, 1));
+        lua_pop(L, 1);
+        (void) l_selection_new(L);
+        sel = l_selection_check(L, 1);
+
+        mf = mapfrag_fromstr(mapstr);
+        free(mapstr);
+
+        if ((err = mapfrag_error(mf)) != NULL) {
+            mapfrag_free(&mf);
+            nhl_error(L, err);
+            /*NOTREACHED*/
+        }
+
+    } else {
+        nhl_error(L, "wrong parameters");
+        /*NOTREACHED*/
+    }
+
+    for (y = 0; y <= sel->hei; y++)
+        for (x = 0; x < sel->wid; x++)
+            selection_setpoint(x, y, sel, mapfrag_match(mf, x,y) ? 1 : 0);
+
+    mapfrag_free(&mf);
+
+    return 1;
+}
+
 
 /* local s = selection.floodfill(x,y); */
 static int
@@ -744,6 +784,7 @@ static const struct luaL_Reg l_selection_methods[] = {
     { "area", l_selection_fillrect },
     { "grow", l_selection_grow },
     { "filter_mapchar", l_selection_filter_mapchar },
+    { "match", l_selection_match },
     { "floodfill", l_selection_flood },
     { "circle", l_selection_circle },
     { "ellipse", l_selection_ellipse },
