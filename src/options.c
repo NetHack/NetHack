@@ -87,7 +87,7 @@ enum window_option_types {
     TEXT_OPTION
 };
 
-enum {optn_err = 0, optn_ok};
+enum {optn_silenterr = -1, optn_err = 0, optn_ok};
 enum requests {do_nothing, do_init, do_set, do_handler, get_val};
 
 static struct allopt_t allopt[SIZE(allopt_init)];
@@ -107,7 +107,7 @@ extern char ttycolors[CLR_MAX]; /* in sys/msdos/video.c */
 #endif
 
 static char empty_optstr[] = { '\0' };
-boolean duplicate;
+boolean duplicate, using_alias;
 
 static const char def_inv_order[MAXOCLASSES] = {
     COIN_CLASS, AMULET_CLASS, WEAPON_CLASS, ARMOR_CLASS, FOOD_CLASS,
@@ -230,8 +230,8 @@ static void FDECL(bad_negation, (const char *, BOOLEAN_P));
 static int FDECL(change_inv_order, (char *));
 static boolean FDECL(warning_opts, (char *, const char *));
 static int FDECL(feature_alert_opts, (char *, const char *));
-static boolean FDECL(duplicate_opt_detection, (const char *, int));
-static void FDECL(complain_about_duplicate, (const char *, int));
+static boolean FDECL(duplicate_opt_detection, (int));
+static void FDECL(complain_about_duplicate, (int));
 static int FDECL(length_without_val, (const char *, int len));
 static void NDECL(determine_ambiguities);
 static int FDECL(check_misc_menu_command, (char *, char *));
@@ -247,7 +247,7 @@ static boolean FDECL(test_regex_pattern, (const char *, const char *));
 static boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
 static void FDECL(free_one_menu_coloring, (int));
 static int NDECL(count_menucolors);
-static boolean FDECL(parse_role_opts, (BOOLEAN_P, const char *,
+static boolean FDECL(parse_role_opts, (int, BOOLEAN_P, const char *,
                                            char *, char **));
 static void FDECL(doset_add_menu, (winid, const char *, int, int));
 static void FDECL(opts_add_others, (winid, const char *, int,
@@ -306,11 +306,12 @@ register char *opts;
 boolean tinitial, tfrom_file;
 {
     char *op;
-    boolean negated, got_match, has_val = FALSE;
+    boolean negated, got_match = FALSE, has_val = FALSE;
     int i, matchidx = -1, optresult = optn_err, optlen, optlen_wo_val;
     boolean retval = TRUE;
 
     duplicate = FALSE;
+    using_alias = FALSE;
     g.opt_initial = tinitial;
     g.opt_from_file = tfrom_file;
     if ((op = index(opts, ',')) != 0) {
@@ -405,6 +406,7 @@ boolean tinitial, tfrom_file;
                                       allopt[i].valok);
             if (got_match) {
                 matchidx = i;
+                using_alias = TRUE;
                 break;
             }
         }
@@ -414,9 +416,9 @@ boolean tinitial, tfrom_file;
     g.program_state.in_parseoptions++;
 
     if (got_match && matchidx >= 0) {
-        duplicate = duplicate_opt_detection(opts, 1);
+        duplicate = duplicate_opt_detection(matchidx);
         if (duplicate && !allopt[matchidx].dupeok)
-            complain_about_duplicate(opts, 1);
+            complain_about_duplicate(matchidx);
 
         /* check for bad negation, so option functions don't have to */
         if (negated && !allopt[matchidx].negateok) {
@@ -461,6 +463,8 @@ boolean tinitial, tfrom_file;
         }
     }
 
+    if (optresult == optn_silenterr)
+        return FALSE;
     if (optresult == optn_ok)
         return retval;
 
@@ -506,13 +510,13 @@ char *op;
         return optn_ok;
     }
     if (req == do_set) {
-        if (parse_role_opts(negated, allopt[optidx].name, opts, &op)) {
+        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
             if ((flags.initalign = str2align(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             }
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -1312,14 +1316,14 @@ char *op;
     }
     if (req == do_set) {
         /* gender:string */
-        if (parse_role_opts(negated, allopt[optidx].name, opts, &op)) {
+        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
             if ((flags.initgend = str2gend(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             } else
                 flags.female = flags.initgend;
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -2453,7 +2457,7 @@ char *op;
 
 #ifndef WIN32
             if (duplicate)
-                complain_about_duplicate(opts, 1);
+                complain_about_duplicate(optidx);
 #endif
 #ifdef MAC
             if (match_optname(opts, "hicolor", 3, TRUE)) {
@@ -3032,14 +3036,14 @@ char *op;
     }
     if (req == do_set) {
         /* race:string */
-        if (parse_role_opts(negated, allopt[optidx].name, opts, &op)) {
+        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
             if ((flags.initrace = str2race(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             } else /* Backwards compatibility */
                 g.pl_race = *op;
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -3107,14 +3111,14 @@ char *op;
         return optn_ok;
     }
     if (req == do_set) {
-        if (parse_role_opts(negated, allopt[optidx].name, opts, &op)) {
+        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
             if ((flags.initrole = str2role(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             } else /* Backwards compatibility */
                 nmcpy(g.pl_character, op, PL_NSIZ);
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -4381,7 +4385,7 @@ char *op;
                 return optn_err;
             }
             if (duplicate)
-                complain_about_duplicate(opts, 1);
+                complain_about_duplicate(optidx);
             if (opttype > 0 && !negated
                 && (op = string_for_opt(opts, FALSE)) != empty_optstr) {
                 switch (opttype) {
@@ -4517,10 +4521,6 @@ char *op;
         /* option that must come from config file? */
         if (!g.opt_initial && (allopt[optidx].setwhere == set_in_config))
             return optn_err;
-
-        /* 0 means boolean opts */
-        if (duplicate_opt_detection(allopt[optidx].name, 0))
-            complain_about_duplicate(allopt[optidx].name, 0);
 
         op = string_for_opt(opts, TRUE);
         if (op != empty_optstr) {
@@ -5788,84 +5788,41 @@ boolean val_allowed;
 }
 
 void
-set_duplicate_opt_detection(on_or_off)
-int on_or_off;
+reset_duplicate_opt_detection(VOID_ARGS)
 {
-    int k, *optptr;
+    int k;
 
-    if (on_or_off != 0) {
-        /*-- ON --*/
-        if (iflags.opt_booldup)
-            impossible("iflags.opt_booldup already on (memory leak)");
-        iflags.opt_booldup = (int *) alloc(SIZE(allopt) * sizeof (int));
-        optptr = iflags.opt_booldup;
-        for (k = 0; k < SIZE(allopt); ++k)
-            *optptr++ = 0;
-
-        if (iflags.opt_compdup)
-            impossible("iflags.opt_compdup already on (memory leak)");
-        iflags.opt_compdup = (int *) alloc(SIZE(allopt) * sizeof (int));
-        optptr = iflags.opt_compdup;
-        for (k = 0; k < SIZE(allopt); ++k)
-            *optptr++ = 0;
-    } else {
-        /*-- OFF --*/
-        if (iflags.opt_booldup)
-            free((genericptr_t) iflags.opt_booldup);
-        iflags.opt_booldup = (int *) 0;
-        if (iflags.opt_compdup)
-            free((genericptr_t) iflags.opt_compdup);
-        iflags.opt_compdup = (int *) 0;
-    }
+    for (k = 0; k < OPTCOUNT; ++k)
+        allopt[k].dupdetected = 0;
 }
 
 static boolean
-duplicate_opt_detection(opts, iscompound)
-const char *opts;
-int iscompound; /* 0 == boolean option, 1 == compound */
+duplicate_opt_detection(optidx)
+int optidx;
 {
-    int i, *optptr;
-
-    if (!iscompound && iflags.opt_booldup && g.opt_initial && g.opt_from_file) {
-        for (i = 0; allopt[i].name; i++) {
-            if (match_optname(opts, allopt[i].name, 3, FALSE)) {
-                optptr = iflags.opt_booldup + i;
-                *optptr += 1;
-                if (*optptr > 1)
-                    return TRUE;
-                else
-                    return FALSE;
-            }
-        }
-    } else if (iscompound && iflags.opt_compdup && g.opt_initial && g.opt_from_file) {
-        for (i = 0; allopt[i].name; i++) {
-            if (match_optname(opts, allopt[i].name, strlen(allopt[i].name),
-                              TRUE)) {
-                optptr = iflags.opt_compdup + i;
-                *optptr += 1;
-                if (*optptr > 1)
-                    return TRUE;
-                else
-                    return FALSE;
-            }
-        }
-    }
+    if (g.opt_initial && g.opt_from_file)
+        return allopt[optidx].dupdetected++;
     return FALSE;
 }
 
 static void
-complain_about_duplicate(opts, iscompound)
-const char *opts;
-int iscompound; /* 0 == boolean option, 1 == compound */
+complain_about_duplicate(optidx)
+int optidx;
 {
+    char buf[BUFSZ];
+
 #ifdef MAC
     /* the Mac has trouble dealing with the output of messages while
      * processing the config file.  That should get fixed one day.
      * For now just return.
      */
 #else /* !MAC */
-    config_error_add("%s option specified multiple times: %s",
-                     iscompound ? "compound" : "boolean", opts);
+    buf[0] = '\0';
+    if (using_alias)
+        Sprintf(buf, " (via alias: %s)", allopt[optidx].alias);
+    config_error_add("%s option specified multiple times: %s%s",
+                     (allopt[optidx].opttyp == CompOpt) ? "compound" : "boolean",
+                     allopt[optidx].name, buf);
 #endif /* ?MAC */
     return;
 }
@@ -6098,9 +6055,6 @@ initoptions_init()
     /* initialize the random number generator(s) */
     init_random(rn2);
     init_random(rn2_on_display_rng);
-
-    /* for detection of configfile options specified multiple times */
-    iflags.opt_booldup = iflags.opt_compdup = (int *) 0;
 
     for (i = 0; allopt[i].name; i++) {
         if (allopt[i].addr)
@@ -7099,7 +7053,8 @@ count_menucolors(VOID_ARGS)
 }
 
 static boolean
-parse_role_opts(negated, fullname, opts, opp)
+parse_role_opts(optidx, negated, fullname, opts, opp)
+int optidx;
 boolean negated;
 const char *fullname;
 char *opts;
@@ -7126,8 +7081,8 @@ char **opp;
                 return FALSE;
             }
         } else {
-            if (duplicate_opt_detection(opts, 1))
-                complain_about_duplicate(opts, 1);
+            if (duplicate && !allopt[optidx].dupeok)
+                complain_about_duplicate(optidx);
             *opp = op;
             return TRUE;
         }

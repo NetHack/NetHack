@@ -57,7 +57,6 @@ static int FDECL(pm_to_humidity, (struct permonst *));
 static void FDECL(create_monster, (monster *, struct mkroom *));
 static void FDECL(create_object, (object *, struct mkroom *));
 static void FDECL(create_altar, (altar *, struct mkroom *));
-static void FDECL(replace_terrain, (replaceterrain *, struct mkroom *));
 static boolean FDECL(search_door, (struct mkroom *,
                                        xchar *, xchar *, XCHAR_P, int));
 static void NDECL(fix_stair_rooms);
@@ -94,6 +93,7 @@ static void FDECL(sel_set_ter, (int, int, genericptr_t));
 static void FDECL(sel_set_door, (int, int, genericptr_t));
 static void FDECL(sel_set_feature, (int, int, genericptr_t));
 static int FDECL(get_coord, (lua_State *, int, int *, int *));
+static void FDECL(get_table_xy_or_coord, (lua_State *, int *, int *));
 static int FDECL(get_table_region, (lua_State *, const char *,
                                     int *, int *, int *, int *, BOOLEAN_P));
 static void FDECL(set_wallprop_in_selection, (lua_State *, int));
@@ -171,6 +171,97 @@ static struct monst *invent_carrying_monster = (struct monst *) 0;
     /*
      * end of no 'g.'
      */
+
+struct mapfragment *
+mapfrag_fromstr(str)
+char *str;
+{
+    struct mapfragment *mf = (struct mapfragment *) alloc(sizeof(struct mapfragment));
+
+    char *tmps;
+
+    mf->data = dupstr(str);
+
+    (void) stripdigits(mf->data);
+    mf->wid = str_lines_maxlen(mf->data);
+    mf->hei = 0;
+    tmps = mf->data;
+    while (tmps && *tmps) {
+        char *s1 = index(tmps, '\n');
+
+        if (mf->hei > MAP_Y_LIM) {
+            free(mf->data);
+            free(mf);
+            return NULL;
+        }
+        if (s1)
+            s1++;
+        tmps = s1;
+        mf->hei++;
+    }
+    return mf;
+}
+
+void
+mapfrag_free(mf)
+struct mapfragment **mf;
+{
+    if (mf && *mf) {
+        free((*mf)->data);
+        free(*mf);
+        mf = NULL;
+    }
+}
+
+schar
+mapfrag_get(mf, x,y)
+struct mapfragment *mf;
+int x,y;
+{
+    if (y < 0 || x < 0 || y > mf->hei-1 || x > mf->wid-1)
+        panic("outside mapfrag (%i,%i), wanted (%i,%i)", mf->wid, mf->hei, x,y);
+    return splev_chr2typ(mf->data[y * (mf->wid + 1) + x]);
+}
+
+boolean
+mapfrag_canmatch(mf)
+struct mapfragment *mf;
+{
+    return ((mf->wid % 2) && (mf->hei % 2));
+}
+
+const char *
+mapfrag_error(mf)
+struct mapfragment *mf;
+{
+    if (!mf)
+        return "mapfragment error";
+    else if (!mapfrag_canmatch(mf)) {
+        mapfrag_free(&mf);
+        return "mapfragment needs to have odd height and width";
+    } else if (mapfrag_get(mf, (mf->wid/2), (mf->hei/2)) >= MAX_TYPE) {
+        mapfrag_free(&mf);
+        return "mapfragment center must be valid terrain";
+    }
+    return NULL;
+}
+
+boolean
+mapfrag_match(mf, x,y)
+struct mapfragment *mf;
+int x,y;
+{
+    int rx, ry;
+
+    for (rx = -(mf->wid / 2); rx <= (mf->wid / 2); rx++)
+        for (ry = -(mf->hei / 2); ry <= (mf->hei / 2); ry++) {
+            schar mapc = mapfrag_get(mf, rx + (mf->wid / 2) , ry + (mf->hei / 2));
+            schar levc = isok(x+rx, y+ry) ? levl[x+rx][y+ry].typ : STONE;
+            if ((mapc < MAX_TYPE) && (mapc != levc))
+                return FALSE;
+        }
+    return TRUE;
+}
 
 static void
 solidify_map()
@@ -2126,31 +2217,6 @@ struct mkroom *croom;
     }
 }
 
-static void
-replace_terrain(terr, croom)
-replaceterrain *terr;
-struct mkroom *croom;
-{
-    schar x, y, x1, y1, x2, y2;
-
-    if (terr->toter >= MAX_TYPE)
-        return;
-
-    x1 = terr->x1;
-    y1 = terr->y1;
-    get_location(&x1, &y1, ANY_LOC, croom);
-
-    x2 = terr->x2;
-    y2 = terr->y2;
-    get_location(&x2, &y2, ANY_LOC, croom);
-
-    for (x = max(x1, 0); x <= min(x2, COLNO - 1); x++)
-        for (y = max(y1, 0); y <= min(y2, ROWNO - 1); y++)
-            if (levl[x][y].typ == terr->fromter && rn2(100) < terr->chance) {
-                SET_TYPLIT(x, y, terr->toter, terr->tolit);
-            }
-}
-
 /*
  * Search for a door in a room on a specified wall.
  */
@@ -2831,6 +2897,24 @@ lua_State *L;
     return ret;
 }
 
+static void
+get_table_xy_or_coord(L, x,y)
+lua_State *L;
+int *x, *y;
+{
+    int mx = get_table_int_opt(L, "x", -1);
+    int my = get_table_int_opt(L, "y", -1);
+
+    if (mx == -1 && my == -1) {
+        lua_getfield(L, 1, "coord");
+        get_coord(L, -1, &mx, &my);
+        lua_pop(L, 1);
+    }
+
+    *x = mx;
+    *y = my;
+}
+
 /* monster(); */
 /* monster("wood nymph"); */
 /* monster("D"); */
@@ -2942,14 +3026,7 @@ lua_State *L;
             Free(mappear);
         }
 
-        mx = get_table_int_opt(L, "x", -1);
-        my = get_table_int_opt(L, "y", -1);
-
-        if (mx == -1 && my == -1) {
-            lua_getfield(L, 1, "coord");
-            get_coord(L, -1, &mx, &my);
-            lua_pop(L, 1);
-        }
+        get_table_xy_or_coord(L, &mx, &my);
 
         tmpmons.id = get_table_montype(L);
         tmpmons.class = get_table_monclass(L);
@@ -3181,14 +3258,7 @@ lua_State *L;
         tmpobj.broken = get_table_boolean_opt(L, "broken", 0);
         tmpobj.achievement = get_table_boolean_opt(L, "achievement", 0);
 
-        ox = get_table_int_opt(L, "x", -1);
-        oy = get_table_int_opt(L, "y", -1);
-
-        if (ox == -1 && oy == -1) {
-            lua_getfield(L, 1, "coord");
-            get_coord(L, -1, &ox, &oy);
-            lua_pop(L, 1);
-        }
+        get_table_xy_or_coord(L, &ox, &oy);
 
         tmpobj.id = get_table_objtype(L);
         tmpobj.class = get_table_objclass(L);
@@ -3372,6 +3442,7 @@ lua_State *L;
 }
 
 /* engraving({ x = 1, y = 1, type="burn", text="Foo" }); */
+/* engraving({ coord={1, 1}, type="burn", text="Foo" }); */
 /* engraving({x,y}, "engrave", "Foo"); */
 int
 lspo_engraving(L)
@@ -3392,11 +3463,13 @@ lua_State *L;
     create_des_coder();
 
     if (argc == 1) {
+        int ex, ey;
         lcheck_param_table(L);
 
+        get_table_xy_or_coord(L, &ex, &ey);
+        x = ex;
+        y = ey;
         etyp = engrtypes2i[get_table_option(L, "type", "engrave", engrtypes)];
-        x = get_table_int_opt(L, "x", -1);
-        y = get_table_int_opt(L, "y", -1);
         txt = get_table_str(L, "text");
     } else if (argc == 3) {
         int ex, ey;
@@ -3488,12 +3561,15 @@ int defval;
                 res = room_types[i].type;
                 break;
             }
+        if (!room_types[i].name)
+            impossible("Unknown room type '%s'", roomstr);
     }
     Free(roomstr);
     return res;
 }
 
 /* room({ type="ordinary", lit=1, x=3,y=3, xalign="center",yalign="center", w=11,h=9 }); */
+/* room({ lit=1, coord={3,3}, xalign="center",yalign="center", w=11,h=9 }); */
 int
 lspo_room(L)
 lua_State *L;
@@ -3518,9 +3594,10 @@ lua_State *L;
         static const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1, -1 };
         room tmproom;
         struct mkroom *tmpcr;
+        int rx, ry;
 
-        tmproom.x = get_table_int_opt(L, "x", -1);
-        tmproom.y = get_table_int_opt(L, "y", -1);
+        get_table_xy_or_coord(L, &rx, &ry);
+        tmproom.x = rx, tmproom.y = ry;
         if ((tmproom.x == -1 || tmproom.y == -1) && tmproom.x != tmproom.y)
             nhl_error(L, "Room must have both x and y");
 
@@ -3624,14 +3701,7 @@ lua_State *L;
     } else {
         lcheck_param_table(L);
 
-        ax = get_table_int_opt(L, "x", -1);
-        ay = get_table_int_opt(L, "y", -1);
-
-        if (ax == -1 && ay == -1) {
-            lua_getfield(L, 1, "coord");
-            get_coord(L, -1, &ax, &ay);
-            lua_pop(L, 1);
-        }
+        get_table_xy_or_coord(L, &ax, &ay);
 
         up = stairdirs2i[get_table_option(L, "dir", "down", stairdirs)];
     }
@@ -3682,14 +3752,7 @@ lua_State *L;
     } else {
         lcheck_param_table(L);
 
-        ax = get_table_int_opt(L, "x", -1);
-        ay = get_table_int_opt(L, "y", -1);
-
-        if (ax == -1 && ay == -1) {
-            lua_getfield(L, 1, "coord");
-            get_coord(L, -1, &ax, &ay);
-            lua_pop(L, 1);
-        }
+        get_table_xy_or_coord(L, &ax, &ay);
 
         up = stairdirs2i[get_table_option(L, "dir", "down", stairdirs)];
     }
@@ -3721,10 +3784,16 @@ lua_State *L;
     return 0;
 }
 
+/* grave(); */
+/* grave(x,y, "text"); */
+/* grave({ x = 1, y = 1 }); */
+/* grave({ x = 1, y = 1, text = "Foo" }); */
+/* grave({ coord = {1, 1}, text = "Foo" }); */
 int
 lspo_grave(L)
 lua_State *L;
 {
+    int argc = lua_gettop(L);
     schar x, y;
     long scoord;
     int ax,ay;
@@ -3732,11 +3801,17 @@ lua_State *L;
 
     create_des_coder();
 
-    lcheck_param_table(L);
+    if (argc == 3) {
+        x = ax = luaL_checkinteger(L, 1);
+        y = ay = luaL_checkinteger(L, 2);
+        txt = dupstr(luaL_checkstring(L, 3));
+    } else {
+        lcheck_param_table(L);
 
-    x = ax = get_table_int_opt(L, "x", -1);
-    y = ay = get_table_int_opt(L, "y", -1);
-    txt = get_table_str_opt(L, "text", NULL);
+        get_table_xy_or_coord(L, &ax, &ay);
+        x = ax, y = ay;
+        txt = get_table_str_opt(L, "text", NULL);
+    }
 
     if (x == -1 && y == -1)
         scoord = SP_COORD_PACK_RANDOM(0);
@@ -3775,14 +3850,7 @@ lua_State *L;
 
     lcheck_param_table(L);
 
-    x = get_table_int_opt(L, "x", -1);
-    y = get_table_int_opt(L, "y", -1);
-
-    if (x == -1 && y == -1) {
-        lua_getfield(L, 1, "coord");
-        get_coord(L, -1, &x, &y);
-        lua_pop(L, 1);
-    }
+    get_table_xy_or_coord(L, &x, &y);
 
     align = get_table_align(L);
     shrine = shrines2i[get_table_option(L, "type", "altar", shrines)];
@@ -3911,15 +3979,8 @@ lua_State *L;
     } else {
         lcheck_param_table(L);
 
-        x = get_table_int_opt(L, "x", -1);
-        y = get_table_int_opt(L, "y", -1);
+        get_table_xy_or_coord(L, &x, &y);
         tmptrap.type = get_table_traptype_opt(L, "type", -1);
-
-        if (x == -1 && y == -1) {
-            lua_getfield(L, 1, "coord");
-            get_coord(L, -1, &x, &y);
-            lua_pop(L, 1);
-        }
     }
 
     if (tmptrap.type == NO_TRAP)
@@ -3938,6 +3999,7 @@ lua_State *L;
 /* gold(500, 3,5); */
 /* gold(500, {5, 6}); */
 /* gold({ amount = 500, x = 2, y = 5 });*/
+/* gold({ amount = 500, coord = {2, 5} });*/
 /* gold(); */
 int
 lspo_gold(L)
@@ -3964,8 +4026,8 @@ lua_State *L;
         lcheck_param_table(L);
 
         amount = get_table_int_opt(L, "amount", -1);
-        x = gx = get_table_int_opt(L, "x", -1);
-        y = gy = get_table_int_opt(L, "y", -1);
+        get_table_xy_or_coord(L, &gx, &gy);
+        x = gx, y = gy;
     } else {
         nhl_error(L, "Wrong parameters");
         return 0;
@@ -4736,6 +4798,7 @@ genericptr_t arg;
 }
 
 /* door({ x = 1, y = 1, state = "nodoor" }); */
+/* door({ coord = {1, 1}, state = "nodoor" }); */
 /* door({ wall = "north", pos = 3, state="secret" }); */
 /* door("nodoor", 1, 2); */
 int
@@ -4762,10 +4825,11 @@ lua_State *L;
         y = luaL_checkinteger(L, 3);
 
     } else {
+        int dx, dy;
         lcheck_param_table(L);
 
-        x = get_table_int_opt(L, "x", -1);
-        y = get_table_int_opt(L, "y", -1);
+        get_table_xy_or_coord(L, &dx, &dy);
+        x = dx, y = dy;
         msk = doorstates2i[get_table_option(L, "state", "random", doorstates)];
     }
 
@@ -4802,6 +4866,7 @@ lua_State *L;
 /* feature("fountain", x, y); */
 /* feature("fountain", {x,y}); */
 /* feature({ type="fountain", x=NN, y=NN }); */
+/* feature({ type="fountain", coord={NN, NN} }); */
 int
 lspo_feature(L)
 lua_State *L;
@@ -4826,10 +4891,11 @@ lua_State *L;
         x = luaL_checkinteger(L, 2);
         y = luaL_checkinteger(L, 3);
     } else {
+        int fx, fy;
         lcheck_param_table(L);
 
-        x = get_table_int(L, "x");
-        y = get_table_int(L, "y");
+        get_table_xy_or_coord(L, &fx, &fy);
+        x = fx, y = fy;
         typ = features2i[get_table_option(L, "type", NULL, features)];
     }
 
@@ -4857,6 +4923,7 @@ lua_State *L;
 }
 
 /* terrain({ x=NN, y=NN, typ=MAPCHAR, lit=BOOL }); */
+/* terrain({ coord={X, Y}, typ=MAPCHAR, lit=BOOL }); */
 /* terrain({ selection=SELECTION, typ=MAPCHAR, lit=BOOL }); */
 /* terrain( SELECTION, MAPCHAR [, BOOL ] ); */
 /* terrain({x,y}, MAPCHAR); */
@@ -4875,11 +4942,12 @@ lua_State *L;
     tmpterrain.ter = INVALID_TYPE;
 
     if (argc == 1) {
+        int tx, ty;
         lcheck_param_table(L);
 
-        x = get_table_int_opt(L, "x", -1);
-        y = get_table_int_opt(L, "y", -1);
-        if (x == -1 && y == -1) {
+        get_table_xy_or_coord(L, &tx, &ty);
+        x = tx, y = ty;
+        if (tx == -1 && ty == -1) {
             lua_getfield(L, 1, "selection");
             sel = l_selection_check(L, -1);
             lua_pop(L, 1);
@@ -4919,17 +4987,22 @@ lua_State *L;
     return 0;
 }
 
-/* TODO: better parameters, allow selection instead of x1,y1,x2,y2 nonsense.
-   TODO: or remove, if terrain + selection can do this better?
-*/
 /* replace_terrain({ x1=NN,y1=NN, x2=NN,y2=NN, fromterrain=MAPCHAR, toterrain=MAPCHAR, lit=N, chance=NN }); */
 /* replace_terrain({ region={x1,y1, x2,y2}, fromterrain=MAPCHAR, toterrain=MAPCHAR, lit=N, chance=NN }); */
+/* replace_terrain({ selection=selection.area(2,5, 40,10), fromterrain=MAPCHAR, toterrain=MAPCHAR }); */
+/* replace_terrain({ selection=SEL, mapfragment=[[...]], toterrain=MAPCHAR }); */
 int
 lspo_replace_terrain(L)
 lua_State *L;
 {
-    replaceterrain rt;
     xchar totyp, fromtyp;
+    struct mapfragment *mf = NULL;
+    struct selectionvar *sel = NULL;
+    boolean freesel = FALSE;
+    int x, y;
+    int x1, y1, x2, y2;
+    int chance;
+    int tolit;
 
     create_des_coder();
 
@@ -4937,25 +5010,75 @@ lua_State *L;
 
     totyp = get_table_mapchr(L, "toterrain");
 
-    fromtyp = get_table_mapchr(L, "fromterrain");
+    if (totyp >= MAX_TYPE)
+        return 0;
 
-    rt.chance = get_table_int_opt(L, "chance", 100);
-    rt.tolit = get_table_int_opt(L, "lit", 1);
-    rt.toter = totyp;
-    rt.fromter = fromtyp;
-    rt.x1 = get_table_int_opt(L, "x1", -1);
-    rt.y1 = get_table_int_opt(L, "y1", -1);
-    rt.x2 = get_table_int_opt(L, "x2", -1);
-    rt.y2 = get_table_int_opt(L, "y2", -1);
+    fromtyp = get_table_mapchr_opt(L, "fromterrain", INVALID_TYPE);
 
-    if (rt.x1 == -1 && rt.y1 == -1 && rt.x2 == -1 && rt.y2 == -1) {
-        int rx1, ry1, rx2, ry2;
-        get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
-        rt.x1 = rx1; rt.y1 = ry1;
-        rt.x2 = rx2; rt.y2 = ry2;
+    if (fromtyp == INVALID_TYPE) {
+        const char *err;
+        char *tmpstr = get_table_str(L, "mapfragment");
+        mf = mapfrag_fromstr(tmpstr);
+        free(tmpstr);
+
+        if ((err = mapfrag_error(mf)) != NULL) {
+            mapfrag_free(&mf);
+            nhl_error(L, err);
+            /*NOTREACHED*/
+        }
     }
 
-    replace_terrain(&rt, g.coder->croom);
+    chance = get_table_int_opt(L, "chance", 100);
+    tolit = get_table_int_opt(L, "lit", -2);
+    x1 = get_table_int_opt(L, "x1", -1);
+    y1 = get_table_int_opt(L, "y1", -1);
+    x2 = get_table_int_opt(L, "x2", -1);
+    y2 = get_table_int_opt(L, "y2", -1);
+
+    if (x1 == -1 && y1 == -1 && x2 == -1 && y2 == -1) {
+        get_table_region(L, "region", &x1, &y1, &x2, &y2, TRUE);
+    }
+
+    if (x1 == -1 && y1 == -1 && x2 == -1 && y2 == -1) {
+        lua_getfield(L, 1, "selection");
+        if (lua_type(L, -1) != LUA_TNIL)
+            sel = l_selection_check(L, -1);
+        lua_pop(L, 1);
+    }
+
+    if (!sel) {
+        sel = selection_new();
+        freesel = TRUE;
+
+        if (x1 == -1 && y1 == -1 && x2 == -1 && y2 == -1) {
+            (void) selection_not(sel);
+        } else {
+            schar rx1, ry1, rx2, ry2;
+            rx1 = x1, ry1 = y1, rx2 = x2, ry2 = x2;
+            get_location(&rx1, &ry1, ANY_LOC, g.coder->croom);
+            get_location(&rx2, &ry2, ANY_LOC, g.coder->croom);
+            for (x = max(rx1, 0); x <= min(rx2, COLNO - 1); x++)
+                for (y = max(ry1, 0); y <= min(ry2, ROWNO - 1); y++)
+                    selection_setpoint(x,y, sel, 1);
+        }
+    }
+
+    for (y = 0; y <= sel->hei; y++)
+        for (x = 0; x < sel->wid; x++)
+            if (selection_getpoint(x,y,sel)) {
+                if (mf) {
+                    if (mapfrag_match(mf, x,y) && (rn2(100)) < chance)
+                        SET_TYPLIT(x, y, totyp, tolit);
+                } else {
+                    if (levl[x][y].typ == fromtyp && rn2(100) < chance)
+                        SET_TYPLIT(x, y, totyp, tolit);
+                }
+            }
+
+    if (freesel)
+        selection_free(sel, TRUE);
+
+    mapfrag_free(&mf);
 
     return 0;
 }
@@ -5434,7 +5557,8 @@ lua_State *L;
     return 0;
 }
 
-/* drawbridge({ dir="east", state="closed", x=05,y=08}); */
+/* drawbridge({ dir="east", state="closed", x=05,y=08 }); */
+/* drawbridge({ dir="east", state="closed", coord={05,08} }); */
 int
 lspo_drawbridge(L)
 lua_State *L;
@@ -5458,8 +5582,8 @@ lua_State *L;
 
     lcheck_param_table(L);
 
-    mx = get_table_int(L, "x");
-    my = get_table_int(L, "y");
+    get_table_xy_or_coord(L, &mx, &my);
+
     dir = mwdirs2i[get_table_option(L, "dir", "random", mwdirs)];
     dcoord = SP_COORD_PACK(mx, my);
     db_open = dbopens2i[get_table_option(L, "state", "random", dbopens)];
@@ -5477,6 +5601,7 @@ lua_State *L;
 }
 
 /* mazewalk({ x = NN, y = NN, typ = ".", dir = "north", stocked = 0 }); */
+/* mazewalk({ coord = {XX, YY}, typ = ".", dir = "north", stocked = 0 }); */
 /* mazewalk(x,y,dir); */
 int
 lspo_mazewalk(L)
@@ -5502,8 +5627,7 @@ lua_State *L;
     } else {
         lcheck_param_table(L);
 
-        mx = get_table_int(L, "x");
-        my = get_table_int(L, "y");
+        get_table_xy_or_coord(L, &mx, &my);
         ftyp = get_table_mapchr_opt(L, "typ", ROOM);
         fstocked = get_table_boolean_opt(L, "stocked", 1);
         dir = mwdirs2i[get_table_option(L, "dir", "random", mwdirs)];
@@ -5725,13 +5849,13 @@ lua_State *L UNUSED;
 }
 
 /* map({ x = 10, y = 10, map = [[...]] }); */
+/* map({ coord = {10, 10}, map = [[...]] }); */
 /* map({ halign = "center", valign = "center", map = [[...]] }); */
 /* map([[...]]) */
 int
 lspo_map(L)
 lua_State *L;
 {
-    mazepart tmpmazepart;
     xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
 
     /*
@@ -5751,37 +5875,31 @@ TODO: g.coder->croom needs to be updated
     };
     static const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1 };
     int lr, tb, keepregion = 1, x = -1, y = -1;
-    char *tmps, *mapdata;
-    int mapwid, maphei = 0;
+    struct mapfragment *mf;
     int argc = lua_gettop(L);
 
     create_des_coder();
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
+        char *tmpstr = dupstr(luaL_checkstring(L, 1));
         lr = tb = CENTER;
-        mapdata = dupstr(luaL_checkstring(L, 1));
+        mf = mapfrag_fromstr(tmpstr);
+        free(tmpstr);
     } else {
+        char *tmpstr;
         lcheck_param_table(L);
         lr = l_or_r2i[get_table_option(L, "halign", "none", left_or_right)];
         tb = t_or_b2i[get_table_option(L, "valign", "none", top_or_bot)];
         keepregion = get_table_boolean_opt(L, "keepregion", 1); /* TODO: maybe rename? */
-        x = get_table_int_opt(L, "x", -1);
-        y = get_table_int_opt(L, "y", -1);
-        mapdata = get_table_str(L, "map");
+        get_table_xy_or_coord(L, &x, &y);
+        tmpstr = get_table_str(L, "map");
+        mf = mapfrag_fromstr(tmpstr);
+        free(tmpstr);
     }
 
-    (void) stripdigits(mapdata);
-    mapwid = str_lines_maxlen(mapdata);
-    tmps = mapdata;
-    while (tmps && *tmps) {
-        char *s1 = index(tmps, '\n');
-
-        if (maphei > MAP_Y_LIM)
-            break;
-        if (s1)
-            s1++;
-        tmps = s1;
-        maphei++;
+    if (!mf) {
+        nhl_error(L, "Map data error");
+        return 0;
     }
 
     /* keepregion restricts the coordinates of the commands coming after
@@ -5793,10 +5911,8 @@ TODO: g.coder->croom needs to be updated
     tmpystart = g.ystart;
 
 
-    g.xsize = tmpmazepart.xsize = mapwid;
-    g.ysize = tmpmazepart.ysize = maphei;
-    tmpmazepart.halign = lr;
-    tmpmazepart.valign = tb;
+    g.xsize = mf->wid;
+    g.ysize = mf->hei;
 
     if (lr == -1 && tb == -1) {
         if (isok(x,y)) {
@@ -5805,17 +5921,18 @@ TODO: g.coder->croom needs to be updated
                 /* in a room? adjust to room relative coords */
                 g.xstart = x + g.coder->croom->lx;
                 g.ystart = y + g.coder->croom->ly;
-                g.xsize = min(tmpmazepart.xsize,
+                g.xsize = min(mf->wid,
                               (g.coder->croom->hx - g.coder->croom->lx));
-                g.ysize = min(tmpmazepart.ysize,
+                g.ysize = min(mf->hei,
                               (g.coder->croom->hy - g.coder->croom->ly));
             } else {
-                g.xsize = tmpmazepart.xsize;
-                g.ysize = tmpmazepart.ysize;
+                g.xsize = mf->wid;
+                g.ysize = mf->hei;
                 g.xstart = x;
                 g.ystart = y;
             }
         } else {
+            mapfrag_free(&mf);
             nhl_error(L, "Map requires either x,y or halign,valign params");
             return 0;
         }
@@ -5869,15 +5986,12 @@ TODO: g.coder->croom needs to be updated
         g.xsize = COLNO - 1;
         g.ysize = ROWNO;
     } else {
-        char mpchr;
         xchar mptyp;
 
         /* Load the map */
         for (y = g.ystart; y < min(ROWNO, g.ystart + g.ysize); y++)
             for (x = g.xstart; x < min(COLNO, g.xstart + g.xsize); x++) {
-                mpchr = mapdata[(y - g.ystart) * (mapwid + 1)
-                                + (x - g.xstart)];
-                mptyp = splev_chr2typ(mpchr);
+                mptyp = mapfrag_get(mf, (x - g.xstart), (y - g.ystart));
                 if (mptyp == INVALID_TYPE) {
                     /* TODO: warn about illegal map char */
                     continue;
@@ -5926,7 +6040,7 @@ TODO: g.coder->croom needs to be updated
         g.ysize = tmpysize;
     }
 
-    Free(mapdata);
+    mapfrag_free(&mf);
 
     return 0;
 }

@@ -352,8 +352,11 @@ function test_sel_flood()
    sel_pt_ne(selb, 5,5, 1, __func__);
    sel_pt_ne(selb, 6,5, 1, __func__);
    sel_pt_ne(selb, 7,5, 1, __func__);
-
 end -- test_sel_flood
+
+function test_sel_match()
+   local sel = selection.match([[...]]);
+end -- test_sel_match
 
 test_selection_params();
 test_sel_negate();
@@ -368,3 +371,4 @@ test_sel_randline();
 test_sel_grow();
 test_sel_filter_mapchar();
 test_sel_flood();
+test_sel_match();

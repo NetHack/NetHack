@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1581886862 2020/02/16 21:01:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1583193505 2020/03/02 23:58:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,6 +21,8 @@ static void FDECL(missmu, (struct monst *, BOOLEAN_P, struct attack *));
 static void FDECL(mswings, (struct monst *, struct obj *));
 static void FDECL(wildmiss, (struct monst *, struct attack *));
 static void FDECL(hitmsg, (struct monst *, struct attack *));
+
+#define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
 
 static void
 hitmsg(mtmp, mattk)
@@ -505,7 +507,8 @@ register struct monst *mtmp;
                         || u.umonnum == PM_TRAPPER)
                         pline(
                              "Wait, %s!  There's a hidden %s named %s there!",
-                              m_monnam(mtmp), g.youmonst.data->mname, g.plname);
+                              m_monnam(mtmp),
+                              g.youmonst.data->mname, g.plname);
                     else
                         pline(
                           "Wait, %s!  There's a %s named %s hiding under %s!",
@@ -547,7 +550,7 @@ register struct monst *mtmp;
             map_invisible(mtmp->mx, mtmp->my);
         if (!youseeit)
             pline("%s %s!", Something, (likes_gold(mtmp->data)
-                                        && g.youmonst.mappearance == GOLD_PIECE)
+                                      && g.youmonst.mappearance == GOLD_PIECE)
                                            ? "tries to pick you up"
                                            : "disturbs you");
         else /* see note about m_monnam() above */
@@ -660,6 +663,9 @@ register struct monst *mtmp;
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
+        if (i > 0 && foundyou /* previous attack might have moved hero */
+            && (mtmp->mux != u.ux || mtmp->muy != u.uy))
+            continue; /* fill in sum[] with 'miss' but skip other actions */
         mon_currwep = (struct obj *)0;
         mattk = getmattk(mtmp, &g.youmonst, i, sum, &alt_attk);
         if ((u.uswallow && mattk->aatyp != AT_ENGL)
@@ -1003,8 +1009,8 @@ register struct attack *mattk;
                     dmg += rn1(4, 3); /* 3..6 */
                 if (dmg <= 0)
                     dmg = 1;
-                if (!(otmp->oartifact
-                      && artifact_hit(mtmp, &g.youmonst, otmp, &dmg, g.mhitu_dieroll)))
+                if (!(otmp->oartifact && artifact_hit(mtmp, &g.youmonst, otmp,
+                                                      &dmg, g.mhitu_dieroll)))
                     hitmsg(mtmp, mattk);
                 if (!dmg)
                     break;
@@ -2581,10 +2587,23 @@ struct monst *mon;
         return 1;
 
     if (uarm || uarmc) {
-        if (!Deaf)
-            verbalize("You're such a %s; I wish...",
-                      flags.female ? "sweet lady" : "nice guy");
-        else if (seewho)
+        if (!Deaf) {
+            if (!(ld() && mon->female)) {
+                verbalize("You're such a %s; I wish...",
+                          flags.female ? "sweet lady" : "nice guy");
+            } else {
+                struct obj *yourgloves = u_carried_gloves();
+
+                /* have her call your gloves by their correct
+                   name, possibly revealing them to you */
+                if (yourgloves)
+                    yourgloves->dknown = 1;
+                verbalize("Well, then you owe me %s%s!",
+                          yourgloves ? yname(yourgloves)
+                                     : "twelve pairs of gloves",
+                          yourgloves ? " and eleven more pairs of gloves" : "");
+            }
+	} else if (seewho)
             pline("%s appears to sigh.", Monnam(mon));
         /* else no regret message if can't see or hear seducer */
 
