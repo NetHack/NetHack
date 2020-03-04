@@ -316,12 +316,33 @@ Example:
 
 === map
 
+Construct a piece of the level from text map. Takes one parameter, either a text string
+describing the map, or a table with multiple parameters.
+
+[options="header"]
+|===
+| parameter | description
+| x, y      | Coordinates on the level.
+| coord     | Coordinates in table format.
+| halign    | Horizontal alignment on a rough 3x3 grid.
+| valign    | Vertical alignment on a rough 3x3 grid.
+| map       | Multi-line string describing the map.
+| contents  | A function called with one parameter, a table with "width" and "height", the map width and height. All coordinates in the function will be relative to the map.
+|===
+
 Example:
 
  des.map({ x = 10, y = 10, map = [[...]] });
  des.map({ coord = {10, 10}, map = [[...]] });
  des.map({ halign = "center", valign = "center", map = [[...]] });
- des.map([[...]])
+ des.map([[...]]);
+ des.map({ halign = "center", valign = "center", map = [[
+ ....
+ ....
+ ....]], contents = function(map)
+   des.terrain(0,0, "L");
+   des.terrain(map.width-1, map.height-1, "T");
+ end });
 
 === mazewalk
 
@@ -409,10 +430,34 @@ Example:
 
 === room
 
+Create a room of certain type and size. Takes one parameter, a table with the following
+fields:
+
+[options="header"]
+|===
+| parameter | description
+| type      | The room type. Default is "ordinary"
+| chance    | Percentage chance this room is of type, otherwise it will be created as ordinary room. Default is 100.
+| x,y       | Room coordinates.
+| coord     | Room coordinates, in table format.
+| w, h      | Width and height. Both default to -1 (random). If one is set, then both must be set.
+| xalign    | Horizontal alignment on a rough 3x3 grid. Default is "random".
+| yalign    | Vertical alignment on a rough 3x3 grid. Default is "random".
+| lit       | Is the room lit or unlit? Defaults to -1 (random).
+| filled    | Is the room filled as per the room type. Defaults to 1 (filled).
+| joined    | Is the room joined to the rest of the level with corridors? Default is 1 (joined).
+| contents  | A function called with one parameter, a table with "width" and "height", the room width and height, excluding the walls. All coordinates in the function will be relative to the room.
+|===
+
+
 Example:
 
  des.room({ type="ordinary", lit=1, x=3,y=3, xalign="center",yalign="center", w=11,h=9 });
  des.room({ lit=1, coord={3,3}, xalign="center",yalign="center", w=11,h=9 });
+ des.room({ type="ordinary", contents=function(room)
+    des.terrain(0,0, "L");
+    des.terrain(room.width, room.height, "T");
+ end });
 
 === stair
 

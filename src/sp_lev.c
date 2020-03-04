@@ -99,6 +99,7 @@ static int FDECL(get_table_region, (lua_State *, const char *,
 static void FDECL(set_wallprop_in_selection, (lua_State *, int));
 static int FDECL(floodfillchk_match_under, (int, int));
 static int FDECL(floodfillchk_match_accessible, (int, int));
+static void FDECL(l_push_wid_hei_table, (lua_State *, int, int));
 
 /* lua_CFunction prototypes */
 int FDECL(lspo_altar, (lua_State *));
@@ -2799,6 +2800,23 @@ spo_pop_container()
     }
 }
 
+/* push a table on lua stack: {width=wid, height=hei} */
+static void
+l_push_wid_hei_table(L, wid, hei)
+lua_State *L;
+int wid, hei;
+{
+    lua_newtable(L);
+
+    lua_pushstring(L, "width");
+    lua_pushinteger(L, wid);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "height");
+    lua_pushinteger(L, hei);
+    lua_rawset(L, -3);
+}
+
 /* message("What a strange feeling!"); */
 int
 lspo_message(L)
@@ -3570,6 +3588,7 @@ int defval;
 
 /* room({ type="ordinary", lit=1, x=3,y=3, xalign="center",yalign="center", w=11,h=9 }); */
 /* room({ lit=1, coord={3,3}, xalign="center",yalign="center", w=11,h=9 }); */
+/* room({ coord={3,3}, xalign="center",yalign="center", w=11,h=9, contents=function(room) ... end }); */
 int
 lspo_room(L)
 lua_State *L;
@@ -3627,7 +3646,8 @@ lua_State *L;
                 lua_getfield(L, 1, "contents");
                 if (lua_type(L, -1) == LUA_TFUNCTION) {
                     lua_remove(L, -2);
-                    lua_call(L, 0, 0);
+                    l_push_wid_hei_table(L, tmpcr->hx - tmpcr->lx, tmpcr->hy - tmpcr->ly);
+                    lua_call(L, 1, 0);
                 } else
                     lua_pop(L, 1);
                 spo_endroom(g.coder);
@@ -5851,6 +5871,7 @@ lua_State *L UNUSED;
 /* map({ x = 10, y = 10, map = [[...]] }); */
 /* map({ coord = {10, 10}, map = [[...]] }); */
 /* map({ halign = "center", valign = "center", map = [[...]] }); */
+/* map({ map = [[...]], contents = function(map) ... end }); */
 /* map([[...]]) */
 int
 lspo_map(L)
@@ -5874,9 +5895,10 @@ TODO: g.coder->croom needs to be updated
         "top", "center", "bottom", "none", NULL
     };
     static const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1 };
-    int lr, tb, keepregion = 1, x = -1, y = -1;
+    int lr, tb, x = -1, y = -1;
     struct mapfragment *mf;
     int argc = lua_gettop(L);
+    boolean has_contents = FALSE;
 
     create_des_coder();
 
@@ -5890,9 +5912,15 @@ TODO: g.coder->croom needs to be updated
         lcheck_param_table(L);
         lr = l_or_r2i[get_table_option(L, "halign", "none", left_or_right)];
         tb = t_or_b2i[get_table_option(L, "valign", "none", top_or_bot)];
-        keepregion = get_table_boolean_opt(L, "keepregion", 1); /* TODO: maybe rename? */
         get_table_xy_or_coord(L, &x, &y);
         tmpstr = get_table_str(L, "map");
+        lua_getfield(L, 1, "contents");
+        if (lua_type(L, -1) == LUA_TFUNCTION) {
+            lua_remove(L, -2);
+            has_contents = TRUE;
+        } else {
+            lua_pop(L, 1);
+        }
         mf = mapfrag_fromstr(tmpstr);
         free(tmpstr);
     }
@@ -5902,14 +5930,10 @@ TODO: g.coder->croom needs to be updated
         return 0;
     }
 
-    /* keepregion restricts the coordinates of the commands coming after
-       the map into the map region */
-    /* for keepregion */
     tmpxsize = g.xsize;
     tmpysize = g.ysize;
     tmpxstart = g.xstart;
     tmpystart = g.ystart;
-
 
     g.xsize = mf->wid;
     g.ysize = mf->hei;
@@ -6033,14 +6057,18 @@ TODO: g.coder->croom needs to be updated
             remove_rooms(g.xstart, g.ystart,
                          g.xstart + g.xsize, g.ystart + g.ysize);
     }
-    if (!keepregion) {
-        g.xstart = tmpxstart;
-        g.ystart = tmpystart;
-        g.xsize = tmpxsize;
-        g.ysize = tmpysize;
-    }
 
     mapfrag_free(&mf);
+
+    if (has_contents) {
+        l_push_wid_hei_table(L, g.xsize, g.ysize);
+        lua_call(L, 1, 0);
+    }
+
+    tmpxsize = g.xsize;
+    tmpysize = g.ysize;
+    tmpxstart = g.xstart;
+    tmpystart = g.ystart;
 
     return 0;
 }
