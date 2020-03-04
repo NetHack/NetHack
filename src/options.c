@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1582748890 2020/02/26 20:28:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.451 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1583282760 2020/03/04 00:46:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.457 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6529,12 +6529,13 @@ char *str;
             c = colornames[i].color;
             break;
         }
-    if (i == SIZE(colornames) && (*str >= '0' && *str <= '9'))
+    if (i == SIZE(colornames) && digit(*str))
         c = atoi(str);
 
-    if (c == CLR_MAX)
-        config_error_add("Unknown color '%s'", str);
-
+    if (c < 0 || c >= CLR_MAX) {
+        config_error_add("Unknown color '%.60s'", str);
+        c = CLR_MAX; /* "none of the above" */
+    }
     return c;
 }
 
@@ -6565,7 +6566,7 @@ boolean complain;
         }
 
     if (a == -1 && complain)
-        config_error_add("Unknown text attribute '%s'", str);
+        config_error_add("Unknown text attribute '%.50s'", str);
 
     return a;
 }
