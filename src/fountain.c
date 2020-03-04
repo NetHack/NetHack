@@ -474,7 +474,7 @@ register struct obj *obj;
                         if (!otmp->quan)
                             delobj(otmp);
                     }
-                You("lost some of your money in the fountain!");
+                You("lost some of your gold in the fountain!");
                 CLEAR_FOUNTAIN_LOOTED(u.ux, u.uy);
                 exercise(A_WIS, FALSE);
             }

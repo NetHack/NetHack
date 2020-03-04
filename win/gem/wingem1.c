@@ -1424,8 +1424,9 @@ mar_more()
 
 /************************* Gem_start_menu *******************************/
 void
-Gem_start_menu(win)
+Gem_start_menu(win, mbehavior)
 winid win;
+unsigned long mbehavior UNUSED;
 {
     win = win;
     if (invent_list) {
@@ -1783,7 +1784,10 @@ char acc;
 
     for (curr = invent_list; start-- && curr; curr = curr->Gmi_next)
         ;
-    for (; page-- && curr; curr = curr->Gmi_next)
+    for (; page-- && curr; curr = curr->Gmi_next) {
+        if (!menuitem_invert_test(0, curr->Gmi_itemflags, curr->Gmi_selected)
+            continue;
+
         if (curr->Gmi_identifier && (acc == 0 || curr->Gmi_groupacc == acc)) {
             if (curr->Gmi_selected) {
                 curr->Gmi_selected = FALSE;
@@ -1791,6 +1795,7 @@ char acc;
             } else
                 curr->Gmi_selected = TRUE;
         }
+    }
 }
 
 /************************* Inv_Handler and Inv_Init
@@ -2547,7 +2552,7 @@ winid window;
         use_rip = FALSE;
         break;
     case NHW_MENU:
-        Gem_start_menu(window); /* delete invent_list */
+        Gem_start_menu(window, MENU_BEHAVE_STANDARD); /* delete invent_list */
         test_free(Menu_title);
         break;
     case 0: /* No window available, probably an error message? */

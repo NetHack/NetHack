@@ -806,7 +806,7 @@ int howmuch;
                 /* Zonk all memory of this location. */
                 levl[zx][zy].seenv = 0;
                 levl[zx][zy].waslit = 0;
-                levl[zx][zy].glyph = cmap_to_glyph(S_stone);
+                levl[zx][zy].glyph = GLYPH_UNEXPLORED;
                 g.lastseentyp[zx][zy] = STONE;
             }
     /* forget overview data for this level */
@@ -1605,7 +1605,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (!already_known)
             (void) learnscrolltyp(SCR_FIRE);
         if (confused) {
-            if (Fire_resistance) {
+            if (Underwater) {
+                pline("A little %s around you vaporizes.", hliquid("water"));
+            }
+            else if (Fire_resistance) {
                 shieldeff(u.ux, u.uy);
                 if (!Blind)
                     pline("Oh, look, what a pretty fire in your %s.",
@@ -2104,7 +2107,6 @@ do_class_genocide()
                      * have G_GENOD or !G_GENO.
                      */
                     g.mvitals[i].mvflags |= (G_GENOD | G_NOCORPSE);
-                    reset_rndmonst(i);
                     kill_genocided_monsters();
                     update_inventory(); /* eggs & tins */
                     pline("Wiped out all %s.", nam);
@@ -2321,7 +2323,6 @@ int how;
         } else if (ptr == g.youmonst.data) {
             rehumanize();
         }
-        reset_rndmonst(mndx);
         kill_genocided_monsters();
         update_inventory(); /* in case identified eggs were affected */
     } else {
@@ -2437,6 +2438,7 @@ struct obj *from_obj;
 }
 
 struct _create_particular_data {
+    int quan;
     int which;
     int fem;
     char monclass;
@@ -2453,6 +2455,7 @@ struct _create_particular_data *d;
     char *bufp = str;
     char *tmpp;
 
+    d->quan = 1 + ((g.multi > 0) ? g.multi : 0);
     d->monclass = MAXMCLASSES;
     d->which = g.urole.malenum; /* an arbitrary index into mons[] */
     d->fem = -1; /* gender not specified */
@@ -2460,6 +2463,14 @@ struct _create_particular_data *d;
     d->maketame = d->makepeaceful = d->makehostile = FALSE;
     d->sleeping = d->saddled = d->invisible = d->hidden = FALSE;
 
+    /* quantity */
+    if (digit(*bufp) && strcmp(bufp, "0")) {
+        d->quan = atoi(bufp);
+        while (digit(*bufp))
+            bufp++;
+        while (*bufp == ' ')
+            bufp++;
+    }
     if ((tmpp = strstri(bufp, "saddled ")) != 0) {
         d->saddled = TRUE;
         (void) memset(tmpp, ' ', sizeof "saddled " - 1);
@@ -2548,7 +2559,7 @@ struct _create_particular_data *d;
         }
         whichpm = &mons[d->which];
     }
-    for (i = 0; i <= g.multi; i++) {
+    for (i = 0; i < d->quan; i++) {
         if (d->monclass != MAXMCLASSES)
             whichpm = mkclass(d->monclass, 0);
         else if (d->randmonst)

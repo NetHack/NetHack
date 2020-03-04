@@ -51,10 +51,10 @@ public:
 	static void qt_putstr(winid wid, int attr, const std::string& text);
 	static void qt_putstr(winid wid, int attr, const QString& text);
 	static void qt_display_file(const char *filename, BOOLEAN_P must_exist);
-	static void qt_start_menu(winid wid);
+	static void qt_start_menu(winid wid, unsigned long mbehavior);
 	static void qt_add_menu(winid wid, int glyph,
 		const ANY_P * identifier, CHAR_P ch, CHAR_P gch, int attr,
-		const char *str, BOOLEAN_P presel);
+		const char *str, unsigned int itemflags);
 	static void qt_end_menu(winid wid, const char *prompt);
 	static int qt_select_menu(winid wid, int how, MENU_ITEM_P **menu_list);
 	static void qt_update_inventory();

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1575768410 2019/12/08 01:26:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1579649788 2020/01/21 23:36:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -593,6 +593,8 @@ Gloves_off(VOID_ARGS)
        engage if a corpse has been set up as the alternate weapon.] */
     if (u.twoweap && uswapwep && uswapwep->otyp == CORPSE)
         wielding_corpse(uswapwep, on_purpose);
+    if (condtests[bl_bareh].enabled)
+        g.context.botl = 1;
 
     return 0;
 }
@@ -1159,15 +1161,19 @@ void
 Blindf_off(otmp)
 struct obj *otmp;
 {
-    boolean was_blind = Blind, changed = FALSE;
+    boolean was_blind = Blind, changed = FALSE,
+            nooffmsg = !otmp;
 
+    if (!otmp)
+        otmp = ublindf;
     if (!otmp) {
-        impossible("Blindf_off without otmp");
+        impossible("Blindf_off without eyewear?");
         return;
     }
     g.context.takeoff.mask &= ~W_TOOL;
     setworn((struct obj *) 0, otmp->owornmask);
-    off_msg(otmp);
+    if (!nooffmsg)
+        off_msg(otmp);
 
     if (Blind) {
         if (was_blind) {
@@ -1895,6 +1901,15 @@ struct obj *obj;
             return 1;
         }
     } else {
+        /*
+         * FIXME:
+         *  except for the rings/nolimbs case, this allows you to put on
+         *  accessories without having any hands to manipulate them, and
+         *  to put them on when poly'd into a tiny or huge form where
+         *  they shouldn't fit.  [If the latter situation changes, make
+         *  comparable change to break_armor(polyself.c).]
+         */
+
         /* accessory */
         if (ring) {
             char answer, qbuf[QBUFSZ];
@@ -1965,6 +1980,11 @@ struct obj *obj;
                 return 0;
             }
         } else if (eyewear) {
+            if (!has_head(g.youmonst.data)) {
+                You("have no head to wear %s on.", ansimpleoname(obj));
+                return 0;
+            }
+
             if (ublindf) {
                 if (ublindf->otyp == TOWEL)
                     Your("%s is already covered by a towel.",

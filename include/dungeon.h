@@ -56,6 +56,7 @@ typedef struct dest_area { /* non-stairway level change identifier */
 typedef struct dungeon {   /* basic dungeon identifier */
     char dname[24];        /* name of the dungeon (eg. "Hell") */
     char proto[15];        /* name of prototype file (eg. "tower") */
+    char fill_lvl[15];     /* name of "fill" level protype file */
     char boneid;           /* character to id dungeon in bones files */
     d_flags flags;         /* dungeon flags */
     xchar entry_lev;       /* entry level */

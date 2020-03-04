@@ -52,10 +52,23 @@ if math.random(0, 99) < 50 then
    des.terrain(47,09, "S")
    des.terrain(47,10, "|")
 end
+
 --   The Vault
---   Using unfilled morgue for
---   identification in mkmaze.c
-des.region({ region={21,08,35,11}, lit=1, type="morgue", prefilled=1 })
+function treasure_spot(x,y)
+   des.gold({ x = x, y = y, amount = 600 + math.random(0, 300) });
+   if (math.random(0,2) == 0) then
+      if (math.random(0,2) == 0) then
+         des.trap("spiked pit", x,y);
+      else
+         des.trap("land mine", x,y);
+      end
+   end
+end
+
+des.region({ region={21,08,35,11}, lit=1, type="ordinary" })
+local treasury = selection.area(21,08,35,11);
+treasury:iterate(treasure_spot);
+
 --   Vault entrance also varies
 if math.random(0, 99) < 50 then
    des.terrain(36,09, "|")

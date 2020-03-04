@@ -133,6 +133,7 @@ typedef struct x11_mi {
     int attr;            /* Attribute for the line. */
     boolean selected;    /* Been selected? */
     boolean preselected; /*   in advance?  */
+    unsigned itemflags;  /* MENU_ITEMFLAGS_foo */
     char selector;       /* Char used to select this entry. */
     char gselector;      /* Group selector. */
     Widget w;
@@ -416,9 +417,9 @@ E void FDECL(X11_destroy_nhwindow, (winid));
 E void FDECL(X11_curs, (winid, int, int));
 E void FDECL(X11_putstr, (winid, int, const char *));
 E void FDECL(X11_display_file, (const char *, BOOLEAN_P));
-E void FDECL(X11_start_menu, (winid));
+E void FDECL(X11_start_menu, (winid, unsigned long));
 E void FDECL(X11_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
-                            const char *, BOOLEAN_P));
+                            const char *, unsigned int));
 E void FDECL(X11_end_menu, (winid, const char *));
 E int FDECL(X11_select_menu, (winid, int, MENU_ITEM_P **));
 E void NDECL(X11_update_inventory);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1552441031 2019/03/13 01:37:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1577063125 2019/12/23 01:05:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -94,9 +94,6 @@ static int (*old_error_handler) (Display *, XErrorEvent *);
 static XtSignalId X11_sig_id;
 #endif
 #endif
-
-/* this is only needed until X11_status_* routines are written */
-extern NEARDATA winid WIN_STATUS;
 
 /* Interface definition, for windows.c */
 struct window_procs X11_procs = {
@@ -1495,8 +1492,8 @@ char **argv;
         window_list[i].type = NHW_NONE;
 
     /* add another option that can be set */
-    set_wc_option_mod_status(WC_TILED_MAP, SET_IN_GAME);
-    set_option_mod_status("mouse_support", SET_IN_GAME);
+    set_wc_option_mod_status(WC_TILED_MAP, set_in_game);
+    set_option_mod_status("mouse_support", set_in_game);
 
     load_default_resources(); /* create default_resource_data[] */
 
@@ -1960,12 +1957,12 @@ boolean complain;
 
     newwin = X11_create_nhwindow(NHW_MENU);
     wp = &window_list[newwin];
-    X11_start_menu(newwin);
+    X11_start_menu(newwin, MENU_BEHAVE_STANDARD);
 
     any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
         X11_add_menu(newwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     line, MENU_UNSELECTED);
+                     line, MENU_ITEMFLAGS_NONE);
     }
     (void) dlb_fclose(fp);
 

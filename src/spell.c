@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1546565814 2019/01/04 01:36:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.88 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1581322667 2020/02/10 08:17:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -259,6 +259,7 @@ struct obj *book2;
             /* successful invocation */
             mkinvokearea();
             u.uevent.invoked = 1;
+            record_achievement(ACH_INVK);
             /* in case you haven't killed the Wizard yet, behave as if
                you just did */
             u.uevent.udemigod = 1; /* wizdead() */
@@ -464,7 +465,8 @@ register struct obj *spellbook;
         }
     }
 
-    if (g.context.spbook.delay && !confused && spellbook == g.context.spbook.book
+    if (g.context.spbook.delay && !confused
+        && spellbook == g.context.spbook.book
         /* handle the sequence: start reading, get interrupted, have
            g.context.spbook.book become erased somehow, resume reading it */
         && booktype != SPE_BLANK_PAPER) {
@@ -489,6 +491,7 @@ register struct obj *spellbook;
                 check_unpaid(spellbook);
                 makeknown(booktype);
                 if (!u.uevent.read_tribute) {
+                    record_achievement(ACH_NOVL);
                     /* give bonus of 20 xp and 4*20+0 pts */
                     more_experienced(20, 0);
                     newexplevel();
@@ -1556,7 +1559,7 @@ spellsortmenu()
     int i, n, choice;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany; /* zero out all bits */
 
     for (i = 0; i < SIZE(spl_sortchoices); i++) {
@@ -1565,13 +1568,13 @@ spellsortmenu()
             /* separate final choice from others with a blank line */
             any.a_int = 0;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
         } else {
             let = 'a' + i;
         }
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, let, 0, ATR_NONE, spl_sortchoices[i],
-                 (i == g.spl_sortmode) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (i == g.spl_sortmode) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "View known spells list sorted");
 
@@ -1639,7 +1642,7 @@ int *spell_no;
     anything any;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany; /* zero out all bits */
 
     /*
@@ -1658,7 +1661,7 @@ int *spell_no;
         fmt = "%s\t%-d\t%s\t%-d%%\t%s";
     }
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf,
-             MENU_UNSELECTED);
+             MENU_ITEMFLAGS_NONE);
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
         splnum = !g.spl_orderindx ? i : g.spl_orderindx[i];
         Sprintf(buf, fmt, spellname(splnum), spellev(splnum),
@@ -1668,7 +1671,7 @@ int *spell_no;
 
         any.a_int = splnum + 1; /* must be non-zero */
         add_menu(tmpwin, NO_GLYPH, &any, spellet(splnum), 0, ATR_NONE, buf,
-                 (splnum == splaction) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (splnum == splaction) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     how = PICK_ONE;
     if (splaction == SPELLMENU_VIEW) {
@@ -1679,7 +1682,7 @@ int *spell_no;
             /* more than 1 spell, add an extra menu entry */
             any.a_int = SPELLMENU_SORT + 1;
             add_menu(tmpwin, NO_GLYPH, &any, '+', 0, ATR_NONE,
-                     "[sort spells]", MENU_UNSELECTED);
+                     "[sort spells]", MENU_ITEMFLAGS_NONE);
         }
     }
     end_menu(tmpwin, prompt);

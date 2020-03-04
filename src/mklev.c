@@ -10,6 +10,7 @@
 /* conversion of result to int is reasonable */
 
 static void FDECL(mkfount, (int, struct mkroom *));
+static boolean FDECL(find_okay_roompos, (struct mkroom *, coord *));
 static void FDECL(mksink, (struct mkroom *));
 static void FDECL(mkaltar, (struct mkroom *));
 static void FDECL(mkgrave, (struct mkroom *));
@@ -584,7 +585,7 @@ makevtele()
 void
 clear_level_structures()
 {
-    static struct rm zerorm = { cmap_to_glyph(S_stone),
+    static struct rm zerorm = { GLYPH_UNEXPLORED,
                                 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     register int x, y;
     register struct rm *lev;
@@ -685,8 +686,8 @@ makelevel()
         } else if (g.dungeons[u.uz.dnum].proto[0]) {
             makemaz("");
             return;
-        } else if (In_mines(&u.uz)) {
-            makemaz("minefill");
+        } else if (g.dungeons[u.uz.dnum].fill_lvl[0]) {
+            makemaz(g.dungeons[u.uz.dnum].fill_lvl);
             return;
         } else if (In_quest(&u.uz)) {
             char fillname[9];
@@ -812,6 +813,7 @@ makelevel()
 
     /* for each room: put things inside */
     for (croom = g.rooms; croom->hx > 0; croom++) {
+        int trycnt = 0;
         if (croom->rtype != OROOM)
             continue;
 
@@ -833,7 +835,7 @@ makelevel()
         x = 8 - (level_difficulty() / 6);
         if (x <= 1)
             x = 2;
-        while (!rn2(x))
+        while (!rn2(x) && (++trycnt < 1000))
             mktrap(0, 0, croom, (coord *) 0);
         if (!rn2(3))
             (void) mkgold(0L, somex(croom), somey(croom));
@@ -1121,6 +1123,7 @@ coord *mp;
     if (g.nroom == 0) {
         mazexy(mp); /* already verifies location */
     } else {
+        int cnt = 0;
         /* not perfect - there may be only one stairway */
         if (g.nroom > 2) {
             int tryct = 0;
@@ -1135,9 +1138,9 @@ coord *mp;
         do {
             if (!somexy(croom, mp))
                 impossible("Can't place branch!");
-        } while (occupied(mp->x, mp->y)
+        } while ((occupied(mp->x, mp->y)
                  || (levl[mp->x][mp->y].typ != CORR
-                     && levl[mp->x][mp->y].typ != ROOM));
+                     && levl[mp->x][mp->y].typ != ROOM)) && (++cnt < 1000));
     }
     return croom;
 }
@@ -1604,19 +1607,30 @@ struct mkroom *croom;
     g.level.flags.nfountains++;
 }
 
+static boolean
+find_okay_roompos(croom, crd)
+struct mkroom *croom;
+coord *crd;
+{
+    int tryct = 0;
+
+    do {
+        if (++tryct > 200)
+            return FALSE;
+        if (!somexy(croom, crd))
+            return FALSE;
+    } while (occupied(crd->x, crd->y) || bydoor(crd->x, crd->y));
+    return TRUE;
+}
+
 static void
 mksink(croom)
 struct mkroom *croom;
 {
     coord m;
-    register int tryct = 0;
 
-    do {
-        if (++tryct > 200)
-            return;
-        if (!somexy(croom, &m))
-            return;
-    } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
+    if (!find_okay_roompos(croom, &m))
+        return;
 
     /* Put a sink at m.x, m.y */
     levl[m.x][m.y].typ = SINK;
@@ -1629,18 +1643,13 @@ mkaltar(croom)
 struct mkroom *croom;
 {
     coord m;
-    register int tryct = 0;
     aligntyp al;
 
     if (croom->rtype != OROOM)
         return;
 
-    do {
-        if (++tryct > 200)
-            return;
-        if (!somexy(croom, &m))
-            return;
-    } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
+    if (!find_okay_roompos(croom, &m))
+        return;
 
     /* Put an altar at m.x, m.y */
     levl[m.x][m.y].typ = ALTAR;
@@ -1662,12 +1671,8 @@ struct mkroom *croom;
     if (croom->rtype != OROOM)
         return;
 
-    do {
-        if (++tryct > 200)
-            return;
-        if (!somexy(croom, &m))
-            return;
-    } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
+    if (!find_okay_roompos(croom, &m))
+        return;
 
     /* Put a grave at <m.x,m.y> */
     make_grave(m.x, m.y, dobell ? "Saved by the bell!" : (char *) 0);

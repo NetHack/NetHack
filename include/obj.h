@@ -1,4 +1,4 @@
-/* NetHack 3.6	obj.h	$NHDT-Date: 1508827590 2017/10/24 06:46:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	obj.h	$NHDT-Date: 1580036271 2020/01/26 10:57:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -66,7 +66,8 @@ struct obj {
 #define OBJ_MIGRATING 5 /* object sent off to another level */
 #define OBJ_BURIED 6    /* object buried */
 #define OBJ_ONBILL 7    /* object on shk bill */
-#define NOBJ_STATES 8
+#define OBJ_LUAFREE 8   /* object has been dealloc'd, but is ref'd by lua */
+#define NOBJ_STATES 9
     xchar timed; /* # of fuses (timers) attached to this obj */
 
     Bitfield(cursed, 1);
@@ -113,12 +114,12 @@ struct obj {
 #define leashmon corpsenm /* gets m_id of attached pet */
 #define fromsink corpsenm /* a potion from a sink */
 #define novelidx corpsenm /* 3.6 tribute - the index of the novel title */
-#define record_achieve_special corpsenm
     int usecount;           /* overloaded for various things that tally */
 #define spestudied usecount /* # of times a spellbook has been studied */
     unsigned oeaten;        /* nutrition left in food, if partly eaten */
     long age;               /* creation date */
     long owornmask;
+    unsigned lua_ref_cnt;  /* # of lua script references for this object */
     struct oextra *oextra; /* pointer to oextra struct */
 };
 
@@ -344,19 +345,9 @@ struct obj {
          && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD)))
 #define pair_of(o) ((o)->otyp == LENSES || is_gloves(o) || is_boots(o))
 
-/* 'PRIZE' values override obj->corpsenm so prizes mustn't be object types
-   which use that field for monster type (or other overloaded purpose) */
-#define MINES_PRIZE 1
-#define SOKO_PRIZE1 2
-#define SOKO_PRIZE2 3
-#define is_mines_prize(o) \
-    ((o)->otyp == iflags.mines_prize_type                \
-     && (o)->record_achieve_special == MINES_PRIZE)
-#define is_soko_prize(o) \
-    (((o)->otyp == iflags.soko_prize_type1               \
-      && (o)->record_achieve_special == SOKO_PRIZE1)     \
-     || ((o)->otyp == iflags.soko_prize_type2            \
-         && (o)->record_achieve_special == SOKO_PRIZE2))
+/* achievement tracking; 3.6.x did this differently */
+#define is_mines_prize(o) ((o)->o_id == g.context.achieveo.mines_prize_oid)
+#define is_soko_prize(o) ((o)->o_id == g.context.achieveo.soko_prize_oid)
 
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO 0x1

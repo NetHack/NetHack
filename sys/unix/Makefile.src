@@ -445,11 +445,12 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
 	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
-	   files.c fountain.c hack.c hacklib.c invent.c isaac64.c light.c \
+	   files.c fountain.c hack.c hacklib.c \
+	   insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mapglyph.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
-	   nhlua.c nhlsel.c o_init.c objects.c objnam.c \
+	   nhlua.c nhlsel.c nhlobj.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
 	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
@@ -494,14 +495,14 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 #
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h def_os2.h \
-	display.h dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h \
-	global.h hack.h lev.h lint.h macconf.h mextra.h mfndpos.h micro.h \
-	mkroom.h \
+	display.h dlb.h dungeon.h engrave.h extern.h flag.h fnamesiz.h \
+	func_tab.h global.h hack.h lint.h macconf.h mextra.h mfndpos.h \
+	micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
-	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h \
-	rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h \
-	tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
-	wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
+	optlist.h os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
+	region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
+	tosconf.h tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h \
+	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
 
@@ -512,11 +513,12 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
 	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
-	extralev.o files.o fountain.o hack.o hacklib.o invent.o isaac64.o \
+	extralev.o files.o fountain.o hack.o hacklib.o \
+	insight.o invent.o isaac64.o \
 	light.o lock.o mail.o makemon.o mapglyph.o mcastu.o mdlib.o mhitm.o \
 	mhitu.o minion.o mklev.o mkmap.o mkmaze.o mkobj.o mkroom.o mon.o \
 	mondata.o monmove.o mplayer.o mthrowu.o muse.o music.o \
-	nhlua.o nhlsel.o o_init.o objnam.o options.o \
+	nhlua.o nhlsel.o nhlobj.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o sfstruct.o \
@@ -640,7 +642,7 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \
-		../include/dlb.h ../include/patchlevel.h ../include/qtext.h
+		../include/dlb.h ../include/patchlevel.h
 	@( cd ../util ; $(MAKE) makedefs )
 
 #	Source files created by 'makedefs' at build time.
@@ -733,7 +735,8 @@ $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/system.h ../include/nhlua.h ../include/unixconf.h \
 		../include/os2conf.h ../include/micro.h ../include/pcconf.h \
 		../include/tosconf.h ../include/amiconf.h ../include/macconf.h \
-		../include/beconf.h ../include/wceconf.h ../include/ntconf.h
+		../include/beconf.h ../include/wceconf.h ../include/ntconf.h \
+		../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
@@ -742,13 +745,13 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/permonst.h ../include/monattk.h \
 		../include/monflag.h ../include/mondata.h ../include/pm.h \
 		../include/wintype.h ../include/context.h ../include/rm.h \
-		../include/botl.h ../include/qtext.h ../include/rect.h \
-		../include/region.h ../include/decl.h ../include/quest.h \
-		../include/spell.h ../include/color.h ../include/obj.h \
-		../include/you.h ../include/attrib.h ../include/monst.h \
-		../include/mextra.h ../include/skills.h ../include/onames.h \
-		../include/timeout.h ../include/trap.h ../include/flag.h \
-		../include/vision.h ../include/display.h ../include/engrave.h \
+		../include/botl.h ../include/rect.h ../include/region.h \
+		../include/decl.h ../include/quest.h ../include/spell.h \
+		../include/color.h ../include/obj.h ../include/you.h \
+		../include/attrib.h ../include/monst.h ../include/mextra.h \
+		../include/skills.h ../include/onames.h ../include/timeout.h \
+		../include/trap.h ../include/flag.h ../include/vision.h \
+		../include/display.h ../include/engrave.h \
 		../include/winprocs.h ../include/sys.h ../include/wintty.h \
 		../include/trampoli.h
 	touch $(HACK_H)
@@ -1044,16 +1047,16 @@ apply.o: apply.c $(HACK_H)
 artifact.o: artifact.c $(HACK_H) ../include/artifact.h ../include/artilist.h
 attrib.o: attrib.c $(HACK_H)
 ball.o: ball.c $(HACK_H)
-bones.o: bones.c $(HACK_H) ../include/lev.h
+bones.o: bones.c $(HACK_H)
 botl.o: botl.c $(HACK_H)
-cmd.o: cmd.c $(HACK_H) ../include/lev.h ../include/func_tab.h
+cmd.o: cmd.c $(HACK_H) ../include/func_tab.h
 dbridge.o: dbridge.c $(HACK_H)
 decl.o: decl.c $(HACK_H)
 detect.o: detect.c $(HACK_H) ../include/artifact.h
 dig.o: dig.c $(HACK_H)
 display.o: display.c $(HACK_H)
 dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h ../include/patchlevel.h
-do.o: do.c $(HACK_H) ../include/lev.h
+do.o: do.c $(HACK_H)
 do_name.o: do_name.c $(HACK_H)
 do_wear.o: do_wear.c $(HACK_H)
 dog.o: dog.c $(HACK_H)
@@ -1061,21 +1064,21 @@ dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h
 dokick.o: dokick.c $(HACK_H)
 dothrow.o: dothrow.c $(HACK_H)
 drawing.o: drawing.c $(HACK_H) ../include/tcap.h
-dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h \
-		../include/lev.h
+dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
 eat.o: eat.c $(HACK_H)
-end.o: end.c $(HACK_H) ../include/lev.h ../include/dlb.h
-engrave.o: engrave.c $(HACK_H) ../include/lev.h
+end.o: end.c $(HACK_H) ../include/dlb.h
+engrave.o: engrave.c $(HACK_H)
 exper.o: exper.c $(HACK_H)
 explode.o: explode.c $(HACK_H)
 extralev.o: extralev.c $(HACK_H)
-files.o: files.c $(HACK_H) ../include/dlb.h ../include/lev.h #zlib.h
+files.o: files.c $(HACK_H) ../include/dlb.h #zlib.h
 fountain.o: fountain.c $(HACK_H)
 hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
+insight.o: insight.c $(HACK_H)
 invent.o: invent.c $(HACK_H)
 isaac64.o: isaac64.c $(CONFIG_H) ../include/isaac64.h
-light.o: light.c $(HACK_H) ../include/lev.h
+light.o: light.c $(HACK_H)
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) ../include/mail.h
 makemon.o: makemon.c $(HACK_H)
@@ -1094,7 +1097,7 @@ mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 minion.o: minion.c $(HACK_H)
 mklev.o: mklev.c $(HACK_H)
 mkmap.o: mkmap.c $(HACK_H) ../include/sp_lev.h
-mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h ../include/lev.h
+mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h
 mkobj.o: mkobj.c $(HACK_H)
 mkroom.o: mkroom.c $(HACK_H)
 mon.o: mon.c $(HACK_H) ../include/mfndpos.h
@@ -1109,12 +1112,13 @@ muse.o: muse.c $(HACK_H)
 music.o: music.c $(HACK_H)
 nhlua.o: nhlua.c $(HACK_H) ../include/dlb.h
 nhlsel.o: nhlsel.c $(HACK_H) ../include/sp_lev.h
-o_init.o: o_init.c $(HACK_H) ../include/lev.h
+nhlobj.o: nhlobj.c $(HACK_H) ../include/sp_lev.h
+o_init.o: o_init.c $(HACK_H)
 objects.o: objects.c $(CONFIG_H) ../include/obj.h ../include/objclass.h \
 		../include/prop.h ../include/skills.h ../include/color.h
 objnam.o: objnam.c $(HACK_H)
 options.o: options.c $(CONFIG_H) ../include/objclass.h ../include/flag.h \
-		$(HACK_H) ../include/tcap.h
+		$(HACK_H) ../include/tcap.h ../include/optlist.h
 pager.o: pager.c $(HACK_H) ../include/dlb.h
 pickup.o: pickup.c $(HACK_H)
 pline.o: pline.c $(HACK_H)
@@ -1126,13 +1130,13 @@ quest.o: quest.c $(HACK_H)
 questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h
 read.o: read.c $(HACK_H)
 rect.o: rect.c $(HACK_H)
-region.o: region.c $(HACK_H) ../include/lev.h
-restore.o: restore.c $(HACK_H) ../include/lev.h ../include/tcap.h
+region.o: region.c $(HACK_H)
+restore.o: restore.c $(HACK_H) ../include/tcap.h
 rip.o: rip.c $(HACK_H)
 rnd.o: rnd.c $(HACK_H) ../include/isaac64.h
 role.o: role.c $(HACK_H)
-rumors.o: rumors.c $(HACK_H) ../include/lev.h ../include/dlb.h
-save.o: save.c $(HACK_H) ../include/lev.h
+rumors.o: rumors.c $(HACK_H) ../include/dlb.h
+save.o: save.c $(HACK_H)
 sfstruct.o: sfstruct.c $(HACK_H)
 shk.o: shk.c $(HACK_H)
 shknam.o: shknam.c $(HACK_H)
@@ -1144,7 +1148,7 @@ steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
 sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
-timeout.o: timeout.c $(HACK_H) ../include/lev.h
+timeout.o: timeout.c $(HACK_H)
 topten.o: topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h
 track.o: track.c $(HACK_H)
 trap.o: trap.c $(HACK_H)
@@ -1152,14 +1156,14 @@ u_init.o: u_init.c $(HACK_H)
 uhitm.o: uhitm.c $(HACK_H)
 vault.o: vault.c $(HACK_H)
 version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h \
-		../include/lev.h ../include/patchlevel.h
+		../include/patchlevel.h
 vision.o: vision.c $(HACK_H) ../include/vis_tab.h
 weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
 windows.o: windows.c $(HACK_H) ../include/wingem.h ../include/winGnome.h
 wizard.o: wizard.c $(HACK_H)
-worm.o: worm.c $(HACK_H) ../include/lev.h
+worm.o: worm.c $(HACK_H)
 worn.o: worn.c $(HACK_H)
 write.o: write.c $(HACK_H)
 zap.o: zap.c $(HACK_H)

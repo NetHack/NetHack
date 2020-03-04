@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1575830189 2019/12/08 18:36:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1581322665 2020/02/10 08:17:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -484,7 +484,7 @@ int trouble;
             what = rightglow;
         else if (otmp == uleft)
             what = leftglow;
-    decurse:
+ decurse:
         if (!otmp) {
             impossible("fix_worst_trouble: nothing to uncurse.");
             return;
@@ -1181,10 +1181,9 @@ aligntyp g_align;
             struct obj *otmp;
             int sp_no, trycnt = u.ulevel + 1;
 
-            /* not yet known spells given preference over already known ones
-             */
-            /* Also, try to grant a spell for which there is a skill slot */
-            otmp = mkobj(SPBOOK_CLASS, TRUE);
+            /* not yet known spells given preference over already known ones;
+               also, try to grant a spell for which there is a skill slot */
+            otmp = mkobj(SPBOOK_no_NOVEL, TRUE);
             while (--trycnt > 0) {
                 if (otmp->otyp != SPE_BLANK_PAPER) {
                     for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
@@ -1309,7 +1308,11 @@ register struct obj *otmp;
         Your("sacrifice disappears!");
     else
         Your("sacrifice is consumed in a %s!",
-             u.ualign.type == A_LAWFUL ? "flash of light" : "burst of flame");
+             u.ualign.type == A_LAWFUL
+                ? "flash of light"
+                : u.ualign.type == A_NEUTRAL
+                    ? "cloud of smoke"
+                    : "burst of flame");
     if (carried(otmp))
         useup(otmp);
     else
@@ -1493,7 +1496,7 @@ dosacrifice()
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
         if (!highaltar) {
-        too_soon:
+ too_soon:
             if (altaralign == A_NONE && Inhell)
                 /* hero has left Moloch's Sanctum so is in the process
                    of getting away with the Amulet (outside of Gehennom,
@@ -1513,7 +1516,6 @@ dosacrifice()
             /* The final Test.  Did you win? */
             if (uamul == otmp)
                 Amulet_off();
-            u.uevent.ascended = 1;
             if (carried(otmp))
                 useup(otmp); /* well, it's gone now */
             else
@@ -1523,6 +1525,8 @@ dosacrifice()
                 /* Moloch's high altar */
                 if (u.ualign.record > -99)
                     u.ualign.record = -99;
+                pline(
+              "An invisible choir chants, and you are bathed in darkness...");
                 /*[apparently shrug/snarl can be sensed without being seen]*/
                 pline("%s shrugs and retains dominion over %s,", Moloch,
                       u_gname());
@@ -1547,8 +1551,8 @@ dosacrifice()
                 pline(cloud_of_smoke, hcolor(NH_ORANGE));
                 done(ESCAPED);
             } else { /* super big win */
+                u.uevent.ascended = 1;
                 adjalign(10);
-                u.uachieve.ascended = 1;
                 pline(
                "An invisible choir sings, and you are bathed in radiance...");
                 godvoice(altaralign, "Mortal, thou hast done well!");
@@ -1559,6 +1563,7 @@ dosacrifice()
                     flags.female ? "dess" : "");
                 done(ASCENDED);
             }
+            /*NOTREACHED*/
         }
     } /* real Amulet */
 
@@ -1589,7 +1594,7 @@ dosacrifice()
     }
 
     if (altaralign != u.ualign.type && highaltar) {
-    desecrate_high_altar:
+ desecrate_high_altar:
         /*
          * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
          * gets the god who owns it truly pissed off.
@@ -1826,7 +1831,8 @@ boolean praying; /* false means no messages should be given */
     }
 
     if (is_undead(g.youmonst.data) && !Inhell
-        && (g.p_aligntyp == A_LAWFUL || (g.p_aligntyp == A_NEUTRAL && !rn2(10))))
+        && (g.p_aligntyp == A_LAWFUL
+            || (g.p_aligntyp == A_NEUTRAL && !rn2(10))))
         g.p_type = -1;
     /* Note:  when !praying, the random factor for neutrals makes the
        return value a non-deterministic approximation for enlightenment.

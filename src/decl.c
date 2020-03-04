@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1573869062 2019/11/16 01:51:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1580600496 2020/02/01 23:41:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,6 +36,8 @@ NEARDATA struct obj *uwep, *uarm, *uswapwep,
     *uskin, /* dragon armor, if a dragon */
     *uarmc, *uarmh, *uarms, *uarmg,*uarmf, *uamul,
     *uright, *uleft, *ublindf, *uchain, *uball;
+
+struct engr *head_engr;
 
 #ifdef TEXTCOLOR
 /*
@@ -235,6 +237,7 @@ const struct instance_globals g_init = {
 #endif
     UNDEFINED_VALUES, /* cond_hilites */
     0, /* now_or_before_idx */
+    0, /* condmenu_sortorder */
 
     /* cmd.c */
     UNDEFINED_VALUES, /* Cmd */
@@ -461,8 +464,6 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES,
 
     /* makemon.c */
-    { -1, /* choice_count */
-     { 0 } }, /* mchoices */
 
     /* mhitm.c */
     UNDEFINED_VALUE, /* vis */
@@ -630,19 +631,11 @@ const struct instance_globals g_init = {
     NULL, /* lev_message */
     NULL, /* lregions */
     0, /* num_lregions */
-    UNDEFINED_VALUES, /* SpLev_Map */
     NULL, /* coder */
     UNDEFINED_VALUE, /* xstart */
     UNDEFINED_VALUE, /* ystart */
     UNDEFINED_VALUE, /* xsize */
     UNDEFINED_VALUE, /* ysize */
-    FALSE, /* splev_init_present */
-    FALSE, /* icedpools */
-    0, /* mines_prize_count */
-    0, /* soki_prize_count */
-    { UNDEFINED_PTR }, /* container_obj */
-    0, /* container_idx */
-    NULL, /* invent_carrying_monster */
 
     /* spells.c */
     0, /* spl_sortmode */

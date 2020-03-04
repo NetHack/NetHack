@@ -1,4 +1,4 @@
-/* NetHack 3.6	winstat.c	$NHDT-Date: 1543447325 2018/11/28 23:22:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	winstat.c	$NHDT-Date: 1582833042 2020/02/27 19:50:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -87,8 +87,10 @@ static void FDECL(update_fancy_status, (struct xwindow *));
 static void FDECL(update_fancy_status_field, (int));
 static Widget FDECL(create_fancy_status, (Widget, Widget));
 static void FDECL(destroy_fancy_status, (struct xwindow *));
-static void FDECL(create_status_window_fancy, (struct xwindow *, BOOLEAN_P, Widget));
-static void FDECL(create_status_window_tty, (struct xwindow *, BOOLEAN_P, Widget));
+static void FDECL(create_status_window_fancy, (struct xwindow *,
+                                               BOOLEAN_P, Widget));
+static void FDECL(create_status_window_tty, (struct xwindow *,
+                                             BOOLEAN_P, Widget));
 static void FDECL(destroy_status_window_fancy, (struct xwindow *));
 static void FDECL(destroy_status_window_tty, (struct xwindow *));
 static void FDECL(adjust_status_fancy, (struct xwindow *, const char *));
@@ -251,8 +253,10 @@ const char *text;
         XtSetArg(args[num_args], nhStr(XtNy), &lbl_y); num_args++;
         XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
         XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
-        XtSetArg(args[num_args], nhStr(XtNinternalWidth), &lbl_iwidth); num_args++;
-        XtSetArg(args[num_args], nhStr(XtNborderWidth), &lbl_border_wid); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNinternalWidth),
+                 &lbl_iwidth); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNborderWidth),
+                 &lbl_border_wid); num_args++;
         XtGetValues(label, args, num_args);
 
         if (text && *text)
@@ -261,13 +265,16 @@ const char *text;
             lbl_wid = 1;
 
         num_args = 0;
-        XtSetArg(args[num_args], nhStr(XtNlabel), (text && *text) ? text : ""); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNlabel),
+                 (text && *text) ? text : ""); num_args++;
         XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;
 
-        fg = (coloridx != NO_COLOR) ? get_nhcolor(xw_status_win, coloridx).pixel
-                                    : X11_status_widget_fg;
+        fg = (coloridx != NO_COLOR)
+             ? get_nhcolor(xw_status_win, coloridx).pixel
+             : X11_status_widget_fg;
         if (attrmask & HL_INVERSE) {
             Pixel tmppx = fg;
+
             fg = bg;
             bg = tmppx;
         }
@@ -289,8 +296,10 @@ const char *text;
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
         XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
-        XtSetArg(args[num_args], nhStr(XtNinternalWidth), &lbl_iwidth); num_args++;
-        XtSetArg(args[num_args], nhStr(XtNborderWidth), &lbl_border_wid); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNinternalWidth),
+                 &lbl_iwidth); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNborderWidth),
+                 &lbl_border_wid); num_args++;
         XtGetValues(label, args, num_args);
 
         num_args = 0;
@@ -390,8 +399,10 @@ unsigned long *colormasks;
             XtSetArg(args[num_args], nhStr(XtNy), &lbl_y); num_args++;
             XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
             XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
-            XtSetArg(args[num_args], nhStr(XtNinternalWidth), &lbl_iwidth); num_args++;
-            XtSetArg(args[num_args], nhStr(XtNborderWidth), &lbl_border_wid); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNinternalWidth),
+                     &lbl_iwidth); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNborderWidth),
+                     &lbl_border_wid); num_args++;
             XtGetValues(label, args, num_args);
 
             /*raw_printf("font: %i-%i",
@@ -409,8 +420,9 @@ unsigned long *colormasks;
                      (text && *text) ? text : ""); num_args++;
             XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;
 
-            fg = (coloridx != NO_COLOR) ? get_nhcolor(xw_status_win, coloridx).pixel
-                                        : X11_status_widget_fg;
+            fg = (coloridx != NO_COLOR)
+                 ? get_nhcolor(xw_status_win, coloridx).pixel
+                 : X11_status_widget_fg;
             if (attridx & HL_INVERSE) {
                 Pixel tmppx = fg;
 
@@ -453,10 +465,14 @@ unsigned long *colormasks;
                         label = X11_cond_labels[i];
 
                         num_args = 0;
-                        XtSetArg(args[num_args], nhStr(XtNx), &lbl_x); num_args++;
-                        XtSetArg(args[num_args], nhStr(XtNy), &lbl_y); num_args++;
-                        XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
-                        XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
+                        XtSetArg(args[num_args], nhStr(XtNx),
+                                 &lbl_x); num_args++;
+                        XtSetArg(args[num_args], nhStr(XtNy),
+                                 &lbl_y); num_args++;
+                        XtSetArg(args[num_args], nhStr(XtNwidth),
+                                 &lbl_wid); num_args++;
+                        XtSetArg(args[num_args], nhStr(XtNheight),
+                                 &lbl_hei); num_args++;
                         XtSetArg(args[num_args], nhStr(XtNborderWidth),
                                  &lbl_border_wid); num_args++;
                         XtGetValues(label, args, num_args);
@@ -464,7 +480,8 @@ unsigned long *colormasks;
                         lbl_x = dx;
 
                         num_args = 0;
-                        XtSetArg(args[num_args], nhStr(XtNx), lbl_x); num_args++;
+                        XtSetArg(args[num_args], nhStr(XtNx),
+                                 lbl_x); num_args++;
                         XtSetValues(label, args, num_args);
                         XtConfigureWidget(label, lbl_x, lbl_y,
                                           lbl_wid, lbl_hei, lbl_border_wid);
@@ -483,8 +500,10 @@ unsigned long *colormasks;
                 num_args = 0;
                 XtSetArg(args[num_args], nhStr(XtNx), &lbl_x); num_args++;
                 XtSetArg(args[num_args], nhStr(XtNy), &lbl_y); num_args++;
-                XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
-                XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
+                XtSetArg(args[num_args], nhStr(XtNwidth),
+                         &lbl_wid); num_args++;
+                XtSetArg(args[num_args], nhStr(XtNheight),
+                         &lbl_hei); num_args++;
                 XtSetArg(args[num_args], nhStr(XtNborderWidth),
                          &lbl_border_wid); num_args++;
                 XtGetValues(label, args, num_args);
@@ -604,13 +623,10 @@ Widget parent, top;
 
     num_args = 0;
     if (top != (Widget) 0) {
-        XtSetArg(args[num_args], nhStr(XtNfromVert), top);
-        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNfromVert), top); num_args++;
     }
-    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);
-    num_args++;
-    XtSetArg(args[num_args], XtNborderWidth, 0);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
     XtSetArg(args[num_args], XtNwidth, 400); num_args++;
     XtSetArg(args[num_args], XtNheight, 100); num_args++;
     form = XtCreateManagedWidget("status_viewport", viewportWidgetClass,
@@ -620,7 +636,7 @@ Widget parent, top;
     XtSetArg(args[num_args], XtNwidth, 400); num_args++;
     XtSetArg(args[num_args], XtNheight, 100); num_args++;
     w = XtCreateManagedWidget("status_form", formWidgetClass,
-                             form, args, num_args);
+                              form, args, num_args);
     for (y = 0; y < X11_NUM_STATUS_LINES; y++) {
         for (x = 0; x < X11_NUM_STATUS_FIELD; x++) {
             int fld = X11_fieldorder[y][x];
@@ -649,7 +665,8 @@ Widget parent, top;
             XtSetArg(args[num_args], nhStr(XtNbottomMargin), 0); num_args++;
             XtSetArg(args[num_args], nhStr(XtNleftMargin), 0); num_args++;
             XtSetArg(args[num_args], nhStr(XtNrightMargin), 0); num_args++;
-            XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNjustify),
+                     XtJustifyLeft); num_args++;
             XtSetArg(args[num_args], nhStr(XtNborderWidth), 0); num_args++;
             /*
             XtSetArg(args[num_args], nhStr(XtNlabel),
@@ -708,8 +725,10 @@ Widget parent;
     X11_status_widget = wp->w = create_tty_status(parent, (Widget) 0);
 
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNforeground), &X11_status_widget_fg); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbackground), &X11_status_widget_bg); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNforeground),
+             &X11_status_widget_fg); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbackground),
+             &X11_status_widget_bg); num_args++;
     XtGetValues(X11_status_widget, args, num_args);
 }
 
@@ -727,6 +746,7 @@ struct xwindow *wp;
         free((genericptr_t) wp->status_information);
         wp->status_information = 0;
     } else {
+        ;
     }
     if (!wp->keep_window)
         wp->type = NHW_NONE;
@@ -804,32 +824,28 @@ Widget parent;
     }
 
     wp->status_information =
-        (struct status_info_t *) alloc(sizeof(struct status_info_t));
+        (struct status_info_t *) alloc(sizeof (struct status_info_t));
 
     init_text_buffer(&wp->status_information->text);
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNallowShellResize, False);
-    num_args++;
-    XtSetArg(args[num_args], XtNinput, False);
-    num_args++;
+    XtSetArg(args[num_args], XtNallowShellResize, False); num_args++;
+    XtSetArg(args[num_args], XtNinput, False); num_args++;
 
-    wp->popup = parent = XtCreatePopupShell(
-        "status_popup", topLevelShellWidgetClass, toplevel, args, num_args);
+    wp->popup = parent = XtCreatePopupShell("status_popup",
+                                            topLevelShellWidgetClass,
+                                            toplevel, args, num_args);
     /*
      * If we're here, then this is an auxiliary status window.  If we're
      * cancelled via a delete window message, we should just pop down.
      */
 
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNdisplayCaret), False);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdisplayCaret), False); num_args++;
     XtSetArg(args[num_args], nhStr(XtNscrollHorizontal),
-             XawtextScrollWhenNeeded);
-    num_args++;
+             XawtextScrollWhenNeeded); num_args++;
     XtSetArg(args[num_args], nhStr(XtNscrollVertical),
-             XawtextScrollWhenNeeded);
-    num_args++;
+             XawtextScrollWhenNeeded); num_args++;
 
     wp->w = XtCreateManagedWidget("status", /* name */
                                   asciiTextWidgetClass,
@@ -844,28 +860,22 @@ Widget parent;
 
     /* Get the font and margin information. */
     num_args = 0;
-    XtSetArg(args[num_args], XtNfont, &fs);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtopMargin), &top_margin);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbottomMargin), &bottom_margin);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleftMargin), &left_margin);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNrightMargin), &right_margin);
-    num_args++;
+    XtSetArg(args[num_args], XtNfont, &fs); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtopMargin), &top_margin); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottomMargin),
+             &bottom_margin); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleftMargin), &left_margin); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNrightMargin), &right_margin); num_args++;
     XtGetValues(wp->w, args, num_args);
 
     wp->pixel_height = 2 * nhFontHeight(wp->w) + top_margin + bottom_margin;
-    wp->pixel_width =
-        COLNO * fs->max_bounds.width + left_margin + right_margin;
+    wp->pixel_width = COLNO * fs->max_bounds.width
+                    + left_margin + right_margin;
 
     /* Set the new width and height. */
     num_args = 0;
-    XtSetArg(args[num_args], XtNwidth, wp->pixel_width);
-    num_args++;
-    XtSetArg(args[num_args], XtNheight, wp->pixel_height);
-    num_args++;
+    XtSetArg(args[num_args], XtNwidth, wp->pixel_width); num_args++;
+    XtSetArg(args[num_args], XtNheight, wp->pixel_height); num_args++;
     XtSetValues(wp->w, args, num_args);
 }
 
@@ -917,8 +927,8 @@ const char *str;
 
     /* Set new buffer as text. */
     num_args = 0;
-    XtSetArg(args[num_args], XtNstring, wp->status_information->text.text);
-    num_args++;
+    XtSetArg(args[num_args], XtNstring,
+             wp->status_information->text.text); num_args++;
     XtSetValues(wp->w, args, num_args);
 }
 
@@ -1074,7 +1084,8 @@ long new_value;
                 }
                 Strcat(buf, mname);
             } else
-                Strcat(buf, rank_of(u.ulevel, g.pl_character[0], flags.female));
+                Strcat(buf,
+                       rank_of(u.ulevel, g.pl_character[0], flags.female));
 
         } else if (attr_rec == &shown_stats[F_DLEVEL]) {
             if (!describe_level(buf)) {
@@ -1132,10 +1143,9 @@ long new_value;
             }
             if (!flagtime)
                 return;
-        }
 
         /* special case: exp can be enabled & disabled */
-        else if (attr_rec == &shown_stats[F_EXP]) {
+        } else if (attr_rec == &shown_stats[F_EXP]) {
             static boolean flagexp = TRUE;
 
             if (flags.showexp && !flagexp) {
@@ -1175,10 +1185,9 @@ long new_value;
             }
             return;
 #endif
-        }
 
         /* special case: when polymorphed, show "HD", disable exp */
-        else if (attr_rec == &shown_stats[F_LEVEL]) {
+        } else if (attr_rec == &shown_stats[F_LEVEL]) {
             static boolean lev_was_poly = FALSE;
 
             if (Upolyd && !lev_was_poly) {
@@ -1551,10 +1560,8 @@ int sv_index;
         *(char *) (sv->name) = '\0';
 
         num_args = 0;
-        XtSetArg(args[num_args], XtNborderWidth, 0);
-        num_args++;
-        XtSetArg(args[num_args], XtNinternalHeight, 0);
-        num_args++;
+        XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
+        XtSetArg(args[num_args], XtNinternalHeight, 0); num_args++;
         sv->w = XtCreateManagedWidget((sv_index == F_NAME)
                                          ? "name"
                                          : "dlevel",
@@ -1639,15 +1646,12 @@ int *col_indices;
 
     num_args = 0;
     if (top != (Widget) 0) {
-        XtSetArg(args[num_args], nhStr(XtNfromVert), top);
-        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNfromVert), top); num_args++;
     }
     if (left != (Widget) 0) {
-        XtSetArg(args[num_args], nhStr(XtNfromHoriz), left);
-        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNfromHoriz), left); num_args++;
     }
-    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
     form = XtCreateManagedWidget(name, formWidgetClass, parent,
                                  args, num_args);
 
@@ -1658,8 +1662,7 @@ int *col_indices;
         if (ip != col_indices) {      /* not first */
             num_args = 0;
             XtSetArg(args[num_args], nhStr(XtNfromVert),
-                     shown_stats[*(ip - 1)].w);
-            num_args++;
+                     shown_stats[*(ip - 1)].w); num_args++;
             XtSetValues(sv->w, args, num_args);
         }
         get_widths(sv, &width1, &width2);
@@ -1732,17 +1735,14 @@ Widget parent, top, left;
 
     num_args = 0;
     if (top != (Widget) 0) {
-        XtSetArg(args[num_args], nhStr(XtNfromVert), top);
-        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNfromVert), top); num_args++;
     }
     if (left != (Widget) 0) {
-        XtSetArg(args[num_args], nhStr(XtNfromHoriz), left);
-        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNfromHoriz), left); num_args++;
     }
-    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);
-    num_args++;
-    form = XtCreateManagedWidget("status_info", formWidgetClass, parent, args,
-                                 num_args);
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
+    form = XtCreateManagedWidget("status_info", formWidgetClass, parent,
+                                 args, num_args);
 
     /* top of form */
     sv_name = &shown_stats[F_NAME];
@@ -1753,8 +1753,7 @@ Widget parent, top, left;
     create_widget(form, sv_dlevel, F_DLEVEL);
 
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNfromVert), sv_name->w);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromVert), sv_name->w); num_args++;
     XtSetValues(sv_dlevel->w, args, num_args);
 
     /* two columns beneath */
@@ -1831,15 +1830,11 @@ Widget parent, top;
 
     num_args = 0;
     if (top != (Widget) 0) {
-        XtSetArg(args[num_args], nhStr(XtNfromVert), top);
-        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNfromVert), top); num_args++;
     }
-    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);
-    num_args++;
-    XtSetArg(args[num_args], XtNborderWidth, 0);
-    num_args++;
-    XtSetArg(args[num_args], XtNorientation, XtorientHorizontal);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
+    XtSetArg(args[num_args], XtNorientation, XtorientHorizontal); num_args++;
     form = XtCreateManagedWidget("fancy_status", panedWidgetClass, parent,
                                  args, num_args);
 

@@ -5,7 +5,7 @@
 --
 des.level_init({ style = "solidfill", fg = " " });
 
-des.level_flags("mazelevel", "hardfloor", "icedpools")
+des.level_flags("mazelevel", "hardfloor", "icedpools", "noflip")
 
 des.level_init({ style="mines", fg=".", bg="I", smoothed=true, joined=false, lit=1, walled=false })
 

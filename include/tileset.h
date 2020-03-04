@@ -18,8 +18,14 @@ struct TileImage {
 
 boolean FDECL(read_tiles, (const char *filename, BOOLEAN_P true_color));
 const struct Pixel *NDECL(get_palette);
+boolean FDECL(set_tile_type, (BOOLEAN_P true_color));
 void NDECL(free_tiles);
 const struct TileImage *FDECL(get_tile, (unsigned tile_index));
+
+/* For resizing tiles */
+struct TileImage *FDECL(stretch_tile, (const struct TileImage *,
+                                       unsigned, unsigned));
+void FDECL(free_tile, (struct TileImage *));
 
 /* Used internally by the tile set code */
 struct TileSetImage {

@@ -4,8 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
-
 
 #ifdef MFLOPPY
 extern long bytes_counted;
@@ -167,14 +165,10 @@ boolean restore;
                     if (mnum == PM_DOPPELGANGER && otmp->otyp == CORPSE)
                         set_corpsenm(otmp, mnum);
                 }
-            } else if ((otmp->otyp == iflags.mines_prize_type
-                        && !Is_mineend_level(&u.uz))
-                       || ((otmp->otyp == iflags.soko_prize_type1
-                            || otmp->otyp == iflags.soko_prize_type2)
-                           && !Is_sokoend_level(&u.uz))) {
-                /* "special prize" in this game becomes ordinary object
-                   if loaded into another game */
-                otmp->record_achieve_special = NON_PM;
+            } else if (is_mines_prize(otmp) || is_soko_prize(otmp)) {
+                /* achievement tracking; in case prize was moved off its
+                   original level (which is always a no-bones level) */
+                otmp->nomerge = 0;
             } else if (otmp->otyp == AMULET_OF_YENDOR) {
                 /* no longer the real Amulet */
                 otmp->otyp = FAKE_AMULET_OF_YENDOR;
@@ -490,7 +484,7 @@ struct obj *corpse;
         for (y = 0; y < ROWNO; y++) {
             levl[x][y].seenv = 0;
             levl[x][y].waslit = 0;
-            levl[x][y].glyph = cmap_to_glyph(S_stone);
+            levl[x][y].glyph = GLYPH_UNEXPLORED;
             g.lastseentyp[x][y] = 0;
         }
 
@@ -587,7 +581,7 @@ struct obj *corpse;
 int
 getbones()
 {
-    int ok, i;
+    int ok;
     NHFILE *nhfp = (NHFILE *) 0;
     char c = 0, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
@@ -615,7 +609,7 @@ getbones()
 
     if (validate(nhfp, g.bones) != 0) {
         if (!wizard)
-            pline("Discarding unuseable bones; no need to panic...");
+            pline("Discarding unusable bones; no need to panic...");
         ok = FALSE;
     } else {
         ok = TRUE;
@@ -651,7 +645,7 @@ getbones()
         } else {
             register struct monst *mtmp;
 
-            getlev(nhfp, 0, 0, TRUE);
+            getlev(nhfp, 0, 0);
 
             /* Note that getlev() now keeps tabs on unique
              * monsters such as demon lords, and tracks the

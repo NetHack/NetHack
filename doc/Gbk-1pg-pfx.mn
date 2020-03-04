@@ -1,0 +1,3 @@
+.\" prefix to Guidebook.mn for 'roff version of Guidebook written as one page
+.
+.pl 12345v \" set page size of 12345 lines

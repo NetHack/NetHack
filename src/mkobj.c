@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1571531889 2019/10/20 00:38:09 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1578895344 2020/01/13 06:02:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -245,7 +245,7 @@ boolean init, artif;
    result is always non-Null */
 struct obj *
 mkobj(oclass, artif)
-char oclass;
+int oclass;
 boolean artif;
 {
     int tprob, i, prob = rnd(1000);
@@ -257,13 +257,18 @@ boolean artif;
                                             : (const struct icp *) mkobjprobs;
 
         for (tprob = rnd(100); (tprob -= iprobs->iprob) > 0; iprobs++)
-            ;
+            continue;
         oclass = iprobs->iclass;
     }
 
-    i = g.bases[(int) oclass];
-    while ((prob -= objects[i].oc_prob) > 0)
-        i++;
+    if (oclass == SPBOOK_no_NOVEL) {
+        i = rnd_class(g.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
+        oclass = SPBOOK_CLASS; /* for sanity check below */
+    } else {
+        i = g.bases[oclass];
+        while ((prob -= objects[i].oc_prob) > 0)
+            ++i;
+    }
 
     if (objects[i].oc_class != oclass || !OBJ_NAME(objects[i]))
         panic("probtype error, oclass=%d i=%d", (int) oclass, i);
@@ -444,6 +449,7 @@ long num;
     obj->owt = weight(obj);
     otmp->quan = num;
     otmp->owt = weight(otmp); /* -= obj->owt ? */
+    otmp->lua_ref_cnt = 0;
 
     g.context.objsplit.parent_oid = obj->o_id;
     g.context.objsplit.child_oid = otmp->o_id;
@@ -797,6 +803,7 @@ boolean artif;
     otmp->lknown = 0;
     otmp->cknown = 0;
     otmp->corpsenm = NON_PM;
+    otmp->lua_ref_cnt = 0;
 
     if (init) {
         switch (let) {
@@ -1054,7 +1061,8 @@ boolean artif;
                 otmp->corpsenm = rndmonnum();
                 if (!verysmall(&mons[otmp->corpsenm])
                     && rn2(level_difficulty() / 2 + 10) > 10)
-                    (void) add_to_container(otmp, mkobj(SPBOOK_CLASS, FALSE));
+                    (void) add_to_container(otmp,
+                                            mkobj(SPBOOK_no_NOVEL, FALSE));
             }
             break;
         case COIN_CLASS:
@@ -1967,6 +1975,7 @@ struct monst *mtmp;
  *      OBJ_MIGRATING   migrating chain
  *      OBJ_BURIED      level.buriedobjs chain
  *      OBJ_ONBILL      on g.billobjs chain
+ *      OBJ_LUAFREE     obj is dealloc'd from core, but still used by lua
  */
 void
 obj_extract_self(obj)
@@ -1974,6 +1983,7 @@ struct obj *obj;
 {
     switch (obj->where) {
     case OBJ_FREE:
+    case OBJ_LUAFREE:
         break;
     case OBJ_FLOOR:
         remove_object(obj);
@@ -2159,7 +2169,7 @@ void
 dealloc_obj(obj)
 struct obj *obj;
 {
-    if (obj->where != OBJ_FREE)
+    if (obj->where != OBJ_FREE && obj->where != OBJ_LUAFREE)
         panic("dealloc_obj: obj not free");
     if (obj->nobj)
         panic("dealloc_obj with nobj");
@@ -2178,8 +2188,10 @@ struct obj *obj;
      * list must track all objects that can have a light source
      * attached to it (and also requires lamplit to be set).
      */
-    if (obj_sheds_light(obj))
+    if (obj_sheds_light(obj)) {
         del_light_source(LS_OBJECT, obj_to_any(obj));
+        obj->lamplit = 0;
+    }
 
     if (obj == g.thrownobj)
         g.thrownobj = 0;
@@ -2188,6 +2200,11 @@ struct obj *obj;
 
     if (obj->oextra)
         dealloc_oextra(obj);
+    if (obj->lua_ref_cnt) {
+        /* obj is referenced from a lua script, let lua gc free it */
+        obj->where = OBJ_LUAFREE;
+        return;
+    }
     free((genericptr_t) obj);
 }
 
@@ -2424,7 +2441,8 @@ const char *mesg;
 static const char *obj_state_names[NOBJ_STATES] = { "free",      "floor",
                                                     "contained", "invent",
                                                     "minvent",   "migrating",
-                                                    "buried",    "onbill" };
+                                                    "buried",    "onbill",
+                                                    "luafree" };
 
 static const char *
 where_name(obj)

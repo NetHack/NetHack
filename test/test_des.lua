@@ -14,6 +14,20 @@ function is_map_at(x,y, mapch, lit)
    end
 end
 
+function check_loc_name(x, y, name)
+   local loc = nh.getmap(x,y);
+   if (loc.typ_name ~= name) then
+      error("No " .. name .. " at " .. x .. "," .. y .. " (" .. loc.typ_name .. ")");
+   end
+end
+
+function check_trap_at(x,y, name)
+   local t = nh.gettrap(x + 1, y); -- + 1 == g.xstart
+   if (t.ttyp_name ~= name) then
+      error("Trap at " .. x .. "," .. y .. " is " .. t.ttyp_name .. ", not " .. name);
+   end
+end
+
 function test_level_init()
    des.reset_level();
    des.level_init();
@@ -134,6 +148,7 @@ end
 function test_engraving()
    des.engraving({02,04},"engrave","Trespassers will be persecuted!")
    des.engraving({ x = 1, y = 2, type = "burn", text = "Elbereth" });
+   des.engraving({ coord = {1, 3}, type = "burn", text = "Elbereth" });
    des.engraving({ type = "dust", text = "X marks the spot." })
    des.engraving({ text = "Foobar" })
    des.engraving({ type = "mark", text = "X" })
@@ -147,8 +162,10 @@ end
 
 function test_grave()
    des.grave();
+   des.grave(39,10, "Foo is here");
    des.grave({ text = "Lil Miss Marker" });
    des.grave({ x = 40, y = 11 });
+   des.grave({ coord = {40, 12} });
    des.grave({ x = 41, y = 12, text = "Bongo" });
    des.grave({ x = 42, y = 13, text = "" });
 end
@@ -171,6 +188,28 @@ LTL]])
 FFF
 F.F
 FFF]] })
+   for x = 60, 62 do
+      for y = 5, 7 do
+         local nam = "iron bars";
+         if (x == 61 and y == 6) then
+             nam = "room";
+         end
+         check_loc_name(x, y, nam);
+      end
+   end
+   des.map({ coord = {60, 5}, map = [[
+...
+.T.
+...]] })
+   for x = 60, 62 do
+      for y = 5, 7 do
+         local nam = "room";
+         if (x == 61 and y == 6) then
+             nam = "tree";
+         end
+         check_loc_name(x, y, nam);
+      end
+   end
    des.map({ halign = "left", valign = "bottom", map = [[
 III
 .I.
@@ -179,19 +218,36 @@ end
 
 function test_feature()
    des.feature("fountain", 40, 08);
+   check_loc_name(40 + 1, 08, "fountain");
    des.feature("sink", {41, 08});
+   check_loc_name(41 + 1, 08, "sink");
    des.feature({ type = "pool", x = 42, y = 08 });
+   check_loc_name(42 + 1, 08, "pool");
+   des.feature({ type = "sink", coord = {43, 08} });
+   check_loc_name(43 + 1, 08, "sink");
 end
 
 function test_gold()
+   des.gold();
    des.gold({ amount = 999, x = 40, y = 07 });
+   des.gold({ amount = 999, coord = {40, 08} });
+   des.gold(666, 41,07);
+   des.gold(123, {42,07});
 end
 
 function test_trap()
    des.trap("pit", 41, 06);
+   check_trap_at(41, 06, "pit");
+
    des.trap("level teleport", {42, 06});
-   des.trap({ type = "hole", x = 43, y = 06 });
-   des.trap({ type = "hole", coord = {44, 06} });
+   check_trap_at(42, 06, "level teleport");
+
+   des.trap({ type = "falling rock", x = 43, y = 06 });
+   check_trap_at(43, 06, "falling rock");
+
+   des.trap({ type = "dart", coord = {44, 06} });
+   check_trap_at(44, 06, "dart");
+
    des.trap();
    des.trap("rust");
 end
@@ -228,7 +284,8 @@ end
 function test_door()
    des.door("nodoor", 12,12);
    des.door({ x = 13, y = 12, state = "open" });
-   des.room({ type = "graveyard", contents = function()
+   des.door({ coord = {14, 12}, state = "open" });
+   des.room({ type = "ordinary", contents = function()
                  des.door({ wall = "north", pos = 1 });
                  des.door({ wall = "random", state = "locked" });
                          end
@@ -243,17 +300,22 @@ function test_mazewalk()
    des.reset_level();
    des.level_init({ style = "mazegrid", bg ="-" });
    des.mazewalk({ x=2,y=10, dir="north", typ="L", stocked=true });
+
+   des.reset_level();
+   des.level_init({ style = "mazegrid", bg ="-" });
+   des.mazewalk({ coord={2,10}, dir="north", typ="L", stocked=true });
 end
 
 function test_room()
    des.reset_level();
    des.level_init({ style = "solidfill", fg=" " });
-   des.room({ type = " ordinary", lit = 1,
+   des.room({ type = "ordinary", lit = 1,
               x=3, y=3, xalign="center", yalign="center",
               w=11, h=9, contents = function()
                  des.room({ x=4, y=3, w=3,h=3 });
               end
    });
+   des.room({ type="ordinary", coord={3, 3}, w=3, h=3 });
    des.room();
    des.room({ contents = function()
                  des.object();
@@ -296,6 +358,9 @@ function test_terrain()
    des.terrain({ x = 5, y = 5, typ = "L" });
    is_map_at(5,5, "L");
 
+   des.terrain({ coord = {5, 5}, typ = "T" });
+   is_map_at(5,5, "T");
+
    -- TODO: allow lit = false
    -- des.terrain({ x = 5, y = 5, typ = ".", lit = false });
    -- is_map_at(5,5, ".", false);
@@ -325,6 +390,8 @@ function test_replace_terrain()
    des.replace_terrain({ x1=1, y1=1, x2=70,y2=19, fromterrain=".", toterrain="I", lit=1 });
    des.replace_terrain({ x1=1, y1=1, x2=70,y2=19, fromterrain=".", toterrain="I", chance=50 });
    des.replace_terrain({ region={1,1, 70,19}, fromterrain=".", toterrain="L", chance=25 });
+   des.replace_terrain({ selection=selection.area(2,5, 10,15), fromterrain="L", toterrain="." });
+   des.replace_terrain({ mapfragment=[[...]], toterrain="T" });
 end
 
 function test_corridor()

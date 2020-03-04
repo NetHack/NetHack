@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1555552624 2019/04/18 01:57:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1580044340 2020/01/26 13:12:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -25,9 +25,6 @@ early_init()
     decl_globals_init();
     objects_globals_init();
     monst_globals_init();
-#if defined(OPTIONS_AT_RUNTIME) || defined(CROSSCOMPILE_TARGET)
-    runtime_info_init();
-#endif
     sys_early_init();
 }
 
@@ -66,6 +63,10 @@ boolean resuming;
         g.context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
         (void) pickup(1);      /* autopickup at initial location */
+        /* only matters if someday a character is able to start with
+           clairvoyance (wizard with cornuthaum perhaps?); without this,
+           first "random" occurrence would always kick in on turn 1 */
+        g.context.seer_turn = (long) rnd(30);
     }
     g.context.botlx = TRUE; /* for STATUS_HILITES */
     update_inventory(); /* for perm_invent */
@@ -81,7 +82,7 @@ boolean resuming;
     initrack();
 
     u.uz0.dlevel = u.uz.dlevel;
-    g.youmonst.movement = NORMAL_SPEED; /* give the hero some movement points */
+    g.youmonst.movement = NORMAL_SPEED; /* give hero some movement points */
     g.context.move = 0;
 
     g.program_state.in_moveloop = 1;
@@ -121,7 +122,7 @@ boolean resuming;
                        to skip dead monsters here because they will have
                        been purged at end of their previous round of moving */
                     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-                        mtmp->movement += mcalcmove(mtmp);
+                        mtmp->movement += mcalcmove(mtmp, TRUE);
 
                     /* occasionally add another monster; since this takes
                        place after movement has been allotted, the new
@@ -135,7 +136,7 @@ boolean resuming;
                     /* calculate how much time passed. */
                     if (u.usteed && u.umoved) {
                         /* your speed doesn't augment steed's speed */
-                        moveamt = mcalcmove(u.usteed);
+                        moveamt = mcalcmove(u.usteed, TRUE);
                     } else {
                         moveamt = g.youmonst.data->mmove;
 
@@ -174,7 +175,7 @@ boolean resuming;
                         g.youmonst.movement = 0;
                     settrack();
 
-                    g.monstermoves++;
+                    g.monstermoves++; /* [obsolete (for a long time...)] */
                     g.moves++;
 
                     /********************************/
@@ -336,9 +337,21 @@ boolean resuming;
 #endif
             if (g.context.bypasses)
                 clear_bypasses();
-            if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
-                && !BClairvoyant && !(g.moves % 15) && !rn2(2))
-                do_vicinity_map((struct obj *) 0);
+            if (g.moves >= g.context.seer_turn) {
+                if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
+                    && !BClairvoyant)
+                    do_vicinity_map((struct obj *) 0);
+                /* we maintain this counter even when clairvoyance isn't
+                   taking place; on average, go again 30 turns from now */
+                g.context.seer_turn = g.moves + (long) rn1(31, 15); /*15..45*/
+                /* [it used to be that on every 15th turn, there was a 50%
+                   chance of farsight, so it could happen as often as every
+                   15 turns or theoretically never happen at all; but when
+                   a fast hero got multiple moves on that 15th turn, it
+                   could actually happen more than once on the same turn!] */
+            }
+            /* [fast hero who gets multiple moves per turn ends up sinking
+               multiple times per turn; is that what we really want?] */
             if (u.utrap && u.utraptype == TT_LAVA)
                 sink_into_lava();
             /* when/if hero escapes from lava, he can't just stay there */
@@ -452,7 +465,8 @@ boolean resuming;
             vision_recalc(0); /* vision! */
         /* when running in non-tport mode, this gets done through domove() */
         if ((!g.context.run || flags.runmode == RUN_TPORT)
-            && (g.multi && (!g.context.travel ? !(g.multi % 7) : !(g.moves % 7L)))) {
+            && (g.multi && (!g.context.travel ? !(g.multi % 7)
+                                              : !(g.moves % 7L)))) {
             if (flags.time && g.context.run)
                 g.context.botl = TRUE;
             /* [should this be flush_screen() instead?] */
@@ -559,7 +573,7 @@ display_gamewindows()
     WIN_INVEN = create_nhwindow(NHW_MENU);
     /* in case of early quit where WIN_INVEN could be destroyed before
        ever having been used, use it here to pacify the Qt interface */
-    start_menu(WIN_INVEN), end_menu(WIN_INVEN, (char *) 0);
+    start_menu(WIN_INVEN, 0U), end_menu(WIN_INVEN, (char *) 0);
 
 #ifdef MAC
     /* This _is_ the right place for this - maybe we will
@@ -667,6 +681,9 @@ boolean new_game; /* false => restoring an old game */
         pline("You're back, but you still feel %s inside.", udeadinside());
         return;
     }
+
+    if (Hallucination)
+        pline("NetHack is filmed in front of an undead studio audience.");
 
     /*
      * The "welcome back" message always describes your innate form

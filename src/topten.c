@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1450451497 2015/12/18 15:11:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1581322668 2020/02/10 08:17:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -70,7 +70,7 @@ static void FDECL(writeentry, (FILE *, struct toptenentry *));
 static void FDECL(writexlentry, (FILE *, struct toptenentry *, int));
 static long NDECL(encodexlogflags);
 static long NDECL(encodeconduct);
-static long NDECL(encodeachieve);
+static long FDECL(encodeachieve, (BOOLEAN_P));
 #endif
 static void FDECL(free_ttlist, (struct toptenentry *));
 static int FDECL(classmon, (char *, BOOLEAN_P));
@@ -365,7 +365,8 @@ int how;
         Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
                 g.multi_reason ? g.multi_reason : "helpless");
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
-            encodeconduct(), XLOG_SEP, g.moves, XLOG_SEP, encodeachieve());
+            encodeconduct(), XLOG_SEP, g.moves, XLOG_SEP,
+            encodeachieve(FALSE));
     Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld", XLOG_SEP,
             (long) urealtime.realtime, XLOG_SEP,
             (long) ubirthday, XLOG_SEP, (long) urealtime.finish_time);
@@ -426,39 +427,26 @@ encodeconduct()
 }
 
 static long
-encodeachieve()
+encodeachieve(secondlong)
+boolean secondlong; /* False: handle achievements 1..31, True: 32..62 */
 {
+    int i, achidx, offset;
     long r = 0L;
 
-    if (u.uachieve.bell)
-        r |= 1L << 0;
-    if (u.uachieve.enter_gehennom)
-        r |= 1L << 1;
-    if (u.uachieve.menorah)
-        r |= 1L << 2;
-    if (u.uachieve.book)
-        r |= 1L << 3;
-    if (u.uevent.invoked)
-        r |= 1L << 4;
-    if (u.uachieve.amulet)
-        r |= 1L << 5;
-    if (In_endgame(&u.uz))
-        r |= 1L << 6;
-    if (Is_astralevel(&u.uz))
-        r |= 1L << 7;
-    if (u.uachieve.ascended)
-        r |= 1L << 8;
-    if (u.uachieve.mines_luckstone)
-        r |= 1L << 9;
-    if (u.uachieve.finish_sokoban)
-        r |= 1L << 10;
-    if (u.uachieve.killed_medusa)
-        r |= 1L << 11;
-    if (u.uroleplay.blind)
-        r |= 1L << 12;
-    if (u.uroleplay.nudist)
-        r |= 1L << 13;
-
+    /*
+     * 32: portable limit for 'long'.
+     * Force 32 even on configurations that are using 64 bit longs.
+     *
+     * We use signed long and limit ourselves to 31 bits since tools
+     * that post-process xlogfile might not be able to cope with
+     * 'unsigned long'.
+     */
+    offset = secondlong ? (32 - 1) : 0;
+    for (i = 0; u.uachieved[i]; ++i) {
+        achidx = u.uachieved[i] - offset;
+        if (achidx > 0 && achidx < 32) /* value 1..31 sets bit 0..30 */
+            r |= 1L << (achidx - 1);
+    }
     return r;
 }
 
@@ -997,6 +985,7 @@ int uid;
  * print selected parts of score list.
  * argc >= 2, with argv[0] untrustworthy (directory names, et al.),
  * and argv[1] starting with "-s".
+ * caveat: some shells might allow argv elements to be arbitrarily long.
  */
 void
 prscore(argc, argv)

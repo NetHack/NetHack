@@ -4,7 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h" /* save & restore info */
 
 static void FDECL(setgemprobs, (d_level *));
 static void FDECL(shuffle, (int, int, BOOLEAN_P));
@@ -289,7 +288,7 @@ void
 savenames(nhfp)
 NHFILE *nhfp;
 {
-    int i, j;
+    int i;
     unsigned int len;
 
     if (perform_bwrite(nhfp)) {
@@ -323,7 +322,7 @@ void
 restnames(nhfp)
 NHFILE *nhfp;
 {
-    int i, j;
+    int i;
     unsigned int len = 0;
 
     if (nhfp->structlevel) {
@@ -521,7 +520,7 @@ doclassdisco()
                    || flags.menu_style == MENU_COMBINATION);
     if (!traditional) {
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     }
     any = cg.zeroany;
     menulet = 'a';
@@ -533,7 +532,7 @@ doclassdisco()
             if (!traditional) {
                 any.a_int = 'u';
                 add_menu(tmpwin, NO_GLYPH, &any, menulet++, 0, ATR_NONE,
-                         unique_items, MENU_UNSELECTED);
+                         unique_items, MENU_ITEMFLAGS_NONE);
             }
             break;
         }
@@ -544,7 +543,7 @@ doclassdisco()
         if (!traditional) {
             any.a_int = 'a';
             add_menu(tmpwin, NO_GLYPH, &any, menulet++, 0, ATR_NONE,
-                     artifact_items, MENU_UNSELECTED);
+                     artifact_items, MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -566,7 +565,7 @@ doclassdisco()
                         any.a_int = c;
                         add_menu(tmpwin, NO_GLYPH, &any, menulet++, c,
                                  ATR_NONE, oclass_to_name(oclass, buf),
-                                 MENU_UNSELECTED);
+                                 MENU_ITEMFLAGS_NONE);
                     }
                 }
             }
@@ -681,7 +680,7 @@ rename_disco()
 
     any = cg.zeroany;
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     /*
      * Skip the "unique objects" section (each will appear within its
@@ -708,12 +707,12 @@ rename_disco()
                 any.a_int = 0;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                          let_to_name(oclass, FALSE, FALSE),
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 prev_class = oclass;
             }
             any.a_int = dis;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     obj_typename(dis), MENU_UNSELECTED);
+                     obj_typename(dis), MENU_ITEMFLAGS_NONE);
         }
     }
     if (ct == 0) {

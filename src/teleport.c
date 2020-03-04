@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1575245091 2019/12/02 00:04:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1581886867 2020/02/16 21:01:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,6 +10,26 @@ static boolean FDECL(teleok, (int, int, BOOLEAN_P));
 static void NDECL(vault_tele);
 static boolean FDECL(rloc_pos_ok, (int, int, struct monst *));
 static void FDECL(mvault_tele, (struct monst *));
+
+/* teleporting is prevented on this level for this monster? */
+boolean
+noteleport_level(mon)
+struct monst *mon;
+{
+    struct monst *mtmp;
+
+    /* demon court in Gehennom prevent others from teleporting */
+    if (In_hell(&u.uz) && !(is_dlord(mon->data) || is_dprince(mon->data)))
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+            if (is_dlord(mtmp->data) || is_dprince(mtmp->data))
+                return TRUE;
+
+    /* natural no-teleport level */
+    if (g.level.flags.noteleport)
+        return TRUE;
+
+    return FALSE;
+}
 
 /*
  * Is (x,y) a good position of mtmp?  If mtmp is NULL, then is (x,y) good
@@ -263,9 +283,9 @@ boolean trapok;
     if (!trapok) {
         /* allow teleportation onto vibrating square, it's not a real trap */
         struct trap *trap = t_at(x, y);
-        if (trap && trap->ttyp != VIBRATING_SQUARE) {
+
+        if (trap && trap->ttyp != VIBRATING_SQUARE)
             return FALSE;
-        }
     }
     if (!goodpos(x, y, &g.youmonst, 0))
         return FALSE;
@@ -277,11 +297,13 @@ boolean trapok;
 }
 
 void
-teleds(nux, nuy, allow_drag)
-register int nux, nuy;
-boolean allow_drag;
+teleds(nux, nuy, teleds_flags)
+int nux, nuy;
+int teleds_flags;
 {
     boolean ball_active, ball_still_in_range;
+    boolean allow_drag = teleds_flags & TELEDS_ALLOW_DRAG;
+    boolean is_teleport = teleds_flags & TELEDS_TELEPORT;
     struct monst *vault_guard = vault_occupied(u.urooms) ? findgd() : 0;
 
     if (u.utraptype == TT_BURIEDBALL) {
@@ -321,7 +343,7 @@ boolean allow_drag;
         }
     }
     reset_utrap(FALSE);
-    u.ustuck = 0;
+    set_ustuck((struct monst *) 0);
     u.ux0 = u.ux;
     u.uy0 = u.uy;
 
@@ -355,6 +377,11 @@ boolean allow_drag;
             }
         }
     }
+
+    if (is_teleport && flags.verbose)
+        You("materialize in %s location!",
+            (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
+
     /* must set u.ux, u.uy after drag_ball(), which may need to know
        the old position if allow_drag is true... */
     u_on_newpos(nux, nuy); /* set u.<x,y>, usteed-><mx,my>; cliparound() */
@@ -410,8 +437,8 @@ boolean allow_drag;
 }
 
 boolean
-safe_teleds(allow_drag)
-boolean allow_drag;
+safe_teleds(teleds_flags)
+int teleds_flags;
 {
     register int nux, nuy, tcnt = 0;
 
@@ -421,7 +448,7 @@ boolean allow_drag;
     } while (!teleok(nux, nuy, (boolean) (tcnt > 200)) && ++tcnt <= 400);
 
     if (tcnt <= 400) {
-        teleds(nux, nuy, allow_drag);
+        teleds(nux, nuy, teleds_flags);
         return TRUE;
     } else
         return FALSE;
@@ -434,7 +461,7 @@ vault_tele()
     coord c;
 
     if (croom && somexy(croom, &c) && teleok(c.x, c.y, FALSE)) {
-        teleds(c.x, c.y, FALSE);
+        teleds(c.x, c.y, TELEDS_TELEPORT);
         return;
     }
     tele();
@@ -488,7 +515,7 @@ struct obj *scroll;
     boolean result = FALSE; /* don't learn scroll */
 
     /* Disable teleportation in stronghold && Vlad's Tower */
-    if (g.level.flags.noteleport) {
+    if (noteleport_level(&g.youmonst)) {
         if (!wizard) {
             pline("A mysterious force prevents you from teleporting!");
             return TRUE;
@@ -524,7 +551,7 @@ struct obj *scroll;
                 /* for scroll, discover it regardless of destination */
                 if (scroll)
                     learnscroll(scroll);
-                teleds(cc.x, cc.y, FALSE);
+                teleds(cc.x, cc.y, TELEDS_TELEPORT);
                 return TRUE;
             }
             pline("Sorry...");
@@ -538,7 +565,7 @@ struct obj *scroll;
     }
 
     g.telescroll = scroll;
-    (void) safe_teleds(FALSE);
+    (void) safe_teleds(TELEDS_TELEPORT);
     /* teleds() will leave g.telescroll intact iff random destination
        is far enough away for scroll discovery to be warranted */
     if (g.telescroll)
@@ -601,14 +628,14 @@ dotelecmd()
         int i, tmode;
 
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
         for (i = 0; i < SIZE(tports); ++i) {
             any.a_int = (int) tports[i].menulet;
             add_menu(win, NO_GLYPH, &any, (char) any.a_int, 0, ATR_NONE,
                      tports[i].menudesc,
-                     (tports[i].menulet == 'w') ? MENU_SELECTED
-                                                : MENU_UNSELECTED);
+                     (tports[i].menulet == 'w') ? MENU_ITEMFLAGS_SELECTED
+                                                : MENU_ITEMFLAGS_NONE);
         }
         end_menu(win, "Which way do you want to teleport?");
         i = select_menu(win, PICK_ONE, &picks);
@@ -778,6 +805,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
 void
 level_tele()
 {
+    static const char get_there_from[] = "get there from %s.";
     register int newlev;
     d_level newlevel;
     const char *escape_by_flying = 0; /* when surviving dest of -N */
@@ -893,7 +921,7 @@ level_tele()
          * status line, and consequently it should be incremented to
          * the value of the logical depth of the target level.
          *
-         * we let negative values requests fall into the "heaven" loop.
+         * we let negative values requests fall into the "heaven" handling.
          */
         if (In_quest(&u.uz) && newlev > 0)
             newlev = newlev + g.dungeons[u.uz.dnum].depth_start - 1;
@@ -917,7 +945,7 @@ level_tele()
         int llimit = dunlevs_in_dungeon(&u.uz);
 
         if (newlev >= 0 || newlev <= -llimit) {
-            You_cant("get there from here.");
+            You_cant(get_there_from, "here");
             return;
         }
         newlevel.dnum = u.uz.dnum;
@@ -984,25 +1012,34 @@ level_tele()
     /* calls done(ESCAPED) if newlevel==0 */
     if (escape_by_flying) {
         You("%s.", escape_by_flying);
-        newlevel.dnum = 0;   /* specify main dungeon */
-        newlevel.dlevel = 0; /* escape the dungeon */
         /* [dlevel used to be set to 1, but it doesn't make sense to
             teleport out of the dungeon and float or fly down to the
             surface but then actually arrive back inside the dungeon] */
+        newlevel.dnum = 0;   /* specify main dungeon */
+        newlevel.dlevel = 0; /* escape the dungeon */
+    } else if (force_dest) {
+        /* wizard mode menu; no further validation needed */
+        ;
     } else if (u.uz.dnum == medusa_level.dnum
                && newlev >= g.dungeons[u.uz.dnum].depth_start
                                 + dunlevs_in_dungeon(&u.uz)) {
-        if (!(wizard && force_dest))
-            find_hell(&newlevel);
+        find_hell(&newlevel);
     } else {
+        /* FIXME: we should avoid using hard-coded knowledge of
+           which branches don't connect to anything deeper;
+           mainly used to distinguish "can't get there from here"
+           vs "from anywhere" rather than to control destination */
+        d_level *branch = In_quest(&u.uz) ? &qstart_level
+                          : In_mines(&u.uz) ? &mineend_level
+                            : &sanctum_level;
+        int deepest = g.dungeons[branch->dnum].depth_start
+                      + dunlevs_in_dungeon(branch) - 1;
+
         /* if invocation did not yet occur, teleporting into
          * the last level of Gehennom is forbidden.
          */
-        if (!wizard && Inhell && !u.uevent.invoked
-            && newlev >= (g.dungeons[u.uz.dnum].depth_start
-                          + dunlevs_in_dungeon(&u.uz) - 1)) {
-            newlev = g.dungeons[u.uz.dnum].depth_start
-                     + dunlevs_in_dungeon(&u.uz) - 2;
+        if (!wizard && Inhell && !u.uevent.invoked && newlev >= deepest) {
+            newlev = deepest - 1;
             pline("Sorry...");
         }
         /* no teleporting out of quest dungeon */
@@ -1012,10 +1049,19 @@ level_tele()
          * we must translate newlev to a number relative to the
          * current dungeon.
          */
-        if (!(wizard && force_dest))
-            get_level(&newlevel, newlev);
+        get_level(&newlevel, newlev);
+
+        if (on_level(&newlevel, &u.uz) && newlev != depth(&u.uz)) {
+            You_cant(get_there_from,
+                     (newlev > deepest) ? "anywhere" : "here");
+            return;
+        }
     }
-    schedule_goto(&newlevel, FALSE, FALSE, 0, (char *) 0, (char *) 0);
+
+    schedule_goto(&newlevel, FALSE, FALSE, 0, (char *) 0,
+                  flags.verbose ? "You materialize on a different level!"
+                                : (char *) 0);
+
     /* in case player just read a scroll and is about to be asked to
        call it something, we can't defer until the end of the turn */
     if (u.utotype && !g.context.mon_moving)
@@ -1290,7 +1336,7 @@ boolean
 tele_restrict(mon)
 struct monst *mon;
 {
-    if (g.level.flags.noteleport) {
+    if (noteleport_level(mon)) {
         if (canseemon(mon))
             pline("A mysterious force prevents %s from teleporting!",
                   mon_nam(mon));
@@ -1565,7 +1611,7 @@ boolean give_feedback;
         if (give_feedback)
             pline("%s resists your magic!", Monnam(mtmp));
         return FALSE;
-    } else if (g.level.flags.noteleport && u.uswallow && mtmp == u.ustuck) {
+    } else if (u.uswallow && mtmp == u.ustuck && noteleport_level(mtmp)) {
         if (give_feedback)
             You("are no longer inside %s!", mon_nam(mtmp));
         unstuck(mtmp);

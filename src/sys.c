@@ -83,6 +83,9 @@ sys_early_init()
     /* default to little-endian in 3.7 */
     sysopt.saveformat[0] = sysopt.bonesformat[0] = lendian;
     sysopt.accessibility = 0;
+#ifdef WIN32
+    sysopt.portable_device_paths = 0;
+#endif
     return;
 }
 

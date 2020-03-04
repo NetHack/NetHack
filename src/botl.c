@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1573178085 2019/11/08 01:54:45 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1583190980 2020/03/02 23:16:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -421,6 +421,8 @@ static int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
 static char *FDECL(anything_to_s, (char *, anything *, int));
 static int FDECL(percentage, (struct istat_s *, struct istat_s *));
 static int NDECL(exp_percentage);
+static int FDECL(CFDECLSPEC cond_cmp, (const genericptr, const genericptr));
+static int FDECL(CFDECLSPEC menualpha_cmp, (const genericptr, const genericptr));
 
 #ifdef STATUS_HILITES
 static void FDECL(s_to_anything, (anything *, char *, int));
@@ -511,7 +513,156 @@ static struct istat_s initblstats[MAXBLSTATS] = {
 #undef INIT_THRESH
 
 #ifdef STATUS_HILITES
-#endif
+
+const struct condmap condition_aliases[] = {
+    { "strangled",      BL_MASK_STRNGL },
+    { "all",            BL_MASK_BAREH | BL_MASK_BLIND | BL_MASK_BUSY
+                        | BL_MASK_CONF | BL_MASK_DEAF | BL_MASK_ELF_IRON
+                        | BL_MASK_FLY | BL_MASK_FOODPOIS | BL_MASK_GLOWHANDS
+                        | BL_MASK_GRAB | BL_MASK_HALLU | BL_MASK_HELD
+                        | BL_MASK_ICY | BL_MASK_INLAVA | BL_MASK_LEV
+                        | BL_MASK_PARLYZ | BL_MASK_RIDE | BL_MASK_SLEEPING
+                        | BL_MASK_SLIME | BL_MASK_SLIPPERY | BL_MASK_STONE
+                        | BL_MASK_STRNGL | BL_MASK_STUN | BL_MASK_SUBMERGED
+                        | BL_MASK_TERMILL | BL_MASK_TETHERED
+                        | BL_MASK_TRAPPED | BL_MASK_UNCONSC
+                        | BL_MASK_WOUNDEDL | BL_MASK_HOLDING },
+    { "major_troubles", BL_MASK_FOODPOIS | BL_MASK_GRAB | BL_MASK_INLAVA
+                        | BL_MASK_SLIME | BL_MASK_STONE | BL_MASK_STRNGL
+                        | BL_MASK_TERMILL },
+    { "minor_troubles", BL_MASK_BLIND | BL_MASK_CONF | BL_MASK_DEAF
+                        | BL_MASK_HALLU | BL_MASK_PARLYZ | BL_MASK_SUBMERGED
+                        | BL_MASK_STUN },
+    { "movement",       BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE },
+    { "opt_in",         BL_MASK_BAREH | BL_MASK_BUSY | BL_MASK_GLOWHANDS
+                        | BL_MASK_HELD | BL_MASK_ICY | BL_MASK_PARLYZ
+                        | BL_MASK_SLEEPING | BL_MASK_SLIPPERY
+                        | BL_MASK_SUBMERGED | BL_MASK_TETHERED | BL_MASK_TRAPPED
+                        | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL
+                        | BL_MASK_HOLDING },
+};
+
+#endif /* STATUS_HILITES */
+
+const struct conditions_t conditions[] = {
+    /* ranking, mask, identifier, txt1, txt2, txt3 */
+    { 20, BL_MASK_BAREH,     bl_bareh,     { "Bare",     "Bar",   "Bh"  } },
+    { 10, BL_MASK_BLIND,     bl_blind,     { "Blind",    "Blnd",  "Bl"  } },
+    { 20, BL_MASK_BUSY,      bl_busy,      { "Busy",     "Bsy",   "By"  } },
+    { 10, BL_MASK_CONF,      bl_conf,      { "Conf",     "Cnf",   "Cf"  } },
+    { 10, BL_MASK_DEAF,      bl_deaf,      { "Deaf",     "Def",   "Df"  } },
+    { 15, BL_MASK_ELF_IRON,  bl_elf_iron,  { "Iron",     "Irn",   "Fe"  } },
+    { 10, BL_MASK_FLY,       bl_fly,       { "Fly",      "Fly",   "Fl"  } },
+    {  6, BL_MASK_FOODPOIS,  bl_foodpois,  { "FoodPois", "Fpois", "Poi" } },
+    { 20, BL_MASK_GLOWHANDS, bl_glowhands, { "Glow",     "Glo",   "Gl"  } },
+    {  2, BL_MASK_GRAB,      bl_grab,      { "Grab",     "Grb",   "Gr"  } },
+    { 10, BL_MASK_HALLU,     bl_hallu,     { "Hallu",    "Hal",   "Hl"  } },
+    { 20, BL_MASK_HELD,      bl_held,      { "Held",     "Hld",   "Hd"  } },
+    { 20, BL_MASK_ICY,       bl_icy,       { "Icy",      "Icy",   "Ic"  } },
+    {  8, BL_MASK_INLAVA,    bl_inlava,    { "Lava",     "Lav",   "La"  } },
+    { 10, BL_MASK_LEV,       bl_lev,       { "Lev",      "Lev",   "Lv"  } },
+    { 20, BL_MASK_PARLYZ,    bl_parlyz,    { "Parlyz",   "Para",  "Par" } },
+    { 10, BL_MASK_RIDE,      bl_ride,      { "Ride",     "Rid",   "Rd"  } },
+    { 20, BL_MASK_SLEEPING,  bl_sleeping,  { "Zzz",      "Zzz",   "Zz"  } },
+    {  6, BL_MASK_SLIME,     bl_slime,     { "Slime",    "Slim",  "Slm" } },
+    { 20, BL_MASK_SLIPPERY,  bl_slippery,  { "Slip",     "Sli",   "Sl"  } },
+    {  6, BL_MASK_STONE,     bl_stone,     { "Stone",    "Ston",  "Sto" } },
+    {  4, BL_MASK_STRNGL,    bl_strngl,    { "Strngl",   "Stngl", "Str" } },
+    { 10, BL_MASK_STUN,      bl_stun,      { "Stun",     "Stun",  "St"  } },
+    { 15, BL_MASK_SUBMERGED, bl_submerged, { "Sub",      "Sub",   "Sw"  } },
+    {  6, BL_MASK_TERMILL,   bl_termill,   { "TermIll",  "Ill",   "Ill" } },
+    { 20, BL_MASK_TETHERED,  bl_tethered,  { "Teth",     "Tth",   "Te"  } },
+    { 20, BL_MASK_TRAPPED,   bl_trapped,   { "Trap",     "Trp",   "Tr"  } },
+    { 20, BL_MASK_UNCONSC,   bl_unconsc,   { "Out",      "Out",   "KO"  } },
+    { 20, BL_MASK_WOUNDEDL,  bl_woundedl,  { "Legs",     "Leg",   "Lg"  } },
+    { 20, BL_MASK_HOLDING,   bl_holding,   { "UHold",    "UHld",  "UHd" } },
+};
+
+struct condtests_t condtests[CONDITION_COUNT] = {
+    /* id, useropt, opt_in or out, enabled, configchoice, testresult */
+    { bl_bareh,     "barehanded",  opt_in,  FALSE, FALSE, FALSE },
+    { bl_blind,     "blind",       opt_out, TRUE,  FALSE, FALSE },
+    { bl_busy,      "busy",        opt_in,  FALSE, FALSE, FALSE },
+    { bl_conf,      "conf",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_deaf,      "deaf",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_elf_iron,  "iron",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_fly,       "fly",         opt_out, TRUE,  FALSE, FALSE },
+    { bl_foodpois,  "foodPois",    opt_out, TRUE,  FALSE, FALSE },
+    { bl_glowhands, "glowhands",   opt_in,  FALSE, FALSE, FALSE },
+    { bl_grab,      "grab",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_hallu,     "hallucinat",  opt_out, TRUE,  FALSE, FALSE },
+    { bl_held,      "held",        opt_in,  FALSE, FALSE, FALSE },
+    { bl_icy,       "ice",         opt_in,  FALSE, FALSE, FALSE },
+    { bl_inlava,    "lava",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_lev,       "levitate",    opt_out, TRUE,  FALSE, FALSE },
+    { bl_parlyz,    "paralyzed",   opt_in,  FALSE, FALSE, FALSE },
+    { bl_ride,      "ride",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_sleeping,  "sleep",       opt_in,  FALSE, FALSE, FALSE },
+    { bl_slime,     "slime",       opt_out, TRUE,  FALSE, FALSE },
+    { bl_slippery,  "slip",        opt_in,  FALSE, FALSE, FALSE },
+    { bl_stone,     "stone",       opt_out, TRUE,  FALSE, FALSE },
+    { bl_strngl,    "strngl",      opt_out, TRUE,  FALSE, FALSE },
+    { bl_stun,      "stun",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_submerged, "submerged",   opt_in,  FALSE, FALSE, FALSE },
+    { bl_termill,   "termIll",     opt_out, TRUE,  FALSE, FALSE },
+    { bl_tethered,  "tethered",    opt_in,  FALSE, FALSE, FALSE },
+    { bl_trapped,   "trap",        opt_in,  FALSE, FALSE, FALSE },
+    { bl_unconsc,   "unconscious", opt_in,  FALSE, FALSE, FALSE },
+    { bl_woundedl,  "woundedlegs", opt_in,  FALSE, FALSE, FALSE },
+    { bl_holding,   "holding",     opt_in,  FALSE, FALSE, FALSE },
+};
+/* condition indexing */
+int cond_idx[CONDITION_COUNT] = { 0 };
+
+/* cache-related */
+static boolean cache_avail[3] = { FALSE, FALSE, FALSE };
+static boolean cache_reslt[3] = { FALSE, FALSE, FALSE };
+static const char *cache_nomovemsg = NULL, *cache_multi_reason = NULL;
+static d_level cache_uz = { 0 };
+static boolean cache_underwater = FALSE;
+
+#define cond_cache_prepA()                                  \
+do {                                                        \
+    boolean clear_cache = FALSE, refresh_cache = FALSE;     \
+                                                            \
+    if (g.multi < 0) {                                      \
+        if (g.nomovemsg || g.multi_reason) {                \
+            if (cache_nomovemsg != g.nomovemsg)             \
+                refresh_cache = TRUE;                       \
+            if (cache_multi_reason != g.multi_reason)       \
+                refresh_cache = TRUE;                       \
+        } else {                                            \
+            clear_cache = TRUE;                             \
+        }                                                   \
+    } else {                                                \
+        clear_cache = TRUE;                                 \
+    }                                                       \
+    if (clear_cache) {                                      \
+        cache_nomovemsg = (const char *) 0;                 \
+        cache_multi_reason = (const char *) 0;              \
+    }                                                       \
+    if (refresh_cache) {                                    \
+        cache_nomovemsg = g.nomovemsg;                      \
+        cache_multi_reason = g.multi_reason;                \
+    }                                                       \
+    if (clear_cache || refresh_cache) {                     \
+        cache_reslt[0] = cache_avail[0] = FALSE;            \
+        cache_reslt[1] = cache_avail[1] = FALSE;            \
+    }                                                       \
+} while (0)
+
+#define cond_cache_prepB()                                  \
+do {                                                        \
+    if (((cache_uz.dnum != u.uz.dnum)                       \
+        || (cache_uz.dlevel != u.uz.dlevel))                \
+        || (cache_underwater != Underwater))  {             \
+        cache_uz.dnum = 0;                                  \
+        cache_uz.dlevel = 0;                                \
+        cache_underwater = 0;                               \
+        cache_reslt[2] = cache_avail[2] = FALSE;            \
+    }                                                       \
+} while (0)
+
 /* we don't put this next declaration in #ifdef STATUS_HILITES.
  * In the absence of STATUS_HILITES, each array
  * element will be 0 however, and quite meaningless,
@@ -667,39 +818,134 @@ bot_via_windowport()
     g.valset[BL_CAP] = TRUE;
 
     /* Conditions */
+
     g.blstats[idx][BL_CONDITION].a.a_ulong = 0L;
-    if (Stoned)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STONE;
-    if (Slimed)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_SLIME;
-    if (Strangled)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STRNGL;
-    if (Sick && (u.usick_type & SICK_VOMITABLE) != 0)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FOODPOIS;
-    if (Sick && (u.usick_type & SICK_NONVOMITABLE) != 0)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_TERMILL;
-    /*
-     * basic formatting puts hunger status and encumbrance here
-     */
-    if (Blind)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_BLIND;
-    if (Deaf)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_DEAF;
-    if (Stunned)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STUN;
-    if (Confusion)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_CONF;
-    if (Hallucination)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_HALLU;
-    /* levitation and flying are mututally exclusive */
-    if (Levitation)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_LEV;
-    if (Flying)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FLY;
-    if (u.usteed)
-        g.blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_RIDE;
+
+    /* avoid anything that does string comparisons in here because this
+       is called *extremely* often, for every screen update and the same
+       string comparisons would be repeated, thus contributing toward
+       performance degradation. If it is essential that string comparisons
+       are needed for a particular condition, consider adding a caching
+       mechanism to limit the string comparisons to the first occurrence
+       for that cache lifetime. There is caching of that nature done for
+       unconsc (1) and parlyz (2)  because the suggested way of being able
+       to distinguish unconsc, parlyz, sleeping, and busy involves multiple
+       string comparisons. There is also caching done for submerged (3) to
+       avoid repeatedly calling the on_level() function unnecessarily. */
+
+#define test_if_enabled(c) if (condtests[(c)].enabled) condtests[(c)].test
+
+    condtests[bl_foodpois].test = condtests[bl_termill].test = FALSE;
+    if (Sick) {
+        test_if_enabled(bl_foodpois) = (u.usick_type & SICK_VOMITABLE) != 0;
+        test_if_enabled(bl_termill) = (u.usick_type & SICK_NONVOMITABLE) != 0;
+    }
+    condtests[bl_inlava].test = condtests[bl_tethered].test
+        = condtests[bl_trapped].test = FALSE;
+    if (u.utrap) {
+        test_if_enabled(bl_inlava) = (u.utraptype == TT_LAVA);
+        test_if_enabled(bl_tethered) = (u.utraptype == TT_BURIEDBALL);
+        /* if in-lava or tethered is disabled and the condition applies,
+           lump it in with trapped */
+        test_if_enabled(bl_trapped) = (!condtests[bl_inlava].test
+                                       && !condtests[bl_tethered].test);
+    }
+    condtests[bl_grab].test = condtests[bl_held].test
+        = condtests[bl_holding].test = FALSE;
+    if (u.ustuck) {
+        if (Upolyd && sticks(g.youmonst.data)) {
+            test_if_enabled(bl_holding) = TRUE;
+        } else {
+            test_if_enabled(bl_grab) = (u.ustuck->data->mlet == S_EEL);
+#if 0
+            test_if_enabled(bl_engulfed) = u.uswallow ? TRUE : FALSE;
+            test_if_enabled(bl_held) = (!condtests[bl_grab].test
+                                        && !condtests[bl_engulfed].test);
+#else
+            test_if_enabled(bl_held) = (!condtests[bl_grab].test
+                /* engulfed/swallowed isn't currently a tracked condition
+                   and showing "held" when in that state looks a bit odd,
+                   so suppress "held" if swallowed */
+                                        && !u.uswallow);
+#endif
+        }
+    }
+    condtests[bl_blind].test     = (Blind);
+    condtests[bl_conf].test      = (Confusion) ? TRUE : FALSE;
+    condtests[bl_deaf].test      = (Deaf);
+    condtests[bl_fly].test       = (Flying);
+    condtests[bl_glowhands].test = (u.umconf);
+    condtests[bl_hallu].test     = (Hallucination);
+    condtests[bl_lev].test       = (Levitation);
+    condtests[bl_ride].test      = (u.usteed) ? TRUE : FALSE;
+    condtests[bl_slime].test     = (Slimed) ? TRUE : FALSE;
+    condtests[bl_stone].test     = (Stoned) ? TRUE : FALSE;
+    condtests[bl_strngl].test    = (Strangled) ? TRUE : FALSE;
+    condtests[bl_stun].test      = (Stunned) ? TRUE : FALSE;
+    test_if_enabled(bl_elf_iron) = (FALSE);
+    test_if_enabled(bl_bareh)    = (!uarmg && !uwep);
+    test_if_enabled(bl_icy)      = levl[u.ux][u.uy].typ == ICE;
+    test_if_enabled(bl_slippery) = (Glib) ? TRUE : FALSE;
+    test_if_enabled(bl_woundedl) = (Wounded_legs);
+
+    if (g.multi < 0) {
+        cond_cache_prepA();
+        if (condtests[bl_unconsc].enabled
+            && cache_nomovemsg && !cache_avail[0]) {
+                cache_reslt[0] = (!u.usleep && unconscious());
+                cache_avail[0] = TRUE;
+        }
+        if (condtests[bl_parlyz].enabled
+            && cache_multi_reason && !cache_avail[1]) {
+                cache_reslt[1] = (!strncmp(cache_multi_reason, "paralyzed", 9)
+                                 || !strncmp(cache_multi_reason, "frozen", 6));
+                cache_avail[1] = TRUE;
+        }
+        if (cache_avail[0] && cache_reslt[0]) {
+            condtests[bl_unconsc].test = cache_reslt[0];
+        } else if (cache_avail[1] && cache_reslt[1]) {
+            condtests[bl_parlyz].test = cache_reslt[1];
+        } else if (condtests[bl_sleeping].enabled && u.usleep) {
+            condtests[bl_sleeping].test = TRUE;
+        } else if (condtests[bl_busy].enabled) {
+            condtests[bl_busy].test = TRUE;
+        }
+    } else {
+        condtests[bl_unconsc].test = condtests[bl_parlyz].test =
+            condtests[bl_sleeping].test = condtests[bl_busy].test = FALSE;
+    }
+
+    /* submerged */
+    if (condtests[bl_submerged].enabled) {
+        cond_cache_prepB();
+        if (!cache_avail[2] && cache_underwater == 0
+            && (cache_uz.dlevel == 0 && cache_uz.dnum == 0)) {
+            cache_uz = u.uz;
+            cache_underwater = (Underwater) ? TRUE : FALSE;
+            cache_reslt[2] = (Underwater && !Is_waterlevel(&u.uz));
+            cache_avail[2] = TRUE;
+        }
+        if (cache_avail[2]) {
+            condtests[bl_submerged].test = cache_reslt[2];
+        } else {
+            condtests[bl_submerged].test = FALSE;
+        }
+    } else {
+        condtests[bl_submerged].test = FALSE;
+    }
+
+#define cond_bitset(c) \
+        g.blstats[idx][BL_CONDITION].a.a_ulong |= conditions[(c)].mask;
+
+    for (i = 0; i < CONDITION_COUNT; ++i) {
+        if (condtests[i].enabled
+             /* && i != bl_holding  */ /* uncomment to suppress UHold */
+                && condtests[i].test)
+            cond_bitset(i);
+    }
     evaluate_and_notify_windowport(g.valset, idx);
 }
+
 
 /* update just the status lines' 'time' field */
 static void
@@ -717,6 +963,165 @@ stat_update_time()
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, (unsigned long *) 0);
     return;
+}
+
+/* deal with player's choice to change processing of a condition */
+void
+condopt(idx, addr, negated)
+int idx;
+boolean *addr;
+boolean negated;
+{
+    int i;
+
+    /* sanity check */
+    if ((idx < 0 || idx >= CONDITION_COUNT)
+        || (addr && addr != &condtests[idx].choice))
+        return;
+
+    if (!addr) {
+        /* special: indicates a request to init so
+           set the choice values to match the defaults */
+        g.condmenu_sortorder = 0;
+        for (i = 0; i < CONDITION_COUNT; ++i) {
+            cond_idx[i] = i;
+            condtests[i].choice = condtests[i].enabled;
+        }
+        qsort((genericptr_t) cond_idx, CONDITION_COUNT,
+              sizeof cond_idx[0], cond_cmp);
+    } else {
+        /* (addr == &condtests[idx].choice) */
+        condtests[idx].enabled = negated ? FALSE : TRUE;
+        condtests[idx].choice = condtests[idx].enabled;
+        /* avoid lingering false positives if test is no longer run */
+        if (!condtests[idx].enabled)
+            condtests[idx].test = FALSE;
+    }
+}
+
+/* qsort callback routine for sorting the condition index */
+static int CFDECLSPEC
+cond_cmp(vptr1, vptr2)
+const genericptr vptr1;
+const genericptr vptr2;
+{
+    int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2,
+        c1 = conditions[indx1].ranking, c2 = conditions[indx2].ranking;
+
+    if (c1 != c2)
+        return c1 - c2;
+    /* tie-breaker - visible alpha by name */
+    return strcmpi(condtests[indx1].useroption, condtests[indx2].useroption);
+}
+
+/* qsort callback routine for alphabetical sorting of index */
+static int CFDECLSPEC
+menualpha_cmp(vptr1, vptr2)
+const genericptr vptr1;
+const genericptr vptr2;
+{
+    int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2;
+
+    return strcmpi(condtests[indx1].useroption, condtests[indx2].useroption);
+}
+
+int
+parse_cond_option(negated, opts)
+boolean negated;
+char *opts;
+{
+    int i;
+    size_t sl;
+    const char *compareto, *uniqpart, prefix[] = "cond_";
+
+    if (!opts || strlen(opts) <= sizeof prefix - 1)
+        return 2;
+    uniqpart = opts + (sizeof prefix - 1);
+    for (i = 0; i < CONDITION_COUNT; ++i) {
+        compareto = condtests[i].useroption;
+        sl = strlen(compareto);
+        if (match_optname(uniqpart, compareto, (sl >= 4) ? 4 : sl, FALSE)) {
+            condopt(i, &condtests[i].choice, negated);
+            return 0;
+        }
+    }
+    return 1;  /* !0 indicates error */
+}
+
+void
+cond_menu(VOID_ARGS)
+{
+    static const char *menutitle[2] = { "alphabetically", "by ranking"};
+    int i, res, idx = 0;
+    int sequence[CONDITION_COUNT];
+    winid tmpwin;
+    anything any;
+    menu_item *picks = (menu_item *) 0;
+    char mbuf[QBUFSZ];
+    boolean showmenu = TRUE;
+
+    do {
+        for (i = 0; i < CONDITION_COUNT; ++i) {
+            sequence[i] = i;
+        }
+        qsort((genericptr_t) sequence, CONDITION_COUNT,
+              sizeof sequence[0],
+              (g.condmenu_sortorder) ? cond_cmp : menualpha_cmp);
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+
+        any = cg.zeroany;
+        any.a_int = 1;
+        Sprintf(mbuf, "change sort order from \"%s\" to \"%s\"",
+                menutitle[g.condmenu_sortorder],
+                menutitle[1 - g.condmenu_sortorder]);
+        add_menu(tmpwin, NO_GLYPH, &any, 'S', 0, ATR_NONE, mbuf,
+                 MENU_ITEMFLAGS_NONE);
+        any = cg.zeroany;
+        Sprintf(mbuf, "sorted %s", menutitle[g.condmenu_sortorder]);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, mbuf,
+                 MENU_ITEMFLAGS_NONE);
+        for (i = 0; i < SIZE(condtests); i++) {
+            idx = sequence[i];
+            Sprintf(mbuf, "cond_%-14s", condtests[idx].useroption);
+            any = cg.zeroany;
+            any.a_int = idx + 2; /* avoid zero and the sort change pick */
+            condtests[idx].choice = FALSE;
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     mbuf,
+                     condtests[idx].enabled
+                        ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        }
+
+        end_menu(tmpwin, "Choose status conditions to toggle");
+
+        res = select_menu(tmpwin, PICK_ANY, &picks);
+        destroy_nhwindow(tmpwin);
+        showmenu = FALSE;
+        if (res > 0) {
+            for (i = 0; i < res; i++) {
+                idx = picks[i].item.a_int;
+                if (idx == 1) {
+                   /* sort change requested */
+                   g.condmenu_sortorder = 1 - g.condmenu_sortorder;
+                   showmenu = TRUE;
+                   break;       /* for loop */
+                } else {
+                    idx -= 2;
+                    condtests[idx].choice = TRUE;
+                }
+            }
+            free((genericptr_t) picks);
+        }
+    } while (showmenu);
+
+    if (res > 0) {
+        for (i = 0; i < CONDITION_COUNT; ++i) {
+            if (condtests[i].enabled != condtests[i].choice)
+                condtests[i].enabled = condtests[i].choice;
+        }
+    }
 }
 
 static boolean
@@ -750,7 +1155,11 @@ boolean *valsetlist;
      *  [Affects exp_percent_changing() too.]
      */
     if (((chg || g.update_all || fld == BL_XP)
-         && curr->percent_matters && curr->thresholds)
+         && curr->percent_matters
+#ifdef STATUS_HILITES
+         && curr->thresholds
+#endif
+        )
         /* when 'hitpointbar' is On, percent matters even if HP
            hasn't changed and has no percentage rules (in case HPmax
            has changed when HP hasn't, where we ordinarily wouldn't
@@ -1288,9 +1697,12 @@ exp_percentage()
 boolean
 exp_percent_changing()
 {
-    int pc, color_dummy;
+    int pc;
     anything a;
+#ifdef STATUS_HILITES
+    int color_dummy;
     struct hilite_s *rule;
+#endif
     struct istat_s *curr;
 
     /* if status update is already requested, skip this processing */
@@ -1302,14 +1714,19 @@ exp_percent_changing()
         curr = &g.blstats[g.now_or_before_idx][BL_XP];
         /* TODO: [see eval_notify_windowport_field() about percent_matters
            and the check against 'thresholds'] */
-        if (curr->percent_matters && curr->thresholds
+        if (curr->percent_matters
+#ifdef STATUS_HILITES
+            && curr->thresholds
+#endif
             && (pc = exp_percentage()) != curr->percent_value) {
             a = cg.zeroany;
             a.a_int = (int) u.ulevel;
+#ifdef STATUS_HILITES
             rule = get_hilite(g.now_or_before_idx, BL_XP,
                               (genericptr_t) &a, 0, pc, &color_dummy);
             if (rule != curr->hilite_rule)
                 return TRUE; /* caller should set 'g.context.botl' to True */
+#endif
         }
     }
     return FALSE;
@@ -1924,13 +2341,13 @@ int arrmin, arrmax;
     int adj = (arrmin > 0) ? 1 : arrmax;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     for (i = arrmin; i < arrmax; i++) {
         any = cg.zeroany;
         any.a_int = i + adj;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 arr[i], MENU_UNSELECTED);
+                 arr[i], MENU_ITEMFLAGS_NONE);
     }
 
     end_menu(tmpwin, querystr);
@@ -2257,37 +2674,7 @@ boolean from_configfile;
 }
 #endif /* STATUS_HILITES */
 
-const struct condmap valid_conditions[] = {
-    { "stone",    BL_MASK_STONE },
-    { "slime",    BL_MASK_SLIME },
-    { "strngl",   BL_MASK_STRNGL },
-    { "foodPois", BL_MASK_FOODPOIS },
-    { "termIll",  BL_MASK_TERMILL },
-    { "blind",    BL_MASK_BLIND },
-    { "deaf",     BL_MASK_DEAF },
-    { "stun",     BL_MASK_STUN },
-    { "conf",     BL_MASK_CONF },
-    { "hallu",    BL_MASK_HALLU },
-    { "lev",      BL_MASK_LEV },
-    { "fly",      BL_MASK_FLY },
-    { "ride",     BL_MASK_RIDE },
-};
-
 #ifdef STATUS_HILITES
-
-const struct condmap condition_aliases[] = {
-    { "strangled",      BL_MASK_STRNGL },
-    { "all",            BL_MASK_STONE | BL_MASK_SLIME | BL_MASK_STRNGL
-                        | BL_MASK_FOODPOIS | BL_MASK_TERMILL
-                        | BL_MASK_BLIND | BL_MASK_DEAF | BL_MASK_STUN
-                        | BL_MASK_CONF | BL_MASK_HALLU
-                        | BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE },
-    { "major_troubles", BL_MASK_STONE | BL_MASK_SLIME | BL_MASK_STRNGL
-                        | BL_MASK_FOODPOIS | BL_MASK_TERMILL },
-    { "minor_troubles", BL_MASK_BLIND | BL_MASK_DEAF | BL_MASK_STUN
-                        | BL_MASK_CONF | BL_MASK_HALLU },
-    { "movement",       BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE }
-};
 
 unsigned long
 query_conditions()
@@ -2299,13 +2686,13 @@ query_conditions()
     menu_item *picks = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
-    for (i = 0; i < SIZE(valid_conditions); i++) {
+    for (i = 0; i < SIZE(conditions); i++) {
         any = cg.zeroany;
-        any.a_ulong = valid_conditions[i].bitmask;
+        any.a_ulong = conditions[i].mask;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 valid_conditions[i].id, MENU_UNSELECTED);
+                 conditions[i].text[0], MENU_ITEMFLAGS_NONE);
     }
 
     end_menu(tmpwin, "Choose status conditions");
@@ -2338,10 +2725,10 @@ unsigned long ul;
         if (condition_aliases[i].bitmask == ul)
             alias = condition_aliases[i].id;
 
-    for (i = 0; i < SIZE(valid_conditions); i++)
-        if ((valid_conditions[i].bitmask & ul) != 0UL) {
+    for (i = 0; i < SIZE(conditions); i++)
+        if ((conditions[i].mask & ul) != 0UL) {
             Sprintf(eos(buf), "%s%s", (first) ? "" : "+",
-                    valid_conditions[i].id);
+                    conditions[i].text[0]);
             first = FALSE;
         }
 
@@ -2360,9 +2747,9 @@ const char *str;
 
     if (str && *str) {
         /* check matches to canonical names */
-        for (i = 0; i < SIZE(valid_conditions); i++)
-            if (fuzzymatch(valid_conditions[i].id, str, " -_", TRUE)) {
-                mask |= valid_conditions[i].bitmask;
+        for (i = 0; i < SIZE(conditions); i++)
+            if (fuzzymatch(conditions[i].text[0], str, " -_", TRUE)) {
+                mask |= conditions[i].mask;
                 nmatches++;
             }
 
@@ -2398,7 +2785,7 @@ char *str;
     char **subfields;
     int i, sf;
 
-    sf = splitsubfields(str, &subfields, SIZE(valid_conditions));
+    sf = splitsubfields(str, &subfields, SIZE(conditions));
 
     if (sf < 1)
         return 0UL;
@@ -2682,30 +3069,30 @@ status_hilite_linestr_gather_conditions()
     struct _cond_map {
         unsigned long bm;
         unsigned long clratr;
-    } cond_maps[SIZE(valid_conditions)];
+    } cond_maps[SIZE(conditions)];
 
     (void) memset(cond_maps, 0,
-                  SIZE(valid_conditions) * sizeof (struct _cond_map));
+                  SIZE(conditions) * sizeof (struct _cond_map));
 
-    for (i = 0; i < SIZE(valid_conditions); i++) {
+    for (i = 0; i < SIZE(conditions); i++) {
         int clr = NO_COLOR;
         int atr = HL_NONE;
         int j;
 
         for (j = 0; j < CLR_MAX; j++)
-            if (g.cond_hilites[j] & valid_conditions[i].bitmask) {
+            if (g.cond_hilites[j] & conditions[i].mask) {
                 clr = j;
                 break;
             }
-        if (g.cond_hilites[HL_ATTCLR_DIM] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_DIM] & conditions[i].mask)
             atr |= HL_DIM;
-        if (g.cond_hilites[HL_ATTCLR_BOLD] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_BOLD] & conditions[i].mask)
             atr |= HL_BOLD;
-        if (g.cond_hilites[HL_ATTCLR_BLINK] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_BLINK] & conditions[i].mask)
             atr |= HL_BLINK;
-        if (g.cond_hilites[HL_ATTCLR_ULINE] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_ULINE] & conditions[i].mask)
             atr |= HL_ULINE;
-        if (g.cond_hilites[HL_ATTCLR_INVERSE] & valid_conditions[i].bitmask)
+        if (g.cond_hilites[HL_ATTCLR_INVERSE] & conditions[i].mask)
             atr |= HL_INVERSE;
         if (atr != HL_NONE)
             atr &= ~HL_NONE;
@@ -2714,16 +3101,16 @@ status_hilite_linestr_gather_conditions()
             unsigned long ca = clr | (atr << 8);
             boolean added_condmap = FALSE;
 
-            for (j = 0; j < SIZE(valid_conditions); j++)
+            for (j = 0; j < SIZE(conditions); j++)
                 if (cond_maps[j].clratr == ca) {
-                    cond_maps[j].bm |= valid_conditions[i].bitmask;
+                    cond_maps[j].bm |= conditions[i].mask;
                     added_condmap = TRUE;
                     break;
                 }
             if (!added_condmap) {
-                for (j = 0; j < SIZE(valid_conditions); j++)
+                for (j = 0; j < SIZE(conditions); j++)
                     if (!cond_maps[j].bm) {
-                        cond_maps[j].bm = valid_conditions[i].bitmask;
+                        cond_maps[j].bm = conditions[i].mask;
                         cond_maps[j].clratr = ca;
                         break;
                     }
@@ -2731,7 +3118,7 @@ status_hilite_linestr_gather_conditions()
         }
     }
 
-    for (i = 0; i < SIZE(valid_conditions); i++)
+    for (i = 0; i < SIZE(conditions); i++)
         if (cond_maps[i].bm) {
             int clr = NO_COLOR, atr = HL_NONE;
 
@@ -2863,7 +3250,7 @@ status_hilite_menu_choose_field()
     menu_item *picks = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     for (i = 0; i < MAXBLSTATS; i++) {
 #ifndef SCORE_ON_BOTL
@@ -2874,7 +3261,7 @@ status_hilite_menu_choose_field()
         any = cg.zeroany;
         any.a_int = (i + 1);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 initblstats[i].fldname, MENU_UNSELECTED);
+                 initblstats[i].fldname, MENU_ITEMFLAGS_NONE);
     }
 
     end_menu(tmpwin, "Select a hilite field:");
@@ -2906,14 +3293,14 @@ int fld;
     at = initblstats[fld].anytype;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     if (fld != BL_CONDITION) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_ALWAYS_HILITE;
         Sprintf(buf, "Always highlight %s", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 'a', 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2921,7 +3308,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_CONDITION;
         add_menu(tmpwin, NO_GLYPH, &any, 'b', 0, ATR_NONE,
-                 "Bitmask of conditions", MENU_UNSELECTED);
+                 "Bitmask of conditions", MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2930,7 +3317,7 @@ int fld;
         any.a_int = onlybeh = BL_TH_UPDOWN;
         Sprintf(buf, "%s value changes", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2939,7 +3326,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_ABSOLUTE;
         add_menu(tmpwin, NO_GLYPH, &any, 'n', 0, ATR_NONE,
-                 "Number threshold", MENU_UNSELECTED);
+                 "Number threshold", MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2947,7 +3334,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_PERCENTAGE;
         add_menu(tmpwin, NO_GLYPH, &any, 'p', 0, ATR_NONE,
-                 "Percentage threshold", MENU_UNSELECTED);
+                 "Percentage threshold", MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2957,7 +3344,7 @@ int fld;
         any.a_int = onlybeh = BL_TH_TEXTMATCH;
         Sprintf(buf, "%s text match", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 't', 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -2993,7 +3380,7 @@ boolean ltok, gtok;
     menu_item *picks = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     if (ltok) {
         if (str)
@@ -3004,7 +3391,7 @@ boolean ltok, gtok;
         any = cg.zeroany;
         any.a_int = 10 + LT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
 
         if (str) {
             Sprintf(buf, "%s or %s",
@@ -3012,7 +3399,7 @@ boolean ltok, gtok;
             any = cg.zeroany;
             any.a_int = 10 + LE_VALUE;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     buf, MENU_UNSELECTED);
+                     buf, MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -3023,7 +3410,7 @@ boolean ltok, gtok;
     any = cg.zeroany;
     any.a_int = 10 + EQ_VALUE;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             buf, MENU_UNSELECTED);
+             buf, MENU_ITEMFLAGS_NONE);
 
     if (gtok) {
         if (str) {
@@ -3032,7 +3419,7 @@ boolean ltok, gtok;
             any = cg.zeroany;
             any.a_int = 10 + GE_VALUE;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     buf, MENU_UNSELECTED);
+                     buf, MENU_ITEMFLAGS_NONE);
         }
 
         if (str)
@@ -3043,7 +3430,7 @@ boolean ltok, gtok;
         any = cg.zeroany;
         any.a_int = 10 + GT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             buf, MENU_UNSELECTED);
+             buf, MENU_ITEMFLAGS_NONE);
     }
     Sprintf(buf, "Select field %s value:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
@@ -3536,7 +3923,7 @@ int fld;
     }
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     if (count) {
         hlstr = status_hilite_str;
@@ -3545,25 +3932,28 @@ int fld;
                 any = cg.zeroany;
                 any.a_int = hlstr->id;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                         hlstr->str, MENU_UNSELECTED);
+                         hlstr->str, MENU_ITEMFLAGS_NONE);
             }
             hlstr = hlstr->next;
         }
     } else {
         any = cg.zeroany;
         Sprintf(buf, "No current hilites for %s", initblstats[fld].fldname);
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+                 MENU_ITEMFLAGS_NONE);
     }
 
     /* separator line */
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
+             MENU_ITEMFLAGS_NONE);
 
     if (count) {
         any = cg.zeroany;
         any.a_int = -1;
         add_menu(tmpwin, NO_GLYPH, &any, 'X', 0, ATR_NONE,
-                 "Remove selected hilites", MENU_UNSELECTED);
+                 "Remove selected hilites",
+                 MENU_ITEMFLAGS_NONE);
     }
 
 #ifndef SCORE_ON_BOTL
@@ -3579,7 +3969,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = -2;
         add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
-                 "Add a new hilite", MENU_UNSELECTED);
+                 "Add a new hilite", MENU_ITEMFLAGS_NONE);
     }
 
     Sprintf(buf, "Current %s hilites:", initblstats[fld].fldname);
@@ -3667,7 +4057,7 @@ shlmenu_redo:
     redo = FALSE;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     status_hilite_linestr_gather();
     countall = status_hilite_linestr_countfield(BL_FLUSH);
@@ -3675,10 +4065,12 @@ shlmenu_redo:
         any = cg.zeroany;
         any.a_int = -1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 "View all hilites in config format", MENU_UNSELECTED);
+                 "View all hilites in config format",
+                 MENU_ITEMFLAGS_NONE);
 
         any = cg.zeroany;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
+                 MENU_ITEMFLAGS_NONE);
     }
 
     for (i = 0; i < MAXBLSTATS; i++) {
@@ -3699,7 +4091,7 @@ shlmenu_redo:
         if (count)
             Sprintf(eos(buf), " (%d defined)", count);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
+                 buf, MENU_ITEMFLAGS_NONE);
     }
 
     end_menu(tmpwin, "Status hilites:");

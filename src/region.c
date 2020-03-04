@@ -1,9 +1,8 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1573957877 2019/11/17 02:31:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1579655029 2020/01/22 01:03:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 
 /*
  * This should really go into the level structure, but
@@ -703,14 +702,14 @@ NHFILE *nhfp;
 }
 
 void
-rest_regions(nhfp, ghostly)
+rest_regions(nhfp)
 NHFILE *nhfp;
-boolean ghostly; /* If a bones file restore */
 {
     int i, j;
     unsigned n = 0;
     long tmstamp = 0L;
     char *msg_buf;
+    boolean ghostly = (nhfp->ftype == NHF_BONESFILE);
 
     clear_regions();		/* Just for security */
     if (nhfp->structlevel)
@@ -1025,7 +1024,10 @@ genericptr_t p2;
             pline("%s is burning your %s!", Something,
                   makeplural(body_part(LUNG)));
             You("cough and spit blood!");
-            losehp(Maybe_Half_Phys(rnd(dam) + 5), "gas cloud", KILLED_BY_AN);
+            dam = Maybe_Half_Phys(rnd(dam) + 5);
+            if (Half_gas_damage) /* worn towel */
+                dam = (dam + 1) / 2;
+            losehp(dam, "gas cloud", KILLED_BY_AN);
             return FALSE;
         } else {
             You("cough!");

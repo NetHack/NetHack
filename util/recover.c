@@ -27,6 +27,7 @@ void FDECL(set_levelfile_name, (int));
 int FDECL(open_levelfile, (int));
 int NDECL(create_savefile);
 void FDECL(copy_bytes, (int, int));
+static void FDECL(store_formatindicator, (int));
 
 #ifndef WIN_CE
 #define Fprintf (void) fprintf
@@ -37,20 +38,6 @@ static void nhce_message(FILE *, const char *, ...);
 
 #define Close (void) close
 
-#ifdef UNIX
-#define SAVESIZE (PL_NSIZ + 13) /* save/99999player.e */
-#else
-#ifdef VMS
-#define SAVESIZE (PL_NSIZ + 22) /* [.save]<uid>player.e;1 */
-#else
-#ifdef WIN32
-#define SAVESIZE (PL_NSIZ + 40) /* username-player.NetHack-saved-game */
-#else
-#define SAVESIZE FILENAME /* from macconf.h or pcconf.h */
-#endif
-#endif
-#endif
-
 #if defined(EXEPATH)
 char *FDECL(exepath, (char *));
 #endif
@@ -58,6 +45,8 @@ char *FDECL(exepath, (char *));
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern unsigned _stklen = STKSIZ;
 #endif
+
+/* SAVESIZE is defined in "fnamesiz.h" */
 char savename[SAVESIZE]; /* holds relative path of save file from playground */
 
 int
@@ -216,11 +205,11 @@ restore_savefile(basename)
 char *basename;
 {
     int gfd, lfd, sfd;
-    int res = 0, lev, savelev, hpid, pltmpsiz;
+    int res = 0, lev, savelev, hpid, pltmpsiz, filecmc;
     xchar levc;
     struct version_info version_data;
     struct savefile_info sfi;
-    char plbuf[PL_NSIZ];
+    char plbuf[PL_NSIZ], indicator;
 
     /* level 0 file contains:
      *  pid of creating process (ignored here)
@@ -265,6 +254,10 @@ char *basename;
     }
     if ((read(gfd, (genericptr_t) savename, sizeof savename)
          != sizeof savename)
+        || (read(gfd, (genericptr_t) &indicator, sizeof indicator)
+            != sizeof indicator)
+        || (read(gfd, (genericptr_t) &filecmc, sizeof filecmc)
+            != sizeof filecmc)
         || (read(gfd, (genericptr_t) &version_data, sizeof version_data)
             != sizeof version_data)
         || (read(gfd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi)
@@ -277,6 +270,7 @@ char *basename;
     }
 
     /* save file should contain:
+     *  format indicator and cmc
      *  version info
      *  savefile info
      *  player name
@@ -299,6 +293,7 @@ char *basename;
         return -1;
     }
 
+    store_formatindicator(sfd);
     if (write(sfd, (genericptr_t) &version_data, sizeof version_data)
         != sizeof version_data) {
         Fprintf(stderr, "Error writing %s; recovery failed.\n", savename);
@@ -393,6 +388,19 @@ char *basename;
 #endif
     return res;
 }
+
+static void
+store_formatindicator(fd)
+int fd;
+{
+    char indicate = 'h';      /* historical */
+    int cmc = 0;
+
+    write(fd, (genericptr_t) &indicate, sizeof indicate);
+    write(fd, (genericptr_t) &cmc, sizeof cmc);
+}
+
+
 
 #ifdef EXEPATH
 #ifdef __DJGPP__

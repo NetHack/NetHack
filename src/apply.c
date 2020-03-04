@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1574648938 2019/11/25 02:28:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1582155875 2020/02/19 23:44:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -29,8 +29,10 @@ static int FDECL(use_whip, (struct obj *));
 static void FDECL(display_polearm_positions, (int));
 static int FDECL(use_pole, (struct obj *));
 static int FDECL(use_cream_pie, (struct obj *));
+static int FDECL(use_royal_jelly, (struct obj *));
 static int FDECL(use_grapple, (struct obj *));
 static int FDECL(do_break_wand, (struct obj *));
+static int FDECL(flip_through_book, (struct obj *));
 static boolean FDECL(figurine_location_checks, (struct obj *,
                                                     coord *, BOOLEAN_P));
 static void FDECL(add_class, (char *, CHAR_P));
@@ -814,14 +816,25 @@ register xchar x, y;
     }
 }
 
+/* charisma is supposed to include qualities like leadership and personal
+   magnetism rather than just appearance, but it has devolved to this... */
 const char *
 beautiful()
 {
-    return ((ACURR(A_CHA) > 14)
-               ? ((poly_gender() == 1)
-                     ? "beautiful"
-                     : "handsome")
-               : "ugly");
+    const char *res;
+    int cha = ACURR(A_CHA);
+
+    /* don't bother complaining about the sexism; nethack is not real life */
+    res = ((cha >= 25) ? "sublime" /* 25 is the maximum possible */
+           : (cha >= 19) ? "splendorous" /* note: not "splendiferous" */
+             : (cha >= 16) ? ((poly_gender() == 1) ? "beautiful" : "handsome")
+               : (cha >= 14) ? ((poly_gender() == 1) ? "winsome" : "amiable")
+                 : (cha >= 11) ? "cute"
+                   : (cha >= 9) ? "plain"
+                     : (cha >= 6) ? "homely"
+                       : (cha >= 4) ? "ugly"
+                         : "hideous"); /* 3 is the minimum possible */
+    return res;
 }
 
 static const char look_str[] = "look %s.";
@@ -1137,7 +1150,16 @@ register struct obj *obj;
         return;
     }
     if (obj->spe <= 0) {
+        struct obj *otmp;
+
         pline("This %s has no %s.", xname(obj), s);
+        /* only output tip if candles are in inventory */
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
+            if (Is_candle(otmp))
+                break;
+        if (otmp)
+            pline("To attach candles, apply them instead of the %s.",
+                  xname(obj));
         return;
     }
     if (Underwater) {
@@ -1446,24 +1468,36 @@ struct obj **optr;
     *optr = obj;
 }
 
-static NEARDATA const char cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 };
+static NEARDATA const char
+    cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 },
+    cuddlier[] = { TOOL_CLASS, GEM_CLASS, FOOD_CLASS, 0 };
 
 int
 dorub()
 {
-    struct obj *obj = getobj(cuddly, "rub");
+    struct obj *obj;
 
-    if (obj && obj->oclass == GEM_CLASS) {
+    if (nohands(g.youmonst.data)) {
+        You("aren't able to rub anything without hands.");
+        return 0;
+    }
+    obj = getobj(carrying(LUMP_OF_ROYAL_JELLY) ? cuddlier : cuddly, "rub");
+    if (!obj) {
+        /* pline1(Never_mind); -- handled by getobj() */
+        return 0;
+    }
+    if (obj->oclass == GEM_CLASS || obj->oclass == FOOD_CLASS) {
         if (is_graystone(obj)) {
             use_stone(obj);
             return 1;
+        } else if (obj->otyp == LUMP_OF_ROYAL_JELLY) {
+            return use_royal_jelly(obj);
         } else {
             pline("Sorry, I don't know how to use that.");
             return 0;
         }
     }
-
-    if (!obj || !wield_tool(obj, "rub"))
+    if (!wield_tool(obj, "rub"))
         return 0;
 
     /* now uwep is obj */
@@ -1687,8 +1721,10 @@ int magic; /* 0=Physical, otherwise skill level */
         return 0;
     } else if (u.ustuck) {
         if (u.ustuck->mtame && !Conflict && !u.ustuck->mconf) {
-            You("pull free from %s.", mon_nam(u.ustuck));
-            u.ustuck = 0;
+            struct monst *mtmp = u.ustuck;
+
+            set_ustuck((struct monst *) 0);
+            You("pull free from %s.", mon_nam(mtmp));
             return 1;
         }
         if (magic) {
@@ -1711,18 +1747,7 @@ int magic; /* 0=Physical, otherwise skill level */
         You("lack the strength to jump!");
         return 0;
     } else if (!magic && Wounded_legs) {
-        long wl = (Wounded_legs & BOTH_SIDES);
-        const char *bp = body_part(LEG);
-
-        if (wl == BOTH_SIDES)
-            bp = makeplural(bp);
-        if (u.usteed)
-            pline("%s is in no shape for jumping.", Monnam(u.usteed));
-        else
-            Your("%s%s %s in no shape for jumping.",
-                 (wl == LEFT_SIDE) ? "left " : (wl == RIGHT_SIDE) ? "right "
-                                                                  : "",
-                 bp, (wl == BOTH_SIDES) ? "are" : "is");
+        legs_in_no_shape("jumping", u.usteed != 0);
         return 0;
     } else if (u.usteed && u.utrap) {
         pline("%s is stuck in a trap.", Monnam(u.usteed));
@@ -1797,8 +1822,7 @@ int magic; /* 0=Physical, otherwise skill level */
          * and usually moves the ball if punished, but does not handle all
          * the effects of landing on the final position.
          */
-        teleds(cc.x, cc.y, FALSE);
-        sokoban_guilt();
+        teleds(cc.x, cc.y, TELEDS_NO_FLAGS);
         nomul(-1);
         g.multi_reason = "jumping around";
         g.nomovemsg = "";
@@ -2513,10 +2537,10 @@ struct obj *otmp;
         return;
     }
     ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
-    if (otmp == g.trapinfo.tobj && u.ux == g.trapinfo.tx 
+    if (otmp == g.trapinfo.tobj && u.ux == g.trapinfo.tx
                                 && u.uy == g.trapinfo.ty) {
         You("resume setting %s%s.", shk_your(buf, otmp),
-            defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation);
+            trapname(ttyp, FALSE));
         set_occupation(set_trap, occutext, 0);
         return;
     }
@@ -2541,8 +2565,7 @@ struct obj *otmp;
             chance = (rnl(10) > 5);
         You("aren't very skilled at reaching from %s.", mon_nam(u.usteed));
         Sprintf(buf, "Continue your attempt to set %s?",
-                the(defsyms[trap_to_defsym(what_trap(ttyp, rn2))]
-                    .explanation));
+                the(trapname(ttyp, FALSE)));
         if (yn(buf) == 'y') {
             if (chance) {
                 switch (ttyp) {
@@ -2552,9 +2575,7 @@ struct obj *otmp;
                     break;
                 case BEAR_TRAP: /* drop it without arming it */
                     reset_trapset();
-                    You("drop %s!",
-                        the(defsyms[trap_to_defsym(what_trap(ttyp, rn2))]
-                                .explanation));
+                    You("drop %s!", the(trapname(ttyp, FALSE)));
                     dropx(otmp);
                     return;
                 }
@@ -2564,8 +2585,7 @@ struct obj *otmp;
             return;
         }
     }
-    You("begin setting %s%s.", shk_your(buf, otmp),
-        defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation);
+    You("begin setting %s%s.", shk_your(buf, otmp), trapname(ttyp, FALSE));
     set_occupation(set_trap, occutext, 0);
     return;
 }
@@ -2596,8 +2616,7 @@ set_trap()
             add_damage(u.ux, u.uy, 0L); /* schedule removal */
         }
         if (!g.trapinfo.force_bungle)
-            You("finish arming %s.",
-                the(defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation));
+            You("finish arming %s.", the(trapname(ttyp, FALSE)));
         if (((otmp->cursed || Fumbling) && (rnl(10) > 5))
             || g.trapinfo.force_bungle)
             dotrap(ttmp,
@@ -2751,7 +2770,7 @@ struct obj *obj;
             if (proficient && rn2(proficient + 2)) {
                 if (!mtmp || enexto(&cc, rx, ry, g.youmonst.data)) {
                     You("yank yourself out of the pit!");
-                    teleds(cc.x, cc.y, TRUE);
+                    teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG);
                     reset_utrap(TRUE);
                     g.vision_full_recalc = 1;
                 }
@@ -3116,6 +3135,72 @@ struct obj *obj;
 }
 
 static int
+use_royal_jelly(obj)
+struct obj *obj;
+{
+    static const char allowall[2] = { ALL_CLASSES, 0 };
+    int oldcorpsenm;
+    unsigned was_timed;
+    struct obj *eobj;
+
+    if (obj->quan > 1L)
+        obj = splitobj(obj, 1L);
+    /* remove from inventory so that it won't be offered as a choice
+       to rub on itself */
+    freeinv(obj);
+
+    /* right now you can rub one royal jelly on an entire stack of eggs */
+    eobj = getobj(allowall, "rub the royal jelly on");
+    if (!eobj) {
+        addinv(obj); /* put the unused lump back; if it came from
+                      * a split, it should merge back */
+        /* pline1(Never_mind); -- getobj() took care of this */
+        return 0;
+    }
+
+    You("smear royal jelly all over %s.", yname(eobj));
+    if (eobj->otyp != EGG) {
+        pline1(nothing_happens);
+        goto useup_jelly;
+    }
+
+    oldcorpsenm = eobj->corpsenm;
+    if (eobj->corpsenm == PM_KILLER_BEE)
+        eobj->corpsenm = PM_QUEEN_BEE;
+
+    if (obj->cursed) {
+        if (eobj->timed || eobj->corpsenm != oldcorpsenm)
+            pline("The %s %s feebly.", xname(eobj), otense(eobj, "quiver"));
+        else
+            pline("Nothing seems to happen.");
+        kill_egg(eobj);
+        goto useup_jelly;
+    }
+
+    was_timed = eobj->timed;
+    if (eobj->corpsenm != NON_PM) {
+        if (!eobj->timed)
+            attach_egg_hatch_timeout(eobj, 0L);
+        /* blessed royal jelly will make the hatched creature think
+           you're the parent - but has no effect if you laid the egg */
+        if (obj->blessed && !eobj->spe)
+            eobj->spe = 2;
+    }
+
+    if ((eobj->timed && !was_timed) || eobj->spe == 2
+        || eobj->corpsenm != oldcorpsenm)
+        pline("The %s %s briefly.", xname(eobj), otense(eobj, "quiver"));
+    else
+        pline("Nothing seems to happen.");
+
+ useup_jelly:
+    /* not useup() because we've already done freeinv() */
+    setnotworn(obj);
+    obfree(obj, (struct obj *) 0);
+    return 1;
+}
+
+static int
 use_grapple(obj)
 struct obj *obj;
 {
@@ -3174,18 +3259,18 @@ struct obj *obj;
 
         any = cg.zeroany; /* set all bits to zero */
         any.a_int = 1; /* use index+1 (cant use 0) as identifier */
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any.a_int++;
         Sprintf(buf, "an object on the %s", surface(cc.x, cc.y));
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
         any.a_int++;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "a monster",
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
         any.a_int++;
         Sprintf(buf, "the %s", surface(cc.x, cc.y));
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
         end_menu(tmpwin, "Aim for what?");
         tohit = rn2(4);
         if (select_menu(tmpwin, PICK_ONE, &selected) > 0
@@ -3511,11 +3596,12 @@ char class_list[];
 {
     register struct obj *otmp;
     int otyp;
-    boolean knowoil, knowtouchstone, addpotions, addstones, addfood;
+    boolean knowoil, knowtouchstone;
+    boolean addpotions, addstones, addfood, addspellbooks;
 
     knowoil = objects[POT_OIL].oc_name_known;
     knowtouchstone = objects[TOUCHSTONE].oc_name_known;
-    addpotions = addstones = addfood = FALSE;
+    addpotions = addstones = addfood = addspellbooks = FALSE;
     for (otmp = g.invent; otmp; otmp = otmp->nobj) {
         otyp = otmp->otyp;
         if (otyp == POT_OIL
@@ -3528,8 +3614,11 @@ char class_list[];
                 && (!otmp->dknown
                     || (!knowtouchstone && !objects[otyp].oc_name_known))))
             addstones = TRUE;
-        if (otyp == CREAM_PIE || otyp == EUCALYPTUS_LEAF)
+        if (otyp == CREAM_PIE || otyp == EUCALYPTUS_LEAF
+            || otyp == LUMP_OF_ROYAL_JELLY)
             addfood = TRUE;
+        if (otmp->oclass == SPBOOK_CLASS)
+            addspellbooks = TRUE;
     }
 
     class_list[0] = '\0';
@@ -3542,6 +3631,8 @@ char class_list[];
         add_class(class_list, GEM_CLASS);
     if (addfood)
         add_class(class_list, FOOD_CLASS);
+    if (addspellbooks)
+        add_class(class_list, SPBOOK_CLASS);
 }
 
 /* the 'a' command */
@@ -3552,6 +3643,10 @@ doapply()
     register int res = 1;
     char class_list[MAXOCLASSES + 2];
 
+    if (nohands(g.youmonst.data)) {
+        You("aren't able to use or apply tools in your current form.");
+        return 0;
+    }
     if (check_capacity((char *) 0))
         return 0;
 
@@ -3566,6 +3661,9 @@ doapply()
 
     if (obj->oclass == WAND_CLASS)
         return do_break_wand(obj);
+
+    if (obj->oclass == SPBOOK_CLASS)
+        return flip_through_book(obj);
 
     switch (obj->otyp) {
     case BLINDFOLD:
@@ -3585,6 +3683,9 @@ doapply()
         break;
     case CREAM_PIE:
         res = use_cream_pie(obj);
+        break;
+    case LUMP_OF_ROYAL_JELLY:
+        res = use_royal_jelly(obj);
         break;
     case BULLWHIP:
         res = use_whip(obj);
@@ -3609,7 +3710,7 @@ doapply()
     case LOCK_PICK:
     case CREDIT_CARD:
     case SKELETON_KEY:
-        res = (pick_lock(obj) != 0);
+        res = (pick_lock(obj, 0, 0, NULL) != 0);
         break;
     case PICK_AXE:
     case DWARVISH_MATTOCK:
@@ -3780,6 +3881,59 @@ boolean is_horn;
         unfixable_trbl++;
 
     return unfixable_trbl;
+}
+
+static int
+flip_through_book(obj)
+struct obj *obj;
+{
+    if (Underwater) {
+        pline("You don't want to get the pages even more soggy, do you?");
+        return 0;
+    }
+
+    You("flip through the pages of the spellbook.");
+
+    if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+        if (Deaf) {
+            You_see("the pages glow faintly %s.", hcolor(NH_RED));
+        } else {
+            You_hear("the pages make an unpleasant %s sound.",
+                    Hallucination ? "chuckling"
+                                  : "rustling");
+        }
+        return 1;
+    } else if (Blind) {
+        pline("The pages feel %s.",
+              Hallucination ? "freshly picked"
+                            : "rough and dry");
+        return 1;
+    } else if (obj->otyp == SPE_BLANK_PAPER) {
+        pline("This spellbook %s.",
+              Hallucination ? "doesn't have much of a plot"
+                            : "has nothing written in it");
+        makeknown(obj->otyp);
+        return 1;
+    }
+
+    if (Hallucination) {
+        You("enjoy the animated initials.");
+    } else {
+        static const char* fadeness[] = {
+            "fresh",
+            "slightly faded",
+            "very faded",
+            "extremely faded",
+            "barely visible"
+        };
+
+        int index = min(obj->spestudied, MAX_SPELL_STUDY);
+        pline("The%s ink in this spellbook is %s.",
+              objects[obj->otyp].oc_magic ? " magical" : "",
+              fadeness[index]);
+    }
+
+    return 1;
 }
 
 /*apply.c*/

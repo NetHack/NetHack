@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1574648943 2019/11/25 02:29:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1583102142 2020/03/01 22:35:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -749,7 +749,7 @@ randrole_filtered()
 
     /* this doesn't rule out impossible combinations but attempts to
        honor all the filter masks */
-    for (i = 0; i < SIZE(roles); ++i)
+    for (i = 0; i < SIZE(roles) - 1; ++i) /* -1: avoid terminating element */
         if (ok_role(i, ROLE_NONE, ROLE_NONE, ROLE_NONE)
             && ok_race(i, ROLE_RANDOM, ROLE_NONE, ROLE_NONE)
             && ok_gend(i, ROLE_NONE, ROLE_RANDOM, ROLE_NONE)
@@ -1047,8 +1047,8 @@ int racenum, gendnum, alignnum, pickhow;
                        gendnum, alignnum)
             && ok_gend(i, racenum,
                        (gendnum >= 0) ? gendnum : ROLE_RANDOM, alignnum)
-            && ok_race(i, racenum,
-                       gendnum, (alignnum >= 0) ? alignnum : ROLE_RANDOM))
+            && ok_align(i, racenum,
+                        gendnum, (alignnum >= 0) ? alignnum : ROLE_RANDOM))
             set[roles_ok++] = i;
     }
     if (roles_ok == 0 || (roles_ok > 1 && pickhow == PICK_RIGID))
@@ -1221,7 +1221,7 @@ int alignnum;
         /* random; check whether any selection is possible */
         for (i = 0; i < ROLE_ALIGNS; i++) {
             if (g.rfilter.mask & aligns[i].allow)
-                return FALSE;
+                continue;
             allow = aligns[i].allow;
             if (rolenum >= 0 && rolenum < SIZE(roles) - 1
                 && !(allow & roles[rolenum].allow & ROLE_ALIGNMASK))
@@ -1902,24 +1902,28 @@ boolean preselect;
         /* use four spaces of padding to fake a grayed out menu choice */
         Sprintf(buf, "%4s%s forces %s", "", constrainer, forcedvalue);
         add_menu(where, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
     } else if (what) {
         any.a_int = RS_menu_arg(which);
         Sprintf(buf, "Pick%s %s first", (f >= 0) ? " another" : "", what);
         add_menu(where, NO_GLYPH, &any, RS_menu_let[which], 0, ATR_NONE, buf,
-                 MENU_UNSELECTED);
+                 MENU_ITEMFLAGS_NONE);
     } else if (which == RS_filter) {
+        char setfiltering[40];
+
         any.a_int = RS_menu_arg(RS_filter);
+        Sprintf(setfiltering, "%s role/race/&c filtering",
+                gotrolefilter() ? "Reset" : "Set");
         add_menu(where, NO_GLYPH, &any, '~', 0, ATR_NONE,
-                 "Reset role/race/&c filtering", MENU_UNSELECTED);
+                 setfiltering, MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_RANDOM) {
         any.a_int = ROLE_RANDOM;
         add_menu(where, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                 preselect ? MENU_SELECTED : MENU_UNSELECTED);
+                 preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_NONE) {
         any.a_int = ROLE_NONE;
         add_menu(where, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                 preselect ? MENU_SELECTED : MENU_UNSELECTED);
+                 preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else {
         impossible("role_menu_extra: bad arg (%d)", which);
     }
@@ -1935,7 +1939,7 @@ boolean preselect;
  *      1 - The Rogue Leader is the Tourist Nemesis.
  *      2 - Priests start with a random alignment - convert the leader and
  *          guardians here.
- *      3 - Priests also get their of deities from a randomly chosen role.
+ *      3 - Priests also get their set of deities from a randomly chosen role.
  *      4 - [obsolete] Elves can have one of two different leaders,
  *          but can't work it out here because it requires hacking the
  *          level file data (see sp_lev.c).
@@ -2028,9 +2032,19 @@ role_init()
 
     /* Fix up the god names */
     if (flags.pantheon == -1) {             /* new game */
+        int trycnt = 0;
         flags.pantheon = flags.initrole;    /* use own gods */
-        while (!roles[flags.pantheon].lgod) /* unless they're missing */
+        /* unless they're missing */
+        while (!roles[flags.pantheon].lgod && ++trycnt < 100)
             flags.pantheon = randrole(FALSE);
+        if (!roles[flags.pantheon].lgod) {
+            int i;
+            for (i = 0; i < SIZE(roles) - 1; i++)
+                if (roles[i].lgod) {
+                    flags.pantheon = i;
+                    break;
+                }
+        }
     }
     if (!g.urole.lgod) {
         g.urole.lgod = roles[flags.pantheon].lgod;

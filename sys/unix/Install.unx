@@ -1,4 +1,4 @@
-                Instructions for installing NetHack 3.6
+                Instructions for installing NetHack 3.7
                            on a UNIX system
                 =======================================
 NB: We are gradually replacing this process with the process documented in
@@ -109,7 +109,7 @@ the file NewInstall.unx.
 Notes:
 
 1.  Save files and bones files from previous versions will not work with
-    NetHack 3.6.  Don't bother trying to keep them.
+    NetHack 3.7.  Don't bother trying to keep them.
 
 2.  To install an update of this version of NetHack after changing something,
     type 'make update' from the main directory.  If you created the new
@@ -210,25 +210,7 @@ Notes:
     and -xenix.  The cc problems are old enough that a new, working
     version may have been released by this time.
 
-10. Xenix/286's lex generates a faulty lexical analyser from lev_comp.l.
-    The beta-release of flex 2.3 (available from uunet, osu-cis,
-    prep.ai.mit.edu, etc.) can be used to generate the lexer.
-    The only change to flex is to change "#define yyleng (yy_cp - yy_bp)"
-    to "#define yyleng (int)(yy_cp - yy_bp)" in flex.skel.
-    Flex is not needed with Xenix/386, as its lex generates a proper lexical
-    analyser.  [Xenix instructions by J.T. Conklin]
-
-11. If your system does not have a lex/yacc or flex/bison combination
-    capable of producing the dungeon and level compilers, lex and yacc
-    output from one of our development systems can be found in sys/share.
-    Unfortunately, this output is less portable than the rest of the code,
-    as it contains skeleton parsing code provided by the specific vendor
-    who has no particular incentive to make such skeletons portable, but
-    the output works on most systems.  To try it on yours, copy dgn_comp.h
-    and lev_comp.h to include and dgn_lex.c, dgn_yacc.c, lev_lex.c, and
-    lev_yacc.c to util.
-
-12. Yes, Virginia, you compile NetHack for a NeXT as if it ran UNIX instead
+10. Yes, Virginia, you compile NetHack for a NeXT as if it ran UNIX instead
     of Mach.  Just tell NetHack you're a BSD system (Mach is extremely
     close to BSD UNIX for traditional system calls, so this is also a
     likely thing to try for any other programs you want to compile).
@@ -237,7 +219,7 @@ Notes:
     not allowed", you might want to re-install using the setgid option instead
     (see Note 7 above, and the setgid comment in the toplevel Makefile).
 
-13. If you are using Solaris 2.x (aka SunOS 5.x) you shouldn't have to
+11. If you are using Solaris 2.x (aka SunOS 5.x) you shouldn't have to
     do any system configuration -- this is the default.  In case it is
     messed up, follow these instructions.
 
@@ -258,39 +240,16 @@ Notes:
     compiler, /usr/bin/cc, or gcc, but _not_ ucbcc.  The lattermost will
     not work.  After this, you should get a clean compile.
 
-    Also, it is recommended that you use FLEX instead of the standard
-    lex bundled with Solaris 2.x (even if that last one should work ;-).
+12. If you are trying to cross-compile for another system, see the file
+    Cross-compiling.
 
-15. If you are trying to cross-compile for another system, there is some
-    support in the src and util Makefiles, but there are still other
-    complications.  It may well be best to make another copy of util,
-    util2, to compile target copies of makedefs, lev_comp, and recover
-    (duplicating the cross-compilation settings from the src Makefile)
-    without disturbing the main build.
-
-    You can use the host makedefs for everything but "makedefs -v", which
-    creates include/date.h, which provides various sanity-checking values
-    for making sure files read by NetHack at run-time are compatible.
-    These values depend on the endianness of your processor, its type
-    sizes, and its compiler's idea of struct packing.  Your host and target
-    computers may disagree on these things, so you'll need to build a target
-    version of makedefs, run "makedefs -v" on your target, and bring the
-    resulting date.h back for the builds on the host.  (Making sure the host
-    makedefs doesn't decide it needs to overwrite it for you. :-)
-
-    You also need a target version of lev_comp, and to provide it with all
-    the dat/*.des files, and copy all the resulting *.lev files back for
-    packaging on the host.
-
-    For recover, you just want the target binary to install on the target.
-
-16. If you get a compiler warning about 'get_colors()' being implicitly
+13. If you get a compiler warning about 'get_colors()' being implicitly
     declared, try uncommenting NEED_GET_COLORS_DECL in unixconf.h.
     If you get a compiler complaint about tparmdecl() having conflicting
     declarations, add '#define NOTPARMDECL' to unixconf.h or '-DNOTPARMDECL'
     to CFLAGS in src/Makefile.  (The hints files for Mac OSX already do the
     latter.)
 
-# NetHack 3.6  Install.unx       $NHDT-Date: 1548372344 2019/01/24 23:25:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $
+# NetHack 3.7  Install.unx       $NHDT-Date: 1577568915 2019/12/28 21:35:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $
 # Copyright (c) 2012 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.

@@ -9,6 +9,8 @@ autoopen       walking into a door attempts to open it            [TRUE]
 autopickup     automatically pick up objects you move over        [TRUE]
 autoquiver     when firing with an empty quiver, select some      [FALSE]
                suitable inventory weapon to fill the quiver
+autounlock     when opening a locked door or looting a locked     [TRUE]
+               container while carrying a key, offer to use it
 BIOS           allow the use of IBM ROM BIOS calls                [FALSE]
 blind          your character is permanently blind                [FALSE]
 bones          allow loading bones files                          [TRUE]
@@ -32,6 +34,8 @@ legacy         print introductory message                         [TRUE]
 lit_corridor   show a dark corridor as lit if in sight            [FALSE]
 lootabc        use a/b/c rather than o/i/b when looting           [FALSE]
 mail           enable the mail daemon                             [TRUE]
+mention_decor  give feedback when walking across stairs, altars,  [FALSE]
+               fountains, and such even when not obscured by objects
 mention_walls  give feedback when walking against a wall          [FALSE]
 menu_objsyms   show object symbols in menus if it is selectable   [FALSE]
 menu_overlay   overlay menus on the screen and align to right     [TRUE]
@@ -43,6 +47,8 @@ perm_invent    keep inventory in a permanent window               [FALSE]
 pickup_thrown  override pickup_types for thrown objects           [TRUE]
 pushweapon     when wielding a new weapon, put your previously    [FALSE]
                wielded weapon into the secondary weapon slot
+quick_farsight usually skip the chance to browse the map when     [FALSE]
+               randomly triggered clairvoyance takes place
 rawio          allow the use of raw I/O                           [FALSE]
 rest_on_space  count the space bar as a rest character            [FALSE]
 safe_pet       prevent you from (knowingly) attacking your pet(s) [TRUE]
@@ -58,8 +64,9 @@ status_updates update the status lines                            [TRUE]
 time           display elapsed game time, in moves                [FALSE]
 tombstone      print tombstone when you die                       [TRUE]
 toptenwin      print topten in a window rather than stdout        [FALSE]
-travel         enable the command to travel to a map location via [TRUE]
-               a shortest-path algorithm, usually invoked by '_'.
+travel         enables travelling via mouse click if supported;   [TRUE]
+               can be toggled off to prevent mouse clicks on the map from
+               attempting to move the hero; does not affect travel via '_'
 use_darkgray   use bold black instead of blue for black glyphs.   [TRUE]
 use_inverse    display detected monsters in highlighted manner    [FALSE]
 verbose        print more commentary during the game              [TRUE]

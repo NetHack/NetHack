@@ -356,21 +356,23 @@ boolean complain;
 }
 
 void
-trace_start_menu(vp, window)
+trace_start_menu(vp, window, mbehavior)
 void *vp;
 winid window;
+unsigned long mbehavior;
 {
     struct trace_data *tdp = vp;
 
-    fprintf(wc_tracelogf, "%sstart_menu(%d)\n", INDENT, window);
+    fprintf(wc_tracelogf, "%sstart_menu(%d, %lu)\n", INDENT,
+            window, mbehavior);
 
     PRE;
-    (*tdp->nprocs->win_start_menu)(tdp->ndata, window);
+    (*tdp->nprocs->win_start_menu)(tdp->ndata, window, mbehavior);
     POST;
 }
 
 void
-trace_add_menu(vp, window, glyph, identifier, ch, gch, attr, str, preselected)
+trace_add_menu(vp, window, glyph, identifier, ch, gch, attr, str, itemflags)
 void *vp;
 winid window;               /* window to use, must be of type NHW_MENU */
 int glyph;                  /* glyph to display with item (unused) */
@@ -379,7 +381,7 @@ char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
 int attr;                   /* attribute for string (like tty_putstr()) */
 const char *str;            /* menu string */
-boolean preselected;        /* item is marked as selected */
+unsigned int itemflags;     /* itemflags such as marked as selected */
 {
     struct trace_data *tdp = vp;
 
@@ -400,19 +402,19 @@ boolean preselected;        /* item is marked as selected */
 
     if (str) {
         fprintf(wc_tracelogf,
-                "%sadd_menu(%d, %d, %p, %s, %s, %d, '%s'(%d), %d)\n", INDENT,
+                "%sadd_menu(%d, %d, %p, %s, %s, %d, '%s'(%d), %u)\n", INDENT,
                 window, glyph, (void *) identifier, buf_ch, buf_gch, attr,
-                str, (int) strlen(str), preselected);
+                str, (int) strlen(str), itemflags);
     } else {
         fprintf(wc_tracelogf,
-                "%sadd_menu(%d, %d, %p, %s, %s, %d, NULL, %d)\n", INDENT,
+                "%sadd_menu(%d, %d, %p, %s, %s, %d, NULL, %u)\n", INDENT,
                 window, glyph, (void *) identifier, buf_ch, buf_gch, attr,
-                preselected);
+                itemflags);
     }
 
     PRE;
     (*tdp->nprocs->win_add_menu)(tdp->ndata, window, glyph, identifier, ch,
-                                 gch, attr, str, preselected);
+                                 gch, attr, str, itemflags);
     POST;
 }
 

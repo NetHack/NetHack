@@ -7,7 +7,7 @@
 
  	<Copy SourceFiles="$(SysWinntDir)porthelp" DestinationFolder="$(DatDir)"/>
 	<WriteLinesToFile File="$(DatDir)dlb.lst" Lines="@(DlbList->'%(filename)%(extension)')" Overwrite="true"/>
-	<Exec Command="$(ToolsDir)dlb.exe cIf $(DatDir)dlb.lst $(BinDir)nhdat" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="&quot;$(ToolsDir)dlb.exe&quot; cIf dlb.lst &quot;$(BinDir)nhdat&quot;" WorkingDirectory="$(DatDir)"/>
 	<Delete Files="$(DatDir)porthelp"/>
 
 	</Target>

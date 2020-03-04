@@ -1,10 +1,9 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1573290422 2019/11/09 09:07:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1582925432 2020/02/28 21:30:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h" /* for checking save modes */
 
 static void NDECL(stoned_dialogue);
 static void NDECL(vomiting_dialogue);
@@ -93,7 +92,7 @@ const struct propname {
     { UNCHANGING, "unchanging" },
     { REFLECTING, "reflecting" },
     { FREE_ACTION, "free action" },
-    { FIXED_ABIL, "fixed abilites" },
+    { FIXED_ABIL, "fixed abilities" },
     { LIFESAVED, "life will be saved" },
     {  0, 0 },
 };
@@ -171,6 +170,7 @@ static void
 vomiting_dialogue()
 {
     const char *txt = 0;
+    char buf[BUFSZ];
     long v = (Vomiting & TIMEOUT);
 
     /* note: nhtimeout() hasn't decremented timed properties for the
@@ -181,6 +181,8 @@ vomiting_dialogue()
         break;
     case 11:
         txt = vomiting_texts[1];
+        if (strstri(txt, " confused") && Confusion)
+            txt = strsubst(strcpy(buf, txt), " confused", " more confused");
         break;
     case 6:
         make_stunned((HStun & TIMEOUT) + (long) d(2, 4), FALSE);
@@ -194,6 +196,8 @@ vomiting_dialogue()
         break;
     case 8:
         txt = vomiting_texts[2];
+        if (strstri(txt, " think") && Stunned)
+            txt = strsubst(strcpy(buf, txt), "can't seem to ", "can't ");
         break;
     case 5:
         txt = vomiting_texts[3];
@@ -592,7 +596,7 @@ nh_timeout()
                 break;
             case FAST:
                 if (!Very_fast)
-                    You_feel("yourself slowing down%s.",
+                    You_feel("yourself slow down%s.",
                              Fast ? " a bit" : "");
                 break;
             case CONFUSION:
@@ -1398,7 +1402,7 @@ long timeout;
         break; /* case [otyp ==] candelabrum|tallow_candle|wax_candle */
 
     default:
-        impossible("burn_object: unexpeced obj %s", xname(obj));
+        impossible("burn_object: unexpected obj %s", xname(obj));
         break;
     }
     if (need_newsym)
@@ -1659,7 +1663,7 @@ do_storms()
  *      are saved with a level.  Object and monster timers are
  *      saved using their respective id's instead of pointers.
  *
- *  void restore_timers(NHFILE *, int range, boolean ghostly, long adjust)
+ *  void restore_timers(NHFILE *, int range, long adjust)
  *      Restore timers of range 'range'.  If from a ghost pile,
  *      adjust the timeout by 'adjust'.  The object and monster
  *      ids are not restored until later.
@@ -2361,14 +2365,14 @@ int range;
  * monster pointers.
  */
 void
-restore_timers(nhfp, range, ghostly, adjust)
+restore_timers(nhfp, range, adjust)
 NHFILE *nhfp;
 int range;
-boolean ghostly; /* restoring from a ghost level */
 long adjust;     /* how much to adjust timeout */
 {
     int count = 0;
     timer_element *curr;
+    boolean ghostly = (nhfp->ftype == NHF_BONESFILE); /* from a ghost level */
 
     if (range == RANGE_GLOBAL) {
         if (nhfp->structlevel)

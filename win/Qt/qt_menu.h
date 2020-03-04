@@ -55,7 +55,7 @@ public:
 
 	virtual void StartMenu();
 	virtual void AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-			const QString& str, bool presel);
+			const QString& str, unsigned itemflags);
 	virtual void EndMenu(const QString& prompt);
 	virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);
 
@@ -85,6 +85,7 @@ private:
 		char ch;
                 char gch;
 		bool selected;
+                unsigned itemflags;
                 unsigned color;
 
 		bool Selectable() const { return identifier.a_void!=0; }
@@ -172,7 +173,7 @@ public:
 	// Menu
 	virtual void StartMenu();
 	virtual void AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-			const QString& str, bool presel);
+			const QString& str, unsigned itemflags);
 	virtual void EndMenu(const QString& prompt);
 	virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);
 

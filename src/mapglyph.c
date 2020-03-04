@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1575830186 2019/12/08 18:36:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1580252137 2020/01/28 22:55:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -102,7 +102,15 @@ unsigned mgflags;
      *  Warning:  For speed, this makes an assumption on the order of
      *            offsets.  The order is set in display.h.
      */
-    if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) { /* a statue */
+    if ((offset = (glyph - GLYPH_NOTHING_OFF)) >= 0) {
+        idx = SYM_NOTHING + SYM_OFF_X;
+        color = NO_COLOR;
+        special |= MG_NOTHING;
+    } else if ((offset = (glyph - GLYPH_UNEXPLORED_OFF)) >= 0) {
+        idx = SYM_UNEXPLORED + SYM_OFF_X;
+        color = NO_COLOR;
+        special |= MG_UNEXPL;
+    } else if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) { /* a statue */
         idx = mons[offset].mlet + SYM_OFF_M;
         if (has_rogue_color)
             color = CLR_RED;
@@ -162,6 +170,12 @@ unsigned mgflags;
                        || g.showsyms[idx]
                           == g.showsyms[S_water + SYM_OFF_P])) {
             special |= MG_BW_LAVA;
+        /* similar for floor [what about empty doorway?] and ice */
+        } else if (!iflags.use_color && offset == S_ice
+                   && (g.showsyms[idx] == g.showsyms[S_room + SYM_OFF_P]
+                       || g.showsyms[idx]
+                          == g.showsyms[S_darkroom + SYM_OFF_P])) {
+            special |= MG_BW_ICE;
         } else if (offset == S_altar && iflags.use_color) {
             int amsk = altarmask_at(x, y); /* might be a mimic */
 
@@ -436,6 +450,28 @@ const char *str;
 
     /* now send it to the normal putstr */
     putstr(window, attr, decode_mixed(buf, str));
+}
+
+/*
+ * Window port helper function for menu invert routines to move the decision
+ * logic into one place instead of 7 different window-port routines.
+ */
+boolean
+menuitem_invert_test(mode, itemflags, is_selected)
+int mode;
+unsigned itemflags;     /* The itemflags for the item               */
+boolean is_selected;    /* The current selection status of the item */
+{
+    boolean skipinvert = (itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0;
+    
+    if ((iflags.menuinvertmode == 1 || iflags.menuinvertmode == 2)
+        && !mode && skipinvert && !is_selected)
+        return FALSE;
+    else if (iflags.menuinvertmode == 2
+        && !mode && skipinvert && is_selected)
+        return TRUE;
+    else
+        return TRUE;
 }
 
 /*mapglyph.c*/

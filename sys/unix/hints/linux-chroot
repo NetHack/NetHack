@@ -39,7 +39,7 @@ WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)
 WINLIB = $(WINTTYLIB)
 
-WINTTYLIB=-lcurses
+WINTTYLIB=-lncurses -ltinfo
 
 CHOWN=true
 CHGRP=true

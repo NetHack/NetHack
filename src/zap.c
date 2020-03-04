@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1573688696 2019/11/13 23:44:56 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.316 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1580322890 2020/01/29 18:34:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.330 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -23,6 +23,7 @@ static void FDECL(skiprange, (int, int *, int *));
 static int FDECL(zap_hit, (int, int));
 static void FDECL(disintegrate_mon, (struct monst *, int, const char *));
 static void FDECL(backfire, (struct obj *));
+static void FDECL(boxlock_invent, (struct obj *));
 static int FDECL(spell_hit_bonus, (int));
 static void FDECL(destroy_one_item, (struct obj *, int, int));
 static void FDECL(wishcmdassist, (int));
@@ -2200,7 +2201,7 @@ struct obj *otmp;
     pline("%s suddenly explodes!", The(xname(otmp)));
     dmg = d(otmp->spe + 2, 6);
     losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
-    useup(otmp);
+    useupall(otmp);
 }
 
 static NEARDATA const char zap_syms[] = { WAND_CLASS, 0 };
@@ -2209,9 +2210,13 @@ static NEARDATA const char zap_syms[] = { WAND_CLASS, 0 };
 int
 dozap()
 {
-    register struct obj *obj;
-    int damage;
+    struct obj *obj;
+    int damage, need_dir;
 
+    if (nohands(g.youmonst.data)) {
+        You("aren't able to zap anything in your current form.");
+        return 0;
+    }
     if (check_capacity((char *) 0))
         return 0;
     obj = getobj(zap_syms, "zap");
@@ -2220,19 +2225,20 @@ dozap()
 
     check_unpaid(obj);
 
-    /* zappable addition done by GAN 11/03/86 */
-    if (!zappable(obj))
+    need_dir = objects[obj->otyp].oc_dir != NODIR;
+    if (!zappable(obj)) {
         pline1(nothing_happens);
-    else if (obj->cursed && !rn2(WAND_BACKFIRE_CHANCE)) {
+    } else if (obj->cursed && !rn2(WAND_BACKFIRE_CHANCE)) {
         backfire(obj); /* the wand blows up in your face! */
         exercise(A_STR, FALSE);
+        /* 'obj' is gone; skip update_inventory() because
+           backfire() -> useupall() -> freeinv() did it */
         return 1;
-    } else if (!(objects[obj->otyp].oc_dir == NODIR) && !getdir((char *) 0)) {
+    } else if (need_dir && !getdir((char *) 0)) {
         if (!Blind)
             pline("%s glows and fades.", The(xname(obj)));
         /* make him pay for knowing !NODIR */
-    } else if (!u.dx && !u.dy && !u.dz
-               && !(objects[obj->otyp].oc_dir == NODIR)) {
+    } else if (need_dir && !u.dx && !u.dy && !u.dz) {
         if ((damage = zapyourself(obj, TRUE)) != 0) {
             char buf[BUFSZ];
 
@@ -2253,10 +2259,28 @@ dozap()
     }
     if (obj && obj->spe < 0) {
         pline("%s to dust.", Tobjnam(obj, "turn"));
-        useup(obj);
-    }
-    update_inventory(); /* maybe used a charge */
+        useupall(obj); /* calls freeinv() -> update_inventory() */
+    } else
+        update_inventory(); /* maybe used a charge */
     return 1;
+}
+
+/* Lock or unlock all boxes in inventory */
+static void
+boxlock_invent(obj)
+struct obj *obj;
+{
+    struct obj *otmp;
+    boolean boxing = FALSE;
+
+    /* (un)lock carried boxes */
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
+        if (Is_box(otmp)) {
+            (void) boxlock(otmp, obj);
+            boxing = TRUE;
+        }
+    if (boxing)
+        update_inventory(); /* in case any box->lknown has changed */
 }
 
 int
@@ -2491,18 +2515,7 @@ boolean ordinary;
         }
         /* invent is hit iff hero doesn't escape from a trap */
         if (!u.utrap || !openholdingtrap(&g.youmonst, &learn_it)) {
-            struct obj *otmp;
-            boolean boxing = FALSE;
-
-            /* unlock carried boxes */
-            for (otmp = g.invent; otmp; otmp = otmp->nobj)
-                if (Is_box(otmp)) {
-                    (void) boxlock(otmp, obj);
-                    boxing = TRUE;
-                }
-            if (boxing)
-                update_inventory(); /* in case any box->lknown has changed */
-
+            boxlock_invent(obj);
             /* trigger previously escaped trapdoor */
             (void) openfallingtrap(&g.youmonst, TRUE, &learn_it);
         }
@@ -2511,17 +2524,7 @@ boolean ordinary;
     case SPE_WIZARD_LOCK:
         /* similar logic to opening; invent is hit iff no trap triggered */
         if (u.utrap || !closeholdingtrap(&g.youmonst, &learn_it)) {
-            struct obj *otmp;
-            boolean boxing = FALSE;
-
-            /* lock carried boxes */
-            for (otmp = g.invent; otmp; otmp = otmp->nobj)
-                if (Is_box(otmp)) {
-                    (void) boxlock(otmp, obj);
-                    boxing = TRUE;
-                }
-            if (boxing)
-                update_inventory(); /* in case any box->lknown has changed */
+            boxlock_invent(obj);
         }
         break;
     case WAN_DIGGING:
@@ -4626,7 +4629,7 @@ short exploding_wand_typ;
         case ZT_COLD:
             new_doormask = D_NODOOR;
             see_txt = "The door freezes and shatters!";
-            sense_txt = "feel cold.";
+            hear_txt = "a deep cracking sound.";
             break;
         case ZT_DEATH:
             /* death spells/wands don't disintegrate */

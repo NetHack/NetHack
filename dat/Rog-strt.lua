@@ -40,8 +40,7 @@ des.map([[
 -- Dungeon Description
 --REGION:(00,00,75,20),lit,"ordinary"
 
-local streets = selection.floodfill(selection.new(), 0,12)
-
+local streets = selection.floodfill(0,12)
 
 -- The down stairs is at one of the 4 "exits".  The others are mimics,
 -- mimicing stairwells.

@@ -167,7 +167,7 @@ makedefs.obj :	makedefs.c \
 		$(CONFIG_H) $(INC)permonst.h $(INC)objclass.h \
 		$(INC)monsym.h $(INC)artilist.h $(INC)dungeon.h \
 		$(INC)obj.h $(INC)monst.h $(INC)you.h $(INC)flag.h \
-		$(INC)dlb.h $(INC)patchlevel.h $(INC)qtext.h
+		$(INC)dlb.h $(INC)patchlevel.h
 
 $(INC)onames.h	: $(MAKEDEFS)
 	$(RUN) $(MAKEDEFS) -o

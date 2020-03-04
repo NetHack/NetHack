@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1574648939 2019/11/25 02:28:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1582364431 2020/02/22 09:40:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -241,7 +241,7 @@ const void *b;
 #define IS_UNEXPLORED_LOC(x,y) \
     (isok((x), (y))                                     \
      && glyph_is_cmap(levl[(x)][(y)].glyph)             \
-     && glyph_to_cmap(levl[(x)][(y)].glyph) == S_stone  \
+     && levl[(x)][(y)].glyph == GLYPH_UNEXPLORED        \
      && !levl[(x)][(y)].seenv)
 
 #define GLOC_SAME_AREA(x,y)                                     \
@@ -326,7 +326,7 @@ void
 gloc_filter_done()
 {
     if (g.gloc_filter_map) {
-        selection_free(g.gloc_filter_map);
+        selection_free(g.gloc_filter_map, TRUE);
         g.gloc_filter_map = (struct selectionvar *) 0;
 
     }
@@ -581,7 +581,7 @@ int gloc;
     }
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
 
     /* gather_locs returns array[0] == you. skip it. */
@@ -601,7 +601,7 @@ int gloc;
             Sprintf(fullbuf, "%s%s%s", firstmatch,
                     (*tmpbuf ? " " : ""), tmpbuf);
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, fullbuf,
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -1348,30 +1348,30 @@ docallcmd()
     boolean abc = flags.lootabc;
 
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_char = 'm'; /* group accelerator 'C' */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'C', ATR_NONE,
-             "a monster", MENU_UNSELECTED);
+             "a monster", MENU_ITEMFLAGS_NONE);
     if (g.invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
         add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'y', ATR_NONE,
-                 "a particular object in inventory", MENU_UNSELECTED);
+                 "a particular object in inventory", MENU_ITEMFLAGS_NONE);
         any.a_char = 'o'; /* group accelerator 'n' */
         add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'n', ATR_NONE,
-                 "the type of an object in inventory", MENU_UNSELECTED);
+                 "the type of an object in inventory", MENU_ITEMFLAGS_NONE);
     }
     any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, ',', ATR_NONE,
-             "the type of an object upon the floor", MENU_UNSELECTED);
+             "the type of an object upon the floor", MENU_ITEMFLAGS_NONE);
     any.a_char = 'd'; /* group accelerator '\' */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, '\\', ATR_NONE,
-             "the type of an object on discoveries list", MENU_UNSELECTED);
+             "the type of an object on discoveries list", MENU_ITEMFLAGS_NONE);
     any.a_char = 'a'; /* group accelerator 'l' */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'l', ATR_NONE,
-             "record an annotation for the current level", MENU_UNSELECTED);
+             "record an annotation for the current level", MENU_ITEMFLAGS_NONE);
     end_menu(win, "What do you want to name?");
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         ch = pick_list[0].item.a_char;
@@ -2054,15 +2054,16 @@ char *buf, *code;
     static const char bogon_codes[] = "-_+|="; /* see dat/bonusmon.txt */
     char *mname = buf;
 
+    if (code)
+        *code = '\0';
+    /* might fail (return empty buf[]) if the file isn't available */
     get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng);
-    /* strip prefix if present */
-    if (index(bogon_codes, *mname)) {
+    if (!*mname) {
+        Strcpy(buf, "bogon");
+    } else if (index(bogon_codes, *mname)) { /* strip prefix if present */
         if (code)
             *code = *mname;
         ++mname;
-    } else {
-        if (code)
-            *code = '\0';
     }
     return mname;
 }
@@ -2125,7 +2126,8 @@ roguename()
 
 static NEARDATA const char *const hcolors[] = {
     "ultraviolet", "infrared", "bluish-orange", "reddish-green", "dark white",
-    "light black", "sky blue-pink", "salty", "sweet", "sour", "bitter",
+    "light black", "sky blue-pink",
+    "salty", "sweet", "sour", "bitter", "umami", /* basic tastes */
     "striped", "spiral", "swirly", "plaid", "checkered", "argyle", "paisley",
     "blotchy", "guernsey-spotted", "polka-dotted", "square", "round",
     "triangular", "cabernet", "sangria", "fuchsia", "wisteria", "lemon-lime",
@@ -2161,14 +2163,26 @@ static NEARDATA const char *const hliquids[] = {
     "caramel sauce", "ink", "aqueous humour", "milk substitute",
     "fruit juice", "glowing lava", "gastric acid", "mineral water",
     "cough syrup", "quicksilver", "sweet vitriol", "grey goo", "pink slime",
+    /* "new coke (tm)", --better not */
 };
 
+/* if hallucinating, return a random liquid instead of 'liquidpref' */
 const char *
 hliquid(liquidpref)
-const char *liquidpref;
+const char *liquidpref; /* use as-is when not hallucinating (unless empty) */
 {
-    return (Hallucination || !liquidpref) ? hliquids[rn2(SIZE(hliquids))]
-                                          : liquidpref;
+    if (Hallucination || !liquidpref || !*liquidpref) {
+        int indx, count = SIZE(hliquids);
+
+        /* if we have a non-hallucinatory default value, include it
+           among the choices */
+        if (liquidpref && *liquidpref)
+            ++count;
+        indx = rn2_on_display_rng(count);
+        if (indx < SIZE(hliquids))
+            return hliquids[indx];
+    }
+    return liquidpref;
 }
 
 /* Aliases for road-runner nemesis

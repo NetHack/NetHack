@@ -153,13 +153,13 @@ char **argv;
     set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS
                                  | WC_TILE_WIDTH | WC_TILE_HEIGHT
                                  | WC_TILE_FILE,
-                             DISP_IN_GAME);
+                             set_gameview);
     set_wc_option_mod_status(
         WC_HILITE_PET | WC_SCROLL_MARGIN | WC_FONT_MESSAGE | WC_FONT_MAP
             | WC_FONT_STATUS | WC_FONT_MENU | WC_FONT_TEXT
             | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_MAP | WC_FONTSIZ_STATUS
             | WC_FONTSIZ_MENU | WC_FONTSIZ_TEXT | WC_VARY_MSGCOUNT,
-        SET_IN_GAME);
+        set_in_game);
     if (iflags.wc_align_message == 0)
         iflags.wc_align_message = ALIGN_TOP;
     if (iflags.wc_align_status == 0)
@@ -241,7 +241,7 @@ Gem_player_selection()
         } else {
             /* Prompt for a role */
             win = create_nhwindow(NHW_MENU);
-            start_menu(win);
+            start_menu(win, MENU_BEHAVE_STANDARD);
             any.a_void = 0; /* zero out all bits */
             for (i = 0; roles[i].name.m; i++) {
                 if (ok_role(i, flags.initrace, flags.initgend,
@@ -251,7 +251,7 @@ Gem_player_selection()
                     if (currch == lastch)
                         currch = highc(currch);
                     add_menu(win, roles[i].malenum, &any, currch, 0, ATR_NONE,
-                             an(roles[i].name.m), MENU_UNSELECTED);
+                             an(roles[i].name.m), MENU_ITEMFLAGS_NONE);
                     lastch = currch;
                 }
             }
@@ -260,10 +260,10 @@ Gem_player_selection()
             if (any.a_int == 0) /* must be non-zero */
                 any.a_int = randrole(FALSE) + 1;
             add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
             any.a_int = i + 1; /* must be non-zero */
             add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
             end_menu(win, "Pick a role");
             n = select_menu(win, PICK_ONE, &selected);
             destroy_nhwindow(win);
@@ -313,24 +313,24 @@ Gem_player_selection()
             /* Permit the user to pick, if there is more than one */
             if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; races[i].noun; i++)
                     if (ok_race(flags.initrole, i, flags.initgend,
                                 flags.initalign)) {
                         any.a_int = i + 1; /* must be non-zero */
                         add_menu(win, NO_GLYPH, &any, races[i].noun[0], 0,
-                                 ATR_NONE, races[i].noun, MENU_UNSELECTED);
+                                 ATR_NONE, races[i].noun, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_race(flags.initrole, flags.initgend,
                                       flags.initalign, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randrace(flags.initrole) + 1;
                 add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
                 add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the race of your %s",
                         roles[flags.initrole].name.m);
                 end_menu(win, pbuf);
@@ -382,24 +382,24 @@ Gem_player_selection()
             /* Permit the user to pick, if there is more than one */
             if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; i < ROLE_GENDERS; i++)
                     if (ok_gend(flags.initrole, flags.initrace, i,
                                 flags.initalign)) {
                         any.a_int = i + 1;
                         add_menu(win, NO_GLYPH, &any, genders[i].adj[0], 0,
-                                 ATR_NONE, genders[i].adj, MENU_UNSELECTED);
+                                 ATR_NONE, genders[i].adj, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_gend(flags.initrole, flags.initrace,
                                       flags.initalign, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randgend(flags.initrole, flags.initrace) + 1;
                 add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
                 add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the gender of your %s %s",
                         races[flags.initrace].adj,
                         roles[flags.initrole].name.m);
@@ -451,24 +451,24 @@ Gem_player_selection()
             /* Permit the user to pick, if there is more than one */
             if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
-                start_menu(win);
+                start_menu(win, MENU_BEHAVE_STANDARD);
                 any.a_void = 0; /* zero out all bits */
                 for (i = 0; i < ROLE_ALIGNS; i++)
                     if (ok_align(flags.initrole, flags.initrace,
                                  flags.initgend, i)) {
                         any.a_int = i + 1;
                         add_menu(win, NO_GLYPH, &any, aligns[i].adj[0], 0,
-                                 ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
+                                 ATR_NONE, aligns[i].adj, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_align(flags.initrole, flags.initrace,
                                        flags.initgend, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randalign(flags.initrole, flags.initrace) + 1;
                 add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
                 add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the alignment of your %s %s %s",
                         genders[flags.initgend].adj,
                         races[flags.initrace].adj,
@@ -754,7 +754,7 @@ boolean complain;
  * later.
  */
 void
-Gem_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+Gem_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
 winid window;               /* window to use, must be of type NHW_MENU */
 int glyph;                  /* glyph to display with item (unused) */
 const anything *identifier; /* what to return if selected */
@@ -762,8 +762,9 @@ char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
 int attr;                   /* attribute for string (like Gem_putstr()) */
 const char *str;            /* menu string */
-boolean preselected;        /* item is marked as selected */
+unsigned int itemflags;     /* itemflags such as marked as selected */
 {
+    boolean preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
     Gem_menu_item *G_item;
     const char *newstr;
     char buf[QBUFSZ];
@@ -787,6 +788,7 @@ boolean preselected;        /* item is marked as selected */
     G_item->Gmi_selected = preselected ? 1 : 0;
     G_item->Gmi_accelerator = ch;
     G_item->Gmi_groupacc = gch;
+    G_item->Gmi_itemflags = itemflags;
     G_item->Gmi_attr = attr;
     G_item->Gmi_str = copy_of(newstr);
     mar_add_menu(window, G_item);
@@ -1000,7 +1002,7 @@ Gem_get_ext_cmd()
     const char *ptr;
 
     wind = Gem_create_nhwindow(NHW_MENU);
-    Gem_start_menu(wind);
+    Gem_start_menu(wind, MENU_BEHAVE_STANDARD);
     for (i = 0; (ptr = extcmdlist[i].ef_txt); i++) {
         any.a_int = i;
         accelerator = *ptr;
@@ -1014,7 +1016,7 @@ Gem_get_ext_cmd()
             too_much = FALSE;
         tmp_acc = *ptr;
         Gem_add_menu(wind, NO_GLYPH, &any, accelerator, 0, ATR_NONE, ptr,
-                     FALSE);
+                     MENU_ITEMFLAGS_NONE);
     }
     Gem_end_menu(wind, "What extended command?");
     count = Gem_select_menu(wind, PICK_ONE, &selected);

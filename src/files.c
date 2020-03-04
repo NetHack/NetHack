@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1574116097 2019/11/18 22:28:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.272 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1576626110 2019/12/17 23:41:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.276 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,7 +8,6 @@
 #include "hack.h"
 #include "dlb.h"
 #include <ctype.h>
-#include "lev.h"
 
 #ifdef TTY_GRAPHICS
 #include "wintty.h" /* more() */
@@ -1048,8 +1047,8 @@ boolean regularize_it;
     }
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if (overflow)
-        impossible("set_savefile_name() couldn't complete without overlow %d",
-                    overflow);
+        impossible("set_savefile_name() couldn't complete without overflow %d",
+                   overflow);
 #endif
 }
 
@@ -1102,12 +1101,7 @@ create_savefile()
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = WRITING;
-#ifdef SYSCF
-        if (sysopt.saveformat[0] > historical &&
-            sysopt.saveformat[0] <= ascii)
-            do_historical = FALSE;
-#endif /* SYSCF */
-        if (g.program_state.in_self_recover) {
+        if (g.program_state.in_self_recover || do_historical) {
             do_historical = TRUE;       /* force it */
             nhfp->structlevel = TRUE;
             nhfp->fieldlevel = FALSE;
@@ -1163,7 +1157,7 @@ open_savefile()
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = READING;
-        if (g.program_state.in_self_recover) {
+        if (g.program_state.in_self_recover || do_historical) {
             do_historical = TRUE;       /* force it */
             nhfp->structlevel = TRUE;
             nhfp->fieldlevel = FALSE;
@@ -2105,7 +2099,7 @@ int src;
     char *envp;
 #endif
 
-    if (src == SET_IN_SYS) {
+    if (src == set_in_sysconf) {
         /* SYSCF_FILE; if we can't open it, caller will bail */
         if (filename && *filename) {
             set_configfile_name(fqname(filename, SYSCONFPREFIX, 0));
@@ -2114,7 +2108,7 @@ int src;
             fp = (FILE *) 0;
         return  fp;
     }
-    /* If src != SET_IN_SYS, "filename" is an environment variable, so it
+    /* If src != set_in_sysconf, "filename" is an environment variable, so it
      * should hang around. If set, it is expected to be a full path name
      * (if relevant)
      */
@@ -2442,10 +2436,14 @@ char *origbuf;
     int len;
     boolean retval = TRUE;
 
+    while (*origbuf == ' ' || *origbuf == '\t') /* skip leading whitespace */
+        ++origbuf;                   /* (caller probably already did this) */
+    (void) strncpy(buf, origbuf, sizeof buf - 1);
+    buf[sizeof buf - 1] = '\0'; /* strncpy not guaranteed to NUL terminate */
     /* convert any tab to space, condense consecutive spaces into one,
        remove leading and trailing spaces (exception: if there is nothing
        but spaces, one of them will be kept even though it leads/trails) */
-    mungspaces(strcpy(buf, origbuf));
+    mungspaces(buf);
 
     /* find the '=' or ':' */
     bufp = find_optparam(buf);
@@ -2558,7 +2556,7 @@ char *origbuf;
         (void) strncpy(g.catname, bufp, PL_PSIZ - 1);
 
 #ifdef SYSCF
-    } else if (src == SET_IN_SYS && match_varname(buf, "WIZARDS", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "WIZARDS", 7)) {
         if (sysopt.wizards)
             free((genericptr_t) sysopt.wizards);
         sysopt.wizards = dupstr(bufp);
@@ -2570,15 +2568,15 @@ char *origbuf;
                 free((genericptr_t) sysopt.fmtd_wizard_list);
             sysopt.fmtd_wizard_list = build_english_list(sysopt.wizards);
         }
-    } else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "SHELLERS", 8)) {
         if (sysopt.shellers)
             free((genericptr_t) sysopt.shellers);
         sysopt.shellers = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "EXPLORERS", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "EXPLORERS", 7)) {
         if (sysopt.explorers)
             free((genericptr_t) sysopt.explorers);
         sysopt.explorers = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "DEBUGFILES", 5)) {
         /* if showdebug() has already been called (perhaps we've added
            some debugpline() calls to option processing) and has found
            a value for getenv("DEBUGFILES"), don't override that */
@@ -2587,17 +2585,17 @@ char *origbuf;
                 free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
         }
-    } else if (src == SET_IN_SYS && match_varname(buf, "DUMPLOGFILE", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "DUMPLOGFILE", 7)) {
 #ifdef DUMPLOG
         if (sysopt.dumplogfile)
             free((genericptr_t) sysopt.dumplogfile);
         sysopt.dumplogfile = dupstr(bufp);
 #endif
-    } else if (src == SET_IN_SYS && match_varname(buf, "GENERICUSERS", 12)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "GENERICUSERS", 12)) {
         if (sysopt.genericusers)
             free((genericptr_t) sysopt.genericusers);
         sysopt.genericusers = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "BONES_POOLS", 10)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "BONES_POOLS", 10)) {
         /* max value of 10 guarantees (N % bones.pools) will be one digit
            so we don't lose control of the length of bones file names */
         n = atoi(bufp);
@@ -2605,32 +2603,32 @@ char *origbuf;
         /* note: right now bones_pools==0 is the same as bones_pools==1,
            but we could change that and make bones_pools==0 become an
            indicator to suppress bones usage altogether */
-    } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
             free((genericptr_t) sysopt.support);
         sysopt.support = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "RECOVER", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "RECOVER", 7)) {
         if (sysopt.recover)
             free((genericptr_t) sysopt.recover);
         sysopt.recover = dupstr(bufp);
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "CHECK_SAVE_UID", 14)) {
         n = atoi(bufp);
         sysopt.check_save_uid = n;
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "CHECK_PLNAME", 12)) {
         n = atoi(bufp);
         sysopt.check_plname = n;
     } else if (match_varname(buf, "SEDUCE", 6)) {
         n = !!atoi(bufp); /* XXX this could be tighter */
         /* allow anyone to turn it off, but only sysconf to turn it on*/
-        if (src != SET_IN_SYS && n != 0) {
+        if (src != set_in_sysconf && n != 0) {
             config_error_add("Illegal value in SEDUCE");
             return FALSE;
         }
         sysopt.seduce = n;
         sysopt_seduce_set(sysopt.seduce);
-    } else if (src == SET_IN_SYS && match_varname(buf, "MAXPLAYERS", 10)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "MAXPLAYERS", 10)) {
         n = atoi(bufp);
         /* XXX to get more than 25, need to rewrite all lock code */
         if (n < 0 || n > 25) {
@@ -2638,35 +2636,35 @@ char *origbuf;
             return FALSE;
         }
         sysopt.maxplayers = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "PERSMAX", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "PERSMAX", 7)) {
         n = atoi(bufp);
         if (n < 1) {
             config_error_add("Illegal value in PERSMAX (minimum is 1).");
             return FALSE;
         }
         sysopt.persmax = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "PERS_IS_UID", 11)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "PERS_IS_UID", 11)) {
         n = atoi(bufp);
         if (n != 0 && n != 1) {
             config_error_add("Illegal value in PERS_IS_UID (must be 0 or 1).");
             return FALSE;
         }
         sysopt.pers_is_uid = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "ENTRYMAX", 8)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "ENTRYMAX", 8)) {
         n = atoi(bufp);
         if (n < 10) {
             config_error_add("Illegal value in ENTRYMAX (minimum is 10).");
             return FALSE;
         }
         sysopt.entrymax = n;
-    } else if ((src == SET_IN_SYS) && match_varname(buf, "POINTSMIN", 9)) {
+    } else if ((src == set_in_sysconf) && match_varname(buf, "POINTSMIN", 9)) {
         n = atoi(bufp);
         if (n < 1) {
             config_error_add("Illegal value in POINTSMIN (minimum is 1).");
             return FALSE;
         }
         sysopt.pointsmin = n;
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "MAX_STATUENAME_RANK", 10)) {
         n = atoi(bufp);
         if (n < 1) {
@@ -2677,7 +2675,7 @@ char *origbuf;
         sysopt.tt_oname_maxrank = n;
 
     /* SYSCF PANICTRACE options */
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "PANICTRACE_LIBC", 15)) {
         n = atoi(bufp);
 #if defined(PANICTRACE) && defined(PANICTRACE_LIBC)
@@ -2687,7 +2685,7 @@ char *origbuf;
         }
 #endif
         sysopt.panictrace_libc = n;
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "PANICTRACE_GDB", 14)) {
         n = atoi(bufp);
 #if defined(PANICTRACE)
@@ -2697,7 +2695,7 @@ char *origbuf;
         }
 #endif
         sysopt.panictrace_gdb = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "GDBPATH", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "GDBPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
             config_error_add("File specified in GDBPATH does not exist.");
@@ -2707,7 +2705,7 @@ char *origbuf;
         if (sysopt.gdbpath)
             free((genericptr_t) sysopt.gdbpath);
         sysopt.gdbpath = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "GREPPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
             config_error_add("File specified in GREPPATH does not exist.");
@@ -2718,13 +2716,13 @@ char *origbuf;
             free((genericptr_t) sysopt.greppath);
         sysopt.greppath = dupstr(bufp);
     /* SYSCF SAVE and BONES format options */
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "SAVEFORMAT", 10)) {
         parseformat(sysopt.saveformat, bufp);
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "BONESFORMAT", 11)) {
         parseformat(sysopt.bonesformat, bufp);
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "ACCESSIBILITY", 13)) {
         n = atoi(bufp);
         if (n < 0 || n > 1) {
@@ -2732,6 +2730,16 @@ char *origbuf;
             return FALSE;
         }
         sysopt.accessibility = n;
+#ifdef WIN32
+    } else if (src == set_in_sysconf
+                && match_varname(buf, "portable_device_paths", 8)) {
+        n = atoi(bufp);
+        if (n < 0 || n > 1) {
+            config_error_add("Illegal value in portable_device_paths (not 0,1).");
+            return FALSE;
+        }
+        sysopt.portable_device_paths = n;
+#endif
 #endif /* SYSCF */
 
     } else if (match_varname(buf, "BOULDER", 3)) {
@@ -2959,6 +2967,7 @@ boolean secure;
 
     tmp->next = config_error_data;
     config_error_data = tmp;
+    g.program_state.config_error_ready = TRUE;
 }
 
 static boolean
@@ -3034,6 +3043,7 @@ config_error_done()
     }
     config_error_data = tmp->next;
     free(tmp);
+    g.program_state.config_error_ready = FALSE;
     return n;
 }
 
@@ -3049,7 +3059,7 @@ int src;
         return FALSE;
 
     /* begin detection of duplicate configfile options */
-    set_duplicate_opt_detection(1);
+    reset_duplicate_opt_detection();
     free_config_sections();
     iflags.parse_config_file_src = src;
 
@@ -3058,7 +3068,7 @@ int src;
 
     free_config_sections();
     /* turn off detection of duplicate configfile options */
-    set_duplicate_opt_detection(0);
+    reset_duplicate_opt_detection();
     return rv;
 }
 
@@ -3165,7 +3175,11 @@ boolean
 proc_wizkit_line(buf)
 char *buf;
 {
-    struct obj *otmp = readobjnam(buf, (struct obj *) 0);
+    struct obj *otmp;
+
+    if (strlen(buf) >= BUFSZ)
+        buf[BUFSZ - 1] = '\0';
+    otmp = readobjnam(buf, (struct obj *) 0);
 
     if (otmp) {
         if (otmp != &cg.zeroobj)
@@ -3273,22 +3287,24 @@ boolean FDECL((*proc), (char *));
 
                 /* merge now read line with previous ones, if necessary */
                 if (!ignoreline) {
-                    len = (int) strlen(inbuf) + 1;
+                    len = (int) strlen(ep) + 1; /* +1: final '\0' */
                     if (buf)
-                        len += (int) strlen(buf);
+                        len += (int) strlen(buf) + 1; /* +1: space */
                     tmpbuf = (char *) alloc(len);
+                    *tmpbuf = '\0';
                     if (buf) {
-                        Sprintf(tmpbuf, "%s %s", buf, inbuf);
+                        Strcat(strcpy(tmpbuf, buf), " ");
                         free(buf);
-                    } else
-                        Strcpy(tmpbuf, inbuf);
-                    buf = tmpbuf;
+                    }
+                    buf = strcat(tmpbuf, ep);
+                    if (strlen(buf) >= sizeof inbuf)
+                        buf[sizeof inbuf - 1] = '\0';
                 }
 
                 if (morelines || (ignoreline && !oldline))
                     continue;
 
-                if (handle_config_section(ep)) {
+                if (handle_config_section(buf)) {
                     free(buf);
                     buf = (char *) 0;
                     continue;
@@ -3310,11 +3326,11 @@ boolean FDECL((*proc), (char *));
                     }
                     bufp++;
                     if (g.config_section_chosen)
-                        free(g.config_section_chosen);
+                        free(g.config_section_chosen), g.config_section_chosen = 0;
                     section = choose_random_part(bufp, ',');
-                    if (section)
+                    if (section) {
                         g.config_section_chosen = dupstr(section);
-                    else {
+                    } else {
                         config_error_add("No config section to choose");
                         rv = FALSE;
                     }
@@ -3376,6 +3392,7 @@ int which_set;
     g.symset[which_set].explicitly = TRUE;
     g.chosen_symset_start = g.chosen_symset_end = FALSE;
     g.symset_which_set = which_set;
+    g.symset_count = 0;
 
     config_error_init(TRUE, "symbols", FALSE);
 
@@ -3426,6 +3443,8 @@ int which_set;
     struct symparse *symp;
     char *bufp, *commentp, *altp;
 
+    if (strlen(buf) >= BUFSZ)
+        buf[BUFSZ - 1] = '\0';
     /* convert each instance of whitespace (tabs, consecutive spaces)
        into a single space; leading and trailing spaces are stripped */
     mungspaces(buf);
@@ -3483,6 +3502,7 @@ int which_set;
                     g.symset_list = tmpsp;
                 else
                     lastsp->next = tmpsp;
+                tmpsp->idx = g.symset_count++;
                 tmpsp->name = dupstr(bufp);
                 tmpsp->desc = (char *) 0;
                 tmpsp->handling = H_UNK;
@@ -4320,6 +4340,15 @@ reveal_paths(VOID_ARGS)
     } else
 #endif /* ?DUMPLOG */
         raw_printf("No end-of-game disclosure file (%s).", nodumpreason);
+
+#ifdef WIN32
+    if (sysopt.portable_device_paths) {
+        const char *pd = get_portable_device();
+
+        raw_printf("portable_device_paths (set in sysconf):");
+        raw_printf("    \"%s\"", pd);
+    }
+#endif
 
     /* personal configuration file */
 

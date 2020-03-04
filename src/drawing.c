@@ -130,7 +130,7 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
  *  Default screen symbols with explanations and colors.
  */
 const struct symdef defsyms[MAXPCHARS] = {
-/* 0*/ { ' ', "dark part of a room", C(NO_COLOR) },  /* stone */
+/* 0*/ { ' ', "stone", C(NO_COLOR) },                /* stone */
        { '|', "wall", C(CLR_GRAY) },                 /* vwall */
        { '-', "wall", C(CLR_GRAY) },                 /* hwall */
        { '-', "wall", C(CLR_GRAY) },                 /* tlcorn */
@@ -405,12 +405,22 @@ int idx, which_set;
                                   : g.primary_syms[oidx];
     if (!sym) {
         switch(idx) {
+            case SYM_NOTHING:
+            case SYM_UNEXPLORED:
+                sym = DEF_NOTHING;
+                break;
             case SYM_BOULDER:
                 sym = def_oc_syms[ROCK_CLASS].sym;
                 break;
             case SYM_INVISIBLE:
                 sym = DEF_INVISIBLE;
                 break;
+#if 0
+            /* these intentionally have no defaults */
+            case SYM_PET_OVERRIDE:
+            case SYM_HERO_OVERRIDE:
+                break;
+#endif
         }
     }
     return sym;
@@ -805,6 +815,8 @@ const struct symparse loadsyms[] = {
     { SYM_MON, S_LIZARD + SYM_OFF_M, "S_lizard" },
     { SYM_MON, S_WORM_TAIL + SYM_OFF_M, "S_worm_tail" },
     { SYM_MON, S_MIMIC_DEF + SYM_OFF_M, "S_mimic_def" },
+    { SYM_OTH, SYM_NOTHING + SYM_OFF_X, "S_nothing" },
+    { SYM_OTH, SYM_UNEXPLORED + SYM_OFF_X, "S_unexplored" },
     { SYM_OTH, SYM_BOULDER + SYM_OFF_X, "S_boulder" },
     { SYM_OTH, SYM_INVISIBLE + SYM_OFF_X, "S_invisible" },
     { SYM_OTH, SYM_PET_OVERRIDE + SYM_OFF_X, "S_pet_override" },

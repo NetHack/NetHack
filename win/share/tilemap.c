@@ -207,6 +207,24 @@ int set, entry;
     }
     tilenum += WARNCOUNT;
 
+    i = entry - tilenum;
+    if (i < 1) {
+        if (set == OTH_GLYPH) {
+            Sprintf(buf, "unexplored");
+            return buf;
+        }
+    }
+    tilenum += 1;
+
+    i = entry - tilenum;
+    if (i < 1) {
+        if (set == OTH_GLYPH) {
+            Sprintf(buf, "nothing");
+            return buf;
+        }
+    }
+    tilenum += 1;
+
     for (i = 0; i < SIZE(substitutes); i++) {
         j = entry - tilenum;
         if (j <= substitutes[i].last_glyph - substitutes[i].first_glyph) {
@@ -358,6 +376,16 @@ init_tilemap()
 
     for (i = 0; i < WARNCOUNT; i++) {
         tilemap[GLYPH_WARNING_OFF + i] = tilenum;
+        tilenum++;
+    }
+
+    for (i = 0; i < 1; i++) {
+        tilemap[GLYPH_UNEXPLORED_OFF + i] = tilenum;
+        tilenum++;
+    }
+
+    for (i = 0; i < 1; i++) {
+        tilemap[GLYPH_NOTHING + i] = tilenum;
         tilenum++;
     }
 

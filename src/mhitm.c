@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1573773926 2019/11/14 23:25:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1581886861 2020/02/16 21:01:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -22,6 +22,7 @@ static int FDECL(mdamagem, (struct monst *, struct monst *,
 static void FDECL(mswingsm, (struct monst *, struct monst *,
                                  struct obj *));
 static void FDECL(noises, (struct monst *, struct attack *));
+static void FDECL(pre_mm_attack, (struct monst *, struct monst *));
 static void FDECL(missmm, (struct monst *, struct monst *,
                                struct attack *));
 static int FDECL(passivemm, (struct monst *, struct monst *,
@@ -44,14 +45,10 @@ register struct attack *mattk;
     }
 }
 
-static
-void
-missmm(magr, mdef, mattk)
-register struct monst *magr, *mdef;
-struct attack *mattk;
+static void
+pre_mm_attack(magr, mdef)
+struct monst *magr, *mdef;
 {
-    const char *fmt;
-    char buf[BUFSZ];
     boolean showit = FALSE;
 
     /* unhiding or unmimicking happens even if hero can't see it
@@ -80,7 +77,21 @@ struct attack *mattk;
             map_invisible(mdef->mx, mdef->my);
         else if (showit)
             newsym(mdef->mx, mdef->my);
+    }
+}
 
+static
+void
+missmm(magr, mdef, mattk)
+register struct monst *magr, *mdef;
+struct attack *mattk;
+{
+    const char *fmt;
+    char buf[BUFSZ];
+
+    pre_mm_attack(magr, mdef);
+
+    if (g.vis) {
         fmt = (could_seduce(magr, mdef, mattk) && !magr->mcan)
                   ? "%s pretends to be friendly to"
                   : "%s misses";
@@ -135,8 +146,8 @@ register struct monst *mtmp;
             if (monnear(mtmp, mon->mx, mon->my)) {
                 if (!u.uswallow && (mtmp == u.ustuck)) {
                     if (!rn2(4)) {
+                        set_ustuck((struct monst *) 0);
                         pline("%s releases you!", Monnam(mtmp));
-                        u.ustuck = 0;
                     } else
                         break;
                 }
@@ -530,38 +541,13 @@ struct attack *mattk;
     boolean weaponhit = ((mattk->aatyp == AT_WEAP
                           || (mattk->aatyp == AT_CLAW && g.otmp))),
             silverhit = (weaponhit && g.otmp
-                         && objects[g.otmp->otyp].oc_material == SILVER),
-            showit = FALSE;
+                         && objects[g.otmp->otyp].oc_material == SILVER);
 
-    /* unhiding or unmimicking happens even if hero can't see it
-       because the formerly concealed monster is now in action */
-    if (M_AP_TYPE(mdef)) {
-        seemimic(mdef);
-        showit |= g.vis;
-    } else if (mdef->mundetected) {
-        mdef->mundetected = 0;
-        showit |= g.vis;
-    }
-    if (M_AP_TYPE(magr)) {
-        seemimic(magr);
-        showit |= g.vis;
-    } else if (magr->mundetected) {
-        magr->mundetected = 0;
-        showit |= g.vis;
-    }
+    pre_mm_attack(magr, mdef);
 
     if (g.vis) {
         int compat;
         char buf[BUFSZ];
-
-        if (!canspotmon(magr))
-            map_invisible(magr->mx, magr->my);
-        else if (showit)
-            newsym(magr->mx, magr->my);
-        if (!canspotmon(mdef))
-            map_invisible(mdef->mx, mdef->my);
-        else if (showit)
-            newsym(mdef->mx, mdef->my);
 
         if ((compat = could_seduce(magr, mdef, mattk)) && !magr->mcan) {
             Sprintf(buf, "%s %s", Monnam(magr),

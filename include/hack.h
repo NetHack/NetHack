@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1559227823 2019/05/30 14:50:23 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.105 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1580600495 2020/02/01 23:41:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,6 +18,7 @@
 #define BOLT_LIM 8        /* from this distance ranged attacks will be made */
 #define MAX_CARR_CAP 1000 /* so that boulders can be heavier */
 #define DUMMY { 0 }       /* array initializer, letting [1..N-1] default */
+#define DEF_NOTHING ' '   /* default symbol for NOTHING and UNEXPLORED  */
 
 /* The UNDEFINED macros are used to initialize variables whose
    initialized value is not relied upon.
@@ -83,15 +84,18 @@ enum dismount_types {
 #define MG_FLAG_NOOVERRIDE 0x01
 
 /* Special returns from mapglyph() */
-#define MG_CORPSE  0x01
-#define MG_INVIS   0x02
-#define MG_DETECT  0x04
-#define MG_PET     0x08
-#define MG_RIDDEN  0x10
-#define MG_STATUE  0x20
-#define MG_OBJPILE 0x40  /* more than one stack of objects */
-#define MG_BW_LAVA 0x80  /* 'black & white lava': highlight lava if it
-                            can't be distringuished from water by color */
+#define MG_CORPSE  0x0001
+#define MG_INVIS   0x0002
+#define MG_DETECT  0x0004
+#define MG_PET     0x0008
+#define MG_RIDDEN  0x0010
+#define MG_STATUE  0x0020
+#define MG_OBJPILE 0x0040  /* more than one stack of objects */
+#define MG_BW_LAVA 0x0080  /* 'black & white lava': highlight lava if it
+                              can't be distringuished from water by color */
+#define MG_BW_ICE  0x0100  /* similar for ice vs floor */
+#define MG_NOTHING 0x0200  /* char represents GLYPH_NOTHING */
+#define MG_UNEXPL  0x0400  /* char represents GLYPH_UNEXPLORED */
 
 /* sellobj_state() states */
 #define SELL_NORMAL (0)
@@ -168,9 +172,6 @@ typedef struct strbuf {
     char   buf[256];
 } strbuf_t;
 
-/* max. layers of object containment from sp_lev.h */
-#define MAX_CONTAINMENT 10
-
 /* str_or_len from sp_lev.h */
 typedef union str_or_len {
     char *str;
@@ -202,7 +203,6 @@ typedef struct {
 #include "context.h"
 #include "rm.h"
 #include "botl.h"
-#include "qtext.h"
 
 /* Symbol offsets */
 #define SYM_OFF_P (0)
@@ -491,23 +491,25 @@ enum bodypart_types {
 #define MENU_FULL 2
 #define MENU_PARTIAL 3
 
-#define MENU_SELECTED TRUE
-#define MENU_UNSELECTED FALSE
+/* flags to control teleds() */
+#define TELEDS_NO_FLAGS   0
+#define TELEDS_ALLOW_DRAG 1
+#define TELEDS_TELEPORT   2
 
 /*
- * Option flags
- * Each higher number includes the characteristics of the numbers
- * below it.
+ * option setting restrictions
  */
-/* XXX This should be replaced with a bitmap. */
-#define SET_IN_SYS 0   /* system config file option only */
-#define SET_IN_FILE 1  /* config file option only */
-#define SET_VIA_PROG 2 /* may be set via extern program, not seen in game */
-#define DISP_IN_GAME 3 /* may be set via extern program, displayed in game \
-                          */
-#define SET_IN_GAME 4  /* may be set via extern program or set in the game */
-#define SET_IN_WIZGAME 5  /* may be set set in the game if wizmode */
-#define SET__IS_VALUE_VALID(s) ((s < SET_IN_SYS) || (s > SET_IN_WIZGAME))
+
+enum optset_restrictions {
+    set_in_sysconf = 0, /* system config file option only */
+    set_in_config  = 1, /* config file option only */
+    set_viaprog    = 2, /* may be set via extern program, not seen in game */
+    set_gameview   = 3, /* may be set via extern program, displayed in game */
+    set_in_game    = 4, /* may be set via extern program or set in the game */
+    set_wizonly    = 5, /* may be set set in the game if wizmode */
+    set_hidden     = 6  /* placeholder for prefixed entries, never show it  */
+};
+#define SET__IS_VALUE_VALID(s) ((s < set_in_sysconf) || (s > set_wizonly))
 
 #define FEATURE_NOTICE_VER(major, minor, patch)                    \
     (((unsigned long) major << 24) | ((unsigned long) minor << 16) \

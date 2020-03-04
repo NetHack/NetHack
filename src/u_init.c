@@ -1,4 +1,4 @@
-/* NetHack 3.6	u_init.c	$NHDT-Date: 1575245094 2019/12/02 00:04:54 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	u_init.c	$NHDT-Date: 1578855627 2020/01/12 19:00:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -979,6 +979,7 @@ register struct trobj *trop;
         if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
         } else { /* UNDEF_TYP */
+            int trycnt = 0;
             /*
              * For random objects, do not create certain overly powerful
              * items: wand of wishing, ring of levitation, or the
@@ -1015,10 +1016,13 @@ register struct trobj *trop;
                       spells in restricted skill categories */
                    || (obj->oclass == SPBOOK_CLASS
                        && (objects[otyp].oc_level > 3
-                           || restricted_spell_discipline(otyp)))) {
+                           || restricted_spell_discipline(otyp)))
+                   || otyp == SPE_NOVEL) {
                 dealloc_obj(obj);
                 obj = mkobj(trop->trclass, FALSE);
                 otyp = obj->otyp;
+                if (++trycnt > 1000)
+                    break;
             }
 
             /* Don't start with +0 or negative rings */

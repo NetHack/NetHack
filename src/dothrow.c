@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1573688688 2019/11/13 23:44:48 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1583073990 2020/03/01 14:46:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,13 +28,59 @@ static NEARDATA const char bullets[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES,
 
 /* g.thrownobj (decl.c) tracks an object until it lands */
 
+int
+multishot_class_bonus(pm, ammo, launcher)
+int pm;
+struct obj *ammo;
+struct obj *launcher; /* can be NULL */
+{
+    int multishot = 0;
+    schar skill = objects[ammo->otyp].oc_skill;
+
+    switch (pm) {
+    case PM_CAVEMAN:
+        /* give bonus for low-tech gear */
+        if (skill == -P_SLING || skill == P_SPEAR)
+            multishot++;
+        break;
+    case PM_MONK:
+        /* allow higher volley count despite skill limitation */
+        if (skill == -P_SHURIKEN)
+            multishot++;
+        break;
+    case PM_RANGER:
+        /* arbitrary; encourage use of other missiles beside daggers */
+        if (skill != P_DAGGER)
+            multishot++;
+        break;
+    case PM_ROGUE:
+        /* possibly should add knives... */
+        if (skill == P_DAGGER)
+            multishot++;
+        break;
+    case PM_NINJA:
+        if (skill == -P_SHURIKEN || skill == -P_DART)
+            multishot++;
+        /*FALLTHRU*/
+    case PM_SAMURAI:
+        /* role-specific launcher and its ammo */
+        if (ammo->otyp == YA && launcher && launcher->otyp == YUMI)
+            multishot++;
+        break;
+    default:
+        break; /* No bonus */
+    }
+
+    return multishot;
+}
+
 /* Throw the selected object, asking for direction */
 static int
 throw_obj(obj, shotlimit)
 struct obj *obj;
 int shotlimit;
 {
-    struct obj *otmp;
+    struct obj *otmp, *oldslot;
     int multishot;
     schar skill;
     long wep_mask;
@@ -56,11 +102,11 @@ int shotlimit;
     }
 
     /*
-     * Throwing money is usually for getting rid of it when
+     * Throwing gold is usually for getting rid of it when
      * a leprechaun approaches, or for bribing an oncoming
      * angry monster.  So throw the whole object.
      *
-     * If the money is in quiver, throw one coin at a time,
+     * If the gold is in quiver, throw one coin at a time,
      * possibly using a sling.
      */
     if (obj->oclass == COIN_CLASS && obj != uquiver)
@@ -130,35 +176,8 @@ int shotlimit;
             break;
         }
         /* ...or is using a special weapon for their role... */
-        switch (Role_switch) {
-        case PM_CAVEMAN:
-            /* give bonus for low-tech gear */
-            if (skill == -P_SLING || skill == P_SPEAR)
-                multishot++;
-            break;
-        case PM_MONK:
-            /* allow higher volley count despite skill limitation */
-            if (skill == -P_SHURIKEN)
-                multishot++;
-            break;
-        case PM_RANGER:
-            /* arbitrary; encourage use of other missiles beside daggers */
-            if (skill != P_DAGGER)
-                multishot++;
-            break;
-        case PM_ROGUE:
-            /* possibly should add knives... */
-            if (skill == P_DAGGER)
-                multishot++;
-            break;
-        case PM_SAMURAI:
-            /* role-specific launcher and its ammo */
-            if (obj->otyp == YA && uwep && uwep->otyp == YUMI)
-                multishot++;
-            break;
-        default:
-            break; /* No bonus */
-        }
+        multishot += multishot_class_bonus(Role_switch, obj, uwep);
+
         /* ...or using their race's special bow; no bonus for spears */
         if (!weakmultishot)
             switch (Race_switch) {
@@ -209,6 +228,7 @@ int shotlimit;
     }
 
     wep_mask = obj->owornmask;
+    oldslot = 0;
     g.m_shot.o = obj->otyp;
     g.m_shot.n = multishot;
     for (g.m_shot.i = 1; g.m_shot.i <= g.m_shot.n; g.m_shot.i++) {
@@ -220,9 +240,10 @@ int shotlimit;
             otmp = obj;
             if (otmp->owornmask)
                 remove_worn_item(otmp, FALSE);
+            oldslot = obj->nobj;
         }
         freeinv(otmp);
-        throwit(otmp, wep_mask, twoweap);
+        throwit(otmp, wep_mask, twoweap, oldslot);
     }
     g.m_shot.n = g.m_shot.i = 0;
     g.m_shot.o = STRANGE_OBJECT;
@@ -410,7 +431,8 @@ boolean verbose;
     if (g.m_shot.i < g.m_shot.n) {
         if (verbose && !g.context.mon_moving) {
             You("stop %s after the %d%s %s.",
-                g.m_shot.s ? "firing" : "throwing", g.m_shot.i, ordin(g.m_shot.i),
+                g.m_shot.s ? "firing" : "throwing",
+                g.m_shot.i, ordin(g.m_shot.i),
                 g.m_shot.s ? "shot" : "toss");
         }
         g.m_shot.n = g.m_shot.i; /* make current shot be the last */
@@ -756,8 +778,7 @@ int x, y;
             return TRUE;
         } else {
             if (ttmp->tseen)
-                You("pass right over %s.",
-                    an(defsyms[trap_to_defsym(ttmp->ttyp)].explanation));
+                You("pass right over %s.", an(trapname(ttmp->ttyp, FALSE)));
         }
     }
     if (--*range < 0) /* make sure our range never goes negative */
@@ -843,7 +864,6 @@ boolean verbose;
         You("%s in the opposite direction.", range > 1 ? "hurtle" : "float");
     /* if we're in the midst of shooting multiple projectiles, stop */
     endmultishot(TRUE);
-    sokoban_guilt();
     uc.x = u.ux;
     uc.y = u.uy;
     /* this setting of cc is only correct if dx and dy are [-1,0,1] only */
@@ -1090,10 +1110,11 @@ struct obj *obj;
 
 /* throw an object, NB: obj may be consumed in the process */
 void
-throwit(obj, wep_mask, twoweap)
+throwit(obj, wep_mask, twoweap, oldslot)
 struct obj *obj;
 long wep_mask; /* used to re-equip returning boomerang */
 boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
+struct obj *oldslot; /* for thrown-and-return used with !fixinv */
 {
     register struct monst *mon;
     int range, urange;
@@ -1166,7 +1187,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             && !impaired) {
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
                   ceiling(u.ux, u.uy));
-            obj = addinv(obj);
+            obj = addinv_before(obj, oldslot);
             (void) encumber_msg();
             if (obj->owornmask & W_QUIVER) /* in case addinv() autoquivered */
                 setuqwep((struct obj *) 0);
@@ -1191,7 +1212,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         mon = boomhit(obj, u.dx, u.dy);
         if (mon == &g.youmonst) { /* the thing was caught */
             exercise(A_DEX, TRUE);
-            obj = addinv(obj);
+            obj = addinv_before(obj, oldslot);
             (void) encumber_msg();
             if (wep_mask && !(obj->owornmask & wep_mask)) {
                 setworn(obj, wep_mask);
@@ -1323,7 +1344,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 
                 if (!impaired && rn2(100)) {
                     pline("%s to your hand!", Tobjnam(obj, "return"));
-                    obj = addinv(obj);
+                    obj = addinv_before(obj, oldslot);
                     (void) encumber_msg();
                     /* addinv autoquivers an aklys if quiver is empty;
                        if obj is quivered, remove it before wielding */
@@ -1349,8 +1370,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                               Tobjnam(obj, Blind ? "hit" : "fly"),
                               body_part(ARM));
                         if (obj->oartifact)
-                            (void) artifact_hit((struct monst *) 0, &g.youmonst,
-                                                obj, &dmg, 0);
+                            (void) artifact_hit((struct monst *) 0,
+                                                &g.youmonst, obj, &dmg, 0);
                         losehp(Maybe_Half_Phys(dmg), killer_xname(obj),
                                KILLED_BY);
                     }
@@ -1979,7 +2000,8 @@ boolean from_invent;
             explode_oil(obj, x, y);
         } else if (distu(x, y) <= 2) {
             if (!breathless(g.youmonst.data) || haseyes(g.youmonst.data)) {
-                if (obj->otyp != POT_WATER) {
+                /* wet towel protects both eyes and breathing */
+                if (obj->otyp != POT_WATER && !Half_gas_damage) {
                     if (!breathless(g.youmonst.data)) {
                         /* [what about "familiar odor" when known?] */
                         You("smell a peculiar odor...");
@@ -2128,7 +2150,7 @@ struct obj *obj;
     if (u.uswallow) {
         pline(is_animal(u.ustuck->data) ? "%s in the %s's entrails."
                                         : "%s into %s.",
-              "The money disappears", mon_nam(u.ustuck));
+              "The gold disappears", mon_nam(u.ustuck));
         add_to_minv(u.ustuck, obj);
         return 1;
     }

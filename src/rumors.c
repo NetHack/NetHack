@@ -1,10 +1,9 @@
-/* NetHack 3.6	rumors.c	$NHDT-Date: 1545132266 2018/12/18 11:24:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	rumors.c	$NHDT-Date: 1582364450 2020/02/22 09:40:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 #include "dlb.h"
 
 /*      [note: this comment is fairly old, but still accurate for 3.1]
@@ -280,23 +279,26 @@ int FDECL((*rng), (int));
     dlb *fh;
 
     buf[0] = '\0';
-
     fh = dlb_fopen(fname, "r");
-
     if (fh) {
-        /* TODO: cache sizetxt, starttxt, endtxt. maybe cache file contents?
-         */
-        long sizetxt = 0, starttxt = 0, endtxt = 0, tidbit = 0;
+        /* TODO: cache sizetxt, starttxt, endtxt. maybe cache file contents? */
+        long sizetxt = 0L, starttxt = 0L, endtxt = 0L, tidbit = 0L;
         char *endp, line[BUFSZ], xbuf[BUFSZ];
-        (void) dlb_fgets(line, sizeof line,
-                         fh); /* skip "don't edit" comment */
+
+        /* skip "don't edit" comment */
+        (void) dlb_fgets(line, sizeof line, fh);
 
         (void) dlb_fseek(fh, 0L, SEEK_CUR);
         starttxt = dlb_ftell(fh);
         (void) dlb_fseek(fh, 0L, SEEK_END);
         endtxt = dlb_ftell(fh);
         sizetxt = endtxt - starttxt;
-        tidbit = rng(sizetxt);
+        /* might be zero (only if file is empty); should complain in that
+           case but if could happen over and over, also the suggestion
+           that save and restore might fix the problem wouldn't be useful */
+        if (sizetxt < 1L)
+            return buf;
+        tidbit = (*rng)(sizetxt);
 
         (void) dlb_fseek(fh, starttxt + tidbit, SEEK_SET);
         (void) dlb_fgets(line, sizeof line, fh);
@@ -386,14 +388,14 @@ void
 save_oracles(nhfp)
 NHFILE *nhfp;
 {
-    int i;
-
     if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
+                bwrite(nhfp->fd, (genericptr_t) &g.oracle_cnt,
+                       sizeof g.oracle_cnt);
             if (g.oracle_cnt) {
                 if (nhfp->structlevel) {
-                    bwrite(nhfp->fd, (genericptr_t)g.oracle_loc, g.oracle_cnt * sizeof (long));
+                    bwrite(nhfp->fd, (genericptr_t) g.oracle_loc,
+                           g.oracle_cnt * sizeof (long));
                 }
             }
     }
@@ -409,14 +411,14 @@ void
 restore_oracles(nhfp)
 NHFILE *nhfp;
 {
-    int i;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
 
     if (g.oracle_cnt) {
         g.oracle_loc = (unsigned long *) alloc(g.oracle_cnt * sizeof(long));
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) g.oracle_loc, g.oracle_cnt * sizeof (long));
+            mread(nhfp->fd, (genericptr_t) g.oracle_loc,
+                  g.oracle_cnt * sizeof (long));
         }
         g.oracle_flg = 1; /* no need to call init_oracles() */
     }
@@ -459,7 +461,7 @@ boolean delphi;
         if (delphi)
             putstr(tmpwin, 0,
                    special
-                     ? "The Oracle scornfully takes all your money and says:"
+                     ? "The Oracle scornfully takes all your gold and says:"
                      : "The Oracle meditates for a moment and then intones:");
         else
             putstr(tmpwin, 0, "The message reads:");
@@ -499,7 +501,7 @@ struct monst *oracl;
         pline("%s is in no mood for consultations.", Monnam(oracl));
         return 0;
     } else if (!umoney) {
-        You("have no money.");
+        You("have no gold.");
         return 0;
     }
 
@@ -511,7 +513,7 @@ struct monst *oracl;
         return 0;
     case 'y':
         if (umoney < (long) minor_cost) {
-            You("don't even have enough money for that!");
+            You("don't even have enough gold for that!");
             return 0;
         }
         u_pay = minor_cost;
@@ -529,6 +531,8 @@ struct monst *oracl;
     }
     money2mon(oracl, (long) u_pay);
     g.context.botl = 1;
+    if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
+        record_achievement(ACH_ORCL);
     add_xpts = 0; /* first oracle of each type gives experience points */
     if (u_pay == minor_cost) {
         outrumor(1, BY_ORACLE);

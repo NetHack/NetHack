@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1544930819 2018/12/16 03:26:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1580434523 2020/01/31 01:35:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,7 +39,8 @@ enum lvlinit_types {
     LVLINIT_SOLIDFILL,
     LVLINIT_MAZEGRID,
     LVLINIT_MINES,
-    LVLINIT_ROGUE
+    LVLINIT_ROGUE,
+    LVLINIT_SWAMP
 };
 
 /* max. nested depth of subrooms */
@@ -86,6 +87,7 @@ struct sp_coder {
     int n_subroom;
     int lvl_is_joined;
     boolean check_inaccessibles;
+    int allow_flips;
 };
 
 /*
@@ -142,7 +144,8 @@ typedef struct {
     int quan;
     short buried;
     short lit;
-    short eroded, locked, trapped, recharged, invis, greased, broken;
+    short eroded, locked, trapped, recharged, invis, greased, broken,
+          achievement;
 } object;
 
 typedef struct {
@@ -162,12 +165,6 @@ typedef struct {
 } terrain;
 
 typedef struct {
-    xchar chance;
-    xchar x1, y1, x2, y2;
-    xchar fromter, toter, tolit;
-} replaceterrain;
-
-typedef struct {
     struct {
         xchar room;
         xchar wall;
@@ -183,12 +180,9 @@ typedef struct _room {
     xchar rtype, chance, rlit, filled, joined;
 } room;
 
-typedef struct {
-    schar zaligntyp;
-    schar keep_region;
-    schar halign, valign;
-    char xsize, ysize;
-    char **map;
-} mazepart;
+struct mapfragment {
+    int wid, hei;
+    char *data;
+};
 
 #endif /* SP_LEV_H */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1575245054 2019/12/02 00:04:14 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1578252630 2020/01/05 19:30:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1314,7 +1314,8 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
             /* fake spellbook 'sobj' implies hero has cast the spell;
                when book is blessed, casting is skilled or expert level;
                if already clairvoyant, non-skilled spell acts like skilled */
-            extended = (sobj && (sobj->blessed || Clairvoyant));
+            extended = (sobj && (sobj->blessed || Clairvoyant)),
+            random_farsight = !sobj;
     int newglyph, oldglyph,
         lo_y = ((u.uy - 5 < 0) ? 0 : u.uy - 5),
         hi_y = ((u.uy + 6 >= ROWNO) ? ROWNO - 1 : u.uy + 6),
@@ -1391,7 +1392,18 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
             }
         }
 
-    if (!g.level.flags.hero_memory || unconstrained || mdetected || odetected) {
+    /* when this instance of clairvoyance is random (see allmain()) and
+       the only reason to browse the map is that previously undetected
+       monster(s) or object(s) have been revealed, player can prevent
+       the you-sense-your-surroundings message and browse operation from
+       happening by setting 'quick_farsight' option; for clairvoyance
+       spell, that option is ignored because the message and the pause
+       for map browsing isn't as intrusive in that circumstance */
+    if (random_farsight && flags.quick_farsight)
+        mdetected = odetected = FALSE;
+
+    if (!g.level.flags.hero_memory || unconstrained
+        || mdetected || odetected) {
         flush_screen(1);                 /* flush temp screen */
         /* the getpos() prompt from browse_map() is only shown when
            flags.verbose is set, but make this unconditional so that
@@ -1435,14 +1447,14 @@ struct rm *lev;
 {
     int newmask = lev->doormask & ~WM_MASK;
 
-    if (Is_rogue_level(&u.uz))
+    if (Is_rogue_level(&u.uz)) {
         /* rogue didn't have doors, only doorways */
         newmask = D_NODOOR;
-    else
+    } else {
         /* newly exposed door is closed */
         if (!(newmask & D_LOCKED))
-        newmask |= D_CLOSED;
-
+            newmask |= D_CLOSED;
+    }
     lev->typ = DOOR;
     lev->doormask = newmask;
 }
@@ -1612,7 +1624,6 @@ void
 find_trap(trap)
 struct trap *trap;
 {
-    int tt = what_trap(trap->ttyp, rn2);
     boolean cleared = FALSE;
 
     trap->tseen = 1;
@@ -1623,8 +1634,7 @@ struct trap *trap;
        behaviour might need a rework in the hallucination case
        (e.g. to not prompt if any trap glyph appears on the square). */
     if (Hallucination ||
-        levl[trap->tx][trap->ty].glyph !=
-        trap_to_glyph(trap, rn2_on_display_rng)) {
+        levl[trap->tx][trap->ty].glyph != trap_to_glyph(trap)) {
         /* There's too much clutter to see your find otherwise */
         cls();
         map_trap(trap, 1);
@@ -1632,7 +1642,7 @@ struct trap *trap;
         cleared = TRUE;
     }
 
-    You("find %s.", an(defsyms[trap_to_defsym(tt)].explanation));
+    You("find %s.", an(trapname(trap->ttyp, FALSE)));
 
     if (cleared) {
         display_nhwindow(WIN_MAP, TRUE); /* wait */
@@ -1871,7 +1881,7 @@ int default_glyph, which_subset;
              || glyph_is_invisible(glyph))
             && keep_traps && !covers_traps(x, y)) {
             if ((t = t_at(x, y)) != 0 && t->tseen)
-                glyph = trap_to_glyph(t, rn2_on_display_rng);
+                glyph = trap_to_glyph(t);
         }
         if ((glyph_is_object(glyph) && !keep_objs)
             || (glyph_is_trap(glyph) && !keep_traps)
