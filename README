@@ -1,15 +1,14 @@
-         NetHack 3.6.5 -- General information January 27, 2020
+         NetHack 3.6.6 -- General information March 2020
 
 NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.5 is the official release of NetHack that follows NetHack 3.6.4
-and contains bug fixes since 3.6.4, including some fixes for exploitable
-security-related vulnerabilities that affected NetHack versions between 3.6.0
-and 3.6.4.
+NetHack 3.6.6 is the official release of NetHack that follows NetHack 3.6.5
+and contains bug fixes since 3.6.5, including a security fix that affected
+versions 3.6.1, 3.6.2, 3.6.3, 3.6.4 and 3.6.5.
 
-The file doc/fixes36.5 in the source distribution has a full list of fixes.
+The file doc/fixes36.6 in the source distribution has a full list of fixes.
 The text in there was written for the development team's own use and is
 provided "as is", so please do not ask us to further explain the entries in
 that file.  Some entries might be considered "spoilers", particularly in the
@@ -18,19 +17,10 @@ that file.  Some entries might be considered "spoilers", particularly in the
 Below you will find some other general notes that were not considered
 spoilers:
 
- *  fix accessing mons[-1] when trying to gate in a non-valid demon
- *  fix accessing mons[-1] when monster figures out if a tin cures stoning
- *  have string_for_opt() return empty_optstr on failure
- *  ensure existing callers of string_for_opt() check return value
- *  fix potential buffer overflow in add_menu_coloring()
- *  fix potential buffer overflow in sym_val()
- *  fix potential buffer overflow in pline(), raw_printf(), config_error_add()
- *  fix potential buffer overflow in choose_windows()
- *  use vsnprintf instead of vsprintf in pline.c where possible
- *  Windows: includes a fix from a 3.6.4 post-release update where
- *      OPTIONS=map_mode:fit_to_screen could cause a game start failure
- *  Windows: users with C-locale unmappable names could get game start failure
-
+ *  invalid status highlight color could be maliciously used to corrupt memory
+ *  formatting corpse names used internal buffers differently from formatting
+ *	other objects and could potentially clobber memory
+ 
                         - - - - - - - - - - -
 
 Please read items (1), (2) and (3) BEFORE doing anything with your new code.

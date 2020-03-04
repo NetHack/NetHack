@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1576638500 2019/12/18 03:08:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.257 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1583315888 2020/03/04 09:58:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.293 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1368,7 +1368,8 @@ struct obj *otmp;
 const char *adjective;
 unsigned cxn_flags; /* bitmask of CXN_xxx values */
 {
-    char *nambuf = nextobuf();
+    /* some callers [aobjnam()] rely on prefix area that xname() sets aside */
+    char *nambuf = nextobuf() + PREFIX;
     int omndx = otmp->corpsenm;
     boolean ignore_quan = (cxn_flags & CXN_SINGULAR) != 0,
             /* suppress "the" from "the unique monster corpse" */
@@ -1519,8 +1520,7 @@ struct obj *obj;
 
     /* format the object */
     if (obj->otyp == CORPSE) {
-        buf = nextobuf();
-        Strcpy(buf, corpse_xname(obj, (const char *) 0, CXN_NORMAL));
+        buf = corpse_xname(obj, (const char *) 0, CXN_NORMAL);
     } else if (obj->otyp == SLIME_MOLD) {
         /* concession to "most unique deaths competition" in the annual
            devnull tournament, suppress player supplied fruit names because

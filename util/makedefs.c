@@ -53,7 +53,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.6\t2020/01/18";
+static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.6\t2020/03/04";
 #endif
 
 /* names of files to be generated */

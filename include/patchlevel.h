@@ -1,4 +1,4 @@
-/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1557510467 2019/05/10 17:47:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1583297273 2020/03/04 04:47:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,7 +9,7 @@
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL 5
+#define PATCHLEVEL 6
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -35,6 +35,14 @@
 
 /****************************************************************************/
 /* Version 3.6.x */
+
+/*  Patch 6, March ??, 2020
+ *  invalid status highlight color could be maliciously used to corrupt memory
+ *
+ *  invalid status highlight color could be maliciously used to corrupt memory
+ *  formatting corpse names used internal buffers differently from formatting
+ *      other objects and could potentially clobber memory
+ */
 
 /*  Patch 5, January 27, 2020
  *
