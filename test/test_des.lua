@@ -214,6 +214,15 @@ FFF]] })
 III
 .I.
 III]] })
+   des.map({ coord = {30, 5}, map = [[
+...
+...
+...]], contents = function(map)
+                des.terrain(0,0, "L");
+                des.terrain(map.width-1,map.height-1, "T");
+   end});
+   check_loc_name(30, 5, "lava pool");
+   check_loc_name(32, 7, "tree");
 end
 
 function test_feature()
@@ -317,9 +326,11 @@ function test_room()
    });
    des.room({ type="ordinary", coord={3, 3}, w=3, h=3 });
    des.room();
-   des.room({ contents = function()
+   des.room({ contents = function(rm)
                  des.object();
                  des.monster();
+                 des.terrain(0,0, "L");
+                 des.terrain(rm.width, rm.height, "T");
                          end
    });
    des.random_corridors();
