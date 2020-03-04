@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.117 $ $NHDT-Date: 1583282760 2020/03/04 00:46:00 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ $NHDT-Date: 1583315888 2020/03/04 09:58:08 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -64,6 +64,8 @@ randomly choosing role could lead to crash via segfault
 if eel bite attack caused hero to move (killed + rehumanized + crawled out
 	of water), its grab attack could succeed even if no longer adjacent
 invalid status highlight color could be maliciously used to corrupt memory
+formatting corpse names used internal buffers differently from formatting
+	other objects and could potentially clobber memory
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
