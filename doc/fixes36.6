@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1583332314 2020/03/04 14:31:54 $
+$NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.1 $ $NHDT-Date: 1583445339 2020/03/05 21:55:39 $
 
 fixes36.6 contains a terse summary of changes made to 3.6.5 in order to
 produce 3.6.6 as well as any post-release fixes in binaries.
@@ -10,6 +10,8 @@ invalid status highlight color could be maliciously used to corrupt memory
 formatting corpse names used internal buffers differently from formatting
 	other objects and could potentially clobber memory
 avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
+avoid #wizrumorcheck crash if either 'rumors.tru' or 'rumors.fal' or both
+	were empty when makedefs built 'rumors'
   
 
 Platform- and/or Interface-Specific Fixes or Features

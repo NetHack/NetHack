@@ -1,4 +1,4 @@
-/* NetHack 3.6	rumors.c	$NHDT-Date: 1582364450 2020/02/22 09:40:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	rumors.c	$NHDT-Date: 1583445339 2020/03/05 21:55:39 $  $NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -159,9 +159,10 @@ boolean exclude_cookie;
         couldnt_open_file(RUMORFILE);
         true_rumor_size = -1; /* don't try to open it again */
     }
-/* this is safe either way, so do it always since we can't get the definition
- * out of makedefs.c
- */
+
+    /* this is safe either way, so do it always since we can't get the
+     * definition out of makedefs.c
+     */
 #define PAD_RUMORS_TO
 #ifdef PAD_RUMORS_TO
     /* remove padding */
@@ -188,10 +189,8 @@ rumor_check()
     char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
 
     if (true_rumor_size < 0L) { /* we couldn't open RUMORFILE */
-    no_rumors:
+ no_rumors:
         pline("rumors not accessible.");
-        if (rumors)
-            (void) dlb_fclose(rumors);
         return;
     }
 
@@ -203,29 +202,27 @@ rumor_check()
         rumor_buf[0] = '\0';
         if (true_rumor_size == 0L) { /* if this is 1st outrumor() */
             init_rumors(rumors);
-            if (true_rumor_size < 0L)
+            if (true_rumor_size < 0L) {
+                rumors = (dlb *) 0; /* init_rumors() closes it upon failure */
                 goto no_rumors; /* init failed */
+            }
         }
         tmpwin = create_nhwindow(NHW_TEXT);
 
         /*
          * reveal the values.
          */
-
-        Sprintf(
-            rumor_buf,
-            "T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) true_rumor_start, true_rumor_start, true_rumor_end,
-            (unsigned long) true_rumor_end, true_rumor_size,
-            (unsigned long) true_rumor_size);
+        Sprintf(rumor_buf,
+               "T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+                (long) true_rumor_start, true_rumor_start,
+                true_rumor_end, (unsigned long) true_rumor_end,
+                true_rumor_size, (unsigned long) true_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
-
-        Sprintf(
-            rumor_buf,
-            "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) false_rumor_start, false_rumor_start, false_rumor_end,
-            (unsigned long) false_rumor_end, false_rumor_size,
-            (unsigned long) false_rumor_size);
+        Sprintf(rumor_buf,
+               "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+                (long) false_rumor_start, false_rumor_start,
+                false_rumor_end, (unsigned long) false_rumor_end,
+                false_rumor_size, (unsigned long) false_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
 
         /*
