@@ -190,7 +190,7 @@ rumor_check()
         rumor_buf[0] = '\0';
         if (g.true_rumor_size == 0L) { /* if this is 1st outrumor() */
             init_rumors(rumors);
-            if (g.true_rumor_size < 0L)
+            if (g.true_rumor_size < 0L) {
                 rumors = (dlb *) 0; /* init_rumors() closes it upon failure */
                 goto no_rumors; /* init failed */
             }
@@ -209,8 +209,8 @@ rumor_check()
         Sprintf(rumor_buf,
                "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
             (long) g.false_rumor_start, g.false_rumor_start,
-            g.false_rumor_end,(unsigned long) g.false_rumor_end,
-            g.false_rumor_size,(unsigned long) g.false_rumor_size);
+            g.false_rumor_end, (unsigned long) g.false_rumor_end,
+            g.false_rumor_size, (unsigned long) g.false_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
 
         /*
