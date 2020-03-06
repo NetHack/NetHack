@@ -62,8 +62,6 @@ display wasn't updating immediately after toggling hilite_pet option
 randomly choosing role could lead to crash via segfault
 if eel bite attack caused hero to move (killed + rehumanized + crawled out
 	of water), its grab attack could succeed even if no longer adjacent
-formatting corpse names used internal buffers differently from formatting
-	other objects and could potentially clobber memory
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
