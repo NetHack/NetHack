@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                    March 4, 2020
+                                    March 8, 2020
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -456,7 +456,7 @@
           scribe things that are impossible to represent visually.  If  you
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -786,7 +786,7 @@
                Du  - drop only unpaid objects (when in a shop).
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -852,7 +852,7 @@
                the  character for a particular set of objects, like `[' for
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -918,7 +918,7 @@
                erally at the ready (only one of these  is  available  at  a
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -984,7 +984,7 @@
                lected via the `Q' (quiver) command.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1050,7 +1050,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1116,7 +1116,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1182,7 +1182,7 @@
                different  name  will  not  be  merged.  This contrasts with
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1446,7 +1446,7 @@
                `^P'.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1578,7 +1578,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1644,7 +1644,7 @@
                Show vision array.  Autocompletes.  Debug mode only.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1842,7 +1842,7 @@
           areas  are  only  displayed  if they are within one space of you.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2172,7 +2172,7 @@
           presence.  If you attempt to walk into it, you will try to  fight
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2238,7 +2238,7 @@
           it will be transferred to your inventory.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2304,7 +2304,7 @@
           "Stressed", "Strained", "Overtaxed" or "Overloaded" will be shown
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2370,7 +2370,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2436,7 +2436,7 @@
           to hit your target compared to using just one weapon at a time.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2502,7 +2502,7 @@
           in  the  same  direction;  if  the first ones kill a monster, the
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2568,7 +2568,7 @@
           you  stop -- or before you begin, for that matter -- wielding two
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2634,7 +2634,7 @@
           armor class even further.  Most of these provide  a  one  or  two
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2700,7 +2700,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2766,7 +2766,7 @@
           tempts  to use the wand will usually result in nothing happening.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2832,7 +2832,7 @@
           level,  or  if  you  have little skill with the appropriate spell
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2898,7 +2898,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -2964,7 +2964,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3030,7 +3030,7 @@
           only the top item of the  pile  is  displayed.   The  hilite_pile
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3096,7 +3096,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3162,7 +3162,7 @@
           avoiding  these   effects   are   each   considered   challenges.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3228,7 +3228,7 @@
           game.  Finding other instances of the same objects doesn't record
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3294,7 +3294,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3360,7 +3360,7 @@
             game problems is kept. Defaults to HACKDIR, must be writable.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3426,7 +3426,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3492,7 +3492,7 @@
           can set string options by typing the  option  name,  a  colon  or
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3558,7 +3558,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3624,7 +3624,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3690,7 +3690,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3756,7 +3756,7 @@
             Name  a  fruit  after  something  you enjoy eating (for example
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3822,7 +3822,7 @@
             small plus-symbol beside the object on the top of the pile.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -3954,7 +3954,7 @@
             symbols act as menu accelerators (default off).
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4020,7 +4020,7 @@
             (which  defaults  to  "full"),  or  it  can  be  negated (which
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4086,7 +4086,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4152,7 +4152,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4218,7 +4218,7 @@
             entirely.   Requesting  it  when  not  allowed  or not possible
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4284,7 +4284,7 @@
             run      - update the map after every seven or so steps;
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4350,7 +4350,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4416,7 +4416,7 @@
             ed moves if you  make  inadvertent  mouse  clicks  on  the  map
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4482,7 +4482,7 @@
             select which one to  use,  such  as  "tty"  or  "X11"  (default
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4548,7 +4548,7 @@
             your terminal (default off).
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4614,7 +4614,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4680,7 +4680,7 @@
             Specify the name of an alternative tile file  to  override  the
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4746,7 +4746,7 @@
             fit in the visible area of the window.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4812,7 +4812,7 @@
             (Win32 tty NetHack only).  May be used to alter  the  value  of
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4878,7 +4878,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -4944,7 +4944,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5010,7 +5010,7 @@
             When asked for a location,  the  key  to  go  to  next  closest
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5142,7 +5142,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5208,7 +5208,7 @@
           tty, curses, win32tty and win32gui interfaces support this.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5274,7 +5274,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5340,7 +5340,7 @@
           be used in combination with any of the other attributes.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5406,7 +5406,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5472,7 +5472,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5538,7 +5538,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5670,7 +5670,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5736,7 +5736,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5802,7 +5802,7 @@
           may want to alter settings via SYMBOLS= and ROGUESYMBOLS= in your
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5868,7 +5868,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -6066,7 +6066,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -6132,7 +6132,7 @@
           Eric Raymond, and Eric Smith undertook a radical revision of 3.0.
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -6198,7 +6198,7 @@
           his own NetHack-- to  produce  SLASH.   Larry  Stewart-Zerba  and
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -6264,7 +6264,7 @@
           Windows  platform.   Alex  Kompel  contributed  a  new  graphical
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -6330,7 +6330,7 @@
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -6390,16 +6390,13 @@
                NetHack 3.6.5 was released on January  27,  2020  containing
           some security fixes and a small number of bug fixes.
 
-               NetHack  3.6.6 was released in March 2020 containing a secu-
-          rity fix.
-
-               The official NetHack web site is maintained by Ken Lorber at
-          https://www.nethack.org/.
+               NetHack 3.6.6 was released on March 8, 2020 containing a se-
+          curity fix and some bug fixes.
 
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -6408,6 +6405,9 @@
           NetHack Guidebook                                              98
 
 
+
+               The official NetHack web site is maintained by Ken Lorber at
+          https://www.nethack.org/.
 
           12.1.  SPECIAL THANKS
 
@@ -6459,13 +6459,10 @@
              Eric S. Raymond          Mark Modrall         Steve Linhart
               Erik Andersen         Marvin Bressler      Steve VanDevender
             Fredrik Ljungdahl         Matthew Day           Teemu Suikki
-            Frederick Roeber          Merlyn LeRoy           Tim Lennan
-               Gil Neiger           Michael Allison        Timo Hakulinen
-               Greg Laskin            Michael Feir            Tom Almy
 
 
 
-          NetHack 3.7                                     February 17, 2020
+          NetHack 3.7                                         March 8, 2020
 
 
 
@@ -6475,6 +6472,9 @@
 
 
 
+            Frederick Roeber          Merlyn LeRoy           Tim Lennan
+               Gil Neiger           Michael Allison        Timo Hakulinen
+               Greg Laskin            Michael Feir            Tom Almy
                Greg Olson            Michael Hamel            Tom West
              Gregg Wonderly         Michael Sokolov        Warren Cheung
               Hao-yang Wang           Mike Engber         Warwick Allison
@@ -6492,7 +6492,6 @@
 
 
 
-          NetHack 3.6                                         March 4, 2020
 
 
 
@@ -6529,7 +6528,7 @@
 
 
 
+          NetHack 3.7                                         March 8, 2020
 
 
-          NetHack 3.7                                     February 17, 2020
 
