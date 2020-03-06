@@ -60,7 +60,7 @@ considered spoilers:
         their individual fields and save those fields instead of the entire
         struct
  -  savefile: use little-endian format for fields where that makes a difference
-
+ 
                         - - - - - - - - - - -
 
 Please read items (1), (2) and (3) BEFORE doing anything with your new code.
@@ -213,6 +213,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1572309271 2019/10/29 00:34:31 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.57 $
+# $NHDT-Date: 1583508658 2020/03/06 15:30:58 $ $NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.80 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.

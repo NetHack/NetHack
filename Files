@@ -136,7 +136,7 @@ vault.c     version.c   vision.c    weapon.c    were.c      wield.c
 windows.c   wizard.c    worm.c      worn.c      write.c     zap.c
 
 sys/amiga:
-(files for Amiga versions - untested for 3.6.5)
+(files for Amiga versions - untested for 3.6.6)
 Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
 amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
 amii.hlp      amimenu.c     amirip.c      amistack.c    amitty.c
