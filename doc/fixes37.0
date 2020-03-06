@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ $NHDT-Date: 1583315888 2020/03/04 09:58:08 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ $NHDT-Date: 1583515468 2020/03/06 17:24:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -62,6 +62,8 @@ display wasn't updating immediately after toggling hilite_pet option
 randomly choosing role could lead to crash via segfault
 if eel bite attack caused hero to move (killed + rehumanized + crawled out
 	of water), its grab attack could succeed even if no longer adjacent
+specifying a count when picking [part of] a stack of scrolls of scare monster
+	ignored that count and the whole stack was affected
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
