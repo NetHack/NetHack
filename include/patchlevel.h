@@ -1,4 +1,4 @@
-/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1583297273 2020/03/04 04:47:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1583508697 2020/03/06 15:31:37 $  $NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,12 +36,13 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
-/*  Patch 6, March ??, 2020
- *  invalid status highlight color could be maliciously used to corrupt memory
- *
+/*  Patch 6, March 8, 2020
  *  invalid status highlight color could be maliciously used to corrupt memory
  *  formatting corpse names used internal buffers differently from formatting
  *      other objects and could potentially clobber memory
+ *  avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
+ *  avoid #wizrumorcheck crash if either 'rumors.tru' or 'rumors.fal' or both
+ *      were empty when makedefs built 'rumors'
  */
 
 /*  Patch 5, January 27, 2020

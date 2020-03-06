@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.337 $ $NHDT-Date: 1576431522 2019/12/15 17:38:42 $
+.\" $NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.347 $ $NHDT-Date: 1583508684 2020/03/06 15:31:24 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 4, 2020
+.ds f2 "March 8, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -5164,7 +5164,8 @@ and a few bug fixes.
 NetHack 3.6.5 was released on January 27, 2020 containing some security fixes
 and a small number of bug fixes.
 .pg
-NetHack 3.6.6 was released in March 2020 containing a security fix.
+NetHack 3.6.6 was released on March 8, 2020 containing a security fix and
+some bug fixes.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP
 at

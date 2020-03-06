@@ -19,7 +19,10 @@ spoilers:
 
  *  invalid status highlight color could be maliciously used to corrupt memory
  *  formatting corpse names used internal buffers differently from formatting
- *	other objects and could potentially clobber memory
+ *      other objects and could potentially clobber memory
+ *  avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
+ *  avoid #wizrumorcheck crash if either 'rumors.tru' or 'rumors.fal' or both
+ *      were empty when makedefs built 'rumors'
  
                         - - - - - - - - - - -
 
@@ -167,6 +170,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1575587888 2019/12/05 23:18:08 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $
+# $NHDT-Date: 1583508658 2020/03/06 15:30:58 $ $NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.80 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
