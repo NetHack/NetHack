@@ -89,6 +89,7 @@ static void FDECL(sel_set_wallify, (int, int, genericptr_t));
 static void NDECL(spo_end_moninvent);
 static void NDECL(spo_pop_container);
 static void FDECL(spo_endroom, (struct sp_coder *));
+static void FDECL(l_table_getset_feature_flag, (lua_State *, int, int, const char *, int));
 static void FDECL(sel_set_ter, (int, int, genericptr_t));
 static void FDECL(sel_set_door, (int, int, genericptr_t));
 static void FDECL(sel_set_feature, (int, int, genericptr_t));
@@ -4883,19 +4884,41 @@ lua_State *L;
     return 0;
 }
 
+static void
+l_table_getset_feature_flag(L, x,y, name, flag)
+lua_State *L;
+int x, y;
+const char *name;
+int flag;
+{
+    int val = get_table_boolean_opt(L, name, -2);
+
+    if (val != -2) {
+        if (val == -1) val = rn2(2);
+        if (val)
+            levl[x][y].flags |= flag;
+        else
+            levl[x][y].flags &= ~flag;
+    }
+}
+
 /* feature("fountain", x, y); */
 /* feature("fountain", {x,y}); */
 /* feature({ type="fountain", x=NN, y=NN }); */
 /* feature({ type="fountain", coord={NN, NN} }); */
+/* feature({ type="tree", coord={NN, NN}, swarm=true, looted=false }); */
 int
 lspo_feature(L)
 lua_State *L;
 {
-    static const char *const features[] = { "fountain", "sink", "pool", NULL };
-    static const int features2i[] = { FOUNTAIN, SINK, POOL, STONE };
+    static const char *const features[] = { "fountain", "sink", "pool",
+                                            "throne", "tree", NULL };
+    static const int features2i[] = { FOUNTAIN, SINK, POOL,
+                                      THRONE, TREE, STONE };
     schar x,y;
     int typ;
     int argc = lua_gettop(L);
+    boolean can_have_flags = FALSE;
 
     create_des_coder();
 
@@ -4917,27 +4940,39 @@ lua_State *L;
         get_table_xy_or_coord(L, &fx, &fy);
         x = fx, y = fy;
         typ = features2i[get_table_option(L, "type", NULL, features)];
+        can_have_flags = TRUE;
     }
 
     get_location_coord(&x, &y, ANY_LOC, g.coder->croom, SP_COORD_PACK(x,y));
+
+    if (typ == STONE)
+        impossible("feature has unknown type param.");
+    else
+        sel_set_feature(x, y, (genericptr_t) &typ);
+
+    if (levl[x][y].typ != typ || !can_have_flags)
+        return 0;
 
     switch (typ) {
     default:
         break;
     case FOUNTAIN:
-        typ = FOUNTAIN;
+        l_table_getset_feature_flag(L, x, y, "looted", F_LOOTED);
+        l_table_getset_feature_flag(L, x, y, "warned", F_WARNED);
         break;
     case SINK:
-        typ = SINK;
+        l_table_getset_feature_flag(L, x, y, "pudding", S_LPUDDING);
+        l_table_getset_feature_flag(L, x, y, "dishwasher", S_LDWASHER);
+        l_table_getset_feature_flag(L, x, y, "ring", S_LRING);
         break;
-    case POOL:
-        typ = POOL;
+    case THRONE:
+        l_table_getset_feature_flag(L, x, y, "looted", T_LOOTED);
+        break;
+    case TREE:
+        l_table_getset_feature_flag(L, x, y, "looted", TREE_LOOTED);
+        l_table_getset_feature_flag(L, x, y, "swarm", TREE_SWARM);
         break;
     }
-    if (typ == STONE)
-        impossible("feature has unknown type param.");
-    else
-        sel_set_feature(x, y, (genericptr_t) &typ);
 
     return 0;
 }

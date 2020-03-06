@@ -232,7 +232,10 @@ Example:
 
 === feature
 
-Create a fountain, a sink, or a pool.
+Create a feature, and set flags for it.
+Valid features are a fountain, a sink, a pool, a throne, or a tree.
+Throne has `looted` flag, tree has `looted` and `swarm`, fountain has `looted` and `warned`,
+sink has `pudding`, `dishwasher`, and `ring`.
 
 Example:
 
@@ -240,6 +243,8 @@ Example:
  des.feature("fountain", {4, 5});
  des.feature({ type = "fountain", x = 12, y = 6 });
  des.feature({ type = "fountain", coord = {4, 6} });
+ des.feature({ type = "throne", coord = {4, 6}, looted = true });
+ des.feature({ type = "tree", coord = {4, 6}, looted = true, swarm = false });
 
 === gold
 
