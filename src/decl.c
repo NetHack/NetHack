@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1580600496 2020/02/01 23:41:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1583608833 2020/03/07 19:20:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -469,8 +469,6 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* vis */
     UNDEFINED_VALUE, /* far_noise */
     UNDEFINED_VALUE, /* noisetime */
-    UNDEFINED_PTR, /* otmp */
-    UNDEFINED_VALUE, /* dieroll */
 
     /* mhitu.c */
     UNDEFINED_VALUE, /* mhitu_dieroll */
