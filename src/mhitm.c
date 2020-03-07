@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1573773926 2019/11/14 23:25:26 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1583606861 2020/03/07 18:47:41 $  $NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -860,7 +860,7 @@ mdamagem(magr, mdef, mattk)
 register struct monst *magr, *mdef;
 register struct attack *mattk;
 {
-    struct obj *obj, dmgwep;
+    struct obj *obj;
     char buf[BUFSZ];
     struct permonst *pa = magr->data, *pd = mdef->data;
     int armpro, num,
@@ -968,14 +968,8 @@ register struct attack *mattk;
     case AD_HEAL:
     case AD_PHYS:
  physical:
-        /* this shade check is necessary in case any attacks which
-           dish out physical damage bypass hitmm() to get here */
-        if ((mattk->aatyp == AT_WEAP || mattk->aatyp == AT_CLAW) && otmp)
-            dmgwep = *otmp;
-        else
-            dmgwep = zeroobj;
-
-        if (shade_miss(magr, mdef, &dmgwep, FALSE, TRUE)) {
+        obj = (mattk->aatyp == AT_WEAP || mattk->aatyp == AT_CLAW) ? otmp : 0;
+        if (shade_miss(magr, mdef, obj, FALSE, TRUE)) {
             tmp = 0;
         } else if (mattk->aatyp == AT_KICK && thick_skinned(pd)) {
             tmp = 0;
