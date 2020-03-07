@@ -461,18 +461,28 @@ boolean extras;
 
     /* stairs and ladders */
     if (flp & 1) {
-	yupstair = FlipY(yupstair);
-	ydnstair = FlipY(ydnstair);
-	yupladder = FlipY(yupladder);
-	ydnladder = FlipY(ydnladder);
-        g.sstairs.sy = FlipY(g.sstairs.sy);
+        if (xupstair)
+            yupstair = FlipY(yupstair);
+        if (xdnstair)
+            ydnstair = FlipY(ydnstair);
+        if (xupladder)
+            yupladder = FlipY(yupladder);
+        if (xdnladder)
+            ydnladder = FlipY(ydnladder);
+        if (g.sstairs.sx)
+            g.sstairs.sy = FlipY(g.sstairs.sy);
     }
     if (flp & 2) {
-	xupstair = FlipX(xupstair);
-	xdnstair = FlipX(xdnstair);
-	xupladder = FlipX(xupladder);
-	xdnladder = FlipX(xdnladder);
-        g.sstairs.sx = FlipX(g.sstairs.sx);
+        if (xupstair)
+            xupstair = FlipX(xupstair);
+        if (xdnstair)
+            xdnstair = FlipX(xdnstair);
+        if (xupladder)
+            xupladder = FlipX(xupladder);
+        if (xdnladder)
+            xdnladder = FlipX(xdnladder);
+        if (g.sstairs.sx)
+            g.sstairs.sx = FlipX(g.sstairs.sx);
     }
 
     /* traps */
