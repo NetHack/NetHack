@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros">
     <VERSION_MAJOR>3</VERSION_MAJOR>
     <VERSION_MINOR>6</VERSION_MINOR>
-    <PATCHLEVEL>5</PATCHLEVEL>
+    <PATCHLEVEL>6</PATCHLEVEL>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
