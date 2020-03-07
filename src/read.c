@@ -2465,7 +2465,7 @@ struct _create_particular_data *d;
 
     /* quantity */
     if (digit(*bufp) && strcmp(bufp, "0")) {
-        d->quan = atoi(bufp);
+        d->quan = min(255, atoi(bufp));
         while (digit(*bufp))
             bufp++;
         while (*bufp == ' ')
