@@ -1512,6 +1512,9 @@ Default key is \(oqw\(cq.
 Wipe off your face.
 Autocompletes.
 Default key is \(oqM-w\(cq.
+.lp "#wizborn "
+Show monster birth, death, genocide, and extinct statistics.
+Debug mode only.
 .lp "#wizbury "
 Bury objects under and around you.
 Autocompletes.

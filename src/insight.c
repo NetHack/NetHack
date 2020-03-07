@@ -2062,6 +2062,39 @@ dovanquished()
     return 0;
 }
 
+/* #wizborn extended command */
+int
+doborn()
+{
+    static const char fmt[] = "%4i %4i %c %-30s";
+    int i;
+    winid datawin = create_nhwindow(NHW_TEXT);
+    char buf[BUFSZ];
+    int nborn = 0, ndied = 0;
+
+    putstr(datawin, 0, "died born");
+    for (i = LOW_PM; i < NUMMONS; i++)
+        if (g.mvitals[i].born || g.mvitals[i].died
+            || (g.mvitals[i].mvflags & G_GONE)) {
+            Sprintf(buf, fmt,
+                    g.mvitals[i].died, g.mvitals[i].born,
+                    ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E' :
+                    ((g.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G' : ' ',
+                    mons[i].mname);
+            putstr(datawin, 0, buf);
+            nborn += g.mvitals[i].born;
+            ndied += g.mvitals[i].died;
+        }
+
+    putstr(datawin, 0, "");
+    Sprintf(buf, fmt, ndied, nborn, ' ', "");
+
+    display_nhwindow(datawin, FALSE);
+    destroy_nhwindow(datawin);
+
+    return 0;
+}
+
 /* high priests aren't unique but are flagged as such to simplify something */
 #define UniqCritterIndx(mndx) ((mons[mndx].geno & G_UNIQ) \
                                && mndx != PM_HIGH_PRIEST)
