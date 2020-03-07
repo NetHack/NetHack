@@ -19,6 +19,7 @@ Debug-Mode Quick Reference:
 #timeout        == look at timeout queue and hero's timed intrinsics
 #vanquished     == disclose counts of dead monsters sorted in various ways
 #vision         == show vision array
+#wizborn        == show monster birth/death/geno/extinct stats
 #wizintrinsic   == set selected intrinsic timeouts
 #wizmakemap     == recreate the current dungeon level
 #wizrumorcheck  == validate first and last rumor for true and false set

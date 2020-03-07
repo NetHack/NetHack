@@ -64,6 +64,8 @@ if eel bite attack caused hero to move (killed + rehumanized + crawled out
 	of water), its grab attack could succeed even if no longer adjacent
 specifying a count when picking [part of] a stack of scrolls of scare monster
 	ignored that count and the whole stack was affected
+wizmakemap didn't account for unique monsters and didn't correct monster
+	birth counts
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -175,6 +177,7 @@ demon lords and princes suppress teleporting in Gehennom
 for !fixinv option where inventory letters normally don't stick, try to put
 	a throw-and-return weapon back into the same inventory slot it gets
 	thrown from; only works if it does return and is successfully caught
+wizard mode #wizborn command
 
 
 Platform- and/or Interface-Specific New Features
