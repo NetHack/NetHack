@@ -164,6 +164,6 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-  prerelease: true
+  prerelease: false
   name: "Pre-Release build of NetHack 3.7.0"
   body: "This is an auto generated Pre-Release build of NetHack 3.7.0"
