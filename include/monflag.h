@@ -203,5 +203,6 @@ enum ms_sounds {
 #define MV_KNOWS_EGG                        \
     0x0008 /* player recognizes egg of this \
               monster type */
+#define G_IGNORE 0x1000 /* for mkclass(), ignore G_GENOD|G_EXTINCT */
 
 #endif /* MONFLAG_H */

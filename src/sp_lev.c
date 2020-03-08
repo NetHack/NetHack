@@ -3313,7 +3313,7 @@ lua_State *L;
         if (montype) {
             if (strlen(montype) == 1
                 && def_char_to_monclass(*montype) != MAXMCLASSES) {
-                pm = mkclass(def_char_to_monclass(*montype), G_NOGEN);
+                pm = mkclass(def_char_to_monclass(*montype), G_NOGEN|G_IGNORE);
             } else {
                 for (i = LOW_PM; i < NUMMONS; i++)
                     if (!strcmpi(mons[i].mname, montype)) {
