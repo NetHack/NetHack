@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1561485713 2019/06/25 18:01:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.172 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1583688568 2020/03/08 17:29:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2464,17 +2464,25 @@ struct _create_particular_data *d;
     d->sleeping = d->saddled = d->invisible = d->hidden = FALSE;
 
     /* quantity */
-    if (digit(*bufp) && strcmp(bufp, "0")) {
-        d->quan = min(255, atoi(bufp));
+    if (digit(*bufp)) {
+        d->quan = atoi(bufp);
         while (digit(*bufp))
             bufp++;
         while (*bufp == ' ')
             bufp++;
     }
+#define QUAN_LIMIT (ROWNO * (COLNO - 1))
+    /* maximum possible quantity is one per cell: (0..ROWNO-1) x (1..COLNO-1)
+       [21*79==1659 for default map size; could subtract 1 for hero's spot] */
+    if (d->quan < 1 || d->quan > QUAN_LIMIT)
+        d->quan = QUAN_LIMIT - monster_census(FALSE);
+#undef QUAN_LIMIT
+    /* gear -- extremely limited number of possibilities supported */
     if ((tmpp = strstri(bufp, "saddled ")) != 0) {
         d->saddled = TRUE;
         (void) memset(tmpp, ' ', sizeof "saddled " - 1);
     }
+    /* state -- limited number of possibilitie supported */
     if ((tmpp = strstri(bufp, "sleeping ")) != 0) {
         d->sleeping = TRUE;
         (void) memset(tmpp, ' ', sizeof "sleeping " - 1);
