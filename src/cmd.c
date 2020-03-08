@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1582594149 2020/02/25 01:29:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.406 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1583704247 2020/03/08 21:50:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.408 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -793,19 +793,21 @@ boolean pre, wiztower;
                 continue;
             if (mtmp->isshk)
                 setpaid(mtmp);
-            /* achievement tracking */
-            {
-                static const char Unachieve[] = "%s achievement revoked.";
+        }
+        {
+            static const char Unachieve[] = "%s achievement revoked.";
 
-                if (Is_mineend_level(&u.uz)) {
-                    if (remove_achievement(ACH_MINE_PRIZE))
-                        pline(Unachieve, "Mine's-end");
-                    g.context.achieveo.mines_prize_oid = 0;
-                } else if (Is_sokoend_level(&u.uz)) {
-                    if (remove_achievement(ACH_SOKO_PRIZE))
-                        pline(Unachieve, "Sokoban-end");
-                    g.context.achieveo.soko_prize_oid = 0;
-                }
+            /* achievement tracking; if replacing a level that has a
+               special prize, lose credit for previously finding it and
+               reset for the new instance of that prize */
+            if (Is_mineend_level(&u.uz)) {
+                if (remove_achievement(ACH_MINE_PRIZE))
+                    pline(Unachieve, "Mine's-end");
+                g.context.achieveo.mines_prize_oid = 0;
+            } else if (Is_sokoend_level(&u.uz)) {
+                if (remove_achievement(ACH_SOKO_PRIZE))
+                    pline(Unachieve, "Soko-prize");
+                g.context.achieveo.soko_prize_oid = 0;
             }
         }
         if (Punished) {
