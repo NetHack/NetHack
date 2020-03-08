@@ -527,6 +527,12 @@ boolean extras;
 
     /* monsters */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (mtmp->isgd && mtmp->mx == 0)
+            continue;
+        /* skip the occasional earth elemental outside the flip area */
+        if (mtmp->mx < minx || mtmp->mx > maxx
+            || mtmp->my < miny || mtmp->my > maxy)
+            continue;
 	if (flp & 1) {
 	    mtmp->my = FlipY(mtmp->my);
 	    if (mtmp->ispriest)
