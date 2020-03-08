@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ $NHDT-Date: 1583193505 2020/03/02 23:58:25 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ $NHDT-Date: 1583515468 2020/03/06 17:24:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -58,11 +58,16 @@ give feedback if controlled level teleport attempt fails because hero is
 unseen pet that drowned didn't give "you have a sad feeling" message
 prevent ravens from blinding other ravens: /corvus oculum corvi non eruit/
 have ^X provide more information when held or swallowed
-avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
 display wasn't updating immediately after toggling hilite_pet option
 randomly choosing role could lead to crash via segfault
 if eel bite attack caused hero to move (killed + rehumanized + crawled out
 	of water), its grab attack could succeed even if no longer adjacent
+specifying a count when picking [part of] a stack of scrolls of scare monster
+	ignored that count and the whole stack was affected
+wizmakemap didn't account for unique monsters and didn't correct monster
+	birth counts
+generate objects (eg. statues) with genocided or extinct monster classes
+	in special levels, if requested
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -103,6 +108,7 @@ set g.context.botl for glove and wielding actions that could start or end
 reinstate ranked ordering of the status condition fields
 grammar for messages about a monster removing items from a container was bad
 some new status conditions didn't always update when they should
+fix flipping non-existent stairs and ladders (github #311)
 
 
 Platform- and/or Interface-Specific Fixes
@@ -173,6 +179,7 @@ demon lords and princes suppress teleporting in Gehennom
 for !fixinv option where inventory letters normally don't stick, try to put
 	a throw-and-return weapon back into the same inventory slot it gets
 	thrown from; only works if it does return and is successfully caught
+wizard mode #wizborn command
 
 
 Platform- and/or Interface-Specific New Features

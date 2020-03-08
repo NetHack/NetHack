@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1580600478 2020/02/01 23:41:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.221 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1583608809 2020/03/07 19:20:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -928,11 +928,6 @@ struct instance_globals {
     boolean vis;
     boolean far_noise;
     long noisetime;
-    struct obj *otmp;
-    int dieroll; /* Needed for the special case of monsters wielding vorpal
-                  * blades (rare). If we use this a lot it should probably
-                  * be a parameter to mdamagem() instead of a global variable.
-                  */
 
     /* mhitu.c */
     int mhitu_dieroll;

@@ -89,6 +89,7 @@ static void FDECL(sel_set_wallify, (int, int, genericptr_t));
 static void NDECL(spo_end_moninvent);
 static void NDECL(spo_pop_container);
 static void FDECL(spo_endroom, (struct sp_coder *));
+static void FDECL(l_table_getset_feature_flag, (lua_State *, int, int, const char *, int));
 static void FDECL(sel_set_ter, (int, int, genericptr_t));
 static void FDECL(sel_set_door, (int, int, genericptr_t));
 static void FDECL(sel_set_feature, (int, int, genericptr_t));
@@ -99,6 +100,7 @@ static int FDECL(get_table_region, (lua_State *, const char *,
 static void FDECL(set_wallprop_in_selection, (lua_State *, int));
 static int FDECL(floodfillchk_match_under, (int, int));
 static int FDECL(floodfillchk_match_accessible, (int, int));
+static void FDECL(l_push_wid_hei_table, (lua_State *, int, int));
 
 /* lua_CFunction prototypes */
 int FDECL(lspo_altar, (lua_State *));
@@ -459,18 +461,28 @@ boolean extras;
 
     /* stairs and ladders */
     if (flp & 1) {
-	yupstair = FlipY(yupstair);
-	ydnstair = FlipY(ydnstair);
-	yupladder = FlipY(yupladder);
-	ydnladder = FlipY(ydnladder);
-        g.sstairs.sy = FlipY(g.sstairs.sy);
+        if (xupstair)
+            yupstair = FlipY(yupstair);
+        if (xdnstair)
+            ydnstair = FlipY(ydnstair);
+        if (xupladder)
+            yupladder = FlipY(yupladder);
+        if (xdnladder)
+            ydnladder = FlipY(ydnladder);
+        if (g.sstairs.sx)
+            g.sstairs.sy = FlipY(g.sstairs.sy);
     }
     if (flp & 2) {
-	xupstair = FlipX(xupstair);
-	xdnstair = FlipX(xdnstair);
-	xupladder = FlipX(xupladder);
-	xdnladder = FlipX(xdnladder);
-        g.sstairs.sx = FlipX(g.sstairs.sx);
+        if (xupstair)
+            xupstair = FlipX(xupstair);
+        if (xdnstair)
+            xdnstair = FlipX(xdnstair);
+        if (xupladder)
+            xupladder = FlipX(xupladder);
+        if (xdnladder)
+            xdnladder = FlipX(xdnladder);
+        if (g.sstairs.sx)
+            g.sstairs.sx = FlipX(g.sstairs.sx);
     }
 
     /* traps */
@@ -515,6 +527,12 @@ boolean extras;
 
     /* monsters */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (mtmp->isgd && mtmp->mx == 0)
+            continue;
+        /* skip the occasional earth elemental outside the flip area */
+        if (mtmp->mx < minx || mtmp->mx > maxx
+            || mtmp->my < miny || mtmp->my > maxy)
+            continue;
 	if (flp & 1) {
 	    mtmp->my = FlipY(mtmp->my);
 	    if (mtmp->ispriest)
@@ -2799,6 +2817,23 @@ spo_pop_container()
     }
 }
 
+/* push a table on lua stack: {width=wid, height=hei} */
+static void
+l_push_wid_hei_table(L, wid, hei)
+lua_State *L;
+int wid, hei;
+{
+    lua_newtable(L);
+
+    lua_pushstring(L, "width");
+    lua_pushinteger(L, wid);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "height");
+    lua_pushinteger(L, hei);
+    lua_rawset(L, -3);
+}
+
 /* message("What a strange feeling!"); */
 int
 lspo_message(L)
@@ -3284,7 +3319,7 @@ lua_State *L;
         if (montype) {
             if (strlen(montype) == 1
                 && def_char_to_monclass(*montype) != MAXMCLASSES) {
-                pm = mkclass(def_char_to_monclass(*montype), G_NOGEN);
+                pm = mkclass(def_char_to_monclass(*montype), G_NOGEN|G_IGNORE);
             } else {
                 for (i = LOW_PM; i < NUMMONS; i++)
                     if (!strcmpi(mons[i].mname, montype)) {
@@ -3570,6 +3605,7 @@ int defval;
 
 /* room({ type="ordinary", lit=1, x=3,y=3, xalign="center",yalign="center", w=11,h=9 }); */
 /* room({ lit=1, coord={3,3}, xalign="center",yalign="center", w=11,h=9 }); */
+/* room({ coord={3,3}, xalign="center",yalign="center", w=11,h=9, contents=function(room) ... end }); */
 int
 lspo_room(L)
 lua_State *L;
@@ -3627,7 +3663,8 @@ lua_State *L;
                 lua_getfield(L, 1, "contents");
                 if (lua_type(L, -1) == LUA_TFUNCTION) {
                     lua_remove(L, -2);
-                    lua_call(L, 0, 0);
+                    l_push_wid_hei_table(L, tmpcr->hx - tmpcr->lx, tmpcr->hy - tmpcr->ly);
+                    lua_call(L, 1, 0);
                 } else
                     lua_pop(L, 1);
                 spo_endroom(g.coder);
@@ -4863,19 +4900,41 @@ lua_State *L;
     return 0;
 }
 
+static void
+l_table_getset_feature_flag(L, x,y, name, flag)
+lua_State *L;
+int x, y;
+const char *name;
+int flag;
+{
+    int val = get_table_boolean_opt(L, name, -2);
+
+    if (val != -2) {
+        if (val == -1) val = rn2(2);
+        if (val)
+            levl[x][y].flags |= flag;
+        else
+            levl[x][y].flags &= ~flag;
+    }
+}
+
 /* feature("fountain", x, y); */
 /* feature("fountain", {x,y}); */
 /* feature({ type="fountain", x=NN, y=NN }); */
 /* feature({ type="fountain", coord={NN, NN} }); */
+/* feature({ type="tree", coord={NN, NN}, swarm=true, looted=false }); */
 int
 lspo_feature(L)
 lua_State *L;
 {
-    static const char *const features[] = { "fountain", "sink", "pool", NULL };
-    static const int features2i[] = { FOUNTAIN, SINK, POOL, STONE };
+    static const char *const features[] = { "fountain", "sink", "pool",
+                                            "throne", "tree", NULL };
+    static const int features2i[] = { FOUNTAIN, SINK, POOL,
+                                      THRONE, TREE, STONE };
     schar x,y;
     int typ;
     int argc = lua_gettop(L);
+    boolean can_have_flags = FALSE;
 
     create_des_coder();
 
@@ -4897,27 +4956,39 @@ lua_State *L;
         get_table_xy_or_coord(L, &fx, &fy);
         x = fx, y = fy;
         typ = features2i[get_table_option(L, "type", NULL, features)];
+        can_have_flags = TRUE;
     }
 
     get_location_coord(&x, &y, ANY_LOC, g.coder->croom, SP_COORD_PACK(x,y));
+
+    if (typ == STONE)
+        impossible("feature has unknown type param.");
+    else
+        sel_set_feature(x, y, (genericptr_t) &typ);
+
+    if (levl[x][y].typ != typ || !can_have_flags)
+        return 0;
 
     switch (typ) {
     default:
         break;
     case FOUNTAIN:
-        typ = FOUNTAIN;
+        l_table_getset_feature_flag(L, x, y, "looted", F_LOOTED);
+        l_table_getset_feature_flag(L, x, y, "warned", F_WARNED);
         break;
     case SINK:
-        typ = SINK;
+        l_table_getset_feature_flag(L, x, y, "pudding", S_LPUDDING);
+        l_table_getset_feature_flag(L, x, y, "dishwasher", S_LDWASHER);
+        l_table_getset_feature_flag(L, x, y, "ring", S_LRING);
         break;
-    case POOL:
-        typ = POOL;
+    case THRONE:
+        l_table_getset_feature_flag(L, x, y, "looted", T_LOOTED);
+        break;
+    case TREE:
+        l_table_getset_feature_flag(L, x, y, "looted", TREE_LOOTED);
+        l_table_getset_feature_flag(L, x, y, "swarm", TREE_SWARM);
         break;
     }
-    if (typ == STONE)
-        impossible("feature has unknown type param.");
-    else
-        sel_set_feature(x, y, (genericptr_t) &typ);
 
     return 0;
 }
@@ -5851,6 +5922,7 @@ lua_State *L UNUSED;
 /* map({ x = 10, y = 10, map = [[...]] }); */
 /* map({ coord = {10, 10}, map = [[...]] }); */
 /* map({ halign = "center", valign = "center", map = [[...]] }); */
+/* map({ map = [[...]], contents = function(map) ... end }); */
 /* map([[...]]) */
 int
 lspo_map(L)
@@ -5874,9 +5946,10 @@ TODO: g.coder->croom needs to be updated
         "top", "center", "bottom", "none", NULL
     };
     static const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1 };
-    int lr, tb, keepregion = 1, x = -1, y = -1;
+    int lr, tb, x = -1, y = -1;
     struct mapfragment *mf;
     int argc = lua_gettop(L);
+    boolean has_contents = FALSE;
 
     create_des_coder();
 
@@ -5890,9 +5963,15 @@ TODO: g.coder->croom needs to be updated
         lcheck_param_table(L);
         lr = l_or_r2i[get_table_option(L, "halign", "none", left_or_right)];
         tb = t_or_b2i[get_table_option(L, "valign", "none", top_or_bot)];
-        keepregion = get_table_boolean_opt(L, "keepregion", 1); /* TODO: maybe rename? */
         get_table_xy_or_coord(L, &x, &y);
         tmpstr = get_table_str(L, "map");
+        lua_getfield(L, 1, "contents");
+        if (lua_type(L, -1) == LUA_TFUNCTION) {
+            lua_remove(L, -2);
+            has_contents = TRUE;
+        } else {
+            lua_pop(L, 1);
+        }
         mf = mapfrag_fromstr(tmpstr);
         free(tmpstr);
     }
@@ -5902,14 +5981,10 @@ TODO: g.coder->croom needs to be updated
         return 0;
     }
 
-    /* keepregion restricts the coordinates of the commands coming after
-       the map into the map region */
-    /* for keepregion */
     tmpxsize = g.xsize;
     tmpysize = g.ysize;
     tmpxstart = g.xstart;
     tmpystart = g.ystart;
-
 
     g.xsize = mf->wid;
     g.ysize = mf->hei;
@@ -6033,14 +6108,18 @@ TODO: g.coder->croom needs to be updated
             remove_rooms(g.xstart, g.ystart,
                          g.xstart + g.xsize, g.ystart + g.ysize);
     }
-    if (!keepregion) {
-        g.xstart = tmpxstart;
-        g.ystart = tmpystart;
-        g.xsize = tmpxsize;
-        g.ysize = tmpysize;
-    }
 
     mapfrag_free(&mf);
+
+    if (has_contents) {
+        l_push_wid_hei_table(L, g.xsize, g.ysize);
+        lua_call(L, 1, 0);
+    }
+
+    tmpxsize = g.xsize;
+    tmpysize = g.ysize;
+    tmpxstart = g.xstart;
+    tmpystart = g.ystart;
 
     return 0;
 }

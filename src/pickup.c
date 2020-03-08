@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1581985559 2020/02/18 00:25:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.261 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1583515468 2020/03/06 17:24:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1570,16 +1570,32 @@ boolean telekinesis; /* not picking it up directly by hand */
             || rider_corpse_revival(obj, telekinesis))
             return -1;
     } else if (obj->otyp == SCR_SCARE_MONSTER) {
-        if (obj->blessed)
-            obj->blessed = 0;
-        else if (!obj->spe && !obj->cursed)
+        int old_wt, new_wt;
+
+        /* process a count before altering/deleting scrolls;
+           tricky because being unable to lift full stack imposes an
+           implicit count; unliftable ones should be treated as if
+           the count excluded them so that they don't change state */
+        if ((count = carry_count(obj, (struct obj *) 0,
+                                 count ? count : obj->quan,
+                                 FALSE, &old_wt, &new_wt)) < 1L)
+            return -1; /* couldn't even pick up 1, so effectively untouched */
+        /* all current callers handle a new object sanely when traversing
+           a list; other half of a split will be left as-is and whatever
+           already follows 'obj' will still be processed next */
+        if (count > 0L && count < obj->quan)
+            obj = splitobj(obj, count);
+
+        if (obj->blessed) {
+            unbless(obj);
+        } else if (!obj->spe && !obj->cursed) {
             obj->spe = 1;
-        else {
+        } else {
             pline_The("scroll%s %s to dust as you %s %s up.", plur(obj->quan),
                       otense(obj, "turn"), telekinesis ? "raise" : "pick",
                       (obj->quan == 1L) ? "it" : "them");
-            if (!(objects[SCR_SCARE_MONSTER].oc_name_known)
-                && !(objects[SCR_SCARE_MONSTER].oc_uname))
+            if (!objects[SCR_SCARE_MONSTER].oc_name_known
+                && !objects[SCR_SCARE_MONSTER].oc_uname)
                 docall(obj);
             useupf(obj, obj->quan);
             return 1; /* tried to pick something up and failed, but

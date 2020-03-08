@@ -21,6 +21,13 @@ function check_loc_name(x, y, name)
    end
 end
 
+function check_loc_flag(x, y, flag, value)
+   local loc = nh.getmap(x, y);
+   if (loc.flags[flag] ~= value) then
+      error(loc.typ_name .. " at (" .. x .. "," .. y .. ") flag " .. flag .. " is " .. tostring(loc.flags[flag]) .. ", not " .. tostring(value));
+   end
+end
+
 function check_trap_at(x,y, name)
    local t = nh.gettrap(x + 1, y); -- + 1 == g.xstart
    if (t.ttyp_name ~= name) then
@@ -214,9 +221,20 @@ FFF]] })
 III
 .I.
 III]] })
+   des.map({ coord = {30, 5}, map = [[
+...
+...
+...]], contents = function(map)
+                des.terrain(0,0, "L");
+                des.terrain(map.width-1,map.height-1, "T");
+   end});
+   check_loc_name(30, 5, "lava pool");
+   check_loc_name(32, 7, "tree");
 end
 
 function test_feature()
+   des.reset_level();
+   des.level_init({ style = "solidfill", fg = ".", lit = 1 });
    des.feature("fountain", 40, 08);
    check_loc_name(40 + 1, 08, "fountain");
    des.feature("sink", {41, 08});
@@ -225,6 +243,35 @@ function test_feature()
    check_loc_name(42 + 1, 08, "pool");
    des.feature({ type = "sink", coord = {43, 08} });
    check_loc_name(43 + 1, 08, "sink");
+
+   des.feature({ type = "throne", coord = {44, 08}, looted=true });
+   check_loc_name(44 + 1, 08, "throne");
+   check_loc_flag(44 + 1, 08, "looted", true);
+
+   des.feature({ type = "throne", coord = {44, 08}, looted=false });
+   check_loc_name(44 + 1, 08, "throne");
+   check_loc_flag(44 + 1, 08, "looted", false);
+
+   des.feature({ type = "tree", coord = {45, 08}, looted=true, swarm=false });
+   check_loc_name(45 + 1, 08, "tree");
+   check_loc_flag(45 + 1, 08, "looted", true);
+   check_loc_flag(45 + 1, 08, "swarm", false);
+
+   des.feature({ type = "tree", coord = {45, 08}, looted=false, swarm=true });
+   check_loc_name(45 + 1, 08, "tree");
+   check_loc_flag(45 + 1, 08, "looted", false);
+   check_loc_flag(45 + 1, 08, "swarm", true);
+
+   des.feature({ type = "fountain", coord = {46, 08}, looted=false, warned=true });
+   check_loc_name(46 + 1, 08, "fountain");
+   check_loc_flag(46 + 1, 08, "looted", false);
+   check_loc_flag(46 + 1, 08, "warned", true);
+
+   des.feature({ type = "sink", coord = {47, 08}, pudding=false, dishwasher=true, ring=true });
+   check_loc_name(47 + 1, 08, "sink");
+   check_loc_flag(47 + 1, 08, "pudding", false);
+   check_loc_flag(47 + 1, 08, "dishwasher", true);
+   check_loc_flag(47 + 1, 08, "ring", true);
 end
 
 function test_gold()
@@ -317,9 +364,11 @@ function test_room()
    });
    des.room({ type="ordinary", coord={3, 3}, w=3, h=3 });
    des.room();
-   des.room({ contents = function()
+   des.room({ contents = function(rm)
                  des.object();
                  des.monster();
+                 des.terrain(0,0, "L");
+                 des.terrain(rm.width, rm.height, "T");
                          end
    });
    des.random_corridors();

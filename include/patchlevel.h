@@ -44,6 +44,15 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
+/*  Patch 6, March 8, 2020
+ *  invalid status highlight color could be maliciously used to corrupt memory
+ *  formatting corpse names used internal buffers differently from formatting
+ *      other objects and could potentially clobber memory
+ *  avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
+ *  avoid #wizrumorcheck crash if either 'rumors.tru' or 'rumors.fal' or both
+ *      were empty when makedefs built 'rumors'
+ */
+
 /*  Patch 5, January 27, 2020
  *
  *  fix accessing mons[-1] when trying to gate in a non-valid demon

@@ -1592,7 +1592,7 @@ int mndx, mvflagsmask, genomask;
 {
     struct permonst *ptr = &mons[mndx];
 
-    if (g.mvitals[mndx].mvflags & mvflagsmask)
+    if ((g.mvitals[mndx].mvflags & mvflagsmask) && !(genomask & G_IGNORE))
         return FALSE;
     if (ptr->geno & genomask)
         return FALSE;
@@ -1627,6 +1627,7 @@ aligntyp atyp;
 {
     register int first, last, num = 0;
     int k, nums[SPECIAL_PM + 1]; /* +1: insurance for final return value */
+    int ignore = (spc & G_IGNORE);
     int maxmlev, mask = (G_NOGEN | G_UNIQ) & ~spc;
 
     (void) memset((genericptr_t) nums, 0, sizeof nums);
@@ -1655,7 +1656,7 @@ aligntyp atyp;
     for (last = first; last < SPECIAL_PM && mons[last].mlet == class; last++) {
         if (atyp != A_NONE && sgn(mons[last].maligntyp) != sgn(atyp))
             continue;
-        if (mk_gen_ok(last, G_GONE, mask)) {
+        if (mk_gen_ok(last, G_GONE, mask|ignore)) {
             /* consider it; don't reject a toostrong() monster if we
                don't have anything yet (num==0) or if it is the same
                (or lower) difficulty as preceding candidate (non-zero

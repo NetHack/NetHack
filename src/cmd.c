@@ -780,10 +780,15 @@ boolean pre, wiztower;
     if (pre) {
         rm_mapseen(ledger_no(&u.uz));
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            int ndx = monsndx(mtmp->data);
             if (mtmp->isgd) { /* vault is going away; get rid of guard */
                 mtmp->isgd = 0;
                 mongone(mtmp);
             }
+            if (mtmp->data->geno & G_UNIQ)
+                g.mvitals[ndx].mvflags &= ~(G_EXTINCT);
+            if (g.mvitals[ndx].born)
+                g.mvitals[ndx].born--;
             if (DEADMONSTER(mtmp))
                 continue;
             if (mtmp->isshk)
@@ -802,11 +807,6 @@ boolean pre, wiztower;
                     g.context.achieveo.soko_prize_oid = 0;
                 }
             }
-            /* TODO?
-             *  Reduce 'born' tally for each monster about to be discarded
-             *  by savelev(), otherwise replacing heavily populated levels
-             *  tends to make their inhabitants become extinct.
-             */
         }
         if (Punished) {
             ballrelease(FALSE);
@@ -1890,6 +1890,8 @@ struct ext_func_tab extcmdlist[] = {
             dowhatis, IFBURIED | GENERALCMD },
     { 'w', "wield", "wield (put in use) a weapon", dowield },
     { M('w'), "wipe", "wipe off your face", dowipe, AUTOCOMPLETE },
+    { '\0', "wizborn", "show stats of monsters created",
+            doborn, IFBURIED | WIZMODECMD },
 #ifdef DEBUG
     { '\0', "wizbury", "bury objs under and around you",
             wiz_debug_cmd_bury, IFBURIED | AUTOCOMPLETE | WIZMODECMD },

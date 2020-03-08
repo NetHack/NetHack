@@ -1002,6 +1002,7 @@ E void FDECL(record_achievement, (XCHAR_P));
 E boolean FDECL(remove_achievement, (XCHAR_P));
 E int NDECL(count_achievements);
 E int NDECL(dovanquished);
+E int NDECL(doborn);
 E void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
 E int NDECL(num_genocides);
 E void FDECL(list_genocided, (CHAR_P, BOOLEAN_P));

@@ -575,7 +575,7 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-    struct mapfragment *mf;
+    struct mapfragment *mf = (struct mapfragment *) 0;
     int x, y;
 
     if (argc == 1) {
