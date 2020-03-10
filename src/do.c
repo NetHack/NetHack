@@ -1507,12 +1507,11 @@ boolean at_stairs, falling, portal;
                 break;
 
         if (!ttrap) {
-            if (u.uevent.qexpelled && Is_qstart(&u.uz0)) {
-                /* we're coming back from the quest home level, after
-                   already getting expelled once. The portal back doesn't
-                   exist anymore - see expulsion(). This can only happen
-                   in wizmode.
-                 */
+            if (u.uevent.qexpelled
+                && (Is_qstart(&u.uz0) || Is_qstart(&u.uz))) {
+                /* we're coming back from or going into the quest home level,
+                   after already getting expelled once. The portal back
+                   doesn't exist anymore - see expulsion(). */
                 u_on_rndspot(0);
             } else {
                 panic("goto_level: no corresponding portal!");
