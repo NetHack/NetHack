@@ -1506,10 +1506,21 @@ boolean at_stairs, falling, portal;
             if (ttrap->ttyp == MAGIC_PORTAL)
                 break;
 
-        if (!ttrap)
-            panic("goto_level: no corresponding portal!");
-        seetrap(ttrap);
-        u_on_newpos(ttrap->tx, ttrap->ty);
+        if (!ttrap) {
+            if (u.uevent.qexpelled && Is_qstart(&u.uz0)) {
+                /* we're coming back from the quest home level, after
+                   already getting expelled once. The portal back doesn't
+                   exist anymore - see expulsion(). This can only happen
+                   in wizmode.
+                 */
+                u_on_rndspot(0);
+            } else {
+                panic("goto_level: no corresponding portal!");
+            }
+        } else {
+            seetrap(ttrap);
+            u_on_newpos(ttrap->tx, ttrap->ty);
+        }
     } else if (at_stairs && !In_endgame(&u.uz)) {
         if (up) {
             if (g.at_ladder)
