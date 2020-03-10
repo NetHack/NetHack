@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.125 $ $NHDT-Date: 1583708535 2020/03/08 23:02:15 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ $NHDT-Date: 1583881126 2020/03/10 22:58:46 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -70,6 +70,9 @@ generate objects (eg. statues) with genocided or extinct monster classes
 	in special levels, if requested
 if the orc-town version of mine town has been loaded, creation of orc zombies
 	or orc mummies would name them as part of the town raiding orc clan
+when punished, involuntarily teleporting and landing within chain range of
+	attached ball while encumbered worse than burdened could trigger
+	"remove_object: obj not on floor" panic on hero's next move
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1581886867 2020/02/16 21:01:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1583881126 2020/03/10 22:58:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -302,8 +302,9 @@ int nux, nuy;
 int teleds_flags;
 {
     boolean ball_active, ball_still_in_range;
-    boolean allow_drag = teleds_flags & TELEDS_ALLOW_DRAG;
-    boolean is_teleport = teleds_flags & TELEDS_TELEPORT;
+    boolean allow_drag = ((teleds_flags & TELEDS_ALLOW_DRAG) != 0
+                          && near_capacity() <= SLT_ENCUMBER);
+    boolean is_teleport = (teleds_flags & TELEDS_TELEPORT) != 0;
     struct monst *vault_guard = vault_occupied(u.urooms) ? findgd() : 0;
 
     if (u.utraptype == TT_BURIEDBALL) {
