@@ -1503,7 +1503,7 @@ struct mkroom *broom;
             y = broom->ly - 1;
             x = broom->lx
                 + ((dpos == -1) ? rn2(1 + (broom->hx - broom->lx)) : dpos);
-            if (!isok(x,y - 1))
+            if (!isok(x,y - 1) || IS_ROCK(levl[x][y - 1].typ))
                 goto redoloop;
             goto outdirloop;
         case 1:
@@ -1512,7 +1512,7 @@ struct mkroom *broom;
             y = broom->hy + 1;
             x = broom->lx
                 + ((dpos == -1) ? rn2(1 + (broom->hx - broom->lx)) : dpos);
-            if (!isok(x,y + 1))
+            if (!isok(x,y + 1) || IS_ROCK(levl[x][y + 1].typ))
                 goto redoloop;
             goto outdirloop;
         case 2:
@@ -1521,7 +1521,7 @@ struct mkroom *broom;
             x = broom->lx - 1;
             y = broom->ly
                 + ((dpos == -1) ? rn2(1 + (broom->hy - broom->ly)) : dpos);
-            if (!isok(x - 1,y))
+            if (!isok(x - 1,y) || IS_ROCK(levl[x - 1][y].typ))
                 goto redoloop;
             goto outdirloop;
         case 3:
@@ -1530,7 +1530,7 @@ struct mkroom *broom;
             x = broom->hx + 1;
             y = broom->ly
                 + ((dpos == -1) ? rn2(1 + (broom->hy - broom->ly)) : dpos);
-            if (!isok(x + 1,y))
+            if (!isok(x + 1,y) || IS_ROCK(levl[x + 1][y].typ))
                 goto redoloop;
             goto outdirloop;
         default:
