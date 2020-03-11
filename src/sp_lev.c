@@ -487,6 +487,9 @@ boolean extras;
 
     /* traps */
     for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
+        if (ttmp->tx < minx || ttmp->tx > maxx
+            || ttmp->ty < miny || ttmp->ty > maxy)
+            continue;
 	if (flp & 1) {
 	    ttmp->ty = FlipY(ttmp->ty);
 	    if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
@@ -511,6 +514,9 @@ boolean extras;
 
     /* objects */
     for (otmp = fobj; otmp; otmp = otmp->nobj) {
+        if (otmp->ox < minx || otmp->ox > maxx
+            || otmp->oy < miny || otmp->oy > maxy)
+            continue;
 	if (flp & 1)
 	    otmp->oy = FlipY(otmp->oy);
 	if (flp & 2)
@@ -519,6 +525,9 @@ boolean extras;
 
     /* buried objects */
     for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
+        if (otmp->ox < minx || otmp->ox > maxx
+            || otmp->oy < miny || otmp->oy > maxy)
+            continue;
 	if (flp & 1)
 	    otmp->oy = FlipY(otmp->oy);
 	if (flp & 2)
@@ -704,10 +713,13 @@ boolean extras;
     }
 
     if (extras) {
-        if (flp & 1)
-            u.uy = FlipY(u.uy), u.uy0 = FlipY(u.uy0);
-        if (flp & 2)
-            u.ux = FlipX(u.ux), u.ux0 = FlipX(u.ux0);
+        /* flip hero location only if inside the flippable area */
+        if (!(u.ux < minx || u.ux > maxx || u.uy < miny || u.uy > maxy)) {
+            if (flp & 1)
+                u.uy = FlipY(u.uy), u.uy0 = FlipY(u.uy0);
+            if (flp & 2)
+                u.ux = FlipX(u.ux), u.ux0 = FlipX(u.ux0);
+        }
     }
 
     fix_wall_spines(1, 0, COLNO - 1, ROWNO - 1);
