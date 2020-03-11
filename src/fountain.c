@@ -1,4 +1,4 @@
-/* NetHack 3.6	fountain.c	$NHDT-Date: 1544442711 2018/12/10 11:51:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	fountain.c	$NHDT-Date: 1583926845 2020/03/11 11:40:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -293,15 +293,21 @@ drinkfountain()
         case 23: /* Water demon */
             dowaterdemon();
             break;
-        case 24: /* Curse an item */ {
+        case 24: { /* Maybe curse some items */
             register struct obj *obj;
+            int buc_changed = 0;
 
             pline("This water's no good!");
             morehungry(rn1(20, 11));
             exercise(A_CON, FALSE);
+            /* this is more severe than rndcurse() */
             for (obj = g.invent; obj; obj = obj->nobj)
-                if (!rn2(5))
+                if (obj->oclass != COIN_CLASS && !obj->cursed && !rn2(5)) {
                     curse(obj);
+                    ++buc_changed;
+                }
+            if (buc_changed)
+                update_inventory();
             break;
         }
         case 25: /* See invisible */
@@ -416,7 +422,9 @@ register struct obj *obj;
 
     switch (rnd(30)) {
     case 16: /* Curse the item */
-        curse(obj);
+        if (obj->oclass != COIN_CLASS && !obj->cursed) {
+            curse(obj);
+        }
         break;
     case 17:
     case 18:
