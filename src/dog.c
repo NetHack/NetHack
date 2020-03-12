@@ -408,7 +408,8 @@ boolean with_you;
         if (t) {
             xlocale = t->tx, ylocale = t->ty;
             break;
-        } else {
+        } else if (!(u.uevent.qexpelled
+                     && (Is_qstart(&u.uz0) || Is_qstart(&u.uz)))) {
             impossible("mon_arrive: no corresponding portal?");
         } /*FALLTHRU*/
     default:
