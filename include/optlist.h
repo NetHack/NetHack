@@ -506,7 +506,7 @@ pfx_##a,
                 "method of video updating")
 #endif
 #ifdef VIDEOSHADES
-    NHOPTC(videocolors, 40, opt_in, set_gameview, No, Yes, No, "videocolours",
+    NHOPTC(videocolors, 40, opt_in, set_gameview, No, Yes, No, No, "videocolours",
                 "color mappings for internal screen routines")
     NHOPTC(videoshades, 32, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "gray shades to map to black/gray/white")
@@ -558,7 +558,7 @@ pfx_##a,
                 "prefix for font options")
 #if defined(MICRO) && !defined(AMIGA)
     /* included for compatibility with old NetHack.cnf files */
-    NHOPTP(IBM_, 0, opt_in, set_hidden, No, No, Yes, NoAlias,
+    NHOPTP(IBM_, 0, opt_in, set_hidden, No, No, Yes, No, NoAlias,
                 "prefix for old micro IBM_ options")
 #endif /* MICRO */
 
