@@ -1084,6 +1084,14 @@ register int humidity;
     return FALSE;
 }
 
+boolean
+pm_good_location(x, y, pm)
+int x, y;
+struct permonst *pm;
+{
+    return is_ok_location(x, y, pm_to_humidity(pm));
+}
+
 static unpacked_coord
 get_unpacked_coord(loc, defhumidity)
 long loc;

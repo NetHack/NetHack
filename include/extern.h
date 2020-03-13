@@ -2490,6 +2490,7 @@ E void FDECL(selection_free, (struct selectionvar *, BOOLEAN_P));
 E void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
 E void FDECL(selection_floodfill, (struct selectionvar *, int, int,
                                    BOOLEAN_P));
+E boolean FDECL(pm_good_location, (int, int, struct permonst *));
 E void FDECL(get_location_coord, (schar *, schar *, int, struct mkroom *,
                                   long));
 E void FDECL(selection_setpoint, (int, int, struct selectionvar *, XCHAR_P));
