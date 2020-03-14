@@ -78,6 +78,7 @@ inventory cursing caused by "this water's no good" effect when drinking from
 fix priest created inside temple wall
 fix vault guard occasionally encasing monsters in stone
 tone down scare monster by excluding humans and uniques
+lock the castle chest
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
