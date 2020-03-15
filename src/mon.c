@@ -4170,6 +4170,22 @@ pacify_guards()
     }
 }
 
+struct monst *
+find_ghost_with_name(str)
+char *str;
+{
+    struct monst *mtmp;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp)
+            || mtmp->data != &mons[PM_GHOST] || !has_mname(mtmp))
+            continue;
+        if (!strcmpi(MNAME(mtmp), str))
+            return mtmp;
+    }
+    return (struct monst *) 0;
+}
+
 void
 mimic_hit_msg(mtmp, otyp)
 struct monst *mtmp;

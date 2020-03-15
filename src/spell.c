@@ -397,8 +397,6 @@ learn(VOID_ARGS)
             book->spestudied++;
             exercise(A_WIS, TRUE); /* extra study */
         }
-        /* make book become known even when spell is already
-           known, in case amnesia made you forget the book */
         makeknown((int) booktype);
     } else { /* (spellid(i) == NO_SPELL) */
         /* for a normal book, spestudied will be zero, but for
