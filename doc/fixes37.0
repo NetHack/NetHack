@@ -76,6 +76,9 @@ when punished, involuntarily teleporting and landing within chain range of
 inventory cursing caused by "this water's no good" effect when drinking from
 	a fountain didn't update persistent inventory window
 fix priest created inside temple wall
+fix vault guard occasionally encasing monsters in stone
+tone down scare monster by excluding humans and uniques
+lock the castle chest
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -125,6 +128,7 @@ msdos:  Add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
 windows: update for new status condition fields
+X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 
 
 General New Features

@@ -115,10 +115,18 @@ struct mesg_info_t {
 };
 
 /*
- * Information specific to a "text" status window.
+ * Information specific to "fancy", "text", or "tty-style" status window.
+ * (Tty-style supports status highlighting and effectively makes "text"
+ * obsolete.)
  */
 struct status_info_t {
     struct text_buffer text; /* Just a text buffer. */
+    Pixel fg, bg;          /* foreground and background */
+    XFontStruct *fs;       /* Status window font structure. */
+    Dimension spacew;      /* width of one space */
+    Position x, y[3];      /* x coord (not used), y for up to three lines */
+    Dimension wd, ht;      /* width (not used), height (same for all lines) */
+    Dimension brd, in_wd;  /* border width, internal width */
 };
 
 /*
@@ -285,11 +293,12 @@ E void (*input_func)();
 extern struct window_procs X11_procs;
 
 /* Check for an invalid window id. */
-#define check_winid(window)                                             \
-    if ((window) < 0 || (window) >= MAX_WINDOWS) {                      \
-        panic("illegal windid [%d] in %s at line %d", window, __FILE__, \
-              __LINE__);                                                \
-    }
+#define check_winid(window) \
+    do {                                                        \
+        if ((window) < 0 || (window) >= MAX_WINDOWS)            \
+            panic("illegal windid [%d] in %s at line %d",       \
+                  window, __FILE__, __LINE__);                  \
+    } while (0)
 
 /* ### dialogs.c ### */
 E Widget
@@ -442,8 +451,10 @@ E void FDECL(X11_number_pad, (int));
 E void NDECL(X11_delay_output);
 E void NDECL(X11_status_init);
 E void NDECL(X11_status_finish);
-E void FDECL(X11_status_enablefield, (int, const char *, const char *, BOOLEAN_P));
-E void FDECL(X11_status_update, (int, genericptr_t, int, int, int, unsigned long *));
+E void FDECL(X11_status_enablefield, (int, const char *, const char *,
+                                      BOOLEAN_P));
+E void FDECL(X11_status_update, (int, genericptr_t, int, int, int,
+                                 unsigned long *));
 
 /* other defs that really should go away (they're tty specific) */
 E void NDECL(X11_start_screen);

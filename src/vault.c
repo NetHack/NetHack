@@ -76,7 +76,7 @@ boolean forceshow;
         if ((mtmp = m_at(fcx, fcy)) != 0) {
             if (mtmp->isgd) {
                 return FALSE;
-            } else if (!in_fcorridor(grd, u.ux, u.uy)) {
+            } else {
                 if (mtmp->mtame)
                     yelp(mtmp);
                 if (!rloc(mtmp, TRUE))
