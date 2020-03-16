@@ -928,7 +928,7 @@ coord *cc;
     case 1:
         You("unearth a corpse.");
         if ((otmp = mk_tt_object(CORPSE, dig_x, dig_y)) != 0)
-            otmp->age -= 100; /* this is an *OLD* corpse */
+            otmp->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
         break;
     case 2:
         if (!Blind)

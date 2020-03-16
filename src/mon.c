@@ -350,7 +350,7 @@ unsigned corpseflags;
         num = undead_to_corpse(mndx);
         corpstatflags |= CORPSTAT_INIT;
         obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
-        obj->age -= 100; /* this is an *OLD* corpse */
+        obj->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
         break;
     case PM_KOBOLD_MUMMY:
     case PM_DWARF_MUMMY:
@@ -371,7 +371,7 @@ unsigned corpseflags;
         num = undead_to_corpse(mndx);
         corpstatflags |= CORPSTAT_INIT;
         obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
-        obj->age -= 100; /* this is an *OLD* corpse */
+        obj->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
         break;
     case PM_IRON_GOLEM:
         num = d(2, 6);

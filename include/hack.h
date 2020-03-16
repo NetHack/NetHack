@@ -477,6 +477,11 @@ enum bodypart_types {
 #define RANDOM_TIN (-2)
 #define HEALTHY_TIN (-3)
 
+/* Corpse aging */
+#define TAINT_AGE (50L)        /* age when corpses go bad */
+#define TROLL_REVIVE_CHANCE 37 /* 1/37 chance for 50 turns ~ 75% chance */
+#define ROT_AGE (250L)         /* age when corpses rot away */
+
 /* Some misc definitions */
 #define POTION_OCCUPANT_CHANCE(n) (13 + 2 * (n))
 #define WAND_BACKFIRE_CHANCE 100
