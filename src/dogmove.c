@@ -1181,6 +1181,10 @@ int after; /* this is extra fast monster movement */
                     }
                 }
             }
+
+            /* pet moved when attacking */
+            if (mtmp->mx != omx || mtmp->my != omy)
+                return 0;
         }
     }
 
