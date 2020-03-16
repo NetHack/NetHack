@@ -453,8 +453,8 @@ boolean extras;
     /* get_level_extends() returns -1,-1 to COLNO,ROWNO at max */
     if (miny < 0)
         miny = 0;
-    if (minx < 0)
-        minx = 0;
+    if (minx < 1)
+        minx = 1;
     if (maxx >= COLNO)
         maxx = (COLNO - 1);
     if (maxy >= ROWNO)
