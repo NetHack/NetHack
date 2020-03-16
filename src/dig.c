@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1578659784 2020/01/10 12:36:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1584350347 2020/03/16 09:19:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1827,8 +1827,7 @@ boolean *dealloced;
         *dealloced = FALSE;
     if (otmp == uball) {
         unpunish();
-        u.utrap = rn1(50, 20);
-        u.utraptype = TT_BURIEDBALL;
+        set_utrap((unsigned) rn1(50, 20), TT_BURIEDBALL);
         pline_The("iron ball gets buried!");
     }
     /* after unpunish(), or might get deallocated chain */

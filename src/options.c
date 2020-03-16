@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1583282760 2020/03/04 00:46:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.457 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1584350350 2020/03/16 09:19:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.459 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7568,6 +7568,8 @@ doset() /* changing options via menu by Per Liboriussen */
         check_gold_symbol();
         reglyph_darkroom();
         (void) doredraw();
+    } else if (g.context.botl || g.context.botlx) {
+        bot();
     }
     return 0;
 }
