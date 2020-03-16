@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ $NHDT-Date: 1583926845 2020/03/11 11:40:45 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ $NHDT-Date: 1584398443 2020/03/16 22:40:43 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -80,6 +80,8 @@ fix vault guard occasionally encasing monsters in stone
 tone down scare monster by excluding humans and uniques
 lock the castle chest
 revamp amnesia to forget skills instead of objects or maps
+when Punished and carrying the iron ball and levitating, hurtling in the
+	opposite direction of a thrown object didn't bring along the chain
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1583073990 2020/03/01 14:46:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1584398443 2020/03/16 22:40:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -714,8 +714,9 @@ int x, y;
         }
     }
 
-    /* Caller has already determined that dragging the ball is allowed */
-    if (Punished && uball->where == OBJ_FLOOR) {
+    /* caller has already determined that dragging the ball is allowed;
+       if ball is carried we might still need to drag the chain */
+    if (Punished) {
         int bc_control;
         xchar ballx, bally, chainx, chainy;
         boolean cause_delay;
