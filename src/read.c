@@ -22,7 +22,6 @@ static char *FDECL(apron_text, (struct obj *, char *buf));
 static void FDECL(stripspe, (struct obj *));
 static void FDECL(p_glow1, (struct obj *));
 static void FDECL(p_glow2, (struct obj *, const char *));
-static void FDECL(randomize, (int *, int));
 static void FDECL(forget, (int));
 static int FDECL(maybe_tame, (struct monst *, struct obj *));
 static boolean FDECL(get_valid_stinking_cloud_pos, (int, int));
@@ -704,23 +703,6 @@ int curse_bless;
     } else {
     not_chargable:
         You("have a feeling of loss.");
-    }
-}
-
-/* randomize the given list of numbers  0 <= i < count */
-static void
-randomize(indices, count)
-int *indices;
-int count;
-{
-    int i, iswap, temp;
-
-    for (i = count - 1; i > 0; i--) {
-        if ((iswap = rn2(i + 1)) == i)
-            continue;
-        temp = indices[i];
-        indices[i] = indices[iswap];
-        indices[iswap] = temp;
     }
 }
 

@@ -1380,7 +1380,6 @@ int n; /* number of skills to drain */
     int skill;
     int i;
     int tmpskills[P_NUM_SKILLS];
-    int tmpidx = 0;
 
     (void) memset((genericptr_t) tmpskills, 0, sizeof(tmpskills));
 
