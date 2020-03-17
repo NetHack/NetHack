@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1581886869 2020/02/16 21:01:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.227 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1584405117 2020/03/17 00:31:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -366,14 +366,12 @@ register struct monst *mtmp;
                 Strcpy(buf, y_monnam(mtmp));
                 buf[0] = highc(buf[0]);
                 You("stop.  %s is in the way!", buf);
-                g.context.travel = g.context.travel1 = g.context.mv = g.context.run
-                    = 0;
+                end_running(TRUE);
                 return TRUE;
             } else if ((mtmp->mfrozen || (!mtmp->mcanmove)
                         || (mtmp->data->mmove == 0)) && rn2(6)) {
                 pline("%s doesn't seem to move!", Monnam(mtmp));
-                g.context.travel = g.context.travel1 = g.context.mv = g.context.run
-                    = 0;
+                end_running(TRUE);
                 return TRUE;
             } else
                 return FALSE;

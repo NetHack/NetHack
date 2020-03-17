@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1583073988 2020/03/01 14:46:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.809 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1584405113 2020/03/17 00:31:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.814 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -906,6 +906,7 @@ E int NDECL(dopickup);
 E void NDECL(lookaround);
 E boolean FDECL(crawl_destination, (int, int));
 E int NDECL(monster_nearby);
+E void FDECL(end_running, (BOOLEAN_P));
 E void FDECL(nomul, (int));
 E void FDECL(unmul, (const char *));
 E void FDECL(losehp, (int, const char *, BOOLEAN_P));
