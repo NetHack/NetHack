@@ -82,6 +82,7 @@ lock the castle chest
 revamp amnesia to forget skills instead of objects or maps
 when Punished and carrying the iron ball and levitating, hurtling in the
 	opposite direction of a thrown object didn't bring along the chain
+recognize "kirin" as alias for "ki-rin" when asked to create a monster
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
