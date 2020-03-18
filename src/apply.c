@@ -1188,6 +1188,13 @@ register struct obj *obj;
            1 would yield 0, confusing begin_burn() and producing an
            unlightable, unrefillable candelabrum; round up instead */
         obj->age = (obj->age + 1L) / 2L;
+
+        /* to make absolutely sure the game doesn't become unwinnable as
+           a consequence of a broken candelabrum */
+        if (obj->age == 0) {
+            impossible("Candelabrum with candles but no fuel?");
+            obj->age = 1;
+        }
     } else {
         if (obj->spe == 7) {
             if (Blind)
