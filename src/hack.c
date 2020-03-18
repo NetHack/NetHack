@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1582799171 2020/02/27 10:26:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1584405116 2020/03/17 00:31:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -954,7 +954,7 @@ int mode;
     if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && g.context.travel1
         && distmin(u.ux, u.uy, u.tx, u.ty) == 1
         && !(u.ux != u.tx && u.uy != u.ty && NODIAG(u.umonnum))) {
-        g.context.run = 0;
+        end_running(FALSE);
         if (test_move(u.ux, u.uy, u.tx - u.ux, u.ty - u.uy, TEST_MOVE)) {
             if (mode == TRAVP_TRAVEL) {
                 u.dx = u.tx - u.ux;
@@ -1964,10 +1964,14 @@ domove_core()
     }
 
     if (g.context.run && flags.runmode != RUN_TPORT) {
-        /* display every step or every 7th step depending upon mode */
+        /* for tport mode, don't display anything until we've stopped;
+           for normal (leap) mode, update display every 7th step
+           (relative to turn counter; ought to be to start of running);
+           for walk and crawl (visual debugging) modes, update the
+           display after every step */
         if (flags.runmode != RUN_LEAP || !(g.moves % 7L)) {
-            if (flags.time)
-                iflags.time_botl = 1;
+            /* moveloop() suppresses time_botl when running */
+            iflags.time_botl = flags.time;
             curs_on_u();
             delay_output();
             if (flags.runmode == RUN_CRAWL) {
@@ -2928,6 +2932,21 @@ monster_nearby()
 }
 
 void
+end_running(and_travel)
+boolean and_travel;
+{
+    /* moveloop() suppresses time_botl when context.run is non-zero; when
+       running stops, update 'time' even if other botl status is unchanged */
+    if (flags.time && g.context.run)
+        iflags.time_botl = TRUE;
+    g.context.run = 0;
+    /* 'context.mv' isn't travel but callers who want to end travel
+       all clear it too */
+    if (and_travel)
+        g.context.travel = g.context.travel1 = g.context.mv = 0;
+}
+
+void
 nomul(nval)
 int nval;
 {
@@ -2939,7 +2958,7 @@ int nval;
     g.multi = nval;
     if (nval == 0)
         g.multi_reason = NULL;
-    g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
+    end_running(TRUE);
 }
 
 /* called when a non-movement, multi-turn action has completed */
@@ -2947,7 +2966,7 @@ void
 unmul(msg_override)
 const char *msg_override;
 {
-    g.context.botl = 1;
+    g.context.botl = TRUE;
     g.multi = 0; /* caller will usually have done this already */
     if (msg_override)
         g.nomovemsg = msg_override;
@@ -3018,11 +3037,19 @@ register int n;
 register const char *knam;
 boolean k_format;
 {
+#if 0   /* code below is prepared to handle negative 'loss' so don't add this
+         * until we've verified that no callers intentionally rely on that */
+    if (n <= 0) {
+        impossible("hero losing %d hit points due to \"%s\"?", n, knam);
+        return;
+    }
+#endif
+    g.context.botl = TRUE; /* u.uhp or u.mh is changing */
+    end_running(TRUE);
     if (Upolyd) {
         u.mh -= n;
         if (u.mhmax < u.mh)
             u.mhmax = u.mh;
-        g.context.botl = 1;
         if (u.mh < 1)
             rehumanize();
         else if (n > 0 && u.mh * 10 < u.mhmax && Unchanging)
@@ -3033,9 +3060,6 @@ boolean k_format;
     u.uhp -= n;
     if (u.uhp > u.uhpmax)
         u.uhpmax = u.uhp; /* perhaps n was negative */
-    else
-        g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
-    g.context.botl = 1;
     if (u.uhp < 1) {
         g.killer.format = k_format;
         if (g.killer.name != knam) /* the thing that killed you */

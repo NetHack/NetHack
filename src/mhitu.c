@@ -1175,8 +1175,6 @@ register struct attack *mattk;
         }
         /* adjattrib gives dunce cap message when appropriate */
         (void) adjattrib(A_INT, -rnd(2), FALSE);
-        forget_levels(25);  /* lose memory of 25% of levels */
-        forget_objects(25); /* lose memory of 25% of objects */
         break;
     case AD_PLYS:
         hitmsg(mtmp, mattk);

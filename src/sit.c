@@ -210,7 +210,7 @@ dosit()
 
                 /* Magical voice not affected by deafness */
                 pline("A voice echoes:");
-                verbalize("Thy audience hath been summoned, %s!",
+                verbalize("Thine audience hath been summoned, %s!",
                           flags.female ? "Dame" : "Sire");
                 while (cnt--)
                     (void) makemon(courtmon(), u.ux, u.uy, NO_MM_FLAGS);

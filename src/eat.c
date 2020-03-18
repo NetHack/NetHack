@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1577190688 2019/12/24 12:31:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1584405116 2020/03/17 00:31:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3056,17 +3056,16 @@ boolean incr;
         switch (newhs) {
         case HUNGRY:
             if (Hallucination) {
-                You((!incr) ? "now have a lesser case of the munchies."
-                            : "are getting the munchies.");
+                You(!incr ? "now have a lesser case of the munchies."
+                    : "are getting the munchies.");
             } else
-                You((!incr) ? "only feel hungry now."
-                            : (u.uhunger < 145)
-                                  ? "feel hungry."
-                                  : "are beginning to feel hungry.");
+                You(!incr ? "only feel hungry now."
+                    : (u.uhunger < 145) ? "feel hungry."
+                      : "are beginning to feel hungry.");
             if (incr && g.occupation
                 && (g.occupation != eatfood && g.occupation != opentin))
                 stop_occupation();
-            g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
+            end_running(TRUE);
             break;
         case WEAK:
             if (Hallucination)
@@ -3079,14 +3078,13 @@ boolean incr;
                           ? g.urole.name.m
                           : "Elf");
             else
-                You((!incr)
-                        ? "feel weak now."
-                        : (u.uhunger < 45) ? "feel weak."
-                                           : "are beginning to feel weak.");
+                You(!incr ? "feel weak now."
+                    : (u.uhunger < 45) ? "feel weak."
+                      : "are beginning to feel weak.");
             if (incr && g.occupation
                 && (g.occupation != eatfood && g.occupation != opentin))
                 stop_occupation();
-            g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
+            end_running(TRUE);
             break;
         }
         u.uhs = newhs;

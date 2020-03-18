@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1583190980 2020/03/02 23:16:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1584350350 2020/03/16 09:19:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1117,10 +1117,11 @@ cond_menu(VOID_ARGS)
     } while (showmenu);
 
     if (res > 0) {
-        for (i = 0; i < CONDITION_COUNT; ++i) {
-            if (condtests[i].enabled != condtests[i].choice)
+        for (i = 0; i < CONDITION_COUNT; ++i)
+            if (condtests[i].enabled != condtests[i].choice) {
                 condtests[i].enabled = condtests[i].choice;
-        }
+                g.context.botl = TRUE;
+            }
     }
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	winstat.c	$NHDT-Date: 1582833042 2020/02/27 19:50:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	winstat.c	$NHDT-Date: 1584482684 2020/03/17 22:04:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1341,21 +1341,12 @@ static void
 hilight_label(w)
 Widget w; /* label widget */
 {
-    Arg args[2];
-    Pixel fg, bg;
     /*
      * This predates STATUS_HILITES.
      * It is used to show any changed item in inverse and gets
      * reset on the next turn.
      */
-
-    XtSetArg(args[0], XtNforeground, &fg);
-    XtSetArg(args[1], XtNbackground, &bg);
-    XtGetValues(w, args, TWO);
-
-    XtSetArg(args[0], XtNforeground, bg);
-    XtSetArg(args[1], XtNbackground, fg);
-    XtSetValues(w, args, TWO);
+    swap_fg_bg(w);
 }
 
 static void
@@ -1415,14 +1406,17 @@ long new_value;
 
         /* special cases: hunger and encumbrance */
         if (attr_rec == &shown_stats[F_HUNGER]) {
-            XtSetArg(args[0], XtNlabel, hu_stat[new_value]);
+            Strcpy(buf, hu_stat[new_value]);
+            (void) mungspaces(buf);
         } else if (attr_rec == &shown_stats[F_ENCUMBER]) {
-            XtSetArg(args[0], XtNlabel, enc_stat[new_value]);
+            Strcpy(buf, enc_stat[new_value]);
         } else if (new_value) {
-            XtSetArg(args[0], XtNlabel, attr_rec->name);
+            Strcpy(buf, attr_rec->name); /* condition name On */
         } else {
-            XtSetArg(args[0], XtNlabel, "");
+            *buf = '\0'; /* condition name Off */
         }
+
+        XtSetArg(args[0], XtNlabel, buf);
         XtSetValues(attr_rec->w, args, ONE);
 
     } else { /* a value pair */
@@ -1532,18 +1526,28 @@ long new_value;
     }
 
     /*
-     * Now hilight the changed information.  Names, time and score don't
-     * hilight.  If first time, don't hilight.  If already lit, don't do
-     * it again.
+     * Now highlight the changed information.  Don't highlight Time because
+     * it's continually changing.  For others, don't highlight if this is
+     * the first update.  If already highlighted, don't change it unless
+     * it's being set to blank (where that item should be reset now instead
+     * of showing highlighted blank until the next expiration check).
+     *
+     * 3.7:  highlight non-labelled 'name' items (conditions plus hunger
+     * and encumbrance) when they come On.  For all conditions going Off,
+     * or changing to not-hungry or not-encumbered, there's nothing to
+     * highlight because the field becomes blank.
      */
-    if (attr_rec->type != SV_NAME && attr_rec != &shown_stats[F_TIME]) {
+    if (attr_rec != &shown_stats[F_TIME]) {
         if (attr_rec->after_init) {
-            if (!attr_rec->set) {
-                if (attr_rec->type == SV_LABEL)
+            /* toggle if not highlighted and just set to nonblank or if
+               already highlighted and just set to blank */
+            if (!attr_rec->set ^ !*buf) {
+                if (attr_rec->type == SV_LABEL || attr_rec->type == SV_NAME)
                     hilight_label(attr_rec->w);
                 else
                     hilight_value(attr_rec->w);
-                attr_rec->set = TRUE;
+
+                attr_rec->set = !attr_rec->set;
             }
             attr_rec->turn_count = 0;
         } else {
@@ -1780,8 +1784,8 @@ check_turn_events()
             continue;
 
         if (sv->turn_count++ >= hilight_time) {
-            /* unhighlights by toggling a highlit item back off again */
-            if (sv->type == SV_LABEL)
+            /* unhighlights by toggling a highlighted item back off again */
+            if (sv->type == SV_LABEL || sv->type == SV_NAME)
                 hilight_label(sv->w);
             else
                 hilight_value(sv->w);

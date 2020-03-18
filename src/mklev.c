@@ -1543,7 +1543,7 @@ coord *tm;
         otmp = mkcorpstat(CORPSE, NULL, &mons[victim_mnum], m.x, m.y,
                           CORPSTAT_INIT);
         if (otmp)
-            otmp->age -= 51; /* died too long ago to eat */
+            otmp->age -= (TAINT_AGE + 1); /* died too long ago to eat */
     }
 }
 

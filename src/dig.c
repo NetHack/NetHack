@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1578659784 2020/01/10 12:36:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1584350347 2020/03/16 09:19:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -928,7 +928,7 @@ coord *cc;
     case 1:
         You("unearth a corpse.");
         if ((otmp = mk_tt_object(CORPSE, dig_x, dig_y)) != 0)
-            otmp->age -= 100; /* this is an *OLD* corpse */
+            otmp->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
         break;
     case 2:
         if (!Blind)
@@ -1409,7 +1409,10 @@ zap_dig()
             if (is_animal(mtmp->data))
                 You("pierce %s %s wall!", s_suffix(mon_nam(mtmp)),
                     mbodypart(mtmp, STOMACH));
-            mtmp->mhp = 1; /* almost dead */
+            if (unique_corpstat(mtmp->data))
+                mtmp->mhp = (mtmp->mhp + 1) / 2;
+            else
+                mtmp->mhp = 1; /* almost dead */
             expels(mtmp, mtmp->data, !is_animal(mtmp->data));
         }
         return;
@@ -1827,8 +1830,7 @@ boolean *dealloced;
         *dealloced = FALSE;
     if (otmp == uball) {
         unpunish();
-        u.utrap = rn1(50, 20);
-        u.utraptype = TT_BURIEDBALL;
+        set_utrap((unsigned) rn1(50, 20), TT_BURIEDBALL);
         pline_The("iron ball gets buried!");
     }
     /* after unpunish(), or might get deallocated chain */
