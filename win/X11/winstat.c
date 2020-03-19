@@ -1,4 +1,4 @@
-/* NetHack 3.6	winstat.c	$NHDT-Date: 1584482684 2020/03/17 22:04:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	winstat.c	$NHDT-Date: 1584582374 2020/03/19 01:46:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -66,30 +66,34 @@
 /* status conditions grouped by columns; tty orders these differently;
    hunger/encumbrance/movement used to be in the middle with fatal
    conditions on the left but those columns have been swapped and
-   renumbered to match new order (forcing shown_stat[] to be reordered) */
+   renumbered to match new order (forcing shown_stats[] to be reordered);
+   some mutually exclusive conditions are overloaded during display--
+   they're separate within shown_stats[] but share the same widget */
 #define F_HUNGER   20
 #define F_ENCUMBER 21
 #define F_TRAPPED  22
-#define F_LEV      23
-#define F_FLY      24
-#define F_RIDE     25
+#define F_TETHERED 23 /* overloads trapped rather than having its own slot */
+#define F_LEV      24
+#define F_FLY      25
+#define F_RIDE     26
 
-#define F_GRABBED  26
-#define F_STONE    27
-#define F_SLIME    28
-#define F_STRNGL   29
-#define F_FOODPOIS 30
-#define F_TERMILL  31
-#define F_IN_LAVA  32
+#define F_GRABBED  27
+#define F_STONE    28
+#define F_SLIME    29
+#define F_STRNGL   30
+#define F_FOODPOIS 31
+#define F_TERMILL  32
+#define F_IN_LAVA  33 /* could overload trapped but severity differs a lot */
 
-#define F_HELD     33
-#define F_BLIND    34
-#define F_DEAF     35
-#define F_STUN     36
-#define F_CONF     37
-#define F_HALLU    38
+#define F_HELD     34 /* could overload grabbed but severity differs a lot */
+#define F_HOLDING  35 /* overloads held */
+#define F_BLIND    36
+#define F_DEAF     37
+#define F_STUN     38
+#define F_CONF     39
+#define F_HALLU    40
 
-#define NUM_STATS  39
+#define NUM_STATS  41
 
 static int FDECL(condcolor, (long, unsigned long *));
 static int FDECL(condattr, (long, unsigned long *));
@@ -147,20 +151,22 @@ static struct tt_condinfo {
     unsigned long mask;
     const char *text;
 } tt_condorder[] = {
-    { BL_MASK_GRAB, "Grab!" },
+    { BL_MASK_GRAB, "Grabbed!" },
     { BL_MASK_STONE, "Stone" },
     { BL_MASK_SLIME, "Slime" },
     { BL_MASK_STRNGL, "Strngl" },
     { BL_MASK_FOODPOIS, "FoodPois" },
     { BL_MASK_TERMILL, "TermIll" },
-    { BL_MASK_INLAVA, "Lava" },
+    { BL_MASK_INLAVA, "InLava" },
     { BL_MASK_HELD, "Held" },
+    { BL_MASK_HELD, "Holding" },
     { BL_MASK_BLIND, "Blind" },
     { BL_MASK_DEAF, "Deaf" },
     { BL_MASK_STUN, "Stun" },
     { BL_MASK_CONF, "Conf" },
     { BL_MASK_HALLU, "Hallu" },
-    { BL_MASK_TRAPPED, "Trap" },
+    { BL_MASK_TRAPPED, "Trapped" },
+    { BL_MASK_TETHERED, "Tethered", },
     { BL_MASK_LEV, "Lev" },
     { BL_MASK_FLY, "Fly" },
     { BL_MASK_RIDE, "Ride" },
@@ -847,12 +853,14 @@ unsigned long *colormasks UNUSED;
         { BL_MASK_TERMILL, F_TERMILL },
         { BL_MASK_INLAVA, F_IN_LAVA },
         { BL_MASK_HELD, F_HELD },
+        { BL_MASK_HOLDING, F_HOLDING },
         { BL_MASK_BLIND, F_BLIND },
         { BL_MASK_DEAF, F_DEAF },
         { BL_MASK_STUN, F_STUN },
         { BL_MASK_CONF, F_CONF },
         { BL_MASK_HALLU, F_HALLU },
         { BL_MASK_TRAPPED, F_TRAPPED },
+        { BL_MASK_TETHERED, F_TETHERED },
         { BL_MASK_LEV, F_LEV },
         { BL_MASK_FLY, F_FLY },
         { BL_MASK_RIDE, F_RIDE }
@@ -876,7 +884,7 @@ unsigned long *colormasks UNUSED;
             for (i = 0; i < SIZE(mask_to_fancyfield); i++)
                 if ((changed_bits & mask_to_fancyfield[i].mask) != 0L)
                     update_fancy_status_field(mask_to_fancyfield[i].ff);
-            old_condition_bits = X11_condition_bits;
+            old_condition_bits = X11_condition_bits; /* remember 'On' bits */
         }
     } else {
         for (i = 0; i < SIZE(bl_to_fancyfield); i++)
@@ -1217,6 +1225,9 @@ const char *str;
 }
 
 /* Fancy ================================================================== */
+extern const char *hu_stat[];  /* from eat.c */
+extern const char *enc_stat[]; /* from botl.c */
+
 static int hilight_time = 1; /* number of turns to hilight a changed value */
 
 struct X_status_value {
@@ -1235,8 +1246,22 @@ struct X_status_value {
 #define SV_LABEL 1 /* displays a changable label */
 #define SV_NAME  2 /* displays an unchangeable name */
 
+/* for overloaded conditions */
+struct ovld_item {
+    unsigned long ovl_mask;
+    int ff;
+};
+#define NUM_OVLD 4 /* peak number of overloads for a single field */
+struct f_overload {
+    unsigned long all_mask;
+    struct ovld_item conds[NUM_OVLD];
+};
+
+static const struct f_overload *FDECL(ff_ovld_from_mask, (unsigned long));
+static const struct f_overload *FDECL(ff_ovld_from_indx, (int));
 static void FDECL(hilight_label, (Widget));
 static void FDECL(update_val, (struct X_status_value *, long));
+static void FDECL(skip_cond_val, (struct X_status_value *));
 static const char *FDECL(width_string, (int));
 static void FDECL(create_widget, (Widget, struct X_status_value *, int));
 static void FDECL(get_widths, (struct X_status_value *, int *, int *));
@@ -1255,55 +1280,118 @@ static Widget FDECL(init_info_form, (Widget, Widget, Widget));
  * - These must be in the same order as the F_foo numbers.
  */
 static struct X_status_value shown_stats[NUM_STATS] = {
-    { "", SV_NAME, (Widget) 0, -1, 0, FALSE, FALSE }, /* 0, F_DUMMY */
+    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE, FALSE }, /* 0 */
 
-    { "Strength", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /* 1*/
-    { "Dexterity", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Constitution", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Intelligence", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Wisdom", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /* 5*/
-    { "Charisma", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "Strength",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /* 1*/
+    { "Dexterity",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Constitution", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Intelligence", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Wisdom",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /* 5*/
+    { "Charisma",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
 
-    { "", SV_LABEL, (Widget) 0, -1, 0, FALSE, FALSE }, /* 7, F_NAME */
-    { "", SV_LABEL, (Widget) 0, -1, 0, FALSE, FALSE }, /* F_DLEVEL */
-    { "Gold", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Hit Points", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /*10*/
-    { "Max HP", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Power", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Max Power", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Armor Class", SV_VALUE, (Widget) 0, 256, 0, FALSE, FALSE },
-    { "Xp Level", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /*15*/
-    /*{ "Hit Dice", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },==15*/
-    { "Exp Points", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Alignment", SV_VALUE, (Widget) 0, -2, 0, FALSE, FALSE },
-    { "Time", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Score", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*NAME*/
+    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*DLEVEL*/
+    { "Gold",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Hit Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*10*/
+    { "Max HP",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Power",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Max Power",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Armor Class",  SV_VALUE, (Widget) 0, 256L, 0, FALSE, FALSE },
+    { "Xp Level",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*15*/
+    /*{ "Hit Dice",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, ==15*/
+    { "Exp Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Alignment",    SV_VALUE, (Widget) 0,  -2L, 0, FALSE, FALSE },
+    { "Time",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Score",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*19*/
 
-    { "", SV_NAME, (Widget) 0, -1, 0, FALSE, TRUE }, /*20, F_HUNGER */
-    { "", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /* F_ENCUMBER */
-    { "Trapped", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "Levitating", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "Flying", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "Riding", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*25, F_RIDE */
+    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE,  TRUE }, /*20 */
+    { "",             SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*ENCMBR*/
+    { "Trapped",      SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Tethered",     SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Levitating",   SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Flying",       SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*25*/
+    { "Riding",       SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
 
-    { "Grabbed!", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*26, F_GRAB */
-    { "Petrifying", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /* F_STONE */
-    { "Slimed", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "Strangled", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "Food Pois", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*30*/
-    { "Term Ill", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "Sinking", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /* 32, F_IN_LAVA */
+    { "Grabbed!",     SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*27*/
+    { "Petrifying",   SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*STONE*/
+    { "Slimed",       SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Strangled",    SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*30*/
+    { "Food Pois",    SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Term Ill",     SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Sinking",      SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*LAVA*/
 
-    { "Held", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*33*/
-    { "Blind", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "Deaf", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*35*/
-    { "Stunned", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "Confused", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "Hallucinating", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*38*/
+    { "Held",         SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*34*/
+    { "Holding",      SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*35*/
+    { "Blind",        SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Deaf",         SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Stunned",      SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Confused",     SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "Hallucinat",   SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*40*/
+};
+/*
+ * The following are supported by the core but not yet handled here:
+ *  bareh      'bare handed' (no weapon and no gloves)
+ *  busy       involved in some multi-turn activity, possibly involuntarily
+ *  elf_iron   elf being harmed by contact with iron (not implemented)
+ *  glowhands  'glowing hands' (inflict confuse monster for next N melee hits)
+ *  icy        on or above ice terrain (temporary fumbling; might melt)
+ *  parlyz     paralyzed (can't move)
+ *  sleeping   asleep (can't move; might wake if attacked)
+ *  slippery   'slippery hands' or gloves (will drop non-cursed weapons)
+ *  submerged  underwater (severely restricted vision, hampered movement)
+ *  unconsc    unconscious (can't move; includes fainted)
+ *  woundedl   'wounded legs' (can't kick; temporary dex loss)
+ */
+
+/* overloaded condition fields */
+static const struct f_overload cond_ovl[] = {
+    { (BL_MASK_TRAPPED | BL_MASK_TETHERED),
+      { { BL_MASK_TRAPPED, F_TRAPPED },
+        { BL_MASK_TETHERED, F_TETHERED } },
+    },
+    { (BL_MASK_HELD | BL_MASK_HOLDING),
+      { { BL_MASK_HELD, F_HELD },
+        { BL_MASK_HOLDING, F_HOLDING } },
+    },
+#if 0   /* not yet implemented */
+    { (BL_MASK_BUSY | BL_MASK_PARALYZ | BL_MASK_SLEEPING | BL_MASK_UNCONSC),
+      { { BL_MASK_BUSY, F_BUSY }, /* can't move but none of the below... */
+        { BL_MASK_PARALYZ, F_PARALYZED }
+        { BL_MASK_SLEEPING, F_SLEEPING }
+        { BL_MASK_UNCONSC, F_UNCONSCIOUS } },
+    },
+#endif
 };
 
-extern const char *hu_stat[];  /* from eat.c */
-extern const char *enc_stat[]; /* from botl.c */
+static const struct f_overload *
+ff_ovld_from_mask(mask)
+unsigned long mask;
+{
+    const struct f_overload *fo;
+
+    for (fo = cond_ovl; fo < cond_ovl + SIZE(cond_ovl); ++fo) {
+        if ((fo->all_mask & mask) != 0L)
+            return fo;
+    }
+    return (struct f_overload *) 0;
+}
+
+static const struct f_overload *
+ff_ovld_from_indx(indx)
+int indx; /* F_foo number, index into shown_stats[] */
+{
+    const struct f_overload *fo;
+    int i, ff;
+
+    if (indx > 0) { /* skip 0 (F_DUMMY) */
+        for (fo = cond_ovl; fo < cond_ovl + SIZE(cond_ovl); ++fo) {
+            for (i = 0; i < NUM_OVLD && (ff = fo->conds[i].ff) > 0; ++i)
+                if (ff == indx)
+                    return fo;
+        }
+    }
+    return (struct f_overload *) 0;
+}
 
 /*
  * Set all widget values to a null string.  This is used after all spacings
@@ -1556,6 +1644,23 @@ long new_value;
     }
 }
 
+/* overloaded condition is being cleared without going through update_val()
+   so that an alternate can be shown; put this one back to default settings */
+static void
+skip_cond_val(sv)
+struct X_status_value *sv;
+{
+    sv->last_value = 0L; /* Off */
+    if (sv->set) {
+        /* if condition was highlighted and the alternate value has
+           also requested to be highlighted, it used its own copy of
+           'set' but the same widget so the highlighing got toggled
+           off; this will turn in back on in that exceptional case */
+        hilight_label(sv->w);
+        sv->set = FALSE;
+    }
+}
+
 /*
  * Update the displayed status.  The current code in botl.c updates
  * two lines of information.  Both lines are always updated one after
@@ -1615,9 +1720,13 @@ int i;
             val = (long) near_capacity();
             break;
 
-        case F_TRAPPED:
+        case F_TRAPPED: /* belongs with non-fatal but fits with 'other' */
             condmask = BL_MASK_TRAPPED;
             break;
+        case F_TETHERED: /* overloaded with 'trapped' */
+            condmask = BL_MASK_TETHERED;
+            break;
+        /* 'other' status conditions */
         case F_LEV:
             condmask = BL_MASK_LEV;
             break;
@@ -1646,12 +1755,15 @@ int i;
         case F_TERMILL:
             condmask = BL_MASK_TERMILL;
             break;
-        case F_IN_LAVA:
+        case F_IN_LAVA: /* could overload with 'trapped' but is more severe */
             condmask = BL_MASK_INLAVA;
             break;
         /* non-fatal status conditions */
         case F_HELD:
             condmask = BL_MASK_HELD;
+            break;
+        case F_HOLDING: /* belongs with 'other' but overloads 'held' */
+            condmask = BL_MASK_HOLDING;
             break;
         case F_BLIND:
             condmask = BL_MASK_BLIND;
@@ -1735,8 +1847,18 @@ int i;
         } /* default */
     } /* switch */
 
-    if (condmask)
+    if (condmask) {
+        const struct f_overload *fo = ff_ovld_from_mask(condmask);
+
         val = ((X11_condition_bits & condmask) != 0L);
+        /* if we're turning an overloaded field Off, don't do it if any
+           of the other alternatives are being set On because we would
+           clobber that if the other one happens to be drawn first */
+        if (!val && fo && (X11_condition_bits & fo->all_mask) != 0L) {
+            skip_cond_val(sv);
+            return;
+        }
+    }
     update_val(sv, val);
 }
 
@@ -1762,6 +1884,7 @@ boolean force_update;
            than that and do this when toggling on as well as off */
         for (i = 0; i < NUM_STATS; i++)
             update_fancy_status_field(i);
+        old_condition_bits = X11_condition_bits;
 
         old_upolyd = Upolyd;
         old_showtime = flags.time;
@@ -1823,6 +1946,7 @@ int sv_index;
     case F_FLY:
     case F_RIDE:
     case F_TRAPPED:
+    case F_TETHERED:
     case F_GRABBED:
     case F_STONE:
     case F_SLIME:
@@ -1831,6 +1955,7 @@ int sv_index;
     case F_TERMILL:
     case F_IN_LAVA:
     case F_HELD:
+    case F_HOLDING:
     case F_BLIND:
     case F_DEAF:
     case F_STUN:
@@ -1895,14 +2020,43 @@ int sv_index;
                                       labelWidgetClass, parent,
                                       args, num_args);
         break;
-    case SV_NAME:
+    case SV_NAME: {
+        char buf[BUFSZ];
+        const char *txt;
+        const struct f_overload *fo = ff_ovld_from_indx(sv_index);
+        int baseindx = fo ? fo->conds[0].ff : sv_index;
+
+        if (sv_index != baseindx) {
+            /* this code isn't actually executed; only the base condition
+               is in one of the fancy status columns and only the fields
+               in those columns are passed to this routine; the real
+               initialization--this same assignment--for overloaded
+               conditions takes place at the end of create_fancy_status() */
+            sv->w = shown_stats[baseindx].w;
+            break;
+        }
+        txt = width_string(sv_index); /* for conditions, it's just sv->name */
+        if (fo) {
+            int i, ff, altln, ln = (int) strlen(txt);
+
+            /* make the initial value have the width of the longest of
+               these overloaded conditions; used for widget sizing, not for
+               display, and ultimately only matters if one of the overloads
+               happens to be the longest string in its whole column */
+            for (i = 1; i < NUM_OVLD && (ff = fo->conds[i].ff) > 0; ++i)
+                if ((altln = (int) strlen(width_string(ff))) > ln)
+                    ln = altln;
+            Sprintf(buf, "%*s", ln, txt);
+            txt = buf;
+        }
         num_args = 0;
-        XtSetArg(args[0], XtNlabel, width_string(sv_index)); num_args++;
+        XtSetArg(args[0], XtNlabel, txt); num_args++;
         XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
         XtSetArg(args[num_args], XtNinternalHeight, 0); num_args++;
         sv->w = XtCreateManagedWidget(sv->name, labelWidgetClass, parent,
                                       args, num_args);
         break;
+    }
     default:
         panic("create_widget: unknown type %d", sv->type);
     }
@@ -2187,7 +2341,8 @@ Widget parent, top;
     Arg args[8];
     Cardinal num_args;
     char buf[32];
-    int i;
+    const struct f_overload *fo;
+    int i, ff;
 
     num_args = 0;
     if (top != (Widget) 0) {
@@ -2209,9 +2364,19 @@ Widget parent, top;
         w = init_column(buf, form, (Widget) 0, w, status_indices[i], 0);
     }
     fixup_cond_widths(); /* make all 3 status_conditionN columns same width */
-    w = init_column("status_leftover", form, (Widget) 0, w,
-                    leftover_indices, 0);
-    nhUse(w);
+    /* extra dummy 'column' to allocate any remaining space below the map */
+    (void) init_column("status_leftover", form, (Widget) 0, w,
+                       leftover_indices, 0);
+
+    /* handle overloading; extra conditions don't start out in any column
+       so need to be initialized separately; the only initialization they
+       need is to share the widget of the base condition which is present
+       in one of the columns [could be deferred until first use] */
+    for (fo = cond_ovl; fo < cond_ovl + SIZE(cond_ovl); ++fo)
+        for (i = 1; i < NUM_OVLD && (ff = fo->conds[i].ff) > 0; ++i)
+            if (!shown_stats[ff].w)
+                shown_stats[ff].w = shown_stats[fo->conds[0].ff].w;
+
     return form;
 }
 
