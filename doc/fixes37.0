@@ -84,6 +84,9 @@ when Punished and carrying the iron ball and levitating, hurtling in the
 	opposite direction of a thrown object didn't bring along the chain
 recognize "kirin" as alias for "ki-rin" when asked to create a monster
 make unique swallowing monsters (Juiblex) resist magical digging from inside
+correctly account for fuel remaining when lit candles are attached
+	to candelabrum (the previous code would make the game unwinnable if
+	there were 15 or fewer turns remaining)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
