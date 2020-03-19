@@ -88,6 +88,7 @@ static void FDECL(sel_set_wallify, (int, int, genericptr_t));
 #endif
 static void NDECL(spo_end_moninvent);
 static void NDECL(spo_pop_container);
+static int FDECL(l_create_stairway, (lua_State *, BOOLEAN_P));
 static void FDECL(spo_endroom, (struct sp_coder *));
 static void FDECL(l_table_getset_feature_flag, (lua_State *, int, int, const char *, int));
 static void FDECL(sel_set_ter, (int, int, genericptr_t));
@@ -3738,23 +3739,16 @@ struct sp_coder *coder UNUSED;
     update_croom();
 }
 
-/* stair("up"); */
-/* stair({ dir = "down" }); */
-/* stair({ dir = "down", x = 4, y = 7 }); */
-/* stair({ dir = "down", coord = {x,y} }); */
-/* stair("down", 4, 7); */
-/* TODO: stair(selection, "down"); */
-/* TODO: stair("up", {x,y}); */
-int
-lspo_stair(L)
+static int
+l_create_stairway(L, ladder)
 lua_State *L;
+boolean ladder;
 {
+    static const char *const stairdirs[] = { "down", "up", NULL };
+    static const int stairdirs2i[] = { 0, 1 };
     int argc = lua_gettop(L);
     xchar x = -1, y = -1;
     struct trap *badtrap;
-
-    static const char *const stairdirs[] = { "down", "up", NULL };
-    static const int stairdirs2i[] = { 0, 1 };
 
     long scoord;
     int ax = -1, ay = -1;
@@ -3771,9 +3765,7 @@ lua_State *L;
         ay = luaL_checkinteger(L, 3);
     } else {
         lcheck_param_table(L);
-
         get_table_xy_or_coord(L, &ax, &ay);
-
         up = stairdirs2i[get_table_option(L, "dir", "down", stairdirs)];
     }
 
@@ -3788,10 +3780,37 @@ lua_State *L;
     get_location_coord(&x, &y, DRY, g.coder->croom, scoord);
     if ((badtrap = t_at(x, y)) != 0)
         deltrap(badtrap);
-    mkstairs(x, y, (char) up, g.coder->croom);
     SpLev_Map[x][y] = 1;
 
+    if (ladder) {
+        levl[x][y].typ = LADDER;
+        if (up) {
+            xupladder = x;
+            yupladder = y;
+            levl[x][y].ladder = LA_UP;
+        } else {
+            xdnladder = x;
+            ydnladder = y;
+            levl[x][y].ladder = LA_DOWN;
+        }
+    } else {
+        mkstairs(x, y, (char) up, g.coder->croom);
+    }
     return 0;
+}
+
+/* stair("up"); */
+/* stair({ dir = "down" }); */
+/* stair({ dir = "down", x = 4, y = 7 }); */
+/* stair({ dir = "down", coord = {x,y} }); */
+/* stair("down", 4, 7); */
+/* TODO: stair(selection, "down"); */
+/* TODO: stair("up", {x,y}); */
+int
+lspo_stair(L)
+lua_State *L;
+{
+    return l_create_stairway(L, FALSE);
 }
 
 /* ladder("down"); */
@@ -3801,58 +3820,7 @@ int
 lspo_ladder(L)
 lua_State *L;
 {
-    static const char *const stairdirs[] = { "down", "up", NULL };
-    static const int stairdirs2i[] = { 0, 1 };
-    int argc = lua_gettop(L);
-    xchar x = -1, y = -1;
-    struct trap *badtrap;
-
-    long scoord;
-    int ax = -1, ay = -1;
-    int up;
-    int ltype = lua_type(L, 1);
-
-    create_des_coder();
-
-    if (argc == 1 && ltype == LUA_TSTRING) {
-        up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
-    } else if (argc == 3 && ltype == LUA_TSTRING) {
-        up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
-        ax = luaL_checkinteger(L, 2);
-        ay = luaL_checkinteger(L, 3);
-    } else {
-        lcheck_param_table(L);
-
-        get_table_xy_or_coord(L, &ax, &ay);
-
-        up = stairdirs2i[get_table_option(L, "dir", "down", stairdirs)];
-    }
-
-    x = ax;
-    y = ay;
-
-    if (x == -1 && y == -1)
-        scoord = SP_COORD_PACK_RANDOM(0);
-    else
-        scoord = SP_COORD_PACK(ax, ay);
-
-    get_location_coord(&x, &y, DRY, g.coder->croom, scoord);
-
-    if ((badtrap = t_at(x, y)) != 0)
-        deltrap(badtrap);
-    levl[x][y].typ = LADDER;
-    SpLev_Map[x][y] = 1;
-    if (up) {
-        xupladder = x;
-        yupladder = y;
-        levl[x][y].ladder = LA_UP;
-    } else {
-        xdnladder = x;
-        ydnladder = y;
-        levl[x][y].ladder = LA_DOWN;
-    }
-
-    return 0;
+    return l_create_stairway(L, TRUE);
 }
 
 /* grave(); */
