@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1582592810 2020/02/25 01:06:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1584655714 2020/03/19 22:08:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3740,9 +3740,9 @@ struct sp_coder *coder UNUSED;
 }
 
 static int
-l_create_stairway(L, ladder)
+l_create_stairway(L, using_ladder)
 lua_State *L;
-boolean ladder;
+boolean using_ladder;
 {
     static const char *const stairdirs[] = { "down", "up", NULL };
     static const int stairdirs2i[] = { 0, 1 };
@@ -3782,7 +3782,7 @@ boolean ladder;
         deltrap(badtrap);
     SpLev_Map[x][y] = 1;
 
-    if (ladder) {
+    if (using_ladder) {
         levl[x][y].typ = LADDER;
         if (up) {
             xupladder = x;
