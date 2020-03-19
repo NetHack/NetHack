@@ -48,7 +48,7 @@ Functions and Control Statements
 
 For a function definition, the return type, declarator, and opening brace
 should each appear on a line of their own. Arguments are never declared in the
-function declarator, but are declared, unintended, K&R-style before the
+function declarator, but are declared, unindented, K&R-style before the
 opening brace:
 
     void
