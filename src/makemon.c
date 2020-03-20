@@ -941,7 +941,9 @@ propagate(int mndx, boolean tally, boolean ghostly)
     result = ((int) gm.mvitals[mndx].born < lim && !gone) ? TRUE : FALSE;
 
     /* if it's unique, don't ever make it again */
-    if ((mons[mndx].geno & G_UNIQ) != 0 && mndx != PM_HIGH_CLERIC)
+    if ((mons[mndx].geno & G_UNIQ) != 0
+        && mndx != PM_HIGH_CLERIC
+        && mndx != PM_JUIBLEX)
         gm.mvitals[mndx].mvflags |= G_EXTINCT;
 
     if (gm.mvitals[mndx].born < 255 && tally && (!ghostly || result))

@@ -19,6 +19,7 @@ static void mon_leaving_level(struct monst *);
 static void m_detach(struct monst *, struct permonst *);
 static void set_mon_min_mhpmax(struct monst *, int);
 static void lifesaved_monster(struct monst *);
+static void juiblex_transferral(void);
 static boolean ok_to_obliterate(struct monst *);
 static void m_restartcham(struct monst *);
 static boolean restrap(struct monst *);
@@ -2544,6 +2545,20 @@ lifesaved_monster(struct monst* mtmp)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
+/* transfer the juiblex "mind" to a clone */
+static void
+juiblex_transferral(void)
+{
+    struct monst *mtmp;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        if (!DEADMONSTER(mtmp)
+            && mtmp->data == &mons[PM_JUIBLEX] && mtmp->mcloned) {
+            mtmp->mcloned = 0;
+            return;
+        }
+}
+
 void
 mondead(struct monst *mtmp)
 {
@@ -2641,6 +2656,9 @@ mondead(struct monst *mtmp)
         set_mon_data(mtmp, &mons[PM_HUMAN_WEREWOLF]);
     else if (mtmp->data == &mons[PM_WERERAT])
         set_mon_data(mtmp, &mons[PM_HUMAN_WERERAT]);
+
+    if (mtmp->data == &mons[PM_JUIBLEX] && !mtmp->mcloned)
+        juiblex_transferral();
 
     /*
      * gm.mvitals[].died does double duty as total number of dead monsters

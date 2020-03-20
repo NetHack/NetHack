@@ -255,6 +255,10 @@ strategy(struct monst *mtmp)
 {
     unsigned long strat, dstrat;
 
+    /* Only one Juiblex has a mind */
+    if (mtmp->data == &mons[PM_JUIBLEX] && mtmp->mcloned)
+        return STRAT_NONE;
+
     if (!is_covetous(mtmp->data)
         /* perhaps a shopkeeper has been polymorphed into a master
            lich; we don't want it teleporting to the stairs to heal

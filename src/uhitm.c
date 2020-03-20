@@ -1394,7 +1394,9 @@ hmon_hitmon_pet(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj UNU
 static void
 hmon_hitmon_splitmon(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
 {
-    if ((hmd->mdat == &mons[PM_BLACK_PUDDING] || hmd->mdat == &mons[PM_BROWN_PUDDING])
+    if ((hmd->mdat == &mons[PM_BLACK_PUDDING]
+         || hmd->mdat == &mons[PM_BROWN_PUDDING]
+         || (hmd->mdat == &mons[PM_JUIBLEX] && !mon->mcloned))
         /* pudding is alive and healthy enough to split */
         && mon->mhp > 1 && !mon->mcan
         /* iron weapon using melee or polearm hit [3.6.1: metal weapon too;
@@ -1410,12 +1412,15 @@ hmon_hitmon_splitmon(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
         char withwhat[BUFSZ];
 
         if ((mclone = clone_mon(mon, 0, 0)) != 0) {
-            withwhat[0] = '\0';
-            if (u.twoweap && Verbose(4, hmon_hitmon1))
-                Sprintf(withwhat, " with %s", yname(obj));
-            pline("%s divides as you hit it%s!", Monnam(mon), withwhat);
-            hmd->hittxt = TRUE;
-            (void) mintrap(mclone, NO_TRAP_FLAGS);
+            if (canspotmon(mclone) && !u.uswallow) {
+                withwhat[0] = '\0';
+                if (u.twoweap && Verbose(4, hmon_hitmon1))
+                    Sprintf(withwhat, " with %s", yname(obj));
+                pline("%s divides as you hit it%s!", Monnam(mon),
+                        withwhat);
+                hmd->hittxt = TRUE;
+                (void) mintrap(mclone, NO_TRAP_FLAGS);
+            }
         }
     }
 }
@@ -3226,7 +3231,7 @@ mhitm_ad_slim(struct monst *magr, struct attack *mattk, struct monst *mdef,
 
                 if (gv.vis && canseemon(mdef))
                     ncflags |= NC_SHOW_MSG;
-                if (newcham(mdef, &mons[PM_GREEN_SLIME], ncflags)) 
+                if (newcham(mdef, &mons[PM_GREEN_SLIME], ncflags))
                     pd = mdef->data;
                 mdef->mstrategy &= ~STRAT_WAITFORU;
                 mhm->hitflags = MM_HIT;

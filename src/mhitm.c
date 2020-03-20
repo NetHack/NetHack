@@ -426,7 +426,8 @@ mattackm(register struct monst *magr, register struct monst *mdef)
             if (strike) {
                 res[i] = hitmm(magr, mdef, mattk, mwep, dieroll);
                 if ((mdef->data == &mons[PM_BLACK_PUDDING]
-                     || mdef->data == &mons[PM_BROWN_PUDDING])
+                     || mdef->data == &mons[PM_BROWN_PUDDING]
+                     || (mdef->data == &mons[PM_JUIBLEX] && !mdef->mcloned))
                     && (mwep && (objects[mwep->otyp].oc_material == IRON
                                  || objects[mwep->otyp].oc_material == METAL))
                     && mdef->mhp > 1 && !mdef->mcan) {
