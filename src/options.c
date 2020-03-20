@@ -739,7 +739,10 @@ char *op UNUSED;
             clash = opts[0] ? 1 : 0;
         else if (opts[0] >= '1' && opts[0] < WARNCOUNT + '0')
             clash = 2;
-        if (clash) {
+        if (opts[0] < ' ') {
+            config_error_add("boulder symbol cannot be a control character");
+            return optn_ok;
+        } else if (clash) {
             /* symbol chosen matches a used monster or warning
                symbol which is not good - reject it */
             config_error_add("Badoption - boulder symbol '%s' would conflict "
