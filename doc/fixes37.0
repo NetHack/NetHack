@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ $NHDT-Date: 1584482684 2020/03/17 22:04:44 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ $NHDT-Date: 1584756090 2020/03/21 02:01:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -87,6 +87,8 @@ make unique swallowing monsters (Juiblex) resist magical digging from inside
 correctly account for fuel remaining when lit candles are attached
 	to candelabrum (the previous code would make the game unwinnable if
 	there were 15 or fewer turns remaining)
+praying on an unaligned altar outside of Gehennom behaved like an ordinary
+	prayer; make that always fail
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
