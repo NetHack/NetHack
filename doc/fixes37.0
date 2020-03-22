@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ $NHDT-Date: 1584756090 2020/03/21 02:01:30 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ $NHDT-Date: 1584869896 2020/03/22 09:38:16 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -89,6 +89,7 @@ correctly account for fuel remaining when lit candles are attached
 	there were 15 or fewer turns remaining)
 praying on an unaligned altar outside of Gehennom behaved like an ordinary
 	prayer; make that always fail
+Discworld typo: Moving Pictures passage 12 "or" -> "of"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
