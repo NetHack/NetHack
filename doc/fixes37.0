@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ $NHDT-Date: 1584869896 2020/03/22 09:38:16 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ $NHDT-Date: 1584872363 2020/03/22 10:19:23 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -90,6 +90,7 @@ correctly account for fuel remaining when lit candles are attached
 praying on an unaligned altar outside of Gehennom behaved like an ordinary
 	prayer; make that always fail
 Discworld typo: Moving Pictures passage 12 "or" -> "of"
+unicorn corpses and wraith corpses could be sacrificed even if "too old"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
