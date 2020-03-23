@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ $NHDT-Date: 1583926845 2020/03/11 11:40:45 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ $NHDT-Date: 1584872363 2020/03/22 10:19:23 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -79,6 +79,18 @@ fix priest created inside temple wall
 fix vault guard occasionally encasing monsters in stone
 tone down scare monster by excluding humans and uniques
 lock the castle chest
+revamp amnesia to forget skills instead of objects or maps
+when Punished and carrying the iron ball and levitating, hurtling in the
+	opposite direction of a thrown object didn't bring along the chain
+recognize "kirin" as alias for "ki-rin" when asked to create a monster
+make unique swallowing monsters (Juiblex) resist magical digging from inside
+correctly account for fuel remaining when lit candles are attached
+	to candelabrum (the previous code would make the game unwinnable if
+	there were 15 or fewer turns remaining)
+praying on an unaligned altar outside of Gehennom behaved like an ordinary
+	prayer; make that always fail
+Discworld typo: Moving Pictures passage 12 "or" -> "of"
+unicorn corpses and wraith corpses could be sacrificed even if "too old"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -129,6 +141,8 @@ tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
 windows: update for new status condition fields
 X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
+X11: extend fancy status one-turn inverse video status-change highlighting to
+	hunger, encumbrance, and conditions
 
 
 General New Features

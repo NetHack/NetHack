@@ -350,7 +350,7 @@ unsigned corpseflags;
         num = undead_to_corpse(mndx);
         corpstatflags |= CORPSTAT_INIT;
         obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
-        obj->age -= 100; /* this is an *OLD* corpse */
+        obj->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
         break;
     case PM_KOBOLD_MUMMY:
     case PM_DWARF_MUMMY:
@@ -371,7 +371,7 @@ unsigned corpseflags;
         num = undead_to_corpse(mndx);
         corpstatflags |= CORPSTAT_INIT;
         obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
-        obj->age -= 100; /* this is an *OLD* corpse */
+        obj->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
         break;
     case PM_IRON_GOLEM:
         num = d(2, 6);
@@ -4168,6 +4168,22 @@ pacify_guards()
         if (is_watch(mtmp->data))
             mtmp->mpeaceful = 1;
     }
+}
+
+struct monst *
+find_ghost_with_name(str)
+char *str;
+{
+    struct monst *mtmp;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp)
+            || mtmp->data != &mons[PM_GHOST] || !has_mname(mtmp))
+            continue;
+        if (!strcmpi(MNAME(mtmp), str))
+            return mtmp;
+    }
+    return (struct monst *) 0;
 }
 
 void

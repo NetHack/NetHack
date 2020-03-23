@@ -329,9 +329,15 @@ function test_region()
 end
 
 function test_door()
+   des.terrain(12, 12, "-");
    des.door("nodoor", 12,12);
+
+   des.terrain(13, 12, "-");
    des.door({ x = 13, y = 12, state = "open" });
+
+   des.terrain(14, 12, "-");
    des.door({ coord = {14, 12}, state = "open" });
+
    des.room({ type = "ordinary", contents = function()
                  des.door({ wall = "north", pos = 1 });
                  des.door({ wall = "random", state = "locked" });
@@ -446,16 +452,8 @@ end
 function test_corridor()
    des.reset_level();
    des.level_init({ style = "solidfill", fg=" " });
-   des.room({ x=2, y=2, xalign="center", yalign="center", w=4, h=4,
-              contents = function()
-                 des.door({ wall = "south", pos = 2 });
-                         end
-   });
-   des.room({ x=1, y=3, xalign="center", yalign="center", w=6, h=6,
-              contents = function()
-                 des.door({ wall = "north", pos = 1 });
-                         end
-   });
+   des.room({ x=2, y=2, xalign="center", yalign="center", w=4, h=4 });
+   des.room({ x=1, y=3, xalign="center", yalign="center", w=6, h=6 });
    des.corridor({ srcroom=0, srcwall="south", srcdoor=0, destroom=1, destwall="north", destdoor=0 });
 end
 

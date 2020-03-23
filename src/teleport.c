@@ -719,11 +719,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
 
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(g.youmonst.data))) {
-            /* Try to use teleport away spell.
-               Prior to 3.6.2 this used to require that you know the spellbook
-               (probably just intended as an optimization to skip the
-               lookup loop) but it is possible to know and cast a spell
-               after forgetting its book due to amnesia. */
+            /* Try to use teleport away spell. */
             for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
                 if (g.spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY)
                     break;

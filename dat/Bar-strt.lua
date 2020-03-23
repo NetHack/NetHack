@@ -90,14 +90,8 @@ des.monster("giant eel", 36, 01)
 des.monster("giant eel", 37, 09)
 des.monster("giant eel", 39, 15)
 -- Monsters on siege duty.
-des.monster({ id = "ogre", x=40, y=08, peaceful=0 })
-des.monster({ id = "ogre", x=41, y=06, peaceful=0 })
-des.monster({ id = "ogre", x=41, y=07, peaceful=0 })
-des.monster({ id = "ogre", x=41, y=08, peaceful=0 })
-des.monster({ id = "ogre", x=41, y=09, peaceful=0 })
-des.monster({ id = "ogre", x=41, y=10, peaceful=0 })
-des.monster({ id = "ogre", x=42, y=06, peaceful=0 })
-des.monster({ id = "ogre", x=42, y=07, peaceful=0 })
-des.monster({ id = "ogre", x=42, y=08, peaceful=0 })
-des.monster({ id = "ogre", x=42, y=09, peaceful=0 })
-des.monster({ id = "ogre", x=42, y=10, peaceful=0 })
+local ogrelocs = selection.floodfill(37,7) & selection.area(40,03, 45,20)
+for i = 0, 11 do
+   local x,y = ogrelocs:rndcoord(1);
+   des.monster({ id = "ogre", coord={x,y}, peaceful=0 })
+end

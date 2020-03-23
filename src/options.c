@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1583282760 2020/03/04 00:46:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.457 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1584350350 2020/03/16 09:19:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.459 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -739,7 +739,10 @@ char *op UNUSED;
             clash = opts[0] ? 1 : 0;
         else if (opts[0] >= '1' && opts[0] < WARNCOUNT + '0')
             clash = 2;
-        if (clash) {
+        if (opts[0] < ' ') {
+            config_error_add("boulder symbol cannot be a control character");
+            return optn_ok;
+        } else if (clash) {
             /* symbol chosen matches a used monster or warning
                symbol which is not good - reject it */
             config_error_add("Badoption - boulder symbol '%s' would conflict "
@@ -7568,6 +7571,8 @@ doset() /* changing options via menu by Per Liboriussen */
         check_gold_symbol();
         reglyph_darkroom();
         (void) doredraw();
+    } else if (g.context.botl || g.context.botlx) {
+        bot();
     }
     return 0;
 }

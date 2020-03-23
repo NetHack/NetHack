@@ -42,6 +42,8 @@ des.region({ region={24,06, 33,13}, lit=1, type="temple" })
 des.replace_terrain({ region={00,00, 10,19}, fromterrain=".", toterrain="T", chance=10 })
 des.replace_terrain({ region={65,00, 75,19}, fromterrain=".", toterrain="T", chance=10 })
 
+local spacelocs = selection.floodfill(05,04);
+
 -- Portal arrival point
 des.terrain({05,04}, ".")
 des.levregion({ region = {05,04,05,04}, type="branch" })
@@ -83,22 +85,20 @@ des.monster("abbot", 33, 12)
 -- Non diggable walls
 des.non_diggable(selection.area(18,03,55,16))
 -- Random traps
-des.trap("dart",20,09)
-des.trap("dart",20,10)
+for i = 1, 2 do
+   local x,y = spacelocs:rndcoord(1);
+   des.trap("dart",x,y)
+end
 des.trap()
 des.trap()
 des.trap()
 des.trap()
 -- Monsters on siege duty.
-des.monster("earth elemental", 37, 01)
-des.monster("earth elemental", 37, 18)
-des.monster("earth elemental", 03, 03)
-des.monster("earth elemental", 65, 04)
-des.monster("earth elemental", 12, 11)
-des.monster("earth elemental", 60, 12)
-des.monster("earth elemental", 14, 08)
-des.monster("earth elemental", 55, 00)
-des.monster("xorn", 18, 18)
-des.monster("xorn", 59, 10)
-des.monster("xorn", 13, 09)
-des.monster("xorn", 01, 17)
+for i = 1, 8 do
+   local x,y = spacelocs:rndcoord(1);
+   des.monster("earth elemental", x, y)
+end
+for i = 1, 4 do
+   local x,y = spacelocs:rndcoord(1);
+   des.monster("xorn", x, y)
+end
