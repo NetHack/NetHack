@@ -158,6 +158,23 @@ Example:
  nh.pline("Message text to show.");
 
 
+=== random
+
+Generate a random number.
+
+Example:
+
+ nh.random(10);  -- returns a number between 0 and 9, inclusive.
+ nh.random(1,5); -- same as 1 + nh.random(5);
+
+=== rn2
+
+Generate a random number.
+
+Example:
+
+ nh.rn2(10); -- returns a number between 0 and 9, inclusive.
+
 === s_suffix
 
 Return a string converted to possessive.
