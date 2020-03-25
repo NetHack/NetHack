@@ -1440,6 +1440,7 @@ int x, y;
 #ifdef CLIPPING
     cliparound(u.ux, u.uy);
 #endif
+    u.uundetected = 0;
     /* ridden steed always shares hero's location */
     if (u.usteed)
         u.usteed->mx = u.ux, u.usteed->my = u.uy;
