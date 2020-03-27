@@ -826,6 +826,8 @@ boolean pre, wiztower;
         /* escape from trap */
         reset_utrap(FALSE);
         check_special_room(TRUE); /* room exit */
+        (void) memset((genericptr_t)&g.dndest, 0, sizeof (dest_area));
+        (void) memset((genericptr_t)&g.updest, 0, sizeof (dest_area));
         u.ustuck = (struct monst *) 0;
         u.uswallow = u.uswldtim = 0;
         u.uinwater = 0;
