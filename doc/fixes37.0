@@ -94,6 +94,7 @@ unicorn corpses and wraith corpses could be sacrificed even if "too old"
 hero polymorphed into a hider and hiding was not unhidden when teleporting
 impose tighter restraints on 'summon nasties', both for spellcasting monsters
 	and post-Wizard harassment
+prevent swallowing monster ending up in a solid wall if it killed vault guard
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
