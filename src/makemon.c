@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1574722863 2019/11/25 23:01:03 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.142 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1585361050 2020/03/28 02:04:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -923,20 +923,20 @@ int mndx;
 boolean tally;
 boolean ghostly;
 {
-    boolean result;
-    uchar lim = mbirth_limit(mndx);
-    boolean gone = (g.mvitals[mndx].mvflags & G_GONE) != 0; /* geno'd|extinct */
+    boolean gone, result;
+    int lim = mbirth_limit(mndx);
 
-    result = (((int) g.mvitals[mndx].born < lim) && !gone) ? TRUE : FALSE;
+    gone = (g.mvitals[mndx].mvflags & G_GONE) != 0; /* geno'd|extinct */
+    result = ((int) g.mvitals[mndx].born < lim && !gone) ? TRUE : FALSE;
 
     /* if it's unique, don't ever make it again */
-    if ((mons[mndx].geno & G_UNIQ) && mndx != PM_HIGH_PRIEST)
+    if ((mons[mndx].geno & G_UNIQ) != 0 && mndx != PM_HIGH_PRIEST)
         g.mvitals[mndx].mvflags |= G_EXTINCT;
 
-    if (g.mvitals[mndx].born < 255 && tally
-        && (!ghostly || (ghostly && result)))
+    if (g.mvitals[mndx].born < 255 && tally && (!ghostly || result))
         g.mvitals[mndx].born++;
-    if ((int) g.mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN)
+    if ((int) g.mvitals[mndx].born >= lim
+        && !(mons[mndx].geno & G_NOGEN)
         && !(g.mvitals[mndx].mvflags & G_EXTINCT)) {
         if (wizard) {
             debugpline1("Automatically extinguished %s.",
@@ -1391,7 +1391,7 @@ int mmflags;
     } else {
         /* no initial inventory is allowed */
         if (mtmp->minvent)
-            discard_minvent(mtmp);
+            discard_minvent(mtmp, TRUE);
         mtmp->minvent = (struct obj *) 0; /* caller expects this */
     }
     if (ptr->mflags3 && !(mmflags & MM_NOWAIT)) {
@@ -1410,6 +1410,34 @@ int mmflags;
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
 
     return mtmp;
+}
+
+/* caller rejects makemon()'s result; always returns Null */
+struct monst *
+unmakemon(mon, mmflags)
+struct monst *mon;
+int mmflags;
+{
+    boolean countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0);
+    int mndx = monsndx(mon->data);
+
+    /* if count has reached the limit of 255, we don't know whether
+       that just happened when creating this monster or the threshold
+       had already been reached and further incrments were suppressed;
+       assume the latter */
+    if (countbirth && g.mvitals[mndx].born > 0 && g.mvitals[mndx].born < 255)
+        g.mvitals[mndx].born -= 1;
+    if ((mon->data->geno & G_UNIQ) != 0)
+        g.mvitals[mndx].mvflags &= ~G_EXTINCT;
+
+    mon->mhp = 0; /* let discard_minvent() know that mon isn't being kept */
+    /* uncreate any artifact that the monster was provided with; unlike
+       mongone(), this doesn't protect special items like the Amulet
+       by dropping them so caller should handle them when applicable */
+    discard_minvent(mon, TRUE);
+
+    mongone(mon);
+    return (struct monst *) 0;
 }
 
 int
