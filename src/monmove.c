@@ -1483,7 +1483,8 @@ register int after;
             }
 
             /* possibly dig */
-            if (can_tunnel && mdig_tunnel(mtmp))
+            if (can_tunnel && may_dig(mtmp->mx, mtmp->my)
+                && mdig_tunnel(mtmp))
                 return 2; /* mon died (position already updated) */
 
             /* set also in domove(), hack.c */
