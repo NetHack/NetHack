@@ -121,9 +121,9 @@ lua_State *L;
 {
     struct selectionvar *sel = l_selection_check(L, 1);
     struct selectionvar *tmp;
-    lua_pop(L, 1);
+
     (void) l_selection_new(L);
-    tmp = l_selection_check(L, 1);
+    tmp = l_selection_check(L, 2);
     if (tmp->map)
         free(tmp->map);
     tmp->map = dupstr(sel->map);
@@ -222,10 +222,9 @@ lua_State *L;
     } else {
         sel = l_selection_check(L, 1);
         (void) l_selection_clone(L);
-        sel2 = l_selection_check(L, 1);
+        sel2 = l_selection_check(L, 2);
         selection_not(sel2);
     }
-    lua_settop(L, 1);
     return 1;
 }
 
@@ -305,7 +304,7 @@ lua_State *L;
     p = (int) luaL_checkinteger(L, 2);
     lua_pop(L, 1);
     (void) l_selection_clone(L);
-    ret = l_selection_check(L, 1);
+    ret = l_selection_check(L, 2);
     selection_filter_percent(ret, p);
 
     return 1;
@@ -380,7 +379,7 @@ static int
 l_selection_line(L)
 lua_State *L;
 {
-    struct selectionvar *sel;
+    struct selectionvar *sel = NULL;
     schar x1;
     schar y1;
     schar x2;
@@ -393,9 +392,8 @@ lua_State *L;
     get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
     get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2,y2));
 
-    lua_settop(L, 1);
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     selection_do_line(x1,y1,x2,y2, sel);
     return 1;
 }
@@ -405,7 +403,7 @@ static int
 l_selection_rect(L)
 lua_State *L;
 {
-    struct selectionvar *sel;
+    struct selectionvar *sel = NULL;
     schar x1;
     schar y1;
     schar x2;
@@ -420,9 +418,8 @@ lua_State *L;
     get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
                        SP_COORD_PACK(x2, y2));
 
-    lua_settop(L, 1);
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     selection_do_line(x1, y1, x2, y1, sel);
     selection_do_line(x1, y1, x1, y2, sel);
     selection_do_line(x2, y1, x2, y2, sel);
@@ -438,7 +435,7 @@ static int
 l_selection_fillrect(L)
 lua_State *L;
 {
-    struct selectionvar *sel;
+    struct selectionvar *sel = NULL;
     int y;
     schar x1;
     schar y1;
@@ -454,9 +451,8 @@ lua_State *L;
     get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
                        SP_COORD_PACK(x2, y2));
 
-    lua_settop(L, 1);
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     if (x1 == x2) {
         for (y = y1; y <= y2; y++)
             selection_setpoint(x1, y, sel, 1);
@@ -505,7 +501,7 @@ lua_State *L;
                        g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2, y2));
 
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     selection_do_randline(x1, y1, x2, y2, roughness, 12, sel);
     return 1;
 }
@@ -527,9 +523,8 @@ lua_State *L;
         lua_pop(L, 1); /* get rid of growdir */
 
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     selection_do_grow(sel, dir);
-    lua_settop(L, 1);
     return 1;
 }
 
@@ -752,11 +747,10 @@ lua_State *L;
 
     if (argc == 2 && lua_type(L, 2) == LUA_TFUNCTION) {
         sel = l_selection_check(L, 1);
-        lua_remove(L, 1);
         for (y = 0; y < sel->hei; y++)
             for (x = 0; x < sel->wid; x++)
                 if (selection_getpoint(x, y, sel)) {
-                    lua_pushvalue(L, 1);
+                    lua_pushvalue(L, 2);
                     lua_pushinteger(L, x - g.xstart);
                     lua_pushinteger(L, y - g.ystart);
                     lua_call(L, 2, 0);
