@@ -30,6 +30,8 @@ static int FDECL(nhl_makesingular, (lua_State *));
 static int FDECL(nhl_s_suffix, (lua_State *));
 static int FDECL(nhl_ing_suffix, (lua_State *));
 static int FDECL(nhl_an, (lua_State *));
+static int FDECL(nhl_rn2, (lua_State *));
+static int FDECL(nhl_random, (lua_State *));
 static int FDECL(nhl_meta_u_index, (lua_State *));
 static int FDECL(nhl_meta_u_newindex, (lua_State *));
 static int FDECL(nhl_u_clear_inventory, (lua_State *));
@@ -615,6 +617,39 @@ lua_State *L;
     return 1;
 }
 
+/* rn2(10) */
+static int
+nhl_rn2(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1)
+        lua_pushinteger(L, rn2(luaL_checkinteger(L, 1)));
+    else
+        nhl_error(L, "Wrong args");
+
+    return 1;
+}
+
+/* random(10);  -- is the same as rn2(10); */
+/* random(5,8); -- same as 5 + rn2(8); */
+static int
+nhl_random(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1)
+        lua_pushinteger(L, rn2(luaL_checkinteger(L, 1)));
+    else if (argc == 2)
+        lua_pushinteger(L, luaL_checkinteger(L, 1) + rn2(luaL_checkinteger(L, 2)));
+    else
+        nhl_error(L, "Wrong args");
+
+    return 1;
+}
+
 /* get mandatory integer value from table */
 int
 get_table_int(L, name)
@@ -787,6 +822,8 @@ static const struct luaL_Reg nhl_functions[] = {
     {"s_suffix", nhl_s_suffix},
     {"ing_suffix", nhl_ing_suffix},
     {"an", nhl_an},
+    {"rn2", nhl_rn2},
+    {"random", nhl_random},
     {NULL, NULL}
 };
 

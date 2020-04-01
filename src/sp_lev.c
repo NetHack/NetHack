@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1584655714 2020/03/19 22:08:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1585569501 2020/03/30 11:58:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,6 +30,7 @@ static void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
 static void FDECL(lvlfill_swamp, (SCHAR_P, SCHAR_P, SCHAR_P));
 static void FDECL(flip_drawbridge_horizontal, (struct rm *));
 static void FDECL(flip_drawbridge_vertical, (struct rm *));
+static void FDECL(flip_visuals, (int, int, int, int, int));
 static int FDECL(flip_encoded_direction_bits, (int, int));
 static void FDECL(set_wall_property, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                                           int));
@@ -370,16 +371,17 @@ struct rm *lev;
 }
 
 /* for #wizlevelflip; not needed when flipping during level creation;
-   update seen vector for whole level and glyph for walls */
+   update seen vector for whole flip area and glyph for known walls */
 static void
-flip_visuals(flp)
+flip_visuals(flp, minx, miny, maxx, maxy)
 int flp;
+int minx, miny, maxx, maxy;
 {
     struct rm *lev;
     int x, y, seenv;
 
-    for (y = 0; y < ROWNO; ++y) {
-        for (x = 1; x < COLNO; ++x) {
+    for (y = miny; y <= maxy; ++y) {
+        for (x = minx; x <= maxx; ++x) {
             lev = &levl[x][y];
             seenv = lev->seenv & 0xff;
             /* locations which haven't been seen can be skipped */
@@ -432,6 +434,17 @@ flip_encoded_direction_bits(int flp, int val)
 
 #define FlipX(val) ((maxx - (val)) + minx)
 #define FlipY(val) ((maxy - (val)) + miny)
+#define inFlipArea(x,y) \
+    ((x) >= minx && (x) <= maxx && (y) >= miny && (y) <= maxy)
+#define Flip_coord(cc) \
+    do {                                            \
+        if ((cc).x && inFlipArea((cc).x, (cc).y)) { \
+            if (flp & 1)                            \
+                (cc).y = FlipY((cc).y);             \
+            if (flp & 2)                            \
+                (cc).x = FlipX((cc).x);             \
+        }                                           \
+    } while (0)
 
 /* transpose top with bottom or left with right or both; sometimes called
    for new special levels, or for any level via the #wizlevelflip command */
@@ -449,6 +462,11 @@ boolean extras;
     struct engr *etmp;
     struct mkroom *sroom;
     timer_element *timer;
+    boolean ball_active = FALSE, ball_fliparea = FALSE;
+
+    /* nothing to do unless (flp & 1) or (flp & 2) or both */
+    if ((flp & 3) == 0)
+        return;
 
     get_level_extends(&minx, &miny, &maxx, &maxy);
     /* get_level_extends() returns -1,-1 to COLNO,ROWNO at max */
@@ -460,6 +478,26 @@ boolean extras;
         maxx = (COLNO - 1);
     if (maxy >= ROWNO)
         maxy = (ROWNO - 1);
+
+    if (extras) {
+        if (Punished && uball->where != OBJ_FREE) {
+            ball_active = TRUE;
+            /* if hero and ball and chain are all inside flip area,
+               flip b&c coordinates along with other objects; if they
+               are all outside, leave them to be rejected when flipping
+               so that they stay as is; if some are inside and some are
+               outside, un-place here and subsequently re-place them on
+               hero's [possibly new] spot below */
+            if (carried(uball))
+                uball->ox = u.ux, uball->oy = u.uy;
+            ball_fliparea = ((inFlipArea(uball->ox, uball->oy)
+                              == inFlipArea(uchain->ox, uchain->oy))
+                             && (inFlipArea(uball->ox, uball->oy)
+                                 == inFlipArea(u.ux, u.uy)));
+            if (!ball_fliparea)
+                unplacebc();
+        }
+    }
 
     /* stairs and ladders */
     if (flp & 1) {
@@ -489,8 +527,7 @@ boolean extras;
 
     /* traps */
     for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
-        if (ttmp->tx < minx || ttmp->tx > maxx
-            || ttmp->ty < miny || ttmp->ty > maxy)
+        if (!inFlipArea(ttmp->tx, ttmp->ty))
             continue;
 	if (flp & 1) {
 	    ttmp->ty = FlipY(ttmp->ty);
@@ -516,8 +553,7 @@ boolean extras;
 
     /* objects */
     for (otmp = fobj; otmp; otmp = otmp->nobj) {
-        if (otmp->ox < minx || otmp->ox > maxx
-            || otmp->oy < miny || otmp->oy > maxy)
+        if (!inFlipArea(otmp->ox, otmp->oy))
             continue;
 	if (flp & 1)
 	    otmp->oy = FlipY(otmp->oy);
@@ -527,8 +563,7 @@ boolean extras;
 
     /* buried objects */
     for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
-        if (otmp->ox < minx || otmp->ox > maxx
-            || otmp->oy < miny || otmp->oy > maxy)
+        if (!inFlipArea(otmp->ox, otmp->oy))
             continue;
 	if (flp & 1)
 	    otmp->oy = FlipY(otmp->oy);
@@ -541,31 +576,30 @@ boolean extras;
         if (mtmp->isgd && mtmp->mx == 0)
             continue;
         /* skip the occasional earth elemental outside the flip area */
-        if (mtmp->mx < minx || mtmp->mx > maxx
-            || mtmp->my < miny || mtmp->my > maxy)
+        if (!inFlipArea(mtmp->mx, mtmp->my))
             continue;
-	if (flp & 1) {
+	if (flp & 1)
 	    mtmp->my = FlipY(mtmp->my);
-	    if (mtmp->ispriest)
-		EPRI(mtmp)->shrpos.y = FlipY(EPRI(mtmp)->shrpos.y);
-	    else if (mtmp->isshk) {
-		ESHK(mtmp)->shk.y = FlipY(ESHK(mtmp)->shk.y);
-		ESHK(mtmp)->shd.y = FlipY(ESHK(mtmp)->shd.y);
-	    } else if (mtmp->wormno) {
-		flip_worm_segs_vertical(mtmp, miny, maxy);
-	    }
-	}
-	if (flp & 2) {
+	if (flp & 2)
 	    mtmp->mx = FlipX(mtmp->mx);
-	    if (mtmp->ispriest)
-		EPRI(mtmp)->shrpos.x = FlipX(EPRI(mtmp)->shrpos.x);
-	    else if (mtmp->isshk) {
-		ESHK(mtmp)->shk.x = FlipX(ESHK(mtmp)->shk.x);
-		ESHK(mtmp)->shd.x = FlipX(ESHK(mtmp)->shd.x);
-	    } else if (mtmp->wormno) {
+
+        if (mtmp->ispriest) {
+            Flip_coord(EPRI(mtmp)->shrpos);
+        } else if (mtmp->isshk) {
+            Flip_coord(ESHK(mtmp)->shk); /* shk's preferred spot */
+            Flip_coord(ESHK(mtmp)->shd); /* shop door */
+        } else if (mtmp->wormno) {
+            if (flp & 1)
+                flip_worm_segs_vertical(mtmp, miny, maxy);
+            if (flp & 2)
 		flip_worm_segs_horizontal(mtmp, minx, maxx);
-	    }
 	}
+#if 0   /* not useful unless tracking also gets flipped */
+        if (extras) {
+            if (mtmp->tame && has_edog(mtmp))
+                Flip_coord(EDOG(mtmp)->ogoal);
+        }
+#endif
     }
 
     /* engravings */
@@ -615,8 +649,9 @@ boolean extras;
     }
 
     /* rooms */
-    for(sroom = &g.rooms[0]; ; sroom++) {
-	if (sroom->hx < 0) break;
+    for (sroom = &g.rooms[0]; ; sroom++) {
+	if (sroom->hx < 0)
+            break;
 
 	if (flp & 1) {
 	    sroom->ly = FlipY(sroom->ly);
@@ -664,10 +699,7 @@ boolean extras;
 
     /* doors */
     for (i = 0; i < g.doorindex; i++) {
-	if (flp & 1)
-	    g.doors[i].y = FlipY(g.doors[i].y);
-	if (flp & 2)
-	    g.doors[i].x = FlipX(g.doors[i].x);
+	Flip_coord(g.doors[i]);
     }
 
     /* the map */
@@ -717,36 +749,46 @@ boolean extras;
     /* timed effects */
     for (timer = g.timer_base; timer; timer = timer->next) {
         if (timer->func_index == MELT_ICE_AWAY) {
-            long ty = ((long)timer->arg.a_void) & 0xFFFF;
-            long tx = (((long)timer->arg.a_void) >> 16) & 0xFFFF;
+            long ty = ((long) timer->arg.a_void) & 0xffff;
+            long tx = (((long) timer->arg.a_void) >> 16) & 0xffff;
+
             if (flp & 1)
                 ty = FlipY(ty);
             if (flp & 2)
                 tx = FlipX(tx);
-            timer->arg.a_void = (genericptr_t)((tx << 16) | ty);
+            timer->arg.a_void = (genericptr_t) ((tx << 16) | ty);
         }
     }
 
-    if (extras) {
+    if (extras) { /* for #wizlevelflip rather than during level creation */
         /* flip hero location only if inside the flippable area */
-        if (!(u.ux < minx || u.ux > maxx || u.uy < miny || u.uy > maxy)) {
+        if (inFlipArea(u.ux, u.uy)) {
             if (flp & 1)
-                u.uy = FlipY(u.uy), u.uy0 = FlipY(u.uy0);
+                u.uy = FlipY(u.uy);
             if (flp & 2)
-                u.ux = FlipX(u.ux), u.ux0 = FlipX(u.ux0);
+                u.ux = FlipX(u.ux);
+            /* we could flip <ux0,uy0> too if it's inside the flip area,
+               but have to resort to this if outside, so just do this */
+            u.ux0 = u.ux, u.uy0 = u.uy;
         }
+        if (ball_active && !ball_fliparea)
+            placebc();
+        Flip_coord(iflags.travelcc);
+        Flip_coord(g.context.digging.pos);
     }
 
     fix_wall_spines(1, 0, COLNO - 1, ROWNO - 1);
     if (extras && flp) {
         set_wall_state();
-        flip_visuals(flp); /* after wall_spines; flips seenv and wall joins */
+        /* after wall_spines; flips seenv and wall joins */
+        flip_visuals(flp, minx, miny, maxx, maxy);
     }
     vision_reset();
 }
 
 #undef FlipX
 #undef FlipY
+#undef inFlipArea
 
 /* randomly transpose top with bottom or left with right or both;
    caller controls which transpositions are allowed */
@@ -1785,6 +1827,9 @@ struct mkroom *croom;
     if (MON_AT(x, y) && enexto(&cc, x, y, pm))
         x = cc.x, y = cc.y;
 
+    if (croom && !inside_room(croom, x, y))
+        return;
+
     if (m->align != AM_SPLEV_RANDOM)
         mtmp = mk_roamer(pm, Amask2align(amask), x, y, m->peaceful);
     else if (PM_ARCHEOLOGIST <= m->id && m->id <= PM_WIZARD)
@@ -1972,7 +2017,7 @@ struct mkroom *croom;
         }
 
         if (m->has_invent) {
-            discard_minvent(mtmp);
+            discard_minvent(mtmp, TRUE);
             invent_carrying_monster = mtmp;
         }
     }

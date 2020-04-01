@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ $NHDT-Date: 1584872363 2020/03/22 10:19:23 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $ $NHDT-Date: 1585361048 2020/03/28 02:04:08 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -91,6 +91,12 @@ praying on an unaligned altar outside of Gehennom behaved like an ordinary
 	prayer; make that always fail
 Discworld typo: Moving Pictures passage 12 "or" -> "of"
 unicorn corpses and wraith corpses could be sacrificed even if "too old"
+hero polymorphed into a hider and hiding was not unhidden when teleporting
+impose tighter restraints on 'summon nasties', both for spellcasting monsters
+	and post-Wizard harassment
+prevent swallowing monster ending up in a solid wall if it killed vault guard
+fix attached ball getting deallocated if swallowed, going down into a pit,
+	and saving
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

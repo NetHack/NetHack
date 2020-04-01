@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1584405113 2020/03/17 00:31:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.814 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1585361043 2020/03/28 02:04:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.815 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1218,6 +1218,7 @@ E struct mextra *NDECL(newmextra);
 E void FDECL(copy_mextra, (struct monst *, struct monst *));
 E void FDECL(dealloc_mextra, (struct monst *));
 E struct monst *FDECL(makemon, (struct permonst *, int, int, int));
+E struct monst *FDECL(unmakemon, (struct monst *, int));
 E boolean FDECL(create_critters, (int, struct permonst *, BOOLEAN_P));
 E struct permonst *NDECL(rndmonst);
 E struct permonst *FDECL(mkclass, (CHAR_P, int));
@@ -1406,7 +1407,7 @@ E boolean FDECL(is_flammable, (struct obj *));
 E boolean FDECL(is_rottable, (struct obj *));
 E void FDECL(place_object, (struct obj *, int, int));
 E void FDECL(remove_object, (struct obj *));
-E void FDECL(discard_minvent, (struct monst *));
+E void FDECL(discard_minvent, (struct monst *, BOOLEAN_P));
 E void FDECL(obj_extract_self, (struct obj *));
 E void FDECL(extract_nobj, (struct obj *, struct obj **));
 E void FDECL(extract_nexthere, (struct obj *, struct obj **));
@@ -3037,7 +3038,7 @@ E int FDECL(tactics, (struct monst *));
 E boolean FDECL(has_aggravatables, (struct monst *));
 E void NDECL(aggravate);
 E void NDECL(clonewiz);
-E int NDECL(pick_nasty);
+E int FDECL(pick_nasty, (int));
 E int FDECL(nasty, (struct monst *));
 E void NDECL(resurrect);
 E void NDECL(intervene);

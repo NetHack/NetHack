@@ -652,6 +652,11 @@ inside_room(croom, x, y)
 struct mkroom *croom;
 xchar x, y;
 {
+    if (croom->irregular) {
+        int i = (int) ((croom - g.rooms) + ROOMOFFSET);
+        return (!levl[x][y].edge && (int) levl[x][y].roomno == i);
+    }
+
     return (boolean) (x >= croom->lx - 1 && x <= croom->hx + 1
                       && y >= croom->ly - 1 && y <= croom->hy + 1);
 }

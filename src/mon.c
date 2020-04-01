@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1581886863 2020/02/16 21:01:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.324 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1585361052 2020/03/28 02:04:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.327 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2197,7 +2197,7 @@ struct monst *mdef;
        can't remove them from the game */
     mdrop_special_objs(mdef);
     /* release rest of monster's inventory--it is removed from game */
-    discard_minvent(mdef);
+    discard_minvent(mdef, FALSE);
     m_detach(mdef, mdef->data);
 }
 
@@ -3534,11 +3534,11 @@ struct monst *mon;
     switch (mon->cham) {
     case PM_SANDESTIN:
         if (rn2(7))
-            mndx = pick_nasty();
+            mndx = pick_nasty(mons[PM_ARCHON].difficulty - 1);
         break;
     case PM_DOPPELGANGER:
         if (!rn2(7)) {
-            mndx = pick_nasty();
+            mndx = pick_nasty(mons[PM_JABBERWOCK].difficulty - 1);
         } else if (rn2(3)) { /* role monsters */
             mndx = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
         } else if (!rn2(3)) { /* quest guardians */

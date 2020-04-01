@@ -765,6 +765,8 @@ register struct attack *mattk;
          *  magr from level.monsters[mdef->mx][mdef->my].  We need to
          *  put it back and display it.  -kd
          */
+        if (!goodpos(dx, dy, magr, MM_IGNOREWATER))
+            dx = ax, dy = ay;
         place_monster(magr, dx, dy);
         newsym(dx, dy);
         /* aggressor moves to <dx,dy> and might encounter trouble there */
