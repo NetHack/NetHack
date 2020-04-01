@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $ $NHDT-Date: 1585361048 2020/03/28 02:04:08 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.148 $ $NHDT-Date: 1585776162 2020/04/01 21:22:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -98,6 +98,8 @@ prevent swallowing monster ending up in a solid wall if it killed vault guard
 fix attached ball getting deallocated if swallowed, going down into a pit,
 	and saving
 level compiler creates correct novel with supplied name
+for farlook, describe water in the castle moat and in Juiblex's swamp as moat
+	and as swamp, respectively, rather than just as "water"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
