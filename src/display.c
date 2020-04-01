@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1583195581 2020/03/03 00:33:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1585781359 2020/04/01 22:49:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1501,7 +1501,7 @@ void
 newsym_force(x, y)
 register int x, y;
 {
-    newsym(x,y);
+    newsym(x, y);
     g.gbuf[y][x].gnew = 1;
     if (g.gbuf_start[y] > x)
         g.gbuf_start[y] = x;
@@ -1642,8 +1642,8 @@ int start, stop, y;
 void
 cls()
 {
-    int y;
     static boolean in_cls = 0;
+    int y, x, force_unexplored;
 
     if (in_cls)
         return;
@@ -1653,9 +1653,14 @@ cls()
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
     clear_glyph_buffer(); /* this is sort of an extra effort, but OK */
+    force_unexplored = (g.showsyms[SYM_UNEXPLORED + SYM_OFF_X] != ' ');
     for (y = 0; y < ROWNO; y++) {
-        g.gbuf_start[y] = 0;
+        g.gbuf_start[y] = 1;
         g.gbuf_stop[y] = COLNO - 1;
+        if (force_unexplored) {
+            for (x = 1; x < COLNO; x++)
+                g.gbuf[y][x].gnew = 1;
+        }
     }
     in_cls = FALSE;
 }
