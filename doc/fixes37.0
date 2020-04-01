@@ -95,6 +95,8 @@ hero polymorphed into a hider and hiding was not unhidden when teleporting
 impose tighter restraints on 'summon nasties', both for spellcasting monsters
 	and post-Wizard harassment
 prevent swallowing monster ending up in a solid wall if it killed vault guard
+fix attached ball getting deallocated if swallowed, going down into a pit,
+	and saving
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

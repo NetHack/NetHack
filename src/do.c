@@ -1012,6 +1012,14 @@ dodown()
         return 1; /* came out of hiding; might need '>' again to go down */
     }
 
+    if (u.ustuck) {
+        You("are %s, and cannot go down.",
+            !u.uswallow ? "being held" : is_animal(u.ustuck->data)
+                                             ? "swallowed"
+                                             : "engulfed");
+        return 1;
+    }
+
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
         if (trap && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
@@ -1026,13 +1034,6 @@ dodown()
                 return 0;
             }
         }
-    }
-    if (u.ustuck) {
-        You("are %s, and cannot go down.",
-            !u.uswallow ? "being held" : is_animal(u.ustuck->data)
-                                             ? "swallowed"
-                                             : "engulfed");
-        return 1;
     }
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
         You("are standing at the gate to Gehennom.");
