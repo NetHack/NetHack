@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.148 $ $NHDT-Date: 1585776162 2020/04/01 21:22:42 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.149 $ $NHDT-Date: 1585778315 2020/04/01 21:58:35 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -140,6 +140,8 @@ grammar for messages about a monster removing items from a container was bad
 some new status conditions didn't always update when they should
 fix flipping non-existent stairs and ladders (github #311)
 fix door created into random wall or position opening into solid wall
+'use_inverse' option was accidentally made Windows-only; change it back to
+	being more general; change its default to True
 
 
 Platform- and/or Interface-Specific Fixes
