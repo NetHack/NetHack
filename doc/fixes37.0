@@ -97,6 +97,7 @@ impose tighter restraints on 'summon nasties', both for spellcasting monsters
 prevent swallowing monster ending up in a solid wall if it killed vault guard
 fix attached ball getting deallocated if swallowed, going down into a pit,
 	and saving
+level compiler creates correct novel with supplied name
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
