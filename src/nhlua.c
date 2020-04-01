@@ -625,7 +625,7 @@ lua_State *L;
     int argc = lua_gettop(L);
 
     if (argc == 1)
-        lua_pushinteger(L, rn2(luaL_checkinteger(L, 1)));
+        lua_pushinteger(L, rn2((int) luaL_checkinteger(L, 1)));
     else
         nhl_error(L, "Wrong args");
 
@@ -641,9 +641,9 @@ lua_State *L;
     int argc = lua_gettop(L);
 
     if (argc == 1)
-        lua_pushinteger(L, rn2(luaL_checkinteger(L, 1)));
+        lua_pushinteger(L, rn2((int) luaL_checkinteger(L, 1)));
     else if (argc == 2)
-        lua_pushinteger(L, luaL_checkinteger(L, 1) + rn2(luaL_checkinteger(L, 2)));
+        lua_pushinteger(L, luaL_checkinteger(L, 1) + rn2((int) luaL_checkinteger(L, 2)));
     else
         nhl_error(L, "Wrong args");
 
