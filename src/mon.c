@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1585361052 2020/03/28 02:04:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.327 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1585856901 2020/04/02 19:48:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.329 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -148,6 +148,7 @@ m_poisongas_ok(mtmp)
 struct monst *mtmp;
 {
     int px, py;
+    boolean is_you = (mtmp == &g.youmonst);
 
     /* Non living and non breathing monsters are not concerned */
     if (nonliving(mtmp->data) || is_vampshifter(mtmp)
@@ -156,10 +157,10 @@ struct monst *mtmp;
     /* not is_swimmer(); assume that non-fish are swimming on
        the surface and breathing the air above it periodically
        unless located at water spot on plane of water */
-    px = (mtmp == &g.youmonst) ? u.ux : mtmp->mx;
-    py = (mtmp == &g.youmonst) ? u.uy : mtmp->my;
+    px = is_you ? u.ux : mtmp->mx;
+    py = is_you ? u.uy : mtmp->my;
     if ((mtmp->data->mlet == S_EEL || Is_waterlevel(&u.uz))
-        && isok(px, py) && is_pool(px, py))
+        && is_pool(px, py))
         return M_POISONGAS_OK;
     /* exclude monsters with poison gas breath attack:
        adult green dragon and Chromatic Dragon (and iron golem,
@@ -167,10 +168,9 @@ struct monst *mtmp;
     if (attacktype_fordmg(mtmp->data, AT_BREA, AD_DRST)
         || attacktype_fordmg(mtmp->data, AT_BREA, AD_RBRE))
         return M_POISONGAS_OK;
-    if ((mtmp == &g.youmonst)
-        && (u.uinvulnerable || Breathless || Underwater))
+    if (is_you && (u.uinvulnerable || Breathless || Underwater))
         return M_POISONGAS_OK;
-    if (resists_poison(mtmp) || (mtmp == &g.youmonst) && Poison_resistance)
+    if (is_you ? Poison_resistance : resists_poison(mtmp))
         return M_POISONGAS_MINOR;
     return M_POISONGAS_BAD;
 }
