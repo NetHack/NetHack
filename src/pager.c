@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1578764034 2020/01/11 17:33:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1585776162 2020/04/01 21:22:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -520,6 +520,9 @@ char *buf, *monbuf;
         case S_cloud:
             Strcpy(buf,
                    Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
+            break;
+        case S_pool:
+            Strcpy(buf, waterbody_name(x, y));
             break;
         case S_stone:
             if (!levl[x][y].seenv) {

@@ -490,13 +490,8 @@ pfx_##a,
 #endif
     NHOPTB(use_darkgray, 0, opt_out, set_in_config, On, Yes, No, No, NoAlias,
                 &iflags.wc2_darkgray)
-#ifdef WIN32
     NHOPTB(use_inverse, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &iflags.wc_inverse)
-#else
-    NHOPTB(use_inverse, 0, opt_in, set_in_game, On, No, No, No, NoAlias,
-                (boolean *) 0)
-#endif
     NHOPTC(vary_msgcount, 20, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "show more old messages at a time")
     NHOPTB(verbose, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,

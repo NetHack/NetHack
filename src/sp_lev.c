@@ -2102,8 +2102,13 @@ struct mkroom *croom;
     }
     /* set_corpsenm() took care of egg hatch and corpse timers */
 
-    if (named)
+    if (named) {
         otmp = oname(otmp, o->name.str);
+        if (otmp->otyp == SPE_NOVEL) {
+            /* needs to be an existing title */
+            (void) lookup_novel(o->name.str, &otmp->novelidx);
+        }
+    }
 
     if (o->eroded) {
         if (o->eroded < 0) {
