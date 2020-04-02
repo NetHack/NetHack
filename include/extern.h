@@ -1449,6 +1449,7 @@ E int FDECL(cmap_to_type, (int));
 /* ### mon.c ### */
 
 E void NDECL(mon_sanity_check);
+E int FDECL(m_poisongas_ok, (struct monst *));
 E int FDECL(undead_to_corpse, (int));
 E int FDECL(genus, (int, int));
 E int FDECL(pm_to_cham, (int));

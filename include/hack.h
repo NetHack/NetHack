@@ -315,6 +315,11 @@ typedef struct sortloot_item Loot;
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
 #define SHIFT_MSG 0x02     /* always put out a message */
 
+/* m_poisongas_ok() return values */
+#define M_POISONGAS_BAD   0 /* poison gas is bad */
+#define M_POISONGAS_MINOR 1 /* poison gas is ok, maybe causes coughing */
+#define M_POISONGAS_OK    2 /* ignores poison gas completely */
+
 /* flags for deliver_obj_to_mon */
 #define DF_NONE     0x00
 #define DF_RANDOM   0x01
