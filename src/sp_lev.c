@@ -1279,7 +1279,7 @@ boolean vault;
             ymax = (ROWNO - 1);
         lev = &levl[x][y];
         for (; y <= ymax; y++) {
-            if (lev++->typ) {
+            if (lev++->typ != STONE) {
                 if (!vault) {
                     debugpline2("strange area [%d,%d] in check_room.", x, y);
                 }
