@@ -145,9 +145,9 @@ struct monst *mtmp;
     int px, py;
     boolean is_you = (mtmp == &g.youmonst);
 
-    /* Non living and non breathing monsters are not concerned */
+    /* Non living, non breathing, immune monsters are not concerned */
     if (nonliving(mtmp->data) || is_vampshifter(mtmp)
-        || breathless(mtmp->data))
+        || breathless(mtmp->data) || immune_poisongas(mtmp->data))
         return M_POISONGAS_OK;
     /* not is_swimmer(); assume that non-fish are swimming on
        the surface and breathing the air above it periodically

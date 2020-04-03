@@ -623,6 +623,9 @@ register struct monst *mtmp;
     /*  Now the actual movement phase
      */
 
+    if (mtmp->data == &mons[PM_HEZROU]) /* stench */
+        create_gas_cloud(mtmp->mx, mtmp->my, 1, 8);
+
     if (mdat == &mons[PM_KILLER_BEE]
         /* could be smarter and deliberately move to royal jelly, but
            then we'd need to scan the level for queen bee in advance;
