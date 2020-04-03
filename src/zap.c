@@ -4514,7 +4514,7 @@ short exploding_wand_typ;
                 if (x == u.ux && y == u.uy) {
                     if (u.uinwater) { /* not just `if (Underwater)' */
                         /* leave the no longer existent water */
-                        u.uinwater = 0;
+                        set_uinwater(0); /* u.uinwater = 0 */
                         u.uundetected = 0;
                         docrt();
                         g.vision_full_recalc = 1;

@@ -3119,7 +3119,7 @@ int locked, trapped;
         /* hero started at <x,y> but might not be there anymore (create
            lava, decline to die, and get teleported away to safety) */
         if (u.uinwater && !is_pool(u.ux, u.uy)) {
-            u.uinwater = 0; /* leave the water */
+            set_uinwater(0); /* u.uinwater = 0; leave the water */
             docrt();
             /* [block/unblock_point was handled by docrt -> vision_recalc] */
         } else {

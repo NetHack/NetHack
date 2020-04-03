@@ -834,7 +834,7 @@ boolean pre, wiztower;
         (void) memset((genericptr_t)&g.updest, 0, sizeof (dest_area));
         u.ustuck = (struct monst *) 0;
         u.uswallow = u.uswldtim = 0;
-        u.uinwater = 0;
+        set_uinwater(0); /* u.uinwater = 0 */
         u.uundetected = 0; /* not hidden, even if means are available */
         dmonsfree(); /* purge dead monsters from 'fmon' */
 

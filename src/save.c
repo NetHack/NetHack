@@ -104,7 +104,7 @@ dosave0()
     if (iflags.save_uswallow)
         u.uswallow = 1, iflags.save_uswallow = 0;
     if (iflags.save_uinwater)
-        u.uinwater = 1, iflags.save_uinwater = 0;
+        u.uinwater = 1, iflags.save_uinwater = 0; /* bypass set_uinwater() */
     if (iflags.save_uburied)
         u.uburied = 1, iflags.save_uburied = 0;
 

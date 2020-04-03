@@ -35,7 +35,7 @@ unconstrain_map()
     boolean res = u.uinwater || u.uburied || u.uswallow;
 
     /* bring Underwater, buried, or swallowed hero to normal map */
-    iflags.save_uinwater = u.uinwater, u.uinwater = 0;
+    iflags.save_uinwater = u.uinwater, u.uinwater = 0; /* bypass set_uinwater() */
     iflags.save_uburied  = u.uburied,  u.uburied  = 0;
     iflags.save_uswallow = u.uswallow, u.uswallow = 0;
 
@@ -46,7 +46,7 @@ unconstrain_map()
 static void
 reconstrain_map()
 {
-    u.uinwater = iflags.save_uinwater, iflags.save_uinwater = 0;
+    u.uinwater = iflags.save_uinwater, iflags.save_uinwater = 0; /* set_uinwater() */
     u.uburied  = iflags.save_uburied,  iflags.save_uburied  = 0;
     u.uswallow = iflags.save_uswallow, iflags.save_uswallow = 0;
 }

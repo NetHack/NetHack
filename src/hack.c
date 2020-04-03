@@ -2086,6 +2086,14 @@ switch_terrain()
         g.context.botl = TRUE; /* update Lev/Fly status condition */
 }
 
+/* set or clear u.uinwater */
+void
+set_uinwater(in_out)
+int in_out;
+{
+    u.uinwater = in_out;
+}
+
 /* extracted from spoteffects; called by spoteffects to check for entering or
    leaving a pool of water/lava, and by moveloop to check for staying on one;
    returns true to skip rest of spoteffects */
@@ -2119,7 +2127,7 @@ boolean newspot;             /* true if called by spoteffects */
         if (!still_inwater) {
             boolean was_underwater = (Underwater && !Is_waterlevel(&u.uz));
 
-            u.uinwater = 0;       /* leave the water */
+            set_uinwater(0); /* u.uinwater = 0; leave the water */
             if (was_underwater) { /* restore vision */
                 docrt();
                 g.vision_full_recalc = 1;
