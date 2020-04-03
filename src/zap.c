@@ -1629,12 +1629,12 @@ int id;
                 if (was_twohanded || !bimanual(otmp) || !uarms)
                     setuwep(otmp);
                 if (was_twoweap && uwep && !bimanual(uwep))
-                    u.twoweap = TRUE;
+                    set_twoweap(TRUE); /* u.twoweap = TRUE */
             } else if ((new_wornmask & W_SWAPWEP) != 0L) {
                 if (was_twohanded || !bimanual(otmp))
                     setuswapwep(otmp);
                 if (was_twoweap && uswapwep)
-                    u.twoweap = TRUE;
+                    set_twoweap(TRUE); /* u.twoweap = TRUE */
             } else if ((new_wornmask & W_QUIVER) != 0L) {
                 setuqwep(otmp);
             } else if (new_wornmask) {

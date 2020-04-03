@@ -2989,6 +2989,7 @@ E int NDECL(dotwoweapon);
 E void NDECL(uwepgone);
 E void NDECL(uswapwepgone);
 E void NDECL(uqwepgone);
+E void FDECL(set_twoweap, (BOOLEAN_P));
 E void NDECL(untwoweapon);
 E int FDECL(chwepon, (struct obj *, int));
 E int FDECL(welded, (struct obj *));

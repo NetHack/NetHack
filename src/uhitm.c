@@ -1149,7 +1149,7 @@ int dieroll;
         if (jousting < 0) {
             pline("%s shatters on impact!", Yname2(obj));
             /* (must be either primary or secondary weapon to get here) */
-            u.twoweap = FALSE; /* untwoweapon() is too verbose here */
+            set_twoweap(FALSE); /* u.twoweap = FALSE; untwoweapon() is too verbose */
             if (obj == uwep)
                 uwepgone(); /* set g.unweapon */
             /* minor side-effect: broken lance won't split puddings */

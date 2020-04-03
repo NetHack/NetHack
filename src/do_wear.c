@@ -2467,12 +2467,12 @@ do_takeoff()
         if (!cursed(uwep)) {
             setuwep((struct obj *) 0);
             You("are empty %s.", body_part(HANDED));
-            u.twoweap = FALSE;
+            set_twoweap(FALSE); /* u.twoweap = FALSE [ought to be in setuwep()] */
         }
     } else if (doff->what == W_SWAPWEP) {
         setuswapwep((struct obj *) 0);
         You("no longer have a second weapon readied.");
-        u.twoweap = FALSE;
+        set_twoweap(FALSE); /* u.twoweap = FALSE; [ought to be in setuswapwep()] */
     } else if (doff->what == W_QUIVER) {
         setuqwep((struct obj *) 0);
         You("no longer have ammunition readied.");
