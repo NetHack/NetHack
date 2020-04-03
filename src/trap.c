@@ -5361,6 +5361,7 @@ lava_effects()
             pline("You're still burning.");
         }
         You("find yourself back on solid %s.", surface(u.ux, u.uy));
+        iflags.last_msg = PLNMSG_BACK_ON_GROUND;
         return TRUE;
     } else if (!Wwalking && (!u.utrap || u.utraptype != TT_LAVA)) {
         boil_away = !Fire_resistance;

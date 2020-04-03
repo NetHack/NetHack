@@ -446,7 +446,9 @@ enum plnmsg_types {
     PLNMSG_CAUGHT_IN_EXPLOSION, /* explode() feedback */
     PLNMSG_OBJ_GLOWS,           /* "the <obj> glows <color>" */
     PLNMSG_OBJNAM_ONLY,         /* xname/doname only, for #tip */
-    PLNMSG_OK_DONT_DIE          /* overriding death in explore/wizard mode */
+    PLNMSG_OK_DONT_DIE,         /* overriding death in explore/wizard mode */
+    PLNMSG_BACK_ON_GROUND,      /* leaving water */
+    PLNMSG_enum /* allows inserting new entries with unconditional trailing comma */
 };
 
 /* runmode options */
