@@ -2091,7 +2091,7 @@ void
 set_uinwater(in_out)
 int in_out;
 {
-    u.uinwater = in_out;
+    u.uinwater = in_out ? 1 : 0;
 }
 
 /* extracted from spoteffects; called by spoteffects to check for entering or
