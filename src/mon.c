@@ -3,11 +3,6 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* If you're using precompiled headers, you don't want this either */
-#ifdef MICROPORT_BUG
-#define MKROOM_H
-#endif
-
 #include "hack.h"
 #include "mfndpos.h"
 #include <ctype.h>
@@ -3895,16 +3890,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
             unstuck(mtmp);
     }
 
-#ifndef DCC30_BUG
     if (mdat == &mons[PM_LONG_WORM] && (mtmp->wormno = get_wormno()) != 0) {
-#else
-    /* DICE 3.0 doesn't like assigning and comparing mtmp->wormno in the
-     * same expression.
-     */
-    if (mdat == &mons[PM_LONG_WORM]
-        && (mtmp->wormno = get_wormno(), mtmp->wormno != 0)) {
-#endif
-        /* we can now create worms with tails - 11/91 */
         initworm(mtmp, rn2(5));
         place_worm_tail_randomly(mtmp, mtmp->mx, mtmp->my);
     }

@@ -600,15 +600,8 @@ struct levelflags {
 
 typedef struct {
     struct rm locations[COLNO][ROWNO];
-#ifndef MICROPORT_BUG
     struct obj *objects[COLNO][ROWNO];
     struct monst *monsters[COLNO][ROWNO];
-#else
-    struct obj *objects[1][ROWNO];
-    char *yuk1[COLNO - 1][ROWNO];
-    struct monst *monsters[1][ROWNO];
-    char *yuk2[COLNO - 1][ROWNO];
-#endif
     struct obj *objlist;
     struct obj *buriedobjlist;
     struct monst *monlist;

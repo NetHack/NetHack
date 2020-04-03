@@ -79,9 +79,5 @@ extern int FDECL(strncmpi, (const char *, const char *, size_t));
 extern boolean colors_changed; /* in tos.c */
 #endif
 
-#ifdef __GNUC__
-#define GCC_BUG /* correct a gcc bug involving double for loops */
-#endif
-
 #endif /* TOSCONF_H */
 #endif /* TOS */
