@@ -3116,6 +3116,7 @@ int locked, trapped;
 
     if (madeterrain) {
         feel_newsym(x, y); /* map the spot where the wish occurred */
+
         /* hero started at <x,y> but might not be there anymore (create
            lava, decline to die, and get teleported away to safety) */
         if (u.uinwater && !is_pool(u.ux, u.uy)) {
@@ -3134,6 +3135,7 @@ int locked, trapped;
                     unblock_point(x, y);
             }
         }
+
         /* fixups for replaced terrain that aren't handled above;
            for fountain placed on fountain or sink placed on sink, the
            increment above gets canceled out by the decrement here;
@@ -3156,6 +3158,11 @@ int locked, trapped;
         }
         /* note: lev->lit and lev->nondiggable retain their values even
            though those might not make sense with the new terrain */
+
+        /* might have changed terrain from something that blocked
+           levitation and flying to something that doesn't (levitating
+           while in xorn form and replacing solid stone with furniture) */
+        switch_terrain();
     }
     if (madeterrain || badterrain) {
         /* cast 'const' away; caller won't modify this */
