@@ -35,7 +35,7 @@ unconstrain_map()
     boolean res = u.uinwater || u.uburied || u.uswallow;
 
     /* bring Underwater, buried, or swallowed hero to normal map */
-    iflags.save_uinwater = u.uinwater, u.uinwater = 0;
+    iflags.save_uinwater = u.uinwater, u.uinwater = 0; /* bypass set_uinwater() */
     iflags.save_uburied  = u.uburied,  u.uburied  = 0;
     iflags.save_uswallow = u.uswallow, u.uswallow = 0;
 
@@ -46,7 +46,7 @@ unconstrain_map()
 static void
 reconstrain_map()
 {
-    u.uinwater = iflags.save_uinwater, iflags.save_uinwater = 0;
+    u.uinwater = iflags.save_uinwater, iflags.save_uinwater = 0; /* set_uinwater() */
     u.uburied  = iflags.save_uburied,  iflags.save_uburied  = 0;
     u.uswallow = iflags.save_uswallow, iflags.save_uswallow = 0;
 }
@@ -1704,16 +1704,7 @@ int
 dosearch0(aflag)
 register int aflag; /* intrinsic autosearch vs explicit searching */
 {
-#ifdef GCC_BUG
-    /* Some old versions of gcc seriously muck up nested loops.  If you get
-     * strange crashes while searching in a version compiled with gcc, try
-     * putting #define GCC_BUG in *conf.h (or adding -DGCC_BUG to CFLAGS in
-     * the makefile).
-     */
-    volatile xchar x, y;
-#else
-    register xchar x, y;
-#endif
+    xchar x, y;
     register struct trap *trap;
     register struct monst *mtmp;
 

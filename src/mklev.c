@@ -598,13 +598,6 @@ clear_level_structures()
         lev = &levl[x][0];
         for (y = 0; y < ROWNO; y++) {
             *lev++ = zerorm;
-            /*
-             * These used to be '#if MICROPORT_BUG',
-             * with use of memset(0) for '#if !MICROPORT_BUG' below,
-             * but memset is not appropriate for initializing pointers,
-             * so do these g.level.objects[][] and level.monsters[][]
-             * initializations unconditionally.
-             */
             g.level.objects[x][y] = (struct obj *) 0;
             g.level.monsters[x][y] = (struct monst *) 0;
         }

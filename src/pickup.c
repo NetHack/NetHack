@@ -332,10 +332,15 @@ describe_decor()
         if ((IS_POOL(iflags.prev_decor)
              || iflags.prev_decor == LAVAPOOL
              || iflags.prev_decor == ICE)) {
-            pline("%s %s %s.",
-                  flags.verbose ? "You are back" : "Back",
-                  (Levitation || Flying) ? "over" : "on",
-                  surface(u.ux, u.uy));
+            const char *ground = surface(u.ux, u.uy);
+
+            if (iflags.last_msg != PLNMSG_BACK_ON_GROUND
+                || (strcmpi(ground, "floor") && strcmpi(ground, "ground")
+                    && strcmpi(ground, "ice")))
+                pline("%s %s %s.",
+                      flags.verbose ? "You are back" : "Back",
+                      (Levitation || Flying) ? "over" : "on",
+                      ground);
         }
     }
     iflags.prev_decor = ltyp;

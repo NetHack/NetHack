@@ -1629,12 +1629,12 @@ int id;
                 if (was_twohanded || !bimanual(otmp) || !uarms)
                     setuwep(otmp);
                 if (was_twoweap && uwep && !bimanual(uwep))
-                    u.twoweap = TRUE;
+                    set_twoweap(TRUE); /* u.twoweap = TRUE */
             } else if ((new_wornmask & W_SWAPWEP) != 0L) {
                 if (was_twohanded || !bimanual(otmp))
                     setuswapwep(otmp);
                 if (was_twoweap && uswapwep)
-                    u.twoweap = TRUE;
+                    set_twoweap(TRUE); /* u.twoweap = TRUE */
             } else if ((new_wornmask & W_QUIVER) != 0L) {
                 setuqwep(otmp);
             } else if (new_wornmask) {
@@ -4514,7 +4514,7 @@ short exploding_wand_typ;
                 if (x == u.ux && y == u.uy) {
                     if (u.uinwater) { /* not just `if (Underwater)' */
                         /* leave the no longer existent water */
-                        u.uinwater = 0;
+                        set_uinwater(0); /* u.uinwater = 0 */
                         u.uundetected = 0;
                         docrt();
                         g.vision_full_recalc = 1;

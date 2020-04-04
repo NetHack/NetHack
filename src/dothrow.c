@@ -1193,7 +1193,7 @@ struct obj *oldslot; /* for thrown-and-return used with !fixinv */
             if (obj->owornmask & W_QUIVER) /* in case addinv() autoquivered */
                 setuqwep((struct obj *) 0);
             setuwep(obj);
-            u.twoweap = twoweap;
+            set_twoweap(twoweap); /* u.twoweap = twoweap */
         } else if (u.dz < 0) {
             (void) toss_up(obj, rn2(5) && !Underwater);
         } else if (u.dz > 0 && u.usteed && obj->oclass == POTION_CLASS
@@ -1217,7 +1217,7 @@ struct obj *oldslot; /* for thrown-and-return used with !fixinv */
             (void) encumber_msg();
             if (wep_mask && !(obj->owornmask & wep_mask)) {
                 setworn(obj, wep_mask);
-                u.twoweap = twoweap;
+                set_twoweap(twoweap); /* u.twoweap = twoweap */
             }
             clear_thrownobj = TRUE;
             goto throwit_return;
@@ -1352,7 +1352,7 @@ struct obj *oldslot; /* for thrown-and-return used with !fixinv */
                     if (obj->owornmask & W_QUIVER)
                         setuqwep((struct obj *) 0);
                     setuwep(obj);
-                    u.twoweap = twoweap;
+                    set_twoweap(twoweap); /* u.twoweap = twoweap */
                     if (cansee(g.bhitpos.x, g.bhitpos.y))
                         newsym(g.bhitpos.x, g.bhitpos.y);
                 } else {

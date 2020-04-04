@@ -1,12 +1,7 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1585361052 2020/03/28 02:04:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.327 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1585856901 2020/04/02 19:48:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.329 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
-
-/* If you're using precompiled headers, you don't want this either */
-#ifdef MICROPORT_BUG
-#define MKROOM_H
-#endif
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -140,6 +135,40 @@ mon_sanity_check()
     }
 }
 
+/* Would monster be OK with poison gas? */
+/* Does not check for actual poison gas at the location. */
+/* Returns one of M_POISONGAS_foo */
+int
+m_poisongas_ok(mtmp)
+struct monst *mtmp;
+{
+    int px, py;
+    boolean is_you = (mtmp == &g.youmonst);
+
+    /* Non living, non breathing, immune monsters are not concerned */
+    if (nonliving(mtmp->data) || is_vampshifter(mtmp)
+        || breathless(mtmp->data) || immune_poisongas(mtmp->data))
+        return M_POISONGAS_OK;
+    /* not is_swimmer(); assume that non-fish are swimming on
+       the surface and breathing the air above it periodically
+       unless located at water spot on plane of water */
+    px = is_you ? u.ux : mtmp->mx;
+    py = is_you ? u.uy : mtmp->my;
+    if ((mtmp->data->mlet == S_EEL || Is_waterlevel(&u.uz))
+        && is_pool(px, py))
+        return M_POISONGAS_OK;
+    /* exclude monsters with poison gas breath attack:
+       adult green dragon and Chromatic Dragon (and iron golem,
+       but nonliving() and breathless() tests also catch that) */
+    if (attacktype_fordmg(mtmp->data, AT_BREA, AD_DRST)
+        || attacktype_fordmg(mtmp->data, AT_BREA, AD_RBRE))
+        return M_POISONGAS_OK;
+    if (is_you && (u.uinvulnerable || Breathless || Underwater))
+        return M_POISONGAS_OK;
+    if (is_you ? Poison_resistance : resists_poison(mtmp))
+        return M_POISONGAS_MINOR;
+    return M_POISONGAS_BAD;
+}
 
 /* convert the monster index of an undead to its living counterpart */
 int
@@ -1354,8 +1383,7 @@ long flag;
     if (mdat == &mons[PM_FLOATING_EYE]) /* prefers to avoid heat */
         lavaok = FALSE;
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);
-    poisongas_ok = ((nonliving(mdat) || is_vampshifter(mon)
-                     || breathless(mdat)) || resists_poison(mon));
+    poisongas_ok = (m_poisongas_ok(mon) == M_POISONGAS_OK);
     in_poisongas = ((gas_reg = visible_region_at(x,y)) != 0
                     && gas_reg->glyph == gas_glyph);
 
@@ -3862,16 +3890,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
             unstuck(mtmp);
     }
 
-#ifndef DCC30_BUG
     if (mdat == &mons[PM_LONG_WORM] && (mtmp->wormno = get_wormno()) != 0) {
-#else
-    /* DICE 3.0 doesn't like assigning and comparing mtmp->wormno in the
-     * same expression.
-     */
-    if (mdat == &mons[PM_LONG_WORM]
-        && (mtmp->wormno = get_wormno(), mtmp->wormno != 0)) {
-#endif
-        /* we can now create worms with tails - 11/91 */
         initworm(mtmp, rn2(5));
         place_worm_tail_randomly(mtmp, mtmp->mx, mtmp->my);
     }

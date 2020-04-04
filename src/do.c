@@ -96,7 +96,7 @@ boolean pushing;
             }
 
             if (fills_up && u.uinwater && distu(rx, ry) == 0) {
-                u.uinwater = 0;
+                set_uinwater(0); /* u.uinwater = 0 */
                 docrt();
                 g.vision_full_recalc = 1;
                 You("find yourself on dry land again!");
@@ -1377,7 +1377,7 @@ boolean at_stairs, falling, portal;
     fill_pit(u.ux, u.uy);
     set_ustuck((struct monst *) 0); /* idem */
     u.uswallow = u.uswldtim = 0;
-    u.uinwater = 0;
+    set_uinwater(0); /* u.uinwater = 0 */
     u.uundetected = 0; /* not hidden, even if means are available */
     keepdogs(FALSE);
     recalc_mapseen(); /* recalculate map overview before we leave the level */
@@ -1495,7 +1495,7 @@ boolean at_stairs, falling, portal;
         oinit(); /* reassign level dependent obj probabilities */
     }
     reglyph_darkroom();
-    u.uinwater = 0;
+    set_uinwater(0); /* u.uinwater = 0 */
     /* do this prior to level-change pline messages */
     vision_reset();         /* clear old level's line-of-sight */
     g.vision_full_recalc = 0; /* don't let that reenable vision yet */

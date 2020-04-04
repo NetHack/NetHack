@@ -100,6 +100,7 @@ fix attached ball getting deallocated if swallowed, going down into a pit,
 level compiler creates correct novel with supplied name
 for farlook, describe water in the castle moat and in Juiblex's swamp as moat
 	and as swamp, respectively, rather than just as "water"
+make hezrous emit poison clouds when they move
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

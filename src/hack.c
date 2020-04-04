@@ -2086,6 +2086,14 @@ switch_terrain()
         g.context.botl = TRUE; /* update Lev/Fly status condition */
 }
 
+/* set or clear u.uinwater */
+void
+set_uinwater(in_out)
+int in_out;
+{
+    u.uinwater = in_out ? 1 : 0;
+}
+
 /* extracted from spoteffects; called by spoteffects to check for entering or
    leaving a pool of water/lava, and by moveloop to check for staying on one;
    returns true to skip rest of spoteffects */
@@ -2098,13 +2106,15 @@ boolean newspot;             /* true if called by spoteffects */
         boolean still_inwater = FALSE; /* assume we're getting out */
 
         if (!is_pool(u.ux, u.uy)) {
-            if (Is_waterlevel(&u.uz))
+            if (Is_waterlevel(&u.uz)) {
                 You("pop into an air bubble.");
-            else if (is_lava(u.ux, u.uy))
+            } else if (is_lava(u.ux, u.uy)) {
                 You("leave the %s...", hliquid("water")); /* oops! */
-            else
+            } else {
                 You("are on solid %s again.",
                     is_ice(u.ux, u.uy) ? "ice" : "land");
+                iflags.last_msg = PLNMSG_BACK_ON_GROUND;
+            }
         } else if (Is_waterlevel(&u.uz)) {
             still_inwater = TRUE;
         } else if (Levitation) {
@@ -2119,7 +2129,7 @@ boolean newspot;             /* true if called by spoteffects */
         if (!still_inwater) {
             boolean was_underwater = (Underwater && !Is_waterlevel(&u.uz));
 
-            u.uinwater = 0;       /* leave the water */
+            set_uinwater(0); /* u.uinwater = 0; leave the water */
             if (was_underwater) { /* restore vision */
                 docrt();
                 g.vision_full_recalc = 1;

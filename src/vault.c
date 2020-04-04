@@ -305,9 +305,6 @@ xchar *rx, *ry;
 void
 invault()
 {
-#ifdef BSD_43_BUG
-    int dummy; /* hack to avoid schain botch */
-#endif
     struct monst *guard;
     boolean gsensed;
     int trycount, vaultroom = (int) vault_occupied(u.urooms);

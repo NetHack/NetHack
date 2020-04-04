@@ -610,7 +610,7 @@ boolean extras;
 	    etmp->engr_x = FlipX(etmp->engr_x);
     }
 
-    /* regions */
+    /* level (teleport) regions */
     for (i = 0; i < g.num_lregions; i++) {
 	if (flp & 1) {
 	    g.lregions[i].inarea.y1 = FlipY(g.lregions[i].inarea.y1);
@@ -646,6 +646,35 @@ boolean extras;
 		g.lregions[i].delarea.x2 = itmp;
 	    }
 	}
+    }
+
+    /* regions (poison clouds, etc) */
+    for (i = 0; i < g.n_regions; i++) {
+        int j, tmp1, tmp2;
+        if (flp & 1) {
+            tmp1 = FlipY(g.regions[i]->bounding_box.ly);
+            tmp2 = FlipY(g.regions[i]->bounding_box.hy);
+            g.regions[i]->bounding_box.ly = min(tmp1, tmp2);
+            g.regions[i]->bounding_box.hy = max(tmp1, tmp2);
+            for (j = 0; j < g.regions[i]->nrects; j++) {
+                tmp1 = FlipY(g.regions[i]->rects[j].ly);
+                tmp2 = FlipY(g.regions[i]->rects[j].hy);
+                g.regions[i]->rects[j].ly = min(tmp1, tmp2);
+                g.regions[i]->rects[j].hy = max(tmp1, tmp2);
+            }
+        }
+        if (flp & 2) {
+            tmp1 = FlipX(g.regions[i]->bounding_box.lx);
+            tmp2 = FlipX(g.regions[i]->bounding_box.hx);
+            g.regions[i]->bounding_box.lx = min(tmp1, tmp2);
+            g.regions[i]->bounding_box.hx = max(tmp1, tmp2);
+            for (j = 0; j < g.regions[i]->nrects; j++) {
+                tmp1 = FlipX(g.regions[i]->rects[j].lx);
+                tmp2 = FlipX(g.regions[i]->rects[j].hx);
+                g.regions[i]->rects[j].lx = min(tmp1, tmp2);
+                g.regions[i]->rects[j].hx = max(tmp1, tmp2);
+            }
+        }
     }
 
     /* rooms */
@@ -1279,7 +1308,7 @@ boolean vault;
             ymax = (ROWNO - 1);
         lev = &levl[x][y];
         for (; y <= ymax; y++) {
-            if (lev++->typ) {
+            if (lev++->typ != STONE) {
                 if (!vault) {
                     debugpline2("strange area [%d,%d] in check_room.", x, y);
                 }
