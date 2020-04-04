@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.149 $ $NHDT-Date: 1585778315 2020/04/01 21:58:35 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.151 $ $NHDT-Date: 1585993266 2020/04/04 09:41:06 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -101,6 +101,8 @@ level compiler creates correct novel with supplied name
 for farlook, describe water in the castle moat and in Juiblex's swamp as moat
 	and as swamp, respectively, rather than just as "water"
 make hezrous emit poison clouds when they move
+stepping from one type of terrain to another was triggering an unnecessary
+	status update
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1584405116 2020/03/17 00:31:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.250 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1585993266 2020/04/04 09:41:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.254 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2082,7 +2082,7 @@ switch_terrain()
         if (Flying)
             You("start flying.");
     }
-    if ((!Levitation ^ was_levitating) || (!Flying ^ was_flying))
+    if ((!!Levitation ^ was_levitating) || (!!Flying ^ was_flying))
         g.context.botl = TRUE; /* update Lev/Fly status condition */
 }
 
