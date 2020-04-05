@@ -1143,6 +1143,69 @@ struct monst *mtmp;
     return (count > 0 || ecount > 0) ? 1 : 0;
 }
 
+/* Monster eats a corpse off the ground.
+ * Return value is 0 = nothing eaten, 1 = ate a corpse, 2 = died */
+int
+meatcorpse(mtmp) /* for purple worms and other voracious monsters */
+struct monst* mtmp;
+{
+    struct obj *otmp;
+    struct permonst *ptr, *original_ptr = mtmp->data, *corpsepm;
+    boolean poly, grow, heal, eyes = FALSE;
+    int x = mtmp->mx, y = mtmp->my;
+
+    /* if a pet, eating is handled separately, in dog.c */
+    if (mtmp->mtame)
+        return 0;
+
+    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere) {
+        if (otmp->otyp != CORPSE)
+            continue;
+
+        corpsepm = &mons[otmp->corpsenm];
+        if (is_rider(corpsepm)) {
+            revive_corpse(otmp);
+            continue;
+        }
+
+        /* don't eat harmful corpses */
+        if (touch_petrifies(corpsepm) && !resists_ston(mtmp))
+            continue;
+
+        if (cansee(x, y) && canseemon(mtmp)) {
+            if (flags.verbose)
+                pline("%s eats %s!", Monnam(mtmp), distant_name(otmp, doname));
+        } else if (flags.verbose)
+            You_hear("a masticating sound.");
+
+        poly = polyfodder(otmp);
+        grow = mlevelgain(otmp);
+        heal = mhealup(otmp);
+        eyes = (otmp->otyp == CARROT);
+        delobj(otmp);
+        if (poly) {
+            if (newcham(mtmp, NULL, FALSE, FALSE))
+                ptr = mtmp->data;
+        } else if (grow) {
+            ptr = grow_up(mtmp, (struct monst *) 0);
+        } else if (heal) {
+            mtmp->mhp = mtmp->mhpmax;
+        }
+        if ((eyes || heal) && !mtmp->mcansee)
+            mcureblindness(mtmp, canseemon(mtmp));
+        /* in case it polymorphed or died */
+        if (ptr != original_ptr)
+            return !ptr ? 2 : 1;
+
+        /* Engulf & devour is instant, so don't set meating */
+        if (mtmp->minvis)
+            newsym(x, y);
+
+        return 1;
+    }
+    return 0;
+}
+
 void
 mpickgold(mtmp)
 register struct monst *mtmp;
@@ -1602,9 +1665,11 @@ mm_aggression(magr, mdef)
 struct monst *magr, /* monster that is currently deciding where to move */
              *mdef; /* another monster which is next to it */
 {
+    int mndx = monsndx(magr->data);
+
     /* supposedly purple worms are attracted to shrieking because they
        like to eat shriekers, so attack the latter when feasible */
-    if (magr->data == &mons[PM_PURPLE_WORM]
+    if ((mndx == PM_PURPLE_WORM || mndx == PM_BABY_PURPLE_WORM)
         && mdef->data == &mons[PM_SHRIEKER])
         return ALLOW_M | ALLOW_TM;
     /* Various other combinations such as dog vs cat, cat vs rat, and
@@ -2930,9 +2995,13 @@ struct monst *mtmp;
             stop_occupation();
         }
         if (!rn2(10)) {
-            if (!rn2(13))
-                (void) makemon(&mons[PM_PURPLE_WORM], 0, 0, NO_MM_FLAGS);
-            else
+            if (!rn2(13)) {
+                /* don't generate purple worms if they would be too difficult */
+                int pm = montoostrong(PM_PURPLE_WORM, monmax_difficulty_lev())
+                    ? PM_BABY_PURPLE_WORM : PM_PURPLE_WORM;
+
+                (void) makemon(&mons[pm], 0, 0, NO_MM_FLAGS);
+            } else
                 (void) makemon((struct permonst *) 0, 0, 0, NO_MM_FLAGS);
         }
         aggravate();

@@ -103,6 +103,10 @@ for farlook, describe water in the castle moat and in Juiblex's swamp as moat
 make hezrous emit poison clouds when they move
 stepping from one type of terrain to another was triggering an unnecessary
 	status update
+make shriekers summon baby purple worms if purple worms would be too tough
+make non-tame (baby) purple worms eat corpses off the ground
+make baby purple worms attack shriekers
+make hero polymorphed into baby purple worm warned against shriekers
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
