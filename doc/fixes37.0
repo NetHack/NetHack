@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.151 $ $NHDT-Date: 1585993266 2020/04/04 09:41:06 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ $NHDT-Date: 1586119020 2020/04/05 20:37:00 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -158,6 +158,8 @@ fix flipping non-existent stairs and ladders (github #311)
 fix door created into random wall or position opening into solid wall
 'use_inverse' option was accidentally made Windows-only; change it back to
 	being more general; change its default to True
+X11: was still initializing map to 'stone' instead of 'unexplored' after they
+	became separate glyphs
 
 
 Platform- and/or Interface-Specific Fixes
