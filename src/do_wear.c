@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1579649788 2020/01/21 23:36:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1586125907 2020/04/05 22:31:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2460,19 +2460,23 @@ static struct obj *
 do_takeoff()
 {
     struct obj *otmp = (struct obj *) 0;
+    boolean was_twoweap = u.twoweap;
     struct takeoff_info *doff = &g.context.takeoff;
 
     g.context.takeoff.mask |= I_SPECIAL; /* set flag for cancel_doff() */
     if (doff->what == W_WEP) {
         if (!cursed(uwep)) {
             setuwep((struct obj *) 0);
-            You("are empty %s.", body_part(HANDED));
-            set_twoweap(FALSE); /* u.twoweap = FALSE [ought to be in setuwep()] */
+            if (was_twoweap)
+                You("are no longer wielding either weapon.");
+            else
+                You("are empty %s.", body_part(HANDED));
         }
     } else if (doff->what == W_SWAPWEP) {
         setuswapwep((struct obj *) 0);
-        You("no longer have a second weapon readied.");
-        set_twoweap(FALSE); /* u.twoweap = FALSE; [ought to be in setuswapwep()] */
+        You("%sno longer %s.", was_twoweap ? "are " : "",
+            was_twoweap ? "wielding two weapons at once"
+                        : "have a second weapon readied");
     } else if (doff->what == W_QUIVER) {
         setuqwep((struct obj *) 0);
         You("no longer have ammunition readied.");
@@ -2650,13 +2654,13 @@ doddoremarm()
         result = menu_remarm(result);
 
     if (g.context.takeoff.mask) {
-        /* default activity for armor and/or accessories,
-           possibly combined with weapons */
-        (void) strncpy(g.context.takeoff.disrobing, "disrobing", CONTEXTVERBSZ);
-        /* specific activity when handling weapons only */
-        if (!(g.context.takeoff.mask & ~W_WEAPONS))
-            (void) strncpy(g.context.takeoff.disrobing, "disarming",
-                           CONTEXTVERBSZ);
+        (void) strncpy(g.context.takeoff.disrobing,
+                       (((g.context.takeoff.mask & ~W_WEAPONS) != 0)
+                        /* default activity for armor and/or accessories,
+                           possibly combined with weapons */
+                        ? "disrobing"
+                        /* specific activity when handling weapons only */
+                        : "disarming"), CONTEXTVERBSZ);
         (void) take_off();
     }
     /* The time to perform the command is already completely accounted for
