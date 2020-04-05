@@ -123,6 +123,11 @@ extern int NDECL(dozap);              /**/
 extern int NDECL(doorganize);         /**/
 #endif /* DUMB */
 
+static void NDECL(commands_init);
+static int FDECL(dokeylist_putcmds, (winid, BOOLEAN_P, int, int, boolean *));
+static int FDECL(ch2spkeys, (char, int, int));
+static boolean FDECL(prefix_cmd, (char));
+
 static int NDECL((*timed_occ_fn));
 
 static int NDECL(dosuspend_core);
@@ -2035,7 +2040,7 @@ const char *command;
 }
 
 /* initialize all keyboard commands */
-void
+static void
 commands_init()
 {
     struct ext_func_tab *extcmd;
@@ -2067,7 +2072,7 @@ commands_init()
     (void) bind_key(' ',    "wait");
 }
 
-int
+static int
 dokeylist_putcmds(datawin, docount, cmdflags, exflags, keys_used)
 winid datawin;
 boolean docount;
@@ -3081,7 +3086,7 @@ rnd_extcmd_idx(VOID_ARGS)
     return rn2(extcmdlist_length + 1) - 1;
 }
 
-int
+static int
 ch2spkeys(c, start, end)
 char c;
 int start,end;
@@ -3384,7 +3389,7 @@ char c;
                       || (g.Cmd.num_pad && c == g.Cmd.spkeys[NHKF_REDRAW2]));
 }
 
-boolean
+static boolean
 prefix_cmd(c)
 char c;
 {
@@ -4073,12 +4078,12 @@ int x, y, mod;
 }
 
 char
-get_count(allowchars, inkey, maxcount, count, historical)
+get_count(allowchars, inkey, maxcount, count, historicmsg)
 char *allowchars;
 char inkey;
 long maxcount;
 long *count;
-boolean historical; /* whether to include in message history: True => yes */
+boolean historicmsg; /* whether to include in message history: True => yes */
 {
     char qbuf[QBUFSZ];
     int key;
@@ -4124,7 +4129,7 @@ boolean historical; /* whether to include in message history: True => yes */
         }
     }
 
-    if (historical) {
+    if (historicmsg) {
         Sprintf(qbuf, "Count: %ld ", *count);
         (void) key2txt((uchar) key, eos(qbuf));
         putmsghistory(qbuf, FALSE);
