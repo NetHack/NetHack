@@ -16,6 +16,12 @@ const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
 static const char *NDECL(rank);
 static void NDECL(bot_via_windowport);
 static void NDECL(stat_update_time);
+#ifdef STATUS_HILITES
+static unsigned long NDECL(query_conditions);
+static boolean FDECL(status_hilite_remove, (int));
+static boolean FDECL(status_hilite_menu_fld, (int));
+static void NDECL(status_hilites_viewall);
+#endif
 
 static char *
 get_strength_str()
@@ -2644,7 +2650,7 @@ boolean from_configfile;
 
 #ifdef STATUS_HILITES
 
-unsigned long
+static unsigned long
 query_conditions()
 {
     int i,res;
@@ -3818,7 +3824,7 @@ choose_color:
     return TRUE;
 }
 
-boolean
+static boolean
 status_hilite_remove(id)
 int id;
 {
@@ -3868,7 +3874,7 @@ int id;
     return FALSE;
 }
 
-boolean
+static boolean
 status_hilite_menu_fld(fld)
 int fld;
 {
@@ -3990,7 +3996,7 @@ shlmenu_free:
     return acted;
 }
 
-void
+static void
 status_hilites_viewall()
 {
     winid datawin;
