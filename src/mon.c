@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1585856901 2020/04/02 19:48:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.329 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1586091449 2020/04/05 12:57:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.333 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1028,8 +1028,16 @@ struct monst *mtmp;
 
         /* touch sensitive items */
         if (otmp->otyp == CORPSE && is_rider(&mons[otmp->corpsenm])) {
+            int ox = otmp->ox, oy = otmp->oy;
+            boolean revived_it = revive_corpse(otmp);
+
+            newsym(ox, oy);
             /* Rider corpse isn't just inedible; can't engulf it either */
-            (void) revive_corpse(otmp);
+            if (!revived_it)
+                continue;
+            /* [should check whether revival forced 'mtmp' off the level
+               and return 3 in that situation (if possible...)] */
+            break;
 
         /* untouchable (or inaccessible) items */
         } else if ((otmp->otyp == CORPSE
@@ -1158,30 +1166,48 @@ struct monst* mtmp;
     if (mtmp->mtame)
         return 0;
 
-    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere) {
-        if (otmp->otyp != CORPSE)
-            continue;
+    for (otmp = sobj_at(CORPSE, x, y); otmp;
+         /* won't get back here if otmp is split or gets used up */
+         otmp = nxtobj(otmp, CORPSE, TRUE)) {
 
         corpsepm = &mons[otmp->corpsenm];
-        if (is_rider(corpsepm)) {
-            revive_corpse(otmp);
+        /* skip some corpses */
+        if (vegan(corpsepm) /* ignore veggy corpse even if omnivorous */
+            /* don't eat harmful corpses */
+            || (touch_petrifies(corpsepm) && !resists_ston(mtmp)))
             continue;
+        if (is_rider(corpsepm)) {
+            boolean revived_it = revive_corpse(otmp);
+
+            newsym(x, y); /* corpse is gone; mtmp might be too so do this now
+                             since we're bypassing the bottom of the loop */
+            if (!revived_it)
+                continue; /* revival failed? if so, corpse is gone */
+            /* Successful Rider revival; unlike skipped corpses, don't
+               just move on to next corpse as if nothing has happened.
+               [Can Rider revival bump 'mtmp' off level when it's full?
+               We ought to return 3 if that happens.] */
+            break;
         }
 
-        /* don't eat harmful corpses */
-        if (touch_petrifies(corpsepm) && !resists_ston(mtmp))
-            continue;
+        if (otmp->quan > 1)
+            otmp = splitobj(otmp, 1L);
 
         if (cansee(x, y) && canseemon(mtmp)) {
             if (flags.verbose)
                 pline("%s eats %s!", Monnam(mtmp), distant_name(otmp, doname));
-        } else if (flags.verbose)
-            You_hear("a masticating sound.");
+        } else {
+            if (flags.verbose)
+                You_hear("a masticating sound.");
+        }
 
+        /* [should include quickmimic but can't handle that unless this
+           gets changed to set mtmp->meating] */
         poly = polyfodder(otmp);
         grow = mlevelgain(otmp);
         heal = mhealup(otmp);
-        eyes = (otmp->otyp == CARROT);
+        eyes = (otmp->otyp == CARROT); /*[always false since not a corpse]*/
+        ptr = original_ptr;
         delobj(otmp);
         if (poly) {
             if (newcham(mtmp, NULL, FALSE, FALSE))
@@ -2996,9 +3022,9 @@ struct monst *mtmp;
         }
         if (!rn2(10)) {
             if (!rn2(13)) {
-                /* don't generate purple worms if they would be too difficult */
+                /* don't generate purple worms if too difficult */
                 int pm = montoostrong(PM_PURPLE_WORM, monmax_difficulty_lev())
-                    ? PM_BABY_PURPLE_WORM : PM_PURPLE_WORM;
+                         ? PM_BABY_PURPLE_WORM : PM_PURPLE_WORM;
 
                 (void) makemon(&mons[pm], 0, 0, NO_MM_FLAGS);
             } else
