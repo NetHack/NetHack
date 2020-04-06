@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1586179508 2020/04/06 13:25:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1586186430 2020/04/06 15:20:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1077,7 +1077,7 @@ int final;
      * Skill with current weapon.  Might help players who've never
      * noticed #enhance or decided that it was pointless.
      */
-    if (uwep && (wtype = weapon_type(uwep)) != P_NONE && !is_ammo(uwep)) {
+    if ((wtype = weapon_type(uwep)) != P_NONE && (!uwep || !is_ammo(uwep))) {
         char sklvlbuf[20];
         int sklvl = P_SKILL(wtype);
         boolean hav = (sklvl != P_UNSKILLED && sklvl != P_SKILLED);
