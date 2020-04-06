@@ -347,6 +347,10 @@ E void NDECL(unearth_you);
 E void NDECL(escape_tomb);
 E void FDECL(bury_obj, (struct obj *));
 #endif
+#ifdef DEBUG
+extern int NDECL(wiz_debug_cmd_bury);
+#endif
+
 
 /* ### display.c ### */
 

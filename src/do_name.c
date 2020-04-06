@@ -6,11 +6,16 @@
 #include "hack.h"
 
 static char *NDECL(nextmbuf);
+static void FDECL(getpos_help_keyxhelp, (winid, const char *, const char *, int));
 static void FDECL(getpos_help, (BOOLEAN_P, const char *));
 static int FDECL(CFDECLSPEC cmp_coord_distu, (const void *, const void *));
+static int FDECL(gloc_filter_classify_glyph, (int));
+static int FDECL(gloc_filter_floodfill_matcharea, (int, int));
+static void FDECL(gloc_filter_floodfill, (int, int));
+static void NDECL(gloc_filter_init);
+static void NDECL(gloc_filter_done);
 static boolean FDECL(gather_locs_interesting, (int, int, int));
 static void FDECL(gather_locs, (coord **, int *, int));
-static int FDECL(gloc_filter_floodfill_matcharea, (int, int));
 static void FDECL(auto_describe, (int, int));
 static void NDECL(do_mname);
 static boolean FDECL(alreadynamed, (struct monst *, char *, char *));
@@ -68,7 +73,7 @@ static const char *const gloc_filtertxt[NUM_GFILTER] = {
     " in this area"
 };
 
-void
+static void
 getpos_help_keyxhelp(tmpwin, k1, k2, gloc)
 winid tmpwin;
 const char *k1;
@@ -248,7 +253,7 @@ const void *b;
     (isok((x), (y))                                             \
      && (selection_getpoint((x),(y), g.gloc_filter_map)))
 
-int
+static int
 gloc_filter_classify_glyph(glyph)
 int glyph;
 {
@@ -291,7 +296,7 @@ int x, y;
     return FALSE;
 }
 
-void
+static void
 gloc_filter_floodfill(x, y)
 int x, y;
 {
@@ -301,7 +306,7 @@ int x, y;
     selection_floodfill(g.gloc_filter_map, x, y, FALSE);
 }
 
-void
+static void
 gloc_filter_init()
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
@@ -322,7 +327,7 @@ gloc_filter_init()
     }
 }
 
-void
+static void
 gloc_filter_done()
 {
     if (g.gloc_filter_map) {

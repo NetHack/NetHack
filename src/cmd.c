@@ -42,10 +42,6 @@ static boolean alt_esc = FALSE;
 #define CMD_TRAVEL (char) 0x90
 #define CMD_CLICKLOOK (char) 0x8F
 
-#ifdef DEBUG
-extern int NDECL(wiz_debug_cmd_bury);
-#endif
-
 #ifdef DUMB /* stuff commented out in extern.h, but needed here */
 extern int NDECL(doapply);            /**/
 extern int NDECL(dorub);              /**/
