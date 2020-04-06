@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1585856901 2020/04/02 19:48:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.329 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1586091449 2020/04/05 12:57:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.333 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1028,8 +1028,16 @@ struct monst *mtmp;
 
         /* touch sensitive items */
         if (otmp->otyp == CORPSE && is_rider(&mons[otmp->corpsenm])) {
+            int ox = otmp->ox, oy = otmp->oy;
+            boolean revived_it = revive_corpse(otmp);
+
+            newsym(ox, oy);
             /* Rider corpse isn't just inedible; can't engulf it either */
-            (void) revive_corpse(otmp);
+            if (!revived_it)
+                continue;
+            /* [should check whether revival forced 'mtmp' off the level
+               and return 3 in that situation (if possible...)] */
+            break;
 
         /* untouchable (or inaccessible) items */
         } else if ((otmp->otyp == CORPSE
@@ -1141,6 +1149,87 @@ struct monst *mtmp;
                      (ecount == 1) ? "a" : "several", plur(ecount));
     }
     return (count > 0 || ecount > 0) ? 1 : 0;
+}
+
+/* Monster eats a corpse off the ground.
+ * Return value is 0 = nothing eaten, 1 = ate a corpse, 2 = died */
+int
+meatcorpse(mtmp) /* for purple worms and other voracious monsters */
+struct monst* mtmp;
+{
+    struct obj *otmp;
+    struct permonst *ptr, *original_ptr = mtmp->data, *corpsepm;
+    boolean poly, grow, heal, eyes = FALSE;
+    int x = mtmp->mx, y = mtmp->my;
+
+    /* if a pet, eating is handled separately, in dog.c */
+    if (mtmp->mtame)
+        return 0;
+
+    for (otmp = sobj_at(CORPSE, x, y); otmp;
+         /* won't get back here if otmp is split or gets used up */
+         otmp = nxtobj(otmp, CORPSE, TRUE)) {
+
+        corpsepm = &mons[otmp->corpsenm];
+        /* skip some corpses */
+        if (vegan(corpsepm) /* ignore veggy corpse even if omnivorous */
+            /* don't eat harmful corpses */
+            || (touch_petrifies(corpsepm) && !resists_ston(mtmp)))
+            continue;
+        if (is_rider(corpsepm)) {
+            boolean revived_it = revive_corpse(otmp);
+
+            newsym(x, y); /* corpse is gone; mtmp might be too so do this now
+                             since we're bypassing the bottom of the loop */
+            if (!revived_it)
+                continue; /* revival failed? if so, corpse is gone */
+            /* Successful Rider revival; unlike skipped corpses, don't
+               just move on to next corpse as if nothing has happened.
+               [Can Rider revival bump 'mtmp' off level when it's full?
+               We ought to return 3 if that happens.] */
+            break;
+        }
+
+        if (otmp->quan > 1)
+            otmp = splitobj(otmp, 1L);
+
+        if (cansee(x, y) && canseemon(mtmp)) {
+            if (flags.verbose)
+                pline("%s eats %s!", Monnam(mtmp), distant_name(otmp, doname));
+        } else {
+            if (flags.verbose)
+                You_hear("a masticating sound.");
+        }
+
+        /* [should include quickmimic but can't handle that unless this
+           gets changed to set mtmp->meating] */
+        poly = polyfodder(otmp);
+        grow = mlevelgain(otmp);
+        heal = mhealup(otmp);
+        eyes = (otmp->otyp == CARROT); /*[always false since not a corpse]*/
+        ptr = original_ptr;
+        delobj(otmp);
+        if (poly) {
+            if (newcham(mtmp, NULL, FALSE, FALSE))
+                ptr = mtmp->data;
+        } else if (grow) {
+            ptr = grow_up(mtmp, (struct monst *) 0);
+        } else if (heal) {
+            mtmp->mhp = mtmp->mhpmax;
+        }
+        if ((eyes || heal) && !mtmp->mcansee)
+            mcureblindness(mtmp, canseemon(mtmp));
+        /* in case it polymorphed or died */
+        if (ptr != original_ptr)
+            return !ptr ? 2 : 1;
+
+        /* Engulf & devour is instant, so don't set meating */
+        if (mtmp->minvis)
+            newsym(x, y);
+
+        return 1;
+    }
+    return 0;
 }
 
 void
@@ -1602,9 +1691,11 @@ mm_aggression(magr, mdef)
 struct monst *magr, /* monster that is currently deciding where to move */
              *mdef; /* another monster which is next to it */
 {
+    int mndx = monsndx(magr->data);
+
     /* supposedly purple worms are attracted to shrieking because they
        like to eat shriekers, so attack the latter when feasible */
-    if (magr->data == &mons[PM_PURPLE_WORM]
+    if ((mndx == PM_PURPLE_WORM || mndx == PM_BABY_PURPLE_WORM)
         && mdef->data == &mons[PM_SHRIEKER])
         return ALLOW_M | ALLOW_TM;
     /* Various other combinations such as dog vs cat, cat vs rat, and
@@ -2930,9 +3021,13 @@ struct monst *mtmp;
             stop_occupation();
         }
         if (!rn2(10)) {
-            if (!rn2(13))
-                (void) makemon(&mons[PM_PURPLE_WORM], 0, 0, NO_MM_FLAGS);
-            else
+            if (!rn2(13)) {
+                /* don't generate purple worms if too difficult */
+                int pm = montoostrong(PM_PURPLE_WORM, monmax_difficulty_lev())
+                         ? PM_BABY_PURPLE_WORM : PM_PURPLE_WORM;
+
+                (void) makemon(&mons[pm], 0, 0, NO_MM_FLAGS);
+            } else
                 (void) makemon((struct permonst *) 0, 0, 0, NO_MM_FLAGS);
         }
         aggravate();

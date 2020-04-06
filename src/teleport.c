@@ -519,7 +519,8 @@ struct obj *scroll;
         if (!wizard || yn("Override?") != 'y')
             return FALSE;
     }
-    if ((Teleport_control && !Stunned) || wizard) {
+    if ((Teleport_control && !Stunned) || (scroll && scroll->blessed)
+         || wizard) {
         if (unconscious()) {
             pline("Being unconscious, you cannot control your teleport.");
         } else {
@@ -545,11 +546,6 @@ struct obj *scroll;
             pline("Sorry...");
             result = TRUE;
         }
-    } else if (scroll && scroll->blessed) {
-        /* (this used to be handled in seffects()) */
-        if (yn("Do you wish to teleport?") == 'n')
-            return TRUE;
-        result = TRUE;
     }
 
     g.telescroll = scroll;
@@ -682,23 +678,34 @@ boolean break_the_rules; /* True: wizard mode ^T */
     boolean trap_once = FALSE;
 
     trap = t_at(u.ux, u.uy);
-    if (trap && (!trap->tseen || trap->ttyp != TELEP_TRAP))
+    if (trap && !trap->tseen)
         trap = 0;
 
     if (trap) {
-        trap_once = trap->once; /* trap may get deleted, save this */
-        if (trap->once) {
-            pline("This is a vault teleport, usable once only.");
-            if (yn("Jump in?") == 'n') {
-                trap = 0;
-            } else {
-                deltrap(trap);
-                newsym(u.ux, u.uy);
+        if (trap->ttyp == LEVEL_TELEP && trap->tseen) {
+            if (yn("There is a level teleporter here. Trigger it?") == 'y') {
+                level_tele_trap(trap, FORCETRAP);
+                /* deliberate jumping will always take time even if it doesn't
+                 * work */
+                return 1;
+            } else
+                trap = 0; /* continue with normal horizontal teleport */
+        } else if (trap->ttyp == TELEP_TRAP) {
+            trap_once = trap->once; /* trap may get deleted, save this */
+            if (trap->once) {
+                pline("This is a vault teleport, usable once only.");
+                if (yn("Jump in?") == 'n') {
+                    trap = 0;
+                } else {
+                    deltrap(trap);
+                    newsym(u.ux, u.uy);
+                }
             }
-        }
-        if (trap)
-            You("%s onto the teleportation trap.",
-                locomotion(g.youmonst.data, "jump"));
+            if (trap)
+                You("%s onto the teleportation trap.",
+                    locomotion(g.youmonst.data, "jump"));
+        } else
+            trap = 0;
     }
     if (!trap) {
         boolean castit = FALSE;
@@ -1013,11 +1020,11 @@ level_tele()
            which branches don't connect to anything deeper;
            mainly used to distinguish "can't get there from here"
            vs "from anywhere" rather than to control destination */
-        d_level *branch = In_quest(&u.uz) ? &qstart_level
+        d_level *qbranch = In_quest(&u.uz) ? &qstart_level
                           : In_mines(&u.uz) ? &mineend_level
                             : &sanctum_level;
-        int deepest = g.dungeons[branch->dnum].depth_start
-                      + dunlevs_in_dungeon(branch) - 1;
+        int deepest = g.dungeons[qbranch->dnum].depth_start
+                      + dunlevs_in_dungeon(qbranch) - 1;
 
         /* if invocation did not yet occur, teleporting into
          * the last level of Gehennom is forbidden.
@@ -1112,19 +1119,21 @@ struct trap *trap;
 unsigned trflags;
 {
     char verbbuf[BUFSZ];
+    boolean intentional = FALSE;
 
-    if ((trflags & VIASITTING) != 0)
+    if ((trflags & (VIASITTING|FORCETRAP)) != 0) {
         Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
-    else
+        intentional = TRUE;
+    } else
         Sprintf(verbbuf, "%s onto",
                 Levitation ? (const char *) "float"
                            : locomotion(g.youmonst.data, "step"));
     You("%s a level teleport trap!", verbbuf);
 
-    if (Antimagic) {
+    if (Antimagic && !intentional) {
         shieldeff(u.ux, u.uy);
     }
-    if (Antimagic || In_endgame(&u.uz)) {
+    if ((Antimagic && !intentional) || In_endgame(&u.uz)) {
         You_feel("a wrenching sensation.");
         return;
     }

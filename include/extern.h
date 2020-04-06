@@ -347,6 +347,10 @@ E void NDECL(unearth_you);
 E void NDECL(escape_tomb);
 E void FDECL(bury_obj, (struct obj *));
 #endif
+#ifdef DEBUG
+extern int NDECL(wiz_debug_cmd_bury);
+#endif
+
 
 /* ### display.c ### */
 
@@ -1227,7 +1231,7 @@ E struct permonst *FDECL(mkclass_aligned, (CHAR_P, int, ALIGNTYP_P));
 E int FDECL(mkclass_poly, (int));
 E int FDECL(adj_lev, (struct permonst *));
 E struct permonst *FDECL(grow_up, (struct monst *, struct monst *));
-E int FDECL(mongets, (struct monst *, int));
+E struct obj* FDECL(mongets, (struct monst *, int));
 E int FDECL(golemhp, (int));
 E boolean FDECL(peace_minded, (struct permonst *));
 E void FDECL(set_malign, (struct monst *));
@@ -1458,6 +1462,7 @@ E int FDECL(minliquid, (struct monst *));
 E int NDECL(movemon);
 E int FDECL(meatmetal, (struct monst *));
 E int FDECL(meatobj, (struct monst *));
+E int FDECL(meatcorpse, (struct monst *));
 E void FDECL(mpickgold, (struct monst *));
 E boolean FDECL(mpickstuff, (struct monst *, const char *));
 E int FDECL(curr_mon_load, (struct monst *));
@@ -2487,6 +2492,7 @@ E boolean FDECL(load_special, (const char *));
 E xchar FDECL(selection_getpoint, (int, int, struct selectionvar *));
 E struct selectionvar *NDECL(selection_new);
 E void FDECL(selection_free, (struct selectionvar *, BOOLEAN_P));
+E struct selectionvar *FDECL(selection_clone, (struct selectionvar *));
 E void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
 E void FDECL(selection_floodfill, (struct selectionvar *, int, int,
                                    BOOLEAN_P));

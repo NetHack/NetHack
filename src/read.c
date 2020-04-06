@@ -18,7 +18,7 @@ static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 static boolean FDECL(learnscrolltyp, (SHORT_P));
 static char *FDECL(erode_obj_text, (struct obj *, char *));
-static char *FDECL(apron_text, (struct obj *, char *buf));
+static char *FDECL(apron_text, (struct obj *, char *));
 static void FDECL(stripspe, (struct obj *));
 static void FDECL(p_glow1, (struct obj *));
 static void FDECL(p_glow2, (struct obj *, const char *));
@@ -29,6 +29,8 @@ static boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
 static void FDECL(display_stinking_cloud_positions, (int));
 static void FDECL(set_lit, (int, int, genericptr));
 static void NDECL(do_class_genocide);
+static boolean FDECL(create_particular_parse, (char *, struct _create_particular_data *));
+static boolean FDECL(create_particular_creation, (struct _create_particular_data *));
 
 static boolean
 learnscrolltyp(scrolltyp)
@@ -1138,6 +1140,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                         if (shop_h2o)
                             costly_alteration(obj, COST_UNCURS);
                         uncurse(obj);
+                        /* if the object was known to be cursed and is now known not to be,
+                           make the scroll known; it's trivial to identify anyway by comparing
+                           inventory before and after */
+                        if (obj->bknown && otyp == SCR_REMOVE_CURSE) {
+                            learnscrolltyp(SCR_REMOVE_CURSE);
+                        }
                     }
                 }
             }
@@ -1252,19 +1260,40 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             do_genocide((!scursed) | (2 * !!Confusion));
         break;
     case SCR_LIGHT:
-        if (!confused || rn2(5)) {
+        if (!confused) {
             if (!Blind)
                 g.known = TRUE;
-            litroom(!confused && !scursed, sobj);
-            if (!confused && !scursed) {
+            litroom(!scursed, sobj);
+            if (!scursed) {
                 if (lightdamage(sobj, TRUE, 5))
                     g.known = TRUE;
             }
         } else {
-            /* could be scroll of create monster, don't set known ...*/
-            (void) create_critters(1, !scursed ? &mons[PM_YELLOW_LIGHT]
-                                               : &mons[PM_BLACK_LIGHT],
-                                   TRUE);
+            int pm = scursed ? PM_BLACK_LIGHT : PM_YELLOW_LIGHT;
+
+            if ((g.mvitals[pm].mvflags & G_GONE)) {
+                pline("Tiny lights sparkle in the air momentarily.");
+            } else {
+                /* surround with cancelled tame lights which won't explode */
+                boolean sawlights = FALSE;
+                int numlights = rn1(2,3) + (sblessed * 2);
+                int i;
+
+                for (i = 0; i < numlights; ++i) {
+                    struct monst * mon = makemon(&mons[pm], u.ux, u.uy,
+                                                 MM_EDOG | NO_MINVENT);
+                    initedog(mon);
+                    mon->msleeping = 0;
+                    mon->mcan = TRUE;
+                    if (canspotmon(mon))
+                        sawlights = TRUE;
+                    newsym(mon->mx, mon->my);
+                }
+                if (sawlights) {
+                    pline("Lights appear all around you!");
+                    g.known = TRUE;
+                }
+            }
         }
         break;
     case SCR_TELEPORTATION:
@@ -2242,17 +2271,7 @@ struct obj *from_obj;
     return FALSE;
 }
 
-struct _create_particular_data {
-    int quan;
-    int which;
-    int fem;
-    char monclass;
-    boolean randmonst;
-    boolean maketame, makepeaceful, makehostile;
-    boolean sleeping, saddled, invisible, hidden;
-};
-
-boolean
+static boolean
 create_particular_parse(str, d)
 char *str;
 struct _create_particular_data *d;
@@ -2349,7 +2368,7 @@ struct _create_particular_data *d;
     return FALSE;
 }
 
-boolean
+static boolean
 create_particular_creation(d)
 struct _create_particular_data *d;
 {

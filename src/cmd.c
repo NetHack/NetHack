@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1583704247 2020/03/08 21:50:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.408 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1586122255 2020/04/05 21:30:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.413 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -41,10 +41,6 @@ static boolean alt_esc = FALSE;
 
 #define CMD_TRAVEL (char) 0x90
 #define CMD_CLICKLOOK (char) 0x8F
-
-#ifdef DEBUG
-extern int NDECL(wiz_debug_cmd_bury);
-#endif
 
 #ifdef DUMB /* stuff commented out in extern.h, but needed here */
 extern int NDECL(doapply);            /**/
@@ -123,8 +119,6 @@ extern int NDECL(dozap);              /**/
 extern int NDECL(doorganize);         /**/
 #endif /* DUMB */
 
-static int NDECL((*timed_occ_fn));
-
 static int NDECL(dosuspend_core);
 static int NDECL(dosh_core);
 static int NDECL(doherecmdmenu);
@@ -153,13 +147,16 @@ static int NDECL(wiz_show_vision);
 static int NDECL(wiz_smell);
 static int NDECL(wiz_intrinsic);
 static int NDECL(wiz_show_wmodes);
+static int NDECL(wiz_show_stats);
+static int NDECL(wiz_rumor_check);
+#ifdef DEBUG_MIGRATING_MONS
+static int NDECL(wiz_migrate_mons);
+#endif
+
 static void NDECL(wiz_map_levltyp);
 static void NDECL(wiz_levltyp_legend);
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern void FDECL(show_borlandc_stats, (winid));
-#endif
-#ifdef DEBUG_MIGRATING_MONS
-static int NDECL(wiz_migrate_mons);
 #endif
 static int FDECL(size_monst, (struct monst *, BOOLEAN_P));
 static int FDECL(size_obj, (struct obj *));
@@ -173,9 +170,7 @@ static void FDECL(mon_chain, (winid, const char *, struct monst *,
                                   BOOLEAN_P, long *, long *));
 static void FDECL(contained_stats, (winid, const char *, long *, long *));
 static void FDECL(misc_stats, (winid, long *, long *));
-static int NDECL(wiz_show_stats);
 static boolean FDECL(accept_menu_prefix, (int NDECL((*))));
-static int NDECL(wiz_rumor_check);
 
 static void FDECL(add_herecmd_menuitem, (winid, int NDECL((*)),
                                              const char *));
@@ -184,6 +179,13 @@ static char FDECL(there_cmd_menu, (BOOLEAN_P, int, int));
 static char *NDECL(parse);
 static void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
 static boolean FDECL(help_dir, (CHAR_P, int, const char *));
+
+static void NDECL(commands_init);
+static int FDECL(dokeylist_putcmds, (winid, BOOLEAN_P, int, int, boolean *));
+static int FDECL(ch2spkeys, (CHAR_P, int, int));
+static boolean FDECL(prefix_cmd, (CHAR_P));
+
+static int NDECL((*timed_occ_fn));
 
 static const char *readchar_queue = "";
 /* for rejecting attempts to use wizard mode commands */
@@ -2035,7 +2037,7 @@ const char *command;
 }
 
 /* initialize all keyboard commands */
-void
+static void
 commands_init()
 {
     struct ext_func_tab *extcmd;
@@ -2067,7 +2069,7 @@ commands_init()
     (void) bind_key(' ',    "wait");
 }
 
-int
+static int
 dokeylist_putcmds(datawin, docount, cmdflags, exflags, keys_used)
 winid datawin;
 boolean docount;
@@ -3081,7 +3083,7 @@ rnd_extcmd_idx(VOID_ARGS)
     return rn2(extcmdlist_length + 1) - 1;
 }
 
-int
+static int
 ch2spkeys(c, start, end)
 char c;
 int start,end;
@@ -3384,7 +3386,7 @@ char c;
                       || (g.Cmd.num_pad && c == g.Cmd.spkeys[NHKF_REDRAW2]));
 }
 
-boolean
+static boolean
 prefix_cmd(c)
 char c;
 {
@@ -4073,12 +4075,12 @@ int x, y, mod;
 }
 
 char
-get_count(allowchars, inkey, maxcount, count, historical)
+get_count(allowchars, inkey, maxcount, count, historicmsg)
 char *allowchars;
 char inkey;
 long maxcount;
 long *count;
-boolean historical; /* whether to include in message history: True => yes */
+boolean historicmsg; /* whether to include in message history: True => yes */
 {
     char qbuf[QBUFSZ];
     int key;
@@ -4124,7 +4126,7 @@ boolean historical; /* whether to include in message history: True => yes */
         }
     }
 
-    if (historical) {
+    if (historicmsg) {
         Sprintf(qbuf, "Count: %ld ", *count);
         (void) key2txt((uchar) key, eos(qbuf));
         putmsghistory(qbuf, FALSE);

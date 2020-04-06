@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1585361053 2020/03/28 02:04:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1586091452 2020/04/05 12:57:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -838,7 +838,7 @@ m_move(mtmp, after)
 register struct monst *mtmp;
 register int after;
 {
-    register int appr;
+    int appr, etmp;
     xchar gx, gy, nix, niy, chcnt;
     int chi; /* could be schar except for stupid Sun-2 compiler */
     boolean likegold = 0, likegems = 0, likeobjs = 0, likemagic = 0,
@@ -1008,8 +1008,8 @@ register int after;
 
     if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
         boolean in_line = (lined_up(mtmp)
-               && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
-                   <= (throws_rocks(g.youmonst.data) ? 20 : ACURRSTR / 2 + 1)));
+             && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
+                 <= (throws_rocks(g.youmonst.data) ? 20 : ACURRSTR / 2 + 1)));
 
         if (appr != 1 || !in_line) {
             /* Monsters in combat won't pick stuff up, avoiding the
@@ -1530,8 +1530,14 @@ register int after;
 
             /* Maybe a cube ate just about anything */
             if (ptr == &mons[PM_GELATINOUS_CUBE]) {
-                if (meatobj(mtmp) == 2)
-                    return 2; /* it died */
+                if ((etmp = meatobj(mtmp)) >= 2)
+                    return etmp; /* it died or got forced off the level */
+            }
+            /* Maybe a purple worm ate a corpse */
+            if (ptr == &mons[PM_PURPLE_WORM]
+                || ptr == &mons[PM_BABY_PURPLE_WORM]) {
+                if ((etmp = meatcorpse(mtmp)) >= 2)
+                    return etmp; /* it died or got forced off the level */
             }
 
             if (!*in_rooms(mtmp->mx, mtmp->my, SHOPBASE) || !rn2(25)) {

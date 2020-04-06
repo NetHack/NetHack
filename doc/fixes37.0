@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.149 $ $NHDT-Date: 1585778315 2020/04/01 21:58:35 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ $NHDT-Date: 1586179508 2020/04/06 13:25:08 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -26,6 +26,7 @@ monster wielding Stormbringer or healer's Staff against another monster would
 	heal the hero instead of the wielding monster when draining life
 change twoweapon feedback from "not a weapon" to "not a suitable weapon"
 don't allow twoweapon combat if either weapon is a bow, crossbow, or sling
+	[later: or arrows, bolts, and missiles (darts, shuriken, boomerangs)]
 drum of earthquake feedback reported various things (fountains, thrones, &c)
 	falling into a chasm but they remained intact because trap creation
 	had been changed to not clobber such things (so couldn't make pits)
@@ -101,6 +102,21 @@ level compiler creates correct novel with supplied name
 for farlook, describe water in the castle moat and in Juiblex's swamp as moat
 	and as swamp, respectively, rather than just as "water"
 make hezrous emit poison clouds when they move
+stepping from one type of terrain to another was triggering an unnecessary
+	status update
+make shriekers summon baby purple worms if purple worms would be too tough
+make non-tame (baby) purple worms eat corpses off the ground
+make baby purple worms attack shriekers
+make hero polymorphed into baby purple worm warned against shriekers
+confused scroll of light summons tame cancelled lights
+potions of hallucination can give enlightenment
+add a small chance of surviving food poisoning
+deliberate level teleporter activation ignores magic resistance
+auto-id scroll of remove curse when a known buc-state was changed
+demon lords hate Demonbane
+pets avoid eating shapeshifter corpses unless starving or nearly feral
+blessed scroll of teleportation gives a single controlled teleport
+allow opening a tin without interruption if slimed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -143,6 +159,8 @@ fix flipping non-existent stairs and ladders (github #311)
 fix door created into random wall or position opening into solid wall
 'use_inverse' option was accidentally made Windows-only; change it back to
 	being more general; change its default to True
+X11: was still initializing map to 'stone' instead of 'unexplored' after they
+	became separate glyphs
 
 
 Platform- and/or Interface-Specific Fixes
@@ -217,6 +235,7 @@ for !fixinv option where inventory letters normally don't stick, try to put
 	a throw-and-return weapon back into the same inventory slot it gets
 	thrown from; only works if it does return and is successfully caught
 wizard mode #wizborn command
+include more skill information in ^X output when dual-wielding
 
 
 Platform- and/or Interface-Specific New Features

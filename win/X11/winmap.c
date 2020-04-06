@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1455389908 2016/02/13 18:58:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $ */
+/* NetHack 3.6	winmap.c	$NHDT-Date: 1586119020 2020/04/05 20:37:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,6 +64,7 @@ static void FDECL(init_text, (struct xwindow *));
 static void FDECL(map_exposed, (Widget, XtPointer, XtPointer));
 static void FDECL(set_gc, (Widget, Font, const char *, Pixel, GC *, GC *));
 static void FDECL(get_text_gc, (struct xwindow *, Font));
+static void FDECL(map_all_unexplored, (struct map_info_t *));
 static void FDECL(get_char_info, (struct xwindow *));
 static void FDECL(display_cursor, (struct xwindow *));
 
@@ -476,7 +477,9 @@ ntiles %ld\n",
                               0);               /* bytes_per_line */
 
     if (!tile_image)
-        impossible("init_tiles: insufficient memory to create image");
+        /* 3.7: this was calling impossible() but when that returned,
+           the next line would deference a Null pointer (twice!) */
+        panic("init_tiles: insufficient memory to create image");
 
     /* now we know the physical memory requirements, we can allocate space */
     tile_image->data =
@@ -541,7 +544,7 @@ ntiles %ld\n",
     tile_info->black_gc = XtGetGC(wp->w, mask, &values);
 #endif /* USE_WHITE */
 
-tiledone:
+ tiledone:
 #ifndef USE_XPM
     if (fp)
         (void) fclose(fp);
@@ -914,19 +917,36 @@ struct xwindow *wp;
 }
 
 /*
- * Set all map tiles to S_stone
+ * Set all map tiles and characters to S_unexplored (was S_stone).
+ * (Actually, column 0 is set to S_nothing and 1..COLNO-1 to S_unexplored.)
  */
 static void
-map_all_stone(map_info)
+map_all_unexplored(map_info) /* [was map_all_stone()] */
 struct map_info_t *map_info;
 {
     int x, y;
-    unsigned short stone = cmap_to_glyph(S_stone);
+ /* unsigned short g_stone = cmap_to_glyph(S_stone); */
+    unsigned short g_unexp = GLYPH_UNEXPLORED, g_nothg = GLYPH_NOTHING;
+    int mgunexp = ' ', mgnothg = ' ', mgcolor = NO_COLOR;
+    unsigned mgspecial = 0;
+    struct tile_map_info_t *tile_map = &map_info->tile_map;
+    struct text_map_info_t *text_map = &map_info->text_map;
 
+    mapglyph(GLYPH_UNEXPLORED, &mgunexp, &mgcolor, &mgspecial, 0, 0, 0U);
+    mapglyph(GLYPH_NOTHING, &mgnothg, &mgcolor, &mgspecial, 0, 0, 0U);
+    /*
+     * Tiles map tracks glyphs.
+     * Text map tracks characters derived from glyphs.
+     */
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
-            map_info->tile_map.glyphs[y][x].glyph = stone;
-            map_info->tile_map.glyphs[y][x].special = 0;
+            tile_map->glyphs[y][x].glyph = !x ? g_nothg : g_unexp;
+            tile_map->glyphs[y][x].special = 0;
+
+            text_map->text[y][x] = (uchar) (!x ? mgnothg : mgunexp);
+#ifdef TEXTCOLOR
+            text_map->colors[y][x] = NO_COLOR;
+#endif
         }
 }
 
@@ -943,20 +963,14 @@ struct xwindow *wp;
     struct map_info_t *map_info = wp->map_information;
 
     /* update both tile and text backing store, then update */
-
-    map_all_stone(map_info);
-    (void) memset((genericptr_t) map_info->text_map.text, ' ',
-                  sizeof map_info->text_map.text);
-#ifdef TEXTCOLOR
-    (void) memset((genericptr_t) map_info->text_map.colors, NO_COLOR,
-                  sizeof map_info->text_map.colors);
-#endif
+    map_all_unexplored(map_info);
 
     /* force a full update */
     (void) memset((genericptr_t) map_info->t_start, (char) 0,
                   sizeof map_info->t_start);
     (void) memset((genericptr_t) map_info->t_stop, (char) COLNO - 1,
                   sizeof map_info->t_stop);
+
     display_map_window(wp);
 }
 
@@ -1074,7 +1088,7 @@ Cardinal *num_params;
             nbytes = XLookupString(key, keystring, MAX_KEY_STRING,
                                    (KeySym *) 0, (XComposeStatus *) 0);
         }
-    key_events:
+ key_events:
         /* Modifier keys return a zero length string when pressed. */
         if (nbytes) {
 #ifdef VERBOSE_INPUT
@@ -1581,7 +1595,7 @@ Widget parent;
         set_map_size(wp, COLNO, ROWNO);
     }
 
-    map_all_stone(map_info);
+    map_all_unexplored(map_info);
 }
 
 /*
@@ -1675,7 +1689,7 @@ int exit_condition;
         XtDispatchEvent(&event);
 
     /* See if we can exit. */
-    try_test:
+ try_test:
         switch (exit_condition) {
         case EXIT_ON_SENT_EVENT: {
             XAnyEvent *any = (XAnyEvent *) &event;

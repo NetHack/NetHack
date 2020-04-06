@@ -17,6 +17,7 @@ static struct obj *FDECL(on_ground, (SHORT_P));
 static boolean FDECL(you_have, (int));
 static unsigned long FDECL(target_on, (int, struct monst *));
 static unsigned long FDECL(strategy, (struct monst *));
+static void FDECL(choose_stairs, (xchar *, xchar *));
 
 /* adding more neutral creatures will tend to reduce the number of monsters
    summoned by nasty(); adding more lawful creatures will reduce the number
@@ -321,7 +322,7 @@ register struct monst *mtmp;
     return dstrat;
 }
 
-void
+static void
 choose_stairs(sx, sy)
 xchar *sx;
 xchar *sy;

@@ -20,6 +20,7 @@
 static boolean FDECL(isbig, (struct mkroom *));
 static struct mkroom *FDECL(pick_room, (BOOLEAN_P));
 static void NDECL(mkshop), FDECL(mkzoo, (int)), NDECL(mkswamp);
+static void FDECL(mk_zoo_thronemon, (int, int));
 static void NDECL(mktemple);
 static coord *FDECL(shrine_pos, (int));
 static struct permonst *NDECL(morguemon);
@@ -240,7 +241,7 @@ int type;
     }
 }
 
-void
+static void
 mk_zoo_thronemon(x,y)
 int x,y;
 {

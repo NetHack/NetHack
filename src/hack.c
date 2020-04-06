@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1584405116 2020/03/17 00:31:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.250 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1585993266 2020/04/04 09:41:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.254 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,6 +16,7 @@ static boolean FDECL(trapmove, (int, int, struct trap *));
 static struct monst *FDECL(monstinroom, (struct permonst *, int));
 static boolean FDECL(doorless_door, (int, int));
 static void FDECL(move_update, (BOOLEAN_P));
+static int NDECL(pickup_checks);
 static void FDECL(maybe_smudge_engr, (int, int, int, int));
 static void NDECL(domove_core);
 
@@ -2082,7 +2083,7 @@ switch_terrain()
         if (Flying)
             You("start flying.");
     }
-    if ((!Levitation ^ was_levitating) || (!Flying ^ was_flying))
+    if ((!!Levitation ^ was_levitating) || (!!Flying ^ was_flying))
         g.context.botl = TRUE; /* update Lev/Fly status condition */
 }
 
@@ -2620,7 +2621,7 @@ boolean newlev;
    0 = cannot pickup, no time taken
   -1 = do normal pickup
   -2 = loot the monster */
-int
+static int
 pickup_checks()
 {
     /* uswallow case added by GAN 01/29/87 */

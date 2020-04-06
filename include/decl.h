@@ -631,6 +631,17 @@ struct role_filter {
     short mask;
 };
 
+/* read.c, create_particular() & create_particular_parse() */
+struct _create_particular_data {
+    int quan;
+    int which;
+    int fem;
+    char monclass;
+    boolean randmonst;
+    boolean maketame, makepeaceful, makehostile;
+    boolean sleeping, saddled, invisible, hidden;
+};
+
 /* instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * an set in decl.c during early early engine initialization.

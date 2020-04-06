@@ -1908,6 +1908,7 @@ polysense()
 
     switch (u.umonnum) {
     case PM_PURPLE_WORM:
+    case PM_BABY_PURPLE_WORM:
         warnidx = PM_SHRIEKER;
         break;
     case PM_VAMPIRE:

@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1578190903 2020/01/05 02:21:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1586178709 2020/04/06 13:11:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -662,9 +662,15 @@ can_twoweapon()
 {
     struct obj *otmp;
 
-    /* to dual-wield, must be a weapon-tool or a weapon other than a bow */
+    /* to dual-wield, obj must be a weapon or a weapon-tool, and not
+       a bow or arrow or missile (dart, shuriken, boomerang), matching
+       the sorts of weapons which yield "you begin bashing" when used
+       for melee; we don't bother including polearms here because
+       they'll be rejected as two-weapon because they're two-handed */
 #define TWOWEAPOK(obj) \
-    (((obj)->oclass == WEAPON_CLASS) ? !is_launcher(obj) : is_weptool(obj))
+    (((obj)->oclass == WEAPON_CLASS)                            \
+     ? !(is_launcher(obj) ||is_ammo(obj) || is_missile(obj))    \
+     : is_weptool(obj))
 
     if (!could_twoweap(g.youmonst.data)) {
         if (Upolyd)

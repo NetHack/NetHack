@@ -146,7 +146,7 @@ lua_State *L;
     schar x = -1, y = -1;
     int val = 1;
     int argc = lua_gettop(L);
-    long coord = 0L;
+    long crd = 0L;
 
     if (argc == 0) {
         (void) l_selection_new(L);
@@ -172,11 +172,11 @@ lua_State *L;
     }
 
     if (x == -1 && y == -1)
-        coord = SP_COORD_PACK_RANDOM(0);
+        crd = SP_COORD_PACK_RANDOM(0);
     else
-        coord = SP_COORD_PACK(x,y);
+        crd = SP_COORD_PACK(x,y);
     get_location_coord(&x, &y, ANY_LOC,
-                       g.coder ? g.coder->croom : NULL, coord);
+                       g.coder ? g.coder->croom : NULL, crd);
     selection_setpoint(x, y, sel, val);
     lua_settop(L, 1);
     return 1;
@@ -191,13 +191,13 @@ lua_State *L;
     schar x = (schar) luaL_checkinteger(L, 2);
     schar y = (schar) luaL_checkinteger(L, 3);
     int val;
-    long coord;
+    long crd;
 
     if (x == -1 && y == -1)
-        coord = SP_COORD_PACK_RANDOM(0);
+        crd = SP_COORD_PACK_RANDOM(0);
     else
-        coord = SP_COORD_PACK(x,y);
-    get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, coord);
+        crd = SP_COORD_PACK(x,y);
+    get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, crd);
 
     val = selection_getpoint(x, y, sel);
     lua_settop(L, 0);

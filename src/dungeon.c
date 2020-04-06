@@ -49,6 +49,7 @@ static int FDECL(possible_places, (int, boolean *,
                                        struct proto_dungeon *));
 static xchar FDECL(pick_level, (boolean *, int));
 static boolean FDECL(place_level, (int, struct proto_dungeon *));
+static int FDECL(get_dgn_flags, (lua_State *));
 static boolean FDECL(unplaced_floater, (struct dungeon *));
 static boolean FDECL(unreachable_level, (d_level *, BOOLEAN_P));
 static void FDECL(tport_menu, (winid, char *, struct lchoice *, d_level *,

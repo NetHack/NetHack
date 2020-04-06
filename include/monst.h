@@ -205,6 +205,7 @@ struct monst {
    given the current level difficulty and the hero's level. */
 #define monmax_difficulty(levdif) (((levdif) + u.ulevel) / 2)
 #define monmin_difficulty(levdif) ((levdif) / 6)
+#define monmax_difficulty_lev() (monmax_difficulty(level_difficulty()))
 
 /* Macros for whether a type of monster is too strong for a specific level. */
 #define montoostrong(monindx, lev) (mons[monindx].difficulty > lev)

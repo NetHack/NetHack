@@ -10,6 +10,7 @@ static int FDECL(iswall, (int, int));
 static int FDECL(iswall_or_stone, (int, int));
 static boolean FDECL(is_solid, (int, int));
 static int FDECL(extend_spine, (int[3][3], int, int, int));
+static void FDECL(wall_cleanup, (int, int, int, int));
 static boolean FDECL(okay, (int, int, int));
 static void FDECL(maze0xy, (coord *));
 static boolean FDECL(put_lregion_here, (XCHAR_P, XCHAR_P, XCHAR_P,
@@ -21,7 +22,11 @@ static void NDECL(unsetup_waterlevel);
 static void FDECL(check_ransacked, (char *));
 static void FDECL(migr_booty_item, (int, const char *));
 static void FDECL(migrate_orc, (struct monst *, unsigned long));
+static void FDECL(shiny_orc_stuff, (struct monst *));
 static void NDECL(stolen_booty);
+static boolean FDECL(maze_inbounds, (int, int));
+static void FDECL(maze_remove_deadends, (XCHAR_P));
+static void FDECL(create_maze, (int, int));
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -119,7 +124,7 @@ int wall_there, dx, dy;
 }
 
 /* Remove walls totally surrounded by stone */
-void
+static void
 wall_cleanup(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
@@ -635,7 +640,7 @@ unsigned long mflags;
     migrate_to_level(mtmp, ledger_no(&dest), MIGR_RANDOM, (coord *) 0);
 }
 
-void
+static void
 shiny_orc_stuff(mtmp)
 struct monst *mtmp;
 {
@@ -782,7 +787,7 @@ stolen_booty(VOID_ARGS)
 
 #undef ORC_LEADER
 
-boolean
+static boolean
 maze_inbounds(x, y)
 int x, y;
 {
@@ -790,7 +795,7 @@ int x, y;
             && x < g.x_maze_max && y < g.y_maze_max && isok(x, y));
 }
 
-void
+static void
 maze_remove_deadends(typ)
 xchar typ;
 {
@@ -837,7 +842,7 @@ xchar typ;
 /* Create a maze with specified corridor width and wall thickness
  * TODO: rewrite walkfrom so it works on temp space, not levl
  */
-void
+static void
 create_maze(corrwid, wallthick)
 int corrwid;
 int wallthick;
