@@ -1020,11 +1020,11 @@ level_tele()
            which branches don't connect to anything deeper;
            mainly used to distinguish "can't get there from here"
            vs "from anywhere" rather than to control destination */
-        d_level *branch = In_quest(&u.uz) ? &qstart_level
+        d_level *qbranch = In_quest(&u.uz) ? &qstart_level
                           : In_mines(&u.uz) ? &mineend_level
                             : &sanctum_level;
-        int deepest = g.dungeons[branch->dnum].depth_start
-                      + dunlevs_in_dungeon(branch) - 1;
+        int deepest = g.dungeons[qbranch->dnum].depth_start
+                      + dunlevs_in_dungeon(qbranch) - 1;
 
         /* if invocation did not yet occur, teleporting into
          * the last level of Gehennom is forbidden.

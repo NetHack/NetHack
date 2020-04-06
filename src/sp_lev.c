@@ -93,6 +93,7 @@ static void NDECL(spo_pop_container);
 static int FDECL(l_create_stairway, (lua_State *, BOOLEAN_P));
 static void FDECL(spo_endroom, (struct sp_coder *));
 static void FDECL(l_table_getset_feature_flag, (lua_State *, int, int, const char *, int));
+static void FDECL(sel_set_lit, (int, int, genericptr_t));
 static void FDECL(sel_set_ter, (int, int, genericptr_t));
 static void FDECL(sel_set_door, (int, int, genericptr_t));
 static void FDECL(sel_set_feature, (int, int, genericptr_t));
@@ -4825,32 +4826,6 @@ genericptr_t arg;
                 (*func)(x, y, arg);
 }
 
-
-void
-stackDump(L)
-lua_State *L;
-{
-    int i;
-    int top = lua_gettop(L);
-    for (i = 1; i <= top; i++) {  /* repeat for each level */
-        int t = lua_type(L, i);
-        switch (t) {
-        case LUA_TSTRING:  /* strings */
-            pline("%i:\"%s\"", i, lua_tostring(L, i));
-            break;
-        case LUA_TBOOLEAN:  /* booleans */
-            pline("%i:%s", i, lua_toboolean(L, i) ? "true" : "false");
-            break;
-        case LUA_TNUMBER:  /* numbers */
-            pline("%i:%g", i, lua_tonumber(L, i));
-            break;
-        default:  /* other values */
-            pline("%i:%s", i, lua_typename(L, t));
-            break;
-        }
-    }
-}
-
 static void
 sel_set_ter(x, y, arg)
 int x, y;
@@ -5548,8 +5523,7 @@ lua_State *L;
     return 0;
 }
 
-
-void
+static void
 sel_set_lit(x, y, arg)
 int x, y;
 genericptr_t arg;

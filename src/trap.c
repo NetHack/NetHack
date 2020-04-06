@@ -9,6 +9,8 @@ extern const char *const destroy_strings[][3]; /* from zap.c */
 
 static boolean FDECL(keep_saddle_with_steedcorpse, (unsigned, struct obj *,
                                                     struct obj *));
+static boolean FDECL(mu_maybe_destroy_web, (struct monst *, BOOLEAN_P,
+                                            struct trap *));
 static struct obj *FDECL(t_missile, (int, struct trap *));
 static char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 static int FDECL(steedintrap, (struct trap *, struct obj *));
@@ -805,7 +807,7 @@ struct obj *objchn, *saddle;
 
 /* monster or you go through and possibly destroy a web.
    return TRUE if could go through. */
-boolean
+static boolean
 mu_maybe_destroy_web(mtmp, domsg, trap)
 struct monst *mtmp;
 boolean domsg;
