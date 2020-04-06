@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ $NHDT-Date: 1586178711 2020/04/06 13:11:51 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ $NHDT-Date: 1586179508 2020/04/06 13:25:08 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -235,6 +235,7 @@ for !fixinv option where inventory letters normally don't stick, try to put
 	a throw-and-return weapon back into the same inventory slot it gets
 	thrown from; only works if it does return and is successfully caught
 wizard mode #wizborn command
+include more skill information in ^X output when dual-wielding
 
 
 Platform- and/or Interface-Specific New Features
