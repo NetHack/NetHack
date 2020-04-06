@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ $NHDT-Date: 1586119020 2020/04/05 20:37:00 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ $NHDT-Date: 1586178711 2020/04/06 13:11:51 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -26,6 +26,7 @@ monster wielding Stormbringer or healer's Staff against another monster would
 	heal the hero instead of the wielding monster when draining life
 change twoweapon feedback from "not a weapon" to "not a suitable weapon"
 don't allow twoweapon combat if either weapon is a bow, crossbow, or sling
+	[later: or arrows, bolts, and missiles (darts, shuriken, boomerangs)]
 drum of earthquake feedback reported various things (fountains, thrones, &c)
 	falling into a chasm but they remained intact because trap creation
 	had been changed to not clobber such things (so couldn't make pits)
