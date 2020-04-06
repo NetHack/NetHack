@@ -18,7 +18,7 @@ static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 static boolean FDECL(learnscrolltyp, (SHORT_P));
 static char *FDECL(erode_obj_text, (struct obj *, char *));
-static char *FDECL(apron_text, (struct obj *, char *buf));
+static char *FDECL(apron_text, (struct obj *, char *));
 static void FDECL(stripspe, (struct obj *));
 static void FDECL(p_glow1, (struct obj *));
 static void FDECL(p_glow2, (struct obj *, const char *));
@@ -29,6 +29,8 @@ static boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
 static void FDECL(display_stinking_cloud_positions, (int));
 static void FDECL(set_lit, (int, int, genericptr));
 static void NDECL(do_class_genocide);
+static boolean FDECL(create_particular_parse, (char *, struct _create_particular_data *));
+static boolean FDECL(create_particular_creation, (struct _create_particular_data *));
 
 static boolean
 learnscrolltyp(scrolltyp)
@@ -2269,17 +2271,7 @@ struct obj *from_obj;
     return FALSE;
 }
 
-struct _create_particular_data {
-    int quan;
-    int which;
-    int fem;
-    char monclass;
-    boolean randmonst;
-    boolean maketame, makepeaceful, makehostile;
-    boolean sleeping, saddled, invisible, hidden;
-};
-
-boolean
+static boolean
 create_particular_parse(str, d)
 char *str;
 struct _create_particular_data *d;
@@ -2376,7 +2368,7 @@ struct _create_particular_data *d;
     return FALSE;
 }
 
-boolean
+static boolean
 create_particular_creation(d)
 struct _create_particular_data *d;
 {

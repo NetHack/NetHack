@@ -5,6 +5,12 @@
 #include "hack.h"
 #include "sp_lev.h"
 
+struct _lua_obj {
+    int state; /* UNUSED */
+    struct obj *obj;
+};
+
+static struct _lua_obj *FDECL(l_obj_check, (lua_State *, int));
 static int FDECL(l_obj_add_to_container, (lua_State *));
 static int FDECL(l_obj_gc, (lua_State *));
 static int FDECL(l_obj_getcontents, (lua_State *));
@@ -17,14 +23,9 @@ static int FDECL(l_obj_to_table, (lua_State *));
 static int FDECL(l_obj_at, (lua_State *));
 static int FDECL(l_obj_container, (lua_State *));
 
-struct _lua_obj {
-    int state; /* UNUSED */
-    struct obj *obj;
-};
-
 #define lobj_is_ok(lo) ((lo) && (lo)->obj && (lo)->obj->where != OBJ_LUAFREE)
 
-struct _lua_obj *
+static struct _lua_obj *
 l_obj_check(L, index)
 lua_State *L;
 int index;

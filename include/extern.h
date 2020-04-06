@@ -2492,6 +2492,7 @@ E boolean FDECL(load_special, (const char *));
 E xchar FDECL(selection_getpoint, (int, int, struct selectionvar *));
 E struct selectionvar *NDECL(selection_new);
 E void FDECL(selection_free, (struct selectionvar *, BOOLEAN_P));
+E struct selectionvar *FDECL(selection_clone, (struct selectionvar *));
 E void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
 E void FDECL(selection_floodfill, (struct selectionvar *, int, int,
                                    BOOLEAN_P));

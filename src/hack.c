@@ -16,6 +16,7 @@ static boolean FDECL(trapmove, (int, int, struct trap *));
 static struct monst *FDECL(monstinroom, (struct permonst *, int));
 static boolean FDECL(doorless_door, (int, int));
 static void FDECL(move_update, (BOOLEAN_P));
+static int NDECL(pickup_checks);
 static void FDECL(maybe_smudge_engr, (int, int, int, int));
 static void NDECL(domove_core);
 
@@ -2620,7 +2621,7 @@ boolean newlev;
    0 = cannot pickup, no time taken
   -1 = do normal pickup
   -2 = loot the monster */
-int
+static int
 pickup_checks()
 {
     /* uswallow case added by GAN 01/29/87 */

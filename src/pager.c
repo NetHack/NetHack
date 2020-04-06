@@ -32,6 +32,7 @@ static void NDECL(hmenu_dohistory);
 static void NDECL(hmenu_dowhatis);
 static void NDECL(hmenu_dowhatdoes);
 static void NDECL(hmenu_doextlist);
+static void NDECL(domenucontrols);
 #ifdef PORT_HELP
 extern void NDECL(port_help);
 #endif
@@ -2068,7 +2069,7 @@ hmenu_doextlist(VOID_ARGS)
     (void) doextlist();
 }
 
-void
+static void
 domenucontrols(VOID_ARGS)
 {
     winid cwin = create_nhwindow(NHW_TEXT);

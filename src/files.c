@@ -127,6 +127,8 @@ extern char *sounddir;
 #define SELECTSAVED
 #endif
 
+static NHFILE *NDECL(new_nhfile);
+static void FDECL(free_nhfile, (NHFILE *));
 #ifdef SELECTSAVED
 static int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
 #endif
@@ -163,6 +165,7 @@ static void NDECL(free_config_sections);
 static char *FDECL(choose_random_part, (char *, CHAR_P));
 static boolean FDECL(is_config_section, (const char *));
 static boolean FDECL(handle_config_section, (char *));
+static char *FDECL(find_optparam, (const char *));
 static void FDECL(parseformat, (int *, char *));
 
 #ifdef SELF_RECOVER
@@ -422,7 +425,7 @@ NHFILE *nhfp;
     }
 }
 
-NHFILE *
+static NHFILE *
 new_nhfile()
 {
     NHFILE *nhfp = (NHFILE *)alloc(sizeof(NHFILE));
@@ -431,7 +434,7 @@ new_nhfile()
     return nhfp;
 }
 
-void
+static void
 free_nhfile(nhfp)
 NHFILE *nhfp;
 {
@@ -2407,7 +2410,7 @@ char *buf;
 #define match_varname(INP, NAM, LEN) match_optname(INP, NAM, LEN, TRUE)
 
 /* find the '=' or ':' */
-char *
+static char *
 find_optparam(buf)
 const char *buf;
 {

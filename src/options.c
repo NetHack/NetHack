@@ -2531,7 +2531,8 @@ char *op;
     return optn_ok;
 }
 
-int optfn_paranoid_confirmation(optidx, req, negated, opts, op)
+int
+optfn_paranoid_confirmation(optidx, req, negated, opts, op)
 int optidx;
 int req;
 boolean negated;
