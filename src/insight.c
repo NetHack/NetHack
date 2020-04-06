@@ -1077,7 +1077,7 @@ int final;
      * Skill with current weapon.  Might help players who've never
      * noticed #enhance or decided that it was pointless.
      */
-    if ((wtype = weapon_type(uwep)) != P_NONE && !is_ammo(uwep)) {
+    if (uwep && (wtype = weapon_type(uwep)) != P_NONE && !is_ammo(uwep)) {
         char sklvlbuf[20];
         int sklvl = P_SKILL(wtype);
         boolean hav = (sklvl != P_UNSKILLED && sklvl != P_SKILLED);
