@@ -55,6 +55,8 @@ extern int total_tiles_used;
 
 #define USE_WHITE /* almost always use white as a tile cursor border */
 
+#define COL0_OFFSET 1 /* change to 0 to revert to displaying unused column 0 */
+
 static boolean FDECL(init_tiles, (struct xwindow *));
 static void FDECL(set_button_values, (Widget, int, int, unsigned));
 static void FDECL(map_check_size_change, (struct xwindow *));
@@ -1148,6 +1150,7 @@ unsigned int button;
         click_x = x / map_info->text_map.square_width;
         click_y = y / map_info->text_map.square_height;
     }
+    click_x += COL0_OFFSET; /* note: reverse of usual adjustment */
 
     /* The values can be out of range if the map window has been resized
        to be larger than the max size. */
@@ -1288,7 +1291,7 @@ boolean inverted;
                 int glyph = tile_map->glyphs[row][cur_col].glyph;
                 int tile = glyph2tile[glyph];
                 int src_x, src_y;
-                int dest_x = cur_col * tile_map->square_width;
+                int dest_x = (cur_col - COL0_OFFSET) * tile_map->square_width;
                 int dest_y = row * tile_map->square_height;
 
                 src_x = (tile % TILES_PER_ROW) * tile_width;
@@ -1343,7 +1346,7 @@ boolean inverted;
 #else
                            tile_map->white_gc,
 #endif
-                           start_col * tile_map->square_width,
+                           (start_col - COL0_OFFSET) * tile_map->square_width,
                            start_row * tile_map->square_height,
                            tile_map->square_width - 1,
                            tile_map->square_height - 1);
@@ -1387,7 +1390,8 @@ boolean inverted;
                                            ? text_map->inv_copy_gc
                                            : text_map->copy_gc),
                                      text_map->square_lbearing
-                                         + (text_map->square_width * cur_col),
+                                         + (text_map->square_width
+                                            * (cur_col - COL0_OFFSET)),
                                      win_ystart, t_ptr, count);
 
                     /* move text pointer and column count */
@@ -1403,7 +1407,8 @@ boolean inverted;
             /* We always start at the same x window position and have
                the same character count. */
             win_xstart = text_map->square_lbearing
-                         + (win_start_col * text_map->square_width);
+                         + ((win_start_col - COL0_OFFSET)
+                            * text_map->square_width);
             count = stop_col - start_col + 1;
 
             for (row = start_row, win_row = win_start_row; row <= stop_row;
@@ -1431,6 +1436,7 @@ Dimension cols, rows;
     Arg args[4];
     Cardinal num_args;
 
+    cols -= COL0_OFFSET;
     if (wp->map_information->is_tile) {
         wp->pixel_width = wp->map_information->tile_map.square_width * cols;
         wp->pixel_height = wp->map_information->tile_map.square_height * rows;
