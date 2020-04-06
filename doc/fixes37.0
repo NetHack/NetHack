@@ -161,6 +161,8 @@ fix door created into random wall or position opening into solid wall
 	being more general; change its default to True
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
+X11: for text map without color, add support for black&white ice; draw it in
+	inverse video to distinguish from ordinary floor
 
 
 Platform- and/or Interface-Specific Fixes

@@ -129,7 +129,8 @@ int bkglyph UNUSED;
         co_ptr = &map_info->text_map.colors[y][x];
         colordif = (((special & MG_PET) != 0 && iflags.hilite_pet)
                     || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
-                    || ((special & (MG_DETECT | MG_BW_LAVA)) != 0))
+                    || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE)) != 0
+                        && iflags.use_inverse))
                       ? CLR_MAX : 0;
         if (*co_ptr != (uchar) (color + colordif)) {
             *co_ptr = (uchar) (color + colordif);
@@ -141,9 +142,9 @@ int bkglyph UNUSED;
 
     if (update_bbox) { /* update row bbox */
         if ((uchar) x < map_info->t_start[y])
-            map_info->t_start[y] = x;
+            map_info->t_start[y] = (uchar) x;
         if ((uchar) x > map_info->t_stop[y])
-            map_info->t_stop[y] = x;
+            map_info->t_stop[y] = (uchar) x;
     }
 }
 
