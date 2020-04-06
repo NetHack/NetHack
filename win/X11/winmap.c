@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1586119020 2020/04/05 20:37:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	winmap.c	$NHDT-Date: 1586202188 2020/04/06 19:43:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -292,7 +292,7 @@ struct xwindow *wp;
     map_info = wp->map_information;
     tile_info = &map_info->tile_map;
     (void) memset((genericptr_t) tile_info, 0,
-                  sizeof(struct tile_map_info_t));
+                  sizeof (struct tile_map_info_t));
 
     /* no tile file name, no tile information */
     if (!appResources.tile_file[0]) {
@@ -402,7 +402,7 @@ ntiles %ld\n",
         goto tiledone;
     }
 
-    colors = (XColor *) alloc(sizeof(XColor) * (unsigned) header.ncolors);
+    colors = (XColor *) alloc(sizeof (XColor) * (unsigned) header.ncolors);
     for (i = 0; i < header.ncolors; i++) {
         cp = colormap + (3 * i);
         colors[i].red = cp[0] * 256;
@@ -476,10 +476,12 @@ ntiles %ld\n",
                               bitmap_pad,       /* bit pad */
                               0);               /* bytes_per_line */
 
-    if (!tile_image)
-        /* 3.7: this was calling impossible() but when that returned,
-           the next line would deference a Null pointer (twice!) */
-        panic("init_tiles: insufficient memory to create image");
+    if (!tile_image) {
+        impossible("init_tiles: insufficient memory to create image");
+        X11_raw_print("Resorting to text map.");
+        result = FALSE;
+        goto tiledone;
+    }
 
     /* now we know the physical memory requirements, we can allocate space */
     tile_image->data =
@@ -487,7 +489,7 @@ ntiles %ld\n",
 
     if (appResources.double_tile_size) {
         unsigned long *expanded_row =
-            (unsigned long *) alloc(sizeof(unsigned long) * image_width);
+            (unsigned long *) alloc(sizeof (unsigned long) * image_width);
 
         tb = tile_bytes;
         for (y = 0; y < (int) image_height; y++) {
@@ -1448,13 +1450,9 @@ init_text(wp)
 struct xwindow *wp;
 {
     struct map_info_t *map_info = wp->map_information;
-    struct text_map_info_t *text_map = &map_info->text_map;
 
-    (void) memset((genericptr_t) text_map->text, ' ', sizeof text_map->text);
-#ifdef TEXTCOLOR
-    (void) memset((genericptr_t) text_map->colors, NO_COLOR,
-                  sizeof text_map->colors);
-#endif
+    /* set up map_info->text_map->text */
+    map_all_unexplored(map_info);
 
     get_char_info(wp);
     get_text_gc(wp, WindowFont(wp->w));
@@ -1549,15 +1547,15 @@ Widget parent;
     XtAddCallback(map, XtNexposeCallback, map_exposed, (XtPointer) 0);
 
     map_info = wp->map_information =
-        (struct map_info_t *) alloc(sizeof(struct map_info_t));
+        (struct map_info_t *) alloc(sizeof (struct map_info_t));
 
     map_info->viewport_width = map_info->viewport_height = 0;
 
     /* reset the "new entry" indicators */
     (void) memset((genericptr_t) map_info->t_start, (char) COLNO,
-                  sizeof(map_info->t_start));
+                  sizeof (map_info->t_start));
     (void) memset((genericptr_t) map_info->t_stop, (char) 0,
-                  sizeof(map_info->t_stop));
+                  sizeof (map_info->t_stop));
 
     /* we probably want to restrict this to the 1st map window only */
     map_info->is_tile = (init_tiles(wp) && iflags.wc_tiled_map);
