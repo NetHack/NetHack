@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.168 $ $NHDT-Date: 1586285681 2020/04/07 18:54:41 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ $NHDT-Date: 1586303701 2020/04/07 23:55:01 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -122,6 +122,8 @@ object taking erosion damage might give feedback message when out of view
 	or not give such when in view, depending on stale value of 'bhitpos'
 	[cited case assumed message came from drowned monster's dropped
 	inventory when out-of-view ice melted]
+it's possible to wish for tins of the Riders in wizard mode; eating one is
+	fatal but if you're life-saved or decline to die, the game crashed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
