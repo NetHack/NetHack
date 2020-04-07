@@ -117,6 +117,7 @@ demon lords hate Demonbane
 pets avoid eating shapeshifter corpses unless starving or nearly feral
 blessed scroll of teleportation gives a single controlled teleport
 allow opening a tin without interruption if slimed
+tell player when wielding a different weapon toggles off dual-wielding
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
