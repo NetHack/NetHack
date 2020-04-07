@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1586265433 2020/04/07 13:17:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1586267147 2020/04/07 13:45:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1106,11 +1106,11 @@ int final;
                 sknambuf2[20], sklvlbuf2[20], twobuf[20];
             const char *also = "", *also2 = "", *also3 = (char *) 0,
                        *verb_present, *verb_past;
-            int a1, a2, ab,
-                wtype2 = weapon_type(uswapwep),
+            int wtype2 = weapon_type(uswapwep),
                 sklvl2 = P_SKILL(wtype2),
                 twoskl = P_SKILL(P_TWO_WEAPON_COMBAT);
-            boolean hav2 = (sklvl2 != P_UNSKILLED && sklvl2 != P_SKILLED);
+            boolean a1, a2, ab,
+                    hav2 = (sklvl2 != P_UNSKILLED && sklvl2 != P_SKILLED);
 
             /* normally hero must have access to two-weapon skill in
                order to initiate u.twoweap, but not if polymorphed into
@@ -1204,7 +1204,7 @@ int final;
                spending skill credits enhancing one might make either
                or both of the others become ineligible for enhancement */
             a1 = can_advance(wtype, FALSE);
-            a2 = (wtype2 != wtype) ? can_advance(wtype2, FALSE) : 0;
+            a2 = (wtype2 != wtype) ? can_advance(wtype2, FALSE) : FALSE;
             ab = can_advance(P_TWO_WEAPON_COMBAT, FALSE);
             if (a1 || a2 || ab) {
                 static const char also_wik_[] = " and also with ";
@@ -1217,9 +1217,9 @@ int final;
                    5) "skills with <primary>, <secondary>, and two-weapons"
                    (no 'also's or extra 'with's for case 5); when primary
                    and secondary use the same skill, only cases 1 and 3 are
-                   possible because 'a2' gets forced to 0 above */
+                   possible because 'a2' gets forced to False above */
                 Sprintf(sfx, " skill%s with %s%s%s%s%s",
-                        (a1 + a2 + ab > 1) ? "s" : "",
+                        ((int) a1 + (int) a2 + (int) ab > 1) ? "s" : "",
                         a1 ? skill_name(wtype) : "",
                         ((a1 && a2 && ab) ? ", "
                          : (a1 && (a2 || ab)) ? also_wik_ : ""),
