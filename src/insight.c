@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1586186430 2020/04/06 15:20:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1586265433 2020/04/07 13:17:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1100,7 +1100,7 @@ int final;
             else
                 you_are(buf, "");
 
-        } else { /* twoweap, so two-weapon skill is at least unskilled  */
+        } else { /* two-weapon */
             static const char also_[] = "also ";
             char pfx[QBUFSZ], sfx[QBUFSZ],
                 sknambuf2[20], sklvlbuf2[20], twobuf[20];
@@ -1119,7 +1119,7 @@ int final;
             if (twoskl == P_ISRESTRICTED) {
                 twoskl = P_UNSKILLED;
                 /* restricted is the same as unskilled as far as bonus
-                   or penaly goes, and it isn't ordinarily seen so
+                   or penalty goes, and it isn't ordinarily seen so
                    skill_level_name() returns "Unknown" for it */
                 Strcpy(twobuf, "restricted");
             } else {
@@ -1154,61 +1154,78 @@ int final;
             else
                 you_are(buf, "");
 
-            if (wtype2 == wtype)
-                return;
-
-            Strcpy(sknambuf2, skill_name(wtype2));
-            (void) lcase(skill_level_name(wtype2, sklvlbuf2));
-            verb_present = "is", verb_past = "was";
-            pfx[0] = sfx[0] = buf[0] = '\0';
-            if (twoskl < sklvl2) {
-                /* twoskil is at least unskilled, sklvl2 at least basic */
-                Sprintf(pfx, "Your skill in %s ", sknambuf2);
-                Sprintf(sfx, " %slimited by being %s with two weapons",
-                        also, twobuf);
-            } else if (twoskl > sklvl2) {
-                /* sklvl2 might be restricted */
-                Strcpy(pfx, "Your two weapon skill ");
-                Sprintf(sfx, " %slimited by ", also2);
-                if (sklvl2 > P_ISRESTRICTED)
-                    Sprintf(eos(sfx), "being %s with", sklvlbuf2);
-                else
-                    Strcat(eos(sfx), "having no skill");
-                Sprintf(eos(sfx), " with %s", sknambuf2);
-
-            } else {
-                /* equal; two-weapon is at least unskilled, so so is sklvl2;
-                   "you [also] have basic/expert/master/grand-master skill
-                   with <skill>" or "you [also] are unskilled/skilled in*" */
-                Sprintf(buf, "%s %s %s", sklvlbuf2,
-                        hav2 ? "skill with" : "in", sknambuf2);
-                Strcat(buf, " and two weapons");
-                if (also3) {
-                    Strcpy(pfx, "You also ");
-                    Sprintf(sfx, " %s", buf), buf[0] = '\0';
-                    verb_present = hav2 ? "have" : "are";
-                    verb_past = hav2 ? "had" : "were";
+            /* skip comparison between secondary and two-weapons if it is
+               identical to the comparison between primary and twoweap */
+            if (wtype2 != wtype) {
+                Strcpy(sknambuf2, skill_name(wtype2));
+                (void) lcase(skill_level_name(wtype2, sklvlbuf2));
+                verb_present = "is", verb_past = "was";
+                pfx[0] = sfx[0] = buf[0] = '\0';
+                if (twoskl < sklvl2) {
+                    /* twoskil is at least unskilled, sklvl2 at least basic */
+                    Sprintf(pfx, "Your skill in %s ", sknambuf2);
+                    Sprintf(sfx, " %slimited by being %s with two weapons",
+                            also, twobuf);
+                } else if (twoskl > sklvl2) {
+                    /* sklvl2 might be restricted */
+                    Strcpy(pfx, "Your two weapon skill ");
+                    Sprintf(sfx, " %slimited by ", also2);
+                    if (sklvl2 > P_ISRESTRICTED)
+                        Sprintf(eos(sfx), "being %s with", sklvlbuf2);
+                    else
+                        Strcat(eos(sfx), "having no skill");
+                    Sprintf(eos(sfx), " with %s", sknambuf2);
+                } else {
+                    /* equal; two-weapon is at least unskilled, so sklvl2 is
+                       too; "you [also] have basic/expert/master/grand-master
+                       skill with <skill>" or "you [also] are unskilled/
+                       skilled in <skill> */
+                    Sprintf(buf, "%s %s %s", sklvlbuf2,
+                            hav2 ? "skill with" : "in", sknambuf2);
+                    Strcat(buf, " and two weapons");
+                    if (also3) {
+                        Strcpy(pfx, "You also ");
+                        Sprintf(sfx, " %s", buf), buf[0] = '\0';
+                        verb_present = hav2 ? "have" : "are";
+                        verb_past = hav2 ? "had" : "were";
+                    }
                 }
-            }
-            if (*pfx)
-                enl_msg(pfx, verb_present, verb_past, sfx, "");
-            else if (hav2)
-                you_have(buf, "");
-            else
-                you_are(buf, "");
+                if (*pfx)
+                    enl_msg(pfx, verb_present, verb_past, sfx, "");
+                else if (hav2)
+                    you_have(buf, "");
+                else
+                    you_are(buf, "");
+            } /* wtype2 != wtype */
 
+            /* if training and available skill credits already allow
+               #enhance for any of primary, secondary, or two-weapon,
+               tell the player; avoid attempting figure out whether
+               spending skill credits enhancing one might make either
+               or both of the others become ineligible for enhancement */
             a1 = can_advance(wtype, FALSE);
-            a2 = can_advance(wtype2, FALSE);
+            a2 = (wtype2 != wtype) ? can_advance(wtype2, FALSE) : 0;
             ab = can_advance(P_TWO_WEAPON_COMBAT, FALSE);
             if (a1 || a2 || ab) {
+                static const char also_wik_[] = " and also with ";
+
+                /* for just one, the conditionals yield
+                   1) "skill with <that one>"; for more than one:
+                   2) "skills with <primary> and also with <secondary>" or
+                   3) "skills with <primary> and also with two-weapons" or
+                   4) "skills with <secondary> and also with two-weapons" or
+                   5) "skills with <primary>, <secondary>, and two-weapons"
+                   (no 'also's or extra 'with's for case 5); when primary
+                   and secondary use the same skill, only cases 1 and 3 are
+                   possible because 'a2' gets forced to 0 above */
                 Sprintf(sfx, " skill%s with %s%s%s%s%s",
                         (a1 + a2 + ab > 1) ? "s" : "",
                         a1 ? skill_name(wtype) : "",
                         ((a1 && a2 && ab) ? ", "
-                         : (a1 && (a2 || ab)) ? " and " : ""),
+                         : (a1 && (a2 || ab)) ? also_wik_ : ""),
                         a2 ? skill_name(wtype2) : "",
                         ((a1 && a2 && ab) ? ", and "
-                         : (a2 && ab) ? " and " : ""),
+                         : (a2 && ab) ? also_wik_ : ""),
                         ab ? "two weapons" : "");
                 enl_msg(You_, "can enhance", "could have enhanced", sfx, "");
             }
