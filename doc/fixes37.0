@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ $NHDT-Date: 1586179508 2020/04/06 13:25:08 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.168 $ $NHDT-Date: 1586285681 2020/04/07 18:54:41 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -118,6 +118,10 @@ pets avoid eating shapeshifter corpses unless starving or nearly feral
 blessed scroll of teleportation gives a single controlled teleport
 allow opening a tin without interruption if slimed
 tell player when wielding a different weapon toggles off dual-wielding
+object taking erosion damage might give feedback message when out of view
+	or not give such when in view, depending on stale value of 'bhitpos'
+	[cited case assumed message came from drowned monster's dropped
+	inventory when out-of-view ice melted]
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1582799195 2020/02/27 10:26:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.353 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1586285683 2020/04/07 18:54:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.357 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3424,6 +3424,10 @@ xchar x, y;
     struct obj *obj, *nobj;
     int num = 0;
 
+    /* erode_obj() relies on bhitpos if target objects aren't carried by
+       the hero or a monster, to check visibility controlling feedback */
+    g.bhitpos.x = x, g.bhitpos.y = y;
+
     for (obj = chain; obj; obj = nobj) {
         nobj = here ? obj->nexthere : obj->nobj;
         if (fire_damage(obj, force, x, y))
@@ -3676,11 +3680,17 @@ struct obj *obj;
 boolean here;
 {
     struct obj *otmp;
+    xchar x, y;
 
     /* initialize acid context: so far, neither seen (dknown) potions of
        acid nor unseen have exploded during this water damage sequence */
     g.acid_ctx.dkn_boom = g.acid_ctx.unk_boom = 0;
     g.acid_ctx.ctx_valid = TRUE;
+
+    /* erode_obj() relies on bhitpos if target objects aren't carried by
+       the hero or a monster, to check visibility controlling feedback */
+    if (get_obj_location(obj, &x, &y, CONTAINED_TOO))
+        g.bhitpos.x = x, g.bhitpos.y = y;
 
     for (; obj; obj = otmp) {
         otmp = here ? obj->nexthere : obj->nobj;
