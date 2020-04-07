@@ -26,7 +26,6 @@ static void FDECL(shiny_orc_stuff, (struct monst *));
 static void NDECL(stolen_booty);
 static boolean FDECL(maze_inbounds, (int, int));
 static void FDECL(maze_remove_deadends, (XCHAR_P));
-static void FDECL(create_maze, (int, int));
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -842,10 +841,10 @@ xchar typ;
 /* Create a maze with specified corridor width and wall thickness
  * TODO: rewrite walkfrom so it works on temp space, not levl
  */
-static void
-create_maze(corrwid, wallthick)
-int corrwid;
-int wallthick;
+void
+create_maze(corrwid, wallthick, rmdeadends)
+int corrwid, wallthick;
+boolean rmdeadends;
 {
     int x,y;
     coord mm;
@@ -854,6 +853,12 @@ int wallthick;
     int rdx = 0;
     int rdy = 0;
     int scale;
+
+    if (corrwid == -1)
+        corrwid = rnd(4);
+
+    if (wallthick == -1)
+        wallthick = rnd(4) - corrwid;
 
     if (wallthick < 1)
         wallthick = 1;
@@ -886,7 +891,7 @@ int wallthick;
     maze0xy(&mm);
     walkfrom((int) mm.x, (int) mm.y, 0);
 
-    if (!rn2(5))
+    if (rmdeadends)
         maze_remove_deadends((g.level.flags.corrmaze) ? CORR : ROOM);
 
     /* restore bounds */
@@ -1004,10 +1009,9 @@ const char *s;
     g.level.flags.corrmaze = !rn2(3);
 
     if (!Invocation_lev(&u.uz) && rn2(2)) {
-        int corrscale = rnd(4);
-        create_maze(corrscale,rnd(4)-corrscale);
+        create_maze(-1, -1, !rn2(5));
     } else {
-        create_maze(1,1);
+        create_maze(1, 1, FALSE);
     }
 
     if (!g.level.flags.corrmaze)

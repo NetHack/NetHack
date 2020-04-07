@@ -1340,6 +1340,7 @@ E boolean FDECL(litstate_rnd, (int));
 
 /* ### mkmaze.c ### */
 
+E void FDECL(create_maze, (int, int, BOOLEAN_P));
 E void FDECL(wallification, (int, int, int, int));
 E void FDECL(fix_wall_spines, (int, int, int, int));
 E void FDECL(walkfrom, (int, int, SCHAR_P));

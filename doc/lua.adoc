@@ -329,6 +329,7 @@ Example:
 
  des.level_init({ style = "solidfill", fg = " " });
  des.level_init({ style = "mines", fg = ".", bg = "}", smoothed=1, joined=1, lit=0 })
+ des.level_init({ style = "maze", corrwid = 3, wallthick = 1, deadends = false });
 
 === levregion
 
