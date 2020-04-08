@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.171 $ $NHDT-Date: 1586382777 2020/04/08 21:52:57 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.172 $ $NHDT-Date: 1586384219 2020/04/08 22:16:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -168,6 +168,7 @@ fix door created into random wall or position opening into solid wall
 	being more general; change its default to True
 change inconsistent achievement spelling of "Mine Town" to "Minetown"
 fix crash in water_damage_chain
+teleport feedback "you materialize at another location" was given too soon
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
