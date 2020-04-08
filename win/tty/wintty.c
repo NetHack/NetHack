@@ -180,6 +180,8 @@ static void NDECL(new_status_window);
 static void FDECL(erase_menu_or_text, (winid, struct WinDesc *,
                                            BOOLEAN_P));
 static void FDECL(free_window_info, (struct WinDesc *, BOOLEAN_P));
+static boolean FDECL(toggle_menu_curr, (winid, tty_menu_item *, int,
+                                        BOOLEAN_P, BOOLEAN_P, long));
 static void FDECL(dmore, (struct WinDesc *, const char *));
 static void FDECL(set_item_state, (winid, int, tty_menu_item *));
 static void FDECL(set_all_on_page, (winid, tty_menu_item *,
@@ -1668,7 +1670,7 @@ winid window;
     cw->curx = cw->cury = 0;
 }
 
-boolean
+static boolean
 toggle_menu_curr(window, curr, lineno, in_view, counting, count)
 winid window;
 tty_menu_item *curr;
