@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ $NHDT-Date: 1586303701 2020/04/07 23:55:01 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.170 $ $NHDT-Date: 1586375530 2020/04/08 19:52:10 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -166,6 +166,7 @@ fix flipping non-existent stairs and ladders (github #311)
 fix door created into random wall or position opening into solid wall
 'use_inverse' option was accidentally made Windows-only; change it back to
 	being more general; change its default to True
+change inconsistent achievement spelling of "Mine Town" to "Minetown"
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in

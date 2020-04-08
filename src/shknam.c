@@ -1,4 +1,4 @@
-/* NetHack 3.6	shknam.c	$NHDT-Date: 1454485432 2016/02/03 07:43:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	shknam.c	$NHDT-Date: 1586375496 2020/04/08 19:51:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -513,7 +513,7 @@ const char *const *nlp;
         /* We want variation from game to game, without needing the save
            and restore support which would be necessary for randomization;
            try not to make too many assumptions about time_t's internals;
-           use ledger_no rather than depth to keep mine town distinct. */
+           use ledger_no rather than depth to keep minetown distinct. */
         int nseed = (int) ((long) ubirthday / 257L);
 
         name_wanted = ledger_no(&u.uz) + (nseed % 13) - (nseed % 5);

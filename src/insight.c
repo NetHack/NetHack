@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1586267147 2020/04/07 13:45:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1586375531 2020/04/08 19:52:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1933,7 +1933,7 @@ int final; /* used "behind the curtain" by enl_foo() macros */
             you_have_X("entered the Gnomish Mines");
             break;
         case ACH_TOWN:
-            you_have_X("entered Mine Town");
+            you_have_X("entered Minetown");
             break;
         case ACH_SHOP:
             you_have_X("entered a shop");

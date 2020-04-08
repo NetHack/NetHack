@@ -1,4 +1,4 @@
-/* NetHack 3.6	you.h	$NHDT-Date: 1581322658 2020/02/10 08:17:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	you.h	$NHDT-Date: 1586375530 2020/04/08 19:52:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -86,7 +86,7 @@ enum achivements {
     /* 1 through 14 were present in 3.6.x; the rest are newer; first,
        some easier ones so less skilled players can have achievements */
     ACH_MINE = 15, /* entered Gnomish Mines */
-    ACH_TOWN = 16, /* reached Mine Town */
+    ACH_TOWN = 16, /* reached Minetown */
     ACH_SHOP = 17, /* entered a shop */
     ACH_TMPL = 18, /* entered a temple */
     ACH_ORCL = 19, /* consulted the Oracle */
