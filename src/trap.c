@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1586285683 2020/04/07 18:54:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.357 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1586382778 2020/04/08 21:52:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.358 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3681,6 +3681,9 @@ boolean here;
 {
     struct obj *otmp;
     xchar x, y;
+
+    if (!obj)
+        return;
 
     /* initialize acid context: so far, neither seen (dknown) potions of
        acid nor unseen have exploded during this water damage sequence */
