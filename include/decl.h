@@ -1136,6 +1136,8 @@ struct instance_globals {
     struct sp_coder *coder;
     xchar xstart, ystart;
     xchar xsize, ysize;
+    boolean in_mk_themerooms;
+    boolean themeroom_failed;
 
     /* spells.c */
     int spl_sortmode;   /* index into spl_sortchoices[] */

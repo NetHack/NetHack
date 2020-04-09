@@ -638,6 +638,8 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* ystart */
     UNDEFINED_VALUE, /* xsize */
     UNDEFINED_VALUE, /* ysize */
+    FALSE, /* in_mk_themerooms */
+    FALSE, /* themeroom_failed */
 
     /* spells.c */
     0, /* spl_sortmode */

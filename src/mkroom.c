@@ -713,6 +713,23 @@ coord *c;
     return TRUE;
 }
 
+boolean
+somexyspace(croom, c)
+struct mkroom *croom;
+coord *c;
+{
+    int trycnt = 0;
+    boolean okay;
+
+    do {
+        okay = somexy(croom, c) && isok(c->x, c->y) && !occupied(c->x, c->y)
+            && (levl[c->x][c->y].typ == ROOM
+                || levl[c->x][c->y].typ == CORR
+                || levl[c->x][c->y].typ == ICE);
+    } while (trycnt++ < 100 && !okay);
+    return okay;
+}
+
 /*
  * Search for a special room given its type (zoo, court, etc...)
  *      Special values :

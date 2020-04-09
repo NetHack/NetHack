@@ -1446,6 +1446,7 @@ E int FDECL(somex, (struct mkroom *));
 E int FDECL(somey, (struct mkroom *));
 E boolean FDECL(inside_room, (struct mkroom *, XCHAR_P, XCHAR_P));
 E boolean FDECL(somexy, (struct mkroom *, coord *));
+E boolean FDECL(somexyspace, (struct mkroom *, coord *));
 E void FDECL(mkundead, (coord *, BOOLEAN_P, int));
 E struct permonst *NDECL(courtmon);
 E void FDECL(save_rooms, (NHFILE *));
@@ -2478,6 +2479,7 @@ E void FDECL(sysopt_seduce_set, (int));
 
 /* ### sp_lev.c ### */
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+E void NDECL(create_des_coder);
 E struct mapfragment *FDECL(mapfrag_fromstr, (char *));
 E void FDECL(mapfrag_free, (struct mapfragment **));
 E schar FDECL(mapfrag_get, (struct mapfragment *, int, int));

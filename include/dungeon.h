@@ -57,6 +57,7 @@ typedef struct dungeon {   /* basic dungeon identifier */
     char dname[24];        /* name of the dungeon (eg. "Hell") */
     char proto[15];        /* name of prototype file (eg. "tower") */
     char fill_lvl[15];     /* name of "fill" level protype file */
+    char themerms[15];     /* lua file name containing themed rooms */
     char boneid;           /* character to id dungeon in bones files */
     d_flags flags;         /* dungeon flags */
     xchar entry_lev;       /* entry level */
@@ -64,6 +65,7 @@ typedef struct dungeon {   /* basic dungeon identifier */
     xchar dunlev_ureached; /* how deep you have been in this dungeon */
     int ledger_start,      /* the starting depth in "real" terms */
         depth_start;       /* the starting depth in "logical" terms */
+    lua_State *themelua;   /* themerms compiled lua */
 } dungeon;
 
 /*

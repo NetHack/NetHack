@@ -23,7 +23,6 @@ typedef void FDECL((*select_iter_func), (int, int, genericptr));
 
 extern void FDECL(mkmap, (lev_init *));
 
-static void NDECL(create_des_coder); 
 static void NDECL(solidify_map);
 static void FDECL(lvlfill_maze_grid, (int, int, int, int, SCHAR_P));
 static void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
@@ -1311,6 +1310,10 @@ boolean vault;
     register int x, y, hix = *lowx + *ddx, hiy = *lowy + *ddy;
     register struct rm *lev;
     int xlim, ylim, ymax;
+    xchar s_lowx, s_ddx, s_lowy, s_ddy;
+
+    s_lowx = *lowx; s_ddx = *ddx;
+    s_lowy = *lowy; s_ddy = *ddy;
 
     xlim = XLIM + (vault ? 1 : 0);
     ylim = YLIM + (vault ? 1 : 0);
@@ -1325,6 +1328,10 @@ boolean vault;
         hiy = ROWNO - 3;
  chk:
     if (hix <= *lowx || hiy <= *lowy)
+        return FALSE;
+
+    if (g.in_mk_themerooms && (s_lowx != *lowx) && (s_ddx != *ddx)
+        && (s_lowy != *lowy) && (s_ddy != *ddy))
         return FALSE;
 
     /* check area around room (and make room smaller if necessary) */
@@ -1345,6 +1352,8 @@ boolean vault;
                 }
                 if (!rn2(3))
                     return FALSE;
+                if (g.in_mk_themerooms)
+                    return FALSE;
                 if (x < *lowx)
                     *lowx = x + xlim + 1;
                 else
@@ -1359,6 +1368,11 @@ boolean vault;
     }
     *ddx = hix - *lowx;
     *ddy = hiy - *lowy;
+
+    if (g.in_mk_themerooms && (s_lowx != *lowx) && (s_ddx != *ddx)
+        && (s_lowy != *lowy) && (s_ddy != *ddy))
+        return FALSE;
+
     return TRUE;
 }
 
@@ -1462,6 +1476,7 @@ xchar rtype, rlit;
             r2.hy = yabs + htmp;
         } else { /* Only some parameters are random */
             int rndpos = 0;
+            xchar dx, dy;
 
             if (xtmp < 0 && ytmp < 0) { /* Position is RANDOM */
                 xtmp = rnd(5);
@@ -1518,6 +1533,12 @@ xchar rtype, rlit;
             r2.hx = xabs + wtmp + rndpos;
             r2.hy = yabs + htmp + rndpos;
             r1 = get_rect(&r2);
+            dx = wtmp;
+            dy = htmp;
+
+            if (r1 && !check_room(&xabs, &dx, &yabs, &dy, vault)) {
+                r1 = 0;
+            }
         }
     } while (++trycnt <= 100 && !r1);
     if (!r1) { /* creation of room failed ? */
@@ -3703,9 +3724,8 @@ static const struct {
     const char *name;
     int type;
 } room_types[] = {
-    /* for historical reasons, room types are not contiguous numbers */
-    /* (type 1 is skipped) */
     { "ordinary", OROOM },
+    { "themed", THEMEROOM },
     { "throne", COURT },
     { "swamp", SWAMP },
     { "vault", VAULT },
@@ -3764,6 +3784,9 @@ lua_State *L;
 {
     create_des_coder();
 
+    if (g.in_mk_themerooms && g.themeroom_failed)
+        return 0;
+
     lcheck_param_table(L);
 
     if (g.coder->n_subroom > MAX_NESTED_ROOMS) {
@@ -3802,7 +3825,7 @@ lua_State *L;
         tmproom.rtype = get_table_roomtype_opt(L, "type", OROOM);
         tmproom.chance = get_table_int_opt(L, "chance", 100);
         tmproom.rlit = get_table_int_opt(L, "lit", -1);
-        tmproom.filled = get_table_int_opt(L, "filled", 1);
+        tmproom.filled = get_table_int_opt(L, "filled", g.in_mk_themerooms ? 0 : 1);
         tmproom.joined = get_table_int_opt(L, "joined", 1);
 
         if (!g.coder->failed_room[g.coder->n_subroom - 1]) {
@@ -3822,6 +3845,8 @@ lua_State *L;
                 spo_endroom(g.coder);
                 return 0;
             }
+            if (g.in_mk_themerooms)
+                g.themeroom_failed = TRUE;
         } /* failed to create parent room, so fail this too */
     }
     g.coder->tmproomlist[g.coder->n_subroom] = (struct mkroom *) 0;
@@ -3829,6 +3854,8 @@ lua_State *L;
     g.coder->n_subroom++;
     update_croom();
     spo_endroom(g.coder);
+    if (g.in_mk_themerooms)
+        g.themeroom_failed = TRUE;
 
     return 0;
 }
@@ -5628,7 +5655,7 @@ lua_State *L;
     /* for an ordinary room, `prefilled' is a flag to force
        an actual room to be created (such rooms are used to
        control placement of migrating monster arrivals) */
-    room_not_needed = (rtype == OROOM && !irregular && !prefilled);
+    room_not_needed = (rtype == OROOM && !irregular && !prefilled && !g.in_mk_themerooms);
     if (room_not_needed || g.nroom >= MAXNROFROOMS) {
         region tmpregion;
         if (!room_not_needed)
@@ -5667,6 +5694,9 @@ lua_State *L;
         topologize(troom); /* set roomno */
 #endif
     }
+
+    if (g.in_mk_themerooms && prefilled)
+        troom->needfill = 1;
 
     if (!room_not_needed) {
         if (g.coder->n_subroom > 1)
@@ -6009,8 +6039,13 @@ TODO: g.coder->croom needs to be updated
     struct mapfragment *mf;
     int argc = lua_gettop(L);
     boolean has_contents = FALSE;
+    int tryct = 0;
+    int ox, oy;
 
     create_des_coder();
+
+    if (g.in_mk_themerooms && g.themeroom_failed)
+        return 0;
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         char *tmpstr = dupstr(luaL_checkstring(L, 1));
@@ -6040,10 +6075,34 @@ TODO: g.coder->croom needs to be updated
         return 0;
     }
 
+    ox = x;
+    oy = y;
+redo_maploc:
+
     g.xsize = mf->wid;
     g.ysize = mf->hei;
 
     if (lr == -1 && tb == -1) {
+        if (g.in_mk_themerooms && (ox == -1 || oy == -1)) {
+            if (ox == -1) {
+                if (g.coder->croom) {
+                    x = somex(g.coder->croom) - mf->wid;
+                    if (x < 1) x = 1;
+                } else {
+                    x = 1 + rn2(COLNO - 1 - mf->wid);
+                }
+            }
+
+            if (oy == -1) {
+                if (g.coder->croom) {
+                    y = somey(g.coder->croom) - mf->hei;
+                    if (y < 1) y = 1;
+                } else {
+                    y = rn2(ROWNO - mf->wid);
+                }
+            }
+        }
+
         if (isok(x,y)) {
             /* x,y is given, place map starting at x,y */
             if (g.coder->croom) {
@@ -6102,6 +6161,10 @@ TODO: g.coder->croom needs to be updated
     }
 
     if (g.ystart < 0 || g.ystart + g.ysize > ROWNO) {
+        if (g.in_mk_themerooms) {
+            g.themeroom_failed = TRUE;
+            goto skipmap;
+        }
         /* try to move the start a bit */
         g.ystart += (g.ystart > 0) ? -2 : 2;
         if (g.ysize == ROWNO)
@@ -6116,6 +6179,32 @@ TODO: g.coder->croom needs to be updated
         g.ysize = ROWNO;
     } else {
         xchar mptyp;
+
+        /* Themed rooms should never overwrite anything */
+        if (g.in_mk_themerooms) {
+            boolean isokp = TRUE;
+            for (y = g.ystart - 1; y < min(ROWNO, g.ystart + g.ysize) + 1; y++)
+                for (x = g.xstart - 1; x < min(COLNO, g.xstart + g.xsize) + 1; x++) {
+                    if (!isok(x, y)) {
+                        isokp = FALSE;
+                    } else if (y < g.ystart || y >= (g.ystart + g.ysize)
+                               || x < g.xstart || x >= (g.xstart + g.xsize)) {
+                        if (levl[x][y].typ != STONE) isokp = FALSE;
+                        if (levl[x][y].roomno != NO_ROOM) isokp = FALSE;
+                    } else {
+                        mptyp = mapfrag_get(mf, (x - g.xstart), (y - g.ystart));
+                        if (mptyp >= MAX_TYPE) continue;
+                        if (levl[x][y].typ != STONE && levl[x][y].typ != mptyp) isokp = FALSE;
+                        if (levl[x][y].roomno != NO_ROOM) isokp = FALSE;
+                    }
+                    if (!isokp) {
+                        if ((tryct++ < 100) && ((lr == -1) || (tb == -1)))
+                            goto redo_maploc;
+                        g.themeroom_failed = TRUE;
+                        goto skipmap;
+                    }
+                }
+        }
 
         /* Load the map */
         for (y = g.ystart; y < min(ROWNO, g.ystart + g.ysize); y++)
@@ -6158,14 +6247,16 @@ TODO: g.coder->croom needs to be updated
                 else if (splev_init_present && levl[x][y].typ == ICE)
                     levl[x][y].icedpool = icedpools ? ICED_POOL : ICED_MOAT;
             }
-        if (g.coder->lvl_is_joined)
+        if (g.coder->lvl_is_joined && !g.in_mk_themerooms)
             remove_rooms(g.xstart, g.ystart,
                          g.xstart + g.xsize, g.ystart + g.ysize);
     }
 
+skipmap:
+
     mapfrag_free(&mf);
 
-    if (has_contents) {
+    if (has_contents && !(g.in_mk_themerooms && g.themeroom_failed)) {
         l_push_wid_hei_table(L, g.xsize, g.ysize);
         lua_call(L, 1, 0);
     }
@@ -6290,7 +6381,7 @@ lua_State *L;
     lua_setglobal(L, "des");
 }
 
-static void
+void
 create_des_coder()
 {
     if (!g.coder)
