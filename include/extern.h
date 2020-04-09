@@ -1981,6 +1981,7 @@ E void NDECL(getlock);
 E int FDECL(collect_obj_classes, (char *, struct obj *, BOOLEAN_P,
                                   boolean FDECL((*), (OBJ_P)), int *));
 E boolean FDECL(rider_corpse_revival, (struct obj *, BOOLEAN_P));
+E void FDECL(deferred_decor, (BOOLEAN_P));
 E boolean FDECL(menu_class_present, (int));
 E void FDECL(add_valid_menu_class, (int));
 E boolean FDECL(allow_all, (struct obj *));

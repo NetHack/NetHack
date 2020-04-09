@@ -257,6 +257,7 @@ struct instance_flags {
     boolean autodescribe;     /* autodescribe mode in getpos() */
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
+    boolean defer_decor;      /* terrain change message vs slipping on ice */
     boolean echo;             /* 1 to echo characters */
     boolean force_invmenu;    /* always menu when handling inventory */
     boolean hilite_pile;      /* mark piles of objects with a hilite */

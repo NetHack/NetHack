@@ -169,6 +169,8 @@ fix door created into random wall or position opening into solid wall
 change inconsistent achievement spelling of "Mine Town" to "Minetown"
 fix crash in water_damage_chain
 teleport feedback "you materialize at another location" was given too soon
+'mention_decore' was repeatedly reporting "you are back on bottom" when
+	moving around underwater
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
