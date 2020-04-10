@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1584405116 2020/03/17 00:31:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1586303701 2020/04/07 23:55:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.225 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -712,10 +712,13 @@ register int pm;
         done(DIED);
         /* life-saving needed to reach here */
         exercise(A_WIS, FALSE);
-        /* It so happens that since we know these monsters */
-        /* cannot appear in tins, g.context.victual.piece will always */
-        /* be what we want, which is not generally true. */
-        if (revive_corpse(g.context.victual.piece)) {
+        /* revive an actual corpse; can't do that if it was a tin;
+           3.7: this used to assume that such tins were impossible but
+           they can be wished for in wizard mode; they can't make it
+           to normal play though because bones creation empties them */
+        if (g.context.victual.piece /* Null for tins */
+            && g.context.victual.piece->otyp == CORPSE /* paranoia */
+            && revive_corpse(g.context.victual.piece)) {
             g.context.victual.piece = (struct obj *) 0;
             g.context.victual.o_id = 0;
         }
@@ -1074,6 +1077,11 @@ int pm;
            no feedback if hero already lacks the chosen ability */
         debugpline0("using attrcurse to strip an intrinsic");
         attrcurse();
+        break;
+    case PM_DEATH:
+    case PM_PESTILENCE:
+    case PM_FAMINE:
+        /* life-saved; don't attempt to confer any intrinsics */
         break;
     case PM_MIND_FLAYER:
     case PM_MASTER_MIND_FLAYER:

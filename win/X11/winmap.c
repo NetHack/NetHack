@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1586119020 2020/04/05 20:37:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	winmap.c	$NHDT-Date: 1586202188 2020/04/06 19:43:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -54,6 +54,8 @@ extern int total_tiles_used;
 /* #define VERBOSE_INPUT */  /* print input events */
 
 #define USE_WHITE /* almost always use white as a tile cursor border */
+
+#define COL0_OFFSET 1 /* change to 0 to revert to displaying unused column 0 */
 
 static boolean FDECL(init_tiles, (struct xwindow *));
 static void FDECL(set_button_values, (Widget, int, int, unsigned));
@@ -127,7 +129,8 @@ int bkglyph UNUSED;
         co_ptr = &map_info->text_map.colors[y][x];
         colordif = (((special & MG_PET) != 0 && iflags.hilite_pet)
                     || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
-                    || ((special & (MG_DETECT | MG_BW_LAVA)) != 0))
+                    || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE)) != 0
+                        && iflags.use_inverse))
                       ? CLR_MAX : 0;
         if (*co_ptr != (uchar) (color + colordif)) {
             *co_ptr = (uchar) (color + colordif);
@@ -139,9 +142,9 @@ int bkglyph UNUSED;
 
     if (update_bbox) { /* update row bbox */
         if ((uchar) x < map_info->t_start[y])
-            map_info->t_start[y] = x;
+            map_info->t_start[y] = (uchar) x;
         if ((uchar) x > map_info->t_stop[y])
-            map_info->t_stop[y] = x;
+            map_info->t_stop[y] = (uchar) x;
     }
 }
 
@@ -292,7 +295,7 @@ struct xwindow *wp;
     map_info = wp->map_information;
     tile_info = &map_info->tile_map;
     (void) memset((genericptr_t) tile_info, 0,
-                  sizeof(struct tile_map_info_t));
+                  sizeof (struct tile_map_info_t));
 
     /* no tile file name, no tile information */
     if (!appResources.tile_file[0]) {
@@ -402,7 +405,7 @@ ntiles %ld\n",
         goto tiledone;
     }
 
-    colors = (XColor *) alloc(sizeof(XColor) * (unsigned) header.ncolors);
+    colors = (XColor *) alloc(sizeof (XColor) * (unsigned) header.ncolors);
     for (i = 0; i < header.ncolors; i++) {
         cp = colormap + (3 * i);
         colors[i].red = cp[0] * 256;
@@ -476,10 +479,12 @@ ntiles %ld\n",
                               bitmap_pad,       /* bit pad */
                               0);               /* bytes_per_line */
 
-    if (!tile_image)
-        /* 3.7: this was calling impossible() but when that returned,
-           the next line would deference a Null pointer (twice!) */
-        panic("init_tiles: insufficient memory to create image");
+    if (!tile_image) {
+        impossible("init_tiles: insufficient memory to create image");
+        X11_raw_print("Resorting to text map.");
+        result = FALSE;
+        goto tiledone;
+    }
 
     /* now we know the physical memory requirements, we can allocate space */
     tile_image->data =
@@ -487,7 +492,7 @@ ntiles %ld\n",
 
     if (appResources.double_tile_size) {
         unsigned long *expanded_row =
-            (unsigned long *) alloc(sizeof(unsigned long) * image_width);
+            (unsigned long *) alloc(sizeof (unsigned long) * image_width);
 
         tb = tile_bytes;
         for (y = 0; y < (int) image_height; y++) {
@@ -1146,6 +1151,7 @@ unsigned int button;
         click_x = x / map_info->text_map.square_width;
         click_y = y / map_info->text_map.square_height;
     }
+    click_x += COL0_OFFSET; /* note: reverse of usual adjustment */
 
     /* The values can be out of range if the map window has been resized
        to be larger than the max size. */
@@ -1286,7 +1292,7 @@ boolean inverted;
                 int glyph = tile_map->glyphs[row][cur_col].glyph;
                 int tile = glyph2tile[glyph];
                 int src_x, src_y;
-                int dest_x = cur_col * tile_map->square_width;
+                int dest_x = (cur_col - COL0_OFFSET) * tile_map->square_width;
                 int dest_y = row * tile_map->square_height;
 
                 src_x = (tile % TILES_PER_ROW) * tile_width;
@@ -1341,7 +1347,7 @@ boolean inverted;
 #else
                            tile_map->white_gc,
 #endif
-                           start_col * tile_map->square_width,
+                           (start_col - COL0_OFFSET) * tile_map->square_width,
                            start_row * tile_map->square_height,
                            tile_map->square_width - 1,
                            tile_map->square_height - 1);
@@ -1385,7 +1391,8 @@ boolean inverted;
                                            ? text_map->inv_copy_gc
                                            : text_map->copy_gc),
                                      text_map->square_lbearing
-                                         + (text_map->square_width * cur_col),
+                                         + (text_map->square_width
+                                            * (cur_col - COL0_OFFSET)),
                                      win_ystart, t_ptr, count);
 
                     /* move text pointer and column count */
@@ -1401,7 +1408,8 @@ boolean inverted;
             /* We always start at the same x window position and have
                the same character count. */
             win_xstart = text_map->square_lbearing
-                         + (win_start_col * text_map->square_width);
+                         + ((win_start_col - COL0_OFFSET)
+                            * text_map->square_width);
             count = stop_col - start_col + 1;
 
             for (row = start_row, win_row = win_start_row; row <= stop_row;
@@ -1429,6 +1437,7 @@ Dimension cols, rows;
     Arg args[4];
     Cardinal num_args;
 
+    cols -= COL0_OFFSET;
     if (wp->map_information->is_tile) {
         wp->pixel_width = wp->map_information->tile_map.square_width * cols;
         wp->pixel_height = wp->map_information->tile_map.square_height * rows;
@@ -1448,13 +1457,9 @@ init_text(wp)
 struct xwindow *wp;
 {
     struct map_info_t *map_info = wp->map_information;
-    struct text_map_info_t *text_map = &map_info->text_map;
 
-    (void) memset((genericptr_t) text_map->text, ' ', sizeof text_map->text);
-#ifdef TEXTCOLOR
-    (void) memset((genericptr_t) text_map->colors, NO_COLOR,
-                  sizeof text_map->colors);
-#endif
+    /* set up map_info->text_map->text */
+    map_all_unexplored(map_info);
 
     get_char_info(wp);
     get_text_gc(wp, WindowFont(wp->w));
@@ -1549,15 +1554,15 @@ Widget parent;
     XtAddCallback(map, XtNexposeCallback, map_exposed, (XtPointer) 0);
 
     map_info = wp->map_information =
-        (struct map_info_t *) alloc(sizeof(struct map_info_t));
+        (struct map_info_t *) alloc(sizeof (struct map_info_t));
 
     map_info->viewport_width = map_info->viewport_height = 0;
 
     /* reset the "new entry" indicators */
     (void) memset((genericptr_t) map_info->t_start, (char) COLNO,
-                  sizeof(map_info->t_start));
+                  sizeof (map_info->t_start));
     (void) memset((genericptr_t) map_info->t_stop, (char) 0,
-                  sizeof(map_info->t_stop));
+                  sizeof (map_info->t_stop));
 
     /* we probably want to restrict this to the 1st map window only */
     map_info->is_tile = (init_tiles(wp) && iflags.wc_tiled_map);

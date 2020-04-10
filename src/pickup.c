@@ -287,6 +287,18 @@ boolean remotely;
     return TRUE;
 }
 
+void
+deferred_decor(setup)
+boolean setup; /* True: deferring, False: catching up */
+{
+    if (setup) {
+        iflags.defer_decor = TRUE;
+    } else {
+        describe_decor();
+        iflags.defer_decor = FALSE;
+    }
+}
+
 /* handle 'mention_decor' (when walking onto a dungeon feature such as
    stairs or altar, describe it even if it isn't covered up by an object) */
 static void
@@ -294,20 +306,38 @@ describe_decor()
 {
     char outbuf[BUFSZ], fbuf[QBUFSZ];
     boolean doorhere, waterhere, do_norep;
-    const char *dfeature = dfeature_at(u.ux, u.uy, fbuf);
-    int ltyp = levl[u.ux][u.uy].typ;
+    const char *dfeature;
+    int ltyp;
 
+    if (Fumbling && !iflags.defer_decor) {
+        /*
+         * In case Fumbling is due to walking on ice.
+         * Work around a message sequencing issue:  avoid
+         *  |You are back on floor.
+         *  |You trip over <object>.
+         * when the trip is being caused by moving on ice as hero
+         * steps off ice onto non-ice.
+         */
+        deferred_decor(TRUE);
+        return;
+    }
+
+    ltyp = levl[u.ux][u.uy].typ;
     if (ltyp == DRAWBRIDGE_UP) /* surface for spot in front of closed db */
         ltyp = db_under_typ(levl[u.ux][u.uy].drawbridgemask);
+    dfeature = dfeature_at(u.ux, u.uy, fbuf);
 
     /* we don't mention "ordinary" doors but do mention broken ones */
     doorhere = dfeature && (!strcmp(dfeature, "open door")
                             || !strcmp(dfeature, "doorway"));
     waterhere = dfeature && !strcmp(dfeature, "pool of water");
-    if (doorhere || (waterhere && Underwater))
+    if (doorhere || Underwater
+        || (ltyp == ICE && IS_POOL(iflags.prev_decor))) /* pooleffects() */
         dfeature = 0;
 
-    if (dfeature) {
+    if (ltyp == iflags.prev_decor && !IS_FURNITURE(ltyp)) {
+        ;
+    } else if (dfeature) {
         if (waterhere)
             dfeature = strcpy(fbuf, waterbody_name(u.ux, u.uy));
         if (strcmp(dfeature, "swamp"))
@@ -328,15 +358,13 @@ describe_decor()
             pline("%s", outbuf);
         else
             Norep("%s", outbuf);
-    } else {
-        if ((IS_POOL(iflags.prev_decor)
-             || iflags.prev_decor == LAVAPOOL
-             || iflags.prev_decor == ICE)) {
+    } else if (!Underwater) {
+        if (IS_POOL(iflags.prev_decor)
+            || iflags.prev_decor == LAVAPOOL
+            || iflags.prev_decor == ICE) {
             const char *ground = surface(u.ux, u.uy);
 
-            if (iflags.last_msg != PLNMSG_BACK_ON_GROUND
-                || (strcmpi(ground, "floor") && strcmpi(ground, "ground")
-                    && strcmpi(ground, "ice")))
+            if (iflags.last_msg != PLNMSG_BACK_ON_GROUND)
                 pline("%s %s %s.",
                       flags.verbose ? "You are back" : "Back",
                       (Levitation || Flying) ? "over" : "on",
@@ -354,6 +382,9 @@ boolean picked_some;
     register struct obj *obj;
     register int ct = 0;
 
+    if (flags.mention_decor)
+        describe_decor();
+
     /* count the objects here */
     for (obj = g.level.objects[u.ux][u.uy]; obj; obj = obj->nexthere) {
         if (obj != uchain)
@@ -369,8 +400,6 @@ boolean picked_some;
 
         iflags.prev_decor = STONE;
     } else {
-        if (flags.mention_decor)
-            describe_decor();
         read_engr_at(u.ux, u.uy);
     }
 }

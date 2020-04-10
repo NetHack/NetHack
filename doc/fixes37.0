@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ $NHDT-Date: 1586179508 2020/04/06 13:25:08 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.172 $ $NHDT-Date: 1586384219 2020/04/08 22:16:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -117,6 +117,13 @@ demon lords hate Demonbane
 pets avoid eating shapeshifter corpses unless starving or nearly feral
 blessed scroll of teleportation gives a single controlled teleport
 allow opening a tin without interruption if slimed
+tell player when wielding a different weapon toggles off dual-wielding
+object taking erosion damage might give feedback message when out of view
+	or not give such when in view, depending on stale value of 'bhitpos'
+	[cited case assumed message came from drowned monster's dropped
+	inventory when out-of-view ice melted]
+it's possible to wish for tins of the Riders in wizard mode; eating one is
+	fatal but if you're life-saved or decline to die, the game crashed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -159,8 +166,15 @@ fix flipping non-existent stairs and ladders (github #311)
 fix door created into random wall or position opening into solid wall
 'use_inverse' option was accidentally made Windows-only; change it back to
 	being more general; change its default to True
+change inconsistent achievement spelling of "Mine Town" to "Minetown"
+fix crash in water_damage_chain
+teleport feedback "you materialize at another location" was given too soon
+'mention_decore' was repeatedly reporting "you are back on bottom" when
+	moving around underwater
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
+X11: for text map without color, add support for black&white ice; draw it in
+	inverse video to distinguish from ordinary floor
 
 
 Platform- and/or Interface-Specific Fixes
@@ -173,6 +187,7 @@ windows: update for new status condition fields
 X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 X11: extend fancy status one-turn inverse video status-change highlighting to
 	hunger, encumbrance, and conditions
+X11: stop including unused column 0 in the map
 
 
 General New Features

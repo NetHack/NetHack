@@ -94,6 +94,7 @@ static int FDECL(l_create_stairway, (lua_State *, BOOLEAN_P));
 static void FDECL(spo_endroom, (struct sp_coder *));
 static void FDECL(l_table_getset_feature_flag, (lua_State *, int, int, const char *, int));
 static void FDECL(sel_set_lit, (int, int, genericptr_t));
+static void FDECL(selection_iterate, (struct selectionvar *, select_iter_func, genericptr_t));
 static void FDECL(sel_set_ter, (int, int, genericptr_t));
 static void FDECL(sel_set_door, (int, int, genericptr_t));
 static void FDECL(sel_set_feature, (int, int, genericptr_t));
@@ -2900,6 +2901,9 @@ lev_init *linit;
     case LVLINIT_MAZEGRID:
         lvlfill_maze_grid(2, 0, g.x_maze_max, g.y_maze_max, linit->bg);
         break;
+    case LVLINIT_MAZE:
+        create_maze(linit->corrwid, linit->wallthick, linit->rm_deadends);
+        break;
     case LVLINIT_ROGUE:
         makeroguerooms();
         break;
@@ -3573,10 +3577,10 @@ lspo_level_init(L)
 lua_State *L;
 {
     static const char *const initstyles[] = {
-        "solidfill", "mazegrid", "rogue", "mines", "swamp", NULL
+        "solidfill", "mazegrid", "maze", "rogue", "mines", "swamp", NULL
     };
     static const int initstyles2i[] = {
-        LVLINIT_SOLIDFILL, LVLINIT_MAZEGRID, LVLINIT_ROGUE,
+        LVLINIT_SOLIDFILL, LVLINIT_MAZEGRID, LVLINIT_MAZE, LVLINIT_ROGUE,
         LVLINIT_MINES, LVLINIT_SWAMP, 0
     };
     lev_init init_lev;
@@ -3596,6 +3600,9 @@ lua_State *L;
     init_lev.lit = get_table_int_or_random(L, "lit", -1); /* TODO: allow lit=BOOL */
     init_lev.walled = get_table_boolean_opt(L, "walled", 0);
     init_lev.filling = get_table_mapchr_opt(L, "filling", init_lev.fg);
+    init_lev.corrwid = get_table_int_opt(L, "corrwid", -1);
+    init_lev.wallthick = get_table_int_opt(L, "wallthick", -1);
+    init_lev.rm_deadends = !get_table_boolean_opt(L, "deadends", 1);
 
     g.coder->lvl_is_joined = init_lev.joined;
 
@@ -4682,6 +4689,8 @@ long x, y, x2, y2, gtyp, mind, maxd, limit;
 
     switch (gtyp) {
     default:
+        impossible("Unrecognized gradient type! Defaulting to radial...");
+        /* FALLTHRU */
     case SEL_GRADIENT_RADIAL: {
         for (dx = 0; dx < COLNO; dx++)
             for (dy = 0; dy < ROWNO; dy++) {
@@ -4808,7 +4817,7 @@ struct selectionvar *ov;
     selection_setpoint(x2, y2, ov, 1);
 }
 
-void
+static void
 selection_iterate(ov, func, arg)
 struct selectionvar *ov;
 select_iter_func func;

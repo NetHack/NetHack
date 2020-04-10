@@ -1340,6 +1340,7 @@ E boolean FDECL(litstate_rnd, (int));
 
 /* ### mkmaze.c ### */
 
+E void FDECL(create_maze, (int, int, BOOLEAN_P));
 E void FDECL(wallification, (int, int, int, int));
 E void FDECL(fix_wall_spines, (int, int, int, int));
 E void FDECL(walkfrom, (int, int, SCHAR_P));
@@ -1980,6 +1981,7 @@ E void NDECL(getlock);
 E int FDECL(collect_obj_classes, (char *, struct obj *, BOOLEAN_P,
                                   boolean FDECL((*), (OBJ_P)), int *));
 E boolean FDECL(rider_corpse_revival, (struct obj *, BOOLEAN_P));
+E void FDECL(deferred_decor, (BOOLEAN_P));
 E boolean FDECL(menu_class_present, (int));
 E void FDECL(add_valid_menu_class, (int));
 E boolean FDECL(allow_all, (struct obj *));
@@ -2514,6 +2516,8 @@ E struct selectionvar *FDECL(selection_filter_mapchar, (struct selectionvar *,
 E void FDECL(set_floodfillchk_match_under, (XCHAR_P));
 E void FDECL(selection_do_ellipse, (struct selectionvar *,
                                     int, int, int, int, int));
+E void FDECL(selection_do_gradient, (struct selectionvar *, long, long,
+                                     long, long, long, long, long, long));
 E void NDECL(update_croom);
 E const char *FDECL(get_trapname_bytype, (int));
 E void FDECL(l_register_des, (lua_State *));

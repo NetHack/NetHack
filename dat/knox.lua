@@ -41,14 +41,14 @@ des.teleport_region({ region = {06,15,09,16}, dir="down" })
 --   Throne room, with Croesus on the throne
 des.region({ x1=37,y1=08,x2=46,y2=11, lit=1, type="throne", prefilled=0 })
 --   50% chance each to move throne and/or fort's entry secret door up one row
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.monster({ id = "Croesus", x=43, y=10, peaceful = 0 })
 else
    des.monster({ id = "Croesus", x=43, y=09, peaceful = 0 })
    des.terrain(43,09, "\\")
    des.terrain(43,10, ".")
 end
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain(47,09, "S")
    des.terrain(47,10, "|")
 end
@@ -70,7 +70,7 @@ local treasury = selection.area(21,08,35,11);
 treasury:iterate(treasure_spot);
 
 --   Vault entrance also varies
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain(36,09, "|")
    des.terrain(36,10, "S")
 end

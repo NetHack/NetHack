@@ -329,6 +329,7 @@ Example:
 
  des.level_init({ style = "solidfill", fg = " " });
  des.level_init({ style = "mines", fg = ".", bg = "}", smoothed=1, joined=1, lit=0 })
+ des.level_init({ style = "maze", corrwid = 3, wallthick = 1, deadends = false });
 
 === levregion
 
@@ -645,6 +646,14 @@ Get the selection value at (x,y).
 Example:
 
  local value = selection.get(sel, x, y);
+
+=== gradient
+
+Create a "gradient" of selected positions.
+
+Example:
+
+ local s = selection.gradient({ type = "radial", x = 3, y = 5, x2 = 10, y2 = 12, mindist = 4, maxdist = 10, limited = false });
 
 === grow
 

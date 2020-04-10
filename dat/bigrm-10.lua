@@ -25,7 +25,7 @@ des.map([[
 .......................................................................
 ]]);
 
-if math.random(0,99) < 40 then
+if percent(40) then
    -- occasionally it's not a fog maze
    local terrain = { "L", "}", "T", "-", "F" };
    local tidx = math.random(1, #terrain);
