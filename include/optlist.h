@@ -339,10 +339,10 @@ pfx_##a,
                 "the inventory order of the items in your pack")
 #ifdef CHANGE_COLOR
 #ifndef WIN32
-    NHOPTC(palette, 15, opt_in, set_in_game, No, Yes, No, "hicolor",
+    NHOPTC(palette, 15, opt_in, set_in_game, No, Yes, No, No,"hicolor",
                 "palette (00c/880/-fff is blue/yellow/reverse white)")
 #else
-    NHOPTC(palette, 15, opt_in, set_in_config, No, Yes, No, "hicolor",
+    NHOPTC(palette, 15, opt_in, set_in_config, No, Yes, No, No, "hicolor",
                 "palette (adjust an RGB color in palette (color-R-G-B)")
 #endif
 #endif
