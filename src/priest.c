@@ -232,7 +232,7 @@ boolean sanctum; /* is it the seat of the high priest? */
     struct monst *priest;
     struct obj *otmp;
     int cnt;
-    int px, py, i, si = rn2(8);
+    int px = 0, py = 0, i, si = rn2(8);
     struct permonst *prim = &mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST];
 
     for (i = 0; i < 8; i++) {

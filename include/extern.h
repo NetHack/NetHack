@@ -3120,6 +3120,7 @@ E struct monst *FDECL(get_container_location,
 E struct monst *FDECL(montraits, (struct obj *, coord *, BOOLEAN_P));
 E struct monst *FDECL(revive, (struct obj *, BOOLEAN_P));
 E int FDECL(unturn_dead, (struct monst *));
+E void NDECL(unturn_you);
 E void FDECL(cancel_item, (struct obj *));
 E boolean FDECL(drain_item, (struct obj *, BOOLEAN_P));
 E struct obj *FDECL(poly_obj, (struct obj *, int));

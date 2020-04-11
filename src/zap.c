@@ -989,6 +989,19 @@ struct monst *mon;
     return res;
 }
 
+void
+unturn_you()
+{
+    (void) unturn_dead(&g.youmonst); /* hit carried corpses and eggs */
+
+    if (is_undead(g.youmonst.data)) {
+        You_feel("frightened and %sstunned.", Stunned ? "even more " : "");
+        make_stunned((HStun & TIMEOUT) + (long) rnd(30), FALSE);
+    } else {
+        You("shudder in dread.");
+    }
+}
+
 /* cancel obj, possibly carried by you or a monster */
 void
 cancel_item(obj)
@@ -1998,6 +2011,7 @@ struct obj *obj, *otmp;
             } else if (obj->otyp == CORPSE) {
                 struct monst *mtmp;
                 xchar ox, oy;
+                boolean by_u = !g.context.mon_moving;
                 int corpsenm = corpse_revive_type(obj);
                 char *corpsname = cxname_singular(obj);
 
@@ -2013,7 +2027,7 @@ struct obj *obj, *otmp;
                         if (canspotmon(mtmp)) {
                             pline("%s is resurrected!",
                                   upstart(noname_monnam(mtmp, ARTICLE_THE)));
-                            learn_it = TRUE;
+                            learn_it = by_u ? TRUE : g.zap_oseen;
                         } else {
                             /* saw corpse but don't see monster: maybe
                                mtmp is invisible, or has been placed at
@@ -2032,7 +2046,7 @@ struct obj *obj, *otmp;
                                 You_hear("%s reviving.", corpsname);
                             else
                                 You_hear("a defibrillator.");
-                            learn_it = TRUE;
+                            learn_it = by_u ? TRUE : g.zap_oseen;
                         }
                         if (canspotmon(mtmp))
                             /* didn't see corpse but do see monster: it
@@ -2479,13 +2493,7 @@ boolean ordinary;
     case WAN_UNDEAD_TURNING:
     case SPE_TURN_UNDEAD:
         learn_it = TRUE;
-        (void) unturn_dead(&g.youmonst);
-        if (is_undead(g.youmonst.data)) {
-            You_feel("frightened and %sstunned.",
-                     Stunned ? "even more " : "");
-            make_stunned((HStun & TIMEOUT) + (long) rnd(30), FALSE);
-        } else
-            You("shudder in dread.");
+        unturn_you();
         break;
     case SPE_HEALING:
     case SPE_EXTRA_HEALING:
