@@ -119,6 +119,7 @@ matrix:
         - export ADD_CURSES=Y
         - export PDCURSES_TOP=../lib/pdcurses
         - export LUA_VERSION=5.3.5
+        - export STAMP20200411
         - sh sys/winnt/travis-gcc.sh
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - test -d "lib/pdcurses" || exit 0
