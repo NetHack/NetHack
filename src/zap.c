@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1580322890 2020/01/29 18:34:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.330 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1586633039 2020/04/11 19:23:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.335 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -852,6 +852,7 @@ boolean by_hero;
             if (one_of) /* could be simplified to ''corpse->quan = 1L;'' */
                 corpse->quan--;
             pline("%s glows iridescently.", upstart(buf));
+            iflags.last_msg = PLNMSG_OBJ_GLOWS; /* usually for BUC change */
         } else if (shkp) {
             /* need some prior description of the corpse since
                stolen_value() will refer to the object as "it" */
@@ -957,11 +958,11 @@ struct monst *mon;
     struct obj *otmp, *otmp2;
     struct monst *mtmp2;
     char owner[BUFSZ], corpse[BUFSZ];
-    boolean youseeit;
-    int res = 0;
+    boolean youseeit, different_type, is_u = (mon == &g.youmonst);
+    int corpsenm, res = 0;
 
-    youseeit = (mon == &g.youmonst) ? TRUE : canseemon(mon);
-    otmp2 = (mon == &g.youmonst) ? g.invent : mon->minvent;
+    youseeit = is_u ? TRUE : canseemon(mon);
+    otmp2 = is_u ? g.invent : mon->minvent;
     owner[0] = corpse[0] = '\0'; /* lint suppression */
 
     while ((otmp = otmp2) != 0) {
@@ -972,20 +973,43 @@ struct monst *mon;
             continue;
         /* save the name; the object is liable to go away */
         if (youseeit) {
-            Strcpy(corpse,
-                   corpse_xname(otmp, (const char *) 0, CXN_SINGULAR));
-            Shk_Your(owner, otmp); /* includes a trailing space */
+            Strcpy(corpse, corpse_xname(otmp, (const char *) 0, CXN_NORMAL));
+            /* shk_your/Shk_Your produces a value with a trailing space */
+            if (otmp->quan > 1L) {
+                Strcpy(owner, "One of ");
+                (void) shk_your(eos(owner), otmp);
+            } else
+                (void) Shk_Your(owner, otmp);
         }
-
-        /* for a stack, only one is revived */
+        /* for a stack, only one is revived; if is_u, revive() calls
+           useup() which calls update_inventory() but not encumber_msg() */
+        corpsenm = otmp->corpsenm;
         if ((mtmp2 = revive(otmp, !g.context.mon_moving)) != 0) {
             ++res;
+            /* might get revived as a zombie rather than corpse's monster */
+            different_type = (mtmp2->data != &mons[corpsenm]);
+            if (iflags.last_msg == PLNMSG_OBJ_GLOWS) {
+                /* when hero zaps undead turning at self (or breaks
+                   non-empty wand), revive() reports "[one of] your <mon>
+                   corpse[s] glows iridescently"; override saved corpse
+                   and owner names to say "It comes alive" [note: we did
+                   earlier setup because corpse gets used up but need to
+                   do the override here after revive() sets 'last_msg'] */
+                Strcpy(corpse, "It");
+                owner[0] = '\0';
+            }
             if (youseeit)
-                pline("%s%s suddenly comes alive!", owner, corpse);
+                pline("%s%s suddenly %s%s%s!", owner, corpse,
+                      nonliving(mtmp2->data) ? "reanimates" : "comes alive",
+                      different_type ? " as " : "",
+                      different_type ? an(mtmp2->data->mname) : "");
             else if (canseemon(mtmp2))
                 pline("%s suddenly appears!", Amonnam(mtmp2));
         }
     }
+    if (is_u && res)
+        (void) encumber_msg();
+
     return res;
 }
 
