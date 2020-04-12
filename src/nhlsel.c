@@ -584,7 +584,6 @@ lua_State *L;
         free(mapstr);
 
         if ((err = mapfrag_error(mf)) != NULL) {
-            mapfrag_free(&mf);
             nhl_error(L, err);
             /*NOTREACHED*/
         }
