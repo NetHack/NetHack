@@ -127,6 +127,7 @@ it's possible to wish for tins of the Riders in wizard mode; eating one is
 revival via undead turning of corpse carried by hero said "your <mon> corpse
 	comes alive" even when revived monster was undead
 prevent searching or waiting next to a hostile monster - override with 'm'
+allow random mimics to show up mimicing more furniture than just stairs
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
