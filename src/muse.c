@@ -28,6 +28,7 @@ static struct permonst *FDECL(muse_newcham_mon, (struct monst *));
 static int FDECL(mloot_container, (struct monst *mon, struct obj *,
                                    BOOLEAN_P));
 static void FDECL(you_aggravate, (struct monst *));
+static boolean FDECL(necrophiliac, (struct obj *, BOOLEAN_P));
 static void FDECL(mon_consume_unstone, (struct monst *, struct obj *,
                                             BOOLEAN_P, BOOLEAN_P));
 static boolean FDECL(cures_stoning, (struct monst *, struct obj *,
@@ -285,7 +286,7 @@ struct obj *otmp;
 #define MUSE_UNICORN_HORN 17
 #define MUSE_POT_FULL_HEALING 18
 #define MUSE_LIZARD_CORPSE 19
-#define MUSE_WAN_UNDEAD_TURNING 20
+#define MUSE_WAN_UNDEAD_TURNING 20 /* also an offensive item */
 /*
 #define MUSE_INNATE_TPT 9999
  * We cannot use this.  Since monsters get unlimited teleportation, if they
@@ -1092,6 +1093,8 @@ struct monst *mtmp;
 /*#define MUSE_WAN_TELEPORTATION 15*/
 #define MUSE_POT_SLEEPING 16
 #define MUSE_SCR_EARTH 17
+/*#define MUSE_WAN_UNDEAD_TURNING 20*/ /* also a defensive item so don't
+                                     * redefine; nonconsecutive value is ok */
 
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
@@ -1165,6 +1168,35 @@ struct monst *mtmp;
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_WAN_MAGIC_MISSILE;
             }
+        }
+        nomore(MUSE_WAN_UNDEAD_TURNING);
+        if (obj->otyp == WAN_UNDEAD_TURNING && obj->spe > 0
+            /* not necrophiliac(); unlike deciding whether to pick this
+               type of wand up, we aren't interested in corpses within
+               carried containers until they're moved into open inventory;
+               we don't check whether hero is poly'd into an undead--the
+               wand's turning effect is too weak to be a useful direct
+               attack--only whether hero is carrying at least one corpse */
+            && carrying(CORPSE)) {
+            /*
+             * Hero is carrying one or more corpses but isn't wielding
+             * a cockatrice corpse (unless being hit by one won't do
+             * the monster much harm); otherwise we'd be using this wand
+             * as a defensive item with higher priority.
+             *
+             * Might be cockatrice intended as a weapon (or being denied
+             * to glove-wearing monsters for use as a weapon) or lizard
+             * intended as a cure or lichen intended as veggy food or
+             * sacrifice fodder being lugged to an altar.  Zapping with
+             * this will deprive hero of one from each stack although
+             * they might subsequently be recovered after killing again.
+             * In the sacrifice fodder case, it could even be to the
+             * player's advantage (fresher corpse if a new one gets
+             * dropped; player might not choose to spend a wand charge
+             * on that when/if hero acquires this wand).
+             */
+            g.m.offensive = obj;
+            g.m.has_offense = MUSE_WAN_UNDEAD_TURNING;
         }
         nomore(MUSE_WAN_STRIKING);
         if (obj->otyp == WAN_STRIKING && obj->spe > 0) {
@@ -1486,6 +1518,7 @@ struct monst *mtmp;
         g.m_using = FALSE;
         return (DEADMONSTER(mtmp)) ? 1 : 2;
     case MUSE_WAN_TELEPORTATION:
+    case MUSE_WAN_UNDEAD_TURNING:
     case MUSE_WAN_STRIKING:
         g.zap_oseen = oseen;
         mzapwand(mtmp, otmp, FALSE);
@@ -2222,6 +2255,23 @@ struct monst *mtmp;
     return 0;
 }
 
+/* check whether hero is carrying a corpse or contained petrifier corpse */
+static boolean
+necrophiliac(objlist, any_corpse)
+struct obj *objlist;
+boolean any_corpse;
+{
+    while (objlist) {
+        if (objlist->otyp == CORPSE
+            && (any_corpse || touch_petrifies(&mons[objlist->corpsenm])))
+            return TRUE;
+        if (Has_contents(objlist) && necrophiliac(objlist->cobj, FALSE))
+            return TRUE;
+        objlist = objlist->nobj;
+    }
+    return FALSE;
+}
+
 boolean
 searches_for_item(mon, obj)
 struct monst *mon;
@@ -2258,7 +2308,8 @@ struct obj *obj;
             || typ == WAN_TELEPORTATION || typ == WAN_CREATE_MONSTER)
             return TRUE;
         if (typ == WAN_UNDEAD_TURNING)
-            return carrying(CORPSE) || (Upolyd && is_undead(g.youmonst.data));
+            return (necrophiliac(g.invent, TRUE)
+                    || (Upolyd && is_undead(g.youmonst.data)));
         break;
     case POTION_CLASS:
         if (typ == POT_HEALING || typ == POT_EXTRA_HEALING

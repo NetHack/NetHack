@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.172 $ $NHDT-Date: 1586384219 2020/04/08 22:16:59 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ $NHDT-Date: 1586633039 2020/04/11 19:23:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -124,6 +124,8 @@ object taking erosion damage might give feedback message when out of view
 	inventory when out-of-view ice melted]
 it's possible to wish for tins of the Riders in wizard mode; eating one is
 	fatal but if you're life-saved or decline to die, the game crashed
+revival via undead turning of corpse carried by hero said "your <mon> corpse
+	comes alive" even when revived monster was undead
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
