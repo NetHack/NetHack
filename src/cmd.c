@@ -2995,6 +2995,8 @@ int NDECL((*cmd_func));
         || cmd_func == doloot
         /* travel: pop up a menu of interesting targets in view */
         || cmd_func == dotravel
+        /* wait and search: allow even if next to a hostile monster */
+        || cmd_func == donull || cmd_func == dosearch
         /* wizard mode ^V and ^T */
         || cmd_func == wiz_level_tele || cmd_func == dotelecmd
         /* 'm' prefix allowed for some extended commands */
