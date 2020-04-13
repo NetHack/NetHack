@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.175 $ $NHDT-Date: 1586633039 2020/04/11 19:23:59 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.179 $ $NHDT-Date: 1586807928 2020/04/13 19:58:48 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -129,6 +129,10 @@ revival via undead turning of corpse carried by hero said "your <mon> corpse
 prevent searching or waiting next to a hostile monster - override with 'm'
 allow random mimics to show up mimicing more furniture than just stairs
 scatter exploding bag of holding contents instead of outright deleting them
+male hero poly'd into nymph chooses charm vs seduce message based on being
+	male rather than on all nymphs being female but charm message was
+	using hardcoded pronouns She,her for target monster--wrong for male
+	target and noticable if "<mon> finishes taking off his suit" is given
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1584405117 2020/03/17 00:31:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1586807928 2020/04/13 19:58:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.230 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1546,9 +1546,16 @@ struct attack *mattk;
     gold = findgold(mdef->minvent);
 
     if (stealoid) { /* we will be taking everything */
-        if (gender(mdef) == (int) u.mfemale && g.youmonst.data->mlet == S_NYMPH)
-            You("charm %s.  She gladly hands over %sher possessions.",
-                mon_nam(mdef), !gold ? "" : "most of ");
+        char heshe[20];
+
+        /* 3.7: this uses hero's base gender rather than nymph feminimity
+           but was using hardcoded pronouns She/her for target monster;
+           switch to dynamic pronoun */
+        if (gender(mdef) == (int) u.mfemale
+            && g.youmonst.data->mlet == S_NYMPH)
+            You("charm %s.  %s gladly hands over %s%s possessions.",
+                mon_nam(mdef), upstart(strcpy(heshe, mhe(mdef))),
+                !gold ? "" : "most of ", mhis(mdef));
         else
             You("seduce %s and %s starts to take off %s clothes.",
                 mon_nam(mdef), mhe(mdef), mhis(mdef));
