@@ -194,6 +194,19 @@ static struct monst *invent_carrying_monster = (struct monst *) 0;
      * end of no 'g.'
      */
 
+/* Does typ match with levl[][].typ, considering special types
+   MATCH_WALL and MAX_TYPE (aka transparency)? */
+boolean
+match_maptyps(typ, levltyp)
+xchar typ, levltyp;
+{
+    if ((typ == MATCH_WALL) && !IS_STWALL(levltyp))
+        return FALSE;
+    if ((typ < MAX_TYPE) && (typ != levltyp))
+        return FALSE;
+    return TRUE;
+}
+
 struct mapfragment *
 mapfrag_fromstr(str)
 char *str;
@@ -279,7 +292,7 @@ int x,y;
         for (ry = -(mf->hei / 2); ry <= (mf->hei / 2); ry++) {
             schar mapc = mapfrag_get(mf, rx + (mf->wid / 2) , ry + (mf->hei / 2));
             schar levc = isok(x+rx, y+ry) ? levl[x+rx][y+ry].typ : STONE;
-            if ((mapc < MAX_TYPE) && (mapc != levc))
+            if (!match_maptyps(mapc, levc))
                 return FALSE;
         }
     return TRUE;
@@ -4337,7 +4350,7 @@ int lit;
 
     for (x = 0; x < ret->wid; x++)
         for (y = 0; y < ret->hei; y++)
-            if (selection_getpoint(x, y, ov) && (levl[x][y].typ == typ)) {
+            if (selection_getpoint(x, y, ov) && match_maptyps(typ, levl[x][y].typ)) {
                 switch (lit) {
                 default:
                 case -2:
@@ -5142,7 +5155,6 @@ lua_State *L;
         free(tmpstr);
 
         if ((err = mapfrag_error(mf)) != NULL) {
-            mapfrag_free(&mf);
             nhl_error(L, err);
             /*NOTREACHED*/
         }

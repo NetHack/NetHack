@@ -206,6 +206,7 @@ const struct {
                 { 'F', IRONBARS }, /* Fe = iron */
                 { 'x', MAX_TYPE }, /* "see-through" */
                 { 'B', CROSSWALL }, /* hack: boundary location */
+                { 'w', MATCH_WALL }, /* IS_STWALL() */
                 { '\0', STONE },
 };
 

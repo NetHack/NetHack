@@ -74,6 +74,7 @@ enum levl_typ_types {
     CLOUD     = 35,
 
     MAX_TYPE  = 36,
+    MATCH_WALL = 37,
     INVALID_TYPE = 127
 };
 
