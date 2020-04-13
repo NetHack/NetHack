@@ -782,6 +782,8 @@ looting will do #force if you could do it and the container is locked
 	and you didn't have a tool to unlock it
 use silly names for rays (such as breath weapons) when hallucinating
 zombies groan instead of being silent
+martial arts users, sasquatches, and heroes wearing kicking boots can
+	no longer miss a monster completely with a clumsy kick
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
