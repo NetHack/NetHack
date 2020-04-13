@@ -674,7 +674,8 @@ For ports with mouse
 support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 .lp .
-Wait or rest, do nothing for one turn.
+Wait or rest, do nothing for one turn. Precede with the \(oqm\(cq prefix
+to wait for a turn even next to a hostile monster.
 .lp a
 Apply (use) a tool (pick-axe, key, lamp...).
 .lp ""
@@ -882,6 +883,8 @@ Redraw the screen.
 .lp s
 Search for secret doors and traps around you.
 It usually takes several tries to find something.
+Precede with the \(oqm\(cq prefix to search for a turn
+even next to a hostile monster.
 .lp ""
 Can also be used to figure out whether there is still a monster at
 an adjacent \(lqremembered, unseen monster\(rq marker.

@@ -1782,6 +1782,10 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
 int
 dosearch()
 {
+    if (!iflags.menu_requested && !g.multi && monster_nearby()) {
+        Norep("You already found a monster.");
+        return 0;
+    }
     return dosearch0(0);
 }
 

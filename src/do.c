@@ -1970,6 +1970,11 @@ long timeout UNUSED;
 int
 donull()
 {
+    if (!iflags.menu_requested && !g.multi && monster_nearby()) {
+        Norep("Are you waiting to get hit?");
+        return 0;
+    }
+
     return 1; /* Do nothing, but let other things happen */
 }
 
