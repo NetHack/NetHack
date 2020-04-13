@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1586285681 2020/04/07 18:54:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1586815086 2020/04/13 21:58:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.237 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1967,14 +1967,22 @@ long timeout UNUSED;
     }
 }
 
+/* '.' command: do nothing == rest; also the
+   ' ' command iff 'rest_on_space' option is On */
 int
 donull()
 {
     if (!iflags.menu_requested && !g.multi && monster_nearby()) {
-        Norep("Are you waiting to get hit?");
+        char buf[QBUFSZ];
+
+        buf[0] = '\0';
+        if (iflags.cmdassist || !g.did_nothing_flag++)
+            Sprintf(buf, "  Use '%s' prefix to force a no-op (to rest).",
+                    visctrl(g.Cmd.spkeys[NHKF_REQMENU])); /* default is "m" */
+        Norep("Are you waiting to get hit?%s", buf);
         return 0;
     }
-
+    g.did_nothing_flag = 0; /* reset */
     return 1; /* Do nothing, but let other things happen */
 }
 

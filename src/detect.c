@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1578252630 2020/01/05 19:30:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1586815085 2020/04/13 21:58:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1783,9 +1783,16 @@ int
 dosearch()
 {
     if (!iflags.menu_requested && !g.multi && monster_nearby()) {
-        Norep("You already found a monster.");
+        char buf[QBUFSZ];
+
+        buf[0] = '\0';
+        if (iflags.cmdassist || !g.already_found_flag++)
+            Sprintf(buf, "  Use '%s' prefix to force another search.",
+                    visctrl(g.Cmd.spkeys[NHKF_REQMENU])); /* default is "m" */
+        Norep("You already found a monster.%s", buf);
         return 0;
     }
+    g.already_found_flag = 0; /* start over */
     return dosearch0(0);
 }
 

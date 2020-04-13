@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1583608833 2020/03/07 19:20:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1586815084 2020/04/13 21:58:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.209 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -357,6 +357,9 @@ const struct instance_globals g_init = {
 #endif
     UNDEFINED_VALUES, /* program_state */
 
+    /* detect.c */
+    0, /* already_found_flag */
+
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */
 
@@ -369,6 +372,7 @@ const struct instance_globals g_init = {
     FALSE, /* at_ladder */
     NULL, /* dfr_pre_msg */
     NULL, /* dfr_post_msg */
+    0, /* did_nothing_flag */
     { 0, 0 }, /* save_dlevel */
 
     /* do_name.c */
