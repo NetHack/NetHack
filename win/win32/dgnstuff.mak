@@ -74,7 +74,7 @@ tools:
 	   copy $(YTABH) ..\include\dgn_comp.h
 	   @del $(YTABC)
 	   @del $(YTABH)
-	   chdir ..\build
+	   chdir ..\src
 !ENDIF
 
 ..\util\dgn_lex.c: ..\util\dgn_comp.l
@@ -89,5 +89,5 @@ tools:
 	   $(LEX) dgn_comp.l
 	   copy $(LEXYYC) $@
 	   @del $(LEXYYC)
-	   chdir ..\build
+	   chdir ..\src
 !ENDIF

@@ -33,11 +33,13 @@ export LEX=win_flex.exe
 export YTABC=y.tab.c
 export YTABH=y.tab.h
 export LEXYYC=lex.yy.c
-ls -R /c/ProgramData/chocolatey
+#ls -R /c/ProgramData/chocolatey
 export
 mkdir ../binary
 cd src
 cp ../sys/winnt/Makefile.msc ./Makefile
 nmake install
+ls -l
+ls -l ../util
 cd ..
 powershell -Command "Compress-Archive -U -Path binary/* -DestinationPath $TRAVIS_TAG.x86.zip"
