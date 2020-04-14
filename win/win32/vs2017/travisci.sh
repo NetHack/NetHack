@@ -39,7 +39,5 @@ mkdir ../binary
 cd src
 cp ../sys/winnt/Makefile.msc ./Makefile
 nmake install
-ls -l
-ls -l ../util
 cd ..
 powershell -Command "Compress-Archive -U -Path binary/* -DestinationPath $TRAVIS_TAG.x86.zip"
