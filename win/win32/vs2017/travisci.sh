@@ -35,9 +35,9 @@ export LEXYYC=lex.yy.c
 export
 mkdir ../binary
 #find /c -iname 'bison.exe' -print
+#dir C:\ProgramData\chocolatey\lib\winflexbison\tools
+ls -l /c/ProgramData/chocolatey
 cd src
-dir C:\ProgramData\chocolatey\lib\winflexbison\tools
-ls -l /ProgramData/chocolatey/lib/winflexbison/tools
 cp ../sys/winnt/Makefile.msc ./Makefile
 #nmake install
 cd ..
