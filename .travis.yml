@@ -70,6 +70,7 @@ matrix:
               make install
               cat dat/options
     - os: windows
+      install: choco install winflexbison
       env: DESCR=windows-visualstudio
       language: shell
       script:

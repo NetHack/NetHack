@@ -13,6 +13,7 @@ export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVE
 export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/bin/HostX64/x86:$PATH
 export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/Common7/IDE/CommonExtensions/Microsoft/TestWindow
 export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/MSBuild/Current/bin/Roslyn
+export PATH=$PATH:/c/ProgramData/chocolatey/lib/winflexbison/tools
 export INCLUDE=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/$TOOLSVER/VC/Tools/MSVC/$MSVER/include
 export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Include/$WKITVER/ucrt
 export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/ucrt
@@ -27,8 +28,13 @@ export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
 git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
 export ADD_CURSES=Y
 export PDCURSES_TOP=../../pdcurses
-export
+export YACC="win_bison -y"
+export LEX=win_flex.exe
+export YTABC=y.tab.c
+export YTABH=y.tab.h
+export LEXYYC=lex.yy.cexport
 cd src
+mkdir ../binary
 cp ../sys/winnt/Makefile.msc ./Makefile
 nmake install
 cd ..
