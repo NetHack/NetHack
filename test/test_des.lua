@@ -447,6 +447,7 @@ function test_replace_terrain()
    des.replace_terrain({ region={1,1, 70,19}, fromterrain=".", toterrain="L", chance=25 });
    des.replace_terrain({ selection=selection.area(2,5, 10,15), fromterrain="L", toterrain="." });
    des.replace_terrain({ mapfragment=[[...]], toterrain="T" });
+   des.replace_terrain({ mapfragment=[[w.w]], toterrain="L" });
 end
 
 function test_corridor()

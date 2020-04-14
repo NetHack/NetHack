@@ -39,6 +39,18 @@ function sel_are_equal(sela, selb, msg)
    end
 end
 
+function is_map_at(x,y, mapch, lit)
+   local rm = nh.getmap(x + 1, y); -- + 1 == g.xstart
+   if rm.mapchr ~= mapch then
+      error("Terrain at (" .. x .. "," .. y .. ") is not \"" .. mapch .. "\", but \"" .. rm.mapchr .. "\"");
+   end
+   if lit ~= nil then
+      if rm.lit ~= lit then
+         error("light state at (" .. x .. "," .. y .. ") is not \"" .. lit .. "\", but \"" .. tostring(rm.lit) .. "\"");
+      end
+   end
+end
+
 -- test selection parameters
 function test_selection_params()
    local sel = selection.new();
@@ -334,6 +346,15 @@ function test_sel_filter_mapchar()
    sel_has_n_points(selb, 2, __func__);
    sel_pt_ne(selb, 5,5, 1, __func__);
    sel_pt_ne(selb, 15,10, 1, __func__);
+
+   des.reset_level();
+   des.level_init({ style = "solidfill", fg = " " });
+   des.replace_terrain({ selection=sela, fromterrain=" ", toterrain="-", chance=50 });
+   des.replace_terrain({ selection=sela, fromterrain=" ", toterrain="|", chance=50 });
+
+   -- test filtering by "w" (match any solid wall)
+   local seld = sela:filter_mapchar("w");
+   sel_has_n_points(seld, 1659, __func__);
 end -- test_sel_filter_mapchar
 
 function test_sel_flood()
@@ -355,8 +376,58 @@ function test_sel_flood()
 end -- test_sel_flood
 
 function test_sel_match()
-   local sel = selection.match([[...]]);
+   local __func__ = "test_sel_match";
+   des.reset_level();
+   des.level_init({ style = "solidfill", fg = " " });
+
+   -- test horizontal map fragment
+   des.terrain(5,5, ".");
+   des.terrain(6,5, ".");
+   des.terrain(7,5, ".");
+   local sela = selection.match([[...]]);
+   sel_has_n_points(sela, 1, __func__);
+   sel_pt_ne(sela, 6,5, 1, __func__);
+
+   -- test vertical map fragment
+   local mapfragv = " \n.\n ";
+   local selb = selection.match(mapfragv);
+   sel_has_n_points(selb, 3, __func__);
+   sel_pt_ne(selb, 5,5, 1, __func__);
+   sel_pt_ne(selb, 6,5, 1, __func__);
+   sel_pt_ne(selb, 7,5, 1, __func__);
+
+   -- test matching with "w" to match any wall
+   des.terrain(5,4, "-");
+   des.terrain(6,6, "|");
+   local mapfragv = "w\n.\nw";
+   local selc = selection.match(mapfragv);
+   sel_has_n_points(selc, 3, __func__);
+   sel_pt_ne(selc, 5,5, 1, __func__);
+   sel_pt_ne(selc, 6,5, 1, __func__);
+   sel_pt_ne(selc, 7,5, 1, __func__);
+
+   -- test a 3x3 map fragment
+   local mapfrag = "www\n...\nwww";
+   local seld = selection.match(mapfrag);
+   sel_has_n_points(seld, 1, __func__);
+   sel_pt_ne(seld, 6,5, 1, __func__);
 end -- test_sel_match
+
+function test_sel_iterate()
+   local __func__ = "test_sel_iterate";
+   des.reset_level();
+   des.level_init({ style = "solidfill", fg = " " });
+
+   des.terrain(5,5, ".");
+   des.terrain(7,5, ".");
+   des.terrain(9,5, ".");
+
+   local sela = selection.match(".");
+   sela:iterate(function(x,y) des.terrain(x, y, "L"); end);
+   is_map_at(5,5, "L");
+   is_map_at(7,5, "L");
+   is_map_at(9,5, "L");
+end
 
 test_selection_params();
 test_sel_negate();
@@ -372,3 +443,4 @@ test_sel_grow();
 test_sel_filter_mapchar();
 test_sel_flood();
 test_sel_match();
+test_sel_iterate();

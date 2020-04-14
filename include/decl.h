@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1583608809 2020/03/07 19:20:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1586815081 2020/04/13 21:58:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.230 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -814,6 +814,10 @@ struct instance_globals {
 #endif
     struct sinfo program_state;
 
+    /* detect.c */
+
+    int already_found_flag; /* used to augment first "already found a monster"
+                             * message if 'cmdassist' is Off */
     /* dig.c */
 
     boolean did_dig_msg;
@@ -828,7 +832,8 @@ struct instance_globals {
     boolean at_ladder;
     char *dfr_pre_msg;  /* pline() before level change */
     char *dfr_post_msg; /* pline() after level change */
-    d_level save_dlevel;
+    int did_nothing_flag; /* to augment the no-rest-next-to-monster message */
+    d_level save_dlevel; /* ? [even back in 3.4.3, only used in bones.c] */
 
     /* do_name.c */
     struct selectionvar *gloc_filter_map;

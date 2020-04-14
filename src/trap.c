@@ -4920,7 +4920,10 @@ boolean disarm;
         case 18:
         case 17:
             pline("A cloud of noxious gas billows from %s.", the(xname(obj)));
-            poisoned("gas cloud", A_STR, "cloud of poison gas", 15, FALSE);
+            if (rn2(3))
+                poisoned("gas cloud", A_STR, "cloud of poison gas", 15, FALSE);
+            else
+                create_gas_cloud(obj->ox, obj->oy, 1, 8);
             exercise(A_CON, FALSE);
             break;
         case 16:
