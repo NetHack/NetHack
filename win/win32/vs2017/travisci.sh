@@ -37,7 +37,8 @@ mkdir ../binary
 #find /c -iname 'bison.exe' -print
 cd src
 dir C:\ProgramData\chocolatey\lib\winflexbison\tools
+ls -l /ProgramData/chocolatey/lib/winflexbison/tools
 cp ../sys/winnt/Makefile.msc ./Makefile
-nmake install
+#nmake install
 cd ..
 powershell -Command "Compress-Archive -U -Path binary/* -DestinationPath $TRAVIS_TAG.x86.zip"
