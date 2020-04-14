@@ -28,8 +28,8 @@ export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
 git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
 export ADD_CURSES=Y
 export PDCURSES_TOP=../../pdcurses
-export YACC="bison -y"
-export LEX=flex.exe
+export YACC="win_bison -y"
+export LEX=win_flex.exe
 export YTABC=y.tab.c
 export YTABH=y.tab.h
 export LEXYYC=lex.yy.c
