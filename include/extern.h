@@ -1660,6 +1660,7 @@ E void FDECL(Delay, (int));
 
 /* ### mthrowu.c ### */
 
+E boolean FDECL(m_has_launcher_and_ammo, (struct monst *));
 E int FDECL(thitu, (int, int, struct obj **, const char *));
 E int FDECL(ohitmon, (struct monst *, struct obj *, int, BOOLEAN_P));
 E void FDECL(thrwmu, (struct monst *));
