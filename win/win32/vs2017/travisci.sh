@@ -33,6 +33,7 @@ export YTABC=y.tab.c
 export YTABH=y.tab.h
 export LEXYYC=lex.yy.c
 export
+md ../binary
 find /c -iname 'bison.exe' -print
 cd src
 cp ../sys/winnt/Makefile.msc ./Makefile
