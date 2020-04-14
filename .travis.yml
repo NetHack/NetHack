@@ -74,8 +74,6 @@ matrix:
       env: DESCR=windows-visualstudio
       language: shell
       script:
-#        - find /c/Program\ Files\ \(x86\) -iname 'flex.exe' -print
-        - find /c -iname 'flex.exe' -print
         - ./win/win32/vs2017/travisci.sh
     - os: windows
 #     install: choco install mingw

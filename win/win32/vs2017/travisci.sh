@@ -27,7 +27,13 @@ export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
 git clone --depth 1 https://github.com/wmcbrine/PDCurses.git ../pdcurses
 export ADD_CURSES=Y
 export PDCURSES_TOP=../../pdcurses
+export YACC=bison -y
+export LEX=flex.exe
+export YTABC=y.tab.c
+export YTABH=y.tab.h
+export LEXYYC=lex.yy.c
 export
+find /c -iname 'bison.exe' -print
 cd src
 cp ../sys/winnt/Makefile.msc ./Makefile
 nmake install
