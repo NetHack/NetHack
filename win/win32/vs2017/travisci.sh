@@ -33,6 +33,7 @@ export LEX=flex.exe
 export YTABC=y.tab.c
 export YTABH=y.tab.h
 export LEXYYC=lex.yy.c
+ls -R /c/ProgramData/chocolatey
 export
 mkdir ../binary
 cd src
