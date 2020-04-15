@@ -2216,7 +2216,7 @@ register struct monst *mtmp;
             ap_type = M_AP_OBJECT;
             appear = -s_sym;
         } else {
-            if (s_sym == RANDOM_CLASS)
+            if (s_sym == RANDOM_CLASS || s_sym >= MAXOCLASSES)
                 s_sym = syms[rn2((int) sizeof(syms) - 2) + 2];
             goto assign_sym;
         }

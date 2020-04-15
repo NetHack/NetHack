@@ -802,7 +802,8 @@ struct obj *obj;
     return FALSE;
 }
 
-/* positive value: class; negative value: specific object type */
+/* positive value: class; negative value: specific object type.
+   can also return non-existing object class (eg. VEGETARIAN_CLASS) */
 int
 get_shop_item(type)
 int type;
