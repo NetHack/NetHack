@@ -187,6 +187,14 @@ struct monst {
      || (mon)->cham == PM_VLAD_THE_IMPALER)
 #define vampshifted(mon) (is_vampshifter((mon)) && !is_vampire((mon)->data))
 
+/* monsters which cannot be displaced: priests, shopkeepers, vault guards,
+   Oracle, quest leader */
+#define mundisplaceable(mon) ((mon)->ispriest                    \
+                              || (mon)->isshk                    \
+                              || (mon)->isgd                     \
+                              || (mon)->data == &mons[PM_ORACLE] \
+                              || (mon)->m_id == g.quest_status.leader_m_id)
+
 /* mimic appearances that block vision/light */
 #define is_lightblocker_mappear(mon)                       \
     (is_obj_mappear(mon, BOULDER)                          \

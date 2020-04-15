@@ -1843,10 +1843,7 @@ domove_core()
         } else if (mtmp->mpeaceful
                    && (!goodpos(u.ux0, u.uy0, mtmp, 0)
                        || t_at(u.ux0, u.uy0) != NULL
-                       || mtmp->ispriest
-                       || mtmp->isshk
-                       || mtmp->data == &mons[PM_ORACLE]
-                       || mtmp->m_id == g.quest_status.leader_m_id)) {
+                       || mundisplaceable(mtmp))) {
             /* displacing peaceful into unsafe or trapped space, or trying to
              * displace quest leader, Oracle, shopkeeper, or priest */
             You("stop.  %s doesn't want to swap places.",
