@@ -245,8 +245,7 @@ const void *b;
 
 #define IS_UNEXPLORED_LOC(x,y) \
     (isok((x), (y))                                     \
-     && glyph_is_cmap(levl[(x)][(y)].glyph)             \
-     && levl[(x)][(y)].glyph == GLYPH_UNEXPLORED        \
+     && glyph_is_unexplored(levl[(x)][(y)].glyph)   \
      && !levl[(x)][(y)].seenv)
 
 #define GLOC_SAME_AREA(x,y)                                     \
@@ -371,6 +370,7 @@ int x, y, gloc;
                     || glyph_to_cmap(glyph) == S_ndoor));
     case GLOC_EXPLORE:
         return (glyph_is_cmap(glyph)
+                && !glyph_is_nothing(glyph_to_cmap(glyph))
                 && (is_cmap_door(glyph_to_cmap(glyph))
                     || is_cmap_drawbridge(glyph_to_cmap(glyph))
                     || glyph_to_cmap(glyph) == S_ndoor
@@ -402,7 +402,9 @@ int x, y, gloc;
                      || glyph_to_cmap(glyph) == S_room
                      || glyph_to_cmap(glyph) == S_darkroom
                      || glyph_to_cmap(glyph) == S_corr
-                     || glyph_to_cmap(glyph) == S_litcorr));
+                     || glyph_to_cmap(glyph) == S_litcorr)
+                 || glyph_is_nothing(glyph)
+                 || glyph_is_unexplored(glyph));
     }
     /*NOTREACHED*/
     return FALSE;
