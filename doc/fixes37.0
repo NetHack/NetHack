@@ -134,6 +134,7 @@ male hero poly'd into nymph chooses charm vs seduce message based on being
 	using hardcoded pronouns She,her for target monster--wrong for male
 	target and noticable if "<mon> finishes taking off his suit" is given
 hostile monsters with launcher and ammo try to stay away from melee range
+allow displacing peaceful creatures
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
