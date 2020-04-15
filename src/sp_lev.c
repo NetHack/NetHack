@@ -3459,7 +3459,8 @@ lua_State *L;
         tmpobj.id = -1;
 
     if (tmpobj.id == STATUE || tmpobj.id == EGG
-        || tmpobj.id == CORPSE || tmpobj.id == TIN) {
+        || tmpobj.id == CORPSE || tmpobj.id == TIN
+        || tmpobj.id == FIGURINE) {
         struct permonst *pm = NULL;
         int i, lflags = 0;
         char *montype = get_table_str_opt(L, "montype", NULL);
