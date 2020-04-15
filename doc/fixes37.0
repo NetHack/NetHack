@@ -135,6 +135,7 @@ male hero poly'd into nymph chooses charm vs seduce message based on being
 	target and noticable if "<mon> finishes taking off his suit" is given
 hostile monsters with launcher and ammo try to stay away from melee range
 allow displacing peaceful creatures
+unicorn horns don't restore attribute loss anymore
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
