@@ -929,6 +929,9 @@ lua_State *L;
     if (!strcmp(tkey, "inventory")) {
         nhl_push_obj(L, g.invent);
         return 1;
+    } else if (!strcmp(tkey, "role")) {
+        lua_pushstring(L, g.urole.name.m);
+        return 1;
     }
 
     nhl_error(L, "Unknown u table index");

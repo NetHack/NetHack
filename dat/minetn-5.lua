@@ -101,7 +101,7 @@ des.region({ region={59, 9, 67,10}, lit=1, type="shop", prefilled=0 })
 des.door("closed",66,08)
 des.region({ region={57,13, 60,15}, lit=1, type="tool shop", prefilled=0 })
 des.door("closed",56,14)
-des.region({ region={05,09, 08,10}, lit=1, type="food shop", prefilled=0 })
+des.region({ region={05,09, 08,10}, lit=1, type=monkfoodshop(), prefilled=0 })
 des.door("closed",07,11)
 -- Gnome homes
 des.door("closed",04,14)

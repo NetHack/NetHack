@@ -498,13 +498,6 @@ const char *const *nlp;
     int name_wanted;
     s_level *sptr;
 
-    if (nlp == shkfoods && In_mines(&u.uz) && Role_if(PM_MONK)
-        && (sptr = Is_special(&u.uz)) != 0 && sptr->flags.town) {
-        /* special-case override for minetown food store for monks */
-        nlp = shkhealthfoods;
-        ESHK(shk)->shoptype = FODDERSHOP;
-    }
-
     if (nlp == shklight && In_mines(&u.uz)
         && (sptr = Is_special(&u.uz)) != 0 && sptr->flags.town) {
         /* special-case minetown lighting shk */
@@ -676,8 +669,6 @@ struct mkroom *sroom;
     if (shp->shknms == shkrings)
         (void) mongets(shk, TOUCHSTONE);
     nameshk(shk, shp->shknms);
-    /* might have changed delicatessen to health food store */
-    sroom->rtype = eshkp->shoptype;
 
     return sh;
 }
