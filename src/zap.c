@@ -4475,6 +4475,7 @@ short exploding_wand_typ;
         if (is_ice(x, y)) {
             melt_ice(x, y, (char *) 0);
         } else if (is_pool(x, y)) {
+            create_gas_cloud(x, y, rnd(2), 0);
             const char *msgtxt = (!Deaf)
                                      ? "You hear hissing gas." /* Deaf-aware */
                                      : (type >= 0)
@@ -4498,6 +4499,7 @@ short exploding_wand_typ;
             if (lev->typ == ROOM)
                 newsym(x, y);
         } else if (IS_FOUNTAIN(lev->typ)) {
+            create_gas_cloud(x, y, rnd(3), 0);
             if (see_it)
                 pline("Steam billows from the fountain.");
             rangemod -= 1;

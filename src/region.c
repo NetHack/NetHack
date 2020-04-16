@@ -1012,6 +1012,8 @@ genericptr_t p2;
 
     reg = (NhRegion *) p1;
     dam = reg->arg.a_int;
+    if (!dam)
+        return FALSE;
     if (p2 == (genericptr_t) 0) { /* This means *YOU* Bozo! */
         if (m_poisongas_ok(&g.youmonst) == M_POISONGAS_OK)
             return FALSE;
