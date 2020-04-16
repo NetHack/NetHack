@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.179 $ $NHDT-Date: 1586807928 2020/04/13 19:58:48 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ $NHDT-Date: 1587024026 2020/04/16 08:00:26 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -136,6 +136,7 @@ male hero poly'd into nymph chooses charm vs seduce message based on being
 hostile monsters with launcher and ammo try to stay away from melee range
 allow displacing peaceful creatures
 unicorn horns don't restore attribute loss anymore
+when a shop is changed from food to health food, change room type to match
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

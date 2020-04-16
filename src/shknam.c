@@ -1,4 +1,4 @@
-/* NetHack 3.6	shknam.c	$NHDT-Date: 1586375496 2020/04/08 19:51:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.6	shknam.c	$NHDT-Date: 1587024023 2020/04/16 08:00:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -502,10 +502,11 @@ const char *const *nlp;
         && (sptr = Is_special(&u.uz)) != 0 && sptr->flags.town) {
         /* special-case override for minetown food store for monks */
         nlp = shkhealthfoods;
+        ESHK(shk)->shoptype = FODDERSHOP;
     }
 
-    if (nlp == shklight && In_mines(&u.uz) && (sptr = Is_special(&u.uz)) != 0
-        && sptr->flags.town) {
+    if (nlp == shklight && In_mines(&u.uz)
+        && (sptr = Is_special(&u.uz)) != 0 && sptr->flags.town) {
         /* special-case minetown lighting shk */
         shname = "+Izchak";
         shk->female = FALSE;
@@ -675,6 +676,8 @@ struct mkroom *sroom;
     if (shp->shknms == shkrings)
         (void) mongets(shk, TOUCHSTONE);
     nameshk(shk, shp->shknms);
+    /* might have changed delicatessen to health food store */
+    sroom->rtype = eshkp->shoptype;
 
     return sh;
 }
