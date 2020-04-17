@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1585781359 2020/04/01 22:49:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1587110793 2020/04/17 08:06:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1625,18 +1625,24 @@ clear_glyph_buffer()
     reset_glyph_bbox();
 }
 
-/*
- * Assumes that the indicated positions are filled with GLYPH_UNEXPLORED glyphs.
- */
+/* used by tty after menu or text popup has temporarily overwritten the map */
 void
 row_refresh(start, stop, y)
 int start, stop, y;
 {
-    register int x;
+    register int x, glyph;
+    register boolean force;
+    int ch = ' ', color = NO_COLOR;
+    unsigned special = 0;
 
-    for (x = start; x <= stop; x++)
-        if (g.gbuf[y][x].glyph != GLYPH_UNEXPLORED)
-            print_glyph(WIN_MAP, x, y, g.gbuf[y][x].glyph, get_bk_glyph(x, y));
+    (void) mapglyph(GLYPH_UNEXPLORED, &ch, &color, &special, 0, 0, 0);
+    force = (ch != ' ' || color != NO_COLOR || (special & ~MG_UNEXPL) != 0);
+
+    for (x = start; x <= stop; x++) {
+        glyph = g.gbuf[y][x].glyph;
+        if (force || glyph != GLYPH_UNEXPLORED)
+            print_glyph(WIN_MAP, x, y, glyph, get_bk_glyph(x, y));
+    }
 }
 
 void
