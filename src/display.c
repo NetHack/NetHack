@@ -1606,9 +1606,9 @@ int x, y, glyph;
         }                                \
     }
 
-static const gbuf_entry nul_gbuf = { 0, GLYPH_UNEXPLORED };
+static const gbuf_entry nul_gbuf = { 1, GLYPH_UNEXPLORED };
 /*
- * Turn the 3rd screen into UNEXPLORED.
+ * Turn the 3rd screen into UNEXPLORED that needs to be refreshed.
  */
 void
 clear_glyph_buffer()
@@ -1621,11 +1621,13 @@ clear_glyph_buffer()
         for (x = COLNO; x; x--) {
             *gptr++ = nul_gbuf;
         }
+        g.gbuf_start[y] = 1;
+        g.gbuf_stop[y] = COLNO - 1;
     }
-    reset_glyph_bbox();
 }
 
-/* used by tty after menu or text popup has temporarily overwritten the map */
+/* used by tty after menu or text popup has temporarily overwritten the map
+   and it has been erased so shows spaces, not necessarily S_unexplored */
 void
 row_refresh(start, stop, y)
 int start, stop, y;
@@ -1649,7 +1651,6 @@ void
 cls()
 {
     static boolean in_cls = 0;
-    int y, x, force_unexplored;
 
     if (in_cls)
         return;
@@ -1658,16 +1659,7 @@ cls()
     g.context.botlx = 1;                    /* force update of botl window */
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
-    clear_glyph_buffer(); /* this is sort of an extra effort, but OK */
-    force_unexplored = (g.showsyms[SYM_UNEXPLORED + SYM_OFF_X] != ' ');
-    for (y = 0; y < ROWNO; y++) {
-        g.gbuf_start[y] = 1;
-        g.gbuf_stop[y] = COLNO - 1;
-        if (force_unexplored) {
-            for (x = 1; x < COLNO; x++)
-                g.gbuf[y][x].gnew = 1;
-        }
-    }
+    clear_glyph_buffer(); /* force gbuf[][].glyph to unexplored */
     in_cls = FALSE;
 }
 
