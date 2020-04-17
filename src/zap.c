@@ -4475,21 +4475,29 @@ short exploding_wand_typ;
         if (is_ice(x, y)) {
             melt_ice(x, y, (char *) 0);
         } else if (is_pool(x, y)) {
+            boolean on_water_level = Is_waterlevel(&u.uz);
             const char *msgtxt = (!Deaf)
-                                     ? "You hear hissing gas." /* Deaf-aware */
-                                     : (type >= 0)
-                                         ? "That seemed remarkably uneventful."
-                                         : (const char *) 0;
+                                 ? "You hear hissing gas." /* Deaf-aware */
+                                 : (type >= 0)
+                                   ? "That seemed remarkably uneventful."
+                                   : (char *) 0;
 
-            if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP */
-                if (see_it)
+            /* don't create steam clouds on Plane of Water; air bubble
+               movement and gas regions don't understand each other */
+            if (!on_water_level)
+                create_gas_cloud(x, y, rnd(3), 0); /* radius 1..3, no damg */
+
+            if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP or WATER */
+                if (on_water_level)
+                    msgtxt = (see_it || !Deaf) ? "Some water boils." : 0;
+                else if (see_it)
                     msgtxt = "Some water evaporates.";
             } else {
                 rangemod -= 3;
                 lev->typ = ROOM, lev->flags = 0;
                 t = maketrap(x, y, PIT);
-                if (t)
-                    t->tseen = 1;
+                /*if (t) -- this was before the vapor cloud was added --
+                      t->tseen = 1;*/
                 if (see_it)
                     msgtxt = "The water evaporates.";
             }
@@ -4498,6 +4506,7 @@ short exploding_wand_typ;
             if (lev->typ == ROOM)
                 newsym(x, y);
         } else if (IS_FOUNTAIN(lev->typ)) {
+            create_gas_cloud(x, y, rnd(2), 0); /* radius 1..2, no damage */
             if (see_it)
                 pline("Steam billows from the fountain.");
             rangemod -= 1;
