@@ -2239,7 +2239,7 @@ struct mkroom *croom;
 
             remove_object(otmp);
             if (cobj) {
-                (void) add_to_container(cobj, otmp);
+                otmp = add_to_container(cobj, otmp);
                 cobj->owt = weight(cobj);
             } else {
                 obj_extract_self(otmp);
@@ -2324,18 +2324,19 @@ struct mkroom *croom;
         }
     }
 
-    stackobj(otmp);
+    if (!(o->containment & SP_OBJ_CONTENT)) {
+        stackobj(otmp);
 
-    if (o->lit) {
-        begin_burn(otmp, FALSE);
-    }
+        if (o->lit)
+            begin_burn(otmp, FALSE);
 
-    if (o->buried) {
-        boolean dealloced;
+        if (o->buried) {
+            boolean dealloced;
 
-        (void) bury_an_obj(otmp, &dealloced);
-        if (dealloced && container_idx) {
-            container_obj[container_idx - 1] = NULL;
+            (void) bury_an_obj(otmp, &dealloced);
+            if (dealloced && container_idx) {
+                container_obj[container_idx - 1] = NULL;
+            }
         }
     }
 }
