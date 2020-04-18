@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ $NHDT-Date: 1587110793 2020/04/17 08:06:33 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.188 $ $NHDT-Date: 1587248920 2020/04/18 22:28:40 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -184,6 +184,8 @@ fix crash in water_damage_chain
 teleport feedback "you materialize at another location" was given too soon
 'mention_decore' was repeatedly reporting "you are back on bottom" when
 	moving around underwater
+poison gas clouds located over known but unlit pools were visible as known
+	clouds but steam clouds in that situation were not
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
