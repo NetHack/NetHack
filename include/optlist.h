@@ -281,7 +281,7 @@ pfx_##a,
     NHOPTB(menu_objsyms, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.menu_head_objsym)
 #ifdef TTY_GRAPHICS
-    NHOPTB(menu_overlay, 0, opt_in, set_in_game, On, No, No, No, NoAlias,
+    NHOPTB(menu_overlay, 0, opt_in, set_in_game, On, Yes, No, No, NoAlias,
                 &iflags.menu_overlay)
 #else
     NHOPTB(menu_overlay, 0, opt_in, set_in_config, Off, No, No, No, NoAlias,
