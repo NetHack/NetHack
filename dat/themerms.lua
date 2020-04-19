@@ -492,6 +492,25 @@ xx|.....|xx
 -----x-----]], contents = function(m) des.region({ region={6,6,6,6}, type="ordinary", irregular=true, prefilled=true }); end });
    end,
 
+   -- Water-surrounded vault
+   function()
+      des.map({ map = [[
+}}}}}}
+}----}
+}|..|}
+}|..|}
+}----}
+}}}}}}]], contents = function(m) des.region({ region={3,3,3,3}, type="themed", irregular=true, prefilled=false, joined=false });
+     local nasty_undead = { "giant zombie", "ettin zombie", "vampire lord" };
+     des.object("chest", 2, 2);
+     des.object("chest", 3, 2);
+     des.object("chest", 2, 3);
+     des.object("chest", 3, 3);
+     shuffle(nasty_undead);
+     des.monster(nasty_undead[1], 2, 2);
+end });
+   end,
+
 };
 
 local total_frequency = 0;
