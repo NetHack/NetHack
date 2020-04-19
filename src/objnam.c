@@ -3585,19 +3585,24 @@ struct obj *no_wish;
         && strncmpi(bp, "ninja-to", 8)     /* not the "ninja" rank */
         && strncmpi(bp, "master key", 10)  /* not the "master" rank */
         && strncmpi(bp, "magenta", 7)) {   /* not the "mage" rank */
+        const char *rest = 0;
+
         if (mntmp < LOW_PM && strlen(bp) > 2
-            && (mntmp = name_to_mon(bp)) >= LOW_PM) {
-            int mntmptoo, mntmplen; /* double check for rank title */
+            && (mntmp = name_to_monplus(bp, &rest)) >= LOW_PM) {
             char *obp = bp;
 
-            mntmptoo = title_to_mon(bp, (int *) 0, &mntmplen);
-            bp += (mntmp != mntmptoo) ? (int) strlen(mons[mntmp].mname)
-                                      : mntmplen;
+            /* 'rest' is a pointer past the matching portion; if that was
+               an alternate name or a rank title rather than the canonical
+               monster name we wouldn't otherwise know how much to skip */
+            bp = (char *) rest; /* cast away const */
+
             if (*bp == ' ') {
                 bp++;
-            } else if (!strncmpi(bp, "s ", 2)) {
+            } else if (!strncmpi(bp, "s ", 2)
+                       || (bp > origbp && !strncmpi(bp - 1, "s' ", 3))) {
                 bp += 2;
-            } else if (!strncmpi(bp, "es ", 3)) {
+            } else if (!strncmpi(bp, "es ", 3)
+                       || !strncmpi(bp, "'s ", 3)) {
                 bp += 3;
             } else if (!*bp && !actualn && !dn && !un && !oclass) {
                 /* no referent; they don't really mean a monster type */

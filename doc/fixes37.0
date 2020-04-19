@@ -137,6 +137,10 @@ hostile monsters with launcher and ammo try to stay away from melee range
 allow displacing peaceful creatures
 unicorn horns don't restore attribute loss anymore
 when a shop is changed from food to health food, change room type to match
+wish parsing of things containing monster names would accept all supported
+	alternate spellings if they occurred at the end ("corpse of mumakil")
+	but only some when they occurred elsewhere ("gray-elf corpse" worked,
+	"mumakil corpse" yielded "does not exist") depending upon name length
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
