@@ -2171,7 +2171,7 @@ struct mkroom *croom;
         unbless(otmp);
         break;
     default: /* random */
-        break; /* keept what mkobj gave us */
+        break; /* keep what mkobj gave us */
     }
 
     /* corpsenm is "empty" if -1, random if -2, otherwise specific */

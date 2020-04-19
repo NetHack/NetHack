@@ -423,7 +423,9 @@ Create an object. The table parameter accepts the following:
 | id          | string   | Specific object type name
 | class       | string   | Single character, object class
 | spe         | int      | obj-struct spe-field value. See table below. Also accepts "random".
-| buc         | string   | one of "random", "blessed", "uncursed", "cursed", "not-curse", "not-uncursed", "not-blessed". Default is "random"
+| buc         | string   | one of "random", "blessed", "uncursed", "cursed",
+                           "not-cursed", "not-uncursed", "not-blessed".
+                           Default is "random"
 | name        | string   | Object name
 | quantity    | int      | Number of items in this stack. Also accepts "random".
 | buried      | boolean  | Is the object buried?
