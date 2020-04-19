@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1586122255 2020/04/05 21:30:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.413 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1587317999 2020/04/19 17:39:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.418 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -376,7 +376,7 @@ boolean doc;
 int
 doextlist(VOID_ARGS)
 {
-    register const struct ext_func_tab *efp;
+    register const struct ext_func_tab *efp = (struct ext_func_tab *) 0;
     char buf[BUFSZ], searchbuf[BUFSZ], promptbuf[QBUFSZ];
     winid menuwin;
     anything any;
