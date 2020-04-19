@@ -1606,7 +1606,6 @@ int x, y, glyph;
         }                                \
     }
 
-static const gbuf_entry nul_gbuf = { 1, GLYPH_UNEXPLORED };
 /*
  * Turn the 3rd screen into UNEXPLORED that needs to be refreshed.
  */
@@ -1614,7 +1613,14 @@ void
 clear_glyph_buffer()
 {
     register int x, y;
-    register gbuf_entry *gptr;
+    register gbuf_entry *gptr, nul_gbuf;
+    int ch = ' ', color = NO_COLOR;
+    unsigned special = 0;
+
+    (void) mapglyph(GLYPH_UNEXPLORED, &ch, &color, &special, 0, 0, 0);
+    nul_gbuf.gnew = (ch != ' ' || color != NO_COLOR
+                     || (special & ~MG_UNEXPL) != 0) ? 1 : 0;
+    nul_gbuf.glyph = GLYPH_UNEXPLORED;
 
     for (y = 0; y < ROWNO; y++) {
         gptr = &g.gbuf[y][0];

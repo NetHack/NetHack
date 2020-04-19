@@ -1652,16 +1652,12 @@ winid window;
         g.context.botlx = 1;
         break;
     case NHW_MAP:
-        /* the full map isn't erased often so the benefit of clearing the
-           whole screen and then redrawing status would be minimal here */
-        docorner(1, ROWNO - 1); /* sets map cells to S_unexplored
-                                 * which might not be <space> */
-        break;
+        /* cheap -- clear the whole thing and tell nethack to redraw botl */
+        g.context.botlx = 1;
+        /*FALLTHRU*/
     case NHW_BASE:
         clear_screen();
-        if (!g.program_state.gameover)
-            g.context.botlx = 1;
-        /* [this sould also reset state for MESSAGE, MAP, and STATUS] */
+        /* [this should reset state for MESSAGE, MAP, and STATUS] */
         break;
     case NHW_MENU:
     case NHW_TEXT:
