@@ -141,6 +141,13 @@ wish parsing of things containing monster names would accept all supported
 	alternate spellings if they occurred at the end ("corpse of mumakil")
 	but only some when they occurred elsewhere ("gray-elf corpse" worked,
 	"mumakil corpse" yielded "does not exist") depending upon name length
+couldn't wish for werecreature corpse or tin because monster name lookup
+	always matched the beast form which is flagged no-corpse; switch to
+	human form for "were<creature>"
+wishing for werecreature figurine always made one that created the monster in
+	beast form if activated; allow "human were<creature>" to explicitly
+	specify werecreature's human form (for corpses and tins as well as
+	figurines); override the restriction against human figurines for that
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

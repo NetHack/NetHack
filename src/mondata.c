@@ -770,6 +770,15 @@ const char **remainder_p;
             { "woodland nymph", PM_WOOD_NYMPH },
             { "halfling", PM_HOBBIT },    /* potential guess for polyself */
             { "genie", PM_DJINNI }, /* potential guess for ^G/#wizgenesis */
+            /* prefix used to workaround duplicate monster names for
+               monsters with alternate forms */
+            { "human wererat", PM_HUMAN_WERERAT },
+            { "human werejackal", PM_HUMAN_WEREJACKAL },
+            { "human werewolf", PM_HUMAN_WEREWOLF },
+            /* for completeness */
+            { "rat wererat", PM_WERERAT },
+            { "jackal werejackal", PM_WEREJACKAL },
+            { "wolf werewolf", PM_WEREWOLF },
             /* Hyphenated names -- it would be nice to handle these via
                fuzzymatch() but it isn't able to ignore trailing stuff */
             { "ki rin", PM_KI_RIN },

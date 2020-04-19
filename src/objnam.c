@@ -4116,8 +4116,17 @@ struct obj *no_wish;
 
     /* set otmp->corpsenm or dragon scale [mail] */
     if (mntmp >= LOW_PM) {
+        int humanwere;
+
         if (mntmp == PM_LONG_WORM_TAIL)
             mntmp = PM_LONG_WORM;
+        /* werecreatures in beast form are all flagged no-corpse so for
+           corpses and tins, switch to their corresponding human form;
+           for figurines, override the can't-be-human restriction instead */
+        if (typ != FIGURINE && is_were(&mons[mntmp])
+            && (g.mvitals[mntmp].mvflags & G_NOCORPSE) != 0
+            && (humanwere = counter_were(mntmp)) != NON_PM)
+            mntmp = humanwere;
 
         switch (typ) {
         case TIN:
@@ -4144,7 +4153,8 @@ struct obj *no_wish;
             set_corpsenm(otmp, mntmp);
             break;
         case FIGURINE:
-            if (!(mons[mntmp].geno & G_UNIQ) && !is_human(&mons[mntmp])
+            if (!(mons[mntmp].geno & G_UNIQ)
+                && (!is_human(&mons[mntmp]) || is_were(&mons[mntmp]))
 #ifdef MAIL_STRUCTURES
                 && mntmp != PM_MAIL_DAEMON
 #endif
