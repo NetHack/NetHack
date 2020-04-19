@@ -713,7 +713,7 @@ struct instance_globals {
     const char *hname; /* name of the game (argv[0] of main) */
     int hackpid; /* current process id */
     char chosen_windowtype[WINTYPELEN];
-    int bases[MAXOCLASSES];
+    int bases[MAXOCLASSES + 1];
     int multi;
     const char *multi_reason;
     int nroom;
