@@ -210,6 +210,9 @@ NHFILE *nhfp;
     }
     last = g.branches = (branch *) 0;
 
+    for (i = 0; i < g.n_dgns; i++)
+        g.dungeons[i].themelua = (lua_State *) 0;
+
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
 
