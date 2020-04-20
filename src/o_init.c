@@ -502,7 +502,6 @@ dodiscovered() /* free after Robert Viduya */
                 Sprintf(buf, "%s %s", /* see comment in discovered_cmp */
                         (objects[dis].oc_pre_discovered ? "*" : " "),
                         obj_typename(dis));
-                /* putstr(tmpwin, 0, buf); */
                 sorted_lines[sorted_count++] = dupstr(buf);
             }
         }
@@ -693,7 +692,6 @@ doclassdisco()
                 Sprintf(buf, "%s %s",
                         objects[dis].oc_pre_discovered ? "*" : " ",
                         obj_typename(dis));
-                /* putstr(tmpwin, 0, buf); */
                 sorted_lines[sorted_count++] = dupstr(buf);
                 ++ct;
             }
