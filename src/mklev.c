@@ -255,6 +255,7 @@ makerooms()
                 g.dungeons[u.uz.dnum].themerms[0] = '\0';
                 lua_close(g.dungeons[u.uz.dnum].themelua);
                 g.dungeons[u.uz.dnum].themelua = NULL;
+                dothemes = FALSE;
             } else {
                 dothemes = TRUE;
             }
