@@ -151,6 +151,10 @@ wishing for werecreature figurine always made one that created the monster in
 wishing for "royal jelly" yielded "lump of royal jelly" as a special case, but
 	other 'of' items such as "clove of garlic", "sprig of wolfsbane", or
 	"piece of cloth" didn't allow using their post-of words as shorthand
+monster or object detection found semi-dead vault guard at <0,0> while
+	traversing fmon list; monster detection gave misleading feedback
+	(blank map instead of 'strange feeling') if there were no other
+	monsters on level; likewise object detection and guard's minvent
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
