@@ -829,6 +829,7 @@ const char **remainder_p;
         if (m_i_len > len && !strncmpi(mons[i].mname, str, m_i_len)) {
             if (m_i_len == slen) {
                 mntmp = i;
+                len = m_i_len;
                 break; /* exact match */
             } else if (slen > m_i_len
                        && (str[m_i_len] == ' '

@@ -197,6 +197,9 @@ teleport feedback "you materialize at another location" was given too soon
 	moving around underwater
 poison gas clouds located over known but unlit pools were visible as known
 	clouds but steam clouds in that situation were not
+after the wish parsing change, wishing for "<something of monster>" or for
+	"<monster something>" worked as intended but wishing for "<monster>"
+	(where <monster> used the canonical spelling) triggered a crash
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
