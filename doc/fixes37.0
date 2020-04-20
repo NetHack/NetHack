@@ -148,6 +148,9 @@ wishing for werecreature figurine always made one that created the monster in
 	beast form if activated; allow "human were<creature>" to explicitly
 	specify werecreature's human form (for corpses and tins as well as
 	figurines); override the restriction against human figurines for that
+wishing for "royal jelly" yielded "lump of royal jelly" as a special case, but
+	other 'of' items such as "clove of garlic", "sprig of wolfsbane", or
+	"piece of cloth" didn't allow using their post-of words as shorthand
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

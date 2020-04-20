@@ -2842,7 +2842,7 @@ static const struct alt_spellings {
     { "can opener", TIN_OPENER },
     { "kelp", KELP_FROND },
     { "eucalyptus", EUCALYPTUS_LEAF },
-    { "royal jelly", LUMP_OF_ROYAL_JELLY },
+    /* { "royal jelly", LUMP_OF_ROYAL_JELLY }, -- caught by " of " match */
     { "lembas", LEMBAS_WAFER },
     { "cookie", FORTUNE_COOKIE },
     { "pie", CREAM_PIE },
@@ -2896,11 +2896,17 @@ int xtra_prob; /* to force 0% random generation items to also be considered */
 {
     int i, n = 0;
     short validobjs[NUM_OBJECTS];
-    register const char *zn;
-    int lo, hi, prob, maxprob = 0;
+    register const char *zn, *of;
+    boolean check_of;
+    int lo, hi, minglob, maxglob, prob, maxprob = 0;
 
     if (!name || !*name)
         return STRANGE_OBJECT;
+
+    /* only skip "foo of" for "foo of bar" if target doesn't contain " of " */
+    check_of = (strstri(name, " of ") == 0);
+    minglob = GLOB_OF_GRAY_OOZE;
+    maxglob = GLOB_OF_BLACK_PUDDING;
 
     (void) memset((genericptr_t) validobjs, 0, sizeof validobjs);
     if (oclass) {
@@ -2922,11 +2928,27 @@ int xtra_prob; /* to force 0% random generation items to also be considered */
         /* don't match extra descriptions (w/o real name) */
         if ((zn = OBJ_NAME(objects[i])) == 0)
             continue;
-        if (wishymatch(name, zn, TRUE)
+        if (wishymatch(name, zn, TRUE) /* objects[] name */
+            /* let "<bar>" match "<foo> of <bar>" (already does if foo is
+               an object class, but this is for lump of royal jelly,
+               clove of garlic, bag of tricks, &c) with a few exceptions:
+               for "opening", don't match "bell of opening"; for monster
+               type ooze/pudding/slime don't match glob of same since that
+               ought to match "corpse/egg/figurine of type" too but won't */
+            || (check_of
+                && i != BELL_OF_OPENING && i != HUGE_CHUNK_OF_MEAT
+                && (i < minglob || i > maxglob)
+                && (of = strstri(zn, " of ")) != 0
+                && wishymatch(name, of + 4, FALSE)) /* partial name */
             || ((zn = OBJ_DESCR(objects[i])) != 0
-                && wishymatch(name, zn, FALSE))
+                && wishymatch(name, zn, FALSE)) /* objects[] description */
+            /* "cloth" should match "piece of cloth"; there's only one
+               description containing " of " so no special case handling */
+            || (zn && check_of && (of = strstri(zn, " of ")) != 0
+                && wishymatch(name, of + 4, FALSE)) /* partial description */
             || ((zn = objects[i].oc_uname) != 0
-                && wishymatch(name, zn, FALSE))) {
+                && wishymatch(name, zn, FALSE)) /* user-called name */
+            ) {
             validobjs[n++] = (short) i;
             maxprob += (objects[i].oc_prob + xtra_prob);
         }
@@ -3613,7 +3635,18 @@ struct obj *no_wish;
     }
 
     /* first change to singular if necessary */
-    if (*bp) {
+    if (*bp
+        /* we want "tricks" to match "bag of tricks" [rnd_otyp_by_namedesc()]
+           but that wouldn't work if it gets singularized to "trick"
+           ["tricks bag" matches whether or not this exception is present
+           because singularize operates on "bag" and wishymatch()'s
+           'of inversion' finds a match] */
+        && strcmpi(bp, "tricks")
+        /* an odd potential wish; fail rather than get a false match with
+           "cloth" because it might yield a "cloth spellbook" rather than
+           a "piece of cloth" cloak [maybe we should give random armor?] */
+        && strcmpi(bp, "clothes")
+        ) {
         char *sng = makesingular(bp);
 
         if (strcmp(bp, sng)) {
@@ -4022,6 +4055,12 @@ struct obj *no_wish;
         }
     }
 
+    /* if asking for corpse of a monster which leaves behind a glob, give
+       glob instead of rejecting the monster type to create random corpse */
+    if (typ == CORPSE && mntmp >= LOW_PM && mons[mntmp].mlet == S_PUDDING) {
+        typ = GLOB_OF_GRAY_OOZE + (mntmp - PM_GRAY_OOZE);
+        mntmp = NON_PM; /* not used for globs */
+    }
     /*
      * Create the object, then fine-tune it.
      */
