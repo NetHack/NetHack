@@ -547,11 +547,13 @@ doclassdisco()
         artifact_items[] = "artifacts";
     char *s, c, oclass, menulet, allclasses[MAXOCLASSES],
         discosyms[2 + MAXOCLASSES + 1], buf[BUFSZ];
-    int i, ct, dis, xtras;
+    int i, j, ct, dis, xtras;
     boolean traditional;
     winid tmpwin = WIN_ERR;
     anything any;
     menu_item *pick_list = 0;
+    char *sorted_lines[NUM_OBJECTS]; // overkill
+    int sorted_count = 0;
 
     discosyms[0] = '\0';
     traditional = (flags.menu_style == MENU_TRADITIONAL
@@ -691,10 +693,17 @@ doclassdisco()
                 Sprintf(buf, "%s %s",
                         objects[dis].oc_pre_discovered ? "*" : " ",
                         obj_typename(dis));
-                putstr(tmpwin, 0, buf);
+                /* putstr(tmpwin, 0, buf); */
+                sorted_lines[sorted_count++] = dupstr(buf);
                 ++ct;
             }
         }
+        qsort(sorted_lines, sorted_count, sizeof(char *), discovered_cmp);
+        for (j = 0; j < sorted_count; j++) {
+            putstr(tmpwin, 0, sorted_lines[j]);
+            free(sorted_lines[j]);
+        }
+        sorted_count = 0;
         if (!ct)
             You(havent_discovered_any, oclass_to_name(oclass, buf));
         break;
