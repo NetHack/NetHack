@@ -445,13 +445,24 @@ static const short uniq_objs[] = {
     BELL_OF_OPENING,
 };
 
+/* qsort C-string comparison function */
+int
+discovered_cmp(const void *a, const void *b)
+{
+    const char **ia = (const char **)a;
+    const char **ib = (const char **)b;
+    return strcmp((*ia) + 2, (*ib) + 2); /* skip leading "* " or "  " */
+}
+
 /* the '\' command - show discovered object types */
 int
 dodiscovered() /* free after Robert Viduya */
 {
-    register int i, dis;
+    register int i, j, dis;
     int ct = 0;
     char *s, oclass, prev_class, classes[MAXOCLASSES], buf[BUFSZ];
+    char *sorted_lines[NUM_OBJECTS]; // overkill
+    int sorted_count = 0;
     winid tmpwin;
 
     tmpwin = create_nhwindow(NHW_MENU);
@@ -488,12 +499,19 @@ dodiscovered() /* free after Robert Viduya */
                            let_to_name(oclass, FALSE, FALSE));
                     prev_class = oclass;
                 }
-                Sprintf(buf, "%s %s",
+                Sprintf(buf, "%s %s", /* see comment in discovered_cmp */
                         (objects[dis].oc_pre_discovered ? "*" : " "),
                         obj_typename(dis));
-                putstr(tmpwin, 0, buf);
+                /* putstr(tmpwin, 0, buf); */
+                sorted_lines[sorted_count++] = dupstr(buf);
             }
         }
+        qsort(sorted_lines, sorted_count, sizeof(char *), discovered_cmp);
+        for (j = 0; j < sorted_count; j++) {
+            putstr(tmpwin, 0, sorted_lines[j]);
+            free(sorted_lines[j]);
+        }
+        sorted_count = 0;
     }
     if (ct == 0) {
         You("haven't discovered anything yet...");
