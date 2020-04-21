@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.c	$NHDT-Date: 1582061573 2020/02/18 21:32:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	monst.c	$NHDT-Date: 1587502224 2020/04/21 20:50:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -47,7 +47,8 @@
     {                                                                      \
         nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)   \
     }
-/* LVL() and SIZ() collect several fields to cut down on # of args for MON()
+/* LVL() and SIZ() collect several fields to cut down on number of args
+ * for MON()
  */
 #define LVL(lvl, mov, ac, mr, aln) lvl, mov, ac, mr, aln
 #define SIZ(wt, nut, snd, siz) wt, nut, snd, siz
@@ -2115,108 +2116,111 @@ struct permonst _mons2[] = {
         M1_BREATHLESS | M1_MINDLESS | M1_HUMANOID | M1_THICK_HIDE | M1_POIS,
         M2_HOSTILE | M2_STRONG | M2_COLLECT, 0, 22, HI_METAL),
     /*
-     * humans, including elves and were-critters
+     * humans, including elves and were-critters;
+     *  the '@' class does not obey rule #2.
      */
     MON("human", S_HUMAN, LVL(0, 12, 10, 0, 0), G_NOGEN, /* for corpses */
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE,
         2, HI_DOMESTIC),
     MON("wererat", S_HUMAN, LVL(2, 12, 10, 10, -7), (1),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_WERE, MZ_HUMAN), MR_POISON, 0,
         M1_HUMANOID | M1_POIS | M1_REGEN | M1_OMNIVORE,
         M2_NOPOLY | M2_WERE | M2_HOSTILE | M2_HUMAN | M2_COLLECT,
         M3_INFRAVISIBLE, 3, CLR_BROWN),
     MON("werejackal", S_HUMAN, LVL(2, 12, 10, 10, -7), (1),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_WERE, MZ_HUMAN), MR_POISON, 0,
         M1_HUMANOID | M1_POIS | M1_REGEN | M1_OMNIVORE,
         M2_NOPOLY | M2_WERE | M2_HOSTILE | M2_HUMAN | M2_COLLECT,
         M3_INFRAVISIBLE, 3, CLR_RED),
     MON("werewolf", S_HUMAN, LVL(5, 12, 10, 20, -7), (1),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_WERE, MZ_HUMAN), MR_POISON, 0,
         M1_HUMANOID | M1_POIS | M1_REGEN | M1_OMNIVORE,
         M2_NOPOLY | M2_WERE | M2_HOSTILE | M2_HUMAN | M2_COLLECT,
         M3_INFRAVISIBLE, 6, CLR_ORANGE),
-    MON("elf", S_HUMAN, LVL(10, 12, 10, 2, -3), G_NOGEN, /* for corpses */
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+    MON("elf", S_HUMAN, LVL(0, 12, 10, 2, -3), G_NOGEN, /* for corpses */
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS,
         M2_NOPOLY | M2_ELF | M2_STRONG | M2_COLLECT,
-        M3_INFRAVISION | M3_INFRAVISIBLE, 12, HI_DOMESTIC),
+        M3_INFRAVISION | M3_INFRAVISIBLE, 2, HI_DOMESTIC),
     MON("Woodland-elf", S_HUMAN, LVL(4, 12, 10, 10, -5),
-        (G_GENO | G_SGROUP | 2), A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK,
-                                   NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        (G_GENO | G_SGROUP | 2),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS, M2_ELF | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 6, CLR_GREEN),
     MON("Green-elf", S_HUMAN, LVL(5, 12, 10, 10, -6), (G_GENO | G_SGROUP | 2),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS, M2_ELF | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 7, CLR_BRIGHT_GREEN),
     MON("Grey-elf", S_HUMAN, LVL(6, 12, 10, 10, -7), (G_GENO | G_SGROUP | 2),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS, M2_ELF | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 8, CLR_GRAY),
     MON("elf-lord", S_HUMAN, LVL(8, 12, 10, 20, -9), (G_GENO | G_SGROUP | 2),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK,
-          NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS,
         M2_ELF | M2_STRONG | M2_LORD | M2_MALE | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 11, CLR_BRIGHT_BLUE),
     MON("Elvenking", S_HUMAN, LVL(9, 12, 10, 25, -10), (G_GENO | 1),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK,
-          NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS,
         M2_ELF | M2_STRONG | M2_PRINCE | M2_MALE | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 11, HI_LORD),
     MON("doppelganger", S_HUMAN, LVL(9, 12, 5, 20, 0), (G_GENO | 1),
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 12), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 12),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_IMITATE, MZ_HUMAN), MR_SLEEP, 0,
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_HOSTILE | M2_STRONG | M2_COLLECT
             | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE, 11, HI_DOMESTIC),
     MON("shopkeeper", S_HUMAN, LVL(12, 18, 0, 50, 0), G_NOGEN,
-        A(ATTK(AT_WEAP, AD_PHYS, 4, 4), ATTK(AT_WEAP, AD_PHYS, 4, 4), NO_ATTK,
-          NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 4, 4), ATTK(AT_WEAP, AD_PHYS, 4, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_SELL, MZ_HUMAN), 0, 0,
-        M1_HUMANOID | M1_OMNIVORE, M2_NOPOLY | M2_HUMAN | M2_PEACEFUL
-                                       | M2_STRONG | M2_COLLECT | M2_MAGIC,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_PEACEFUL
+            | M2_STRONG | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE, 15, HI_DOMESTIC),
     MON("guard", S_HUMAN, LVL(12, 12, 10, 40, 10), G_NOGEN,
-        A(ATTK(AT_WEAP, AD_PHYS, 4, 10), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 4, 10),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_GUARD, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_MERC | M2_PEACEFUL | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE, 14, CLR_BLUE),
-    MON("prisoner", S_HUMAN, LVL(12, 12, 10, 0, 0),
-        G_NOGEN, /* for special levels */
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+    /* prisoner is used on some special levels */
+    MON("prisoner", S_HUMAN, LVL(12, 12, 10, 0, 0), G_NOGEN,
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_DJINNI, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE | M3_CLOSE, 14, HI_DOMESTIC),
     MON("Oracle", S_HUMAN, LVL(12, 0, 0, 50, 0), (G_NOGEN | G_UNIQ),
-        A(ATTK(AT_NONE, AD_MAGM, 0, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_NONE, AD_MAGM, 0, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_ORACLE, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_FEMALE, M3_INFRAVISIBLE,
@@ -2276,9 +2280,6 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_OMNIVORE, M2_NOPOLY | M2_HUMAN | M2_MERC | M2_STALK
                                        | M2_HOSTILE | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE, 14, CLR_BLUE),
-    /* Keep these separate - some of the mkroom code assumes that
-     * all the soldiers are contiguous.
-     */
     MON("watchman", S_HUMAN, LVL(6, 10, 10, 0, -2),
         (G_SGROUP | G_NOGEN | G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
