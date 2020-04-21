@@ -79,12 +79,17 @@ themerooms = {
    -- Boulder room
    function()
       des.room({ type = "themed",
-                 contents = function()
-                    for i = 1, 3 + d(6) do
-                       des.object("boulder");
-                    end
-                    for i = 1, d(4) do
-                       des.trap("rolling boulder");
+                 contents = function(rm)
+                    for x = 0, rm.width do
+                       for y = 0, rm.height do
+                          if (percent(30)) then
+                             if (percent(50)) then
+                                des.object("boulder");
+                             else
+                                des.trap("rolling boulder");
+                             end
+                          end
+                       end
                     end
                  end
       });
@@ -93,9 +98,13 @@ themerooms = {
    -- Spider nest
    function()
       des.room({ type = "themed",
-                 contents = function()
-                    for i = 1, d(3,3) do
-                       des.trap("web");
+                 contents = function(rm)
+                    for x = 0, rm.width do
+                       for y = 0, rm.height do
+                          if (percent(30)) then
+                             des.trap("web", x, y);
+                          end
+                       end
                     end
                  end
       });
@@ -111,7 +120,7 @@ themerooms = {
                     shuffle(traps);
                     for x = 0, rm.width do
                        for y = 0, rm.height do
-                          if (percent(75)) then
+                          if (percent(30)) then
                              des.trap(traps[1], x, y);
                           end
                        end
