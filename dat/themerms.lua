@@ -190,26 +190,22 @@ themerooms = {
 
    -- Mausoleum
    function()
-      des.room({ type = "themed", w = 5,h = 5,
-                 contents = function()
-                    local pts = { {1,1}, {2,1}, {3,1},
-                                  {1,2},        {3,2},
-                                  {1,3}, {2,3}, {3,3} };
-                    for i = 1, #pts do
-                       des.terrain(pts[i], "-");
-                    end
-                    if (percent(50)) then
-                       local mons = { "M", "V", "L", "Z" };
-                       shuffle(mons);
-                       des.monster(mons[1], 2,2);
-                    else
-                       des.object({ id = "corpse", montype = "@", coord = {2,2} });
-                    end
-                    if (percent(20)) then
-                       local place = { {2,1}, {1,2}, {3,2}, {2,3} };
-                       shuffle(place);
-                       des.terrain(place[1], "S");
-                    end
+      des.room({ type = "themed", w = 5 + nh.rn2(3)*2, h = 5 + nh.rn2(3)*2,
+                 contents = function(rm)
+                    des.room({ type = "themed", x = (rm.width / 2), y = (rm.height / 2), w = 1, h = 1, joined = 0,
+                               contents = function()
+                                  if (percent(50)) then
+                                     local mons = { "M", "V", "L", "Z" };
+                                     shuffle(mons);
+                                     des.monster(mons[1], 0,0);
+                                  else
+                                     des.object({ id = "corpse", montype = "@", coord = {0,0} });
+                                  end
+                                  if (percent(20)) then
+                                     des.door({ state="secret", wall="all" });
+                                  end
+                               end
+                    });
                  end
       });
    end,
