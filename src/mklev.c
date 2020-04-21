@@ -1165,26 +1165,10 @@ coord *mp;
     if (g.nroom == 0) {
         mazexy(mp); /* already verifies location */
     } else {
-        int cnt = 0;
-        /* not perfect - there may be only one stairway */
-        if (g.nroom > 2) {
-            int tryct = 0;
+        croom = generate_stairs_find_room();
 
-            do
-                croom = &g.rooms[rn2(g.nroom)];
-            while ((croom == g.dnstairs_room || croom == g.upstairs_room
-                    || (croom->rtype != OROOM && croom->rtype != THEMEROOM))
-                   && (++tryct < 100));
-        } else
-            croom = &g.rooms[rn2(g.nroom)];
-
-        do {
-            if (!somexy(croom, mp))
-                impossible("Can't place branch!");
-        } while ((occupied(mp->x, mp->y)
-                 || (levl[mp->x][mp->y].typ != CORR
-                     && levl[mp->x][mp->y].typ != ICE
-                     && levl[mp->x][mp->y].typ != ROOM)) && (++cnt < 1000));
+        if (!somexyspace(croom, mp))
+            impossible("Can't place branch!");
     }
     return croom;
 }
