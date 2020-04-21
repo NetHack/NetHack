@@ -163,6 +163,24 @@ themerooms = {
       });
    end,
 
+   -- Pillars
+   function()
+      des.room({ type = "themed", w = 10, h = 10,
+                 contents = function(rm)
+                    local terr = { "-", "-", "-", "-", "L", "P", "T" };
+                    shuffle(terr);
+                    for x = 0, (rm.width - 3) / 4 do
+                       for y = 0, (rm.height - 3) / 4 do
+                          des.terrain({ x = x * 4 + 2, y = y * 4 + 2, typ = terr[1], lit = -2 });
+                          des.terrain({ x = x * 4 + 3, y = y * 4 + 2, typ = terr[1], lit = -2 });
+                          des.terrain({ x = x * 4 + 2, y = y * 4 + 3, typ = terr[1], lit = -2 });
+                          des.terrain({ x = x * 4 + 3, y = y * 4 + 3, typ = terr[1], lit = -2 });
+                       end
+                    end
+                 end
+      });
+   end,
+
    -- Statuary
    function()
       des.room({ type = "themed",
