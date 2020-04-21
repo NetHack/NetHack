@@ -155,6 +155,8 @@ monster or object detection found semi-dead vault guard at <0,0> while
 	traversing fmon list; monster detection gave misleading feedback
 	(blank map instead of 'strange feeling') if there were no other
 	monsters on level; likewise object detection and guard's minvent
+squadprob[] in mkroom.c was defined with 5 elements but initialized only 4
+	resulting in giant ants sometimes
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
