@@ -307,13 +307,13 @@ char ch;
 
     for (i = 0; i < SIZE(defsyms); ++i) {
         if (!furniture) {
-            if (!strncmpi(defsyms[i].explanation, first_furniture, 5))
+            if (!strncmp(defsyms[i].explanation, first_furniture, 5))
                 furniture = TRUE;
         }
         if (furniture) {
             if (defsyms[i].sym == (uchar) ch)
                 return i;
-            if (!strcmpi(defsyms[i].explanation, last_furniture))
+            if (!strcmp(defsyms[i].explanation, last_furniture))
                 break; /* reached last furniture */
         }
     }
