@@ -20,6 +20,7 @@ static boolean FDECL(check_map_spot, (int, int, CHAR_P, unsigned));
 static boolean FDECL(clear_stale_map, (CHAR_P, unsigned));
 static void FDECL(sense_trap, (struct trap *, XCHAR_P, XCHAR_P, int));
 static int FDECL(detect_obj_traps, (struct obj *, BOOLEAN_P, int));
+static int NDECL(furniture_detect);
 static void FDECL(show_map_spot, (int, int));
 static void FDECL(findone, (int, int, genericptr_t));
 static void FDECL(openone, (int, int, genericptr_t));
@@ -957,7 +958,8 @@ struct obj *sobj; /* null if crystal ball, *scroll if gold detection scroll */
         else
             found = TRUE;
     }
-    if ((tr = detect_obj_traps(g.level.buriedobjlist, FALSE, 0)) != OTRAP_NONE) {
+    if ((tr = detect_obj_traps(g.level.buriedobjlist, FALSE, 0))
+        != OTRAP_NONE) {
         if (tr & OTRAP_THERE)
             goto outtrapmap;
         else
@@ -1039,6 +1041,56 @@ struct obj *sobj; /* null if crystal ball, *scroll if gold detection scroll */
     return 0;
 }
 
+static int
+furniture_detect()
+{
+    struct monst *mon;
+    int x, y, glyph, sym, found = 0, revealed = 0;
+
+    (void) unconstrain_map();
+
+    for (y = 0; y < ROWNO; ++y)
+        for (x = 1; x < COLNO; ++x) {
+            glyph = glyph_at(x, y);
+            sym = glyph_to_cmap(glyph);
+            if (IS_FURNITURE(levl[x][y].typ)) {
+                ++found;
+                magic_map_background(x, y, 1);
+            } else if (is_cmap_furniture(sym)) {
+                ++found;
+                if ((mon = m_at(x, y)) != 0
+                    && M_AP_TYPE(mon) == M_AP_FURNITURE)
+                    seemimic(mon);
+                if (!mon || !canspotmon(mon))
+                    map_invisible(x, y);
+            }
+            if (glyph_at(x, y) != glyph)
+                ++revealed;
+        }
+
+    if (!found)
+        pline("There seems to be nothing of interest on this level.");
+    else if (!revealed)
+        /* [what about clipped map with points of interest outside of the
+            currently shown area?] */
+        Your("map already shows all relevant locations.");
+
+    if (!revealed)
+        display_nhwindow(WIN_MAP, TRUE);
+    else /* we need to browse all types because we haven't redrawn the map
+          * with only points of interest */
+        browse_map(TER_DETECT | TER_MAP | TER_TRP | TER_OBJ | TER_MON,
+                   "location");
+
+    reconstrain_map();
+    docrt(); /* redraw everything */
+    if (Underwater)
+        under_water(2);
+    if (u.uburied)
+        under_ground(2);
+    return 0;
+}
+
 const char *
 level_distance(where)
 d_level *where;
@@ -1082,7 +1134,15 @@ d_level *where;
         return "near you";
 }
 
-static const struct {
+    /*
+     * This could be made a lot more useful.  Especially now that
+     * amnesia no longer causes levels to be forgotten.  Perhaps a
+     * menu, and it ought to include the entrance to Vlad's Tower,
+     * one of the few things that requires active searching/mapping
+     * to find.  And once the Wizard is in play, he is easy for the
+     * game to locate but not necessarily for the player.
+     */
+static const struct crystalballlevels {
     const char *what;
     d_level *where;
 } level_detects[] = {
@@ -1099,25 +1159,28 @@ struct obj **optr;
     char ch;
     int oops;
     struct obj *obj = *optr;
+    boolean charged = (obj->spe > 0);
 
     if (Blind) {
         pline("Too bad you can't see %s.", the(xname(obj)));
         return;
     }
-    oops = (rnd(20) > ACURR(A_INT) || obj->cursed);
-    if (oops && (obj->spe > 0)) {
-        switch (rnd(obj->oartifact ? 4 : 5)) {
+    oops = is_quest_artifact(obj) ? 8 : obj->blessed ? 16 : 20;
+    if (charged && (obj->cursed || rnd(oops) > ACURR(A_INT))) {
+        long impair = (long) rnd(100 - 3 * ACURR(A_INT));
+
+        switch (rnd((obj->oartifact || obj->blessed) ? 4 : 5)) {
         case 1:
             pline("%s too much to comprehend!", Tobjnam(obj, "are"));
             break;
         case 2:
             pline("%s you!", Tobjnam(obj, "confuse"));
-            make_confused((HConfusion & TIMEOUT) + (long) rnd(100), FALSE);
+            make_confused((HConfusion & TIMEOUT) + impair, FALSE);
             break;
         case 3:
             if (!resists_blnd(&g.youmonst)) {
                 pline("%s your vision!", Tobjnam(obj, "damage"));
-                make_blinded((Blinded & TIMEOUT) + (long) rnd(100), FALSE);
+                make_blinded((Blinded & TIMEOUT) + impair, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             } else {
@@ -1127,8 +1190,8 @@ struct obj **optr;
             break;
         case 4:
             pline("%s your mind!", Tobjnam(obj, "zap"));
-            (void) make_hallucinated(
-                (HHallucination & TIMEOUT) + (long) rnd(100), FALSE, 0L);
+            (void) make_hallucinated((HHallucination & TIMEOUT) + impair,
+                                     FALSE, 0L);
             break;
         case 5:
             pline("%s!", Tobjnam(obj, "explode"));
@@ -1145,8 +1208,14 @@ struct obj **optr;
     }
 
     if (Hallucination) {
-        if (!obj->spe) {
+        nomul(-rnd(charged ? 4 : 2));
+        g.multi_reason = "gazing into a Magic 8-Ball (tm)";
+        g.nomovemsg = "";
+
+        if (!charged) {
             pline("All you see is funky %s haze.", hcolor((char *) 0));
+            if (obj->spe < 0)
+                goto implode; /* destroy it when it has been cancelled */
         } else {
             switch (rnd(6)) {
             case 1:
@@ -1178,7 +1247,7 @@ struct obj **optr;
 
     /* read a single character */
     if (flags.verbose)
-        You("may look for an object or monster symbol.");
+        You("may look for an object, monster, or special map symbol.");
     ch = yn_function("What do you look for?", (char *) 0, '\0');
     /* Don't filter out ' ' here; it has a use */
     if ((ch != def_monsyms[S_GHOST].sym) && index(quitchars, ch)) {
@@ -1186,12 +1255,26 @@ struct obj **optr;
             pline1(Never_mind);
         return;
     }
+    /* Possible extension:
+     *  If ch=='?', ask whether player wants to find scrolls or is asking
+     *  for help in using the crystal ball.
+     */
+
     You("peer into %s...", the(xname(obj)));
-    nomul(-rnd(10));
+    nomul(-rnd(charged ? 10 : 2));
     g.multi_reason = "gazing into a crystal ball";
     g.nomovemsg = "";
-    if (obj->spe <= 0) {
+
+    if (!charged) {
         pline_The("vision is unclear.");
+
+        if (obj->spe < 0) { /* destroy ball if used after being cancelled */
+ implode:   /* no damage to hero but 'multi' has a small negative value */
+            pline("%s!", Tobjnam(obj, "implode"));
+            useup(obj);
+            *optr = obj = (struct obj *) 0; /* it's gone */
+            return;
+        }
     } else {
         int class, i;
         int ret = 0;
@@ -1205,25 +1288,25 @@ struct obj **optr;
         if (ch == DEF_MIMIC_DEF)
             ch = DEF_MIMIC;
 
-        if ((class = def_char_to_objclass(ch)) != MAXOCLASSES)
+        /* checking furnture before objects allows '_' to find altars
+           (along with other furniture) instead of finding iron chains */
+        if (def_char_is_furniture(ch) >= 0) {
+            ret = furniture_detect();
+        } else if ((class = def_char_to_objclass(ch)) != MAXOCLASSES) {
             ret = object_detect((struct obj *) 0, class);
-        else if ((class = def_char_to_monclass(ch)) != MAXMCLASSES)
+        } else if ((class = def_char_to_monclass(ch)) != MAXMCLASSES) {
             ret = monster_detect((struct obj *) 0, class);
-        else if (g.showsyms[SYM_BOULDER + SYM_OFF_X]
-                 && (ch == g.showsyms[SYM_BOULDER + SYM_OFF_X]))
+        } else if (g.showsyms[SYM_BOULDER + SYM_OFF_X]
+                 && (ch == g.showsyms[SYM_BOULDER + SYM_OFF_X])) {
             ret = object_detect((struct obj *) 0, ROCK_CLASS);
-        else
-            switch (ch) {
-            case '^':
-                ret = trap_detect((struct obj *) 0);
-                break;
-            default:
-                i = rn2(SIZE(level_detects));
-                You_see("%s, %s.", level_detects[i].what,
-                        level_distance(level_detects[i].where));
-                ret = 0;
-                break;
-            }
+        } else if (ch == '^') {
+            ret = trap_detect((struct obj *) 0);
+        } else {
+            i = rn2(SIZE(level_detects));
+            You_see("%s, %s.", level_detects[i].what,
+                    level_distance(level_detects[i].where));
+            ret = 0;
+        }
 
         if (ret) {
             if (!rn2(100)) /* make them nervous */

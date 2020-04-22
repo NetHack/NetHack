@@ -596,6 +596,7 @@ E boolean FDECL(hurtle_step, (genericptr_t, int, int));
 #endif /* !MAKEDEFS_C && !MDLIB_C && !LEV_LEX_C */
 E int FDECL(def_char_to_objclass, (CHAR_P));
 E int FDECL(def_char_to_monclass, (CHAR_P));
+E int FDECL(def_char_is_furniture, (CHAR_P));
 #if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(LEV_LEX_C)
 E void FDECL(switch_symbols, (int));
 E void FDECL(assign_graphics, (int));

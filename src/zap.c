@@ -1031,63 +1031,77 @@ void
 cancel_item(obj)
 register struct obj *obj;
 {
-    boolean u_ring = (obj == uleft || obj == uright);
     int otyp = obj->otyp;
 
-    switch (otyp) {
-    case RIN_GAIN_STRENGTH:
-        if ((obj->owornmask & W_RING) && u_ring) {
-            ABON(A_STR) -= obj->spe;
-            g.context.botl = 1;
+    if (carried(obj)) {
+        /* handle items being worn by hero */
+        switch (otyp) {
+        case RIN_GAIN_STRENGTH:
+            if ((obj->owornmask & W_RING) != 0L) {
+                ABON(A_STR) -= obj->spe;
+                g.context.botl = TRUE;
+            }
+            break;
+        case RIN_GAIN_CONSTITUTION:
+            if ((obj->owornmask & W_RING) != 0L) {
+                ABON(A_CON) -= obj->spe;
+                g.context.botl = TRUE;
+            }
+            break;
+        case RIN_ADORNMENT:
+            if ((obj->owornmask & W_RING) != 0L) {
+                ABON(A_CHA) -= obj->spe;
+                g.context.botl = TRUE;
+            }
+            break;
+        case RIN_INCREASE_ACCURACY:
+            if ((obj->owornmask & W_RING) != 0L)
+                u.uhitinc -= obj->spe;
+            break;
+        case RIN_INCREASE_DAMAGE:
+            if ((obj->owornmask & W_RING) != 0L)
+                u.udaminc -= obj->spe;
+            break;
+        case RIN_PROTECTION:
+            if ((obj->owornmask & W_RING) != 0L)
+                g.context.botl = TRUE;
+            break;
+        case GAUNTLETS_OF_DEXTERITY:
+            if ((obj->owornmask & W_ARMG) != 0L) {
+                ABON(A_DEX) -= obj->spe;
+                g.context.botl = TRUE;
+            }
+            break;
+        case HELM_OF_BRILLIANCE:
+            if ((obj->owornmask & W_ARMH) != 0L) {
+                ABON(A_INT) -= obj->spe;
+                ABON(A_WIS) -= obj->spe;
+                g.context.botl = TRUE;
+            }
+            break;
+        default:
+            if ((obj->owornmask & W_ARMOR) != 0L) /* AC */
+                g.context.botl = TRUE;
+            break;
         }
-        break;
-    case RIN_GAIN_CONSTITUTION:
-        if ((obj->owornmask & W_RING) && u_ring) {
-            ABON(A_CON) -= obj->spe;
-            g.context.botl = 1;
-        }
-        break;
-    case RIN_ADORNMENT:
-        if ((obj->owornmask & W_RING) && u_ring) {
-            ABON(A_CHA) -= obj->spe;
-            g.context.botl = 1;
-        }
-        break;
-    case RIN_INCREASE_ACCURACY:
-        if ((obj->owornmask & W_RING) && u_ring)
-            u.uhitinc -= obj->spe;
-        break;
-    case RIN_INCREASE_DAMAGE:
-        if ((obj->owornmask & W_RING) && u_ring)
-            u.udaminc -= obj->spe;
-        break;
-    case GAUNTLETS_OF_DEXTERITY:
-        if ((obj->owornmask & W_ARMG) && (obj == uarmg)) {
-            ABON(A_DEX) -= obj->spe;
-            g.context.botl = 1;
-        }
-        break;
-    case HELM_OF_BRILLIANCE:
-        if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
-            ABON(A_INT) -= obj->spe;
-            ABON(A_WIS) -= obj->spe;
-            g.context.botl = 1;
-        }
-        break;
-        /* case RIN_PROTECTION:  not needed */
     }
+    /* cancelled item might not be in hero's possession but
+       cancellation is presumed to be instigated by hero */
     if (objects[otyp].oc_magic
         || (obj->spe && (obj->oclass == ARMOR_CLASS
                          || obj->oclass == WEAPON_CLASS || is_weptool(obj)))
         || otyp == POT_ACID
         || otyp == POT_SICKNESS
         || (otyp == POT_WATER && (obj->blessed || obj->cursed))) {
-        if (obj->spe != ((obj->oclass == WAND_CLASS) ? -1 : 0)
+        int cancelled_spe = (obj->oclass == WAND_CLASS
+                             || obj->otyp == CRYSTAL_BALL) ? -1 : 0;
+
+        if (obj->spe != cancelled_spe
             && otyp != WAN_CANCELLATION /* can't cancel cancellation */
             && otyp != MAGIC_LAMP /* cancelling doesn't remove djinni */
             && otyp != CANDELABRUM_OF_INVOCATION) {
             costly_alteration(obj, COST_CANCEL);
-            obj->spe = (obj->oclass == WAND_CLASS) ? -1 : 0;
+            obj->spe = cancelled_spe;
         }
         switch (obj->oclass) {
         case SCROLL_CLASS:
@@ -1103,10 +1117,8 @@ register struct obj *obj;
             }
             break;
         case POTION_CLASS:
-            costly_alteration(obj,
-                              (otyp != POT_WATER)
-                                  ? COST_CANCEL
-                                  : obj->cursed ? COST_UNCURS : COST_UNBLSS);
+            costly_alteration(obj, (otyp != POT_WATER) ? COST_CANCEL
+                                   : obj->cursed ? COST_UNCURS : COST_UNBLSS);
             if (otyp == POT_SICKNESS || otyp == POT_SEE_INVISIBLE) {
                 /* sickness is "biologically contaminated" fruit juice;
                    cancel it and it just becomes fruit juice...
@@ -2759,10 +2771,10 @@ register struct monst *mdef;
 register struct obj *obj;
 boolean youattack, allow_cancel_kill, self_cancel;
 {
+    static const char
+        writing_vanishes[] = "Some writing vanishes from %s head!",
+        your[] = "your"; /* should be extern */
     boolean youdefend = (mdef == &g.youmonst);
-    static const char writing_vanishes[] =
-        "Some writing vanishes from %s head!";
-    static const char your[] = "your"; /* should be extern */
 
     if (youdefend ? (!youattack && Antimagic)
                   : resist(mdef, obj->oclass, 0, NOTELL))
@@ -2774,9 +2786,11 @@ boolean youattack, allow_cancel_kill, self_cancel;
         for (otmp = (youdefend ? g.invent : mdef->minvent); otmp;
              otmp = otmp->nobj)
             cancel_item(otmp);
+
         if (youdefend) {
             g.context.botl = 1; /* potential AC change */
             find_ac();
+            /* update_inventory(); -- handled by caller */
         }
     }
 
