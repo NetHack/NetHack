@@ -157,6 +157,7 @@ monster or object detection found semi-dead vault guard at <0,0> while
 	monsters on level; likewise object detection and guard's minvent
 squadprob[] in mkroom.c was defined with 5 elements but initialized only 4
 	resulting in giant ants sometimes
+allow nurses heal attack when wielding a non-weapon/weaptool
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

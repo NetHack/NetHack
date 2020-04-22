@@ -1508,7 +1508,9 @@ register struct attack *mattk;
             hitmsg(mtmp, mattk);
             break;
         }
-        if (!uwep && !uarmu && !uarm && !uarmc
+        /* weapon check should match the one in sounds.c for MS_NURSE */
+        if (!(uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+            && !uarmu && !uarm && !uarmc
             && !uarms && !uarmg && !uarmf && !uarmh) {
             boolean goaway = FALSE;
 
