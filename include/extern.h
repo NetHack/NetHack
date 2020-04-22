@@ -2749,8 +2749,10 @@ E void NDECL(port_help);
 #endif
 E void FDECL(sethanguphandler, (void (*)(int)));
 E boolean NDECL(authorize_wizard_mode);
+E void FDECL(append_slash, (char *));
 E boolean FDECL(check_user_string, (char *));
 E char *NDECL(get_login_name);
+E unsigned long NDECL(sys_random_seed);
 #endif /* UNIX */
 
 /* ### unixtty.c ### */

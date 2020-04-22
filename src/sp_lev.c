@@ -23,6 +23,7 @@ typedef void FDECL((*select_iter_func), (int, int, genericptr));
 
 extern void FDECL(mkmap, (lev_init *));
 
+static boolean FDECL(match_maptyps, (XCHAR_P, XCHAR_P));
 static void NDECL(solidify_map);
 static void FDECL(lvlfill_maze_grid, (int, int, int, int, SCHAR_P));
 static void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
@@ -91,9 +92,11 @@ static void NDECL(spo_end_moninvent);
 static void NDECL(spo_pop_container);
 static int FDECL(l_create_stairway, (lua_State *, BOOLEAN_P));
 static void FDECL(spo_endroom, (struct sp_coder *));
-static void FDECL(l_table_getset_feature_flag, (lua_State *, int, int, const char *, int));
+static void FDECL(l_table_getset_feature_flag, (lua_State *, int, int,
+                                                const char *, int));
 static void FDECL(sel_set_lit, (int, int, genericptr_t));
-static void FDECL(selection_iterate, (struct selectionvar *, select_iter_func, genericptr_t));
+static void FDECL(selection_iterate, (struct selectionvar *, select_iter_func,
+                                      genericptr_t));
 static void FDECL(sel_set_ter, (int, int, genericptr_t));
 static void FDECL(sel_set_door, (int, int, genericptr_t));
 static void FDECL(sel_set_feature, (int, int, genericptr_t));
@@ -105,6 +108,8 @@ static int FDECL(get_table_region, (lua_State *, const char *,
 static void FDECL(set_wallprop_in_selection, (lua_State *, int));
 static int FDECL(floodfillchk_match_under, (int, int));
 static int FDECL(floodfillchk_match_accessible, (int, int));
+static boolean FDECL(sel_flood_havepoint, (int, int, xchar *, xchar *, int));
+static long FDECL(line_dist_coord, (long, long, long, long, long, long));
 static void FDECL(l_push_wid_hei_table, (lua_State *, int, int));
 static int FDECL(get_table_align, (lua_State *));
 static int FDECL(get_table_monclass, (lua_State *));
@@ -195,7 +200,7 @@ static struct monst *invent_carrying_monster = (struct monst *) 0;
 
 /* Does typ match with levl[][].typ, considering special types
    MATCH_WALL and MAX_TYPE (aka transparency)? */
-boolean
+static boolean
 match_maptyps(typ, levltyp)
 xchar typ, levltyp;
 {
@@ -4684,7 +4689,7 @@ int xc, yc, a, b, filled;
 }
 
 /* distance from line segment (x1,y1, x2,y2) to point (x3,y3) */
-long
+static long
 line_dist_coord(x1, y1, x2, y2, x3, y3)
 long x1, y1, x2, y2, x3, y3;
 {

@@ -3236,6 +3236,8 @@ struct permonst _mons2[] = {
 
 #ifndef SPLITMON_1
 
+void NDECL(monst_globals_init); /* in hack.h but we're using config.h */
+
 struct permonst mons[SIZE(mons_init)];
 
 void
