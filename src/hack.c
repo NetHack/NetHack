@@ -1822,7 +1822,7 @@ domove_core()
             didnt_move = TRUE;
         } else if (u_with_boulder
                     && !(verysmall(mtmp->data)
-                         && (!mtmp->minvent || (curr_mon_load(mtmp) <= 600)))) {
+                         && (!mtmp->minvent || curr_mon_load(mtmp) <= 600))) {
             /* can't swap places when pet won't fit there with the boulder */
             You("stop.  %s won't fit into the same spot that you're at.",
                  upstart(y_monnam(mtmp)));
@@ -1835,8 +1835,8 @@ domove_core()
             didnt_move = TRUE;
         } else if ((mtmp->mpeaceful || mtmp->mtame) && mtmp->mtrapped) {
             /* Since peaceful monsters simply being unable to move out of traps
-             * was inconsistent with pets being able to but being untamed in the
-             * process, apply this logic equally to pets and peacefuls. */
+             * was inconsistent with pets being able to but being untamed in
+             * the process, apply this logic equally to pets and peacefuls. */
             You("stop.  %s can't move out of that trap.",
                 upstart(y_monnam(mtmp)));
             didnt_move = TRUE;
@@ -1850,10 +1850,6 @@ domove_core()
                 upstart(y_monnam(mtmp)));
             didnt_move = TRUE;
         } else {
-            char pnambuf[BUFSZ];
-
-            /* save its current description in case of polymorph */
-            Strcpy(pnambuf, y_monnam(mtmp));
             mtmp->mtrapped = 0;
             remove_monster(x, y);
             place_monster(mtmp, u.ux0, u.uy0);
@@ -1861,7 +1857,12 @@ domove_core()
             newsym(u.ux0, u.uy0);
 
             You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
-                pnambuf);
+                x_monnam(mtmp,
+                         mtmp->mtame ? ARTICLE_YOUR
+                         : (!has_mname(mtmp) && !type_is_pname(mtmp->data))
+                           ? ARTICLE_THE : ARTICLE_NONE,
+                         (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                         has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 
             /* check for displacing it into pools and traps */
             switch (minliquid(mtmp) ? 2 : mintrap(mtmp)) {
