@@ -2668,6 +2668,12 @@ struct obj *obj;
             kick_steed();
             return 1;
         }
+        if (is_pool_or_lava(u.ux, u.uy)) {
+            You("cause a small splash.");
+            if (is_lava(u.ux, u.uy))
+                (void) fire_damage(uwep, FALSE, u.ux, u.uy);
+            return 1;
+        }
         if (Levitation || u.usteed) {
             /* Have a shot at snaring something on the floor */
             otmp = g.level.objects[u.ux][u.uy];

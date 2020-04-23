@@ -158,6 +158,8 @@ monster or object detection found semi-dead vault guard at <0,0> while
 squadprob[] in mkroom.c was defined with 5 elements but initialized only 4
 	resulting in giant ants sometimes
 allow nurses heal attack when wielding a non-weapon/weaptool
+if riding or levitating, hero could apply bullwhip downward to pull up things
+	from underwater or lava; feedback implied the item was on the surface
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
