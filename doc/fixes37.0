@@ -210,6 +210,7 @@ poison gas clouds located over known but unlit pools were visible as known
 after the wish parsing change, wishing for "<something of monster>" or for
 	"<monster something>" worked as intended but wishing for "<monster>"
 	(where <monster> used the canonical spelling) triggered a crash
+fix new "objects[0] class #1 not in order!" panic if plain 'char' is unsigned
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on

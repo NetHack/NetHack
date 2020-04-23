@@ -108,8 +108,8 @@ boolean domaterial;
 void
 init_objects()
 {
-    int i, first, last, sum;
-    char oclass, prevoclass;
+    int i, first, last, sum, prevoclass;
+    char oclass;
 #ifdef TEXTCOLOR
 #define COPY_OBJ_DESCR(o_dst, o_src) \
     o_dst.oc_descr_idx = o_src.oc_descr_idx, o_dst.oc_color = o_src.oc_color
@@ -138,7 +138,7 @@ init_objects()
          * earlier class would involve switching back to a lower class
          * number after having moved on to one or more other classes.
          */
-        if (oclass < prevoclass)
+        if ((int) oclass < prevoclass)
             panic("objects[%d] class #%d not in order!", first, oclass);
 
         last = first + 1;
@@ -181,7 +181,7 @@ init_objects()
         if (sum != 1000)
             error("init-prob error for class %d (%d%%)", oclass, sum);
         first = last;
-        prevoclass = oclass;
+        prevoclass = (int) oclass;
     }
     /* extra entry allows deriving the range of a class via
        bases[class] through bases[class+1]-1 for all classes */
