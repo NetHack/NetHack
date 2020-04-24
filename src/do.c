@@ -717,9 +717,10 @@ boolean with_impact;
             if (obj->otyp == CORPSE) {
                 could_petrify = touch_petrifies(&mons[obj->corpsenm]);
                 could_poly = polyfodder(obj);
-                could_slime = (obj->corpsenm == PM_GREEN_SLIME);
                 could_grow = (obj->corpsenm == PM_WRAITH);
                 could_heal = (obj->corpsenm == PM_NURSE);
+            } else if (obj->otyp == GLOB_OF_GREEN_SLIME) {
+                could_slime = TRUE;
             }
             if (is_unpaid(obj))
                 (void) stolen_value(obj, u.ux, u.uy, TRUE, FALSE);
@@ -730,7 +731,7 @@ boolean with_impact;
                                    could_poly ? (struct permonst *) 0
                                               : &mons[PM_GREEN_SLIME],
                                    FALSE, could_slime);
-                    delobj(obj); /* corpse is digested */
+                    delobj(obj); /* corpse or glob is digested */
                 } else if (could_petrify) {
                     minstapetrify(u.ustuck, TRUE);
                     /* Don't leave a cockatrice corpse in a statue */

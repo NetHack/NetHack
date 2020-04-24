@@ -160,6 +160,8 @@ squadprob[] in mkroom.c was defined with 5 elements but initialized only 4
 allow nurses heal attack when wielding a non-weapon/weaptool
 if riding or levitating, hero could apply bullwhip downward to pull up things
 	from underwater or lava; feedback implied the item was on the surface
+some monster code was checking whether pets or engulfers were eating green
+	slime by checking for green slime corpse instead of glob
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
