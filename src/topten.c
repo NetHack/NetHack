@@ -379,6 +379,7 @@ int how;
             genders[flags.initgend].filecode, XLOG_SEP,
             aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
     Fprintf(rfile, "%cflags=0x%lx", XLOG_SEP, encodexlogflags());
+    Fprintf(rfile, "%cgold=%ld", XLOG_SEP, money_cnt(g.invent) + hidden_gold());
     Fprintf(rfile, "\n");
 #undef XLOG_SEP
 }
