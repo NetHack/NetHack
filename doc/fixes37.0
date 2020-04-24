@@ -371,4 +371,6 @@ options overhaul: moved the option definitions into include/optlist.h;
 function reglyph_darkroom() relocated from options.c to display.c
 resurrect 'makedefs -m' to be able to derive default mons[].diffculty values
 	suitable for assigning to new or changed monsters
+convert obj->oextra->omid from pointer to scalar
+get rid of unused obj->oextra->olong
 

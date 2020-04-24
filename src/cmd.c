@@ -2295,12 +2295,9 @@ struct obj *otmp;
             sz += (int) strlen(ONAME(otmp)) + 1;
         if (OMONST(otmp))
             sz += size_monst(OMONST(otmp), FALSE);
-        if (OMID(otmp))
-            sz += (int) sizeof (unsigned);
-        if (OLONG(otmp))
-            sz += (int) sizeof (long);
         if (OMAILCMD(otmp))
             sz += (int) strlen(OMAILCMD(otmp)) + 1;
+        /* sz += (int) sizeof (unsigned); -- now part of oextra itself */
     }
     return sz;
 }

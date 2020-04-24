@@ -3718,6 +3718,11 @@ register struct obj *otmp, *obj;
     if (obj->unpaid && !same_price(obj, otmp))
         return FALSE;
 
+    /* some additional information is always incompatible */
+    if (has_omonst(obj) || has_omid(obj)
+        || has_omonst(otmp) || has_omid(otmp))
+        return FALSE;
+
     /* if they have names, make sure they're the same */
     objnamelth = strlen(safe_oname(obj));
     otmpnamelth = strlen(safe_oname(otmp));
@@ -3727,11 +3732,12 @@ register struct obj *otmp, *obj;
             && strncmp(ONAME(obj), ONAME(otmp), objnamelth)))
         return FALSE;
 
-    /* for the moment, any additional information is incompatible */
-    if (has_omonst(obj) || has_omid(obj) || has_olong(obj) || has_omonst(otmp)
-        || has_omid(otmp) || has_olong(otmp))
+    /* if one has an attached mail command, other must have same command */
+    if (!has_omailcmd(obj) ? has_omailcmd(otmp)
+        : (!has_omailcmd(otmp) || strcmp(OMAILCMD(obj), OMAILCMD(otmp)) != 0))
         return FALSE;
 
+    /* should be moot since matching artifacts wouldn't be unique */
     if (obj->oartifact != otmp->oartifact)
         return FALSE;
 

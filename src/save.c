@@ -633,9 +633,9 @@ boolean rlecomp;
                     /* run has been broken, write out run-length encoding */
  writeout:
                     if (nhfp->structlevel) {
-                        bwrite(nhfp->fd, (genericptr_t) &match, sizeof (uchar));
-                        bwrite(nhfp->fd, (genericptr_t) rgrm, sizeof (struct rm));
-		    }
+                        bwrite(nhfp->fd, (genericptr_t) &match, sizeof match);
+                        bwrite(nhfp->fd, (genericptr_t) rgrm, sizeof *rgrm);
+                    }
                     /* start encoding again. we have at least 1 rm
                        in the next run, viz. this one. */
                     match = 1;
@@ -679,7 +679,7 @@ struct cemetery **cemeteryaddr;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) thisbones, sizeof *thisbones);
-	}
+        }
         if (release_data(nhfp))
             free((genericptr_t) thisbones);
     }
@@ -705,7 +705,7 @@ NHFILE *nhfp;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) damageptr, sizeof *damageptr);
-	}
+        }
         tmp_dam = damageptr;
         damageptr = damageptr->next;
         if (release_data(nhfp))
@@ -742,23 +742,8 @@ struct obj *otmp;
         } else {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &zerobuf, sizeof zerobuf);
-	}
-        buflen = OMID(otmp) ? (int) sizeof (unsigned) : 0;
-        if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0) {
-            if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) OMID(otmp), buflen);
-	}
-        /* TODO: post 3.6.x, get rid of this */
-        buflen = OLONG(otmp) ? (int) sizeof (long) : 0;
-        if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0) {
-            if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) OLONG(otmp), buflen);
-	}
-
+        }
+        /* extra info about scroll of mail */
         buflen = OMAILCMD(otmp) ? (int) strlen(OMAILCMD(otmp)) + 1 : 0;
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
@@ -766,6 +751,11 @@ struct obj *otmp;
             if (nhfp->structlevel)
                   bwrite(nhfp->fd, (genericptr_t) OMAILCMD(otmp), buflen);
         }
+        /* omid used to be indirect via a pointer in oextra but has
+           become part of oextra itself; 0 means not applicable and
+           gets saved/restored whenever any other oxtra components do */
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &OMID(otmp), sizeof OMID(otmp));
     }
 }
 
@@ -874,11 +864,12 @@ struct monst *mtmp;
         if (buflen > 0) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) EDOG(mtmp), buflen);
-	}
+        }
         /* mcorpsenm is inline int rather than pointer to something,
            so doesn't need to be preceded by a length field */
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
+            bwrite(nhfp->fd, (genericptr_t) &MCORPSENM(mtmp),
+                   sizeof MCORPSENM(mtmp));
     }
 }
 
@@ -930,7 +921,7 @@ register struct trap *trap;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)  
                 bwrite(nhfp->fd, (genericptr_t) trap, sizeof *trap);
-	}
+        }
         if (release_data(nhfp))
             dealloc_trap(trap);
         trap = trap2;
@@ -959,7 +950,7 @@ NHFILE *nhfp;
         if (f1->fid >= 0 && perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) f1, sizeof *f1);
-	}
+        }
         if (release_data(nhfp))
             dealloc_fruit(f1);
         f1 = f2;
@@ -992,7 +983,7 @@ NHFILE *nhfp;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) tmplev, sizeof *tmplev);
-	}
+        }
         if (release_data(nhfp))
             free((genericptr_t) tmplev);
     }
