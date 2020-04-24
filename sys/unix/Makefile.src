@@ -817,9 +817,11 @@ cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursinvt.h
 	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursinvt.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
-		$(CONFIG_H) ../include/lint.h
+		$(CONFIG_H) ../include/lint.h ../include/winX.h \
+		../include/color.h ../include/wintype.h
 	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/Window.c
-dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h
+dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h \
+		../include/winX.h ../include/color.h ../include/wintype.h
 	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
 		../include/xwindow.h ../win/X11/nh72icon ../win/X11/nh56icon \
