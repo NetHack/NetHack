@@ -3143,6 +3143,10 @@ register char *cmd;
     if (g.program_state.done_hup)
         end_of_input();
 #endif
+#ifdef AUTOSAVE
+    if (!iflags.autosave)
+        dosave();
+#endif
     if (firsttime) {
         g.context.nopick = 0;
         cmd = parse();

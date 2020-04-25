@@ -671,6 +671,49 @@ char *op UNUSED;
     return optn_ok;
 }
 
+#ifdef AUTOSAVE
+int
+optfn_autosave(optidx, req, negated, opts, op)
+int optidx;
+int req;
+boolean negated;
+char *opts;
+char *op;
+{
+    /* autosave: play game for N turns, then automatically save-and-quit
+       when safe opportunity presents itself (-1 = no autosave) */
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        op = string_for_opt(opts, TRUE);
+        if ((negated && !op) || (!negated && op))
+            iflags.autosave = negated ? -1 : atoi(op);
+        else if (op == empty_optstr && negated) {
+            bad_negation(allopt[optidx].name, TRUE);
+            return optn_err;
+        }
+        else
+            iflags.autosave = -1;
+        /* sanity check - map any negative values to -1 and also map zero to
+           -1 (off) because it doesn't make sense, as it would cause the game
+           to exit as soon as game starts */
+        if (iflags.autosave <= 0)
+            iflags.autosave = -1;
+        return optn_ok;
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        (iflags.autosave < 0)
+            ? Strcpy(opts, "off")
+            : Sprintf(opts, "%d", iflags.autosave);
+        return optn_ok;
+    }
+    return optn_ok;
+}
+#endif
+
 int
 optfn_boulder(optidx, req, negated, opts, op)
 int optidx UNUSED;
@@ -5994,6 +6037,9 @@ initoptions_init()
     flags.runmode = RUN_LEAP;
     iflags.msg_history = 20;
     /* msg_window has conflicting defaults for multi-interface binary */
+#ifdef AUTOSAVE
+    iflags.autosave = -1;                /* Disabled by default */
+#endif
 #ifdef TTY_GRAPHICS
     iflags.prevmsg_window = 's';
 #else

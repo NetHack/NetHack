@@ -54,7 +54,11 @@ dosave()
     if (iflags.debug_fuzzer)
         return 0;
     clear_nhwindow(WIN_MESSAGE);
+#ifdef AUTOSAVE
+    if (iflags.autosave && yn("Really save?") == 'n') {
+#else
     if (yn("Really save?") == 'n') {
+#endif
         clear_nhwindow(WIN_MESSAGE);
         if (g.multi > 0)
             nomul(0);

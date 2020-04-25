@@ -102,6 +102,10 @@ pfx_##a,
                 &flags.pickup)
     NHOPTB(autoquiver, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.autoquiver)
+#ifdef AUTOSAVE
+    NHOPTC(autosave, 20, opt_in, set_in_game, Yes, Yes, No, No, NoAlias,
+                "quit game after N turns")
+#endif
     NHOPTB(autounlock, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.autounlock)
 #if defined(MICRO) && !defined(AMIGA)

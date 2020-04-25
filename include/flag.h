@@ -217,6 +217,9 @@ struct instance_flags {
 #ifdef ALTMETA
     boolean altmeta;      /* Alt-c sends ESC c rather than M-c */
 #endif
+#ifdef AUTOSAVE
+    int autosave;         /* controls, how many turns to wait before autosave */
+#endif
     boolean autodescribe;     /* autodescribe mode in getpos() */
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */

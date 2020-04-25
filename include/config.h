@@ -576,6 +576,11 @@ typedef unsigned char uchar;
 
 #define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 
+/* AUTOSAVE enables a new 'autosave' compound option, which allows
+ * to specify max number of turns to play, before doing automatic
+ * save-and-quit, defaults to off. */
+/* #define AUTOSAVE */
+
 /* End of Section 4 */
 
 #ifdef TTY_TILES_ESCCODES
