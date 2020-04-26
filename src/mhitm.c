@@ -976,9 +976,11 @@ int dieroll;
                    now we'll know and might need to deliver skipped message
                    (note: if there's no message there'll be no auxilliary
                    damage so the message here isn't coming too late) */
-                if (!artifact_hit(magr, mdef, mwep, &tmp, dieroll))
-                    pline("%s hits %s.", Monnam(magr),
-                          mon_nam_too(mdef, magr));
+                if (!artifact_hit(magr, mdef, mwep, &tmp, dieroll)) {
+                    if (g.vis)
+                        pline("%s hits %s.", Monnam(magr),
+                              mon_nam_too(mdef, magr));
+                }
                 /* artifact_hit updates 'tmp' but doesn't inflict any
                    damage; however, it might cause carried items to be
                    destroyed and they might do so */
