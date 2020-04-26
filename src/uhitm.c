@@ -808,6 +808,9 @@ int dieroll;
 
                 if (obj->oartifact
                     && artifact_hit(&g.youmonst, mon, obj, &tmp, dieroll)) {
+                    /* artifact_hit updates 'tmp' but doesn't inflict any
+                       damage; however, it might cause carried items to be
+                       destroyed and they might do so */
                     if (DEADMONSTER(mon)) /* artifact killed monster */
                         return FALSE;
                     if (tmp == 0)
