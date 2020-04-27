@@ -4036,6 +4036,10 @@ struct trap *ttmp;
         || drag_ball(x, y, &bc, &bx, &by, &cx, &cy, &unused, TRUE)) {
         u.ux0 = u.ux, u.uy0 = u.uy;
         u.ux = x, u.uy = y;
+        if (u.usteed) {
+            u.usteed->mx = u.ux,
+            u.usteed->my = u.uy;
+        }
         u.umoved = TRUE;
         newsym(u.ux0, u.uy0);
         vision_recalc(1);
