@@ -134,6 +134,10 @@ enum cost_alteration_types {
 #define CXN_ARTICLE 8   /* include a/an/the prefix */
 #define CXN_NOCORPSE 16 /* suppress " corpse" suffix */
 
+/* flags for look_here() */
+#define LOOKHERE_PICKED_SOME   1
+#define LOOKHERE_SKIP_DFEATURE 2
+
 /* getpos() return values */
 enum getpos_retval {
     LOOK_TRADITIONAL = 0, /* '.' -- ask about "more info?" */
@@ -255,13 +259,12 @@ struct sortloot_item {
 };
 typedef struct sortloot_item Loot;
 
-#define MATCH_WARN_OF_MON(mon)                                               \
-    (Warn_of_mon && ((g.context.warntype.obj                                   \
-                      && (g.context.warntype.obj & (mon)->data->mflags2))      \
-                     || (g.context.warntype.polyd                              \
-                         && (g.context.warntype.polyd & (mon)->data->mflags2)) \
-                     || (g.context.warntype.species                            \
-                         && (g.context.warntype.species == (mon)->data))))
+#define MATCH_WARN_OF_MON(mon) \
+    (Warn_of_mon                                                        \
+     && ((g.context.warntype.obj & (mon)->data->mflags2) != 0           \
+         || (g.context.warntype.polyd & (mon)->data->mflags2) != 0      \
+         || (g.context.warntype.species                                 \
+             && (g.context.warntype.species == (mon)->data))))
 
 #include "trap.h"
 #include "flag.h"

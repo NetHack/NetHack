@@ -737,18 +737,8 @@ nh_timeout()
                     incr_itimeout(&HFumbling, rnd(20));
 
                 if (iflags.defer_decor) {
-                    /*
-                     * describe_decor() is attempting to work around a
-                     * message sequencing issue:  avoid
-                     *  |You are back on floor.
-                     *  |You trip over <object>.
-                     * if the trip is being caused by moving on ice
-                     * that the hero just left.  A trip message has
-                     * just been given, now give change-in-terrain one.
-                     * Operate this way even for non-ice Fumbling so
-                     * that describe_decor() doesn't need to know any
-                     * details about that.
-                     */
+                    /* 'mention_decor' was deferred for message sequencing
+                       reasons; catch up now */
                     deferred_decor(FALSE);
                 }
                 break;

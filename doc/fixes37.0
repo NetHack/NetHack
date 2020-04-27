@@ -211,6 +211,8 @@ fix crash in water_damage_chain
 teleport feedback "you materialize at another location" was given too soon
 'mention_decore' was repeatedly reporting "you are back on bottom" when
 	moving around underwater
+revised 'mention_decor' was describing furniture or ice right before look-here
+	described the same thing when stepping onto object(s)
 poison gas clouds located over known but unlit pools were visible as known
 	clouds but steam clouds in that situation were not
 after the wish parsing change, wishing for "<something of monster>" or for

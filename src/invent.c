@@ -3414,9 +3414,9 @@ char *buf;
 /* look at what is here; if there are many objects (pile_limit or more),
    don't show them unless obj_cnt is 0 */
 int
-look_here(obj_cnt, picked_some)
+look_here(obj_cnt, lookhere_flags)
 int obj_cnt; /* obj_cnt > 0 implies that autopickup is in progress */
-boolean picked_some;
+unsigned lookhere_flags;
 {
     struct obj *otmp;
     struct trap *trap;
@@ -3424,12 +3424,15 @@ boolean picked_some;
     const char *dfeature = (char *) 0;
     char fbuf[BUFSZ], fbuf2[BUFSZ];
     winid tmpwin;
-    boolean skip_objects, felt_cockatrice = FALSE;
+    boolean skip_objects, felt_cockatrice = FALSE,
+            picked_some = (lookhere_flags & LOOKHERE_PICKED_SOME) != 0,
+            /* skip 'dfeature' if caller used describe_decor() to show it */
+            skip_dfeature = (lookhere_flags & LOOKHERE_SKIP_DFEATURE) != 0;
 
     /* default pile_limit is 5; a value of 0 means "never skip"
        (and 1 effectively forces "always skip") */
     skip_objects = (flags.pile_limit > 0 && obj_cnt >= flags.pile_limit);
-    if (u.uswallow && u.ustuck) {
+    if (u.uswallow) {
         struct monst *mtmp = u.ustuck;
 
         /*
@@ -3502,12 +3505,12 @@ boolean picked_some;
         }
     }
 
-    if (dfeature)
+    if (dfeature && !skip_dfeature)
         Sprintf(fbuf, "There is %s here.", an(dfeature));
 
     if (!otmp || is_lava(u.ux, u.uy)
         || (is_pool(u.ux, u.uy) && !Underwater)) {
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (!skip_objects && (Blind || !dfeature))
@@ -3517,7 +3520,7 @@ boolean picked_some;
     /* we know there is something here */
 
     if (skip_objects) {
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
@@ -3547,7 +3550,7 @@ boolean picked_some;
             }
     } else if (!otmp->nexthere) {
         /* only one object */
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         You("%s here %s.", verb, doname_with_price(otmp));
@@ -3559,7 +3562,7 @@ boolean picked_some;
 
         display_nhwindow(WIN_MESSAGE, FALSE);
         tmpwin = create_nhwindow(NHW_MENU);
-        if (dfeature) {
+        if (dfeature && !skip_dfeature) {
             putstr(tmpwin, 0, fbuf);
             putstr(tmpwin, 0, "");
         }
