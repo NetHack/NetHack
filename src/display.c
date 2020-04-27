@@ -1296,18 +1296,12 @@ see_monsters()
             new_warn_obj_cnt++;
     }
 
-    /* message sequencing:  when changing levels via level teleport,
-       the start-glow/stop-glow message from Sting_effects() would come
-       too soon so we suppress it for docrt() -> see_monsters() then
-       reenable it and call see_monsters() a second time */
-    if (!iflags.no_glow) {
-        /*
-         * Make Sting glow blue or stop glowing if required.
-         */
-        if (new_warn_obj_cnt != g.warn_obj_cnt) {
-            Sting_effects(new_warn_obj_cnt);
-            g.warn_obj_cnt = new_warn_obj_cnt;
-        }
+    /*
+     * Make Sting glow blue or stop glowing if required.
+     */
+    if (new_warn_obj_cnt != g.warn_obj_cnt) {
+        Sting_effects(new_warn_obj_cnt);
+        g.warn_obj_cnt = new_warn_obj_cnt;
     }
 
     /* when mounted, hero's location gets caught by monster loop */

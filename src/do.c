@@ -1265,7 +1265,7 @@ boolean at_stairs, falling, portal;
     int l_idx, save_mode;
     NHFILE *nhfp;
     xchar new_ledger;
-    boolean cant_go_back, great_effort, materializing,
+    boolean cant_go_back, great_effort,
             up = (depth(newlevel) < depth(&u.uz)),
             newdungeon = (u.uz.dnum != newlevel->dnum),
             was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
@@ -1613,15 +1613,9 @@ boolean at_stairs, falling, portal;
     else if (Is_firelevel(&u.uz))
         fumaroles();
 
-    /* to control message sequencing hack for Sting_effects() */
-    materializing = (g.dfr_post_msg
-                     && !strncmpi(g.dfr_post_msg, "You materialize", 15));
-
     /* Reset the screen. */
     vision_reset(); /* reset the blockages */
     g.glyphmap_perlevel_flags = 0L; /* force per-level mapglyph() changes */
-    if (materializing)
-        iflags.no_glow++; /* to suppress see_monster()'s Sting_effects() */
     docrt();        /* does a full vision recalc */
     flush_screen(-1);
 
@@ -1630,14 +1624,14 @@ boolean at_stairs, falling, portal;
      */
 
     /* deferred arrival message for level teleport looks odd if given
-       after the various messages below so give it before them */
-    if (materializing) {
-        pline("%s", g.dfr_post_msg);
-        free((genericptr_t) g.dfr_post_msg), g.dfr_post_msg = 0;
-
-        iflags.no_glow--;
-        see_monsters(); /* docrt() did this but we need to repeat it */
-    }
+       after the various messages below, so give it before them;
+       [it might have already been delivered via docrt() -> see_monsters()
+       -> Sting_effects() -> maybe_lvltport_feedback(), in which case
+       'dfr_post_msg' has already been reset to Null];
+       if 'dfr_post_msg' is "you materialize on another level" then
+       maybe_lvltport_feedback() will deliver it now and then free it */
+    if (g.dfr_post_msg)
+        maybe_lvltport_feedback(); /* potentially called by Sting_effects() */
 
     /* special levels can have a custom arrival message */
     deliver_splev_message();
@@ -1756,6 +1750,17 @@ boolean at_stairs, falling, portal;
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
     (void) pickup(1);
+}
+
+/* usually called from goto_level(); might be called from Sting_effects() */
+void
+maybe_lvltport_feedback()
+{
+    if (g.dfr_post_msg && !strncmpi(g.dfr_post_msg, "You materialize", 15)) {
+        /* "You materialize on a different level." */
+        pline("%s", g.dfr_post_msg);
+        free((genericptr_t) g.dfr_post_msg), g.dfr_post_msg = 0;
+    }
 }
 
 static void
