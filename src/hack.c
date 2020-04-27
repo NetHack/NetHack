@@ -1778,7 +1778,7 @@ domove_core()
         return;
 
     mtmp = m_at(x, y);
-    /* tentaively move the hero plus steed; leave CLIPPING til later */
+    /* tentatively move the hero plus steed; leave CLIPPING til later */
     u.ux += u.dx;
     u.uy += u.dy;
     if (u.usteed) {
