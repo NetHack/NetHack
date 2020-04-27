@@ -219,6 +219,7 @@ struct instance_flags {
     int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
     int in_lava_effects;   /* hack for Boots_off() */
     int last_msg;          /* indicator of last message player saw */
+    int no_glow;           /* controls see_monster()'s Sting_effects() */
     int override_ID;       /* true to force full identification of objects */
     int parse_config_file_src;  /* hack for parse_config_line() */
     int purge_monsters;    /* # of dead monsters still on fmon list */

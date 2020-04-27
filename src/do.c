@@ -1265,7 +1265,7 @@ boolean at_stairs, falling, portal;
     int l_idx, save_mode;
     NHFILE *nhfp;
     xchar new_ledger;
-    boolean cant_go_back, great_effort,
+    boolean cant_go_back, great_effort, materializing,
             up = (depth(newlevel) < depth(&u.uz)),
             newdungeon = (u.uz.dnum != newlevel->dnum),
             was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
@@ -1613,9 +1613,15 @@ boolean at_stairs, falling, portal;
     else if (Is_firelevel(&u.uz))
         fumaroles();
 
+    /* to control message sequencing hack for Sting_effects() */
+    materializing = (g.dfr_post_msg
+                     && !strncmpi(g.dfr_post_msg, "You materialize", 15));
+
     /* Reset the screen. */
     vision_reset(); /* reset the blockages */
     g.glyphmap_perlevel_flags = 0L; /* force per-level mapglyph() changes */
+    if (materializing)
+        iflags.no_glow++; /* to suppress see_monster()'s Sting_effects() */
     docrt();        /* does a full vision recalc */
     flush_screen(-1);
 
@@ -1625,9 +1631,12 @@ boolean at_stairs, falling, portal;
 
     /* deferred arrival message for level teleport looks odd if given
        after the various messages below so give it before them */
-    if (g.dfr_post_msg && !strncmpi(g.dfr_post_msg, "You materialize", 15)) {
+    if (materializing) {
         pline("%s", g.dfr_post_msg);
         free((genericptr_t) g.dfr_post_msg), g.dfr_post_msg = 0;
+
+        iflags.no_glow--;
+        see_monsters(); /* docrt() did this but we need to repeat it */
     }
 
     /* special levels can have a custom arrival message */
