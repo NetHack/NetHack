@@ -1416,8 +1416,8 @@ domove_core()
     }
     if (u.uswallow) {
         u.dx = u.dy = 0;
-        u.ux = x = u.ustuck->mx;
-        u.uy = y = u.ustuck->my;
+        x = u.ustuck->mx, y = u.ustuck->my;
+        u_on_newpos(x, y); /* set u.ux,uy and handle CLIPPING */
         mtmp = u.ustuck;
     } else {
         if (Is_airlevel(&u.uz) && rn2(4) && !Levitation && !Flying) {
@@ -1777,15 +1777,15 @@ domove_core()
     if (!in_out_region(x, y))
         return;
 
-    /* now move the hero */
     mtmp = m_at(x, y);
+    /* tentaively move the hero plus steed; leave CLIPPING til later */
     u.ux += u.dx;
     u.uy += u.dy;
-    /* Move your steed, too */
     if (u.usteed) {
         u.usteed->mx = u.ux;
         u.usteed->my = u.uy;
-        exercise_steed();
+        /* [if move attempt ends up being blocked, should training count?] */
+        exercise_steed(); /* train riding skill */
     }
 
     /*
@@ -1911,10 +1911,15 @@ domove_core()
 
         if (didnt_move) {
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            /* could skip this bit since we're about to call u_on_newpos() */
             if (u.usteed)
                 u.usteed->mx = u.ux, u.usteed->my = u.uy;
         }
     }
+    /* tentative move above didn't handle CLIPPING, in case there was a
+       monster in the way and the move attempt ended up being blocked;
+       do a full re-position now, possibly back to where hero started */
+    u_on_newpos(u.ux, u.uy);
 
     reset_occupations();
     if (g.context.run) {

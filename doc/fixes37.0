@@ -164,6 +164,8 @@ some monster code was checking whether pets or engulfers were eating green
 	slime by checking for green slime corpse instead of glob
 change light radius of stack of candles to square root
 could get redundate "mon hits other-mon" messages when mon wields an artifact
+failed untrap while mounted that moved hero onto the trap would leave steed
+	with stale coordinates, triggering warnings if 'sanity_check' is On
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
