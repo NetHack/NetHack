@@ -1628,7 +1628,7 @@ boolean at_stairs, falling, portal;
        [it might have already been delivered via docrt() -> see_monsters()
        -> Sting_effects() -> maybe_lvltport_feedback(), in which case
        'dfr_post_msg' has already been reset to Null];
-       if 'dfr_post_msg' is "you materialize on another level" then
+       if 'dfr_post_msg' is "you materialize on a different level" then
        maybe_lvltport_feedback() will deliver it now and then free it */
     if (g.dfr_post_msg)
         maybe_lvltport_feedback(); /* potentially called by Sting_effects() */
