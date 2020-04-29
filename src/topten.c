@@ -555,8 +555,6 @@ static char *
 encode_extended_conducts()
 {
     static char buf[BUFSZ];
-    const char *achievement = NULL;
-    int i;
 
     buf[0] = '\0';
     add_achieveX(buf, "foodless",     !u.uconduct.food);
