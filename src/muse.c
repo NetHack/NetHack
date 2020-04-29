@@ -2563,15 +2563,15 @@ boolean tinok;
 {
     if (obj->otyp == POT_ACID)
         return TRUE;
+    if (obj->otyp == GLOB_OF_GREEN_SLIME)
+        return (boolean) slimeproof(mon->data);
     if (obj->otyp != CORPSE && (obj->otyp != TIN || !tinok))
         return FALSE;
     /* corpse, or tin that mon can open */
     if (obj->corpsenm == NON_PM) /* empty/special tin */
         return FALSE;
     return (boolean) (obj->corpsenm == PM_LIZARD
-                      || (acidic(&mons[obj->corpsenm])
-                          && (obj->corpsenm != PM_GREEN_SLIME
-                              || slimeproof(mon->data))));
+                      || acidic(&mons[obj->corpsenm]));
 }
 
 static boolean

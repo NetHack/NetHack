@@ -919,7 +919,7 @@ register struct monst *mtmp;
 {
     register struct obj *otmp;
     struct permonst *ptr;
-    int poly, grow, heal, mstone;
+    int poly, grow, heal, mstone, vis = canseemon(mtmp);
 
     /* If a pet, eating is handled separately, in dog.c */
     if (mtmp->mtame)
@@ -936,18 +936,19 @@ register struct monst *mtmp;
         if (is_metallic(otmp) && !obj_resists(otmp, 5, 95)
             && touch_artifact(otmp, mtmp)) {
             if (mtmp->data == &mons[PM_RUST_MONSTER] && otmp->oerodeproof) {
-                if (canseemon(mtmp) && flags.verbose) {
+                if (vis && flags.verbose) {
                     pline("%s eats %s!", Monnam(mtmp),
                           distant_name(otmp, doname));
                 }
                 /* The object's rustproofing is gone now */
                 otmp->oerodeproof = 0;
                 mtmp->mstun = 1;
-                if (canseemon(mtmp) && flags.verbose) {
+                if (vis && flags.verbose) {
                     pline("%s spits %s out in disgust!", Monnam(mtmp),
                           distant_name(otmp, doname));
                 }
             } else {
+                /* [should this be canseemon()?] */
                 if (cansee(mtmp->mx, mtmp->my) && flags.verbose)
                     pline("%s eats %s!", Monnam(mtmp),
                           distant_name(otmp, doname));
@@ -966,6 +967,8 @@ register struct monst *mtmp;
                 } else if (otmp == uchain) {
                     unpunish(); /* frees uchain */
                 } else {
+                    /* these can occur via eating metal if it's a tin
+                       [can't be slimed; that could only happen via glob] */
                     poly = polyfodder(otmp);
                     grow = mlevelgain(otmp);
                     heal = mhealup(otmp);
@@ -973,7 +976,7 @@ register struct monst *mtmp;
                     delobj(otmp);
                     ptr = mtmp->data;
                     if (poly) {
-                        if (newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
+                        if (newcham(mtmp, (struct permonst *) 0, FALSE, vis))
                             ptr = mtmp->data;
                     } else if (grow) {
                         ptr = grow_up(mtmp, (struct monst *) 0);
@@ -982,13 +985,17 @@ register struct monst *mtmp;
                             mon_to_stone(mtmp);
                             ptr = mtmp->data;
                         } else if (!resists_ston(mtmp)) {
-                            if (canseemon(mtmp))
+                            if (vis)
                                 pline("%s turns to stone!", Monnam(mtmp));
                             monstone(mtmp);
-                            ptr = (struct permonst *) 0;
+                            /* might be life-saved if had a previous shape
+                               which was capable to putting on an amulet */
+                            if (DEADMONSTER(mtmp))
+                                ptr = (struct permonst *) 0;
                         }
                     } else if (heal) {
                         mtmp->mhp = mtmp->mhpmax;
+                        mcureblindness(mtmp, canseemon(mtmp));
                     }
                     if (!ptr)
                         return 2; /* it died */
@@ -1011,7 +1018,7 @@ struct monst *mtmp;
 {
     struct obj *otmp, *otmp2;
     struct permonst *ptr, *original_ptr = mtmp->data;
-    int poly, grow, heal, eyes, count = 0, ecount = 0;
+    int poly, grow, heal, eyes, count = 0, ecount = 0, vis = canseemon(mtmp);
     char buf[BUFSZ];
 
     buf[0] = '\0';
@@ -1062,12 +1069,9 @@ struct monst *mtmp;
                        || otmp->otyp == RIN_SLOW_DIGESTION)
                    /* cockatrice corpses handled above; this
                       touch_petrifies() check catches eggs */
-                   || ((otmp->otyp == CORPSE || otmp->otyp == EGG
-                        || otmp->globby)
-                       && ((touch_petrifies(&mons[otmp->corpsenm])
-                            && !resists_ston(mtmp))
-                           || (otmp->corpsenm == PM_GREEN_SLIME
-                               && !slimeproof(mtmp->data))))) {
+                   || (mstoning(otmp) && !resists_ston(mtmp))
+                   || (otmp->otyp == GLOB_OF_GREEN_SLIME
+                       && !slimeproof(mtmp->data))) {
             /* engulf */
             ++ecount;
             if (ecount == 1)
@@ -1114,6 +1118,9 @@ struct monst *mtmp;
                     (void) mpickobj(mtmp, otmp3);
                 }
             }
+            /* possibility of being turned to stone or into slime can't
+               reach here (don't touch for cockatrice corpse, engulf rather
+               than eat for tin, cockatrice egg, or glob of green slime) */
             poly = polyfodder(otmp);
             grow = mlevelgain(otmp);
             heal = mhealup(otmp);
@@ -1121,7 +1128,7 @@ struct monst *mtmp;
             delobj(otmp); /* munch */
             ptr = mtmp->data;
             if (poly) {
-                if (newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
+                if (newcham(mtmp, (struct permonst *) 0, FALSE, vis))
                     ptr = mtmp->data;
             } else if (grow) {
                 ptr = grow_up(mtmp, (struct monst *) 0);
@@ -1158,13 +1165,14 @@ struct monst* mtmp;
 {
     struct obj *otmp;
     struct permonst *ptr, *original_ptr = mtmp->data, *corpsepm;
-    boolean poly, grow, heal, eyes = FALSE;
+    boolean poly, grow, heal, eyes = FALSE, vis = canseemon(mtmp);
     int x = mtmp->mx, y = mtmp->my;
 
     /* if a pet, eating is handled separately, in dog.c */
     if (mtmp->mtame)
         return 0;
 
+    /* skips past any globs */
     for (otmp = sobj_at(CORPSE, x, y); otmp;
          /* won't get back here if otmp is split or gets used up */
          otmp = nxtobj(otmp, CORPSE, TRUE)) {
@@ -1209,7 +1217,7 @@ struct monst* mtmp;
         ptr = original_ptr;
         delobj(otmp);
         if (poly) {
-            if (newcham(mtmp, NULL, FALSE, FALSE))
+            if (newcham(mtmp, (struct permonst *) 0, FALSE, vis))
                 ptr = mtmp->data;
         } else if (grow) {
             ptr = grow_up(mtmp, (struct monst *) 0);
