@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1470272344 2016/08/04 00:59:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.172 $ */
+/* NetHack 3.6  eat.c   $NHDT-Date: 1470272344 2016/08/04 00:59:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.172 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1769,7 +1769,10 @@ struct obj *otmp;
         break;
     case TRIPE_RATION:
         if (carnivorous(youmonst.data) && !humanoid(youmonst.data))
-            pline("That tripe ration was surprisingly good!");
+            if (Hallucination && (u.umonnum == PM_TIGER))
+                pline("That tripe ration was gr-r-reat!");
+            else
+                pline("That tripe ration was surprisingly good!");
         else if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC)))
             pline(Hallucination ? "Tastes great! Less filling!"
                                 : "Mmm, tripe... not bad!");
@@ -1853,7 +1856,7 @@ struct obj *otmp;
                         || otmp->otyp == K_RATION
                         || otmp->otyp == C_RATION)
                         ? "bland."
-                        : Hallucination ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly") : "delicious!");
+                        : Hallucination ? ((u.umonnum == PM_TIGER) ? "gr-r-reat!" : "gnarly") : "delicious!");
         }
         break; /* default */
     } /* switch */
