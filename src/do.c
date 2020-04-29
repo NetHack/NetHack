@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1586815086 2020/04/13 21:58:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.237 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1588191740 2020/04/29 20:22:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.243 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,6 +12,7 @@ static void NDECL(polymorph_sink);
 static boolean NDECL(teleport_sink);
 static void FDECL(dosinkring, (struct obj *));
 static int FDECL(drop, (struct obj *));
+static boolean FDECL(engulfer_digests_food, (struct obj *));
 static int NDECL(wipeoff);
 static int FDECL(menu_drop, (int));
 static NHFILE *NDECL(currentlevel_rewrite);
@@ -705,46 +706,15 @@ boolean with_impact;
 
     if (!u.uswallow && flooreffects(obj, u.ux, u.uy, "drop"))
         return;
-    /* uswallow check done by GAN 01/29/87 */
     if (u.uswallow) {
-        boolean could_petrify = FALSE;
-        boolean could_poly = FALSE;
-        boolean could_slime = FALSE;
-        boolean could_grow = FALSE;
-        boolean could_heal = FALSE;
-
+        /* hero has dropped an item while inside an engulfer */
         if (obj != uball) { /* mon doesn't pick up ball */
-            if (obj->otyp == CORPSE) {
-                could_petrify = touch_petrifies(&mons[obj->corpsenm]);
-                could_poly = polyfodder(obj);
-                could_grow = (obj->corpsenm == PM_WRAITH);
-                could_heal = (obj->corpsenm == PM_NURSE);
-            } else if (obj->otyp == GLOB_OF_GREEN_SLIME) {
-                could_slime = TRUE;
-            }
+            /* moving shop item into engulfer's inventory treated as theft */
             if (is_unpaid(obj))
                 (void) stolen_value(obj, u.ux, u.uy, TRUE, FALSE);
-            (void) mpickobj(u.ustuck, obj);
-            if (is_animal(u.ustuck->data)) {
-                if (could_poly || could_slime) {
-                    (void) newcham(u.ustuck,
-                                   could_poly ? (struct permonst *) 0
-                                              : &mons[PM_GREEN_SLIME],
-                                   FALSE, could_slime);
-                    delobj(obj); /* corpse or glob is digested */
-                } else if (could_petrify) {
-                    minstapetrify(u.ustuck, TRUE);
-                    /* Don't leave a cockatrice corpse in a statue */
-                    if (!u.uswallow)
-                        delobj(obj);
-                } else if (could_grow) {
-                    (void) grow_up(u.ustuck, (struct monst *) 0);
-                    delobj(obj); /* corpse is digested */
-                } else if (could_heal) {
-                    u.ustuck->mhp = u.ustuck->mhpmax;
-                    delobj(obj); /* corpse is digested */
-                }
-            }
+            /* add to engulfer's inventory if not immediately eaten */
+            if (!engulfer_digests_food(obj))
+                (void) mpickobj(u.ustuck, obj);
         }
     } else {
         place_object(obj, u.ux, u.uy);
@@ -759,6 +729,52 @@ boolean with_impact;
             map_object(obj, 0);
         newsym(u.ux, u.uy); /* remap location under self */
     }
+}
+
+/* when swallowed, move dropped object from OBJ_FREE to u.ustuck's inventory;
+   for purple worm, immediately eat any corpse, glob, or special meat item
+   from object polymorph; return True if object is used up, False otherwise */
+static boolean
+engulfer_digests_food(obj)
+struct obj *obj;
+{
+    /* animal swallower (purple worn, trapper, lurker above) eats any
+       corpse, glob, or meat <item> but not other types of food */
+    if (is_animal(u.ustuck->data)
+        && (obj->otyp == CORPSE || obj->globby
+            || obj->otyp == MEATBALL || obj->otyp == HUGE_CHUNK_OF_MEAT
+            || obj->otyp == MEAT_RING || obj->otyp == MEAT_STICK)) {
+        boolean could_petrify = FALSE,
+                could_poly = FALSE, could_slime = FALSE,
+                could_grow = FALSE, could_heal = FALSE;
+
+        if (obj->otyp == CORPSE) {
+            could_petrify = touch_petrifies(&mons[obj->corpsenm]);
+            could_poly = polyfodder(obj);
+            could_grow = (obj->corpsenm == PM_WRAITH);
+            could_heal = (obj->corpsenm == PM_NURSE);
+        } else if (obj->otyp == GLOB_OF_GREEN_SLIME) {
+            could_slime = TRUE;
+        }
+        /* see or feel the effect */
+        pline("%s instantly digested!", Tobjnam(obj, "are"));
+
+        if (could_poly || could_slime) {
+            (void) newcham(u.ustuck, could_slime ? &mons[PM_GREEN_SLIME] : 0,
+                           FALSE, could_slime);
+        } else if (could_petrify) {
+            minstapetrify(u.ustuck, TRUE);
+        } else if (could_grow) {
+            (void) grow_up(u.ustuck, (struct monst *) 0);
+        } else if (could_heal) {
+            u.ustuck->mhp = u.ustuck->mhpmax;
+            /* False: don't realize that sight is cured from inside */
+            mcureblindness(u.ustuck, FALSE);
+        }
+        delobj(obj); /* always used up */
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /* things that must change when not held; recurse into containers.
