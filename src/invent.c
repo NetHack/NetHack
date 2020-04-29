@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1583073990 2020/03/01 14:46:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.294 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1588189423 2020/04/29 19:43:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.297 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1071,7 +1071,7 @@ const char *drop_fmt, *drop_arg, *hold_msg;
     if (drop_fmt)
         pline(drop_fmt, drop_arg);
     obj->nomerge = 0;
-    if (can_reach_floor(TRUE)) {
+    if (can_reach_floor(TRUE) || u.uswallow) {
         dropx(obj);
     } else {
         freeinv(obj);

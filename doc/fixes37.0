@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.195 $ $NHDT-Date: 1587503040 2020/04/21 21:04:00 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ $NHDT-Date: 1588189422 2020/04/29 19:43:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -166,6 +166,8 @@ change light radius of stack of candles to square root
 could get redundate "mon hits other-mon" messages when mon wields an artifact
 failed untrap while mounted that moved hero onto the trap would leave steed
 	with stale coordinates, triggering warnings if 'sanity_check' is On
+when hold_another_object() fails while hero is swallowed, drop the item into
+	swallower's inventory instead of onto the floor
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
