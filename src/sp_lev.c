@@ -813,14 +813,14 @@ boolean extras;
     /* timed effects */
     for (timer = g.timer_base; timer; timer = timer->next) {
         if (timer->func_index == MELT_ICE_AWAY) {
-            long ty = ((long) timer->arg.a_void) & 0xffff;
-            long tx = (((long) timer->arg.a_void) >> 16) & 0xffff;
+            long ty = timer->arg.a_long & 0xffff;
+            long tx = (timer->arg.a_long >> 16) & 0xffff;
 
             if (flp & 1)
                 ty = FlipY(ty);
             if (flp & 2)
                 tx = FlipX(tx);
-            timer->arg.a_void = (genericptr_t) ((tx << 16) | ty);
+            timer->arg.a_long = ((tx << 16) | ty);
         }
     }
 
