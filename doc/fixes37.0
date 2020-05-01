@@ -171,6 +171,9 @@ when hold_another_object() fails while hero is swallowed, drop the item into
 when digging a pit results in it being filled by adjacent pool or lava, any
 	objects at the spot weren't subjected to water or fire damage;
 	also, riding hero's steed wasn't subjected to immersion either
+after "double trouble", cloned Wizard would wait until he had suffered some
+	damage or hero moved into direct view; keep STRAT_WAIT for original
+	Wizard but avoid that for clones
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
