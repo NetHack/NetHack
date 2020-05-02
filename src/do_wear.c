@@ -784,7 +784,31 @@ Amulet_on()
            gotten set by previously eating one of these amulets */
         if (newnap < oldnap || oldnap == 0L)
             HSleepy = (HSleepy & ~TIMEOUT) | newnap;
-    } break;
+        break;
+    }
+    case AMULET_OF_FLYING:
+        /* setworn() has already set extrinisic flying */
+        float_vs_flight(); /* block flying if levitating */
+        if (Flying) {
+            boolean already_flying;
+
+            /* to determine whether this flight is new we have to muck
+               about in the Flying intrinsic (actually extrinsic) */
+            EFlying &= ~W_AMUL;
+            already_flying = !!Flying;
+            EFlying |= W_AMUL;
+
+            if (!already_flying) {
+                makeknown(AMULET_OF_FLYING);
+                g.context.botl = TRUE; /* status: 'Fly' On */
+                You("are now in flight.");
+            }
+        }
+        break;
+    case AMULET_OF_GUARDING:
+        makeknown(AMULET_OF_GUARDING);
+        find_ac();
+        break;
     case AMULET_OF_YENDOR:
         break;
     }
@@ -838,6 +862,26 @@ Amulet_off()
         if (!ESleepy && !(HSleepy & ~TIMEOUT))
             HSleepy &= ~TIMEOUT; /* clear timeout bits */
         return;
+    case AMULET_OF_FLYING: {
+        boolean was_flying = !!Flying;
+
+        /* remove amulet 'early' to determine whether Flying changes */
+        setworn((struct obj *) 0, W_AMUL);
+        float_vs_flight(); /* probably not needed here */
+        if (was_flying && !Flying) {
+            makeknown(AMULET_OF_FLYING);
+            g.context.botl = TRUE; /* status: 'Fly' Off */
+            You("%s.", (is_pool_or_lava(u.ux, u.uy)
+                        || Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
+                          ? "stop flying"
+                          : "land");
+            spoteffects(TRUE);
+        }
+        break;
+    }
+    case AMULET_OF_GUARDING:
+        find_ac();
+        break;
     case AMULET_OF_YENDOR:
         break;
     }
@@ -2056,7 +2100,7 @@ struct obj *obj;
             g.multi_reason = "dressing up";
             g.nomovemsg = "You finish your dressing maneuver.";
         } else {
-            unmul(""); /* call (*g.aftermv)(), clear it+g.nomovemsg+g.multi_reason */
+            unmul(""); /* call aftermv, clear it+nomovemsg+multi_reason */
             on_msg(obj);
         }
         g.context.takeoff.mask = g.context.takeoff.what = 0L;
@@ -2151,6 +2195,8 @@ find_ac()
         uac -= uleft->spe;
     if (uright && uright->otyp == RIN_PROTECTION)
         uac -= uright->spe;
+    if (uamul && uamul->otyp == AMULET_OF_GUARDING)
+        uac -= 2; /* fixed amount; main benefit is to MC */
 
     /* armor class from other sources */
     if (HProtection & INTRINSIC)

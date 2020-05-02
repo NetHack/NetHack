@@ -911,6 +911,7 @@ struct monst *mon;
     long wearmask;
     int armpro, mc = 0;
     boolean is_you = (mon == &g.youmonst),
+            via_amul = FALSE,
             gotprot = is_you ? (EProtection != 0L)
                              /* high priests have innate protection */
                              : (mon->data == &mons[PM_HIGH_PRIEST]);
@@ -921,6 +922,8 @@ struct monst *mon;
             armpro = objects[o->otyp].a_can;
             if (armpro > mc)
                 mc = armpro;
+        } else if ((o->owornmask & W_AMUL) != 0L) {
+            via_amul = TRUE;
         }
         /* if we've already confirmed Protection, skip additional checks */
         if (is_you || gotprot)
@@ -935,9 +938,10 @@ struct monst *mon;
     }
 
     if (gotprot) {
-        /* extrinsic Protection increases mc by 1 */
-        if (mc < 3)
-            mc += 1;
+        /* extrinsic Protection increases mc by 1; 2 for amulet */
+        mc += via_amul ? 2 : 1;
+        if (mc > 3)
+            mc = 3;
     } else if (mc < 1) {
         /* intrinsic Protection is weaker (play balance; obtaining divine
            protection is too easy); it confers minimum mc 1 instead of 0 */

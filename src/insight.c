@@ -1478,6 +1478,8 @@ int final;
             prot += uleft->spe;
         if (uright && uright->otyp == RIN_PROTECTION)
             prot += uright->spe;
+        if (uamul && uamul->otyp == AMULET_OF_GUARDING)
+            prot += 2;
         if (HProtection & INTRINSIC)
             prot += u.ublessed;
         prot += u.uspellprot;

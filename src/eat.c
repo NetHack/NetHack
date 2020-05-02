@@ -1819,7 +1819,8 @@ struct obj *otmp;
             /* not cannibalism, but we use similar criteria
                for deciding whether to be sickened by this meal */
             if (rn2(2) && !CANNIBAL_ALLOWED())
-                make_vomiting((long) rn1(g.context.victual.reqtime, 14), FALSE);
+                make_vomiting((long) rn1(g.context.victual.reqtime, 14),
+                              FALSE);
         }
         break;
     case LEMBAS_WAFER:
@@ -2031,10 +2032,13 @@ struct obj *otmp;
                                                  RIN_INCREASE_DAMAGE);
             break;
         case RIN_PROTECTION:
+        case AMULET_OF_GUARDING:
             accessory_has_effect(otmp);
             HProtection |= FROMOUTSIDE;
-            u.ublessed = bounded_increase(u.ublessed, otmp->spe,
-                                          RIN_PROTECTION);
+            u.ublessed = bounded_increase(u.ublessed,
+                                          (typ == RIN_PROTECTION) ? otmp->spe
+                                           : 2, /* fixed amount for amulet */
+                                          typ);
             g.context.botl = 1;
             break;
         case RIN_FREE_ACTION:
@@ -2078,6 +2082,7 @@ struct obj *otmp;
         }
         case RIN_SUSTAIN_ABILITY:
         case AMULET_OF_LIFE_SAVING:
+        case AMULET_OF_FLYING:
         case AMULET_OF_REFLECTION: /* nice try */
             /* can't eat Amulet of Yendor or fakes,
              * and no oc_prop even if you could -3.
@@ -2839,7 +2844,9 @@ gethungry()
                    need to check whether both rings are +0 protection or
                    they'd both slip by the "is there another source?" test,
                    but don't do that for both rings or they will both be
-                   treated as supplying "MC" when only one matters */
+                   treated as supplying "MC" when only one matters;
+                   note: amulet of guarding overrides both +0 rings and
+                   is caught by the (EProtection & ~W_RINGx) == 0L tests */
                 && (uleft->spe
                     || !objects[uleft->otyp].oc_charged
                     || (uleft->otyp == RIN_PROTECTION

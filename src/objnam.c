@@ -2834,6 +2834,7 @@ static const struct alt_spellings {
     { "lantern", BRASS_LANTERN },
     { "mattock", DWARVISH_MATTOCK },
     { "amulet of poison resistance", AMULET_VERSUS_POISON },
+    { "amulet of protection", AMULET_OF_GUARDING },
     { "potion of sleep", POT_SLEEPING },
     { "stone", ROCK },
     { "camera", EXPENSIVE_CAMERA },
