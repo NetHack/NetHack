@@ -53,6 +53,7 @@ typedef struct dest_area { /* non-stairway level change identifier */
     xchar nhx, nhy;        /* opposite corner of invalid area */
 } dest_area;
 
+#ifndef MAKEDEFS_C
 typedef struct dungeon {   /* basic dungeon identifier */
     char dname[24];        /* name of the dungeon (eg. "Hell") */
     char proto[15];        /* name of prototype file (eg. "tower") */
@@ -67,6 +68,7 @@ typedef struct dungeon {   /* basic dungeon identifier */
         depth_start;       /* the starting depth in "logical" terms */
     lua_State *themelua;   /* themerms compiled lua */
 } dungeon;
+#endif /* MAKEDEFS_C */
 
 /*
  * A branch structure defines the connection between two dungeons.  They
