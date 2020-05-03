@@ -204,15 +204,22 @@ boolean isyou;
             if (yn("Dry up fountain?") == 'n')
                 return;
         }
+        /* FIXME: sight-blocking clouds should use block_point() when
+           being created and unblock_point() when going away, then this
+           glyph hackery wouldn't be necessary */
+        if (cansee(x, y)) {
+            int glyph = glyph_at(x, y);
+
+            if (!glyph_is_cmap(glyph) || glyph_to_cmap(glyph) != S_cloud)
+                pline_The("fountain dries up!");
+        }
         /* replace the fountain with ordinary floor */
         levl[x][y].typ = ROOM, levl[x][y].flags = 0;
         levl[x][y].blessedftn = 0;
-        if (cansee(x, y))
-            pline_The("fountain dries up!");
+        g.level.flags.nfountains--;
         /* The location is seen if the hero/monster is invisible
            or felt if the hero is blind. */
         newsym(x, y);
-        g.level.flags.nfountains--;
         if (isyou && in_town(x, y))
             (void) angry_guards(FALSE);
     }

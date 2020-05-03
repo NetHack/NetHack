@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1585781359 2020/04/01 22:49:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1587248921 2020/04/18 22:28:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -124,8 +124,8 @@
 #include "hack.h"
 
 static void FDECL(show_mon_or_warn, (int, int, int));
-static void FDECL(display_monster,
-                      (XCHAR_P, XCHAR_P, struct monst *, int, XCHAR_P));
+static void FDECL(display_monster, (XCHAR_P, XCHAR_P, struct monst *, int,
+                                    BOOLEAN_P));
 static int FDECL(swallow_to_glyph, (int, int));
 static void FDECL(display_warning, (struct monst *));
 
@@ -402,7 +402,7 @@ register xchar x, y;        /* display position */
 register struct monst *mon; /* monster to display */
 int sightflags;             /* 1 if the monster is physically seen;
                                2 if detected using Detect_monsters */
-xchar worm_tail;            /* mon is actually a worm tail */
+boolean worm_tail;          /* mon is actually a worm tail */
 {
     boolean mon_mimic = (M_AP_TYPE(mon) != M_AP_NOTHING);
     int sensed = (mon_mimic && (Protection_from_shape_changers
@@ -733,10 +733,10 @@ void
 newsym(x, y)
 register int x, y;
 {
-    register struct monst *mon;
+    struct monst *mon;
+    int see_it;
+    boolean worm_tail;
     register struct rm *lev = &(levl[x][y]);
-    register int see_it;
-    register xchar worm_tail;
 
     if (g.in_mklev)
         return;
@@ -780,13 +780,13 @@ register int x, y;
 
         /*
          * Normal region shown only on accessible positions, but
-         * poison clouds also shown above lava, pools and moats.
+         * poison clouds and steam clouds also shown above lava,
+         * pools and moats.
          * However, sensed monsters take precedence over all regions.
          */
         if (reg
             && (ACCESSIBLE(lev->typ)
-                || (reg->glyph == cmap_to_glyph(S_poisoncloud)
-                    && is_pool_or_lava(x, y)))
+                || (reg->visible && is_pool_or_lava(x, y)))
             && (!mon || worm_tail || !sensemon(mon))) {
             show_region(reg, x, y);
             return;
@@ -1295,6 +1295,7 @@ see_monsters()
         if (Warn_of_mon && (g.context.warntype.obj & mon->data->mflags2) != 0L)
             new_warn_obj_cnt++;
     }
+
     /*
      * Make Sting glow blue or stop glowing if required.
      */
@@ -1606,44 +1607,57 @@ int x, y, glyph;
         }                                \
     }
 
-static const gbuf_entry nul_gbuf = { 0, GLYPH_UNEXPLORED };
 /*
- * Turn the 3rd screen into UNEXPLORED.
+ * Turn the 3rd screen into UNEXPLORED that needs to be refreshed.
  */
 void
 clear_glyph_buffer()
 {
     register int x, y;
-    register gbuf_entry *gptr;
+    register gbuf_entry *gptr, nul_gbuf;
+    int ch = ' ', color = NO_COLOR;
+    unsigned special = 0;
+
+    (void) mapglyph(GLYPH_UNEXPLORED, &ch, &color, &special, 0, 0, 0);
+    nul_gbuf.gnew = (ch != ' ' || color != NO_COLOR
+                     || (special & ~MG_UNEXPL) != 0) ? 1 : 0;
+    nul_gbuf.glyph = GLYPH_UNEXPLORED;
 
     for (y = 0; y < ROWNO; y++) {
         gptr = &g.gbuf[y][0];
         for (x = COLNO; x; x--) {
             *gptr++ = nul_gbuf;
         }
+        g.gbuf_start[y] = 1;
+        g.gbuf_stop[y] = COLNO - 1;
     }
-    reset_glyph_bbox();
 }
 
-/*
- * Assumes that the indicated positions are filled with GLYPH_UNEXPLORED glyphs.
- */
+/* used by tty after menu or text popup has temporarily overwritten the map
+   and it has been erased so shows spaces, not necessarily S_unexplored */
 void
 row_refresh(start, stop, y)
 int start, stop, y;
 {
-    register int x;
+    register int x, glyph;
+    register boolean force;
+    int ch = ' ', color = NO_COLOR;
+    unsigned special = 0;
 
-    for (x = start; x <= stop; x++)
-        if (g.gbuf[y][x].glyph != GLYPH_UNEXPLORED)
-            print_glyph(WIN_MAP, x, y, g.gbuf[y][x].glyph, get_bk_glyph(x, y));
+    (void) mapglyph(GLYPH_UNEXPLORED, &ch, &color, &special, 0, 0, 0);
+    force = (ch != ' ' || color != NO_COLOR || (special & ~MG_UNEXPL) != 0);
+
+    for (x = start; x <= stop; x++) {
+        glyph = g.gbuf[y][x].glyph;
+        if (force || glyph != GLYPH_UNEXPLORED)
+            print_glyph(WIN_MAP, x, y, glyph, get_bk_glyph(x, y));
+    }
 }
 
 void
 cls()
 {
     static boolean in_cls = 0;
-    int y, x, force_unexplored;
 
     if (in_cls)
         return;
@@ -1652,16 +1666,7 @@ cls()
     g.context.botlx = 1;                    /* force update of botl window */
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
-    clear_glyph_buffer(); /* this is sort of an extra effort, but OK */
-    force_unexplored = (g.showsyms[SYM_UNEXPLORED + SYM_OFF_X] != ' ');
-    for (y = 0; y < ROWNO; y++) {
-        g.gbuf_start[y] = 1;
-        g.gbuf_stop[y] = COLNO - 1;
-        if (force_unexplored) {
-            for (x = 1; x < COLNO; x++)
-                g.gbuf[y][x].gnew = 1;
-        }
-    }
+    clear_glyph_buffer(); /* force gbuf[][].glyph to unexplored */
     in_cls = FALSE;
 }
 

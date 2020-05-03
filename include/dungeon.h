@@ -6,6 +6,13 @@
 #ifndef DUNGEON_H
 #define DUNGEON_H
 
+typedef struct d_level { /* basic dungeon level element */
+    xchar dnum;          /* dungeon number */
+    xchar dlevel;        /* level number */
+} d_level;
+
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C)
+
 typedef struct d_flags {     /* dungeon/level type flags */
     Bitfield(town, 1);       /* is this a town? (levels only) */
     Bitfield(hellish, 1);    /* is this part of hell? */
@@ -14,11 +21,6 @@ typedef struct d_flags {     /* dungeon/level type flags */
     Bitfield(align, 3);      /* dungeon alignment. */
     Bitfield(unused, 1);     /* etc... */
 } d_flags;
-
-typedef struct d_level { /* basic dungeon level element */
-    xchar dnum;          /* dungeon number */
-    xchar dlevel;        /* level number */
-} d_level;
 
 typedef struct s_level { /* special dungeon level element */
     struct s_level *next;
@@ -57,6 +59,7 @@ typedef struct dungeon {   /* basic dungeon identifier */
     char dname[24];        /* name of the dungeon (eg. "Hell") */
     char proto[15];        /* name of prototype file (eg. "tower") */
     char fill_lvl[15];     /* name of "fill" level protype file */
+    char themerms[15];     /* lua file name containing themed rooms */
     char boneid;           /* character to id dungeon in bones files */
     d_flags flags;         /* dungeon flags */
     xchar entry_lev;       /* entry level */
@@ -64,6 +67,7 @@ typedef struct dungeon {   /* basic dungeon identifier */
     xchar dunlev_ureached; /* how deep you have been in this dungeon */
     int ledger_start,      /* the starting depth in "real" terms */
         depth_start;       /* the starting depth in "logical" terms */
+    lua_State *themelua;   /* themerms compiled lua */
 } dungeon;
 
 /*
@@ -261,5 +265,7 @@ typedef struct mapseen {
     /* dead heroes; might not have graves or ghosts */
     struct cemetery *final_resting_place; /* same as level.bonesinfo */
 } mapseen;
+
+#endif /* !MAKEDEFS_C && !MDLIB_C */
 
 #endif /* DUNGEON_H */

@@ -31,8 +31,9 @@
 
 #include "xwindowp.h"
 
-#include "config.h"
-#include "lint.h"
+#include "config.h" /* #define for const for non __STDC__ compilers */
+#include "lint.h"   /* for nethack's nhStr() macro */
+#include "winX.h"   /* to make sure protoypes match corresponding functions */
 
 static XtResource resources[] = {
 #define offset(field) XtOffset(WindowWidget, window.field)

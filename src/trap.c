@@ -4035,7 +4035,8 @@ struct trap *ttmp;
     if (!Punished
         || drag_ball(x, y, &bc, &bx, &by, &cx, &cy, &unused, TRUE)) {
         u.ux0 = u.ux, u.uy0 = u.uy;
-        u.ux = x, u.uy = y;
+        /* set u.ux,u.uy and u.usteed->mx,my plus handle CLIPPING */
+        u_on_newpos(x, y);
         u.umoved = TRUE;
         newsym(u.ux0, u.uy0);
         vision_recalc(1);

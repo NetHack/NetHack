@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1586122255 2020/04/05 21:30:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.413 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1587317999 2020/04/19 17:39:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.418 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -376,7 +376,7 @@ boolean doc;
 int
 doextlist(VOID_ARGS)
 {
-    register const struct ext_func_tab *efp;
+    register const struct ext_func_tab *efp = (struct ext_func_tab *) 0;
     char buf[BUFSZ], searchbuf[BUFSZ], promptbuf[QBUFSZ];
     winid menuwin;
     anything any;
@@ -721,7 +721,7 @@ domonability(VOID_ARGS)
         } else
             There("is no fountain here.");
     } else if (is_unicorn(g.youmonst.data)) {
-        use_unicorn_horn((struct obj *) 0);
+        use_unicorn_horn((struct obj **) 0);
         return 1;
     } else if (g.youmonst.data->msound == MS_SHRIEK) {
         You("shriek.");
@@ -2295,12 +2295,9 @@ struct obj *otmp;
             sz += (int) strlen(ONAME(otmp)) + 1;
         if (OMONST(otmp))
             sz += size_monst(OMONST(otmp), FALSE);
-        if (OMID(otmp))
-            sz += (int) sizeof (unsigned);
-        if (OLONG(otmp))
-            sz += (int) sizeof (long);
         if (OMAILCMD(otmp))
             sz += (int) strlen(OMAILCMD(otmp)) + 1;
+        /* sz += (int) sizeof (unsigned); -- now part of oextra itself */
     }
     return sz;
 }

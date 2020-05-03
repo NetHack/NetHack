@@ -310,8 +310,11 @@ NhRegion *reg;
                 continue;
             if (MON_AT(i, j) && inside_region(reg, i, j))
                 add_mon_to_reg(reg, g.level.monsters[i][j]);
-            if (reg->visible && cansee(i, j))
-                newsym(i, j);
+            if (reg->visible) {
+                /*block_point(i, j);*/
+                if (cansee(i, j))
+                    newsym(i, j);
+            }
         }
     /* Check for player now... */
     if (inside_region(reg, u.ux, u.uy))
@@ -345,8 +348,12 @@ NhRegion *reg;
     if (reg->visible)
         for (x = reg->bounding_box.lx; x <= reg->bounding_box.hx; x++)
             for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++)
-                if (isok(x, y) && inside_region(reg, x, y) && cansee(x, y))
-                    newsym(x, y);
+                if (isok(x, y) && inside_region(reg, x, y)) {
+                    /*if (!sobj_at(BOULDER, x, y))
+                          unblock_point(x, y);*/
+                    if (cansee(x, y))
+                        newsym(x, y);
+                }
 
     free_region(reg);
 }
@@ -532,7 +539,8 @@ update_player_regions()
     register int i;
 
     for (i = 0; i < g.n_regions; i++)
-        if (!g.regions[i]->attach_2_u && inside_region(g.regions[i], u.ux, u.uy))
+        if (!g.regions[i]->attach_2_u
+            && inside_region(g.regions[i], u.ux, u.uy))
             set_hero_inside(g.regions[i]);
         else
             clear_hero_inside(g.regions[i]);
@@ -996,23 +1004,25 @@ genericptr_t p2 UNUSED;
     return TRUE; /* OK, it's gone, you can free it! */
 }
 
+/* returns True if p2 is killed by region p1, False otherwise */
 boolean
 inside_gas_cloud(p1, p2)
 genericptr_t p1;
 genericptr_t p2;
 {
-    NhRegion *reg;
-    struct monst *mtmp;
-    int dam;
+    NhRegion *reg = (NhRegion *) p1;
+    struct monst *mtmp = (struct monst *) p2;
+    int dam = reg->arg.a_int;
 
     /*
      * Gas clouds can't be targetted at water locations, but they can
      * start next to water and spread over it.
      */
 
-    reg = (NhRegion *) p1;
-    dam = reg->arg.a_int;
-    if (p2 == (genericptr_t) 0) { /* This means *YOU* Bozo! */
+    if (dam < 1)
+        return FALSE; /* if no damage then there's nothing to do here... */
+
+    if (!mtmp) { /* hero is indicated by Null rather than by &youmonst */
         if (m_poisongas_ok(&g.youmonst) == M_POISONGAS_OK)
             return FALSE;
         if (!Blind) {

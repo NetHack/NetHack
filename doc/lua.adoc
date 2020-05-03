@@ -413,6 +413,51 @@ Example:
  des.non_passwall(selection);
  des.non_passwall();
 
+=== object
+
+Create an object. The table parameter accepts the following:
+
+[options="header"]
+|===
+| key         | type     | description
+| id          | string   | Specific object type name
+| class       | string   | Single character, object class
+| spe         | int      | obj-struct spe-field value. See table below. Also accepts "random".
+| buc         | string   | one of "random", "blessed", "uncursed", "cursed",
+                           "not-cursed", "not-uncursed", "not-blessed".
+                           Default is "random"
+| name        | string   | Object name
+| quantity    | int      | Number of items in this stack. Also accepts "random".
+| buried      | boolean  | Is the object buried?
+| lit         | boolean  | Is the object lit?
+| eroded      | int      | Object erosion
+| locked      | boolean  | Is the object locked?
+| trapped     | boolean  | Is the object trapped?
+| recharged   | boolean  | Is the object recharged?
+| greased     | boolean  | Is the object greased?
+| broken      | boolean  | Is the object broken?
+| achievement | boolean  | Is there an achievement attached to the object?
+| x, y        | int      | Coordinates on the level
+| coord       | table    | x,y coordinates in table format
+| montype     | string   | Monster id or class
+| historic    | boolean  | Is statue historic?
+| male        | boolean  | Is statue male?
+| female      | boolean  | Is statue female?
+| laid_by_you | boolean  | Is an egg laid by you?
+| contents    | function | Container contents
+|===
+
+Example:
+
+ des.object();
+ des.object("/");
+ des.object("sack");
+ des.object("scimitar", 6, 7);
+ des.object("scimitar", {6, 7});
+ des.object({ class = "%" });
+ des.object({ id = "boulder", x = 03, y = 12});
+ des.object({ id = "chest", coord = {03, 12}, locked = true, contents = function() des.object("rock"); end });
+
 === random_corridors
 
 Create random corridors between rooms.

@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1583073990 2020/03/01 14:46:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.294 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1588189423 2020/04/29 19:43:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.297 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1071,7 +1071,7 @@ const char *drop_fmt, *drop_arg, *hold_msg;
     if (drop_fmt)
         pline(drop_fmt, drop_arg);
     obj->nomerge = 0;
-    if (can_reach_floor(TRUE)) {
+    if (can_reach_floor(TRUE) || u.uswallow) {
         dropx(obj);
     } else {
         freeinv(obj);
@@ -3414,9 +3414,9 @@ char *buf;
 /* look at what is here; if there are many objects (pile_limit or more),
    don't show them unless obj_cnt is 0 */
 int
-look_here(obj_cnt, picked_some)
+look_here(obj_cnt, lookhere_flags)
 int obj_cnt; /* obj_cnt > 0 implies that autopickup is in progress */
-boolean picked_some;
+unsigned lookhere_flags;
 {
     struct obj *otmp;
     struct trap *trap;
@@ -3424,12 +3424,15 @@ boolean picked_some;
     const char *dfeature = (char *) 0;
     char fbuf[BUFSZ], fbuf2[BUFSZ];
     winid tmpwin;
-    boolean skip_objects, felt_cockatrice = FALSE;
+    boolean skip_objects, felt_cockatrice = FALSE,
+            picked_some = (lookhere_flags & LOOKHERE_PICKED_SOME) != 0,
+            /* skip 'dfeature' if caller used describe_decor() to show it */
+            skip_dfeature = (lookhere_flags & LOOKHERE_SKIP_DFEATURE) != 0;
 
     /* default pile_limit is 5; a value of 0 means "never skip"
        (and 1 effectively forces "always skip") */
     skip_objects = (flags.pile_limit > 0 && obj_cnt >= flags.pile_limit);
-    if (u.uswallow && u.ustuck) {
+    if (u.uswallow) {
         struct monst *mtmp = u.ustuck;
 
         /*
@@ -3502,12 +3505,12 @@ boolean picked_some;
         }
     }
 
-    if (dfeature)
+    if (dfeature && !skip_dfeature)
         Sprintf(fbuf, "There is %s here.", an(dfeature));
 
     if (!otmp || is_lava(u.ux, u.uy)
         || (is_pool(u.ux, u.uy) && !Underwater)) {
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (!skip_objects && (Blind || !dfeature))
@@ -3517,7 +3520,7 @@ boolean picked_some;
     /* we know there is something here */
 
     if (skip_objects) {
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
@@ -3547,7 +3550,7 @@ boolean picked_some;
             }
     } else if (!otmp->nexthere) {
         /* only one object */
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         You("%s here %s.", verb, doname_with_price(otmp));
@@ -3559,7 +3562,7 @@ boolean picked_some;
 
         display_nhwindow(WIN_MESSAGE, FALSE);
         tmpwin = create_nhwindow(NHW_MENU);
-        if (dfeature) {
+        if (dfeature && !skip_dfeature) {
             putstr(tmpwin, 0, fbuf);
             putstr(tmpwin, 0, "");
         }
@@ -3718,6 +3721,11 @@ register struct obj *otmp, *obj;
     if (obj->unpaid && !same_price(obj, otmp))
         return FALSE;
 
+    /* some additional information is always incompatible */
+    if (has_omonst(obj) || has_omid(obj)
+        || has_omonst(otmp) || has_omid(otmp))
+        return FALSE;
+
     /* if they have names, make sure they're the same */
     objnamelth = strlen(safe_oname(obj));
     otmpnamelth = strlen(safe_oname(otmp));
@@ -3727,11 +3735,12 @@ register struct obj *otmp, *obj;
             && strncmp(ONAME(obj), ONAME(otmp), objnamelth)))
         return FALSE;
 
-    /* for the moment, any additional information is incompatible */
-    if (has_omonst(obj) || has_omid(obj) || has_olong(obj) || has_omonst(otmp)
-        || has_omid(otmp) || has_olong(otmp))
+    /* if one has an attached mail command, other must have same command */
+    if (!has_omailcmd(obj) ? has_omailcmd(otmp)
+        : (!has_omailcmd(otmp) || strcmp(OMAILCMD(obj), OMAILCMD(otmp)) != 0))
         return FALSE;
 
+    /* should be moot since matching artifacts wouldn't be unique */
     if (obj->oartifact != otmp->oartifact)
         return FALSE;
 

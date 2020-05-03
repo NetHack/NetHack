@@ -557,6 +557,7 @@ int dieroll;
             char magr_name[BUFSZ];
 
             Strcpy(magr_name, Monnam(magr));
+            buf[0] = '\0';
             switch (mattk->aatyp) {
             case AT_BITE:
                 Sprintf(buf, "%s bites", magr_name);
@@ -580,9 +581,12 @@ int dieroll;
                 }
                 /*FALLTHRU*/
             default:
-                Sprintf(buf, "%s hits", magr_name);
+                if (!weaponhit || !mwep || !mwep->oartifact)
+                    Sprintf(buf, "%s hits", magr_name);
+                break;
             }
-            pline("%s %s.", buf, mon_nam_too(mdef, magr));
+            if (*buf)
+                pline("%s %s.", buf, mon_nam_too(mdef, magr));
 
             if (mon_hates_silver(mdef) && silverhit) {
                 char *mdef_name = mon_nam_too(mdef, magr);
@@ -967,8 +971,20 @@ int dieroll;
             if (tmp < 1) /* is this necessary?  mhitu.c has it... */
                 tmp = 1;
             if (mwep->oartifact) {
-                (void) artifact_hit(magr, mdef, mwep, &tmp, dieroll);
-                if (DEADMONSTER(mdef))
+                /* when magr's weapon is an artifact, caller suppressed its
+                   usual 'hit' message in case artifact_hit() delivers one;
+                   now we'll know and might need to deliver skipped message
+                   (note: if there's no message there'll be no auxilliary
+                   damage so the message here isn't coming too late) */
+                if (!artifact_hit(magr, mdef, mwep, &tmp, dieroll)) {
+                    if (g.vis)
+                        pline("%s hits %s.", Monnam(magr),
+                              mon_nam_too(mdef, magr));
+                }
+                /* artifact_hit updates 'tmp' but doesn't inflict any
+                   damage; however, it might cause carried items to be
+                   destroyed and they might do so */
+               if (DEADMONSTER(mdef))
                     return (MM_DEF_DIED
                             | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
             }

@@ -996,6 +996,7 @@ const char *s;
     if (*protofile) {
         check_ransacked(protofile);
         Strcat(protofile, LEV_EXT);
+        g.in_mk_themerooms = FALSE;
         if (load_special(protofile)) {
             /* some levels can end up with monsters
                on dead mon list, including light source monsters */

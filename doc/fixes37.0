@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.179 $ $NHDT-Date: 1586807928 2020/04/13 19:58:48 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ $NHDT-Date: 1588189422 2020/04/29 19:43:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -134,6 +134,46 @@ male hero poly'd into nymph chooses charm vs seduce message based on being
 	using hardcoded pronouns She,her for target monster--wrong for male
 	target and noticable if "<mon> finishes taking off his suit" is given
 hostile monsters with launcher and ammo try to stay away from melee range
+allow displacing peaceful creatures
+unicorn horns don't restore attribute loss anymore
+when a shop is changed from food to health food, change room type to match
+wish parsing of things containing monster names would accept all supported
+	alternate spellings if they occurred at the end ("corpse of mumakil")
+	but only some when they occurred elsewhere ("gray-elf corpse" worked,
+	"mumakil corpse" yielded "does not exist") depending upon name length
+couldn't wish for werecreature corpse or tin because monster name lookup
+	always matched the beast form which is flagged no-corpse; switch to
+	human form for "were<creature>"
+wishing for werecreature figurine always made one that created the monster in
+	beast form if activated; allow "human were<creature>" to explicitly
+	specify werecreature's human form (for corpses and tins as well as
+	figurines); override the restriction against human figurines for that
+wishing for "royal jelly" yielded "lump of royal jelly" as a special case, but
+	other 'of' items such as "clove of garlic", "sprig of wolfsbane", or
+	"piece of cloth" didn't allow using their post-of words as shorthand
+monster or object detection found semi-dead vault guard at <0,0> while
+	traversing fmon list; monster detection gave misleading feedback
+	(blank map instead of 'strange feeling') if there were no other
+	monsters on level; likewise object detection and guard's minvent
+squadprob[] in mkroom.c was defined with 5 elements but initialized only 4
+	resulting in giant ants sometimes
+allow nurses heal attack when wielding a non-weapon/weaptool
+if riding or levitating, hero could apply bullwhip downward to pull up things
+	from underwater or lava; feedback implied the item was on the surface
+some monster code was checking whether pets or engulfers were eating green
+	slime by checking for green slime corpse instead of glob
+change light radius of stack of candles to square root
+could get redundate "mon hits other-mon" messages when mon wields an artifact
+failed untrap while mounted that moved hero onto the trap would leave steed
+	with stale coordinates, triggering warnings if 'sanity_check' is On
+when hold_another_object() fails while hero is swallowed, drop the item into
+	swallower's inventory instead of onto the floor
+when digging a pit results in it being filled by adjacent pool or lava, any
+	objects at the spot weren't subjected to water or fire damage;
+	also, riding hero's steed wasn't subjected to immersion either
+after "double trouble", cloned Wizard would wait until he had suffered some
+	damage or hero moved into direct view; keep STRAT_WAIT for original
+	Wizard but avoid that for clones
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -162,11 +202,14 @@ data.base lookup of an entry with any blank lines would falsely claim that
 using nhl_error() to report a Lua processing problem would clobber the stack
 level teleporation's "You materialize on a different level!" could be given
 	out of sequence with other arrival messages
-creating Mine Town variant 1 (Orcish Town) sometimes complained about being
-	unable to place lregion type 1 and failed to have any staircase up
+more sequencing: if wielding Sting or similar and level teleporting to a
+	level with different warning effect, the start-glowing or stop-glowing
+	message came before the materialize message on the destination level
 prevent "you materialize on a different level" after "a mysterious force
 	prevents you from descending" if you try to level teleport past the
 	stairs down from the quest home level before being granted access
+creating Mine Town variant 1 (Orcish Town) sometimes complained about being
+	unable to place lregion type 1 and failed to have any staircase up
 set g.context.botl for glove and wielding actions that could start or end
 	bare-handedness in support of condtests[bl_bareh]
 reinstate ranked ordering of the status condition fields
@@ -181,6 +224,18 @@ fix crash in water_damage_chain
 teleport feedback "you materialize at another location" was given too soon
 'mention_decore' was repeatedly reporting "you are back on bottom" when
 	moving around underwater
+revised 'mention_decor' was describing furniture or ice right before look-here
+	described the same thing when stepping onto object(s)
+poison gas clouds located over known but unlit pools were visible as known
+	clouds but steam clouds in that situation were not
+after the wish parsing change, wishing for "<something of monster>" or for
+	"<monster something>" worked as intended but wishing for "<monster>"
+	(where <monster> used the canonical spelling) triggered a crash
+fix new "objects[0] class #1 not in order!" panic if plain 'char' is unsigned
+tty: redraw unexplored locations as S_unexplored rather than <space> after
+	map has been partially overwritten by popup menu or text display
+tty: previous change resulted in remnants of previous level being shown on
+	new level after level change when S_unexplored is <space>
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
@@ -263,6 +318,10 @@ wizard mode #wizborn command
 include more skill information in ^X output when dual-wielding
 item-using monsters will zap wand of undead turning at corpse-wielding hero
 	when the corpse is harmful
+boiling a pool or fountain now creates a temporary cloud of steam
+random themed rooms in the dungeons of doom
+extended achievement and conduct fields for xlogfile
+record amount of gold in hero's possession in xlogfile
 
 
 Platform- and/or Interface-Specific New Features
@@ -329,3 +388,8 @@ options overhaul: moved the option definitions into include/optlist.h;
 	for retrieving the option value, and for processing the option
 	following its selection in the 'O' menu, added doc/options.doc file.
 function reglyph_darkroom() relocated from options.c to display.c
+resurrect 'makedefs -m' to be able to derive default mons[].diffculty values
+	suitable for assigning to new or changed monsters
+convert obj->oextra->omid from pointer to scalar
+get rid of unused obj->oextra->olong
+

@@ -69,7 +69,7 @@ des.room({ type = "ordinary", lit=1, x=3,y=3,
                          end
               })
 
-              des.room({ type = "food shop", chance=90, lit=1, x=11, y=11, w=3, h=2,
+              des.room({ type = monkfoodshop(), chance=90, lit=1, x=11, y=11, w=3, h=2,
                          contents = function()
                             des.door({ state = "closed", wall="east" })
                          end

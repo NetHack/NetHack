@@ -40,6 +40,12 @@ local wishtest_objects = {
    ["bear trap"] = { otyp_name = "beartrap", oclass = "(" },
    ["landmine"] = { otyp_name = "land mine", oclass = "(" },
    ["land mine"] = { otyp_name = "land mine", oclass = "(" },
+   ["sprig of wolfsbane"] = { otyp_name = "sprig of wolfsbane", oclass = "%" },
+   ["wolfsbane"] = { otyp_name = "sprig of wolfsbane", oclass = "%" },
+   ["clove of garlic"] = { otyp_name = "clove of garlic", oclass = "%" },
+   ["garlic"] = { otyp_name = "clove of garlic", oclass = "%" },
+   ["lump of royal jelly"] = { otyp_name = "lump of royal jelly", oclass = "%" },
+   ["royal jelly"] = { otyp_name = "lump of royal jelly", oclass = "%" },
    ["blessed historic statue of woodland-elf named Foo"] = { otyp_name = "statue", blessed = 1, historic = 1, corpsenm_name = "Woodland-elf", oname = "Foo" },
    ["blessed figurine of a ki-rin"] = { otyp_name = "figurine", blessed = 1, corpsenm_name = "ki-rin" },
    ["partly eaten orange"] = { otyp_name = "orange", oclass = "%", oeaten = function ()

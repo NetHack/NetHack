@@ -9,6 +9,13 @@
 #ifndef WINX_H
 #define WINX_H
 
+#ifndef COLOR_H
+#include "color.h"      /* CLR_MAX */
+#endif
+#ifndef WINTYPE_H
+#include "wintype.h"    /* winid */
+#endif
+
 #ifndef E
 #define E extern
 #endif
@@ -300,9 +307,12 @@ extern struct window_procs X11_procs;
                   window, __FILE__, __LINE__);                  \
     } while (0)
 
+/* ### Window.c ### */
+E Font FDECL(WindowFont, (Widget));
+E XFontStruct *FDECL(WindowFontStruct, (Widget));
+
 /* ### dialogs.c ### */
-E Widget
-FDECL(CreateDialog, (Widget, String, XtCallbackProc, XtCallbackProc));
+E Widget FDECL(CreateDialog, (Widget, String, XtCallbackProc, XtCallbackProc));
 E void FDECL(SetDialogPrompt, (Widget, String));
 E String FDECL(GetDialogResponse, (Widget));
 E void FDECL(SetDialogResponse, (Widget, String, unsigned));
@@ -314,6 +324,10 @@ E XColor FDECL(get_nhcolor, (struct xwindow *, int));
 E void FDECL(init_menu_nhcolors, (struct xwindow *));
 E void FDECL(load_boldfont, (struct xwindow *, Widget));
 E Boolean FDECL(nhApproxColor, (Screen *, Colormap, char *, XColor *));
+E Boolean FDECL(nhCvtStringToPixel, (Display *, XrmValuePtr, Cardinal *,
+                                     XrmValuePtr, XrmValuePtr, XtPointer *));
+E void FDECL(get_window_frame_extents, (Widget,
+                                        long *, long *, long *, long *));
 E void FDECL(get_widget_window_geometry, (Widget, int *, int *, int *, int *));
 E char *FDECL(fontname_boldify, (const char *));
 E Dimension FDECL(nhFontHeight, (Widget));
@@ -352,6 +366,8 @@ E void FDECL(create_menu_window, (struct xwindow *));
 E void FDECL(destroy_menu_window, (struct xwindow *));
 
 /* ### winmisc.c ### */
+E XtPointer FDECL(i2xtp, (int));
+E int FDECL(xtp2i, (XtPointer));
 E void FDECL(ps_key, (Widget, XEvent *, String *,
                       Cardinal *)); /* player selection action */
 E void FDECL(race_key, (Widget, XEvent *, String *,

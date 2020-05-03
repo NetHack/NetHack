@@ -69,7 +69,7 @@ pfx_##a,
  al, z, #a, Off, h, 0 },
 #endif
 
-/* B:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, boolptr */
+/* B:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, bool_p */
 /* C:nm, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc */
 /* P:pfx, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc*/
 
@@ -88,7 +88,7 @@ pfx_##a,
                &sysflags.altmeta)
 #else
 #ifdef ALTMETA
-    NHOPTB(altmeta, 0, opt_out, set_in_config, Off, No, No, No, NoAlias,
+    NHOPTB(altmeta, 0, opt_out, set_in_game, Off, No, No, No, NoAlias,
                &iflags.altmeta)
 #else
     NHOPTB(altmeta, 0, opt_out, set_in_config, Off, No, No, No, NoAlias,
@@ -248,11 +248,9 @@ pfx_##a,
                 &flags.lit_corridor)
     NHOPTB(lootabc, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.lootabc)
-#ifdef BACKWARD_COMPAT
-#ifdef MAC_GRAPHICS_ENV
+#if defined(BACKWARD_COMPAT) && defined(MAC_GRAPHICS_ENV)
     NHOPTC(Macgraphics, 70, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "load MACGraphics display symbols")
-#endif
 #endif
     NHOPTB(mail, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.biff)
@@ -281,7 +279,7 @@ pfx_##a,
     NHOPTB(menu_objsyms, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.menu_head_objsym)
 #ifdef TTY_GRAPHICS
-    NHOPTB(menu_overlay, 0, opt_in, set_in_game, On, No, No, No, NoAlias,
+    NHOPTB(menu_overlay, 0, opt_in, set_in_game, On, Yes, No, No, NoAlias,
                 &iflags.menu_overlay)
 #else
     NHOPTB(menu_overlay, 0, opt_in, set_in_config, Off, No, No, No, NoAlias,

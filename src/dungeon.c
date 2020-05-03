@@ -210,6 +210,9 @@ NHFILE *nhfp;
     }
     last = g.branches = (branch *) 0;
 
+    for (i = 0; i < g.n_dgns; i++)
+        g.dungeons[i].themelua = (lua_State *) 0;
+
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
 
@@ -842,6 +845,7 @@ init_dungeons()
     i = 0;
     while (lua_next(L, tidx) != 0) {
         char *dgn_name, *dgn_bonetag, *dgn_protoname, *dgn_fill;
+        char *dgn_themerms;
         int dgn_base, dgn_range, dgn_align, dgn_entry, dgn_chance, dgn_flags;
 
         if (!lua_istable(L, -1))
@@ -858,6 +862,7 @@ init_dungeons()
         dgn_chance = get_table_int_opt(L, "chance", 100);
         dgn_flags = get_dgn_flags(L);
         dgn_fill = get_table_str_opt(L, "lvlfill", emptystr);
+        dgn_themerms = get_table_str_opt(L, "themerooms", emptystr);
 
         debugpline4("DUNGEON[%i]: %s, base=(%i,%i)",
                     i, dgn_name, dgn_base, dgn_range);
@@ -870,6 +875,7 @@ init_dungeons()
             free((genericptr_t) dgn_bonetag);
             free((genericptr_t) dgn_protoname);
             free((genericptr_t) dgn_fill);
+            free((genericptr_t) dgn_themerms);
             continue;
         }
 
@@ -1023,10 +1029,13 @@ init_dungeons()
         Strcpy(g.dungeons[i].fill_lvl, dgn_fill); /* FIXME: fill_lvl len */
         Strcpy(g.dungeons[i].dname, dgn_name); /* FIXME: dname length */
         Strcpy(g.dungeons[i].proto, dgn_protoname); /* FIXME: proto length */
+        Strcpy(g.dungeons[i].themerms, dgn_themerms); /* FIXME: length */
+        g.dungeons[i].themelua = (lua_State *) 0;
         g.dungeons[i].boneid = *dgn_bonetag ? *dgn_bonetag : 0;
         free((genericptr) dgn_fill);
         /* free((genericptr) dgn_protoname); -- stored in pd.tmpdungeon[] */
         free((genericptr) dgn_bonetag);
+        free((genericptr) dgn_themerms);
 
         if (dgn_range)
             g.dungeons[i].num_dunlevs = (xchar) rn1(dgn_range, dgn_base);

@@ -108,8 +108,8 @@ boolean domaterial;
 void
 init_objects()
 {
-    register int i, first, last, sum;
-    register char oclass;
+    int i, first, last, sum, prevoclass;
+    char oclass;
 #ifdef TEXTCOLOR
 #define COPY_OBJ_DESCR(o_dst, o_src) \
     o_dst.oc_descr_idx = o_src.oc_descr_idx, o_dst.oc_color = o_src.oc_color
@@ -120,7 +120,7 @@ init_objects()
     /* bug fix to prevent "initialization error" abort on Intel Xenix.
      * reported by mikew@semike
      */
-    for (i = 0; i < MAXOCLASSES; i++)
+    for (i = 0; i <= MAXOCLASSES; i++)
         g.bases[i] = 0;
     /* initialize object descriptions */
     for (i = 0; i < NUM_OBJECTS; i++)
@@ -128,8 +128,19 @@ init_objects()
     /* init base; if probs given check that they add up to 1000,
        otherwise compute probs */
     first = 0;
+    prevoclass = -1;
     while (first < NUM_OBJECTS) {
         oclass = objects[first].oc_class;
+        /*
+         * objects[] sanity check:  must be in ascending oc_class order to
+         * be able to use bases[class+1]-1 for the end of a class's range.
+         * Also catches a non-contiguous class because reverting to any
+         * earlier class would involve switching back to a lower class
+         * number after having moved on to one or more other classes.
+         */
+        if ((int) oclass < prevoclass)
+            panic("objects[%d] class #%d not in order!", first, oclass);
+
         last = first + 1;
         while (last < NUM_OBJECTS && objects[last].oc_class == oclass)
             last++;
@@ -170,7 +181,18 @@ init_objects()
         if (sum != 1000)
             error("init-prob error for class %d (%d%%)", oclass, sum);
         first = last;
+        prevoclass = (int) oclass;
     }
+    /* extra entry allows deriving the range of a class via
+       bases[class] through bases[class+1]-1 for all classes */
+    g.bases[MAXOCLASSES] = NUM_OBJECTS;
+    /* hypothetically someone might remove all objects of some class,
+       or be adding a new class and not populated it yet, leaving gaps
+       in bases[]; guarantee that there are no such gaps */
+    for (last = MAXOCLASSES - 1; last >= 0; --last)
+        if (!g.bases[last])
+            g.bases[last] = g.bases[last + 1];
+
     /* shuffle descriptions */
     shuffle_all();
 #ifdef USE_TILES
@@ -221,9 +243,7 @@ int *lo_p, *hi_p; /* output: range that item belongs among */
     case VENOM_CLASS:
         /* entire class */
         *lo_p = g.bases[ocls];
-        for (i = *lo_p; objects[i].oc_class == ocls; i++)
-            continue;
-        *hi_p = i - 1;
+        *hi_p = g.bases[ocls + 1] - 1;
         break;
     }
 

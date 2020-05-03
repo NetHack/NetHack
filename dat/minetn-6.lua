@@ -39,7 +39,7 @@ des.region(selection.area(13,5,14,6),"unlit")
 des.region({ region={09,07, 11,09}, lit=1, type="candle shop", prefilled=0 })
 des.region({ region={16,04, 18,06}, lit=1, type="tool shop", prefilled=0 })
 des.region({ region={23,01, 25,03}, lit=1, type="shop", prefilled=0 })
-des.region({ region={22,12, 24,13}, lit=1, type="food shop", prefilled=0 })
+des.region({ region={22,12, 24,13}, lit=1, type=monkfoodshop(), prefilled=0 })
 des.region({ region={31,12, 36,14}, lit=1, type="temple", prefilled=0 })
 des.altar({ x=35,y=13,align=align[1],type="shrine"})
 

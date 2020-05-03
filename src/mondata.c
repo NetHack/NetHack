@@ -678,10 +678,23 @@ struct alt_spl {
     short pm_val;
 };
 
-/* figure out what type of monster a user-supplied string is specifying */
+/* figure out what type of monster a user-supplied string is specifying;
+   ingore anything past the monster name */
 int
 name_to_mon(in_str)
 const char *in_str;
+{
+    return name_to_monplus(in_str, (const char **) 0);
+}
+
+/* figure out what type of monster a user-supplied string is specifying;
+   return a pointer to whatever is past the monster name--necessary if
+   caller wants to strip off the name and it matches one of the alternate
+   names rather the canonical mons[].mname */
+int
+name_to_monplus(in_str, remainder_p)
+const char *in_str;
+const char **remainder_p;
 {
     /* Be careful.  We must check the entire string in case it was
      * something such as "ettin zombie corpse".  The calling routine
@@ -700,6 +713,9 @@ const char *in_str;
     register char *s, *str, *term;
     char buf[BUFSZ];
     int len, slen;
+
+    if (remainder_p)
+        *remainder_p = (const char *) 0;
 
     str = strcpy(buf, in_str);
 
@@ -754,6 +770,15 @@ const char *in_str;
             { "woodland nymph", PM_WOOD_NYMPH },
             { "halfling", PM_HOBBIT },    /* potential guess for polyself */
             { "genie", PM_DJINNI }, /* potential guess for ^G/#wizgenesis */
+            /* prefix used to workaround duplicate monster names for
+               monsters with alternate forms */
+            { "human wererat", PM_HUMAN_WERERAT },
+            { "human werejackal", PM_HUMAN_WEREJACKAL },
+            { "human werewolf", PM_HUMAN_WEREWOLF },
+            /* for completeness */
+            { "rat wererat", PM_WERERAT },
+            { "jackal werejackal", PM_WEREJACKAL },
+            { "wolf werewolf", PM_WEREWOLF },
             /* Hyphenated names -- it would be nice to handle these via
                fuzzymatch() but it isn't able to ignore trailing stuff */
             { "ki rin", PM_KI_RIN },
@@ -767,6 +792,7 @@ const char *in_str;
             { "elf lord", PM_ELF_LORD },
             { "olog hai", PM_OLOG_HAI },
             { "arch lich", PM_ARCH_LICH },
+            { "archlich", PM_ARCH_LICH },
             /* Some irregular plurals */
             { "incubi", PM_INCUBUS },
             { "succubi", PM_SUCCUBUS },
@@ -785,9 +811,16 @@ const char *in_str;
         };
         register const struct alt_spl *namep;
 
-        for (namep = names; namep->name; namep++)
-            if (!strncmpi(str, namep->name, (int) strlen(namep->name)))
+        for (namep = names; namep->name; namep++) {
+            len = (int) strlen(namep->name);
+            if (!strncmpi(str, namep->name, len)
+                /* force full word (which could conceivably be possessive) */
+                && (!str[len] || str[len] == ' ' || str[len] == '\'')) {
+                if (remainder_p)
+                    *remainder_p = in_str + (&str[len] - buf);
                 return namep->pm_val;
+            }
+        }
     }
 
     for (len = 0, i = LOW_PM; i < NUMMONS; i++) {
@@ -796,6 +829,7 @@ const char *in_str;
         if (m_i_len > len && !strncmpi(mons[i].mname, str, m_i_len)) {
             if (m_i_len == slen) {
                 mntmp = i;
+                len = m_i_len;
                 break; /* exact match */
             } else if (slen > m_i_len
                        && (str[m_i_len] == ' '
@@ -813,7 +847,9 @@ const char *in_str;
         }
     }
     if (mntmp == NON_PM)
-        mntmp = title_to_mon(str, (int *) 0, (int *) 0);
+        mntmp = title_to_mon(str, (int *) 0, &len);
+    if (len && remainder_p)
+        *remainder_p = in_str + (&str[len] - buf);
     return mntmp;
 }
 

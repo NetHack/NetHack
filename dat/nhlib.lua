@@ -41,3 +41,10 @@ end
 function percent(threshold)
    return math.random(0, 99) < threshold
 end
+
+function monkfoodshop()
+   if (u.role == "Monk") then
+      return "health food shop";
+   end
+   return "food shop";
+end

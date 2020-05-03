@@ -91,6 +91,21 @@ static const char popup_entry_translations[] = "#override\n\
      <Btn4Down>: scroll(8)\n\
      <Btn5Down>: scroll(2)";
 
+static void NDECL(plsel_dialog_acceptvalues);
+static void FDECL(plsel_set_play_button, (BOOLEAN_P));
+static void FDECL(plsel_set_sensitivities, (BOOLEAN_P));
+static void NDECL(X11_player_selection_randomize);
+static void NDECL(X11_player_selection_setupOthers);
+static void FDECL(racetoggleCallback, (Widget, XtPointer, XtPointer));
+static void FDECL(roletoggleCallback, (Widget, XtPointer, XtPointer));
+static void FDECL(gendertoggleCallback, (Widget, XtPointer, XtPointer));
+static void FDECL(aligntoggleCallback, (Widget, XtPointer, XtPointer));
+static void FDECL(plsel_random_btn_callback, (Widget, XtPointer, XtPointer));
+static void FDECL(plsel_play_btn_callback, (Widget, XtPointer, XtPointer));
+static void FDECL(plsel_quit_btn_callback, (Widget, XtPointer, XtPointer));
+static Widget FDECL(X11_create_player_selection_name, (Widget));
+static void NDECL(X11_player_selection_dialog);
+static void NDECL(X11_player_selection_prompts);
 static void FDECL(ps_quit, (Widget, XtPointer, XtPointer));
 static void FDECL(ps_random, (Widget, XtPointer, XtPointer));
 static void FDECL(ps_select, (Widget, XtPointer, XtPointer));
@@ -105,9 +120,6 @@ static Widget FDECL(make_menu, (const char *, const char *, const char *,
                                 const char *, XtCallbackProc, const char *,
                                 XtCallbackProc, int, const char **,
                                 Widget **, XtCallbackProc, Widget *));
-
-void NDECL(X11_player_selection_setupOthers);
-void NDECL(X11_player_selection_randomize);
 
 /* Bad Hack alert. Using integers instead of XtPointers */
 XtPointer
@@ -348,7 +360,7 @@ Widget plsel_name_input;
 
 Widget plsel_btn_play;
 
-void
+static void
 plsel_dialog_acceptvalues()
 {
     Arg args[2];
@@ -431,7 +443,7 @@ Cardinal *num_params;
 }
 
 /* enable or disable the Play button */
-void
+static void
 plsel_set_play_button(state)
 boolean state;
 {
@@ -441,7 +453,7 @@ boolean state;
     XtSetValues(plsel_btn_play, args, ONE);
 }
 
-void
+static void
 plsel_set_sensitivities(setcurr)
 boolean setcurr;
 {
@@ -495,7 +507,7 @@ boolean setcurr;
     X11_player_selection_setupOthers();
 }
 
-void
+static void
 X11_player_selection_randomize()
 {
     int nrole = plsel_n_roles;
@@ -582,7 +594,7 @@ X11_player_selection_randomize()
     plsel_set_sensitivities(FALSE);
 }
 
-void
+static void
 X11_player_selection_setupOthers()
 {
     Arg args[2];
@@ -789,7 +801,7 @@ XtPointer call;
     exit_x_event = TRUE; /* leave event loop */
 }
 
-Widget
+static Widget
 X11_create_player_selection_name(form)
 Widget form;
 {
@@ -852,7 +864,7 @@ Widget form;
     return name_vp;
 }
 
-void
+static void
 X11_player_selection_dialog()
 {
     Widget popup, popup_vp;
@@ -1277,8 +1289,7 @@ X11_player_selection_dialog()
     }
 }
 
-/* Global functions ======================================================== */
-void
+static void
 X11_player_selection_prompts()
 {
     int num_roles, num_races, num_gends, num_algns, i, availcount, availindex;
@@ -1563,6 +1574,8 @@ X11_player_selection_prompts()
         } /* more than one alignment choice available */
     }
 }
+
+/* Global functions ======================================================== */
 
 void
 X11_player_selection()

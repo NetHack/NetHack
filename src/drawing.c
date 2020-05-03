@@ -269,6 +269,7 @@ def_char_to_objclass(ch)
 char ch;
 {
     int i;
+
     for (i = 1; i < MAXOCLASSES; i++)
         if (ch == def_oc_syms[i].sym)
             break;
@@ -285,10 +286,38 @@ def_char_to_monclass(ch)
 char ch;
 {
     int i;
+
     for (i = 1; i < MAXMCLASSES; i++)
         if (ch == def_monsyms[i].sym)
             break;
     return i;
+}
+
+/* does 'ch' represent a furniture character?  returns index into defsyms[] */
+int
+def_char_is_furniture(ch)
+char ch;
+{
+    /* note: these refer to defsyms[] order which is much different from
+       levl[][].typ order but both keep furniture in a contiguous block */
+    static const char first_furniture[] = "stair", /* "staircase up" */
+                      last_furniture[] = "fountain";
+    int i;
+    boolean furniture = FALSE;
+
+    for (i = 0; i < SIZE(defsyms); ++i) {
+        if (!furniture) {
+            if (!strncmp(defsyms[i].explanation, first_furniture, 5))
+                furniture = TRUE;
+        }
+        if (furniture) {
+            if (defsyms[i].sym == (uchar) ch)
+                return i;
+            if (!strcmp(defsyms[i].explanation, last_furniture))
+                break; /* reached last furniture */
+        }
+    }
+    return -1;
 }
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)

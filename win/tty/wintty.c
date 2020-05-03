@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1580252140 2020/01/28 22:55:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1587110794 2020/04/17 08:06:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1657,8 +1657,7 @@ winid window;
         /*FALLTHRU*/
     case NHW_BASE:
         clear_screen();
-        /*for (i = 0; i < cw->maxrow; ++i)           */
-        /*    finalx[i][NOW] = finalx[i][BEFORE] = 0;*/
+        /* [this should reset state for MESSAGE, MAP, and STATUS] */
         break;
     case NHW_MENU:
     case NHW_TEXT:

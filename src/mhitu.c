@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1583193505 2020/03/02 23:58:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1586913203 2020/04/15 01:13:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.187 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,19 +8,20 @@
 
 static NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 
-static boolean FDECL(u_slip_free, (struct monst *, struct attack *));
-static int FDECL(passiveum, (struct permonst *, struct monst *,
-                                 struct attack *));
-static void FDECL(mayberem, (struct monst *, const char *,
-                                 struct obj *, const char *));
-static boolean FDECL(diseasemu, (struct permonst *));
-static int FDECL(hitmu, (struct monst *, struct attack *));
-static int FDECL(gulpmu, (struct monst *, struct attack *));
-static int FDECL(explmu, (struct monst *, struct attack *, BOOLEAN_P));
+static void FDECL(hitmsg, (struct monst *, struct attack *));
 static void FDECL(missmu, (struct monst *, BOOLEAN_P, struct attack *));
 static void FDECL(mswings, (struct monst *, struct obj *));
 static void FDECL(wildmiss, (struct monst *, struct attack *));
-static void FDECL(hitmsg, (struct monst *, struct attack *));
+static void FDECL(summonmu, (struct monst *, BOOLEAN_P));
+static boolean FDECL(diseasemu, (struct permonst *));
+static boolean FDECL(u_slip_free, (struct monst *, struct attack *));
+static int FDECL(hitmu, (struct monst *, struct attack *));
+static int FDECL(gulpmu, (struct monst *, struct attack *));
+static int FDECL(explmu, (struct monst *, struct attack *, BOOLEAN_P));
+static void FDECL(mayberem, (struct monst *, const char *,
+                                 struct obj *, const char *));
+static int FDECL(passiveum, (struct permonst *, struct monst *,
+                                 struct attack *));
 
 #define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
 
@@ -366,18 +367,22 @@ register struct monst *mtmp;
     struct attack *mattk, alt_attk;
     int i, j = 0, tmp, sum[NATTK];
     struct permonst *mdat = mtmp->data;
-    boolean ranged = (distu(mtmp->mx, mtmp->my) > 3);
-    /* Is it near you?  Affects your actions */
-    boolean range2 = !monnear(mtmp, mtmp->mux, mtmp->muy);
-    /* Does it think it's near you?  Affects its actions */
-    boolean foundyou = (mtmp->mux == u.ux && mtmp->muy == u.uy);
-    /* Is it attacking you or your image? */
-    boolean youseeit = canseemon(mtmp);
-    /* Might be attacking your image around the corner, or
-     * invisible, or you might be blind....
+    /*
+     * ranged: Is it near you?  Affects your actions.
+     * ranged2: Does it think it's near you?  Affects its actions.
+     * foundyou: Is it attacking you or your image?
+     * youseeit: Can you observe the attack?  It might be attacking your
+     *     image around the corner, or invisible, or you might be blind.
+     * skipnonmagc: Are further physical attack attempts useless?  (After
+     *     a wild miss--usually due to attacking displaced image.  Avoids
+     *     excessively verbose miss feedback when monster can do multiple
+     *     attacks and would miss the same wrong spot each time.)
      */
-    boolean skipnonmagc = FALSE;
-    /* Are further physical attack attempts useless? */
+    boolean ranged = (distu(mtmp->mx, mtmp->my) > 3),
+            range2 = !monnear(mtmp, mtmp->mux, mtmp->muy),
+            foundyou = (mtmp->mux == u.ux && mtmp->muy == u.uy),
+            youseeit = canseemon(mtmp),
+            skipnonmagc = FALSE;
 
     if (!ranged)
         nomul(0);
@@ -586,60 +591,16 @@ register struct monst *mtmp;
         newsym(mtmp->mx, mtmp->my);
     }
 
-    /*  Special demon handling code */
-    if ((mtmp->cham == NON_PM) && is_demon(mdat) && !range2
-        && mtmp->data != &mons[PM_BALROG] && mtmp->data != &mons[PM_SUCCUBUS]
-        && mtmp->data != &mons[PM_INCUBUS])
-        if (!mtmp->mcan && !rn2(13))
-            (void) msummon(mtmp);
-
-    /*  Special lycanthrope handling code */
-    if ((mtmp->cham == NON_PM) && is_were(mdat) && !range2) {
-        if (is_human(mdat)) {
-            if (!rn2(5 - (night() * 2)) && !mtmp->mcan)
-                new_were(mtmp);
-        } else if (!rn2(30) && !mtmp->mcan)
-            new_were(mtmp);
-        mdat = mtmp->data;
-
-        if (!rn2(10) && !mtmp->mcan) {
-            int numseen, numhelp;
-            char buf[BUFSZ], genericwere[BUFSZ];
-
-            Strcpy(genericwere, "creature");
-            numhelp = were_summon(mdat, FALSE, &numseen, genericwere);
-            if (youseeit) {
-                pline("%s summons help!", Monnam(mtmp));
-                if (numhelp > 0) {
-                    if (numseen == 0)
-                        You_feel("hemmed in.");
-                } else
-                    pline("But none comes.");
-            } else {
-                const char *from_nowhere;
-
-                if (!Deaf) {
-                    pline("%s %s!", Something, makeplural(growl_sound(mtmp)));
-                    from_nowhere = "";
-                } else
-                    from_nowhere = " from nowhere";
-                if (numhelp > 0) {
-                    if (numseen < 1)
-                        You_feel("hemmed in.");
-                    else {
-                        if (numseen == 1)
-                            Sprintf(buf, "%s appears", an(genericwere));
-                        else
-                            Sprintf(buf, "%s appear",
-                                    makeplural(genericwere));
-                        pline("%s%s!", upstart(buf), from_nowhere);
-                    }
-                } /* else no help came; but you didn't know it tried */
-            }
-        }
+    /* when not cancelled and not in current form due to shapechange, many
+       demons can summon more demons and were creatures can summon critters;
+       also, were creature might change from human to animal or vice versa */
+    if (mtmp->cham == NON_PM && !mtmp->mcan
+        && (is_demon(mdat) || is_were(mdat))) {
+        summonmu(mtmp, youseeit);
+        mdat = mtmp->data; /* update cached value in case of were change */
     }
 
-    if (u.uinvulnerable) {
+    if (u.uinvulnerable) { /* in the midst of successful prayer */
         /* monsters won't attack you */
         if (mtmp == u.ustuck) {
             pline("%s loosens its grip slightly.", Monnam(mtmp));
@@ -816,6 +777,80 @@ register struct monst *mtmp;
     return 0;
 }
 
+/* monster summons help for its fight against hero */
+static void
+summonmu(mtmp, youseeit)
+struct monst *mtmp;
+boolean youseeit;
+{
+    struct permonst *mdat = mtmp->data;
+
+    /*
+     * Extracted from mattacku() to reduce clutter there.
+     * Caller has verified that 'mtmp' hasn't been cancelled
+     * and isn't a shapechanger.
+     */
+
+    if (is_demon(mdat)) {
+        if (mdat != &mons[PM_BALROG]
+            && mdat != &mons[PM_SUCCUBUS] && mdat != &mons[PM_INCUBUS]) {
+            if (!rn2(13))
+                (void) msummon(mtmp);
+        }
+        return; /* no such thing as a demon were creature, so we're done */
+    }
+
+    if (is_were(mdat)) {
+        if (is_human(mdat)) { /* maybe switch to animal form */
+            if (!rn2(5 - (night() * 2)))
+                new_were(mtmp);
+        } else { /* maybe switch to back human form */
+            if (!rn2(30))
+                new_were(mtmp);
+        }
+        mdat = mtmp->data; /* form change invalidates cached value */
+
+        if (!rn2(10)) { /* maybe summon compatible critters */
+            int numseen, numhelp;
+            char buf[BUFSZ], genericwere[BUFSZ];
+
+            Strcpy(genericwere, "creature");
+            numhelp = were_summon(mdat, FALSE, &numseen, genericwere);
+            if (youseeit) {
+                pline("%s summons help!", Monnam(mtmp));
+                if (numhelp > 0) {
+                    if (numseen == 0)
+                        You_feel("hemmed in.");
+                } else {
+                    pline("But none comes.");
+                }
+            } else {
+                const char *from_nowhere;
+
+                if (!Deaf) {
+                    pline("%s %s!", Something, makeplural(growl_sound(mtmp)));
+                    from_nowhere = "";
+                } else {
+                    from_nowhere = " from nowhere";
+                }
+                if (numhelp > 0) {
+                    if (numseen < 1) {
+                        You_feel("hemmed in.");
+                    } else {
+                        if (numseen == 1)
+                            Sprintf(buf, "%s appears", an(genericwere));
+                        else
+                            Sprintf(buf, "%s appear",
+                                    makeplural(genericwere));
+                        pline("%s%s!", upstart(buf), from_nowhere);
+                    }
+                } /* else no help came; but you didn't know it tried */
+            }
+        } /* summon critters */
+        return;
+    } /* were creature */
+}
+
 static boolean
 diseasemu(mdat)
 struct permonst *mdat;
@@ -876,6 +911,7 @@ struct monst *mon;
     long wearmask;
     int armpro, mc = 0;
     boolean is_you = (mon == &g.youmonst),
+            via_amul = FALSE,
             gotprot = is_you ? (EProtection != 0L)
                              /* high priests have innate protection */
                              : (mon->data == &mons[PM_HIGH_PRIEST]);
@@ -886,6 +922,8 @@ struct monst *mon;
             armpro = objects[o->otyp].a_can;
             if (armpro > mc)
                 mc = armpro;
+        } else if ((o->owornmask & W_AMUL) != 0L) {
+            via_amul = TRUE;
         }
         /* if we've already confirmed Protection, skip additional checks */
         if (is_you || gotprot)
@@ -900,9 +938,10 @@ struct monst *mon;
     }
 
     if (gotprot) {
-        /* extrinsic Protection increases mc by 1 */
-        if (mc < 3)
-            mc += 1;
+        /* extrinsic Protection increases mc by 1; 2 for amulet */
+        mc += via_amul ? 2 : 1;
+        if (mc > 3)
+            mc = 3;
     } else if (mc < 1) {
         /* intrinsic Protection is weaker (play balance; obtaining divine
            protection is too easy); it confers minimum mc 1 instead of 0 */
@@ -1473,7 +1512,9 @@ register struct attack *mattk;
             hitmsg(mtmp, mattk);
             break;
         }
-        if (!uwep && !uarmu && !uarm && !uarmc
+        /* weapon check should match the one in sounds.c for MS_NURSE */
+        if (!(uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+            && !uarmu && !uarm && !uarmc
             && !uarms && !uarmg && !uarmf && !uarmh) {
             boolean goaway = FALSE;
 
@@ -2741,6 +2782,7 @@ struct monst *mon;
     return 1;
 }
 
+/* 'mon' tries to remove a piece of hero's armor */
 static void
 mayberem(mon, seducer, obj, str)
 struct monst *mon;

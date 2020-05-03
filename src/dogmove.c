@@ -220,7 +220,7 @@ boolean devour;
     deadmimic = (obj->otyp == CORPSE && (obj->corpsenm == PM_SMALL_MIMIC
                                          || obj->corpsenm == PM_LARGE_MIMIC
                                          || obj->corpsenm == PM_GIANT_MIMIC));
-    slimer = (obj->otyp == CORPSE && obj->corpsenm == PM_GREEN_SLIME);
+    slimer = (obj->otyp == GLOB_OF_GREEN_SLIME);
     poly = polyfodder(obj);
     grow = mlevelgain(obj);
     heal = mhealup(obj);
