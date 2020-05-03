@@ -2,7 +2,7 @@
 /* Copyright (c) Michael Allison, 2018                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#define SAFEPROCS
+/* must #define SAFEPROCS in xxxconf.h or via CFLAGS or this won't compile */
 #include "config.h"
 #include "color.h"
 #include "wintype.h"
