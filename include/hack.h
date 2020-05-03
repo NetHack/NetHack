@@ -416,18 +416,6 @@ typedef struct sortloot_item Loot;
 #define LAUNCH_UNSEEN 0x40 /* hero neither caused nor saw it */
 #define LAUNCH_KNOWN 0x80  /* the hero caused this by explicit action */
 
-/* Macros for explosion types */
-enum explosion_types {
-    EXPL_DARK    = 0,
-    EXPL_NOXIOUS = 1,
-    EXPL_MUDDY   = 2,
-    EXPL_WET     = 3,
-    EXPL_MAGICAL = 4,
-    EXPL_FIERY   = 5,
-    EXPL_FROSTY  = 6,
-    EXPL_MAX     = 7
-};
-
 /* enlightenment control flags */
 #define BASICENLIGHTENMENT 1 /* show mundane stuff */
 #define MAGICENLIGHTENMENT 2 /* show intrinsics and such */

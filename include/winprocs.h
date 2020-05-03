@@ -78,7 +78,8 @@ struct window_procs {
     void NDECL((*win_status_finish));
     void FDECL((*win_status_enablefield),
                (int, const char *, const char *, BOOLEAN_P));
-    void FDECL((*win_status_update), (int, genericptr_t, int, int, int, unsigned long *));
+    void FDECL((*win_status_update), (int, genericptr_t, int, int, int,
+                                      unsigned long *));
     boolean NDECL((*win_can_suspend));
 };
 
@@ -218,15 +219,15 @@ extern
 #define WC2_RESET_STATUS  0x0100L /* 09 call status_update(BL_RESET) to
                                    *    indicate 'draw everything'      */
 #define WC2_TERM_SIZE     0x0200L /* 10 support setting terminal size   */
-#define WC2_STATUSLINES   0x0400L /* 16 switch between 2 or 3 lines of status */
-#define WC2_WINDOWBORDERS 0x0800L /* 11 display borders on nh windows   */
-#define WC2_PETATTR       0x1000L /* 12 attributes for hilite_pet       */
-#define WC2_GUICOLOR      0x2000L /* 13 display colours outside map win */
+#define WC2_STATUSLINES   0x0400L /* 11 switch between 2|3 lines of status */
+#define WC2_WINDOWBORDERS 0x0800L /* 12 display borders on nh windows   */
+#define WC2_PETATTR       0x1000L /* 13 attributes for hilite_pet       */
+#define WC2_GUICOLOR      0x2000L /* 14 display colours outside map win */
 /* pline() can overload the display attributes argument passed to putstr()
    with one or more flags and at most one of bold/blink/inverse/&c */
-#define WC2_URGENT_MESG   0x4000L /* 14 putstr(WIN_MESSAGE) supports urgency
+#define WC2_URGENT_MESG   0x4000L /* 15 putstr(WIN_MESSAGE) supports urgency
                                    *    via non-display attribute flag  */
-#define WC2_SUPPRESS_HIST 0x8000L /* 15 putstr(WIN_MESSAGE) supports history
+#define WC2_SUPPRESS_HIST 0x8000L /* 16 putstr(WIN_MESSAGE) supports history
                                    *    suppression via non-disp attr   */
                                   /* 16 free bits */
 
@@ -378,7 +379,8 @@ struct chain_procs {
     void FDECL((*win_status_finish), (CARGS));
     void FDECL((*win_status_enablefield),
                (CARGS, int, const char *, const char *, BOOLEAN_P));
-    void FDECL((*win_status_update), (CARGS, int, genericptr_t, int, int, int, unsigned long *));
+    void FDECL((*win_status_update), (CARGS, int, genericptr_t, int, int, int,
+                                      unsigned long *));
     boolean FDECL((*win_can_suspend), (CARGS));
 };
 #endif /* WINCHAIN */
@@ -446,9 +448,10 @@ extern char *FDECL(safe_getmsghistory, (BOOLEAN_P));
 extern void FDECL(safe_putmsghistory, (const char *, BOOLEAN_P));
 extern void NDECL(safe_status_init);
 extern void NDECL(safe_status_finish);
-extern void FDECL(safe_status_enablefield,
-                    (int, const char *, const char *, BOOLEAN_P));
-extern void FDECL(safe_status_update, (int, genericptr_t, int, int, int, unsigned long *));
+extern void FDECL(safe_status_enablefield, (int, const char *, const char *,
+                                            BOOLEAN_P));
+extern void FDECL(safe_status_update, (int, genericptr_t, int, int, int,
+                                       unsigned long *));
 extern boolean NDECL(safe_can_suspend);
 extern void FDECL(stdio_raw_print, (const char *));
 extern void FDECL(stdio_nonl_raw_print, (const char *));
@@ -457,4 +460,3 @@ extern void NDECL(stdio_wait_synch);
 extern int NDECL(stdio_nhgetch);
 #endif /* SAFEPROCS */
 #endif /* WINPROCS_H */
-

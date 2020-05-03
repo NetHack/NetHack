@@ -8,7 +8,14 @@
  *      then again with it defined to produce tiletxt.{o,obj}.
  */
 
-#include "hack.h"
+#include "config.h"
+#include "pm.h"
+#include "onames.h"
+#include "permonst.h"
+#include "objclass.h"
+#include "rm.h"
+#include "display.h"
+extern int FDECL(def_char_to_objclass, (CHAR_P));
 
 #define Fprintf (void) fprintf
 
