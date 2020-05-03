@@ -1727,6 +1727,10 @@ register struct attack *mattk;
             }
         }
         break;
+    case AD_POLY:
+        if (uncancelled && Maybe_Half_Phys(dmg) < (Upolyd ? u.mh : u.uhp))
+            dmg = mon_poly(mtmp, &g.youmonst, dmg);
+        break;
     default:
         dmg = 0;
         break;

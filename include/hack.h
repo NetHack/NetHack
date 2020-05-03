@@ -289,7 +289,8 @@ typedef struct sortloot_item Loot;
 #include "extern.h"
 #endif /* USE_TRAMPOLI */
 
-/* flags to control makemon(); goodpos() uses some plus has some of its own */
+/* flags to control makemon(); goodpos() uses some plus has some of its own;
+   these flags have exceeded 16-bits worth so ought to be changed to 'long' */
 #define NO_MM_FLAGS 0x00000 /* use this rather than plain 0 */
 #define NO_MINVENT  0x00001 /* suppress minvent when creating mon */
 #define MM_NOWAIT   0x00002 /* don't set STRAT_WAITMASK flags */
@@ -308,6 +309,7 @@ typedef struct sortloot_item Loot;
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
 #define GP_ALLOW_XY 0x08000 /* [actually used by enexto() to decide whether
                              * to make an extra call to goodpos()]          */
+#define GP_ALLOW_U  0x10000 /* don't reject hero's location */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00

@@ -137,11 +137,11 @@ enum explosion_types {
  * is_safepet(mon)
  *
  * A special case check used in attack() and domove().  Placing the
- * definition here is convenient.
+ * definition here is convenient.  No longer limited to pets.
  */
-#define is_safepet(mon)                                                   \
-    (mon && (mon->mtame || mon->mpeaceful) && canspotmon(mon) && flags.safe_dog && !Confusion \
-     && !Hallucination && !Stunned)
+#define is_safepet(mon) \
+    (flags.safe_dog && (mon) && (mon)->mpeaceful && canspotmon(mon)     \
+     && !Confusion && !Hallucination && !Stunned)
 
 /*
  * canseeself()
