@@ -244,17 +244,17 @@ makerooms()
 {
     boolean tried_vault = FALSE;
     int themeroom_tries = 0;
-    boolean dothemes = (g.dungeons[u.uz.dnum].themelua != NULL);
+    boolean dothemes = (luadata[u.uz.dnum].themelua != NULL);
     char *fname = g.dungeons[u.uz.dnum].themerms;
 
-    if (*fname && !g.dungeons[u.uz.dnum].themelua) {
-        g.dungeons[u.uz.dnum].themelua = nhl_init();
-        if (g.dungeons[u.uz.dnum].themelua) {
-            if (!nhl_loadlua(g.dungeons[u.uz.dnum].themelua, fname)) {
+    if (*fname && !luadata[u.uz.dnum].themelua) {
+        luadata[u.uz.dnum].themelua = nhl_init();
+        if (luadata[u.uz.dnum].themelua) {
+            if (!nhl_loadlua(luadata[u.uz.dnum].themelua, fname)) {
                 /* loading lua failed, don't use themed rooms */
                 g.dungeons[u.uz.dnum].themerms[0] = '\0';
-                lua_close(g.dungeons[u.uz.dnum].themelua);
-                g.dungeons[u.uz.dnum].themelua = NULL;
+                lua_close(luadata[u.uz.dnum].themelua);
+                luadata[u.uz.dnum].themelua = NULL;
                 dothemes = FALSE;
             } else {
                 dothemes = TRUE;
@@ -280,9 +280,9 @@ makerooms()
             if (dothemes) {
                 g.in_mk_themerooms = TRUE;
                 g.themeroom_failed = FALSE;
-                lua_getglobal(g.dungeons[u.uz.dnum].themelua,
+                lua_getglobal(luadata[u.uz.dnum].themelua,
                               "themerooms_generate");
-                lua_call(g.dungeons[u.uz.dnum].themelua, 0, 0);
+                lua_call(luadata[u.uz.dnum].themelua, 0, 0);
                 g.in_mk_themerooms = FALSE;
                 if (g.themeroom_failed
                     && ((themeroom_tries++ > 10)

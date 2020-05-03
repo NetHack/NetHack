@@ -207,6 +207,9 @@ typedef struct {
 #include "context.h"
 #include "rm.h"
 #include "botl.h"
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+#include "luadefs.h"
+#endif
 
 /* Symbol offsets */
 #define SYM_OFF_P (0)

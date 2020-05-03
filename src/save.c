@@ -1077,9 +1077,9 @@ free_dungeons()
     savelevchn(&tnhfp);
     save_dungeon(&tnhfp, FALSE, TRUE);
     for (i = 0; i < g.n_dgns; i++)
-        if (g.dungeons[i].themelua) {
-            lua_close(g.dungeons[i].themelua);
-            g.dungeons[i].themelua = (lua_State *) 0;
+        if (luadata[i].themelua) {
+            lua_close(luadata[i].themelua);
+            luadata[i].themelua = (lua_State *) 0;
         }
 #endif
     return;
