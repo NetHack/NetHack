@@ -11,9 +11,6 @@ typedef struct d_level { /* basic dungeon level element */
     xchar dlevel;        /* level number */
 } d_level;
 
-#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) 
-#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
-
 typedef struct d_flags {     /* dungeon/level type flags */
     Bitfield(town, 1);       /* is this a town? (levels only) */
     Bitfield(hellish, 1);    /* is this part of hell? */
@@ -265,8 +262,5 @@ typedef struct mapseen {
     /* dead heroes; might not have graves or ghosts */
     struct cemetery *final_resting_place; /* same as level.bonesinfo */
 } mapseen;
-
-#endif /* !CROSSCOMPILE) || CROSSCOMPILE_TARGET */
-#endif /* !MAKEDEFS_C && !MDLIB_C */
 
 #endif /* DUNGEON_H */
