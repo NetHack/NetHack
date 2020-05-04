@@ -213,9 +213,7 @@ const struct Race urace_init_data = {
     { 1, 0, 2, 0, 2, 0 }  /* Energy */
 };
 
-#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 luastruct luadata[MAXDUNGEON]; /* init'ed by init_dungeon() */
-#endif
 
 const struct instance_globals g_init = {
     /* apply.c */
