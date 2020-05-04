@@ -1625,8 +1625,8 @@ void
 set_apparxy(mtmp)
 register struct monst *mtmp;
 {
-    boolean notseen, gotu;
-    register int disp, mx = mtmp->mux, my = mtmp->muy;
+    boolean notseen, notthere, gotu;
+    int disp, mx = mtmp->mux, my = mtmp->muy;
     long umoney = money_cnt(g.invent);
 
     /*
@@ -1643,24 +1643,25 @@ register struct monst *mtmp;
         goto found_you;
 
     notseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data)));
+    notthere = (Displaced && mtmp->data != &mons[PM_DISPLACER_BEAST]);
     /* add cases as required.  eg. Displacement ... */
-    if (notseen || Underwater) {
+    if (Underwater) {
+        disp = 1;
+    } else if (notseen) {
         /* Xorns can smell quantities of valuable metal
-            like that in solid gold coins, treat as seen */
-        if ((mtmp->data == &mons[PM_XORN]) && umoney && !Underwater)
-            disp = 0;
-        else
-            disp = 1;
-    } else if (Displaced) {
+           like that in solid gold coins, treat as seen */
+        disp = (mtmp->data == &mons[PM_XORN] && umoney) ? 0 : 1;
+    } else if (notthere) {
         disp = couldsee(mx, my) ? 2 : 1;
-    } else
+    } else {
         disp = 0;
+    }
     if (!disp)
         goto found_you;
 
     /* without something like the following, invisibility and displacement
        are too powerful */
-    gotu = notseen ? !rn2(3) : Displaced ? !rn2(4) : FALSE;
+    gotu = notseen ? !rn2(3) : notthere ? !rn2(4) : FALSE;
 
     if (!gotu) {
         register int try_cnt = 0;

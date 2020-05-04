@@ -289,7 +289,8 @@ typedef struct sortloot_item Loot;
 #include "extern.h"
 #endif /* USE_TRAMPOLI */
 
-/* flags to control makemon(); goodpos() uses some plus has some of its own */
+/* flags to control makemon(); goodpos() uses some plus has some of its own;
+   these flags have exceeded 16-bits worth so ought to be changed to 'long' */
 #define NO_MM_FLAGS 0x00000 /* use this rather than plain 0 */
 #define NO_MINVENT  0x00001 /* suppress minvent when creating mon */
 #define MM_NOWAIT   0x00002 /* don't set STRAT_WAITMASK flags */
@@ -308,6 +309,7 @@ typedef struct sortloot_item Loot;
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
 #define GP_ALLOW_XY 0x08000 /* [actually used by enexto() to decide whether
                              * to make an extra call to goodpos()]          */
+#define GP_ALLOW_U  0x10000 /* don't reject hero's location */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00
@@ -415,18 +417,6 @@ typedef struct sortloot_item Loot;
 #define FLING 0x02         /* the object is flying thru the air */
 #define LAUNCH_UNSEEN 0x40 /* hero neither caused nor saw it */
 #define LAUNCH_KNOWN 0x80  /* the hero caused this by explicit action */
-
-/* Macros for explosion types */
-enum explosion_types {
-    EXPL_DARK    = 0,
-    EXPL_NOXIOUS = 1,
-    EXPL_MUDDY   = 2,
-    EXPL_WET     = 3,
-    EXPL_MAGICAL = 4,
-    EXPL_FIERY   = 5,
-    EXPL_FROSTY  = 6,
-    EXPL_MAX     = 7
-};
 
 /* enlightenment control flags */
 #define BASICENLIGHTENMENT 1 /* show mundane stuff */

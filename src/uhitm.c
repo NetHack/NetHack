@@ -2011,6 +2011,10 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             mdef->mconf = 1;
         }
         break;
+    case AD_POLY:
+        if (!negated && tmp < mdef->mhp)
+            tmp = mon_poly(&g.youmonst, mdef, tmp);
+        break;
     default:
         tmp = 0;
         break;

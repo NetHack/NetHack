@@ -18,7 +18,7 @@ struct TileImage {
 
 boolean FDECL(read_tiles, (const char *filename, BOOLEAN_P true_color));
 const struct Pixel *NDECL(get_palette);
-boolean FDECL(set_tile_type, (BOOLEAN_P true_color));
+void FDECL(set_tile_type, (BOOLEAN_P true_color));
 void NDECL(free_tiles);
 const struct TileImage *FDECL(get_tile, (unsigned tile_index));
 
@@ -42,8 +42,11 @@ struct TileSetImage {
     unsigned tile_width, tile_height;
 };
 
-boolean FDECL(read_bmp_tiles, (const char *filename, struct TileSetImage *image));
-boolean FDECL(read_gif_tiles, (const char *filename, struct TileSetImage *image));
-boolean FDECL(read_png_tiles, (const char *filename, struct TileSetImage *image));
+boolean FDECL(read_bmp_tiles, (const char *filename,
+                               struct TileSetImage *image));
+boolean FDECL(read_gif_tiles, (const char *filename,
+                               struct TileSetImage *image));
+boolean FDECL(read_png_tiles, (const char *filename,
+                               struct TileSetImage *image));
 
 #endif

@@ -833,7 +833,7 @@ struct attack *mattk;
 /*
  *  See comment at top of mattackm(), for return values.
  */
-int
+static int
 mdamagem(magr, mdef, mattk, mwep, dieroll)
 struct monst *magr, *mdef;
 struct attack *mattk;
@@ -1438,6 +1438,10 @@ int dieroll;
         /* there's no msomearmor() function, so just do damage */
         /* if (cancelled) break; */
         break;
+    case AD_POLY:
+        if (!magr->mcan && tmp < mdef->mhp)
+            tmp = mon_poly(magr, mdef, tmp);
+        break;
     default:
         tmp = 0;
         break;
@@ -1478,6 +1482,75 @@ int dieroll;
         return (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
     }
     return (res == MM_AGR_DIED) ? MM_AGR_DIED : MM_HIT;
+}
+
+int
+mon_poly(magr, mdef, dmg)
+struct monst *magr, *mdef;
+int dmg;
+{
+    if (mdef == &g.youmonst) {
+        if (Antimagic) {
+            shieldeff(mdef->mx, mdef->my);
+        } else if (Unchanging) {
+            ; /* just take a little damage */
+        } else {
+            /* system shock might take place in polyself() */
+            if (u.ulycn == NON_PM) {
+                You("are subjected to a freakish metamorphosis.");
+                polyself(0);
+            } else if (u.umonnum != u.ulycn) {
+                You_feel("an unnatural urge coming on.");
+                you_were();
+            } else {
+                You_feel("a natural urge coming on.");
+                you_unwere(FALSE);
+            }
+            dmg = 0;
+        }
+    } else {
+        char Before[BUFSZ];
+
+        Strcpy(Before, Monnam(mdef));
+        if (resists_magm(mdef)) {
+            /* Magic resistance */
+            if (g.vis)
+                shieldeff(mdef->mx, mdef->my);
+        } else if (resist(mdef, WAND_CLASS, 0, TELL)) {
+            /* general resistance to magic... */
+            ;
+        } else if (!rn2(25) && mdef->cham == NON_PM
+                   && (mdef->mcan
+                       || pm_to_cham(monsndx(mdef->data)) != NON_PM)) {
+            /* system shock; this variation takes away half of mon's HP
+               rather than kill outright */
+            if (g.vis)
+                pline("%s shudders!", Before);
+
+            dmg += (mdef->mhpmax + 1) / 2;
+            mdef->mhp -= dmg;
+            dmg = 0;
+            if (DEADMONSTER(mdef)) {
+                if (magr == &g.youmonst)
+                    xkilled(mdef, XKILL_GIVEMSG | XKILL_NOCORPSE);
+                else
+                    monkilled(mdef, "", AD_RBRE);
+            }
+        } else if (newcham(mdef, (struct permonst *) 0, FALSE, FALSE)) {
+            if (g.vis && canspotmon(mdef))
+                pline("%s%s turns into %s.", Before,
+                      !flags.verbose ? ""
+                       : " undergoes a freakish metamorphosis and",
+                      x_monnam(mdef, ARTICLE_A, (char *) 0,
+                               (SUPPRESS_NAME | SUPPRESS_IT
+                                | SUPPRESS_INVISIBLE), FALSE));
+            dmg = 0;
+        } else {
+            if (g.vis && flags.verbose)
+                pline1(nothing_happens);
+        }
+    }
+    return dmg;
 }
 
 void

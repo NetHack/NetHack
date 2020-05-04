@@ -2,7 +2,9 @@
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#include "hack.h"
+#include "config.h"
+#include "objclass.h"
+#include "flag.h"
 #include "tileset.h"
 
 static void FDECL(get_tile_map, (const char *));
@@ -102,7 +104,7 @@ error:
 }
 
 /* Free tile memory not required by the chosen display mode */
-boolean
+void
 set_tile_type(true_color)
 boolean true_color;
 {
