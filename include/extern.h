@@ -489,6 +489,7 @@ E int NDECL(take_off);
 #endif
 E const char *FDECL(fingers_or_gloves, (BOOLEAN_P));
 E void FDECL(off_msg, (struct obj *));
+E void FDECL(toggle_displacement, (struct obj *, long, BOOLEAN_P));
 E void FDECL(set_wear, (struct obj *));
 E boolean FDECL(donning, (struct obj *));
 E boolean FDECL(doffing, (struct obj *));

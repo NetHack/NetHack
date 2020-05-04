@@ -22,7 +22,6 @@ static NEARDATA const long takeoff_order[] = {
 
 static void FDECL(on_msg, (struct obj *));
 static void FDECL(toggle_stealth, (struct obj *, long, BOOLEAN_P));
-static void FDECL(toggle_displacement, (struct obj *, long, BOOLEAN_P));
 static int NDECL(Armor_on);
 /* int NDECL(Boots_on); -- moved to extern.h */
 static int NDECL(Cloak_on);
@@ -114,10 +113,11 @@ boolean on;
     }
 }
 
-/* putting on or taking off an item which confers displacement;
+/* putting on or taking off an item which confers displacement, or gaining
+   or losing timed displacement after eating a displacer beast corpse or tin;
    give feedback and discover it iff displacement state is changing *and*
-   hero is able to see self (or sense monsters) */
-static
+   hero is able to see self (or sense monsters); for timed, 'obj' is Null
+   and this is only called for the message */
 void
 toggle_displacement(obj, oldprop, on)
 struct obj *obj;
@@ -128,8 +128,8 @@ boolean on;
         return;
 
     if (!oldprop /* extrinsic displacement from something else */
-        && !(u.uprops[DISPLACED].intrinsic) /* (theoretical) */
-        && !(u.uprops[DISPLACED].blocked) /* (also theoretical) */
+        && !(u.uprops[DISPLACED].intrinsic) /* timed, from eating */
+        && !(u.uprops[DISPLACED].blocked) /* (theoretical) */
         /* we don't use canseeself() here because it augments vision
            with touch, which isn't appropriate for deciding whether
            we'll notice that monsters have trouble spotting the hero */
@@ -142,7 +142,8 @@ boolean on;
             || (Unblind_telepat
                 || (Blind_telepat && Blind)
                 || Detect_monsters))) {
-        makeknown(obj->otyp);
+        if (obj)
+            makeknown(obj->otyp);
 
         You_feel("that monsters%s have difficulty pinpointing your location.",
                  on ? "" : " no longer");
