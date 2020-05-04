@@ -148,7 +148,7 @@ TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_
 
 TILE_BMP    = $(DAT)/NHTILES.BMP
 
-TILEUTIL    = $(TILOBJ) $(TILE_BMP)
+TILEUTIL    = $(TILE_BMP)
 
 TILEFILES   = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
 
@@ -627,7 +627,7 @@ spotless: clean
 
 # src dependencies
 
-$(HOST_O)tile.o: tile.c $(HACK_H)
+#$(HOST_O)tile.o: tile.c $(HACK_H)
 $(HOST_O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(HOST_O)alloc.o: alloc.c $(CONFIG_H)
 $(HOST_O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h
