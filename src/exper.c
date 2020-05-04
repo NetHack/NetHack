@@ -299,9 +299,12 @@ boolean incr; /* true iff via incremental experience growth */
 
     /* increase level (unless already maxxed) */
     if (u.ulevel < MAXULEV) {
+        int newrank, oldrank = xlev_to_rank(u.ulevel);
+
         /* increase experience points to reflect new level */
         if (incr) {
             long tmp = newuexp(u.ulevel + 1);
+
             if (u.uexp >= tmp)
                 u.uexp = tmp - 1;
         } else {
@@ -314,6 +317,9 @@ boolean incr; /* true iff via incremental experience growth */
         if (u.ulevelmax < u.ulevel)
             u.ulevelmax = u.ulevel;
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
+        newrank = xlev_to_rank(u.ulevel);
+        if (newrank > oldrank)
+            record_achievement(achieve_rank(newrank));
     }
     g.context.botl = TRUE;
 }

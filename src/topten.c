@@ -474,13 +474,16 @@ boolean condition;
 static char *
 encode_extended_achievements()
 {
-    static char buf[N_ACH*40];
+    static char buf[N_ACH * 40];
+    char rnkbuf[40];
     const char *achievement = NULL;
-    int i;
+    int i, achidx, absidx;
 
     buf[0] = '\0';
     for (i = 0; u.uachieved[i]; i++) {
-        switch (u.uachieved[i]) {
+        achidx = u.uachieved[i];
+        absidx = abs(achidx);
+        switch (absidx) {
         case ACH_UWIN:
             achievement = "ascended";
             break;
@@ -517,7 +520,6 @@ encode_extended_achievements()
         case ACH_SOKO_PRIZE:
             achievement = "obtained_the_sokoban_prize";
             break;
-
         case ACH_ORCL:
             achievement = "consulted_the_oracle";
             break;
@@ -541,6 +543,15 @@ encode_extended_achievements()
             break;
         case ACH_BGRM:
             achievement = "entered_bigroom";
+            break;
+        /* rank 0 is the starting condition, not an achievement; 8 is Xp 30 */
+        case ACH_RNK1: case ACH_RNK2: case ACH_RNK3: case ACH_RNK4:
+        case ACH_RNK5: case ACH_RNK6: case ACH_RNK7: case ACH_RNK8:
+            Sprintf(rnkbuf, "attained_the_rank_of_%s",
+                    rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1)),
+                            Role_switch, (achidx < 0) ? TRUE : FALSE));
+            strNsubst(rnkbuf, " ", "_", 0); /* replace every ' ' with '_' */
+            achievement = lcase(rnkbuf);
             break;
         default:
             continue;

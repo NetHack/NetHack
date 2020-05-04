@@ -270,18 +270,37 @@ int
 xlev_to_rank(xlev)
 int xlev;
 {
+    /*
+     *   1..2  => 0
+     *   3..5  => 1
+     *   6..9  => 2
+     *  10..13 => 3
+     *      ...
+     *  26..29 => 7
+     *    30   => 8
+     * Conversion is precise but only partially reversible.
+     */
     return (xlev <= 2) ? 0 : (xlev <= 30) ? ((xlev + 2) / 4) : 8;
 }
 
-#if 0 /* not currently needed */
 /* convert rank index (0..8) to experience level (1..30) */
 int
 rank_to_xlev(rank)
 int rank;
 {
-    return (rank <= 0) ? 1 : (rank <= 8) ? ((rank * 4) - 2) : 30;
+    /*
+     *  0 =>  1..2
+     *  1 =>  3..5
+     *  2 =>  6..9
+     *  3 => 10..13
+     *      ...
+     *  7 => 26..29
+     *  8 =>   30
+     * We return the low end of each range.
+     */
+    return (rank < 1) ? 1 : (rank < 2) ? 3
+           : (rank < 8) ? ((rank * 4) - 2) : 30;
 }
-#endif
 
 const char *
 rank_of(lev, monnum, female)
