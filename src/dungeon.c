@@ -211,7 +211,7 @@ NHFILE *nhfp;
     last = g.branches = (branch *) 0;
 
     for (i = 0; i < g.n_dgns; i++)
-        luadata[i].themelua = (lua_State *) 0;
+        g.dungeons[i].themelua = (lua_State *) 0;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
@@ -1030,7 +1030,7 @@ init_dungeons()
         Strcpy(g.dungeons[i].dname, dgn_name); /* FIXME: dname length */
         Strcpy(g.dungeons[i].proto, dgn_protoname); /* FIXME: proto length */
         Strcpy(g.dungeons[i].themerms, dgn_themerms); /* FIXME: length */
-        luadata[i].themelua = (lua_State *) 0;
+        g.dungeons[i].themelua = (lua_State *) 0;
         g.dungeons[i].boneid = *dgn_bonetag ? *dgn_bonetag : 0;
         free((genericptr) dgn_fill);
         /* free((genericptr) dgn_protoname); -- stored in pd.tmpdungeon[] */

@@ -654,7 +654,6 @@ struct _create_particular_data {
 
 #define LUA_VER_BUFSIZ 20
 #define LUA_COPYRIGHT_BUFSIZ 120
-E luastruct luadata[MAXDUNGEON]; /* init'ed by init_dungeon() */
 
 struct instance_globals {
 
@@ -1218,7 +1217,6 @@ struct const_globals {
 };
 
 E const struct const_globals cg;
-
 
 #undef E
 

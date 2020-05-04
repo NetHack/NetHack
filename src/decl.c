@@ -213,8 +213,6 @@ const struct Race urace_init_data = {
     { 1, 0, 2, 0, 2, 0 }  /* Energy */
 };
 
-luastruct luadata[MAXDUNGEON]; /* init'ed by init_dungeon() */
-
 const struct instance_globals g_init = {
     /* apply.c */
     0,  /* jumping_is_magic */

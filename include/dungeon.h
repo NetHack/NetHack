@@ -68,6 +68,7 @@ typedef struct dungeon {   /* basic dungeon identifier */
     xchar dunlev_ureached; /* how deep you have been in this dungeon */
     int ledger_start,      /* the starting depth in "real" terms */
         depth_start;       /* the starting depth in "logical" terms */
+    lua_State *themelua;   /* themerms compiled lua */
 } dungeon;
 
 /*
