@@ -134,12 +134,12 @@ enum explosion_types {
              && distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM))))
 
 /*
- * is_safepet(mon)
+ * is_safemon(mon)
  *
  * A special case check used in attack() and domove().  Placing the
  * definition here is convenient.  No longer limited to pets.
  */
-#define is_safepet(mon) \
+#define is_safemon(mon) \
     (flags.safe_dog && (mon) && (mon)->mpeaceful && canspotmon(mon)     \
      && !Confusion && !Hallucination && !Stunned)
 

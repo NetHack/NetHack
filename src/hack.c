@@ -1584,7 +1584,7 @@ domove_core()
         }
 
         mtmp = m_at(x, y);
-        if (mtmp && !is_safepet(mtmp)) {
+        if (mtmp && !is_safemon(mtmp)) {
             /* Don't attack if you're running, and can see it */
             /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
@@ -1611,7 +1611,7 @@ domove_core()
         /* don't stop travel when displacing pets; if the
            displace fails for some reason, attack() in uhitm.c
            will stop travel rather than domove */
-        if (!is_safepet(mtmp) || g.context.forcefight)
+        if (!is_safemon(mtmp) || g.context.forcefight)
             nomul(0);
         /* only attack if we know it's there */
         /* or if we used the 'F' command to fight blindly */
@@ -1642,7 +1642,7 @@ domove_core()
         }
         if (g.context.forcefight || !mtmp->mundetected || sensemon(mtmp)
             || ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL)
-                && !is_safepet(mtmp))) {
+                && !is_safemon(mtmp))) {
 
             /* target monster might decide to switch places with you... */
             if (mtmp->data == &mons[PM_DISPLACER_BEAST] && !rn2(2)
@@ -1830,7 +1830,7 @@ domove_core()
      * Ceiling-hiding pets are skipped by this section of code, to
      * be caught by the normal falling-monster code.
      */
-    } else if (is_safepet(mtmp)
+    } else if (is_safemon(mtmp)
                && !(is_hider(mtmp->data) && mtmp->mundetected)) {
         /* if it turns out we can't actually move */
         boolean didnt_move = FALSE;
