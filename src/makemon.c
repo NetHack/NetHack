@@ -22,8 +22,7 @@ static void FDECL(m_initgrp, (struct monst *, int, int, int, int));
 static void FDECL(m_initthrow, (struct monst *, int, int));
 static void FDECL(m_initweap, (struct monst *));
 static void FDECL(m_initinv, (struct monst *));
-static boolean FDECL(makemon_rnd_goodpos, (struct monst *,
-                                               unsigned, coord *));
+static boolean FDECL(makemon_rnd_goodpos, (struct monst *, long, coord *));
 
 #define m_initsgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 3, mmf)
 #define m_initlgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 10, mmf)
@@ -1046,11 +1045,11 @@ newmextra()
 static boolean
 makemon_rnd_goodpos(mon, gpflags, cc)
 struct monst *mon;
-unsigned gpflags;
+long gpflags;
 coord *cc;
 {
     int tryct = 0;
-    int nx,ny;
+    int nx, ny;
     boolean good;
 
     do {
@@ -1119,7 +1118,7 @@ struct monst *
 makemon(ptr, x, y, mmflags)
 register struct permonst *ptr;
 register int x, y;
-int mmflags;
+long mmflags;
 {
     register struct monst *mtmp;
     struct monst fakemon;
@@ -1425,7 +1424,7 @@ int mmflags;
 struct monst *
 unmakemon(mon, mmflags)
 struct monst *mon;
-int mmflags;
+long mmflags;
 {
     boolean countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0);
     int mndx = monsndx(mon->data);
