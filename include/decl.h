@@ -654,9 +654,7 @@ struct _create_particular_data {
 
 #define LUA_VER_BUFSIZ 20
 #define LUA_COPYRIGHT_BUFSIZ 120
-#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 E luastruct luadata[MAXDUNGEON]; /* init'ed by init_dungeon() */
-#endif
 
 struct instance_globals {
 
