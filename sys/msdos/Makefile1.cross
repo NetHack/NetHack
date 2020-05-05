@@ -304,10 +304,10 @@ default: prereq
 util: $(HOST_O)utility.tag
 
 $(HOST_O)utility.tag: $(INCL)/date.h $(INCL)/trap.h $(INCL)/onames.h \
-	$(INCL)/pm.h vis_tab.c $(TILEUTIL)
+	$(INCL)/pm.h vis_tab.c $(TILEUTIL) $(SRC)/tile.c
 	echo host utilities made > $@
 
-tileutil: $(U)gif2txt $(U)txt2ppm $(SRC)/tile.c
+tileutil: $(U)gif2txt $(U)txt2ppm
 	@echo Optional tile development utilities are up to date.
 
 $(HOST_O)prereq.tag: $(INCL)/nhlua.h hobj.tag $(U)makedefs \
