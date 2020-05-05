@@ -681,6 +681,10 @@ nh_timeout()
                     spoteffects(TRUE);
                 }
                 break;
+            case DISPLACED:
+                if (!Displaced) /* give a message */
+                    toggle_displacement((struct obj *) 0, 0L, FALSE);
+                break;
             case WARN_OF_MON:
                 /* timed Warn_of_mon is via #wizintrinsic only */
                 if (!Warn_of_mon) {

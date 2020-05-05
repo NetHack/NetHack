@@ -289,27 +289,26 @@ typedef struct sortloot_item Loot;
 #include "extern.h"
 #endif /* USE_TRAMPOLI */
 
-/* flags to control makemon(); goodpos() uses some plus has some of its own;
-   these flags have exceeded 16-bits worth so ought to be changed to 'long' */
-#define NO_MM_FLAGS 0x00000 /* use this rather than plain 0 */
-#define NO_MINVENT  0x00001 /* suppress minvent when creating mon */
-#define MM_NOWAIT   0x00002 /* don't set STRAT_WAITMASK flags */
-#define MM_NOCOUNTBIRTH 0x00004 /* don't increment born count (for revival) */
-#define MM_IGNOREWATER  0x00008 /* ignore water when positioning */
-#define MM_ADJACENTOK   0x00010 /* acceptable to use adjacent coordinates */
-#define MM_ANGRY    0x00020 /* monster is created angry */
-#define MM_NONAME   0x00040 /* monster is not christened */
-#define MM_EGD      0x00100 /* add egd structure */
-#define MM_EPRI     0x00200 /* add epri structure */
-#define MM_ESHK     0x00400 /* add eshk structure */
-#define MM_EMIN     0x00800 /* add emin structure */
-#define MM_EDOG     0x01000 /* add edog structure */
-#define MM_ASLEEP   0x02000 /* monsters should be generated asleep */
-#define MM_NOGRP    0x04000 /* suppress creation of monster groups */
+/* flags to control makemon(); goodpos() uses some plus has some of its own*/
+#define NO_MM_FLAGS 0x000000L /* use this rather than plain 0 */
+#define NO_MINVENT  0x000001L /* suppress minvent when creating mon */
+#define MM_NOWAIT   0x000002L /* don't set STRAT_WAITMASK flags */
+#define MM_NOCOUNTBIRTH 0x0004L /* don't increment born count (for revival) */
+#define MM_IGNOREWATER  0x0008L /* ignore water when positioning */
+#define MM_ADJACENTOK   0x0010L /* acceptable to use adjacent coordinates */
+#define MM_ANGRY    0x000020L /* monster is created angry */
+#define MM_NONAME   0x000040L /* monster is not christened */
+#define MM_EGD      0x000100L /* add egd structure */
+#define MM_EPRI     0x000200L /* add epri structure */
+#define MM_ESHK     0x000400L /* add eshk structure */
+#define MM_EMIN     0x000800L /* add emin structure */
+#define MM_EDOG     0x001000L /* add edog structure */
+#define MM_ASLEEP   0x002000L /* monsters should be generated asleep */
+#define MM_NOGRP    0x004000L /* suppress creation of monster groups */
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
-#define GP_ALLOW_XY 0x08000 /* [actually used by enexto() to decide whether
-                             * to make an extra call to goodpos()]          */
-#define GP_ALLOW_U  0x10000 /* don't reject hero's location */
+#define GP_ALLOW_XY 0x008000L /* [actually used by enexto() to decide whether
+                               * to make an extra call to goodpos()]        */
+#define GP_ALLOW_U  0x010000L /* don't reject hero's location */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00
