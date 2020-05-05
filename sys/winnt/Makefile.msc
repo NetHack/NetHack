@@ -98,8 +98,8 @@ GAMEDIR = ..\binary               # Default game build directory
 #    PDCurses header (.h) files and PDCURSES_C to the location
 #    of your PDCurses C files.
 #
-#ADD_CURSES=Y
-#PDCURSES_TOP=..\lib\pdcurses
+ADD_CURSES=Y
+PDCURSES_TOP=..\lib\pdcurses
 #
 #------------------------------------------------------------------------------
 # OPTIONAL - zlib support (to allow compressed savefile exchange across platforms
@@ -149,7 +149,6 @@ LUATOP=..\lib\lua-5.3.5
 #==============================================================================
 #
 #TEST_CROSSCOMPILE=Y
-#OPTIONS_AT_RUNTIME=Y
 #
 #==============================================================================
 #======================== End of Modification Section =========================
@@ -248,7 +247,6 @@ U  = $(UTIL)^\
 CROSSCOMPILE_TARGET = -DCROSSCOMPILE_TARGET
 CROSSCOMPILE_HOST = -DCROSSCOMPILE_HOST
 CROSSCOMPILE = -DCROSSCOMPILE
-OPTIONS_AT_RUNTIME=Y
 HOST=_host
 !ELSE
 !UNDEF CROSSCOMPILE_TARGET
@@ -283,10 +281,10 @@ DO_UTILS = N
 
 !IF "$(DO_UTILS)" == "Y"
 TEXT_IO        = $(O)tiletext$(HOST).o	$(O)tiletxt$(HOST).o	$(O)drawing$(HOST).o \
-		 $(O)decl$(HOST).o	$(O)monst$(HOST).o	$(O)objects$(HOST).o
+		 $(O)monst$(HOST).o	$(O)objects$(HOST).o
 
 TEXT_IO32      = $(O)tilete32$(HOST).o $(O)tiletx32$(HOST).o $(O)drawing$(HOST).o \
-		 $(O)decl$(HOST).o $(O)monst$(HOST).o $(O)objects$(HOST).o
+		 $(O)monst$(HOST).o $(O)objects$(HOST).o
 
 GIFREADERS     = $(O)gifread$(HOST).o	$(O)alloc$(HOST).o $(O)panic$(HOST).o
 GIFREADERS32   = $(O)gifrd32$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o
@@ -339,12 +337,6 @@ REGEX  = $(O)cppregex.o
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
 MDLIB = $(O)mdlib.o
-
-!IF "$(OPTIONS_AT_RUNTIME)" == "Y"
-RUNTIMEOPTDEF=-DOPTIONS_AT_RUNTIME
-!ELSE
-RUNTIMEOPTDEF=
-!ENDIF
 
 !IFNDEF ADD_CURSES
 CURSESOBJ=

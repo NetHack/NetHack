@@ -249,7 +249,7 @@ U  = $(UTIL)/
 #
 #else
 #
-#TILOBJ      = $(O)tile.o $(VIDEO_OBJ)
+TILOBJ      = $(O)tile.o $(VIDEO_OBJ)
 #
 #TILOBJ2     = $(O)tileset.o $(O)bmptiles.o $(O)giftiles.o
 #
@@ -898,6 +898,7 @@ $(O)pmatchre.o : $(HACK_H) $(SSHR)/pmatchre.c
 	$(TARGET_CC) $(cflags) -o$@ $(SSHR)/pmatchre.c
 
 # sys/msdos
+$(O)tile.o : $(HACK_H) $(SRC)/tile.c
 $(O)msdos.o : $(HACK_H)  $(MSYS)/msdos.c
 $(O)pckeys.o : $(HACK_H)  $(MSYS)/pckeys.c
 $(O)pctiles.o : $(HACK_H)  $(MSYS)/pctiles.c $(MSYS)/portio.h
