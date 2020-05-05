@@ -124,14 +124,6 @@ MAKEDEFSOBJS    = $(HOST_O)makedefs.o  $(HOST_O)monst.o	 $(HOST_O)objects.o
 
 LUA_QTEXT_FILE = "quest.lua"
 
-#SPLEVSRC    = lev_yacc.c  lev_$(LEX).c	 lev_main.c  panic.c
-#DGNCOMPSRC  = dgn_yacc.c  dgn_$(LEX).c	 dgn_main.c
-#SPLEVOBJS   = $(HOST_O)lev_yacc.o $(HOST_O)lev_$(LEX).o $(HOST_O)lev_main.o $(HOST_O)alloc.o \
-#		$(HOST_O)monst.o $(HOST_O)objects.o $(HOST_O)panic.o                     \
-#		$(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)stubvid.o
-#DGNCOMPOBJS = $(HOST_O)dgn_yacc.o  $(HOST_O)dgn_$(LEX).o $(HOST_O)dgn_main.o  $(HOST_O)alloc.o  \
-#		$(HOST_O)panic.o
-
 #==========================================
 #  Tile related object files.
 #==========================================
@@ -140,10 +132,10 @@ TILOBJ      = $(HOST_O)tile.o $(VGAOBJ)
 
 TILOBJ2     = $(HOST_O)tileset.o $(HOST_O)bmptiles.o $(HOST_O)giftiles.o
 
-TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
+TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)monst.o \
 		$(HOST_O)objects.o
 
-TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
+TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)monst.o \
 		$(HOST_O)objects.o
 
 TILE_BMP    = $(DAT)/NHTILES.BMP
