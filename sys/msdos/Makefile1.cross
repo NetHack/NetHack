@@ -307,7 +307,7 @@ $(HOST_O)utility.tag: $(INCL)/date.h $(INCL)/trap.h $(INCL)/onames.h \
 	$(INCL)/pm.h vis_tab.c $(TILEUTIL)
 	echo host utilities made > $@
 
-tileutil: $(U)gif2txt $(U)txt2ppm
+tileutil: $(U)gif2txt $(U)txt2ppm $(SRC)/tile.c
 	@echo Optional tile development utilities are up to date.
 
 $(HOST_O)prereq.tag: $(INCL)/nhlua.h hobj.tag $(U)makedefs \
