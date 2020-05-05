@@ -2,7 +2,15 @@
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 #include "hack.h"
+#else
+#include "config.h"
+#include "color.h"
+#include "rm.h"
+#include "objclass.h"
+#include "monsym.h"
+#endif
 #include "tcap.h"
 
 /* Relevant header information in rm.h, objclass.h, and monsym.h. */
