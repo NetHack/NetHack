@@ -128,8 +128,6 @@ LUA_QTEXT_FILE = "quest.lua"
 #  Tile related object files.
 #==========================================
 
-TILOBJ      = $(HOST_O)tile.o $(VGAOBJ)
-
 TILOBJ2     = $(HOST_O)tileset.o $(HOST_O)bmptiles.o $(HOST_O)giftiles.o
 
 TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)monst.o \
@@ -619,7 +617,6 @@ spotless: clean
 
 # src dependencies
 
-#$(HOST_O)tile.o: tile.c $(HACK_H)
 $(HOST_O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(HOST_O)alloc.o: alloc.c $(CONFIG_H)
 $(HOST_O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h

@@ -249,7 +249,7 @@ U  = $(UTIL)/
 #
 #else
 #
-#TILOBJ      = $(O)tile.o $(VIDEO_OBJ)
+TILOBJ      = $(O)tile.o $(VIDEO_OBJ)
 #
 #TILOBJ2     = $(O)tileset.o $(O)bmptiles.o $(O)giftiles.o
 #
