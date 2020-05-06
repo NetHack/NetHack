@@ -1070,17 +1070,12 @@ free_dungeons()
 {
 #ifdef FREE_ALL_MEMORY
     NHFILE tnhfp;
-    int i;
 
     zero_nhfile(&tnhfp);    /* also sets fd to -1 */
     tnhfp.mode = FREEING;
     savelevchn(&tnhfp);
     save_dungeon(&tnhfp, FALSE, TRUE);
-    for (i = 0; i < g.n_dgns; i++)
-        if (g.dungeons[i].themelua) {
-            lua_close(g.dungeons[i].themelua);
-            g.dungeons[i].themelua = (lua_State *) 0;
-        }
+    free_luathemes(TRUE);
 #endif
     return;
 }

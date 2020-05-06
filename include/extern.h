@@ -1325,6 +1325,7 @@ E void NDECL(sort_rooms);
 E void FDECL(add_room, (int, int, int, int, BOOLEAN_P, SCHAR_P, BOOLEAN_P));
 E void FDECL(add_subroom, (struct mkroom *, int, int, int, int, BOOLEAN_P,
                            SCHAR_P, BOOLEAN_P));
+E void FDECL(free_luathemes, (BOOLEAN_P));
 E void NDECL(makecorridors);
 E void FDECL(add_door, (int, int, struct mkroom *));
 E void NDECL(clear_level_structures);

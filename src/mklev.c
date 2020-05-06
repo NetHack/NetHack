@@ -239,30 +239,46 @@ boolean special;
     g.nsubroom++;
 }
 
+void
+free_luathemes(keependgame)
+boolean keependgame; /* False: exiting, True: discarding main dungeon */
+{
+    int i;
+
+    for (i = 0; i < g.n_dgns; ++i) {
+        if (keependgame && i == astral_level.dnum)
+            continue;
+        if (g.luathemes[i]) {
+            lua_close((lua_State *) g.luathemes[i]);
+            g.luathemes[i] = (lua_State *) 0;
+        }
+    }
+}
+
 static void
 makerooms()
 {
     boolean tried_vault = FALSE;
     int themeroom_tries = 0;
-    boolean dothemes = (g.dungeons[u.uz.dnum].themelua != NULL);
-    char *fname = g.dungeons[u.uz.dnum].themerms;
+    char *fname;
+    lua_State *themes = (lua_State *) g.luathemes[u.uz.dnum];
 
-    if (*fname && !g.dungeons[u.uz.dnum].themelua) {
-        g.dungeons[u.uz.dnum].themelua = nhl_init();
-        if (g.dungeons[u.uz.dnum].themelua) {
-            if (!nhl_loadlua(g.dungeons[u.uz.dnum].themelua, fname)) {
+    if (!themes && *(fname = g.dungeons[u.uz.dnum].themerms)) {
+        if ((themes = nhl_init()) != 0) {
+            if (!nhl_loadlua(themes, fname)) {
                 /* loading lua failed, don't use themed rooms */
-                g.dungeons[u.uz.dnum].themerms[0] = '\0';
-                lua_close(g.dungeons[u.uz.dnum].themelua);
-                g.dungeons[u.uz.dnum].themelua = NULL;
-                dothemes = FALSE;
+                lua_close(themes);
+                themes = (lua_State *) 0;
             } else {
-                dothemes = TRUE;
+                /* success; save state for this dungeon branch */
+                g.luathemes[u.uz.dnum] = (genericptr_t) themes;
             }
         }
+        if (!themes) /* don't try again when making next level */
+            *fname = '\0'; /* g.dungeons[u.uz.dnum].themerms */
     }
 
-    if (dothemes) {
+    if (themes) {
         create_des_coder();
     }
 
@@ -277,12 +293,11 @@ makerooms()
                 g.rooms[g.nroom].hx = -1;
             }
         } else {
-            if (dothemes) {
+            if (themes) {
                 g.in_mk_themerooms = TRUE;
                 g.themeroom_failed = FALSE;
-                lua_getglobal(g.dungeons[u.uz.dnum].themelua,
-                              "themerooms_generate");
-                lua_call(g.dungeons[u.uz.dnum].themelua, 0, 0);
+                lua_getglobal(themes, "themerooms_generate");
+                lua_call(themes, 0, 0);
                 g.in_mk_themerooms = FALSE;
                 if (g.themeroom_failed
                     && ((themeroom_tries++ > 10)
@@ -294,7 +309,7 @@ makerooms()
             }
         }
     }
-    if (dothemes) {
+    if (themes) {
         wallification(1, 0, COLNO - 1, ROWNO - 1);
         free(g.coder);
         g.coder = NULL;

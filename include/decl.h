@@ -949,6 +949,7 @@ struct instance_globals {
     int mhitu_dieroll;
 
     /* mklev.c */
+    genericptr_t luathemes[MAXDUNGEON];
     xchar vault_x;
     xchar vault_y;
     boolean made_branch; /* used only during level creation */
