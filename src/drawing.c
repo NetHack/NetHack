@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1573943500 2019/11/16 22:31:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1588778111 2020/05/06 15:15:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,9 +21,6 @@
 #define C(n)
 #endif
 
-const char invisexplain[] = "remembered, unseen, creature",
-           altinvisexplain[] = "unseen creature"; /* for clairvoyance */
-           
 /* Default object class symbols.  See objclass.h.
  * {symbol, name, explain}
  *     name:    used in object_detect().
