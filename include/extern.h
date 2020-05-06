@@ -552,6 +552,7 @@ E void FDECL(wary_dog, (struct monst *, BOOLEAN_P));
 
 /* ### dogmove.c ### */
 
+E boolean FDECL(cursed_object_at, (int, int));
 E struct obj *FDECL(droppables, (struct monst *));
 E int FDECL(dog_nutrition, (struct monst *, struct obj *));
 E int FDECL(dog_eat, (struct monst *, struct obj *, int, int, BOOLEAN_P));
@@ -596,26 +597,10 @@ E boolean FDECL(hurtle_jump, (genericptr_t, int, int));
 E boolean FDECL(hurtle_step, (genericptr_t, int, int));
 
 /* ### drawing.c ### */
-#endif /* !MAKEDEFS_C && !MDLIB_C && !LEV_LEX_C */
+
 E int FDECL(def_char_to_objclass, (CHAR_P));
 E int FDECL(def_char_to_monclass, (CHAR_P));
 E int FDECL(def_char_is_furniture, (CHAR_P));
-#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(LEV_LEX_C)
-E void FDECL(switch_symbols, (int));
-E void FDECL(assign_graphics, (int));
-E void NDECL(init_symbols);
-E void NDECL(init_showsyms);
-E void NDECL(init_primary_symbols);
-E void NDECL(init_rogue_symbols);
-E void NDECL(init_ov_primary_symbols);
-E void NDECL(init_ov_rogue_symbols);
-E void FDECL(clear_symsetentry, (int, BOOLEAN_P));
-E void FDECL(update_primary_symset, (struct symparse *, int));
-E void FDECL(update_rogue_symset, (struct symparse *, int));
-E void FDECL(update_ov_primary_symset, (struct symparse *, int));
-E void FDECL(update_ov_rogue_symset, (struct symparse *, int));
-E boolean FDECL(cursed_object_at, (int, int));
-E nhsym FDECL(get_othersym, (int, int));
 
 /* ### dungeon.c ### */
 
@@ -2476,12 +2461,6 @@ E int FDECL(add_sound_mapping, (const char *));
 E void FDECL(play_sound_for_message, (const char *));
 #endif
 
-/* ### sys.c ### */
-
-E void NDECL(sys_early_init);
-E void NDECL(sysopt_release);
-E void FDECL(sysopt_seduce_set, (int));
-
 /* ### sp_lev.c ### */
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 E void NDECL(create_des_coder);
@@ -2581,6 +2560,29 @@ E void NDECL(kick_steed);
 E void FDECL(dismount_steed, (int));
 E void FDECL(place_monster, (struct monst *, int, int));
 E boolean FDECL(stucksteed, (BOOLEAN_P));
+
+/* ### symbols.c ### */
+
+E void FDECL(switch_symbols, (int));
+E void FDECL(assign_graphics, (int));
+E void NDECL(init_symbols);
+E void NDECL(init_showsyms);
+E void NDECL(init_primary_symbols);
+E void NDECL(init_rogue_symbols);
+E void NDECL(init_ov_primary_symbols);
+E void NDECL(init_ov_rogue_symbols);
+E void FDECL(clear_symsetentry, (int, BOOLEAN_P));
+E void FDECL(update_primary_symset, (struct symparse *, int));
+E void FDECL(update_rogue_symset, (struct symparse *, int));
+E void FDECL(update_ov_primary_symset, (struct symparse *, int));
+E void FDECL(update_ov_rogue_symset, (struct symparse *, int));
+E nhsym FDECL(get_othersym, (int, int));
+
+/* ### sys.c ### */
+
+E void NDECL(sys_early_init);
+E void NDECL(sysopt_release);
+E void FDECL(sysopt_seduce_set, (int));
 
 /* ### teleport.c ### */
 
