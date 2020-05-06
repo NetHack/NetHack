@@ -323,8 +323,7 @@ E struct tc_gbl_data {   /* also declared in tcap.h */
 #define CO g.tc_gbl_data.tc_CO
 #endif
 
-/* xxxexplain[] is in drawing.c */
-E const char *const monexplain[], invisexplain[], *const oclass_names[];
+E const char *const oclass_names[];
 
 /* Some systems want to use full pathnames for some subsets of file names,
  * rather than assuming that they're all in the current directory.  This
@@ -949,6 +948,7 @@ struct instance_globals {
     int mhitu_dieroll;
 
     /* mklev.c */
+    genericptr_t luathemes[MAXDUNGEON];
     xchar vault_x;
     xchar vault_y;
     boolean made_branch; /* used only during level creation */

@@ -233,46 +233,6 @@ U  = $(UTIL)/
 #  Tile related object files.
 #==========================================
 
-#ifeq ($(SUPPRESS_GRAPHICS),Y)
-#TILOBJ       =
-#TILOBJ2      =
-#TEXTIO       =
-#TEXTIO2      =
-#TILE_BMP     =
-#TILEUTIL     = 
-#TILEFILES    = 
-#TILEFILES2   = 
-#GIFREADERS   = 
-#GIFREAD2     = 
-#PPMWRITERS   = 
-#PPMWRIT2     = 
-#
-#else
-#
-#TILOBJ      = $(O)tile.o $(VIDEO_OBJ)
-#
-#TILOBJ2     = $(O)tileset.o $(O)bmptiles.o $(O)giftiles.o
-#
-#TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
-#		$(HOST_O)objects.o $(HOST_O)stubvid.o
-#
-#TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
-#		$(HOST_O)objects.o $(HOST_O)stubvid.o
-#TILEUTIL    = $(TILOBJ) $(U)tile2bin $(U)til2bin2 $(TILE_BMP) $(PLANAR_TIB) $(OVERVIEW_TIB)
-#
-#TILEFILES   = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
-#
-#TILEFILES2  = $(WSHR)/monthin.txt $(WSHR)/objthin.txt $(WSHR)/oththin.txt
-#
-#GIFREADERS  = $(HOST_O)gifread.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#
-#GIFREAD2    = $(HOST_O)gifread2.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#
-#PPMWRITERS  = $(HOST_O)ppmwrite.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#
-#PPMWRIT2    = $(HOST_O)ppmwrit2.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#endif
-
 PLANAR_TIB   = $(DAT)/NETHACK1.tib
 OVERVIEW_TIB = $(DAT)/NETHACKO.tib
 TILE_BMP     = $(DAT)/NHTILES.BMP
@@ -309,12 +269,12 @@ VOBJ20 = $(O)region.o  $(O)restore.o  $(O)rip.o      $(O)rnd.o
 VOBJ21 = $(O)role.o    $(O)rumors.o   $(O)save.o     $(O)sfstruct.o
 VOBJ22 = $(O)shk.o     $(O)shknam.o   $(O)sit.o      $(O)sounds.o
 VOBJ23 = $(O)sp_lev.o  $(O)spell.o    $(O)steal.o    $(O)steed.o
-VOBJ24 = $(O)sys.o     $(O)teleport.o $(O)termcap.o  $(O)timeout.o
-VOBJ25 = $(O)topl.o    $(O)topten.o   $(O)track.o    $(O)trap.o
-VOBJ26 = $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
-VOBJ27 = $(O)vis_tab.o $(O)weapon.o   $(O)were.o     $(O)wield.o
-VOBJ28 = $(O)windows.o $(O)wintty.o   $(O)wizard.o   $(O)worm.o
-VOBJ29 = $(O)worn.o    $(O)write.o    $(O)zap.o
+VOBJ24 = $(O)symbols.o $(O)sys.o      $(O)teleport.o $(O)termcap.o
+VOBJ25 = $(O)timeout.o $(O)topl.o     $(O)topten.o   $(O)track.o
+VOBJ26 = $(O)trap.o    $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
+VOBJ27 = $(O)vision.o  $(O)vis_tab.o  $(O)weapon.o   $(O)were.o
+VOBJ28 = $(O)wield.o   $(O)windows.o  $(O)wintty.o   $(O)wizard.o
+VOBJ29 = $(O)worm.o    $(O)worn.o     $(O)write.o    $(O)zap.o
 VOBJ30 = $(REGEX)      $(VIDEO_OBJ)
 
 SOBJ   = $(O)msdos.o   $(O)pcsys.o    $(O)tty.o      $(O)unix.o \
@@ -898,6 +858,7 @@ $(O)pmatchre.o : $(HACK_H) $(SSHR)/pmatchre.c
 	$(TARGET_CC) $(cflags) -o$@ $(SSHR)/pmatchre.c
 
 # sys/msdos
+$(O)tile.o : $(HACK_H) $(SRC)/tile.c
 $(O)msdos.o : $(HACK_H)  $(MSYS)/msdos.c
 $(O)pckeys.o : $(HACK_H)  $(MSYS)/pckeys.c
 $(O)pctiles.o : $(HACK_H)  $(MSYS)/pctiles.c $(MSYS)/portio.h
@@ -1070,7 +1031,7 @@ $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
-$(O)drawing.o: drawing.c $(HACK_H) $(INCL)/tcap.h
+$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)/tcap.h
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)/dlb.h
@@ -1143,6 +1104,7 @@ $(O)sp_lev.o: sp_lev.c $(HACK_H) $(INCL)/dlb.h $(INCL)/sp_lev.h
 $(O)spell.o: spell.c $(HACK_H)
 $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
+$(O)symbols.o: symbols.c $(HACK_H)
 $(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
 $(O)timeout.o: timeout.c $(HACK_H)

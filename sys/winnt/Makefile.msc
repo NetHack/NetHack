@@ -149,7 +149,6 @@ LUATOP=..\lib\lua-5.3.5
 #==============================================================================
 #
 #TEST_CROSSCOMPILE=Y
-#OPTIONS_AT_RUNTIME=Y
 #
 #==============================================================================
 #======================== End of Modification Section =========================
@@ -245,16 +244,15 @@ O  = $(OBJ)^\
 U  = $(UTIL)^\
 
 !IFDEF TEST_CROSSCOMPILE
-CROSSCOMPILE_TARGET = -DCROSSCOMPILE_TARGET
-CROSSCOMPILE_HOST = -DCROSSCOMPILE_HOST
-CROSSCOMPILE = -DCROSSCOMPILE
-OPTIONS_AT_RUNTIME=Y
 HOST=_host
+CROSSCOMPILE_TARGET= -DCROSSCOMPILE_TARGET
+CROSSCOMPILE_HOST= -DCROSSCOMPILE_HOST
+CROSSCOMPILE= -DCROSSCOMPILE
 !ELSE
-!UNDEF CROSSCOMPILE_TARGET
-!UNDEF CROSSCOMPILE_HOST
-!UNDEF CROSSCOMPILE
-!UNDEF HOST
+HOST=
+CROSSCOMPILE_TARGET=
+CROSSCOMPILE_HOST=
+CROSSCOMPILE=
 !ENDIF
 
 #
@@ -263,7 +261,7 @@ HOST=_host
 
 MAKESRC       = $(U)makedefs.c
 
-MAKEDEFSOBJS  = $(O)makedefs$(HOST).o $(O)monst$(HOST).o $(O)objects$(HOST).o
+MAKEDEFSOBJS  = $(O)makedefs.o $(O)monst$(HOST).o $(O)objects$(HOST).o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -273,26 +271,16 @@ TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 # These are not invoked during a normal game build in 3.4
 #
 
-!IFDEF CROSSCOMPILE_HOST
-DO_UTILS = Y
-!ELSE IFNDEF CROSSCOMPILE
-DO_UTILS = Y
-!ELSE
-DO_UTILS = N
-!ENDIF
+TEXT_IO   = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing$(HOST).o \
+		 $(O)monst$(HOST).o	$(O)objects$(HOST).o
 
-!IF "$(DO_UTILS)" == "Y"
-TEXT_IO        = $(O)tiletext$(HOST).o	$(O)tiletxt$(HOST).o	$(O)drawing$(HOST).o \
-		 $(O)decl$(HOST).o	$(O)monst$(HOST).o	$(O)objects$(HOST).o
+TEXT_IO32 = $(O)tilete32.o $(O)tiletx32.o $(O)drawing$(HOST).o \
+		 $(O)monst$(HOST).o $(O)objects$(HOST).o
 
-TEXT_IO32      = $(O)tilete32$(HOST).o $(O)tiletx32$(HOST).o $(O)drawing$(HOST).o \
-		 $(O)decl$(HOST).o $(O)monst$(HOST).o $(O)objects$(HOST).o
+GIFREADERS_HOST     = $(O)gifread.o	$(O)alloc$(HOST).o $(O)panic$(HOST).o
+GIFREADERS32_HOST   = $(O)gifrd32.o $(O)alloc$(HOST).o $(O)panic$(HOST).o
 
-GIFREADERS     = $(O)gifread$(HOST).o	$(O)alloc$(HOST).o $(O)panic$(HOST).o
-GIFREADERS32   = $(O)gifrd32$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o
-
-PPMWRITERS     = $(O)ppmwrite$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o
-!ENDIF
+PPMWRITERS     = $(O)ppmwrite.o $(O)alloc$(HOST).o $(O)panic$(HOST).o
 
 #
 #  Object files for the game itself.
@@ -320,16 +308,16 @@ VOBJ19 = $(O)read.o     $(O)rect.o     $(O)region.o   $(O)restore.o
 VOBJ20 = $(O)rip.o      $(O)rnd.o      $(O)role.o     $(O)rumors.o
 VOBJ21 = $(O)save.o     $(O)sfstruct.o $(O)shk.o      $(O)shknam.o
 VOBJ22 = $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o
-VOBJ23 = $(O)steal.o    $(O)steed.o    $(O)sys.o      $(O)teleport.o
-VOBJ24 = $(O)timeout.o  $(O)topten.o   $(O)track.o    $(O)trap.o
-VOBJ25 = $(O)u_init.o   $(O)uhitm.o    $(O)vault.o    $(O)vis_tab.o
-VOBJ26 = $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o
-VOBJ27 = $(O)windows.o  $(O)wizard.o   $(O)worm.o     $(O)worn.o
-VOBJ28 = $(O)write.o    $(O)zap.o
+VOBJ23 = $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o
+VOBJ24 = $(O)teleport.o $(O)timeout.o  $(O)topten.o   $(O)track.o
+VOBJ25 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
+VOBJ26 = $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o   $(O)were.o
+VOBJ27 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o
+VOBJ28 = $(O)worn.o     $(O)write.o    $(O)zap.o
 
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 
-!IFDEF CROSSCOMPILE_HOST
+!IFDEF TEST_CROSSCOMPILE
 DLBOBJ_HOST = $(O)dlb$(HOST).o
 !ENDIF
 DLBOBJ = $(O)dlb.o
@@ -339,12 +327,6 @@ REGEX  = $(O)cppregex.o
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
 MDLIB = $(O)mdlib.o
-
-!IF "$(OPTIONS_AT_RUNTIME)" == "Y"
-RUNTIMEOPTDEF=-DOPTIONS_AT_RUNTIME
-!ELSE
-RUNTIMEOPTDEF=
-!ENDIF
 
 !IFNDEF ADD_CURSES
 CURSESOBJ=
@@ -776,7 +758,7 @@ DLB =
 #==========================================
 
 {$(UTIL)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $<
+	@$(cc) $(cflagsBuild) -Fo$@ $<
 
 #==========================================
 # Rules for files in win\share
@@ -1066,18 +1048,18 @@ $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 #==========================================
 # Makedefs Stuff
 #==========================================
-$(U)nhsizes3.exe: $(O)nhsizes3$(HOST).o
+$(U)nhsizes3.exe: $(O)nhsizes3.o
 	@echo Linking $(@:\=/)
-	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes$(HOST).o $(O)panic$(HOST).o $(O)alloc$(HOST).o
+	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes.o $(O)panic$(HOST).o $(O)alloc$(HOST).o
 
-$(O)nhsizes3$(HOST).o: $(CONFIG_H) nhsizes3.c
+$(O)nhsizes3.o: $(CONFIG_H) nhsizes3.c
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ nhsizes3.c
 
 $(U)makedefs.exe:	$(MAKEDEFSOBJS)
 	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEDEFSOBJS)
 
-$(O)makedefs$(HOST).o: $(U)makedefs.c $(SRC)\mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
+$(O)makedefs.o: $(U)makedefs.c $(SRC)\mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
 		$(INCL)\objclass.h $(INCL)\monsym.h \
 		$(INCL)\artilist.h $(INCL)\dungeon.h $(INCL)\obj.h \
 		$(INCL)\monst.h $(INCL)\you.h $(INCL)\flag.h \
@@ -1111,11 +1093,11 @@ $(SRC)\vis_tab.c: $(U)makedefs.exe
 # uudecode utility and uuencoded targets
 #==========================================
 
-$(U)uudecode.exe: $(O)uudecode$(HOST).o
+$(U)uudecode.exe: $(O)uudecode.o
 	@echo Linking $(@:\=/)
-	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode$(HOST).o
+	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
-$(O)uudecode$(HOST).o: $(SSYS)\uudecode.c
+$(O)uudecode.o: $(SSYS)\uudecode.c
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
 
 $(MSWSYS)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
@@ -1213,15 +1195,15 @@ $(U)dlb.exe: $(DLBOBJ_HOST) $(O)dlb$(HOST).o
 		$(O)panic$(HOST).o
 <<
 
-!IFDEF CROSSCOMPILE_HOST
+!IFDEF TEST_CROSSCOMPILE
 $(O)dlb$(HOST).o: $(O)dlb_main$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o $(INCL)\dlb.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(SRC)\dlb.c
 !ENDIF
 
 $(O)dlb.o: $(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(SRC)\dlb.c
+	@$(cc) $(cflagsBuild) /Fo$@ $(SRC)\dlb.c
 	
-!IFDEF CROSSCOMPILE_HOST
+!IFDEF TEST_CROSSCOMPILE
 $(O)dlb_main$(HOST).o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(UTIL)\dlb_main.c
 !ENDIF
@@ -1269,61 +1251,61 @@ $(U)recover.exe: $(RECOVOBJS)
 	$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(MSWSYS)\win32api.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(U)recover.c
+	@$(cc) $(cflagsBuild) -Fo$@ $(U)recover.c
 
 #==========================================
 #  Tile Mapping
 #==========================================
 
 $(SRC)\tile.c: $(U)tilemap.exe
-	@echo A new $(@:\=/) has been created
 	@$(U)tilemap
+	@echo A new $(@:\=/) has been created
 
-$(U)tilemap.exe: $(O)tilemap$(HOST).o
+$(U)tilemap.exe: $(O)tilemap.o
 	@echo Linking $(@:\=/)
-	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap$(HOST).o
+	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
-$(O)tilemap$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
+$(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(WSHR)\tilemap.c
 
-$(O)tiletx32$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
+$(O)tiletx32.o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
 
-$(O)tiletxt$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
+$(O)tiletxt.o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
 
-$(O)gifread$(HOST).o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
+$(O)gifread.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
 
-$(O)gifrd32$(HOST).o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
+$(O)gifrd32.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
 
-$(O)ppmwrite$(HOST).o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
+$(O)ppmwrite.o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
 
-$(O)tiletext$(HOST).o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
+$(O)tiletext.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
 
-$(O)tilete32$(HOST).o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
+$(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
 
 #==========================================
 # Optional Tile Utilities
 #==========================================
 
-$(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
+$(U)gif2txt.exe: $(GIFREADERS_HOST) $(TEXT_IO)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
-		$(GIFREADERS:^	=^
+		$(GIFREADERS_HOST:^	=^
 		)
 		$(TEXT_IO:^	=^
 		)
 <<
 
-$(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
+$(U)gif2tx32.exe: $(GIFREADERS32_HOST) $(TEXT_IO32)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
-		$(GIFREADERS32:^	=^
+		$(GIFREADERS32_HOST:^	=^
 		)
 		$(TEXT_IO32:^	=^
 		)
@@ -1347,26 +1329,26 @@ $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
 #	@$(U)til2bm32 $(TILEBMP32)
 
 
-$(U)tile2bmp.exe: $(O)tile2bmp$(HOST).o $(TEXT_IO)
+$(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
-		$(O)tile2bmp$(HOST).o
+		$(O)tile2bmp.o
 		$(TEXT_IO:^  =^
 		)
 <<
 
-$(U)til2bm32.exe: $(O)til2bm32$(HOST).o $(TEXT_IO32)
+$(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
-		$(O)til2bm32$(HOST).o
+		$(O)til2bm32.o
 		$(TEXT_IO32:^  =^
 		)
 <<
 
-$(O)tile2bmp$(HOST).o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
+$(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
 
-$(O)til2bm32$(HOST).o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
+$(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
 #===============================================================================
@@ -1490,14 +1472,14 @@ $(O)sfstruct.o: $(HACK_H) $(SRC)\sfstruct.c
 # data file.
 #
 
-!IFDEF CROSSCOMPILE_HOST
+!IFDEF TEST_CROSSCOMPILE
 $(O)mdlib$(HOST).o: $(SRC)\mdlib.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_HOST) -Fo$@ $(SRC)\mdlib.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(SRC)\mdlib.c
 !ENDIF
 
 $(O)mdlib.o: $(SRC)\mdlib.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(SRC)\mdlib.c
-#	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EP -Fo$@ $(SRC)\mdlib.c >mdlib.c.preprocessed
+	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\mdlib.c
+#	@$(cc) $(cflagsBuild) /EP -Fo$@ $(SRC)\mdlib.c >mdlib.c.preprocessed
 
 #============================================
 # util dual-role CROSSCOMPILE dependencies
@@ -1505,64 +1487,41 @@ $(O)mdlib.o: $(SRC)\mdlib.c
 #
 # These have dual-roles and need to be build for host and target platforms.
 #
-!IFDEF CROSSCOMPILE_HOST
-$(O)panic$(HOST).o:  $(U)panic.c $(CONFIG_H)
+$(O)panic_host.o:  $(U)panic.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(U)panic.c
-!ENDIF
 
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(U)panic.c
+	@$(cc) $(cflagsBuild) -Fo$@ $(U)panic.c
 
-
-!IFDEF CROSSCOMPILE_HOST
-$(O)drawing$(HOST).o: drawing.c $(HACK_H) $(INCL)\tcap.h
+$(O)drawing_host.o: drawing.c $(HACK_H) $(INCL)\tcap.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ drawing.c
-!ENDIF
 
 $(O)drawing.o: drawing.c $(HACK_H) $(INCL)\tcap.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ drawing.c
+	@$(cc) $(cflagsBuild) -Fo$@ drawing.c
 
-!IFDEF CROSSCOMPILE_HOST
-$(O)decl$(HOST).o: decl.c $(HACK_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ decl.c
-!ENDIF
-
-$(O)decl.o: decl.c $(HACK_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ decl.c
-
-!IFDEF CROSSCOMPILE_HOST
-$(O)monst$(HOST).o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
+$(O)monst_host.o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
 		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\monsym.h \
 		$(INCL)\color.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ monst.c
-!ENDIF
+	@$(cc) $(cflagsBuild) -Fo$@ monst.c
 
 $(O)monst.o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
 		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\monsym.h \
 		$(INCL)\color.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ monst.c
+	@$(cc) $(cflagsBuild) -Fo$@ monst.c
 
-!IFDEF CROSSCOMPILE_HOST
-$(O)objects$(HOST).o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
-		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ objects.c
-!ENDIF
-
-$(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
+$(O)objects_host.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ objects.c
 
-!IFDEF CROSSCOMPILE_HOST
-$(O)alloc$(HOST).o: alloc.c $(CONFIG_H)
+$(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
+		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
+	@$(cc) $(cflagsBuild) -Fo$@ objects.c
+
+$(O)alloc_host.o: alloc.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ alloc.c
-!ENDIF
 
 $(O)alloc.o: alloc.c $(CONFIG_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ alloc.c
-
-$(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h \
-		$(INCL)\patchlevel.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ version.c
+	@$(cc) $(cflagsBuild) -Fo$@ alloc.c
 
 #===================================================================
 # DAT dependencies
@@ -2014,7 +1973,7 @@ $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)\mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
-$(O)drawing.o: drawing.c $(HACK_H) $(INCL)\tcap.h
+$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)\tcap.h
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)\dgn_file.h $(INCL)\dlb.h
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)\dlb.h
@@ -2070,8 +2029,8 @@ $(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 $(O)objnam.o: objnam.c $(HACK_H)
 $(O)options.o: options.c $(INCL)\optlist.h $(CONFIG_H) $(INCL)\objclass.h $(INCL)\flag.h \
 		$(HACK_H) $(INCL)\tcap.h
-	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EP options.c >$(@B).preproc
-	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ options.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ options.c
+#	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EP options.c >$(@B).preproc
 $(O)pager.o: pager.c $(HACK_H) $(INCL)\dlb.h
 $(O)pickup.o: pickup.c $(HACK_H)
 $(O)pline.o: pline.c $(HACK_H)
@@ -2099,6 +2058,7 @@ $(O)sp_lev.o: sp_lev.c $(HACK_H) $(INCL)\sp_lev.h
 $(O)spell.o: spell.c $(HACK_H)
 $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
+$(O)symbols.o: symbols.c $(HACK_H)
 $(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
 $(O)timeout.o: timeout.c $(HACK_H)
@@ -2110,6 +2070,7 @@ $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
 $(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h \
 		$(INCL)\patchlevel.h
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ version.c
 $(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
