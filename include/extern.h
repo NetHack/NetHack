@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1585361043 2020/03/28 02:04:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.815 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1588798973 2020/05/06 21:02:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.842 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,7 +16,7 @@ E char *FDECL(fmt_ptr, (const genericptr));
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */
-#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(LEV_LEX_C)
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C)
 
 /* ### allmain.c ### */
 
@@ -714,9 +714,9 @@ E int NDECL(done2);
 E void FDECL(done_intr, (int));
 #endif
 E void FDECL(done_in_by, (struct monst *, int));
-#endif /* !MAKEDEFS_C && MDLIB_C && !LEV_LEX_C */
+#endif /* !MAKEDEFS_C && MDLIB_C */
 E void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2) NORETURN;
-#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(LEV_LEX_C)
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C)
 E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *, BOOLEAN_P,
                                   BOOLEAN_P, BOOLEAN_P));
@@ -3178,7 +3178,7 @@ E int FDECL(destroy_mitem, (struct monst *, int, int));
 E int FDECL(resist, (struct monst *, CHAR_P, int, int));
 E void NDECL(makewish);
 
-#endif /* !MAKEDEFS_C && !MDLIB_C && !LEV_LEX_C */
+#endif /* !MAKEDEFS_C && !MDLIB_C */
 
 #undef E
 
