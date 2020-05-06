@@ -30,7 +30,6 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="$(SrcDir)decl.c" />
     <ClCompile Include="$(SrcDir)drawing.c" />
     <ClCompile Include="$(SrcDir)monst.c" />
     <ClCompile Include="$(SrcDir)objects.c" />

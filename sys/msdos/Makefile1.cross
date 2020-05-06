@@ -612,11 +612,12 @@ spotless: clean
 #	if [ -f $(WSHR)/oththin.txt ]; then rm $(WSHR)/oththin.txt; fi;
 
 #==========================================
-# Game Dependencies
+# Host Utility Dependencies
 #==========================================
 
 # src dependencies
 
+$(HOST_O)drawing.o: $(CONFIG_H)
 $(HOST_O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(HOST_O)alloc.o: alloc.c $(CONFIG_H)
 $(HOST_O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h

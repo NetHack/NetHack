@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl    $NHDT-Date: 1576976264 2019/12/22 00:57:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $
+# NetHack 3.6  Makefile.utl    $NHDT-Date: 1588776926 2020/05/06 14:55:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -171,8 +171,8 @@ UTILSRCS = $(MAKESRC) panic.c $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
 CMONOBJ = ../src/monst.c ../src/objects.c
 OMONOBJ = $(OBJDIR)/monst.o $(OBJDIR)/objects.o
 # files that provide access to NetHack's names
-CNAMING = ../src/drawing.c ../src/decl.c $(CMONOBJ)
-ONAMING = $(OBJDIR)/drawing.o $(OBJDIR)/decl.o $(OMONOBJ)
+CNAMING = ../src/drawing.c $(CMONOBJ)
+ONAMING = $(OBJDIR)/drawing.o $(OMONOBJ)
 # dynamic memory allocation
 CALLOC = ../src/alloc.c panic.c
 OALLOC = $(OBJDIR)/alloc.o panic.o
