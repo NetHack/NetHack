@@ -180,6 +180,7 @@
     <ClCompile Include="$(SrcDir)sp_lev.c" />
     <ClCompile Include="$(SrcDir)steal.c" />
     <ClCompile Include="$(SrcDir)steed.c" />
+    <ClCompile Include="$(SrcDir)symbols.c" />
     <ClCompile Include="$(SrcDir)sys.c" />
     <ClCompile Include="$(SrcDir)teleport.c" />
     <ClCompile Include="$(SrcDir)tile.c" />

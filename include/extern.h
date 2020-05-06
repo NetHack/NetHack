@@ -1264,6 +1264,11 @@ E boolean FDECL(menuitem_invert_test, (int, unsigned, BOOLEAN_P));
 E int FDECL(castmu, (struct monst *, struct attack *, BOOLEAN_P, BOOLEAN_P));
 E int FDECL(buzzmu, (struct monst *, struct attack *));
 
+/* ### mdlib.c ### */
+
+E void NDECL(runtime_info_init);
+E const char *FDECL(do_runtime_info, (int *));
+
 /* ### mhitm.c ### */
 
 E int FDECL(fightm, (struct monst *));
@@ -1320,6 +1325,7 @@ E void NDECL(sort_rooms);
 E void FDECL(add_room, (int, int, int, int, BOOLEAN_P, SCHAR_P, BOOLEAN_P));
 E void FDECL(add_subroom, (struct mkroom *, int, int, int, int, BOOLEAN_P,
                            SCHAR_P, BOOLEAN_P));
+E void FDECL(free_luathemes, (BOOLEAN_P));
 E void NDECL(makecorridors);
 E void FDECL(add_door, (int, int, struct mkroom *));
 E void NDECL(clear_level_structures);
@@ -1517,8 +1523,8 @@ E boolean FDECL(valid_vampshiftform, (int, int));
 E boolean FDECL(validvamp, (struct monst *, int *, int));
 E int FDECL(select_newcham_form, (struct monst *));
 E void FDECL(mgender_from_permonst, (struct monst *, struct permonst *));
-E int FDECL(newcham,
-            (struct monst *, struct permonst *, BOOLEAN_P, BOOLEAN_P));
+E int FDECL(newcham, (struct monst *, struct permonst *, BOOLEAN_P,
+                      BOOLEAN_P));
 E int FDECL(can_be_hatched, (int));
 E int FDECL(egg_type_from_parent, (int, BOOLEAN_P));
 E boolean FDECL(dead_species, (int, BOOLEAN_P));
@@ -1529,7 +1535,6 @@ E void NDECL(pacify_guards);
 E struct monst *FDECL(find_ghost_with_name, (char *));
 E void FDECL(decide_to_shapeshift, (struct monst *, int));
 E boolean FDECL(vamp_stone, (struct monst *));
-E void NDECL(monst_globals_init);
 
 /* ### mondata.c ### */
 
@@ -1605,9 +1610,7 @@ E boolean FDECL(undesirable_disp, (struct monst *, XCHAR_P, XCHAR_P));
 
 /* ### monst.c ### */
 
-/* ### monstr.c ### */
-
-E void NDECL(monstr_init);
+E void NDECL(monst_globals_init);
 
 /* ### mplayer.c ### */
 
@@ -1767,11 +1770,6 @@ E boolean FDECL(regex_compile, (const char *, struct nhregex *));
 E const char *FDECL(regex_error_desc, (struct nhregex *));
 E boolean FDECL(regex_match, (const char *, struct nhregex *));
 E void FDECL(regex_free, (struct nhregex *));
-
-/* ### mdlib.c ### */
-
-E void NDECL(runtime_info_init);
-E const char *FDECL(do_runtime_info, (int *));
 
 /* ### nttty.c ### */
 

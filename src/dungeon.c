@@ -144,23 +144,24 @@ boolean perform_write, free_data;
             bwrite(nhfp->fd, (genericptr_t) &g.n_dgns, sizeof g.n_dgns);
             bwrite(nhfp->fd, (genericptr_t) g.dungeons,
                    sizeof(dungeon) * (unsigned) g.n_dgns);
-            bwrite(nhfp->fd, (genericptr_t) &g.dungeon_topology, sizeof g.dungeon_topology);
+            bwrite(nhfp->fd, (genericptr_t) &g.dungeon_topology,
+                   sizeof g.dungeon_topology);
             bwrite(nhfp->fd, (genericptr_t) g.tune, sizeof tune);
         }
         for (count = 0, curr = g.branches; curr; curr = curr->next)
             count++;
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &count, sizeof(count));
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
 
         for (curr = g.branches; curr; curr = curr->next) {
           if (nhfp->structlevel)
-              bwrite(nhfp->fd, (genericptr_t) curr, sizeof(branch));
+              bwrite(nhfp->fd, (genericptr_t) curr, sizeof *curr);
         }
         count = maxledgerno();
         if (nhfp->structlevel) { 
             bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
             bwrite(nhfp->fd, (genericptr_t) g.level_info,
-                   (unsigned) count * sizeof(struct linfo));
+                   (unsigned) count * sizeof (struct linfo));
             bwrite(nhfp->fd, (genericptr_t) &g.inv_pos, sizeof g.inv_pos);
         }
         for (count = 0, curr_ms = g.mapseenchn; curr_ms;
@@ -168,7 +169,7 @@ boolean perform_write, free_data;
             count++;
 
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &count, sizeof(count));
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
 
         for (curr_ms = g.mapseenchn; curr_ms; curr_ms = curr_ms->next) {
             save_mapseen(nhfp, curr_ms);
@@ -203,23 +204,22 @@ NHFILE *nhfp;
     mapseen *curr_ms, *last_ms;
 
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) &g.n_dgns, sizeof(g.n_dgns));
-        mread(nhfp->fd, (genericptr_t) g.dungeons, sizeof(dungeon) * (unsigned) g.n_dgns);
-        mread(nhfp->fd, (genericptr_t) &g.dungeon_topology, sizeof g.dungeon_topology);
+        mread(nhfp->fd, (genericptr_t) &g.n_dgns, sizeof g.n_dgns);
+        mread(nhfp->fd, (genericptr_t) g.dungeons,
+              sizeof (dungeon) * (unsigned) g.n_dgns);
+        mread(nhfp->fd, (genericptr_t) &g.dungeon_topology,
+              sizeof g.dungeon_topology);
         mread(nhfp->fd, (genericptr_t) g.tune, sizeof tune);
     }
     last = g.branches = (branch *) 0;
 
-    for (i = 0; i < g.n_dgns; i++)
-        g.dungeons[i].themelua = (lua_State *) 0;
-
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
 
     for (i = 0; i < count; i++) {
-        curr = (branch *) alloc(sizeof(branch));
+        curr = (branch *) alloc(sizeof *curr);
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) curr, sizeof(branch));
+            mread(nhfp->fd, (genericptr_t) curr, sizeof *curr);
         curr->next = (branch *) 0;
         if (last)
             last->next = curr;
@@ -229,18 +229,18 @@ NHFILE *nhfp;
     }
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
 
     if (count >= MAXLINFO)
         panic("level information count larger (%d) than allocated size",
               count);
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) g.level_info,
-              (unsigned) count * sizeof(struct linfo));
+              (unsigned) count * sizeof (struct linfo));
 
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) &g.inv_pos, sizeof g.inv_pos);
-        mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
     }
 
     last_ms = (mapseen *) 0;
@@ -1030,7 +1030,6 @@ init_dungeons()
         Strcpy(g.dungeons[i].dname, dgn_name); /* FIXME: dname length */
         Strcpy(g.dungeons[i].proto, dgn_protoname); /* FIXME: proto length */
         Strcpy(g.dungeons[i].themerms, dgn_themerms); /* FIXME: length */
-        g.dungeons[i].themelua = (lua_State *) 0;
         g.dungeons[i].boneid = *dgn_bonetag ? *dgn_bonetag : 0;
         free((genericptr) dgn_fill);
         /* free((genericptr) dgn_protoname); -- stored in pd.tmpdungeon[] */
