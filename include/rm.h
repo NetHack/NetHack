@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1580070206 2020/01/26 20:23:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1589064684 2020/05/09 22:51:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -663,5 +663,14 @@ typedef struct {
 
 /* restricted movement, potential luck penalties */
 #define Sokoban g.level.flags.sokoban_rules
+
+/*
+ * These prototypes are in extern.h but some of the code which uses them
+ * includes config.h instead of hack.h so doesn't see extern.h.
+ */
+/* ### drawing.c ### */
+extern int FDECL(def_char_to_objclass, (CHAR_P));
+extern int FDECL(def_char_to_monclass, (CHAR_P));
+extern int FDECL(def_char_is_furniture, (CHAR_P));
 
 #endif /* RM_H */
