@@ -7,7 +7,6 @@
 #include "rm.h"
 #include "objclass.h"
 #include "monsym.h"
-#include "tcap.h"
 
 /* Relevant header information in rm.h, objclass.h, and monsym.h. */
 

@@ -355,7 +355,7 @@ int state;
 }
 
 #ifdef TERMLIB
-extern void NDECL((*decgraphics_mode_callback)); /* defined in drawing.c */
+extern void NDECL((*decgraphics_mode_callback)); /* defined in symbols.c */
 static void NDECL(tty_decgraphics_termcap_fixup);
 
 /*
