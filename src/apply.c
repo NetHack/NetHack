@@ -75,11 +75,16 @@ struct obj *obj;
             (u.dz > 0) ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
     } else if (!u.dx && !u.dy) {
         (void) zapyourself(obj, TRUE);
-    } else if ((mtmp = bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT,
-                            (int FDECL((*), (MONST_P, OBJ_P))) 0,
-                            (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj)) != 0) {
-        obj->ox = u.ux, obj->oy = u.uy;
-        (void) flash_hits_mon(mtmp, obj);
+    } else {
+        mtmp = bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT,
+                    (int FDECL((*), (MONST_P, OBJ_P))) 0,
+                    (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj);
+        obj->ox = u.ux, obj->oy = u.uy; /* flash_hits_mon() wants this */
+        if (mtmp)
+            (void) flash_hits_mon(mtmp, obj);
+        /* normally bhit() would do this but for FLASHED_LIGHT we want it
+           to be deferred until after flash_hits_mon() */
+        transient_light_cleanup();
     }
     return 1;
 }

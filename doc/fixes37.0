@@ -324,6 +324,8 @@ extended achievement and conduct fields for xlogfile
 record amount of gold in hero's possession in xlogfile
 new objects:  amulets of flying and guarding
 new monsters:  displacer beast ('f') and genetic engineer ('Q')
+make camera flash which reveals previously unseen map features or objects or
+	monsters record those on the hero's map; monsters revert to 'unseen'
 
 
 Platform- and/or Interface-Specific New Features

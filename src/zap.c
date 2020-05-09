@@ -3320,6 +3320,8 @@ struct obj **pobj; /* object tossed/used, set to NULL
 
         /* iron bars will block anything big enough and break some things */
         if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON) {
+            if (obj->lamplit && !Blind)
+                show_transient_light(obj, g.bhitpos.x, g.bhitpos.y);
             if (typ == IRONBARS
                 && hits_bars(pobj, x - ddx, y - ddy, g.bhitpos.x, g.bhitpos.y,
                              point_blank ? 0 : !rn2(5), 1)) {
@@ -3328,9 +3330,11 @@ struct obj **pobj; /* object tossed/used, set to NULL
                 g.bhitpos.x -= ddx;
                 g.bhitpos.y -= ddy;
                 break;
-            } else if (obj->lamplit && !Blind) {
-                show_transient_light(obj, g.bhitpos.x, g.bhitpos.y);
             }
+        } else if (weapon == FLASHED_LIGHT) {
+            if (!Blind)
+                show_transient_light((struct obj *) 0,
+                                     g.bhitpos.x, g.bhitpos.y);
         }
 
         if (weapon == ZAPPED_WAND && find_drawbridge(&x, &y)) {
@@ -3546,6 +3550,8 @@ struct obj **pobj; /* object tossed/used, set to NULL
         pay_for_damage("destroy", FALSE);
 
  bhit_done:
+    /* note: for FLASHED_LIGHT, _caller_ must call transient_light_cleanup()
+       after possibly calling flash_hits_mon() */
     if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
         transient_light_cleanup();
 
