@@ -322,7 +322,7 @@ transient_light_cleanup()
         if (mon->mtemplit) {
             mon->mtemplit = 0;
             ++mtempcount;
-            if (!canseemon(mon))
+            if (!canspotmon(mon))
                 map_invisible(mon->mx, mon->my);
         }
     }
