@@ -397,4 +397,6 @@ resurrect 'makedefs -m' to be able to derive default mons[].diffculty values
 	suitable for assigning to new or changed monsters
 convert obj->oextra->omid from pointer to scalar
 get rid of unused obj->oextra->olong
-
+relocated unmaintained code to outdated folder, specifically sys/amiga, 
+	sys/atari, sys/be, sys/mac, sys/os2, sys/wince, win/Qt3, win/gem,
+	win/gnome
