@@ -695,6 +695,7 @@ $(U)tilemap.exe: $(O)tilemap.o
 $(O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H) $(TILE_H)
 	$(CC) $(cflags) -I$(WSHR) -I$(MSYS) -o$@ $(WSHR)/tilemap.c
 
+endif
 
 #==========================================
 #   Tile Utilities
@@ -789,7 +790,6 @@ $(U)viewtib.exe: $(O)viewtib.o
 	$(LINK) $(LFLAGS) -o$@ $(O)viewtib.o $(LIBRARIES)
 
 $(O)viewtib.o: $(MSYS)/viewtib.c
-!endif
 
 #==========================================
 # PDCurses Library
