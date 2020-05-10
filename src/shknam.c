@@ -688,6 +688,12 @@ int rmno, sh, sx,sy;
                || (sy == sroom->ly && g.doors[sh].y == sy - 1)
                || (sy == sroom->hy && g.doors[sh].y == sy + 1))
         return FALSE;
+
+    /* only generate items on solid floor squares */
+    if (!IS_ROOM(levl[sx][sy].typ)) {
+        return FALSE;
+    }
+
     return TRUE;
 }
 
