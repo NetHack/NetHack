@@ -1217,6 +1217,14 @@ aligntyp g_align;
     if (kick_on_butt)
         u.ublesscnt += kick_on_butt * rnz(1000);
 
+    /* Avoid games that go into infinite loops of copy-pasted commands with no
+       human interaction; this is a DoS vector against the computer running
+       NetHack. Once the turn counter is over 100000, every additional 100 turns
+       increases the prayer timeout by 1, thus eventually nutrition prayers will
+       fail and some other source of nutrition will be required. */
+    if (g.moves > 100000L)
+        u.ublesscnt += (g.moves - 100000L) / 100;
+
     return;
 }
 
