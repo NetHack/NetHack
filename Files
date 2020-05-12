@@ -114,6 +114,86 @@ wintty.h
 mac-carbon.h  mac-qt.h      mac-term.h    macconf.h     macpopup.h
 mactty.h      macwin.h      mttypriv.h
 
+outdated/sys/amiga:
+(files for Amiga versions - untested for 3.7)
+Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
+amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
+amii.hlp      amimenu.c     amirip.c      amistack.c    amitty.c
+amiwind.c     amiwind.p     clipwin.c     colorwin.c    grave16.xpm
+ifchange      mkdmake       txt2iff.c     winami.c      winami.p
+winchar.c     windefs.h     winext.h      winfuncs.c    winkey.c
+winmenu.c     winproto.h    winreq.c      winstr.c      xpm2iff.c
+
+outdated/sys/atari:
+(files for Atari version - untested for 3.7)
+Install.tos   atarifnt.uue  nethack.mnu   setup.g       tos.c
+unx2atar.sed
+
+outdated/sys/be:
+(files for BeOS version - untested for 3.7)
+README    bemain.c
+
+outdated/sys/mac:
+(files for 68K Macintosh versions)
+Files.r       Install.mw    MacHelp       NHDeflts      NHrsrc.hqx
+NHsound.hqx   News          README        carbon.plist  dprintf.c
+maccurs.c     macerrs.c     macfile.c     machelp.hqx   macmain.c
+macmenu.c     mactopl.c     mactty.c      macunix.c     macwin.c
+mgetline.c    mmodal.c      mrecover.c    mrecover.hqx  mttymain.c
+
+outdated/sys/msdos:
+(files for deprecated real mode msdos version)
+Makefile.BC   Makefile.MSC  SCHEMA35.MSC  moveinit.pat  ovlinit.c
+schema1.BC    schema2.BC    schema3.MSC
+
+outdated/sys/os2:
+(files for OS/2 version - untested for 3.7)
+Install.os2   Makefile.os2  nhpmico.uu    os2.c
+
+outdated/sys/wince:
+(files for Windows CE and PocketPC - untested for 3.7)
+Install.ce    bootstrp.mak  celib.c       cesetup.bat   cesound.c
+defaults.nh   keypad.uu     menubar.uu    mhaskyn.c     mhaskyn.h
+mhcmd.c       mhcmd.h       mhcolor.c     mhcolor.h     mhdlg.c
+mhdlg.h       mhfont.c      mhfont.h      mhinput.c     mhinput.h
+mhmain.c      mhmain.h      mhmap.c       mhmap.h       mhmenu.c
+mhmenu.h      mhmsg.h       mhmsgwnd.c    mhmsgwnd.h    mhrip.c
+mhrip.h       mhstatus.c    mhstatus.h    mhtext.c      mhtext.h
+mhtxtbuf.c    mhtxtbuf.h    mswproc.c     newres.h      nhico.uu
+resource.h    winMS.h       winhack.c     winhack.rc    winhcksp.rc
+winmain.c
+
+outdated/sys/wince/ceinc:
+(header files for Windows CE and PocketPC - untested for 3.7)
+assert.h  errno.h   fcntl.h
+
+outdated/sys/wince/ceinc/sys:
+(sys/stat.h for Windows CE and PocketPC - untested for 3.6.2)
+stat.h
+
+outdated/win/Qt3:
+(files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
+Info.plist           Install.Qt           knethack.lnk
+knh-mini.xpm         knh.xpm              qpe-nethack.control
+qt3_clust.cpp        qt3_clust.h          qt3_kde0.h
+qt3_win.cpp          qt3_win.h            qt3_xpms.h
+qt3tableview.cpp     qt3tableview.h       tileedit.cpp
+tileedit.h
+
+outdated/win/gem:
+(files for GEM versions - untested for 3.7)
+Install.gem  bitmfile.c   gem_rsc.uu   gem_rso.uu   gr_rect.c    gr_rect.h
+load_img.c   tile2img.c   title.uu     wingem.c     wingem1.c    xpm2img.c
+
+outdated/win/gnome:
+(files for GNOME versions - untested for 3.7)
+README      gn_xpms.h   gnaskstr.c  gnaskstr.h  gnbind.c    gnbind.h
+gnglyph.c   gnglyph.h   gnmain.c    gnmain.h    gnmap.c     gnmap.h
+gnmenu.c    gnmenu.h    gnmesg.c    gnmesg.h    gnomeprv.h  gnopts.c
+gnopts.h    gnplayer.c  gnplayer.h  gnsignal.c  gnsignal.h  gnstatus.c
+gnstatus.h  gntext.c    gntext.h    gnworn.c    gnworn.h    gnyesno.c
+gnyesno.h   mapbg.xpm
+
 src:
 (files for all versions)
 allmain.c   alloc.c     apply.c     artifact.c  attrib.c    ball.c
@@ -137,52 +217,18 @@ uhitm.c     vault.c     version.c   vision.c    weapon.c    were.c
 wield.c     windows.c   wizard.c    worm.c      worn.c      write.c
 zap.c
 
-sys/amiga:
-(files for Amiga versions - untested for 3.7)
-Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
-amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
-amii.hlp      amimenu.c     amirip.c      amistack.c    amitty.c
-amiwind.c     amiwind.p     clipwin.c     colorwin.c    grave16.xpm
-ifchange      mkdmake       txt2iff.c     winami.c      winami.p
-winchar.c     windefs.h     winext.h      winfuncs.c    winkey.c
-winmenu.c     winproto.h    winreq.c      winstr.c      xpm2iff.c
-
-sys/atari:
-(files for Atari version - untested for 3.7)
-Install.tos   atarifnt.uue  nethack.mnu   setup.g       tos.c
-unx2atar.sed
-
-sys/be:
-(files for BeOS version - untested for 3.7)
-README    bemain.c
-
-sys/mac:
-(files for 68K Macintosh versions)
-Files.r       Install.mw    MacHelp       NHDeflts      NHrsrc.hqx
-NHsound.hqx   News          README        carbon.plist  dprintf.c
-maccurs.c     macerrs.c     macfile.c     machelp.hqx   macmain.c
-macmenu.c     mactopl.c     mactty.c      macunix.c     macwin.c
-mgetline.c    mmodal.c      mrecover.c    mrecover.hqx  mttymain.c
-
 sys/msdos:
 (files for MSDOS version)
-Install.dos             Makefile.BC             Makefile.GCC
-Makefile.MSC            Makefile1.cross         Makefile2.cross
-SCHEMA35.MSC            moveinit.pat            msdos-cross-compile.sh
-msdos.c                 msdoshlp.txt            nhlua.h
-ovlinit.c               pckeys.c                pctiles.c
-pctiles.h               pcvideo.h               portio.h
-schema1.BC              schema2.BC              schema3.MSC
-setup.bat               sysconf                 tile2bin.c
-vesa.h                  video.c                 vidtxt.c
-vidvesa.c               vidvga.c
+Install.dos             Makefile.GCC            Makefile1.cross
+Makefile2.cross         msdos-cross-compile.sh  msdos.c
+msdoshlp.txt            nhlua.h                 pckeys.c
+pctiles.c               pctiles.h               pcvideo.h
+portio.h                setup.bat               sysconf
+tile2bin.c              vesa.h                  video.c
+vidtxt.c                vidvesa.c               vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
-
-sys/os2:
-(files for OS/2 version - untested for 3.7)
-Install.os2   Makefile.os2  nhpmico.uu    os2.c
 
 sys/share:
 (Berkeley random number file, which may be included in any version)
@@ -267,27 +313,6 @@ Makefile.utl  install.com   lev_lex.h     nethack.com   oldcrtl.c
 spec_lev.com  sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c
 vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
 
-sys/wince:
-(files for Windows CE and PocketPC - untested for 3.7)
-Install.ce    bootstrp.mak  celib.c       cesetup.bat   cesound.c
-defaults.nh   keypad.uu     menubar.uu    mhaskyn.c     mhaskyn.h
-mhcmd.c       mhcmd.h       mhcolor.c     mhcolor.h     mhdlg.c
-mhdlg.h       mhfont.c      mhfont.h      mhinput.c     mhinput.h
-mhmain.c      mhmain.h      mhmap.c       mhmap.h       mhmenu.c
-mhmenu.h      mhmsg.h       mhmsgwnd.c    mhmsgwnd.h    mhrip.c
-mhrip.h       mhstatus.c    mhstatus.h    mhtext.c      mhtext.h
-mhtxtbuf.c    mhtxtbuf.h    mswproc.c     newres.h      nhico.uu
-resource.h    winMS.h       winhack.c     winhack.rc    winhcksp.rc
-winmain.c
-
-sys/wince/ceinc:
-(header files for Windows CE and PocketPC - untested for 3.7)
-assert.h  errno.h   fcntl.h
-
-sys/wince/ceinc/sys:
-(sys/stat.h for Windows CE and PocketPC - untested for 3.6.2)
-stat.h
-
 sys/winnt:
 (files for Windows 7/8.x/10 version)
 .nethackrc.template  Install.nt           Makefile.gcc
@@ -321,15 +346,6 @@ qt_str.cpp    qt_str.h      qt_streq.cpp  qt_streq.h    qt_svsel.cpp
 qt_svsel.h    qt_win.cpp    qt_win.h      qt_xcmd.cpp   qt_xcmd.h
 qt_xpms.h     qt_yndlg.cpp  qt_yndlg.h
 
-win/Qt3:
-(files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
-Info.plist           Install.Qt           knethack.lnk
-knh-mini.xpm         knh.xpm              qpe-nethack.control
-qt3_clust.cpp        qt3_clust.h          qt3_kde0.h
-qt3_win.cpp          qt3_win.h            qt3_xpms.h
-qt3tableview.cpp     qt3tableview.h       tileedit.cpp
-tileedit.h
-
 win/X11:
 (files for X versions)
 Install.X11   NetHack.ad    Window.c      dialogs.c     ibm.bdf
@@ -347,20 +363,6 @@ win/curses:
 Bugs.txt    Readme.txt  Todo.txt    cursdial.c  cursdial.h  cursinit.c
 cursinit.h  cursinvt.c  cursinvt.h  cursmain.c  cursmesg.c  cursmesg.h
 cursmisc.c  cursmisc.h  cursstat.c  cursstat.h  curswins.c  curswins.h
-
-win/gem:
-(files for GEM versions - untested for 3.7)
-Install.gem  bitmfile.c   gem_rsc.uu   gem_rso.uu   gr_rect.c    gr_rect.h
-load_img.c   tile2img.c   title.uu     wingem.c     wingem1.c    xpm2img.c
-
-win/gnome:
-(files for GNOME versions - untested for 3.7)
-README      gn_xpms.h   gnaskstr.c  gnaskstr.h  gnbind.c    gnbind.h
-gnglyph.c   gnglyph.h   gnmain.c    gnmain.h    gnmap.c     gnmap.h
-gnmenu.c    gnmenu.h    gnmesg.c    gnmesg.h    gnomeprv.h  gnopts.c
-gnopts.h    gnplayer.c  gnplayer.h  gnsignal.c  gnsignal.h  gnstatus.c
-gnstatus.h  gntext.c    gntext.h    gnworn.c    gnworn.h    gnyesno.c
-gnyesno.h   mapbg.xpm
 
 win/macosx:
 (files for macosx versions)

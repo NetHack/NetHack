@@ -647,9 +647,6 @@ register struct obj *obj;
                 ELevitation = W_ART; /* other than W_ARTI */
             if (flags.verbose)
                 You("drop %s.", doname(obj));
-            /* Ensure update when we drop gold objects */
-            if (obj->oclass == COIN_CLASS)
-                g.context.botl = 1;
             freeinv(obj);
             hitfloor(obj, TRUE);
             if (levhack)
@@ -670,9 +667,6 @@ void
 dropx(obj)
 register struct obj *obj;
 {
-    /* Ensure update when we drop gold objects */
-    if (obj->oclass == COIN_CLASS)
-        g.context.botl = 1;
     freeinv(obj);
     if (!u.uswallow) {
         if (ship_object(obj, u.ux, u.uy, FALSE))

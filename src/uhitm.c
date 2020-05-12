@@ -3110,14 +3110,21 @@ struct monst *mon;
     u.umconf--;
 }
 
+/* returns 1 if light flash has noticeable effect on 'mtmp', 0 otherwise */
 int
 flash_hits_mon(mtmp, otmp)
 struct monst *mtmp;
 struct obj *otmp; /* source of flash */
 {
-    int tmp, amt, res = 0, useeit = canseemon(mtmp);
+    struct rm *lev;
+    int tmp, amt, useeit, res = 0;
 
-    if (mtmp->msleeping) {
+    if (g.notonhead)
+        return 0;
+    lev = &levl[mtmp->mx][mtmp->my];
+    useeit = canseemon(mtmp);
+
+    if (mtmp->msleeping && haseyes(mtmp->data)) {
         mtmp->msleeping = 0;
         if (useeit) {
             pline_The("flash awakens %s.", mon_nam(mtmp));
@@ -3144,7 +3151,18 @@ struct obj *otmp; /* source of flash */
                 mtmp->mcansee = 0;
                 mtmp->mblinded = (tmp < 3) ? 0 : rnd(1 + 50 / tmp);
             }
+        } else if (flags.verbose && useeit) {
+            if (lev->lit)
+                pline("The flash of light shines on %s.", mon_nam(mtmp));
+            else
+                pline("%s is illuminated.", Monnam(mtmp));
+            res = 2; /* 'message has been given' temporary value */
         }
+    }
+    if (res) {
+        if (!lev->lit)
+            display_nhwindow(WIN_MESSAGE, TRUE);
+        res &= 1; /* change temporary 2 back to 0 */
     }
     return res;
 }

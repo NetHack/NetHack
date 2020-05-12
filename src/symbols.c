@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "tcap.h"
 
 extern const uchar def_r_oc_syms[MAXOCLASSES];      /* drawing.c */
 

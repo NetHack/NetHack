@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1542501042 2018/11/18 00:30:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1589064692 2020/05/09 22:51:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /*      Copyright (c) 2016 by Michael Allison                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,7 +15,6 @@
 #include "objclass.h"
 #include "rm.h"
 #include "display.h"
-extern int FDECL(def_char_to_objclass, (CHAR_P));
 
 #define Fprintf (void) fprintf
 

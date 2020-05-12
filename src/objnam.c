@@ -2715,18 +2715,14 @@ boolean retry_inverted; /* optional extra "of" handling */
         o_of = strstri(o_str, " of ");
         if (u_of && !o_of) {
             Strcpy(buf, u_of + 4);
-            p = eos(strcat(buf, " "));
-            while (u_str < u_of)
-                *p++ = *u_str++;
-            *p = '\0';
-            return fuzzymatch(buf, o_str, " -", TRUE);
+            copynchars(eos(strcat(buf, " ")), u_str, (int) (u_of - u_str));
+            if (fuzzymatch(buf, o_str, " -", TRUE))
+                return TRUE;
         } else if (o_of && !u_of) {
             Strcpy(buf, o_of + 4);
-            p = eos(strcat(buf, " "));
-            while (o_str < o_of)
-                *p++ = *o_str++;
-            *p = '\0';
-            return fuzzymatch(u_str, buf, " -", TRUE);
+            copynchars(eos(strcat(buf, " ")), o_str, (int) (o_of - o_str));
+            if (fuzzymatch(u_str, buf, " -", TRUE))
+                return TRUE;
         }
     }
 
@@ -2741,6 +2737,15 @@ boolean retry_inverted; /* optional extra "of" handling */
             return fuzzymatch(u_str + 7, o_str + 6, " -", TRUE);
         else if (!strncmpi(u_str, "elfin ", 6))
             return fuzzymatch(u_str + 6, o_str + 6, " -", TRUE);
+    } else if (strstri(o_str, "helm") && strstri(u_str, "helmet")) {
+        copynchars(buf, u_str, (int) sizeof buf - 1);
+        (void) strsubst(buf, "helmet", "helm");
+        return wishymatch(buf, o_str,  TRUE);
+    } else if (strstri(o_str, "gauntlets") && strstri(u_str, "gloves")) {
+        /* -3: room to replace shorter "gloves" with longer "gauntlets" */
+        copynchars(buf, u_str, (int) sizeof buf - 1 - 3);
+        (void) strsubst(buf, "gloves", "gauntlets");
+        return wishymatch(buf, o_str, TRUE);
     } else if (!strncmp(o_str, detect_SP, sizeof detect_SP - 1)) {
         /* check for "detect <foo>" vs "<foo> detection" */
         if ((p = strstri(u_str, SP_detection)) != 0
@@ -2835,6 +2840,11 @@ static const struct alt_spellings {
     { "mattock", DWARVISH_MATTOCK },
     { "amulet of poison resistance", AMULET_VERSUS_POISON },
     { "amulet of protection", AMULET_OF_GUARDING },
+    { "amulet of telepathy", AMULET_OF_ESP },
+    { "helm of esp", HELM_OF_TELEPATHY },
+    { "gauntlets of ogre power", GAUNTLETS_OF_POWER },
+    { "gauntlets of giant strength", GAUNTLETS_OF_POWER },
+    { "elven chain mail", ELVEN_MITHRIL_COAT },
     { "potion of sleep", POT_SLEEPING },
     { "stone", ROCK },
     { "camera", EXPENSIVE_CAMERA },
@@ -2843,7 +2853,6 @@ static const struct alt_spellings {
     { "can opener", TIN_OPENER },
     { "kelp", KELP_FROND },
     { "eucalyptus", EUCALYPTUS_LEAF },
-    /* { "royal jelly", LUMP_OF_ROYAL_JELLY }, -- caught by " of " match */
     { "lembas", LEMBAS_WAFER },
     { "cookie", FORTUNE_COOKIE },
     { "pie", CREAM_PIE },
@@ -3583,8 +3592,12 @@ struct obj *no_wish;
          * Find corpse type using "of" (figurine of an orc, tin of orc meat)
          * Don't check if it's a wand or spellbook.
          * (avoid "wand/finger of death" confusion).
+         * Don't match "ogre" or "giant" monster name inside alternate item
+         * names "gauntlets of ogre power" and "gauntlets of giant strength"
+         * (or the alternate spelling of those, "gloves of ...").
          */
         if (!strstri(bp, "wand ") && !strstri(bp, "spellbook ")
+            && !strstri(bp, "gauntlets ") && !strstri(bp, "gloves ")
             && !strstri(bp, "finger ")) {
             if ((p = strstri(bp, "tin of ")) != 0) {
                 if (!strcmpi(p + 7, "spinach")) {
@@ -3662,7 +3675,7 @@ struct obj *no_wish;
         const struct alt_spellings *as = spellings;
 
         while (as->sp) {
-            if (fuzzymatch(bp, as->sp, " -", TRUE)) {
+            if (wishymatch(bp, as->sp, TRUE)) {
                 typ = as->ob;
                 goto typfnd;
             }

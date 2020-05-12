@@ -1065,7 +1065,7 @@ dog.o: dog.c $(HACK_H)
 dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h
 dokick.o: dokick.c $(HACK_H)
 dothrow.o: dothrow.c $(HACK_H)
-drawing.o: drawing.c $(CONFIG_H) ../include/tcap.h
+drawing.o: drawing.c $(CONFIG_H)
 dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
 eat.o: eat.c $(HACK_H)
 end.o: end.c $(HACK_H) ../include/dlb.h
@@ -1148,7 +1148,7 @@ sp_lev.o: sp_lev.c $(HACK_H) ../include/sp_lev.h
 spell.o: spell.c $(HACK_H)
 steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
-symbols.o: symbols.c $(HACK_H)
+symbols.o: symbols.c $(HACK_H) ../include/tcap.h
 sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
 timeout.o: timeout.c $(HACK_H)

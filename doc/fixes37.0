@@ -174,6 +174,9 @@ when digging a pit results in it being filled by adjacent pool or lava, any
 after "double trouble", cloned Wizard would wait until he had suffered some
 	damage or hero moved into direct view; keep STRAT_WAIT for original
 	Wizard but avoid that for clones
+beyond turn 100000, prayer timeout is longer (scaling with game length)
+falling while going down stairs and dropping items due to encumbrance or
+	punishment wasn't subject fragile ones to breakage
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -240,6 +243,7 @@ X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
 	inverse video to distinguish from ordinary floor
+only generate shop items on solid floor squares
 
 
 Platform- and/or Interface-Specific Fixes
@@ -324,6 +328,8 @@ extended achievement and conduct fields for xlogfile
 record amount of gold in hero's possession in xlogfile
 new objects:  amulets of flying and guarding
 new monsters:  displacer beast ('f') and genetic engineer ('Q')
+make camera flash which reveals previously unseen map features or objects or
+	monsters record those on the hero's map; monsters revert to 'unseen'
 
 
 Platform- and/or Interface-Specific New Features
@@ -394,4 +400,6 @@ resurrect 'makedefs -m' to be able to derive default mons[].diffculty values
 	suitable for assigning to new or changed monsters
 convert obj->oextra->omid from pointer to scalar
 get rid of unused obj->oextra->olong
-
+relocated unmaintained code to outdated folder, specifically sys/amiga, 
+	sys/atari, sys/be, sys/mac, sys/os2, sys/wince, win/Qt3, win/gem,
+	win/gnome

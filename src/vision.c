@@ -24,45 +24,48 @@
  *
  */
 const char circle_data[] = {
-    /*  0*/ 1,  1,
-    /*  2*/ 2,  2,  1,
-    /*  5*/ 3,  3,  2,  1,
-    /*  9*/ 4,  4,  4,  3,  2,
-    /* 14*/ 5,  5,  5,  4,  3,  2,
-    /* 20*/ 6,  6,  6,  5,  5,  4,  2,
-    /* 27*/ 7,  7,  7,  6,  6,  5,  4,  2,
-    /* 35*/ 8,  8,  8,  7,  7,  6,  6,  4,  2,
-    /* 44*/ 9,  9,  9,  9,  8,  8,  7,  6,  5,  3,
-    /* 54*/ 10, 10, 10, 10, 9,  9,  8,  7,  6,  5,  3,
-    /* 65*/ 11, 11, 11, 11, 10, 10, 9,  9,  8,  7,  5,  3,
-    /* 77*/ 12, 12, 12, 12, 11, 11, 10, 10, 9,  8,  7,  5,  3,
-    /* 90*/ 13, 13, 13, 13, 12, 12, 12, 11, 10, 10, 9,  7,  6, 3,
-    /*104*/ 14, 14, 14, 14, 13, 13, 13, 12, 12, 11, 10, 9,  8, 6, 3,
-    /*119*/ 15, 15, 15, 15, 14, 14, 14, 13, 13, 12, 11, 10, 9, 8, 6, 3,
-    /*135*/ 16 /* MAX_RADIUS+1; used to terminate range loops -dlc */
+    /*  0*/ 0,
+    /*  1*/ 1,  1,
+    /*  3*/ 2,  2,  1,
+    /*  6*/ 3,  3,  2,  1,
+    /* 10*/ 4,  4,  4,  3,  2,
+    /* 15*/ 5,  5,  5,  4,  3,  2,
+    /* 21*/ 6,  6,  6,  5,  5,  4,  2,
+    /* 28*/ 7,  7,  7,  6,  6,  5,  4,  2,
+    /* 36*/ 8,  8,  8,  7,  7,  6,  6,  4,  2,
+    /* 45*/ 9,  9,  9,  9,  8,  8,  7,  6,  5,  3,
+    /* 55*/ 10, 10, 10, 10, 9,  9,  8,  7,  6,  5,  3,
+    /* 66*/ 11, 11, 11, 11, 10, 10, 9,  9,  8,  7,  5,  3,
+    /* 78*/ 12, 12, 12, 12, 11, 11, 10, 10, 9,  8,  7,  5,  3,
+    /* 91*/ 13, 13, 13, 13, 12, 12, 12, 11, 10, 10, 9,  7,  6, 3,
+    /*105*/ 14, 14, 14, 14, 13, 13, 13, 12, 12, 11, 10, 9,  8, 6, 3,
+    /*120*/ 15, 15, 15, 15, 14, 14, 14, 13, 13, 12, 11, 10, 9, 8, 6, 3,
+    /*136*/ 16 /* MAX_RADIUS+1; used to terminate range loops -dlc */
 };
 
 /*
  * These are the starting indexes into the circle_data[] array for a
- * circle of a given radius.
+ * circle of a given radius.  Radius 0 used to be unused, but is now
+ * used for a single point:  temporary light source of a camera flash
+ * as it traverses its path.
  */
 const char circle_start[] = {
-    /*  */ 0, /* circles of radius zero are not used */
-    /* 1*/ 0,
-    /* 2*/ 2,
-    /* 3*/ 5,
-    /* 4*/ 9,
-    /* 5*/ 14,
-    /* 6*/ 20,
-    /* 7*/ 27,
-    /* 8*/ 35,
-    /* 9*/ 44,
-    /*10*/ 54,
-    /*11*/ 65,
-    /*12*/ 77,
-    /*13*/ 90,
-    /*14*/ 104,
-    /*15*/ 119,
+    /* 0*/ 0,
+    /* 1*/ 1,
+    /* 2*/ 3,
+    /* 3*/ 6,
+    /* 4*/ 10,
+    /* 5*/ 15,
+    /* 6*/ 21,
+    /* 7*/ 38,
+    /* 8*/ 36,
+    /* 9*/ 45,
+    /*10*/ 55,
+    /*11*/ 66,
+    /*12*/ 78,
+    /*13*/ 91,
+    /*14*/ 105,
+    /*15*/ 120,
 };
 
 /*==========================================================================*/
@@ -263,11 +266,10 @@ char **rmin, **rmax;
     nrmin = *rmin;
     nrmax = *rmax;
 
-    (void) memset((genericptr_t) * *rows, 0,
-                  ROWNO * COLNO);       /* we see nothing */
+    (void) memset((genericptr_t) **rows, 0, ROWNO * COLNO); /* see nothing */
     for (row = 0; row < ROWNO; row++) { /* set row min & max */
         *nrmin++ = COLNO - 1;
-        *nrmax++ = 0;
+        *nrmax++ = 1;
     }
 }
 
@@ -490,23 +492,23 @@ void
 vision_recalc(control)
 int control;
 {
+    extern unsigned char seenv_matrix[3][3]; /* from display.c */
+    static unsigned char colbump[COLNO + 1]; /* cols to bump sv */
     char **temp_array; /* points to the old vision array */
     char **next_array; /* points to the new vision array */
     char *next_row;    /* row pointer for the new array */
     char *old_row;     /* row pointer for the old array */
     char *next_rmin;   /* min pointer for the new array */
     char *next_rmax;   /* max pointer for the new array */
-    const char *ranges;      /* circle ranges -- used for xray & night vision */
+    const char *ranges; /* circle ranges -- used for xray & night vision */
     int row = 0;       /* row counter (outer loop)  */
     int start, stop;   /* inner loop starting/stopping index */
     int dx, dy;        /* one step from a lit door or lit wall (see below) */
     register int col;  /* inner loop counter */
     register struct rm *lev; /* pointer to current pos */
-    struct rm *flev; /* pointer to position in "front" of current pos */
-    extern unsigned char seenv_matrix[3][3]; /* from display.c */
-    static unsigned char colbump[COLNO + 1]; /* cols to bump sv */
-    unsigned char *sv;                       /* ptr to seen angle bits */
-    int oldseenv;                            /* previous seenv value */
+    struct rm *flev;   /* pointer to position in "front" of current pos */
+    unsigned char *sv; /* ptr to seen angle bits */
+    int oldseenv;      /* previous seenv value */
 
     g.vision_full_recalc = 0; /* reset flag */
     if (g.in_mklev || !iflags.vision_inited)
@@ -532,7 +534,6 @@ int control;
          *
          *      + Monsters to see with the "new" vision, even on the rogue
          *        level.
-         *
          *      + Monsters can see you even when you're in a pit.
          */
         view_from(u.uy, u.ux, next_array, next_rmin, next_rmax, 0,
@@ -564,7 +565,7 @@ int control;
     } else if (Is_rogue_level(&u.uz)) {
         rogue_vision(next_array, next_rmin, next_rmax);
     } else {
-        int has_night_vision = 1; /* hero has night vision */
+        int lo_col, has_night_vision = 1; /* hero has night vision */
 
         if (Underwater && !Is_waterlevel(&u.uz)) {
             /*
@@ -574,8 +575,9 @@ int control;
              */
             has_night_vision = 0;
 
+            lo_col = max(u.ux - 1, 1);
             for (row = u.uy - 1; row <= u.uy + 1; row++)
-                for (col = u.ux - 1; col <= u.ux + 1; col++) {
+                for (col = lo_col; col <= u.ux + 1; col++) {
                     if (!isok(col, row) || !is_pool(col, row))
                         continue;
 
@@ -592,7 +594,7 @@ int control;
                 if (row >= ROWNO)
                     break;
 
-                next_rmin[row] = max(0, u.ux - 1);
+                next_rmin[row] = max(1, u.ux - 1);
                 next_rmax[row] = min(COLNO - 1, u.ux + 1);
                 next_row = next_array[row];
 
@@ -620,11 +622,12 @@ int control;
                     dy = v_abs(u.uy - row);
                     next_row = next_array[row];
 
-                    start = max(0, u.ux - ranges[dy]);
+                    start = max(1, u.ux - ranges[dy]);
                     stop = min(COLNO - 1, u.ux + ranges[dy]);
 
                     for (col = start; col <= stop; col++) {
                         char old_row_val = next_row[col];
+
                         next_row[col] |= IN_SIGHT;
                         oldseenv = levl[col][row].seenv;
                         levl[col][row].seenv = SVALL; /* see all! */
@@ -663,7 +666,7 @@ int control;
                     dy = v_abs(u.uy - row);
                     next_row = next_array[row];
 
-                    start = max(0, u.ux - ranges[dy]);
+                    start = max(1, u.ux - ranges[dy]);
                     stop = min(COLNO - 1, u.ux + ranges[dy]);
 
                     for (col = start; col <= stop; col++)
