@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ $NHDT-Date: 1588189422 2020/04/29 19:43:42 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.217 $ $NHDT-Date: 1589322383 2020/05/12 22:26:23 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -177,6 +177,8 @@ after "double trouble", cloned Wizard would wait until he had suffered some
 beyond turn 100000, prayer timeout is longer (scaling with game length)
 falling while going down stairs and dropping items due to encumbrance or
 	punishment wasn't subject fragile ones to breakage
+objects scattered by an explosion which land on water or lava weren't affected
+	by the water or lava
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
