@@ -440,7 +440,7 @@ boolean verbose;
 }
 
 /* Object hits floor at hero's feet.
-   Called from drop(), throwit(), hold_another_object(). */
+   Called from drop(), throwit(), hold_another_object(), litter(). */
 void
 hitfloor(obj, verbosely)
 struct obj *obj;

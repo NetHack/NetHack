@@ -175,6 +175,8 @@ after "double trouble", cloned Wizard would wait until he had suffered some
 	damage or hero moved into direct view; keep STRAT_WAIT for original
 	Wizard but avoid that for clones
 beyond turn 100000, prayer timeout is longer (scaling with game length)
+falling while going down stairs and dropping items due to encumbrance or
+	punishment wasn't subject fragile ones to breakage
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

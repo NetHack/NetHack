@@ -980,12 +980,13 @@ litter()
 
     for (otmp = g.invent; otmp; otmp = nextobj) {
         nextobj = otmp->nobj;
-        if ((otmp != uball) && (rnd(capacity) <= (int) otmp->owt)) {
+        if (otmp != uball && rnd(capacity) <= (int) otmp->owt) {
             if (canletgo(otmp, "")) {
                 You("drop %s and %s %s down the stairs with you.",
                     yname(otmp), (otmp->quan == 1L) ? "it" : "they",
                     otense(otmp, "fall"));
-                dropx(otmp);
+                freeinv(otmp);
+                hitfloor(otmp, FALSE);
                 encumber_msg(); /* drop[xyz]() probably ought to to this... */
             }
         }
