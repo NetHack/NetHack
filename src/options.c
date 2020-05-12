@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1584350350 2020/03/16 09:19:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.459 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1589326675 2020/05/12 23:37:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8520,7 +8520,7 @@ set_playmode()
 {
     if (wizard) {
         if (authorize_wizard_mode())
-            Strcpy(g.plname, "wizard");
+            g.plnamelen = (int) strlen(strcpy(g.plname, "wizard"));
         else
             wizard = FALSE; /* not allowed or not available */
         /* force explore mode if we didn't make it into wizard mode */

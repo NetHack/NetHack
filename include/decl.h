@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1586815081 2020/04/13 21:58:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.230 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1589326665 2020/05/12 23:37:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -735,6 +735,7 @@ struct instance_globals {
 #define DOMOVE_RUSH         0x00000002
     const char *nomovemsg;
     char plname[PL_NSIZ]; /* player name */
+    int plnamelen; /* length of plname[] if that came from getlogin() */
     char pl_character[PL_CSIZ];
     char pl_race; /* character's race */
     char pl_fruit[PL_FSIZ];

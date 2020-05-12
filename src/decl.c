@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1586815084 2020/04/13 21:58:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.209 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1589326673 2020/05/12 23:37:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -285,6 +285,7 @@ const struct instance_globals g_init = {
     0L, /* domove_succeeded */
     NULL, /* nomovemsg */
     DUMMY, /* plname */
+    0, /* plnamelen */
     DUMMY, /* pl_character */
     '\0', /* pl_race */
     DUMMY, /* pl_fruit */

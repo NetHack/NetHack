@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixmain.c	$NHDT-Date: 1570408210 2019/10/07 00:30:10 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	unixmain.c	$NHDT-Date: 1589326677 2020/05/12 23:37:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -228,22 +228,8 @@ char *argv[];
 
     /* wizard mode access is deferred until here */
     set_playmode(); /* sets plname to "wizard" for wizard mode */
-    if (exact_username) {
-        /*
-         * FIXME: this no longer works, ever since 3.3.0
-         * when plnamesuffix() was changed to find
-         * Name-Role-Race-Gender-Alignment.  It removes
-         * all dashes rather than just the last one,
-         * regardless of whether whatever follows each
-         * dash matches role, race, gender, or alignment.
-         */
-        /* guard against user names with hyphens in them */
-        int len = (int) strlen(g.plname);
-        /* append the current role, if any, so that last dash is ours */
-        if (++len < (int) sizeof g.plname)
-            (void) strncat(strcat(g.plname, "-"), g.pl_character,
-                           sizeof g.plname - len - 1);
-    }
+    /* hide any hyphens from plnamesuffix() */
+    g.plnamelen = exact_username ? (int) strlen(g.plname) : 0;
     /* strip role,race,&c suffix; calls askname() if plname[] is empty
        or holds a generic user name like "player" or "games" */
     plnamesuffix();
@@ -398,10 +384,12 @@ char *argv[];
         case 'u':
             if (argv[0][2]) {
                 (void) strncpy(g.plname, argv[0] + 2, sizeof g.plname - 1);
+                g.plnamelen = 0; /* plname[] might have -role-race attached */
             } else if (argc > 1) {
                 argc--;
                 argv++;
                 (void) strncpy(g.plname, argv[0], sizeof g.plname - 1);
+                g.plnamelen = 0;
             } else {
                 raw_print("Player name expected after -u");
             }
