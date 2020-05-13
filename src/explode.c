@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1545182146 2018/12/19 01:15:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1589322381 2020/05/12 22:26:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -764,8 +764,10 @@ struct obj *obj; /* only scatter this obj        */
         if (stmp->obj) {
             if (x != sx || y != sy)
                 total += stmp->obj->quan;
-            place_object(stmp->obj, x, y);
-            stackobj(stmp->obj);
+            if (!flooreffects(stmp->obj, x, y, "land")) {
+                place_object(stmp->obj, x, y);
+                stackobj(stmp->obj);
+            }
         }
         free((genericptr_t) stmp);
         newsym(x, y);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1583102142 2020/03/01 22:35:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1589326676 2020/05/12 23:37:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1657,14 +1657,19 @@ plnamesuffix()
                 && (sptr[i] == ' ' || sptr[i] == '\0'))
                 *g.plname = '\0'; /* call askname() */
         }
+        if (!*g.plname)
+            g.plnamelen = 0;
     }
 
     do {
-        if (!*g.plname)
+        if (!*g.plname) {
             askname(); /* fill g.plname[] if necessary, or set defer_plname */
+            g.plnamelen = 0; /* plname[] might have -role-race-&c attached */
+        }
 
         /* Look for tokens delimited by '-' */
-        if ((eptr = index(g.plname, '-')) != (char *) 0)
+        sptr = g.plname + g.plnamelen;
+        if ((eptr = index(sptr, '-')) != (char *) 0)
             *eptr++ = '\0';
         while (eptr) {
             /* Isolate the next token */
@@ -1685,10 +1690,7 @@ plnamesuffix()
     } while (!*g.plname && !iflags.defer_plname);
 
     /* commas in the g.plname confuse the record file, convert to spaces */
-    for (sptr = g.plname; *sptr; sptr++) {
-        if (*sptr == ',')
-            *sptr = ' ';
-    }
+    (void) strNsubst(g.plname, ",", " ", 0);
 }
 
 /* show current settings for name, role, race, gender, and alignment
@@ -1739,7 +1741,8 @@ winid where;
        to narrow something done to a single choice] */
 
     Sprintf(buf, "%12s ", "name:");
-    Strcat(buf, (which == RS_NAME) ? choosing : !*g.plname ? not_yet : g.plname);
+    Strcat(buf, (which == RS_NAME) ? choosing
+                : !*g.plname ? not_yet : g.plname);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "role:");
     Strcat(buf, (which == RS_ROLE) ? choosing : (r == ROLE_NONE)

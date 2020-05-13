@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ $NHDT-Date: 1588189422 2020/04/29 19:43:42 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ $NHDT-Date: 1589323704 2020/05/12 22:48:24 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -177,6 +177,8 @@ after "double trouble", cloned Wizard would wait until he had suffered some
 beyond turn 100000, prayer timeout is longer (scaling with game length)
 falling while going down stairs and dropping items due to encumbrance or
 	punishment wasn't subject fragile ones to breakage
+objects scattered by an explosion which land on water or lava weren't affected
+	by the water or lava
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -252,6 +254,9 @@ msdos:  Add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs. 
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
+Unix: when user name is used as default character name, keep hyphenated value
+	intact instead stripping off dash and whatever follows as if that
+	specified role/race/&c (worked once upon a time; broken since 3.3.0)
 windows: update for new status condition fields
 X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 X11: extend fancy status one-turn inverse video status-change highlighting to
