@@ -1,6 +1,6 @@
 
 des.level_init({ style = "solidfill", fg = " " });
-des.level_flags("mazelevel");
+des.level_flags("mazelevel", "noflip");
 
 des.map([[
 ---------------------------------------------------------------------------
@@ -24,31 +24,28 @@ des.map([[
 ]]);
 
 
-if math.random(0,99) < 75 then
+if percent(75) then
    local terrains = { "-", "F", "L", "T", "C" };
    local tidx = math.random(1, #terrains);
    local choice = math.random(0, 4);
    if choice == 0 then
+      -- one horizontal line
       des.terrain(selection.line(10,8, 65,8), terrains[tidx]);
    elseif choice == 1 then
-      local sel = selection.new();
-      sel:line(15,4, 15, 13);
-      sel:line(59,4, 59, 13);
+      -- two vertical lines
+      local sel = selection.line(15,4, 15, 13) | selection.line(59,4, 59, 13);
       des.terrain(sel, terrains[tidx]);
    elseif choice == 2 then
-      local sel = selection.new();
-      sel:line(10,8, 38, 8);
-      sel:line(37,8, 65, 8);
-      sel:line(37,3, 37, 8);
-      sel:line(37,8, 37,14);
+      -- plus sign
+      local sel = selection.line(10,8, 64, 8) | selection.line(37,3, 37, 14);
       des.terrain(sel, terrains[tidx]);
    elseif choice == 3 then
+      -- brackets:  [  ]
       des.terrain(selection.rect(4,4, 70,13), terrains[tidx]);
-      local sel = selection.new();
-      sel:line(25,4, 50,4);
-      sel:line(25,13, 50,13);
+      local sel = selection.line(25,4, 50,4) | selection.line(25,13, 50,13);
       des.terrain(sel, '.');
    else
+      -- nothing
    end
 end
 

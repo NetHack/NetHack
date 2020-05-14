@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1542501042 2018/11/18 00:30:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1589064692 2020/05/09 22:51:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /*      Copyright (c) 2016 by Michael Allison                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,7 +8,13 @@
  *      then again with it defined to produce tiletxt.{o,obj}.
  */
 
-#include "hack.h"
+#include "config.h"
+#include "pm.h"
+#include "onames.h"
+#include "permonst.h"
+#include "objclass.h"
+#include "rm.h"
+#include "display.h"
 
 #define Fprintf (void) fprintf
 
@@ -207,6 +213,24 @@ int set, entry;
     }
     tilenum += WARNCOUNT;
 
+    i = entry - tilenum;
+    if (i < 1) {
+        if (set == OTH_GLYPH) {
+            Sprintf(buf, "unexplored");
+            return buf;
+        }
+    }
+    tilenum += 1;
+
+    i = entry - tilenum;
+    if (i < 1) {
+        if (set == OTH_GLYPH) {
+            Sprintf(buf, "nothing");
+            return buf;
+        }
+    }
+    tilenum += 1;
+
     for (i = 0; i < SIZE(substitutes); i++) {
         j = entry - tilenum;
         if (j <= substitutes[i].last_glyph - substitutes[i].first_glyph) {
@@ -358,6 +382,16 @@ init_tilemap()
 
     for (i = 0; i < WARNCOUNT; i++) {
         tilemap[GLYPH_WARNING_OFF + i] = tilenum;
+        tilenum++;
+    }
+
+    for (i = 0; i < 1; i++) {
+        tilemap[GLYPH_UNEXPLORED_OFF + i] = tilenum;
+        tilenum++;
+    }
+
+    for (i = 0; i < 1; i++) {
+        tilemap[GLYPH_NOTHING + i] = tilenum;
         tilenum++;
     }
 

@@ -7,7 +7,6 @@
 /*  quest dungeon branch routines. */
 
 #include "quest.h"
-#include "qtext.h"
 
 #define Not_firsttime (on_level(&u.uz0, &u.uz))
 #define Qstat(x) (g.quest_status.x)

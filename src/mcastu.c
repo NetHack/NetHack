@@ -1,4 +1,4 @@
-/* NetHack 3.6	mcastu.c	$NHDT-Date: 1567418129 2019/09/02 09:55:29 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	mcastu.c	$NHDT-Date: 1580633721 2020/02/02 08:55:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -82,8 +82,7 @@ static int
 choose_magic_spell(spellval)
 int spellval;
 {
-    /* for 3.4.3 and earlier, val greater than 22 selected the default spell
-     */
+    /* for 3.4.3 and earlier, val greater than 22 selected default spell */
     while (spellval > 24 && rn2(25))
         spellval = rn2(spellval);
 
@@ -232,7 +231,7 @@ boolean foundyou;
     /* monster unable to cast spells? */
     if (mtmp->mcan || mtmp->mspec_used || !ml) {
         cursetxt(mtmp, is_undirected_spell(mattk->adtyp, spellnum));
-        return (0);
+        return 0;
     }
 
     if (mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) {
@@ -250,14 +249,14 @@ boolean foundyou;
               canseemon(mtmp) ? Monnam(mtmp) : "Something",
               levl[mtmp->mux][mtmp->muy].typ == WATER ? "empty water"
                                                       : "thin air");
-        return (0);
+        return 0;
     }
 
     nomul(0);
     if (rn2(ml * 10) < (mtmp->mconf ? 100 : 20)) { /* fumbled attack */
         if (canseemon(mtmp) && !Deaf)
             pline_The("air crackles around %s.", mon_nam(mtmp));
-        return (0);
+        return 0;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(mattk->adtyp, spellnum)) {
         pline("%s casts a spell%s!",
@@ -283,7 +282,7 @@ boolean foundyou;
             impossible(
               "%s casting non-hand-to-hand version of hand-to-hand spell %d?",
                        Monnam(mtmp), mattk->adtyp);
-            return (0);
+            return 0;
         }
     } else if (mattk->damd)
         dmg = d((int) ((ml / 2) + mattk->damn), (int) mattk->damd);
@@ -293,7 +292,6 @@ boolean foundyou;
         dmg = (dmg + 1) / 2;
 
     ret = 1;
-
     switch (mattk->adtyp) {
     case AD_FIRE:
         pline("You're enveloped in flames.");
@@ -334,7 +332,7 @@ boolean foundyou;
     }
     if (dmg)
         mdamageu(mtmp, dmg);
-    return (ret);
+    return ret;
 }
 
 static int
@@ -845,11 +843,11 @@ register struct attack *mattk;
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */
     if (mattk->adtyp > AD_SPC2)
-        return (0);
+        return 0;
 
     if (mtmp->mcan) {
         cursetxt(mtmp, FALSE);
-        return (0);
+        return 0;
     }
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
@@ -862,7 +860,7 @@ register struct attack *mattk;
         } else
             impossible("Monster spell %d cast", mattk->adtyp - 1);
     }
-    return (1);
+    return 1;
 }
 
 /*mcastu.c*/

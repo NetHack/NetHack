@@ -46,7 +46,6 @@
     <ClInclude Include="..\..\..\include\ntconf.h" />
     <ClInclude Include="..\..\..\include\objclass.h" />
     <ClInclude Include="..\..\..\include\patchlevel.h" />
-    <ClInclude Include="..\..\..\include\qtext.h" />
     <ClInclude Include="..\..\..\include\tradstdc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

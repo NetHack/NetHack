@@ -4,9 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
-#include "sfproto.h"
-
 
 #ifdef MFLOPPY
 extern long bytes_counted;
@@ -168,14 +165,10 @@ boolean restore;
                     if (mnum == PM_DOPPELGANGER && otmp->otyp == CORPSE)
                         set_corpsenm(otmp, mnum);
                 }
-            } else if ((otmp->otyp == iflags.mines_prize_type
-                        && !Is_mineend_level(&u.uz))
-                       || ((otmp->otyp == iflags.soko_prize_type1
-                            || otmp->otyp == iflags.soko_prize_type2)
-                           && !Is_sokoend_level(&u.uz))) {
-                /* "special prize" in this game becomes ordinary object
-                   if loaded into another game */
-                otmp->record_achieve_special = NON_PM;
+            } else if (is_mines_prize(otmp) || is_soko_prize(otmp)) {
+                /* achievement tracking; in case prize was moved off its
+                   original level (which is always a no-bones level) */
+                otmp->nomerge = 0;
             } else if (otmp->otyp == AMULET_OF_YENDOR) {
                 /* no longer the real Amulet */
                 otmp->otyp = FAKE_AMULET_OF_YENDOR;
@@ -238,7 +231,12 @@ int x, y;
 {
     struct obj *otmp;
 
-    u.twoweap = 0; /* ensure curse() won't cause swapwep to drop twice */
+    /* when dual-wielding, the second weapon gets dropped rather than welded if
+       it becomes cursed; ensure that that won't happen here by ending dual-wield */
+    u.twoweap = FALSE; /* bypass set_twoweap() */
+
+    /* all inventory is dropped (for the normal case), even non-droppable things
+       like worn armor and accessories, welded weapon, or cursed loadstones */
     while ((otmp = g.invent) != 0) {
         obj_extract_self(otmp);
         /* when turning into green slime, all gear remains held;
@@ -491,7 +489,7 @@ struct obj *corpse;
         for (y = 0; y < ROWNO; y++) {
             levl[x][y].seenv = 0;
             levl[x][y].waslit = 0;
-            levl[x][y].glyph = cmap_to_glyph(S_stone);
+            levl[x][y].glyph = GLYPH_UNEXPLORED;
             g.lastseentyp[x][y] = 0;
         }
 
@@ -555,10 +553,6 @@ struct obj *corpse;
             bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
             bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nnn */
         }
-        if (nhfp->fieldlevel) {
-            sfo_char(nhfp, &c, "bones", "bones_count", 1);
-            sfo_char(nhfp, bonesid, "bones", "bonesid", (int) c);
-        }
         savefruitchn(nhfp);
         if (nhfp->structlevel)
             bflush(nhfp->fd);
@@ -582,11 +576,6 @@ struct obj *corpse;
         bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c);	/* DD.nnn */
         savefruitchn(nhfp);
     }
-    if (nhfp->fieldlevel) {
-        sfo_char(nhfp, &c, "bones", "bones_count", 1);
-        sfo_char(nhfp, bonesid, "bones", "bonesid", (int) c); 	/* DD.nnn */
-        savefruitchn(nhfp);
-    }
     update_mlstmv(); /* update monsters for eventual restoration */
     savelev(nhfp, ledger_no(&u.uz));
     close_nhfile(nhfp);
@@ -597,7 +586,7 @@ struct obj *corpse;
 int
 getbones()
 {
-    int ok, i;
+    int ok;
     NHFILE *nhfp = (NHFILE *) 0;
     char c = 0, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
@@ -625,7 +614,7 @@ getbones()
 
     if (validate(nhfp, g.bones) != 0) {
         if (!wizard)
-            pline("Discarding unuseable bones; no need to panic...");
+            pline("Discarding unusable bones; no need to panic...");
         ok = FALSE;
     } else {
         ok = TRUE;
@@ -640,11 +629,6 @@ getbones()
             mread(nhfp->fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
             mread(nhfp->fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
         }
-        if (nhfp->fieldlevel) {
-            sfi_char(nhfp, &c, "bones", "bones_count", 1); /* length incl. '\0' */
-            for (i = 0; i < (int) c; ++i)
-                sfi_char(nhfp, &oldbonesid[i], "bones", "bonesid", 1);
-	}
         if (strcmp(bonesid, oldbonesid) != 0
             /* from 3.3.0 through 3.6.0, bones in the quest branch stored
                a bogus bonesid in the file; 3.6.1 fixed that, but for
@@ -666,7 +650,7 @@ getbones()
         } else {
             register struct monst *mtmp;
 
-            getlev(nhfp, 0, 0, TRUE);
+            getlev(nhfp, 0, 0);
 
             /* Note that getlev() now keeps tabs on unique
              * monsters such as demon lords, and tracks the

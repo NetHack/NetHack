@@ -732,7 +732,7 @@ curses_character_dialog(const char **choices, const char *prompt)
     winid wid = curses_get_wid(NHW_MENU);
 
     identifier.a_void = 0;
-    curses_start_menu(wid);
+    curses_start_menu(wid, MENU_BEHAVE_STANDARD);
 
     for (count = 0; choices[count]; count++) {
         curletter = tolower(choices[count][0]);
@@ -744,19 +744,19 @@ curses_character_dialog(const char **choices, const char *prompt)
 
         identifier.a_int = (count + 1); /* Must be non-zero */
         curses_add_menu(wid, NO_GLYPH, &identifier, curletter, 0,
-                        A_NORMAL, choices[count], FALSE);
+                        A_NORMAL, choices[count], MENU_ITEMFLAGS_NONE);
         used_letters[count] = curletter;
     }
 
     /* Random Selection */
     identifier.a_int = ROLE_RANDOM;
     curses_add_menu(wid, NO_GLYPH, &identifier, '*', 0, A_NORMAL, "Random",
-                    FALSE);
+                    MENU_ITEMFLAGS_NONE);
 
     /* Quit prompt */
     identifier.a_int = ROLE_NONE;
     curses_add_menu(wid, NO_GLYPH, &identifier, 'q', 0, A_NORMAL, "Quit",
-                    FALSE);
+                    MENU_ITEMFLAGS_NONE);
     curses_end_menu(wid, prompt);
     ret = curses_select_menu(wid, PICK_ONE, &selected);
     if (ret == 1) {
@@ -778,11 +778,11 @@ curses_character_dialog(const char **choices, const char *prompt)
 void
 curses_init_options()
 {
-    /* change these from DISP_IN_GAME to SET_IN_GAME */
-    set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS, SET_IN_GAME);
+    /* change these from set_gameview to set_in_game */
+    set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS, set_in_game);
 
     /* Remove a few options that are irrelevant to this windowport */
-    set_option_mod_status("eight_bit_tty", SET_IN_FILE);
+    set_option_mod_status("eight_bit_tty", set_in_config);
 
     /* If we don't have a symset defined, load the curses symset by default */
     if (!g.symset[PRIMARY].explicitly)

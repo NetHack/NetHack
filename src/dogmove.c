@@ -220,7 +220,7 @@ boolean devour;
     deadmimic = (obj->otyp == CORPSE && (obj->corpsenm == PM_SMALL_MIMIC
                                          || obj->corpsenm == PM_LARGE_MIMIC
                                          || obj->corpsenm == PM_GIANT_MIMIC));
-    slimer = (obj->otyp == CORPSE && obj->corpsenm == PM_GREEN_SLIME);
+    slimer = (obj->otyp == GLOB_OF_GREEN_SLIME);
     poly = polyfodder(obj);
     grow = mlevelgain(obj);
     heal = mhealup(obj);
@@ -859,7 +859,13 @@ struct monst *mtmp;   /* Pet */
     return best_targ;
 }
 
-/* return 0 (no move), 1 (move) or 2 (dead) */
+/* Return values (same as m_move):
+ * 0: did not move, but can still attack and do other stuff.
+ * 1: moved, possibly can attack.
+ * 2: monster died.
+ * 3: did not move, and can't do anything else either.
+ *    (may have attacked something)
+ */
 int
 dog_move(mtmp, after)
 register struct monst *mtmp;
@@ -1038,7 +1044,7 @@ int after; /* this is extra fast monster movement */
                 if (mstatus & MM_DEF_DIED)
                     return 2;
             }
-            return 0;
+            return 3;
         }
         if ((info[i] & ALLOW_MDISP) && MON_AT(nx, ny)
             && better_with_displacing && !undesirable_disp(mtmp, nx, ny)) {
@@ -1181,6 +1187,7 @@ int after; /* this is extra fast monster movement */
                     }
                 }
             }
+            return 3;
         }
     }
 
@@ -1195,7 +1202,7 @@ int after; /* this is extra fast monster movement */
                 m_unleash(mtmp, FALSE);
             }
             (void) mattacku(mtmp);
-            return 0;
+            return 3;
         }
         if (!m_in_out_region(mtmp, nix, niy))
             return 1;

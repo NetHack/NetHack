@@ -19,6 +19,7 @@ struct mkroom {
     schar fdoor;          /* index for the first door of the room */
     schar nsubrooms;      /* number of subrooms */
     boolean irregular;    /* true if room is non-rectangular */
+    schar roomnoidx;
     struct mkroom *sbrooms[MAX_SUBROOMS]; /* Subrooms pointers */
     struct monst *resident; /* priest/shopkeeper/guard for this room */
 };
@@ -48,6 +49,7 @@ struct shclass {
 /* values for rtype in the room definition structure */
 enum roomtype_types {
     OROOM      =  0, /* ordinary room */
+    THEMEROOM  =  1, /* like OROOM, but never converted to special room */
     COURT      =  2, /* contains a throne */
     SWAMP      =  3, /* contains pools */
     VAULT      =  4, /* detached room usually reached via teleport trap */

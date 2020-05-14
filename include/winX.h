@@ -9,6 +9,13 @@
 #ifndef WINX_H
 #define WINX_H
 
+#ifndef COLOR_H
+#include "color.h"      /* CLR_MAX */
+#endif
+#ifndef WINTYPE_H
+#include "wintype.h"    /* winid */
+#endif
+
 #ifndef E
 #define E extern
 #endif
@@ -115,10 +122,18 @@ struct mesg_info_t {
 };
 
 /*
- * Information specific to a "text" status window.
+ * Information specific to "fancy", "text", or "tty-style" status window.
+ * (Tty-style supports status highlighting and effectively makes "text"
+ * obsolete.)
  */
 struct status_info_t {
     struct text_buffer text; /* Just a text buffer. */
+    Pixel fg, bg;          /* foreground and background */
+    XFontStruct *fs;       /* Status window font structure. */
+    Dimension spacew;      /* width of one space */
+    Position x, y[3];      /* x coord (not used), y for up to three lines */
+    Dimension wd, ht;      /* width (not used), height (same for all lines) */
+    Dimension brd, in_wd;  /* border width, internal width */
 };
 
 /*
@@ -133,6 +148,7 @@ typedef struct x11_mi {
     int attr;            /* Attribute for the line. */
     boolean selected;    /* Been selected? */
     boolean preselected; /*   in advance?  */
+    unsigned itemflags;  /* MENU_ITEMFLAGS_foo */
     char selector;       /* Char used to select this entry. */
     char gselector;      /* Group selector. */
     Widget w;
@@ -284,15 +300,19 @@ E void (*input_func)();
 extern struct window_procs X11_procs;
 
 /* Check for an invalid window id. */
-#define check_winid(window)                                             \
-    if ((window) < 0 || (window) >= MAX_WINDOWS) {                      \
-        panic("illegal windid [%d] in %s at line %d", window, __FILE__, \
-              __LINE__);                                                \
-    }
+#define check_winid(window) \
+    do {                                                        \
+        if ((window) < 0 || (window) >= MAX_WINDOWS)            \
+            panic("illegal windid [%d] in %s at line %d",       \
+                  window, __FILE__, __LINE__);                  \
+    } while (0)
+
+/* ### Window.c ### */
+E Font FDECL(WindowFont, (Widget));
+E XFontStruct *FDECL(WindowFontStruct, (Widget));
 
 /* ### dialogs.c ### */
-E Widget
-FDECL(CreateDialog, (Widget, String, XtCallbackProc, XtCallbackProc));
+E Widget FDECL(CreateDialog, (Widget, String, XtCallbackProc, XtCallbackProc));
 E void FDECL(SetDialogPrompt, (Widget, String));
 E String FDECL(GetDialogResponse, (Widget));
 E void FDECL(SetDialogResponse, (Widget, String, unsigned));
@@ -304,6 +324,10 @@ E XColor FDECL(get_nhcolor, (struct xwindow *, int));
 E void FDECL(init_menu_nhcolors, (struct xwindow *));
 E void FDECL(load_boldfont, (struct xwindow *, Widget));
 E Boolean FDECL(nhApproxColor, (Screen *, Colormap, char *, XColor *));
+E Boolean FDECL(nhCvtStringToPixel, (Display *, XrmValuePtr, Cardinal *,
+                                     XrmValuePtr, XrmValuePtr, XtPointer *));
+E void FDECL(get_window_frame_extents, (Widget,
+                                        long *, long *, long *, long *));
 E void FDECL(get_widget_window_geometry, (Widget, int *, int *, int *, int *));
 E char *FDECL(fontname_boldify, (const char *));
 E Dimension FDECL(nhFontHeight, (Widget));
@@ -342,6 +366,8 @@ E void FDECL(create_menu_window, (struct xwindow *));
 E void FDECL(destroy_menu_window, (struct xwindow *));
 
 /* ### winmisc.c ### */
+E XtPointer FDECL(i2xtp, (int));
+E int FDECL(xtp2i, (XtPointer));
 E void FDECL(ps_key, (Widget, XEvent *, String *,
                       Cardinal *)); /* player selection action */
 E void FDECL(race_key, (Widget, XEvent *, String *,
@@ -416,9 +442,9 @@ E void FDECL(X11_destroy_nhwindow, (winid));
 E void FDECL(X11_curs, (winid, int, int));
 E void FDECL(X11_putstr, (winid, int, const char *));
 E void FDECL(X11_display_file, (const char *, BOOLEAN_P));
-E void FDECL(X11_start_menu, (winid));
+E void FDECL(X11_start_menu, (winid, unsigned long));
 E void FDECL(X11_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
-                            const char *, BOOLEAN_P));
+                            const char *, unsigned int));
 E void FDECL(X11_end_menu, (winid, const char *));
 E int FDECL(X11_select_menu, (winid, int, MENU_ITEM_P **));
 E void NDECL(X11_update_inventory);
@@ -441,8 +467,10 @@ E void FDECL(X11_number_pad, (int));
 E void NDECL(X11_delay_output);
 E void NDECL(X11_status_init);
 E void NDECL(X11_status_finish);
-E void FDECL(X11_status_enablefield, (int, const char *, const char *, BOOLEAN_P));
-E void FDECL(X11_status_update, (int, genericptr_t, int, int, int, unsigned long *));
+E void FDECL(X11_status_enablefield, (int, const char *, const char *,
+                                      BOOLEAN_P));
+E void FDECL(X11_status_update, (int, genericptr_t, int, int, int,
+                                 unsigned long *));
 
 /* other defs that really should go away (they're tty specific) */
 E void NDECL(X11_start_screen);

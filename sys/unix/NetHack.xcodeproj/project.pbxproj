@@ -142,15 +142,14 @@
 		31B8A46021A26AE70055BD01 /* dlb_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A45F21A26AE70055BD01 /* dlb_main.c */; };
 		31B8A46121A26AF60055BD01 /* panic.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42721A267E60055BD01 /* panic.c */; };
 		31B8A46221A26B020055BD01 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
-		544768A323994965004B9739 /* sfascii.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A223994965004B9739 /* sfascii.c */; };
-		544768A5239949A8004B9739 /* sfbase.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A4239949A8004B9739 /* sfbase.c */; };
-		544768A9239949FA004B9739 /* sfdata.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A6239949FA004B9739 /* sfdata.c */; };
-		544768AA239949FA004B9739 /* sflendian.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A7239949FA004B9739 /* sflendian.c */; };
 		544768AB239949FA004B9739 /* sfstruct.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A8239949FA004B9739 /* sfstruct.c */; };
 		544768AE23994A17004B9739 /* nhlsel.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AC23994A17004B9739 /* nhlsel.c */; };
 		544768AF23994A17004B9739 /* nhlua.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AD23994A17004B9739 /* nhlua.c */; };
 		544768B123994A2C004B9739 /* mdlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768B023994A2C004B9739 /* mdlib.c */; };
 		544768BA23995BB7004B9739 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 544768B923995BB7004B9739 /* liblua.a */; };
+		544768BC23A53C9F004B9739 /* nhlobj.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768BB23A53C9F004B9739 /* nhlobj.c */; };
+		5462D14823E7B19200969423 /* insight.c in Sources */ = {isa = PBXBuildFile; fileRef = 5462D14723E7B19200969423 /* insight.c */; };
+		54FB2B4B246310A600397C0E /* symbols.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FB2B4A246310A600397C0E /* symbols.c */; };
 		54FCE8292223261F00F393C8 /* isaac64.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FCE8282223261F00F393C8 /* isaac64.c */; };
 /* End PBXBuildFile section */
 
@@ -270,7 +269,6 @@
 		3186A38F21A4B0FC0052BF02 /* monflag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monflag.h; path = ../../include/monflag.h; sourceTree = "<group>"; };
 		3186A39021A4B0FC0052BF02 /* lev_comp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lev_comp.h; path = ../../include/lev_comp.h; sourceTree = "<group>"; };
 		3186A39121A4B0FC0052BF02 /* micro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = micro.h; path = ../../include/micro.h; sourceTree = "<group>"; };
-		3186A39221A4B0FC0052BF02 /* qtext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qtext.h; path = ../../include/qtext.h; sourceTree = "<group>"; };
 		3186A39321A4B0FC0052BF02 /* xwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xwindow.h; path = ../../include/xwindow.h; sourceTree = "<group>"; };
 		3186A39421A4B0FC0052BF02 /* tileset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tileset.h; path = ../../include/tileset.h; sourceTree = "<group>"; };
 		3186A39521A4B0FC0052BF02 /* obj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = obj.h; path = ../../include/obj.h; sourceTree = "<group>"; };
@@ -331,7 +329,6 @@
 		3186A3CC21A4B0FE0052BF02 /* gem_rsc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gem_rsc.h; path = ../../include/gem_rsc.h; sourceTree = "<group>"; };
 		3186A3CD21A4B0FE0052BF02 /* trap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trap.h; path = ../../include/trap.h; sourceTree = "<group>"; };
 		3186A3CE21A4B0FE0052BF02 /* winGnome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = winGnome.h; path = ../../include/winGnome.h; sourceTree = "<group>"; };
-		3186A3CF21A4B0FE0052BF02 /* lev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lev.h; path = ../../include/lev.h; sourceTree = "<group>"; };
 		3186A3D021A4B0FE0052BF02 /* decl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decl.h; path = ../../include/decl.h; sourceTree = "<group>"; };
 		3186A3D321A4B14B0052BF02 /* cursstat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursstat.h; path = ../../win/curses/cursstat.h; sourceTree = "<group>"; };
 		3186A3D421A4B14B0052BF02 /* cursdial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursdial.h; path = ../../win/curses/cursdial.h; sourceTree = "<group>"; };
@@ -486,19 +483,16 @@
 		31B8A45F21A26AE70055BD01 /* dlb_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlb_main.c; path = ../../util/dlb_main.c; sourceTree = "<group>"; };
 		31B8A46421A278AC0055BD01 /* dgn_comp.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = dgn_comp.y; path = ../../util/dgn_comp.y; sourceTree = "<group>"; };
 		31B8A46821A288770055BD01 /* dgn_comp.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = dgn_comp.l; path = ../../util/dgn_comp.l; sourceTree = "<group>"; };
-		544768A223994965004B9739 /* sfascii.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfascii.c; path = ../../src/sfascii.c; sourceTree = "<group>"; };
-		544768A4239949A8004B9739 /* sfbase.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfbase.c; path = ../../src/sfbase.c; sourceTree = "<group>"; };
-		544768A6239949FA004B9739 /* sfdata.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfdata.c; path = ../../src/sfdata.c; sourceTree = "<group>"; };
-		544768A7239949FA004B9739 /* sflendian.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sflendian.c; path = ../../src/sflendian.c; sourceTree = "<group>"; };
 		544768A8239949FA004B9739 /* sfstruct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfstruct.c; path = ../../src/sfstruct.c; sourceTree = "<group>"; };
 		544768AC23994A17004B9739 /* nhlsel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlsel.c; path = ../../src/nhlsel.c; sourceTree = "<group>"; };
 		544768AD23994A17004B9739 /* nhlua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlua.c; path = ../../src/nhlua.c; sourceTree = "<group>"; };
 		544768B023994A2C004B9739 /* mdlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mdlib.c; path = ../../src/mdlib.c; sourceTree = "<group>"; };
 		544768B423995447004B9739 /* isaac64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = isaac64.h; path = ../../include/isaac64.h; sourceTree = "<group>"; };
 		544768B523995488004B9739 /* nhlua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nhlua.h; path = ../../include/nhlua.h; sourceTree = "<group>"; };
-		544768B623995488004B9739 /* sfprocs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sfprocs.h; path = ../../include/sfprocs.h; sourceTree = "<group>"; };
-		544768B723995488004B9739 /* sfproto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sfproto.h; path = ../../include/sfproto.h; sourceTree = "<group>"; };
 		544768B923995BB7004B9739 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../lib/lua/liblua.a; sourceTree = "<group>"; };
+		544768BB23A53C9F004B9739 /* nhlobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlobj.c; path = ../../src/nhlobj.c; sourceTree = "<group>"; };
+		5462D14723E7B19200969423 /* insight.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insight.c; path = ../../src/insight.c; sourceTree = "<group>"; };
+		54FB2B4A246310A600397C0E /* symbols.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = symbols.c; path = ../../src/symbols.c; sourceTree = "<group>"; };
 		54FCE8282223261F00F393C8 /* isaac64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = isaac64.c; path = ../../src/isaac64.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -540,6 +534,7 @@
 			isa = PBXGroup;
 			children = (
 				2A953FB221A3F404007906E5 /* XCode.xcconfig */,
+				544768BB23A53C9F004B9739 /* nhlobj.c */,
 				31B8A3F821A23E490055BD01 /* win */,
 				31B8A3E921A23CC40055BD01 /* sys */,
 				3189579621A2046700FB2ABE /* include */,
@@ -564,14 +559,11 @@
 		3189578C21A1FF8200FB2ABE /* src */ = {
 			isa = PBXGroup;
 			children = (
+				54FB2B4A246310A600397C0E /* symbols.c */,
 				544768B023994A2C004B9739 /* mdlib.c */,
 				544768AC23994A17004B9739 /* nhlsel.c */,
 				544768AD23994A17004B9739 /* nhlua.c */,
-				544768A6239949FA004B9739 /* sfdata.c */,
-				544768A7239949FA004B9739 /* sflendian.c */,
 				544768A8239949FA004B9739 /* sfstruct.c */,
-				544768A4239949A8004B9739 /* sfbase.c */,
-				544768A223994965004B9739 /* sfascii.c */,
 				31B8A35521A238030055BD01 /* allmain.c */,
 				31B8A36521A238040055BD01 /* alloc.c */,
 				31B8A35E21A238040055BD01 /* apply.c */,
@@ -606,6 +598,7 @@
 				31B8A33921A238020055BD01 /* fountain.c */,
 				31B8A35821A238040055BD01 /* hack.c */,
 				31B8A36421A238040055BD01 /* hacklib.c */,
+				5462D14723E7B19200969423 /* insight.c */,
 				31B8A33121A238010055BD01 /* invent.c */,
 				54FCE8282223261F00F393C8 /* isaac64.c */,
 				31B8A32B21A238010055BD01 /* light.c */,
@@ -710,8 +703,6 @@
 			isa = PBXGroup;
 			children = (
 				544768B523995488004B9739 /* nhlua.h */,
-				544768B623995488004B9739 /* sfprocs.h */,
-				544768B723995488004B9739 /* sfproto.h */,
 				544768B423995447004B9739 /* isaac64.h */,
 				3186A3B721A4B0FD0052BF02 /* align.h */,
 				3186A38021A4B0FB0052BF02 /* amiconf.h */,
@@ -743,7 +734,6 @@
 				3186A3A521A4B0FD0052BF02 /* hack.h */,
 				3186A37A21A4B0FA0052BF02 /* integer.h */,
 				3186A39021A4B0FC0052BF02 /* lev_comp.h */,
-				3186A3CF21A4B0FE0052BF02 /* lev.h */,
 				3186A3BC21A4B0FD0052BF02 /* lint.h */,
 				3186A39921A4B0FD0052BF02 /* load_img.h */,
 				3186A3A421A4B0FD0052BF02 /* mac-carbon.h */,
@@ -778,7 +768,6 @@
 				3186A37821A4B0FA0052BF02 /* qt_kde0.h */,
 				3186A3B421A4B0FD0052BF02 /* qt_win.h */,
 				3186A3BD21A4B0FD0052BF02 /* qt_xpms.h */,
-				3186A39221A4B0FC0052BF02 /* qtext.h */,
 				3186A3C421A4B0FE0052BF02 /* qttableview.h */,
 				3186A39E21A4B0FD0052BF02 /* quest.h */,
 				3186A37C21A4B0FA0052BF02 /* rect.h */,
@@ -993,7 +982,7 @@
 		3189576921A1FCC100FB2ABE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1120;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Bart House";
 				TargetAttributes = {
 					3189577021A1FCC100FB2ABE = {
@@ -1460,7 +1449,6 @@
 			files = (
 				31B8A3BC21A238060055BD01 /* eat.c in Sources */,
 				31B8A3A921A238060055BD01 /* music.c in Sources */,
-				544768A9239949FA004B9739 /* sfdata.c in Sources */,
 				544768B123994A2C004B9739 /* mdlib.c in Sources */,
 				31B8A3D221A238060055BD01 /* engrave.c in Sources */,
 				31B8A3A021A238060055BD01 /* exper.c in Sources */,
@@ -1472,6 +1460,7 @@
 				31B8A38521A238060055BD01 /* rnd.c in Sources */,
 				31B8A38B21A238060055BD01 /* topten.c in Sources */,
 				31B8A38121A238060055BD01 /* mapglyph.c in Sources */,
+				5462D14823E7B19200969423 /* insight.c in Sources */,
 				31B8A41321A23F650055BD01 /* version.c in Sources */,
 				31B8A3BB21A238060055BD01 /* allmain.c in Sources */,
 				31B8A39521A238060055BD01 /* windows.c in Sources */,
@@ -1479,7 +1468,6 @@
 				31B8A41921A244940055BD01 /* objects.c in Sources */,
 				31B8A3AA21A238060055BD01 /* wizard.c in Sources */,
 				31B8A3D021A238060055BD01 /* explode.c in Sources */,
-				544768A5239949A8004B9739 /* sfbase.c in Sources */,
 				31B8A3DE21A238060055BD01 /* sys.c in Sources */,
 				31B8A38021A238060055BD01 /* sit.c in Sources */,
 				31B8A3AF21A238060055BD01 /* lock.c in Sources */,
@@ -1502,6 +1490,7 @@
 				31B8A3C821A238060055BD01 /* options.c in Sources */,
 				31B8A3CD21A238060055BD01 /* write.c in Sources */,
 				31B8A40F21A23EEC0055BD01 /* cursmesg.c in Sources */,
+				544768BC23A53C9F004B9739 /* nhlobj.c in Sources */,
 				31B8A3DF21A238060055BD01 /* end.c in Sources */,
 				31B8A38921A238060055BD01 /* mklev.c in Sources */,
 				31B8A3D721A238060055BD01 /* muse.c in Sources */,
@@ -1545,6 +1534,7 @@
 				31B8A3A821A238060055BD01 /* weapon.c in Sources */,
 				31B8A3DA21A238060055BD01 /* mkmaze.c in Sources */,
 				31B8A37E21A238060055BD01 /* steal.c in Sources */,
+				54FB2B4B246310A600397C0E /* symbols.c in Sources */,
 				31B8A3BA21A238060055BD01 /* mkobj.c in Sources */,
 				31B8A41121A23EEC0055BD01 /* cursstat.c in Sources */,
 				31B8A3E021A238060055BD01 /* wield.c in Sources */,
@@ -1580,7 +1570,6 @@
 				31B8A38E21A238060055BD01 /* quest.c in Sources */,
 				31B8A3D621A238060055BD01 /* region.c in Sources */,
 				31B8A3D421A238060055BD01 /* worm.c in Sources */,
-				544768AA239949FA004B9739 /* sflendian.c in Sources */,
 				31B8A3C921A238060055BD01 /* sounds.c in Sources */,
 				31B8A37C21A238060055BD01 /* pager.c in Sources */,
 				31B8A39F21A238060055BD01 /* fountain.c in Sources */,
@@ -1589,7 +1578,6 @@
 				31B8A3D321A238060055BD01 /* cmd.c in Sources */,
 				31B8A3AB21A238060055BD01 /* mplayer.c in Sources */,
 				31B8A3CC21A238060055BD01 /* pickup.c in Sources */,
-				544768A323994965004B9739 /* sfascii.c in Sources */,
 				31B8A39721A238060055BD01 /* invent.c in Sources */,
 				31B8A40021A23E6E0055BD01 /* getline.c in Sources */,
 				31B8A3B521A238060055BD01 /* rect.c in Sources */,

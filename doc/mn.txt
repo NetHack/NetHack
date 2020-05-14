@@ -1,0 +1,215 @@
+MN(7)                  Miscellaneous Information Manual                  MN(7)
+
+
+
+NAME
+       mn - text formatting macros for the news documentation
+
+SYNOPSIS
+       nroff  -mn [ options ]  file  ...
+       troff  -mn [ options ]  file  ...
+
+DESCRIPTION
+       This package of nroff(1) and troff(1) macro definitions provides a for-
+       matting facility which may be used to run off the formatted news  docu-
+       ments.  When reverse line motions are needed, filter the output through
+       col(1).
+
+       All -mn macros, diversions, string registers, and number registers  are
+       defined below.  Many nroff and troff requests are unsafe in conjunction
+       with this package.  However,  the  requests  below  may  be  used  with
+       impunity:
+
+            .bp    begin new page
+            .br    break output line
+            .sp n  insert n spacing lines
+            .ce n  center next n lines
+            .ls n  line spacing: n=1 single, n=2 double space
+            .na    no alignment of right margin
+
+       Font  and point size changes with \f and \s are also allowed; for exam-
+       ple, ``\f2word\fR'' will italicize word.  Output of the tbl(1), eqn(1),
+       and  refer(1)  preprocessors  for  equations, tables, and references is
+       acceptable as input.
+
+FILES
+       /usr/lib/tmac/tmac.n
+
+SEE ALSO
+       eqn(1), refer(1), tbl(1), troff(1)
+
+WARNINGS
+       If you do not set the string register ``.f'' to the file name, you will
+       only  be told the line number on which any errors occur.  If you define
+       this string to be the file name, you will get the file name, too.  This
+       is useful when dealing with a document split up into many files.
+
+       This package is not now intended for uses other than with the news doc-
+       umentation.
+
+       Bug reports are  always  welcome;  please  send  them  to  the  author.
+       (Include a sample of the input; this helps track down the bug.)
+
+AUTHOR
+       Matt     Bishop     (mab@riacs.arpa,     ihnp4!ames!riacs!mab,     dec-
+       vax!decwrl!riacs!mab)
+       Updated for versions 1.4-1.6 by The NetHack Development Team
+
+REQUESTS
+       In the Note column, b means the request causes a break, and i means the
+       macro,  number  register, string register, or diversion is internal and
+       should not be used for anything.  In the What It Is column,  div  means
+       diversion,  mac  means  macro, num means number register, and str means
+       string register.  In the Initial Value column, a hyphen means  no  ini-
+       tial value is used, anything else is the initial value, and if two val-
+       ues are given, the first is for nroff and the second for troff.
+
+Macro     What    Initial   Note   Explanation
+Name      It Is   Value
+.f        num     -         -    file name, used in error messages if set
+.ai       mac     -         -    author's institution
+.au       mac     -         b    author's name
+.b x y z  mac     -         -    print x in font 3, y after, z before;
+                                 if no arguments, switch to font 3
+b         num     -         i    used to embolden italics
+.bi x y z mac     -         -    print x in emboldened font 2, y after,
+                                 z before
+bm        num     1i,1i+1v  -    height of bottom margin
+.bt       mac     -         -    print pottom title
+bt        num     .5i+1v    -    bottom of footer to bottom of page
+.cf x y z mac     -         -    print contents of header line (double
+                                 quotes around x, y before, z after)
+cm        num     0         -    0 if no cut marks, nonzero if cut marks
+.cn x y z mac     -         -    print computer/site name; same as .i
+.dd       div     -         i    text of display
+dg        str     *,-       -    footnote mark
+dw        str     current   -    name of current day of week
+dy        str     current   -    full date
+.ed       mac     -         b    end display
+.ef       mac     -         b    end footnote
+.ei       mac     -         b    move left margin to the right
+.er       mac     -         -    print error message
+.et       mac     -         b,i  macro called at end of text
+f0        str     -         -    left bottom title
+f1        num     -         i    current font number
+f1        str     date,-    -    center bottom title
+f2        num     -         i    previous font number
+f2        str     -         -    right bottom title
+fc        num     -         i    per-page footnote count
+.fd       mac     -         b,i  drop footnotes
+fg        num     -         i    gets fudge factor for footnote
+fl        num     5.5i      -    default footnote line length
+.fn       mac     -         -    begin footnote
+.fo       mac     -         -    bottom of page (footer) macro
+fp        num     -         i    current location of trap for .fo macro
+.fs       mac     -         i    print text/footnote separator
+fs        num     -         i    position where footnote printing should begin
+.fx       mac     -         i    collect overflow footnotes
+.fy       div     -         i    text of footnote overflow
+.fz       mac     -         i    move overflow footnotes from .fy to .tf
+gs        num     -         i    used to be sure footnotes fit
+h0        num     0         i    current level 1 section number
+h0        str     -         -    left header title
+h1        num     0         i    current level 2 section number
+h1        str     - page -  -    center header title
+h2        num     0         i    current level 3 section number
+h2        str     -         -    right header title
+h3        num     0         i    current level 4 section number
+.hd       mac     -         i    top of page (header) macro
+.hf       mac     -         -    print header field name; same as .cf
+.hn x     mac     -         b    numbered section; if present, x is level
+hn        num     0         i    current level of numbering (temporary)
+hs        num     1v        -    default intra-section spacing
+.hu       mac     -         b    unnumbered section header
+.i x y z  mac     -         -    print x in font 2, y after, z before;
+                                 if no arguments, switch to font 2
+i1        num     -         i    current indent
+i2        num     -         i    previous indent
+id        num     0         i    1 if in display, 0 otherwise
+if        num     0         i    1 if in footnote, 0 otherwise
+.is x y z mac     -         -    print x 2p bigger, y after, z before;
+                                 if no arguments, increase point size by 2p
+it        num     0         i    0 before .bt called, 1 after
+l0        num     0         i    leftmost position for left margin
+l1        num     -         i    first level of indent for left margin
+l2        num     -         i    second level of indent for left margin
+l3        num     -         i    third level of indent for left margin
+l4        num     -         i    fourth level of indent for left margin
+l5        num     -         i    fifth level of indent for left margin
+l6        num     -         i    sixth level of indent for left margin
+l7        num     -         i    seventh level of indent for left margin
+l8        num     -         i    eighth level of indent for left margin
+l9        num     -         i    ninth level of indent for left margin
+li        num     5n        -    paragraph indent
+ll        num     6i        -    default line length
+lm        num     0         i    current level of indent for left margin
+lo        num     -         i    previous level for left margin
+.lp x y   mac     -         b    labelled paragraph; x is label, y indent
+lq        str     ",``      -    left double quotation marks
+mo        str     current   -    name of current month
+.mt       mac     -         b    title
+mt        num     1.5i+1v   -    distance of title from top of page
+.ng x y z mac     -         -    newsgroup name; same as .b
+.nl       mac     -         b    reset point size to default
+ns        num     0         i    if nonzero, .fn does not call .fs
+.op x y z mac     -         -    command option; same as .b
+p1        num     0         i    1 after PDP-11(tm) footnote printed,
+                                 0 before
+.pa x y z mac     -         -    print protocol appellation; same as .i
+.pd x y   mac     -         -    print PDP-11(tm), footnote; x after,
+                                 y before
+pd        num     1v,.3v    -    intra-paragraph spacing
+.pf       mac     -         -    print footer title
+.pg x     mac     -         b    paragraph; if x is l, left justify
+pi        num     5n        -    default paragraph indent
+po        num     1.25i     -    default page offset
+ps        num     12p       -    default point size
+.pt x     mac     -         -    print header; x is distance from top of
+                                 page
+.qc x y z mac     -         -    print name of control char; x is name,
+                                 in font 3, between <>, y after, z before
+.qp x y z mac     -         -    print char; same as .b
+.r        mac     -         -    switch to font 1
+rg        str     -         -    registered trademark symbol
+rq        str     ",''      -    right double quotation marks
+s1        num     -         i    current point size
+s2        num     -         i    previous point size
+.sd x     mac     -         -    start display; if x is c, center display
+sf        num     -         i    1 if center display, 0 otherwise
+.si x     num     -         -    indent left margin by x (5n default)
+.sm x y z mac     -         -    print x 2p smaller, y after, z before;
+                                 if no arguments, decrease point size by 2p
+.sn x     mac     -         b    space by x (1v default), enter nospace mode
+.sr x     mac     -         -    enter spacemode, space by x (1v default)
+t2        num     0         i    0 if little/no space, nonzero otherwise
+.tf       div     -         i    text of footnotes
+tm        num     1i-.5v    -    height of top margin
+tt        num     .5i-.5v   -    distance from top of page to header
+.ux x y   mac     -         -    print UNIX(tm), footnote; x after,
+                                 y before
+ux        num     0         i    1 after UNIX(tm) footnote printed,
+                                 0 before
+v1        num     -         i    current vertical spacing
+v2        num     -         i    previous vertical spacing
+vr        str     -         -    current version of news
+vs        num     16p       -    default vertical spacing
+vx        num     0         i    1 after VAX(tm) footnote printed,
+                                 0 before
+.vx x y   mac     -         -    print VAX(tm), footnote; x after,
+                                 y before
+ws        str     -         -    used to construct error message
+.ya       mac     -         -    same as calling .yf, .yi, .ys, .yv
+.yf       mac     -         -    restore fonts saved by .zf
+.yi       mac     -         -    restore indents saved by .zi
+Yr        str     -         -    current year
+.ys       mac     -         -    restore point sizes saved by .zs
+.yv       mac     -         -    restore vertical spacings saved by .zv
+.za       mac     -         -    same as calling .zf, .zi, .zs, .zv
+.zf       mac     -         -    save previous, current fonts
+.zi       mac     -         -    save previous, current indents
+.zs       mac     -         -    save previous, current point sizes
+.zv       mac     -         -    save previous, current vertical spacings
+
+
+
+                              News Version B2.11                         MN(7)

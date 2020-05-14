@@ -1,18 +1,16 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1559422240 2019/06/01 20:50:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1577674536 2019/12/30 02:55:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "sp_lev.h"
-#include "lev.h" /* save & restore info */
-#include "sfproto.h"
-
 
 static int FDECL(iswall, (int, int));
 static int FDECL(iswall_or_stone, (int, int));
 static boolean FDECL(is_solid, (int, int));
 static int FDECL(extend_spine, (int[3][3], int, int, int));
+static void FDECL(wall_cleanup, (int, int, int, int));
 static boolean FDECL(okay, (int, int, int));
 static void FDECL(maze0xy, (coord *));
 static boolean FDECL(put_lregion_here, (XCHAR_P, XCHAR_P, XCHAR_P,
@@ -24,7 +22,10 @@ static void NDECL(unsetup_waterlevel);
 static void FDECL(check_ransacked, (char *));
 static void FDECL(migr_booty_item, (int, const char *));
 static void FDECL(migrate_orc, (struct monst *, unsigned long));
+static void FDECL(shiny_orc_stuff, (struct monst *));
 static void NDECL(stolen_booty);
+static boolean FDECL(maze_inbounds, (int, int));
+static void FDECL(maze_remove_deadends, (XCHAR_P));
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -122,7 +123,7 @@ int wall_there, dx, dy;
 }
 
 /* Remove walls totally surrounded by stone */
-void
+static void
 wall_cleanup(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
@@ -568,32 +569,11 @@ fixup_special()
                 set_corpsenm(otmp, rndmonnum());
             }
         }
-    } else if (Is_wiz1_level(&u.uz)) {
-        croom = search_special(MORGUE);
-
-        create_secret_door(croom, W_SOUTH | W_EAST | W_WEST);
-    } else if (Is_knox(&u.uz)) {
-        /* using an unfilled morgue for rm id */
-        croom = search_special(MORGUE);
-        /* avoid inappropriate morgue-related messages */
-        g.level.flags.graveyard = g.level.flags.has_morgue = 0;
-        croom->rtype = OROOM; /* perhaps it should be set to VAULT? */
-        /* stock the main vault */
-        for (x = croom->lx; x <= croom->hx; x++)
-            for (y = croom->ly; y <= croom->hy; y++) {
-                (void) mkgold((long) rn1(300, 600), x, y);
-                if (!rn2(3) && !is_pool(x, y))
-                    (void) maketrap(x, y, rn2(3) ? LANDMINE : SPIKED_PIT);
-            }
     } else if (Role_if(PM_PRIEST) && In_quest(&u.uz)) {
         /* less chance for undead corpses (lured from lower morgues) */
         g.level.flags.graveyard = 1;
     } else if (Is_stronghold(&u.uz)) {
         g.level.flags.graveyard = 1;
-    } else if (Is_sanctum(&u.uz)) {
-        croom = search_special(TEMPLE);
-
-        create_secret_door(croom, W_ANY);
     } else if (on_level(&u.uz, &orcus_level)) {
         struct monst *mtmp, *mtmp2;
 
@@ -659,7 +639,7 @@ unsigned long mflags;
     migrate_to_level(mtmp, ledger_no(&dest), MIGR_RANDOM, (coord *) 0);
 }
 
-void
+static void
 shiny_orc_stuff(mtmp)
 struct monst *mtmp;
 {
@@ -702,7 +682,7 @@ const char *gang;
     if (otmp && gang) {
         new_oname(otmp, strlen(gang) + 1); /* removes old name if present */
         Strcpy(ONAME(otmp), gang);
-        if (otyp >= TRIPE_RATION && otyp <= TIN) {
+        if (objects[otyp].oc_class == FOOD_CLASS) {
             if (otyp == SLIME_MOLD)
                 otmp->spe = fruitadd((char *) orcfruit[rn2(SIZE(orcfruit))],
                                      (struct fruit *) 0);
@@ -745,12 +725,16 @@ stolen_booty(VOID_ARGS)
     cnt = rnd(10);
     for (i = 0; i < cnt; ++i) {
         /* Food items - but no lembas! (or some other weird things) */
-        otyp = rn2((TIN - TRIPE_RATION) + 1) + TRIPE_RATION;
-        if (otyp != LEMBAS_WAFER && otyp != GLOB_OF_GRAY_OOZE
-            && otyp != GLOB_OF_BROWN_PUDDING && otyp != GLOB_OF_GREEN_SLIME
-            && otyp != GLOB_OF_BLACK_PUDDING && otyp != MEAT_STICK
-            && otyp != MEATBALL && otyp != MEAT_STICK && otyp != MEAT_RING
-            && otyp != HUGE_CHUNK_OF_MEAT && otyp != CORPSE)
+        otyp = rn1(TIN - TRIPE_RATION + 1, TRIPE_RATION);
+        if (otyp != LEMBAS_WAFER
+            /* exclude meat <anything>, globs of <anything>, kelp
+               which all have random generation probability of 0
+               (K-/C-rations do too, but we want to include those) */
+            && (objects[otyp].oc_prob != 0
+                || otyp == C_RATION || otyp == K_RATION)
+            /* exclude food items which utilize obj->corpsenm because
+               that field is going to be overloaded for delivery purposes */
+            && otyp != CORPSE && otyp != EGG && otyp != TIN)
             migr_booty_item(otyp, gang);
     }
     migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
@@ -770,7 +754,7 @@ stolen_booty(VOID_ARGS)
         if (is_orc(mtmp->data) && !has_mname(mtmp) && rn2(10)) {
             /*
              * We'll consider the orc captain from the level
-             * .des file to be the captain of a rival orc horde
+             * description to be the captain of a rival orc horde
              * who is there to see what has transpired, and to
              * contemplate future action.
              *
@@ -802,7 +786,7 @@ stolen_booty(VOID_ARGS)
 
 #undef ORC_LEADER
 
-boolean
+static boolean
 maze_inbounds(x, y)
 int x, y;
 {
@@ -810,7 +794,7 @@ int x, y;
             && x < g.x_maze_max && y < g.y_maze_max && isok(x, y));
 }
 
-void
+static void
 maze_remove_deadends(typ)
 xchar typ;
 {
@@ -858,9 +842,9 @@ xchar typ;
  * TODO: rewrite walkfrom so it works on temp space, not levl
  */
 void
-create_maze(corrwid, wallthick)
-int corrwid;
-int wallthick;
+create_maze(corrwid, wallthick, rmdeadends)
+int corrwid, wallthick;
+boolean rmdeadends;
 {
     int x,y;
     coord mm;
@@ -869,6 +853,12 @@ int wallthick;
     int rdx = 0;
     int rdy = 0;
     int scale;
+
+    if (corrwid == -1)
+        corrwid = rnd(4);
+
+    if (wallthick == -1)
+        wallthick = rnd(4) - corrwid;
 
     if (wallthick < 1)
         wallthick = 1;
@@ -901,7 +891,7 @@ int wallthick;
     maze0xy(&mm);
     walkfrom((int) mm.x, (int) mm.y, 0);
 
-    if (!rn2(5))
+    if (rmdeadends)
         maze_remove_deadends((g.level.flags.corrmaze) ? CORR : ROOM);
 
     /* restore bounds */
@@ -1006,6 +996,7 @@ const char *s;
     if (*protofile) {
         check_ransacked(protofile);
         Strcat(protofile, LEV_EXT);
+        g.in_mk_themerooms = FALSE;
         if (load_special(protofile)) {
             /* some levels can end up with monsters
                on dead mon list, including light source monsters */
@@ -1019,10 +1010,9 @@ const char *s;
     g.level.flags.corrmaze = !rn2(3);
 
     if (!Invocation_lev(&u.uz) && rn2(2)) {
-        int corrscale = rnd(4);
-        create_maze(corrscale,rnd(4)-corrscale);
+        create_maze(-1, -1, !rn2(5));
     } else {
-        create_maze(1,1);
+        create_maze(1, 1, FALSE);
     }
 
     if (!g.level.flags.corrmaze)
@@ -1034,6 +1024,7 @@ const char *s;
         mazexy(&mm);
         mkstairs(mm.x, mm.y, 0, (struct mkroom *) 0); /* down */
     } else { /* choose "vibrating square" location */
+        int trycnt = 0;
 #define x_maze_min 2
 #define y_maze_min 2
 /*
@@ -1063,6 +1054,8 @@ const char *s;
             y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
             /* we don't want it to be too near the stairs, nor
                to be on a spot that's already in use (wall|trap) */
+            if (++trycnt > 1000)
+                break;
         } while (x == xupstair || y == yupstair /*(direct line)*/
                  || abs(x - xupstair) == abs(y - yupstair)
                  || distmin(x, y, xupstair, yupstair) <= INVPOS_DISTANCE
@@ -1228,27 +1221,15 @@ coord *cc;
     return;
 }
 
-/* put a non-diggable boundary around the initial portion of a level map.
- * assumes that no level will initially put things beyond the isok() range.
- *
- * we can't bound unconditionally on the last line with something in it,
- * because that something might be a niche which was already reachable,
- * so the boundary would be breached
- *
- * we can't bound unconditionally on one beyond the last line, because
- * that provides a window of abuse for wallified special levels
- */
 void
-bound_digging()
+get_level_extends(left, top, right, bottom)
+int *left, *top, *right, *bottom;
 {
     int x, y;
     unsigned typ;
     struct rm *lev;
     boolean found, nonwall;
     int xmin, xmax, ymin, ymax;
-
-    if (Is_earthlevel(&u.uz))
-        return; /* everything diggable here */
 
     found = nonwall = FALSE;
     for (xmin = 0; !found && xmin <= COLNO; xmin++) {
@@ -1310,16 +1291,37 @@ bound_digging()
     }
     ymax += (nonwall || !g.level.flags.is_maze_lev) ? 2 : 1;
 
+    *left = xmin;
+    *right = xmax;
+    *top = ymin;
+    *bottom = ymax;
+}
+
+/* put a non-diggable boundary around the initial portion of a level map.
+ * assumes that no level will initially put things beyond the isok() range.
+ *
+ * we can't bound unconditionally on the last line with something in it,
+ * because that something might be a niche which was already reachable,
+ * so the boundary would be breached
+ *
+ * we can't bound unconditionally on one beyond the last line, because
+ * that provides a window of abuse for wallified special levels
+ */
+void
+bound_digging()
+{
+    int x, y;
+    int xmin, xmax, ymin, ymax;
+
+    if (Is_earthlevel(&u.uz))
+        return; /* everything diggable here */
+
+    get_level_extends(&xmin, &ymin, &xmax, &ymax);
+
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            if (y <= ymin || y >= ymax || x <= xmin || x >= xmax) {
-#ifdef DCC30_BUG
-                lev = &levl[x][y];
-                lev->wall_info |= W_NONDIGGABLE;
-#else
+            if (y <= ymin || y >= ymax || x <= xmin || x >= xmax)
                 levl[x][y].wall_info |= W_NONDIGGABLE;
-#endif
-            }
 }
 
 void
@@ -1579,18 +1581,9 @@ NHFILE *nhfp;
             bwrite(nhfp->fd, (genericptr_t) &g.xmax, sizeof(int));
             bwrite(nhfp->fd, (genericptr_t) &g.ymax, sizeof(int));
         }
-        if (nhfp->fieldlevel) {
-            sfo_int(nhfp, &n, "waterlevel", "bubble_count", 1);
-            sfo_int(nhfp, &g.xmin, "waterlevel", "g.xmin", 1);
-            sfo_int(nhfp, &g.ymin, "waterlevel", "g.ymin", 1);
-            sfo_int(nhfp, &g.xmax, "waterlevel", "g.xmax", 1);
-            sfo_int(nhfp, &g.ymax, "waterlevel", "g.ymax", 1);
-        }
         for (b = g.bbubbles; b; b = b->next) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) b, sizeof(struct bubble));
-            if (nhfp->fieldlevel)
-                sfo_bubble(nhfp, b, "waterlevel", "bubble", 1);
         }
     }
     if (release_data(nhfp))
@@ -1623,20 +1616,11 @@ NHFILE *nhfp;
         mread(nhfp->fd,(genericptr_t)&g.xmax,sizeof(int));
         mread(nhfp->fd,(genericptr_t)&g.ymax,sizeof(int));
     }
-    if (nhfp->fieldlevel) {
-        sfi_int(nhfp, &n, "waterlevel", "bubble_count", 1);
-        sfi_int(nhfp, &g.xmin, "waterlevel", "g.xmin", 1);
-        sfi_int(nhfp, &g.ymin, "waterlevel", "g.ymin", 1);
-        sfi_int(nhfp, &g.xmax, "waterlevel", "g.xmax", 1);
-        sfi_int(nhfp, &g.ymax, "waterlevel", "g.ymax", 1);
-    }
     for (i = 0; i < n; i++) {
         btmp = b;
         b = (struct bubble *) alloc(sizeof(struct bubble));
         if (nhfp->structlevel)
             mread(nhfp->fd,(genericptr_t) b, sizeof(struct bubble));
-        if (nhfp->fieldlevel)
-            sfi_bubble(nhfp, b, "waterlevel", "bubble", 1);
       if (g.bbubbles) {
           btmp->next = b;
           b->prev = btmp;

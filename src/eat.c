@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1574900825 2019/11/28 00:27:05 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1586303701 2020/04/07 23:55:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.225 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -712,10 +712,13 @@ register int pm;
         done(DIED);
         /* life-saving needed to reach here */
         exercise(A_WIS, FALSE);
-        /* It so happens that since we know these monsters */
-        /* cannot appear in tins, g.context.victual.piece will always */
-        /* be what we want, which is not generally true. */
-        if (revive_corpse(g.context.victual.piece)) {
+        /* revive an actual corpse; can't do that if it was a tin;
+           3.7: this used to assume that such tins were impossible but
+           they can be wished for in wizard mode; they can't make it
+           to normal play though because bones creation empties them */
+        if (g.context.victual.piece /* Null for tins */
+            && g.context.victual.piece->otyp == CORPSE /* paranoia */
+            && revive_corpse(g.context.victual.piece)) {
             g.context.victual.piece = (struct obj *) 0;
             g.context.victual.o_id = 0;
         }
@@ -1062,18 +1065,31 @@ int pm;
     case PM_CHAMELEON:
     case PM_DOPPELGANGER:
     case PM_SANDESTIN: /* moot--they don't leave corpses */
+    case PM_GENETIC_ENGINEER:
         if (Unchanging) {
             You_feel("momentarily different."); /* same as poly trap */
         } else {
-            You_feel("a change coming over you.");
+            You("%s.", (pm == PM_GENETIC_ENGINEER)
+                          ? "undergo a freakish metamorphosis"
+                          : "feel a change coming over you");
             polyself(0);
         }
+        break;
+    case PM_DISPLACER_BEAST:
+        if (!Displaced) /* give a message (before setting the timeout) */
+            toggle_displacement((struct obj *) 0, 0L, TRUE);
+        incr_itimeout(&HDisplaced, d(6, 6));
         break;
     case PM_DISENCHANTER:
         /* picks an intrinsic at random and removes it; there's
            no feedback if hero already lacks the chosen ability */
         debugpline0("using attrcurse to strip an intrinsic");
         attrcurse();
+        break;
+    case PM_DEATH:
+    case PM_PESTILENCE:
+    case PM_FAMINE:
+        /* life-saved; don't attempt to confer any intrinsics */
         break;
     case PM_MIND_FLAYER:
     case PM_MASTER_MIND_FLAYER:
@@ -1811,7 +1827,8 @@ struct obj *otmp;
             /* not cannibalism, but we use similar criteria
                for deciding whether to be sickened by this meal */
             if (rn2(2) && !CANNIBAL_ALLOWED())
-                make_vomiting((long) rn1(g.context.victual.reqtime, 14), FALSE);
+                make_vomiting((long) rn1(g.context.victual.reqtime, 14),
+                              FALSE);
         }
         break;
     case LEMBAS_WAFER:
@@ -2023,10 +2040,13 @@ struct obj *otmp;
                                                  RIN_INCREASE_DAMAGE);
             break;
         case RIN_PROTECTION:
+        case AMULET_OF_GUARDING:
             accessory_has_effect(otmp);
             HProtection |= FROMOUTSIDE;
-            u.ublessed = bounded_increase(u.ublessed, otmp->spe,
-                                          RIN_PROTECTION);
+            u.ublessed = bounded_increase(u.ublessed,
+                                          (typ == RIN_PROTECTION) ? otmp->spe
+                                           : 2, /* fixed amount for amulet */
+                                          typ);
             g.context.botl = 1;
             break;
         case RIN_FREE_ACTION:
@@ -2070,6 +2090,7 @@ struct obj *otmp;
         }
         case RIN_SUSTAIN_ABILITY:
         case AMULET_OF_LIFE_SAVING:
+        case AMULET_OF_FLYING:
         case AMULET_OF_REFLECTION: /* nice try */
             /* can't eat Amulet of Yendor or fakes,
              * and no oc_prop even if you could -3.
@@ -2810,19 +2831,49 @@ gethungry()
         /* Conflict uses up food too */
         if (HConflict || (EConflict & (~W_ARTI)))
             u.uhunger--;
-        /* +0 charged rings don't do anything, so don't affect hunger.
-           Slow digestion cancels move hunger but still causes ring hunger. */
+        /*
+         * +0 charged rings don't do anything, so don't affect hunger.
+         * Slow digestion cancels movement and melee hunger but still
+         * causes ring hunger.
+         * Possessing the real Amulet imposes a separate hunger penalty
+         * from wearing an amulet (so gets a double penalty when worn).
+         *
+         * 3.7.0:  Worn meat rings don't affect hunger.
+         * Same with worn cheap plastic imitation of the Amulet.
+         * +0 ring of protection might do something (enhanced "magical
+         * cancellation") if hero doesn't have protection from some
+         * other source (cloak or second ring).
+         */
         switch ((int) (g.moves % 20)) { /* note: use even cases only */
         case 4:
-            if (uleft && (uleft->spe || !objects[uleft->otyp].oc_charged))
+            if (uleft && uleft->otyp != MEAT_RING
+                /* more hungry if +/- is nonzero or +/- doesn't apply or
+                   +0 ring of protection is only source of protection;
+                   need to check whether both rings are +0 protection or
+                   they'd both slip by the "is there another source?" test,
+                   but don't do that for both rings or they will both be
+                   treated as supplying "MC" when only one matters;
+                   note: amulet of guarding overrides both +0 rings and
+                   is caught by the (EProtection & ~W_RINGx) == 0L tests */
+                && (uleft->spe
+                    || !objects[uleft->otyp].oc_charged
+                    || (uleft->otyp == RIN_PROTECTION
+                        && ((EProtection & ~W_RINGL) == 0L
+                            || ((EProtection & ~W_RINGL) == W_RINGR
+                                && uright && uright->otyp == RIN_PROTECTION
+                                && !uright->spe)))))
                 u.uhunger--;
             break;
         case 8:
-            if (uamul)
+            if (uamul && uamul->otyp != FAKE_AMULET_OF_YENDOR)
                 u.uhunger--;
             break;
         case 12:
-            if (uright && (uright->spe || !objects[uright->otyp].oc_charged))
+            if (uright && uright->otyp != MEAT_RING
+                && (uright->spe
+                    || !objects[uright->otyp].oc_charged
+                    || (uright->otyp == RIN_PROTECTION
+                        && (EProtection & ~W_RINGR) == 0L)))
                 u.uhunger--;
             break;
         case 16:
@@ -3028,17 +3079,16 @@ boolean incr;
         switch (newhs) {
         case HUNGRY:
             if (Hallucination) {
-                You((!incr) ? "now have a lesser case of the munchies."
-                            : "are getting the munchies.");
+                You(!incr ? "now have a lesser case of the munchies."
+                    : "are getting the munchies.");
             } else
-                You((!incr) ? "only feel hungry now."
-                            : (u.uhunger < 145)
-                                  ? "feel hungry."
-                                  : "are beginning to feel hungry.");
+                You(!incr ? "only feel hungry now."
+                    : (u.uhunger < 145) ? "feel hungry."
+                      : "are beginning to feel hungry.");
             if (incr && g.occupation
                 && (g.occupation != eatfood && g.occupation != opentin))
                 stop_occupation();
-            g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
+            end_running(TRUE);
             break;
         case WEAK:
             if (Hallucination)
@@ -3051,14 +3101,13 @@ boolean incr;
                           ? g.urole.name.m
                           : "Elf");
             else
-                You((!incr)
-                        ? "feel weak now."
-                        : (u.uhunger < 45) ? "feel weak."
-                                           : "are beginning to feel weak.");
+                You(!incr ? "feel weak now."
+                    : (u.uhunger < 45) ? "feel weak."
+                      : "are beginning to feel weak.");
             if (incr && g.occupation
                 && (g.occupation != eatfood && g.occupation != opentin))
                 stop_occupation();
-            g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
+            end_running(TRUE);
             break;
         }
         u.uhs = newhs;
@@ -3331,8 +3380,10 @@ int threat;
     case STONED:
         return (boolean) (mndx >= LOW_PM
                           && (mndx == PM_LIZARD || acidic(&mons[mndx])));
-    /* no tins can cure these (yet?) */
+    /* polymorph into a fiery monster */
     case SLIMED:
+        return (boolean) (mndx == PM_CHAMELEON);
+    /* no tins can cure these (yet?) */
     case SICK:
     case VOMITING:
         break;

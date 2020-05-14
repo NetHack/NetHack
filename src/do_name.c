@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1574648939 2019/11/25 02:28:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1586940208 2020/04/15 08:43:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.178 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,11 +6,16 @@
 #include "hack.h"
 
 static char *NDECL(nextmbuf);
+static void FDECL(getpos_help_keyxhelp, (winid, const char *, const char *, int));
 static void FDECL(getpos_help, (BOOLEAN_P, const char *));
 static int FDECL(CFDECLSPEC cmp_coord_distu, (const void *, const void *));
+static int FDECL(gloc_filter_classify_glyph, (int));
+static int FDECL(gloc_filter_floodfill_matcharea, (int, int));
+static void FDECL(gloc_filter_floodfill, (int, int));
+static void NDECL(gloc_filter_init);
+static void NDECL(gloc_filter_done);
 static boolean FDECL(gather_locs_interesting, (int, int, int));
 static void FDECL(gather_locs, (coord **, int *, int));
-static int FDECL(gloc_filter_floodfill_matcharea, (int, int));
 static void FDECL(auto_describe, (int, int));
 static void NDECL(do_mname);
 static boolean FDECL(alreadynamed, (struct monst *, char *, char *));
@@ -53,9 +58,10 @@ boolean FDECL((*gp_getvalidf), (int, int));
 static const char *const gloc_descr[NUM_GLOCS][4] = {
     { "any monsters", "monster", "next/previous monster", "monsters" },
     { "any items", "item", "next/previous object", "objects" },
-    { "any doors", "door", "next/previous door or doorway", "doors or doorways" },
+    { "any doors", "door", "next/previous door or doorway",
+      "doors or doorways" },
     { "any unexplored areas", "unexplored area", "unexplored location",
-      "unexplored locations" },
+      "locations next to unexplored locations" },
     { "anything interesting", "interesting thing", "anything interesting",
       "anything interesting" },
     { "any valid locations", "valid location", "valid location",
@@ -68,21 +74,31 @@ static const char *const gloc_filtertxt[NUM_GFILTER] = {
     " in this area"
 };
 
-void
+static void
 getpos_help_keyxhelp(tmpwin, k1, k2, gloc)
 winid tmpwin;
 const char *k1;
 const char *k2;
 int gloc;
 {
-    char sbuf[BUFSZ];
+    char sbuf[BUFSZ], fbuf[QBUFSZ];
+    const char *move_cursor_to = "move the cursor to ",
+               *filtertxt = gloc_filtertxt[iflags.getloc_filter];
 
+    if (gloc == GLOC_EXPLORE) {
+        /* default of "move to unexplored location" is inaccurate
+           because the position will be one spot short of that */
+        move_cursor_to = "move the cursor next to an ";
+        if (iflags.getloc_usemenu)
+            /* default is too wide for basic 80-column tty so shorten it
+               to avoid wrapping */
+            filtertxt = strsubst(strcpy(fbuf, filtertxt),
+                                 "this area", "area");
+    }
     Sprintf(sbuf, "Use '%s'/'%s' to %s%s%s.",
             k1, k2,
-            iflags.getloc_usemenu ? "get a menu of "
-                                  : "move the cursor to ",
-            gloc_descr[gloc][2 + iflags.getloc_usemenu],
-            gloc_filtertxt[iflags.getloc_filter]);
+            iflags.getloc_usemenu ? "get a menu of " : move_cursor_to,
+            gloc_descr[gloc][2 + iflags.getloc_usemenu], filtertxt);
     putstr(tmpwin, 0, sbuf);
 }
 
@@ -134,8 +150,8 @@ const char *goal;
                              visctrl(g.Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]),
                              GLOC_EXPLORE);
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]),
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
+                          visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]),
+                          visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
     Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
@@ -240,15 +256,14 @@ const void *b;
 
 #define IS_UNEXPLORED_LOC(x,y) \
     (isok((x), (y))                                     \
-     && glyph_is_cmap(levl[(x)][(y)].glyph)             \
-     && glyph_to_cmap(levl[(x)][(y)].glyph) == S_stone  \
+     && glyph_is_unexplored(levl[(x)][(y)].glyph)   \
      && !levl[(x)][(y)].seenv)
 
 #define GLOC_SAME_AREA(x,y)                                     \
     (isok((x), (y))                                             \
      && (selection_getpoint((x),(y), g.gloc_filter_map)))
 
-int
+static int
 gloc_filter_classify_glyph(glyph)
 int glyph;
 {
@@ -291,7 +306,7 @@ int x, y;
     return FALSE;
 }
 
-void
+static void
 gloc_filter_floodfill(x, y)
 int x, y;
 {
@@ -301,7 +316,7 @@ int x, y;
     selection_floodfill(g.gloc_filter_map, x, y, FALSE);
 }
 
-void
+static void
 gloc_filter_init()
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
@@ -322,11 +337,11 @@ gloc_filter_init()
     }
 }
 
-void
+static void
 gloc_filter_done()
 {
     if (g.gloc_filter_map) {
-        selection_free(g.gloc_filter_map);
+        selection_free(g.gloc_filter_map, TRUE);
         g.gloc_filter_map = (struct selectionvar *) 0;
 
     }
@@ -336,10 +351,7 @@ static boolean
 gather_locs_interesting(x, y, gloc)
 int x, y, gloc;
 {
-    /* TODO: if glyph is a pile glyph, convert to ordinary one
-     *       in order to keep tail/boulder/rock check simple.
-     */
-    int glyph = glyph_at(x, y);
+    int glyph, sym;
 
     if (iflags.getloc_filter == GFILTER_VIEW && !cansee(x, y))
         return FALSE;
@@ -348,6 +360,8 @@ int x, y, gloc;
         && !GLOC_SAME_AREA(x + 1, y) && !GLOC_SAME_AREA(x, y + 1))
         return FALSE;
 
+    glyph = glyph_at(x, y);
+    sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
     switch (gloc) {
     default:
     case GLOC_MONS:
@@ -361,43 +375,41 @@ int x, y, gloc;
                 && glyph != objnum_to_glyph(ROCK));
     case GLOC_DOOR:
         return (glyph_is_cmap(glyph)
-                && (is_cmap_door(glyph_to_cmap(glyph))
-                    || is_cmap_drawbridge(glyph_to_cmap(glyph))
-                    || glyph_to_cmap(glyph) == S_ndoor));
+                && (is_cmap_door(sym)
+                    || is_cmap_drawbridge(sym)
+                    || sym == S_ndoor));
     case GLOC_EXPLORE:
         return (glyph_is_cmap(glyph)
-                && (is_cmap_door(glyph_to_cmap(glyph))
-                    || is_cmap_drawbridge(glyph_to_cmap(glyph))
-                    || glyph_to_cmap(glyph) == S_ndoor
-                    || glyph_to_cmap(glyph) == S_room
-                    || glyph_to_cmap(glyph) == S_darkroom
-                    || glyph_to_cmap(glyph) == S_corr
-                    || glyph_to_cmap(glyph) == S_litcorr)
+                && !glyph_is_nothing(glyph_to_cmap(glyph))
+                && (is_cmap_door(sym)
+                    || is_cmap_drawbridge(sym)
+                    || sym == S_ndoor
+                    || is_cmap_room(sym)
+                    || is_cmap_corr(sym))
                 && (IS_UNEXPLORED_LOC(x + 1, y)
                     || IS_UNEXPLORED_LOC(x - 1, y)
                     || IS_UNEXPLORED_LOC(x, y + 1)
                     || IS_UNEXPLORED_LOC(x, y - 1)));
     case GLOC_VALID:
         if (getpos_getvalid)
-            return (*getpos_getvalid)(x,y);
+            return (*getpos_getvalid)(x, y);
         /*FALLTHRU*/
     case GLOC_INTERESTING:
-        return gather_locs_interesting(x,y, GLOC_DOOR)
-            || !(glyph_is_cmap(glyph)
-                 && (is_cmap_wall(glyph_to_cmap(glyph))
-                     || glyph_to_cmap(glyph) == S_tree
-                     || glyph_to_cmap(glyph) == S_bars
-                     || glyph_to_cmap(glyph) == S_ice
-                     || glyph_to_cmap(glyph) == S_air
-                     || glyph_to_cmap(glyph) == S_cloud
-                     || glyph_to_cmap(glyph) == S_lava
-                     || glyph_to_cmap(glyph) == S_water
-                     || glyph_to_cmap(glyph) == S_pool
-                     || glyph_to_cmap(glyph) == S_ndoor
-                     || glyph_to_cmap(glyph) == S_room
-                     || glyph_to_cmap(glyph) == S_darkroom
-                     || glyph_to_cmap(glyph) == S_corr
-                     || glyph_to_cmap(glyph) == S_litcorr));
+        return (gather_locs_interesting(x, y, GLOC_DOOR)
+                || !((glyph_is_cmap(glyph)
+                      && (is_cmap_wall(sym)
+                          || sym == S_tree
+                          || sym == S_bars
+                          || sym == S_ice
+                          || sym == S_air
+                          || sym == S_cloud
+                          || is_cmap_lava(sym)
+                          || is_cmap_water(sym)
+                          || sym == S_ndoor
+                          || is_cmap_room(sym)
+                          || is_cmap_corr(sym)))
+                     || glyph_is_nothing(glyph)
+                     || glyph_is_unexplored(glyph)));
     }
     /*NOTREACHED*/
     return FALSE;
@@ -575,13 +587,13 @@ int gloc;
     if (gcount < 2) { /* gcount always includes the hero */
         free((genericptr_t) garr);
         You("cannot %s %s.",
-            iflags.getloc_filter == GFILTER_VIEW ? "see" : "detect",
+            (iflags.getloc_filter == GFILTER_VIEW) ? "see" : "detect",
             gloc_descr[gloc][0]);
         return FALSE;
     }
 
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
 
     /* gather_locs returns array[0] == you. skip it. */
@@ -601,7 +613,7 @@ int gloc;
             Sprintf(fullbuf, "%s%s%s", firstmatch,
                     (*tmpbuf ? " " : ""), tmpbuf);
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, fullbuf,
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -1348,30 +1360,30 @@ docallcmd()
     boolean abc = flags.lootabc;
 
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_char = 'm'; /* group accelerator 'C' */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'C', ATR_NONE,
-             "a monster", MENU_UNSELECTED);
+             "a monster", MENU_ITEMFLAGS_NONE);
     if (g.invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
         add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'y', ATR_NONE,
-                 "a particular object in inventory", MENU_UNSELECTED);
+                 "a particular object in inventory", MENU_ITEMFLAGS_NONE);
         any.a_char = 'o'; /* group accelerator 'n' */
         add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'n', ATR_NONE,
-                 "the type of an object in inventory", MENU_UNSELECTED);
+                 "the type of an object in inventory", MENU_ITEMFLAGS_NONE);
     }
     any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, ',', ATR_NONE,
-             "the type of an object upon the floor", MENU_UNSELECTED);
+             "the type of an object upon the floor", MENU_ITEMFLAGS_NONE);
     any.a_char = 'd'; /* group accelerator '\' */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, '\\', ATR_NONE,
-             "the type of an object on discoveries list", MENU_UNSELECTED);
+             "the type of an object on discoveries list", MENU_ITEMFLAGS_NONE);
     any.a_char = 'a'; /* group accelerator 'l' */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'l', ATR_NONE,
-             "record an annotation for the current level", MENU_UNSELECTED);
+             "record an annotation for the current level", MENU_ITEMFLAGS_NONE);
     end_menu(win, "What do you want to name?");
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         ch = pick_list[0].item.a_char;
@@ -2054,15 +2066,16 @@ char *buf, *code;
     static const char bogon_codes[] = "-_+|="; /* see dat/bonusmon.txt */
     char *mname = buf;
 
+    if (code)
+        *code = '\0';
+    /* might fail (return empty buf[]) if the file isn't available */
     get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng);
-    /* strip prefix if present */
-    if (index(bogon_codes, *mname)) {
+    if (!*mname) {
+        Strcpy(buf, "bogon");
+    } else if (index(bogon_codes, *mname)) { /* strip prefix if present */
         if (code)
             *code = *mname;
         ++mname;
-    } else {
-        if (code)
-            *code = '\0';
     }
     return mname;
 }
@@ -2125,7 +2138,8 @@ roguename()
 
 static NEARDATA const char *const hcolors[] = {
     "ultraviolet", "infrared", "bluish-orange", "reddish-green", "dark white",
-    "light black", "sky blue-pink", "salty", "sweet", "sour", "bitter",
+    "light black", "sky blue-pink",
+    "salty", "sweet", "sour", "bitter", "umami", /* basic tastes */
     "striped", "spiral", "swirly", "plaid", "checkered", "argyle", "paisley",
     "blotchy", "guernsey-spotted", "polka-dotted", "square", "round",
     "triangular", "cabernet", "sangria", "fuchsia", "wisteria", "lemon-lime",
@@ -2161,14 +2175,26 @@ static NEARDATA const char *const hliquids[] = {
     "caramel sauce", "ink", "aqueous humour", "milk substitute",
     "fruit juice", "glowing lava", "gastric acid", "mineral water",
     "cough syrup", "quicksilver", "sweet vitriol", "grey goo", "pink slime",
+    /* "new coke (tm)", --better not */
 };
 
+/* if hallucinating, return a random liquid instead of 'liquidpref' */
 const char *
 hliquid(liquidpref)
-const char *liquidpref;
+const char *liquidpref; /* use as-is when not hallucinating (unless empty) */
 {
-    return (Hallucination || !liquidpref) ? hliquids[rn2(SIZE(hliquids))]
-                                          : liquidpref;
+    if (Hallucination || !liquidpref || !*liquidpref) {
+        int indx, count = SIZE(hliquids);
+
+        /* if we have a non-hallucinatory default value, include it
+           among the choices */
+        if (liquidpref && *liquidpref)
+            ++count;
+        indx = rn2_on_display_rng(count);
+        if (indx < SIZE(hliquids))
+            return hliquids[indx];
+    }
+    return liquidpref;
 }
 
 /* Aliases for road-runner nemesis

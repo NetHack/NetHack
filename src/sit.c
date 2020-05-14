@@ -25,7 +25,7 @@ take_gold()
     if (!lost_money) {
         You_feel("a strange sensation.");
     } else {
-        You("notice you have no money!");
+        You("notice you have no gold!");
         g.context.botl = 1;
     }
 }
@@ -75,6 +75,8 @@ dosit()
             You("coil up around your %shoard.",
                 (obj->quan + money_cnt(g.invent) < u.ulevel * 1000) ? "meager "
                                                                   : "");
+        } else if (obj->otyp == TOWEL) {
+            pline("It's probably not a good time for a picnic...");
         } else {
             You("sit on %s.", the(xname(obj)));
             if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
@@ -208,7 +210,7 @@ dosit()
 
                 /* Magical voice not affected by deafness */
                 pline("A voice echoes:");
-                verbalize("Thy audience hath been summoned, %s!",
+                verbalize("Thine audience hath been summoned, %s!",
                           flags.female ? "Dame" : "Sire");
                 while (cnt--)
                     (void) makemon(courtmon(), u.ux, u.uy, NO_MM_FLAGS);
@@ -274,7 +276,7 @@ dosit()
                 break;
             }
         } else {
-            if (is_prince(g.youmonst.data))
+            if (is_prince(g.youmonst.data) || u.uevent.uhand_of_elbereth)
                 You_feel("very comfortable here.");
             else
                 You_feel("somehow out of place...");

@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1574116097 2019/11/18 22:28:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.272 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1576626110 2019/12/17 23:41:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.276 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,9 +8,6 @@
 #include "hack.h"
 #include "dlb.h"
 #include <ctype.h>
-#include "sfproto.h"
-#include "sfprocs.h"
-#include "lev.h"
 
 #ifdef TTY_GRAPHICS
 #include "wintty.h" /* more() */
@@ -130,6 +127,8 @@ extern char *sounddir;
 #define SELECTSAVED
 #endif
 
+static NHFILE *NDECL(new_nhfile);
+static void FDECL(free_nhfile, (NHFILE *));
 #ifdef SELECTSAVED
 static int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
 #endif
@@ -166,6 +165,7 @@ static void NDECL(free_config_sections);
 static char *FDECL(choose_random_part, (char *, CHAR_P));
 static boolean FDECL(is_config_section, (const char *));
 static boolean FDECL(handle_config_section, (char *));
+static char *FDECL(find_optparam, (const char *));
 static void FDECL(parseformat, (int *, char *));
 
 #ifdef SELF_RECOVER
@@ -425,7 +425,7 @@ NHFILE *nhfp;
     }
 }
 
-NHFILE *
+static NHFILE *
 new_nhfile()
 {
     NHFILE *nhfp = (NHFILE *)alloc(sizeof(NHFILE));
@@ -434,7 +434,7 @@ new_nhfile()
     return nhfp;
 }
 
-void
+static void
 free_nhfile(nhfp)
 NHFILE *nhfp;
 {
@@ -451,18 +451,6 @@ NHFILE *nhfp;
     if (nhfp) {
         if (nhfp->structlevel && nhfp->fd != -1)
             (void) nhclose(nhfp->fd), nhfp->fd = -1;
-        if (nhfp->fieldlevel) {
-            if (nhfp->fpdef) {
-                (void) fclose(nhfp->fpdef);
-                nhfp->fpdef = (FILE *) 0;
-            }
-        }
-        if (nhfp->fplog)
-            (void) fprintf(nhfp->fplog, "# closing\n");
-        if (nhfp->fplog)
-            (void) fclose(nhfp->fplog);
-        if (nhfp->fpdebug)
-            (void) fclose(nhfp->fpdebug);
         zero_nhfile(nhfp);
         free_nhfile(nhfp);
     }
@@ -479,13 +467,6 @@ NHFILE *nhfp;
         (void) lseek(nhfp->fd, (off_t) 0, 0);
 #endif
     }
-    if (nhfp->fieldlevel) {
-        if (nhfp->fpdef) {
-            rewind(nhfp->fpdef);
-            nhfp->count = 0L;
-            nhfp->eof = FALSE;
-        }
-    }
 }
 
 static
@@ -497,25 +478,10 @@ NHFILE *nhfp;
        the pointer to the nethack file descriptor */
     if (nhfp) {
          /* check for no open file at all,
-          * not a structlevel legacy file,
-          * nor a fieldlevel file.
+          * not a structlevel legacy file
           */
-         if (((nhfp->fd == -1) && !nhfp->fpdef)
-                || (nhfp->structlevel && nhfp->fd < 0)
-                || (nhfp->fieldlevel && !nhfp->fpdef)) {
+         if (nhfp->structlevel && nhfp->fd < 0) {
             /* not viable, start the cleanup */
-            if (nhfp->fieldlevel) {
-                if (nhfp->fpdef) {
-                    (void) fclose(nhfp->fpdef);
-                    nhfp->fpdef = (FILE *) 0;
-                }
-                if (nhfp->fplog) {
-                    (void) fprintf(nhfp->fplog, "# closing, not viable\n");
-                    (void) fclose(nhfp->fplog);
-                }
-                if (nhfp->fpdebug)
-                    (void) fclose(nhfp->fpdebug);
-            }
             zero_nhfile(nhfp);
             free_nhfile(nhfp);
             nhfp = (NHFILE *) 0;
@@ -795,8 +761,6 @@ d_level *lev;
         Sprintf(eos(dptr), ".%d", lev->dlevel);
 #ifdef SYSCF
     idx = sysopt.bonesformat[0];
-    if (idx > historical && idx <= ascii)
-        Strcat(dptr, sfoprocs[idx].ext);
 #endif
 #ifdef VMS
     Strcat(dptr, ";1");
@@ -847,26 +811,6 @@ char errbuf[];
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_BONESFILE;
         nhfp->mode = WRITING;
-#ifdef SYSCF
-        if (sysopt.bonesformat[0] > historical &&
-            sysopt.bonesformat[0] <= ascii) {
-            nhfp->structlevel = FALSE;
-            nhfp->fieldlevel = TRUE;
-            nhfp->addinfo = TRUE;
-            nhfp->style.deflt = TRUE;
-            nhfp->style.binary = (sysopt.bonesformat[0] != ascii);
-            nhfp->fnidx = sysopt.bonesformat[0];
-            nhfp->fd = -1;
-            nhfp->fpdef = fopen(file, nhfp->style.binary ? WRBMODE : WRTMODE);
-            if (nhfp->fpdef) {
-#ifdef SAVEFILE_DEBUGGING
-                nhfp->fpdebug = fopen("create_bonesfile-debug.log", "a");
-#endif
-            } else {
-                failed = errno;
-            }
-        }
-#endif      /* SYSCF */
         if (nhfp->structlevel) {
 #if defined(MICRO) || defined(WIN32)
             /* Use O_TRUNC to force the file to be shortened if it already
@@ -962,26 +906,6 @@ char **bonesid;
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_BONESFILE;
         nhfp->mode = READING;
-#ifdef SYSCF
-        if (sysopt.bonesformat[0] > historical &&
-            sysopt.bonesformat[0] <= ascii) {
-            nhfp->structlevel = FALSE;
-            nhfp->fieldlevel = TRUE;
-            nhfp->addinfo = TRUE;
-            nhfp->style.deflt = TRUE;
-            nhfp->style.binary = (sysopt.bonesformat[0] != ascii);
-            nhfp->fnidx = sysopt.bonesformat[0];
-            nhfp->fd = -1;
-            nhfp->fpdef = fopen(fq_bones, nhfp->style.binary ? RDBMODE : RDTMODE);
-            if (nhfp->fpdef) {
-#ifdef SAVEFILE_DEBUGGING
-                nhfp->fpdebug = fopen("open_bonesfile-debug.log", "a");
-#endif
-            } else {
-                failed = errno;
-            }
-        }
-#endif  /* SYSCF */
         if (nhfp->structlevel) {
 #ifdef MAC
             nhfp->fd = macopen(fq_bones, O_RDONLY | O_BINARY, BONE_TYPE);
@@ -1022,16 +946,11 @@ void
 set_savefile_name(regularize_it)
 boolean regularize_it;
 {
-    int idx = 0, regoffset = 0, overflow = 0,  
+    int idx = historical, regoffset = 0, overflow = 0,  
         indicator_spot = 0; /* 0=no indicator, 1=before ext, 2=after ext */
     const char *postappend = (const char *) 0,
                *sfindicator = (const char *) 0;
 
-#ifdef SYSCF
-    idx = sysopt.saveformat[0];
-    if (idx > historical && idx <= ascii)
-        sfindicator = sfoprocs[idx].ext;
-#endif
     if (g.program_state.in_self_recover) {
         /* self_recover needs to be done as historical
            structlevel content until that process is
@@ -1041,7 +960,6 @@ boolean regularize_it;
            place it into the save file.
         */
         idx = historical;
-        sfindicator = sfoprocs[idx].ext;
     }
 #ifdef VMS
     Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
@@ -1112,15 +1030,7 @@ boolean regularize_it;
         if (strlen(g.SAVEF) + strlen(SAVE_EXTENSION) < (SAVESIZE - 1)) {
             Strcat(g.SAVEF, SAVE_EXTENSION);
 #ifdef MSDOS
-#ifdef SYSCF
- 	if (idx >= historical && idx <= ascii) {
-	    /* we did leave room for the extra char in SAVE_EXTENSION */
-	    g.SAVEF[strlen(g.SAVEF)-1] =
-	    	(idx == lendian) ? 'l' :
-	    	(idx == ascii)   ? 'a' : '\0';
-	}
-        sfindicator = (g.program_state.in_self_recover) ? "" : sfoprocs[idx].ext;
-#endif
+        sfindicator = "";
 #endif
         } else
             overflow = 3;
@@ -1140,8 +1050,8 @@ boolean regularize_it;
     }
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
     if (overflow)
-        impossible("set_savefile_name() couldn't complete without overlow %d",
-                    overflow);
+        impossible("set_savefile_name() couldn't complete without overflow %d",
+                   overflow);
 #endif
 }
 
@@ -1152,8 +1062,6 @@ NHFILE *nhfp;
 {
     if (nhfp->structlevel)
         (void) write(nhfp->fd, (genericptr_t) g.SAVEF, sizeof(g.SAVEF));
-    if (nhfp->fieldlevel)
-        sfo_str(nhfp, g.SAVEF, "savefile_name", "g.savef", sizeof(g.SAVEF)); 
 }
 #endif
 
@@ -1196,12 +1104,7 @@ create_savefile()
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = WRITING;
-#ifdef SYSCF
-        if (sysopt.saveformat[0] > historical &&
-            sysopt.saveformat[0] <= ascii)
-            do_historical = FALSE;
-#endif /* SYSCF */
-        if (g.program_state.in_self_recover) {
+        if (g.program_state.in_self_recover || do_historical) {
             do_historical = TRUE;       /* force it */
             nhfp->structlevel = TRUE;
             nhfp->fieldlevel = FALSE;
@@ -1211,23 +1114,6 @@ create_savefile()
             nhfp->fnidx = historical;
             nhfp->fd = -1;
             nhfp->fpdef = (FILE *) 0;
-        }
-        if (!do_historical) {
-            nhfp->structlevel = FALSE;
-            nhfp->fieldlevel = TRUE;
-            nhfp->addinfo = TRUE;
-            nhfp->style.deflt = TRUE;
-            nhfp->style.binary = (sysopt.saveformat[0] != ascii);
-            nhfp->fnidx = sysopt.saveformat[0];
-            nhfp->fd = -1;
-            nhfp->fpdef = fopen(fq_save, nhfp->style.binary ? WRBMODE : WRTMODE);
-            if (nhfp->fpdef) {
-#ifdef SAVEFILE_DEBUGGING
-                nhfp->fpdebug = fopen("create_savefile-debug.log", "a");
-#endif
-            } else {
-                failed = errno;
-            }
         }
         if (nhfp->structlevel) {
 #if defined(MICRO) || defined(WIN32)
@@ -1274,12 +1160,7 @@ open_savefile()
         nhfp->fieldlevel = FALSE;
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = READING;
-#ifdef SYSCF
-        if (sysopt.saveformat[0] > historical &&
-            sysopt.saveformat[0] <= ascii)
-            do_historical = FALSE;
-#endif /* SYSCF */
-        if (g.program_state.in_self_recover) {
+        if (g.program_state.in_self_recover || do_historical) {
             do_historical = TRUE;       /* force it */
             nhfp->structlevel = TRUE;
             nhfp->fieldlevel = FALSE;
@@ -1289,23 +1170,6 @@ open_savefile()
             nhfp->fnidx = historical;
             nhfp->fd = -1;
             nhfp->fpdef = (FILE *) 0;
-        }
-        if (!do_historical) {
-            nhfp->structlevel = FALSE;
-            nhfp->fieldlevel = TRUE;
-            nhfp->addinfo = TRUE;
-            nhfp->style.deflt = TRUE;
-            nhfp->style.binary = (sysopt.saveformat[0] < ascii);
-            nhfp->fnidx = sysopt.saveformat[0];
-            nhfp->fd = -1;
-            nhfp->fpdef = fopen(fq_save, nhfp->style.binary ? RDBMODE : RDTMODE);
-            if (nhfp->fpdef) {
-#ifdef SAVEFILE_DEBUGGING
-                nhfp->fpdebug = fopen("open_savefile-debug.log", "a");
-#endif
-            } else {
-                failed = errno;
-            }
         }
         if (nhfp->structlevel) {
 #ifdef MAC
@@ -1345,10 +1209,6 @@ restore_saved_game()
 
     nh_uncompress(fq_save);
     if ((nhfp = open_savefile()) != 0) {
-        if (nhfp && nhfp->fieldlevel && nhfp->fplog)
-            (void) fprintf(nhfp->fplog, "# just opened\n");
-        if (nhfp->fieldlevel && nhfp->addinfo)
-            sfi_addinfo(nhfp, "NetHack", "start", "savefile", 0);
         if (validate(nhfp, fq_save) != 0) {
             close_nhfile(nhfp);
             nhfp = (NHFILE *)0;
@@ -2242,7 +2102,7 @@ int src;
     char *envp;
 #endif
 
-    if (src == SET_IN_SYS) {
+    if (src == set_in_sysconf) {
         /* SYSCF_FILE; if we can't open it, caller will bail */
         if (filename && *filename) {
             set_configfile_name(fqname(filename, SYSCONFPREFIX, 0));
@@ -2251,7 +2111,7 @@ int src;
             fp = (FILE *) 0;
         return  fp;
     }
-    /* If src != SET_IN_SYS, "filename" is an environment variable, so it
+    /* If src != set_in_sysconf, "filename" is an environment variable, so it
      * should hang around. If set, it is expected to be a full path name
      * (if relevant)
      */
@@ -2550,7 +2410,7 @@ char *buf;
 #define match_varname(INP, NAM, LEN) match_optname(INP, NAM, LEN, TRUE)
 
 /* find the '=' or ':' */
-char *
+static char *
 find_optparam(buf)
 const char *buf;
 {
@@ -2579,10 +2439,14 @@ char *origbuf;
     int len;
     boolean retval = TRUE;
 
+    while (*origbuf == ' ' || *origbuf == '\t') /* skip leading whitespace */
+        ++origbuf;                   /* (caller probably already did this) */
+    (void) strncpy(buf, origbuf, sizeof buf - 1);
+    buf[sizeof buf - 1] = '\0'; /* strncpy not guaranteed to NUL terminate */
     /* convert any tab to space, condense consecutive spaces into one,
        remove leading and trailing spaces (exception: if there is nothing
        but spaces, one of them will be kept even though it leads/trails) */
-    mungspaces(strcpy(buf, origbuf));
+    mungspaces(buf);
 
     /* find the '=' or ':' */
     bufp = find_optparam(buf);
@@ -2695,7 +2559,7 @@ char *origbuf;
         (void) strncpy(g.catname, bufp, PL_PSIZ - 1);
 
 #ifdef SYSCF
-    } else if (src == SET_IN_SYS && match_varname(buf, "WIZARDS", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "WIZARDS", 7)) {
         if (sysopt.wizards)
             free((genericptr_t) sysopt.wizards);
         sysopt.wizards = dupstr(bufp);
@@ -2707,15 +2571,15 @@ char *origbuf;
                 free((genericptr_t) sysopt.fmtd_wizard_list);
             sysopt.fmtd_wizard_list = build_english_list(sysopt.wizards);
         }
-    } else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "SHELLERS", 8)) {
         if (sysopt.shellers)
             free((genericptr_t) sysopt.shellers);
         sysopt.shellers = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "EXPLORERS", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "EXPLORERS", 7)) {
         if (sysopt.explorers)
             free((genericptr_t) sysopt.explorers);
         sysopt.explorers = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "DEBUGFILES", 5)) {
         /* if showdebug() has already been called (perhaps we've added
            some debugpline() calls to option processing) and has found
            a value for getenv("DEBUGFILES"), don't override that */
@@ -2724,17 +2588,17 @@ char *origbuf;
                 free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
         }
-    } else if (src == SET_IN_SYS && match_varname(buf, "DUMPLOGFILE", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "DUMPLOGFILE", 7)) {
 #ifdef DUMPLOG
         if (sysopt.dumplogfile)
             free((genericptr_t) sysopt.dumplogfile);
         sysopt.dumplogfile = dupstr(bufp);
 #endif
-    } else if (src == SET_IN_SYS && match_varname(buf, "GENERICUSERS", 12)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "GENERICUSERS", 12)) {
         if (sysopt.genericusers)
             free((genericptr_t) sysopt.genericusers);
         sysopt.genericusers = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "BONES_POOLS", 10)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "BONES_POOLS", 10)) {
         /* max value of 10 guarantees (N % bones.pools) will be one digit
            so we don't lose control of the length of bones file names */
         n = atoi(bufp);
@@ -2742,32 +2606,32 @@ char *origbuf;
         /* note: right now bones_pools==0 is the same as bones_pools==1,
            but we could change that and make bones_pools==0 become an
            indicator to suppress bones usage altogether */
-    } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
             free((genericptr_t) sysopt.support);
         sysopt.support = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "RECOVER", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "RECOVER", 7)) {
         if (sysopt.recover)
             free((genericptr_t) sysopt.recover);
         sysopt.recover = dupstr(bufp);
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "CHECK_SAVE_UID", 14)) {
         n = atoi(bufp);
         sysopt.check_save_uid = n;
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "CHECK_PLNAME", 12)) {
         n = atoi(bufp);
         sysopt.check_plname = n;
     } else if (match_varname(buf, "SEDUCE", 6)) {
         n = !!atoi(bufp); /* XXX this could be tighter */
         /* allow anyone to turn it off, but only sysconf to turn it on*/
-        if (src != SET_IN_SYS && n != 0) {
+        if (src != set_in_sysconf && n != 0) {
             config_error_add("Illegal value in SEDUCE");
             return FALSE;
         }
         sysopt.seduce = n;
         sysopt_seduce_set(sysopt.seduce);
-    } else if (src == SET_IN_SYS && match_varname(buf, "MAXPLAYERS", 10)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "MAXPLAYERS", 10)) {
         n = atoi(bufp);
         /* XXX to get more than 25, need to rewrite all lock code */
         if (n < 0 || n > 25) {
@@ -2775,35 +2639,35 @@ char *origbuf;
             return FALSE;
         }
         sysopt.maxplayers = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "PERSMAX", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "PERSMAX", 7)) {
         n = atoi(bufp);
         if (n < 1) {
             config_error_add("Illegal value in PERSMAX (minimum is 1).");
             return FALSE;
         }
         sysopt.persmax = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "PERS_IS_UID", 11)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "PERS_IS_UID", 11)) {
         n = atoi(bufp);
         if (n != 0 && n != 1) {
             config_error_add("Illegal value in PERS_IS_UID (must be 0 or 1).");
             return FALSE;
         }
         sysopt.pers_is_uid = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "ENTRYMAX", 8)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "ENTRYMAX", 8)) {
         n = atoi(bufp);
         if (n < 10) {
             config_error_add("Illegal value in ENTRYMAX (minimum is 10).");
             return FALSE;
         }
         sysopt.entrymax = n;
-    } else if ((src == SET_IN_SYS) && match_varname(buf, "POINTSMIN", 9)) {
+    } else if ((src == set_in_sysconf) && match_varname(buf, "POINTSMIN", 9)) {
         n = atoi(bufp);
         if (n < 1) {
             config_error_add("Illegal value in POINTSMIN (minimum is 1).");
             return FALSE;
         }
         sysopt.pointsmin = n;
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "MAX_STATUENAME_RANK", 10)) {
         n = atoi(bufp);
         if (n < 1) {
@@ -2814,7 +2678,7 @@ char *origbuf;
         sysopt.tt_oname_maxrank = n;
 
     /* SYSCF PANICTRACE options */
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "PANICTRACE_LIBC", 15)) {
         n = atoi(bufp);
 #if defined(PANICTRACE) && defined(PANICTRACE_LIBC)
@@ -2824,7 +2688,7 @@ char *origbuf;
         }
 #endif
         sysopt.panictrace_libc = n;
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "PANICTRACE_GDB", 14)) {
         n = atoi(bufp);
 #if defined(PANICTRACE)
@@ -2834,7 +2698,7 @@ char *origbuf;
         }
 #endif
         sysopt.panictrace_gdb = n;
-    } else if (src == SET_IN_SYS && match_varname(buf, "GDBPATH", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "GDBPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
             config_error_add("File specified in GDBPATH does not exist.");
@@ -2844,7 +2708,7 @@ char *origbuf;
         if (sysopt.gdbpath)
             free((genericptr_t) sysopt.gdbpath);
         sysopt.gdbpath = dupstr(bufp);
-    } else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
+    } else if (src == set_in_sysconf && match_varname(buf, "GREPPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
             config_error_add("File specified in GREPPATH does not exist.");
@@ -2855,13 +2719,13 @@ char *origbuf;
             free((genericptr_t) sysopt.greppath);
         sysopt.greppath = dupstr(bufp);
     /* SYSCF SAVE and BONES format options */
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "SAVEFORMAT", 10)) {
         parseformat(sysopt.saveformat, bufp);
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "BONESFORMAT", 11)) {
         parseformat(sysopt.bonesformat, bufp);
-    } else if (src == SET_IN_SYS
+    } else if (src == set_in_sysconf
                && match_varname(buf, "ACCESSIBILITY", 13)) {
         n = atoi(bufp);
         if (n < 0 || n > 1) {
@@ -2869,6 +2733,16 @@ char *origbuf;
             return FALSE;
         }
         sysopt.accessibility = n;
+#ifdef WIN32
+    } else if (src == set_in_sysconf
+                && match_varname(buf, "portable_device_paths", 8)) {
+        n = atoi(bufp);
+        if (n < 0 || n > 1) {
+            config_error_add("Illegal value in portable_device_paths (not 0,1).");
+            return FALSE;
+        }
+        sysopt.portable_device_paths = n;
+#endif
 #endif /* SYSCF */
 
     } else if (match_varname(buf, "BOULDER", 3)) {
@@ -3096,6 +2970,7 @@ boolean secure;
 
     tmp->next = config_error_data;
     config_error_data = tmp;
+    g.program_state.config_error_ready = TRUE;
 }
 
 static boolean
@@ -3171,6 +3046,7 @@ config_error_done()
     }
     config_error_data = tmp->next;
     free(tmp);
+    g.program_state.config_error_ready = FALSE;
     return n;
 }
 
@@ -3186,7 +3062,7 @@ int src;
         return FALSE;
 
     /* begin detection of duplicate configfile options */
-    set_duplicate_opt_detection(1);
+    reset_duplicate_opt_detection();
     free_config_sections();
     iflags.parse_config_file_src = src;
 
@@ -3195,7 +3071,7 @@ int src;
 
     free_config_sections();
     /* turn off detection of duplicate configfile options */
-    set_duplicate_opt_detection(0);
+    reset_duplicate_opt_detection();
     return rv;
 }
 
@@ -3302,7 +3178,11 @@ boolean
 proc_wizkit_line(buf)
 char *buf;
 {
-    struct obj *otmp = readobjnam(buf, (struct obj *) 0);
+    struct obj *otmp;
+
+    if (strlen(buf) >= BUFSZ)
+        buf[BUFSZ - 1] = '\0';
+    otmp = readobjnam(buf, (struct obj *) 0);
 
     if (otmp) {
         if (otmp != &cg.zeroobj)
@@ -3410,22 +3290,24 @@ boolean FDECL((*proc), (char *));
 
                 /* merge now read line with previous ones, if necessary */
                 if (!ignoreline) {
-                    len = (int) strlen(inbuf) + 1;
+                    len = (int) strlen(ep) + 1; /* +1: final '\0' */
                     if (buf)
-                        len += (int) strlen(buf);
+                        len += (int) strlen(buf) + 1; /* +1: space */
                     tmpbuf = (char *) alloc(len);
+                    *tmpbuf = '\0';
                     if (buf) {
-                        Sprintf(tmpbuf, "%s %s", buf, inbuf);
+                        Strcat(strcpy(tmpbuf, buf), " ");
                         free(buf);
-                    } else
-                        Strcpy(tmpbuf, inbuf);
-                    buf = tmpbuf;
+                    }
+                    buf = strcat(tmpbuf, ep);
+                    if (strlen(buf) >= sizeof inbuf)
+                        buf[sizeof inbuf - 1] = '\0';
                 }
 
                 if (morelines || (ignoreline && !oldline))
                     continue;
 
-                if (handle_config_section(ep)) {
+                if (handle_config_section(buf)) {
                     free(buf);
                     buf = (char *) 0;
                     continue;
@@ -3447,11 +3329,11 @@ boolean FDECL((*proc), (char *));
                     }
                     bufp++;
                     if (g.config_section_chosen)
-                        free(g.config_section_chosen);
+                        free(g.config_section_chosen), g.config_section_chosen = 0;
                     section = choose_random_part(bufp, ',');
-                    if (section)
+                    if (section) {
                         g.config_section_chosen = dupstr(section);
-                    else {
+                    } else {
                         config_error_add("No config section to choose");
                         rv = FALSE;
                     }
@@ -3513,6 +3395,7 @@ int which_set;
     g.symset[which_set].explicitly = TRUE;
     g.chosen_symset_start = g.chosen_symset_end = FALSE;
     g.symset_which_set = which_set;
+    g.symset_count = 0;
 
     config_error_init(TRUE, "symbols", FALSE);
 
@@ -3563,6 +3446,8 @@ int which_set;
     struct symparse *symp;
     char *bufp, *commentp, *altp;
 
+    if (strlen(buf) >= BUFSZ)
+        buf[BUFSZ - 1] = '\0';
     /* convert each instance of whitespace (tabs, consecutive spaces)
        into a single space; leading and trailing spaces are stripped */
     mungspaces(buf);
@@ -3620,6 +3505,7 @@ int which_set;
                     g.symset_list = tmpsp;
                 else
                     lastsp->next = tmpsp;
+                tmpsp->idx = g.symset_count++;
                 tmpsp->name = dupstr(bufp);
                 tmpsp->desc = (char *) 0;
                 tmpsp->handling = H_UNK;
@@ -4051,15 +3937,6 @@ recover_savefile()
      */
 
     /*
-     * Things are different now. We could be in a situation
-     * where the default save file format is not structlevel.
-     * self-recover is currently written to use copy_bytes()
-     * to move content from the level files into the savefile.
-     * Until the code is updated to use something other than
-     * copy_bytes, what we need to do is force the recovery
-     * save to be structlevel, finish creating it, then read
-     * it back in. The save after that can be fieldlevel again.
-     *
      * Set a flag for the savefile routines to know the
      * circumstances and act accordingly:
      *    g.program_state.in_self_recover
@@ -4088,28 +3965,10 @@ recover_savefile()
      */
     /*store_formatindicator(snhfp); */
     store_version(snhfp);
-#if 0
-    if (snhfp->structlevel) {
-        if (write(snhfp->fd, (genericptr_t) &version_data, sizeof version_data)
-            != sizeof version_data)
-            savewrite_failure = "version_info";
-    }
-    if (snhfp->fieldlevel) {
-        sfo_version_info(snhfp, (struct version_info *) &version_data,
-                         "version", "version_info", 1);
-        savewrite_failure = (const char *) 0;
-    }
-    if (savewrite_failure)
-        goto cleanup;
-#endif
 
     if (snhfp->structlevel) {
         if (write(snhfp->fd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi)
             savewrite_failure = "savefileinfo";
-    }
-    if (snhfp->fieldlevel) {
-        sfo_savefile_info(snhfp, &sfsaveinfo, "savefileinfo", "savefile_info", 1);
-        savewrite_failure = (const char *) 0;
     }
     if (savewrite_failure)
         goto cleanup;
@@ -4119,10 +3978,6 @@ recover_savefile()
             != sizeof pltmpsiz)
             savewrite_failure = "player name size";
     }
-    if (snhfp->fieldlevel) {
-        sfo_int(snhfp, &pltmpsiz, "plname", "plname_size", 1);
-        savewrite_failure = (const char *) 0;
-    }
     if (savewrite_failure)
         goto cleanup;
 
@@ -4130,18 +3985,9 @@ recover_savefile()
         if (write(snhfp->fd, (genericptr_t) &tmpplbuf, pltmpsiz) != pltmpsiz)
             savewrite_failure = "player name";
     }
-    if (snhfp->fieldlevel) {
-        sfo_str(snhfp, tmpplbuf, "plname", "tmpplbuf", pltmpsiz);
-        savewrite_failure = (const char *) 0;
-    }
     if (savewrite_failure)
         goto cleanup;
 
-    /*
-     * copy_bytes isn't good enough anymore.
-     * We could be reading from a structlevel file but
-     * writing into a fieldlevel save file. Yikes!
-     */
     if (!copy_bytes(lnhfp->fd, snhfp->fd)) {
         close_nhfile(gnhfp);
         close_nhfile(snhfp);
@@ -4497,6 +4343,15 @@ reveal_paths(VOID_ARGS)
     } else
 #endif /* ?DUMPLOG */
         raw_printf("No end-of-game disclosure file (%s).", nodumpreason);
+
+#ifdef WIN32
+    if (sysopt.portable_device_paths) {
+        const char *pd = get_portable_device();
+
+        raw_printf("portable_device_paths (set in sysconf):");
+        raw_printf("    \"%s\"", pd);
+    }
+#endif
 
     /* personal configuration file */
 

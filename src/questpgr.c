@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1574634383 2019/11/24 22:26:23 $  $NHDT-Branch: paxed-quest-lua $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1575830005 2019/12/08 18:33:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,8 +6,6 @@
 #include "dlb.h"
 
 /*  quest-specific pager routines. */
-
-#include "qtext.h"
 
 #define QTEXT_FILE "quest.lua"
 
@@ -26,6 +24,7 @@ static void FDECL(convert_line, (char *,char *));
 static void FDECL(deliver_by_pline, (const char *));
 static void FDECL(deliver_by_window, (const char *, int));
 static boolean FDECL(skip_pager, (BOOLEAN_P));
+static boolean FDECL(com_pager_core, (const char *, const char *, BOOLEAN_P));
 
 short
 quest_info(typ)
@@ -433,10 +432,11 @@ boolean common UNUSED;
     return FALSE;
 }
 
-boolean
-com_pager_core(section, msgid)
+static boolean
+com_pager_core(section, msgid, showerror)
 const char *section;
 const char *msgid;
+boolean showerror;
 {
     const char *const howtoput[] = { "pline", "window", "text", "menu", "default", NULL };
     const int howtoput2i[] = { 1, 2, 2, 3, 0, 0 };
@@ -444,6 +444,7 @@ const char *msgid;
     lua_State *L;
     char *synopsis;
     char *text;
+    char *fallback_msgid = NULL;
 
     if (skip_pager(TRUE))
         return FALSE;
@@ -451,7 +452,8 @@ const char *msgid;
     L = nhl_init();
 
     if (!nhl_loadlua(L, QTEXT_FILE)) {
-        impossible("com_pager: %s not found.", QTEXT_FILE);
+        if (showerror)
+            impossible("com_pager: %s not found.", QTEXT_FILE);
         lua_close(L);
         return FALSE;
     }
@@ -459,21 +461,40 @@ const char *msgid;
     lua_settop(L, 0);
     lua_getglobal(L, "questtext");
     if (!lua_istable(L, -1)) {
-        impossible("com_pager: questtext in %s is not a lua table", QTEXT_FILE);
+        if (showerror)
+            impossible("com_pager: questtext in %s is not a lua table",
+                       QTEXT_FILE);
         lua_close(L);
         return FALSE;
     }
 
     lua_getfield(L, -1, section);
     if (!lua_istable(L, -1)) {
-        impossible("com_pager: questtext[%s] in %s is not a lua table", section, QTEXT_FILE);
+        if (showerror)
+            impossible("com_pager: questtext[%s] in %s is not a lua table",
+                       section, QTEXT_FILE);
         lua_close(L);
         return FALSE;
     }
 
-    lua_getfield(L, -1, msgid);
+tryagain:
+    lua_getfield(L, -1, fallback_msgid ? fallback_msgid : msgid);
     if (!lua_istable(L, -1)) {
-        impossible("com_pager: questtext[%s][%s] in %s is not a lua table", section, msgid, QTEXT_FILE);
+        if (!fallback_msgid) {
+            /* Do we have questtxt[msg_fallbacks][<msgid>]? */
+            lua_getfield(L, -3, "msg_fallbacks");
+            if (lua_istable(L, -1)) {
+                fallback_msgid = get_table_str_opt(L, msgid, NULL);
+                lua_pop(L, 2);
+                if (fallback_msgid)
+                    goto tryagain;
+            }
+        }
+
+        if (showerror)
+            impossible("com_pager: questtext[%s][%s] in %s is not a lua table",
+                       section, msgid, QTEXT_FILE);
+        free(fallback_msgid);
         lua_close(L);
         return FALSE;
     }
@@ -489,7 +510,11 @@ const char *msgid;
         nelems = (int) lua_tointeger(L, -1);
         lua_pop(L, 1);
         if (nelems < 2) {
-            impossible("com_pager: questtext[%s][%s] in %s in not an array of strings", section, msgid, QTEXT_FILE);
+            if (showerror)
+                impossible(
+                "com_pager: questtext[%s][%s] in %s in not an array of strings",
+                       section, msgid, QTEXT_FILE);
+            free(fallback_msgid);
             lua_close(L);
             return FALSE;
         }
@@ -511,12 +536,14 @@ const char *msgid;
 
     if (synopsis) {
         char in_line[BUFSZ], out_line[BUFSZ];
+
         Strcpy(in_line, synopsis);
         convert_line(in_line, out_line);
         putmsghistory(out_line, FALSE);
+        free(synopsis);
     }
 
-    free(synopsis);
+    free(fallback_msgid);
     free(text);
     lua_close(L);
     return TRUE;
@@ -526,15 +553,15 @@ void
 com_pager(msgid)
 const char *msgid;
 {
-    com_pager_core("common", msgid);
+    com_pager_core("common", msgid, TRUE);
 }
 
 void
 qt_pager(msgid)
 const char *msgid;
 {
-    if (!com_pager_core(g.urole.filecode, msgid))
-        com_pager_core("common", msgid);
+    if (!com_pager_core(g.urole.filecode, msgid, FALSE))
+        com_pager_core("common", msgid, TRUE);
 }
 
 struct permonst *

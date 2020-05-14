@@ -5,7 +5,7 @@
 --
 des.level_init({ style = "solidfill", fg = "L" });
 
-des.level_flags("mazelevel", "icedpools")
+des.level_flags("mazelevel", "icedpools", "noflip")
 
 des.level_init({ style="mines", fg=".", bg="L", smoothed=true, joined=true, lit=1, walled=false })
 
@@ -38,7 +38,7 @@ des.non_diggable(selection.area(00,00,34,16))
 -- Drawbridges; northern one opens from the south (portcullis) to further
 -- north (lowered span), southern one from the north to further south
 des.drawbridge({ x=17, y=02, dir="south", state="random" })
-if math.random(0, 99) < 75 then
+if percent(75) then
    des.drawbridge({ x=17, y=14, dir="north", state="open" })
 else
    des.drawbridge({ x=17, y=14, dir="north", state="random" })

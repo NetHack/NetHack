@@ -2,8 +2,11 @@
 /* Copyright (c) Michael Allison, 2018                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#include "hack.h"
-#include <stdio.h>
+/* must #define SAFEPROCS in xxxconf.h or via CFLAGS or this won't compile */
+#include "config.h"
+#include "color.h"
+#include "wintype.h"
+#include "winprocs.h"
 
 /*
  * ***********************************************************
@@ -71,7 +74,7 @@ struct window_procs safe_procs = {
     safe_init_nhwindows, safe_player_selection, safe_askname, safe_get_nh_event,
     safe_exit_nhwindows, safe_suspend_nhwindows, safe_resume_nhwindows,
     safe_create_nhwindow, safe_clear_nhwindow, safe_display_nhwindow,
-    safe_destroy_nhwindow, safe_curs, safe_putstr, genl_putmixed,
+    safe_destroy_nhwindow, safe_curs, safe_putstr, safe_putmixed,
     safe_display_file, safe_start_menu, safe_add_menu, safe_end_menu,
     safe_select_menu, safe_message_menu, safe_update_inventory, safe_mark_synch,
     safe_wait_synch,
@@ -91,16 +94,12 @@ struct window_procs safe_procs = {
 #endif
     safe_get_color_string,
 #endif
-    safe_start_screen, safe_end_screen, genl_outrip,
+    safe_start_screen, safe_end_screen, safe_outrip,
     safe_preference_update,
     safe_getmsghistory, safe_putmsghistory,
     safe_status_init,
     safe_status_finish, safe_status_enablefield,
-#ifdef STATUS_HILITES
     safe_status_update,
-#else
-    safe_status_update,
-#endif
     safe_can_suspend,
 };
 
@@ -222,6 +221,15 @@ const char *str;
 }
 
 void
+safe_putmixed(window, attr, str)
+winid window;
+int attr;
+const char *str;
+{
+    return;
+}
+
+void
 safe_display_file(fname, complain)
 const char *fname;
 boolean complain;
@@ -230,8 +238,9 @@ boolean complain;
 }
 
 void
-safe_start_menu(window)
+safe_start_menu(window, mbehavior)
 winid window;
+unsigned long mbehavior;
 {
     return;
 }
@@ -242,7 +251,7 @@ winid window;
  * later.
  */
 void
-safe_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
+safe_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
 winid window;               /* window to use, must be of type NHW_MENU */
 int glyph UNUSED;           /* glyph to display with item (not used) */
 const anything *identifier; /* what to return if selected */
@@ -250,7 +259,7 @@ char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
 int attr;                   /* attribute for string (like safe_putstr()) */
 const char *str;            /* menu string */
-boolean preselected;        /* item is marked as selected */
+unsigned int itemflags;     /* itemflags such as marked as selected */
 {
     return;
 }
@@ -495,7 +504,6 @@ boolean enable;
 {
 }
 
-#ifdef STATUS_HILITES
 /* call once for each field, then call with BL_FLUSH to output the result */
 void
 safe_status_update(idx, ptr, chg, percent, color, colormasks)
@@ -505,7 +513,6 @@ int chg UNUSED, percent UNUSED, color UNUSED;
 unsigned long *colormasks UNUSED;
 {
 }
-#endif /* STATUS_HILITES */
 
 /**************************************************************
  * These are some optionally selectable routines that add

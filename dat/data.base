@@ -1,5 +1,5 @@
 # NetHack 3.6	data.base
-# $NHDT-Date: 1545359287 2018/12/21 02:28:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.87 $
+# $NHDT-Date: 1581206724 2020/02/09 00:05:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.93 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -2207,7 +2207,8 @@ hermes
 	numbers, the alphabet, weights and measures, and sacrificing.
 hezrou
 	"Hezrou" is the common name for the type II demon.  It is
-	among the weaker of demons, but still quite formidable.
+	among the weaker of demons, but still quite formidable,
+	mostly due to the stench.
 hippocrates
 	Greek physician, recognized as the father of medicine.  He
 	is believed to have been born on the island of Cos, to have
@@ -5539,6 +5540,15 @@ whistle
 	flat on his back upon a cold stone with his hands on his
 	breast.
 		[ The Fellowship of the Ring, by J.R.R. Tolkien ]
+win
+winner
+winning
+	... the rules of Brockian Ultra Cricket, as played in the higher
+	dimensions.  A full set of rules is so massively complicated ...
+	A brief summary, however, follows:
+	...
+	/Rule Six/:  The winning team shall be the first team that wins.
+	    [ Life, the Universe and Everything, by Douglas Adams ]
 # note: need to convert player character "gnomish wizard" into just "wizard"
 # in the lookup code to avoid conflict with the monster of that same name
 ~gnomish wizard

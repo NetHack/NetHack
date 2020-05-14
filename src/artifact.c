@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1553363416 2019/03/23 17:50:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1581886858 2020/02/16 21:00:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,8 +6,6 @@
 #include "hack.h"
 #include "artifact.h"
 #include "artilist.h"
-#include "sfproto.h"
-
 
 /*
  * Note:  both artilist[] and artiexist[] have a dummy element #0,
@@ -85,15 +83,6 @@ NHFILE *nhfp;
         bwrite(nhfp->fd, (genericptr_t) g.artiexist, sizeof g.artiexist);
         bwrite(nhfp->fd, (genericptr_t) g.artidisco, sizeof g.artidisco);
     }
-    if (nhfp->fieldlevel) {
-        int i;
-
-        for (i = 0; i < (1 + NROFARTIFACTS + 1); ++i)
-            sfo_boolean(nhfp, &g.artiexist[i], "artifacts", "g.artiexist", 1);
-
-        for (i = 0; i < NROFARTIFACTS; ++i)
-            sfo_xchar(nhfp, &g.artidisco[i], "artifacts", "g.artidisco", 1);
-    }
 }
 
 void
@@ -103,15 +92,6 @@ NHFILE *nhfp;
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) g.artiexist, sizeof g.artiexist);
         mread(nhfp->fd, (genericptr_t) g.artidisco, sizeof g.artidisco);
-    }
-    if (nhfp->fieldlevel) {
-        int i;
-
-        for (i = 0; i < (1 + NROFARTIFACTS + 1); ++i)
-            sfi_boolean(nhfp, &g.artiexist[i], "artifacts", "g.artiexist", 1);
-
-        for (i = 0; i < NROFARTIFACTS; ++i)
-            sfi_xchar(nhfp, &g.artidisco[i], "artifacts", "g.artidisco", 1);
     }
     hack_artifacts();	/* redo non-saved special cases */
 }
@@ -1081,7 +1061,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                 g.multi_reason = "being scared stiff";
                 g.nomovemsg = "";
                 if (magr && magr == u.ustuck && sticks(g.youmonst.data)) {
-                    u.ustuck = (struct monst *) 0;
+                    set_ustuck((struct monst *) 0);
                     You("release %s!", mon_nam(magr));
                 }
             }
@@ -1342,7 +1322,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                     *dmgptr = 0;
                     return TRUE;
                 }
-                if (noncorporeal(g.youmonst.data) || amorphous(g.youmonst.data)) {
+                if (noncorporeal(g.youmonst.data)
+                    || amorphous(g.youmonst.data)) {
                     pline("%s slices through your %s.", wepdesc,
                           body_part(NECK));
                     return TRUE;
@@ -1371,6 +1352,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                           mon_nam(mdef));
             }
             if (mdef->m_lev == 0) {
+                /* losing a level when at 0 is fatal */
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
             } else {
                 int drain = monhp_per_lvl(mdef);
@@ -1379,8 +1361,16 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 mdef->mhpmax -= drain;
                 mdef->m_lev--;
                 drain /= 2;
-                if (drain)
-                    healup(drain, 0, FALSE, FALSE);
+                if (drain) {
+                    /* attacker heals in proportion to amount drained */
+                    if (youattack) {
+                        healup(drain, 0, FALSE, FALSE);
+                    } else {
+                        magr->mhp += drain;
+                        if (magr->mhp > magr->mhpmax)
+                            magr->mhp = magr->mhpmax;
+                    }
+                }
             }
             return vis;
         } else { /* youdefend */
@@ -1537,14 +1527,14 @@ struct obj *obj;
             anything any;
 
             any = cg.zeroany; /* set all bits to zero */
-            start_menu(tmpwin);
+            start_menu(tmpwin, MENU_BEHAVE_STANDARD);
             /* use index+1 (cant use 0) as identifier */
             for (i = num_ok_dungeons = 0; i < g.n_dgns; i++) {
                 if (!g.dungeons[i].dunlev_ureached)
                     continue;
                 any.a_int = i + 1;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                         g.dungeons[i].dname, MENU_UNSELECTED);
+                         g.dungeons[i].dname, MENU_ITEMFLAGS_NONE);
                 num_ok_dungeons++;
                 last_ok_dungeon = i;
             }
@@ -1917,6 +1907,11 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
             pline("%s is %s.", bare_artifactname(uwep),
                   glow_verb(Blind ? 0 : g.warn_obj_cnt, TRUE));
         } else if (newstr > 0 && newstr != oldstr) {
+            /* goto_level() -> docrt() -> see_monsters() -> Sting_effects();
+               if "you materialize on a different level" is pending, give
+               it now so that start-glowing message comes after it */
+            maybe_lvltport_feedback(); /* usually called by goto_level() */
+
             /* 'start' message */
             if (!Blind)
                 pline("%s %s %s%c", bare_artifactname(uwep),

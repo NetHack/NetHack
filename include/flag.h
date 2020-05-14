@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1574982014 2019/11/28 23:00:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1581637124 2020/02/13 23:38:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.176 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,34 +16,40 @@
  */
 
 struct flag {
-    boolean acoustics;  /* allow dungeon sound messages */
-    boolean autodig;    /* MRKR: Automatically dig */
-    boolean autoquiver; /* Automatically fill quiver */
-    boolean autoopen;   /* open doors by walking into them */
-    boolean beginner;
-    boolean biff;      /* enable checking for mail */
-    boolean bones;     /* allow saving/loading bones */
-    boolean confirm;   /* confirm before hitting tame monsters */
-    boolean dark_room; /* show shadows in lit rooms */
-    boolean debug;     /* in debugging mode */
+    boolean acoustics;       /* allow dungeon sound messages */
+    boolean autodig;         /* MRKR: Automatically dig */
+    boolean autoquiver;      /* Automatically fill quiver */
+    boolean autoopen;        /* open doors by walking into them */
+    boolean autounlock;      /* automatically apply unlocking tools */
+    boolean beginner;        /* True early in each game; affects feedback */
+    boolean biff;            /* enable checking for mail */
+    boolean bones;           /* allow saving/loading bones */
+    boolean confirm;         /* confirm before hitting tame monsters */
+    boolean dark_room;       /* show shadows in lit rooms */
+    boolean debug;           /* in debugging mode (aka wizard mode) */
 #define wizard flags.debug
-    boolean end_own; /* list all own scores */
-    boolean explore; /* in exploration mode */
+    boolean end_own;         /* list all own scores */
+    boolean explore;         /* in exploration mode (aka discover mode) */
 #define discover flags.explore
     boolean female;
     boolean friday13;        /* it's Friday the 13th */
     boolean goldX;           /* for BUCX filtering, whether gold is X or U */
     boolean help;            /* look in data file for info about stuff */
     boolean ignintr;         /* ignore interrupts */
+    boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean ins_chkpt;       /* checkpoint as appropriate; INSURANCE */
     boolean invlet_constant; /* let objects keep their inventory symbol */
     boolean legacy;          /* print game entry "story" */
     boolean lit_corridor;    /* show a dark corr as lit if it is in sight */
+    boolean mention_decor;   /* give feedback for unobscured furniture */
+    boolean mention_walls;   /* give feedback when bumping walls */
     boolean nap;             /* `timed_delay' option for display effects */
     boolean null;            /* OK to send nulls to the terminal */
     boolean pickup;          /* whether you pickup or move and look */
     boolean pickup_thrown;   /* auto-pickup items you threw */
     boolean pushweapon; /* When wielding, push old weapon into second slot */
+    boolean quick_farsight;  /* True disables map browsing during random
+                              * clairvoyance */
     boolean rest_on_space;   /* space means rest */
     boolean safe_dog;        /* give complete protection to the dog */
     boolean showexp;         /* show experience points */
@@ -207,6 +213,7 @@ struct instance_flags {
     boolean defer_plname;  /* X11 hack: askname() might not set g.plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
+    boolean sad_feeling;   /* unseen pet is dying */
     int at_midnight;       /* only valid during end of game disclosure */
     int at_night;          /* also only valid during end of game disclosure */
     int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
@@ -241,20 +248,19 @@ struct instance_flags {
      */
     unsigned msg_history; /* hint: # of top lines to save */
     int getpos_coords;    /* show coordinates when getting cursor position */
+    int menuinvertmode;  /* 0 = invert toggles every item;
+                            1 = invert skips 'all items' item */
     int menu_headings;    /* ATR for menu headings */
-    int *opt_booldup;     /* for duplication of boolean opts in config file */
-    int *opt_compdup;     /* for duplication of compound opts in conf file */
 #ifdef ALTMETA
     boolean altmeta;      /* Alt-c sends ESC c rather than M-c */
 #endif
     boolean autodescribe;     /* autodescribe mode in getpos() */
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
+    boolean defer_decor;      /* terrain change message vs slipping on ice */
     boolean echo;             /* 1 to echo characters */
     boolean force_invmenu;    /* always menu when handling inventory */
     boolean hilite_pile;      /* mark piles of objects with a hilite */
-    boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
-    boolean mention_walls;    /* give feedback when bumping walls */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */
     boolean menu_overlay;     /* Draw menus over the map */
     boolean menu_requested;   /* Flag for overloaded use of 'm' prefix
@@ -278,6 +284,7 @@ struct instance_flags {
     boolean zerocomp;         /* write zero-compressed save files */
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */
+    schar prev_decor;         /* 'mention_decor' just mentioned this */
     uchar num_pad_mode;
     uchar bouldersym;         /* symbol for boulder display */
     char prevmsg_window;      /* type of old message window to use */
@@ -362,6 +369,10 @@ struct instance_flags {
     int wc_map_mode;        /* specify map viewing options, mostly
                              * for backward compatibility */
     int wc_player_selection;    /* method of choosing character */
+#if defined(MSDOS)
+    unsigned wc_video_width;    /* X resolution of screen */
+    unsigned wc_video_height;   /* Y resolution of screen */
+#endif
     boolean wc_splash_screen;   /* display an opening splash screen or not */
     boolean wc_popup_dialog;    /* put queries in pop up dialogs instead of
                                  * in the message window */
@@ -389,11 +400,6 @@ struct instance_flags {
     Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
-    /* item types used to acomplish "special achievements"; find the target
-       object and you'll be flagged as having achieved something... */
-    short mines_prize_type;     /* luckstone */
-    short soko_prize_type1;     /* bag of holding or    */
-    short soko_prize_type2;     /* amulet of reflection */
     struct debug_flags debug;
     boolean windowtype_locked;  /* windowtype can't change from configfile */
     boolean windowtype_deferred; /* pick a windowport and store it in
@@ -441,7 +447,9 @@ enum plnmsg_types {
     PLNMSG_CAUGHT_IN_EXPLOSION, /* explode() feedback */
     PLNMSG_OBJ_GLOWS,           /* "the <obj> glows <color>" */
     PLNMSG_OBJNAM_ONLY,         /* xname/doname only, for #tip */
-    PLNMSG_OK_DONT_DIE          /* overriding death in explore/wizard mode */
+    PLNMSG_OK_DONT_DIE,         /* overriding death in explore/wizard mode */
+    PLNMSG_BACK_ON_GROUND,      /* leaving water */
+    PLNMSG_enum /* allows inserting new entries with unconditional trailing comma */
 };
 
 /* runmode options */

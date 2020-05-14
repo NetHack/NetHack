@@ -13,6 +13,18 @@
 #include "mondata.h" /* for mindless() */
 #endif
 
+/* types of explosions */
+enum explosion_types {
+    EXPL_DARK    = 0,
+    EXPL_NOXIOUS = 1,
+    EXPL_MUDDY   = 2,
+    EXPL_WET     = 3,
+    EXPL_MAGICAL = 4,
+    EXPL_FIERY   = 5,
+    EXPL_FROSTY  = 6,
+    EXPL_MAX     = 7
+};
+
 /*
  * vobj_at()
  *
@@ -122,14 +134,14 @@
              && distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM))))
 
 /*
- * is_safepet(mon)
+ * is_safemon(mon)
  *
  * A special case check used in attack() and domove().  Placing the
- * definition here is convenient.
+ * definition here is convenient.  No longer limited to pets.
  */
-#define is_safepet(mon)                                                   \
-    (mon && mon->mtame && canspotmon(mon) && flags.safe_dog && !Confusion \
-     && !Hallucination && !Stunned)
+#define is_safemon(mon) \
+    (flags.safe_dog && (mon) && (mon)->mpeaceful && canspotmon(mon)     \
+     && !Confusion && !Hallucination && !Stunned)
 
 /*
  * canseeself()
@@ -149,25 +161,21 @@
 /*
  * random_monster()
  * random_object()
- * random_trap()
  *
- * Respectively return a random monster, object, or trap number.
+ * Respectively return a random monster or object.
  */
 #define random_monster(rng) rng(NUMMONS)
 #define random_object(rng) (rng(NUM_OBJECTS - 1) + 1)
-#define random_trap(rng) (rng(TRAPNUM - 1) + 1)
 
 /*
  * what_obj()
  * what_mon()
- * what_trap()
  *
  * If hallucinating, choose a random object/monster, otherwise, use the one
  * given. Use the given rng to handle hallucination.
  */
 #define what_obj(obj, rng) (Hallucination ? random_object(rng) : obj)
 #define what_mon(mon, rng) (Hallucination ? random_monster(rng) : mon)
-#define what_trap(trp, rng) (Hallucination ? random_trap(rng) : trp)
 
 /*
  * newsym_rn2
@@ -264,7 +272,7 @@
  * explosions   A set of nine for each of the following seven explosion types:
  *                   dark, noxious, muddy, wet, magical, fiery, frosty.
  *              The nine positions represent those surrounding the hero.
- *              Count: MAXEXPCHARS * EXPL_MAX (EXPL_MAX is defined in hack.h)
+ *              Count: MAXEXPCHARS * EXPL_MAX
  *
  * zap beam     A set of four (there are four directions) for each beam type.
  *              The beam type is shifted over 2 positions and the direction
@@ -278,6 +286,9 @@
  * warning      A set of six representing the different warning levels.
  *
  * statue       One for each monster.  Count: NUMMONS
+ *
+ * unexplored   One for unexplored areas of the map
+ * nothing      Nothing but background
  *
  * The following are offsets used to convert to and from a glyph.
  */
@@ -296,10 +307,14 @@
 #define GLYPH_SWALLOW_OFF ((NUM_ZAP << 2) + GLYPH_ZAP_OFF)
 #define GLYPH_WARNING_OFF ((NUMMONS << 3) + GLYPH_SWALLOW_OFF)
 #define GLYPH_STATUE_OFF  (WARNCOUNT + GLYPH_WARNING_OFF)
-#define MAX_GLYPH         (NUMMONS + GLYPH_STATUE_OFF)
+#define GLYPH_UNEXPLORED_OFF (NUMMONS + GLYPH_STATUE_OFF)
+#define GLYPH_NOTHING_OFF (GLYPH_UNEXPLORED_OFF + 1)
+#define MAX_GLYPH         (GLYPH_NOTHING_OFF + 1)
 
 #define NO_GLYPH          MAX_GLYPH
 #define GLYPH_INVISIBLE   GLYPH_INVIS_OFF
+#define GLYPH_UNEXPLORED  GLYPH_UNEXPLORED_OFF
+#define GLYPH_NOTHING     GLYPH_NOTHING_OFF
 
 #define warning_to_glyph(mwarnlev) ((mwarnlev) + GLYPH_WARNING_OFF)
 #define mon_to_glyph(mon, rng)                                      \
@@ -338,8 +353,8 @@
 #define explosion_to_glyph(expltype, idx) \
     ((((expltype) * MAXEXPCHARS) + ((idx) - S_explode1)) + GLYPH_EXPLODE_OFF)
 
-#define trap_to_glyph(trap, rng)                                \
-    cmap_to_glyph(trap_to_defsym(what_trap((trap)->ttyp, rng)))
+#define trap_to_glyph(trap)                                \
+    cmap_to_glyph(trap_to_defsym((trap)->ttyp))
 
 /* Not affected by hallucination.  Gives a generic body for CORPSE */
 /* MRKR: ...and the generic statue */
@@ -438,5 +453,7 @@
 #define glyph_is_warning(glyph)   \
     ((glyph) >= GLYPH_WARNING_OFF \
      && (glyph) < (GLYPH_WARNING_OFF + WARNCOUNT))
+#define glyph_is_unexplored(glyph) ((glyph) == GLYPH_UNEXPLORED)
+#define glyph_is_nothing(glyph) ((glyph) == GLYPH_NOTHING)
 
 #endif /* DISPLAY_H */

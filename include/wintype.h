@@ -54,8 +54,9 @@ enum any_types {
 
 /* menu return list */
 typedef struct mi {
-    anything item; /* identifier */
-    long count;    /* count */
+    anything item;     /* identifier */
+    long count;        /* count */
+    unsigned itemflags; /* item flags */
 } menu_item;
 #define MENU_ITEM_P struct mi
 
@@ -105,6 +106,21 @@ typedef struct mi {
 #define MENU_UNSELECT_PAGE      '\\'
 #define MENU_INVERT_PAGE        '~'
 #define MENU_SEARCH             ':'
+
+#define MENU_ITEMFLAGS_NONE       0x0000000U
+#define MENU_ITEMFLAGS_SELECTED   0x0000001U
+#define MENU_ITEMFLAGS_SKIPINVERT 0x0000002U
+
+/* 3.7+ enhanced menu flags that not all window ports are likely to
+ * support initially.
+ *
+ * As behavior and appearance modification flags are added, the various
+ * individual window ports will likely have to be updated to respond
+ * to the flags in an appropriate way.
+ */
+
+#define MENU_BEHAVE_STANDARD      0x0000000U
+
 /* clang-format on */
 
 #endif /* WINTYPE_H */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1574882660 2019/11/27 19:24:20 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1587248921 2020/04/18 22:28:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -124,8 +124,8 @@
 #include "hack.h"
 
 static void FDECL(show_mon_or_warn, (int, int, int));
-static void FDECL(display_monster,
-                      (XCHAR_P, XCHAR_P, struct monst *, int, XCHAR_P));
+static void FDECL(display_monster, (XCHAR_P, XCHAR_P, struct monst *, int,
+                                    BOOLEAN_P));
 static int FDECL(swallow_to_glyph, (int, int));
 static void FDECL(display_warning, (struct monst *));
 
@@ -169,9 +169,9 @@ int show;
     if (!cansee(x, y) && !lev->waslit) {
         /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
         if (lev->typ == ROOM && glyph == cmap_to_glyph(S_room))
-            glyph = cmap_to_glyph((flags.dark_room && iflags.use_color)
-                                      ? (DARKROOMSYM)
-                                      : S_stone);
+            glyph = (flags.dark_room && iflags.use_color)
+                        ? cmap_to_glyph(DARKROOMSYM)
+                        : GLYPH_NOTHING;
         else if (lev->typ == CORR && glyph == cmap_to_glyph(S_litcorr))
             glyph = cmap_to_glyph(S_corr);
     }
@@ -229,7 +229,7 @@ register struct trap *trap;
 register int show;
 {
     register int x = trap->tx, y = trap->ty;
-    register int glyph = trap_to_glyph(trap, newsym_rn2);
+    register int glyph = trap_to_glyph(trap);
 
     if (g.level.flags.hero_memory)
         levl[x][y].glyph = glyph;
@@ -402,7 +402,7 @@ register xchar x, y;        /* display position */
 register struct monst *mon; /* monster to display */
 int sightflags;             /* 1 if the monster is physically seen;
                                2 if detected using Detect_monsters */
-xchar worm_tail;            /* mon is actually a worm tail */
+boolean worm_tail;          /* mon is actually a worm tail */
 {
     boolean mon_mimic = (M_AP_TYPE(mon) != M_AP_NOTHING);
     int sensed = (mon_mimic && (Protection_from_shape_changers
@@ -733,10 +733,10 @@ void
 newsym(x, y)
 register int x, y;
 {
-    register struct monst *mon;
+    struct monst *mon;
+    int see_it;
+    boolean worm_tail;
     register struct rm *lev = &(levl[x][y]);
-    register int see_it;
-    register xchar worm_tail;
 
     if (g.in_mklev)
         return;
@@ -780,13 +780,13 @@ register int x, y;
 
         /*
          * Normal region shown only on accessible positions, but
-         * poison clouds also shown above lava, pools and moats.
+         * poison clouds and steam clouds also shown above lava,
+         * pools and moats.
          * However, sensed monsters take precedence over all regions.
          */
         if (reg
             && (ACCESSIBLE(lev->typ)
-                || (reg->glyph == cmap_to_glyph(S_poisoncloud)
-                    && is_pool_or_lava(x, y)))
+                || (reg->visible && is_pool_or_lava(x, y)))
             && (!mon || worm_tail || !sensemon(mon))) {
             show_region(reg, x, y);
             return;
@@ -1137,7 +1137,7 @@ int first;
         for (y = lasty - 1; y <= lasty + 1; y++)
             for (x = lastx - 1; x <= lastx + 1; x++)
                 if (isok(x, y))
-                    show_glyph(x, y, cmap_to_glyph(S_stone));
+                    show_glyph(x, y, GLYPH_UNEXPLORED);
     }
 
     swallower = monsndx(u.ustuck->data);
@@ -1211,7 +1211,7 @@ int mode;
         for (y = lasty - 1; y <= lasty + 1; y++)
             for (x = lastx - 1; x <= lastx + 1; x++)
                 if (isok(x, y))
-                    show_glyph(x, y, cmap_to_glyph(S_stone));
+                    show_glyph(x, y, GLYPH_UNEXPLORED);
     }
 
     /*
@@ -1222,7 +1222,7 @@ int mode;
         for (y = u.uy - 1; y <= u.uy + 1; y++)
             if (isok(x, y) && (is_pool_or_lava(x, y) || is_ice(x, y))) {
                 if (Blind && !(x == u.ux && y == u.uy))
-                    show_glyph(x, y, cmap_to_glyph(S_stone));
+                    show_glyph(x, y, GLYPH_UNEXPLORED);
                 else
                     newsym(x, y);
             }
@@ -1295,6 +1295,7 @@ see_monsters()
         if (Warn_of_mon && (g.context.warntype.obj & mon->data->mflags2) != 0L)
             new_warn_obj_cnt++;
     }
+
     /*
      * Make Sting glow blue or stop glowing if required.
      */
@@ -1411,8 +1412,7 @@ docrt()
     for (x = 1; x < COLNO; x++) {
         lev = &levl[x][0];
         for (y = 0; y < ROWNO; y++, lev++)
-            if (lev->glyph != cmap_to_glyph(S_stone))
-                show_glyph(x, y, lev->glyph);
+            show_glyph(x, y, lev->glyph);
     }
 
     /* see what is to be seen */
@@ -1460,6 +1460,38 @@ redraw_map()
     flush_screen(1);
 }
 
+/*
+ * =======================================================
+ */
+void
+reglyph_darkroom()
+{
+    xchar x, y;
+
+    for (x = 1; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+            struct rm *lev = &levl[x][y];
+
+            if (!flags.dark_room || !iflags.use_color
+                || Is_rogue_level(&u.uz)) {
+                if (lev->glyph == cmap_to_glyph(S_darkroom))
+                    lev->glyph = lev->waslit ? cmap_to_glyph(S_room)
+                                             : GLYPH_NOTHING;
+            } else {
+                if (lev->glyph == cmap_to_glyph(S_room) && lev->seenv
+                    && lev->waslit && !cansee(x, y))
+                    lev->glyph = cmap_to_glyph(S_darkroom);
+                else if (lev->glyph == GLYPH_NOTHING
+                         && lev->typ == ROOM && lev->seenv && !cansee(x, y))
+                    lev->glyph = cmap_to_glyph(S_darkroom);
+            }
+        }
+    if (flags.dark_room && iflags.use_color)
+        g.showsyms[S_darkroom] = g.showsyms[S_room];
+    else
+        g.showsyms[S_darkroom] = g.showsyms[SYM_NOTHING + SYM_OFF_X];
+}
+
 /* ======================================================================== */
 /* Glyph Buffering (3rd screen) =========================================== */
 
@@ -1470,7 +1502,7 @@ void
 newsym_force(x, y)
 register int x, y;
 {
-    newsym(x,y);
+    newsym(x, y);
     g.gbuf[y][x].gnew = 1;
     if (g.gbuf_start[y] > x)
         g.gbuf_start[y] = x;
@@ -1565,47 +1597,61 @@ int x, y, glyph;
  * Reset the changed glyph borders so that none of the 3rd screen has
  * changed.
  */
-#define reset_glyph_bbox()             \
-    {                                  \
-        int i;                         \
-                                       \
-        for (i = 0; i < ROWNO; i++) {  \
+#define reset_glyph_bbox()               \
+    {                                    \
+        int i;                           \
+                                         \
+        for (i = 0; i < ROWNO; i++) {    \
             g.gbuf_start[i] = COLNO - 1; \
             g.gbuf_stop[i] = 0;          \
-        }                              \
+        }                                \
     }
 
-static const gbuf_entry nul_gbuf = { 0, cmap_to_glyph(S_stone) };
 /*
- * Turn the 3rd screen into stone.
+ * Turn the 3rd screen into UNEXPLORED that needs to be refreshed.
  */
 void
 clear_glyph_buffer()
 {
     register int x, y;
-    register gbuf_entry *gptr;
+    register gbuf_entry *gptr, nul_gbuf;
+    int ch = ' ', color = NO_COLOR;
+    unsigned special = 0;
+
+    (void) mapglyph(GLYPH_UNEXPLORED, &ch, &color, &special, 0, 0, 0);
+    nul_gbuf.gnew = (ch != ' ' || color != NO_COLOR
+                     || (special & ~MG_UNEXPL) != 0) ? 1 : 0;
+    nul_gbuf.glyph = GLYPH_UNEXPLORED;
 
     for (y = 0; y < ROWNO; y++) {
         gptr = &g.gbuf[y][0];
         for (x = COLNO; x; x--) {
             *gptr++ = nul_gbuf;
         }
+        g.gbuf_start[y] = 1;
+        g.gbuf_stop[y] = COLNO - 1;
     }
-    reset_glyph_bbox();
 }
 
-/*
- * Assumes that the indicated positions are filled with S_stone glyphs.
- */
+/* used by tty after menu or text popup has temporarily overwritten the map
+   and it has been erased so shows spaces, not necessarily S_unexplored */
 void
 row_refresh(start, stop, y)
 int start, stop, y;
 {
-    register int x;
+    register int x, glyph;
+    register boolean force;
+    int ch = ' ', color = NO_COLOR;
+    unsigned special = 0;
 
-    for (x = start; x <= stop; x++)
-        if (g.gbuf[y][x].glyph != cmap_to_glyph(S_stone))
-            print_glyph(WIN_MAP, x, y, g.gbuf[y][x].glyph, get_bk_glyph(x, y));
+    (void) mapglyph(GLYPH_UNEXPLORED, &ch, &color, &special, 0, 0, 0);
+    force = (ch != ' ' || color != NO_COLOR || (special & ~MG_UNEXPL) != 0);
+
+    for (x = start; x <= stop; x++) {
+        glyph = g.gbuf[y][x].glyph;
+        if (force || glyph != GLYPH_UNEXPLORED)
+            print_glyph(WIN_MAP, x, y, glyph, get_bk_glyph(x, y));
+    }
 }
 
 void
@@ -1620,7 +1666,7 @@ cls()
     g.context.botlx = 1;                    /* force update of botl window */
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
-    clear_glyph_buffer(); /* this is sort of an extra effort, but OK */
+    clear_glyph_buffer(); /* force gbuf[][].glyph to unexplored */
     in_cls = FALSE;
 }
 
@@ -1890,11 +1936,11 @@ static int
 get_bk_glyph(x, y)
 xchar x, y;
 {
-    int idx, bkglyph = NO_GLYPH;
+    int idx, bkglyph = GLYPH_UNEXPLORED;
     struct rm *lev = &levl[x][y];
 
     if (iflags.use_background_glyph && lev->seenv != 0
-        && g.gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
+        && (g.gbuf[y][x].glyph != GLYPH_UNEXPLORED)) {
         switch (lev->typ) {
         case SCORR:
         case STONE:

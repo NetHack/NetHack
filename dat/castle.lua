@@ -19,7 +19,7 @@
 
 des.level_init({ style="mazegrid", bg ="-" });
 
-des.level_flags("mazelevel", "noteleport")
+des.level_flags("mazelevel", "noteleport", "noflipy")
 
 des.map([[
 }}}}}}}}}.............................................}}}}}}}}}
@@ -141,7 +141,7 @@ des.object(object[4],54,11)
 des.object(object[4],55,11)
 -- THE WAND OF WISHING in 1 of the 4 towers
 local px, py = place:rndcoord(1);
-des.object({ id = "chest", trapped = 0, x = px, y = py,
+des.object({ id = "chest", trapped = 0, locked = 1, x = px, y = py,
              contents = function()
                 des.object("wishing");
              end

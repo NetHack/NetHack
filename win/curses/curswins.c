@@ -504,12 +504,13 @@ curses_puts(winid wid, int attr, const char *text)
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         if (!curses_menu_exists(wid)) {
             impossible(
-                     "curses_puts: Attempted write to nonexistant window %d!",
+                     "curses_puts: Attempted write to nonexistent window %d!",
                        wid);
             return;
         }
         Id = cg.zeroany;
-        curses_add_nhmenu_item(wid, NO_GLYPH, &Id, 0, 0, attr, text, FALSE);
+        curses_add_nhmenu_item(wid, NO_GLYPH, &Id, 0, 0, attr, text,
+                                MENU_ITEMFLAGS_NONE);
     } else {
         waddstr(win, text);
         wnoutrefresh(win);

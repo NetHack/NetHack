@@ -1,4 +1,4 @@
-/* NetHack 3.6	youprop.h	$NHDT-Date: 1568831820 2019/09/18 18:37:00 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.6	youprop.h	$NHDT-Date: 1579655025 2020/01/22 01:03:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -180,8 +180,9 @@
 #define Invisible (Invis && !See_invisible)
 /* Note: invisibility also hides inventory and steed */
 
-#define EDisplaced u.uprops[DISPLACED].extrinsic
-#define Displaced EDisplaced
+#define HDisplaced u.uprops[DISPLACED].intrinsic /* timed from corpse */
+#define EDisplaced u.uprops[DISPLACED].extrinsic /* worn cloak */
+#define Displaced (HDisplaced || EDisplaced)
 
 #define HStealth u.uprops[STEALTH].intrinsic
 #define EStealth u.uprops[STEALTH].extrinsic
@@ -373,5 +374,9 @@
 #define Unaware (g.multi < 0 && (unconscious() || is_fainted()))
 
 #define Hate_silver (u.ulycn >= LOW_PM || hates_silver(g.youmonst.data))
+
+/* _Hitchhikers_Guide_to_the_Galaxy_ on uses for 'towel': "wrap it round
+   your head to ward off noxious fumes" [we require it to be damp or wet] */
+#define Half_gas_damage (ublindf && ublindf->otyp == TOWEL && ublindf->spe > 0)
 
 #endif /* YOUPROP_H */

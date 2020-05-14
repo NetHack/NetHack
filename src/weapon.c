@@ -1,4 +1,4 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1559998716 2019/06/08 12:58:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1579648295 2020/01/21 23:11:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -50,7 +50,7 @@ static NEARDATA const char *const odd_skill_names[] = {
     "attack spells", "healing spells", "divination spells",
     "enchantment spells", "clerical spells", "escape spells", "matter spells",
 };
-/* indexed vis `is_martial() */
+/* indexed via is_martial() */
 static NEARDATA const char *const barehands_or_martial[] = {
     "bare handed combat", "martial arts"
 };
@@ -74,6 +74,11 @@ int skill;
                  : (skill <= P_LAST_WEAPON) ? "weapon "
                      : (skill <= P_LAST_SPELL) ? "spell casting "
                          : "fighting ");
+
+    if (!g.context.enhance_tip) {
+        g.context.enhance_tip = TRUE;
+        pline("(Use the #enhance command to advance them.)");
+    }
 }
 
 /* weapon's skill category name for use as generalized description of weapon;
@@ -90,13 +95,17 @@ struct obj *obj;
     switch (skill) {
     case P_NONE:
         /* not a weapon or weptool: use item class name;
-           override class name "food" for corpses, tins, and eggs,
-           "large rock" for statues and boulders, and "tool" for towels */
+           override class name for things where it sounds strange and
+           for things that aren't unexpected to find being wielded:
+           corpses, tins, eggs, and globs avoid "food",
+           statues and boulders avoid "large rock",
+           and towels and tin openers avoid "tool" */
         descr = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG
                  || obj->otyp == STATUE || obj->otyp == BOULDER
-                 || obj->otyp == TOWEL)
-                    ? OBJ_NAME(objects[obj->otyp])
-                    : def_oc_syms[(int) obj->oclass].name;
+                 || obj->otyp == TOWEL || obj->otyp == TIN_OPENER)
+                ? OBJ_NAME(objects[obj->otyp])
+                : obj->globby ? "glob"
+                  : def_oc_syms[(int) obj->oclass].name;
         break;
     case P_SLING:
         if (is_ammo(obj))
@@ -1162,6 +1171,9 @@ enhance_weapon_skill()
     winid win;
     boolean speedy = FALSE;
 
+    /* player knows about #enhance, don't show tip anymore */
+    g.context.enhance_tip = TRUE;
+
     if (wizard && yn("Advance skills without practice?") == 'y')
         speedy = TRUE;
 
@@ -1182,7 +1194,7 @@ enhance_weapon_skill()
         }
 
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
 
         /* start with a legend if any entries will be annotated
            with "*" or "#" below */
@@ -1195,17 +1207,17 @@ enhance_weapon_skill()
                             ? "when you're more experienced"
                             : "if skill slots become available");
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
             }
             if (maxxed_cnt > 0) {
                 Sprintf(buf,
                  "(Skill%s flagged by \"#\" cannot be enhanced any further.)",
                         plur(maxxed_cnt));
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
             }
             add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
         }
 
         /* List the skills, making ones that could be advanced
@@ -1219,7 +1231,7 @@ enhance_weapon_skill()
                 any = cg.zeroany;
                 if (i == skill_ranges[pass].first)
                     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-                             skill_ranges[pass].name, MENU_UNSELECTED);
+                             skill_ranges[pass].name, MENU_ITEMFLAGS_NONE);
 
                 if (P_RESTRICTED(i))
                     continue;
@@ -1261,7 +1273,7 @@ enhance_weapon_skill()
                 }
                 any.a_int = can_advance(i, speedy) ? i + 1 : 0;
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
             }
 
         Strcpy(buf, (to_advance > 0) ? "Pick a skill to advance:"
@@ -1359,6 +1371,44 @@ int n; /* number of slots to lose; normally one */
                to that effect would seem pretty confusing.... */
         }
     }
+}
+
+void
+drain_weapon_skill(n)
+int n; /* number of skills to drain */
+{
+    int skill;
+    int i;
+    int tmpskills[P_NUM_SKILLS];
+
+    (void) memset((genericptr_t) tmpskills, 0, sizeof(tmpskills));
+
+    while (--n >= 0) {
+        if (u.skills_advanced) {
+            /* Pick a random skill, deleting it from the list. */
+            i = rn2(u.skills_advanced);
+            skill = u.skill_record[i];
+            tmpskills[skill] = 1;
+            for (; i < u.skills_advanced - 1; i++) {
+                u.skill_record[i] = u.skill_record[i + 1];
+            }
+            u.skills_advanced--;
+            if (P_SKILL(skill) <= P_UNSKILLED)
+                panic("drain_weapon_skill (%d)", skill);
+            P_SKILL(skill)--;   /* drop skill one level */
+            /* refund slots used for skill */
+            u.weapon_slots += slots_required(skill);
+            /* drain a random proportion of skill training */
+            if (P_ADVANCE(skill))
+                P_ADVANCE(skill) = rn2(P_ADVANCE(skill));
+        }
+    }
+
+    for (skill = 0; skill < P_NUM_SKILLS; skill++)
+        if (tmpskills[skill]) {
+            You("forget %syour training in %s.",
+                P_SKILL(skill) >= P_BASIC ? "some of " : "", P_NAME(skill));
+        }
 }
 
 int

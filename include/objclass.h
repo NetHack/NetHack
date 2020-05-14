@@ -1,4 +1,4 @@
-/* NetHack 3.6	objclass.h	$NHDT-Date: 1547255901 2019/01/12 01:18:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	objclass.h	$NHDT-Date: 1578895344 2020/01/13 06:02:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -163,6 +163,8 @@ enum obj_class_types {
 
     MAXOCLASSES  = 18
 };
+/* for mkobj() use ONLY! odd '-SPBOOK_CLASS' is in case of unsigned enums */
+#define SPBOOK_no_NOVEL (0 - (int) SPBOOK_CLASS)
 
 #define ALLOW_COUNT (MAXOCLASSES + 1) /* Can be used in the object class    */
 #define ALL_CLASSES (MAXOCLASSES + 2) /* input to getobj().                 */

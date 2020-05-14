@@ -1,4 +1,4 @@
-# NetHack 3.6  tribute       $NHDT-Date: 1574107001 2019/11/18 19:56:41 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.86 $
+# NetHack 3.6  tribute       $NHDT-Date: 1584869896 2020/03/22 09:38:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -2380,7 +2380,7 @@ Rock grinned.  "Right you are, Mr Dibbler," he said.
 # p. 189
 %passage 12
 Magic wasn't difficult.  That was the big secret that the whole baroque
-edifice or wizardry had been set up to conceal.  Anyone with a bit of
+edifice of wizardry had been set up to conceal.  Anyone with a bit of
 intelligence and enough perseverance could do magic, which was why the
 wizards cloaked it with rituals and the whole pointy-hat business.
 

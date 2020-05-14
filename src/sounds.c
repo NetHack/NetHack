@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1570844005 2019/10/12 01:33:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1582061574 2020/02/18 21:32:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,6 +7,7 @@
 static boolean FDECL(mon_is_gecko, (struct monst *));
 static int FDECL(domonnoise, (struct monst *));
 static int NDECL(dochat);
+static struct monst *FDECL(responsive_mon_at, (int, int));
 static int FDECL(mon_in_room, (struct monst *, int));
 
 /* this easily could be a macro, but it might overtax dumb compilers */
@@ -107,7 +108,7 @@ dosounds()
                 {
                     if (gold_in_vault)
                         You_hear(!hallu
-                                     ? "someone counting money."
+                                     ? "someone counting gold coins."
                                      : "the quarterback calling the play.");
                     else
                         You_hear("someone searching.");
@@ -339,6 +340,9 @@ register struct monst *mtmp;
     case MS_WAIL:
         ret = "wail";
         break;
+    case MS_MOO:
+        ret = "low";
+        break;
     case MS_SILENT:
         ret = "commotion";
         break;
@@ -458,12 +462,20 @@ register struct monst *mtmp;
         return;
 
     /* presumably nearness and soundok checks have already been made */
-    if (!is_silent(mtmp->data) && mtmp->data->msound <= MS_ANIMAL)
+    if (!is_silent(mtmp->data) && mtmp->data->msound <= MS_ANIMAL) {
         (void) domonnoise(mtmp);
-    else if (mtmp->data->msound >= MS_HUMANOID) {
+    } else if (mtmp->data->msound >= MS_HUMANOID) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         verbalize("I'm hungry.");
+    } else {
+        /* this is pretty lame but is better than leaving out the block
+           of speech types between animal and humanoid; this covers
+           MS_SILENT too (if caller lets that get this far) since it's
+           excluded by the first two cases */
+        if (canspotmon(mtmp))
+            pline("%s seems famished.", Monnam(mtmp));
+        /* looking famished will be a good trick for a tame skeleton... */
     }
 }
 
@@ -511,8 +523,8 @@ register struct monst *mtmp;
     else if (msound == MS_GUARDIAN && ptr != &mons[g.urole.guardnum])
         msound = mons[genus(monsndx(ptr), 1)].msound;
     /* some normally non-speaking types can/will speak if hero is similar */
-    else if (msound == MS_ORC         /* note: MS_ORC is same as MS_GRUNT */
-             && ((same_race(ptr, g.youmonst.data)          /* current form, */
+    else if (msound == MS_ORC
+             && ((same_race(ptr, g.youmonst.data)        /* current form, */
                   || same_race(ptr, &mons[Race_switch])) /* unpoly'd form */
                  || Hallucination))
         msound = MS_HUMANOID;
@@ -622,12 +634,13 @@ register struct monst *mtmp;
                     verbl_msg = vampmsg[vampindex];
             }
         }
-    } break;
+        break;
+    }
     case MS_WERE:
         if (flags.moonphase == FULL_MOON && (night() ^ !rn2(13))) {
             pline("%s throws back %s head and lets out a blood curdling %s!",
                   Monnam(mtmp), mhis(mtmp),
-                  ptr == &mons[PM_HUMAN_WERERAT] ? "shriek" : "howl");
+                  (ptr == &mons[PM_HUMAN_WERERAT]) ? "shriek" : "howl");
             wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
         } else
             pline_msg =
@@ -701,6 +714,9 @@ register struct monst *mtmp;
         else
             pline_msg = "whickers.";
         break;
+    case MS_MOO:
+        pline_msg = mtmp->mpeaceful ? "moos." : "bellows!";
+        break;
     case MS_WAIL:
         pline_msg = "wails mournfully.";
         break;
@@ -709,6 +725,10 @@ register struct monst *mtmp;
         break;
     case MS_BURBLE:
         pline_msg = "burbles.";
+        break;
+    case MS_TRUMPET:
+        pline_msg = "trumpets!";
+        wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
         break;
     case MS_SHRIEK:
         pline_msg = "shrieks.";
@@ -729,9 +749,13 @@ register struct monst *mtmp;
             "giggles.", "chuckles.", "snickers.", "laughs.",
         };
         pline_msg = laugh_msg[rn2(4)];
-    } break;
+        break;
+    }
     case MS_MUMBLE:
         pline_msg = "mumbles incomprehensibly.";
+        break;
+    case MS_ORC: /* this used to be an alias for grunt, now it is distinct */
+        pline_msg = "grunts.";
         break;
     case MS_DJINNI:
         if (mtmp->mtame) {
@@ -744,10 +768,8 @@ register struct monst *mtmp;
         } else {
             if (ptr != &mons[PM_PRISONER])
                 verbl_msg = "This will teach you not to disturb me!";
-#if 0
-            else
-                verbl_msg = "??????????";
-#endif
+            else /* vague because prisoner might already be out of cell */
+                verbl_msg = "Get me out of here.";
         }
         break;
     case MS_BOAST: /* giants */
@@ -805,18 +827,25 @@ register struct monst *mtmp;
             pline_msg = "talks about spellcraft.";
         else if (ptr->mlet == S_CENTAUR)
             pline_msg = "discusses hunting.";
-        else if (is_gnome(ptr) && Hallucination && (gnomeplan = rn2(4)) % 2)
-            /* skipped for rn2(4) result of 0 or 2;
-               gag from an early episode of South Park called "Gnomes";
-               initially, Tweek (introduced in that episode) is the only
-               one aware of the tiny gnomes after spotting them sneaking
-               about; they are embarked upon a three-step business plan;
-               a diagram of the plan shows:
-                         Phase 1         Phase 2      Phase 3
-                   Collect underpants       ?          Profit
-               and they never verbalize step 2 so we don't either */
-            verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
-                                         : "Phase three, profit!";
+        else if (is_gnome(ptr)) {
+            if (Hallucination && (gnomeplan = rn2(4)) % 2) {
+                /* skipped for rn2(4) result of 0 or 2;
+                   gag from an early episode of South Park called "Gnomes";
+                   initially, Tweek (introduced in that episode) is the only
+                   one aware of the tiny gnomes after spotting them sneaking
+                   about; they are embarked upon a three-step business plan;
+                   a diagram of the plan shows:
+                               Phase 1         Phase 2      Phase 3
+                         Collect underpants       ?          Profit
+                   and they never verbalize step 2 so we don't either */
+                verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
+                                             : "Phase three, profit!";
+            }
+            else {
+                verbl_msg =
+                "Many enter the dungeon, and few return to the sunlit lands.";
+            }
+        }
         else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:
@@ -910,15 +939,14 @@ register struct monst *mtmp;
         break;
     case MS_SOLDIER: {
         static const char
-            *const soldier_foe_msg[3] =
-                {
-                  "Resistance is useless!", "You're dog meat!", "Surrender!",
-                },
-                   *const soldier_pax_msg[3] = {
-                       "What lousy pay we're getting here!",
-                       "The food's not fit for Orcs!",
-                       "My feet hurt, I've been on them all day!",
-                   };
+            *const soldier_foe_msg[3] = {
+                "Resistance is useless!", "You're dog meat!", "Surrender!",
+            },
+            *const soldier_pax_msg[3] = {
+                "What lousy pay we're getting here!",
+                "The food's not fit for Orcs!",
+                "My feet hurt, I've been on them all day!",
+            };
         verbl_msg = mtmp->mpeaceful ? soldier_pax_msg[rn2(3)]
                                     : soldier_foe_msg[rn2(3)];
         break;
@@ -1097,6 +1125,135 @@ dochat()
     }
 
     return domonnoise(mtmp);
+}
+
+/* is there a monster at <x,y> that can see the hero and react? */
+static struct monst *
+responsive_mon_at(x, y)
+int x, y;
+{
+    struct monst *mtmp = isok(x, y) ? m_at(x, y) : 0;
+
+    if (mtmp && (!mtmp->mcanmove || mtmp->msleeping /* immobilized monst */
+                 || !mtmp->mcansee || !haseyes(mtmp->data) /* blind monst */
+                 || (Invis && !perceives(mtmp->data)) /* unseen hero */
+                 || (x != mtmp->mx || y != mtmp->my))) /* worm tail */
+        mtmp = (struct monst *) 0;
+    return mtmp;
+}
+
+/* player chose 'uarmh' for #tip (pickup.c); visual #chat, sort of... */
+int
+tiphat()
+{
+    struct monst *mtmp;
+    struct obj *otmp;
+    int x, y, range, glyph, vismon, unseen, statue, res;
+
+    if (!uarmh) /* can't get here from there */
+        return 0;
+
+    res = uarmh->bknown ? 0 : 1;
+    if (cursed(uarmh)) /* "You can't.  It is cursed." */
+        return res; /* if learned of curse, use a move */
+
+    /* might choose a position, but dealing with direct lines is simpler */
+    if (!getdir("At whom? (in what direction)")) /* bail on ESC */
+        return res; /* iffy; now know it's not cursed for sure (since we got
+                     * past prior test) but might have already known that */
+    res = 1; /* physical action is going to take place */
+
+    /* most helmets have a short wear/take-off delay and we could set
+       'multi' to account for that, but we'll pretend that no extra time
+       beyond the current move is necessary */
+    You("briefly doff your %s.", helm_simple_name(uarmh));
+
+    if (!u.dx && !u.dy) {
+        if (u.usteed && u.dz > 0) {
+            if (!u.usteed->mcanmove || u.usteed->msleeping)
+                pline("%s doesn't notice.", Monnam(u.usteed));
+            else
+                (void) domonnoise(u.usteed);
+        } else if (u.dz) {
+            pline("There's no one %s there.", (u.dz < 0) ? "up" : "down");
+        } else {
+            pline_The("lout here doesn't acknowledge you...");
+        }
+        return res;
+    }
+
+    mtmp = (struct monst *) 0;
+    vismon = unseen = statue = 0, glyph = GLYPH_MON_OFF;
+    x = u.ux, y = u.uy;
+    for (range = 1; range <= BOLT_LIM + 1; ++range) {
+        x += u.dx, y += u.dy;
+        if (!isok(x, y) || (range > 1 && !couldsee(x, y))) {
+            /* switch back to coordinates for previous interation's 'mtmp' */
+            x -= u.dx, y -= u.dy;
+            break;
+        }
+        mtmp = m_at(x, y);
+        vismon = (mtmp && canseemon(mtmp));
+        glyph = glyph_at(x, y);
+        unseen = glyph_is_invisible(glyph);
+        statue = (glyph_is_statue(glyph) /* mimic or hallucinatory statue */
+                  || (!vismon && !unseen && (otmp = vobj_at(x, y)) != 0
+                      && otmp->otyp == STATUE)); /* or actual statue */
+        if (vismon && (M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                       || M_AP_TYPE(mtmp) == M_AP_OBJECT))
+            vismon = 0, mtmp = (struct monst *) 0;
+        if (vismon || unseen || (statue && Hallucination)
+            /* unseen adjacent monster will respond if able */
+            || (range == 1 && mtmp && responsive_mon_at(x, y)
+                && !is_silent(mtmp->data))
+            /* we check accessible() after m_at() in case there's a
+               visible monster phazing through a wall here */
+            || !(accessible(x, y) || levl[x][y].typ == IRONBARS))
+            break;
+    }
+
+    if (unseen || (statue && Hallucination)) {
+        pline("That %screature is ignoring you!", unseen ? "unseen " : "");
+    } else if (!mtmp || !responsive_mon_at(x, y)) {
+        if (vismon) /* 'vismon' is only True when 'mtmp' is non-Null */
+            pline("%s seems not to notice you.", Monnam(mtmp));
+        else
+            goto nada;
+    } else { /* 'mtmp' is guaranteed to be non-Null if we get here */
+        /* if this monster is waiting for something, prod it into action */
+        mtmp->mstrategy &= ~STRAT_WAITMASK;
+
+        if (vismon && humanoid(mtmp->data) && mtmp->mpeaceful && !Conflict) {
+            if ((otmp = which_armor(mtmp, W_ARMH)) == 0) {
+                pline("%s waves.", Monnam(mtmp));
+            } else if (otmp->cursed) {
+                pline("%s grasps %s %s but can't remove it.", Monnam(mtmp),
+                      mhis(mtmp), helm_simple_name(otmp));
+                otmp->bknown = 1;
+            } else {
+                pline("%s tips %s %s in response.", Monnam(mtmp),
+                      mhis(mtmp), helm_simple_name(otmp));
+            }
+        } else if (vismon && humanoid(mtmp->data)) {
+            static const char *const reaction[3] = {
+                "curses", "gestures rudely", "gestures offensively",
+            };
+            int which = !Deaf ? rn2(3) : rn1(2, 1),
+                twice = (Deaf || which > 0 || rn2(3)) ? 0 : rn1(2, 1);
+
+            pline("%s %s%s%s at you...", Monnam(mtmp), reaction[which],
+                  twice ? " and " : "", twice ? reaction[twice] : "");
+        } else if (distu(x, y) <= 2 && !Deaf && domonnoise(mtmp)) {
+            if (!vismon)
+                map_invisible(x, y);
+        } else if (vismon) {
+            pline("%s doesn't respond.", Monnam(mtmp));
+        } else {
+ nada:
+            pline("%s", nothing_happens);
+        }
+    }
+    return res;
 }
 
 #ifdef USER_SOUNDS

@@ -181,6 +181,10 @@ struct overview_planar_cell_struct {
 #define ATTRIB_VGA_INTENSE 14      /* Intense White 94/06/07 palette chg*/
 #endif                             /*SCREEN_VGA || SCREEN_8514*/
 
+#if defined(SCREEN_VESA)
+#define BACKGROUND_VESA_COLOR 240
+#endif                             /*SCREEN_VESA*/
+
 #if defined(PC9800)
 static unsigned char attr98[CLR_MAX] = {
     0xe1, /*  0 white            */
@@ -249,6 +253,7 @@ E void FDECL(txt_xputc, (CHAR_P, int));
 
 /* ### vidvga.c ### */
 
+enum vga_pan_direction { pan_left, pan_up, pan_right, pan_down };
 #ifdef SCREEN_VGA
 E void NDECL(vga_backsp);
 E void FDECL(vga_clear_screen, (int));
@@ -274,7 +279,7 @@ E void FDECL(vga_tty_startup, (int *, int *));
 E void FDECL(vga_xputs, (const char *, int, int));
 E void FDECL(vga_xputc, (CHAR_P, int));
 E void FDECL(vga_xputg, (int, int, unsigned));
-E void FDECL(vga_userpan, (BOOLEAN_P));
+E void FDECL(vga_userpan, (enum vga_pan_direction));
 E void FDECL(vga_overview, (BOOLEAN_P));
 E void FDECL(vga_traditional, (BOOLEAN_P));
 E void NDECL(vga_refresh);
@@ -303,10 +308,11 @@ E void FDECL(vesa_tty_startup, (int *, int *));
 E void FDECL(vesa_xputs, (const char *, int, int));
 E void FDECL(vesa_xputc, (CHAR_P, int));
 E void FDECL(vesa_xputg, (int, int, unsigned));
-E void FDECL(vesa_userpan, (BOOLEAN_P));
+E void FDECL(vesa_userpan, (enum vga_pan_direction));
 E void FDECL(vesa_overview, (BOOLEAN_P));
 E void FDECL(vesa_traditional, (BOOLEAN_P));
 E void NDECL(vesa_refresh);
+E void NDECL(vesa_flush_text);
 #endif /* SCREEN_VESA */
 #endif /* NO_TERMS   */
 

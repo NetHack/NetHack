@@ -1,11 +1,8 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1573957877 2019/11/17 02:31:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1579655029 2020/01/22 01:03:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
-#include "sfproto.h"
-
 
 /*
  * This should really go into the level structure, but
@@ -313,8 +310,11 @@ NhRegion *reg;
                 continue;
             if (MON_AT(i, j) && inside_region(reg, i, j))
                 add_mon_to_reg(reg, g.level.monsters[i][j]);
-            if (reg->visible && cansee(i, j))
-                newsym(i, j);
+            if (reg->visible) {
+                /*block_point(i, j);*/
+                if (cansee(i, j))
+                    newsym(i, j);
+            }
         }
     /* Check for player now... */
     if (inside_region(reg, u.ux, u.uy))
@@ -348,8 +348,12 @@ NhRegion *reg;
     if (reg->visible)
         for (x = reg->bounding_box.lx; x <= reg->bounding_box.hx; x++)
             for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++)
-                if (isok(x, y) && inside_region(reg, x, y) && cansee(x, y))
-                    newsym(x, y);
+                if (isok(x, y) && inside_region(reg, x, y)) {
+                    /*if (!sobj_at(BOULDER, x, y))
+                          unblock_point(x, y);*/
+                    if (cansee(x, y))
+                        newsym(x, y);
+                }
 
     free_region(reg);
 }
@@ -535,7 +539,8 @@ update_player_regions()
     register int i;
 
     for (i = 0; i < g.n_regions; i++)
-        if (!g.regions[i]->attach_2_u && inside_region(g.regions[i], u.ux, u.uy))
+        if (!g.regions[i]->attach_2_u
+            && inside_region(g.regions[i], u.ux, u.uy))
             set_hero_inside(g.regions[i]);
         else
             clear_hero_inside(g.regions[i]);
@@ -641,63 +646,39 @@ NHFILE *nhfp;
         bwrite(nhfp->fd, (genericptr_t) &g.moves, sizeof (g.moves));	/* timestamp */
         bwrite(nhfp->fd, (genericptr_t) &g.n_regions, sizeof (g.n_regions));
     }
-    if (nhfp->fieldlevel) {
-        sfo_long(nhfp, &g.moves, "regions", "tmstamp", 1);
-        sfo_int(nhfp, &g.n_regions, "regions", "region_count", 1);
-    }
     for (i = 0; i < g.n_regions; i++) {
         if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->bounding_box, sizeof (NhRect));
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->nrects, sizeof (short));
         }
-        if (nhfp->fieldlevel) {
-            sfo_nhrect(nhfp, &g.regions[i]->bounding_box, "g.regions", "bounding_box", 1);
-            sfo_short(nhfp, &g.regions[i]->nrects, "g.regions", "nrects", 1);
-        }
         for (j = 0; j < g.regions[i]->nrects; j++) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->rects[j], sizeof (NhRect));
-            if (nhfp->fieldlevel)
-                sfo_nhrect(nhfp, &g.regions[i]->rects[j], "g.regions", "rect", 1);
         }
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_u, sizeof (boolean));
-        if (nhfp->fieldlevel)
-            sfo_boolean(nhfp, &g.regions[i]->attach_2_u, "g.regions", "attach_2_u", 1);
         n = 0;
 
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_m, sizeof (unsigned));
-        if (nhfp->fieldlevel)
-            sfo_unsigned(nhfp, &g.regions[i]->attach_2_m, "g.regions", "attach_2_m", 1);
 
         n = g.regions[i]->enter_msg != (const char *)0 ?
                                         strlen(g.regions[i]->enter_msg) : 0;
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &n, sizeof n);
-        if (nhfp->fieldlevel)
-            sfo_unsigned(nhfp, &n, "g.regions", "enter_msg_length", 1);
 
         if (n > 0) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) g.regions[i]->enter_msg, n);
-            if (nhfp->fieldlevel)
-                sfo_char(nhfp, g.regions[i]->enter_msg, "g.regions", "enter_msg", 1);
         }
         n = g.regions[i]->leave_msg != (const char *)0 ?
                                         strlen(g.regions[i]->leave_msg) : 0;
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &n, sizeof n);
-        if (nhfp->fieldlevel)
-            sfo_unsigned(nhfp, &n, "g.regions", "leave_msg_length", 1);
 
         if (n > 0) {
             if (nhfp->structlevel) {
                 bwrite(nhfp->fd, (genericptr_t) g.regions[i]->leave_msg, n);
-            }
-            if (nhfp->fieldlevel) {
-                for (j = 0; j < (int) n; ++j)
-                    sfo_char(nhfp, &g.regions[i]->leave_msg[j], "g.regions", "leave_msg", 1);
             }
         }
         if (nhfp->structlevel) {
@@ -711,33 +692,15 @@ NHFILE *nhfp;
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->player_flags, sizeof (unsigned int));
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->n_monst, sizeof (short));
         }
-        if (nhfp->fieldlevel) {
-            sfo_long(nhfp, &g.regions[i]->ttl, "g.regions", "ttl", 1);
-            sfo_short(nhfp, &g.regions[i]->expire_f, "g.regions", "expire_f", 1);
-            sfo_short(nhfp, &g.regions[i]->can_enter_f, "g.regions", "can_enter_f", 1);
-            sfo_short(nhfp, &g.regions[i]->enter_f, "g.regions", "enter_f", 1);
-            sfo_short(nhfp, &g.regions[i]->can_leave_f, "g.regions", "can_leave_f", 1);
-            sfo_short(nhfp, &g.regions[i]->leave_f, "g.regions", "leave_f", 1);
-            sfo_short(nhfp, &g.regions[i]->inside_f, "g.regions", "inside_f", 1);
-            sfo_unsigned(nhfp, &g.regions[i]->player_flags, "g.regions", "player_flags", 1);
-            sfo_short(nhfp, &g.regions[i]->n_monst, "g.regions", "monster_count", 1);
-        }
         for (j = 0; j < g.regions[i]->n_monst; j++) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->monsters[j],
                         sizeof (unsigned));
-            if (nhfp->fieldlevel)
-                sfo_unsigned(nhfp, &g.regions[i]->monsters[j], "g.regions", "monster", 1);
         }
         if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->visible, sizeof (boolean));
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->glyph, sizeof (int));
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->arg, sizeof (anything));
-        }
-        if (nhfp->fieldlevel) {
-            sfo_boolean(nhfp, &g.regions[i]->visible, "g.regions", "visible", 1);
-            sfo_int(nhfp, &g.regions[i]->glyph, "g.regions", "glyph", 1);
-            sfo_any(nhfp, &g.regions[i]->arg, "g.regions", "arg", 1);
         }
     }
   
@@ -747,20 +710,18 @@ NHFILE *nhfp;
 }
 
 void
-rest_regions(nhfp, ghostly)
+rest_regions(nhfp)
 NHFILE *nhfp;
-boolean ghostly; /* If a bones file restore */
 {
     int i, j;
     unsigned n = 0;
     long tmstamp = 0L;
     char *msg_buf;
+    boolean ghostly = (nhfp->ftype == NHF_BONESFILE);
 
     clear_regions();		/* Just for security */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &tmstamp, sizeof (tmstamp));
-    if (nhfp->fieldlevel)
-        sfi_long(nhfp, &tmstamp, "regions", "tmstamp", 1);
     if (ghostly)
         tmstamp = 0;
     else
@@ -768,8 +729,6 @@ boolean ghostly; /* If a bones file restore */
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.n_regions, sizeof (g.n_regions));
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &g.n_regions, "regions", "region_count", 1);
 
     g.max_regions = g.n_regions;
     if (g.n_regions > 0)
@@ -780,40 +739,24 @@ boolean ghostly; /* If a bones file restore */
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->bounding_box, sizeof (NhRect));
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->nrects, sizeof (short));
         }
-        if (nhfp->fieldlevel) {
-            sfi_nhrect(nhfp, &g.regions[i]->bounding_box, "g.regions", "bounding box", 1);
-            sfi_short(nhfp, &g.regions[i]->nrects, "g.regions", "nrects", 1);
-        }
         if (g.regions[i]->nrects > 0)
             g.regions[i]->rects = (NhRect *)
                                  alloc(sizeof (NhRect) * g.regions[i]->nrects);
         for (j = 0; j < g.regions[i]->nrects; j++) {
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) &g.regions[i]->rects[j], sizeof (NhRect));
-            if (nhfp->fieldlevel)
-                sfi_nhrect(nhfp, &g.regions[i]->rects[j], "g.regions", "rect", 1);
         }
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_u, sizeof (boolean));
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->attach_2_m, sizeof (unsigned));
         }
-        if (nhfp->fieldlevel) {
-            sfi_boolean(nhfp, &g.regions[i]->attach_2_u, "g.regions", "attach_2_u", 1);
-            sfi_unsigned(nhfp, &g.regions[i]->attach_2_m, "g.regions", "attach_2_m", 1);
-        }
 
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &n, sizeof n);
-        if (nhfp->fieldlevel)
-            sfi_unsigned(nhfp, &n, "g.regions", "enter_msg_length", 1);
         if (n > 0) {
             msg_buf = (char *) alloc(n + 1);
             if (nhfp->structlevel) {
                 mread(nhfp->fd, (genericptr_t) msg_buf, n);
-            }
-            if (nhfp->fieldlevel) {
-                for (j = 0; (unsigned) j < n; ++j)
-                    sfi_char(nhfp, &msg_buf[j], "g.regions", "enter_msg", 1);
             }
             msg_buf[n] = '\0';
             g.regions[i]->enter_msg = (const char *) msg_buf;
@@ -822,16 +765,10 @@ boolean ghostly; /* If a bones file restore */
 
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &n, sizeof n);
-        if (nhfp->fieldlevel)
-            sfi_unsigned(nhfp, &n, "g.regions", "leave_msg_length", 1);
-        if (n > 0) {
+         if (n > 0) {
             msg_buf = (char *) alloc(n + 1);
             if (nhfp->structlevel) {
                 mread(nhfp->fd, (genericptr_t) msg_buf, n);
-            }
-            if (nhfp->fieldlevel) {
-                for (j = 0; (unsigned) j < n; ++j)
-                    sfi_char(nhfp, &msg_buf[j], "g.regions", "leave_msg", 1);
             }
             msg_buf[n] = '\0';
 	    g.regions[i]->leave_msg = (const char *) msg_buf;
@@ -840,8 +777,6 @@ boolean ghostly; /* If a bones file restore */
 
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->ttl, sizeof (long));
-        if (nhfp->fieldlevel)
-            sfi_long(nhfp, &g.regions[i]->ttl, "g.regions", "ttl", 1);
         /* check for expired region */
         if (g.regions[i]->ttl >= 0L)
             g.regions[i]->ttl =
@@ -862,23 +797,12 @@ boolean ghostly; /* If a bones file restore */
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->player_flags,
                     sizeof (unsigned int));
         }
-        if (nhfp->fieldlevel) {
-            sfi_short(nhfp, &g.regions[i]->expire_f, "g.regions", "expire_f", 1);
-            sfi_short(nhfp, &g.regions[i]->can_enter_f, "g.regions", "can_enter_f", 1);
-            sfi_short(nhfp, &g.regions[i]->enter_f, "g.regions", "enter_f", 1);
-            sfi_short(nhfp, &g.regions[i]->can_leave_f, "g.regions", "can_leave_f", 1);
-            sfi_short(nhfp, &g.regions[i]->leave_f, "g.regions", "leave_f", 1);
-            sfi_short(nhfp, &g.regions[i]->inside_f, "g.regions", "inside_f", 1);
-            sfi_unsigned(nhfp, &g.regions[i]->player_flags, "g.regions", "player_flags", 1);
-        }
         if (ghostly) {	/* settings pertained to old player */
             clear_hero_inside(g.regions[i]);
             clear_heros_fault(g.regions[i]);
         }
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->n_monst, sizeof (short));
-        if (nhfp->fieldlevel)
-            sfi_short(nhfp, &g.regions[i]->n_monst, "g.regions", "monster_count", 1);
         if (g.regions[i]->n_monst > 0)
             g.regions[i]->monsters =
                         (unsigned *) alloc(sizeof (unsigned) * g.regions[i]->n_monst);
@@ -889,18 +813,11 @@ boolean ghostly; /* If a bones file restore */
             if (nhfp->structlevel)
                 mread(nhfp->fd, (genericptr_t) &g.regions[i]->monsters[j],
                         sizeof (unsigned));
-            if (nhfp->fieldlevel)
-                sfi_unsigned(nhfp, &g.regions[i]->monsters[j], "g.regions", "monster", 1);
         }
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->visible, sizeof (boolean));
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->glyph, sizeof (int));
             mread(nhfp->fd, (genericptr_t) &g.regions[i]->arg, sizeof (anything));
-        }
-        if (nhfp->fieldlevel) {
-            sfi_boolean(nhfp, &g.regions[i]->visible, "g.regions", "visible", 1);
-            sfi_int(nhfp, &g.regions[i]->glyph, "g.regions", "glyph", 1);
-            sfi_any(nhfp, &g.regions[i]->arg, "g.regions", "arg", 1);
         }
     }
     /* remove expired regions, do not trigger the expire_f callback (yet!);
@@ -1087,25 +1004,26 @@ genericptr_t p2 UNUSED;
     return TRUE; /* OK, it's gone, you can free it! */
 }
 
+/* returns True if p2 is killed by region p1, False otherwise */
 boolean
 inside_gas_cloud(p1, p2)
 genericptr_t p1;
 genericptr_t p2;
 {
-    NhRegion *reg;
-    struct monst *mtmp;
-    int dam;
+    NhRegion *reg = (NhRegion *) p1;
+    struct monst *mtmp = (struct monst *) p2;
+    int dam = reg->arg.a_int;
 
     /*
      * Gas clouds can't be targetted at water locations, but they can
      * start next to water and spread over it.
      */
 
-    reg = (NhRegion *) p1;
-    dam = reg->arg.a_int;
-    if (p2 == (genericptr_t) 0) { /* This means *YOU* Bozo! */
-        if (u.uinvulnerable || nonliving(g.youmonst.data) || Breathless
-            || Underwater)
+    if (dam < 1)
+        return FALSE; /* if no damage then there's nothing to do here... */
+
+    if (!mtmp) { /* hero is indicated by Null rather than by &youmonst */
+        if (m_poisongas_ok(&g.youmonst) == M_POISONGAS_OK)
             return FALSE;
         if (!Blind) {
             Your("%s sting.", makeplural(body_part(EYE)));
@@ -1115,7 +1033,10 @@ genericptr_t p2;
             pline("%s is burning your %s!", Something,
                   makeplural(body_part(LUNG)));
             You("cough and spit blood!");
-            losehp(Maybe_Half_Phys(rnd(dam) + 5), "gas cloud", KILLED_BY_AN);
+            dam = Maybe_Half_Phys(rnd(dam) + 5);
+            if (Half_gas_damage) /* worn towel */
+                dam = (dam + 1) / 2;
+            losehp(dam, "gas cloud", KILLED_BY_AN);
             return FALSE;
         } else {
             You("cough!");
@@ -1124,20 +1045,7 @@ genericptr_t p2;
     } else { /* A monster is inside the cloud */
         mtmp = (struct monst *) p2;
 
-        /* Non living and non breathing monsters are not concerned;
-           adult green dragon is not affected by gas cloud, baby one is */
-        if (!(nonliving(mtmp->data) || is_vampshifter(mtmp))
-            && !breathless(mtmp->data)
-            /* not is_swimmer(); assume that non-fish are swimming on
-               the surface and breathing the air above it periodically
-               unless located at water spot on plane of water */
-            && !((mtmp->data->mlet == S_EEL || Is_waterlevel(&u.uz))
-                 && is_pool(mtmp->mx, mtmp->my))
-            /* exclude monsters with poison gas breath attack:
-               adult green dragon and Chromatic Dragon (and iron golem,
-               but nonliving() and breathless() tests also catch that) */
-            && !(attacktype_fordmg(mtmp->data, AT_BREA, AD_DRST)
-                 || attacktype_fordmg(mtmp->data, AT_BREA, AD_RBRE))) {
+        if (m_poisongas_ok(mtmp) != M_POISONGAS_OK) {
             if (cansee(mtmp->mx, mtmp->my))
                 pline("%s coughs!", Monnam(mtmp));
             if (heros_fault(reg))

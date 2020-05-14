@@ -215,7 +215,6 @@ const char *drainer; /* cause of death, if drain should be fatal */
         pline("%s level %d.", Goodbye(), u.ulevel--);
         /* remove intrinsic abilities */
         adjabil(u.ulevel + 1, u.ulevel);
-        reset_rndmonst(NON_PM); /* new monster selection */
     } else {
         if (drainer) {
             g.killer.format = KILLED_BY;
@@ -300,9 +299,12 @@ boolean incr; /* true iff via incremental experience growth */
 
     /* increase level (unless already maxxed) */
     if (u.ulevel < MAXULEV) {
+        int newrank, oldrank = xlev_to_rank(u.ulevel);
+
         /* increase experience points to reflect new level */
         if (incr) {
             long tmp = newuexp(u.ulevel + 1);
+
             if (u.uexp >= tmp)
                 u.uexp = tmp - 1;
         } else {
@@ -315,7 +317,9 @@ boolean incr; /* true iff via incremental experience growth */
         if (u.ulevelmax < u.ulevel)
             u.ulevelmax = u.ulevel;
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
-        reset_rndmonst(NON_PM);          /* new monster selection */
+        newrank = xlev_to_rank(u.ulevel);
+        if (newrank > oldrank)
+            record_achievement(achieve_rank(newrank));
     }
     g.context.botl = TRUE;
 }

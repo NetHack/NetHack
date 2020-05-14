@@ -48,27 +48,99 @@ enum relationships { NO_LTEQGT = -1,
                      EQ_VALUE, LT_VALUE, LE_VALUE,
                      GE_VALUE, GT_VALUE, TXT_VALUE };
 
-#define BEFORE  0
-#define NOW     1
+enum blconditions {
+    bl_bareh,
+    bl_blind,
+    bl_busy,
+    bl_conf,
+    bl_deaf,
+    bl_elf_iron,
+    bl_fly,
+    bl_foodpois,
+    bl_glowhands,
+    bl_grab,
+    bl_hallu,
+    bl_held,
+    bl_icy,
+    bl_inlava,
+    bl_lev,
+    bl_parlyz,
+    bl_ride,
+    bl_sleeping,
+    bl_slime,
+    bl_slippery,
+    bl_stone,
+    bl_strngl,
+    bl_stun,
+    bl_submerged,
+    bl_termill,
+    bl_tethered,
+    bl_trapped,
+    bl_unconsc,
+    bl_woundedl,
+    bl_holding,
+
+    CONDITION_COUNT
+};
 
 /* Boolean condition bits for the condition mask */
 
 /* clang-format off */
-#define BL_MASK_STONE           0x00000001L
-#define BL_MASK_SLIME           0x00000002L
-#define BL_MASK_STRNGL          0x00000004L
-#define BL_MASK_FOODPOIS        0x00000008L
-#define BL_MASK_TERMILL         0x00000010L
-#define BL_MASK_BLIND           0x00000020L
-#define BL_MASK_DEAF            0x00000040L
-#define BL_MASK_STUN            0x00000080L
-#define BL_MASK_CONF            0x00000100L
-#define BL_MASK_HALLU           0x00000200L
-#define BL_MASK_LEV             0x00000400L
-#define BL_MASK_FLY             0x00000800L
-#define BL_MASK_RIDE            0x00001000L
-#define BL_MASK_BITS            13 /* number of mask bits that can be set */
+#define BL_MASK_BAREH        0x00000001L
+#define BL_MASK_BLIND        0x00000002L
+#define BL_MASK_BUSY         0x00000004L
+#define BL_MASK_CONF         0x00000008L
+#define BL_MASK_DEAF         0x00000010L
+#define BL_MASK_ELF_IRON     0x00000020L
+#define BL_MASK_FLY          0x00000040L
+#define BL_MASK_FOODPOIS     0x00000080L
+#define BL_MASK_GLOWHANDS    0x00000100L
+#define BL_MASK_GRAB         0x00000200L
+#define BL_MASK_HALLU        0x00000400L
+#define BL_MASK_HELD         0x00000800L
+#define BL_MASK_ICY          0x00001000L
+#define BL_MASK_INLAVA       0x00002000L
+#define BL_MASK_LEV          0x00004000L
+#define BL_MASK_PARLYZ       0x00008000L
+#define BL_MASK_RIDE         0x00010000L
+#define BL_MASK_SLEEPING     0x00020000L
+#define BL_MASK_SLIME        0x00040000L
+#define BL_MASK_SLIPPERY     0x00080000L
+#define BL_MASK_STONE        0x00100000L
+#define BL_MASK_STRNGL       0x00200000L
+#define BL_MASK_STUN         0x00400000L
+#define BL_MASK_SUBMERGED    0x00800000L
+#define BL_MASK_TERMILL      0x01000000L
+#define BL_MASK_TETHERED     0x02000000L
+#define BL_MASK_TRAPPED      0x04000000L
+#define BL_MASK_UNCONSC      0x08000000L
+#define BL_MASK_WOUNDEDL     0x10000000L
+#define BL_MASK_HOLDING      0x20000000L
+#define BL_MASK_BITS            30 /* number of mask bits that can be set */
 /* clang-format on */
+
+struct conditions_t {
+    int ranking;
+    long mask;
+    enum blconditions c;
+    const char *text[3];
+};
+extern const struct conditions_t conditions[CONDITION_COUNT];
+
+struct condtests_t {
+    enum blconditions c;
+    const char *useroption;
+    enum optchoice opt;
+    boolean enabled;
+    boolean choice;
+    boolean test;
+};
+
+extern struct condtests_t condtests[CONDITION_COUNT];
+extern int cond_idx[CONDITION_COUNT];
+
+#define BEFORE  0
+#define NOW     1
 
 /*
  * Possible additional conditions:

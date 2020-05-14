@@ -233,46 +233,6 @@ U  = $(UTIL)/
 #  Tile related object files.
 #==========================================
 
-#ifeq ($(SUPPRESS_GRAPHICS),Y)
-#TILOBJ       =
-#TILOBJ2      =
-#TEXTIO       =
-#TEXTIO2      =
-#TILE_BMP     =
-#TILEUTIL     = 
-#TILEFILES    = 
-#TILEFILES2   = 
-#GIFREADERS   = 
-#GIFREAD2     = 
-#PPMWRITERS   = 
-#PPMWRIT2     = 
-#
-#else
-#
-#TILOBJ      = $(O)tile.o $(VIDEO_OBJ)
-#
-#TILOBJ2     = $(O)tileset.o $(O)bmptiles.o $(O)giftiles.o
-#
-#TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
-#		$(HOST_O)objects.o $(HOST_O)stubvid.o
-#
-#TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
-#		$(HOST_O)objects.o $(HOST_O)stubvid.o
-#TILEUTIL    = $(TILOBJ) $(U)tile2bin $(U)til2bin2 $(TILE_BMP) $(PLANAR_TIB) $(OVERVIEW_TIB)
-#
-#TILEFILES   = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
-#
-#TILEFILES2  = $(WSHR)/monthin.txt $(WSHR)/objthin.txt $(WSHR)/oththin.txt
-#
-#GIFREADERS  = $(HOST_O)gifread.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#
-#GIFREAD2    = $(HOST_O)gifread2.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#
-#PPMWRITERS  = $(HOST_O)ppmwrite.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#
-#PPMWRIT2    = $(HOST_O)ppmwrit2.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#endif
-
 PLANAR_TIB   = $(DAT)/NETHACK1.tib
 OVERVIEW_TIB = $(DAT)/NETHACKO.tib
 TILE_BMP     = $(DAT)/NHTILES.BMP
@@ -286,43 +246,46 @@ RECOVOBJS    = $(O)recover.o
 
 #  Object files for the game itself.
 
+VOBJ01 = $(O)allmain.o $(O)alloc.o    $(O)apply.o    $(O)artifact.o
+VOBJ02 = $(O)attrib.o  $(O)ball.o     $(O)bones.o    $(O)botl.o
+VOBJ03 = $(O)cmd.o     $(O)dbridge.o  $(O)decl.o     $(O)detect.o
+VOBJ04 = $(O)display.o $(O)dlb.o      $(O)dig.o      $(O)do.o
+VOBJ05 = $(O)do_name.o $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o
+VOBJ06 = $(O)dokick.o  $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o
+VOBJ07 = $(O)eat.o     $(O)end.o      $(O)engrave.o  $(O)exper.o
+VOBJ08 = $(O)explode.o $(O)extralev.o $(O)files.o    $(O)fountain.o
+VOBJ09 = $(O)getline.o $(O)hack.o     $(O)hacklib.o  $(O)insight.o
+VOBJ10 = $(O)invent.o  $(O)isaac64.o  $(O)light.o    $(O)lock.o
+VOBJ11 = $(O)mail.o    $(O)main.o     $(O)makemon.o  $(O)mapglyph.o
+VOBJ12 = $(O)mcastu.o  $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o
+VOBJ13 = $(O)mkmap.o   $(O)mklev.o    $(O)mkmaze.o   $(O)mkobj.o
+VOBJ14 = $(O)mkroom.o  $(O)mon.o      $(O)mondata.o  $(O)monmove.o
+VOBJ15 = $(O)monst.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
+VOBJ16 = $(O)music.o   $(O)o_init.o   $(O)objects.o  $(O)objnam.o
+VOBJ17 = $(O)options.o $(O)pickup.o   $(O)pline.o    $(O)polyself.o
+VOBJ18 = $(O)potion.o  $(O)quest.o    $(O)questpgr.o $(O)pager.o
+VOBJ19 = $(O)pray.o    $(O)priest.o   $(O)read.o     $(O)rect.o
+VOBJ20 = $(O)region.o  $(O)restore.o  $(O)rip.o      $(O)rnd.o
+VOBJ21 = $(O)role.o    $(O)rumors.o   $(O)save.o     $(O)sfstruct.o
+VOBJ22 = $(O)shk.o     $(O)shknam.o   $(O)sit.o      $(O)sounds.o
+VOBJ23 = $(O)sp_lev.o  $(O)spell.o    $(O)steal.o    $(O)steed.o
+VOBJ24 = $(O)symbols.o $(O)sys.o      $(O)teleport.o $(O)termcap.o
+VOBJ25 = $(O)timeout.o $(O)topl.o     $(O)topten.o   $(O)track.o
+VOBJ26 = $(O)trap.o    $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
+VOBJ27 = $(O)vision.o  $(O)vis_tab.o  $(O)weapon.o   $(O)were.o
+VOBJ28 = $(O)wield.o   $(O)windows.o  $(O)wintty.o   $(O)wizard.o
+VOBJ29 = $(O)worm.o    $(O)worn.o     $(O)write.o    $(O)zap.o
+VOBJ30 = $(REGEX)      $(VIDEO_OBJ)
 
-VOBJ01 = $(O)allmain.o  $(O)alloc.o   $(O)apply.o    $(O)artifact.o $(O)attrib.o
-VOBJ02 = $(O)ball.o     $(O)bones.o   $(O)botl.o     $(O)cmd.o      $(O)dbridge.o
-VOBJ03 = $(O)decl.o     $(O)detect.o  $(O)display.o  $(O)do.o       $(O)do_name.o
-VOBJ04 = $(O)do_wear.o  $(O)dog.o     $(O)dogmove.o  $(O)dokick.o   $(O)dothrow.o
-VOBJ05 = $(O)drawing.o  $(O)dungeon.o $(O)eat.o      $(O)end.o      $(O)engrave.o
-VOBJ06 = $(O)exper.o    $(O)explode.o $(O)extralev.o $(O)files.o    $(O)fountain.o
-VOBJ07 = $(O)getline.o  $(O)hack.o    $(O)hacklib.o  $(O)invent.o   $(O)lock.o
-VOBJ08 = $(O)mail.o     $(O)main.o    $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o $(O)mhitm.o
-VOBJ09 = $(O)mhitu.o    $(O)minion.o  $(O)mkmap.o    $(O)mklev.o    $(O)mkmaze.o
-VOBJ10 = $(O)mkobj.o    $(O)mkroom.o  $(O)mon.o      $(O)mondata.o  $(O)monmove.o
-VOBJ11 = $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
-VOBJ12 = $(O)music.o    $(O)o_init.o  $(O)objects.o  $(O)objnam.o   $(O)options.o
-VOBJ13 = $(O)pickup.o   $(O)pline.o   $(O)polyself.o $(O)potion.o   $(O)quest.o
-VOBJ14 = $(O)questpgr.o $(O)pager.o   $(O)pray.o     $(O)priest.o   $(O)read.o
-VOBJ15 = $(O)rect.o     $(O)restore.o $(O)rip.o      $(O)rnd.o      $(O)role.o
-VOBJ16 = $(O)rumors.o   $(O)save.o    $(O)shk.o      $(O)shknam.o   $(O)sit.o
-VOBJ17 = $(O)sounds.o   $(O)sp_lev.o  $(O)spell.o    $(O)steal.o    $(O)steed.o
-VOBJ18 = $(O)termcap.o  $(O)timeout.o $(O)topl.o     $(O)topten.o   $(O)track.o
-VOBJ19 = $(O)trap.o     $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
-VOBJ20 = $(O)vis_tab.o  $(O)weapon.o  $(O)were.o     $(O)wield.o    $(O)windows.o
-VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
-VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
-VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)       $(O)isaac64.o  $(VIDEO_OBJ)
-VOBJ24 = $(O)sfbase.o   $(O)sfdata.o
-VOBJ25 = $(O)sfstruct.o $(O)sfascii.o $(O)sflendian.o 
-
-SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
-	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
+SOBJ   = $(O)msdos.o   $(O)pcsys.o    $(O)tty.o      $(O)unix.o \
+	 $(O)video.o   $(O)vidtxt.o   $(O)pckeys.o
 
 VVOBJ  = $(O)version.o
 
 MDLIB  = $(O)mdlib.o
 
 ifeq "$(ADD_LUA)" "Y"
-LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o
-LUA_QTEXT_FILE = "quest.lua"
+LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 endif
 
 ifeq "$(ADD_CURSES)" "Y"
@@ -337,6 +300,7 @@ VOBJ  = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
 	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
+	$(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(VOBJ30) \
 	$(LUAOBJ) $(CURSESOBJ) $(MDLIB)
 
 ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
@@ -441,19 +405,34 @@ YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h   \
 DISPLAY_H  = $(MONDATA_H)	$(INCL)/vision.h    $(INCL)/display.h
 PCCONF_H   = $(INCL)/micro.h	$(INCL)/system.h    $(INCL)/pcconf.h \
 	    $(MSYS)/pcvideo.h
-CONFIG_H   = $(GLOBAL_H)	$(INCL)/tradstdc.h  $(INCL)/config1.h \
-	    $(INCL)/config.h
 DECL_H	   = $(YOU_H)		$(INCL)/spell.h	    $(INCL)/color.h   \
 	     $(INCL)/obj.h	$(INCL)/onames.h    $(INCL)/pm.h      \
 	      $(INCL)/decl.h
 GLOBAL_H   = $(PCCONF_H)	$(INCL)/coord.h	   $(INCL)/global.h
-HACK_H	   = $(CONFIG_H)	$(INCL)/context.h  $(DUNGEON_H)	       \
-	     $(DECL_H)	      	$(DISPLAY_H)	   $(INCL)/monsym.h    \
-	     $(INCL)/mkroom.h	$(INCL)/objclass.h $(INCL)/trap.h      \
-	     $(INCL)/flag.h     $(RM_H)		   $(INCL)/vision.h    \
-	     $(INCL)/wintype.h  $(INCL)/engrave.h  $(INCL)/rect.h      \
-	     $(INCL)/trampoli.h $(INCL)/hack.h     $(REGION_H)	       \
-	     $(INCL)/sys.h
+
+CONFIG_H = $(INCL)/config.h $(INCL)/config1.h $(INCL)/tradstdc.h \
+		$(INCL)/global.h $(INCL)/coord.h $(INCL)/vmsconf.h \
+		$(INCL)/system.h $(INCL)/nhlua.h $(INCL)/unixconf.h \
+		$(INCL)/os2conf.h $(INCL)/micro.h $(INCL)/pcconf.h \
+		$(INCL)/tosconf.h $(INCL)/amiconf.h $(INCL)/macconf.h \
+		$(INCL)/beconf.h $(INCL)/wceconf.h $(INCL)/ntconf.h
+
+HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/lint.h $(INCL)/align.h \
+		$(INCL)/dungeon.h $(INCL)/monsym.h $(INCL)/mkroom.h \
+		$(INCL)/objclass.h $(INCL)/youprop.h $(INCL)/prop.h \
+		$(INCL)/permonst.h $(INCL)/monattk.h \
+		$(INCL)/monflag.h $(INCL)/mondata.h $(INCL)/pm.h \
+		$(INCL)/wintype.h $(INCL)/context.h $(INCL)/rm.h \
+		$(INCL)/botl.h $(INCL)/rect.h \
+		$(INCL)/region.h $(INCL)/decl.h $(INCL)/quest.h \
+		$(INCL)/spell.h $(INCL)/color.h $(INCL)/obj.h \
+		$(INCL)/you.h $(INCL)/attrib.h $(INCL)/monst.h \
+		$(INCL)/mextra.h $(INCL)/skills.h $(INCL)/onames.h \
+		$(INCL)/timeout.h $(INCL)/trap.h $(INCL)/flag.h \
+		$(INCL)/vision.h $(INCL)/display.h $(INCL)/engrave.h \
+		$(INCL)/winprocs.h $(INCL)/sys.h $(INCL)/wintty.h \
+		$(INCL)/trampoli.h
+
 DLB_H      = $(INCL)/dlb.h
 
 ifeq ($(SUPPRESS_GRAPHICS),Y)
@@ -591,12 +570,6 @@ install: $(GAMEFILE) $(O)install.tag
 
 default: $(GAMEFILE)
 
-util: $(O)utility.tag
-
-$(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h $(INCL)/onames.h \
-	$(INCL)/pm.h vis_tab.c $(TILEUTIL)
-	echo utilities made > $@
-
 tileutil: $(U)gif2txt $(U)txt2ppm
 	@echo Optional tile development utilities are up to date.
 
@@ -633,7 +606,7 @@ endif
 #==========================================
 
 $(GAMEFILE): $(O)obj.tag $(PDCLIB) $(LUALIB) \
-	$(O)utility.tag $(ALLOBJ) $(O)$(GAME).lnk
+	$(ALLOBJ) $(O)$(GAME).lnk
 	if [ -f temp.a ]; then rm temp.a; fi;
 	@$(TARGET_AR) r temp.a $(VOBJ01)
 	@$(TARGET_AR) r temp.a $(VOBJ02)
@@ -660,6 +633,11 @@ $(GAMEFILE): $(O)obj.tag $(PDCLIB) $(LUALIB) \
 	@$(TARGET_AR) r temp.a $(VOBJ23)
 	@$(TARGET_AR) r temp.a $(VOBJ24)
 	@$(TARGET_AR) r temp.a $(VOBJ25)
+	@$(TARGET_AR) r temp.a $(VOBJ26)
+	@$(TARGET_AR) r temp.a $(VOBJ27)
+	@$(TARGET_AR) r temp.a $(VOBJ28)
+	@$(TARGET_AR) r temp.a $(VOBJ29)
+	@$(TARGET_AR) r temp.a $(VOBJ30)
 	@$(TARGET_AR) r temp.a $(VIDEO_OBJ)
 	@$(TARGET_AR) r temp.a $(SOBJ)
 	@$(TARGET_AR) r temp.a $(TILOBJ)
@@ -834,9 +812,6 @@ spotless: clean
 	if [ -f $(DAT)/data ];         then rm $(DAT)/data; fi;
 	if [ -f $(DAT)/rumors ];       then rm $(DAT)/rumors; fi;
 	if [ -f $(DAT)/oracles ];      then rm $(DAT)/oracles; fi;
-ifndef LUA_QTEXT_FILE
-	if [ -f $(DAT)/quest.dat ];    then rm $(DAT)/quest.dat; fi;
-endif
 	if [ -f $(DAT)/bogusmon ];     then rm $(DAT)/bogusmon; fi;
 	if [ -f $(DAT)/engrave ];      then rm $(DAT)/engrave; fi;
 	if [ -f $(DAT)/epitaph ];      then rm $(DAT)/epitaph; fi;
@@ -883,6 +858,7 @@ $(O)pmatchre.o : $(HACK_H) $(SSHR)/pmatchre.c
 	$(TARGET_CC) $(cflags) -o$@ $(SSHR)/pmatchre.c
 
 # sys/msdos
+$(O)tile.o : $(HACK_H) $(SRC)/tile.c
 $(O)msdos.o : $(HACK_H)  $(MSYS)/msdos.c
 $(O)pckeys.o : $(HACK_H)  $(MSYS)/pckeys.c
 $(O)pctiles.o : $(HACK_H)  $(MSYS)/pctiles.c $(MSYS)/portio.h
@@ -1038,7 +1014,7 @@ $(O)apply.o: apply.c $(HACK_H)
 $(O)artifact.o: artifact.c $(HACK_H) $(INCL)/artifact.h $(INCL)/artilist.h
 $(O)attrib.o: attrib.c $(HACK_H)
 $(O)ball.o: ball.c $(HACK_H)
-$(O)bones.o: bones.c $(HACK_H) $(INCL)/lev.h
+$(O)bones.o: bones.c $(HACK_H)
 $(O)botl.o: botl.c $(HACK_H)
 $(O)cmd.o: cmd.c $(HACK_H) $(INCL)/func_tab.h
 $(O)dbridge.o: dbridge.c $(HACK_H)
@@ -1048,18 +1024,18 @@ $(O)dig.o: dig.c $(HACK_H)
 $(O)display.o: display.c $(HACK_H)
 $(O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h
 	$(TARGET_CC) $(cflags) -I../sys/msdos -o$@ dlb.c
-$(O)do.o: do.c $(HACK_H) $(INCL)/lev.h
+$(O)do.o: do.c $(HACK_H)
 $(O)do_name.o: do_name.c $(HACK_H)
 $(O)do_wear.o: do_wear.c $(HACK_H)
 $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
-$(O)drawing.o: drawing.c $(HACK_H) $(INCL)/tcap.h
+$(O)drawing.o: drawing.c $(CONFIG_H)
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
-$(O)end.o: end.c $(HACK_H) $(INCL)/lev.h $(INCL)/dlb.h
-$(O)engrave.o: engrave.c $(HACK_H) $(INCL)/lev.h
+$(O)end.o: end.c $(HACK_H) $(INCL)/dlb.h
+$(O)engrave.o: engrave.c $(HACK_H)
 $(O)exper.o: exper.c $(HACK_H)
 $(O)explode.o: explode.c $(HACK_H)
 $(O)extralev.o: extralev.c $(HACK_H)
@@ -1067,8 +1043,9 @@ $(O)files.o: files.c $(HACK_H) $(INCL)/dlb.h
 $(O)fountain.o: fountain.c $(HACK_H)
 $(O)hack.o: hack.c $(HACK_H)
 $(O)hacklib.o: hacklib.c $(HACK_H)
+$(O)insight.o: insight.c $(HACK_H)
 $(O)invent.o: invent.c $(HACK_H)
-$(O)light.o: light.c $(HACK_H) $(INCL)/lev.h
+$(O)light.o: light.c $(HACK_H)
 $(O)lock.o: lock.c $(HACK_H)
 $(O)mail.o: mail.c $(HACK_H) $(INCL)/mail.h
 $(O)makemon.o: makemon.c $(HACK_H)
@@ -1079,7 +1056,7 @@ $(O)mhitu.o: mhitu.c $(HACK_H) $(INCL)/artifact.h
 $(O)minion.o: minion.c $(HACK_H)
 $(O)mklev.o: mklev.c $(HACK_H)
 $(O)mkmap.o: mkmap.c $(HACK_H) $(INCL)/sp_lev.h
-$(O)mkmaze.o: mkmaze.c $(HACK_H) $(INCL)/sp_lev.h $(INCL)/lev.h
+$(O)mkmaze.o: mkmaze.c $(HACK_H) $(INCL)/sp_lev.h
 $(O)mkobj.o: mkobj.c $(HACK_H)
 $(O)mkroom.o: mkroom.c $(HACK_H)
 $(O)mon.o: mon.c $(HACK_H) $(INCL)/mfndpos.h
@@ -1092,7 +1069,10 @@ $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H)
 $(O)music.o: music.c $(HACK_H) #interp.c
-$(O)o_init.o: o_init.c $(HACK_H) $(INCL)/lev.h
+$(O)nhlua.o: nhlua.c $(HACK_H)
+$(O)nhlsel.o: nhlsel.c $(HACK_H)
+$(O)nhlobj.o: nhlobj.c $(HACK_H)
+$(O)o_init.o: o_init.c $(HACK_H)
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)/obj.h $(INCL)/objclass.h \
 		$(INCL)/prop.h $(INCL)/skills.h $(INCL)/color.h
 $(O)objnam.o: objnam.c $(HACK_H)
@@ -1105,17 +1085,17 @@ $(O)polyself.o: polyself.c $(HACK_H)
 $(O)potion.o: potion.c $(HACK_H)
 $(O)pray.o: pray.c $(HACK_H)
 $(O)priest.o: priest.c $(HACK_H) $(INCL)/mfndpos.h
-$(O)quest.o: quest.c $(HACK_H) $(INCL)/qtext.h
-$(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)/dlb.h $(INCL)/qtext.h
+$(O)quest.o: quest.c $(HACK_H)
+$(O)questpgr.o: questpgr.c $(HACK_H) $(INCL)/dlb.h
 $(O)read.o: read.c $(HACK_H)
 $(O)rect.o: rect.c $(HACK_H)
-$(O)region.o: region.c $(HACK_H) $(INCL)/lev.h
-$(O)restore.o: restore.c $(HACK_H) $(INCL)/lev.h $(INCL)/tcap.h
+$(O)region.o: region.c $(HACK_H)
+$(O)restore.o: restore.c $(HACK_H) $(INCL)/tcap.h
 $(O)rip.o: rip.c $(HACK_H)
 $(O)rnd.o: rnd.c $(HACK_H)
 $(O)role.o: role.c $(HACK_H)
-$(O)rumors.o: rumors.c $(HACK_H) $(INCL)/lev.h $(INCL)/dlb.h
-$(O)save.o: save.c $(HACK_H) $(INCL)/lev.h
+$(O)rumors.o: rumors.c $(HACK_H) $(INCL)/dlb.h
+$(O)save.o: save.c $(HACK_H)
 $(O)shk.o: shk.c $(HACK_H)
 $(O)shknam.o: shknam.c $(HACK_H)
 $(O)sit.o: sit.c $(HACK_H) $(INCL)/artifact.h
@@ -1124,9 +1104,10 @@ $(O)sp_lev.o: sp_lev.c $(HACK_H) $(INCL)/dlb.h $(INCL)/sp_lev.h
 $(O)spell.o: spell.c $(HACK_H)
 $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
+$(O)symbols.o: symbols.c $(HACK_H) $(INCL)/tcap.h
 $(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
-$(O)timeout.o: timeout.c $(HACK_H) $(INCL)/lev.h
+$(O)timeout.o: timeout.c $(HACK_H)
 $(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h $(PATCHLEV_H)
 $(O)track.o: track.c $(HACK_H)
 $(O)trap.o: trap.c $(HACK_H)
@@ -1139,8 +1120,8 @@ $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
 $(O)windows.o: windows.c $(HACK_H) $(INCL)/wingem.h $(INCL)/winGnome.h
-$(O)wizard.o: wizard.c $(HACK_H) $(INCL)/qtext.h
-$(O)worm.o: worm.c $(HACK_H) $(INCL)/lev.h
+$(O)wizard.o: wizard.c $(HACK_H)
+$(O)worm.o: worm.c $(HACK_H)
 $(O)worn.o: worn.c $(HACK_H)
 $(O)write.o: write.c $(HACK_H)
 $(O)zap.o: zap.c $(HACK_H)
@@ -1149,5 +1130,5 @@ $(O)tileset.o: $(WSHR)/tileset.c $(HACK_H)
 $(O)bmptiles.o: $(WSHR)/bmptiles.c $(INCL)/config.h $(INCL)/tileset.h $(INCL)/integer.h
 $(O)giftiles.o: $(WSHR)/giftiles.c $(INCL)/config.h $(INCL)/tileset.h $(INCL)/integer.h
 
-# end of file
+#end of file
 

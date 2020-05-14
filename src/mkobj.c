@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1571531889 2019/10/20 00:38:09 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1585361051 2020/03/28 02:04:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.176 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -75,9 +75,8 @@ newoextra()
     oextra = (struct oextra *) alloc(sizeof (struct oextra));
     oextra->oname = 0;
     oextra->omonst = 0;
-    oextra->omid = 0;
-    oextra->olong = 0;
     oextra->omailcmd = 0;
+    oextra->omid = 0;
     return oextra;
 }
 
@@ -92,10 +91,6 @@ struct obj *o;
             free((genericptr_t) x->oname);
         if (x->omonst)
             free_omonst(o);     /* 'o' rather than 'x' */
-        if (x->omid)
-            free((genericptr_t) x->omid);
-        if (x->olong)
-            free((genericptr_t) x->olong);
         if (x->omailcmd)
             free((genericptr_t) x->omailcmd);
 
@@ -141,42 +136,14 @@ struct obj *otmp;
 {
     if (!otmp->oextra)
         otmp->oextra = newoextra();
-    if (!OMID(otmp)) {
-        OMID(otmp) = (unsigned *) alloc(sizeof (unsigned));
-        (void) memset((genericptr_t) OMID(otmp), 0, sizeof (unsigned));
-    }
+    OMID(otmp) = 0;
 }
 
 void
 free_omid(otmp)
 struct obj *otmp;
 {
-    if (otmp->oextra && OMID(otmp)) {
-        free((genericptr_t) OMID(otmp));
-        OMID(otmp) = (unsigned *) 0;
-    }
-}
-
-void
-newolong(otmp)
-struct obj *otmp;
-{
-    if (!otmp->oextra)
-        otmp->oextra = newoextra();
-    if (!OLONG(otmp)) {
-        OLONG(otmp) = (long *) alloc(sizeof (long));
-        (void) memset((genericptr_t) OLONG(otmp), 0, sizeof (long));
-    }
-}
-
-void
-free_olong(otmp)
-struct obj *otmp;
-{
-    if (otmp->oextra && OLONG(otmp)) {
-        free((genericptr_t) OLONG(otmp));
-        OLONG(otmp) = (long *) 0;
-    }
+    OMID(otmp) = 0;
 }
 
 void
@@ -245,7 +212,7 @@ boolean init, artif;
    result is always non-Null */
 struct obj *
 mkobj(oclass, artif)
-char oclass;
+int oclass;
 boolean artif;
 {
     int tprob, i, prob = rnd(1000);
@@ -257,13 +224,18 @@ boolean artif;
                                             : (const struct icp *) mkobjprobs;
 
         for (tprob = rnd(100); (tprob -= iprobs->iprob) > 0; iprobs++)
-            ;
+            continue;
         oclass = iprobs->iclass;
     }
 
-    i = g.bases[(int) oclass];
-    while ((prob -= objects[i].oc_prob) > 0)
-        i++;
+    if (oclass == SPBOOK_no_NOVEL) {
+        i = rnd_class(g.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
+        oclass = SPBOOK_CLASS; /* for sanity check below */
+    } else {
+        i = g.bases[oclass];
+        while ((prob -= objects[i].oc_prob) > 0)
+            ++i;
+    }
 
     if (objects[i].oc_class != oclass || !OBJ_NAME(objects[i]))
         panic("probtype error, oclass=%d i=%d", (int) oclass, i);
@@ -401,20 +373,13 @@ struct obj *obj2, *obj1;
         if (OMONST(obj1)->mextra)
             copy_mextra(OMONST(obj2), OMONST(obj1));
     }
+    if (has_omailcmd(obj1)) {
+        new_omailcmd(obj2, OMAILCMD(obj1));
+    }
     if (has_omid(obj1)) {
         if (!OMID(obj2))
             newomid(obj2);
-        (void) memcpy((genericptr_t) OMID(obj2), (genericptr_t) OMID(obj1),
-                      sizeof (unsigned));
-    }
-    if (has_olong(obj1)) {
-        if (!OLONG(obj2))
-            newolong(obj2);
-        (void) memcpy((genericptr_t) OLONG(obj2), (genericptr_t) OLONG(obj1),
-                      sizeof (long));
-    }
-    if (has_omailcmd(obj1)) {
-        new_omailcmd(obj2, OMAILCMD(obj1));
+        OMID(obj2) = OMID(obj1);
     }
 }
 
@@ -444,6 +409,7 @@ long num;
     obj->owt = weight(obj);
     otmp->quan = num;
     otmp->owt = weight(otmp); /* -= obj->owt ? */
+    otmp->lua_ref_cnt = 0;
 
     g.context.objsplit.parent_oid = obj->o_id;
     g.context.objsplit.child_oid = otmp->o_id;
@@ -797,6 +763,7 @@ boolean artif;
     otmp->lknown = 0;
     otmp->cknown = 0;
     otmp->corpsenm = NON_PM;
+    otmp->lua_ref_cnt = 0;
 
     if (init) {
         switch (let) {
@@ -934,16 +901,16 @@ boolean artif;
                 otmp->spe = rn1(70, 30);
                 break;
             case CAN_OF_GREASE:
-                otmp->spe = rnd(25);
+                otmp->spe = rn1(21, 5); /* 0..20 + 5 => 5..25 */
                 blessorcurse(otmp, 10);
                 break;
             case CRYSTAL_BALL:
-                otmp->spe = rnd(5);
+                otmp->spe = rn1(5, 3); /* 0..4 + 3 => 3..7 */
                 blessorcurse(otmp, 2);
                 break;
             case HORN_OF_PLENTY:
             case BAG_OF_TRICKS:
-                otmp->spe = rnd(20);
+                otmp->spe = rn1(18, 3); /* 0..17 + 3 => 3..20 */
                 break;
             case FIGURINE:
                 tryct = 0;
@@ -1054,7 +1021,8 @@ boolean artif;
                 otmp->corpsenm = rndmonnum();
                 if (!verysmall(&mons[otmp->corpsenm])
                     && rn2(level_difficulty() / 2 + 10) > 10)
-                    (void) add_to_container(otmp, mkobj(SPBOOK_CLASS, FALSE));
+                    (void) add_to_container(otmp,
+                                            mkobj(SPBOOK_no_NOVEL, FALSE));
             }
             break;
         case COIN_CLASS:
@@ -1180,10 +1148,6 @@ struct obj *body;
     long corpse_age; /* age of corpse          */
     int rot_adjust;
     short action;
-
-#define TAINT_AGE (50L)        /* age when corpses go bad */
-#define TROLL_REVIVE_CHANCE 37 /* 1/37 chance for 50 turns ~ 75% chance */
-#define ROT_AGE (250L)         /* age when corpses rot away */
 
     /* lizards and lichen don't rot or revive */
     if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN)
@@ -1601,7 +1565,7 @@ unsigned mid;
     if (!mid || !obj)
         return (struct obj *) 0;
     newomid(obj);
-    *OMID(obj) = mid;
+    OMID(obj) = mid;
     return obj;
 }
 
@@ -1931,11 +1895,12 @@ register struct obj *otmp;
 
 /* throw away all of a monster's inventory */
 void
-discard_minvent(mtmp)
+discard_minvent(mtmp, uncreate_artifacts)
 struct monst *mtmp;
+boolean uncreate_artifacts;
 {
     struct obj *otmp, *mwep = MON_WEP(mtmp);
-    boolean keeping_mon = (!DEADMONSTER(mtmp));
+    boolean keeping_mon = !DEADMONSTER(mtmp);
 
     while ((otmp = mtmp->minvent) != 0) {
         /* this has now become very similar to m_useupall()... */
@@ -1949,6 +1914,8 @@ struct monst *mtmp;
             }
             otmp->owornmask = 0L; /* obfree() expects this */
         }
+        if (uncreate_artifacts && otmp->oartifact)
+            artifact_exists(otmp, safe_oname(otmp), FALSE);
         obfree(otmp, (struct obj *) 0); /* dealloc_obj() isn't sufficient */
     }
 }
@@ -1967,6 +1934,7 @@ struct monst *mtmp;
  *      OBJ_MIGRATING   migrating chain
  *      OBJ_BURIED      level.buriedobjs chain
  *      OBJ_ONBILL      on g.billobjs chain
+ *      OBJ_LUAFREE     obj is dealloc'd from core, but still used by lua
  */
 void
 obj_extract_self(obj)
@@ -1974,6 +1942,7 @@ struct obj *obj;
 {
     switch (obj->where) {
     case OBJ_FREE:
+    case OBJ_LUAFREE:
         break;
     case OBJ_FLOOR:
         remove_object(obj);
@@ -2159,7 +2128,7 @@ void
 dealloc_obj(obj)
 struct obj *obj;
 {
-    if (obj->where != OBJ_FREE)
+    if (obj->where != OBJ_FREE && obj->where != OBJ_LUAFREE)
         panic("dealloc_obj: obj not free");
     if (obj->nobj)
         panic("dealloc_obj with nobj");
@@ -2178,8 +2147,10 @@ struct obj *obj;
      * list must track all objects that can have a light source
      * attached to it (and also requires lamplit to be set).
      */
-    if (obj_sheds_light(obj))
+    if (obj_sheds_light(obj)) {
         del_light_source(LS_OBJECT, obj_to_any(obj));
+        obj->lamplit = 0;
+    }
 
     if (obj == g.thrownobj)
         g.thrownobj = 0;
@@ -2188,6 +2159,11 @@ struct obj *obj;
 
     if (obj->oextra)
         dealloc_oextra(obj);
+    if (obj->lua_ref_cnt) {
+        /* obj is referenced from a lua script, let lua gc free it */
+        obj->where = OBJ_LUAFREE;
+        return;
+    }
     free((genericptr_t) obj);
 }
 
@@ -2424,7 +2400,8 @@ const char *mesg;
 static const char *obj_state_names[NOBJ_STATES] = { "free",      "floor",
                                                     "contained", "invent",
                                                     "minvent",   "migrating",
-                                                    "buried",    "onbill" };
+                                                    "buried",    "onbill",
+                                                    "luafree" };
 
 static const char *
 where_name(obj)

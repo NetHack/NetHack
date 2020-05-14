@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1573290419 2019/11/09 09:06:59 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1583073991 2020/03/01 14:46:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -299,7 +299,6 @@ newman()
         change_sex();
 
     adjabil(oldlvl, (int) u.ulevel);
-    reset_rndmonst(NON_PM); /* new monster generation criteria */
 
     /* random experience points for the new experience level */
     u.uexp = rndexp(FALSE);
@@ -462,14 +461,19 @@ int psflags;
                     pline("I've never heard of such monsters.");
                 else
                     You_cant("polymorph into any of those.");
+            } else if (wizard && Upolyd && mntmp == u.umonster) {
+                /* in wizard mode, picking own role while poly'd reverts to
+                   normal without newman()'s chance of level or sex change */
+                rehumanize();
+                goto made_change;
             } else if (iswere && (were_beastie(mntmp) == u.ulycn
                                   || mntmp == counter_were(u.ulycn)
                                   || (Upolyd && mntmp == PM_HUMAN))) {
                 goto do_shift;
-                /* Note:  humans are illegal as monsters, but an
-                 * illegal monster forces newman(), which is what we
-                 * want if they specified a human.... */
             } else if (!polyok(&mons[mntmp])
+                       /* Note:  humans are illegal as monsters, but an
+                          illegal monster forces newman(), which is what
+                          we want if they specified a human.... */
                        && !(mntmp == PM_HUMAN || your_race(&mons[mntmp])
                             || mntmp == g.urole.malenum
                             || mntmp == g.urole.femalenum)) {
@@ -762,7 +766,7 @@ int mntmp;
        grabber to engulfer or vice versa because engulfing by poly'd hero
        always ends immediately so won't be in effect during a polymorph] */
     if (!sticky && !u.uswallow && u.ustuck && sticks(g.youmonst.data))
-        u.ustuck = 0;
+        set_ustuck((struct monst *) 0);
     else if (sticky && !sticks(g.youmonst.data))
         uunstick();
 
@@ -934,7 +938,7 @@ break_armor()
             useup(uarmu);
         }
     } else if (sliparm(g.youmonst.data)) {
-        if (((otmp = uarm) != 0) && (racial_exception(&g.youmonst, otmp) < 1)) {
+        if ((otmp = uarm) != 0 && racial_exception(&g.youmonst, otmp) < 1) {
             if (donning(otmp))
                 cancel_don();
             Your("armor falls around you!");
@@ -1016,6 +1020,21 @@ break_armor()
             dropp(otmp);
         }
     }
+    /* not armor, but eyewear shouldn't stay worn without a head to wear
+       it/them on (should also come off if head is too tiny or too huge,
+       but putting accessories on doesn't reject those cases [yet?]);
+       amulet stays worn */
+    if ((otmp = ublindf) != 0 && !has_head(g.youmonst.data)) {
+        int l;
+        const char *eyewear = simpleonames(otmp); /* blindfold|towel|lenses */
+
+        if (!strncmp(eyewear, "pair of ", l = 8)) /* lenses */
+            eyewear += l;
+        Your("%s %s off!", eyewear, vtense(eyewear, "fall"));
+        (void) Blindf_off((struct obj *) 0); /* Null: skip usual off mesg */
+        dropp(otmp);
+    }
+    /* rings stay worn even when no hands */
 }
 
 static void
@@ -1184,7 +1203,7 @@ dospit()
             break;
         }
         otmp->spe = 1; /* to indicate it's yours */
-        throwit(otmp, 0L, FALSE);
+        throwit(otmp, 0L, FALSE, (struct obj *) 0);
     }
     return 1;
 }
@@ -1602,12 +1621,14 @@ domindblast()
 void
 uunstick()
 {
-    if (!u.ustuck) {
+    struct monst *mtmp = u.ustuck;
+
+    if (!mtmp) {
         impossible("uunstick: no ustuck?");
         return;
     }
-    pline("%s is no longer in your clutches.", Monnam(u.ustuck));
-    u.ustuck = 0;
+    set_ustuck((struct monst *) 0); /* before pline() */
+    pline("%s is no longer in your clutches.", Monnam(mtmp));
 }
 
 void
@@ -1887,6 +1908,7 @@ polysense()
 
     switch (u.umonnum) {
     case PM_PURPLE_WORM:
+    case PM_BABY_PURPLE_WORM:
         warnidx = PM_SHRIEKER;
         break;
     case PM_VAMPIRE:

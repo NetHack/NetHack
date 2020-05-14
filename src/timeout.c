@@ -1,12 +1,9 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1573290422 2019/11/09 09:07:02 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1582925432 2020/02/28 21:30:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h" /* for checking save modes */
-#include "sfproto.h"
-
 
 static void NDECL(stoned_dialogue);
 static void NDECL(vomiting_dialogue);
@@ -95,7 +92,7 @@ const struct propname {
     { UNCHANGING, "unchanging" },
     { REFLECTING, "reflecting" },
     { FREE_ACTION, "free action" },
-    { FIXED_ABIL, "fixed abilites" },
+    { FIXED_ABIL, "fixed abilities" },
     { LIFESAVED, "life will be saved" },
     {  0, 0 },
 };
@@ -173,6 +170,7 @@ static void
 vomiting_dialogue()
 {
     const char *txt = 0;
+    char buf[BUFSZ];
     long v = (Vomiting & TIMEOUT);
 
     /* note: nhtimeout() hasn't decremented timed properties for the
@@ -183,6 +181,8 @@ vomiting_dialogue()
         break;
     case 11:
         txt = vomiting_texts[1];
+        if (strstri(txt, " confused") && Confusion)
+            txt = strsubst(strcpy(buf, txt), " confused", " more confused");
         break;
     case 6:
         make_stunned((HStun & TIMEOUT) + (long) d(2, 4), FALSE);
@@ -196,6 +196,8 @@ vomiting_dialogue()
         break;
     case 8:
         txt = vomiting_texts[2];
+        if (strstri(txt, " think") && Stunned)
+            txt = strsubst(strcpy(buf, txt), "can't seem to ", "can't ");
         break;
     case 5:
         txt = vomiting_texts[3];
@@ -571,6 +573,16 @@ nh_timeout()
                 make_vomiting(0L, TRUE);
                 break;
             case SICK:
+                /* You might be able to bounce back from food poisoning, but not
+                 * other forms of illness. */
+                if ((u.usick_type & SICK_NONVOMITABLE) == 0
+                    && rn2(100) < ACURR(A_CON)) {
+                    You("have recovered from your illness.");
+                    make_sick(0, NULL, FALSE, SICK_ALL);
+                    exercise(A_CON, FALSE);
+                    adjattrib(A_CON, -1, 1);
+                    break;
+                }
                 You("die from your illness.");
                 if (kptr && kptr->name[0]) {
                     g.killer.format = kptr->format;
@@ -594,7 +606,7 @@ nh_timeout()
                 break;
             case FAST:
                 if (!Very_fast)
-                    You_feel("yourself slowing down%s.",
+                    You_feel("yourself slow down%s.",
                              Fast ? " a bit" : "");
                 break;
             case CONFUSION:
@@ -669,6 +681,10 @@ nh_timeout()
                     spoteffects(TRUE);
                 }
                 break;
+            case DISPLACED:
+                if (!Displaced) /* give a message */
+                    toggle_displacement((struct obj *) 0, 0L, FALSE);
+                break;
             case WARN_OF_MON:
                 /* timed Warn_of_mon is via #wizintrinsic only */
                 if (!Warn_of_mon) {
@@ -704,7 +720,7 @@ nh_timeout()
             case FUMBLING:
                 /* call this only when a move took place.  */
                 /* otherwise handle fumbling msgs locally. */
-                if (u.umoved && !Levitation) {
+                if (u.umoved && !(Levitation || Flying)) {
                     slip_or_trip();
                     nomul(-2);
                     g.multi_reason = "fumbling";
@@ -723,6 +739,12 @@ nh_timeout()
                 HFumbling &= ~FROMOUTSIDE;
                 if (Fumbling)
                     incr_itimeout(&HFumbling, rnd(20));
+
+                if (iflags.defer_decor) {
+                    /* 'mention_decor' was deferred for message sequencing
+                       reasons; catch up now */
+                    deferred_decor(FALSE);
+                }
                 break;
             case DETECT_MONSTERS:
                 see_monsters();
@@ -1400,7 +1422,7 @@ long timeout;
         break; /* case [otyp ==] candelabrum|tallow_candle|wax_candle */
 
     default:
-        impossible("burn_object: unexpeced obj %s", xname(obj));
+        impossible("burn_object: unexpected obj %s", xname(obj));
         break;
     }
     if (need_newsym)
@@ -1661,7 +1683,7 @@ do_storms()
  *      are saved with a level.  Object and monster timers are
  *      saved using their respective id's instead of pointers.
  *
- *  void restore_timers(NHFILE *, int range, boolean ghostly, long adjust)
+ *  void restore_timers(NHFILE *, int range, long adjust)
  *      Restore timers of range 'range'.  If from a ghost pile,
  *      adjust the timeout by 'adjust'.  The object and monster
  *      ids are not restored until later.
@@ -2165,16 +2187,12 @@ timer_element *timer;
         /* assume no pointers in arg */
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) timer, sizeof(timer_element));
-        if (nhfp->fieldlevel)
-            sfo_fe(nhfp, timer, "timers", "timer", 1);
         break;
 
     case TIMER_OBJECT:
         if (timer->needs_fixup) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
-            if (nhfp->fieldlevel)
-                sfo_fe(nhfp, timer, "timers", "timer", 1);
         } else {
             /* replace object pointer with id */
             arg_save.a_obj = timer->arg.a_obj;
@@ -2183,8 +2201,6 @@ timer_element *timer;
             timer->needs_fixup = 1;
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
-            if (nhfp->fieldlevel)
-                sfo_fe(nhfp, timer, "timers", "timer", 1);
             timer->arg.a_obj = arg_save.a_obj;
             timer->needs_fixup = 0;
         }
@@ -2194,8 +2210,6 @@ timer_element *timer;
         if (timer->needs_fixup) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
-            if (nhfp->fieldlevel)
-                sfo_fe(nhfp, timer, "timers", "timer", 1);
         } else {
             /* replace monster pointer with id */
             arg_save.a_monst = timer->arg.a_monst;
@@ -2204,8 +2218,6 @@ timer_element *timer;
             timer->needs_fixup = 1;
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
-            if (nhfp->fieldlevel)
-                sfo_fe(nhfp, timer, "timers", "timer", 1);
             timer->arg.a_monst = arg_save.a_monst;
             timer->needs_fixup = 0;
         }
@@ -2343,14 +2355,10 @@ int range;
         if (range == RANGE_GLOBAL) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &g.timer_id, sizeof(g.timer_id));
-            if (nhfp->fieldlevel)
-                sfo_ulong(nhfp, &g.timer_id, "timers", "g.timer_id", 1);
         }
         count = maybe_write_timer(nhfp, range, FALSE);
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
-        if (nhfp->fieldlevel)
-            sfo_int(nhfp, &count, "timers", "timer_count", 1);
         (void) maybe_write_timer(nhfp, range, TRUE);
     }
 
@@ -2377,34 +2385,28 @@ int range;
  * monster pointers.
  */
 void
-restore_timers(nhfp, range, ghostly, adjust)
+restore_timers(nhfp, range, adjust)
 NHFILE *nhfp;
 int range;
-boolean ghostly; /* restoring from a ghost level */
 long adjust;     /* how much to adjust timeout */
 {
     int count = 0;
     timer_element *curr;
+    boolean ghostly = (nhfp->ftype == NHF_BONESFILE); /* from a ghost level */
 
     if (range == RANGE_GLOBAL) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &g.timer_id, sizeof g.timer_id);
-        if (nhfp->fieldlevel)
-            sfi_ulong(nhfp, &g.timer_id, "timers", "g.timer_id", 1);
     }
 
     /* restore elements */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof count);
-    if (nhfp->fieldlevel)
-        sfi_int(nhfp, &count, "timers", "timer_count", 1);
        
     while (count-- > 0) {
         curr = (timer_element *) alloc(sizeof(timer_element));
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) curr, sizeof(timer_element));
-        if (nhfp->fieldlevel)
-            sfi_fe(nhfp, curr, "timers", "timer", 1);
         if (ghostly)
             curr->timeout += adjust;
         insert_timer(curr);

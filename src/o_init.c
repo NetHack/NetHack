@@ -4,9 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h" /* save & restore info */
-#include "sfproto.h"
-
 
 static void FDECL(setgemprobs, (d_level *));
 static void FDECL(shuffle, (int, int, BOOLEAN_P));
@@ -111,8 +108,8 @@ boolean domaterial;
 void
 init_objects()
 {
-    register int i, first, last, sum;
-    register char oclass;
+    int i, first, last, sum, prevoclass;
+    char oclass;
 #ifdef TEXTCOLOR
 #define COPY_OBJ_DESCR(o_dst, o_src) \
     o_dst.oc_descr_idx = o_src.oc_descr_idx, o_dst.oc_color = o_src.oc_color
@@ -123,7 +120,7 @@ init_objects()
     /* bug fix to prevent "initialization error" abort on Intel Xenix.
      * reported by mikew@semike
      */
-    for (i = 0; i < MAXOCLASSES; i++)
+    for (i = 0; i <= MAXOCLASSES; i++)
         g.bases[i] = 0;
     /* initialize object descriptions */
     for (i = 0; i < NUM_OBJECTS; i++)
@@ -131,8 +128,19 @@ init_objects()
     /* init base; if probs given check that they add up to 1000,
        otherwise compute probs */
     first = 0;
+    prevoclass = -1;
     while (first < NUM_OBJECTS) {
         oclass = objects[first].oc_class;
+        /*
+         * objects[] sanity check:  must be in ascending oc_class order to
+         * be able to use bases[class+1]-1 for the end of a class's range.
+         * Also catches a non-contiguous class because reverting to any
+         * earlier class would involve switching back to a lower class
+         * number after having moved on to one or more other classes.
+         */
+        if ((int) oclass < prevoclass)
+            panic("objects[%d] class #%d not in order!", first, oclass);
+
         last = first + 1;
         while (last < NUM_OBJECTS && objects[last].oc_class == oclass)
             last++;
@@ -173,7 +181,18 @@ init_objects()
         if (sum != 1000)
             error("init-prob error for class %d (%d%%)", oclass, sum);
         first = last;
+        prevoclass = (int) oclass;
     }
+    /* extra entry allows deriving the range of a class via
+       bases[class] through bases[class+1]-1 for all classes */
+    g.bases[MAXOCLASSES] = NUM_OBJECTS;
+    /* hypothetically someone might remove all objects of some class,
+       or be adding a new class and not populated it yet, leaving gaps
+       in bases[]; guarantee that there are no such gaps */
+    for (last = MAXOCLASSES - 1; last >= 0; --last)
+        if (!g.bases[last])
+            g.bases[last] = g.bases[last + 1];
+
     /* shuffle descriptions */
     shuffle_all();
 #ifdef USE_TILES
@@ -224,9 +243,7 @@ int *lo_p, *hi_p; /* output: range that item belongs among */
     case VENOM_CLASS:
         /* entire class */
         *lo_p = g.bases[ocls];
-        for (i = *lo_p; objects[i].oc_class == ocls; i++)
-            continue;
-        *hi_p = i - 1;
+        *hi_p = g.bases[ocls + 1] - 1;
         break;
     }
 
@@ -291,7 +308,7 @@ void
 savenames(nhfp)
 NHFILE *nhfp;
 {
-    int i, j;
+    int i;
     unsigned int len;
 
     if (perform_bwrite(nhfp)) {
@@ -300,14 +317,6 @@ NHFILE *nhfp;
             bwrite(nhfp->fd, (genericptr_t)g.disco, sizeof g.disco);
             bwrite(nhfp->fd, (genericptr_t)objects,
                    sizeof(struct objclass) * NUM_OBJECTS);
-        }
-        if (nhfp->fieldlevel) {
-            for (i = 0; i < MAXOCLASSES; ++i)
-                sfo_int(nhfp, &g.bases[i], "names", "g.bases", 1);
-            for (i = 0; i < NUM_OBJECTS; ++i)
-                sfo_short(nhfp, &g.disco[i], "names", "g.disco", 1);
-            for (i = 0; i < NUM_OBJECTS; ++i)
-                sfo_objclass(nhfp, &objects[i], "names", "objclass", 1);
         }
     }
     /* as long as we use only one version of Hack we
@@ -321,11 +330,6 @@ NHFILE *nhfp;
                     bwrite(nhfp->fd, (genericptr_t)&len, sizeof len);
                     bwrite(nhfp->fd, (genericptr_t)objects[i].oc_uname, len);
                 }
-                if (nhfp->fieldlevel) {
-                    sfo_unsigned(nhfp, &len, "names", "len", 1);
-                    for (j = 0; (unsigned) j < len; ++j)
-                        sfo_char(nhfp, &objects[i].oc_uname[j], "names", "oc_uname", 1);
-                }
             }
             if (release_data(nhfp)) {
                 free((genericptr_t) objects[i].oc_uname);
@@ -338,7 +342,7 @@ void
 restnames(nhfp)
 NHFILE *nhfp;
 {
-    int i, j;
+    int i;
     unsigned int len = 0;
 
     if (nhfp->structlevel) {
@@ -347,30 +351,14 @@ NHFILE *nhfp;
         mread(nhfp->fd, (genericptr_t) objects,
                 sizeof(struct objclass) * NUM_OBJECTS);
     }
-    if (nhfp->fieldlevel) {
-        for (i = 0; i < MAXOCLASSES; ++i)
-            sfi_int(nhfp, &g.bases[i], "names", "g.bases", 1);
-        for (i = 0; i < NUM_OBJECTS; ++i)
-            sfi_short(nhfp, &g.disco[i], "names", "g.disco", 1);
-        for (i = 0; i < NUM_OBJECTS; ++i)
-            sfi_objclass(nhfp, &objects[i], "names", "objclass", 1);
-    }
     for (i = 0; i < NUM_OBJECTS; i++) {
         if (objects[i].oc_uname) {
             if (nhfp->structlevel) {
                 mread(nhfp->fd, (genericptr_t) &len, sizeof len);
             }
-            if (nhfp->fieldlevel) {
-                sfi_unsigned(nhfp, &len, "names", "len", 1);
-            }
             objects[i].oc_uname = (char *) alloc(len);
             if (nhfp->structlevel) {
                 mread(nhfp->fd, (genericptr_t)objects[i].oc_uname, len);
-            }
-            if (nhfp->fieldlevel) {
-                for (j = 0; (unsigned) j < len; ++j)
-                    sfi_char(nhfp, &objects[i].oc_uname[j],
-                                "names", "oc_uname", 1);
             }
 	}
     }
@@ -552,7 +540,7 @@ doclassdisco()
                    || flags.menu_style == MENU_COMBINATION);
     if (!traditional) {
         tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     }
     any = cg.zeroany;
     menulet = 'a';
@@ -564,7 +552,7 @@ doclassdisco()
             if (!traditional) {
                 any.a_int = 'u';
                 add_menu(tmpwin, NO_GLYPH, &any, menulet++, 0, ATR_NONE,
-                         unique_items, MENU_UNSELECTED);
+                         unique_items, MENU_ITEMFLAGS_NONE);
             }
             break;
         }
@@ -575,7 +563,7 @@ doclassdisco()
         if (!traditional) {
             any.a_int = 'a';
             add_menu(tmpwin, NO_GLYPH, &any, menulet++, 0, ATR_NONE,
-                     artifact_items, MENU_UNSELECTED);
+                     artifact_items, MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -597,7 +585,7 @@ doclassdisco()
                         any.a_int = c;
                         add_menu(tmpwin, NO_GLYPH, &any, menulet++, c,
                                  ATR_NONE, oclass_to_name(oclass, buf),
-                                 MENU_UNSELECTED);
+                                 MENU_ITEMFLAGS_NONE);
                     }
                 }
             }
@@ -712,7 +700,7 @@ rename_disco()
 
     any = cg.zeroany;
     tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
     /*
      * Skip the "unique objects" section (each will appear within its
@@ -739,12 +727,12 @@ rename_disco()
                 any.a_int = 0;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                          let_to_name(oclass, FALSE, FALSE),
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 prev_class = oclass;
             }
             any.a_int = dis;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     obj_typename(dis), MENU_UNSELECTED);
+                     obj_typename(dis), MENU_ITEMFLAGS_NONE);
         }
     }
     if (ct == 0) {

@@ -7,7 +7,7 @@ des.level_init({ style = "solidfill", fg = " " });
 
 -- TODO FIXME: see baalz_fixup - the legs get removed currently.
 
-des.level_flags("mazelevel", "noteleport", "corrmaze")
+des.level_flags("mazelevel", "corrmaze")
 -- the two pools are fakes used to mark spots which need special wall fixups
 -- the two iron bars are eyes and spots to their left will be made diggable
 des.map({ halign = "right", valign = "center", map = [[
@@ -33,7 +33,7 @@ des.non_diggable(selection.area(00,00,47,12))
 des.mazewalk(00,06,"west")
 des.stair("down", 44,06)
 des.door("locked",00,06)
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain(34,08,'-')
    des.terrain(34,04,'S')
    des.terrain(29,05,'|')

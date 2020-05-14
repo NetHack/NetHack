@@ -66,9 +66,9 @@ static winid FDECL(dump_create_nhwindow, (int));
 static void FDECL(dump_clear_nhwindow, (winid));
 static void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
 static void FDECL(dump_destroy_nhwindow, (winid));
-static void FDECL(dump_start_menu, (winid));
+static void FDECL(dump_start_menu, (winid, unsigned long));
 static void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P,
-                                      CHAR_P, int, const char *, BOOLEAN_P));
+                                      CHAR_P, int, const char *, unsigned int));
 static void FDECL(dump_end_menu, (winid, const char *));
 static int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
 static void FDECL(dump_putstr, (winid, int, const char *));
@@ -241,7 +241,8 @@ void
 choose_windows(s)
 const char *s;
 {
-    register int i;
+    int i;
+    char *tmps = 0;
 
     for (i = 0; winchoices[i].procs; i++) {
         if ('+' == winchoices[i].procs->name[0])
@@ -267,9 +268,22 @@ const char *s;
         windowprocs.win_wait_synch = def_wait_synch;
 
     if (!winchoices[0].procs) {
-        raw_printf("No window types?");
+        raw_printf("No window types supported?");
         nh_terminate(EXIT_FAILURE);
     }
+    /* 50: arbitrary, no real window_type names are anywhere near that long;
+       used to prevent potential raw_printf() overflow if user supplies a
+       very long string (on the order of 1200 chars) on the command line
+       (config file options can't get that big; they're truncated at 1023) */
+#define WINDOW_TYPE_MAXLEN 50
+    if (strlen(s) >= WINDOW_TYPE_MAXLEN) {
+        tmps = (char *) alloc(WINDOW_TYPE_MAXLEN);
+        (void) strncpy(tmps, s, WINDOW_TYPE_MAXLEN - 1);
+        tmps[WINDOW_TYPE_MAXLEN - 1] = '\0';
+        s = tmps;
+    }
+#undef WINDOW_TYPE_MAXLEN
+
     if (!winchoices[1].procs) {
         config_error_add(
                      "Window type %s not recognized.  The only choice is: %s",
@@ -291,6 +305,8 @@ const char *s;
         config_error_add("Window type %s not recognized.  Choices are:  %s",
                          s, buf);
     }
+    if (tmps)
+        free((genericptr_t) tmps) /*, tmps = 0*/ ;
 
     if (windowprocs.win_raw_print == def_raw_print
             || WINDOWPORT("safe-startup"))
@@ -495,7 +511,7 @@ static void FDECL(hup_exit_nhwindows, (const char *));
 static winid FDECL(hup_create_nhwindow, (int));
 static int FDECL(hup_select_menu, (winid, int, MENU_ITEM_P **));
 static void FDECL(hup_add_menu, (winid, int, const anything *, CHAR_P, CHAR_P,
-                                 int, const char *, BOOLEAN_P));
+                                 int, const char *, unsigned int));
 static void FDECL(hup_end_menu, (winid, const char *));
 static void FDECL(hup_putstr, (winid, int, const char *));
 static void FDECL(hup_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
@@ -520,6 +536,7 @@ static int NDECL(hup_int_ndecl);
 static void NDECL(hup_void_ndecl);
 static void FDECL(hup_void_fdecl_int, (int));
 static void FDECL(hup_void_fdecl_winid, (winid));
+static void FDECL(hup_void_fdecl_winid_ulong, (winid, unsigned long));
 static void FDECL(hup_void_fdecl_constchar_p, (const char *));
 
 static struct window_procs hup_procs = {
@@ -534,7 +551,7 @@ static struct window_procs hup_procs = {
     hup_create_nhwindow, hup_void_fdecl_winid,         /* clear_nhwindow */
     hup_display_nhwindow, hup_void_fdecl_winid,        /* destroy_nhwindow */
     hup_curs, hup_putstr, hup_putstr,                  /* putmixed */
-    hup_display_file, hup_void_fdecl_winid,            /* start_menu */
+    hup_display_file, hup_void_fdecl_winid_ulong,      /* start_menu */
     hup_add_menu, hup_end_menu, hup_select_menu, genl_message_menu,
     hup_void_ndecl,                                    /* update_inventory */
     hup_void_ndecl,                                    /* mark_synch */
@@ -681,13 +698,13 @@ struct mi **menu_list UNUSED;
 
 /*ARGSUSED*/
 static void
-hup_add_menu(window, glyph, identifier, sel, grpsel, attr, txt, preselected)
+hup_add_menu(window, glyph, identifier, sel, grpsel, attr, txt, itemflags)
 winid window UNUSED;
 int glyph UNUSED, attr UNUSED;
 const anything *identifier UNUSED;
 char sel UNUSED, grpsel UNUSED;
 const char *txt UNUSED;
-boolean preselected UNUSED;
+unsigned int itemflags UNUSED;
 {
     return;
 }
@@ -843,6 +860,15 @@ winid window UNUSED;
 
 /*ARGUSED*/
 static void
+hup_void_fdecl_winid_ulong(window, mbehavior)
+winid window UNUSED;
+unsigned long mbehavior UNUSED;
+{
+    return;
+}
+
+/*ARGUSED*/
+static void
 hup_void_fdecl_constchar_p(string)
 const char *string UNUSED;
 {
@@ -860,7 +886,6 @@ const char *status_fieldnm[MAXBLSTATS];
 const char *status_fieldfmt[MAXBLSTATS];
 char *status_vals[MAXBLSTATS];
 boolean status_activefields[MAXBLSTATS];
-NEARDATA winid WIN_STATUS;
 
 void
 genl_status_init()
@@ -1155,7 +1180,7 @@ boolean fullsubs; /* True -> full substitution for file name, False ->
                 else
                     Strcpy(tmpbuf, "{current date+time}");
                 break;
-            case 'v': /* version, eg. "3.6.3-0" */
+            case 'v': /* version, eg. "3.7.0-0" */
                 Sprintf(tmpbuf, "%s", version_string(verbuf));
                 break;
             case 'u': /* UID */
@@ -1299,15 +1324,16 @@ winid win UNUSED;
 
 /*ARGUSED*/
 static void
-dump_start_menu(win)
+dump_start_menu(win, mbehavior)
 winid win UNUSED;
+unsigned long mbehavior UNUSED;
 {
     return;
 }
 
 /*ARGSUSED*/
 static void
-dump_add_menu(win, glyph, identifier, ch, gch, attr, str, preselected)
+dump_add_menu(win, glyph, identifier, ch, gch, attr, str, itemflags)
 winid win UNUSED;
 int glyph;
 const anything *identifier UNUSED;
@@ -1315,7 +1341,7 @@ char ch;
 char gch UNUSED;
 int attr UNUSED;
 const char *str;
-boolean preselected UNUSED;
+unsigned int itemflags UNUSED;
 {
     if (dumplog_file) {
         if (glyph == NO_GLYPH)

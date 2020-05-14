@@ -1,4 +1,4 @@
-# NetHack 3.6  engrave.txt       $NHDT-Date: 1524689579 2018/04/25 20:52:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.2 $
+# NetHack 3.6  engrave.txt       $NHDT-Date: 1581206725 2020/02/09 00:05:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
 # Copyright (c) 2015 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 # Random engravings on the floor
@@ -23,7 +23,8 @@ You won't get it up the steps
 Lasciate ogni speranza o voi ch'entrate.
 # Prisoner
 Well Come
-# So Long...
+# God's Final Message to His Creation (from "So Long, and Thanks for All
+# the Fish" by Douglas Adams):
 We apologize for the inconvenience.
 # Thriller
 See you next Wednesday

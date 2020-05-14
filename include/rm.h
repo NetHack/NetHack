@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1573943499 2019/11/16 22:31:39 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1589064684 2020/05/09 22:51:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -74,6 +74,7 @@ enum levl_typ_types {
     CLOUD     = 35,
 
     MAX_TYPE  = 36,
+    MATCH_WALL = 37,
     INVALID_TYPE = 127
 };
 
@@ -264,11 +265,13 @@ struct symparse {
 };
 
 /* misc symbol definitions */
-#define SYM_BOULDER 0
-#define SYM_INVISIBLE 1
-#define SYM_PET_OVERRIDE 2
-#define SYM_HERO_OVERRIDE 3
-#define MAXOTHER 4
+#define SYM_NOTHING 0
+#define SYM_UNEXPLORED 1
+#define SYM_BOULDER 2
+#define SYM_INVISIBLE 3
+#define SYM_PET_OVERRIDE 4
+#define SYM_HERO_OVERRIDE 5
+#define MAXOTHER 6
 
 /* linked list of symsets and their characteristics */
 struct symsetentry {
@@ -310,9 +313,20 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define SYMHANDLING(ht) (g.symset[g.currentgraphics].handling == (ht))
 
 /*
- * The 5 possible states of doors
+ *      Note:  secret doors (SDOOR) want to use both rm.doormask and
+ *      rm.wall_info but those both overload rm.flags.  SDOOR only
+ *      has 2 states (closed or locked).  However, it can't specify
+ *      D_CLOSED due to that conflicting with WM_MASK (below).  When
+ *      a secret door is revealed, the door gets set to D_CLOSED iff
+ *      it isn't set to D_LOCKED (see cvt_sdoor_to_door() in detect.c).
+ *
+ *      D_TRAPPED conflicts with W_NONDIGGABLE but the latter is not
+ *      expected to be used on door locations.
  */
 
+/*
+ * The 5 possible states of doors.
+ */
 #define D_NODOOR 0
 #define D_BROKEN 1
 #define D_ISOPEN 2
@@ -517,16 +531,19 @@ struct rm {
 #define SV7   0x80
 #define SVALL 0xFF
 
-#define doormask flags
-#define altarmask flags
-#define wall_info flags
-#define ladder flags
-#define drawbridgemask flags
-#define looted flags
-#define icedpool flags
-
+/* if these get changed or expanded, make sure wizard-mode wishing becomes
+   aware of the new usage */
+#define doormask   flags /* door, sdoor (note conflict with wall_info) */
+#define altarmask  flags /* alignment and maybe temple */
+#define wall_info  flags /* wall, sdoor (note conflict with doormask) */
+#define ladder     flags /* up or down */
+#define drawbridgemask flags /* what's underneath when the span is open */
+#define looted     flags /* used for throne, tree, fountain, sink, door */
+#define icedpool   flags /* used for ice (in case it melts) */
+/* horizonal applies to walls, doors (including sdoor); also to iron bars
+   even though they don't have separate symbols for horizontal and vertical */
 #define blessedftn horizontal /* a fountain that grants attribs */
-#define disturbed horizontal  /* a grave that has been disturbed */
+#define disturbed  horizontal /* a grave that has been disturbed */
 
 struct damage {
     struct damage *next;
@@ -584,15 +601,8 @@ struct levelflags {
 
 typedef struct {
     struct rm locations[COLNO][ROWNO];
-#ifndef MICROPORT_BUG
     struct obj *objects[COLNO][ROWNO];
     struct monst *monsters[COLNO][ROWNO];
-#else
-    struct obj *objects[1][ROWNO];
-    char *yuk1[COLNO - 1][ROWNO];
-    struct monst *monsters[1][ROWNO];
-    char *yuk2[COLNO - 1][ROWNO];
-#endif
     struct obj *objlist;
     struct obj *buriedobjlist;
     struct monst *monlist;
@@ -653,5 +663,14 @@ typedef struct {
 
 /* restricted movement, potential luck penalties */
 #define Sokoban g.level.flags.sokoban_rules
+
+/*
+ * These prototypes are in extern.h but some of the code which uses them
+ * includes config.h instead of hack.h so doesn't see extern.h.
+ */
+/* ### drawing.c ### */
+extern int FDECL(def_char_to_objclass, (CHAR_P));
+extern int FDECL(def_char_to_monclass, (CHAR_P));
+extern int FDECL(def_char_is_furniture, (CHAR_P));
 
 #endif /* RM_H */

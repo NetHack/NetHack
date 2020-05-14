@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1575755075 2019/12/07 21:44:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1587110793 2020/04/17 08:06:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -102,7 +102,15 @@ unsigned mgflags;
      *  Warning:  For speed, this makes an assumption on the order of
      *            offsets.  The order is set in display.h.
      */
-    if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) { /* a statue */
+    if ((offset = (glyph - GLYPH_NOTHING_OFF)) >= 0) {
+        idx = SYM_NOTHING + SYM_OFF_X;
+        color = NO_COLOR;
+        special |= MG_NOTHING;
+    } else if ((offset = (glyph - GLYPH_UNEXPLORED_OFF)) >= 0) {
+        idx = SYM_UNEXPLORED + SYM_OFF_X;
+        color = NO_COLOR;
+        special |= MG_UNEXPL;
+    } else if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) { /* a statue */
         idx = mons[offset].mlet + SYM_OFF_M;
         if (has_rogue_color)
             color = CLR_RED;
@@ -162,23 +170,31 @@ unsigned mgflags;
                        || g.showsyms[idx]
                           == g.showsyms[S_water + SYM_OFF_P])) {
             special |= MG_BW_LAVA;
+        /* similar for floor [what about empty doorway?] and ice */
+        } else if (!iflags.use_color && offset == S_ice
+                   && (g.showsyms[idx] == g.showsyms[S_room + SYM_OFF_P]
+                       || g.showsyms[idx]
+                          == g.showsyms[S_darkroom + SYM_OFF_P])) {
+            special |= MG_BW_ICE;
         } else if (offset == S_altar && iflags.use_color) {
+            int amsk = altarmask_at(x, y); /* might be a mimic */
+
             if ((g.glyphmap_perlevel_flags & GMAP_ALTARCOLOR)
-                && (levl[x][y].altarmask & AM_SHRINE)) {
+                && (amsk & AM_SHRINE) != 0) {
                 /* high altar */
                 color = CLR_BRIGHT_MAGENTA;
             } else {
-                switch (levl[x][y].altarmask & AM_MASK) {
+                switch (amsk & AM_MASK) {
 #if 0   /*
-         * On OSX with XTERM=xterm-color256 these render as
+         * On OSX with TERM=xterm-color256 these render as
          *  white -> tty: gray, curses: ok
          *  gray  -> both tty and curses: black
          *  black -> both tty and curses: blue
          *  red   -> both tty and curses: ok.
-         * Since the colors have specific associations (mainly with
-         * the unicorns matched with each alignment), we shouldn't use
+         * Since the colors have specific associations (with the
+         * unicorns matched with each alignment), we shouldn't use
          * scrambled colors and we don't have sufficient information
-         * to handle platform-specific variations.
+         * to handle platform-specific color variations.
          */
                 case AM_LAWFUL:  /* 4 */
                     color = CLR_WHITE;
@@ -311,8 +327,8 @@ unsigned mgflags;
     ch = g.showsyms[idx];
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
-    if (!has_color(color) ||
-            ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL) && !has_rogue_color))
+    if (!has_color(color)
+        || ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL) && !has_rogue_color))
 #endif
         color = NO_COLOR;
     *ochar = (int) ch;
@@ -434,6 +450,28 @@ const char *str;
 
     /* now send it to the normal putstr */
     putstr(window, attr, decode_mixed(buf, str));
+}
+
+/*
+ * Window port helper function for menu invert routines to move the decision
+ * logic into one place instead of 7 different window-port routines.
+ */
+boolean
+menuitem_invert_test(mode, itemflags, is_selected)
+int mode;
+unsigned itemflags;     /* The itemflags for the item               */
+boolean is_selected;    /* The current selection status of the item */
+{
+    boolean skipinvert = (itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0;
+    
+    if ((iflags.menuinvertmode == 1 || iflags.menuinvertmode == 2)
+        && !mode && skipinvert && !is_selected)
+        return FALSE;
+    else if (iflags.menuinvertmode == 2
+        && !mode && skipinvert && is_selected)
+        return TRUE;
+    else
+        return TRUE;
 }
 
 /*mapglyph.c*/

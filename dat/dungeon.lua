@@ -6,6 +6,7 @@ dungeon = {
       base = 25,
       range = 5,
       alignment = "unaligned",
+      themerooms = "themerms.lua",
       branches = {
          {
             name = "The Gnomish Mines",
@@ -167,6 +168,7 @@ dungeon = {
       range = 2,
       alignment = "lawful",
       flags = { "mazelike" },
+      lvlfill = "minefill",
       levels = {
          {
             name = "minetn",
@@ -178,7 +180,8 @@ dungeon = {
          },
          {
             name = "minend",
-            bonetag = "E",
+--          3.7.0: minend changed to no-bones to simplify achievement tracking
+--          bonetag = "E"
             base = -1,
             nlevels = 3
          },

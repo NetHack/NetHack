@@ -1,13 +1,10 @@
-/* NetHack 3.6	rumors.c	$NHDT-Date: 1545132266 2018/12/18 11:24:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.7	rumors.c	$NHDT-Date: 1583445339 2020/03/05 21:55:39 $  $NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 #include "dlb.h"
-#include "sfproto.h"
-
 
 /*      [note: this comment is fairly old, but still accurate for 3.1]
  * Rumors have been entirely rewritten to speed up the access.  This is
@@ -150,9 +147,10 @@ boolean exclude_cookie;
         couldnt_open_file(RUMORFILE);
         g.true_rumor_size = -1; /* don't try to open it again */
     }
-/* this is safe either way, so do it always since we can't get the definition
- * out of makedefs.c
- */
+
+    /* this is safe either way, so do it always since we can't get the
+     * definition out of makedefs.c
+     */
 #define PAD_RUMORS_TO
 #ifdef PAD_RUMORS_TO
     /* remove padding */
@@ -179,10 +177,8 @@ rumor_check()
     char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
 
     if (g.true_rumor_size < 0L) { /* we couldn't open RUMORFILE */
-    no_rumors:
+ no_rumors:
         pline("rumors not accessible.");
-        if (rumors)
-            (void) dlb_fclose(rumors);
         return;
     }
 
@@ -194,29 +190,27 @@ rumor_check()
         rumor_buf[0] = '\0';
         if (g.true_rumor_size == 0L) { /* if this is 1st outrumor() */
             init_rumors(rumors);
-            if (g.true_rumor_size < 0L)
+            if (g.true_rumor_size < 0L) {
+                rumors = (dlb *) 0; /* init_rumors() closes it upon failure */
                 goto no_rumors; /* init failed */
+            }
         }
         tmpwin = create_nhwindow(NHW_TEXT);
 
         /*
          * reveal the values.
          */
-
-        Sprintf(
-            rumor_buf,
-            "T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) g.true_rumor_start, g.true_rumor_start, g.true_rumor_end,
-            (unsigned long) g.true_rumor_end, g.true_rumor_size,
-            (unsigned long) g.true_rumor_size);
+        Sprintf(rumor_buf,
+               "T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+            (long) g.true_rumor_start, g.true_rumor_start,
+            g.true_rumor_end, (unsigned long) g.true_rumor_end,
+            g.true_rumor_size,(unsigned long) g.true_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
-
-        Sprintf(
-            rumor_buf,
-            "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) g.false_rumor_start, g.false_rumor_start, g.false_rumor_end,
-            (unsigned long) g.false_rumor_end, g.false_rumor_size,
-            (unsigned long) g.false_rumor_size);
+        Sprintf(rumor_buf,
+               "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+            (long) g.false_rumor_start, g.false_rumor_start,
+            g.false_rumor_end, (unsigned long) g.false_rumor_end,
+            g.false_rumor_size, (unsigned long) g.false_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
 
         /*
@@ -282,23 +276,26 @@ int FDECL((*rng), (int));
     dlb *fh;
 
     buf[0] = '\0';
-
     fh = dlb_fopen(fname, "r");
-
     if (fh) {
-        /* TODO: cache sizetxt, starttxt, endtxt. maybe cache file contents?
-         */
-        long sizetxt = 0, starttxt = 0, endtxt = 0, tidbit = 0;
+        /* TODO: cache sizetxt, starttxt, endtxt. maybe cache file contents? */
+        long sizetxt = 0L, starttxt = 0L, endtxt = 0L, tidbit = 0L;
         char *endp, line[BUFSZ], xbuf[BUFSZ];
-        (void) dlb_fgets(line, sizeof line,
-                         fh); /* skip "don't edit" comment */
+
+        /* skip "don't edit" comment */
+        (void) dlb_fgets(line, sizeof line, fh);
 
         (void) dlb_fseek(fh, 0L, SEEK_CUR);
         starttxt = dlb_ftell(fh);
         (void) dlb_fseek(fh, 0L, SEEK_END);
         endtxt = dlb_ftell(fh);
         sizetxt = endtxt - starttxt;
-        tidbit = rng(sizetxt);
+        /* might be zero (only if file is empty); should complain in that
+           case but if could happen over and over, also the suggestion
+           that save and restore might fix the problem wouldn't be useful */
+        if (sizetxt < 1L)
+            return buf;
+        tidbit = (*rng)(sizetxt);
 
         (void) dlb_fseek(fh, starttxt + tidbit, SEEK_SET);
         (void) dlb_fgets(line, sizeof line, fh);
@@ -388,20 +385,14 @@ void
 save_oracles(nhfp)
 NHFILE *nhfp;
 {
-    int i;
-
     if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
-            if (nhfp->fieldlevel)
-                sfo_unsigned(nhfp, &g.oracle_cnt, "oracles", "g.oracle_cnt", 1);
+                bwrite(nhfp->fd, (genericptr_t) &g.oracle_cnt,
+                       sizeof g.oracle_cnt);
             if (g.oracle_cnt) {
                 if (nhfp->structlevel) {
-                    bwrite(nhfp->fd, (genericptr_t)g.oracle_loc, g.oracle_cnt * sizeof (long));
-                }
-                if (nhfp->fieldlevel) {
-                    for (i = 0; (unsigned) i < g.oracle_cnt; ++i)
-                        sfo_ulong(nhfp, &g.oracle_loc[i], "oracles", "oracle loc", 1);
+                    bwrite(nhfp->fd, (genericptr_t) g.oracle_loc,
+                           g.oracle_cnt * sizeof (long));
                 }
             }
     }
@@ -417,20 +408,14 @@ void
 restore_oracles(nhfp)
 NHFILE *nhfp;
 {
-    int i;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
-    if (nhfp->fieldlevel)
-        sfi_unsigned(nhfp, &g.oracle_cnt, "oracles", "g.oracle_cnt", 1);
 
     if (g.oracle_cnt) {
         g.oracle_loc = (unsigned long *) alloc(g.oracle_cnt * sizeof(long));
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) g.oracle_loc, g.oracle_cnt * sizeof (long));
-        }
-        if (nhfp->fieldlevel) {
-            for (i = 0; (unsigned) i < g.oracle_cnt; ++i)
-                sfi_ulong(nhfp, &g.oracle_loc[i], "oracles", "g.oracle_loc", 1);
+            mread(nhfp->fd, (genericptr_t) g.oracle_loc,
+                  g.oracle_cnt * sizeof (long));
         }
         g.oracle_flg = 1; /* no need to call init_oracles() */
     }
@@ -473,7 +458,7 @@ boolean delphi;
         if (delphi)
             putstr(tmpwin, 0,
                    special
-                     ? "The Oracle scornfully takes all your money and says:"
+                     ? "The Oracle scornfully takes all your gold and says:"
                      : "The Oracle meditates for a moment and then intones:");
         else
             putstr(tmpwin, 0, "The message reads:");
@@ -513,7 +498,7 @@ struct monst *oracl;
         pline("%s is in no mood for consultations.", Monnam(oracl));
         return 0;
     } else if (!umoney) {
-        You("have no money.");
+        You("have no gold.");
         return 0;
     }
 
@@ -525,7 +510,7 @@ struct monst *oracl;
         return 0;
     case 'y':
         if (umoney < (long) minor_cost) {
-            You("don't even have enough money for that!");
+            You("don't even have enough gold for that!");
             return 0;
         }
         u_pay = minor_cost;
@@ -543,6 +528,8 @@ struct monst *oracl;
     }
     money2mon(oracl, (long) u_pay);
     g.context.botl = 1;
+    if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
+        record_achievement(ACH_ORCL);
     add_xpts = 0; /* first oracle of each type gives experience points */
     if (u_pay == minor_cost) {
         outrumor(1, BY_ORACLE);

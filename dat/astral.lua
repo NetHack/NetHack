@@ -39,28 +39,28 @@ for i=1,2 do
    -- 3.6.[01]: 75% chance that both sides opened up, 25% that neither did;
    -- 3.6.2: 60% twice == 36% chance that both sides open up, 24% left side
    -- only, 24% right side only, 16% that neither side opens up
-   local hall = selection.new()
-   if math.random(0, 99) < 60 then
+   local hall;
+   if percent(60) then
      if i == 1 then
         des.terrain(selection.area(17,14, 30,18),".")
         des.wallify()
         -- temporarily close off the area to be filled so that it doesn't cover
         -- the entire entry area
         des.terrain(33,18, "|")
-        hall:floodfill(30,16)
+        hall = selection.floodfill(30,16)
         -- re-connect the opened wing with the rest of the map
         des.terrain(33,18, ".")
      else
         des.terrain(selection.area(44,14, 57,18),".")
         des.wallify()
         des.terrain(41,18, "|")
-        hall:floodfill(44,16)
+        hall = selection.floodfill(44,16)
         des.terrain(41,18, ".")
      end
      -- extra monsters; was [6 + 3d4] when both wings were opened up at once
      for i=1,3 + math.random(2 - 1,2*3) do
         des.monster({ id="Angel", coord = { hall:rndcoord(1) }, align="noalign", peaceful=0 })
-        if math.random(0,99) < 50 then
+        if percent(50) then
            des.monster({ coord = { hall:rndcoord(1) }, peaceful=0 })
         end
      end

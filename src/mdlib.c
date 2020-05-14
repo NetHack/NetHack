@@ -47,7 +47,12 @@
 #endif
 #endif  /* !MAKEDEFS_C */
 
-#if defined(MAKEDEFS_C) || defined(CROSSCOMPILE_TARGET)
+/* shorten up some lines */
+#if defined(CROSSCOMPILE_TARGET) || defined(OPTIONS_AT_RUNTIME)
+#define FOR_RUNTIME
+#endif
+
+#if defined(MAKEDEFS_C) || defined(FOR_RUNTIME)
 /* REPRODUCIBLE_BUILD will change this to TRUE */
 static boolean date_via_env = FALSE;
 
@@ -58,9 +63,18 @@ static char *FDECL(bannerc_string, (char *, const char *));
 static int FDECL(case_insensitive_comp, (const char *, const char *));
 static void NDECL(make_version);
 static char *FDECL(eos, (char *));
-#endif /* MAKEDEFS_C || CROSSCOMPILE_TARGET */
+static char *FDECL(mdlib_strsubst, (char *, const char *, const char *));
+#endif /* MAKEDEFS_C || FOR_RUNTIME */
+#if !defined(MAKEDEFS_C) && defined(WIN32)
+extern int GUILaunched;
+#endif
+
+/* these two are in extern.h but we don't include hack.h */
+void NDECL(runtime_info_init);
+const char *FDECL(do_runtime_info, (int *));
 
 void NDECL(build_options);
+static int NDECL(count_and_validate_winopts);
 static void FDECL(opt_out_words, (char *, int *));
 static void NDECL(build_savebones_compat_string);
 static int idxopttext, done_runtime_opt_init_once = 0;
@@ -74,6 +88,7 @@ static const char opt_indent[] = "    ";
 struct win_info {
     const char *id, /* DEFAULT_WINDOW_SYS string */
         *name;      /* description, often same as id */
+    boolean valid;
 };
 
 static struct win_info window_opts[] = {
@@ -85,42 +100,43 @@ static struct win_info window_opts[] = {
          confusing to most users (and it will already be listed separately
          in the compiled options section so users aware of it can find it) */
 #ifdef MSDOS
-      "traditional text with optional 'tiles' graphics"
+      "traditional text with optional 'tiles' graphics",
 #else
       /* assume that one or more of IBMgraphics, DECgraphics, or MACgraphics
          can be enabled; we can't tell from here whether that is accurate */
-      "traditional text with optional line-drawing"
+      "traditional text with optional line-drawing",
 #endif
+      TRUE
     },
 #endif /*TTY_GRAPHICS */
 #ifdef CURSES_GRAPHICS
-    { "curses", "terminal-based graphics" },
+    { "curses", "terminal-based graphics", TRUE },
 #endif
 #ifdef X11_GRAPHICS
-    { "X11", "X11" },
+    { "X11", "X11", TRUE },
 #endif
 #ifdef QT_GRAPHICS /* too vague; there are multiple incompatible versions */
-    { "Qt", "Qt" },
+    { "Qt", "Qt", TRUE },
 #endif
 #ifdef GNOME_GRAPHICS /* unmaintained/defunct */
-    { "Gnome", "Gnome" },
+    { "Gnome", "Gnome", TRUE },
 #endif
 #ifdef MAC /* defunct OS 9 interface */
-    { "mac", "Mac" },
+    { "mac", "Mac", TRUE },
 #endif
 #ifdef AMIGA_INTUITION /* unmaintained/defunct */
-    { "amii", "Amiga Intuition" },
+    { "amii", "Amiga Intuition", TRUE },
 #endif
 #ifdef GEM_GRAPHICS /* defunct Atari interface */
-    { "Gem", "Gem" },
+    { "Gem", "Gem", TRUE },
 #endif
 #ifdef MSWIN_GRAPHICS /* win32 */
-    { "mswin", "mswin" },
+    { "mswin", "mswin", TRUE },
 #endif
 #ifdef BEOS_GRAPHICS /* unmaintained/defunct */
-    { "BeOS", "BeOS InterfaceKit" },
+    { "BeOS", "BeOS InterfaceKit", TRUE },
 #endif
-    { 0, 0 }
+    { 0, 0, FALSE }
 };
 
 /*
@@ -222,7 +238,7 @@ make_version()
     return;
 }
 
-#if defined(MAKEDEFS_C) || defined(CROSSCOMPILE_TARGET)
+#if defined(MAKEDEFS_C) || defined(FOR_RUNTIME)
 
 static char *
 version_string(outbuf, delim)
@@ -270,7 +286,7 @@ const char *build_date;
     return outbuf;
 }
 
-/* still within #if MAKDEFS_C || CROSSCOMPILE_TARGET */
+/* still within #if MAKDEFS_C || FOR_RUNTIME */
 
 static char *
 bannerc_string(outbuf, build_date)
@@ -303,7 +319,7 @@ const char *build_date;
     return outbuf;
 }
 
-#endif /* MAKEDEFS_C || CROSSCOMPILE_TARGET */
+#endif /* MAKEDEFS_C || FOR_RUNTIME */
 
 static int
 case_insensitive_comp(s1, s2)
@@ -332,6 +348,25 @@ char *str;
     while (*str)
         str++;
     return str;
+}
+
+static char *
+mdlib_strsubst(bp, orig, replacement)
+char *bp;
+const char *orig, *replacement;
+{
+    char *found, buf[BUFSZ];
+
+    if (bp) {
+        /* [this could be replaced by strNsubst(bp, orig, replacement, 1)] */
+        found = strstr(bp, orig);
+        if (found) {
+            Strcpy(buf, found + strlen(orig));
+            Strcpy(found, replacement);
+            Strcat(bp, buf);
+        }
+    }
+    return bp;
 }
 
 static char save_bones_compat_buf[BUFSZ];
@@ -419,7 +454,7 @@ static const char *build_opts[] = {
 #ifdef PANICLOG
     "errors and warnings log file",
 #endif
-#ifdef MAIL_STRUCTURES
+#ifdef MAIL
     "mail daemon",
 #endif
 #if defined(GNUDOS) || defined(__DJGPP__)
@@ -540,6 +575,29 @@ static const char *build_opts[] = {
     "and basic NetHack features"
 };
 
+int
+count_and_validate_winopts(VOID_ARGS)
+{
+    int i, cnt = 0;
+
+    /* window_opts has a fencepost entry at the end */
+    for (i = 0; i < SIZE(window_opts) - 1; i++) {
+#if !defined(MAKEDEFS_C) && defined(FOR_RUNTIME)
+#ifdef WIN32
+        window_opts[i].valid = FALSE;
+        if ((GUILaunched
+             && case_insensitive_comp(window_opts[i].id, "mswin") != 0)
+            || (!GUILaunched
+                && case_insensitive_comp(window_opts[i].id, "mswin") == 0))
+            continue;
+#endif
+#endif /* !MAKEDEFS_C && FOR_RUNTIME */
+        ++cnt;
+        window_opts[i].valid = TRUE;
+    }
+    return cnt;
+}
+
 static void
 opt_out_words(str, length_p)
 char *str; /* input, but modified during processing */
@@ -575,8 +633,14 @@ void
 build_options()
 {
     char buf[BUFSZ];
-    int i, length, winsyscnt;
+    int i, length, winsyscnt, cnt = 0;
+    const char *defwinsys = DEFAULT_WINDOW_SYS;
 
+#if !defined (MAKEDEFS_C) && defined(FOR_RUNTIME)
+#ifdef WIN32
+    defwinsys = GUILaunched ? "mswin" : "tty";
+#endif
+#endif
     build_savebones_compat_string();
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
@@ -602,6 +666,14 @@ build_options()
     optbuf[0] = '\0';
     length = COLNO + 1; /* force 1st item onto new line */
     for (i = 0; i < SIZE(build_opts); i++) {
+#if !defined(MAKEDEFS_C) && defined(FOR_RUNTIME)
+#ifdef WIN32
+        /* ignore the console entry if GUI version */
+        if (GUILaunched
+            && !strcmp("screen control via WIN32 console I/O", build_opts[i]))
+            continue;
+#endif
+#endif /* !MAKEDEFS_C && FOR_RUNTIME */
         opt_out_words(strcat(strcpy(buf, build_opts[i]),
                              (i < SIZE(build_opts) - 1) ? "," : "."),
                       &length);
@@ -610,7 +682,7 @@ build_options()
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
     optbuf[0] = '\0';
-    winsyscnt = SIZE(window_opts) - 1;
+    winsyscnt = count_and_validate_winopts();
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
@@ -621,7 +693,10 @@ build_options()
         idxopttext++;
     optbuf[0] = '\0';
     length = COLNO + 1; /* force 1st item onto new line */
-    for (i = 0; i < winsyscnt; i++) {
+
+    for (i = 0; i < SIZE(window_opts) - 1; i++) {
+        if (!window_opts[i].valid)
+            continue;
         Sprintf(buf, "\"%s\"", window_opts[i].id);
         if (strcmp(window_opts[i].name, window_opts[i].id))
             Sprintf(eos(buf), " (%s)", window_opts[i].name);
@@ -630,22 +705,26 @@ build_options()
          * 2 : foo and bar  (note no period; comes from 'with default' below)
          * 3+: for, bar, and quux
          */
-        opt_out_words(strcat(buf, (winsyscnt == 1) ? "." /* no 'default' */
-                                  : (winsyscnt == 2 && i == 0) ? " and"
-                                    : (i == winsyscnt - 2) ? ", and"
-                                      : ","),
-                      &length);
+        if (cnt != (winsyscnt - 1)) {
+            Strcat(buf, (winsyscnt == 1) ? "." /* no 'default' */
+                          : (winsyscnt == 2 && cnt == 0) ? " and"
+                            : (cnt == winsyscnt - 2) ? ", and"
+                              : ",");
+        }
+        opt_out_words(buf, &length);
+        cnt++;
     }
-    if (winsyscnt > 1) {
-        Sprintf(buf, "with a default of \"%s\".", DEFAULT_WINDOW_SYS);
+    if (cnt > 1) {
+        Sprintf(buf, ", with a default of \"%s\".", defwinsys);
         opt_out_words(buf, &length);
     }
+    (void) mdlib_strsubst(optbuf, " , ", ", ");
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
     optbuf[0] = '\0';
 
-#if defined(MAKEDEFS_C) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_TARGET))
+#if defined(MAKEDEFS_C) || defined(FOR_RUNTIME)
     {
         static const char *lua_info[] = {
  "", "NetHack 3.7.* uses the 'Lua' interpreter to process some data:", "",
@@ -673,7 +752,7 @@ build_options()
                 idxopttext++;
         }
     }
-#endif /* MAKEDEFS_C || (CROSSCOMPILE && CROSSCOMPILE_TARGET) */
+#endif /* MAKEDEFS_C || FOR_RUNTIME */
 
     /* end with a blank line */
     opttext[idxopttext] = strdup("");
@@ -754,7 +833,7 @@ runtime_info_init()
             extract_field(tmpbuf, rttimebuf, 2, 18);  /* sec  */
             t.tm_sec = atoi(tmpbuf);
             timeresult = mktime(&t);
-#if defined(CROSSCOMPILE_TARGET) && !defined(MAKEDEFS_C)
+#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET)
             BUILD_TIME = (unsigned long) timeresult;
             BUILD_DATE = rttimebuf;
 #endif
@@ -762,7 +841,7 @@ runtime_info_init()
             nhUse(strp);
 #endif /* __DATE__ && __TIME__ */
 
-#if defined(CROSSCOMPILE_TARGET) && !defined(MAKEDEFS_C)
+#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET)
             VERSION_NUMBER = version.incarnation;
             VERSION_FEATURES = version.feature_set;
 #ifdef MD_IGNORED_FEATURES
@@ -781,7 +860,7 @@ runtime_info_init()
 #ifdef NETHACK_HOST_GIT_BRANCH
             NETHACK_GIT_BRANCH = strdup(NETHACK_HOST_GIT_BRANCH);
 #endif
-#endif /* CROSSCOMPILE_TARGET && !MAKEDEFS_C */
+#endif /* !MAKEDEFS_C  && CROSSCOMPILE_TARGET */
 	}
         idxopttext = 0;
         build_options();

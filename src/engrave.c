@@ -4,11 +4,8 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
-#include "sfproto.h"
 
-
-static NEARDATA struct engr *head_engr;
+struct engr *head_engr;
 static const char *NDECL(blengr);
 
 char *
@@ -1194,11 +1191,6 @@ NHFILE *nhfp;
                 bwrite(nhfp->fd, (genericptr_t)&(ep->engr_lth), sizeof(ep->engr_lth));
                 bwrite(nhfp->fd, (genericptr_t)ep, sizeof(struct engr) + ep->engr_lth);
             }
-            if (nhfp->fieldlevel) {
-                sfo_unsigned(nhfp, &(ep->engr_lth), "engravings", "engr_lth", 1);
-                sfo_engr(nhfp, ep, "engravings", "engr", 1);
-                sfo_str(nhfp, ep->engr_txt, "engravings", "engr_txt", ep->engr_lth);
-            }
         }
         if (release_data(nhfp))
             dealloc_engr(ep);
@@ -1206,8 +1198,6 @@ NHFILE *nhfp;
     if (perform_bwrite(nhfp)) {
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t)&no_more_engr, sizeof no_more_engr);
-        if (nhfp->fieldlevel)
-           sfo_unsigned(nhfp, &no_more_engr, "engravings", "engr_lth", 1);
     }
     if (release_data(nhfp))
         head_engr = 0;
@@ -1224,19 +1214,12 @@ NHFILE *nhfp;
     while (1) {
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &lth, sizeof(unsigned));
-        if (nhfp->fieldlevel)
-            sfi_unsigned(nhfp, &lth, "engravings", "engr_lth", 1);
 
         if (lth == 0)
             return;
         ep = newengr(lth);
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) ep, sizeof(struct engr) + lth);
-        }
-        if (nhfp->fieldlevel) {
-            sfi_engr(nhfp, ep, "engravings", "engr", 1);
-            ep->engr_txt = (char *) (ep + 1);
-            sfi_str(nhfp, ep->engr_txt, "engravings", "engr_txt", lth);
         }
         ep->nxt_engr = head_engr;
         head_engr = ep;

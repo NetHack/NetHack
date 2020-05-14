@@ -28,7 +28,6 @@
 #ifdef _DCC
 #include <stdlib.h>
 #define _SIZE_T
-#define DCC30_BUG /* A bitfield bug (from dog.c, others) in DICE 3.0. */
 #endif
 
 #ifndef __GNUC__

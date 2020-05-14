@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1575245062 2019/12/02 00:04:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.267 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1588189423 2020/04/29 19:43:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.297 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,9 +15,11 @@
 
 static void FDECL(loot_classify, (Loot *, struct obj *));
 static char *FDECL(loot_xname, (struct obj *));
+static int FDECL(invletter_value, (CHAR_P));
 static int FDECL(CFDECLSPEC sortloot_cmp, (const genericptr,
                                                const genericptr));
 static void NDECL(reorder_invent);
+static struct obj *FDECL(addinv_core0, (struct obj *, struct obj *));
 static void FDECL(noarmor, (BOOLEAN_P));
 static void FDECL(invdisp_nothing, (const char *, const char *));
 static boolean FDECL(worn_wield_only, (struct obj *));
@@ -294,6 +296,17 @@ struct obj *obj;
     return res;
 }
 
+static int
+invletter_value(c)
+char c;
+{
+    return ('a' <= c && c <= 'z') ? (c - 'a' + 2)
+        : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
+        : (c == '$') ? 1
+        : (c == '#') ? 1 + 52 + 1
+        : 1 + 52 + 1 + 1; /* none of the above */
+}
+
 /* qsort comparison routine for sortloot() */
 static int CFDECLSPEC
 sortloot_cmp(vptr1, vptr2)
@@ -305,7 +318,7 @@ const genericptr vptr2;
     struct obj *obj1 = sli1->obj,
                *obj2 = sli2->obj;
     char *nam1, *nam2;
-    int val1, val2, c, namcmp;
+    int val1, val2, namcmp;
 
     /* order by object class unless we're doing by-invlet without sortpack */
     if ((g.sortlootmode & (SORTLOOT_PACK | SORTLOOT_INVLET))
@@ -350,18 +363,8 @@ const genericptr vptr2;
 
     /* order by assigned inventory letter */
     if ((g.sortlootmode & SORTLOOT_INVLET) != 0) {
-        c = obj1->invlet;
-        val1 = ('a' <= c && c <= 'z') ? (c - 'a' + 2)
-               : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
-                 : (c == '$') ? 1
-                   : (c == '#') ? 1 + 52 + 1
-                     : 1 + 52 + 1 + 1; /* none of the above */
-        c = obj2->invlet;
-        val2 = ('a' <= c && c <= 'z') ? (c - 'a' + 2)
-               : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
-                 : (c == '$') ? 1
-                   : (c == '#') ? 1 + 52 + 1
-                     : 1 + 52 + 1 + 1; /* none of the above */
+        val1 = invletter_value(obj1->invlet);
+        val2 = invletter_value(obj2->invlet);
         if (val1 != val2)
             return val1 - val2;
     }
@@ -808,22 +811,22 @@ struct obj *obj;
         if (u.uhave.amulet)
             impossible("already have amulet?");
         u.uhave.amulet = 1;
-        u.uachieve.amulet = 1;
+        record_achievement(ACH_AMUL);
     } else if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
         if (u.uhave.menorah)
             impossible("already have candelabrum?");
         u.uhave.menorah = 1;
-        u.uachieve.menorah = 1;
+        record_achievement(ACH_CNDL);
     } else if (obj->otyp == BELL_OF_OPENING) {
         if (u.uhave.bell)
             impossible("already have silver bell?");
         u.uhave.bell = 1;
-        u.uachieve.bell = 1;
+        record_achievement(ACH_BELL);
     } else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
         if (u.uhave.book)
             impossible("already have the book?");
         u.uhave.book = 1;
-        u.uachieve.book = 1;
+        record_achievement(ACH_BOOK);
     } else if (obj->oartifact) {
         if (is_quest_artifact(obj)) {
             if (u.uhave.questart)
@@ -834,21 +837,15 @@ struct obj *obj;
         set_artifact_intrinsic(obj, 1, W_ART);
     }
 
-    /* "special achievements" aren't discoverable during play, they
-       end up being recorded in XLOGFILE at end of game, nowhere else;
-       record_achieve_special overloads corpsenm which is ordinarily
-       initialized to NON_PM (-1) rather than to 0; any special prize
-       must never be a corpse, egg, tin, figurine, or statue because
-       their use of obj->corpsenm for monster type would conflict,
-       nor be a leash (corpsenm overloaded for m_id of leashed
-       monster) or a novel (corpsenm overloaded for novel index) */
+    /* "special achievements"; revealed in end of game disclosure and
+       dumplog, originally just recorded in XLOGFILE */
     if (is_mines_prize(obj)) {
-        u.uachieve.mines_luckstone = 1;
-        obj->record_achieve_special = NON_PM;
+        record_achievement(ACH_MINE_PRIZE);
+        g.context.achieveo.mines_prize_oid = 0; /* done with luckstone o_id */
         obj->nomerge = 0;
     } else if (is_soko_prize(obj)) {
-        u.uachieve.finish_sokoban = 1;
-        obj->record_achieve_special = NON_PM;
+        record_achievement(ACH_SOKO_PRIZE);
+        g.context.achieveo.soko_prize_oid = 0; /* done with bag/amulet o_id */
         obj->nomerge = 0;
     }
 }
@@ -877,9 +874,9 @@ struct obj *obj;
  * Add obj to the hero's inventory.  Make sure the object is "free".
  * Adjust hero attributes as necessary.
  */
-struct obj *
-addinv(obj)
-struct obj *obj;
+static struct obj *
+addinv_core0(obj, other_obj)
+struct obj *obj, *other_obj;
 {
     struct obj *otmp, *prev;
     int saved_otyp = (int) obj->otyp; /* for panic */
@@ -896,6 +893,20 @@ struct obj *obj;
     obj->was_thrown = 0;       /* not meaningful for invent */
 
     addinv_core1(obj);
+
+    /* for addinv_before(); if something has been removed and is now being
+       reinserted, try to put it in the same place instead of merging or
+       placing at end; for thrown-and-return weapon with !fixinv setting */
+    if (other_obj) {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj) {
+            if (otmp->nobj == other_obj) {
+                obj->nobj = other_obj;
+                otmp->nobj = obj;
+                obj->where = OBJ_INVENT;
+                goto added;
+            }
+        }
+    }
 
     /* merge with quiver in preference to any other inventory slot
        in case quiver and wielded weapon are both eligible; adding
@@ -941,6 +952,22 @@ struct obj *obj;
     carry_obj_effects(obj); /* carrying affects the obj */
     update_inventory();
     return obj;
+}
+
+/* add obj to the hero's inventory in the default fashion */
+struct obj *
+addinv(obj)
+struct obj *obj;
+{
+    return addinv_core0(obj, (struct obj *) 0);
+}
+
+/* add obj to the hero's inventory by inserting in front of a specific item */
+struct obj *
+addinv_before(obj, other_obj)
+struct obj *obj, *other_obj;
+{
+    return addinv_core0(obj, other_obj);
 }
 
 /*
@@ -1044,7 +1071,7 @@ const char *drop_fmt, *drop_arg, *hold_msg;
     if (drop_fmt)
         pline(drop_fmt, drop_arg);
     obj->nomerge = 0;
-    if (can_reach_floor(TRUE)) {
+    if (can_reach_floor(TRUE) || u.uswallow) {
         dropx(obj);
     } else {
         freeinv(obj);
@@ -1288,6 +1315,23 @@ have_lizard()
             return  TRUE;
     return FALSE;
 }
+
+struct obj *
+u_carried_gloves() {
+    struct obj *otmp, *gloves = (struct obj *) 0;
+
+    if (uarmg) {
+        gloves = uarmg;
+    } else {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
+            if (is_gloves(otmp)) {
+                gloves = otmp;
+                break;
+            }
+    }
+    return gloves;
+}
+
 
 /* 3.6 tribute */
 struct obj *
@@ -1537,7 +1581,9 @@ register const char *let, *word;
              || (!strcmp(word, "rub")
                  && ((otmp->oclass == TOOL_CLASS && otyp != OIL_LAMP
                       && otyp != MAGIC_LAMP && otyp != BRASS_LANTERN)
-                     || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
+                     || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))
+                     || (otmp->oclass == FOOD_CLASS
+                         && otmp->otyp != LUMP_OF_ROYAL_JELLY)))
              || (!strcmp(word, "use or apply")
                  /* Picks, axes, pole-weapons, bullwhips */
                  && ((otmp->oclass == WEAPON_CLASS
@@ -1549,8 +1595,10 @@ register const char *let, *word;
                          && (otyp != POT_OIL || !otmp->dknown
                              || !objects[POT_OIL].oc_name_known))
                      || (otmp->oclass == FOOD_CLASS
-                         && otyp != CREAM_PIE && otyp != EUCALYPTUS_LEAF)
+                         && otyp != CREAM_PIE && otyp != EUCALYPTUS_LEAF
+                         && otyp != LUMP_OF_ROYAL_JELLY)
                      || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
+             || (!strcmp(word, "rub the royal jelly on") && otmp->otyp != EGG)
              || (!strcmp(word, "invoke")
                  && !otmp->oartifact
                  && !objects[otyp].oc_unique
@@ -2642,7 +2690,7 @@ long *out_cnt;
     sortedinvent = sortloot(&g.invent, sortflags, FALSE,
                             (boolean FDECL((*), (OBJ_P))) 0);
 
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     if (wizard && iflags.override_ID) {
         int unid_cnt;
@@ -2654,11 +2702,11 @@ long *out_cnt;
             Sprintf(eos(prompt),
                     " -- unidentified or partially identified item%s",
                     plur(unid_cnt));
-        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt, MENU_UNSELECTED);
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt, MENU_ITEMFLAGS_NONE);
         if (!unid_cnt) {
             add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "(all items are permanently identified already)",
-                     MENU_UNSELECTED);
+                     MENU_ITEMFLAGS_NONE);
             gotsomething = TRUE;
         } else {
             any.a_obj = &wizid_fakeobj;
@@ -2673,17 +2721,17 @@ long *out_cnt;
                 Sprintf(eos(prompt), " (%s for all)",
                         visctrl(iflags.override_ID));
             add_menu(win, NO_GLYPH, &any, '_', iflags.override_ID, ATR_NONE,
-                     prompt, MENU_UNSELECTED);
+                     prompt, MENU_ITEMFLAGS_NONE);
             gotsomething = TRUE;
         }
    } else if (xtra_choice) {
         /* wizard override ID and xtra_choice are mutually exclusive */
         if (flags.sortpack)
             add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-                     "Miscellaneous", MENU_UNSELECTED);
+                     "Miscellaneous", MENU_ITEMFLAGS_NONE);
         any.a_char = HANDS_SYM; /* '-' */
         add_menu(win, NO_GLYPH, &any, HANDS_SYM, 0, ATR_NONE,
-                 xtra_choice, MENU_UNSELECTED);
+                 xtra_choice, MENU_ITEMFLAGS_NONE);
         gotsomething = TRUE;
     }
  nextclass:
@@ -2700,7 +2748,7 @@ long *out_cnt;
                 add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                          let_to_name(*invlet, FALSE,
                                      (want_reply && iflags.menu_head_objsym)),
-                         MENU_UNSELECTED);
+                         MENU_ITEMFLAGS_NONE);
                 classcount++;
             }
             if (wizid)
@@ -2709,7 +2757,7 @@ long *out_cnt;
                 any.a_char = ilet;
             add_menu(win, obj_to_glyph(otmp, rn2_on_display_rng), &any, ilet,
                      wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
-                     ATR_NONE, doname(otmp), MENU_UNSELECTED);
+                     ATR_NONE, doname(otmp), MENU_ITEMFLAGS_NONE);
             gotsomething = TRUE;
         }
     }
@@ -2724,10 +2772,10 @@ long *out_cnt;
     if (iflags.force_invmenu && lets && want_reply) {
         any = cg.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-                 "Special", MENU_UNSELECTED);
+                 "Special", MENU_ITEMFLAGS_NONE);
         any.a_char = '*';
         add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
-                 "(list everything)", MENU_UNSELECTED);
+                 "(list everything)", MENU_ITEMFLAGS_NONE);
         gotsomething = TRUE;
     }
     unsortloot(&sortedinvent);
@@ -2738,7 +2786,7 @@ long *out_cnt;
     if (iflags.perm_invent && !lets && !gotsomething) {
         any = cg.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, 0,
-                 not_carrying_anything, MENU_UNSELECTED);
+                 not_carrying_anything, MENU_ITEMFLAGS_NONE);
         want_reply = FALSE;
     }
     end_menu(win, query && *query ? query : (char *) 0);
@@ -2810,7 +2858,7 @@ char avoidlet;
 
     if (g.invent) {
         win = create_nhwindow(NHW_MENU);
-        start_menu(win);
+        start_menu(win, MENU_BEHAVE_STANDARD);
         while (!invdone) {
             any = cg.zeroany; /* set all bits to zero */
             classcount = 0;
@@ -2824,13 +2872,13 @@ char avoidlet;
                         add_menu(win, NO_GLYPH, &any, 0, 0,
                                  iflags.menu_headings,
                                  let_to_name(*invlet, FALSE, FALSE),
-                                 MENU_UNSELECTED);
+                                 MENU_ITEMFLAGS_NONE);
                         classcount++;
                     }
                     any.a_char = ilet;
                     add_menu(win, obj_to_glyph(otmp, rn2_on_display_rng),
                              &any, ilet, 0, ATR_NONE,
-                             doname(otmp), MENU_UNSELECTED);
+                             doname(otmp), MENU_ITEMFLAGS_NONE);
                 }
             }
             if (flags.sortpack && *++invlet)
@@ -3366,9 +3414,9 @@ char *buf;
 /* look at what is here; if there are many objects (pile_limit or more),
    don't show them unless obj_cnt is 0 */
 int
-look_here(obj_cnt, picked_some)
+look_here(obj_cnt, lookhere_flags)
 int obj_cnt; /* obj_cnt > 0 implies that autopickup is in progress */
-boolean picked_some;
+unsigned lookhere_flags;
 {
     struct obj *otmp;
     struct trap *trap;
@@ -3376,12 +3424,15 @@ boolean picked_some;
     const char *dfeature = (char *) 0;
     char fbuf[BUFSZ], fbuf2[BUFSZ];
     winid tmpwin;
-    boolean skip_objects, felt_cockatrice = FALSE;
+    boolean skip_objects, felt_cockatrice = FALSE,
+            picked_some = (lookhere_flags & LOOKHERE_PICKED_SOME) != 0,
+            /* skip 'dfeature' if caller used describe_decor() to show it */
+            skip_dfeature = (lookhere_flags & LOOKHERE_SKIP_DFEATURE) != 0;
 
     /* default pile_limit is 5; a value of 0 means "never skip"
        (and 1 effectively forces "always skip") */
     skip_objects = (flags.pile_limit > 0 && obj_cnt >= flags.pile_limit);
-    if (u.uswallow && u.ustuck) {
+    if (u.uswallow) {
         struct monst *mtmp = u.ustuck;
 
         /*
@@ -3422,8 +3473,7 @@ boolean picked_some;
         return !!Blind;
     }
     if (!skip_objects && (trap = t_at(u.ux, u.uy)) && trap->tseen)
-        There("is %s here.",
-              an(defsyms[trap_to_defsym(trap->ttyp)].explanation));
+        There("is %s here.", an(trapname(trap->ttyp, FALSE)));
 
     otmp = g.level.objects[u.ux][u.uy];
     dfeature = dfeature_at(u.ux, u.uy, fbuf2);
@@ -3455,12 +3505,12 @@ boolean picked_some;
         }
     }
 
-    if (dfeature)
+    if (dfeature && !skip_dfeature)
         Sprintf(fbuf, "There is %s here.", an(dfeature));
 
     if (!otmp || is_lava(u.ux, u.uy)
         || (is_pool(u.ux, u.uy) && !Underwater)) {
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (!skip_objects && (Blind || !dfeature))
@@ -3470,7 +3520,7 @@ boolean picked_some;
     /* we know there is something here */
 
     if (skip_objects) {
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
@@ -3500,7 +3550,7 @@ boolean picked_some;
             }
     } else if (!otmp->nexthere) {
         /* only one object */
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         You("%s here %s.", verb, doname_with_price(otmp));
@@ -3512,7 +3562,7 @@ boolean picked_some;
 
         display_nhwindow(WIN_MESSAGE, FALSE);
         tmpwin = create_nhwindow(NHW_MENU);
-        if (dfeature) {
+        if (dfeature && !skip_dfeature) {
             putstr(tmpwin, 0, fbuf);
             putstr(tmpwin, 0, "");
         }
@@ -3671,6 +3721,11 @@ register struct obj *otmp, *obj;
     if (obj->unpaid && !same_price(obj, otmp))
         return FALSE;
 
+    /* some additional information is always incompatible */
+    if (has_omonst(obj) || has_omid(obj)
+        || has_omonst(otmp) || has_omid(otmp))
+        return FALSE;
+
     /* if they have names, make sure they're the same */
     objnamelth = strlen(safe_oname(obj));
     otmpnamelth = strlen(safe_oname(otmp));
@@ -3680,11 +3735,12 @@ register struct obj *otmp, *obj;
             && strncmp(ONAME(obj), ONAME(otmp), objnamelth)))
         return FALSE;
 
-    /* for the moment, any additional information is incompatible */
-    if (has_omonst(obj) || has_omid(obj) || has_olong(obj) || has_omonst(otmp)
-        || has_omid(otmp) || has_olong(otmp))
+    /* if one has an attached mail command, other must have same command */
+    if (!has_omailcmd(obj) ? has_omailcmd(otmp)
+        : (!has_omailcmd(otmp) || strcmp(OMAILCMD(obj), OMAILCMD(otmp)) != 0))
         return FALSE;
 
+    /* should be moot since matching artifacts wouldn't be unique */
     if (obj->oartifact != otmp->oartifact)
         return FALSE;
 
@@ -4273,11 +4329,11 @@ const char *hdr, *txt;
 
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
-    start_menu(win);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, hdr,
-             MENU_UNSELECTED);
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, txt, MENU_UNSELECTED);
+             MENU_ITEMFLAGS_NONE);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, txt, MENU_ITEMFLAGS_NONE);
     end_menu(win, (char *) 0);
     if (select_menu(win, PICK_NONE, &selected) > 0)
         free((genericptr_t) selected);

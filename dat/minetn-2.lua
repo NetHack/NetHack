@@ -12,7 +12,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
               des.feature("fountain", 17, 5)
               des.feature("fountain", 13, 8)
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", x=2,y=0, w=2,h=2,
                             contents = function()
                                des.door({ state="closed", wall="west" })
@@ -20,7 +20,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                  })
               end
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", lit=0, x=5,y=0, w=2,h=2,
                             contents = function()
                                des.door({ state="closed", wall="south" })
@@ -28,7 +28,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                  })
               end
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", x=8,y=0, w=2,h=2,
                             contents = function()
                                des.door({ state="closed", wall="east" })
@@ -36,7 +36,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                  })
               end
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", lit=1, x=16,y=0, w=2,h=2,
                             contents = function()
                                des.door({ state="closed", wall="west" })
@@ -44,7 +44,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                  })
               end
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", lit=0, x=19,y=0, w=2,h=2,
                             contents = function()
                                des.door({ state="closed", wall="south" })
@@ -52,7 +52,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                  })
               end
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", x=22,y=0, w=2,h=2,
                             contents = function()
                                des.door({ state="closed", wall="south" })
@@ -61,7 +61,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                  })
               end
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", lit=0, x=25,y=0, w=2,h=2,
                             contents = function()
                                des.door({ state="closed", wall="east" })
@@ -69,7 +69,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                  })
               end
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", lit=1, x=2,y=5, w=2,h=2,
                             contents = function()
                                des.door({ state="closed", wall="north" })
@@ -77,7 +77,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                  })
               end
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", lit=1, x=5,y=5, w=2,h=2,
                             contents = function()
                                des.door({ state="closed", wall="south" })
@@ -85,7 +85,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                  })
               end
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", x=8,y=5, w=2,h=2,
                             contents = function()
                                des.door({ state="locked", wall="north" })
@@ -106,7 +106,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                          end
               });
 
-              des.room({ type = "food shop", chance=90, lit=1, x=24,y=5, w=3,h=4,
+              des.room({ type = monkfoodshop(), chance=90, lit=1, x=24,y=5, w=3,h=4,
                          contents = function()
                             des.door({ state="closed", wall="north" })
                          end
@@ -118,7 +118,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                          end
               });
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", lit=0, x=7,y=10, w=3,h=3,
                             contents = function()
                                des.door({ state="locked", wall="north" })
@@ -136,7 +136,7 @@ des.room({ type = "ordinary", lit=1, x=3, y=3,
                          end
               });
 
-              if math.random(0,99) < 75 then
+              if percent(75) then
                  des.room({ type = "ordinary", lit=1, x=18,y=10, w=4,h=3,
                             contents = function()
                                des.door({ state="locked", wall="west" })

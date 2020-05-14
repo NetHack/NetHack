@@ -21,7 +21,7 @@ static const int *fieldorders[] = { fieldorder1, fieldorder2, NULL };
 static const int fieldcounts[NHSW_LINES] = { SIZE(fieldorder1) - 1, SIZE(fieldorder2) - 1};
 
 #define MSWIN_MAX_LINE1_STRINGS (SIZE(fieldorder1) - 1)
-#define MSWIN_MAX_LINE2_STRINGS (SIZE(fieldorder2) - 1 + BL_MASK_BITS)
+#define MSWIN_MAX_LINE2_STRINGS (SIZE(fieldorder2) - 1 + CONDITION_COUNT)
 #define MSWIN_MAX_LINE_STRINGS (MSWIN_MAX_LINE1_STRINGS > MSWIN_MAX_LINE2_STRINGS ? \
                                 MSWIN_MAX_LINE1_STRINGS : MSWIN_MAX_LINE2_STRINGS)
 

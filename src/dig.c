@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1547421446 2019/01/13 23:17:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1584350347 2020/03/16 09:19:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -579,7 +579,7 @@ int ttyp;
 
     if (ttyp != PIT && (!Can_dig_down(&u.uz) && !lev->candig)) {
         impossible("digactualhole: can't dig %s on this level.",
-                   defsyms[trap_to_defsym(ttyp)].explanation);
+                   trapname(ttyp, TRUE));
         ttyp = PIT;
     }
 
@@ -739,6 +739,8 @@ schar typ;
 struct trap *ttmp;
 const char *fillmsg;
 {
+    struct obj *objchain;
+    struct monst *mon;
     boolean u_spot = (x == u.ux && y == u.uy);
 
     if (ttmp)
@@ -748,11 +750,18 @@ const char *fillmsg;
 
     if (fillmsg)
         pline(fillmsg, hliquid(typ == LAVAPOOL ? "lava" : "water"));
-    if (u_spot && !(Levitation || Flying)) {
+    /* handle object damage before hero damage; affects potential bones */
+    if ((objchain = g.level.objects[x][y]) != 0) {
         if (typ == LAVAPOOL)
-            (void) lava_effects();
-        else if (!Wwalking)
-            (void) drown();
+            fire_damage_chain(objchain, TRUE, TRUE, x, y);
+        else
+            water_damage_chain(objchain, TRUE);
+    }
+    /* damage to the hero */
+    if (u_spot) {
+        (void) pooleffects(FALSE);
+    } else if ((mon = m_at(x, y)) != 0) {
+        (void) minliquid(mon);
     }
 }
 
@@ -928,7 +937,7 @@ coord *cc;
     case 1:
         You("unearth a corpse.");
         if ((otmp = mk_tt_object(CORPSE, dig_x, dig_y)) != 0)
-            otmp->age -= 100; /* this is an *OLD* corpse */
+            otmp->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
         break;
     case 2:
         if (!Blind)
@@ -1409,7 +1418,10 @@ zap_dig()
             if (is_animal(mtmp->data))
                 You("pierce %s %s wall!", s_suffix(mon_nam(mtmp)),
                     mbodypart(mtmp, STOMACH));
-            mtmp->mhp = 1; /* almost dead */
+            if (unique_corpstat(mtmp->data))
+                mtmp->mhp = (mtmp->mhp + 1) / 2;
+            else
+                mtmp->mhp = 1; /* almost dead */
             expels(mtmp, mtmp->data, !is_animal(mtmp->data));
         }
         return;
@@ -1635,6 +1647,7 @@ char *msg;
     } else if (ltyp == IRONBARS) {
         /* "set of iron bars" */
         Strcpy(msg, "The bars go much deeper than your pit.");
+        return FALSE;
 #if 0
     } else if (is_lava(cc->x, cc->y)) {
     } else if (is_ice(cc->x, cc->y)) {
@@ -1644,8 +1657,7 @@ char *msg;
     } else if (IS_SINK(ltyp)) {
         Strcpy(msg, "A tangled mass of plumbing remains below the sink.");
         return FALSE;
-    } else if ((cc->x == xupladder && cc->y == yupladder) /* ladder up */
-               || (cc->x == xdnladder && cc->y == ydnladder)) { /* " down */
+    } else if (On_ladder(cc->x, cc->y)) {
         Strcpy(msg, "The ladder is unaffected.");
         return FALSE;
     } else {
@@ -1657,15 +1669,8 @@ char *msg;
             supporting = "throne";
         else if (IS_ALTAR(ltyp))
             supporting = "altar";
-        else if ((cc->x == xupstair && cc->y == yupstair)
-                 || (cc->x == g.sstairs.sx && cc->y == g.sstairs.sy
-                     && g.sstairs.up))
-            /* "staircase up" */
-            supporting = "stairs";
-        else if ((cc->x == xdnstair && cc->y == ydnstair)
-                 || (cc->x == g.sstairs.sx && cc->y == g.sstairs.sy
-                     && !g.sstairs.up))
-            /* "staircase down" */
+        else if (On_stairs(cc->x, cc->y))
+            /* staircase up or down. On_ladder handled above. */
             supporting = "stairs";
         else if (ltyp == DRAWBRIDGE_DOWN   /* "lowered drawbridge" */
                  || ltyp == DBWALL)        /* "raised drawbridge" */
@@ -1689,6 +1694,12 @@ pit_flow(trap, filltyp)
 struct trap *trap;
 schar filltyp;
 {
+    /*
+     * FIXME?
+     *  liquid_flow() -> pooleffects() -> {drown(),lava_effects()}
+     *  might kill the hero; the game will end and if that leaves bones,
+     *  remaining conjoined pits will be left unprocessed.
+     */
     if (trap && filltyp != ROOM && is_pit(trap->ttyp)) {
         struct trap t;
         int idx;
@@ -1741,7 +1752,10 @@ coord *cc;
      *  only lets hero get one step away from the buried ball?]
      */
 
-    if (u.utrap && u.utraptype == TT_BURIEDBALL)
+    /* u.utrap might have already been cleared, in which case the value
+       of u.utraptype is no longer meaningful; if u.utrap is still set
+       then u.utraptype needs to be for buried ball */
+    if (!u.utrap || u.utraptype == TT_BURIEDBALL) {
         for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
             if (otmp->otyp != HEAVY_IRON_BALL)
                 continue;
@@ -1760,6 +1774,7 @@ coord *cc;
                 bdist = odist;
             }
         }
+    }
     if (ball) {
         /* found, but not at < cc->x, cc->y > */
         cc->x = ball->ox;
@@ -1830,8 +1845,7 @@ boolean *dealloced;
         *dealloced = FALSE;
     if (otmp == uball) {
         unpunish();
-        u.utrap = rn1(50, 20);
-        u.utraptype = TT_BURIEDBALL;
+        set_utrap((unsigned) rn1(50, 20), TT_BURIEDBALL);
         pline_The("iron ball gets buried!");
     }
     /* after unpunish(), or might get deallocated chain */

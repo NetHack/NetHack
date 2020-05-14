@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1575161967 2019/12/01 00:59:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.168 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1587503038 2020/04/21 21:03:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -53,7 +53,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.7\t2019/11/19";
+static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.7\t2020/01/18";
 #endif
 
 /* names of files to be generated */
@@ -177,7 +177,7 @@ static void FDECL(do_ext_makedefs, (int, char **));
 static char *FDECL(xcrypt, (const char *));
 static unsigned long FDECL(read_rumors_file,
                            (const char *, int *, long *, unsigned long));
-static void FDECL(do_rnd_access_file, (const char *));
+static void FDECL(do_rnd_access_file, (const char *, const char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
 static void FDECL(opt_out_words, (char *, int *));
@@ -341,9 +341,22 @@ char *options;
             break;
         case 's':
         case 'S':
-            do_rnd_access_file(EPITAPHFILE);
-            do_rnd_access_file(ENGRAVEFILE);
-            do_rnd_access_file(BOGUSMONFILE);
+            /*
+             * post-3.6.5:
+             *  File must not be empty to avoid divide by 0
+             *  in core's rn2(), so provide a default entry.
+             */
+            do_rnd_access_file(EPITAPHFILE,
+                /* default epitaph:  parody of the default engraving */
+                               "No matter where I went, here I am.");
+            do_rnd_access_file(ENGRAVEFILE,
+                /* default engraving:  popularized by "The Adventures of
+                   Buckaroo Bonzai Across the 8th Dimenstion" but predates
+                   that 1984 movie; some attribute it to Confucius */
+                               "No matter where you go, there you are.");
+            do_rnd_access_file(BOGUSMONFILE,
+                /* default bogusmon:  iconic monster that isn't in nethack */
+                               "grue");
             break;
         case 'h':
         case 'H':
@@ -929,8 +942,9 @@ unsigned long old_rumor_offset;
 }
 
 static void
-do_rnd_access_file(fname)
+do_rnd_access_file(fname, deflt_content)
 const char *fname;
+const char *deflt_content;
 {
     char *line;
 
@@ -950,6 +964,11 @@ const char *fname;
         exit(EXIT_FAILURE);
     }
     Fprintf(ofp, "%s", Dont_Edit_Data);
+    /* write out the default content entry unconditionally instead of
+       waiting to see whether there are no regular output lines; if it
+       matches a regular entry (bogusmon "grue"), that entry will become
+       more likely to be picked than normal but it's nothing to worry about */
+    (void) fputs(xcrypt(deflt_content), ofp);
 
     tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
     grep0(ifp, tfp);
@@ -958,7 +977,7 @@ const char *fname;
     while ((line = fgetline(ifp)) != 0) {
         if (line[0] != '#' && line[0] != '\n')
             (void) fputs(xcrypt(line), ofp);
-        free(line);
+        free((genericptr_t) line);
     }
     Fclose(ifp);
     Fclose(ofp);
@@ -1265,7 +1284,7 @@ char *githash, *gitbranch;
             *strval++ = '\0';
             /* strip off the '\n' */
             if ((c = index(strval, '\n')) != 0)
-                *c = '\0'; 
+                *c = '\0';
             if ((c = index(opt, '\n')) != 0)
                 *c = '\0';
             /* strip leading and trailing white space */
@@ -1752,9 +1771,107 @@ do_dungeon()
     return;
 }
 
+/*
+ * In 3.4.3 and earlier, this code was used to construct monstr[] array
+ * in generated file src/monstr.c.  It wasn't used in 3.6.  For 3.7 it
+ * has been reincarnated as a way to generate default monster strength
+ * values:
+ *      add new monster(s) to src/monst.c with placeholder value for
+ *          the monstr field;
+ *      run 'makedefs -m' to create src/monstr.c; ignore the complaints
+ *          about it being deprecated;
+ *      transfer relevant generated monstr values to src/monst.c;
+ *      delete src/monstr.c.
+ */
+static int FDECL(mstrength, (struct permonst *));
+static boolean FDECL(ranged_attk, (struct permonst *));
+
+ /*
+ * This routine is designed to return an integer value which represents
+ * an approximation of monster strength.  It uses a similar method of
+ * determination as "experience()" to arrive at the strength.
+ */
+static int
+mstrength(ptr)
+struct permonst *ptr;
+{
+    int	i, tmp2, n, tmp = ptr->mlevel;
+
+    if (tmp > 49)		/* special fixed hp monster */
+        tmp = 2 * (tmp - 6) / 4;
+
+    /*	For creation in groups */
+    n = (!!(ptr->geno & G_SGROUP));
+    n += (!!(ptr->geno & G_LGROUP)) << 1;
+
+    /*	For ranged attacks */
+    if (ranged_attk(ptr))
+        n++;
+
+    /*	For higher ac values */
+    n += (ptr->ac < 4);
+    n += (ptr->ac < 0);
+
+    /*	For very fast monsters */
+    n += (ptr->mmove >= 18);
+
+    /*	For each attack and "special" attack */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].aatyp;
+        n += (tmp2 > 0);
+        n += (tmp2 == AT_MAGC);
+        n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
+    }
+
+    /*	For each "special" damage type */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].adtyp;
+        if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
+            || (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
+            n += 2;
+        else if (strcmp(ptr->mname, "grid bug"))
+            n += (tmp2 != AD_PHYS);
+        n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
+    }
+
+    /*	Leprechauns are special cases.  They have many hit dice so they
+	can hit and are hard to kill, but they don't really do much damage. */
+    if (!strcmp(ptr->mname, "leprechaun"))
+        n -= 2;
+
+    /*	Finally, adjust the monster level  0 <= n <= 24 (approx.) */
+    if (n == 0)
+        tmp--;
+    else if (n >= 6)
+        tmp += (n / 2);
+    else
+        tmp += (n / 3 + 1);
+
+    return (tmp >= 0) ? tmp : 0;
+}
+
+/* returns True if monster can attack at range */
+static boolean
+ranged_attk(ptr)
+register struct permonst *ptr;
+{
+    register int i, j;
+    register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
+
+    for (i = 0; i < NATTK; i++) {
+        if ((j = ptr->mattk[i].aatyp) >= AT_WEAP
+            || (j < 32 && (atk_mask & (1 << j)) != 0))
+            return TRUE;
+    }
+    return FALSE;
+}
+
 void
 do_monstr()
 {
+    struct permonst *ptr;
+    int i, j;
+
     /* Don't break anything for ports that haven't been updated. */
     printf("DEPRECATION WARNINGS:\n");
     printf("'makedefs -m' is deprecated.  Remove all references\n");
@@ -1789,8 +1906,17 @@ do_monstr()
     Fprintf(ofp, "  it from the build process.\n");
     Fprintf(ofp, "monstr[] is deprecated.  Replace monstr[x] with\n");
     Fprintf(ofp, "  mons[x].difficulty\n");
-    Fprintf(ofp, "monstr_init() is deprecated.  Remove all references to it.\n");
+    Fprintf(ofp,
+            "monstr_init() is deprecated.  Remove all references to it.\n");
     Fprintf(ofp, "*/\n");
+
+    /* output derived monstr values as a comment */
+    Fprintf(ofp, "\n\n/*\n * default mons[].difficulty values\n *\n");
+    for (ptr = &mons[0], j = 0; ptr->mlet; ptr++) {
+        i = mstrength(ptr);
+        Fprintf(ofp, "%-24s %2u\n", ptr->mname, (unsigned int) (uchar) i);
+    }
+    Fprintf(ofp, " *\n */\n\n");
 
     Fprintf(ofp, "\nvoid NDECL(monstr_init);\n");
     Fprintf(ofp, "\nvoid\n");

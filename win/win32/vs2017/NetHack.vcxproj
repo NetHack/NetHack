@@ -120,6 +120,7 @@
     <ClCompile Include="$(SrcDir)fountain.c" />
     <ClCompile Include="$(SrcDir)hack.c" />
     <ClCompile Include="$(SrcDir)hacklib.c" />
+    <ClCompile Include="$(SrcDir)insight.c" />
     <ClCompile Include="$(SrcDir)invent.c" />
     <ClCompile Include="$(SrcDir)isaac64.c" />
     <ClCompile Include="$(SrcDir)light.c" />
@@ -128,6 +129,7 @@
     <ClCompile Include="$(SrcDir)makemon.c" />
     <ClCompile Include="$(SrcDir)mapglyph.c" />
     <ClCompile Include="$(SrcDir)mcastu.c" />
+    <ClCompile Include="$(SrcDir)mdlib.c" />
     <ClCompile Include="$(SrcDir)mhitm.c" />
     <ClCompile Include="$(SrcDir)mhitu.c" />
     <ClCompile Include="$(SrcDir)minion.c" />
@@ -144,8 +146,9 @@
     <ClCompile Include="$(SrcDir)mthrowu.c" />
     <ClCompile Include="$(SrcDir)muse.c" />
     <ClCompile Include="$(SrcDir)music.c" />
-    <ClCompile Include="$(SrcDir)nhlua.c" />
+    <ClCompile Include="$(SrcDir)nhlobj.c" />
     <ClCompile Include="$(SrcDir)nhlsel.c" />
+    <ClCompile Include="$(SrcDir)nhlua.c" />
     <ClCompile Include="$(SrcDir)objects.c" />
     <ClCompile Include="$(SrcDir)objnam.c" />
     <ClCompile Include="$(SrcDir)options.c" />
@@ -169,10 +172,6 @@
     <ClCompile Include="$(SrcDir)rumors.c" />
     <ClCompile Include="$(SrcDir)save.c" />
     <ClCompile Include="$(SrcDir)sfstruct.c" />
-    <ClCompile Include="$(SrcDir)sfbase.c" />
-    <ClCompile Include="$(SrcDir)sflendian.c" />
-    <ClCompile Include="$(SrcDir)sfascii.c" />
-    <ClCompile Include="$(SrcDir)sfdata.c" />
     <ClCompile Include="$(SrcDir)shk.c" />
     <ClCompile Include="$(SrcDir)shknam.c" />
     <ClCompile Include="$(SrcDir)sit.c" />
@@ -181,6 +180,7 @@
     <ClCompile Include="$(SrcDir)sp_lev.c" />
     <ClCompile Include="$(SrcDir)steal.c" />
     <ClCompile Include="$(SrcDir)steed.c" />
+    <ClCompile Include="$(SrcDir)symbols.c" />
     <ClCompile Include="$(SrcDir)sys.c" />
     <ClCompile Include="$(SrcDir)teleport.c" />
     <ClCompile Include="$(SrcDir)tile.c" />
@@ -248,7 +248,6 @@
     <ClInclude Include="$(IncDir)global.h" />
     <ClInclude Include="$(IncDir)hack.h" />
     <ClInclude Include="$(IncDir)isaac64.h" />
-    <ClInclude Include="$(IncDir)lev.h" />
     <ClInclude Include="$(IncDir)mextra.h" />
     <ClInclude Include="$(IncDir)mfndpos.h" />
     <ClInclude Include="$(IncDir)mkroom.h" />
@@ -266,7 +265,6 @@
     <ClInclude Include="$(IncDir)permonst.h" />
     <ClInclude Include="$(IncDir)pm.h" />
     <ClInclude Include="$(IncDir)prop.h" />
-    <ClInclude Include="$(IncDir)qtext.h" />
     <ClInclude Include="$(IncDir)quest.h" />
     <ClInclude Include="$(IncDir)rect.h" />
     <ClInclude Include="$(IncDir)region.h" />

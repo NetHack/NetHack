@@ -4,7 +4,7 @@
 --  - export the quest string replacements to lua, instead of %H etc
 --  - allow checking if hero is carrying item (see comments for %Cp Arc 00042)
 --  - fold quest_portal, quest_portal_again, quest_portal_demand into one
---  - some roles have no goal_alt, fold into goal_next?
+--  - write tests to check questtext validity?
 --  - qt_pager hack(?): if (qt_msg->delivery == 'p' && strcmp(windowprocs.name, "X11"))
 
 
@@ -25,6 +25,10 @@
 
 
 questtext = {
+   -- If a role doesn't have a specific message, try a fallback
+   msg_fallbacks = {
+      goal_alt = "goal_next"
+   },
    common = {
       TEST_PATTERN = {
          output = "text",
@@ -228,7 +232,7 @@ the entrance.
 Strange forbidding shapes seem to be moving in the distance.]],
       },
       goal_alt = {
-         text = "The have returned to %ns lair.",
+         text = "You have returned to %ns lair.",
       },
       goal_first = {
          synopsis = "[This strange feeling must be the presence of %o.]",

@@ -35,11 +35,14 @@ des.map([[
 .....................................
 ]]);
 
--- Don't let the player fall into his likely death
-des.teleport_region({ region={01,01,20,19}, region_islev=1, exclude={20,00,70,19}, exclude_islev=1 })
-des.region(selection.area(00,00,36,16),"lit")
-des.levregion({ type="stair-up", region={01,03,20,19}, region_islev=1, exclude={00,00,36,15}, exclude_islev=1 });
-des.levregion({ type="stair-down", region={61,03,75,19}, region_islev=1, exclude={00,00,36,15} })
+-- Don't let the player fall into his likely death; used to explicitly exclude
+-- the town, but that meant that you couldn't teleport out as well as not in.
+des.teleport_region({ region={01,01,20,19}, region_islev=1 })
+des.region(selection.area(01,01,35,17), "lit")
+des.levregion({ type="stair-up", region={01,03,20,19}, region_islev=1,
+		exclude={00,01,36,17} });
+des.levregion({ type="stair-down", region={61,03,75,19}, region_islev=1,
+		exclude={00,01,36,17} })
 
 -- shame we can't make polluted fountains
 des.feature("fountain",16,09)
@@ -86,7 +89,7 @@ des.object({ id = "corpse", montype="watch captain" })
 
 -- Rubble!
 for i=1,9 + math.random(2 - 1,2*5) do
-  if math.random(0,99) < 90 then
+  if percent(90) then
     des.object("boulder")
   end
   des.object("rock")
@@ -112,14 +115,14 @@ des.object({ id = "magic missile", coord = place[5], buc="uncursed", spe=0 })
 
 -- the Orcish Army
 
-local inside = selection.floodfill(selection.new(), 18,8)
-local near_temple = selection.area(selection.new(), 17,8, 23,14) & inside
+local inside = selection.floodfill(18,8)
+local near_temple = selection.area(17,8, 23,14) & inside
 
 for i=1,5 + math.random(1 - 1,1*10) do
-   if math.random(0, 99) < 50 then
+   if percent(50) then
       des.monster({ id = "orc-captain", coord = { inside:rndcoord(1) }, peaceful=0 });
    else
-      if math.random(0, 99) < 80 then
+      if percent(80) then
          des.monster({ id = "Uruk-hai", coord = { inside:rndcoord(1) }, peaceful=0 })
       else
          des.monster({ id = "Mordor orc", coord = { inside:rndcoord(1) }, peaceful=0 })
@@ -133,7 +136,7 @@ end
 -- these are not such a big deal
 -- to run into outside the bars
 for i=1,9 + math.random(2 - 1,2*5) do
-   if math.random(0, 99) < 90 then
+   if percent(90) then
       des.monster({ id = "hill orc", peaceful = 0 })
    else
       des.monster({ id = "goblin", peaceful = 0 })

@@ -76,7 +76,7 @@ boolean forceshow;
         if ((mtmp = m_at(fcx, fcy)) != 0) {
             if (mtmp->isgd) {
                 return FALSE;
-            } else if (!in_fcorridor(grd, u.ux, u.uy)) {
+            } else {
                 if (mtmp->mtame)
                     yelp(mtmp);
                 if (!rloc(mtmp, TRUE))
@@ -305,9 +305,6 @@ xchar *rx, *ry;
 void
 invault()
 {
-#ifdef BSD_43_BUG
-    int dummy; /* hack to avoid schain botch */
-#endif
     struct monst *guard;
     boolean gsensed;
     int trycount, vaultroom = (int) vault_occupied(u.urooms);
@@ -804,8 +801,8 @@ register struct monst *grd;
             if (egrd->warncnt == 3 && !Deaf)
                 verbalize("I repeat, %sfollow me!",
                           u_carry_gold
-                              ? (!umoney ? "drop that hidden money and "
-                                         : "drop that money and ")
+                              ? (!umoney ? "drop that hidden gold and "
+                                         : "drop that gold and ")
                               : "");
             if (egrd->warncnt == 7) {
                 m = grd->mx;

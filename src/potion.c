@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1573848199 2019/11/15 20:03:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1581810073 2020/02/15 23:41:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -442,6 +442,7 @@ void
 make_glib(xtime)
 int xtime;
 {
+    g.context.botl |= (!Glib ^ !!xtime);
     set_itimeout(&Glib, xtime);
     /* may change "(being worn)" to "(being worn; slippery)" or vice versa */
     if (uarmg)
@@ -631,11 +632,22 @@ register struct obj *otmp;
         }
         break;
     case POT_HALLUCINATION:
-        if (Hallucination || Halluc_resistance)
+        if (Halluc_resistance) {
             g.potion_nothing++;
+            break;
+        } else if (Hallucination) {
+            g.potion_nothing++;
+        }
         (void) make_hallucinated(itimeout_incr(HHallucination,
                                           rn1(200, 600 - 300 * bcsign(otmp))),
                                  TRUE, 0L);
+        if ((otmp->blessed && !rn2(3)) || (!otmp->cursed && !rn2(6))) {
+            You("perceive yourself...");
+            display_nhwindow(WIN_MESSAGE, FALSE);
+            enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
+            Your("awareness re-normalizes.");
+            exercise(A_WIS, TRUE);
+        }
         break;
     case POT_WATER:
         if (!otmp->blessed && !otmp->cursed) {
@@ -1210,11 +1222,20 @@ const char *txt;
 
 const char *bottlenames[] = { "bottle", "phial", "flagon", "carafe",
                               "flask",  "jar",   "vial" };
+const char *hbottlenames[] = {
+    "jug", "pitcher", "barrel", "tin", "bag", "box", "glass", "beaker",
+    "tumbler", "vase", "flowerpot", "pan", "thingy", "mug", "teacup", "teapot",
+    "keg", "bucket", "thermos", "amphora", "wineskin", "parcel", "bowl",
+    "ampoule"
+};
 
 const char *
 bottlename()
 {
-    return bottlenames[rn2(SIZE(bottlenames))];
+    if (Hallucination)
+        return hbottlenames[rn2(SIZE(hbottlenames))];
+    else
+        return bottlenames[rn2(SIZE(bottlenames))];
 }
 
 /* handle item dipped into water potion or steed saddle splashed by same */
@@ -1618,13 +1639,19 @@ register struct obj *obj;
        remains in inventory where our caller expects it to be */
     obj->in_use = 1;
 
-    switch (obj->otyp) {
+    /* wearing a wet towel protects both eyes and breathing, even when
+       the breath effect might be beneficial; we still pass down to the
+       naming opportunity in case potion was thrown at hero by a monster */
+    switch (Half_gas_damage ? TOWEL : obj->otyp) {
+    case TOWEL:
+        pline("Some vapor passes harmlessly around you.");
+        break;
     case POT_RESTORE_ABILITY:
     case POT_GAIN_ABILITY:
         if (obj->cursed) {
-            if (!breathless(g.youmonst.data))
+            if (!breathless(g.youmonst.data)) {
                 pline("Ulch!  That potion smells terrible!");
-            else if (haseyes(g.youmonst.data)) {
+            } else if (haseyes(g.youmonst.data)) {
                 const char *eyes = body_part(EYE);
 
                 if (eyecount(g.youmonst.data) != 1)
@@ -2257,7 +2284,7 @@ dodip()
                           more_than_one ? " that you dipped into" : "",
                           newbuf);
             else
-                pline("Somehing happens.");
+                pline("Something happens.");
 
             if (old_dknown
                 && !objects[old_otyp].oc_name_known

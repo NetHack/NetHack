@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1575767152 2019/12/08 01:05:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1588776919 2020/05/06 14:55:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -171,7 +171,7 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 # CFLAGS = -g -I../include
 
 #CFLAGS = -O -I../include
-#LFLAGS = 
+#LFLAGS =
 
 # -lm required by lua
 LIBS += -lm
@@ -224,10 +224,11 @@ WINX11SRC = ../win/X11/Window.c ../win/X11/dialogs.c ../win/X11/winX.c \
 WINX11OBJ = Window.o dialogs.o winX.o winmap.o winmenu.o winmesg.o \
 	winmisc.o winstat.o wintext.o winval.o tile.o
 #
-# Files for a Qt port
+# Files for a Qt 3 port (renamed since nethack 3.6.x)
 #
-WINQTSRC = ../win/Qt/qt_win.cpp ../win/Qt/qt_clust.cpp ../win/Qt/qttableview.cpp
-WINQTOBJ = qt_win.o qt_clust.o qttableview.o tile.o
+WINQT3SRC = ../win/Qt3/qt3_win.cpp ../win/Qt3/qt3_clust.cpp \
+	../win/Qt3/qt3tableview.cpp
+WINQT3OBJ = qt3_win.o qt3_clust.o qt3tableview.o tile.o
 #
 # Files for a Qt 4 or 5 port
 #
@@ -319,7 +320,7 @@ WINGNOMELIB = -lgnomeui -lgnome -lart_lgpl -lgtk -lgdk -lpopt
 # libraries for Gem port
 WINGEMLIB = -le_gem -lgem
 #
-# libraries for BeOS 
+# libraries for BeOS
 WINBELIB = -lbe
 #
 # libraries for curses port
@@ -444,18 +445,18 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
 	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
-	   files.c fountain.c hack.c hacklib.c invent.c isaac64.c light.c \
+	   files.c fountain.c hack.c hacklib.c \
+	   insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mapglyph.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
-	   nhlua.c nhlsel.c o_init.c objects.c objnam.c \
+	   nhlua.c nhlsel.c nhlobj.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
 	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
-	   sfbase.c sfdata.c sfascii.c sflendian.c \
 	   shk.c shknam.c sit.c sounds.c \
-	   sp_lev.c spell.c steal.c steed.c sys.c teleport.c timeout.c \
-	   topten.c track.c trap.c u_init.c \
+	   sp_lev.c spell.c steal.c steed.c symbols.c sys.c teleport.c \
+	   timeout.c topten.c track.c trap.c u_init.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
@@ -469,12 +470,12 @@ SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 SYSCXXSRC = ../sys/share/cppregex.cpp
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = vis_tab.c	sfdata.c #tile.c
+GENCSRC = vis_tab.c	#tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
-WINCXXSRC = $(WINQTSRC) $(WINBESRC)
+WINCXXSRC = $(WINQTSRC) $(WINQT3SRC) $(WINBESRC)
 
 # Files for window system chaining. Requires SYSCF; include via HINTSRC/HINTOBJ
 CHAINSRC = ../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
@@ -494,14 +495,14 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 #
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h def_os2.h \
-	display.h dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h \
-	global.h hack.h lev.h lint.h macconf.h mextra.h mfndpos.h micro.h \
-	mkroom.h \
+	display.h dlb.h dungeon.h engrave.h extern.h flag.h fnamesiz.h \
+	func_tab.h global.h hack.h lint.h macconf.h mextra.h mfndpos.h \
+	micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
-	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h \
-	rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h \
-	tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
-	wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
+	optlist.h os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
+	region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
+	tosconf.h tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h \
+	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
 
@@ -512,21 +513,25 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
 	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
-	extralev.o files.o fountain.o hack.o hacklib.o invent.o isaac64.o \
+	extralev.o files.o fountain.o hack.o hacklib.o \
+	insight.o invent.o isaac64.o \
 	light.o lock.o mail.o makemon.o mapglyph.o mcastu.o mdlib.o mhitm.o \
 	mhitu.o minion.o mklev.o mkmap.o mkmaze.o mkobj.o mkroom.o mon.o \
 	mondata.o monmove.o mplayer.o mthrowu.o muse.o music.o \
-	nhlua.o nhlsel.o o_init.o objnam.o options.o \
+	nhlua.o nhlsel.o nhlobj.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o sfstruct.o \
-	sfbase.o sfdata.o sfascii.o sflendian.o \
-	shk.o shknam.o sit.o sounds.o sp_lev.o spell.o sys.o \
+	shk.o shknam.o sit.o sounds.o sp_lev.o spell.o symbols.o sys.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
 	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
 	wizard.o worm.o worn.o write.o zap.o \
 	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) version.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
+
+# first target is also the default target for 'make' without any arguments
+all:	$(GAME)
+	@echo ""
 
 $(GAME):	$(SYSTEM)
 	@echo "$(GAME) is up to date."
@@ -583,8 +588,6 @@ DUMB.Setup:	../include/extern.h
 	cp ../include/extern.DUMB ../include/extern.h
 	@touch DUMB.Setup
 
-all:	$(GAME)
-
 ../lib/lua/liblua.a ../include/nhlua.h:
 	@( cd .. ; $(MAKE) lua_support )
 
@@ -603,14 +606,12 @@ objects.o:
 	@rm -f $(MAKEDEFS)
 
 # Qt 3 windowport meta-object-compiler output
-qt3kde0.moc: ../include/qt_kde0.h
-	$(QTDIR)/bin/moc -o qt3kde0.moc ../include/qt_kde0.h
-
-qt3win.moc: ../include/qt_win.h
-	$(QTDIR)/bin/moc -o qt3win.moc ../include/qt_win.h
-
-qttableview.moc: ../include/qttableview.h
-	$(QTDIR)/bin/moc -o qttableview.moc ../include/qttableview.h
+qt3_kde0.moc: ../win/Qt3/qt3_kde0.h
+	$(QTDIR)/bin/moc -o qt3kde0.moc ../win/Qt3/qt3_kde0.h
+qt3_win.moc: ../win/Qt3/qt3_win.h
+	$(QTDIR)/bin/moc -o qt3win.moc ../win/Qt3/qt3_win.h
+qt3tableview.moc: ../win/Qt3/qt3tableview.h
+	$(QTDIR)/bin/moc -o qt3tableview.moc ../win/Qt/qt3tableview.h
 
 # Qt 4 windowport meta-object-compiler output
 qt_kde0.moc : ../win/Qt/qt_kde0.h
@@ -641,7 +642,7 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \
-		../include/dlb.h ../include/patchlevel.h ../include/qtext.h
+		../include/dlb.h ../include/patchlevel.h
 	@( cd ../util ; $(MAKE) makedefs )
 
 #	Source files created by 'makedefs' at build time.
@@ -666,26 +667,7 @@ tile.c: ../win/share/tilemap.c $(HACK_H)
 ../win/gnome/gn_rip.h: ../win/X11/rip.xpm
 	cp ../win/X11/rip.xpm ../win/gnome/gn_rip.h
 
-# readtags dependencies
-#
-#
 sfstruct.o: sfstruct.c $(HACK_H)
-sfbase.o: sfbase.c $(HACK_H) ../include/sfproto.h ../include/sfprocs.h
-sfascii.o: sfascii.c $(HACK_H) ../include/sfprocs.h
-sflendian.o: sflendian.c $(HACK_H) ../include/sfprocs.h
-sfdata.o: sfdata.c $(HACK_H) ../include/sfprocs.h
-
-#../util/readtags:
-#	@( cd ../util ; $(MAKE) readtags )
-#
-#../util/nethack.tags:
-#	@( cd ../util ; $(MAKE) nethack.tags )
-#
-#sfdata.c: ../util/readtags ../util/nethack.tags
-#	@( cd ../util ; ./readtags )
-#
-#../include/sfproto.h: ../util/readtags ../util/nethack.tags
-#	@( cd ../util ; ./readtags )
 
 #	date.h should be remade any time any of the source or include code
 #	is modified.  Unfortunately, this would make the contents of this
@@ -730,7 +712,7 @@ spotless: clean
 depend: ../sys/unix/depend.awk \
 		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
 		$(CHAINSRC) $(GENCSRC) $(HACKCSRC)
-	$(AWK) -f ../sys/unix/depend.awk ../include/*.h \
+	$(AWK) -f ../sys/unix/depend.awk ../include/*.h ../win/*/*.h \
 		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
 		$(CHAINSRC) $(GENCSRC) $(HACKCSRC) >makedep
 	@echo '/^# DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT/+2,$$d' >eddep
@@ -750,11 +732,11 @@ depend: ../sys/unix/depend.awk \
 # config.h timestamp
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/global.h ../include/coord.h ../include/vmsconf.h \
-		../include/system.h ../include/nhlua.h \
-		../include/unixconf.h ../include/os2conf.h ../include/micro.h \
-		../include/pcconf.h ../include/tosconf.h ../include/amiconf.h \
-		../include/macconf.h ../include/beconf.h ../include/wceconf.h \
-		../include/ntconf.h
+		../include/system.h ../include/nhlua.h ../include/unixconf.h \
+		../include/os2conf.h ../include/micro.h ../include/pcconf.h \
+		../include/tosconf.h ../include/amiconf.h ../include/macconf.h \
+		../include/beconf.h ../include/wceconf.h ../include/ntconf.h \
+		../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
@@ -763,21 +745,20 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/permonst.h ../include/monattk.h \
 		../include/monflag.h ../include/mondata.h ../include/pm.h \
 		../include/wintype.h ../include/context.h ../include/rm.h \
-		../include/botl.h ../include/qtext.h ../include/rect.h \
-		../include/region.h ../include/decl.h ../include/quest.h \
-		../include/spell.h ../include/color.h ../include/obj.h \
-		../include/you.h ../include/attrib.h ../include/monst.h \
-		../include/mextra.h ../include/skills.h ../include/onames.h \
-		../include/timeout.h ../include/trap.h ../include/flag.h \
-		../include/vision.h ../include/display.h ../include/engrave.h \
+		../include/botl.h ../include/rect.h ../include/region.h \
+		../include/decl.h ../include/quest.h ../include/spell.h \
+		../include/color.h ../include/obj.h ../include/you.h \
+		../include/attrib.h ../include/monst.h ../include/mextra.h \
+		../include/skills.h ../include/onames.h ../include/timeout.h \
+		../include/trap.h ../include/flag.h ../include/vision.h \
+		../include/display.h ../include/engrave.h \
 		../include/winprocs.h ../include/sys.h ../include/wintty.h \
 		../include/trampoli.h
 	touch $(HACK_H)
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c -o $@ ../sys/atari/tos.c
-pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h \
-		../include/sfproto.h ../include/integer.h
+pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
 	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcmain.c
 pcsys.o: ../sys/share/pcsys.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcsys.c
@@ -836,9 +817,11 @@ cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursinvt.h
 	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursinvt.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
-		$(CONFIG_H) ../include/lint.h
+		$(CONFIG_H) ../include/lint.h ../include/winX.h \
+		../include/color.h ../include/wintype.h
 	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/Window.c
-dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h
+dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h \
+		../include/winX.h ../include/color.h ../include/wintype.h
 	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
 		../include/xwindow.h ../win/X11/nh72icon ../win/X11/nh56icon \
@@ -864,44 +847,82 @@ tile.o: tile.c $(HACK_H)
 gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
 		../win/gnome/gnmain.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnaskstr.c
-gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnmain.h \
-		../win/gnome/gnmenu.h ../win/gnome/gnaskstr.h \
-		../win/gnome/gnyesno.h
+gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnomeprv.h \
+		$(HACK_H) ../include/dlb.h ../include/patchlevel.h \
+		../include/winGnome.h ../win/gnome/gnmain.h \
+		../win/gnome/gnmap.h ../win/gnome/gnmenu.h \
+		../win/gnome/gnplayer.h ../win/gnome/gnsignal.h \
+		../win/gnome/gnglyph.h ../win/gnome/gnstatus.h \
+		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
+		../win/gnome/gnyesno.h ../win/gnome/gnworn.h \
+		../win/gnome/gnaskstr.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnbind.c
-gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h ../include/tile2x11.h
+gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h $(CONFIG_H) \
+		../include/tile2x11.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnglyph.c
 gnmain.o: ../win/gnome/gnmain.c ../win/gnome/gnmain.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnbind.h ../win/gnome/gnopts.h $(HACK_H) \
-		../include/date.h
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnglyph.h ../win/gnome/gnbind.h \
+		../win/gnome/gnmap.h ../win/gnome/gnmenu.h \
+		../win/gnome/gnplayer.h ../win/gnome/gnstatus.h \
+		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
+		../win/gnome/gnyesno.h ../win/gnome/gnworn.h \
+		../win/gnome/gnopts.h ../include/date.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmain.c
-gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnsignal.h $(HACK_H)
+gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h $(CONFIG_H) \
+		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmap.c
-gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h ../win/gnome/gnmain.h \
-		../win/gnome/gnbind.h ../include/func_tab.h
+gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h $(CONFIG_H) \
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnmain.h ../win/gnome/gnbind.h \
+		../win/gnome/gnmap.h ../win/gnome/gnplayer.h \
+		../win/gnome/gnsignal.h ../win/gnome/gnglyph.h \
+		../win/gnome/gnstatus.h ../win/gnome/gntext.h \
+		../win/gnome/gnmesg.h ../win/gnome/gnyesno.h \
+		../win/gnome/gnworn.h ../include/func_tab.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmenu.c
-gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h ../win/gnome/gnsignal.h
+gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h $(CONFIG_H) \
+		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h $(HACK_H) \
+		../include/dlb.h ../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnglyph.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmesg.c
 gnopts.o: ../win/gnome/gnopts.c ../win/gnome/gnopts.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
+		$(CONFIG_H) ../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnopts.c
 gnplayer.o: ../win/gnome/gnplayer.c ../win/gnome/gnplayer.h \
 		../win/gnome/gnmain.h $(HACK_H)
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnplayer.c
 gnsignal.o: ../win/gnome/gnsignal.c ../win/gnome/gnsignal.h \
-		../win/gnome/gnmain.h
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnglyph.h ../win/gnome/gnmain.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnsignal.c
-gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h \
-		../win/gnome/gnsignal.h ../win/gnome/gn_xpms.h \
-		../win/gnome/gnomeprv.h
+gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h $(CONFIG_H) \
+		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h $(HACK_H) \
+		../include/dlb.h ../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnglyph.h ../win/gnome/gn_xpms.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnstatus.c
-gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h ../win/gnome/gnmain.h \
-		../win/gnome/gn_rip.h
+gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h $(CONFIG_H) \
+		../win/gnome/gnmain.h ../win/gnome/gn_rip.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gntext.c
-gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
+gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h \
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h \
+		../win/gnome/gnmain.h ../win/gnome/gnmap.h \
+		../win/gnome/gnmenu.h ../win/gnome/gnplayer.h \
+		../win/gnome/gnsignal.h ../win/gnome/gnglyph.h \
+		../win/gnome/gnstatus.h ../win/gnome/gntext.h \
+		../win/gnome/gnmesg.h ../win/gnome/gnyesno.h \
+		../win/gnome/gnworn.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnyesno.c
-gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h
+gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h $(CONFIG_H) \
+		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
+		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
+		../include/patchlevel.h ../include/winGnome.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnworn.c
 wingem.o: ../win/gem/wingem.c $(HACK_H) ../include/func_tab.h ../include/dlb.h \
 		../include/patchlevel.h ../include/wingem.h
@@ -916,84 +937,105 @@ gr_rect.o: ../win/gem/gr_rect.c ../include/gr_rect.h
 tile.o: tile.c $(HACK_H)
 cppregex.o: ../sys/share/cppregex.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ ../sys/share/cppregex.cpp
-qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../include/qt_bind.h \
-		../include/qt_click.h ../include/qt_delay.h \
-		../include/qt_xcmd.h ../include/qt_key.h ../include/qt_map.h \
-		../include/qt_menu.h ../include/qt_msg.h ../include/qt_plsel.h \
-		../include/qt_svsel.h ../include/qt_set.h ../include/qt_stat.h \
-		../include/qt_streq.h ../include/qt_yndlg.h \
-		../include/qt_str.h ../include/dlb.h
+qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_click.h \
+		../win/Qt/qt_delay.h ../win/Qt/qt_xcmd.h ../win/Qt/qt_key.h \
+		../win/Qt/qt_map.h ../win/Qt/qt_win.h ../win/Qt/qt_clust.h \
+		../win/Qt/qt_menu.h ../win/Qt/qt_rip.h ../win/Qt/qt_msg.h \
+		../win/Qt/qt_plsel.h ../win/Qt/qt_svsel.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_stat.h ../win/Qt/qt_icon.h ../win/Qt/qt_streq.h \
+		../win/Qt/qt_line.h ../win/Qt/qt_yndlg.h ../win/Qt/qt_str.h \
+		../include/dlb.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_bind.cpp
-qt_click.o: ../win/Qt/qt_click.cpp $(HACK_H) ../include/qt_click.h
+qt_click.o: ../win/Qt/qt_click.cpp $(HACK_H) ../win/Qt/qt_click.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_click.cpp
-qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
+qt_clust.o: ../win/Qt/qt_clust.cpp ../win/Qt/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_clust.cpp
-qt_delay.o: ../win/Qt/qt_delay.cpp $(HACK_H) ../include/qt_delay.h
+qt_delay.o: ../win/Qt/qt_delay.cpp $(HACK_H) ../win/Qt/qt_delay.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_delay.cpp
 qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) ../include/tile2x11.h \
-		../include/qt_glyph.h ../include/qt_set.h ../include/qt_str.h
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_glyph.cpp
-qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../include/qt_icon.h
+qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../win/Qt/qt_icon.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_icon.cpp
-qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../include/qt_inv.h \
-		../include/qt_glyph.h ../include/qt_set.h
+qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../win/Qt/qt_inv.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_inv.cpp
-qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../include/qt_key.h
+qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../win/Qt/qt_key.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_key.cpp
-qt_line.o: ../win/Qt/qt_line.cpp $(HACK_H) ../include/qt_line.h
+qt_line.o: ../win/Qt/qt_line.cpp $(HACK_H) ../win/Qt/qt_line.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_line.cpp
 qt_main.o: ../win/Qt/qt_main.cpp $(HACK_H) ../include/patchlevel.h \
-		../include/qt_main.h qt_main.moc ../include/qt_bind.h \
-		../include/qt_glyph.h ../include/qt_inv.h ../include/qt_key.h \
-		../include/qt_map.h ../include/qt_msg.h ../include/qt_set.h \
-		../include/qt_stat.h ../include/qt_str.h qt_kde0.moc
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h qt_main.moc \
+		../win/Qt/qt_bind.h ../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h \
+		../win/Qt/qt_key.h ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_clust.h ../win/Qt/qt_msg.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_stat.h ../win/Qt/qt_icon.h ../win/Qt/qt_str.h \
+		qt_kde0.moc
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_main.cpp
-qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../include/qt_map.h qt_map.moc \
-		../include/qt_click.h ../include/qt_glyph.h \
-		../include/qt_xpms.h ../include/qt_set.h ../include/qt_str.h
+qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_clust.h qt_map.moc ../win/Qt/qt_click.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_xpms.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_map.cpp
-qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../include/qt_menu.h qt_menu.moc \
-		../include/qt_glyph.h ../include/qt_set.h \
-		../include/qt_streq.h ../include/qt_str.h
+qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../win/Qt/qt_menu.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_rip.h qt_menu.moc \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_streq.h \
+		../win/Qt/qt_line.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_menu.cpp
-qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../include/qt_msg.h qt_msg.moc \
-		../include/qt_map.h ../include/qt_set.h ../include/qt_str.h
+qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_msg.h ../win/Qt/qt_win.h \
+		qt_msg.moc ../win/Qt/qt_map.h ../win/Qt/qt_clust.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_msg.cpp
-qt_plsel.o: ../win/Qt/qt_plsel.cpp $(HACK_H) ../include/qt_plsel.h \
-		qt_plsel.moc ../include/qt_bind.h ../include/qt_glyph.h \
-		../include/qt_set.h ../include/qt_str.h
+qt_plsel.o: ../win/Qt/qt_plsel.cpp $(HACK_H) ../win/Qt/qt_plsel.h qt_plsel.moc \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_plsel.cpp
-qt_rip.o: ../win/Qt/qt_rip.cpp $(HACK_H) ../include/qt_rip.h \
-		../include/qt_bind.h ../include/qt_str.h
+qt_rip.o: ../win/Qt/qt_rip.cpp $(HACK_H) ../win/Qt/qt_rip.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_rip.cpp
-qt_set.o: ../win/Qt/qt_set.cpp $(HACK_H) ../include/qt_set.h qt_set.moc \
-		../include/qt_glyph.h ../include/qt_str.h
+qt_set.o: ../win/Qt/qt_set.cpp $(HACK_H) ../win/Qt/qt_set.h qt_set.moc \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_set.cpp
-qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../include/qt_stat.h qt_stat.moc \
-		../include/qt_set.h ../include/qt_str.h ../include/qt_xpms.h
+qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../win/Qt/qt_stat.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_icon.h qt_stat.moc \
+		../win/Qt/qt_set.h ../win/Qt/qt_str.h ../win/Qt/qt_xpms.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_stat.cpp
-qt_str.o: ../win/Qt/qt_str.cpp ../include/qt_str.h
+qt_str.o: ../win/Qt/qt_str.cpp ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_str.cpp
-qt_streq.o: ../win/Qt/qt_streq.cpp $(HACK_H) ../include/qt_streq.h \
-		../include/qt_str.h
+qt_streq.o: ../win/Qt/qt_streq.cpp $(HACK_H) ../win/Qt/qt_streq.h \
+		../win/Qt/qt_line.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_streq.cpp
-qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../include/qt_svsel.h \
-		../include/qt_bind.h ../include/qt_str.h
+qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../win/Qt/qt_svsel.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_svsel.cpp
-qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../include/qt_win.h \
-		../include/qt_clust.h ../include/qt_kde0.h \
-		../include/qt_bind.h ../include/qt_click.h \
-		../include/qt_glyph.h ../include/qt_inv.h ../include/qt_key.h \
-		../include/qt_icon.h ../include/qt_map.h ../include/qt_menu.h \
-		../include/qt_msg.h ../include/qt_set.h
+qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_win.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_click.h ../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h \
+		../win/Qt/qt_key.h ../win/Qt/qt_icon.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_clust.h ../win/Qt/qt_menu.h ../win/Qt/qt_rip.h \
+		../win/Qt/qt_msg.h ../win/Qt/qt_set.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
 qt_xcmd.o: ../win/Qt/qt_xcmd.cpp $(HACK_H) ../include/func_tab.h \
-		../include/qt_xcmd.h qt_xcmd.moc ../include/qt_bind.h \
-		../include/qt_set.h ../include/qt_str.h
+		../win/Qt/qt_xcmd.h qt_xcmd.moc ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_xcmd.cpp
-qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../include/qt_yndlg.h \
-		qt_yndlg.moc ../include/qt_str.h
+qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_yndlg.h qt_yndlg.moc \
+		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
+qt3_win.o: ../win/Qt3/qt3_win.cpp $(HACK_H) ../include/func_tab.h \
+		../include/dlb.h ../include/patchlevel.h ../include/tile2x11.h \
+		../win/Qt3/qt3_win.h ../win/Qt3/qt3_clust.h \
+		../win/Qt3/qt3_kde0.h ../win/Qt3/qt3_xpms.h qt3_win.moc \
+		qt3_kde0.moc qt3tableview.moc
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt3_win.cpp
+qt3_clust.o: ../win/Qt3/qt3_clust.cpp ../win/Qt3/qt3_clust.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt3_clust.cpp
+qt3tableview.o: ../win/Qt3/qt3tableview.cpp ../win/Qt3/qt3tableview.h
+	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt3tableview.cpp
 wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
 wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
@@ -1001,53 +1043,44 @@ wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
 wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
 	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_trace.c
 vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
-sfdata.o: sfdata.c $(HACK_H) ../include/artifact.h ../include/func_tab.h \
-		../include/lev.h ../include/integer.h ../include/sfproto.h
 allmain.o: allmain.c $(HACK_H)
 alloc.o: alloc.c $(CONFIG_H)
 apply.o: apply.c $(HACK_H)
-artifact.o: artifact.c $(HACK_H) ../include/artifact.h ../include/artilist.h \
-		../include/sfproto.h ../include/integer.h
+artifact.o: artifact.c $(HACK_H) ../include/artifact.h ../include/artilist.h
 attrib.o: attrib.c $(HACK_H)
 ball.o: ball.c $(HACK_H)
-bones.o: bones.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
-		../include/integer.h
+bones.o: bones.c $(HACK_H)
 botl.o: botl.c $(HACK_H)
-cmd.o: cmd.c $(HACK_H) ../include/lev.h ../include/func_tab.h
+cmd.o: cmd.c $(HACK_H) ../include/func_tab.h
 dbridge.o: dbridge.c $(HACK_H)
 decl.o: decl.c $(HACK_H)
 detect.o: detect.c $(HACK_H) ../include/artifact.h
 dig.o: dig.c $(HACK_H)
 display.o: display.c $(HACK_H)
 dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h ../include/patchlevel.h
-do.o: do.c $(HACK_H) ../include/lev.h
+do.o: do.c $(HACK_H)
 do_name.o: do_name.c $(HACK_H)
 do_wear.o: do_wear.c $(HACK_H)
 dog.o: dog.c $(HACK_H)
 dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h
 dokick.o: dokick.c $(HACK_H)
 dothrow.o: dothrow.c $(HACK_H)
-drawing.o: drawing.c $(HACK_H) ../include/tcap.h
-dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h \
-		../include/lev.h ../include/sfproto.h ../include/integer.h
+drawing.o: drawing.c $(CONFIG_H)
+dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
 eat.o: eat.c $(HACK_H)
-end.o: end.c $(HACK_H) ../include/lev.h ../include/dlb.h ../include/sfproto.h \
-		../include/integer.h
-engrave.o: engrave.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
-		../include/integer.h
+end.o: end.c $(HACK_H) ../include/dlb.h
+engrave.o: engrave.c $(HACK_H)
 exper.o: exper.c $(HACK_H)
 explode.o: explode.c $(HACK_H)
 extralev.o: extralev.c $(HACK_H)
-files.o: files.c $(HACK_H) ../include/dlb.h ../include/sfproto.h \
-		../include/integer.h ../include/sfprocs.h ../include/lev.h \
-		#zlib.h
+files.o: files.c $(HACK_H) ../include/dlb.h #zlib.h
 fountain.o: fountain.c $(HACK_H)
 hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
+insight.o: insight.c $(HACK_H)
 invent.o: invent.c $(HACK_H)
 isaac64.o: isaac64.c $(CONFIG_H) ../include/isaac64.h
-light.o: light.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
-		../include/integer.h
+light.o: light.c $(HACK_H)
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) ../include/mail.h
 makemon.o: makemon.c $(HACK_H)
@@ -1066,10 +1099,9 @@ mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 minion.o: minion.c $(HACK_H)
 mklev.o: mklev.c $(HACK_H)
 mkmap.o: mkmap.c $(HACK_H) ../include/sp_lev.h
-mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h ../include/lev.h \
-		../include/sfproto.h ../include/integer.h
+mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h
 mkobj.o: mkobj.c $(HACK_H)
-mkroom.o: mkroom.c $(HACK_H) ../include/sfproto.h ../include/integer.h
+mkroom.o: mkroom.c $(HACK_H)
 mon.o: mon.c $(HACK_H) ../include/mfndpos.h
 mondata.o: mondata.c $(HACK_H)
 monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h ../include/artifact.h
@@ -1082,14 +1114,13 @@ muse.o: muse.c $(HACK_H)
 music.o: music.c $(HACK_H)
 nhlua.o: nhlua.c $(HACK_H) ../include/dlb.h
 nhlsel.o: nhlsel.c $(HACK_H) ../include/sp_lev.h
-o_init.o: o_init.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
-		../include/integer.h
+nhlobj.o: nhlobj.c $(HACK_H) ../include/sp_lev.h
+o_init.o: o_init.c $(HACK_H)
 objects.o: objects.c $(CONFIG_H) ../include/obj.h ../include/objclass.h \
 		../include/prop.h ../include/skills.h ../include/color.h
 objnam.o: objnam.c $(HACK_H)
 options.o: options.c $(CONFIG_H) ../include/objclass.h ../include/flag.h \
-		$(HACK_H) ../include/tcap.h ../include/sfprocs.h \
-		../include/integer.h
+		$(HACK_H) ../include/tcap.h ../include/optlist.h
 pager.o: pager.c $(HACK_H) ../include/dlb.h
 pickup.o: pickup.c $(HACK_H)
 pline.o: pline.c $(HACK_H)
@@ -1101,23 +1132,14 @@ quest.o: quest.c $(HACK_H)
 questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h
 read.o: read.c $(HACK_H)
 rect.o: rect.c $(HACK_H)
-region.o: region.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
-		../include/integer.h
-restore.o: restore.c $(HACK_H) ../include/lev.h ../include/tcap.h \
-		../include/sfproto.h ../include/integer.h
+region.o: region.c $(HACK_H)
+restore.o: restore.c $(HACK_H) ../include/tcap.h
 rip.o: rip.c $(HACK_H)
 rnd.o: rnd.c $(HACK_H) ../include/isaac64.h
 role.o: role.c $(HACK_H)
-rumors.o: rumors.c $(HACK_H) ../include/lev.h ../include/dlb.h \
-		../include/sfproto.h ../include/integer.h
-save.o: save.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
-		../include/integer.h
+rumors.o: rumors.c $(HACK_H) ../include/dlb.h
+save.o: save.c $(HACK_H)
 sfstruct.o: sfstruct.c $(HACK_H)
-sfbase.o: sfbase.c $(HACK_H) ../include/integer.h ../include/sfprocs.h
-sfdata.o: sfdata.c $(HACK_H) ../include/artifact.h ../include/func_tab.h \
-		../include/lev.h ../include/integer.h ../include/sfproto.h
-sfascii.o: sfascii.c $(HACK_H) ../include/integer.h ../include/sfprocs.h
-sflendian.o: sflendian.c $(HACK_H) ../include/integer.h ../include/sfprocs.h
 shk.o: shk.c $(HACK_H)
 shknam.o: shknam.c $(HACK_H)
 sit.o: sit.c $(HACK_H) ../include/artifact.h
@@ -1126,10 +1148,10 @@ sp_lev.o: sp_lev.c $(HACK_H) ../include/sp_lev.h
 spell.o: spell.c $(HACK_H)
 steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
+symbols.o: symbols.c $(HACK_H) ../include/tcap.h
 sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
-timeout.o: timeout.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
-		../include/integer.h
+timeout.o: timeout.c $(HACK_H)
 topten.o: topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h
 track.o: track.c $(HACK_H)
 trap.o: trap.c $(HACK_H)
@@ -1137,7 +1159,6 @@ u_init.o: u_init.c $(HACK_H)
 uhitm.o: uhitm.c $(HACK_H)
 vault.o: vault.c $(HACK_H)
 version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h \
-		../include/lev.h ../include/sfproto.h ../include/integer.h \
 		../include/patchlevel.h
 vision.o: vision.c $(HACK_H) ../include/vis_tab.h
 weapon.o: weapon.c $(HACK_H)
@@ -1145,8 +1166,7 @@ were.o: were.c $(HACK_H)
 wield.o: wield.c $(HACK_H)
 windows.o: windows.c $(HACK_H) ../include/wingem.h ../include/winGnome.h
 wizard.o: wizard.c $(HACK_H)
-worm.o: worm.c $(HACK_H) ../include/lev.h ../include/sfproto.h \
-		../include/integer.h
+worm.o: worm.c $(HACK_H)
 worn.o: worn.c $(HACK_H)
 write.o: write.c $(HACK_H)
 zap.o: zap.c $(HACK_H)

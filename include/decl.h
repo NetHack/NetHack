@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1573869061 2019/11/16 01:51:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1589326665 2020/05/12 23:37:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,70 +7,6 @@
 #define DECL_H
 
 #define E extern
-#if !defined(MICRO) && !defined(VMS) && !defined(WIN32)
-#define LOCKNAMESIZE (PL_NSIZ + 14) /* long enough for uid+name+.99 */
-#define LOCKNAMEINIT "1lock"
-#define BONESINIT "bonesnn.xxx.le"
-#define BONESSIZE sizeof(BONESINIT)
-#else
-#if defined(MICRO)
-#define LOCKNAMESIZE FILENAME
-#define LOCKNAMEINIT ""
-#define BONESINIT ""
-#define BONESSIZE FILENAME
-#endif
-#if defined(VMS)
-#define LOCKNAMESIZE (PL_NSIZ + 17) /* long enough for _uid+name+.99;1 */
-#define LOCKNAMEINIT "1lock"
-#define BONESINIT "bonesnn.xxx_le;1"
-#define BONESSIZE sizeof(BONESINIT)
-#endif
-#if defined(WIN32)
-#define LOCKNAMESIZE (PL_NSIZ + 25) /* long enough for username+-+name+.99 */
-#define LOCKNAMEINIT ""
-#define BONESINIT "bonesnn.xxx.le"
-#define BONESSIZE sizeof(BONESINIT)
-#endif
-#endif
-
-#define INDEXT ".xxxxxx"           /* largest indicator suffix */
-#define INDSIZE sizeof(INDEXT)
-
-#if defined(UNIX) || defined(__BEOS__)
-#define SAVEX "save/99999.e"
-#ifndef SAVE_EXTENSION
-#define SAVE_EXTENSION ""
-#endif
-#else /* UNIX || __BEOS__ */
-#ifdef VMS
-#define SAVEX "[.save]nnnnn.e;1"
-#ifndef SAVE_EXTENSION
-#define SAVE_EXTENSION ""
-#endif
-#else /* VMS */
-#if defined(WIN32) || defined(MICRO)
-#define SAVEX ""
-#if !defined(SAVE_EXTENSION)
-#ifdef MICRO
-#define SAVE_EXTENSION ".svh"
-#endif
-#ifdef WIN32
-#define SAVE_EXTENSION ".NetHack-saved-game"
-#endif
-#endif /* !SAVE_EXTENSION */
-#endif /* WIN32 || MICRO */
-#endif /* else !VMS */
-#endif /* else !(UNIX || __BEOS__) */
-
-#ifndef SAVE_EXTENSION
-#define SAVE_EXTENSION ""
-#endif
-
-#ifndef MICRO
-#define SAVESIZE (PL_NSIZ + sizeof(SAVEX) + sizeof(SAVE_EXTENSION) + INDSIZE)
-#else
-#define SAVESIZE FILENAME
-#endif
 
 /* max size of a windowtype option */
 #define WINTYPELEN 16
@@ -171,6 +107,8 @@ struct sinfo {
     int in_moveloop;
     int in_impossible;
     int in_self_recover;
+    int in_parseoptions;        /* in parseoptions */
+    int config_error_ready;     /* config_error_add is ready, available */
 #ifdef PANICLOG
     int in_paniclog;
 #endif
@@ -215,7 +153,7 @@ typedef struct {
     boolean fieldlevel;   /* fieldlevel saves saves each field individually */
     boolean addinfo;      /* if set, some additional context info from core */
     boolean eof;          /* place to mark eof reached */
-    boolean bendian;      /* set to true if executing on a big-endian machine */
+    boolean bendian;      /* set to true if executing on big-endian machine */
     FILE *fpdef;          /* file pointer for fieldlevel default style */
     FILE *fpdefmap;       /* file pointer mapfile for def format */
     FILE *fplog;          /* file pointer logfile */
@@ -273,6 +211,9 @@ E NEARDATA struct obj *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
 
 E NEARDATA struct obj *uchain; /* defined only when punished */
 E NEARDATA struct obj *uball;
+
+#include "engrave.h"
+E struct engr *head_engr;
 
 #include "you.h"
 E NEARDATA struct you u;
@@ -381,9 +322,6 @@ E struct tc_gbl_data {   /* also declared in tcap.h */
 #define LI g.tc_gbl_data.tc_LI
 #define CO g.tc_gbl_data.tc_CO
 #endif
-
-/* xxxexplain[] is in drawing.c */
-E const char *const monexplain[], invisexplain[], *const oclass_names[];
 
 /* Some systems want to use full pathnames for some subsets of file names,
  * rather than assuming that they're all in the current directory.  This
@@ -690,6 +628,17 @@ struct role_filter {
     short mask;
 };
 
+/* read.c, create_particular() & create_particular_parse() */
+struct _create_particular_data {
+    int quan;
+    int which;
+    int fem;
+    char monclass;
+    boolean randmonst;
+    boolean maketame, makepeaceful, makehostile;
+    boolean sleeping, saddled, invisible, hidden;
+};
+
 /* instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * an set in decl.c during early early engine initialization.
@@ -731,6 +680,7 @@ struct instance_globals {
 #endif
     unsigned long cond_hilites[BL_ATTCLR_MAX];
     int now_or_before_idx;   /* 0..1 for array[2][] first index */
+    int condmenu_sortorder;
 
     /* cmd.c */
     struct cmd Cmd; /* flag.h */
@@ -760,7 +710,7 @@ struct instance_globals {
     const char *hname; /* name of the game (argv[0] of main) */
     int hackpid; /* current process id */
     char chosen_windowtype[WINTYPELEN];
-    int bases[MAXOCLASSES];
+    int bases[MAXOCLASSES + 1];
     int multi;
     const char *multi_reason;
     int nroom;
@@ -785,6 +735,7 @@ struct instance_globals {
 #define DOMOVE_RUSH         0x00000002
     const char *nomovemsg;
     char plname[PL_NSIZ]; /* player name */
+    int plnamelen; /* length of plname[] if that came from getlogin() */
     char pl_character[PL_CSIZ];
     char pl_race; /* character's race */
     char pl_fruit[PL_FSIZ];
@@ -861,6 +812,10 @@ struct instance_globals {
 #endif
     struct sinfo program_state;
 
+    /* detect.c */
+
+    int already_found_flag; /* used to augment first "already found a monster"
+                             * message if 'cmdassist' is Off */
     /* dig.c */
 
     boolean did_dig_msg;
@@ -875,7 +830,8 @@ struct instance_globals {
     boolean at_ladder;
     char *dfr_pre_msg;  /* pline() before level change */
     char *dfr_post_msg; /* pline() after level change */
-    d_level save_dlevel;
+    int did_nothing_flag; /* to augment the no-rest-next-to-monster message */
+    d_level save_dlevel; /* ? [even back in 3.4.3, only used in bones.c] */
 
     /* do_name.c */
     struct selectionvar *gloc_filter_map;
@@ -945,17 +901,19 @@ struct instance_globals {
     boolean chosen_symset_start;
     boolean chosen_symset_end;
     int symset_which_set;
-    char SAVEF[SAVESIZE]; /* holds relative path of save file from playground */
+    /* SAVESIZE, BONESSIZE, LOCKNAMESIZE are defined in "fnamesiz.h" */
+    char SAVEF[SAVESIZE]; /* relative path of save file from playground */
 #ifdef MICRO
     char SAVEP[SAVESIZE]; /* holds path of directory for save file */
 #endif
     char bones[BONESSIZE];
     char lock[LOCKNAMESIZE];
 
-
     /* hack.c */
     anything tmp_anything;
     int wc; /* current weight_cap(); valid after call to inv_weight() */
+
+    /* insight.c */
 
     /* invent.c */
     int lastinvnr;  /* 0 ... 51 (never saved&restored) */
@@ -964,7 +922,7 @@ struct instance_globals {
     char *invbuf;
     unsigned invbufsiz;
     /* for perm_invent when operating on a partial inventory display, so that
-       the persistent one doesn't get shrunk during filtering for item selection
+       persistent one doesn't get shrunk during filtering for item selection
        then regrown to full inventory, possibly being resized in the process */
     winid cached_pickinv_win;
     /* query objlist callback: return TRUE if obj type matches "this_type" */
@@ -975,30 +933,21 @@ struct instance_globals {
     /* light.c */
     light_source *light_base;
 
-
     /* lock.c */
     struct xlock_s xlock;
 
     /* makemon.c */
-    struct {
-        int choice_count;
-        char mchoices[SPECIAL_PM]; /* value range is 0..127 */
-    } rndmonst_state;
 
     /* mhitm.c */
     boolean vis;
     boolean far_noise;
     long noisetime;
-    struct obj *otmp;
-    int dieroll; /* Needed for the special case of monsters wielding vorpal
-                  * blades (rare). If we use this a lot it should probably
-                  * be a parameter to mdamagem() instead of a global variable.
-                  */
 
     /* mhitu.c */
     int mhitu_dieroll;
 
     /* mklev.c */
+    genericptr_t luathemes[MAXDUNGEON];
     xchar vault_x;
     xchar vault_y;
     boolean made_branch; /* used only during level creation */
@@ -1173,29 +1122,21 @@ struct instance_globals {
     /* auto-response flag for/from "sell foo?" 'a' => 'y', 'q' => 'n' */
     char sell_response;
     int sell_how;
-    /* can't just use sell_response='y' for auto_credit because the 'a' response
+    /* can't just use sell_response='y' for auto_credit because 'a' response
        shouldn't carry over from ordinary selling to credit selling */
     boolean auto_credit;
     struct repo repo;
-   long int followmsg; /* last time of follow message */
-
+    long int followmsg; /* last time of follow message */
 
     /* sp_lev.c */
     char *lev_message;
     lev_region *lregions;
     int num_lregions;
-    /* positions touched by level elements explicitly defined in the des-file */
-    char SpLev_Map[COLNO][ROWNO];
     struct sp_coder *coder;
     xchar xstart, ystart;
-    char xsize, ysize;
-    boolean splev_init_present;
-    boolean icedpools;
-    int mines_prize_count;
-    int soko_prize_count; /* achievements */
-    struct obj *container_obj[MAX_CONTAINMENT];
-    int container_idx;
-    struct monst *invent_carrying_monster;
+    xchar xsize, ysize;
+    boolean in_mk_themerooms;
+    boolean themeroom_failed;
 
     /* spells.c */
     int spl_sortmode;   /* index into spl_sortchoices[] */

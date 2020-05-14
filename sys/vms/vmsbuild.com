@@ -3,6 +3,10 @@ $	version_number = "3.7.0"
 $ ! $NHDT-Date: 1557701799 2019/05/12 22:56:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $
 $ ! Copyright (c) 2018 by Robert Patrick Rankin
 $ ! NetHack may be freely redistributed.  See license for details.
+$
+$!TODO: Separate the lua build and create an object library for it instead
+$!	of putting lua modules into nethack.olb.
+$
 $ !
 $ ! usage:
 $ !   $ set default [.src]	!or [-.-.src] if starting from [.sys.vms]
@@ -61,13 +65,13 @@ $	copy sys$input: sys$error:	!p1 usage
    or  "DECC" -- use DEC C to compile everything
    or  "GNUC" -- use GNU C to compile everything
    or  "LINK" -- skip compilation, just relink nethack.exe
-   or  "SPEC[IAL]" -- just compile and link lev_comp.exe
+   or  "SPEC[IAL]" -- just compile and link dlb.exe and recover.exe
    or    ""   -- default operation (VAXC unless 'CC' is defined)
 
 Note: if a DCL symbol for CC is defined, "VAXC" and "GNUC" are no-ops.
       If the symbol value begins with "G" (or "g"), then the GNU C
       library will be included in all link operations.  Do not rebuild
-      lev_comp with "SPECIAL" unless you have a CC symbol setup with
+      dlb+recover with "SPECIAL" unless you have a CC symbol setup with
       the proper options.
 $	abort
 $p1_ok:
@@ -185,6 +189,7 @@ $	nethacklib = "[-.src]nethack.olb"
 $	create nethack.opt
 ! nethack.opt
 nethack.olb/Include=(vmsmain)/Library
+![-.lib.lua]liblua.olb/Library
 ! lib$initialize is used to call a routine (before main()) in vmsunix.c that
 ! tries to check whether debugger support has been linked in, for PANICTRACE
 sys$library:starlet.olb/Include=(lib$initialize)
@@ -238,7 +243,6 @@ $!
 $ if f$search("pmatchregex.c").eqs."" then  copy [-.sys.share]pmatchregex.c []*.*
 $ if f$search("random.c").eqs."" then  copy [-.sys.share]random.c []*.*
 $ if f$search("tclib.c") .eqs."" then  copy [-.sys.share]tclib.c  []*.*
-$ if f$search("[-.util]lev_yacc.c").eqs."" then  @[-.sys.vms]spec_lev.com
 $!
 $	p5 := 'p5'
 $	ttysrc = "[-.win.tty]getline,[-.win.tty]termcap" -
@@ -251,7 +255,7 @@ $	interface = ttysrc !default
 $	if p5.eqs."CURSES" then  interface = cursessrc
 $	if p5.eqs."TTY+CURSES" then  interface = ttysrc + "," + cursessrc
 $	if p5.eqs."CURSES+TTY" then  interface = cursessrc + "," + ttysrc
-
+$
 $ if f$search("[-.include]nhlua.h").eqs.""
 $ then
 $	create [-.include]nhlua.h	!empty
@@ -300,14 +304,15 @@ $ c_list = "decl,version,[-.sys.vms]vmsmain,[-.sys.vms]vmsunix" -
 $ gosub compile_list
 $ c_list = interface !ttysrc or cursessrc or both
 $ gosub compile_list
-$ c_list = "allmain,apply,artifact,attrib,ball,bones,botl,cmd,dbridge,detect" -
-	+ ",dig,display,do,do_name,do_wear,dog,dogmove,dokick,dothrow,drawing" -
-	+ ",dungeon,eat,end,engrave,exper,explode,extralev,files,fountain"
+$ c_list = "allmain,apply,artifact,attrib,ball,bones,botl,cmd,dbridge" -
+	+ ",dothrow,drawing,detect,dig,display,do,do_name,do_wear,dog" -
+	+ ",dogmove,dokick,dungeon,eat,end,engrave,exper,explode" -
+	+ ",extralev,files,fountain"
 $ gosub compile_list
-$ c_list = "hack,hacklib,invent,light,lock,mail,makemon,mapglyph,mcastu" -
-	+ ",mhitm,mhitu,minion,mklev,mkmap,mkmaze,mkobj,mkroom,mon,mondata" -
-	+ ",monmove,mplayer,mthrowu,muse,music,o_init,objnam,options" -
-	+ ",pager,pickup"
+$ c_list = "hack,hacklib,insight,invent,light,lock,mail,makemon" -
+	+ ",mapglyph,mcastu,mhitm,mhitu,minion,mklev,mkmap,mkmaze" -
+	+ ",mkobj,mkroom,mon,mondata,monmove,mplayer,mthrowu,muse" -
+	+ ",music,o_init,objnam,options,pager,pickup"
 $ gosub compile_list
 $ c_list = "pline,polyself,potion,pray,priest,quest,questpgr,read" -
 	+ ",rect,region,restore,rip,rnd,role,rumors,save,shk,shknam,sit" -
@@ -320,7 +325,7 @@ $ gosub compile_list
 $!
 $! Files added in 3.7
 $!
-$ c_list = "sfbase,sfdata,sfstruct,sflendian,sfascii,nhlua,nhlsel"
+$ c_list = "nhlua,nhlobj,nhlsel" !,sfstruct
 $ gosub compile_list
 $!
 $! 3.7 runtime LUA level parser/loader
@@ -347,24 +352,10 @@ $ milestone "NetHack"
 $     if c_opt.eq.o_LINK then  goto done	!"LINK" only
 $special:
 $!
-$! build special level and dungeon compilers
+$! utilities only [dgn_comp and lev_comp are gone]
 $!
 $ set default [-.util]
-$! c_list = "#panic,#lev_main,#lev_yacc,#dgn_main,#dgn_yacc"
-$!     if c_opt.eq.o_SPCL then  c_list = "[-.sys.vms]vmsfiles," + c_list
-$! gosub compile_list
-$! c_list = "#lev_lex,#dgn_lex"
-$! copy [-.sys.vms]lev_lex.h stdio.*/Prot=(s:rwd,o:rwd)
-$! gosub compile_list
-$! rename stdio.h lev_lex.*
-$! link/exe=lev_comp.exe lev_main.obj,lev_yacc.obj,lev_lex.obj,-
-$!	panic.obj,'nethacklib'/Lib,[-.src]ident.opt/Opt,[-.src]crtl.opt/Opt
-$! milestone "lev_comp"
-$! link/exe=dgn_comp.exe dgn_main.obj,dgn_yacc.obj,dgn_lex.obj,-
-$!	panic.obj,'nethacklib'/Lib,[-.src]ident.opt/Opt,[-.src]crtl.opt/Opt
-$! milestone "dgn_comp"
-$!
-$ c_list = "#dlb_main,#recover"
+$ c_list = "#panic,#dlb_main,#recover"
 $ gosub compile_list
 $ link/exe=dlb.exe dlb_main.obj,-
 	panic.obj,'nethacklib'/Lib,[-.src]ident.opt/Opt,[-.src]crtl.opt/Opt

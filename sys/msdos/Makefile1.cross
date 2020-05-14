@@ -124,31 +124,21 @@ MAKEDEFSOBJS    = $(HOST_O)makedefs.o  $(HOST_O)monst.o	 $(HOST_O)objects.o
 
 LUA_QTEXT_FILE = "quest.lua"
 
-#SPLEVSRC    = lev_yacc.c  lev_$(LEX).c	 lev_main.c  panic.c
-#DGNCOMPSRC  = dgn_yacc.c  dgn_$(LEX).c	 dgn_main.c
-#SPLEVOBJS   = $(HOST_O)lev_yacc.o $(HOST_O)lev_$(LEX).o $(HOST_O)lev_main.o $(HOST_O)alloc.o \
-#		$(HOST_O)monst.o $(HOST_O)objects.o $(HOST_O)panic.o                     \
-#		$(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)stubvid.o
-#DGNCOMPOBJS = $(HOST_O)dgn_yacc.o  $(HOST_O)dgn_$(LEX).o $(HOST_O)dgn_main.o  $(HOST_O)alloc.o  \
-#		$(HOST_O)panic.o
-
 #==========================================
 #  Tile related object files.
 #==========================================
 
-TILOBJ      = $(HOST_O)tile.o $(VGAOBJ)
-
 TILOBJ2     = $(HOST_O)tileset.o $(HOST_O)bmptiles.o $(HOST_O)giftiles.o
 
-TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
+TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)monst.o \
 		$(HOST_O)objects.o
 
-TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
+TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)monst.o \
 		$(HOST_O)objects.o
 
 TILE_BMP    = $(DAT)/NHTILES.BMP
 
-TILEUTIL    = $(TILOBJ) $(TILE_BMP)
+TILEUTIL    = $(TILE_BMP)
 
 TILEFILES   = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
 
@@ -192,19 +182,34 @@ YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h   \
 DISPLAY_H  = $(MONDATA_H)	$(INCL)/vision.h    $(INCL)/display.h
 PCCONF_H   = $(INCL)/micro.h	$(INCL)/system.h    $(INCL)/pcconf.h \
 	    $(MSYS)/pcvideo.h
-CONFIG_H   = $(GLOBAL_H)	$(INCL)/tradstdc.h  $(INCL)/config1.h \
-	    $(INCL)/config.h
 DECL_H	   = $(YOU_H)		$(INCL)/spell.h	    $(INCL)/color.h   \
 	     $(INCL)/obj.h	$(INCL)/onames.h    $(INCL)/pm.h      \
 	      $(INCL)/decl.h
 GLOBAL_H   = $(PCCONF_H)	$(INCL)/coord.h	   $(INCL)/global.h
-HACK_H	   = $(CONFIG_H)	$(INCL)/context.h  $(DUNGEON_H)	       \
-	     $(DECL_H)	      	$(DISPLAY_H)	   $(INCL)/monsym.h    \
-	     $(INCL)/mkroom.h	$(INCL)/objclass.h $(INCL)/trap.h      \
-	     $(INCL)/flag.h     $(RM_H)		   $(INCL)/vision.h    \
-	     $(INCL)/wintype.h  $(INCL)/engrave.h  $(INCL)/rect.h      \
-	     $(INCL)/trampoli.h $(INCL)/hack.h     $(REGION_H)	       \
-	     $(INCL)/sys.h
+
+CONFIG_H = $(INCL)/config.h $(INCL)/config1.h $(INCL)/tradstdc.h \
+		$(INCL)/global.h $(INCL)/coord.h $(INCL)/vmsconf.h \
+		$(INCL)/system.h $(INCL)/nhlua.h $(INCL)/unixconf.h \
+		$(INCL)/os2conf.h $(INCL)/micro.h $(INCL)/pcconf.h \
+		$(INCL)/tosconf.h $(INCL)/amiconf.h $(INCL)/macconf.h \
+		$(INCL)/beconf.h $(INCL)/wceconf.h $(INCL)/ntconf.h
+
+HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/lint.h $(INCL)/align.h \
+		$(INCL)/dungeon.h $(INCL)/monsym.h $(INCL)/mkroom.h \
+		$(INCL)/objclass.h $(INCL)/youprop.h $(INCL)/prop.h \
+		$(INCL)/permonst.h $(INCL)/monattk.h \
+		$(INCL)/monflag.h $(INCL)/mondata.h $(INCL)/pm.h \
+		$(INCL)/wintype.h $(INCL)/context.h $(INCL)/rm.h \
+		$(INCL)/botl.h $(INCL)/rect.h \
+		$(INCL)/region.h $(INCL)/decl.h $(INCL)/quest.h \
+		$(INCL)/spell.h $(INCL)/color.h $(INCL)/obj.h \
+		$(INCL)/you.h $(INCL)/attrib.h $(INCL)/monst.h \
+		$(INCL)/mextra.h $(INCL)/skills.h $(INCL)/onames.h \
+		$(INCL)/timeout.h $(INCL)/trap.h $(INCL)/flag.h \
+		$(INCL)/vision.h $(INCL)/display.h $(INCL)/engrave.h \
+		$(INCL)/winprocs.h $(INCL)/sys.h $(INCL)/wintty.h \
+		$(INCL)/trampoli.h
+
 DLB_H      = $(INCL)/dlb.h
 
 ifeq ($(SUPPRESS_GRAPHICS),Y)
@@ -270,6 +275,9 @@ $(HOST_O)%.o : $(MSYS)/%.c
 $(HOST_O)%.o : $(SRC)/%.c
 	$(HOST_CC) $(cflags) -o$@ $<
 
+$(HOST_O)%.o : $(UTIL)/%.c
+	$(HOST_CC) $(cflags) -o$@ $<
+
 $(HOST_O)%.o : %.c
 	$(HOST_CC) $(cflags) -o$@ $<
 
@@ -296,7 +304,7 @@ default: prereq
 util: $(HOST_O)utility.tag
 
 $(HOST_O)utility.tag: $(INCL)/date.h $(INCL)/trap.h $(INCL)/onames.h \
-	$(INCL)/pm.h vis_tab.c $(TILEUTIL)
+	$(INCL)/pm.h vis_tab.c $(TILEUTIL) $(SRC)/tile.c
 	echo host utilities made > $@
 
 tileutil: $(U)gif2txt $(U)txt2ppm
@@ -396,9 +404,11 @@ hobj.tag:
 $(U)makedefs:  $(MAKEDEFSOBJS)
 	$(HOST_LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS)
 
-$(HOST_O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
-		$(INCL)/monsym.h   $(INCL)/qtext.h $(U)makedefs.c
-	$(HOST_CC) $(cflags) -o$@ $(U)makedefs.c
+$(HOST_O)makedefs.o: $(U)makedefs.c $(SRC)/mdlib.c $(CONFIG_H) $(INCL)/permonst.h \
+		$(INCL)/objclass.h $(INCL)/monsym.h \
+		$(INCL)/artilist.h $(INCL)/dungeon.h $(INCL)/obj.h \
+		$(INCL)/monst.h $(INCL)/you.h $(INCL)/flag.h \
+		$(INCL)/dlb.h $(INCL)/patchlevel.h
 
 #=============================================
 #  Header file moves required for tile support
@@ -419,7 +429,7 @@ $(U)tilemap: $(HOST_O)tilemap.o
 	$(HOST_LINK) $(LFLAGS) -o$@ $(HOST_O)tilemap.o
 
 $(HOST_O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H) $(TILE_H)
-	$(HOST_CC) $(cflags) -I$(WSHR) -I$(MSYS) -o$@ $(WSHR)/tilemap.c
+	$(HOST_CC) $(cflags) -I$(WSHR) -I$(MSYS) -DSTATUES_LOOK_LIKE_MONSTERS -o$@ $(WSHR)/tilemap.c
 
 
 #==========================================
@@ -602,12 +612,12 @@ spotless: clean
 #	if [ -f $(WSHR)/oththin.txt ]; then rm $(WSHR)/oththin.txt; fi;
 
 #==========================================
-# Game Dependencies
+# Host Utility Dependencies
 #==========================================
 
 # src dependencies
 
-$(HOST_O)tile.o: tile.c $(HACK_H)
+$(HOST_O)drawing.o: $(CONFIG_H)
 $(HOST_O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(HOST_O)alloc.o: alloc.c $(CONFIG_H)
 $(HOST_O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h
