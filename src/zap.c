@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1586633039 2020/04/11 19:23:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.335 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1589491666 2020/05/14 21:27:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.340 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5365,9 +5365,8 @@ makewish()
     }
     /*
      *  Note: if they wished for and got a non-object successfully,
-     *  otmp == &cg.zeroobj.  That includes gold, or an artifact that
-     *  has been denied.  Wishing for "nothing" requires a separate
-     *  value to remain distinct.
+     *  otmp == &zeroobj.  That includes an artifact which has been denied.
+     *  Wishing for "nothing" requires a separate value to remain distinct.
      */
     otmp = readobjnam(buf, &nothing);
     if (!otmp) {

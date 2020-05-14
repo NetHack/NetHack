@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ $NHDT-Date: 1589323704 2020/05/12 22:48:24 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.219 $ $NHDT-Date: 1589491665 2020/05/14 21:27:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -166,8 +166,6 @@ change light radius of stack of candles to square root
 could get redundate "mon hits other-mon" messages when mon wields an artifact
 failed untrap while mounted that moved hero onto the trap would leave steed
 	with stale coordinates, triggering warnings if 'sanity_check' is On
-when hold_another_object() fails while hero is swallowed, drop the item into
-	swallower's inventory instead of onto the floor
 when digging a pit results in it being filled by adjacent pool or lava, any
 	objects at the spot weren't subjected to water or fire damage;
 	also, riding hero's steed wasn't subjected to immersion either
@@ -179,6 +177,16 @@ falling while going down stairs and dropping items due to encumbrance or
 	punishment wasn't subject fragile ones to breakage
 objects scattered by an explosion which land on water or lava weren't affected
 	by the water or lava
+hold_another_object (for wishing, horn of plenty, theft while poly'd, other
+	non-pickup actions giving hero another inventory item) wasn't
+	reporting change in encumbrance; that would catch up on next turn but
+	could be off during additional move(s) for current turn
+hold_another_object added item to inventory first, then maybe removed and
+	dropped it, resulting in spurious add and remove perm_invent updates
+hold_another_object used hardcoded Stressed to limit carrying instead of
+	using the 'pickup_burden' option for that
+when hold_another_object fails while hero is swallowed, drop the item into
+	swallower's inventory instead of onto the floor
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
