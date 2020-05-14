@@ -16,7 +16,7 @@
 -- to generate a single themed room.
 
 themerooms = {
-  {
+   {
      -- the "default" room
       frequency = 1000,
       contents = function()
@@ -79,38 +79,44 @@ themerooms = {
    end,
 
    -- Boulder room
-   function()
-      des.room({ type = "themed",
-                 contents = function(rm)
-                    for x = 0, rm.width - 1 do
-                       for y = 0, rm.height - 1 do
-                          if (percent(30)) then
-                             if (percent(50)) then
-                                des.object("boulder");
-                             else
-                                des.trap("rolling boulder");
-                             end
-                          end
-                       end
-                    end
-                 end
-      });
-   end,
+   {
+      mindiff = 4,
+      contents = function()
+         des.room({ type = "themed",
+                  contents = function(rm)
+                     for x = 0, rm.width - 1 do
+                        for y = 0, rm.height - 1 do
+                           if (percent(30)) then
+                              if (percent(50)) then
+                                 des.object("boulder");
+                              else
+                                 des.trap("rolling boulder");
+                              end
+                           end
+                        end
+                     end
+                  end
+         });
+      end
+   },
 
    -- Spider nest
-   function()
-      des.room({ type = "themed",
-                 contents = function(rm)
-                    for x = 0, rm.width - 1 do
-                       for y = 0, rm.height - 1 do
-                          if (percent(30)) then
-                             des.trap("web", x, y);
-                          end
-                       end
-                    end
-                 end
-      });
-   end,
+   {
+      mindiff = 10,
+      contents = function()
+         des.room({ type = "themed",
+                  contents = function(rm)
+                     for x = 0, rm.width - 1 do
+                        for y = 0, rm.height - 1 do
+                           if (percent(30)) then
+                              des.trap("web", x, y);
+                           end
+                        end
+                     end
+                  end
+         });
+      end
+   },
 
    -- Trap room
    function()
