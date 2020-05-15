@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.219 $ $NHDT-Date: 1589491665 2020/05/14 21:27:45 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ $NHDT-Date: 1589575727 2020/05/15 20:48:47 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -265,7 +265,9 @@ tty: role and race selection menus weren't filtering out potential choices
 Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)
-windows: update for new status condition fields
+Unix: add "ec2-user" to the list of user names 'sysconf' classifies as generic
+Windows: update for new status condition fields
+Windows: include commented-out 'PORTABLE_DEVICE_PATHS' in sysconf.template
 X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 X11: extend fancy status one-turn inverse video status-change highlighting to
 	hunger, encumbrance, and conditions
