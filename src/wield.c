@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1578190903 2020/01/05 02:21:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1586178709 2020/04/06 13:11:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -64,6 +64,19 @@ static int FDECL(ready_weapon, (struct obj *));
 /* used by welded(), and also while wielding */
 #define will_weld(optr) \
     ((optr)->cursed && (erodeable_wep(optr) || (optr)->otyp == TIN_OPENER))
+
+/* to dual-wield, 'obj' must be a weapon or a weapon-tool, and not a bow
+   or arrow or missile (dart, shuriken, boomerang), so not matching the
+   one-handed weapons which yield "you begin bashing" if used for melee;
+   empty hands and two-handed weapons have to be handled separately */
+#define TWOWEAPOK(obj) \
+    (((obj)->oclass == WEAPON_CLASS)                            \
+     ? !(is_launcher(obj) ||is_ammo(obj) || is_missile(obj))    \
+     : is_weptool(obj))
+
+static const char
+    are_no_longer_twoweap[] = "are no longer using two weapons at once",
+    can_no_longer_twoweap[] = "can no longer wield two weapons at once";
 
 /*** Functions that place a given item in a slot ***/
 /* Proper usage includes:
@@ -139,7 +152,7 @@ struct obj *wep;
 {
     /* Separated function so swapping works easily */
     int res = 0;
-    boolean had_wep = (uwep != 0);
+    boolean was_twoweap = u.twoweap, had_wep = (uwep != 0);
 
     if (!wep) {
         /* No weapon */
@@ -192,7 +205,16 @@ struct obj *wep;
             prinv((char *) 0, wep, 0L);
             wep->owornmask = dummy;
         }
+
         setuwep(wep);
+        if (was_twoweap && !u.twoweap && flags.verbose) {
+            /* skip this message if we already got "empty handed" one above;
+               also, Null is not safe for neither TWOWEAPOK() or bimanual() */
+            if (uwep)
+                You("%s.", ((TWOWEAPOK(uwep) && !bimanual(uwep))
+                            ? are_no_longer_twoweap
+                            : can_no_longer_twoweap));
+        }
 
         /* KMH -- Talking artifacts are finally implemented */
         arti_speak(wep);
@@ -571,7 +593,7 @@ dowieldquiver()
         You("are now empty %s.", body_part(HANDED));
         res = 1;
     } else if (was_twoweap && !u.twoweap) {
-        You("are no longer wielding two weapons at once.");
+        You("%s.", are_no_longer_twoweap);
         res = 1;
     }
     return res;
@@ -662,10 +684,6 @@ can_twoweapon()
 {
     struct obj *otmp;
 
-    /* to dual-wield, must be a weapon-tool or a weapon other than a bow */
-#define TWOWEAPOK(obj) \
-    (((obj)->oclass == WEAPON_CLASS) ? !is_launcher(obj) : is_weptool(obj))
-
     if (!could_twoweap(g.youmonst.data)) {
         if (Upolyd)
             You_cant("use two weapons in your current form.");
@@ -719,13 +737,20 @@ drop_uswapwep()
     dropx(obj);
 }
 
+void
+set_twoweap(on_off)
+boolean on_off;
+{
+    u.twoweap = on_off;
+}
+
 int
 dotwoweapon()
 {
     /* You can always toggle it off */
     if (u.twoweap) {
         You("switch to your primary weapon.");
-        u.twoweap = 0;
+        set_twoweap(FALSE); /* u.twoweap = FALSE */
         update_inventory();
         return 0;
     }
@@ -734,7 +759,7 @@ dotwoweapon()
     if (can_twoweapon()) {
         /* Success! */
         You("begin two-weapon combat.");
-        u.twoweap = 1;
+        set_twoweap(TRUE); /* u.twoweap = TRUE */
         update_inventory();
         return (rnd(20) > ACURR(A_DEX));
     }
@@ -784,8 +809,8 @@ void
 untwoweapon()
 {
     if (u.twoweap) {
-        You("can no longer use two weapons at once.");
-        u.twoweap = FALSE;
+        You("%s.", can_no_longer_twoweap);
+        set_twoweap(FALSE); /* u.twoweap = FALSE */
         update_inventory();
     }
     return;

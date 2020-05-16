@@ -1,4 +1,4 @@
-# NetHack 3.6 sysconf $NHDT-Date: 1575245127 2019/12/02 00:05:27 $ $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.32 $
+# NetHack 3.6 sysconf $NHDT-Date: 1589575728 2020/05/15 20:48:48 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -35,7 +35,8 @@ EXPLORERS=*
 # If the user name is found in this list, prompt for username instead.
 # Uses the same syntax as the WIZARDS option above.
 # A public server should probably disable this.
-GENERICUSERS=play player game games nethack nethacker
+# ["ec2-user" is the default user name on Amazon Linux]
+GENERICUSERS=play player game games nethack nethacker ec2-user
 
 # Use the player name for matching WIZARDS, EXPLORERS and SHELLERS,
 # instead of the user's login name.
@@ -128,10 +129,22 @@ GREPPATH=/bin/grep
 PANICTRACE_GDB=1
 PANICTRACE_LIBC=2
 
+# 'portable_device_paths' is only supported for Windows.  Starting with
+# 3.6.3, nethack on Windows treats the folder containing nethack.exe and
+# nethackW.exe as read-only and puts data files which are generated or
+# modified during play or by the user in assorted folders derived from
+# user name.  3.6.4 added PORTABLE_DEVICE_PATHS to allow reverting to
+# the old behavior of having the run-time configuration file and other
+# data in the same directory as the executable so that the whole thing
+# can be moved from one machine to another (flash drive or perhaps cloud)
+# without updating folder paths.
+#PORTABLE_DEVICE_PATHS=0
+
 # Ordinary run-time options can be set here to override the builtin-in
-# default values.  Unlike the SYSCF values above, individual users can
-# still choose their own option settings via NETHACKOPTIONS in their
-# environment or via ~/.nethackrc run-time configuration file.
+# default values.  Unlike all the SYSCF values above, individual users
+# can override the overridden options set here by choosing their own
+# option settings via NETHACKOPTIONS in their environment or via
+# ~/.nethackrc run-time configuration file.
 #OPTIONS=!autopickup,fruit:tomato,symset:DECgraphics
 
 #eof

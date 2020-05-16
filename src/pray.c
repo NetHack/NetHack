@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1581322665 2020/02/10 08:17:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1584872363 2020/03/22 10:19:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1217,6 +1217,14 @@ aligntyp g_align;
     if (kick_on_butt)
         u.ublesscnt += kick_on_butt * rnz(1000);
 
+    /* Avoid games that go into infinite loops of copy-pasted commands with no
+       human interaction; this is a DoS vector against the computer running
+       NetHack. Once the turn counter is over 100000, every additional 100 turns
+       increases the prayer timeout by 1, thus eventually nutrition prayers will
+       fail and some other source of nutrition will be required. */
+    if (g.moves > 100000L)
+        u.ublesscnt += (g.moves - 100000L) / 100;
+
     return;
 }
 
@@ -1323,8 +1331,8 @@ register struct obj *otmp;
 int
 dosacrifice()
 {
-    static NEARDATA const char cloud_of_smoke[] =
-        "A cloud of %s smoke surrounds you...";
+    static NEARDATA const char
+        cloud_of_smoke[] = "A cloud of %s smoke surrounds you...";
     register struct obj *otmp;
     int value = 0, pm;
     boolean highaltar;
@@ -1371,6 +1379,8 @@ dosacrifice()
                 value = eaten_stat(value, otmp);
         }
 
+        /* same race or former pet results apply even if the corpse is
+           too old (value==0) */
         if (your_race(ptr)) {
             if (is_demon(g.youmonst.data)) {
                 You("find the idea very satisfying.");
@@ -1454,8 +1464,16 @@ dosacrifice()
             adjalign(-3);
             value = -1;
             HAggravate_monster |= FROMOUTSIDE;
+        } else if (!value) {
+            ; /* too old; don't give undead or unicorn bonus or penalty */
         } else if (is_undead(ptr)) { /* Not demons--no demon corpses */
-            if (u.ualign.type != A_CHAOTIC)
+            /* most undead that leave a corpse yield 'human' (or other race)
+               corpse so won't get here; the exception is wraith; give the
+               bonus for wraith to chaotics too because they are sacrificing
+               something valuable (unless hero refuses to eat such things) */
+            if (u.ualign.type != A_CHAOTIC
+                /* reaching this side of the 'or' means hero is chaotic */
+                || (ptr == &mons[PM_WRAITH] && u.uconduct.unvegetarian))
                 value += 1;
         } else if (is_unicorn(ptr)) {
             int unicalign = sgn(ptr->maligntyp);
@@ -1605,8 +1623,7 @@ dosacrifice()
                  "So, mortal!  You dare desecrate my High Temple!");
         /* Throw everything we have at the player */
         god_zaps_you(altaralign);
-    } else if (value
-               < 0) { /* I don't think the gods are gonna like this... */
+    } else if (value < 0) { /* don't think the gods are gonna like this... */
         gods_upset(altaralign);
     } else {
         int saved_anger = u.ugangr;
@@ -1800,7 +1817,8 @@ boolean praying; /* false means no messages should be given */
     g.p_aligntyp = on_altar() ? a_align(u.ux, u.uy) : u.ualign.type;
     g.p_trouble = in_trouble();
 
-    if (is_demon(g.youmonst.data) && (g.p_aligntyp != A_CHAOTIC)) {
+    if (is_demon(g.youmonst.data) /* ok if chaotic or none (Moloch) */
+        && (g.p_aligntyp == A_LAWFUL || g.p_aligntyp != A_NEUTRAL)) {
         if (praying)
             pline_The("very idea of praying to a %s god is repugnant to you.",
                       g.p_aligntyp ? "lawful" : "neutral");
@@ -1817,9 +1835,11 @@ boolean praying; /* false means no messages should be given */
     else
         alignment = u.ualign.record;
 
-    if ((g.p_trouble > 0) ? (u.ublesscnt > 200)      /* big trouble */
-           : (g.p_trouble < 0) ? (u.ublesscnt > 100) /* minor difficulties */
-              : (u.ublesscnt > 0))                 /* not in trouble */
+    if (g.p_aligntyp == A_NONE) /* praying to Moloch */
+        g.p_type = -2;
+    else if ((g.p_trouble > 0) ? (u.ublesscnt > 200) /* big trouble */
+             : (g.p_trouble < 0) ? (u.ublesscnt > 100) /* minor difficulties */
+               : (u.ublesscnt > 0))                  /* not in trouble */
         g.p_type = 0;                     /* too soon... */
     else if ((int) Luck < 0 || u.ugangr || alignment < 0)
         g.p_type = 1; /* too naughty... */
@@ -1888,7 +1908,20 @@ prayer_done() /* M. Stephenson (1.0.3b) */
     aligntyp alignment = g.p_aligntyp;
 
     u.uinvulnerable = FALSE;
-    if (g.p_type == -1) {
+    if (g.p_type == -2) {
+        /* praying at an unaligned altar, not necessarily in Gehennom */
+        You("%s diabolical laughter all around you...",
+            !Deaf ? "hear" : "intuit");
+        wake_nearby();
+        adjalign(-2);
+        exercise(A_WIS, FALSE);
+        if (!Inhell) {
+            /* hero's god[dess] seems to be keeping his/her head down */
+            pline("Nothing else happens."); /* not actually true... */
+            return 1;
+        } /* else use regular Inhell result below */
+    } else if (g.p_type == -1) {
+        /* praying while poly'd into an undead creature while non-chaotic */
         godvoice(alignment,
                  (alignment == A_LAWFUL)
                     ? "Vile creature, thou durst call upon me?"

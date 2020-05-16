@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1581886869 2020/02/16 21:01:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.227 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1586807928 2020/04/13 19:58:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.230 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -336,7 +336,7 @@ register struct monst *mtmp;
      * you'll usually just swap places if this is a movement command
      */
     /* Intelligent chaotic weapons (Stormbringer) want blood */
-    if (is_safepet(mtmp) && !g.context.forcefight) {
+    if (is_safemon(mtmp) && !g.context.forcefight) {
         if (!uwep || uwep->oartifact != ART_STORMBRINGER) {
             /* There are some additional considerations: this won't work
              * if in a shop or Punished or you miss a random roll or
@@ -366,14 +366,12 @@ register struct monst *mtmp;
                 Strcpy(buf, y_monnam(mtmp));
                 buf[0] = highc(buf[0]);
                 You("stop.  %s is in the way!", buf);
-                g.context.travel = g.context.travel1 = g.context.mv = g.context.run
-                    = 0;
+                end_running(TRUE);
                 return TRUE;
-            } else if ((mtmp->mfrozen || (!mtmp->mcanmove)
-                        || (mtmp->data->mmove == 0)) && rn2(6)) {
+            } else if (mtmp->mfrozen || mtmp->msleeping || (!mtmp->mcanmove)
+                       || (mtmp->data->mmove == 0 && rn2(6))) {
                 pline("%s doesn't seem to move!", Monnam(mtmp));
-                g.context.travel = g.context.travel1 = g.context.mv = g.context.run
-                    = 0;
+                end_running(TRUE);
                 return TRUE;
             } else
                 return FALSE;
@@ -810,6 +808,9 @@ int dieroll;
 
                 if (obj->oartifact
                     && artifact_hit(&g.youmonst, mon, obj, &tmp, dieroll)) {
+                    /* artifact_hit updates 'tmp' but doesn't inflict any
+                       damage; however, it might cause carried items to be
+                       destroyed and they might do so */
                     if (DEADMONSTER(mon)) /* artifact killed monster */
                         return FALSE;
                     if (tmp == 0)
@@ -1151,7 +1152,7 @@ int dieroll;
         if (jousting < 0) {
             pline("%s shatters on impact!", Yname2(obj));
             /* (must be either primary or secondary weapon to get here) */
-            u.twoweap = FALSE; /* untwoweapon() is too verbose here */
+            set_twoweap(FALSE); /* u.twoweap = FALSE; untwoweapon() is too verbose */
             if (obj == uwep)
                 uwepgone(); /* set g.unweapon */
             /* minor side-effect: broken lance won't split puddings */
@@ -1548,9 +1549,16 @@ struct attack *mattk;
     gold = findgold(mdef->minvent);
 
     if (stealoid) { /* we will be taking everything */
-        if (gender(mdef) == (int) u.mfemale && g.youmonst.data->mlet == S_NYMPH)
-            You("charm %s.  She gladly hands over %sher possessions.",
-                mon_nam(mdef), !gold ? "" : "most of ");
+        char heshe[20];
+
+        /* 3.7: this uses hero's base gender rather than nymph feminimity
+           but was using hardcoded pronouns She/her for target monster;
+           switch to dynamic pronoun */
+        if (gender(mdef) == (int) u.mfemale
+            && g.youmonst.data->mlet == S_NYMPH)
+            You("charm %s.  %s gladly hands over %s%s possessions.",
+                mon_nam(mdef), upstart(strcpy(heshe, mhe(mdef))),
+                !gold ? "" : "most of ", mhis(mdef));
         else
             You("seduce %s and %s starts to take off %s clothes.",
                 mon_nam(mdef), mhe(mdef), mhis(mdef));
@@ -2002,6 +2010,10 @@ int specialdmg; /* blessed and/or silver bonus against various things */
                 pline("%s looks confused.", Monnam(mdef));
             mdef->mconf = 1;
         }
+        break;
+    case AD_POLY:
+        if (!negated && tmp < mdef->mhp)
+            tmp = mon_poly(&g.youmonst, mdef, tmp);
         break;
     default:
         tmp = 0;
@@ -3098,14 +3110,21 @@ struct monst *mon;
     u.umconf--;
 }
 
+/* returns 1 if light flash has noticeable effect on 'mtmp', 0 otherwise */
 int
 flash_hits_mon(mtmp, otmp)
 struct monst *mtmp;
 struct obj *otmp; /* source of flash */
 {
-    int tmp, amt, res = 0, useeit = canseemon(mtmp);
+    struct rm *lev;
+    int tmp, amt, useeit, res = 0;
 
-    if (mtmp->msleeping) {
+    if (g.notonhead)
+        return 0;
+    lev = &levl[mtmp->mx][mtmp->my];
+    useeit = canseemon(mtmp);
+
+    if (mtmp->msleeping && haseyes(mtmp->data)) {
         mtmp->msleeping = 0;
         if (useeit) {
             pline_The("flash awakens %s.", mon_nam(mtmp));
@@ -3132,7 +3151,18 @@ struct obj *otmp; /* source of flash */
                 mtmp->mcansee = 0;
                 mtmp->mblinded = (tmp < 3) ? 0 : rnd(1 + 50 / tmp);
             }
+        } else if (flags.verbose && useeit) {
+            if (lev->lit)
+                pline("The flash of light shines on %s.", mon_nam(mtmp));
+            else
+                pline("%s is illuminated.", Monnam(mtmp));
+            res = 2; /* 'message has been given' temporary value */
         }
+    }
+    if (res) {
+        if (!lev->lit)
+            display_nhwindow(WIN_MESSAGE, TRUE);
+        res &= 1; /* change temporary 2 back to 0 */
     }
     return res;
 }

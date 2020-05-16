@@ -281,7 +281,7 @@ On the HOST, here are the mandatory things that have to be built.
        for use in linking other HOST utilities if the HOST-native obj files
        produced from them are still around.  
 
-       NOTE: A few other source files (src/drawing.c, src/decl.c) that need to
+       NOTE: A few other source files (src/drawing.c) that need to
        be compiled for native HOST utilities, also need to be compiled again
        later as TARGET obj files for linking into the TARGET executable. It is
        important to keep the compiled HOST-side obj files produced by the HOST
@@ -295,7 +295,7 @@ On the HOST, here are the mandatory things that have to be built.
           util/dlb
 
                    from sources: src/dlb.c, src/dlb_main.c, src/alloc.c,
-                                 src/panic.c
+                                 util/panic.c
                    purpose:      For packaging up many files that are
                                  required components of the TARGET game
                                  into a single nhdat or nhdat370 combined
@@ -319,23 +319,23 @@ On the HOST, here are the mandatory things that have to be built.
 
                    from sources: win/share/tile2bmp.c, win/share/tiletext.c,
                                  win/share/tilemap.c, src/drawing.c,
-                                 src/decl.c, src/monst.c, src/objects.c
+                                 src/monst.c, src/objects.c
                    purpose:      <TBD>
 
           util/gif2txt
 
                    from sources: win/share/gifread.c, win/share/tiletext.c,
                                  win/share/tilemap.c, src/drawing.c,
-                                 src/decl.c, src/monst.c, src/objects.c,
-                                 src/alloc.c, src/panic.c
+                                 src/monst.c, src/objects.c,
+                                 src/alloc.c, util/panic.c
                    purpose:      <TBD>
 
           util/ppmwrite
 
                    from sources: win/share/ppmwrite.c, win/share/tiletext.c,
                                  win/share/tilemap.c, src/drawing.c,
-                                 src/decl.c, src/monst.c, src/objects.c,
-                                 src/alloc.c, src/panic.c
+                                 src/monst.c, src/objects.c,
+                                 src/alloc.c, util/panic.c
                    purpose:      <TBD>
 
 

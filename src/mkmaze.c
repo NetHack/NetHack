@@ -10,6 +10,7 @@ static int FDECL(iswall, (int, int));
 static int FDECL(iswall_or_stone, (int, int));
 static boolean FDECL(is_solid, (int, int));
 static int FDECL(extend_spine, (int[3][3], int, int, int));
+static void FDECL(wall_cleanup, (int, int, int, int));
 static boolean FDECL(okay, (int, int, int));
 static void FDECL(maze0xy, (coord *));
 static boolean FDECL(put_lregion_here, (XCHAR_P, XCHAR_P, XCHAR_P,
@@ -21,7 +22,10 @@ static void NDECL(unsetup_waterlevel);
 static void FDECL(check_ransacked, (char *));
 static void FDECL(migr_booty_item, (int, const char *));
 static void FDECL(migrate_orc, (struct monst *, unsigned long));
+static void FDECL(shiny_orc_stuff, (struct monst *));
 static void NDECL(stolen_booty);
+static boolean FDECL(maze_inbounds, (int, int));
+static void FDECL(maze_remove_deadends, (XCHAR_P));
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -119,7 +123,7 @@ int wall_there, dx, dy;
 }
 
 /* Remove walls totally surrounded by stone */
-void
+static void
 wall_cleanup(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
@@ -635,7 +639,7 @@ unsigned long mflags;
     migrate_to_level(mtmp, ledger_no(&dest), MIGR_RANDOM, (coord *) 0);
 }
 
-void
+static void
 shiny_orc_stuff(mtmp)
 struct monst *mtmp;
 {
@@ -782,7 +786,7 @@ stolen_booty(VOID_ARGS)
 
 #undef ORC_LEADER
 
-boolean
+static boolean
 maze_inbounds(x, y)
 int x, y;
 {
@@ -790,7 +794,7 @@ int x, y;
             && x < g.x_maze_max && y < g.y_maze_max && isok(x, y));
 }
 
-void
+static void
 maze_remove_deadends(typ)
 xchar typ;
 {
@@ -838,9 +842,9 @@ xchar typ;
  * TODO: rewrite walkfrom so it works on temp space, not levl
  */
 void
-create_maze(corrwid, wallthick)
-int corrwid;
-int wallthick;
+create_maze(corrwid, wallthick, rmdeadends)
+int corrwid, wallthick;
+boolean rmdeadends;
 {
     int x,y;
     coord mm;
@@ -849,6 +853,12 @@ int wallthick;
     int rdx = 0;
     int rdy = 0;
     int scale;
+
+    if (corrwid == -1)
+        corrwid = rnd(4);
+
+    if (wallthick == -1)
+        wallthick = rnd(4) - corrwid;
 
     if (wallthick < 1)
         wallthick = 1;
@@ -881,7 +891,7 @@ int wallthick;
     maze0xy(&mm);
     walkfrom((int) mm.x, (int) mm.y, 0);
 
-    if (!rn2(5))
+    if (rmdeadends)
         maze_remove_deadends((g.level.flags.corrmaze) ? CORR : ROOM);
 
     /* restore bounds */
@@ -986,6 +996,7 @@ const char *s;
     if (*protofile) {
         check_ransacked(protofile);
         Strcat(protofile, LEV_EXT);
+        g.in_mk_themerooms = FALSE;
         if (load_special(protofile)) {
             /* some levels can end up with monsters
                on dead mon list, including light source monsters */
@@ -999,10 +1010,9 @@ const char *s;
     g.level.flags.corrmaze = !rn2(3);
 
     if (!Invocation_lev(&u.uz) && rn2(2)) {
-        int corrscale = rnd(4);
-        create_maze(corrscale,rnd(4)-corrscale);
+        create_maze(-1, -1, !rn2(5));
     } else {
-        create_maze(1,1);
+        create_maze(1, 1, FALSE);
     }
 
     if (!g.level.flags.corrmaze)

@@ -1907,6 +1907,11 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
             pline("%s is %s.", bare_artifactname(uwep),
                   glow_verb(Blind ? 0 : g.warn_obj_cnt, TRUE));
         } else if (newstr > 0 && newstr != oldstr) {
+            /* goto_level() -> docrt() -> see_monsters() -> Sting_effects();
+               if "you materialize on a different level" is pending, give
+               it now so that start-glowing message comes after it */
+            maybe_lvltport_feedback(); /* usually called by goto_level() */
+
             /* 'start' message */
             if (!Blind)
                 pline("%s %s %s%c", bare_artifactname(uwep),

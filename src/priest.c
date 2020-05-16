@@ -232,12 +232,22 @@ boolean sanctum; /* is it the seat of the high priest? */
     struct monst *priest;
     struct obj *otmp;
     int cnt;
+    int px = 0, py = 0, i, si = rn2(8);
+    struct permonst *prim = &mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST];
 
-    if (MON_AT(sx + 1, sy))
-        (void) rloc(m_at(sx + 1, sy), FALSE); /* insurance */
+    for (i = 0; i < 8; i++) {
+        px = sx + xdir[(i+si) % 8];
+        py = sy + ydir[(i+si) % 8];
+        if (pm_good_location(px, py, prim))
+            break;
+    }
+    if (i == 8)
+        px = sx, py = sy;
 
-    priest = makemon(&mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST],
-                     sx + 1, sy, MM_EPRI);
+    if (MON_AT(px, py))
+        (void) rloc(m_at(px, py), FALSE); /* insurance */
+
+    priest = makemon(prim, px, py, MM_EPRI);
     if (priest) {
         EPRI(priest)->shroom = (schar) ((sroom - g.rooms) + ROOMOFFSET);
         EPRI(priest)->shralign = Amask2align(levl[sx][sy].altarmask);

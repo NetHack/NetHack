@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1582799171 2020/02/27 10:26:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1585993266 2020/04/04 09:41:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.254 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,6 +16,7 @@ static boolean FDECL(trapmove, (int, int, struct trap *));
 static struct monst *FDECL(monstinroom, (struct permonst *, int));
 static boolean FDECL(doorless_door, (int, int));
 static void FDECL(move_update, (BOOLEAN_P));
+static int NDECL(pickup_checks);
 static void FDECL(maybe_smudge_engr, (int, int, int, int));
 static void NDECL(domove_core);
 
@@ -954,7 +955,7 @@ int mode;
     if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && g.context.travel1
         && distmin(u.ux, u.uy, u.tx, u.ty) == 1
         && !(u.ux != u.tx && u.uy != u.ty && NODIAG(u.umonnum))) {
-        g.context.run = 0;
+        end_running(FALSE);
         if (test_move(u.ux, u.uy, u.tx - u.ux, u.ty - u.uy, TEST_MOVE)) {
             if (mode == TRAVP_TRAVEL) {
                 u.dx = u.tx - u.ux;
@@ -1392,6 +1393,7 @@ domove_core()
           ballx = 0, bally = 0;         /* ball&chain new positions */
     int bc_control = 0;                 /* control for ball&chain */
     boolean cause_delay = FALSE,        /* dragging ball will skip a move */
+            displaceu = FALSE,          /* involuntary swap */
             u_with_boulder = (sobj_at(BOULDER, u.ux, u.uy) != 0);
 
     if (g.context.travel) {
@@ -1415,8 +1417,8 @@ domove_core()
     }
     if (u.uswallow) {
         u.dx = u.dy = 0;
-        u.ux = x = u.ustuck->mx;
-        u.uy = y = u.ustuck->my;
+        x = u.ustuck->mx, y = u.ustuck->my;
+        u_on_newpos(x, y); /* set u.ux,uy and handle CLIPPING */
         mtmp = u.ustuck;
     } else {
         if (Is_airlevel(&u.uz) && rn2(4) && !Levitation && !Flying) {
@@ -1582,7 +1584,7 @@ domove_core()
         }
 
         mtmp = m_at(x, y);
-        if (mtmp && !is_safepet(mtmp)) {
+        if (mtmp && !is_safemon(mtmp)) {
             /* Don't attack if you're running, and can see it */
             /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
@@ -1609,7 +1611,7 @@ domove_core()
         /* don't stop travel when displacing pets; if the
            displace fails for some reason, attack() in uhitm.c
            will stop travel rather than domove */
-        if (!is_safepet(mtmp) || g.context.forcefight)
+        if (!is_safemon(mtmp) || g.context.forcefight)
             nomul(0);
         /* only attack if we know it's there */
         /* or if we used the 'F' command to fight blindly */
@@ -1640,10 +1642,25 @@ domove_core()
         }
         if (g.context.forcefight || !mtmp->mundetected || sensemon(mtmp)
             || ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL)
-                && !is_safepet(mtmp))) {
-            /* try to attack; note that it might evade */
-            /* also, we don't attack tame when _safepet_ */
-            if (attack(mtmp))
+                && !is_safemon(mtmp))) {
+
+            /* target monster might decide to switch places with you... */
+            if (mtmp->data == &mons[PM_DISPLACER_BEAST] && !rn2(2)
+                && mtmp->mux == u.ux0 && mtmp->muy == u.uy0
+                && mtmp->mcanmove && !mtmp->msleeping && !mtmp->meating
+                && !mtmp->mtrapped && !u.utrap && !u.ustuck && !u.usteed
+                && !(u.dx && u.dy
+                     && (NODIAG(u.umonnum)
+                         || (bad_rock(mtmp->data, x, u.uy0)
+                             && bad_rock(mtmp->data, u.ux0, y))
+                         || (bad_rock(g.youmonst.data, u.ux0, y)
+                             && bad_rock(g.youmonst.data, x, u.uy0))))
+                && goodpos(u.ux0, u.uy0, mtmp, GP_ALLOW_U))
+                displaceu = TRUE;
+
+            /* try to attack; note that it might evade;
+               also, we don't attack tame when _safepet_ */
+            else if (attack(mtmp))
                 return;
         }
     }
@@ -1776,42 +1793,47 @@ domove_core()
     if (!in_out_region(x, y))
         return;
 
-    /* now move the hero */
     mtmp = m_at(x, y);
+    /* tentatively move the hero plus steed; leave CLIPPING til later */
     u.ux += u.dx;
     u.uy += u.dy;
-    /* Move your steed, too */
     if (u.usteed) {
         u.usteed->mx = u.ux;
         u.usteed->my = u.uy;
-        exercise_steed();
+        /* [if move attempt ends up being blocked, should training count?] */
+        exercise_steed(); /* train riding skill */
     }
+
+    if (displaceu && mtmp) {
+        remove_monster(u.ux, u.uy);
+        place_monster(mtmp, u.ux0, u.uy0);
+        newsym(u.ux, u.uy);
+        newsym(u.ux0, u.uy0);
+        /* monst still knows where hero is */
+        mtmp->mux = u.ux, mtmp->muy = u.uy;
+
+        pline("%s swaps places with you...", Monnam(mtmp));
+        /* monster chose to swap places; hero doesn't get any credit
+           or blame if something bad happens to it */
+        g.context.mon_moving = 1;
+        if (!minliquid(mtmp))
+            (void) mintrap(mtmp);
+        g.context.mon_moving = 0;
 
     /*
      * If safepet at destination then move the pet to the hero's
      * previous location using the same conditions as in attack().
      * there are special extenuating circumstances:
      * (1) if the pet dies then your god angers,
-     * (2) if the pet gets trapped then your god may disapprove,
-     * (3) if the pet was already trapped and you attempt to free it
-     * not only do you encounter the trap but you may frighten your
-     * pet causing it to go wild!  moral: don't abuse this privilege.
+     * (2) if the pet gets trapped then your god may disapprove.
      *
      * Ceiling-hiding pets are skipped by this section of code, to
      * be caught by the normal falling-monster code.
      */
-    if (is_safepet(mtmp) && !(is_hider(mtmp->data) && mtmp->mundetected)) {
-        /* if trapped, there's a chance the pet goes wild */
-        if (mtmp->mtrapped) {
-            if (!rn2(mtmp->mtame)) {
-                mtmp->mtame = mtmp->mpeaceful = mtmp->msleeping = 0;
-                if (mtmp->mleashed)
-                    m_unleash(mtmp, TRUE);
-                growl(mtmp);
-            } else {
-                yelp(mtmp);
-            }
-        }
+    } else if (is_safemon(mtmp)
+               && !(is_hider(mtmp->data) && mtmp->mundetected)) {
+        /* if it turns out we can't actually move */
+        boolean didnt_move = FALSE;
 
         /* seemimic/newsym should be done before moving hero, otherwise
            the display code will draw the hero here before we possibly
@@ -1820,53 +1842,60 @@ domove_core()
         mtmp->mundetected = 0;
         if (M_AP_TYPE(mtmp))
             seemimic(mtmp);
-        else if (!mtmp->mtame)
-            newsym(mtmp->mx, mtmp->my);
         u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
 
         if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
             && is_pit(trap->ttyp)
             && sobj_at(BOULDER, trap->tx, trap->ty)) {
             /* can't swap places with pet pinned in a pit by a boulder */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+            didnt_move = TRUE;
         } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
             /* can't swap places when pet can't move to your spot */
-            u.ux = u.ux0, u.uy = u.uy0;
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
         } else if (u_with_boulder
-                    && !(verysmall(mtmp->data)
-                         && (!mtmp->minvent || (curr_mon_load(mtmp) <= 600)))) {
+                   && !(verysmall(mtmp->data)
+                        && (!mtmp->minvent || curr_mon_load(mtmp) <= 600))) {
             /* can't swap places when pet won't fit there with the boulder */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s won't fit into the same spot that you're at.",
                  upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
             /* can't swap places when pet won't fit thru the opening */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
+        } else if ((mtmp->mpeaceful || mtmp->mtame) && mtmp->mtrapped) {
+            /* Since peaceful monsters simply being unable to move out of traps
+             * was inconsistent with pets being able to but being untamed in
+             * the process, apply this logic equally to pets and peacefuls. */
+            You("stop.  %s can't move out of that trap.",
+                upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
+        } else if (mtmp->mpeaceful && !mtmp->mtame
+                   && (!goodpos(u.ux0, u.uy0, mtmp, 0)
+                       || t_at(u.ux0, u.uy0) != NULL
+                       || mundisplaceable(mtmp))) {
+            /* displacing peaceful into unsafe or trapped space, or trying to
+             * displace quest leader, Oracle, shopkeeper, or priest */
+            You("stop.  %s doesn't want to swap places.",
+                upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
         } else {
-            char pnambuf[BUFSZ];
-
-            /* save its current description in case of polymorph */
-            Strcpy(pnambuf, y_monnam(mtmp));
             mtmp->mtrapped = 0;
             remove_monster(x, y);
             place_monster(mtmp, u.ux0, u.uy0);
             newsym(x, y);
             newsym(u.ux0, u.uy0);
 
-            You("%s %s.", mtmp->mtame ? "swap places with" : "frighten",
-                pnambuf);
+            You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
+                x_monnam(mtmp,
+                         mtmp->mtame ? ARTICLE_YOUR
+                         : (!has_mname(mtmp) && !type_is_pname(mtmp->data))
+                           ? ARTICLE_THE : ARTICLE_NONE,
+                         (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                         has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 
             /* check for displacing it into pools and traps */
             switch (minliquid(mtmp) ? 2 : mintrap(mtmp)) {
@@ -1912,7 +1941,18 @@ domove_core()
                 break;
             }
         }
+
+        if (didnt_move) {
+            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            /* could skip this bit since we're about to call u_on_newpos() */
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+        }
     }
+    /* tentative move above didn't handle CLIPPING, in case there was a
+       monster in the way and the move attempt ended up being blocked;
+       do a full re-position now, possibly back to where hero started */
+    u_on_newpos(u.ux, u.uy);
 
     reset_occupations();
     if (g.context.run) {
@@ -1964,10 +2004,14 @@ domove_core()
     }
 
     if (g.context.run && flags.runmode != RUN_TPORT) {
-        /* display every step or every 7th step depending upon mode */
+        /* for tport mode, don't display anything until we've stopped;
+           for normal (leap) mode, update display every 7th step
+           (relative to turn counter; ought to be to start of running);
+           for walk and crawl (visual debugging) modes, update the
+           display after every step */
         if (flags.runmode != RUN_LEAP || !(g.moves % 7L)) {
-            if (flags.time)
-                iflags.time_botl = 1;
+            /* moveloop() suppresses time_botl when running */
+            iflags.time_botl = flags.time;
             curs_on_u();
             delay_output();
             if (flags.runmode == RUN_CRAWL) {
@@ -2078,8 +2122,16 @@ switch_terrain()
         if (Flying)
             You("start flying.");
     }
-    if ((!Levitation ^ was_levitating) || (!Flying ^ was_flying))
+    if ((!!Levitation ^ was_levitating) || (!!Flying ^ was_flying))
         g.context.botl = TRUE; /* update Lev/Fly status condition */
+}
+
+/* set or clear u.uinwater */
+void
+set_uinwater(in_out)
+int in_out;
+{
+    u.uinwater = in_out ? 1 : 0;
 }
 
 /* extracted from spoteffects; called by spoteffects to check for entering or
@@ -2094,13 +2146,15 @@ boolean newspot;             /* true if called by spoteffects */
         boolean still_inwater = FALSE; /* assume we're getting out */
 
         if (!is_pool(u.ux, u.uy)) {
-            if (Is_waterlevel(&u.uz))
+            if (Is_waterlevel(&u.uz)) {
                 You("pop into an air bubble.");
-            else if (is_lava(u.ux, u.uy))
+            } else if (is_lava(u.ux, u.uy)) {
                 You("leave the %s...", hliquid("water")); /* oops! */
-            else
+            } else {
                 You("are on solid %s again.",
                     is_ice(u.ux, u.uy) ? "ice" : "land");
+                iflags.last_msg = PLNMSG_BACK_ON_GROUND;
+            }
         } else if (Is_waterlevel(&u.uz)) {
             still_inwater = TRUE;
         } else if (Levitation) {
@@ -2115,7 +2169,7 @@ boolean newspot;             /* true if called by spoteffects */
         if (!still_inwater) {
             boolean was_underwater = (Underwater && !Is_waterlevel(&u.uz));
 
-            u.uinwater = 0;       /* leave the water */
+            set_uinwater(0); /* u.uinwater = 0; leave the water */
             if (was_underwater) { /* restore vision */
                 docrt();
                 g.vision_full_recalc = 1;
@@ -2606,7 +2660,7 @@ boolean newlev;
    0 = cannot pickup, no time taken
   -1 = do normal pickup
   -2 = loot the monster */
-int
+static int
 pickup_checks()
 {
     /* uswallow case added by GAN 01/29/87 */
@@ -2928,6 +2982,21 @@ monster_nearby()
 }
 
 void
+end_running(and_travel)
+boolean and_travel;
+{
+    /* moveloop() suppresses time_botl when context.run is non-zero; when
+       running stops, update 'time' even if other botl status is unchanged */
+    if (flags.time && g.context.run)
+        iflags.time_botl = TRUE;
+    g.context.run = 0;
+    /* 'context.mv' isn't travel but callers who want to end travel
+       all clear it too */
+    if (and_travel)
+        g.context.travel = g.context.travel1 = g.context.mv = 0;
+}
+
+void
 nomul(nval)
 int nval;
 {
@@ -2939,7 +3008,7 @@ int nval;
     g.multi = nval;
     if (nval == 0)
         g.multi_reason = NULL;
-    g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
+    end_running(TRUE);
 }
 
 /* called when a non-movement, multi-turn action has completed */
@@ -2947,7 +3016,7 @@ void
 unmul(msg_override)
 const char *msg_override;
 {
-    g.context.botl = 1;
+    g.context.botl = TRUE;
     g.multi = 0; /* caller will usually have done this already */
     if (msg_override)
         g.nomovemsg = msg_override;
@@ -3018,11 +3087,19 @@ register int n;
 register const char *knam;
 boolean k_format;
 {
+#if 0   /* code below is prepared to handle negative 'loss' so don't add this
+         * until we've verified that no callers intentionally rely on that */
+    if (n <= 0) {
+        impossible("hero losing %d hit points due to \"%s\"?", n, knam);
+        return;
+    }
+#endif
+    g.context.botl = TRUE; /* u.uhp or u.mh is changing */
+    end_running(TRUE);
     if (Upolyd) {
         u.mh -= n;
         if (u.mhmax < u.mh)
             u.mhmax = u.mh;
-        g.context.botl = 1;
         if (u.mh < 1)
             rehumanize();
         else if (n > 0 && u.mh * 10 < u.mhmax && Unchanging)
@@ -3033,9 +3110,6 @@ boolean k_format;
     u.uhp -= n;
     if (u.uhp > u.uhpmax)
         u.uhpmax = u.uhp; /* perhaps n was negative */
-    else
-        g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
-    g.context.botl = 1;
     if (u.uhp < 1) {
         g.killer.format = k_format;
         if (g.killer.name != knam) /* the thing that killed you */

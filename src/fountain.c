@@ -1,4 +1,4 @@
-/* NetHack 3.6	fountain.c	$NHDT-Date: 1544442711 2018/12/10 11:51:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	fountain.c	$NHDT-Date: 1583926845 2020/03/11 11:40:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -204,15 +204,22 @@ boolean isyou;
             if (yn("Dry up fountain?") == 'n')
                 return;
         }
+        /* FIXME: sight-blocking clouds should use block_point() when
+           being created and unblock_point() when going away, then this
+           glyph hackery wouldn't be necessary */
+        if (cansee(x, y)) {
+            int glyph = glyph_at(x, y);
+
+            if (!glyph_is_cmap(glyph) || glyph_to_cmap(glyph) != S_cloud)
+                pline_The("fountain dries up!");
+        }
         /* replace the fountain with ordinary floor */
         levl[x][y].typ = ROOM, levl[x][y].flags = 0;
         levl[x][y].blessedftn = 0;
-        if (cansee(x, y))
-            pline_The("fountain dries up!");
+        g.level.flags.nfountains--;
         /* The location is seen if the hero/monster is invisible
            or felt if the hero is blind. */
         newsym(x, y);
-        g.level.flags.nfountains--;
         if (isyou && in_town(x, y))
             (void) angry_guards(FALSE);
     }
@@ -293,15 +300,21 @@ drinkfountain()
         case 23: /* Water demon */
             dowaterdemon();
             break;
-        case 24: /* Curse an item */ {
+        case 24: { /* Maybe curse some items */
             register struct obj *obj;
+            int buc_changed = 0;
 
             pline("This water's no good!");
             morehungry(rn1(20, 11));
             exercise(A_CON, FALSE);
+            /* this is more severe than rndcurse() */
             for (obj = g.invent; obj; obj = obj->nobj)
-                if (!rn2(5))
+                if (obj->oclass != COIN_CLASS && !obj->cursed && !rn2(5)) {
                     curse(obj);
+                    ++buc_changed;
+                }
+            if (buc_changed)
+                update_inventory();
             break;
         }
         case 25: /* See invisible */
@@ -416,7 +429,9 @@ register struct obj *obj;
 
     switch (rnd(30)) {
     case 16: /* Curse the item */
-        curse(obj);
+        if (obj->oclass != COIN_CLASS && !obj->cursed) {
+            curse(obj);
+        }
         break;
     case 17:
     case 18:

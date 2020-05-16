@@ -1,4 +1,4 @@
-/* NetHack 3.6	you.h	$NHDT-Date: 1581322658 2020/02/10 08:17:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	you.h	$NHDT-Date: 1586375530 2020/04/08 19:52:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -86,21 +86,22 @@ enum achivements {
     /* 1 through 14 were present in 3.6.x; the rest are newer; first,
        some easier ones so less skilled players can have achievements */
     ACH_MINE = 15, /* entered Gnomish Mines */
-    ACH_TOWN = 16, /* reached Mine Town */
+    ACH_TOWN = 16, /* reached Minetown */
     ACH_SHOP = 17, /* entered a shop */
     ACH_TMPL = 18, /* entered a temple */
     ACH_ORCL = 19, /* consulted the Oracle */
     ACH_NOVL = 20, /* read at least one passage from a Discworld novel */
     ACH_SOKO = 21, /* entered Sokoban */
     ACH_BGRM = 22, /* entered Bigroom (not guaranteed to be in every dgn) */
-    /* 23..31, 9 available potential achievements; #32 currently off-limits */
+    /* 23..30 are negated if hero is female at the time new rank is gained */
+    ACH_RNK1 = 23, ACH_RNK2 = 24, ACH_RNK3 = 25, ACH_RNK4 = 26,
+    ACH_RNK5 = 27, ACH_RNK6 = 28, ACH_RNK7 = 29, ACH_RNK8 = 30,
+    /* foo=31, 1 available potential achievement; #32 currently off-limits */
     N_ACH = 32     /* allocate room for 31 plus a slot for 0 terminator */
 };
     /*
      * Other potential achievements to track (this comment briefly resided
      * in encodeachieve(topten.c) and has been revised since moving here:
-     *  [reached experience level N for a few interesting values of N
-     *   or perhaps "became a <rank title>" for each new rank reached]
      *  got quest summons,
      *  entered quest branch,
      *  chatted with leader,
@@ -456,7 +457,7 @@ struct you {
     struct skills weapon_skills[P_NUM_SKILLS];
     boolean twoweap;         /* KMH -- Using two-weapon combat */
     short mcham;             /* vampire mndx if shapeshifted to bat/cloud */
-    xchar uachieved[N_ACH];  /* list of achievements in the order attained */
+    schar uachieved[N_ACH];  /* list of achievements in the order attained */
 }; /* end of `struct you' */
 
 #define Upolyd (u.umonnum != u.umonster)

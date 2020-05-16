@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1581322662 2020/02/10 08:17:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.290 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1589491665 2020/05/14 21:27:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,6 +19,8 @@ static int FDECL(invletter_value, (CHAR_P));
 static int FDECL(CFDECLSPEC sortloot_cmp, (const genericptr,
                                                const genericptr));
 static void NDECL(reorder_invent);
+static struct obj *FDECL(addinv_core0, (struct obj *, struct obj *,
+                                        BOOLEAN_P));
 static void FDECL(noarmor, (BOOLEAN_P));
 static void FDECL(invdisp_nothing, (const char *, const char *));
 static boolean FDECL(worn_wield_only, (struct obj *));
@@ -873,9 +875,10 @@ struct obj *obj;
  * Add obj to the hero's inventory.  Make sure the object is "free".
  * Adjust hero attributes as necessary.
  */
-struct obj *
-addinv(obj)
-struct obj *obj;
+static struct obj *
+addinv_core0(obj, other_obj, update_perm_invent)
+struct obj *obj, *other_obj;
+boolean update_perm_invent;
 {
     struct obj *otmp, *prev;
     int saved_otyp = (int) obj->otyp; /* for panic */
@@ -892,6 +895,20 @@ struct obj *obj;
     obj->was_thrown = 0;       /* not meaningful for invent */
 
     addinv_core1(obj);
+
+    /* for addinv_before(); if something has been removed and is now being
+       reinserted, try to put it in the same place instead of merging or
+       placing at end; for thrown-and-return weapon with !fixinv setting */
+    if (other_obj) {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj) {
+            if (otmp->nobj == other_obj) {
+                obj->nobj = other_obj;
+                otmp->nobj = obj;
+                obj->where = OBJ_INVENT;
+                goto added;
+            }
+        }
+    }
 
     /* merge with quiver in preference to any other inventory slot
        in case quiver and wielded weapon are both eligible; adding
@@ -935,8 +952,25 @@ struct obj *obj;
  added:
     addinv_core2(obj);
     carry_obj_effects(obj); /* carrying affects the obj */
-    update_inventory();
+    if (update_perm_invent)
+        update_inventory();
     return obj;
+}
+
+/* add obj to the hero's inventory in the default fashion */
+struct obj *
+addinv(obj)
+struct obj *obj;
+{
+    return addinv_core0(obj, (struct obj *) 0, TRUE);
+}
+
+/* add obj to the hero's inventory by inserting in front of a specific item */
+struct obj *
+addinv_before(obj, other_obj)
+struct obj *obj, *other_obj;
+{
+    return addinv_core0(obj, other_obj, TRUE);
 }
 
 /*
@@ -1003,22 +1037,26 @@ const char *drop_fmt, *drop_arg, *hold_msg;
     }
     if (Fumbling) {
         obj->nomerge = 1;
-        obj = addinv(obj); /* dropping expects obj to be in invent */
+        /* dropping expects obj to be in invent */
+        obj = addinv_core0(obj, (struct obj *) 0, FALSE);
         goto drop_it;
     } else {
         long oquan = obj->quan;
         int prev_encumbr = near_capacity(); /* before addinv() */
 
-        /* encumbrance only matters if it would now become worse
-           than max( current_value, stressed ) */
-        if (prev_encumbr < MOD_ENCUMBER)
-            prev_encumbr = MOD_ENCUMBER;
+        /* encumbrance limit is max( current_state, pickup_burden );
+           this used to use hardcoded MOD_ENCUMBER (stressed) instead
+           of the 'pickup_burden' option (which defaults to stressed) */
+        if (prev_encumbr < flags.pickup_burden)
+            prev_encumbr = flags.pickup_burden;
         /* addinv() may redraw the entire inventory, overwriting
-           drop_arg when it comes from something like doname() */
+           drop_arg when it is kept in an 'obuf' from doname();
+           [should no longer be necessary now that perm_invent update is
+           suppressed, but it's cheap to keep as a paranoid precaution] */
         if (drop_arg)
             drop_arg = strcpy(buf, drop_arg);
 
-        obj = addinv(obj);
+        obj = addinv_core0(obj, (struct obj *) 0, FALSE);
         if (inv_cnt(FALSE) > 52 || ((obj->otyp != LOADSTONE || !obj->cursed)
                                     && near_capacity() > prev_encumbr)) {
             /* undo any merge which took place */
@@ -1032,6 +1070,9 @@ const char *drop_fmt, *drop_arg, *hold_msg;
                 setuqwep(obj);
             if (hold_msg || drop_fmt)
                 prinv(hold_msg, obj, oquan);
+            /* obj made it into inventory and is staying there */
+            update_inventory();
+            encumber_msg();
         }
     }
     return obj;
@@ -1040,7 +1081,7 @@ const char *drop_fmt, *drop_arg, *hold_msg;
     if (drop_fmt)
         pline(drop_fmt, drop_arg);
     obj->nomerge = 0;
-    if (can_reach_floor(TRUE)) {
+    if (can_reach_floor(TRUE) || u.uswallow) {
         dropx(obj);
     } else {
         freeinv(obj);
@@ -1284,6 +1325,23 @@ have_lizard()
             return  TRUE;
     return FALSE;
 }
+
+struct obj *
+u_carried_gloves() {
+    struct obj *otmp, *gloves = (struct obj *) 0;
+
+    if (uarmg) {
+        gloves = uarmg;
+    } else {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
+            if (is_gloves(otmp)) {
+                gloves = otmp;
+                break;
+            }
+    }
+    return gloves;
+}
+
 
 /* 3.6 tribute */
 struct obj *
@@ -3366,9 +3424,9 @@ char *buf;
 /* look at what is here; if there are many objects (pile_limit or more),
    don't show them unless obj_cnt is 0 */
 int
-look_here(obj_cnt, picked_some)
+look_here(obj_cnt, lookhere_flags)
 int obj_cnt; /* obj_cnt > 0 implies that autopickup is in progress */
-boolean picked_some;
+unsigned lookhere_flags;
 {
     struct obj *otmp;
     struct trap *trap;
@@ -3376,12 +3434,15 @@ boolean picked_some;
     const char *dfeature = (char *) 0;
     char fbuf[BUFSZ], fbuf2[BUFSZ];
     winid tmpwin;
-    boolean skip_objects, felt_cockatrice = FALSE;
+    boolean skip_objects, felt_cockatrice = FALSE,
+            picked_some = (lookhere_flags & LOOKHERE_PICKED_SOME) != 0,
+            /* skip 'dfeature' if caller used describe_decor() to show it */
+            skip_dfeature = (lookhere_flags & LOOKHERE_SKIP_DFEATURE) != 0;
 
     /* default pile_limit is 5; a value of 0 means "never skip"
        (and 1 effectively forces "always skip") */
     skip_objects = (flags.pile_limit > 0 && obj_cnt >= flags.pile_limit);
-    if (u.uswallow && u.ustuck) {
+    if (u.uswallow) {
         struct monst *mtmp = u.ustuck;
 
         /*
@@ -3454,12 +3515,12 @@ boolean picked_some;
         }
     }
 
-    if (dfeature)
+    if (dfeature && !skip_dfeature)
         Sprintf(fbuf, "There is %s here.", an(dfeature));
 
     if (!otmp || is_lava(u.ux, u.uy)
         || (is_pool(u.ux, u.uy) && !Underwater)) {
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (!skip_objects && (Blind || !dfeature))
@@ -3469,7 +3530,7 @@ boolean picked_some;
     /* we know there is something here */
 
     if (skip_objects) {
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
@@ -3499,7 +3560,7 @@ boolean picked_some;
             }
     } else if (!otmp->nexthere) {
         /* only one object */
-        if (dfeature)
+        if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         You("%s here %s.", verb, doname_with_price(otmp));
@@ -3511,7 +3572,7 @@ boolean picked_some;
 
         display_nhwindow(WIN_MESSAGE, FALSE);
         tmpwin = create_nhwindow(NHW_MENU);
-        if (dfeature) {
+        if (dfeature && !skip_dfeature) {
             putstr(tmpwin, 0, fbuf);
             putstr(tmpwin, 0, "");
         }
@@ -3670,6 +3731,11 @@ register struct obj *otmp, *obj;
     if (obj->unpaid && !same_price(obj, otmp))
         return FALSE;
 
+    /* some additional information is always incompatible */
+    if (has_omonst(obj) || has_omid(obj)
+        || has_omonst(otmp) || has_omid(otmp))
+        return FALSE;
+
     /* if they have names, make sure they're the same */
     objnamelth = strlen(safe_oname(obj));
     otmpnamelth = strlen(safe_oname(otmp));
@@ -3679,11 +3745,12 @@ register struct obj *otmp, *obj;
             && strncmp(ONAME(obj), ONAME(otmp), objnamelth)))
         return FALSE;
 
-    /* for the moment, any additional information is incompatible */
-    if (has_omonst(obj) || has_omid(obj) || has_olong(obj) || has_omonst(otmp)
-        || has_omid(otmp) || has_olong(otmp))
+    /* if one has an attached mail command, other must have same command */
+    if (!has_omailcmd(obj) ? has_omailcmd(otmp)
+        : (!has_omailcmd(otmp) || strcmp(OMAILCMD(obj), OMAILCMD(otmp)) != 0))
         return FALSE;
 
+    /* should be moot since matching artifacts wouldn't be unique */
     if (obj->oartifact != otmp->oartifact)
         return FALSE;
 

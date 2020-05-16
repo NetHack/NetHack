@@ -16,15 +16,14 @@ union vptrs {
 };
 
 /****
- ***	oextra -- collection of all object extensions
- **	(see the note at the bottom of this file before adding oextra fields)
+ ***    oextra -- collection of all object extensions
+ **     (see the note at the bottom of this file before adding oextra fields)
  */
 struct oextra {
     char *oname;          /* ptr to name of object */
     struct monst *omonst; /* ptr to attached monst struct */
-    unsigned *omid;       /* ptr to m_id */
-    long *olong;          /* ptr to misc long (temporary gold object) */
-    char *omailcmd;       /* response_cmd for mail deliver */
+    char *omailcmd;       /* response_cmd for mail delivery */
+    unsigned omid;        /* for corpse; m_id of corpse's ghost */
 };
 
 struct obj {
@@ -126,32 +125,30 @@ struct obj {
 #define newobj() (struct obj *) alloc(sizeof(struct obj))
 
 /***
- **	oextra referencing and testing macros
+ **     oextra referencing and testing macros
  */
 
 #define ONAME(o) ((o)->oextra->oname)
-#define OMID(o) ((o)->oextra->omid)
 #define OMONST(o) ((o)->oextra->omonst)
-#define OLONG(o) ((o)->oextra->olong)
 #define OMAILCMD(o) ((o)->oextra->omailcmd)
+#define OMID(o) ((o)->oextra->omid) /* non-zero => set, zero => not set */
 
 #define has_oname(o) ((o)->oextra && ONAME(o))
-#define has_omid(o) ((o)->oextra && OMID(o))
 #define has_omonst(o) ((o)->oextra && OMONST(o))
-#define has_olong(o) ((o)->oextra && OLONG(o))
 #define has_omailcmd(o) ((o)->oextra && OMAILCMD(o))
+#define has_omid(o) ((o)->oextra && OMID(o))
 
 /* Weapons and weapon-tools */
 /* KMH -- now based on skill categories.  Formerly:
- *	#define is_sword(otmp)	(otmp->oclass == WEAPON_CLASS && \
- *			 objects[otmp->otyp].oc_wepcat == WEP_SWORD)
- *	#define is_blade(otmp)	(otmp->oclass == WEAPON_CLASS && \
- *			 (objects[otmp->otyp].oc_wepcat == WEP_BLADE || \
- *			  objects[otmp->otyp].oc_wepcat == WEP_SWORD))
- *	#define is_weptool(o)	((o)->oclass == TOOL_CLASS && \
- *			 objects[(o)->otyp].oc_weptool)
- *	#define is_multigen(otyp) (otyp <= SHURIKEN)
- *	#define is_poisonable(otyp) (otyp <= BEC_DE_CORBIN)
+ *      #define is_sword(otmp)  (otmp->oclass == WEAPON_CLASS && \
+ *                       objects[otmp->otyp].oc_wepcat == WEP_SWORD)
+ *      #define is_blade(otmp)  (otmp->oclass == WEAPON_CLASS && \
+ *                       (objects[otmp->otyp].oc_wepcat == WEP_BLADE || \
+ *                        objects[otmp->otyp].oc_wepcat == WEP_SWORD))
+ *      #define is_weptool(o)   ((o)->oclass == TOOL_CLASS && \
+ *                       objects[(o)->otyp].oc_weptool)
+ *      #define is_multigen(otyp) (otyp <= SHURIKEN)
+ *      #define is_poisonable(otyp) (otyp <= BEC_DE_CORBIN)
  */
 #define is_blade(otmp)                           \
     (otmp->oclass == WEAPON_CLASS                \
@@ -247,7 +244,9 @@ struct obj {
 #define stale_egg(egg) \
     ((g.monstermoves - (egg)->age) > (2 * MAX_EGG_HATCH_TIME))
 #define ofood(o) ((o)->otyp == CORPSE || (o)->otyp == EGG || (o)->otyp == TIN)
-#define polyfodder(obj) (ofood(obj) && pm_to_cham((obj)->corpsenm) != NON_PM)
+#define polyfodder(obj) \
+    (ofood(obj) && (pm_to_cham((obj)->corpsenm) != NON_PM       \
+                    || dmgtype(&mons[(obj)->corpsenm], AD_POLY)))
 #define mlevelgain(obj) (ofood(obj) && (obj)->corpsenm == PM_WRAITH)
 #define mhealup(obj) (ofood(obj) && (obj)->corpsenm == PM_NURSE)
 #define Is_pudding(o)                                                 \
@@ -381,43 +380,44 @@ struct obj {
 /*
  *  Notes for adding new oextra structures:
  *
- *	 1. Add the structure definition and any required macros in an
+ *       1. Add the structure definition and any required macros in an
  *          appropriate header file that precedes this one.
- *	 2. Add a pointer to your new struct to oextra struct in this file.
- *	 3. Add a referencing macro to this file after the newobj macro above
- *	    (see ONAME, OMONST, OMIN, OLONG, or OMAILCMD for examples).
- *	 4. Add a testing macro after the set of referencing macros
- *	    (see has_oname(), has_omonst(), has_omin(), has_olong(),
- *	    has_omailcmd() for examples).
- *	 5. Create newXX(otmp) function and possibly free_XX(otmp) function
- *	    in an appropriate new or existing source file and add a prototype
- *	    for it to include/extern.h.  The majority of these are currently
- *	    located in mkobj.c for convenience.
+ *       2. Add a pointer to your new struct to oextra struct in this file.
+ *       3. Add a referencing macro to this file after the newobj macro above
+ *          (see ONAME, OMONST, OMAILCMD, or OMIN for examples).
+ *       4. Add a testing macro after the set of referencing macros
+ *          (see has_oname(), has_omonst(), has_omailcmd(), and has_omin(),
+ *          for examples).
+ *       5. Create newXX(otmp) function and possibly free_XX(otmp) function
+ *          in an appropriate new or existing source file and add a prototype
+ *          for it to include/extern.h.  The majority of these are currently
+ *          located in mkobj.c for convenience.
  *
- *		void FDECL(newXX, (struct obj *));
- *	        void FDECL(free_XX, (struct obj *));
+ *          void FDECL(newXX, (struct obj *));
+ *          void FDECL(free_XX, (struct obj *));
  *
- *	          void
- *	          newxx(otmp)
- *	          struct obj *otmp;
- *	          {
- *	              if (!otmp->oextra) otmp->oextra = newoextra();
- *	              if (!XX(otmp)) {
- *	                  XX(otmp) = (struct XX *)alloc(sizeof(struct xx));
- *	                  (void) memset((genericptr_t) XX(otmp),
- *	                             0, sizeof(struct xx));
- *	              }
- *	          }
+ *          void
+ *          newxx(otmp)
+ *          struct obj *otmp;
+ *          {
+ *              if (!otmp->oextra)
+ *                  otmp->oextra = newoextra();
+ *              if (!XX(otmp)) {
+ *                  XX(otmp) = (struct XX *) alloc(sizeof (struct xx));
+ *                  (void) memset((genericptr_t) XX(otmp),
+ *                                0, sizeof (struct xx));
+ *              }
+ *         }
  *
- *	 6. Adjust size_obj() in src/cmd.c appropriately.
- *	 7. Adjust dealloc_oextra() in src/mkobj.c to clean up
- *	    properly during obj deallocation.
- *	 8. Adjust copy_oextra() in src/mkobj.c to make duplicate
- *	    copies of your struct or data onto another obj struct.
- *	 9. Adjust restobj() in src/restore.c to deal with your
- *	    struct or data during a restore.
- *	10. Adjust saveobj() in src/save.c to deal with your
- *	    struct or data during a save.
+ *       6. Adjust size_obj() in src/cmd.c appropriately.
+ *       7. Adjust dealloc_oextra() in src/mkobj.c to clean up
+ *          properly during obj deallocation.
+ *       8. Adjust copy_oextra() in src/mkobj.c to make duplicate
+ *          copies of your struct or data onto another obj struct.
+ *       9. Adjust restobj() in src/restore.c to deal with your
+ *          struct or data during a restore.
+ *      10. Adjust saveobj() in src/save.c to deal with your
+ *          struct or data during a save.
  */
 
 #endif /* OBJ_H */

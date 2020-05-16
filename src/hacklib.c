@@ -73,6 +73,7 @@
         void            strbuf_nl_to_crlf (strbuf_t *)
         char *          nonconst        (const char *, char *)
         int             swapbits        (int, int, int)
+        void            shuffle_int_array (int *, int)
 =*/
 #ifdef LINT
 #define Static /* pacify lint */
@@ -1299,6 +1300,23 @@ int val, bita, bitb;
     int tmp = ((val >> bita) & 1) ^ ((val >> bitb) & 1);
 
     return (val ^ ((tmp << bita) | (tmp << bitb)));
+}
+
+/* randomize the given list of numbers  0 <= i < count */
+void
+shuffle_int_array(indices, count)
+int *indices;
+int count;
+{
+    int i, iswap, temp;
+
+    for (i = count - 1; i > 0; i--) {
+        if ((iswap = rn2(i + 1)) == i)
+            continue;
+        temp = indices[i];
+        indices[i] = indices[iswap];
+        indices[iswap] = temp;
+    }
 }
 
 /*hacklib.c*/

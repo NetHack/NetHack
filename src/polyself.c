@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1581886864 2020/02/16 21:01:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1583073991 2020/03/01 14:46:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1203,7 +1203,7 @@ dospit()
             break;
         }
         otmp->spe = 1; /* to indicate it's yours */
-        throwit(otmp, 0L, FALSE);
+        throwit(otmp, 0L, FALSE, (struct obj *) 0);
     }
     return 1;
 }
@@ -1908,6 +1908,7 @@ polysense()
 
     switch (u.umonnum) {
     case PM_PURPLE_WORM:
+    case PM_BABY_PURPLE_WORM:
         warnidx = PM_SHRIEKER;
         break;
     case PM_VAMPIRE:

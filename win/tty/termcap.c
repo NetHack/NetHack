@@ -10,11 +10,7 @@
 #include "wintty.h"
 #include "tcap.h"
 
-#ifdef MICROPORT_286_BUG
-#define Tgetstr(key) (tgetstr(key, tbuf))
-#else
 #define Tgetstr(key) (tgetstr(key, &tbufptr))
-#endif /* MICROPORT_286_BUG **/
 
 static char *FDECL(s_atr2str, (int));
 static char *FDECL(e_atr2str, (int));
@@ -359,7 +355,7 @@ int state;
 }
 
 #ifdef TERMLIB
-extern void NDECL((*decgraphics_mode_callback)); /* defined in drawing.c */
+extern void NDECL((*decgraphics_mode_callback)); /* defined in symbols.c */
 static void NDECL(tty_decgraphics_termcap_fixup);
 
 /*

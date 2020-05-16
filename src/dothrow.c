@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1579655027 2020/01/22 01:03:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1584398443 2020/03/16 22:40:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -80,7 +80,7 @@ throw_obj(obj, shotlimit)
 struct obj *obj;
 int shotlimit;
 {
-    struct obj *otmp;
+    struct obj *otmp, *oldslot;
     int multishot;
     schar skill;
     long wep_mask;
@@ -228,6 +228,7 @@ int shotlimit;
     }
 
     wep_mask = obj->owornmask;
+    oldslot = 0;
     g.m_shot.o = obj->otyp;
     g.m_shot.n = multishot;
     for (g.m_shot.i = 1; g.m_shot.i <= g.m_shot.n; g.m_shot.i++) {
@@ -239,9 +240,10 @@ int shotlimit;
             otmp = obj;
             if (otmp->owornmask)
                 remove_worn_item(otmp, FALSE);
+            oldslot = obj->nobj;
         }
         freeinv(otmp);
-        throwit(otmp, wep_mask, twoweap);
+        throwit(otmp, wep_mask, twoweap, oldslot);
     }
     g.m_shot.n = g.m_shot.i = 0;
     g.m_shot.o = STRANGE_OBJECT;
@@ -429,7 +431,8 @@ boolean verbose;
     if (g.m_shot.i < g.m_shot.n) {
         if (verbose && !g.context.mon_moving) {
             You("stop %s after the %d%s %s.",
-                g.m_shot.s ? "firing" : "throwing", g.m_shot.i, ordin(g.m_shot.i),
+                g.m_shot.s ? "firing" : "throwing",
+                g.m_shot.i, ordin(g.m_shot.i),
                 g.m_shot.s ? "shot" : "toss");
         }
         g.m_shot.n = g.m_shot.i; /* make current shot be the last */
@@ -437,7 +440,7 @@ boolean verbose;
 }
 
 /* Object hits floor at hero's feet.
-   Called from drop(), throwit(), hold_another_object(). */
+   Called from drop(), throwit(), hold_another_object(), litter(). */
 void
 hitfloor(obj, verbosely)
 struct obj *obj;
@@ -711,8 +714,9 @@ int x, y;
         }
     }
 
-    /* Caller has already determined that dragging the ball is allowed */
-    if (Punished && uball->where == OBJ_FLOOR) {
+    /* caller has already determined that dragging the ball is allowed;
+       if ball is carried we might still need to drag the chain */
+    if (Punished) {
         int bc_control;
         xchar ballx, bally, chainx, chainy;
         boolean cause_delay;
@@ -1107,10 +1111,11 @@ struct obj *obj;
 
 /* throw an object, NB: obj may be consumed in the process */
 void
-throwit(obj, wep_mask, twoweap)
+throwit(obj, wep_mask, twoweap, oldslot)
 struct obj *obj;
 long wep_mask; /* used to re-equip returning boomerang */
 boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
+struct obj *oldslot; /* for thrown-and-return used with !fixinv */
 {
     register struct monst *mon;
     int range, urange;
@@ -1183,12 +1188,12 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             && !impaired) {
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
                   ceiling(u.ux, u.uy));
-            obj = addinv(obj);
+            obj = addinv_before(obj, oldslot);
             (void) encumber_msg();
             if (obj->owornmask & W_QUIVER) /* in case addinv() autoquivered */
                 setuqwep((struct obj *) 0);
             setuwep(obj);
-            u.twoweap = twoweap;
+            set_twoweap(twoweap); /* u.twoweap = twoweap */
         } else if (u.dz < 0) {
             (void) toss_up(obj, rn2(5) && !Underwater);
         } else if (u.dz > 0 && u.usteed && obj->oclass == POTION_CLASS
@@ -1208,11 +1213,11 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         mon = boomhit(obj, u.dx, u.dy);
         if (mon == &g.youmonst) { /* the thing was caught */
             exercise(A_DEX, TRUE);
-            obj = addinv(obj);
+            obj = addinv_before(obj, oldslot);
             (void) encumber_msg();
             if (wep_mask && !(obj->owornmask & wep_mask)) {
                 setworn(obj, wep_mask);
-                u.twoweap = twoweap;
+                set_twoweap(twoweap); /* u.twoweap = twoweap */
             }
             clear_thrownobj = TRUE;
             goto throwit_return;
@@ -1340,14 +1345,14 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 
                 if (!impaired && rn2(100)) {
                     pline("%s to your hand!", Tobjnam(obj, "return"));
-                    obj = addinv(obj);
+                    obj = addinv_before(obj, oldslot);
                     (void) encumber_msg();
                     /* addinv autoquivers an aklys if quiver is empty;
                        if obj is quivered, remove it before wielding */
                     if (obj->owornmask & W_QUIVER)
                         setuqwep((struct obj *) 0);
                     setuwep(obj);
-                    u.twoweap = twoweap;
+                    set_twoweap(twoweap); /* u.twoweap = twoweap */
                     if (cansee(g.bhitpos.x, g.bhitpos.y))
                         newsym(g.bhitpos.x, g.bhitpos.y);
                 } else {
@@ -1366,8 +1371,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                               Tobjnam(obj, Blind ? "hit" : "fly"),
                               body_part(ARM));
                         if (obj->oartifact)
-                            (void) artifact_hit((struct monst *) 0, &g.youmonst,
-                                                obj, &dmg, 0);
+                            (void) artifact_hit((struct monst *) 0,
+                                                &g.youmonst, obj, &dmg, 0);
                         losehp(Maybe_Half_Phys(dmg), killer_xname(obj),
                                KILLED_BY);
                     }

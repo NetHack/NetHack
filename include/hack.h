@@ -134,6 +134,10 @@ enum cost_alteration_types {
 #define CXN_ARTICLE 8   /* include a/an/the prefix */
 #define CXN_NOCORPSE 16 /* suppress " corpse" suffix */
 
+/* flags for look_here() */
+#define LOOKHERE_PICKED_SOME   1
+#define LOOKHERE_SKIP_DFEATURE 2
+
 /* getpos() return values */
 enum getpos_retval {
     LOOK_TRADITIONAL = 0, /* '.' -- ask about "more info?" */
@@ -255,13 +259,12 @@ struct sortloot_item {
 };
 typedef struct sortloot_item Loot;
 
-#define MATCH_WARN_OF_MON(mon)                                               \
-    (Warn_of_mon && ((g.context.warntype.obj                                   \
-                      && (g.context.warntype.obj & (mon)->data->mflags2))      \
-                     || (g.context.warntype.polyd                              \
-                         && (g.context.warntype.polyd & (mon)->data->mflags2)) \
-                     || (g.context.warntype.species                            \
-                         && (g.context.warntype.species == (mon)->data))))
+#define MATCH_WARN_OF_MON(mon) \
+    (Warn_of_mon                                                        \
+     && ((g.context.warntype.obj & (mon)->data->mflags2) != 0           \
+         || (g.context.warntype.polyd & (mon)->data->mflags2) != 0      \
+         || (g.context.warntype.species                                 \
+             && (g.context.warntype.species == (mon)->data))))
 
 #include "trap.h"
 #include "flag.h"
@@ -286,25 +289,26 @@ typedef struct sortloot_item Loot;
 #include "extern.h"
 #endif /* USE_TRAMPOLI */
 
-/* flags to control makemon(); goodpos() uses some plus has some of its own */
-#define NO_MM_FLAGS 0x00000 /* use this rather than plain 0 */
-#define NO_MINVENT  0x00001 /* suppress minvent when creating mon */
-#define MM_NOWAIT   0x00002 /* don't set STRAT_WAITMASK flags */
-#define MM_NOCOUNTBIRTH 0x00004 /* don't increment born count (for revival) */
-#define MM_IGNOREWATER  0x00008 /* ignore water when positioning */
-#define MM_ADJACENTOK   0x00010 /* acceptable to use adjacent coordinates */
-#define MM_ANGRY    0x00020 /* monster is created angry */
-#define MM_NONAME   0x00040 /* monster is not christened */
-#define MM_EGD      0x00100 /* add egd structure */
-#define MM_EPRI     0x00200 /* add epri structure */
-#define MM_ESHK     0x00400 /* add eshk structure */
-#define MM_EMIN     0x00800 /* add emin structure */
-#define MM_EDOG     0x01000 /* add edog structure */
-#define MM_ASLEEP   0x02000 /* monsters should be generated asleep */
-#define MM_NOGRP    0x04000 /* suppress creation of monster groups */
+/* flags to control makemon(); goodpos() uses some plus has some of its own*/
+#define NO_MM_FLAGS 0x000000L /* use this rather than plain 0 */
+#define NO_MINVENT  0x000001L /* suppress minvent when creating mon */
+#define MM_NOWAIT   0x000002L /* don't set STRAT_WAITMASK flags */
+#define MM_NOCOUNTBIRTH 0x0004L /* don't increment born count (for revival) */
+#define MM_IGNOREWATER  0x0008L /* ignore water when positioning */
+#define MM_ADJACENTOK   0x0010L /* acceptable to use adjacent coordinates */
+#define MM_ANGRY    0x000020L /* monster is created angry */
+#define MM_NONAME   0x000040L /* monster is not christened */
+#define MM_EGD      0x000100L /* add egd structure */
+#define MM_EPRI     0x000200L /* add epri structure */
+#define MM_ESHK     0x000400L /* add eshk structure */
+#define MM_EMIN     0x000800L /* add emin structure */
+#define MM_EDOG     0x001000L /* add edog structure */
+#define MM_ASLEEP   0x002000L /* monsters should be generated asleep */
+#define MM_NOGRP    0x004000L /* suppress creation of monster groups */
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
-#define GP_ALLOW_XY 0x08000 /* [actually used by enexto() to decide whether
-                             * to make an extra call to goodpos()]          */
+#define GP_ALLOW_XY 0x008000L /* [actually used by enexto() to decide whether
+                               * to make an extra call to goodpos()]        */
+#define GP_ALLOW_U  0x010000L /* don't reject hero's location */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00
@@ -314,6 +318,11 @@ typedef struct sortloot_item Loot;
 /* flags for decide_to_shift() */
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
 #define SHIFT_MSG 0x02     /* always put out a message */
+
+/* m_poisongas_ok() return values */
+#define M_POISONGAS_BAD   0 /* poison gas is bad */
+#define M_POISONGAS_MINOR 1 /* poison gas is ok, maybe causes coughing */
+#define M_POISONGAS_OK    2 /* ignores poison gas completely */
 
 /* flags for deliver_obj_to_mon */
 #define DF_NONE     0x00
@@ -408,18 +417,6 @@ typedef struct sortloot_item Loot;
 #define LAUNCH_UNSEEN 0x40 /* hero neither caused nor saw it */
 #define LAUNCH_KNOWN 0x80  /* the hero caused this by explicit action */
 
-/* Macros for explosion types */
-enum explosion_types {
-    EXPL_DARK    = 0,
-    EXPL_NOXIOUS = 1,
-    EXPL_MUDDY   = 2,
-    EXPL_WET     = 3,
-    EXPL_MAGICAL = 4,
-    EXPL_FIERY   = 5,
-    EXPL_FROSTY  = 6,
-    EXPL_MAX     = 7
-};
-
 /* enlightenment control flags */
 #define BASICENLIGHTENMENT 1 /* show mundane stuff */
 #define MAGICENLIGHTENMENT 2 /* show intrinsics and such */
@@ -476,6 +473,11 @@ enum bodypart_types {
 #define SPINACH_TIN (-1)
 #define RANDOM_TIN (-2)
 #define HEALTHY_TIN (-3)
+
+/* Corpse aging */
+#define TAINT_AGE (50L)        /* age when corpses go bad */
+#define TROLL_REVIVE_CHANCE 37 /* 1/37 chance for 50 turns ~ 75% chance */
+#define ROT_AGE (250L)         /* age when corpses rot away */
 
 /* Some misc definitions */
 #define POTION_OCCUPANT_CHANCE(n) (13 + 2 * (n))

@@ -408,7 +408,8 @@ boolean with_you;
         if (t) {
             xlocale = t->tx, ylocale = t->ty;
             break;
-        } else {
+        } else if (!(u.uevent.qexpelled
+                     && (Is_qstart(&u.uz0) || Is_qstart(&u.uz)))) {
             impossible("mon_arrive: no corresponding portal?");
         } /*FALLTHRU*/
     default:
@@ -803,10 +804,17 @@ register struct obj *obj;
                 || (acidic(fptr) && !resists_acid(mon))
                 || (poisonous(fptr) && !resists_poison(mon)))
                 return POISON;
-            /* turning into slime is preferable to starvation */
-            else if (fptr == &mons[PM_GREEN_SLIME] && !slimeproof(mon->data))
-                return starving ? ACCFOOD : POISON;
-            else if (vegan(fptr))
+            /* polymorphing is preferable to starvation, and pet might also
+               want to take its chances on that if they've been mistreated */
+            else if (is_shapeshifter(fptr)) {
+                if (mon->mtame == 1) {
+                    /* A herbivore still won't eat a nonvegan corpse, but
+                       in any other circumstance a pet with tameness 1 will
+                       happily eat a shapeshifter. */
+                    return (herbi && !vegan(fptr)) ? MANFOOD : CADAVER;
+                }
+                return starving ? ACCFOOD : MANFOOD;
+            } else if (vegan(fptr))
                 return herbi ? CADAVER : MANFOOD;
             /* most humanoids will avoid cannibalism unless starving;
                arbitrary: elves won't eat other elves even then */
@@ -816,6 +824,9 @@ register struct obj *obj;
                 return (starving && carni && !is_elf(mptr)) ? ACCFOOD : TABU;
             else
                 return carni ? CADAVER : MANFOOD;
+        case GLOB_OF_GREEN_SLIME: /* other globs use the default case */
+            /* turning into slime is preferable to starvation */
+            return (starving || slimeproof(mon->data)) ? ACCFOOD : POISON;
         case CLOVE_OF_GARLIC:
             return (is_undead(mptr) || is_vampshifter(mon))
                       ? TABU

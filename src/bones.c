@@ -231,7 +231,12 @@ int x, y;
 {
     struct obj *otmp;
 
-    u.twoweap = 0; /* ensure curse() won't cause swapwep to drop twice */
+    /* when dual-wielding, the second weapon gets dropped rather than welded if
+       it becomes cursed; ensure that that won't happen here by ending dual-wield */
+    u.twoweap = FALSE; /* bypass set_twoweap() */
+
+    /* all inventory is dropped (for the normal case), even non-droppable things
+       like worn armor and accessories, welded weapon, or cursed loadstones */
     while ((otmp = g.invent) != 0) {
         obj_extract_self(otmp);
         /* when turning into green slime, all gear remains held;

@@ -2,8 +2,11 @@
 /* Copyright (c) Michael Allison, 2018                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#include "hack.h"
-#include <stdio.h>
+/* must #define SAFEPROCS in xxxconf.h or via CFLAGS or this won't compile */
+#include "config.h"
+#include "color.h"
+#include "wintype.h"
+#include "winprocs.h"
 
 /*
  * ***********************************************************
@@ -71,7 +74,7 @@ struct window_procs safe_procs = {
     safe_init_nhwindows, safe_player_selection, safe_askname, safe_get_nh_event,
     safe_exit_nhwindows, safe_suspend_nhwindows, safe_resume_nhwindows,
     safe_create_nhwindow, safe_clear_nhwindow, safe_display_nhwindow,
-    safe_destroy_nhwindow, safe_curs, safe_putstr, genl_putmixed,
+    safe_destroy_nhwindow, safe_curs, safe_putstr, safe_putmixed,
     safe_display_file, safe_start_menu, safe_add_menu, safe_end_menu,
     safe_select_menu, safe_message_menu, safe_update_inventory, safe_mark_synch,
     safe_wait_synch,
@@ -91,7 +94,7 @@ struct window_procs safe_procs = {
 #endif
     safe_get_color_string,
 #endif
-    safe_start_screen, safe_end_screen, genl_outrip,
+    safe_start_screen, safe_end_screen, safe_outrip,
     safe_preference_update,
     safe_getmsghistory, safe_putmsghistory,
     safe_status_init,
@@ -210,6 +213,15 @@ int x, y;
 
 void
 safe_putstr(window, attr, str)
+winid window;
+int attr;
+const char *str;
+{
+    return;
+}
+
+void
+safe_putmixed(window, attr, str)
 winid window;
 int attr;
 const char *str;

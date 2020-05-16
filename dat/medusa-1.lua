@@ -58,16 +58,16 @@ des.non_diggable(selection.area(30,06,46,13))
 des.object({ id = "statue", x=36,y=10, buc="uncursed",
              montype="knight", historic=1, male = 1, name="Perseus",
              contents = function()
-                if math.random(0,99) < 75 then
+                if percent(75) then
                    des.object({ id = "shield of reflection", buc="cursed", spe=0 })
                 end
-                if math.random(0,99) < 25 then
+                if percent(25) then
                    des.object({ id = "levitation boots", spe=0 })
                 end
-                if math.random(0,99) < 50 then
+                if percent(50) then
                    des.object({ id = "scimitar", buc="blessed", spe=2 })
                 end
-                if math.random(0,99) < 50 then
+                if percent(50) then
                    des.object("sack")
                 end
              end

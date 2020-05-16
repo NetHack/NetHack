@@ -24,7 +24,7 @@ des.map([[
 ]]);
 
 
-if math.random(0,99) < 75 then
+if percent(75) then
    local terrains = { "-", "F", "L", "T", "C" };
    local tidx = math.random(1, #terrains);
    local choice = math.random(0, 4);

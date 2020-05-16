@@ -1,4 +1,4 @@
-/* NetHack 3.6	shknam.c	$NHDT-Date: 1454485432 2016/02/03 07:43:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	shknam.c	$NHDT-Date: 1587024023 2020/04/16 08:00:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -498,14 +498,8 @@ const char *const *nlp;
     int name_wanted;
     s_level *sptr;
 
-    if (nlp == shkfoods && In_mines(&u.uz) && Role_if(PM_MONK)
+    if (nlp == shklight && In_mines(&u.uz)
         && (sptr = Is_special(&u.uz)) != 0 && sptr->flags.town) {
-        /* special-case override for minetown food store for monks */
-        nlp = shkhealthfoods;
-    }
-
-    if (nlp == shklight && In_mines(&u.uz) && (sptr = Is_special(&u.uz)) != 0
-        && sptr->flags.town) {
         /* special-case minetown lighting shk */
         shname = "+Izchak";
         shk->female = FALSE;
@@ -513,7 +507,7 @@ const char *const *nlp;
         /* We want variation from game to game, without needing the save
            and restore support which would be necessary for randomization;
            try not to make too many assumptions about time_t's internals;
-           use ledger_no rather than depth to keep mine town distinct. */
+           use ledger_no rather than depth to keep minetown distinct. */
         int nseed = (int) ((long) ubirthday / 257L);
 
         name_wanted = ledger_no(&u.uz) + (nseed % 13) - (nseed % 5);
@@ -694,6 +688,12 @@ int rmno, sh, sx,sy;
                || (sy == sroom->ly && g.doors[sh].y == sy - 1)
                || (sy == sroom->hy && g.doors[sh].y == sy + 1))
         return FALSE;
+
+    /* only generate items on solid floor squares */
+    if (!IS_ROOM(levl[sx][sy].typ)) {
+        return FALSE;
+    }
+
     return TRUE;
 }
 
@@ -802,7 +802,8 @@ struct obj *obj;
     return FALSE;
 }
 
-/* positive value: class; negative value: specific object type */
+/* positive value: class; negative value: specific object type.
+   can also return non-existing object class (eg. VEGETARIAN_CLASS) */
 int
 get_shop_item(type)
 int type;

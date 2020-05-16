@@ -229,25 +229,6 @@ struct obj *otmp;
             restmon(nhfp, OMONST(otmp));
         }
 
-        /* omid - monster id number, connecting corpse to ghost */
-        if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-
-        if (buflen > 0) {
-            newomid(otmp);
-            if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) OMID(otmp), buflen);
-        }
-
-        /* olong - temporary gold */
-        if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (buflen > 0) {
-            newolong(otmp);
-            if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) OLONG(otmp), buflen);
-        }
-
         /* omailcmd - feedback mechanism for scroll of mail */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
@@ -259,6 +240,11 @@ struct obj *otmp;
             new_omailcmd(otmp, omailcmd);
             free((genericptr_t) omailcmd);
         }
+
+        /* omid - monster id number, connecting corpse to ghost */
+        newomid(otmp); /* superfluous; we're already allocated otmp->oextra */
+        if (nhfp->structlevel)
+            mread(nhfp->fd, (genericptr_t) &OMID(otmp), sizeof OMID(otmp));
     }
 }
 
@@ -1393,6 +1379,7 @@ boolean ghostly;
 {
     struct obj *otmp;
     unsigned oldid, nid;
+
     for (otmp = fobj; otmp; otmp = otmp->nobj) {
         if (ghostly && has_omonst(otmp)) {
             struct monst *mtmp = OMONST(otmp);
@@ -1401,11 +1388,9 @@ boolean ghostly;
             mtmp->mpeaceful = mtmp->mtame = 0; /* pet's owner died! */
         }
         if (ghostly && has_omid(otmp)) {
-            (void) memcpy((genericptr_t) &oldid, (genericptr_t) OMID(otmp),
-                          sizeof(oldid));
+            oldid = OMID(otmp);
             if (lookup_id_mapping(oldid, &nid))
-                (void) memcpy((genericptr_t) OMID(otmp), (genericptr_t) &nid,
-                              sizeof(nid));
+                OMID(otmp) = nid;
             else
                 free_omid(otmp);
         }

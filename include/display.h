@@ -13,6 +13,18 @@
 #include "mondata.h" /* for mindless() */
 #endif
 
+/* types of explosions */
+enum explosion_types {
+    EXPL_DARK    = 0,
+    EXPL_NOXIOUS = 1,
+    EXPL_MUDDY   = 2,
+    EXPL_WET     = 3,
+    EXPL_MAGICAL = 4,
+    EXPL_FIERY   = 5,
+    EXPL_FROSTY  = 6,
+    EXPL_MAX     = 7
+};
+
 /*
  * vobj_at()
  *
@@ -122,14 +134,14 @@
              && distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM))))
 
 /*
- * is_safepet(mon)
+ * is_safemon(mon)
  *
  * A special case check used in attack() and domove().  Placing the
- * definition here is convenient.
+ * definition here is convenient.  No longer limited to pets.
  */
-#define is_safepet(mon)                                                   \
-    (mon && mon->mtame && canspotmon(mon) && flags.safe_dog && !Confusion \
-     && !Hallucination && !Stunned)
+#define is_safemon(mon) \
+    (flags.safe_dog && (mon) && (mon)->mpeaceful && canspotmon(mon)     \
+     && !Confusion && !Hallucination && !Stunned)
 
 /*
  * canseeself()
@@ -260,7 +272,7 @@
  * explosions   A set of nine for each of the following seven explosion types:
  *                   dark, noxious, muddy, wet, magical, fiery, frosty.
  *              The nine positions represent those surrounding the hero.
- *              Count: MAXEXPCHARS * EXPL_MAX (EXPL_MAX is defined in hack.h)
+ *              Count: MAXEXPCHARS * EXPL_MAX
  *
  * zap beam     A set of four (there are four directions) for each beam type.
  *              The beam type is shifted over 2 positions and the direction

@@ -69,6 +69,10 @@ static char *FDECL(mdlib_strsubst, (char *, const char *, const char *));
 extern int GUILaunched;
 #endif
 
+/* these two are in extern.h but we don't include hack.h */
+void NDECL(runtime_info_init);
+const char *FDECL(do_runtime_info, (int *));
+
 void NDECL(build_options);
 static int NDECL(count_and_validate_winopts);
 static void FDECL(opt_out_words, (char *, int *));

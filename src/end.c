@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1581322661 2020/02/10 08:17:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1583190253 2020/03/02 23:04:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -195,13 +195,17 @@ NH_panictrace_libc()
 #ifdef PANICTRACE_LIBC
     void *bt[20];
     size_t count, x;
-    char **info;
+    char **info, buf[BUFSZ];
 
     raw_print("Generating more information you may report:\n");
     count = backtrace(bt, SIZE(bt));
     info = backtrace_symbols(bt, count);
     for (x = 0; x < count; x++) {
-        raw_printf("[%lu] %s", (unsigned long) x, info[x]);
+        copynchars(buf, info[x], (int) sizeof buf - 1);
+        /* try to remove up to 16 blank spaces by removing 8 twice */
+        (void) strsubst(buf, "        ", "");
+        (void) strsubst(buf, "        ", "");
+        raw_printf("[%02lu] %s", (unsigned long) x, buf);
     }
     /* free(info);   -- Don't risk it. */
     return TRUE;
@@ -1093,8 +1097,9 @@ int how;
 #ifdef HANGUPHANDLING
         || g.program_state.done_hup
 #endif
-        ) {
-        /* skip status update if panicking or disconnected */
+        || (how == QUIT && done_stopprint)) {
+        /* skip status update if panicking or disconnected
+           or answer of 'q' to "Really quit?" */
         g.context.botl = g.context.botlx = iflags.time_botl = FALSE;
     } else {
         /* otherwise force full status update */

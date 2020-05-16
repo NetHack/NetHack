@@ -76,7 +76,7 @@ boolean forceshow;
         if ((mtmp = m_at(fcx, fcy)) != 0) {
             if (mtmp->isgd) {
                 return FALSE;
-            } else if (!in_fcorridor(grd, u.ux, u.uy)) {
+            } else {
                 if (mtmp->mtame)
                     yelp(mtmp);
                 if (!rloc(mtmp, TRUE))
@@ -305,9 +305,6 @@ xchar *rx, *ry;
 void
 invault()
 {
-#ifdef BSD_43_BUG
-    int dummy; /* hack to avoid schain botch */
-#endif
     struct monst *guard;
     boolean gsensed;
     int trycount, vaultroom = (int) vault_occupied(u.urooms);

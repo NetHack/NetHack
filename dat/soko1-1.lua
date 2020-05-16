@@ -98,7 +98,7 @@ des.region({ region={18,10, 22,16}, lit = 1, type = "zoo",
 	     prefilled = 0, irregular = 1 });
 
 px, py = selection.rndcoord(place);
-if math.random(0, 99) < 75 then
+if percent(75) then
    des.object({ id="bag of holding", x=px, y=py,
 		buc="not-cursed", achievement=1 });
 else

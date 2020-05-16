@@ -128,39 +128,6 @@ support is only a small, optional, part of nethack, and the Makefile is
 needed for systems that don't use X11.
 
 
-Notes for Sun's OpenWindows:
-    1.	For OpenWindows 3.0 (NOT 2.x), define OPENWINBUG in include/unixconf.h.
-	The library bug from SunOS 4.1.x is fixed in Solaris 2.x (or when
-	proper Sun patches have been applied to 4.1.x), so it is also
-	unnecessary there.  (Defining it when unnecessary causes the same
-	problem being avoided when it is necessary. :-)
-
-    2.  In addition to the changes suggested by the comments in src/Makefile,
-
-	-- for OpenWindows 2.x and 3.0 (NOT 3.1) (i.e., versions for SunOS 4.x),
-	   add -I/usr/openwin/include to CFLAGS, -L/usr/openwin/lib to LFLAGS,
-	   and -lm to WINX11LIB in src/Makefile.
-
-	-- for OpenWindows 3.1 (i.e., versions for Solaris 2.x), add
-	   -I/usr/openwin/include to CFLAGS, -L/usr/openwin/lib -L/usr/ccs/lib
-	   -R/usr/openwin/lib to LFLAGS, and -lsocket -lnsl -lm
-	   to WINX11LIB in src/Makefile.
-
-	(Naturally, if your OpenWindows is installed elsewhere, adapt the
-	openwin paths.)  This will allow you to create a game executable.
-
-    3.	Run the fonts through convertfont and run bldfamily on the directory.
-	Now you must let your X server know where to find the fonts.  For a
-	personal installation, the simplest thing is to include the directory
-	of the fonts in the environment variable FONTPATH, as set in your
-	.profile or .login before starting the server.  For a multi-user
-	installation, you have the various "xset fp+" options outlined
-	above for standard X.
-
-    4.  Something must still be done with the NetHack.ad file -- all three
-	of the possibilities mentioned for standard X11 should work.
-
-
 Notes for AIX 3.2:
     1.  AIX 3.2 includes the Athena Widget Toolkit library (and other things)
 	under the /usr/lpp/X11/Xamples tree, so you will have to add
@@ -170,8 +137,7 @@ Notes for AIX 3.2:
 
 Notes for XFree86 - (on linux and BSD386 platforms)
 
-    1.  Edit src/Makefile for linux/BSD386. Even though you use the 
-	Open Look Window manager, do not define OPENWINBUG.  Use the 
+    1.  Edit src/Makefile for linux/BSD386. Use the
 	standard X11 object and library options.
 
     2.  Follow the standard installation directions defined above.

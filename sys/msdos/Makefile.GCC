@@ -94,38 +94,6 @@ TERMLIB =
 LIBRARIES = $(LIBS) $(TERMLIB)
 
 #
-#  Yacc/Lex ... if you got 'em.
-#
-# If you have yacc/lex or a work-alike set YACC_LEX to Y
-#
-YACC_LEX = N
-
-ifeq "$(YACC_LEX)" "Y"
-DO_YACC = YACC_ACT
-DO_LEX  = LEX_ACT
-endif
-
-# If YACC_LEX is Y above, set the following to values appropriate for
-# your tools.
-#
-YACC   = bison -y
-LEX    = flex
-#
-# If your flex and bison port mess with the output names directly
-# you must set the file names to the appropriate output file names
-# here
-#YTABC  = y_tab.c
-#YTABH  = y_tab.h
-#LEXYYC = lexyy.c
-#
-# If your flex and bison are able to produce files named
-# y.tab.c, y.tab.h or lex.yy.c you might have to set these
-# to the short file name equivalent (DIR /X to reveal them):
-YTABC  = ytab~1.c
-YTABH  = ytab~1.h
-LEXYYC = lexyy~1.c
-
-#
 # Uncomment the line below if you want to store all the level files,
 # help files, etc. in a single library file.
 
@@ -220,10 +188,6 @@ VGAOBJ      = $(O)vidvga.o $(O)vidvesa.o
 
 MAKESRC	    = makedefs.c
 
-ifneq "$(ADD_LUA)" "Y"
-SPLEVSRC    = lev_yacc.c  lev_$(LEX).c	 lev_main.c  panic.c
-endif
-
 MAKEDEFSOBJS    = $(O)makedefs.o  $(O)monst.o	 $(O)objects.o
 
 RECOVOBJS   = $(O)recover.o
@@ -253,10 +217,10 @@ TILOBJ      = $(O)tile.o $(VGAOBJ)
 
 TILOBJ2     = $(O)tileset.o $(O)bmptiles.o $(O)giftiles.o
 
-TEXTIO      = $(O)tiletext.o $(O)tiletxt.o $(O)drawing.o $(O)decl.o $(O)monst.o \
+TEXTIO      = $(O)tiletext.o $(O)tiletxt.o $(O)drawing.o $(O)monst.o \
 		$(O)objects.o $(O)stubvid.o
 
-TEXTIO2     = $(O)tiletex2.o $(O)tiletxt2.o $(O)drawing.o $(O)decl.o $(O)monst.o \
+TEXTIO2     = $(O)tiletex2.o $(O)tiletxt2.o $(O)drawing.o $(O)monst.o \
 		$(O)objects.o $(O)stubvid.o
 
 TILE_BMP    = $(DAT)/nhtiles.bmp
@@ -285,40 +249,38 @@ DLBOBJ = $(O)dlb.o
 #  Object files for the game itself.
 
 
-VOBJ01 = $(O)allmain.o  $(O)alloc.o   $(O)apply.o    $(O)artifact.o $(O)attrib.o
-VOBJ02 = $(O)ball.o     $(O)bones.o   $(O)botl.o     $(O)cmd.o      $(O)dbridge.o
-VOBJ03 = $(O)decl.o     $(O)detect.o  $(O)display.o  $(O)do.o       $(O)do_name.o
-VOBJ04 = $(O)do_wear.o  $(O)dog.o     $(O)dogmove.o  $(O)dokick.o   $(O)dothrow.o
-VOBJ05 = $(O)drawing.o  $(O)dungeon.o $(O)eat.o      $(O)end.o      $(O)engrave.o
-VOBJ06 = $(O)exper.o    $(O)explode.o $(O)extralev.o $(O)files.o    $(O)fountain.o
-VOBJ07 = $(O)getline.o  $(O)hack.o    $(O)hacklib.o  $(O)invent.o   $(O)lock.o
-VOBJ08 = $(O)mail.o     $(O)main.o    $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o $(O)mhitm.o
-VOBJ09 = $(O)mhitu.o    $(O)minion.o  $(O)mkmap.o    $(O)mklev.o    $(O)mkmaze.o
-VOBJ10 = $(O)mkobj.o    $(O)mkroom.o  $(O)mon.o      $(O)mondata.o  $(O)monmove.o
-VOBJ11 = $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
-VOBJ12 = $(O)music.o    $(O)o_init.o  $(O)objects.o  $(O)objnam.o   $(O)options.o
-VOBJ13 = $(O)pickup.o   $(O)pline.o   $(O)polyself.o $(O)potion.o   $(O)quest.o
-VOBJ14 = $(O)questpgr.o $(O)pager.o   $(O)pray.o     $(O)priest.o   $(O)read.o
-VOBJ15 = $(O)rect.o     $(O)restore.o $(O)rip.o      $(O)rnd.o      $(O)role.o
-VOBJ16 = $(O)rumors.o   $(O)save.o    $(O)shk.o      $(O)shknam.o   $(O)sit.o
-VOBJ17 = $(O)sounds.o   $(O)sp_lev.o  $(O)spell.o    $(O)steal.o    $(O)steed.o
-VOBJ18 = $(O)termcap.o  $(O)timeout.o $(O)topl.o     $(O)topten.o   $(O)track.o
-VOBJ19 = $(O)trap.o     $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
-VOBJ20 = $(O)vis_tab.o  $(O)weapon.o  $(O)were.o     $(O)wield.o    $(O)windows.o
-VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
-VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
-VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)       $(O)isaac64.o
-VOBJ24 = $(O)sfstruct.o
+VOBJ01 = $(O)allmain.o  $(O)alloc.o    $(O)apply.o    $(O)artifact.o $(O)attrib.o
+VOBJ02 = $(O)ball.o     $(O)bones.o    $(O)botl.o     $(O)cmd.o      $(O)dbridge.o
+VOBJ03 = $(O)decl.o     $(O)detect.o   $(O)display.o  $(O)do.o       $(O)do_name.o
+VOBJ04 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o   $(O)dothrow.o
+VOBJ05 = $(O)drawing.o  $(O)dungeon.o  $(O)eat.o      $(O)end.o      $(O)engrave.o
+VOBJ06 = $(O)exper.o    $(O)explode.o  $(O)extralev.o $(O)files.o    $(O)fountain.o
+VOBJ07 = $(O)getline.o  $(O)hack.o     $(O)hacklib.o  $(O)isaac64.o  $(O)invent.o
+VOBJ08 = $(O)lock.o     $(O)mail.o     $(O)main.o     $(O)makemon.o  $(O)mapglyph.o
+VOBJ09 = $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mkmap.o
+VOBJ10 = $(O)mklev.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o   $(O)mon.o
+VOBJ11 = $(O)mondata.o  $(O)monmove.o  $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o
+VOBJ12 = $(O)muse.o     $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o
+VOBJ13 = $(O)options.o  $(O)pickup.o   $(O)pline.o    $(O)polyself.o $(O)potion.o
+VOBJ14 = $(O)quest.o    $(O)questpgr.o $(O)pager.o    $(O)pray.o     $(O)priest.o
+VOBJ15 = $(O)read.o     $(O)rect.o     $(O)restore.o  $(O)rip.o      $(O)rnd.o
+VOBJ16 = $(O)role.o     $(O)rumors.o   $(O)save.o     $(O)sfstruct.o $(O)shk.o
+VOBJ17 = $(O)shknam.o   $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o
+VOBJ18 = $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o      $(O)termcap.o
+VOBJ19 = $(O)timeout.o  $(O)topl.o     $(O)topten.o   $(O)track.o    $(O)trap.o
+VOBJ20 = $(O)u_init.o   $(O)uhitm.o    $(O)vault.o    $(O)vision.o   $(O)vis_tab.o
+VOBJ21 = $(O)weapon.o   $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wintty.o
+VOBJ22 = $(O)wizard.o   $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
+VOBJ23 = $(O)light.o    $(O)dlb.o      $(O)dig.o      $(O)teleport.o $(O)region.o
+VOBJ24 = $(REGEX)         
 
 SOBJ   = $(O)msdos.o    $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
 
 VVOBJ  = $(O)version.o
 
-ifeq "$(ADD_LUA)" "Y"
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 LUA_QTEXT_FILE = "quest.lua"
-endif
 
 ifeq "$(ADD_CURSES)" "Y"
 CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
@@ -336,7 +298,6 @@ VOBJ  = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 
 ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 
-ifeq "$(ADD_LUA)" "Y"
 #===============-=================================================
 # LUA library
 # Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
@@ -366,7 +327,6 @@ LUAOBJFILES2 =	$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
 LUAOBJFILES3 =	$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
 LUAOBJFILES = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3)
-endif
 
 ifeq "$(ADD_CURSES)" "Y"
 #==========================================
@@ -560,14 +520,12 @@ $(OBJ)/%.o : $(PDCSRC)/%.c
 $(OBJ)/%.o : $(PDCDOS)/%.c
 	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
 
-ifeq "$(ADD_LUA)" "Y"
 #==========================================
 # Rules for LUA files
 #==========================================
 
 $(OBJ)/%.o : $(LUASRC)/%.c
 	$(CC) $(cflags)  -o$@  $<
-endif
 
 #==========================================
 #  Primary Targets.
@@ -584,11 +542,6 @@ default: $(GAMEFILE)
 
 util: $(O)utility.tag
 
-ifneq "$(ADD_LUA)" "Y"
-LEVCOMPEXE = $(U)lev_comp.exe
-else
-LEVCOMPEXE =
-endif
 $(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h \
 	$(INCL)/pm.h	  vis_tab.c $(TILEUTIL)
 	$(subst /,\,echo utilities made > $@)
@@ -607,11 +560,7 @@ ifeq ($(USE_DLB),Y)
 else
 	@$(subst /,\,copy $(DAT)/*. $(GAMEDIR))
 	@$(subst /,\,copy $(DAT)/*.dat $(GAMEDIR))
-ifeq "$(ADD_LUA)" "Y"
 	@$(subst /,\,copy $(DAT)/*.lua $(GAMEDIR))
-else
-	@$(subst /,\,copy $(DAT)/*.lev $(GAMEDIR))
-endif
 	@$(subst /,\,copy $(MSYS)/msdoshlp.txt $(GAMEDIR))
 	@$(subst /,\,if exist $(GAMEDIR)/makefile. del $(GAMEDIR)/makefile.)
 endif
@@ -669,9 +618,7 @@ $(GAMEFILE): $(O)obj.tag $(PATCHLEV_H) $(PDCLIB) $(LUATARGETS) \
 	 @ar ruS temp.a $(TILOBJ)
 	 @ar ruS temp.a $(TILOBJ2)
 	 @ar ruS temp.a $(VVOBJ)
-ifeq "$(ADD_LUA)" "Y"
 	 @ar ruS temp.a $(LUAOBJ)
-endif
 ifeq "$(ADD_CURSES)" "Y"
 	 @ar ruS temp.a $(CURSESOBJ)
 endif
@@ -717,81 +664,6 @@ $(U)makedefs.exe:  $(MAKEDEFSOBJS)
 $(O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
 		$(INCL)/monsym.h   $(U)makedefs.c
 
-ifneq "$(ADD_LUA)" "Y"
-#==========================================
-#  Level Compiler Dependencies
-#==========================================
-
-$(U)lev_comp.exe:  $(SPLEVOBJS)
-	-rm -f temp.a
-	@ar ru temp.a $(SPLEVOBJS)
-	$(LINK) $(LFLAGS) -o$@ temp.a
-
-ifeq ($(YACC_LEX),Y)
-
-$(O)lev_yacc.o:  $(HACK_H)	 $(SP_LEV_H)	$(U)lev_yacc.c
-	$(CC) $(cflags) -o$@ $(U)lev_yacc.c
-
-else
-
-$(O)lev_yacc.o:  $(HACK_H)	 $(SP_LEV_H) $(INCL)/lev_comp.h $(U)lev_yacc.c
-	$(CC) $(cflags) -o$@ $(U)lev_yacc.c
-
-endif
-
-$(O)lev_$(LEX).o:  $(HACK_H)   $(SP_LEV_H)	  $(INCL)/lev_comp.h \
-	$(U)lev_$(LEX).c
-	$(CC) $(cflags) -o$@ $(U)lev_$(LEX).c
-
-$(O)lev_main.o:  $(HACK_H) $(INCL)/sp_lev.h $(INCL)/date.h $(U)lev_main.c
-
-ifeq  "$(DO_YACC)" "YACC_ACT"
-
-$(INCL)/lev_comp.h: $(U)lev_yacc.c
-
-$(U)lev_yacc.c $(INCL)/lev_comp.h : $(U)lev_comp.y
-	@$(subst /,\,chdir $(UTIL))
-	@$(subst /,\,$(YACC) -d lev_comp.y)
-	@$(subst /,\,copy $(YTABC) lev_yacc.c)
-	@$(subst /,\,copy $(YTABH) $(INCL)/lev_comp.h)
-	@$(subst /,\,@del $(YTABC))
-	@$(subst /,\,@del $(YTABH))
-	@$(subst /,\,chdir $(SRC))
-else
-
-$(U)lev_yacc.c: $(SSHR)/lev_yacc.c
-	@echo ---
-	@echo For now, we will copy the prebuilt
-	@echo lev_comp.c from $(SSHR) into $(U) and use that.
-	@$(subst /,\,copy $(SSHR)/lev_yacc.c $(U)lev_yacc.c)
-	@$(subst /,\,echo.>>$(U)lev_yacc.c)
-
-$(INCL)/lev_comp.h : $(SSHR)/lev_comp.h
-	@echo ---
-	@echo For now, we will copy the prebuilt lev_comp.h
-	@echo from $(SSHR) into $(INCL) and use that.
-	@$(subst /,\,copy $(SSHR)/lev_comp.h $(INCL)/lev_comp.h)
-	@$(subst /,\,echo.>>$(INCL)/lev_comp.h)
-
-endif
-
-$(U)lev_$(LEX).c: $(U)lev_comp.l
-ifeq  "$(DO_LEX)" "LEX_ACT"
-	@$(subst /,\,chdir $(UTIL))
-	@$(subst /,\,$(LEX) $(FLEXSKEL) lev_comp.l)
-	@$(subst /,\,if exist $@ del $@)
-	@$(subst /,\,copy $(LEXYYC) $@)
-	@$(subst /,\,del $(LEXYYC))
-	@$(subst /,\,chdir $(SRC))
-else
-	@echo ---
-	@echo For now, we will copy the prebuilt lev_lex.c
-	@echo from $(SSHR) into $(U) and use it.
-	@$(subst /,\,copy $(SSHR)/lev_lex.c $@)
-	@$(subst /,\,echo.>>$@)
-endif
-endif
-
 #==========================================
 #  Recover Utility
 #==========================================
@@ -823,6 +695,7 @@ $(U)tilemap.exe: $(O)tilemap.o
 $(O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H) $(TILE_H)
 	$(CC) $(cflags) -I$(WSHR) -I$(MSYS) -o$@ $(WSHR)/tilemap.c
 
+endif
 
 #==========================================
 #   Tile Utilities
@@ -918,8 +791,6 @@ $(U)viewtib.exe: $(O)viewtib.o
 
 $(O)viewtib.o: $(MSYS)/viewtib.c
 
-endif
-
 #==========================================
 # PDCurses Library
 #==========================================
@@ -970,11 +841,6 @@ $(DAT)/data: $(O)utility.tag	$(DATABASE)
 $(DAT)/rumors:	     $(O)utility.tag    $(DAT)/rumors.tru	$(DAT)/rumors.fal
 	@$(subst /,\,$(U)makedefs.exe -r)
 
-ifndef LUA_QTEXT_FILE
-$(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
-	@$(subst /,\,$(U)makedefs.exe -q)
-endif
-
 $(DAT)/oracles:	     $(O)utility.tag    $(DAT)/oracles.txt
 	@$(subst /,\,$(U)makedefs.exe -h)
 
@@ -996,11 +862,6 @@ $(O)sp_lev.tag: $(O)utility.tag
 
 #note that dir below assumes bin/dir.exe from djgpp distribution
 #
-ifndef LUA_QTEXT_FILE
-QUEST_DAT = $(DAT)/quest.dat
-else
-QUEST_DAT =
-endif
 $(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
 		$(DAT)/oracles \
 		$(QUEST_DAT) \
@@ -1010,9 +871,6 @@ $(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
 	@$(subst /,\,cd $(DAT))
 	@$(subst /,\,copy $(MSYS)/msdoshlp.txt .)
 	@$(LS) data oracles options rumors help hh >dlb.lst
-ifndef LUA_QTEXT_FILE
-	@$(LS) quest.dat >>dlb.lst
-endif
 	@$(LS) cmdhelp history opthelp wizhelp license msdoshlp.txt >>dlb.lst
 	@$(LS) bogusmon engrave epitaph tribute >>dlb.lst
 	$(LS) $(subst /,\,*.lua) >>dlb.lst
@@ -1061,9 +919,6 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
 	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
 	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
-ifndef LUA_QTEXT_FILE
-	$(subst /,\,if exist $(DAT)/quest.dat del $(DAT)/quest.dat)
-endif
 	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
 	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
 	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
@@ -1385,7 +1240,7 @@ $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
-$(O)drawing.o: drawing.c $(HACK_H) $(INCL)/tcap.h
+$(O)drawing.o: drawing.c $(HACK_H)
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)/dlb.h
@@ -1457,6 +1312,7 @@ $(O)sp_lev.o: sp_lev.c $(HACK_H) $(INCL)/dlb.h $(INCL)/sp_lev.h
 $(O)spell.o: spell.c $(HACK_H)
 $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
+$(O)symbols.o: symbols.c $(HACK_H) $(INCL)/tcap.h
 $(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
 $(O)timeout.o: timeout.c $(HACK_H)

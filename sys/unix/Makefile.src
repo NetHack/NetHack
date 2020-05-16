@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1575932543 2019/12/09 23:02:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1588776919 2020/05/06 14:55:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -455,8 +455,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
 	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
 	   shk.c shknam.c sit.c sounds.c \
-	   sp_lev.c spell.c steal.c steed.c sys.c teleport.c timeout.c \
-	   topten.c track.c trap.c u_init.c \
+	   sp_lev.c spell.c steal.c steed.c symbols.c sys.c teleport.c \
+	   timeout.c topten.c track.c trap.c u_init.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
@@ -522,7 +522,7 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o sfstruct.o \
-	shk.o shknam.o sit.o sounds.o sp_lev.o spell.o sys.o \
+	shk.o shknam.o sit.o sounds.o sp_lev.o spell.o symbols.o sys.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
 	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
 	wizard.o worm.o worn.o write.o zap.o \
@@ -817,9 +817,11 @@ cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursinvt.h
 	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursinvt.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
-		$(CONFIG_H) ../include/lint.h
+		$(CONFIG_H) ../include/lint.h ../include/winX.h \
+		../include/color.h ../include/wintype.h
 	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/Window.c
-dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h
+dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h \
+		../include/winX.h ../include/color.h ../include/wintype.h
 	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
 		../include/xwindow.h ../win/X11/nh72icon ../win/X11/nh56icon \
@@ -1063,7 +1065,7 @@ dog.o: dog.c $(HACK_H)
 dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h
 dokick.o: dokick.c $(HACK_H)
 dothrow.o: dothrow.c $(HACK_H)
-drawing.o: drawing.c $(HACK_H) ../include/tcap.h
+drawing.o: drawing.c $(CONFIG_H)
 dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
 eat.o: eat.c $(HACK_H)
 end.o: end.c $(HACK_H) ../include/dlb.h
@@ -1146,6 +1148,7 @@ sp_lev.o: sp_lev.c $(HACK_H) ../include/sp_lev.h
 spell.o: spell.c $(HACK_H)
 steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
+symbols.o: symbols.c $(HACK_H) ../include/tcap.h
 sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
 timeout.o: timeout.c $(HACK_H)

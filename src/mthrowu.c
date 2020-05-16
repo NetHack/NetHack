@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1581184742 2020/02/08 17:59:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1586567393 2020/04/11 01:09:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,7 +8,7 @@
 static int FDECL(monmulti, (struct monst *, struct obj *, struct obj *));
 static void FDECL(monshoot, (struct monst *, struct obj *, struct obj *));
 static int FDECL(drop_throw, (struct obj *, BOOLEAN_P, int, int));
-static boolean FDECL(m_lined_up, (struct monst *, struct monst *));
+static int FDECL(m_lined_up, (struct monst *, struct monst *));
 
 #define URETREATING(x, y) \
     (distmin(u.ux, u.uy, x, y) > distmin(u.ux0, u.uy0, x, y))
@@ -25,6 +25,22 @@ static NEARDATA const char *breathwep[] = {
     "lightning", "poison gas", "acid", "strange breath #8",
     "strange breath #9"
 };
+
+boolean
+m_has_launcher_and_ammo(mtmp)
+struct monst *mtmp;
+{
+    struct obj *mwep = MON_WEP(mtmp);
+
+    if (mwep && is_launcher(mwep)) {
+        struct obj *otmp;
+
+        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+            if (ammo_and_launcher(otmp, mwep))
+                return TRUE;
+    }
+    return FALSE;
+}
 
 /* hero is hit by something other than a monster */
 int
@@ -1014,7 +1030,7 @@ int boulderhandling; /* 0=block, 1=ignore, 2=conditionally block */
     return FALSE;
 }
 
-static boolean
+static int
 m_lined_up(mtarg, mtmp)
 struct monst *mtarg, *mtmp;
 {
@@ -1030,6 +1046,7 @@ struct monst *mtarg, *mtmp;
                               && U_AP_TYPE != M_AP_MONSTER)))
         return FALSE;
 
+    /* [no callers care about the 1 vs 2 situation any more] */
     return linedup(tx, ty, mtmp->mx, mtmp->my,
                    utarget ? (ignore_boulders ? 1 : 2) : 0);
 }
@@ -1040,7 +1057,7 @@ boolean
 lined_up(mtmp)
 register struct monst *mtmp;
 {
-    return m_lined_up(&g.youmonst, mtmp);
+    return m_lined_up(&g.youmonst, mtmp) ? TRUE : FALSE;
 }
 
 /* check if a monster is carrying a particular item */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1579649788 2020/01/21 23:36:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1586125907 2020/04/05 22:31:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -22,7 +22,6 @@ static NEARDATA const long takeoff_order[] = {
 
 static void FDECL(on_msg, (struct obj *));
 static void FDECL(toggle_stealth, (struct obj *, long, BOOLEAN_P));
-static void FDECL(toggle_displacement, (struct obj *, long, BOOLEAN_P));
 static int NDECL(Armor_on);
 /* int NDECL(Boots_on); -- moved to extern.h */
 static int NDECL(Cloak_on);
@@ -114,10 +113,11 @@ boolean on;
     }
 }
 
-/* putting on or taking off an item which confers displacement;
+/* putting on or taking off an item which confers displacement, or gaining
+   or losing timed displacement after eating a displacer beast corpse or tin;
    give feedback and discover it iff displacement state is changing *and*
-   hero is able to see self (or sense monsters) */
-static
+   hero is able to see self (or sense monsters); for timed, 'obj' is Null
+   and this is only called for the message */
 void
 toggle_displacement(obj, oldprop, on)
 struct obj *obj;
@@ -128,8 +128,8 @@ boolean on;
         return;
 
     if (!oldprop /* extrinsic displacement from something else */
-        && !(u.uprops[DISPLACED].intrinsic) /* (theoretical) */
-        && !(u.uprops[DISPLACED].blocked) /* (also theoretical) */
+        && !(u.uprops[DISPLACED].intrinsic) /* timed, from eating */
+        && !(u.uprops[DISPLACED].blocked) /* (theoretical) */
         /* we don't use canseeself() here because it augments vision
            with touch, which isn't appropriate for deciding whether
            we'll notice that monsters have trouble spotting the hero */
@@ -142,7 +142,8 @@ boolean on;
             || (Unblind_telepat
                 || (Blind_telepat && Blind)
                 || Detect_monsters))) {
-        makeknown(obj->otyp);
+        if (obj)
+            makeknown(obj->otyp);
 
         You_feel("that monsters%s have difficulty pinpointing your location.",
                  on ? "" : " no longer");
@@ -784,7 +785,31 @@ Amulet_on()
            gotten set by previously eating one of these amulets */
         if (newnap < oldnap || oldnap == 0L)
             HSleepy = (HSleepy & ~TIMEOUT) | newnap;
-    } break;
+        break;
+    }
+    case AMULET_OF_FLYING:
+        /* setworn() has already set extrinisic flying */
+        float_vs_flight(); /* block flying if levitating */
+        if (Flying) {
+            boolean already_flying;
+
+            /* to determine whether this flight is new we have to muck
+               about in the Flying intrinsic (actually extrinsic) */
+            EFlying &= ~W_AMUL;
+            already_flying = !!Flying;
+            EFlying |= W_AMUL;
+
+            if (!already_flying) {
+                makeknown(AMULET_OF_FLYING);
+                g.context.botl = TRUE; /* status: 'Fly' On */
+                You("are now in flight.");
+            }
+        }
+        break;
+    case AMULET_OF_GUARDING:
+        makeknown(AMULET_OF_GUARDING);
+        find_ac();
+        break;
     case AMULET_OF_YENDOR:
         break;
     }
@@ -838,6 +863,26 @@ Amulet_off()
         if (!ESleepy && !(HSleepy & ~TIMEOUT))
             HSleepy &= ~TIMEOUT; /* clear timeout bits */
         return;
+    case AMULET_OF_FLYING: {
+        boolean was_flying = !!Flying;
+
+        /* remove amulet 'early' to determine whether Flying changes */
+        setworn((struct obj *) 0, W_AMUL);
+        float_vs_flight(); /* probably not needed here */
+        if (was_flying && !Flying) {
+            makeknown(AMULET_OF_FLYING);
+            g.context.botl = TRUE; /* status: 'Fly' Off */
+            You("%s.", (is_pool_or_lava(u.ux, u.uy)
+                        || Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
+                          ? "stop flying"
+                          : "land");
+            spoteffects(TRUE);
+        }
+        break;
+    }
+    case AMULET_OF_GUARDING:
+        find_ac();
+        break;
     case AMULET_OF_YENDOR:
         break;
     }
@@ -2056,7 +2101,7 @@ struct obj *obj;
             g.multi_reason = "dressing up";
             g.nomovemsg = "You finish your dressing maneuver.";
         } else {
-            unmul(""); /* call (*g.aftermv)(), clear it+g.nomovemsg+g.multi_reason */
+            unmul(""); /* call aftermv, clear it+nomovemsg+multi_reason */
             on_msg(obj);
         }
         g.context.takeoff.mask = g.context.takeoff.what = 0L;
@@ -2151,6 +2196,8 @@ find_ac()
         uac -= uleft->spe;
     if (uright && uright->otyp == RIN_PROTECTION)
         uac -= uright->spe;
+    if (uamul && uamul->otyp == AMULET_OF_GUARDING)
+        uac -= 2; /* fixed amount; main benefit is to MC */
 
     /* armor class from other sources */
     if (HProtection & INTRINSIC)
@@ -2460,19 +2507,23 @@ static struct obj *
 do_takeoff()
 {
     struct obj *otmp = (struct obj *) 0;
+    boolean was_twoweap = u.twoweap;
     struct takeoff_info *doff = &g.context.takeoff;
 
     g.context.takeoff.mask |= I_SPECIAL; /* set flag for cancel_doff() */
     if (doff->what == W_WEP) {
         if (!cursed(uwep)) {
             setuwep((struct obj *) 0);
-            You("are empty %s.", body_part(HANDED));
-            u.twoweap = FALSE;
+            if (was_twoweap)
+                You("are no longer wielding either weapon.");
+            else
+                You("are empty %s.", body_part(HANDED));
         }
     } else if (doff->what == W_SWAPWEP) {
         setuswapwep((struct obj *) 0);
-        You("no longer have a second weapon readied.");
-        u.twoweap = FALSE;
+        You("%sno longer %s.", was_twoweap ? "are " : "",
+            was_twoweap ? "wielding two weapons at once"
+                        : "have a second weapon readied");
     } else if (doff->what == W_QUIVER) {
         setuqwep((struct obj *) 0);
         You("no longer have ammunition readied.");
@@ -2650,13 +2701,13 @@ doddoremarm()
         result = menu_remarm(result);
 
     if (g.context.takeoff.mask) {
-        /* default activity for armor and/or accessories,
-           possibly combined with weapons */
-        (void) strncpy(g.context.takeoff.disrobing, "disrobing", CONTEXTVERBSZ);
-        /* specific activity when handling weapons only */
-        if (!(g.context.takeoff.mask & ~W_WEAPONS))
-            (void) strncpy(g.context.takeoff.disrobing, "disarming",
-                           CONTEXTVERBSZ);
+        (void) strncpy(g.context.takeoff.disrobing,
+                       (((g.context.takeoff.mask & ~W_WEAPONS) != 0)
+                        /* default activity for armor and/or accessories,
+                           possibly combined with weapons */
+                        ? "disrobing"
+                        /* specific activity when handling weapons only */
+                        : "disarming"), CONTEXTVERBSZ);
         (void) take_off();
     }
     /* The time to perform the command is already completely accounted for

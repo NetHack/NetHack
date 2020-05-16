@@ -19,12 +19,13 @@ static int FDECL(l_selection_line, (lua_State *));
 static int FDECL(l_selection_randline, (lua_State *));
 static int FDECL(l_selection_rect, (lua_State *));
 static int FDECL(l_selection_fillrect, (lua_State *));
-static int FDECL(l_selection_fillrect, (lua_State *));
 static int FDECL(l_selection_grow, (lua_State *));
 static int FDECL(l_selection_filter_mapchar, (lua_State *));
+static int FDECL(l_selection_match, (lua_State *));
 static int FDECL(l_selection_flood, (lua_State *));
 static int FDECL(l_selection_circle, (lua_State *));
 static int FDECL(l_selection_ellipse, (lua_State *));
+static int FDECL(l_selection_gradient, (lua_State *));
 static int FDECL(l_selection_iterate, (lua_State *));
 static int FDECL(l_selection_gc, (lua_State *));
 static int FDECL(l_selection_not, (lua_State *));
@@ -39,7 +40,6 @@ static int FDECL(l_selection_not, (lua_State *));
    if ifdef'd out the prototype here and the
    function body below.
  */
-static int FDECL(l_selection_gradient, (lua_State *));
 static int FDECL(l_selection_add, (lua_State *));
 static int FDECL(l_selection_sub, (lua_State *));
 static int FDECL(l_selection_ipairs, (lua_State *));
@@ -121,9 +121,9 @@ lua_State *L;
 {
     struct selectionvar *sel = l_selection_check(L, 1);
     struct selectionvar *tmp;
-    lua_pop(L, 1);
+
     (void) l_selection_new(L);
-    tmp = l_selection_check(L, 1);
+    tmp = l_selection_check(L, 2);
     if (tmp->map)
         free(tmp->map);
     tmp->map = dupstr(sel->map);
@@ -146,7 +146,7 @@ lua_State *L;
     schar x = -1, y = -1;
     int val = 1;
     int argc = lua_gettop(L);
-    long coord = 0L;
+    long crd = 0L;
 
     if (argc == 0) {
         (void) l_selection_new(L);
@@ -172,11 +172,11 @@ lua_State *L;
     }
 
     if (x == -1 && y == -1)
-        coord = SP_COORD_PACK_RANDOM(0);
+        crd = SP_COORD_PACK_RANDOM(0);
     else
-        coord = SP_COORD_PACK(x,y);
+        crd = SP_COORD_PACK(x,y);
     get_location_coord(&x, &y, ANY_LOC,
-                       g.coder ? g.coder->croom : NULL, coord);
+                       g.coder ? g.coder->croom : NULL, crd);
     selection_setpoint(x, y, sel, val);
     lua_settop(L, 1);
     return 1;
@@ -191,13 +191,13 @@ lua_State *L;
     schar x = (schar) luaL_checkinteger(L, 2);
     schar y = (schar) luaL_checkinteger(L, 3);
     int val;
-    long coord;
+    long crd;
 
     if (x == -1 && y == -1)
-        coord = SP_COORD_PACK_RANDOM(0);
+        crd = SP_COORD_PACK_RANDOM(0);
     else
-        coord = SP_COORD_PACK(x,y);
-    get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, coord);
+        crd = SP_COORD_PACK(x,y);
+    get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, crd);
 
     val = selection_getpoint(x, y, sel);
     lua_settop(L, 0);
@@ -222,10 +222,9 @@ lua_State *L;
     } else {
         sel = l_selection_check(L, 1);
         (void) l_selection_clone(L);
-        sel2 = l_selection_check(L, 1);
+        sel2 = l_selection_check(L, 2);
         selection_not(sel2);
     }
-    lua_settop(L, 1);
     return 1;
 }
 
@@ -305,7 +304,7 @@ lua_State *L;
     p = (int) luaL_checkinteger(L, 2);
     lua_pop(L, 1);
     (void) l_selection_clone(L);
-    ret = l_selection_check(L, 1);
+    ret = l_selection_check(L, 2);
     selection_filter_percent(ret, p);
 
     return 1;
@@ -380,7 +379,7 @@ static int
 l_selection_line(L)
 lua_State *L;
 {
-    struct selectionvar *sel;
+    struct selectionvar *sel = NULL;
     schar x1;
     schar y1;
     schar x2;
@@ -393,9 +392,8 @@ lua_State *L;
     get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
     get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2,y2));
 
-    lua_settop(L, 1);
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     selection_do_line(x1,y1,x2,y2, sel);
     return 1;
 }
@@ -405,7 +403,7 @@ static int
 l_selection_rect(L)
 lua_State *L;
 {
-    struct selectionvar *sel;
+    struct selectionvar *sel = NULL;
     schar x1;
     schar y1;
     schar x2;
@@ -420,9 +418,8 @@ lua_State *L;
     get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
                        SP_COORD_PACK(x2, y2));
 
-    lua_settop(L, 1);
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     selection_do_line(x1, y1, x2, y1, sel);
     selection_do_line(x1, y1, x1, y2, sel);
     selection_do_line(x2, y1, x2, y2, sel);
@@ -438,7 +435,7 @@ static int
 l_selection_fillrect(L)
 lua_State *L;
 {
-    struct selectionvar *sel;
+    struct selectionvar *sel = NULL;
     int y;
     schar x1;
     schar y1;
@@ -454,9 +451,8 @@ lua_State *L;
     get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
                        SP_COORD_PACK(x2, y2));
 
-    lua_settop(L, 1);
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     if (x1 == x2) {
         for (y = y1; y <= y2; y++)
             selection_setpoint(x1, y, sel, 1);
@@ -505,7 +501,7 @@ lua_State *L;
                        g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2, y2));
 
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     selection_do_randline(x1, y1, x2, y2, roughness, 12, sel);
     return 1;
 }
@@ -527,9 +523,8 @@ lua_State *L;
         lua_pop(L, 1); /* get rid of growdir */
 
     (void) l_selection_clone(L);
-    sel = l_selection_check(L, 1);
+    sel = l_selection_check(L, 2);
     selection_do_grow(sel, dir);
-    lua_settop(L, 1);
     return 1;
 }
 
@@ -564,6 +559,45 @@ lua_State *L;
 
     if (mapchr)
         free(mapchr);
+
+    return 1;
+}
+
+/* local s = selection.match([[...]]); */
+static int
+l_selection_match(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+    struct selectionvar *sel = (struct selectionvar *) 0;
+    struct mapfragment *mf = (struct mapfragment *) 0;
+    int x, y;
+
+    if (argc == 1) {
+        const char *err;
+        char *mapstr = dupstr(luaL_checkstring(L, 1));
+        lua_pop(L, 1);
+        (void) l_selection_new(L);
+        sel = l_selection_check(L, 1);
+
+        mf = mapfrag_fromstr(mapstr);
+        free(mapstr);
+
+        if ((err = mapfrag_error(mf)) != NULL) {
+            nhl_error(L, err);
+            /*NOTREACHED*/
+        }
+
+    } else {
+        nhl_error(L, "wrong parameters");
+        /*NOTREACHED*/
+    }
+
+    for (y = 0; y <= sel->hei; y++)
+        for (x = 0; x < sel->wid; x++)
+            selection_setpoint(x, y, sel, mapfrag_match(mf, x,y) ? 1 : 0);
+
+    mapfrag_free(&mf);
 
     return 1;
 }
@@ -701,6 +735,70 @@ lua_State *L;
     return 1;
 }
 
+/* Gradients are versatile enough, with so many independently optional
+ * arguments, that it doesn't seem helpful to provide a non-table form with
+ * non-obvious argument order. */
+/* selection.gradient({ type = "radial", x = 3, y = 5, x2 = 10, y2 = 12,
+ *                      mindist = 4, maxdist = 10, limited = false });    */
+static int
+l_selection_gradient(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+    struct selectionvar *sel = (struct selectionvar *) 0;
+    /* if x2 and y2 aren't set, the gradient has a single center point of x,y;
+     * if they are set, the gradient is centered on a (x,y) to (x2,y2) line */
+    schar x = 0, y = 0, x2 = -1, y2 = -1;
+    /* points will not be added within mindist of the center; the chance for a
+     * point between mindist and maxdist to be added to the selection starts at
+     * 0% at mindist and increases linearly to 100% at maxdist */
+    xchar mindist = 0, maxdist = 0;
+    /* if limited is true, no points farther than maxdist will be added; if
+     * false, all points farther than maxdist will be added */
+    boolean limited = FALSE;
+    long type;
+    static const char *const gradtypes[] = {
+        "radial", "square", NULL
+    };
+    static const int gradtypes2i[] = {
+        SEL_GRADIENT_RADIAL, SEL_GRADIENT_SQUARE, -1
+    };
+
+    if (argc == 1 && lua_type(L, 1) == LUA_TTABLE) {
+        lcheck_param_table(L);
+        type = gradtypes2i[get_table_option(L, "type", "radial", gradtypes)];
+        x = (schar) get_table_int(L, "x");
+        y = (schar) get_table_int(L, "y");
+        x2 = (schar) get_table_int_opt(L, "x2", -1);
+        y2 = (schar) get_table_int_opt(L, "y2", -1);
+        /* maxdist is required because there's no obvious default value for it,
+         * whereas mindist has an obvious defalt of 0 */
+        maxdist = get_table_int(L, "maxdist");
+        mindist = get_table_int_opt(L, "mindist", 0);
+        limited = get_table_boolean_opt(L, "limited", FALSE);
+
+        lua_pop(L, 1);
+        (void) l_selection_new(L);
+        sel = l_selection_check(L, 1);
+    } else {
+        nhl_error(L, "wrong parameters");
+        /* NOTREACHED */
+    }
+
+    /* someone might conceivably want to draw a gradient somewhere off-map. So
+     * the only coordinate that's "illegal" for that is (-1,-1).
+     * If a level designer really needs to draw a gradient line using that
+     * coordinate, they can do so by setting regular x and y to -1. */
+    if (x2 == -1 && y2 == -1) {
+        x2 = x;
+        y2 = y;
+    }
+
+    selection_do_gradient(sel, x, y, x2, y2, type, mindist, maxdist, limited);
+    lua_settop(L, 1);
+    return 1;
+}
+
 /* sel:iterate(function(x,y) ... end); */
 static int
 l_selection_iterate(L)
@@ -712,11 +810,10 @@ lua_State *L;
 
     if (argc == 2 && lua_type(L, 2) == LUA_TFUNCTION) {
         sel = l_selection_check(L, 1);
-        lua_remove(L, 1);
         for (y = 0; y < sel->hei; y++)
             for (x = 0; x < sel->wid; x++)
                 if (selection_getpoint(x, y, sel)) {
-                    lua_pushvalue(L, 1);
+                    lua_pushvalue(L, 2);
                     lua_pushinteger(L, x - g.xstart);
                     lua_pushinteger(L, y - g.ystart);
                     lua_call(L, 2, 0);
@@ -744,13 +841,12 @@ static const struct luaL_Reg l_selection_methods[] = {
     { "area", l_selection_fillrect },
     { "grow", l_selection_grow },
     { "filter_mapchar", l_selection_filter_mapchar },
+    { "match", l_selection_match },
     { "floodfill", l_selection_flood },
     { "circle", l_selection_circle },
     { "ellipse", l_selection_ellipse },
+    { "gradient", l_selection_gradient },
     { "iterate", l_selection_iterate },
-    /* TODO:
-       { "gradient", l_selection_gradient },
-    */
     { NULL, NULL }
 };
 

@@ -251,14 +251,13 @@ struct instance_flags {
     int menuinvertmode;  /* 0 = invert toggles every item;
                             1 = invert skips 'all items' item */
     int menu_headings;    /* ATR for menu headings */
-    int *opt_booldup;     /* for duplication of boolean opts in config file */
-    int *opt_compdup;     /* for duplication of compound opts in conf file */
 #ifdef ALTMETA
     boolean altmeta;      /* Alt-c sends ESC c rather than M-c */
 #endif
     boolean autodescribe;     /* autodescribe mode in getpos() */
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
+    boolean defer_decor;      /* terrain change message vs slipping on ice */
     boolean echo;             /* 1 to echo characters */
     boolean force_invmenu;    /* always menu when handling inventory */
     boolean hilite_pile;      /* mark piles of objects with a hilite */
@@ -448,7 +447,9 @@ enum plnmsg_types {
     PLNMSG_CAUGHT_IN_EXPLOSION, /* explode() feedback */
     PLNMSG_OBJ_GLOWS,           /* "the <obj> glows <color>" */
     PLNMSG_OBJNAM_ONLY,         /* xname/doname only, for #tip */
-    PLNMSG_OK_DONT_DIE          /* overriding death in explore/wizard mode */
+    PLNMSG_OK_DONT_DIE,         /* overriding death in explore/wizard mode */
+    PLNMSG_BACK_ON_GROUND,      /* leaving water */
+    PLNMSG_enum /* allows inserting new entries with unconditional trailing comma */
 };
 
 /* runmode options */

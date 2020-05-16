@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1561485713 2019/06/25 18:01:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.172 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1583688568 2020/03/08 17:29:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,15 +18,10 @@ static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 static boolean FDECL(learnscrolltyp, (SHORT_P));
 static char *FDECL(erode_obj_text, (struct obj *, char *));
-static char *FDECL(apron_text, (struct obj *, char *buf));
+static char *FDECL(apron_text, (struct obj *, char *));
 static void FDECL(stripspe, (struct obj *));
 static void FDECL(p_glow1, (struct obj *));
 static void FDECL(p_glow2, (struct obj *, const char *));
-static void FDECL(forget_single_object, (int));
-#if 0 /* not used */
-static void FDECL(forget_objclass, (int));
-#endif
-static void FDECL(randomize, (int *, int));
 static void FDECL(forget, (int));
 static int FDECL(maybe_tame, (struct monst *, struct obj *));
 static boolean FDECL(get_valid_stinking_cloud_pos, (int, int));
@@ -34,6 +29,8 @@ static boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
 static void FDECL(display_stinking_cloud_positions, (int));
 static void FDECL(set_lit, (int, int, genericptr));
 static void NDECL(do_class_genocide);
+static boolean FDECL(create_particular_parse, (char *, struct _create_particular_data *));
+static boolean FDECL(create_particular_creation, (struct _create_particular_data *));
 
 static boolean
 learnscrolltyp(scrolltyp)
@@ -647,17 +644,43 @@ int curse_bless;
             }
             break;
         case CRYSTAL_BALL:
+            if (obj->spe == -1) /* like wands, first uncancel */
+                obj->spe = 0;
+
             if (is_cursed) {
-                stripspe(obj);
+                /* cursed scroll removes charges and curses ball */
+                /*stripspe(obj); -- doesn't do quite what we want...*/
+                if (!obj->cursed) {
+                    p_glow2(obj, NH_BLACK);
+                    curse(obj);
+                } else {
+                    pline("%s briefly.", Yobjnam2(obj, "vibrate"));
+                }
+                if (obj->spe > 0)
+                    costly_alteration(obj, COST_UNCHRG);
+                obj->spe = 0;
             } else if (is_blessed) {
-                obj->spe = 6;
-                p_glow2(obj, NH_BLUE);
+                /* blessed scroll sets charges to max and blesses ball */
+                obj->spe = 7;
+                p_glow2(obj, !obj->blessed ? NH_LIGHT_BLUE : NH_BLUE);
+                if (!obj->blessed)
+                    bless(obj);
+                /* [shop price stays the same regardless of charges or BUC] */
             } else {
-                if (obj->spe < 5) {
-                    obj->spe++;
-                    p_glow1(obj);
-                } else
+                /* uncursed scroll increments charges and uncurses ball */
+                if (obj->spe < 7 || obj->cursed) {
+                    n = rnd(2);
+                    obj->spe = min(obj->spe + n, 7);
+                    if (!obj->cursed) {
+                        p_glow1(obj);
+                    } else {
+                        p_glow2(obj, NH_AMBER);
+                        uncurse(obj);
+                    }
+                } else {
+                    /* charges at max and ball not being uncursed */
                     pline1(nothing_happens);
+                }
             }
             break;
         case HORN_OF_PLENTY:
@@ -674,7 +697,7 @@ int curse_bless;
                     obj->spe = 50;
                 p_glow2(obj, NH_BLUE);
             } else {
-                obj->spe += rnd(5);
+                obj->spe += rn1(5, 2);
                 if (obj->spe > 50)
                     obj->spe = 50;
                 p_glow1(obj);
@@ -711,183 +734,13 @@ int curse_bless;
     }
 }
 
-/* Forget known information about this object type. */
-static void
-forget_single_object(obj_id)
-int obj_id;
-{
-    objects[obj_id].oc_name_known = 0;
-    objects[obj_id].oc_pre_discovered = 0; /* a discovery when relearned */
-    if (objects[obj_id].oc_uname) {
-        free((genericptr_t) objects[obj_id].oc_uname);
-        objects[obj_id].oc_uname = 0;
-    }
-    undiscover_object(obj_id); /* after clearing oc_name_known */
-
-    /* clear & free object names from matching inventory items too? */
-}
-
-#if 0 /* here if anyone wants it.... */
-/* Forget everything known about a particular object class. */
-static void
-forget_objclass(oclass)
-int oclass;
-{
-    int i;
-
-    for (i = g.bases[oclass];
-         i < NUM_OBJECTS && objects[i].oc_class == oclass; i++)
-        forget_single_object(i);
-}
-#endif
-
-/* randomize the given list of numbers  0 <= i < count */
-static void
-randomize(indices, count)
-int *indices;
-int count;
-{
-    int i, iswap, temp;
-
-    for (i = count - 1; i > 0; i--) {
-        if ((iswap = rn2(i + 1)) == i)
-            continue;
-        temp = indices[i];
-        indices[i] = indices[iswap];
-        indices[iswap] = temp;
-    }
-}
-
-/* Forget % of known objects. */
-void
-forget_objects(percent)
-int percent;
-{
-    int i, count;
-    int indices[NUM_OBJECTS];
-
-    if (percent == 0)
-        return;
-    if (percent <= 0 || percent > 100) {
-        impossible("forget_objects: bad percent %d", percent);
-        return;
-    }
-
-    indices[0] = 0; /* lint suppression */
-    for (count = 0, i = 1; i < NUM_OBJECTS; i++)
-        if (OBJ_DESCR(objects[i])
-            && (objects[i].oc_name_known || objects[i].oc_uname))
-            indices[count++] = i;
-
-    if (count > 0) {
-        randomize(indices, count);
-
-        /* forget first % of randomized indices */
-        count = ((count * percent) + rn2(100)) / 100;
-        for (i = 0; i < count; i++)
-            forget_single_object(indices[i]);
-    }
-}
-
-/* Forget some or all of map (depends on parameters). */
-void
-forget_map(howmuch)
-int howmuch;
-{
-    register int zx, zy;
-
-    if (Sokoban)
-        return;
-
-    g.known = TRUE;
-    for (zx = 0; zx < COLNO; zx++)
-        for (zy = 0; zy < ROWNO; zy++)
-            if (howmuch & ALL_MAP || rn2(7)) {
-                /* Zonk all memory of this location. */
-                levl[zx][zy].seenv = 0;
-                levl[zx][zy].waslit = 0;
-                levl[zx][zy].glyph = GLYPH_UNEXPLORED;
-                g.lastseentyp[zx][zy] = STONE;
-            }
-    /* forget overview data for this level */
-    forget_mapseen(ledger_no(&u.uz));
-}
-
-/* Forget all traps on the level. */
-void
-forget_traps()
-{
-    register struct trap *trap;
-
-    /* forget all traps (except the one the hero is in :-) */
-    for (trap = g.ftrap; trap; trap = trap->ntrap)
-        if ((trap->tx != u.ux || trap->ty != u.uy) && (trap->ttyp != HOLE))
-            trap->tseen = 0;
-}
-
-/*
- * Forget given % of all levels that the hero has visited and not forgotten,
- * except this one.
- */
-void
-forget_levels(percent)
-int percent;
-{
-    int i, count;
-    xchar maxl, this_lev;
-    int indices[MAXLINFO];
-
-    if (percent == 0)
-        return;
-
-    if (percent <= 0 || percent > 100) {
-        impossible("forget_levels: bad percent %d", percent);
-        return;
-    }
-
-    this_lev = ledger_no(&u.uz);
-    maxl = maxledgerno();
-
-    /* count & save indices of non-forgotten visited levels */
-    /* Sokoban levels are pre-mapped for the player, and should stay
-     * so, or they become nearly impossible to solve.  But try to
-     * shift the forgetting elsewhere by fiddling with percent
-     * instead of forgetting fewer levels.
-     */
-    indices[0] = 0; /* lint suppression */
-    for (count = 0, i = 0; i <= maxl; i++)
-        if ((g.level_info[i].flags & VISITED)
-            && !(g.level_info[i].flags & FORGOTTEN) && i != this_lev) {
-            if (ledger_to_dnum(i) == sokoban_dnum)
-                percent += 2;
-            else
-                indices[count++] = i;
-        }
-
-    if (percent > 100)
-        percent = 100;
-
-    if (count > 0) {
-        randomize(indices, count);
-
-        /* forget first % of randomized indices */
-        count = ((count * percent) + 50) / 100;
-        for (i = 0; i < count; i++) {
-            g.level_info[indices[i]].flags |= FORGOTTEN;
-            forget_mapseen(indices[i]);
-        }
-    }
-}
-
 /*
  * Forget some things (e.g. after reading a scroll of amnesia).  When called,
  * the following are always forgotten:
  *      - felt ball & chain
- *      - traps
- *      - part (6 out of 7) of the map
+ *      - skill training
  *
  * Other things are subject to flags:
- *      howmuch & ALL_MAP       = forget whole map
  *      howmuch & ALL_SPELLS    = forget all spells
  */
 static void
@@ -897,30 +750,11 @@ int howmuch;
     if (Punished)
         u.bc_felt = 0; /* forget felt ball&chain */
 
-    forget_map(howmuch);
-    forget_traps();
-
-    /* 1 in 3 chance of forgetting some levels */
-    if (!rn2(3))
-        forget_levels(rn2(25));
-
-    /* 1 in 3 chance of forgetting some objects */
-    if (!rn2(3))
-        forget_objects(rn2(25));
-
     if (howmuch & ALL_SPELLS)
         losespells();
-    /*
-     * Make sure that what was seen is restored correctly.  To do this,
-     * we need to go blind for an instant --- turn off the display,
-     * then restart it.  All this work is needed to correctly handle
-     * walls which are stone on one side and wall on the other.  Turning
-     * off the seen bits above will make the wall revert to stone,  but
-     * there are cases where we don't want this to happen.  The easiest
-     * thing to do is to run it through the vision system again, which
-     * is always correct.
-     */
-    docrt(); /* this correctly will reset vision */
+
+    /* Forget some skills. */
+    drain_weapon_skill(rnd(howmuch ? 5 : 3));
 }
 
 /* monster is hit by scroll of taming's effect */
@@ -1332,6 +1166,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                         if (shop_h2o)
                             costly_alteration(obj, COST_UNCURS);
                         uncurse(obj);
+                        /* if the object was known to be cursed and is now known not to be,
+                           make the scroll known; it's trivial to identify anyway by comparing
+                           inventory before and after */
+                        if (obj->bknown && otyp == SCR_REMOVE_CURSE) {
+                            learnscrolltyp(SCR_REMOVE_CURSE);
+                        }
                     }
                 }
             }
@@ -1446,19 +1286,40 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             do_genocide((!scursed) | (2 * !!Confusion));
         break;
     case SCR_LIGHT:
-        if (!confused || rn2(5)) {
+        if (!confused) {
             if (!Blind)
                 g.known = TRUE;
-            litroom(!confused && !scursed, sobj);
-            if (!confused && !scursed) {
+            litroom(!scursed, sobj);
+            if (!scursed) {
                 if (lightdamage(sobj, TRUE, 5))
                     g.known = TRUE;
             }
         } else {
-            /* could be scroll of create monster, don't set known ...*/
-            (void) create_critters(1, !scursed ? &mons[PM_YELLOW_LIGHT]
-                                               : &mons[PM_BLACK_LIGHT],
-                                   TRUE);
+            int pm = scursed ? PM_BLACK_LIGHT : PM_YELLOW_LIGHT;
+
+            if ((g.mvitals[pm].mvflags & G_GONE)) {
+                pline("Tiny lights sparkle in the air momentarily.");
+            } else {
+                /* surround with cancelled tame lights which won't explode */
+                boolean sawlights = FALSE;
+                int numlights = rn1(2,3) + (sblessed * 2);
+                int i;
+
+                for (i = 0; i < numlights; ++i) {
+                    struct monst * mon = makemon(&mons[pm], u.ux, u.uy,
+                                                 MM_EDOG | NO_MINVENT);
+                    initedog(mon);
+                    mon->msleeping = 0;
+                    mon->mcan = TRUE;
+                    if (canspotmon(mon))
+                        sawlights = TRUE;
+                    newsym(mon->mx, mon->my);
+                }
+                if (sawlights) {
+                    pline("Lights appear all around you!");
+                    g.known = TRUE;
+                }
+            }
         }
         break;
     case SCR_TELEPORTATION:
@@ -1585,8 +1446,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         break;
     case SCR_AMNESIA:
         g.known = TRUE;
-        forget((!sblessed ? ALL_SPELLS : 0)
-               | (!confused || scursed ? ALL_MAP : 0));
+        forget((!sblessed ? ALL_SPELLS : 0));
         if (Hallucination) /* Ommmmmm! */
             Your("mind releases itself from mundane concerns.");
         else if (!strncmpi(g.plname, "Maud", 4))
@@ -2443,17 +2303,7 @@ struct obj *from_obj;
     return FALSE;
 }
 
-struct _create_particular_data {
-    int quan;
-    int which;
-    int fem;
-    char monclass;
-    boolean randmonst;
-    boolean maketame, makepeaceful, makehostile;
-    boolean sleeping, saddled, invisible, hidden;
-};
-
-boolean
+static boolean
 create_particular_parse(str, d)
 char *str;
 struct _create_particular_data *d;
@@ -2470,17 +2320,25 @@ struct _create_particular_data *d;
     d->sleeping = d->saddled = d->invisible = d->hidden = FALSE;
 
     /* quantity */
-    if (digit(*bufp) && strcmp(bufp, "0")) {
+    if (digit(*bufp)) {
         d->quan = atoi(bufp);
         while (digit(*bufp))
             bufp++;
         while (*bufp == ' ')
             bufp++;
     }
+#define QUAN_LIMIT (ROWNO * (COLNO - 1))
+    /* maximum possible quantity is one per cell: (0..ROWNO-1) x (1..COLNO-1)
+       [21*79==1659 for default map size; could subtract 1 for hero's spot] */
+    if (d->quan < 1 || d->quan > QUAN_LIMIT)
+        d->quan = QUAN_LIMIT - monster_census(FALSE);
+#undef QUAN_LIMIT
+    /* gear -- extremely limited number of possibilities supported */
     if ((tmpp = strstri(bufp, "saddled ")) != 0) {
         d->saddled = TRUE;
         (void) memset(tmpp, ' ', sizeof "saddled " - 1);
     }
+    /* state -- limited number of possibilitie supported */
     if ((tmpp = strstri(bufp, "sleeping ")) != 0) {
         d->sleeping = TRUE;
         (void) memset(tmpp, ' ', sizeof "sleeping " - 1);
@@ -2542,7 +2400,7 @@ struct _create_particular_data *d;
     return FALSE;
 }
 
-boolean
+static boolean
 create_particular_creation(d)
 struct _create_particular_data *d;
 {

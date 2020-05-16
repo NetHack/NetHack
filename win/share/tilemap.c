@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1542501042 2018/11/18 00:30:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1589064692 2020/05/09 22:51:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /*      Copyright (c) 2016 by Michael Allison                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,7 +8,13 @@
  *      then again with it defined to produce tiletxt.{o,obj}.
  */
 
-#include "hack.h"
+#include "config.h"
+#include "pm.h"
+#include "onames.h"
+#include "permonst.h"
+#include "objclass.h"
+#include "rm.h"
+#include "display.h"
 
 #define Fprintf (void) fprintf
 

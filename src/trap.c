@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1582799195 2020/02/27 10:26:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.353 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1586382778 2020/04/08 21:52:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.358 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,6 +9,8 @@ extern const char *const destroy_strings[][3]; /* from zap.c */
 
 static boolean FDECL(keep_saddle_with_steedcorpse, (unsigned, struct obj *,
                                                     struct obj *));
+static boolean FDECL(mu_maybe_destroy_web, (struct monst *, BOOLEAN_P,
+                                            struct trap *));
 static struct obj *FDECL(t_missile, (int, struct trap *));
 static char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 static int FDECL(steedintrap, (struct trap *, struct obj *));
@@ -805,7 +807,7 @@ struct obj *objchn, *saddle;
 
 /* monster or you go through and possibly destroy a web.
    return TRUE if could go through. */
-boolean
+static boolean
 mu_maybe_destroy_web(mtmp, domsg, trap)
 struct monst *mtmp;
 boolean domsg;
@@ -3422,6 +3424,10 @@ xchar x, y;
     struct obj *obj, *nobj;
     int num = 0;
 
+    /* erode_obj() relies on bhitpos if target objects aren't carried by
+       the hero or a monster, to check visibility controlling feedback */
+    g.bhitpos.x = x, g.bhitpos.y = y;
+
     for (obj = chain; obj; obj = nobj) {
         nobj = here ? obj->nexthere : obj->nobj;
         if (fire_damage(obj, force, x, y))
@@ -3674,11 +3680,20 @@ struct obj *obj;
 boolean here;
 {
     struct obj *otmp;
+    xchar x, y;
+
+    if (!obj)
+        return;
 
     /* initialize acid context: so far, neither seen (dknown) potions of
        acid nor unseen have exploded during this water damage sequence */
     g.acid_ctx.dkn_boom = g.acid_ctx.unk_boom = 0;
     g.acid_ctx.ctx_valid = TRUE;
+
+    /* erode_obj() relies on bhitpos if target objects aren't carried by
+       the hero or a monster, to check visibility controlling feedback */
+    if (get_obj_location(obj, &x, &y, CONTAINED_TOO))
+        g.bhitpos.x = x, g.bhitpos.y = y;
 
     for (; obj; obj = otmp) {
         otmp = here ? obj->nexthere : obj->nobj;
@@ -3805,7 +3820,7 @@ drown()
             placebc();
         }
         vision_recalc(2); /* unsee old position */
-        u.uinwater = 1;
+        set_uinwater(1); /* u.uinwater = 1 */
         under_water(1);
         g.vision_full_recalc = 1;
         return FALSE;
@@ -3871,7 +3886,7 @@ drown()
         /* still too much weight */
         pline("But in vain.");
     }
-    u.uinwater = 1;
+    set_uinwater(1); /* u.uinwater = 1 */
     You("drown.");
     for (i = 0; i < 5; i++) { /* arbitrary number of loops */
         /* killer format and name are reconstructed every iteration
@@ -3890,7 +3905,7 @@ drown()
         pline("You're still drowning.");
     }
     if (u.uinwater) {
-        u.uinwater = 0;
+        set_uinwater(0); /* u.uinwater = 0 */
         You("find yourself back %s.",
             Is_waterlevel(&u.uz) ? "in an air bubble" : "on land");
     }
@@ -4020,7 +4035,8 @@ struct trap *ttmp;
     if (!Punished
         || drag_ball(x, y, &bc, &bx, &by, &cx, &cy, &unused, TRUE)) {
         u.ux0 = u.ux, u.uy0 = u.uy;
-        u.ux = x, u.uy = y;
+        /* set u.ux,u.uy and u.usteed->mx,my plus handle CLIPPING */
+        u_on_newpos(x, y);
         u.umoved = TRUE;
         newsym(u.ux0, u.uy0);
         vision_recalc(1);
@@ -4905,7 +4921,10 @@ boolean disarm;
         case 18:
         case 17:
             pline("A cloud of noxious gas billows from %s.", the(xname(obj)));
-            poisoned("gas cloud", A_STR, "cloud of poison gas", 15, FALSE);
+            if (rn2(3))
+                poisoned("gas cloud", A_STR, "cloud of poison gas", 15, FALSE);
+            else
+                create_gas_cloud(obj->ox, obj->oy, 1, 8);
             exercise(A_CON, FALSE);
             break;
         case 16:
@@ -5361,6 +5380,7 @@ lava_effects()
             pline("You're still burning.");
         }
         You("find yourself back on solid %s.", surface(u.ux, u.uy));
+        iflags.last_msg = PLNMSG_BACK_ON_GROUND;
         return TRUE;
     } else if (!Wwalking && (!u.utrap || u.utraptype != TT_LAVA)) {
         boil_away = !Fire_resistance;

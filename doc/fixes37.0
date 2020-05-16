@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $ $NHDT-Date: 1582364458 2020/02/22 09:40:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.221 $ $NHDT-Date: 1589580856 2020/05/15 22:14:16 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -26,6 +26,7 @@ monster wielding Stormbringer or healer's Staff against another monster would
 	heal the hero instead of the wielding monster when draining life
 change twoweapon feedback from "not a weapon" to "not a suitable weapon"
 don't allow twoweapon combat if either weapon is a bow, crossbow, or sling
+	[later: or arrows, bolts, and missiles (darts, shuriken, boomerangs)]
 drum of earthquake feedback reported various things (fountains, thrones, &c)
 	falling into a chasm but they remained intact because trap creation
 	had been changed to not clobber such things (so couldn't make pits)
@@ -58,8 +59,134 @@ give feedback if controlled level teleport attempt fails because hero is
 unseen pet that drowned didn't give "you have a sad feeling" message
 prevent ravens from blinding other ravens: /corvus oculum corvi non eruit/
 have ^X provide more information when held or swallowed
-avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
 display wasn't updating immediately after toggling hilite_pet option
+randomly choosing role could lead to crash via segfault
+if eel bite attack caused hero to move (killed + rehumanized + crawled out
+	of water), its grab attack could succeed even if no longer adjacent
+specifying a count when picking [part of] a stack of scrolls of scare monster
+	ignored that count and the whole stack was affected
+wizmakemap didn't account for unique monsters and didn't correct monster
+	birth counts
+generate objects (eg. statues) with genocided or extinct monster classes
+	in special levels, if requested
+if the orc-town version of mine town has been loaded, creation of orc zombies
+	or orc mummies would name them as part of the town raiding orc clan
+when punished, involuntarily teleporting and landing within chain range of
+	attached ball while encumbered worse than burdened could trigger
+	"remove_object: obj not on floor" panic on hero's next move
+inventory cursing caused by "this water's no good" effect when drinking from
+	a fountain didn't update persistent inventory window
+fix priest created inside temple wall
+fix vault guard occasionally encasing monsters in stone
+tone down scare monster by excluding humans and uniques
+lock the castle chest
+revamp amnesia to forget skills instead of objects or maps
+when Punished and carrying the iron ball and levitating, hurtling in the
+	opposite direction of a thrown object didn't bring along the chain
+recognize "kirin" as alias for "ki-rin" when asked to create a monster
+make unique swallowing monsters (Juiblex) resist magical digging from inside
+correctly account for fuel remaining when lit candles are attached
+	to candelabrum (the previous code would make the game unwinnable if
+	there were 15 or fewer turns remaining)
+praying on an unaligned altar outside of Gehennom behaved like an ordinary
+	prayer; make that always fail
+Discworld typo: Moving Pictures passage 12 "or" -> "of"
+unicorn corpses and wraith corpses could be sacrificed even if "too old"
+hero polymorphed into a hider and hiding was not unhidden when teleporting
+impose tighter restraints on 'summon nasties', both for spellcasting monsters
+	and post-Wizard harassment
+prevent swallowing monster ending up in a solid wall if it killed vault guard
+fix attached ball getting deallocated if swallowed, going down into a pit,
+	and saving
+level compiler creates correct novel with supplied name
+for farlook, describe water in the castle moat and in Juiblex's swamp as moat
+	and as swamp, respectively, rather than just as "water"
+make hezrous emit poison clouds when they move
+stepping from one type of terrain to another was triggering an unnecessary
+	status update
+make shriekers summon baby purple worms if purple worms would be too tough
+make non-tame (baby) purple worms eat corpses off the ground
+make baby purple worms attack shriekers
+make hero polymorphed into baby purple worm warned against shriekers
+confused scroll of light summons tame cancelled lights
+potions of hallucination can give enlightenment
+add a small chance of surviving food poisoning
+deliberate level teleporter activation ignores magic resistance
+auto-id scroll of remove curse when a known buc-state was changed
+demon lords hate Demonbane
+pets avoid eating shapeshifter corpses unless starving or nearly feral
+blessed scroll of teleportation gives a single controlled teleport
+allow opening a tin without interruption if slimed
+tell player when wielding a different weapon toggles off dual-wielding
+object taking erosion damage might give feedback message when out of view
+	or not give such when in view, depending on stale value of 'bhitpos'
+	[cited case assumed message came from drowned monster's dropped
+	inventory when out-of-view ice melted]
+it's possible to wish for tins of the Riders in wizard mode; eating one is
+	fatal but if you're life-saved or decline to die, the game crashed
+revival via undead turning of corpse carried by hero said "your <mon> corpse
+	comes alive" even when revived monster was undead
+prevent searching or waiting next to a hostile monster - override with 'm'
+allow random mimics to show up mimicing more furniture than just stairs
+scatter exploding bag of holding contents instead of outright deleting them
+male hero poly'd into nymph chooses charm vs seduce message based on being
+	male rather than on all nymphs being female but charm message was
+	using hardcoded pronouns She,her for target monster--wrong for male
+	target and noticable if "<mon> finishes taking off his suit" is given
+hostile monsters with launcher and ammo try to stay away from melee range
+allow displacing peaceful creatures
+unicorn horns don't restore attribute loss anymore
+when a shop is changed from food to health food, change room type to match
+wish parsing of things containing monster names would accept all supported
+	alternate spellings if they occurred at the end ("corpse of mumakil")
+	but only some when they occurred elsewhere ("gray-elf corpse" worked,
+	"mumakil corpse" yielded "does not exist") depending upon name length
+couldn't wish for werecreature corpse or tin because monster name lookup
+	always matched the beast form which is flagged no-corpse; switch to
+	human form for "were<creature>"
+wishing for werecreature figurine always made one that created the monster in
+	beast form if activated; allow "human were<creature>" to explicitly
+	specify werecreature's human form (for corpses and tins as well as
+	figurines); override the restriction against human figurines for that
+wishing for "royal jelly" yielded "lump of royal jelly" as a special case, but
+	other 'of' items such as "clove of garlic", "sprig of wolfsbane", or
+	"piece of cloth" didn't allow using their post-of words as shorthand
+monster or object detection found semi-dead vault guard at <0,0> while
+	traversing fmon list; monster detection gave misleading feedback
+	(blank map instead of 'strange feeling') if there were no other
+	monsters on level; likewise object detection and guard's minvent
+squadprob[] in mkroom.c was defined with 5 elements but initialized only 4
+	resulting in giant ants sometimes
+allow nurses heal attack when wielding a non-weapon/weaptool
+if riding or levitating, hero could apply bullwhip downward to pull up things
+	from underwater or lava; feedback implied the item was on the surface
+some monster code was checking whether pets or engulfers were eating green
+	slime by checking for green slime corpse instead of glob
+change light radius of stack of candles to square root
+could get redundate "mon hits other-mon" messages when mon wields an artifact
+failed untrap while mounted that moved hero onto the trap would leave steed
+	with stale coordinates, triggering warnings if 'sanity_check' is On
+when digging a pit results in it being filled by adjacent pool or lava, any
+	objects at the spot weren't subjected to water or fire damage;
+	also, riding hero's steed wasn't subjected to immersion either
+after "double trouble", cloned Wizard would wait until he had suffered some
+	damage or hero moved into direct view; keep STRAT_WAIT for original
+	Wizard but avoid that for clones
+beyond turn 100000, prayer timeout is longer (scaling with game length)
+falling while going down stairs and dropping items due to encumbrance or
+	punishment wasn't subject fragile ones to breakage
+objects scattered by an explosion which land on water or lava weren't affected
+	by the water or lava
+hold_another_object (for wishing, horn of plenty, theft while poly'd, other
+	non-pickup actions giving hero another inventory item) wasn't
+	reporting change in encumbrance; that would catch up on next turn but
+	could be off during additional move(s) for current turn
+hold_another_object added item to inventory first, then maybe removed and
+	dropped it, resulting in spurious add and remove perm_invent updates
+hold_another_object used hardcoded Stressed to limit carrying instead of
+	using the 'pickup_burden' option for that
+when hold_another_object fails while hero is swallowed, drop the item into
+	swallower's inventory instead of onto the floor
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -70,8 +197,6 @@ revised "mysterious force" when climbing out of gehennom could generate
 	warnings about "rn2(0) attempted" or "rn2(-n) attempted"
 after 'w' on split stack patch, wielding '-' would cause an object_lost panic
 same patch allowed partial stack from getobj to replace cursed wielded weapon
-if the orc-town version of mine town has been loaded, creation of orc zombies
-	or orc mummies would name them as part of the town raiding orc clan
 autounlock of door or chest took no time; chest case depended on whether
 	anything got looted along with the unlocking
 autounlock with artifact unlocking tool didn't do touch check on that tool
@@ -90,25 +215,65 @@ data.base lookup of an entry with any blank lines would falsely claim that
 using nhl_error() to report a Lua processing problem would clobber the stack
 level teleporation's "You materialize on a different level!" could be given
 	out of sequence with other arrival messages
-creating Mine Town variant 1 (Orcish Town) sometimes complained about being
-	unable to place lregion type 1 and failed to have any staircase up
+more sequencing: if wielding Sting or similar and level teleporting to a
+	level with different warning effect, the start-glowing or stop-glowing
+	message came before the materialize message on the destination level
 prevent "you materialize on a different level" after "a mysterious force
 	prevents you from descending" if you try to level teleport past the
 	stairs down from the quest home level before being granted access
+creating Mine Town variant 1 (Orcish Town) sometimes complained about being
+	unable to place lregion type 1 and failed to have any staircase up
 set g.context.botl for glove and wielding actions that could start or end
 	bare-handedness in support of condtests[bl_bareh]
 reinstate ranked ordering of the status condition fields
 grammar for messages about a monster removing items from a container was bad
 some new status conditions didn't always update when they should
+fix flipping non-existent stairs and ladders (github #311)
+fix door created into random wall or position opening into solid wall
+'use_inverse' option was accidentally made Windows-only; change it back to
+	being more general; change its default to True
+change inconsistent achievement spelling of "Mine Town" to "Minetown"
+fix crash in water_damage_chain
+teleport feedback "you materialize at another location" was given too soon
+'mention_decore' was repeatedly reporting "you are back on bottom" when
+	moving around underwater
+revised 'mention_decor' was describing furniture or ice right before look-here
+	described the same thing when stepping onto object(s)
+poison gas clouds located over known but unlit pools were visible as known
+	clouds but steam clouds in that situation were not
+after the wish parsing change, wishing for "<something of monster>" or for
+	"<monster something>" worked as intended but wishing for "<monster>"
+	(where <monster> used the canonical spelling) triggered a crash
+fix new "objects[0] class #1 not in order!" panic if plain 'char' is unsigned
+tty: redraw unexplored locations as S_unexplored rather than <space> after
+	map has been partially overwritten by popup menu or text display
+tty: previous change resulted in remnants of previous level being shown on
+	new level after level change when S_unexplored is <space>
+X11: was still initializing map to 'stone' instead of 'unexplored' after they
+	became separate glyphs
+X11: for text map without color, add support for black&white ice; draw it in
+	inverse video to distinguish from ordinary floor
+only generate shop items on solid floor squares
 
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
-msdos:  Add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
-	can display statue glyphs. 
+SYSCF: treat most sysconf directives that have invalid values as warnings
+	rather than errors; use a conservative default value and continue
+msdos: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
+	can display statue glyphs
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
-windows: update for new status condition fields
+Unix: when user name is used as default character name, keep hyphenated value
+	intact instead stripping off dash and whatever follows as if that
+	specified role/race/&c (worked once upon a time; broken since 3.3.0)
+Unix: add "ec2-user" to the list of user names 'sysconf' classifies as generic
+Windows: update for new status condition fields
+Windows: include commented-out 'PORTABLE_DEVICE_PATHS' in sysconf.template
+X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
+X11: extend fancy status one-turn inverse video status-change highlighting to
+	hunger, encumbrance, and conditions
+X11: stop including unused column 0 in the map
 
 
 General New Features
@@ -167,12 +332,25 @@ tipping your cap might get a response
 special levels can be flipped horizontally and/or vertically
 new special level initialization routine, "swamp"
 demon lords and princes suppress teleporting in Gehennom
+for !fixinv option where inventory letters normally don't stick, try to put
+	a throw-and-return weapon back into the same inventory slot it gets
+	thrown from; only works if it does return and is successfully caught
+wizard mode #wizborn command
+include more skill information in ^X output when dual-wielding
+item-using monsters will zap wand of undead turning at corpse-wielding hero
+	when the corpse is harmful
+boiling a pool or fountain now creates a temporary cloud of steam
+random themed rooms in the dungeons of doom
+extended achievement and conduct fields for xlogfile
+record amount of gold in hero's possession in xlogfile
+new objects:  amulets of flying and guarding
+new monsters:  displacer beast ('f') and genetic engineer ('Q')
+make camera flash which reveals previously unseen map features or objects or
+	monsters record those on the hero's map; monsters revert to 'unseen'
 
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------
-teach unix/Makefile.doc how to make Guidebook.dat, an unpaginated copy of
-	Guidebook.txt
 
 
 NetHack Community Patches (or Variation) Included
@@ -235,3 +413,10 @@ options overhaul: moved the option definitions into include/optlist.h;
 	for retrieving the option value, and for processing the option
 	following its selection in the 'O' menu, added doc/options.doc file.
 function reglyph_darkroom() relocated from options.c to display.c
+resurrect 'makedefs -m' to be able to derive default mons[].diffculty values
+	suitable for assigning to new or changed monsters
+convert obj->oextra->omid from pointer to scalar
+get rid of unused obj->oextra->olong
+relocated unmaintained code to outdated folder, specifically sys/amiga, 
+	sys/atari, sys/be, sys/mac, sys/os2, sys/wince, win/Qt3, win/gem,
+	win/gnome

@@ -24,6 +24,7 @@ static void FDECL(convert_line, (char *,char *));
 static void FDECL(deliver_by_pline, (const char *));
 static void FDECL(deliver_by_window, (const char *, int));
 static boolean FDECL(skip_pager, (BOOLEAN_P));
+static boolean FDECL(com_pager_core, (const char *, const char *, BOOLEAN_P));
 
 short
 quest_info(typ)
@@ -431,7 +432,7 @@ boolean common UNUSED;
     return FALSE;
 }
 
-boolean
+static boolean
 com_pager_core(section, msgid, showerror)
 const char *section;
 const char *msgid;

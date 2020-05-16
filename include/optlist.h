@@ -33,7 +33,7 @@ struct allopt_t {
     const char *alias;
     const char *descr;
     const char *prefixgw;
-    boolean initval, has_handler, unused;
+    boolean initval, has_handler, dupdetected;
 };
 
 #endif /* OPTLIST_H */
@@ -69,9 +69,9 @@ pfx_##a,
  al, z, #a, Off, h, 0 },
 #endif
 
-/* B:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, boolptr */
-/* C:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, descr  */
-/* P:pfx, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, descr */
+/* B:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, bool_p */
+/* C:nm, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc */
+/* P:pfx, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc*/
 
     NHOPTB(acoustics, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                &flags.acoustics)
@@ -88,7 +88,7 @@ pfx_##a,
                &sysflags.altmeta)
 #else
 #ifdef ALTMETA
-    NHOPTB(altmeta, 0, opt_out, set_in_config, Off, No, No, No, NoAlias,
+    NHOPTB(altmeta, 0, opt_out, set_in_game, Off, No, No, No, NoAlias,
                &iflags.altmeta)
 #else
     NHOPTB(altmeta, 0, opt_out, set_in_config, Off, No, No, No, NoAlias,
@@ -248,11 +248,9 @@ pfx_##a,
                 &flags.lit_corridor)
     NHOPTB(lootabc, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.lootabc)
-#ifdef BACKWARD_COMPAT
-#ifdef MAC_GRAPHICS_ENV
+#if defined(BACKWARD_COMPAT) && defined(MAC_GRAPHICS_ENV)
     NHOPTC(Macgraphics, 70, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "load MACGraphics display symbols")
-#endif
 #endif
     NHOPTB(mail, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.biff)
@@ -281,7 +279,7 @@ pfx_##a,
     NHOPTB(menu_objsyms, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.menu_head_objsym)
 #ifdef TTY_GRAPHICS
-    NHOPTB(menu_overlay, 0, opt_in, set_in_game, On, No, No, No, NoAlias,
+    NHOPTB(menu_overlay, 0, opt_in, set_in_game, On, Yes, No, No, NoAlias,
                 &iflags.menu_overlay)
 #else
     NHOPTB(menu_overlay, 0, opt_in, set_in_config, Off, No, No, No, NoAlias,
@@ -339,10 +337,10 @@ pfx_##a,
                 "the inventory order of the items in your pack")
 #ifdef CHANGE_COLOR
 #ifndef WIN32
-    NHOPTC(palette, 15, opt_in, set_in_game, No, Yes, No, "hicolor",
+    NHOPTC(palette, 15, opt_in, set_in_game, No, Yes, No, No, "hicolor",
                 "palette (00c/880/-fff is blue/yellow/reverse white)")
 #else
-    NHOPTC(palette, 15, opt_in, set_in_config, No, Yes, No, "hicolor",
+    NHOPTC(palette, 15, opt_in, set_in_config, No, Yes, No, No, "hicolor",
                 "palette (adjust an RGB color in palette (color-R-G-B)")
 #endif
 #endif
@@ -352,7 +350,7 @@ pfx_##a,
                 &iflags.perm_invent)
     NHOPTC(petattr, 88, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                 "attributes for highlighting pets")
-    NHOPTC(pettype, 4, opt_in, set_gameview, Yes, Yes, No, No, NoAlias,
+    NHOPTC(pettype, 4, opt_in, set_gameview, Yes, Yes, No, No, "pet",
                 "your preferred initial pet type")
     NHOPTC(pickup_burden, 20, opt_in, set_in_game, No, Yes, No, Yes, NoAlias,
                 "maximum burden picked up before prompt")
@@ -408,10 +406,10 @@ pfx_##a,
     NHOPTB(showrace, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.showrace)
 #ifdef SCORE_ON_BOTL
-    NHOPTB(showscore, 0, opt_in, set_in_game, Off, No, No, No, NoAlias,
+    NHOPTB(showscore, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.showscore) 
 #else
-    NHOPTB(showscore, 0, opt_in, set_in_config, Off, No, No, No, NoAlias,
+    NHOPTB(showscore, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 (boolean *) 0) 
 #endif
     NHOPTB(silent, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
@@ -490,13 +488,8 @@ pfx_##a,
 #endif
     NHOPTB(use_darkgray, 0, opt_out, set_in_config, On, Yes, No, No, NoAlias,
                 &iflags.wc2_darkgray)
-#ifdef WIN32
     NHOPTB(use_inverse, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &iflags.wc_inverse)
-#else
-    NHOPTB(use_inverse, 0, opt_in, set_in_game, On, No, No, No, NoAlias,
-                (boolean *) 0)
-#endif
     NHOPTC(vary_msgcount, 20, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "show more old messages at a time")
     NHOPTB(verbose, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
@@ -506,7 +499,7 @@ pfx_##a,
                 "method of video updating")
 #endif
 #ifdef VIDEOSHADES
-    NHOPTC(videocolors, 40, opt_in, set_gameview, No, Yes, No, "videocolours",
+    NHOPTC(videocolors, 40, opt_in, set_gameview, No, Yes, No, No, "videocolours",
                 "color mappings for internal screen routines")
     NHOPTC(videoshades, 32, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "gray shades to map to black/gray/white")
@@ -516,6 +509,13 @@ pfx_##a,
                 "video width")
     NHOPTC(video_height, 10, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "video height")
+#endif
+#ifdef TTY_TILES_ESCCODES
+    NHOPTB(vt_tiledata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
+                &iflags.vt_tiledata)
+#else
+    NHOPTB(vt_tiledata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
+                (boolean *) 0)
 #endif
     NHOPTC(warnings, 10, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "display characters for warnings")
@@ -551,7 +551,7 @@ pfx_##a,
                 "prefix for font options")
 #if defined(MICRO) && !defined(AMIGA)
     /* included for compatibility with old NetHack.cnf files */
-    NHOPTP(IBM_, 0, opt_in, set_hidden, No, No, Yes, NoAlias,
+    NHOPTP(IBM_, 0, opt_in, set_hidden, No, No, Yes, No, NoAlias,
                 "prefix for old micro IBM_ options")
 #endif /* MICRO */
 

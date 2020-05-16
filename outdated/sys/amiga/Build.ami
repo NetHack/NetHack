@@ -136,11 +136,5 @@ II.B.3.	Compiling NetHack with the commercial version of DICE
     however, this is not recommended, and you should upgrade to the
     commercial version.)
 
-    DICE 3.0 (the first commercial release) has a couple of bugs in it which
-    turn up in several of the NetHack sources; the DCC30_BUG define fixes
-    them.  If you have a more recent version of the compiler, you may be
-    able to compile without this (and get slightly more efficient code) by
-    commenting out the define in amiconf.h.
-
     During compilation, DICE will output a lot of warnings; they can be
     safely ignored.
