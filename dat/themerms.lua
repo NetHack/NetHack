@@ -80,8 +80,8 @@ themerooms = {
    function()
       des.room({ type = "themed",
                  contents = function(rm)
-                    for x = 0, rm.width do
-                       for y = 0, rm.height do
+                    for x = 0, rm.width - 1 do
+                       for y = 0, rm.height - 1 do
                           if (percent(30)) then
                              if (percent(50)) then
                                 des.object("boulder");
@@ -99,8 +99,8 @@ themerooms = {
    function()
       des.room({ type = "themed",
                  contents = function(rm)
-                    for x = 0, rm.width do
-                       for y = 0, rm.height do
+                    for x = 0, rm.width - 1 do
+                       for y = 0, rm.height - 1 do
                           if (percent(30)) then
                              des.trap("web", x, y);
                           end
@@ -118,8 +118,8 @@ themerooms = {
                                     "land mine", "sleep gas", "rust",
                                     "anti magic" };
                     shuffle(traps);
-                    for x = 0, rm.width do
-                       for y = 0, rm.height do
+                    for x = 0, rm.width - 1 do
+                       for y = 0, rm.height - 1 do
                           if (percent(30)) then
                              des.trap(traps[1], x, y);
                           end
@@ -169,8 +169,8 @@ themerooms = {
                  contents = function(rm)
                     local terr = { "-", "-", "-", "-", "L", "P", "T" };
                     shuffle(terr);
-                    for x = 0, (rm.width - 3) / 4 do
-                       for y = 0, (rm.height - 3) / 4 do
+                    for x = 0, (rm.width / 4) - 1 do
+                       for y = 0, (rm.height / 4) - 1 do
                           des.terrain({ x = x * 4 + 2, y = y * 4 + 2, typ = terr[1], lit = -2 });
                           des.terrain({ x = x * 4 + 3, y = y * 4 + 2, typ = terr[1], lit = -2 });
                           des.terrain({ x = x * 4 + 2, y = y * 4 + 3, typ = terr[1], lit = -2 });
@@ -219,7 +219,7 @@ themerooms = {
    function()
       des.room({ type = "themed", w = 5 + nh.rn2(3)*2, h = 5 + nh.rn2(3)*2,
                  contents = function(rm)
-                    des.room({ type = "themed", x = (rm.width / 2), y = (rm.height / 2), w = 1, h = 1, joined = 0,
+                    des.room({ type = "themed", x = (rm.width - 1)/ 2, y = (rm.height - 1) / 2, w = 1, h = 1, joined = 0,
                                contents = function()
                                   if (percent(50)) then
                                      local mons = { "M", "V", "L", "Z" };
@@ -245,7 +245,7 @@ themerooms = {
                  contents = function(rm)
                     local feature = { "C", "L", "I", "P", "T" };
                     shuffle(feature);
-                    des.terrain(rm.width / 2, rm.height / 2, feature[1]);
+                    des.terrain((rm.width - 1) / 2, (rm.height - 1) / 2, feature[1]);
                  end
       });
    end,
