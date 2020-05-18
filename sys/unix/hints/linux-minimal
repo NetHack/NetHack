@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  linux $NHDT-Date: 1432512814 2018/11/23 16:00:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $
+# NetHack 3.6  linux $NHDT-Date: 1589828479 2020/05/18 19:01:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $
 # Copyright (c) Patric Mueller
 # NetHack may be freely redistributed.  See license for details. 
 #
@@ -14,6 +14,11 @@ INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 
 CFLAGS=-g -I../include
+
+# when building liblua.a, avoid warning that use of tmpnam() should be
+# replaced by mkstemp(); the lua code doesn't use nethack's config.h so
+# this needs to be passed via make rather than defined in unixconf.h
+SYSCFLAGS=-DLUA_USE_POSIX
 
 LINK=$(CC)
 

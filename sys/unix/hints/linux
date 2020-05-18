@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  linux $NHDT-Date: 1432512814 2015/05/25 00:13:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $
+# NetHack 3.6  linux $NHDT-Date: 1589828478 2020/05/18 19:01:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
 #
@@ -34,6 +34,11 @@ CFLAGS+=-DCURSES_GRAPHICS
 #CFLAGS+=-DSCORE_ON_BOTL
 #CFLAGS+=-DMSGHANDLER
 #CFLAGS+=-DTTY_TILES_ESCCODES
+
+# when building liblua.a, avoid warning that use of tmpnam() should be
+# replaced by mkstemp(); the lua code doesn't use nethack's config.h so
+# this needs to be passed via make rather than defined in unixconf.h
+SYSCFLAGS=-DLUA_USE_POSIX
 
 LINK=$(CC)
 # Only needed for GLIBC stack trace:
