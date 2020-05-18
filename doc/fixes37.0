@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ $NHDT-Date: 1589698870 2020/05/17 07:01:10 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ $NHDT-Date: 1589827569 2020/05/18 18:46:09 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -245,6 +245,9 @@ after the wish parsing change, wishing for "<something of monster>" or for
 	"<monster something>" worked as intended but wishing for "<monster>"
 	(where <monster> used the canonical spelling) triggered a crash
 fix new "objects[0] class #1 not in order!" panic if plain 'char' is unsigned
+only generate shop items on solid floor squares
+avoid gcc 10 warning by removing duplicate definition of 'head_engr'
+
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
@@ -253,7 +256,6 @@ X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
 	inverse video to distinguish from ordinary floor
-only generate shop items on solid floor squares
 
 
 Platform- and/or Interface-Specific Fixes
