@@ -10,7 +10,7 @@
  */
 
 #define IN_SP_LEV_C
- 
+
 #include "hack.h"
 #include "sp_lev.h"
 
@@ -40,7 +40,7 @@ static void NDECL(remove_boundary_syms);
 static void FDECL(set_door_orientation, (int, int));
 static void FDECL(maybe_add_door, (int, int, struct mkroom *));
 static void NDECL(link_doors_rooms);
-static void NDECL(fill_rooms);
+static void NDECL(fill_special_rooms);
 static int NDECL(rnddoor);
 static int NDECL(rndtrap);
 static void FDECL(get_location, (schar *, schar *, int, struct mkroom *));
@@ -1036,16 +1036,16 @@ link_doors_rooms()
 }
 
 static void
-fill_rooms()
+fill_special_rooms()
 {
     int tmpi, m;
 
     for (tmpi = 0; tmpi < g.nroom; tmpi++) {
         if (g.rooms[tmpi].needfill)
-            fill_room(&g.rooms[tmpi], (g.rooms[tmpi].needfill == 2));
+            fill_special_room(&g.rooms[tmpi], (g.rooms[tmpi].needfill == 2));
         for (m = 0; m < g.rooms[tmpi].nsubrooms; m++)
             if (g.rooms[tmpi].sbrooms[m]->needfill)
-                fill_room(g.rooms[tmpi].sbrooms[m], FALSE);
+                fill_special_room(g.rooms[tmpi].sbrooms[m], FALSE);
     }
 }
 
@@ -2682,7 +2682,7 @@ corridor *c;
  * Fill a room (shop, zoo, etc...) with appropriate stuff.
  */
 void
-fill_room(croom, prefilled)
+fill_special_room(croom, prefilled)
 struct mkroom *croom;
 boolean prefilled;
 {
@@ -6409,7 +6409,7 @@ const char *name;
         goto give_up;
 
     link_doors_rooms();
-    fill_rooms();
+    fill_special_rooms();
     remove_boundary_syms();
 
     /* TODO: ensure_way_out() needs rewrite */
