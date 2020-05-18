@@ -19,6 +19,7 @@ static void FDECL(mkaltar, (struct mkroom *));
 static void FDECL(mkgrave, (struct mkroom *));
 static void NDECL(makevtele);
 void NDECL(clear_level_structures);
+static void FDECL(fill_ordinary_room, (struct mkroom *));
 static void NDECL(makelevel);
 static boolean FDECL(bydoor, (XCHAR_P, XCHAR_P));
 static struct mkroom *FDECL(find_branch_room, (coord *));
@@ -734,13 +735,114 @@ clear_level_structures()
     }
 }
 
+/* Fill a "random" room (i.e. a typical non-special room in the Dungeons of
+ * Doom) with random monsters, objects, and dungeon features.
+ */
+static void
+fill_ordinary_room(croom)
+struct mkroom *croom;
+{
+    int trycnt = 0;
+    coord pos;
+    struct monst *tmonst; /* always put a web with a spider */
+    int x, y;
+
+    if (croom->rtype != OROOM && croom->rtype != THEMEROOM)
+        return;
+
+    /* If there are subrooms, fill them now - we don't want an outer room
+     * that's specified to be unfilled to block an inner subroom that's
+     * specified to be filled. */
+    for (x = 0; x < croom->nsubrooms; ++x) {
+        fill_ordinary_room(croom->sbrooms[x]);
+    }
+
+    if (!croom->needfill)
+        return;
+
+    /* put a sleeping monster inside */
+    /* Note: monster may be on the stairs. This cannot be
+       avoided: maybe the player fell through a trap door
+       while a monster was on the stairs. Conclusion:
+       we have to check for monsters on the stairs anyway. */
+
+    if ((u.uhave.amulet || !rn2(3)) && somexyspace(croom, &pos)) {
+        tmonst = makemon((struct permonst *) 0, pos.x, pos.y, MM_NOGRP);
+        if (tmonst && tmonst->data == &mons[PM_GIANT_SPIDER]
+            && !occupied(pos.x, pos.y))
+            (void) maketrap(pos.x, pos.y, WEB);
+    }
+    /* put traps and mimics inside */
+    x = 8 - (level_difficulty() / 6);
+    if (x <= 1)
+        x = 2;
+    while (!rn2(x) && (++trycnt < 1000))
+        mktrap(0, 0, croom, (coord *) 0);
+    if (!rn2(3) && somexyspace(croom, &pos))
+        (void) mkgold(0L, pos.x, pos.y);
+    if (Is_rogue_level(&u.uz))
+        goto skip_nonrogue;
+    if (!rn2(10))
+        mkfount(0, croom);
+    if (!rn2(60))
+        mksink(croom);
+    if (!rn2(60))
+        mkaltar(croom);
+    x = 80 - (depth(&u.uz) * 2);
+    if (x < 2)
+        x = 2;
+    if (!rn2(x))
+        mkgrave(croom);
+
+    /* put statues inside */
+    if (!rn2(20) && somexyspace(croom, &pos))
+        (void) mkcorpstat(STATUE, (struct monst *) 0,
+                            (struct permonst *) 0, pos.x,
+                            pos.y, CORPSTAT_INIT);
+    /* put box/chest inside;
+     *  40% chance for at least 1 box, regardless of number
+     *  of rooms; about 5 - 7.5% for 2 boxes, least likely
+     *  when few rooms; chance for 3 or more is negligible.
+     */
+    if (!rn2(g.nroom * 5 / 2) && somexyspace(croom, &pos))
+        (void) mksobj_at((rn2(3)) ? LARGE_BOX : CHEST,
+                            pos.x, pos.y, TRUE, FALSE);
+
+    /* maybe make some graffiti */
+    if (!rn2(27 + 3 * abs(depth(&u.uz)))) {
+        char buf[BUFSZ];
+        const char *mesg = random_engraving(buf);
+
+        if (mesg) {
+            do {
+                somexyspace(croom, &pos);
+                x = pos.x;
+                y = pos.y;
+            } while (levl[x][y].typ != ROOM && !rn2(40));
+            if (!(IS_POOL(levl[x][y].typ)
+                    || IS_FURNITURE(levl[x][y].typ)))
+                make_engr_at(x, y, mesg, 0L, MARK);
+        }
+    }
+
+ skip_nonrogue:
+    if (!rn2(3) && somexyspace(croom, &pos)) {
+        (void) mkobj_at(0, pos.x, pos.y, TRUE);
+        trycnt = 0;
+        while (!rn2(5)) {
+            if (++trycnt > 100) {
+                impossible("trycnt overflow4");
+                break;
+            }
+            (void) mkobj_at(0, pos.x, pos.y, TRUE);
+        }
+    }
+}
+
 static void
 makelevel()
 {
     register struct mkroom *croom;
-    register int tryct;
-    register int x, y;
-    struct monst *tmonst; /* always put a web with a spider */
     branch *branchp;
     int room_threshold;
 
@@ -814,7 +916,7 @@ makelevel()
                      TRUE, VAULT, FALSE);
             g.level.flags.has_vault = 1;
             ++room_threshold;
-            fill_room(&g.rooms[g.nroom - 1], FALSE);
+            fill_special_room(&g.rooms[g.nroom - 1], FALSE);
             mk_knox_portal(g.vault_x + w, g.vault_y + h);
             if (!g.level.flags.noteleport && !rn2(3))
                 makevtele();
@@ -868,90 +970,7 @@ makelevel()
 
     /* for each room: put things inside */
     for (croom = g.rooms; croom->hx > 0; croom++) {
-        int trycnt = 0;
-        coord pos;
-        if (croom->rtype != OROOM && croom->rtype != THEMEROOM)
-            continue;
-        if (!croom->needfill)
-            continue;
-
-        /* put a sleeping monster inside */
-        /* Note: monster may be on the stairs. This cannot be
-           avoided: maybe the player fell through a trap door
-           while a monster was on the stairs. Conclusion:
-           we have to check for monsters on the stairs anyway. */
-
-        if ((u.uhave.amulet || !rn2(3)) && somexyspace(croom, &pos)) {
-            tmonst = makemon((struct permonst *) 0, pos.x, pos.y, MM_NOGRP);
-            if (tmonst && tmonst->data == &mons[PM_GIANT_SPIDER]
-                && !occupied(pos.x, pos.y))
-                (void) maketrap(pos.x, pos.y, WEB);
-        }
-        /* put traps and mimics inside */
-        x = 8 - (level_difficulty() / 6);
-        if (x <= 1)
-            x = 2;
-        while (!rn2(x) && (++trycnt < 1000))
-            mktrap(0, 0, croom, (coord *) 0);
-        if (!rn2(3) && somexyspace(croom, &pos))
-            (void) mkgold(0L, pos.x, pos.y);
-        if (Is_rogue_level(&u.uz))
-            goto skip_nonrogue;
-        if (!rn2(10))
-            mkfount(0, croom);
-        if (!rn2(60))
-            mksink(croom);
-        if (!rn2(60))
-            mkaltar(croom);
-        x = 80 - (depth(&u.uz) * 2);
-        if (x < 2)
-            x = 2;
-        if (!rn2(x))
-            mkgrave(croom);
-
-        /* put statues inside */
-        if (!rn2(20) && somexyspace(croom, &pos))
-            (void) mkcorpstat(STATUE, (struct monst *) 0,
-                              (struct permonst *) 0, pos.x,
-                              pos.y, CORPSTAT_INIT);
-        /* put box/chest inside;
-         *  40% chance for at least 1 box, regardless of number
-         *  of rooms; about 5 - 7.5% for 2 boxes, least likely
-         *  when few rooms; chance for 3 or more is negligible.
-         */
-        if (!rn2(g.nroom * 5 / 2) && somexyspace(croom, &pos))
-            (void) mksobj_at((rn2(3)) ? LARGE_BOX : CHEST,
-                             pos.x, pos.y, TRUE, FALSE);
-
-        /* maybe make some graffiti */
-        if (!rn2(27 + 3 * abs(depth(&u.uz)))) {
-            char buf[BUFSZ];
-            const char *mesg = random_engraving(buf);
-
-            if (mesg) {
-                do {
-                    somexyspace(croom, &pos);
-                    x = pos.x;
-                    y = pos.y;
-                } while (levl[x][y].typ != ROOM && !rn2(40));
-                if (!(IS_POOL(levl[x][y].typ)
-                      || IS_FURNITURE(levl[x][y].typ)))
-                    make_engr_at(x, y, mesg, 0L, MARK);
-            }
-        }
-
- skip_nonrogue:
-        if (!rn2(3) && somexyspace(croom, &pos)) {
-            (void) mkobj_at(0, pos.x, pos.y, TRUE);
-            tryct = 0;
-            while (!rn2(5)) {
-                if (++tryct > 100) {
-                    impossible("tryct overflow4");
-                    break;
-                }
-                (void) mkobj_at(0, pos.x, pos.y, TRUE);
-            }
-        }
+        fill_ordinary_room(croom);
     }
 }
 
