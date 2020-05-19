@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ $NHDT-Date: 1589323704 2020/05/12 22:48:24 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ $NHDT-Date: 1589827569 2020/05/18 18:46:09 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -166,8 +166,6 @@ change light radius of stack of candles to square root
 could get redundate "mon hits other-mon" messages when mon wields an artifact
 failed untrap while mounted that moved hero onto the trap would leave steed
 	with stale coordinates, triggering warnings if 'sanity_check' is On
-when hold_another_object() fails while hero is swallowed, drop the item into
-	swallower's inventory instead of onto the floor
 when digging a pit results in it being filled by adjacent pool or lava, any
 	objects at the spot weren't subjected to water or fire damage;
 	also, riding hero's steed wasn't subjected to immersion either
@@ -179,6 +177,16 @@ falling while going down stairs and dropping items due to encumbrance or
 	punishment wasn't subject fragile ones to breakage
 objects scattered by an explosion which land on water or lava weren't affected
 	by the water or lava
+hold_another_object (for wishing, horn of plenty, theft while poly'd, other
+	non-pickup actions giving hero another inventory item) wasn't
+	reporting change in encumbrance; that would catch up on next turn but
+	could be off during additional move(s) for current turn
+hold_another_object added item to inventory first, then maybe removed and
+	dropped it, resulting in spurious add and remove perm_invent updates
+hold_another_object used hardcoded Stressed to limit carrying instead of
+	using the 'pickup_burden' option for that
+when hold_another_object fails while hero is swallowed, drop the item into
+	swallower's inventory instead of onto the floor
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -237,6 +245,9 @@ after the wish parsing change, wishing for "<something of monster>" or for
 	"<monster something>" worked as intended but wishing for "<monster>"
 	(where <monster> used the canonical spelling) triggered a crash
 fix new "objects[0] class #1 not in order!" panic if plain 'char' is unsigned
+only generate shop items on solid floor squares
+avoid gcc 10 warning by removing duplicate definition of 'head_engr'
+
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
@@ -245,19 +256,26 @@ X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
 	inverse video to distinguish from ordinary floor
-only generate shop items on solid floor squares
 
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
-msdos:  Add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
-	can display statue glyphs. 
+SYSCF: treat most sysconf directives that have invalid values as warnings
+	rather than errors; use a conservative default value and continue
+curses: for vertical status, line up conditions in columns; usually two but
+	condense to three per line if the status window isn't tall enough
+	[at present, highlighting with inverse video includes trailing spaces
+	used to align entries in their columns--that's a feature...]
+msdos: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
+	can display statue glyphs
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
 Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)
-windows: update for new status condition fields
+Unix: add "ec2-user" to the list of user names 'sysconf' classifies as generic
+Windows: update for new status condition fields
+Windows: include commented-out 'PORTABLE_DEVICE_PATHS' in sysconf.template
 X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 X11: extend fancy status one-turn inverse video status-change highlighting to
 	hunger, encumbrance, and conditions

@@ -73,6 +73,17 @@ WIZARDS=*
 # Maximum number of score file entries to use for random statue names
 #MAX_STATUENAME_RANK=10
 
+# 'portable_device_paths' is only supported for Windows.  Starting with
+# 3.6.3, nethack on Windows treats the folder containing nethack.exe and
+# nethackW.exe as read-only and puts data files which are generated or
+# modified during play or by the user in assorted folders derived from
+# user name.  3.6.4 added PORTABLE_DEVICE_PATHS to allow reverting to
+# the old behavior of having the run-time configuration file and other
+# data in the same directory as the executable so that the whole thing
+# can be moved from one machine to another (flash drive or perhaps cloud)
+# without updating folder paths.  Uncomment it and set to 1 to activate.
+#PORTABLE_DEVICE_PATHS=0
+
 # *** LOCATIONS ***
 # IMPORTANT: If you change any of these locations, the directories they
 # point at must exist.  NetHack will not create them for you.

@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1588189423 2020/04/29 19:43:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.297 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1589491665 2020/05/14 21:27:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,7 +19,8 @@ static int FDECL(invletter_value, (CHAR_P));
 static int FDECL(CFDECLSPEC sortloot_cmp, (const genericptr,
                                                const genericptr));
 static void NDECL(reorder_invent);
-static struct obj *FDECL(addinv_core0, (struct obj *, struct obj *));
+static struct obj *FDECL(addinv_core0, (struct obj *, struct obj *,
+                                        BOOLEAN_P));
 static void FDECL(noarmor, (BOOLEAN_P));
 static void FDECL(invdisp_nothing, (const char *, const char *));
 static boolean FDECL(worn_wield_only, (struct obj *));
@@ -875,8 +876,9 @@ struct obj *obj;
  * Adjust hero attributes as necessary.
  */
 static struct obj *
-addinv_core0(obj, other_obj)
+addinv_core0(obj, other_obj, update_perm_invent)
 struct obj *obj, *other_obj;
+boolean update_perm_invent;
 {
     struct obj *otmp, *prev;
     int saved_otyp = (int) obj->otyp; /* for panic */
@@ -950,7 +952,8 @@ struct obj *obj, *other_obj;
  added:
     addinv_core2(obj);
     carry_obj_effects(obj); /* carrying affects the obj */
-    update_inventory();
+    if (update_perm_invent)
+        update_inventory();
     return obj;
 }
 
@@ -959,7 +962,7 @@ struct obj *
 addinv(obj)
 struct obj *obj;
 {
-    return addinv_core0(obj, (struct obj *) 0);
+    return addinv_core0(obj, (struct obj *) 0, TRUE);
 }
 
 /* add obj to the hero's inventory by inserting in front of a specific item */
@@ -967,7 +970,7 @@ struct obj *
 addinv_before(obj, other_obj)
 struct obj *obj, *other_obj;
 {
-    return addinv_core0(obj, other_obj);
+    return addinv_core0(obj, other_obj, TRUE);
 }
 
 /*
@@ -1034,22 +1037,26 @@ const char *drop_fmt, *drop_arg, *hold_msg;
     }
     if (Fumbling) {
         obj->nomerge = 1;
-        obj = addinv(obj); /* dropping expects obj to be in invent */
+        /* dropping expects obj to be in invent */
+        obj = addinv_core0(obj, (struct obj *) 0, FALSE);
         goto drop_it;
     } else {
         long oquan = obj->quan;
         int prev_encumbr = near_capacity(); /* before addinv() */
 
-        /* encumbrance only matters if it would now become worse
-           than max( current_value, stressed ) */
-        if (prev_encumbr < MOD_ENCUMBER)
-            prev_encumbr = MOD_ENCUMBER;
+        /* encumbrance limit is max( current_state, pickup_burden );
+           this used to use hardcoded MOD_ENCUMBER (stressed) instead
+           of the 'pickup_burden' option (which defaults to stressed) */
+        if (prev_encumbr < flags.pickup_burden)
+            prev_encumbr = flags.pickup_burden;
         /* addinv() may redraw the entire inventory, overwriting
-           drop_arg when it comes from something like doname() */
+           drop_arg when it is kept in an 'obuf' from doname();
+           [should no longer be necessary now that perm_invent update is
+           suppressed, but it's cheap to keep as a paranoid precaution] */
         if (drop_arg)
             drop_arg = strcpy(buf, drop_arg);
 
-        obj = addinv(obj);
+        obj = addinv_core0(obj, (struct obj *) 0, FALSE);
         if (inv_cnt(FALSE) > 52 || ((obj->otyp != LOADSTONE || !obj->cursed)
                                     && near_capacity() > prev_encumbr)) {
             /* undo any merge which took place */
@@ -1063,6 +1070,9 @@ const char *drop_fmt, *drop_arg, *hold_msg;
                 setuqwep(obj);
             if (hold_msg || drop_fmt)
                 prinv(hold_msg, obj, oquan);
+            /* obj made it into inventory and is staying there */
+            update_inventory();
+            encumber_msg();
         }
     }
     return obj;

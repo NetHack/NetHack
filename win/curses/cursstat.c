@@ -34,7 +34,7 @@ static void NDECL(draw_status);
 static void FDECL(draw_vertical, (BOOLEAN_P));
 static void FDECL(draw_horizontal, (BOOLEAN_P));
 static void curs_HPbar(char *, int);
-static void curs_stat_conds(int, int *, int *, char *, boolean *);
+static void curs_stat_conds(int, int, int *, int *, char *, boolean *);
 static void curs_vert_status_vals(int);
 #ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
@@ -335,7 +335,7 @@ boolean border;
     /* collect active conditions in cbuf[], space separated, suitable
        for direct output if no highlighting is requested ('asis') but
        primarily used to measure the length */
-    curs_stat_conds(0, &x, &y, cbuf, &asis);
+    curs_stat_conds(0, 0, &x, &y, cbuf, &asis);
     clen = (int) strlen(cbuf);
 
     cap_and_hunger = 0;
@@ -638,7 +638,8 @@ boolean border;
                     if (asis)
                         waddstr(win, cbuf);
                     else /* cond by cond if any cond specifies highlighting */
-                        curs_stat_conds(0, &x, &y, (char *) 0, (boolean *) 0);
+                        curs_stat_conds(0, 0, &x, &y,
+                                        (char *) 0, (boolean *) 0);
                 } /* curses_condition_bits */
             } /* hitpointbar vs regular field vs conditions */
         } /* i (fld) */
@@ -680,7 +681,7 @@ boolean border;
          BL_CONDITION, BL_CAP, BL_HUNGER
     };
     xchar spacing[MAXBLSTATS];
-    int i, fld, cap_and_hunger, time_and_score, cond_count;
+    int i, fld, cap_and_hunger, time_and_score, cond_count, per_line;
     char *text;
 #ifdef STATUS_HILITES
     char *p = 0, savedch = '\0';
@@ -703,10 +704,6 @@ boolean border;
      *  truncate the two portions separately.  (<name> is already being
      *  truncated to 10 chars by the botl.c code, so we don't really
      *  need to do anything further unless we want to override that.)
-     *  Format hunger, encumbrance, and conditions in columns:  12+1+12
-     *  for first two and for 2 conditions, 8+1+8+1+8 for 3+ conditions.
-     *  (Would probably only look good enough to matter when 6 or more
-     *  conditions are present, so not worth bothering with.)
      */
 
     cap_and_hunger = 0;
@@ -725,6 +722,7 @@ boolean border;
             if (curses_condition_bits & (1 << i))
                 ++cond_count;
     }
+    per_line = 2; /* will be changed to 3 if status becomes too tall */
 
     /* count how many lines we'll need; we normally space several groups of
        fields with blank lines but might need to compress some of those out */
@@ -765,8 +763,9 @@ boolean border;
                otherwise just start on next line; if more than 3 conditions
                are present, this will consume multiple lines from height */
             spacing[fld] = cond_count ? (!cap_and_hunger ? 2 : 1) : 0;
-            if (cond_count > 3) /* first 3 handled via '+= spacing[]' below */
-                height_needed += (cond_count - 1) / 3; /* three per line */
+            /* first line handled via '+= spacing[]' below */
+            if (cond_count > per_line)
+                height_needed += (cond_count - 1) / per_line;
             break;
         case BL_XP:
         case BL_HD:
@@ -778,12 +777,20 @@ boolean border;
         height_needed += spacing[fld];
     }
     if (height_needed > height) {
-        for (i = 0; i < SIZE(shrinkorder); ++i) {
-            fld = shrinkorder[i];
-            if (spacing[fld] == 2) {
-                spacing[fld] = 1; /* suppress planned blank line */
-                if (--height_needed <= height)
-                    break;
+        /* if there are a lot of status conditions, compress them first */
+        if (per_line == 2 && cond_count > per_line) {
+             height_needed -= (cond_count - 1) / per_line;
+             per_line = 3;
+             height_needed += (cond_count - 1) / per_line;
+        }
+        if (height_needed > height) {
+            for (i = 0; i < SIZE(shrinkorder); ++i) {
+                fld = shrinkorder[i];
+                if (spacing[fld] == 2) {
+                    spacing[fld] = 1; /* suppress planned blank line */
+                    if (--height_needed <= height)
+                        break;
+                }
             }
         }
 #ifdef SCORE_ON_BOTL
@@ -894,9 +901,11 @@ boolean border;
         } else {
             /* status conditions */
             if (cond_count) {
-                /* output active conditions, three per line;
+                /* output active conditions; usually two per line, but
+                   window isn't tall enough, it's increased to three per line;
                    cursor is already positioned where they should start */
-                curs_stat_conds(1, &x, &y, (char *) 0, (boolean *) 0);
+                curs_stat_conds(1, per_line, &x, &y,
+                                (char *) 0, (boolean *) 0);
             }
         } /* hitpointbar vs regular field vs conditions */
     } /* fld loop */
@@ -978,11 +987,13 @@ extern const struct conditions_t conditions[]; /* botl.c */
 extern int cond_idx[CONDITION_COUNT];
 
 static void
-curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
-                int *x, int *y,  /* real for vertical, ignored otherwise */
-                char *condbuf, /* optional output; collect string of conds */
-                boolean *nohilite) /* optional output; indicates whether -*/
-{                                  /*+ condbuf[] could be used as-is      */
+curs_stat_conds(
+    int vert_cond,     /* 0 => horizontal, 1 => vertical */
+    int per_line,      /* for vertical number of conditions per line */
+    int *x, int *y,    /* real for vertical, ignored otherwise */
+    char *condbuf,     /* optional output; collect string of conds */
+    boolean *nohilite) /* optional output; indicates whether -*/
+{                      /*+ condbuf[] could be used as-is      */
     char condnam[20];
     int i, ci;
     long bitmsk;
@@ -1012,6 +1023,7 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
         }
     } else if (curses_condition_bits) {
         unsigned long cond_bits;
+        const char *vert_fmt = 0;
         int height = 0, width, cx, cy, cy0, cndlen;
 #ifdef STATUS_HILITES
         int attrmask = 0, color = NO_COLOR;
@@ -1022,14 +1034,19 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
         getmaxyx(win, height, width);
         border = curses_window_has_border(STATUS_WIN);
         cy0 = height - (border ? 2 : 1);
+        if (vert_cond)
+            vert_fmt = (per_line == 2) ? "%-12.12s" : "%-8.8s";
 
         cond_bits = curses_condition_bits;
-        /* show active conditions directly; for vertical, three per line */
+        /* show active conditions directly; for vertical, 2 or 3 per line */
         for (i = 0; i < CONDITION_COUNT; ++i) {
             ci = cond_idx[i];
             bitmsk = conditions[ci].mask;
             if (cond_bits & bitmsk) {
-                Strcpy(condnam, conditions[ci].text[0]);
+                if (!vert_fmt)
+                    Strcpy(condnam, conditions[ci].text[0]);
+                else
+                    Sprintf(condnam, vert_fmt, conditions[ci].text[0]);
                 cndlen = 1 + (int) strlen(condnam); /* count leading space */
                 if (!do_vert) {
                     getyx(win, cy, cx);
@@ -1045,7 +1062,7 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                 }
                 cond_bits &= ~bitmsk; /* nonzero if another cond after this */
                 /* output unhighlighted leading space unless at #1 of 3 */
-                if (!do_vert || (vert_cond % 3) != 1)
+                if (!do_vert || (vert_cond % per_line) != 1)
                     waddch(win, ' ');
 #ifdef STATUS_HILITES
                 if (iflags.hilite_delta) {
@@ -1076,7 +1093,7 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                 }
 #endif /* STATUS_HILITES */
                 /* if that was #3 of 3 advance to next line */
-                if (do_vert && (++vert_cond % 3) == 1)
+                if (do_vert && (++vert_cond % per_line) == 1)
                     wmove(win, (*y)++, *x);
             } /* if cond_bits & bitmask */
         } /* for i */
@@ -1189,6 +1206,13 @@ curs_vert_status_vals(int win_width)
                 Sprintf(status_vals_long[fldidx], "%*.*s: %s%s",
                         -lbl_width, lbl_width, lbl, leadingspace, text);
                 *status_vals_long[fldidx] = highc(*status_vals_long[fldidx]);
+            } else if ((fldidx == BL_HUNGER || fldidx == BL_CAP) && *text) {
+                /* hunger and enbumbrance are shown side-by-side in
+                   a 26 character or wider window; if leading space is
+                   present, get rid of it, then add one we're sure about */
+                if (*text == ' ')
+                    ++text;
+                Sprintf(status_vals_long[fldidx], " %-12.12s", text);
             } else {
                 /* unlabeled: title, hp-max, en-max, exp-points, hunger+cap */
                 Sprintf(status_vals_long[fldidx], "%s%s", leadingspace, text);
