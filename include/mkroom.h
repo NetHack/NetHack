@@ -90,6 +90,14 @@ enum roomtype_types {
 #define ROOMOFFSET  3 /* (levl[x][y].roomno - ROOMOFFSET) gives g.rooms[] index,
                        * for inside-squares and non-shared boundaries */
 
+/* Values for needfill */
+#define FILL_NONE    0 /* do not fill this room with anything */
+#define FILL_NORMAL  1 /* fill the room normally (OROOM or THEMEROOM gets
+                          fill_ordinary_room; any other room type gets stocked
+                          with its usual monsters/objects/terrain) */
+#define FILL_LVFLAGS 2 /* special rooms only; set the room's rtype and level
+                          flags as appropriate, but do not put anything in it */
+
 #define IS_ROOM_PTR(x)      ((x) >= g.rooms && (x) < g.rooms + MAXNROFROOMS)
 #define IS_ROOM_INDEX(x)    ((x) >= 0 && (x) < MAXNROFROOMS)
 #define IS_SUBROOM_PTR(x)   ((x) >= g.subrooms && (x) < g.subrooms + MAXNROFROOMS)

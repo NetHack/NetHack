@@ -304,13 +304,13 @@ Set flags for this level.
 | nommap        | Prevents magic mapping
 | shortsighted  | Prevents monsters from seeing the hero from far away
 | arboreal      | Notionally an outdoor map; replaces solid stone with trees
-| mazelevel     | 
+| mazelevel     |
 | shroud        | Unseen locations on the level will not be remembered by the hero, instead of rendering as out-of-sight map, trap, and object glyphs like they normally do.
 | graveyard     | Treats the level as a graveyard level (causes graveyard sounds and undead have a reduced chance of leaving corpses).
 | icedpools     | Ice generated with the level will be treated as frozen pools instead of frozen moats.
-| corrmaze      | 
+| corrmaze      |
 | premapped     | Map, including traps and boulders, is revealed on entrance.
-| solidify      | Areas outside the specified level map are made undiggable and unphaseable. 
+| solidify      | Areas outside the specified level map are made undiggable and unphaseable.
 | inaccessibles | If inaccessible areas are generated, generate ways for them to connect to the "accessible" area.
 | noflip        | Prevent flipping the level.
 | noflipx       | Prevent flipping the level horizontally.
@@ -471,7 +471,7 @@ Example:
 Example:
 
  des.region(selection, lit);
- des.region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL, irregular=BOOL, prefilled=BOOL [ , contents = FUNCTION ] });
+ des.region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL, irregular=BOOL, filled=NN [ , contents = FUNCTION ] });
  des.region({ region={x1,y1, x2,y2}, type="ordinary" });
 
 === replace_terrain

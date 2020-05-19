@@ -76,9 +76,9 @@ place:set(51,9);
 -- Where the player will land on arrival
 des.teleport_region({ region = {29,15,45,15}, exclude = {30,15,44,15} })
 -- Lit courts
-des.region({ region={01,05,16,14},lit=1,type="ordinary",prefilled=1,irregular=1 })
-des.region({ region={31,01,44,10},lit=1,type="ordinary",prefilled=1,irregular=1 })
-des.region({ region={61,05,74,14},lit=1,type="ordinary",prefilled=1,irregular=1 })
+des.region({ region={01,05,16,14},lit=1,type="ordinary",irregular=1 })
+des.region({ region={31,01,44,10},lit=1,type="ordinary",irregular=1 })
+des.region({ region={61,05,74,14},lit=1,type="ordinary",irregular=1 })
 -- A Sanctum for each alignment
 -- The shrines' alignments are shuffled for
 -- each game

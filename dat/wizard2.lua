@@ -26,8 +26,8 @@ des.levregion({ type="stair-down", region={01,00,79,20}, region_islev=1, exclude
 des.levregion({ type="branch", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
 des.teleport_region({ region={01,00,79,20}, region_islev=1, exclude={0,0,27,12} })
 -- entire tower in a region, constrains monster migration
-des.region({ region={01,01, 26,11}, lit=0, type="ordinary", prefilled=1 })
-des.region({ region={09,03, 17,09}, lit=0, type="zoo", prefilled=0 })
+des.region({ region={01,01, 26,11}, lit=0, type="ordinary", arrival_room=true })
+des.region({ region={09,03, 17,09}, lit=0, type="zoo", filled=1 })
 des.door("closed",15,02)
 des.door("closed",11,10)
 des.mazewalk(28,05,"east")

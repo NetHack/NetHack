@@ -757,7 +757,7 @@ struct mkroom *croom;
         fill_ordinary_room(croom->sbrooms[x]);
     }
 
-    if (!croom->needfill)
+    if (croom->needfill != FILL_NORMAL)
         return;
 
     /* put a sleeping monster inside */
@@ -916,7 +916,7 @@ makelevel()
                      TRUE, VAULT, FALSE);
             g.level.flags.has_vault = 1;
             ++room_threshold;
-            fill_special_room(&g.rooms[g.nroom - 1], FALSE);
+            fill_special_room(&g.rooms[g.nroom - 1]);
             mk_knox_portal(g.vault_x + w, g.vault_y + h);
             if (!g.level.flags.noteleport && !rn2(3))
                 makevtele();

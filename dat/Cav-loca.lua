@@ -31,7 +31,7 @@ des.map([[
 ]]);
 -- Dungeon Description
 des.region(selection.area(00,00,75,19), "unlit")
-des.region({ region={52,06, 73,15}, lit=1, type="ordinary", prefilled=0, irregular=1 })
+des.region({ region={52,06, 73,15}, lit=1, type="ordinary", irregular=1 })
 -- Doors
 des.door("locked",28,11)
 -- Stairs

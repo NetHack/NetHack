@@ -36,7 +36,7 @@ des.map([[
 -- Dungeon Description
 des.region(selection.area(00,00,49,15), "lit")
 des.region(selection.area(04,04,45,11), "unlit")
-des.region({ region={06,06,22,09}, lit=1, type="throne", prefilled=1 })
+des.region({ region={06,06,22,09}, lit=1, type="throne", filled=2 })
 des.region(selection.area(27,06,43,09), "lit")
 -- Portal arrival point
 des.levregion({ region = {20,14,20,14}, type="branch" })

@@ -12,7 +12,6 @@
 -- core calls themerooms_generate() multiple times per level
 -- to generate a single themed room.
 
-
 themerooms = {
   {
      -- the "default" room
@@ -260,7 +259,7 @@ themerooms = {
 |......|
 |......|
 |......|
---------]], contents = function(m) des.region({ region={1,1,3,3}, type="ordinary", irregular=true, prefilled=true }); end });
+--------]], contents = function(m) des.region({ region={1,1,3,3}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- L-shaped, rot 1
@@ -273,7 +272,7 @@ xxx|...|
 |......|
 |......|
 |......|
---------]], contents = function(m) des.region({ region={5,1,5,3}, type="ordinary", irregular=true, prefilled=true }); end });
+--------]], contents = function(m) des.region({ region={5,1,5,3}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- L-shaped, rot 2
@@ -286,7 +285,7 @@ xxx|...|
 ----...|
 xxx|...|
 xxx|...|
-xxx-----]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- L-shaped, rot 3
@@ -299,7 +298,7 @@ xxx-----]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary
 |...----
 |...|xxx
 |...|xxx
------xxx]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+-----xxx]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Blocked center
@@ -321,7 +320,7 @@ if (percent(30)) then
    shuffle(terr);
    des.replace_terrain({ region = {1,1, 9,9}, fromterrain = "L", toterrain = terr[1] });
 end
-des.region({ region={1,1,2,2}, type="ordinary", irregular=true, prefilled=true });
+des.region({ region={1,1,2,2}, type="ordinary", irregular=true, filled=1 });
 end });
    end,
 
@@ -334,7 +333,7 @@ x--.--x
 |.....|
 --...--
 x--.--x
-xx---xx]], contents = function(m) des.region({ region={3,3,3,3}, type="ordinary", irregular=true, prefilled=true }); end });
+xx---xx]], contents = function(m) des.region({ region={3,3,3,3}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Circular, medium
@@ -348,7 +347,7 @@ x--...--x
 |.......|
 --.....--
 x--...--x
-xx-----xx]], contents = function(m) des.region({ region={4,4,4,4}, type="ordinary", irregular=true, prefilled=true }); end });
+xx-----xx]], contents = function(m) des.region({ region={4,4,4,4}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Circular, big
@@ -364,7 +363,7 @@ x-.......-x
 --.......--
 x-.......-x
 x---...---x
-xxx-----xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- T-shaped
@@ -377,7 +376,7 @@ xxx|...|xxx
 |.........|
 |.........|
 |.........|
------------]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+-----------]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- T-shaped, rot 1
@@ -393,7 +392,7 @@ xxx|...|xxx
 |...----
 |...|xxx
 |...|xxx
------xxx]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+-----xxx]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- T-shaped, rot 2
@@ -406,7 +405,7 @@ xxx|...|xxx
 ----...----
 xxx|...|xxx
 xxx|...|xxx
-xxx-----xxx]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----xxx]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- T-shaped, rot 3
@@ -422,7 +421,7 @@ xxx|...|
 ----...|
 xxx|...|
 xxx|...|
-xxx-----]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- S-shaped
@@ -438,7 +437,7 @@ xxx-----]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary
 ----...|
 xxx|...|
 xxx|...|
-xxx-----]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- S-shaped, rot 1
@@ -451,7 +450,7 @@ xxx|......|
 |......----
 |......|xxx
 |......|xxx
---------xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+--------xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Z-shaped
@@ -467,7 +466,7 @@ xxx|...|
 |...----
 |...|xxx
 |...|xxx
------xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+-----xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Z-shaped, rot 1
@@ -480,7 +479,7 @@ xxx|...|
 ----......|
 xxx|......|
 xxx|......|
-xxx--------]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx--------]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Cross
@@ -496,7 +495,7 @@ xxx|...|xxx
 ----...----
 xxx|...|xxx
 xxx|...|xxx
-xxx-----xxx]], contents = function(m) des.region({ region={6,6,6,6}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----xxx]], contents = function(m) des.region({ region={6,6,6,6}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Four-leaf clover
@@ -512,7 +511,7 @@ xx|.....|xx
 |.........|
 |...---...|
 |...|x|...|
------x-----]], contents = function(m) des.region({ region={6,6,6,6}, type="ordinary", irregular=true, prefilled=true }); end });
+-----x-----]], contents = function(m) des.region({ region={6,6,6,6}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Water-surrounded vault
@@ -523,7 +522,7 @@ xx|.....|xx
 }|..|}
 }|..|}
 }----}
-}}}}}}]], contents = function(m) des.region({ region={3,3,3,3}, type="themed", irregular=true, prefilled=false, joined=false });
+}}}}}}]], contents = function(m) des.region({ region={3,3,3,3}, type="themed", irregular=true, filled=0, joined=false });
      local nasty_undead = { "giant zombie", "ettin zombie", "vampire lord" };
      des.object("chest", 2, 2);
      des.object("chest", 3, 2);
