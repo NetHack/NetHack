@@ -36,18 +36,18 @@ des.replace_terrain({ region = {34, 1,68,19}, fromterrain="}", toterrain=".", ch
 
 -- Dungeon Description
 des.region(selection.area(00,00,75,20), "lit")
-des.region({ region={37,04,65,16}, lit=0, type="ordinary", prefilled=1, irregular=1,
+des.region({ region={37,04,65,16}, lit=0, type="ordinary", irregular=1,
              contents = function()
                 des.door({ state="secret", wall="random" })
                 end
 })
-des.region({ region={39,06,63,14}, lit=0, type="ordinary", prefilled=1, irregular=1,
+des.region({ region={39,06,63,14}, lit=0, type="ordinary", irregular=1,
              contents = function()
                 des.door({ state="secret", wall="random" })
              end
 })
 
-des.region({ region={41,08,46,12}, lit=1, type="ordinary", prefilled=1, irregular=1,
+des.region({ region={41,08,46,12}, lit=1, type="ordinary", irregular=1,
              contents = function()
                 local walls = { "north", "south", "west" }
                 local widx = math.random(1, #walls)
@@ -55,7 +55,7 @@ des.region({ region={41,08,46,12}, lit=1, type="ordinary", prefilled=1, irregula
              end
 })
 
-des.region({ region={56,08,61,12}, lit=1, type="ordinary", prefilled=1, irregular=1,
+des.region({ region={56,08,61,12}, lit=1, type="ordinary", irregular=1,
              contents = function()
                 local walls = { "north", "south", "east" }
                 local widx = math.random(1, #walls)
@@ -66,7 +66,7 @@ des.region({ region={56,08,61,12}, lit=1, type="ordinary", prefilled=1, irregula
 des.region(selection.area(48,08,54,08), "unlit")
 des.region(selection.area(48,12,54,12), "unlit")
 
-des.region({ region={48,10,54,10}, lit=0, type="ordinary", prefilled=1, irregular=1,
+des.region({ region={48,10,54,10}, lit=0, type="ordinary", irregular=1,
              contents = function()
                 des.door({ state="secret", wall="random" })
              end

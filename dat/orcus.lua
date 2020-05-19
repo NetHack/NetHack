@@ -77,9 +77,9 @@ des.door("open",26,14)
 des.door("closed",06,15)
 -- Special rooms
 des.altar({ x=24,y=07,align="noalign",type="sanctum" })
-des.region({ region={22,12,25,16},lit=0,type="morgue", prefilled=0 })
-des.region({ region={32,09,37,12},lit=1,type="shop",prefilled=0 })
-des.region({ region={12,00,15,04},lit=1,type="shop",prefilled=0 })
+des.region({ region={22,12,25,16},lit=0,type="morgue",filled=1 })
+des.region({ region={32,09,37,12},lit=1,type="shop",filled=1 })
+des.region({ region={12,00,15,04},lit=1,type="shop",filled=1 })
 -- Some traps.
 des.trap("spiked pit")
 des.trap("sleep gas")

@@ -52,7 +52,7 @@ des.region(selection.area(35,16,36,17), "unlit")
 des.region(selection.area(38,13,38,17), "unlit")
 des.region(selection.area(40,13,41,14), "unlit")
 des.region(selection.area(40,16,41,17), "unlit")
-des.region({ region={43,13, 50,15}, lit=0, type="temple", prefilled=0 })
+des.region({ region={43,13, 50,15}, lit=0, type="temple", filled=2 })
 des.region(selection.area(52,13,52,15), "unlit")
 -- Stairs
 des.stair("up", 38,10)

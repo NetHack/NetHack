@@ -324,8 +324,8 @@ end
 function test_region()
    des.region(selection.area(08,03,54,03),"unlit")
    des.region(selection.area(56,02,60,03),"lit")
-   des.region({ region={16,05, 25,06}, lit=1, type="barracks", prefilled=0 })
-   des.region({ region={1,5, 3,7}, lit=1, irregular=true, prefilled=true, joined=false })
+   des.region({ region={16,05, 25,06}, lit=1, type="barracks", filled=0 })
+   des.region({ region={1,5, 3,7}, lit=1, irregular=true, filled=1, joined=false })
 end
 
 function test_door()

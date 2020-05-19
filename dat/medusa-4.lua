@@ -40,7 +40,6 @@ place:set(10,08);
 place:set(10,12);
 --
 des.region(selection.area(00,00,74,19),"lit")
-des.region({ region={13,03, 18,13}, lit=1, type="ordinary", prefilled=1 })
 --
 des.teleport_region({ region = {64,01,74,17}, dir="down" });
 des.teleport_region({ region = {02,02,18,13}, dir="up" });
