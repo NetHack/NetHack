@@ -12,10 +12,9 @@ matrix:
         - make install
     - name: linux-nocommon-xenial-gcc
       os: linux
-      env: HINTS=linux LUA_VERSION=5.3.5
+      env: HINTS=linux-travis LUA_VERSION=5.3.5
       compiler: gcc
       script:
-        - echo "CFLAGS+=-fno-common" >>sys/unix/hints/linux
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
