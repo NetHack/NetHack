@@ -20,6 +20,16 @@ matrix:
         - make fetch-lua
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - make install
+    - name: linux-nocommon-xenial-gcc
+      os: linux
+      env: HINTS=linux LUA_VERSION=5.3.5
+      compiler: gcc
+      script:
+        - echo "CFLAGS+=-fno-common" >>sys/unix/hints/$HINTS
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua
+        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+        - make install
     - name: linux-bionic-gcc
       os: linux
       env: HINTS=linux LUA_VERSION=5.3.5
