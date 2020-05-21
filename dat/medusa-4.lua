@@ -40,6 +40,10 @@ place:set(10,08);
 place:set(10,12);
 --
 des.region(selection.area(00,00,74,19),"lit")
+-- fixup_special hack: The first "room" region in Medusa levels gets filled with
+-- some leaderboard statues, so this needs to be a room; setting irregular=1
+-- will force this
+des.region({ region={13,03, 18,13}, lit=1, type="ordinary", irregular=1 })
 --
 des.teleport_region({ region = {64,01,74,17}, dir="down" });
 des.teleport_region({ region = {02,02,18,13}, dir="up" });

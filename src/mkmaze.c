@@ -541,7 +541,7 @@ fixup_special()
         struct obj *otmp;
         int tryct;
 
-        croom = &g.rooms[0]; /* only one room on the medusa level */
+        croom = &g.rooms[0]; /* the first room defined on the medusa level */
         for (tryct = rnd(4); tryct; tryct--) {
             x = somex(croom);
             y = somey(croom);
