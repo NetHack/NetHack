@@ -32,6 +32,8 @@ des.map([[
 -- Dungeon Description
 des.region(selection.area(00,00,74,19),"lit")
 des.region(selection.area(02,03,05,16),"unlit")
+-- fixup_special hack: the first room defined on a Medusa level gets some
+-- leaderboard statues; setting the region as irregular makes it a room
 des.region({ region={61,03, 72,16}, lit=0, type="ordinary",irregular = 1 })
 des.region(selection.area(71,08,72,11),"unlit")
 -- make the downstairs area a real room to control arriving monsters

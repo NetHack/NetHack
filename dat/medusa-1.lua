@@ -36,7 +36,9 @@ des.map([[
 -- Dungeon Description
 des.region(selection.area(00,00,74,19),"lit")
 des.region(selection.area(31,07,45,07),"unlit")
--- make the downstairs room a real room to control arriving monsters
+-- make the downstairs room a real room to control arriving monsters, 
+-- and also as a fixup_special hack; the first room defined on Medusa's level
+-- receives some statues
 des.region({ region={35,09, 41,10}, lit = 0, type="ordinary", arrival_room=true })
 des.region(selection.area(31,12,45,12),"unlit")
 -- Teleport: down to up stairs island, up to Medusa's island
