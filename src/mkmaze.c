@@ -574,15 +574,6 @@ fixup_special()
         g.level.flags.graveyard = 1;
     } else if (Is_stronghold(&u.uz)) {
         g.level.flags.graveyard = 1;
-    } else if (on_level(&u.uz, &orcus_level)) {
-        struct monst *mtmp, *mtmp2;
-
-        /* it's a ghost town, get rid of shopkeepers */
-        for (mtmp = fmon; mtmp; mtmp = mtmp2) {
-            mtmp2 = mtmp->nmon;
-            if (mtmp->isshk)
-                mongone(mtmp);
-        }
     } else if (on_level(&u.uz, &baalzebub_level)) {
         /* custom wallify the "beetle" potion of the level */
         baalz_fixup();
