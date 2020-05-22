@@ -40,7 +40,6 @@ static void NDECL(remove_boundary_syms);
 static void FDECL(set_door_orientation, (int, int));
 static void FDECL(maybe_add_door, (int, int, struct mkroom *));
 static void NDECL(link_doors_rooms);
-static void NDECL(fill_special_rooms);
 static int NDECL(rnddoor);
 static int NDECL(rndtrap);
 static void FDECL(get_location, (schar *, schar *, int, struct mkroom *));
@@ -1033,16 +1032,6 @@ link_doors_rooms()
                     }
                 }
             }
-}
-
-static void
-fill_special_rooms()
-{
-    int tmpi, m;
-
-    for (tmpi = 0; tmpi < g.nroom; tmpi++) {
-        fill_special_room(&g.rooms[tmpi]);
-    }
 }
 
 /*
@@ -6426,7 +6415,6 @@ const char *name;
         goto give_up;
 
     link_doors_rooms();
-    fill_special_rooms();
     remove_boundary_syms();
 
     /* TODO: ensure_way_out() needs rewrite */
