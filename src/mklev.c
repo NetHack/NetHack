@@ -845,94 +845,87 @@ makelevel()
     register struct mkroom *croom;
     branch *branchp;
     int room_threshold;
+    register s_level *slev = Is_special(&u.uz);
+    int i;
 
     if (wiz1_level.dlevel == 0)
         init_dungeons();
     oinit(); /* assign level dependent obj probabilities */
     clear_level_structures();
 
-    {
-        register s_level *slev = Is_special(&u.uz);
+    /* check for special levels */
+    if (slev && !Is_rogue_level(&u.uz)) {
+        makemaz(slev->proto);
+    } else if (g.dungeons[u.uz.dnum].proto[0]) {
+        makemaz("");
+    } else if (g.dungeons[u.uz.dnum].fill_lvl[0]) {
+        makemaz(g.dungeons[u.uz.dnum].fill_lvl);
+    } else if (In_quest(&u.uz)) {
+        char fillname[9];
+        s_level *loc_lev;
 
-        /* check for special levels */
-        if (slev && !Is_rogue_level(&u.uz)) {
-            makemaz(slev->proto);
-            return;
-        } else if (g.dungeons[u.uz.dnum].proto[0]) {
-            makemaz("");
-            return;
-        } else if (g.dungeons[u.uz.dnum].fill_lvl[0]) {
-            makemaz(g.dungeons[u.uz.dnum].fill_lvl);
-            return;
-        } else if (In_quest(&u.uz)) {
-            char fillname[9];
-            s_level *loc_lev;
+        Sprintf(fillname, "%s-loca", g.urole.filecode);
+        loc_lev = find_level(fillname);
 
-            Sprintf(fillname, "%s-loca", g.urole.filecode);
-            loc_lev = find_level(fillname);
-
-            Sprintf(fillname, "%s-fil", g.urole.filecode);
-            Strcat(fillname,
-                   (u.uz.dlevel < loc_lev->dlevel.dlevel) ? "a" : "b");
-            makemaz(fillname);
-            return;
-        } else if (In_hell(&u.uz)
-                   || (rn2(5) && u.uz.dnum == medusa_level.dnum
-                       && depth(&u.uz) > depth(&medusa_level))) {
-            makemaz("");
-            return;
-        }
-    }
-
-    /* otherwise, fall through - it's a "regular" level. */
-
-    if (Is_rogue_level(&u.uz)) {
-        makeroguerooms();
-        makerogueghost();
-    } else
-        makerooms();
-    sort_rooms();
-
-    generate_stairs(); /* up and down stairs */
-
-    branchp = Is_branchlev(&u.uz);    /* possible dungeon branch */
-    room_threshold = branchp ? 4 : 3; /* minimum number of rooms needed
-                                         to allow a random special room */
-    if (Is_rogue_level(&u.uz))
-        goto skip0;
-    makecorridors();
-    make_niches();
-
-    /* make a secret treasure vault, not connected to the rest */
-    if (do_vault()) {
-        xchar w, h;
-
-        debugpline0("trying to make a vault...");
-        w = 1;
-        h = 1;
-        if (check_room(&g.vault_x, &w, &g.vault_y, &h, TRUE)) {
- fill_vault:
-            add_room(g.vault_x, g.vault_y, g.vault_x + w, g.vault_y + h,
-                     TRUE, VAULT, FALSE);
-            g.level.flags.has_vault = 1;
-            ++room_threshold;
-            fill_special_room(&g.rooms[g.nroom - 1]);
-            mk_knox_portal(g.vault_x + w, g.vault_y + h);
-            if (!g.level.flags.noteleport && !rn2(3))
-                makevtele();
-        } else if (rnd_rect() && create_vault()) {
-            g.vault_x = g.rooms[g.nroom].lx;
-            g.vault_y = g.rooms[g.nroom].ly;
-            if (check_room(&g.vault_x, &w, &g.vault_y, &h, TRUE))
-                goto fill_vault;
-            else
-                g.rooms[g.nroom].hx = -1;
-        }
-    }
-
-    {
+        Sprintf(fillname, "%s-fil", g.urole.filecode);
+        Strcat(fillname,
+                (u.uz.dlevel < loc_lev->dlevel.dlevel) ? "a" : "b");
+        makemaz(fillname);
+    } else if (In_hell(&u.uz)
+                || (rn2(5) && u.uz.dnum == medusa_level.dnum
+                    && depth(&u.uz) > depth(&medusa_level))) {
+        makemaz("");
+    } else {
+        /* otherwise, fall through - it's a "regular" level. */
         register int u_depth = depth(&u.uz);
 
+        if (Is_rogue_level(&u.uz)) {
+            makeroguerooms();
+            makerogueghost();
+        } else
+            makerooms();
+        sort_rooms();
+
+        generate_stairs(); /* up and down stairs */
+
+        branchp = Is_branchlev(&u.uz);    /* possible dungeon branch */
+        room_threshold = branchp ? 4 : 3; /* minimum number of rooms needed
+                                            to allow a random special room */
+        if (Is_rogue_level(&u.uz))
+            goto skip0;
+        makecorridors();
+        make_niches();
+
+        /* make a secret treasure vault, not connected to the rest */
+        if (do_vault()) {
+            xchar w, h;
+
+            debugpline0("trying to make a vault...");
+            w = 1;
+            h = 1;
+            if (check_room(&g.vault_x, &w, &g.vault_y, &h, TRUE)) {
+ fill_vault:
+                add_room(g.vault_x, g.vault_y, g.vault_x + w, g.vault_y + h,
+                        TRUE, VAULT, FALSE);
+                g.level.flags.has_vault = 1;
+                ++room_threshold;
+                fill_special_room(&g.rooms[g.nroom - 1]);
+                mk_knox_portal(g.vault_x + w, g.vault_y + h);
+                if (!g.level.flags.noteleport && !rn2(3))
+                    makevtele();
+            } else if (rnd_rect() && create_vault()) {
+                g.vault_x = g.rooms[g.nroom].lx;
+                g.vault_y = g.rooms[g.nroom].ly;
+                if (check_room(&g.vault_x, &w, &g.vault_y, &h, TRUE))
+                    goto fill_vault;
+                else
+                    g.rooms[g.nroom].hx = -1;
+            }
+        }
+
+        /* make up to 1 special room, with type dependent on depth;
+         * note that mkroom doesn't guarantee a room gets created, and that this
+         * step only sets the room's rtype - it doesn't fill it yet. */
         if (wizard && nh_getenv("SHOPTYPE"))
             mkroom(SHOPBASE);
         else if (u_depth > 1 && u_depth < depth(&medusa_level)
@@ -962,15 +955,20 @@ makelevel()
         else if (u_depth > 16 && !rn2(8)
                  && !(g.mvitals[PM_COCKATRICE].mvflags & G_GONE))
             mkroom(COCKNEST);
-    }
 
  skip0:
-    /* Place multi-dungeon branch. */
-    place_branch(branchp, 0, 0);
+        /* Place multi-dungeon branch. */
+        place_branch(branchp, 0, 0);
 
-    /* for each room: put things inside */
-    for (croom = g.rooms; croom->hx > 0; croom++) {
-        fill_ordinary_room(croom);
+        /* for each room: put things inside */
+        for (croom = g.rooms; croom->hx > 0; croom++) {
+            fill_ordinary_room(croom);
+        }
+    }
+    /* Fill all special rooms now, regardless of whether this is a special
+     * level, proto level, or ordinary level. */
+    for (i = 0; i < g.nroom; ++i) {
+        fill_special_room(&g.rooms[i]);
     }
 }
 
