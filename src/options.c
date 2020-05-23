@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1589326675 2020/05/12 23:37:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.464 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1590263453 2020/05/23 19:50:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.465 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5447,7 +5447,7 @@ handler_menu_colors(VOID_ARGS)
         if (*mcbuf == '\033')
             goto menucolors_done;
         if (*mcbuf
-            && test_regex_pattern(mcbuf, (const char *)0)
+            && test_regex_pattern(mcbuf, "MENUCOLORS regex")
             && (mcclr = query_color((char *) 0)) != -1
             && (mcattr = query_attr((char *) 0)) != -1
             && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
@@ -5529,7 +5529,7 @@ handler_msgtype(VOID_ARGS)
         if (*mtbuf == '\033')
             return TRUE;
         if (*mtbuf
-            && test_regex_pattern(mtbuf, (const char *)0)
+            && test_regex_pattern(mtbuf, "MSGTYPE regex")
             && (mttyp = query_msgtype()) != -1
             && !msgtype_add(mttyp, mtbuf)) {
             pline("Error adding the message type.");
@@ -6671,16 +6671,20 @@ msgtype_add(typ, pattern)
 int typ;
 char *pattern;
 {
+    static const char *re_error = "MSGTYPE regex error";
     struct plinemsg_type *tmp = (struct plinemsg_type *) alloc(sizeof *tmp);
 
     tmp->msgtype = typ;
     tmp->regex = regex_init();
+    /* test_regex_pattern() has already validated this regexp but parsing
+       it again could conceivably run out of memory */
     if (!regex_compile(pattern, tmp->regex)) {
-        static const char *re_error = "MSGTYPE regex error";
+        const char *re_error_desc = regex_error_desc(tmp->regex);
 
-        config_error_add("%s: %s", re_error, regex_error_desc(tmp->regex));
+        /* free first in case reason for failure was insufficient memory */
         regex_free(tmp->regex);
         free((genericptr_t) tmp);
+        config_error_add("%s: %s", re_error, re_error_desc);
         return FALSE;
     }
     tmp->pattern = dupstr(pattern);
@@ -6805,30 +6809,40 @@ char *str;
     return FALSE;
 }
 
+/* parse 'str' as a regular expression to check whether it's valid;
+   compiled regexp gets thrown away regardless of the outcome */
 static boolean
 test_regex_pattern(str, errmsg)
 const char *str;
 const char *errmsg;
 {
-    static const char re_error[] = "Regex error";
+    static const char def_errmsg[] = "NHregex error";
     struct nhregex *match;
-    boolean retval = TRUE;
+    const char *re_error_desc;
+    boolean retval;
 
     if (!str)
         return FALSE;
+    if (!errmsg)
+        errmsg = def_errmsg;
 
     match = regex_init();
     if (!match) {
-        config_error_add("NHregex error");
+        config_error_add("%s", errmsg);
         return FALSE;
     }
 
-    if (!regex_compile(str, match)) {
-        config_error_add("%s: %s", errmsg ? errmsg : re_error,
-                         regex_error_desc(match));
-        retval = FALSE;
-    }
+    retval = regex_compile(str, match);
+    /* get potential error message before freeing regexp and free regexp
+       before issuing message in case the error is "ran out of memory"
+       since message delivery might need to allocate some memory */
+    re_error_desc = !retval ? regex_error_desc(match) : 0;
+    /* discard regexp; caller will re-parse it after validating other stuff */
     regex_free(match);
+    /* if returning failure, tell player */
+    if (!retval)
+        config_error_add("%s: %s", errmsg, re_error_desc);
+
     return retval;
 }
 
@@ -6844,19 +6858,23 @@ int c, a;
         return FALSE;
     tmp = (struct menucoloring *) alloc(sizeof *tmp);
     tmp->match = regex_init();
+    /* test_regex_pattern() has already validated this regexp but parsing
+       it again could conceivably run out of memory */
     if (!regex_compile(str, tmp->match)) {
-        config_error_add("%s: %s", re_error, regex_error_desc(tmp->match));
+        const char *re_error_desc = regex_error_desc(tmp->match);
+
+        /* free first in case reason for regcomp failure was out-of-memory */
         regex_free(tmp->match);
-        free(tmp);
+        free((genericptr_t) tmp);
+        config_error_add("%s: %s", re_error, re_error_desc);
         return FALSE;
-    } else {
-        tmp->next = g.menu_colorings;
-        tmp->origstr = dupstr(str);
-        tmp->color = c;
-        tmp->attr = a;
-        g.menu_colorings = tmp;
-        return TRUE;
     }
+    tmp->next = g.menu_colorings;
+    tmp->origstr = dupstr(str);
+    tmp->color = c;
+    tmp->attr = a;
+    g.menu_colorings = tmp;
+    return TRUE;
 }
 
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
@@ -6935,6 +6953,7 @@ free_menu_coloring()
         free((genericptr_t) tmp->origstr);
         free((genericptr_t) tmp);
     }
+    g.menu_colorings = (struct menucoloring *) 0;
 }
 
 static void
@@ -7752,13 +7771,14 @@ const char *mapping;
     ape = (struct autopickup_exception *) alloc(sizeof *ape);
     ape->regex = regex_init();
     if (!regex_compile(text, ape->regex)) {
-        config_error_add("%s: %s", APE_regex_error,
-                         regex_error_desc(ape->regex));
+        const char *re_error_desc = regex_error_desc(ape->regex);
+
+        /* free first in case reason for failure was insufficient memory */
         regex_free(ape->regex);
         free((genericptr_t) ape);
+        config_error_add("%s: %s", APE_regex_error, re_error_desc);
         return 0;
     }
-
     ape->pattern = dupstr(text);
     ape->grab = grab;
     ape->next = g.apelist;
@@ -7796,10 +7816,10 @@ free_autopickup_exceptions()
     struct autopickup_exception *ape;
 
     while ((ape = g.apelist) != 0) {
-      regex_free(ape->regex);
-      free((genericptr_t) ape->pattern);
-      g.apelist = ape->next;
-      free((genericptr_t) ape);
+        free((genericptr_t) ape->pattern);
+        regex_free(ape->regex);
+        g.apelist = ape->next;
+        free((genericptr_t) ape);
     }
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1589580856 2020/05/15 22:14:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.313 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1590263451 2020/05/23 19:50:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.314 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -120,7 +120,7 @@ extern char *FDECL(translate_path_variables, (const char *, char *));
 #endif
 
 #ifdef USER_SOUNDS
-extern char *sounddir;
+extern char *sounddir; /* defined in sounds.c */
 #endif
 
 #if defined(UNIX) && defined(QT_GRAPHICS)
@@ -2885,6 +2885,8 @@ char *origbuf;
 #endif /*AMIGA*/
 #ifdef USER_SOUNDS
     } else if (match_varname(buf, "SOUNDDIR", 8)) {
+        if (sounddir)
+            free((genericptr_t) sounddir);
         sounddir = dupstr(bufp);
     } else if (match_varname(buf, "SOUND", 5)) {
         add_sound_mapping(bufp);
