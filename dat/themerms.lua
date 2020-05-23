@@ -576,7 +576,8 @@ function themerooms_generate()
             this_frequency = 1;
          end
          total_frequency = total_frequency + this_frequency;
-         if (nh.rn2(total_frequency) < this_frequency) then
+         -- avoid rn2(0) if a room has freq 0
+         if this_frequency > 0 and nh.rn2(total_frequency) < this_frequency then
             pick = i;
          end
       end
