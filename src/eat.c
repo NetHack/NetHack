@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1586303701 2020/04/07 23:55:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.225 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1590346071 2020/05/24 18:47:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.229 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2614,6 +2614,9 @@ doeat()
     }
 
     if (otmp == g.context.victual.piece) {
+        boolean one_bite_left
+            = (g.context.victual.usedtime + 1 >= g.context.victual.reqtime);
+
         /* If they weren't able to choke, they don't suddenly become able to
          * choke just because they were interrupted.  On the other hand, if
          * they were able to choke before, if they lost food it's possible
@@ -2625,9 +2628,12 @@ doeat()
         g.context.victual.piece = touchfood(otmp);
         if (g.context.victual.piece)
             g.context.victual.o_id = g.context.victual.piece->o_id;
-        You("resume %syour meal.",
-            (g.context.victual.usedtime + 1 >= g.context.victual.reqtime)
-            ? "the last bite of " : "");
+        /* if there's only one bite left, there sometimes won't be any
+           "you finish eating" message when done; use different wording
+           for resuming with one bite remaining instead of trying to
+           determine whether or not "you finish" is going to be given */
+        You("%s your meal.",
+            !one_bite_left ? "resume" : "consume the last bite of");
         start_eating(g.context.victual.piece, FALSE);
         return 1;
     }
@@ -2922,14 +2928,16 @@ int num;
          */
         if (u.uhunger >= 1500
             && (!g.context.victual.eating
-                || (g.context.victual.eating && !g.context.victual.fullwarn))) {
+                || (g.context.victual.eating
+                    && !g.context.victual.fullwarn))) {
             pline("You're having a hard time getting all of it down.");
             g.nomovemsg = "You're finally finished.";
             if (!g.context.victual.eating) {
                 g.multi = -2;
             } else {
                 g.context.victual.fullwarn = TRUE;
-                if (g.context.victual.canchoke && g.context.victual.reqtime > 1) {
+                if (g.context.victual.canchoke
+                    && g.context.victual.reqtime > 1) {
                     /* a one-gulp food will not survive a stop */
                     if (!paranoid_query(ParanoidEating, "Continue eating?")) {
                         reset_eat();
