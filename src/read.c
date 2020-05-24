@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1583688568 2020/03/08 17:29:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1590343774 2020/05/24 18:09:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1166,9 +1166,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                         if (shop_h2o)
                             costly_alteration(obj, COST_UNCURS);
                         uncurse(obj);
-                        /* if the object was known to be cursed and is now known not to be,
-                           make the scroll known; it's trivial to identify anyway by comparing
-                           inventory before and after */
+                        /* if the object was known to be cursed and is now
+                           known not to be, make the scroll known; it's
+                           trivial to identify anyway by comparing inventory
+                           before and after */
                         if (obj->bknown && otyp == SCR_REMOVE_CURSE) {
                             learnscrolltyp(SCR_REMOVE_CURSE);
                         }

@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1589491665 2020/05/14 21:27:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1590343765 2020/05/24 18:09:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.299 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2402,8 +2402,8 @@ boolean learning_id; /* true if we just read unknown identify scroll */
     int n, unid_cnt = count_unidentified(g.invent);
 
     if (!unid_cnt) {
-        You("have already identified all %sof your possessions.",
-            learning_id ? "the rest " : "");
+        You("have already identified %s of your possessions.",
+            !learning_id ? "all" : "the rest");
     } else if (!id_limit || id_limit >= unid_cnt) {
         /* identify everything */
         /* TODO:  use fully_identify_obj and cornline/menu/whatever here */
