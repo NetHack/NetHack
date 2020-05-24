@@ -1661,7 +1661,7 @@ int phase;
             && ((croom != g.dnstairs_room && croom != g.upstairs_room)
                 || phase < 1)
             && (croom->rtype == OROOM
-                || ((phase < 2) || croom->rtype == THEMEROOM)));
+                || ((phase < 2) && croom->rtype == THEMEROOM)));
 }
 
 /* find a good room to generate an up or down stairs in */
