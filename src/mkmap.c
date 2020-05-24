@@ -193,7 +193,10 @@ boolean anyroom;
                         levl[ii][jj].edge = 1;
                         if (lit)
                             levl[ii][jj].lit = lit;
-                        if ((int) levl[ii][jj].roomno != rmno)
+
+                        if (levl[ii][jj].roomno == NO_ROOM)
+                            levl[ii][jj].roomno = rmno;
+                        else if ((int) levl[ii][jj].roomno != rmno)
                             levl[ii][jj].roomno = SHARED;
                     }
         }
