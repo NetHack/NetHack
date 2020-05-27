@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1582061574 2020/02/18 21:32:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1590263455 2020/05/23 19:50:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1269,7 +1269,7 @@ typedef struct audio_mapping_rec {
 
 static audio_mapping *soundmap = 0;
 
-char *sounddir = ".";
+char *sounddir = 0; /* set in files.c */
 
 /* adds a sound file mapping, returns 0 on failure, 1 on success */
 int
@@ -1285,24 +1285,29 @@ const char *mapping;
                filename, &volume) == 3) {
         audio_mapping *new_map;
 
-        if (strlen(sounddir) + strlen(filename) > 254) {
+        if (!sounddir)
+            sounddir = dupstr(".");
+
+        if (strlen(sounddir) + 1 + strlen(filename) >= sizeof filespec) {
             raw_print("sound file name too long");
             return 0;
         }
         Sprintf(filespec, "%s/%s", sounddir, filename);
 
         if (can_read_file(filespec)) {
-            new_map = (audio_mapping *) alloc(sizeof(audio_mapping));
+            new_map = (audio_mapping *) alloc(sizeof *new_map);
             new_map->regex = regex_init();
             new_map->filename = dupstr(filespec);
             new_map->volume = volume;
             new_map->next = soundmap;
 
             if (!regex_compile(text, new_map->regex)) {
-                raw_print(regex_error_desc(new_map->regex));
+                const char *re_error_desc = regex_error_desc(new_map->regex);
+
                 regex_free(new_map->regex);
-                free(new_map->filename);
-                free(new_map);
+                free((genericptr_t) new_map->filename);
+                free((genericptr_t) new_map);
+                raw_print(re_error_desc);
                 return 0;
             } else {
                 soundmap = new_map;
@@ -1332,6 +1337,23 @@ const char *msg;
         }
         cursor = cursor->next;
     }
+}
+
+void
+release_sound_mappings()
+{
+    audio_mapping *nextsound = 0;
+
+    while (soundmap) {
+        nextsound = soundmap->next;
+        regex_free(soundmap->regex);
+        free((genericptr_t) soundmap->filename);
+        free((genericptr_t) soundmap);
+        soundmap = nextsound;
+    }
+
+    if (sounddir)
+        free((genericptr_t) sounddir), sounddir = 0;
 }
 
 #endif /* USER_SOUNDS */

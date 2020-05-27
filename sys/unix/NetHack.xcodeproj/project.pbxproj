@@ -142,12 +142,12 @@
 		31B8A46021A26AE70055BD01 /* dlb_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A45F21A26AE70055BD01 /* dlb_main.c */; };
 		31B8A46121A26AF60055BD01 /* panic.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42721A267E60055BD01 /* panic.c */; };
 		31B8A46221A26B020055BD01 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
+		54435B52247999CB00804CB3 /* nhlobj.c in Sources */ = {isa = PBXBuildFile; fileRef = 54435B51247999CB00804CB3 /* nhlobj.c */; };
 		544768AB239949FA004B9739 /* sfstruct.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A8239949FA004B9739 /* sfstruct.c */; };
 		544768AE23994A17004B9739 /* nhlsel.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AC23994A17004B9739 /* nhlsel.c */; };
 		544768AF23994A17004B9739 /* nhlua.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AD23994A17004B9739 /* nhlua.c */; };
 		544768B123994A2C004B9739 /* mdlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768B023994A2C004B9739 /* mdlib.c */; };
 		544768BA23995BB7004B9739 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 544768B923995BB7004B9739 /* liblua.a */; };
-		544768BC23A53C9F004B9739 /* nhlobj.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768BB23A53C9F004B9739 /* nhlobj.c */; };
 		5462D14823E7B19200969423 /* insight.c in Sources */ = {isa = PBXBuildFile; fileRef = 5462D14723E7B19200969423 /* insight.c */; };
 		54FB2B4B246310A600397C0E /* symbols.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FB2B4A246310A600397C0E /* symbols.c */; };
 		54FCE8292223261F00F393C8 /* isaac64.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FCE8282223261F00F393C8 /* isaac64.c */; };
@@ -257,7 +257,6 @@
 		3186A38321A4B0FB0052BF02 /* permonst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = permonst.h; path = ../../include/permonst.h; sourceTree = "<group>"; };
 		3186A38421A4B0FB0052BF02 /* monsym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monsym.h; path = ../../include/monsym.h; sourceTree = "<group>"; };
 		3186A38521A4B0FB0052BF02 /* mextra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mextra.h; path = ../../include/mextra.h; sourceTree = "<group>"; };
-		3186A38621A4B0FB0052BF02 /* dgn_comp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgn_comp.h; path = ../../include/dgn_comp.h; sourceTree = "<group>"; };
 		3186A38721A4B0FB0052BF02 /* color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = color.h; path = ../../include/color.h; sourceTree = "<group>"; };
 		3186A38821A4B0FB0052BF02 /* artifact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = artifact.h; path = ../../include/artifact.h; sourceTree = "<group>"; };
 		3186A38921A4B0FB0052BF02 /* mttypriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mttypriv.h; path = ../../include/mttypriv.h; sourceTree = "<group>"; };
@@ -267,7 +266,6 @@
 		3186A38D21A4B0FC0052BF02 /* vis_tab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vis_tab.h; path = ../../include/vis_tab.h; sourceTree = "<group>"; };
 		3186A38E21A4B0FC0052BF02 /* dlb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dlb.h; path = ../../include/dlb.h; sourceTree = "<group>"; };
 		3186A38F21A4B0FC0052BF02 /* monflag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monflag.h; path = ../../include/monflag.h; sourceTree = "<group>"; };
-		3186A39021A4B0FC0052BF02 /* lev_comp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lev_comp.h; path = ../../include/lev_comp.h; sourceTree = "<group>"; };
 		3186A39121A4B0FC0052BF02 /* micro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = micro.h; path = ../../include/micro.h; sourceTree = "<group>"; };
 		3186A39321A4B0FC0052BF02 /* xwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xwindow.h; path = ../../include/xwindow.h; sourceTree = "<group>"; };
 		3186A39421A4B0FC0052BF02 /* tileset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tileset.h; path = ../../include/tileset.h; sourceTree = "<group>"; };
@@ -339,8 +337,6 @@
 		3186A3D921A4B14B0052BF02 /* curswins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = curswins.h; path = ../../win/curses/curswins.h; sourceTree = "<group>"; };
 		3189577121A1FCC100FB2ABE /* NetHack */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetHack; sourceTree = BUILT_PRODUCTS_DIR; };
 		3189577F21A1FDA400FB2ABE /* makedefs */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = makedefs; sourceTree = BUILT_PRODUCTS_DIR; };
-		3192867B21A3ACAB00325BEB /* lev_comp.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = lev_comp.y; path = ../../util/lev_comp.y; sourceTree = "<group>"; };
-		3192867D21A3ACB800325BEB /* lev_comp.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = lev_comp.l; path = ../../util/lev_comp.l; sourceTree = "<group>"; };
 		31B8A30A21A20D730055BD01 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../include/config.h; sourceTree = "<group>"; };
 		31B8A30B21A20D8B0055BD01 /* makedefs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = makedefs.c; path = ../../util/makedefs.c; sourceTree = "<group>"; };
 		31B8A30D21A20DC10055BD01 /* objects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = objects.c; path = ../../src/objects.c; sourceTree = "<group>"; };
@@ -470,19 +466,12 @@
 		31B8A40921A23EEB0055BD01 /* cursstat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cursstat.c; path = ../../win/curses/cursstat.c; sourceTree = "<group>"; };
 		31B8A40A21A23EEB0055BD01 /* curswins.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = curswins.c; path = ../../win/curses/curswins.c; sourceTree = "<group>"; };
 		31B8A41521A243CC0055BD01 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
-		31B8A42521A267E60055BD01 /* lev_yacc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lev_yacc.c; path = ../../util/lev_yacc.c; sourceTree = "<group>"; };
-		31B8A42621A267E60055BD01 /* lev_lex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lev_lex.c; path = ../../util/lev_lex.c; sourceTree = "<group>"; };
 		31B8A42721A267E60055BD01 /* panic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = panic.c; path = ../../util/panic.c; sourceTree = "<group>"; };
-		31B8A42821A267E60055BD01 /* lev_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lev_main.c; path = ../../util/lev_main.c; sourceTree = "<group>"; };
-		31B8A43D21A2699B0055BD01 /* dgn_yacc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgn_yacc.c; path = ../../util/dgn_yacc.c; sourceTree = "<group>"; };
-		31B8A44021A269C80055BD01 /* dgn_lex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgn_lex.c; path = ../../util/dgn_lex.c; sourceTree = "<group>"; };
-		31B8A44221A269EA0055BD01 /* dgn_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgn_main.c; path = ../../util/dgn_main.c; sourceTree = "<group>"; };
 		31B8A44A21A26A4B0055BD01 /* recover */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = recover; sourceTree = BUILT_PRODUCTS_DIR; };
 		31B8A45121A26A750055BD01 /* recover.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = recover.c; path = ../../util/recover.c; sourceTree = "<group>"; };
 		31B8A45721A26A970055BD01 /* dlb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = dlb; sourceTree = BUILT_PRODUCTS_DIR; };
 		31B8A45F21A26AE70055BD01 /* dlb_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlb_main.c; path = ../../util/dlb_main.c; sourceTree = "<group>"; };
-		31B8A46421A278AC0055BD01 /* dgn_comp.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = dgn_comp.y; path = ../../util/dgn_comp.y; sourceTree = "<group>"; };
-		31B8A46821A288770055BD01 /* dgn_comp.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = dgn_comp.l; path = ../../util/dgn_comp.l; sourceTree = "<group>"; };
+		54435B51247999CB00804CB3 /* nhlobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlobj.c; path = ../../src/nhlobj.c; sourceTree = "<group>"; };
 		544768A8239949FA004B9739 /* sfstruct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfstruct.c; path = ../../src/sfstruct.c; sourceTree = "<group>"; };
 		544768AC23994A17004B9739 /* nhlsel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlsel.c; path = ../../src/nhlsel.c; sourceTree = "<group>"; };
 		544768AD23994A17004B9739 /* nhlua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlua.c; path = ../../src/nhlua.c; sourceTree = "<group>"; };
@@ -490,7 +479,6 @@
 		544768B423995447004B9739 /* isaac64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = isaac64.h; path = ../../include/isaac64.h; sourceTree = "<group>"; };
 		544768B523995488004B9739 /* nhlua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nhlua.h; path = ../../include/nhlua.h; sourceTree = "<group>"; };
 		544768B923995BB7004B9739 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../lib/lua/liblua.a; sourceTree = "<group>"; };
-		544768BB23A53C9F004B9739 /* nhlobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlobj.c; path = ../../src/nhlobj.c; sourceTree = "<group>"; };
 		5462D14723E7B19200969423 /* insight.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insight.c; path = ../../src/insight.c; sourceTree = "<group>"; };
 		54FB2B4A246310A600397C0E /* symbols.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = symbols.c; path = ../../src/symbols.c; sourceTree = "<group>"; };
 		54FCE8282223261F00F393C8 /* isaac64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = isaac64.c; path = ../../src/isaac64.c; sourceTree = "<group>"; };
@@ -534,7 +522,6 @@
 			isa = PBXGroup;
 			children = (
 				2A953FB221A3F404007906E5 /* XCode.xcconfig */,
-				544768BB23A53C9F004B9739 /* nhlobj.c */,
 				31B8A3F821A23E490055BD01 /* win */,
 				31B8A3E921A23CC40055BD01 /* sys */,
 				3189579621A2046700FB2ABE /* include */,
@@ -559,6 +546,7 @@
 		3189578C21A1FF8200FB2ABE /* src */ = {
 			isa = PBXGroup;
 			children = (
+				54435B51247999CB00804CB3 /* nhlobj.c */,
 				54FB2B4A246310A600397C0E /* symbols.c */,
 				544768B023994A2C004B9739 /* mdlib.c */,
 				544768AC23994A17004B9739 /* nhlsel.c */,
@@ -681,18 +669,8 @@
 		3189579321A200EC00FB2ABE /* util */ = {
 			isa = PBXGroup;
 			children = (
-				3192867D21A3ACB800325BEB /* lev_comp.l */,
-				3192867B21A3ACAB00325BEB /* lev_comp.y */,
-				31B8A46421A278AC0055BD01 /* dgn_comp.y */,
 				31B8A45F21A26AE70055BD01 /* dlb_main.c */,
 				31B8A45121A26A750055BD01 /* recover.c */,
-				31B8A44221A269EA0055BD01 /* dgn_main.c */,
-				31B8A44021A269C80055BD01 /* dgn_lex.c */,
-				31B8A46821A288770055BD01 /* dgn_comp.l */,
-				31B8A43D21A2699B0055BD01 /* dgn_yacc.c */,
-				31B8A42621A267E60055BD01 /* lev_lex.c */,
-				31B8A42821A267E60055BD01 /* lev_main.c */,
-				31B8A42521A267E60055BD01 /* lev_yacc.c */,
 				31B8A42721A267E60055BD01 /* panic.c */,
 				31B8A30B21A20D8B0055BD01 /* makedefs.c */,
 			);
@@ -720,7 +698,6 @@
 				3186A3B021A4B0FD0052BF02 /* date.h */,
 				3186A3D021A4B0FE0052BF02 /* decl.h */,
 				3186A3AF21A4B0FD0052BF02 /* def_os2.h */,
-				3186A38621A4B0FB0052BF02 /* dgn_comp.h */,
 				3186A3A021A4B0FD0052BF02 /* dgn_file.h */,
 				3186A3A921A4B0FD0052BF02 /* display.h */,
 				3186A38E21A4B0FC0052BF02 /* dlb.h */,
@@ -733,7 +710,6 @@
 				3186A3C121A4B0FD0052BF02 /* global.h */,
 				3186A3A521A4B0FD0052BF02 /* hack.h */,
 				3186A37A21A4B0FA0052BF02 /* integer.h */,
-				3186A39021A4B0FC0052BF02 /* lev_comp.h */,
 				3186A3BC21A4B0FD0052BF02 /* lint.h */,
 				3186A39921A4B0FD0052BF02 /* load_img.h */,
 				3186A3A421A4B0FD0052BF02 /* mac-carbon.h */,
@@ -1447,6 +1423,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54435B52247999CB00804CB3 /* nhlobj.c in Sources */,
 				31B8A3BC21A238060055BD01 /* eat.c in Sources */,
 				31B8A3A921A238060055BD01 /* music.c in Sources */,
 				544768B123994A2C004B9739 /* mdlib.c in Sources */,
@@ -1490,7 +1467,6 @@
 				31B8A3C821A238060055BD01 /* options.c in Sources */,
 				31B8A3CD21A238060055BD01 /* write.c in Sources */,
 				31B8A40F21A23EEC0055BD01 /* cursmesg.c in Sources */,
-				544768BC23A53C9F004B9739 /* nhlobj.c in Sources */,
 				31B8A3DF21A238060055BD01 /* end.c in Sources */,
 				31B8A38921A238060055BD01 /* mklev.c in Sources */,
 				31B8A3D721A238060055BD01 /* muse.c in Sources */,

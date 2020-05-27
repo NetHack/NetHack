@@ -594,7 +594,7 @@ register struct monst *mtmp;
     /* when not cancelled and not in current form due to shapechange, many
        demons can summon more demons and were creatures can summon critters;
        also, were creature might change from human to animal or vice versa */
-    if (mtmp->cham == NON_PM && !mtmp->mcan
+    if (mtmp->cham == NON_PM && !mtmp->mcan && !range2
         && (is_demon(mdat) || is_were(mdat))) {
         summonmu(mtmp, youseeit);
         mdat = mtmp->data; /* update cached value in case of were change */
