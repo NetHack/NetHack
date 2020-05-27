@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ $NHDT-Date: 1589827569 2020/05/18 18:46:09 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.225 $ $NHDT-Date: 1590613502 2020/05/27 21:05:02 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -187,6 +187,9 @@ hold_another_object used hardcoded Stressed to limit carrying instead of
 	using the 'pickup_burden' option for that
 when hold_another_object fails while hero is swallowed, drop the item into
 	swallower's inventory instead of onto the floor
+change mkclass() to usually honor (always honor for L class) the hell-only and
+	never-in-hell monster creation flags; no more achi-lich in the Castle
+	(nor master lich there unless demilich gets a potion of gain level)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
