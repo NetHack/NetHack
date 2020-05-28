@@ -1,4 +1,4 @@
-# NetHack 3.6  tribute       $NHDT-Date: 1584869896 2020/03/22 09:38:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $
+# NetHack 3.6  tribute       $NHDT-Date: 1590695417 2020/05/28 19:50:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.88 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -1473,7 +1473,7 @@ Nanny Ogg massaged some like back into her fingers.
 
 "I said, what about this rule about not meddling?" said Magrat.
 
-"Ah," said Nanny. She took the girl's arm.  "The thing is," she explained,
+"Ah," said Nanny.  She took the girl's arm.  "The thing is," she explained,
 "as you advance in the Craft, you'll learn there is another rule.  Esme's
 obeyed it all her life."
 
@@ -3800,7 +3800,7 @@ nine times out of ten."
 "How many times have you had to rely on them, sir?"
 
 "Well ... there was Mr. Hong ... that business with the thing in the
-Bursar's wardrobe ... that dragon, you remember ..." Ridcully's lips
+Bursar's wardrobe ... that dragon, you remember ..."  Ridcully's lips
 moved silently as he counted on his fingers.  "Nine times, so far."
 
 "It worked every time, sir?"
@@ -3863,7 +3863,7 @@ not nice doesn't mean it's not miraculous.
 "Oh, no," said the Lecturer in Recent Runes, pushing his chair back.  "Not
 that.  That's meddling with things you don't understand."
 
-"Well, we /are/ wizards," said Ridcully. "We're supposed to meddle with
+"Well, we /are/ wizards," said Ridcully.  "We're supposed to meddle with
 things we don't understand.  If we hung around waitin' till we understood
 things we'd never get anything done."
 
@@ -4788,7 +4788,7 @@ Selachii thumped the table.
 'We could certainly do with one,' said Lord Vetinari.  'We need the money.
 I was about to say that we cannot /afford/ mercenaries.'
 
-'How can this be?' said Lord Downey.  Don't we pay our taxes?'
+'How can this be?' said Lord Downey.  'Don't we pay our taxes?'
 
 'Ah, I thought we might come to that,' said Lord Vetinari.  He raised
 his hand and, on cue again, his clerk placed a piece of paper in it.
@@ -4824,7 +4824,7 @@ They just haven't been paid.'
 
 'That is a disgusting state of affairs!'
 
-The Patrician raised his eyebrows. 'Commander Vines?'
+The Patrician raised his eyebrows.  'Commander Vimes?'
 
 'Yes, sir?'
 
@@ -4835,7 +4835,7 @@ please?  My clerk here will give you a list of the prime defaulters.'
 'Right, sir.  And if they resist, sir?' said Vimes, smiling nastily.
 
 'Oh, how can they resist, commander?  This is the will of our civic
-leaders.'  He took the paper his clerk profferred.  'Let me see, now.  Top
+leaders.'  He took the paper his clerk proffered.  'Let me see, now.  Top
 of the list--'
 
 Lord Selachii coughed hurriedly.  'Far too late for that sort of nonsense
@@ -6975,7 +6975,7 @@ I AM, said Death, sitting down again.
 
 'But you're here!'
 
-AS WELL. Death turned a page and, for a person without breath, managed a
+AS WELL.  Death turned a page and, for a person without breath, managed a
 pretty good sigh.  IT APPEARS THAT THE BUTLER DID IT.
 
 'Did what?'
@@ -8649,7 +8649,7 @@ survived long enough.
 %section Death
 %title Death Quotes (31)
 %passage 1
-WHERE THE FIRST PRIMAL CELL WAS, THERE WAS I ALSO. WHERE MAN IS, THERE AM I.  WHEN THE LAST LIFE CRAWLS UNDER FREEZING STARS, THERE WILL I BE.
+WHERE THE FIRST PRIMAL CELL WAS, THERE WAS I ALSO.  WHERE MAN IS, THERE AM I.  WHEN THE LAST LIFE CRAWLS UNDER FREEZING STARS, THERE WILL I BE.
 %e passage
 # Feet of Clay, p. 17 (Harper Torch edition)
 %passage 2
