@@ -1,5 +1,5 @@
 # NetHack 3.6	data.base
-# $NHDT-Date: 1590520322 2020/05/26 19:12:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $
+# $NHDT-Date: 1590711596 2020/05/29 00:19:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -1083,7 +1083,6 @@ crom
 	aura of evil magic in the air.  Without thought, he readies
 	his weapon, and mutters under his breath:
 	"By Crom, there will be blood spilt today."
-
 	    [ Conan the Avenger by Robert E. Howard, Bjorn Nyberg,
 		and L. Sprague de Camp ]
 crossbow*
@@ -5545,7 +5544,6 @@ whistle
 
 	Well, the best way to find out is evidently to whistle
 	for him.'
-
 		[Ghost Stories of an Antiquary, by Montague Rhodes James
 		 'Oh, Whistle, and I'll Come to You My Lad']
 # werecritter -- see "lycanthrope"
