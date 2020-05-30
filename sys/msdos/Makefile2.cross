@@ -681,6 +681,11 @@ $(O)$(GAME).lnk: $(ALLOBJ)
 	echo $(VOBJ23) >> $@
 	echo $(VOBJ24) >> $@
 	echo $(VOBJ25) >> $@
+	echo $(VOBJ26) >> $@
+	echo $(VOBJ27) >> $@
+	echo $(VOBJ28) >> $@
+	echo $(VOBJ29) >> $@
+	echo $(VOBJ30) >> $@
 	echo $(SOBJ)   >> $@
 	echo $(TILOBJ) >> $@
 	echo $(TILOBJ2) >> $@
