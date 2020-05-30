@@ -201,7 +201,7 @@ enum ms_sounds {
 #define G_EXTINCT       0x0001 /* population control; create no more */
 #define G_GONE          (G_GENOD | G_EXTINCT)
 #define MV_KNOWS_EGG    0x0008 /* player recognizes egg of this monster type */
-#define G_IGNORE        0x1000 /* for mkclass(), ignore G_GENOD|G_EXTINCT */
+#define G_IGNORE        0x2000 /* for mkclass(), ignore G_GENOD|G_EXTINCT */
 
 /* *INDENT-ON* */
 /* clang-format on */
