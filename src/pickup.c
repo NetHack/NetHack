@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1583515468 2020/03/06 17:24:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.263 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1590870789 2020/05/30 20:33:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,7 +36,6 @@ static void FDECL(do_boh_explosion, (struct obj *, BOOLEAN_P));
 static long FDECL(boh_loss, (struct obj *, int));
 static int FDECL(in_container, (struct obj *));
 static int FDECL(out_container, (struct obj *));
-static void FDECL(removed_from_icebox, (struct obj *));
 static long FDECL(mbag_item_gone, (int, struct obj *, BOOLEAN_P));
 static void FDECL(explain_container_prompt, (BOOLEAN_P));
 static int FDECL(traditional_loot, (BOOLEAN_P));
@@ -2353,12 +2352,8 @@ register struct obj *obj;
         obj->age = g.monstermoves - obj->age; /* actual age */
         /* stop any corpse timeouts when frozen */
         if (obj->otyp == CORPSE && obj->timed) {
-            long rot_alarm = stop_timer(ROT_CORPSE, obj_to_any(obj));
-
+            (void) stop_timer(ROT_CORPSE, obj_to_any(obj));
             (void) stop_timer(REVIVE_MON, obj_to_any(obj));
-            /* mark a non-reviving corpse as such */
-            if (rot_alarm)
-                obj->norevive = 1;
         }
     } else if (Is_mbag(g.current_container) && mbag_explodes(obj, 0)) {
         /* explicitly mention what item is triggering the explosion */
@@ -2487,14 +2482,17 @@ register struct obj *obj;
 }
 
 /* taking a corpse out of an ice box needs a couple of adjustments */
-static void
+void
 removed_from_icebox(obj)
 struct obj *obj;
 {
     if (!age_is_relative(obj)) {
         obj->age = g.monstermoves - obj->age; /* actual age */
-        if (obj->otyp == CORPSE)
+        if (obj->otyp == CORPSE) {
+            /* start a rot-away timer but not a troll's revive timer */
+            obj->norevive = 1;
             start_corpse_timeout(obj);
+        }
     }
 }
 
