@@ -233,7 +233,6 @@ U  = $(UTIL)/
 #  Tile related object files.
 #==========================================
 
-TILOBJ      = $(O)tile.o $(VIDEO_OBJ)
 PLANAR_TIB   = $(DAT)/NETHACK1.tib
 OVERVIEW_TIB = $(DAT)/NETHACKO.tib
 TILE_BMP     = $(DAT)/NHTILES.BMP
@@ -682,6 +681,11 @@ $(O)$(GAME).lnk: $(ALLOBJ)
 	echo $(VOBJ23) >> $@
 	echo $(VOBJ24) >> $@
 	echo $(VOBJ25) >> $@
+	echo $(VOBJ26) >> $@
+	echo $(VOBJ27) >> $@
+	echo $(VOBJ28) >> $@
+	echo $(VOBJ29) >> $@
+	echo $(VOBJ30) >> $@
 	echo $(SOBJ)   >> $@
 	echo $(TILOBJ) >> $@
 	echo $(TILOBJ2) >> $@
