@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.226 $ $NHDT-Date: 1590870784 2020/05/30 20:33:04 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.227 $ $NHDT-Date: 1590879610 2020/05/30 23:00:10 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -251,6 +251,7 @@ fix new "objects[0] class #1 not in order!" panic if plain 'char' is unsigned
 only generate shop items on solid floor squares
 avoid gcc 10 warning by removing duplicate definition of 'head_engr'
 if a monster removed a corpse from an ice box, the corpse would never rot away
+monster creation on quest levels could make genocided creatures
 
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display

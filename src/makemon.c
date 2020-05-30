@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1590621476 2020/05/27 23:17:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1590879611 2020/05/30 23:00:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.172 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,7 +16,7 @@
 
 static boolean FDECL(uncommon, (int));
 static int FDECL(align_shift, (struct permonst *));
-static boolean FDECL(mk_gen_ok, (int, int, int));
+static boolean FDECL(mk_gen_ok, (int, unsigned, unsigned));
 static boolean FDECL(wrong_elem_type, (struct permonst *));
 static void FDECL(m_initgrp, (struct monst *, int, int, int, int));
 static void FDECL(m_initthrow, (struct monst *, int, int));
@@ -1624,11 +1624,12 @@ rndmonst()
 /* decide whether it's ok to generate a candidate monster by mkclass() */
 static boolean
 mk_gen_ok(mndx, mvflagsmask, genomask)
-int mndx, mvflagsmask, genomask;
+int mndx;
+unsigned mvflagsmask, genomask;
 {
     struct permonst *ptr = &mons[mndx];
 
-    if ((g.mvitals[mndx].mvflags & mvflagsmask) && !(genomask & G_IGNORE))
+    if (g.mvitals[mndx].mvflags & mvflagsmask)
         return FALSE;
     if (ptr->geno & genomask)
         return FALSE;
@@ -1658,12 +1659,13 @@ int spc;
 struct permonst *
 mkclass_aligned(class, spc, atyp)
 char class;
-int spc;
+int spc; /* special mons[].geno handling */
 aligntyp atyp;
 {
     register int first, last, num = 0;
     int k, nums[SPECIAL_PM + 1]; /* +1: insurance for final return value */
-    int maxmlev, gmask, gehennom = Inhell != 0;
+    int maxmlev, gehennom = Inhell != 0;
+    unsigned mv_mask, gn_mask;
 
     (void) memset((genericptr_t) nums, 0, sizeof nums);
     maxmlev = level_difficulty() >> 1;
@@ -1685,6 +1687,13 @@ aligntyp atyp;
         return (struct permonst *) 0;
     }
 
+    mv_mask = G_GONE; /* G_GENOD | G_EXTINCT */
+    if ((spc & G_IGNORE) != 0) {
+        mv_mask = 0; /* mv_mask &= ~G_GONE; */
+        /* G_IGNORE is not a mons[].geno mask so get rid of it now */
+        spc &= ~G_IGNORE;
+    }
+
     /*  Assumption #2:  monsters of a given class are presented in ascending
      *                  order of strength.
      */
@@ -1696,13 +1705,12 @@ aligntyp atyp;
            the majority of major demons aren't constrained to Gehennom;
            arch- and master liches are always so constrained (for creation;
            lesser liches might grow up into them elsewhere) */
-        gmask = (G_NOGEN | G_UNIQ);
+        gn_mask = (G_NOGEN | G_UNIQ);
         if (rn2(9) || class == S_LICH)
-            gmask |= (gehennom ? G_NOHELL : G_HELL);
-        gmask &= ~spc;
-        gmask |= (spc & G_IGNORE);
+            gn_mask |= (gehennom ? G_NOHELL : G_HELL);
+        gn_mask &= ~spc;
 
-        if (mk_gen_ok(last, G_GONE, gmask)) {
+        if (mk_gen_ok(last, mv_mask, gn_mask)) {
             /* consider it; don't reject a toostrong() monster if we
                don't have anything yet (num==0) or if it is the same
                (or lower) difficulty as preceding candidate (non-zero
@@ -1748,7 +1756,7 @@ mkclass_poly(class)
 int class;
 {
     register int first, last, num = 0;
-    int gmask;
+    unsigned gmask;
 
     for (first = LOW_PM; first < SPECIAL_PM; first++)
         if (mons[first].mlet == class)
