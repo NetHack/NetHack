@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1590870784 2020/05/30 20:33:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.844 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1590904081 2020/05/31 05:48:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.847 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -464,6 +464,7 @@ E char *FDECL(mon_nam_too, (struct monst *, struct monst *));
 E char *FDECL(monverbself, (struct monst *, char *,
                             const char *, const char *));
 E char *FDECL(minimal_monnam, (struct monst *, BOOLEAN_P));
+E char *FDECL(bogusmon, (char *, char *));
 E char *FDECL(rndmonnam, (char *));
 E const char *FDECL(hcolor, (const char *));
 E const char *NDECL(rndcolor);
