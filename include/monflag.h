@@ -1,4 +1,4 @@
-/* NetHack 3.6	monflag.h	$NHDT-Date: 1585356420 2020/03/28 00:47:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6	monflag.h	$NHDT-Date: 1590879610 2020/05/30 23:00:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -194,14 +194,16 @@ enum ms_sounds {
 #define G_GENO          0x0020 /* can be genocided */
 #define G_NOCORPSE      0x0010 /* no corpse left ever */
 #define G_FREQ          0x0007 /* creation frequency mask */
+/* note: G_IGNORE controls handling of mvitals[].mvflags bits but is
+   passed to mkclass() as if it dealt with mons[].geno bits */
+#define G_IGNORE        0x8000 /* for mkclass(), ignore G_GENOD|G_EXTINCT */
 
 /* for g.mvitals[].mvflags (variant during game), along with G_NOCORPSE */
-#define G_KNOWN         0x0004 /* have been encountered */
-#define G_GENOD         0x0002 /* have been genocided */
-#define G_EXTINCT       0x0001 /* population control; create no more */
+#define G_KNOWN         0x04 /* have been encountered */
+#define G_GENOD         0x02 /* have been genocided */
+#define G_EXTINCT       0x01 /* population control; create no more */
 #define G_GONE          (G_GENOD | G_EXTINCT)
-#define MV_KNOWS_EGG    0x0008 /* player recognizes egg of this monster type */
-#define G_IGNORE        0x1000 /* for mkclass(), ignore G_GENOD|G_EXTINCT */
+#define MV_KNOWS_EGG    0x08 /* player recognizes egg of this monster type */
 
 /* *INDENT-ON* */
 /* clang-format on */

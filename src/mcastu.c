@@ -1,4 +1,4 @@
-/* NetHack 3.6	mcastu.c	$NHDT-Date: 1580633721 2020/02/02 08:55:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	mcastu.c	$NHDT-Date: 1590904092 2020/05/31 05:48:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -584,11 +584,11 @@ int spellnum;
            left, go for (sticks to) snakes.  -3. */
         struct permonst *pm = mkclass(S_ANT, 0);
         struct monst *mtmp2 = (struct monst *) 0;
-        char let = (pm ? S_ANT : S_SNAKE);
+        char whatbuf[QBUFSZ], let = (pm ? S_ANT : S_SNAKE);
         boolean success = FALSE, seecaster;
         int i, quan, oldseen, newseen;
         coord bypos;
-        const char *fmt;
+        const char *fmt, *what;
 
         oldseen = monster_census(TRUE);
         quan = (mtmp->m_lev < 2) ? 1 : rnd((int) mtmp->m_lev / 2);
@@ -606,22 +606,26 @@ int spellnum;
         }
         newseen = monster_census(TRUE);
 
-        /* not canspotmon(), which includes unseen things sensed via warning
-         */
+        /* not canspotmon() which includes unseen things sensed via warning */
         seecaster = canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters;
+        what = (let == S_SNAKE) ? "snakes" : "insects";
+        if (Hallucination)
+            what = makeplural(bogusmon(whatbuf, (char *) 0));
 
         fmt = 0;
         if (!seecaster) {
-            char *arg; /* [not const: upstart(N==1 ? an() : makeplural())] */
-            const char *what = (let == S_SNAKE) ? "snake" : "insect";
-
             if (newseen <= oldseen || Unaware) {
                 /* unseen caster fails or summons unseen critters,
                    or unconscious hero ("You dream that you hear...") */
-                You_hear("someone summoning %s.", makeplural(what));
+                You_hear("someone summoning %s.", what);
             } else {
+                char *arg;
+
+                if (what != whatbuf)
+                    what = strcpy(whatbuf, what);
                 /* unseen caster summoned seen critter(s) */
-                arg = (newseen == oldseen + 1) ? an(what) : makeplural(what);
+                arg = (newseen == oldseen + 1) ? an(makesingular(what))
+                                               : whatbuf;
                 if (!Deaf)
                     You_hear("someone summoning something, and %s %s.", arg,
                              vtense(arg, "appear"));
@@ -634,19 +638,21 @@ int spellnum;
            observe complete accuracy of that caster's results (in other
            words, no need to fuss with visibility or singularization;
            player is told what's happening even if hero is unconscious) */
-        } else if (!success)
-            fmt = "%s casts at a clump of sticks, but nothing happens.";
-        else if (let == S_SNAKE)
-            fmt = "%s transforms a clump of sticks into snakes!";
-        else if (Invis && !perceives(mtmp->data)
-                 && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-            fmt = "%s summons insects around a spot near you!";
-        else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-            fmt = "%s summons insects around your displaced image!";
-        else
-            fmt = "%s summons insects!";
+        } else if (!success) {
+            fmt = "%s casts at a clump of sticks, but nothing happens.%s";
+            what = "";
+        } else if (let == S_SNAKE) {
+            fmt = "%s transforms a clump of sticks into %s!";
+        } else if (Invis && !perceives(mtmp->data)
+                   && (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
+            fmt = "%s summons %s around a spot near you!";
+        } else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
+            fmt = "%s summons %s around your displaced image!";
+        } else {
+            fmt = "%s summons %s!";
+        }
         if (fmt)
-            pline(fmt, Monnam(mtmp));
+            pline(fmt, Monnam(mtmp), what);
 
         dmg = 0;
         break;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1586940208 2020/04/15 08:43:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1590904090 2020/05/31 05:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -22,7 +22,6 @@ static boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 static void FDECL(do_oname, (struct obj *));
 static char *FDECL(docall_xname, (struct obj *));
 static void NDECL(namefloorobj);
-static char *FDECL(bogusmon, (char *,char *));
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */
 
@@ -2059,7 +2058,7 @@ boolean ckloc;
 }
 
 /* fake monsters used to be in a hard-coded array, now in a data file */
-static char *
+char *
 bogusmon(buf, code)
 char *buf, *code;
 {

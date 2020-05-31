@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1581726278 2020/02/15 00:24:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1590870788 2020/05/30 20:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1958,6 +1958,8 @@ boolean vismon;
                     pline("%s removes %s.", upstart(mpronounbuf),
                           doname(xobj));
             }
+            if (container->otyp == ICE_BOX)
+                removed_from_icebox(xobj); /* resume rotting for corpse */
             /* obj_extract_self(xobj); -- already done above */
             (void) mpickobj(mon, xobj);
             res = 2;
