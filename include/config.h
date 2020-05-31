@@ -1,16 +1,10 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1590902639 2020/05/31 05:23:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1575245033 2019/12/02 00:03:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef CONFIG_H /* make sure the compiler does not see the typedefs twice */
 #define CONFIG_H
-
-#define MONITOR_HEAP
-#define EXTRA_SANITY_CHECKS
-#define DUMPLOG
-#define SCORE_ON_BOTL
-#define EDIT_GETLIN
 
 /*
  * Section 1:   Operating and window systems selection.
