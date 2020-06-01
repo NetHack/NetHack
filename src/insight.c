@@ -1883,7 +1883,7 @@ show_achievements(final)
 int final; /* used "behind the curtain" by enl_foo() macros */
 {
     int i, achidx, absidx, acnt;
-    char title[QBUFSZ], buf[QBUFSZ];
+    char title[QBUFSZ], buf[QBUFSZ], sokobuf[QBUFSZ];
     winid awin = WIN_ERR;
 
     /* unfortunately we can't show the achievements (at least not all of
@@ -1954,7 +1954,13 @@ int final; /* used "behind the curtain" by enl_foo() macros */
             you_have_X("entered Sokoban");
             break;
         case ACH_SOKO_PRIZE: /* hard to reach guaranteed bag or amulet */
-            you_have_X("completed Sokoban");
+            if (!u.uconduct.cheated)
+                you_have_X("completed Sokoban");
+            else {
+                Sprintf(sokobuf, "completed Sokoban... by cheating (%ld times)", 
+                    u.uconduct.cheated);
+                you_have_X(sokobuf);
+            }
             break;
         case ACH_MINE_PRIZE: /* hidden guaranteed luckstone */
             you_have_X("completed the Gnomish Mines");

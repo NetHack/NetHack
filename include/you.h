@@ -150,6 +150,7 @@ struct u_conduct {     /* number of times... */
     long polyselfs;    /* transformed yourself */
     long wishes;       /* used a wish */
     long wisharti;     /* wished for an artifact */
+    long cheated;      /* cheated at Sokoban */
     /* genocides already listed at end of game */
 };
 
