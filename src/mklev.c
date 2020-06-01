@@ -909,6 +909,7 @@ makelevel()
                         TRUE, VAULT, FALSE);
                 g.level.flags.has_vault = 1;
                 ++room_threshold;
+                g.rooms[g.nroom - 1].needfill = FILL_NORMAL;
                 fill_special_room(&g.rooms[g.nroom - 1]);
                 mk_knox_portal(g.vault_x + w, g.vault_y + h);
                 if (!g.level.flags.noteleport && !rn2(3))
