@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1590904081 2020/05/31 05:48:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.847 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1591017416 2020/06/01 13:16:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.848 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2536,9 +2536,11 @@ E void FDECL(initialspell, (struct obj *));
 
 #ifdef USE_TRAMPOLI
 E int NDECL(stealarm);
+E void NDECL(unstolenarm);
 #endif
 E long FDECL(somegold, (long));
 E void FDECL(stealgold, (struct monst *));
+E void NDECL(thiefdead);
 E void FDECL(remove_worn_item, (struct obj *, BOOLEAN_P));
 E int FDECL(steal, (struct monst *, char *));
 E int FDECL(mpickobj, (struct monst *, struct obj *));
