@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.227 $ $NHDT-Date: 1590879610 2020/05/30 23:00:10 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ $NHDT-Date: 1591017415 2020/06/01 13:16:55 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -190,6 +190,8 @@ when hold_another_object fails while hero is swallowed, drop the item into
 change mkclass() to usually honor (always honor for L class) the hell-only and
 	never-in-hell monster creation flags; no more achi-lich in the Castle
 	(nor master lich there unless demilich gets a potion of gain level)
+thieving monster could be killed while hero was removing armor, triggering
+	warning "stealarm(): dead monster stealing" when taking-off finished
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

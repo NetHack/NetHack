@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1586091449 2020/04/05 12:57:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.333 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1591017419 2020/06/01 13:16:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.337 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1977,6 +1977,8 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
     /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
     mtmp->mtrapped = 0;
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
+    if (mtmp->m_id == g.stealmid)
+        thiefdead();
     relobj(mtmp, 0, FALSE);
     if (onmap || mtmp == g.level.monsters[0][0]) {
         if (mtmp->wormno)

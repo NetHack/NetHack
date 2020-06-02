@@ -1,4 +1,4 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1570566382 2019/10/08 20:26:22 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.6	steal.c	$NHDT-Date: 1591017420 2020/06/01 13:17:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,26 +6,20 @@
 #include "hack.h"
 
 static int NDECL(stealarm);
-
+static int NDECL(unstolenarm);
 static const char *FDECL(equipname, (struct obj *));
 
 static const char *
 equipname(otmp)
 register struct obj *otmp;
 {
-    return ((otmp == uarmu)
-                ? "shirt"
-                : (otmp == uarmf)
-                      ? "boots"
-                      : (otmp == uarms)
-                            ? "shield"
-                            : (otmp == uarmg)
-                                  ? "gloves"
-                                  : (otmp == uarmc)
-                                        ? cloak_simple_name(otmp)
-                                        : (otmp == uarmh)
-                                              ? helm_simple_name(otmp)
-                                              : suit_simple_name(otmp));
+    return ((otmp == uarmu) ? shirt_simple_name(otmp)
+            : (otmp == uarmf) ? boots_simple_name(otmp)
+              : (otmp == uarms) ? shield_simple_name(otmp)
+                : (otmp == uarmg) ? gloves_simple_name(otmp)
+                  : (otmp == uarmc) ? cloak_simple_name(otmp)
+                    : (otmp == uarmh) ? helm_simple_name(otmp)
+                      : suit_simple_name(otmp));
 }
 
 /* proportional subset of gold; return value actually fits in an int */
@@ -139,9 +133,35 @@ register struct monst *mtmp;
     }
 }
 
-/* steal armor after you finish taking it off */
-unsigned int stealoid; /* object to be stolen */
-unsigned int stealmid; /* monster doing the stealing */
+/* monster who was stealing from hero has just died */
+void
+thiefdead()
+{
+    /* hero is busy taking off an item of armor which takes multiple turns */
+    g.stealmid = 0;
+    if (g.afternmv == stealarm)
+        g.afternmv = unstolenarm;
+}
+
+/* called via (*g.afternmv)() when hero finishes taking off armor that
+   was slated to be stolen but the thief died in the interim */
+static int
+unstolenarm(VOID_ARGS)
+{
+    struct obj *obj;
+
+    /* find the object before clearing stealoid; it has already become
+       not-worn and is still in hero's inventory */
+    for (obj = g.invent; obj; obj = obj->nobj)
+        if (obj->o_id == g.stealoid)
+            break;
+    g.stealoid = 0;
+    if (obj) {
+        g.nomovemsg = (char *) 0;
+        You("finish taking off your %s.", equipname(obj));
+    }
+    return 0;
+}
 
 static int
 stealarm(VOID_ARGS)
@@ -149,10 +169,13 @@ stealarm(VOID_ARGS)
     register struct monst *mtmp;
     register struct obj *otmp;
 
+    if (!g.stealoid || !g.stealmid)
+        goto botm;
+
     for (otmp = g.invent; otmp; otmp = otmp->nobj) {
-        if (otmp->o_id == stealoid) {
+        if (otmp->o_id == g.stealoid) {
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                if (mtmp->m_id == stealmid) {
+                if (mtmp->m_id == g.stealmid) {
                     if (DEADMONSTER(mtmp))
                         impossible("stealarm(): dead monster stealing");
                     if (!dmgtype(mtmp->data, AD_SITM)) /* polymorphed */
@@ -174,7 +197,7 @@ stealarm(VOID_ARGS)
         }
     }
  botm:
-    stealoid = 0;
+    g.stealoid = g.stealmid = 0; /* in case only one has been reset so far */
     return 0;
 }
 
@@ -236,10 +259,10 @@ boolean unchain_ball; /* whether to unpunish or just unwield */
     }
 }
 
-/* Returns 1 when something was stolen (or at least, when N should flee now)
- * Returns -1 if the monster died in the attempt
- * Avoid stealing the object stealoid
- * Nymphs and monkeys won't steal coins
+/* Returns 1 when something was stolen (or at least, when N should flee now),
+ * returns -1 if the monster died in the attempt.
+ * Avoid stealing the object 'stealoid'.
+ * Nymphs and monkeys won't steal coins.
  */
 int
 steal(mtmp, objnambuf)
@@ -326,7 +349,7 @@ char *objnambuf;
         otmp = uarm;
 
  gotobj:
-    if (otmp->o_id == stealoid)
+    if (otmp->o_id == g.stealoid)
         return 0;
 
     if (otmp->otyp == BOULDER && !throws_rocks(mtmp->data)) {
@@ -434,12 +457,8 @@ char *objnambuf;
                 remove_worn_item(otmp, TRUE);
                 otmp->cursed = curssv;
                 if (g.multi < 0) {
-                    /*
-                    multi = 0;
-                    afternmv = 0;
-                    */
-                    stealoid = otmp->o_id;
-                    stealmid = mtmp->m_id;
+                    g.stealoid = otmp->o_id;
+                    g.stealmid = mtmp->m_id;
                     g.afternmv = stealarm;
                     return 0;
                 }

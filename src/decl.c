@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1589326673 2020/05/12 23:37:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.212 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1591017417 2020/06/01 13:16:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.213 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -646,6 +646,10 @@ const struct instance_globals g_init = {
     /* spells.c */
     0, /* spl_sortmode */
     NULL, /* spl_orderindx */
+
+    /* steal.c */
+    0, /* stealoid */
+    0, /* stealmid */
 
     /* teleport.c */
     NULL, /* telescroll */

@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1589326665 2020/05/12 23:37:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1591017415 2020/06/01 13:16:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.237 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1141,6 +1141,10 @@ struct instance_globals {
     /* spells.c */
     int spl_sortmode;   /* index into spl_sortchoices[] */
     int *spl_orderindx; /* array of g.spl_book[] indices */
+
+    /* steal.c */
+    unsigned int stealoid; /* object to be stolen */
+    unsigned int stealmid; /* monster doing the stealing */
 
     /* teleport.c */
     struct obj *telescroll; /* non-null when teleporting via this scroll */
