@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.228 $ $NHDT-Date: 1591017415 2020/06/01 13:16:55 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.229 $ $NHDT-Date: 1591178395 2020/06/03 09:59:55 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -192,6 +192,8 @@ change mkclass() to usually honor (always honor for L class) the hell-only and
 	(nor master lich there unless demilich gets a potion of gain level)
 thieving monster could be killed while hero was removing armor, triggering
 	warning "stealarm(): dead monster stealing" when taking-off finished
+petrifying a long worm and then reanimating it handled tail incorrectly;
+	with sanity_check On, X coordinate of head segment was reported as 0
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
