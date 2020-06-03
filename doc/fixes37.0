@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.229 $ $NHDT-Date: 1591178395 2020/06/03 09:59:55 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.230 $ $NHDT-Date: 1591195832 2020/06/03 14:50:32 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -174,7 +174,7 @@ after "double trouble", cloned Wizard would wait until he had suffered some
 	Wizard but avoid that for clones
 beyond turn 100000, prayer timeout is longer (scaling with game length)
 falling while going down stairs and dropping items due to encumbrance or
-	punishment wasn't subject fragile ones to breakage
+	punishment wasn't subjecting fragile ones to breakage
 objects scattered by an explosion which land on water or lava weren't affected
 	by the water or lava
 hold_another_object (for wishing, horn of plenty, theft while poly'd, other
