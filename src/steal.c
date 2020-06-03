@@ -1,4 +1,4 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1591017420 2020/06/01 13:17:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6	steal.c	$NHDT-Date: 1591196090 2020/06/03 14:54:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -139,8 +139,10 @@ thiefdead()
 {
     /* hero is busy taking off an item of armor which takes multiple turns */
     g.stealmid = 0;
-    if (g.afternmv == stealarm)
+    if (g.afternmv == stealarm) {
         g.afternmv = unstolenarm;
+        g.nomovemsg = (char *) 0;
+    }
 }
 
 /* called via (*g.afternmv)() when hero finishes taking off armor that
@@ -157,7 +159,6 @@ unstolenarm(VOID_ARGS)
             break;
     g.stealoid = 0;
     if (obj) {
-        g.nomovemsg = (char *) 0;
         You("finish taking off your %s.", equipname(obj));
     }
     return 0;
