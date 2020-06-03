@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1580633722 2020/02/02 08:55:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	worm.c	$NHDT-Date: 1591178400 2020/06/03 10:00:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -126,9 +126,9 @@ int wseg_count;
     } else {
         wtails[wnum] = wheads[wnum] = seg = newseg();
         seg->nseg = (struct wseg *) 0;
-        seg->wx = worm->mx;
-        seg->wy = worm->my;
     }
+    seg->wx = worm->mx;
+    seg->wy = worm->my;
     wgrowtime[wnum] = 0L;
 }
 
@@ -144,14 +144,13 @@ toss_wsegs(curr, display_update)
 struct wseg *curr;
 boolean display_update;
 {
-    struct wseg *seg;
+    struct wseg *nxtseg;
 
     while (curr) {
-        seg = curr->nseg;
+        nxtseg = curr->nseg;
 
-        /* remove from level.monsters[][] */
-
-        /* need to check curr->wx for genocided while migrating_mon */
+        /* remove from level.monsters[][];
+           need to check curr->wx for genocided while migrating_mon */
         if (curr->wx) {
             remove_monster(curr->wx, curr->wy);
 
@@ -162,7 +161,7 @@ boolean display_update;
 
         /* free memory used by the segment */
         dealloc_seg(curr);
-        curr = seg;
+        curr = nxtseg;
     }
 }
 
@@ -313,7 +312,6 @@ struct monst *worm;
     int wnum = worm->wormno;
 
     worm->wormno = 0;
-
     /*  This will also remove the real monster (ie 'w') from the its
      *  position in level.monsters[][].
      */
@@ -505,11 +503,9 @@ boolean use_detection_glyph;
     int what_tail = what_mon(PM_LONG_WORM_TAIL, newsym_rn2);
 
     while (curr != wheads[worm->wormno]) {
-        num = use_detection_glyph
-            ? detected_monnum_to_glyph(what_tail)
-            : (worm->mtame
-               ? petnum_to_glyph(what_tail)
-               : monnum_to_glyph(what_tail));
+        num = use_detection_glyph ? detected_monnum_to_glyph(what_tail)
+              : worm->mtame ? petnum_to_glyph(what_tail)
+                : monnum_to_glyph(what_tail);
         show_glyph(curr->wx, curr->wy, num);
         curr = curr->nseg;
     }
@@ -612,6 +608,7 @@ NHFILE *nhfp;
  *  place_wsegs()
  *
  *  Place the segments of the given worm.  Called from restore.c
+ *  and from replmon() in mon.c.
  *  If oldworm is not NULL, assumes the oldworm segments are on map
  *  in the same location as worm segments
  */
@@ -622,40 +619,63 @@ struct monst *worm, *oldworm;
     struct wseg *curr = wtails[worm->wormno];
 
     while (curr != wheads[worm->wormno]) {
-        xchar x = curr->wx;
-        xchar y = curr->wy;
+        xchar x = curr->wx, y = curr->wy;
+        struct monst *mtmp = m_at(x, y);
 
-        if (oldworm) {
-            if (m_at(x,y) == oldworm)
-                remove_monster(x, y);
-            else
-                impossible("placing worm seg <%i,%i> over another mon", x, y);
-        }
+        if (oldworm && mtmp == oldworm)
+            remove_monster(x, y);
+        else if (mtmp)
+            impossible("placing worm seg <%d,%d> over another mon", x, y);
+        else if (oldworm)
+            impossible("replacing worm seg <%d,%d> on empty spot", x, y);
+
         place_worm_seg(worm, x, y);
         curr = curr->nseg;
     }
+    /* head segment is co-located with worm itself so not placed on the map */
+    curr->wx = worm->mx, curr->wy = worm->my;
 }
 
+/* called from mon_sanity_check(mon.c) */
 void
 sanity_check_worm(worm)
 struct monst *worm;
 {
     struct wseg *curr;
+    int wnum, x, y;
 
-    if (!worm)
-        panic("no worm!");
-    if (!worm->wormno)
-        panic("not a worm?!");
+    if (!worm) {
+        impossible("worm_sanity: null monster!");
+        return;
+    }
+    /* note: wormno can't be less than 0 (unsigned bit field) and can't
+       be greater that MAX_NUM_WORMS - 1 (which uses all available bits)
+       so checking for 0 is all we can manage for wormno validation;
+       since caller has already done that, this is rather pointless... */
+    if (!worm->wormno) {
+        impossible("worm_sanity: not a worm!");
+        return;
+    }
 
-    curr = wtails[worm->wormno];
+    wnum = worm->wormno;
+    if (!wtails[wnum] || !wheads[wnum]) {
+        impossible("wormno %d is set without proper tail", wnum);
+        return;
+    }
+    /* if worm is migrating, we can't check its segments against the map */
+    if (!worm->mx)
+        return;
 
-    while (curr != wheads[worm->wormno]) {
-        if (curr->wx) {
-            if (!isok(curr->wx, curr->wy))
-                panic("worm seg not isok");
-            if (g.level.monsters[curr->wx][curr->wy] != worm)
-                panic("worm not at seg location");
-        }
+    curr = wtails[wnum];
+    while (curr != wheads[wnum]) {
+        x = curr->wx, y = curr->wy;
+        if (!isok(x, y))
+            impossible("worm seg not isok <%d,%d>", x, y);
+        else if (g.level.monsters[x][y] != worm)
+            impossible("mon (%s) at seg location is not worm (%s)",
+                       fmt_ptr((genericptr_t) g.level.monsters[x][y]),
+                       fmt_ptr((genericptr_t) worm));
+
         curr = curr->nseg;
     }
 }
