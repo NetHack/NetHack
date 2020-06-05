@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1591178401 2020/06/03 10:00:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.341 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1591219976 2020/06/03 21:32:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.342 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -589,7 +589,8 @@ boolean adjacentok; /* False: at obj's spot only, True: nearby is allowed */
                         /* in case mtmp2 is a long worm; saved traits for
                            long worm don't include tail segments so don't
                            give mtmp any; it will be given a new 'wormno'
-                           though unless those are exhausted */
+                           though (unless those are exhausted) so be able
+                           to grow new tail segments */
                         | MM_NOTAIL
                         | (adjacentok ? MM_ADJACENTOK : 0)));
         if (!mtmp) {
