@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.230 $ $NHDT-Date: 1591195832 2020/06/03 14:50:32 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.231 $ $NHDT-Date: 1591476281 2020/06/06 20:44:41 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -363,6 +363,8 @@ new objects:  amulets of flying and guarding
 new monsters:  displacer beast ('f') and genetic engineer ('Q')
 make camera flash which reveals previously unseen map features or objects or
 	monsters record those on the hero's map; monsters revert to 'unseen'
+boolean options can optionally have the form "name:value" with value taken
+	from among "true", "yes", "on", or "false", "no", "off"
 
 
 Platform- and/or Interface-Specific New Features
