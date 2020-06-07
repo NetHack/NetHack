@@ -365,6 +365,7 @@ make camera flash which reveals previously unseen map features or objects or
 	monsters record those on the hero's map; monsters revert to 'unseen'
 boolean options can optionally have the form "name:value" with value taken
 	from among "true", "yes", "on", or "false", "no", "off"
+record number of wishes and artifact wishes in xlogfile
 
 
 Platform- and/or Interface-Specific New Features
