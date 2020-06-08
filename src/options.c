@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1590263453 2020/05/23 19:50:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.465 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1591476281 2020/06/06 20:44:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.466 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -363,10 +363,12 @@ boolean tinitial, tfrom_file;
             }
         }
 
+#if 0
         if (!got_match) {
             if (has_val && !allopt[i].valok)
                 continue;
         }
+#endif
 
         /*
          * During option initialization, the function
@@ -377,13 +379,13 @@ boolean tinitial, tfrom_file;
          *
          */
         if (!got_match)
-            got_match = match_optname(opts, allopt[i].name, allopt[i].minmatch,
-                                      allopt[i].valok);
+            got_match = match_optname(opts, allopt[i].name,
+                                      allopt[i].minmatch, TRUE);
         if (got_match) {
             if (!allopt[i].pfx && optlen < allopt[i].minmatch) {
                 config_error_add(
-              "Ambiguous option %s, %d characters are needed to differentiate",
-                             opts, allopt[i].minmatch);
+             "Ambiguous option %s, %d characters are needed to differentiate",
+                                 opts, allopt[i].minmatch);
                 break;
             }
             matchidx = i;
@@ -403,7 +405,7 @@ boolean tinitial, tfrom_file;
                 continue;
             got_match = match_optname(opts, allopt[i].alias,
                                       (int) strlen(allopt[i].alias),
-                                      allopt[i].valok);
+                                      TRUE);
             if (got_match) {
                 matchidx = i;
                 using_alias = TRUE;
@@ -432,8 +434,8 @@ boolean tinitial, tfrom_file;
          */
         if (allopt[matchidx].optfn) {
             op = string_for_opt(opts, TRUE);
-            optresult = (*allopt[matchidx].optfn)(allopt[matchidx].idx, do_set,
-                                                  negated, opts, op);
+            optresult = (*allopt[matchidx].optfn)(allopt[matchidx].idx,
+                                                  do_set, negated, opts, op);
         }
     }
 
@@ -4445,15 +4447,20 @@ char *op;
 
         op = string_for_opt(opts, TRUE);
         if (op != empty_optstr) {
+            int ln;
+
             if (negated) {
                 config_error_add(
-                    "Negated boolean '%s' should not have a parameter",
-                    allopt[optidx].name);
+                           "Negated boolean '%s' should not have a parameter",
+                                 allopt[optidx].name);
                 return optn_err;
             }
-            if (!strcmp(op, "true") || !strcmp(op, "yes")) {
+            ln = (int) strlen(op);
+            if (!strncmpi(op, "true", max(ln, 3))
+                || !strcmpi(op, "yes") || !strcmpi(op, "on")) {
                 negated = FALSE;
-            } else if (!strcmp(op, "false") || !strcmp(op, "no")) {
+            } else if (!strncmpi(op, "false", max(ln, 3))
+                       || !strcmpi(op, "no") || !strcmpi(op, "off")) {
                 negated = TRUE;
             } else if (!allopt[optidx].valok) {
                 config_error_add("Illegal parameter for a boolean");
