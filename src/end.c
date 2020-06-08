@@ -39,7 +39,7 @@ static void NDECL(dump_plines);
 static void FDECL(dump_everything, (int, time_t));
 
 #if defined(__BEOS__) || defined(MICRO) || defined(OS2) || defined(WIN32)
-extern void FDECL(nethack_exit, (int)) NORETURN;
+extern void FDECL(nethack_exit, (int));
 #else
 #define nethack_exit exit
 #endif
