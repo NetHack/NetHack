@@ -1726,9 +1726,6 @@ int status;
 #endif
     g.program_state.exiting = 1;
     nethack_exit(status);
-#ifdef MSDOS
-    exit(EXIT_SUCCESS);
-#endif
 }
 
 /* set a delayed killer, ensure non-delayed killer is cleared out */
