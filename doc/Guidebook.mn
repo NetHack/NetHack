@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7-Mar2020 $:$NHDT-Revision: 1.347 $ $NHDT-Date: 1583508684 2020/03/06 15:31:24 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.379 $ $NHDT-Date: 1592607019 2020/06/19 22:50:19 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -2725,7 +2725,7 @@ Persistence of Objects
 .pg
 Normally, if you have seen an object at a particular map location and
 move to another location where you can't directly see that object any
-more, if will continue to be displayed on your map.
+more, it will continue to be displayed on your map.
 That remains the case even if it is not actually there any more \(em
 perhaps a monster has picked it up or it has rotted away \(em
 until you can see or feel that location again.
