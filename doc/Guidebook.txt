@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                    March 8, 2020
+                                    June 20, 2020
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -456,7 +456,7 @@
           scribe things that are impossible to represent visually.  If  you
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -786,7 +786,7 @@
                Di  - examine your inventory before dropping anything.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -984,7 +984,7 @@
                hand and it will generally be less effective than when shot.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1050,7 +1050,7 @@
                from normal play to "explore mode", also known as "discovery
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1116,7 +1116,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1182,7 +1182,7 @@
                not  have  a  name,  only  other  stacks  with  no  name are
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1248,7 +1248,7 @@
                Dip  an  object into something.  Autocompletes.  Default key
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1446,7 +1446,7 @@
                it.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1578,7 +1578,7 @@
                Show bare  map  without  displaying  monsters,  objects,  or
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1908,7 +1908,7 @@
           will  set  off  the  trap's  explosion.   (If  you  decline,  you
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2106,7 +2106,7 @@
           that you're able to do so, moving onto water or lava or ice  will
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2172,7 +2172,7 @@
           your intent.  By default  an  answer  of  `y'  acknowledges  that
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2238,7 +2238,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2304,7 +2304,7 @@
           you are  carrying  around  with  you  through  the  dungeon  will
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2370,7 +2370,7 @@
           situation; make of that what you will.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2436,7 +2436,7 @@
           the  `x'  command,  which  exchanges  your primary (the one being
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2502,7 +2502,7 @@
           a  chance  to  fire varies from turn to turn.  You can explicitly
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2568,7 +2568,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2634,7 +2634,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2700,7 +2700,7 @@
           give  you special powers when you eat them.  A good rule of thumb
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2766,7 +2766,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2832,7 +2832,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2898,7 +2898,7 @@
           tools have a limited number of uses, akin to wand  charges.   For
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -2964,7 +2964,7 @@
           They are also a far more efficient way of carrying  your  riches.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3030,7 +3030,7 @@
           unseen monster" marker.  When that marker is later removed  after
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3096,7 +3096,7 @@
           foodless conducts.  This includes tripe rations, the  corpses  or
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3228,7 +3228,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3294,7 +3294,7 @@
           ent operating systems.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3360,7 +3360,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3426,7 +3426,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3492,7 +3492,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3558,7 +3558,7 @@
           as  a  file  name.   If  it  does  start with `/', the at-sign is
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3624,7 +3624,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3690,7 +3690,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3756,7 +3756,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3822,7 +3822,7 @@
             aren't interrupted with the "More info?" prompt,  but  it  also
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3888,7 +3888,7 @@
             held by your character as lit (default off).  Persistent.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -3954,7 +3954,7 @@
             Implemented by the Amiga, Gem and tty ports.  Default `^'.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4020,7 +4020,7 @@
             Allow use of the mouse for input and  travel.   Valid  settings
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4086,7 +4086,7 @@
              2 - like 1 but `5' works as `g' prefix instead of as `G'
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4152,7 +4152,7 @@
             By  default,  the  pray choice is enabled, the others disabled.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4218,7 +4218,7 @@
             If this option is on and autopickup is also on, try to pick  up
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4350,7 +4350,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4416,7 +4416,7 @@
             symbols.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4482,7 +4482,7 @@
             through   next  and  previous  targets,  allows  filtering  the
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4548,7 +4548,7 @@
           ing to suit your preferences, it will attempt to  do  so.  If  it
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4614,7 +4614,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4680,7 +4680,7 @@
             Not all ports support this option.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4746,7 +4746,7 @@
                  2 - auto, on if display is at least (24+2)x(80+2)  (default)
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4812,7 +4812,7 @@
             a second ESC to finish  cancelling  such  a  count.   At  other
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4878,7 +4878,7 @@
             Set the color palette for PC systems  using  NO_TERMS  (default
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -4944,7 +4944,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5010,7 +5010,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5076,7 +5076,7 @@
             When asked for a location, the key to go  to  previous  closest
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5142,7 +5142,7 @@
             location.  Default is `z'.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5208,7 +5208,7 @@
                     sage is shown in between.
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5274,7 +5274,7 @@
             specifies  that  any menu line with " blessed " contained in it
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5340,7 +5340,7 @@
           OPTION=hilite_status:hitpoints/<=30%/red/normal
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5406,7 +5406,7 @@
             deaf,  stun,  conf,  hallu,  lev,  fly,  and ride.  You can use
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5472,7 +5472,7 @@
                  tle".   For  title,  only the role's rank title is tested;
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5538,7 +5538,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5670,7 +5670,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5736,7 +5736,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5802,7 +5802,7 @@
           to an executable, which will be executed with the game message as
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5868,7 +5868,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -6066,7 +6066,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -6132,7 +6132,7 @@
           Macintosh.  Along with various other Dungeoneers, they  continued
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -6264,7 +6264,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -6330,7 +6330,7 @@
           Jessie   Collet,   Ken  Lorber,  Dean  Luick,  Pat  Rankin,  Mike
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -6396,7 +6396,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -6462,7 +6462,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
@@ -6528,7 +6528,7 @@
 
 
 
-          NetHack 3.7                                         March 8, 2020
+          NetHack 3.7                                         June 20, 2020
 
 
 
