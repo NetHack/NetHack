@@ -5932,11 +5932,28 @@ was responsible for the VMS version of {\it NetHack\/} 3.1.
 
 %.pg
 \medskip
-\nd {\it Dean Luick}, with help from {\it David Cohrs}, developed {\it NetHack\/}
-3.1 for X11.
-{\it Warwick Allison} wrote a tiled version of {\it NetHack\/} for the Atari;
-he later contributed the tiles to the {\it NetHack Development Team} and tile support was
-then added to other platforms.
+\nd {\it Dean Luick}, with help from {\it David Cohrs}, developed
+{\it NetHack\/} 3.1 for X11.
+It drew the map as text rather than graphically but
+included {\tt nh10.bdf}, an optionally used custom X11 font which has
+tiny images in place of letters and punctuation, a precursor of tiles.
+Those images don't extend to individual monster and object types, just
+replacements for monster and object classes (so one custom image for all
+``{\tt a}'' insects and another for all ``{\tt [}'' armor and so
+forth, not separate images for beetles and ants or for cloaks and boots).
+
+%.pg
+\medskip
+\nd {\it Warwick Allison\/} wrote a graphically displayed version
+of {\it NetHack\/}
+for the Atari where the tiny pictures were described as ``icons'' and
+were distinct for specific types of monsters and objects rather than just
+their classes.
+He contributed them to the {\it NetHack Development Team\/} which
+rechristened them ``tiles'', original usage which has subsequently been
+picked up by various other games.
+{\it NetHack's\/} tiles support was then implemented on other platforms
+(initially MS-DOS but eventually Windows, Qt, and X11 too).
 
 %.pg
 \medskip
@@ -5966,7 +5983,9 @@ available:
 %.pg
 \medskip
 {\it Tom Proudfoot} and {\it Yuval Oren} created {\it NetHack++},
-which was quickly renamed {\it NetHack$--$}.
+which was quickly renamed {\it NetHack$--$\/}
+when some people incorrectly assumed that it was a conversion of the
+{\it C\/} source code to {\it C++}.
 Working independently, {\it Stephen White} wrote {\it NetHack Plus}.
 {\it Tom Proudfoot} later merged {\it NetHack Plus}
 and his own {\it NetHack$--$} to produce {\it SLASH}.

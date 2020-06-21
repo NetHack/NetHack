@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.381 $ $NHDT-Date: 1592701649 2020/06/21 01:07:29 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.382 $ $NHDT-Date: 1592708267 2020/06/21 02:57:47 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -5418,11 +5418,25 @@ ported NetHack 3.1 to the Atari.  \fBPat Rankin\fP, with help from
 \fBJoshua Delahunty\fP, was responsible for the VMS version of NetHack 3.1.
 \fBMichael Allison\fP ported NetHack 3.1 to Windows NT.
 .pg
-\fBDean Luick\fP, with help from \fBDavid Cohrs\fP, developed NetHack
-3.1 for X11.
-\fBWarwick Allison\fP wrote a tiled version of NetHack for the Atari;
-he later contributed the tiles to the NetHack Development Team and tile support was
-then added to other platforms.
+\fBDean Luick\fP, with help from \fBDavid Cohrs\fP, developed
+NetHack 3.1 for X11.
+It drew the map as text rather than graphically but
+included \f(CRnh10.bdf\fP, an optionally used custom X11 font which has
+tiny images in place of letters and punctuation, a precursor of tiles.
+Those images don't extend to individual monster and object types, just
+replacements for monster and object classes (so one custom image for all
+\(lq\f(CRa\fP\(rq insects and another for all \(lq\f(CR[\fP\(rq armor and so
+forth, not separate images for beetles and ants or for cloaks and boots).
+.pg
+\fBWarwick Allison\fP wrote a graphically displayed version of NetHack
+for the Atari where the tiny pictures were described as \(lqicons\(rq and
+were distinct for specific types of monsters and objects rather than just
+their classes.
+He contributed them to the \fBNetHack Development Team\fP which rechristened
+them \(lqtiles\(rq, original usage which has subsequently been picked up
+by various other games.
+NetHack's tiles support was then implemented on other platforms
+(initially MS-DOS but eventually Windows, Qt, and X11 too).
 .pg
 The 3.2 NetHack Development Team, comprised of \fBMichael Allison\fP, \fBKen
 Arromdee\fP, \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSteve Creps\fP,
@@ -5445,7 +5459,9 @@ their own modifications to the game and made these \(lqvariants\(rq publicly
 available:
 .pg
 \fBTom Proudfoot\fP and \fBYuval Oren\fP created NetHack++,
-which was quickly renamed NetHack--.
+which was quickly renamed NetHack--
+when some people incorrectly assumed that it was a conversion of the
+\fIC\fP source code to \fIC++\fP.
 Working independently, \fBStephen White\fP wrote NetHack Plus.
 \fBTom Proudfoot\fP later merged NetHack Plus
 and his own NetHack-- to produce SLASH.

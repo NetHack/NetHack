@@ -65,9 +65,20 @@ for the VMS version of NetHack 3.1.  Michael Allison ported NetHack 3.1 to
 Windows NT.
 
 Dean Luick, with help from David Cohrs, developed NetHack 3.1 for X11.
-Warwick Allison wrote a tiled version of NetHack for the Atari;
-he later contributed the tiles to the NetHack Development Team and tile
-support was then added to other platforms.
+It drew the map as text rather than graphically but included nh10.bdf, an
+optionally used custom X11 font which has tiny images in place of letters and
+punctuation, a precursor of tiles.  Those images didn't extend to individual
+monster and object types, just replacements for monster and object classes
+(so one custom image for all "a" insects and another for all "[" armor and
+so forth, not separate images for beetles and ants or for cloaks and boots).
+
+Warwick Allison wrote a graphically displayed version of NetHack for the
+Atari where the tiny pictures were described as "icons" and were distinct
+for specific types of monsters and objects rather than just their classes.
+He contributed them to the NetHack Development Team which rechristened them
+"tiles", original usage which has subsequently been picked up by various
+other games.  NetHack's tiles support was then implemented on other platforms
+(initially MS-DOS but eventually Windows, Qt, and X11 too).
 
 The 3.2 NetHack Development Team, comprised of Michael Allison, Ken Arromdee, 
 David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, Steve
@@ -91,11 +102,12 @@ added their own modifications to the game and made these "variants" publicly
 available:
 
 Tom Proudfoot and Yuval Oren created NetHack++, which was quickly renamed
-NetHack--.  Working independently, Stephen White wrote NetHack Plus.
-Tom Proudfoot later merged NetHack Plus and his own NetHack-- to produce
-SLASH.  Larry Stewart-Zerba and Warwick Allison improved the spellcasting
-system with the Wizard Patch.  Warwick Allison also ported NetHack to use
-the Qt interface.
+NetHack-- when some people incorrectly assumed that it was a conversion
+of the C source code to C++.  Working independently, Stephen White wrote
+NetHack Plus.  Tom Proudfoot later merged NetHack Plus and his own NetHack--
+to produce SLASH.  Larry Stewart-Zerba and Warwick Allison improved the
+spellcasting system with the Wizard Patch.  Warwick Allison also ported
+NetHack to use the Qt interface.
 
 Warren Cheung combined SLASH with the Wizard Patch to produce Slash'em, and
 with the help of Kevin Hugo, added more features.  Kevin later joined the
