@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.231 $ $NHDT-Date: 1591476281 2020/06/06 20:44:41 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ $NHDT-Date: 1592875138 2020/06/23 01:18:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -194,6 +194,8 @@ thieving monster could be killed while hero was removing armor, triggering
 	warning "stealarm(): dead monster stealing" when taking-off finished
 petrifying a long worm and then reanimating it handled tail incorrectly;
 	with sanity_check On, X coordinate of head segment was reported as 0
+attempting to read a novel while blind reported "you can't read the mystic
+	runes" like for a spellbook; use "you can't read the words" for novel
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
