@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.382 $ $NHDT-Date: 1592708267 2020/06/21 02:57:47 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.383 $ $NHDT-Date: 1593219357 2020/06/27 00:55:57 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -5341,17 +5341,17 @@ Credits
 .pg
 The original \fIhack\fP game was modeled on the Berkeley
 .UX
-\fIrogue\fP game.  Large portions of this paper were shamelessly
+\fIrogue\fP game.  Large portions of this document were shamelessly
 cribbed from \fIA Guide to the Dungeons of Doom\fP, by Michael C. Toy
 and Kenneth C. R. C. Arnold.  Small portions were adapted from
 \fIFurther Exploration of the Dungeons of Doom\fP, by Ken Arromdee.
 .pg
-NetHack is the product of literally dozens of people's work.
+NetHack is the product of literally scores of people's work.
 Main events in the course of the game development are described below:
 .
 .pg
 \fBJay Fenlason\fP wrote the original Hack, with help from
-\fBKenny Woodland\fP, \fBMike Thome\fP and \fBJon Payne\fP.
+\fBKenny Woodland\fP, \fBMike Thome\fP, and \fBJon Payne\fP.
 .pg
 \fBAndries Brouwer\fP did a major re-write, transforming Hack into a
 very different game, and published (at least) three versions (1.0.1,
@@ -5361,17 +5361,19 @@ machines to the Usenet.
 .pg
 \fBDon G. Kneller\fP ported Hack 1.0.3 to Microsoft C and MS-DOS, producing PC
 HACK 1.01e, added support for DEC Rainbow graphics in version 1.03g, and went
-on to produce at least four more versions (3.0, 3.2, 3.51, and 3.6).
+on to produce at least four more versions (3.0, 3.2, 3.51, and 3.6;
+note that these are old Hack version numbers, not contemporary NetHack ones).
 .pg
 \fBR. Black\fP ported PC HACK 3.51 to Lattice C and the Atari 520/1040ST,
 producing ST Hack 1.03.
 .pg
 \fBMike Stephenson\fP merged these various versions back together,
-incorporating many of the added features, and produced NetHack 1.4.
+incorporating many of the added features, and produced NetHack version 1.4
+in 1987.
 He then coordinated a cast of thousands in enhancing and debugging
 NetHack 1.4 and released NetHack versions 2.2 and 2.3.
 .pg
-Later, Mike coordinated a major rewrite of the game, heading a
+Later, Mike coordinated a major re-write of the game, heading a
 team which included \fBKen Arromdee\fP, \fBJean-Christophe Collet\fP, \fBSteve
 Creps\fP, \fBEric Hendrickson\fP, \fBIzchak Miller\fP, \fBJohn Rupley\fP,
 \fBMike Threepoint\fP, and \fBJanet Walz\fP, to produce NetHack 3.0c.
@@ -5388,8 +5390,15 @@ NetHack 3.0 to the Macintosh.  Along with various other Dungeoneers, they
 continued to enhance the PC, Macintosh, and Amiga ports through the later
 revisions of 3.0.
 .pg
+Version 3.0 went through ten relatively rapidly released \(lqpatch-level\(rq
+revisions.
+Versions at the time were designated \(lq3.0 patchlevel 10\(rq
+or \(lq3.0pl10\(rq rather than 3.0.10; that three component numbering scheme
+began to be used with 3.1.0.
+.pg
 Headed by \fBMike Stephenson\fP and coordinated by \fBIzchak Miller\fP and
-\fBJanet Walz\fP, the NetHack Development Team which now included \fBKen Arromdee\fP,
+\fBJanet Walz\fP, the NetHack Development Team which now included
+\fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJean-Christophe Collet\fP, \fBKevin Darcy\fP,
 \fBMatt Day\fP, \fBTimo Hakulinen\fP, \fBSteve Linhart\fP, \fBDean Luick\fP,
 \fBPat Rankin\fP, \fBEric Raymond\fP, and \fBEric Smith\fP undertook a radical
@@ -5453,6 +5462,10 @@ and 3.2, one of the founding members of the NetHack Development Team, \fBDr. Izc
 Miller\fP, was diagnosed with cancer and passed away.  That release of the
 game was dedicated to him by the development and porting teams.
 .pg
+Version 3.2 proved to be more stable than previous versions.
+Many bugs were fixed, abuses eliminated, and game features tuned for
+better game play.
+.pg
 During the lifespan of NetHack 3.1 and 3.2, several enthusiasts
 of the game added
 their own modifications to the game and made these \(lqvariants\(rq publicly
@@ -5471,8 +5484,8 @@ casting system with the Wizard Patch.
 .pg
 \fBWarren Cheung\fP combined SLASH with the Wizard Patch to produce Slash'EM,
 and with the help of \fBKevin Hugo\fP, added more features.
-Kevin later joined the
-NetHack Development Team and incorporated the best of these ideas in NetHack 3.3.
+Kevin later joined the NetHack Development Team and incorporated the best
+of these ideas into NetHack 3.3.
 .pg
 The final update to 3.2 was the bug fix release 3.2.3, which was released
 simultaneously with 3.3.0 in December 1999 just in time for the Year 2000.
@@ -5542,15 +5555,17 @@ during the tenure of 3.4.3. It was during that same period that several new
 variants emerged within the NetHack community. Notably sporkhack by
 \fBDerek S. Ray\fP, unnethack by \fBPatric Mueller\fP, nitrohack and its
 successors originally by \fBDaniel Thaler\fP and then by \fBAlex Smith\fP,
-and Dynahack by \fBTung Nguyen\fP. Some of those variants continue to be
+and Dynahack by \fBTung Nguyen\fP.
+Some of those variants continue to be
 developed, maintained, and enjoyed by the community to this day.
 .pg
 In September 2014, an interim snapshot of the code under development was
-released publicly by other parties. Since that code was a work-in-progress
+released publicly by other parties.
+Since that code was a work-in-progress
 and had not gone through the process of debugging it as a suitable release,
 it was decided that the version numbers present on that code snapshot would
-be retired and never used in an official NetHack release. An announcement
-was posted on the NetHack Development Team's official
+be retired and never used in an official NetHack release.
+An announcement was posted on the NetHack Development Team's official
 .UR nethack.org
 website to that effect,
 stating that there would never be a 3.4.4, 3.5, or 3.5.0 official release
@@ -5568,9 +5583,10 @@ In early 2015, ahead of the release of 3.6.0, new members
 \fBSean Hunt\fP, \fBPasi Kallinen\fP, and \fBDerek S. Ray\fP
 joined the NetHack Development Team.
 .pg
-Near the end of the development of 3.6.0, one of the significant inspirations for many of
-the humorous and fun features found in the game, author Terry Pratchett,
-passed away. NetHack 3.6.0 introduced a tribute to him.
+Near the end of the development of 3.6.0, one of the significant
+inspirations for many of the humorous and fun features found in the
+game, author Terry Pratchett, passed away.
+NetHack 3.6.0 introduced a tribute to him.
 .pg
 3.6.0 was released in December 2015, and merged work done by the development
 team since the release of 3.4.3 with some of the beloved community
@@ -5595,7 +5611,7 @@ hindered by limited access. \fBKevin Smolkowski\fP has updated and tested it
 for the most recent version of OpenVMS (V8.4 as of this writing) on Alpha
 and Integrity (aka Itanium aka IA64) but not VAX.
 .pg
-\fBRay Chason\fP resurrected the msdos port for 3.6 and contributed the
+\fBRay Chason\fP resurrected the MS-DOS port for 3.6 and contributed the
 necessary updates to the community at large.
 .pg
 In late April 2018, several hundred bug fixes for 3.6.0 and
@@ -5637,7 +5653,7 @@ again to \fBM. Drew Streib\fP and \fBPasi Kallinen\fP for providing a
 public NetHack server at nethack.alt.org. Thanks to \fBKeith Simpson\fP
 and \fBAndy Thomson\fP for hardfought.org. Thanks to all those
 unnamed dungeoneers who invest their time and effort into annual
-NetHack tournaments such as Junethack, The November NetHack Tournament
+NetHack tournaments such as Junethack, The November NetHack Tournament,
 and in days past, devnull.net (gone for now, but not forgotten).
 .pg
 .ce
