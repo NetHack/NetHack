@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ $NHDT-Date: 1592875138 2020/06/23 01:18:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.234 $ $NHDT-Date: 1593309675 2020/06/28 02:01:15 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -196,6 +196,9 @@ petrifying a long worm and then reanimating it handled tail incorrectly;
 	with sanity_check On, X coordinate of head segment was reported as 0
 attempting to read a novel while blind reported "you can't read the mystic
 	runes" like for a spellbook; use "you can't read the words" for novel
+don't let life draining reduce a monster's max HP below its level + 1
+report "<Mon> expires" rather than "<Mon> dies" if polymorphed hero kills a
+	non-living monster (golem, vortex) with life drain (vampire bite)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
