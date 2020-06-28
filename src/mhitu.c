@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1586913203 2020/04/15 01:13:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.187 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1593306907 2020/06/28 01:15:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1232,10 +1232,13 @@ register struct attack *mattk;
             }
         }
         break;
-    case AD_DRLI:
+    case AD_DRLI: /* drain life */
         hitmsg(mtmp, mattk);
         if (uncancelled && !rn2(3) && !Drain_resistance) {
             losexp("life drainage");
+
+            /* unlike hitting with Stormbringer, wounded attacker doesn't
+               heal any from the drained life */
         }
         break;
     case AD_LEGS: {
