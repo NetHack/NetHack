@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.234 $ $NHDT-Date: 1593309675 2020/06/28 02:01:15 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.235 $ $NHDT-Date: 1593611274 2020/07/01 13:47:54 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -199,6 +199,8 @@ attempting to read a novel while blind reported "you can't read the mystic
 don't let life draining reduce a monster's max HP below its level + 1
 report "<Mon> expires" rather than "<Mon> dies" if polymorphed hero kills a
 	non-living monster (golem, vortex) with life drain (vampire bite)
+allow hero in silver-hating form to ring the silver bell but only if on/over
+	the vibrating square
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
